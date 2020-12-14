@@ -16,7 +16,7 @@ in mkDerivation {
     curl fasd fzf htop jq lzma time vim wget which
     libmysqlclient libpcap libressl 
     cacert chromedriver geckodriver mariadb 
-    docker glances
+    docker glances google-chrome
   ] ++ lib.optionals isDarwin [
     apple_sdk.AppKit apple_sdk.ApplicationServices apple_sdk.CoreServices
     apple_sdk.Foundation apple_sdk.Security xcodebuild
