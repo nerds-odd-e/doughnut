@@ -25,6 +25,9 @@ hs_err_pid*
 # DB
 mysql/
 
-# java deps
+# java
 .gradle
+backend/build/
 
+# Jetbrains
+.idea
