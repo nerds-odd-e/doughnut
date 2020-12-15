@@ -9,14 +9,14 @@ in mkDerivation {
   MYSQL_HOME = builtins.getEnv "MYSQL_HOME";
   MYSQL_DATADIR = builtins.getEnv "MYSQL_DATADIR";
   buildInputs = [
-    nodejs yarn jdk14 gradle jetbrains.idea-community
+    nodejs yarn jdk14 gradle
     autoconf coreutils-full gcc gnumake gnupg
     git git-secret gitAndTools.delta
     binutils-unwrapped pkg-config
     curl fasd fzf htop jq lzma time vim wget which
     libmysqlclient libpcap libressl 
     cacert chromedriver geckodriver mariadb 
-    docker glances chromium
+    docker glances
   ] ++ lib.optionals isDarwin [
     apple_sdk.AppKit apple_sdk.ApplicationServices apple_sdk.CoreServices
     apple_sdk.Foundation apple_sdk.Security xcodebuild

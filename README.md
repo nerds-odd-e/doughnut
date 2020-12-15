@@ -15,8 +15,6 @@ Create a nix config file in ~/.config/nixpkgs/config.nix with content:
 { allowUnfree = true; }
 ```
 
-<<<<<<< HEAD
-=======
 
 nix-shell --pure
->>>>>>> a1d0272 (readme)
+
