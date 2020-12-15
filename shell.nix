@@ -22,7 +22,7 @@ in mkDerivation {
     apple_sdk.Foundation apple_sdk.Security xcodebuild
   ];
   shellHook = ''
-    export JAVA_HOME="${pkgs.jdk14}/lib/openjdk"
+    export JAVA_HOME="${pkgs.jdk14}"
     export PATH=$PATH:$JAVA_HOME/bin
     export MYSQL_BASEDIR=${pkgs.mariadb}
     export MYSQL_HOME="''${MYSQL_HOME:-''$PWD/mysql}"
