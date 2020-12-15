@@ -9,7 +9,7 @@ in mkDerivation {
   MYSQL_HOME = builtins.getEnv "MYSQL_HOME";
   MYSQL_DATADIR = builtins.getEnv "MYSQL_DATADIR";
   buildInputs = [
-    nodejs yarn jdk14 gradle
+    nodejs yarn jdk14 gradle 
     autoconf coreutils-full gcc gnumake gnupg
     git git-secret gitAndTools.delta
     binutils-unwrapped pkg-config
@@ -20,6 +20,8 @@ in mkDerivation {
   ] ++ lib.optionals isDarwin [
     apple_sdk.AppKit apple_sdk.ApplicationServices apple_sdk.CoreServices
     apple_sdk.Foundation apple_sdk.Security xcodebuild
+  ] ++ lib.optionals (!isDarwin) [
+    jetbrains.idea-community
   ];
   shellHook = ''
     export JAVA_HOME="${pkgs.jdk14}"
