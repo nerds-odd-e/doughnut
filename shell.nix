@@ -16,7 +16,7 @@ in mkDerivation {
     curl fasd fzf htop jq lzma time vim wget which
     libmysqlclient libpcap libressl 
     cacert chromedriver geckodriver mariadb 
-    docker glances
+    docker glances sops
   ] ++ lib.optionals isDarwin [
     apple_sdk.AppKit apple_sdk.ApplicationServices apple_sdk.CoreServices
     apple_sdk.Foundation apple_sdk.Security xcodebuild
@@ -32,6 +32,11 @@ in mkDerivation {
 
     export MYSQL_UNIX_PORT=$MYSQL_HOME/mysql.sock
     export MYSQL_PID_FILE=$MYSQL_HOME/mysql.pid
+
+    # to import environment variables defined in env.sh
+    set -a
+    source env.sh
+    set +a
 
     echo "#######################################################################"
     echo ">>>>> MYSQL_HOME: $MYSQL_HOME "
