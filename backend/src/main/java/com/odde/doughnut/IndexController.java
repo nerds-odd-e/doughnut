@@ -10,9 +10,10 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 public class IndexController {
     @GetMapping("/")
     public String home(@AuthenticationPrincipal OAuth2User user, Model model) {
-        if(user != null) {
-            model.addAttribute("name", user.getAttribute("name"));
+        if(user == null) {
+            return "login";
         }
+        model.addAttribute("name", user.getAttribute("name"));
         return "index";
     }
 }

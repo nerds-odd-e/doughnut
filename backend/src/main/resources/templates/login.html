@@ -2,10 +2,12 @@
 <html lang="en">
 <head th:replace="fragments/basic_layout :: head"/>
 <body>
-<div th:replace="fragments/basic_layout :: header"/>
 
-<div class="container">
-    <p th:text="'Hello, ' + ${name} + '!'"/>
+<div class="jumbotron jumbotron-fluid">
+    <div class="container">
+        <h1 class="display-4">Welcome to Doughnut!!!</h1>
+        <p>Please <a href="/oauth2/authorization/github">login with Github</a>.</p>
+    </div>
 </div>
 
 <div th:replace="fragments/basic_layout :: footer"/>
