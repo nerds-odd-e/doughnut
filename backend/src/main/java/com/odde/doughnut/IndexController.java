@@ -1,15 +1,16 @@
 package com.odde.doughnut;
 
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-
-import java.util.Map;
+import org.springframework.security.oauth2.core.user.OAuth2User;
 
 @Controller
 public class IndexController {
     @GetMapping("/")
-    public String home(Map<String, Object> model) {
-        model.put("name", "Nut, Doe");
+    public String home(@AuthenticationPrincipal OAuth2User user, Model model) {
+        model.addAttribute("name", user.getAttribute("name"));
         return "index";
     }
 }
