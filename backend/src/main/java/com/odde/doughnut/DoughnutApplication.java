@@ -21,6 +21,9 @@ public class DoughnutApplication extends WebSecurityConfigurerAdapter {
                         .antMatchers("/", "/error").permitAll()
                         .anyRequest().authenticated()
                 )
+                .logout(l -> l
+                        .logoutSuccessUrl("/").permitAll()
+                )
                 .exceptionHandling(e -> e
                         .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
                 )

@@ -6,6 +6,12 @@
 </head>
 <body>
 <h1>Doughnut</h1>
+
+<p>Please <a href="/oauth2/authorization/github">login</a>.</p>
 <p th:text="'Hello, ' + ${name} + '!'" />
+
+<form th:action="@{/logout}" method="post">
+    <input type="submit" value="Logout" />
+</form>
 </body>
 </html>
