@@ -14,6 +14,7 @@ public class IndexController {
             return "login";
         }
         model.addAttribute("name", user.getAttribute("name"));
+        model.addAttribute("user_details", user.toString());
         return "index";
     }
 }

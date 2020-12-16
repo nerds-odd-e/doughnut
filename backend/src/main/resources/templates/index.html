@@ -6,6 +6,8 @@
 
 <div class="container">
     <p th:text="'Hello, ' + ${name} + '!'"/>
+    <p>And here's what we know about you...</p>
+    <samp th:text="${user_details}"/>
 </div>
 
 <div th:replace="fragments/basic_layout :: footer"/>
