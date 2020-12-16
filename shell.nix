@@ -10,18 +10,22 @@ in mkDerivation {
   MYSQL_DATADIR = builtins.getEnv "MYSQL_DATADIR";
   buildInputs = [
     nodejs yarn jdk14 gradle 
-    autoconf coreutils-full gcc gnumake gnupg
+    autoconf automake coreutils-full gcc gnumake gnupg
     git git-secret gitAndTools.delta
     binutils-unwrapped pkg-config
-    curl fasd fzf htop jq lzma time vim wget which
-    libmysqlclient libpcap libressl 
-    cacert chromedriver geckodriver mariadb 
-    docker glances sops
+    bat curl fasd fzf htop jq lzma time vim wget which
+    libmysqlclient libpcap libressl zsh
+    cacert mariadb docker glances sops
+    chromedriver geckodriver
   ] ++ lib.optionals isDarwin [
-    apple_sdk.AppKit apple_sdk.ApplicationServices apple_sdk.CoreServices
-    apple_sdk.Foundation apple_sdk.Security xcodebuild
+    darwin.apple_sdk.libs.utmp darwin.apple_sdk.libs.Xplugin
+    apple_sdk.AppKit apple_sdk.AGL apple_sdk.ApplicationServices apple_sdk.AudioToolbox
+    apple_sdk.AudioUnit apple_sdk.AVFoundation apple_sdk.Carbon apple_sdk.CoreAudio
+    apple_sdk.CoreGraphics apple_sdk.CoreMedia apple_sdk.CoreVideo apple_sdk.Cocoa apple_sdk.CoreServices apple_sdk.CoreText
+    apple_sdk.Foundation apple_sdk.ImageIO apple_sdk.IOKit apple_sdk.Kernel apple_sdk.MediaToolbox apple_sdk.OpenGL
+    apple_sdk.QTKit apple_sdk.Security apple_sdk.SystemConfiguration xcodebuild
   ] ++ lib.optionals (!isDarwin) [
-    jetbrains.idea-community
+    chromium jetbrains.idea-community
   ];
   shellHook = ''
     export JAVA_HOME="${pkgs.jdk14}"
@@ -60,6 +64,9 @@ EOF
     if [[ "$OSTYPE" == "darwin"* ]]; then
        export NIX_SSL_CERT_FILE=/etc/ssl/cert.pem
     fi
+
+    sleep 3s
+    mysql < $MYSQL_HOME/init_doughnut_db.sql
 
     cleanup()
     {
