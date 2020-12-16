@@ -18,7 +18,7 @@ public class DoughnutApplication extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http
                 .authorizeRequests(a -> a
-                        .antMatchers("/", "/error").permitAll()
+                        .antMatchers("/", "/error", "/webjars/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .logout(l -> l
