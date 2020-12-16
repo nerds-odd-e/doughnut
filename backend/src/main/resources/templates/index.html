@@ -1,22 +1,14 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-    <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/4.0.0-2/css/bootstrap.min.css} "/>
-</head>
+<head th:replace="fragments/basic_layout :: head"/>
 <body>
+<div th:replace="fragments/basic_layout :: header"/>
 <h1>Doughnut</h1>
 
 <p>Please <a href="/oauth2/authorization/github">login</a>.</p>
-<p th:text="'Hello, ' + ${name} + '!'" />
+<p th:text="'Hello, ' + ${name} + '!'"/>
 
-<form th:action="@{/logout}" method="post">
-    <input type="submit" value="Logout" />
-</form>
-
-<script th:src="@{/webjars/jquery/3.0.0/jquery.min.js}"></script>
-<script th:src="@{/webjars/popper.js/1.12.9-1/umd/popper.min.js}"></script>
-<script th:src="@{/webjars/bootstrap/4.0.0-2/js/bootstrap.min.js}"></script>
+<div th:replace="fragments/basic_layout :: footer"/>
+<div th:replace="fragments/basic_layout :: foot"/>
 </body>
 </html>
