@@ -4,6 +4,11 @@ spring:
     username: doughnut
     password: doughnut
     driver-class-name: org.mariadb.jdbc.Driver
+  flyway:
+    clean-on-validation-error: true
+  jpa:
+    generate-ddl: false
+    show-sql: true
   security:
     oauth2:
       client:
