@@ -1,4 +1,6 @@
 spring:
+  profiles:
+    active: dev
   datasource:
     url: jdbc:mariadb://localhost:3306/doughnut_development
     username: doughnut
@@ -16,3 +18,26 @@ spring:
           github:
             clientId: ${OAUTH2.github_client_id}
             clientSecret: ${OAUTH2.github_client_secret}
+
+---
+spring:
+  config:
+    activate:
+      on-profile: test
+  datasource:
+    url: jdbc:mariadb://localhost:3306/doughnut_test
+    username: doughnut
+    password: doughnut
+    driver-class-name: org.mariadb.jdbc.Driver
+  flyway:
+    clean-on-validation-error: true
+  jpa:
+    generate-ddl: false
+    show-sql: true
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+            clientId: ${OAUTH2.github_client_id}
+clientSecret: ${OAUTH2.github_client_secret}
