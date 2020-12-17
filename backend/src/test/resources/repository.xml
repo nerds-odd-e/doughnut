@@ -16,7 +16,7 @@
     </context:component-scan>
 
     <bean id="dataSource" class="org.mariadb.jdbc.MariaDbDataSource">
-        <property name="url" value="jdbc:mariadb://localhost:3306/doughnut_development" />
+        <property name="url" value="jdbc:mariadb://localhost:3306/doughnut_test" />
         <property name="user" value="doughnut" />
         <property name="password" value="doughnut" />
     </bean>
