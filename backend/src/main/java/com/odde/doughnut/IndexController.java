@@ -10,8 +10,12 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 
 @Controller
 public class IndexController {
-    @Autowired
-    private NoteRepository noteRepository;
+    private final NoteRepository noteRepository;
+
+    public IndexController(NoteRepository noteRepository) {
+
+        this.noteRepository = noteRepository;
+    }
 
     @GetMapping("/")
     public String home(@AuthenticationPrincipal OAuth2User user, Model model) {
