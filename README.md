@@ -25,13 +25,14 @@ sh <(curl -L https://nixos.org/nix/install) --daemon
 
 2. Setup and run doughnut for the first time
 
-    clone this repo
-    run `nix-shell --pure`
-    run `idea-community &`
-    open doughnut project in idea
-    click import gradle project
-    wait for deps resolution
-    run `cd backend`
-    run `gradle bootRun`
-    open `localhost:8080`
-
+```text
+clone this repo
+run `nix-shell --pure`
+run `idea-community &`
+open doughnut project in idea
+click import gradle project
+wait for deps resolution
+run `cd backend`
+run `gradle bootRun`
+open `localhost:8080`
+```
