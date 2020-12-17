@@ -37,3 +37,8 @@ cd backend
 gradle bootRun
 # open localhost:8080
 ```
+
+3. Setup and run doughnut with migrations in 'test' profile
+```bash
+gradle bootRun --args='--spring.profiles.active=test'
+```

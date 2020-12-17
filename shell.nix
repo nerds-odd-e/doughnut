@@ -12,7 +12,7 @@ in mkDerivation {
     nodejs yarn jdk14 gradle 
     autoconf automake coreutils-full gcc gnumake gnupg
     git git-secret gitAndTools.delta
-    binutils-unwrapped pkg-config
+    binutils-unwrapped pkg-config tree ncdu
     bat curl fasd fzf htop jq lzma time vim wget which
     libmysqlclient libpcap libressl zsh
     cacert mariadb docker glances sops
