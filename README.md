@@ -35,14 +35,14 @@ idea-community &
 # click import gradle project
 #wait for deps resolution
 cd backend
-gradle bootRun --args="--spring.profiles.active=dev"
+./gradlew bootRun --args="--spring.profiles.active=dev"
 # open localhost:8080
 ```
 
 ### 3. Setup and run doughnut with migrations in 'test' profile
 TODO: MAKE MIGRATIONS RUN BEFORE TEST
 ```bash
-gradle bootRun --args='--spring.profiles.active=test'
+./gradlew bootRun --args='--spring.profiles.active=test'
 ```
 
 ### 4. Create gcloud compute instance

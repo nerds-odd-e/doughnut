@@ -9,7 +9,7 @@ in mkDerivation {
   MYSQL_HOME = builtins.getEnv "MYSQL_HOME";
   MYSQL_DATADIR = builtins.getEnv "MYSQL_DATADIR";
   buildInputs = [
-    nodejs yarn jdk14 gradle 
+    nodejs yarn jdk14
     autoconf automake coreutils-full gcc gnumake gnupg
     git git-secret gitAndTools.delta
     binutils-unwrapped pkg-config tree ncdu
