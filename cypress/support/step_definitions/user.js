@@ -5,6 +5,14 @@ Given('There is a Github user with', (data) => {
 });
 
 When('I login using Github account {string} successfully', (email) => {
+  cy.visit('/');
+
+  cy.get('a')
+    .contains('login with Github')
+    .then(($a) => {
+      const url = $a.prop('href')
+      cy.request(({url: url, followRedirect: false})).its('redirectedToUrl').should('contain', 'https://github.com/login/oauth/authorize')
+    })
 });
 
 When('I should be asked to create my profile', () => {
