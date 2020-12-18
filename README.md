@@ -42,3 +42,21 @@ gradle bootRun
 ```bash
 gradle bootRun --args='--spring.profiles.active=test'
 ```
+
+4. Create gcloud compute instance
+```
+gcloud compute instances create doughnut-instance \
+  --image-family debian-10 \
+  --image-project debian-cloud \
+  --machine-type g1-small \
+  --scopes "userinfo-email,cloud-platform" \
+  --metadata-from-file startup-script=instance-startup.sh \
+  --metadata BUCKET=dough-01 \
+  --zone us-east1-b \
+  --tags http-server
+```
+
+5. Check gcloud compute instance startup logs
+```
+gcloud compute instances get-serial-port-output doughnut-instance --zone us-east1-b
+```
