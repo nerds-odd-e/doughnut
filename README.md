@@ -6,7 +6,7 @@ Doughnut is a Personal Knowledge Management ([PKM](https://en.wikipedia.org/wiki
 
 ## Getting started
 
-1. Install nix
+### 1. Install nix
 
 Find instruction at nixos.org (multi-user installation).
 
@@ -23,7 +23,8 @@ sh <(curl -L https://nixos.org/nix/install) --daemon
 (NB: if the install script fails to add sourcing of `nix.sh` in `.bashrc` or `.profile`, you can do it manually `source /etc/profile.d/nix.sh`)
 
 
-2. Setup and run doughnut for the first time
+### 2. Setup and run doughnut for the first time
+The default spring profile is 'test' unless you explicitly set it to 'dev'. Tip: Add `--args="--spring.profiles.active={profile}"` to gradle task command. 
 
 ```bash
 git clone $this_repo
@@ -34,16 +35,17 @@ idea-community &
 # click import gradle project
 #wait for deps resolution
 cd backend
-gradle bootRun
+gradle bootRun --args="--spring.profiles.active=dev"
 # open localhost:8080
 ```
 
-3. Setup and run doughnut with migrations in 'test' profile
+### 3. Setup and run doughnut with migrations in 'test' profile
+TODO: MAKE MIGRATIONS RUN BEFORE TEST
 ```bash
 gradle bootRun --args='--spring.profiles.active=test'
 ```
 
-4. Create gcloud compute instance
+### 4. Create gcloud compute instance
 ```
 gcloud compute instances create doughnut-instance \
   --image-family debian-10 \
