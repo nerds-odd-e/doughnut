@@ -15,10 +15,12 @@
 <!--        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller" />-->
     </context:component-scan>
 
+    <context:property-placeholder location="classpath:db-test.properties" />
+
     <bean id="dataSource" class="org.mariadb.jdbc.MariaDbDataSource">
-        <property name="url" value="jdbc:mariadb://localhost:3306/doughnut_test" />
-        <property name="user" value="doughnut" />
-        <property name="password" value="doughnut" />
+        <property name="url" value="${db.url}" />
+        <property name="user" value="${db.user}" />
+        <property name="password" value="${db.password}" />
     </bean>
     <bean id="emf"
           class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
