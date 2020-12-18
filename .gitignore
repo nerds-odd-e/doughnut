@@ -31,3 +31,6 @@ backend/build/
 
 # Jetbrains
 .idea
+
+# nodes
+node_modules/

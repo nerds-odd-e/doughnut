@@ -1,0 +1,11 @@
+{
+  "name": "doughnut",
+  "version": "1.0.0",
+  "main": "index.js",
+  "repository": "https://github.com/nerds-odd-e/doughnut.git",
+  "author": "Terry Yin <terry.yinzhe@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "cypress": "^6.1.0"
+  }
+}
