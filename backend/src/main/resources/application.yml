@@ -40,4 +40,6 @@ spring:
         registration:
           github:
             clientId: ${OAUTH2.github_client_id}
-clientSecret: ${OAUTH2.github_client_secret}
+            clientSecret: ${OAUTH2.github_client_secret}
+server:
+  port: 8081
