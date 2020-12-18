@@ -19,6 +19,6 @@
   },
 
   "cypress-cucumber-preprocessor": {
-    "nonGlobalStepDefinitions": true
+    "nonGlobalStepDefinitions": false
   }
 }
