@@ -6,6 +6,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.ui.Model;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
 @SpringBootTest
@@ -18,7 +19,7 @@ class DoughnutApplicationTests {
 	void contextLoads() {
 		Model model = mock(Model.class);
 
-		controller.home(null, model);
+		assertEquals("login", controller.home(null, model));
 	}
 
 }

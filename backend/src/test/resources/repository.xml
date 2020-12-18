@@ -33,7 +33,7 @@
         </property>
 
         <property name="persistenceProvider">
-            <bean class="org.hibernate.jpa.HibernatePersistenceProvider"></bean>
+            <bean class="org.hibernate.jpa.HibernatePersistenceProvider"/>
         </property>
 
     </bean>

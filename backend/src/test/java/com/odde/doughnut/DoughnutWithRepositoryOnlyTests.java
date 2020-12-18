@@ -29,7 +29,6 @@ class DoughnutWithRepositoryOnlyTests {
         note.setTitle("sss");
         noteRepository.save(note);
         assertEquals(1, noteRepository.count());
-
     }
 
 }
