@@ -58,7 +58,30 @@ gcloud compute instances create doughnut-instance \
   --tags http-server
 ```
 
-5. Check gcloud compute instance startup logs
+### 5. Check gcloud compute instance startup logs
 ```
 gcloud compute instances get-serial-port-output doughnut-instance --zone us-east1-b
 ```
+
+### 6. End-to-End Test / Features / Cucumber / SbE / ATDD
+
+We use cucumber + cypress + Java library to do end to end test.
+
+#### Commands
+
+| purpose | command |
+|--------| --------|
+| run all e2e test | `yarn test`   |
+| run cypress IDE  | `yarn cy:open`|
+| start SUT (system under test)| `yarn sut` (Not needed for yarn test)|
+
+#### Structure
+
+| purpose | location |
+|--------| --------|
+| feature files | `/cypress/integration/**`   |
+| step definitions  | `/cypress/support/step_definitions`|
+
+#### How to
+
+The Cypress+Cucumber tests are written in JavaScript.
