@@ -1,5 +1,7 @@
 package com.odde.doughnut;
 
+import com.odde.doughnut.models.Note;
+import com.odde.doughnut.repositories.NoteRepository;
 import com.odde.doughnut.testability.DBCleaner;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,9 +26,15 @@ class IndexControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
+    @Autowired
+    private NoteRepository noteRepository;
+
     @Test
     void serving_notes() throws Exception {
+        Note note = new Note();
+        note.setTitle("Kaki is...");
+        noteRepository.save(note);
         this.mockMvc.perform(get("/")).andDo(print()).andExpect(status().isOk())
-                .andExpect(content().string(containsString("Serving 0 notes since the beginning of the universe.")));
+                .andExpect(content().string(containsString("Serving 1 notes since the beginning of the universe.")));
     }
 }
