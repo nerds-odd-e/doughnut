@@ -14,8 +14,8 @@ in mkDerivation {
     git git-secret gitAndTools.delta
     binutils-unwrapped pkg-config tree ncdu
     bat curl fasd fzf htop jq lzma time vim wget which
-    libmysqlclient libpcap libressl zsh
-    cacert mariadb docker glances sops
+    libmysqlclient libpcap libressl fish pulumi-bin
+    cacert mariadb docker glances
     chromedriver geckodriver
   ] ++ lib.optionals isDarwin [
     darwin.apple_sdk.libs.utmp darwin.apple_sdk.libs.Xplugin
@@ -60,6 +60,7 @@ GRANT ALL PRIVILEGES ON doughnut_development.* TO 'doughnut'@'localhost';
 GRANT ALL PRIVILEGES ON doughnut_test.* TO 'doughnut'@'localhost';
 EOF
 
+    export GPG_TTY=$(tty)
     export NIX_SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
     if [[ "$OSTYPE" == "darwin"* ]]; then
        export NIX_SSL_CERT_FILE=/etc/ssl/cert.pem
@@ -67,6 +68,8 @@ EOF
 
     sleep 3s
     mysql < $MYSQL_HOME/init_doughnut_db.sql
+    fish
+    export GPG_TTY='(tty)'
 
     cleanup()
     {
