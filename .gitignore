@@ -35,3 +35,8 @@ backend/build/
 
 # nodes
 node_modules/
+
+# git-secret
+.gitsecret/keys/random_seed
+!*.secret
+env.sh

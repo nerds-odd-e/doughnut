@@ -45,7 +45,37 @@ TODO: MAKE MIGRATIONS RUN BEFORE TEST
 ./gradlew bootRun --args='--spring.profiles.active=test'
 ```
 
-### 4. Create gcloud compute instance
+### 4. Secrets via [git-secret](https://git-secret.io) and [GnuPG](https://www.devdungeon.com/content/gpg-tutorial)
+#### Generate your local GnuPG key
+- Generate your GnuPG key 4096 bits key using your odd-e.com email address with no-expiry (option 0 in dialog): `gpg --full-generate-key`
+- Export your GnuPG public key: `gpg --export <your_email>@odd-e.com --armor > <your_email>_public_gpg_key.gpg`
+- Copy and paste your GnuPG public key file from above step into dough/secrets_public_keys dir
+#### Add a new user's GnuPG public key to local dev machine key-ring for git-secret for team secrets collaboration
+- Add public key to local GnuPG key-ring: `gpg --import public_keys/<your_email>_public_gpg_key.gpg`
+- Add user to git-secret managed list of users: `git secret tell <your_email>@odd-e.com`
+- Re-encrypt all managed secret files: `git secret hide`
+#### List who are list of users managed by git-secret and allowed to encrypt/decrypt those files
+- Short list of user emails of managed users: `git secret whoknows`
+- List of user emails with expiration info of managed users: `git secret whoknows -l`
+#### Removes a user from list of git-secret managed users (e.g. user should no longer be allowed access to list of secrets)
+- `git secret killperson <user_to_be_removed_email>@odd-e.com`
+#### Add a new file for git-secret to manage
+- Remove sensitive file from git: `git rm --cached <the_secret_file>`
+- Tell git-secret to manage the file (auto add to .gitignore and update stuff in .gitsecret dir): `git secret add <the_secret_file>`
+- Encrypt the file (need to reveal and hide for changes in list of users in dough/secrets_public_keys dir_): `git secret hide`
+#### View diff of git-secret managed files
+- `git secret changes -p <your__gpg_passphrase>`
+#### List all git-secret managed files
+- `git secret list`
+#### Remove a git-secret file from git-secret management (make sure you reveal/decrypt it before doing this!!!)
+- Just remove file from git-secret management but leaves it on the filesystem: `git secret remove <your__no_longer_secret_file>`
+- Remove an encrypted file from git-secret management and permanently delete it from filesystem (make sure you have revealed/decrypted the file): `git secret remove -c <your_no_longer_secret_file>`
+#### Reveal all git-secret managed encrypted files
+- Upon hitting `enter/return` for each decrypt command below, enter secret passphrase you used when you generated your GnuPG key-pair.
+- Decrypt secrets to local filesystem: `git secret reveal`
+- Decrypt secrets to stdout: `git secret cat`
+
+### 5. Create gcloud compute instance
 ```
 gcloud compute instances create doughnut-instance \
   --image-family debian-10 \
@@ -58,12 +88,12 @@ gcloud compute instances create doughnut-instance \
   --tags http-server
 ```
 
-### 5. Check gcloud compute instance startup logs
+### 6. Check gcloud compute instance startup logs
 ```
 gcloud compute instances get-serial-port-output doughnut-instance --zone us-east1-b
 ```
 
-### 6. End-to-End Test / Features / Cucumber / SbE / ATDD
+### 7. End-to-End Test / Features / Cucumber / SbE / ATDD
 
 We use cucumber + cypress + Java library to do end to end test.
 

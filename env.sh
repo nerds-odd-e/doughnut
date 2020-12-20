@@ -1,2 +1,0 @@
-export OAUTH2_github_client_id=d43b61dc9d393ad8ac81
-export OAUTH2_github_client_secret=56fa09646a0cde44ce85e22872f548aef3eb5d13
