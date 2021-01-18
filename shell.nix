@@ -4,19 +4,22 @@ with stdenv;
 let
   apple_sdk = darwin.apple_sdk.frameworks;
   nodejs = nodejs-15_x;
+  jdk = jdk11;
+  intellij = jetbrains.idea-community;
 in mkDerivation {
   name = "doughnut";
   MYSQL_HOME = builtins.getEnv "MYSQL_HOME";
   MYSQL_DATADIR = builtins.getEnv "MYSQL_DATADIR";
   buildInputs = [
-    nodejs yarn jdk14
+    gradle nodejs yarn jdk
     autoconf automake coreutils-full gcc gnumake gnupg
     git git-secret gitAndTools.delta
     binutils-unwrapped pkg-config tree ncdu
-    bat curl fasd fzf htop jq lzma time vim wget which
-    libmysqlclient libpcap libressl fish pulumi-bin
+    bat curl duf fasd fzf htop jq lzma time vim wget which
+    libmysqlclient libpcap libressl fish terragrunt
     cacert mariadb docker glances
     chromedriver geckodriver
+    vscodium
   ] ++ lib.optionals isDarwin [
     darwin.apple_sdk.libs.utmp darwin.apple_sdk.libs.Xplugin
     apple_sdk.AppKit apple_sdk.AGL apple_sdk.ApplicationServices apple_sdk.AudioToolbox
@@ -25,10 +28,10 @@ in mkDerivation {
     apple_sdk.Foundation apple_sdk.ImageIO apple_sdk.IOKit apple_sdk.Kernel apple_sdk.MediaToolbox apple_sdk.OpenGL
     apple_sdk.QTKit apple_sdk.Security apple_sdk.SystemConfiguration xcodebuild
   ] ++ lib.optionals (!isDarwin) [
-    chromium jetbrains.idea-community
+    chromium firefox intellij terraform-full
   ];
   shellHook = ''
-    export JAVA_HOME="${pkgs.jdk14}"
+    export JAVA_HOME="${pkgs.jdk}"
     export PATH=$PATH:$JAVA_HOME/bin
     export MYSQL_BASEDIR=${pkgs.mariadb}
     export MYSQL_HOME="''${MYSQL_HOME:-''$PWD/mysql}"

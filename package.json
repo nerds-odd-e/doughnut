@@ -5,20 +5,20 @@
   "repository": "https://github.com/nerds-odd-e/doughnut.git",
   "author": "Terry Yin <terry.yinzhe@gmail.com>",
   "license": "MIT",
-  "dependencies": {
-    "cypress": "^6.1.0",
-    "cypress-cucumber-preprocessor": "^4.0.0",
-    "npm-run-all": "^4.1.5"
-  },
   "scripts": {
     "cy:open": "cypress open",
-    "cy:run": "cypress run",
-    "sut": "cd backend ; ./gradlew bootRun --args='--spring.profiles.active=test'",
-    "open": "run-p --race sut cy:open",
-    "test": "run-p --race sut cy:run"
+    "cy:run": "cypress run --headless",
+    "sut": "backend/gradlew bootRun -p backend --args='--spring.profiles.active=test'",
+    "open": "run-p -clnr sut cy:open",
+    "test": "run-p -clnr sut cy:run"
   },
-
   "cypress-cucumber-preprocessor": {
     "nonGlobalStepDefinitions": false
+  },
+  "devDependencies": {
+    "cypress": "^6.2.1",
+    "cypress-cucumber-preprocessor": "^4.0.0",
+    "npm-run-all": "^4.1.5",
+    "cdktf-cli": "^0.1.0-pre.163"
   }
 }

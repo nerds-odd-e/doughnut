@@ -12,7 +12,7 @@
 
 # Package Files #
 *.jar
-!gradle/wrapper/gradle-wrapper.jar
+!backend/gradle/wrapper/gradle-wrapper.jar
 *.war
 *.nar
 *.ear
@@ -35,8 +35,12 @@ backend/build/
 
 # nodes
 node_modules/
+cypress/videos/
 
 # git-secret
 .gitsecret/keys/random_seed
 !*.secret
 env.sh
+
+# VSCode
+**/*.code-workspace
