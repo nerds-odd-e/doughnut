@@ -14,10 +14,10 @@ in mkDerivation {
     gradle nodejs yarn jdk
     autoconf automake coreutils-full gcc gnumake gnupg
     git git-secret gitAndTools.delta
-    binutils-unwrapped pkg-config tree ncdu
+    binutils-unwrapped pkg-config tree
     bat curl duf fasd fzf htop jq lzma time vim wget which
     libmysqlclient libpcap libressl fish terragrunt
-    cacert mariadb docker glances
+    cacert mariadb glances
     chromedriver geckodriver
     vscodium
   ] ++ lib.optionals isDarwin [
