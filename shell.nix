@@ -13,7 +13,7 @@ in mkDerivation {
   buildInputs = [
     gradle nodejs yarn jdk
     any-nix-shell autoconf automake coreutils-full gcc gnumake gnupg
-    git git-secret gitAndTools.delta locale
+    git git-secret gitAndTools.delta locale less more most
     binutils-unwrapped hostname pkg-config tree
     bat curl duf fasd fzf htop jq lzma time vim wget which zsh
     libmysqlclient libpcap libressl terragrunt
