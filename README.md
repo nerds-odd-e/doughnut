@@ -10,19 +10,43 @@ Doughnut is a Personal Knowledge Management ([PKM](https://en.wikipedia.org/wiki
 
 Find instruction at nixos.org (multi-user installation).
 
-For macOS:
+#### For macOS:
 
 ```
  sh <(curl -L https://nixos.org/nix/install) --darwin-use-unencrypted-nix-store-volume
 ```
 
-For Linux:
+#### For Linux:
 
 ```
 sh <(curl -L https://nixos.org/nix/install) --daemon
 ```
 
 (NB: if the install script fails to add sourcing of `nix.sh` in `.bashrc` or `.profile`, you can do it manually `source /etc/profile.d/nix.sh`)
+
+_Install `any-nix-shell` for using `fish` or `zsh` in nix-shell_
+
+```
+nix-env -i any-nix-shell -f https://github.com/NixOS/nixpkgs/archive/master.tar.gz
+```
+
+##### `fish`
+
+Add the following to your _~/.config/fish/config.fish_.
+Create it if it doesn't exist.
+
+```
+any-nix-shell fish --info-right | source
+```
+
+##### `zsh`
+
+Add the following to your _~/.zshrc_.
+Create it if it doesn't exist.
+
+```
+any-nix-shell zsh --info-right | source /dev/stdin
+```
 
 ### 2. Setup and run doughnut for the first time
 
@@ -32,6 +56,7 @@ The default spring profile is 'test' unless you explicitly set it to 'dev'. Tip:
 git clone $this_repo
 cd doughnut
 nix-shell --pure
+# OR `nix-shell --pure --command "zsh"` if you want to drop down to zsh in nix-shell (uses your OS' ~/.zshrc)
 idea-community &
 # open doughnut project in idea
 # click import gradle project

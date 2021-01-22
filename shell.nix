@@ -12,12 +12,12 @@ in mkDerivation {
   MYSQL_DATADIR = builtins.getEnv "MYSQL_DATADIR";
   buildInputs = [
     gradle nodejs yarn jdk
-    autoconf automake coreutils-full gcc gnumake gnupg
-    git git-secret gitAndTools.delta
-    binutils-unwrapped pkg-config tree
-    bat curl duf fasd fzf htop jq lzma time vim wget which
-    libmysqlclient libpcap libressl fish terragrunt
-    cacert mariadb glances
+    any-nix-shell autoconf automake coreutils-full gcc gnumake gnupg
+    git git-secret gitAndTools.delta locale
+    binutils-unwrapped hostname pkg-config tree
+    bat curl duf fasd fzf htop jq lzma time vim wget which zsh
+    libmysqlclient libpcap libressl terragrunt
+    cacert mariadb glances zsh-powerlevel10k
     chromedriver geckodriver
     vscodium
   ] ++ lib.optionals isDarwin [
@@ -71,7 +71,6 @@ EOF
 
     sleep 3s
     mysql < $MYSQL_HOME/init_doughnut_db.sql
-    fish
     export GPG_TTY='(tty)'
 
     cleanup()
