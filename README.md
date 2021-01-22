@@ -60,12 +60,11 @@ nix-shell --pure
 idea-community &
 # open doughnut project in idea
 # click import gradle project
-#wait for deps resolution
-cd backend
+# wait for deps resolution
 # restore gradle wrapper if missing (still require OS gradle bin see [Missing GradleWrapperMain ClassNotFoundException](https://stackoverflow.com/questions/29805622/could-not-find-or-load-main-class-org-gradle-wrapper-gradlewrappermain))
 gradle wrapper --gradle-version 6.7.1 --distribution-type all
-./gradlew bootRun --args="--spring.profiles.active=dev"
-# open localhost:8080
+backend/gradlew bootRun -p backend --args="--spring.profiles.active=dev"
+# open localhost:8080 in your browser
 ```
 
 ### 3. Setup and run doughnut with migrations in 'test' profile
