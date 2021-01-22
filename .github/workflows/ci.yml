@@ -29,15 +29,17 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
+      - uses: getong/mariadb-action@v1.1
+        with:
+          mysql database: "doughnut_test"
+          mysql user: ${{ secrets.DBUSER }}
+          mysql password: ${{ secrets.DBPASSWORD }}
       - uses: actions/setup-java@v1
         with:
           java-version: 11
-      - uses: eskatos/gradle-command-action@v1
+      - uses: borales/actions-yarn@2.0.0
         with:
-          build-root-directory: backend
-          wrapper-directory: backend
-          arguments: bootRun --args='--spring.profiles.active=test'
-      - uses: cypress-io/github-action@v2
+          cmd: install
+      - uses: borales/actions-yarn@2.0.0
         with:
-          browser: chrome
-          headless: true
+          cmd: test
