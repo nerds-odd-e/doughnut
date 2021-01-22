@@ -1,37 +1,36 @@
 # This workflow will build a package using Gradle and then publish it to GitHub packages when a release is created
 # For more information see: https://github.com/actions/setup-java#publishing-using-gradle
 
-name: Gradle Package
+name: Run gradle build and yarn test on push
 
 on:
-  release:
-    types: [created]
+  push:
+    branches:
+      - main
 
 jobs:
   build:
-    runs-on: debian-10
+    runs-on: debian-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up JDK 11.0
-      uses: actions/setup-java@v1
-      with:
-        java-version: 11.0
-        server-id: github # Value of the distributionManagement/repository/id field of the pom.xml
-        settings-path: ${{ github.workspace }} # location for the settings.xml file
+      - name: Set up JDK 11.0
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - name: runs gradle build with gradle wrapper in backend/gradle/wrapper dir
+      - uses: eskatos/gradle-command-action@v1
+        with:
+          build-root-directory: backend
+          wrapper-directory: backend/gradle/wrapper
+          arguments: build --args='--spring.profiles.active=test'
 
-    - name: Build with Gradle
-      run: backend/gradlew build -p backend --args='--spring.profiles.active=test'
-
-    # The USERNAME and TOKEN need to correspond to the credentials environment variables used in
-    # the publishing section of your build.gradle
-    - name: Run end-to-end tests
-      run: npm i -g yarn && yarn && yarn run test
-
-    # The USERNAME and TOKEN need to correspond to the credentials environment variables used in
-    # the publishing section of your build.gradle
-    #- name: Publish to GitHub Packages
-    #  run: gradle publish
-    #  env:
-    #    USERNAME: ${{ github.actor }}
-    #    TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  cypress-run:
+    runs-on: debian-latest
+    steps:
+      - name: Run end-to-end tests
+      - uses: actions/checkout@v2
+      - uses: cypress-io/github-action@v2
+        with:
+          browser: chrome
+          headless: true
