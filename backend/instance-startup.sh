@@ -15,7 +15,7 @@ gsutil cp gs://${BUCKET}/${ARTIFACT}-${VERSION}.jar .
 apt-get update
 apt-get -y --force-yes install openjdk-11-jdk mariadb-server mariadb-client mariadb-backup gnupg
 
-# Make Java 8 default
+# Make Java 11 default
 update-alternatives --set java /usr/lib/jvm/java-11-openjdk-amd64/jre/bin/java
 
 # Start server
