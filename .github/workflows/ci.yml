@@ -11,7 +11,7 @@ on:
 jobs:
   build:
     name: Gradle Build
-    runs-on: debian-latest
+    runs-on: ubuntu-20.04
 
     steps:
       - uses: actions/checkout@v2
@@ -26,7 +26,7 @@ jobs:
 
   cypress-run:
     name: Cypress e2e tests
-    runs-on: debian-latest
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
       - uses: cypress-io/github-action@v2
