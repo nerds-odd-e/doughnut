@@ -12,7 +12,6 @@ jobs:
     name: Cypress e2e tests
     runs-on: ubuntu-20.04
     steps:
-      - name: Checkout code & init mariadb & start springboot app & run cypress test suite
       - uses: actions/checkout@v2
       - uses: getong/mariadb-action@v1.1
         with:
@@ -31,9 +30,8 @@ jobs:
           install-command: yarn --frozen-lockfile
           wait-on: "http://localhost:8081"
           start: yarn test
-      - name: Build notification
-        if: always()
       - uses: adamkdean/simple-slack-notify@master
+        if: always()
         with:
           channel: "#dough"
           status: ${{ job.status }}
