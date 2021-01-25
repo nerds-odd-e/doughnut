@@ -14,7 +14,7 @@ in mkDerivation {
     gradle nodejs yarn jdk
     any-nix-shell autoconf automake coreutils-full gcc gnumake gnupg
     git git-secret gitAndTools.delta locale less more most
-    binutils-unwrapped hostname pkg-config tree
+    binutils-unwrapped hostname pkg-config tree rsync ssh
     bat curl duf fasd fzf htop jq lzma time vim wget which zsh
     libmysqlclient libpcap libressl terragrunt
     cacert mariadb glances zsh-powerlevel10k
