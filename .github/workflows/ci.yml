@@ -1,12 +1,9 @@
 # This workflow will build a package using Gradle and then publish it to GitHub packages when a release is created
 # For more information see: https://github.com/actions/setup-java#publishing-using-gradle
 
-name: Run gradle build and yarn test on push
+name: Run e2e test suite on every push to any branch
 
-on:
-  push:
-    branches:
-      - main
+on: push
 
 jobs:
   cypress-run:
@@ -29,5 +26,5 @@ jobs:
       - uses: cypress-io/github-action@v2
         with:
           install-command: yarn --frozen-lockfile
-          start: yarn test
           wait-on: "http://localhost:8081"
+          start: yarn test
