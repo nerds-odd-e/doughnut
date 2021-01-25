@@ -14,11 +14,11 @@ in mkDerivation {
     gradle nodejs yarn jdk
     any-nix-shell autoconf automake coreutils-full gcc gnumake gnupg
     git git-secret gitAndTools.delta locale less more most
-    binutils-unwrapped hostname pkg-config tree rsync ssh
+    binutils-unwrapped hostname openssh pkg-config rsync tree
     bat curl duf fasd fzf htop jq lzma time vim wget which zsh
     libmysqlclient libpcap libressl terragrunt
     cacert mariadb glances zsh-powerlevel10k
-    chromedriver geckodriver
+    chromedriver geckodriver google-cloud-sdk
     vscodium
   ] ++ lib.optionals isDarwin [
     darwin.apple_sdk.libs.utmp darwin.apple_sdk.libs.Xplugin
