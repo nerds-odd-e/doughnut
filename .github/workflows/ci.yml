@@ -22,7 +22,7 @@ jobs:
         with:
           build-root-directory: backend
           wrapper-directory: backend
-          arguments: build --args='--spring.profiles.active=test'
+          arguments: build -Dspring.profiles.active=test
 
   cypress-run:
     name: Cypress e2e tests
@@ -39,6 +39,6 @@ jobs:
           java-version: 11
       - uses: cypress-io/github-action@v2
         with:
-          install-command: yarn --frozen-lockfile --silent
-          command: yarn test
-          wait-on: "http://localhost:8080"
+          install-command: yarn --frozen-lockfile
+          start: yarn test
+          wait-on: "http://localhost:8081"

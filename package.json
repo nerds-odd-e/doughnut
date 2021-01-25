@@ -8,7 +8,7 @@
   "scripts": {
     "cy:open": "cypress open",
     "cy:run": "cypress run --headless",
-    "sut": "backend/gradlew bootRun -p backend --args='--spring.profiles.active=test'",
+    "sut": "backend/gradlew bootRun -p backend -Dspring.profiles.active=test",
     "open": "run-p -clnr sut cy:open",
     "test": "run-p -clnr sut cy:run"
   },
