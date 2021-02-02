@@ -74,7 +74,7 @@ backend/gradlew bootRun -p backend --args="--spring.profiles.active=dev"
 TODO: MAKE MIGRATIONS RUN BEFORE TEST
 
 ```bash
-./gradlew bootRun --args='--spring.profiles.active=test'
+backend/gradlew -p backend bootRun --args='--spring.profiles.active=test'
 ```
 
 ### 4. Secrets via [git-secret](https://git-secret.io) and [GnuPG](https://www.devdungeon.com/content/gpg-tutorial)
@@ -127,22 +127,12 @@ TODO: MAKE MIGRATIONS RUN BEFORE TEST
 
 ### 5. Create gcloud compute instance
 
-```
-gcloud compute instances create doughnut-instance \
-  --image-family debian-10 \
-  --image-project debian-cloud \
-  --machine-type g1-small \
-  --scopes "userinfo-email,cloud-platform" \
-  --metadata-from-file startup-script=instance-startup.sh \
-  --metadata BUCKET=dough-01 \
-  --zone us-east1-b \
-  --tags http-server
-```
+[Create App Server in GCloud Compute](backend/scripts/create-gcloud-app-compute.sh)
 
 ### 6. Check gcloud compute instance startup logs
 
 ```
-gcloud compute instances get-serial-port-output doughnut-instance --zone us-east1-b
+gcloud compute instances get-serial-port-output doughnut-app-instance --zone us-east1-b
 ```
 
 ### 7. End-to-End Test / Features / Cucumber / SbE / ATDD
