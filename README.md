@@ -82,7 +82,12 @@ backend/gradlew -p backend bootRun --args='--spring.profiles.active=test'
 #### Generate your local GnuPG key
 
 - Generate your GnuPG key 4096 bits key using your odd-e.com email address with no-expiry (option 0 in dialog): `gpg --full-generate-key`
-- Export your GnuPG public key: `gpg --export <your_email>@odd-e.com --armor > <your_email>_public_gpg_key.gpg`
+- Export your GnuPG public key:
+
+```
+gpg --export <your_email>@odd-e.com --armor > <your_email>_public_gpg_key.gpg
+```
+
 - Copy and paste your GnuPG public key file from above step into dough/secrets_public_keys dir
 
 #### Add a new user's GnuPG public key to local dev machine key-ring for git-secret for team secrets collaboration
