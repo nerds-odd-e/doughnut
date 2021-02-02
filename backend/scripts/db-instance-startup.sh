@@ -51,4 +51,4 @@ GRANT ALL PRIVILEGES ON doughnut.* TO 'doughnut'@'localhost';
 FLUSH PRIVILEGES;
 EOF
 
-sudo mysql -uroot -p${MYSQL_ROOT_PASSWORD} <init_doughnut_db.sql
+sudo mysql -uroot -p${MYSQL_ROOT_PASSWORD} < init_doughnut_db.sql

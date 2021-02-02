@@ -29,8 +29,7 @@ MYSQL_PASSWORD=$(curl "https://secretmanager.googleapis.com/v1/projects/${PROJEC
 	jq -r ".payload.data" | base64 --decode)
 
 # define db-server entry pointing to IP address of mariadb instance
-echo "10.142.0.18	db-server" >>/etc/hosts
+echo "10.142.0.18	db-server" >> /etc/hosts
 
 # Start server
-echo ${MYSQL_PASSWORD}
 java -jar -Dspring-boot.run.profiles=prod -Dspring.datasource.password=${MYSQL_PASSWORD} ${ARTIFACT}-${VERSION}.jar
