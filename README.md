@@ -1,5 +1,7 @@
 # Doughnut
 
+![Run e2e test suite on every push to any branch](https://github.com/nerds-odd-e/doughnut/workflows/Run%20e2e%20test%20suite%20on%20every%20push%20to%20any%20branch/badge.svg)
+
 ## About
 
 Doughnut is a Personal Knowledge Management ([PKM](https://en.wikipedia.org/wiki/Personal_knowledge_management)) tool combining [zettelkasten](https://eugeneyan.com/writing/note-taking-zettelkasten/) style of knowledge capture with some features to enhance learning (spaced-repetition, smart reminders) and ability to share knowledge bits with other people (for buddy/team learning).
