@@ -1,10 +1,24 @@
 # Doughnut
 
-![Run e2e test suite on every push to any branch](https://github.com/nerds-odd-e/doughnut/workflows/Run%20e2e%20test%20suite%20on%20every%20push%20to%20any%20branch/badge.svg)
+![dough CI CD](https://github.com/nerds-odd-e/doughnut/workflows/dough%20CI%20CD/badge.svg)
 
 ## About
 
 Doughnut is a Personal Knowledge Management ([PKM](https://en.wikipedia.org/wiki/Personal_knowledge_management)) tool combining [zettelkasten](https://eugeneyan.com/writing/note-taking-zettelkasten/) style of knowledge capture with some features to enhance learning (spaced-repetition, smart reminders) and ability to share knowledge bits with other people (for buddy/team learning).
+
+### Tech Stack
+- [OpenJDK 11](https://openjdk.java.net/projects/jdk/11/)
+- [Spring Boot](https://spring.io/projects/spring-boot)
+- [Thymeleaf](https://www.thymeleaf.org/)
+- [Gradle](https://gradle.org/)
+- [MariaDB](https://mariadb.org/)
+- [Google Cloud](https://cloud.google.com/gcp/getting-started)
+- [Traefik](https://traefik.io/)
+- [Nix](https://nixos.org/)
+- [Cypress](https://www.cypress.io/)
+- [NodeJS](https://nodejs.org/en/)
+- [Github](https://github.com/nerds-odd-e/doughnut)
+- [Github Actions](https://docs.github.com/en/actions)
 
 ## Getting started
 

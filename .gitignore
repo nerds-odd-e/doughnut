@@ -44,3 +44,6 @@ env.sh
 
 # VSCode
 **/*.code-workspace
+
+# asdf
+.tool-versions

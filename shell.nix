@@ -11,15 +11,15 @@ in mkShell {
   MYSQL_HOME = builtins.getEnv "MYSQL_HOME";
   MYSQL_DATADIR = builtins.getEnv "MYSQL_DATADIR";
   buildInputs = [
-    gradle nodejs yarn jdk python3
+    gradle nodejs yarn jdk python3 zsh zsh-powerlevel10k
     any-nix-shell autoconf automake coreutils-full gcc gnumake gnupg
-    git git-secret gitAndTools.delta locale most neovim vim
-    binutils-unwrapped hostname openssh pkg-config rsync tree
-    bat duf fasd fzf htop jq lzma progress wget which zsh
+    git git-secret gitAndTools.delta locale lsd platinum-searcher most
+    binutils-unwrapped hostname inetutils openssh pkg-config rsync
+    bat duf fasd fzf htop jq lsof lzma progress ripgrep tree wget which
     libmysqlclient libpcap libressl
-    cacert mariadb glances zsh-powerlevel10k
+    cacert curlie glances httpie mariadb python38Packages.pip
     chromedriver geckodriver google-cloud-sdk
-    vscodium
+    vim vimPlugins.nerdtree vimPlugins.nvimdev-nvim vimPlugins.spacevim vscodium
   ] ++ lib.optionals stdenv.isDarwin [
     darwin.apple_sdk.libs.utmp darwin.apple_sdk.libs.Xplugin
     apple_sdk.AppKit apple_sdk.AGL apple_sdk.ApplicationServices apple_sdk.AudioToolbox
