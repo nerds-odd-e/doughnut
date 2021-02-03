@@ -1,34 +1,34 @@
 { pkgs ? import <nixpkgs> {} }:
 with pkgs;
-with stdenv;
 let
+  inherit (pkgs) stdenv;
   apple_sdk = darwin.apple_sdk.frameworks;
   nodejs = nodejs-15_x;
   jdk = jdk11;
   intellij = jetbrains.idea-community;
-in mkDerivation {
+in mkShell {
   name = "doughnut";
   MYSQL_HOME = builtins.getEnv "MYSQL_HOME";
   MYSQL_DATADIR = builtins.getEnv "MYSQL_DATADIR";
   buildInputs = [
-    gradle nodejs yarn jdk
+    gradle nodejs yarn jdk python3
     any-nix-shell autoconf automake coreutils-full gcc gnumake gnupg
-    git git-secret gitAndTools.delta locale less more most
+    git git-secret gitAndTools.delta locale most neovim vim
     binutils-unwrapped hostname openssh pkg-config rsync tree
-    bat curl duf fasd fzf htop jq lzma time vim wget which zsh
-    libmysqlclient libpcap libressl terragrunt
+    bat duf fasd fzf htop jq lzma progress wget which zsh
+    libmysqlclient libpcap libressl
     cacert mariadb glances zsh-powerlevel10k
     chromedriver geckodriver google-cloud-sdk
     vscodium
-  ] ++ lib.optionals isDarwin [
+  ] ++ lib.optionals stdenv.isDarwin [
     darwin.apple_sdk.libs.utmp darwin.apple_sdk.libs.Xplugin
     apple_sdk.AppKit apple_sdk.AGL apple_sdk.ApplicationServices apple_sdk.AudioToolbox
     apple_sdk.AudioUnit apple_sdk.AVFoundation apple_sdk.Carbon apple_sdk.CoreAudio
     apple_sdk.CoreGraphics apple_sdk.CoreMedia apple_sdk.CoreVideo apple_sdk.Cocoa apple_sdk.CoreServices apple_sdk.CoreText
     apple_sdk.Foundation apple_sdk.ImageIO apple_sdk.IOKit apple_sdk.Kernel apple_sdk.MediaToolbox apple_sdk.OpenGL
     apple_sdk.QTKit apple_sdk.Security apple_sdk.SystemConfiguration xcodebuild
-  ] ++ lib.optionals (!isDarwin) [
-    chromium firefox intellij terraform-full
+  ] ++ lib.optionals (!stdenv.isDarwin) [
+    chromium firefox google-chrome intellij
   ];
   shellHook = ''
     export JAVA_HOME="${pkgs.jdk}"
