@@ -1,6 +1,5 @@
 # Doughnut
 
-## Github Actions Status Badge
 ![Run e2e test suite on every push to any branch](https://github.com/nerds-odd-e/doughnut/workflows/Run%20e2e%20test%20suite%20on%20every%20push%20to%20any%20branch/badge.svg)
 
 ## About
