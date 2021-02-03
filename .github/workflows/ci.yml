@@ -23,7 +23,7 @@ jobs:
           java-version: 11
       - uses: cypress-io/github-action@v2
         with:
-          install-command: yarn --frozen-lockfile
+          install-command: yarn
           wait-on: "http://localhost:8081"
           start: yarn test
       - uses: adamkdean/simple-slack-notify@master
