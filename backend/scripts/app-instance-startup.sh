@@ -9,6 +9,7 @@ ARCH="linux_amd64"
 TRAEFIK_VERSION="v2.4.2"
 
 echo "Project ID: ${PROJECTID} Bucket: ${BUCKET}"
+echo "Hello"
 
 # Get the files we need
 mkdir -p /opt/doughnut_app
