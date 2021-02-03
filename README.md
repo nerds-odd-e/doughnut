@@ -132,7 +132,8 @@ gpg --export <your_email>@odd-e.com --armor > <your_email>_public_gpg_key.gpg
 
 ### 5. Create gcloud compute instance
 
-[Create App Server in GCloud Compute](backend/scripts/create-gcloud-app-compute.sh)
+- [Install `Google Cloud SDK`](https://cloud.google.com/sdk/docs/install)
+- [Create App Server in GCloud Compute](backend/scripts/create-gcloud-app-compute.sh)
 
 ### 6. Check gcloud compute instance startup logs
 

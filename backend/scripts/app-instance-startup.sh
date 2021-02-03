@@ -29,15 +29,20 @@ tar -zxvf /opt/traefik/traefik_${TRAEFIK_VERSION}_${ARCH}.tar.gz -C /opt/traefik
 
 # traefik static toml config
 cat <<'EOF' > /opt/traefik/traefik.toml
-defaultEntryPoints = ["http"]
-
 [entryPoints]
   [entryPoints.web]
     address = ":80"
+    [entryPoints.websecure]
+      address = ":443"
+        [entryPoints.websecure.http.tls]
+          certResolver = "leresolver"
+          [[entryPoints.websecure.http.tls.domains]]
+            main = "odd-e.com"
 
 [providers]
   [providers.file]
-    directory = /opt/traefik/dynamic/conf"
+    directory = "/opt/traefik/dynamic/conf"
+    watch = true
 EOF
 
 # traefik dynamic toml config
@@ -46,7 +51,7 @@ cat <<'EOF' > /opt/traefik/dynamic/conf/dynamic.toml
   [http.routers]
     # Define a connection between requests and services
     [http.routers.to-doughnut-app]
-      rule = "Host(`localhost`) && PathPrefix(`/`)"
+      rule = "Host(`dough.odd-e.com`) || Host(`35.237.98.250`) && PathPrefix(`/`)"
       # If the rule matches, applies the middleware
       # If the rule matches, forward to the doughnut-app service
       service = "doughnut-app"
