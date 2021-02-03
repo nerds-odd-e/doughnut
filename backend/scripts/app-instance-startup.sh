@@ -22,11 +22,13 @@ apt-get -y install jq openjdk-11-jdk gnupg gnupg-agent mariadb-client mariadb-ba
 update-alternatives --set java /usr/lib/jvm/java-11-openjdk-amd64/jre/bin/java
 
 # Download and setup traefik-v2
-mkdir -p /opt/traefik/{logs,dynamic/conf}
-curl -sL https://github.com/traefik/traefik/releases/download/${TRAEFIK_VERSION}/traefik_${TRAEFIK_VERSION}_${ARCH}.tar.gz > /opt/traefik/traefik_${TRAEFIK_VERSION}_${ARCH}.tar.gz | tar xz -C /opt/traefik/
+mkdir -p /opt/traefik/logs
+mkdir -p /opt/traefik/dynamic/conf
+curl -sL https://github.com/traefik/traefik/releases/download/${TRAEFIK_VERSION}/traefik_${TRAEFIK_VERSION}_${ARCH}.tar.gz > /opt/traefik/traefik_${TRAEFIK_VERSION}_${ARCH}.tar.gz
+tar -zxvf /opt/traefik/traefik_${TRAEFIK_VERSION}_${ARCH}.tar.gz -C /opt/traefik/
 
 # traefik static toml config
-cat <<'EOF' >/opt/traefik/traefik.toml
+cat <<'EOF' > /opt/traefik/traefik.toml
 defaultEntryPoints = ["http"]
 
 [entryPoints]
@@ -39,7 +41,7 @@ defaultEntryPoints = ["http"]
 EOF
 
 # traefik dynamic toml config
-cat <<'EOF' >/opt/traefik/dynamic/conf/dynamic.toml
+cat <<'EOF' > /opt/traefik/dynamic/conf/dynamic.toml
 [http]
   [http.routers]
     # Define a connection between requests and services
