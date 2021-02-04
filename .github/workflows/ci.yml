@@ -12,8 +12,8 @@ jobs:
     name: Unit & E2E tests
     runs-on: ubuntu-20.04
     steps:
-      - uses: getong/mariadb-action@v1.1
       - name: Set up MariaDB with doughnut_test database
+        uses: getong/mariadb-action@v1.1
         with:
           mysql database: "doughnut_test"
           mysql user: ${{ secrets.DBUSER }}
@@ -26,14 +26,14 @@ jobs:
           architecture: x64
       - name: Unit tests with Gradle
         run: backend/gradlew -p backend test
-      - uses: cypress-io/github-action@v2
       - name: E2E tests with Cypress
+        uses: cypress-io/github-action@v2
         with:
           install-command: yarn
           wait-on: "http://localhost:8081"
           start: yarn test
-      - uses: adamkdean/simple-slack-notify@master
       - name: Slack notify dough channel of CI results
+        uses: adamkdean/simple-slack-notify@master
         if: always()
         with:
           channel: "#dough"
