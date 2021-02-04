@@ -33,7 +33,7 @@ jobs:
           java-version: 11
           architecture: x64
       - name: Unit tests with Gradle
-        run: backend/gradlew -p backend test -Dspring.datasource.url='jdbc:mysql://mariadb:3306/doughnut_test'
+        run: backend/gradlew -p backend test -Dspring.datasource.url='jdbc:mysql://localhost:3306/doughnut_test'
       - name: E2E tests with Cypress
         uses: cypress-io/github-action@v2
         with:
