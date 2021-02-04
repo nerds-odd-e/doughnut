@@ -19,7 +19,7 @@ function for_build_status(url, action) {
             body.match(/check_suite_\d+/).shift(),
             body.match(/This workflow run ([^\.]+\.)/).pop(),
             body.match(/aria\-label\=\"Run \d+ of[^\>]+\>(.*)\<\/a\>/).pop()
-            );
+        );
       }
     });
 }
