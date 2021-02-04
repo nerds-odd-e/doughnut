@@ -8,60 +8,39 @@ env:
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
 jobs:
-  gradle:
-    name: Unit tests
+  unit-e2e-tests-run:
+    name: Unit & E2E tests
     runs-on: ubuntu-20.04
     steps:
       - uses: getong/mariadb-action@v1.1
+      - name: Set up MariaDB with doughnut_test database
         with:
           mysql database: "doughnut_test"
           mysql user: ${{ secrets.DBUSER }}
           mysql password: ${{ secrets.DBPASSWORD }}
       - uses: actions/checkout@v2
-      - uses: actions/setup-java@v1
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
         with:
           java-version: 11
-      - uses: eskatos/gradle-command-action@v1
-        with:
-          build-root-directory: backend
-          wrapper-directory: backend
-          arguments: test
-      - uses: adamkdean/simple-slack-notify@master
-        if: always()
-        with:
-          channel: "#dough"
-          status: ${{ job.status }}
-          success_text: "dough CI Unit Tests (#${env.GITHUB_RUN_NUMBER}) completed successfully"
-          failure_text: "dough CI Unit Tests (#${env.GITHUB_RUN_NUMBER}) failed"
-          cancelled_text: "dough CI Unit Tests (#${env.GITHUB_RUN_NUMBER}) was cancelled"
-          fields: |
-            [{ "title": "Action URL", "value": "${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/actions/runs/${env.GITHUB_RUN_ID}"}]
-   
-  cypress-run:
-    name: End-to-end tests
-    runs-on: ubuntu-20.04
-    steps:
-      - uses: actions/checkout@v2
-      - uses: getong/mariadb-action@v1.1
-        with:
-          mysql database: "doughnut_test"
-          mysql user: ${{ secrets.DBUSER }}
-          mysql password: ${{ secrets.DBPASSWORD }}
-      - uses: actions/setup-java@v1
-        with:
-          java-version: 11
+          architecture: x64
+      - name: Unit tests with Gradle
+        run: backend/gradlew -p backend test
       - uses: cypress-io/github-action@v2
+      - name: E2E tests with Cypress
         with:
           install-command: yarn
           wait-on: "http://localhost:8081"
           start: yarn test
       - uses: adamkdean/simple-slack-notify@master
+      - name: Slack notify dough channel of CI results
         if: always()
         with:
           channel: "#dough"
           status: ${{ job.status }}
-          success_text: "dough CI E2E Tests (#${env.GITHUB_RUN_NUMBER}) completed successfully"
-          failure_text: "dough CI E2E Tests (#${env.GITHUB_RUN_NUMBER}) failed"
-          cancelled_text: "dough CI E2E Tests (#${env.GITHUB_RUN_NUMBER}) was cancelled"
+          success_text: "dough CI Unit & E2E Tests (#${env.GITHUB_RUN_NUMBER}) completed successfully"
+          failure_text: "dough CI Unit & E2E Tests (#${env.GITHUB_RUN_NUMBER}) failed"
+          cancelled_text: "dough CI Unit & E2E Tests (#${env.GITHUB_RUN_NUMBER}) was cancelled"
           fields: |
             [{ "title": "Action URL", "value": "${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/actions/runs/${env.GITHUB_RUN_ID}"}]
+
