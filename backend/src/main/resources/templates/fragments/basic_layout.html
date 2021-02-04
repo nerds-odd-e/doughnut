@@ -3,39 +3,49 @@
 <head th:fragment="head">
     <meta charset="UTF-8">
     <title>Title</title>
-    <link th:rel="stylesheet" th:href="@{/webjars/bootstrap/4.0.0-2/css/bootstrap.min.css} "/>
+    <link th:rel="stylesheet" th:href=
+    "@{/webjars/bootstrap/4.6.0/css/bootstrap.min.css}">
 </head>
 <body>
-<div th:fragment="header">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <a class="navbar-brand" href="#">Doughnut</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
-                aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-            <ul class="navbar-nav mr-auto">
-                <li class="nav-item active">
-                    <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
-                </li>
-            </ul>
-            <form class="form-inline my-2 my-lg-0" th:action="@{/logout}" method="post">
-                <input class="btn btn-outline-success my-2 my-sm-0" type="submit" value="Logout"/>
-            </form>
-        </div>
-    </nav>
-</div>
-
-<div th:fragment="footer">
-    <div class="footer-copyright text-center py-3">
-        &copy; 2021 Odd-e.com
+    <div th:fragment="header">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+            <a class="navbar-brand" href="#">Doughnut</a>
+            <button class="navbar-toggler" type="button"
+            data-toggle="collapse" data-target=
+            "#navbarSupportedContent" aria-controls=
+            "navbarSupportedContent" aria-expanded="false"
+            aria-label="Toggle navigation"><span class=
+            "navbar-toggler-icon"></span></button>
+            <div class="collapse navbar-collapse" id=
+            "navbarSupportedContent">
+                <ul class="navbar-nav mr-auto">
+                    <li class="nav-item active">
+                        <a class="nav-link" href="#">Home
+                        <span class="sr-only">(current)</span></a>
+                    </li>
+                </ul>
+                <form class="form-inline my-2 my-lg-0" th:action=
+                "@{/logout}" method="post">
+                    <input class=
+                    "btn btn-outline-success my-2 my-sm-0" type=
+                    "submit" value="Logout">
+                </form>
+            </div>
+        </nav>
     </div>
-</div>
+    <div th:fragment="footer">
+        <div class="footer-copyright text-center py-3">
+            © 2021 Odd-e.com
+        </div>
+    </div>
+    <div th:fragment="foot">
+        <script th:src=
+        "@{/webjars/jquery/3.0.0/jquery.min.js}"></script>
+        <script th:src=
+        "@{/webjars/popper.js/1.12.9-1/umd/popper.min.js}"></script>
 
-<div th:fragment="foot">
-    <script th:src="@{/webjars/jquery/3.0.0/jquery.min.js}"></script>
-    <script th:src="@{/webjars/popper.js/1.12.9-1/umd/popper.min.js}"></script>
-    <script th:src="@{/webjars/bootstrap/4.0.0-2/js/bootstrap.min.js}"></script>
-</div>
+        <script th:src=
+        "@{/webjars/bootstrap/4.0.0-2/js/bootstrap.min.js}"></script>
+    </div>
 </body>
 </html>
