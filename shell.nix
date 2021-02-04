@@ -1,7 +1,11 @@
-{ pkgs ? import <nixpkgs> { allowUnfree=true; allowUnsupportedSystem=true; } }:
+{ pkgs ? import <nixpkgs> { } }:
 with pkgs;
 let
   inherit (pkgs) stdenv;
+  allowConfig = config.nixpkgs.config {
+    allowUnfree=true;
+    allowUnsupportedSystem=true;
+  };
   apple_sdk = darwin.apple_sdk.frameworks;
   nodejs = nodejs-15_x;
   jdk = jdk11;
