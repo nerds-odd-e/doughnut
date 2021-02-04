@@ -38,8 +38,8 @@ jobs:
         with:
           java-version: 11
           architecture: x64
-      #- name: Unit tests with Gradle
-      #  run: backend/gradlew -p backend test -Dspring.profiles.active=test
+      - name: Unit tests with Gradle
+        run: backend/gradlew -p backend test -Dspring.profiles.active=test
       - name: E2E tests with Cypress
         uses: cypress-io/github-action@v2
         with:
