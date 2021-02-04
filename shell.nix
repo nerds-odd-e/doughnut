@@ -1,4 +1,4 @@
-{ pkgs ? import <nixpkgs> {} }:
+{ pkgs ? import <nixpkgs> { allowUnfree=true; allowUnsupportedSystem=true; } }:
 with pkgs;
 let
   inherit (pkgs) stdenv;
