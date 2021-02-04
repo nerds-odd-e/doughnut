@@ -13,6 +13,11 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
+      - uses: getong/mariadb-action@v1.1
+        with:
+          mysql database: "doughnut_test"
+          mysql user: ${{ secrets.DBUSER }}
+          mysql password: ${{ secrets.DBPASSWORD }}
       - uses: actions/setup-java@v1
         with:
           java-version: 11
