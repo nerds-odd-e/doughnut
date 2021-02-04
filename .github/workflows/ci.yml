@@ -23,8 +23,8 @@ jobs:
           - 3306
         options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=5
     steps:
-      - name: Set up MariaDB Client in host
-        run: sudo apt-get update && sudo apt-get install -y mariadb-client
+      #- name: Set up MariaDB Client in host
+      #  run: sudo apt-get update && sudo apt-get install -y mariadb-client
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Set up JDK 11
@@ -33,7 +33,7 @@ jobs:
           java-version: 11
           architecture: x64
       - name: Unit tests with Gradle
-        run: backend/gradlew -p backend test -Dspring.datasource.url='jdbc:mysql://localhost:3306/doughnut_test'
+        run: backend/gradlew -p backend test -Dspring.datasource.url='jdbc:mysql://mariadb:3306/doughnut_test'
       - name: E2E tests with Cypress
         uses: cypress-io/github-action@v2
         with:
