@@ -28,8 +28,7 @@ var lastStatus = [""];
 var lastBuild = [""];
 function soundMonitor() {
     for_build_status("https://github.com/nerds-odd-e/doughnut/actions", (currentBuild, currentStatus, gitLog)=>{
-        console.error(gitLog);
-        console.error(currentStatus);
+        console.error(gitLog + currentStatus);
         var toSay = "The build ";
         if (lastBuild[0] !== currentBuild) {
             lastBuild[0] = currentBuild;
