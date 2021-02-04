@@ -15,7 +15,11 @@ function for_build_status(url, action) {
         console.error(err)
       }
       else {
-        action(body.match(/check_suite_\d+/).shift(), body.match(/This workflow run[^\.]+\./).shift());
+        action(
+            body.match(/check_suite_\d+/).shift(),
+            body.match(/This workflow run ([^\.]+\.)/).pop(),
+            body.match(/aria\-label\=\"Run \d+ of[^\>]+\>(.*)\<\/a\>/).pop()
+            );
       }
     });
 }
@@ -23,15 +27,19 @@ function for_build_status(url, action) {
 var lastStatus = [""];
 var lastBuild = [""];
 function soundMonitor() {
-    for_build_status("https://github.com/nerds-odd-e/doughnut/actions", (currentBuild, currentStatus)=>{
+    for_build_status("https://github.com/nerds-odd-e/doughnut/actions", (currentBuild, currentStatus, gitLog)=>{
+        console.error(gitLog);
         console.error(currentStatus);
+        var toSay = "The build ";
         if (lastBuild[0] !== currentBuild) {
             lastBuild[0] = currentBuild;
             lastStatus[0] = "";
+            toSay = "A new push: " + gitLog;
         }
         if (lastStatus[0] !== currentStatus) {
-            say(currentStatus);
             lastStatus[0] = currentStatus;
+            toSay += currentStatus;
+            say(toSay);
         }
     });
 }
