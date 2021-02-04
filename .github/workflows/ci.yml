@@ -15,7 +15,6 @@ jobs:
       mysql:
         image: mariadb:10.5
         env:
-          MYSQL_HOST: localhost
           MYSQL_ROOT_PASSWORD: root
           MYSQL_USER: ${{ secrets.DBUSER }}
           MYSQL_PASSWORD: ${{ secrets.DBPASSWORD }}
@@ -33,7 +32,7 @@ jobs:
           java-version: 11
           architecture: x64
       - name: Unit tests with Gradle
-        run: backend/gradlew -p backend test
+        run: backend/gradlew -p backend test -Dspring.datasource.url='jdbc:mysql://mysql:3306/doughnut_test'
       - name: E2E tests with Cypress
         uses: cypress-io/github-action@v2
         with:
