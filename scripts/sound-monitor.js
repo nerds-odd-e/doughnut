@@ -23,10 +23,9 @@ function for_build_status(url, action) {
 var lastStatus = [""];
 var lastBuild = [""];
 function soundMonitor() {
-    for_build_status("https://github.com/nerds-odd-e/doughnut/actions?query=workflow%3A%22Run+e2e+test+suite+on+every+push+to+any+branch%22", (currentBuild, currentStatus)=>{
+    for_build_status("https://github.com/nerds-odd-e/doughnut/actions", (currentBuild, currentStatus)=>{
         console.error(currentStatus);
         if (lastBuild[0] !== currentBuild) {
-            say("Starting a new build.");
             lastBuild[0] = currentBuild;
             lastStatus[0] = "";
         }
