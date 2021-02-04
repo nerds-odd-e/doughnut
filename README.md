@@ -148,6 +148,10 @@ gpg --export <your_email>@odd-e.com --armor > <your_email>_public_gpg_key.gpg
 
 - [Install `Google Cloud SDK`](https://cloud.google.com/sdk/docs/install)
 - [Create App Server in GCloud Compute](backend/scripts/create-gcloud-app-compute.sh)
+- Login to gcloud sdk: `gcloud auth login`
+- Check your login: `gcloud auth list`
+- Set/Point to gcloud dough project: `gcloud config set project carbon-syntax-298809`
+- Check you can see the project as login user: `gcloud config list`
 
 ### 6. Check gcloud compute instance startup logs
 
