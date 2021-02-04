@@ -36,3 +36,31 @@ dependencies {
 test {
 	useJUnitPlatform()
 }
+
+tasks.register("bootRunProd") {
+  group = "application"
+    description = "Runs Doughnut SpringBoot application in prod profile"
+    doFirst {
+      tasks.bootRun.configure {
+        systemProperty("spring.profiles.active", "prod")
+        systemProperty("spring.datasource.url", "jdbc:mysql://db-server:3306/doughnut")
+        systemProperty("spring.datasource.username", "doughnut")
+        systemProperty("spring.datasource.username", "$System.env.MYSQL_PASSWORD")
+      }
+    }
+    finalizedBy("bootRun")
+}
+
+tasks.register("bootRunDev") {
+  group = "application"
+    description = "Runs Doughnut SpringBoot application in dev profile"
+    doFirst {
+      tasks.bootRun.configure {
+        systemProperty("spring.profiles.active", "dev")
+        systemProperty("spring.datasource.url", "jdbc:mysql://localhost:3306/doughnut_dev")
+        systemProperty("spring.datasource.username", "doughnut")
+        systemProperty("spring.datasource.username", "doughnut")
+      }
+    }
+    finalizedBy("bootRun")
+}
