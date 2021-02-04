@@ -30,7 +30,7 @@ jobs:
         with:
           mariadb-version: 10.5
       - name: Creates Test DB and associated DB user and privileges
-        run: mysqladmin create doughnut_test && mysql -e "CREATE USER 'doughnut'@'localhost' IDENTIFIED BY 'doughnut'; GRANT ALL PRIVILEGES ON doughnut_test.* TO 'doughnut'@'localhost'; FLUSH PRIVILEGES;"
+        run: mysqladmin create doughnut_test && mysql -e "CREATE USER 'doughnut'@'localhost' IDENTIFIED BY 'doughnut'; GRANT ALL PRIVILEGES ON doughnut_test.* TO 'runner'@'localhost'; GRANT ALL PRIVILEGES ON doughnut_test.* TO 'doughnut'@'localhost'; FLUSH PRIVILEGES;"
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Set up JDK 11
