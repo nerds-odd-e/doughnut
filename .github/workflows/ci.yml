@@ -10,7 +10,7 @@ env:
 jobs:
   unit-e2e-tests-run:
     name: Unit & E2E tests
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     services:
       mariadb-server:
         image: mariadb:10.3
