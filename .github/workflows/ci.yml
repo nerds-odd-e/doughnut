@@ -15,6 +15,7 @@ jobs:
       mysql:
         image: mariadb:10.5
         env:
+          MYSQL_ROOT_PASSWORD: root
           MYSQL_USER: ${{ secrets.DBUSER }}
           MYSQL_PASSWORD: ${{ secrets.DBPASSWORD }}
           MYSQL_DATABASE: doughnut_test
