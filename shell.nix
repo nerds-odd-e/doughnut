@@ -58,7 +58,7 @@ in mkShell {
     mariadbd --datadir=$MYSQL_DATADIR --pid-file=$MYSQL_PID_FILE --socket=$MYSQL_UNIX_PORT &
     export MYSQL_PID=$!
 
-cat <<EOF > backend/src/main/resources/db/init_doughnut_db.sql
+cat <<EOF > $MYSQL_HOME/init_doughnut_db.sql
 CREATE DATABASE IF NOT EXISTS doughnut_development DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE DATABASE IF NOT EXISTS doughnut_test        DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 SET PASSWORD FOR 'doughnut'@'localhost' = PASSWORD('doughnut');
@@ -79,6 +79,7 @@ EOF
 
     cleanup()
     {
+      rm -f $MYSQL_HOME/init_doughnut_db.sql
       mariadb-admin --socket=$MYSQL_UNIX_PORT shutdown
       wait $MYSQL_PID
       kill -9 $MYSQL_PID
