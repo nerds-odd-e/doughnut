@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       mariadb-server:
-        image: mariadb:latest
+        image: mariadb:10.3
         env:
           MYSQL_ROOT_PASSWORD: root
           MYSQL_USER: ${{ secrets.DBUSER }}
