@@ -32,6 +32,10 @@ cat <<'EOF' > /opt/traefik/traefik.toml
 [entryPoints]
   [entryPoints.web]
     address = ":80"
+      [entryPoints.web.http.redirections.entryPoint]
+        to = "websecure"
+        scheme = "https"
+        permanent = "true"
     [entryPoints.websecure]
       address = ":443"
         [entryPoints.websecure.http.tls]
