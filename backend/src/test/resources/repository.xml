@@ -27,7 +27,7 @@ xsi:schemaLocation="http://www.springframework.org/schema/jdbc http://www.spring
       <props>
         <prop key="hibernate.show_sql">false</prop>
         <prop key="hibernate.dialect">
-        org.hibernate.dialect.MariaDB103Dialect</prop>
+        org.hibernate.dialect.MariaDBDialect</prop>
       </props>
     </property>
     <property name="persistenceProvider">
