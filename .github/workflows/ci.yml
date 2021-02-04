@@ -11,26 +11,20 @@ jobs:
   unit-e2e-tests-run:
     name: Unit & E2E tests
     runs-on: ubuntu-20.04
-    #services:
-    #  mysql:
-    #    image: mariadb:10.5
-    #    env:
-    #      MYSQL_ROOT_PASSWORD: root
-    #      MYSQL_USER: ${{ secrets.DBUSER }}
-    #      MYSQL_PASSWORD: ${{ secrets.DBPASSWORD }}
-    #      MYSQL_DATABASE: doughnut_test
-    #    ports:
-    #      - 3306/tcp
-    #    options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=10s --health-retries=10
+    services:
+      mariadb:
+        image: mariadb:latest
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_USER: ${{ secrets.DBUSER }}
+          MYSQL_PASSWORD: ${{ secrets.DBPASSWORD }}
+          MYSQL_DATABASE: doughnut_test
+        ports:
+          - 3306
+        options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=5
     steps:
       - name: Set up MariaDB Client in host
-        run: sudo apt-get update && sudo apt-get install -y mysql-client
-      - name: Set up MariaDB 10.5 Server
-        uses: ankane/setup-mariadb@v1
-        with:
-          mariadb-version: 10.5
-      - name: Creates Test DB and associated DB user and privileges
-        run: mysqladmin create doughnut_test && mysql -e "CREATE USER 'doughnut'@'localhost' IDENTIFIED BY 'doughnut'; GRANT ALL PRIVILEGES ON doughnut_test.* TO 'doughnut'@'localhost';"
+        run: sudo apt-get update && sudo apt-get install -y mariadb-client
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Set up JDK 11
