@@ -8,6 +8,30 @@ env:
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
 jobs:
+  gradle:
+    name: Unit tests
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-java@v1
+        with:
+          java-version: 11
+      - uses: eskatos/gradle-command-action@v1
+        with:
+          gradle-version: 6.8.1
+          build-root-directory: backend
+          arguments: test
+      - uses: adamkdean/simple-slack-notify@master
+        if: always()
+        with:
+          channel: "#dough"
+          status: ${{ job.status }}
+          success_text: "dough CI Unit Tests (#${env.GITHUB_RUN_NUMBER}) completed successfully"
+          failure_text: "dough CI Unit Tests (#${env.GITHUB_RUN_NUMBER}) failed"
+          cancelled_text: "dough CI Unit Tests (#${env.GITHUB_RUN_NUMBER}) was cancelled"
+          fields: |
+            [{ "title": "Action URL", "value": "${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/actions/runs/${env.GITHUB_RUN_ID}"}]
+   
   cypress-run:
     name: End-to-end tests
     runs-on: ubuntu-20.04
@@ -31,8 +55,8 @@ jobs:
         with:
           channel: "#dough"
           status: ${{ job.status }}
-          success_text: "dough CI (#${env.GITHUB_RUN_NUMBER}) completed successfully"
-          failure_text: "dough CI (#${env.GITHUB_RUN_NUMBER}) failed"
-          cancelled_text: "dough CI (#${env.GITHUB_RUN_NUMBER}) was cancelled"
+          success_text: "dough CI E2E Tests (#${env.GITHUB_RUN_NUMBER}) completed successfully"
+          failure_text: "dough CI E2E Tests (#${env.GITHUB_RUN_NUMBER}) failed"
+          cancelled_text: "dough CI E2E Tests (#${env.GITHUB_RUN_NUMBER}) was cancelled"
           fields: |
             [{ "title": "Action URL", "value": "${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/actions/runs/${env.GITHUB_RUN_ID}"}]
