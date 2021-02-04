@@ -10,20 +10,26 @@ env:
 jobs:
   unit-e2e-tests-run:
     name: Unit & E2E tests
-    runs-on: ubuntu-18.04
-    services:
-      mariadb-server:
-        image: mariadb:10.3
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_USER: ${{ secrets.DBUSER }}
-          MYSQL_PASSWORD: ${{ secrets.DBPASSWORD }}
-          MYSQL_DATABASE: doughnut_test
-        ports:
-          - 3306
-        options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=5
+    runs-on: ubuntu-20.04
+    #services:
+    #  mariadb-server:
+    #    image: mariadb:10.3
+    #    env:
+    #      MYSQL_ROOT_PASSWORD: root
+    #      MYSQL_USER: ${{ secrets.DBUSER }}
+    #      MYSQL_PASSWORD: ${{ secrets.DBPASSWORD }}
+    #      MYSQL_DATABASE: doughnut_test
+    #    ports:
+    #      - 3306
+    #    options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=5
     steps:
-      - name: Set up MySQL Client in host
+      - name: Runs mariadb-server:latest in host
+        uses: getong/mariadb-action@v1.1
+        with:
+          mysql database: 'doughnut_test'
+          mysql user: ${{ secrets.DBUSER }}
+          mysql password: ${{ secrets.DBPASSWORD }}
+      - name: Installs MySQL Client in host
         run: sudo apt-get update && sudo apt-get install -y -f mysql-client
       - name: Checkout code
         uses: actions/checkout@v2
