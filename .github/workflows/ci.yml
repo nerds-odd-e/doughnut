@@ -23,8 +23,8 @@ jobs:
           java-version: 11
       - uses: eskatos/gradle-command-action@v1
         with:
-          gradle-version: 6.8.1
           build-root-directory: backend
+          wrapper-directory: backend/gradle/wrapper
           arguments: test
       - uses: adamkdean/simple-slack-notify@master
         if: always()
