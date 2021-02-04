@@ -26,6 +26,7 @@ jobs:
       - name: Runs mariadb-server:latest in host
         uses: getong/mariadb-action@v1.1
         with:
+          mariadb version: '10.2.36'
           mysql database: 'doughnut_test'
           mysql user: ${{ secrets.DBUSER }}
           mysql password: ${{ secrets.DBPASSWORD }}
