@@ -12,7 +12,7 @@ jobs:
     name: Unit & E2E tests
     runs-on: ubuntu-latest
     services:
-      mariadb:
+      mariadb-server:
         image: mariadb:latest
         env:
           MYSQL_ROOT_PASSWORD: root
@@ -23,8 +23,8 @@ jobs:
           - 3306
         options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=5
     steps:
-      #- name: Set up MariaDB Client in host
-      #  run: sudo apt-get update && sudo apt-get install -y mariadb-client
+      - name: Set up MariaDB Client in host
+        run: sudo apt-get update && sudo apt-get install -y -f mariadb-client
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Set up JDK 11
