@@ -6,6 +6,12 @@
 
 Doughnut is a Personal Knowledge Management ([PKM](https://en.wikipedia.org/wiki/Personal_knowledge_management)) tool combining [zettelkasten](https://eugeneyan.com/writing/note-taking-zettelkasten/) style of knowledge capture with some features to enhance learning (spaced-repetition, smart reminders) and ability to share knowledge bits with other people (for buddy/team learning).
 
+For more background info you can read:
+
+- <https://www.lesswrong.com/tag/scholarship-and-learning>
+- <https://en.m.wikipedia.org/wiki/Knowledge_Acquisition_and_Documentation_Structuring>
+
+
 ### Tech Stack
 - [OpenJDK 11](https://openjdk.java.net/projects/jdk/11/)
 - [Spring Boot](https://spring.io/projects/spring-boot)
