@@ -7,7 +7,8 @@ on: push
 env:
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   ARTIFACT: "doughnut"
-  VERSION: "0.0.1-SNAPSHOT" 
+  VERSION: "0.0.1-SNAPSHOT"
+  GCS_BUCKET: "dough-01"
 
 jobs:
   unit-e2e-tests-run:
@@ -40,12 +41,18 @@ jobs:
           start: yarn test
       - name: Build production application jar artifact
         run: backend/gradlew -p backend build -x test -Dspring.profiles.active=prod
+      - name: Setup Google Cloud SDK with Service Account
+        uses: google-github-actions/setup-gcloud@master
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_email: ${{ secrets.GCP_SA_EMAIL }}
+          service_account_key: ${{ secrets.GCP_SA_KEY }}
+          export_default_credentials: true
       - name: Upload production application jar to Google Cloud Storage
         uses: google-github-actions/upload-cloud-storage@main
         with:
-          credentials: ${{ secrets.GCP_CREDENTIALS }}
-          path: backend/build/libs/"${ARTIFACT}-${VERSION}"
-          destination: dough-01/"${ARTIFACT}-${VERSION}"
+          path: backend/build/libs/"${ARTIFACT}-${VERSION}.jar"
+          destination: "${GCS_BUCKET}/${ARTIFACT}-${VERSION}.jar"
       - name: Slack notify dough channel of CI results
         uses: adamkdean/simple-slack-notify@master
         if: always()
