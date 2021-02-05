@@ -23,18 +23,27 @@ xsi:schemaLocation="http://www.springframework.org/schema/jdbc http://www.spring
     <property name="packagesToScan"
     value="com.odde.doughnut.models" />
     <property name="dataSource" ref="dataSource" />
+    <property name="jpaVendorAdapter" ref="jpaVendorAdapter" />
+    <property name="persistenceUnitName" value="stadto" />
     <property name="jpaProperties">
       <props>
-        <prop key="show_sql">false</prop>
-        <!-- <prop key="dialect"> -->
+        <prop key="hibernate.show_sql">false</prop>
+        <!-- <prop key="hibernate.dialect"> -->
         <!-- org.hibernate.dialect.MariaDB103Dialect</prop> -->
-        <prop key="dialect">
-        org.hibernate.dialect.MySQL57Dialect</prop>
+        <prop key="hibernate.hbm2ddl.auto">create-drop</prop>
       </props>
     </property>
     <property name="persistenceProvider">
       <bean class="org.hibernate.jpa.HibernatePersistenceProvider" />
     </property>
+  </bean>
+  <bean id="jpaVendorAdapter"
+  class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
+
+    <property name="showSql" value="false" />
+    <property name="generateDdl" value="true" />
+    <property name="databasePlatform"
+    value="org.hibernate.dialect.MariaDB103Dialect" />
   </bean>
   <tx:annotation-driven transaction-manager="transactionManager" />
   <bean class="org.springframework.orm.jpa.JpaTransactionManager"
