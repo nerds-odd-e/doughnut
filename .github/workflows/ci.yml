@@ -51,8 +51,8 @@ jobs:
       - name: Upload production application jar to Google Cloud Storage
         uses: google-github-actions/upload-cloud-storage@main
         with:
-          path: backend/build/libs/"${ARTIFACT}-${VERSION}.jar"
-          destination: "${GCS_BUCKET}/${ARTIFACT}-${VERSION}.jar"
+          path: backend/build/libs/doughnut-0.0.1-SNAPSHOT.jar
+          destination: dough-01/doughnut-0.0.1-SNAPSHOT.jar
       - name: Slack notify dough channel of CI results
         uses: adamkdean/simple-slack-notify@master
         if: always()
