@@ -25,8 +25,8 @@ xsi:schemaLocation="http://www.springframework.org/schema/jdbc http://www.spring
     <property name="dataSource" ref="dataSource" />
     <property name="jpaProperties">
       <props>
-        <prop key="hibernate.show_sql">false</prop>
-        <prop key="hibernate.dialect">
+        <prop key="show_sql">false</prop>
+        <prop key="dialect">
         org.hibernate.dialect.MariaDB103Dialect</prop>
       </props>
     </property>
