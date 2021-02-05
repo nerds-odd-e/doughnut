@@ -23,7 +23,7 @@ jobs:
     #      - 3306
     #    options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=5
     steps:
-      - name: Runs mariadb-server:latest in host
+      - name: Runs mariadb-server:10.3.27 in host
         uses: getong/mariadb-action@v1.1
         with:
           mariadb version: '10.3.27'
@@ -31,7 +31,7 @@ jobs:
           mysql user: ${{ secrets.DBUSER }}
           mysql password: ${{ secrets.DBPASSWORD }}
       - name: Installs MySQL Client in host
-        run: sudo apt-get update && sudo apt-get install -y -f mariadb-10.3 libmariadb3 mariadb-client-10.3
+        run: sudo apt-get update && sudo apt-get install -y -f libmariadb3 mariadb-client-10.3
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Set up JDK 11
