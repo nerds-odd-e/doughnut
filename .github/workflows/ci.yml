@@ -31,7 +31,7 @@ jobs:
           mysql user: ${{ secrets.DBUSER }}
           mysql password: ${{ secrets.DBPASSWORD }}
       - name: Installs MySQL Client in host
-        run: sudo apt-get update && sudo apt-get install -y -f libmariadb3 mariadb-client-10.3
+        run: sudo apt-get update && sudo apt-get install -y -f libmysqlclient mariadb-client-10.3
       - name: Checkout code
         uses: actions/checkout@v2
       - name: Set up JDK 11
