@@ -26,9 +26,10 @@ xsi:schemaLocation="http://www.springframework.org/schema/jdbc http://www.spring
     <property name="jpaProperties">
       <props>
         <prop key="show_sql">false</prop>
+        <!-- <prop key="dialect"> -->
+        <!-- org.hibernate.dialect.MariaDB103Dialect</prop> -->
         <prop key="dialect">
-        org.hibernate.dialect.MariaDB103Dialect</prop>
-        <prop key="ddl-auto">create-drop</prop>
+        org.hibernate.dialect.MySQL57Dialect</prop>
       </props>
     </property>
     <property name="persistenceProvider">

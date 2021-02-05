@@ -74,7 +74,7 @@ EOF
     fi
 
     sleep 3s
-    mysql < backend/src/main/resources/db/init_doughnut_db.sql
+    mysql < $MYSQL_HOME/init_doughnut_db.sql
     export GPG_TTY='(tty)'
 
     cleanup()
