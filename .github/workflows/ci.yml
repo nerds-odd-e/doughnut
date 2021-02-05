@@ -11,17 +11,6 @@ jobs:
   unit-e2e-tests-run:
     name: Unit & E2E tests
     runs-on: ubuntu-20.04
-    #services:
-    #  mariadb-server:
-    #    image: mariadb:10.3
-    #    env:
-    #      MYSQL_ROOT_PASSWORD: root
-    #      MYSQL_USER: ${{ secrets.DBUSER }}
-    #      MYSQL_PASSWORD: ${{ secrets.DBPASSWORD }}
-    #      MYSQL_DATABASE: doughnut_test
-    #    ports:
-    #      - 3306
-    #    options: --health-cmd="mysqladmin ping" --health-interval=5s --health-timeout=2s --health-retries=5
     steps:
       - name: Runs mariadb-server:10.3.27 in host
         uses: getong/mariadb-action@v1.1
@@ -39,14 +28,16 @@ jobs:
         with:
           java-version: 11
           architecture: x64
-      - name: Unit tests with Gradle
-        run: backend/gradlew -p backend test -Dspring.jpa.hibernate.ddl-auto=create-drop -Dspring.profiles.active=test
+      #- name: Unit tests with Gradle
+      #  run: backend/gradlew -p backend test -Dspring.profiles.active=test
       - name: E2E tests with Cypress
         uses: cypress-io/github-action@v2
         with:
           install-command: yarn
           wait-on: "http://localhost:8081"
           start: yarn test
+      - name: Build production application jar artifact
+        run: backend/gradlew -p backend build -x test -Dspring.profiles.active=prod
       - name: Slack notify dough channel of CI results
         uses: adamkdean/simple-slack-notify@master
         if: always()
