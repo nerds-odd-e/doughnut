@@ -17,14 +17,17 @@ For more background info you can read:
 - [Spring Boot](https://spring.io/projects/spring-boot)
 - [Thymeleaf](https://www.thymeleaf.org/)
 - [Gradle](https://gradle.org/)
+- [Junit5](https://junit.org/junit5/)
+- [Cypress](https://www.cypress.io/)
+- [JavaScript](https://www.javascript.com)
+- [Cucumber](https://cucumber.io/docs/guides/)  
+- [Flyway](https://flywaydb.org)  
 - [MariaDB](https://mariadb.org/)
 - [Google Cloud](https://cloud.google.com/gcp/getting-started)
 - [Traefik](https://traefik.io/)
-- [Nix](https://nixos.org/)
-- [Cypress](https://www.cypress.io/)
-- [NodeJS](https://nodejs.org/en/)
-- [Github](https://github.com/nerds-odd-e/doughnut)
 - [Github Actions](https://docs.github.com/en/actions)
+- [Nix](https://nixos.org/)  
+- [git-secret](https://git-secret.io)
 
 ## Getting started
 
