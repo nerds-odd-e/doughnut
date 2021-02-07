@@ -14,4 +14,4 @@ gcloud compute instances create doughnut-app-instance \
 	--metadata-from-file startup-script=${SCRIPTPATH}/app-instance-startup.sh \
 	--metadata BUCKET=dough-01 \
 	--zone us-east1-b \
-	--tags app-server,http-server,https-server
+	--tags app-server,https-server
