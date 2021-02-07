@@ -1,4 +1,5 @@
 #/bin/sh
+SCRIPTPATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 
 gcloud compute instances create doughnut-db-instance \
 	--image-family debian-10 \
@@ -10,6 +11,6 @@ gcloud compute instances create doughnut-db-instance \
 	--no-address \
 	--private-network-ip 10.142.0.18 \
 	--machine-type g1-small \
-	--metadata-from-file startup-script=db-instance-startup.sh \
+	--metadata-from-file startup-script=${SCRIPTPATH}/db-instance-startup.sh \
 	--zone us-east1-b \
 	--tags db-server

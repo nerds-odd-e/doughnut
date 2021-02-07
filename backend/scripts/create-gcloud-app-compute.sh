@@ -1,4 +1,5 @@
 #/bin/sh
+SCRIPTPATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 
 gcloud compute instances create doughnut-app-instance \
 	--image-family debian-10 \
@@ -10,7 +11,7 @@ gcloud compute instances create doughnut-app-instance \
 	--address 35.237.98.250 \
 	--private-network-ip 10.142.0.25 \
 	--machine-type g1-small \
-	--metadata-from-file startup-script=app-instance-startup.sh \
+	--metadata-from-file startup-script=${SCRIPTPATH}/app-instance-startup.sh \
 	--metadata BUCKET=dough-01 \
 	--zone us-east1-b \
 	--tags app-server,http-server,https-server
