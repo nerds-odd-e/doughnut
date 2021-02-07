@@ -53,8 +53,10 @@ jobs:
         with:
           path: backend/build/libs/doughnut-0.0.1-SNAPSHOT.jar
           destination: dough-01/doughnut-0.0.1-SNAPSHOT.jar
+      - name: Delete existing Google Cloud Compute VM doughnut-app instance
+        run: backend/scripts/delete-doughnut-app-instance.sh
       - name: Create Google Cloud Compute VM doughnut-app instance
-        run: backend/scripts/create-gcloud-app-compute.sh
+        run: RUNING_APP_INSTANCE_COUNT=`gcloud compute instances list --filter='tags:app-server' | grep RUNNING | wc -l | xargs` && if [[ $RUNING_APP_INSTANCE_COUNT -eq 1 ]]; then backend/scripts/create-gcloud-app-compute.sh; else exit -1; fi
       - name: Slack notify dough channel of CI/CD results
         uses: adamkdean/simple-slack-notify@master
         if: always()
