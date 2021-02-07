@@ -1,5 +1,14 @@
 #/bin/sh
-SCRIPTPATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+SCRIPTPATH="$(
+	cd "$(dirname "$0")" >/dev/null 2>&1
+	pwd -P
+)"
+
+RUNING_APP_INSTANCE_COUNT=$(gcloud compute instances list --filter='tags:app-server' | grep RUNNING | wc -l | xargs)
+
+if [ ${RUNING_APP_INSTANCE_COUNT} -eq 1 ]; then
+	${SCRIPTPATH}/delete-doughnut-app-instance.sh
+fi
 
 gcloud compute instances create doughnut-app-instance \
 	--image-family debian-10 \
