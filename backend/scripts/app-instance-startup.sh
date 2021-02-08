@@ -19,6 +19,7 @@ apt-get update
 apt-get -y install jq openjdk-11-jdk gnupg gnupg-agent libmariadb3 mariadb-client mariadb-backup
 
 # Make Java 11 default
+mkdir -p /etc/ssl/certs/java/cacerts
 update-alternatives --set java /usr/lib/jvm/java-11-openjdk-amd64/jre/bin/java
 
 # Download and setup traefik-v2
@@ -56,11 +57,11 @@ cat <<'EOF' > /opt/traefik/traefik.toml
 [log]
   level = "INFO"
   filePath = "/opt/traefik/logs/traefik.log"
-  bufferringSize = 1024
+  bufferingSize = 1024
 
 [accessLog]
   filePath = "/opt/traefik/logs/access.log"
-  bufferringSize = 1024
+  bufferingSize = 1024
 EOF
 
 # traefik dynamic toml config
