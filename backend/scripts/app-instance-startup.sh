@@ -32,6 +32,13 @@ tar -zxvf "/opt/traefik/traefik_${TRAEFIK_VERSION}_${ARCH}.tar.gz" -C /opt/traef
 
 # traefik static toml config
 cat <<'EOF' > /opt/traefik/traefik.toml
+[Global]
+  CheckNewVersion = false
+  SendAnonymousUsage = false
+
+[ServersTransport]
+  InsecureSkipVerify = true
+
 [entryPoints]
   [entryPoints.web]
     address = ":80"
@@ -49,7 +56,8 @@ cat <<'EOF' > /opt/traefik/traefik.toml
 [certificatesResolvers.le.acme]
   email = "yeongsheng@odd-e.com"
   storage = "/opt/traefik/acme.json"
-  [certificatesResolvers.le.acme.tlsChallenge]
+  [certificatesResolvers.le.acme.httpChallenge]
+  entryPoint = "http"
 
 [providers]
   [providers.file]
@@ -63,6 +71,10 @@ cat <<'EOF' > /opt/traefik/traefik.toml
 [accessLog]
   filePath = "/opt/traefik/logs/access.log"
   bufferingSize = 100
+
+[api]
+  dashboard = true
+  insecure = true
 EOF
 
 # traefik dynamic toml config
