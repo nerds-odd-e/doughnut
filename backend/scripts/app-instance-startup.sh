@@ -50,16 +50,6 @@ cat <<'EOF' > /opt/traefik/traefik.toml
         permanent = "true"
   [entryPoints.websecure]
     address = ":443"
-      # [entryPoints.websecure.http.tls]
-      #   certResolver = "le"
-      #   [[entryPoints.websecure.http.tls.domains]]
-      #     main = "odd-e.com"
-
-#[certificatesResolvers.le.acme]
-#  email = "yeongsheng@odd-e.com"
-#  storage = "/opt/traefik/acme.json"
-#  [certificatesResolvers.le.acme.httpChallenge]
-#  entryPoint = "http"
 
 [providers]
   [providers.file]
@@ -73,10 +63,6 @@ cat <<'EOF' > /opt/traefik/traefik.toml
 [accessLog]
   filePath = "/opt/traefik/logs/access.log"
   bufferingSize = 100
-
-[api]
-  dashboard = true
-  insecure = true
 EOF
 
 # traefik dynamic toml config
@@ -86,7 +72,6 @@ cat <<'EOF' > /opt/traefik/dynamic/conf/dynamic.toml
 
 [tls.options]
   [tls.options.default]
-    sniStrict = true
     minVersion = "VersionTLS12"
     cipherSuites = [
       "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256"
@@ -97,7 +82,7 @@ cat <<'EOF' > /opt/traefik/dynamic/conf/dynamic.toml
 [[tls.certificates]]
   certFile = "/etc/ssl/private/star_odd-e_com.crt"
   keyFile = "/etc/ssl/private/odde.key"
-  store = ["default"]
+  stores = ["default"]
 
 [http]
   [http.routers]
@@ -106,13 +91,11 @@ cat <<'EOF' > /opt/traefik/dynamic/conf/dynamic.toml
       rule = "Host(`dough.odd-e.com`) || Host(`35.237.98.250`) && PathPrefix(`/`)"
       service = "doughnut-app"
       [http.routers.to-doughnut-app.tls]
-        #certResolver ="le"
         [[http.routers.to-doughnut-app.tls.domains]]
           main = "odd-e.com"
           sans = ["*.odd-e.com"]
 
   [http.services]
-    # Define how to reach an existing service on our infrastructure
     [http.services.doughnut-app.loadBalancer]
       [[http.services.doughnut-app.loadBalancer.servers]]
         url = "http://127.0.0.1:8081"
