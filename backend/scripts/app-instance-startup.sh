@@ -12,7 +12,7 @@ echo "Project ID: ${PROJECTID} Bucket: ${BUCKET}"
 
 # Get the files we need
 mkdir -p /opt/doughnut_app
-gsutil cp gs://${BUCKET}/${ARTIFACT}-${VERSION}.jar /opt/doughnut_app/${ARTIFACT}-${VERSION}.jar
+gsutil cp gs://"${BUCKET}/${ARTIFACT}-${VERSION}.jar" "/opt/doughnut_app/${ARTIFACT}-${VERSION}.jar"
 
 # Install dependencies
 apt-get update
@@ -25,8 +25,8 @@ update-alternatives --set java /usr/lib/jvm/java-11-openjdk-amd64/jre/bin/java
 # Download and setup traefik-v2
 mkdir -p /opt/traefik/logs
 mkdir -p /opt/traefik/dynamic/conf
-curl -sL https://github.com/traefik/traefik/releases/download/${TRAEFIK_VERSION}/traefik_${TRAEFIK_VERSION}_${ARCH}.tar.gz > /opt/traefik/traefik_${TRAEFIK_VERSION}_${ARCH}.tar.gz
-tar -zxvf /opt/traefik/traefik_${TRAEFIK_VERSION}_${ARCH}.tar.gz -C /opt/traefik/
+curl -sL "https://github.com/traefik/traefik/releases/download/${TRAEFIK_VERSION}/traefik_${TRAEFIK_VERSION}_${ARCH}.tar.gz" > "/opt/traefik/traefik_${TRAEFIK_VERSION}_${ARCH}.tar.gz"
+tar -zxvf "/opt/traefik/traefik_${TRAEFIK_VERSION}_${ARCH}.tar.gz" -C /opt/traefik/
 
 # traefik static toml config
 cat <<'EOF' > /opt/traefik/traefik.toml
@@ -40,7 +40,7 @@ cat <<'EOF' > /opt/traefik/traefik.toml
   [entryPoints.websecure]
     address = ":443"
       # [entryPoints.websecure.http.tls]
-      #   certResolver = "leresolver"
+      #   certResolver = "le"
       #   [[entryPoints.websecure.http.tls.domains]]
       #     main = "odd-e.com"
 
@@ -71,8 +71,6 @@ cat <<'EOF' > /opt/traefik/dynamic/conf/dynamic.toml
     # Define a connection between requests and services
     [http.routers.to-doughnut-app]
       rule = "Host(`dough.odd-e.com`) || Host(`35.237.98.250`) && PathPrefix(`/`)"
-      # If the rule matches, applies the middleware
-      # If the rule matches, forward to the doughnut-app service
       service = "doughnut-app"
       [http.routers.to-doughnut-app.tls]
         certResolver ="le"
