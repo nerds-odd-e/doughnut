@@ -36,18 +36,17 @@ cat <<'EOF' > /opt/traefik/traefik.toml
         to = "websecure"
         scheme = "https"
         permanent = "true"
-    [entryPoints.websecure]
-      address = ":443"
-        # [entryPoints.websecure.http.tls]
-        #   certResolver = "leresolver"
-        #   [[entryPoints.websecure.http.tls.domains]]
-        #     main = "odd-e.com"
+  [entryPoints.websecure]
+    address = ":443"
+      # [entryPoints.websecure.http.tls]
+      #   certResolver = "leresolver"
+      #   [[entryPoints.websecure.http.tls.domains]]
+      #     main = "odd-e.com"
 
 [certificatesResolvers.le.acme]
   email = "yeongsheng@odd-e.com"
   storage = "/opt/traefik/acme.json"
-  [certificatesResolvers.le.acme.httpChallenge]
-    entryPoint = "web"
+  [certificatesResolvers.le.acme.tlsChallenge]
 
 [providers]
   [providers.file]
