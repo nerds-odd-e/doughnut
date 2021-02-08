@@ -16,11 +16,13 @@ gsutil cp gs://"${BUCKET}/${ARTIFACT}-${VERSION}.jar" "/opt/doughnut_app/${ARTIF
 
 # Install dependencies
 apt-get update
-apt-get -y install jq openjdk-11-jdk gnupg gnupg-agent libmariadb3 mariadb-client mariadb-backup
+apt-get -y install jq openjdk-11-jre gnupg gnupg-agent libmariadb3 mariadb-client mariadb-backup apt-transport-https ca-certificates
 
 # Make Java 11 default
+export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+export PATH=$PATH:$JAVA_HOME/bin
 mkdir -p /etc/ssl/certs/java/cacerts
-update-alternatives --set java /usr/lib/jvm/java-11-openjdk-amd64/jre/bin/java
+update-alternatives --set java /usr/lib/jvm/java-11-openjdk-amd64/bin/java
 
 # Download and setup traefik-v2
 mkdir -p /opt/traefik/logs
@@ -57,11 +59,10 @@ cat <<'EOF' > /opt/traefik/traefik.toml
 [log]
   level = "INFO"
   filePath = "/opt/traefik/logs/traefik.log"
-  bufferingSize = 1024
 
 [accessLog]
   filePath = "/opt/traefik/logs/access.log"
-  bufferingSize = 1024
+  bufferingSize = 100
 EOF
 
 # traefik dynamic toml config
