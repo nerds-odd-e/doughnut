@@ -46,7 +46,6 @@ cat <<'EOF' > /opt/traefik/traefik.toml
 [certificatesResolvers.le.acme]
   email = "yeongsheng@odd-e.com"
   storage = "/opt/traefik/acme.json"
-  httpChallenge = true
   [certificatesResolvers.le.acme.httpChallenge]
     entryPoint = "web"
 
