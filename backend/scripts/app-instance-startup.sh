@@ -13,6 +13,9 @@ echo "Project ID: ${PROJECTID} Bucket: ${BUCKET}"
 # Get the files we need
 mkdir -p /opt/doughnut_app
 gsutil cp gs://"${BUCKET}/${ARTIFACT}-${VERSION}.jar" "/opt/doughnut_app/${ARTIFACT}-${VERSION}.jar"
+gsutil cp gs://"${BUCKET}/ssl/private/odde.key" /etc/ssl/private/odde.key
+gsutil cp gs://"${BUCKET}/ssl/private/star_odd-e_com.crt" /etc/ssl/private/star_odd-e_com.crt
+chmod 640 /etc/ssl/private/*
 
 # Install dependencies
 apt-get update
@@ -21,7 +24,6 @@ apt-get -y install jq openjdk-11-jre gnupg gnupg-agent libmariadb3 mariadb-clien
 # Make Java 11 default
 export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
 export PATH=$PATH:$JAVA_HOME/bin
-mkdir -p /etc/ssl/certs/java/cacerts
 update-alternatives --set java /usr/lib/jvm/java-11-openjdk-amd64/bin/java
 
 # Download and setup traefik-v2
@@ -53,11 +55,11 @@ cat <<'EOF' > /opt/traefik/traefik.toml
       #   [[entryPoints.websecure.http.tls.domains]]
       #     main = "odd-e.com"
 
-[certificatesResolvers.le.acme]
-  email = "yeongsheng@odd-e.com"
-  storage = "/opt/traefik/acme.json"
-  [certificatesResolvers.le.acme.httpChallenge]
-  entryPoint = "http"
+#[certificatesResolvers.le.acme]
+#  email = "yeongsheng@odd-e.com"
+#  storage = "/opt/traefik/acme.json"
+#  [certificatesResolvers.le.acme.httpChallenge]
+#  entryPoint = "http"
 
 [providers]
   [providers.file]
@@ -79,6 +81,24 @@ EOF
 
 # traefik dynamic toml config
 cat <<'EOF' > /opt/traefik/dynamic/conf/dynamic.toml
+[tls.stores]
+  [tls.stores.default]
+
+[tls.options]
+  [tls.options.default]
+    sniStrict = true
+    minVersion = "VersionTLS12"
+    cipherSuites = [
+      "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256"
+    ]
+  [tls.options.mintls13]
+    minVersion = "VersionTLS13"
+
+[[tls.certificates]]
+  certFile = "/etc/ssl/private/star_odd-e_com.crt"
+  keyFile = "/etc/ssl/private/odde.key"
+  store = ["default"]
+
 [http]
   [http.routers]
     # Define a connection between requests and services
@@ -86,7 +106,7 @@ cat <<'EOF' > /opt/traefik/dynamic/conf/dynamic.toml
       rule = "Host(`dough.odd-e.com`) || Host(`35.237.98.250`) && PathPrefix(`/`)"
       service = "doughnut-app"
       [http.routers.to-doughnut-app.tls]
-        certResolver ="le"
+        #certResolver ="le"
         [[http.routers.to-doughnut-app.tls.domains]]
           main = "odd-e.com"
           sans = ["*.odd-e.com"]
