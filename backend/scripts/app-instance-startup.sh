@@ -16,7 +16,7 @@ gsutil cp gs://${BUCKET}/${ARTIFACT}-${VERSION}.jar /opt/doughnut_app/${ARTIFACT
 
 # Install dependencies
 apt-get update
-apt-get -y install jq openjdk-11-jdk gnupg gnupg-agent mariadb-client mariadb-backup
+apt-get -y install jq openjdk-11-jdk gnupg gnupg-agent libmaria3 mariadb-client mariadb-backup
 
 # Make Java 11 default
 update-alternatives --set java /usr/lib/jvm/java-11-openjdk-amd64/jre/bin/java
@@ -38,15 +38,31 @@ cat <<'EOF' > /opt/traefik/traefik.toml
         permanent = "true"
     [entryPoints.websecure]
       address = ":443"
-        [entryPoints.websecure.http.tls]
-          certResolver = "leresolver"
-          [[entryPoints.websecure.http.tls.domains]]
-            main = "odd-e.com"
+        # [entryPoints.websecure.http.tls]
+        #   certResolver = "leresolver"
+        #   [[entryPoints.websecure.http.tls.domains]]
+        #     main = "odd-e.com"
+
+[certificatesResolvers.le.acme]
+  email = "yeongsheng@odd-e.com"
+  storage = "/opt/traefik/acme.json"
+  httpChallenge = true
+  [certificatesResolvers.le.acme.httpChallenge]
+    entryPoint = "web"
 
 [providers]
   [providers.file]
     directory = "/opt/traefik/dynamic/conf"
     watch = true
+
+[log]
+  level = "INFO"
+  filePath = "/opt/traefik/logs/traefik.log"
+  bufferringSize = 1024
+
+[accessLog]
+  filePath = "/opt/traefik/logs/access.log"
+  bufferringSize = 1024
 EOF
 
 # traefik dynamic toml config
@@ -59,6 +75,11 @@ cat <<'EOF' > /opt/traefik/dynamic/conf/dynamic.toml
       # If the rule matches, applies the middleware
       # If the rule matches, forward to the doughnut-app service
       service = "doughnut-app"
+      [http.routers.to-doughnut-app.tls]
+        certResolver ="le"
+        [[http.routers.to-doughnut-app.tls.domains]]
+          main = "odd-e.com"
+          sans = ["*.odd-e.com"]
 
   [http.services]
     # Define how to reach an existing service on our infrastructure
@@ -67,7 +88,7 @@ cat <<'EOF' > /opt/traefik/dynamic/conf/dynamic.toml
         url = "http://127.0.0.1:8081"
 EOF
 
-sh -c "/opt/traefik/traefik --configfile=/opt/traefik/traefik.toml --accesslog=true --accesslog.filepath=/opt/traefik/logs/access.log --log=true --log.filepath=/opt/traefik/logs/traefik.log --log.level=INFO" &
+sh -c "/opt/traefik/traefik --configfile=/opt/traefik/traefik.toml" &
 
 ACCESS_TOKEN=$(curl "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token" \
 	-H "Metadata-Flavor: Google" | jq -r ".access_token")
