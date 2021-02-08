@@ -16,7 +16,7 @@ gsutil cp gs://${BUCKET}/${ARTIFACT}-${VERSION}.jar /opt/doughnut_app/${ARTIFACT
 
 # Install dependencies
 apt-get update
-apt-get -y install jq openjdk-11-jdk gnupg gnupg-agent libmaria3 mariadb-client mariadb-backup
+apt-get -y install jq openjdk-11-jdk gnupg gnupg-agent libmariadb3 mariadb-client mariadb-backup
 
 # Make Java 11 default
 update-alternatives --set java /usr/lib/jvm/java-11-openjdk-amd64/jre/bin/java
