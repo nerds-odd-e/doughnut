@@ -6,7 +6,7 @@ do
   sleep 10
   HEALTHCHECK_STATUS=$(curl -s https://dough.odd-e.com/api/healthcheck 2>&1)
   echo "RETRY (${RETRY}): ${HEALTHCHECK_STATUS}"
-  let RETRY--
+  RETRY=$((RETRY-1))
 done
 
 if [ "${HEALTHCHECK_STATUS}" != "OK" ]; then
