@@ -3,7 +3,7 @@ set -e
 
 HEALTHCHECK_STATUS=""
 RETRY=5
-while [ "${RETRY}" -gt 0 ] || [ "${HEALTHCHECK_STATUS}" == "" ]
+while [ "${RETRY}" -gt 0 ] && [ "${HEALTHCHECK_STATUS}" != "OK" ]
 do
   sleep 10
   HEALTHCHECK_STATUS=$(curl -s https://dough.odd-e.com/api/healthcheck 2>&1)
