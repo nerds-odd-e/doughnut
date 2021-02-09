@@ -12,7 +12,7 @@ env:
 
 jobs:
   unit-e2e-tests-run:
-    name: Unit & E2E tests
+    name: Unit & E2E tests then Deploy with Healthcheck
     runs-on: ubuntu-20.04
     steps:
       - name: Setup & mariadb-server:10.3.27
@@ -55,6 +55,8 @@ jobs:
           destination: dough-01/doughnut-0.0.1-SNAPSHOT.jar
       - name: Create Google Cloud Compute VM doughnut-app instance
         run: backend/scripts/create-gcloud-app-compute.sh
+      - name: Healthcheck doughnut-app instance
+        run: backend/scripts/app-instance-healthcheck.sh
       - name: Slack notify dough channel of CI/CD results
         uses: adamkdean/simple-slack-notify@master
         if: always()
