@@ -1,8 +1,6 @@
 #!/bin/sh
-set -e
-
 HEALTHCHECK_STATUS=""
-RETRY=12
+RETRY=15
 while [ ${RETRY} -gt 0 ] && [ "${HEALTHCHECK_STATUS}" != "OK" ]
 do
   sleep 10
