@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Set the metadata server to the get projct id
 PROJECTID=$(curl -s "http://metadata.google.internal/computeMetadata/v1/project/project-id" -H "Metadata-Flavor: Google")
@@ -19,7 +19,7 @@ chmod 640 /etc/ssl/private/*
 
 # Install dependencies
 apt-get update
-apt-get -y install jq openjdk-11-jre gnupg gnupg-agent libmariadb3 mariadb-client apt-transport-https ca-certificates
+apt-get -y install jq openjdk-11-jre gnupg gnupg-agent libmariadb3 mariadb-client apt-transport-https ca-certificates httpie
 
 # Make Java 11 default
 export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64

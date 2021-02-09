@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # Set the metadata server to the get projct id
 PROJECTID=$(curl -s "http://metadata.google.internal/computeMetadata/v1/project/project-id" -H "Metadata-Flavor: Google")
@@ -51,4 +51,4 @@ GRANT ALL PRIVILEGES ON doughnut.* TO 'doughnut'@'localhost';
 FLUSH PRIVILEGES;
 EOF
 
-sudo mysql -uroot -p${MYSQL_ROOT_PASSWORD} < init_doughnut_db.sql
+mysql -uroot -p${MYSQL_ROOT_PASSWORD} < init_doughnut_db.sql
