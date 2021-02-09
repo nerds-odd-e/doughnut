@@ -3,7 +3,7 @@ HEALTHCHECK_STATUS=""
 RETRY=15
 while [ ${RETRY} -gt 0 ] && [ "${HEALTHCHECK_STATUS}" != "OK" ]
 do
-  sleep 10
+  sleep 20
   HEALTHCHECK_STATUS=$(curl -s https://dough.odd-e.com/api/healthcheck 2>&1)
   echo "RETRY (${RETRY}): ${HEALTHCHECK_STATUS}"
   RETRY=$((RETRY-1))
