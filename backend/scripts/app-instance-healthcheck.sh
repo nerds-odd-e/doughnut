@@ -1,6 +1,4 @@
 #!/bin/sh
-set -e
-
 HEALTHCHECK_STATUS=""
 RETRY=5
 while [ ${RETRY} -gt 0 ] && [ "${HEALTHCHECK_STATUS}" != "OK" ]
