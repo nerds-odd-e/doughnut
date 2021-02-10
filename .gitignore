@@ -47,3 +47,6 @@ env.sh
 
 # asdf
 .tool-versions
+
+# nohup.out
+nohup.out
