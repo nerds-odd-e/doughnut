@@ -23,7 +23,7 @@ public class DBCleaner implements BeforeEachCallback {
   @Transactional
   private void truncateAllTables() {
     withEntityManager(entityManager
-                      -> getTableNames(entityManager)
+                      -> guessTableNames(entityManager)
                              .forEach(t -> truncateTable(t, entityManager)));
   }
 
@@ -45,14 +45,19 @@ public class DBCleaner implements BeforeEachCallback {
   }
 
   private void truncateTable(String tableName, EntityManager entityManager) {
+    entityManager.createNativeQuery("SET FOREIGN_KEY_CHECKS = 0;").executeUpdate();
+    entityManager.createNativeQuery("TRUNCATE TABLE " + tableName + ";").executeUpdate();
+    entityManager.createNativeQuery("ALTER TABLE " + tableName + " AUTO_INCREMENT = 1;").executeUpdate();
+    entityManager.createNativeQuery("SET FOREIGN_KEY_CHECKS = 1;").executeUpdate();
   }
 
-  private List<String> getTableNames(EntityManager manager) {
+  private List<String> guessTableNames(EntityManager manager) {
     Metamodel metamodel = (Metamodel)manager.getMetamodel();
     Set<EntityType<?>> entities = metamodel.getEntities();
 
     return entities.stream()
         .map(EntityType::getName)
+        .map(String::toLowerCase)
         .collect(Collectors.toList());
   }
 }
