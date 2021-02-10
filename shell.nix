@@ -20,10 +20,10 @@ in mkShell {
     git git-secret gitAndTools.delta locale lsd platinum-searcher most
     binutils-unwrapped hostname inetutils openssh pkg-config rsync
     bat duf fasd fzf htop jq lsof lzma progress ripgrep tree wget which
-    libmysqlclient libpcap libressl
+    libmysqlclient libpcap libressl patchelf
     cacert curlie glances httpie mariadb python38Packages.pip
     chromedriver geckodriver google-cloud-sdk
-    vim vimPlugins.nerdtree vimPlugins.nvimdev-nvim vimPlugins.spacevim vscodium
+    dbeaver vim vimPlugins.nerdtree vimPlugins.nvimdev-nvim vimPlugins.spacevim vscodium
   ] ++ lib.optionals stdenv.isDarwin [
     darwin.apple_sdk.libs.utmp darwin.apple_sdk.libs.Xplugin
     apple_sdk.AppKit apple_sdk.AGL apple_sdk.ApplicationServices apple_sdk.AudioToolbox

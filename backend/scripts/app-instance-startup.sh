@@ -45,10 +45,10 @@ cat <<'EOF' > /opt/traefik/traefik.toml
 [entryPoints]
   [entryPoints.web]
     address = ":80"
-      [entryPoints.web.http.redirections.entryPoint]
-        to = "websecure"
-        scheme = "https"
-        permanent = "true"
+      # [entryPoints.web.http.redirections.entryPoint]
+      #   to = "websecure"
+      #   scheme = "https"
+      #   permanent = "true"
   [entryPoints.websecure]
     address = ":443"
 
@@ -88,13 +88,22 @@ cat <<'EOF' > /opt/traefik/dynamic/conf/dynamic.toml
 [http]
   [http.routers]
     # Define a connection between requests and services
-    [http.routers.to-doughnut-app]
+    [http.routers.doughnut-app-http]
+      entryPoints = "web"
       rule = "Host(`dough.odd-e.com`) || Host(`35.237.98.250`) && PathPrefix(`/`)"
+      middlewares = "doughnut-app-https"
+    [http.routers.doughnut-app]
+      entryPoints = "websecure"
+      rule = "Host(`dough.odd-e.com`) || Host(`35.237.98.250`) && PathPrefix(`/`)"
+      tls = true
       service = "doughnut-app"
-      [http.routers.to-doughnut-app.tls]
-        [[http.routers.to-doughnut-app.tls.domains]]
-          main = "odd-e.com"
-          sans = ["*.odd-e.com"]
+      [[http.routers.doughnut-app.tls.domains]]
+        main = "odd-e.com"
+        sans = ["*.odd-e.com"]
+  [http.middlewares.doughnut-app-https.redirectScheme]
+    scheme = "https"
+    permanent = true
+
 
   [http.services]
     [http.services.doughnut-app.loadBalancer]
