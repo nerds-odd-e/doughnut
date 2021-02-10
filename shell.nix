@@ -32,7 +32,7 @@ in mkShell {
     apple_sdk.Foundation apple_sdk.ImageIO apple_sdk.IOKit apple_sdk.Kernel apple_sdk.MediaToolbox apple_sdk.OpenGL
     apple_sdk.QTKit apple_sdk.Security apple_sdk.SystemConfiguration xcodebuild
   ] ++ lib.optionals (!stdenv.isDarwin) [
-    chromium firefox google-chrome intellij
+    chromium firefox intellij
   ];
   shellHook = ''
     export JAVA_HOME="${pkgs.jdk}"
