@@ -13,13 +13,14 @@ echo "Project ID: ${PROJECTID} Bucket: ${BUCKET}"
 # Get the files we need
 mkdir -p /opt/doughnut_app
 gsutil cp gs://"${BUCKET}/${ARTIFACT}-${VERSION}.jar" "/opt/doughnut_app/${ARTIFACT}-${VERSION}.jar"
+gsutil cp gs://"${BUCKET}/ssl/private/odde.pem" /etc/ssl/private/odde.pem
 gsutil cp gs://"${BUCKET}/ssl/private/odde.key" /etc/ssl/private/odde.key
 gsutil cp gs://"${BUCKET}/ssl/private/star_odd-e_com.crt" /etc/ssl/private/star_odd-e_com.crt
 chmod 640 /etc/ssl/private/*
 
 # Install dependencies
 apt-get update
-apt-get -y install jq openjdk-11-jre gnupg gnupg-agent libmariadb3 mariadb-client apt-transport-https ca-certificates
+apt-get -y install jq openjdk-11-jre gnupg gnupg-agent libmariadb3 mariadb-client apt-transport-https ca-certificates openssl
 
 # Make Java 11 default
 export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
