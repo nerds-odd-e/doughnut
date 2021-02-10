@@ -1,13 +1,13 @@
 #!/bin/bash
 SCRIPTPATH="$(
-	cd "$(dirname "$0")" >/dev/null 2>&1
+	cd "$(dirname "$0")" > /dev/null 2>&1
 	pwd -P
 )"
 
 RUNING_APP_INSTANCE_COUNT=$(gcloud compute instances list --filter='tags:app-server' | grep -E 'RUNNING|TERMINATED' | wc -l | xargs)
 
 if [ ${RUNING_APP_INSTANCE_COUNT} -eq 1 ]; then
-  ${SCRIPTPATH}/delete-doughnut-app-instance.sh
+	${SCRIPTPATH}/delete-doughnut-app-instance.sh
 fi
 
 gcloud compute instances create doughnut-app-instance \
@@ -23,4 +23,4 @@ gcloud compute instances create doughnut-app-instance \
 	--metadata-from-file startup-script=${SCRIPTPATH}/app-instance-startup.sh \
 	--metadata BUCKET=dough-01 \
 	--zone us-east1-b \
-	--tags app-server,https-server
+	--tags app-server,http-server,https-server

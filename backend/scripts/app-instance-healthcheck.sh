@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 HEALTHCHECK_STATUS=""
 RETRY=30
 while [[ ${RETRY} -gt 0 ]] && [[ "${HEALTHCHECK_STATUS}" != "OK" ]]
