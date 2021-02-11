@@ -20,10 +20,10 @@ in mkShell {
     git git-secret gitAndTools.delta locale lsd platinum-searcher most
     binutils-unwrapped hostname inetutils openssh pkg-config rsync
     bat duf fasd fzf htop jq lsof lzma progress ripgrep tree wget which
-    libmysqlclient libpcap libressl patchelf
+    libmysqlclient libpcap libressl
     cacert curlie glances httpie mariadb python38Packages.pip
     chromedriver geckodriver google-cloud-sdk
-    dbeaver vim vimPlugins.nerdtree vimPlugins.nvimdev-nvim vimPlugins.spacevim vscodium
+    vim vimPlugins.nerdtree vimPlugins.nvimdev-nvim vimPlugins.spacevim vscodium
   ] ++ lib.optionals stdenv.isDarwin [
     darwin.apple_sdk.libs.utmp darwin.apple_sdk.libs.Xplugin
     apple_sdk.AppKit apple_sdk.AGL apple_sdk.ApplicationServices apple_sdk.AudioToolbox
@@ -32,7 +32,7 @@ in mkShell {
     apple_sdk.Foundation apple_sdk.ImageIO apple_sdk.IOKit apple_sdk.Kernel apple_sdk.MediaToolbox apple_sdk.OpenGL
     apple_sdk.QTKit apple_sdk.Security apple_sdk.SystemConfiguration xcodebuild
   ] ++ lib.optionals (!stdenv.isDarwin) [
-    chromium firefox intellij
+    dbeaver chromium firefox intellij patchelf
   ];
   shellHook = ''
     export JAVA_HOME="${pkgs.jdk}"
