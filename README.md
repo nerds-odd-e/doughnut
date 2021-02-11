@@ -82,7 +82,7 @@ git clone $this_repo
 cd doughnut
 nix-shell --pure
 # OR `nix-shell --pure --command "zsh"` if you want to drop down to zsh in nix-shell (uses your OS' ~/.zshrc)
-idea-community &
+nohup idea-community &
 # open doughnut project in idea
 # click import gradle project
 # wait for deps resolution
@@ -94,8 +94,6 @@ backend/gradlew bootRun -p backend --args="--spring.profiles.active=dev"
 
 ### 3. Setup and run doughnut with migrations in 'test' profile
 
-TODO: MAKE MIGRATIONS RUN BEFORE TEST
-
 ```bash
 backend/gradlew -p backend bootRun --args='--spring.profiles.active=test'
 ```
@@ -104,20 +102,24 @@ backend/gradlew -p backend bootRun --args='--spring.profiles.active=test'
 
 #### Generate your local GnuPG key
 
-- Generate your GnuPG key 4096 bits key using your odd-e.com email address with no-expiry (option 0 in dialog): `gpg --full-generate-key`
+- Generate your GnuPG key 4096 bits key using your odd-e.com email address with no-expiry (option 0 in dialog):
+```
+gpg --full-generate-key
+```
+
 - Export your GnuPG public key:
 
 ```
-gpg --export <your_email>@odd-e.com --armor > <your_email>_public_gpg_key.gpg
+gpg --export --armor <your_email>@odd-e.com > <your_email>_public_gpg_key.gpg
 ```
 
-- Copy and paste your GnuPG public key file from above step into dough/secrets_public_keys dir
+- Email your GnuPG public key file <your_email>_public_gpg_key.gpg from above step and private message an existing git-secret collaborator
 
 #### Add a new user's GnuPG public key to local dev machine key-ring for git-secret for team secrets collaboration
 
-- Add public key to local GnuPG key-ring: `gpg --import public_keys/<your_email>_public_gpg_key.gpg`
+- Add public key to local GnuPG key-ring: `gpg --import <your_email>_public_gpg_key.gpg`
 - Add user to git-secret managed list of users: `git secret tell <your_email>@odd-e.com`
-- Re-encrypt all managed secret files: `git secret hide`
+- Re-encrypt all managed secret files: `git secret hide -d`
 
 #### List who are list of users managed by git-secret and allowed to encrypt/decrypt those files
 
@@ -125,8 +127,9 @@ gpg --export <your_email>@odd-e.com --armor > <your_email>_public_gpg_key.gpg
 - List of user emails with expiration info of managed users: `git secret whoknows -l`
 
 #### Removes a user from list of git-secret managed users (e.g. user should no longer be allowed access to list of secrets)
-
-- `git secret killperson <user_to_be_removed_email>@odd-e.com`
+```
+git secret killperson <user_to_be_removed_email>@odd-e.com
+```
 
 #### Add a new file for git-secret to manage
 
@@ -152,6 +155,11 @@ gpg --export <your_email>@odd-e.com --armor > <your_email>_public_gpg_key.gpg
 - Upon hitting `enter/return` for each decrypt command below, enter secret passphrase you used when you generated your GnuPG key-pair.
 - Decrypt secrets to local filesystem: `git secret reveal`
 - Decrypt secrets to stdout: `git secret cat`
+
+### MariaDB UI Client - DBeaver (ONLY available to Linux users - Non-macOS)
+```
+nohup dbeaver &
+```
 
 ### 5. Create gcloud compute instance
 
