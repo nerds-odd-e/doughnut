@@ -7,7 +7,7 @@
   "license": "MIT",
   "scripts": {
     "cy:open": "cypress open",
-    "cy:run": "cypress run --headless",
+    "cy:run": "cypress run",
     "sut": "backend/gradlew bootRun -p backend -Dspring.profiles.active=test",
     "open": "run-p -clnr sut cy:open",
     "test": "run-p -clnr sut cy:run",
