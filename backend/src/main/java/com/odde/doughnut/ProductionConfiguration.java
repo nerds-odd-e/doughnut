@@ -12,7 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 
 @Configuration
-@Profile({"test", "dev"})
+@Profile("prod1")
 @Order(200)
 public class ProductionConfiguration extends WebSecurityConfigurerAdapter {
 
@@ -37,6 +37,6 @@ public class ProductionConfiguration extends WebSecurityConfigurerAdapter {
                                 -> e.authenticationEntryPoint(
                                 new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 .oauth2Login();
-        //throw(new RuntimeException("here"));
+        throw(new RuntimeException("here"));
     }
 }

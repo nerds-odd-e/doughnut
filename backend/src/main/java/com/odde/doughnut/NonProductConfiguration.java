@@ -10,27 +10,9 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
-@Profile("prod")
+@Profile({"test", "dev", "prod"})
 @Order(200)
 public class NonProductConfiguration extends WebSecurityConfigurerAdapter {
-
-    @Override
-    public void configure(HttpSecurity http) throws Exception {
-        http.csrf()
-                .disable()
-                .authorizeRequests()
-                .antMatchers("/api/healthcheck")
-                .permitAll();
-
-        http.authorizeRequests(
-                a
-                        -> a.antMatchers("/", "/login", "/error", "/webjars/**")
-                        .permitAll()
-                        .anyRequest()
-                        .authenticated())
-                .logout(l -> l.logoutSuccessUrl("/").permitAll())
-                .httpBasic();
-    }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
@@ -45,6 +27,18 @@ public class NonProductConfiguration extends WebSecurityConfigurerAdapter {
                 .withUser("admin")
                 .password(encoder.encode("admin"))
                 .roles("USER", "ADMIN");
+    }
+
+    @Override
+    public void configure(HttpSecurity http) throws Exception {
+        http
+                .authorizeRequests()
+                .anyRequest().authenticated()
+                .and()
+                .formLogin()
+                .and()
+                .httpBasic();
+//        throw(new RuntimeException("here"));
     }
 
 }
