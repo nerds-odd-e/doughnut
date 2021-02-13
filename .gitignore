@@ -41,6 +41,7 @@ cypress/videos/
 .gitsecret/keys/random_seed
 !*.secret
 env.sh
+public_keys/
 
 # VSCode
 **/*.code-workspace
