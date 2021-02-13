@@ -46,10 +46,10 @@ public class DBCleaner implements BeforeEachCallback {
   }
 
   private void truncateTable(String tableName, EntityManager entityManager) {
-    entityManager.createQuery("SET GLOBAL FOREIGN_KEY_CHECKS=OFF").executeUpdate();
+    entityManager.createQuery("SET FOREIGN_KEY_CHECKS=OFF").executeUpdate();
     entityManager.createQuery("TRUNCATE TABLE " + tableName + "").executeUpdate();
     entityManager.createQuery("ALTER TABLE " + tableName + " AUTO_INCREMENT=1").executeUpdate();
-    entityManager.createQuery("SET GLOBAL FOREIGN_KEY_CHECKS=ON").executeUpdate();
+    entityManager.createQuery("SET FOREIGN_KEY_CHECKS=ON").executeUpdate();
   }
 
   private List<String> guessTableNames(EntityManager manager) {
