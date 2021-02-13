@@ -12,7 +12,7 @@ echo "Project ID: ${PROJECTID} Bucket: ${BUCKET}"
 
 # Get the files we need
 mkdir -p /opt/doughnut_app
-gsutil cp gs://"${BUCKET}/${ARTIFACT}-${VERSION}.jar" "/opt/doughnut_app/${ARTIFACT}-${VERSION}.jar"
+gsutil cp gs://"${BUCKET}/backend_app_jar/${ARTIFACT}-${VERSION}.jar" "/opt/doughnut_app/${ARTIFACT}-${VERSION}.jar"
 gsutil cp gs://"${BUCKET}/ssl/private/odde.pem" /etc/ssl/private/odde.pem
 gsutil cp gs://"${BUCKET}/ssl/private/odde.key" /etc/ssl/private/odde.key
 gsutil cp gs://"${BUCKET}/ssl/private/star_odd-e_com.crt" /etc/ssl/private/star_odd-e_com.crt
