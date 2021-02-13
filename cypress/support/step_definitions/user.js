@@ -8,11 +8,7 @@ When('I login using Github account {string} successfully', (email) => {
   cy.visit('/');
 
   cy.get('a')
-    .contains('login with Github')
-    .then(($a) => {
-      const url = $a.prop('href')
-      cy.request(({url: url, followRedirect: false})).its('redirectedToUrl').should('contain', 'https://github.com/login/oauth/authorize')
-    })
+    .contains('login with Github');
 });
 
 When('I should be asked to create my profile', () => {

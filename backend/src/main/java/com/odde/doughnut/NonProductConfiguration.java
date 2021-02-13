@@ -3,14 +3,16 @@ package com.odde.doughnut;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 
 @Configuration
-@Profile("dev")
+@Profile({"dev", "test"})
 @Order(200)
 public class NonProductConfiguration extends WebSecurityConfigurerAdapter {
 
@@ -31,12 +33,19 @@ public class NonProductConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
-        http
-                .authorizeRequests()
-                .anyRequest().authenticated()
-                .and()
+
+        http.authorizeRequests(
+                a
+                        -> a.antMatchers("/", "/login", "/error", "/webjars/**")
+                        .permitAll()
+                        .anyRequest()
+                        .authenticated())
                 .formLogin()
                 .and()
+                .exceptionHandling(
+                        e
+                                -> e.authenticationEntryPoint(
+                                new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 .httpBasic();
     }
 

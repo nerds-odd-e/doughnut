@@ -12,7 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 
 @Configuration
-@Profile({"prod", "test"})
+@Profile({"prod"})
 @Order(200)
 public class ProductionConfiguration extends WebSecurityConfigurerAdapter {
 
