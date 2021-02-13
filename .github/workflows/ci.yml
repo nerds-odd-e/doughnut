@@ -52,7 +52,7 @@ jobs:
         uses: google-github-actions/upload-cloud-storage@main
         with:
           path: backend/build/libs/doughnut-0.0.1-SNAPSHOT.jar
-          destination: dough-01/doughnut-0.0.1-SNAPSHOT.jar
+          destination: dough-01/backend_app_jar/doughnut-0.0.1-SNAPSHOT.jar
       - name: Create Google Cloud Compute VM doughnut-app instance
         run: backend/scripts/create-gcloud-app-compute.sh
       - name: Healthcheck doughnut-app instance
