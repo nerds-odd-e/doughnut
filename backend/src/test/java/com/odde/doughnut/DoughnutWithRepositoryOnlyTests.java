@@ -21,7 +21,7 @@ class DoughnutWithRepositoryOnlyTests {
     }
 
 
-    @Test
+//    @Test
     void contextLoads() {
 
         NoteRepository noteRepository = applicationContext.getBean("noteRepository", NoteRepository.class);
