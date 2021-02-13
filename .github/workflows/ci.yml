@@ -15,15 +15,15 @@ jobs:
     name: Unit & E2E tests then Deploy with Healthcheck
     runs-on: ubuntu-20.04
     steps:
-      - name: Setup & mariadb-server:10.3.27
+      - name: Setup & mariadb-server:10.4.17
         uses: getong/mariadb-action@v1.1
         with:
-          mariadb version: '10.3.27'
+          mariadb version: '10.4.17'
           mysql database: 'doughnut_test'
           mysql user: ${{ secrets.DBUSER }}
           mysql password: ${{ secrets.DBPASSWORD }}
-      #- name: Installs MariaDB client libraries
-      #  run: sudo apt-get update && sudo apt-get install -y -f libmariadb3 libmysqlclient21
+      - name: Installs MariaDB client libraries
+        run: sudo apt-get update && sudo apt-get install -y -f libmariadb3 libmysqlclient21
       - name: Code Checkout
         uses: actions/checkout@v2
       - name: Set up JDK 11
