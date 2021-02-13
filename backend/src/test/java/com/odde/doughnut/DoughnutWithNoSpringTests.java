@@ -19,7 +19,7 @@ class DoughnutWithNoSpringTests {
 
   @Autowired private NoteRepository noteRepository;
 
-  @Test
+//  @Test
   void contextLoads() {
     IndexController controller = new IndexController(noteRepository);
     Model model = mock(Model.class);
