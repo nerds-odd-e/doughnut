@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
+import javax.persistence.PersistenceException;
 import javax.persistence.metamodel.EntityType;
 import org.hibernate.Metamodel;
 import org.hibernate.exception.SQLGrammarException;
@@ -52,7 +53,7 @@ public class DBCleaner implements BeforeEachCallback {
     try {
       entityManager.createNativeQuery("TRUNCATE TABLE `" + tableName + "`").executeUpdate();
       entityManager.createNativeQuery("ALTER TABLE `" + tableName + "` AUTO_INCREMENT=1").executeUpdate();
-    } catch(SQLGrammarException exception) {
+    } catch(PersistenceException exception) {
 
     }
     entityManager.createNativeQuery("SET FOREIGN_KEY_CHECKS=1").executeUpdate();
