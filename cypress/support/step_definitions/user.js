@@ -7,8 +7,6 @@ Given('There is a Github user with', (data) => {
 When('I login using Github account {string} successfully', (email) => {
   cy.visit('/');
 
-  cy.get('a')
-    .contains('login with Github');
 });
 
 When('I should be asked to create my profile', () => {

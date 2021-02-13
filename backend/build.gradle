@@ -33,6 +33,12 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
+task testDBMigrate(type: Test) {
+    useJUnitPlatform {
+        includeTags 'dbMigrate'
+    }
+}
+
 test {
 	useJUnitPlatform()
     testLogging {

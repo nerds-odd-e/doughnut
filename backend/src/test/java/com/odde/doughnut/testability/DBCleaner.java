@@ -15,6 +15,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.annotation.Transactional;
 
 public class DBCleaner implements BeforeEachCallback {
+
   @Override
   public void beforeEach(ExtensionContext context) {
     truncateAllTables();

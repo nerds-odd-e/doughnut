@@ -1,5 +1,7 @@
 package com.odde.doughnut;
 
+import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.annotation.Order;
@@ -33,20 +35,34 @@ public class NonProductConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
-
-        http.authorizeRequests(
-                a
-                        -> a.antMatchers("/", "/login", "/error", "/webjars/**")
-                        .permitAll()
-                        .anyRequest()
-                        .authenticated())
+        http
+                .authorizeRequests()
+                .anyRequest().authenticated()
+                .and()
                 .formLogin()
                 .and()
-                .exceptionHandling(
-                        e
-                                -> e.authenticationEntryPoint(
-                                new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 .httpBasic();
+
+//        http.authorizeRequests(
+//                a
+//                        -> {
+//                    try {
+//                        a.antMatchers("/", "/login", "/error", "/webjars/**")
+//                        .permitAll()
+//                        .anyRequest()
+//                        .authenticated()
+//        .and().formLogin().and().httpBasic();
+//                    } catch (Exception e) {
+//                        e.printStackTrace();
+//                    }
+//                })
+//                .formLogin()
+//                .and()
+//                .exceptionHandling(
+//                        e
+//                                -> e.authenticationEntryPoint(
+//                                new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+//                .httpBasic();
     }
 
 }
