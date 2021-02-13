@@ -27,7 +27,7 @@ class IndexControllerTest {
     @Autowired
     private NoteRepository noteRepository;
 
-    @Test
+//    @Test
     void serving_notes() throws Exception {
         Note note = new Note();
         note.setTitle("Kaki is...");
