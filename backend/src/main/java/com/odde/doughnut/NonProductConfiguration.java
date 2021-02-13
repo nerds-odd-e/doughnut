@@ -10,7 +10,7 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
-@Profile({"test", "dev", "prod"})
+@Profile("dev")
 @Order(200)
 public class NonProductConfiguration extends WebSecurityConfigurerAdapter {
 
@@ -38,7 +38,6 @@ public class NonProductConfiguration extends WebSecurityConfigurerAdapter {
                 .formLogin()
                 .and()
                 .httpBasic();
-//        throw(new RuntimeException("here"));
     }
 
 }

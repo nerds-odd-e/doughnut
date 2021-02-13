@@ -24,12 +24,12 @@ public class IndexController {
   }
 
   @GetMapping("/")
-  public String home(@AuthenticationPrincipal OAuth2User user, Model model) {
+  public String home(Principal user, Model model) {
     if (user == null) {
       model.addAttribute("totalNotes", noteRepository.count());
       return "login";
     }
-    model.addAttribute("name", user.getAttribute("name"));
+    model.addAttribute("name", user.getName());
     model.addAttribute("user_details", user.toString());
     return "index";
   }
