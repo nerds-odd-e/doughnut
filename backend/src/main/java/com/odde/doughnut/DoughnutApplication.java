@@ -16,6 +16,5 @@ public class DoughnutApplication {
   public static void main(String[] args) {
     SpringApplication.run(DoughnutApplication.class, args);
   }
-
 }
 
