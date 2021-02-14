@@ -8,7 +8,7 @@
   "scripts": {
     "cy:open": "cypress open",
     "cy:run": "cypress run",
-    "cy:run:ci": "cypress run --config video=false screenshotOnRunFailure=false",
+    "cy:run:ci": "cypress run --config video=false screenshotOnRunFailure=false pageLoadTimeout=90000",
     "sut": "backend/gradlew bootRun -p backend -Dspring.profiles.active=test",
     "open": "run-p -clnr sut cy:open",
     "test": "run-p -clnr sut cy:run",
