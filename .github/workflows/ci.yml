@@ -39,7 +39,6 @@ jobs:
         uses: cypress-io/github-action@v2
         with:
           install-command: yarn
-          wait-on: "http://localhost:8081"
           start: yarn test:ci
       - name: Build production application jar artifact
         run: backend/gradlew -p backend build -x test -Dspring.profiles.active=prod
