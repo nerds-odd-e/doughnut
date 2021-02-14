@@ -1,4 +1,5 @@
 {
   "baseUrl": "http://localhost:8081",
-  "testFiles": "**/*.{feature,features}"
+  "testFiles": "**/*.{feature,features}",
+  "chromeWebSecurity": false
 }

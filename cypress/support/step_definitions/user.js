@@ -20,7 +20,7 @@ When('I save my profile with:', (data) => {
       cy.get("#" + propName).type(elem[propName]);
     }
   });
-
+  cy.get('input[value="Submit"]').click();
 });
 
 When('Account for {string} should have', (email, data) => {
