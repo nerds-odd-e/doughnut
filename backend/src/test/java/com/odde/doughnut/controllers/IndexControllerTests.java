@@ -38,11 +38,11 @@ class IndexControllerTests {
     Principal user = new UserPrincipal() {
       @Override
       public String getName() {
-        return "Tom";
+        return "1234567";
       }
     };
     Model model = mock(Model.class);
-    assertEquals("index", controller.home(user, model));
+    assertEquals("register", controller.home(user, model));
   }
 
 }

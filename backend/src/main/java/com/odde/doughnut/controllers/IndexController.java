@@ -31,6 +31,6 @@ public class IndexController {
     }
     model.addAttribute("name", user.getName());
     model.addAttribute("user_details", user.toString());
-    return "index";
+    return "register";
   }
 }
