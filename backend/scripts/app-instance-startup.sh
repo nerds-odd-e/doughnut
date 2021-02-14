@@ -123,4 +123,4 @@ MYSQL_PASSWORD=$(curl "https://secretmanager.googleapis.com/v1/projects/${PROJEC
 echo "10.142.0.18	db-server" >> /etc/hosts
 
 # Start server
-sh -c "java -jar -Dspring-boot.run.profiles=prod -Dspring.datasource.url='jdbc:mariadb://db-server:3306/doughnut' -Dspring.datasource.password=${MYSQL_PASSWORD} /opt/doughnut_app/${ARTIFACT}-${VERSION}.jar" &
+sh -c "java -jar -Dspring-boot.run.profiles=prod -Dspring.profiles.active=prod -Dspring.datasource.url='jdbc:mariadb://db-server:3306/doughnut' -Dspring.datasource.password=${MYSQL_PASSWORD} /opt/doughnut_app/${ARTIFACT}-${VERSION}.jar" &
