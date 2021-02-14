@@ -5,6 +5,7 @@ import static org.mockito.Mockito.mock;
 
 import com.odde.doughnut.controllers.IndexController;
 import com.odde.doughnut.repositories.NoteRepository;
+import com.odde.doughnut.repositories.UserRepository;
 import com.odde.doughnut.testability.DBCleaner;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,10 +20,11 @@ import org.springframework.ui.Model;
 class DoughnutWithNoSpringTests {
 
   @Autowired private NoteRepository noteRepository;
+  @Autowired private UserRepository userRepository;
 
   @Test
   void contextLoads() {
-    IndexController controller = new IndexController(noteRepository);
+    IndexController controller = new IndexController(noteRepository, userRepository);
     Model model = mock(Model.class);
 
     String home = controller.home(null, model);

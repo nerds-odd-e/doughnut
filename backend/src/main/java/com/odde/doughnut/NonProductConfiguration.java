@@ -32,7 +32,7 @@ public class NonProductConfiguration extends WebSecurityConfigurerAdapter {
         http.csrf()
                 .disable()
                 .authorizeRequests()
-                .antMatchers("/api/healthcheck")
+                .antMatchers("/api/healthcheck", "/api/testability/**")
                 .permitAll();
 
         http.authorizeRequests()

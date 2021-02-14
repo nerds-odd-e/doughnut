@@ -1,4 +1,9 @@
-import { Given , And , Then , When} from "cypress-cucumber-preprocessor/steps";
+import { Given , And , Then , When, Before} from "cypress-cucumber-preprocessor/steps";
+
+Before({ tags: "@clean_db" }, () => {
+  cy.visit('/api/testability/clean_db');
+  cy.get("body").should('contain', 'OK');
+});
 
 When('I identify myself as a new user', () => {
   cy.visit('/login');
@@ -23,5 +28,6 @@ When('I save my profile with:', (data) => {
   cy.get('input[value="Submit"]').click();
 });
 
-When('Account for {string} should have', (email, data) => {
+Then('I should see {string} in the page', (content) => {
+  cy.get("body").should('contain', content);
 });

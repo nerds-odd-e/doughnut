@@ -1,5 +1,5 @@
 
-package com.odde.doughnut;
+package com.odde.doughnut.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;

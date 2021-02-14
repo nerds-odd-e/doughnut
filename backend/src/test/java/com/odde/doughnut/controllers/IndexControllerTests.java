@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.IndexController;
 import com.odde.doughnut.repositories.NoteRepository;
+import com.odde.doughnut.repositories.UserRepository;
 import com.odde.doughnut.testability.DBCleaner;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,11 +23,12 @@ import static org.mockito.Mockito.mock;
 class IndexControllerTests {
 
   @Autowired private NoteRepository noteRepository;
+  @Autowired private UserRepository userRepository;
 
   @Test
   void visitWithNoUserSession() {
     Model model = mock(Model.class);
-    IndexController controller = new IndexController(noteRepository);
+    IndexController controller = new IndexController(noteRepository, userRepository);
 
     String home = controller.home(null, model);
     assertEquals("login", home);
@@ -34,7 +36,7 @@ class IndexControllerTests {
 
   @Test
   void visitWithUserSessionButNoSuchARegisteredUserYet() {
-    IndexController controller = new IndexController(noteRepository);
+    IndexController controller = new IndexController(noteRepository, userRepository);
     Principal user = new UserPrincipal() {
       @Override
       public String getName() {
