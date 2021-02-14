@@ -7,7 +7,7 @@ import {
 } from "cypress-cucumber-preprocessor/steps";
 
 Before({ tags: "@clean_db" }, () => {
-  cy.request("/api/testability/clean_db").its("body").should("contain", "OK");
+  cy.cleanDB();
 });
 
 When("I identify myself as a new user", () => {
