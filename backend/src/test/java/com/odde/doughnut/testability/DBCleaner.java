@@ -1,22 +1,19 @@
 package com.odde.doughnut.testability;
 
-import java.sql.SQLException;
-import java.util.List;
-import java.util.Set;
-import java.util.function.Consumer;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
-import javax.persistence.EntityTransaction;
-import javax.persistence.PersistenceException;
-import javax.persistence.metamodel.EntityType;
 import org.hibernate.Metamodel;
-import org.hibernate.exception.SQLGrammarException;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.EntityTransaction;
+import javax.persistence.metamodel.EntityType;
+import java.util.List;
+import java.util.Set;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 public class DBCleaner implements BeforeEachCallback {
 
@@ -50,11 +47,6 @@ public class DBCleaner implements BeforeEachCallback {
   }
 
   private void truncateTable(String tableName, EntityManager entityManager) {
-    Logger.getAnonymousLogger().info("BEGIN DEDEBUG");
-    List res = entityManager.createNativeQuery("show tables").getResultList();
-    res.stream().forEach(r-> Logger.getAnonymousLogger().info((String) r));
-    res = entityManager.createNativeQuery("SELECT DATABASE()").getResultList();
-    res.stream().forEach(r-> Logger.getAnonymousLogger().info((String) r));
     entityManager.createNativeQuery("SET FOREIGN_KEY_CHECKS=0").executeUpdate();
     entityManager.createNativeQuery("TRUNCATE TABLE `" + tableName + "`").executeUpdate();
     entityManager.createNativeQuery("TRUNCATE TABLE `" + tableName + "`").executeUpdate();
