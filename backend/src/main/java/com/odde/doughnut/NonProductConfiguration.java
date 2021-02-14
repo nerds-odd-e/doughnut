@@ -15,7 +15,6 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 
 @Configuration
 @Profile({"dev", "test"})
-@Order(200)
 public class NonProductConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
