@@ -33,12 +33,4 @@ public class IndexController {
     model.addAttribute("user_details", user.toString());
     return "index";
   }
-
-  @GetMapping("/xx")
-  @ResponseBody
-  public String xx(Principal principal, Model model) {
-    Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-    return principal.toString();
-  }
-
 }

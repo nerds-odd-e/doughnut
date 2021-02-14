@@ -12,7 +12,15 @@ spring:
   jpa:
     generate-ddl: false
     show-sql: true
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+            clientId: ${OAUTH2_github_client_id_dev}
+            clientSecret: ${OAUTH2_github_client_secret_dev}
 ---
+
 spring:
   config:
     activate:
@@ -27,6 +35,16 @@ spring:
   jpa:
     generate-ddl: false
     show-sql: true
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+            clientId: e6f513b15e066069bb94
+            clientSecret: a0bcf31c3bcad17f49677e5a2e77d9f939395c92
+#            clientId: ${OAUTH2_github_client_id}
+#            clientSecret: ${OAUTH2_github_client_secret}
+
 ---
 spring:
   config:
@@ -43,14 +61,5 @@ spring:
   jpa:
     generate-ddl: false
     show-sql: true
-  security:
-    oauth2:
-      client:
-        registration:
-          github:
-            clientId: e6f513b15e066069bb94
-            clientSecret: a0bcf31c3bcad17f49677e5a2e77d9f939395c92
-#            clientId: ${OAUTH2_github_client_id}
-#            clientSecret: ${OAUTH2_github_client_secret}
 server:
   port: 8081
