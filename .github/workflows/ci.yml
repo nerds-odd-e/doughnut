@@ -31,8 +31,8 @@ jobs:
         with:
           java-version: 11
           architecture: x64
-      - name: DB Migration unit test --info
-        run: backend/gradlew -p backend testDBMigrate -Dspring.profiles.active=test
+      - name: DB Migration unit test
+        run: backend/gradlew -p backend testDBMigrate -Dspring.profiles.active=test --info
       - name: Unit tests with Gradle
         run: backend/gradlew -p backend test -Dspring.datasource.user=doughnut -Dspring.datasource.password=doughnut -Dspring.datasource.url='jdbc:mariadb://localhost:3306/doughnut_test' --debug
       - name: E2E tests with Cypress
