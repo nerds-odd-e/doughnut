@@ -40,7 +40,7 @@ jobs:
         with:
           install-command: yarn
           wait-on: "http://localhost:8081"
-          start: yarn test
+          start: yarn test:ci
       - name: Build production application jar artifact
         run: backend/gradlew -p backend build -x test -Dspring.profiles.active=prod
       - name: Setup Google Cloud SDK with Service Account
