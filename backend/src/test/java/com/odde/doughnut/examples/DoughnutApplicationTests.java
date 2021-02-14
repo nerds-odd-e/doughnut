@@ -1,5 +1,6 @@
-package com.odde.doughnut;
+package com.odde.doughnut.examples;
 
+import com.odde.doughnut.controllers.IndexController;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,9 +12,9 @@ import static org.mockito.Mockito.mock;
 @SpringBootTest
 class DoughnutApplicationTests {
 	@Autowired
-    IndexController controller;
+	IndexController controller;
 
-	//@Test
+	@Test
 	void contextLoads() {
 		Model model = mock(Model.class);
 

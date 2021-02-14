@@ -35,34 +35,24 @@ public class NonProductConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
-        http
+        http.csrf()
+                .disable()
                 .authorizeRequests()
-                .anyRequest().authenticated()
+                .antMatchers("/api/healthcheck")
+                .permitAll();
+
+        http.authorizeRequests()
+                        .antMatchers("/", "/login", "/error", "/webjars/**")
+                        .permitAll()
+                        .anyRequest()
+                        .authenticated()
                 .and()
+                .logout(l -> l.logoutUrl("/logout").logoutSuccessUrl("/").invalidateHttpSession(true).permitAll())
+
                 .formLogin()
                 .and()
                 .httpBasic();
 
-//        http.authorizeRequests(
-//                a
-//                        -> {
-//                    try {
-//                        a.antMatchers("/", "/login", "/error", "/webjars/**")
-//                        .permitAll()
-//                        .anyRequest()
-//                        .authenticated()
-//        .and().formLogin().and().httpBasic();
-//                    } catch (Exception e) {
-//                        e.printStackTrace();
-//                    }
-//                })
-//                .formLogin()
-//                .and()
-//                .exceptionHandling(
-//                        e
-//                                -> e.authenticationEntryPoint(
-//                                new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
-//                .httpBasic();
     }
 
 }

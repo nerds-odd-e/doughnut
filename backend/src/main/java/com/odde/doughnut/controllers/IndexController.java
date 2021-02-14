@@ -1,4 +1,4 @@
-package com.odde.doughnut;
+package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.repositories.NoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;

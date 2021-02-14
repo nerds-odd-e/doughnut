@@ -1,8 +1,9 @@
-package com.odde.doughnut;
+package com.odde.doughnut.examples;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
+import com.odde.doughnut.controllers.IndexController;
 import com.odde.doughnut.repositories.NoteRepository;
 import com.odde.doughnut.testability.DBCleaner;
 import org.junit.jupiter.api.Test;

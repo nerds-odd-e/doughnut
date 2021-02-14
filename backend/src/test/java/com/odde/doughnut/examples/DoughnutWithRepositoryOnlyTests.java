@@ -1,4 +1,4 @@
-package com.odde.doughnut;
+package com.odde.doughnut.examples;
 
 import com.odde.doughnut.models.Note;
 import com.odde.doughnut.repositories.NoteRepository;
@@ -20,15 +20,12 @@ class DoughnutWithRepositoryOnlyTests {
         this.applicationContext = applicationContext;
     }
 
-
     @Test
     void contextLoads() {
-
         NoteRepository noteRepository = applicationContext.getBean("noteRepository", NoteRepository.class);
         Note note = new Note();
         note.setTitle("sss");
         noteRepository.save(note);
         assertEquals(1, noteRepository.count());
     }
-
 }
