@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
@@ -49,6 +50,11 @@ public class DBCleaner implements BeforeEachCallback {
   }
 
   private void truncateTable(String tableName, EntityManager entityManager) {
+    Logger.getAnonymousLogger().info("BEGIN DEDEBUG");
+    List res = entityManager.createNativeQuery("show tables").getResultList();
+    res.stream().forEach(r-> Logger.getAnonymousLogger().info((String) r));
+    res = entityManager.createNativeQuery("SELECT DATABASE()").getResultList();
+    res.stream().forEach(r-> Logger.getAnonymousLogger().info((String) r));
     entityManager.createNativeQuery("SET FOREIGN_KEY_CHECKS=0").executeUpdate();
     entityManager.createNativeQuery("TRUNCATE TABLE `" + tableName + "`").executeUpdate();
     entityManager.createNativeQuery("TRUNCATE TABLE `" + tableName + "`").executeUpdate();
