@@ -38,8 +38,11 @@ jobs:
       - name: E2E tests with Cypress
         uses: cypress-io/github-action@v2
         with:
+          browser: chrome
+          headless: true
+          config: pageLoadTimeout=100000,video=false
           install-command: yarn
-          start: yarn test:ci
+          start: yarn test
       - name: Build production application jar artifact
         run: backend/gradlew -p backend build -x test -Dspring.profiles.active=prod
       - name: Setup Google Cloud SDK with Service Account
