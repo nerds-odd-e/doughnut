@@ -1,5 +1,6 @@
-package com.odde.doughnut;
+package com.odde.doughnut.testability;
 
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,6 +17,7 @@ class DBMigrationTest {
 	private Flyway flyway;
 
 	@Test
+	@Tag("dbMigrate")
 	void migrate() {
 		flyway.migrate();
 	}
