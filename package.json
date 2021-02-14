@@ -8,9 +8,11 @@
   "scripts": {
     "cy:open": "cypress open",
     "cy:run": "cypress run",
+    "cy:run:ci": "cypress run --config video=false screenshotOnRunFailure=false",
     "sut": "backend/gradlew bootRun -p backend -Dspring.profiles.active=test",
     "open": "run-p -clnr sut cy:open",
     "test": "run-p -clnr sut cy:run",
+    "test:ci": "run-p -clnr sut cy:run:ci",
     "sound": "node scripts/sound-monitor.js"
   },
   "cypress-cucumber-preprocessor": {
