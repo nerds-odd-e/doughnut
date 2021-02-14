@@ -1,6 +1,6 @@
 #!/bin/bash
 HEALTHCHECK_STATUS=""
-RETRY=30
+RETRY=20
 while [[ ${RETRY} -gt 0 ]] && [[ "${HEALTHCHECK_STATUS}" != *"OK"* ]]
 do
   sleep 15
