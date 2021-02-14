@@ -23,16 +23,4 @@ class DoughnutApplicationTests {
 		assertEquals("login", controller.home(null, model));
 	}
 
-	@Test
-	void visitWithUserSessionButNoSuchARegisteredUserYet() {
-		Principal user = new UserPrincipal() {
-			@Override
-			public String getName() {
-				return "Tom";
-			}
-		};
-		Model model = mock(Model.class);
-		assertEquals("index", controller.home(user, model));
-	}
-
 }
