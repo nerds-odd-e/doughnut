@@ -13,7 +13,6 @@ import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 
 @Configuration
 @Profile({"prod"})
-@Order(200)
 public class ProductionConfiguration extends WebSecurityConfigurerAdapter {
 
     @Override
