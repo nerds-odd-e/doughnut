@@ -5,9 +5,11 @@
 <div th:replace="fragments/basic_layout :: header"/>
 
 <div class="container">
-    <p th:text="'Hello, ' + ${name} + '!'"/>
-    <p>And here's what we know about you...</p>
-    <samp th:text="${user_details}"/>
+    <h2>Welcome, new user. Please create your profile</h2>
+    <form action="#" th:action="@{/users}" th:object="${user}" method="post">
+        <p>Name: <input type="text" th:field="*{name}" /></p>
+        <p><input type="submit" value="Submit" /></p>
+    </form>
 </div>
 
 <div th:replace="fragments/basic_layout :: footer"/>

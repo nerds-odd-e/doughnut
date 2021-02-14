@@ -1,16 +1,10 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.models.User;
 import com.odde.doughnut.repositories.NoteRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.AuthenticatedPrincipal;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.security.Principal;
 
@@ -31,6 +25,8 @@ public class IndexController {
     }
     model.addAttribute("name", user.getName());
     model.addAttribute("user_details", user.toString());
+
+    model.addAttribute("user", new User());
     return "register";
   }
 }
