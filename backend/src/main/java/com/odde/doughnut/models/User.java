@@ -4,7 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.util.Set;
+import java.util.List;
 
 @Entity
 @Table(name = "user")
@@ -15,5 +15,6 @@ public class User {
   @Getter @Setter private String externalIdentifier;
 
   @OneToMany(mappedBy="user")
-  private Set<Note> notes;
+  @OrderBy("created_datetime DESC")
+  @Getter private List<Note> notes;
 }

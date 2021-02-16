@@ -50,7 +50,7 @@ public class NoteControllerTests {
             };
 
             try {
-                assertEquals(noteController.createNote(user, note, model).getUrl(), "/");
+                assertEquals(noteController.createNote(user, note, model).getUrl(), "/review");
             } catch (Exception e) {
                 e.printStackTrace();
             }

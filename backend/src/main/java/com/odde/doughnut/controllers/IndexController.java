@@ -50,4 +50,12 @@ public class IndexController {
     model.addAttribute("note", new Note());
     return "note";
   }
+
+  @GetMapping("/review")
+  public String review(Principal principal, Model model) {
+    User user = userRepository.findByExternalIdentifier(principal.getName());
+
+    model.addAttribute("notes", user.getNotes());
+    return "review";
+  }
 }

@@ -27,6 +27,6 @@ public class NoteController {
         if (currentUser == null) throw new Exception("User does not exist");
         note.setUser(currentUser);
         noteRepository.save(note);
-        return new RedirectView("/");
+        return new RedirectView("/review");
     }
 }

@@ -9,6 +9,6 @@ Scenario: New user create a note without login
 @clean_db @login_as_new_user @ignore
 Scenario: New user create a note after login
     When I create note with: 
-    | Note Title      |   Description       |
+    | note-title      |   note-description       |
     | Sedition        |   Incite violence   |
-    Then I should see a note saved message
+    Then I should see the note with title and description on the review page

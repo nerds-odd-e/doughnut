@@ -5,12 +5,22 @@
 <div th:replace="fragments/basic_layout :: header"/>
 
 <div class="container">
-    <p>Here are your notes!</p>
+    <h2 class="display-2">Here are your notes!</h2>
 
     <form action="#" th:action="@{/note}" th:object="${note}" method="post">
         <p>Title: <input data-cy="Note Title" th:field="*{title}" /></p>
         <p>Description: <input data-cy="Description" name="description" th:field="*{description}" /></p>
         <p><input type="submit" value="Submit" /></p>
+
+        <h2s class="display-2">Here are your notes!</h2s>
+
+        <!-- <form action="#" th:action="@{/note}" th:object="${note}" method="post">
+            <label for="note-title">Title:</label>
+            <input id="note-title" th:field="*{title}" />
+            <br>
+            <label for="note-description">Description:</label>
+            <input id="note-description" th:field="*{description}" />
+            <p><input type="submit" value="Submit" /></p> -->
     </form>
 </div>
 
