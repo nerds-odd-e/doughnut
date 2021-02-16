@@ -1,6 +1,6 @@
 Feature: link note
 
-  @ignore-this
+  @ignore
   Scenario: Link two notes together
     Given I have created two notes
       | title      |

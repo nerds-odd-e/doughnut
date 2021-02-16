@@ -1,5 +1,8 @@
 {
   "baseUrl": "http://localhost:8081",
+  "env": {
+    "TAGS": "not @ignore"
+  },
   "testFiles": "**/*.{feature,features}",
   "chromeWebSecurity": false
 }
