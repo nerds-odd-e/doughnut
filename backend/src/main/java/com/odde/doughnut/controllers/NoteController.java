@@ -22,8 +22,9 @@ public class NoteController {
     }
 
     @PostMapping("/note")
-    public RedirectView createNote(Principal principal, Note note, Model model) {
+    public RedirectView createNote(Principal principal, Note note, Model model) throws Exception {
         User currentUser = userRepository.findByExternalIdentifier(principal.getName());
+        if (currentUser == null) throw new Exception("User does not exist");
         note.setUser(currentUser);
         noteRepository.save(note);
         return new RedirectView("/");

@@ -37,14 +37,24 @@ class IndexControllerTests {
   @Test
   void visitWithUserSessionButNoSuchARegisteredUserYet() {
     IndexController controller = new IndexController(noteRepository, userRepository);
-    Principal user = new UserPrincipal() {
-      @Override
-      public String getName() {
-        return "1234567";
-      }
-    };
+    Principal user = (UserPrincipal) () -> "1234567";
     Model model = mock(Model.class);
     assertEquals("register", controller.home(user, model));
+  }
+
+  @Test
+  void shouldBeRedirectToLandingPageWhenUserIsNotLogIn() {
+    IndexController controller = new IndexController(noteRepository, userRepository);
+    Model model = mock(Model.class);
+    assertEquals("redirect:/", controller.notes(null, model));
+  }
+
+  @Test
+  void shouldProceedToNotePageWhenUserIsLogIn() {
+    IndexController controller = new IndexController(noteRepository, userRepository);
+    Principal user = (UserPrincipal) () -> "1234567";
+    Model model = mock(Model.class);
+    assertEquals("note", controller.notes(user, model));
   }
 
 }
