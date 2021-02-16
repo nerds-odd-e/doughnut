@@ -1,7 +1,9 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.models.Note;
+import com.odde.doughnut.models.User;
 import com.odde.doughnut.repositories.NoteRepository;
+import com.odde.doughnut.repositories.UserRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,13 +14,18 @@ import java.security.Principal;
 @Controller
 public class NoteController {
     private final NoteRepository noteRepository;
+    private final UserRepository userRepository;
 
-    public NoteController(NoteRepository noteRepository) {
+    public NoteController(NoteRepository noteRepository, UserRepository userRepository) {
         this.noteRepository = noteRepository;
+        this.userRepository = userRepository;
     }
 
     @PostMapping("/note")
-    public RedirectView createUser(Principal principal, Note note, Model model) {
+    public RedirectView createNote(Principal principal, Note note, Model model) {
+        User currentUser = userRepository.findByExternalIdentifier(principal.getName());
+        note.setUser(currentUser);
+        noteRepository.save(note);
         return new RedirectView("/");
     }
 }

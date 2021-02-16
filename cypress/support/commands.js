@@ -23,6 +23,9 @@
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
+
+import '@testing-library/cypress/add-commands'
+
 Cypress.Commands.add("cleanDB", () => {
   cy.request("/api/testability/clean_db").its("body").should("contain", "OK");
 });
