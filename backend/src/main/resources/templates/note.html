@@ -8,8 +8,8 @@
     <p>Here are your notes!</p>
 
     <form action="#" th:action="@{/note}" th:object="${note}" method="post">
-        <p>Name: <input type="text" th:field="*{title}" /></p>
-        <p>Name: <input type="text" th:field="*{description}" /></p>
+        <p>Title: <input data-cy="Note Title" th:field="*{title}" /></p>
+        <p>Description: <input data-cy="Description" name="description" th:field="*{description}" /></p>
         <p><input type="submit" value="Submit" /></p>
     </form>
 </div>

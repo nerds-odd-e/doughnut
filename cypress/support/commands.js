@@ -29,3 +29,13 @@ import '@testing-library/cypress/add-commands'
 Cypress.Commands.add("cleanDB", () => {
   cy.request("/api/testability/clean_db").its("body").should("contain", "OK");
 });
+
+Cypress.Commands.add("loginAsNewUser", () => {
+  cy.visit("/login");
+
+  cy.get("#username").type("user");
+  cy.get("#password").type("password");
+  cy.get("form.form-signin").submit();
+  cy.location("pathname", { timeout: 10000 }).should("eq", "/");
+  cy.get('input[type="submit"][value="Logout"]').should("be.visible");
+})

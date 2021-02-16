@@ -10,6 +10,10 @@ Before({ tags: "@clean_db" }, () => {
   cy.cleanDB();
 });
 
+Before({ tags: "@log_out" }, () => {
+  cy.logOut();
+});
+
 When("I identify myself as a new user", () => {
   cy.visit("/login");
 
