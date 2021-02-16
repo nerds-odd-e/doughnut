@@ -17,7 +17,7 @@ public class Note {
 
   @ManyToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "user_id", referencedColumnName = "id")
-  private User user;
+  @Getter @Setter private User user;
 
   @Column(name="created_datetime")
   @Getter @Setter private Date createdDatetime;

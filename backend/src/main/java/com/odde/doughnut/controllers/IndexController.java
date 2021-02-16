@@ -43,6 +43,10 @@ public class IndexController {
 
   @GetMapping("/note")
   public String notes(Principal principal, Model model) {
+    if (principal == null) {
+      model.addAttribute("totalNotes", noteRepository.count());
+      return "redirect:/";
+    }
     model.addAttribute("note", new Note());
     return "note";
   }
