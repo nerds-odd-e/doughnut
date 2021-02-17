@@ -51,3 +51,7 @@ Then("I should see the note with title and description on the review page", (dat
      }
   });
 })
+
+Then("I click on next note", () => {
+  
+})

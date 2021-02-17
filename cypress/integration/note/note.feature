@@ -7,7 +7,7 @@ Scenario: New user create a note without login
     Then I should be asked to log in
 
 @clean_db @login_as_new_user
-Scenario: New user create a note after login
+Scenario: New user create notes after login
     When I create note with: 
     | note-title      |   note-description  |
     | Sedition        |   Incite violence   |
@@ -15,3 +15,17 @@ Scenario: New user create a note after login
     Then I should see the note with title and description on the review page
     | note-title      |   note-description  |
     | Sedation        |   Put to sleep      |
+
+@clean_db @login_as_new_user @ignore
+Scenario: New user review multiple notes
+    When I create note with: 
+    | note-title      |   note-description  |
+    | Sedition        |   Incite violence   |
+    | Sedation        |   Put to sleep      |
+    Then I should see the note with title and description on the review page
+    | note-title      |   note-description  |
+    | Sedation        |   Put to sleep      |
+    And I click on next note
+    Then I should see the note with title and description on the review page
+    | note-title      |   note-description  |
+    | Sedition        |   Incite violence   |
