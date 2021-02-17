@@ -6,6 +6,10 @@ import {
   Before,
 } from "cypress-cucumber-preprocessor/steps";
 
+//Before({ tags: "@clean_db" }, () => {
+//  cy.cleanDB();
+//});
+
 Before({ tags: "@log_out" }, () => {
   cy.logOut();
 });

@@ -13,7 +13,7 @@ Feature: link note
 
   Background:
       Given I create note with:
-      | Note Title           |   Description       |
+      | note-title      |  note-description       |
       | Sedition        |   Incite violence   |
       | Sedation        |   Put to sleep      |
       | Sedative        |   sleep medicine    |
@@ -22,18 +22,18 @@ Feature: link note
     Scenario Outline: View all linkable notes when no links exist
         When I navigate to the notes page
         Then I should see 3 notes belonging to the user
-            | Note Title      |
+            | note-title       |
             | Sedition        |
             | Sedation        |
             | Sedative        |
         When I click Create Link button on:
-            | Note Title      |
+            | note-title      |
             | Sedition        |
         Then I should be navigated to the linking page
         And I should see below notes
 
         Examples:
-        | Note Title      |   Description       |
+        | note-title      |   note-description       |
         | Sedation        |   Put to sleep      |
 
 @ignore @clean_db @login_as_new_user
@@ -46,5 +46,5 @@ Feature: link note
         And I should see below notes
 
         Examples:
-        | Note Title           |   Description       |
+        | note-title      |   note-description       |
         | Sedative        |   sleep medicine    |

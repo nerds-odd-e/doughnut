@@ -25,7 +25,7 @@ Then("I should see 3 notes belonging to the user", (data) => {
     cy.findByText("Your Notes");
 
     data.hashes().forEach((elem) => {
-         cy.findByText(elem["Note Title"]).should("be.visible");
+         cy.findByText(elem["note-title"]).should("be.visible");
     });
 
 });
