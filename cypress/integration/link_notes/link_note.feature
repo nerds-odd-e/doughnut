@@ -18,18 +18,22 @@ Feature: link note
       | Sedation        |   Put to sleep      |
       | Sedative        |   sleep medicine    |
 
-    @ignore @clean_db @login_as_new_user @link_note
+@ignore @clean_db @login_as_new_user @link_note
     Scenario Outline: View all linkable notes when no links exist
         When I navigate to the notes page
-        Then I should see all notes belonging to the user
+        Then I should see 3 notes belonging to the user
+            | Note Title      |
+            | Sedition        |
+            | Sedation        |
+            | Sedative        |
         When I click Create Link button on:
             | Note Title      |
-            | Sedition   |
+            | Sedition        |
         Then I should be navigated to the linking page
         And I should see below notes
 
         Examples:
-        | Note Title           |   Description       |
+        | Note Title      |   Description       |
         | Sedation        |   Put to sleep      |
 
 @ignore @clean_db @login_as_new_user
