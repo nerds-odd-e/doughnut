@@ -7,7 +7,7 @@
 <div class="container">
     <h2>Welcome, new user. Please create your profile</h2>
     <form action="#" th:action="@{/users}" th:object="${user}" method="post">
-        <p>Name: <input type="text" th:field="*{name}" /></p>
+        <p>Name: <input type="text" id="nameInput" th:field="*{name}" /></p>
         <p><input type="submit" value="Submit" /></p>
     </form>
 </div>

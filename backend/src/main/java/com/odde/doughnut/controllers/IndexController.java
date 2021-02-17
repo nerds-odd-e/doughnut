@@ -51,15 +51,7 @@ public class IndexController {
     return "note";
   }
 
-  @GetMapping("/view")
-  public String view(Principal principal, Model model) {
-    if (principal == null) {
-      model.addAttribute("totalNotes", noteRepository.count());
-      return "redirect:/";
-    }
 
-    return "view";
-  }
 
   @GetMapping("/review")
   public String review(Principal principal, Model model) {
@@ -67,5 +59,17 @@ public class IndexController {
 
     model.addAttribute("notes", user.getNotes());
     return "review";
+  }
+
+  @GetMapping("/view")
+  public String view(Principal principal, Model model) {
+    if (principal == null) {
+      model.addAttribute("totalNotes", noteRepository.count());
+      return "redirect:/";
+    }
+
+    User user = userRepository.findByExternalIdentifier(principal.getName());
+    model.addAttribute("notes", user.getNotes());
+    return "view";
   }
 }

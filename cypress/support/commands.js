@@ -38,4 +38,7 @@ Cypress.Commands.add("loginAsNewUser", () => {
   cy.get("form.form-signin").submit();
   cy.location("pathname", { timeout: 10000 }).should("eq", "/");
   cy.get('input[type="submit"][value="Logout"]').should("be.visible");
+
+  cy.get('[id="nameInput"]').type("Learner A");
+  cy.get('input[value="Submit"]').click();
 })

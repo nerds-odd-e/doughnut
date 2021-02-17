@@ -27,5 +27,5 @@ When("I navigate to the notes page", () => {
 });
 
 Then("I should see all notes belonging to the user", () => {
-
+    cy.findByText("Your Notes");
 });
