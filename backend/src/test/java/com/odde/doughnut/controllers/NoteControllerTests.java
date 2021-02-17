@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.ui.Model;
+import org.springframework.web.servlet.view.RedirectView;
 
 import java.nio.file.attribute.UserPrincipal;
 import java.security.Principal;
@@ -29,16 +30,13 @@ public class NoteControllerTests {
         @Autowired private UserRepository userRepository;
 
         @Test
-        void shouldBeAbleToSaveNoteWhenThereIsValidUser() {
+        void shouldBeAbleToSaveNoteWhenThereIsValidUser() throws Exception {
             Model model = mock(Model.class);
             NoteRepository noteRepository = mock(NoteRepository.class);
             NoteController noteController = new NoteController(noteRepository, createMockUserRepository(new User()));
 
-            try {
-                assertEquals(noteController.createNote(createUser(), createNote(), model).getUrl(), "/review");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            RedirectView note = noteController.createNote(createLogin(), new Note(), model);
+            assertEquals(note.getUrl(), "/review");
         }
 
         @Test
@@ -47,15 +45,13 @@ public class NoteControllerTests {
             NoteRepository noteRepository = mock(NoteRepository.class);
             NoteController noteController = new NoteController(noteRepository, createMockUserRepository(null));
 
-            Note note = createNote();
+            Note note = new Note();
 
             try {
-                noteController.createNote(createUser(), note, model);
+                noteController.createNote(createLogin(), note, model);
             } catch (Exception e) {
-                e.printStackTrace();
+                Mockito.verify(noteRepository, times(0)).save(note);
             }
-            Mockito.verify(noteRepository, times(0)).save(note);
-
         }
 
         private UserRepository createMockUserRepository(User user) {
@@ -64,23 +60,7 @@ public class NoteControllerTests {
             return userRepository;
         }
 
-        private Principal createUser() {
-            Principal user = (UserPrincipal) () -> "1234567";
-            return user;
-        }
-        
-        private Note createNote() {
-            return new Note ()
-            {
-                public int getId(){
-                    return 1;
-                }
-                public String getTitle(){
-                    return "testTitle";
-                }
-                public String getDescription(){
-                    return "testDescription";
-                }
-            };
+        private Principal createLogin() {
+            return (UserPrincipal) () -> "1234567";
         }
 }
