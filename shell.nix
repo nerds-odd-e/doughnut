@@ -19,11 +19,12 @@ in mkShell {
     any-nix-shell autoconf automake coreutils-full gcc gnumake gnupg
     git git-secret gitAndTools.delta locale lsd platinum-searcher most
     binutils-unwrapped hostname inetutils openssh pkg-config rsync
-    bat duf fasd fzf htop jq lsof lzma progress ripgrep tree wget which
+    bat duf fasd fzf htop jq less lesspipe lsof lzma
+    progress ripgrep tree wget which
     libmysqlclient libpcap libressl
     cacert curlie glances httpie mariadb python38Packages.pip
     chromedriver geckodriver google-cloud-sdk
-    vim vimPlugins.nerdtree vimPlugins.nvimdev-nvim vimPlugins.spacevim vscodium
+    vim vimpager vimPlugins.nerdtree vimPlugins.nvimdev-nvim vimPlugins.spacevim vscodium
   ] ++ lib.optionals stdenv.isDarwin [
     darwin.apple_sdk.libs.utmp darwin.apple_sdk.libs.Xplugin
     apple_sdk.AppKit apple_sdk.AGL apple_sdk.ApplicationServices apple_sdk.AudioToolbox
