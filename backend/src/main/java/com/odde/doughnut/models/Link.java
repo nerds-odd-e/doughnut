@@ -10,6 +10,12 @@ import javax.persistence.*;
 public class Link {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) private Integer id;
-    @Column(name = "source_id") @Getter @Setter private Integer sourceId;
-    @Column(name = "target_id") @Getter @Setter private Integer targetId;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "source_id", referencedColumnName = "id")
+    @Getter @Setter private Note sourceNote;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "target_id", referencedColumnName = "id")
+    @Getter @Setter private Note targetNote;
 }

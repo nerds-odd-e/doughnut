@@ -5,7 +5,9 @@ import javax.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "note")
@@ -21,4 +23,12 @@ public class Note {
 
   @Column(name="created_datetime")
   @Getter @Setter private Date createdDatetime;
+
+  @JoinTable(name = "link", joinColumns = {
+          @JoinColumn(name = "source_id", referencedColumnName = "id", nullable =   false)}, inverseJoinColumns = {
+          @JoinColumn(name = "target_id", referencedColumnName = "id", nullable = false)})
+  @ManyToMany
+  @Getter @Setter private List<Note> linksToTargetNote = new ArrayList<>();
+
+
 }

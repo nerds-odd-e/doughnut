@@ -1,9 +1,9 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.models.Link;
+import com.odde.doughnut.models.Note;
 import com.odde.doughnut.repositories.LinkRepository;
 
-import javax.swing.text.html.parser.Entity;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,24 +15,24 @@ public class LinkService {
         this._repository = repo;
     }
 
-    public boolean createOneWayLink(int sourceId, int targetId){
+    public boolean createOneWayLink(Note sourceNote, Note targetNote){
         Link link = new Link();
-        link.setSourceId(sourceId);
-        link.setTargetId(targetId);
+        link.setSourceNote(sourceNote);
+        link.setTargetNote(targetNote);
         Link result = _repository.save(link);
 
         return result != null;
 
     }
 
-    public boolean createTwoWayLink(int sourceId, int targetId){
+    public boolean createTwoWayLink(Note sourceNote, Note targetNote){
         Link link = new Link();
-        link.setSourceId(sourceId);
-        link.setTargetId(targetId);
+        link.setSourceNote(sourceNote);
+        link.setTargetNote(targetNote);
 
         Link linkOpposite = new Link();
-        linkOpposite.setSourceId(targetId);
-        linkOpposite.setTargetId(sourceId);
+        linkOpposite.setSourceNote(targetNote);
+        linkOpposite.setTargetNote(sourceNote);
 
         List<Link> listLink = new ArrayList<Link>();
         listLink.add(link);
