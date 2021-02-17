@@ -11,6 +11,7 @@ Scenario: New user create a note after login
     When I create note with: 
     | note-title      |   note-description  |
     | Sedition        |   Incite violence   |
+    | Sedation        |   Put to sleep      |
     Then I should see the note with title and description on the review page
     | note-title      |   note-description  |
-    | Sedition        |   Incite violence   |
+    | Sedation        |   Put to sleep      |
