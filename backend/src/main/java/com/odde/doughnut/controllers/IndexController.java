@@ -51,6 +51,16 @@ public class IndexController {
     return "note";
   }
 
+  @GetMapping("/view")
+  public String view(Principal principal, Model model) {
+    if (principal == null) {
+      model.addAttribute("totalNotes", noteRepository.count());
+      return "redirect:/";
+    }
+
+    return "view";
+  }
+
   @GetMapping("/review")
   public String review(Principal principal, Model model) {
     User user = userRepository.findByExternalIdentifier(principal.getName());
