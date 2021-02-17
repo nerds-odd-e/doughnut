@@ -1,13 +1,16 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
+<head th:replace="fragments/basic_layout :: head"/>
 <body>
+<div th:replace="fragments/basic_layout :: header"/>
     <h2>Your Notes</h2>
-    <div class="card">Sedition</div>
-    <div class="card">Sedation</div>
-    <div class="card">Sedative</div>
+    <div th:each="note:${notes}">
+        <div class="card">
+            <p th:text="${note.title}"></p>
+            <a th:data-testid="'link-' + ${note.id}" th:href="'link/' + ${note.id}">Link</a>
+        </div>
+    </div>
+<div th:replace="fragments/basic_layout :: footer"/>
+<div th:replace="fragments/basic_layout :: foot"/>
 </body>
 </html>

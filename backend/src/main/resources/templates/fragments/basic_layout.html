@@ -1,5 +1,5 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org" lang="en">
 <head th:fragment="head">
     <meta charset="UTF-8">
     <title>Title</title>
@@ -29,6 +29,10 @@
                     </li>
                     <li class="nav-item active">
                         <a class="nav-link" href="/review">Review
+                            <span class="sr-only">(current)</span></a>
+                    </li>
+                    <li class="nav-item active">
+                        <a class="nav-link" href="/view">View
                             <span class="sr-only">(current)</span></a>
                     </li>
                 </ul>

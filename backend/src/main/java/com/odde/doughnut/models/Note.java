@@ -10,7 +10,7 @@ import java.util.Date;
 @Entity
 @Table(name = "note")
 public class Note {
-  @Id @GeneratedValue(strategy = GenerationType.IDENTITY) private Integer id;
+  @Id @Getter @GeneratedValue(strategy = GenerationType.IDENTITY) private Integer id;
   @Getter
   @Setter private String title;
   @Getter @Setter private String description;

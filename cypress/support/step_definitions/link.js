@@ -18,7 +18,7 @@ Given("I create note with:", (data) => {
 });
 
 When("I navigate to the notes page", () => {
-  cy.visit("/view");
+  cy.findByText("View").click();
 });
 
 Then("I should see 3 notes belonging to the user", (data) => {
@@ -28,4 +28,14 @@ Then("I should see 3 notes belonging to the user", (data) => {
          cy.findByText(elem["note-title"]).should("be.visible");
     });
 
+});
+
+When("I click Create Link hyperlink on Sedition", () => {
+    var hyperlink = cy.findByTestId('link-1');
+    hyperlink.should("be.visible");
+    hyperlink.click();
+});
+
+Then("I should be navigated to the linking page", () =>{
+    cy.url().should('include', 'link/1');
 });
