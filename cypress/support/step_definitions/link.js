@@ -6,11 +6,6 @@ import {
   Before,
   Background
 } from "cypress-cucumber-preprocessor/steps";
-
-Before({ tags: "@clean_db" }, () => {
-  cy.cleanDB();
-});
-
 Given("I create note with:", (data) => {
     data.hashes().forEach((elem) => {
     cy.visit("/note");

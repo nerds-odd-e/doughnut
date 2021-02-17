@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="fragments/basic_layout :: head"/>
+<body>
+<div th:replace="fragments/basic_layout :: header"/>
+
+<div class="container">
+    <h2 class="display-2">Review your notes</h2>
+
+    <div>
+        <h3 data-cy="note-title" th:text="${notes[0].getTitle}" class="display-4"/>
+        <p data-cy="note-description" th:text="${notes[0].getDescription}"class="lead"/>
+    </div>
+</div>
+
+<div th:replace="fragments/basic_layout :: footer"/>
+<div th:replace="fragments/basic_layout :: foot"/>
+</body>
+</html>
