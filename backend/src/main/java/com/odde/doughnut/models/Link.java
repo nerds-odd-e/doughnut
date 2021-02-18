@@ -11,6 +11,8 @@ public class Link {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) private Integer id;
 
+
+
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "source_id", referencedColumnName = "id")
     @Getter @Setter private Note sourceNote;

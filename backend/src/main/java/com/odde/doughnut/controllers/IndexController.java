@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.models.Link;
 import com.odde.doughnut.models.Note;
 import com.odde.doughnut.models.User;
 import com.odde.doughnut.repositories.NoteRepository;
@@ -88,6 +89,8 @@ public class IndexController {
         List<Note> linkableNotes = getLinkableNotes(user, sourceNote);
         model.addAttribute("linkableNotes", linkableNotes);
         model.addAttribute("sourceNote", sourceNote.get());
+        model.addAttribute("targetNote", new Note());
+        model.addAttribute("link", new Link());
         return "link";
     }
 
