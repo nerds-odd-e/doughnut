@@ -40,6 +40,10 @@ Then("I should be navigated to the linking page", () =>{
     cy.url().should('include', 'link/1');
 });
 
+And("I should see the source note as Sedition",() => {
+    cy.findByText("Link Sedition to:").should("be.visible");
+})
+
 And("I should see below notes",(data) => {
     data.hashes().forEach((elem) => {
          cy.findByText(elem["note-title"]).should("be.visible");

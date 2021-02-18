@@ -28,6 +28,7 @@ Feature: link note
             | Sedative        |
         When I click Create Link button on Sedition
         Then I should be navigated to the linking page
+        And I should see the source note as Sedition
         And I should see below notes
         | note-title      |   note-description  |
         | Sedation        |   Put to sleep      |
