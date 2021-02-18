@@ -48,10 +48,6 @@ public class IndexController {
 
     @GetMapping("/note")
     public String notes(Principal principal, Model model) {
-        if (principal == null) {
-            model.addAttribute("totalNotes", noteRepository.count());
-            return "redirect:/";
-        }
         model.addAttribute("note", new Note());
         return "note";
     }
@@ -67,11 +63,6 @@ public class IndexController {
 
     @GetMapping("/view")
     public String view(Principal principal, Model model) {
-        if (principal == null) {
-            model.addAttribute("totalNotes", noteRepository.count());
-            return "redirect:/";
-        }
-
         User user = userRepository.findByExternalIdentifier(principal.getName());
         model.addAttribute("notes", user.getNotes());
         return "view";
@@ -79,11 +70,6 @@ public class IndexController {
 
     @GetMapping("/link/{id}")
     public String link(Principal principal, Model model, @PathVariable("id") String id) {
-        if (principal == null) {
-            model.addAttribute("totalNotes", noteRepository.count());
-            return "redirect:/";
-        }
-
         User user = userRepository.findByExternalIdentifier(principal.getName());
         Optional<Note> sourceNote = noteRepository.findById(Integer.valueOf(id));
         List<Note> linkableNotes = getLinkableNotes(user, sourceNote);

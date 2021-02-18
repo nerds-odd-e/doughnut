@@ -36,7 +36,7 @@ public class NonProductConfiguration extends WebSecurityConfigurerAdapter {
                 .permitAll();
 
         http.authorizeRequests()
-                        .antMatchers("/", "/login", "/note", "/error", "/webjars/**")
+                        .antMatchers("/", "/login", "/error", "/webjars/**")
                         .permitAll()
                         .anyRequest()
                         .authenticated()

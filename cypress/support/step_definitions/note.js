@@ -19,7 +19,7 @@ When("I did not log in", () => {
 });
 
 Then("I should be asked to log in", () => {
-  cy.location("pathname", { timeout: 10000 }).should("eq", "/");
+  cy.location("pathname", { timeout: 10000 }).should("eq", "/login");
 });
 
 When("I create note with:", (data) => {
@@ -32,14 +32,7 @@ When("I create note with:", (data) => {
      cy.get('input[value="Submit"]').click();
     });
 
-});onload="javascript:getNotes()"
-
-Then("I should see a note saved message", () => {
-  const stub = cy.stub()
-
-  cy.on('window:alert', stub);
-  expect(stub.getCall(0)).to.be.calledWith('Note created!');
-})
+});
 
 Then("I should see the note with title and description on the review page", (data) => {
   cy.location("pathname", { timeout: 10000 }).should("eq", "/review");

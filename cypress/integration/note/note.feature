@@ -17,10 +17,8 @@ Scenario: New user create notes after login
 
 @clean_db @login_as_new_user
 Scenario: New user review multiple notes
-    When I create note with: 
-    | note-title      |   note-description  |
-    | Sedition        |   Incite violence   |
-    | Sedation        |   Put to sleep      |
+    Given I have some notes
+    When I review my notes
     Then I should see the note with title and description on the review page
     | note-title      |   note-description  |
     | Sedation        |   Put to sleep      |
@@ -29,7 +27,7 @@ Scenario: New user review multiple notes
     | note-title      |   note-description  |
     | Sedition        |   Incite violence   |
 
-@clean_db @login_as_new_user
+@clean_db @login_as_new_user 
 Scenario: : Get a list of notes
     Given I have some notes
     When I review my notes

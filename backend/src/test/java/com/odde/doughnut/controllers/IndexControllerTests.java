@@ -1,6 +1,5 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.models.Note;
 import com.odde.doughnut.models.User;
 import com.odde.doughnut.repositories.NoteRepository;
 import com.odde.doughnut.repositories.UserRepository;
@@ -43,13 +42,6 @@ class IndexControllerTests {
     Principal user = (UserPrincipal) () -> "1234567";
     Model model = mock(Model.class);
     assertEquals("register", controller.home(user, model));
-  }
-
-  @Test
-  void shouldBeRedirectToLandingPageWhenUserIsNotLogIn() {
-    IndexController controller = new IndexController(noteRepository, userRepository);
-    Model model = mock(Model.class);
-    assertEquals("redirect:/", controller.notes(null, model));
   }
 
   @Test
