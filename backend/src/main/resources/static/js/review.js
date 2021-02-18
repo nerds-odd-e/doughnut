@@ -1,6 +1,18 @@
+let noteList = [];
+let currentIndex = 0;
+
 async function getNotes() {
     const response = await fetch('/getNotes');
-    const noteJson = await response.json(); 
-    document.getElementById("note-title").innerHTML = noteJson[0].title;
-    document.getElementById("note-description").innerHTML = noteJson[0].description;
+    noteList = await response.json(); 
+    nextNote();
+}
+
+function nextNote() {
+    if (currentIndex >= noteList.length) {
+        currentIndex = 0;
+    }
+
+    document.getElementById("note-title").innerHTML = noteList[currentIndex].title;
+    document.getElementById("note-description").innerHTML = noteList[currentIndex].description;
+    currentIndex++;
 }

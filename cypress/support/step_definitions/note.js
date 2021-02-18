@@ -61,5 +61,5 @@ When("I review my notes", () => {
 })
 
 Then("I click on next note", () => {
-  
+  cy.findByText("Next").click();
 })

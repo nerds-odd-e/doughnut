@@ -15,7 +15,7 @@ Scenario: New user create notes after login
     | note-title      |   note-description  |
     | Sedation        |   Put to sleep      |
 
-@clean_db @login_as_new_user @ignore
+@clean_db @login_as_new_user
 Scenario: New user review multiple notes
     When I create note with: 
     | note-title      |   note-description  |
