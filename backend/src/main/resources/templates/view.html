@@ -7,7 +7,7 @@
     <div th:each="note:${notes}">
         <div class="card">
             <p th:text="${note.title}"></p>
-            <a th:data-testid="'link-' + ${note.id}" th:href="'link/' + ${note.id}">Link</a>
+            <a class="btn btn-primary" th:data-testid="'button-' + ${note.id}" th:href="'link/' + ${note.id}">Link</a>
         </div>
     </div>
 <div th:replace="fragments/basic_layout :: footer"/>

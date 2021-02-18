@@ -30,12 +30,18 @@ Then("I should see 3 notes belonging to the user", (data) => {
 
 });
 
-When("I click Create Link hyperlink on Sedition", () => {
-    var hyperlink = cy.findByTestId('link-1');
-    hyperlink.should("be.visible");
-    hyperlink.click();
+When("I click Create Link button on Sedition", () => {
+    var button = cy.findByTestId('button-1');
+    button.should("be.visible");
+    button.click();
 });
 
 Then("I should be navigated to the linking page", () =>{
     cy.url().should('include', 'link/1');
 });
+
+And("I should see below notes",(data) => {
+    data.hashes().forEach((elem) => {
+         cy.findByText(elem["note-title"]).should("be.visible");
+    });
+})
