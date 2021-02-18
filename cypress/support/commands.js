@@ -52,3 +52,15 @@ Cypress.Commands.add("loginAsExistingUser", () => {
   cy.location("pathname", { timeout: 10000 }).should("eq", "/");
   cy.get('input[type="submit"][value="Logout"]').should("be.visible");
 });
+
+Cypress.Commands.add("seedNotes", () => {
+  let now = Date.now();
+  cy.request({method: "POST", url: "/api/testability/seed_note", body: { title: "Sedition", description: "Incite violence", createdDatetime: new Date(now - 1000).toISOString() }})
+  .then((response) => {
+    expect(response.body).to.equal(1);
+  })
+  cy.request({method: "POST", url: "/api/testability/seed_note", body: { title: "Sedation", description: "Put to sleep", createdDatetime: new Date(now).toISOString() }})
+  .then((response) => {
+    expect(response.body).to.equal(2);
+  })
+})

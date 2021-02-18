@@ -1,19 +1,22 @@
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="fragments/basic_layout :: head"/>
-<body>
-<div th:replace="fragments/basic_layout :: header"/>
 
-<div class="container">
-    <h2 class="display-2">Review your notes</h2>
+<head th:replace="fragments/basic_layout :: head" />
 
-    <div>
-        <h3 data-cy="note-title" th:text="${notes[0].getTitle}" class="display-4"/>
-        <p data-cy="note-description" th:text="${notes[0].getDescription}"class="lead"/>
+<body onload="javascript:getNotes()">
+    <div th:replace="fragments/basic_layout :: header" />
+    <div class="container">
+        <h2 class="display-2">Review your notes</h2>
+
+        <div>
+            <h3 id="note-title" data-cy="note-title" class="display-4"></h3>
+            <p id="note-description" data-cy="note-description" class="lead"></p>
+        </div>
     </div>
-</div>
 
-<div th:replace="fragments/basic_layout :: footer"/>
-<div th:replace="fragments/basic_layout :: foot"/>
+    <div th:replace="fragments/basic_layout :: footer" />
+    <div th:replace="fragments/basic_layout :: foot" />
+    <script type="text/javascript" src="js/review.js"></script>
 </body>
+
 </html>

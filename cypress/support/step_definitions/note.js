@@ -6,6 +6,10 @@ import {
   Before,
 } from "cypress-cucumber-preprocessor/steps";
 
+Before({ tags: "@seed_notes" }, () => {
+  cy.seedNotes();
+});
+
 When("I create note", () => {
   cy.visit("/note");
 });
@@ -28,7 +32,7 @@ When("I create note with:", (data) => {
      cy.get('input[value="Submit"]').click();
     });
 
-});
+});onload="javascript:getNotes()"
 
 Then("I should see a note saved message", () => {
   const stub = cy.stub()
@@ -46,6 +50,14 @@ Then("I should see the note with title and description on the review page", (dat
       domElement.should("contain",elem[propName])
      }
   });
+})
+
+Given("I have some notes", () => {
+  cy.seedNotes();
+})
+
+When("I review my notes", () => {
+  cy.visit("/review")
 })
 
 Then("I click on next note", () => {

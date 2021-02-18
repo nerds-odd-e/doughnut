@@ -2,6 +2,7 @@ package com.odde.doughnut.models;
 
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -19,6 +20,7 @@ public class Note {
 
   @ManyToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "user_id", referencedColumnName = "id")
+  @JsonIgnore
   @Getter @Setter private User user;
 
   @Column(name="created_datetime")
