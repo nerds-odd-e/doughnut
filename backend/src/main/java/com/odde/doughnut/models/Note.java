@@ -25,10 +25,16 @@ public class Note {
   @Getter @Setter private Date createdDatetime;
 
   @JoinTable(name = "link", joinColumns = {
-          @JoinColumn(name = "source_id", referencedColumnName = "id", nullable =   false)}, inverseJoinColumns = {
-          @JoinColumn(name = "target_id", referencedColumnName = "id", nullable = false)})
+          @JoinColumn(name = "source_id", referencedColumnName = "id", nullable = false)}, inverseJoinColumns = {
+            @JoinColumn(name = "target_id", referencedColumnName = "id", nullable = false)
+          })
   @ManyToMany
-  @Getter @Setter private List<Note> linksToTargetNote = new ArrayList<>();
+  @Getter @Setter private List<Note> targetNotes = new ArrayList<>();
 
 
+  public void linkToNote(Note targetNote) {
+    this.targetNotes.add(targetNote);
+  }
 }
+
+
