@@ -11,15 +11,14 @@ Feature: link note
 #    And I select Sedation note as target
 #    Then I should see the link created between note Sedition and Sedation
 
-  Background:
-      Given I create note with:
-      | note-title      |  note-description       |
-      | Sedition        |   Incite violence   |
-      | Sedation        |   Put to sleep      |
-      | Sedative        |   sleep medicine    |
 
 @clean_db @login_as_new_user @link_note
     Scenario: View all linkable notes when no links exist
+        Given I create note with:
+            | note-title      |  note-description       |
+            | Sedition        |   Incite violence   |
+            | Sedation        |   Put to sleep      |
+            | Sedative        |   sleep medicine    |
         When I navigate to the notes page
         Then I should see 3 notes belonging to the user
             | note-title       |
@@ -33,6 +32,17 @@ Feature: link note
         | note-title      |   note-description  |
         | Sedation        |   Put to sleep      |
         | Sedative        |   sleep medicine    |
+
+@login_as_existing_user
+    Scenario: Create link for note
+        When I navigate to the notes page
+        And I click Create Link button on Sedition
+        Then I should be navigated to the linking page
+        And I should be able to see the buttons for linking note
+        When I select a Sedation note
+        Then I should be redirected to review page
+
+
 
 @ignore @clean_db @login_as_new_user
     Scenario Outline: View all linkable notes when there are existing links

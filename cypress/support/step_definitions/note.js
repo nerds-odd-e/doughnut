@@ -6,10 +6,6 @@ import {
   Before,
 } from "cypress-cucumber-preprocessor/steps";
 
-Before({ tags: "@login_as_new_user" }, () => {
-  cy.loginAsNewUser();
-});
-
 When("I create note", () => {
   cy.visit("/note");
 });
@@ -17,7 +13,6 @@ When("I create note", () => {
 When("I did not log in", () => {
 
 });
-
 
 Then("I should be asked to log in", () => {
   cy.location("pathname", { timeout: 10000 }).should("eq", "/");

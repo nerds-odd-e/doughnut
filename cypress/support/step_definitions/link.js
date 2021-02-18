@@ -36,6 +36,19 @@ When("I click Create Link button on Sedition", () => {
     button.click();
 });
 
+And("I should be able to see the buttons for linking note", () => {
+    cy.findAllByText("Select").should("have.lengthOf", 2);
+})
+
+When("I select a Sedation note", () => {
+    cy.findByTestId("button-2").click();
+})
+
+Then("I should be redirected to review page", () => {
+    cy.url().should('include', 'review');
+})
+
+
 Then("I should be navigated to the linking page", () =>{
     cy.url().should('include', 'link/1');
 });
