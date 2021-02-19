@@ -1,19 +1,17 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.models.Link;
 import com.odde.doughnut.models.Note;
 import com.odde.doughnut.models.User;
 import com.odde.doughnut.repositories.NoteRepository;
 import com.odde.doughnut.repositories.UserRepository;
+import com.odde.doughnut.services.LinkService;
 import org.springframework.http.MediaType;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.view.RedirectView;
 
-import javax.print.attribute.standard.Media;
 import java.security.Principal;
 import java.util.Date;
 import java.util.List;
@@ -22,10 +20,13 @@ import java.util.List;
 public class NoteController {
     private final NoteRepository noteRepository;
     private final UserRepository userRepository;
+    private final LinkService linkService;
 
-    public NoteController(NoteRepository noteRepository, UserRepository userRepository) {
+
+    public NoteController(NoteRepository noteRepository, UserRepository userRepository, LinkService linkService) {
         this.noteRepository = noteRepository;
         this.userRepository = userRepository;
+        this.linkService = linkService;
     }
 
     @PostMapping("/note")
@@ -46,14 +47,8 @@ public class NoteController {
     }
 
     @PostMapping(value = "/linkNote", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public RedirectView linkNote(Integer sourceNoteId, Integer targetNoteId, Model model) throws Exception {
-        Note sourceNote = noteRepository.findById(sourceNoteId).get();
-        Note targetNote = noteRepository.findById(targetNoteId).get();
-
-        sourceNote.linkToNote(targetNote);
-        sourceNote.setUpdatedDatetime(new Date());
-
-        noteRepository.save(sourceNote);
+    public RedirectView linkNote(Integer sourceNoteId, Integer targetNoteId, Model model) {
+        linkService.linkNote(sourceNoteId, targetNoteId);
         return new RedirectView("/review");
     }
 }

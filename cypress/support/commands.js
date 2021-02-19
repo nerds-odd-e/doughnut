@@ -57,12 +57,10 @@ Cypress.Commands.add("seedNotes", (notes) => {
   let now = Date.now();
 
   const createNotes = (notes) =>{
-       notes.forEach((note, index) => {
-            cy.request({method: "POST", url: "/api/testability/seed_note", body: note})
-                .then((response) => {
-                    expect(response.body).to.equal(index + 1);
-                })
-       });
+    cy.request({method: "POST", url: "/api/testability/seed_notes", body: notes})
+    .then((response) => {
+        expect(response.body.length).to.equal(notes.length);
+    })
   }
 
   if (!notes){
@@ -71,3 +69,11 @@ Cypress.Commands.add("seedNotes", (notes) => {
     createNotes(notes);
   }
 })
+
+Cypress.Commands.add("linkNote", (sourceId, targetId) => {
+  cy.request({
+    method: "POST",
+    url: "/api/testability/link_note",
+    qs: { sourceId,targetId }
+  });
+});

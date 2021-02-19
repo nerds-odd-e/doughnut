@@ -1,6 +1,7 @@
 
 package com.odde.doughnut.testability;
 
+import com.odde.doughnut.services.LinkService;
 import com.odde.doughnut.models.Note;
 import com.odde.doughnut.models.User;
 import com.odde.doughnut.repositories.NoteRepository;
@@ -10,7 +11,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManagerFactory;
 import java.security.Principal;
-
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -25,18 +27,30 @@ class TestabilityController {
   @Autowired
   UserRepository userRepository;
 
+  @Autowired
+  LinkService linkService;
+
   @GetMapping("/clean_db")
   public String cleanDB() {
     new DBCleanerWorker(emf).truncateAllTables();
     return "OK";
   }
 
-  @PostMapping("/seed_note")
-  public int seedNote(Principal principal, @RequestBody Note note) throws Exception {
+  @PostMapping("/seed_notes")
+  public List<Integer> seedNote(Principal principal, @RequestBody List<Note> notes) throws Exception {
     User currentUser = userRepository.findByExternalIdentifier(principal.getName());
     if (currentUser == null) throw new Exception("User does not exist");
-    note.setUser(currentUser);
-    noteRepository.save(note);
-    return note.getId();
+
+    for (Note note : notes) {
+      note.setUser(currentUser);
+    }
+    noteRepository.saveAll(notes);
+    return notes.stream().map(Note::getId).collect(Collectors.toList());
+
+  }
+  @PostMapping(value = "/link_note")
+  public String linkNote( Integer sourceId,  Integer targetId) {
+    linkService.linkNote(sourceId, targetId);
+    return "OK";
   }
 }

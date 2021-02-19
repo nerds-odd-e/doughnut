@@ -1,13 +1,11 @@
 package com.odde.doughnut.models;
 
-import javax.persistence.*;
-
-import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -37,7 +35,7 @@ public class Note {
           })
 
   @ManyToMany
-  @JsonBackReference
+  @JsonIgnoreProperties("targetNotes")
   @Getter @Setter private List<Note> targetNotes = new ArrayList<>();
 
   public void linkToNote(Note targetNote) {

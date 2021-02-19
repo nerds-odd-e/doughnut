@@ -4,6 +4,7 @@ import com.odde.doughnut.models.Note;
 import com.odde.doughnut.models.User;
 import com.odde.doughnut.repositories.NoteRepository;
 import com.odde.doughnut.repositories.UserRepository;
+import com.odde.doughnut.services.LinkService;
 import com.odde.doughnut.testability.DBCleaner;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -40,13 +41,16 @@ public class NoteControllerTests {
     @Autowired
     private SessionFactory sessionFactory;
 
+    private LinkService linkService;
+
     Session session;
 
     @Test
     void shouldBeAbleToSaveNoteWhenThereIsValidUser() throws Exception {
         Model model = mock(Model.class);
         NoteRepository noteRepository = mock(NoteRepository.class);
-        NoteController noteController = new NoteController(noteRepository, createMockUserRepository(new User()));
+
+        NoteController noteController = new NoteController(noteRepository, createMockUserRepository(new User()),linkService );
 
         RedirectView note = noteController.createNote(createLogin(), new Note(), model);
         assertEquals(note.getUrl(), "/review");
@@ -56,7 +60,7 @@ public class NoteControllerTests {
     void shouldNotBeAbleToSaveNoteWhenThereIsInvalidUser() {
         Model model = mock(Model.class);
         NoteRepository noteRepository = mock(NoteRepository.class);
-        NoteController noteController = new NoteController(noteRepository, createMockUserRepository(null));
+        NoteController noteController = new NoteController(noteRepository, createMockUserRepository(null), linkService);
 
         Note note = new Note();
 
@@ -69,14 +73,16 @@ public class NoteControllerTests {
 
     @BeforeEach
     void setupSession() {
+
         session = sessionFactory.openSession();
+        linkService = mock (LinkService.class);
     }
 
     @Test
     void shouldGetListOfNotes() throws Exception {
         User user = createUser();
         Note note = createNote(user);
-        NoteController noteController = new NoteController(noteRepository, userRepository);
+        NoteController noteController = new NoteController(noteRepository, userRepository, linkService);
         assertEquals(note.getTitle(), noteController.getNotes(createLogin()).get(0).getTitle());
     }
 
@@ -87,7 +93,7 @@ public class NoteControllerTests {
         when(mockUserRepo.findByExternalIdentifier(any())).thenReturn(user);
         when(user.getNotesInDescendingOrder()).thenReturn(Arrays.asList(new Note()));
 
-        NoteController noteController = new NoteController(noteRepository, mockUserRepo);
+        NoteController noteController = new NoteController(noteRepository, mockUserRepo, linkService);
         List<Note> notes = noteController.getNotes(createLogin());
         verify(user).getNotesInDescendingOrder();
         assertEquals(1, notes.size());
