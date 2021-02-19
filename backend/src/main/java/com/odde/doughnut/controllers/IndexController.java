@@ -9,6 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.security.Principal;
 import java.util.List;
@@ -69,12 +70,18 @@ public class IndexController {
     }
 
     @GetMapping("/link/{id}")
-    public String link(Principal principal, Model model, @PathVariable("id") String id) {
+    public String link(Principal principal, Model model, @PathVariable("id") String id, @RequestParam(required = false) String searchTerm) {
         User user = userRepository.findByExternalIdentifier(principal.getName());
         Optional<Note> sourceNote = noteRepository.findById(Integer.valueOf(id));
         List<Note> linkableNotes = getLinkableNotes(user, sourceNote);
+
+        if(searchTerm != null) {
+            linkableNotes = getFilteredLinkableNotes(linkableNotes, searchTerm);
+        }
+
         model.addAttribute("linkableNotes", linkableNotes);
         model.addAttribute("sourceNote", sourceNote.get());
+
         return "link";
     }
 
@@ -86,5 +93,12 @@ public class IndexController {
                 .filter(i -> i != sourceNote.get())
                 .collect(Collectors.toList());
         return linkableNotes;
+    }
+
+    private List<Note> getFilteredLinkableNotes(List<Note> notes, String searchTerm ) {
+        List<Note> filteredNotes = notes.stream()
+                .filter(note -> note.getTitle().contains(searchTerm))
+                .collect(Collectors.toList());
+        return filteredNotes;
     }
 }
