@@ -48,6 +48,11 @@ Then("I should be redirected to review page", () => {
     cy.url().should('include', 'review');
 })
 
+And("I should see the Sedition note linked to Sedation",() => {
+    cy.findByText("Sedition").should("be.visible");
+    cy.findByText("Sedation").should("be.visible");
+})
+
 
 Then("I should be navigated to the linking page", () =>{
     cy.url().should('include', 'link/1');
@@ -62,3 +67,15 @@ And("I should see below notes",(data) => {
          cy.findByText(elem["note-title"]).should("be.visible");
     });
 })
+
+When("I search for notes with title \"Sedatio\"", () => {
+    cy.findByPlaceholderText("Search")
+      .type("Sedatio");
+    cy.findByText("Search")
+      .click();
+})
+
+Then("I should see only \"Sedation\"", () =>{
+ cy.findByText("Sedation").should("be.visible");
+})
+
