@@ -55,27 +55,19 @@ Cypress.Commands.add("loginAsExistingUser", () => {
 
 Cypress.Commands.add("seedNotes", (notes) => {
   let now = Date.now();
-  
-  if (!notes) {
-    notes = [
-      { 
-        title: "Sedition",
-        description: "Incite violence",
-        createdDatetime: new Date(now - 1000).toISOString()
-      }, 
-      { 
-        title: "Sedation",
-        description: "Put to sleep",
-        createdDatetime: new Date(now).toISOString()
-      }
-    ]
+
+  const createNotes = (notes) =>{
+       notes.forEach((note, index) => {
+            cy.request({method: "POST", url: "/api/testability/seed_note", body: note})
+                .then((response) => {
+                    expect(response.body).to.equal(index + 1);
+                })
+       });
   }
 
-  notes.forEach((note, index) => {
-    cy.request({method: "POST", url: "/api/testability/seed_note", body: note})
-  .then((response) => {
-      expect(response.body).to.equal(index + 1);
-  })
-  });
-
+  if (!notes){
+    cy.fixture('notes').then(notes =>createNotes(notes));
+  } else {
+    createNotes(notes);
+  }
 })

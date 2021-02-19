@@ -6,10 +6,6 @@ import {
   Before,
 } from "cypress-cucumber-preprocessor/steps";
 
-Before({ tags: "@seed_notes" }, () => {
-  cy.seedNotes();
-});
-
 When("I create note", () => {
   cy.visit("/note");
 });

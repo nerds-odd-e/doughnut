@@ -21,3 +21,7 @@ Before({ tags: "@login_as_new_user" }, () => {
 Before({ tags: "@log_out" }, () => {
   cy.logOut();
 });
+
+Before({ tags: "@seed_notes" }, () => {
+  cy.seedNotes();
+});
