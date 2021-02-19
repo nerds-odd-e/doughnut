@@ -45,14 +45,14 @@ public class NoteTest {
         Note targetNote = new Note();
         targetNote.setTitle("Target Note");
         targetNote.setUser(user);
-        targetNote.setCreatedDatetime(Date.valueOf(LocalDate.now().minusDays(1)));
+        targetNote.setUpdatedDatetime(Date.valueOf(LocalDate.now().minusDays(1)));
         session.save(targetNote);
 
         Note sourceNote = new Note();
         sourceNote.setTitle("Source Note");
         sourceNote.setUser(user);
 
-        sourceNote.setCreatedDatetime(Date.valueOf(LocalDate.now()));
+        sourceNote.setUpdatedDatetime(Date.valueOf(LocalDate.now()));
         session.save(sourceNote);
 
         sourceNote.linkToNote(targetNote);

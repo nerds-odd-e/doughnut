@@ -65,13 +65,13 @@ public class UserTest {
         Note note1 = new Note();
         note1.setTitle("Title A");
         note1.setUser(user);
-        note1.setCreatedDatetime(Date.valueOf(LocalDate.now().minusDays(1)));
+        note1.setUpdatedDatetime(Date.valueOf(LocalDate.now().minusDays(1)));
         session.save(note1);
 
         Note note2 = new Note();
         note2.setTitle("Title B");
         note2.setUser(user);
-        note2.setCreatedDatetime(Date.valueOf(LocalDate.now()));
+        note2.setUpdatedDatetime(Date.valueOf(LocalDate.now()));
         session.save(note2);
 
 
