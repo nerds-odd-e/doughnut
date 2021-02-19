@@ -53,14 +53,29 @@ Cypress.Commands.add("loginAsExistingUser", () => {
   cy.get('input[type="submit"][value="Logout"]').should("be.visible");
 });
 
-Cypress.Commands.add("seedNotes", () => {
+Cypress.Commands.add("seedNotes", (notes) => {
   let now = Date.now();
-  cy.request({method: "POST", url: "/api/testability/seed_note", body: { title: "Sedition", description: "Incite violence", createdDatetime: new Date(now - 1000).toISOString() }})
+  
+  if (!notes) {
+    notes = [
+      { 
+        title: "Sedition",
+        description: "Incite violence",
+        createdDatetime: new Date(now - 1000).toISOString()
+      }, 
+      { 
+        title: "Sedation",
+        description: "Put to sleep",
+        createdDatetime: new Date(now).toISOString()
+      }
+    ]
+  }
+
+  notes.forEach((note, index) => {
+    cy.request({method: "POST", url: "/api/testability/seed_note", body: note})
   .then((response) => {
-    expect(response.body).to.equal(1);
+      expect(response.body).to.equal(index + 1);
   })
-  cy.request({method: "POST", url: "/api/testability/seed_note", body: { title: "Sedation", description: "Put to sleep", createdDatetime: new Date(now).toISOString() }})
-  .then((response) => {
-    expect(response.body).to.equal(2);
-  })
+  });
+
 })

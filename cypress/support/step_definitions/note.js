@@ -40,13 +40,20 @@ Then("I should see the note with title and description on the review page", (dat
   data.hashes().forEach((elem) => {
     for (var propName in elem) {
       var domElement = cy.get(`[data-cy="${propName}"]`);
-      domElement.should("contain",elem[propName])
+      domElement.should("contain", elem[propName])
      }
   });
 })
 
-Given("I have some notes", () => {
-  cy.seedNotes();
+Then("I have some notes", (data) => {
+  let notes = data?.hashes().map((item) => {
+    return {
+      title: item["note-title"],
+      description: item["note-description"],
+      createdDatetime: item["note-createdDateTime"] 
+    }
+})
+  cy.seedNotes(notes);
 })
 
 When("I review my notes", () => {
