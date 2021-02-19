@@ -2,7 +2,9 @@ package com.odde.doughnut.models;
 
 import javax.persistence.*;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -26,17 +28,22 @@ public class Note {
   @Column(name="created_datetime")
   @Getter @Setter private Date createdDatetime;
 
+  @Column(name="updated_datetime")
+  @Getter @Setter private Date updatedDatetime;
+
   @JoinTable(name = "link", joinColumns = {
           @JoinColumn(name = "source_id", referencedColumnName = "id", nullable = false)}, inverseJoinColumns = {
             @JoinColumn(name = "target_id", referencedColumnName = "id", nullable = false)
           })
-  @ManyToMany
-  @Getter @Setter private List<Note> targetNotes = new ArrayList<>();
 
+  @ManyToMany
+  @JsonBackReference
+  @Getter @Setter private List<Note> targetNotes = new ArrayList<>();
 
   public void linkToNote(Note targetNote) {
     this.targetNotes.add(targetNote);
   }
+
 }
 
 

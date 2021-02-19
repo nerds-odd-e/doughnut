@@ -24,7 +24,7 @@ public class User {
 
   public List<Note> getNotesInDescendingOrder() {
     List<Note> notes = getNotes();
-    notes.sort(Comparator.comparing(Note::getCreatedDatetime).reversed());
+    notes.sort(Comparator.comparing(Note::getUpdatedDatetime).reversed());
     return notes;
   }
 }

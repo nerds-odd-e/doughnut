@@ -15,6 +15,7 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import javax.print.attribute.standard.Media;
 import java.security.Principal;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -32,6 +33,7 @@ public class NoteController {
         User currentUser = userRepository.findByExternalIdentifier(principal.getName());
         if (currentUser == null) throw new Exception("User does not exist");
         note.setUser(currentUser);
+
         noteRepository.save(note);
         return new RedirectView("/review");
     }
@@ -47,7 +49,10 @@ public class NoteController {
     public RedirectView linkNote(Integer sourceNoteId, Integer targetNoteId, Model model) throws Exception {
         Note sourceNote = noteRepository.findById(sourceNoteId).get();
         Note targetNote = noteRepository.findById(targetNoteId).get();
+
         sourceNote.linkToNote(targetNote);
+        sourceNote.setUpdatedDatetime(new Date());
+
         noteRepository.save(sourceNote);
         return new RedirectView("/review");
     }
