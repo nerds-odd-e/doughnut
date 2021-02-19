@@ -15,7 +15,7 @@ in mkShell {
   MYSQL_HOME = builtins.getEnv "MYSQL_HOME";
   MYSQL_DATADIR = builtins.getEnv "MYSQL_DATADIR";
   buildInputs = [
-    gradle nodejs yarn jdk python3 zsh zsh-powerlevel10k
+    gradle nodejs-15_x yarn jdk python3 zsh zsh-powerlevel10k
     any-nix-shell autoconf automake coreutils-full gcc gnumake gnupg
     git git-secret gitAndTools.delta locale lsd platinum-searcher most
     binutils-unwrapped hostname inetutils openssh pkg-config rsync
@@ -48,6 +48,7 @@ in mkShell {
 
     # to import environment variables defined in env.sh
     set -a
+    git secret reveal
     source env.sh
     set +a
 
@@ -81,6 +82,7 @@ EOF
 
     cleanup()
     {
+      git secret hide -d
       rm -f $MYSQL_HOME/init_doughnut_db.sql
       mariadb-admin --socket=$MYSQL_UNIX_PORT shutdown
       wait $MYSQL_PID
