@@ -11,10 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import java.security.Principal;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Controller
 public class NoteController {
@@ -39,32 +36,16 @@ public class NoteController {
     }
 
     @GetMapping("/link/{id}")
-    public String link(@RequestAttribute("currentUser") User currentUser, Model model, @PathVariable("id") String id, @RequestParam(required = false) String searchTerm) {
-        Optional<Note> sourceNote = noteRepository.findById(Integer.valueOf(id));
-        List<Note> linkableNotes = getLinkableNotes(currentUser, sourceNote);
-        if(searchTerm != null) {
-            linkableNotes = getFilteredLinkableNotes(linkableNotes, searchTerm);
-        }
+    public String link(
+            @RequestAttribute("currentUser") User currentUser,
+            @PathVariable("id") String id,
+            @RequestParam(required = false) String searchTerm,
+            Model model
+    ) {
+        Note sourceNote = noteRepository.findById(Integer.valueOf(id)).get();
+        List<Note> linkableNotes = currentUser.filterLinkableNotes(sourceNote, searchTerm);
         model.addAttribute("linkableNotes", linkableNotes);
-        model.addAttribute("sourceNote", sourceNote.get());
+        model.addAttribute("sourceNote", sourceNote);
         return "link";
     }
-
-    private List<Note> getLinkableNotes(User user, Optional<Note> sourceNote) {
-        List<Note> targetNotes = sourceNote.get().getTargetNotes();
-        List<Note> allNotes = user.getNotes();
-        List<Note> linkableNotes = allNotes.stream()
-                .filter(i -> !targetNotes.contains(i))
-                .filter(i -> i.getId() != sourceNote.get().getId())
-                .collect(Collectors.toList());
-        return linkableNotes;
-    }
-
-    private List<Note> getFilteredLinkableNotes(List<Note> notes, String searchTerm ) {
-        List<Note> filteredNotes = notes.stream()
-                .filter(note -> note.getTitle().contains(searchTerm))
-                .collect(Collectors.toList());
-        return filteredNotes;
-    }
-
 }
