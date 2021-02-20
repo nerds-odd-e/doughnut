@@ -1,6 +1,5 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.models.Link;
 import com.odde.doughnut.models.Note;
 import com.odde.doughnut.models.User;
 import com.odde.doughnut.repositories.NoteRepository;
@@ -46,13 +45,6 @@ public class IndexController {
 
         return "index";
     }
-
-    @GetMapping("/note")
-    public String notes(Principal principal, Model model) {
-        model.addAttribute("note", new Note());
-        return "note";
-    }
-
 
     @GetMapping("/review")
     public String review(Principal principal, Model model) {

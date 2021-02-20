@@ -45,14 +45,6 @@ class IndexControllerTests {
   }
 
   @Test
-  void shouldProceedToNotePageWhenUserIsLogIn() {
-    IndexController controller = new IndexController(noteRepository, userRepository);
-    Principal user = (UserPrincipal) () -> "1234567";
-    Model model = mock(Model.class);
-    assertEquals("note", controller.notes(user, model));
-  }
-
-  @Test
   void shouldProceedToReviewPage() {
     User user = mock(User.class);
     when(user.getNotesInDescendingOrder()).thenReturn(new ArrayList<>());

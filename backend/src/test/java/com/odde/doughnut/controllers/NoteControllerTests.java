@@ -46,10 +46,18 @@ public class NoteControllerTests {
     Session session;
 
     @Test
+    void shouldProceedToNotePageWhenUserIsLogIn() {
+        Model model = mock(Model.class);
+        NoteRepository noteRepository = mock(NoteRepository.class);
+        NoteController noteController = new NoteController(noteRepository, createMockUserRepository(new User()),linkService );
+        Principal user = (UserPrincipal) () -> "1234567";
+        assertEquals("note", noteController.notes(user, model));
+    }
+
+    @Test
     void shouldBeAbleToSaveNoteWhenThereIsValidUser() throws Exception {
         Model model = mock(Model.class);
         NoteRepository noteRepository = mock(NoteRepository.class);
-
         NoteController noteController = new NoteController(noteRepository, createMockUserRepository(new User()),linkService );
 
         RedirectView note = noteController.createNote(createLogin(), new Note(), model);

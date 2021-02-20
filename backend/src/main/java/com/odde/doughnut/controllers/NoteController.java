@@ -29,6 +29,12 @@ public class NoteController {
         this.linkService = linkService;
     }
 
+    @GetMapping("/note")
+    public String notes(Principal principal, Model model) {
+        model.addAttribute("note", new Note());
+        return "note";
+    }
+
     @PostMapping("/note")
     public RedirectView createNote(Principal principal, Note note, Model model) throws Exception {
         User currentUser = userRepository.findByExternalIdentifier(principal.getName());
