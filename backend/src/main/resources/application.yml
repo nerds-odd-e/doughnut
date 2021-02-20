@@ -11,7 +11,7 @@ spring:
     clean-on-validation-error: true
   jpa:
     generate-ddl: false
-    show-sql: true
+    show-sql: false
   security:
     oauth2:
       client:
@@ -34,7 +34,7 @@ spring:
     clean-on-validation-error: true
   jpa:
     generate-ddl: false
-    show-sql: true
+    show-sql: false
   security:
     oauth2:
       client:
@@ -60,6 +60,6 @@ spring:
     clean-on-validation-error: true
   jpa:
     generate-ddl: false
-    show-sql: true
+    show-sql: false
 server:
   port: 8081
