@@ -45,31 +45,31 @@ jobs:
           start: yarn sut
       - name: Build production application jar artifact
         run: backend/gradlew -p backend build -x test -Dspring.profiles.active=prod
-      - name: Setup Google Cloud SDK with Service Account
-        uses: google-github-actions/setup-gcloud@master
-        with:
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
-          service_account_email: ${{ secrets.GCP_SA_EMAIL }}
-          service_account_key: ${{ secrets.GCP_SA_KEY }}
-          export_default_credentials: true
-      - name: Upload production application jar to Google Cloud Storage
-        uses: google-github-actions/upload-cloud-storage@main
-        with:
-          path: backend/build/libs/doughnut-0.0.1-SNAPSHOT.jar
-          destination: dough-01/backend_app_jar
-      - name: Create Google Cloud Compute VM doughnut-app instance
-        run: backend/scripts/create-gcloud-app-compute.sh
-      - name: Healthcheck doughnut-app instance
-        run: backend/scripts/app-instance-healthcheck.sh
-      - name: Slack notify dough channel of CI/CD results
-        uses: adamkdean/simple-slack-notify@master
-        if: always()
-        with:
-          channel: "#dough"
-          status: ${{ job.status }}
-          success_text: "dough CI Unit & E2E Tests (#${env.GITHUB_RUN_NUMBER}) completed successfully"
-          failure_text: "dough CI Unit & E2E Tests (#${env.GITHUB_RUN_NUMBER}) failed"
-          cancelled_text: "dough CI Unit & E2E Tests (#${env.GITHUB_RUN_NUMBER}) was cancelled"
-          fields: |
-            [{ "title": "Action URL", "value": "${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/actions/runs/${env.GITHUB_RUN_ID}"}]
-
+#      - name: Setup Google Cloud SDK with Service Account
+#        uses: google-github-actions/setup-gcloud@master
+#        with:
+#          project_id: ${{ secrets.GCP_PROJECT_ID }}
+#          service_account_email: ${{ secrets.GCP_SA_EMAIL }}
+#          service_account_key: ${{ secrets.GCP_SA_KEY }}
+#          export_default_credentials: true
+#      - name: Upload production application jar to Google Cloud Storage
+#        uses: google-github-actions/upload-cloud-storage@main
+#        with:
+#          path: backend/build/libs/doughnut-0.0.1-SNAPSHOT.jar
+#          destination: dough-01/backend_app_jar
+#      - name: Create Google Cloud Compute VM doughnut-app instance
+#        run: backend/scripts/create-gcloud-app-compute.sh
+#      - name: Healthcheck doughnut-app instance
+#        run: backend/scripts/app-instance-healthcheck.sh
+#      - name: Slack notify dough channel of CI/CD results
+#        uses: adamkdean/simple-slack-notify@master
+#        if: always()
+#        with:
+#          channel: "#dough"
+#          status: ${{ job.status }}
+#          success_text: "dough CI Unit & E2E Tests (#${env.GITHUB_RUN_NUMBER}) completed successfully"
+#          failure_text: "dough CI Unit & E2E Tests (#${env.GITHUB_RUN_NUMBER}) failed"
+#          cancelled_text: "dough CI Unit & E2E Tests (#${env.GITHUB_RUN_NUMBER}) was cancelled"
+#          fields: |
+#            [{ "title": "Action URL", "value": "${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/actions/runs/${env.GITHUB_RUN_ID}"}]
+#
