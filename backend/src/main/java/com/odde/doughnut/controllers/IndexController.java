@@ -21,7 +21,6 @@ public class IndexController {
     private final UserRepository userRepository;
 
     public IndexController(NoteRepository noteRepository, UserRepository userRepository) {
-
         this.noteRepository = noteRepository;
         this.userRepository = userRepository;
     }
@@ -44,13 +43,6 @@ public class IndexController {
         model.addAttribute("currentUser", currentUser);
 
         return "index";
-    }
-
-    @GetMapping("/view")
-    public String view(Principal principal, Model model) {
-        User user = userRepository.findByExternalIdentifier(principal.getName());
-        model.addAttribute("notes", user.getNotes());
-        return "view";
     }
 
     @GetMapping("/link/{id}")
