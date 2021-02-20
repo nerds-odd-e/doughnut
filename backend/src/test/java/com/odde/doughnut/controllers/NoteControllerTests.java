@@ -30,7 +30,7 @@ class NoteControllerTests {
     NoteController controller = new NoteController(userRepository, noteRepository);
     Principal user = (UserPrincipal) () -> "1234567";
     Model model = mock(Model.class);
-    assertEquals("note", controller.notes(user, model));
+    assertEquals("note", controller.notes(model));
   }
 
 }

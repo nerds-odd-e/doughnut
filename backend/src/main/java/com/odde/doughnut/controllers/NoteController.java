@@ -8,6 +8,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.security.Principal;
@@ -26,16 +27,16 @@ public class NoteController {
     }
 
     @GetMapping("/note")
-    public String notes(Principal principal, Model model) {
+    public String notes(Model model) {
         model.addAttribute("note", new Note());
         return "note";
     }
 
     @GetMapping("/all_my_notes")
-    public String all_my_notes(Principal principal, Model model) {
-        User user = userRepository.findByExternalIdentifier(principal.getName());
-        model.addAttribute("all_my_notes", user.getNotes());
-        return "view";
+    public String all_my_notes(@RequestAttribute("currentUser") User currentUser, Model model) {
+        model.addAttribute("all_my_notes", currentUser.getNotes());
+        model.addAttribute("user", currentUser);
+        return "all_my_notes";
     }
 
     @GetMapping("/link/{id}")
