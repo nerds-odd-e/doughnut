@@ -20,13 +20,10 @@ import java.util.List;
 @RestController
 public class NoteRestController {
     private final NoteRepository noteRepository;
-    private final UserRepository userRepository;
     private final LinkService linkService;
 
-
-    public NoteRestController(NoteRepository noteRepository, UserRepository userRepository, LinkService linkService) {
+    public NoteRestController(NoteRepository noteRepository, LinkService linkService) {
         this.noteRepository = noteRepository;
-        this.userRepository = userRepository;
         this.linkService = linkService;
     }
 
@@ -38,14 +35,12 @@ public class NoteRestController {
     }
 
     @GetMapping(value="/getNotes", produces=MediaType.APPLICATION_JSON_VALUE)
-    public List<Note> getNotes(Principal principal) throws Exception {
-        User currentUser = userRepository.findByExternalIdentifier(principal.getName());
-        if (currentUser == null) throw new Exception("User does not exist");
+    public List<Note> getNotes(@RequestAttribute("currentUser") User currentUser) throws Exception {
         return currentUser.getNotesInDescendingOrder();
     }
 
     @PostMapping(value = "/linkNote", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public RedirectView linkNote(Integer sourceNoteId, Integer targetNoteId, Model model) {
+    public RedirectView linkNote(Integer sourceNoteId, Integer targetNoteId) {
         linkService.linkNote(sourceNoteId, targetNoteId);
         return new RedirectView("/review");
     }

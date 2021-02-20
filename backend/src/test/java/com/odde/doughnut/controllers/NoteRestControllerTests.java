@@ -50,7 +50,7 @@ public class NoteRestControllerTests {
         Model model = mock(Model.class);
         NoteRepository noteRepository = mock(NoteRepository.class);
 
-        NoteRestController noteController = new NoteRestController(noteRepository, createMockUserRepository(new User()),linkService );
+        NoteRestController noteController = new NoteRestController(noteRepository, linkService );
         User user = createUser();
 
         RedirectView note = noteController.createNote(user, new Note());
@@ -61,7 +61,7 @@ public class NoteRestControllerTests {
     void shouldNotBeAbleToSaveNoteWhenThereIsInvalidUser() {
         Model model = mock(Model.class);
         NoteRepository noteRepository = mock(NoteRepository.class);
-        NoteRestController noteController = new NoteRestController(noteRepository, createMockUserRepository(null), linkService);
+        NoteRestController noteController = new NoteRestController(noteRepository, linkService);
 
         Note note = new Note();
         User user = createUser();
@@ -84,8 +84,9 @@ public class NoteRestControllerTests {
     void shouldGetListOfNotes() throws Exception {
         User user = createUser();
         Note note = createNote(user);
-        NoteRestController noteController = new NoteRestController(noteRepository, userRepository, linkService);
-        assertEquals(note.getTitle(), noteController.getNotes(createLogin()).get(0).getTitle());
+        user = userRepository.findByExternalIdentifier(user.getExternalIdentifier());
+        NoteRestController noteController = new NoteRestController(noteRepository, linkService);
+        assertEquals(note.getTitle(), noteController.getNotes(user).get(0).getTitle());
     }
 
     @Test
@@ -95,8 +96,8 @@ public class NoteRestControllerTests {
         when(mockUserRepo.findByExternalIdentifier(any())).thenReturn(user);
         when(user.getNotesInDescendingOrder()).thenReturn(Arrays.asList(new Note()));
 
-        NoteRestController noteController = new NoteRestController(noteRepository, mockUserRepo, linkService);
-        List<Note> notes = noteController.getNotes(createLogin());
+        NoteRestController noteController = new NoteRestController(noteRepository, linkService);
+        List<Note> notes = noteController.getNotes(user);
         verify(user).getNotesInDescendingOrder();
         assertEquals(1, notes.size());
     }
@@ -118,12 +119,6 @@ public class NoteRestControllerTests {
         user.setName("my name");
         session.save(user);
         return user;
-    }
-
-    private UserRepository createMockUserRepository(User user) {
-        UserRepository userRepository = mock(UserRepository.class);
-        when(userRepository.findByExternalIdentifier("1234567")).thenReturn(user);
-        return userRepository;
     }
 
     private Principal createLogin() {
