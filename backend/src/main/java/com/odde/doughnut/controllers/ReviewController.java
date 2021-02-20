@@ -6,6 +6,7 @@ import com.odde.doughnut.repositories.UserRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 
 import java.security.Principal;
 import java.util.List;
@@ -20,9 +21,8 @@ public class ReviewController {
     }
 
     @GetMapping("/review")
-    public String review(Principal principal, Model model) {
-        User user = userRepository.findByExternalIdentifier(principal.getName());
-        List<Note> notes = user.getNotesInDescendingOrder();
+    public String review(@RequestAttribute("currentUser") User currentUser, Model model) {
+        List<Note> notes = currentUser.getNotesInDescendingOrder();
         model.addAttribute("notes", notes);
         return "review";
     }

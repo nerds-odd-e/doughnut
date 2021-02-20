@@ -26,9 +26,8 @@ class ReviewControllerTests {
     User user = mock(User.class);
     when(user.getNotesInDescendingOrder()).thenReturn(new ArrayList<>());
     ReviewController controller = new ReviewController(createMockUserRepository(user));
-    Principal login = (UserPrincipal) () -> "1234567";
     Model model = mock(Model.class);
-    assertEquals("review", controller.review(login, model));
+    assertEquals("review", controller.review(user, model));
   }
 
   private UserRepository createMockUserRepository(User user) {
