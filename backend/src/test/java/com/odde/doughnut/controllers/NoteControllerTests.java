@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.repositories.NoteRepository;
 import com.odde.doughnut.repositories.UserRepository;
 import com.odde.doughnut.testability.DBCleaner;
 import org.junit.jupiter.api.Test;
@@ -21,10 +22,12 @@ import static org.mockito.Mockito.mock;
 class NoteControllerTests {
   @Autowired
   private UserRepository userRepository;
+  @Autowired
+  private NoteRepository noteRepository;
 
   @Test
   void shouldProceedToNotePageWhenUserIsLogIn() {
-    NoteController controller = new NoteController(userRepository);
+    NoteController controller = new NoteController(userRepository, noteRepository);
     Principal user = (UserPrincipal) () -> "1234567";
     Model model = mock(Model.class);
     assertEquals("note", controller.notes(user, model));
