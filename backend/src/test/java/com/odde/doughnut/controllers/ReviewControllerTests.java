@@ -22,26 +22,15 @@ import static org.mockito.Mockito.when;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @ExtendWith(DBCleaner.class)
-class IndexControllerTests {
-
-  @Autowired private NoteRepository noteRepository;
-  @Autowired private UserRepository userRepository;
-
+class ReviewControllerTests {
   @Test
-  void visitWithNoUserSession() {
+  void shouldProceedToReviewPage() {
+    User user = mock(User.class);
+    when(user.getNotesInDescendingOrder()).thenReturn(new ArrayList<>());
+    ReviewController controller = new ReviewController(createMockUserRepository(user));
+    Principal login = (UserPrincipal) () -> "1234567";
     Model model = mock(Model.class);
-    IndexController controller = new IndexController(noteRepository, userRepository);
-
-    String home = controller.home(null, model);
-    assertEquals("login", home);
-  }
-
-  @Test
-  void visitWithUserSessionButNoSuchARegisteredUserYet() {
-    IndexController controller = new IndexController(noteRepository, userRepository);
-    Principal user = (UserPrincipal) () -> "1234567";
-    Model model = mock(Model.class);
-    assertEquals("register", controller.home(user, model));
+    assertEquals("review", controller.review(login, model));
   }
 
   private UserRepository createMockUserRepository(User user) {

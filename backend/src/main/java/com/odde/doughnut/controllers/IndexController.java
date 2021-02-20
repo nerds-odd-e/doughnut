@@ -46,14 +46,6 @@ public class IndexController {
         return "index";
     }
 
-    @GetMapping("/review")
-    public String review(Principal principal, Model model) {
-        User user = userRepository.findByExternalIdentifier(principal.getName());
-        List<Note> notes = user.getNotesInDescendingOrder();
-        model.addAttribute("notes", notes);
-        return "review";
-    }
-
     @GetMapping("/view")
     public String view(Principal principal, Model model) {
         User user = userRepository.findByExternalIdentifier(principal.getName());
