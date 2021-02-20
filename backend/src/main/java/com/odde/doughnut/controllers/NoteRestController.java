@@ -31,10 +31,8 @@ public class NoteRestController {
     }
 
     @PostMapping("/note")
-    public RedirectView createNote(@RequestAttribute("currentUser") User currentUser, Note note) throws Exception {
-        if (currentUser == null) throw new Exception("User does not exist");
+    public RedirectView createNote(@RequestAttribute("currentUser") User currentUser, Note note) {
         note.setUser(currentUser);
-
         noteRepository.save(note);
         return new RedirectView("/review");
     }
