@@ -3,6 +3,7 @@
 
 # Log file
 *.log
+cypress/screenshots/
 
 # BlueJ files
 *.ctxt
