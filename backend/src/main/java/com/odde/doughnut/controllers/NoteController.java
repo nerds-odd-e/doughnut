@@ -23,10 +23,10 @@ public class NoteController {
         return "note";
     }
 
-    @GetMapping("/view")
-    public String view(Principal principal, Model model) {
+    @GetMapping("/all_my_notes")
+    public String all_my_notes(Principal principal, Model model) {
         User user = userRepository.findByExternalIdentifier(principal.getName());
-        model.addAttribute("notes", user.getNotes());
+        model.addAttribute("all_my_notes", user.getNotes());
         return "view";
     }
 
