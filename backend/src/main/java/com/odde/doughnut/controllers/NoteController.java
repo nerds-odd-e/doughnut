@@ -35,15 +35,13 @@ public class NoteController {
     @GetMapping("/all_my_notes")
     public String all_my_notes(@RequestAttribute("currentUser") User currentUser, Model model) {
         model.addAttribute("all_my_notes", currentUser.getNotes());
-        model.addAttribute("user", currentUser);
         return "all_my_notes";
     }
 
     @GetMapping("/link/{id}")
-    public String link(Principal principal, Model model, @PathVariable("id") String id, @RequestParam(required = false) String searchTerm) {
-        User user = userRepository.findByExternalIdentifier(principal.getName());
+    public String link(@RequestAttribute("currentUser") User currentUser, Model model, @PathVariable("id") String id, @RequestParam(required = false) String searchTerm) {
         Optional<Note> sourceNote = noteRepository.findById(Integer.valueOf(id));
-        List<Note> linkableNotes = getLinkableNotes(user, sourceNote);
+        List<Note> linkableNotes = getLinkableNotes(currentUser, sourceNote);
         if(searchTerm != null) {
             linkableNotes = getFilteredLinkableNotes(linkableNotes, searchTerm);
         }
@@ -57,7 +55,7 @@ public class NoteController {
         List<Note> allNotes = user.getNotes();
         List<Note> linkableNotes = allNotes.stream()
                 .filter(i -> !targetNotes.contains(i))
-                .filter(i -> i != sourceNote.get())
+                .filter(i -> i.getId() != sourceNote.get().getId())
                 .collect(Collectors.toList());
         return linkableNotes;
     }
