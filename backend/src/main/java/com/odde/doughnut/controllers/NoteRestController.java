@@ -9,6 +9,7 @@ import org.springframework.http.MediaType;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.view.RedirectView;
 
@@ -30,8 +31,7 @@ public class NoteRestController {
     }
 
     @PostMapping("/note")
-    public RedirectView createNote(Principal principal, Note note, Model model) throws Exception {
-        User currentUser = userRepository.findByExternalIdentifier(principal.getName());
+    public RedirectView createNote(@RequestAttribute("currentUser") User currentUser, Note note) throws Exception {
         if (currentUser == null) throw new Exception("User does not exist");
         note.setUser(currentUser);
 

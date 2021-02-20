@@ -3,7 +3,6 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.models.Note;
 import com.odde.doughnut.models.User;
 import com.odde.doughnut.repositories.NoteRepository;
-import com.odde.doughnut.repositories.UserRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,11 +14,9 @@ import java.util.List;
 
 @Controller
 public class NoteController {
-    private final UserRepository userRepository;
     private final NoteRepository noteRepository;
 
-    public NoteController(UserRepository userRepository, NoteRepository noteRepository) {
-        this.userRepository = userRepository;
+    public NoteController(NoteRepository noteRepository) {
         this.noteRepository = noteRepository;
     }
 

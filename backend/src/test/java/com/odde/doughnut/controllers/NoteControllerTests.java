@@ -27,7 +27,7 @@ class NoteControllerTests {
 
   @Test
   void shouldProceedToNotePageWhenUserIsLogIn() {
-    NoteController controller = new NoteController(userRepository, noteRepository);
+    NoteController controller = new NoteController(noteRepository);
     Principal user = (UserPrincipal) () -> "1234567";
     Model model = mock(Model.class);
     assertEquals("note", controller.notes(model));

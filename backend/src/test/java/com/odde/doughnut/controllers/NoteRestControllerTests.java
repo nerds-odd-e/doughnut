@@ -51,8 +51,9 @@ public class NoteRestControllerTests {
         NoteRepository noteRepository = mock(NoteRepository.class);
 
         NoteRestController noteController = new NoteRestController(noteRepository, createMockUserRepository(new User()),linkService );
+        User user = createUser();
 
-        RedirectView note = noteController.createNote(createLogin(), new Note(), model);
+        RedirectView note = noteController.createNote(user, new Note());
         assertEquals(note.getUrl(), "/review");
     }
 
@@ -63,9 +64,10 @@ public class NoteRestControllerTests {
         NoteRestController noteController = new NoteRestController(noteRepository, createMockUserRepository(null), linkService);
 
         Note note = new Note();
+        User user = createUser();
 
         try {
-            noteController.createNote(createLogin(), note, model);
+            noteController.createNote(user, note);
         } catch (Exception e) {
             Mockito.verify(noteRepository, times(0)).save(note);
         }
