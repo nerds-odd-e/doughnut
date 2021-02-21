@@ -107,7 +107,7 @@ cat <<'EOF' > /opt/traefik/dynamic/conf/dynamic.toml
         url = "http://127.0.0.1:8081"
 EOF
 
-sh -c "/opt/traefik/traefik --configfile=/opt/traefik/traefik.toml" &
+bash -c "/opt/traefik/traefik --configfile=/opt/traefik/traefik.toml" &
 
 ACCESS_TOKEN=$(curl "http://metadata.google.internal/computeMetadata/v1/instance/service-accounts/default/token" \
 	-H "Metadata-Flavor: Google" | jq -r ".access_token")
@@ -137,4 +137,4 @@ export OAUTH2_github_client_secret=$(curl "https://secretmanager.googleapis.com/
 echo "10.142.0.18	db-server" >> /etc/hosts
 
 # Start server
-sh -c "java -jar -Dspring-boot.run.profiles=prod -Dspring.profiles.active=prod -Dspring.datasource.url='jdbc:mariadb://db-server:3306/doughnut' -Dspring.datasource.password=${MYSQL_PASSWORD} /opt/doughnut_app/${ARTIFACT}-${VERSION}.jar" &
+bash -c "java -jar -Dspring-boot.run.profiles=prod -Dspring.profiles.active=prod -Dspring.datasource.url='jdbc:mariadb://db-server:3306/doughnut' -Dspring.datasource.password=${MYSQL_PASSWORD} /opt/doughnut_app/${ARTIFACT}-${VERSION}.jar" &
