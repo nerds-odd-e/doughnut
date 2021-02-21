@@ -46,6 +46,5 @@ class TestabilityController {
     }
     noteRepository.saveAll(notes);
     return notes.stream().map(Note::getId).collect(Collectors.toList());
-
   }
 }
