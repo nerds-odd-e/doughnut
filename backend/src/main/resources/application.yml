@@ -11,7 +11,9 @@ spring:
     clean-on-validation-error: true
   jpa:
     generate-ddl: false
-    show-sql: true
+    show-sql: false
+    properties.hibernate:
+      enable_lazy_load_no_trans: true
   security:
     oauth2:
       client:
@@ -34,16 +36,16 @@ spring:
     clean-on-validation-error: true
   jpa:
     generate-ddl: false
-    show-sql: true
+    show-sql: false
+    properties.hibernate:
+      enable_lazy_load_no_trans: true
   security:
     oauth2:
       client:
         registration:
           github:
-            clientId: e6f513b15e066069bb94
-            clientSecret: a0bcf31c3bcad17f49677e5a2e77d9f939395c92
-#            clientId: ${OAUTH2_github_client_id}
-#            clientSecret: ${OAUTH2_github_client_secret}
+            clientId: ${OAUTH2_github_client_id}
+            clientSecret: ${OAUTH2_github_client_secret}
 
 ---
 spring:
@@ -60,6 +62,8 @@ spring:
     clean-on-validation-error: true
   jpa:
     generate-ddl: false
-    show-sql: true
+    show-sql: false
+    properties.hibernate:
+      enable_lazy_load_no_trans: true
 server:
   port: 8081

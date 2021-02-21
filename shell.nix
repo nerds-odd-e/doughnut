@@ -15,15 +15,17 @@ in mkShell {
   MYSQL_HOME = builtins.getEnv "MYSQL_HOME";
   MYSQL_DATADIR = builtins.getEnv "MYSQL_DATADIR";
   buildInputs = [
-    gradle nodejs yarn jdk python3 zsh zsh-powerlevel10k
+    gradle nodejs-15_x yarn jdk python3 zsh zsh-powerlevel10k
     any-nix-shell autoconf automake coreutils-full gcc gnumake gnupg
     git git-secret gitAndTools.delta locale lsd platinum-searcher most
     binutils-unwrapped hostname inetutils openssh pkg-config rsync
-    bat duf fasd fzf htop jq lsof lzma progress ripgrep tree wget which
+    bat duf fasd fzf htop jq less lesspipe lsof lzma
+    progress ps pstree ripgrep tree vgrep wget which
     libmysqlclient libpcap libressl
-    cacert curlie glances httpie mariadb python38Packages.pip
+    cacert curlie glances httpie
+    mariadb python38Packages.pip
     chromedriver geckodriver google-cloud-sdk
-    vim vimPlugins.nerdtree vimPlugins.nvimdev-nvim vimPlugins.spacevim vscodium
+    vim vimpager vimPlugins.nerdtree vimPlugins.nvimdev-nvim vimPlugins.spacevim vscodium
   ] ++ lib.optionals stdenv.isDarwin [
     darwin.apple_sdk.libs.utmp darwin.apple_sdk.libs.Xplugin
     apple_sdk.AppKit apple_sdk.AGL apple_sdk.ApplicationServices apple_sdk.AudioToolbox
@@ -32,7 +34,7 @@ in mkShell {
     apple_sdk.Foundation apple_sdk.ImageIO apple_sdk.IOKit apple_sdk.Kernel apple_sdk.MediaToolbox apple_sdk.OpenGL
     apple_sdk.QTKit apple_sdk.Security apple_sdk.SystemConfiguration xcodebuild
   ] ++ lib.optionals (!stdenv.isDarwin) [
-    dbeaver chromium firefox intellij patchelf
+    dbeaver chromium firefox gitter intellij patchelf
   ];
   shellHook = ''
     export JAVA_HOME="${pkgs.jdk}"
@@ -46,6 +48,7 @@ in mkShell {
 
     # to import environment variables defined in env.sh
     set -a
+    git secret reveal
     source env.sh
     set +a
 
@@ -79,6 +82,7 @@ EOF
 
     cleanup()
     {
+      git secret hide -d
       rm -f $MYSQL_HOME/init_doughnut_db.sql
       mariadb-admin --socket=$MYSQL_UNIX_PORT shutdown
       wait $MYSQL_PID

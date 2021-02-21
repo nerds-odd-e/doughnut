@@ -1,8 +1,7 @@
 # Doughnut
 
-[![Join the chat at https://gitter.im/Odd-e-doughnut/community](https://badges.gitter.im/Odd-e-doughnut/community.svg)](https://gitter.im/Odd-e-doughnut/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+![dough CI CD](https://github.com/nerds-odd-e/doughnut/workflows/dough%20CI%20CD/badge.svg) [![Join the chat at https://gitter.im/Odd-e-doughnut/community](https://badges.gitter.im/Odd-e-doughnut/community.svg)](https://gitter.im/Odd-e-doughnut/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-![dough CI CD](https://github.com/nerds-odd-e/doughnut/workflows/dough%20CI%20CD/badge.svg)
 
 ## About
 
@@ -13,8 +12,8 @@ For more background info you can read:
 - <https://www.lesswrong.com/tag/scholarship-and-learning>
 - <https://en.m.wikipedia.org/wiki/Knowledge_Acquisition_and_Documentation_Structuring>
 
-
 ### Tech Stack
+
 - [OpenJDK 11](https://openjdk.java.net/projects/jdk/11/)
 - [Spring Boot](https://spring.io/projects/spring-boot)
 - [Thymeleaf](https://www.thymeleaf.org/)
@@ -22,13 +21,13 @@ For more background info you can read:
 - [Junit5](https://junit.org/junit5/)
 - [Cypress](https://www.cypress.io/)
 - [JavaScript](https://www.javascript.com)
-- [Cucumber](https://cucumber.io/docs/guides/)  
-- [Flyway](https://flywaydb.org)  
+- [Cucumber](https://cucumber.io/docs/guides/)
+- [Flyway](https://flywaydb.org)
 - [MariaDB](https://mariadb.org/)
 - [Google Cloud](https://cloud.google.com/gcp/getting-started)
 - [Traefik](https://traefik.io/)
 - [Github Actions](https://docs.github.com/en/actions)
-- [Nix](https://nixos.org/)  
+- [Nix](https://nixos.org/)
 - [git-secret](https://git-secret.io)
 
 ## Getting started
@@ -75,29 +74,49 @@ Create it if it doesn't exist.
 any-nix-shell zsh --info-right | source /dev/stdin
 ```
 
-### 2. Setup and run doughnut for the first time
+### 2. Setup and run doughnut for the first time (local development profile)
 
-The default spring profile is 'test' unless you explicitly set it to 'dev'. Tip: Add `--args="--spring.profiles.active={profile}"` to gradle task command.
+The default spring profile is 'test' unless you explicitly set it to 'dev'. Tip: Add `--Dspring.profiles.active=${profile}"` to gradle task command. MariaDB server is started and initialised on entering the `nix-shell`.
+
+Clone and launch local development environment
 
 ```bash
 git clone $this_repo
 cd doughnut
 nix-shell --pure
 # OR `nix-shell --pure --command "zsh"` if you want to drop down to zsh in nix-shell (uses your OS' ~/.zshrc)
+gradle wrapper --distribution-type all
+backend/gradlew -p backend bootRunDev"
+# open localhost:8080 in your browser
+```
+
+#### IntelliJ IDEA (Community) IDE project import
+
+```bash
 nohup idea-community &
 # open doughnut project in idea
 # click import gradle project
 # wait for deps resolution
-# restore gradle wrapper if missing (still require OS gradle bin see [Missing GradleWrapperMain ClassNotFoundException](https://stackoverflow.com/questions/29805622/could-not-find-or-load-main-class-org-gradle-wrapper-gradlewrappermain))
-gradle wrapper --gradle-version 6.7.1 --distribution-type all
-backend/gradlew bootRun -p backend --args="--spring.profiles.active=dev"
-# open localhost:8080 in your browser
+# restore gradle wrapper if missing
+```
+
+#### Setup IntelliJ IDEA with JDK11 SDK
+
+- Locate your `nix` installed JDK11 path location with `which java`.
+  e.g. `/nix/store/5ib97va5ngfacdqzzcvxff62rjwkxajg-zulu11.2.3-jdk11.0.1/bin/java`.
+- **File -> Project Structure -> Platform Settings -> SDKs -> Add JDK...**
+  - Enter the full path of above (e.g. `/nix/store/5ib97va5ngfacdqzzcvxff62rjwkxajg-zulu11.2.3-jdk11.0.1`).
+
+#### MariaDB UI Client - DBeaver (ONLY available to Linux users - Non-macOS)
+
+```
+nohup dbeaver &
 ```
 
 ### 3. Setup and run doughnut with migrations in 'test' profile
 
 ```bash
-backend/gradlew -p backend bootRun --args='--spring.profiles.active=test'
+backend/gradlew -p backend bootRun
 ```
 
 ### 4. Secrets via [git-secret](https://git-secret.io) and [GnuPG](https://www.devdungeon.com/content/gpg-tutorial)
@@ -105,6 +124,7 @@ backend/gradlew -p backend bootRun --args='--spring.profiles.active=test'
 #### Generate your local GnuPG key
 
 - Generate your GnuPG key 4096 bits key using your odd-e.com email address with no-expiry (option 0 in dialog):
+
 ```
 gpg --full-generate-key
 ```
@@ -115,7 +135,7 @@ gpg --full-generate-key
 gpg --export --armor <your_email>@odd-e.com > <your_email>_public_gpg_key.gpg
 ```
 
-- Email your GnuPG public key file <your_email>_public_gpg_key.gpg from above step and private message an existing git-secret collaborator
+- Email your GnuPG public key file <your_email>\_public_gpg_key.gpg from above step and private message an existing git-secret collaborator
 
 #### Add a new user's GnuPG public key to local dev machine key-ring for git-secret for team secrets collaboration
 
@@ -129,6 +149,7 @@ gpg --export --armor <your_email>@odd-e.com > <your_email>_public_gpg_key.gpg
 - List of user emails with expiration info of managed users: `git secret whoknows -l`
 
 #### Removes a user from list of git-secret managed users (e.g. user should no longer be allowed access to list of secrets)
+
 ```
 git secret killperson <user_to_be_removed_email>@odd-e.com
 ```
@@ -158,11 +179,6 @@ git secret killperson <user_to_be_removed_email>@odd-e.com
 - Decrypt secrets to local filesystem: `git secret reveal`
 - Decrypt secrets to stdout: `git secret cat`
 
-### MariaDB UI Client - DBeaver (ONLY available to Linux users - Non-macOS)
-```
-nohup dbeaver &
-```
-
 ### 5. Create gcloud compute instance
 
 - [Install `Google Cloud SDK`](https://cloud.google.com/sdk/docs/install)
@@ -182,9 +198,12 @@ gcloud compute instances get-serial-port-output doughnut-app-instance --zone us-
 
 We use cucumber + cypress + Java library to do end to end test.
 
+- [Cucumber](https://cucumber.io/)
+- [cypress-cucumber-preprocessor](https://github.com/TheBrainFamily/cypress-cucumber-preprocessor)
+
 #### Commands
 
-| purpose                       | command                               |
+| Purpose                       | Command                               |
 | ----------------------------- | ------------------------------------- |
 | run all e2e test              | `yarn test`                           |
 | run cypress IDE               | `yarn cy:open`                        |
@@ -192,7 +211,7 @@ We use cucumber + cypress + Java library to do end to end test.
 
 #### Structure
 
-| purpose          | location                            |
+| Purpose          | Location                            |
 | ---------------- | ----------------------------------- |
 | feature files    | `/cypress/integration/**`           |
 | step definitions | `/cypress/support/step_definitions` |
@@ -200,3 +219,17 @@ We use cucumber + cypress + Java library to do end to end test.
 #### How to
 
 The Cypress+Cucumber tests are written in JavaScript.
+
+- [Cucumber](https://cucumber.io/)
+- [cypress-cucumber-preprocessor](https://github.com/TheBrainFamily/cypress-cucumber-preprocessor)
+
+### 8. [Product Backlog](https://docs.google.com/spreadsheets/d/1_GofvpnV1tjy2F_aaoOiYTZUOO-8t_qf3twIKMQyGV4/edit?ts=600e6711&pli=1#gid=0)
+
+[Story Map](https://miro.com/app/board/o9J_lTB77Mc=/)
+
+### 9. How to Contribute
+
+- We welcome product ideas and code contribution.
+- FOSS style; Fork and submit Github PR. Collaborate over Github Issues or [doughnut gitter.im](https://gitter.im/Odd-e-doughnut/community)
+    - Please keep the PR small and on only one topic
+    - The code need to come with tests

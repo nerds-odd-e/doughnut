@@ -12,10 +12,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Profile({"test", "dev"})
 public class NonProductConfiguration extends WebSecurityConfigurerAdapter {
 
+    private final CommonConfiguration commonConfiguration = new CommonConfiguration();
+
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        PasswordEncoder encoder =
-                PasswordEncoderFactories.createDelegatingPasswordEncoder();
+        PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
         auth
                 .inMemoryAuthentication()
                 .withUser("user")
@@ -35,14 +36,7 @@ public class NonProductConfiguration extends WebSecurityConfigurerAdapter {
                 .antMatchers("/api/healthcheck", "/api/testability/**")
                 .permitAll();
 
-        http.authorizeRequests()
-                        .antMatchers("/", "/login", "/note", "/error", "/webjars/**")
-                        .permitAll()
-                        .anyRequest()
-                        .authenticated()
-                .and()
-                .logout(l -> l.logoutUrl("/logout").logoutSuccessUrl("/").invalidateHttpSession(true).permitAll())
-
+        commonConfiguration.commonConfig(http)
                 .formLogin()
                 .and()
                 .httpBasic();
