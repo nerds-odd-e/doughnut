@@ -4,8 +4,11 @@ import com.odde.doughnut.models.User;
 import com.odde.doughnut.repositories.NoteRepository;
 import com.odde.doughnut.repositories.UserRepository;
 import com.odde.doughnut.testability.DBCleaner;
+import com.odde.doughnut.testability.MakeMe;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -26,28 +29,30 @@ class IndexControllerTests {
 
   @Autowired private NoteRepository noteRepository;
   @Autowired private UserRepository userRepository;
+  @Mock
+  Model model;
+  private IndexController controller;
+
+  @BeforeEach
+  void setupController() {
+    controller = new IndexController(noteRepository, userRepository);
+  }
 
   @Test
   void visitWithNoUserSession() {
-    Model model = mock(Model.class);
-    IndexController controller = new IndexController(noteRepository, userRepository);
-
-    String home = controller.home(null, model);
-    assertEquals("login", home);
+    assertEquals("login", controller.home(null, model));
   }
 
   @Test
   void visitWithUserSessionButNoSuchARegisteredUserYet() {
-    IndexController controller = new IndexController(noteRepository, userRepository);
-    Principal user = (UserPrincipal) () -> "1234567";
-    Model model = mock(Model.class);
-    assertEquals("register", controller.home(user, model));
+    Principal principal = (UserPrincipal) () -> "1234567";
+    assertEquals("register", controller.home(principal, model));
   }
 
-  private UserRepository createMockUserRepository(User user) {
-    UserRepository userRepository = mock(UserRepository.class);
-    when(userRepository.findByExternalIdentifier("1234567")).thenReturn(user);
-    return userRepository;
+  @Test
+  void visitWithUserSessionAndTheUserExists() {
+    User user = new MakeMe(userRepository).aUser().please();
+    Principal principal = (UserPrincipal) user::getExternalIdentifier;
+    assertEquals("index", controller.home(principal, model));
   }
-
 }
