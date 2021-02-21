@@ -5,9 +5,11 @@ import com.odde.doughnut.models.User;
 import org.hibernate.Session;
 
 public class NoteBuilder {
+    private final Session hibernateSession;
     private Note note = new Note();
 
-    public NoteBuilder(){
+    public NoteBuilder(Session session){
+        hibernateSession = session;
         note.setTitle("title");
         note.setDescription("descrption");
     }
@@ -17,11 +19,12 @@ public class NoteBuilder {
 
     public NoteBuilder forUser(User user) {
         note.setUser(user);
+        hibernateSession.refresh(user);
         return this;
     }
 
-    public Note please(Session session) {
-        session.save(note);
+    public Note please() {
+        hibernateSession.save(note);
         return note;
     }
 }

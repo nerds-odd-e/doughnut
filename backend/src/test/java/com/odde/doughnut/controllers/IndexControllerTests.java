@@ -5,7 +5,6 @@ import com.odde.doughnut.repositories.NoteRepository;
 import com.odde.doughnut.repositories.UserRepository;
 import com.odde.doughnut.testability.DBCleaner;
 import com.odde.doughnut.testability.MakeMe;
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -20,7 +19,6 @@ import java.nio.file.attribute.UserPrincipal;
 import java.security.Principal;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.mock;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
@@ -32,13 +30,11 @@ class IndexControllerTests {
   @Autowired private SessionFactory sessionFactory;
   @Mock Model model;
   private IndexController controller;
-  private Session session;
   private MakeMe makeMe;
 
   @BeforeEach
   void setupController() {
-    session = sessionFactory.openSession();
-    makeMe = new MakeMe();
+    makeMe = new MakeMe(sessionFactory.openSession());
     controller = new IndexController(noteRepository, userRepository);
   }
 
@@ -55,7 +51,7 @@ class IndexControllerTests {
 
   @Test
   void visitWithUserSessionAndTheUserExists() {
-    User user = makeMe.aUser().please(session);
+    User user = makeMe.aUser().please();
     Principal principal = (UserPrincipal) user::getExternalIdentifier;
     assertEquals("index", controller.home(principal, model));
   }

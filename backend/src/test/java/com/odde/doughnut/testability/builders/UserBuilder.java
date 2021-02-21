@@ -5,14 +5,16 @@ import org.hibernate.Session;
 
 public class UserBuilder {
     private User user = new User();
+    private final Session hibernateSession;
 
-    public UserBuilder() {
+    public UserBuilder(Session session) {
+        this.hibernateSession = session;
         user.setExternalIdentifier("121212");
         user.setName("Brown");
     }
 
-    public User please(Session session) {
-        session.save(user);
+    public User please() {
+        hibernateSession.save(user);
         return user;
     }
 }

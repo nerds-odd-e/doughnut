@@ -6,7 +6,6 @@ import com.odde.doughnut.repositories.NoteRepository;
 import com.odde.doughnut.repositories.UserRepository;
 import com.odde.doughnut.testability.DBCleaner;
 import com.odde.doughnut.testability.MakeMe;
-import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -32,16 +31,14 @@ public class NoteRestControllerTests {
     @Autowired private SessionFactory sessionFactory;
     @Mock Model model;
 
-    private Session session;
     private MakeMe makeMe;
     private User currentUser;
     private NoteRestController noteController;
 
     @BeforeEach
     void setup() {
-        session = sessionFactory.openSession();
-        makeMe = new MakeMe();
-        currentUser = makeMe.aUser().please(session);
+        makeMe = new MakeMe(sessionFactory.openSession());
+        currentUser = makeMe.aUser().please();
         noteController = new NoteRestController(noteRepository, userRepository, null );
     }
 
@@ -66,8 +63,7 @@ public class NoteRestControllerTests {
 
     @Test
     void shouldGetListOfNotes() throws Exception {
-        Note note = makeMe.aNote().forUser(currentUser).please(session);
-        session.refresh(currentUser);
+        Note note = makeMe.aNote().forUser(currentUser).please();
         assertEquals(note.getTitle(), noteController.getNotes(currentUser).get(0).getTitle());
     }
 }

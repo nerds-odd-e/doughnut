@@ -12,12 +12,6 @@ import java.util.List;
 
 @Controller
 public class ReviewController {
-    private final UserRepository userRepository;
-
-    public ReviewController(UserRepository userRepository) {
-
-        this.userRepository = userRepository;
-    }
 
     @GetMapping("/review")
     public String review(@RequestAttribute("currentUser") User currentUser, Model model) {
