@@ -43,13 +43,10 @@ public class NoteRestControllerTests {
 
     @BeforeEach
     void setup() {
-        makeMe = new MakeMe(userRepository);
-        currentUser = makeMe.aUser().please();
-        noteController = new NoteRestController(noteRepository, userRepository, null );
-    }
-    @BeforeEach
-    void setupSession() {
         session = sessionFactory.openSession();
+        makeMe = new MakeMe(userRepository);
+        currentUser = makeMe.aUser().please(session);
+        noteController = new NoteRestController(noteRepository, userRepository, null );
     }
 
     @Test
@@ -73,10 +70,9 @@ public class NoteRestControllerTests {
 
     @Test
     void shouldGetListOfNotes() throws Exception {
-        User user = createUser();
-        Note note = createNote(user);
-        user = userRepository.findByExternalIdentifier(user.getExternalIdentifier());
-        assertEquals(note.getTitle(), noteController.getNotes(user).get(0).getTitle());
+        Note note = makeMe.aNote().forUser(currentUser).please(session);
+        session.refresh(currentUser);
+        assertEquals(note.getTitle(), noteController.getNotes(currentUser).get(0).getTitle());
     }
 
     @Test
