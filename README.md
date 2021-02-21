@@ -101,11 +101,16 @@ nohup idea-community &
 ```
 
 #### Setup IntelliJ IDEA with JDK11 SDK
-
 - Locate your `nix` installed JDK11 path location with `which java`.
   e.g. `/nix/store/5ib97va5ngfacdqzzcvxff62rjwkxajg-zulu11.2.3-jdk11.0.1/bin/java`.
 - **File -> Project Structure -> Platform Settings -> SDKs -> Add JDK...**
   - Enter the full path of above (e.g. `/nix/store/5ib97va5ngfacdqzzcvxff62rjwkxajg-zulu11.2.3-jdk11.0.1`).
+
+#### Run a single targetted JUnit5 test in IntelliJ IDEA
+- Setup IntelliJ in Gradle perspective -> Gradle Settings (Wrench Icon) -> Run tests with -> IntelliJ IDEA
+- Locate your test file in IDE (e.g. `backend/src/test/com/odde/doughnut/controllers/NoteRestControllerTests.java`).
+  - Locate specific test method to run and look out for green run arrow icon in line number gutter.
+  - Click on the green run arrow icon to kick off incremental build and single test run.
 
 #### MariaDB UI Client - DBeaver (ONLY available to Linux users - Non-macOS)
 
