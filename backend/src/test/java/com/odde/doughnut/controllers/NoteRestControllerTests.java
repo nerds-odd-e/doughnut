@@ -50,7 +50,7 @@ public class NoteRestControllerTests {
         Model model = mock(Model.class);
         NoteRepository noteRepository = mock(NoteRepository.class);
 
-        NoteRestController noteController = new NoteRestController(noteRepository, linkService );
+        NoteRestController noteController = new NoteRestController(noteRepository, userRepository, linkService );
         User user = createUser();
 
         RedirectView note = noteController.createNote(user, new Note());
@@ -61,7 +61,7 @@ public class NoteRestControllerTests {
     void shouldNotBeAbleToSaveNoteWhenThereIsInvalidUser() {
         Model model = mock(Model.class);
         NoteRepository noteRepository = mock(NoteRepository.class);
-        NoteRestController noteController = new NoteRestController(noteRepository, linkService);
+        NoteRestController noteController = new NoteRestController(noteRepository, userRepository, linkService);
 
         Note note = new Note();
         User user = createUser();
@@ -85,7 +85,7 @@ public class NoteRestControllerTests {
         User user = createUser();
         Note note = createNote(user);
         user = userRepository.findByExternalIdentifier(user.getExternalIdentifier());
-        NoteRestController noteController = new NoteRestController(noteRepository, linkService);
+        NoteRestController noteController = new NoteRestController(noteRepository, userRepository, linkService);
         assertEquals(note.getTitle(), noteController.getNotes(user).get(0).getTitle());
     }
 
@@ -96,7 +96,7 @@ public class NoteRestControllerTests {
         when(mockUserRepo.findByExternalIdentifier(any())).thenReturn(user);
         when(user.getNotesInDescendingOrder()).thenReturn(Arrays.asList(new Note()));
 
-        NoteRestController noteController = new NoteRestController(noteRepository, linkService);
+        NoteRestController noteController = new NoteRestController(noteRepository, userRepository, linkService);
         List<Note> notes = noteController.getNotes(user);
         verify(user).getNotesInDescendingOrder();
         assertEquals(1, notes.size());

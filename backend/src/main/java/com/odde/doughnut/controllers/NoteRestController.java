@@ -6,30 +6,30 @@ import com.odde.doughnut.repositories.NoteRepository;
 import com.odde.doughnut.repositories.UserRepository;
 import com.odde.doughnut.services.LinkService;
 import org.springframework.http.MediaType;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.view.RedirectView;
 
-import java.security.Principal;
-import java.util.Date;
 import java.util.List;
 
 @RestController
 public class NoteRestController {
     private final NoteRepository noteRepository;
+    private final UserRepository userRepository;
     private final LinkService linkService;
 
-    public NoteRestController(NoteRepository noteRepository, LinkService linkService) {
+    public NoteRestController(NoteRepository noteRepository, UserRepository userRepository, LinkService linkService) {
         this.noteRepository = noteRepository;
+        this.userRepository = userRepository;
         this.linkService = linkService;
     }
 
     @PostMapping("/note")
     public RedirectView createNote(@RequestAttribute("currentUser") User currentUser, Note note) {
-        note.setUser(currentUser);
+        User user = userRepository.findByExternalIdentifier(currentUser.getExternalIdentifier());
+        note.setUser(user);
         noteRepository.save(note);
         return new RedirectView("/review");
     }
