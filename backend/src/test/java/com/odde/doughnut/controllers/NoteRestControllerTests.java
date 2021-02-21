@@ -4,14 +4,14 @@ import com.odde.doughnut.models.Note;
 import com.odde.doughnut.models.User;
 import com.odde.doughnut.repositories.NoteRepository;
 import com.odde.doughnut.repositories.UserRepository;
-import com.odde.doughnut.services.LinkService;
 import com.odde.doughnut.testability.DBCleaner;
+import com.odde.doughnut.testability.MakeMe;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mockito;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -19,8 +19,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.servlet.view.RedirectView;
 
 import javax.transaction.Transactional;
-import java.nio.file.attribute.UserPrincipal;
-import java.security.Principal;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -33,50 +31,44 @@ import static org.mockito.Mockito.*;
 @ExtendWith(DBCleaner.class)
 @Transactional
 public class NoteRestControllerTests {
+    @Autowired private NoteRepository noteRepository;
+    @Autowired private UserRepository userRepository;
+    @Autowired private SessionFactory sessionFactory;
+    @Mock Model model;
 
-    @Autowired
-    private NoteRepository noteRepository;
-    @Autowired
-    private UserRepository userRepository;
-    @Autowired
-    private SessionFactory sessionFactory;
+    private Session session;
+    private MakeMe makeMe;
+    private User currentUser;
+    private NoteRestController noteController;
 
-    private LinkService linkService;
-
-    Session session;
+    @BeforeEach
+    void setup() {
+        makeMe = new MakeMe(userRepository);
+        currentUser = makeMe.aUser().please();
+        noteController = new NoteRestController(noteRepository, userRepository, null );
+    }
+    @BeforeEach
+    void setupSession() {
+        session = sessionFactory.openSession();
+    }
 
     @Test
-    void shouldBeAbleToSaveNoteWhenThereIsValidUser() throws Exception {
-        Model model = mock(Model.class);
-        NoteRepository noteRepository = mock(NoteRepository.class);
-
-        NoteRestController noteController = new NoteRestController(noteRepository, userRepository, linkService );
-        User user = createUser();
-
-        RedirectView note = noteController.createNote(user, new Note());
-        assertEquals(note.getUrl(), "/review");
+    void shouldBeAbleToSaveNoteWhenThereIsValidUser() {
+        Note newNote = makeMe.aNote().inMemoryPlease();
+        RedirectView response = noteController.createNote(currentUser, newNote);
+        assertEquals("/review", response.getUrl());
     }
 
     @Test
     void shouldNotBeAbleToSaveNoteWhenThereIsInvalidUser() {
-        Model model = mock(Model.class);
-        NoteRepository noteRepository = mock(NoteRepository.class);
-        NoteRestController noteController = new NoteRestController(noteRepository, userRepository, linkService);
-
-        Note note = new Note();
-        User user = createUser();
+        Note newNote = new Note();
 
         try {
-            noteController.createNote(user, note);
-        } catch (Exception e) {
-            Mockito.verify(noteRepository, times(0)).save(note);
+            noteController.createNote(currentUser, newNote);
+        } catch (Exception ignored) {
         }
-    }
 
-    @BeforeEach
-    void setupSession() {
-        session = sessionFactory.openSession();
-        linkService = mock (LinkService.class);
+        assertEquals(null, newNote.getId());
     }
 
     @Test
@@ -84,7 +76,6 @@ public class NoteRestControllerTests {
         User user = createUser();
         Note note = createNote(user);
         user = userRepository.findByExternalIdentifier(user.getExternalIdentifier());
-        NoteRestController noteController = new NoteRestController(noteRepository, userRepository, linkService);
         assertEquals(note.getTitle(), noteController.getNotes(user).get(0).getTitle());
     }
 
@@ -95,7 +86,6 @@ public class NoteRestControllerTests {
         when(mockUserRepo.findByExternalIdentifier(any())).thenReturn(user);
         when(user.getNotesInDescendingOrder()).thenReturn(Arrays.asList(new Note()));
 
-        NoteRestController noteController = new NoteRestController(noteRepository, userRepository, linkService);
         List<Note> notes = noteController.getNotes(user);
         verify(user).getNotesInDescendingOrder();
         assertEquals(1, notes.size());
@@ -120,7 +110,4 @@ public class NoteRestControllerTests {
         return user;
     }
 
-    private Principal createLogin() {
-        return (UserPrincipal) () -> "1234567";
-    }
 }

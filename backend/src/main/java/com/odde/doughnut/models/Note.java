@@ -14,8 +14,7 @@ import java.util.List;
 @Table(name = "note")
 public class Note {
   @Id @Getter @GeneratedValue(strategy = GenerationType.IDENTITY) private Integer id;
-  @Getter
-  @Setter private String title;
+  @Getter @Setter private String title;
   @Getter @Setter private String description;
 
   @ManyToOne(cascade = CascadeType.ALL)
