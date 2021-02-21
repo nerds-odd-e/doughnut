@@ -1,4 +1,4 @@
-package com.odde.doughnut;
+package com.odde.doughnut.examples;
 
 import com.odde.doughnut.models.Note;
 import com.odde.doughnut.repositories.NoteRepository;

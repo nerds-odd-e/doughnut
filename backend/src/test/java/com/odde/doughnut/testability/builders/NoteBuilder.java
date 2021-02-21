@@ -31,13 +31,13 @@ public class NoteBuilder {
         return this;
     }
 
-    public Note please() {
-        hibernateSession.save(note);
-        return note;
-    }
-
     public NoteBuilder updatedAt(Date updatedDatetime) {
         note.setUpdatedDatetime(updatedDatetime);
         return this;
+    }
+
+    public Note please() {
+        hibernateSession.save(note);
+        return note;
     }
 }

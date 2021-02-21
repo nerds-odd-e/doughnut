@@ -3,8 +3,10 @@ package com.odde.doughnut.models;
 import com.odde.doughnut.repositories.NoteRepository;
 import com.odde.doughnut.repositories.UserRepository;
 import com.odde.doughnut.testability.DBCleaner;
+import com.odde.doughnut.testability.MakeMe;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +17,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.Date;
 import java.time.LocalDate;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SpringExtension.class)
@@ -23,59 +27,36 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @Transactional
 
 public class UserTest {
-    @Autowired
-    private NoteRepository noteRepository;
+    @Autowired private SessionFactory sessionFactory;
+    Session session;
+    MakeMe makeMe;
 
-    @Autowired
-    private UserRepository userRepository;
+    @BeforeEach
+    void setup() {
+        session = sessionFactory.openSession();
+        makeMe = new MakeMe(session);
+    }
 
-    @Autowired
-    private SessionFactory sessionFactory;
     @Test
     void shouldReturnEmptyListWhenThhereIsNoNode() {
-        User user = new User();
+        User user = makeMe.aUser().inMemoryPlease();
         assertEquals(0, user.getNotesInDescendingOrder().size());
     }
 
     @Test
     void shouldReturnTheNoteWhenThereIsOne() {
-        Session session = sessionFactory.openSession();
-
-        User user = new User();
-        user.setExternalIdentifier("hello");
-        user.setName("my name");
-
-        Note note = new Note();
-        note.setTitle("Title A");
-        note.setUser(user);
-        session.save(note);
-
-        user = userRepository.findByExternalIdentifier("hello");
-        assertEquals(note.getTitle(), user.getNotesInDescendingOrder().get(0).getTitle());
+        User user = makeMe.aUser().please();
+        Note note = makeMe.aNote().forUser(user).please();
+        assertThat(user.getNotesInDescendingOrder(), contains(note));
     }
 
     @Test
     void shouldReturnTheNoteWhenThereIsTwo() {
-        Session session = sessionFactory.openSession();
+        User user = makeMe.aUser().please();
+        Date yesterday = Date.valueOf(LocalDate.now().minusDays(1));
+        Note note1 = makeMe.aNote().forUser(user).updatedAt(yesterday).please();
+        Note note2 = makeMe.aNote().forUser(user).please();
 
-        User user = new User();
-        user.setExternalIdentifier("hello");
-        user.setName("my name");
-
-        Note note1 = new Note();
-        note1.setTitle("Title A");
-        note1.setUser(user);
-        note1.setUpdatedDatetime(Date.valueOf(LocalDate.now().minusDays(1)));
-        session.save(note1);
-
-        Note note2 = new Note();
-        note2.setTitle("Title B");
-        note2.setUser(user);
-        note2.setUpdatedDatetime(Date.valueOf(LocalDate.now()));
-        session.save(note2);
-
-
-        user = userRepository.findByExternalIdentifier("hello");
         assertEquals(note2.getTitle(), user.getNotesInDescendingOrder().get(0).getTitle());
     }
 }

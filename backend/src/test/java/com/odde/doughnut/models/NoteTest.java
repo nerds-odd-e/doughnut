@@ -44,7 +44,7 @@ public class NoteTest {
 
     @Test
     void thereShouldBe2NodesForUser() {
-        List<Note> notes = user.getNotesInDescendingOrder();
+        List<Note> notes = user.getNotes();
         assertThat(notes, hasSize(equalTo(2)));
     }
 
@@ -55,7 +55,7 @@ public class NoteTest {
     }
 
     @Test
-    void shouldReturnNoteWithLinkedNotes() {
+    void targetOfLinkedNotes() {
         Note note = user.getNotes().get(0);
         Note targetNote = user.getNotes().get(1);
         note.linkToNote(targetNote);

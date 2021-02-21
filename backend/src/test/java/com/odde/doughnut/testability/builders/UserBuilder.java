@@ -30,5 +30,9 @@ public class UserBuilder {
         hibernateSession.save(user);
         return user;
     }
+
+    public User inMemoryPlease() {
+        return user;
+    }
 }
 
