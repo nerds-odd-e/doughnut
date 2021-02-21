@@ -8,7 +8,7 @@ import java.util.Date;
 
 @Service
 public class LinkService {
-    private  NoteRepository noteRepository;
+    private final NoteRepository noteRepository;
     public LinkService(NoteRepository noteRepository)
     {
         this.noteRepository = noteRepository;

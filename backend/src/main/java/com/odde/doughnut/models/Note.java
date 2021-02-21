@@ -33,7 +33,6 @@ public class Note {
           @JoinColumn(name = "source_id", referencedColumnName = "id", nullable = false)}, inverseJoinColumns = {
             @JoinColumn(name = "target_id", referencedColumnName = "id", nullable = false)
           })
-
   @ManyToMany
   @JsonIgnoreProperties("targetNotes")
   @Getter @Setter private List<Note> targetNotes = new ArrayList<>();
@@ -41,7 +40,6 @@ public class Note {
   public void linkToNote(Note targetNote) {
     this.targetNotes.add(targetNote);
   }
-
 }
 
 
