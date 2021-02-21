@@ -1,12 +1,9 @@
-Feature: Note related feature
+Feature: Note maintenance
+    As a learner, I want to maintain my newly acquired knowledge in
+    notes that linking to each other, so that I can review them in the
+    future.
 
-@clean_db
-Scenario: New user create a note without login
-    When I did not log in
-    And I create note
-    Then I should be asked to log in
-
-@clean_db @login_as_new_user  
+@clean_db @login_as_new_user
 Scenario: New user create notes after login
     When I create note with: 
     | note-title      |   note-description  |
