@@ -4,6 +4,8 @@ import com.odde.doughnut.models.Note;
 import com.odde.doughnut.models.User;
 import org.hibernate.Session;
 
+import java.util.Date;
+
 public class NoteBuilder {
     private final Session hibernateSession;
     private Note note = new Note();
@@ -26,5 +28,10 @@ public class NoteBuilder {
     public Note please() {
         hibernateSession.save(note);
         return note;
+    }
+
+    public NoteBuilder updatedAt(Date updatedDatetime) {
+        note.setUpdatedDatetime(updatedDatetime);
+        return this;
     }
 }

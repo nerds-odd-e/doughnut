@@ -1,10 +1,13 @@
 package com.odde.doughnut.models;
 
+import com.odde.doughnut.controllers.IndexController;
 import com.odde.doughnut.repositories.NoteRepository;
 import com.odde.doughnut.repositories.UserRepository;
 import com.odde.doughnut.testability.DBCleaner;
+import com.odde.doughnut.testability.MakeMe;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,44 +28,31 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class NoteTest {
 
-    @Autowired
-    private NoteRepository noteRepository;
+    @Autowired private NoteRepository noteRepository;
+    @Autowired private UserRepository userRepository;
+    @Autowired private SessionFactory sessionFactory;
 
-    @Autowired
-    private UserRepository userRepository;
+    Session session;
+    private MakeMe makeMe;
 
-    @Autowired
-    private SessionFactory sessionFactory;
+    @BeforeEach
+    void setup() {
+        session = sessionFactory.openSession();
+        makeMe = new MakeMe(session);
+    }
 
     @Test
     void shouldReturnNoteWithLinkedNotes() {
-        Session session = sessionFactory.openSession();
 
-        User user = new User();
-        user.setExternalIdentifier("hello");
-        user.setName("my name");
+        User user = makeMe.aUser().please();
 
-        Note targetNote = new Note();
-        targetNote.setTitle("Target Note");
-        targetNote.setUser(user);
-        targetNote.setUpdatedDatetime(Date.valueOf(LocalDate.now().minusDays(1)));
-        session.save(targetNote);
+        Note targetNote = makeMe.aNote().forUser(user).updatedAt(Date.valueOf(LocalDate.now().minusDays(1))).please();
 
-        Note sourceNote = new Note();
-        sourceNote.setTitle("Source Note");
-        sourceNote.setUser(user);
-
-        sourceNote.setUpdatedDatetime(Date.valueOf(LocalDate.now()));
-        session.save(sourceNote);
+        Note sourceNote = makeMe.aNote().forUser(user).updatedAt(Date.valueOf(LocalDate.now())).please();
 
         sourceNote.linkToNote(targetNote);
 
-        Link link = new Link();
-        link.setSourceNote(sourceNote);
-        link.setTargetNote(targetNote);
-
-        session.save(link);
-        user = userRepository.findByExternalIdentifier("hello");
+        session.refresh(user);
         List<Note> notes = user.getNotesInDescendingOrder();
 
         assertEquals(2, notes.size());
