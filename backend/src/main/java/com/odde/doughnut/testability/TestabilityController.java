@@ -48,13 +48,4 @@ class TestabilityController {
     return notes.stream().map(Note::getId).collect(Collectors.toList());
 
   }
-  @PostMapping(value = "/link_note")
-  public String linkNote( Integer sourceId,  Integer targetId) {
-
-      Note sourceNote = noteRepository.findById(sourceId).get();
-      Note targetNote = noteRepository.findById(targetId).get();
-
-      linkService.linkNote(sourceNote, targetNote);
-      return "OK";
-  }
 }

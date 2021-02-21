@@ -1,7 +1,5 @@
 // ***********************************************
-// This example commands.js shows you how to
-// create various custom commands and overwrite
-// existing commands.
+// custom commands and overwrite existing commands.
 //
 // For more comprehensive examples of custom
 // commands please read more here:
@@ -70,10 +68,11 @@ Cypress.Commands.add("seedNotes", (notes) => {
   }
 })
 
-Cypress.Commands.add("linkNote", (sourceId, targetId) => {
+Cypress.Commands.add("linkNote", (sourceNoteId, targetNoteId) => {
   cy.request({
     method: "POST",
-    url: "/api/testability/link_note",
-    qs: { sourceId,targetId }
+    url: "/linkNote",
+    form: true,
+    body: { sourceNoteId, targetNoteId }
   });
 });
