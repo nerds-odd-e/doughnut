@@ -14,11 +14,7 @@ public class LinkService {
         this.noteRepository = noteRepository;
     }
 
-    public void linkNote(Integer sourceNoteId, Integer targetNoteId) {
-
-        Note sourceNote = noteRepository.findById(sourceNoteId).get();
-        Note targetNote = noteRepository.findById(targetNoteId).get();
-
+    public void linkNote(Note sourceNote, Note targetNote) {
         sourceNote.linkToNote(targetNote);
         sourceNote.setUpdatedDatetime(new Date());
 

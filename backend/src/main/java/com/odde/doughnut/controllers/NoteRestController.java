@@ -41,7 +41,10 @@ public class NoteRestController {
 
     @PostMapping(value = "/linkNote", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public RedirectView linkNote(Integer sourceNoteId, Integer targetNoteId) {
-        linkService.linkNote(sourceNoteId, targetNoteId);
+        Note sourceNote = noteRepository.findById(sourceNoteId).get();
+        Note targetNote = noteRepository.findById(targetNoteId).get();
+
+        linkService.linkNote(sourceNote, targetNote);
         return new RedirectView("/review");
     }
 }

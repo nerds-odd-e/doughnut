@@ -50,7 +50,11 @@ class TestabilityController {
   }
   @PostMapping(value = "/link_note")
   public String linkNote( Integer sourceId,  Integer targetId) {
-    linkService.linkNote(sourceId, targetId);
-    return "OK";
+
+      Note sourceNote = noteRepository.findById(sourceId).get();
+      Note targetNote = noteRepository.findById(targetId).get();
+
+      linkService.linkNote(sourceNote, targetNote);
+      return "OK";
   }
 }

@@ -1,7 +1,5 @@
 package com.odde.doughnut.models;
 
-import com.odde.doughnut.repositories.NoteRepository;
-import com.odde.doughnut.repositories.UserRepository;
 import com.odde.doughnut.testability.DBCleaner;
 import com.odde.doughnut.testability.MakeMe;
 import org.hibernate.Session;
