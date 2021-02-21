@@ -2,6 +2,7 @@ package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.models.Note;
 import com.odde.doughnut.models.User;
+import com.odde.doughnut.testability.MakeMe;
 import org.hibernate.Session;
 
 import java.time.LocalDate;
@@ -11,7 +12,7 @@ public class NoteBuilder {
     private final Session hibernateSession;
     private Note note = new Note();
 
-    public NoteBuilder(Session session){
+    public NoteBuilder(Session session, MakeMe makeMe){
         hibernateSession = session;
         note.setTitle("title");
         note.setDescription("descrption");
@@ -23,7 +24,9 @@ public class NoteBuilder {
 
     public NoteBuilder forUser(User user) {
         note.setUser(user);
-        hibernateSession.refresh(user);
+        if (user.getId() != null) {
+            hibernateSession.refresh(user);
+        }
         return this;
     }
 

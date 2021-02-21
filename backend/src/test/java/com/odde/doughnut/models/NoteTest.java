@@ -39,9 +39,7 @@ public class NoteTest {
     void setup() {
         session = sessionFactory.openSession();
         makeMe = new MakeMe(session);
-        user = makeMe.aUser().please();
-        makeMe.aNote().forUser(user).please();
-        makeMe.aNote().forUser(user).please();
+        user = makeMe.aUser().with2Notes().please();
     }
 
     @Test

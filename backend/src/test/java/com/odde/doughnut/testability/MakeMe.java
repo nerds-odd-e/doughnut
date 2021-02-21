@@ -13,10 +13,10 @@ public class MakeMe {
     }
 
     public UserBuilder aUser() {
-        return new UserBuilder(session);
+        return new UserBuilder(session, this);
     }
 
     public NoteBuilder aNote() {
-        return new NoteBuilder(session);
+        return new NoteBuilder(session, this);
     }
 }
