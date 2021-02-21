@@ -4,6 +4,7 @@ import com.odde.doughnut.models.Note;
 import com.odde.doughnut.models.User;
 import org.hibernate.Session;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 public class NoteBuilder {
@@ -14,6 +15,7 @@ public class NoteBuilder {
         hibernateSession = session;
         note.setTitle("title");
         note.setDescription("descrption");
+        note.setUpdatedDatetime(java.sql.Date.valueOf(LocalDate.now()));
     }
     public Note inMemoryPlease() {
         return note;

@@ -3,6 +3,8 @@ package com.odde.doughnut.testability.builders;
 import com.odde.doughnut.models.User;
 import org.hibernate.Session;
 
+import java.util.function.Consumer;
+
 public class UserBuilder {
     private User user = new User();
     private final Session hibernateSession;
@@ -17,4 +19,5 @@ public class UserBuilder {
         hibernateSession.save(user);
         return user;
     }
+
 }

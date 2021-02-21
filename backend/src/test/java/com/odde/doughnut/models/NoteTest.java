@@ -19,6 +19,8 @@ import java.sql.Date;
 import java.time.LocalDate;
 import java.util.List;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SpringExtension.class)
@@ -27,38 +29,40 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @Transactional
 
 public class NoteTest {
-
-    @Autowired private NoteRepository noteRepository;
-    @Autowired private UserRepository userRepository;
     @Autowired private SessionFactory sessionFactory;
 
     Session session;
-    private MakeMe makeMe;
+    MakeMe makeMe;
+    User user;
 
     @BeforeEach
     void setup() {
         session = sessionFactory.openSession();
         makeMe = new MakeMe(session);
+        user = makeMe.aUser().please();
+        makeMe.aNote().forUser(user).please();
+        makeMe.aNote().forUser(user).please();
+    }
+
+    @Test
+    void thereShouldBe2NodesForUser() {
+        List<Note> notes = user.getNotesInDescendingOrder();
+        assertThat(notes, hasSize(equalTo(2)));
+    }
+
+    @Test
+    void targetIsEmptyByDefault() {
+        Note note = user.getNotes().get(0);
+        assertThat(note.getTargetNotes(), is(empty()));
     }
 
     @Test
     void shouldReturnNoteWithLinkedNotes() {
-
-        User user = makeMe.aUser().please();
-
-        Note targetNote = makeMe.aNote().forUser(user).updatedAt(Date.valueOf(LocalDate.now().minusDays(1))).please();
-
-        Note sourceNote = makeMe.aNote().forUser(user).updatedAt(Date.valueOf(LocalDate.now())).please();
-
-        sourceNote.linkToNote(targetNote);
-
-        session.refresh(user);
-        List<Note> notes = user.getNotesInDescendingOrder();
-
-        assertEquals(2, notes.size());
-        assertEquals(1, notes.get(0).getTargetNotes().size());
-
+        Note note = user.getNotes().get(0);
+        Note targetNote = user.getNotes().get(1);
+        note.linkToNote(targetNote);
+        List<Note> targetNotes = note.getTargetNotes();
+        assertThat(targetNotes, hasSize(equalTo(1)));
+        assertThat(targetNotes, contains(targetNote));
     }
-
-
 }
