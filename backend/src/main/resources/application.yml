@@ -44,10 +44,8 @@ spring:
       client:
         registration:
           github:
-            clientId: e6f513b15e066069bb94
-            clientSecret: a0bcf31c3bcad17f49677e5a2e77d9f939395c92
-#            clientId: ${OAUTH2_github_client_id}
-#            clientSecret: ${OAUTH2_github_client_secret}
+            clientId: ${OAUTH2_github_client_id}
+            clientSecret: ${OAUTH2_github_client_secret}
 
 ---
 spring:

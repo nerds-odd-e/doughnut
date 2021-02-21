@@ -119,6 +119,20 @@ MYSQL_PASSWORD=$(curl "https://secretmanager.googleapis.com/v1/projects/${PROJEC
 	--header "x-goog-user-project: ${PROJECTID}" |
 	jq -r ".payload.data" | base64 --decode)
 
+export OAUTH2_github_client_id=$(curl "https://secretmanager.googleapis.com/v1/projects/${PROJECTID}/secrets/oauth2_github_client_id/versions/1:access" \
+	--request "GET" \
+	--header "authorization: Bearer ${ACCESS_TOKEN}" \
+	--header "content-type: application/json" \
+	--header "x-goog-user-project: ${PROJECTID}" |
+	jq -r ".payload.data" | base64 --decode)
+
+export OAUTH2_github_client_secret=$(curl "https://secretmanager.googleapis.com/v1/projects/${PROJECTID}/secrets/oauth2_github_client_secret/versions/1:access" \
+	--request "GET" \
+	--header "authorization: Bearer ${ACCESS_TOKEN}" \
+	--header "content-type: application/json" \
+	--header "x-goog-user-project: ${PROJECTID}" |
+	jq -r ".payload.data" | base64 --decode)
+
 # define db-server entry pointing to IP address of mariadb instance
 echo "10.142.0.18	db-server" >> /etc/hosts
 
