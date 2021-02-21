@@ -5,6 +5,7 @@ import com.odde.doughnut.repositories.NoteRepository;
 import com.odde.doughnut.repositories.UserRepository;
 import com.odde.doughnut.testability.DBCleaner;
 import com.odde.doughnut.testability.MakeMe;
+import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,8 +30,8 @@ class IndexControllerTests {
 
   @Autowired private NoteRepository noteRepository;
   @Autowired private UserRepository userRepository;
-  @Mock
-  Model model;
+  @Autowired private SessionFactory sessionFactory;
+  @Mock Model model;
   private IndexController controller;
 
   @BeforeEach

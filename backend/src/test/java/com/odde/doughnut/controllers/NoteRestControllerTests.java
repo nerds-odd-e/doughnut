@@ -75,7 +75,6 @@ public class NoteRestControllerTests {
 
     @BeforeEach
     void setupSession() {
-
         session = sessionFactory.openSession();
         linkService = mock (LinkService.class);
     }
