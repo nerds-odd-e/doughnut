@@ -1,18 +1,15 @@
 package com.odde.doughnut.testability;
 
-import com.odde.doughnut.repositories.UserRepository;
 import com.odde.doughnut.testability.builders.NoteBuilder;
-import com.odde.doughnut.testability.builders.UserPersistedBuilder;
+import com.odde.doughnut.testability.builders.UserBuilder;
 
 public class MakeMe {
-    private UserRepository userRepository;
 
-    public MakeMe(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public MakeMe() {
     }
 
-    public UserPersistedBuilder aUser() {
-        return new UserPersistedBuilder(userRepository);
+    public UserBuilder aUser() {
+        return new UserBuilder();
     }
 
     public NoteBuilder aNote() {

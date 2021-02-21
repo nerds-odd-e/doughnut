@@ -1,22 +1,14 @@
 package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.models.User;
-import com.odde.doughnut.repositories.UserRepository;
 import org.hibernate.Session;
 
-public class UserPersistedBuilder {
-    private UserRepository userRepository;
+public class UserBuilder {
     private User user = new User();
 
-    public UserPersistedBuilder(UserRepository userRepository) {
-        this.userRepository = userRepository;
+    public UserBuilder() {
         user.setExternalIdentifier("121212");
         user.setName("Brown");
-    }
-
-    public User please() {
-       userRepository.save(user);
-        return user;
     }
 
     public User please(Session session) {

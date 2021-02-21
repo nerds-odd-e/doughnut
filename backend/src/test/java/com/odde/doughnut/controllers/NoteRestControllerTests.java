@@ -19,12 +19,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.servlet.view.RedirectView;
 
 import javax.transaction.Transactional;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.Mockito.*;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
@@ -44,7 +40,7 @@ public class NoteRestControllerTests {
     @BeforeEach
     void setup() {
         session = sessionFactory.openSession();
-        makeMe = new MakeMe(userRepository);
+        makeMe = new MakeMe();
         currentUser = makeMe.aUser().please(session);
         noteController = new NoteRestController(noteRepository, userRepository, null );
     }
@@ -74,36 +70,4 @@ public class NoteRestControllerTests {
         session.refresh(currentUser);
         assertEquals(note.getTitle(), noteController.getNotes(currentUser).get(0).getTitle());
     }
-
-    @Test
-    void shouldGetListOfNotesWithMock() throws Exception {
-        UserRepository mockUserRepo = mock(UserRepository.class);
-        User user = mock(User.class);
-        when(mockUserRepo.findByExternalIdentifier(any())).thenReturn(user);
-        when(user.getNotesInDescendingOrder()).thenReturn(Arrays.asList(new Note()));
-
-        List<Note> notes = noteController.getNotes(user);
-        verify(user).getNotesInDescendingOrder();
-        assertEquals(1, notes.size());
-    }
-
-    private Note createNote(User user) {
-        Note note = new Note();
-        note.setUser(user);
-        note.setTitle("Sedition");
-        note.setDescription("Incite violence");
-        note.setCreatedDatetime(new Date());
-
-        session.save(note);
-        return note;
-    }
-
-    private User createUser() {
-        User user = new User();
-        user.setExternalIdentifier("1234567");
-        user.setName("my name");
-        session.save(user);
-        return user;
-    }
-
 }
