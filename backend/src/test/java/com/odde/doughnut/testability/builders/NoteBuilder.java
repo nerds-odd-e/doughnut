@@ -9,12 +9,13 @@ import java.time.LocalDate;
 import java.util.Date;
 
 public class NoteBuilder {
+    static TestObjectCounter titleCounter = new TestObjectCounter(n->"title" + n);
     private final Session hibernateSession;
     private Note note = new Note();
 
     public NoteBuilder(Session session, MakeMe makeMe){
         hibernateSession = session;
-        note.setTitle("title");
+        note.setTitle(titleCounter.generate());
         note.setDescription("descrption");
         note.setUpdatedDatetime(java.sql.Date.valueOf(LocalDate.now()));
     }

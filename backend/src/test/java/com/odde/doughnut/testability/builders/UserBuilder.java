@@ -5,15 +5,19 @@ import com.odde.doughnut.testability.MakeMe;
 import org.hibernate.Session;
 
 public class UserBuilder {
+    static TestObjectCounter exIdCounter = new TestObjectCounter(n->"exid" + n);
+    static TestObjectCounter nameCounter = new TestObjectCounter(n->"user" + n);
+
     private User user = new User();
     private final Session hibernateSession;
     private final MakeMe makeMe;
 
+
     public UserBuilder(Session session, MakeMe makeMe) {
         this.hibernateSession = session;
         this.makeMe = makeMe;
-        user.setExternalIdentifier("121212");
-        user.setName("Brown");
+        user.setExternalIdentifier(exIdCounter.generate());
+        user.setName(nameCounter.generate());
     }
 
     public UserBuilder with2Notes() {
