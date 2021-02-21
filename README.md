@@ -230,6 +230,10 @@ The Cypress+Cucumber tests are written in JavaScript.
 ### 9. How to Contribute
 
 - We welcome product ideas and code contribution.
-- FOSS style; Fork and submit Github PR. Collaborate over Github Issues or [doughnut gitter.im](https://gitter.im/Odd-e-doughnut/community)
-    - Please keep the PR small and on only one topic
-    - The code need to come with tests
+- Collaborate over:
+  - [GitHub Discussions](https://github.com/nerds-odd-e/doughnut/discussions) for product ideas/features,
+  - [GitHub Issues](https://github.com/nerds-odd-e/doughnut/issues) for reporting issues or bugs, OR
+  - [doughnut gitter.im](https://gitter.im/Odd-e-doughnut/community)
+- FOSS style; Fork and submit Github PR.
+  - Please keep the PR small and on only one topic
+  - The code need to come with tests
