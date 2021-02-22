@@ -27,7 +27,7 @@
                 <form th:action="@{/linkNote}" method="post">
                     <input type="hidden" name="sourceNoteId" th:value="${sourceNote.id}" />
                     <input type="hidden" name="targetNoteId" th:value="${note.id}"/>
-                    <Button th:data-testid="'button-' + ${note.id}" class="btn btn-primary" type="submit">Select</Button>
+                    <Button class="btn btn-primary" type="submit">Select</Button>
                 </form>
             </div>
         </div>
