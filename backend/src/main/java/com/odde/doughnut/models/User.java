@@ -40,7 +40,7 @@ public class User {
         List<Note> allNotes = getNotes();
         return allNotes.stream()
                 .filter(i -> !targetNotes.contains(i))
-                .filter(i -> !i.getId().equals(source.getId()))
+                .filter(i -> !i.equals(source))
                 .collect(Collectors.toList());
     }
 }
