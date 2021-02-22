@@ -32,7 +32,9 @@ Feature: link note
     Scenario: Search note for linking with partial input
         Given I create link for note "Sedition"
         When I search for notes with title "Sedatio"
-        Then I should see only "Sedation"
+        And I should see below notes as targets only
+            | note-title      |
+            | Sedation        |
 
     @clean_db
     Scenario: Create link for note

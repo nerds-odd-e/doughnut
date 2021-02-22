@@ -51,16 +51,12 @@ And("I should see the source note as {string}",(noteTitle) => {
     cy.findByText(`Link ${noteTitle} to:`).should("be.visible");
 })
 
-And("I should see below notes as targets only",(data) => {
-    cy.expectExactLinkTargets(data.rows().flat());
-})
-
 When("I search for notes with title {string}", (searchKey) => {
     cy.findByPlaceholderText("Search").type(searchKey);
     cy.findByText("Search").click();
 })
 
-Then("I should see only {string}", (noteTitle) =>{
-    cy.expectExactLinkTargets([noteTitle]);
+And("I should see below notes as targets only",(data) => {
+    cy.expectExactLinkTargets(data.rows().flat());
 })
 
