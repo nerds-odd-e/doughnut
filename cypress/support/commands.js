@@ -41,20 +41,10 @@ Cypress.Commands.add("loginAs", (username) => {
 });
 
 Cypress.Commands.add("seedNotes", (notes) => {
-  let now = Date.now();
-
-  const createNotes = (notes) =>{
-    cy.request({method: "POST", url: "/api/testability/seed_notes", body: notes})
-    .then((response) => {
-        expect(response.body.length).to.equal(notes.length);
-    })
-  }
-
-  if (!notes){
-    cy.fixture('notes').then(notes =>createNotes(notes));
-  } else {
-    createNotes(notes);
-  }
+  cy.request({method: "POST", url: "/api/testability/seed_notes", body: notes})
+  .then((response) => {
+     expect(response.body.length).to.equal(notes.length);
+  })
 })
 
 Cypress.Commands.add("linkNote", (sourceNoteId, targetNoteId) => {

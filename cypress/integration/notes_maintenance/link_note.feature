@@ -6,10 +6,10 @@ Feature: link note
     Background:
         Given I've logged in as an existing user
         And there are some notes for the current user
-            | title           | description            |
-            | Sedition        | Incite violence        |
-            | Sedation        | Put to sleep           |
-            | Sedative        | Sleep medicine         |
+            | title           | description            | updatedDatetime          |
+            | Sedition        | Incite violence        | 2021-02-19T03:13:45.000Z |
+            | Sedation        | Put to sleep           | 2021-02-19T03:13:45.000Z |
+            | Sedative        | Sleep medicine         | 2021-02-19T03:13:45.000Z |
 
     @clean_db
     Scenario: View all linkable notes when no links exist
