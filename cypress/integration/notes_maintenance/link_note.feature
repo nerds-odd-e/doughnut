@@ -12,14 +12,17 @@ Feature: link note
             | Sedative        | Sleep medicine         | 2021-02-19T03:13:45.000Z |
 
     @clean_db
-    Scenario: View all linkable notes when no links exist
+    Scenario: View all my notes
         Then I should see these notes belonging to the user
             | note-title      |
             | Sedition        |
             | Sedation        |
             | Sedative        |
+
+    @clean_db
+    Scenario: View all linkable notes when no links exist
         When I create link for note "Sedition"
-        And I should see the source note as Sedition
+        And I should see the source note as "Sedition"
         And I should see below notes
         | note-title      |   note-description  |
         | Sedation        |   Put to sleep      |

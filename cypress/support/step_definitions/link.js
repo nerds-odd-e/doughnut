@@ -47,8 +47,8 @@ And("I should see the Sedition note linked to Sedation",() => {
 })
 
 
-And("I should see the source note as Sedition",() => {
-    cy.findByText("Link Sedition to:").should("be.visible");
+And("I should see the source note as {string}",(noteTitle) => {
+    cy.findByText(`Link ${noteTitle} to:`).should("be.visible");
 })
 
 And("I should see below notes",(data) => {

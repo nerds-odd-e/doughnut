@@ -19,7 +19,6 @@ When("I create note with:", (data) => {
     }
     cy.get('input[value="Submit"]').click();
   });
-
 });
 
 Then("I should see the note with title and description on the review page", (data) => {
