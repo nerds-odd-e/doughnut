@@ -10,14 +10,6 @@ Before({ tags: "@clean_db" }, () => {
   cy.cleanDBAndSeedData();
 });
 
-Before({ tags: "@login_as_existing_user" }, () => {
-  cy.loginAsExistingUser();
-});
-
-Before({ tags: "@login_as_new_user" }, () => {
-  cy.loginAsNewUser();
-});
-
 Before({ tags: "@login_as_existing_user1" }, () => {
   cy.loginAs('old_learner');
 });
