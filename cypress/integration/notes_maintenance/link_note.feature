@@ -23,18 +23,14 @@ Feature: link note
     Scenario: View all linkable notes when no links exist
         When I create link for note "Sedition"
         And I should see the source note as "Sedition"
-        And I should see below notes
+        And I should see below notes as targets only
         | note-title      |   note-description  |
         | Sedation        |   Put to sleep      |
         | Sedative        |   sleep medicine    |
 
     @clean_db
-    Scenario: Search note for linking
+    Scenario: Search note for linking with partial input
         Given I create link for note "Sedition"
-        And  I should see below notes
-            | note-title      |   note-description  |
-            | Sedation        |   Put to sleep      |
-            | Sedative        |   sleep medicine    |
         When I search for notes with title "Sedatio"
         Then I should see only "Sedation"
 

@@ -51,10 +51,11 @@ And("I should see the source note as {string}",(noteTitle) => {
     cy.findByText(`Link ${noteTitle} to:`).should("be.visible");
 })
 
-And("I should see below notes",(data) => {
+And("I should see below notes as targets only",(data) => {
     data.hashes().forEach((elem) => {
-         cy.findByText(elem["note-title"]).should("be.visible");
+         cy.findByText(elem["note-title"], {selector: '.card-title'}).should("be.visible");
     });
+    cy.findAllByText(/.*/, {selector: '.card-title'}).should("have.length", data.hashes().length);
 })
 
 When("I search for notes with title \"Sedatio\"", () => {
