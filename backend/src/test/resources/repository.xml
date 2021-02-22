@@ -12,21 +12,20 @@
     http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
 
     <context:component-scan base-package="com.odde.doughnut.repositories">
-<!--        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller" />-->
+        <!--        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller" />-->
     </context:component-scan>
 
-    <context:property-placeholder location="classpath:db-test.properties" />
+    <context:property-placeholder location="classpath:db-test.properties"/>
 
     <bean id="dataSource" class="org.mariadb.jdbc.MariaDbDataSource">
-        <property name="url" value="${db.url}" />
-        <property name="user" value="${db.user}" />
-        <property name="password" value="${db.password}" />
+        <property name="url" value="${db.url}"/>
+        <property name="user" value="${db.user}"/>
+        <property name="password" value="${db.password}"/>
     </bean>
-    <bean id="emf"
-          class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
-        <property name="packagesToScan" value="com.odde.doughnut.models" />
-        <property name="dataSource" ref="dataSource" />
 
+    <bean id="emf" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="packagesToScan" value="com.odde.doughnut.models"/>
+        <property name="dataSource" ref="dataSource"/>
         <property name="jpaProperties">
             <props>
                 <prop key="hibernate.show_sql">false</prop>
@@ -37,14 +36,27 @@
         <property name="persistenceProvider">
             <bean class="org.hibernate.jpa.HibernatePersistenceProvider"/>
         </property>
-
     </bean>
-    <tx:annotation-driven transaction-manager="transactionManager" />
 
-    <bean class="org.springframework.orm.jpa.JpaTransactionManager"
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="packagesToScan" value="com.odde.doughnut.models"/>
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.current_session_context_class">thread</prop>
+                <prop key="hibernate.dialect">org.hibernate.dialect.MariaDB103Dialect</prop>
+            </props>
+        </property>
+    </bean>
+
+    <tx:annotation-driven transaction-manager="transactionManager"/>
+
+    <bean class="org.springframework.orm.hibernate5.HibernateTransactionManager"
           id="transactionManager">
-        <property name="dataSource" ref="dataSource" />
+        <property name="dataSource" ref="dataSource"/>
+        <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
-    <jpa:repositories base-package="com.odde.doughnut.repositories" entity-manager-factory-ref="emf" />
+    <jpa:repositories base-package="com.odde.doughnut.repositories" entity-manager-factory-ref="emf"/>
+
 
 </beans>

@@ -6,6 +6,7 @@ import com.odde.doughnut.repositories.NoteRepository;
 import com.odde.doughnut.repositories.UserRepository;
 import com.odde.doughnut.testability.DBCleaner;
 import com.odde.doughnut.testability.MakeMe;
+import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,6 +18,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.ui.Model;
 import org.springframework.web.servlet.view.RedirectView;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.transaction.Transactional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -29,23 +32,23 @@ public class NoteRestControllerTests {
     @Autowired private NoteRepository noteRepository;
     @Autowired private UserRepository userRepository;
     @Autowired private SessionFactory sessionFactory;
-    @Mock Model model;
 
     private MakeMe makeMe;
-    private User currentUser;
+    private User user;
     private NoteRestController noteController;
 
     @BeforeEach
     void setup() {
-        makeMe = new MakeMe(sessionFactory.openSession());
-        currentUser = makeMe.aUser().please();
-        noteController = new NoteRestController(noteRepository, userRepository, null );
+        Session session = sessionFactory.openSession();
+        makeMe = new MakeMe(session);
+        user = makeMe.aUser().please();
+        user = userRepository.findByExternalIdentifier(user.getExternalIdentifier());
+        noteController = new NoteRestController(noteRepository, null, new TestCurrentUser(user));
     }
 
-    @Test
     void shouldBeAbleToSaveNoteWhenThereIsValidUser() {
         Note newNote = makeMe.aNote().inMemoryPlease();
-        RedirectView response = noteController.createNote(currentUser, newNote);
+        RedirectView response = noteController.createNote(newNote);
         assertEquals("/review", response.getUrl());
     }
 
@@ -54,7 +57,7 @@ public class NoteRestControllerTests {
         Note newNote = new Note();
 
         try {
-            noteController.createNote(currentUser, newNote);
+            noteController.createNote(newNote);
         } catch (Exception ignored) {
         }
 
@@ -63,7 +66,7 @@ public class NoteRestControllerTests {
 
     @Test
     void shouldGetListOfNotes() throws Exception {
-        Note note = makeMe.aNote().forUser(currentUser).please();
-        assertEquals(note.getTitle(), noteController.getNotes(currentUser).get(0).getTitle());
+        Note note = makeMe.aNote().forUser(user).please();
+        assertEquals(note.getTitle(), noteController.getNotes(user).get(0).getTitle());
     }
 }

@@ -30,9 +30,13 @@ class TestabilityController {
   @Autowired
   LinkService linkService;
 
-  @GetMapping("/clean_db")
-  public String cleanDB() {
+  @GetMapping("/clean_db_and_seed_data")
+  public String cleanDBAndSeedData() {
     new DBCleanerWorker(emf).truncateAllTables();
+    User user = new User();
+    user.setExternalIdentifier("older_learner");
+    user.setName("Older Learner");
+    userRepository.save(user);
     return "OK";
   }
 

@@ -23,7 +23,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @ExtendWith(DBCleaner.class)
 @Transactional
-
 public class UserTest {
     @Autowired private SessionFactory sessionFactory;
     Session session;

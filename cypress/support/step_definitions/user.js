@@ -6,10 +6,6 @@ import {
   Before,
 } from "cypress-cucumber-preprocessor/steps";
 
-//Before({ tags: "@clean_db" }, () => {
-//  cy.cleanDB();
-//});
-
 When("I identify myself as a new user", () => {
   cy.visit("/login");
 

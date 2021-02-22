@@ -7,7 +7,7 @@ import {
   } from "cypress-cucumber-preprocessor/steps";
 
 Before({ tags: "@clean_db" }, () => {
-  cy.cleanDB();
+  cy.cleanDBAndSeedData();
 });
 
 Before({ tags: "@login_as_existing_user" }, () => {
@@ -16,6 +16,10 @@ Before({ tags: "@login_as_existing_user" }, () => {
 
 Before({ tags: "@login_as_new_user" }, () => {
   cy.loginAsNewUser();
+});
+
+Before({ tags: "@login_as_existing_user1" }, () => {
+  cy.loginAsExistingUser1();
 });
 
 Before({ tags: "@log_out" }, () => {

@@ -24,21 +24,27 @@
 
 import '@testing-library/cypress/add-commands'
 
-Cypress.Commands.add("cleanDB", () => {
-  cy.request("/api/testability/clean_db").its("body").should("contain", "OK");
+Cypress.Commands.add("cleanDBAndSeedData", () => {
+  cy.request("/api/testability/clean_db_and_seed_data").its("body").should("contain", "OK");
 });
 
 Cypress.Commands.add("loginAsNewUser", () => {
-  cy.visit("/login");
-
-  cy.get("#username").type("user");
-  cy.get("#password").type("password");
-  cy.get("form.form-signin").submit();
-  cy.location("pathname", { timeout: 10000 }).should("eq", "/");
-  cy.get('input[type="submit"][value="Logout"]').should("be.visible");
-
+  cy.loginAs("user");
+  cy.visit("/");
   cy.get("#name").type("Learner A");
   cy.get('input[value="Submit"]').click();
+});
+
+Cypress.Commands.add("loginAs", (username) => {
+  const password = "password";
+  cy.request({
+    method: "POST",
+    url: "/login",
+    form: true,
+    body: { username, password }
+  }) .then((response) => {
+    expect(response.status).to.equal(200);
+  });
 });
 
 Cypress.Commands.add("loginAsExistingUser", () => {
