@@ -24,9 +24,9 @@ Feature: link note
         When I create link for note "Sedition"
         And I should see the source note as "Sedition"
         And I should see below notes as targets only
-        | note-title      |   note-description  |
-        | Sedation        |   Put to sleep      |
-        | Sedative        |   sleep medicine    |
+        | note-title      |
+        | Sedation        |
+        | Sedative        |
 
     @clean_db
     Scenario: Search note for linking with partial input

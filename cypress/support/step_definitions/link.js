@@ -52,20 +52,15 @@ And("I should see the source note as {string}",(noteTitle) => {
 })
 
 And("I should see below notes as targets only",(data) => {
-    data.hashes().forEach((elem) => {
-         cy.findByText(elem["note-title"], {selector: '.card-title'}).should("be.visible");
-    });
-    cy.findAllByText(/.*/, {selector: '.card-title'}).should("have.length", data.hashes().length);
+    cy.expectExactLinkTargets(data.rows().flat());
 })
 
-When("I search for notes with title \"Sedatio\"", () => {
-    cy.findByPlaceholderText("Search")
-      .type("Sedatio");
-    cy.findByText("Search")
-      .click();
+When("I search for notes with title {string}", (searchKey) => {
+    cy.findByPlaceholderText("Search").type(searchKey);
+    cy.findByText("Search").click();
 })
 
-Then("I should see only \"Sedation\"", () =>{
- cy.findByText("Sedation").should("be.visible");
+Then("I should see only {string}", (noteTitle) =>{
+    cy.expectExactLinkTargets([noteTitle]);
 })
 

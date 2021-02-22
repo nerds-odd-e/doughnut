@@ -63,3 +63,10 @@ Cypress.Commands.add("creatingLinkFor", (noteTitle) => {
     button.click();
 });
 
+Cypress.Commands.add("expectExactLinkTargets", (targets) => {
+    targets.forEach((elem) => {
+         cy.findByText(elem, {selector: '.card-title'}).should("be.visible");
+    });
+    cy.findAllByText(/.*/, {selector: '.card-title'}).should("have.length", targets.length);
+})
+
