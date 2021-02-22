@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.models.Note;
 import com.odde.doughnut.models.User;
 import com.odde.doughnut.repositories.NoteRepository;
@@ -34,7 +35,7 @@ public class NoteRestControllerTests {
     void setup() {
         makeMe = new MakeMe();
         user = makeMe.aUser().please(userRepository);
-        noteController = new NoteRestController(noteRepository, null, new TestCurrentUser(user));
+        noteController = new NoteRestController(noteRepository, null, (CurrentUser) new TestCurrentUser(user));
     }
 
     @Test

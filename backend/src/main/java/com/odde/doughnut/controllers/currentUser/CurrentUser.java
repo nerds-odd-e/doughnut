@@ -1,4 +1,4 @@
-package com.odde.doughnut.controllers;
+package com.odde.doughnut.controllers.currentUser;
 
 import com.odde.doughnut.models.User;
 

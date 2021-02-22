@@ -1,7 +1,7 @@
 
 package com.odde.doughnut.testability;
 
-import com.odde.doughnut.controllers.CurrentUserFromRequest;
+import com.odde.doughnut.controllers.currentUser.CurrentUserFromRequest;
 import com.odde.doughnut.services.LinkService;
 import com.odde.doughnut.models.Note;
 import com.odde.doughnut.models.User;

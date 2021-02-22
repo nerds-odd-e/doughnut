@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.models.Note;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

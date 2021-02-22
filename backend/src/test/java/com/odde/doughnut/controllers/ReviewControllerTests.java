@@ -17,6 +17,6 @@ class ReviewControllerTests {
     when(user.getNotesInDescendingOrder()).thenReturn(new ArrayList<>());
     ReviewController controller = new ReviewController(new TestCurrentUser(user));
     Model model = mock(Model.class);
-    assertEquals("review", controller.review(user, model));
+    assertEquals("review", controller.review(model));
   }
 }
