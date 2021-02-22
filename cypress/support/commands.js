@@ -56,11 +56,15 @@ Cypress.Commands.add("linkNote", (sourceNoteId, targetNoteId) => {
   });
 });
 
+Cypress.Commands.add("clickButtonOnCard", (noteTitle, buttonTitle) => {
+    const card = cy.findByText(noteTitle, { selector: ".card-title"});
+    const button = card.parent().findByText(buttonTitle);
+    button.click();
+});
+
 Cypress.Commands.add("creatingLinkFor", (noteTitle) => {
     cy.visit("/all_my_notes");
-    const card = cy.findByText(noteTitle, { selector: ".card-title"});
-    const button = card.parent().findByText("Link Note");
-    button.click();
+    cy.clickButtonOnCard(noteTitle, "Link Note");
 });
 
 Cypress.Commands.add("expectExactLinkTargets", (targets) => {

@@ -30,14 +30,14 @@ When("I am creating link for note {string}", (noteTitle) => {
 });
 
 When("I link to note {string}", (noteTitle) => {
-    cy.findByTestId("button-2").click();
+    cy.clickButtonOnCard(noteTitle, "Select");
     cy.url().should('include', 'review');
 })
 
 
-And("I should see the Sedition note linked to Sedation",() => {
-    cy.findByText("Sedition").should("be.visible");
-    cy.findByText("Sedation").should("be.visible");
+And("Review should include a related notes page from {string} to {string}",(noteTitle1, noteTitle2) => {
+    cy.findByText(noteTitle1).should("be.visible");
+    cy.findByText(noteTitle2).should("be.visible");
 })
 
 

@@ -39,4 +39,4 @@ Feature: link note
     Scenario: Create link for note
         Given I am creating link for note "Sedition"
         When I link to note "Sedation"
-        Then I should see the Sedition note linked to Sedation
+        Then Review should include a related notes page from "Sedition" to "Sedation"
