@@ -5,7 +5,6 @@ import com.odde.doughnut.repositories.NoteRepository;
 import com.odde.doughnut.repositories.UserRepository;
 import com.odde.doughnut.testability.DBCleaner;
 import com.odde.doughnut.testability.MakeMe;
-import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,7 +32,7 @@ class IndexControllerTests {
 
   @BeforeEach
   void setupController() {
-    makeMe = new MakeMe(null);
+    makeMe = new MakeMe();
     controller = new IndexController(noteRepository, userRepository);
   }
 

@@ -6,8 +6,6 @@ import com.odde.doughnut.repositories.NoteRepository;
 import com.odde.doughnut.repositories.UserRepository;
 import com.odde.doughnut.testability.DBCleaner;
 import com.odde.doughnut.testability.MakeMe;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -34,7 +32,7 @@ public class NoteRestControllerTests {
 
     @BeforeEach
     void setup() {
-        makeMe = new MakeMe(null);
+        makeMe = new MakeMe();
         user = makeMe.aUser().please(userRepository);
         noteController = new NoteRestController(noteRepository, null, new TestCurrentUser(user));
     }

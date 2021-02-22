@@ -2,21 +2,15 @@ package com.odde.doughnut.testability;
 
 import com.odde.doughnut.testability.builders.NoteBuilder;
 import com.odde.doughnut.testability.builders.UserBuilder;
-import org.hibernate.Session;
+import org.springframework.stereotype.Component;
 
+@Component
 public class MakeMe {
-
-    private Session session;
-
-    public MakeMe(Session session) {
-        this.session = session;
-    }
-
     public UserBuilder aUser() {
         return new UserBuilder(this);
     }
 
     public NoteBuilder aNote() {
-        return new NoteBuilder(session, this);
+        return new NoteBuilder(this);
     }
 }
