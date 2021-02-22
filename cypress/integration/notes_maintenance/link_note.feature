@@ -14,7 +14,7 @@ Feature: link note
             | Sedition        |
             | Sedation        |
             | Sedative        |
-        When I click Create Link button on "Sedition"
+        When I create link for note "Sedition"
         And I should see the source note as Sedition
         And I should see below notes
         | note-title      |   note-description  |
@@ -23,7 +23,7 @@ Feature: link note
 
     @clean_db
     Scenario: Search note for linking
-        Given I click Create Link button on "Sedition"
+        Given I create link for note "Sedition"
         And  I should see below notes
             | note-title      |   note-description  |
             | Sedation        |   Put to sleep      |
@@ -33,7 +33,7 @@ Feature: link note
 
     @clean_db
     Scenario: Create link for note
-        Given I click Create Link button on "Sedition"
+        Given I create link for note "Sedition"
         And I should be able to see the buttons for linking note
         When I select a Sedation note
         Then I should be redirected to review page

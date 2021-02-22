@@ -29,10 +29,10 @@ Then("I should see these notes belonging to the user", (data) => {
     });
 });
 
-When("I click Create Link button on {string}", (noteTitle) => {
+When("I create link for note {string}", (noteTitle) => {
     cy.visit("/all_my_notes");
-    var button = cy.findByTestId('button-1');
-    button.should("be.visible");
+    const card = cy.findByText(noteTitle, { selector: ".card-title"});
+    const button = card.parent().findByText("Link Note");
     button.click();
 });
 
