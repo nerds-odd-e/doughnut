@@ -2,7 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.models.User;
 
-public class TestCurrentUser implements ICurrentUser {
+public class TestCurrentUser implements CurrentUser {
     private final User user;
 
     public TestCurrentUser(User user) {

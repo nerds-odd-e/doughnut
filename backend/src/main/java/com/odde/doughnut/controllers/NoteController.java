@@ -14,9 +14,11 @@ import java.util.List;
 
 @Controller
 public class NoteController {
+    private final CurrentUser currentUser;
     private final NoteRepository noteRepository;
 
-    public NoteController(NoteRepository noteRepository) {
+    public NoteController(CurrentUser currentUser, NoteRepository noteRepository) {
+        this.currentUser = currentUser;
         this.noteRepository = noteRepository;
     }
 

@@ -16,9 +16,9 @@ import java.util.List;
 public class NoteRestController {
     private final NoteRepository noteRepository;
     private final LinkService linkService;
-    private final ICurrentUser currentUser;
+    private final CurrentUser currentUser;
 
-    public NoteRestController(NoteRepository noteRepository, LinkService linkService, ICurrentUser currentUser) {
+    public NoteRestController(NoteRepository noteRepository, LinkService linkService, CurrentUser currentUser) {
         this.noteRepository = noteRepository;
         this.linkService = linkService;
         this.currentUser = currentUser;

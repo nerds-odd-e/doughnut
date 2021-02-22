@@ -1,7 +1,6 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.repositories.NoteRepository;
-import com.odde.doughnut.repositories.UserRepository;
 import com.odde.doughnut.testability.DBCleaner;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,7 +21,7 @@ class NoteControllerTests {
 
   @Test
   void shouldProceedToNotePageWhenUserIsLogIn() {
-    NoteController controller = new NoteController(noteRepository);
+    NoteController controller = new NoteController(null, noteRepository);
     assertEquals("note", controller.notes(model));
   }
 }

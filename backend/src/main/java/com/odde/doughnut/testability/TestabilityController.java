@@ -1,7 +1,7 @@
 
 package com.odde.doughnut.testability;
 
-import com.odde.doughnut.controllers.CurrentUser;
+import com.odde.doughnut.controllers.CurrentUserFromRequest;
 import com.odde.doughnut.services.LinkService;
 import com.odde.doughnut.models.Note;
 import com.odde.doughnut.models.User;
@@ -22,7 +22,8 @@ class TestabilityController {
   @Autowired EntityManagerFactory emf;
   @Autowired NoteRepository noteRepository;
   @Autowired UserRepository userRepository;
-  @Autowired CurrentUser currentUser;
+  @Autowired
+  CurrentUserFromRequest currentUser;
 
   @Autowired
   LinkService linkService;
