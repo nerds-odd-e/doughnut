@@ -9,14 +9,12 @@ Feature: link note
 
     @clean_db
     Scenario: View all linkable notes when no links exist
-        When I go to the notes page
-        Then I should see 3 notes belonging to the user
-            | note-title       |
+        Then I should see these notes belonging to the user
+            | note-title      |
             | Sedition        |
             | Sedation        |
             | Sedative        |
         When I click Create Link button on Sedition
-        Then I should be navigated to the linking page
         And I should see the source note as Sedition
         And I should see below notes
         | note-title      |   note-description  |
@@ -27,7 +25,6 @@ Feature: link note
     Scenario: Search note for linking
         When I go to the notes page
         And I click Create Link button on Sedition
-        Then I should be navigated to the linking page
         And  I should see below notes
             | note-title      |   note-description  |
             | Sedation        |   Put to sleep      |
@@ -39,7 +36,6 @@ Feature: link note
     Scenario: Create link for note
         When I go to the notes page
         And I click Create Link button on Sedition
-        Then I should be navigated to the linking page
         And I should be able to see the buttons for linking note
         When I select a Sedation note
         Then I should be redirected to review page

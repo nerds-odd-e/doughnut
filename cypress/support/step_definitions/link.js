@@ -21,13 +21,12 @@ When("I go to the notes page", () => {
   cy.visit("/all_my_notes");
 });
 
-Then("I should see 3 notes belonging to the user", (data) => {
+Then("I should see these notes belonging to the user", (data) => {
+    cy.visit("/all_my_notes");
     cy.findByText("Your Notes");
-
     data.hashes().forEach((elem) => {
          cy.findByText(elem["note-title"]).should("be.visible");
     });
-
 });
 
 When("I click Create Link button on Sedition", () => {
@@ -53,10 +52,6 @@ And("I should see the Sedition note linked to Sedation",() => {
     cy.findByText("Sedation").should("be.visible");
 })
 
-
-Then("I should be navigated to the linking page", () =>{
-    cy.url().should('include', 'link/1');
-});
 
 And("I should see the source note as Sedition",() => {
     cy.findByText("Link Sedition to:").should("be.visible");
