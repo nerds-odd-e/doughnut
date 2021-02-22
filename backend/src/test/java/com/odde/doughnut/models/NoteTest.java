@@ -1,5 +1,6 @@
 package com.odde.doughnut.models;
 
+import com.odde.doughnut.repositories.UserRepository;
 import com.odde.doughnut.testability.DBCleaner;
 import com.odde.doughnut.testability.MakeMe;
 import org.hibernate.Session;
@@ -23,17 +24,15 @@ import static org.hamcrest.Matchers.*;
 @Transactional
 
 public class NoteTest {
-    @Autowired private SessionFactory sessionFactory;
+    @Autowired private UserRepository userRepository;
 
-    Session session;
     MakeMe makeMe;
     User user;
 
     @BeforeEach
     void setup() {
-        session = sessionFactory.openSession();
-        makeMe = new MakeMe(session);
-        user = makeMe.aUser().with2Notes().please();
+        makeMe = new MakeMe(null);
+        user = makeMe.aUser().with2Notes().please(userRepository);
     }
 
     @Test

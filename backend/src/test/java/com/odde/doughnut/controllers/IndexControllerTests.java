@@ -27,14 +27,13 @@ class IndexControllerTests {
 
   @Autowired private NoteRepository noteRepository;
   @Autowired private UserRepository userRepository;
-  @Autowired private SessionFactory sessionFactory;
   @Mock Model model;
   private IndexController controller;
   private MakeMe makeMe;
 
   @BeforeEach
   void setupController() {
-    makeMe = new MakeMe(sessionFactory.openSession());
+    makeMe = new MakeMe(null);
     controller = new IndexController(noteRepository, userRepository);
   }
 
@@ -51,7 +50,7 @@ class IndexControllerTests {
 
   @Test
   void visitWithUserSessionAndTheUserExists() {
-    User user = makeMe.aUser().please();
+    User user = makeMe.aUser().please(userRepository);
     Principal principal = (UserPrincipal) user::getExternalIdentifier;
     assertEquals("index", controller.home(principal, model));
   }

@@ -1,5 +1,7 @@
 package com.odde.doughnut.models;
 
+import com.odde.doughnut.repositories.NoteRepository;
+import com.odde.doughnut.repositories.UserRepository;
 import com.odde.doughnut.testability.DBCleaner;
 import com.odde.doughnut.testability.MakeMe;
 import org.hibernate.Session;
@@ -24,14 +26,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(DBCleaner.class)
 @Transactional
 public class UserTest {
-    @Autowired private SessionFactory sessionFactory;
-    Session session;
+    @Autowired private UserRepository userRepository;
+    @Autowired private NoteRepository noteRepository;
     MakeMe makeMe;
 
     @BeforeEach
     void setup() {
-        session = sessionFactory.openSession();
-        makeMe = new MakeMe(session);
+        makeMe = new MakeMe(null);
     }
 
     @Test
@@ -42,17 +43,17 @@ public class UserTest {
 
     @Test
     void shouldReturnTheNoteWhenThereIsOne() {
-        User user = makeMe.aUser().please();
-        Note note = makeMe.aNote().forUser(user).please();
+        User user = makeMe.aUser().please(userRepository);
+        Note note = makeMe.aNote().forUser(user).please(noteRepository);
         assertThat(user.getNotesInDescendingOrder(), contains(note));
     }
 
     @Test
     void shouldReturnTheNoteWhenThereIsTwo() {
-        User user = makeMe.aUser().please();
+        User user = makeMe.aUser().please(userRepository);
         Date yesterday = Date.valueOf(LocalDate.now().minusDays(1));
-        Note note1 = makeMe.aNote().forUser(user).updatedAt(yesterday).please();
-        Note note2 = makeMe.aNote().forUser(user).please();
+        Note note1 = makeMe.aNote().forUser(user).updatedAt(yesterday).please(noteRepository);
+        Note note2 = makeMe.aNote().forUser(user).please(noteRepository);
 
         assertEquals(note2.getTitle(), user.getNotesInDescendingOrder().get(0).getTitle());
     }

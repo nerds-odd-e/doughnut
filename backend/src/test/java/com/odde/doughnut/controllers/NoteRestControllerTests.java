@@ -11,16 +11,11 @@ import org.hibernate.SessionFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.ui.Model;
 import org.springframework.web.servlet.view.RedirectView;
 
-import javax.persistence.EntityManager;
-import javax.persistence.EntityManagerFactory;
 import javax.transaction.Transactional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -32,7 +27,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class NoteRestControllerTests {
     @Autowired private NoteRepository noteRepository;
     @Autowired private UserRepository userRepository;
-    @Autowired private SessionFactory sessionFactory;
 
     private MakeMe makeMe;
     private User user;
@@ -40,8 +34,7 @@ public class NoteRestControllerTests {
 
     @BeforeEach
     void setup() {
-        Session session = sessionFactory.openSession();
-        makeMe = new MakeMe(session);
+        makeMe = new MakeMe(null);
         user = makeMe.aUser().please(userRepository);
         noteController = new NoteRestController(noteRepository, null, new TestCurrentUser(user));
     }
