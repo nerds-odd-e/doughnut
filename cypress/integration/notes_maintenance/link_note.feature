@@ -1,9 +1,13 @@
 Feature: link note
+    As a learner, I want to maintain my newly acquired knowledge in
+    notes that linking to each other, so that I can review them in the
+    future.
 
     Background:
-        Given there are some notes for the current user
+        Given I've logged in as an existing user
+        And there are some notes for the current user
 
-    @clean_db @login_as_existing_user1
+    @clean_db
     Scenario: View all linkable notes when no links exist
         When I go to the notes page
         Then I should see 3 notes belonging to the user
@@ -19,7 +23,7 @@ Feature: link note
         | Sedation        |   Put to sleep      |
         | Sedative        |   sleep medicine    |
 
-    @clean_db @login_as_existing_user1
+    @clean_db
     Scenario: Search note for linking
         When I go to the notes page
         And I click Create Link button on Sedition
@@ -31,7 +35,7 @@ Feature: link note
         When I search for notes with title "Sedatio"
         Then I should see only "Sedation"
 
-    @clean_db @login_as_existing_user1
+    @clean_db
     Scenario: Create link for note
         When I go to the notes page
         And I click Create Link button on Sedition
