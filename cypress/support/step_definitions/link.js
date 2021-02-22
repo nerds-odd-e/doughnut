@@ -6,16 +6,6 @@ import {
   Before,
   Background
 } from "cypress-cucumber-preprocessor/steps";
-Given("I create note with:", (data) => {
-   data.hashes().forEach((elem) => {
-        cy.visit("/note");
-        for (var propName in elem) {
-
-            cy.get(`[data-cy="${propName}"]`).type(elem[propName]);
-        }
-        cy.get('input[value="Submit"]').click();
-  });
-});
 
 Then("I should see these notes belonging to the user", (data) => {
     cy.visit("/all_my_notes");
