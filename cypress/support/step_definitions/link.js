@@ -25,21 +25,15 @@ Then("I should see these notes belonging to the user", (data) => {
     });
 });
 
-When("I create link for note {string}", (noteTitle) => {
+When("I am creating link for note {string}", (noteTitle) => {
     cy.creatingLinkFor(noteTitle);
 });
 
-And("I should be able to see the buttons for linking note", () => {
-    cy.findAllByText("Select").should("have.lengthOf", 2);
-})
-
-When("I select a Sedation note", () => {
+When("I link to note {string}", (noteTitle) => {
     cy.findByTestId("button-2").click();
-})
-
-Then("I should be redirected to review page", () => {
     cy.url().should('include', 'review');
 })
+
 
 And("I should see the Sedition note linked to Sedation",() => {
     cy.findByText("Sedition").should("be.visible");
@@ -56,7 +50,7 @@ When("I search for notes with title {string}", (searchKey) => {
     cy.findByText("Search").click();
 })
 
-And("I should see below notes as targets only",(data) => {
-    cy.expectExactLinkTargets(data.rows().flat());
+And("I should see {string} as targets only",(noteTitlesAsString) => {
+    cy.expectExactLinkTargets(noteTitlesAsString.split(",").map(i=>i.trim()));
 })
 

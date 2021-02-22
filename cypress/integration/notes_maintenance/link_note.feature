@@ -21,25 +21,22 @@ Feature: link note
 
     @clean_db
     Scenario: View all linkable notes when no links exist
-        When I create link for note "Sedition"
+        When I am creating link for note "Sedition"
         And I should see the source note as "Sedition"
-        And I should see below notes as targets only
-        | note-title      |
-        | Sedation        |
-        | Sedative        |
+        And I should see "Sedation, Sedative" as targets only
 
     @clean_db
-    Scenario: Search note for linking with partial input
-        Given I create link for note "Sedition"
-        When I search for notes with title "Sedatio"
-        And I should see below notes as targets only
-            | note-title      |
-            | Sedation        |
+    Scenario Outline: Search note for linking with partial input
+        Given I am creating link for note "Sedition"
+        When I search for notes with title "<search key>"
+        And I should see "<targets>" as targets only
+      Examples:
+        | search key |  targets           |
+        | Sed        | Sedation, Sedative |
+        | Sedatio    | Sedation           |
 
     @clean_db
     Scenario: Create link for note
-        Given I create link for note "Sedition"
-        And I should be able to see the buttons for linking note
-        When I select a Sedation note
-        Then I should be redirected to review page
-        And I should see the Sedition note linked to Sedation
+        Given I am creating link for note "Sedition"
+        When I link to note "Sedation"
+        Then I should see the Sedition note linked to Sedation
