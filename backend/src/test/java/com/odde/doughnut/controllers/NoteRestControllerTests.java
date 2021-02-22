@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.ui.Model;
@@ -41,11 +42,11 @@ public class NoteRestControllerTests {
     void setup() {
         Session session = sessionFactory.openSession();
         makeMe = new MakeMe(session);
-        user = makeMe.aUser().please();
-        user = userRepository.findByExternalIdentifier(user.getExternalIdentifier());
+        user = makeMe.aUser().please(userRepository);
         noteController = new NoteRestController(noteRepository, null, new TestCurrentUser(user));
     }
 
+    @Test
     void shouldBeAbleToSaveNoteWhenThereIsValidUser() {
         Note newNote = makeMe.aNote().inMemoryPlease();
         RedirectView response = noteController.createNote(newNote);
@@ -66,7 +67,7 @@ public class NoteRestControllerTests {
 
     @Test
     void shouldGetListOfNotes() throws Exception {
-        Note note = makeMe.aNote().forUser(user).please();
+        Note note = makeMe.aNote().forUser(user).please(noteRepository);
         assertEquals(note.getTitle(), noteController.getNotes(user).get(0).getTitle());
     }
 }

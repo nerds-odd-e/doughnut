@@ -1,6 +1,7 @@
 package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.models.User;
+import com.odde.doughnut.repositories.UserRepository;
 import com.odde.doughnut.testability.MakeMe;
 import org.hibernate.Session;
 
@@ -32,6 +33,11 @@ public class UserBuilder {
     }
 
     public User inMemoryPlease() {
+        return user;
+    }
+
+    public User please(UserRepository userRepository) {
+        userRepository.save(user);
         return user;
     }
 }

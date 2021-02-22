@@ -22,8 +22,8 @@
         <property name="user" value="${db.user}"/>
         <property name="password" value="${db.password}"/>
     </bean>
-
-    <bean id="emf" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+    <bean id="emf"
+          class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
         <property name="packagesToScan" value="com.odde.doughnut.models"/>
         <property name="dataSource" ref="dataSource"/>
         <property name="jpaProperties">
@@ -36,27 +36,14 @@
         <property name="persistenceProvider">
             <bean class="org.hibernate.jpa.HibernatePersistenceProvider"/>
         </property>
-    </bean>
 
-    <bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
-        <property name="dataSource" ref="dataSource"/>
-        <property name="packagesToScan" value="com.odde.doughnut.models"/>
-        <property name="hibernateProperties">
-            <props>
-                <prop key="hibernate.current_session_context_class">thread</prop>
-                <prop key="hibernate.dialect">org.hibernate.dialect.MariaDB103Dialect</prop>
-            </props>
-        </property>
     </bean>
-
     <tx:annotation-driven transaction-manager="transactionManager"/>
 
-    <bean class="org.springframework.orm.hibernate5.HibernateTransactionManager"
+    <bean class="org.springframework.orm.jpa.JpaTransactionManager"
           id="transactionManager">
         <property name="dataSource" ref="dataSource"/>
-        <property name="sessionFactory" ref="sessionFactory"/>
     </bean>
     <jpa:repositories base-package="com.odde.doughnut.repositories" entity-manager-factory-ref="emf"/>
-
 
 </beans>

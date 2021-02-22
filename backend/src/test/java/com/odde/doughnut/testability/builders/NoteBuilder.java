@@ -2,6 +2,8 @@ package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.models.Note;
 import com.odde.doughnut.models.User;
+import com.odde.doughnut.repositories.NoteRepository;
+import com.odde.doughnut.repositories.UserRepository;
 import com.odde.doughnut.testability.MakeMe;
 import org.hibernate.Session;
 
@@ -25,9 +27,7 @@ public class NoteBuilder {
 
     public NoteBuilder forUser(User user) {
         note.setUser(user);
-        if (user.getId() != null) {
-            hibernateSession.refresh(user);
-        }
+        user.getNotes().add(note);
         return this;
     }
 
@@ -40,4 +40,10 @@ public class NoteBuilder {
         hibernateSession.save(note);
         return note;
     }
+
+    public Note please(NoteRepository noteRepository) {
+        noteRepository.save(note);
+        return note;
+    }
+
 }
