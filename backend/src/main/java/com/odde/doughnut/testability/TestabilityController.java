@@ -1,6 +1,7 @@
 
 package com.odde.doughnut.testability;
 
+import com.odde.doughnut.controllers.CurrentUser;
 import com.odde.doughnut.services.LinkService;
 import com.odde.doughnut.models.Note;
 import com.odde.doughnut.models.User;
@@ -18,14 +19,10 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/testability")
 class TestabilityController {
-  @Autowired
-  EntityManagerFactory emf;
-
-  @Autowired
-  NoteRepository noteRepository;
-
-  @Autowired
-  UserRepository userRepository;
+  @Autowired EntityManagerFactory emf;
+  @Autowired NoteRepository noteRepository;
+  @Autowired UserRepository userRepository;
+  @Autowired CurrentUser currentUser;
 
   @Autowired
   LinkService linkService;
@@ -34,19 +31,19 @@ class TestabilityController {
   public String cleanDBAndSeedData() {
     new DBCleanerWorker(emf).truncateAllTables();
     User user = new User();
-    user.setExternalIdentifier("older_learner");
-    user.setName("Older Learner");
+    user.setExternalIdentifier("old_learner");
+    user.setName("Old Learner");
     userRepository.save(user);
     return "OK";
   }
 
   @PostMapping("/seed_notes")
   public List<Integer> seedNote(Principal principal, @RequestBody List<Note> notes) throws Exception {
-    User currentUser = userRepository.findByExternalIdentifier(principal.getName());
-    if (currentUser == null) throw new Exception("User does not exist");
+    User user = currentUser.getUser();
+    if (user == null) throw new Exception("User does not exist");
 
     for (Note note : notes) {
-      note.setUser(currentUser);
+      note.setUser(user);
     }
     noteRepository.saveAll(notes);
     return notes.stream().map(Note::getId).collect(Collectors.toList());

@@ -17,8 +17,8 @@ Given("I create note with:", (data) => {
   });
 });
 
-When("I navigate to the notes page", () => {
-  cy.findByText("All My Notes").click();
+When("I go to the notes page", () => {
+  cy.visit("/all_my_notes");
 });
 
 Then("I should see 3 notes belonging to the user", (data) => {

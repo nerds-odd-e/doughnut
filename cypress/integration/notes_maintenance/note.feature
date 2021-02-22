@@ -3,7 +3,7 @@ Feature: Note maintenance
     notes that linking to each other, so that I can review them in the
     future.
 
-@clean_db @login_as_new_user
+@clean_db @login_as_existing_user1
 Scenario: New user create notes after login
     When I create note with: 
     | note-title      |   note-description  |
@@ -12,7 +12,7 @@ Scenario: New user create notes after login
     | note-title      |   note-description  |
     | Sedation        |   Put to sleep      |
 
-@clean_db @login_as_new_user  
+@clean_db @login_as_existing_user1
 Scenario: New user review multiple notes
     Given I have some notes
     | note-title      |   note-description  | note-updatedDateTime     |
@@ -27,7 +27,7 @@ Scenario: New user review multiple notes
     | note-title      |   note-description  |
     | Sedition        |   Incite violence   |
 
-@clean_db @login_as_new_user  
+@clean_db @login_as_existing_user1
 Scenario: : Get a list of notes
     Given I have some notes
     | note-title      |   note-description  | note-updatedDateTime     |
@@ -39,7 +39,7 @@ Scenario: : Get a list of notes
     | B               |   This is a B      |
 
     
-@clean_db @login_as_new_user
+@clean_db @login_as_existing_user1
 Scenario: New user review note with link
     Given I link Sedition to Sedation
     | note-title      |   note-description  |

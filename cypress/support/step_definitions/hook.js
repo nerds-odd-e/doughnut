@@ -19,7 +19,7 @@ Before({ tags: "@login_as_new_user" }, () => {
 });
 
 Before({ tags: "@login_as_existing_user1" }, () => {
-  cy.loginAsExistingUser1();
+  cy.loginAs('old_learner');
 });
 
 Before({ tags: "@log_out" }, () => {

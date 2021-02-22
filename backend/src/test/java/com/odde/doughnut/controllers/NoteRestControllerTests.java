@@ -59,6 +59,6 @@ public class NoteRestControllerTests {
     @Test
     void shouldGetListOfNotes() throws Exception {
         Note note = makeMe.aNote().forUser(user).please(noteRepository);
-        assertEquals(note.getTitle(), noteController.getNotes(user).get(0).getTitle());
+        assertEquals(note.getTitle(), noteController.getNotes().get(0).getTitle());
     }
 }

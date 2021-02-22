@@ -7,7 +7,6 @@ import com.odde.doughnut.services.LinkService;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestAttribute;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.view.RedirectView;
 
@@ -34,8 +33,8 @@ public class NoteRestController {
     }
 
     @GetMapping(value="/getNotes", produces=MediaType.APPLICATION_JSON_VALUE)
-    public List<Note> getNotes(@RequestAttribute("currentUser") User currentUser) throws Exception {
-        return currentUser.getNotesInDescendingOrder();
+    public List<Note> getNotes() throws Exception {
+        return currentUser.getUser().getNotesInDescendingOrder();
     }
 
     @PostMapping(value = "/linkNote", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
