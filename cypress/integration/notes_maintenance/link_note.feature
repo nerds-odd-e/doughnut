@@ -1,7 +1,9 @@
 Feature: link note
 
-  Background:
-    @clean_db @login_as_existing_user1 @seed_notes @link_note
+    Background:
+        Given there are some notes for the current user
+
+    @clean_db @login_as_existing_user1
     Scenario: View all linkable notes when no links exist
         When I go to the notes page
         Then I should see 3 notes belonging to the user
@@ -17,7 +19,7 @@ Feature: link note
         | Sedation        |   Put to sleep      |
         | Sedative        |   sleep medicine    |
 
-    @clean_db @login_as_existing_user1 @seed_notes @link_note
+    @clean_db @login_as_existing_user1
     Scenario: Search note for linking
         When I go to the notes page
         And I click Create Link button on Sedition
@@ -29,7 +31,7 @@ Feature: link note
         When I search for notes with title "Sedatio"
         Then I should see only "Sedation"
 
-    @clean_db @login_as_existing_user1 @seed_notes @link_note
+    @clean_db @login_as_existing_user1
     Scenario: Create link for note
         When I go to the notes page
         And I click Create Link button on Sedition
@@ -38,17 +40,3 @@ Feature: link note
         When I select a Sedation note
         Then I should be redirected to review page
         And I should see the Sedition note linked to Sedation
-
-
-    @ignore @clean_db
-    Scenario Outline: View all linkable notes when there are existing links
-        Given link exist form Sedition to sedation
-        When I go to the notes page
-        Then I should see all notes belonging to the user
-        When I click Create Link button on Sedition note card
-        Then I should be navigated to the linking page
-        And I should see below notes
-
-        Examples:
-        | note-title      |   note-description       |
-        | Sedative        |   sleep medicine    |

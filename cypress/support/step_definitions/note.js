@@ -6,6 +6,10 @@ import {
   Before,
 } from "cypress-cucumber-preprocessor/steps";
 
+Given("there are some notes for the current user", () => {
+  cy.seedNotes();
+})
+
 When("I create note with:", (data) => {
   cy.visit("/note");
 

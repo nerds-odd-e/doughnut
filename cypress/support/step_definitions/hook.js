@@ -14,10 +14,3 @@ Before({ tags: "@login_as_existing_user1" }, () => {
   cy.loginAs('old_learner');
 });
 
-Before({ tags: "@log_out" }, () => {
-  cy.logOut();
-});
-
-Before({ tags: "@seed_notes" }, () => {
-  cy.seedNotes();
-});
