@@ -11,7 +11,7 @@ Feature: Note maintenance
         When I create note with:
         | note-title      |   note-description  |
         | Sedation        |   Put to sleep      |
-        Then I should see the note with title and description on the review page
+        Then Reviews should include note page with:
         | note-title      |   note-description  |
         | Sedation        |   Put to sleep      |
 

@@ -25,7 +25,7 @@ When("I link to note {string}", (noteTitle) => {
 })
 
 
-And("Review should include a related notes page from {string} to {string}",(noteTitle1, noteTitle2) => {
+And("Reviews should include related notes page from {string} to {string}",(noteTitle1, noteTitle2) => {
     cy.findByText(noteTitle1).should("be.visible");
     cy.findByText(noteTitle2).should("be.visible");
 })

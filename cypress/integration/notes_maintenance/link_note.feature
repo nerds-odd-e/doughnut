@@ -39,6 +39,6 @@ Feature: link note
     Scenario: Create link for note
         Given I am creating link for note "Sedition"
         When I link to note "Sedation"
-        Then Review should include a related notes page from "Sedition" to "Sedation"
+        Then Reviews should include related notes page from "Sedition" to "Sedation"
         When I am creating link for note "Sedition"
         And I should see "Sedative" as targets only

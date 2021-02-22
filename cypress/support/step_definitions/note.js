@@ -21,9 +21,18 @@ When("I create note with:", (data) => {
   });
 });
 
+Then("Reviews should include note page with:", (data) => {
+  cy.location("pathname", { timeout: 10000 }).should("eq", "/review");
+  data.hashes().forEach((elem) => {
+    for (var propName in elem) {
+      var domElement = cy.get(`[data-cy="${propName}"]`);
+      domElement.should("contain", elem[propName])
+    }
+  });
+})
+
 Then("I should see the note with title and description on the review page", (data) => {
   cy.location("pathname", { timeout: 10000 }).should("eq", "/review");
-
   data.hashes().forEach((elem) => {
     for (var propName in elem) {
       var domElement = cy.get(`[data-cy="${propName}"]`);
