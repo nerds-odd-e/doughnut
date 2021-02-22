@@ -29,7 +29,8 @@ Then("I should see these notes belonging to the user", (data) => {
     });
 });
 
-When("I click Create Link button on Sedition", () => {
+When("I click Create Link button on {string}", (noteTitle) => {
+    cy.visit("/all_my_notes");
     var button = cy.findByTestId('button-1');
     button.should("be.visible");
     button.click();
