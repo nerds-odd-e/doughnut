@@ -11,9 +11,7 @@ Feature: Note maintenance
         When I create note with:
         | note-title      |   note-description  |
         | Sedation        |   Put to sleep      |
-        Then Reviews should include note page with:
-        | note-title      |   note-description  |
-        | Sedation        |   Put to sleep      |
+        Then Reviews should include note page with title "Sedation" and description "Put to sleep"
 
     @clean_db
     Scenario: New user review multiple notes
@@ -22,13 +20,8 @@ Feature: Note maintenance
         | Sedition        |   Incite violence   | 2021-02-19T02:42:07.597Z |
         | Sedation        |   Put to sleep      | 2021-02-19T02:42:08.597Z |
         When I review my notes
-        Then I should see the note with title and description on the review page
-        | note-title      |   note-description  |
-        | Sedation        |   Put to sleep      |
-        And I click on next note
-        Then I should see the note with title and description on the review page
-        | note-title      |   note-description  |
-        | Sedition        |   Incite violence   |
+        Then Reviews should include note page with title "Sedation" and description "Put to sleep"
+        Then Reviews should include note page with title "Sedition" and description "Incite violence"
 
     @clean_db
     Scenario: : Get a list of notes

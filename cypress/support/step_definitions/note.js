@@ -21,6 +21,27 @@ When("I create note with:", (data) => {
   });
 });
 
+Then("Reviews should include note page with title {string} and description {string}", (noteTitle, noteDescription) => {
+  cy.location("pathname", { timeout: 10000 }).should("eq", "/review");
+
+  const lookUp = (countDown, history, callback) => {
+    if (countDown === 0) {
+      expect(history).to.include(noteTitle);
+      return;
+    }
+    var domElement = cy.get(`[data-cy="note-title"]`);
+    domElement.invoke("text").then(text=>{
+      if(text === noteTitle) {
+        cy.get(`[data-cy="note-description"]`).should("contain", noteDescription);
+        return;
+      }
+      cy.findByText("Next").click();
+      callback(countDown - 1, history.add(text), callback);
+    });
+  };
+  lookUp(5, new Set(), lookUp);
+})
+
 Then("Reviews should include note page with:", (data) => {
   cy.location("pathname", { timeout: 10000 }).should("eq", "/review");
   data.hashes().forEach((elem) => {
