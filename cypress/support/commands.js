@@ -65,3 +65,11 @@ Cypress.Commands.add("linkNote", (sourceNoteId, targetNoteId) => {
     body: { sourceNoteId, targetNoteId }
   });
 });
+
+Cypress.Commands.add("creatingLinkFor", (noteTitle) => {
+    cy.visit("/all_my_notes");
+    const card = cy.findByText(noteTitle, { selector: ".card-title"});
+    const button = card.parent().findByText("Link Note");
+    button.click();
+});
+

@@ -17,10 +17,6 @@ Given("I create note with:", (data) => {
   });
 });
 
-When("I go to the notes page", () => {
-  cy.visit("/all_my_notes");
-});
-
 Then("I should see these notes belonging to the user", (data) => {
     cy.visit("/all_my_notes");
     cy.findByText("Your Notes");
@@ -30,10 +26,7 @@ Then("I should see these notes belonging to the user", (data) => {
 });
 
 When("I create link for note {string}", (noteTitle) => {
-    cy.visit("/all_my_notes");
-    const card = cy.findByText(noteTitle, { selector: ".card-title"});
-    const button = card.parent().findByText("Link Note");
-    button.click();
+    cy.creatingLinkFor(noteTitle);
 });
 
 And("I should be able to see the buttons for linking note", () => {

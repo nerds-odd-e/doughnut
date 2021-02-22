@@ -6,8 +6,8 @@ import {
   Before,
 } from "cypress-cucumber-preprocessor/steps";
 
-Given("there are some notes for the current user", () => {
-  cy.seedNotes();
+Given("there are some notes for the current user", (data) => {
+  cy.seedNotes(data.hashes());
 })
 
 When("I create note with:", (data) => {
