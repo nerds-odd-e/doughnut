@@ -1,24 +1,10 @@
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="fragments/basic_layout :: head"/>
-<body>
-<div th:replace="fragments/basic_layout :: header"/>
-
-
-    <div class="p-5">
+<layout th:replace="fragments/basic_layout :: application_layout(~{ :: .content})">
+    <div class="p-5 content">
         <h2>Your Notes</h2>
-
         <p> <a class="nav-link" href="/note">Add Note</a> </p>
-
         <div th:replace="fragments/note_layout :: cards(${all_my_notes}, ~{ :: .card-button})">
             <a href="#" class="btn btn-primary card-button" th:href="'link/' + ${note.id}">Link Note</a>
         </div>
-
     </div>
-
-
-
-<div th:replace="fragments/basic_layout :: footer"/>
-<div th:replace="fragments/basic_layout :: foot"/>
-</body>
-</html>
+</layout>

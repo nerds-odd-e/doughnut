@@ -1,5 +1,6 @@
-<!DOCTYPE html >
-<html lang="en">
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<layout th:fragment="application_layout(content)">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <head th:fragment="head">
     <meta charset="UTF-8">
     <title>Title</title>
@@ -42,6 +43,7 @@
             </div>
         </nav>
     </div>
+    <div th:replace="${content}"></div>
     <div th:fragment="footer">
         <div class="footer-copyright text-center py-3">
             © 2021 Odd-e.com
@@ -58,3 +60,4 @@
     </div>
 </body>
 </html>
+</layout>
