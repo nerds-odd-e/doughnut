@@ -9,6 +9,7 @@ Feature: Note maintenance
     @clean_db
     Scenario: New user create notes after login
         When I create note with:
-        | note-title      |   note-description  |
-        | Sedation        |   Put to sleep      |
-        Then Reviews should include note page with title "Sedation" and description "Put to sleep"
+            | note-title      | note-description  |
+            | Sedation        | Put to sleep      |
+        Then Reviews should include note page:
+            | Sedation        | Put to sleep      |

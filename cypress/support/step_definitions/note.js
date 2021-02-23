@@ -15,8 +15,8 @@ When("I create note with:", (data) => {
 });
 
 Then("Reviews should include note page:", (data) => {
-  var examples = data.rowsHash();
-  var matched = new Set();
+  let examples = data.rowsHash();
+  let matched = new Set();
   cy.recursiveLookUpInReview(
       5,
       (history, currentNoteTitle, done) => {
@@ -24,18 +24,6 @@ Then("Reviews should include note page:", (data) => {
                 matched.add(currentNoteTitle);
                 cy.get(`[data-cy="note-description"]`).should("contain", examples[currentNoteTitle]);
                 if(matched.size == Object.keys(examples).length) done();
-           }
-      }
-  );
-})
-
-Then("Reviews should include note page with title {string} and description {string}", (noteTitle, noteDescription) => {
-  cy.recursiveLookUpInReview(
-      5,
-      (history, currentNoteTitle, done) => {
-           if(currentNoteTitle === noteTitle) {
-                cy.get(`[data-cy="note-description"]`).should("contain", noteDescription);
-                done();
            }
       }
   );
