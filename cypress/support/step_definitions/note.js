@@ -26,20 +26,19 @@ Then("Reviews should include note page with title {string} and description {stri
 
   const lookUp = (countDown, history, callback) => {
     if (countDown === 0) {
-      expect(history).to.include(noteTitle);
+      expect(history.join(", ")).to.contain(noteTitle);
       return;
     }
-    var domElement = cy.get(`[data-cy="note-title"]`);
-    domElement.invoke("text").then(text=>{
+    cy.get(`[data-cy="note-title"]`).invoke("text").then(text=>{
       if(text === noteTitle) {
         cy.get(`[data-cy="note-description"]`).should("contain", noteDescription);
         return;
       }
       cy.findByText("Next").click();
-      callback(countDown - 1, history.add(text), callback);
+      callback(countDown - 1, [...history, text], callback);
     });
   };
-  lookUp(5, new Set(), lookUp);
+  lookUp(5, [], lookUp);
 })
 
 Then("Reviews should include note page with:", (data) => {
