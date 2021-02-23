@@ -1,18 +1,10 @@
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="fragments/basic_layout :: head"/>
-<body>
-<div th:replace="fragments/basic_layout :: header"/>
-
-<div class="container">
-    <h2>Welcome, new user. Please create your profile</h2>
-    <form action="#" th:action="@{/users}" th:object="${user}" method="post">
-        <p>Name: <input type="text" id="name" th:field="*{name}" /></p>
-        <p><input type="submit" value="Submit" /></p>
-    </form>
-</div>
-
-<div th:replace="fragments/basic_layout :: footer"/>
-<div th:replace="fragments/basic_layout :: foot"/>
-</body>
-</html>
+<layout th:replace="fragments/before_login_layout :: application_before_login_layout(~{ :: .content})">
+    <div class="container content">
+        <h2>Welcome, new user. Please create your profile</h2>
+        <form action="#" th:action="@{/users}" th:object="${user}" method="post">
+            <p>Name: <input type="text" id="name" th:field="*{name}"/></p>
+            <p><input type="submit" value="Submit"/></p>
+        </form>
+    </div>
+</layout>

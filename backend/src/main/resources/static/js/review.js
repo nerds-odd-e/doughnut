@@ -20,6 +20,10 @@ function transformNoteListToView(noteList) {
 }
 
 async function getNotes() {
+    const containers= document.getElementsByClassName("review-container");
+    if (containers.length === 0) {
+        return;
+    }
     const response = await fetch('/getNotes');
     noteList = transformNoteListToView(await response.json());
     nextNote();

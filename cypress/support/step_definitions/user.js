@@ -17,7 +17,6 @@ When("I identify myself as a new user", () => {
   cy.get("#password").type("password");
   cy.get("form.form-signin").submit();
   cy.location("pathname", { timeout: 10000 }).should("eq", "/");
-  cy.get('input[type="submit"][value="Logout"]').should("be.visible");
 });
 
 When("I should be asked to create my profile", () => {

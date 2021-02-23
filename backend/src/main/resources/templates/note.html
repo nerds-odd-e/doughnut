@@ -1,12 +1,7 @@
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<layout th:replace="fragments/basic_layout :: application_layout(~{ :: .content})">
 
-<head th:replace="fragments/basic_layout :: head" />
-
-<body>
-    <div th:replace="fragments/basic_layout :: header" />
-
-    <div class="container">
+    <div class="container content">
         <h2 class="display-2">Here are your notes!</h2>
 
         <form action="#" th:action="@{/note}" th:object="${note}" method="post">
@@ -18,9 +13,4 @@
             <p><input type="submit" value="Submit" /></p>
         </form>
     </div>
-
-    <div th:replace="fragments/basic_layout :: footer" />
-    <div th:replace="fragments/basic_layout :: foot" />
-</body>
-
-</html>
+</layout>
