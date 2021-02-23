@@ -75,13 +75,13 @@ Cypress.Commands.add("expectExactLinkTargets", (targets) => {
     cy.findAllByText(/.*/, {selector: '.card-title'}).should("have.length", targets.length);
 })
 
-Cypress.Commands.add("recursiveLookUpInReview", (maxReviewLookUpCount, forOccurrence) => {
+Cypress.Commands.add("recursiveLookUpInReview", (maxReviewLookUpCount, locator, forOccurrence) => {
   cy.visit('/review');
   let exiting = false;
 
   const lookUp = (history, forOccurrence, callback) => {
     assert.isTrue(history.length < maxReviewLookUpCount, `Failed, but found these: ${history.join(", ")}`);
-    cy.get(`[data-cy="note-title"]`).invoke("text").then(currNoteTitle=>{
+    locator().then(currNoteTitle=>{
       const newHistory = [...history, currNoteTitle];
       forOccurrence(newHistory, currNoteTitle, ()=>exiting = true);
       if(exiting) return;

@@ -7,7 +7,7 @@ Feature: Note maintenance
         Given I've logged in as an existing user
 
     @clean_db
-    Scenario: New user create notes after login
+    Scenario: Create a new note
         When I create note with:
             | note-title      | note-description  |
             | Sedation        | Put to sleep      |

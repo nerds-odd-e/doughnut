@@ -21,13 +21,6 @@ When("I am creating link for note {string}", (noteTitle) => {
 
 When("I link to note {string}", (noteTitle) => {
     cy.clickButtonOnCard(noteTitle, "Select");
-    cy.url().should('include', 'review');
-})
-
-
-And("Reviews should include related notes page from {string} to {string}",(noteTitle1, noteTitle2) => {
-    cy.findByText(noteTitle1).should("be.visible");
-    cy.findByText(noteTitle2).should("be.visible");
 })
 
 
