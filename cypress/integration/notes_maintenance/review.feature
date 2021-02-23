@@ -1,5 +1,5 @@
 Feature: Reviewing
-    As a learner, I want to review my notes so that I have fresh memory.
+    As a learner, I want to review my notes and links so that I have fresh memory.
 
     Background:
         Given I've logged in as an existing user
@@ -8,12 +8,9 @@ Feature: Reviewing
             | Sedition   | Incite violence   |
             | Sedation   | Put to sleep      |
             | Sedative   | Sleep medicine    |
-        And I am creating link for note "Sedition"
-        And I link to note "Sedation"
-        And I am creating link for note "Sedition"
-        And I link to note "Sedative"
+        And I link note "Sedition" to note "Sedation"
+        And I link note "Sedition" to note "Sedative"
 
-    @clean_db
     Scenario: Review notes
         Then Reviews should have review pages in sequence:
             | review type   | title      |   additional info    |

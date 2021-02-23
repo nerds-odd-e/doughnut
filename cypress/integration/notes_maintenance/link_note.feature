@@ -11,21 +11,11 @@ Feature: link note
             | Sedation        | Put to sleep           |
             | Sedative        | Sleep medicine         |
 
-    @clean_db
-    Scenario: View all my notes
-        Then I should see these notes belonging to the user
-            | note-title      |
-            | Sedition        |
-            | Sedation        |
-            | Sedative        |
-
-    @clean_db
-    Scenario: View all linkable notes when no links exist
+    Scenario: View all linkable notes for a note when no link exists
         When I am creating link for note "Sedition"
         And I should see the source note as "Sedition"
         And I should see "Sedation, Sedative" as targets only
 
-    @clean_db
     Scenario Outline: Search note for linking with partial input
         Given I am creating link for note "Sedition"
         When I search for notes with title "<search key>"
@@ -35,9 +25,7 @@ Feature: link note
         | Sed        | Sedation, Sedative |
         | Sedatio    | Sedation           |
 
-    @clean_db
-    Scenario: Create link for note
-        Given I am creating link for note "Sedition"
-        And I link to note "Sedation"
+    Scenario: linkable notes should not include notes already linked
+        Given I link note "Sedition" to note "Sedation"
         When I am creating link for note "Sedition"
         And I should see "Sedative" as targets only

@@ -6,7 +6,7 @@ import {
     Before,
   } from "cypress-cucumber-preprocessor/steps";
 
-Before({ tags: "@clean_db" }, () => {
+Before(() => {
   cy.cleanDBAndSeedData();
 });
 
