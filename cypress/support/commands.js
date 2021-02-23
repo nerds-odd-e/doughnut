@@ -86,12 +86,14 @@ Cypress.Commands.add("expectExactLinkTargets", (targets) => {
 
 Cypress.Commands.add("recursiveLookUpInReview", (maxReviewLookUpCount, forOccurrence) => {
   cy.visit('/review');
+  let exiting = false;
 
   const lookUp = (history, forOccurrence, callback) => {
     assert.isTrue(history.length < maxReviewLookUpCount, `Failed, but found these: ${history.join(", ")}`);
     cy.get(`[data-cy="note-title"]`).invoke("text").then(currNoteTitle=>{
       const newHistory = [...history, currNoteTitle];
-      if(forOccurrence(newHistory, currNoteTitle)) { return; }
+      forOccurrence(newHistory, currNoteTitle, ()=>exiting = true);
+      if(exiting) return;
       cy.findByText("Next").click();
       callback(newHistory, forOccurrence, callback);
     });
