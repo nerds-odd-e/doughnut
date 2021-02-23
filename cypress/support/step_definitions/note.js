@@ -11,18 +11,11 @@ Given("there are some notes for the current user", (data) => {
 })
 
 When("I create note with:", (data) => {
-  cy.visit("/note");
-
-  data.hashes().forEach((elem) => {
-    for (var propName in elem) {
-      cy.get(`[data-cy="${propName}"]`).type(elem[propName]);
-    }
-    cy.get('input[value="Submit"]').click();
-  });
+  cy.createNotes(data.hashes());
 });
 
 Then("Reviews should include note page with title {string} and description {string}", (noteTitle, noteDescription) => {
-  cy.location("pathname", { timeout: 10000 }).should("eq", "/review");
+  cy.visit('/review');
 
   const lookUp = (countDown, history, callback) => {
     if (countDown === 0) {
@@ -59,17 +52,6 @@ Then("I should see the note with title and description on the review page", (dat
       domElement.should("contain", elem[propName])
     }
   });
-})
-
-Then("I have some notes", (data) => {
-  let notes = data?.hashes().map((item) => {
-    return {
-      title: item["note-title"],
-      description: item["note-description"],
-      updatedDatetime: item["note-updatedDateTime"]
-    }
-  })
-  cy.seedNotes(notes);
 })
 
 When("I review my notes", () => {

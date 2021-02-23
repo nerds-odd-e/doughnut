@@ -47,6 +47,16 @@ Cypress.Commands.add("seedNotes", (notes) => {
   })
 })
 
+Cypress.Commands.add("createNotes", (notes) => {
+  cy.visit("/note");
+  notes.forEach((elem) => {
+    for (var propName in elem) {
+      cy.get(`[data-cy="${propName}"]`).type(elem[propName]);
+    }
+    cy.get('input[value="Submit"]').click();
+  });
+});
+
 Cypress.Commands.add("linkNote", (sourceNoteId, targetNoteId) => {
   cy.request({
     method: "POST",
