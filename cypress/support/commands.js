@@ -57,15 +57,6 @@ Cypress.Commands.add("createNotes", (notes) => {
   });
 });
 
-Cypress.Commands.add("linkNote", (sourceNoteId, targetNoteId) => {
-  cy.request({
-    method: "POST",
-    url: "/linkNote",
-    form: true,
-    body: { sourceNoteId, targetNoteId }
-  });
-});
-
 Cypress.Commands.add("clickButtonOnCard", (noteTitle, buttonTitle) => {
     const card = cy.findByText(noteTitle, { selector: ".card-title"});
     const button = card.parent().findByText(buttonTitle);

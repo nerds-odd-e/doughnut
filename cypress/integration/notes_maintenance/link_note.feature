@@ -38,7 +38,6 @@ Feature: link note
     @clean_db
     Scenario: Create link for note
         Given I am creating link for note "Sedition"
-        When I link to note "Sedation"
-        Then Reviews should include related notes page from "Sedition" to "Sedation"
+        And I link to note "Sedation"
         When I am creating link for note "Sedition"
         And I should see "Sedative" as targets only

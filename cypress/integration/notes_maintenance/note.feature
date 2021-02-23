@@ -11,5 +11,5 @@ Feature: Note maintenance
         When I create note with:
             | note-title      | note-description  |
             | Sedation        | Put to sleep      |
-        Then Reviews should include note page:
+        Then Reviews should include single note pages:
             | Sedation        | Put to sleep      |
