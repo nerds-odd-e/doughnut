@@ -7,12 +7,15 @@ Feature: Reviewing
     @clean_db
     Scenario: New user review multiple notes
         Given there are some notes for the current user
-        | title      |   description       |
-        | Sedition   |   Incite violence   |
-        | Sedation   |   Put to sleep      |
+            | title      |   description       |
+            | Sedition   |   Incite violence   |
+            | Sedation   |   Put to sleep      |
         When I review my notes
         Then Reviews should include note page with title "Sedation" and description "Put to sleep"
-        Then Reviews should include note page with title "Sedition" and description "Incite violence"
+#        Then Reviews should include note page:
+#            | title      |   description       |
+#            | Sedition   |   Incite violence   |
+#            | Sedation   |   Put to sleep      |
 
     @clean_db
     Scenario: New user review note with link

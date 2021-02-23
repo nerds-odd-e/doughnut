@@ -15,23 +15,31 @@ When("I create note with:", (data) => {
 });
 
 Then("Reviews should include note page with title {string} and description {string}", (noteTitle, noteDescription) => {
-  cy.visit('/review');
 
-  const lookUp = (countDown, history, callback) => {
-    if (countDown === 0) {
-      expect(history.join(", ")).to.contain(noteTitle);
-      return;
-    }
-    cy.get(`[data-cy="note-title"]`).invoke("text").then(text=>{
-      if(text === noteTitle) {
-        cy.get(`[data-cy="note-description"]`).should("contain", noteDescription);
+  cy.visit('/review');
+  const lookUp = (history, forOccurrence, callback) => {
+    cy.get(`[data-cy="note-title"]`).invoke("text").then(currNoteTitle=>{
+      const newHistory = [...history, currNoteTitle];
+      if(forOccurrence(newHistory, currNoteTitle)) {
         return;
       }
       cy.findByText("Next").click();
-      callback(countDown - 1, [...history, text], callback);
+      callback(newHistory, forOccurrence, callback);
     });
   };
-  lookUp(5, [], lookUp);
+  const recursiveLookUp = (forOccurrence) => lookUp([], forOccurrence, lookUp);
+
+  const maxReviewLookUpCount = 5;
+  recursiveLookUp(
+      (history, currentNoteTitle) => {
+           if (history.length === maxReviewLookUpCount) {assert.isTrue(false, `${history.join(", ")} to contain ${noteTitle}`);}
+           if(currentNoteTitle === noteTitle) {
+                cy.get(`[data-cy="note-description"]`).should("contain", noteDescription);
+                return true;
+           }
+           return false;
+      }
+  );
 })
 
 Then("Reviews should include note page with:", (data) => {
