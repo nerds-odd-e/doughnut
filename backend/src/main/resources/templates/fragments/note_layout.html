@@ -1,0 +1,11 @@
+<!DOCTYPE html >
+<html lang="en">
+<body>
+    <div th:fragment="card(note, button)">
+        <div class="card-body">
+            <h5 class="card-title" th:text="${note.title}"></h5>
+            <div th:replace="${button}">Put your button here</div>
+        </div>
+    </div>
+</body>
+</html>

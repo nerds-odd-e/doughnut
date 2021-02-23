@@ -8,11 +8,12 @@
     <div class="p-5">
         <h2>Your Notes</h2>
 
+        <p> <a class="nav-link" href="/note">Add Note</a> </p>
+
         <div class="row">
             <div class="card col-3 mr-2" style="width: 18rem;"  th:each="note:${all_my_notes}">
-                <div class="card-body">
-                    <h5 class="card-title" th:text="${note.title}"></h5>
-                    <a href="#" class="btn btn-primary" th:href="'link/' + ${note.id}">Link Note</a>
+                <div th:replace="fragments/note_layout :: card(${note}, ~{ :: .card-button})">
+                    <a href="#" class="btn btn-primary card-button" th:href="'link/' + ${note.id}">Link Note</a>
                 </div>
             </div>
         </div>
