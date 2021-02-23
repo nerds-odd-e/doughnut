@@ -10,12 +10,8 @@
 
         <p> <a class="nav-link" href="/note">Add Note</a> </p>
 
-        <div class="row">
-            <div class="card col-3 mr-2" style="width: 18rem;"  th:each="note:${all_my_notes}">
-                <div th:replace="fragments/note_layout :: card(${note}, ~{ :: .card-button})">
-                    <a href="#" class="btn btn-primary card-button" th:href="'link/' + ${note.id}">Link Note</a>
-                </div>
-            </div>
+        <div th:replace="fragments/note_layout :: cards(${all_my_notes}, ~{ :: .card-button})">
+            <a href="#" class="btn btn-primary card-button" th:href="'link/' + ${note.id}">Link Note</a>
         </div>
 
     </div>

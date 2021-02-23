@@ -20,16 +20,12 @@
 
     </div>
 
-    <div class="row">
-        <div class="card col-3 mr-2" style="width: 18rem;"  th:each="note:${linkableNotes}">
-            <div th:replace="fragments/note_layout :: card(${note}, ~{ :: .card-button})">
-                <form th:action="@{/linkNote}" method="post" class="card-button">
-                    <input type="hidden" name="sourceNoteId" th:value="${sourceNote.id}" />
-                    <input type="hidden" name="targetNoteId" th:value="${note.id}"/>
-                    <Button class="btn btn-primary" type="submit">Select</Button>
-                </form>
-            </div>
-        </div>
+    <div th:replace="fragments/note_layout :: cards(${linkableNotes}, ~{ :: .card-button})">
+        <form th:action="@{/linkNote}" method="post" class="card-button">
+            <input type="hidden" name="sourceNoteId" th:value="${sourceNote.id}" />
+            <input type="hidden" name="targetNoteId" th:value="${note.id}"/>
+            <Button class="btn btn-primary" type="submit">Select</Button>
+        </form>
     </div>
 
 </div>
