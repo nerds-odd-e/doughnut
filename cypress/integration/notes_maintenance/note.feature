@@ -11,5 +11,6 @@ Feature: Note maintenance
         When I create note with:
             | note-title      | note-description  |
             | Sedation        | Put to sleep      |
-        Then Reviews should include single note pages:
-            | Sedation        | Put to sleep      |
+        Then Reviews should have review pages in sequence:
+            | review type   | title      |   additional info   |
+            | single note   | Sedation   |   Put to sleep      |

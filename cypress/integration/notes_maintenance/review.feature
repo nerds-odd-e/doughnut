@@ -12,10 +12,9 @@ Feature: Reviewing
 
     @clean_db
     Scenario: Review notes
-        Then Reviews should include single note pages:
-            | Sedition   |   Incite violence   |
-            | Sedation   |   Put to sleep      |
+        Then Reviews should have review pages in sequence:
+            | review type   | title      |   additional info   |
+            | related notes | Sedition   |   Sedation          |
+            | single note   | Sedition   |   Incite violence   |
+            | single note   | Sedation   |   Put to sleep      |
 
-    @clean_db
-    Scenario: Review linked notes
-        Then Reviews should include related notes page from "Sedition" to "Sedation"
