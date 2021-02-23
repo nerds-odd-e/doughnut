@@ -22,7 +22,9 @@ Then("Reviews should have review pages in sequence:", (data) => {
     }
     if (reviewPage["review type"] === "related notes") {
         cy.findByText(reviewPage["title"], {selector: '#note-title'})
-        cy.findByText(reviewPage["additional info"], {selector: '#note-links li'})
+        reviewPage["additional info"].split(", ").forEach(expectedLinkTarget =>
+            cy.findByText(expectedLinkTarget, {selector: '#note-links li'})
+        )
     }
     cy.findByText("Next").click();
   });
