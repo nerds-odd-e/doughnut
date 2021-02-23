@@ -23,7 +23,7 @@ public class IndexController {
     public String home(Principal principal, Model model) {
         if (principal == null) {
             model.addAttribute("totalNotes", noteRepository.count());
-            return "login";
+            return "ask_to_login";
         }
 
         User currentUser = userRepository.findByExternalIdentifier(principal.getName());

@@ -38,7 +38,7 @@ class IndexControllerTests {
 
   @Test
   void visitWithNoUserSession() {
-    assertEquals("login", controller.home(null, model));
+    assertEquals("ask_to_login", controller.home(null, model));
   }
 
   @Test

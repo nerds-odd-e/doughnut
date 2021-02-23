@@ -19,7 +19,7 @@ function transformNoteListToView(noteList) {
     return result;
 }
 
-async function getNotes() {
+async function populateAllNotesForReview() {
     const containers= document.getElementsByClassName("review-container");
     if (containers.length === 0) {
         return;

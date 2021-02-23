@@ -1,11 +1,6 @@
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-
-<head th:replace="fragments/basic_layout :: head" />
-
-<body onload="javascript:getNotes()">
-    <div th:replace="fragments/basic_layout :: header" />
-    <div class="container">
+<layout th:replace="fragments/basic_layout :: application_layout(~{ :: .content})">
+    <div class="container content">
         <h2 class="display-2">Review your notes</h2>
 
         <div class="review-container">
@@ -17,10 +12,4 @@
 
         <button type="button" onclick="javascript:nextNote()" class="btn btn-primary">Next</button>
     </div>
-
-    <div th:replace="fragments/basic_layout :: footer" />
-    <div th:replace="fragments/basic_layout :: foot" />
-    <script type="text/javascript" src="js/review.js"></script>
-</body>
-
-</html>
+</layout>
