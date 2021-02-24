@@ -61,6 +61,13 @@ cy.visit("/all_my_notes");
   });
 });
 
+Cypress.Commands.add("expectNotes", (data) => {
+    cy.findByText("Your Notes");
+    data.hashes().forEach((elem) => {
+         cy.findByText(elem["note-title"]).should("be.visible");
+    });
+});
+
 Cypress.Commands.add("clickButtonOnCard", (noteTitle, buttonTitle) => {
     const card = cy.findByText(noteTitle, { selector: ".card-title a"});
     const button = card.parent().parent().findByText(buttonTitle);

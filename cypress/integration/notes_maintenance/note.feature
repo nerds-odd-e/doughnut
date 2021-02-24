@@ -12,12 +12,11 @@ Feature: Note maintenance
         And I create note with:
             | note-title      | note-description  | note-picture |
             | Sedition        | Incite violence   | a_slide.jpg  |
-        Then I should see these notes belonging to the user
+        Then I should see these notes belonging to the user at the top level of all my notes
             | note-title      |
             | Sedation        |
             | Sedition        |
 
-      @ignore
     Scenario: Create a new note belonging to another node
         Given I create note with:
             | note-title      | note-description     |
