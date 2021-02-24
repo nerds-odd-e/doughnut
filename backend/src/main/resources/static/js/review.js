@@ -50,7 +50,7 @@ function nextNote() {
     }
 
     if (picture) {
-        pictureElem.innerHTML = "<img src='"+ picture + "'/>";
+        pictureElem.innerHTML = "<img src='https://storage.googleapis.com/dough-01/notes_images/"+ picture + "'/>";
     } else {
         pictureElem.innerHTML = "";
     }
