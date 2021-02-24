@@ -15,6 +15,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.servlet.view.RedirectView;
 
+import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -26,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class NoteRestControllerTests {
     @Autowired private NoteRepository noteRepository;
     @Autowired private UserRepository userRepository;
+    @Autowired EntityManager entityManager;
     private MakeMe makeMe;
     private User user;
     private NoteRestController noteController;
@@ -59,6 +61,7 @@ public class NoteRestControllerTests {
     @Test
     void shouldGetListOfNotes() throws Exception {
         Note note = makeMe.aNote().forUser(user).please(noteRepository);
+        makeMe.refresh(entityManager, user);
         assertEquals(note.getTitle(), noteController.getNotes().get(0).getTitle());
     }
 }

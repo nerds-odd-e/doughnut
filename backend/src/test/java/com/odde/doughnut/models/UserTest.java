@@ -14,6 +14,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
 import java.sql.Date;
 import java.time.LocalDate;
 
@@ -28,6 +29,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class UserTest {
     @Autowired private UserRepository userRepository;
     @Autowired private NoteRepository noteRepository;
+    @Autowired EntityManager entityManager;
+
 
     private MakeMe makeMe;
 
@@ -46,6 +49,7 @@ public class UserTest {
     void shouldReturnTheNoteWhenThereIsOne() {
         User user = makeMe.aUser().please(userRepository);
         Note note = makeMe.aNote().forUser(user).please(noteRepository);
+        makeMe.refresh(entityManager, user);
         assertThat(user.getNotesInDescendingOrder(), contains(note));
     }
 
@@ -55,6 +59,7 @@ public class UserTest {
         Date yesterday = Date.valueOf(LocalDate.now().minusDays(1));
         Note note1 = makeMe.aNote().forUser(user).updatedAt(yesterday).please(noteRepository);
         Note note2 = makeMe.aNote().forUser(user).please(noteRepository);
+        makeMe.refresh(entityManager, user);
 
         assertEquals(note2.getTitle(), user.getNotesInDescendingOrder().get(0).getTitle());
     }

@@ -23,7 +23,6 @@ public class NoteBuilder {
 
     public NoteBuilder forUser(User user) {
         note.setUser(user);
-        user.getNotes().add(note);
         return this;
     }
 

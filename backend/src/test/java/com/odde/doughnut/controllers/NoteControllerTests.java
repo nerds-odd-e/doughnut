@@ -54,7 +54,7 @@ class NoteControllerTests {
         user = makeMe.aUser().please(userRepository);
         parentNote = makeMe.aNote().forUser(user).please(noteRepository);
         childNote = makeMe.aNote().forUser(user).under(parentNote).please(noteRepository);
-        entityManager.refresh(user);
+        makeMe.refresh(entityManager, user);
         controller = new NoteController(new TestCurrentUser(user), noteRepository);
     }
 
