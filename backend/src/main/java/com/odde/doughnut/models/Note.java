@@ -49,6 +49,11 @@ public class Note {
   public void linkToNote(Note targetNote) {
     this.targetNotes.add(targetNote);
   }
+
+  public Integer getParentNoteId() {
+    if (parentNote == null) return null;
+    return parentNote.id;
+  }
 }
 
 
