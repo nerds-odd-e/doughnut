@@ -19,9 +19,13 @@ public class Note {
   @Getter @Setter private String picture;
 
   @ManyToOne(cascade = CascadeType.ALL)
-  @JoinColumn(name = "parent_id", referencedColumnName = "id")
+  @JoinColumn(name = "parent_id")
   @JsonIgnore
   @Getter @Setter private Note parentNote;
+
+  @OneToMany(mappedBy = "parentNote")
+  @JsonIgnore
+  @Getter private List<Note> children;
 
   @ManyToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "user_id", referencedColumnName = "id")
@@ -40,7 +44,7 @@ public class Note {
           })
   @ManyToMany
   @JsonIgnoreProperties("targetNotes")
-  @Getter @Setter private List<Note> targetNotes = new ArrayList<>();
+  @Getter @Setter private List<Note> targetNotes;
 
   public void linkToNote(Note targetNote) {
     this.targetNotes.add(targetNote);

@@ -20,10 +20,10 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     @JsonIgnore
-    @Getter @Setter private List<Note> notes = new ArrayList<>();
+    @Getter @Setter private List<Note> notes;
 
     @OneToMany(mappedBy = "user")
-    @Where(clause = "parent_id is null")
+    @Where(clause = "parent_id IS NULL")
     @JsonIgnore
     @Getter private List<Note> orphanedNotes;
 

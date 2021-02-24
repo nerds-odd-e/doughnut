@@ -55,6 +55,7 @@ class NoteControllerTests {
         parentNote = makeMe.aNote().forUser(user).please(noteRepository);
         childNote = makeMe.aNote().forUser(user).under(parentNote).please(noteRepository);
         makeMe.refresh(entityManager, user);
+        makeMe.refresh(entityManager, parentNote);
         controller = new NoteController(new TestCurrentUser(user), noteRepository);
     }
 
@@ -80,8 +81,7 @@ class NoteControllerTests {
     void shouldReturnChildNoteIfNoteIdGiven() {
         controller.all_my_notes(parentNote.getId(), model);
         assertThat(((Note) model.getAttribute("note")).getId(), equalTo(parentNote.getId()));
-//    assertThat((List<Note>)model.getAttribute("all_my_notes"), hasSize(equalTo(1)));
-//    assertThat((List<Note>)model.getAttribute("all_my_notes"), contains(childNote));
+        assertThat((List<Note>) model.getAttribute("all_my_notes"), hasSize(equalTo(1)));
+        assertThat(((List<Note>) model.getAttribute("all_my_notes")), contains(childNote));
     }
-
 }
