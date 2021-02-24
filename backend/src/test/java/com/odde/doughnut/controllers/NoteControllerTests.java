@@ -55,7 +55,14 @@ class NoteControllerTests {
 
     @Test
     void shouldUseTheRigthTemplateForCreatingNote() {
-        assertEquals("new_note", controller.newNote(model));
+        assertEquals("new_note", controller.newNote(null, model));
+        assertThat(((Note)model.getAttribute("note")).getParentNote(), is(nullValue()));
+    }
+
+    @Test
+    void shouldGetTheParentNoteIfIdProvided() {
+        controller.newNote(parentNote.getId(), model);
+        assertThat(((Note)model.getAttribute("note")).getParentNote(), equalTo(parentNote));
     }
 
     @Test

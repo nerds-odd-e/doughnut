@@ -21,9 +21,13 @@ public class NoteController {
         this.noteRepository = noteRepository;
     }
 
-    @GetMapping("/new_note")
-    public String newNote(Model model) {
-        model.addAttribute("note", new Note());
+    @GetMapping({"/new_note", "/new_note/{parent_id}"})
+    public String newNote(@PathVariable(name = "parent_id", required = false) Integer parentId, Model model) {
+        Note note = new Note();
+        if (parentId != null) {
+           note.setParentNote(noteRepository.findById(parentId).get());
+        }
+        model.addAttribute("note", note);
         return "new_note";
     }
 
