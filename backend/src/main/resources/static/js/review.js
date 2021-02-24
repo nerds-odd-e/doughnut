@@ -4,7 +4,7 @@ let currentIndex = 0;
 function transformNoteListToView(noteList) {
     const result = [];
     noteList.forEach((noteItem) => {
-        const { title, description } = noteItem;
+        const { title, description, picture } = noteItem;
 
         if (noteItem.targetNotes?.length) {
             result.push({
@@ -13,7 +13,7 @@ function transformNoteListToView(noteList) {
             })
         }
 
-        result.push({ title, description });
+        result.push({ title, description, picture });
     });
 
     return result;
@@ -34,18 +34,25 @@ function nextNote() {
         currentIndex = 0;
     }
 
-    const { title, description, links } = noteList[currentIndex];
+    const { title, description, picture, links } = noteList[currentIndex];
 
     document.getElementById("note-title").innerHTML = title;
 
     const descElem = document.getElementById("note-description");
+    const pictureElem = document.getElementById("note-picture");
     const listElem = document.getElementById("note-links");
     const listLabelElem = document.getElementById("note-links-label");
 
     if (description) {
-        descElem.innerHTML = noteList[currentIndex].description;
+        descElem.innerHTML = description;
     } else {
         descElem.innerHTML = "";
+    }
+
+    if (picture) {
+        pictureElem.innerHTML = "<img src='"+ picture + "'/>";
+    } else {
+        pictureElem.innerHTML = "";
     }
 
     if (links) {
