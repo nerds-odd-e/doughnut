@@ -66,13 +66,8 @@ class NoteControllerTests {
     }
 
     @Test
-    void shouldUseMyNotesTemplate() {
-        assertEquals("my_notes", controller.myNotes(null, model));
-    }
-
-    @Test
-    void shouldReturnAllParentlessNoteIfNoNoteIdGiven() {
-        controller.myNotes(null, model);
+    void shouldReturnAllParentlessNotesForMyNotes() {
+        assertEquals("my_notes", controller.myNotes( model));
         assertThat(model.getAttribute("note"), is(nullValue()));
         assertThat((List<Note>) model.getAttribute("notes"), hasSize(equalTo(1)));
         assertThat((List<Note>) model.getAttribute("notes"), contains(parentNote));
@@ -80,7 +75,7 @@ class NoteControllerTests {
 
     @Test
     void shouldReturnChildNoteIfNoteIdGiven() {
-        controller.myNotes(parentNote.getId(), model);
+        controller.note(parentNote.getId(), model);
         assertThat(((Note) model.getAttribute("note")).getId(), equalTo(parentNote.getId()));
         assertThat((List<Note>) model.getAttribute("notes"), hasSize(equalTo(1)));
         assertThat(((List<Note>) model.getAttribute("notes")), contains(childNote));
