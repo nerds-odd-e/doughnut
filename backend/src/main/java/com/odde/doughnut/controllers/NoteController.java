@@ -41,7 +41,6 @@ public class NoteController {
     public String note(@PathVariable(name = "id") Integer noteId, Model model) {
         Note note = noteRepository.findById(noteId).get();
         model.addAttribute("note", note);
-        model.addAttribute("currentNoteIdInPath", "/" + noteId);
         model.addAttribute("notes", note.getChildren());
         return "note";
     }

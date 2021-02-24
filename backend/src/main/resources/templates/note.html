@@ -2,7 +2,6 @@
 <layout th:replace="fragments/basic_layout :: application_layout(~{ :: .content})">
     <div class="p-5 content">
         <h2>Your Notes</h2>
-        <p> <a class="nav-link" th:href="'/new_note' + ${currentNoteIdInPath}">Add Note</a> </p>
-        <div th:replace="fragments/note_layout :: noteViewCards(${notes})"/>
+        <div th:replace="fragments/note_layout :: noteViewCards(${notes}, '/'+${note.id})"/>
     </div>
 </layout>
