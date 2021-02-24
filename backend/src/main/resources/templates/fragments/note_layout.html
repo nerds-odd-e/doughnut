@@ -3,7 +3,7 @@
         <div class="card col-3 mr-2" style="width: 18rem;"  th:each="note:${notes}">
             <div class="card-body">
                 <h5 class="card-title">
-                    <a th:href="'all_my_notes/' + ${note.id}" th:text="${note.title}"/>
+                    <a th:href="'/notes/' + ${note.id}" th:text="${note.title}"/>
                 </h5>
                 <div th:replace="${button}">Put your button here</div>
             </div>

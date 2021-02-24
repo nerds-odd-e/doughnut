@@ -31,19 +31,19 @@ public class NoteController {
         return "new_note";
     }
 
-    @GetMapping({"/all_my_notes", "/all_my_notes/{id}"})
-    public String allMyNotes(@PathVariable(name = "id", required = false) Integer noteId, Model model) {
+    @GetMapping({"/notes", "/notes/{id}"})
+    public String myNotes(@PathVariable(name = "id", required = false) Integer noteId, Model model) {
         if (noteId != null) {
             Note note = noteRepository.findById(noteId).get();
             model.addAttribute("note", note);
             model.addAttribute("currentNoteIdInPath", "/" + noteId);
-            model.addAttribute("all_my_notes", note.getChildren());
+            model.addAttribute("notes", note.getChildren());
         }
         else {
-            model.addAttribute("all_my_notes", currentUser.getUser().getOrphanedNotes());
+            model.addAttribute("notes", currentUser.getUser().getOrphanedNotes());
             model.addAttribute("currentNoteIdInPath", "");
         }
-        return "all_my_notes";
+        return "my_notes";
     }
 
     @GetMapping("/link/{id}")

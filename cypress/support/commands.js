@@ -48,7 +48,7 @@ Cypress.Commands.add("seedNotes", (notes) => {
 })
 
 Cypress.Commands.add("createNotes", (notes, parentNoteTitle) => {
-cy.visit("/all_my_notes");
+cy.visit("/notes");
   if (parentNoteTitle) {
     cy.findByText(parentNoteTitle).click();
   }
@@ -75,7 +75,7 @@ Cypress.Commands.add("clickButtonOnCard", (noteTitle, buttonTitle) => {
 });
 
 Cypress.Commands.add("creatingLinkFor", (noteTitle) => {
-    cy.visit("/all_my_notes");
+    cy.visit("/notes");
     cy.clickButtonOnCard(noteTitle, "Link Note");
 });
 

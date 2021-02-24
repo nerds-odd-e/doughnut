@@ -15,7 +15,7 @@ When("I create note with:", (data) => {
 });
 
 Then("I should see these notes belonging to the user at the top level of all my notes", (data) => {
-    cy.visit("/all_my_notes");
+    cy.visit("/notes");
     cy.expectNotes(data);
 });
 
@@ -28,7 +28,7 @@ When("I create note belonging to {string}:", (noteTitle, data) => {
 });
 
 Then("I should not see note {string} at the top level of all my notes", (noteTitle) => {
-    cy.visit("/all_my_notes");
+    cy.visit("/notes");
     cy.findByText("Your Notes");
     cy.findByText(noteTitle).should('not.exist');
 });

@@ -3,8 +3,8 @@
     <div class="p-5 content">
         <h2>Your Notes</h2>
         <p> <a class="nav-link" th:href="'/new_note' + ${currentNoteIdInPath}">Add Note</a> </p>
-        <div th:replace="fragments/note_layout :: cards(${all_my_notes}, ~{ :: .card-button})">
-            <a href="#" class="btn btn-primary card-button" th:href="'link/' + ${note.id}">Link Note</a>
+        <div th:replace="fragments/note_layout :: cards(${notes}, ~{ :: .card-button})">
+            <a href="#" class="btn btn-primary card-button" th:href="'/link/' + ${note.id}">Link Note</a>
         </div>
     </div>
 </layout>

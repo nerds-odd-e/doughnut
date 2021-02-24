@@ -66,23 +66,23 @@ class NoteControllerTests {
     }
 
     @Test
-    void shouldUseAllMyNotesTemplate() {
-        assertEquals("all_my_notes", controller.allMyNotes(null, model));
+    void shouldUseMyNotesTemplate() {
+        assertEquals("my_notes", controller.myNotes(null, model));
     }
 
     @Test
     void shouldReturnAllParentlessNoteIfNoNoteIdGiven() {
-        controller.allMyNotes(null, model);
+        controller.myNotes(null, model);
         assertThat(model.getAttribute("note"), is(nullValue()));
-        assertThat((List<Note>) model.getAttribute("all_my_notes"), hasSize(equalTo(1)));
-        assertThat((List<Note>) model.getAttribute("all_my_notes"), contains(parentNote));
+        assertThat((List<Note>) model.getAttribute("notes"), hasSize(equalTo(1)));
+        assertThat((List<Note>) model.getAttribute("notes"), contains(parentNote));
     }
 
     @Test
     void shouldReturnChildNoteIfNoteIdGiven() {
-        controller.allMyNotes(parentNote.getId(), model);
+        controller.myNotes(parentNote.getId(), model);
         assertThat(((Note) model.getAttribute("note")).getId(), equalTo(parentNote.getId()));
-        assertThat((List<Note>) model.getAttribute("all_my_notes"), hasSize(equalTo(1)));
-        assertThat(((List<Note>) model.getAttribute("all_my_notes")), contains(childNote));
+        assertThat((List<Note>) model.getAttribute("notes"), hasSize(equalTo(1)));
+        assertThat(((List<Note>) model.getAttribute("notes")), contains(childNote));
     }
 }

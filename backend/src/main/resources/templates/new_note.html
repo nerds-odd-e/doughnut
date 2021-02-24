@@ -5,7 +5,7 @@
         <h2 class="display-2">Here are your notes!</h2>
 
         <form action="#" th:action="@{/note}" th:object="${note}" method="post">
-            <input data-cy="note-parent-id" th:field="*{parentNote}" />
+            <input data-cy="note-parent-id" th:field="*{parentNote}" type="hidden" />
             <p>
                 <label for="note-title">Title:</label>
                 <input data-cy="note-title" id="note-title" th:field="*{title}" />
@@ -15,7 +15,7 @@
                 <input data-cy="note-description" id="note-description" th:field="*{description}" />
             </p>
             <p>
-                <label for="note-picture">Description:</label>
+                <label for="note-picture">Picture:</label>
                 <input data-cy="note-picture" id="note-picture" th:field="*{picture}" />
             <p>
             <input type="submit" value="Submit" /></p>
