@@ -26,7 +26,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class NoteRestControllerTests {
     @Autowired private NoteRepository noteRepository;
     @Autowired private UserRepository userRepository;
-
     private MakeMe makeMe;
     private User user;
     private NoteRestController noteController;
@@ -35,7 +34,7 @@ public class NoteRestControllerTests {
     void setup() {
         makeMe = new MakeMe();
         user = makeMe.aUser().please(userRepository);
-        noteController = new NoteRestController(noteRepository, null, (CurrentUser) new TestCurrentUser(user));
+        noteController = new NoteRestController(noteRepository, null, new TestCurrentUser(user));
     }
 
     @Test
