@@ -10,8 +10,8 @@ Feature: Note maintenance
             | note-title      | note-description  |
             | Sedation        | Put to sleep      |
         And I create note with:
-            | note-title      | note-description  | note-picture          |
-            | Sedition        | Incite violence   | a_photo_of_slide.jpg  |
+            | note-title      | note-description  | note-picture |
+            | Sedition        | Incite violence   | a_slide.jpg  |
         Then I should see these notes belonging to the user
             | note-title      |
             | Sedation        |
