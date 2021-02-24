@@ -2,6 +2,10 @@
 <layout th:replace="fragments/basic_layout :: application_layout(~{ :: .content})">
     <div class="p-5 content">
         <h2 th:text="${note.title}"/>
+        <p th:text="${note.description}"/>
+        <p th:if="${note.picture}">
+            <img th:src="'https://storage.googleapis.com/dough-01/notes_images/'+${note.picture}"/>
+        </p>
         <ul>
             <li> <a class="nav-link" th:if="${note.parentNote}" th:href="'/new_note/' + ${note.parentNote.id}">Add Sibling Note</a> </li>
             <li> <a class="nav-link" th:href="'/new_note/' + ${note.id}">Add Child Note</a> </li>
