@@ -17,3 +17,16 @@ Feature: Note maintenance
             | Sedation        |
             | Sedition        |
 
+    @ignore
+    Scenario: Create a new note belonging to another node
+        Given I create note with:
+            | note-title      | note-description     |
+            | LeSS in Action  | An awesome training  |
+        When I create note belonging to "LeSS in Action":
+            | note-title      | note-description                     |
+            | Re-quirement    | Re-think the way we do requirement   |
+        Then I should not see note "Re-quirement" at the top level of all my notes
+        When I open "LeSS in Action" note
+        Then I should see these notes belonging to the user
+            | note-title      |
+            | Re-quirement    |
