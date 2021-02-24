@@ -32,6 +32,15 @@ When("I create note belonging to {string}:", (noteTitle, data) => {
   cy.createNotes(data.hashes());
 });
 
+When("I create a sibling note of {string}:", (noteTitle, data) => {
+  cy.findByText(noteTitle);
+  cy.findByText("Add Sibling Note").click();
+  cy.createNotes(data.hashes());
+});
+
+
+
+
 Then("I should see {string} in note title", (noteTitle) => {
     cy.findByText(noteTitle);
 });
@@ -42,6 +51,7 @@ Then("I should not see note {string} at the top level of all my notes", (noteTit
     cy.findByText(noteTitle).should('not.exist');
 });
 
-When("I open {string} note", (noteTitle) => {
+When("I open {string} note at top level", (noteTitle) => {
+    cy.visit("/notes");
     cy.findByText(noteTitle).click();
 });

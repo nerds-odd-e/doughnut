@@ -18,15 +18,31 @@ Feature: Note maintenance
             | Sedition        |
 
     Scenario: Create a new note belonging to another node
-        Given I create note with:
-            | note-title      | note-description     |
+        Given there are some notes for the current user
+            | title           | description          |
             | LeSS in Action  | An awesome training  |
         When I create note belonging to "LeSS in Action":
             | note-title      | note-description                     |
             | Re-quirement    | Re-think the way we do requirement   |
         Then I should not see note "Re-quirement" at the top level of all my notes
-        When I open "LeSS in Action" note
+        When I open "LeSS in Action" note at top level
         Then I should see "LeSS in Action" in note title
         And I should see these notes belonging to the user
             | note-title      |
             | Re-quirement    |
+
+    Scenario: Create a new sibling note
+        Given there are some notes for the current user
+            | title           | description          |
+            | LeSS in Action  | An awesome training  |
+        And I create note belonging to "LeSS in Action":
+            | note-title      | note-description                     |
+            | Re-quirement    | Re-think the way we do requirement   |
+        When I create a sibling note of "Re-quirement":
+            | note-title      | note-description                     |
+            | Re-Design    | Re-think the way we do design   |
+        When I open "LeSS in Action" note at top level
+        And I should see these notes belonging to the user
+            | note-title      |
+            | Re-quirement    |
+            | Re-Design       |
