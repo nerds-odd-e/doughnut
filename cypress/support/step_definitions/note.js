@@ -23,7 +23,7 @@ Then("I should see these notes belonging to the user", (data) => {
 });
 
 When("I create note belonging to {string}:", (noteTitle, data) => {
-  cy.createNotes(data.hashes());
+  cy.createNotes(data.hashes(), noteTitle);
 });
 
 Then("I should not see note {string} at the top level of all my notes", (noteTitle) => {

@@ -47,8 +47,12 @@ Cypress.Commands.add("seedNotes", (notes) => {
   })
 })
 
-Cypress.Commands.add("createNotes", (notes) => {
-  cy.visit("/note");
+Cypress.Commands.add("createNotes", (notes, parentNoteTitle) => {
+cy.visit("/all_my_notes");
+  if (parentNoteTitle) {
+    cy.findByText(parentNoteTitle).click();
+  }
+  cy.findByText("Add Note").click();
   notes.forEach((elem) => {
     for (var propName in elem) {
       cy.get(`[data-cy="${propName}"]`).type(elem[propName]);
@@ -58,8 +62,8 @@ Cypress.Commands.add("createNotes", (notes) => {
 });
 
 Cypress.Commands.add("clickButtonOnCard", (noteTitle, buttonTitle) => {
-    const card = cy.findByText(noteTitle, { selector: ".card-title"});
-    const button = card.parent().findByText(buttonTitle);
+    const card = cy.findByText(noteTitle, { selector: ".card-title a"});
+    const button = card.parent().parent().findByText(buttonTitle);
     button.click();
 });
 
@@ -70,8 +74,8 @@ Cypress.Commands.add("creatingLinkFor", (noteTitle) => {
 
 Cypress.Commands.add("expectExactLinkTargets", (targets) => {
     targets.forEach((elem) => {
-         cy.findByText(elem, {selector: '.card-title'}).should("be.visible");
+         cy.findByText(elem, {selector: '.card-title a'}).should("be.visible");
     });
-    cy.findAllByText(/.*/, {selector: '.card-title'}).should("have.length", targets.length);
+    cy.findAllByText(/.*/, {selector: '.card-title a'}).should("have.length", targets.length);
 })
 

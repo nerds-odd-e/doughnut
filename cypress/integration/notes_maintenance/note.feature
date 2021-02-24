@@ -17,7 +17,7 @@ Feature: Note maintenance
             | Sedation        |
             | Sedition        |
 
-        @ignore
+      @ignore
     Scenario: Create a new note belonging to another node
         Given I create note with:
             | note-title      | note-description     |
