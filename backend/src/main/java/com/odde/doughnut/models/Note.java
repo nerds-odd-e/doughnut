@@ -16,6 +16,7 @@ public class Note {
   @Id @Getter @GeneratedValue(strategy = GenerationType.IDENTITY) private Integer id;
   @Getter @Setter private String title;
   @Getter @Setter private String description;
+  @Getter @Setter private String picture;
 
   @ManyToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "user_id", referencedColumnName = "id")

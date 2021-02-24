@@ -5,12 +5,19 @@
         <h2 class="display-2">Here are your notes!</h2>
 
         <form action="#" th:action="@{/note}" th:object="${note}" method="post">
-            <label for="note-title">Title:</label>
-            <input data-cy="note-title" id="note-title" th:field="*{title}" />
-            <br>
-            <label for="note-description">Description:</label>
-            <input data-cy="note-description" id="note-description" th:field="*{description}" />
-            <p><input type="submit" value="Submit" /></p>
+            <p>
+                <label for="note-title">Title:</label>
+                <input data-cy="note-title" id="note-title" th:field="*{title}" />
+            </p>
+            <p>
+                <label for="note-description">Description:</label>
+                <input data-cy="note-description" id="note-description" th:field="*{description}" />
+            </p>
+            <p>
+                <label for="note-picture">Description:</label>
+                <input data-cy="note-picture" id="note-picture" th:field="*{picture}" />
+            <p>
+            <input type="submit" value="Submit" /></p>
         </form>
     </div>
 </layout>
