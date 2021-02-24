@@ -47,12 +47,7 @@ Cypress.Commands.add("seedNotes", (notes) => {
   })
 })
 
-Cypress.Commands.add("createNotes", (notes, parentNoteTitle) => {
-cy.visit("/notes");
-  if (parentNoteTitle) {
-    cy.findByText(parentNoteTitle).click();
-  }
-  cy.findByText("Add Note").click();
+Cypress.Commands.add("createNotes", (notes) => {
   notes.forEach((elem) => {
     for (var propName in elem) {
       cy.get(`[data-cy="${propName}"]`).type(elem[propName]);

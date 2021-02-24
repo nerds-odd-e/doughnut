@@ -11,6 +11,8 @@ Given("there are some notes for the current user", (data) => {
 })
 
 When("I create note with:", (data) => {
+  cy.visit("/notes");
+  cy.findByText("Add Top Level Note").click();
   cy.createNotes(data.hashes());
 });
 
@@ -24,7 +26,10 @@ Then("I should see these notes belonging to the user", (data) => {
 });
 
 When("I create note belonging to {string}:", (noteTitle, data) => {
-  cy.createNotes(data.hashes(), noteTitle);
+  cy.visit("/notes");
+  cy.findByText(noteTitle).click();
+  cy.findByText("Add Child Note").click();
+  cy.createNotes(data.hashes());
 });
 
 Then("I should see {string} in note title", (noteTitle) => {

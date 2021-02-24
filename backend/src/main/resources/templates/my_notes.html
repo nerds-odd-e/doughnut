@@ -2,6 +2,7 @@
 <layout th:replace="fragments/basic_layout :: application_layout(~{ :: .content})">
     <div class="p-5 content">
         <h2>Top Level Notes</h2>
-        <div th:replace="fragments/note_layout :: noteViewCards(${notes}, '')"/>
+        <p> <a class="nav-link" href="/new_note">Add Top Level Note</a> </p>
+        <div th:replace="fragments/note_layout :: noteViewCards(${notes})"/>
     </div>
 </layout>
