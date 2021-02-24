@@ -1,7 +1,9 @@
 package com.odde.doughnut.models;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -17,7 +19,13 @@ public class User {
     @Column(name = "external_identifier") @Getter @Setter private String externalIdentifier;
 
     @OneToMany(mappedBy = "user")
+    @JsonIgnore
     @Getter @Setter private List<Note> notes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user")
+    @Where(clause = "parent_id is null")
+    @JsonIgnore
+    @Getter private List<Note> orphanedNotes;
 
     public List<Note> getNotesInDescendingOrder() {
         List<Note> notes = getNotes();

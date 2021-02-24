@@ -19,6 +19,11 @@ public class Note {
   @Getter @Setter private String picture;
 
   @ManyToOne(cascade = CascadeType.ALL)
+  @JoinColumn(name = "parent_id", referencedColumnName = "id")
+  @JsonIgnore
+  @Getter @Setter private Note parentNote;
+
+  @ManyToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "user_id", referencedColumnName = "id")
   @JsonIgnore
   @Getter @Setter private User user;

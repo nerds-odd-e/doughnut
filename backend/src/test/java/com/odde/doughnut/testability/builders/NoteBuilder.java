@@ -27,6 +27,11 @@ public class NoteBuilder {
         return this;
     }
 
+    public NoteBuilder under(Note parentNote) {
+        note.setParentNote(parentNote);
+        return this;
+    }
+
     public NoteBuilder updatedAt(Date updatedDatetime) {
         note.setUpdatedDatetime(updatedDatetime);
         return this;
