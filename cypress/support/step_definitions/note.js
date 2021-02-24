@@ -27,9 +27,13 @@ When("I create note belonging to {string}:", (noteTitle, data) => {
   cy.createNotes(data.hashes(), noteTitle);
 });
 
+Then("I should see {string} in note title", (noteTitle) => {
+    cy.findByText(noteTitle);
+});
+
 Then("I should not see note {string} at the top level of all my notes", (noteTitle) => {
     cy.visit("/notes");
-    cy.findByText("Your Notes");
+    cy.findByText("Top Level Notes");
     cy.findByText(noteTitle).should('not.exist');
 });
 

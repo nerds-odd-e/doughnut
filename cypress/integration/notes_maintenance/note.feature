@@ -26,6 +26,7 @@ Feature: Note maintenance
             | Re-quirement    | Re-think the way we do requirement   |
         Then I should not see note "Re-quirement" at the top level of all my notes
         When I open "LeSS in Action" note
-        Then I should see these notes belonging to the user
+        Then I should see "LeSS in Action" in note title
+        And I should see these notes belonging to the user
             | note-title      |
             | Re-quirement    |

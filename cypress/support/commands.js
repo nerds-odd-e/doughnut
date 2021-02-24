@@ -62,7 +62,6 @@ cy.visit("/notes");
 });
 
 Cypress.Commands.add("expectNotes", (data) => {
-    cy.findByText("Your Notes");
     data.hashes().forEach((elem) => {
          cy.findByText(elem["note-title"]).should("be.visible");
     });
