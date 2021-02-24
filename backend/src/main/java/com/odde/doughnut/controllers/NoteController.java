@@ -27,8 +27,11 @@ public class NoteController {
         return "note";
     }
 
-    @GetMapping("/all_my_notes")
-    public String all_my_notes(Model model) {
+    @GetMapping({"/all_my_notes", "/all_my_notes/{id}"})
+    public String all_my_notes(@PathVariable(name = "id") Integer noteId, Model model) {
+        if (noteId != null) {
+            model.addAttribute("note", noteRepository.findById(noteId).get());
+        }
         model.addAttribute("all_my_notes", currentUser.getUser().getNotes());
         return "all_my_notes";
     }
