@@ -34,7 +34,6 @@ public class NoteController {
     @GetMapping("/notes")
     public String myNotes(Model model) {
         model.addAttribute("notes", currentUser.getUser().getOrphanedNotes());
-        model.addAttribute("currentNoteIdInPath", "");
         return "my_notes";
     }
 
@@ -44,7 +43,7 @@ public class NoteController {
         model.addAttribute("note", note);
         model.addAttribute("currentNoteIdInPath", "/" + noteId);
         model.addAttribute("notes", note.getChildren());
-        return "my_notes";
+        return "note";
     }
 
     @GetMapping("/link/{id}")

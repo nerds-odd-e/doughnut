@@ -11,3 +11,9 @@
     </div>
 </div>
 
+<div th:fragment="noteViewCards(notes)">
+    <div th:replace="fragments/note_layout :: cards(${notes}, ~{ :: .card-button})">
+        <a href="#" class="btn btn-primary card-button" th:href="'/link/' + ${note.id}">Link Note</a>
+    </div>
+</div>
+
