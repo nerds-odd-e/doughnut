@@ -8,6 +8,7 @@ import com.odde.doughnut.models.User;
 import com.odde.doughnut.repositories.NoteRepository;
 import com.odde.doughnut.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManagerFactory;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 
 
 @RestController
+@Profile({"test", "dev"})
 @RequestMapping("/api/testability")
 class TestabilityController {
   @Autowired EntityManagerFactory emf;
