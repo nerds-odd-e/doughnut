@@ -5,7 +5,7 @@
         <h2 class="display-2">Here are your notes!</h2>
 
         <form action="#" th:action="@{/note}" th:object="${note}" method="post">
-            <input data-cy="note-parent-id" th:field="*{parentNoteId}" />
+            <input data-cy="note-parent-id" th:field="*{parentNote}" />
             <p>
                 <label for="note-title">Title:</label>
                 <input data-cy="note-title" id="note-title" th:field="*{title}" />

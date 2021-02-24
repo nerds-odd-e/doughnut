@@ -36,10 +36,12 @@ public class NoteController {
         if (noteId != null) {
             Note note = noteRepository.findById(noteId).get();
             model.addAttribute("note", note);
+            model.addAttribute("currentNoteIdInPath", "/" + noteId);
             model.addAttribute("all_my_notes", note.getChildren());
         }
         else {
             model.addAttribute("all_my_notes", currentUser.getUser().getOrphanedNotes());
+            model.addAttribute("currentNoteIdInPath", "");
         }
         return "all_my_notes";
     }

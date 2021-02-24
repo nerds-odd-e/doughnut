@@ -29,6 +29,7 @@ public class NoteRestController {
     public RedirectView createNote(Note note) {
         User user = currentUser.getUser();
         note.setUser(user);
+
         noteRepository.save(note);
         return new RedirectView("/review");
     }
