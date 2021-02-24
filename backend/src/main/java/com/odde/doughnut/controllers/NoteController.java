@@ -21,14 +21,14 @@ public class NoteController {
         this.noteRepository = noteRepository;
     }
 
-    @GetMapping("/note")
-    public String notes(Model model) {
+    @GetMapping("/new_note")
+    public String newNote(Model model) {
         model.addAttribute("note", new Note());
-        return "note";
+        return "new_note";
     }
 
     @GetMapping({"/all_my_notes", "/all_my_notes/{id}"})
-    public String all_my_notes(@PathVariable(name = "id", required = false) Integer noteId, Model model) {
+    public String allMyNotes(@PathVariable(name = "id", required = false) Integer noteId, Model model) {
         if (noteId != null) {
             Note note = noteRepository.findById(noteId).get();
             model.addAttribute("note", note);

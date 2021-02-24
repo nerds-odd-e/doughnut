@@ -10,19 +10,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.annotation.Commit;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.transaction.TransactionStatus;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionCallbackWithoutResult;
-import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.ui.ExtendedModelMap;
 
 import javax.persistence.EntityManager;
 import java.util.List;
-import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -60,18 +54,18 @@ class NoteControllerTests {
     }
 
     @Test
-    void shouldProceedToNotePageWhenUserIsLogIn() {
-        assertEquals("note", controller.notes(model));
+    void shouldUseTheRigthTemplateForCreatingNote() {
+        assertEquals("new_note", controller.newNote(model));
     }
 
     @Test
     void shouldUseAllMyNotesTemplate() {
-        assertEquals("all_my_notes", controller.all_my_notes(null, model));
+        assertEquals("all_my_notes", controller.allMyNotes(null, model));
     }
 
     @Test
     void shouldReturnAllParentlessNoteIfNoNoteIdGiven() {
-        controller.all_my_notes(null, model);
+        controller.allMyNotes(null, model);
         assertThat(model.getAttribute("note"), is(nullValue()));
         assertThat((List<Note>) model.getAttribute("all_my_notes"), hasSize(equalTo(1)));
         assertThat((List<Note>) model.getAttribute("all_my_notes"), contains(parentNote));
@@ -79,7 +73,7 @@ class NoteControllerTests {
 
     @Test
     void shouldReturnChildNoteIfNoteIdGiven() {
-        controller.all_my_notes(parentNote.getId(), model);
+        controller.allMyNotes(parentNote.getId(), model);
         assertThat(((Note) model.getAttribute("note")).getId(), equalTo(parentNote.getId()));
         assertThat((List<Note>) model.getAttribute("all_my_notes"), hasSize(equalTo(1)));
         assertThat(((List<Note>) model.getAttribute("all_my_notes")), contains(childNote));

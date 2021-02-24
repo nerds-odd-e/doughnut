@@ -20,7 +20,7 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     @JsonIgnore
-    @Getter @Setter private List<Note> notes;
+    @Getter @Setter private List<Note> notes = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
     @Where(clause = "parent_id IS NULL")

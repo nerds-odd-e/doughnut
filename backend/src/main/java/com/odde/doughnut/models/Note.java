@@ -44,7 +44,7 @@ public class Note {
           })
   @ManyToMany
   @JsonIgnoreProperties("targetNotes")
-  @Getter @Setter private List<Note> targetNotes;
+  @Getter @Setter private List<Note> targetNotes = new ArrayList<>();
 
   public void linkToNote(Note targetNote) {
     this.targetNotes.add(targetNote);
