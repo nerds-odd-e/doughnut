@@ -31,7 +31,7 @@ public class NoteRestController {
         note.setUser(user);
 
         noteRepository.save(note);
-        return new RedirectView("/review");
+        return new RedirectView("/notes/" + note.getId());
     }
 
     @GetMapping(value="/getNotes", produces=MediaType.APPLICATION_JSON_VALUE)

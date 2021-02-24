@@ -43,7 +43,7 @@ public class NoteRestControllerTests {
     void shouldBeAbleToSaveNoteWhenThereIsValidUser() {
         Note newNote = makeMe.aNote().inMemoryPlease();
         RedirectView response = noteController.createNote(newNote);
-        assertEquals("/review", response.getUrl());
+        assertEquals("/notes/" + newNote.getId(), response.getUrl());
     }
 
     @Test
