@@ -7,6 +7,7 @@ import com.odde.doughnut.repositories.UserRepository;
 import com.odde.doughnut.testability.DBCleaner;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,5 +80,14 @@ class NoteControllerTests {
         assertThat(((Note) model.getAttribute("note")).getId(), equalTo(parentNote.getId()));
         assertThat((List<Note>) model.getAttribute("notes"), hasSize(equalTo(1)));
         assertThat(((List<Note>) model.getAttribute("notes")), contains(childNote));
+    }
+
+    @Nested
+    class BazaarTest {
+        @Test
+        void whenThereIsNoSharedNote() {
+            assertEquals("bazaar", controller.bazaar(model));
+            assertThat((List<Note>) model.getAttribute("notes"), hasSize(equalTo(1)));
+        }
     }
 }

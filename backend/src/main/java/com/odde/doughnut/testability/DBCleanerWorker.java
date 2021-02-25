@@ -14,47 +14,57 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public class DBCleanerWorker {
-  private final EntityManagerFactory emf;
+    private final EntityManagerFactory emf;
 
-  public DBCleanerWorker(EntityManagerFactory emf) {
-    this.emf = emf;
-  }
+    public DBCleanerWorker(EntityManagerFactory emf) {
+        this.emf = emf;
+    }
 
-  @Transactional
-  public void truncateAllTables() {
-    withEntityManager(entityManager
-                      -> guessTableNames(entityManager)
-                             .forEach(t -> truncateTable(t, entityManager)));
-  }
+    @Transactional
+    public void truncateAllTables() {
+        withEntityManager(entityManager
+                -> guessTableNames(entityManager)
+                .forEach(t -> truncateTable(t, entityManager)));
+    }
 
-  private EntityManager createEntityManager() {
-    return emf.createEntityManager();
-  }
+    private EntityManager createEntityManager() {
+        return emf.createEntityManager();
+    }
 
-  private void withEntityManager(Consumer<EntityManager> consumer) {
-    EntityManager manager = createEntityManager();
-    EntityTransaction transaction = manager.getTransaction();
-    transaction.begin();
-    consumer.accept(manager);
-    transaction.commit();
-    manager.close();
-  }
+    private void withEntityManager(Consumer<EntityManager> consumer) {
+        EntityManager manager = createEntityManager();
+        EntityTransaction transaction = manager.getTransaction();
+        transaction.begin();
+        consumer.accept(manager);
+        transaction.commit();
+        manager.close();
+    }
 
-  private void truncateTable(String tableName, EntityManager entityManager) {
-    entityManager.createNativeQuery("SET FOREIGN_KEY_CHECKS=0").executeUpdate();
-    entityManager.createNativeQuery("TRUNCATE TABLE `" + tableName + "`").executeUpdate();
-    entityManager.createNativeQuery("TRUNCATE TABLE `" + tableName + "`").executeUpdate();
-    entityManager.createNativeQuery("ALTER TABLE `" + tableName + "` AUTO_INCREMENT=1").executeUpdate();
-    entityManager.createNativeQuery("SET FOREIGN_KEY_CHECKS=1").executeUpdate();
-  }
+    private void truncateTable(String tableName, EntityManager entityManager) {
+        entityManager.createNativeQuery("SET FOREIGN_KEY_CHECKS=0").executeUpdate();
+        entityManager.createNativeQuery("TRUNCATE TABLE `" + tableName + "`").executeUpdate();
+        entityManager.createNativeQuery("TRUNCATE TABLE `" + tableName + "`").executeUpdate();
+        entityManager.createNativeQuery("ALTER TABLE `" + tableName + "` AUTO_INCREMENT=1").executeUpdate();
+        entityManager.createNativeQuery("SET FOREIGN_KEY_CHECKS=1").executeUpdate();
+    }
 
-  private List<String> guessTableNames(EntityManager manager) {
-    Metamodel metamodel = (Metamodel)manager.getMetamodel();
-    Set<EntityType<?>> entities = metamodel.getEntities();
+    private List<String> guessTableNames(EntityManager manager) {
+        Metamodel metamodel = (Metamodel) manager.getMetamodel();
+        Set<EntityType<?>> entities = metamodel.getEntities();
 
-    return entities.stream()
-        .map(EntityType::getName)
-        .map(String::toLowerCase)
-        .collect(Collectors.toList());
-  }
+        return entities.stream()
+                .map(EntityType::getName)
+                .map(DBCleanerWorker::camelToSnake)
+                .collect(Collectors.toList());
+    }
+
+    public static String camelToSnake(String camel) {
+        String underscore;
+        underscore = String.valueOf(Character.toLowerCase(camel.charAt(0)));
+        for (int i = 1; i < camel.length(); i++) {
+            underscore += Character.isLowerCase(camel.charAt(i)) ? String.valueOf(camel.charAt(i))
+                    : "_" + Character.toLowerCase(camel.charAt(i));
+        }
+        return underscore;
+    }
 }

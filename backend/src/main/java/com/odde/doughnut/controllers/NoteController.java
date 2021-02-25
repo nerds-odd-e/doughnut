@@ -40,7 +40,7 @@ public class NoteController {
     @GetMapping("/bazaar")
     public String bazaar(Model model) {
         model.addAttribute("notes", currentUser.getUser().getOrphanedNotes());
-        return "my_notes";
+        return "bazaar";
     }
 
     @GetMapping("/notes/{id}")
