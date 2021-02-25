@@ -35,6 +35,7 @@ class BazaarControllerTests {
     @Autowired EntityManager entityManager;
     private MakeMe makeMe;
     private User user;
+    private Note topNote;
     private BazaarController controller;
     ExtendedModelMap model = new ExtendedModelMap();
 
@@ -43,6 +44,7 @@ class BazaarControllerTests {
     void setup() {
         makeMe = new MakeMe();
         user = makeMe.aUser().please(userRepository);
+        topNote = makeMe.aNote().forUser(user).please(noteRepository);
         controller = new BazaarController(new TestCurrentUser(user), noteRepository, bazaarRepository);
     }
 
@@ -51,4 +53,12 @@ class BazaarControllerTests {
         assertEquals("bazaar", controller.bazaar(model));
         assertThat((List<Note>) model.getAttribute("notes"), hasSize(equalTo(0)));
     }
+
+    @Test
+    void whenThereIsSharedNote() {
+        makeMe.aBazaarNode(topNote).please(bazaarRepository);
+        assertEquals("bazaar", controller.bazaar(model));
+        assertThat((List<Note>) model.getAttribute("notes"), hasSize(equalTo(1)));
+    }
+
 }

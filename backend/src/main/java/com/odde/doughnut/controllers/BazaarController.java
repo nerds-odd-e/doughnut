@@ -29,4 +29,5 @@ public class BazaarController {
         model.addAttribute("notes", bazaarRepository.findAll());
         return "bazaar";
     }
+
 }

@@ -1,6 +1,8 @@
 package com.odde.doughnut.testability;
 
+import com.odde.doughnut.models.Note;
 import com.odde.doughnut.models.User;
+import com.odde.doughnut.testability.builders.BazaarNoteBuilder;
 import com.odde.doughnut.testability.builders.NoteBuilder;
 import com.odde.doughnut.testability.builders.UserBuilder;
 import org.springframework.stereotype.Component;
@@ -17,8 +19,13 @@ public class MakeMe {
         return new NoteBuilder(this);
     }
 
+    public BazaarNoteBuilder aBazaarNode(Note note) {
+        return new BazaarNoteBuilder(this, note);
+    }
+    
     public <T> T refresh(EntityManager entityManager, T object) {
         entityManager.refresh(object);
         return object;
     }
 }
+
