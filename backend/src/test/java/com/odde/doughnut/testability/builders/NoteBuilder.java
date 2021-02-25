@@ -27,7 +27,7 @@ public class NoteBuilder {
     }
 
     public NoteBuilder under(Note parentNote) {
-        note.setParentNote(parentNote);
+        parentNote.addChild(note);
         return this;
     }
 

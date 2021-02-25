@@ -18,14 +18,14 @@ public class Note {
   @Getter @Setter private String description;
   @Getter @Setter private String picture;
 
-  @ManyToOne(cascade = CascadeType.ALL)
+  @ManyToOne
   @JoinColumn(name = "parent_id")
   @JsonIgnore
   @Getter @Setter private Note parentNote;
 
-  @OneToMany(mappedBy = "parentNote")
+  @OneToMany(mappedBy = "parentNote", cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonIgnore
-  @Getter private List<Note> children;
+  @Getter private List<Note> children = new ArrayList<>();
 
   @ManyToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "user_id", referencedColumnName = "id")
@@ -48,6 +48,11 @@ public class Note {
 
   public void linkToNote(Note targetNote) {
     this.targetNotes.add(targetNote);
+  }
+
+  public void addChild(Note note) {
+      note.setParentNote(this);
+      getChildren().add(note);
   }
 }
 

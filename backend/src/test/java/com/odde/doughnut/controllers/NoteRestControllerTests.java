@@ -18,6 +18,9 @@ import org.springframework.web.servlet.view.RedirectView;
 import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
@@ -81,6 +84,24 @@ public class NoteRestControllerTests {
             assertFalse(noteRepository.findById(noteId).isPresent());
             assertTrue(userRepository.findById(user.getId()).isPresent());
         }
+
+        @Test
+        void shouldDeleteTheChildNoteButNotSiblingOrParent() {
+            Note parent = makeMe.aNote().forUser(user).please(noteRepository);
+            Note subject = makeMe.aNote().under(parent).forUser(user).please(noteRepository);
+            Note sibling = makeMe.aNote().under(parent).forUser(user).please(noteRepository);
+            Note child = makeMe.aNote().under(subject).forUser(user).please(noteRepository);
+            assertThat(subject.getChildren(), contains(child));
+            Integer siblingId = sibling.getId();
+            Integer childId = child.getId();
+
+            noteController.deleteNote(subject.getId());
+
+            assertTrue(noteRepository.findById(siblingId).isPresent());
+            assertFalse(noteRepository.findById(childId).isPresent());
+        }
+
+
 
     }
 
