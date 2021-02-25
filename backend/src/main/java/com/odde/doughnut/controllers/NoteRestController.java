@@ -50,7 +50,7 @@ public class NoteRestController {
     }
 
     @PostMapping(value = "/delete_note/{id}")
-    public RedirectView linkNote(@PathVariable("id") Integer noteId) {
+    public RedirectView deleteNote(@PathVariable("id") Integer noteId) {
         Note note = noteRepository.findById(noteId).get();
         noteRepository.delete(note);
         return new RedirectView("/notes");
