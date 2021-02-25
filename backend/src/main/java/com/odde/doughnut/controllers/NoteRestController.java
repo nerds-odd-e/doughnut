@@ -50,8 +50,12 @@ public class NoteRestController {
     }
 
     @PostMapping(value = "/delete_note/{id}")
-    public RedirectView deleteNote(@PathVariable("id") Integer noteId) {
+    public RedirectView deleteNote(@PathVariable("id") Integer noteId) throws NoAccessRightException {
         Note note = noteRepository.findById(noteId).get();
+        if (! currentUser.getUser().owns(note)) {
+            throw new NoAccessRightException();
+
+        }
         noteRepository.delete(note);
         return new RedirectView("/notes");
     }

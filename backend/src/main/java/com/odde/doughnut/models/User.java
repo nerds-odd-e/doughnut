@@ -51,4 +51,8 @@ public class User {
                 .filter(i -> !i.equals(source))
                 .collect(Collectors.toList());
     }
+
+    public boolean owns(Note note) {
+        return note.getUser().id == id;
+    }
 }

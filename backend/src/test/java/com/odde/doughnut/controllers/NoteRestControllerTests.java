@@ -77,7 +77,18 @@ public class NoteRestControllerTests {
         @Autowired private LinkRepository linkRepository;
 
         @Test
-        void shouldDeleteTheNoteButNotTheUser() {
+        void shouldNotBeAbleToDeleteNoteThatBelongsToOtherUser() {
+            User anotherUser = makeMe.aUser().please(userRepository);
+            Note note = makeMe.aNote().forUser(anotherUser).please(noteRepository);
+            Integer noteId = note.getId();
+            assertThrows(NoAccessRightException.class, ()->
+                    noteController.deleteNote(noteId)
+                    );
+            assertTrue(noteRepository.findById(noteId).isPresent());
+        }
+
+        @Test
+        void shouldDeleteTheNoteButNotTheUser() throws NoAccessRightException {
             Note note = makeMe.aNote().forUser(user).please(noteRepository);
             Integer noteId = note.getId();
             RedirectView response = noteController.deleteNote(noteId);
@@ -87,7 +98,7 @@ public class NoteRestControllerTests {
         }
 
         @Test
-        void shouldDeleteTheChildNoteButNotSiblingOrParent() {
+        void shouldDeleteTheChildNoteButNotSiblingOrParent() throws NoAccessRightException {
             Note parent = makeMe.aNote().forUser(user).please(noteRepository);
             Note subject = makeMe.aNote().under(parent).forUser(user).please(noteRepository);
             Note sibling = makeMe.aNote().under(parent).forUser(user).please(noteRepository);
@@ -100,7 +111,7 @@ public class NoteRestControllerTests {
         }
 
         @Test
-        void shouldDeleteTheLinkToAndFromThisNote() {
+        void shouldDeleteTheLinkToAndFromThisNote() throws NoAccessRightException {
             Note referTo = makeMe.aNote().forUser(user).please(noteRepository);
             Note subject = makeMe.aNote().forUser(user).linkTo(referTo).please(noteRepository);
             Note referFrom = makeMe.aNote().forUser(user).linkTo(subject).linkTo(referTo).please(noteRepository);
