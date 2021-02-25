@@ -47,7 +47,6 @@ Feature: Note maintenance
             | Re-quirement    |
             | Re-Design       |
 
-      @ignore
     Scenario: Delete a note
         Given there are some notes for the current user
             | title           | description          |

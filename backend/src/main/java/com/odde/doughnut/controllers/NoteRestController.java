@@ -7,6 +7,7 @@ import com.odde.doughnut.repositories.NoteRepository;
 import com.odde.doughnut.services.LinkService;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.view.RedirectView;
@@ -34,7 +35,7 @@ public class NoteRestController {
         return new RedirectView("/notes/" + note.getId());
     }
 
-    @GetMapping(value="/getNotes", produces=MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/getNotes", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Note> getNotes() throws Exception {
         return currentUser.getUser().getNotesInDescendingOrder();
     }
@@ -48,4 +49,10 @@ public class NoteRestController {
         return new RedirectView("/review");
     }
 
+    @PostMapping(value = "/delete_note/{id}")
+    public RedirectView linkNote(@PathVariable("id") Integer noteId) {
+        Note note = noteRepository.findById(noteId).get();
+        noteRepository.delete(note);
+        return new RedirectView("/notes");
+    }
 }

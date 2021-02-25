@@ -27,7 +27,7 @@ public class Note {
   @JsonIgnore
   @Getter private List<Note> children;
 
-  @ManyToOne(cascade = CascadeType.ALL)
+  @ManyToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "user_id", referencedColumnName = "id")
   @JsonIgnore
   @Getter @Setter private User user;

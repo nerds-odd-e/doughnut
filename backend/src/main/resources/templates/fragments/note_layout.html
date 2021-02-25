@@ -1,6 +1,6 @@
 <div th:fragment="cards(notes, button, cardHeader)">
     <div class="row">
-        <div class="card col-3 mr-2" style="width: 18rem;"  th:each="note:${notes}">
+        <div class="card col-3 mr-2" style="width: 18rem;" th:each="note:${notes}">
             <div class="card-body">
                 <div th:replace="${cardHeader}"/>
                 <h5 class="card-title">
@@ -14,7 +14,12 @@
 
 <div th:fragment="noteViewCards(notes)">
     <div th:replace="fragments/note_layout :: cards(${notes}, ~{ :: .card-button},  ~{ :: .card-header})">
-        <span class="card-header"><a class="delete-card"><span class="glyphicon glyphicon-trash">X</span></a></span>
+        <span class="card-header">
+            <form th:action="'/delete_note/'+${note.id}" th:method="delete" onsubmit="return confirm('Are you sure?')">
+              <input type="hidden" name="_method" value="delete"/>
+              <button class="delete-card">X</button>
+            </form>
+        </span>
         <a href="#" class="btn btn-primary card-button" th:href="'/link/' + ${note.id}">Link Note</a>
     </div>
 </div>
