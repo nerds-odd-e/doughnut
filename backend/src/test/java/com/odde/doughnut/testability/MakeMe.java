@@ -22,10 +22,9 @@ public class MakeMe {
     public BazaarNoteBuilder aBazaarNode(Note note) {
         return new BazaarNoteBuilder(this, note);
     }
-    
+
     public <T> T refresh(EntityManager entityManager, T object) {
         entityManager.refresh(object);
         return object;
     }
 }
-

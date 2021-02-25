@@ -16,13 +16,14 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ExtendedModelMap;
+import org.springframework.web.servlet.view.RedirectView;
 
 import javax.persistence.EntityManager;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
@@ -59,6 +60,28 @@ class BazaarControllerTests {
         makeMe.aBazaarNode(topNote).please(bazaarRepository);
         assertEquals("bazaar", controller.bazaar(model));
         assertThat((List<Note>) model.getAttribute("notes"), hasSize(equalTo(1)));
+    }
+
+    @Nested
+    class ShareMyNote {
+        @Test
+        void shareMyNote() throws NoAccessRightException {
+            long oldCount = bazaarRepository.count();
+            RedirectView rv = controller.shareNote(topNote.getId(), model);
+            assertEquals("/notes", rv.getUrl());
+            assertThat(bazaarRepository.count(), equalTo(oldCount + 1));
+        }
+
+        @Test
+        void shouldNotBeAbleToShareNoteThatBelongsToOtherUser() {
+            User anotherUser = makeMe.aUser().please(userRepository);
+            Note note = makeMe.aNote().forUser(anotherUser).please(noteRepository);
+            Integer noteId = note.getId();
+            assertThrows(NoAccessRightException.class, ()->
+                    controller.shareNote(noteId, model)
+            );
+        }
+
     }
 
 }

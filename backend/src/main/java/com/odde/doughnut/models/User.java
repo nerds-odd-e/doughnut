@@ -1,6 +1,7 @@
 package com.odde.doughnut.models;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.odde.doughnut.controllers.NoAccessRightException;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Where;
@@ -54,5 +55,11 @@ public class User {
 
     public boolean owns(Note note) {
         return note.getUser().id == id;
+    }
+
+    public void checkAuthorization(Note note) throws NoAccessRightException {
+        if (! owns(note)) {
+            throw new NoAccessRightException();
+        }
     }
 }
