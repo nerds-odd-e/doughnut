@@ -2,7 +2,7 @@
 <layout th:replace="fragments/basic_layout :: application_layout(~{ :: .content})">
 
     <div class="container content">
-        <h2 class="display-2">Here are your notes!</h2>
+        <h2 class="display-2">Adding new note</h2>
 
         <form action="#" th:action="@{/note}" th:object="${note}" method="post">
             <input data-cy="note-parent-id" th:field="*{parentNote}" type="hidden" />
@@ -12,7 +12,7 @@
             </p>
             <p>
                 <label for="note-description">Description:</label>
-                <input data-cy="note-description" id="note-description" th:field="*{description}" />
+                <textarea data-cy="note-description" id="note-description" th:field="*{description}" />
             </p>
             <p>
                 <label for="note-picture">Picture:</label>

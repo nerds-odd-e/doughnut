@@ -46,3 +46,13 @@ Feature: Note maintenance
             | note-title      |
             | Re-quirement    |
             | Re-Design       |
+
+        @ignore
+    Scenario: Delete a note
+        Given there are some notes for the current user
+            | title           | description          |
+            | LeSS in Action  | An awesome training  |
+        And I create note belonging to "LeSS in Action":
+            | note-title      | note-description                     |
+        When I delete top level note "LeSS in Action"
+        Then I should have no note left
