@@ -1,7 +1,8 @@
-<div th:fragment="cards(notes, button)">
+<div th:fragment="cards(notes, button, cardHeader)">
     <div class="row">
         <div class="card col-3 mr-2" style="width: 18rem;"  th:each="note:${notes}">
             <div class="card-body">
+                <div th:replace="${cardHeader}"/>
                 <h5 class="card-title">
                     <a th:href="'/notes/' + ${note.id}" th:text="${note.title}"/>
                 </h5>
@@ -12,7 +13,8 @@
 </div>
 
 <div th:fragment="noteViewCards(notes)">
-    <div th:replace="fragments/note_layout :: cards(${notes}, ~{ :: .card-button})">
+    <div th:replace="fragments/note_layout :: cards(${notes}, ~{ :: .card-button},  ~{ :: .card-header})">
+        <span class="card-header"><a class="delete-card"><span class="glyphicon glyphicon-trash">X</span></a></span>
         <a href="#" class="btn btn-primary card-button" th:href="'/link/' + ${note.id}">Link Note</a>
     </div>
 </div>

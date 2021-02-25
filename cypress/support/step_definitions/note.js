@@ -32,14 +32,17 @@ When("I create note belonging to {string}:", (noteTitle, data) => {
   cy.createNotes(data.hashes());
 });
 
+When("I delete top level note {string}", (noteTitle) => {
+  cy.visit("/notes");
+  cy.findByText(noteTitle).parent().parent().find(".delete-card").click();
+});
+
+
 When("I create a sibling note of {string}:", (noteTitle, data) => {
   cy.findByText(noteTitle);
   cy.findByText("Add Sibling Note").click();
   cy.createNotes(data.hashes());
 });
-
-
-
 
 Then("I should see {string} in note title", (noteTitle) => {
     cy.findByText(noteTitle);

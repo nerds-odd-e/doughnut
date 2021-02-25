@@ -47,12 +47,10 @@ Feature: Note maintenance
             | Re-quirement    |
             | Re-Design       |
 
-        @ignore
+      @ignore
     Scenario: Delete a note
         Given there are some notes for the current user
             | title           | description          |
             | LeSS in Action  | An awesome training  |
-        And I create note belonging to "LeSS in Action":
-            | note-title      | note-description                     |
         When I delete top level note "LeSS in Action"
-        Then I should have no note left
+        Then I should not see note "LeSS in Action" at the top level of all my notes
