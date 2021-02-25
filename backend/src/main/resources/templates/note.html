@@ -4,7 +4,7 @@
         <h2 th:text="${note.title}"/>
         <p th:text="${note.description}"/>
         <p th:if="${note.picture}">
-            <img th:src="'https://storage.googleapis.com/dough-01/notes_images/'+${note.picture}"/>
+            <img th:src="${note.picture}"/>
         </p>
         <ul>
             <li> <a class="nav-link" th:if="${note.parentNote}" th:href="'/new_note/' + ${note.parentNote.id}">Add Sibling Note</a> </li>
