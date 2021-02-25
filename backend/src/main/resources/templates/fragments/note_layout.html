@@ -15,9 +15,12 @@
 <div th:fragment="noteViewCards(notes)">
     <div th:replace="fragments/note_layout :: cards(${notes}, ~{ :: .card-button},  ~{ :: .card-header})">
         <span class="card-header">
-            <form th:action="'/delete_note/'+${note.id}" th:method="delete" onsubmit="return confirm('Are you sure?')">
+            <form th:action="'/share_note/'+${note.id}" th:method="post" onsubmit="return confirm('Are you sure to share?')">
+              <button class="share-card" title="Share node to bazaar">^</button>
+            </form>
+            <form th:action="'/delete_note/'+${note.id}" th:method="delete" onsubmit="return confirm('Are you sure to delete?')">
               <input type="hidden" name="_method" value="delete"/>
-              <button class="delete-card">X</button>
+              <button class="delete-card" title="delete note">X</button>
             </form>
         </span>
         <a href="#" class="btn btn-primary card-button" th:href="'/link/' + ${note.id}">Link Note</a>
