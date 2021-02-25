@@ -37,6 +37,12 @@ public class NoteController {
         return "my_notes";
     }
 
+    @GetMapping("/bazaar")
+    public String bazaar(Model model) {
+        model.addAttribute("notes", currentUser.getUser().getOrphanedNotes());
+        return "my_notes";
+    }
+
     @GetMapping("/notes/{id}")
     public String note(@PathVariable(name = "id") Integer noteId, Model model) {
         Note note = noteRepository.findById(noteId).get();
