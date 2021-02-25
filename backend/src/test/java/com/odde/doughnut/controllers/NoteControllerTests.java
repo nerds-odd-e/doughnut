@@ -36,7 +36,6 @@ class NoteControllerTests {
     private User user;
     private Note parentNote;
     private Note childNote;
-    private NoteRestController noteController;
     ExtendedModelMap model = new ExtendedModelMap();
     NoteController controller;
 
@@ -57,18 +56,18 @@ class NoteControllerTests {
     @Test
     void shouldUseTheRigthTemplateForCreatingNote() {
         assertEquals("new_note", controller.newNote(null, model));
-        assertThat(((Note)model.getAttribute("note")).getParentNote(), is(nullValue()));
+        assertThat(((Note) model.getAttribute("note")).getParentNote(), is(nullValue()));
     }
 
     @Test
     void shouldGetTheParentNoteIfIdProvided() {
         controller.newNote(parentNote.getId(), model);
-        assertThat(((Note)model.getAttribute("note")).getParentNote(), equalTo(parentNote));
+        assertThat(((Note) model.getAttribute("note")).getParentNote(), equalTo(parentNote));
     }
 
     @Test
     void shouldReturnAllParentlessNotesForMyNotes() {
-        assertEquals("my_notes", controller.myNotes( model));
+        assertEquals("my_notes", controller.myNotes(model));
         assertThat(model.getAttribute("note"), is(nullValue()));
         assertThat((List<Note>) model.getAttribute("notes"), hasSize(equalTo(1)));
         assertThat((List<Note>) model.getAttribute("notes"), contains(parentNote));
@@ -81,13 +80,5 @@ class NoteControllerTests {
         assertThat((List<Note>) model.getAttribute("notes"), hasSize(equalTo(1)));
         assertThat(((List<Note>) model.getAttribute("notes")), contains(childNote));
     }
-
-    @Nested
-    class BazaarTest {
-        @Test
-        void whenThereIsNoSharedNote() {
-            assertEquals("bazaar", controller.bazaar(model));
-            assertThat((List<Note>) model.getAttribute("notes"), hasSize(equalTo(1)));
-        }
-    }
 }
+

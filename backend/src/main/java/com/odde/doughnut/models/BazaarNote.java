@@ -6,12 +6,12 @@ import lombok.Setter;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "link")
+@Table(name = "bazaar_note")
 public class BazaarNote {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) private Integer id;
 
     @ManyToOne
-    @JoinColumn(name = "note", referencedColumnName = "id")
+    @JoinColumn(name = "note_id", referencedColumnName = "id")
     @Getter @Setter private Note note;
 }
