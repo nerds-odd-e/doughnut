@@ -31,6 +31,11 @@ public class NoteBuilder {
         return this;
     }
 
+    public NoteBuilder linkTo(Note referTo) {
+        note.linkToNote(referTo);
+        return this;
+    }
+
     public NoteBuilder updatedAt(Date updatedDatetime) {
         note.setUpdatedDatetime(updatedDatetime);
         return this;

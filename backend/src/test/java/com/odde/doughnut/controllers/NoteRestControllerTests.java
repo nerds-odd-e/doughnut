@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.models.Note;
 import com.odde.doughnut.models.User;
+import com.odde.doughnut.repositories.LinkRepository;
 import com.odde.doughnut.repositories.NoteRepository;
 import com.odde.doughnut.repositories.UserRepository;
 import com.odde.doughnut.testability.DBCleaner;
@@ -19,8 +20,7 @@ import javax.persistence.EntityManager;
 import javax.transaction.Transactional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
@@ -74,6 +74,7 @@ public class NoteRestControllerTests {
 
     @Nested
     class DeleteNoteTest {
+        @Autowired private LinkRepository linkRepository;
 
         @Test
         void shouldDeleteTheNoteButNotTheUser() {
@@ -91,18 +92,25 @@ public class NoteRestControllerTests {
             Note subject = makeMe.aNote().under(parent).forUser(user).please(noteRepository);
             Note sibling = makeMe.aNote().under(parent).forUser(user).please(noteRepository);
             Note child = makeMe.aNote().under(subject).forUser(user).please(noteRepository);
-            assertThat(subject.getChildren(), contains(child));
-            Integer siblingId = sibling.getId();
-            Integer childId = child.getId();
 
             noteController.deleteNote(subject.getId());
 
-            assertTrue(noteRepository.findById(siblingId).isPresent());
-            assertFalse(noteRepository.findById(childId).isPresent());
+            assertTrue(noteRepository.findById(sibling.getId()).isPresent());
+            assertFalse(noteRepository.findById(child.getId()).isPresent());
         }
 
+        @Test
+        void shouldDeleteTheLinkToAndFromThisNote() {
+            Note referTo = makeMe.aNote().forUser(user).please(noteRepository);
+            Note subject = makeMe.aNote().forUser(user).linkTo(referTo).please(noteRepository);
+            Note referFrom = makeMe.aNote().forUser(user).linkTo(subject).linkTo(referTo).please(noteRepository);
+            long oldCount = linkRepository.count();
 
+            noteController.deleteNote(subject.getId());
 
+            assertThat(makeMe.refresh(entityManager, referFrom).getId(), is(not(nullValue())));
+            assertThat(makeMe.refresh(entityManager, referTo).getId(), is(not(nullValue())));
+            assertThat(linkRepository.count(), equalTo(oldCount - 2));
+        }
     }
-
 }

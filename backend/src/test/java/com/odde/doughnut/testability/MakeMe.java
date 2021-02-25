@@ -17,7 +17,8 @@ public class MakeMe {
         return new NoteBuilder(this);
     }
 
-    public void refresh(EntityManager entityManager, Object object) {
+    public <T> T refresh(EntityManager entityManager, T object) {
         entityManager.refresh(object);
+        return object;
     }
 }
