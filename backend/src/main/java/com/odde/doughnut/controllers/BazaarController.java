@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.view.RedirectView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -30,7 +31,10 @@ public class BazaarController {
 
     @GetMapping("/bazaar")
     public String bazaar(Model model) {
-        model.addAttribute("notes", bazaarRepository.findAll());
+        Iterable<BazaarNote> all = bazaarRepository.findAll();
+        List<Note> notes = new ArrayList<>();
+        all.forEach(bn->notes.add(bn.getNote()));
+        model.addAttribute("notes", notes);
         return "bazaar";
     }
 
