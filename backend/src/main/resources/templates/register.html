@@ -3,7 +3,10 @@
     <div class="container content">
         <h2>Welcome, new user. Please create your profile</h2>
         <form action="#" th:action="@{/users}" th:object="${user}" method="post">
-            <p>Name: <input type="text" id="name" th:field="*{name}"/></p>
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" class="form-control" id="name" th:field="*{name}" placeholder="Nickname"/>
+            </div>
             <p><input type="submit" value="Submit"/></p>
         </form>
     </div>

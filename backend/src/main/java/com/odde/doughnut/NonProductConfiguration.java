@@ -27,6 +27,10 @@ public class NonProductConfiguration extends WebSecurityConfigurerAdapter {
                 .password(encoder.encode("password"))
                 .roles("USER")
                 .and()
+                .withUser("manual")
+                .password(encoder.encode("password"))
+                .roles("USER")
+                .and()
                 .withUser("admin")
                 .password(encoder.encode("admin"))
                 .roles("USER", "ADMIN");
