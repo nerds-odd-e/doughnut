@@ -1,10 +1,14 @@
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
 <layout th:replace="fragments/before_login_layout :: application_before_login_layout(~{ :: .content})">
-    <div class="jumbotron jumbotron-fluid content">
-        <div class="container">
-            <h1 class="display-4">Welcome to Doughnut!!!</h1>
-            <h3 th:text="|Serving ${totalNotes} notes since the beginning of the universe.|"/>
-            <p>Please <a href="/oauth2/authorization/github">login with Github</a>.</p>
+    <div class="content">
+        <div class="jumbotron jumbotron-fluid">
+            <div class="container">
+                <h1 class="display-4">Welcome to Doughnut!!!</h1>
+                <p>Please <a href="/oauth2/authorization/github">login with Github</a>.</p>
+            </div>
+        </div>
+        <div class="footer-copyright text-center py-3">
+            <p th:text="|Serving ${totalNotes} notes since the beginning of the universe.|"/>
         </div>
     </div>
 </layout>
