@@ -1,5 +1,6 @@
-<div th:fragment="noteBreadcrumb(note)">
-    <p>Adding at the top level:</p>
+<div th:fragment="noteBreadcrumb(untilNote)">
+    <p th:if="${untilNote == null}">Adding at the top level:</p>
+    <p th:text="${untilNote.title}" th:if="${untilNote != null}"/>
 </div>
 
 <div th:fragment="cards(notes, button, cardHeader)">
