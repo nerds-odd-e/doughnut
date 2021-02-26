@@ -33,16 +33,17 @@ class IndexControllerTests {
   @BeforeEach
   void setupController() {
     makeMe = new MakeMe();
-    controller = new IndexController(noteRepository, userRepository);
   }
 
   @Test
   void visitWithNoUserSession() {
+    controller = new IndexController(noteRepository, userRepository, new TestCurrentUser(null));
     assertEquals("ask_to_login", controller.home(null, model));
   }
 
   @Test
   void visitWithUserSessionButNoSuchARegisteredUserYet() {
+    controller = new IndexController(noteRepository, userRepository, new TestCurrentUser(null));
     Principal principal = (UserPrincipal) () -> "1234567";
     assertEquals("register", controller.home(principal, model));
   }
@@ -51,6 +52,7 @@ class IndexControllerTests {
   void visitWithUserSessionAndTheUserExists() {
     User user = makeMe.aUser().please(userRepository);
     Principal principal = (UserPrincipal) user::getExternalIdentifier;
+    controller = new IndexController(noteRepository, userRepository, new TestCurrentUser(user));
     assertEquals("index", controller.home(principal, model));
   }
 }

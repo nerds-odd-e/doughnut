@@ -1,9 +1,7 @@
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
 <layout th:replace="fragments/basic_layout :: application_layout(~{ :: .content})">
     <div class="container content">
-        <h2 th:text="'Welcome ' + ${currentUser.getName()} + '!'"/>
-        <p>And here's what we know about you...</p>
-        <samp th:text="${user_details}"/>
+        <h2 th:text="'Welcome ' + ${currentUser.getUser().getName()} + '!'"/>
     </div>
 </layout>
 

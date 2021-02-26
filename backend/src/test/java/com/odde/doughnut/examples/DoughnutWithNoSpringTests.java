@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
 import com.odde.doughnut.controllers.IndexController;
+import com.odde.doughnut.controllers.TestCurrentUser;
 import com.odde.doughnut.repositories.NoteRepository;
 import com.odde.doughnut.repositories.UserRepository;
 import com.odde.doughnut.testability.DBCleaner;
@@ -24,7 +25,7 @@ class DoughnutWithNoSpringTests {
 
   @Test
   void contextLoads() {
-    IndexController controller = new IndexController(noteRepository, userRepository);
+    IndexController controller = new IndexController(noteRepository, userRepository, new TestCurrentUser(null));
     Model model = mock(Model.class);
 
     String home = controller.home(null, model);

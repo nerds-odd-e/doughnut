@@ -35,3 +35,8 @@ When("I save my profile with:", (data) => {
 Then("I should see {string} in the page", (content) => {
   cy.get("body").should("contain", content);
 });
+
+Then("My name {string} is in the top bar", (name) => {
+  cy.get("nav").should("contain", name);
+});
+

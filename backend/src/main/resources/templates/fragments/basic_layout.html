@@ -22,6 +22,7 @@
                         <a class="nav-link" href="/bazaar">Bazaar</a>
                     </li>
                 </ul>
+                <span th:text='${currentUser.getUser().getName()}' th:unless="${currentUser == null}"></span>
                 <form class="form-inline my-2 my-lg-0" th:action="@{/logout}" method="post">
                     <input class= "btn btn-outline-success my-2 my-sm-0" type= "submit" value="Logout">
                 </form>
