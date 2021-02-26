@@ -1,11 +1,11 @@
-<div class="row" th:fragment="mainFeatures()">
+<div class="row" th:fragment="mainFeatures(notesButton, reviewButton)">
     <div class="col-sm-6">
         <div class="card text-white bg-success mb-3">
             <div class="card-header">Notes</div>
             <div class="card-body">
                 <p class="card-text">Browse and manage your notes. You can add, reorg and build links between your
                     notes. </p>
-                <a class="btn btn-light" href="/notes"> Go To My Notes </a>
+                <a th:replace="${notesButton}"> Go To My Notes </a>
             </div>
         </div>
     </div>
@@ -15,7 +15,7 @@
             <div class="card-body">
                 <p class="card-text">Review your notes before you are about to forget. Test your memory and update your
                     notes with new realizations. </p>
-                <a class="btn btn-light" href="/review"> Start Review </a>
+                <a th:replace="${reviewButton}"> Go To Review </a>
             </div>
         </div>
     </div>
@@ -25,7 +25,7 @@
             <div class="card-body">
                 <p class="card-text">Look at the notes shared by other people. Search for interesting content to
                     learn. </p>
-                <a class="btn btn-light" href="/notes"> Visit The Bazaar </a>
+                <a class="btn btn-light" href="/bazaar"> Visit The Bazaar </a>
             </div>
         </div>
     </div>
