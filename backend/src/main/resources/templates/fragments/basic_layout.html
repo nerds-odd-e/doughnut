@@ -4,28 +4,37 @@
 <head th:fragment="head">
     <meta charset="UTF-8">
     <title>Title</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link th:rel="stylesheet" th:href=
     "@{/webjars/bootstrap/4.6.0/css/bootstrap.min.css}">
 </head>
 <body onload="javascript:populateAllNotesForReview()">
     <div th:fragment="header">
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-            <a class="navbar-brand" href="/#">Doughnut</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <a class="navbar-brand" href="/#">
+                <img src="https://www.odd-e.com/img/odd-e.png" width="30" height="30" class="d-inline-block align-top" alt="">
+                Doughnut
+            </a>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav mr-auto">
                     <li class="nav-item active">
                         <a class="nav-link" href="/review">Review</a>
                     </li>
-                    <li class="nav-item active">
+                    <li class="nav-item active ">
                         <a class="nav-link" href="/notes">My Notes</a>
                     </li>
                     <li class="nav-item active">
                         <a class="nav-link" href="/bazaar">Bazaar</a>
                     </li>
                 </ul>
-                <span th:text='${currentUser.getUser().getName()}' th:unless="${currentUser == null}"></span>
+                <span class="navbar-text" th:text='${currentUser.getUser().getName()}' th:unless="${currentUser == null}"></span>
                 <form class="form-inline my-2 my-lg-0" th:action="@{/logout}" method="post">
                     <input class= "btn btn-outline-success my-2 my-sm-0" type= "submit" value="Logout">
                 </form>
+            </div>
         </nav>
     </div>
     <div th:replace="${content}"></div>
