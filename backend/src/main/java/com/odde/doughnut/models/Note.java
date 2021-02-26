@@ -54,10 +54,6 @@ public class Note {
       note.setParentNote(this);
       getChildren().add(note);
   }
-
-  public List<Note> getAncestors() {
-    return new ArrayList<>();
-  }
 }
 
 

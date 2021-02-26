@@ -1,7 +1,7 @@
-package com.odde.doughnut.models;
+package com.odde.doughnut.services;
 
+import com.odde.doughnut.models.Note;
 import com.odde.doughnut.repositories.NoteRepository;
-import com.odde.doughnut.repositories.UserRepository;
 import com.odde.doughnut.testability.DBCleaner;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +24,7 @@ import static org.hamcrest.Matchers.*;
 @ExtendWith(DBCleaner.class)
 @Transactional
 
-public class NoteTest {
+public class NoteServiceTest {
     @Autowired private NoteRepository noteRepository;
     @Autowired EntityManager entityManager;
 
@@ -38,15 +38,31 @@ public class NoteTest {
 
     @Nested
     class GetAncestors {
+        Note topLevel;
+
         @BeforeEach
         void setup() {
+            topLevel = makeMe.aNote().please(noteRepository);
         }
+
         @Test
         void topLevelNoteHaveEmptyAncestors() {
-            Note topLevel = makeMe.aNote().please(noteRepository);
-            List<Note> ancestors = topLevel.getAncestors();
-            assertThat(ancestors, is(empty()));
+            NoteService noteService = new NoteService(noteRepository, topLevel);
+            List<Note> ancestors = noteService.getAncestors();
+            assertThat(ancestors, contains(topLevel));
         }
+
+        @Test
+        void childHasParentInAncestors() {
+            Note subject = makeMe.aNote().under(topLevel).please(noteRepository);
+            Note sibling = makeMe.aNote().under(topLevel).please(noteRepository);
+
+            NoteService noteService = new NoteService(noteRepository, subject);
+            List<Note> ancestry = noteService.getAncestors();
+            assertThat(ancestry, contains(topLevel, subject));
+            assertThat(ancestry, not(contains(sibling)));
+        }
+
     }
 
 }

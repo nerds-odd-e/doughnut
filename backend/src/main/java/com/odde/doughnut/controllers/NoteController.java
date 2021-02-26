@@ -3,6 +3,7 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.models.Note;
 import com.odde.doughnut.repositories.NoteRepository;
+import com.odde.doughnut.services.NoteService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,9 +24,12 @@ public class NoteController {
 
     @GetMapping({"/new_note", "/new_note/{parent_id}"})
     public String newNote(@PathVariable(name = "parent_id", required = false) Integer parentId, Model model) {
+        model.addAttribute("parent", null);
         Note note = new Note();
         if (parentId != null) {
-           note.setParentNote(noteRepository.findById(parentId).get());
+            Note parentNote = noteRepository.findById(parentId).get();
+            note.setParentNote(parentNote);
+            model.addAttribute("parent", new NoteService(noteRepository, parentNote));
         }
         model.addAttribute("note", note);
         return "new_note";
