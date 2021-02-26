@@ -1,6 +1,10 @@
+<a th:fragment="noteTitleWithLink(note)" th:href="'/notes/' + ${note.id}" th:text="${note.title}"/>
+
 <div th:fragment="noteBreadcrumb(untilNote)">
     <p th:if="${untilNote == null}">Adding at the top level:</p>
-    <p th:text="${untilNote.title}" th:if="${untilNote != null}"/>
+    <ol class="breadcrumb" th:if="${untilNote != null}">
+        <li class="breadcrumb-item" th:each="note:${untilNote.ancestors}" th:insert=":: noteTitleWithLink(${note})"/>
+    </ol>
 </div>
 
 <div th:fragment="cards(notes, button, cardHeader)">
@@ -8,9 +12,7 @@
         <div class="card col-3 mr-2" style="width: 18rem;" th:each="note:${notes}">
             <div class="card-body">
                 <div th:replace="${cardHeader}"/>
-                <h5 class="card-title">
-                    <a th:href="'/notes/' + ${note.id}" th:text="${note.title}"/>
-                </h5>
+                <h5 th:insert=":: noteTitleWithLink(${note})" class="card-title"/>
                 <div th:replace="${button}">Put your button here</div>
             </div>
         </div>

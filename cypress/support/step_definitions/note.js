@@ -21,9 +21,21 @@ When("I create note belonging to {string}:", (noteTitle, data) => {
   cy.visit("/notes");
   cy.findByText(noteTitle).click();
   cy.findByText("Add Child Note").click();
-  cy.findByText(noteTitle );
   cy.createNotes(data.hashes());
 });
+
+
+When("I am creating note under {string}", (noteTitles, data) => {
+  cy.visit("/notes");
+  noteTitles.split(" > ").forEach(noteTitle => cy.findByText(noteTitle).click());
+  cy.findByText("Add Child Note").click();
+});
+
+When("I should see {string} in breadcrumb", (noteTitles, data) => {
+  noteTitles.split(", ").forEach(noteTitle => cy.findByText(noteTitle));
+});
+
+
 
 Then("I should see these notes belonging to the user at the top level of all my notes", (data) => {
     cy.visit("/notes");

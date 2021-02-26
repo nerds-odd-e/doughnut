@@ -3,7 +3,7 @@
 
     <div class="container content">
         <h2>Adding new note</h2>
-        <div th:replace="fragments/note_layout :: noteBreadcrumb(${note.parentNote})"/>
+        <div th:replace="fragments/note_layout :: noteBreadcrumb(${parent})"/>
 
         <form action="#" th:action="@{/note}" th:object="${note}" method="post">
             <input data-cy="note-parent-id" th:field="*{parentNote}" type="hidden" />

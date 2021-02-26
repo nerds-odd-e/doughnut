@@ -30,6 +30,8 @@ Feature: Note maintenance
         And I should see these notes belonging to the user
             | note-title      |
             | Re-quirement    |
+        When I am creating note under "LeSS in Action > Re-quirement"
+        Then I should see "LeSS in Action, Re-quirement" in breadcrumb
 
     Scenario: Create a new sibling note
         Given there are some notes for the current user

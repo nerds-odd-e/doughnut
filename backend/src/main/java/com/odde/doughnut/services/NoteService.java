@@ -17,4 +17,8 @@ public class NoteService {
     public List<Note> getAncestors() {
         return noteRepository.findAncestry(note.getId().longValue());
     }
+
+    public String getTitle() {
+        return note.getTitle();
+    }
 }
