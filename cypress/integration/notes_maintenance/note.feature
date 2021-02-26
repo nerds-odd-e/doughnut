@@ -6,10 +6,10 @@ Feature: Note maintenance
         Given I've logged in as an existing user
 
     Scenario: Create a new note
-        When I create note with:
+        When I create top level note with:
             | note-title      | note-description  |
             | Sedation        | Put to sleep      |
-        And I create note with:
+        And I create top level note with:
             | note-title      | note-description  | note-picture |
             | Sedition        | Incite violence   | a_slide.jpg  |
         Then I should see these notes belonging to the user at the top level of all my notes

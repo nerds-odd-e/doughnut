@@ -10,9 +10,10 @@ Given("there are some notes for the current user", (data) => {
   cy.seedNotes(data.hashes());
 })
 
-When("I create note with:", (data) => {
+When("I create top level note with:", (data) => {
   cy.visit("/notes");
   cy.findByText("Add Top Level Note").click();
+  cy.findByText("Adding at the top level:");
   cy.createNotes(data.hashes());
 });
 

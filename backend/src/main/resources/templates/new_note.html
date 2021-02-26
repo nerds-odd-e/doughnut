@@ -2,7 +2,8 @@
 <layout th:replace="fragments/basic_layout :: application_layout(~{ :: .content})">
 
     <div class="container content">
-        <h2 class="display-2">Adding new note</h2>
+        <h2>Adding new note</h2>
+        <div th:replace="fragments/note_layout :: noteBreadcrumb(${note})"/>
 
         <form action="#" th:action="@{/note}" th:object="${note}" method="post">
             <input data-cy="note-parent-id" th:field="*{parentNote}" type="hidden" />
