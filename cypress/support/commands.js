@@ -78,5 +78,8 @@ Cypress.Commands.add("expectExactLinkTargets", (targets) => {
          cy.findByText(elem, {selector: '.card-title a'}).should("be.visible");
     });
     cy.findAllByText(/.*/, {selector: '.card-title a'}).should("have.length", targets.length);
-})
+});
 
+Cypress.Commands.add("findNoteCardButton", (noteTitle, selector) => {
+  return cy.findByText(noteTitle).parent().parent().parent().find(selector);
+});

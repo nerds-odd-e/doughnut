@@ -48,7 +48,7 @@ Then("I should see these notes belonging to the user", (data) => {
 
 When("I delete top level note {string}", (noteTitle) => {
   cy.visit("/notes");
-  cy.findByText(noteTitle).parent().parent().find(".delete-card").click();
+  cy.findNoteCardButton(noteTitle, ".delete-card").click();
 });
 
 

@@ -8,7 +8,7 @@ import {
 
 Given("I choose to share my note {string}", (noteTitle) => {
   cy.visit("/notes");
-  cy.findByText(noteTitle).parent().parent().find(".share-card").click();
+  cy.findNoteCardButton(noteTitle, ".share-card").click();
 })
 
 Then("I should see {string} is shared in the Bazaar", (noteTitle) => {

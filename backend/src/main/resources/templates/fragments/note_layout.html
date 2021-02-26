@@ -9,11 +9,13 @@
 
 <div th:fragment="cards(notes, button, cardHeader)">
     <div class="row">
-        <div class="card col-3 mr-2" style="width: 18rem;" th:each="note:${notes}">
-            <div class="card-body">
+        <div class="col-3 mr-2" th:each="note:${notes}">
+            <div class="card">
                 <div th:replace="${cardHeader}"/>
-                <h5 th:insert=":: noteTitleWithLink(${note})" class="card-title"/>
-                <div th:replace="${button}">Put your button here</div>
+                <div class="card-body">
+                    <h5 th:insert=":: noteTitleWithLink(${note})" class="card-title"/>
+                    <div th:replace="${button}">Put your button here</div>
+                </div>
             </div>
         </div>
     </div>
@@ -21,14 +23,22 @@
 
 <div th:fragment="noteViewCards(notes)">
     <div th:replace="fragments/note_layout :: cards(${notes}, ~{ :: .card-button},  ~{ :: .card-header})">
-        <span class="card-header">
-            <form th:action="'/share_note/'+${note.id}" th:method="post" onsubmit="return confirm('Are you sure to share?')">
-              <button class="share-card" title="Share node to bazaar">^</button>
+        <span class="card-header d-flex flex-row-reverse p-0">
+            <div class="btn-group btn-group-sm pull-right">
+            <form th:action="'/share_note/'+${note.id}" th:method="post"
+                  onsubmit="return confirm('Are you sure to share?')">
+              <button class="btn btn-sm share-card" title="Share node to bazaar">
+                <svg th:replace="fragments/svgs :: bazaarShare"/>
+              </button>
             </form>
-            <form th:action="'/delete_note/'+${note.id}" th:method="delete" onsubmit="return confirm('Are you sure to delete?')">
+            <form th:action="'/delete_note/'+${note.id}" th:method="delete"
+                  onsubmit="return confirm('Are you sure to delete?')">
               <input type="hidden" name="_method" value="delete"/>
-              <button class="delete-card" title="delete note">X</button>
+              <button class="btn btn-sm delete-card" title="delete note">
+                <svg th:replace="fragments/svgs :: remove"/>
+              </button>
             </form>
+            </div>
         </span>
         <a href="#" class="btn btn-primary card-button" th:href="'/link/' + ${note.id}">Link Note</a>
     </div>
