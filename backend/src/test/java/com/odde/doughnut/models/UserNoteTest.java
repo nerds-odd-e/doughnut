@@ -1,6 +1,5 @@
 package com.odde.doughnut.models;
 
-import com.odde.doughnut.repositories.NoteRepository;
 import com.odde.doughnut.repositories.UserRepository;
 import com.odde.doughnut.testability.DBCleaner;
 import com.odde.doughnut.testability.MakeMe;
@@ -13,7 +12,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -24,29 +22,37 @@ import static org.hamcrest.Matchers.*;
 @ExtendWith(DBCleaner.class)
 @Transactional
 
-public class NoteTest {
-    @Autowired private NoteRepository noteRepository;
-    @Autowired EntityManager entityManager;
-
+public class UserNoteTest {
+    @Autowired private UserRepository userRepository;
 
     MakeMe makeMe;
+    User user;
 
     @BeforeEach
     void setup() {
         makeMe = new MakeMe();
+        user = makeMe.aUser().with2Notes().please(userRepository);
     }
 
-    @Nested
-    class GetAncestors {
-        @BeforeEach
-        void setup() {
-        }
-        @Test
-        void topLevelNoteHaveEmptyAncestors() {
-            Note topLevel = makeMe.aNote().please(noteRepository);
-            List<Note> ancestors = topLevel.getAncestors();
-            assertThat(ancestors, is(empty()));
-        }
+    @Test
+    void thereShouldBe2NodesForUser() {
+        List<Note> notes = user.getNotes();
+        assertThat(notes, hasSize(equalTo(2)));
     }
 
+    @Test
+    void targetIsEmptyByDefault() {
+        Note note = user.getNotes().get(0);
+        assertThat(note.getTargetNotes(), is(empty()));
+    }
+
+    @Test
+    void targetOfLinkedNotes() {
+        Note note = user.getNotes().get(0);
+        Note targetNote = user.getNotes().get(1);
+        note.linkToNote(targetNote);
+        List<Note> targetNotes = note.getTargetNotes();
+        assertThat(targetNotes, hasSize(equalTo(1)));
+        assertThat(targetNotes, contains(targetNote));
+    }
 }

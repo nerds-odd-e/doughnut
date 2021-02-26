@@ -5,6 +5,7 @@ import com.odde.doughnut.repositories.UserRepository;
 import com.odde.doughnut.testability.DBCleaner;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,4 +64,5 @@ public class UserTest {
 
         assertEquals(note2.getTitle(), user.getNotesInDescendingOrder().get(0).getTitle());
     }
+
 }
