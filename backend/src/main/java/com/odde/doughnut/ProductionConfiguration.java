@@ -23,7 +23,6 @@ public class ProductionConfiguration extends WebSecurityConfigurerAdapter {
                 .permitAll();
 
         commonConfiguration.commonConfig(http)
-                .exceptionHandling(e -> e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
                 .oauth2Login();
     }
 
