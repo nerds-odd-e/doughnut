@@ -1,6 +1,6 @@
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
 <layout th:replace="fragments/basic_layout :: application_layout(~{ :: .content})">
-    <div class="p-5 content">
+    <div class="container content">
         <h2>Welcome To The Bazaar</h2>
         <p>These are shared notes from doughnut users.</p>
         <div th:replace="fragments/note_fragments :: noteViewCards(${notes})"/>
