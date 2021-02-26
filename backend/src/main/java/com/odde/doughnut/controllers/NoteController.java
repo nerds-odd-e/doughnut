@@ -24,14 +24,13 @@ public class NoteController {
 
     @GetMapping({"/new_note", "/new_note/{parent_id}"})
     public String newNote(@PathVariable(name = "parent_id", required = false) Integer parentId, Model model) {
-        model.addAttribute("parent", null);
         Note note = new Note();
         if (parentId != null) {
             Note parentNote = noteRepository.findById(parentId).get();
             note.setParentNote(parentNote);
-            model.addAttribute("parent", new NoteService(noteRepository, parentNote));
         }
         model.addAttribute("note", note);
+        model.addAttribute("parent", new NoteService(noteRepository, note.getParentNote()));
         return "new_note";
     }
 
@@ -46,6 +45,7 @@ public class NoteController {
         Note note = noteRepository.findById(noteId).get();
         model.addAttribute("note", note);
         model.addAttribute("notes", note.getChildren());
+        model.addAttribute("parent", new NoteService(noteRepository, note.getParentNote()));
         return "note";
     }
 

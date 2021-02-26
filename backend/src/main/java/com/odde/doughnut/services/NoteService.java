@@ -3,6 +3,7 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.models.Note;
 import com.odde.doughnut.repositories.NoteRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class NoteService {
@@ -15,6 +16,9 @@ public class NoteService {
     }
 
     public List<Note> getAncestors() {
+        if (note == null) {
+            return new ArrayList<>();
+        }
         return noteRepository.findAncestry(note.getId().longValue());
     }
 

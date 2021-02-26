@@ -1,16 +1,17 @@
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
 <layout th:replace="fragments/basic_layout :: application_layout(~{ :: .content})">
     <div class="p-5 content">
+        <div th:replace="fragments/note_fragments :: noteBreadcrumb(${parent}, ~{:: .additional-item})">
+            <li class="breadcrumb-item additional-item">
+                <a class="text-secondary" th:href="'/new_note/' + ${note.id}">(Add Child Note)</a>
+            </li>
+        </div>
+        <a class="nav-link" th:if="${note.parentNote}" th:href="'/new_note/' + ${note.parentNote.id}">Add Sibling Note</a>
         <h2 th:text="${note.title}"/>
         <p th:text="${note.description}"/>
         <p th:if="${note.picture}">
             <img th:src="${note.picture}"/>
         </p>
-        <ul>
-            <li> <a class="nav-link" th:if="${note.parentNote}" th:href="'/new_note/' + ${note.parentNote.id}">Add Sibling Note</a> </li>
-            <li> <a class="nav-link" th:href="'/new_note/' + ${note.id}">Add Child Note</a> </li>
-
-        </ul>
         <div th:replace="fragments/note_fragments :: noteViewCards(${notes})"/>
     </div>
 </layout>
