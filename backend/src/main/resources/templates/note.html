@@ -11,6 +11,6 @@
             <li> <a class="nav-link" th:href="'/new_note/' + ${note.id}">Add Child Note</a> </li>
 
         </ul>
-        <div th:replace="fragments/note_layout :: noteViewCards(${notes})"/>
+        <div th:replace="fragments/note_fragments :: noteViewCards(${notes})"/>
     </div>
 </layout>

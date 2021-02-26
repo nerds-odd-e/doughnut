@@ -62,7 +62,7 @@ Cypress.Commands.add("expectNotes", (data) => {
     });
 });
 
-Cypress.Commands.add("clickButtonOnCard", (noteTitle, buttonTitle) => {
+Cypress.Commands.add("clickButtonOnCardBody", (noteTitle, buttonTitle) => {
     const card = cy.findByText(noteTitle, { selector: ".card-title a"});
     const button = card.parent().parent().findByText(buttonTitle);
     button.click();
@@ -70,7 +70,7 @@ Cypress.Commands.add("clickButtonOnCard", (noteTitle, buttonTitle) => {
 
 Cypress.Commands.add("creatingLinkFor", (noteTitle) => {
     cy.visit("/notes");
-    cy.clickButtonOnCard(noteTitle, "Link Note");
+    cy.findNoteCardButton(noteTitle, ".link-card").click();
 });
 
 Cypress.Commands.add("expectExactLinkTargets", (targets) => {

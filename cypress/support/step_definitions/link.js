@@ -12,12 +12,12 @@ When("I am creating link for note {string}", (noteTitle) => {
 });
 
 When("I link to note {string}", (noteTitle) => {
-    cy.clickButtonOnCard(noteTitle, "Select");
+    cy.clickButtonOnCardBody(noteTitle, "Select");
 })
 
 When("I link note {string} to note {string}", (fromNoteTitle, toNoteTitle) => {
     cy.creatingLinkFor(fromNoteTitle);
-    cy.clickButtonOnCard(toNoteTitle, "Select");
+    cy.clickButtonOnCardBody(toNoteTitle, "Select");
 })
 
 And("I should see the source note as {string}",(noteTitle) => {

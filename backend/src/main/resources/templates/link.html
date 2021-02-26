@@ -14,7 +14,7 @@
             </div>
         </div>
 
-        <div th:replace="fragments/note_layout :: cards(${linkableNotes}, ~{ :: .card-button}, ~{ :: .card-header})">
+        <div th:replace="fragments/note_fragments :: cards(${linkableNotes}, ~{ :: .card-button}, ~{ :: .card-header})">
             <span class="card-header"></span>
             <form th:action="@{/linkNote}" method="post" class="card-button">
                 <input type="hidden" name="sourceNoteId" th:value="${sourceNote.id}"/>
