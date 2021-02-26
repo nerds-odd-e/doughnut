@@ -1,17 +1,25 @@
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
 <layout th:replace="fragments/basic_layout :: application_layout(~{ :: .content})">
-    <div class="p-5 content">
+    <div class="container content">
         <div th:replace="fragments/note_fragments :: noteBreadcrumb(${parent}, ~{:: .additional-item})">
+            <li class="breadcrumb-item additional-item" th:text="${note.title}"/>
             <li class="breadcrumb-item additional-item">
                 <a class="text-secondary" th:href="'/new_note/' + ${note.id}">(Add Child Note)</a>
             </li>
         </div>
-        <a class="nav-link" th:if="${note.parentNote}" th:href="'/new_note/' + ${note.parentNote.id}">Add Sibling Note</a>
-        <h2 th:text="${note.title}"/>
-        <p th:text="${note.description}"/>
-        <p th:if="${note.picture}">
-            <img th:src="${note.picture}"/>
-        </p>
+
+        <div th:if="${note.parentNote}">
+            <svg th:replace="fragments/svgs :: downRight"/>
+            <a th:if="${note.parentNote}" th:href="'/new_note/' + ${note.parentNote.id}">Add Sibling
+                Note</a>
+        </div>
+        <div class="jumbotron py-4">
+            <h2 class="display-4" th:text="${note.title}"/>
+            <p th:text="${note.description}"/>
+            <p class="text-center" th:if="${note.picture}">
+                <img class="img-fluid" th:src="${note.picture}"/>
+            </p>
+        </div>
         <div th:replace="fragments/note_fragments :: noteViewCards(${notes})"/>
     </div>
 </layout>
