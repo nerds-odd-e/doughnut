@@ -1,8 +1,26 @@
-<a th:fragment="noteTitleWithLink(note)" th:href="'/notes/' + ${note.id}" th:text="${note.title}"/>
+<div th:fragment="textInput(scopeName, field, placeholder)" th:replace=":: inputWithType(~{ :: .control}, ${scopeName}, ${field})">
+    <input
+            class="control"
+            th:class="'form-control' + ${#fields.hasErrors(field) ? ' is-invalid' : ''}"
+            th:id="${scopeName + '-' + field}"
+            th:field="*{__${field}__}"
+            th:placeholder="${placeholder}"
+    />
+</div>
 
-<div th:fragment="input(scopeName, field)" class="form-group">
+<div th:fragment="textarea(scopeName, field, placeholder)" th:replace=":: inputWithType(~{ :: .area-control}, ${scopeName}, ${field})">
+    <textarea
+            class="area-control"
+            th:class="'form-control' + ${#fields.hasErrors(field) ? ' is-invalid' : ''}"
+            th:id="${scopeName + '-' + field}"
+            th:field="*{__${field}__}"
+            th:placeholder="${placeholder}"
+    />
+</div>
+
+<div th:fragment="inputWithType(control, scopeName, field)" class="form-group">
     <label th:for="${scopeName + '-' + field}" th:text="${#strings.capitalize(field)}"/>
-    <input th:class="'form-control' + ${#fields.hasErrors(field) ? ' is-invalid' : ''}" th:id="${scopeName + '-' + field}" th:field="*{__${field}__}" />
+    <input th:replace="${control}"/>
     <div class="invalid-feedback" th:if="${#fields.hasErrors(field)}" th:errors="*{__${field}__}"/>
 </div>
 

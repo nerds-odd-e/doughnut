@@ -8,21 +8,11 @@
         </div>
 
         <form action="#" th:action="@{/note}" th:object="${note}" method="post">
-            <input data-cy="note-parent-id" th:field="*{parentNote}" type="hidden" />
+            <input data-cy="note-parent-id" th:field="*{parentNote}" type="hidden"/>
 
-            <div th:replace="fragments/forms :: input('note', 'title')"/>
-
-            <div class="form-group">
-                <label for="note-description">Description:</label>
-                <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}">description Error</span>
-                <textarea class="form-control" data-cy="note-description" id="note-description" th:field="*{description}" />
-            </p>
-            </div>
-            <div class="form-group">
-                <label for="note-picture">Picture:</label>
-                <span th:if="${#fields.hasErrors('picture')}" th:errors="*{picture}">picture Error</span>
-                <input class="form-control" data-cy="note-picture" id="note-picture" th:field="*{picture}" placeholder="Optional. We only accept full url for now."/>
-            </div>
+            <div th:replace="fragments/forms :: textInput('note', 'title', null)"/>
+            <div th:replace="fragments/forms :: textarea('note', 'description', null)"/>
+            <div th:replace="fragments/forms :: textInput('note', 'picture', 'Optional. We only accept full url for now.')"/>
             <input type="submit" value="Submit" class="btn btn-primary"/>
         </form>
     </div>
