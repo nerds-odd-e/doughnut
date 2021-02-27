@@ -83,8 +83,6 @@ class NoteControllerTests {
         void shouldReturnChildNoteIfNoteIdGiven() {
             assertEquals("note", controller.note(parentNote.getId(), model));
             assertThat(((Note) model.getAttribute("note")).getId(), equalTo(parentNote.getId()));
-            assertThat((List<Note>) model.getAttribute("notes"), hasSize(equalTo(1)));
-            assertThat(((List<Note>) model.getAttribute("notes")), contains(childNote));
         }
     }
 

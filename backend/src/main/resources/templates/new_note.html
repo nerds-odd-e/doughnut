@@ -3,7 +3,7 @@
 
     <div class="container content">
         <h2>Adding new note</h2>
-        <div th:replace="fragments/note_fragments :: noteBreadcrumb(${parent}, ~{:: .additional-item})">
+        <div th:replace="fragments/note_fragments :: noteBreadcrumb(${note}, ~{:: .additional-item})">
             <li class="breadcrumb-item additional-item">(adding here)</li>
         </div>
 

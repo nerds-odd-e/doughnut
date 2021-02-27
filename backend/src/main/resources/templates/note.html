@@ -1,7 +1,7 @@
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
 <layout th:replace="fragments/basic_layout :: application_layout(~{ :: .content})">
     <div class="container content">
-        <div th:replace="fragments/note_fragments :: noteBreadcrumb(${parent}, ~{:: .additional-item})">
+        <div th:replace="fragments/note_fragments :: noteBreadcrumb(${note}, ~{:: .additional-item})">
             <li class="breadcrumb-item additional-item" th:text="${note.title}"/>
             <li class="breadcrumb-item additional-item">
                 <a class="text-secondary" th:href="@{/notes/{id}/new(id=${note.id})}">(Add Child Note)</a>
@@ -20,6 +20,6 @@
                 <img class="img-fluid" th:src="${note.picture}"/>
             </p>
         </div>
-        <div th:replace="fragments/note_fragments :: noteViewCards(${notes})"/>
+        <div th:replace="fragments/note_fragments :: noteViewCards(${note.children})"/>
     </div>
 </layout>

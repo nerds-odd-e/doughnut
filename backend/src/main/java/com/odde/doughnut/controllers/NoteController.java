@@ -35,7 +35,6 @@ public class NoteController {
             note.setParentNote(parentNote);
         }
         model.addAttribute("note", note);
-        model.addAttribute("parent", new NoteDecorator(noteRepository, note.getParentNote()));
         return "new_note";
     }
 
@@ -60,8 +59,6 @@ public class NoteController {
     public String note(@PathVariable(name = "id") Integer noteId, Model model) {
         Note note = noteRepository.findById(noteId).get();
         model.addAttribute("note", note);
-        model.addAttribute("notes", note.getChildren());
-        model.addAttribute("parent", new NoteDecorator(noteRepository, note.getParentNote()));
         return "note";
     }
 
