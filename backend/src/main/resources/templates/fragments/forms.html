@@ -1,1 +1,8 @@
+<a th:fragment="noteTitleWithLink(note)" th:href="'/notes/' + ${note.id}" th:text="${note.title}"/>
+
+<div th:fragment="input(field)" class="form-group">
+    <label for="note-title">Title:</label>
+    <input th:class="'form-control' + ${#fields.hasErrors(field) ? ' is-invalid' : ''}" data-cy="note-title" id="note-title" th:field="*{title}" />
+    <div class="invalid-feedback" th:if="${#fields.hasErrors(field)}" th:errors="*{title}"/>
+</div>
 

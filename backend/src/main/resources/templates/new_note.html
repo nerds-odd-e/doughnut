@@ -9,11 +9,9 @@
 
         <form action="#" th:action="@{/note}" th:object="${note}" method="post">
             <input data-cy="note-parent-id" th:field="*{parentNote}" type="hidden" />
-            <div class="form-group">
-                <label for="note-title">Title:</label>
-                <input th:class="'form-control' + ${#fields.hasErrors('title') ? ' is-invalid' : ''}" data-cy="note-title" id="note-title" th:field="*{title}" />
-                <div class="invalid-feedback" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">title Error</div>
-            </div>
+
+            <div th:replace="fragments/forms :: input('title')"/>
+
             <div class="form-group">
                 <label for="note-description">Description:</label>
                 <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}">description Error</span>
