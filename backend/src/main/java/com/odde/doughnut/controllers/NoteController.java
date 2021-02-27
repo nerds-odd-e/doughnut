@@ -55,6 +55,18 @@ public class NoteController {
         return "redirect:/notes/" + note.getId();
     }
 
+    @GetMapping("/notes/{note}/edit")
+    public String editNote(Note note, Model model) {
+        model.addAttribute("note", note);
+        return "edit_note";
+    }
+
+    @PostMapping("/notes/{note}")
+    public String updateNote(Note note, Model model) {
+        noteRepository.save(note);
+        return "redirect:/notes/" + note.getId();
+    }
+
     @GetMapping("/notes/{id}")
     public String note(@PathVariable(name = "id") Integer noteId, Model model) {
         Note note = noteRepository.findById(noteId).get();
