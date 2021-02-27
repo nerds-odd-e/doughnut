@@ -15,6 +15,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ExtendedModelMap;
+import org.springframework.validation.BindingResult;
 
 import javax.persistence.EntityManager;
 import java.util.List;
@@ -32,53 +33,82 @@ class NoteControllerTests {
     private NoteRepository noteRepository;
     @Autowired
     private UserRepository userRepository;
-    private MakeMe makeMe;
+    private MakeMe makeMe = new MakeMe();
     private User user;
     private Note parentNote;
     private Note childNote;
     ExtendedModelMap model = new ExtendedModelMap();
     NoteController controller;
 
-    @Autowired
-    EntityManager entityManager;
-
     @BeforeEach
     void setup() {
-        makeMe = new MakeMe();
         user = makeMe.aUser().please(userRepository);
-        parentNote = makeMe.aNote().forUser(user).please(noteRepository);
-        childNote = makeMe.aNote().forUser(user).under(parentNote).please(noteRepository);
-        makeMe.refresh(entityManager, user);
-        makeMe.refresh(entityManager, parentNote);
         controller = new NoteController(new TestCurrentUser(user), noteRepository);
     }
 
-    @Test
-    void shouldUseTheRigthTemplateForCreatingNote() {
-        assertEquals("new_note", controller.newNote(null, model));
-        assertThat(((Note) model.getAttribute("note")).getParentNote(), is(nullValue()));
+    @Nested
+    class GetNotes {
+        @Autowired
+        EntityManager entityManager;
+
+        @BeforeEach
+        void setup() {
+            parentNote = makeMe.aNote().forUser(user).please(noteRepository);
+            childNote = makeMe.aNote().forUser(user).under(parentNote).please(noteRepository);
+            makeMe.refresh(entityManager, user);
+            makeMe.refresh(entityManager, parentNote);
+        }
+
+        @Test
+        void shouldUseTheRigthTemplateForCreatingNote() {
+            assertEquals("new_note", controller.newNote(null, model));
+            assertThat(((Note) model.getAttribute("note")).getParentNote(), is(nullValue()));
+        }
+
+        @Test
+        void shouldGetTheParentNoteIfIdProvided() {
+            controller.newNote(parentNote.getId(), model);
+            assertThat(((Note) model.getAttribute("note")).getParentNote(), equalTo(parentNote));
+        }
+
+        @Test
+        void shouldReturnAllParentlessNotesForMyNotes() {
+            assertEquals("my_notes", controller.myNotes(model));
+            assertThat(model.getAttribute("note"), is(nullValue()));
+            assertThat((List<Note>) model.getAttribute("notes"), hasSize(equalTo(1)));
+            assertThat((List<Note>) model.getAttribute("notes"), contains(parentNote));
+        }
+
+        @Test
+        void shouldReturnChildNoteIfNoteIdGiven() {
+            assertEquals("note", controller.note(parentNote.getId(), model));
+            assertThat(((Note) model.getAttribute("note")).getId(), equalTo(parentNote.getId()));
+            assertThat((List<Note>) model.getAttribute("notes"), hasSize(equalTo(1)));
+            assertThat(((List<Note>) model.getAttribute("notes")), contains(childNote));
+        }
     }
 
-    @Test
-    void shouldGetTheParentNoteIfIdProvided() {
-        controller.newNote(parentNote.getId(), model);
-        assertThat(((Note) model.getAttribute("note")).getParentNote(), equalTo(parentNote));
-    }
+    @Nested
+    class createNoteTest {
 
-    @Test
-    void shouldReturnAllParentlessNotesForMyNotes() {
-        assertEquals("my_notes", controller.myNotes(model));
-        assertThat(model.getAttribute("note"), is(nullValue()));
-        assertThat((List<Note>) model.getAttribute("notes"), hasSize(equalTo(1)));
-        assertThat((List<Note>) model.getAttribute("notes"), contains(parentNote));
-    }
+        @Test
+        void shouldBeAbleToSaveNoteWhenThereIsValidUser() {
+            Note newNote = makeMe.aNote().inMemoryPlease();
+            BindingResult bindingResult = makeMe.successfulBindingResult();
 
-    @Test
-    void shouldReturnChildNoteIfNoteIdGiven() {
-        assertEquals("note", controller.note(parentNote.getId(), model));
-        assertThat(((Note) model.getAttribute("note")).getId(), equalTo(parentNote.getId()));
-        assertThat((List<Note>) model.getAttribute("notes"), hasSize(equalTo(1)));
-        assertThat(((List<Note>) model.getAttribute("notes")), contains(childNote));
+            String response = controller.createNote(newNote, bindingResult);
+            assertEquals("redirect:/notes/" + newNote.getId(), response);
+        }
+
+        @Test
+        void shouldNotBeAbleToSaveNoteWhenThereIsInvalidUser() {
+            Note newNote = new Note();
+            BindingResult bindingResult = makeMe.failedBindingResult();
+
+            String response = controller.createNote(newNote, bindingResult);
+            assertEquals(null, newNote.getId());
+            assertEquals("new_note", response);
+        }
     }
 }
 

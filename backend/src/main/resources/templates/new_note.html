@@ -11,15 +11,18 @@
             <input data-cy="note-parent-id" th:field="*{parentNote}" type="hidden" />
             <div class="form-group">
                 <label for="note-title">Title:</label>
-                <input class="form-control" data-cy="note-title" id="note-title" th:field="*{title}" />
+                <input th:class="'form-control' + ${#fields.hasErrors('title') ? ' is-invalid' : ''}" data-cy="note-title" id="note-title" th:field="*{title}" />
+                <div class="invalid-feedback" th:if="${#fields.hasErrors('title')}" th:errors="*{title}">title Error</div>
             </div>
             <div class="form-group">
                 <label for="note-description">Description:</label>
+                <span th:if="${#fields.hasErrors('description')}" th:errors="*{description}">description Error</span>
                 <textarea class="form-control" data-cy="note-description" id="note-description" th:field="*{description}" />
             </p>
             </div>
             <div class="form-group">
                 <label for="note-picture">Picture:</label>
+                <span th:if="${#fields.hasErrors('picture')}" th:errors="*{picture}">picture Error</span>
                 <input class="form-control" data-cy="note-picture" id="note-picture" th:field="*{picture}" placeholder="Optional. We only accept full url for now."/>
             </div>
             <input type="submit" value="Submit" class="btn btn-primary"/>

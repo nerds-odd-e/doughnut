@@ -17,6 +17,12 @@ Feature: Note maintenance
             | Sedation        |
             | Sedition        |
 
+    Scenario: Create a new note with invalid information
+        When I create top level note with:
+            | note-title      | note-description  |
+            |                 | Put to sleep      |
+        Then I should see that the note creation is not successful
+
     Scenario: Create a new note belonging to another node
         Given there are some notes for the current user
             | title           | description          |

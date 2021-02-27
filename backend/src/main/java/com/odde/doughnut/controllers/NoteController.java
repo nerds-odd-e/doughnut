@@ -3,13 +3,18 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.modelDecorators.NoteDecorator;
 import com.odde.doughnut.models.Note;
+import com.odde.doughnut.models.User;
 import com.odde.doughnut.repositories.NoteRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.view.RedirectView;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @Controller
@@ -38,6 +43,17 @@ public class NoteController {
     public String myNotes(Model model) {
         model.addAttribute("notes", currentUser.getUser().getOrphanedNotes());
         return "my_notes";
+    }
+
+    @PostMapping("/note")
+    public String createNote(@Valid Note note, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return "new_note";
+        }
+        User user = currentUser.getUser();
+        note.setUser(user);
+        noteRepository.save(note);
+        return "redirect:/notes/" + note.getId();
     }
 
     @GetMapping("/notes/{id}")

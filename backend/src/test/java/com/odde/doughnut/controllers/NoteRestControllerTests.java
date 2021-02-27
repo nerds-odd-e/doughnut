@@ -49,28 +49,6 @@ public class NoteRestControllerTests {
         assertEquals(note.getTitle(), noteController.getNotes().get(0).getTitle());
     }
 
-    @Nested
-    class createNoteTest {
-
-        @Test
-        void shouldBeAbleToSaveNoteWhenThereIsValidUser() {
-            Note newNote = makeMe.aNote().inMemoryPlease();
-            RedirectView response = noteController.createNote(newNote);
-            assertEquals("/notes/" + newNote.getId(), response.getUrl());
-        }
-
-        @Test
-        void shouldNotBeAbleToSaveNoteWhenThereIsInvalidUser() {
-            Note newNote = new Note();
-
-            try {
-                noteController.createNote(newNote);
-            } catch (Exception ignored) {
-            }
-
-            assertEquals(null, newNote.getId());
-        }
-    }
 
     @Nested
     class DeleteNoteTest {

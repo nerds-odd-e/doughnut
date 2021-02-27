@@ -50,7 +50,9 @@ Cypress.Commands.add("seedNotes", (notes) => {
 Cypress.Commands.add("createNotes", (notes) => {
   notes.forEach((elem) => {
     for (var propName in elem) {
-      cy.get(`[data-cy="${propName}"]`).type(elem[propName]);
+      if (elem[propName]) {
+        cy.get(`[data-cy="${propName}"]`).type(elem[propName]);
+      }
     }
     cy.get('input[value="Submit"]').click();
   });
