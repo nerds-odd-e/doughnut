@@ -14,6 +14,9 @@
                 Note</a>
         </div>
         <div class="jumbotron py-4">
+            <nav class="nav d-flex flex-row-reverse p-0">
+                <div th:replace="fragments/note_fragments :: noteButtons(${note})"/>
+            </nav>
             <h2 class="display-4" th:text="${note.title}"/>
             <p th:text="${note.description}"/>
             <p class="text-center" th:if="${note.picture}">

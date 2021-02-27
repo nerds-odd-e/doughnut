@@ -37,10 +37,10 @@ When("I am creating note under {string}", (noteTitles, data) => {
 });
 
 When("I should see {string} in breadcrumb", (noteTitles, data) => {
-  noteTitles.split(", ").forEach(noteTitle => cy.findByText(noteTitle));
+  cy.get('.breadcrumb').within( ()=>
+      noteTitles.split(", ").forEach(noteTitle => cy.findByText(noteTitle ))
+  )
 });
-
-
 
 Then("I should see these notes belonging to the user at the top level of all my notes", (data) => {
     cy.visit("/notes");
