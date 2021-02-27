@@ -23,6 +23,7 @@ public class Note {
   @Getter @Setter private String description;
   @Getter @Setter private String picture;
   @Getter @Setter private String url;
+  @Column(name="url_is_video")
   @Getter @Setter private Boolean urlIsVideo = false;
 
   @ManyToOne
