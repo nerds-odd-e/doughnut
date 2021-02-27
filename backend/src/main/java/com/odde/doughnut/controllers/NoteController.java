@@ -62,7 +62,10 @@ public class NoteController {
     }
 
     @PostMapping("/notes/{note}")
-    public String updateNote(Note note, Model model) {
+    public String updateNote(@Valid Note note, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+           return "edit_note";
+        }
         noteRepository.save(note);
         return "redirect:/notes/" + note.getId();
     }

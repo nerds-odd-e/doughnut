@@ -88,9 +88,8 @@ class NoteControllerTests {
 
     @Nested
     class createNoteTest {
-
         @Test
-        void shouldBeAbleToSaveNoteWhenThereIsValidUser() {
+        void shouldBeAbleToSaveNoteWhenValid() {
             Note newNote = makeMe.aNote().inMemoryPlease();
             BindingResult bindingResult = makeMe.successfulBindingResult();
 
@@ -99,13 +98,42 @@ class NoteControllerTests {
         }
 
         @Test
-        void shouldNotBeAbleToSaveNoteWhenThereIsInvalidUser() {
+        void shouldNotBeAbleToSaveNoteWhenInvalid() {
             Note newNote = new Note();
             BindingResult bindingResult = makeMe.failedBindingResult();
 
             String response = controller.createNote(newNote, bindingResult);
             assertEquals(null, newNote.getId());
             assertEquals("new_note", response);
+        }
+    }
+
+    @Nested
+    class updateNoteTest {
+        Note note;
+
+        @BeforeEach
+        void setup() {
+            note = makeMe.aNote().please(noteRepository);
+            note.setTitle("new");
+        }
+
+        @Test
+        void shouldBeAbleToSaveNoteWhenValid() {
+            BindingResult bindingResult = makeMe.successfulBindingResult();
+
+            String response = controller.updateNote(note, bindingResult);
+            assertEquals("redirect:/notes/" + note.getId(), response);
+        }
+
+        @Test
+        void shouldNotBeAbleToSaveNoteWhenInvalid() {
+            Note note = makeMe.aNote().please(noteRepository);
+            note.setTitle("new");
+            BindingResult bindingResult = makeMe.failedBindingResult();
+
+            String response = controller.updateNote(note, bindingResult);
+            assertEquals("edit_note", response);
         }
     }
 }
