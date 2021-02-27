@@ -33,7 +33,7 @@ public class NoteRestController {
         return currentUser.getUser().getNotesInDescendingOrder();
     }
 
-    @PostMapping(value = "/notes{id}/link", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    @PostMapping(value = "/notes/{id}/link", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public RedirectView linkNote(@PathVariable("id") Integer id, Integer targetNoteId) {
         Note sourceNote = noteRepository.findById(id).get();
         Note targetNote = noteRepository.findById(targetNoteId).get();
