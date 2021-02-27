@@ -77,7 +77,21 @@ Then("I should not see note {string} at the top level of all my notes", (noteTit
     cy.findByText(noteTitle).should('not.exist');
 });
 
-When("I open {string} note at top level", (noteTitle) => {
+When("I open {string} note at top level", (noteTitles) => {
     cy.visit("/notes");
-    cy.findByText(noteTitle).click();
+    noteTitles.split("/").forEach(noteTitle =>
+      cy.findByText(noteTitle).click()
+    );
 });
+
+When("I should not be able to go to next sibling", () => {
+    cy.findByText("Top");
+});
+
+When("I should be able to go to next note {string}", (noteTitle) => {
+    cy.findByText("Top");
+});
+
+
+
+

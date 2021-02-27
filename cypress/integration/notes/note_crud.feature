@@ -1,4 +1,4 @@
-Feature: Note maintenance
+Feature: Note CRUD
     As a learner, I want to maintain my newly acquired knowledge in
     notes, so that I can review them in the future.
 
@@ -23,17 +23,6 @@ Feature: Note maintenance
             |                 | Put to sleep      |
         Then I should see that the note creation is not successful
 
-    Scenario: Edit a note
-        Given there are some notes for the current user
-            | title           | description          |
-            | Odd-e CSD       | Our best training    |
-        When I edit note "Odd-e CSD" to become:
-            | note-title      | note-description                     |
-            | LeSS in Action  | An awesome training  |
-        Then I should see these notes belonging to the user at the top level of all my notes
-            | note-title      |
-            | LeSS in Action  |
-
     Scenario: Create a new note belonging to another node
         Given there are some notes for the current user
             | title           | description          |
@@ -50,15 +39,6 @@ Feature: Note maintenance
         When I am creating note under "LeSS in Action > Re-quirement"
         Then I should see "LeSS in Action, Re-quirement" in breadcrumb
 
-    Scenario: Note display
-        Given there are some notes for the current user
-            | title                                    | description          |
-            | Potentially shippable product increment  | The output of every Sprint is called a Potentially Shippable Product Increment. The work of all the teams must be integrated before the end of every Sprint—the integration must be done during the Sprint.  |
-        Then I should see these notes belonging to the user at the top level of all my notes
-            | note-title                               | note-description          |
-            | Potentially shippable product increment  | The output of every Sprint is called a Potentia... |
-
-
     Scenario: Create a new sibling note
         Given there are some notes for the current user
             | title           | description          |
@@ -74,6 +54,25 @@ Feature: Note maintenance
             | note-title      |
             | Re-quirement    |
             | Re-Design       |
+
+    Scenario: Note display
+        Given there are some notes for the current user
+            | title                                    | description          |
+            | Potentially shippable product increment  | The output of every Sprint is called a Potentially Shippable Product Increment. The work of all the teams must be integrated before the end of every Sprint—the integration must be done during the Sprint.  |
+        Then I should see these notes belonging to the user at the top level of all my notes
+            | note-title                               | note-description          |
+            | Potentially shippable product increment  | The output of every Sprint is called a Potentia... |
+
+    Scenario: Edit a note
+        Given there are some notes for the current user
+            | title           | description          |
+            | Odd-e CSD       | Our best training    |
+        When I edit note "Odd-e CSD" to become:
+            | note-title      | note-description                     |
+            | LeSS in Action  | An awesome training  |
+        Then I should see these notes belonging to the user at the top level of all my notes
+            | note-title      |
+            | LeSS in Action  |
 
     Scenario: Delete a note
         Given there are some notes for the current user
