@@ -4,13 +4,13 @@
         <div th:replace="fragments/note_fragments :: noteBreadcrumb(${parent}, ~{:: .additional-item})">
             <li class="breadcrumb-item additional-item" th:text="${note.title}"/>
             <li class="breadcrumb-item additional-item">
-                <a class="text-secondary" th:href="'/new_note/' + ${note.id}">(Add Child Note)</a>
+                <a class="text-secondary" th:href="@{/notes/{id}/new(id=${note.id})}">(Add Child Note)</a>
             </li>
         </div>
 
         <div th:if="${note.parentNote}">
             <svg th:replace="fragments/svgs :: downRight"/>
-            <a th:if="${note.parentNote}" th:href="'/new_note/' + ${note.parentNote.id}">Add Sibling
+            <a th:if="${note.parentNote}" th:href="@{/notes/{id}/new(id=${note.parentNote.id})}">Add Sibling
                 Note</a>
         </div>
         <div class="jumbotron py-4">

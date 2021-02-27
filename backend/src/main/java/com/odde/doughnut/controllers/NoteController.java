@@ -27,7 +27,7 @@ public class NoteController {
         this.noteRepository = noteRepository;
     }
 
-    @GetMapping({"/new_note", "/new_note/{parent_id}"})
+    @GetMapping({"/notes/new", "/notes/{parent_id}/new"})
     public String newNote(@PathVariable(name = "parent_id", required = false) Integer parentId, Model model) {
         Note note = new Note();
         if (parentId != null) {
@@ -45,7 +45,7 @@ public class NoteController {
         return "my_notes";
     }
 
-    @PostMapping("/note")
+    @PostMapping("/notes")
     public String createNote(@Valid Note note, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return "new_note";

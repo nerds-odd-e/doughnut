@@ -7,7 +7,7 @@
             <li class="breadcrumb-item additional-item">(adding here)</li>
         </div>
 
-        <form action="#" th:action="@{/note}" th:object="${note}" method="post">
+        <form action="#" th:action="@{/notes}" th:object="${note}" method="post">
             <input data-cy="note-parent-id" th:field="*{parentNote}" type="hidden"/>
 
             <div th:replace="fragments/forms :: textInput('note', 'title', null)"/>
