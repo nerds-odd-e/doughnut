@@ -1,4 +1,4 @@
-package com.odde.doughnut.services;
+package com.odde.doughnut.modelDecorators;
 
 import com.odde.doughnut.models.Note;
 import com.odde.doughnut.repositories.NoteRepository;
@@ -6,11 +6,11 @@ import com.odde.doughnut.repositories.NoteRepository;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NoteService {
+public class NoteDecorator {
     private final NoteRepository noteRepository;
     private final Note note;
 
-    public NoteService(NoteRepository noteRepository, Note note) {
+    public NoteDecorator(NoteRepository noteRepository, Note note) {
         this.noteRepository = noteRepository;
         this.note = note;
     }

@@ -1,4 +1,4 @@
-package com.odde.doughnut.services;
+package com.odde.doughnut.modelDecorators;
 
 import com.odde.doughnut.models.Note;
 import com.odde.doughnut.repositories.NoteRepository;
@@ -17,14 +17,15 @@ import javax.persistence.EntityManager;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.not;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @ExtendWith(DBCleaner.class)
 @Transactional
 
-public class NoteServiceTest {
+public class NoteDecoratorTest {
     @Autowired private NoteRepository noteRepository;
     @Autowired EntityManager entityManager;
 
@@ -47,8 +48,8 @@ public class NoteServiceTest {
 
         @Test
         void topLevelNoteHaveEmptyAncestors() {
-            NoteService noteService = new NoteService(noteRepository, topLevel);
-            List<Note> ancestors = noteService.getAncestors();
+            NoteDecorator decoratedNote = new NoteDecorator(noteRepository, topLevel);
+            List<Note> ancestors = decoratedNote.getAncestors();
             assertThat(ancestors, contains(topLevel));
         }
 
@@ -57,8 +58,8 @@ public class NoteServiceTest {
             Note subject = makeMe.aNote().under(topLevel).please(noteRepository);
             Note sibling = makeMe.aNote().under(topLevel).please(noteRepository);
 
-            NoteService noteService = new NoteService(noteRepository, subject);
-            List<Note> ancestry = noteService.getAncestors();
+            NoteDecorator decoratedNote = new NoteDecorator(noteRepository, subject);
+            List<Note> ancestry = decoratedNote.getAncestors();
             assertThat(ancestry, contains(topLevel, subject));
             assertThat(ancestry, not(contains(sibling)));
         }

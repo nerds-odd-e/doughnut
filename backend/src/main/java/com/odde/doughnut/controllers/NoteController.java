@@ -1,9 +1,9 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUser;
+import com.odde.doughnut.modelDecorators.NoteDecorator;
 import com.odde.doughnut.models.Note;
 import com.odde.doughnut.repositories.NoteRepository;
-import com.odde.doughnut.services.NoteService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,7 +30,7 @@ public class NoteController {
             note.setParentNote(parentNote);
         }
         model.addAttribute("note", note);
-        model.addAttribute("parent", new NoteService(noteRepository, note.getParentNote()));
+        model.addAttribute("parent", new NoteDecorator(noteRepository, note.getParentNote()));
         return "new_note";
     }
 
@@ -45,7 +45,7 @@ public class NoteController {
         Note note = noteRepository.findById(noteId).get();
         model.addAttribute("note", note);
         model.addAttribute("notes", note.getChildren());
-        model.addAttribute("parent", new NoteService(noteRepository, note.getParentNote()));
+        model.addAttribute("parent", new NoteDecorator(noteRepository, note.getParentNote()));
         return "note";
     }
 
