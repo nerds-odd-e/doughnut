@@ -9,10 +9,7 @@
 
         <form action="#" th:action="@{/notes}" th:object="${note}" method="post">
             <input data-cy="note-parent-id" th:field="*{parentNote}" type="hidden"/>
-
-            <div th:replace="fragments/forms :: textInput('note', 'title', null)"/>
-            <div th:replace="fragments/forms :: textarea('note', 'description', null)"/>
-            <div th:replace="fragments/forms :: textInput('note', 'picture', 'Optional. We only accept full url for now.')"/>
+            <div th:replace="fragments/note_fragments :: noteFormBody(${note})"/>
             <input type="submit" value="Submit" class="btn btn-primary"/>
         </form>
     </div>

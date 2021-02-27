@@ -54,3 +54,11 @@
     </div>
 </div>
 
+<div th:fragment="noteFormBody(note)">
+    <div th:replace="fragments/forms :: textInput('note', 'title', null)"/>
+    <div th:replace="fragments/forms :: textarea('note', 'description', null)"/>
+    <div th:replace="fragments/forms :: textInput('note', 'picture', 'Optional. We only accept full url for now.')"/>
+    <div th:replace="fragments/forms :: textInput('note', 'url', null)"/>
+    <div th:replace="fragments/forms :: checkInput('note', 'urlIsVideo')"/>
+</div>
+

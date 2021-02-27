@@ -8,6 +8,17 @@
     />
 </div>
 
+<div th:fragment="checkInput(scopeName, field)" class="form-check">
+    <input
+            type="checkbox"
+            th:class="'form-check-input' + ${#fields.hasErrors(field) ? ' is-invalid' : ''}"
+            th:id="${scopeName + '-' + field}"
+            th:field="*{__${field}__}"
+    />
+    <label class="form-check-label" th:for="${scopeName + '-' + field}" th:text="${#strings.capitalize(field)}"/>
+    <div class="invalid-feedback" th:if="${#fields.hasErrors(field)}" th:errors="*{__${field}__}"/>
+</div>
+
 <div th:fragment="textarea(scopeName, field, placeholder)" th:replace=":: inputWithType(~{ :: .area-control}, ${scopeName}, ${field})">
     <textarea
             class="area-control"

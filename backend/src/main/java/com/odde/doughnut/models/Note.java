@@ -22,6 +22,8 @@ public class Note {
   @Getter @Setter private String title;
   @Getter @Setter private String description;
   @Getter @Setter private String picture;
+  @Getter @Setter private String url;
+  @Getter @Setter private Boolean urlIsVideo = false;
 
   @ManyToOne
   @JoinColumn(name = "parent_id")
