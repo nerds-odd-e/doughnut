@@ -62,7 +62,7 @@ public class NoteController {
         return "note";
     }
 
-    @GetMapping("/link/{id}")
+    @GetMapping("/notes/{id}/link")
     public String link(
             @PathVariable("id") String id,
             @RequestParam(required = false) String searchTerm,

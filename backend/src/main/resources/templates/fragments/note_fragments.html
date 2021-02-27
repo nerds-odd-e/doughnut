@@ -27,16 +27,19 @@
     <div th:replace="fragments/note_fragments :: cards(${notes}, ~{ :: .card-button},  ~{ :: .card-header})">
         <span class="card-header d-flex flex-row-reverse p-0">
             <div class="btn-group btn-group-sm pull-right">
-                <a class="btn btn-sm link-card" th:href="'/link/' + ${note.id}" title="link note">
+                <a class="btn btn-sm edit-card" th:href="@{/notes/{id}/edit(id=${note.id})}" title="edit note">
+                    <svg th:replace="fragments/svgs :: edit"/>
+                </a>
+                <a class="btn btn-sm link-card" th:href="@{/notes/{id}/link(id=${note.id})}" title="link note">
                     <svg th:replace="fragments/svgs :: linkNote"/>
                 </a>
-                <form th:action="'/share_note/'+${note.id}" th:method="post"
+                <form th:action="@{/notes/{id}/share(id=${note.id})}" th:method="post"
                       onsubmit="return confirm('Are you sure to share?')">
                   <button class="btn btn-sm share-card" title="Share node to bazaar">
                     <svg th:replace="fragments/svgs :: bazaarShare"/>
                   </button>
                 </form>
-                <form th:action="'/delete_note/'+${note.id}" th:method="delete"
+                <form th:action="@{/notes/{id}/delete(id=${note.id})}" th:method="delete"
                       onsubmit="return confirm('Are you sure to delete?')">
                   <input type="hidden" name="_method" value="delete"/>
                   <button class="btn btn-sm delete-card" title="delete note">

@@ -33,16 +33,16 @@ public class NoteRestController {
         return currentUser.getUser().getNotesInDescendingOrder();
     }
 
-    @PostMapping(value = "/linkNote", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public RedirectView linkNote(Integer sourceNoteId, Integer targetNoteId) {
-        Note sourceNote = noteRepository.findById(sourceNoteId).get();
+    @PostMapping(value = "/notes{id}/link", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public RedirectView linkNote(@PathVariable("id") Integer id, Integer targetNoteId) {
+        Note sourceNote = noteRepository.findById(id).get();
         Note targetNote = noteRepository.findById(targetNoteId).get();
 
         linkService.linkNote(sourceNote, targetNote);
         return new RedirectView("/review");
     }
 
-    @PostMapping(value = "/delete_note/{id}")
+    @PostMapping(value = "/notes/{id}/delete")
     public RedirectView deleteNote(@PathVariable("id") Integer noteId) throws NoAccessRightException {
         Note note = noteRepository.findById(noteId).get();
         currentUser.getUser().checkAuthorization(note);

@@ -47,7 +47,7 @@ Cypress.Commands.add("seedNotes", (notes) => {
   })
 })
 
-Cypress.Commands.add("createNotes", (notes) => {
+Cypress.Commands.add("submitNoteFormWith", (notes) => {
   notes.forEach((elem) => {
     for (var propName in elem) {
       if (elem[propName]) {

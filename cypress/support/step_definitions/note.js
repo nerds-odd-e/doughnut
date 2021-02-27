@@ -13,14 +13,20 @@ Given("there are some notes for the current user", (data) => {
 When("I create top level note with:", (data) => {
   cy.visit("/notes");
   cy.findByText("Add Top Level Note").click();
-  cy.createNotes(data.hashes());
+  cy.submitNoteFormWith(data.hashes());
+});
+
+When("I edit note {string} to become:", (noteTitle, data) => {
+  cy.visit("/notes");
+  cy.findNoteCardButton(noteTitle, ".edit-card").click();
+  cy.submitNoteFormWith(data.hashes());
 });
 
 When("I create note belonging to {string}:", (noteTitle, data) => {
   cy.visit("/notes");
   cy.findByText(noteTitle).click();
   cy.findByText("(Add Child Note)").click();
-  cy.createNotes(data.hashes());
+  cy.submitNoteFormWith(data.hashes());
 });
 
 
@@ -54,7 +60,7 @@ When("I delete top level note {string}", (noteTitle) => {
 When("I create a sibling note of {string}:", (noteTitle, data) => {
   cy.findByText(noteTitle, {selector: ".display-4"});
   cy.findByText("Add Sibling Note").click();
-  cy.createNotes(data.hashes());
+  cy.submitNoteFormWith(data.hashes());
 });
 
 When("I should see that the note creation is not successful", (noteTitle, data) => {

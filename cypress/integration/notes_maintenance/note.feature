@@ -23,6 +23,16 @@ Feature: Note maintenance
             |                 | Put to sleep      |
         Then I should see that the note creation is not successful
 
+        @ignore
+    Scenario: Edit a note
+        Given there are some notes for the current user
+            | title           | description          |
+            | Odd-e CSD       | Our best training    |
+        When I edit note "Odd-e CSD" to become:
+            | note-title      | note-description                     |
+            | LeSS in Action  | An awesome training  |
+        Then I should not see note "LeSS in Action" at the top level of all my notes
+
     Scenario: Create a new note belonging to another node
         Given there are some notes for the current user
             | title           | description          |

@@ -11,7 +11,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.ArrayList;
@@ -38,7 +37,7 @@ public class BazaarController {
         return "bazaar";
     }
 
-    @PostMapping(value = "/share_note/{id}")
+    @PostMapping(value = "/notes/{id}/share")
     public RedirectView shareNote(@PathVariable("id") Integer noteId, ExtendedModelMap model) throws NoAccessRightException {
         Note note = noteRepository.findById(noteId).get();
         currentUser.getUser().checkAuthorization(note);
