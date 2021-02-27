@@ -10,7 +10,7 @@
         <form action="#" th:action="@{/note}" th:object="${note}" method="post">
             <input data-cy="note-parent-id" th:field="*{parentNote}" type="hidden" />
 
-            <div th:replace="fragments/forms :: input('title')"/>
+            <div th:replace="fragments/forms :: input('note', 'title')"/>
 
             <div class="form-group">
                 <label for="note-description">Description:</label>
