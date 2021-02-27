@@ -28,6 +28,9 @@
                 <img class="img-fluid" th:src="${note.picture}"/>
             </p>
         </div>
+
+        <a role="button" title="next" th:href="@{/notes/2}">Next</a>
+
         <div th:replace="fragments/note_fragments :: noteViewCards(${note.children})"/>
     </div>
 </layout>

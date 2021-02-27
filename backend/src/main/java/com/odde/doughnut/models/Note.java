@@ -54,6 +54,9 @@ public class Note {
   @JsonIgnoreProperties("targetNotes")
   @Getter @Setter private List<Note> targetNotes = new ArrayList<>();
 
+  @Transient
+  @Getter @Setter private String testingLinkTo;
+
   public void linkToNote(Note targetNote) {
     this.targetNotes.add(targetNote);
   }
