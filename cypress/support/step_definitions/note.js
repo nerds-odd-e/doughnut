@@ -44,11 +44,11 @@ When("I should see {string} in breadcrumb", (noteTitles, data) => {
 
 Then("I should see these notes belonging to the user at the top level of all my notes", (data) => {
     cy.visit("/notes");
-    cy.expectNotes(data);
+    cy.expectNoteCards(data.hashes());
 });
 
 Then("I should see these notes belonging to the user", (data) => {
-    cy.expectNotes(data);
+    cy.expectNoteCards(data.hashes());
 });
 
 When("I delete top level note {string}", (noteTitle) => {

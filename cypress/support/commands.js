@@ -58,10 +58,12 @@ Cypress.Commands.add("submitNoteFormWith", (notes) => {
   });
 });
 
-Cypress.Commands.add("expectNotes", (data) => {
-    data.hashes().forEach((elem) => {
-         cy.findByText(elem["note-title"]).should("be.visible");
-    });
+Cypress.Commands.add("expectNoteCards", (expectedCards) => {
+  expectedCards.forEach((elem) => {
+    for (var propName in elem) {
+         cy.findByText(elem[propName]).should("be.visible");
+    }
+  });
 });
 
 Cypress.Commands.add("clickButtonOnCardBody", (noteTitle, buttonTitle) => {

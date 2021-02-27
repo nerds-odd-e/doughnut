@@ -50,6 +50,15 @@ Feature: Note maintenance
         When I am creating note under "LeSS in Action > Re-quirement"
         Then I should see "LeSS in Action, Re-quirement" in breadcrumb
 
+    Scenario: Note display
+        Given there are some notes for the current user
+            | title                                    | description          |
+            | Potentially shippable product increment  | The output of every Sprint is called a Potentially Shippable Product Increment. The work of all the teams must be integrated before the end of every Sprint—the integration must be done during the Sprint.  |
+        Then I should see these notes belonging to the user at the top level of all my notes
+            | note-title                               | note-description          |
+            | Potentially shippable product increment  | The output of every Sprint is called a Potentia... |
+
+
     Scenario: Create a new sibling note
         Given there are some notes for the current user
             | title           | description          |

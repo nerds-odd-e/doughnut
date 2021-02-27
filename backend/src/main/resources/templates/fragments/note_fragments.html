@@ -15,7 +15,7 @@
                 <div th:replace="${cardHeader}"/>
                 <div class="card-body">
                     <h5 th:insert=":: noteTitleWithLink(${note})" class="card-title"/>
-                    <p th:text="${note.description}"/>
+                    <p th:text="${#strings.abbreviate(note.description, 50)}"/>
                     <div th:replace="${button}">Put your button here</div>
                 </div>
             </div>
