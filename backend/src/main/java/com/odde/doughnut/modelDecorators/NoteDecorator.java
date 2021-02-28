@@ -36,40 +36,29 @@ public class NoteDecorator {
     }
 
     public Note getNextNote() {
-        return note.getChildren().stream().findFirst().orElse(null);
+        return note.getChildren().stream().findFirst().orElse(getNextSiblingNote());
     }
 
     public Note getNextSiblingNote() {
-        if (note.getParentNote() != null) {
-            List<Note> allByParentId = noteRepository.findAllByParentNote(note.getParentNote());
-            allByParentId.remove(0);
-            for (Note n: allByParentId) {
-                if (n != note) {
-                    return n;
-                }
-            }
+        if (note.getParentNote() == null) {
+            return null;
         }
-        return null;
+        return noteRepository.findFirstByParentNoteAndSiblingOrderGreaterThanOrderBySiblingOrder(note.getParentNote(), note.getSiblingOrder());
     }
 
     public Note getPreviousNote() {
-        Note previousSiblingNote = getPreviousSiblingNote();
-        if (previousSiblingNote != null) {
-            return previousSiblingNote.getChildren().stream().findFirst().orElse(null);
+        Note result = getPreviousSiblingNote();
+        if (result != null) {
+            return result;
         }
-        return null;
+        return note.getParentNote();
     }
 
     public Note getPreviousSiblingNote() {
-        if (note.getParentNote() != null) {
-            List<Note> allByParentId = noteRepository.findAllByParentNote(note.getParentNote());
-            for (Note n: allByParentId) {
-                if (n != note) {
-                    return n;
-                }
-            }
+        if (note.getParentNote() == null) {
+            return null;
         }
-        return null;
+        return noteRepository.findFirstByParentNoteAndSiblingOrderLessThanOrderBySiblingOrderDesc(note.getParentNote(), note.getSiblingOrder());
     }
 
 }

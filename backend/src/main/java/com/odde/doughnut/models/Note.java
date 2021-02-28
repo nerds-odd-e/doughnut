@@ -28,6 +28,14 @@ public class Note {
   @Column(name="sibling_order")
   @Getter @Setter private Long siblingOrder = System.nanoTime();
 
+  @Override
+  public String toString() {
+    return "Note{" +
+            "id=" + id +
+            ", title='" + title + '\'' +
+            '}';
+  }
+
   @ManyToOne
   @JoinColumn(name = "parent_id")
   @JsonIgnore

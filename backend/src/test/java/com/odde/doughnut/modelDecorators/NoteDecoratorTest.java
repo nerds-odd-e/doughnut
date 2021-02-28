@@ -69,7 +69,7 @@ public class NoteDecoratorTest {
     class Navigations {
 
         @Test
-        void topNodeHasNoSiblings() {
+        void topNoteHasNoSiblings() {
             Note subjectNote = makeMe.aNote().please(noteRepository);
             Note nextTopLevel = makeMe.aNote().please(noteRepository);
             NoteDecorator subject = decorate(subjectNote);
@@ -77,12 +77,45 @@ public class NoteDecoratorTest {
             assertNavigation(subject, null, null, null, null);
         }
 
-        @Test
-        void singleChildNoteGoesBackToParentOnly() {
-            Note subjectNote = makeMe.aNote().under(topLevel).please(noteRepository);
-            NoteDecorator subject = decorate(subjectNote);
+        @Nested
+        class TopLevelNoteHasAChild {
+            Note child;
+            Note nephew;
 
-            //assertNavigation(subject, null, topLevel, null, null);
+            @BeforeEach
+            void setup() {
+                child = makeMe.aNote().under(topLevel).please(noteRepository);
+                nephew = makeMe.aNote().under(topLevel).please(noteRepository);
+            }
+
+            @Test
+            void topLevelHasChildAsNext() {
+                NoteDecorator subject = decorate(topLevel);
+                assertNavigation(subject, null, null, child, null);
+            }
+
+            @Test
+            void firstChildNote() {
+                NoteDecorator subject = decorate(child);
+                assertNavigation(subject, null, topLevel, nephew, nephew);
+            }
+
+            @Test
+            void secondChild() {
+                NoteDecorator subject = decorate(nephew);
+                assertNavigation(subject, child, child, null, null);
+            }
+
+            @Nested
+            class ChildHasGrandchild {
+                Note grandchild;
+
+                @BeforeEach
+                void setup() {
+                    grandchild = makeMe.aNote().under(child).please(noteRepository);
+                }
+
+            }
         }
 
         private void assertNavigation(NoteDecorator subject, Note previousSibling, Note previous, Note next, Note nextSibling) {
