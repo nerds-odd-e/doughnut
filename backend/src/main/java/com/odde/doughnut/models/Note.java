@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -26,7 +25,30 @@ public class Note {
   @Column(name="url_is_video")
   @Getter @Setter private Boolean urlIsVideo = false;
   @Column(name="sibling_order")
-  @Getter @Setter private Long siblingOrder = System.nanoTime();
+  @Getter @Setter private Long siblingOrder = getGoodEnoughOrderNumber();
+
+
+  //
+  // SiblingOrder is used to decide the order among the notes under the same parent.
+  // In a real life situation, using millisecond * 1000 is good enough for ordering and
+  // also leave enough space for inserting items in between.
+  // However, in extreme cases like unit testing or importing batch of notes, there is
+  // still a chance of duplicated order number.
+  // Since this will likely to happy within the same java running instance, a simple
+  // static variable `localLastOrderNumberForGoodEnoughSiblingOrder` is introduced to
+  // detect and remove the duplicates.
+  //
+  static long localLastOrderNumberForGoodEnoughSiblingOrder;
+  private static Long getGoodEnoughOrderNumber() {
+    long newNumber = System.currentTimeMillis() * 1000;
+    if (newNumber <= localLastOrderNumberForGoodEnoughSiblingOrder) {
+      localLastOrderNumberForGoodEnoughSiblingOrder += 1000;
+    }
+    else {
+      localLastOrderNumberForGoodEnoughSiblingOrder = newNumber;
+    }
+    return localLastOrderNumberForGoodEnoughSiblingOrder;
+  }
 
   @Override
   public String toString() {
