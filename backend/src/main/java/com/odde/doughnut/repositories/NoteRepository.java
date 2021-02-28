@@ -22,5 +22,6 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
                     + "SELECT id from ancestors ORDER BY lvl DESC"
             , nativeQuery = true)
     List<Note> findAncestry(@Param("noteId") Long noteId);
+    List<Note> findAllByParentNote(Note parentNote);
 
 }

@@ -18,7 +18,7 @@
                 <div th:replace="fragments/note_fragments :: noteButtons(${note})"/>
             </nav>
             <h2 class="display-4" th:text="${note.title}"/>
-            <p th:each="line : ${@decoratorService.decorate(note).descriptionLines}" th:text="${line}"/>
+            <p th:each="line : ${noteDecorated.descriptionLines}" th:text="${line}"/>
             <div th:if="${note.url}">
                 <label th:unless="${note.urlIsVideo}">Url:</label>
                 <label th:if="${note.urlIsVideo}">Video Url:</label>
@@ -29,7 +29,8 @@
             </p>
         </div>
 
-        <a role="button" title="next" th:href="@{/notes/2}">Next</a>
+        <a role="button" title="next" th:if="${noteDecorated.nextNote}" th:href="@{/notes/{id}(id=${noteDecorated.nextNote.id})}">Next</a>
+        <a role="button" title="next sibling" th:if="${noteDecorated.nextSiblingNote}" th:href="@{/notes/{id}(id=${noteDecorated.nextSiblingNote.id})}">Next Sibling</a>
 
         <div th:replace="fragments/note_fragments :: noteViewCards(${note.children})"/>
     </div>

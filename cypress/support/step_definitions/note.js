@@ -84,10 +84,6 @@ When("I open {string} note at top level", (noteTitles) => {
     );
 });
 
-When("I should not see these buttons: {string}", (noButtons) => {
-    cy.findByText("Top");
-});
-
 When("I should be able to go to the {string} note {string}", (button, noteTitle) => {
     cy.findByRole('button', { name: button }).click();
     cy.get('.jumbotron').within( ()=>

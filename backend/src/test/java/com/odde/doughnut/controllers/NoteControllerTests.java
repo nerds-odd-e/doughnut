@@ -43,7 +43,7 @@ class NoteControllerTests {
     @BeforeEach
     void setup() {
         user = makeMe.aUser().please(userRepository);
-        controller = new NoteController(new TestCurrentUser(user), noteRepository);
+        controller = new NoteController(new TestCurrentUser(user), noteRepository, decoratorService);
     }
 
     @Nested

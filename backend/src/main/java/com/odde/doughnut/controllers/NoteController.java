@@ -1,10 +1,10 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUser;
-import com.odde.doughnut.modelDecorators.NoteDecorator;
 import com.odde.doughnut.models.Note;
 import com.odde.doughnut.models.User;
 import com.odde.doughnut.repositories.NoteRepository;
+import com.odde.doughnut.services.DecoratorService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.view.RedirectView;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -21,10 +20,12 @@ import java.util.List;
 public class NoteController {
     private final CurrentUser currentUser;
     private final NoteRepository noteRepository;
+    private final DecoratorService decoratorService;
 
-    public NoteController(CurrentUser currentUser, NoteRepository noteRepository) {
+    public NoteController(CurrentUser currentUser, NoteRepository noteRepository, DecoratorService decoratorService) {
         this.currentUser = currentUser;
         this.noteRepository = noteRepository;
+        this.decoratorService = decoratorService;
     }
 
     @GetMapping({"/notes/new", "/notes/{parent_id}/new"})
@@ -74,6 +75,7 @@ public class NoteController {
     public String note(@PathVariable(name = "id") Integer noteId, Model model) {
         Note note = noteRepository.findById(noteId).get();
         model.addAttribute("note", note);
+        model.addAttribute("noteDecorated", decoratorService.decorate(note));
         return "note";
     }
 

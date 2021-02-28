@@ -34,4 +34,23 @@ public class NoteDecorator {
         }
         return Arrays.asList(note.getDescription().split("\n"));
     }
+
+    public Note getNextNote() {
+        return note.getChildren().stream().findFirst().orElse(null);
+    }
+
+    public Note getNextSiblingNote() {
+        if (note.getParentNote() != null) {
+            List<Note> allByParentId = noteRepository.findAllByParentNote(note.getParentNote());
+            allByParentId.remove(0);
+            for (Note n: allByParentId) {
+                if (n != note) {
+                    return n;
+                }
+
+            }
+        }
+        return null;
+    }
+
 }
