@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindingResult;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.Validation;
@@ -31,6 +32,13 @@ public class NoteTest {
 
     MakeMe makeMe = new MakeMe();
     User user;
+
+    @Test
+    void timeOrder() {
+        Note note1 = makeMe.aNote().inMemoryPlease();
+        Note note2 = makeMe.aNote().inMemoryPlease();
+        assertThat(note1.getSiblingOrder(), is(lessThan(note2.getSiblingOrder())));
+    }
 
     @Nested
     class ValidationTest {

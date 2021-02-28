@@ -77,6 +77,14 @@ public class NoteDecoratorTest {
             assertNavigation(subject, null, null, null, null);
         }
 
+        @Test
+        void singleChildNoteGoesBackToParentOnly() {
+            Note subjectNote = makeMe.aNote().under(topLevel).please(noteRepository);
+            NoteDecorator subject = decorate(subjectNote);
+
+            //assertNavigation(subject, null, topLevel, null, null);
+        }
+
         private void assertNavigation(NoteDecorator subject, Note previousSibling, Note previous, Note next, Note nextSibling) {
             assertThat(subject.getPreviousSiblingNote(), equalTo(previousSibling));
             assertThat(subject.getPreviousNote(), equalTo(previous));

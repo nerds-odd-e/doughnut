@@ -108,6 +108,7 @@ class NoteControllerTests {
             assertEquals(null, newNote.getId());
             assertEquals("new_note", response);
         }
+
     }
 
     @Nested

@@ -25,6 +25,8 @@ public class Note {
   @Getter @Setter private String url;
   @Column(name="url_is_video")
   @Getter @Setter private Boolean urlIsVideo = false;
+  @Column(name="sibling_order")
+  @Getter @Setter private Long siblingOrder = System.nanoTime();
 
   @ManyToOne
   @JoinColumn(name = "parent_id")
