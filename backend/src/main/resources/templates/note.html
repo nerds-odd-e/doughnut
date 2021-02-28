@@ -30,20 +30,12 @@
         </div>
 
         <nav class="nav d-flex flex-row-reverse p-0 mb-2">
-            <div th:fragment="noteButtons(note)" class="btn-group btn-group-sm">
-                <a role="button" class="btn btn-sm" title="previous sibling" th:if="${noteDecorated.previousSiblingNote}" th:href="@{/notes/{id}(id=${noteDecorated.previousSiblingNote.id})}">
-                    <<
-                </a>
-                <a role="button" class="btn btn-sm" title="previous" th:if="${noteDecorated.previousNote}" th:href="@{/notes/{id}(id=${noteDecorated.previousNote.id})}">
-                    <
-                </a>
-                <a role="button" class="btn btn-lg" title="next" th:if="${noteDecorated.nextNote}" th:href="@{/notes/{id}(id=${noteDecorated.nextNote.id})}">
-                    >
-                </a>
-                <a role="button" class="btn btn-sm" title="next sibling" th:if="${noteDecorated.nextSiblingNote}" th:href="@{/notes/{id}(id=${noteDecorated.nextSiblingNote.id})}">
-                    >>
-                </a>
-            </div>
+            <div class="btn-group btn-group-sm">
+                <a th:replace="fragments/note_fragments :: noteLinkButton(${noteDecorated.previousSiblingNote}, 'fastBackward', 'previous sibling')"/>
+                <a th:replace="fragments/note_fragments :: noteLinkButton(${noteDecorated.previousNote}, 'backward', 'previous')"/>
+                <a th:replace="fragments/note_fragments :: noteLinkButton(${noteDecorated.nextNote}, 'forward', 'next')"/>
+                <a th:replace="fragments/note_fragments :: noteLinkButton(${noteDecorated.nextSiblingNote}, 'fastForward', 'next sibling')"/>
+            </a>
         </nav>
 
         <div th:replace="fragments/note_fragments :: noteViewCards(${note.children})"/>

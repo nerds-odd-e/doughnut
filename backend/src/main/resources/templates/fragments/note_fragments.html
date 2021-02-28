@@ -62,3 +62,11 @@
     <div th:replace="fragments/forms :: checkInput('note', 'urlIsVideo')"/>
 </div>
 
+<div th:fragment="noteLinkButton(note, svg, title)">
+    <a role="button" class="btn btn-sm" th:title="${title}" th:if="${note}" th:href="@{/notes/{id}(id=${note.id})}">
+        <svg th:replace="fragments/svgs :: __${svg}__"/>
+    </a>
+    <a role="button" class="btn btn-sm disabled" th:unless="${note}">
+        <svg th:replace="fragments/svgs :: __${svg}__"/>
+    </a>
+</div>

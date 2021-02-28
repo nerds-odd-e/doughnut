@@ -35,33 +35,15 @@ public class NoteDecorator {
         return Arrays.asList(note.getDescription().split("\n"));
     }
 
-    public Note getNextNote() {
-        Note firstChild = noteRepository.findFirstByParentNoteOrderBySiblingOrder(note);
-        if (firstChild != null) {
-            return firstChild;
+    public Note getPreviousSiblingNote() {
+        if (note.getParentNote() == null) {
+            return null;
         }
-
-        Note next = note;
-        while(next != null) {
-            Note sibling = nextSiblingOfNote(next);
-            if (sibling != null) {
-                return sibling;
-            }
-            next = next.getParentNote();
-
-        }
-        return null;
+        return noteRepository.findFirstByParentNoteAndSiblingOrderLessThanOrderBySiblingOrderDesc(note.getParentNote(), note.getSiblingOrder());
     }
 
     public Note getNextSiblingNote() {
         return nextSiblingOfNote(note);
-    }
-
-    private Note nextSiblingOfNote(Note note) {
-        if (note.getParentNote() == null) {
-            return null;
-        }
-        return noteRepository.findFirstByParentNoteAndSiblingOrderGreaterThanOrderBySiblingOrder(note.getParentNote(), note.getSiblingOrder());
     }
 
     public Note getPreviousNote() {
@@ -75,15 +57,30 @@ public class NoteDecorator {
                 return result;
             }
             result = lastChild;
-
         }
     }
 
-    public Note getPreviousSiblingNote() {
+    public Note getNextNote() {
+        Note firstChild = noteRepository.findFirstByParentNoteOrderBySiblingOrder(note);
+        if (firstChild != null) {
+            return firstChild;
+        }
+        Note next = note;
+        while(next != null) {
+            Note sibling = nextSiblingOfNote(next);
+            if (sibling != null) {
+                return sibling;
+            }
+            next = next.getParentNote();
+        }
+        return null;
+    }
+
+    private Note nextSiblingOfNote(Note note) {
         if (note.getParentNote() == null) {
             return null;
         }
-        return noteRepository.findFirstByParentNoteAndSiblingOrderLessThanOrderBySiblingOrderDesc(note.getParentNote(), note.getSiblingOrder());
+        return noteRepository.findFirstByParentNoteAndSiblingOrderGreaterThanOrderBySiblingOrder(note.getParentNote(), note.getSiblingOrder());
     }
 
 }
