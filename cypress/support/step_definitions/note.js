@@ -91,6 +91,13 @@ When("I should be able to go to the {string} note {string}", (button, noteTitle)
     );
 });
 
+When("I move note {string} left", (noteTitles, data) => {
+  cy.visit("/notes");
+  noteTitles.split("/").forEach(noteTitle => cy.findByText(noteTitle).click());
+  cy.findByText("Move This Note").click();
+});
+
+
 
 
 

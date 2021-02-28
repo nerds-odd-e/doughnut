@@ -58,14 +58,6 @@ public class NoteController {
 
     @GetMapping("/notes/{note}/edit")
     public String editNote(Note note, Model model) {
-
-        noteRepository.findAll().forEach(
-                n -> {
-                    n.setSiblingOrder(System.currentTimeMillis() * 100 + System.nanoTime() % 100);
-                    noteRepository.save(n);
-                }
-        );
-
         model.addAttribute("note", note);
         return "edit_note";
     }
