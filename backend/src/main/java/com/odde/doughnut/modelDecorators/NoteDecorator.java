@@ -36,10 +36,28 @@ public class NoteDecorator {
     }
 
     public Note getNextNote() {
-        return note.getChildren().stream().findFirst().orElse(getNextSiblingNote());
+        Note firstChild = noteRepository.findFirstByParentNoteOrderBySiblingOrder(note);
+        if (firstChild != null) {
+            return firstChild;
+        }
+
+        Note next = note;
+        while(next != null) {
+            Note sibling = nextSiblingOfNote(next);
+            if (sibling != null) {
+                return sibling;
+            }
+            next = next.getParentNote();
+
+        }
+        return null;
     }
 
     public Note getNextSiblingNote() {
+        return nextSiblingOfNote(note);
+    }
+
+    private Note nextSiblingOfNote(Note note) {
         if (note.getParentNote() == null) {
             return null;
         }
@@ -48,10 +66,17 @@ public class NoteDecorator {
 
     public Note getPreviousNote() {
         Note result = getPreviousSiblingNote();
-        if (result != null) {
-            return result;
+        if (result == null) {
+            return note.getParentNote();
         }
-        return note.getParentNote();
+        while(true) {
+            Note lastChild =noteRepository.findFirstByParentNoteOrderBySiblingOrderDesc(result);
+            if (lastChild == null) {
+                return result;
+            }
+            result = lastChild;
+
+        }
     }
 
     public Note getPreviousSiblingNote() {

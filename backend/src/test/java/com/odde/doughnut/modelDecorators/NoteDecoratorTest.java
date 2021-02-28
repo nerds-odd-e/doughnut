@@ -115,6 +115,24 @@ public class NoteDecoratorTest {
                     grandchild = makeMe.aNote().under(child).please(noteRepository);
                 }
 
+                @Test
+                void firstChildNote() {
+                    NoteDecorator subject = decorate(child);
+                    assertNavigation(subject, null, topLevel, grandchild, nephew);
+                }
+
+                @Test
+                void secondChild() {
+                    NoteDecorator subject = decorate(nephew);
+                    assertNavigation(subject, child, grandchild, null, null);
+                }
+
+                @Test
+                void grandchildView() {
+                    NoteDecorator subject = decorate(grandchild);
+                    assertNavigation(subject, null, child, nephew, null);
+                }
+
             }
         }
 
