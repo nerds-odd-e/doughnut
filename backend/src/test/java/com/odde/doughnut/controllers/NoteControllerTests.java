@@ -4,6 +4,7 @@ import com.odde.doughnut.models.Note;
 import com.odde.doughnut.models.User;
 import com.odde.doughnut.repositories.NoteRepository;
 import com.odde.doughnut.repositories.UserRepository;
+import com.odde.doughnut.services.DecoratorService;
 import com.odde.doughnut.testability.DBCleaner;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
@@ -43,6 +44,7 @@ class NoteControllerTests {
     @BeforeEach
     void setup() {
         user = makeMe.aUser().please(userRepository);
+        DecoratorService decoratorService = new DecoratorService(noteRepository);
         controller = new NoteController(new TestCurrentUser(user), noteRepository, decoratorService);
     }
 

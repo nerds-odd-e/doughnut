@@ -29,6 +29,8 @@
             </p>
         </div>
 
+        <a role="button" title="previous sibling" th:if="${noteDecorated.previousSiblingNote}" th:href="@{/notes/{id}(id=${noteDecorated.previousSiblingNote.id})}">Previous Sibling</a>
+        <a role="button" title="previous" th:if="${noteDecorated.previousNote}" th:href="@{/notes/{id}(id=${noteDecorated.previousNote.id})}">Previous</a>
         <a role="button" title="next" th:if="${noteDecorated.nextNote}" th:href="@{/notes/{id}(id=${noteDecorated.nextNote.id})}">Next</a>
         <a role="button" title="next sibling" th:if="${noteDecorated.nextSiblingNote}" th:href="@{/notes/{id}(id=${noteDecorated.nextSiblingNote.id})}">Next Sibling</a>
 

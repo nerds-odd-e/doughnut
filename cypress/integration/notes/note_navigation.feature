@@ -17,6 +17,8 @@ Feature: Note navigation
         But I should be able to go to the "<button>" note "<expected title>"
 
         Examples:
-            | button          |  expected title       |
-            | next            |  Equilateral triangle |
-            | next sibling    |  Circle               |
+            | button           |  expected title       |
+            | next             |  Equilateral triangle |
+            | next sibling     |  Circle               |
+            | previous         |  Square               |
+            | previous sibling |  Rectangle            |

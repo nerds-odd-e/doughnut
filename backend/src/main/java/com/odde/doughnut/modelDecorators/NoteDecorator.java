@@ -47,7 +47,26 @@ public class NoteDecorator {
                 if (n != note) {
                     return n;
                 }
+            }
+        }
+        return null;
+    }
 
+    public Note getPreviousNote() {
+        Note previousSiblingNote = getPreviousSiblingNote();
+        if (previousSiblingNote != null) {
+            return previousSiblingNote.getChildren().stream().findFirst().orElse(null);
+        }
+        return null;
+    }
+
+    public Note getPreviousSiblingNote() {
+        if (note.getParentNote() != null) {
+            List<Note> allByParentId = noteRepository.findAllByParentNote(note.getParentNote());
+            for (Note n: allByParentId) {
+                if (n != note) {
+                    return n;
+                }
             }
         }
         return null;
