@@ -98,6 +98,13 @@ When("I move note {string} left", (noteTitles) => {
   cy.findByRole('button', {name: 'Move Left'}).click();
 });
 
+When("I move note {string} right", (noteTitles) => {
+  cy.visit("/notes");
+  noteTitles.split("/").forEach(noteTitle => cy.findByText(noteTitle).click());
+  cy.findByText("Move This Note").click();
+  cy.findByRole('button', {name: 'Move Right'}).click();
+});
+
 When("I should see {string} is before {string} in {string}", (noteTitle1, noteTitle2, parentNoteTitles) => {
   cy.visit("/notes");
   parentNoteTitles.split("/").forEach(noteTitle => cy.findByText(noteTitle).click());

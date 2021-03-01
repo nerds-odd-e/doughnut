@@ -7,8 +7,12 @@
             <li class="breadcrumb-item additional-item" th:text="${noteEntity.title}"/>
         </div>
 
-        <form action="#" th:action="@{/notes/{id}/move(id=${noteEntity.id})}" th:object="${noteEntity}" method="post">
+        <form action="#" th:action="@{/notes/{id}/move(id=${noteEntity.id})}" th:object="${noteMotion}" method="post">
             <input type="submit" value="Move Left" class="btn btn-primary"/>
+        </form>
+        <form action="#" th:action="@{/notes/{id}/move(id=${noteEntity.id})}" th:object="${noteMotionRight}" method="post">
+            <input type="hidden" th:field="*{behind}"/>
+            <input type="submit" value="Move Right" class="btn btn-primary"/>
         </form>
     </div>
 </layout>

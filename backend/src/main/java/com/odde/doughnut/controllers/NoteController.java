@@ -5,6 +5,7 @@ import com.odde.doughnut.controllers.exceptions.NoAccessRightException;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.UserEntity;
 import com.odde.doughnut.models.NoteModel;
+import com.odde.doughnut.models.NoteMotion;
 import com.odde.doughnut.services.ModelFactoryService;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -96,14 +97,22 @@ public class NoteController {
 
     @GetMapping("/{noteEntity}/move")
     public String prepareToNote(NoteEntity noteEntity, Model model) {
-        model.addAttribute("noteEntity", noteEntity);
+        model.addAttribute("noteMotion", new NoteMotion(noteEntity, null));
+        model.addAttribute("noteMotionRight", new NoteMotion(noteEntity, noteEntity));
         return "move_note";
     }
 
     @PostMapping("/{noteEntity}/move")
-    public String moveNote(NoteEntity noteEntity, Model model) {
-        model.addAttribute("noteEntity", noteEntity);
-        return "move_note";
+    public String moveNote(NoteEntity noteEntity, NoteMotion noteMotion, Model model) {
+        if (noteMotion.getBehind() == null) {
+            noteEntity.setSiblingOrder(0L);
+        }
+        else {
+            noteEntity.setSiblingOrder(999999999999999999L);
+        }
+
+        modelFactoryService.noteRepository.save(noteEntity);
+        return "redirect:/notes/" + noteEntity.getId();
     }
 
     @PostMapping(value = "/{note}/delete")
