@@ -1,6 +1,6 @@
 package com.odde.doughnut.controllers.currentUser;
 
-import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.UserEntity;
 import com.odde.doughnut.entities.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -15,7 +15,7 @@ public class CurrentUserFromRequest implements CurrentUser {
     @Autowired
     UserRepository userRepository;
     String externalId = null;
-    User user = null;
+    UserEntity userEntity = null;
 
     public CurrentUserFromRequest(HttpServletRequest request) {
         Principal userPrincipal = request.getUserPrincipal();
@@ -26,10 +26,10 @@ public class CurrentUserFromRequest implements CurrentUser {
     }
 
     @Override
-    public User getUser() {
-        if (user == null && externalId != null) {
-            user = userRepository.findByExternalIdentifier(externalId);
+    public UserEntity getUser() {
+        if (userEntity == null && externalId != null) {
+            userEntity = userRepository.findByExternalIdentifier(externalId);
         }
-        return user;
+        return userEntity;
     }
 }

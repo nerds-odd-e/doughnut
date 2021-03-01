@@ -1,6 +1,6 @@
 package com.odde.doughnut.services;
 
-import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.UserEntity;
 import com.odde.doughnut.entities.repositories.BazaarNoteRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
 import com.odde.doughnut.models.BazaarModel;
@@ -33,7 +33,7 @@ public class ModelFactoryService {
         return new BazaarModel(this);
     }
 
-    public Optional<User> findUserById(Integer id) {
+    public Optional<UserEntity> findUserById(Integer id) {
         return userRepository.findById(id);
     }
 

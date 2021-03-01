@@ -1,11 +1,9 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.repositories.NoteRepository;
+import com.odde.doughnut.entities.UserEntity;
 import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.DBCleaner;
 import com.odde.doughnut.testability.MakeMe;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -44,9 +42,9 @@ class IndexControllerTests {
 
   @Test
   void visitWithUserSessionAndTheUserExists() {
-    User user = makeMe.aUser().please(modelFactoryService);
-    Principal principal = (UserPrincipal) user::getExternalIdentifier;
-    controller = new IndexController(new TestCurrentUser(user), modelFactoryService);
+    UserEntity userEntity = makeMe.aUser().please(modelFactoryService);
+    Principal principal = (UserPrincipal) userEntity::getExternalIdentifier;
+    controller = new IndexController(new TestCurrentUser(userEntity), modelFactoryService);
     assertEquals("index", controller.home(principal, model));
   }
 }

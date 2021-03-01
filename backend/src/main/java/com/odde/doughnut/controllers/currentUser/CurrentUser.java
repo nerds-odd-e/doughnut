@@ -1,7 +1,7 @@
 package com.odde.doughnut.controllers.currentUser;
 
-import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.UserEntity;
 
 public interface CurrentUser {
-    User getUser();
+    UserEntity getUser();
 }

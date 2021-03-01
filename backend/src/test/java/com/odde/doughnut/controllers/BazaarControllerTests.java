@@ -2,7 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.exceptions.NoAccessRightException;
 import com.odde.doughnut.entities.NoteEntity;
-import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.UserEntity;
 import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.DBCleaner;
 import com.odde.doughnut.testability.MakeMe;
@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class BazaarControllerTests {
     @Autowired ModelFactoryService modelFactoryService;
     private MakeMe makeMe = new MakeMe();
-    private User user;
+    private UserEntity userEntity;
     private NoteEntity topNote;
     private BazaarController controller;
     ExtendedModelMap model = new ExtendedModelMap();
@@ -40,9 +40,9 @@ class BazaarControllerTests {
 
     @BeforeEach
     void setup() {
-        user = makeMe.aUser().please(modelFactoryService);
-        topNote = makeMe.aNote().forUser(user).please(modelFactoryService);
-        controller = new BazaarController(new TestCurrentUser(user), modelFactoryService);
+        userEntity = makeMe.aUser().please(modelFactoryService);
+        topNote = makeMe.aNote().forUser(userEntity).please(modelFactoryService);
+        controller = new BazaarController(new TestCurrentUser(userEntity), modelFactoryService);
     }
 
     @Test
@@ -70,8 +70,8 @@ class BazaarControllerTests {
 
         @Test
         void shouldNotBeAbleToShareNoteThatBelongsToOtherUser() {
-            User anotherUser = makeMe.aUser().please(modelFactoryService);
-            NoteEntity note = makeMe.aNote().forUser(anotherUser).please(modelFactoryService);
+            UserEntity anotherUserEntity = makeMe.aUser().please(modelFactoryService);
+            NoteEntity note = makeMe.aNote().forUser(anotherUserEntity).please(modelFactoryService);
             assertThrows(NoAccessRightException.class, ()->
                     controller.shareNote(note)
             );

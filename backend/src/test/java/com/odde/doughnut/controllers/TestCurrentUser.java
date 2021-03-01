@@ -1,17 +1,17 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUser;
-import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.UserEntity;
 
 public class TestCurrentUser implements CurrentUser {
-    private final User user;
+    private final UserEntity userEntity;
 
-    public TestCurrentUser(User user) {
-        this.user = user;
+    public TestCurrentUser(UserEntity userEntity) {
+        this.userEntity = userEntity;
     }
 
     @Override
-    public User getUser() {
-        return user;
+    public UserEntity getUser() {
+        return userEntity;
     }
 }

@@ -2,7 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.exceptions.NoAccessRightException;
 import com.odde.doughnut.entities.NoteEntity;
-import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.UserEntity;
 import com.odde.doughnut.entities.repositories.LinkRepository;
 import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.DBCleaner;
@@ -36,7 +36,7 @@ class NoteControllerTests {
     ModelFactoryService modelFactoryService;
 
     private MakeMe makeMe = new MakeMe();
-    private User user;
+    private UserEntity userEntity;
     private NoteEntity parentNote;
     private NoteEntity childNote;
     ExtendedModelMap model = new ExtendedModelMap();
@@ -44,8 +44,8 @@ class NoteControllerTests {
 
     @BeforeEach
     void setup() {
-        user = makeMe.aUser().please(modelFactoryService);
-        controller = new NoteController(new TestCurrentUser(user), modelFactoryService);
+        userEntity = makeMe.aUser().please(modelFactoryService);
+        controller = new NoteController(new TestCurrentUser(userEntity), modelFactoryService);
     }
 
     @Nested
@@ -55,9 +55,9 @@ class NoteControllerTests {
 
         @BeforeEach
         void setup() {
-            parentNote = makeMe.aNote().forUser(user).please(modelFactoryService);
-            childNote = makeMe.aNote().forUser(user).under(parentNote).please(modelFactoryService);
-            makeMe.refresh(entityManager, user);
+            parentNote = makeMe.aNote().forUser(userEntity).please(modelFactoryService);
+            childNote = makeMe.aNote().forUser(userEntity).under(parentNote).please(modelFactoryService);
+            makeMe.refresh(entityManager, userEntity);
             makeMe.refresh(entityManager, parentNote);
         }
 
@@ -147,8 +147,8 @@ class NoteControllerTests {
 
         @Test
         void shouldNotBeAbleToDeleteNoteThatBelongsToOtherUser() {
-            User anotherUser = makeMe.aUser().please(modelFactoryService);
-            NoteEntity note = makeMe.aNote().forUser(anotherUser).please(modelFactoryService);
+            UserEntity anotherUserEntity = makeMe.aUser().please(modelFactoryService);
+            NoteEntity note = makeMe.aNote().forUser(anotherUserEntity).please(modelFactoryService);
             Integer noteId = note.getId();
             assertThrows(NoAccessRightException.class, ()->
                     controller.deleteNote(note)
@@ -158,7 +158,7 @@ class NoteControllerTests {
 
         @Test
         void shouldDeleteTheNoteButNotTheUser() throws NoAccessRightException {
-            NoteEntity note = makeMe.aNote().forUser(user).please(modelFactoryService);
+            NoteEntity note = makeMe.aNote().forUser(userEntity).please(modelFactoryService);
             Integer noteId = note.getId();
             RedirectView response = controller.deleteNote(note);
             assertEquals("/notes", response.getUrl());
@@ -168,10 +168,10 @@ class NoteControllerTests {
 
         @Test
         void shouldDeleteTheChildNoteButNotSiblingOrParent() throws NoAccessRightException {
-            NoteEntity parent = makeMe.aNote().forUser(user).please(modelFactoryService);
-            NoteEntity subject = makeMe.aNote().under(parent).forUser(user).please(modelFactoryService);
-            NoteEntity sibling = makeMe.aNote().under(parent).forUser(user).please(modelFactoryService);
-            NoteEntity child = makeMe.aNote().under(subject).forUser(user).please(modelFactoryService);
+            NoteEntity parent = makeMe.aNote().forUser(userEntity).please(modelFactoryService);
+            NoteEntity subject = makeMe.aNote().under(parent).forUser(userEntity).please(modelFactoryService);
+            NoteEntity sibling = makeMe.aNote().under(parent).forUser(userEntity).please(modelFactoryService);
+            NoteEntity child = makeMe.aNote().under(subject).forUser(userEntity).please(modelFactoryService);
 
             controller.deleteNote(subject);
 
@@ -181,9 +181,9 @@ class NoteControllerTests {
 
         @Test
         void shouldDeleteTheLinkToAndFromThisNote() throws NoAccessRightException {
-            NoteEntity referTo = makeMe.aNote().forUser(user).please(modelFactoryService);
-            NoteEntity subject = makeMe.aNote().forUser(user).linkTo(referTo).please(modelFactoryService);
-            NoteEntity referFrom = makeMe.aNote().forUser(user).linkTo(subject).linkTo(referTo).please(modelFactoryService);
+            NoteEntity referTo = makeMe.aNote().forUser(userEntity).please(modelFactoryService);
+            NoteEntity subject = makeMe.aNote().forUser(userEntity).linkTo(referTo).please(modelFactoryService);
+            NoteEntity referFrom = makeMe.aNote().forUser(userEntity).linkTo(subject).linkTo(referTo).please(modelFactoryService);
             long oldCount = linkRepository.count();
 
             controller.deleteNote(subject);

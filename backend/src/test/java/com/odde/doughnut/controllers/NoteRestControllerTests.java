@@ -1,7 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.NoteEntity;
-import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.UserEntity;
 import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.DBCleaner;
 import com.odde.doughnut.testability.MakeMe;
@@ -25,20 +25,20 @@ public class NoteRestControllerTests {
     @Autowired EntityManager entityManager;
     @Autowired ModelFactoryService modelFactoryService;
     private MakeMe makeMe;
-    private User user;
+    private UserEntity userEntity;
     private NoteRestController noteController;
 
     @BeforeEach
     void setup() {
         makeMe = new MakeMe();
-        user = makeMe.aUser().please(modelFactoryService);
-        noteController = new NoteRestController(new TestCurrentUser(user), modelFactoryService);
+        userEntity = makeMe.aUser().please(modelFactoryService);
+        noteController = new NoteRestController(new TestCurrentUser(userEntity), modelFactoryService);
     }
 
     @Test
     void shouldGetListOfNotes() {
-        NoteEntity note = makeMe.aNote().forUser(user).please(modelFactoryService);
-        makeMe.refresh(entityManager, user);
+        NoteEntity note = makeMe.aNote().forUser(userEntity).please(modelFactoryService);
+        makeMe.refresh(entityManager, userEntity);
         assertEquals(note.getTitle(), noteController.getNotes().get(0).getTitle());
     }
 

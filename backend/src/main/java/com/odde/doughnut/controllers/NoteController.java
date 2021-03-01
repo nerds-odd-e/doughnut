@@ -3,7 +3,7 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.exceptions.NoAccessRightException;
 import com.odde.doughnut.entities.NoteEntity;
-import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.UserEntity;
 import com.odde.doughnut.models.NoteModel;
 import com.odde.doughnut.services.ModelFactoryService;
 import org.springframework.http.MediaType;
@@ -46,8 +46,8 @@ public class NoteController {
         if (bindingResult.hasErrors()) {
             return "new_note";
         }
-        User user = currentUser.getUser();
-        noteEntity.setUser(user);
+        UserEntity userEntity = currentUser.getUser();
+        noteEntity.setUserEntity(userEntity);
         modelFactoryService.noteRepository.save(noteEntity);
         return "redirect:/notes/" + noteEntity.getId();
     }

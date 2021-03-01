@@ -70,7 +70,7 @@ public class NoteEntity {
   @ManyToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "user_id", referencedColumnName = "id")
   @JsonIgnore
-  @Getter @Setter private User user;
+  @Getter @Setter private UserEntity userEntity;
 
   @Column(name="created_datetime")
   @Getter @Setter private Date createdDatetime;

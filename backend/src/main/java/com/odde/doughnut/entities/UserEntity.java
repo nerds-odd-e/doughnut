@@ -14,16 +14,16 @@ import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "user")
-public class User {
+public class UserEntity {
     @Id @Getter @GeneratedValue(strategy = GenerationType.IDENTITY) private Integer id;
     @Getter @Setter private String name;
     @Column(name = "external_identifier") @Getter @Setter private String externalIdentifier;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "userEntity")
     @JsonIgnore
     @Getter @Setter private List<NoteEntity> notes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "userEntity")
     @Where(clause = "parent_id IS NULL")
     @JsonIgnore
     @Getter private List<NoteEntity> orphanedNotes;
@@ -54,7 +54,7 @@ public class User {
     }
 
     public boolean owns(NoteEntity note) {
-        return note.getUser().id == id;
+        return note.getUserEntity().id == id;
     }
 
     public void checkAuthorization(NoteEntity note) throws NoAccessRightException {

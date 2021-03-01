@@ -7,7 +7,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "link")
-public class Link {
+public class LinkEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) private Integer id;
 

@@ -30,7 +30,7 @@ import static org.hamcrest.Matchers.*;
 public class NoteEntityTest {
 
     MakeMe makeMe = new MakeMe();
-    User user;
+    UserEntity userEntity;
 
     @Test
     void timeOrder() {
@@ -74,30 +74,30 @@ public class NoteEntityTest {
     }
 
     @Nested
-    class NoteEntityWithUser {
+    class NoteEntityWithUserEntity {
         @Autowired private ModelFactoryService modelFactoryService;
 
         @BeforeEach
         void setup() {
-            user = makeMe.aUser().with2Notes().please(modelFactoryService);
+            userEntity = makeMe.aUser().with2Notes().please(modelFactoryService);
         }
 
         @Test
         void thereShouldBe2NodesForUser() {
-            List<NoteEntity> notes = user.getNotes();
+            List<NoteEntity> notes = userEntity.getNotes();
             assertThat(notes, hasSize(equalTo(2)));
         }
 
         @Test
         void targetIsEmptyByDefault() {
-            NoteEntity note = user.getNotes().get(0);
+            NoteEntity note = userEntity.getNotes().get(0);
             assertThat(note.getTargetNotes(), is(empty()));
         }
 
         @Test
         void targetOfLinkedNotes() {
-            NoteEntity note = user.getNotes().get(0);
-            NoteEntity targetNote = user.getNotes().get(1);
+            NoteEntity note = userEntity.getNotes().get(0);
+            NoteEntity targetNote = userEntity.getNotes().get(1);
             note.linkToNote(targetNote);
             List<NoteEntity> targetNotes = note.getTargetNotes();
             assertThat(targetNotes, hasSize(equalTo(1)));
