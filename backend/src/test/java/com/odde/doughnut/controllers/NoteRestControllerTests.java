@@ -6,6 +6,7 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.LinkRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
+import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.DBCleaner;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
@@ -40,11 +41,11 @@ public class NoteRestControllerTests {
     void setup() {
         makeMe = new MakeMe();
         user = makeMe.aUser().please(userRepository);
-        noteController = new NoteRestController(noteRepository, null, new TestCurrentUser(user));
+        noteController = new NoteRestController(noteRepository, new TestCurrentUser(user));
     }
 
     @Test
-    void shouldGetListOfNotes() throws Exception {
+    void shouldGetListOfNotes() {
         Note note = makeMe.aNote().forUser(user).please(noteRepository);
         makeMe.refresh(entityManager, user);
         assertEquals(note.getTitle(), noteController.getNotes().get(0).getTitle());

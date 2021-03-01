@@ -2,7 +2,6 @@
 package com.odde.doughnut.testability;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFromRequest;
-import com.odde.doughnut.services.LinkService;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
@@ -26,9 +25,6 @@ class TestabilityController {
   @Autowired UserRepository userRepository;
   @Autowired
   CurrentUserFromRequest currentUser;
-
-  @Autowired
-  LinkService linkService;
 
   @GetMapping("/clean_db_and_seed_data")
   public String cleanDBAndSeedData() {

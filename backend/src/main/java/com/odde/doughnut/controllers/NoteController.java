@@ -4,11 +4,14 @@ import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
+import com.odde.doughnut.models.NoteModel;
 import com.odde.doughnut.services.ModelFactoryService;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.view.RedirectView;
 
 import javax.validation.Valid;
 import java.util.List;
@@ -54,9 +57,8 @@ public class NoteController {
         return "redirect:/notes/" + note.getId();
     }
 
-    @GetMapping("/{id}")
-    public String note(@PathVariable(name = "id") Integer noteId, Model model) {
-        Note note = noteRepository.findById(noteId).get();
+    @GetMapping("/{note}")
+    public String note(@PathVariable(name = "note") Note note, Model model) {
         model.addAttribute("note", note);
         model.addAttribute("noteDecorated", modelFactoryService.toModel(note));
         return "note";
@@ -77,17 +79,25 @@ public class NoteController {
         return "redirect:/notes/" + note.getId();
     }
 
-    @GetMapping("/{id}/link")
+    @GetMapping("/{note}/link")
     public String link(
-            @PathVariable("id") String id,
+            @PathVariable("note") Note note,
             @RequestParam(required = false) String searchTerm,
             Model model
     ) {
-        Note sourceNote = noteRepository.findById(Integer.valueOf(id)).get();
-        List<Note> linkableNotes = currentUser.getUser().filterLinkableNotes(sourceNote, searchTerm);
+        List<Note> linkableNotes = currentUser.getUser().filterLinkableNotes(note, searchTerm);
         model.addAttribute("linkableNotes", linkableNotes);
-        model.addAttribute("sourceNote", sourceNote);
+        model.addAttribute("sourceNote", note);
         return "link";
+    }
+
+    @PostMapping(value = "/{id}/link", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public RedirectView linkNote(@PathVariable("id") Integer id, Integer targetNoteId) {
+        Note sourceNote = noteRepository.findById(id).get();
+        Note targetNote = noteRepository.findById(targetNoteId).get();
+        NoteModel noteModel = modelFactoryService.toModel(sourceNote);
+        noteModel.linkNote(targetNote);
+        return new RedirectView("/review");
     }
 
     @GetMapping("/{note}/move")

@@ -83,7 +83,7 @@ class NoteControllerTests {
 
         @Test
         void shouldReturnChildNoteIfNoteIdGiven() {
-            assertEquals("note", controller.note(parentNote.getId(), model));
+            assertEquals("note", controller.note(parentNote, model));
             assertThat(((Note) model.getAttribute("note")).getId(), equalTo(parentNote.getId()));
         }
     }

@@ -4,7 +4,6 @@ import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.exceptions.NoAccessRightException;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.repositories.NoteRepository;
-import com.odde.doughnut.services.LinkService;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,26 +16,16 @@ import java.util.List;
 @RestController
 public class NoteRestController {
     private final NoteRepository noteRepository;
-    private final LinkService linkService;
     private final CurrentUser currentUser;
 
-    public NoteRestController(NoteRepository noteRepository, LinkService linkService, CurrentUser currentUser) {
+    public NoteRestController(NoteRepository noteRepository, CurrentUser currentUser) {
         this.noteRepository = noteRepository;
-        this.linkService = linkService;
         this.currentUser = currentUser;
     }
 
     @GetMapping(value = "/api/notes", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<Note> getNotes() throws Exception {
+    public List<Note> getNotes() {
         return currentUser.getUser().getNotesInDescendingOrder();
-    }
-
-    @PostMapping(value = "/notes/{id}/link", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public RedirectView linkNote(@PathVariable("id") Integer id, Integer targetNoteId) {
-        Note sourceNote = noteRepository.findById(id).get();
-        Note targetNote = noteRepository.findById(targetNoteId).get();
-        linkService.linkNote(sourceNote, targetNote);
-        return new RedirectView("/review");
     }
 
     @PostMapping(value = "/notes/{id}/delete")
