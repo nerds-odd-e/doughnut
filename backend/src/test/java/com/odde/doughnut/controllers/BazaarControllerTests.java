@@ -4,7 +4,6 @@ import com.odde.doughnut.controllers.exceptions.NoAccessRightException;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.UserEntity;
 import com.odde.doughnut.services.ModelFactoryService;
-import com.odde.doughnut.testability.DBCleaner;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -27,7 +26,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
-@ExtendWith(DBCleaner.class)
 @Transactional
 class BazaarControllerTests {
     @Autowired ModelFactoryService modelFactoryService;

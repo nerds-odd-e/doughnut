@@ -20,13 +20,10 @@ import static org.hamcrest.Matchers.*;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
-@ExtendWith(DBCleaner.class)
 @Transactional
-
 public class NoteModelTest {
     NoteEntity topLevel;
     @Autowired ModelFactoryService modelFactoryService;
-
 
     MakeMe makeMe;
 
@@ -60,7 +57,6 @@ public class NoteModelTest {
             assertThat(ancestry, contains(topLevel, subject));
             assertThat(ancestry, not(contains(sibling)));
         }
-
     }
 
     @Nested

@@ -15,9 +15,11 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.ui.Model;
 
+import javax.transaction.Transactional;
+
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
-@ExtendWith(DBCleaner.class)
+@Transactional
 class DoughnutWithNoSpringTests {
 
   @Autowired private NoteRepository noteRepository;

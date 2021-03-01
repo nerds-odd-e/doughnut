@@ -20,7 +20,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
-@ExtendWith(DBCleaner.class)
 @Transactional
 public class UserEntityTest {
     @Autowired EntityManager entityManager;

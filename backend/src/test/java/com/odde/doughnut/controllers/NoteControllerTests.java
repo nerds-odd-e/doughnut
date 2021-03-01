@@ -29,7 +29,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
-@ExtendWith(DBCleaner.class)
 @Transactional
 class NoteControllerTests {
     @Autowired
@@ -163,7 +162,7 @@ class NoteControllerTests {
             RedirectView response = controller.deleteNote(note);
             assertEquals("/notes", response.getUrl());
             assertFalse(modelFactoryService.findNoteById(noteId).isPresent());
-            assertTrue(modelFactoryService.findUserById(note.getId()).isPresent());
+            assertTrue(modelFactoryService.findUserById(userEntity.getId()).isPresent());
         }
 
         @Test

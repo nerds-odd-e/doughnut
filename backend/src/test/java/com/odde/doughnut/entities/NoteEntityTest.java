@@ -24,7 +24,6 @@ import static org.hamcrest.Matchers.*;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
-@ExtendWith(DBCleaner.class)
 @Transactional
 
 public class NoteEntityTest {
