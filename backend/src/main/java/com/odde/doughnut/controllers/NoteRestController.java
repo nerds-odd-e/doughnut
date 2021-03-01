@@ -1,7 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUser;
-import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.services.ModelFactoryService;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +20,7 @@ public class NoteRestController {
     }
 
     @GetMapping(value = "/api/notes", produces = MediaType.APPLICATION_JSON_VALUE)
-    public List<Note> getNotes() {
+    public List<NoteEntity> getNotes() {
         return currentUser.getUser().getNotesInDescendingOrder();
     }
 

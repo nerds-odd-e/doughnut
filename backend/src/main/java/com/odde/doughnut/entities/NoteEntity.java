@@ -14,7 +14,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "note")
-public class Note {
+public class NoteEntity {
   @Id @Getter @GeneratedValue(strategy = GenerationType.IDENTITY) private Integer id;
   @NotNull
   @Size(min=1, max=100)
@@ -61,11 +61,11 @@ public class Note {
   @ManyToOne
   @JoinColumn(name = "parent_id")
   @JsonIgnore
-  @Getter @Setter private Note parentNote;
+  @Getter @Setter private NoteEntity parentNote;
 
   @OneToMany(mappedBy = "parentNote", cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonIgnore
-  @Getter private List<Note> children = new ArrayList<>();
+  @Getter private List<NoteEntity> children = new ArrayList<>();
 
   @ManyToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "user_id", referencedColumnName = "id")
@@ -84,16 +84,16 @@ public class Note {
           })
   @ManyToMany
   @JsonIgnoreProperties("targetNotes")
-  @Getter @Setter private List<Note> targetNotes = new ArrayList<>();
+  @Getter @Setter private List<NoteEntity> targetNotes = new ArrayList<>();
 
   @Transient
   @Getter @Setter private String testingLinkTo;
 
-  public void linkToNote(Note targetNote) {
+  public void linkToNote(NoteEntity targetNote) {
     this.targetNotes.add(targetNote);
   }
 
-  public void addChild(Note note) {
+  public void addChild(NoteEntity note) {
       note.setParentNote(this);
       getChildren().add(note);
   }

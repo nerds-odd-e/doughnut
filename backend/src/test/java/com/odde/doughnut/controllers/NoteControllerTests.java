@@ -1,7 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.exceptions.NoAccessRightException;
-import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.LinkRepository;
 import com.odde.doughnut.services.ModelFactoryService;
@@ -37,8 +37,8 @@ class NoteControllerTests {
 
     private MakeMe makeMe = new MakeMe();
     private User user;
-    private Note parentNote;
-    private Note childNote;
+    private NoteEntity parentNote;
+    private NoteEntity childNote;
     ExtendedModelMap model = new ExtendedModelMap();
     NoteController controller;
 
@@ -64,27 +64,27 @@ class NoteControllerTests {
         @Test
         void shouldUseTheRigthTemplateForCreatingNote() {
             assertEquals("new_note", controller.newNote(null, model));
-            assertThat(((Note) model.getAttribute("note")).getParentNote(), is(nullValue()));
+            assertThat(((NoteEntity) model.getAttribute("noteEntity")).getParentNote(), is(nullValue()));
         }
 
         @Test
         void shouldGetTheParentNoteIfIdProvided() {
             controller.newNote(parentNote, model);
-            assertThat(((Note) model.getAttribute("note")).getParentNote(), equalTo(parentNote));
+            assertThat(((NoteEntity) model.getAttribute("noteEntity")).getParentNote(), equalTo(parentNote));
         }
 
         @Test
         void shouldReturnAllParentlessNotesForMyNotes() {
             assertEquals("my_notes", controller.myNotes(model));
             assertThat(model.getAttribute("note"), is(nullValue()));
-            assertThat((List<Note>) model.getAttribute("notes"), hasSize(equalTo(1)));
-            assertThat((List<Note>) model.getAttribute("notes"), contains(parentNote));
+            assertThat((List<NoteEntity>) model.getAttribute("notes"), hasSize(equalTo(1)));
+            assertThat((List<NoteEntity>) model.getAttribute("notes"), contains(parentNote));
         }
 
         @Test
         void shouldReturnChildNoteIfNoteIdGiven() {
             assertEquals("note", controller.note(parentNote, model));
-            assertThat(((Note) model.getAttribute("note")).getId(), equalTo(parentNote.getId()));
+            assertThat(((NoteEntity) model.getAttribute("note")).getId(), equalTo(parentNote.getId()));
         }
     }
 
@@ -92,19 +92,19 @@ class NoteControllerTests {
     class createNoteTest {
         @Test
         void shouldBeAbleToSaveNoteWhenValid() {
-            Note newNote = makeMe.aNote().inMemoryPlease();
+            NoteEntity newNote = makeMe.aNote().inMemoryPlease();
             BindingResult bindingResult = makeMe.successfulBindingResult();
 
-            String response = controller.createNote(newNote, bindingResult);
+            String response = controller.createNote(newNote, bindingResult, model);
             assertEquals("redirect:/notes/" + newNote.getId(), response);
         }
 
         @Test
         void shouldNotBeAbleToSaveNoteWhenInvalid() {
-            Note newNote = new Note();
+            NoteEntity newNote = new NoteEntity();
             BindingResult bindingResult = makeMe.failedBindingResult();
 
-            String response = controller.createNote(newNote, bindingResult);
+            String response = controller.createNote(newNote, bindingResult, model);
             assertEquals(null, newNote.getId());
             assertEquals("new_note", response);
         }
@@ -113,7 +113,7 @@ class NoteControllerTests {
 
     @Nested
     class updateNoteTest {
-        Note note;
+        NoteEntity note;
 
         @BeforeEach
         void setup() {
@@ -131,7 +131,7 @@ class NoteControllerTests {
 
         @Test
         void shouldNotBeAbleToSaveNoteWhenInvalid() {
-            Note note = makeMe.aNote().please(modelFactoryService);
+            NoteEntity note = makeMe.aNote().please(modelFactoryService);
             note.setTitle("new");
             BindingResult bindingResult = makeMe.failedBindingResult();
 
@@ -148,7 +148,7 @@ class NoteControllerTests {
         @Test
         void shouldNotBeAbleToDeleteNoteThatBelongsToOtherUser() {
             User anotherUser = makeMe.aUser().please(modelFactoryService);
-            Note note = makeMe.aNote().forUser(anotherUser).please(modelFactoryService);
+            NoteEntity note = makeMe.aNote().forUser(anotherUser).please(modelFactoryService);
             Integer noteId = note.getId();
             assertThrows(NoAccessRightException.class, ()->
                     controller.deleteNote(note)
@@ -158,20 +158,20 @@ class NoteControllerTests {
 
         @Test
         void shouldDeleteTheNoteButNotTheUser() throws NoAccessRightException {
-            Note note = makeMe.aNote().forUser(user).please(modelFactoryService);
+            NoteEntity note = makeMe.aNote().forUser(user).please(modelFactoryService);
             Integer noteId = note.getId();
             RedirectView response = controller.deleteNote(note);
             assertEquals("/notes", response.getUrl());
             assertFalse(modelFactoryService.findNoteById(noteId).isPresent());
-            assert(modelFactoryService.findUserById(note.getId()).isPresent());
+            assertTrue(modelFactoryService.findUserById(note.getId()).isPresent());
         }
 
         @Test
         void shouldDeleteTheChildNoteButNotSiblingOrParent() throws NoAccessRightException {
-            Note parent = makeMe.aNote().forUser(user).please(modelFactoryService);
-            Note subject = makeMe.aNote().under(parent).forUser(user).please(modelFactoryService);
-            Note sibling = makeMe.aNote().under(parent).forUser(user).please(modelFactoryService);
-            Note child = makeMe.aNote().under(subject).forUser(user).please(modelFactoryService);
+            NoteEntity parent = makeMe.aNote().forUser(user).please(modelFactoryService);
+            NoteEntity subject = makeMe.aNote().under(parent).forUser(user).please(modelFactoryService);
+            NoteEntity sibling = makeMe.aNote().under(parent).forUser(user).please(modelFactoryService);
+            NoteEntity child = makeMe.aNote().under(subject).forUser(user).please(modelFactoryService);
 
             controller.deleteNote(subject);
 
@@ -181,9 +181,9 @@ class NoteControllerTests {
 
         @Test
         void shouldDeleteTheLinkToAndFromThisNote() throws NoAccessRightException {
-            Note referTo = makeMe.aNote().forUser(user).please(modelFactoryService);
-            Note subject = makeMe.aNote().forUser(user).linkTo(referTo).please(modelFactoryService);
-            Note referFrom = makeMe.aNote().forUser(user).linkTo(subject).linkTo(referTo).please(modelFactoryService);
+            NoteEntity referTo = makeMe.aNote().forUser(user).please(modelFactoryService);
+            NoteEntity subject = makeMe.aNote().forUser(user).linkTo(referTo).please(modelFactoryService);
+            NoteEntity referFrom = makeMe.aNote().forUser(user).linkTo(subject).linkTo(referTo).please(modelFactoryService);
             long oldCount = linkRepository.count();
 
             controller.deleteNote(subject);

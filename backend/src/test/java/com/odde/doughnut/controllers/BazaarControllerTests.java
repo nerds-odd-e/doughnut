@@ -1,7 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.exceptions.NoAccessRightException;
-import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.DBCleaner;
@@ -33,7 +33,7 @@ class BazaarControllerTests {
     @Autowired ModelFactoryService modelFactoryService;
     private MakeMe makeMe = new MakeMe();
     private User user;
-    private Note topNote;
+    private NoteEntity topNote;
     private BazaarController controller;
     ExtendedModelMap model = new ExtendedModelMap();
 
@@ -48,14 +48,14 @@ class BazaarControllerTests {
     @Test
     void whenThereIsNoSharedNote() {
         assertEquals("bazaar", controller.bazaar(model));
-        assertThat((List<Note>) model.getAttribute("notes"), hasSize(equalTo(0)));
+        assertThat((List<NoteEntity>) model.getAttribute("notes"), hasSize(equalTo(0)));
     }
 
     @Test
     void whenThereIsSharedNote() {
         makeMe.aBazaarNode(topNote).please(modelFactoryService);
         assertEquals("bazaar", controller.bazaar(model));
-        assertThat((List<Note>) model.getAttribute("notes"), hasSize(equalTo(1)));
+        assertThat((List<NoteEntity>) model.getAttribute("notes"), hasSize(equalTo(1)));
     }
 
     @Nested
@@ -71,7 +71,7 @@ class BazaarControllerTests {
         @Test
         void shouldNotBeAbleToShareNoteThatBelongsToOtherUser() {
             User anotherUser = makeMe.aUser().please(modelFactoryService);
-            Note note = makeMe.aNote().forUser(anotherUser).please(modelFactoryService);
+            NoteEntity note = makeMe.aNote().forUser(anotherUser).please(modelFactoryService);
             assertThrows(NoAccessRightException.class, ()->
                     controller.shareNote(note)
             );

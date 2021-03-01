@@ -1,6 +1,5 @@
 package com.odde.doughnut.entities;
 
-import com.odde.doughnut.entities.repositories.UserRepository;
 import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.DBCleaner;
 import com.odde.doughnut.testability.MakeMe;
@@ -28,22 +27,22 @@ import static org.hamcrest.Matchers.*;
 @ExtendWith(DBCleaner.class)
 @Transactional
 
-public class NoteTest {
+public class NoteEntityTest {
 
     MakeMe makeMe = new MakeMe();
     User user;
 
     @Test
     void timeOrder() {
-        Note note1 = makeMe.aNote().inMemoryPlease();
-        Note note2 = makeMe.aNote().inMemoryPlease();
+        NoteEntity note1 = makeMe.aNote().inMemoryPlease();
+        NoteEntity note2 = makeMe.aNote().inMemoryPlease();
         assertThat(note1.getSiblingOrder(), is(lessThan(note2.getSiblingOrder())));
     }
 
     @Nested
     class ValidationTest {
         private Validator validator;
-        private final Note note = makeMe.aNote().inMemoryPlease();
+        private final NoteEntity note = makeMe.aNote().inMemoryPlease();
 
         @BeforeEach
         public void setUp() {
@@ -68,14 +67,14 @@ public class NoteTest {
             assertThat(getViolations(), is(not(empty())));
         }
 
-        private Set<ConstraintViolation<Note>> getViolations() {
+        private Set<ConstraintViolation<NoteEntity>> getViolations() {
             return validator.validate(note);
         }
 
     }
 
     @Nested
-    class NoteWithUser {
+    class NoteEntityWithUser {
         @Autowired private ModelFactoryService modelFactoryService;
 
         @BeforeEach
@@ -85,22 +84,22 @@ public class NoteTest {
 
         @Test
         void thereShouldBe2NodesForUser() {
-            List<Note> notes = user.getNotes();
+            List<NoteEntity> notes = user.getNotes();
             assertThat(notes, hasSize(equalTo(2)));
         }
 
         @Test
         void targetIsEmptyByDefault() {
-            Note note = user.getNotes().get(0);
+            NoteEntity note = user.getNotes().get(0);
             assertThat(note.getTargetNotes(), is(empty()));
         }
 
         @Test
         void targetOfLinkedNotes() {
-            Note note = user.getNotes().get(0);
-            Note targetNote = user.getNotes().get(1);
+            NoteEntity note = user.getNotes().get(0);
+            NoteEntity targetNote = user.getNotes().get(1);
             note.linkToNote(targetNote);
-            List<Note> targetNotes = note.getTargetNotes();
+            List<NoteEntity> targetNotes = note.getTargetNotes();
             assertThat(targetNotes, hasSize(equalTo(1)));
             assertThat(targetNotes, contains(targetNote));
         }

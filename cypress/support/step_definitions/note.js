@@ -101,10 +101,14 @@ When("I move note {string} left", (noteTitles) => {
 When("I should see {string} is before {string} in {string}", (noteTitle1, noteTitle2, parentNoteTitles) => {
   cy.visit("/notes");
   parentNoteTitles.split("/").forEach(noteTitle => cy.findByText(noteTitle).click());
-  var matcher = new RegExp(noteTitle2 + ".*" +noteTitle1, "g");
-  cy.queryAllBy({selector: '.card-title'}).then(array =>
-    cy.log(array)
-  )
+  var matcher = new RegExp(noteTitle1 + ".*" +noteTitle2, "g");
+
+  cy.get(".card-title").then(($els) => {
+    const texts = Array.from($els, el => el.innerText);
+    expect(texts).to.match(matcher);
+  });
+
+
 });
 
 

@@ -3,13 +3,13 @@
 
     <div class="container content">
         <h2>Adding new note</h2>
-        <div th:replace="fragments/note_fragments :: noteBreadcrumb(${note}, ~{:: .additional-item})">
+        <div th:replace="fragments/note_fragments :: noteBreadcrumb(${noteEntity}, ~{:: .additional-item})">
             <li class="breadcrumb-item additional-item">(adding here)</li>
         </div>
 
-        <form action="#" th:action="@{/notes}" th:object="${note}" method="post">
+        <form action="#" th:action="@{/notes}" th:object="${noteEntity}" method="post">
             <input data-cy="note-parent-id" th:field="*{parentNote}" type="hidden"/>
-            <div th:replace="fragments/note_fragments :: noteFormBody(${note})"/>
+            <div th:replace="fragments/note_fragments :: noteFormBody(${noteEntity})"/>
             <input type="submit" value="Submit" class="btn btn-primary"/>
         </form>
     </div>

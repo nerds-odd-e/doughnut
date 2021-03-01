@@ -2,7 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.exceptions.NoAccessRightException;
-import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.models.NoteModel;
 import com.odde.doughnut.services.ModelFactoryService;
@@ -34,39 +34,39 @@ public class NoteController {
     }
 
     @GetMapping({"/new", "/{parentNote}/new"})
-    public String newNote(@PathVariable(name = "parentNote", required = false) Note parentNote, Model model) {
-        Note note = new Note();
-        note.setParentNote(parentNote);
-        model.addAttribute("note", note);
+    public String newNote(@PathVariable(name = "parentNote", required = false) NoteEntity parentNote, Model model) {
+        NoteEntity noteEntity = new NoteEntity();
+        noteEntity.setParentNote(parentNote);
+        model.addAttribute("noteEntity", noteEntity);
         return "new_note";
     }
 
     @PostMapping("")
-    public String createNote(@Valid Note note, BindingResult bindingResult) {
+    public String createNote(@Valid NoteEntity noteEntity, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
             return "new_note";
         }
         User user = currentUser.getUser();
-        note.setUser(user);
-        modelFactoryService.noteRepository.save(note);
-        return "redirect:/notes/" + note.getId();
+        noteEntity.setUser(user);
+        modelFactoryService.noteRepository.save(noteEntity);
+        return "redirect:/notes/" + noteEntity.getId();
     }
 
     @GetMapping("/{note}")
-    public String note(@PathVariable(name = "note") Note note, Model model) {
+    public String note(@PathVariable(name = "note") NoteEntity note, Model model) {
         model.addAttribute("note", note);
         model.addAttribute("noteDecorated", modelFactoryService.toModel(note));
         return "note";
     }
 
     @GetMapping("/{note}/edit")
-    public String editNote(Note note, Model model) {
+    public String editNote(NoteEntity note, Model model) {
         model.addAttribute("note", note);
         return "edit_note";
     }
 
     @PostMapping("/{note}")
-    public String updateNote(@Valid Note note, BindingResult bindingResult) {
+    public String updateNote(@Valid NoteEntity note, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
            return "edit_note";
         }
@@ -76,32 +76,32 @@ public class NoteController {
 
     @GetMapping("/{note}/link")
     public String link(
-            @PathVariable("note") Note note,
+            @PathVariable("note") NoteEntity note,
             @RequestParam(required = false) String searchTerm,
             Model model
     ) {
-        List<Note> linkableNotes = currentUser.getUser().filterLinkableNotes(note, searchTerm);
+        List<NoteEntity> linkableNotes = currentUser.getUser().filterLinkableNotes(note, searchTerm);
         model.addAttribute("linkableNotes", linkableNotes);
         model.addAttribute("sourceNote", note);
         return "link";
     }
 
     @PostMapping(value = "/{note}/link", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public RedirectView linkNote(@PathVariable("note") Note note, Integer targetNoteId) {
-        Note targetNote = modelFactoryService.noteRepository.findById(targetNoteId).get();
+    public RedirectView linkNote(@PathVariable("note") NoteEntity note, Integer targetNoteId) {
+        NoteEntity targetNote = modelFactoryService.noteRepository.findById(targetNoteId).get();
         NoteModel noteModel = modelFactoryService.toModel(note);
         noteModel.linkNote(targetNote);
         return new RedirectView("/review");
     }
 
     @GetMapping("/{note}/move")
-    public String moveNote(Note note, Model model) {
+    public String moveNote(NoteEntity note, Model model) {
         model.addAttribute("note", note);
         return "move_note";
     }
 
     @PostMapping(value = "/{note}/delete")
-    public RedirectView deleteNote(@PathVariable("note") Note note) throws NoAccessRightException {
+    public RedirectView deleteNote(@PathVariable("note") NoteEntity note) throws NoAccessRightException {
         currentUser.getUser().checkAuthorization(note);
         modelFactoryService.noteRepository.delete(note);
         return new RedirectView("/notes");

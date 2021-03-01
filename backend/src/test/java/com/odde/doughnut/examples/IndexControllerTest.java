@@ -1,7 +1,5 @@
 package com.odde.doughnut.examples;
 
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.DBCleaner;
 import com.odde.doughnut.testability.MakeMe;

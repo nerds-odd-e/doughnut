@@ -1,7 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUser;
-import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.NoteEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,7 +18,7 @@ public class ReviewController {
 
     @GetMapping("/review")
     public String review(Model model) {
-        List<Note> notes = currentUser.getUser().getNotesInDescendingOrder();
+        List<NoteEntity> notes = currentUser.getUser().getNotesInDescendingOrder();
         model.addAttribute("notes", notes);
         return "review";
     }

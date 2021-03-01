@@ -1,6 +1,6 @@
 package com.odde.doughnut.models;
 
-import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.services.ModelFactoryService;
 import org.apache.logging.log4j.util.Strings;
@@ -12,14 +12,14 @@ import java.util.List;
 
 public class NoteModel {
     private final NoteRepository noteRepository;
-    private final Note note;
+    private final NoteEntity note;
 
-    public NoteModel(Note note, ModelFactoryService modelFactoryService) {
+    public NoteModel(NoteEntity note, ModelFactoryService modelFactoryService) {
         this.noteRepository = modelFactoryService.noteRepository;
         this.note = note;
     }
 
-    public List<Note> getAncestors() {
+    public List<NoteEntity> getAncestors() {
         if (note == null) {
             return new ArrayList<>();
         }
@@ -37,24 +37,24 @@ public class NoteModel {
         return Arrays.asList(note.getDescription().split("\n"));
     }
 
-    public Note getPreviousSiblingNote() {
+    public NoteEntity getPreviousSiblingNote() {
         if (note.getParentNote() == null) {
             return null;
         }
         return noteRepository.findFirstByParentNoteAndSiblingOrderLessThanOrderBySiblingOrderDesc(note.getParentNote(), note.getSiblingOrder());
     }
 
-    public Note getNextSiblingNote() {
+    public NoteEntity getNextSiblingNote() {
         return nextSiblingOfNote(note);
     }
 
-    public Note getPreviousNote() {
-        Note result = getPreviousSiblingNote();
+    public NoteEntity getPreviousNote() {
+        NoteEntity result = getPreviousSiblingNote();
         if (result == null) {
             return note.getParentNote();
         }
         while(true) {
-            Note lastChild =noteRepository.findFirstByParentNoteOrderBySiblingOrderDesc(result);
+            NoteEntity lastChild =noteRepository.findFirstByParentNoteOrderBySiblingOrderDesc(result);
             if (lastChild == null) {
                 return result;
             }
@@ -62,14 +62,14 @@ public class NoteModel {
         }
     }
 
-    public Note getNextNote() {
-        Note firstChild = noteRepository.findFirstByParentNoteOrderBySiblingOrder(note);
+    public NoteEntity getNextNote() {
+        NoteEntity firstChild = noteRepository.findFirstByParentNoteOrderBySiblingOrder(note);
         if (firstChild != null) {
             return firstChild;
         }
-        Note next = note;
+        NoteEntity next = note;
         while(next != null) {
-            Note sibling = nextSiblingOfNote(next);
+            NoteEntity sibling = nextSiblingOfNote(next);
             if (sibling != null) {
                 return sibling;
             }
@@ -78,14 +78,14 @@ public class NoteModel {
         return null;
     }
 
-    public void linkNote(Note targetNote) {
+    public void linkNote(NoteEntity targetNote) {
         note.linkToNote(targetNote);
         note.setUpdatedDatetime(new Date());
         noteRepository.save(note);
     }
 
 
-    private Note nextSiblingOfNote(Note note) {
+    private NoteEntity nextSiblingOfNote(NoteEntity note) {
         if (note.getParentNote() == null) {
             return null;
         }

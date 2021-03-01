@@ -1,7 +1,6 @@
 package com.odde.doughnut.models;
 
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.repositories.NoteRepository;
+import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.DBCleaner;
 import com.odde.doughnut.testability.MakeMe;
@@ -25,13 +24,13 @@ import static org.hamcrest.Matchers.*;
 @Transactional
 
 public class NoteModelTest {
-    Note topLevel;
+    NoteEntity topLevel;
     @Autowired ModelFactoryService modelFactoryService;
 
 
     MakeMe makeMe;
 
-    NoteModel toModel(Note subjectNote) {
+    NoteModel toModel(NoteEntity subjectNote) {
         return modelFactoryService.toModel(subjectNote);
     }
 
@@ -47,17 +46,17 @@ public class NoteModelTest {
         @Test
         void topLevelNoteHaveEmptyAncestors() {
             NoteModel decoratedNote = toModel(topLevel);
-            List<Note> ancestors = decoratedNote.getAncestors();
+            List<NoteEntity> ancestors = decoratedNote.getAncestors();
             assertThat(ancestors, contains(topLevel));
         }
 
         @Test
         void childHasParentInAncestors() {
-            Note subject = makeMe.aNote().under(topLevel).please(modelFactoryService);
-            Note sibling = makeMe.aNote().under(topLevel).please(modelFactoryService);
+            NoteEntity subject = makeMe.aNote().under(topLevel).please(modelFactoryService);
+            NoteEntity sibling = makeMe.aNote().under(topLevel).please(modelFactoryService);
 
             NoteModel decoratedNote = toModel(subject);
-            List<Note> ancestry = decoratedNote.getAncestors();
+            List<NoteEntity> ancestry = decoratedNote.getAncestors();
             assertThat(ancestry, contains(topLevel, subject));
             assertThat(ancestry, not(contains(sibling)));
         }
@@ -69,8 +68,8 @@ public class NoteModelTest {
 
         @Test
         void topNoteHasNoSiblings() {
-            Note subjectNote = makeMe.aNote().please(modelFactoryService);
-            Note nextTopLevel = makeMe.aNote().please(modelFactoryService);
+            NoteEntity subjectNote = makeMe.aNote().please(modelFactoryService);
+            NoteEntity nextTopLevel = makeMe.aNote().please(modelFactoryService);
             NoteModel subject = toModel(subjectNote);
 
             assertNavigation(subject, null, null, null, null);
@@ -78,8 +77,8 @@ public class NoteModelTest {
 
         @Nested
         class TopLevelNoteHasAChild {
-            Note child;
-            Note nephew;
+            NoteEntity child;
+            NoteEntity nephew;
 
             @BeforeEach
             void setup() {
@@ -107,7 +106,7 @@ public class NoteModelTest {
 
             @Nested
             class ChildHasGrandchild {
-                Note grandchild;
+                NoteEntity grandchild;
 
                 @BeforeEach
                 void setup() {
@@ -135,7 +134,7 @@ public class NoteModelTest {
             }
         }
 
-        private void assertNavigation(NoteModel subject, Note previousSibling, Note previous, Note next, Note nextSibling) {
+        private void assertNavigation(NoteModel subject, NoteEntity previousSibling, NoteEntity previous, NoteEntity next, NoteEntity nextSibling) {
             assertThat(subject.getPreviousSiblingNote(), equalTo(previousSibling));
             assertThat(subject.getPreviousNote(), equalTo(previous));
             assertThat(subject.getNextNote(), equalTo(next));

@@ -5,7 +5,7 @@ import com.odde.doughnut.entities.repositories.BazaarNoteRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
 import com.odde.doughnut.models.BazaarModel;
 import com.odde.doughnut.models.NoteModel;
-import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -25,7 +25,7 @@ public class ModelFactoryService {
         this.bazaarNoteRepository = bazaarNoteRepository;
     }
 
-    public NoteModel toModel(Note note) {
+    public NoteModel toModel(NoteEntity note) {
         return new NoteModel(note, this);
     }
 
@@ -37,7 +37,7 @@ public class ModelFactoryService {
         return userRepository.findById(id);
     }
 
-    public Optional<Note> findNoteById(Integer noteId) {
+    public Optional<NoteEntity> findNoteById(Integer noteId) {
         return noteRepository.findById(noteId);
     }
 }

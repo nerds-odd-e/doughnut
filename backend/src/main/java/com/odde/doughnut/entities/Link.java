@@ -13,9 +13,9 @@ public class Link {
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "source_id", referencedColumnName = "id")
-    @Getter @Setter private Note sourceNote;
+    @Getter @Setter private NoteEntity sourceNote;
 
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "target_id", referencedColumnName = "id")
-    @Getter @Setter private Note targetNote;
+    @Getter @Setter private NoteEntity targetNote;
 }

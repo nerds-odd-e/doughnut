@@ -2,7 +2,7 @@
 package com.odde.doughnut.testability;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFromRequest;
-import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
@@ -37,17 +37,17 @@ class TestabilityController {
   }
 
   @PostMapping("/seed_notes")
-  public List<Integer> seedNote(@RequestBody List<Note> notes) throws Exception {
+  public List<Integer> seedNote(@RequestBody List<NoteEntity> notes) throws Exception {
     User user = currentUser.getUser();
     if (user == null) throw new Exception("User does not exist");
-    HashMap<String, Note> earlyNotes = new HashMap<>();
+    HashMap<String, NoteEntity> earlyNotes = new HashMap<>();
 
-    for (Note note : notes) {
+    for (NoteEntity note : notes) {
       earlyNotes.put(note.getTitle(), note);
       note.setUser(user);
       note.setParentNote(earlyNotes.get(note.getTestingLinkTo()));
     }
     noteRepository.saveAll(notes);
-    return notes.stream().map(Note::getId).collect(Collectors.toList());
+    return notes.stream().map(NoteEntity::getId).collect(Collectors.toList());
   }
 }

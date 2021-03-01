@@ -21,21 +21,21 @@ public class User {
 
     @OneToMany(mappedBy = "user")
     @JsonIgnore
-    @Getter @Setter private List<Note> notes = new ArrayList<>();
+    @Getter @Setter private List<NoteEntity> notes = new ArrayList<>();
 
     @OneToMany(mappedBy = "user")
     @Where(clause = "parent_id IS NULL")
     @JsonIgnore
-    @Getter private List<Note> orphanedNotes;
+    @Getter private List<NoteEntity> orphanedNotes;
 
-    public List<Note> getNotesInDescendingOrder() {
-        List<Note> notes = getNotes();
-        notes.sort(Comparator.comparing(Note::getUpdatedDatetime).reversed());
+    public List<NoteEntity> getNotesInDescendingOrder() {
+        List<NoteEntity> notes = getNotes();
+        notes.sort(Comparator.comparing(NoteEntity::getUpdatedDatetime).reversed());
         return notes;
     }
 
-    public List<Note> filterLinkableNotes(Note source, String searchTerm) {
-        List<Note> linkableNotes = getAllLinkableNotes(source);
+    public List<NoteEntity> filterLinkableNotes(NoteEntity source, String searchTerm) {
+        List<NoteEntity> linkableNotes = getAllLinkableNotes(source);
         if (searchTerm != null) {
             return linkableNotes.stream()
                     .filter(note -> note.getTitle().contains(searchTerm))
@@ -44,20 +44,20 @@ public class User {
         return linkableNotes;
     }
 
-    private List<Note> getAllLinkableNotes(Note source) {
-        List<Note> targetNotes = source.getTargetNotes();
-        List<Note> allNotes = getNotes();
+    private List<NoteEntity> getAllLinkableNotes(NoteEntity source) {
+        List<NoteEntity> targetNotes = source.getTargetNotes();
+        List<NoteEntity> allNotes = getNotes();
         return allNotes.stream()
                 .filter(i -> !targetNotes.contains(i))
                 .filter(i -> !i.equals(source))
                 .collect(Collectors.toList());
     }
 
-    public boolean owns(Note note) {
+    public boolean owns(NoteEntity note) {
         return note.getUser().id == id;
     }
 
-    public void checkAuthorization(Note note) throws NoAccessRightException {
+    public void checkAuthorization(NoteEntity note) throws NoAccessRightException {
         if (! owns(note)) {
             throw new NoAccessRightException();
         }

@@ -1,8 +1,7 @@
 package com.odde.doughnut.testability.builders;
 
-import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.MakeMe;
 
@@ -11,14 +10,14 @@ import java.util.Date;
 
 public class NoteBuilder {
     static TestObjectCounter titleCounter = new TestObjectCounter(n->"title" + n);
-    private Note note = new Note();
+    private NoteEntity note = new NoteEntity();
 
     public NoteBuilder(MakeMe makeMe){
         note.setTitle(titleCounter.generate());
         note.setDescription("descrption");
         note.setUpdatedDatetime(java.sql.Date.valueOf(LocalDate.now()));
     }
-    public Note inMemoryPlease() {
+    public NoteEntity inMemoryPlease() {
         return note;
     }
 
@@ -27,12 +26,12 @@ public class NoteBuilder {
         return this;
     }
 
-    public NoteBuilder under(Note parentNote) {
+    public NoteBuilder under(NoteEntity parentNote) {
         parentNote.addChild(note);
         return this;
     }
 
-    public NoteBuilder linkTo(Note referTo) {
+    public NoteBuilder linkTo(NoteEntity referTo) {
         note.linkToNote(referTo);
         return this;
     }
@@ -42,7 +41,7 @@ public class NoteBuilder {
         return this;
     }
 
-    public Note please(ModelFactoryService modelFactoryService) {
+    public NoteEntity please(ModelFactoryService modelFactoryService) {
         modelFactoryService.noteRepository.save(note);
         return note;
     }

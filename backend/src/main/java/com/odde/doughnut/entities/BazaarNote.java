@@ -13,5 +13,5 @@ public class BazaarNote {
 
     @ManyToOne
     @JoinColumn(name = "note_id", referencedColumnName = "id")
-    @Getter @Setter private Note note;
+    @Getter @Setter private NoteEntity note;
 }

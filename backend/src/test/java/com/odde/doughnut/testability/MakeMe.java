@@ -1,6 +1,6 @@
 package com.odde.doughnut.testability;
 
-import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.testability.builders.BazaarNoteBuilder;
 import com.odde.doughnut.testability.builders.FakeBindingResult;
 import com.odde.doughnut.testability.builders.NoteBuilder;
@@ -21,7 +21,7 @@ public class MakeMe {
         return new NoteBuilder(this);
     }
 
-    public BazaarNoteBuilder aBazaarNode(Note note) {
+    public BazaarNoteBuilder aBazaarNode(NoteEntity note) {
         return new BazaarNoteBuilder(this, note);
     }
 

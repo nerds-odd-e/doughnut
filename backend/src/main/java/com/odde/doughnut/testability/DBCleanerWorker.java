@@ -1,12 +1,12 @@
 package com.odde.doughnut.testability;
 
 import org.hibernate.Metamodel;
-import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.EntityTransaction;
+import javax.persistence.Table;
 import javax.persistence.metamodel.EntityType;
 import java.util.List;
 import java.util.Set;
@@ -23,7 +23,7 @@ public class DBCleanerWorker {
     @Transactional
     public void truncateAllTables() {
         withEntityManager(entityManager
-                -> guessTableNames(entityManager)
+                -> getAnnotatedTableNames(entityManager)
                 .forEach(t -> truncateTable(t, entityManager)));
     }
 
@@ -48,13 +48,15 @@ public class DBCleanerWorker {
         entityManager.createNativeQuery("SET FOREIGN_KEY_CHECKS=1").executeUpdate();
     }
 
-    private List<String> guessTableNames(EntityManager manager) {
+    private List<String> getAnnotatedTableNames(EntityManager manager) {
         Metamodel metamodel = (Metamodel) manager.getMetamodel();
         Set<EntityType<?>> entities = metamodel.getEntities();
 
         return entities.stream()
-                .map(EntityType::getName)
-                .map(DBCleanerWorker::camelToSnake)
+                .map(e->{
+                    Table annotation = e.getJavaType().getAnnotation(Table.class);
+                    return annotation.name();
+                })
                 .collect(Collectors.toList());
     }
 

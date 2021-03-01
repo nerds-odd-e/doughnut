@@ -1,13 +1,13 @@
 package com.odde.doughnut.entities.repositories;
 
-import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.NoteEntity;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface NoteRepository extends CrudRepository<Note, Integer> {
+public interface NoteRepository extends CrudRepository<NoteEntity, Integer> {
     @Query(
             value = "WITH RECURSIVE ancestors(id, parent_id, lvl) AS ("
                     + "   SELECT thisNote.id, thisNote.parent_id, 1 AS lvl "
@@ -21,10 +21,10 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
                     + " )"
                     + "SELECT id from ancestors ORDER BY lvl DESC"
             , nativeQuery = true)
-    List<Note> findAncestry(@Param("noteId") Long noteId);
-    Note findFirstByParentNoteOrderBySiblingOrderDesc(Note parentNote);
-    Note findFirstByParentNoteOrderBySiblingOrder(Note parentNote);
-    Note findFirstByParentNoteAndSiblingOrderLessThanOrderBySiblingOrderDesc(Note parentNote, Long siblingOrder);
-    Note findFirstByParentNoteAndSiblingOrderGreaterThanOrderBySiblingOrder(Note parentNote, Long siblingOrder);
+    List<NoteEntity> findAncestry(@Param("noteId") Long noteId);
+    NoteEntity findFirstByParentNoteOrderBySiblingOrderDesc(NoteEntity parentNote);
+    NoteEntity findFirstByParentNoteOrderBySiblingOrder(NoteEntity parentNote);
+    NoteEntity findFirstByParentNoteAndSiblingOrderLessThanOrderBySiblingOrderDesc(NoteEntity parentNote, Long siblingOrder);
+    NoteEntity findFirstByParentNoteAndSiblingOrderGreaterThanOrderBySiblingOrder(NoteEntity parentNote, Long siblingOrder);
 
 }
