@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUser;
+import com.odde.doughnut.controllers.exceptions.NoAccessRightException;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.models.NoteModel;
@@ -97,6 +98,13 @@ public class NoteController {
     public String moveNote(Note note, Model model) {
         model.addAttribute("note", note);
         return "move_note";
+    }
+
+    @PostMapping(value = "/{note}/delete")
+    public RedirectView deleteNote(@PathVariable("note") Note note) throws NoAccessRightException {
+        currentUser.getUser().checkAuthorization(note);
+        modelFactoryService.noteRepository.delete(note);
+        return new RedirectView("/notes");
     }
 
 }

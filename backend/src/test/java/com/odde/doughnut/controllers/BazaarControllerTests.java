@@ -3,7 +3,6 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.controllers.exceptions.NoAccessRightException;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.repositories.BazaarNoteRepository;
 import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.DBCleaner;
 import com.odde.doughnut.testability.MakeMe;
@@ -18,22 +17,21 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.web.servlet.view.RedirectView;
 
-import javax.persistence.EntityManager;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @ExtendWith(DBCleaner.class)
 @Transactional
 class BazaarControllerTests {
-    @Autowired private BazaarNoteRepository bazaarRepository;
     @Autowired ModelFactoryService modelFactoryService;
-    @Autowired EntityManager entityManager;
-    private MakeMe makeMe;
+    private MakeMe makeMe = new MakeMe();
     private User user;
     private Note topNote;
     private BazaarController controller;
@@ -42,7 +40,6 @@ class BazaarControllerTests {
 
     @BeforeEach
     void setup() {
-        makeMe = new MakeMe();
         user = makeMe.aUser().please(modelFactoryService);
         topNote = makeMe.aNote().forUser(user).please(modelFactoryService);
         controller = new BazaarController(new TestCurrentUser(user), modelFactoryService);
@@ -65,10 +62,10 @@ class BazaarControllerTests {
     class ShareMyNote {
         @Test
         void shareMyNote() throws NoAccessRightException {
-            long oldCount = bazaarRepository.count();
+            long oldCount = modelFactoryService.bazaarNoteRepository.count();
             RedirectView rv = controller.shareNote(topNote);
             assertEquals("/notes", rv.getUrl());
-            assertThat(bazaarRepository.count(), equalTo(oldCount + 1));
+            assertThat(modelFactoryService.bazaarNoteRepository.count(), equalTo(oldCount + 1));
         }
 
         @Test

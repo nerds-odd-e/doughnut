@@ -36,4 +36,8 @@ public class ModelFactoryService {
     public Optional<User> findUserById(Integer id) {
         return userRepository.findById(id);
     }
+
+    public Optional<Note> findNoteById(Integer noteId) {
+        return noteRepository.findById(noteId);
+    }
 }

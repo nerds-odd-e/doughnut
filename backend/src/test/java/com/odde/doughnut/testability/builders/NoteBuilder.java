@@ -42,12 +42,8 @@ public class NoteBuilder {
         return this;
     }
 
-    public Note please(NoteRepository noteRepository) {
-        noteRepository.save(note);
-        return note;
-    }
-
     public Note please(ModelFactoryService modelFactoryService) {
-        return please(modelFactoryService.noteRepository);
+        modelFactoryService.noteRepository.save(note);
+        return note;
     }
 }

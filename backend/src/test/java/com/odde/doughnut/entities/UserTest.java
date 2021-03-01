@@ -2,6 +2,7 @@ package com.odde.doughnut.entities;
 
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
+import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.DBCleaner;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
@@ -25,17 +26,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(DBCleaner.class)
 @Transactional
 public class UserTest {
-    @Autowired private UserRepository userRepository;
-    @Autowired private NoteRepository noteRepository;
     @Autowired EntityManager entityManager;
+    @Autowired ModelFactoryService modelFactoryService;
 
-
-    private MakeMe makeMe;
-
-    @BeforeEach
-    void setup() {
-        makeMe = new MakeMe();
-    }
+    private MakeMe makeMe = new MakeMe();
 
     @Test
     void shouldReturnEmptyListWhenThhereIsNoNode() {
@@ -45,18 +39,18 @@ public class UserTest {
 
     @Test
     void shouldReturnTheNoteWhenThereIsOne() {
-        User user = makeMe.aUser().please(userRepository);
-        Note note = makeMe.aNote().forUser(user).please(noteRepository);
+        User user = makeMe.aUser().please(modelFactoryService);
+        Note note = makeMe.aNote().forUser(user).please(modelFactoryService);
         makeMe.refresh(entityManager, user);
         assertThat(user.getNotesInDescendingOrder(), contains(note));
     }
 
     @Test
     void shouldReturnTheNoteWhenThereIsTwo() {
-        User user = makeMe.aUser().please(userRepository);
+        User user = makeMe.aUser().please(modelFactoryService);
         Date yesterday = Date.valueOf(LocalDate.now().minusDays(1));
-        Note note1 = makeMe.aNote().forUser(user).updatedAt(yesterday).please(noteRepository);
-        Note note2 = makeMe.aNote().forUser(user).please(noteRepository);
+        Note note1 = makeMe.aNote().forUser(user).updatedAt(yesterday).please(modelFactoryService);
+        Note note2 = makeMe.aNote().forUser(user).please(modelFactoryService);
         makeMe.refresh(entityManager, user);
 
         assertEquals(note2.getTitle(), user.getNotesInDescendingOrder().get(0).getTitle());

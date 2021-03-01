@@ -27,12 +27,7 @@ class IndexControllerTests {
   @Autowired private ModelFactoryService modelFactoryService;
   @Mock Model model;
   private IndexController controller;
-  private MakeMe makeMe;
-
-  @BeforeEach
-  void setupController() {
-    makeMe = new MakeMe();
-  }
+  private MakeMe makeMe = new MakeMe();
 
   @Test
   void visitWithNoUserSession() {

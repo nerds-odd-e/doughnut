@@ -29,13 +29,9 @@ public class UserBuilder {
         return user;
     }
 
-    public User please(UserRepository userRepository) {
-        userRepository.save(user);
-        return user;
-    }
-
     public User please(ModelFactoryService modelFactoryService) {
-        return please(modelFactoryService.userRepository);
+        modelFactoryService.userRepository.save(user);
+        return user;
     }
 }
 

@@ -26,9 +26,7 @@ import static org.hamcrest.Matchers.*;
 
 public class NoteModelTest {
     Note topLevel;
-    @Autowired NoteRepository noteRepository;
-    @Autowired
-    ModelFactoryService modelFactoryService;
+    @Autowired ModelFactoryService modelFactoryService;
 
 
     MakeMe makeMe;
@@ -40,7 +38,7 @@ public class NoteModelTest {
     @BeforeEach
     void setup() {
         makeMe = new MakeMe();
-        topLevel = makeMe.aNote().please(noteRepository);
+        topLevel = makeMe.aNote().please(modelFactoryService);
     }
 
     @Nested
@@ -55,8 +53,8 @@ public class NoteModelTest {
 
         @Test
         void childHasParentInAncestors() {
-            Note subject = makeMe.aNote().under(topLevel).please(noteRepository);
-            Note sibling = makeMe.aNote().under(topLevel).please(noteRepository);
+            Note subject = makeMe.aNote().under(topLevel).please(modelFactoryService);
+            Note sibling = makeMe.aNote().under(topLevel).please(modelFactoryService);
 
             NoteModel decoratedNote = toModel(subject);
             List<Note> ancestry = decoratedNote.getAncestors();
@@ -71,8 +69,8 @@ public class NoteModelTest {
 
         @Test
         void topNoteHasNoSiblings() {
-            Note subjectNote = makeMe.aNote().please(noteRepository);
-            Note nextTopLevel = makeMe.aNote().please(noteRepository);
+            Note subjectNote = makeMe.aNote().please(modelFactoryService);
+            Note nextTopLevel = makeMe.aNote().please(modelFactoryService);
             NoteModel subject = toModel(subjectNote);
 
             assertNavigation(subject, null, null, null, null);
@@ -85,8 +83,8 @@ public class NoteModelTest {
 
             @BeforeEach
             void setup() {
-                child = makeMe.aNote().under(topLevel).please(noteRepository);
-                nephew = makeMe.aNote().under(topLevel).please(noteRepository);
+                child = makeMe.aNote().under(topLevel).please(modelFactoryService);
+                nephew = makeMe.aNote().under(topLevel).please(modelFactoryService);
             }
 
             @Test
@@ -113,7 +111,7 @@ public class NoteModelTest {
 
                 @BeforeEach
                 void setup() {
-                    grandchild = makeMe.aNote().under(child).please(noteRepository);
+                    grandchild = makeMe.aNote().under(child).please(modelFactoryService);
                 }
 
                 @Test

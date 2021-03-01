@@ -1,6 +1,7 @@
 package com.odde.doughnut.entities;
 
 import com.odde.doughnut.entities.repositories.UserRepository;
+import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.DBCleaner;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
@@ -75,11 +76,11 @@ public class NoteTest {
 
     @Nested
     class NoteWithUser {
-        @Autowired private UserRepository userRepository;
+        @Autowired private ModelFactoryService modelFactoryService;
 
         @BeforeEach
         void setup() {
-            user = makeMe.aUser().with2Notes().please(userRepository);
+            user = makeMe.aUser().with2Notes().please(modelFactoryService);
         }
 
         @Test
