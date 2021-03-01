@@ -1,5 +1,6 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.BazaarNoteRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
 import com.odde.doughnut.models.BazaarModel;
@@ -8,6 +9,8 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class ModelFactoryService {
@@ -28,5 +31,9 @@ public class ModelFactoryService {
 
     public BazaarModel getBazaarModel() {
         return new BazaarModel(this);
+    }
+
+    public Optional<User> findUserById(Integer id) {
+        return userRepository.findById(id);
     }
 }

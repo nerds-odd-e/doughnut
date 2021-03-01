@@ -3,7 +3,7 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.exceptions.NoAccessRightException;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.repositories.NoteRepository;
+import com.odde.doughnut.services.ModelFactoryService;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,12 +15,12 @@ import java.util.List;
 
 @RestController
 public class NoteRestController {
-    private final NoteRepository noteRepository;
     private final CurrentUser currentUser;
+    private final ModelFactoryService modelFactoryService;
 
-    public NoteRestController(NoteRepository noteRepository, CurrentUser currentUser) {
-        this.noteRepository = noteRepository;
+    public NoteRestController(CurrentUser currentUser, ModelFactoryService modelFactoryService) {
         this.currentUser = currentUser;
+        this.modelFactoryService = modelFactoryService;
     }
 
     @GetMapping(value = "/api/notes", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -28,11 +28,10 @@ public class NoteRestController {
         return currentUser.getUser().getNotesInDescendingOrder();
     }
 
-    @PostMapping(value = "/notes/{id}/delete")
-    public RedirectView deleteNote(@PathVariable("id") Integer noteId) throws NoAccessRightException {
-        Note note = noteRepository.findById(noteId).get();
+    @PostMapping(value = "/notes/{note}/delete")
+    public RedirectView deleteNote(@PathVariable("note") Note note) throws NoAccessRightException {
         currentUser.getUser().checkAuthorization(note);
-        noteRepository.delete(note);
+        modelFactoryService.noteRepository.delete(note);
         return new RedirectView("/notes");
     }
 

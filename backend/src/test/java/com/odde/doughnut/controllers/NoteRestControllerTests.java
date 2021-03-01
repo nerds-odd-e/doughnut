@@ -5,7 +5,6 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.LinkRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
-import com.odde.doughnut.entities.repositories.UserRepository;
 import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.DBCleaner;
 import com.odde.doughnut.testability.MakeMe;
@@ -31,8 +30,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @Transactional
 public class NoteRestControllerTests {
     @Autowired private NoteRepository noteRepository;
-    @Autowired private UserRepository userRepository;
     @Autowired EntityManager entityManager;
+    @Autowired ModelFactoryService modelFactoryService;
     private MakeMe makeMe;
     private User user;
     private NoteRestController noteController;
@@ -40,8 +39,8 @@ public class NoteRestControllerTests {
     @BeforeEach
     void setup() {
         makeMe = new MakeMe();
-        user = makeMe.aUser().please(userRepository);
-        noteController = new NoteRestController(noteRepository, new TestCurrentUser(user));
+        user = makeMe.aUser().please(modelFactoryService);
+        noteController = new NoteRestController(new TestCurrentUser(user), modelFactoryService);
     }
 
     @Test
@@ -58,11 +57,11 @@ public class NoteRestControllerTests {
 
         @Test
         void shouldNotBeAbleToDeleteNoteThatBelongsToOtherUser() {
-            User anotherUser = makeMe.aUser().please(userRepository);
+            User anotherUser = makeMe.aUser().please(modelFactoryService);
             Note note = makeMe.aNote().forUser(anotherUser).please(noteRepository);
             Integer noteId = note.getId();
             assertThrows(NoAccessRightException.class, ()->
-                    noteController.deleteNote(noteId)
+                    noteController.deleteNote(note)
                     );
             assertTrue(noteRepository.findById(noteId).isPresent());
         }
@@ -71,10 +70,10 @@ public class NoteRestControllerTests {
         void shouldDeleteTheNoteButNotTheUser() throws NoAccessRightException {
             Note note = makeMe.aNote().forUser(user).please(noteRepository);
             Integer noteId = note.getId();
-            RedirectView response = noteController.deleteNote(noteId);
+            RedirectView response = noteController.deleteNote(note);
             assertEquals("/notes", response.getUrl());
             assertFalse(noteRepository.findById(noteId).isPresent());
-            assertTrue(userRepository.findById(user.getId()).isPresent());
+            assert(modelFactoryService.findUserById(note.getId()).isPresent());
         }
 
         @Test
@@ -84,7 +83,7 @@ public class NoteRestControllerTests {
             Note sibling = makeMe.aNote().under(parent).forUser(user).please(noteRepository);
             Note child = makeMe.aNote().under(subject).forUser(user).please(noteRepository);
 
-            noteController.deleteNote(subject.getId());
+            noteController.deleteNote(subject);
 
             assertTrue(noteRepository.findById(sibling.getId()).isPresent());
             assertFalse(noteRepository.findById(child.getId()).isPresent());
@@ -97,7 +96,7 @@ public class NoteRestControllerTests {
             Note referFrom = makeMe.aNote().forUser(user).linkTo(subject).linkTo(referTo).please(noteRepository);
             long oldCount = linkRepository.count();
 
-            noteController.deleteNote(subject.getId());
+            noteController.deleteNote(subject);
 
             assertThat(makeMe.refresh(entityManager, referFrom).getId(), is(not(nullValue())));
             assertThat(makeMe.refresh(entityManager, referTo).getId(), is(not(nullValue())));
