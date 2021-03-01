@@ -4,7 +4,7 @@ import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
-import com.odde.doughnut.services.DecoratorService;
+import com.odde.doughnut.services.ModelFactoryService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -18,12 +18,12 @@ import java.util.List;
 public class NoteController {
     private final CurrentUser currentUser;
     private final NoteRepository noteRepository;
-    private final DecoratorService decoratorService;
+    private final ModelFactoryService modelFactoryService;
 
-    public NoteController(CurrentUser currentUser, NoteRepository noteRepository, DecoratorService decoratorService) {
+    public NoteController(CurrentUser currentUser, NoteRepository noteRepository, ModelFactoryService modelFactoryService) {
         this.currentUser = currentUser;
         this.noteRepository = noteRepository;
-        this.decoratorService = decoratorService;
+        this.modelFactoryService = modelFactoryService;
     }
 
     @GetMapping("")
@@ -58,7 +58,7 @@ public class NoteController {
     public String note(@PathVariable(name = "id") Integer noteId, Model model) {
         Note note = noteRepository.findById(noteId).get();
         model.addAttribute("note", note);
-        model.addAttribute("noteDecorated", decoratorService.decorate(note));
+        model.addAttribute("noteDecorated", modelFactoryService.toModel(note));
         return "note";
     }
 

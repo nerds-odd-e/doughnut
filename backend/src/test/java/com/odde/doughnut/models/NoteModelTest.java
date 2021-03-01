@@ -2,6 +2,7 @@ package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.repositories.NoteRepository;
+import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.DBCleaner;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
@@ -13,7 +14,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -26,14 +26,15 @@ import static org.hamcrest.Matchers.*;
 
 public class NoteModelTest {
     Note topLevel;
-    @Autowired private NoteRepository noteRepository;
-    @Autowired EntityManager entityManager;
+    @Autowired NoteRepository noteRepository;
+    @Autowired
+    ModelFactoryService modelFactoryService;
 
 
     MakeMe makeMe;
 
-    NoteModel decorate(Note subjectNote) {
-        return new NoteModel(noteRepository, subjectNote);
+    NoteModel toModel(Note subjectNote) {
+        return modelFactoryService.toModel(subjectNote);
     }
 
     @BeforeEach
@@ -47,7 +48,7 @@ public class NoteModelTest {
 
         @Test
         void topLevelNoteHaveEmptyAncestors() {
-            NoteModel decoratedNote = decorate(topLevel);
+            NoteModel decoratedNote = toModel(topLevel);
             List<Note> ancestors = decoratedNote.getAncestors();
             assertThat(ancestors, contains(topLevel));
         }
@@ -57,7 +58,7 @@ public class NoteModelTest {
             Note subject = makeMe.aNote().under(topLevel).please(noteRepository);
             Note sibling = makeMe.aNote().under(topLevel).please(noteRepository);
 
-            NoteModel decoratedNote = decorate(subject);
+            NoteModel decoratedNote = toModel(subject);
             List<Note> ancestry = decoratedNote.getAncestors();
             assertThat(ancestry, contains(topLevel, subject));
             assertThat(ancestry, not(contains(sibling)));
@@ -72,7 +73,7 @@ public class NoteModelTest {
         void topNoteHasNoSiblings() {
             Note subjectNote = makeMe.aNote().please(noteRepository);
             Note nextTopLevel = makeMe.aNote().please(noteRepository);
-            NoteModel subject = decorate(subjectNote);
+            NoteModel subject = toModel(subjectNote);
 
             assertNavigation(subject, null, null, null, null);
         }
@@ -90,19 +91,19 @@ public class NoteModelTest {
 
             @Test
             void topLevelHasChildAsNext() {
-                NoteModel subject = decorate(topLevel);
+                NoteModel subject = toModel(topLevel);
                 assertNavigation(subject, null, null, child, null);
             }
 
             @Test
             void firstChildNote() {
-                NoteModel subject = decorate(child);
+                NoteModel subject = toModel(child);
                 assertNavigation(subject, null, topLevel, nephew, nephew);
             }
 
             @Test
             void secondChild() {
-                NoteModel subject = decorate(nephew);
+                NoteModel subject = toModel(nephew);
                 assertNavigation(subject, child, child, null, null);
             }
 
@@ -117,19 +118,19 @@ public class NoteModelTest {
 
                 @Test
                 void firstChildNote() {
-                    NoteModel subject = decorate(child);
+                    NoteModel subject = toModel(child);
                     assertNavigation(subject, null, topLevel, grandchild, nephew);
                 }
 
                 @Test
                 void secondChild() {
-                    NoteModel subject = decorate(nephew);
+                    NoteModel subject = toModel(nephew);
                     assertNavigation(subject, child, grandchild, null, null);
                 }
 
                 @Test
                 void grandchildView() {
-                    NoteModel subject = decorate(grandchild);
+                    NoteModel subject = toModel(grandchild);
                     assertNavigation(subject, null, child, nephew, null);
                 }
 

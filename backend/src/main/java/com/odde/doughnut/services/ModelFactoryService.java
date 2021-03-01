@@ -7,15 +7,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class DecoratorService {
+public class ModelFactoryService {
     @Autowired
-    private final NoteRepository noteRepository;
-    public DecoratorService(NoteRepository noteRepository)
+    public final NoteRepository noteRepository;
+    public ModelFactoryService(NoteRepository noteRepository)
     {
         this.noteRepository = noteRepository;
     }
 
-    public NoteModel decorate(Note note) {
-        return new NoteModel(noteRepository, note);
+    public NoteModel toModel(Note note) {
+        return new NoteModel(note, this);
     }
 }

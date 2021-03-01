@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUser;
+import com.odde.doughnut.controllers.exceptions.NoAccessRightException;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.services.LinkService;
@@ -25,7 +26,7 @@ public class NoteRestController {
         this.currentUser = currentUser;
     }
 
-    @GetMapping(value = "/getNotes", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/api/notes", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<Note> getNotes() throws Exception {
         return currentUser.getUser().getNotesInDescendingOrder();
     }
@@ -34,7 +35,6 @@ public class NoteRestController {
     public RedirectView linkNote(@PathVariable("id") Integer id, Integer targetNoteId) {
         Note sourceNote = noteRepository.findById(id).get();
         Note targetNote = noteRepository.findById(targetNoteId).get();
-
         linkService.linkNote(sourceNote, targetNote);
         return new RedirectView("/review");
     }

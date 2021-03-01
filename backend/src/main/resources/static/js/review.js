@@ -24,7 +24,7 @@ async function populateAllNotesForReview() {
     if (containers.length === 0) {
         return;
     }
-    const response = await fetch('/getNotes');
+    const response = await fetch('/api/notes');
     noteList = transformNoteListToView(await response.json());
     nextNote();
 }

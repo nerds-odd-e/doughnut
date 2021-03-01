@@ -2,6 +2,7 @@ package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.repositories.NoteRepository;
+import com.odde.doughnut.services.ModelFactoryService;
 import org.apache.logging.log4j.util.Strings;
 
 import java.util.ArrayList;
@@ -12,8 +13,8 @@ public class NoteModel {
     private final NoteRepository noteRepository;
     private final Note note;
 
-    public NoteModel(NoteRepository noteRepository, Note note) {
-        this.noteRepository = noteRepository;
+    public NoteModel(Note note, ModelFactoryService modelFactoryService) {
+        this.noteRepository = modelFactoryService.noteRepository;
         this.note = note;
     }
 
