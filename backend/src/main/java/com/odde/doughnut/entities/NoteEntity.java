@@ -64,6 +64,7 @@ public class NoteEntity {
   @Getter @Setter private NoteEntity parentNote;
 
   @OneToMany(mappedBy = "parentNote", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OrderBy("sibling_order")
   @JsonIgnore
   @Getter private List<NoteEntity> children = new ArrayList<>();
 

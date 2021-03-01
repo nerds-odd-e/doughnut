@@ -94,9 +94,15 @@ public class NoteController {
         return new RedirectView("/review");
     }
 
-    @GetMapping("/{note}/move")
-    public String moveNote(NoteEntity note, Model model) {
-        model.addAttribute("note", note);
+    @GetMapping("/{noteEntity}/move")
+    public String prepareToNote(NoteEntity noteEntity, Model model) {
+        model.addAttribute("noteEntity", noteEntity);
+        return "move_note";
+    }
+
+    @PostMapping("/{noteEntity}/move")
+    public String moveNote(NoteEntity noteEntity, Model model) {
+        model.addAttribute("noteEntity", noteEntity);
         return "move_note";
     }
 
