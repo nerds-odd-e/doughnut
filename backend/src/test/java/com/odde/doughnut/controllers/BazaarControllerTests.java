@@ -45,7 +45,7 @@ class BazaarControllerTests {
         makeMe = new MakeMe();
         user = makeMe.aUser().please(modelFactoryService);
         topNote = makeMe.aNote().forUser(user).please(modelFactoryService);
-        controller = new BazaarController(new TestCurrentUser(user), bazaarRepository, modelFactoryService);
+        controller = new BazaarController(new TestCurrentUser(user), modelFactoryService);
     }
 
     @Test

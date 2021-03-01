@@ -2,7 +2,9 @@ package com.odde.doughnut.examples;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.repositories.NoteRepository;
+import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.DBCleaner;
+import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,17 +23,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(DBCleaner.class)
 class IndexControllerTest {
 
-    @Autowired
-    private MockMvc mockMvc;
-
-    @Autowired
-    private NoteRepository noteRepository;
+    @Autowired private MockMvc mockMvc;
+    @Autowired private ModelFactoryService modelFactoryService;
+    MakeMe makeMe = new MakeMe();
 
     @Test
     void serving_notes() throws Exception {
-        Note note = new Note();
-        note.setTitle("Kaki is...");
-        noteRepository.save(note);
+        makeMe.aNote().please(modelFactoryService);
         this.mockMvc.perform(get("/")).andDo(print()).andExpect(status().isOk())
                 .andExpect(content().string(containsString("Serving 1 notes since the beginning of the universe.")));
     }

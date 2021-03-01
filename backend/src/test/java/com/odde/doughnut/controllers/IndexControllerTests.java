@@ -2,7 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.NoteRepository;
-import com.odde.doughnut.entities.repositories.UserRepository;
+import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.DBCleaner;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,8 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(DBCleaner.class)
 class IndexControllerTests {
 
-  @Autowired private NoteRepository noteRepository;
-  @Autowired private UserRepository userRepository;
+  @Autowired private ModelFactoryService modelFactoryService;
   @Mock Model model;
   private IndexController controller;
   private MakeMe makeMe;
@@ -37,22 +36,22 @@ class IndexControllerTests {
 
   @Test
   void visitWithNoUserSession() {
-    controller = new IndexController(noteRepository, userRepository, new TestCurrentUser(null));
+    controller = new IndexController(new TestCurrentUser(null), modelFactoryService);
     assertEquals("ask_to_login", controller.home(null, model));
   }
 
   @Test
   void visitWithUserSessionButNoSuchARegisteredUserYet() {
-    controller = new IndexController(noteRepository, userRepository, new TestCurrentUser(null));
+    controller = new IndexController(new TestCurrentUser(null), modelFactoryService);
     Principal principal = (UserPrincipal) () -> "1234567";
     assertEquals("register", controller.home(principal, model));
   }
 
   @Test
   void visitWithUserSessionAndTheUserExists() {
-    User user = makeMe.aUser().please(userRepository);
+    User user = makeMe.aUser().please(modelFactoryService);
     Principal principal = (UserPrincipal) user::getExternalIdentifier;
-    controller = new IndexController(noteRepository, userRepository, new TestCurrentUser(user));
+    controller = new IndexController(new TestCurrentUser(user), modelFactoryService);
     assertEquals("index", controller.home(principal, model));
   }
 }

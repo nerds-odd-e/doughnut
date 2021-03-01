@@ -3,7 +3,6 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.exceptions.NoAccessRightException;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.repositories.BazaarNoteRepository;
 import com.odde.doughnut.models.BazaarModel;
 import com.odde.doughnut.services.ModelFactoryService;
 import org.springframework.stereotype.Controller;
@@ -16,12 +15,10 @@ import org.springframework.web.servlet.view.RedirectView;
 @Controller
 public class BazaarController {
     private final CurrentUser currentUser;
-    private final BazaarNoteRepository bazaarRepository;
     private final ModelFactoryService modelFactoryService;
 
-    public BazaarController(CurrentUser currentUser, BazaarNoteRepository bazaarRepository, ModelFactoryService modelFactoryService) {
+    public BazaarController(CurrentUser currentUser, ModelFactoryService modelFactoryService) {
         this.currentUser = currentUser;
-        this.bazaarRepository = bazaarRepository;
         this.modelFactoryService = modelFactoryService;
     }
 
