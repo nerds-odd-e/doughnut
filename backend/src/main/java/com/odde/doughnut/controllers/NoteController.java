@@ -8,15 +8,13 @@ import com.odde.doughnut.services.DecoratorService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
 
 @Controller
+@RequestMapping("/notes")
 public class NoteController {
     private final CurrentUser currentUser;
     private final NoteRepository noteRepository;
@@ -28,7 +26,13 @@ public class NoteController {
         this.decoratorService = decoratorService;
     }
 
-    @GetMapping({"/notes/new", "/notes/{parent_id}/new"})
+    @GetMapping("")
+    public String myNotes(Model model) {
+        model.addAttribute("notes", currentUser.getUser().getOrphanedNotes());
+        return "my_notes";
+    }
+
+    @GetMapping({"/new", "/{parent_id}/new"})
     public String newNote(@PathVariable(name = "parent_id", required = false) Integer parentId, Model model) {
         Note note = new Note();
         if (parentId != null) {
@@ -39,13 +43,7 @@ public class NoteController {
         return "new_note";
     }
 
-    @GetMapping("/notes")
-    public String myNotes(Model model) {
-        model.addAttribute("notes", currentUser.getUser().getOrphanedNotes());
-        return "my_notes";
-    }
-
-    @PostMapping("/notes")
+    @PostMapping("")
     public String createNote(@Valid Note note, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return "new_note";
@@ -56,13 +54,21 @@ public class NoteController {
         return "redirect:/notes/" + note.getId();
     }
 
-    @GetMapping("/notes/{note}/edit")
+    @GetMapping("/{id}")
+    public String note(@PathVariable(name = "id") Integer noteId, Model model) {
+        Note note = noteRepository.findById(noteId).get();
+        model.addAttribute("note", note);
+        model.addAttribute("noteDecorated", decoratorService.decorate(note));
+        return "note";
+    }
+
+    @GetMapping("/{note}/edit")
     public String editNote(Note note, Model model) {
         model.addAttribute("note", note);
         return "edit_note";
     }
 
-    @PostMapping("/notes/{note}")
+    @PostMapping("/{note}")
     public String updateNote(@Valid Note note, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
            return "edit_note";
@@ -71,15 +77,7 @@ public class NoteController {
         return "redirect:/notes/" + note.getId();
     }
 
-    @GetMapping("/notes/{id}")
-    public String note(@PathVariable(name = "id") Integer noteId, Model model) {
-        Note note = noteRepository.findById(noteId).get();
-        model.addAttribute("note", note);
-        model.addAttribute("noteDecorated", decoratorService.decorate(note));
-        return "note";
-    }
-
-    @GetMapping("/notes/{id}/link")
+    @GetMapping("/{id}/link")
     public String link(
             @PathVariable("id") String id,
             @RequestParam(required = false) String searchTerm,
@@ -92,7 +90,7 @@ public class NoteController {
         return "link";
     }
 
-    @GetMapping("/notes/{note}/move")
+    @GetMapping("/{note}/move")
     public String moveNote(Note note, Model model) {
         model.addAttribute("note", note);
         return "move_note";
