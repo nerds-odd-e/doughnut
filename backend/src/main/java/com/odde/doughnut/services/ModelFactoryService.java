@@ -7,6 +7,7 @@ import com.odde.doughnut.models.BazaarModel;
 import com.odde.doughnut.models.NoteModel;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.repositories.NoteRepository;
+import com.odde.doughnut.models.NoteMotion;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -39,5 +40,21 @@ public class ModelFactoryService {
 
     public Optional<NoteEntity> findNoteById(Integer noteId) {
         return noteRepository.findById(noteId);
+    }
+
+    public NoteMotion getLeftNoteMotion(NoteEntity noteEntity) {
+        NoteModel noteModel = toModel(noteEntity);
+        NoteEntity previousSiblingNote = noteModel.getPreviousSiblingNote();
+        NoteModel prev = toModel(previousSiblingNote);
+        NoteEntity prevprev = prev.getPreviousSiblingNote();
+        if (prevprev == null) {
+            return new NoteMotion(noteEntity.getParentNote(), true);
+        }
+        return new NoteMotion(prevprev, false);
+    }
+
+    public NoteMotion getRightNoteMotion(NoteEntity noteEntity) {
+        NoteModel noteModel = toModel(noteEntity);
+        return new NoteMotion(noteModel.getNextSiblingNote(), false);
     }
 }

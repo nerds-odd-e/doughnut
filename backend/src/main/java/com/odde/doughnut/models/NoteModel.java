@@ -38,7 +38,7 @@ public class NoteModel {
     }
 
     public NoteEntity getPreviousSiblingNote() {
-        if (note.getParentNote() == null) {
+        if(note == null || note.getParentNote() == null) {
             return null;
         }
         return noteRepository.findFirstByParentNoteAndSiblingOrderLessThanOrderBySiblingOrderDesc(note.getParentNote(), note.getSiblingOrder());
@@ -63,7 +63,7 @@ public class NoteModel {
     }
 
     public NoteEntity getNextNote() {
-        NoteEntity firstChild = noteRepository.findFirstByParentNoteOrderBySiblingOrder(note);
+        NoteEntity firstChild = getFirstChild();
         if (firstChild != null) {
             return firstChild;
         }
@@ -92,4 +92,7 @@ public class NoteModel {
         return noteRepository.findFirstByParentNoteAndSiblingOrderGreaterThanOrderBySiblingOrder(note.getParentNote(), note.getSiblingOrder());
     }
 
+    public NoteEntity getFirstChild() {
+        return noteRepository.findFirstByParentNoteOrderBySiblingOrder(note);
+    }
 }

@@ -37,6 +37,17 @@ public class NoteModelTest {
         topLevel = makeMe.aNote().please(modelFactoryService);
     }
 
+    @Test
+    void emptyTopLevelNote() {
+        assertThat(toModel(topLevel).getFirstChild(), is(nullValue()));
+    }
+
+    @Test
+    void topLevelNoteWithOneChild() {
+        NoteEntity child = makeMe.aNote().under(topLevel).please(modelFactoryService);
+        assertThat(toModel(topLevel).getFirstChild(), equalTo(child));
+    }
+
     @Nested
     class GetAncestors {
 

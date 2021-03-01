@@ -69,7 +69,7 @@ public class NoteController {
     @PostMapping("/{note}")
     public String updateNote(@Valid NoteEntity note, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-           return "edit_note";
+            return "edit_note";
         }
         modelFactoryService.noteRepository.save(note);
         return "redirect:/notes/" + note.getId();
@@ -97,21 +97,16 @@ public class NoteController {
 
     @GetMapping("/{noteEntity}/move")
     public String prepareToNote(NoteEntity noteEntity, Model model) {
-        model.addAttribute("noteMotion", new NoteMotion(noteEntity, null));
-        model.addAttribute("noteMotionRight", new NoteMotion(noteEntity, noteEntity));
+        model.addAttribute("noteMotion", this.modelFactoryService.getLeftNoteMotion(noteEntity));
+        model.addAttribute("noteMotionRight", this.modelFactoryService.getRightNoteMotion(noteEntity));
+        NoteMotion motionUnder = new NoteMotion(null, true);
+        model.addAttribute("noteMotionUnder", motionUnder);
         return "move_note";
     }
 
     @PostMapping("/{noteEntity}/move")
     public String moveNote(NoteEntity noteEntity, NoteMotion noteMotion, Model model) {
-        if (noteMotion.getBehind() == null) {
-            noteEntity.setSiblingOrder(0L);
-        }
-        else {
-            noteEntity.setSiblingOrder(999999999999999999L);
-        }
-
-        modelFactoryService.noteRepository.save(noteEntity);
+        noteMotion.execute(noteEntity, this.modelFactoryService);
         return "redirect:/notes/" + noteEntity.getId();
     }
 
