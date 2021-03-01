@@ -2,6 +2,7 @@ package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.UserRepository;
+import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.MakeMe;
 
 public class UserBuilder {
@@ -31,6 +32,10 @@ public class UserBuilder {
     public User please(UserRepository userRepository) {
         userRepository.save(user);
         return user;
+    }
+
+    public User please(ModelFactoryService modelFactoryService) {
+        return please(modelFactoryService.userRepository);
     }
 }
 

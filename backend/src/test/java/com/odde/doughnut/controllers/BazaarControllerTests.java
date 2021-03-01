@@ -6,6 +6,7 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.BazaarNoteRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
+import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.DBCleaner;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,6 +35,7 @@ class BazaarControllerTests {
     @Autowired private NoteRepository noteRepository;
     @Autowired private UserRepository userRepository;
     @Autowired private BazaarNoteRepository bazaarRepository;
+    @Autowired ModelFactoryService modelFactoryService;
     @Autowired EntityManager entityManager;
     private MakeMe makeMe;
     private User user;
@@ -45,8 +47,8 @@ class BazaarControllerTests {
     @BeforeEach
     void setup() {
         makeMe = new MakeMe();
-        user = makeMe.aUser().please(userRepository);
-        topNote = makeMe.aNote().forUser(user).please(noteRepository);
+        user = makeMe.aUser().please(modelFactoryService);
+        topNote = makeMe.aNote().forUser(user).please(modelFactoryService);
         controller = new BazaarController(new TestCurrentUser(user), noteRepository, bazaarRepository);
     }
 
@@ -58,7 +60,7 @@ class BazaarControllerTests {
 
     @Test
     void whenThereIsSharedNote() {
-        makeMe.aBazaarNode(topNote).please(bazaarRepository);
+        makeMe.aBazaarNode(topNote).please(modelFactoryService);
         assertEquals("bazaar", controller.bazaar(model));
         assertThat((List<Note>) model.getAttribute("notes"), hasSize(equalTo(1)));
     }
@@ -68,18 +70,17 @@ class BazaarControllerTests {
         @Test
         void shareMyNote() throws NoAccessRightException {
             long oldCount = bazaarRepository.count();
-            RedirectView rv = controller.shareNote(topNote.getId(), model);
+            RedirectView rv = controller.shareNote(topNote, model);
             assertEquals("/notes", rv.getUrl());
             assertThat(bazaarRepository.count(), equalTo(oldCount + 1));
         }
 
         @Test
         void shouldNotBeAbleToShareNoteThatBelongsToOtherUser() {
-            User anotherUser = makeMe.aUser().please(userRepository);
-            Note note = makeMe.aNote().forUser(anotherUser).please(noteRepository);
-            Integer noteId = note.getId();
+            User anotherUser = makeMe.aUser().please(modelFactoryService);
+            Note note = makeMe.aNote().forUser(anotherUser).please(modelFactoryService);
             assertThrows(NoAccessRightException.class, ()->
-                    controller.shareNote(noteId, model)
+                    controller.shareNote(note, model)
             );
         }
 

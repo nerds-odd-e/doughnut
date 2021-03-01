@@ -3,6 +3,7 @@ package com.odde.doughnut.testability.builders;
 import com.odde.doughnut.entities.BazaarNote;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.repositories.BazaarNoteRepository;
+import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.MakeMe;
 
 public class BazaarNoteBuilder {
@@ -17,7 +18,7 @@ public class BazaarNoteBuilder {
         bazaarNote.setNote(note);
     }
 
-    public void please(BazaarNoteRepository bazaarRepository) {
-        bazaarRepository.save(bazaarNote);
+    public void please(ModelFactoryService modelFactoryService) {
+        modelFactoryService.bazaarNoteRepository.save(bazaarNote);
     }
 }

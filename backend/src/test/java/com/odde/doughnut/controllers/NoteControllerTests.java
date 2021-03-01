@@ -31,9 +31,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @Transactional
 class NoteControllerTests {
     @Autowired
-    private NoteRepository noteRepository;
-    @Autowired
-    private UserRepository userRepository;
+    ModelFactoryService modelFactoryService;
+
     private MakeMe makeMe = new MakeMe();
     private User user;
     private Note parentNote;
@@ -43,9 +42,8 @@ class NoteControllerTests {
 
     @BeforeEach
     void setup() {
-        user = makeMe.aUser().please(userRepository);
-        ModelFactoryService modelFactoryService = new ModelFactoryService(noteRepository);
-        controller = new NoteController(new TestCurrentUser(user), noteRepository, modelFactoryService);
+        user = makeMe.aUser().please(modelFactoryService);
+        controller = new NoteController(new TestCurrentUser(user), modelFactoryService);
     }
 
     @Nested
@@ -55,8 +53,8 @@ class NoteControllerTests {
 
         @BeforeEach
         void setup() {
-            parentNote = makeMe.aNote().forUser(user).please(noteRepository);
-            childNote = makeMe.aNote().forUser(user).under(parentNote).please(noteRepository);
+            parentNote = makeMe.aNote().forUser(user).please(modelFactoryService);
+            childNote = makeMe.aNote().forUser(user).under(parentNote).please(modelFactoryService);
             makeMe.refresh(entityManager, user);
             makeMe.refresh(entityManager, parentNote);
         }
@@ -69,7 +67,7 @@ class NoteControllerTests {
 
         @Test
         void shouldGetTheParentNoteIfIdProvided() {
-            controller.newNote(parentNote.getId(), model);
+            controller.newNote(parentNote, model);
             assertThat(((Note) model.getAttribute("note")).getParentNote(), equalTo(parentNote));
         }
 
@@ -117,7 +115,7 @@ class NoteControllerTests {
 
         @BeforeEach
         void setup() {
-            note = makeMe.aNote().please(noteRepository);
+            note = makeMe.aNote().please(modelFactoryService);
             note.setTitle("new");
         }
 
@@ -131,7 +129,7 @@ class NoteControllerTests {
 
         @Test
         void shouldNotBeAbleToSaveNoteWhenInvalid() {
-            Note note = makeMe.aNote().please(noteRepository);
+            Note note = makeMe.aNote().please(modelFactoryService);
             note.setTitle("new");
             BindingResult bindingResult = makeMe.failedBindingResult();
 

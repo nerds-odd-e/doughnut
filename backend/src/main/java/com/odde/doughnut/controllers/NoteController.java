@@ -20,12 +20,10 @@ import java.util.List;
 @RequestMapping("/notes")
 public class NoteController {
     private final CurrentUser currentUser;
-    private final NoteRepository noteRepository;
     private final ModelFactoryService modelFactoryService;
 
-    public NoteController(CurrentUser currentUser, NoteRepository noteRepository, ModelFactoryService modelFactoryService) {
+    public NoteController(CurrentUser currentUser, ModelFactoryService modelFactoryService) {
         this.currentUser = currentUser;
-        this.noteRepository = noteRepository;
         this.modelFactoryService = modelFactoryService;
     }
 
@@ -35,13 +33,10 @@ public class NoteController {
         return "my_notes";
     }
 
-    @GetMapping({"/new", "/{parent_id}/new"})
-    public String newNote(@PathVariable(name = "parent_id", required = false) Integer parentId, Model model) {
+    @GetMapping({"/new", "/{parentNote}/new"})
+    public String newNote(@PathVariable(name = "parentNote", required = false) Note parentNote, Model model) {
         Note note = new Note();
-        if (parentId != null) {
-            Note parentNote = noteRepository.findById(parentId).get();
-            note.setParentNote(parentNote);
-        }
+        note.setParentNote(parentNote);
         model.addAttribute("note", note);
         return "new_note";
     }
@@ -53,7 +48,7 @@ public class NoteController {
         }
         User user = currentUser.getUser();
         note.setUser(user);
-        noteRepository.save(note);
+        modelFactoryService.noteRepository.save(note);
         return "redirect:/notes/" + note.getId();
     }
 
@@ -75,7 +70,7 @@ public class NoteController {
         if (bindingResult.hasErrors()) {
            return "edit_note";
         }
-        noteRepository.save(note);
+        modelFactoryService.noteRepository.save(note);
         return "redirect:/notes/" + note.getId();
     }
 
@@ -91,11 +86,10 @@ public class NoteController {
         return "link";
     }
 
-    @PostMapping(value = "/{id}/link", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public RedirectView linkNote(@PathVariable("id") Integer id, Integer targetNoteId) {
-        Note sourceNote = noteRepository.findById(id).get();
-        Note targetNote = noteRepository.findById(targetNoteId).get();
-        NoteModel noteModel = modelFactoryService.toModel(sourceNote);
+    @PostMapping(value = "/{note}/link", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public RedirectView linkNote(@PathVariable("note") Note note, Integer targetNoteId) {
+        Note targetNote = modelFactoryService.noteRepository.findById(targetNoteId).get();
+        NoteModel noteModel = modelFactoryService.toModel(note);
         noteModel.linkNote(targetNote);
         return new RedirectView("/review");
     }

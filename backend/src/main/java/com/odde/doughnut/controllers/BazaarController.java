@@ -38,9 +38,8 @@ public class BazaarController {
         return "bazaar";
     }
 
-    @PostMapping(value = "/notes/{id}/share")
-    public RedirectView shareNote(@PathVariable("id") Integer noteId, ExtendedModelMap model) throws NoAccessRightException {
-        Note note = noteRepository.findById(noteId).get();
+    @PostMapping(value = "/notes/{note}/share")
+    public RedirectView shareNote(@PathVariable("note") Note note, ExtendedModelMap model) throws NoAccessRightException {
         currentUser.getUser().checkAuthorization(note);
         BazaarNote bazaarNote = new BazaarNote();
         bazaarNote.setNote(note);
