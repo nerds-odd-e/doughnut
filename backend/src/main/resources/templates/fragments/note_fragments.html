@@ -3,7 +3,7 @@
 <div th:fragment="noteBreadcrumb(untilNote, additional)">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a href="/notes">Top</a></li>
-        <li class="breadcrumb-item" th:each="note:${@modelFactoryService.decorate(untilNote.parentNote).ancestors}" th:insert=":: noteTitleWithLink(${note})"/>
+        <li class="breadcrumb-item" th:each="note:${@modelFactoryService.toModel(untilNote.parentNote).ancestors}" th:insert=":: noteTitleWithLink(${note})"/>
         <li class="breadcrumb-item" th:replace="${additional}"/>
     </ol>
 </div>

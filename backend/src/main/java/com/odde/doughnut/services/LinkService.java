@@ -2,6 +2,7 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.repositories.NoteRepository;
+import com.odde.doughnut.models.NoteModel;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -17,10 +18,8 @@ public class LinkService {
     }
 
     public void linkNote(Note sourceNote, Note targetNote) {
-
-        sourceNote.linkToNote(targetNote);
-        sourceNote.setUpdatedDatetime(new Date());
-
-        noteRepository.save(sourceNote);
+        NoteModel noteModel = modelFactoryService.toModel(sourceNote);
+        noteModel.linkNote(targetNote);
     }
+
 }

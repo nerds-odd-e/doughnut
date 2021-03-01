@@ -7,6 +7,7 @@ import org.apache.logging.log4j.util.Strings;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 public class NoteModel {
@@ -76,6 +77,13 @@ public class NoteModel {
         }
         return null;
     }
+
+    public void linkNote(Note targetNote) {
+        note.linkToNote(targetNote);
+        note.setUpdatedDatetime(new Date());
+        noteRepository.save(note);
+    }
+
 
     private Note nextSiblingOfNote(Note note) {
         if (note.getParentNote() == null) {
