@@ -2,6 +2,7 @@ package com.odde.doughnut.services;
 
 import com.odde.doughnut.entities.repositories.BazaarNoteRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
+import com.odde.doughnut.models.BazaarModel;
 import com.odde.doughnut.models.NoteModel;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.repositories.NoteRepository;
@@ -23,5 +24,9 @@ public class ModelFactoryService {
 
     public NoteModel toModel(Note note) {
         return new NoteModel(note, this);
+    }
+
+    public BazaarModel getBazaarModel() {
+        return new BazaarModel(this);
     }
 }

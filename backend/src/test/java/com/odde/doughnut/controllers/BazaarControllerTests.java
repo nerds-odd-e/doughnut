@@ -4,8 +4,6 @@ import com.odde.doughnut.controllers.exceptions.NoAccessRightException;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.BazaarNoteRepository;
-import com.odde.doughnut.entities.repositories.NoteRepository;
-import com.odde.doughnut.entities.repositories.UserRepository;
 import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.DBCleaner;
 import com.odde.doughnut.testability.MakeMe;
@@ -32,8 +30,6 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(DBCleaner.class)
 @Transactional
 class BazaarControllerTests {
-    @Autowired private NoteRepository noteRepository;
-    @Autowired private UserRepository userRepository;
     @Autowired private BazaarNoteRepository bazaarRepository;
     @Autowired ModelFactoryService modelFactoryService;
     @Autowired EntityManager entityManager;
@@ -49,7 +45,7 @@ class BazaarControllerTests {
         makeMe = new MakeMe();
         user = makeMe.aUser().please(modelFactoryService);
         topNote = makeMe.aNote().forUser(user).please(modelFactoryService);
-        controller = new BazaarController(new TestCurrentUser(user), noteRepository, bazaarRepository);
+        controller = new BazaarController(new TestCurrentUser(user), bazaarRepository, modelFactoryService);
     }
 
     @Test
@@ -70,7 +66,7 @@ class BazaarControllerTests {
         @Test
         void shareMyNote() throws NoAccessRightException {
             long oldCount = bazaarRepository.count();
-            RedirectView rv = controller.shareNote(topNote, model);
+            RedirectView rv = controller.shareNote(topNote);
             assertEquals("/notes", rv.getUrl());
             assertThat(bazaarRepository.count(), equalTo(oldCount + 1));
         }
@@ -80,7 +76,7 @@ class BazaarControllerTests {
             User anotherUser = makeMe.aUser().please(modelFactoryService);
             Note note = makeMe.aNote().forUser(anotherUser).please(modelFactoryService);
             assertThrows(NoAccessRightException.class, ()->
-                    controller.shareNote(note, model)
+                    controller.shareNote(note)
             );
         }
 

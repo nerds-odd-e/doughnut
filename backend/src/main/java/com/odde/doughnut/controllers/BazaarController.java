@@ -2,48 +2,42 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.exceptions.NoAccessRightException;
-import com.odde.doughnut.entities.BazaarNote;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.repositories.BazaarNoteRepository;
-import com.odde.doughnut.entities.repositories.NoteRepository;
+import com.odde.doughnut.models.BazaarModel;
+import com.odde.doughnut.services.ModelFactoryService;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.view.RedirectView;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Controller
 public class BazaarController {
     private final CurrentUser currentUser;
-    private final NoteRepository noteRepository;
     private final BazaarNoteRepository bazaarRepository;
+    private final ModelFactoryService modelFactoryService;
 
-    public BazaarController(CurrentUser currentUser, NoteRepository noteRepository, BazaarNoteRepository bazaarRepository) {
+    public BazaarController(CurrentUser currentUser, BazaarNoteRepository bazaarRepository, ModelFactoryService modelFactoryService) {
         this.currentUser = currentUser;
-        this.noteRepository = noteRepository;
         this.bazaarRepository = bazaarRepository;
+        this.modelFactoryService = modelFactoryService;
     }
 
     @GetMapping("/bazaar")
     public String bazaar(Model model) {
-        Iterable<BazaarNote> all = bazaarRepository.findAll();
-        List<Note> notes = new ArrayList<>();
-        all.forEach(bn->notes.add(bn.getNote()));
-        model.addAttribute("notes", notes);
+        BazaarModel bazaar = modelFactoryService.getBazaarModel();
+        model.addAttribute("notes", bazaar.getAllNotes());
         return "bazaar";
     }
 
     @PostMapping(value = "/notes/{note}/share")
-    public RedirectView shareNote(@PathVariable("note") Note note, ExtendedModelMap model) throws NoAccessRightException {
+    public RedirectView shareNote(@PathVariable("note") Note note) throws NoAccessRightException {
         currentUser.getUser().checkAuthorization(note);
-        BazaarNote bazaarNote = new BazaarNote();
-        bazaarNote.setNote(note);
-        bazaarRepository.save(bazaarNote);
+        BazaarModel bazaar = modelFactoryService.getBazaarModel();
+        bazaar.shareNote(note);
         return new RedirectView("/notes");
     }
+
 }
