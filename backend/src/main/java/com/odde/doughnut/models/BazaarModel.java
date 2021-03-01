@@ -1,6 +1,6 @@
 package com.odde.doughnut.models;
 
-import com.odde.doughnut.entities.BazaarNote;
+import com.odde.doughnut.entities.BazaarNoteEntity;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.repositories.BazaarNoteRepository;
 import com.odde.doughnut.services.ModelFactoryService;
@@ -16,15 +16,15 @@ public class BazaarModel {
     }
 
     public List<NoteEntity> getAllNotes() {
-        Iterable<BazaarNote> all = bazaarNoteRepository.findAll();
+        Iterable<BazaarNoteEntity> all = bazaarNoteRepository.findAll();
         List<NoteEntity> notes = new ArrayList<>();
         all.forEach(bn->notes.add(bn.getNote()));
         return notes;
     }
 
     public void shareNote(NoteEntity note) {
-        BazaarNote bazaarNote = new BazaarNote();
-        bazaarNote.setNote(note);
-        bazaarNoteRepository.save(bazaarNote);
+        BazaarNoteEntity bazaarNoteEntity = new BazaarNoteEntity();
+        bazaarNoteEntity.setNote(note);
+        bazaarNoteRepository.save(bazaarNoteEntity);
     }
 }

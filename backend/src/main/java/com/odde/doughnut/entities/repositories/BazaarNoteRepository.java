@@ -1,7 +1,7 @@
 package com.odde.doughnut.entities.repositories;
 
-import com.odde.doughnut.entities.BazaarNote;
+import com.odde.doughnut.entities.BazaarNoteEntity;
 import org.springframework.data.repository.CrudRepository;
 
-public interface BazaarNoteRepository extends CrudRepository<BazaarNote, Integer> {
+public interface BazaarNoteRepository extends CrudRepository<BazaarNoteEntity, Integer> {
 }
