@@ -1,8 +1,8 @@
 package com.odde.doughnut.testability.builders;
 
-import com.odde.doughnut.models.BazaarNote;
-import com.odde.doughnut.models.Note;
-import com.odde.doughnut.repositories.BazaarNoteRepository;
+import com.odde.doughnut.entities.BazaarNote;
+import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.repositories.BazaarNoteRepository;
 import com.odde.doughnut.testability.MakeMe;
 
 public class BazaarNoteBuilder {

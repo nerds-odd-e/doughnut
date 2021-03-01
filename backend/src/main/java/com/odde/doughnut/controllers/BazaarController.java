@@ -1,10 +1,10 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUser;
-import com.odde.doughnut.models.BazaarNote;
-import com.odde.doughnut.models.Note;
-import com.odde.doughnut.repositories.BazaarNoteRepository;
-import com.odde.doughnut.repositories.NoteRepository;
+import com.odde.doughnut.entities.BazaarNote;
+import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.repositories.BazaarNoteRepository;
+import com.odde.doughnut.entities.repositories.NoteRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.ui.Model;

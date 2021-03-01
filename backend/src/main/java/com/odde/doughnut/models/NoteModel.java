@@ -1,18 +1,18 @@
-package com.odde.doughnut.modelDecorators;
+package com.odde.doughnut.models;
 
-import com.odde.doughnut.models.Note;
-import com.odde.doughnut.repositories.NoteRepository;
+import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.repositories.NoteRepository;
 import org.apache.logging.log4j.util.Strings;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class NoteDecorator {
+public class NoteModel {
     private final NoteRepository noteRepository;
     private final Note note;
 
-    public NoteDecorator(NoteRepository noteRepository, Note note) {
+    public NoteModel(NoteRepository noteRepository, Note note) {
         this.noteRepository = noteRepository;
         this.note = note;
     }

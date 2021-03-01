@@ -1,4 +1,4 @@
-package com.odde.doughnut.models;
+package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;

@@ -1,7 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUser;
-import com.odde.doughnut.models.User;
+import com.odde.doughnut.entities.User;
 
 public class TestCurrentUser implements CurrentUser {
     private final User user;

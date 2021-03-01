@@ -1,7 +1,7 @@
 package com.odde.doughnut.testability.builders;
 
-import com.odde.doughnut.models.User;
-import com.odde.doughnut.repositories.UserRepository;
+import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.repositories.UserRepository;
 import com.odde.doughnut.testability.MakeMe;
 
 public class UserBuilder {

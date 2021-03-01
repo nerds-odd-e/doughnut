@@ -1,6 +1,6 @@
 package com.odde.doughnut.testability;
 
-import com.odde.doughnut.models.Note;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.testability.builders.BazaarNoteBuilder;
 import com.odde.doughnut.testability.builders.FakeBindingResult;
 import com.odde.doughnut.testability.builders.NoteBuilder;

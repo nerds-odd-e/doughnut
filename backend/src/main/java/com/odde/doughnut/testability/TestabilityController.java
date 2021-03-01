@@ -3,17 +3,15 @@ package com.odde.doughnut.testability;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFromRequest;
 import com.odde.doughnut.services.LinkService;
-import com.odde.doughnut.models.Note;
-import com.odde.doughnut.models.User;
-import com.odde.doughnut.repositories.NoteRepository;
-import com.odde.doughnut.repositories.UserRepository;
-import org.apache.logging.log4j.util.Strings;
+import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.repositories.NoteRepository;
+import com.odde.doughnut.entities.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManagerFactory;
-import java.security.Principal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;

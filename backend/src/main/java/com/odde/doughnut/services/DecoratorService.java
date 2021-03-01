@@ -1,8 +1,8 @@
 package com.odde.doughnut.services;
 
-import com.odde.doughnut.modelDecorators.NoteDecorator;
-import com.odde.doughnut.models.Note;
-import com.odde.doughnut.repositories.NoteRepository;
+import com.odde.doughnut.models.NoteModel;
+import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.repositories.NoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +15,7 @@ public class DecoratorService {
         this.noteRepository = noteRepository;
     }
 
-    public NoteDecorator decorate(Note note) {
-        return new NoteDecorator(noteRepository, note);
+    public NoteModel decorate(Note note) {
+        return new NoteModel(noteRepository, note);
     }
 }

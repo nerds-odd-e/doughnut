@@ -1,7 +1,7 @@
-package com.odde.doughnut.modelDecorators;
+package com.odde.doughnut.models;
 
-import com.odde.doughnut.models.Note;
-import com.odde.doughnut.repositories.NoteRepository;
+import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.testability.DBCleaner;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
@@ -24,7 +24,7 @@ import static org.hamcrest.Matchers.*;
 @ExtendWith(DBCleaner.class)
 @Transactional
 
-public class NoteDecoratorTest {
+public class NoteModelTest {
     Note topLevel;
     @Autowired private NoteRepository noteRepository;
     @Autowired EntityManager entityManager;
@@ -32,8 +32,8 @@ public class NoteDecoratorTest {
 
     MakeMe makeMe;
 
-    NoteDecorator decorate(Note subjectNote) {
-        return new NoteDecorator(noteRepository, subjectNote);
+    NoteModel decorate(Note subjectNote) {
+        return new NoteModel(noteRepository, subjectNote);
     }
 
     @BeforeEach
@@ -47,7 +47,7 @@ public class NoteDecoratorTest {
 
         @Test
         void topLevelNoteHaveEmptyAncestors() {
-            NoteDecorator decoratedNote = decorate(topLevel);
+            NoteModel decoratedNote = decorate(topLevel);
             List<Note> ancestors = decoratedNote.getAncestors();
             assertThat(ancestors, contains(topLevel));
         }
@@ -57,7 +57,7 @@ public class NoteDecoratorTest {
             Note subject = makeMe.aNote().under(topLevel).please(noteRepository);
             Note sibling = makeMe.aNote().under(topLevel).please(noteRepository);
 
-            NoteDecorator decoratedNote = decorate(subject);
+            NoteModel decoratedNote = decorate(subject);
             List<Note> ancestry = decoratedNote.getAncestors();
             assertThat(ancestry, contains(topLevel, subject));
             assertThat(ancestry, not(contains(sibling)));
@@ -72,7 +72,7 @@ public class NoteDecoratorTest {
         void topNoteHasNoSiblings() {
             Note subjectNote = makeMe.aNote().please(noteRepository);
             Note nextTopLevel = makeMe.aNote().please(noteRepository);
-            NoteDecorator subject = decorate(subjectNote);
+            NoteModel subject = decorate(subjectNote);
 
             assertNavigation(subject, null, null, null, null);
         }
@@ -90,19 +90,19 @@ public class NoteDecoratorTest {
 
             @Test
             void topLevelHasChildAsNext() {
-                NoteDecorator subject = decorate(topLevel);
+                NoteModel subject = decorate(topLevel);
                 assertNavigation(subject, null, null, child, null);
             }
 
             @Test
             void firstChildNote() {
-                NoteDecorator subject = decorate(child);
+                NoteModel subject = decorate(child);
                 assertNavigation(subject, null, topLevel, nephew, nephew);
             }
 
             @Test
             void secondChild() {
-                NoteDecorator subject = decorate(nephew);
+                NoteModel subject = decorate(nephew);
                 assertNavigation(subject, child, child, null, null);
             }
 
@@ -117,26 +117,26 @@ public class NoteDecoratorTest {
 
                 @Test
                 void firstChildNote() {
-                    NoteDecorator subject = decorate(child);
+                    NoteModel subject = decorate(child);
                     assertNavigation(subject, null, topLevel, grandchild, nephew);
                 }
 
                 @Test
                 void secondChild() {
-                    NoteDecorator subject = decorate(nephew);
+                    NoteModel subject = decorate(nephew);
                     assertNavigation(subject, child, grandchild, null, null);
                 }
 
                 @Test
                 void grandchildView() {
-                    NoteDecorator subject = decorate(grandchild);
+                    NoteModel subject = decorate(grandchild);
                     assertNavigation(subject, null, child, nephew, null);
                 }
 
             }
         }
 
-        private void assertNavigation(NoteDecorator subject, Note previousSibling, Note previous, Note next, Note nextSibling) {
+        private void assertNavigation(NoteModel subject, Note previousSibling, Note previous, Note next, Note nextSibling) {
             assertThat(subject.getPreviousSiblingNote(), equalTo(previousSibling));
             assertThat(subject.getPreviousNote(), equalTo(previous));
             assertThat(subject.getNextNote(), equalTo(next));

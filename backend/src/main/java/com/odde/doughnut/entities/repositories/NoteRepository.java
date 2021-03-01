@@ -1,6 +1,6 @@
-package com.odde.doughnut.repositories;
+package com.odde.doughnut.entities.repositories;
 
-import com.odde.doughnut.models.Note;
+import com.odde.doughnut.entities.Note;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;

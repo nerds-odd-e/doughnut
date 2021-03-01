@@ -1,11 +1,10 @@
 package com.odde.doughnut.controllers.currentUser;
 
-import com.odde.doughnut.models.User;
-import com.odde.doughnut.repositories.UserRepository;
+import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
-import org.springframework.web.context.annotation.SessionScope;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Principal;

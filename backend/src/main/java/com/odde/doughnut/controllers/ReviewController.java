@@ -1,11 +1,10 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUser;
-import com.odde.doughnut.models.Note;
+import com.odde.doughnut.entities.Note;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.context.annotation.SessionScope;
 
 import java.util.List;
 

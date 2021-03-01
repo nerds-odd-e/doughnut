@@ -1,7 +1,7 @@
 package com.odde.doughnut.services;
 
-import com.odde.doughnut.models.Note;
-import com.odde.doughnut.repositories.NoteRepository;
+import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.repositories.NoteRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;

@@ -1,4 +1,4 @@
-package com.odde.doughnut.models;
+package com.odde.doughnut.entities;
 
 import lombok.Getter;
 import lombok.Setter;

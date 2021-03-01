@@ -1,6 +1,6 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.models.User;
+import com.odde.doughnut.entities.User;
 import org.junit.jupiter.api.Test;
 import org.springframework.ui.Model;
 

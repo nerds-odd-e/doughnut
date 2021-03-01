@@ -1,7 +1,7 @@
 package com.odde.doughnut.examples;
 
-import com.odde.doughnut.models.Note;
-import com.odde.doughnut.repositories.NoteRepository;
+import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.testability.DBCleaner;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

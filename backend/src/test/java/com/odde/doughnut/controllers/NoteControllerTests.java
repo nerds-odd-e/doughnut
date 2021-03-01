@@ -1,9 +1,9 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.models.Note;
-import com.odde.doughnut.models.User;
-import com.odde.doughnut.repositories.NoteRepository;
-import com.odde.doughnut.repositories.UserRepository;
+import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.repositories.NoteRepository;
+import com.odde.doughnut.entities.repositories.UserRepository;
 import com.odde.doughnut.services.DecoratorService;
 import com.odde.doughnut.testability.DBCleaner;
 import com.odde.doughnut.testability.MakeMe;

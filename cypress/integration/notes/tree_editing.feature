@@ -12,7 +12,7 @@ Feature: Tree editing
             | Equilateral triangle | Triangle       |
             | Circle               | Shape         |
 
-      @ignore
+        @ignore
     Scenario: Move left right
         When I move note "Shape/Triangle" left
         Then I should see "Triangle" is before "Rectangle" in "Shape"

@@ -91,11 +91,22 @@ When("I should be able to go to the {string} note {string}", (button, noteTitle)
     );
 });
 
-When("I move note {string} left", (noteTitles, data) => {
+When("I move note {string} left", (noteTitles) => {
   cy.visit("/notes");
   noteTitles.split("/").forEach(noteTitle => cy.findByText(noteTitle).click());
   cy.findByText("Move This Note").click();
+  cy.findByRole('button', {name: 'Move Left'}).click();
 });
+
+When("I should see {string} is before {string} in {string}", (noteTitle1, noteTitle2, parentNoteTitles) => {
+  cy.visit("/notes");
+  parentNoteTitles.split("/").forEach(noteTitle => cy.findByText(noteTitle).click());
+  var matcher = new RegExp(noteTitle2 + ".*" +noteTitle1, "g");
+  cy.queryAllBy({selector: '.card-title'}).then(array =>
+    cy.log(array)
+  )
+});
+
 
 
 
