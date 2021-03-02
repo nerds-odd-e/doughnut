@@ -1,10 +1,12 @@
 package com.odde.doughnut.testability;
 
 import com.odde.doughnut.entities.NoteEntity;
+import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.builders.BazaarNoteBuilder;
 import com.odde.doughnut.testability.builders.FakeBindingResult;
 import com.odde.doughnut.testability.builders.NoteBuilder;
 import com.odde.doughnut.testability.builders.UserBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 
@@ -13,6 +15,8 @@ import java.nio.CharBuffer;
 
 @Component
 public class MakeMe {
+    @Autowired public ModelFactoryService modelFactoryService;
+
     public UserBuilder aUser() {
         return new UserBuilder(this);
     }

@@ -25,16 +25,16 @@ public class NoteMotionModelTest {
     @Autowired
     ModelFactoryService modelFactoryService;
 
-    MakeMe makeMe = new MakeMe();
+    @Autowired MakeMe makeMe;
     NoteEntity topNote;
     NoteEntity firstChild;
     NoteEntity secondChild;
 
     @BeforeEach
     void setup() {
-        topNote = makeMe.aNote().please(modelFactoryService);
-        firstChild = makeMe.aNote().under(topNote).please(modelFactoryService);
-        secondChild = makeMe.aNote().under(topNote).please(modelFactoryService);
+        topNote = makeMe.aNote().please();
+        firstChild = makeMe.aNote().under(topNote).please();
+        secondChild = makeMe.aNote().under(topNote).please();
     }
 
     void move(NoteEntity subject, NoteEntity relativeNote, boolean asFirstChildOfNote) throws CyclicLinkDetectedException {
@@ -80,7 +80,7 @@ public class NoteMotionModelTest {
 
         @BeforeEach
         void setup() {
-            thirdLevel = makeMe.aNote().under(firstChild).please(modelFactoryService);
+            thirdLevel = makeMe.aNote().under(firstChild).please();
         }
 
         @Test
@@ -103,7 +103,7 @@ public class NoteMotionModelTest {
 
         @BeforeEach
         void setup() {
-            thirdChild = makeMe.aNote().under(topNote).please(modelFactoryService);
+            thirdChild = makeMe.aNote().under(topNote).please();
         }
 
         @Test

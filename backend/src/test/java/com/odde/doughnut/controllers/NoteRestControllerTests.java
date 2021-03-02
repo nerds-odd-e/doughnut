@@ -22,20 +22,19 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class NoteRestControllerTests {
     @Autowired EntityManager entityManager;
     @Autowired ModelFactoryService modelFactoryService;
-    private MakeMe makeMe;
+    @Autowired MakeMe makeMe;
     private UserEntity userEntity;
     private NoteRestController noteController;
 
     @BeforeEach
     void setup() {
-        makeMe = new MakeMe();
-        userEntity = makeMe.aUser().please(modelFactoryService);
+        userEntity = makeMe.aUser().please();
         noteController = new NoteRestController(new TestCurrentUser(userEntity), modelFactoryService);
     }
 
     @Test
     void shouldGetListOfNotes() {
-        NoteEntity note = makeMe.aNote().forUser(userEntity).please(modelFactoryService);
+        NoteEntity note = makeMe.aNote().forUser(userEntity).please();
         makeMe.refresh(entityManager, userEntity);
         assertEquals(note.getTitle(), noteController.getNotes().get(0).getTitle());
     }

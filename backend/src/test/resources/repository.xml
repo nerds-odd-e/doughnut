@@ -16,6 +16,8 @@
     </context:component-scan>
     <context:component-scan base-package="com.odde.doughnut.services">
     </context:component-scan>
+    <context:component-scan base-package="com.odde.doughnut.testability">
+    </context:component-scan>
 
     <context:property-placeholder location="classpath:db-test.properties"/>
 

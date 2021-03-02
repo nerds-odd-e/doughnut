@@ -1,7 +1,6 @@
 package com.odde.doughnut.entities;
 
 import com.odde.doughnut.services.ModelFactoryService;
-import com.odde.doughnut.testability.DBCleaner;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -28,7 +27,7 @@ import static org.hamcrest.Matchers.*;
 
 public class NoteEntityTest {
 
-    MakeMe makeMe = new MakeMe();
+    @Autowired MakeMe makeMe;
     UserEntity userEntity;
 
     @Test
@@ -78,7 +77,7 @@ public class NoteEntityTest {
 
         @BeforeEach
         void setup() {
-            userEntity = makeMe.aUser().with2Notes().please(modelFactoryService);
+            userEntity = makeMe.aUser().with2Notes().please();
         }
 
         @Test

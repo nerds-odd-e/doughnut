@@ -28,8 +28,8 @@ public class UserBuilder {
         return userEntity;
     }
 
-    public UserEntity please(ModelFactoryService modelFactoryService) {
-        modelFactoryService.userRepository.save(userEntity);
+    public UserEntity please() {
+        makeMe.modelFactoryService.userRepository.save(userEntity);
         return userEntity;
     }
 }

@@ -15,7 +15,7 @@ public class BazaarNoteBuilder {
         bazaarNoteEntity.setNote(note);
     }
 
-    public void please(ModelFactoryService modelFactoryService) {
-        modelFactoryService.bazaarNoteRepository.save(bazaarNoteEntity);
+    public void please() {
+        makeMe.modelFactoryService.bazaarNoteRepository.save(bazaarNoteEntity);
     }
 }

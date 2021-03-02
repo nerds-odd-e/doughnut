@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @Transactional
 class BazaarControllerTests {
     @Autowired ModelFactoryService modelFactoryService;
-    private MakeMe makeMe = new MakeMe();
+    @Autowired private MakeMe makeMe;
     private UserEntity userEntity;
     private NoteEntity topNote;
     private BazaarController controller;
@@ -38,8 +38,8 @@ class BazaarControllerTests {
 
     @BeforeEach
     void setup() {
-        userEntity = makeMe.aUser().please(modelFactoryService);
-        topNote = makeMe.aNote().forUser(userEntity).please(modelFactoryService);
+        userEntity = makeMe.aUser().please();
+        topNote = makeMe.aNote().forUser(userEntity).please();
         controller = new BazaarController(new TestCurrentUser(userEntity), modelFactoryService);
     }
 
@@ -51,7 +51,7 @@ class BazaarControllerTests {
 
     @Test
     void whenThereIsSharedNote() {
-        makeMe.aBazaarNode(topNote).please(modelFactoryService);
+        makeMe.aBazaarNode(topNote).please();
         assertEquals("bazaar", controller.bazaar(model));
         assertThat((List<NoteEntity>) model.getAttribute("notes"), hasSize(equalTo(1)));
     }
@@ -68,8 +68,8 @@ class BazaarControllerTests {
 
         @Test
         void shouldNotBeAbleToShareNoteThatBelongsToOtherUser() {
-            UserEntity anotherUserEntity = makeMe.aUser().please(modelFactoryService);
-            NoteEntity note = makeMe.aNote().forUser(anotherUserEntity).please(modelFactoryService);
+            UserEntity anotherUserEntity = makeMe.aUser().please();
+            NoteEntity note = makeMe.aNote().forUser(anotherUserEntity).please();
             assertThrows(NoAccessRightException.class, ()->
                     controller.shareNote(note)
             );

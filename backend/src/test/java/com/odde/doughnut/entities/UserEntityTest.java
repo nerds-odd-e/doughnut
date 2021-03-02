@@ -1,7 +1,6 @@
 package com.odde.doughnut.entities;
 
 import com.odde.doughnut.services.ModelFactoryService;
-import com.odde.doughnut.testability.DBCleaner;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -23,9 +22,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @Transactional
 public class UserEntityTest {
     @Autowired EntityManager entityManager;
-    @Autowired ModelFactoryService modelFactoryService;
 
-    private MakeMe makeMe = new MakeMe();
+    @Autowired MakeMe makeMe;
 
     @Test
     void shouldReturnEmptyListWhenThhereIsNoNode() {
@@ -35,18 +33,18 @@ public class UserEntityTest {
 
     @Test
     void shouldReturnTheNoteWhenThereIsOne() {
-        UserEntity userEntity = makeMe.aUser().please(modelFactoryService);
-        NoteEntity note = makeMe.aNote().forUser(userEntity).please(modelFactoryService);
+        UserEntity userEntity = makeMe.aUser().please();
+        NoteEntity note = makeMe.aNote().forUser(userEntity).please();
         makeMe.refresh(entityManager, userEntity);
         assertThat(userEntity.getNotesInDescendingOrder(), contains(note));
     }
 
     @Test
     void shouldReturnTheNoteWhenThereIsTwo() {
-        UserEntity userEntity = makeMe.aUser().please(modelFactoryService);
+        UserEntity userEntity = makeMe.aUser().please();
         Date yesterday = Date.valueOf(LocalDate.now().minusDays(1));
-        NoteEntity note1 = makeMe.aNote().forUser(userEntity).updatedAt(yesterday).please(modelFactoryService);
-        NoteEntity note2 = makeMe.aNote().forUser(userEntity).please(modelFactoryService);
+        NoteEntity note1 = makeMe.aNote().forUser(userEntity).updatedAt(yesterday).please();
+        NoteEntity note2 = makeMe.aNote().forUser(userEntity).please();
         makeMe.refresh(entityManager, userEntity);
 
         assertEquals(note2.getTitle(), userEntity.getNotesInDescendingOrder().get(0).getTitle());

@@ -24,7 +24,7 @@ public class NoteModelTest {
     NoteEntity topLevel;
     @Autowired ModelFactoryService modelFactoryService;
 
-    MakeMe makeMe;
+    @Autowired MakeMe makeMe;
 
     TreeNodeModel toModel(NoteEntity subjectNote) {
         return modelFactoryService.toTreeNodeModel(subjectNote);
@@ -32,8 +32,7 @@ public class NoteModelTest {
 
     @BeforeEach
     void setup() {
-        makeMe = new MakeMe();
-        topLevel = makeMe.aNote().please(modelFactoryService);
+        topLevel = makeMe.aNote().please();
     }
 
     @Test
@@ -43,7 +42,7 @@ public class NoteModelTest {
 
     @Test
     void topLevelNoteWithOneChild() {
-        NoteEntity child = makeMe.aNote().under(topLevel).please(modelFactoryService);
+        NoteEntity child = makeMe.aNote().under(topLevel).please();
         assertThat(toModel(topLevel).getFirstChild(), equalTo(child));
     }
 
@@ -59,8 +58,8 @@ public class NoteModelTest {
 
         @Test
         void childHasParentInAncestors() {
-            NoteEntity subject = makeMe.aNote().under(topLevel).please(modelFactoryService);
-            NoteEntity sibling = makeMe.aNote().under(topLevel).please(modelFactoryService);
+            NoteEntity subject = makeMe.aNote().under(topLevel).please();
+            NoteEntity sibling = makeMe.aNote().under(topLevel).please();
 
             TreeNodeModel decoratedNote = toModel(subject);
             List<NoteEntity> ancestry = decoratedNote.getAncestors();
@@ -74,8 +73,8 @@ public class NoteModelTest {
 
         @Test
         void topNoteHasNoSiblings() {
-            NoteEntity subjectNote = makeMe.aNote().please(modelFactoryService);
-            NoteEntity nextTopLevel = makeMe.aNote().please(modelFactoryService);
+            NoteEntity subjectNote = makeMe.aNote().please();
+            NoteEntity nextTopLevel = makeMe.aNote().please();
             TreeNodeModel subject = toModel(subjectNote);
 
             assertNavigation(subject, null, null, null, null);
@@ -88,8 +87,8 @@ public class NoteModelTest {
 
             @BeforeEach
             void setup() {
-                child = makeMe.aNote().under(topLevel).please(modelFactoryService);
-                nephew = makeMe.aNote().under(topLevel).please(modelFactoryService);
+                child = makeMe.aNote().under(topLevel).please();
+                nephew = makeMe.aNote().under(topLevel).please();
             }
 
             @Test
@@ -116,7 +115,7 @@ public class NoteModelTest {
 
                 @BeforeEach
                 void setup() {
-                    grandchild = makeMe.aNote().under(child).please(modelFactoryService);
+                    grandchild = makeMe.aNote().under(child).please();
                 }
 
                 @Test

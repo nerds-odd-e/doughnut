@@ -10,9 +10,11 @@ import java.util.Date;
 
 public class NoteBuilder {
     static TestObjectCounter titleCounter = new TestObjectCounter(n->"title" + n);
+    private final MakeMe makeMe;
     private NoteEntity note = new NoteEntity();
 
     public NoteBuilder(MakeMe makeMe){
+        this.makeMe = makeMe;
         note.setTitle(titleCounter.generate());
         note.setDescription("descrption");
         note.setUpdatedDatetime(java.sql.Date.valueOf(LocalDate.now()));
@@ -42,8 +44,8 @@ public class NoteBuilder {
         return this;
     }
 
-    public NoteEntity please(ModelFactoryService modelFactoryService) {
-        modelFactoryService.noteRepository.save(note);
+    public NoteEntity please() {
+        makeMe.modelFactoryService.noteRepository.save(note);
         return note;
     }
 }
