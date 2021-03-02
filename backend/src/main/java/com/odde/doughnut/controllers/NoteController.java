@@ -60,19 +60,19 @@ public class NoteController {
         return "note";
     }
 
-    @GetMapping("/{note}/edit")
-    public String editNote(NoteEntity note, Model model) {
-        model.addAttribute("note", note);
+    @GetMapping("/{noteEntity}/edit")
+    public String editNote(NoteEntity noteEntity, Model model) {
+        model.addAttribute("noteEntity", noteEntity);
         return "edit_note";
     }
 
-    @PostMapping("/{note}")
-    public String updateNote(@Valid NoteEntity note, BindingResult bindingResult) {
+    @PostMapping("/{noteEntity}")
+    public String updateNote(@Valid NoteEntity noteEntity, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return "edit_note";
         }
-        modelFactoryService.noteRepository.save(note);
-        return "redirect:/notes/" + note.getId();
+        modelFactoryService.noteRepository.save(noteEntity);
+        return "redirect:/notes/" + noteEntity.getId();
     }
 
     @GetMapping("/{note}/link")

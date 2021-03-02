@@ -16,9 +16,13 @@ When("I create top level note with:", (data) => {
   cy.submitNoteFormWith(data.hashes());
 });
 
-When("I edit note {string} to become:", (noteTitle, data) => {
+When("I am editing note {string} the title is expected to be pre-filled with {string}", (noteTitle, oldTitle) => {
   cy.visit("/notes");
   cy.findNoteCardButton(noteTitle, ".edit-card").click();
+  cy.get("#note-title").should('have.value', oldTitle);
+});
+
+When("I update it to become:", (data) => {
   cy.submitNoteFormWith(data.hashes());
 });
 

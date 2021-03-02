@@ -67,7 +67,8 @@ Feature: Note CRUD
         Given there are some notes for the current user
             | title           | description          |
             | Odd-e CSD       | Our best training    |
-        When I edit note "Odd-e CSD" to become:
+        When I am editing note "Odd-e CSD" the title is expected to be pre-filled with "Odd-e CSD"
+        And I update it to become:
             | note-title      | note-description                     |
             | LeSS in Action  | An awesome training  |
         Then I should see these notes belonging to the user at the top level of all my notes

@@ -3,12 +3,12 @@
 
     <div class="container content">
         <h2>Edit note</h2>
-        <div th:replace="fragments/note_fragments :: noteBreadcrumb(${note}, ~{:: .additional-item})">
-            <li class="breadcrumb-item additional-item" th:text="${note.title}"/>
+        <div th:replace="fragments/note_fragments :: noteBreadcrumb(${noteEntity}, ~{:: .additional-item})">
+            <li class="breadcrumb-item additional-item" th:text="${noteEntity.title}"/>
         </div>
 
-        <form action="#" th:action="@{/notes/{id}(id=${note.id})}" th:object="${note}" method="post">
-            <div th:replace="fragments/note_fragments :: noteFormBody(${note})"/>
+        <form action="#" th:action="@{/notes/{id}(id=${noteEntity.id})}" th:object="${noteEntity}" method="post">
+            <div th:replace="fragments/note_fragments :: noteFormBody(${noteEntity})"/>
             <input type="submit" value="Submit" class="btn btn-primary"/>
         </form>
     </div>
