@@ -53,10 +53,10 @@ public class NoteController {
         return "redirect:/notes/" + noteEntity.getId();
     }
 
-    @GetMapping("/{note}")
-    public String note(@PathVariable(name = "note") NoteEntity note, Model model) {
-        model.addAttribute("note", note);
-        model.addAttribute("noteDecorated", modelFactoryService.toModel(note));
+    @GetMapping("/{noteEntity}")
+    public String note(@PathVariable(name = "noteEntity") NoteEntity noteEntity, Model model) {
+        model.addAttribute("note", noteEntity);
+        model.addAttribute("noteDecorated", modelFactoryService.toModel(noteEntity));
         return "note";
     }
 

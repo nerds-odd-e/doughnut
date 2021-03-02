@@ -1,37 +1,37 @@
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
 <layout th:replace="fragments/basic_layout :: application_layout(~{ :: .content})">
     <div class="container content">
-        <div th:replace="fragments/note_fragments :: noteBreadcrumb(${note}, ~{:: .additional-item})">
-            <li class="breadcrumb-item additional-item" th:text="${note.title}"/>
+        <div th:replace="fragments/note_fragments :: noteBreadcrumb(${noteEntity}, ~{:: .additional-item})">
+            <li class="breadcrumb-item additional-item" th:text="${noteEntity.title}"/>
             <li class="breadcrumb-item additional-item">
-                <a class="text-secondary" th:href="@{/notes/{id}/new(id=${note.id})}">(Add Child Note)</a>
+                <a class="text-secondary" th:href="@{/notes/{id}/new(id=${noteEntity.id})}">(Add Child Note)</a>
             </li>
         </div>
 
-        <div th:if="${note.parentNote}">
+        <div th:if="${noteEntity.parentNote}">
             <svg th:replace="fragments/svgs :: downRight"/>
-            <a th:if="${note.parentNote}" th:href="@{/notes/{id}/new(id=${note.parentNote.id})}">Add Sibling
+            <a th:if="${noteEntity.parentNote}" th:href="@{/notes/{id}/new(id=${noteEntity.parentNote.id})}">Add Sibling
                 Note</a>
         </div>
         <div class="jumbotron py-4 mb-2">
             <nav class="nav d-flex flex-row-reverse p-0">
-                <div th:replace="fragments/note_fragments :: noteButtons(${note})"/>
+                <div th:replace="fragments/note_fragments :: noteButtons(${noteEntity})"/>
             </nav>
-            <h2 class="display-4" th:text="${note.title}"/>
+            <h2 class="display-4" th:text="${noteEntity.title}"/>
             <p th:each="line : ${noteDecorated.descriptionLines}" th:text="${line}"/>
-            <div th:if="${note.url}">
-                <label th:unless="${note.urlIsVideo}">Url:</label>
-                <label th:if="${note.urlIsVideo}">Video Url:</label>
-                <p th:text="${note.url}"/>
+            <div th:if="${noteEntity.url}">
+                <label th:unless="${noteEntity.urlIsVideo}">Url:</label>
+                <label th:if="${noteEntity.urlIsVideo}">Video Url:</label>
+                <p th:text="${noteEntity.url}"/>
             </div>
-            <p class="text-center" th:if="${note.picture}">
-                <img class="img-fluid" th:src="${note.picture}"/>
+            <p class="text-center" th:if="${noteEntity.picture}">
+                <img class="img-fluid" th:src="${noteEntity.picture}"/>
             </p>
         </div>
 
         <nav class="nav d-flex justify-content-between p-0 mb-2">
             <div class="btn-group btn-group-sm">
-                <a th:href="@{/notes/{id}/move(id=${note.id})}">Move This Note</a>
+                <a th:href="@{/notes/{id}/move(id=${noteEntity.id})}">Move This Note</a>
             </div>
             <div class="btn-group btn-group-sm">
                 <a th:replace="fragments/note_fragments :: noteLinkButton(${noteDecorated.previousSiblingNote}, 'fastBackward', 'previous sibling')"/>
@@ -41,6 +41,6 @@
             </a>
         </nav>
 
-        <div th:replace="fragments/note_fragments :: noteViewCards(${note.children})"/>
+        <div th:replace="fragments/note_fragments :: noteViewCards(${noteEntity.children})"/>
     </div>
 </layout>
