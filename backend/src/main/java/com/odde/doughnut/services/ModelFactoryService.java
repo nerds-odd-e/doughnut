@@ -52,20 +52,4 @@ public class ModelFactoryService {
         return noteRepository.findById(noteId);
     }
 
-    public NoteMotionEntity getLeftNoteMotion(NoteEntity noteEntity) {
-        TreeNodeModel treeNodeModel = toTreeNodeModel(noteEntity);
-        NoteEntity previousSiblingNote = treeNodeModel.getPreviousSiblingNote();
-        TreeNodeModel prev = toTreeNodeModel(previousSiblingNote);
-        NoteEntity prevprev = prev.getPreviousSiblingNote();
-        if (prevprev == null) {
-            return new NoteMotionEntity(noteEntity.getParentNote(), true);
-        }
-        return new NoteMotionEntity(prevprev, false);
-    }
-
-    public NoteMotionEntity getRightNoteMotion(NoteEntity noteEntity) {
-        TreeNodeModel treeNodeModel = toTreeNodeModel(noteEntity);
-        return new NoteMotionEntity(treeNodeModel.getNextSiblingNote(), false);
-    }
-
 }

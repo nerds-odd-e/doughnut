@@ -1,4 +1,4 @@
-package com.odde.doughnut.controllers.exceptions;
+package com.odde.doughnut.exceptions;
 
 public class NoAccessRightException extends Exception {
 }

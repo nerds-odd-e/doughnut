@@ -2,6 +2,7 @@ package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.NoteMotionEntity;
+import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
@@ -15,12 +16,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
 public class NoteMotionModelTest {
-    NoteEntity topLevel;
     @Autowired
     ModelFactoryService modelFactoryService;
 
@@ -36,54 +37,64 @@ public class NoteMotionModelTest {
         secondChild = makeMe.aNote().under(topNote).please(modelFactoryService);
     }
 
-    void move(NoteEntity subject, NoteEntity relativeNote, boolean asFirstChildOfNote) {
+    void move(NoteEntity subject, NoteEntity relativeNote, boolean asFirstChildOfNote) throws CyclicLinkDetectedException {
         NoteMotionEntity motion = new NoteMotionEntity(relativeNote, asFirstChildOfNote);
         NoteMotionModel noteMotionModel = modelFactoryService.toNoteMotionModel(motion, subject);
         noteMotionModel.execute();
     }
 
     @Test
-    void moveBehind() {
+    void moveBehind() throws CyclicLinkDetectedException {
         move(firstChild, secondChild, false);
         assertThat(secondChild.getSiblingOrder(), is(lessThan(firstChild.getSiblingOrder())));
     }
 
     @Test
-    void moveSecondBehindFirst() {
+    void moveSecondBehindFirst() throws CyclicLinkDetectedException {
         move(secondChild, firstChild, false);
         assertThat(firstChild.getSiblingOrder(), is(lessThan(secondChild.getSiblingOrder())));
     }
 
     @Test
-    void moveSecondBehindItself() {
-        move(secondChild, secondChild, false);
-        assertThat(firstChild.getSiblingOrder(), is(lessThan(secondChild.getSiblingOrder())));
-    }
-
-    @Test
-    void moveSecondToBeTheFirstSibling() {
+    void moveSecondToBeTheFirstSibling() throws CyclicLinkDetectedException {
         move(secondChild, topNote, true);
         assertThat(secondChild.getSiblingOrder(), is(lessThan(firstChild.getSiblingOrder())));
     }
 
     @Test
-    void moveUnder() {
+    void moveUnder() throws CyclicLinkDetectedException {
         move(firstChild, secondChild, true);
         assertThat(firstChild.getParentNote(), equalTo(secondChild));
     }
 
     @Test
-    void moveAfterNoteOfDifferentLevel() {
-        NoteEntity thirdLevel = makeMe.aNote().under(firstChild).please(modelFactoryService);
-        move(secondChild, thirdLevel, false);
-        assertThat(secondChild.getParentNote(), equalTo(firstChild));
-    }
-
-    @Test
-    void moveBothToTheEndInSequence() {
+    void moveBothToTheEndInSequence() throws CyclicLinkDetectedException {
         move(firstChild, secondChild, false);
         move(secondChild, firstChild, false);
         assertThat(firstChild.getSiblingOrder(), is(lessThan(secondChild.getSiblingOrder())));
+    }
+
+    @Nested
+    class WhenThereIsAThirdLevel {
+        NoteEntity thirdLevel;
+
+        @BeforeEach
+        void setup() {
+            thirdLevel = makeMe.aNote().under(firstChild).please(modelFactoryService);
+        }
+
+        @Test
+        void moveAfterNoteOfDifferentLevel() throws CyclicLinkDetectedException {
+            move(secondChild, thirdLevel, false);
+            assertThat(secondChild.getParentNote(), equalTo(firstChild));
+        }
+
+        @Test
+        void moveToOwnDescendentIsNotAllowed() {
+            assertThrows(CyclicLinkDetectedException.class, ()->
+                move(topNote, thirdLevel, false)
+            );
+        }
     }
 
     @Nested
@@ -96,7 +107,7 @@ public class NoteMotionModelTest {
         }
 
         @Test
-        void moveBetweenSecondAndThird() {
+        void moveBetweenSecondAndThird() throws CyclicLinkDetectedException {
             move(firstChild, secondChild, false);
             assertThat(secondChild.getSiblingOrder(), is(lessThan(firstChild.getSiblingOrder())));
             assertThat(firstChild.getSiblingOrder(), is(lessThan(thirdChild.getSiblingOrder())));

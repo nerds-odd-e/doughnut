@@ -1,7 +1,7 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.odde.doughnut.controllers.exceptions.NoAccessRightException;
+import com.odde.doughnut.exceptions.NoAccessRightException;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Where;

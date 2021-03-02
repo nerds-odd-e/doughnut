@@ -1,11 +1,13 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUser;
-import com.odde.doughnut.controllers.exceptions.NoAccessRightException;
+import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
+import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.NoteMotionEntity;
 import com.odde.doughnut.entities.UserEntity;
 import com.odde.doughnut.models.NoteModel;
+import com.odde.doughnut.models.TreeNodeModel;
 import com.odde.doughnut.services.ModelFactoryService;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -90,14 +92,30 @@ public class NoteController {
 
     @GetMapping("/{noteEntity}/move")
     public String prepareToNote(NoteEntity noteEntity, Model model) {
-        model.addAttribute("noteMotion", this.modelFactoryService.getLeftNoteMotion(noteEntity));
-        model.addAttribute("noteMotionRight", this.modelFactoryService.getRightNoteMotion(noteEntity));
+        model.addAttribute("noteMotion", getLeftNoteMotion(noteEntity));
+        model.addAttribute("noteMotionRight", getRightNoteMotion(noteEntity));
         model.addAttribute("noteMotionUnder", new NoteMotionEntity(null, true));
         return "notes/move";
     }
 
+    private NoteMotionEntity getLeftNoteMotion(NoteEntity noteEntity) {
+        TreeNodeModel treeNodeModel = this.modelFactoryService.toTreeNodeModel(noteEntity);
+        NoteEntity previousSiblingNote = treeNodeModel.getPreviousSiblingNote();
+        TreeNodeModel prev = this.modelFactoryService.toTreeNodeModel(previousSiblingNote);
+        NoteEntity prevprev = prev.getPreviousSiblingNote();
+        if (prevprev == null) {
+            return new NoteMotionEntity(noteEntity.getParentNote(), true);
+        }
+        return new NoteMotionEntity(prevprev, false);
+    }
+
+    private NoteMotionEntity getRightNoteMotion(NoteEntity noteEntity) {
+        TreeNodeModel treeNodeModel = this.modelFactoryService.toTreeNodeModel(noteEntity);
+        return new NoteMotionEntity(treeNodeModel.getNextSiblingNote(), false);
+    }
+
     @PostMapping("/{noteEntity}/move")
-    public String moveNote(NoteEntity noteEntity, NoteMotionEntity noteMotionEntity, Model model) {
+    public String moveNote(NoteEntity noteEntity, NoteMotionEntity noteMotionEntity, Model model) throws CyclicLinkDetectedException {
         modelFactoryService.toNoteMotionModel(noteMotionEntity, noteEntity).execute();
         return "redirect:/notes/" + noteEntity.getId();
     }
