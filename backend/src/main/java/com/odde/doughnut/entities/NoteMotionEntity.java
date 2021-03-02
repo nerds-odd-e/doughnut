@@ -1,7 +1,5 @@
 package com.odde.doughnut.entities;
 
-import com.odde.doughnut.models.NoteModel;
-import com.odde.doughnut.services.ModelFactoryService;
 import lombok.Getter;
 import lombok.Setter;
 

@@ -26,7 +26,7 @@ public class NoteModelTest {
 
     MakeMe makeMe;
 
-    NoteModel toModel(NoteEntity subjectNote) {
+    TreeNodeModel toModel(NoteEntity subjectNote) {
         return modelFactoryService.toNoteModel(subjectNote);
     }
 
@@ -52,7 +52,7 @@ public class NoteModelTest {
 
         @Test
         void topLevelNoteHaveEmptyAncestors() {
-            NoteModel decoratedNote = toModel(topLevel);
+            TreeNodeModel decoratedNote = toModel(topLevel);
             List<NoteEntity> ancestors = decoratedNote.getAncestors();
             assertThat(ancestors, contains(topLevel));
         }
@@ -62,7 +62,7 @@ public class NoteModelTest {
             NoteEntity subject = makeMe.aNote().under(topLevel).please(modelFactoryService);
             NoteEntity sibling = makeMe.aNote().under(topLevel).please(modelFactoryService);
 
-            NoteModel decoratedNote = toModel(subject);
+            TreeNodeModel decoratedNote = toModel(subject);
             List<NoteEntity> ancestry = decoratedNote.getAncestors();
             assertThat(ancestry, contains(topLevel, subject));
             assertThat(ancestry, not(contains(sibling)));
@@ -76,7 +76,7 @@ public class NoteModelTest {
         void topNoteHasNoSiblings() {
             NoteEntity subjectNote = makeMe.aNote().please(modelFactoryService);
             NoteEntity nextTopLevel = makeMe.aNote().please(modelFactoryService);
-            NoteModel subject = toModel(subjectNote);
+            TreeNodeModel subject = toModel(subjectNote);
 
             assertNavigation(subject, null, null, null, null);
         }
@@ -94,19 +94,19 @@ public class NoteModelTest {
 
             @Test
             void topLevelHasChildAsNext() {
-                NoteModel subject = toModel(topLevel);
+                TreeNodeModel subject = toModel(topLevel);
                 assertNavigation(subject, null, null, child, null);
             }
 
             @Test
             void firstChildNote() {
-                NoteModel subject = toModel(child);
+                TreeNodeModel subject = toModel(child);
                 assertNavigation(subject, null, topLevel, nephew, nephew);
             }
 
             @Test
             void secondChild() {
-                NoteModel subject = toModel(nephew);
+                TreeNodeModel subject = toModel(nephew);
                 assertNavigation(subject, child, child, null, null);
             }
 
@@ -121,26 +121,26 @@ public class NoteModelTest {
 
                 @Test
                 void firstChildNote() {
-                    NoteModel subject = toModel(child);
+                    TreeNodeModel subject = toModel(child);
                     assertNavigation(subject, null, topLevel, grandchild, nephew);
                 }
 
                 @Test
                 void secondChild() {
-                    NoteModel subject = toModel(nephew);
+                    TreeNodeModel subject = toModel(nephew);
                     assertNavigation(subject, child, grandchild, null, null);
                 }
 
                 @Test
                 void grandchildView() {
-                    NoteModel subject = toModel(grandchild);
+                    TreeNodeModel subject = toModel(grandchild);
                     assertNavigation(subject, null, child, nephew, null);
                 }
 
             }
         }
 
-        private void assertNavigation(NoteModel subject, NoteEntity previousSibling, NoteEntity previous, NoteEntity next, NoteEntity nextSibling) {
+        private void assertNavigation(TreeNodeModel subject, NoteEntity previousSibling, NoteEntity previous, NoteEntity next, NoteEntity nextSibling) {
             assertThat(subject.getPreviousSiblingNote(), equalTo(previousSibling));
             assertThat(subject.getPreviousNote(), equalTo(previous));
             assertThat(subject.getNextNote(), equalTo(next));

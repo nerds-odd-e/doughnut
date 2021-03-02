@@ -9,6 +9,7 @@ import com.odde.doughnut.models.NoteModel;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.models.NoteMotionModel;
+import com.odde.doughnut.models.TreeNodeModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +32,10 @@ public class ModelFactoryService {
         return new NoteModel(note, this);
     }
 
+    public TreeNodeModel toTreeNodeModel(NoteEntity note) {
+        return new TreeNodeModel(note, this);
+    }
+
     public NoteMotionModel toNoteMotionModel(NoteMotionEntity noteMotionEntity, NoteEntity noteEntity) {
         return new NoteMotionModel(noteMotionEntity, noteEntity, this);
     }
@@ -48,9 +53,9 @@ public class ModelFactoryService {
     }
 
     public NoteMotionEntity getLeftNoteMotion(NoteEntity noteEntity) {
-        NoteModel noteModel = toNoteModel(noteEntity);
-        NoteEntity previousSiblingNote = noteModel.getPreviousSiblingNote();
-        NoteModel prev = toNoteModel(previousSiblingNote);
+        TreeNodeModel treeNodeModel = toNoteModel(noteEntity);
+        NoteEntity previousSiblingNote = treeNodeModel.getPreviousSiblingNote();
+        TreeNodeModel prev = toNoteModel(previousSiblingNote);
         NoteEntity prevprev = prev.getPreviousSiblingNote();
         if (prevprev == null) {
             return new NoteMotionEntity(noteEntity.getParentNote(), true);
@@ -59,8 +64,8 @@ public class ModelFactoryService {
     }
 
     public NoteMotionEntity getRightNoteMotion(NoteEntity noteEntity) {
-        NoteModel noteModel = toNoteModel(noteEntity);
-        return new NoteMotionEntity(noteModel.getNextSiblingNote(), false);
+        TreeNodeModel treeNodeModel = toNoteModel(noteEntity);
+        return new NoteMotionEntity(treeNodeModel.getNextSiblingNote(), false);
     }
 
 }

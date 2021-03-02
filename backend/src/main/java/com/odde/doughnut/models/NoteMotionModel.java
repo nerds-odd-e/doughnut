@@ -17,8 +17,8 @@ public class NoteMotionModel {
 
     public void execute() {
         subject.setParentNote(noteMotionEntity.getNewParent());
-        NoteModel noteModel = modelFactoryService.toNoteModel(noteMotionEntity.getRelativeToNote());
-        Long newSiblingOrder = noteModel.theSiblingOrderItTakesToMoveRelativeToMe(noteMotionEntity.isAsFirstChildOfNote());
+        TreeNodeModel treeNodeModel = modelFactoryService.toNoteModel(noteMotionEntity.getRelativeToNote());
+        Long newSiblingOrder = treeNodeModel.theSiblingOrderItTakesToMoveRelativeToMe(noteMotionEntity.isAsFirstChildOfNote());
         if (newSiblingOrder != null) {
             subject.setSiblingOrder(newSiblingOrder);
         }
