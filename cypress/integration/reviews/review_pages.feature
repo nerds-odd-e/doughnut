@@ -11,11 +11,12 @@ Feature: Reviewing
         And I link note "Sedition" to note "Sedation"
         And I link note "Sedition" to note "Sedative"
 
-    Scenario: Review notes
+    Scenario: Different review pages for different notes
         Then Reviews should have review pages in sequence:
             | review type   | title      |   additional info             |
             | related notes | Sedition   |   Sedation, Sedative          |
             | single note   | Sedition   |   Incite violence             |
             | single note   | Sedation   |   Put to sleep                |
             | picture note  | Sedative   |   Sleep medicine; a_slide.jpg |
+            | end of review |            |                               |
 
