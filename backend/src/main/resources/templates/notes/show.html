@@ -18,7 +18,7 @@
                 <div th:replace="fragments/note_fragments :: noteButtons(${noteEntity})"/>
             </nav>
             <h2 class="display-4" th:text="${noteEntity.title}"/>
-            <p th:each="line : ${noteDecorated.descriptionLines}" th:text="${line}"/>
+            <p th:each="line : ${noteEntity.descriptionLines}" th:text="${line}"/>
             <div th:if="${noteEntity.url}">
                 <label th:unless="${noteEntity.urlIsVideo}">Url:</label>
                 <label th:if="${noteEntity.urlIsVideo}">Video Url:</label>
@@ -34,10 +34,10 @@
                 <a th:href="@{/notes/{id}/move(id=${noteEntity.id})}">Move This Note</a>
             </div>
             <div class="btn-group btn-group-sm">
-                <a th:replace="fragments/note_fragments :: noteLinkButton(${noteDecorated.previousSiblingNote}, 'fastBackward', 'previous sibling')"/>
-                <a th:replace="fragments/note_fragments :: noteLinkButton(${noteDecorated.previousNote}, 'backward', 'previous')"/>
-                <a th:replace="fragments/note_fragments :: noteLinkButton(${noteDecorated.nextNote}, 'forward', 'next')"/>
-                <a th:replace="fragments/note_fragments :: noteLinkButton(${noteDecorated.nextSiblingNote}, 'fastForward', 'next sibling')"/>
+                <a th:replace="fragments/note_fragments :: noteLinkButton(${treeNodeModel.previousSiblingNote}, 'fastBackward', 'previous sibling')"/>
+                <a th:replace="fragments/note_fragments :: noteLinkButton(${treeNodeModel.previousNote}, 'backward', 'previous')"/>
+                <a th:replace="fragments/note_fragments :: noteLinkButton(${treeNodeModel.nextNote}, 'forward', 'next')"/>
+                <a th:replace="fragments/note_fragments :: noteLinkButton(${treeNodeModel.nextSiblingNote}, 'fastForward', 'next sibling')"/>
             </a>
         </nav>
 

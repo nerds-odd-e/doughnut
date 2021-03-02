@@ -27,7 +27,7 @@ public class NoteModelTest {
     MakeMe makeMe;
 
     TreeNodeModel toModel(NoteEntity subjectNote) {
-        return modelFactoryService.toNoteModel(subjectNote);
+        return modelFactoryService.toTreeNodeModel(subjectNote);
     }
 
     @BeforeEach

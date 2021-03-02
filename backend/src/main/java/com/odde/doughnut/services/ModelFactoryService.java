@@ -53,9 +53,9 @@ public class ModelFactoryService {
     }
 
     public NoteMotionEntity getLeftNoteMotion(NoteEntity noteEntity) {
-        TreeNodeModel treeNodeModel = toNoteModel(noteEntity);
+        TreeNodeModel treeNodeModel = toTreeNodeModel(noteEntity);
         NoteEntity previousSiblingNote = treeNodeModel.getPreviousSiblingNote();
-        TreeNodeModel prev = toNoteModel(previousSiblingNote);
+        TreeNodeModel prev = toTreeNodeModel(previousSiblingNote);
         NoteEntity prevprev = prev.getPreviousSiblingNote();
         if (prevprev == null) {
             return new NoteMotionEntity(noteEntity.getParentNote(), true);
@@ -64,7 +64,7 @@ public class ModelFactoryService {
     }
 
     public NoteMotionEntity getRightNoteMotion(NoteEntity noteEntity) {
-        TreeNodeModel treeNodeModel = toNoteModel(noteEntity);
+        TreeNodeModel treeNodeModel = toTreeNodeModel(noteEntity);
         return new NoteMotionEntity(treeNodeModel.getNextSiblingNote(), false);
     }
 

@@ -55,7 +55,7 @@ public class NoteController {
 
     @GetMapping("/{noteEntity}")
     public String showNote(@PathVariable(name = "noteEntity") NoteEntity noteEntity, Model model) {
-        model.addAttribute("noteDecorated", modelFactoryService.toNoteModel(noteEntity));
+        model.addAttribute("treeNodeModel", modelFactoryService.toTreeNodeModel(noteEntity));
         return "notes/show";
     }
 

@@ -9,27 +9,24 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-public class NoteModel extends TreeNodeModel {
+public class NoteModel {
+
+    private final NoteEntity note;
+    private final ModelFactoryService modelFactoryService;
 
     public NoteModel(NoteEntity note, ModelFactoryService modelFactoryService) {
-        super(note, modelFactoryService);
+        this.note = note;
+        this.modelFactoryService = modelFactoryService;
     }
 
     public String getTitle() {
         return note.getTitle();
     }
 
-    public List<String> getDescriptionLines() {
-        if (Strings.isEmpty(note.getDescription())) {
-            return new ArrayList<>();
-        }
-        return Arrays.asList(note.getDescription().split("\n"));
-    }
-
     public void linkNote(NoteEntity targetNote) {
         note.linkToNote(targetNote);
         note.setUpdatedDatetime(new Date());
-        noteRepository.save(note);
+        modelFactoryService.noteRepository.save(note);
     }
 
 
