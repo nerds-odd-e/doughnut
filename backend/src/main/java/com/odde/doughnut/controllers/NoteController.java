@@ -54,15 +54,13 @@ public class NoteController {
     }
 
     @GetMapping("/{noteEntity}")
-    public String note(@PathVariable(name = "noteEntity") NoteEntity noteEntity, Model model) {
-        model.addAttribute("note", noteEntity);
+    public String showNote(@PathVariable(name = "noteEntity") NoteEntity noteEntity, Model model) {
         model.addAttribute("noteDecorated", modelFactoryService.toModel(noteEntity));
         return "note";
     }
 
     @GetMapping("/{noteEntity}/edit")
     public String editNote(NoteEntity noteEntity, Model model) {
-        model.addAttribute("noteEntity", noteEntity);
         return "edit_note";
     }
 
@@ -87,10 +85,10 @@ public class NoteController {
         return "link";
     }
 
-    @PostMapping(value = "/{note}/link", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public RedirectView linkNote(@PathVariable("note") NoteEntity note, Integer targetNoteId) {
+    @PostMapping(value = "/{noteEntity}/link", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public RedirectView linkNote(@PathVariable("noteEntity") NoteEntity noteEntity, Integer targetNoteId) {
         NoteEntity targetNote = modelFactoryService.noteRepository.findById(targetNoteId).get();
-        NoteModel noteModel = modelFactoryService.toModel(note);
+        NoteModel noteModel = modelFactoryService.toModel(noteEntity);
         noteModel.linkNote(targetNote);
         return new RedirectView("/review");
     }
@@ -110,10 +108,10 @@ public class NoteController {
         return "redirect:/notes/" + noteEntity.getId();
     }
 
-    @PostMapping(value = "/{note}/delete")
-    public RedirectView deleteNote(@PathVariable("note") NoteEntity note) throws NoAccessRightException {
-        currentUser.getUser().checkAuthorization(note);
-        modelFactoryService.noteRepository.delete(note);
+    @PostMapping(value = "/{noteEntity}/delete")
+    public RedirectView deleteNote(@PathVariable("noteEntity") NoteEntity noteEntity) throws NoAccessRightException {
+        currentUser.getUser().checkAuthorization(noteEntity);
+        modelFactoryService.noteRepository.delete(noteEntity);
         return new RedirectView("/notes");
     }
 
