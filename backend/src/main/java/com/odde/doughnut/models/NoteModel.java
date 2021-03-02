@@ -95,4 +95,28 @@ public class NoteModel {
     public NoteEntity getFirstChild() {
         return noteRepository.findFirstByParentNoteOrderBySiblingOrder(note);
     }
+
+    private long getSiblingOrderToInsertBehindMe() {
+        NoteEntity nextSiblingNote = getNextSiblingNote();
+        Long relativeToSiblingOrder = note.getSiblingOrder();
+        if (nextSiblingNote == null) {
+            return relativeToSiblingOrder + NoteEntity.MINIMUM_SIBLING_ORDER_INCREMENT;
+        }
+        return (relativeToSiblingOrder + nextSiblingNote.getSiblingOrder()) / 2;
+    }
+
+    private Long getSiblingOrderToBecomeMyFirstChild() {
+        NoteEntity firstChild = getFirstChild();
+        if (firstChild != null) {
+            return firstChild.getSiblingOrder() - NoteEntity.MINIMUM_SIBLING_ORDER_INCREMENT;
+        }
+        return null;
+    }
+
+    Long theSiblingOrderItTakesToMoveRelativeToMe(boolean asFirstChildOfNote) {
+        if (!asFirstChildOfNote) {
+            return getSiblingOrderToInsertBehindMe();
+        }
+        return getSiblingOrderToBecomeMyFirstChild();
+    }
 }

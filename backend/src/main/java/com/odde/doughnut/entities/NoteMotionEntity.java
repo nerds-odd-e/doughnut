@@ -14,35 +14,11 @@ public class NoteMotionEntity {
         this.asFirstChildOfNote = asFirstChildOfNote;
     }
 
-    public void execute(NoteEntity subject, ModelFactoryService modelFactoryService) {
-        subject.setParentNote(getNewParent());
-        Long newSiblingOrder = getNewSiblingOrder(modelFactoryService);
-        if (newSiblingOrder != null) {
-            subject.setSiblingOrder(newSiblingOrder);
-        }
-        modelFactoryService.noteRepository.save(subject);
-    }
-
-    private NoteEntity getNewParent() {
+    public NoteEntity getNewParent() {
         if (asFirstChildOfNote) {
             return relativeToNote;
         }
         return relativeToNote.getParentNote();
     }
 
-    private Long getNewSiblingOrder(ModelFactoryService modelFactoryService) {
-        NoteModel noteModel = modelFactoryService.toNoteModel(relativeToNote);
-        if (!asFirstChildOfNote) {
-            NoteEntity nextSiblingNote = noteModel.getNextSiblingNote();
-            if (nextSiblingNote == null) {
-                return relativeToNote.getSiblingOrder() + NoteEntity.MINIMUM_SIBLING_ORDER_INCREMENT;
-            }
-            return (relativeToNote.getSiblingOrder() + nextSiblingNote.getSiblingOrder()) / 2;
-        }
-        NoteEntity firstChild = noteModel.getFirstChild();
-        if (firstChild != null) {
-            return firstChild.getSiblingOrder() - NoteEntity.MINIMUM_SIBLING_ORDER_INCREMENT;
-        }
-        return null;
-    }
 }

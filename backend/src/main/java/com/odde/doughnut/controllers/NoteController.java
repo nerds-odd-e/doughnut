@@ -98,8 +98,7 @@ public class NoteController {
 
     @PostMapping("/{noteEntity}/move")
     public String moveNote(NoteEntity noteEntity, NoteMotionEntity noteMotionEntity, Model model) {
-        modelFactoryService.toNoteMotionModel(noteMotionEntity, noteEntity);
-        noteMotionEntity.execute(noteEntity, this.modelFactoryService);
+        modelFactoryService.toNoteMotionModel(noteMotionEntity, noteEntity).execute();
         return "redirect:/notes/" + noteEntity.getId();
     }
 

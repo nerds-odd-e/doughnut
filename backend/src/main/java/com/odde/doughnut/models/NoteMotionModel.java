@@ -16,6 +16,13 @@ public class NoteMotionModel {
     }
 
     public void execute() {
-        noteMotionEntity.execute(subject, modelFactoryService);
+        subject.setParentNote(noteMotionEntity.getNewParent());
+        NoteModel noteModel = modelFactoryService.toNoteModel(noteMotionEntity.getRelativeToNote());
+        Long newSiblingOrder = noteModel.theSiblingOrderItTakesToMoveRelativeToMe(noteMotionEntity.isAsFirstChildOfNote());
+        if (newSiblingOrder != null) {
+            subject.setSiblingOrder(newSiblingOrder);
+        }
+        modelFactoryService.noteRepository.save(subject);
     }
+
 }
