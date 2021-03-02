@@ -60,13 +60,13 @@ class NoteControllerTests {
         }
 
         @Test
-        void shouldUseTheRigthTemplateForCreatingNote() {
+        void shouldUseTheRigthTemplateForCreatingNote() throws NoAccessRightException {
             assertEquals("notes/new", controller.newNote(null, model));
             assertThat(((NoteEntity) model.getAttribute("noteEntity")).getParentNote(), is(nullValue()));
         }
 
         @Test
-        void shouldGetTheParentNoteIfIdProvided() {
+        void shouldGetTheParentNoteIfIdProvided() throws NoAccessRightException {
             controller.newNote(parentNote, model);
             assertThat(((NoteEntity) model.getAttribute("noteEntity")).getParentNote(), equalTo(parentNote));
         }
@@ -83,7 +83,7 @@ class NoteControllerTests {
     @Nested
     class createNoteTest {
         @Test
-        void shouldBeAbleToSaveNoteWhenValid() {
+        void shouldBeAbleToSaveNoteWhenValid() throws NoAccessRightException {
             NoteEntity newNote = makeMe.aNote().inMemoryPlease();
             BindingResult bindingResult = makeMe.successfulBindingResult();
 
@@ -92,7 +92,7 @@ class NoteControllerTests {
         }
 
         @Test
-        void shouldNotBeAbleToSaveNoteWhenInvalid() {
+        void shouldNotBeAbleToSaveNoteWhenInvalid() throws NoAccessRightException {
             NoteEntity newNote = new NoteEntity();
             BindingResult bindingResult = makeMe.failedBindingResult();
 
@@ -109,12 +109,12 @@ class NoteControllerTests {
 
         @BeforeEach
         void setup() {
-            note = makeMe.aNote().please(modelFactoryService);
+            note = makeMe.aNote().forUser(userEntity).please(modelFactoryService);
             note.setTitle("new");
         }
 
         @Test
-        void shouldBeAbleToSaveNoteWhenValid() {
+        void shouldBeAbleToSaveNoteWhenValid() throws NoAccessRightException {
             BindingResult bindingResult = makeMe.successfulBindingResult();
 
             String response = controller.updateNote(note, bindingResult);
@@ -122,8 +122,7 @@ class NoteControllerTests {
         }
 
         @Test
-        void shouldNotBeAbleToSaveNoteWhenInvalid() {
-            NoteEntity note = makeMe.aNote().please(modelFactoryService);
+        void shouldNotBeAbleToSaveNoteWhenInvalid() throws NoAccessRightException {
             note.setTitle("new");
             BindingResult bindingResult = makeMe.failedBindingResult();
 

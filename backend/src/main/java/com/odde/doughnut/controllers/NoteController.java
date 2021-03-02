@@ -37,7 +37,10 @@ public class NoteController {
     }
 
     @GetMapping({"/new", "/{parentNote}/new"})
-    public String newNote(@PathVariable(name = "parentNote", required = false) NoteEntity parentNote, Model model) {
+    public String newNote(@PathVariable(name = "parentNote", required = false) NoteEntity parentNote, Model model) throws NoAccessRightException {
+        if (parentNote != null) {
+            currentUser.getUser().assertAuthorization(parentNote);
+        }
         NoteEntity noteEntity = new NoteEntity();
         noteEntity.setParentNote(parentNote);
         model.addAttribute("noteEntity", noteEntity);
@@ -45,9 +48,12 @@ public class NoteController {
     }
 
     @PostMapping("")
-    public String createNote(@Valid NoteEntity noteEntity, BindingResult bindingResult, Model model) {
+    public String createNote(@Valid NoteEntity noteEntity, BindingResult bindingResult, Model model) throws NoAccessRightException {
         if (bindingResult.hasErrors()) {
             return "notes/new";
+        }
+        if (noteEntity.getParentNote() != null) {
+            currentUser.getUser().assertAuthorization(noteEntity.getParentNote());
         }
         UserEntity userEntity = currentUser.getUser();
         noteEntity.setUserEntity(userEntity);
@@ -67,7 +73,8 @@ public class NoteController {
     }
 
     @PostMapping("/{noteEntity}")
-    public String updateNote(@Valid NoteEntity noteEntity, BindingResult bindingResult) {
+    public String updateNote(@Valid NoteEntity noteEntity, BindingResult bindingResult) throws NoAccessRightException {
+        currentUser.getUser().assertAuthorization(noteEntity);
         if (bindingResult.hasErrors()) {
             return "notes/edit";
         }
@@ -83,7 +90,8 @@ public class NoteController {
     }
 
     @PostMapping(value = "/{noteEntity}/link", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public RedirectView linkNote(@PathVariable("noteEntity") NoteEntity noteEntity, Integer targetNoteId) {
+    public RedirectView linkNote(@PathVariable("noteEntity") NoteEntity noteEntity, Integer targetNoteId) throws NoAccessRightException {
+        currentUser.getUser().assertAuthorization(noteEntity);
         NoteEntity targetNote = modelFactoryService.noteRepository.findById(targetNoteId).get();
         NoteModel noteModel = modelFactoryService.toNoteModel(noteEntity);
         noteModel.linkNote(targetNote);
@@ -91,7 +99,7 @@ public class NoteController {
     }
 
     @GetMapping("/{noteEntity}/move")
-    public String prepareToNote(NoteEntity noteEntity, Model model) {
+    public String prepareToMove(NoteEntity noteEntity, Model model) {
         model.addAttribute("noteMotion", getLeftNoteMotion(noteEntity));
         model.addAttribute("noteMotionRight", getRightNoteMotion(noteEntity));
         model.addAttribute("noteMotionUnder", new NoteMotionEntity(null, true));
