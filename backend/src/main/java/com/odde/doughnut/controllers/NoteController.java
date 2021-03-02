@@ -31,7 +31,7 @@ public class NoteController {
     @GetMapping("")
     public String myNotes(Model model) {
         model.addAttribute("notes", currentUser.getUser().getOrphanedNotes());
-        return "my_notes";
+        return "notes/my_notes";
     }
 
     @GetMapping({"/new", "/{parentNote}/new"})
@@ -39,13 +39,13 @@ public class NoteController {
         NoteEntity noteEntity = new NoteEntity();
         noteEntity.setParentNote(parentNote);
         model.addAttribute("noteEntity", noteEntity);
-        return "new_note";
+        return "notes/new";
     }
 
     @PostMapping("")
     public String createNote(@Valid NoteEntity noteEntity, BindingResult bindingResult, Model model) {
         if (bindingResult.hasErrors()) {
-            return "new_note";
+            return "notes/new";
         }
         UserEntity userEntity = currentUser.getUser();
         noteEntity.setUserEntity(userEntity);
@@ -56,18 +56,18 @@ public class NoteController {
     @GetMapping("/{noteEntity}")
     public String showNote(@PathVariable(name = "noteEntity") NoteEntity noteEntity, Model model) {
         model.addAttribute("noteDecorated", modelFactoryService.toModel(noteEntity));
-        return "show_note";
+        return "notes/show";
     }
 
     @GetMapping("/{noteEntity}/edit")
     public String editNote(NoteEntity noteEntity) {
-        return "edit_note";
+        return "notes/edit";
     }
 
     @PostMapping("/{noteEntity}")
     public String updateNote(@Valid NoteEntity noteEntity, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return "edit_note";
+            return "notes/edit";
         }
         modelFactoryService.noteRepository.save(noteEntity);
         return "redirect:/notes/" + noteEntity.getId();
@@ -77,7 +77,7 @@ public class NoteController {
     public String link( @PathVariable("noteEntity") NoteEntity noteEntity, @RequestParam(required = false) String searchTerm, Model model) {
         List<NoteEntity> linkableNotes = currentUser.getUser().filterLinkableNotes(noteEntity, searchTerm);
         model.addAttribute("linkableNotes", linkableNotes);
-        return "link";
+        return "notes/link";
     }
 
     @PostMapping(value = "/{noteEntity}/link", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
@@ -93,7 +93,7 @@ public class NoteController {
         model.addAttribute("noteMotion", this.modelFactoryService.getLeftNoteMotion(noteEntity));
         model.addAttribute("noteMotionRight", this.modelFactoryService.getRightNoteMotion(noteEntity));
         model.addAttribute("noteMotionUnder", new NoteMotion(null, true));
-        return "move_note";
+        return "notes/move";
     }
 
     @PostMapping("/{noteEntity}/move")

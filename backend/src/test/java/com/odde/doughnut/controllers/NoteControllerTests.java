@@ -60,7 +60,7 @@ class NoteControllerTests {
 
         @Test
         void shouldUseTheRigthTemplateForCreatingNote() {
-            assertEquals("new_note", controller.newNote(null, model));
+            assertEquals("notes/new", controller.newNote(null, model));
             assertThat(((NoteEntity) model.getAttribute("noteEntity")).getParentNote(), is(nullValue()));
         }
 
@@ -72,15 +72,10 @@ class NoteControllerTests {
 
         @Test
         void shouldReturnAllParentlessNotesForMyNotes() {
-            assertEquals("my_notes", controller.myNotes(model));
+            assertEquals("notes/my_notes", controller.myNotes(model));
             assertThat(model.getAttribute("note"), is(nullValue()));
             assertThat((List<NoteEntity>) model.getAttribute("notes"), hasSize(equalTo(1)));
             assertThat((List<NoteEntity>) model.getAttribute("notes"), contains(parentNote));
-        }
-
-        @Test
-        void shouldReturnChildNoteIfNoteIdGiven() {
-            assertEquals("show_note", controller.showNote(parentNote, model));
         }
     }
 
@@ -102,7 +97,7 @@ class NoteControllerTests {
 
             String response = controller.createNote(newNote, bindingResult, model);
             assertEquals(null, newNote.getId());
-            assertEquals("new_note", response);
+            assertEquals("notes/new", response);
         }
 
     }
@@ -132,7 +127,7 @@ class NoteControllerTests {
             BindingResult bindingResult = makeMe.failedBindingResult();
 
             String response = controller.updateNote(note, bindingResult);
-            assertEquals("edit_note", response);
+            assertEquals("notes/edit", response);
         }
     }
 
