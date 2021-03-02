@@ -56,11 +56,11 @@ public class NoteController {
     @GetMapping("/{noteEntity}")
     public String showNote(@PathVariable(name = "noteEntity") NoteEntity noteEntity, Model model) {
         model.addAttribute("noteDecorated", modelFactoryService.toModel(noteEntity));
-        return "note";
+        return "show_note";
     }
 
     @GetMapping("/{noteEntity}/edit")
-    public String editNote(NoteEntity noteEntity, Model model) {
+    public String editNote(NoteEntity noteEntity) {
         return "edit_note";
     }
 
@@ -73,15 +73,10 @@ public class NoteController {
         return "redirect:/notes/" + noteEntity.getId();
     }
 
-    @GetMapping("/{note}/link")
-    public String link(
-            @PathVariable("note") NoteEntity note,
-            @RequestParam(required = false) String searchTerm,
-            Model model
-    ) {
-        List<NoteEntity> linkableNotes = currentUser.getUser().filterLinkableNotes(note, searchTerm);
+    @GetMapping("/{noteEntity}/link")
+    public String link( @PathVariable("noteEntity") NoteEntity noteEntity, @RequestParam(required = false) String searchTerm, Model model) {
+        List<NoteEntity> linkableNotes = currentUser.getUser().filterLinkableNotes(noteEntity, searchTerm);
         model.addAttribute("linkableNotes", linkableNotes);
-        model.addAttribute("sourceNote", note);
         return "link";
     }
 
@@ -97,8 +92,7 @@ public class NoteController {
     public String prepareToNote(NoteEntity noteEntity, Model model) {
         model.addAttribute("noteMotion", this.modelFactoryService.getLeftNoteMotion(noteEntity));
         model.addAttribute("noteMotionRight", this.modelFactoryService.getRightNoteMotion(noteEntity));
-        NoteMotion motionUnder = new NoteMotion(null, true);
-        model.addAttribute("noteMotionUnder", motionUnder);
+        model.addAttribute("noteMotionUnder", new NoteMotion(null, true));
         return "move_note";
     }
 

@@ -80,8 +80,7 @@ class NoteControllerTests {
 
         @Test
         void shouldReturnChildNoteIfNoteIdGiven() {
-            assertEquals("note", controller.showNote(parentNote, model));
-            assertThat(((NoteEntity) model.getAttribute("note")).getId(), equalTo(parentNote.getId()));
+            assertEquals("show_note", controller.showNote(parentNote, model));
         }
     }
 
