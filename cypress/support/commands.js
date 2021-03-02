@@ -44,6 +44,9 @@ Cypress.Commands.add("seedNotes", (notes) => {
   cy.request({method: "POST", url: "/api/testability/seed_notes", body: notes})
   .then((response) => {
      expect(response.body.length).to.equal(notes.length);
+     const titles = notes.map(n=>n["title"]);
+     const noteMap = Object.assign({}, ...titles.map((t, index) => ({[t]: response.body[index]})));
+     cy.wrap(noteMap).as("seededNoteIdMap");
   })
 })
 
@@ -64,6 +67,19 @@ Cypress.Commands.add("expectNoteCards", (expectedCards) => {
          cy.findByText(elem[propName]).should("be.visible");
     }
   });
+});
+
+Cypress.Commands.add("navigateToNotePage", (noteTitlesDividedBySlash) => {
+  cy.visit("/notes");
+  noteTitlesDividedBySlash.split("/").forEach(noteTitle => cy.findByText(noteTitle).click());
+});
+
+// jumptoNotePage is faster than navigateToNotePage
+//    it uses the note id memorized when creating them with testability api
+Cypress.Commands.add("jumpToNotePage", (noteTitle) => {
+  cy.get('@seededNoteIdMap').then(seededNoteIdMap=>
+    cy.visit(`/notes/${seededNoteIdMap[noteTitle]}`)
+  );
 });
 
 Cypress.Commands.add("clickButtonOnCardBody", (noteTitle, buttonTitle) => {

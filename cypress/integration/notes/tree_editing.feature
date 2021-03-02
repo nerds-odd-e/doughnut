@@ -13,7 +13,7 @@ Feature: Tree editing
             | Circle               | Shape         |
 
     Scenario: Move left right
-        When I move note "Shape/Triangle" left
+        When I move note "Triangle" left
         Then I should see "Triangle" is before "Rectangle" in "Shape"
-        When I move note "Shape/Triangle" right
+        When I move note "Triangle" right
         Then I should see "Rectangle" is before "Triangle" in "Shape"

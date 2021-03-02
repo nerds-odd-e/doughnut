@@ -31,12 +31,12 @@ Feature: Note CRUD
             | note-title      | note-description                     |
             | Re-quirement    | Re-think the way we do requirement   |
         Then I should not see note "Re-quirement" at the top level of all my notes
-        When I open "LeSS in Action" note at top level
+        When I open "LeSS in Action" note from top level
         Then I should see "LeSS in Action" in note title
         And I should see these notes belonging to the user
             | note-title      |
             | Re-quirement    |
-        When I am creating note under "LeSS in Action > Re-quirement"
+        When I am creating note under "LeSS in Action/Re-quirement"
         Then I should see "LeSS in Action, Re-quirement" in breadcrumb
 
     Scenario: Create a new sibling note
@@ -49,7 +49,7 @@ Feature: Note CRUD
         When I create a sibling note of "Re-quirement":
             | note-title      | note-description                     |
             | Re-Design    | Re-think the way we do design   |
-        When I open "LeSS in Action" note at top level
+        When I open "LeSS in Action" note from top level
         And I should see these notes belonging to the user
             | note-title      |
             | Re-quirement    |

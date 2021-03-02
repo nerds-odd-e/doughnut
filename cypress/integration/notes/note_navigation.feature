@@ -13,7 +13,7 @@ Feature: Note navigation
             | Triangle             | Shape         |
             | Equilateral triangle | Triangle       |
             | Circle               | Shape         |
-        When I open "Shape/Triangle" note at top level
+        When I open "Shape/Triangle" note from top level
         But I should be able to go to the "<button>" note "<expected title>"
 
         Examples:
