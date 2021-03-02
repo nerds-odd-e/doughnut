@@ -57,7 +57,7 @@ public class UserEntity {
         return note.getUserEntity().id == id;
     }
 
-    public void checkAuthorization(NoteEntity note) throws NoAccessRightException {
+    public void assertAuthorization(NoteEntity note) throws NoAccessRightException {
         if (! owns(note)) {
             throw new NoAccessRightException();
         }

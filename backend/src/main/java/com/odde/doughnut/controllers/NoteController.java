@@ -115,14 +115,16 @@ public class NoteController {
     }
 
     @PostMapping("/{noteEntity}/move")
-    public String moveNote(NoteEntity noteEntity, NoteMotionEntity noteMotionEntity, Model model) throws CyclicLinkDetectedException {
+    public String moveNote(NoteEntity noteEntity, NoteMotionEntity noteMotionEntity) throws CyclicLinkDetectedException, NoAccessRightException {
+        currentUser.getUser().assertAuthorization(noteEntity);
+        currentUser.getUser().assertAuthorization(noteMotionEntity.getRelativeToNote());
         modelFactoryService.toNoteMotionModel(noteMotionEntity, noteEntity).execute();
         return "redirect:/notes/" + noteEntity.getId();
     }
 
     @PostMapping(value = "/{noteEntity}/delete")
     public RedirectView deleteNote(@PathVariable("noteEntity") NoteEntity noteEntity) throws NoAccessRightException {
-        currentUser.getUser().checkAuthorization(noteEntity);
+        currentUser.getUser().assertAuthorization(noteEntity);
         modelFactoryService.noteRepository.delete(noteEntity);
         return new RedirectView("/notes");
     }

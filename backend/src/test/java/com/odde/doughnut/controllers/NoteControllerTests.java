@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.entities.NoteMotionEntity;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.UserEntity;
@@ -133,15 +134,17 @@ class NoteControllerTests {
 
     @Nested
     class DeleteNoteTest {
-        @Autowired private LinkRepository linkRepository;
-        @Autowired EntityManager entityManager;
+        @Autowired
+        private LinkRepository linkRepository;
+        @Autowired
+        EntityManager entityManager;
 
         @Test
         void shouldNotBeAbleToDeleteNoteThatBelongsToOtherUser() {
             UserEntity anotherUserEntity = makeMe.aUser().please(modelFactoryService);
             NoteEntity note = makeMe.aNote().forUser(anotherUserEntity).please(modelFactoryService);
             Integer noteId = note.getId();
-            assertThrows(NoAccessRightException.class, ()->
+            assertThrows(NoAccessRightException.class, () ->
                     controller.deleteNote(note)
             );
             assertTrue(modelFactoryService.findNoteById(noteId).isPresent());
@@ -184,5 +187,36 @@ class NoteControllerTests {
             assertThat(linkRepository.count(), equalTo(oldCount - 2));
         }
     }
-}
 
+    @Nested
+    class MoveNoteTest {
+        UserEntity anotherUser;
+        NoteEntity note1;
+        NoteEntity note2;
+
+        @BeforeEach
+        void setup() {
+            anotherUser = makeMe.aUser().please(modelFactoryService);
+            note1 = makeMe.aNote().forUser(anotherUser).please(modelFactoryService);
+            note2 = makeMe.aNote().forUser(userEntity).please(modelFactoryService);
+        }
+
+        @Test
+        void shouldNotAllowMoveOtherPeoplesNote() {
+            NoteMotionEntity motion = new NoteMotionEntity(note2, false);
+            assertThrows(NoAccessRightException.class, ()->
+                    controller.moveNote(note1, motion)
+            );
+        }
+
+        @Test
+        void shouldNotAllowMoveToOtherPeoplesNote() {
+            NoteMotionEntity motion = new NoteMotionEntity(note1, false);
+            assertThrows(NoAccessRightException.class, ()->
+                    controller.moveNote(note2, motion)
+            );
+        }
+
+    }
+
+}

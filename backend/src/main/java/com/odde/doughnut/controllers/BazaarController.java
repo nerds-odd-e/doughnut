@@ -31,7 +31,7 @@ public class BazaarController {
 
     @PostMapping(value = "/notes/{note}/share")
     public RedirectView shareNote(@PathVariable("note") NoteEntity note) throws NoAccessRightException {
-        currentUser.getUser().checkAuthorization(note);
+        currentUser.getUser().assertAuthorization(note);
         BazaarModel bazaar = modelFactoryService.toBazaarModel();
         bazaar.shareNote(note);
         return new RedirectView("/notes");
