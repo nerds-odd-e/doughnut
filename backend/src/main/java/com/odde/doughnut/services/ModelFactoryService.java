@@ -3,6 +3,7 @@ package com.odde.doughnut.services;
 import com.odde.doughnut.entities.NoteMotionEntity;
 import com.odde.doughnut.entities.UserEntity;
 import com.odde.doughnut.entities.repositories.BazaarNoteRepository;
+import com.odde.doughnut.entities.repositories.ReviewPointRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
 import com.odde.doughnut.models.BazaarModel;
 import com.odde.doughnut.models.NoteModel;
@@ -20,12 +21,14 @@ public class ModelFactoryService {
     @Autowired public final NoteRepository noteRepository;
     @Autowired public final UserRepository userRepository;
     @Autowired public final BazaarNoteRepository bazaarNoteRepository;
+    @Autowired public final ReviewPointRepository reviewPointRepository;
 
-    public ModelFactoryService(NoteRepository noteRepository, UserRepository userRepository, BazaarNoteRepository bazaarNoteRepository)
+    public ModelFactoryService(NoteRepository noteRepository, UserRepository userRepository, BazaarNoteRepository bazaarNoteRepository, ReviewPointRepository reviewPointRepository)
     {
         this.noteRepository = noteRepository;
         this.userRepository = userRepository;
         this.bazaarNoteRepository = bazaarNoteRepository;
+        this.reviewPointRepository = reviewPointRepository;
     }
 
     public NoteModel toNoteModel(NoteEntity note) {

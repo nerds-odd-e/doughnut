@@ -31,7 +31,8 @@ async function populateAllNotesForReview() {
 
 function nextNote() {
     if (currentIndex >= noteList.length) {
-        currentIndex = 0;
+        window.location.href = "/review"
+        return;
     }
 
     const { title, description, picture, links } = noteList[currentIndex];

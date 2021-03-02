@@ -7,8 +7,8 @@ import {
 } from "cypress-cucumber-preprocessor/steps";
 
 Then("Reviews should have review pages in sequence:", (data) => {
+  cy.visit('/review');
   data.hashes().forEach(reviewPage => {
-
     switch(reviewPage["review type"]) {
     case "single note": {
         cy.findByText(reviewPage["title"], {selector: '#note-title'})
@@ -29,11 +29,12 @@ Then("Reviews should have review pages in sequence:", (data) => {
         reviewPage["additional info"].split(", ").forEach(expectedLinkTarget =>
             cy.findByText(expectedLinkTarget, {selector: '#note-links li'})
         )
+        break;
     }
 
     case "end of review": {
         cy.findByText("You have done all the reviews for today.").should("be.visible");
-        break;
+        return;
     }
     default:
         expect(true).to.be.false("unknown view page type");

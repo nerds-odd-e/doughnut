@@ -15,7 +15,7 @@ class ReviewControllerTests {
   void shouldProceedToReviewPage() {
     UserEntity userEntity = mock(UserEntity.class);
     when(userEntity.getNotesInDescendingOrder()).thenReturn(new ArrayList<>());
-    ReviewController controller = new ReviewController(new TestCurrentUser(userEntity));
+    ReviewController controller = new ReviewController(new TestCurrentUser(userEntity), modelFactoryService);
     Model model = mock(Model.class);
     assertEquals("review", controller.review(model));
   }

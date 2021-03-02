@@ -90,12 +90,12 @@ public class NoteController {
     }
 
     @PostMapping(value = "/{noteEntity}/link", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public RedirectView linkNote(@PathVariable("noteEntity") NoteEntity noteEntity, Integer targetNoteId) throws NoAccessRightException {
+    public String linkNote(@PathVariable("noteEntity") NoteEntity noteEntity, Integer targetNoteId) throws NoAccessRightException {
         currentUser.getUser().assertAuthorization(noteEntity);
         NoteEntity targetNote = modelFactoryService.noteRepository.findById(targetNoteId).get();
         NoteModel noteModel = modelFactoryService.toNoteModel(noteEntity);
         noteModel.linkNote(targetNote);
-        return new RedirectView("/review");
+        return "redirect:/notes/" + noteEntity.getId();
     }
 
     @GetMapping("/{noteEntity}/move")
