@@ -24,7 +24,7 @@ public class BazaarController {
 
     @GetMapping("/bazaar")
     public String bazaar(Model model) {
-        BazaarModel bazaar = modelFactoryService.getBazaarModel();
+        BazaarModel bazaar = modelFactoryService.toBazaarModel();
         model.addAttribute("notes", bazaar.getAllNotes());
         return "bazaar";
     }
@@ -32,7 +32,7 @@ public class BazaarController {
     @PostMapping(value = "/notes/{note}/share")
     public RedirectView shareNote(@PathVariable("note") NoteEntity note) throws NoAccessRightException {
         currentUser.getUser().checkAuthorization(note);
-        BazaarModel bazaar = modelFactoryService.getBazaarModel();
+        BazaarModel bazaar = modelFactoryService.toBazaarModel();
         bazaar.shareNote(note);
         return new RedirectView("/notes");
     }

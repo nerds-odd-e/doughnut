@@ -3,9 +3,9 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.controllers.currentUser.CurrentUser;
 import com.odde.doughnut.controllers.exceptions.NoAccessRightException;
 import com.odde.doughnut.entities.NoteEntity;
+import com.odde.doughnut.entities.NoteMotionEntity;
 import com.odde.doughnut.entities.UserEntity;
 import com.odde.doughnut.models.NoteModel;
-import com.odde.doughnut.models.NoteMotion;
 import com.odde.doughnut.services.ModelFactoryService;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -55,7 +55,7 @@ public class NoteController {
 
     @GetMapping("/{noteEntity}")
     public String showNote(@PathVariable(name = "noteEntity") NoteEntity noteEntity, Model model) {
-        model.addAttribute("noteDecorated", modelFactoryService.toModel(noteEntity));
+        model.addAttribute("noteDecorated", modelFactoryService.toNoteModel(noteEntity));
         return "notes/show";
     }
 
@@ -83,7 +83,7 @@ public class NoteController {
     @PostMapping(value = "/{noteEntity}/link", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public RedirectView linkNote(@PathVariable("noteEntity") NoteEntity noteEntity, Integer targetNoteId) {
         NoteEntity targetNote = modelFactoryService.noteRepository.findById(targetNoteId).get();
-        NoteModel noteModel = modelFactoryService.toModel(noteEntity);
+        NoteModel noteModel = modelFactoryService.toNoteModel(noteEntity);
         noteModel.linkNote(targetNote);
         return new RedirectView("/review");
     }
@@ -92,13 +92,14 @@ public class NoteController {
     public String prepareToNote(NoteEntity noteEntity, Model model) {
         model.addAttribute("noteMotion", this.modelFactoryService.getLeftNoteMotion(noteEntity));
         model.addAttribute("noteMotionRight", this.modelFactoryService.getRightNoteMotion(noteEntity));
-        model.addAttribute("noteMotionUnder", new NoteMotion(null, true));
+        model.addAttribute("noteMotionUnder", new NoteMotionEntity(null, true));
         return "notes/move";
     }
 
     @PostMapping("/{noteEntity}/move")
-    public String moveNote(NoteEntity noteEntity, NoteMotion noteMotion, Model model) {
-        noteMotion.execute(noteEntity, this.modelFactoryService);
+    public String moveNote(NoteEntity noteEntity, NoteMotionEntity noteMotionEntity, Model model) {
+        modelFactoryService.toNoteMotionModel(noteMotionEntity, noteEntity);
+        noteMotionEntity.execute(noteEntity, this.modelFactoryService);
         return "redirect:/notes/" + noteEntity.getId();
     }
 

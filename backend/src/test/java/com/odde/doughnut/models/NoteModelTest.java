@@ -2,7 +2,6 @@ package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.services.ModelFactoryService;
-import com.odde.doughnut.testability.DBCleaner;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -28,7 +27,7 @@ public class NoteModelTest {
     MakeMe makeMe;
 
     NoteModel toModel(NoteEntity subjectNote) {
-        return modelFactoryService.toModel(subjectNote);
+        return modelFactoryService.toNoteModel(subjectNote);
     }
 
     @BeforeEach

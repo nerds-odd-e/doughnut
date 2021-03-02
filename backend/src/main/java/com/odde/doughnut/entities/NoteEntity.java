@@ -39,10 +39,11 @@ public class NoteEntity {
   // detect and remove the duplicates.
   //
   static long localLastOrderNumberForGoodEnoughSiblingOrder;
+  static final long MINIMUM_SIBLING_ORDER_INCREMENT = 1000;
   private static Long getGoodEnoughOrderNumber() {
-    long newNumber = System.currentTimeMillis() * 1000;
+    long newNumber = System.currentTimeMillis() * MINIMUM_SIBLING_ORDER_INCREMENT;
     if (newNumber <= localLastOrderNumberForGoodEnoughSiblingOrder) {
-      localLastOrderNumberForGoodEnoughSiblingOrder += 1000;
+      localLastOrderNumberForGoodEnoughSiblingOrder += MINIMUM_SIBLING_ORDER_INCREMENT;
     }
     else {
       localLastOrderNumberForGoodEnoughSiblingOrder = newNumber;

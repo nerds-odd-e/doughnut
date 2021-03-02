@@ -1,5 +1,6 @@
 package com.odde.doughnut.services;
 
+import com.odde.doughnut.entities.NoteMotionEntity;
 import com.odde.doughnut.entities.UserEntity;
 import com.odde.doughnut.entities.repositories.BazaarNoteRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
@@ -7,7 +8,7 @@ import com.odde.doughnut.models.BazaarModel;
 import com.odde.doughnut.models.NoteModel;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.repositories.NoteRepository;
-import com.odde.doughnut.models.NoteMotion;
+import com.odde.doughnut.models.NoteMotionModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,11 +27,15 @@ public class ModelFactoryService {
         this.bazaarNoteRepository = bazaarNoteRepository;
     }
 
-    public NoteModel toModel(NoteEntity note) {
+    public NoteModel toNoteModel(NoteEntity note) {
         return new NoteModel(note, this);
     }
 
-    public BazaarModel getBazaarModel() {
+    public NoteMotionModel toNoteMotionModel(NoteMotionEntity noteMotionEntity, NoteEntity noteEntity) {
+        return new NoteMotionModel(noteMotionEntity, noteEntity);
+    }
+
+    public BazaarModel toBazaarModel() {
         return new BazaarModel(this);
     }
 
@@ -42,19 +47,20 @@ public class ModelFactoryService {
         return noteRepository.findById(noteId);
     }
 
-    public NoteMotion getLeftNoteMotion(NoteEntity noteEntity) {
-        NoteModel noteModel = toModel(noteEntity);
+    public NoteMotionEntity getLeftNoteMotion(NoteEntity noteEntity) {
+        NoteModel noteModel = toNoteModel(noteEntity);
         NoteEntity previousSiblingNote = noteModel.getPreviousSiblingNote();
-        NoteModel prev = toModel(previousSiblingNote);
+        NoteModel prev = toNoteModel(previousSiblingNote);
         NoteEntity prevprev = prev.getPreviousSiblingNote();
         if (prevprev == null) {
-            return new NoteMotion(noteEntity.getParentNote(), true);
+            return new NoteMotionEntity(noteEntity.getParentNote(), true);
         }
-        return new NoteMotion(prevprev, false);
+        return new NoteMotionEntity(prevprev, false);
     }
 
-    public NoteMotion getRightNoteMotion(NoteEntity noteEntity) {
-        NoteModel noteModel = toModel(noteEntity);
-        return new NoteMotion(noteModel.getNextSiblingNote(), false);
+    public NoteMotionEntity getRightNoteMotion(NoteEntity noteEntity) {
+        NoteModel noteModel = toNoteModel(noteEntity);
+        return new NoteMotionEntity(noteModel.getNextSiblingNote(), false);
     }
+
 }
