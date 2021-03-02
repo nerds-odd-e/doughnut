@@ -32,7 +32,7 @@ public class ModelFactoryService {
     }
 
     public NoteMotionModel toNoteMotionModel(NoteMotionEntity noteMotionEntity, NoteEntity noteEntity) {
-        return new NoteMotionModel(noteMotionEntity, noteEntity);
+        return new NoteMotionModel(noteMotionEntity, noteEntity, this);
     }
 
     public BazaarModel toBazaarModel() {

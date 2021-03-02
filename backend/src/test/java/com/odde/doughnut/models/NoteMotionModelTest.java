@@ -19,7 +19,7 @@ import static org.hamcrest.Matchers.*;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
-public class NoteMotionEntityTest {
+public class NoteMotionModelTest {
     NoteEntity topLevel;
     @Autowired
     ModelFactoryService modelFactoryService;
@@ -36,57 +36,53 @@ public class NoteMotionEntityTest {
         secondChild = makeMe.aNote().under(topNote).please(modelFactoryService);
     }
 
+    void move(NoteEntity subject, NoteEntity relativeNote, boolean asFirstChildOfNote) {
+        NoteMotionEntity motion = new NoteMotionEntity(relativeNote, asFirstChildOfNote);
+        NoteMotionModel noteMotionModel = modelFactoryService.toNoteMotionModel(motion, subject);
+        noteMotionModel.execute();
+    }
+
     @Test
     void moveBehind() {
-        NoteMotionEntity motion = new NoteMotionEntity(secondChild, false);
-        motion.execute(firstChild, modelFactoryService);
+        move(firstChild, secondChild, false);
         assertThat(secondChild.getSiblingOrder(), is(lessThan(firstChild.getSiblingOrder())));
     }
 
     @Test
     void moveSecondBehindFirst() {
-        NoteMotionEntity motion = new NoteMotionEntity(firstChild, false);
-        motion.execute(secondChild, modelFactoryService);
+        move(secondChild, firstChild, false);
         assertThat(firstChild.getSiblingOrder(), is(lessThan(secondChild.getSiblingOrder())));
     }
 
     @Test
     void moveSecondBehindItself() {
-        NoteMotionEntity motion = new NoteMotionEntity(secondChild, false);
-        motion.execute(secondChild, modelFactoryService);
+        move(secondChild, secondChild, false);
         assertThat(firstChild.getSiblingOrder(), is(lessThan(secondChild.getSiblingOrder())));
     }
 
     @Test
     void moveSecondToBeTheFirstSibling() {
-        NoteMotionEntity motion = new NoteMotionEntity(topLevel, true);
-        motion.execute(secondChild, modelFactoryService);
+        move(secondChild, topNote, true);
         assertThat(secondChild.getSiblingOrder(), is(lessThan(firstChild.getSiblingOrder())));
     }
 
     @Test
     void moveUnder() {
-        NoteMotionEntity motion = new NoteMotionEntity(secondChild, true);
-        motion.execute(firstChild, modelFactoryService);
+        move(firstChild, secondChild, true);
         assertThat(firstChild.getParentNote(), equalTo(secondChild));
     }
 
     @Test
     void moveAfterNoteOfDifferentLevel() {
         NoteEntity thirdLevel = makeMe.aNote().under(firstChild).please(modelFactoryService);
-        NoteMotionEntity motion = new NoteMotionEntity(thirdLevel, false);
-        motion.execute(secondChild, modelFactoryService);
+        move(secondChild, thirdLevel, false);
         assertThat(secondChild.getParentNote(), equalTo(firstChild));
     }
 
     @Test
     void moveBothToTheEndInSequence() {
-        NoteMotionEntity motion = new NoteMotionEntity(secondChild, false);
-        motion.execute(firstChild, modelFactoryService);
-
-        NoteMotionEntity motion2 = new NoteMotionEntity(firstChild, false);
-        motion2.execute(secondChild, modelFactoryService);
-
+        move(firstChild, secondChild, false);
+        move(secondChild, firstChild, false);
         assertThat(firstChild.getSiblingOrder(), is(lessThan(secondChild.getSiblingOrder())));
     }
 
@@ -101,8 +97,7 @@ public class NoteMotionEntityTest {
 
         @Test
         void moveBetweenSecondAndThird() {
-            NoteMotionEntity motion = new NoteMotionEntity(secondChild, false);
-            motion.execute(firstChild, modelFactoryService);
+            move(firstChild, secondChild, false);
             assertThat(secondChild.getSiblingOrder(), is(lessThan(firstChild.getSiblingOrder())));
             assertThat(firstChild.getSiblingOrder(), is(lessThan(thirdChild.getSiblingOrder())));
         }
