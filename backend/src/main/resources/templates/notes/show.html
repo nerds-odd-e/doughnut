@@ -15,10 +15,13 @@
         </div>
         <div class="jumbotron py-4 mb-2">
             <nav class="nav d-flex flex-row-reverse p-0">
+<!--                <span class="descendant-counter" th:text="${treeNodeModel.descendantCount()}"/>-->
+<!--                <span class="descendant-counter" th:text="5"/>-->
                 <div th:replace="fragments/note_fragments :: noteButtons(${noteEntity})"/>
             </nav>
             <h2 class="display-4" th:text="${noteEntity.title}"/>
-            <p th:each="line : ${noteEntity.descriptionLines}" th:text="${line}"/>
+            <pre th:each="line : ${noteEntity.description}" th:text="${line}" style="white-space: pre-wrap;"/>
+<!--            <p th:each="line : ${noteEntity.descriptionLines}" th:text="${line}"/>-->
             <div th:if="${noteEntity.url}">
                 <label th:unless="${noteEntity.urlIsVideo}">Url:</label>
                 <label th:if="${noteEntity.urlIsVideo}">Video Url:</label>

@@ -23,7 +23,6 @@ import static org.hamcrest.Matchers.*;
 public class NoteModelTest {
     NoteEntity topLevel;
     @Autowired ModelFactoryService modelFactoryService;
-
     @Autowired MakeMe makeMe;
 
     TreeNodeModel toModel(NoteEntity subjectNote) {

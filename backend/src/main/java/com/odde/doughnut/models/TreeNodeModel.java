@@ -3,6 +3,7 @@ package com.odde.doughnut.models;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.services.ModelFactoryService;
+import org.thymeleaf.model.IModelFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -10,10 +11,12 @@ import java.util.List;
 public class TreeNodeModel {
     protected final NoteRepository noteRepository;
     protected final NoteEntity note;
+    private final ModelFactoryService modelFactoryService;
 
     public TreeNodeModel(NoteEntity note, ModelFactoryService modelFactoryService) {
         this.noteRepository = modelFactoryService.noteRepository;
         this.note = note;
+        this.modelFactoryService = modelFactoryService;
     }
 
     public List<NoteEntity> getAncestors() {
@@ -93,11 +96,13 @@ public class TreeNodeModel {
     }
 
     Long theSiblingOrderItTakesToMoveRelativeToMe(boolean asFirstChildOfNote) {
-        // comment
-        // samething
         if (!asFirstChildOfNote) {
             return getSiblingOrderToInsertBehindMe();
         }
         return getSiblingOrderToBecomeMyFirstChild();
     }
+
+//    public int getDescendantCount() {
+//        return 0;
+//    }
 }
