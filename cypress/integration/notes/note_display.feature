@@ -13,7 +13,6 @@ Feature: Note display
             | note-title                               | note-description          |
             | Potentially shippable product increment  | The output of every Sprint is called a Potentia... |
 
-        @ignore
     Scenario: The note display page should contain the total descendant cout
         Given there are some notes for the current user
             | title                | testingLinkTo |
