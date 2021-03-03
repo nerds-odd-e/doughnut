@@ -8,7 +8,7 @@ Feature: Spaced-repetition
         Given there are notes from Note 1 to Note 5
 
       @ignore
-    Scenario: Different review pages for different notes
+    Scenario: First day of review
         Then Reviews should have review pages in sequence:
             | review type   | title      |
             | single note   | Note 1     |
@@ -18,15 +18,15 @@ Feature: Spaced-repetition
     @ignore
     Scenario: Strictly follow the schedule
         Then Review sequence
-            | days | old review | new review  |
-            | 1    |            | 1, 2        |
-            | 2    | 1, 2       | 3, 4        |
-            | 3    | 3, 4       | 5           |
-            | 4    | 1, 2, 5    |             |
-            | 5    | 3, 4       |             |
-            | 6    |            |             |
-            | 7    | 5          |             |
-            | 8    | 1, 2       |             |
+            | days | old notes to review | new notes to review  |
+            | 1    |                     | 1, 2                 |
+            | 2    | 1, 2                | 3, 4                 |
+            | 3    | 3, 4                | 5                    |
+            | 4    | 1, 2, 5             |                      |
+            | 5    | 3, 4                |                      |
+            | 6    |                     |                      |
+            | 7    | 5                   |                      |
+            | 8    | 1, 2                |                      |
 
     @ignore
     Scenario: Not strictly follow the schedule
