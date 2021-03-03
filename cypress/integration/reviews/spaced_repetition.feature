@@ -7,7 +7,7 @@ Feature: Spaced-repetition
         And my space setting is 1, 2, 4, 8
         Given there are notes from Note 1 to Note 5
 
-      @ignore
+    @ignore
     Scenario: First day of review
         Then Reviews should have review pages in sequence:
             | review type   | title      |
@@ -36,3 +36,21 @@ Feature: Spaced-repetition
             | 2    | 1          |             |
             | 3    | 2          | 3           |
             | 4    | 1, 2       |             |
+
+    @ignore
+    Scenario: I want to learn more new notes
+        Then Review sequence
+            | days | old review | new review  | learn more  |
+            | 1    |            | 1, 2        |             |
+            | 2    | 1, 2       | 3, 4        | 5           |
+            | 3    | 3, 4, 5    |             |             |
+
+    @ignore
+    Scenario: I want to review more
+        Then Review sequence
+            | days | old review | new review  | review more |
+            | 1    |            | 1, 2        |             |
+            | 2    | 1, 2       | 3, 4        | 1, 2, 3, 4  |
+            | 3    | 3, 4       | 5           |             |
+            | 4    | 1, 2, 5    |             |             |
+

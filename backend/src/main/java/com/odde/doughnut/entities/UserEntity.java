@@ -15,6 +15,7 @@ import java.util.stream.Collectors;
 @Entity
 @Table(name = "user")
 public class UserEntity {
+
     @Id @Getter @GeneratedValue(strategy = GenerationType.IDENTITY) private Integer id;
     @Getter @Setter private String name;
     @Column(name = "external_identifier") @Getter @Setter private String externalIdentifier;
@@ -27,6 +28,10 @@ public class UserEntity {
     @Where(clause = "parent_id IS NULL")
     @JsonIgnore
     @Getter private List<NoteEntity> orphanedNotes;
+
+    @Column(name = "daily_new_notes_count") @Getter @Setter private Integer dailyNewNotesCount = 10;
+
+    @Column(name = "space_intervals") @Getter @Setter private String spaceIntervals = "1, 2, 3, 5, 8, 13, 21, 34, 55";
 
     public List<NoteEntity> getNotesInDescendingOrder() {
         List<NoteEntity> notes = getNotes();

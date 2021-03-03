@@ -23,8 +23,7 @@ class TestabilityController {
   @Autowired EntityManagerFactory emf;
   @Autowired NoteRepository noteRepository;
   @Autowired UserRepository userRepository;
-  @Autowired
-  CurrentUserFromRequest currentUser;
+  @Autowired CurrentUserFromRequest currentUser;
 
   @GetMapping("/clean_db_and_seed_data")
   public String cleanDBAndSeedData() {
@@ -50,4 +49,18 @@ class TestabilityController {
     noteRepository.saveAll(notes);
     return notes.stream().map(NoteEntity::getId).collect(Collectors.toList());
   }
+
+  @PostMapping("/update_current_user")
+  public String updateCurrentUser(@RequestBody HashMap<String, String> userInfo) throws Exception {
+    UserEntity currentUserEntity = currentUser.getUser();
+    if (userInfo.containsKey("daily_new_notes_count")) {
+      currentUserEntity.setDailyNewNotesCount(Integer.valueOf(userInfo.get("daily_new_notes_count")));
+    }
+    if (userInfo.containsKey("space_intervals")) {
+      currentUserEntity.setSpaceIntervals(userInfo.get("space_intervals"));
+    }
+    userRepository.save(currentUserEntity);
+    return "OK";
+  }
+
 }
