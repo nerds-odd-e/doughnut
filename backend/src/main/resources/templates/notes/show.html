@@ -22,7 +22,7 @@
             <div th:if="${noteEntity.url}">
                 <label th:unless="${noteEntity.urlIsVideo}">Url:</label>
                 <label th:if="${noteEntity.urlIsVideo}">Video Url:</label>
-                <p th:text="${noteEntity.url}"/>
+                <a th:href="${noteEntity.url}" th:text="${noteEntity.url}"/>
             </div>
             <p class="text-center" th:if="${noteEntity.picture}">
                 <img class="img-fluid" th:src="${noteEntity.picture}"/>
