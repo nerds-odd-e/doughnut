@@ -17,15 +17,15 @@ Feature: Note display
     # The following part is commented out for demo purpose
     #
 
-    Scenario: The note display page should contain the total descendant count
-        Given there are some notes for the current user
-            | title                | testingLinkTo |
-            | Shape                |               |
-            | Rectangle            | Shape         |
-            | Square               | Rectangle     |
-            | Triangle             | Shape         |
-            | Equilateral triangle | Triangle      |
-            | Circle               | Shape         |
-        When I open "Shape" note from top level
-        Then I should see there are 5 descendants
+#    Scenario: The note display page should contain the total descendant count
+#        Given there are some notes for the current user
+#            | title                | testingLinkTo |
+#            | Shape                |               |
+#            | Rectangle            | Shape         |
+#            | Square               | Rectangle     |
+#            | Triangle             | Shape         |
+#            | Equilateral triangle | Triangle      |
+#            | Circle               | Shape         |
+#        When I open "Shape" note from top level
+#        Then I should see there are 5 descendants
 

@@ -121,11 +121,8 @@ When("I should see {string} is before {string} in {string}", (noteTitle1, noteTi
 
 });
 
-Then("I should see there are {int} descendants", (numberOfDescendants) => {
+// This step definition is for demo purpose
+Then("*for demo* I should see there are {int} descendants", (numberOfDescendants) => {
   cy.findByText('' + numberOfDescendants, {selector: '.descendant-counter'})
 });
-
-
-
-
 

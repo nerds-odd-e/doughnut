@@ -30,7 +30,9 @@ class TreeNodeModelTest {
         treeNodeModel = modelFactoryService.toTreeNodeModel(topLevel);
     }
 
+    // This test is leaving empty for demo purpose
     @Test
     void shouldGet_0_WhenNoDescendant() {
     }
+
 }
