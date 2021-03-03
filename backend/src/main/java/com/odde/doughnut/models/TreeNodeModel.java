@@ -103,6 +103,10 @@ public class TreeNodeModel {
     }
 
     public int descendantCount() {
-        return 5;
+        int count[] = {0};
+        note.getChildren().forEach(note->
+                count[0] += modelFactoryService.toTreeNodeModel(note).descendantCount()
+                );
+        return note.getChildren().size() + count[0];
     }
 }
