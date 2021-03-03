@@ -51,3 +51,14 @@ Then("Reviews should have review pages in sequence:", (data) => {
   });
 })
 
+Then("Review in sequence", (data) => {
+  data.hashes().forEach(reviewActionsOfADay => {
+      const travelTo = new Date(Date() + reviewActionsOfADay["day"]);
+      cy.request({
+        method: "POST",
+        url: "/api/testability/time_travel",
+        body: { travel_to: JSON.stringify(travelTo) }
+      }).its("body").should("contain", "OK")
+  });
+});
+

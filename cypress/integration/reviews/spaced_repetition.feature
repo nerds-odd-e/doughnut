@@ -14,10 +14,9 @@ Feature: Spaced-repetition
             | single note   | Note 2     |
             | end of review |            |
 
-    @ignore
     Scenario: Strictly follow the schedule
-        Then Review sequence
-            | days | old notes to review | new notes to review  |
+        Then Review in sequence
+            | day  | old notes to review | new notes to review  |
             | 1    |                     | 1, 2                 |
             | 2    | 1, 2                | 3, 4                 |
             | 3    | 3, 4                | 5                    |
@@ -29,8 +28,8 @@ Feature: Spaced-repetition
 
     @ignore
     Scenario: Not strictly follow the schedule
-        Then Review sequence
-            | days | old review | new review  |
+        Then Review in sequence
+            | day  | old review | new review  |
             | 1    |            | 1, 2        |
             | 2    | 1          |             |
             | 3    | 2          | 3           |
@@ -39,7 +38,7 @@ Feature: Spaced-repetition
     @ignore
     Scenario: I want to learn more new notes
         Then Review sequence
-            | days | old review | new review  | learn more  |
+            | day  | old review | new review  | learn more  |
             | 1    |            | 1, 2        |             |
             | 2    | 1, 2       | 3, 4        | 5           |
             | 3    | 3, 4, 5    |             |             |
@@ -47,7 +46,7 @@ Feature: Spaced-repetition
     @ignore
     Scenario: I want to review more
         Then Review sequence
-            | days | old review | new review  | review more |
+            | day  | old review | new review  | review more |
             | 1    |            | 1, 2        |             |
             | 2    | 1, 2       | 3, 4        | 1, 2, 3, 4  |
             | 3    | 3, 4       | 5           |             |

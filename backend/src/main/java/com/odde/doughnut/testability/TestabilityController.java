@@ -11,6 +11,10 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManagerFactory;
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,6 +28,7 @@ class TestabilityController {
   @Autowired NoteRepository noteRepository;
   @Autowired UserRepository userRepository;
   @Autowired CurrentUserFromRequest currentUser;
+  @Autowired TimeTraveler timeTraveler;
 
   @GetMapping("/clean_db_and_seed_data")
   public String cleanDBAndSeedData() {
@@ -51,7 +56,7 @@ class TestabilityController {
   }
 
   @PostMapping("/update_current_user")
-  public String updateCurrentUser(@RequestBody HashMap<String, String> userInfo) throws Exception {
+  public String updateCurrentUser(@RequestBody HashMap<String, String> userInfo) {
     UserEntity currentUserEntity = currentUser.getUser();
     if (userInfo.containsKey("daily_new_notes_count")) {
       currentUserEntity.setDailyNewNotesCount(Integer.valueOf(userInfo.get("daily_new_notes_count")));
@@ -60,6 +65,18 @@ class TestabilityController {
       currentUserEntity.setSpaceIntervals(userInfo.get("space_intervals"));
     }
     userRepository.save(currentUserEntity);
+    return "OK";
+  }
+
+  @PostMapping("/time_travel")
+  public String timeTravel(@RequestBody HashMap<String, String> userInfo) {
+    String pattern = "\"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'\"";
+    String travelTo = userInfo.get("travel_to");
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
+    LocalDateTime localDateTime = LocalDateTime.from(formatter.parse(travelTo));
+    Timestamp timestamp = Timestamp.valueOf(localDateTime);
+
+    timeTraveler.timeTravelTo(timestamp);
     return "OK";
   }
 
