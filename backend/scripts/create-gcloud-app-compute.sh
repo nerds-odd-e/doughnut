@@ -19,7 +19,7 @@ gcloud compute instances create doughnut-app-instance \
 	--scopes "userinfo-email,cloud-platform" \
 	--address 35.237.98.250 \
 	--private-network-ip 10.142.0.25 \
-	--machine-type g1-small \
+	--machine-type e2-medium \
 	--metadata-from-file startup-script=${SCRIPTPATH}/app-instance-startup.sh \
 	--metadata BUCKET=dough-01 \
 	--zone us-east1-b \
