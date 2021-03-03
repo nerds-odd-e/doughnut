@@ -105,6 +105,7 @@ public class TreeNodeModel {
     //
     // This piece of commented code is for demo purpose
     //
-//    public int descendantCount() {
-//    }
+    public int descendantCount() {
+        return 5;
+    }
 }
