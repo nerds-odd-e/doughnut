@@ -103,3 +103,13 @@ Cypress.Commands.add("expectExactLinkTargets", (targets) => {
 Cypress.Commands.add("findNoteCardButton", (noteTitle, selector) => {
   return cy.findByText(noteTitle).parent().parent().parent().find(selector);
 });
+
+Cypress.Commands.add("updateCurrentUserSettingsWith", (hash) => {
+  cy.request({
+    method: "POST",
+    url: "/api/testability/update_current_user",
+    body: hash
+  }).its("body").should("contain", "OK")
+});
+
+

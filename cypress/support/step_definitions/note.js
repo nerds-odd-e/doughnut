@@ -10,6 +10,13 @@ Given("there are some notes for the current user", (data) => {
   cy.seedNotes(data.hashes());
 })
 
+Given("there are notes from Note {int} to Note {int}", (from, to) => {
+  const notes = Array(to-from+1).fill(0).map((_,i) => {return {title: `Note ${i+from}`};});
+  cy.seedNotes(notes);
+})
+
+
+
 When("I create top level note with:", (data) => {
   cy.visit("/notes");
   cy.findByText("Add Top Level Note").click();

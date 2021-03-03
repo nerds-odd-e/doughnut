@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class NoteRestController {
@@ -21,7 +22,8 @@ public class NoteRestController {
 
     @GetMapping(value = "/api/notes", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<NoteEntity> getNotes() {
-        return currentUser.getUser().getNotesInDescendingOrder();
+        List<NoteEntity> notes = currentUser.getUser().getNotesInDescendingOrder();
+        return notes.stream().limit(currentUser.getUser().getDailyNewNotesCount()).collect(Collectors.toList());
     }
 
 }

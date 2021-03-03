@@ -4,10 +4,9 @@ Feature: Spaced-repetition
     Background:
         Given I've logged in as an existing user
         And my daily new notes to review is set to 2
-        And my space setting is 1, 2, 4, 8
+        And my space setting is "1, 2, 4, 8"
         Given there are notes from Note 1 to Note 5
 
-    @ignore
     Scenario: First day of review
         Then Reviews should have review pages in sequence:
             | review type   | title      |

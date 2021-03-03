@@ -41,13 +41,12 @@ Then("My name {string} is in the top bar", (name) => {
 });
 
 Then("my daily new notes to review is set to {int}", (number) => {
-  cy.request({
-    method: "POST",
-    url: "/api/testability/update_current_user",
-    body: {
-      daily_new_notes_count: number
-    }
-  }).its("body").should("contain", "OK")
+  cy.updateCurrentUserSettingsWith({ daily_new_notes_count: number });
 });
+
+Then("my space setting is {string}", (number) => {
+  cy.updateCurrentUserSettingsWith({ space_intervals: number });
+});
+
 
 
