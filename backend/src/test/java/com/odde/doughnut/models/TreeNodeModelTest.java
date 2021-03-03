@@ -32,31 +32,5 @@ class TreeNodeModelTest {
 
     @Test
     void shouldGet_0_WhenNoDescendant() {
-        int count = treeNodeModel.descendantCount();
-        assertThat(count, equalTo(0));
     }
-
-    @Test
-    void shouldGet_1_WhenThereIsOneChild() {
-        makeMe.aNote().under(topLevel).please();
-        int count = treeNodeModel.descendantCount();
-        assertThat(count, equalTo(1));
-    }
-
-    @Test
-    void shouldGet_2_WhenThereAreTwoChildren() {
-        makeMe.aNote().under(topLevel).please();
-        makeMe.aNote().under(topLevel).please();
-        int count = treeNodeModel.descendantCount();
-        assertThat(count, equalTo(2));
-    }
-
-    @Test
-    void shouldGetTheGrandchildCounting() {
-        NoteEntity child = makeMe.aNote().under(topLevel).please();
-        makeMe.aNote().under(child).please();
-        int count = treeNodeModel.descendantCount();
-        assertThat(count, equalTo(2));
-    }
-
 }

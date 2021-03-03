@@ -102,11 +102,9 @@ public class TreeNodeModel {
         return getSiblingOrderToBecomeMyFirstChild();
     }
 
-    public int descendantCount() {
-        int count[] = {0};
-        note.getChildren().forEach(note->
-                count[0] += modelFactoryService.toTreeNodeModel(note).descendantCount()
-                );
-        return note.getChildren().size() + count[0];
-    }
+    //
+    // This piece of commented code is for demo purpose
+    //
+//    public int descendantCount() {
+//    }
 }

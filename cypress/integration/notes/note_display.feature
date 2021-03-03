@@ -13,15 +13,19 @@ Feature: Note display
             | note-title                               | note-description          |
             | Potentially shippable product increment  | The output of every Sprint is called a Potentia... |
 
-    Scenario: The note display page should contain the total descendant cout
-        Given there are some notes for the current user
-            | title                | testingLinkTo |
-            | Shape                |               |
-            | Rectangle            | Shape         |
-            | Square               | Rectangle     |
-            | Triangle             | Shape         |
-            | Equilateral triangle | Triangle      |
-            | Circle               | Shape         |
-        When I open "Shape" note from top level
-        Then I should see there are 5 descendants
+    #
+    # The following part is commented out for demo purpose
+    #
+
+#    Scenario: The note display page should contain the total descendant cout
+#        Given there are some notes for the current user
+#            | title                | testingLinkTo |
+#            | Shape                |               |
+#            | Rectangle            | Shape         |
+#            | Square               | Rectangle     |
+#            | Triangle             | Shape         |
+#            | Equilateral triangle | Triangle      |
+#            | Circle               | Shape         |
+#        When I open "Shape" note from top level
+#        Then I should see there are 5 descendants
 
