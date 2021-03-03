@@ -102,7 +102,7 @@ public class TreeNodeModel {
         return getSiblingOrderToBecomeMyFirstChild();
     }
 
-//    public int getDescendantCount() {
-//        return 0;
-//    }
+    public int descendantCount() {
+        return 5;
+    }
 }
