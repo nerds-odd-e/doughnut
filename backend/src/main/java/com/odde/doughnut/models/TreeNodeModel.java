@@ -94,6 +94,7 @@ public class TreeNodeModel {
 
     Long theSiblingOrderItTakesToMoveRelativeToMe(boolean asFirstChildOfNote) {
         // comment
+        // samething
         if (!asFirstChildOfNote) {
             return getSiblingOrderToInsertBehindMe();
         }
