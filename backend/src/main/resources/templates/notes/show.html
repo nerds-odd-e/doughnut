@@ -17,7 +17,7 @@
             <nav class="nav d-flex flex-row-reverse p-0">
 <!--                the following commented code is for demo purpose -->
 <!--                <span class="descendant-counter" th:text="${treeNodeModel.descendantCount()}"/>-->
-<!--                <span class="descendant-counter" th:text="0"/>-->
+                <span class="descendant-counter" th:text="5"/>
                 <div th:replace="fragments/note_fragments :: noteButtons(${noteEntity})"/>
             </nav>
             <h2 class="display-4" th:text="${noteEntity.title}"/>
