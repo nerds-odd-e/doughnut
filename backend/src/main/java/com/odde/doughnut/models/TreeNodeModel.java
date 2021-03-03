@@ -85,7 +85,6 @@ public class TreeNodeModel {
     }
 
     private Long getSiblingOrderToBecomeMyFirstChild() {
-        // my comment
         NoteEntity firstChild = getFirstChild();
         if (firstChild != null) {
             return firstChild.getSiblingOrder() - NoteEntity.MINIMUM_SIBLING_ORDER_INCREMENT;
