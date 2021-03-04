@@ -4,6 +4,8 @@ import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.models.UserModel;
 
+import java.sql.Timestamp;
+
 public class ReviewPointBuilder {
     private final MakeMe makeMe;
     private ReviewPointEntity reviewPointEntity;
@@ -16,6 +18,11 @@ public class ReviewPointBuilder {
 
     public ReviewPointBuilder by(UserModel userModel) {
         reviewPointEntity.setUserEntity(userModel.getEntity());
+        return this;
+    }
+
+    public ReviewPointBuilder on(Timestamp reviewTimestamp) {
+        reviewPointEntity.setLastReviewedAt(reviewTimestamp);
         return this;
     }
 

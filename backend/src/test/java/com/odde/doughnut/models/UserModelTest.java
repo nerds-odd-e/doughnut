@@ -75,21 +75,22 @@ public class UserModelTest {
 
                 @Test
                 void shouldNotIncludeNotesThatAreAlreadyReviewed() {
-                    makeMe.aReviewPointFor(note1).by(userModel).please();
+                    makeMe.aReviewPointFor(note1).by(userModel).on(day1).please();
                     assertThat(userModel.getNewNotesToReview(day1), hasSize(equalTo(0)));
                 }
 
                 @Test
                 void shouldIncludeNotesThatAreReviewedByOtherPeople() {
                     UserModel anotherUser = makeMe.aUser().toModelPlease();
-                    makeMe.aReviewPointFor(note1).by(anotherUser).please();
+                    makeMe.aReviewPointFor(note1).by(anotherUser).on(day1).please();
                     assertThat(userModel.getNewNotesToReview(day1), hasSize(equalTo(1)));
                 }
 
                 @Test
                 void theDailyCountShouldBeResetOnNextDay() {
-                    makeMe.aReviewPointFor(note1).by(userModel).please();
-                    assertThat(userModel.getNewNotesToReview(day1), hasSize(equalTo(0)));
+                    makeMe.aReviewPointFor(note1).by(userModel).on(day1).please();
+                    Timestamp day2 = makeMe.aTimestamp().of(2, 8).forWhereTheUserIs(userModel).please();
+                    assertThat(userModel.getNewNotesToReview(day2), hasSize(equalTo(1)));
                 }
 
             }

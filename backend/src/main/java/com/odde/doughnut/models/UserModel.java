@@ -53,9 +53,9 @@ public class UserModel extends ModelForEntity<UserEntity>{
         return linkableNotes;
     }
 
-    public List<NoteEntity> getNewNotesToReview(Timestamp day1) {
+    public List<NoteEntity> getNewNotesToReview(Timestamp currentTime) {
         List<NoteEntity> notes = new ArrayList<>();
-        int countDown = getNewNotesCountForToday();
+        int countDown = getNewNotesCountForToday(currentTime);
         for(NoteEntity note: entity.getNotes()) {
             if (countDown <= 0) {
                 break;
@@ -70,10 +70,15 @@ public class UserModel extends ModelForEntity<UserEntity>{
         return notes;
     }
 
-    private int getNewNotesCountForToday() {
+    private int getNewNotesCountForToday(Timestamp currentTime) {
         int countDown = entity.getDailyNewNotesCount();
-        countDown -= entity.getReviewPoints().size();
+        countDown -= entity.getReviewPoints().stream().filter(p -> sameDay(p.getLastReviewedAt(), currentTime)).count();
+
         return countDown;
+    }
+
+    private boolean sameDay(Timestamp lastReviewedAt, Timestamp currentTime) {
+        return lastReviewedAt == currentTime;
     }
 
     private List<NoteEntity> getAllLinkableNotes(NoteEntity source) {
