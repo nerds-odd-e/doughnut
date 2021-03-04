@@ -1,5 +1,7 @@
-package com.odde.doughnut.entities;
+package com.odde.doughnut.models;
 
+import com.odde.doughnut.entities.NoteEntity;
+import com.odde.doughnut.entities.UserEntity;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,34 +21,34 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
-public class UserEntityTest {
+public class UserModelTest {
     @Autowired EntityManager entityManager;
 
     @Autowired MakeMe makeMe;
 
     @Test
     void shouldReturnEmptyListWhenThhereIsNoNode() {
-        UserEntity userEntity = makeMe.aUser().inMemoryPlease();
-        assertEquals(0, userEntity.getNewNotesToReview().size());
+        UserModel userModel = makeMe.aUser().toModelPlease();
+        assertEquals(0, userModel.getNewNotesToReview().size());
     }
 
     @Test
     void shouldReturnTheNoteWhenThereIsOne() {
-        UserEntity userEntity = makeMe.aUser().please();
-        NoteEntity note = makeMe.aNote().forUser(userEntity).please();
-        makeMe.refresh(entityManager, userEntity);
-        assertThat(userEntity.getNewNotesToReview(), contains(note));
+        UserModel userModel = makeMe.aUser().toModelPlease();
+        NoteEntity note = makeMe.aNote().forUser(userModel).please();
+        makeMe.refresh(entityManager, userModel.getUserEntity());
+        assertThat(userModel.getNewNotesToReview(), contains(note));
     }
 
     @Test
     void shouldReturnTheNoteWhenThereIsTwo() {
-        UserEntity userEntity = makeMe.aUser().please();
+        UserModel userModel = makeMe.aUser().toModelPlease();
         Date yesterday = Date.valueOf(LocalDate.now().minusDays(1));
-        NoteEntity note1 = makeMe.aNote().forUser(userEntity).updatedAt(yesterday).please();
-        NoteEntity note2 = makeMe.aNote().forUser(userEntity).please();
-        makeMe.refresh(entityManager, userEntity);
+        NoteEntity note1 = makeMe.aNote().forUser(userModel).updatedAt(yesterday).please();
+        NoteEntity note2 = makeMe.aNote().forUser(userModel).please();
+        makeMe.refresh(entityManager, userModel.getUserEntity());
 
-        assertEquals(note2.getTitle(), userEntity.getNewNotesToReview().get(0).getTitle());
+        assertEquals(note2.getTitle(), userModel.getNewNotesToReview().get(0).getTitle());
     }
 
 }

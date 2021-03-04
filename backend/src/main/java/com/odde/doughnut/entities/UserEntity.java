@@ -33,38 +33,8 @@ public class UserEntity {
 
     @Column(name = "space_intervals") @Getter @Setter private String spaceIntervals = "1, 2, 3, 5, 8, 13, 21, 34, 55";
 
-    public List<NoteEntity> getNewNotesToReview() {
-        List<NoteEntity> notes = getNotes();
-        notes.sort(Comparator.comparing(NoteEntity::getUpdatedDatetime).reversed());
-        return notes;
-    }
-
-    public List<NoteEntity> filterLinkableNotes(NoteEntity source, String searchTerm) {
-        List<NoteEntity> linkableNotes = getAllLinkableNotes(source);
-        if (searchTerm != null) {
-            return linkableNotes.stream()
-                    .filter(note -> note.getTitle().contains(searchTerm))
-                    .collect(Collectors.toList());
-        }
-        return linkableNotes;
-    }
-
-    private List<NoteEntity> getAllLinkableNotes(NoteEntity source) {
-        List<NoteEntity> targetNotes = source.getTargetNotes();
-        List<NoteEntity> allNotes = getNotes();
-        return allNotes.stream()
-                .filter(i -> !targetNotes.contains(i))
-                .filter(i -> !i.equals(source))
-                .collect(Collectors.toList());
-    }
-
     public boolean owns(NoteEntity note) {
         return note.getUserEntity().id == id;
     }
 
-    public void assertAuthorization(NoteEntity note) throws NoAccessRightException {
-        if (! owns(note)) {
-            throw new NoAccessRightException();
-        }
-    }
 }
