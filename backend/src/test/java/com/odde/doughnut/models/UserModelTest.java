@@ -1,7 +1,6 @@
 package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.NoteEntity;
-import com.odde.doughnut.entities.UserEntity;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -36,7 +35,7 @@ public class UserModelTest {
     void shouldReturnTheNoteWhenThereIsOne() {
         UserModel userModel = makeMe.aUser().toModelPlease();
         NoteEntity note = makeMe.aNote().forUser(userModel).please();
-        makeMe.refresh(entityManager, userModel.getUserEntity());
+        makeMe.refresh(entityManager, userModel.getEntity());
         assertThat(userModel.getNewNotesToReview(), contains(note));
     }
 
@@ -46,7 +45,7 @@ public class UserModelTest {
         Date yesterday = Date.valueOf(LocalDate.now().minusDays(1));
         NoteEntity note1 = makeMe.aNote().forUser(userModel).updatedAt(yesterday).please();
         NoteEntity note2 = makeMe.aNote().forUser(userModel).please();
-        makeMe.refresh(entityManager, userModel.getUserEntity());
+        makeMe.refresh(entityManager, userModel.getEntity());
 
         assertEquals(note2.getTitle(), userModel.getNewNotesToReview().get(0).getTitle());
     }

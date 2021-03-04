@@ -56,7 +56,7 @@ class NoteControllerTests {
         void setup() {
             parentNote = makeMe.aNote().forUser(userModel).please();
             childNote = makeMe.aNote().forUser(userModel).under(parentNote).please();
-            makeMe.refresh(entityManager, userModel.getUserEntity());
+            makeMe.refresh(entityManager, userModel.getEntity());
             makeMe.refresh(entityManager, parentNote);
         }
 
@@ -157,7 +157,7 @@ class NoteControllerTests {
             RedirectView response = controller.deleteNote(note);
             assertEquals("/notes", response.getUrl());
             assertFalse(modelFactoryService.findNoteById(noteId).isPresent());
-            assertTrue(modelFactoryService.findUserById(userModel.getUserEntity().getId()).isPresent());
+            assertTrue(modelFactoryService.findUserById(userModel.getEntity().getId()).isPresent());
         }
 
         @Test

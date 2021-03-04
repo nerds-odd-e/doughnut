@@ -3,7 +3,6 @@ package com.odde.doughnut.testability.builders;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.UserEntity;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.MakeMe;
 
 import java.time.LocalDate;
@@ -30,7 +29,7 @@ public class NoteBuilder {
     }
 
     public NoteBuilder forUser(UserModel userModel) {
-        note.setUserEntity(userModel.getUserEntity());
+        note.setUserEntity(userModel.getEntity());
         return this;
     }
 

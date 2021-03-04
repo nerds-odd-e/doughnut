@@ -56,7 +56,7 @@ public class NoteController {
             currentUserFetcher.getUser().assertAuthorization(noteEntity.getParentNote());
         }
         UserModel userModel = currentUserFetcher.getUser();
-        noteEntity.setUserEntity(userModel.getUserEntity());
+        noteEntity.setUserEntity(userModel.getEntity());
         modelFactoryService.noteRepository.save(noteEntity);
         return "redirect:/notes/" + noteEntity.getId();
     }

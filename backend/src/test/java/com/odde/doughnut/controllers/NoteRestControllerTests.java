@@ -35,7 +35,7 @@ public class NoteRestControllerTests {
     @Test
     void shouldGetListOfNotes() {
         NoteEntity note = makeMe.aNote().forUser(userModel).please();
-        makeMe.refresh(entityManager, userModel.getUserEntity());
+        makeMe.refresh(entityManager, userModel.getEntity());
         assertEquals(note.getTitle(), noteController.getNotes().get(0).getTitle());
     }
 
