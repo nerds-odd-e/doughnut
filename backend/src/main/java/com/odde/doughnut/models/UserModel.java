@@ -1,6 +1,7 @@
 package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.NoteEntity;
+import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.entities.UserEntity;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.services.ModelFactoryService;
@@ -8,6 +9,7 @@ import com.odde.doughnut.services.ModelFactoryService;
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -72,9 +74,15 @@ public class UserModel extends ModelForEntity<UserEntity>{
         return notes;
     }
 
+    private List<ReviewPointEntity> getRecentReviewPoints(Timestamp currentTime) {
+        ZonedDateTime zonedDateTime = currentTime.toInstant().atZone(ZoneId.of("UTC"));
+        Timestamp oneDayAgo = Timestamp.from(zonedDateTime.minus(1, ChronoUnit.DAYS).toInstant());
+        return modelFactoryService.reviewPointRepository.findAllByUserEntityAndLastReviewedAtGreaterThan(entity, oneDayAgo);
+    }
+
     private int getNewNotesCountForToday(Timestamp currentTime) {
         int countDown = entity.getDailyNewNotesCount();
-        countDown -= entity.getReviewPoints().stream().filter(p -> sameDay(p.getLastReviewedAt(), currentTime)).count();
+        countDown -= getRecentReviewPoints(currentTime).stream().filter(p -> sameDay(p.getLastReviewedAt(), currentTime)).count();
 
         return countDown;
     }

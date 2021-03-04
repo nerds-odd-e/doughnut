@@ -5,6 +5,9 @@ import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.entities.UserEntity;
 import org.springframework.data.repository.CrudRepository;
 
+import java.sql.Timestamp;
+import java.util.List;
+
 public interface ReviewPointRepository extends CrudRepository<ReviewPointEntity, Integer> {
-    ReviewPointEntity findByNoteEntity(NoteEntity noteEntity);
+    List<ReviewPointEntity> findAllByUserEntityAndLastReviewedAtGreaterThan(UserEntity userEntity, Timestamp since);
 }
