@@ -23,11 +23,10 @@ public class ReviewController {
     @GetMapping("/review")
     public String review(Model model) {
         List<NoteEntity> notes = currentUserFetcher.getUser().getNewNotesToReview();
-        if (modelFactoryService.reviewPointRepository.findAll().iterator().hasNext()) {
+        if (notes.size() == 0) {
             return "review_done";
         }
 
-        model.addAttribute("notes", notes);
         return "review";
     }
 }

@@ -26,15 +26,14 @@ async function populateAllNotesForReview() {
     }
     const response = await fetch('/api/notes');
     noteList = transformNoteListToView(await response.json());
-    nextNote();
+    showNote();
 }
 
 function nextNote() {
-    if (currentIndex >= noteList.length) {
-        window.location.href = "/review"
-        return;
-    }
+   window.location.href = "/review"
+}
 
+function showNote() {
     const { title, description, picture, links } = noteList[currentIndex];
 
     document.getElementById("note-title").innerHTML = title;

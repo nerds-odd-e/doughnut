@@ -64,8 +64,8 @@ public class UserModel extends ModelForEntity<UserEntity>{
             boolean byNoteEntity = entity.getReviewPoints().stream().anyMatch(rp->rp.getNoteEntity() == note);
             if (!byNoteEntity) {
                 notes.add(note);
-                countDown--;
             }
+            countDown--;
         }
 
         return notes;
