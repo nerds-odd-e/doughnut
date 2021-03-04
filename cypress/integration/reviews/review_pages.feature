@@ -11,7 +11,6 @@ Feature: Review Pages
         And I link note "Sedition" to note "Sedation"
         And I link note "Sedition" to note "Sedative"
 
-        @ignore
     Scenario: Different review pages for different notes
         * Reviews should have review pages in sequence:
             | review type   | title      |   additional info             |
