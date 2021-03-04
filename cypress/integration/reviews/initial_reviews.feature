@@ -8,6 +8,7 @@ Feature: Initial Review
         And my daily new notes to review is set to 2
         And there are notes from Note 1 to Note 5
 
+        @ignore
     Scenario: First day of review
         Given It's day 1, 8 hour
         Then Reviews should have review pages in sequence:

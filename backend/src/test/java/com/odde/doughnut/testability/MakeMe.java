@@ -1,12 +1,14 @@
 package com.odde.doughnut.testability;
 
 import com.odde.doughnut.entities.NoteEntity;
+import com.odde.doughnut.models.ModelForEntity;
 import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.builders.BazaarNoteBuilder;
 import com.odde.doughnut.testability.builders.FakeBindingResult;
 import com.odde.doughnut.testability.builders.NoteBuilder;
 import com.odde.doughnut.testability.builders.UserBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 
@@ -29,8 +31,13 @@ public class MakeMe {
         return new BazaarNoteBuilder(this, note);
     }
 
-    public <T> T refresh(EntityManager entityManager, T object) {
-        entityManager.refresh(object);
+    public <T> T refresh(T object) {
+        if (object instanceof ModelForEntity) {
+            modelFactoryService.entityManager.refresh(((ModelForEntity<?>) object).getEntity());
+        }
+        else {
+            modelFactoryService.entityManager.refresh(object);
+        }
         return object;
     }
 
@@ -48,5 +55,9 @@ public class MakeMe {
 
     public BindingResult failedBindingResult() {
         return new FakeBindingResult(true);
+    }
+
+    public ReviewPointBuilder aReviewPointFor(NoteEntity noteEntity) {
+        return new ReviewPointBuilder(noteEntity, this);
     }
 }

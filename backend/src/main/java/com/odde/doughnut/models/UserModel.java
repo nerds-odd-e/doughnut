@@ -1,10 +1,12 @@
 package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.NoteEntity;
+import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.entities.UserEntity;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.services.ModelFactoryService;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,7 +20,7 @@ public class UserModel extends ModelForEntity<UserEntity>{
         return entity.getName();
     }
 
-    public long getDailyNewNotesCount() {
+    public int getDailyNewNotesCount() {
         return entity.getDailyNewNotesCount();
     }
 
@@ -53,8 +55,19 @@ public class UserModel extends ModelForEntity<UserEntity>{
     }
 
     public List<NoteEntity> getNewNotesToReview() {
-        List<NoteEntity> notes = entity.getNotes();
-        notes.sort(Comparator.comparing(NoteEntity::getUpdatedDatetime).reversed());
+        List<NoteEntity> notes = new ArrayList<>();
+        int countDown = entity.getDailyNewNotesCount();
+        for(NoteEntity note: entity.getNotes()) {
+            if (countDown == 0) {
+                break;
+            }
+            boolean byNoteEntity = entity.getReviewPoints().stream().anyMatch(rp->rp.getNoteEntity() == note);
+            if (!byNoteEntity) {
+                notes.add(note);
+                countDown--;
+            }
+        }
+
         return notes;
     }
 

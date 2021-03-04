@@ -1,4 +1,4 @@
-Feature: Reviewing
+Feature: Review Pages
     As a learner, I want to review my notes and links so that I have fresh memory.
 
     Background:
@@ -11,6 +11,7 @@ Feature: Reviewing
         And I link note "Sedition" to note "Sedation"
         And I link note "Sedition" to note "Sedative"
 
+        @ignore
     Scenario: Different review pages for different notes
         * Reviews should have review pages in sequence:
             | review type   | title      |   additional info             |

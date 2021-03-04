@@ -56,8 +56,8 @@ class NoteControllerTests {
         void setup() {
             parentNote = makeMe.aNote().forUser(userModel).please();
             childNote = makeMe.aNote().forUser(userModel).under(parentNote).please();
-            makeMe.refresh(entityManager, userModel.getEntity());
-            makeMe.refresh(entityManager, parentNote);
+            makeMe.refresh(userModel.getEntity());
+            makeMe.refresh(parentNote);
         }
 
         @Test
@@ -182,8 +182,8 @@ class NoteControllerTests {
 
             controller.deleteNote(subject);
 
-            assertThat(makeMe.refresh(entityManager, referFrom).getId(), is(not(nullValue())));
-            assertThat(makeMe.refresh(entityManager, referTo).getId(), is(not(nullValue())));
+            assertThat(makeMe.refresh(referFrom).getId(), is(not(nullValue())));
+            assertThat(makeMe.refresh(referTo).getId(), is(not(nullValue())));
             assertThat(linkRepository.count(), equalTo(oldCount - 2));
         }
     }

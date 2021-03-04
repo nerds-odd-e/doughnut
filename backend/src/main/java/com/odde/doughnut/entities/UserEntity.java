@@ -25,6 +25,10 @@ public class UserEntity {
     @Getter @Setter private List<NoteEntity> notes = new ArrayList<>();
 
     @OneToMany(mappedBy = "userEntity")
+    @JsonIgnore
+    @Getter @Setter private List<ReviewPointEntity> reviewPoints = new ArrayList<>();
+
+    @OneToMany(mappedBy = "userEntity")
     @Where(clause = "parent_id IS NULL")
     @JsonIgnore
     @Getter private List<NoteEntity> orphanedNotes;
