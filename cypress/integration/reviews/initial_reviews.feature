@@ -20,7 +20,6 @@ Feature: Initial Review
             | review type   | title      |
             | end of review |            |
 
-        @ignore
     Scenario: First day review only part of the daily number
         Given It's day 1, 8 hour
         Then Reviews should have review pages in sequence:

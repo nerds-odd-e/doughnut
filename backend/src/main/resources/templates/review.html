@@ -11,6 +11,9 @@
             <ul id="note-links" class="list-group"></ul>
         </div>
 
-        <button type="button" onclick="javascript:nextNote()" class="btn btn-primary">Next</button>
+        <form action="#" th:action="@{/review_points/}" th:object="${reviewPointEntity}" method="post">
+            <input th:field="*{noteEntity}" type="hidden"/>
+            <input type="submit" value="Next" class="btn btn-primary"/>
+        </form>
     </div>
 </layout>

@@ -19,6 +19,6 @@ class ReviewControllerTests {
     ModelFactoryService modelFactoryService = mock(ModelFactoryService.class);
     ReviewController controller = new ReviewController(new TestCurrentUserFetcher(userModel), modelFactoryService);
     Model model = mock(Model.class);
-    assertEquals("review", controller.review(model));
+    assertEquals("review_done", controller.review(model));
   }
 }
