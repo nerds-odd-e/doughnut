@@ -78,7 +78,8 @@ public class UserModel extends ModelForEntity<UserEntity>{
     }
 
     private boolean sameDay(Timestamp lastReviewedAt, Timestamp currentTime) {
-        return lastReviewedAt == currentTime;
+        long i = lastReviewedAt.toInstant().toEpochMilli() - currentTime.toInstant().toEpochMilli();
+        return Math.abs(i) < 10000;
     }
 
     private List<NoteEntity> getAllLinkableNotes(NoteEntity source) {

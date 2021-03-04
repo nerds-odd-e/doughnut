@@ -11,6 +11,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -18,6 +19,9 @@ import java.util.List;
 public class ReviewController {
     private final CurrentUserFetcher currentUserFetcher;
     private final ModelFactoryService modelFactoryService;
+
+
+    @Resource(name = "timeTraveler")
     private final TimeTraveler timeTraveler;
 
     public ReviewController(CurrentUserFetcher currentUserFetcher, ModelFactoryService modelFactoryService, TimeTraveler timeTraveler) {
@@ -44,6 +48,7 @@ public class ReviewController {
     @PostMapping("/review_points")
     public String create(@Valid ReviewPointEntity reviewPointEntity) {
         UserModel userModel = currentUserFetcher.getUser();
+        reviewPointEntity.setLastReviewedAt(timeTraveler.getCurrentUTCTimestamp());
         reviewPointEntity.setUserEntity(userModel.getEntity());
         modelFactoryService.reviewPointRepository.save(reviewPointEntity);
         return "redirect:/review";
