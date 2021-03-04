@@ -4,10 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
 
 import com.odde.doughnut.controllers.IndexController;
-import com.odde.doughnut.controllers.TestCurrentUser;
+import com.odde.doughnut.controllers.TestCurrentUserFetcher;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.services.ModelFactoryService;
-import com.odde.doughnut.testability.DBCleaner;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +26,7 @@ class DoughnutWithNoSpringTests {
 
   @Test
   void contextLoads() {
-    IndexController controller = new IndexController(new TestCurrentUser(null), modelFactoryService);
+    IndexController controller = new IndexController(new TestCurrentUserFetcher(null), modelFactoryService);
     Model model = mock(Model.class);
 
     String home = controller.home(null, model);

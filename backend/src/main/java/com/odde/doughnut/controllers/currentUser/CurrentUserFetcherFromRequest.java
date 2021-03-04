@@ -13,7 +13,7 @@ import java.security.Principal;
 
 @Component
 @RequestScope
-public class CurrentUserFromRequest implements CurrentUser {
+public class CurrentUserFetcherFromRequest implements CurrentUserFetcher {
     @Autowired
     UserRepository userRepository;
     @Autowired
@@ -21,12 +21,12 @@ public class CurrentUserFromRequest implements CurrentUser {
     String externalId = null;
     UserEntity userEntity = null;
 
-    public CurrentUserFromRequest(HttpServletRequest request) {
+    public CurrentUserFetcherFromRequest(HttpServletRequest request) {
         Principal userPrincipal = request.getUserPrincipal();
         if (userPrincipal != null) {
             externalId = userPrincipal.getName();
         }
-        request.setAttribute("currentUser", this);
+        request.setAttribute("currentUserFetcher", this);
     }
 
     @Override

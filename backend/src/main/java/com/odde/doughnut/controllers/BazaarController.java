@@ -1,6 +1,6 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.currentUser.CurrentUser;
+import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.models.BazaarModel;
@@ -14,11 +14,11 @@ import org.springframework.web.servlet.view.RedirectView;
 
 @Controller
 public class BazaarController {
-    private final CurrentUser currentUser;
+    private final CurrentUserFetcher currentUserFetcher;
     private final ModelFactoryService modelFactoryService;
 
-    public BazaarController(CurrentUser currentUser, ModelFactoryService modelFactoryService) {
-        this.currentUser = currentUser;
+    public BazaarController(CurrentUserFetcher currentUserFetcher, ModelFactoryService modelFactoryService) {
+        this.currentUserFetcher = currentUserFetcher;
         this.modelFactoryService = modelFactoryService;
     }
 
@@ -31,7 +31,7 @@ public class BazaarController {
 
     @PostMapping(value = "/notes/{note}/share")
     public RedirectView shareNote(@PathVariable("note") NoteEntity note) throws NoAccessRightException {
-        currentUser.getUser().assertAuthorization(note);
+        currentUserFetcher.getUser().assertAuthorization(note);
         BazaarModel bazaar = modelFactoryService.toBazaarModel();
         bazaar.shareNote(note);
         return new RedirectView("/notes");

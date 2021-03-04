@@ -44,7 +44,7 @@ class NoteControllerTests {
     @BeforeEach
     void setup() {
         userModel = makeMe.aUser().toModelPlease();
-        controller = new NoteController(new TestCurrentUser(userModel), modelFactoryService);
+        controller = new NoteController(new TestCurrentUserFetcher(userModel), modelFactoryService);
     }
 
     @Nested

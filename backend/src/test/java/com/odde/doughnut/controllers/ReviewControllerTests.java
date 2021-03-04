@@ -1,6 +1,5 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.entities.UserEntity;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ModelFactoryService;
 import org.junit.jupiter.api.Test;
@@ -18,7 +17,7 @@ class ReviewControllerTests {
     UserModel userModel = mock(UserModel.class);
     when(userModel.getNewNotesToReview()).thenReturn(new ArrayList<>());
     ModelFactoryService modelFactoryService = mock(ModelFactoryService.class);
-    ReviewController controller = new ReviewController(new TestCurrentUser(userModel), modelFactoryService);
+    ReviewController controller = new ReviewController(new TestCurrentUserFetcher(userModel), modelFactoryService);
     Model model = mock(Model.class);
     assertEquals("review", controller.review(model));
   }

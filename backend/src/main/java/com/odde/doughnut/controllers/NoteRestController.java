@@ -1,6 +1,6 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.currentUser.CurrentUser;
+import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.services.ModelFactoryService;
 import org.springframework.http.MediaType;
@@ -12,18 +12,18 @@ import java.util.stream.Collectors;
 
 @RestController
 public class NoteRestController {
-    private final CurrentUser currentUser;
+    private final CurrentUserFetcher currentUserFetcher;
     private final ModelFactoryService modelFactoryService;
 
-    public NoteRestController(CurrentUser currentUser, ModelFactoryService modelFactoryService) {
-        this.currentUser = currentUser;
+    public NoteRestController(CurrentUserFetcher currentUserFetcher, ModelFactoryService modelFactoryService) {
+        this.currentUserFetcher = currentUserFetcher;
         this.modelFactoryService = modelFactoryService;
     }
 
     @GetMapping(value = "/api/notes", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<NoteEntity> getNotes() {
-        List<NoteEntity> notes = currentUser.getUser().getNewNotesToReview();
-        return notes.stream().limit(currentUser.getUser().getDailyNewNotesCount()).collect(Collectors.toList());
+        List<NoteEntity> notes = currentUserFetcher.getUser().getNewNotesToReview();
+        return notes.stream().limit(currentUserFetcher.getUser().getDailyNewNotesCount()).collect(Collectors.toList());
     }
 
 }

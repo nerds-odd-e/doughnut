@@ -1,7 +1,7 @@
 
 package com.odde.doughnut.testability;
 
-import com.odde.doughnut.controllers.currentUser.CurrentUserFromRequest;
+import com.odde.doughnut.controllers.currentUser.CurrentUserFetcherFromRequest;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.UserEntity;
 import com.odde.doughnut.entities.repositories.NoteRepository;
@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManagerFactory;
 import java.sql.Timestamp;
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -28,7 +27,8 @@ class TestabilityController {
   @Autowired EntityManagerFactory emf;
   @Autowired NoteRepository noteRepository;
   @Autowired UserRepository userRepository;
-  @Autowired CurrentUserFromRequest currentUser;
+  @Autowired
+  CurrentUserFetcherFromRequest currentUser;
   @Autowired TimeTraveler timeTraveler;
 
   @GetMapping("/clean_db_and_seed_data")

@@ -1,11 +1,10 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.currentUser.CurrentUser;
+import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.NoteMotionEntity;
-import com.odde.doughnut.entities.UserEntity;
 import com.odde.doughnut.models.NoteContentModel;
 import com.odde.doughnut.models.TreeNodeModel;
 import com.odde.doughnut.models.UserModel;
@@ -23,24 +22,24 @@ import java.util.List;
 @Controller
 @RequestMapping("/notes")
 public class NoteController {
-    private final CurrentUser currentUser;
+    private final CurrentUserFetcher currentUserFetcher;
     private final ModelFactoryService modelFactoryService;
 
-    public NoteController(CurrentUser currentUser, ModelFactoryService modelFactoryService) {
-        this.currentUser = currentUser;
+    public NoteController(CurrentUserFetcher currentUserFetcher, ModelFactoryService modelFactoryService) {
+        this.currentUserFetcher = currentUserFetcher;
         this.modelFactoryService = modelFactoryService;
     }
 
     @GetMapping("")
     public String myNotes(Model model) {
-        model.addAttribute("notes", currentUser.getUser().getOrphanedNotes());
+        model.addAttribute("notes", currentUserFetcher.getUser().getOrphanedNotes());
         return "notes/my_notes";
     }
 
     @GetMapping({"/new", "/{parentNote}/new"})
     public String newNote(@PathVariable(name = "parentNote", required = false) NoteEntity parentNote, Model model) throws NoAccessRightException {
         if (parentNote != null) {
-            currentUser.getUser().assertAuthorization(parentNote);
+            currentUserFetcher.getUser().assertAuthorization(parentNote);
         }
         NoteEntity noteEntity = new NoteEntity();
         noteEntity.setParentNote(parentNote);
@@ -54,9 +53,9 @@ public class NoteController {
             return "notes/new";
         }
         if (noteEntity.getParentNote() != null) {
-            currentUser.getUser().assertAuthorization(noteEntity.getParentNote());
+            currentUserFetcher.getUser().assertAuthorization(noteEntity.getParentNote());
         }
-        UserModel userModel = currentUser.getUser();
+        UserModel userModel = currentUserFetcher.getUser();
         noteEntity.setUserEntity(userModel.getUserEntity());
         modelFactoryService.noteRepository.save(noteEntity);
         return "redirect:/notes/" + noteEntity.getId();
@@ -75,7 +74,7 @@ public class NoteController {
 
     @PostMapping("/{noteEntity}")
     public String updateNote(@Valid NoteEntity noteEntity, BindingResult bindingResult) throws NoAccessRightException {
-        currentUser.getUser().assertAuthorization(noteEntity);
+        currentUserFetcher.getUser().assertAuthorization(noteEntity);
         if (bindingResult.hasErrors()) {
             return "notes/edit";
         }
@@ -85,14 +84,14 @@ public class NoteController {
 
     @GetMapping("/{noteEntity}/link")
     public String link( @PathVariable("noteEntity") NoteEntity noteEntity, @RequestParam(required = false) String searchTerm, Model model) {
-        List<NoteEntity> linkableNotes = currentUser.getUser().filterLinkableNotes(noteEntity, searchTerm);
+        List<NoteEntity> linkableNotes = currentUserFetcher.getUser().filterLinkableNotes(noteEntity, searchTerm);
         model.addAttribute("linkableNotes", linkableNotes);
         return "notes/link";
     }
 
     @PostMapping(value = "/{noteEntity}/link", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public String linkNote(@PathVariable("noteEntity") NoteEntity noteEntity, Integer targetNoteId) throws NoAccessRightException {
-        currentUser.getUser().assertAuthorization(noteEntity);
+        currentUserFetcher.getUser().assertAuthorization(noteEntity);
         NoteEntity targetNote = modelFactoryService.noteRepository.findById(targetNoteId).get();
         NoteContentModel noteContentModel = modelFactoryService.toNoteModel(noteEntity);
         noteContentModel.linkNote(targetNote);
@@ -125,15 +124,15 @@ public class NoteController {
 
     @PostMapping("/{noteEntity}/move")
     public String moveNote(NoteEntity noteEntity, NoteMotionEntity noteMotionEntity) throws CyclicLinkDetectedException, NoAccessRightException {
-        currentUser.getUser().assertAuthorization(noteEntity);
-        currentUser.getUser().assertAuthorization(noteMotionEntity.getRelativeToNote());
+        currentUserFetcher.getUser().assertAuthorization(noteEntity);
+        currentUserFetcher.getUser().assertAuthorization(noteMotionEntity.getRelativeToNote());
         modelFactoryService.toNoteMotionModel(noteMotionEntity, noteEntity).execute();
         return "redirect:/notes/" + noteEntity.getId();
     }
 
     @PostMapping(value = "/{noteEntity}/delete")
     public RedirectView deleteNote(@PathVariable("noteEntity") NoteEntity noteEntity) throws NoAccessRightException {
-        currentUser.getUser().assertAuthorization(noteEntity);
+        currentUserFetcher.getUser().assertAuthorization(noteEntity);
         modelFactoryService.noteRepository.delete(noteEntity);
         return new RedirectView("/notes");
     }

@@ -1,6 +1,6 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.currentUser.CurrentUser;
+import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.UserEntity;
 import com.odde.doughnut.services.ModelFactoryService;
 import org.springframework.stereotype.Controller;
@@ -11,11 +11,11 @@ import java.security.Principal;
 
 @Controller
 public class IndexController {
-    private final CurrentUser currentUser;
+    private final CurrentUserFetcher currentUserFetcher;
     private final ModelFactoryService modelFactoryService;
 
-    public IndexController(CurrentUser currentUser, ModelFactoryService modelFactoryService) {
-        this.currentUser = currentUser;
+    public IndexController(CurrentUserFetcher currentUserFetcher, ModelFactoryService modelFactoryService) {
+        this.currentUserFetcher = currentUserFetcher;
         this.modelFactoryService = modelFactoryService;
     }
 
@@ -26,7 +26,7 @@ public class IndexController {
             return "ask_to_login";
         }
 
-        if (currentUser.getUser() == null) {
+        if (currentUserFetcher.getUser() == null) {
             model.addAttribute("user", new UserEntity());
             return "register";
         }

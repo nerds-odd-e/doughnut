@@ -1,13 +1,12 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.currentUser.CurrentUser;
-import com.odde.doughnut.entities.UserEntity;
+import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.models.UserModel;
 
-public class TestCurrentUser implements CurrentUser {
+public class TestCurrentUserFetcher implements CurrentUserFetcher {
     private final UserModel userModel;
 
-    public TestCurrentUser(UserModel userModel) {
+    public TestCurrentUserFetcher(UserModel userModel) {
         this.userModel = userModel;
     }
 

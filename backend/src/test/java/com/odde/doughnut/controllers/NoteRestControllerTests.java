@@ -29,7 +29,7 @@ public class NoteRestControllerTests {
     @BeforeEach
     void setup() {
         userModel = makeMe.aUser().toModelPlease();
-        noteController = new NoteRestController(new TestCurrentUser(userModel), modelFactoryService);
+        noteController = new NoteRestController(new TestCurrentUserFetcher(userModel), modelFactoryService);
     }
 
     @Test
