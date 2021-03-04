@@ -5,6 +5,7 @@ import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.UserEntity;
 import com.odde.doughnut.entities.repositories.LinkRepository;
+import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,7 +35,7 @@ class NoteControllerTests {
     ModelFactoryService modelFactoryService;
 
     @Autowired MakeMe makeMe;
-    private UserEntity userEntity;
+    private UserModel userModel;
     private NoteEntity parentNote;
     private NoteEntity childNote;
     ExtendedModelMap model = new ExtendedModelMap();
@@ -42,8 +43,8 @@ class NoteControllerTests {
 
     @BeforeEach
     void setup() {
-        userEntity = makeMe.aUser().please();
-        controller = new NoteController(new TestCurrentUser(userEntity), modelFactoryService);
+        userModel = makeMe.aUser().toModelPlease();
+        controller = new NoteController(new TestCurrentUser(userModel), modelFactoryService);
     }
 
     @Nested
@@ -53,9 +54,9 @@ class NoteControllerTests {
 
         @BeforeEach
         void setup() {
-            parentNote = makeMe.aNote().forUser(userEntity).please();
-            childNote = makeMe.aNote().forUser(userEntity).under(parentNote).please();
-            makeMe.refresh(entityManager, userEntity);
+            parentNote = makeMe.aNote().forUser(userModel).please();
+            childNote = makeMe.aNote().forUser(userModel).under(parentNote).please();
+            makeMe.refresh(entityManager, userModel.getUserEntity());
             makeMe.refresh(entityManager, parentNote);
         }
 
@@ -109,7 +110,7 @@ class NoteControllerTests {
 
         @BeforeEach
         void setup() {
-            note = makeMe.aNote().forUser(userEntity).please();
+            note = makeMe.aNote().forUser(userModel).please();
             note.setTitle("new");
         }
 
@@ -151,20 +152,20 @@ class NoteControllerTests {
 
         @Test
         void shouldDeleteTheNoteButNotTheUser() throws NoAccessRightException {
-            NoteEntity note = makeMe.aNote().forUser(userEntity).please();
+            NoteEntity note = makeMe.aNote().forUser(userModel).please();
             Integer noteId = note.getId();
             RedirectView response = controller.deleteNote(note);
             assertEquals("/notes", response.getUrl());
             assertFalse(modelFactoryService.findNoteById(noteId).isPresent());
-            assertTrue(modelFactoryService.findUserById(userEntity.getId()).isPresent());
+            assertTrue(modelFactoryService.findUserById(userModel.getUserEntity().getId()).isPresent());
         }
 
         @Test
         void shouldDeleteTheChildNoteButNotSiblingOrParent() throws NoAccessRightException {
-            NoteEntity parent = makeMe.aNote().forUser(userEntity).please();
-            NoteEntity subject = makeMe.aNote().under(parent).forUser(userEntity).please();
-            NoteEntity sibling = makeMe.aNote().under(parent).forUser(userEntity).please();
-            NoteEntity child = makeMe.aNote().under(subject).forUser(userEntity).please();
+            NoteEntity parent = makeMe.aNote().forUser(userModel).please();
+            NoteEntity subject = makeMe.aNote().under(parent).forUser(userModel).please();
+            NoteEntity sibling = makeMe.aNote().under(parent).forUser(userModel).please();
+            NoteEntity child = makeMe.aNote().under(subject).forUser(userModel).please();
 
             controller.deleteNote(subject);
 
@@ -174,9 +175,9 @@ class NoteControllerTests {
 
         @Test
         void shouldDeleteTheLinkToAndFromThisNote() throws NoAccessRightException {
-            NoteEntity referTo = makeMe.aNote().forUser(userEntity).please();
-            NoteEntity subject = makeMe.aNote().forUser(userEntity).linkTo(referTo).please();
-            NoteEntity referFrom = makeMe.aNote().forUser(userEntity).linkTo(subject).linkTo(referTo).please();
+            NoteEntity referTo = makeMe.aNote().forUser(userModel).please();
+            NoteEntity subject = makeMe.aNote().forUser(userModel).linkTo(referTo).please();
+            NoteEntity referFrom = makeMe.aNote().forUser(userModel).linkTo(subject).linkTo(referTo).please();
             long oldCount = linkRepository.count();
 
             controller.deleteNote(subject);
@@ -197,7 +198,7 @@ class NoteControllerTests {
         void setup() {
             anotherUser = makeMe.aUser().please();
             note1 = makeMe.aNote().forUser(anotherUser).please();
-            note2 = makeMe.aNote().forUser(userEntity).please();
+            note2 = makeMe.aNote().forUser(userModel).please();
         }
 
         @Test

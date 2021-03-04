@@ -30,7 +30,7 @@ public class ReviewController {
             }
             ReviewPointEntity reviewPointEntity = new ReviewPointEntity();
             reviewPointEntity.setNoteEntity(noteEntity);
-            reviewPointEntity.setUserEntity(currentUser.getUser());
+            reviewPointEntity.setUserEntity(currentUser.getUser().getUserEntity());
             modelFactoryService.reviewPointRepository.save(reviewPointEntity);
         }
         model.addAttribute("notes", notes);

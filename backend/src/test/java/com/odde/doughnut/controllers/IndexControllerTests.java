@@ -44,7 +44,7 @@ class IndexControllerTests {
   void visitWithUserSessionAndTheUserExists() {
     UserEntity userEntity = makeMe.aUser().please();
     Principal principal = (UserPrincipal) userEntity::getExternalIdentifier;
-    controller = new IndexController(new TestCurrentUser(userEntity), modelFactoryService);
+    controller = new IndexController(new TestCurrentUser(modelFactoryService.toUserModel(userEntity)), modelFactoryService);
     assertEquals("index", controller.home(principal, model));
   }
 }

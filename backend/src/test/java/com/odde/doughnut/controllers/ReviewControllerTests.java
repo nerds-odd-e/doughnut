@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.UserEntity;
+import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ModelFactoryService;
 import org.junit.jupiter.api.Test;
 import org.springframework.ui.Model;
@@ -14,10 +15,10 @@ import static org.mockito.Mockito.when;
 class ReviewControllerTests {
   @Test
   void shouldProceedToReviewPage() {
-    UserEntity userEntity = mock(UserEntity.class);
-    when(userEntity.getNewNotesToReview()).thenReturn(new ArrayList<>());
+    UserModel userModel = mock(UserModel.class);
+    when(userModel.getNewNotesToReview()).thenReturn(new ArrayList<>());
     ModelFactoryService modelFactoryService = mock(ModelFactoryService.class);
-    ReviewController controller = new ReviewController(new TestCurrentUser(userEntity), modelFactoryService);
+    ReviewController controller = new ReviewController(new TestCurrentUser(userModel), modelFactoryService);
     Model model = mock(Model.class);
     assertEquals("review", controller.review(model));
   }

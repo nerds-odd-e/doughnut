@@ -2,6 +2,8 @@ package com.odde.doughnut.controllers.currentUser;
 
 import com.odde.doughnut.entities.UserEntity;
 import com.odde.doughnut.entities.repositories.UserRepository;
+import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.ModelFactoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;
@@ -14,6 +16,8 @@ import java.security.Principal;
 public class CurrentUserFromRequest implements CurrentUser {
     @Autowired
     UserRepository userRepository;
+    @Autowired
+    ModelFactoryService modelFactoryService;
     String externalId = null;
     UserEntity userEntity = null;
 
@@ -26,10 +30,10 @@ public class CurrentUserFromRequest implements CurrentUser {
     }
 
     @Override
-    public UserEntity getUser() {
+    public UserModel getUser() {
         if (userEntity == null && externalId != null) {
             userEntity = userRepository.findByExternalIdentifier(externalId);
         }
-        return userEntity;
+        return modelFactoryService.toUserModel(userEntity);
     }
 }

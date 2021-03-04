@@ -5,12 +5,9 @@ import com.odde.doughnut.entities.UserEntity;
 import com.odde.doughnut.entities.repositories.BazaarNoteRepository;
 import com.odde.doughnut.entities.repositories.ReviewPointRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
-import com.odde.doughnut.models.BazaarModel;
-import com.odde.doughnut.models.NoteContentModel;
+import com.odde.doughnut.models.*;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.repositories.NoteRepository;
-import com.odde.doughnut.models.NoteMotionModel;
-import com.odde.doughnut.models.TreeNodeModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -55,4 +52,10 @@ public class ModelFactoryService {
         return noteRepository.findById(noteId);
     }
 
+    public UserModel toUserModel(UserEntity userEntity) {
+        if (userEntity == null) {
+            return null;
+        }
+        return new UserModel(userEntity, this);
+    }
 }

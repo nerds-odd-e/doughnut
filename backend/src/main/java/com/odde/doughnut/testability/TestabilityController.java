@@ -6,6 +6,7 @@ import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.UserEntity;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
+import com.odde.doughnut.models.UserModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.bind.annotation.*;
@@ -42,13 +43,13 @@ class TestabilityController {
 
   @PostMapping("/seed_notes")
   public List<Integer> seedNote(@RequestBody List<NoteEntity> notes) throws Exception {
-    UserEntity userEntity = currentUser.getUser();
-    if (userEntity == null) throw new Exception("User does not exist");
+    UserModel userModel = currentUser.getUser();
+    if (userModel == null) throw new Exception("User does not exist");
     HashMap<String, NoteEntity> earlyNotes = new HashMap<>();
 
     for (NoteEntity note : notes) {
       earlyNotes.put(note.getTitle(), note);
-      note.setUserEntity(userEntity);
+      note.setUserEntity(userModel.getUserEntity());
       note.setParentNote(earlyNotes.get(note.getTestingLinkTo()));
     }
     noteRepository.saveAll(notes);
@@ -57,14 +58,13 @@ class TestabilityController {
 
   @PostMapping("/update_current_user")
   public String updateCurrentUser(@RequestBody HashMap<String, String> userInfo) {
-    UserEntity currentUserEntity = currentUser.getUser();
+    UserModel currentUserModel = currentUser.getUser();
     if (userInfo.containsKey("daily_new_notes_count")) {
-      currentUserEntity.setDailyNewNotesCount(Integer.valueOf(userInfo.get("daily_new_notes_count")));
+      currentUserModel.setDailyNewNotesCount(Integer.valueOf(userInfo.get("daily_new_notes_count")));
     }
     if (userInfo.containsKey("space_intervals")) {
-      currentUserEntity.setSpaceIntervals(userInfo.get("space_intervals"));
+      currentUserModel.setSpaceIntervals(userInfo.get("space_intervals"));
     }
-    userRepository.save(currentUserEntity);
     return "OK";
   }
 

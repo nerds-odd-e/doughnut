@@ -8,6 +8,7 @@ import com.odde.doughnut.entities.NoteMotionEntity;
 import com.odde.doughnut.entities.UserEntity;
 import com.odde.doughnut.models.NoteContentModel;
 import com.odde.doughnut.models.TreeNodeModel;
+import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ModelFactoryService;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
@@ -55,8 +56,8 @@ public class NoteController {
         if (noteEntity.getParentNote() != null) {
             currentUser.getUser().assertAuthorization(noteEntity.getParentNote());
         }
-        UserEntity userEntity = currentUser.getUser();
-        noteEntity.setUserEntity(userEntity);
+        UserModel userModel = currentUser.getUser();
+        noteEntity.setUserEntity(userModel.getUserEntity());
         modelFactoryService.noteRepository.save(noteEntity);
         return "redirect:/notes/" + noteEntity.getId();
     }

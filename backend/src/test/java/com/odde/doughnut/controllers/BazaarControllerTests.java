@@ -3,6 +3,7 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.UserEntity;
+import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,7 +31,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class BazaarControllerTests {
     @Autowired ModelFactoryService modelFactoryService;
     @Autowired private MakeMe makeMe;
-    private UserEntity userEntity;
+    private UserModel userModel;
     private NoteEntity topNote;
     private BazaarController controller;
     ExtendedModelMap model = new ExtendedModelMap();
@@ -38,9 +39,9 @@ class BazaarControllerTests {
 
     @BeforeEach
     void setup() {
-        userEntity = makeMe.aUser().please();
-        topNote = makeMe.aNote().forUser(userEntity).please();
-        controller = new BazaarController(new TestCurrentUser(userEntity), modelFactoryService);
+        userModel = makeMe.aUser().toModelPlease();
+        topNote = makeMe.aNote().forUser(userModel).please();
+        controller = new BazaarController(new TestCurrentUser(userModel), modelFactoryService);
     }
 
     @Test

@@ -1,7 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.NoteEntity;
-import com.odde.doughnut.entities.UserEntity;
+import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
@@ -23,19 +23,19 @@ public class NoteRestControllerTests {
     @Autowired EntityManager entityManager;
     @Autowired ModelFactoryService modelFactoryService;
     @Autowired MakeMe makeMe;
-    private UserEntity userEntity;
+    private UserModel userModel;
     private NoteRestController noteController;
 
     @BeforeEach
     void setup() {
-        userEntity = makeMe.aUser().please();
-        noteController = new NoteRestController(new TestCurrentUser(userEntity), modelFactoryService);
+        userModel = makeMe.aUser().toModelPlease();
+        noteController = new NoteRestController(new TestCurrentUser(userModel), modelFactoryService);
     }
 
     @Test
     void shouldGetListOfNotes() {
-        NoteEntity note = makeMe.aNote().forUser(userEntity).please();
-        makeMe.refresh(entityManager, userEntity);
+        NoteEntity note = makeMe.aNote().forUser(userModel).please();
+        makeMe.refresh(entityManager, userModel.getUserEntity());
         assertEquals(note.getTitle(), noteController.getNotes().get(0).getTitle());
     }
 
