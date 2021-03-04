@@ -11,6 +11,7 @@ import com.odde.doughnut.entities.repositories.NoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
 import java.util.Optional;
 
 @Service
@@ -19,13 +20,15 @@ public class ModelFactoryService {
     @Autowired public final UserRepository userRepository;
     @Autowired public final BazaarNoteRepository bazaarNoteRepository;
     @Autowired public final ReviewPointRepository reviewPointRepository;
+    @Autowired public final EntityManager entityManager;
 
-    public ModelFactoryService(NoteRepository noteRepository, UserRepository userRepository, BazaarNoteRepository bazaarNoteRepository, ReviewPointRepository reviewPointRepository)
+    public ModelFactoryService(NoteRepository noteRepository, UserRepository userRepository, BazaarNoteRepository bazaarNoteRepository, ReviewPointRepository reviewPointRepository, EntityManager entityManager)
     {
         this.noteRepository = noteRepository;
         this.userRepository = userRepository;
         this.bazaarNoteRepository = bazaarNoteRepository;
         this.reviewPointRepository = reviewPointRepository;
+        this.entityManager = entityManager;
     }
 
     public NoteContentModel toNoteModel(NoteEntity note) {

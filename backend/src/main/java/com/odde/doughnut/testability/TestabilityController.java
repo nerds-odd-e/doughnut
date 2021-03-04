@@ -9,6 +9,7 @@ import com.odde.doughnut.entities.repositories.UserRepository;
 import com.odde.doughnut.models.UserModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManagerFactory;
@@ -57,13 +58,14 @@ class TestabilityController {
   }
 
   @PostMapping("/update_current_user")
+  @Transactional
   public String updateCurrentUser(@RequestBody HashMap<String, String> userInfo) {
     UserModel currentUserModel = currentUser.getUser();
     if (userInfo.containsKey("daily_new_notes_count")) {
-      currentUserModel.setDailyNewNotesCount(Integer.valueOf(userInfo.get("daily_new_notes_count")));
+      currentUserModel.setAndSaveDailyNewNotesCount(Integer.valueOf(userInfo.get("daily_new_notes_count")));
     }
     if (userInfo.containsKey("space_intervals")) {
-      currentUserModel.setSpaceIntervals(userInfo.get("space_intervals"));
+      currentUserModel.setAndSaveSpaceIntervals(userInfo.get("space_intervals"));
     }
     return "OK";
   }

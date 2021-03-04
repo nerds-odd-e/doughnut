@@ -29,7 +29,7 @@ public class UserBuilder {
     }
 
     public UserEntity please() {
-        makeMe.modelFactoryService.userRepository.save(userEntity);
+        makeMe.modelFactoryService.entityManager.persist(userEntity);
         return userEntity;
     }
 

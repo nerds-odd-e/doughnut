@@ -3,44 +3,40 @@ package com.odde.doughnut.models;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.services.ModelFactoryService;
-import org.thymeleaf.model.IModelFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TreeNodeModel {
+public class TreeNodeModel extends ModelForEntity<NoteEntity> {
     protected final NoteRepository noteRepository;
-    protected final NoteEntity note;
-    private final ModelFactoryService modelFactoryService;
 
-    public TreeNodeModel(NoteEntity note, ModelFactoryService modelFactoryService) {
+    public TreeNodeModel(NoteEntity noteEntity, ModelFactoryService modelFactoryService) {
+        super(noteEntity, modelFactoryService);
         this.noteRepository = modelFactoryService.noteRepository;
-        this.note = note;
-        this.modelFactoryService = modelFactoryService;
     }
 
     public List<NoteEntity> getAncestors() {
-        if (note == null) {
+        if (entity == null) {
             return new ArrayList<>();
         }
-        return noteRepository.findAncestry(note.getId().longValue());
+        return noteRepository.findAncestry(entity.getId().longValue());
     }
 
     public NoteEntity getPreviousSiblingNote() {
-        if (note == null || note.getParentNote() == null) {
+        if (entity == null || entity.getParentNote() == null) {
             return null;
         }
-        return noteRepository.findFirstByParentNoteAndSiblingOrderLessThanOrderBySiblingOrderDesc(note.getParentNote(), note.getSiblingOrder());
+        return noteRepository.findFirstByParentNoteAndSiblingOrderLessThanOrderBySiblingOrderDesc(entity.getParentNote(), entity.getSiblingOrder());
     }
 
     public NoteEntity getNextSiblingNote() {
-        return nextSiblingOfNote(note);
+        return nextSiblingOfNote(entity);
     }
 
     public NoteEntity getPreviousNote() {
         NoteEntity result = getPreviousSiblingNote();
         if (result == null) {
-            return note.getParentNote();
+            return entity.getParentNote();
         }
         while (true) {
             NoteEntity lastChild = noteRepository.findFirstByParentNoteOrderBySiblingOrderDesc(result);
@@ -56,7 +52,7 @@ public class TreeNodeModel {
         if (firstChild != null) {
             return firstChild;
         }
-        NoteEntity next = note;
+        NoteEntity next = entity;
         while (next != null) {
             NoteEntity sibling = nextSiblingOfNote(next);
             if (sibling != null) {
@@ -75,12 +71,12 @@ public class TreeNodeModel {
     }
 
     public NoteEntity getFirstChild() {
-        return noteRepository.findFirstByParentNoteOrderBySiblingOrder(note);
+        return noteRepository.findFirstByParentNoteOrderBySiblingOrder(entity);
     }
 
     private long getSiblingOrderToInsertBehindMe() {
         NoteEntity nextSiblingNote = getNextSiblingNote();
-        Long relativeToSiblingOrder = note.getSiblingOrder();
+        Long relativeToSiblingOrder = entity.getSiblingOrder();
         if (nextSiblingNote == null) {
             return relativeToSiblingOrder + NoteEntity.MINIMUM_SIBLING_ORDER_INCREMENT;
         }

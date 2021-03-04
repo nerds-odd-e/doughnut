@@ -22,18 +22,14 @@ public class UserModel extends ModelForEntity<UserEntity>{
         return entity.getDailyNewNotesCount();
     }
 
-    public void setDailyNewNotesCount(Integer dailyNewNotesCount) {
+    public void setAndSaveDailyNewNotesCount(Integer dailyNewNotesCount) {
         entity.setDailyNewNotesCount(dailyNewNotesCount);
         save();
     }
 
-    public void setSpaceIntervals(String spaceIntervals) {
+    public void setAndSaveSpaceIntervals(String spaceIntervals) {
         entity.setSpaceIntervals(spaceIntervals);
         save();
-    }
-
-    private void save() {
-        modelFactoryService.userRepository.save(entity);
     }
 
     public List<NoteEntity> getOrphanedNotes() {

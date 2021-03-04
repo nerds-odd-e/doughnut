@@ -12,4 +12,8 @@ public abstract class ModelForEntity<T> {
         this.entity = entity;
         this.modelFactoryService = modelFactoryService;
     }
+
+    protected void save() {
+        modelFactoryService.entityManager.persist(entity);
+    }
 }

@@ -5,25 +5,22 @@ import com.odde.doughnut.entities.NoteMotionEntity;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.services.ModelFactoryService;
 
-public class NoteMotionModel {
-    private final NoteMotionEntity noteMotionEntity;
+public class NoteMotionModel extends ModelForEntity<NoteMotionEntity>{
     private final NoteEntity subject;
-    private final ModelFactoryService modelFactoryService;
 
     public NoteMotionModel(NoteMotionEntity noteMotionEntity, NoteEntity subject, ModelFactoryService modelFactoryService) {
-        this.noteMotionEntity = noteMotionEntity;
+        super(noteMotionEntity, modelFactoryService);
         this.subject = subject;
-        this.modelFactoryService = modelFactoryService;
     }
 
     public void execute() throws CyclicLinkDetectedException {
-        TreeNodeModel treeNodeModel = modelFactoryService.toTreeNodeModel(noteMotionEntity.getRelativeToNote());
+        TreeNodeModel treeNodeModel = modelFactoryService.toTreeNodeModel(entity.getRelativeToNote());
 
         if(treeNodeModel.getAncestors().contains(subject)) {
             throw new CyclicLinkDetectedException();
         }
-        subject.setParentNote(noteMotionEntity.getNewParent());
-        Long newSiblingOrder = treeNodeModel.theSiblingOrderItTakesToMoveRelativeToMe(noteMotionEntity.isAsFirstChildOfNote());
+        subject.setParentNote(entity.getNewParent());
+        Long newSiblingOrder = treeNodeModel.theSiblingOrderItTakesToMoveRelativeToMe(entity.isAsFirstChildOfNote());
         if (newSiblingOrder != null) {
             subject.setSiblingOrder(newSiblingOrder);
         }

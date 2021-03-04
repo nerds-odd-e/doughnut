@@ -50,7 +50,7 @@ public class NoteBuilder {
     }
 
     public NoteEntity please() {
-        makeMe.modelFactoryService.noteRepository.save(note);
+        makeMe.modelFactoryService.entityManager.persist(note);
         return note;
     }
 }
