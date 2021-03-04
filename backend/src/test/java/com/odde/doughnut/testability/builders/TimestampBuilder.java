@@ -1,7 +1,6 @@
 package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.testability.ReviewPointBuilder;
 
 import java.sql.Timestamp;
 import java.time.*;
@@ -18,7 +17,7 @@ public class TimestampBuilder {
     }
 
     public TimestampBuilder forWhereTheUserIs(UserModel userModel) {
-        userTimeZone = ZoneId.of("Asia/Shanghai");
+        userTimeZone = userModel.getTimeZone();
         return this;
     }
 
@@ -27,7 +26,7 @@ public class TimestampBuilder {
             throw new RuntimeException("We don't know the user's time zone yet");
         }
         ZonedDateTime userDateTime = ZonedDateTime.of(1989, 1, 1, hour, 0, 0, 0, userTimeZone);
-        ZonedDateTime utc = userDateTime.withZoneSameInstant(ZoneId.of("UTC"));
+        ZonedDateTime utc = userDateTime.withZoneSameInstant(ZoneId.systemDefault());
 
         return Timestamp.valueOf(utc.plusDays(day).toLocalDateTime());
     }

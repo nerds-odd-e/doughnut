@@ -87,9 +87,16 @@ public class UserModelTest {
                 }
 
                 @Test
+                void theDailyCountShouldNotBeResetOnSameDayDifferentHour() {
+                    makeMe.aReviewPointFor(note1).by(userModel).on(day1).please();
+                    Timestamp day1_23 = makeMe.aTimestamp().of(1, 23).forWhereTheUserIs(userModel).please();
+                    assertThat(userModel.getNewNotesToReview(day1_23), hasSize(equalTo(0)));
+                }
+
+                @Test
                 void theDailyCountShouldBeResetOnNextDay() {
                     makeMe.aReviewPointFor(note1).by(userModel).on(day1).please();
-                    Timestamp day2 = makeMe.aTimestamp().of(2, 8).forWhereTheUserIs(userModel).please();
+                    Timestamp day2 = makeMe.aTimestamp().of(2, 1).forWhereTheUserIs(userModel).please();
                     assertThat(userModel.getNewNotesToReview(day2), hasSize(equalTo(1)));
                 }
 

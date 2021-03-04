@@ -6,6 +6,8 @@ import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.services.ModelFactoryService;
 
 import java.sql.Timestamp;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -78,8 +80,13 @@ public class UserModel extends ModelForEntity<UserEntity>{
     }
 
     private boolean sameDay(Timestamp lastReviewedAt, Timestamp currentTime) {
-        long i = lastReviewedAt.toInstant().toEpochMilli() - currentTime.toInstant().toEpochMilli();
-        return Math.abs(i) < 10000;
+        return getYearId(lastReviewedAt) == getYearId(currentTime);
+    }
+
+    private int getYearId(Timestamp timestamp) {
+        ZonedDateTime systemLocalDateTime = timestamp.toLocalDateTime().atZone(ZoneId.systemDefault());
+        ZonedDateTime userLocalDateTime = systemLocalDateTime.withZoneSameInstant(getTimeZone());
+        return userLocalDateTime.getYear() * 366 + userLocalDateTime.getDayOfYear();
     }
 
     private List<NoteEntity> getAllLinkableNotes(NoteEntity source) {
@@ -91,4 +98,7 @@ public class UserModel extends ModelForEntity<UserEntity>{
                 .collect(Collectors.toList());
     }
 
+    public ZoneId getTimeZone() {
+        return ZoneId.of("Asia/Shanghai");
+    }
 }

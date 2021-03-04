@@ -15,7 +15,7 @@ Feature: Initial Review
             | single note   | Note 1     |
             | single note   | Note 2     |
             | end of review |            |
-        Given It's day 1, 8 hour
+        Given It's day 1, 9 hour
         Then Reviews should have review pages in sequence:
             | review type   | title      |
             | end of review |            |
@@ -25,7 +25,7 @@ Feature: Initial Review
         Then Reviews should have review pages in sequence:
             | review type   | title      |
             | single note   | Note 1     |
-        Given It's day 1, 8 hour
+        Given It's day 1, 9 hour
         Then Reviews should have review pages in sequence:
             | review type   | title      |
             | single note   | Note 2     |
