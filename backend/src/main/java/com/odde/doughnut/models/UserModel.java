@@ -10,7 +10,6 @@ import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,10 +20,6 @@ public class UserModel extends ModelForEntity<UserEntity>{
 
     public String getName() {
         return entity.getName();
-    }
-
-    public int getDailyNewNotesCount() {
-        return entity.getDailyNewNotesCount();
     }
 
     public void setAndSaveDailyNewNotesCount(Integer dailyNewNotesCount) {
@@ -73,20 +68,8 @@ public class UserModel extends ModelForEntity<UserEntity>{
     }
 
     private int getNewNotesCountForToday(Timestamp currentTime) {
-        int countDown = entity.getDailyNewNotesCount();
-        countDown -= getRecentReviewPoints(currentTime).stream().filter(p -> sameDay(p.getLastReviewedAt(), currentTime)).count();
-
-        return countDown;
-    }
-
-    private boolean sameDay(Timestamp lastReviewedAt, Timestamp currentTime) {
-        return getYearId(lastReviewedAt) == getYearId(currentTime);
-    }
-
-    private int getYearId(Timestamp timestamp) {
-        ZonedDateTime systemLocalDateTime = timestamp.toLocalDateTime().atZone(ZoneId.systemDefault());
-        ZonedDateTime userLocalDateTime = systemLocalDateTime.withZoneSameInstant(getTimeZone());
-        return userLocalDateTime.getYear() * 366 + userLocalDateTime.getDayOfYear();
+        long sameDayCount = getRecentReviewPoints(currentTime).stream().filter(p -> p.isOnSameDay(currentTime, getTimeZone())).count();
+        return (int) (entity.getDailyNewNotesCount() - sameDayCount);
     }
 
     private List<NoteEntity> getAllLinkableNotes(NoteEntity source) {

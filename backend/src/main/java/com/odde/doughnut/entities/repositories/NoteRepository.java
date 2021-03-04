@@ -30,7 +30,7 @@ public interface NoteRepository extends CrudRepository<NoteEntity, Integer> {
     NoteEntity findFirstByParentNoteAndSiblingOrderGreaterThanOrderBySiblingOrder(NoteEntity parentNote, Long siblingOrder);
 
     @Query(
-            value = "SELECT note.id from note "
+            value = "SELECT note.* from note "
                     + " LEFT JOIN ("
                     + "     SELECT id, note_id FROM review_point WHERE user_id = :userId"
                     + " ) as rp"

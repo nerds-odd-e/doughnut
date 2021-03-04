@@ -1,19 +1,13 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.logging.log4j.util.Strings;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 @Entity
 @Table(name = "review_point")
@@ -48,6 +42,17 @@ public class ReviewPointEntity {
     @Getter
     @Setter
     private Timestamp lastReviewedAt;
+
+    public boolean isOnSameDay(Timestamp currentTime, ZoneId timeZone) {
+        return getYearId(getLastReviewedAt(), timeZone) == getYearId(currentTime, timeZone);
+    }
+
+    public static int getYearId(Timestamp timestamp, ZoneId timeZone) {
+        ZonedDateTime systemLocalDateTime = timestamp.toLocalDateTime().atZone(ZoneId.systemDefault());
+        ZonedDateTime userLocalDateTime = systemLocalDateTime.withZoneSameInstant(timeZone);
+        return userLocalDateTime.getYear() * 366 + userLocalDateTime.getDayOfYear();
+    }
+
 }
 
 
