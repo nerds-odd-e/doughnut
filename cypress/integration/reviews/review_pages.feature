@@ -14,7 +14,7 @@ Feature: Review Pages
     Scenario: Different review pages for different notes
         * Reviews should have review pages in sequence:
             | review type   | title      |   additional info             |
-            | related notes | Sedition   |   Sedation, Sedative          |
+#            | related notes | Sedition   |   Sedation, Sedative          |
             | single note   | Sedition   |   Incite violence             |
             | single note   | Sedation   |   Put to sleep                |
             | picture note  | Sedative   |   Sleep medicine; a_slide.jpg |

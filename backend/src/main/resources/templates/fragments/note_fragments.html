@@ -70,3 +70,16 @@
         <svg th:replace="fragments/svgs :: __${svg}__"/>
     </a>
 </div>
+<div th:fragment="noteShow(noteEntity)" th:object="${noteEntity}">
+    <h2 class="display-4" id="note-title" th:text="*{title}"/>
+    <pre id="note-description" th:text="*{description}" style="white-space: pre-wrap;"/>
+    <div th:if="*{url}">
+        <label th:unless="*{urlIsVideo}">Url:</label>
+        <label th:if="*{urlIsVideo}">Video Url:</label>
+        <a th:href="*{url}" th:text="*{url}"/>
+    </div>
+    <p id="note-picture" class="text-center" th:if="*{picture}">
+        <img class="img-fluid" th:src="*{picture}"/>
+    </p>
+</div>
+

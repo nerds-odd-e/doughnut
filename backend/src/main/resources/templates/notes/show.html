@@ -15,21 +15,14 @@
         </div>
         <div class="jumbotron py-4 mb-2">
             <nav class="nav d-flex flex-row-reverse p-0">
-<!--                the following commented code is for demo purpose -->
-<!--                <span class="descendant-counter" th:text="${treeNodeModel.descendantCount()}"/>-->
-<!--                <span class="descendant-counter" th:text="0"/>-->
+                <!--                the following commented code is for demo purpose -->
+                <!--                <span class="descendant-counter" th:text="${treeNodeModel.descendantCount()}"/>-->
+                <!--                <span class="descendant-counter" th:text="0"/>-->
                 <div th:replace="fragments/note_fragments :: noteButtons(${noteEntity})"/>
             </nav>
-            <h2 class="display-4" th:text="${noteEntity.title}"/>
-            <pre th:each="line : ${noteEntity.description}" th:text="${line}" style="white-space: pre-wrap;"/>
-            <div th:if="${noteEntity.url}">
-                <label th:unless="${noteEntity.urlIsVideo}">Url:</label>
-                <label th:if="${noteEntity.urlIsVideo}">Video Url:</label>
-                <a th:href="${noteEntity.url}" th:text="${noteEntity.url}"/>
-            </div>
-            <p class="text-center" th:if="${noteEntity.picture}">
-                <img class="img-fluid" th:src="${noteEntity.picture}"/>
-            </p>
+
+            <div th:replace="fragments/note_fragments :: noteShow(${noteEntity})"/>
+
         </div>
 
         <nav class="nav d-flex justify-content-between p-0 mb-2">
@@ -41,7 +34,7 @@
                 <a th:replace="fragments/note_fragments :: noteLinkButton(${treeNodeModel.previousNote}, 'backward', 'previous')"/>
                 <a th:replace="fragments/note_fragments :: noteLinkButton(${treeNodeModel.nextNote}, 'forward', 'next')"/>
                 <a th:replace="fragments/note_fragments :: noteLinkButton(${treeNodeModel.nextSiblingNote}, 'fastForward', 'next sibling')"/>
-            </a>
+                </a>
         </nav>
 
         <div th:replace="fragments/note_fragments :: noteViewCards(${noteEntity.children})"/>

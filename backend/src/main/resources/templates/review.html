@@ -3,13 +3,7 @@
     <div class="container content">
         <h2 class="display-2">Review your notes</h2>
 
-        <div class="review-container">
-            <h3 id="note-title" class="display-4"></h3>
-            <p id="note-description" class="lead"></p>
-            <p id="note-picture" class="lead"></p>
-            <p id="note-links-label" class="lead"></p>
-            <ul id="note-links" class="list-group"></ul>
-        </div>
+        <div th:replace="fragments/note_fragments :: noteShow(${reviewPointEntity.noteEntity})"/>
 
         <form action="#" th:action="@{/review_points/}" th:object="${reviewPointEntity}" method="post">
             <input th:field="*{noteEntity}" type="hidden"/>
