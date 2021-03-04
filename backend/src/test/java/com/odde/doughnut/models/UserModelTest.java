@@ -24,11 +24,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class UserModelTest {
     @Autowired MakeMe makeMe;
     UserModel userModel;
+    UserModel anotherUser;
     Timestamp day1;
 
     @BeforeEach
     void setup() {
         userModel = makeMe.aUser().toModelPlease();
+        anotherUser = makeMe.aUser().toModelPlease();
         day1 = makeMe.aTimestamp().of(1, 8).forWhereTheUserIs(userModel).please();
     }
 
@@ -37,7 +39,6 @@ public class UserModelTest {
 
         @Test
         void whenThereIsNoNotesForUser() {
-            UserModel anotherUser = makeMe.aUser().toModelPlease();
             makeMe.aNote().forUser(anotherUser).please();
             assertEquals(0, userModel.getNewNotesToReview(day1).size());
         }
@@ -81,9 +82,8 @@ public class UserModelTest {
 
                 @Test
                 void shouldIncludeNotesThatAreReviewedByOtherPeople() {
-                    UserModel anotherUser = makeMe.aUser().toModelPlease();
                     makeMe.aReviewPointFor(note1).by(anotherUser).on(day1).please();
-                    assertThat(userModel.getNewNotesToReview(day1), hasSize(equalTo(1)));
+                    assertThat(userModel.getNewNotesToReview(day1), contains(note1));
                 }
 
                 @Test

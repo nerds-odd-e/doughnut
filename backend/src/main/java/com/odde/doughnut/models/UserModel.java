@@ -58,20 +58,12 @@ public class UserModel extends ModelForEntity<UserEntity>{
     }
 
     public List<NoteEntity> getNewNotesToReview(Timestamp currentTime) {
-        List<NoteEntity> notes = new ArrayList<>();
-        int countDown = getNewNotesCountForToday(currentTime);
-        for(NoteEntity note: entity.getNotes()) {
-            if (countDown <= 0) {
-                break;
-            }
-            boolean byNoteEntity = entity.getReviewPoints().stream().anyMatch(rp->rp.getNoteEntity() == note);
-            if (!byNoteEntity) {
-                notes.add(note);
-                countDown--;
-            }
-        }
+        int count = getNewNotesCountForToday(currentTime);
+        return getNotesHaveNotBeenReviewedAtAll().stream().limit(count).collect(Collectors.toList());
+    }
 
-        return notes;
+    private List<NoteEntity> getNotesHaveNotBeenReviewedAtAll() {
+        return modelFactoryService.noteRepository.findByUserWhereThereIsNoReviewPoint(entity.getId());
     }
 
     private List<ReviewPointEntity> getRecentReviewPoints(Timestamp currentTime) {
