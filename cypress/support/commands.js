@@ -112,4 +112,18 @@ Cypress.Commands.add("updateCurrentUserSettingsWith", (hash) => {
   }).its("body").should("contain", "OK")
 });
 
+Date.prototype.addDays = function(days) {
+    var date = new Date(this.valueOf());
+    date.setDate(date.getDate() + days);
+    return date;
+}
+
+Cypress.Commands.add("timeTravelTo", (day, hour) => {
+  const travelTo = new Date(1976, 5, 1, hour).addDays(day);
+  cy.request({
+    method: "POST",
+    url: "/api/testability/time_travel",
+    body: { travel_to: JSON.stringify(travelTo) }
+  }).its("body").should("contain", "OK")
+});
 
