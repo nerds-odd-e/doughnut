@@ -6,7 +6,7 @@ import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.NoteMotionEntity;
 import com.odde.doughnut.entities.UserEntity;
-import com.odde.doughnut.models.NoteModel;
+import com.odde.doughnut.models.NoteContentModel;
 import com.odde.doughnut.models.TreeNodeModel;
 import com.odde.doughnut.services.ModelFactoryService;
 import org.springframework.http.MediaType;
@@ -93,8 +93,8 @@ public class NoteController {
     public String linkNote(@PathVariable("noteEntity") NoteEntity noteEntity, Integer targetNoteId) throws NoAccessRightException {
         currentUser.getUser().assertAuthorization(noteEntity);
         NoteEntity targetNote = modelFactoryService.noteRepository.findById(targetNoteId).get();
-        NoteModel noteModel = modelFactoryService.toNoteModel(noteEntity);
-        noteModel.linkNote(targetNote);
+        NoteContentModel noteContentModel = modelFactoryService.toNoteModel(noteEntity);
+        noteContentModel.linkNote(targetNote);
         return "redirect:/notes/" + noteEntity.getId();
     }
 

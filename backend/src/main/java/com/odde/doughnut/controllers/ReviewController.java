@@ -9,7 +9,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Controller
 public class ReviewController {
@@ -23,7 +22,7 @@ public class ReviewController {
 
     @GetMapping("/review")
     public String review(Model model) {
-        List<NoteEntity> notes = currentUser.getUser().getNotesInDescendingOrder();
+        List<NoteEntity> notes = currentUser.getUser().getNewNotesToReview();
         if (notes.size() > 0) {
             NoteEntity noteEntity = notes.get(0);
             if (modelFactoryService.reviewPointRepository.findByNoteEntity(noteEntity) != null) {

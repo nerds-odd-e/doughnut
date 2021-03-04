@@ -1,6 +1,5 @@
 package com.odde.doughnut.entities;
 
-import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,7 +27,7 @@ public class UserEntityTest {
     @Test
     void shouldReturnEmptyListWhenThhereIsNoNode() {
         UserEntity userEntity = makeMe.aUser().inMemoryPlease();
-        assertEquals(0, userEntity.getNotesInDescendingOrder().size());
+        assertEquals(0, userEntity.getNewNotesToReview().size());
     }
 
     @Test
@@ -36,7 +35,7 @@ public class UserEntityTest {
         UserEntity userEntity = makeMe.aUser().please();
         NoteEntity note = makeMe.aNote().forUser(userEntity).please();
         makeMe.refresh(entityManager, userEntity);
-        assertThat(userEntity.getNotesInDescendingOrder(), contains(note));
+        assertThat(userEntity.getNewNotesToReview(), contains(note));
     }
 
     @Test
@@ -47,7 +46,7 @@ public class UserEntityTest {
         NoteEntity note2 = makeMe.aNote().forUser(userEntity).please();
         makeMe.refresh(entityManager, userEntity);
 
-        assertEquals(note2.getTitle(), userEntity.getNotesInDescendingOrder().get(0).getTitle());
+        assertEquals(note2.getTitle(), userEntity.getNewNotesToReview().get(0).getTitle());
     }
 
 }

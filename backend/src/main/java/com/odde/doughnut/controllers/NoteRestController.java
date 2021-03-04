@@ -22,7 +22,7 @@ public class NoteRestController {
 
     @GetMapping(value = "/api/notes", produces = MediaType.APPLICATION_JSON_VALUE)
     public List<NoteEntity> getNotes() {
-        List<NoteEntity> notes = currentUser.getUser().getNotesInDescendingOrder();
+        List<NoteEntity> notes = currentUser.getUser().getNewNotesToReview();
         return notes.stream().limit(currentUser.getUser().getDailyNewNotesCount()).collect(Collectors.toList());
     }
 

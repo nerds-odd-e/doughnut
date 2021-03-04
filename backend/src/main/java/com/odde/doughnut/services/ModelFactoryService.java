@@ -6,7 +6,7 @@ import com.odde.doughnut.entities.repositories.BazaarNoteRepository;
 import com.odde.doughnut.entities.repositories.ReviewPointRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
 import com.odde.doughnut.models.BazaarModel;
-import com.odde.doughnut.models.NoteModel;
+import com.odde.doughnut.models.NoteContentModel;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.models.NoteMotionModel;
@@ -31,8 +31,8 @@ public class ModelFactoryService {
         this.reviewPointRepository = reviewPointRepository;
     }
 
-    public NoteModel toNoteModel(NoteEntity note) {
-        return new NoteModel(note, this);
+    public NoteContentModel toNoteModel(NoteEntity note) {
+        return new NoteContentModel(note, this);
     }
 
     public TreeNodeModel toTreeNodeModel(NoteEntity note) {

@@ -33,7 +33,7 @@ public class UserEntity {
 
     @Column(name = "space_intervals") @Getter @Setter private String spaceIntervals = "1, 2, 3, 5, 8, 13, 21, 34, 55";
 
-    public List<NoteEntity> getNotesInDescendingOrder() {
+    public List<NoteEntity> getNewNotesToReview() {
         List<NoteEntity> notes = getNotes();
         notes.sort(Comparator.comparing(NoteEntity::getUpdatedDatetime).reversed());
         return notes;

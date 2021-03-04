@@ -9,12 +9,12 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-public class NoteModel {
+public class NoteContentModel {
 
     private final NoteEntity note;
     private final ModelFactoryService modelFactoryService;
 
-    public NoteModel(NoteEntity note, ModelFactoryService modelFactoryService) {
+    public NoteContentModel(NoteEntity note, ModelFactoryService modelFactoryService) {
         this.note = note;
         this.modelFactoryService = modelFactoryService;
     }
