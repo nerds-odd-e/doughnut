@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ModelFactoryService;
+import com.odde.doughnut.testability.TimeTraveler;
 import org.junit.jupiter.api.Test;
 import org.springframework.ui.Model;
 
@@ -15,9 +16,10 @@ class ReviewControllerTests {
   @Test
   void shouldProceedToReviewPage() {
     UserModel userModel = mock(UserModel.class);
-    when(userModel.getNewNotesToReview()).thenReturn(new ArrayList<>());
+    TimeTraveler timeTraveler = mock(TimeTraveler.class);
+    when(userModel.getNewNotesToReview(null)).thenReturn(new ArrayList<>());
     ModelFactoryService modelFactoryService = mock(ModelFactoryService.class);
-    ReviewController controller = new ReviewController(new TestCurrentUserFetcher(userModel), modelFactoryService);
+    ReviewController controller = new ReviewController(new TestCurrentUserFetcher(userModel), modelFactoryService, timeTraveler);
     Model model = mock(Model.class);
     assertEquals("review_done", controller.review(model));
   }

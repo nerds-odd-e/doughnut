@@ -3,16 +3,11 @@ package com.odde.doughnut.testability;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.models.ModelForEntity;
 import com.odde.doughnut.services.ModelFactoryService;
-import com.odde.doughnut.testability.builders.BazaarNoteBuilder;
-import com.odde.doughnut.testability.builders.FakeBindingResult;
-import com.odde.doughnut.testability.builders.NoteBuilder;
-import com.odde.doughnut.testability.builders.UserBuilder;
+import com.odde.doughnut.testability.builders.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 
-import javax.persistence.EntityManager;
 import java.nio.CharBuffer;
 
 @Component
@@ -59,5 +54,9 @@ public class MakeMe {
 
     public ReviewPointBuilder aReviewPointFor(NoteEntity noteEntity) {
         return new ReviewPointBuilder(noteEntity, this);
+    }
+
+    public TimestampBuilder aTimestamp() {
+        return new TimestampBuilder();
     }
 }

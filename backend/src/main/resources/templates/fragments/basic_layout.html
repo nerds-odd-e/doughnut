@@ -8,7 +8,7 @@
     <link th:rel="stylesheet" th:href=
     "@{/webjars/bootstrap/4.6.0/css/bootstrap.min.css}">
 </head>
-<body onload="javascript:populateAllNotesForReview()">
+<body>
     <div th:fragment="header">
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
@@ -44,7 +44,6 @@
         </div>
     </div>
     <foot th:fragment="foot">
-        <script type="text/javascript" src="/js/review.js"></script>
         <script th:src=
                         "@{/webjars/jquery/3.5.1/jquery.min.js}"></script>
         <script th:src=

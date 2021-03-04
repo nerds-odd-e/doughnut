@@ -4,6 +4,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.SessionScope;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
 
 @Component
 @SessionScope
@@ -14,7 +15,7 @@ public class TimeTraveler {
         this.timestamp = timestamp;
     }
 
-    public Timestamp getCurrentTime() {
+    public Timestamp getCurrentUTCTimestamp() {
         if (timestamp == null) {
             return new Timestamp(System.currentTimeMillis());
         }
