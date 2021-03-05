@@ -16,5 +16,9 @@
 // Import commands.js using ES2015 syntax:
 import './commands'
 
+String.prototype.commonSenseSplit = function(separator) {
+   return this.split(separator).filter(s => s !== "");
+}
+
 // Alternatively you can use CommonJS syntax:
 // require('./commands')

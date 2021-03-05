@@ -39,7 +39,18 @@ public class ReviewController {
         ReviewPointEntity reviewPointEntity = new ReviewPointEntity();
         reviewPointEntity.setNoteEntity(notes.get(0));
         model.addAttribute("reviewPointEntity", reviewPointEntity);
+        return "reviews/initial";
+    }
 
+    @GetMapping("/reviews/repeat")
+    public String repeatReview(Model model) {
+        List<NoteEntity> notes = currentUserFetcher.getUser().getNewNotesToReview(timeTraveler.getCurrentUTCTimestamp());
+        if (notes.size() == 0) {
+            return "reviews/initial_done";
+        }
+        ReviewPointEntity reviewPointEntity = new ReviewPointEntity();
+        reviewPointEntity.setNoteEntity(notes.get(0));
+        model.addAttribute("reviewPointEntity", reviewPointEntity);
         return "reviews/initial";
     }
 

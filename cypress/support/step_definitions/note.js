@@ -47,7 +47,7 @@ When("I am creating note under {string}", (noteTitles, data) => {
 
 When("I should see {string} in breadcrumb", (noteTitles, data) => {
   cy.get('.breadcrumb').within( ()=>
-      noteTitles.split(", ").forEach(noteTitle => cy.findByText(noteTitle ))
+      noteTitles.commonSenseSplit(", ").forEach(noteTitle => cy.findByText(noteTitle ))
   )
 });
 

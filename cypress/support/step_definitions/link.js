@@ -30,6 +30,6 @@ When("I search for notes with title {string}", (searchKey) => {
 })
 
 And("I should see {string} as targets only",(noteTitlesAsString) => {
-    cy.expectExactLinkTargets(noteTitlesAsString.split(",").map(i=>i.trim()));
+    cy.expectExactLinkTargets(noteTitlesAsString.commonSenseSplit(",").map(i=>i.trim()));
 })
 

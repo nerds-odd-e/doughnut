@@ -7,11 +7,12 @@ Feature: Spaced-repetition
         And my space setting is "1, 2, 4, 8"
         Given there are notes from Note 1 to Note 3
 
+        @ignore
     Scenario: Strictly follow the schedule
         * I should be able to follow these review actions:
             | day  | old_notes_to_review | initial_review  |
             | 1    |                     | 1               |
-#            | 2    | 1                   | 2               |
+            | 2    | 1                   | 2               |
 #            | 3    | 2                   | 3               |
 #            | 4    | 1, 3                |                 |
 #            | 5    | 2                   |                 |

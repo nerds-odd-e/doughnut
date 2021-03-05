@@ -71,7 +71,7 @@ Cypress.Commands.add("expectNoteCards", (expectedCards) => {
 
 Cypress.Commands.add("navigateToNotePage", (noteTitlesDividedBySlash) => {
   cy.visit("/notes");
-  noteTitlesDividedBySlash.split("/").forEach(noteTitle => cy.findByText(noteTitle).click());
+  noteTitlesDividedBySlash.commonSenseSplit("/").forEach(noteTitle => cy.findByText(noteTitle).click());
 });
 
 // jumptoNotePage is faster than navigateToNotePage
@@ -143,7 +143,7 @@ Cypress.Commands.add("initialReviewOneNoteIfThereIs", ({review_type, title, addi
 
         case  "picture note": {
             if(additional_info) {
-                const [expectedDescription, expectedPicture] = additional_info.split("; ")
+                const [expectedDescription, expectedPicture] = additional_info.commonSenseSplit("; ")
                 cy.get('#note-description').should("contain", expectedDescription);
                 cy.get('#note-picture').find('img').should('have.attr', 'src').should('include',expectedPicture);
             }
@@ -152,7 +152,7 @@ Cypress.Commands.add("initialReviewOneNoteIfThereIs", ({review_type, title, addi
 
         case "related notes": {
             if(additional_info) {
-                additional_info.split(", ").forEach(expectedLinkTarget =>
+                additional_info.commonSenseSplit(", ").forEach(expectedLinkTarget =>
                     cy.findByText(expectedLinkTarget, {selector: '#note-links li'})
                 )
             }
@@ -165,4 +165,8 @@ Cypress.Commands.add("initialReviewOneNoteIfThereIs", ({review_type, title, addi
 
         cy.findByText("Next").click();
     }
+});
+
+Cypress.Commands.add("repeatReviewOneNoteIfThereIs", ({review_type, title, additional_info}) => {
+    cy.initialReviewOneNoteIfThereIs({review_type, title, additional_info});
 });
