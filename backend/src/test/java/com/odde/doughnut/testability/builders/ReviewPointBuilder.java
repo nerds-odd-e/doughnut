@@ -8,6 +8,7 @@ import com.odde.doughnut.testability.EntityAndModelBuilder;
 import com.odde.doughnut.testability.MakeMe;
 
 import java.sql.Timestamp;
+import java.util.function.Supplier;
 
 public class ReviewPointBuilder extends EntityAndModelBuilder<ReviewPointEntity, ReviewPointModel> {
 
@@ -30,12 +31,4 @@ public class ReviewPointBuilder extends EntityAndModelBuilder<ReviewPointEntity,
         return this;
     }
 
-    public ReviewPointEntity please() {
-        makeMe.modelFactoryService.entityManager.persist(entity);
-        return entity;
-    }
-
-    public ReviewPointModel toModelPlease() {
-        return new ReviewPointModel(please(), makeMe.modelFactoryService);
-    }
 }
