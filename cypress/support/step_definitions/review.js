@@ -17,15 +17,14 @@ Given("It's day {int}, {int} hour", (day, hour) => {
     cy.timeTravelTo(day, hour);
 });
 
-Then("On day {int} at {int} hour I repeat old {string} and at {int} hour initial review new {string}", (day, repeatHour, repeatNotes, initialHour, initialNotes) => {
-    cy.timeTravelTo(day, repeatHour);
+Then("On day {int} I repeat old {string} and initial review new {string}", (day, repeatNotes, initialNotes) => {
+    cy.timeTravelTo(day, 8);
     cy.visit('/reviews/repeat');
     repeatNotes.commonSenseSplit(",").forEach(title => {
         const review_type = "single note";
         cy.repeatReviewOneNoteIfThereIs({review_type, title});
     });
 
-    cy.timeTravelTo(day, initialHour);
     cy.visit('/reviews/initial');
     initialNotes.commonSenseSplit(", ").forEach(title => {
         const review_type = "single note";

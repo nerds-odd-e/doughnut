@@ -65,7 +65,7 @@ public class ReviewController {
         reviewPointEntity.setLastReviewedAt(timeTraveler.getCurrentUTCTimestamp());
         reviewPointEntity.repeatedOnTime();
         modelFactoryService.reviewPointRepository.save(reviewPointEntity);
-        return "redirect:/reviews/initial";
+        return "redirect:/reviews/repeat";
     }
 
 }
