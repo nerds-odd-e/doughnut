@@ -5,7 +5,7 @@
 
         <div th:replace="fragments/note_fragments :: noteShow(${reviewPointEntity.noteEntity})"/>
 
-        <form action="#" th:action="@{/review_points/}" th:object="${reviewPointEntity}" method="post">
+        <form action="#" th:action="@{/reviews/}" th:object="${reviewPointEntity}" method="post">
             <input th:field="*{noteEntity}" type="hidden"/>
             <input type="submit" value="Next" class="btn btn-primary"/>
         </form>

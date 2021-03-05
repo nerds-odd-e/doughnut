@@ -30,26 +30,26 @@ public class ReviewController {
         this.timeTraveler = timeTraveler;
     }
 
-    @GetMapping("/review")
+    @GetMapping("/reviews/initial")
     public String review(Model model) {
         List<NoteEntity> notes = currentUserFetcher.getUser().getNewNotesToReview(timeTraveler.getCurrentUTCTimestamp());
         if (notes.size() == 0) {
-            return "review_done";
+            return "reviews/initial_done";
         }
         ReviewPointEntity reviewPointEntity = new ReviewPointEntity();
         reviewPointEntity.setNoteEntity(notes.get(0));
         model.addAttribute("reviewPointEntity", reviewPointEntity);
 
-        return "review";
+        return "reviews/initial";
     }
 
-    @PostMapping("/review_points")
+    @PostMapping("/reviews")
     public String create(@Valid ReviewPointEntity reviewPointEntity) {
         UserModel userModel = currentUserFetcher.getUser();
         reviewPointEntity.setLastReviewedAt(timeTraveler.getCurrentUTCTimestamp());
         reviewPointEntity.setUserEntity(userModel.getEntity());
         modelFactoryService.reviewPointRepository.save(reviewPointEntity);
-        return "redirect:/review";
+        return "redirect:/reviews/initial";
     }
 
 }
