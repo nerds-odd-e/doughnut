@@ -1,6 +1,7 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.entities.NoteMotionEntity;
+import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.entities.UserEntity;
 import com.odde.doughnut.entities.repositories.BazaarNoteRepository;
 import com.odde.doughnut.entities.repositories.ReviewPointRepository;
@@ -12,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
+import javax.validation.Valid;
 import java.util.Optional;
 
 @Service
@@ -60,5 +62,9 @@ public class ModelFactoryService {
             return null;
         }
         return new UserModel(userEntity, this);
+    }
+
+    public ReviewPointModel toReviewPointModel(@Valid ReviewPointEntity reviewPointEntity) {
+        return new ReviewPointModel(reviewPointEntity, this);
     }
 }
