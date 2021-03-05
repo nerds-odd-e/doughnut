@@ -31,8 +31,4 @@ public class TimestampBuilder {
         return Timestamp.valueOf(utc.plusDays(day).toLocalDateTime());
     }
 
-    public TimestampBuilder atTimeZone(String zoneId) {
-        userTimeZone = ZoneId.of("Asia/Shanghai");
-        return this;
-    }
 }
