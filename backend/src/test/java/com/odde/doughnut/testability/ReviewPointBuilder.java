@@ -2,6 +2,7 @@ package com.odde.doughnut.testability;
 
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.ReviewPointEntity;
+import com.odde.doughnut.models.ReviewPointModel;
 import com.odde.doughnut.models.UserModel;
 
 import java.sql.Timestamp;
@@ -29,5 +30,9 @@ public class ReviewPointBuilder {
     public ReviewPointEntity please() {
         makeMe.modelFactoryService.entityManager.persist(reviewPointEntity);
         return reviewPointEntity;
+    }
+
+    public ReviewPointModel toModelPlease() {
+        return new ReviewPointModel(please(), makeMe.modelFactoryService);
     }
 }
