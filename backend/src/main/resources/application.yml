@@ -8,7 +8,7 @@ spring:
     password: doughnut
     driver-class-name: org.mariadb.jdbc.Driver
   flyway:
-    clean-on-validation-error: true
+    clean-on-validation-error: false
   jpa:
     generate-ddl: false
     show-sql: false
@@ -33,7 +33,7 @@ spring:
     password: ${MYSQL_PASSWORD}
     driver-class-name: org.mariadb.jdbc.Driver
   flyway:
-    clean-on-validation-error: true
+    clean-on-validation-error: false
   jpa:
     generate-ddl: false
     show-sql: false
