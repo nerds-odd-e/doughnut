@@ -3,22 +3,21 @@ Feature: Spaced-repetition
 
     Background:
         Given I've logged in as an existing user
-        And my daily new notes to review is set to 2
+        And my daily new notes to review is set to 1
         And my space setting is "1, 2, 4, 8"
-        Given there are notes from Note 1 to Note 5
+        Given there are notes from Note 1 to Note 3
 
-        @ignore
     Scenario: Strictly follow the schedule
-        Then Review in sequence
-            | day  | old notes to review | new notes to review  |
-            | 1    |                     | 1, 2                 |
-            | 2    | 1, 2                | 3, 4                 |
-            | 3    | 3, 4                | 5                    |
-            | 4    | 1, 2, 5             |                      |
-            | 5    | 3, 4                |                      |
-            | 6    |                     |                      |
-            | 7    | 5                   |                      |
-            | 8    | 1, 2                |                      |
+        * I should be able to follow these review actions:
+            | day  | old notes to review | initial review  |
+            | 1    |                     | 1               |
+#            | 2    | 1                   | 2               |
+#            | 3    | 2                   | 3               |
+#            | 4    | 1, 3                |                 |
+#            | 5    | 2                   |                 |
+#            | 6    |                     |                 |
+#            | 7    | 3                   |                 |
+#            | 8    | 1                   |                 |
 
     @ignore
     Scenario: Not strictly follow the schedule

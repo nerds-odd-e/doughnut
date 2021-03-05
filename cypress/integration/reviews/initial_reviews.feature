@@ -10,35 +10,35 @@ Feature: Initial Review
 
     Scenario: First day of review
         Given It's day 1, 8 hour
-        Then Reviews should have review pages in sequence:
+        Then I do these initial reviews in sequence:
             | review type   | title      |
             | single note   | Note 1     |
             | single note   | Note 2     |
             | end of review |            |
         Given It's day 1, 9 hour
-        Then Reviews should have review pages in sequence:
+        Then I do these initial reviews in sequence:
             | review type   | title      |
             | end of review |            |
 
     Scenario: First day review only part of the daily number
         Given It's day 1, 8 hour
-        Then Reviews should have review pages in sequence:
+        Then I do these initial reviews in sequence:
             | review type   | title      |
             | single note   | Note 1     |
         Given It's day 1, 9 hour
-        Then Reviews should have review pages in sequence:
+        Then I do these initial reviews in sequence:
             | review type   | title      |
             | single note   | Note 2     |
             | end of review |            |
 
     Scenario: Follow schedule strictly for 2 days
         Given It's day 1, 8 hour
-        Then Reviews should have review pages in sequence:
+        Then I do these initial reviews in sequence:
             | review type   | title      |
             | single note   | Note 1     |
             | single note   | Note 2     |
         Given It's day 2, 8 hour
-        Then Reviews should have review pages in sequence:
+        Then I do these initial reviews in sequence:
             | review type   | title      |
             | single note   | Note 3     |
 

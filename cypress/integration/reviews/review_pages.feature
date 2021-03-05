@@ -12,7 +12,7 @@ Feature: Review Pages
         And I link note "Sedition" to note "Sedative"
 
     Scenario: Different review pages for different notes
-        * Reviews should have review pages in sequence:
+        * I do these initial reviews in sequence:
             | review type   | title      |   additional info             |
 #            | related notes | Sedition   |   Sedation, Sedative          |
             | single note   | Sedition   |   Incite violence             |

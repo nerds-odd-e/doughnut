@@ -6,7 +6,7 @@ import {
   Before,
 } from "cypress-cucumber-preprocessor/steps";
 
-Then("Reviews should have review pages in sequence:", (data) => {
+Then("I do these initial reviews in sequence:", (data) => {
   cy.visit('/review');
   data.hashes().forEach(reviewPage => {
     const additionalInfo = reviewPage["additional info"];
@@ -51,13 +51,13 @@ Then("Reviews should have review pages in sequence:", (data) => {
   });
 })
 
-Then("Review in sequence", (data) => {
+Given("It's day {int}, {int} hour", (day, hour) => {
+    cy.timeTravelTo(day, hour);
+});
+
+Then("I should be able to follow these review actions:", (data) => {
   data.hashes().forEach(reviewActionsOfADay => {
     cy.timeTravelTo(reviewActionsOfADay["day"], 8);
   });
-});
-
-Given("It's day {int}, {int} hour", (day, hour) => {
-    cy.timeTravelTo(day, hour);
 });
 
