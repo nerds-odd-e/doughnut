@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.Iterator;
 import java.util.List;
 
 @Controller
@@ -45,13 +46,13 @@ public class ReviewController {
     @GetMapping("/reviews/repeat")
     public String repeatReview(Model model) {
         List<NoteEntity> notes = currentUserFetcher.getUser().getNewNotesToReview(timeTraveler.getCurrentUTCTimestamp());
-        if (notes.size() == 0) {
-            return "reviews/initial_done";
+        Iterator<ReviewPointEntity> iterator = modelFactoryService.reviewPointRepository.findAll().iterator();
+        if (iterator.hasNext()) {
+            ReviewPointEntity reviewPointEntity = iterator.next();
+            model.addAttribute("reviewPointEntity", reviewPointEntity);
+            return "reviews/initial";
         }
-        ReviewPointEntity reviewPointEntity = new ReviewPointEntity();
-        reviewPointEntity.setNoteEntity(notes.get(0));
-        model.addAttribute("reviewPointEntity", reviewPointEntity);
-        return "reviews/initial";
+        return "reviews/initial_done";
     }
 
     @PostMapping("/reviews")
