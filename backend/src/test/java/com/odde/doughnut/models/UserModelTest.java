@@ -15,7 +15,6 @@ import java.sql.Timestamp;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
@@ -39,7 +38,7 @@ public class UserModelTest {
         @Test
         void whenThereIsNoNotesForUser() {
             makeMe.aNote().forUser(anotherUser).please();
-            assertEquals(0, userModel.getNewNotesToReview(day1).size());
+            assertThat(userModel.getOneInitialReviewPointEntity(day1), is(nullValue()));
         }
 
         @Nested
@@ -55,8 +54,10 @@ public class UserModelTest {
             }
 
             @Test
-            void shouldReturnTheNoteWhenThereAreTwo() {
-                assertThat(userModel.getNewNotesToReview(day1), contains(note1, note2));
+            void shouldReturnTheFirstNoteAndThenTheSecondWhenThereAreTwo() {
+                assertThat(userModel.getOneInitialReviewPointEntity(day1).getNoteEntity(), equalTo(note1));
+                makeMe.aReviewPointFor(note1).by(userModel).initiallyReviewedOn(day1).please();
+                assertThat(userModel.getOneInitialReviewPointEntity(day1).getNoteEntity(), equalTo(note2));
             }
 
             @Nested
@@ -69,34 +70,34 @@ public class UserModelTest {
 
                 @Test
                 void shouldReturnOneIfUsersDailySettignIsOne() {
-                    assertThat(userModel.getNewNotesToReview(day1), hasSize(equalTo(1)));
+                    assertThat(userModel.getOneInitialReviewPointEntity(day1).getNoteEntity(), equalTo(note1));
                 }
 
 
                 @Test
                 void shouldNotIncludeNotesThatAreAlreadyReviewed() {
                     makeMe.aReviewPointFor(note1).by(userModel).initiallyReviewedOn(day1).please();
-                    assertThat(userModel.getNewNotesToReview(day1), hasSize(equalTo(0)));
+                    assertThat(userModel.getOneInitialReviewPointEntity(day1), is(nullValue()));
                 }
 
                 @Test
                 void shouldIncludeNotesThatAreReviewedByOtherPeople() {
                     makeMe.aReviewPointFor(note1).by(anotherUser).initiallyReviewedOn(day1).please();
-                    assertThat(userModel.getNewNotesToReview(day1), contains(note1));
+                    assertThat(userModel.getOneInitialReviewPointEntity(day1).getNoteEntity(), equalTo(note1));
                 }
 
                 @Test
                 void theDailyCountShouldNotBeResetOnSameDayDifferentHour() {
                     makeMe.aReviewPointFor(note1).by(userModel).initiallyReviewedOn(day1).please();
                     Timestamp day1_23 = makeMe.aTimestamp().of(1, 23).forWhereTheUserIs(userModel).please();
-                    assertThat(userModel.getNewNotesToReview(day1_23), hasSize(equalTo(0)));
+                    assertThat(userModel.getOneInitialReviewPointEntity(day1_23), is(nullValue()));
                 }
 
                 @Test
                 void theDailyCountShouldBeResetOnNextDay() {
                     makeMe.aReviewPointFor(note1).by(userModel).initiallyReviewedOn(day1).please();
                     Timestamp day2 = makeMe.aTimestamp().of(2, 1).forWhereTheUserIs(userModel).please();
-                    assertThat(userModel.getNewNotesToReview(day2), hasSize(equalTo(1)));
+                    assertThat(userModel.getOneInitialReviewPointEntity(day2).getNoteEntity(), equalTo(note2));
                 }
 
             }
