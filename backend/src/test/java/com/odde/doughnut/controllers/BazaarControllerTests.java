@@ -34,7 +34,7 @@ class BazaarControllerTests {
     private UserModel userModel;
     private NoteEntity topNote;
     private BazaarController controller;
-    ExtendedModelMap model = new ExtendedModelMap();
+    final ExtendedModelMap model = new ExtendedModelMap();
 
 
     @BeforeEach

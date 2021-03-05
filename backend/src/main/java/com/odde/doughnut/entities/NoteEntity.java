@@ -87,7 +87,7 @@ public class NoteEntity {
     @OrderBy("sibling_order")
     @JsonIgnore
     @Getter
-    private List<NoteEntity> children = new ArrayList<>();
+    private final List<NoteEntity> children = new ArrayList<>();
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "user_id", referencedColumnName = "id")

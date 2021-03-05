@@ -9,9 +9,9 @@ import java.time.LocalDate;
 import java.util.Date;
 
 public class NoteBuilder {
-    static TestObjectCounter titleCounter = new TestObjectCounter(n->"title" + n);
+    static final TestObjectCounter titleCounter = new TestObjectCounter(n->"title" + n);
     private final MakeMe makeMe;
-    private NoteEntity note = new NoteEntity();
+    private final NoteEntity note = new NoteEntity();
 
     public NoteBuilder(MakeMe makeMe){
         this.makeMe = makeMe;

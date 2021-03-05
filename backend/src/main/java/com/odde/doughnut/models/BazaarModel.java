@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BazaarModel {
-    BazaarNoteRepository bazaarNoteRepository;
+    final BazaarNoteRepository bazaarNoteRepository;
 
     public BazaarModel(ModelFactoryService modelFactoryService) {
         bazaarNoteRepository = modelFactoryService.bazaarNoteRepository;

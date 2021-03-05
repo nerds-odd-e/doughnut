@@ -36,8 +36,6 @@ public class ReviewController {
         if (notes.size() == 0) {
             return "review_done";
         }
-
-
         ReviewPointEntity reviewPointEntity = new ReviewPointEntity();
         reviewPointEntity.setNoteEntity(notes.get(0));
         model.addAttribute("reviewPointEntity", reviewPointEntity);

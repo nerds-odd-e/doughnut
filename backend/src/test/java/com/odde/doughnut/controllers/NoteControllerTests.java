@@ -38,7 +38,7 @@ class NoteControllerTests {
     private UserModel userModel;
     private NoteEntity parentNote;
     private NoteEntity childNote;
-    ExtendedModelMap model = new ExtendedModelMap();
+    final ExtendedModelMap model = new ExtendedModelMap();
     NoteController controller;
 
     @BeforeEach
@@ -98,7 +98,7 @@ class NoteControllerTests {
             BindingResult bindingResult = makeMe.failedBindingResult();
 
             String response = controller.createNote(newNote, bindingResult, model);
-            assertEquals(null, newNote.getId());
+            assertNull(newNote.getId());
             assertEquals("notes/new", response);
         }
 

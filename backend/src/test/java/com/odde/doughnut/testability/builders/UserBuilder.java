@@ -5,10 +5,10 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 
 public class UserBuilder {
-    static TestObjectCounter exIdCounter = new TestObjectCounter(n->"exid" + n);
-    static TestObjectCounter nameCounter = new TestObjectCounter(n->"user" + n);
+    static final TestObjectCounter exIdCounter = new TestObjectCounter(n->"exid" + n);
+    static final TestObjectCounter nameCounter = new TestObjectCounter(n->"user" + n);
 
-    private UserEntity userEntity = new UserEntity();
+    private final UserEntity userEntity = new UserEntity();
     private final MakeMe makeMe;
 
 

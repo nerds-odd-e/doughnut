@@ -1,16 +1,13 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.odde.doughnut.exceptions.NoAccessRightException;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "user")
@@ -38,7 +35,7 @@ public class UserEntity {
     @Column(name = "space_intervals") @Getter @Setter private String spaceIntervals = "1, 2, 3, 5, 8, 13, 21, 34, 55";
 
     public boolean owns(NoteEntity note) {
-        return note.getUserEntity().id == id;
+        return note.getUserEntity().id.equals(id);
     }
 
 }

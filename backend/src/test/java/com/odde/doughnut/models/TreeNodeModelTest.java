@@ -11,9 +11,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
@@ -31,6 +28,7 @@ class TreeNodeModelTest {
     }
 
     // This test is leaving empty for demo purpose
+    @SuppressWarnings("EmptyMethod")
     @Test
     void shouldGet_0_WhenNoDescendant() {
     }

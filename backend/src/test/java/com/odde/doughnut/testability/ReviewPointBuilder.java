@@ -8,7 +8,7 @@ import java.sql.Timestamp;
 
 public class ReviewPointBuilder {
     private final MakeMe makeMe;
-    private ReviewPointEntity reviewPointEntity;
+    private final ReviewPointEntity reviewPointEntity;
 
     public ReviewPointBuilder(NoteEntity noteEntity, MakeMe makeMe) {
         reviewPointEntity = new ReviewPointEntity();
