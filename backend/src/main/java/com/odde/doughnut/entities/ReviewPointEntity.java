@@ -1,6 +1,7 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.odde.doughnut.models.SpacedRepetition;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,8 +13,6 @@ import java.time.ZonedDateTime;
 @Entity
 @Table(name = "review_point")
 public class ReviewPointEntity {
-    private static final Integer DEFAULT_FORGETTING_CURVE_INDEX = 100;
-    private static final Integer DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT = 10;
     @Id
     @Getter
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -53,7 +52,7 @@ public class ReviewPointEntity {
     @Column(name = "forgetting_curve_index")
     @Getter
     @Setter
-    private Integer forgettingCurveIndex = DEFAULT_FORGETTING_CURVE_INDEX;
+    private Integer forgettingCurveIndex = SpacedRepetition.DEFAULT_FORGETTING_CURVE_INDEX;
 
     public boolean isInitialReviewOnSameDay(Timestamp currentTime, ZoneId timeZone) {
         return getDayId(getInitialReviewedAt(), timeZone) == getDayId(currentTime, timeZone);
@@ -66,7 +65,7 @@ public class ReviewPointEntity {
     }
 
     public void repeatedOnTime() {
-        forgettingCurveIndex += DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT;
+        this.forgettingCurveIndex = SpacedRepetition.getNextForgettingCurveIndex(this.forgettingCurveIndex);
     }
 
 }

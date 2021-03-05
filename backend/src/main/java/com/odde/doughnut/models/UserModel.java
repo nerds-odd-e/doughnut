@@ -10,8 +10,6 @@ import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -111,16 +109,14 @@ public class UserModel extends ModelForEntity<UserEntity> {
         return modelFactoryService.reviewPointRepository.findAllByUserEntityOrderByLastReviewedAt(getEntity()).stream().filter(
                 reviewPointEntity -> {
                     Timestamp lastReviewedAt = reviewPointEntity.getLastReviewedAt();
-                    Timestamp nextReviewTime = addDaysToTimestamp(lastReviewedAt, getDaysToAdd(reviewPointEntity));
+                    Timestamp nextReviewTime = addDaysToTimestamp(lastReviewedAt, getSpacedRepetition().getNextRepeatInDays(reviewPointEntity.getForgettingCurveIndex()));
                     return (nextReviewTime.compareTo(currentUTCTimestamp) != 1);
                 }
         ).findFirst().orElse(null) ;
     }
 
-    private int getDaysToAdd(ReviewPointEntity reviewPointEntity) {
-        int index = (reviewPointEntity.getForgettingCurveIndex() - 100) / 10;
-        List<Integer> spaces = Arrays.stream(entity.getSpaceIntervals().split(",\\s*")).map(Integer::valueOf).collect(Collectors.toList());
-        return spaces.get(index);
+    private SpacedRepetition getSpacedRepetition() {
+        return new SpacedRepetition(entity.getSpaceIntervals());
     }
 
 }
