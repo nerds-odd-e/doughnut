@@ -20,6 +20,6 @@ class ReviewControllerTests {
     ModelFactoryService modelFactoryService = mock(ModelFactoryService.class);
     ReviewController controller = new ReviewController(new TestCurrentUserFetcher(userModel), modelFactoryService, timeTraveler);
     Model model = mock(Model.class);
-    assertEquals("reviews/initial_done", controller.review(model));
+    assertEquals("redirect:/reviews", controller.review(model));
   }
 }
