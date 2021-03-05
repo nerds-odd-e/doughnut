@@ -84,4 +84,14 @@ public class UserModel extends ModelForEntity<UserEntity>{
     public ZoneId getTimeZone() {
         return ZoneId.of("Asia/Shanghai");
     }
+
+    public ReviewPointEntity getOneInitialReviewPointEntity(Timestamp currentUTCTimestamp) {
+        List<NoteEntity> notes = getNewNotesToReview(currentUTCTimestamp);
+        if (notes.size() == 0) {
+            return null;
+        }
+        ReviewPointEntity reviewPointEntity = new ReviewPointEntity();
+        reviewPointEntity.setNoteEntity(notes.get(0));
+        return reviewPointEntity;
+    }
 }

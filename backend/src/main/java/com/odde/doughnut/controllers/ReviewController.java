@@ -1,7 +1,6 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
-import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.models.ReviewPointModel;
 import com.odde.doughnut.models.UserModel;
@@ -14,8 +13,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.sql.Timestamp;
 import java.util.Iterator;
-import java.util.List;
 
 @Controller
 public class ReviewController {
@@ -34,12 +33,11 @@ public class ReviewController {
 
     @GetMapping("/reviews/initial")
     public String review(Model model) {
-        List<NoteEntity> notes = currentUserFetcher.getUser().getNewNotesToReview(timeTraveler.getCurrentUTCTimestamp());
-        if (notes.size() == 0) {
+        UserModel user = currentUserFetcher.getUser();
+        ReviewPointEntity reviewPointEntity = user.getOneInitialReviewPointEntity(timeTraveler.getCurrentUTCTimestamp());
+        if (reviewPointEntity == null) {
             return "reviews/initial_done";
         }
-        ReviewPointEntity reviewPointEntity = new ReviewPointEntity();
-        reviewPointEntity.setNoteEntity(notes.get(0));
         model.addAttribute("reviewPointEntity", reviewPointEntity);
         return "reviews/initial";
     }

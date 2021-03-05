@@ -18,9 +18,6 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
         entity.setDescription("descrption");
         entity.setUpdatedDatetime(java.sql.Date.valueOf(LocalDate.now()));
     }
-    public NoteEntity inMemoryPlease() {
-        return entity;
-    }
 
     public NoteBuilder forUser(UserEntity userEntity) {
         entity.setUserEntity(userEntity);
