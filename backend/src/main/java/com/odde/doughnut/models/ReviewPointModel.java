@@ -16,4 +16,10 @@ public class ReviewPointModel extends ModelForEntity<ReviewPointEntity> {
         getEntity().setUserEntity(userModel.getEntity());
         modelFactoryService.reviewPointRepository.save(getEntity());
     }
+
+    public void repeat(Timestamp currentUTCTimestamp) {
+        getEntity().setLastReviewedAt(currentUTCTimestamp);
+        getEntity().repeatedOnTime();
+        this.modelFactoryService.reviewPointRepository.save(getEntity());
+    }
 }

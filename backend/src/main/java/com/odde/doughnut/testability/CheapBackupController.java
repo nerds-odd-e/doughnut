@@ -1,4 +1,4 @@
-package com.odde.doughnut.controllers;
+package com.odde.doughnut.testability;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.services.ModelFactoryService;
@@ -10,11 +10,9 @@ import java.util.List;
 
 @RestController
 public class CheapBackupController {
-    private final CurrentUserFetcher currentUserFetcher;
     private final ModelFactoryService modelFactoryService;
 
-    public CheapBackupController(CurrentUserFetcher currentUserFetcher, ModelFactoryService modelFactoryService) {
-        this.currentUserFetcher = currentUserFetcher;
+    public CheapBackupController(ModelFactoryService modelFactoryService) {
         this.modelFactoryService = modelFactoryService;
     }
 

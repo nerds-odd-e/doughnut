@@ -71,9 +71,8 @@ public class ReviewController {
 
     @PostMapping("/{reviewPointEntity}")
     public String update(@Valid ReviewPointEntity reviewPointEntity) {
-        reviewPointEntity.setLastReviewedAt(timeTraveler.getCurrentUTCTimestamp());
-        reviewPointEntity.repeatedOnTime();
-        modelFactoryService.reviewPointRepository.save(reviewPointEntity);
+        ReviewPointModel reviewPointModel = modelFactoryService.toReviewPointModel(reviewPointEntity);
+        reviewPointModel.repeat(timeTraveler.getCurrentUTCTimestamp());
         return "redirect:/reviews/repeat";
     }
 

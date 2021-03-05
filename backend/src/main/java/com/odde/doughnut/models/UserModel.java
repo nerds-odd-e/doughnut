@@ -8,8 +8,6 @@ import com.odde.doughnut.services.ModelFactoryService;
 
 import java.sql.Timestamp;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -69,27 +67,21 @@ public class UserModel extends ModelForEntity<UserEntity> {
         if (count == 0) {
             return Optional.empty();
         }
-        List<NoteEntity> notesHaveNotBeenReviewedAtAll = getNotesHaveNotBeenReviewedAtAll();
-        return notesHaveNotBeenReviewedAtAll.stream().findFirst();
+        return getNotesHaveNotBeenReviewedAtAll().stream().findFirst();
     }
 
     private List<NoteEntity> getNotesHaveNotBeenReviewedAtAll() {
         return modelFactoryService.noteRepository.findByUserWhereThereIsNoReviewPoint(entity.getId());
     }
 
-    private List<ReviewPointEntity> getRecentReviewPoints(Timestamp currentTime) {
-        Timestamp oneDayAgo = addDaysToTimestamp(currentTime, -1);
-        return modelFactoryService.reviewPointRepository.findAllByUserEntityAndInitialReviewedAtGreaterThan(entity, oneDayAgo);
-    }
-
-    public static Timestamp addDaysToTimestamp(Timestamp timestamp, int daysToAdd) {
-        ZonedDateTime zonedDateTime = timestamp.toInstant().atZone(ZoneId.of("UTC"));
-        return Timestamp.from(zonedDateTime.plus(daysToAdd, ChronoUnit.DAYS).toInstant());
-    }
-
     private int getNewNotesCountForToday(Timestamp currentTime) {
         long sameDayCount = getRecentReviewPoints(currentTime).stream().filter(p -> p.isInitialReviewOnSameDay(currentTime, getTimeZone())).count();
         return (int) (entity.getDailyNewNotesCount() - sameDayCount);
+    }
+
+    private List<ReviewPointEntity> getRecentReviewPoints(Timestamp currentTime) {
+        Timestamp oneDayAgo = TimestampOptions.addDaysToTimestamp(currentTime, -1);
+        return modelFactoryService.reviewPointRepository.findAllByUserEntityAndInitialReviewedAtGreaterThan(entity, oneDayAgo);
     }
 
     private List<NoteEntity> getAllLinkableNotes(NoteEntity source) {
@@ -109,7 +101,7 @@ public class UserModel extends ModelForEntity<UserEntity> {
         return modelFactoryService.reviewPointRepository.findAllByUserEntityOrderByLastReviewedAt(getEntity()).stream().filter(
                 reviewPointEntity -> {
                     Timestamp lastReviewedAt = reviewPointEntity.getLastReviewedAt();
-                    Timestamp nextReviewTime = addDaysToTimestamp(lastReviewedAt, getSpacedRepetition().getNextRepeatInDays(reviewPointEntity.getForgettingCurveIndex()));
+                    Timestamp nextReviewTime = TimestampOptions.addDaysToTimestamp(lastReviewedAt, getSpacedRepetition().getNextRepeatInDays(reviewPointEntity.getForgettingCurveIndex()));
                     return (nextReviewTime.compareTo(currentUTCTimestamp) != 1);
                 }
         ).findFirst().orElse(null) ;
