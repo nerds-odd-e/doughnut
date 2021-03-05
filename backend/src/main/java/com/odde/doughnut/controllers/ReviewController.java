@@ -10,11 +10,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
 @Controller
+@RequestMapping("/reviews")
 public class ReviewController {
     private final CurrentUserFetcher currentUserFetcher;
     private final ModelFactoryService modelFactoryService;
@@ -29,18 +31,23 @@ public class ReviewController {
         this.timeTraveler = timeTraveler;
     }
 
-    @GetMapping("/reviews/initial")
+    @GetMapping("")
+    public String index(Model model) {
+        return "reviews/index";
+    }
+
+    @GetMapping("/initial")
     public String review(Model model) {
         UserModel user = currentUserFetcher.getUser();
         ReviewPointEntity reviewPointEntity = user.getOneInitialReviewPointEntity(timeTraveler.getCurrentUTCTimestamp());
         if (reviewPointEntity == null) {
-            return "reviews/initial_done";
+            return "redirect:/reviews";
         }
         model.addAttribute("reviewPointEntity", reviewPointEntity);
         return "reviews/initial";
     }
 
-    @GetMapping("/reviews/repeat")
+    @GetMapping("/repeat")
     public String repeatReview(Model model) {
         UserModel user = currentUserFetcher.getUser();
         ReviewPointEntity reviewPointEntity = user.getMostUrgentReviewPointEntity(timeTraveler.getCurrentUTCTimestamp());
@@ -48,19 +55,18 @@ public class ReviewController {
             model.addAttribute("reviewPointEntity", reviewPointEntity);
             return "reviews/repeat";
         }
-        return "reviews/initial_done";
+        return "redirect:/reviews";
     }
 
-    @PostMapping("/reviews")
+    @PostMapping("")
     public String create(@Valid ReviewPointEntity reviewPointEntity) {
         UserModel userModel = currentUserFetcher.getUser();
         ReviewPointModel reviewPointModel = modelFactoryService.toReviewPointModel(reviewPointEntity);
         reviewPointModel.initalReview(userModel, timeTraveler.getCurrentUTCTimestamp());
-
         return "redirect:/reviews/initial";
     }
 
-    @PostMapping("/reviews/{reviewPointEntity}")
+    @PostMapping("/{reviewPointEntity}")
     public String update(@Valid ReviewPointEntity reviewPointEntity) {
         reviewPointEntity.setLastReviewedAt(timeTraveler.getCurrentUTCTimestamp());
         reviewPointEntity.repeatedOnTime();
