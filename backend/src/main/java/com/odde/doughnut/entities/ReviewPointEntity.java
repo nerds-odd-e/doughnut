@@ -68,6 +68,10 @@ public class ReviewPointEntity {
     public void onTimeRepetition() {
         forgettingCurveIndex += DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT;
     }
+
+    public boolean isLastReviewOnSameDay(Timestamp currentTime, ZoneId timeZone) {
+        return getYearId(getLastReviewedAt(), timeZone) == getYearId(currentTime, timeZone);
+    }
 }
 
 

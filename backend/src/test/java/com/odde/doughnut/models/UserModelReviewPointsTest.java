@@ -48,13 +48,13 @@ public class UserModelReviewPointsTest {
         @Test
         void whenThereIsNoReviewedNotesForUser() {
             makeMe.aReviewPointFor(noteEntity).by(anotherUser).please();
-            assertThat(userModel.getMostUrgentReviewPointEntity(baseDay), is(nullValue()));
+            assertThat(userModel.getMostUrgentReviewPointEntity(daysAfterBase(1)), is(nullValue()));
         }
 
         @ParameterizedTest
         @CsvSource({
                 //repetitionDone, reviewDay, expectedToRepeat
-//                "0,   0, false",
+                "0,   0, false",
                 "0,   1, true",
                 "0,   2, true",
                 "0,  10, true",
@@ -71,9 +71,13 @@ public class UserModelReviewPointsTest {
                 })
         void whenThereOneReviewedNotesForUser(Integer repetitionDone, Integer reviewDay, Boolean expectedToRepeat) {
             makeMe.aReviewPointFor(noteEntity).by(userModel).lastReviewedAt(baseDay).nthStrictRepetitionDone(repetitionDone).please();
-            ReviewPointEntity mostUrgentReviewPointEntity = userModel.getMostUrgentReviewPointEntity(UserModel.addDaysToTimestamp(baseDay, reviewDay));
+            ReviewPointEntity mostUrgentReviewPointEntity = userModel.getMostUrgentReviewPointEntity(daysAfterBase(reviewDay));
             assertThat(mostUrgentReviewPointEntity != null, is(expectedToRepeat));
         }
 
+    }
+
+    private Timestamp daysAfterBase(Integer reviewDay) {
+        return UserModel.addDaysToTimestamp(baseDay, reviewDay);
     }
 }

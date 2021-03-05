@@ -107,11 +107,20 @@ public class UserModel extends ModelForEntity<UserEntity> {
     }
 
     public ReviewPointEntity getMostUrgentReviewPointEntity(Timestamp currentUTCTimestamp) {
-        Iterator<ReviewPointEntity> iterator = modelFactoryService.reviewPointRepository.findAllByUserEntityOrderByLastReviewedAt(getEntity()).iterator();
-        ReviewPointEntity reviewPointEntity = null;
-        if (iterator.hasNext()) {
-            reviewPointEntity = iterator.next();
+        ReviewPointEntity reviewPointEntity = getReviewPointEntity();
+        if(reviewPointEntity != null) {
+            if (reviewPointEntity.isLastReviewOnSameDay(currentUTCTimestamp, getTimeZone())) {
+                return null;
+            }
         }
         return reviewPointEntity;
+    }
+
+    private ReviewPointEntity getReviewPointEntity() {
+        Iterator<ReviewPointEntity> iterator = modelFactoryService.reviewPointRepository.findAllByUserEntityOrderByLastReviewedAt(getEntity()).iterator();
+        if (iterator.hasNext()) {
+            return iterator.next();
+        }
+        return null;
     }
 }

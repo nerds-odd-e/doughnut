@@ -35,9 +35,6 @@ public class ReviewPointBuilder extends EntityAndModelBuilder<ReviewPointEntity,
 
     public ReviewPointBuilder lastReviewedAt(Timestamp timestamp) {
         entity.setLastReviewedAt(timestamp);
-        if (entity.getInitialReviewedAt() == null) {
-            entity.setInitialReviewedAt(timestamp);
-        }
         return this;
     }
 
