@@ -8,14 +8,14 @@ Feature: Spaced-repetition
         Given there are notes from Note 1 to Note 3
 
     Scenario: Strictly follow the schedule
-        * On day 1 I repeat old "                " and initial review new "Note 1   "
-        * On day 2 I repeat old "Note 1          " and initial review new "Note 2   "
-        * On day 3 I repeat old "Note 2          " and initial review new "Note 3   "
-        * On day 4 I repeat old "Note 1, Note 3  " and initial review new "         "
-        * On day 5 I repeat old "Note 2          " and initial review new "         "
-        * On day 6 I repeat old "                " and initial review new "         "
-        * On day 7 I repeat old "Note 3          " and initial review new "         "
-        * On day 8 I repeat old "Note 1          " and initial review new "         "
+        * On day 1 I repeat old "end                 " and initial review new "Note 1, end "
+        * On day 2 I repeat old "Note 1, end         " and initial review new "Note 2, end "
+        * On day 3 I repeat old "Note 2, end         " and initial review new "Note 3, end "
+        * On day 4 I repeat old "Note 1, Note 3, end " and initial review new "end         "
+        * On day 5 I repeat old "Note 2, end         " and initial review new "            "
+        * On day 6 I repeat old "Note 3, end         " and initial review new "            "
+        * On day 7 I repeat old "end                 " and initial review new "            "
+        * On day 8 I repeat old "Note 1, end         " and initial review new "            "
 
     @ignore
     Scenario: Not strictly follow the schedule

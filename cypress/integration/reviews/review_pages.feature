@@ -18,4 +18,4 @@ Feature: Review Pages
             | single note   | Sedition   |   Incite violence             |
             | single note   | Sedation   |   Put to sleep                |
             | picture note  | Sedative   |   Sleep medicine; a_slide.jpg |
-            | end of review |            |                               |
+            | initial done  |            |                               |

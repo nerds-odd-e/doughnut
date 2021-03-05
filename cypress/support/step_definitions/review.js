@@ -21,13 +21,13 @@ Then("On day {int} I repeat old {string} and initial review new {string}", (day,
     cy.timeTravelTo(day, 8);
     cy.visit('/reviews/repeat');
     repeatNotes.commonSenseSplit(",").forEach(title => {
-        const review_type = "single note";
+        const review_type = title === "end" ? "repeat done" : "single note";
         cy.repeatReviewOneNoteIfThereIs({review_type, title});
     });
 
     cy.visit('/reviews/initial');
     initialNotes.commonSenseSplit(", ").forEach(title => {
-        const review_type = "single note";
+        const review_type = title === "end" ? "initial done" : "single note";
         cy.initialReviewOneNoteIfThereIs({review_type, title});
     });
 

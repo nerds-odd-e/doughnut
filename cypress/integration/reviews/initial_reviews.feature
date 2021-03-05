@@ -14,11 +14,11 @@ Feature: Initial Review
             | review_type   | title      |
             | single note   | Note 1     |
             | single note   | Note 2     |
-            | end of review |            |
+            | initial done  |            |
         Given It's day 1, 9 hour
         Then I do these initial reviews in sequence:
             | review_type   | title      |
-            | end of review |            |
+            | initial done  |            |
 
     Scenario: First day review only part of the daily number
         Given It's day 1, 8 hour
@@ -29,7 +29,7 @@ Feature: Initial Review
         Then I do these initial reviews in sequence:
             | review_type   | title      |
             | single note   | Note 2     |
-            | end of review |            |
+            | initial done  |            |
 
     Scenario: Follow schedule strictly for 2 days
         Given It's day 1, 8 hour
