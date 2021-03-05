@@ -63,7 +63,4 @@ public class MakeMe {
         return new TimestampBuilder();
     }
 
-    public <T> ReviewPointModel toModel(T please) {
-        return new ReviewPointModel((ReviewPointEntity)please, modelFactoryService);
-    }
 }

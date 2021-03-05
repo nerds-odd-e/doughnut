@@ -67,4 +67,12 @@ public class ModelFactoryService {
     public ReviewPointModel toReviewPointModel(@Valid ReviewPointEntity reviewPointEntity) {
         return new ReviewPointModel(reviewPointEntity, this);
     }
+
+    public <T, M extends ModelForEntity<T>> M toModel(T please, Class<M> klass){
+        if (klass == ReviewPointModel.class) {
+            return (M) toReviewPointModel((ReviewPointEntity) please);
+        }
+        return null;
+    }
+
 }

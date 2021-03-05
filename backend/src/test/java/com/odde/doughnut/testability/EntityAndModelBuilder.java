@@ -1,21 +1,20 @@
 package com.odde.doughnut.testability;
 
 import com.odde.doughnut.models.ModelForEntity;
-import com.odde.doughnut.models.ReviewPointModel;
-
-import java.util.function.Supplier;
 
 public abstract class EntityAndModelBuilder<T, M extends ModelForEntity<T>> {
     protected final MakeMe makeMe;
     protected final T entity;
+    protected final Class<M> mClass;
 
-    public ReviewPointModel toModelPlease() {
-        return makeMe.toModel(please());
+    public M toModelPlease() {
+        return makeMe.modelFactoryService.toModel(please(), mClass);
     }
 
-    public EntityAndModelBuilder(MakeMe makeMe, T reviewPointEntity) {
+    public EntityAndModelBuilder(MakeMe makeMe, T reviewPointEntity, Class<M> mClass) {
         this.makeMe = makeMe;
         entity = reviewPointEntity;
+        this.mClass = mClass;
     }
 
     public T please() {

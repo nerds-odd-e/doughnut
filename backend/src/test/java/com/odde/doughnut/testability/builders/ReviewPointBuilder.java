@@ -8,12 +8,11 @@ import com.odde.doughnut.testability.EntityAndModelBuilder;
 import com.odde.doughnut.testability.MakeMe;
 
 import java.sql.Timestamp;
-import java.util.function.Supplier;
 
 public class ReviewPointBuilder extends EntityAndModelBuilder<ReviewPointEntity, ReviewPointModel> {
 
     public ReviewPointBuilder(ReviewPointEntity reviewPointEntity, MakeMe makeMe) {
-        super(makeMe, reviewPointEntity);
+        super(makeMe, reviewPointEntity, ReviewPointModel.class);
     }
 
     public ReviewPointBuilder forNote(NoteEntity noteEntity) {
