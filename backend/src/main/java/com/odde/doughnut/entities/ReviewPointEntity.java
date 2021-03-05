@@ -56,10 +56,10 @@ public class ReviewPointEntity {
     private Integer forgettingCurveIndex = DEFAULT_FORGETTING_CURVE_INDEX;
 
     public boolean isInitialReviewOnSameDay(Timestamp currentTime, ZoneId timeZone) {
-        return getYearId(getInitialReviewedAt(), timeZone) == getYearId(currentTime, timeZone);
+        return getDayId(getInitialReviewedAt(), timeZone) == getDayId(currentTime, timeZone);
     }
 
-    public static int getYearId(Timestamp timestamp, ZoneId timeZone) {
+    public static int getDayId(Timestamp timestamp, ZoneId timeZone) {
         ZonedDateTime systemLocalDateTime = timestamp.toLocalDateTime().atZone(ZoneId.systemDefault());
         ZonedDateTime userLocalDateTime = systemLocalDateTime.withZoneSameInstant(timeZone);
         return userLocalDateTime.getYear() * 366 + userLocalDateTime.getDayOfYear();
@@ -69,9 +69,6 @@ public class ReviewPointEntity {
         forgettingCurveIndex += DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT;
     }
 
-    public boolean isLastReviewOnSameDay(Timestamp currentTime, ZoneId timeZone) {
-        return getYearId(getLastReviewedAt(), timeZone) == getYearId(currentTime, timeZone);
-    }
 }
 
 

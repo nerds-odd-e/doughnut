@@ -59,10 +59,10 @@ public class UserModelReviewPointsTest {
                 "0,   2, true",
                 "0,  10, true",
 
-//                "1,   0, false",
-//                "1,   1, false",
-//                "1,   2, true",
-//                "1,  10, true",
+                "1,   0, false",
+                "1,   1, false",
+                "1,   2, true",
+                "1,  10, true",
 //
 //                "2,   0, false",
 //                "2,   1, false",

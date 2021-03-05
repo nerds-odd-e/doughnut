@@ -83,8 +83,8 @@ public class UserModel extends ModelForEntity<UserEntity> {
         return modelFactoryService.reviewPointRepository.findAllByUserEntityAndInitialReviewedAtGreaterThan(entity, oneDayAgo);
     }
 
-    public static Timestamp addDaysToTimestamp(Timestamp currentTime, int daysToAdd) {
-        ZonedDateTime zonedDateTime = currentTime.toInstant().atZone(ZoneId.of("UTC"));
+    public static Timestamp addDaysToTimestamp(Timestamp timestamp, int daysToAdd) {
+        ZonedDateTime zonedDateTime = timestamp.toInstant().atZone(ZoneId.of("UTC"));
         return Timestamp.from(zonedDateTime.plus(daysToAdd, ChronoUnit.DAYS).toInstant());
     }
 
@@ -109,7 +109,9 @@ public class UserModel extends ModelForEntity<UserEntity> {
     public ReviewPointEntity getMostUrgentReviewPointEntity(Timestamp currentUTCTimestamp) {
         ReviewPointEntity reviewPointEntity = getReviewPointEntity();
         if(reviewPointEntity != null) {
-            if (reviewPointEntity.isLastReviewOnSameDay(currentUTCTimestamp, getTimeZone())) {
+            Timestamp lastReviewedAt = reviewPointEntity.getLastReviewedAt();
+            Timestamp nextReviewTime = addDaysToTimestamp(lastReviewedAt, (reviewPointEntity.getForgettingCurveIndex() - 100) / 10);
+            if (nextReviewTime.toInstant().toEpochMilli() >= currentUTCTimestamp.toInstant().toEpochMilli()) {
                 return null;
             }
         }
