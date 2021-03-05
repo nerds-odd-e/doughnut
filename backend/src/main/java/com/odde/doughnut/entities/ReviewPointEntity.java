@@ -12,6 +12,8 @@ import java.time.ZonedDateTime;
 @Entity
 @Table(name = "review_point")
 public class ReviewPointEntity {
+    private static final Integer DEFAULT_FORGETTING_CURVE_INDEX = 100;
+    private static final Integer DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT = 10;
     @Id
     @Getter
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -48,6 +50,11 @@ public class ReviewPointEntity {
     @Setter
     private Timestamp initialReviewedAt;
 
+    @Column(name = "forgetting_curve_index")
+    @Getter
+    @Setter
+    private Integer forgettingCurveIndex = DEFAULT_FORGETTING_CURVE_INDEX;
+
     public boolean isInitialReviewOnSameDay(Timestamp currentTime, ZoneId timeZone) {
         return getYearId(getInitialReviewedAt(), timeZone) == getYearId(currentTime, timeZone);
     }
@@ -58,6 +65,9 @@ public class ReviewPointEntity {
         return userLocalDateTime.getYear() * 366 + userLocalDateTime.getDayOfYear();
     }
 
+    public void onTimeRepetition() {
+        forgettingCurveIndex += DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT;
+    }
 }
 
 

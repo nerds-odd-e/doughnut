@@ -79,9 +79,13 @@ public class UserModel extends ModelForEntity<UserEntity> {
     }
 
     private List<ReviewPointEntity> getRecentReviewPoints(Timestamp currentTime) {
-        ZonedDateTime zonedDateTime = currentTime.toInstant().atZone(ZoneId.of("UTC"));
-        Timestamp oneDayAgo = Timestamp.from(zonedDateTime.minus(1, ChronoUnit.DAYS).toInstant());
+        Timestamp oneDayAgo = addDaysToTimestamp(currentTime, -1);
         return modelFactoryService.reviewPointRepository.findAllByUserEntityAndInitialReviewedAtGreaterThan(entity, oneDayAgo);
+    }
+
+    public static Timestamp addDaysToTimestamp(Timestamp currentTime, int daysToAdd) {
+        ZonedDateTime zonedDateTime = currentTime.toInstant().atZone(ZoneId.of("UTC"));
+        return Timestamp.from(zonedDateTime.plus(daysToAdd, ChronoUnit.DAYS).toInstant());
     }
 
     private int getNewNotesCountForToday(Timestamp currentTime) {

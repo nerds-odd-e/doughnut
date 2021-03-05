@@ -1,11 +1,14 @@
 package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.NoteEntity;
+import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -24,13 +27,13 @@ public class UserModelReviewPointsTest {
     MakeMe makeMe;
     UserModel userModel;
     UserModel anotherUser;
-    Timestamp day1;
+    Timestamp baseDay;
 
     @BeforeEach
     void setup() {
         userModel = makeMe.aUser().withSpaceIntervals("1, 2, 4, 8").toModelPlease();
         anotherUser = makeMe.aUser().toModelPlease();
-        day1 = makeMe.aTimestamp().of(1, 8).forWhereTheUserIs(userModel).please();
+        baseDay = makeMe.aTimestamp().of(1, 8).forWhereTheUserIs(userModel).please();
     }
 
     @Nested
@@ -45,13 +48,31 @@ public class UserModelReviewPointsTest {
         @Test
         void whenThereIsNoReviewedNotesForUser() {
             makeMe.aReviewPointFor(noteEntity).by(anotherUser).please();
-            assertThat(userModel.getMostUrgentReviewPointEntity(day1), is(nullValue()));
+            assertThat(userModel.getMostUrgentReviewPointEntity(baseDay), is(nullValue()));
         }
 
-        @Test
-        void whenThereOneReviewedNotesForUser() {
-            makeMe.aReviewPointFor(noteEntity).by(userModel).please();
-            assertThat(userModel.getMostUrgentReviewPointEntity(day1).getNoteEntity(), equalTo(noteEntity));
+        @ParameterizedTest
+        @CsvSource({
+                //repetitionDone, reviewDay, expectedToRepeat
+//                "0,   0, false",
+                "0,   1, true",
+                "0,   2, true",
+                "0,  10, true",
+
+//                "1,   0, false",
+//                "1,   1, false",
+//                "1,   2, true",
+//                "1,  10, true",
+//
+//                "2,   0, false",
+//                "2,   1, false",
+//                "2,   3, false",
+//                "2,   4, true",
+                })
+        void whenThereOneReviewedNotesForUser(Integer repetitionDone, Integer reviewDay, Boolean expectedToRepeat) {
+            makeMe.aReviewPointFor(noteEntity).by(userModel).lastReviewedAt(baseDay).nthStrictRepetitionDone(repetitionDone).please();
+            ReviewPointEntity mostUrgentReviewPointEntity = userModel.getMostUrgentReviewPointEntity(UserModel.addDaysToTimestamp(baseDay, reviewDay));
+            assertThat(mostUrgentReviewPointEntity != null, is(expectedToRepeat));
         }
 
     }
