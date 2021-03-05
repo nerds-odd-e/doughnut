@@ -10,6 +10,7 @@ import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -101,4 +102,12 @@ public class UserModel extends ModelForEntity<UserEntity> {
         return ZoneId.of("Asia/Shanghai");
     }
 
+    public ReviewPointEntity getMostUrgentReviewPointEntity() {
+        Iterator<ReviewPointEntity> iterator = modelFactoryService.reviewPointRepository.findAllByUserEntityOrderByLastReviewedAt(getEntity()).iterator();
+        ReviewPointEntity reviewPointEntity = null;
+        if (iterator.hasNext()) {
+            reviewPointEntity = iterator.next();
+        }
+        return reviewPointEntity;
+    }
 }
