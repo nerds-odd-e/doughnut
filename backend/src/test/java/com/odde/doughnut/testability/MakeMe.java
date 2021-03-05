@@ -1,6 +1,7 @@
 package com.odde.doughnut.testability;
 
 import com.odde.doughnut.entities.NoteEntity;
+import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.models.ModelForEntity;
 import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.builders.*;
@@ -53,7 +54,8 @@ public class MakeMe {
     }
 
     public ReviewPointBuilder aReviewPointFor(NoteEntity noteEntity) {
-        return new ReviewPointBuilder(noteEntity, this);
+        ReviewPointEntity reviewPointEntity = new ReviewPointEntity();
+        return new ReviewPointBuilder(reviewPointEntity, this).forNote(noteEntity);
     }
 
     public TimestampBuilder aTimestamp() {
