@@ -21,4 +21,8 @@ public abstract class EntityAndModelBuilder<T, M extends ModelForEntity<T>> {
         makeMe.modelFactoryService.entityManager.persist(entity);
         return entity;
     }
+
+    public T inMemoryPlease() {
+        return entity;
+    }
 }
