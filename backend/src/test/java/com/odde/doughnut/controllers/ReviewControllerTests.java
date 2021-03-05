@@ -17,7 +17,6 @@ class ReviewControllerTests {
   void shouldProceedToReviewPage() {
     UserModel userModel = mock(UserModel.class);
     TimeTraveler timeTraveler = mock(TimeTraveler.class);
-    when(userModel.getNewNotesToReview(null)).thenReturn(new ArrayList<>());
     ModelFactoryService modelFactoryService = mock(ModelFactoryService.class);
     ReviewController controller = new ReviewController(new TestCurrentUserFetcher(userModel), modelFactoryService, timeTraveler);
     Model model = mock(Model.class);

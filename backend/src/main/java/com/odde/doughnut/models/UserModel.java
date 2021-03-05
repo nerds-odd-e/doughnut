@@ -11,9 +11,10 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class UserModel extends ModelForEntity<UserEntity>{
+public class UserModel extends ModelForEntity<UserEntity> {
     public UserModel(UserEntity userEntity, ModelFactoryService modelFactoryService) {
         super(userEntity, modelFactoryService);
     }
@@ -37,7 +38,7 @@ public class UserModel extends ModelForEntity<UserEntity>{
     }
 
     public void assertAuthorization(NoteEntity noteEntity) throws NoAccessRightException {
-        if (! entity.owns(noteEntity)) {
+        if (!entity.owns(noteEntity)) {
             throw new NoAccessRightException();
         }
     }
@@ -52,9 +53,24 @@ public class UserModel extends ModelForEntity<UserEntity>{
         return linkableNotes;
     }
 
-    public List<NoteEntity> getNewNotesToReview(Timestamp currentTime) {
+    public ReviewPointEntity getOneInitialReviewPointEntity(Timestamp currentUTCTimestamp) {
+        return getOneFreshNoteToReview(currentUTCTimestamp).map(
+                noteEntity -> {
+                    ReviewPointEntity reviewPointEntity = new ReviewPointEntity();
+                    reviewPointEntity.setNoteEntity(noteEntity);
+                    return reviewPointEntity;
+                }
+
+        ).orElse(null);
+    }
+
+    private Optional<NoteEntity> getOneFreshNoteToReview(Timestamp currentTime) {
         int count = getNewNotesCountForToday(currentTime);
-        return getNotesHaveNotBeenReviewedAtAll().stream().limit(count).collect(Collectors.toList());
+        if (count == 0) {
+            return Optional.empty();
+        }
+        List<NoteEntity> notesHaveNotBeenReviewedAtAll = getNotesHaveNotBeenReviewedAtAll();
+        return notesHaveNotBeenReviewedAtAll.stream().findFirst();
     }
 
     private List<NoteEntity> getNotesHaveNotBeenReviewedAtAll() {
@@ -85,13 +101,4 @@ public class UserModel extends ModelForEntity<UserEntity>{
         return ZoneId.of("Asia/Shanghai");
     }
 
-    public ReviewPointEntity getOneInitialReviewPointEntity(Timestamp currentUTCTimestamp) {
-        List<NoteEntity> notes = getNewNotesToReview(currentUTCTimestamp);
-        if (notes.size() == 0) {
-            return null;
-        }
-        ReviewPointEntity reviewPointEntity = new ReviewPointEntity();
-        reviewPointEntity.setNoteEntity(notes.get(0));
-        return reviewPointEntity;
-    }
 }
