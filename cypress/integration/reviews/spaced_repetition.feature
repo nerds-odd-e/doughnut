@@ -8,9 +8,9 @@ Feature: Spaced-repetition
         Given there are notes from Note 1 to Note 3
 
     Scenario: Strictly follow the schedule
-        * On day 1 at 8 hour I repeat old "                " and at 9 hour initial review new "Note 1   "
-        * On day 2 at 8 hour I repeat old "Note 1          " and at 9 hour initial review new "Note 2   "
-#        * On day 3 at 8 hour I repeat old "Note 2          " and at 9 hour initial review new "Note 3   "
+        * On day 1 at 8 hour I repeat old "                " and at 8 hour initial review new "Note 1   "
+        * On day 2 at 8 hour I repeat old "Note 1          " and at 8 hour initial review new "Note 2   "
+#        * On day 3 at 8 hour I repeat old "Note 2          " and at 8 hour initial review new "Note 3   "
 #            | 4    | 1, 3                |                          |
 #            | 5    | 2                   |                          |
 #            | 6    |                     |                          |

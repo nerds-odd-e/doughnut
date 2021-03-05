@@ -53,7 +53,6 @@ public class UserModelReviewPointsTest {
 
         @ParameterizedTest
         @CsvSource({
-                //repetitionDone, reviewDay, expectedToRepeat
                 "0,   0, false",
                 "0,   1, true",
                 "0,   2, true",
@@ -63,11 +62,11 @@ public class UserModelReviewPointsTest {
                 "1,   1, false",
                 "1,   2, true",
                 "1,  10, true",
-//
-//                "2,   0, false",
-//                "2,   1, false",
-//                "2,   3, false",
-//                "2,   4, true",
+
+                "2,   0, false",
+                "2,   1, false",
+                "2,   3, false",
+                "2,   4, true",
                 })
         void whenThereOneReviewedNotesForUser(Integer repetitionDone, Integer reviewDay, Boolean expectedToRepeat) {
             makeMe.aReviewPointFor(noteEntity).by(userModel).lastReviewedAt(baseDay).nthStrictRepetitionDone(repetitionDone).please();

@@ -10,6 +10,7 @@ import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
@@ -110,12 +111,18 @@ public class UserModel extends ModelForEntity<UserEntity> {
         ReviewPointEntity reviewPointEntity = getReviewPointEntity();
         if(reviewPointEntity != null) {
             Timestamp lastReviewedAt = reviewPointEntity.getLastReviewedAt();
-            Timestamp nextReviewTime = addDaysToTimestamp(lastReviewedAt, (reviewPointEntity.getForgettingCurveIndex() - 100) / 10);
-            if (nextReviewTime.toInstant().toEpochMilli() >= currentUTCTimestamp.toInstant().toEpochMilli()) {
-                return null;
+            Timestamp nextReviewTime = addDaysToTimestamp(lastReviewedAt, getDaysToAdd(reviewPointEntity));
+            if (nextReviewTime.compareTo(currentUTCTimestamp) != 1) {
+                return reviewPointEntity;
             }
         }
-        return reviewPointEntity;
+        return null;
+    }
+
+    private int getDaysToAdd(ReviewPointEntity reviewPointEntity) {
+        int index = (reviewPointEntity.getForgettingCurveIndex() - 100) / 10;
+        List<Integer> spaces = Arrays.stream(entity.getSpaceIntervals().split(",\\s*")).map(Integer::valueOf).collect(Collectors.toList());
+        return spaces.get(index);
     }
 
     private ReviewPointEntity getReviewPointEntity() {
