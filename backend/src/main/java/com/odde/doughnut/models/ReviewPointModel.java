@@ -18,8 +18,8 @@ public class ReviewPointModel extends ModelForEntity<ReviewPointEntity> {
     }
 
     public void repeat(UserModel userModel, Timestamp currentUTCTimestamp) {
-        getEntity().setLastAndNextReviewAt(userModel, currentUTCTimestamp);
         getEntity().repeatedOnTime();
+        getEntity().setLastAndNextReviewAt(userModel, currentUTCTimestamp);
         this.modelFactoryService.reviewPointRepository.save(getEntity());
     }
 

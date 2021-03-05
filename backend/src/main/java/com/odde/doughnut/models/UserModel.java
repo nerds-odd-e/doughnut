@@ -100,7 +100,7 @@ public class UserModel extends ModelForEntity<UserEntity> {
     public ReviewPointEntity getReviewPointNeedToRepeat(Timestamp currentUTCTimestamp) {
         return modelFactoryService.reviewPointRepository.findAllByUserEntityOrderByLastReviewedAt(getEntity()).stream().filter(
                 reviewPointEntity -> {
-                    Timestamp nextReviewTime = getNextReviewAt(reviewPointEntity);
+                    Timestamp nextReviewTime = reviewPointEntity.getNextReviewAt();
                     return (nextReviewTime.compareTo(currentUTCTimestamp) != 1);
                 }
         ).findFirst().orElse(null) ;
@@ -111,7 +111,7 @@ public class UserModel extends ModelForEntity<UserEntity> {
         return TimestampOptions.addDaysToTimestamp(lastReviewedAt, getSpacedRepetition().getNextRepeatInDays(reviewPointEntity.getForgettingCurveIndex()));
     }
 
-    private SpacedRepetition getSpacedRepetition() {
+    public SpacedRepetition getSpacedRepetition() {
         return new SpacedRepetition(entity.getSpaceIntervals());
     }
 
