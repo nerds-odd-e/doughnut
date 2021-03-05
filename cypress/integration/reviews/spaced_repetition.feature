@@ -9,7 +9,7 @@ Feature: Spaced-repetition
 
     Scenario: Strictly follow the schedule
         * I should be able to follow these review actions:
-            | day  | old notes to review | initial review  |
+            | day  | old_notes_to_review | initial_review  |
             | 1    |                     | 1               |
 #            | 2    | 1                   | 2               |
 #            | 3    | 2                   | 3               |

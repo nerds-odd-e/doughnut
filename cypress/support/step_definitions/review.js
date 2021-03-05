@@ -8,21 +8,20 @@ import {
 
 Then("I do these initial reviews in sequence:", (data) => {
   cy.visit('/review');
-  data.hashes().forEach(reviewPage => {
-    const additionalInfo = reviewPage["additional info"];
-    switch(reviewPage["review type"]) {
+  data.hashes().forEach(({review_type, title, additional_info}) => {
+    switch(review_type) {
     case "single note": {
-        cy.findByText(reviewPage["title"], {selector: '#note-title'})
-        if(additionalInfo) {
-            cy.get('#note-description').should("contain", additionalInfo);
+        cy.findByText(title, {selector: '#note-title'})
+        if(additional_info) {
+            cy.get('#note-description').should("contain", additional_info);
         }
         break;
     }
 
     case  "picture note": {
-        cy.findByText(reviewPage["title"], {selector: '#note-title'})
-        if(additionalInfo) {
-            const [expectedDescription, expectedPicture] = additionalInfo.split("; ")
+        cy.findByText(title, {selector: '#note-title'})
+        if(additional_info) {
+            const [expectedDescription, expectedPicture] = additional_info.split("; ")
             cy.get('#note-description').should("contain", expectedDescription);
             cy.get('#note-picture').find('img').should('have.attr', 'src').should('include',expectedPicture);
         }
@@ -30,9 +29,9 @@ Then("I do these initial reviews in sequence:", (data) => {
     }
 
     case "related notes": {
-        cy.findByText(reviewPage["title"], {selector: '#note-title'})
-        if(additionalInfo) {
-            additionalInfo.split(", ").forEach(expectedLinkTarget =>
+        cy.findByText(title, {selector: '#note-title'})
+        if(additional_info) {
+            additional_info.split(", ").forEach(expectedLinkTarget =>
                 cy.findByText(expectedLinkTarget, {selector: '#note-links li'})
             )
         }
@@ -44,7 +43,7 @@ Then("I do these initial reviews in sequence:", (data) => {
         return;
     }
     default:
-        expect(true).to.be.false("unknown view page type");
+        expect(review_type).equal("a known review page type");
     }
 
     cy.findByText("Next").click();
@@ -56,8 +55,9 @@ Given("It's day {int}, {int} hour", (day, hour) => {
 });
 
 Then("I should be able to follow these review actions:", (data) => {
-  data.hashes().forEach(reviewActionsOfADay => {
-    cy.timeTravelTo(reviewActionsOfADay["day"], 8);
+  data.hashes().forEach(({day, old_notes_to_review, initial_review}) => {
+    cy.timeTravelTo(day, 8);
+    cy.log(initial_review)
   });
 });
 

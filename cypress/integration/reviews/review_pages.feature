@@ -13,7 +13,7 @@ Feature: Review Pages
 
     Scenario: Different review pages for different notes
         * I do these initial reviews in sequence:
-            | review type   | title      |   additional info             |
+            | review_type   | title      |   additional_info             |
 #            | related notes | Sedition   |   Sedation, Sedative          |
             | single note   | Sedition   |   Incite violence             |
             | single note   | Sedation   |   Put to sleep                |
