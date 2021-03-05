@@ -10,7 +10,7 @@ Feature: Spaced-repetition
     Scenario: Strictly follow the schedule
         * On day 1 at 8 hour I repeat old "                " and at 8 hour initial review new "Note 1   "
         * On day 2 at 8 hour I repeat old "Note 1          " and at 8 hour initial review new "Note 2   "
-#        * On day 3 at 8 hour I repeat old "Note 2          " and at 8 hour initial review new "Note 3   "
+        * On day 3 at 8 hour I repeat old "Note 2          " and at 8 hour initial review new "Note 3   "
 #            | 4    | 1, 3                |                          |
 #            | 5    | 2                   |                          |
 #            | 6    |                     |                          |

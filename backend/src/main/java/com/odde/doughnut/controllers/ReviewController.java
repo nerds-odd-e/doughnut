@@ -63,6 +63,7 @@ public class ReviewController {
     @PostMapping("/reviews/{reviewPointEntity}")
     public String update(@Valid ReviewPointEntity reviewPointEntity) {
         reviewPointEntity.setLastReviewedAt(timeTraveler.getCurrentUTCTimestamp());
+        reviewPointEntity.repeatedOnTime();
         modelFactoryService.reviewPointRepository.save(reviewPointEntity);
         return "redirect:/reviews/initial";
     }

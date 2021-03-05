@@ -65,7 +65,7 @@ public class ReviewPointEntity {
         return userLocalDateTime.getYear() * 366 + userLocalDateTime.getDayOfYear();
     }
 
-    public void onTimeRepetition() {
+    public void repeatedOnTime() {
         forgettingCurveIndex += DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT;
     }
 

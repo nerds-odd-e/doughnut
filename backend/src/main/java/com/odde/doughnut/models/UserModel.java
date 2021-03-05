@@ -108,15 +108,13 @@ public class UserModel extends ModelForEntity<UserEntity> {
     }
 
     public ReviewPointEntity getMostUrgentReviewPointEntity(Timestamp currentUTCTimestamp) {
-        ReviewPointEntity reviewPointEntity = getReviewPointEntity();
-        if(reviewPointEntity != null) {
-            Timestamp lastReviewedAt = reviewPointEntity.getLastReviewedAt();
-            Timestamp nextReviewTime = addDaysToTimestamp(lastReviewedAt, getDaysToAdd(reviewPointEntity));
-            if (nextReviewTime.compareTo(currentUTCTimestamp) != 1) {
-                return reviewPointEntity;
-            }
-        }
-        return null;
+        return modelFactoryService.reviewPointRepository.findAllByUserEntityOrderByLastReviewedAt(getEntity()).stream().filter(
+                reviewPointEntity -> {
+                    Timestamp lastReviewedAt = reviewPointEntity.getLastReviewedAt();
+                    Timestamp nextReviewTime = addDaysToTimestamp(lastReviewedAt, getDaysToAdd(reviewPointEntity));
+                    return (nextReviewTime.compareTo(currentUTCTimestamp) != 1);
+                }
+        ).findFirst().orElse(null) ;
     }
 
     private int getDaysToAdd(ReviewPointEntity reviewPointEntity) {
@@ -125,11 +123,4 @@ public class UserModel extends ModelForEntity<UserEntity> {
         return spaces.get(index);
     }
 
-    private ReviewPointEntity getReviewPointEntity() {
-        Iterator<ReviewPointEntity> iterator = modelFactoryService.reviewPointRepository.findAllByUserEntityOrderByLastReviewedAt(getEntity()).iterator();
-        if (iterator.hasNext()) {
-            return iterator.next();
-        }
-        return null;
-    }
 }
