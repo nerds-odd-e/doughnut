@@ -1,6 +1,7 @@
 package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.UserEntity;
+import com.odde.doughnut.models.ModelForEntity;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.EntityAndModelBuilder;
 import com.odde.doughnut.testability.MakeMe;
@@ -18,6 +19,11 @@ public class UserBuilder extends EntityAndModelBuilder<UserEntity, UserModel> {
     public UserBuilder with2Notes() {
         entity.getNotes().add(makeMe.aNote().inMemoryPlease());
         entity.getNotes().add(makeMe.aNote().inMemoryPlease());
+        return this;
+    }
+
+    public UserBuilder withSpaceIntervals(String spaceIntervals) {
+        entity.setSpaceIntervals(spaceIntervals);
         return this;
     }
 }
