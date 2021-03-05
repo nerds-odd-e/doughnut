@@ -39,6 +39,7 @@ public class NoteEntity {
     @Getter
     @Setter
     private Boolean urlIsVideo = false;
+
     @Column(name = "sibling_order")
     @Getter
     @Setter
@@ -83,6 +84,14 @@ public class NoteEntity {
     @Setter
     private NoteEntity parentNote;
 
+    @Column(name = "parent_id", insertable = false, updatable = false)
+    @Getter
+    private Integer parentId;
+
+    @Column(name = "user_id", insertable = false, updatable = false)
+    @Getter
+    private Integer userId;
+
     @OneToMany(mappedBy = "parentNote", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("sibling_order")
     @JsonIgnore
@@ -111,12 +120,13 @@ public class NoteEntity {
             @JoinColumn(name = "target_id", referencedColumnName = "id", nullable = false)
     })
     @ManyToMany
-    @JsonIgnoreProperties("targetNotes")
+    @JsonIgnore
     @Getter
     @Setter
     private List<NoteEntity> targetNotes = new ArrayList<>();
 
     @Transient
+    @JsonIgnore
     @Getter
     @Setter
     private String testingLinkTo;
@@ -124,14 +134,6 @@ public class NoteEntity {
     public void linkToNote(NoteEntity targetNote) {
         this.targetNotes.add(targetNote);
     }
-
-    public List<String> getDescriptionLines() {
-        if (Strings.isEmpty(description)) {
-            return new ArrayList<>();
-        }
-        return Arrays.asList(description.split("\n"));
-    }
-
 }
 
 

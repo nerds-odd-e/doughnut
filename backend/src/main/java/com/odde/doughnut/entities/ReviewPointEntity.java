@@ -54,6 +54,14 @@ public class ReviewPointEntity {
     @Setter
     private Integer forgettingCurveIndex = SpacedRepetition.DEFAULT_FORGETTING_CURVE_INDEX;
 
+    @Column(name = "note_id", insertable = false, updatable = false)
+    @Getter
+    private Integer noteId;
+
+    @Column(name = "user_id", insertable = false, updatable = false)
+    @Getter
+    private Integer userId;
+
     public boolean isInitialReviewOnSameDay(Timestamp currentTime, ZoneId timeZone) {
         return getDayId(getInitialReviewedAt(), timeZone) == getDayId(currentTime, timeZone);
     }
