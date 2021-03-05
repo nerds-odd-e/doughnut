@@ -2,6 +2,7 @@ package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.models.SpacedRepetition;
+import com.odde.doughnut.models.UserModel;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -44,6 +45,11 @@ public class ReviewPointEntity {
     @Setter
     private Timestamp lastReviewedAt;
 
+    @Column(name = "next_review_at")
+    @Getter
+    @Setter
+    private Timestamp nextReviewAt;
+
     @Column(name = "initial_reviewed_at")
     @Getter
     @Setter
@@ -76,6 +82,10 @@ public class ReviewPointEntity {
         this.forgettingCurveIndex = SpacedRepetition.getNextForgettingCurveIndex(this.forgettingCurveIndex);
     }
 
+    public void setLastAndNextReviewAt(UserModel userModel, Timestamp currentUTCTimestamp) {
+        setLastReviewedAt(currentUTCTimestamp);
+        setNextReviewAt(userModel.getNextReviewAt(this));
+    }
 }
 
 
