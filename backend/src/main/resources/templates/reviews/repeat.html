@@ -1,12 +1,11 @@
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
 <layout th:replace="fragments/basic_layout :: application_layout(~{ :: .content})">
     <div class="container content">
-        <h2 class="display-5">Review your notes</h2>
+        <h2 class="display-5">Repeat reviewing your notes</h2>
 
         <div th:replace="fragments/note_fragments :: noteShow(${reviewPointEntity.noteEntity})"/>
 
-        <form action="#" th:action="@{/reviews/}" th:object="${reviewPointEntity}" method="post">
-            <input th:field="*{noteEntity}" type="hidden"/>
+        <form action="#" th:action="@{/reviews/{id}(id=${reviewPointEntity.id})}" th:object="${reviewPointEntity}" method="post">
             <input type="submit" value="Next" class="btn btn-primary"/>
         </form>
     </div>

@@ -8,5 +8,6 @@ import java.sql.Timestamp;
 import java.util.List;
 
 public interface ReviewPointRepository extends CrudRepository<ReviewPointEntity, Integer> {
-    List<ReviewPointEntity> findAllByUserEntityAndLastReviewedAtGreaterThan(UserEntity userEntity, Timestamp since);
+    List<ReviewPointEntity> findAllByUserEntityAndInitialReviewedAtGreaterThan(UserEntity userEntity, Timestamp since);
+    List<ReviewPointEntity> findAllByUserEntityOrderByLastReviewedAt(UserEntity userEntity);
 }

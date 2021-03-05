@@ -21,8 +21,8 @@ public class ReviewPointBuilder {
         return this;
     }
 
-    public ReviewPointBuilder on(Timestamp reviewTimestamp) {
-        reviewPointEntity.setLastReviewedAt(reviewTimestamp);
+    public ReviewPointBuilder initiallyReviewedOn(Timestamp reviewTimestamp) {
+        reviewPointEntity.setInitialReviewedAt(reviewTimestamp);
         return this;
     }
 

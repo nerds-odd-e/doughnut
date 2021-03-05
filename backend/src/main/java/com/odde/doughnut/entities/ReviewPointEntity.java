@@ -43,8 +43,13 @@ public class ReviewPointEntity {
     @Setter
     private Timestamp lastReviewedAt;
 
-    public boolean isOnSameDay(Timestamp currentTime, ZoneId timeZone) {
-        return getYearId(getLastReviewedAt(), timeZone) == getYearId(currentTime, timeZone);
+    @Column(name = "initial_reviewed_at")
+    @Getter
+    @Setter
+    private Timestamp initialReviewedAt;
+
+    public boolean isInitialReviewOnSameDay(Timestamp currentTime, ZoneId timeZone) {
+        return getYearId(getInitialReviewedAt(), timeZone) == getYearId(currentTime, timeZone);
     }
 
     public static int getYearId(Timestamp timestamp, ZoneId timeZone) {

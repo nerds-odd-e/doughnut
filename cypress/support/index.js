@@ -17,7 +17,7 @@
 import './commands'
 
 String.prototype.commonSenseSplit = function(separator) {
-   return this.split(separator).filter(s => s !== "");
+   return this.trim().split(separator).filter(s => s !== "").map(s => s.trim());
 }
 
 // Alternatively you can use CommonJS syntax:

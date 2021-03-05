@@ -17,22 +17,20 @@ Given("It's day {int}, {int} hour", (day, hour) => {
     cy.timeTravelTo(day, hour);
 });
 
-Then("I should be able to follow these review actions:", (data) => {
-  data.hashes().forEach(({day, old_notes_to_review, initial_review}) => {
-    cy.timeTravelTo(day, 8);
-
+Then("On day {int} at {int} hour I repeat old {string} and at {int} hour initial review new {string}", (day, repeatHour, repeatNotes, initialHour, initialNotes) => {
+    cy.timeTravelTo(day, repeatHour);
     cy.visit('/reviews/repeat');
-    old_notes_to_review.commonSenseSplit(", ").forEach(noteIndex => {
-        const [review_type, title] = ["single note", `Note ${noteIndex}`];
+    repeatNotes.commonSenseSplit(",").forEach(title => {
+        const review_type = "single note";
         cy.repeatReviewOneNoteIfThereIs({review_type, title});
     });
 
+    cy.timeTravelTo(day, initialHour);
     cy.visit('/reviews/initial');
-    initial_review.commonSenseSplit(", ").forEach(noteIndex => {
-        const [review_type, title] = ["single note", `Note ${noteIndex}`];
+    initialNotes.commonSenseSplit(", ").forEach(title => {
+        const review_type = "single note";
         cy.initialReviewOneNoteIfThereIs({review_type, title});
     });
 
-  });
 });
 

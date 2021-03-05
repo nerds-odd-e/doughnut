@@ -64,11 +64,11 @@ public class UserModel extends ModelForEntity<UserEntity>{
     private List<ReviewPointEntity> getRecentReviewPoints(Timestamp currentTime) {
         ZonedDateTime zonedDateTime = currentTime.toInstant().atZone(ZoneId.of("UTC"));
         Timestamp oneDayAgo = Timestamp.from(zonedDateTime.minus(1, ChronoUnit.DAYS).toInstant());
-        return modelFactoryService.reviewPointRepository.findAllByUserEntityAndLastReviewedAtGreaterThan(entity, oneDayAgo);
+        return modelFactoryService.reviewPointRepository.findAllByUserEntityAndInitialReviewedAtGreaterThan(entity, oneDayAgo);
     }
 
     private int getNewNotesCountForToday(Timestamp currentTime) {
-        long sameDayCount = getRecentReviewPoints(currentTime).stream().filter(p -> p.isOnSameDay(currentTime, getTimeZone())).count();
+        long sameDayCount = getRecentReviewPoints(currentTime).stream().filter(p -> p.isInitialReviewOnSameDay(currentTime, getTimeZone())).count();
         return (int) (entity.getDailyNewNotesCount() - sameDayCount);
     }
 

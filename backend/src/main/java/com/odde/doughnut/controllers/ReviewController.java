@@ -45,12 +45,12 @@ public class ReviewController {
 
     @GetMapping("/reviews/repeat")
     public String repeatReview(Model model) {
-        List<NoteEntity> notes = currentUserFetcher.getUser().getNewNotesToReview(timeTraveler.getCurrentUTCTimestamp());
-        Iterator<ReviewPointEntity> iterator = modelFactoryService.reviewPointRepository.findAll().iterator();
+        UserModel user = currentUserFetcher.getUser();
+        Iterator<ReviewPointEntity> iterator = modelFactoryService.reviewPointRepository.findAllByUserEntityOrderByLastReviewedAt(user.getEntity()).iterator();
         if (iterator.hasNext()) {
             ReviewPointEntity reviewPointEntity = iterator.next();
             model.addAttribute("reviewPointEntity", reviewPointEntity);
-            return "reviews/initial";
+            return "reviews/repeat";
         }
         return "reviews/initial_done";
     }
@@ -58,8 +58,16 @@ public class ReviewController {
     @PostMapping("/reviews")
     public String create(@Valid ReviewPointEntity reviewPointEntity) {
         UserModel userModel = currentUserFetcher.getUser();
+        reviewPointEntity.setInitialReviewedAt(timeTraveler.getCurrentUTCTimestamp());
         reviewPointEntity.setLastReviewedAt(timeTraveler.getCurrentUTCTimestamp());
         reviewPointEntity.setUserEntity(userModel.getEntity());
+        modelFactoryService.reviewPointRepository.save(reviewPointEntity);
+        return "redirect:/reviews/initial";
+    }
+
+    @PostMapping("/reviews/{reviewPointEntity}")
+    public String update(@Valid ReviewPointEntity reviewPointEntity) {
+        reviewPointEntity.setLastReviewedAt(timeTraveler.getCurrentUTCTimestamp());
         modelFactoryService.reviewPointRepository.save(reviewPointEntity);
         return "redirect:/reviews/initial";
     }
