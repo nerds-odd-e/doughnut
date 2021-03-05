@@ -126,7 +126,6 @@ public class NoteEntity {
     private List<NoteEntity> targetNotes = new ArrayList<>();
 
     @Transient
-    @JsonIgnore
     @Getter
     @Setter
     private String testingLinkTo;
