@@ -19,3 +19,14 @@ Feature: Review Pages
             | single note   | Sedation   |   Put to sleep                |
             | picture note  | Sedative   |   Sleep medicine; a_slide.jpg |
             | initial done  |            |                               |
+
+    Scenario: Index page
+        Given It's day 1, 8 hour
+        And I do these initial reviews in sequence:
+            | review_type   | title      |
+            | single note   | Sedition   |
+        When It's day 2, 9 hour
+        And I go to the reviews page
+        Then I should see that I have old notes to repeat
+        And I should see that I have new notes to learn
+

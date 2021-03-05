@@ -105,7 +105,7 @@ public class UserModel extends ModelForEntity<UserEntity> {
         return ZoneId.of("Asia/Shanghai");
     }
 
-    public ReviewPointEntity getMostUrgentReviewPointEntity(Timestamp currentUTCTimestamp) {
+    public ReviewPointEntity getReviewPointNeedToRepeat(Timestamp currentUTCTimestamp) {
         return modelFactoryService.reviewPointRepository.findAllByUserEntityOrderByLastReviewedAt(getEntity()).stream().filter(
                 reviewPointEntity -> {
                     Timestamp lastReviewedAt = reviewPointEntity.getLastReviewedAt();

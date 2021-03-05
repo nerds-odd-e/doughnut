@@ -33,6 +33,9 @@ public class ReviewController {
 
     @GetMapping("")
     public String index(Model model) {
+        UserModel user = currentUserFetcher.getUser();
+        model.addAttribute("oldEntity", user.getReviewPointNeedToRepeat(timeTraveler.getCurrentUTCTimestamp()));
+        model.addAttribute("newEntity", user.getOneInitialReviewPointEntity(timeTraveler.getCurrentUTCTimestamp()));
         return "reviews/index";
     }
 
@@ -50,7 +53,7 @@ public class ReviewController {
     @GetMapping("/repeat")
     public String repeatReview(Model model) {
         UserModel user = currentUserFetcher.getUser();
-        ReviewPointEntity reviewPointEntity = user.getMostUrgentReviewPointEntity(timeTraveler.getCurrentUTCTimestamp());
+        ReviewPointEntity reviewPointEntity = user.getReviewPointNeedToRepeat(timeTraveler.getCurrentUTCTimestamp());
         if(reviewPointEntity != null) {
             model.addAttribute("reviewPointEntity", reviewPointEntity);
             return "reviews/repeat";

@@ -33,3 +33,18 @@ Then("On day {int} I repeat old {string} and initial review new {string}", (day,
 
 });
 
+Given("I go to the reviews page", () => {
+    cy.visit("/reviews");
+});
+
+Then("I should see that I have old notes to repeat", () => {
+  cy.findByRole('button', {name: "Start reviewing old notes"});
+});
+
+Then("I should see that I have new notes to learn", () => {
+  cy.findByRole('button', {name: "Start reviewing new notes"});
+});
+
+
+
+

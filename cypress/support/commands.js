@@ -129,7 +129,7 @@ Cypress.Commands.add("timeTravelTo", (day, hour) => {
 
 Cypress.Commands.add("initialReviewOneNoteIfThereIs", ({review_type, title, additional_info}) => {
     if(review_type == "initial done") {
-        cy.findByText("You have done all the reviews for today.").should("be.visible");
+        cy.findByText("You have achieved your daily new notes goal.").should("be.visible");
     }
     else {
         cy.findByText(title, {selector: '#note-title'})
@@ -169,7 +169,7 @@ Cypress.Commands.add("initialReviewOneNoteIfThereIs", ({review_type, title, addi
 
 Cypress.Commands.add("repeatReviewOneNoteIfThereIs", ({review_type, title, additional_info}) => {
     if(review_type == "repeat done") {
-        cy.findByText("You have done all the reviews for today.").should("be.visible");
+        cy.findByText("You have reviewed all the old notes for today.").should("be.visible");
     }
     else {
         cy.initialReviewOneNoteIfThereIs({review_type, title, additional_info});
