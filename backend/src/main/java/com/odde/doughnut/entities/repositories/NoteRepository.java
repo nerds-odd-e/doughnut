@@ -10,6 +10,32 @@ import java.util.List;
 public interface NoteRepository extends CrudRepository<NoteEntity, Integer> {
 
     @Query(
+            value = ""
+             + "   WITH ancestors3(id, parent_id) AS ( "
+             + "       WITH ancestors2(id, parent_id) AS ( "
+             + "           WITH ancestors1(id, parent_id) AS ( "
+             + "               SELECT thisNote.id, thisNote.parent_id "
+             + "               FROM note thisNote WHERE thisNote.id = :noteId "
+             + "           ) "
+
+             + "           SELECT * from ancestors1 "
+             + "           UNION "
+             + "           SELECT parent.id, parent.parent_id "
+             + "           FROM note parent INNER JOIN ancestors1 a1 ON a1.parent_id = parent.id "
+             + "       ) "
+             + "       SELECT * from ancestors2 "
+             + "       UNION "
+             + "       SELECT parent.id, parent.parent_id "
+             + "       FROM note parent INNER JOIN ancestors2 a1 ON a1.parent_id = parent.id "
+             + "   ) "
+             + "   SELECT id from ancestors3 "
+             + "           UNION "
+             + "   SELECT parent.id "
+             + "   FROM note parent INNER JOIN ancestors3 a1 ON a1.parent_id = parent.id "
+            , nativeQuery = true)
+    List<NoteEntity> findAncestry(@Param("noteId") Long noteId);
+
+    @Query(
             value = "WITH RECURSIVE ancestors(id, parent_id, lvl) AS ("
                     + "   SELECT thisNote.id, thisNote.parent_id, 1 AS lvl "
                     + "   FROM note thisNote "
@@ -22,7 +48,7 @@ public interface NoteRepository extends CrudRepository<NoteEntity, Integer> {
                     + " )"
                     + "SELECT id from ancestors ORDER BY lvl DESC"
             , nativeQuery = true)
-    List<NoteEntity> findAncestry(@Param("noteId") Long noteId);
+    List<NoteEntity> findAncestry1(@Param("noteId") Long noteId);
 
     NoteEntity findFirstByParentNoteOrderBySiblingOrderDesc(NoteEntity parentNote);
     NoteEntity findFirstByParentNoteOrderBySiblingOrder(NoteEntity parentNote);
