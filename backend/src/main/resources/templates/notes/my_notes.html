@@ -1,8 +1,8 @@
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
-<layout th:replace="fragments/basic_layout :: application_layout(~{ :: .content})">
+<layout th:replace="_fragments/basic_layout :: application_layout(~{ :: .content})">
     <div class="container content">
         <h2>Top Level Notes</h2>
         <p> <a class="nav-link" href="/notes/new">Add Top Level Note</a> </p>
-        <div th:replace="fragments/note_fragments :: noteOwnerViewCards(${notes})"/>
+        <div th:replace="_fragments/note_fragments :: noteOwnerViewCards(${notes})"/>
     </div>
 </layout>

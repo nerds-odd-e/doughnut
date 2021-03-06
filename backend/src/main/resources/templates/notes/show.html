@@ -1,7 +1,7 @@
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
-<layout th:replace="fragments/basic_layout :: application_layout(~{ :: .content})">
+<layout th:replace="_fragments/basic_layout :: application_layout(~{ :: .content})">
     <div class="container content">
-        <div th:replace="fragments/note_fragments :: noteBreadcrumb(${noteEntity}, ~{:: .additional-item})">
+        <div th:replace="_fragments/note_fragments :: noteBreadcrumb(${noteEntity}, ~{:: .additional-item})">
             <li class="breadcrumb-item additional-item" th:text="${noteEntity.title}"/>
             <li class="breadcrumb-item additional-item">
                 <a class="text-secondary" th:href="@{/notes/{id}/new(id=${noteEntity.id})}">(Add Child Note)</a>
@@ -9,7 +9,7 @@
         </div>
 
         <div th:if="${noteEntity.parentNote}">
-            <svg th:replace="fragments/svgs :: downRight"/>
+            <svg th:replace="_fragments/svgs :: downRight"/>
             <a th:if="${noteEntity.parentNote}" th:href="@{/notes/{id}/new(id=${noteEntity.parentNote.id})}">Add Sibling
                 Note</a>
         </div>
@@ -18,10 +18,10 @@
                 <!--                the following commented code is for demo purpose -->
                 <!--                <span class="descendant-counter" th:text="${treeNodeModel.descendantCount()}"/>-->
                 <!--                <span class="descendant-counter" th:text="0"/>-->
-                <div th:replace="fragments/note_fragments :: noteButtons(${noteEntity})"/>
+                <div th:replace="_fragments/note_fragments :: noteButtons(${noteEntity})"/>
             </nav>
 
-            <div th:replace="fragments/note_fragments :: noteShow(${noteEntity})"/>
+            <div th:replace="_fragments/note_fragments :: noteShow(${noteEntity})"/>
 
         </div>
 
@@ -30,13 +30,13 @@
                 <a th:href="@{/notes/{id}/move(id=${noteEntity.id})}">Move This Note</a>
             </div>
             <div class="btn-group btn-group-sm">
-                <a th:replace="fragments/note_fragments :: noteLinkButton(${treeNodeModel.previousSiblingNote}, 'fastBackward', 'previous sibling')"/>
-                <a th:replace="fragments/note_fragments :: noteLinkButton(${treeNodeModel.previousNote}, 'backward', 'previous')"/>
-                <a th:replace="fragments/note_fragments :: noteLinkButton(${treeNodeModel.nextNote}, 'forward', 'next')"/>
-                <a th:replace="fragments/note_fragments :: noteLinkButton(${treeNodeModel.nextSiblingNote}, 'fastForward', 'next sibling')"/>
+                <a th:replace="_fragments/note_fragments :: noteLinkButton(${treeNodeModel.previousSiblingNote}, 'fastBackward', 'previous sibling')"/>
+                <a th:replace="_fragments/note_fragments :: noteLinkButton(${treeNodeModel.previousNote}, 'backward', 'previous')"/>
+                <a th:replace="_fragments/note_fragments :: noteLinkButton(${treeNodeModel.nextNote}, 'forward', 'next')"/>
+                <a th:replace="_fragments/note_fragments :: noteLinkButton(${treeNodeModel.nextSiblingNote}, 'fastForward', 'next sibling')"/>
                 </a>
         </nav>
 
-        <div th:replace="fragments/note_fragments :: noteOwnerViewCards(${noteEntity.children})"/>
+        <div th:replace="_fragments/note_fragments :: noteOwnerViewCards(${noteEntity.children})"/>
     </div>
 </layout>

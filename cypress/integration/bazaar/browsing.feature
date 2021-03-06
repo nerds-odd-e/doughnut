@@ -1,7 +1,6 @@
 Feature: Bazaar browsing
   Part of the bazaar should be visible to everyone.
 
-  @ignore
   Scenario: Browsing as non-user
     Given there are some notes for existing user "old_learner"
       | title           | description                | testingParent |

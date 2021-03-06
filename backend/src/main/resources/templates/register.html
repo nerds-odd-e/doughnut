@@ -1,5 +1,5 @@
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
-<layout th:replace="fragments/before_login_layout :: application_before_login_layout(~{ :: .content})">
+<layout th:replace="_fragments/before_login_layout :: application_before_login_layout(~{ :: .content})">
     <div class="container content">
         <h2>Welcome, new user. Please create your profile</h2>
         <form action="#" th:action="@{/users}" th:object="${user}" method="post">

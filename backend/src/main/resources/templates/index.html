@@ -1,9 +1,9 @@
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
-<layout th:replace="fragments/basic_layout :: application_layout(~{ :: .content})">
+<layout th:replace="_fragments/basic_layout :: application_layout(~{ :: .content})">
     <div class="container content">
         <h2 th:text="'Welcome ' + ${currentUserFetcher.getUser().getName()} + '!'"/>
 
-        <div th:replace="fragments/front_pages :: mainFeatures(~{ :: .notes-button}, ~{ :: .review-button})">
+        <div th:replace="_fragments/front_pages :: mainFeatures(~{ :: .notes-button}, ~{ :: .review-button})">
             <a class="btn btn-light notes-button" href="/notes"> Go To My Notes </a>
             <a class="btn btn-light review-button" href="/reviews"> Start Review </a>
         </div>

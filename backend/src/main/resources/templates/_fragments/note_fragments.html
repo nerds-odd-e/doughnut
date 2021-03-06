@@ -25,22 +25,22 @@
 
 <div th:fragment="noteButtons(note)" class="btn-group btn-group-sm">
     <a class="btn btn-sm edit-card" th:href="@{/notes/{id}/edit(id=${note.id})}" title="edit note">
-        <svg th:replace="fragments/svgs :: edit"/>
+        <svg th:replace="_fragments/svgs :: edit"/>
     </a>
     <a class="btn btn-sm link-card" th:href="@{/notes/{id}/link(id=${note.id})}" title="link note">
-        <svg th:replace="fragments/svgs :: linkNote"/>
+        <svg th:replace="_fragments/svgs :: linkNote"/>
     </a>
     <form th:action="@{/notes/{id}/share(id=${note.id})}" th:method="post"
           onsubmit="return confirm('Are you sure to share?')">
         <button class="btn btn-sm share-card" title="Share node to bazaar">
-            <svg th:replace="fragments/svgs :: bazaarShare"/>
+            <svg th:replace="_fragments/svgs :: bazaarShare"/>
         </button>
     </form>
     <form th:action="@{/notes/{id}/delete(id=${note.id})}" th:method="delete"
           onsubmit="return confirm('Are you sure to delete?')">
         <input type="hidden" name="_method" value="delete"/>
         <button class="btn btn-sm delete-card" title="delete note">
-            <svg th:replace="fragments/svgs :: remove"/>
+            <svg th:replace="_fragments/svgs :: remove"/>
         </button>
     </form>
 </div>
@@ -59,19 +59,19 @@
 </div>
 
 <div th:fragment="noteFormBody(note)">
-    <div th:replace="fragments/forms :: textInput('note', 'title', null)"/>
-    <div th:replace="fragments/forms :: textarea('note', 'description', null)"/>
-    <div th:replace="fragments/forms :: textInput('note', 'picture', 'Optional. We only accept full url for now.')"/>
-    <div th:replace="fragments/forms :: textInput('note', 'url', null)"/>
-    <div th:replace="fragments/forms :: checkInput('note', 'urlIsVideo')"/>
+    <div th:replace="_fragments/forms :: textInput('note', 'title', null)"/>
+    <div th:replace="_fragments/forms :: textarea('note', 'description', null)"/>
+    <div th:replace="_fragments/forms :: textInput('note', 'picture', 'Optional. We only accept full url for now.')"/>
+    <div th:replace="_fragments/forms :: textInput('note', 'url', null)"/>
+    <div th:replace="_fragments/forms :: checkInput('note', 'urlIsVideo')"/>
 </div>
 
 <div th:fragment="noteLinkButton(note, svg, title)">
     <a role="button" class="btn btn-sm" th:title="${title}" th:if="${note}" th:href="@{/notes/{id}(id=${note.id})}">
-        <svg th:replace="fragments/svgs :: __${svg}__"/>
+        <svg th:replace="_fragments/svgs :: __${svg}__"/>
     </a>
     <a role="button" class="btn btn-sm disabled" th:unless="${note}">
-        <svg th:replace="fragments/svgs :: __${svg}__"/>
+        <svg th:replace="_fragments/svgs :: __${svg}__"/>
     </a>
 </div>
 <div th:fragment="noteShow(noteEntity)" th:object="${noteEntity}">

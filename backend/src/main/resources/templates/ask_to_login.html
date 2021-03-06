@@ -1,6 +1,6 @@
 
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
-<layout th:replace="fragments/before_login_layout :: application_before_login_layout(~{ :: .content})">
+<layout th:replace="_fragments/before_login_layout :: application_before_login_layout(~{ :: .content})">
     <div class="content">
         <div class="jumbotron jumbotron-fluid">
             <div class="container">
@@ -8,7 +8,7 @@
                 <p>
                     Please <a href="/oauth2/authorization/github">login with Github</a>.
                 </p>
-            <div th:replace="fragments/front_pages :: mainFeatures(~{ :: .notes-button}, ~{ :: .review-button})">
+            <div th:replace="_fragments/front_pages :: mainFeatures(~{ :: .notes-button}, ~{ :: .review-button})">
                 <p class= "notes-button" >Please login</p>
                 <p class= "review-button">Please login</p>
             </div>

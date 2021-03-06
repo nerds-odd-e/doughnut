@@ -1,11 +1,11 @@
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
 <layout th:fragment="application_before_login_layout(content)">
     <html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
-    <head th:replace="fragments/basic_layout :: head"/>
+    <head th:replace="_fragments/basic_layout :: head"/>
     <body>
         <div th:replace="${content}"></div>
-        <div th:replace="fragments/basic_layout :: footer"/>
-        <div th:replace="fragments/basic_layout :: foot"/>
+        <div th:replace="_fragments/basic_layout :: footer"/>
+        <div th:replace="_fragments/basic_layout :: foot"/>
     </body>
     </html>
 </layout>

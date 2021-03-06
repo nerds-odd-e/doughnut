@@ -1,12 +1,12 @@
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
-<layout th:replace="fragments/basic_layout :: application_layout(~{ :: .content})">
+<layout th:replace="_fragments/basic_layout :: application_layout(~{ :: .content})">
     <div class="container content">
-        <div th:replace="fragments/note_fragments :: noteBreadcrumb(${noteEntity}, ~{:: .additional-item})">
+        <div th:replace="_fragments/note_fragments :: noteBreadcrumb(${noteEntity}, ~{:: .additional-item})">
             <li class="breadcrumb-item additional-item" th:text="${noteEntity.title}"/>
         </div>
 
         <div class="jumbotron py-4 mb-2">
-            <div th:replace="fragments/note_fragments :: noteShow(${noteEntity})"/>
+            <div th:replace="_fragments/note_fragments :: noteShow(${noteEntity})"/>
 
         </div>
 
@@ -15,13 +15,13 @@
                 <a th:href="@{/notes/{id}/move(id=${noteEntity.id})}">Move This Note</a>
             </div>
             <div class="btn-group btn-group-sm">
-                <a th:replace="fragments/note_fragments :: noteLinkButton(${treeNodeModel.previousSiblingNote}, 'fastBackward', 'previous sibling')"/>
-                <a th:replace="fragments/note_fragments :: noteLinkButton(${treeNodeModel.previousNote}, 'backward', 'previous')"/>
-                <a th:replace="fragments/note_fragments :: noteLinkButton(${treeNodeModel.nextNote}, 'forward', 'next')"/>
-                <a th:replace="fragments/note_fragments :: noteLinkButton(${treeNodeModel.nextSiblingNote}, 'fastForward', 'next sibling')"/>
+                <a th:replace="_fragments/note_fragments :: noteLinkButton(${treeNodeModel.previousSiblingNote}, 'fastBackward', 'previous sibling')"/>
+                <a th:replace="_fragments/note_fragments :: noteLinkButton(${treeNodeModel.previousNote}, 'backward', 'previous')"/>
+                <a th:replace="_fragments/note_fragments :: noteLinkButton(${treeNodeModel.nextNote}, 'forward', 'next')"/>
+                <a th:replace="_fragments/note_fragments :: noteLinkButton(${treeNodeModel.nextSiblingNote}, 'fastForward', 'next sibling')"/>
                 </a>
         </nav>
 
-        <div th:replace="fragments/note_fragments :: noteOwnerViewCards(${noteEntity.children})"/>
+        <div th:replace="_fragments/bazaar_fragments :: noteBazaarViewCards(${noteEntity.children})"/>
     </div>
 </layout>
