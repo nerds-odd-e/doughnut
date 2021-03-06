@@ -104,6 +104,10 @@ Cypress.Commands.add("findNoteCardButton", (noteTitle, selector) => {
   return cy.findByText(noteTitle).parent().parent().parent().find(selector);
 });
 
+Cypress.Commands.add("findNoteCardEditButton", (noteTitle) => {
+  return cy.findNoteCardButton(noteTitle, ".edit-card");
+});
+
 Cypress.Commands.add("updateCurrentUserSettingsWith", (hash) => {
   cy.request({
     method: "POST",

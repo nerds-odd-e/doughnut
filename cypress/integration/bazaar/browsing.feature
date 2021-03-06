@@ -10,4 +10,5 @@ Feature: Bazaar browsing
     And note "Shape" is shared to the Bazaar
     When I haven't login
     Then I should see "Shape" is shared in the Bazaar
+    And there shouldn't be any note edit button for "Shape"
 

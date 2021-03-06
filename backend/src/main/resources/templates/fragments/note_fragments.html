@@ -45,13 +45,22 @@
     </form>
 </div>
 
-<div th:fragment="noteViewCards(notes)">
-    <div th:replace=":: cards(${notes}, ~{ :: .card-button},  ~{ :: .card-header})">
+<div th:fragment="noteCardWithHeaderAndButton(notes, bodyButton, headerButtons)">
+    <div th:replace=":: cards(${notes}, ${bodyButton},  ~{ :: .card-header})">
         <span class="card-header d-flex flex-row-reverse p-0">
-            <div th:replace=":: noteButtons(${note})"/>
+            <div th:replace="${headerButtons}"/>
         </span>
-        <span class="card-button"></span>
     </div>
+</div>
+
+<div th:fragment="noteOwnerViewCards(notes)"  th:replace=":: noteCardWithHeaderAndButton(${notes}, ~{ :: .card-button},  ~{ :: .card-header-buttons})">
+    <div class="card-header-buttons" th:replace=":: noteButtons(${note})"/>
+    <span class="card-button"/>
+</div>
+
+<div th:fragment="noteBazaarViewCards(notes)"  th:replace=":: noteCardWithHeaderAndButton(${notes}, ~{ :: .b-card-button},  ~{ :: .b-card-header-buttons})">
+    <div class="b-card-header-buttons"/>
+    <span class="b-card-button"/>
 </div>
 
 <div th:fragment="noteFormBody(note)">

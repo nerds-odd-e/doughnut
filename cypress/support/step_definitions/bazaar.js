@@ -25,3 +25,8 @@ Then("note {string} is shared to the Bazaar", (noteTitle) => {
     expect(response.status).to.equal(200);
   });
 });
+
+Then("there shouldn't be any note edit button for {string}", (noteTitle) => {
+  cy.findNoteCardEditButton(noteTitle).should("not.exist");
+});
+
