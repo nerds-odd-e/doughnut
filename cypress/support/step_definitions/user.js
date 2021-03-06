@@ -48,5 +48,11 @@ Then("my space setting is {string}", (number) => {
   cy.updateCurrentUserSettingsWith({ space_intervals: number });
 });
 
+Then("I haven't login", () => {
+});
+
+
+
+
 
 

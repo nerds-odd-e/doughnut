@@ -78,7 +78,14 @@ class TestabilityController {
         throw new Exception("User with external identifier `" + externalIdentifier + "` does not exist");
     }
 
-    @PostMapping("/update_current_user")
+    @PostMapping("/share_to_bazaar")
+    public String shareToBazaar(@RequestBody HashMap<String, String> map) throws Exception {
+        NoteEntity noteEntity = noteRepository.findFirstByTitle(map.get("noteTitle"));
+        modelFactoryService.toBazaarModel().shareNote(noteEntity);
+        return "OK";
+    }
+
+        @PostMapping("/update_current_user")
     @Transactional
     public String updateCurrentUser(@RequestBody HashMap<String, String> userInfo) {
         UserModel currentUserModel = currentUser.getUser();

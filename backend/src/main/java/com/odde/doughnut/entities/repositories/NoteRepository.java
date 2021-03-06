@@ -40,4 +40,5 @@ public interface NoteRepository extends CrudRepository<NoteEntity, Integer> {
             , nativeQuery = true)
     List<NoteEntity> findByUserWhereThereIsNoReviewPoint(@Param("userId") Integer userId);
 
+    NoteEntity findFirstByTitle(String noteTitle);
 }
