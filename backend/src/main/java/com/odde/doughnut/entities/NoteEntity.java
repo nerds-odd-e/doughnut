@@ -128,7 +128,7 @@ public class NoteEntity {
     @Transient
     @Getter
     @Setter
-    private String testingLinkTo;
+    private String testingParent;
 
     public void linkToNote(NoteEntity targetNote) {
         this.targetNotes.add(targetNote);

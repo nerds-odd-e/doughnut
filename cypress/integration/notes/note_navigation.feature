@@ -6,7 +6,7 @@ Feature: Note navigation
 
     Scenario Outline: Navigation
         Given there are some notes for the current user
-            | title                | testingLinkTo |
+            | title                | testingParent |
             | Shape                |               |
             | Rectangle            | Shape         |
             | Square               | Rectangle     |

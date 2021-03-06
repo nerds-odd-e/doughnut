@@ -19,7 +19,7 @@ Feature: Note display
 
 #    Scenario: The note display page should contain the total descendant count
 #        Given there are some notes for the current user
-#            | title                | testingLinkTo |
+#            | title                | testingParent |
 #            | Shape                |               |
 #            | Rectangle            | Shape         |
 #            | Square               | Rectangle     |

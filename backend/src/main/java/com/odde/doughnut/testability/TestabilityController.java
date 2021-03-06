@@ -58,7 +58,7 @@ class TestabilityController {
         for (NoteEntity note : notes) {
             earlyNotes.put(note.getTitle(), note);
             note.setUserEntity(userModel.getEntity());
-            note.setParentNote(earlyNotes.get(note.getTestingLinkTo()));
+            note.setParentNote(earlyNotes.get(note.getTestingParent()));
         }
         noteRepository.saveAll(notes);
         return notes.stream().map(NoteEntity::getId).collect(Collectors.toList());

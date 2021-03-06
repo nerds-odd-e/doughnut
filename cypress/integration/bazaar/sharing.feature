@@ -7,7 +7,7 @@ Feature: Bazaar sharing
 
   Scenario: Contributing To Bazaar
     Given there are some notes for the current user
-      | title           | description                | linkTo        |
+      | title           | description                | testingParent |
       | Shape           | The form of something      |               |
       | Square          | four equal straight sides  | Shape         |
       | Triangle        | three sides shape          | Shape         |

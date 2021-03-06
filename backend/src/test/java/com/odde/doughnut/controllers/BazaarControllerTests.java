@@ -45,16 +45,8 @@ class BazaarControllerTests {
     }
 
     @Test
-    void whenThereIsNoSharedNote() {
-        assertEquals("bazaar", controller.bazaar(model));
-        assertThat((List<NoteEntity>) model.getAttribute("notes"), hasSize(equalTo(0)));
-    }
-
-    @Test
-    void whenThereIsSharedNote() {
-        makeMe.aBazaarNode(topNote).please();
-        assertEquals("bazaar", controller.bazaar(model));
-        assertThat((List<NoteEntity>) model.getAttribute("notes"), hasSize(equalTo(1)));
+    void renderTheTemplate() {
+        assertEquals("bazaar/index", controller.bazaar(model));
     }
 
     @Nested

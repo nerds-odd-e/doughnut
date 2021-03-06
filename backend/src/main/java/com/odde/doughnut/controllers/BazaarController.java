@@ -26,7 +26,7 @@ public class BazaarController {
     public String bazaar(Model model) {
         BazaarModel bazaar = modelFactoryService.toBazaarModel();
         model.addAttribute("notes", bazaar.getAllNotes());
-        return "bazaar";
+        return "bazaar/index";
     }
 
     @PostMapping(value = "/notes/{note}/share")
@@ -35,6 +35,12 @@ public class BazaarController {
         BazaarModel bazaar = modelFactoryService.toBazaarModel();
         bazaar.shareNote(note);
         return new RedirectView("/notes");
+    }
+
+    @GetMapping("/bazaar/notes/{noteEntity}")
+    public String showBazaarNote(@PathVariable(name = "noteEntity") NoteEntity noteEntity, Model model) {
+        model.addAttribute("treeNodeModel", modelFactoryService.toTreeNodeModel(noteEntity));
+        return "bazaar/show";
     }
 
 }

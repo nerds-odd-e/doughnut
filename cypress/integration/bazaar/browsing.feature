@@ -4,7 +4,7 @@ Feature: Bazaar browsing
   @ignore
   Scenario: Browsing as non-user
     Given there are some notes for existing user "old_learner"
-      | title           | description                | linkTo        |
+      | title           | description                | testingParent |
       | Shape           | The form of something      |               |
       | Square          | four equal straight sides  | Shape         |
       | Triangle        | three sides shape          | Shape         |
