@@ -78,18 +78,6 @@ public class ReviewPointEntity {
         return userLocalDateTime.getYear() * 366 + userLocalDateTime.getDayOfYear();
     }
 
-    public void repeatedOnTime() {
-        this.forgettingCurveIndex = SpacedRepetition.getNextForgettingCurveIndex(this.forgettingCurveIndex);
-    }
-
-    public void setLastAndNextReviewAt(SpacedRepetition spacedRepetition, Timestamp currentUTCTimestamp) {
-        setLastReviewedAt(currentUTCTimestamp);
-        setNextReviewAt(calculateNextReviewAt(spacedRepetition));
-    }
-
-    private Timestamp calculateNextReviewAt(SpacedRepetition spacedRepetition) {
-        return TimestampOptions.addDaysToTimestamp(lastReviewedAt, spacedRepetition.getNextRepeatInDays(getForgettingCurveIndex()));
-    }
 }
 
 

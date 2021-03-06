@@ -26,30 +26,24 @@ public class SpacedRepettionTest {
 
         @Test
         void fallOnTheFirstRepeatLevel() {
-            int index = SpacedRepetition.getNextForgettingCurveIndex(SpacedRepetition.DEFAULT_FORGETTING_CURVE_INDEX);
+            int index = spacedRepetition.getNextForgettingCurveIndex(SpacedRepetition.DEFAULT_FORGETTING_CURVE_INDEX);
             assertThat(spacedRepetition.getNextRepeatInDays(index), equalTo(3));
         }
 
         @Test
         void fallOnTheSecondRepeatLevel() {
-            int index = SpacedRepetition.getNextForgettingCurveIndex(SpacedRepetition.DEFAULT_FORGETTING_CURVE_INDEX);
-            index = SpacedRepetition.getNextForgettingCurveIndex(index);
+            int index = spacedRepetition.getNextForgettingCurveIndex(SpacedRepetition.DEFAULT_FORGETTING_CURVE_INDEX);
+            index = spacedRepetition.getNextForgettingCurveIndex(index);
             assertThat(spacedRepetition.getNextRepeatInDays(index), equalTo(4));
         }
 
         @Test
         void beyondSettingShouldGetFromDefault() {
-            int index = SpacedRepetition.getNextForgettingCurveIndex(SpacedRepetition.DEFAULT_FORGETTING_CURVE_INDEX);
-            index = SpacedRepetition.getNextForgettingCurveIndex(index);
-            index = SpacedRepetition.getNextForgettingCurveIndex(index);
-            index = SpacedRepetition.getNextForgettingCurveIndex(index);
+            int index = spacedRepetition.getNextForgettingCurveIndex(SpacedRepetition.DEFAULT_FORGETTING_CURVE_INDEX);
+            index = spacedRepetition.getNextForgettingCurveIndex(index);
+            index = spacedRepetition.getNextForgettingCurveIndex(index);
+            index = spacedRepetition.getNextForgettingCurveIndex(index);
             assertThat(spacedRepetition.getNextRepeatInDays(index), equalTo(8));
         }
-
-
-
-
-
     }
-
 }

@@ -21,7 +21,7 @@ public class SpacedRepetition {
         }
     }
 
-    public static int getNextForgettingCurveIndex(Integer oldForgettingCurveIndex) {
+    public int getNextForgettingCurveIndex(Integer oldForgettingCurveIndex) {
         return oldForgettingCurveIndex + DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT;
     }
 
