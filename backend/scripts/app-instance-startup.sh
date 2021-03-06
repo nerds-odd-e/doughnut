@@ -19,8 +19,8 @@ gsutil cp gs://"${BUCKET}/ssl/private/star_odd-e_com.crt" /etc/ssl/private/star_
 chmod 640 /etc/ssl/private/*
 
 # Install dependencies
-apt-get update
-apt-get -y install jq openjdk-11-jre gnupg gnupg-agent libmariadb3 mariadb-client apt-transport-https ca-certificates openssl
+apt-get -y update && apt-get -y upgrade
+apt-get -y install htop jq openjdk-11-jre gnupg gnupg-agent libmariadb3 mariadb-client apt-transport-https ca-certificates openssl
 
 # Make Java 11 default
 export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
