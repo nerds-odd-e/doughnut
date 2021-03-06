@@ -1,0 +1,6 @@
+<a th:fragment="noteTitleWithBazaarLink(note)" th:href="'/bazaar/notes/' + ${note.id}" th:text="${note.title}"/>
+
+<div th:fragment="noteBazaarViewCards(notes)"  th:replace="fragments/note_fragments::noteCardWithHeaderAndButton(notes=${notes}, bodyButton=~{ :: .b-card-button},  headerButtons=~{ :: .b-card-header-buttons}, linkFragment='fragments/bazaar_fragments::noteTitleWithBazaarLink')">
+    <div class="b-card-header-buttons"/>
+    <span class="b-card-button"/>
+</div>

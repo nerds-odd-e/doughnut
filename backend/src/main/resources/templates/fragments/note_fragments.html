@@ -8,13 +8,13 @@
     </ol>
 </div>
 
-<div th:fragment="cards(notes, button, cardHeader)">
+<div th:fragment="cards(notes, button, cardHeader)" th:with="linkFragment=${linkFragment} ?: ':: noteTitleWithLink'">
     <div class="row">
         <div class="col-12 col-sm-6 col-md-4 col-lg-3" th:each="note:${notes}">
             <div class="card">
                 <div th:replace="${cardHeader}"/>
                 <div class="card-body">
-                    <h5 th:insert=":: noteTitleWithLink(${note})" class="card-title"/>
+                    <h5 th:insert="__${linkFragment}__(${note})" class="card-title"/>
                     <p th:text="${#strings.abbreviate(note.description, 50)}"/>
                     <div th:replace="${button}">Put your button here</div>
                 </div>
@@ -46,7 +46,7 @@
 </div>
 
 <div th:fragment="noteCardWithHeaderAndButton(notes, bodyButton, headerButtons)">
-    <div th:replace=":: cards(${notes}, ${bodyButton},  ~{ :: .card-header})">
+    <div th:replace=":: cards(notes=${notes}, button=${bodyButton}, cardHeader=~{ :: .card-header}, linkFragment=${linkFragment})">
         <span class="card-header d-flex flex-row-reverse p-0">
             <div th:replace="${headerButtons}"/>
         </span>
@@ -56,11 +56,6 @@
 <div th:fragment="noteOwnerViewCards(notes)"  th:replace=":: noteCardWithHeaderAndButton(${notes}, ~{ :: .card-button},  ~{ :: .card-header-buttons})">
     <div class="card-header-buttons" th:replace=":: noteButtons(${note})"/>
     <span class="card-button"/>
-</div>
-
-<div th:fragment="noteBazaarViewCards(notes)"  th:replace=":: noteCardWithHeaderAndButton(${notes}, ~{ :: .b-card-button},  ~{ :: .b-card-header-buttons})">
-    <div class="b-card-header-buttons"/>
-    <span class="b-card-button"/>
 </div>
 
 <div th:fragment="noteFormBody(note)">

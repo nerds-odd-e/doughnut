@@ -30,3 +30,8 @@ Then("there shouldn't be any note edit button for {string}", (noteTitle) => {
   cy.findNoteCardEditButton(noteTitle).should("not.exist");
 });
 
+When("I open the note {string} in the Bazaar", (noteTitle) => {
+  cy.findByText(noteTitle).click();
+});
+
+
