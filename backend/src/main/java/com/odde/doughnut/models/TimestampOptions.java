@@ -10,4 +10,8 @@ public abstract class TimestampOptions {
         ZonedDateTime zonedDateTime = timestamp.toInstant().atZone(ZoneId.of("UTC"));
         return Timestamp.from(zonedDateTime.plus(daysToAdd, ChronoUnit.DAYS).toInstant());
     }
+
+    public static ZonedDateTime getSystemLocalDateTime(Timestamp timestamp) {
+        return timestamp.toLocalDateTime().atZone(ZoneId.systemDefault());
+    }
 }

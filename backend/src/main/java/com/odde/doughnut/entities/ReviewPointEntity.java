@@ -73,7 +73,7 @@ public class ReviewPointEntity {
     }
 
     public static int getDayId(Timestamp timestamp, ZoneId timeZone) {
-        ZonedDateTime systemLocalDateTime = timestamp.toLocalDateTime().atZone(ZoneId.systemDefault());
+        ZonedDateTime systemLocalDateTime = TimestampOptions.getSystemLocalDateTime(timestamp);
         ZonedDateTime userLocalDateTime = systemLocalDateTime.withZoneSameInstant(timeZone);
         return userLocalDateTime.getYear() * 366 + userLocalDateTime.getDayOfYear();
     }

@@ -9,5 +9,5 @@ import java.util.List;
 
 public interface ReviewPointRepository extends CrudRepository<ReviewPointEntity, Integer> {
     List<ReviewPointEntity> findAllByUserEntityAndInitialReviewedAtGreaterThan(UserEntity userEntity, Timestamp since);
-    List<ReviewPointEntity> findAllByUserEntityOrderByLastReviewedAt(UserEntity userEntity);
+    List<ReviewPointEntity> findAllByUserEntityAndNextReviewAtLessThanEqualOrderByNextReviewAt(UserEntity userEntity, Timestamp nextReviewAt);
 }
