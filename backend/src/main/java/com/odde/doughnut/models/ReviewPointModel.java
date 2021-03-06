@@ -10,17 +10,20 @@ public class ReviewPointModel extends ModelForEntity<ReviewPointEntity> {
         super(entity, modelFactoryService);
     }
 
-    public void initalReview(UserModel userModel, Timestamp currentUTCTimestamp) {
-        getEntity().setInitialReviewedAt(currentUTCTimestamp);
-        getEntity().setLastAndNextReviewAt(userModel, currentUTCTimestamp);
+    public void initialReview(UserModel userModel, Timestamp currentUTCTimestamp) {
         getEntity().setUserEntity(userModel.getEntity());
-        modelFactoryService.reviewPointRepository.save(getEntity());
+        getEntity().setInitialReviewedAt(currentUTCTimestamp);
+        repeat(currentUTCTimestamp);
     }
 
-    public void repeat(UserModel userModel, Timestamp currentUTCTimestamp) {
+    public void repeat(Timestamp currentUTCTimestamp) {
         getEntity().repeatedOnTime();
-        getEntity().setLastAndNextReviewAt(userModel, currentUTCTimestamp);
+        getEntity().setLastAndNextReviewAt(getUserModel().getSpacedRepetition(), currentUTCTimestamp);
         this.modelFactoryService.reviewPointRepository.save(getEntity());
+    }
+
+    private UserModel getUserModel() {
+        return modelFactoryService.toUserModel(getEntity().getUserEntity());
     }
 
 }

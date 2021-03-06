@@ -16,23 +16,31 @@ public class SpacedRepettionTest {
 
     @Nested
     class ASettingOf379 {
-        SpacedRepetition spacedRepetition = new SpacedRepetition("3, 8, 9");
+        SpacedRepetition spacedRepetition = new SpacedRepetition("3, 4, 5");
+
+        @Test
+        void fallBeforeTheFirstRepeatLevel() {
+            int index = SpacedRepetition.DEFAULT_FORGETTING_CURVE_INDEX;
+            assertThat(spacedRepetition.getNextRepeatInDays(index), equalTo(0));
+        }
 
         @Test
         void fallOnTheFirstRepeatLevel() {
-            int index = SpacedRepetition.DEFAULT_FORGETTING_CURVE_INDEX;
+            int index = SpacedRepetition.getNextForgettingCurveIndex(SpacedRepetition.DEFAULT_FORGETTING_CURVE_INDEX);
             assertThat(spacedRepetition.getNextRepeatInDays(index), equalTo(3));
         }
 
         @Test
         void fallOnTheSecondRepeatLevel() {
             int index = SpacedRepetition.getNextForgettingCurveIndex(SpacedRepetition.DEFAULT_FORGETTING_CURVE_INDEX);
-            assertThat(spacedRepetition.getNextRepeatInDays(index), equalTo(8));
+            index = SpacedRepetition.getNextForgettingCurveIndex(index);
+            assertThat(spacedRepetition.getNextRepeatInDays(index), equalTo(4));
         }
 
         @Test
-        void beyondSetting() {
+        void beyondSettingShouldGetFromDefault() {
             int index = SpacedRepetition.getNextForgettingCurveIndex(SpacedRepetition.DEFAULT_FORGETTING_CURVE_INDEX);
+            index = SpacedRepetition.getNextForgettingCurveIndex(index);
             index = SpacedRepetition.getNextForgettingCurveIndex(index);
             index = SpacedRepetition.getNextForgettingCurveIndex(index);
             assertThat(spacedRepetition.getNextRepeatInDays(index), equalTo(8));

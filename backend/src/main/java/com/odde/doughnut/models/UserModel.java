@@ -106,11 +106,6 @@ public class UserModel extends ModelForEntity<UserEntity> {
         ).findFirst().orElse(null) ;
     }
 
-    public Timestamp getNextReviewAt(ReviewPointEntity reviewPointEntity) {
-        Timestamp lastReviewedAt = reviewPointEntity.getLastReviewedAt();
-        return TimestampOptions.addDaysToTimestamp(lastReviewedAt, getSpacedRepetition().getNextRepeatInDays(reviewPointEntity.getForgettingCurveIndex()));
-    }
-
     public SpacedRepetition getSpacedRepetition() {
         return new SpacedRepetition(entity.getSpaceIntervals());
     }

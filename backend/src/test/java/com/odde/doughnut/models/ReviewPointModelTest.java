@@ -39,7 +39,7 @@ public class ReviewPointModelTest {
         void initialReviewShouldSetBothInitialAndLastReviewAt() {
             NoteEntity noteEntity = makeMe.aNote().forUser(userModel).please();
             ReviewPointModel reviewPoint = makeMe.aReviewPointFor(noteEntity).by(userModel).toModelPlease();
-            reviewPoint.initalReview(userModel, day1);
+            reviewPoint.initialReview(userModel, day1);
             assertThat(reviewPoint.getEntity().getInitialReviewedAt(), equalTo(day1));
             assertThat(reviewPoint.getEntity().getLastReviewedAt(), equalTo(day1));
         }

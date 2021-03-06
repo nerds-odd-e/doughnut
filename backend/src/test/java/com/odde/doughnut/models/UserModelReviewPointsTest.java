@@ -68,8 +68,12 @@ public class UserModelReviewPointsTest {
                 "2,   3, false",
                 "2,   4, true",
                 })
-        void whenThereOneReviewedNotesForUser(Integer repetitionDone, Integer reviewDay, Boolean expectedToRepeat) {
-            makeMe.aReviewPointFor(noteEntity).by(userModel).lastReviewedAt(baseDay).nthStrictRepetitionDone(repetitionDone).please();
+        void whenThereIsOneReviewedNotesForUser(Integer repetitionDone, Integer reviewDay, Boolean expectedToRepeat) {
+            makeMe
+                    .aReviewPointFor(noteEntity)
+                    .by(userModel)
+                    .nthStrictRepetitionOn(repetitionDone, baseDay)
+                    .please();
             ReviewPointEntity mostUrgentReviewPointEntity = userModel.getReviewPointNeedToRepeat(daysAfterBase(reviewDay));
             assertThat(mostUrgentReviewPointEntity != null, is(expectedToRepeat));
         }

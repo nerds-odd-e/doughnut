@@ -2,9 +2,11 @@ package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.ReviewPointEntity;
+import com.odde.doughnut.models.ModelForEntity;
 import com.odde.doughnut.models.ReviewPointModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.EntityAndModelBuilder;
+import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 
 import java.sql.Timestamp;
@@ -31,14 +33,10 @@ public class ReviewPointBuilder extends EntityAndModelBuilder<ReviewPointEntity,
         return this;
     }
 
-    public ReviewPointBuilder lastReviewedAt(Timestamp timestamp) {
-        entity.setLastReviewedAt(timestamp);
-        return this;
-    }
-
-    public ReviewPointBuilder nthStrictRepetitionDone(Integer repetitionDone) {
-        for (int i = 0; i < repetitionDone; i++) {
-            entity.repeatedOnTime();
+    public ReviewPointBuilder nthStrictRepetitionOn(Integer repetitionDone, Timestamp timestamp) {
+        ReviewPointModel reviewPointModel = makeMe.modelFactoryService.toReviewPointModel(entity);
+        for (int i = 0; i < repetitionDone + 1; i++) {
+            reviewPointModel.repeat(timestamp);
         }
         return this;
     }

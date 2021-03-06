@@ -25,8 +25,8 @@ public class SpacedRepetition {
         return oldForgettingCurveIndex + DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT;
     }
 
-    Integer getNextRepeatInDays(Integer forgettingCurveIndex) {
-        int index = (forgettingCurveIndex - DEFAULT_FORGETTING_CURVE_INDEX) / DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT;
+    public Integer getNextRepeatInDays(Integer forgettingCurveIndex) {
+        int index = (forgettingCurveIndex - DEFAULT_FORGETTING_CURVE_INDEX) / DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT - 1;
         if (index < 0) {
             return 0;
         }

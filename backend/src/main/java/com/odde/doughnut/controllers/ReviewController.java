@@ -65,15 +65,14 @@ public class ReviewController {
     public String create(@Valid ReviewPointEntity reviewPointEntity) {
         UserModel userModel = currentUserFetcher.getUser();
         ReviewPointModel reviewPointModel = modelFactoryService.toReviewPointModel(reviewPointEntity);
-        reviewPointModel.initalReview(userModel, timeTraveler.getCurrentUTCTimestamp());
+        reviewPointModel.initialReview(userModel, timeTraveler.getCurrentUTCTimestamp());
         return "redirect:/reviews/initial";
     }
 
     @PostMapping("/{reviewPointEntity}")
     public String update(@Valid ReviewPointEntity reviewPointEntity) {
-        UserModel userModel = currentUserFetcher.getUser();
         ReviewPointModel reviewPointModel = modelFactoryService.toReviewPointModel(reviewPointEntity);
-        reviewPointModel.repeat(userModel, timeTraveler.getCurrentUTCTimestamp());
+        reviewPointModel.repeat(timeTraveler.getCurrentUTCTimestamp());
         return "redirect:/reviews/repeat";
     }
 
