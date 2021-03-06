@@ -21,7 +21,7 @@ public class TreeNodeModel extends ModelForEntity<NoteEntity> {
             return new ArrayList<>();
         }
         List<NoteEntity> ancestry = noteRepository.findAncestry(entity.getId().longValue());
-//        Collections.reverse(ancestry);
+        Collections.reverse(ancestry);
         return ancestry;
     }
 
