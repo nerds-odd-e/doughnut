@@ -10,6 +10,10 @@ Given("there are some notes for the current user", (data) => {
   cy.seedNotes(data.hashes());
 })
 
+Given("there are some notes for existing user {string}", (externalIdentifier, data) => {
+  cy.seedNotes(data.hashes(), externalIdentifier);
+})
+
 Given("there are notes from Note {int} to Note {int}", (from, to) => {
   const notes = Array(to-from+1).fill(0).map((_,i) => {return {title: `Note ${i+from}`};});
   cy.seedNotes(notes);

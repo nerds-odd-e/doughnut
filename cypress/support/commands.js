@@ -40,8 +40,8 @@ Cypress.Commands.add("loginAs", (username) => {
   });
 });
 
-Cypress.Commands.add("seedNotes", (notes) => {
-  cy.request({method: "POST", url: "/api/testability/seed_notes", body: notes})
+Cypress.Commands.add("seedNotes", (notes, externalIdentifier='') => {
+  cy.request({method: "POST", url: `/api/testability/seed_notes?external_identifier=${externalIdentifier}`, body: notes})
   .then((response) => {
      expect(response.body.length).to.equal(notes.length);
      const titles = notes.map(n=>n["title"]);

@@ -2,8 +2,8 @@ Feature: Bazaar browsing
   Part of the bazaar should be visible to everyone.
 
   @ignore
-  Scenario: Contributing To Bazaar
-    Given there are some notes for existing user 'old_learner'
+  Scenario: Browsing as non-user
+    Given there are some notes for existing user "old_learner"
       | title           | description                | linkTo        |
       | Shape           | The form of something      |               |
       | Square          | four equal straight sides  | Shape         |
