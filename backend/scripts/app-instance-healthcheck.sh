@@ -1,9 +1,9 @@
 #!/bin/bash
 HEALTHCHECK_STATUS=""
-RETRY=20
+RETRY=30
 while [[ ${RETRY} -gt 0 ]] && [[ "${HEALTHCHECK_STATUS}" != *"OK"* ]]
 do
-  sleep 12
+  sleep 20
   echo "RETRY (${RETRY})..."
   HEALTHCHECK_STATUS=$(curl -sk https://dough.odd-e.com/api/healthcheck 2>&1)
   if [[ "${HEALTHCHECK_STATUS}" == *"OK"* ]]; then
