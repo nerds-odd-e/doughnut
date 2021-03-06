@@ -5,7 +5,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 public class CommonConfiguration {
     HttpSecurity commonConfig(HttpSecurity http) throws Exception {
         return http.authorizeRequests()
-                .antMatchers("/", "/login", "/error", "/js/**", "/webjars/**")
+                .antMatchers("/", "/login", "/error", "/js/**", "/webjars/**", "/bazaar**")
                 .permitAll()
                 .anyRequest()
                 .authenticated()
