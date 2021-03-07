@@ -190,7 +190,6 @@ class NoteControllerTests {
         }
 
         @Test
-        @Transactional
         void shouldDeleteTheReviewPoints() throws NoAccessRightException {
             NoteEntity subject = makeMe.aNote().forUser(userModel).please();
             makeMe.aReviewPointFor(subject).by(userModel).please();

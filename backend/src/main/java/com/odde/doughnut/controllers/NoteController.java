@@ -11,6 +11,7 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ModelFactoryService;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -131,6 +132,7 @@ public class NoteController {
     }
 
     @PostMapping(value = "/{noteEntity}/delete")
+    @Transactional
     public RedirectView deleteNote(@PathVariable("noteEntity") NoteEntity noteEntity) throws NoAccessRightException {
         currentUserFetcher.getUser().assertAuthorization(noteEntity);
         modelFactoryService.toNoteModel(noteEntity).destroy();
