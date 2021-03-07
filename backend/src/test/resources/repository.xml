@@ -21,7 +21,7 @@ xsi:schemaLocation="http://www.springframework.org/schema/jdbc http://www.spring
 
     <property name="driverClassName" value="${db.driver}" />
     <property name="url" value="${db.url}" />
-    <property name="user" value="${db.user}" />
+    <property name="username" value="${db.user}" />
     <property name="password" value="${db.password}" />
   </bean>
   <bean id="emf"
