@@ -7,6 +7,7 @@ import com.odde.doughnut.services.ModelFactoryService;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class TreeNodeModel extends ModelForEntity<NoteEntity> {
     protected final NoteRepository noteRepository;
@@ -105,6 +106,19 @@ public class TreeNodeModel extends ModelForEntity<NoteEntity> {
             return getSiblingOrderToInsertBehindMe();
         }
         return getSiblingOrderToBecomeMyFirstChild();
+    }
+
+    public void destroy() {
+        traverse(child ->
+                modelFactoryService.toTreeNodeModel(child).destroy());
+        modelFactoryService.reviewPointRepository.deleteAllByNoteEntity(getEntity());
+        modelFactoryService.noteRepository.delete(getEntity());
+    }
+
+    private void traverse(Consumer<NoteEntity> noteEntityConsumer) {
+        getEntity().getChildren().forEach(
+                noteEntityConsumer
+        );
     }
 
     //

@@ -135,7 +135,7 @@ public class NoteController {
     @Transactional
     public RedirectView deleteNote(@PathVariable("noteEntity") NoteEntity noteEntity) throws NoAccessRightException {
         currentUserFetcher.getUser().assertAuthorization(noteEntity);
-        modelFactoryService.toNoteModel(noteEntity).destroy();
+        modelFactoryService.toTreeNodeModel(noteEntity).destroy();
         return new RedirectView("/notes");
     }
 

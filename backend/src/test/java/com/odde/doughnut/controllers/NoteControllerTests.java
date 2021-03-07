@@ -192,7 +192,8 @@ class NoteControllerTests {
         @Test
         void shouldDeleteTheReviewPoints() throws NoAccessRightException {
             NoteEntity subject = makeMe.aNote().forUser(userModel).please();
-            makeMe.aReviewPointFor(subject).by(userModel).please();
+            NoteEntity child = makeMe.aNote().forUser(userModel).under(subject).please();
+            makeMe.aReviewPointFor(child).by(userModel).please();
             long oldCount = makeMe.modelFactoryService.reviewPointRepository.count();
             controller.deleteNote(subject);
 

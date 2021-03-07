@@ -19,10 +19,4 @@ public class NoteContentModel extends ModelForEntity<NoteEntity> {
         entity.setUpdatedDatetime(new Date());
         modelFactoryService.noteRepository.save(entity);
     }
-
-
-    public void destroy() {
-        modelFactoryService.reviewPointRepository.deleteAllByNoteEntity(getEntity());
-        modelFactoryService.noteRepository.delete(getEntity());
-    }
 }
