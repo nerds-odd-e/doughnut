@@ -25,7 +25,12 @@
 
         </div>
 
-        <a th:replace="_fragments/note_fragments :: noteLinkButtons('', ${treeNodeModel})"/>
+        <nav class="nav d-flex justify-content-between p-0 mb-2">
+            <div class="btn-group btn-group-sm">
+                <a th:href="@{/notes/{id}/move(id=${noteEntity.id})}">Move This Note</a>
+            </div>
+            <a th:replace="_fragments/note_fragments :: noteLinkButtons('', ${treeNodeModel})"/>
+        </nav>
 
         <div th:replace="_fragments/note_fragments :: noteOwnerViewCards(${noteEntity.children})"/>
     </div>
