@@ -43,4 +43,10 @@ public class BazaarController {
         return "bazaar/show";
     }
 
+    @GetMapping("/bazaar/articles/{noteEntity}")
+    public String showBazaarNoteAsArticle(@PathVariable(name = "noteEntity") NoteEntity noteEntity, Model model) {
+        model.addAttribute("treeNodeModel", modelFactoryService.toTreeNodeModel(noteEntity));
+        return "bazaar/article";
+    }
+
 }

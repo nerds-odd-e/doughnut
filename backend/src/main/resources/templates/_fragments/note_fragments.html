@@ -95,9 +95,9 @@
 </nav>
 
 <div th:fragment="noteShow(noteEntity)" th:object="${noteEntity}">
-    <h2 class="display-4" id="note-title" th:text="*{title}"/>
+    <h2 class="h1" id="note-title" th:text="*{title}"/>
     <pre id="note-description" th:text="*{description}" style="white-space: pre-wrap;"/>
-    <div th:if="*{url}">
+    <div th:unless="${#strings.isEmpty(noteEntity.url)}">
         <label th:unless="*{urlIsVideo}">Url:</label>
         <label th:if="*{urlIsVideo}">Video Url:</label>
         <a th:href="*{url}" th:text="*{url}"/>

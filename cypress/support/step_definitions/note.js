@@ -71,7 +71,7 @@ When("I delete top level note {string}", (noteTitle) => {
 
 
 When("I create a sibling note of {string}:", (noteTitle, data) => {
-  cy.findByText(noteTitle, {selector: ".display-4"});
+  cy.findByText(noteTitle, {selector: ".h1"});
   cy.findByText("Add Sibling Note").click();
   cy.submitNoteFormWith(data.hashes());
 });
@@ -81,7 +81,7 @@ When("I should see that the note creation is not successful", (noteTitle, data) 
 });
 
 Then("I should see {string} in note title", (noteTitle) => {
-    cy.findByText(noteTitle, {selector: '.display-4'});
+    cy.findByText(noteTitle, {selector: '.h1'});
 });
 
 Then("I should not see note {string} at the top level of all my notes", (noteTitle) => {

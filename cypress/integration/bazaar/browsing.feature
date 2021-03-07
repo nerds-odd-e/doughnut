@@ -18,7 +18,6 @@ Feature: Bazaar browsing
     And I should see "Bazaar, Shape" in breadcrumb
     #And I should be able to go to the "next" note "Square"
 
-  @ignore
   Scenario: Browsing as non-user in article view
     When I haven't login
     Then I should see "Shape" is shared in the Bazaar

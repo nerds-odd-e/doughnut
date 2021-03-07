@@ -34,3 +34,17 @@ When("I open the note {string} in the Bazaar", (noteTitle) => {
   cy.findByText(noteTitle).click();
 });
 
+When("I open the note {string} in the Bazaar in article view", (noteTitle) => {
+  cy.findByText(noteTitle).click();
+  cy.findByRole('button', {name: "Article View"}).click();
+});
+
+When("I should see the article {string} with sub-content {string}", (title, contents) => {
+  cy.findByText(title, {selector: '.h1'}).should("be.visible");
+//  contents.commonSenseSplit(",").forEach(content =>
+//      cy.findByText(content).should("be.visible")
+//  )
+});
+
+
+
