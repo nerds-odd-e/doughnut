@@ -31,9 +31,10 @@
                     </li>
                 </ul>
                 <span class="navbar-text" th:text='${currentUserFetcher.getUser().getName()}' th:unless="${currentUserFetcher == null}"></span>
-                <form class="form-inline my-2 my-lg-0" th:action="@{/logout}" method="post">
+                <form class="form-inline my-2 my-lg-0" th:action="@{/logout}" method="post" th:unless="${currentUserFetcher == null}">
                     <input class= "btn btn-outline-success my-2 my-sm-0" type= "submit" value="Logout">
                 </form>
+                <a class= "btn btn-outline-primary my-2 my-sm-0" href="/login" th:if="${currentUserFetcher == null}">Login via Github</a>
             </div>
         </nav>
     </div>
