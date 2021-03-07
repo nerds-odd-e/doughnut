@@ -1,7 +1,7 @@
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
 <layout th:replace="_fragments/basic_layout :: application_layout(~{ :: .content})">
     <div class="container content">
-        <div th:replace="_fragments/note_fragments :: noteBreadcrumb(${noteEntity}, ~{:: .additional-item})">
+        <div th:replace="_fragments/note_fragments :: noteOwnerBreadcrumb(${noteEntity}, ~{:: .additional-item})">
             <li class="breadcrumb-item additional-item" th:text="${noteEntity.title}"/>
             <li class="breadcrumb-item additional-item">
                 <a class="text-secondary" th:href="@{/notes/{id}/new(id=${noteEntity.id})}">(Add Child Note)</a>

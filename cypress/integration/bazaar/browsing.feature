@@ -13,4 +13,5 @@ Feature: Bazaar browsing
     And there shouldn't be any note edit button for "Shape"
     When I open the note "Shape" in the Bazaar
     Then there shouldn't be any note edit button for "Square"
+    And I should see "Bazaar, Shape" in breadcrumb
 

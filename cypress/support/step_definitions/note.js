@@ -44,12 +44,12 @@ When("I create note belonging to {string}:", (noteTitle, data) => {
 });
 
 
-When("I am creating note under {string}", (noteTitles, data) => {
+When("I am creating note under {string}", (noteTitles) => {
   cy.navigateToNotePage(noteTitles);
   cy.findByText("(Add Child Note)").click();
 });
 
-When("I should see {string} in breadcrumb", (noteTitles, data) => {
+Then("I should see {string} in breadcrumb", (noteTitles) => {
   cy.get('.breadcrumb').within( ()=>
       noteTitles.commonSenseSplit(", ").forEach(noteTitle => cy.findByText(noteTitle ))
   )

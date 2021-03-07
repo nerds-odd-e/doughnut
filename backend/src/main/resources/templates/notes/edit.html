@@ -3,7 +3,7 @@
 
     <div class="container content">
         <h2>Edit note</h2>
-        <div th:replace="_fragments/note_fragments :: noteBreadcrumb(${noteEntity}, ~{:: .additional-item})">
+        <div th:replace="_fragments/note_fragments :: noteOwnerBreadcrumb(${noteEntity}, ~{:: .additional-item})">
             <li class="breadcrumb-item additional-item" th:text="${noteEntity.title}"/>
         </div>
 
