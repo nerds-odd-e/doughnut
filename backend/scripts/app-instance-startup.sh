@@ -27,6 +27,7 @@ EOF
 
 # Install dependencies
 apt-get -y update
+apt-key adv --keyserver hkp://pool.sks-keyservers.net:80 --recv-keys 8C718D3B5072E1F5
 apt-get -y install jq openjdk-11-jre gnupg gnupg-agent libmysqlclient20 mysql-community-client ca-certificates openssl
 apt-get -y autoremove
 
