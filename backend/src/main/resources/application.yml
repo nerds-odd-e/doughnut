@@ -33,12 +33,12 @@ spring:
     driver-class-name: com.mysql.jdbc.Driver
   flyway:
     clean-on-validation-error: false
+    clean-disabled: true
   jpa:
     generate-ddl: false
     show-sql: false
     properties.hibernate:
       enable_lazy_load_no_trans: true
-      clean-disabled: true
   security:
     oauth2:
       client:
