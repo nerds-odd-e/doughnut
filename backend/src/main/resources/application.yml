@@ -38,6 +38,7 @@ spring:
     show-sql: false
     properties.hibernate:
       enable_lazy_load_no_trans: true
+      clean-disabled: true
   security:
     oauth2:
       client:
