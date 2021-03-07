@@ -23,9 +23,9 @@ in mkShell {
     progress ps pstree ripgrep tree vgrep wget which
     libmysqlclient libpcap libressl
     cacert curlie glances httpie
-    mysql57 mysql-client mysql_jdbc python38Packages.pip
+    mysql80 mysql-client mysql_jdbc python38Packages.pip
     chromedriver geckodriver google-cloud-sdk
-    vim vimpager vimPlugins.nerdtree vimPlugins.nvimdev-nvim vimPlugins.spacevim vscodium
+    vim vimpager vimPlugins.nerdtree vimPlugins.nvimdev-nvim vscodium
   ] ++ lib.optionals stdenv.isDarwin [
     darwin.apple_sdk.libs.utmp darwin.apple_sdk.libs.Xplugin
     apple_sdk.AppKit apple_sdk.AGL apple_sdk.ApplicationServices apple_sdk.AudioToolbox
@@ -39,7 +39,7 @@ in mkShell {
   shellHook = ''
     export JAVA_HOME="${pkgs.jdk}"
     export PATH=$PATH:$JAVA_HOME/bin
-    export MYSQL_BASEDIR=${pkgs.mysql57}
+    export MYSQL_BASEDIR=${pkgs.mysql80}
     export MYSQL_HOME="''${MYSQL_HOME:-''$PWD/mysql}"
     export MYSQL_DATADIR="''${MYSQL_DATADIR:-''$MYSQL_HOME/data}"
 
@@ -88,6 +88,7 @@ EOF
       rm -f $MYSQL_HOME/init_doughnut_db.sql
       mysqladmin -u root --socket=$MYSQL_UNIX_PORT shutdown
       wait $MYSQL_PID
+      rm -rf mysql
       kill -9 $MYSQL_PID
     }
     trap cleanup EXIT

@@ -6,7 +6,7 @@ spring:
     url: jdbc:mysql://localhost:3306/doughnut_development
     username: doughnut
     password: doughnut
-    driver-class-name: com.mysql.jdbc.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
   flyway:
     clean-on-validation-error: false
     clean-disabled: true
@@ -31,7 +31,7 @@ spring:
     url: jdbc:mysql://db-server:3306/doughnut
     username: doughnut
     password: ${MYSQL_PASSWORD}
-    driver-class-name: com.mysql.jdbc.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
   flyway:
     clean-on-validation-error: false
     clean-disabled: true
@@ -57,7 +57,7 @@ spring:
     url: ${db.url}
     username: ${db.user}
     password: ${db.password}
-    driver-class-name: com.mysql.jdbc.Driver
+    driver-class-name: com.mysql.cj.jdbc.Driver
   flyway:
     clean-on-validation-error: true
     clean-disabled: true
