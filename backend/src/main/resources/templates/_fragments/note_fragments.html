@@ -72,8 +72,8 @@
     <div th:replace="_fragments/forms :: checkInput('note', 'urlIsVideo')"/>
 </div>
 
-<div th:fragment="noteLinkButton(note, svg, title)">
-    <a role="button" class="btn btn-sm" th:title="${title}" th:if="${note}" th:href="@{/notes/{id}(id=${note.id})}">
+<div th:fragment="noteLinkButton(urlPrefix, note, svg, title)">
+    <a role="button" class="btn btn-sm" th:title="${title}" th:if="${note}" th:href="${urlPrefix}+'/notes/'+${note.id}">
         <svg th:replace="_fragments/svgs :: __${svg}__"/>
     </a>
     <a role="button" class="btn btn-sm disabled" th:unless="${note}">
@@ -81,15 +81,15 @@
     </a>
 </div>
 
-<nav th:fragment="noteLinkButtons(treeNodeModel)" class="nav d-flex justify-content-between p-0 mb-2">
+<nav th:fragment="noteLinkButtons(urlPrefix, treeNodeModel)" class="nav d-flex justify-content-between p-0 mb-2">
     <div class="btn-group btn-group-sm">
         <a th:href="@{/notes/{id}/move(id=${noteEntity.id})}">Move This Note</a>
     </div>
     <div class="btn-group btn-group-sm">
-        <a th:replace="_fragments/note_fragments :: noteLinkButton(${treeNodeModel.previousSiblingNote}, 'fastBackward', 'previous sibling')"/>
-        <a th:replace="_fragments/note_fragments :: noteLinkButton(${treeNodeModel.previousNote}, 'backward', 'previous')"/>
-        <a th:replace="_fragments/note_fragments :: noteLinkButton(${treeNodeModel.nextNote}, 'forward', 'next')"/>
-        <a th:replace="_fragments/note_fragments :: noteLinkButton(${treeNodeModel.nextSiblingNote}, 'fastForward', 'next sibling')"/>
+        <a th:replace="_fragments/note_fragments :: noteLinkButton(${urlPrefix}, ${treeNodeModel.previousSiblingNote}, 'fastBackward', 'previous sibling')"/>
+        <a th:replace="_fragments/note_fragments :: noteLinkButton(${urlPrefix}, ${treeNodeModel.previousNote}, 'backward', 'previous')"/>
+        <a th:replace="_fragments/note_fragments :: noteLinkButton(${urlPrefix}, ${treeNodeModel.nextNote}, 'forward', 'next')"/>
+        <a th:replace="_fragments/note_fragments :: noteLinkButton(${urlPrefix}, ${treeNodeModel.nextSiblingNote}, 'fastForward', 'next sibling')"/>
         </a>
     </div>
 </nav>

@@ -4,6 +4,12 @@
         <div th:replace="_fragments/bazaar_fragments :: noteBazaarBreadcrumb(${noteEntity}, ~{:: .additional-item})">
             <li class="breadcrumb-item additional-item" th:text="${noteEntity.title}"/>
         </div>
+        <nav class="nav d-flex flex-row-reverse p-0">
+            <a role="button" class="btn btn-sm" title="Cards View" th:href="@{/bazaar/notes/{id}(id=${noteEntity.id})}">
+                <svg th:replace="_fragments/svgs :: cards"/>
+            </a>
+        </nav>
+
 
         <div th:replace="_fragments/note_fragments :: noteAsArticle(${noteEntity}, 1)"/>
     </div>

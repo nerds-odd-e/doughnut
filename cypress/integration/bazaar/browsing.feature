@@ -17,7 +17,7 @@ Feature: Bazaar browsing
     When I open the note "Shape" in the Bazaar
     Then there shouldn't be any note edit button for "Square"
     And I should see "Bazaar, Shape" in breadcrumb
-    #And I should be able to go to the "next" note "Square"
+    And I should be able to go to the "next" note "Square"
 
   Scenario: Browsing as non-user in article view
     When I haven't login

@@ -60,7 +60,6 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
   flyway:
     clean-on-validation-error: true
-    clean-disabled: true
   jpa:
     generate-ddl: false
     show-sql: true

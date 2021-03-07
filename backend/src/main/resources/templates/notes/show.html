@@ -25,7 +25,7 @@
 
         </div>
 
-        <a th:replace="_fragments/note_fragments :: noteLinkButtons(${treeNodeModel})"/>
+        <a th:replace="_fragments/note_fragments :: noteLinkButtons('', ${treeNodeModel})"/>
 
         <div th:replace="_fragments/note_fragments :: noteOwnerViewCards(${noteEntity.children})"/>
     </div>
