@@ -41,9 +41,9 @@ When("I open the note {string} in the Bazaar in article view", (noteTitle) => {
 
 When("I should see the article {string} with sub-content {string}", (title, contents) => {
   cy.findByText(title, {selector: '.h1'}).should("be.visible");
-//  contents.commonSenseSplit(",").forEach(content =>
-//      cy.findByText(content).should("be.visible")
-//  )
+  contents.commonSenseSplit(",").forEach(content =>
+      cy.findByText(content, {selector: '.h2'}).should("be.visible")
+  )
 });
 
 

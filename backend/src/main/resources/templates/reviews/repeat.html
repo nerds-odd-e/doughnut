@@ -3,7 +3,7 @@
     <div class="container content">
         <h2 class="display-5">Repeat reviewing your notes</h2>
 
-        <div th:replace="_fragments/note_fragments :: noteShow(${reviewPointEntity.noteEntity})"/>
+        <div th:replace="_fragments/note_fragments :: noteShow(${reviewPointEntity.noteEntity}, 1)"/>
 
         <form action="#" th:action="@{/reviews/{id}(id=${reviewPointEntity.id})}" th:object="${reviewPointEntity}" method="post">
             <input type="submit" value="Next" class="btn btn-primary"/>

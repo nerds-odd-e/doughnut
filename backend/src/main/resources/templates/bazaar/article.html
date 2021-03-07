@@ -5,7 +5,11 @@
             <li class="breadcrumb-item additional-item" th:text="${noteEntity.title}"/>
         </div>
 
-        <div th:replace="_fragments/note_fragments :: noteShow(${noteEntity})"/>
+        <div th:replace="_fragments/note_fragments :: noteShow(${noteEntity}, 1)"/>
+
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3" th:each="child:${noteEntity.children}">
+            <div th:replace="_fragments/note_fragments :: noteShow(${child}, 2)"/>
+        </div>
 
     </div>
 </layout>
