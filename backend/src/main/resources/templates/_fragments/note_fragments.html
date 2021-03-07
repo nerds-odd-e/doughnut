@@ -1,9 +1,11 @@
 <a th:fragment="noteTitleWithLink(note)" th:href="'/notes/' + ${note.id}" th:text="${note.title}"/>
 
-<div th:fragment="noteBreadcrumb(topLink, untilNote, additional)">
+<div th:fragment="noteBreadcrumb(topLink, untilNote, additional)" th:with="linkFragment=${linkFragment} ?: ':: noteTitleWithLink'">
     <ol class="breadcrumb">
         <li class="breadcrumb-item"><a th:replace="${topLink}"/></li>
-        <li class="breadcrumb-item" th:each="note:${@modelFactoryService.toTreeNodeModel(untilNote.parentNote).ancestors}" th:insert=":: noteTitleWithLink(${note})"/>
+        <li class="breadcrumb-item"
+            th:each="note:${@modelFactoryService.toTreeNodeModel(untilNote.parentNote).ancestors}"
+            th:insert="__${linkFragment}__(${note})"/>
         <li class="breadcrumb-item" th:replace="${additional}"/>
     </ol>
 </div>

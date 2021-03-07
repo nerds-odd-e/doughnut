@@ -1,11 +1,21 @@
 <a th:fragment="noteTitleWithBazaarLink(note)" th:href="'/bazaar/notes/' + ${note.id}" th:text="${note.title}"/>
 
-<div th:fragment="noteBazaarViewCards(notes)"  th:replace="_fragments/note_fragments::noteCardWithHeaderAndButton(notes=${notes}, bodyButton=~{ :: .b-card-button},  headerButtons=~{ :: .b-card-header-buttons}, linkFragment='_fragments/bazaar_fragments::noteTitleWithBazaarLink')">
+<div th:fragment="noteBazaarViewCards(notes)"  th:replace="_fragments/note_fragments::noteCardWithHeaderAndButton(
+         notes=${notes},
+         bodyButton=~{ :: .b-card-button},
+         headerButtons=~{ :: .b-card-header-buttons},
+         linkFragment='_fragments/bazaar_fragments::noteTitleWithBazaarLink'
+         )">
     <div class="b-card-header-buttons"></div>
     <span class="b-card-button"></div>
 </div>
 
-<div th:fragment="noteBazaarBreadcrumb(untilNote, additional)" th:replace="_fragments/note_fragments::noteBreadcrumb(~{:: .b-top-link}, ${untilNote}, ${additional})">
+<div th:fragment="noteBazaarBreadcrumb(untilNote, additional)" th:replace="_fragments/note_fragments::noteBreadcrumb(
+         topLink=~{:: .b-top-link},
+         untilNote=${untilNote},
+         additional=${additional},
+         linkFragment='_fragments/bazaar_fragments::noteTitleWithBazaarLink'
+         )">
     <a class="b-top-link" href="/bazaar">Bazaar</a>
 </div>
 

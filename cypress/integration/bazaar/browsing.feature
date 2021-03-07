@@ -15,3 +15,4 @@ Feature: Bazaar browsing
     Then there shouldn't be any note edit button for "Square"
     And I should see "Bazaar, Shape" in breadcrumb
 
+  Scenario: Breadcrumb should be until the share point
