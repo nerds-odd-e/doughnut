@@ -16,16 +16,16 @@ in mkShell {
   MYSQL_DATADIR = builtins.getEnv "MYSQL_DATADIR";
   buildInputs = [
     gradle nodejs-15_x yarn jdk python3 zsh zsh-powerlevel10k
-    any-nix-shell autoconf automake coreutils-full gcc gnumake gnupg
-    git git-secret gitAndTools.delta locale lsd platinum-searcher most
+    any-nix-shell autoconf automake cmake coreutils-full gcc gnumake
+    git git-secret gitAndTools.delta locale lsd platinum-searcher
     binutils-unwrapped hostname inetutils openssh pkg-config rsync
-    bat duf fasd fzf htop jq less lesspipe lsof lzma
-    progress ps pstree ripgrep tree vgrep wget which
+    bat duf fasd fzf gnupg htop jq less lesspipe lsof lzma
+    most progress ps pstree ripgrep tree vgrep wget which
     libmysqlclient libpcap libressl
     cacert curlie glances httpie
-    mysql80 mysql-client mysql_jdbc python38Packages.pip
+    mysql57 mysql-client mysql_jdbc python38Packages.pip
     chromedriver geckodriver google-cloud-sdk
-    vim vimpager vimPlugins.nerdtree vimPlugins.nvimdev-nvim vscodium
+    vim vimpager vscodium
   ] ++ lib.optionals stdenv.isDarwin [
     darwin.apple_sdk.libs.utmp darwin.apple_sdk.libs.Xplugin
     apple_sdk.AppKit apple_sdk.AGL apple_sdk.ApplicationServices apple_sdk.AudioToolbox
@@ -39,7 +39,7 @@ in mkShell {
   shellHook = ''
     export JAVA_HOME="${pkgs.jdk}"
     export PATH=$PATH:$JAVA_HOME/bin
-    export MYSQL_BASEDIR=${pkgs.mysql80}
+    export MYSQL_BASEDIR=${pkgs.mysql57}
     export MYSQL_HOME="''${MYSQL_HOME:-''$PWD/mysql}"
     export MYSQL_DATADIR="''${MYSQL_DATADIR:-''$MYSQL_HOME/data}"
 
@@ -78,7 +78,7 @@ EOF
        export NIX_SSL_CERT_FILE=/etc/ssl/cert.pem
     fi
 
-    sleep 3s
+    sleep 2s
     mysql -u root < $MYSQL_HOME/init_doughnut_db.sql
     export GPG_TTY='(tty)'
 
@@ -88,7 +88,6 @@ EOF
       rm -f $MYSQL_HOME/init_doughnut_db.sql
       mysqladmin -u root --socket=$MYSQL_UNIX_PORT shutdown
       wait $MYSQL_PID
-      rm -rf mysql
       kill -9 $MYSQL_PID
     }
     trap cleanup EXIT

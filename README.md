@@ -22,7 +22,7 @@ For more background info you can read:
 - [JavaScript](https://www.javascript.com)
 - [Cucumber](https://cucumber.io/docs/guides/)
 - [Flyway](https://flywaydb.org)
-- [MySQL 8.0](https://dev.mysql.com/doc/refman/8.0/en/)
+- [MySQL 5.7](https://dev.mysql.com/doc/refman/5.7/en/)
 - [Google Cloud](https://cloud.google.com/gcp/getting-started)
 - [Traefik](https://traefik.io/)
 - [Github Actions](https://docs.github.com/en/actions)
@@ -75,7 +75,8 @@ any-nix-shell zsh --info-right | source /dev/stdin
 
 ### 2. Setup and run doughnut for the first time (local development profile)
 
-The default spring profile is 'test' unless you explicitly set it to 'dev'. Tip: Add `--Dspring.profiles.active=${profile}"` to gradle task command. MySQL 8.0 DB server is started and initialised on entering the `nix-shell`.
+The default spring profile is 'test' unless you explicitly set it to 'dev'. Tip: Add `--Dspring.profiles.active=${profile}"` to gradle task command.
+MySQL DB server is started and initialised on entering the `nix-shell`.
 
 Clone and launch local development environment
 
