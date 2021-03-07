@@ -87,7 +87,6 @@ EOF
       git secret hide -d
       rm -f $MYSQL_HOME/init_doughnut_db.sql
       mysqladmin -u root --socket=$MYSQL_UNIX_PORT shutdown
-      rm -rf mysql
       wait $MYSQL_PID
       kill -9 $MYSQL_PID
     }
