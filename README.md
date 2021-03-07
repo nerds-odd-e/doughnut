@@ -2,7 +2,6 @@
 
 ![dough CI CD](https://github.com/nerds-odd-e/doughnut/workflows/dough%20CI%20CD/badge.svg) [![Join the chat at https://gitter.im/Odd-e-doughnut/community](https://badges.gitter.im/Odd-e-doughnut/community.svg)](https://gitter.im/Odd-e-doughnut/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-
 ## About
 
 Doughnut is a Personal Knowledge Management ([PKM](https://en.wikipedia.org/wiki/Personal_knowledge_management)) tool combining [zettelkasten](https://eugeneyan.com/writing/note-taking-zettelkasten/) style of knowledge capture with some features to enhance learning (spaced-repetition, smart reminders) and ability to share knowledge bits with other people (for buddy/team learning).
@@ -23,7 +22,7 @@ For more background info you can read:
 - [JavaScript](https://www.javascript.com)
 - [Cucumber](https://cucumber.io/docs/guides/)
 - [Flyway](https://flywaydb.org)
-- [MariaDB](https://mariadb.org/)
+- [MySQL57](https://dev.mysql.com/doc/refman/5.7/en/)
 - [Google Cloud](https://cloud.google.com/gcp/getting-started)
 - [Traefik](https://traefik.io/)
 - [Github Actions](https://docs.github.com/en/actions)
@@ -76,7 +75,7 @@ any-nix-shell zsh --info-right | source /dev/stdin
 
 ### 2. Setup and run doughnut for the first time (local development profile)
 
-The default spring profile is 'test' unless you explicitly set it to 'dev'. Tip: Add `--Dspring.profiles.active=${profile}"` to gradle task command. MariaDB server is started and initialised on entering the `nix-shell`.
+The default spring profile is 'test' unless you explicitly set it to 'dev'. Tip: Add `--Dspring.profiles.active=${profile}"` to gradle task command. MySQL57 DB server is started and initialised on entering the `nix-shell`.
 
 Clone and launch local development environment
 
@@ -101,18 +100,20 @@ nohup idea-community &
 ```
 
 #### Setup IntelliJ IDEA with JDK11 SDK
+
 - Locate your `nix` installed JDK11 path location with `which java`.
   e.g. `/nix/store/5ib97va5ngfacdqzzcvxff62rjwkxajg-zulu11.2.3-jdk11.0.1/bin/java`.
 - **File -> Project Structure -> Platform Settings -> SDKs -> Add JDK...**
   - Enter the full path of above (e.g. `/nix/store/5ib97va5ngfacdqzzcvxff62rjwkxajg-zulu11.2.3-jdk11.0.1`).
 
 #### Run a single targetted JUnit5 test in IntelliJ IDEA
+
 - Setup IntelliJ in Gradle perspective -> Gradle Settings (Wrench Icon) -> Run tests with -> IntelliJ IDEA
 - Locate your test file in IDE (e.g. `backend/src/test/com/odde/doughnut/controllers/NoteRestControllerTests.java`).
   - Locate specific test method to run and look out for green run arrow icon in line number gutter.
   - Click on the green run arrow icon to kick off incremental build and single test run.
 
-#### MariaDB UI Client - DBeaver (ONLY available to Linux users - Non-macOS)
+#### MySQL DB UI Client - DBeaver (ONLY available to Linux users - Non-macOS)
 
 ```
 nohup dbeaver &

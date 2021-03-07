@@ -3,10 +3,10 @@ spring:
     activate:
       on-profile: dev
   datasource:
-    url: jdbc:mariadb://localhost:3306/doughnut_development
+    url: jdbc:mysql://localhost:3306/doughnut_development
     username: doughnut
     password: doughnut
-    driver-class-name: org.mariadb.jdbc.Driver
+    driver-class-name: com.mysql.jdbc.Driver
   flyway:
     clean-on-validation-error: false
   jpa:
@@ -22,16 +22,15 @@ spring:
             clientId: ${OAUTH2_github_client_id_dev}
             clientSecret: ${OAUTH2_github_client_secret_dev}
 ---
-
 spring:
   config:
     activate:
       on-profile: prod
   datasource:
-    url: jdbc:mariadb://db-server:3306/doughnut
+    url: jdbc:mysql://db-server:3306/doughnut
     username: doughnut
     password: ${MYSQL_PASSWORD}
-    driver-class-name: org.mariadb.jdbc.Driver
+    driver-class-name: com.mysql.jdbc.Driver
   flyway:
     clean-on-validation-error: false
   jpa:
@@ -46,7 +45,6 @@ spring:
           github:
             clientId: ${OAUTH2_github_client_id}
             clientSecret: ${OAUTH2_github_client_secret}
-
 ---
 spring:
   config:
@@ -57,7 +55,7 @@ spring:
     url: ${db.url}
     username: ${db.user}
     password: ${db.password}
-    driver-class-name: org.mariadb.jdbc.Driver
+    driver-class-name: com.mysql.jdbc.Driver
   flyway:
     clean-on-validation-error: true
   jpa:

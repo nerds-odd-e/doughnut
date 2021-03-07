@@ -18,9 +18,17 @@ gsutil cp gs://"${BUCKET}/ssl/private/odde.key" /etc/ssl/private/odde.key
 gsutil cp gs://"${BUCKET}/ssl/private/star_odd-e_com.crt" /etc/ssl/private/star_odd-e_com.crt
 chmod 640 /etc/ssl/private/*
 
+cat <<'EOF' > /etc/apt/sources.list.d/mysql.list
+deb http://repo.mysql.com/apt/debian/ buster mysql-apt-config
+deb http://repo.mysql.com/apt/debian/ buster mysql-5.7
+deb http://repo.mysql.com/apt/debian/ buster mysql-tools
+deb-src http://repo.mysql.com/apt/debian/ buster mysql-5.7
+EOF
+
 # Install dependencies
-apt-get -y update && apt-get -y upgrade
-apt-get -y install htop jq openjdk-11-jre gnupg gnupg-agent libmariadb3 mariadb-client apt-transport-https ca-certificates openssl
+apt-get -y update
+apt-get -y install jq openjdk-11-jre gnupg gnupg-agent libmysqlclient20 mysql-community-client ca-certificates openssl
+apt-get -y autoremove
 
 # Make Java 11 default
 export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
@@ -133,9 +141,8 @@ export OAUTH2_github_client_secret=$(curl "https://secretmanager.googleapis.com/
 	--header "x-goog-user-project: ${PROJECTID}" |
 	jq -r ".payload.data" | base64 --decode)
 
-# define db-server entry pointing to IP address of mariadb instance
-# echo "10.142.0.18	db-server" >> /etc/hosts
+# define db-server entry pointing to IP address of mysql db instance
 echo "10.111.16.4	db-server" >> /etc/hosts
 
 # Start server
-bash -c "java -jar -Dspring-boot.run.profiles=prod -Dspring.profiles.active=prod -Dspring.datasource.url='jdbc:mariadb://db-server:3306/doughnut' -Dspring.datasource.password=${MYSQL_PASSWORD} /opt/doughnut_app/${ARTIFACT}-${VERSION}.jar" &
+bash -c "java -jar -Dspring-boot.run.profiles=prod -Dspring.profiles.active=prod -Dspring.datasource.url='jdbc:mysql://db-server:3306/doughnut' -Dspring.datasource.password=${MYSQL_PASSWORD} /opt/doughnut_app/${ARTIFACT}-${VERSION}.jar" &

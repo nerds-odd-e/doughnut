@@ -23,7 +23,7 @@ in mkShell {
     progress ps pstree ripgrep tree vgrep wget which
     libmysqlclient libpcap libressl
     cacert curlie glances httpie
-    mariadb python38Packages.pip
+    mysql57 mysql-client mysql_jdbc python38Packages.pip
     chromedriver geckodriver google-cloud-sdk
     vim vimpager vimPlugins.nerdtree vimPlugins.nvimdev-nvim vimPlugins.spacevim vscodium
   ] ++ lib.optionals stdenv.isDarwin [
@@ -39,7 +39,7 @@ in mkShell {
   shellHook = ''
     export JAVA_HOME="${pkgs.jdk}"
     export PATH=$PATH:$JAVA_HOME/bin
-    export MYSQL_BASEDIR=${pkgs.mariadb}
+    export MYSQL_BASEDIR=${pkgs.mysql57}
     export MYSQL_HOME="''${MYSQL_HOME:-''$PWD/mysql}"
     export MYSQL_DATADIR="''${MYSQL_DATADIR:-''$MYSQL_HOME/data}"
 
@@ -56,9 +56,11 @@ in mkShell {
     echo ">>>>> MYSQL_HOME: $MYSQL_HOME "
     echo ">>>>> MYSQL_DATADIR: $MYSQL_DATADIR "
     echo "#######################################################################"
+    mkdir -p $MYSQL_HOME
+    mkdir -p $MYSQL_DATADIR
     
-    mariadb-install-db --datadir=$MYSQL_DATADIR --basedir=$MYSQL_BASEDIR --pid-file=$MYSQL_PID_FILE
-    mariadbd --datadir=$MYSQL_DATADIR --pid-file=$MYSQL_PID_FILE --socket=$MYSQL_UNIX_PORT &
+    mysqld --initialize-insecure --user=`whoami` --datadir=$MYSQL_DATADIR --basedir=$MYSQL_BASEDIR --explicit_defaults_for_timestamp
+    mysqld --datadir=$MYSQL_DATADIR --pid-file=$MYSQL_PID_FILE --socket=$MYSQL_UNIX_PORT &
     export MYSQL_PID=$!
 
 cat <<EOF > $MYSQL_HOME/init_doughnut_db.sql
@@ -77,14 +79,15 @@ EOF
     fi
 
     sleep 3s
-    mysql < $MYSQL_HOME/init_doughnut_db.sql
+    mysql -u root < $MYSQL_HOME/init_doughnut_db.sql
     export GPG_TTY='(tty)'
 
     cleanup()
     {
       git secret hide -d
       rm -f $MYSQL_HOME/init_doughnut_db.sql
-      mariadb-admin --socket=$MYSQL_UNIX_PORT shutdown
+      mysqladmin -u root --socket=$MYSQL_UNIX_PORT shutdown
+      rm -rf mysql
       wait $MYSQL_PID
       kill -9 $MYSQL_PID
     }
