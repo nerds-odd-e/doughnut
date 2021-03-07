@@ -2,15 +2,17 @@ package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.UserEntity;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.testability.EntityAndModelBuilder;
+import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 
-public class UserBuilder extends EntityAndModelBuilder<UserEntity, UserModel> {
+public class UserBuilder extends EntityBuilder<UserEntity> {
     static final TestObjectCounter exIdCounter = new TestObjectCounter(n -> "exid" + n);
     static final TestObjectCounter nameCounter = new TestObjectCounter(n -> "user" + n);
+    protected final Class<UserModel> mClass;
 
     public UserBuilder(MakeMe makeMe) {
-        super(makeMe, new UserEntity(), UserModel.class);
+        super(makeMe, new UserEntity());
+        this.mClass = UserModel.class;
         entity.setExternalIdentifier(exIdCounter.generate());
         entity.setName(nameCounter.generate());
     }
@@ -24,6 +26,10 @@ public class UserBuilder extends EntityAndModelBuilder<UserEntity, UserModel> {
     public UserBuilder withSpaceIntervals(String spaceIntervals) {
         entity.setSpaceIntervals(spaceIntervals);
         return this;
+    }
+
+    public UserModel toModelPlease() {
+        return makeMe.modelFactoryService.toModel(please(), mClass);
     }
 }
 
