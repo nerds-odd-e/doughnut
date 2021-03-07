@@ -7,6 +7,7 @@ Feature: Bazaar browsing
       | Shape           | The form of something      |               |
       | Square          | four equal straight sides  | Shape         |
       | Triangle        | three sides shape          | Shape         |
+      | Big Square      | a square but big           | Square        |
     And note "Shape" is shared to the Bazaar
 
   Scenario: Browsing as non-user
@@ -22,6 +23,10 @@ Feature: Bazaar browsing
     When I haven't login
     Then I should see "Shape" is shared in the Bazaar
     When I open the note "Shape" in the Bazaar in article view
-    Then I should see the article "Shape" with sub-content "Square, Triangle"
+    Then I should see in the article:
+       | level      | title         |
+       | h1         | Shape         |
+       | h2         | Triangle      |
+       | h3         | Big Square    |
 
   Scenario: Breadcrumb should be until the share point

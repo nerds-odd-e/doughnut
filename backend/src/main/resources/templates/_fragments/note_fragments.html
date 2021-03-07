@@ -107,3 +107,11 @@
     </p>
 </div>
 
+<div th:fragment="noteAsArticle(noteEntity, level)">
+    <div th:replace="_fragments/note_fragments :: noteShow(${noteEntity}, ${level})"/>
+    <div class="" th:each="child:${noteEntity.children}">
+        <div th:replace="_fragments/note_fragments :: noteAsArticle(${child}, ${1 + level})"/>
+    </div>
+</div>
+
+

@@ -39,11 +39,10 @@ When("I open the note {string} in the Bazaar in article view", (noteTitle) => {
   cy.findByRole('button', {name: "Article View"}).click();
 });
 
-When("I should see the article {string} with sub-content {string}", (title, contents) => {
-  cy.findByText(title, {selector: '.h1'}).should("be.visible");
-  contents.commonSenseSplit(",").forEach(content =>
-      cy.findByText(content, {selector: '.h2'}).should("be.visible")
-  )
+When("I should see in the article:", (data) => {
+  data.hashes().forEach(({level, title}) => {
+      cy.findByText(title, {selector: '.'+level}).should("be.visible");
+  });
 });
 
 
