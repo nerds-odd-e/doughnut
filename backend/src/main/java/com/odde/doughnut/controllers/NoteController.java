@@ -133,7 +133,7 @@ public class NoteController {
     @PostMapping(value = "/{noteEntity}/delete")
     public RedirectView deleteNote(@PathVariable("noteEntity") NoteEntity noteEntity) throws NoAccessRightException {
         currentUserFetcher.getUser().assertAuthorization(noteEntity);
-        modelFactoryService.noteRepository.delete(noteEntity);
+        modelFactoryService.toNoteModel(noteEntity).destroy();
         return new RedirectView("/notes");
     }
 

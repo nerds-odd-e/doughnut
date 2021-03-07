@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.NoteMotionEntity;
+import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.UserEntity;
@@ -13,6 +14,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.annotation.Commit;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
@@ -186,6 +188,18 @@ class NoteControllerTests {
             assertThat(makeMe.refresh(referTo).getId(), is(not(nullValue())));
             assertThat(linkRepository.count(), equalTo(oldCount - 2));
         }
+
+        @Test
+        @Transactional
+        void shouldDeleteTheReviewPoints() throws NoAccessRightException {
+            NoteEntity subject = makeMe.aNote().forUser(userModel).please();
+            makeMe.aReviewPointFor(subject).by(userModel).please();
+            long oldCount = makeMe.modelFactoryService.reviewPointRepository.count();
+            controller.deleteNote(subject);
+
+            assertThat(makeMe.modelFactoryService.reviewPointRepository.count(), equalTo(oldCount - 1));
+        }
+
     }
 
     @Nested

@@ -21,4 +21,8 @@ public class NoteContentModel extends ModelForEntity<NoteEntity> {
     }
 
 
+    public void destroy() {
+        modelFactoryService.reviewPointRepository.deleteAllByNoteEntity(getEntity());
+        modelFactoryService.noteRepository.delete(getEntity());
+    }
 }
