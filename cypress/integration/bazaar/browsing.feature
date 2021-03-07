@@ -1,6 +1,7 @@
 Feature: Bazaar browsing
   Part of the bazaar should be visible to everyone.
 
+  @ignore
   Scenario: Browsing as non-user
     Given there are some notes for existing user "old_learner"
       | title           | description                | testingParent |
@@ -14,5 +15,6 @@ Feature: Bazaar browsing
     When I open the note "Shape" in the Bazaar
     Then there shouldn't be any note edit button for "Square"
     And I should see "Bazaar, Shape" in breadcrumb
+    And I should be able to go to the "next" note "Square"
 
   Scenario: Breadcrumb should be until the share point

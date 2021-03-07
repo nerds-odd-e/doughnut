@@ -25,17 +25,7 @@
 
         </div>
 
-        <nav class="nav d-flex justify-content-between p-0 mb-2">
-            <div class="btn-group btn-group-sm">
-                <a th:href="@{/notes/{id}/move(id=${noteEntity.id})}">Move This Note</a>
-            </div>
-            <div class="btn-group btn-group-sm">
-                <a th:replace="_fragments/note_fragments :: noteLinkButton(${treeNodeModel.previousSiblingNote}, 'fastBackward', 'previous sibling')"/>
-                <a th:replace="_fragments/note_fragments :: noteLinkButton(${treeNodeModel.previousNote}, 'backward', 'previous')"/>
-                <a th:replace="_fragments/note_fragments :: noteLinkButton(${treeNodeModel.nextNote}, 'forward', 'next')"/>
-                <a th:replace="_fragments/note_fragments :: noteLinkButton(${treeNodeModel.nextSiblingNote}, 'fastForward', 'next sibling')"/>
-                </a>
-        </nav>
+        <a th:replace="_fragments/note_fragments :: noteLinkButtons(${treeNodeModel})"/>
 
         <div th:replace="_fragments/note_fragments :: noteOwnerViewCards(${noteEntity.children})"/>
     </div>

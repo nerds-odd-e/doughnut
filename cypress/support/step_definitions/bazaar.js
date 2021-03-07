@@ -34,4 +34,3 @@ When("I open the note {string} in the Bazaar", (noteTitle) => {
   cy.findByText(noteTitle).click();
 });
 
-
