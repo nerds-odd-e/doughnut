@@ -9,6 +9,7 @@ spring:
     driver-class-name: com.mysql.jdbc.Driver
   flyway:
     clean-on-validation-error: false
+    clean-disabled: true
   jpa:
     generate-ddl: false
     show-sql: false
@@ -59,6 +60,7 @@ spring:
     driver-class-name: com.mysql.jdbc.Driver
   flyway:
     clean-on-validation-error: true
+    clean-disabled: true
   jpa:
     generate-ddl: false
     show-sql: true
