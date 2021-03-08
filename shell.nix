@@ -46,12 +46,6 @@ in mkShell {
     export MYSQL_UNIX_PORT=$MYSQL_HOME/mysql.sock
     export MYSQL_PID_FILE=$MYSQL_HOME/mysql.pid
 
-    # to import environment variables defined in env.sh
-    set -a
-    git secret reveal
-    source env.sh
-    set +a
-
     echo "#######################################################################"
     echo ">>>>> MYSQL_HOME: $MYSQL_HOME "
     echo ">>>>> MYSQL_DATADIR: $MYSQL_DATADIR "
@@ -78,7 +72,12 @@ EOF
        export NIX_SSL_CERT_FILE=/etc/ssl/cert.pem
     fi
 
-    sleep 2s
+    # Import environment variables defined in env.sh (first decrypt the secrets with your GPG key)
+    set -a
+    git secret reveal
+    source env.sh
+    set +a
+
     mysql -u root < $MYSQL_HOME/init_doughnut_db.sql
     export GPG_TTY='(tty)'
 
