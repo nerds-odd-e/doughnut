@@ -1,11 +1,14 @@
 package com.odde.doughnut.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 @Entity
@@ -25,6 +28,15 @@ public class CircleEntity {
     @Getter
     @Column(name = "invitation_code")
     private String invitationCode = generateRandomInvitationCode(15);
+
+    @JoinTable(name = "circle_user", joinColumns = {
+            @JoinColumn(name = "circle_id", referencedColumnName = "id", nullable = false)}, inverseJoinColumns = {
+            @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)
+    })
+    @ManyToMany
+    @JsonIgnore
+    @Getter
+    private List<UserEntity> members = new ArrayList<>();
 
     private static String generateRandomInvitationCode(int targetStringLength) {
         int leftLimit = 48; // numeral '0'

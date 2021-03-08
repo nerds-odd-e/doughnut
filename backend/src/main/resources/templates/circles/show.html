@@ -2,6 +2,13 @@
 <layout th:replace="_fragments/basic_layout :: application_layout(~{ :: .content})">
     <div class="container content">
         <h1 th:text="${circleEntity.name}"/>
+        <nav class="nav justify-content-end">
+            <div class="nav-item circle-member" th:each="member:${circleEntity.members}">
+               <span th:title="${member.name}">
+                   <svg th:replace="_fragments/svgs :: missingAvatar"/>
+            </div>
+        </nav>
+
         <h2>Invite People To Your Circle</h2>
         Please share this invitation code so that they can join your circle:
 
