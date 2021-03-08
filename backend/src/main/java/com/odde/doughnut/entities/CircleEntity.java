@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 @Entity
-@Table(name = "note")
+@Table(name = "circle")
 public class CircleEntity {
     @Id
     @Getter

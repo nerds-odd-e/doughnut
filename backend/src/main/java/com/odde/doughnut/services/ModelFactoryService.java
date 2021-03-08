@@ -1,13 +1,10 @@
 package com.odde.doughnut.services;
 
-import com.odde.doughnut.entities.NoteMotionEntity;
-import com.odde.doughnut.entities.ReviewPointEntity;
-import com.odde.doughnut.entities.UserEntity;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.BazaarNoteRepository;
 import com.odde.doughnut.entities.repositories.ReviewPointRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
 import com.odde.doughnut.models.*;
-import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -78,4 +75,7 @@ public class ModelFactoryService {
         return null;
     }
 
+    public CircleModel toCircleModel(CircleEntity circleEntity) {
+        return new CircleModel(circleEntity, this);
+    }
 }

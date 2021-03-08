@@ -13,7 +13,7 @@ public abstract class ModelForEntity<T> {
         this.modelFactoryService = modelFactoryService;
     }
 
-    protected void save() {
+    public void save() {
         modelFactoryService.entityManager.persist(entity);
     }
 }

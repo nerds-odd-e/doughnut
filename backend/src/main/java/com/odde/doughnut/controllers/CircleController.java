@@ -2,13 +2,19 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.CircleEntity;
+import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.ReviewPointEntity;
+import com.odde.doughnut.exceptions.NoAccessRightException;
+import com.odde.doughnut.models.CircleModel;
+import com.odde.doughnut.models.NoteContentModel;
 import com.odde.doughnut.models.ReviewPointModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.TimeTraveler;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,6 +44,18 @@ public class CircleController {
     public String review(Model model) {
         model.addAttribute("circleEntity", new CircleEntity());
         return "circles/new";
+    }
+
+    @PostMapping("")
+    @Transactional
+    public String createCircle(@Valid CircleEntity circleEntity, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return "circles/new";
+        }
+        UserModel userModel = currentUserFetcher.getUser();
+        CircleModel circleModel = modelFactoryService.toCircleModel(circleEntity);
+        circleModel.save();
+        return "redirect:/circles/" + circleEntity.getId();
     }
 
 }
