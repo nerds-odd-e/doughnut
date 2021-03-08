@@ -26,8 +26,7 @@ deb-src http://repo.mysql.com/apt/debian/ buster mysql-5.7
 EOF
 
 # Install dependencies
-# apt-key adv --keyserver hkp://pool.sks-keyservers.net:80 --recv-keys 8C718D3B5072E1F5
-apt-key adv --keyserver pgp.mit.edu --recv-keys 5072E1F5
+apt-key adv --keyserver hkp://pool.sks-keyservers.net:80 --recv-keys 8C718D3B5072E1F5
 apt-get -y update
 apt-get -y install jq openjdk-11-jre gnupg gnupg-agent libmysqlclient20 mysql-community-client ca-certificates openssl
 apt-get -y autoremove
