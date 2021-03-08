@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ModelFactoryService;
@@ -54,7 +55,8 @@ public class CircleController {
     }
 
     @GetMapping("/{circleEntity}")
-    public String showCircle(@PathVariable("circleEntity") CircleEntity circleEntity, Model model) {
+    public String showCircle(@PathVariable("circleEntity") CircleEntity circleEntity, Model model) throws NoAccessRightException {
+        currentUserFetcher.getUser().assertAuthorization(circleEntity);
         return "circles/show";
     }
 

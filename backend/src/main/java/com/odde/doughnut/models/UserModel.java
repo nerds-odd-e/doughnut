@@ -1,5 +1,6 @@
 package com.odde.doughnut.models;
 
+import com.odde.doughnut.entities.CircleEntity;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.entities.UserEntity;
@@ -37,6 +38,12 @@ public class UserModel extends ModelForEntity<UserEntity> {
 
     public void assertAuthorization(NoteEntity noteEntity) throws NoAccessRightException {
         if (!entity.owns(noteEntity)) {
+            throw new NoAccessRightException();
+        }
+    }
+
+    public void assertAuthorization(CircleEntity circleEntity) throws NoAccessRightException {
+        if(!circleEntity.getMembers().contains(entity)) {
             throw new NoAccessRightException();
         }
     }
@@ -108,5 +115,6 @@ public class UserModel extends ModelForEntity<UserEntity> {
     public SpacedRepetition getSpacedRepetition() {
         return new SpacedRepetition(entity.getSpaceIntervals());
     }
+
 
 }

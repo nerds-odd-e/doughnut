@@ -39,7 +39,6 @@ class NoteControllerTests {
     @Autowired MakeMe makeMe;
     private UserModel userModel;
     private NoteEntity parentNote;
-    private NoteEntity childNote;
     final ExtendedModelMap model = new ExtendedModelMap();
     NoteController controller;
 
@@ -51,8 +50,7 @@ class NoteControllerTests {
 
     @Nested
     class GetNotes {
-        @Autowired
-        EntityManager entityManager;
+        private NoteEntity childNote;
 
         @BeforeEach
         void setup() {
