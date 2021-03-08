@@ -14,6 +14,7 @@ public class CircleEntity {
     @Getter
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
     @NotNull
     @Size(min = 1, max = 255)
     @Getter

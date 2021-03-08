@@ -4,6 +4,7 @@ import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.CircleEntity;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.ReviewPointEntity;
+import com.odde.doughnut.entities.UserEntity;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.NoteContentModel;
@@ -16,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -41,7 +43,7 @@ public class CircleController {
     }
 
     @GetMapping("/new")
-    public String review(Model model) {
+    public String newCircle(Model model) {
         model.addAttribute("circleEntity", new CircleEntity());
         return "circles/new";
     }
@@ -56,6 +58,11 @@ public class CircleController {
         CircleModel circleModel = modelFactoryService.toCircleModel(circleEntity);
         circleModel.save();
         return "redirect:/circles/" + circleEntity.getId();
+    }
+
+    @GetMapping("/{circleEntity}")
+    public String showCircle(@PathVariable("circleEntity") CircleEntity circleEntity, Model model) {
+        return "circles/show";
     }
 
 }
