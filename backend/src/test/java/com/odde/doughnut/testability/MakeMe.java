@@ -63,4 +63,7 @@ public class MakeMe {
         return new TimestampBuilder();
     }
 
+    public CircleBuilder aCircle() {
+        return new CircleBuilder(this);
+    }
 }

@@ -1,6 +1,12 @@
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
 <layout th:replace="_fragments/basic_layout :: application_layout(~{ :: .content})">
     <div class="container content">
-        <h1 th:text="${circleEntity.getName()}"/>
+        <h1 th:text="${circleEntity.name}"/>
+        <h2>Invite People To Your Circle</h2>
+        Please share this invitation code so that they can join your circle:
+
+        <div class="jumbotron">
+            <input id="invitation-code" th:value="${circleEntity.invitationCode}" readonly/>
+        </div>
     </div>
 </layout>
