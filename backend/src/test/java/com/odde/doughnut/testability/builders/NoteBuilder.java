@@ -2,6 +2,7 @@ package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.UserEntity;
+import com.odde.doughnut.models.NoteContentModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
@@ -20,13 +21,13 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
     }
 
     public NoteBuilder forUser(UserEntity userEntity) {
-        entity.setUserEntity(userEntity);
-        entity.setOwnershipEntity(userEntity.getOwnershipEntity());
-        return this;
+        return forUser(makeMe.modelFactoryService.toUserModel(userEntity));
     }
 
     public NoteBuilder forUser(UserModel userModel) {
-        return forUser(userModel.getEntity());
+        NoteContentModel noteModel = makeMe.modelFactoryService.toNoteModel(entity);
+        noteModel.setOwnership(userModel);
+        return this;
     }
 
     public NoteBuilder under(NoteEntity parentNote) {

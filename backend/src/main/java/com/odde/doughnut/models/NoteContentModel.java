@@ -19,4 +19,14 @@ public class NoteContentModel extends ModelForEntity<NoteEntity> {
         entity.setUpdatedDatetime(new Date());
         modelFactoryService.noteRepository.save(entity);
     }
+
+    public void createForUser(UserModel userModel) {
+        setOwnership(userModel);
+        this.modelFactoryService.noteRepository.save(entity);
+    }
+
+    public void setOwnership(UserModel userModel) {
+        entity.setUserEntity(userModel.getEntity());
+        entity.setOwnershipEntity(userModel.getEntity().getOwnershipEntity());
+    }
 }

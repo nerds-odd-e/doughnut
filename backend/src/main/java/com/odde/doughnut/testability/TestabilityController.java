@@ -6,6 +6,7 @@ import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.UserEntity;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
+import com.odde.doughnut.models.NoteContentModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ModelFactoryService;
 import org.apache.logging.log4j.util.Strings;
@@ -57,8 +58,8 @@ class TestabilityController {
 
         for (NoteEntity note : notes) {
             earlyNotes.put(note.getTitle(), note);
-            note.setUserEntity(userModel.getEntity());
-            note.setOwnershipEntity(userModel.getEntity().getOwnershipEntity());
+            NoteContentModel noteModel = modelFactoryService.toNoteModel(note);
+            noteModel.setOwnership(userModel);
             note.setParentNote(earlyNotes.get(note.getTestingParent()));
         }
         noteRepository.saveAll(notes);
