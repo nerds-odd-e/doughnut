@@ -10,6 +10,10 @@ Given("I've logged in as an existing user", () => {
   cy.loginAs('old_learner');
 });
 
+Given("I've logged in as another existing user", () => {
+  cy.loginAs('another_old_learner');
+});
+
 When("I identify myself as a new user", () => {
   cy.visit("/login");
 

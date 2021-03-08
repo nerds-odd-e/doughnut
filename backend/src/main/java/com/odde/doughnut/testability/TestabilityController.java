@@ -44,11 +44,16 @@ class TestabilityController {
     @GetMapping("/clean_db_and_seed_data")
     public String cleanDBAndSeedData() {
         new DBCleanerWorker(emf).truncateAllTables();
-        UserEntity userEntity = new UserEntity();
-        userEntity.setExternalIdentifier("old_learner");
-        userEntity.setName("Old Learner");
-        userRepository.save(userEntity);
+        createUser("old_learner", "Old Learner");
+        createUser("another_old_learner", "Another Old Learner");
         return "OK";
+    }
+
+    private void createUser(String externalIdentifier, String name) {
+        UserEntity userEntity = new UserEntity();
+        userEntity.setExternalIdentifier(externalIdentifier);
+        userEntity.setName(name);
+        userRepository.save(userEntity);
     }
 
     @PostMapping("/seed_notes")
