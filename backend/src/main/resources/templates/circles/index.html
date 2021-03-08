@@ -1,0 +1,15 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<layout th:replace="_fragments/basic_layout :: application_layout(~{ :: .content})">
+
+    <div class="container content">
+        <h1>My Circles</h1>
+        <p>
+           <a href="/circles/new">Create a new circle</a>
+        </p>
+        <h2>Join a circle</h2>
+        <form action="#" th:action="@{/circles/join}" th:object="${circleJoiningByInvitationEntity}" method="post">
+            <div th:replace="_fragments/forms :: textInput('circle', 'invitationCode', 'Invitation code you got from other people')"/>
+            <input type="submit" value="Submit" class="btn btn-primary"/>
+        </form>
+    </div>
+</layout>

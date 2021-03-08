@@ -1,10 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
-import com.odde.doughnut.entities.CircleEntity;
-import com.odde.doughnut.entities.NoteEntity;
-import com.odde.doughnut.entities.ReviewPointEntity;
-import com.odde.doughnut.entities.UserEntity;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.NoteContentModel;
@@ -39,7 +36,8 @@ public class CircleController {
     @GetMapping("")
     public String index(Model model) {
         UserModel user = currentUserFetcher.getUser();
-        return "circle/index";
+        model.addAttribute("circleJoiningByInvitationEntity", new CircleJoiningByInvitationEntity());
+        return "circles/index";
     }
 
     @GetMapping("/new")
@@ -63,6 +61,16 @@ public class CircleController {
     @GetMapping("/{circleEntity}")
     public String showCircle(@PathVariable("circleEntity") CircleEntity circleEntity, Model model) {
         return "circles/show";
+    }
+
+    @PostMapping("/join")
+    @Transactional
+    public String joinCircle(@Valid CircleJoiningByInvitationEntity circleJoiningByInvitationEntity, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return "circles/index";
+        }
+        CircleModel circleModel = modelFactoryService.findCircleByInvitationCode(circleJoiningByInvitationEntity.getInvitationCode());
+        return "redirect:/circles/" + circleModel.getEntity().getId();
     }
 
 }

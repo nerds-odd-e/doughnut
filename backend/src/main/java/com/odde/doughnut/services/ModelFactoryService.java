@@ -1,11 +1,8 @@
 package com.odde.doughnut.services;
 
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.repositories.BazaarNoteRepository;
-import com.odde.doughnut.entities.repositories.ReviewPointRepository;
-import com.odde.doughnut.entities.repositories.UserRepository;
+import com.odde.doughnut.entities.repositories.*;
 import com.odde.doughnut.models.*;
-import com.odde.doughnut.entities.repositories.NoteRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,14 +16,16 @@ public class ModelFactoryService {
     @Autowired public final UserRepository userRepository;
     @Autowired public final BazaarNoteRepository bazaarNoteRepository;
     @Autowired public final ReviewPointRepository reviewPointRepository;
+    @Autowired public final CircleRepository circleRepository;
     @Autowired public final EntityManager entityManager;
 
-    public ModelFactoryService(NoteRepository noteRepository, UserRepository userRepository, BazaarNoteRepository bazaarNoteRepository, ReviewPointRepository reviewPointRepository, EntityManager entityManager)
+    public ModelFactoryService(NoteRepository noteRepository, UserRepository userRepository, BazaarNoteRepository bazaarNoteRepository, ReviewPointRepository reviewPointRepository, CircleRepository circleRepository, EntityManager entityManager)
     {
         this.noteRepository = noteRepository;
         this.userRepository = userRepository;
         this.bazaarNoteRepository = bazaarNoteRepository;
         this.reviewPointRepository = reviewPointRepository;
+        this.circleRepository = circleRepository;
         this.entityManager = entityManager;
     }
 
@@ -77,5 +76,13 @@ public class ModelFactoryService {
 
     public CircleModel toCircleModel(CircleEntity circleEntity) {
         return new CircleModel(circleEntity, this);
+    }
+
+    public CircleModel findCircleByInvitationCode(String invitationCode) {
+        CircleEntity circleEntity = circleRepository.findFirstByInvitationCode(invitationCode);
+        if (circleEntity == null) {
+            return null;
+        }
+        return toCircleModel(circleEntity);
     }
 }

@@ -5,4 +5,5 @@ import com.odde.doughnut.entities.UserEntity;
 import org.springframework.data.repository.CrudRepository;
 
 public interface CircleRepository extends CrudRepository<CircleEntity, Integer> {
+    CircleEntity findFirstByInvitationCode(String invitationCode);
 }
