@@ -81,6 +81,6 @@ public class UserModelReviewPointsTest {
     }
 
     private Timestamp daysAfterBase(Integer reviewDay) {
-        return TimestampOptions.addDaysToTimestamp(baseDay, reviewDay);
+        return TimestampOperations.addDaysToTimestamp(baseDay, reviewDay);
     }
 }

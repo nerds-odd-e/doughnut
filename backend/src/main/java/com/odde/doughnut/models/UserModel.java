@@ -80,7 +80,7 @@ public class UserModel extends ModelForEntity<UserEntity> {
     }
 
     private List<ReviewPointEntity> getRecentReviewPoints(Timestamp currentTime) {
-        Timestamp oneDayAgo = TimestampOptions.addDaysToTimestamp(currentTime, -1);
+        Timestamp oneDayAgo = TimestampOperations.addDaysToTimestamp(currentTime, -1);
         return modelFactoryService.reviewPointRepository.findAllByUserEntityAndInitialReviewedAtGreaterThan(entity, oneDayAgo);
     }
 

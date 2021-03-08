@@ -2,7 +2,7 @@ package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.models.SpacedRepetition;
-import com.odde.doughnut.models.TimestampOptions;
+import com.odde.doughnut.models.TimestampOperations;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -73,7 +73,7 @@ public class ReviewPointEntity {
     }
 
     public static int getDayId(Timestamp timestamp, ZoneId timeZone) {
-        ZonedDateTime systemLocalDateTime = TimestampOptions.getSystemLocalDateTime(timestamp);
+        ZonedDateTime systemLocalDateTime = TimestampOperations.getSystemLocalDateTime(timestamp);
         ZonedDateTime userLocalDateTime = systemLocalDateTime.withZoneSameInstant(timeZone);
         return userLocalDateTime.getYear() * 366 + userLocalDateTime.getDayOfYear();
     }

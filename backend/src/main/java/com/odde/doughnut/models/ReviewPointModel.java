@@ -32,7 +32,7 @@ public class ReviewPointModel extends ModelForEntity<ReviewPointEntity> {
     }
 
     private Timestamp calculateNextReviewAt(SpacedRepetition spacedRepetition) {
-        return TimestampOptions.addDaysToTimestamp(getEntity().getLastReviewedAt(), spacedRepetition.getNextRepeatInDays(getEntity().getForgettingCurveIndex()));
+        return TimestampOperations.addDaysToTimestamp(getEntity().getLastReviewedAt(), spacedRepetition.getNextRepeatInDays(getEntity().getForgettingCurveIndex()));
     }
 
 }
