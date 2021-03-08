@@ -20,6 +20,7 @@ public class BazaarController {
     public BazaarController(CurrentUserFetcher currentUserFetcher, ModelFactoryService modelFactoryService) {
         this.currentUserFetcher = currentUserFetcher;
         this.modelFactoryService = modelFactoryService;
+        currentUserFetcher.toString();
     }
 
     @GetMapping("/bazaar")
