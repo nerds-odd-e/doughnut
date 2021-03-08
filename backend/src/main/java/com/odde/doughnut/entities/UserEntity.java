@@ -38,6 +38,15 @@ public class UserEntity {
 
     @Column(name = "space_intervals") @Getter @Setter private String spaceIntervals = "1, 2, 3, 5, 8, 13, 21, 34, 55";
 
+    @JoinTable(name = "circle_user", joinColumns = {
+            @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)}, inverseJoinColumns = {
+            @JoinColumn(name = "circle_id", referencedColumnName = "id", nullable = false)
+    })
+    @ManyToMany
+    @JsonIgnore
+    @Getter
+    private List<CircleEntity> circles = new ArrayList<>();
+
     public UserEntity() {
         ownershipEntity.setUserEntity(this);
     }

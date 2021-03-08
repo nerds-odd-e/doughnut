@@ -31,6 +31,7 @@ public class CircleController {
     @GetMapping("")
     public String index(Model model) {
         UserModel user = currentUserFetcher.getUser();
+        model.addAttribute("userEntity", user.getEntity());
         model.addAttribute("circleJoiningByInvitationEntity", new CircleJoiningByInvitationEntity());
         return "circles/index";
     }

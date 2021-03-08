@@ -3,9 +3,16 @@
 
     <div class="container content">
         <h1>My Circles</h1>
-        <p>
-           <a href="/circles/new">Create a new circle</a>
-        </p>
+        <div class="row">
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3" th:each="circle:${userEntity.circles}">
+                <div class="card rounded-circle text-center">
+                    <div class= "card-title">
+                        <a th:text="${circle.name}" th:href="@{/circles/{id}(id=${circle.id})}"/>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <p> <a href="/circles/new">Create a new circle</a> </p>
         <h2>Join a circle</h2>
         <form action="#" th:action="@{/circles/join}" th:object="${circleJoiningByInvitationEntity}" method="post">
             <div th:replace="_fragments/forms :: textInput('circle', 'invitationCode', 'Invitation code you got from other people')"/>
