@@ -24,7 +24,7 @@ in mkShell {
     libmysqlclient libpcap libressl
     cacert curlie glances httpie
     mysql57 mysql-client mysql_jdbc python38Packages.pip
-    chromedriver geckodriver google-cloud-sdk
+    chromedriver geckodriver google-cloud-sdk packer
     vim vimpager vscodium
   ] ++ lib.optionals stdenv.isDarwin [
     darwin.apple_sdk.libs.utmp darwin.apple_sdk.libs.Xplugin
