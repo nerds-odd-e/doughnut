@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
+import com.odde.doughnut.entities.CircleEntity;
 import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.models.ReviewPointModel;
 import com.odde.doughnut.models.UserModel;
@@ -35,7 +36,8 @@ public class CircleController {
 
     @GetMapping("/new")
     public String review(Model model) {
-        return "reviews/index";
+        model.addAttribute("circleEntity", new CircleEntity());
+        return "circles/new";
     }
 
 }
