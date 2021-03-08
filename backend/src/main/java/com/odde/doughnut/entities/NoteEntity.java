@@ -101,6 +101,13 @@ public class NoteEntity {
     @Setter
     private UserEntity userEntity;
 
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "ownership_id", referencedColumnName = "id")
+    @JsonIgnore
+    @Getter
+    @Setter
+    private OwnershipEntity ownershipEntity;
+
     @Column(name = "created_datetime")
     @Getter
     @Setter

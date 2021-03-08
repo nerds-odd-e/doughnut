@@ -31,6 +31,11 @@ public class UserBuilder extends EntityBuilder<UserEntity> {
     public UserModel toModelPlease() {
         return makeMe.modelFactoryService.toModel(please(), mClass);
     }
+
+    @Override
+    public void beforeCreate() {
+
+    }
 }
 
 

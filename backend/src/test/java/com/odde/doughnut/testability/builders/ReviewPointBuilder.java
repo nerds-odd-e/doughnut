@@ -45,4 +45,9 @@ public class ReviewPointBuilder extends EntityBuilder<ReviewPointEntity> {
     public ReviewPointModel toModelPlease() {
         return makeMe.modelFactoryService.toModel(please(), mClass);
     }
+
+    @Override
+    protected void beforeCreate() {
+
+    }
 }

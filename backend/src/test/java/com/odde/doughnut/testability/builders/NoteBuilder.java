@@ -21,12 +21,12 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
 
     public NoteBuilder forUser(UserEntity userEntity) {
         entity.setUserEntity(userEntity);
+        entity.setOwnershipEntity(userEntity.getOwnershipEntity());
         return this;
     }
 
     public NoteBuilder forUser(UserModel userModel) {
-        entity.setUserEntity(userModel.getEntity());
-        return this;
+        return forUser(userModel.getEntity());
     }
 
     public NoteBuilder under(NoteEntity parentNote) {
@@ -40,4 +40,11 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
         return this;
     }
 
+    @Override
+    protected void beforeCreate() {
+        if (entity.getUserEntity() == null) {
+            forUser(makeMe.aUser().please());
+        }
+
+    }
 }

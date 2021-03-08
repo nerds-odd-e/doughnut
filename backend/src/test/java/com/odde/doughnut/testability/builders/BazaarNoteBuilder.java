@@ -11,4 +11,9 @@ public class BazaarNoteBuilder extends EntityBuilder<BazaarNoteEntity> {
         super(makeMe, new BazaarNoteEntity());
         entity.setNote(note);
     }
+
+    @Override
+    protected void beforeCreate() {
+
+    }
 }
