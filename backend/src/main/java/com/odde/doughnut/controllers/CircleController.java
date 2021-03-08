@@ -10,6 +10,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -55,7 +56,7 @@ public class CircleController {
     }
 
     @GetMapping("/{circleEntity}")
-    public String showCircle(@PathVariable("circleEntity") CircleEntity circleEntity, Model model) throws NoAccessRightException {
+    public String showCircle(@PathVariable("circleEntity") CircleEntity circleEntity) throws NoAccessRightException {
         currentUserFetcher.getUser().assertAuthorization(circleEntity);
         return "circles/show";
     }
@@ -64,9 +65,13 @@ public class CircleController {
     @Transactional
     public String joinCircle(@Valid CircleJoiningByInvitationEntity circleJoiningByInvitationEntity, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
-            return "circles/index";
+            return "circles/join";
         }
         CircleModel circleModel = modelFactoryService.findCircleByInvitationCode(circleJoiningByInvitationEntity.getInvitationCode());
+        if (circleModel == null) {
+            bindingResult.rejectValue("invitationCode", "error.error", "Does not match any circle");
+            return "circles/join";
+        }
         UserModel userModel = currentUserFetcher.getUser();
         circleModel.joinAndSave(userModel);
         return "redirect:/circles/" + circleModel.getEntity().getId();

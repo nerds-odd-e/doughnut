@@ -1,10 +1,6 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.entities.CircleEntity;
-import com.odde.doughnut.entities.NoteEntity;
-import com.odde.doughnut.entities.NoteMotionEntity;
-import com.odde.doughnut.entities.UserEntity;
-import com.odde.doughnut.entities.repositories.LinkRepository;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ModelFactoryService;
@@ -13,20 +9,21 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.servlet.view.RedirectView;
-
-import javax.persistence.EntityManager;
-import java.util.List;
+import org.springframework.validation.ObjectError;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
@@ -53,8 +50,22 @@ class CircleControllerTests {
         void itShouldNotAllowNonMemberToSeeACircle() {
             CircleEntity circleEntity = makeMe.aCircle().please();
             assertThrows(NoAccessRightException.class, ()->{
-                controller.showCircle(circleEntity, model);
+                controller.showCircle(circleEntity);
             });
         }
     }
+
+    @Nested
+    class JoinCircle {
+        @Test
+        void circleDoesNotExist() {
+            CircleJoiningByInvitationEntity entity = new CircleJoiningByInvitationEntity();
+            entity.setInvitationCode("not exist");
+            BindingResult bindingResult = mock(BindingResult.class);
+            assertThat(controller.joinCircle(entity, bindingResult), equalTo("circles/join"));
+            ArgumentCaptor<ObjectError> errorArgumentCaptor = ArgumentCaptor.forClass(ObjectError.class);
+            verify(bindingResult).rejectValue(eq("invitationCode"), anyString(), anyString());
+        }
+    }
+
 }
