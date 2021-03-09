@@ -17,8 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.web.servlet.view.RedirectView;
 
-import java.util.List;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
@@ -40,7 +38,7 @@ class BazaarControllerTests {
     @BeforeEach
     void setup() {
         userModel = makeMe.aUser().toModelPlease();
-        topNote = makeMe.aNote().forUser(userModel).please();
+        topNote = makeMe.aNote().byUser(userModel).please();
         controller = new BazaarController(new TestCurrentUserFetcher(userModel), modelFactoryService);
     }
 
@@ -62,7 +60,7 @@ class BazaarControllerTests {
         @Test
         void shouldNotBeAbleToShareNoteThatBelongsToOtherUser() {
             UserEntity anotherUserEntity = makeMe.aUser().please();
-            NoteEntity note = makeMe.aNote().forUser(anotherUserEntity).please();
+            NoteEntity note = makeMe.aNote().byUser(anotherUserEntity).please();
             assertThrows(NoAccessRightException.class, ()->
                     controller.shareNote(note)
             );

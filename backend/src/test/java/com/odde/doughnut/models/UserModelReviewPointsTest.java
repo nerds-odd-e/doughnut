@@ -42,7 +42,7 @@ public class UserModelReviewPointsTest {
 
         @BeforeEach
         void setup() {
-            noteEntity = makeMe.aNote().forUser(userModel).please();
+            noteEntity = makeMe.aNote().byUser(userModel).please();
         }
 
         @Test

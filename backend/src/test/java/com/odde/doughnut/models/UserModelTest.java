@@ -37,7 +37,7 @@ public class UserModelTest {
 
         @Test
         void whenThereIsNoNotesForUser() {
-            makeMe.aNote().forUser(anotherUser).please();
+            makeMe.aNote().byUser(anotherUser).please();
             assertThat(userModel.getOneInitialReviewPointEntity(day1), is(nullValue()));
         }
 
@@ -48,8 +48,8 @@ public class UserModelTest {
 
             @BeforeEach
             void setup() {
-                note1 = makeMe.aNote().forUser(userModel).please();
-                note2 = makeMe.aNote().forUser(userModel).please();
+                note1 = makeMe.aNote().byUser(userModel).please();
+                note2 = makeMe.aNote().byUser(userModel).please();
                 makeMe.refresh(userModel);
             }
 

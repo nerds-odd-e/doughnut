@@ -13,7 +13,7 @@ public class BazaarNoteBuilder extends EntityBuilder<BazaarNoteEntity> {
     }
 
     @Override
-    protected void beforeCreate() {
+    protected void beforeCreate(boolean needPersist) {
 
     }
 }

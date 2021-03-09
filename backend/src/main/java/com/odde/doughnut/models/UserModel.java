@@ -37,9 +37,13 @@ public class UserModel extends ModelForEntity<UserEntity> {
     }
 
     public void assertAuthorization(NoteEntity noteEntity) throws NoAccessRightException {
-        if (!entity.owns(noteEntity)) {
+        if (!hasAuthority(noteEntity)) {
             throw new NoAccessRightException();
         }
+    }
+
+    public boolean hasAuthority(NoteEntity noteEntity) {
+        return entity.owns(noteEntity);
     }
 
     public void assertAuthorization(CircleEntity circleEntity) throws NoAccessRightException {

@@ -1,7 +1,6 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.NoteMotionEntity;
-import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.UserEntity;
@@ -14,7 +13,6 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.Commit;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
@@ -54,8 +52,8 @@ class NoteControllerTests {
 
         @BeforeEach
         void setup() {
-            parentNote = makeMe.aNote().forUser(userModel).please();
-            childNote = makeMe.aNote().forUser(userModel).under(parentNote).please();
+            parentNote = makeMe.aNote().byUser(userModel).please();
+            childNote = makeMe.aNote().byUser(userModel).under(parentNote).please();
             makeMe.refresh(userModel.getEntity());
             makeMe.refresh(parentNote);
         }
@@ -85,7 +83,7 @@ class NoteControllerTests {
     class createNoteTest {
         @Test
         void shouldBeAbleToSaveNoteWhenValid() throws NoAccessRightException {
-            NoteEntity newNote = makeMe.aNote().forUser(userModel).inMemoryPlease();
+            NoteEntity newNote = makeMe.aNote().byUser(userModel).inMemoryPlease();
             BindingResult bindingResult = makeMe.successfulBindingResult();
 
             String response = controller.createNote(newNote, bindingResult, model);
@@ -110,7 +108,7 @@ class NoteControllerTests {
 
         @BeforeEach
         void setup() {
-            note = makeMe.aNote().forUser(userModel).please();
+            note = makeMe.aNote().byUser(userModel).please();
             note.setTitle("new");
         }
 
@@ -142,7 +140,7 @@ class NoteControllerTests {
         @Test
         void shouldNotBeAbleToDeleteNoteThatBelongsToOtherUser() {
             UserEntity anotherUserEntity = makeMe.aUser().please();
-            NoteEntity note = makeMe.aNote().forUser(anotherUserEntity).please();
+            NoteEntity note = makeMe.aNote().byUser(anotherUserEntity).please();
             Integer noteId = note.getId();
             assertThrows(NoAccessRightException.class, () ->
                     controller.deleteNote(note)
@@ -152,7 +150,7 @@ class NoteControllerTests {
 
         @Test
         void shouldDeleteTheNoteButNotTheUser() throws NoAccessRightException {
-            NoteEntity note = makeMe.aNote().forUser(userModel).please();
+            NoteEntity note = makeMe.aNote().byUser(userModel).please();
             Integer noteId = note.getId();
             RedirectView response = controller.deleteNote(note);
             assertEquals("/notes", response.getUrl());
@@ -162,10 +160,10 @@ class NoteControllerTests {
 
         @Test
         void shouldDeleteTheChildNoteButNotSiblingOrParent() throws NoAccessRightException {
-            NoteEntity parent = makeMe.aNote().forUser(userModel).please();
-            NoteEntity subject = makeMe.aNote().under(parent).forUser(userModel).please();
-            NoteEntity sibling = makeMe.aNote().under(parent).forUser(userModel).please();
-            NoteEntity child = makeMe.aNote().under(subject).forUser(userModel).please();
+            NoteEntity parent = makeMe.aNote().byUser(userModel).please();
+            NoteEntity subject = makeMe.aNote().under(parent).byUser(userModel).please();
+            NoteEntity sibling = makeMe.aNote().under(parent).byUser(userModel).please();
+            NoteEntity child = makeMe.aNote().under(subject).byUser(userModel).please();
 
             controller.deleteNote(subject);
 
@@ -175,9 +173,9 @@ class NoteControllerTests {
 
         @Test
         void shouldDeleteTheLinkToAndFromThisNote() throws NoAccessRightException {
-            NoteEntity referTo = makeMe.aNote().forUser(userModel).please();
-            NoteEntity subject = makeMe.aNote().forUser(userModel).linkTo(referTo).please();
-            NoteEntity referFrom = makeMe.aNote().forUser(userModel).linkTo(subject).linkTo(referTo).please();
+            NoteEntity referTo = makeMe.aNote().byUser(userModel).please();
+            NoteEntity subject = makeMe.aNote().byUser(userModel).linkTo(referTo).please();
+            NoteEntity referFrom = makeMe.aNote().byUser(userModel).linkTo(subject).linkTo(referTo).please();
             long oldCount = linkRepository.count();
 
             controller.deleteNote(subject);
@@ -189,8 +187,8 @@ class NoteControllerTests {
 
         @Test
         void shouldDeleteTheReviewPoints() throws NoAccessRightException {
-            NoteEntity subject = makeMe.aNote().forUser(userModel).please();
-            NoteEntity child = makeMe.aNote().forUser(userModel).under(subject).please();
+            NoteEntity subject = makeMe.aNote().byUser(userModel).please();
+            NoteEntity child = makeMe.aNote().byUser(userModel).under(subject).please();
             makeMe.aReviewPointFor(child).by(userModel).please();
             long oldCount = makeMe.modelFactoryService.reviewPointRepository.count();
             controller.deleteNote(subject);
@@ -209,8 +207,8 @@ class NoteControllerTests {
         @BeforeEach
         void setup() {
             anotherUser = makeMe.aUser().please();
-            note1 = makeMe.aNote().forUser(anotherUser).please();
-            note2 = makeMe.aNote().forUser(userModel).please();
+            note1 = makeMe.aNote().byUser(anotherUser).please();
+            note2 = makeMe.aNote().byUser(userModel).please();
         }
 
         @Test

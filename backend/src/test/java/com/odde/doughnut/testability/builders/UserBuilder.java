@@ -33,7 +33,7 @@ public class UserBuilder extends EntityBuilder<UserEntity> {
     }
 
     @Override
-    public void beforeCreate() {
+    public void beforeCreate(boolean needPersist) {
 
     }
 }

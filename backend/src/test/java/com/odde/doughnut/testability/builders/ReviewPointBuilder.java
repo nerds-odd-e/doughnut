@@ -47,7 +47,7 @@ public class ReviewPointBuilder extends EntityBuilder<ReviewPointEntity> {
     }
 
     @Override
-    protected void beforeCreate() {
+    protected void beforeCreate(boolean needPersist) {
 
     }
 }

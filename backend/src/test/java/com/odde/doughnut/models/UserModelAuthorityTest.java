@@ -11,37 +11,49 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Timestamp;
-
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
-public class ReviewPointModelTest {
+public class UserModelAuthorityTest {
     @Autowired
     MakeMe makeMe;
     UserModel userModel;
-    Timestamp day1;
+    UserModel anotherUser;
 
     @BeforeEach
     void setup() {
         userModel = makeMe.aUser().toModelPlease();
-        day1 = makeMe.aTimestamp().of(1, 8).forWhereTheUserIs(userModel).please();
+        anotherUser = makeMe.aUser().toModelPlease();
     }
 
     @Nested
-    class InitialReview {
+    class noteBelongsToACircle {
+        CircleModel circleModel;
+        NoteEntity noteEntity;
+
+        @BeforeEach
+        void setup() {
+            circleModel = makeMe.aCircle().toModelPlease();
+            noteEntity = makeMe.aNote().inCircle(circleModel).please();
+        }
 
         @Test
-        void initialReviewShouldSetBothInitialAndLastReviewAt() {
-            NoteEntity noteEntity = makeMe.aNote().byUser(userModel).please();
-            ReviewPointModel reviewPoint = makeMe.aReviewPointFor(noteEntity).by(userModel).toModelPlease();
-            reviewPoint.initialReview(userModel, day1);
-            assertThat(reviewPoint.getEntity().getInitialReviewedAt(), equalTo(day1));
-            assertThat(reviewPoint.getEntity().getLastReviewedAt(), equalTo(day1));
+        void userCanNotAccessNotesBelongToCircle() {
+            assertFalse(userModel.hasAuthority(noteEntity));
         }
+
+        @Test
+        void userCanAccessNotesBelongToCircleIfIsAMember() {
+            makeMe.theCircle(circleModel).hasMember(userModel).please();
+            assertTrue(userModel.hasAuthority(noteEntity));
+        }
+
+
+
     }
 }
+

@@ -47,7 +47,7 @@ public class UserEntity {
     }
 
     public boolean owns(NoteEntity note) {
-        return note.getUserEntity().id.equals(id);
+        return note.getOwnershipEntity().ownsBy(this);
     }
 
     public List<NoteEntity> orphanedNotes() {

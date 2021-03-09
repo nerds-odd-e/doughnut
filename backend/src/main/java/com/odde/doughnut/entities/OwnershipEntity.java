@@ -29,4 +29,10 @@ public class OwnershipEntity {
     @JsonIgnore
     @Getter private List<NoteEntity> orphanedNotes;
 
+    public boolean ownsBy(UserEntity user) {
+        if(userEntity != null) {
+            return userEntity.equals(user);
+        }
+        return circleEntity.getMembers().contains(user);
+    }
 }

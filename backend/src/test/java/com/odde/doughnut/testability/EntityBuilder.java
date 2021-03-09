@@ -10,15 +10,21 @@ public abstract class EntityBuilder<T> {
     }
 
     public T inMemoryPlease() {
-        return entity;
+        return please(false);
     }
 
     public T please() {
-        beforeCreate();
-        makeMe.modelFactoryService.entityManager.persist(entity);
+        return please(true);
+    }
+
+    public T please(boolean persistNeeded) {
+        beforeCreate(persistNeeded);
+        if (persistNeeded) {
+            makeMe.modelFactoryService.entityManager.persist(entity);
+        }
         return entity;
     }
 
-    protected abstract void beforeCreate();
+    protected abstract void beforeCreate(boolean needPersist);
 
 }

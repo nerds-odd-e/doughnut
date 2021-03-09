@@ -47,6 +47,12 @@ When("I should see the note {string} in circle {string}", (noteTitle, circleName
   cy.findByText(noteTitle).should('be.visible');
 });
 
+When("I add a note {string} under {string}", (noteTitle, parentNoteTitle) => {
+  cy.findByText(parentNoteTitle).click();
+  cy.findByText("(Add Child Note)").click();
+  cy.submitNoteFormWith([{'note-title': noteTitle}]);
+});
+
 
 
 

@@ -77,7 +77,7 @@ class CircleControllerTests {
 
         @Test
         void userAlreadyInCircle() {
-            CircleEntity circleEntity = makeMe.aCircle().withMember(userModel).please();
+            CircleEntity circleEntity = makeMe.aCircle().hasMember(userModel).please();
             CircleJoiningByInvitationEntity entity = new CircleJoiningByInvitationEntity();
             entity.setInvitationCode(circleEntity.getInvitationCode());
             BindingResult bindingResult = mock(BindingResult.class);

@@ -2,13 +2,12 @@ package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.UserEntity;
-import com.odde.doughnut.models.NoteContentModel;
+import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 public class NoteBuilder extends EntityBuilder<NoteEntity> {
     static final TestObjectCounter titleCounter = new TestObjectCounter(n->"title" + n);
@@ -20,14 +19,13 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
         entity.setUpdatedDatetime(java.sql.Date.valueOf(LocalDate.now()));
     }
 
-    public NoteBuilder forUser(UserEntity userEntity) {
-        return forUser(makeMe.modelFactoryService.toUserModel(userEntity));
+    public NoteBuilder byUser(UserEntity userEntity) {
+        entity.setUserEntity(userEntity);
+        return this;
     }
 
-    public NoteBuilder forUser(UserModel userModel) {
-        NoteContentModel noteModel = makeMe.modelFactoryService.toNoteModel(entity);
-        noteModel.setOwnership(userModel);
-        return this;
+    public NoteBuilder byUser(UserModel userModel) {
+        return byUser(userModel.getEntity());
     }
 
     public NoteBuilder under(NoteEntity parentNote) {
@@ -41,11 +39,20 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
         return this;
     }
 
+    public NoteBuilder inCircle(CircleModel circleModel) {
+        entity.setOwnershipEntity(circleModel.getEntity().getOwnershipEntity());
+        return this;
+    }
+
     @Override
-    protected void beforeCreate() {
+    protected void beforeCreate(boolean needPersist) {
         if (entity.getUserEntity() == null) {
-            forUser(makeMe.aUser().please());
+            byUser(makeMe.aUser().please(needPersist));
+        }
+        if (entity.getOwnershipEntity() == null) {
+            entity.setOwnershipEntity(entity.getUserEntity().getOwnershipEntity());
         }
 
     }
+
 }

@@ -66,8 +66,8 @@ class TestabilityController {
 
         for (NoteEntity note : notes) {
             earlyNotes.put(note.getTitle(), note);
-            NoteContentModel noteModel = modelFactoryService.toNoteModel(note);
-            noteModel.setOwnership(userModel);
+            note.setUserEntity(userModel.getEntity());
+            note.setOwnershipEntity(userModel.getEntity().getOwnershipEntity());
             note.setParentNote(earlyNotes.get(note.getTestingParent()));
         }
         noteRepository.saveAll(notes);
