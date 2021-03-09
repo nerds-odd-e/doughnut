@@ -34,7 +34,7 @@ public class NoteController {
     @GetMapping("")
     public String myNotes(Model model) {
         model.addAttribute("notes", currentUserFetcher.getUser().getOrphanedNotes());
-        return "notes/my_notes";
+        return "notes/index";
     }
 
     @GetMapping({"/new", "/{parentNote}/new"})

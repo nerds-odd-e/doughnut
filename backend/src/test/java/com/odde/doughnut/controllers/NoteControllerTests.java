@@ -74,7 +74,7 @@ class NoteControllerTests {
 
         @Test
         void shouldReturnAllParentlessNotesForMyNotes() {
-            assertEquals("notes/my_notes", controller.myNotes(model));
+            assertEquals("notes/index", controller.myNotes(model));
             assertThat(model.getAttribute("note"), is(nullValue()));
             assertThat((List<NoteEntity>) model.getAttribute("notes"), hasSize(equalTo(1)));
             assertThat((List<NoteEntity>) model.getAttribute("notes"), contains(parentNote));

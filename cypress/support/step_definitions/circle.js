@@ -37,6 +37,16 @@ Given("There is a circle {string} with {string} members", (circleName, members) 
   })
 });
 
+When("I create a note {string} in circle {string}", (noteTitle, circleName) => {
+  cy.visit("/circles");
+  cy.findByText(circleName).click();
+  cy.findByText("Add Top Level Note In This Circle").click();
+  cy.submitNoteFormWith([{'note-title': noteTitle}]);
+});
+
+
+
+
 
 
 
