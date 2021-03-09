@@ -124,5 +124,15 @@ public class UserModel extends ModelForEntity<UserEntity> {
         return new SpacedRepetition(entity.getSpaceIntervals());
     }
 
-
+    public NoteEntity newNote(NoteEntity parentNote) {
+        NoteEntity noteEntity = new NoteEntity();
+        noteEntity.setParentNote(parentNote);
+        if (parentNote != null) {
+            noteEntity.setOwnershipEntity(parentNote.getOwnershipEntity());
+        }
+        else {
+            noteEntity.setOwnershipEntity(getEntity().getOwnershipEntity());
+        }
+        return noteEntity;
+    }
 }

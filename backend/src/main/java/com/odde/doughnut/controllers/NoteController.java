@@ -43,9 +43,7 @@ public class NoteController {
         if (parentNote != null) {
             userModel.assertAuthorization(parentNote);
         }
-        NoteEntity noteEntity = new NoteEntity();
-        noteEntity.setParentNote(parentNote);
-        noteEntity.setOwnershipEntity(userModel.getEntity().getOwnershipEntity());
+        NoteEntity noteEntity = userModel.newNote(parentNote);
         model.addAttribute("noteEntity", noteEntity);
         return "notes/new";
     }
