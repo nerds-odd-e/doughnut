@@ -85,7 +85,7 @@ class NoteControllerTests {
     class createNoteTest {
         @Test
         void shouldBeAbleToSaveNoteWhenValid() throws NoAccessRightException {
-            NoteEntity newNote = makeMe.aNote().inMemoryPlease();
+            NoteEntity newNote = makeMe.aNote().forUser(userModel).inMemoryPlease();
             BindingResult bindingResult = makeMe.successfulBindingResult();
 
             String response = controller.createNote(newNote, bindingResult, model);

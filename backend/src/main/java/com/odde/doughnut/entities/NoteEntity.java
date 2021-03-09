@@ -136,6 +136,15 @@ public class NoteEntity {
     public void linkToNote(NoteEntity targetNote) {
         this.targetNotes.add(targetNote);
     }
+
+    public boolean isFromCircle() {
+        return circle() != null;
+    }
+
+    public CircleEntity circle() {
+        return ownershipEntity.getCircleEntity();
+    }
+
 }
 
 

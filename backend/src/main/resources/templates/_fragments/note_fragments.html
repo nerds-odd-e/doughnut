@@ -2,7 +2,7 @@
 
 <div th:fragment="noteBreadcrumb(topLink, untilNote, additional)" th:with="linkFragment=${linkFragment} ?: ':: noteTitleWithLink'">
     <ol class="breadcrumb">
-        <li class="breadcrumb-item"><a th:replace="${topLink}"/></li>
+        <li class="breadcrumb-item" th:replace="${topLink}"/>
         <li class="breadcrumb-item"
             th:each="note:${@modelFactoryService.toTreeNodeModel(untilNote.parentNote).ancestors}"
             th:insert="__${linkFragment}__(${note})"/>
@@ -11,7 +11,9 @@
 </div>
 
 <div th:fragment="noteOwnerBreadcrumb(untilNote, additional)" th:replace="::noteBreadcrumb(~{:: .top-link}, ${untilNote}, ${additional})">
-   <a class="top-link" href="/notes">Top</a>
+    <li class="breadcrumb-item top-link" th:unless="${untilNote.isFromCircle}"><a href="/notes">Top</a></li>
+    <li class="breadcrumb-item top-link" th:if="${untilNote.isFromCircle}"><a href="/circles">Circles</a></li>
+    <li class="breadcrumb-item top-link"  th:if="${untilNote.isFromCircle}"><a th:href="@{/circles/{id}(id=${untilNote.circle.id})}" th:text="${untilNote.circle.name}"/></li>
 </div>
 
 <div th:fragment="cards(notes, button, cardHeader)" th:with="linkFragment=${linkFragment} ?: ':: noteTitleWithLink'">
