@@ -23,8 +23,7 @@ When("I join the circle with the invitation code", () => {
 });
 
 When("I should see the circle {string} and it has two members in it", (circleName) => {
-  cy.visit("/circles");
-  cy.findByText(circleName).click();
+  cy.navigateToCircle(circleName);
   cy.get('body').find('.circle-member').should('have.length', 2);
 });
 
@@ -38,11 +37,16 @@ Given("There is a circle {string} with {string} members", (circleName, members) 
 });
 
 When("I create a note {string} in circle {string}", (noteTitle, circleName) => {
-  cy.visit("/circles");
-  cy.findByText(circleName).click();
+  cy.navigateToCircle(circleName);
   cy.findByText("Add Top Level Note In This Circle").click();
   cy.submitNoteFormWith([{'note-title': noteTitle}]);
 });
+
+When("I should see the note {string} in circle {string}", (noteTitle, circleName) => {
+  cy.navigateToCircle(circleName);
+  cy.findByText(noteTitle).should('be.visible');
+});
+
 
 
 

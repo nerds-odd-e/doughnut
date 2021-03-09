@@ -24,4 +24,9 @@ public class OwnershipEntity {
     @JsonIgnore
     @Getter @Setter private CircleEntity circleEntity;
 
+    @OneToMany(mappedBy = "ownershipEntity")
+    @Where(clause = "parent_id IS NULL")
+    @JsonIgnore
+    @Getter private List<NoteEntity> orphanedNotes;
+
 }

@@ -179,3 +179,8 @@ Cypress.Commands.add("repeatReviewOneNoteIfThereIs", ({review_type, title, addit
         cy.initialReviewOneNoteIfThereIs({review_type, title, additional_info});
     }
 });
+
+Cypress.Commands.add("navigateToCircle", (circleName) => {
+  cy.visit("/circles");
+  cy.findByText(circleName).click();
+});
