@@ -25,11 +25,6 @@ public class UserEntity {
     @JsonIgnore
     @Getter @Setter private List<ReviewPointEntity> reviewPoints = new ArrayList<>();
 
-    @OneToMany(mappedBy = "userEntity")
-    @Where(clause = "parent_id IS NULL")
-    @JsonIgnore
-    @Getter private List<NoteEntity> orphanedNotes;
-
     @OneToOne(mappedBy = "userEntity", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
     @Getter @Setter private OwnershipEntity ownershipEntity = new OwnershipEntity();
@@ -55,4 +50,7 @@ public class UserEntity {
         return note.getUserEntity().id.equals(id);
     }
 
+    public List<NoteEntity> orphanedNotes() {
+        return ownershipEntity.getOrphanedNotes();
+    }
 }

@@ -33,7 +33,7 @@ public class UserModel extends ModelForEntity<UserEntity> {
     }
 
     public List<NoteEntity> getOrphanedNotes() {
-        return entity.getOrphanedNotes();
+        return entity.orphanedNotes();
     }
 
     public void assertAuthorization(NoteEntity noteEntity) throws NoAccessRightException {
