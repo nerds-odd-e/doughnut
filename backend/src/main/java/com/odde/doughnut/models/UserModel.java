@@ -43,9 +43,13 @@ public class UserModel extends ModelForEntity<UserEntity> {
     }
 
     public void assertAuthorization(CircleEntity circleEntity) throws NoAccessRightException {
-        if(!circleEntity.getMembers().contains(entity)) {
+        if(!inCircle(circleEntity)) {
             throw new NoAccessRightException();
         }
+    }
+
+    public boolean inCircle(CircleEntity circleEntity) {
+        return circleEntity.getMembers().contains(entity);
     }
 
     public List<NoteEntity> filterLinkableNotes(NoteEntity noteEntity, String searchTerm) {

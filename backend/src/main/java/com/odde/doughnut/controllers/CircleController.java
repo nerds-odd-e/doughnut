@@ -73,6 +73,10 @@ public class CircleController {
             return "circles/join";
         }
         UserModel userModel = currentUserFetcher.getUser();
+        if (userModel.inCircle(circleModel.getEntity())) {
+            bindingResult.rejectValue("invitationCode", "error.error", "You are already in this circle");
+            return "circles/join";
+        }
         circleModel.joinAndSave(userModel);
         return "redirect:/circles/" + circleModel.getEntity().getId();
     }

@@ -58,6 +58,14 @@ class CircleControllerTests {
     @Nested
     class JoinCircle {
         @Test
+        void validationFailed() {
+            CircleJoiningByInvitationEntity entity = new CircleJoiningByInvitationEntity();
+            entity.setInvitationCode("not exist");
+            BindingResult bindingResult = makeMe.failedBindingResult();
+            assertThat(controller.joinCircle(entity, bindingResult), equalTo("circles/join"));
+        }
+
+        @Test
         void circleDoesNotExist() {
             CircleJoiningByInvitationEntity entity = new CircleJoiningByInvitationEntity();
             entity.setInvitationCode("not exist");
@@ -66,6 +74,18 @@ class CircleControllerTests {
             ArgumentCaptor<ObjectError> errorArgumentCaptor = ArgumentCaptor.forClass(ObjectError.class);
             verify(bindingResult).rejectValue(eq("invitationCode"), anyString(), anyString());
         }
+
+        @Test
+        void userAlreadyInCircle() {
+            CircleEntity circleEntity = makeMe.aCircle().withMember(userModel).please();
+            CircleJoiningByInvitationEntity entity = new CircleJoiningByInvitationEntity();
+            entity.setInvitationCode(circleEntity.getInvitationCode());
+            BindingResult bindingResult = mock(BindingResult.class);
+            assertThat(controller.joinCircle(entity, bindingResult), equalTo("circles/join"));
+            ArgumentCaptor<ObjectError> errorArgumentCaptor = ArgumentCaptor.forClass(ObjectError.class);
+            verify(bindingResult).rejectValue(eq("invitationCode"), anyString(), anyString());
+        }
+
     }
 
 }
