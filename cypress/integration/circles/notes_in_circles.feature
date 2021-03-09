@@ -11,5 +11,5 @@ Feature: Notes in circles
     When I add a note "Keep it complex" under "Team agreement"
     Then I should see "Circles, Odd-e SG Team, Team agreement, Keep it complex" in breadcrumb
 
-  Scenario: Sharing my note to the circle
-  Scenario: Sharing circle note to bazaar
+#  Scenario: Sharing my note to the circle
+#  Scenario: Sharing circle note to bazaar
