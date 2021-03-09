@@ -6,6 +6,10 @@ import {
   Before,
 } from "cypress-cucumber-preprocessor/steps";
 
+Given("I've logged in as {string}", (externalIdentifier) => {
+  cy.loginAs(externalIdentifier);
+});
+
 Given("I've logged in as an existing user", () => {
   cy.loginAs('old_learner');
 });

@@ -29,6 +29,17 @@ When("I should see the circle {string} and it has two members in it", (circleNam
 });
 
 
+Given("There is a circle {string} with {string} members", (circleName, members) => {
+  cy.request({method: "POST", url: `/api/testability/seed_circle`,
+   body: { circleName, members }})
+  .then((response) => {
+     expect(response.status).to.equal(200);
+  })
+});
+
+
+
+
 
 
 

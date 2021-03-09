@@ -2,10 +2,12 @@
 package com.odde.doughnut.testability;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcherFromRequest;
+import com.odde.doughnut.entities.CircleEntity;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.UserEntity;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
+import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.NoteContentModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ModelFactoryService;
@@ -19,6 +21,7 @@ import javax.persistence.EntityManagerFactory;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -71,28 +74,24 @@ class TestabilityController {
         return notes.stream().map(NoteEntity::getId).collect(Collectors.toList());
     }
 
-    private UserModel getUserModelByExternalIdentifierOrCurrentUser(String externalIdentifier) throws Exception {
+    private UserModel getUserModelByExternalIdentifierOrCurrentUser(String externalIdentifier) {
         if (Strings.isEmpty(externalIdentifier)) {
             if (currentUser.getUser() == null) {
-                throw new Exception("There is no current user");
+                throw new RuntimeException("There is no current user");
             }
             return currentUser.getUser();
         }
-        UserEntity userEntity = userRepository.findByExternalIdentifier(externalIdentifier);
-        if (userEntity != null) {
-            return modelFactoryService.toUserModel(userEntity);
-        }
-        throw new Exception("User with external identifier `" + externalIdentifier + "` does not exist");
+        return getUserModelByExternalIdentifier(externalIdentifier);
     }
 
     @PostMapping("/share_to_bazaar")
-    public String shareToBazaar(@RequestBody HashMap<String, String> map) throws Exception {
+    public String shareToBazaar(@RequestBody HashMap<String, String> map) {
         NoteEntity noteEntity = noteRepository.findFirstByTitle(map.get("noteTitle"));
         modelFactoryService.toBazaarModel().shareNote(noteEntity);
         return "OK";
     }
 
-        @PostMapping("/update_current_user")
+    @PostMapping("/update_current_user")
     @Transactional
     public String updateCurrentUser(@RequestBody HashMap<String, String> userInfo) {
         UserModel currentUserModel = currentUser.getUser();
@@ -102,6 +101,17 @@ class TestabilityController {
         if (userInfo.containsKey("space_intervals")) {
             currentUserModel.setAndSaveSpaceIntervals(userInfo.get("space_intervals"));
         }
+        return "OK";
+    }
+
+    @PostMapping("/seed_circle")
+    public String seedCircle(@RequestBody HashMap<String, String> circleInfo) {
+        CircleEntity entity = new CircleEntity();
+        entity.setName(circleInfo.get("circleName"));
+        CircleModel circleModel = modelFactoryService.toCircleModel(entity);
+        Arrays.stream(circleInfo.get("members").split(",")).map(String::trim).forEach(s->{
+            circleModel.joinAndSave(getUserModelByExternalIdentifier(s));
+        });
         return "OK";
     }
 
@@ -115,6 +125,14 @@ class TestabilityController {
 
         timeTraveler.timeTravelTo(timestamp);
         return "OK";
+    }
+
+    private UserModel getUserModelByExternalIdentifier(String externalIdentifier) {
+        UserEntity userEntity = userRepository.findByExternalIdentifier(externalIdentifier);
+        if (userEntity != null) {
+            return modelFactoryService.toUserModel(userEntity);
+        }
+        throw new RuntimeException("User with external identifier `" + externalIdentifier + "` does not exist");
     }
 
 }
