@@ -20,8 +20,8 @@ public class NoteContentModel extends ModelForEntity<NoteEntity> {
         modelFactoryService.noteRepository.save(entity);
     }
 
-    public void createForUser(UserModel userModel) {
-        setOwnership(userModel);
+    public void createByUser(UserModel userModel) {
+        entity.setUserEntity(userModel.getEntity());
         this.modelFactoryService.noteRepository.save(entity);
     }
 

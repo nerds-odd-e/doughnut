@@ -39,11 +39,13 @@ public class NoteController {
 
     @GetMapping({"/new", "/{parentNote}/new"})
     public String newNote(@PathVariable(name = "parentNote", required = false) NoteEntity parentNote, Model model) throws NoAccessRightException {
+        UserModel userModel = currentUserFetcher.getUser();
         if (parentNote != null) {
-            currentUserFetcher.getUser().assertAuthorization(parentNote);
+            userModel.assertAuthorization(parentNote);
         }
         NoteEntity noteEntity = new NoteEntity();
         noteEntity.setParentNote(parentNote);
+        noteEntity.setOwnershipEntity(userModel.getEntity().getOwnershipEntity());
         model.addAttribute("noteEntity", noteEntity);
         return "notes/new";
     }
@@ -58,7 +60,7 @@ public class NoteController {
         }
         UserModel userModel = currentUserFetcher.getUser();
         NoteContentModel noteContentModel = modelFactoryService.toNoteModel(noteEntity);
-        noteContentModel.createForUser(userModel);
+        noteContentModel.createByUser(userModel);
         return "redirect:/notes/" + noteEntity.getId();
     }
 

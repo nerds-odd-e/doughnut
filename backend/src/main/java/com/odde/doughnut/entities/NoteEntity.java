@@ -80,6 +80,13 @@ public class NoteEntity {
     @Setter
     private NoteEntity parentNote;
 
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "ownership_id", referencedColumnName = "id")
+    @JsonIgnore
+    @Getter
+    @Setter
+    private OwnershipEntity ownershipEntity;
+
     @Column(name = "parent_id", insertable = false, updatable = false)
     @Getter
     private Integer parentId;
@@ -100,13 +107,6 @@ public class NoteEntity {
     @Getter
     @Setter
     private UserEntity userEntity;
-
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "ownership_id", referencedColumnName = "id")
-    @JsonIgnore
-    @Getter
-    @Setter
-    private OwnershipEntity ownershipEntity;
 
     @Column(name = "created_datetime")
     @Getter

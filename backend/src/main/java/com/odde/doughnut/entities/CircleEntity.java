@@ -38,6 +38,14 @@ public class CircleEntity {
     @Getter
     private List<UserEntity> members = new ArrayList<>();
 
+    @OneToOne(mappedBy = "circleEntity", cascade = CascadeType.ALL)
+    @PrimaryKeyJoinColumn
+    @Getter @Setter private OwnershipEntity ownershipEntity = new OwnershipEntity();
+
+    public CircleEntity() {
+        ownershipEntity.setCircleEntity(this);
+    }
+
     private static String generateRandomInvitationCode(int targetStringLength) {
         int leftLimit = 48; // numeral '0'
         int rightLimit = 122; // letter 'z'

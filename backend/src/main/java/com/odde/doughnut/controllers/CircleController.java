@@ -81,4 +81,12 @@ public class CircleController {
         return "redirect:/circles/" + circleModel.getEntity().getId();
     }
 
+    @GetMapping("/{circleEntity}/notes/new")
+    public String newNoteInCircle(@PathVariable("circleEntity") CircleEntity circleEntity, Model model) {
+        NoteEntity noteEntity = new NoteEntity();
+        noteEntity.setOwnershipEntity(circleEntity.getOwnershipEntity());
+        model.addAttribute("noteEntity", noteEntity);
+        return "notes/new";
+    }
+
 }

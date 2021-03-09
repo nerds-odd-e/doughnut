@@ -8,7 +8,9 @@
         </div>
 
         <form action="#" th:action="@{/notes}" th:object="${noteEntity}" method="post">
+            <span th:text="${noteEntity.ownershipEntity.id}"/>
             <input data-cy="note-parent-id" th:field="*{parentNote}" type="hidden"/>
+            <input data-cy="note-ownership-id" th:field="*{ownershipEntity}" type="hidden"/>
             <div th:replace="_fragments/note_fragments :: noteFormBody(${noteEntity})"/>
             <input type="submit" value="Submit" class="btn btn-primary"/>
         </form>

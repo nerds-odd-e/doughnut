@@ -2,7 +2,7 @@
 <layout th:replace="_fragments/basic_layout :: application_layout(~{ :: .content})">
     <div class="container content">
         <h1 th:text="${circleEntity.name}"/>
-        <p> <a class="nav-link" href="/notes/new">Add Top Level Note In This Circle</a> </p>
+        <p> <a class="nav-link" th:href="@{/circles/{id}/notes/new(id=${circleEntity.id})}">Add Top Level Note In This Circle</a> </p>
         <nav class="nav justify-content-end">
             <div class="nav-item circle-member" th:each="member:${circleEntity.members}">
                <span th:title="${member.name}">

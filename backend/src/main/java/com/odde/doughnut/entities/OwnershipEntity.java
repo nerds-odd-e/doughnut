@@ -19,4 +19,9 @@ public class OwnershipEntity {
     @JsonIgnore
     @Getter @Setter private UserEntity userEntity;
 
+    @OneToOne
+    @JoinColumn(name = "circle_id")
+    @JsonIgnore
+    @Getter @Setter private CircleEntity circleEntity;
+
 }
