@@ -207,6 +207,7 @@ infra/scripts/stop-gcloud-doughnut-compute-instances.sh
 
 ### 8. Build/Refresh base image used to spawn doughnut app compute instance VM
 ```
+cd infra
 PACKER_LOGS=1 packer build packer.json`
 ```
 

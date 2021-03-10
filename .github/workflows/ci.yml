@@ -58,9 +58,9 @@ jobs:
           path: backend/build/libs/doughnut-0.0.1-SNAPSHOT.jar
           destination: dough-01/backend_app_jar
       - name: Create Google Cloud Compute VM doughnut-app instance
-        run: backend/scripts/create-gcloud-app-compute.sh
+        run: infra/scripts/create-gcloud-app-compute.sh
       - name: Healthcheck doughnut-app instance
-        run: backend/scripts/app-instance-healthcheck.sh
+        run: infra/scripts/app-instance-healthcheck.sh
       - name: Slack notify dough channel of CI/CD results
         uses: adamkdean/simple-slack-notify@master
         if: always()
