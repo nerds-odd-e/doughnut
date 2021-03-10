@@ -30,7 +30,7 @@
   "provisioners": [
     {
       "type": "shell",
-      "script": "../backend/scripts/app-instance-deps.sh"
+      "script": "scripts/app-instance-deps.sh"
     }
   ]
 }

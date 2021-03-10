@@ -189,19 +189,33 @@ git secret killperson <user_to_be_removed_email>@odd-e.com
 ### 5. Create gcloud compute instance
 
 - [Install `Google Cloud SDK`](https://cloud.google.com/sdk/docs/install)
-- [Create App Server in GCloud Compute](backend/scripts/create-gcloud-app-compute.sh)
+- [Create App Server in GCloud Compute](infra/scripts/create-gcloud-app-compute.sh)
 - Login to gcloud sdk: `gcloud auth login`
 - Check your login: `gcloud auth list`
 - Set/Point to gcloud dough project: `gcloud config set project carbon-syntax-298809`
 - Check you can see the project as login user: `gcloud config list`
 
-### 6. Check gcloud compute instance startup logs
+### 6. View doughnut app instance startup logs
+```
+infra/scripts/view-doughnut-app-instance-logs.sh
+```
 
+### 7. Shutdown running gcloud compute instance VMs (does not include Google Cloud SQL)
+```
+infra/scripts/stop-gcloud-doughnut-compute-instances.sh
+```
+
+### 8. Build/Refresh base image used to spawn doughnut app compute instance VM
+```
+PACKER_LOGS=1 packer build packer.json`
+```
+
+### 9. Check gcloud compute instance startup logs
 ```
 gcloud compute instances get-serial-port-output doughnut-app-instance --zone us-east1-b
 ```
 
-### 7. End-to-End Test / Features / Cucumber / SbE / ATDD
+### 10. End-to-End Test / Features / Cucumber / SbE / ATDD
 
 We use cucumber + cypress + Java library to do end to end test.
 
@@ -230,11 +244,11 @@ The Cypress+Cucumber tests are written in JavaScript.
 - [Cucumber](https://cucumber.io/)
 - [cypress-cucumber-preprocessor](https://github.com/TheBrainFamily/cypress-cucumber-preprocessor)
 
-### 8. [Product Backlog](https://docs.google.com/spreadsheets/d/1_GofvpnV1tjy2F_aaoOiYTZUOO-8t_qf3twIKMQyGV4/edit?ts=600e6711&pli=1#gid=0)
+### 11. [Product Backlog](https://docs.google.com/spreadsheets/d/1_GofvpnV1tjy2F_aaoOiYTZUOO-8t_qf3twIKMQyGV4/edit?ts=600e6711&pli=1#gid=0)
 
 [Story Map](https://miro.com/app/board/o9J_lTB77Mc=/)
 
-### 9. How to Contribute
+### 12. How to Contribute
 
 - We welcome product ideas and code contribution.
 - Collaborate over:

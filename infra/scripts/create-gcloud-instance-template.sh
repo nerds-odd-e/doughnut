@@ -5,8 +5,7 @@ SCRIPTPATH="$(
 )"
 
 gcloud compute instance-templates create doughnut-template \
-	--image-family debian-10 \
-	--image-project debian-cloud \
+	--image doughnut-debian10-mysql57-base \
 	--service-account 220715781008-compute@developer.gserviceaccount.com \
 	--service-account doughnut-gcp-svc-acct@carbon-syntax-298809.iam.gserviceaccount.com \
 	--scopes https://www.googleapis.com/auth/cloud-platform \
