@@ -5,7 +5,6 @@ import com.odde.doughnut.entities.ReviewPointEntity;
 
 import java.sql.Timestamp;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 public class Reviewing {
     private final UserModel userModel;
