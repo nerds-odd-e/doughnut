@@ -7,6 +7,13 @@ Feature: Spaced-repetition
         And my space setting is "1, 2, 4, 8"
         Given there are notes from Note 1 to Note 3
 
+        @ignore
+    Scenario: The review page
+        Given On day 1 I should have "1/3" note for initial review and "0/0" for repeat
+        When I initial review "Note 1"
+        Then On day 1 I should have "0/2" note for initial review and "0/1" for repeat
+        And On day 2 I should have "0/2" note for initial review and "1/1" for repeat
+
     Scenario: Strictly follow the schedule
         * On day 1 I repeat old "end                 " and initial review new "Note 1, end "
         * On day 2 I repeat old "Note 1, end         " and initial review new "Note 2, end "
@@ -16,30 +23,4 @@ Feature: Spaced-repetition
         * On day 6 I repeat old "Note 3, end         " and initial review new "            "
         * On day 7 I repeat old "end                 " and initial review new "            "
         * On day 8 I repeat old "Note 1, end         " and initial review new "            "
-
-    @ignore
-    Scenario: Not strictly follow the schedule
-        Then Review in sequence
-            | day  | old review | new review  |
-            | 1    |            | 1, 2        |
-            | 2    | 1          |             |
-            | 3    | 2          | 3           |
-            | 4    | 1, 2       |             |
-
-    @ignore
-    Scenario: I want to learn more new notes
-        Then Review sequence
-            | day  | old review | new review  | learn more  |
-            | 1    |            | 1, 2        |             |
-            | 2    | 1, 2       | 3, 4        | 5           |
-            | 3    | 3, 4, 5    |             |             |
-
-    @ignore
-    Scenario: I want to review more
-        Then Review sequence
-            | day  | old review | new review  | review more |
-            | 1    |            | 1, 2        |             |
-            | 2    | 1, 2       | 3, 4        | 1, 2, 3, 4  |
-            | 3    | 3, 4       | 5           |             |
-            | 4    | 1, 2, 5    |             |             |
 

@@ -6,7 +6,10 @@
         <div class="row">
             <div class="col-sm-6">
                 <div class="card text-white bg-success mb-3">
-                    <div class="card-header">Repeat Old Notes</div>
+                    <div class="card-header">
+                        Repeat Old Notes
+                        <span class="badge bg-secondary number-of-repeats">0/0</span>
+                    </div>
                     <div class="card-body">
                         <p class="card-text">Using spaced repetition technique, you only need to review the old notes you have learned at the optimal time. </p>
                         <a th:if="${oldEntity}" role="button" class="btn btn-light" href="/reviews/repeat"> Start reviewing old notes </a>
@@ -16,7 +19,10 @@
             </div>
             <div class="col-sm-6">
                 <div class="card text-white bg-primary mb-3">
-                    <div class="card-header">Learn New Notes</div>
+                    <div class="card-header">
+                        Learn New Notes
+                        <span class="badge bg-secondary number-of-initial-reviews">1/3</span>
+                    </div>
                     <div class="card-body">
                         <p class="card-text">Do the initial review for your notes. You may try to remember them for the first time. Or, you can mark some as no repetition needed.
                             </p>

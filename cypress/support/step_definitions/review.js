@@ -45,6 +45,20 @@ Then("I should see that I have new notes to learn", () => {
   cy.findByRole('button', {name: "Start reviewing new notes"});
 });
 
+Then("On day {int} I should have {string} note for initial review and {string} for repeat", (day, numberOfInitialReviews, numberOfRepeats) => {
+    cy.timeTravelTo(day, 8);
+    cy.visit('/reviews');
+    cy.findByText(numberOfInitialReviews, {selector: '.number-of-initial-reviews'});
+    cy.findByText(numberOfRepeats, {selector: '.number-of-repeats'});
+});
+
+Then("I initial review {string}", (noteTitle) => {
+    cy.visit('/reviews/initial');
+    const [review_type, title] = ["single note", noteTitle];
+    cy.initialReviewOneNoteIfThereIs({review_type, title});
+});
+
+
 
 
 
