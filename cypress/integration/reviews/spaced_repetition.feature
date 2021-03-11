@@ -7,7 +7,6 @@ Feature: Spaced-repetition
         And my space setting is "1, 2, 4, 8"
         Given there are notes from Note 1 to Note 3
 
-        @ignore
     Scenario: The review page
         Given On day 1 I should have "1/3" note for initial review and "0/0" for repeat
         When I initial review "Note 1"

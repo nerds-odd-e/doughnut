@@ -66,30 +66,27 @@ public class UserModel extends ModelForEntity<UserEntity> {
         return linkableNotes;
     }
 
-    public ReviewPointEntity getOneInitialReviewPointEntity(Timestamp currentUTCTimestamp) {
-        return getOneFreshNoteToReview(currentUTCTimestamp).map(
-                noteEntity -> {
-                    ReviewPointEntity reviewPointEntity = new ReviewPointEntity();
-                    reviewPointEntity.setNoteEntity(noteEntity);
-                    return reviewPointEntity;
-                }
-
-        ).orElse(null);
+    public int toRepeatCount() {
+        return 0;
     }
 
-    private Optional<NoteEntity> getOneFreshNoteToReview(Timestamp currentTime) {
-        int count = getNewNotesCountForToday(currentTime);
-        if (count == 0) {
-            return Optional.empty();
-        }
-        return getNotesHaveNotBeenReviewedAtAll().stream().findFirst();
+    public int learntCount() {
+        return modelFactoryService.reviewPointRepository.countByUserEntity(entity);
     }
 
-    private List<NoteEntity> getNotesHaveNotBeenReviewedAtAll() {
+    public int toInitialReviewCount() {
+        return 0;
+    }
+
+    public int notLearntCount() {
+        return 0;
+    }
+
+    public List<NoteEntity> getNotesHaveNotBeenReviewedAtAll() {
         return modelFactoryService.noteRepository.findByUserWhereThereIsNoReviewPoint(entity.getId());
     }
 
-    private int getNewNotesCountForToday(Timestamp currentTime) {
+    public int getNewNotesCountForToday(Timestamp currentTime) {
         long sameDayCount = getRecentReviewPoints(currentTime).stream().filter(p -> p.isInitialReviewOnSameDay(currentTime, getTimeZone())).count();
         return (int) (entity.getDailyNewNotesCount() - sameDayCount);
     }
@@ -112,12 +109,16 @@ public class UserModel extends ModelForEntity<UserEntity> {
         return ZoneId.of("Asia/Shanghai");
     }
 
-    public ReviewPointEntity getReviewPointNeedToRepeat(Timestamp currentUTCTimestamp) {
+    public ReviewPointEntity getOneReviewPointNeedToRepeat(Timestamp currentUTCTimestamp) {
+        return getReviewPointsNeedToRepeat(currentUTCTimestamp).stream().findFirst().orElse(null);
+    }
+
+    private List<ReviewPointEntity> getReviewPointsNeedToRepeat(Timestamp currentUTCTimestamp) {
         return modelFactoryService.reviewPointRepository
                 .findAllByUserEntityAndNextReviewAtLessThanEqualOrderByNextReviewAt(
                         getEntity(),
                         currentUTCTimestamp
-                ).stream().findFirst().orElse(null);
+                );
     }
 
     public SpacedRepetition getSpacedRepetition() {

@@ -1,6 +1,7 @@
 package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.NoteEntity;
+import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -33,10 +34,15 @@ public class User_NewNotesToReviewTest {
         day1 = makeMe.aTimestamp().of(1, 8).forWhereTheUserIs(userModel).please();
     }
 
+    private ReviewPointEntity getOneInitialReviewPointEntity(Timestamp timestamp) {
+        ReviewingUser reviewingUser = new ReviewingUser(userModel, timestamp);
+        return reviewingUser.getOneInitialReviewPointEntity();
+    }
+
     @Test
     void whenThereIsNoNotesForUser() {
         makeMe.aNote().byUser(anotherUser).please();
-        assertThat(userModel.getOneInitialReviewPointEntity(day1), is(nullValue()));
+        assertThat(getOneInitialReviewPointEntity(day1), is(nullValue()));
     }
 
     @Nested
@@ -53,15 +59,15 @@ public class User_NewNotesToReviewTest {
 
         @Test
         void shouldReturnTheFirstNoteAndThenTheSecondWhenThereAreTwo() {
-            assertThat(userModel.getOneInitialReviewPointEntity(day1).getNoteEntity(), equalTo(note1));
+            assertThat(getOneInitialReviewPointEntity(day1).getNoteEntity(), equalTo(note1));
             makeMe.aReviewPointFor(note1).by(userModel).initiallyReviewedOn(day1).please();
-            assertThat(userModel.getOneInitialReviewPointEntity(day1).getNoteEntity(), equalTo(note2));
+            assertThat(getOneInitialReviewPointEntity(day1).getNoteEntity(), equalTo(note2));
         }
 
         @Test
         void shouldNotIncludeNoteThatIsSkippedForReview() {
             makeMe.theNote(note1).skipReview().please();
-            assertThat(userModel.getOneInitialReviewPointEntity(day1).getNoteEntity(), equalTo(note2));
+            assertThat(getOneInitialReviewPointEntity(day1).getNoteEntity(), equalTo(note2));
         }
 
         @Nested
@@ -74,34 +80,34 @@ public class User_NewNotesToReviewTest {
 
             @Test
             void shouldReturnOneIfUsersDailySettignIsOne() {
-                assertThat(userModel.getOneInitialReviewPointEntity(day1).getNoteEntity(), equalTo(note1));
+                assertThat(getOneInitialReviewPointEntity(day1).getNoteEntity(), equalTo(note1));
             }
 
 
             @Test
             void shouldNotIncludeNotesThatAreAlreadyReviewed() {
                 makeMe.aReviewPointFor(note1).by(userModel).initiallyReviewedOn(day1).please();
-                assertThat(userModel.getOneInitialReviewPointEntity(day1), is(nullValue()));
+                assertThat(getOneInitialReviewPointEntity(day1), is(nullValue()));
             }
 
             @Test
             void shouldIncludeNotesThatAreReviewedByOtherPeople() {
                 makeMe.aReviewPointFor(note1).by(anotherUser).initiallyReviewedOn(day1).please();
-                assertThat(userModel.getOneInitialReviewPointEntity(day1).getNoteEntity(), equalTo(note1));
+                assertThat(getOneInitialReviewPointEntity(day1).getNoteEntity(), equalTo(note1));
             }
 
             @Test
             void theDailyCountShouldNotBeResetOnSameDayDifferentHour() {
                 makeMe.aReviewPointFor(note1).by(userModel).initiallyReviewedOn(day1).please();
                 Timestamp day1_23 = makeMe.aTimestamp().of(1, 23).forWhereTheUserIs(userModel).please();
-                assertThat(userModel.getOneInitialReviewPointEntity(day1_23), is(nullValue()));
+                assertThat(getOneInitialReviewPointEntity(day1_23), is(nullValue()));
             }
 
             @Test
             void theDailyCountShouldBeResetOnNextDay() {
                 makeMe.aReviewPointFor(note1).by(userModel).initiallyReviewedOn(day1).please();
                 Timestamp day2 = makeMe.aTimestamp().of(2, 1).forWhereTheUserIs(userModel).please();
-                assertThat(userModel.getOneInitialReviewPointEntity(day2).getNoteEntity(), equalTo(note2));
+                assertThat(getOneInitialReviewPointEntity(day2).getNoteEntity(), equalTo(note2));
             }
 
         }

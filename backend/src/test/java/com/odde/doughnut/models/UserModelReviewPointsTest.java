@@ -48,7 +48,7 @@ public class UserModelReviewPointsTest {
         @Test
         void whenThereIsNoReviewedNotesForUser() {
             makeMe.aReviewPointFor(noteEntity).by(anotherUser).please();
-            assertThat(userModel.getReviewPointNeedToRepeat(daysAfterBase(1)), is(nullValue()));
+            assertThat(userModel.getOneReviewPointNeedToRepeat(daysAfterBase(1)), is(nullValue()));
         }
 
         @ParameterizedTest
@@ -74,7 +74,7 @@ public class UserModelReviewPointsTest {
                     .by(userModel)
                     .nthStrictRepetitionOn(repetitionDone, baseDay)
                     .please();
-            ReviewPointEntity mostUrgentReviewPointEntity = userModel.getReviewPointNeedToRepeat(daysAfterBase(reviewDay));
+            ReviewPointEntity mostUrgentReviewPointEntity = userModel.getOneReviewPointNeedToRepeat(daysAfterBase(reviewDay));
             assertThat(mostUrgentReviewPointEntity != null, is(expectedToRepeat));
         }
 
