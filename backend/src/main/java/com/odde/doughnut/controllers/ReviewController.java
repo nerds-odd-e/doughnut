@@ -55,7 +55,8 @@ public class ReviewController {
     @GetMapping("/repeat")
     public String repeatReview(Model model) {
         UserModel user = currentUserFetcher.getUser();
-        ReviewPointEntity reviewPointEntity = user.getOneReviewPointNeedToRepeat(timeTraveler.getCurrentUTCTimestamp());
+        Reviewing reviewing = new Reviewing(user, timeTraveler.getCurrentUTCTimestamp());
+        ReviewPointEntity reviewPointEntity = reviewing.getOneReviewPointNeedToRepeat();
         if(reviewPointEntity != null) {
             model.addAttribute("reviewPointEntity", reviewPointEntity);
             return "reviews/repeat";

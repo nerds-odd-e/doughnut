@@ -70,6 +70,10 @@ public class UserModel extends ModelForEntity<UserEntity> {
         return modelFactoryService.noteRepository.findByUserWhereThereIsNoReviewPoint(entity.getId());
     }
 
+    public int getNotesHaveNotBeenReviewedAtAllCount() {
+        return modelFactoryService.noteRepository.countByUserWhereThereIsNoReviewPoint(entity.getId());
+    }
+
     public List<ReviewPointEntity> getRecentReviewPoints1(Timestamp since) {
         return modelFactoryService.reviewPointRepository.findAllByUserEntityAndInitialReviewedAtGreaterThan(entity, since);
     }
@@ -87,11 +91,7 @@ public class UserModel extends ModelForEntity<UserEntity> {
         return ZoneId.of("Asia/Shanghai");
     }
 
-    public ReviewPointEntity getOneReviewPointNeedToRepeat(Timestamp currentUTCTimestamp) {
-        return getReviewPointsNeedToRepeat(currentUTCTimestamp).stream().findFirst().orElse(null);
-    }
-
-    private List<ReviewPointEntity> getReviewPointsNeedToRepeat(Timestamp currentUTCTimestamp) {
+    public List<ReviewPointEntity> getReviewPointsNeedToRepeat(Timestamp currentUTCTimestamp) {
         return modelFactoryService.reviewPointRepository
                 .findAllByUserEntityAndNextReviewAtLessThanEqualOrderByNextReviewAt(
                         getEntity(),
@@ -118,4 +118,5 @@ public class UserModel extends ModelForEntity<UserEntity> {
     int learntCount() {
         return modelFactoryService.reviewPointRepository.countByUserEntity(entity);
     }
+
 }

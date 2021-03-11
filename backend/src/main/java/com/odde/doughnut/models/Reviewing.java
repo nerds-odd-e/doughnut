@@ -28,33 +28,36 @@ public class Reviewing {
     }
 
     public int toRepeatCount() {
-        return 0;
+        return userModel.getReviewPointsNeedToRepeat(currentUTCTimestamp).size();
     }
 
     public int learntCount() {
-        UserModel userModel = this.userModel;
         return userModel.learntCount();
     }
 
-    public int toInitialReviewCount() {
-        return 0;
+    public int notLearntCount() {
+        return userModel.getNotesHaveNotBeenReviewedAtAllCount();
     }
 
-    public int notLearntCount() {
-        return 0;
+    public int toInitialReviewCount() {
+        return Math.min(remainingDailyNewNotesCount(), notLearntCount());
     }
 
     private Optional<NoteEntity> getOneFreshNoteToReview() {
-        int count = getNewNotesCountForToday();
+        int count = remainingDailyNewNotesCount();
         if (count == 0) {
             return Optional.empty();
         }
         return userModel.getNotesHaveNotBeenReviewedAtAll().stream().findFirst();
     }
 
-    private int getNewNotesCountForToday() {
+    public int remainingDailyNewNotesCount() {
         Timestamp oneDayAgo = TimestampOperations.addDaysToTimestamp(currentUTCTimestamp, -1);
         long sameDayCount = userModel.getRecentReviewPoints1(oneDayAgo).stream().filter(p -> p.isInitialReviewOnSameDay(currentUTCTimestamp, userModel.getTimeZone())).count();
         return (int) (userModel.entity.getDailyNewNotesCount() - sameDayCount);
+    }
+
+    public ReviewPointEntity getOneReviewPointNeedToRepeat() {
+        return userModel.getReviewPointsNeedToRepeat(currentUTCTimestamp).stream().findFirst().orElse(null);
     }
 }

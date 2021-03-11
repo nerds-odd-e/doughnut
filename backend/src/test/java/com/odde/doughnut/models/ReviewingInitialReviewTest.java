@@ -20,7 +20,7 @@ import static org.hamcrest.Matchers.*;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
-public class User_NewNotesToReviewTest {
+public class ReviewingInitialReviewTest {
     @Autowired
     MakeMe makeMe;
     UserModel userModel;

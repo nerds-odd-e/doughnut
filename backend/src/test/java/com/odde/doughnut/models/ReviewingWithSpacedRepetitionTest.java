@@ -22,7 +22,7 @@ import static org.hamcrest.Matchers.*;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
-public class UserModelReviewPointsTest {
+public class ReviewingWithSpacedRepetitionTest {
     @Autowired
     MakeMe makeMe;
     UserModel userModel;
@@ -48,7 +48,7 @@ public class UserModelReviewPointsTest {
         @Test
         void whenThereIsNoReviewedNotesForUser() {
             makeMe.aReviewPointFor(noteEntity).by(anotherUser).please();
-            assertThat(userModel.getOneReviewPointNeedToRepeat(daysAfterBase(1)), is(nullValue()));
+            assertThat(getOneReviewPointNeedToRepeat(1), is(nullValue()));
         }
 
         @ParameterizedTest
@@ -74,10 +74,15 @@ public class UserModelReviewPointsTest {
                     .by(userModel)
                     .nthStrictRepetitionOn(repetitionDone, baseDay)
                     .please();
-            ReviewPointEntity mostUrgentReviewPointEntity = userModel.getOneReviewPointNeedToRepeat(daysAfterBase(reviewDay));
+            ReviewPointEntity mostUrgentReviewPointEntity = getOneReviewPointNeedToRepeat(reviewDay);
             assertThat(mostUrgentReviewPointEntity != null, is(expectedToRepeat));
         }
 
+    }
+
+    private ReviewPointEntity getOneReviewPointNeedToRepeat(Integer reviewDay) {
+        Reviewing reviewing = new Reviewing(userModel, daysAfterBase(reviewDay));
+        return reviewing.getOneReviewPointNeedToRepeat();
     }
 
     private Timestamp daysAfterBase(Integer reviewDay) {
