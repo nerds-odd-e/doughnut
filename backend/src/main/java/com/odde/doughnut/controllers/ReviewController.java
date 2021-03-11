@@ -3,7 +3,7 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.models.ReviewPointModel;
-import com.odde.doughnut.models.ReviewingUser;
+import com.odde.doughnut.models.Reviewing;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.TimeTraveler;
@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.sql.Timestamp;
 
 @Controller
 @RequestMapping("/reviews")
@@ -36,15 +35,16 @@ public class ReviewController {
     @GetMapping("")
     public String index(Model model) {
         UserModel user = currentUserFetcher.getUser();
-        model.addAttribute("user", user);
+        Reviewing reviewing = new Reviewing(user, timeTraveler.getCurrentUTCTimestamp());
+        model.addAttribute("reviewing", reviewing);
         return "reviews/index";
     }
 
     @GetMapping("/initial")
     public String review(Model model) {
         UserModel user = currentUserFetcher.getUser();
-        ReviewingUser reviewingUser = new ReviewingUser(user, timeTraveler.getCurrentUTCTimestamp());
-        ReviewPointEntity reviewPointEntity = reviewingUser.getOneInitialReviewPointEntity();
+        Reviewing reviewing = new Reviewing(user, timeTraveler.getCurrentUTCTimestamp());
+        ReviewPointEntity reviewPointEntity = reviewing.getOneInitialReviewPointEntity();
         if (reviewPointEntity == null) {
             return "redirect:/reviews";
         }

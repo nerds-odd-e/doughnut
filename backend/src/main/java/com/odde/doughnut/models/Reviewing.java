@@ -6,11 +6,11 @@ import com.odde.doughnut.entities.ReviewPointEntity;
 import java.sql.Timestamp;
 import java.util.Optional;
 
-public class ReviewingUser {
-    public final UserModel userModel;
+public class Reviewing {
+    private final UserModel userModel;
     private final Timestamp currentUTCTimestamp;
 
-    public ReviewingUser(UserModel user, Timestamp currentUTCTimestamp) {
+    public Reviewing(UserModel user, Timestamp currentUTCTimestamp) {
 
         userModel = user;
         this.currentUTCTimestamp = currentUTCTimestamp;
@@ -27,6 +27,23 @@ public class ReviewingUser {
         ).orElse(null);
     }
 
+    public int toRepeatCount() {
+        return 0;
+    }
+
+    public int learntCount() {
+        UserModel userModel = this.userModel;
+        return userModel.learntCount();
+    }
+
+    public int toInitialReviewCount() {
+        return 0;
+    }
+
+    public int notLearntCount() {
+        return 0;
+    }
+
     private Optional<NoteEntity> getOneFreshNoteToReview() {
         int count = getNewNotesCountForToday();
         if (count == 0) {
@@ -36,6 +53,8 @@ public class ReviewingUser {
     }
 
     private int getNewNotesCountForToday() {
-        return userModel.getNewNotesCountForToday(currentUTCTimestamp);
+        Timestamp oneDayAgo = TimestampOperations.addDaysToTimestamp(currentUTCTimestamp, -1);
+        long sameDayCount = userModel.getRecentReviewPoints1(oneDayAgo).stream().filter(p -> p.isInitialReviewOnSameDay(currentUTCTimestamp, userModel.getTimeZone())).count();
+        return (int) (userModel.entity.getDailyNewNotesCount() - sameDayCount);
     }
 }

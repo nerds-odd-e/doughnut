@@ -66,34 +66,12 @@ public class UserModel extends ModelForEntity<UserEntity> {
         return linkableNotes;
     }
 
-    public int toRepeatCount() {
-        return 0;
-    }
-
-    public int learntCount() {
-        return modelFactoryService.reviewPointRepository.countByUserEntity(entity);
-    }
-
-    public int toInitialReviewCount() {
-        return 0;
-    }
-
-    public int notLearntCount() {
-        return 0;
-    }
-
     public List<NoteEntity> getNotesHaveNotBeenReviewedAtAll() {
         return modelFactoryService.noteRepository.findByUserWhereThereIsNoReviewPoint(entity.getId());
     }
 
-    public int getNewNotesCountForToday(Timestamp currentTime) {
-        long sameDayCount = getRecentReviewPoints(currentTime).stream().filter(p -> p.isInitialReviewOnSameDay(currentTime, getTimeZone())).count();
-        return (int) (entity.getDailyNewNotesCount() - sameDayCount);
-    }
-
-    private List<ReviewPointEntity> getRecentReviewPoints(Timestamp currentTime) {
-        Timestamp oneDayAgo = TimestampOperations.addDaysToTimestamp(currentTime, -1);
-        return modelFactoryService.reviewPointRepository.findAllByUserEntityAndInitialReviewedAtGreaterThan(entity, oneDayAgo);
+    public List<ReviewPointEntity> getRecentReviewPoints1(Timestamp since) {
+        return modelFactoryService.reviewPointRepository.findAllByUserEntityAndInitialReviewedAtGreaterThan(entity, since);
     }
 
     private List<NoteEntity> getAllLinkableNotes(NoteEntity source) {
@@ -135,5 +113,9 @@ public class UserModel extends ModelForEntity<UserEntity> {
             noteEntity.setOwnershipEntity(getEntity().getOwnershipEntity());
         }
         return noteEntity;
+    }
+
+    int learntCount() {
+        return modelFactoryService.reviewPointRepository.countByUserEntity(entity);
     }
 }
