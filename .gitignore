@@ -52,3 +52,6 @@ public_keys/
 
 # nohup.out
 nohup.out
+
+# OS
+**/.DS_Store
