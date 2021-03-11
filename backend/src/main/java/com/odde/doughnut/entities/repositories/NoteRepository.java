@@ -36,6 +36,7 @@ public interface NoteRepository extends CrudRepository<NoteEntity, Integer> {
                     + " ) as rp"
                     + " ON note.id = rp.note_id "
                     + " WHERE note.user_id = :userId "
+                    + "   AND note.skip_review IS FALSE "
                     + "   AND rp.id IS NULL "
             , nativeQuery = true)
     List<NoteEntity> findByUserWhereThereIsNoReviewPoint(@Param("userId") Integer userId);

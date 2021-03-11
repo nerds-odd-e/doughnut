@@ -21,9 +21,13 @@ public class MakeMe {
     }
 
     public NoteBuilder aNote() {
-        return new NoteBuilder(this);
+        return new NoteBuilder(new NoteEntity(), this);
     }
 
+
+    public NoteBuilder theNote(NoteEntity noteEntity) {
+        return new NoteBuilder(noteEntity, this);
+    }
     public BazaarNoteBuilder aBazaarNode(NoteEntity note) {
         return new BazaarNoteBuilder(this, note);
     }

@@ -12,8 +12,8 @@ import java.time.LocalDate;
 public class NoteBuilder extends EntityBuilder<NoteEntity> {
     static final TestObjectCounter titleCounter = new TestObjectCounter(n->"title" + n);
 
-    public NoteBuilder(MakeMe makeMe){
-        super(makeMe, new NoteEntity());
+    public NoteBuilder(NoteEntity noteEntity, MakeMe makeMe){
+        super(makeMe, noteEntity);
         entity.setTitle(titleCounter.generate());
         entity.setDescription("descrption");
         entity.setUpdatedDatetime(java.sql.Date.valueOf(LocalDate.now()));
@@ -55,4 +55,8 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
 
     }
 
+    public NoteBuilder skipReview() {
+        entity.setSkipReview(true);
+        return this;
+    }
 }
