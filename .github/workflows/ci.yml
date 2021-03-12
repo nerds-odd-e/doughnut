@@ -63,10 +63,10 @@ jobs:
         run: infra/scripts/app-instance-healthcheck.sh
       - name: Slack notify dough channel of CI/CD results
         uses: adamkdean/simple-slack-notify@master
-        if: failed()
         with:
           channel: "#dough"
           status: ${{ job.status }}
+          color: "danger"
           success_text: "dough CI Unit & E2E Tests (#${env.GITHUB_RUN_NUMBER}) completed successfully"
           failure_text: "dough CI Unit & E2E Tests (#${env.GITHUB_RUN_NUMBER}) failed"
           cancelled_text: "dough CI Unit & E2E Tests (#${env.GITHUB_RUN_NUMBER}) was cancelled"
