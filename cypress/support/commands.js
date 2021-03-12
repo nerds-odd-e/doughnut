@@ -126,9 +126,10 @@ Cypress.Commands.add("timeTravelTo", (day, hour) => {
   const travelTo = new Date(1976, 5, 1, hour).addDays(day);
   cy.request({
     method: "POST",
-    url: "/api/testability/time_travel",
+    url: "/testability/time_travel",
+    form: true,
     body: { travel_to: JSON.stringify(travelTo) }
-  }).its("body").should("contain", "OK")
+  }).its("status").should("equal", 200);
 });
 
 Cypress.Commands.add("initialReviewOneNoteIfThereIs", ({review_type, title, additional_info}) => {
