@@ -6,14 +6,14 @@
         <div th:replace="_fragments/note_fragments :: noteOwnerBreadcrumb(${reviewPointEntity.noteEntity}, ~{})"/>
         <div th:replace="_fragments/note_fragments :: noteShow(${reviewPointEntity.noteEntity}, 1)"/>
 
-        <form action="#" th:action="@{/reviews/{id}(id=${reviewPointEntity.id})}" th:object="${reviewPointEntity}" method="post">
-            <input type="submit" value="Next" class="btn btn-primary"/>
-        </form>
-
-        <form action="#" th:action="@{/reviews/{id}(id=${reviewPointEntity.id})}" th:object="${reviewPointEntity}" method="post">
-            <input type="hidden" name="removedFromReview" value="1"/>
-            <input type="submit" value="Remove This Note from Review" class="btn btn-secondary"/>
-        </form>
-
+        <div class="btn-toolbar">
+            <div th:replace="_fragments/review_fragments :: repeatForm(${reviewPointEntity}, ~{:: .submit-button}, ~{})">
+                <input type="submit" value="Next" class="btn btn-primary submit-button"/>
+            </div>
+            <div th:replace="_fragments/review_fragments :: repeatForm(${reviewPointEntity}, ~{:: .skip-button}, ~{:: .additional-input})">
+                <input class="additional-input" type="hidden" name="removedFromReview" value="1"/>
+                <input type="submit" value="Remove This Note from Review" class="btn btn-secondary ml-2 skip-button"/>
+            </div>
+        </div>
     </div>
 </layout>
