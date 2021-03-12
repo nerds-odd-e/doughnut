@@ -31,14 +31,3 @@ Feature: Initial Review
             | single note   | Note 2     |
             | initial done  |            |
 
-    Scenario: Follow schedule strictly for 2 days
-        Given It's day 1, 8 hour
-        Then I do these initial reviews in sequence:
-            | review_type   | title      |
-            | single note   | Note 1     |
-            | single note   | Note 2     |
-        Given It's day 2, 8 hour
-        Then I do these initial reviews in sequence:
-            | review_type   | title      |
-            | single note   | Note 3     |
-
