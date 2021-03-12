@@ -7,10 +7,7 @@ import {
 } from "cypress-cucumber-preprocessor/steps";
 
 Then("I do these initial reviews in sequence:", (data) => {
-  cy.visit('/reviews/initial');
-  data.hashes().forEach(initialReview => {
-    cy.initialReviewOneNoteIfThereIs(initialReview);
-  });
+  cy.initialReviewInSequence(data.hashes());
 })
 
 Given("It's day {int}, {int} hour", (day, hour) => {
@@ -19,18 +16,9 @@ Given("It's day {int}, {int} hour", (day, hour) => {
 
 Then("On day {int} I repeat old {string} and initial review new {string}", (day, repeatNotes, initialNotes) => {
     cy.timeTravelTo(day, 8);
-    cy.visit('/reviews/repeat');
-    repeatNotes.commonSenseSplit(",").forEach(title => {
-        const review_type = title === "end" ? "repeat done" : "single note";
-        cy.repeatReviewOneNoteIfThereIs({review_type, title});
-    });
 
-    cy.visit('/reviews/initial');
-    initialNotes.commonSenseSplit(", ").forEach(title => {
-        const review_type = title === "end" ? "initial done" : "single note";
-        cy.initialReviewOneNoteIfThereIs({review_type, title});
-    });
-
+    cy.repeatReviewNotes(repeatNotes);
+    cy.initialReviewNotes(initialNotes);
 });
 
 Given("I go to the reviews page", () => {
@@ -53,12 +41,22 @@ Then("On day {int} I should have {string} note for initial review and {string} f
 });
 
 Then("I initial review {string}", (noteTitle) => {
-    cy.visit('/reviews/initial');
-    const [review_type, title] = ["single note", noteTitle];
-    cy.initialReviewOneNoteIfThereIs({review_type, title});
+    cy.initialReviewNotes(noteTitle);
 });
 
+Then("I learned one note {string} on day {int}", (noteTitle, day) => {
+    cy.seedNotes([{title: noteTitle}]);
+    cy.timeTravelTo(day, 8);
+    cy.initialReviewNotes(noteTitle);
+});
 
+Then("I repeat reviewing my old note {string} on day {int}", (noteTitle, day) => {
+    cy.timeTravelTo(day, 8);
+    cy.visit('/reviews/repeat');
+});
 
+Then("choose to remove it fromm reviews", () => {
+    cy.findByRole('button', {name: 'Remove This Note from Review'}).click();
+});
 
 

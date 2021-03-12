@@ -11,7 +11,7 @@
         </form>
 
         <form action="#" th:action="@{/reviews/{id}(id=${reviewPointEntity.id})}" th:object="${reviewPointEntity}" method="post">
-<!--            <input type="hidden" th:field="*{removedFromReview}" value="1"/>-->
+            <input type="hidden" th:field="*{removedFromReview}" value="1"/>
             <input type="submit" value="Remove This Note from Review" class="btn btn-secondary"/>
         </form>
 

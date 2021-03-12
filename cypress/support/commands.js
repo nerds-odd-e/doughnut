@@ -185,3 +185,27 @@ Cypress.Commands.add("navigateToCircle", (circleName) => {
   cy.visit("/circles");
   cy.findByText(circleName).click();
 });
+
+Cypress.Commands.add("initialReviewInSequence", (reviews) => {
+  cy.visit('/reviews/initial');
+  reviews.forEach(initialReview => {
+    cy.initialReviewOneNoteIfThereIs(initialReview);
+  });
+});
+
+Cypress.Commands.add("initialReviewNotes", (noteTitles) => {
+    cy.initialReviewInSequence(
+        noteTitles.commonSenseSplit(", ").map(title => {
+            return {review_type: (title === "end" ? "initial done" : "single note"), title};
+        })
+    );
+});
+
+Cypress.Commands.add("repeatReviewNotes", (noteTitles) => {
+    cy.visit('/reviews/repeat');
+    noteTitles.commonSenseSplit(",").forEach(title => {
+        const review_type = title === "end" ? "repeat done" : "single note";
+        cy.repeatReviewOneNoteIfThereIs({review_type, title});
+    });
+});
+

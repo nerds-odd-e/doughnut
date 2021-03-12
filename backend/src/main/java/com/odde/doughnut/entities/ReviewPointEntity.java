@@ -60,6 +60,11 @@ public class ReviewPointEntity {
     @Setter
     private Integer forgettingCurveIndex = SpacedRepetition.DEFAULT_FORGETTING_CURVE_INDEX;
 
+    @Column(name = "removed_from_review")
+    @Getter
+    @Setter
+    private Boolean removedFromReview = false;
+
     @Column(name = "note_id", insertable = false, updatable = false)
     @Getter
     private Integer noteId;
