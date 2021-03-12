@@ -1,0 +1,14 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<layout th:replace="_fragments/basic_layout :: application_layout(~{ :: .content})">
+
+    <div class="container content">
+        <h2>Edit User Setting</h2>
+
+        <form action="#" th:action="@{/users/{id}(id=${userEntity.id})}" th:object="${userEntity}" method="post">
+            <div th:replace="_fragments/forms :: textInput('user', 'name', null)"/>
+            <div th:replace="_fragments/forms :: textInput('user', 'dailyNewNotesCount', null)"/>
+            <div th:replace="_fragments/forms :: textInput('user', 'spaceIntervals', null)"/>
+            <input type="submit" value="Save" class="btn btn-primary"/>
+        </form>
+    </div>
+</layout>

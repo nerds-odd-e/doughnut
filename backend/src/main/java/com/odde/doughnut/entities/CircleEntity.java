@@ -27,7 +27,7 @@ public class CircleEntity {
 
     @Getter
     @Column(name = "invitation_code")
-    private String invitationCode = generateRandomInvitationCode(15);
+    private final String invitationCode = generateRandomInvitationCode(15);
 
     @JoinTable(name = "circle_user", joinColumns = {
             @JoinColumn(name = "circle_id", referencedColumnName = "id", nullable = false)}, inverseJoinColumns = {
@@ -36,7 +36,7 @@ public class CircleEntity {
     @ManyToMany
     @JsonIgnore
     @Getter
-    private List<UserEntity> members = new ArrayList<>();
+    private final List<UserEntity> members = new ArrayList<>();
 
     @OneToOne(mappedBy = "circleEntity", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn

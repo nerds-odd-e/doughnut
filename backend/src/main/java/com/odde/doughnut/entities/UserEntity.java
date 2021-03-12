@@ -40,7 +40,7 @@ public class UserEntity {
     @ManyToMany
     @JsonIgnore
     @Getter
-    private List<CircleEntity> circles = new ArrayList<>();
+    private final List<CircleEntity> circles = new ArrayList<>();
 
     public UserEntity() {
         ownershipEntity.setUserEntity(this);
