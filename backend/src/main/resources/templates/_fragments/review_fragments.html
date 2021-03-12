@@ -1,5 +1,0 @@
-<form th:fragment="repeatForm(reviewPointEntity, submitButton, additionalInputs)" action="#" th:action="@{/reviews/{id}(id=${reviewPointEntity.id})}" th:object="${reviewPointEntity}" method="post">
-    <input th:replace="${additionalInputs}"/>
-    <input th:replace="${submitButton}"/>
-</form>
-
