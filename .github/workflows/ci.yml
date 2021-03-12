@@ -63,7 +63,7 @@ jobs:
         run: infra/scripts/app-instance-healthcheck.sh
       - name: Slack notify dough channel of CI/CD results
         uses: adamkdean/simple-slack-notify@master
-        if: always()
+        if: failed()
         with:
           channel: "#dough"
           status: ${{ job.status }}
