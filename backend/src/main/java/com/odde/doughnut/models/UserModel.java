@@ -10,7 +10,6 @@ import com.odde.doughnut.services.ModelFactoryService;
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class UserModel extends ModelForEntity<UserEntity> {
@@ -74,7 +73,7 @@ public class UserModel extends ModelForEntity<UserEntity> {
         return modelFactoryService.noteRepository.countByUserWhereThereIsNoReviewPoint(entity.getId());
     }
 
-    public List<ReviewPointEntity> getRecentReviewPoints1(Timestamp since) {
+    public List<ReviewPointEntity> getRecentReviewPoints(Timestamp since) {
         return modelFactoryService.reviewPointRepository.findAllByUserEntityAndInitialReviewedAtGreaterThan(entity, since);
     }
 
@@ -116,7 +115,7 @@ public class UserModel extends ModelForEntity<UserEntity> {
     }
 
     int learntCount() {
-        return modelFactoryService.reviewPointRepository.countByUserEntity(entity);
+        return modelFactoryService.reviewPointRepository.countByUserEntityNotRemoved(entity);
     }
 
 }

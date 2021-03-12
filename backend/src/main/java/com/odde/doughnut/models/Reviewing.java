@@ -70,7 +70,7 @@ public class Reviewing {
 
     public int remainingDailyNewNotesCount() {
         Timestamp oneDayAgo = TimestampOperations.addDaysToTimestamp(currentUTCTimestamp, -1);
-        long sameDayCount = userModel.getRecentReviewPoints1(oneDayAgo).stream().filter(p -> p.isInitialReviewOnSameDay(currentUTCTimestamp, userModel.getTimeZone())).count();
+        long sameDayCount = userModel.getRecentReviewPoints(oneDayAgo).stream().filter(p -> p.isInitialReviewOnSameDay(currentUTCTimestamp, userModel.getTimeZone())).count();
         return (int) (userModel.entity.getDailyNewNotesCount() - sameDayCount);
     }
 

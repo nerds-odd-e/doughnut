@@ -43,4 +43,5 @@ public interface NoteRepository extends CrudRepository<NoteEntity, Integer> {
                 + " WHERE note.user_id = :userId "
                 + "   AND note.skip_review IS FALSE "
                 + "   AND rp.id IS NULL ";
+
 }

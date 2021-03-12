@@ -5,7 +5,6 @@ Feature: Repetition
         Given I've logged in as an existing user
         And I learned one note "Fungible" on day 1
 
-        @ignore
     Scenario: I can remove a note from further reviews
         Given I repeat reviewing my old note "Fungible" on day 2
         When choose to remove it fromm reviews
