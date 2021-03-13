@@ -50,7 +50,7 @@ Then("I learned one note {string} on day {int}", (noteTitle, day) => {
     cy.initialReviewNotes(noteTitle);
 });
 
-Then("I repeat reviewing my old note {string} on day {int}", (noteTitle, day) => {
+Then("I repeat reviewing my old note on day {int}", (day) => {
     cy.timeTravelTo(day, 8);
     cy.visit('/reviews/repeat');
 });
