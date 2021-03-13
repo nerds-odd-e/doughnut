@@ -36,16 +36,32 @@ class QuizQuestionTest {
 
     @Test
     void aNoteWithDescriptionHasAutoClozeDeletionQuiz() {
-        NoteEntity noteEntity = makeMe.aNote().byUser(userModel).please();
+        NoteEntity noteEntity = makeMe.aNote().please();
         QuizQuestion quizQuestion = getQuizQuestion(noteEntity);
         assertThat(quizQuestion.getDescription(), equalTo(noteEntity.getDescription()));
     }
 
     @Test
     void whenDescripitonIncludesTitle() {
-        NoteEntity noteEntity = makeMe.aNote().title("Sedition").description("Word sedition means incite violence").byUser(userModel).please();
+        NoteEntity noteEntity = makeMe.aNote().title("Sedition").description("Word sedition means incite violence").please();
         QuizQuestion quizQuestion = getQuizQuestion(noteEntity);
         assertThat(quizQuestion.getDescription(), equalTo("Word [...] means incite violence"));
+    }
+
+    @Test
+    void aNoteWithNoSiblings() {
+        NoteEntity noteEntity = makeMe.aNote().please();
+        QuizQuestion quizQuestion = getQuizQuestion(noteEntity);
+        assertThat(quizQuestion.getOptions(), contains(noteEntity.getTitle()));
+    }
+
+    @Test
+    void aNoteWith1Siblings() {
+        NoteEntity top = makeMe.aNote().please();
+        NoteEntity noteEntity1 = makeMe.aNote().under(top).please();
+        NoteEntity noteEntity2 = makeMe.aNote().under(top).please();
+        QuizQuestion quizQuestion = getQuizQuestion(noteEntity1);
+        assertThat(quizQuestion.getOptions(), containsInAnyOrder(noteEntity1.getTitle(), noteEntity2.getTitle()));
     }
 
     private QuizQuestion getQuizQuestion(NoteEntity noteEntity) {

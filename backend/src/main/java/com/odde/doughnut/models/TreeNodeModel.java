@@ -121,6 +121,10 @@ public class TreeNodeModel extends ModelForEntity<NoteEntity> {
         );
     }
 
+    public List<NoteEntity> getSiblings() {
+        return noteRepository.findAllByParentNote(entity.getParentNote());
+    }
+
     //
     // This piece of commented code is for demo purpose
     //

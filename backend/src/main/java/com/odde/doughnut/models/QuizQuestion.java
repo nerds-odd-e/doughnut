@@ -5,8 +5,11 @@ import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.services.ModelFactoryService;
 
 import java.sql.Timestamp;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class QuizQuestion {
     private final NoteEntity noteEntity;
@@ -20,5 +23,15 @@ public class QuizQuestion {
     public String getDescription() {
         Pattern pattern = Pattern.compile(Pattern.quote(noteEntity.getTitle()), Pattern.CASE_INSENSITIVE);
         return pattern.matcher(noteEntity.getDescription()).replaceAll("[...]");
+    }
+
+    public List<String> getOptions() {
+        TreeNodeModel treeNodeModel = getTreeNodeModel();
+        return treeNodeModel.getSiblings().stream().map(NoteEntity::getTitle).collect(Collectors.toUnmodifiableList());
+
+    }
+
+    private TreeNodeModel getTreeNodeModel() {
+        return modelFactoryService.toTreeNodeModel(noteEntity);
     }
 }

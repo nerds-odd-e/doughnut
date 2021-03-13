@@ -53,7 +53,12 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
     @Override
     protected void beforeCreate(boolean needPersist) {
         if (entity.getUserEntity() == null) {
-            byUser(makeMe.aUser().please(needPersist));
+            NoteEntity parent = entity.getParentNote();
+            if (parent != null && parent.getUserEntity() != null) {
+                byUser(parent.getUserEntity());
+            }else{
+                byUser(makeMe.aUser().please(needPersist));
+            }
         }
         if (entity.getOwnershipEntity() == null) {
             entity.setOwnershipEntity(entity.getUserEntity().getOwnershipEntity());
