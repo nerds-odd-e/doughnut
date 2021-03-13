@@ -6,6 +6,9 @@ import lombok.Setter;
 import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +17,11 @@ import java.util.List;
 public class UserEntity {
 
     @Id @Getter @GeneratedValue(strategy = GenerationType.IDENTITY) private Integer id;
+
+    @NotNull
+    @Size(min = 1, max = 100)
     @Getter @Setter private String name;
+
     @Column(name = "external_identifier") @Getter @Setter private String externalIdentifier;
 
     @OneToMany(mappedBy = "userEntity")
@@ -31,6 +38,7 @@ public class UserEntity {
 
     @Column(name = "daily_new_notes_count") @Getter @Setter private Integer dailyNewNotesCount = 10;
 
+    @Pattern(regexp="^\\d+(,\\s*\\d+)*$",message="must be numbers separated by ','")
     @Column(name = "space_intervals") @Getter @Setter private String spaceIntervals = "1, 2, 3, 5, 8, 13, 21, 34, 55";
 
     @JoinTable(name = "circle_user", joinColumns = {
