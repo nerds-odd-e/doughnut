@@ -105,6 +105,9 @@
     </p>
     <p th:each="linkType:${noteEntity.linkTypes()}">
         <span th:text="${linkType}"/>
+        <span th:each="note:${noteEntity.linksOfType(linkType)}">
+            <span th:replace=":: noteTitleWithLink(${note})"/>
+        </span>
     </p>
 </div>
 

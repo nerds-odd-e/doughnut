@@ -30,7 +30,6 @@ Feature: link note
         When I am creating link for note "Sedition"
         And I should see "Sedative" as targets only
 
-        @ignore
     Scenario: links should show in the view
         When I link note "Sedition" as "is similar to" note "Sedation"
         And I link note "Sedition" as "is similar to" note "Sedative"

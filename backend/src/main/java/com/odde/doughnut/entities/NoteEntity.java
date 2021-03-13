@@ -146,6 +146,10 @@ public class NoteEntity {
         return links.stream().map(LinkEntity::getType).distinct().collect(Collectors.toUnmodifiableList());
     }
 
+    public List<NoteEntity> linksOfType(String type) {
+        return links.stream().filter(l->l.getType().equals(type)).map(LinkEntity::getTargetNote).collect(Collectors.toUnmodifiableList());
+    }
+
     public boolean isFromCircle() {
         return circle() != null;
     }
