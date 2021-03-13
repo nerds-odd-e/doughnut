@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.UserEntity;
+import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.services.ModelFactoryService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -39,7 +40,8 @@ public class UserController {
     }
 
     @PostMapping("/{userEntity}")
-    public String updateUser(@Valid UserEntity userEntity, BindingResult bindingResult) {
+    public String updateUser(@Valid UserEntity userEntity, BindingResult bindingResult) throws NoAccessRightException {
+        currentUserFetcher.getUser().assertAuthorization(userEntity);
         if (bindingResult.hasErrors()) {
             return "users/edit";
         }

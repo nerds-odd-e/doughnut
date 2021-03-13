@@ -51,6 +51,11 @@ public class UserModel extends ModelForEntity<UserEntity> {
         }
     }
 
+    public void assertAuthorization(UserEntity userEntity) throws NoAccessRightException {
+        if(entity.getId() != userEntity.getId()) {
+            throw new NoAccessRightException();
+        }
+    }
     public boolean inCircle(CircleEntity circleEntity) {
         return circleEntity.getMembers().contains(entity);
     }
