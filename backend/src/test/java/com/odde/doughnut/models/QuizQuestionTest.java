@@ -56,12 +56,22 @@ class QuizQuestionTest {
     }
 
     @Test
-    void aNoteWith1Siblings() {
+    void aNoteWithOneSibling() {
         NoteEntity top = makeMe.aNote().please();
         NoteEntity noteEntity1 = makeMe.aNote().under(top).please();
         NoteEntity noteEntity2 = makeMe.aNote().under(top).please();
         QuizQuestion quizQuestion = getQuizQuestion(noteEntity1);
         assertThat(quizQuestion.getOptions(), containsInAnyOrder(noteEntity1.getTitle(), noteEntity2.getTitle()));
+    }
+
+    @Test
+    void aNoteWithManySiblings() {
+        NoteEntity top = makeMe.aNote().please();
+        makeMe.theNote(top).with10Children().please();
+        NoteEntity noteEntity = makeMe.aNote().under(top).please();
+        QuizQuestion quizQuestion = getQuizQuestion(noteEntity);
+        assertThat(quizQuestion.getOptions().size(), equalTo(6));
+        assertThat(quizQuestion.getOptions().contains(noteEntity.getTitle()), is(true));
     }
 
     private QuizQuestion getQuizQuestion(NoteEntity noteEntity) {

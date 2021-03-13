@@ -86,4 +86,10 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
         return this;
     }
 
+    public NoteBuilder with10Children() {
+        for(int i=0; i < 10; i++) {
+            makeMe.aNote().under(entity).please();
+        }
+        return this;
+    }
 }

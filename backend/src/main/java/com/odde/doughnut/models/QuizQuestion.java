@@ -6,6 +6,7 @@ import com.odde.doughnut.services.ModelFactoryService;
 
 import java.sql.Timestamp;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
@@ -27,7 +28,15 @@ public class QuizQuestion {
 
     public List<String> getOptions() {
         TreeNodeModel treeNodeModel = getTreeNodeModel();
-        return treeNodeModel.getSiblings().stream().map(NoteEntity::getTitle).collect(Collectors.toUnmodifiableList());
+        List<String> list = treeNodeModel.getSiblings().stream().map(NoteEntity::getTitle)
+                .filter(t->!t.equals(noteEntity.getTitle()))
+                .collect(Collectors.toList());
+        Collections.shuffle(list);
+        List<String> selectedList = list.stream().limit(5).collect(Collectors.toList());
+        selectedList.add(noteEntity.getTitle());
+        Collections.shuffle(selectedList);
+
+        return selectedList;
 
     }
 
