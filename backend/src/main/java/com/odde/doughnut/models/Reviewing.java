@@ -76,9 +76,10 @@ public class Reviewing {
         return (int) (userModel.entity.getDailyNewNotesCount() - sameDayCount);
     }
 
-    public ReviewPointEntity getOneReviewPointNeedToRepeat() {
+    public ReviewPointModel getOneReviewPointNeedToRepeat() {
         return userModel.getReviewPointsNeedToRepeat(currentUTCTimestamp).stream()
                 .findFirst()
+                .map(rp->modelFactoryService.toReviewPointModel(rp))
                 .orElse(null);
     }
 }

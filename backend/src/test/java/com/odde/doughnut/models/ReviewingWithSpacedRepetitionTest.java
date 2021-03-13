@@ -82,7 +82,9 @@ public class ReviewingWithSpacedRepetitionTest {
 
     private ReviewPointEntity getOneReviewPointNeedToRepeat(Integer reviewDay) {
         Reviewing reviewing = userModel.createReviewing(daysAfterBase(reviewDay));
-        return reviewing.getOneReviewPointNeedToRepeat();
+        ReviewPointModel model = reviewing.getOneReviewPointNeedToRepeat();
+        if(model == null) return null;
+        return model.getEntity();
     }
 
     private Timestamp daysAfterBase(Integer reviewDay) {
