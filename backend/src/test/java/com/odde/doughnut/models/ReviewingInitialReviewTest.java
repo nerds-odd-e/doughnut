@@ -35,7 +35,7 @@ public class ReviewingInitialReviewTest {
     }
 
     private ReviewPointEntity getOneInitialReviewPointEntity(Timestamp timestamp) {
-        Reviewing reviewing = new Reviewing(userModel, timestamp);
+        Reviewing reviewing = userModel.createReviewing(timestamp);
         return reviewing.getOneInitialReviewPointEntity();
     }
 

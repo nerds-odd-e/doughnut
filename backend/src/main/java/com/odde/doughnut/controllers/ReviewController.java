@@ -36,7 +36,7 @@ public class ReviewController {
     @GetMapping("")
     public String index(Model model) {
         UserModel user = currentUserFetcher.getUser();
-        Reviewing reviewing = new Reviewing(user, timeTraveler.getCurrentUTCTimestamp());
+        Reviewing reviewing = user.createReviewing(timeTraveler.getCurrentUTCTimestamp());
         model.addAttribute("reviewing", reviewing);
         return "reviews/index";
     }
@@ -44,7 +44,7 @@ public class ReviewController {
     @GetMapping("/initial")
     public String review(Model model) {
         UserModel user = currentUserFetcher.getUser();
-        Reviewing reviewing = new Reviewing(user, timeTraveler.getCurrentUTCTimestamp());
+        Reviewing reviewing = user.createReviewing(timeTraveler.getCurrentUTCTimestamp());
         ReviewPointEntity reviewPointEntity = reviewing.getOneInitialReviewPointEntity();
         if (reviewPointEntity == null) {
             return "redirect:/reviews";
@@ -64,7 +64,7 @@ public class ReviewController {
     @GetMapping("/repeat")
     public String repeatReview(Model model) {
         UserModel user = currentUserFetcher.getUser();
-        Reviewing reviewing = new Reviewing(user, timeTraveler.getCurrentUTCTimestamp());
+        Reviewing reviewing = user.createReviewing(timeTraveler.getCurrentUTCTimestamp());
         ReviewPointEntity reviewPointEntity = reviewing.getOneReviewPointNeedToRepeat();
         if(reviewPointEntity != null) {
             model.addAttribute("reviewPointEntity", reviewPointEntity);

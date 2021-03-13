@@ -2,6 +2,7 @@ package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.ReviewPointEntity;
+import com.odde.doughnut.services.ModelFactoryService;
 
 import java.sql.Timestamp;
 import java.util.Optional;
@@ -9,12 +10,13 @@ import java.util.Optional;
 public class Reviewing {
     private final UserModel userModel;
     private final Timestamp currentUTCTimestamp;
+    private final ModelFactoryService modelFactoryService;
     private final Memoizer memoizer = new Memoizer();
 
-    public Reviewing(UserModel user, Timestamp currentUTCTimestamp) {
-
+    public Reviewing(UserModel user, Timestamp currentUTCTimestamp, ModelFactoryService modelFactoryService) {
         userModel = user;
         this.currentUTCTimestamp = currentUTCTimestamp;
+        this.modelFactoryService = modelFactoryService;
     }
 
     public ReviewPointEntity getOneInitialReviewPointEntity() {
@@ -75,6 +77,8 @@ public class Reviewing {
     }
 
     public ReviewPointEntity getOneReviewPointNeedToRepeat() {
-        return userModel.getReviewPointsNeedToRepeat(currentUTCTimestamp).stream().findFirst().orElse(null);
+        return userModel.getReviewPointsNeedToRepeat(currentUTCTimestamp).stream()
+                .findFirst()
+                .orElse(null);
     }
 }

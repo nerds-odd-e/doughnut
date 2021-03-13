@@ -123,4 +123,7 @@ public class UserModel extends ModelForEntity<UserEntity> {
         return modelFactoryService.reviewPointRepository.countByUserEntityNotRemoved(entity);
     }
 
+    public Reviewing createReviewing(Timestamp currentUTCTimestamp) {
+        return new Reviewing(this, currentUTCTimestamp, modelFactoryService);
+    }
 }
