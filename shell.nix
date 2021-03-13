@@ -8,19 +8,19 @@ let
   };
   apple_sdk = darwin.apple_sdk.frameworks;
   nodejs = nodejs-15_x;
-  jdk = jdk11;
   intellij = jetbrains.idea-community;
 in mkShell {
   name = "doughnut";
   MYSQL_HOME = builtins.getEnv "MYSQL_HOME";
   MYSQL_DATADIR = builtins.getEnv "MYSQL_DATADIR";
   buildInputs = [
-    gradle nodejs-15_x yarn jdk python3 zsh zsh-powerlevel10k
-    any-nix-shell autoconf automake cmake coreutils-full gcc gnumake
+    autoconf automake cmake coreutils-full gcc10 gccStdenv gnumake
+    gradle nodejs-15_x python3 yarn zulu
+    any-nix-shell zsh zsh-powerlevel10k
     git git-secret gitAndTools.delta locale lsd platinum-searcher
     binutils-unwrapped hostname inetutils openssh pkg-config rsync
     bat duf fasd fzf gnupg htop jq less lesspipe lsof lzma
-    most progress ps pstree ripgrep tree vgrep wget which
+    most progress ps pstree ripgrep tree vgrep which
     libmysqlclient libpcap libressl
     cacert curlie glances httpie
     mysql57 mysql-client mysql_jdbc python38Packages.pip
