@@ -1,0 +1,21 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<layout th:replace="_fragments/basic_layout :: application_layout(~{ :: .content})">
+
+    <div class="container content">
+        <h2>Adding new note</h2>
+        <div th:replace="_fragments/note_fragments :: noteOwnerBreadcrumb(${noteEntity}, ~{:: .additional-item})">
+            <li class="breadcrumb-item additional-item">(adding here)</li>
+        </div>
+        <div>
+            From: <span th:text="${linkEntity.sourceNote.title}"/>
+            To: <span th:text="${linkEntity.targetNote.title}"/>
+        </div>
+
+        <form action="#" th:action="@{/links/create_link}" th:object="${linkEntity}" method="post">
+            <input th:field="*{sourceNote}" type="hidden"/>
+            <input th:field="*{targetNote}" type="hidden"/>
+            <input th:field="*{type}" type="hidden"/>
+            <input type="submit" value="Link" class="btn btn-primary"/>
+        </form>
+    </div>
+</layout>

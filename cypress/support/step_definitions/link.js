@@ -14,6 +14,7 @@ When("I am creating link for note {string}", (noteTitle) => {
 When("I link note {string} to note {string}", (fromNoteTitle, toNoteTitle) => {
     cy.creatingLinkFor(fromNoteTitle);
     cy.clickButtonOnCardBody(toNoteTitle, "Select");
+    cy.findByRole('button', {name: "Link"}).click();
 })
 
 And("I should see the source note as {string}",(noteTitle) => {

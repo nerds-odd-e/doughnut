@@ -17,15 +17,17 @@ public class ModelFactoryService {
     @Autowired public final BazaarNoteRepository bazaarNoteRepository;
     @Autowired public final ReviewPointRepository reviewPointRepository;
     @Autowired public final CircleRepository circleRepository;
+    @Autowired public final LinkRepository linkRepository;
     @Autowired public final EntityManager entityManager;
 
-    public ModelFactoryService(NoteRepository noteRepository, UserRepository userRepository, BazaarNoteRepository bazaarNoteRepository, ReviewPointRepository reviewPointRepository, CircleRepository circleRepository, EntityManager entityManager)
+    public ModelFactoryService(NoteRepository noteRepository, UserRepository userRepository, BazaarNoteRepository bazaarNoteRepository, ReviewPointRepository reviewPointRepository, CircleRepository circleRepository, LinkRepository linkRepository, EntityManager entityManager)
     {
         this.noteRepository = noteRepository;
         this.userRepository = userRepository;
         this.bazaarNoteRepository = bazaarNoteRepository;
         this.reviewPointRepository = reviewPointRepository;
         this.circleRepository = circleRepository;
+        this.linkRepository = linkRepository;
         this.entityManager = entityManager;
     }
 

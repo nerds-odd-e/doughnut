@@ -6,7 +6,7 @@
 
             <div class="row">
                 <div class="my-3 col-6">
-                    <form th:action="@{/notes/{id}/link(id=${noteEntity.id})}" method="get">
+                    <form th:action="@{/links/{id}/link(id=${noteEntity.id})}" method="get">
                         <input type="text" class="form-control " placeholder="Search" name="searchTerm">
                         <button type="submit" class="btn btn-primary">Search</button>
                     </form>
@@ -16,7 +16,7 @@
 
         <div th:replace="_fragments/note_fragments :: cards(${linkableNotes}, ~{ :: .card-button}, ~{ :: .card-header})">
             <span class="card-header"></span>
-            <form th:action="@{/notes/{id}/link(id=${noteEntity.id})}" method="post" class="card-button">
+            <form th:action="@{/links/{id}/link(id=${noteEntity.id})}" method="post" class="card-button">
                 <input type="hidden" name="targetNoteId" th:value="${note.id}"/>
                 <Button class="btn btn-primary" type="submit">Select</Button>
             </form>

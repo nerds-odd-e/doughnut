@@ -35,7 +35,7 @@
     <a class="btn btn-sm edit-card" th:href="@{/notes/{id}/edit(id=${note.id})}" title="edit note">
         <svg th:replace="_fragments/svgs :: edit"/>
     </a>
-    <a class="btn btn-sm link-card" th:href="@{/notes/{id}/link(id=${note.id})}" title="link note">
+    <a class="btn btn-sm link-card" th:href="@{/links/{id}/link(id=${note.id})}" title="link note">
         <svg th:replace="_fragments/svgs :: linkNote"/>
     </a>
     <form th:action="@{/notes/{id}/share(id=${note.id})}" th:method="post"

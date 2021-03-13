@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
+import com.odde.doughnut.entities.LinkEntity;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.entities.NoteEntity;
@@ -80,22 +81,6 @@ public class NoteController {
             return "notes/edit";
         }
         modelFactoryService.noteRepository.save(noteEntity);
-        return "redirect:/notes/" + noteEntity.getId();
-    }
-
-    @GetMapping("/{noteEntity}/link")
-    public String link( @PathVariable("noteEntity") NoteEntity noteEntity, @RequestParam(required = false) String searchTerm, Model model) {
-        List<NoteEntity> linkableNotes = currentUserFetcher.getUser().filterLinkableNotes(noteEntity, searchTerm);
-        model.addAttribute("linkableNotes", linkableNotes);
-        return "notes/link";
-    }
-
-    @PostMapping(value = "/{noteEntity}/link", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public String linkNote(@PathVariable("noteEntity") NoteEntity noteEntity, Integer targetNoteId) throws NoAccessRightException {
-        currentUserFetcher.getUser().assertAuthorization(noteEntity);
-        NoteEntity targetNote = modelFactoryService.noteRepository.findById(targetNoteId).get();
-        NoteContentModel noteContentModel = modelFactoryService.toNoteModel(noteEntity);
-        noteContentModel.linkNote(targetNote);
         return "redirect:/notes/" + noteEntity.getId();
     }
 
