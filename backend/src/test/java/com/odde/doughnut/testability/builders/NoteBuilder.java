@@ -1,5 +1,6 @@
 package com.odde.doughnut.testability.builders;
 
+import com.odde.doughnut.entities.LinkEntity;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.UserEntity;
 import com.odde.doughnut.models.CircleModel;
@@ -35,7 +36,11 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
     }
 
     public NoteBuilder linkTo(NoteEntity referTo) {
-        entity.linkToNote(referTo);
+        LinkEntity linkEntity = new LinkEntity();
+        linkEntity.setTargetNote(referTo);
+        linkEntity.setSourceNote(entity);
+        linkEntity.setType("belongs to");
+        entity.getLinks().add(linkEntity);
         return this;
     }
 

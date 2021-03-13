@@ -103,6 +103,9 @@
     <p id="note-picture" class="text-center" th:if="*{picture}">
         <img class="img-fluid" th:src="*{picture}"/>
     </p>
+    <p th:each="linkType:${noteEntity.linkTypes()}">
+        <span th:text="${linkType}"/>
+    </p>
 </div>
 
 <div th:fragment="noteAsArticle(noteEntity, level)">

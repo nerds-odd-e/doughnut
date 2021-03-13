@@ -10,6 +10,7 @@ import javax.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -137,16 +138,12 @@ public class NoteEntity {
     @Setter
     private String testingParent;
 
-    public void linkToNote(NoteEntity targetNote) {
-        LinkEntity linkEntity = new LinkEntity();
-        linkEntity.setTargetNote(targetNote);
-        linkEntity.setSourceNote(this);
-        linkEntity.setType("belongs to");
-        this.links.add(linkEntity);
-    }
-
     public List<NoteEntity> getTargetNotes() {
         return links.stream().map(LinkEntity::getTargetNote).collect(toList());
+    }
+
+    public List<String> linkTypes() {
+        return links.stream().map(LinkEntity::getType).distinct().collect(Collectors.toUnmodifiableList());
     }
 
     public boolean isFromCircle() {

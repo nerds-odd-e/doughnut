@@ -96,7 +96,7 @@ public class NoteEntityTest {
         void targetOfLinkedNotes() {
             NoteEntity note = userEntity.getNotes().get(0);
             NoteEntity targetNote = userEntity.getNotes().get(1);
-            note.linkToNote(targetNote);
+            makeMe.theNote(note).linkTo(targetNote).please();
             List<NoteEntity> targetNotes = note.getTargetNotes();
             assertThat(targetNotes, hasSize(equalTo(1)));
             assertThat(targetNotes, contains(targetNote));

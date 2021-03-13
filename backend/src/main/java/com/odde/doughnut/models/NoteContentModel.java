@@ -14,12 +14,6 @@ public class NoteContentModel extends ModelForEntity<NoteEntity> {
         return entity.getTitle();
     }
 
-    public void linkNote(NoteEntity targetNote) {
-        entity.linkToNote(targetNote);
-        entity.setUpdatedDatetime(new Date());
-        modelFactoryService.noteRepository.save(entity);
-    }
-
     public void createByUser(UserModel userModel) {
         entity.setUserEntity(userModel.getEntity());
         this.modelFactoryService.noteRepository.save(entity);
