@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.ReviewPointEntity;
+import com.odde.doughnut.models.QuizQuestion;
 import com.odde.doughnut.models.ReviewPointModel;
 import com.odde.doughnut.models.Reviewing;
 import com.odde.doughnut.models.UserModel;
@@ -68,9 +69,11 @@ public class ReviewController {
         ReviewPointModel reviewPointModel = reviewing.getOneReviewPointNeedToRepeat();
         if(reviewPointModel != null) {
             model.addAttribute("reviewPointEntity", reviewPointModel.getEntity());
-            if (Strings.isEmpty(reviewPointModel.getEntity().getNoteEntity().getDescription())) {
+            QuizQuestion quizQuestion = reviewPointModel.generateAQuizQuestion();
+            if (quizQuestion == null) {
                 return "reviews/repeat";
             }
+            model.addAttribute("quizQuestion", quizQuestion);
             return "reviews/quiz";
         }
         return "redirect:/reviews";

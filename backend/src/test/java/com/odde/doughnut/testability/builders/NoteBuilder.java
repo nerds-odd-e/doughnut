@@ -8,6 +8,7 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 
+import java.beans.BeanProperty;
 import java.time.LocalDate;
 
 public class NoteBuilder extends EntityBuilder<NoteEntity> {
@@ -64,4 +65,20 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
         entity.setSkipReview(true);
         return this;
     }
+
+    public NoteBuilder withNoDescription() {
+        entity.setDescription("");
+        return this;
+    }
+
+    public NoteBuilder title(String text) {
+        entity.setTitle(text);
+        return this;
+    }
+
+    public NoteBuilder description(String text) {
+        entity.setDescription(text);
+        return this;
+    }
+
 }

@@ -2,6 +2,7 @@ package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.services.ModelFactoryService;
+import org.apache.logging.log4j.util.Strings;
 
 import java.sql.Timestamp;
 
@@ -35,4 +36,10 @@ public class ReviewPointModel extends ModelForEntity<ReviewPointEntity> {
         return TimestampOperations.addDaysToTimestamp(getEntity().getLastReviewedAt(), spacedRepetition.getNextRepeatInDays(getEntity().getForgettingCurveIndex()));
     }
 
+    public QuizQuestion generateAQuizQuestion() {
+        if (Strings.isEmpty(getEntity().getNoteEntity().getDescription())) {
+            return null;
+        }
+        return new QuizQuestion(entity.getNoteEntity(), modelFactoryService);
+    }
 }
