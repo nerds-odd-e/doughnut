@@ -4,7 +4,7 @@
         <h2 class="display-5" th:text="${quizQuestion.getDescription()}"/>
 
         <div class="row">
-            <div class="col-sm-6" th:each="option:${quizQuestion.getOptions()}">
+            <div class="col-sm-6 mb-3" th:each="option:${quizQuestion.getOptions()}">
                 <form th:action="@{/reviews/{id}/answer(id=${reviewPointEntity.id})}" th:object="${reviewPointEntity}" method="post">
                     <input type="submit" th:value="${option}" class="btn btn-secondary btn-lg btn-block"/>
                 </form>

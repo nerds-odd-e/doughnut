@@ -14,6 +14,7 @@ public class LinkEntity {
         BELONGS_TO("belongs to"),
         RELATED_TO("is related to"),
         SIMILAR_TO("is similar to"),
+        OPPOSITE_OF("is the opposite of"),
         CONFUSE_WITH("confuses with");
 
         public final String label;
