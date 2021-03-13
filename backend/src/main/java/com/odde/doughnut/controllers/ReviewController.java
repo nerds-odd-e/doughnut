@@ -7,6 +7,7 @@ import com.odde.doughnut.models.Reviewing;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.TimeTraveler;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -52,6 +53,14 @@ public class ReviewController {
         return "reviews/initial";
     }
 
+    @PostMapping("")
+    public String create(@Valid ReviewPointEntity reviewPointEntity) {
+        UserModel userModel = currentUserFetcher.getUser();
+        ReviewPointModel reviewPointModel = modelFactoryService.toReviewPointModel(reviewPointEntity);
+        reviewPointModel.initialReview(userModel, timeTraveler.getCurrentUTCTimestamp());
+        return "redirect:/reviews/initial";
+    }
+
     @GetMapping("/repeat")
     public String repeatReview(Model model) {
         UserModel user = currentUserFetcher.getUser();
@@ -59,17 +68,18 @@ public class ReviewController {
         ReviewPointEntity reviewPointEntity = reviewing.getOneReviewPointNeedToRepeat();
         if(reviewPointEntity != null) {
             model.addAttribute("reviewPointEntity", reviewPointEntity);
-            return "reviews/repeat";
+            if (Strings.isEmpty(reviewPointEntity.getNoteEntity().getDescription())) {
+                return "reviews/repeat";
+            }
+            return "reviews/quiz";
         }
         return "redirect:/reviews";
     }
 
-    @PostMapping("")
-    public String create(@Valid ReviewPointEntity reviewPointEntity) {
-        UserModel userModel = currentUserFetcher.getUser();
-        ReviewPointModel reviewPointModel = modelFactoryService.toReviewPointModel(reviewPointEntity);
-        reviewPointModel.initialReview(userModel, timeTraveler.getCurrentUTCTimestamp());
-        return "redirect:/reviews/initial";
+    @PostMapping("/{reviewPointEntity}/answer")
+    public String answerQuiz(ReviewPointEntity reviewPointEntity, Model model) {
+        model.addAttribute("answer", true);
+        return "reviews/repeat";
     }
 
     @PostMapping("/{reviewPointEntity}")

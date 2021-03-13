@@ -3,6 +3,8 @@
     <div class="container content">
         <h2 class="display-5">Repeat reviewing your notes</h2>
 
+        <div class="alert alert-success" th:if="${answer}">Correct!</div>
+
         <div th:replace="_fragments/note_fragments :: noteOwnerBreadcrumb(${reviewPointEntity.noteEntity}, ~{})"/>
         <div th:replace="_fragments/note_fragments :: noteShow(${reviewPointEntity.noteEntity}, 1)"/>
 
