@@ -5,10 +5,23 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "link")
 public class LinkEntity {
+    public enum LinkType {
+        BELONGS_TO("belongs to"),
+        RELATED_TO("is related to"),
+        SIMILAR_TO("is similar to"),
+        CONFUSE_WITH("confuses with");
+
+        public final String label;
+
+        private LinkType(String label) {
+            this.label = label;
+        }
+    }
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) private Integer id;
 
@@ -24,5 +37,4 @@ public class LinkEntity {
     @Getter
     @Setter
     private String type;
-
 }

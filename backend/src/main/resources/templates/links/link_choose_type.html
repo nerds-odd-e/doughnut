@@ -14,7 +14,9 @@
         <form action="#" th:action="@{/links/create_link}" th:object="${linkEntity}" method="post">
             <input th:field="*{sourceNote}" type="hidden"/>
             <input th:field="*{targetNote}" type="hidden"/>
-            <input th:field="*{type}" type="hidden"/>
+            <select th:replace="_fragments/forms :: selectControl('link', 'type', ~{:: .options})">
+                <option class="options" th:each="i : ${T(com.odde.doughnut.entities.LinkEntity.LinkType).values()}" th:value="${i.label}" th:text="${i.label}"/>
+            </select>
             <input type="submit" value="Link" class="btn btn-primary"/>
         </form>
     </div>

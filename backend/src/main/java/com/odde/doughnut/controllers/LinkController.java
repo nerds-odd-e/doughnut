@@ -45,7 +45,7 @@ public class LinkController {
         LinkEntity linkEntity = new LinkEntity();
         linkEntity.setSourceNote(noteEntity);
         linkEntity.setTargetNote(targetNote);
-        linkEntity.setType("belongs to");
+        linkEntity.setType(LinkEntity.LinkType.RELATED_TO.label);
         model.addAttribute("linkEntity", linkEntity);
         return "links/link_choose_type";
     }

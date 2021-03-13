@@ -1,11 +1,22 @@
-<div th:fragment="textInput(scopeName, field, placeholder)" th:replace=":: inputWithType(~{ :: .control}, ${scopeName}, ${field})">
+<div th:fragment="textInput(scopeName, field, placeholder)" th:replace=":: inputWithType(~{ :: .text-input-control}, ${scopeName}, ${field})">
     <input
-            class="control"
+            class="text-input-control"
             th:class="'form-control' + ${#fields.hasErrors(field) ? ' is-invalid' : ''}"
             th:id="${scopeName + '-' + field}"
             th:field="*{__${field}__}"
             th:placeholder="${placeholder}"
     />
+</div>
+
+<div th:fragment="selectControl(scopeName, field, options)" th:replace=":: inputWithType(~{ :: .select-control}, ${scopeName}, ${field})">
+    <select
+            class="select-control"
+            th:class="'form-control' + ${#fields.hasErrors(field) ? ' is-invalid' : ''}"
+            th:id="${scopeName + '-' + field}"
+            th:field="*{__${field}__}"
+    >
+        <option th:replace="${options}"/>
+    </select>
 </div>
 
 <div th:fragment="checkInput(scopeName, field)" class="form-check">
