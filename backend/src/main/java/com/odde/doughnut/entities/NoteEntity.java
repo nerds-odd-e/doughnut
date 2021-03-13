@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import static java.util.stream.Collectors.toList;
+
 @Entity
 @Table(name = "note")
 public class NoteEntity {
@@ -124,15 +126,11 @@ public class NoteEntity {
     @Setter
     private Date updatedDatetime;
 
-    @JoinTable(name = "link", joinColumns = {
-            @JoinColumn(name = "source_id", referencedColumnName = "id", nullable = false)}, inverseJoinColumns = {
-            @JoinColumn(name = "target_id", referencedColumnName = "id", nullable = false)
-    })
-    @ManyToMany
+    @OneToMany(mappedBy = "sourceNote", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     @Getter
     @Setter
-    private List<NoteEntity> targetNotes = new ArrayList<>();
+    private List<LinkEntity> links = new ArrayList<>();
 
     @Transient
     @Getter
@@ -140,7 +138,15 @@ public class NoteEntity {
     private String testingParent;
 
     public void linkToNote(NoteEntity targetNote) {
-        this.targetNotes.add(targetNote);
+        LinkEntity linkEntity = new LinkEntity();
+        linkEntity.setTargetNote(targetNote);
+        linkEntity.setSourceNote(this);
+        linkEntity.setType("belongs to");
+        this.links.add(linkEntity);
+    }
+
+    public List<NoteEntity> getTargetNotes() {
+        return links.stream().map(LinkEntity::getTargetNote).collect(toList());
     }
 
     public boolean isFromCircle() {

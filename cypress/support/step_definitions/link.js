@@ -11,10 +11,6 @@ When("I am creating link for note {string}", (noteTitle) => {
     cy.creatingLinkFor(noteTitle);
 });
 
-When("I link to note {string}", (noteTitle) => {
-    cy.clickButtonOnCardBody(noteTitle, "Select");
-})
-
 When("I link note {string} to note {string}", (fromNoteTitle, toNoteTitle) => {
     cy.creatingLinkFor(fromNoteTitle);
     cy.clickButtonOnCardBody(toNoteTitle, "Select");

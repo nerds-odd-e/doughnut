@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @Entity
 @Table(name = "link")
@@ -18,4 +19,10 @@ public class LinkEntity {
     @ManyToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "target_id", referencedColumnName = "id")
     @Getter @Setter private NoteEntity targetNote;
+
+    @Column(name = "type")
+    @Getter
+    @Setter
+    private String type;
+
 }

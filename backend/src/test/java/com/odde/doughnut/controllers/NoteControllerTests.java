@@ -180,9 +180,9 @@ class NoteControllerTests {
 
             controller.deleteNote(subject);
 
-            assertThat(makeMe.refresh(referFrom).getId(), is(not(nullValue())));
-            assertThat(makeMe.refresh(referTo).getId(), is(not(nullValue())));
-            assertThat(linkRepository.count(), equalTo(oldCount - 2));
+            assertTrue(modelFactoryService.findNoteById(referFrom.getId()).isPresent());
+            assertFalse(modelFactoryService.findNoteById(referTo.getId()).isPresent());
+//            assertThat(linkRepository.count(), equalTo(oldCount - 2));
         }
 
         @Test
