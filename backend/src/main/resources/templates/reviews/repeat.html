@@ -13,12 +13,15 @@
 
         <div class="btn-toolbar">
             <form th:action="@{/reviews/{id}(id=${reviewPointEntity.id})}" th:object="${reviewPointEntity}" method="post">
-                <input type="submit" value="Next" class="btn btn-primary"/>
+                <input type="submit" value="Again" class="btn btn-warning mr-2"/>
+            </form>
+            <form th:action="@{/reviews/{id}(id=${reviewPointEntity.id})}" th:object="${reviewPointEntity}" method="post" th:unless="${answer!=null && !answer.isCorrect()}">
+                <input type="submit" value="Next" class="btn btn-primary mr-2"/>
             </form>
             <form th:action="@{/reviews/{id}(id=${reviewPointEntity.id})}" th:object="${reviewPointEntity}" method="post"
                 onsubmit="return confirm('Are you sure to hide this note from reviewing in the future?')">
                 <input type="hidden" name="removedFromReview" value="1"/>
-                <input type="submit" value="Remove This Note from Review" class="btn btn-secondary ml-2"/>
+                <input type="submit" value="Remove This Note from Review" class="btn btn-secondary mr-2"/>
             </form>
         </div>
     </div>

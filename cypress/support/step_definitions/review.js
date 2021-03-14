@@ -40,6 +40,13 @@ Then("On day {int} I should have {string} note for initial review and {string} f
     cy.findByText(numberOfRepeats, {selector: '.number-of-repeats'});
 });
 
+Then("I should have {string} for repeat now", (numberOfRepeats) => {
+    cy.visit('/reviews');
+    cy.findByText(numberOfRepeats, {selector: '.number-of-repeats'});
+});
+
+
+
 Then("I initial review {string}", (noteTitle) => {
     cy.initialReviewNotes(noteTitle);
 });
@@ -85,6 +92,10 @@ Then("I should see the information of note {string}", (noteTitle) => {
 
 Then("I should see that my answer {string} is wrong", (answer) => {
     cy.findByText(`Your answer \`${answer}\` is wrong.`);
+});
+
+Then("I should see the next button: {string}", (yesNo) => {
+    const prom = cy.get('input[value="Next"]').should(yesNo === 'yes' ? 'exist' : 'not.exist');
 });
 
 

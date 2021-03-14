@@ -15,9 +15,10 @@ Feature: Repetition
         Then I should be asked cloze deletion question "[...] means incite violence" with options "sedition, sedation"
         When I choose answer "<answer>"
         Then I should see that my answer <result>
+        And I should see the next button: "<should see the next button>"
 
         Examples:
-        | answer   | result               |
-        | sedation | "sedation" is wrong  |
-        | sedition | is correct           |
+        | answer   | result               | should see the next button |
+        | sedation | "sedation" is wrong  | no                         |
+        | sedition | is correct           | yes                        |
 
