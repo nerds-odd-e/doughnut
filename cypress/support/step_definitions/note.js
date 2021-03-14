@@ -19,8 +19,6 @@ Given("there are notes from Note {int} to Note {int}", (from, to) => {
   cy.seedNotes(notes);
 })
 
-
-
 When("I create top level note with:", (data) => {
   cy.visit("/notes");
   cy.findByText("Add Top Level Note").click();

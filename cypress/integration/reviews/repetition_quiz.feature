@@ -11,7 +11,7 @@ Feature: Repetition Quiz
 
     Scenario Outline: Auto generate cloze deletion
         Given I learned one note "sedition" on day 1
-        When I repeat reviewing my old note on day 2
+        When I am repeat-reviewing my old note on day 2
         Then I should be asked cloze deletion question "[...] means incite violence" with options "sedition, sedation"
         When I choose answer "<answer>"
         Then I should see that my answer <result>
@@ -24,9 +24,9 @@ Feature: Repetition Quiz
 
         @ignore
     Scenario Outline: Spelling quiz
-        Given I am learning note "sedition" on day 1
-        And I have selected the option "spelling quiz"
-        When I repeat reviewing my old note on day 2
+        Given I am learning new note on day 1
+        And I have selected the option "rememberSpelling"
+        When I am repeat-reviewing my old note on day 2
         Then I should be asked spelling question "[...] means incite violence" with options "sedition, sedation"
         When I type my answer "<answer>"
         Then I should see that my answer <result>

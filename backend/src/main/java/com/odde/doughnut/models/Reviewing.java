@@ -2,6 +2,7 @@ package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.ReviewPointEntity;
+import com.odde.doughnut.entities.ReviewSettingEntity;
 import com.odde.doughnut.services.ModelFactoryService;
 
 import java.sql.Timestamp;
@@ -81,5 +82,9 @@ public class Reviewing {
                 .findFirst()
                 .map(rp->modelFactoryService.toReviewPointModel(rp))
                 .orElse(null);
+    }
+
+    public ReviewSettingEntity getReviewSettingEntity() {
+        return new ReviewSettingEntity();
     }
 }

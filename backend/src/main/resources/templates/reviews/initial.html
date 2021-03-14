@@ -8,7 +8,10 @@
 
         <form action="#" th:action="@{/reviews/}" th:object="${reviewPointEntity}" method="post">
             <input th:field="*{noteEntity}" type="hidden"/>
+            <div th:object="${reviewSettingEntity}">
+                <div th:replace="_fragments/forms :: checkInput('review_setting', 'rememberSpelling')">
+            </div>
             <input type="submit" value="Next" class="btn btn-primary"/>
-        </form>
+        </div>
     </div>
 </layout>

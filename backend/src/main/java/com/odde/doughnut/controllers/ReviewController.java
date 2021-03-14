@@ -49,6 +49,7 @@ public class ReviewController {
             return "redirect:/reviews";
         }
         model.addAttribute("reviewPointEntity", reviewPointEntity);
+        model.addAttribute("reviewSettingEntity", reviewing.getReviewSettingEntity());
         return "reviews/initial";
     }
 

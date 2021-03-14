@@ -62,10 +62,24 @@ Then("I learned one note {string} on day {int}", (noteTitle, day) => {
     cy.initialReviewNotes(noteTitle);
 });
 
-Then("I repeat reviewing my old note on day {int}", (day) => {
+Then("I am repeat-reviewing my old note on day {int}", (day) => {
     cy.timeTravelTo(day, 8);
     cy.visit('/reviews/repeat');
 });
+
+Then("I am learning new note on day {int}", (day) => {
+    cy.timeTravelTo(day, 8);
+    cy.visit('/reviews/initial');
+});
+
+Then("I have selected the option {string}", (option) => {
+    cy.get("#review_setting-" + option).check();
+    cy.findByRole('button', {name: 'Next'}).click();
+});
+
+
+
+
 
 Then("choose to remove it fromm reviews", () => {
     cy.findByRole('button', {name: 'Remove This Note from Review'}).click();
