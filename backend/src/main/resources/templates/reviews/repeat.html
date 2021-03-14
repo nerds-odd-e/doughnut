@@ -13,6 +13,7 @@
 
         <div class="btn-toolbar">
             <form th:action="@{/reviews/{id}(id=${reviewPointEntity.id})}" th:object="${reviewPointEntity}" method="post">
+                <input type="hidden" name="repeatAgainToday" value="1"/>
                 <input type="submit" value="Again" class="btn btn-warning mr-2"/>
             </form>
             <form th:action="@{/reviews/{id}(id=${reviewPointEntity.id})}" th:object="${reviewPointEntity}" method="post" th:unless="${answer!=null && !answer.isCorrect()}">

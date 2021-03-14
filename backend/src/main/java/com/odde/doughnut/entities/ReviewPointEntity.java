@@ -73,6 +73,11 @@ public class ReviewPointEntity {
     @Getter
     private Integer userId;
 
+    @Transient
+    @Getter
+    @Setter
+    private Boolean repeatAgainToday = false;
+
     public boolean isInitialReviewOnSameDay(Timestamp currentTime, ZoneId timeZone) {
         return getDayId(getInitialReviewedAt(), timeZone) == getDayId(currentTime, timeZone);
     }

@@ -18,9 +18,14 @@ public class ReviewPointModel extends ModelForEntity<ReviewPointEntity> {
     }
 
     public void repeat(Timestamp currentUTCTimestamp) {
-        getEntity().setForgettingCurveIndex(getSpacedRepetition().getNextForgettingCurveIndex(getEntity().getForgettingCurveIndex()));
-        getEntity().setLastReviewedAt(currentUTCTimestamp);
-        getEntity().setNextReviewAt(calculateNextReviewAt(getSpacedRepetition()));
+        if (entity.getRepeatAgainToday()) {
+            entity.setNextReviewAt(currentUTCTimestamp);
+        }
+        else {
+            entity.setLastReviewedAt(currentUTCTimestamp);
+            entity.setForgettingCurveIndex(getSpacedRepetition().getNextForgettingCurveIndex(entity.getForgettingCurveIndex()));
+            entity.setNextReviewAt(calculateNextReviewAt(getSpacedRepetition()));
+        }
         this.modelFactoryService.reviewPointRepository.save(getEntity());
     }
 

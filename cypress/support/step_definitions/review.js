@@ -71,6 +71,11 @@ Then("choose to remove it fromm reviews", () => {
     cy.findByRole('button', {name: 'Remove This Note from Review'}).click();
 });
 
+Then("I choose to do it again", () => {
+    cy.findByRole('button', {name: 'Again'}).click();
+});
+
+
 Then("I should be asked cloze deletion question {string} with options {string}", (question, options) => {
     cy.findByText(question).should('be.visible');
     options.commonSenseSplit(",").forEach(
