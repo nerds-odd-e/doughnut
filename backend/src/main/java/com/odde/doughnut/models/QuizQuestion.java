@@ -19,7 +19,7 @@ public class QuizQuestion {
 
         public final String label;
 
-        private QuestionType(String label) {
+        QuestionType(String label) {
             this.label = label;
         }
     }
