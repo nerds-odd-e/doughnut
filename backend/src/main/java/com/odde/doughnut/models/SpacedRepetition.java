@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 public class SpacedRepetition {
     public static final Integer DEFAULT_FORGETTING_CURVE_INDEX = 100;
     public static final Integer DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT = 10;
-    public static final List<Integer> DEFAULT_SPACES = Arrays.asList(1, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181, 6765, 10946);
+    public static final List<Integer> DEFAULT_SPACES = Arrays.asList(0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987, 1597, 2584, 4181, 6765, 10946);
     private final List<Integer> spaces;
     public SpacedRepetition(String spaceIntervals) {
         if (!Strings.isEmpty(spaceIntervals)) {

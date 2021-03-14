@@ -39,7 +39,7 @@ public class UserEntity {
     @Column(name = "daily_new_notes_count") @Getter @Setter private Integer dailyNewNotesCount = 10;
 
     @Pattern(regexp="^\\d+(,\\s*\\d+)*$",message="must be numbers separated by ','")
-    @Column(name = "space_intervals") @Getter @Setter private String spaceIntervals = "1, 2, 3, 5, 8, 13, 21, 34, 55";
+    @Column(name = "space_intervals") @Getter @Setter private String spaceIntervals = "0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55";
 
     @JoinTable(name = "circle_user", joinColumns = {
             @JoinColumn(name = "user_id", referencedColumnName = "id", nullable = false)}, inverseJoinColumns = {

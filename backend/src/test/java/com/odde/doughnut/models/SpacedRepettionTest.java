@@ -43,6 +43,9 @@ public class SpacedRepettionTest {
             index = spacedRepetition.getNextForgettingCurveIndex(index);
             index = spacedRepetition.getNextForgettingCurveIndex(index);
             index = spacedRepetition.getNextForgettingCurveIndex(index);
+            index = spacedRepetition.getNextForgettingCurveIndex(index);
+            index = spacedRepetition.getNextForgettingCurveIndex(index);
+            index = spacedRepetition.getNextForgettingCurveIndex(index);
             assertThat(spacedRepetition.getNextRepeatInDays(index), equalTo(8));
         }
     }
