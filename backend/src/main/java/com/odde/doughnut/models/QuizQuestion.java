@@ -1,5 +1,6 @@
 package com.odde.doughnut.models;
 
+import com.odde.doughnut.entities.AnswerEntity;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.services.ModelFactoryService;
@@ -15,9 +16,11 @@ import java.util.stream.Collectors;
 public class QuizQuestion {
     private final NoteEntity noteEntity;
     private final ModelFactoryService modelFactoryService;
+    private final ReviewPointEntity reviewPointEntity;
 
-    public QuizQuestion(NoteEntity noteEntity, ModelFactoryService modelFactoryService) {
-        this.noteEntity = noteEntity;
+    public QuizQuestion(ReviewPointEntity reviewPointEntity, ModelFactoryService modelFactoryService) {
+        this.reviewPointEntity = reviewPointEntity;
+        this.noteEntity = reviewPointEntity.getNoteEntity();
         this.modelFactoryService = modelFactoryService;
     }
 
@@ -38,6 +41,12 @@ public class QuizQuestion {
 
         return selectedList;
 
+    }
+
+    public AnswerEntity buildAnswer() {
+        AnswerEntity answerEntity = new AnswerEntity();
+        answerEntity.setReviewPointEntity(reviewPointEntity);
+        return answerEntity;
     }
 
     private TreeNodeModel getTreeNodeModel() {

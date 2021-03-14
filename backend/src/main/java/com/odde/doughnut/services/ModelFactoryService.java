@@ -89,4 +89,7 @@ public class ModelFactoryService {
         return toCircleModel(circleEntity);
     }
 
+    public AnswerModel toAnswerModel(AnswerEntity answerEntity) {
+        return new AnswerModel(answerEntity, this);
+    }
 }

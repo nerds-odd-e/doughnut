@@ -1,11 +1,9 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
+import com.odde.doughnut.entities.AnswerEntity;
 import com.odde.doughnut.entities.ReviewPointEntity;
-import com.odde.doughnut.models.QuizQuestion;
-import com.odde.doughnut.models.ReviewPointModel;
-import com.odde.doughnut.models.Reviewing;
-import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.models.*;
 import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.TimeTraveler;
 import org.apache.logging.log4j.util.Strings;
@@ -74,14 +72,18 @@ public class ReviewController {
                 return "reviews/repeat";
             }
             model.addAttribute("quizQuestion", quizQuestion);
+            model.addAttribute("emptyAnswer", quizQuestion.buildAnswer());
             return "reviews/quiz";
         }
         return "redirect:/reviews";
     }
 
     @PostMapping("/{reviewPointEntity}/answer")
-    public String answerQuiz(ReviewPointEntity reviewPointEntity, Model model) {
-        model.addAttribute("answer", true);
+    public String answerQuiz(ReviewPointEntity reviewPointEntity, @Valid AnswerEntity answerEntity, Model model) {
+        AnswerModel answerModel = modelFactoryService.toAnswerModel(answerEntity);
+        answerModel.checkResult();
+
+        model.addAttribute("answer", answerModel);
         return "reviews/repeat";
     }
 

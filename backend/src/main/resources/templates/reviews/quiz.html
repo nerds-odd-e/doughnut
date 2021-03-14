@@ -5,7 +5,9 @@
 
         <div class="row">
             <div class="col-sm-6 mb-3" th:each="option:${quizQuestion.getOptions()}">
-                <form th:action="@{/reviews/{id}/answer(id=${reviewPointEntity.id})}" th:object="${reviewPointEntity}" method="post">
+                <form th:action="@{/reviews/{id}/answer(id=${reviewPointEntity.id})}" th:object="${emptyAnswer}" method="post">
+                    <input type="hidden" name="answer" th:value="${option}"/>
+                    <input type="hidden" th:field="*{reviewPointEntity}"/>
                     <input type="submit" th:value="${option}" class="btn btn-secondary btn-lg btn-block"/>
                 </form>
             </div>

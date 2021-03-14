@@ -83,4 +83,8 @@ Then("I should see the information of note {string}", (noteTitle) => {
     cy.findByText(noteTitle);
 });
 
+Then("I should see that my answer {string} is wrong", (answer) => {
+    cy.findByText(`Your answer \`${answer}\` is wrong.`);
+});
+
 
