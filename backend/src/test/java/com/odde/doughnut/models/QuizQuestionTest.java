@@ -1,6 +1,7 @@
 package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.NoteEntity;
+import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,7 +13,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
@@ -21,6 +21,7 @@ class QuizQuestionTest {
     @Autowired
     MakeMe makeMe;
     UserModel userModel;
+    NonRandomizer randomizer = new NonRandomizer();
 
     @BeforeEach
     void setup() {
@@ -76,7 +77,7 @@ class QuizQuestionTest {
 
     private QuizQuestion getQuizQuestion(NoteEntity noteEntity) {
         ReviewPointModel reviewPoint = makeMe.aReviewPointFor(noteEntity).by(userModel).toModelPlease();
-        return reviewPoint.generateAQuizQuestion();
+        return reviewPoint.generateAQuizQuestion(randomizer);
     }
 
 }

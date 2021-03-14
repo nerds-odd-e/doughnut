@@ -24,12 +24,14 @@ public class QuizQuestion {
     }
 
     private final NoteEntity noteEntity;
+    private final Randomizer randomizer;
     private final ModelFactoryService modelFactoryService;
     private final ReviewPointEntity reviewPointEntity;
 
-    public QuizQuestion(ReviewPointEntity reviewPointEntity, ModelFactoryService modelFactoryService) {
+    public QuizQuestion(ReviewPointEntity reviewPointEntity, Randomizer randomizer, ModelFactoryService modelFactoryService) {
         this.reviewPointEntity = reviewPointEntity;
         this.noteEntity = reviewPointEntity.getNoteEntity();
+        this.randomizer = randomizer;
         this.modelFactoryService = modelFactoryService;
     }
 

@@ -71,7 +71,7 @@ public class ReviewController {
         ReviewPointModel reviewPointModel = reviewing.getOneReviewPointNeedToRepeat();
         if(reviewPointModel != null) {
             model.addAttribute("reviewPointEntity", reviewPointModel.getEntity());
-            QuizQuestion quizQuestion = reviewPointModel.generateAQuizQuestion();
+            QuizQuestion quizQuestion = reviewPointModel.generateAQuizQuestion(timeTraveler.getRandomizer());
             if (quizQuestion == null) {
                 return "reviews/repeat";
             }

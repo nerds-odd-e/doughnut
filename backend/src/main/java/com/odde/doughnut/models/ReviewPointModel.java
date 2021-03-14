@@ -47,10 +47,10 @@ public class ReviewPointModel extends ModelForEntity<ReviewPointEntity> {
         return TimestampOperations.addDaysToTimestamp(entity.getLastReviewedAt(), spacedRepetition.getNextRepeatInDays(entity.getForgettingCurveIndex()));
     }
 
-    public QuizQuestion generateAQuizQuestion() {
+    public QuizQuestion generateAQuizQuestion(Randomizer randomizer) {
         if (Strings.isEmpty(entity.getNoteEntity().getDescription())) {
             return null;
         }
-        return new QuizQuestion(entity, modelFactoryService);
+        return new QuizQuestion(entity, randomizer, modelFactoryService);
     }
 }
