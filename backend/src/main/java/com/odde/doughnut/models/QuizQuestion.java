@@ -28,6 +28,7 @@ public class QuizQuestion {
     private final Randomizer randomizer;
     private final ModelFactoryService modelFactoryService;
     private final ReviewPointEntity reviewPointEntity;
+    private QuestionType questionType = null;
 
     public QuizQuestion(ReviewPointEntity reviewPointEntity, Randomizer randomizer, ModelFactoryService modelFactoryService) {
         this.reviewPointEntity = reviewPointEntity;
@@ -37,13 +38,21 @@ public class QuizQuestion {
     }
 
     public String getQuestionType() {
-        ReviewSettingEntity reviewSettingEntity = noteEntity.getMasterReviewSettingEntity();
-        List<String> questionTypes = new ArrayList<>();
-        if(reviewSettingEntity != null && reviewSettingEntity.getRememberSpelling()) {
-            questionTypes.add(QuestionType.SPELLING.label);
+        if (questionType == null) {
+            questionType = generateQuestionType();
         }
-        questionTypes.add(QuestionType.CLOZE_SELECTION.label);
-        return randomizer.chooseOneRandomly(questionTypes);
+        return questionType.label;
+    }
+
+    private QuestionType generateQuestionType() {
+        ReviewSettingEntity reviewSettingEntity = noteEntity.getMasterReviewSettingEntity();
+        List<QuestionType> questionTypes = new ArrayList<>();
+        if(reviewSettingEntity != null && reviewSettingEntity.getRememberSpelling()) {
+            questionTypes.add(QuestionType.SPELLING);
+        }
+        questionTypes.add(QuestionType.CLOZE_SELECTION);
+        QuestionType questionType = randomizer.chooseOneRandomly(questionTypes);
+        return questionType;
     }
 
     public String getDescription() {

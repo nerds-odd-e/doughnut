@@ -98,10 +98,22 @@ class QuizQuestionTest {
         }
 
         @Test
-        void shouldChooseTypeRandomly() {
-            QuizQuestion randomQuizQuestion = getRandomQuizQuestion(note);
+        void shouldReturnTheSameType() {
+            ReviewPointModel reviewPoint = getReviewPointModel(note);
+            QuizQuestion randomQuizQuestion = reviewPoint.generateAQuizQuestion(new RealRandomizer());
             Set<String> types = new HashSet<>();
+            for(int i = 0; i < 3; i++) {
+                types.add(randomQuizQuestion.getQuestionType());
+            }
+            assertThat(types, hasSize(1));
+        }
+
+        @Test
+        void shouldChooseTypeRandomly() {
+            Set<String> types = new HashSet<>();
+            ReviewPointModel reviewPoint = getReviewPointModel(note);
             for(int i = 0; i < 10; i++) {
+                QuizQuestion randomQuizQuestion = reviewPoint.generateAQuizQuestion(new RealRandomizer());
                 types.add(randomQuizQuestion.getQuestionType());
             }
             assertThat(types, containsInAnyOrder(QuizQuestion.QuestionType.SPELLING.label, QuizQuestion.QuestionType.CLOZE_SELECTION.label));
@@ -114,14 +126,8 @@ class QuizQuestionTest {
         return reviewPoint.generateAQuizQuestion(randomizer);
     }
 
-    private QuizQuestion getRandomQuizQuestion(NoteEntity noteEntity) {
-        ReviewPointModel reviewPoint = getReviewPointModel(noteEntity);
-        return reviewPoint.generateAQuizQuestion(new RealRandomizer());
-    }
-
     private ReviewPointModel getReviewPointModel(NoteEntity noteEntity) {
-        ReviewPointModel reviewPoint = makeMe.aReviewPointFor(noteEntity).by(userModel).toModelPlease();
-        return reviewPoint;
+        return makeMe.aReviewPointFor(noteEntity).by(userModel).toModelPlease();
     }
 
 }

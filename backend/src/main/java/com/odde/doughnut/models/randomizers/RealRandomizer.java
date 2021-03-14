@@ -7,7 +7,7 @@ import java.util.Random;
 
 public class RealRandomizer implements Randomizer {
     @Override
-    public String chooseOneRandomly(List<String> list) {
+    public <T> T chooseOneRandomly(List<T> list) {
         Random rand = new Random();
         return list.get(rand.nextInt(list.size()));
     }
