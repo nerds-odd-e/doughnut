@@ -11,7 +11,9 @@ public class AnswerModel extends ModelForEntity<AnswerEntity>{
     }
 
     public void checkResult() {
-        cachedIsCorrect = (entity.getAnswer().equals(entity.getReviewPointEntity().getNoteEntity().getTitle()));
+        cachedIsCorrect = (
+                entity.getAnswer().toLowerCase().trim().equals(
+                        entity.getReviewPointEntity().getNoteEntity().getTitle().toLowerCase().trim()));
     }
 
     public boolean isCorrect() {

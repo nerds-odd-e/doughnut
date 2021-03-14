@@ -15,5 +15,5 @@ public class ReviewSettingEntity {
     @Column(name="remember_spelling")
     @Getter
     @Setter
-    private Boolean rememberSpelling;
+    private Boolean rememberSpelling = false;
 }

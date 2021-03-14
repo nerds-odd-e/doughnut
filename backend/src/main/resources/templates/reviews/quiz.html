@@ -3,7 +3,7 @@
     <div class="container content">
         <h2 class="display-5" th:text="${quizQuestion.getDescription()}"/>
 
-        <div class="row">
+        <div class="row" th:if="${quizQuestion.getQuestionType()=='cloze_selection'}">
             <div class="col-sm-6 mb-3" th:each="option:${quizQuestion.getOptions()}">
                 <form th:action="@{/reviews/{id}/answer(id=${reviewPointEntity.id})}" th:object="${emptyAnswer}" method="post">
                     <input type="hidden" name="answer" th:value="${option}"/>
@@ -12,5 +12,14 @@
                 </form>
             </div>
         </div>
+
+        <div th:if="${quizQuestion.getQuestionType()=='spelling'}">
+            <form th:action="@{/reviews/{id}/answer(id=${reviewPointEntity.id})}" th:object="${emptyAnswer}" method="post">
+                <input type="hidden" th:field="*{reviewPointEntity}"/>
+                <div class="aaa" th:insert="_fragments/forms :: textInput('review_point', 'answer', 'put your answer here', true)"/>
+                <input type="submit" value="OK" class="btn btn-primary btn-lg btn-block"/>
+            </form>
+        </div>
+
     </div>
 </layout>

@@ -3,17 +3,26 @@ package com.odde.doughnut.models;
 import com.odde.doughnut.entities.AnswerEntity;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.ReviewPointEntity;
+import com.odde.doughnut.entities.ReviewSettingEntity;
 import com.odde.doughnut.services.ModelFactoryService;
 
-import java.sql.Timestamp;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class QuizQuestion {
+    public enum QuestionType {
+        CLOZE_SELECTION("cloze_selection"),
+        SPELLING("spelling");
+
+        public final String label;
+
+        private QuestionType(String label) {
+            this.label = label;
+        }
+    }
+
     private final NoteEntity noteEntity;
     private final ModelFactoryService modelFactoryService;
     private final ReviewPointEntity reviewPointEntity;
@@ -22,6 +31,14 @@ public class QuizQuestion {
         this.reviewPointEntity = reviewPointEntity;
         this.noteEntity = reviewPointEntity.getNoteEntity();
         this.modelFactoryService = modelFactoryService;
+    }
+
+    public String getQuestionType() {
+        ReviewSettingEntity reviewSettingEntity = noteEntity.getMasterReviewSettingEntity();
+        if(reviewSettingEntity != null && reviewSettingEntity.getRememberSpelling()) {
+            return QuestionType.SPELLING.label;
+        }
+        return QuestionType.CLOZE_SELECTION.label;
     }
 
     public String getDescription() {

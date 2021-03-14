@@ -10,6 +10,7 @@ import java.util.List;
 @Entity
 @Table(name = "link")
 public class LinkEntity {
+
     public enum LinkType {
         BELONGS_TO("belongs to"),
         RELATED_TO("is related to"),
@@ -23,6 +24,7 @@ public class LinkEntity {
             this.label = label;
         }
     }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY) private Integer id;
 

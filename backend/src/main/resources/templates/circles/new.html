@@ -4,7 +4,7 @@
     <div class="container content">
         <h2>Create a new circle</h2>
         <form action="#" th:action="@{/circles}" th:object="${circleEntity}" method="post">
-            <div th:replace="_fragments/forms :: textInput('circle', 'name', 'Name of your new circle')"/>
+            <div th:replace="_fragments/forms :: textInput('circle', 'name', 'Name of your new circle', false)"/>
             <input type="submit" value="Submit" class="btn btn-primary"/>
         </form>
     </div>

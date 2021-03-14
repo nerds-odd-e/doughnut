@@ -22,12 +22,11 @@ Feature: Repetition Quiz
         | sedation | "sedation" is wrong  | no                         |
         | sedition | is correct           | yes                        |
 
-        @ignore
     Scenario Outline: Spelling quiz
         Given I am learning new note on day 1
         And I have selected the option "rememberSpelling"
         When I am repeat-reviewing my old note on day 2
-        Then I should be asked spelling question "[...] means incite violence" with options "sedition, sedation"
+        Then I should be asked spelling question "[...] means incite violence"
         When I type my answer "<answer>"
         Then I should see that my answer <result>
 

@@ -96,6 +96,12 @@ public class NoteEntity {
     @Setter
     private OwnershipEntity ownershipEntity;
 
+    @OneToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "master_review_setting_id", referencedColumnName = "id")
+    @Getter
+    @Setter
+    private ReviewSettingEntity masterReviewSettingEntity;
+
     @Column(name = "parent_id", insertable = false, updatable = false)
     @Getter
     private Integer parentId;

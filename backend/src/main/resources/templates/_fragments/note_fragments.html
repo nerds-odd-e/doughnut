@@ -67,10 +67,10 @@
 </div>
 
 <div th:fragment="noteFormBody(note)">
-    <div th:replace="_fragments/forms :: textInput('note', 'title', null)"/>
+    <div th:replace="_fragments/forms :: textInput('note', 'title', null, false)"/>
     <div th:replace="_fragments/forms :: textarea('note', 'description', null)"/>
-    <div th:replace="_fragments/forms :: textInput('note', 'picture', 'Optional. We only accept full url for now.')"/>
-    <div th:replace="_fragments/forms :: textInput('note', 'url', null)"/>
+    <div th:replace="_fragments/forms :: textInput('note', 'picture', 'Optional. We only accept full url for now.', false)"/>
+    <div th:replace="_fragments/forms :: textInput('note', 'url', null, false)"/>
     <div th:replace="_fragments/forms :: checkInput('note', 'urlIsVideo')"/>
     <div th:replace="_fragments/forms :: checkInput('note', 'skipReview')"/>
 </div>

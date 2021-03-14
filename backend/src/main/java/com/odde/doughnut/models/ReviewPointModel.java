@@ -1,6 +1,7 @@
 package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.ReviewPointEntity;
+import com.odde.doughnut.entities.ReviewSettingEntity;
 import com.odde.doughnut.services.ModelFactoryService;
 import org.apache.logging.log4j.util.Strings;
 
@@ -11,7 +12,8 @@ public class ReviewPointModel extends ModelForEntity<ReviewPointEntity> {
         super(entity, modelFactoryService);
     }
 
-    public void initialReview(UserModel userModel, Timestamp currentUTCTimestamp) {
+    public void initialReview(UserModel userModel, ReviewSettingEntity reviewSettingEntity, Timestamp currentUTCTimestamp) {
+        getNoteModel().setAndSaveMasterReviewSetting(reviewSettingEntity);
         entity.setUserEntity(userModel.getEntity());
         entity.setInitialReviewedAt(currentUTCTimestamp);
         repeat(currentUTCTimestamp);
@@ -35,6 +37,10 @@ public class ReviewPointModel extends ModelForEntity<ReviewPointEntity> {
 
     private UserModel getUserModel() {
         return modelFactoryService.toUserModel(entity.getUserEntity());
+    }
+
+    private NoteContentModel getNoteModel() {
+        return modelFactoryService.toNoteModel(entity.getNoteEntity());
     }
 
     private Timestamp calculateNextReviewAt(SpacedRepetition spacedRepetition) {

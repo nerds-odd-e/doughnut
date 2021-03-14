@@ -3,11 +3,13 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.AnswerEntity;
 import com.odde.doughnut.entities.ReviewPointEntity;
+import com.odde.doughnut.entities.ReviewSettingEntity;
 import com.odde.doughnut.models.*;
 import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.TimeTraveler;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -54,10 +56,11 @@ public class ReviewController {
     }
 
     @PostMapping("")
-    public String create(@Valid ReviewPointEntity reviewPointEntity) {
+    @Transactional
+    public String create(@Valid ReviewPointEntity reviewPointEntity, @Valid ReviewSettingEntity reviewSettingEntity) {
         UserModel userModel = currentUserFetcher.getUser();
         ReviewPointModel reviewPointModel = modelFactoryService.toReviewPointModel(reviewPointEntity);
-        reviewPointModel.initialReview(userModel, timeTraveler.getCurrentUTCTimestamp());
+        reviewPointModel.initialReview(userModel, reviewSettingEntity, timeTraveler.getCurrentUTCTimestamp());
         return "redirect:/reviews/initial";
     }
 

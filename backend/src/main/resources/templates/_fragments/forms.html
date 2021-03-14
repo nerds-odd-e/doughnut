@@ -1,10 +1,11 @@
-<div th:fragment="textInput(scopeName, field, placeholder)" th:replace=":: inputWithType(~{ :: .text-input-control}, ${scopeName}, ${field})">
+<div th:fragment="textInput(scopeName, field, placeholder, autofocus)" th:replace=":: inputWithType(~{ :: .text-input-control}, ${scopeName}, ${field})">
     <input
             class="text-input-control"
             th:class="'form-control' + ${#fields.hasErrors(field) ? ' is-invalid' : ''}"
             th:id="${scopeName + '-' + field}"
             th:field="*{__${field}__}"
             th:placeholder="${placeholder}"
+            th:autofocus="${autofocus}"
     />
 </div>
 

@@ -77,10 +77,6 @@ Then("I have selected the option {string}", (option) => {
     cy.findByRole('button', {name: 'Next'}).click();
 });
 
-
-
-
-
 Then("choose to remove it fromm reviews", () => {
     cy.findByRole('button', {name: 'Remove This Note from Review'}).click();
 });
@@ -96,6 +92,17 @@ Then("I should be asked cloze deletion question {string} with options {string}",
         option => cy.findByText(option).should('be.visible')
     );
 });
+
+Then("I should be asked spelling question {string}", (question) => {
+    cy.findByText(question).should('be.visible');
+});
+
+Then("I type my answer {string}", (answer) => {
+    cy.get("#review_point-answer").type(answer);
+    cy.findByRole('button', {name: 'OK'}).click();
+});
+
+
 
 Then("I choose answer {string}", (noteTitle) => {
     cy.findByRole('button', {name: noteTitle}).click();
