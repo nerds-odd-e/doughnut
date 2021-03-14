@@ -2,6 +2,7 @@ package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.LinkEntity;
 import com.odde.doughnut.entities.NoteEntity;
+import com.odde.doughnut.entities.ReviewSettingEntity;
 import com.odde.doughnut.entities.UserEntity;
 import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.UserModel;
@@ -90,6 +91,14 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
         for(int i=0; i < 10; i++) {
             makeMe.aNote().under(entity).please();
         }
+        return this;
+    }
+
+    public NoteBuilder rememberSpelling() {
+        if(entity.getMasterReviewSettingEntity() == null) {
+            entity.setMasterReviewSettingEntity(new ReviewSettingEntity());
+        }
+        entity.getMasterReviewSettingEntity().setRememberSpelling(true);
         return this;
     }
 }

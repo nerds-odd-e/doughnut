@@ -3,10 +3,12 @@ package com.odde.doughnut.models.randomizers;
 import com.odde.doughnut.models.Randomizer;
 
 import java.util.List;
+import java.util.Random;
 
-public class NonRandomizer implements Randomizer {
+public class RealRandomizer implements Randomizer {
     @Override
     public String chooseOneRandomly(List<String> list) {
-        return list.get(0);
+        Random rand = new Random();
+        return list.get(rand.nextInt(list.size()));
     }
 }

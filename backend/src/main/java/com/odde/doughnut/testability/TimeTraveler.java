@@ -2,7 +2,7 @@ package com.odde.doughnut.testability;
 
 import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
-import com.odde.doughnut.models.randomizers.ReadRandomizer;
+import com.odde.doughnut.models.randomizers.RealRandomizer;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.SessionScope;
 
@@ -26,7 +26,7 @@ public class TimeTraveler {
 
     public Randomizer getRandomizer() {
         if (timestamp == null) {
-            return new ReadRandomizer();
+            return new RealRandomizer();
         }
         return new NonRandomizer();
     }

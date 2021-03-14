@@ -6,6 +6,7 @@ import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.entities.ReviewSettingEntity;
 import com.odde.doughnut.services.ModelFactoryService;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -37,10 +38,12 @@ public class QuizQuestion {
 
     public String getQuestionType() {
         ReviewSettingEntity reviewSettingEntity = noteEntity.getMasterReviewSettingEntity();
+        List<String> questionTypes = new ArrayList<>();
         if(reviewSettingEntity != null && reviewSettingEntity.getRememberSpelling()) {
-            return QuestionType.SPELLING.label;
+            questionTypes.add(QuestionType.SPELLING.label);
         }
-        return QuestionType.CLOZE_SELECTION.label;
+        questionTypes.add(QuestionType.CLOZE_SELECTION.label);
+        return randomizer.chooseOneRandomly(questionTypes);
     }
 
     public String getDescription() {
