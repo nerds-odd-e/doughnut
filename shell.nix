@@ -14,12 +14,12 @@ in mkShell {
   MYSQL_HOME = builtins.getEnv "MYSQL_HOME";
   MYSQL_DATADIR = builtins.getEnv "MYSQL_DATADIR";
   buildInputs = [
-    autoconf automake cmake coreutils-full gcc10 gccStdenv gnumake
+    autoconf automake cmake coreutils-full gcc10 gcc10Stdenv gnumake
     gradle nodejs-15_x python3 yarn zulu
     any-nix-shell zsh zsh-powerlevel10k
     git git-secret gitAndTools.delta locale lsd platinum-searcher
     binutils-unwrapped hostname inetutils openssh pkg-config rsync
-    bat duf fasd fzf gnupg htop jq less lesspipe lsof lzma
+    autojump bat duf fasd fzf gnupg htop jq less lesspipe lsof lzma
     most progress ps pstree ripgrep tree vgrep which
     libmysqlclient libpcap libressl
     cacert curlie glances httpie
@@ -74,7 +74,7 @@ EOF
 
     # Import environment variables defined in env.sh (first decrypt the secrets with your GPG key)
     set -a
-    git secret reveal
+    sleep 2 && git secret reveal
     source env.sh
     set +a
 
