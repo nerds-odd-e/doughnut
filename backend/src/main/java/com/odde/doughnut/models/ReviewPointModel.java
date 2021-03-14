@@ -12,8 +12,8 @@ public class ReviewPointModel extends ModelForEntity<ReviewPointEntity> {
     }
 
     public void initialReview(UserModel userModel, Timestamp currentUTCTimestamp) {
-        getEntity().setUserEntity(userModel.getEntity());
-        getEntity().setInitialReviewedAt(currentUTCTimestamp);
+        entity.setUserEntity(userModel.getEntity());
+        entity.setInitialReviewedAt(currentUTCTimestamp);
         repeat(currentUTCTimestamp);
     }
 
@@ -26,7 +26,7 @@ public class ReviewPointModel extends ModelForEntity<ReviewPointEntity> {
             entity.setForgettingCurveIndex(getSpacedRepetition().getNextForgettingCurveIndex(entity.getForgettingCurveIndex()));
             entity.setNextReviewAt(calculateNextReviewAt(getSpacedRepetition()));
         }
-        this.modelFactoryService.reviewPointRepository.save(getEntity());
+        this.modelFactoryService.reviewPointRepository.save(entity);
     }
 
     private SpacedRepetition getSpacedRepetition() {
@@ -34,15 +34,15 @@ public class ReviewPointModel extends ModelForEntity<ReviewPointEntity> {
     }
 
     private UserModel getUserModel() {
-        return modelFactoryService.toUserModel(getEntity().getUserEntity());
+        return modelFactoryService.toUserModel(entity.getUserEntity());
     }
 
     private Timestamp calculateNextReviewAt(SpacedRepetition spacedRepetition) {
-        return TimestampOperations.addDaysToTimestamp(getEntity().getLastReviewedAt(), spacedRepetition.getNextRepeatInDays(getEntity().getForgettingCurveIndex()));
+        return TimestampOperations.addDaysToTimestamp(entity.getLastReviewedAt(), spacedRepetition.getNextRepeatInDays(entity.getForgettingCurveIndex()));
     }
 
     public QuizQuestion generateAQuizQuestion() {
-        if (Strings.isEmpty(getEntity().getNoteEntity().getDescription())) {
+        if (Strings.isEmpty(entity.getNoteEntity().getDescription())) {
             return null;
         }
         return new QuizQuestion(entity, modelFactoryService);
