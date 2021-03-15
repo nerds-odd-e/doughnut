@@ -35,3 +35,13 @@ Feature: Repetition Quiz
             | asdf     | "asdf" is wrong      |
             | Sedition | is correct           |
 
+        @ignore
+    Scenario: Update review setting
+        Given I am changing note "sedition"'s review setting
+        And I have selected the option "rememberSpelling"
+        When I am learning new note on day 1
+        Then I should see the option "rememberSpelling" is "on"
+        When I have unselected the option "rememberSpelling"
+        And I am changing note "sedition"'s review setting
+        Then I should see the option "rememberSpelling" is "off"
+
