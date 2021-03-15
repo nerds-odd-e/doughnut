@@ -50,15 +50,27 @@
                     <svg th:replace="_fragments/svgs :: cog"/>
                 </button>
                 <div class="dropdown-menu dropdown-menu-right">
-                    <a class="dropdown-item" th:href="@{/notes/{id}/edit(id=${reviewPointEntity.noteEntity.id})}">Edit Note</a>
+                    <a class="dropdown-item" th:href="@{/notes/{id}/review_setting(id=${reviewPointEntity.noteEntity.id})}">
+                        <svg th:replace="_fragments/svgs :: reviewSetting"/>
+                        Edit Review Settings
+                    </a>
+                    <a class="dropdown-item" th:href="@{/links/{id}/link(id=${reviewPointEntity.noteEntity.id})}">
+                        <svg th:replace="_fragments/svgs :: linkNote"/>
+                        Make Link
+                    <a class="dropdown-item" th:href="@{/notes/{id}/edit(id=${reviewPointEntity.noteEntity.id})}">
+                        <svg th:replace="_fragments/svgs :: edit"/>
+                        Edit Note
+                    </a>
                     <div class="dropdown-divider"></div>
                     <form th:action="@{/reviews/{id}(id=${reviewPointEntity.id})}" th:object="${reviewPointEntity}"
                           method="post"
                           onsubmit="return confirm('Are you sure to hide this note from reviewing in the future?')">
                         <input type="hidden" name="removedFromReview" value="1"/>
-                        <input type="submit" value="Remove This Note from Review" class="dropdown-item"/>
+                        <button type="submit" class="dropdown-item">
+                            <svg th:replace="_fragments/svgs :: noReview"/>
+                            Remove This Note from Review
+                        </button>
                     </form>
-
                 </div>
             </div>
 
