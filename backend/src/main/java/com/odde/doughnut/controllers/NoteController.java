@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.LinkEntity;
+import com.odde.doughnut.entities.ReviewSettingEntity;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.entities.NoteEntity;
@@ -122,6 +123,28 @@ public class NoteController {
         currentUserFetcher.getUser().assertAuthorization(noteEntity);
         modelFactoryService.toTreeNodeModel(noteEntity).destroy();
         return new RedirectView("/notes");
+    }
+
+    @GetMapping("/{noteEntity}/review_setting")
+    public String editReviewSetting(NoteEntity noteEntity, Model model) {
+        ReviewSettingEntity reviewSettingEntity = noteEntity.getMasterReviewSettingEntity();
+        if(reviewSettingEntity == null) {
+            reviewSettingEntity = new ReviewSettingEntity();
+        }
+        model.addAttribute("reviewSettingEntity", reviewSettingEntity);
+        return "notes/edit_review_setting";
+    }
+
+    @PostMapping(value = "/{noteEntity}/review_setting")
+    @Transactional
+    public String updateReviewSetting(@PathVariable("noteEntity") NoteEntity noteEntity, @Valid ReviewSettingEntity reviewSettingEntity, BindingResult bindingResult) throws NoAccessRightException {
+        if (bindingResult.hasErrors()) {
+            return "notes/edit_review_setting";
+        }
+        currentUserFetcher.getUser().assertAuthorization(noteEntity);
+        modelFactoryService.toNoteModel(noteEntity).setAndSaveMasterReviewSetting(reviewSettingEntity);
+
+        return "redirect:/notes/" + noteEntity.getId();
     }
 
 }

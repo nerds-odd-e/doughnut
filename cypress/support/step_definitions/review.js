@@ -74,7 +74,22 @@ Then("I am learning new note on day {int}", (day) => {
 
 Then("I have selected the option {string}", (option) => {
     cy.get("#review_setting-" + option).check();
-    cy.findByRole('button', {name: 'Next'}).click();
+    cy.get('form#review-setting').submit();
+});
+
+Then("I have unselected the option {string}", (option) => {
+    cy.get("#review_setting-" + option).uncheck();
+    cy.get('form#review-setting').submit();
+});
+
+Then("I should see the option {string} is {string}", (option, status) => {
+  const elm = cy.get("#review_setting-" + option);
+  if ((status === "on")) {
+      elm.should("be.checked")
+  }
+  else {
+      elm.should("not.be.checked");
+  }
 });
 
 Then("choose to remove it fromm reviews", () => {
@@ -122,7 +137,12 @@ Then("I should see that my answer {string} is wrong", (answer) => {
 });
 
 Then("I should see the satisfied button: {string}", (yesNo) => {
-    const prom = cy.get('#repeat-satisfied').should(yesNo === 'yes' ? 'exist' : 'not.exist');
+    cy.get('#repeat-satisfied').should(yesNo === 'yes' ? 'exist' : 'not.exist');
 });
 
+Then("I am changing note {string}'s review setting", (noteTitle) => {
+  cy.get('@seededNoteIdMap').then(seededNoteIdMap=>
+    cy.visit(`/notes/${seededNoteIdMap[noteTitle]}/review_setting`)
+  );
+});
 

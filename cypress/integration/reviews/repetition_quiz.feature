@@ -35,7 +35,6 @@ Feature: Repetition Quiz
             | asdf     | "asdf" is wrong      |
             | Sedition | is correct           |
 
-        @ignore
     Scenario: Update review setting
         Given I am changing note "sedition"'s review setting
         And I have selected the option "rememberSpelling"

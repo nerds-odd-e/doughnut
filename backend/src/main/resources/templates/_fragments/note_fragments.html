@@ -118,4 +118,8 @@
     </div>
 </div>
 
+<div th:fragment="reviewSettingForm(reviewSettingEntity)" th:object="${reviewSettingEntity}">
+    <div th:replace="_fragments/forms :: checkInput('review_setting', 'rememberSpelling')">
+    </div>
+</div>
 

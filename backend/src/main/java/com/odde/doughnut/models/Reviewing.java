@@ -84,7 +84,11 @@ public class Reviewing {
                 .orElse(null);
     }
 
-    public ReviewSettingEntity getReviewSettingEntity() {
-        return new ReviewSettingEntity();
+    public ReviewSettingEntity getReviewSettingEntity(NoteEntity noteEntity) {
+        ReviewSettingEntity reviewSettingEntity = noteEntity.getMasterReviewSettingEntity();
+        if (reviewSettingEntity == null) {
+            reviewSettingEntity = new ReviewSettingEntity();
+        }
+        return reviewSettingEntity;
     }
 }
