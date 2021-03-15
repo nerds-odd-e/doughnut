@@ -78,6 +78,7 @@ Then("I have selected the option {string}", (option) => {
 });
 
 Then("choose to remove it fromm reviews", () => {
+    cy.get("#more-action-for-repeat").click();
     cy.findByRole('button', {name: 'Remove This Note from Review'}).click();
 });
 
