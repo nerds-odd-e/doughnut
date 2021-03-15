@@ -83,7 +83,7 @@ Then("choose to remove it fromm reviews", () => {
 });
 
 Then("I choose to do it again", () => {
-    cy.findByRole('button', {name: 'Again'}).click();
+    cy.get("#repeat-again").click();
 });
 
 
@@ -121,8 +121,8 @@ Then("I should see that my answer {string} is wrong", (answer) => {
     cy.findByText(`Your answer \`${answer}\` is wrong.`);
 });
 
-Then("I should see the next button: {string}", (yesNo) => {
-    const prom = cy.get('input[value="Next"]').should(yesNo === 'yes' ? 'exist' : 'not.exist');
+Then("I should see the satisfied button: {string}", (yesNo) => {
+    const prom = cy.get('#repeat-satisfied').should(yesNo === 'yes' ? 'exist' : 'not.exist');
 });
 
 

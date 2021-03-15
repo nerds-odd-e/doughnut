@@ -155,15 +155,6 @@ Cypress.Commands.add("initialReviewOneNoteIfThereIs", ({review_type, title, addi
             break;
         }
 
-        case "related notes": {
-            if(additional_info) {
-                additional_info.commonSenseSplit(", ").forEach(expectedLinkTarget =>
-                    cy.findByText(expectedLinkTarget, {selector: '#note-links li'})
-                )
-            }
-            break;
-        }
-
         default:
             expect(review_type).equal("a known review page type");
         }
@@ -177,9 +168,22 @@ Cypress.Commands.add("repeatReviewOneNoteIfThereIs", ({review_type, title, addit
         cy.findByText("You have reviewed all the old notes for today.").should("be.visible");
     }
     else {
-        cy.initialReviewOneNoteIfThereIs({review_type, title, additional_info});
+        cy.findByText(title, {selector: '#note-title'})
+        switch(review_type) {
+        case "single note": {
+            if(additional_info) {
+                cy.get('#note-description').should("contain", additional_info);
+            }
+            break;
+        }
+
+        default:
+            expect(review_type).equal("a known review page type");
+        }
+        cy.get("#repeat-satisfied").click();
     }
 });
+
 
 Cypress.Commands.add("navigateToCircle", (circleName) => {
   cy.visit("/circles");

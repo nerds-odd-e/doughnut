@@ -17,16 +17,35 @@
                 <form th:action="@{/reviews/{id}(id=${reviewPointEntity.id})}" th:object="${reviewPointEntity}"
                       method="post">
                     <input type="hidden" name="repeatAgainToday" value="1"/>
-                    <input type="submit" value="Again" class="btn btn-warning mr-2"/>
+                    <button type="submit"class="btn btn-light" id="repeat-again">
+                        <svg th:replace="_fragments/svgs :: failed"/>
+                    </button>
                 </form>
+
                 <form th:action="@{/reviews/{id}(id=${reviewPointEntity.id})}" th:object="${reviewPointEntity}"
                       method="post" th:unless="${answer!=null && !answer.isCorrect()}">
-                    <input type="submit" value="Next" class="btn btn-primary mr-2"/>
+                    <button type="submit"class="btn btn-light" id="repeat-sad">
+                        <svg th:replace="_fragments/svgs :: sad"/>
+                    </button>
+                </form>
+
+                <form th:action="@{/reviews/{id}(id=${reviewPointEntity.id})}" th:object="${reviewPointEntity}"
+                      method="post" th:unless="${answer!=null && !answer.isCorrect()}">
+                    <button type="submit"class="btn btn-light" id="repeat-satisfied">
+                        <svg th:replace="_fragments/svgs :: satisfying"/>
+                    </button>
+                </form>
+
+                <form th:action="@{/reviews/{id}(id=${reviewPointEntity.id})}" th:object="${reviewPointEntity}"
+                      method="post" th:unless="${answer!=null && !answer.isCorrect()}">
+                    <button type="submit"class="btn btn-light" id="repeat-happy">
+                        <svg th:replace="_fragments/svgs :: happy"/>
+                    </button>
                 </form>
 
             </div>
             <div class="btn-group dropup">
-                <button type="button" id="more-action-for-repeat" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
+                <button type="button" id="more-action-for-repeat" class="btn btn-light dropdown-toggle" data-toggle="dropdown" aria-haspopup="true"
                         aria-expanded="false">
                     <svg th:replace="_fragments/svgs :: cog"/>
                 </button>
