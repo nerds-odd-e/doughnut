@@ -2,6 +2,7 @@ package com.odde.doughnut.entities;
 
 import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.builders.NoteBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -18,6 +19,7 @@ import javax.validation.ValidatorFactory;
 import java.util.List;
 import java.util.Set;
 
+import static com.odde.doughnut.entities.LinkEntity.LinkType.RELATED_TO;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
@@ -101,5 +103,40 @@ public class NoteEntityTest {
             assertThat(targetNotes, hasSize(equalTo(1)));
             assertThat(targetNotes, contains(targetNote));
         }
+    }
+
+    @Nested
+    class LinkTypes {
+        NoteEntity noteEntityA;
+        NoteEntity noteEntityB;
+
+        @BeforeEach
+        void setup() {
+            noteEntityA = makeMe.aNote().please();
+            noteEntityB = makeMe.aNote().please();
+        }
+
+        @Nested
+        class Related {
+            @BeforeEach
+            void setup() {
+                makeMe.theNote(noteEntityA).linkTo(noteEntityB, RELATED_TO).please();
+            }
+
+
+            @Test
+            void AIsRelatedToB() {
+                assertThat(noteEntityA.linkTypes(), contains(RELATED_TO.label));
+                assertThat(noteEntityA.linksOfType(RELATED_TO.label), contains(noteEntityB));
+            }
+
+            @Test
+            void BIsAlsoRelatedToA() {
+                assertThat(noteEntityB.linkTypes(), contains(RELATED_TO.label));
+                assertThat(noteEntityB.linksOfType(RELATED_TO.label), contains(noteEntityA));
+            }
+
+        }
+
     }
 }

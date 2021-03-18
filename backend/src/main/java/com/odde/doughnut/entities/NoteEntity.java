@@ -139,6 +139,12 @@ public class NoteEntity {
     @Setter
     private List<LinkEntity> links = new ArrayList<>();
 
+    @OneToMany(mappedBy = "targetNote", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    @Getter
+    @Setter
+    private List<LinkEntity> refers = new ArrayList<>();
+
     @Transient
     @Getter
     @Setter
@@ -149,11 +155,19 @@ public class NoteEntity {
     }
 
     public List<String> linkTypes() {
-        return links.stream().map(LinkEntity::getType).distinct().collect(Collectors.toUnmodifiableList());
+        List<String> referredTypes = refers.stream().map(LinkEntity::getType).filter(t -> t.equals(LinkEntity.LinkType.RELATED_TO.label)).collect(toList());
+        List<String> linkedTypes = links.stream().map(LinkEntity::getType).collect(toList());
+        referredTypes.addAll(linkedTypes);
+        return referredTypes.stream().distinct().collect(Collectors.toUnmodifiableList());
     }
 
     public List<NoteEntity> linksOfType(String type) {
-        return links.stream().filter(l->l.getType().equals(type)).map(LinkEntity::getTargetNote).collect(Collectors.toUnmodifiableList());
+        List<NoteEntity> linkedNotes = links.stream().filter(l -> l.getType().equals(type)).map(LinkEntity::getTargetNote).collect(Collectors.toList());
+        if (type.equals(LinkEntity.LinkType.RELATED_TO.label)) {
+            List<NoteEntity> referredNotes = refers.stream().filter(l -> l.getType().equals(type)).map(LinkEntity::getSourceNote).collect(Collectors.toUnmodifiableList());
+            linkedNotes.addAll(referredNotes);
+        }
+        return linkedNotes;
     }
 
     public boolean isFromCircle() {

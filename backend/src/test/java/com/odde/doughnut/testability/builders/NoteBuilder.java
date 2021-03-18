@@ -38,12 +38,20 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
     }
 
     public NoteBuilder linkTo(NoteEntity referTo) {
+        return linkTo(referTo, LinkEntity.LinkType.BELONGS_TO);
+
+    }
+
+
+    public NoteBuilder linkTo(NoteEntity referTo, LinkEntity.LinkType linkType) {
         LinkEntity linkEntity = new LinkEntity();
         linkEntity.setTargetNote(referTo);
         linkEntity.setSourceNote(entity);
-        linkEntity.setType("belongs to");
+        linkEntity.setType(linkType.label);
         entity.getLinks().add(linkEntity);
+        referTo.getRefers().add(linkEntity);
         return this;
+
     }
 
     public NoteBuilder inCircle(CircleModel circleModel) {
