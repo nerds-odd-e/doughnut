@@ -68,7 +68,7 @@ public class ReviewController {
     public String repeatReview(Model model) {
         UserModel user = currentUserFetcher.getUser();
         Reviewing reviewing = user.createReviewing(timeTraveler.getCurrentUTCTimestamp());
-        ReviewPointModel reviewPointModel = reviewing.getOneReviewPointNeedToRepeat();
+        ReviewPointModel reviewPointModel = reviewing.getOneReviewPointNeedToRepeat(timeTraveler.getRandomizer());
         if(reviewPointModel != null) {
             model.addAttribute("reviewPointEntity", reviewPointModel.getEntity());
             QuizQuestion quizQuestion = reviewPointModel.generateAQuizQuestion(timeTraveler.getRandomizer());

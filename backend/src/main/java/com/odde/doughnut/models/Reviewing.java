@@ -6,6 +6,7 @@ import com.odde.doughnut.entities.ReviewSettingEntity;
 import com.odde.doughnut.services.ModelFactoryService;
 
 import java.sql.Timestamp;
+import java.util.List;
 import java.util.Optional;
 
 public class Reviewing {
@@ -77,11 +78,13 @@ public class Reviewing {
         return (int) (userModel.entity.getDailyNewNotesCount() - sameDayCount);
     }
 
-    public ReviewPointModel getOneReviewPointNeedToRepeat() {
-        return userModel.getReviewPointsNeedToRepeat(currentUTCTimestamp).stream()
-                .findFirst()
-                .map(rp->modelFactoryService.toReviewPointModel(rp))
-                .orElse(null);
+    public ReviewPointModel getOneReviewPointNeedToRepeat(Randomizer randomizer) {
+        List<ReviewPointEntity> reviewPointsNeedToRepeat = userModel.getReviewPointsNeedToRepeat(currentUTCTimestamp);
+        if (reviewPointsNeedToRepeat.size() == 0) {
+            return null;
+        }
+        ReviewPointEntity reviewPointEntity = randomizer.chooseOneRandomly(reviewPointsNeedToRepeat);
+        return modelFactoryService.toReviewPointModel(reviewPointEntity);
     }
 
     public ReviewSettingEntity getReviewSettingEntity(NoteEntity noteEntity) {

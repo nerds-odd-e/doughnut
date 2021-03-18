@@ -2,7 +2,9 @@ package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.ReviewPointEntity;
+import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.TimeTraveler;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -28,6 +30,7 @@ public class ReviewingWithSpacedRepetitionTest {
     UserModel userModel;
     UserModel anotherUser;
     Timestamp baseDay;
+    private Randomizer randomizer = new NonRandomizer();
 
     @BeforeEach
     void setup() {
@@ -82,7 +85,7 @@ public class ReviewingWithSpacedRepetitionTest {
 
     private ReviewPointEntity getOneReviewPointNeedToRepeat(Integer reviewDay) {
         Reviewing reviewing = userModel.createReviewing(daysAfterBase(reviewDay));
-        ReviewPointModel model = reviewing.getOneReviewPointNeedToRepeat();
+        ReviewPointModel model = reviewing.getOneReviewPointNeedToRepeat(randomizer);
         if(model == null) return null;
         return model.getEntity();
     }

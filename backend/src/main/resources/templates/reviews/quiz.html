@@ -1,6 +1,7 @@
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
 <layout th:replace="_fragments/basic_layout :: application_layout(~{ :: .content})">
     <div class="container content">
+        <div th:replace="_fragments/note_fragments :: noteOwnerBreadcrumb(${reviewPointEntity.noteEntity}, ~{})"/>
         <h2 class="display-5" th:text="${quizQuestion.getDescription()}"/>
 
         <div class="row" th:if="${quizQuestion.getQuestionType()=='cloze_selection'}">
