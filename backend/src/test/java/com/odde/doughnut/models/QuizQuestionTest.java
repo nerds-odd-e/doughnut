@@ -47,6 +47,7 @@ class QuizQuestionTest {
             "moon,            partner of earth,                    partner of earth",
             "Sedition,        word sedition means this,            word [...] means this",
             "north / up,      it's on the north or up side,        it's on the [...] or [...] side",
+            "cats,            a cat,                               a [..~]",
     })
     void clozeDescription(String title, String description, String expectedClozeDescription) {
         NoteEntity noteEntity = makeMe.aNote().title(title).description(description).please();

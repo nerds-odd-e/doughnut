@@ -46,7 +46,11 @@ public class QuizQuestion {
                 .map(String::trim)
                 .reduce(noteEntity.getDescription(), (result, word)-> {
                     Pattern pattern = Pattern.compile(Pattern.quote(word), Pattern.CASE_INSENSITIVE);
-                    return pattern.matcher(result).replaceAll("[...]");
+                    String literal = pattern.matcher(result).replaceAll("[...]");
+                    String substring = word.substring(0, word.length() * 3 / 4);
+                    Pattern subPattern = Pattern.compile(Pattern.quote(substring), Pattern.CASE_INSENSITIVE);
+                    literal = subPattern.matcher(literal).replaceAll("[..~]");
+                    return literal;
                 });
     }
 
