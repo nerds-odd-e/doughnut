@@ -43,14 +43,14 @@ class QuizQuestionTest {
     void aNoteWithDescriptionHasAutoClozeDeletionQuiz() {
         NoteEntity noteEntity = makeMe.aNote().please();
         QuizQuestion quizQuestion = getQuizQuestion(noteEntity);
-        assertThat(quizQuestion.getDescription(), equalTo(noteEntity.getDescription()));
+        assertThat(quizQuestion.getClozeDescription(), equalTo(noteEntity.getDescription()));
     }
 
     @Test
     void whenDescripitonIncludesTitle() {
         NoteEntity noteEntity = makeMe.aNote().title("Sedition").description("Word sedition means incite violence").please();
         QuizQuestion quizQuestion = getQuizQuestion(noteEntity);
-        assertThat(quizQuestion.getDescription(), equalTo("Word [...] means incite violence"));
+        assertThat(quizQuestion.getClozeDescription(), equalTo("Word [...] means incite violence"));
     }
 
     @Nested
@@ -94,14 +94,14 @@ class QuizQuestionTest {
 
         @Test
         void typeShouldBeSpellingQuiz() {
-            assertThat(getQuizQuestion(note).getQuestionType(), equalTo(QuizQuestion.QuestionType.SPELLING.label));
+            assertThat(getQuizQuestion(note).getQuestionType(), equalTo(QuizQuestion.QuestionType.SPELLING));
         }
 
         @Test
         void shouldReturnTheSameType() {
             ReviewPointModel reviewPoint = getReviewPointModel(note);
             QuizQuestion randomQuizQuestion = reviewPoint.generateAQuizQuestion(new RealRandomizer());
-            Set<String> types = new HashSet<>();
+            Set<QuizQuestion.QuestionType> types = new HashSet<>();
             for(int i = 0; i < 3; i++) {
                 types.add(randomQuizQuestion.getQuestionType());
             }
@@ -110,13 +110,13 @@ class QuizQuestionTest {
 
         @Test
         void shouldChooseTypeRandomly() {
-            Set<String> types = new HashSet<>();
+            Set<QuizQuestion.QuestionType> types = new HashSet<>();
             ReviewPointModel reviewPoint = getReviewPointModel(note);
             for(int i = 0; i < 10; i++) {
                 QuizQuestion randomQuizQuestion = reviewPoint.generateAQuizQuestion(new RealRandomizer());
                 types.add(randomQuizQuestion.getQuestionType());
             }
-            assertThat(types, containsInAnyOrder(QuizQuestion.QuestionType.SPELLING.label, QuizQuestion.QuestionType.CLOZE_SELECTION.label));
+            assertThat(types, containsInAnyOrder(QuizQuestion.QuestionType.SPELLING, QuizQuestion.QuestionType.CLOZE_SELECTION));
         }
 
     }
