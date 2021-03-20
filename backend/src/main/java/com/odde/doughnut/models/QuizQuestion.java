@@ -3,13 +3,10 @@ package com.odde.doughnut.models;
 import com.odde.doughnut.entities.AnswerEntity;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.ReviewPointEntity;
-import com.odde.doughnut.entities.ReviewSettingEntity;
 import com.odde.doughnut.services.ModelFactoryService;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.logging.log4j.util.Strings;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -49,7 +46,10 @@ public class QuizQuestion {
     }
 
     private String clozeString(String description, String wordToHide) {
-        String ptn = String.join("([\\s-]+)((and\\s+)|(the\\s+)|(a\\s+)|(an\\s+))?", Arrays.stream(wordToHide.split("[\\s-]+")).map(x->Pattern.quote(x)).collect(Collectors.toUnmodifiableList()));
+        String ptn = String.join("([\\s-]+)((and\\s+)|(the\\s+)|(a\\s+)|(an\\s+))?",
+                Arrays.stream(wordToHide.split("[\\s-]+"))
+                        .filter(x->!Arrays.asList("the", "a", "an").contains(x))
+                        .map(Pattern::quote).collect(Collectors.toUnmodifiableList()));
         Pattern pattern = Pattern.compile(ptn, Pattern.CASE_INSENSITIVE);
         String literal = pattern.matcher(description).replaceAll("[...]");
         String substring = wordToHide.substring(0, wordToHide.length() * 3 / 4);
