@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -41,8 +42,12 @@ public class QuizQuestion {
     }
 
     public String getClozeDescription() {
-        Pattern pattern = Pattern.compile(Pattern.quote(noteEntity.getTitle()), Pattern.CASE_INSENSITIVE);
-        return pattern.matcher(noteEntity.getDescription()).replaceAll("[...]");
+        return Arrays.stream(noteEntity.getTitle().split("/"))
+                .map(String::trim)
+                .reduce(noteEntity.getDescription(), (result, word)-> {
+                    Pattern pattern = Pattern.compile(Pattern.quote(word), Pattern.CASE_INSENSITIVE);
+                    return pattern.matcher(result).replaceAll("[...]");
+                });
     }
 
     public List<String> getOptions() {

@@ -1,6 +1,7 @@
 package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.NoteEntity;
+import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.models.randomizers.RealRandomizer;
 import com.odde.doughnut.testability.MakeMe;
@@ -8,6 +9,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.Nested;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -39,18 +42,16 @@ class QuizQuestionTest {
         assertThat(quizQuestion, is(nullValue()));
     }
 
-    @Test
-    void aNoteWithDescriptionHasAutoClozeDeletionQuiz() {
-        NoteEntity noteEntity = makeMe.aNote().please();
+    @ParameterizedTest
+    @CsvSource({
+            "moon,            partner of earth,                    partner of earth",
+            "Sedition,        word sedition means this,            word [...] means this",
+            "north / up,      it's on the north or up side,        it's on the [...] or [...] side",
+    })
+    void clozeDescription(String title, String description, String expectedClozeDescription) {
+        NoteEntity noteEntity = makeMe.aNote().title(title).description(description).please();
         QuizQuestion quizQuestion = getQuizQuestion(noteEntity);
-        assertThat(quizQuestion.getClozeDescription(), equalTo(noteEntity.getDescription()));
-    }
-
-    @Test
-    void whenDescripitonIncludesTitle() {
-        NoteEntity noteEntity = makeMe.aNote().title("Sedition").description("Word sedition means incite violence").please();
-        QuizQuestion quizQuestion = getQuizQuestion(noteEntity);
-        assertThat(quizQuestion.getClozeDescription(), equalTo("Word [...] means incite violence"));
+        assertThat(quizQuestion.getClozeDescription(), equalTo(expectedClozeDescription));
     }
 
     @Nested
@@ -102,7 +103,7 @@ class QuizQuestionTest {
             ReviewPointModel reviewPoint = getReviewPointModel(note);
             QuizQuestion randomQuizQuestion = reviewPoint.generateAQuizQuestion(new RealRandomizer());
             Set<QuizQuestion.QuestionType> types = new HashSet<>();
-            for(int i = 0; i < 3; i++) {
+            for (int i = 0; i < 3; i++) {
                 types.add(randomQuizQuestion.getQuestionType());
             }
             assertThat(types, hasSize(1));
@@ -112,7 +113,7 @@ class QuizQuestionTest {
         void shouldChooseTypeRandomly() {
             Set<QuizQuestion.QuestionType> types = new HashSet<>();
             ReviewPointModel reviewPoint = getReviewPointModel(note);
-            for(int i = 0; i < 10; i++) {
+            for (int i = 0; i < 10; i++) {
                 QuizQuestion randomQuizQuestion = reviewPoint.generateAQuizQuestion(new RealRandomizer());
                 types.add(randomQuizQuestion.getQuestionType());
             }
