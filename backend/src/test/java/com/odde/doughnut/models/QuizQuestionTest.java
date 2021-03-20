@@ -42,23 +42,11 @@ class QuizQuestionTest {
         assertThat(quizQuestion, is(nullValue()));
     }
 
-    @ParameterizedTest
-    @CsvSource({
-            "moon,            partner of earth,                    partner of earth",
-            "Sedition,        word sedition means this,            word [...] means this",
-            "north / up,      it's on the north or up side,        it's on the [...] or [...] side",
-            "cats,            a cat,                               a [..~]",
-            "cat-dog,         cat dog,                             [...]",
-            "cat dog,         cat-dog,                             [...]",
-            "cat dog,         cat and dog,                         [...]",
-            "cat dog,         cat a dog,                           [...]",
-            "cat dog,         cat the dog,                         [...]",
-            "cat the dog,     cat dog,                             [...]",
-    })
-    void clozeDescription(String title, String description, String expectedClozeDescription) {
-        NoteEntity noteEntity = makeMe.aNote().title(title).description(description).please();
+    @Test
+    void useClozeDescription() {
+        NoteEntity noteEntity = makeMe.aNote().title("abc").description("abc has 3 letters").please();
         QuizQuestion quizQuestion = getQuizQuestion(noteEntity);
-        assertThat(quizQuestion.getClozeDescription(), equalTo(expectedClozeDescription));
+        assertThat(quizQuestion.getClozeDescription(), equalTo("[...] has 3 letters"));
     }
 
     @Nested

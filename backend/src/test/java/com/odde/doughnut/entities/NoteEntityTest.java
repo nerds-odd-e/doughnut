@@ -1,5 +1,6 @@
 package com.odde.doughnut.entities;
 
+import com.odde.doughnut.models.QuizQuestion;
 import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.builders.NoteBuilder;
@@ -7,6 +8,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -138,5 +141,23 @@ public class NoteEntityTest {
 
         }
 
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "moon,            partner of earth,                    partner of earth",
+            "Sedition,        word sedition means this,            word [...] means this",
+            "north / up,      it's on the north or up side,        it's on the [...] or [...] side",
+            "cats,            a cat,                               a [..~]",
+            "cat-dog,         cat dog,                             [...]",
+            "cat dog,         cat-dog,                             [...]",
+            "cat dog,         cat and dog,                         [...]",
+            "cat dog,         cat a dog,                           [...]",
+            "cat dog,         cat the dog,                         [...]",
+            "cat the dog,     cat dog,                             [...]",
+    })
+    void clozeDescription(String title, String description, String expectedClozeDescription) {
+        NoteEntity noteEntity = makeMe.aNote().title(title).description(description).inMemoryPlease();
+        assertThat(noteEntity.getClozeDescription(), equalTo(expectedClozeDescription));
     }
 }

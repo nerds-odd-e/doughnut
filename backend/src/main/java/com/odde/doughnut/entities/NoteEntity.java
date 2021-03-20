@@ -8,8 +8,10 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
@@ -176,6 +178,24 @@ public class NoteEntity {
 
     public CircleEntity circle() {
         return ownershipEntity.getCircleEntity();
+    }
+
+    public String getClozeDescription() {
+        return Arrays.stream(title.split("/"))
+                .map(String::trim)
+                .reduce(description, this::clozeString);
+    }
+
+    private String clozeString(String description, String wordToHide) {
+        String ptn = String.join("([\\s-]+)((and\\s+)|(the\\s+)|(a\\s+)|(an\\s+))?",
+                Arrays.stream(wordToHide.split("[\\s-]+"))
+                        .filter(x->!Arrays.asList("the", "a", "an").contains(x))
+                        .map(Pattern::quote).collect(Collectors.toUnmodifiableList()));
+        Pattern pattern = Pattern.compile(ptn, Pattern.CASE_INSENSITIVE);
+        String literal = pattern.matcher(description).replaceAll("[...]");
+        String substring = wordToHide.substring(0, wordToHide.length() * 3 / 4);
+        pattern = Pattern.compile(Pattern.quote(substring), Pattern.CASE_INSENSITIVE);
+        return pattern.matcher(literal).replaceAll("[..~]");
     }
 
 }
