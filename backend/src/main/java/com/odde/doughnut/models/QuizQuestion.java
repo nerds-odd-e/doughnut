@@ -7,6 +7,7 @@ import com.odde.doughnut.entities.ReviewSettingEntity;
 import com.odde.doughnut.services.ModelFactoryService;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.logging.log4j.util.Strings;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,14 +45,16 @@ public class QuizQuestion {
     public String getClozeDescription() {
         return Arrays.stream(noteEntity.getTitle().split("/"))
                 .map(String::trim)
-                .reduce(noteEntity.getDescription(), (result, word)-> {
-                    Pattern pattern = Pattern.compile(Pattern.quote(word), Pattern.CASE_INSENSITIVE);
-                    String literal = pattern.matcher(result).replaceAll("[...]");
-                    String substring = word.substring(0, word.length() * 3 / 4);
-                    Pattern subPattern = Pattern.compile(Pattern.quote(substring), Pattern.CASE_INSENSITIVE);
-                    literal = subPattern.matcher(literal).replaceAll("[..~]");
-                    return literal;
-                });
+                .reduce(noteEntity.getDescription(), this::clozeString);
+    }
+
+    private String clozeString(String description, String wordToHide) {
+        String ptn = String.join("([\\s-]+)((and\\s+)|(the\\s+)|(a\\s+)|(an\\s+))?", Arrays.stream(wordToHide.split("[\\s-]+")).map(x->Pattern.quote(x)).collect(Collectors.toUnmodifiableList()));
+        Pattern pattern = Pattern.compile(ptn, Pattern.CASE_INSENSITIVE);
+        String literal = pattern.matcher(description).replaceAll("[...]");
+        String substring = wordToHide.substring(0, wordToHide.length() * 3 / 4);
+        pattern = Pattern.compile(Pattern.quote(substring), Pattern.CASE_INSENSITIVE);
+        return pattern.matcher(literal).replaceAll("[..~]");
     }
 
     public List<String> getOptions() {
