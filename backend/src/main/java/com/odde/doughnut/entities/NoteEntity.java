@@ -157,18 +157,27 @@ public class NoteEntity {
     }
 
     public List<String> linkTypes() {
-        List<String> referredTypes = refers.stream().map(LinkEntity::getType).filter(t -> t.equals(LinkEntity.LinkType.RELATED_TO.label)).collect(toList());
-        List<String> linkedTypes = links.stream().map(LinkEntity::getType).collect(toList());
-        referredTypes.addAll(linkedTypes);
-        return referredTypes.stream().distinct().collect(Collectors.toUnmodifiableList());
+        return Arrays.stream(LinkEntity.LinkType.values())
+                .filter(t->!linksOfType(t.label).isEmpty())
+                .map(t->t.label)
+                .collect(Collectors.toUnmodifiableList());
     }
 
     public List<NoteEntity> linksOfType(String type) {
-        List<NoteEntity> linkedNotes = links.stream().filter(l -> l.getType().equals(type)).map(LinkEntity::getTargetNote).collect(Collectors.toList());
-        if (type.equals(LinkEntity.LinkType.RELATED_TO.label)) {
-            List<NoteEntity> referredNotes = refers.stream().filter(l -> l.getType().equals(type)).map(LinkEntity::getSourceNote).collect(Collectors.toUnmodifiableList());
-            linkedNotes.addAll(referredNotes);
-        }
+        return linksOfType(LinkEntity.LinkType.fromString(type));
+    }
+
+    public List<NoteEntity> linksOfType(LinkEntity.LinkType linkType) {
+        List<NoteEntity> linkedNotes = links.stream()
+                .filter(l -> l.getLinkType().equals(linkType))
+                .map(LinkEntity::getTargetNote)
+                .collect(Collectors.toList());
+        List<NoteEntity> referredNotes = refers.stream()
+                .filter(l -> l.getLinkType().equals(linkType.reverseType()))
+                .map(LinkEntity::getSourceNote)
+                .collect(Collectors.toUnmodifiableList());
+        linkedNotes.addAll(referredNotes);
+
         return linkedNotes;
     }
 

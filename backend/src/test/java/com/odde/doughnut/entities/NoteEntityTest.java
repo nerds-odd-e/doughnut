@@ -22,7 +22,7 @@ import javax.validation.ValidatorFactory;
 import java.util.List;
 import java.util.Set;
 
-import static com.odde.doughnut.entities.LinkEntity.LinkType.RELATED_TO;
+import static com.odde.doughnut.entities.LinkEntity.LinkType.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
@@ -140,6 +140,50 @@ public class NoteEntityTest {
             }
 
         }
+
+        @Nested
+        class BelongsTo {
+            @BeforeEach
+            void setup() {
+                makeMe.theNote(noteEntityA).linkTo(noteEntityB, BELONGS_TO).please();
+            }
+
+            @Test
+            void ABelongToB() {
+                assertThat(noteEntityA.linkTypes(), contains(BELONGS_TO.label));
+                assertThat(noteEntityA.linksOfType(BELONGS_TO.label), contains(noteEntityB));
+            }
+
+            @Test
+            void BHasA() {
+                assertThat(noteEntityB.linkTypes(), contains(HAS.label));
+                assertThat(noteEntityB.linksOfType(HAS.label), contains(noteEntityA));
+            }
+
+        }
+
+        @Nested
+        class Has {
+            @BeforeEach
+            void setup() {
+                makeMe.theNote(noteEntityA).linkTo(noteEntityB, HAS).please();
+            }
+
+            @Test
+            void AHasB() {
+                assertThat(noteEntityA.linkTypes(), contains(HAS.label));
+                assertThat(noteEntityA.linksOfType(HAS.label), contains(noteEntityB));
+            }
+
+            @Test
+            void BBelongsToA() {
+                assertThat(noteEntityB.linkTypes(), contains(BELONGS_TO.label));
+                assertThat(noteEntityB.linksOfType(BELONGS_TO.label), contains(noteEntityA));
+            }
+
+        }
+
+
 
     }
 

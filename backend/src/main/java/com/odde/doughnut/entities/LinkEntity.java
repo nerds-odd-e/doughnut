@@ -13,9 +13,12 @@ public class LinkEntity {
 
     public enum LinkType {
         BELONGS_TO("belongs to"),
+        HAS("has"),
         RELATED_TO("is related to"),
-        SIMILAR_TO("is similar to"),
         OPPOSITE_OF("is the opposite of"),
+        BROUGHT_BY("is brought by"),
+        AUTHOR_OF("is author of"),
+        SIMILAR_TO("is similar to"),
         CONFUSE_WITH("confuses with");
 
         public final String label;
@@ -23,6 +26,24 @@ public class LinkEntity {
         private LinkType(String label) {
             this.label = label;
         }
+
+        public static LinkType fromString(String text) {
+            for (LinkType b : LinkType.values()) {
+                if (b.label.equalsIgnoreCase(text)) {
+                    return b;
+                }
+            }
+            return null;
+        }
+
+        public LinkType reverseType() {
+            if (this.equals(BELONGS_TO)) return HAS;
+            if (this.equals(HAS)) return BELONGS_TO;
+            if (this.equals(BROUGHT_BY)) return AUTHOR_OF;
+            if (this.equals(AUTHOR_OF)) return BROUGHT_BY;
+            return this;
+        }
+
     }
 
     @Id
@@ -40,4 +61,8 @@ public class LinkEntity {
     @Getter
     @Setter
     private String type;
+
+    LinkType getLinkType() {
+        return LinkType.fromString(type);
+    }
 }
