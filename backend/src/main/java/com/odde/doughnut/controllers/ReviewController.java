@@ -43,7 +43,7 @@ public class ReviewController {
     }
 
     @GetMapping("/initial")
-    public String review(Model model) {
+    public String initialReview(Model model) {
         UserModel user = currentUserFetcher.getUser();
         Reviewing reviewing = user.createReviewing(timeTraveler.getCurrentUTCTimestamp());
         ReviewPointEntity reviewPointEntity = reviewing.getOneInitialReviewPointEntity();

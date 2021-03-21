@@ -66,7 +66,13 @@ public class ReviewingInitialReviewTest {
 
         @Test
         void shouldNotIncludeNoteThatIsSkippedForReview() {
-            makeMe.theNote(note1).skipReview().please();
+            makeMe.theNote(note1).skipReview().linkTo(note2).please();
+            assertThat(getOneInitialReviewPointEntity(day1).getNoteEntity(), equalTo(note2));
+        }
+
+        void shouldReturnReviewPointForLink() {
+            makeMe.theNote(note1).skipReview().linkTo(note2).please();
+            makeMe.aReviewPointFor(note2).by(userModel).initiallyReviewedOn(day1).please();
             assertThat(getOneInitialReviewPointEntity(day1).getNoteEntity(), equalTo(note2));
         }
 
