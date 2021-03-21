@@ -1,5 +1,6 @@
 package com.odde.doughnut.models;
 
+import com.odde.doughnut.algorithms.SpacedRepetition;
 import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.entities.ReviewSettingEntity;
 import com.odde.doughnut.services.ModelFactoryService;

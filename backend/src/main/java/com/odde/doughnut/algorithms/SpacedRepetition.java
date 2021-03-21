@@ -1,4 +1,4 @@
-package com.odde.doughnut.models;
+package com.odde.doughnut.algorithms;
 
 import org.apache.logging.log4j.util.Strings;
 

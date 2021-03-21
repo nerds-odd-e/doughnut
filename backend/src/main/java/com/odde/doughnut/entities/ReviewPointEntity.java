@@ -1,7 +1,7 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.odde.doughnut.models.SpacedRepetition;
+import com.odde.doughnut.algorithms.SpacedRepetition;
 import com.odde.doughnut.models.TimestampOperations;
 import lombok.Getter;
 import lombok.Setter;

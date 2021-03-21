@@ -1,5 +1,6 @@
 package com.odde.doughnut.models;
 
+import com.odde.doughnut.algorithms.SpacedRepetition;
 import com.odde.doughnut.entities.CircleEntity;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.ReviewPointEntity;
