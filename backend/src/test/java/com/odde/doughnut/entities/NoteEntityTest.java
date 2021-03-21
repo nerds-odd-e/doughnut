@@ -183,8 +183,6 @@ public class NoteEntityTest {
 
         }
 
-
-
     }
 
     @ParameterizedTest
@@ -199,6 +197,7 @@ public class NoteEntityTest {
             "cat dog,         cat a dog,                           [...]",
             "cat dog,         cat the dog,                         [...]",
             "cat the dog,     cat dog,                             [...]",
+            "cat,             /kat/,                               /.../",
     })
     void clozeDescription(String title, String description, String expectedClozeDescription) {
         NoteEntity noteEntity = makeMe.aNote().title(title).description(description).inMemoryPlease();
