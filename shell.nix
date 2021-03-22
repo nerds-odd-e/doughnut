@@ -88,7 +88,10 @@ EOF
       rm -f $MYSQL_HOME/init_doughnut_db.sql
       mysqladmin -u root --socket=$MYSQL_UNIX_PORT shutdown
       wait $MYSQL_PID
-      kill -9 $MYSQL_PID
+      MYSQL_PID=$(lsof -t -i:3306)
+      if [ ! -z "$MYSQL_PID" ]; then
+        kill -9 $MYSQL_PID
+      fi
     }
     trap cleanup EXIT
   '';
