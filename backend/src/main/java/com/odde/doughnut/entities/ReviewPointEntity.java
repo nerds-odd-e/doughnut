@@ -33,6 +33,13 @@ public class ReviewPointEntity {
     @Setter
     private NoteEntity noteEntity;
 
+    @ManyToOne
+    @JoinColumn(name = "link_id")
+    @JsonIgnore
+    @Getter
+    @Setter
+    private LinkEntity linkEntity;
+
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @JsonIgnore

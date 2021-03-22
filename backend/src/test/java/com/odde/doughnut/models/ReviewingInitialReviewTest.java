@@ -70,10 +70,12 @@ public class ReviewingInitialReviewTest {
             assertThat(getOneInitialReviewPointEntity(day1).getNoteEntity(), equalTo(note2));
         }
 
+        @Test
         void shouldReturnReviewPointForLink() {
             makeMe.theNote(note1).skipReview().linkTo(note2).please();
             makeMe.aReviewPointFor(note2).by(userModel).initiallyReviewedOn(day1).please();
-            assertThat(getOneInitialReviewPointEntity(day1).getNoteEntity(), equalTo(note2));
+            assertThat(getOneInitialReviewPointEntity(day1).getLinkEntity().getSourceNote(), equalTo(note1));
+            assertThat(getOneInitialReviewPointEntity(day1).getNoteEntity(), is(nullValue()));
         }
 
         @Nested

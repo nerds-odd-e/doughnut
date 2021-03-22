@@ -1,16 +1,14 @@
 package com.odde.doughnut.models;
 
 import com.odde.doughnut.algorithms.SpacedRepetition;
-import com.odde.doughnut.entities.CircleEntity;
-import com.odde.doughnut.entities.NoteEntity;
-import com.odde.doughnut.entities.ReviewPointEntity;
-import com.odde.doughnut.entities.UserEntity;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.services.ModelFactoryService;
 
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class UserModel extends ModelForEntity<UserEntity> {
@@ -77,6 +75,10 @@ public class UserModel extends ModelForEntity<UserEntity> {
 
     public int getNotesHaveNotBeenReviewedAtAllCount() {
         return modelFactoryService.noteRepository.countByUserWhereThereIsNoReviewPoint(entity.getId());
+    }
+
+    public List<LinkEntity> getLinksHaveNotBeenReviewedAtAll() {
+        return modelFactoryService.linkRepository.findByUserWhereThereIsNoReviewPoint(entity.getId());
     }
 
     public List<ReviewPointEntity> getRecentReviewPoints(Timestamp since) {

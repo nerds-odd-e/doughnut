@@ -1,5 +1,6 @@
 package com.odde.doughnut.models;
 
+import com.odde.doughnut.entities.LinkEntity;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.entities.ReviewSettingEntity;
@@ -22,14 +23,32 @@ public class Reviewing {
     }
 
     public ReviewPointEntity getOneInitialReviewPointEntity() {
-        return getOneFreshNoteToReview().map(
+        int count = remainingDailyNewNotesCount();
+        if (count == 0) {
+            return null;
+        }
+
+        ReviewPointEntity reviewPointEntity1 = getOneFreshNoteToReview().map(
                 noteEntity -> {
                     ReviewPointEntity reviewPointEntity = new ReviewPointEntity();
                     reviewPointEntity.setNoteEntity(noteEntity);
                     return reviewPointEntity;
                 }
-
         ).orElse(null);
+
+        ReviewPointEntity reviewPointEntity2 = getOneFreshLinkToReview().map(
+                linkEntity -> {
+                    ReviewPointEntity reviewPointEntity = new ReviewPointEntity();
+                    reviewPointEntity.setLinkEntity(linkEntity);
+                    return reviewPointEntity;
+                }
+        ).orElse(null);
+
+        if (reviewPointEntity1 == null) {
+            return reviewPointEntity2;
+        }
+
+        return reviewPointEntity1;
     }
 
     public int toRepeatCount() {
@@ -65,11 +84,11 @@ public class Reviewing {
     }
 
     private Optional<NoteEntity> getOneFreshNoteToReview() {
-        int count = remainingDailyNewNotesCount();
-        if (count == 0) {
-            return Optional.empty();
-        }
         return userModel.getNotesHaveNotBeenReviewedAtAll().stream().findFirst();
+    }
+
+    private Optional<LinkEntity> getOneFreshLinkToReview() {
+        return userModel.getLinksHaveNotBeenReviewedAtAll().stream().findFirst();
     }
 
     public int remainingDailyNewNotesCount() {
