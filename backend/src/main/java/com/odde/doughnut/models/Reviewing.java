@@ -27,37 +27,28 @@ public class Reviewing {
         if (count == 0) {
             return null;
         }
+        return getOneNewReviewPointEntity();
+    }
 
-        ReviewPointEntity reviewPointEntity1 = getOneFreshNoteToReview().map(
-                noteEntity -> {
-                    ReviewPointEntity reviewPointEntity = new ReviewPointEntity();
-                    reviewPointEntity.setNoteEntity(noteEntity);
-                    return reviewPointEntity;
-                }
-        ).orElse(null);
+    private ReviewPointEntity getOneNewReviewPointEntity() {
+        NoteEntity noteEntity = getOneFreshNoteToReview().orElse(null);
+        LinkEntity linkEntity = getOneFreshLinkToReview().orElse(null);
 
-        ReviewPointEntity reviewPointEntity2 = getOneFreshLinkToReview().map(
-                linkEntity -> {
-                    ReviewPointEntity reviewPointEntity = new ReviewPointEntity();
-                    reviewPointEntity.setLinkEntity(linkEntity);
-                    return reviewPointEntity;
-                }
-        ).orElse(null);
-
-        if (reviewPointEntity1 == null) {
-            return reviewPointEntity2;
+        if (noteEntity == null && linkEntity == null) {
+            return null;
+        }
+        if (noteEntity != null && linkEntity != null) {
+            if (noteEntity.getCreatedDatetime().compareTo(linkEntity.getCreateAt()) > 0) {
+                noteEntity = null;
+            } else {
+                linkEntity = null;
+            }
         }
 
-        if (reviewPointEntity2 == null) {
-            return reviewPointEntity1;
-        }
-
-        if(reviewPointEntity1.getNoteEntity().getCreatedDatetime().compareTo(reviewPointEntity2.getLinkEntity().getCreateAt()) > 0) {
-            return reviewPointEntity2;
-        }
-
-
-        return reviewPointEntity1;
+        ReviewPointEntity reviewPointEntity = new ReviewPointEntity();
+        reviewPointEntity.setNoteEntity(noteEntity);
+        reviewPointEntity.setLinkEntity(linkEntity);
+        return reviewPointEntity;
     }
 
     public int toRepeatCount() {

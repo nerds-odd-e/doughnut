@@ -14,6 +14,9 @@ public class RealRandomizer implements Randomizer {
 
     @Override
     public <T> T chooseOneRandomly(List<T> list) {
+        if(list.isEmpty()) {
+            return null;
+        }
         Random rand = new Random();
         return list.get(rand.nextInt(list.size()));
     }
