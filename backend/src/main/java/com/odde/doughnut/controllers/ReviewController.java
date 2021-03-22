@@ -85,8 +85,6 @@ public class ReviewController {
     @PostMapping("/{reviewPointEntity}/answer")
     public String answerQuiz(ReviewPointEntity reviewPointEntity, @Valid AnswerEntity answerEntity, Model model) {
         AnswerModel answerModel = modelFactoryService.toAnswerModel(answerEntity);
-        answerModel.checkResult();
-
         model.addAttribute("answer", answerModel);
         return "reviews/repeat";
     }

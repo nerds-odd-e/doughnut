@@ -62,6 +62,10 @@ public class LinkEntity {
     @Setter
     private String type;
 
+    public String getQuizDescription() {
+        return "`" + getSourceNote().getTitle() + "` " + getType() + ":";
+    }
+
     LinkType getLinkType() {
         return LinkType.fromString(type);
     }

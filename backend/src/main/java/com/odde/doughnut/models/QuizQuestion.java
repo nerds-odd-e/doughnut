@@ -14,7 +14,8 @@ import java.util.stream.Collectors;
 public class QuizQuestion {
     public enum QuestionType {
         CLOZE_SELECTION("cloze_selection"),
-        SPELLING("spelling");
+        SPELLING("spelling"),
+        LINK_TARGET("link_target");
 
         public final String label;
 
@@ -23,7 +24,6 @@ public class QuizQuestion {
         }
     }
 
-    private final NoteEntity noteEntity;
     private final Randomizer randomizer;
     private final ModelFactoryService modelFactoryService;
     private final ReviewPointEntity reviewPointEntity;
@@ -32,23 +32,25 @@ public class QuizQuestion {
 
     public QuizQuestion(ReviewPointEntity reviewPointEntity, Randomizer randomizer, ModelFactoryService modelFactoryService) {
         this.reviewPointEntity = reviewPointEntity;
-        this.noteEntity = reviewPointEntity.getNoteEntity();
         this.randomizer = randomizer;
         this.modelFactoryService = modelFactoryService;
     }
 
-    public String getClozeDescription() {
-        return noteEntity.getClozeDescription();
+    public String getDescription() {
+        if (questionType.equals(QuestionType.LINK_TARGET)) {
+            return reviewPointEntity.getLinkEntity().getQuizDescription();
+        }
+        return getAnswerNote().getClozeDescription();
     }
 
     public List<String> getOptions() {
-        TreeNodeModel treeNodeModel = getTreeNodeModel();
+        TreeNodeModel treeNodeModel = getAnswerTreeNodeModel();
         List<String> list = treeNodeModel.getSiblings().stream().map(NoteEntity::getTitle)
-                .filter(t->!t.equals(noteEntity.getTitle()))
+                .filter(t->!t.equals(getAnswerNote().getTitle()))
                 .collect(Collectors.toList());
         randomizer.shuffle(list);
         List<String> selectedList = list.stream().limit(5).collect(Collectors.toList());
-        selectedList.add(noteEntity.getTitle());
+        selectedList.add(getAnswerNote().getTitle());
         Collections.shuffle(selectedList);
 
         return selectedList;
@@ -58,10 +60,18 @@ public class QuizQuestion {
     public AnswerEntity buildAnswer() {
         AnswerEntity answerEntity = new AnswerEntity();
         answerEntity.setReviewPointEntity(reviewPointEntity);
+        answerEntity.setQuestionType(questionType);
         return answerEntity;
     }
 
-    private TreeNodeModel getTreeNodeModel() {
-        return modelFactoryService.toTreeNodeModel(noteEntity);
+    private TreeNodeModel getAnswerTreeNodeModel() {
+        return modelFactoryService.toTreeNodeModel(getAnswerNote());
+    }
+
+    private NoteEntity getAnswerNote() {
+        if (questionType == QuestionType.LINK_TARGET) {
+            return reviewPointEntity.getLinkEntity().getTargetNote();
+        }
+        return reviewPointEntity.getNoteEntity();
     }
 }

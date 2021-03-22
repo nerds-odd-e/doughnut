@@ -11,7 +11,6 @@ Feature: Repetition Link Quiz
             | Mars       | true        | Space          |
         And there is "belongs to" link between note "Moon" and "Earth"
 
-        @ignore
     Scenario Outline: "Belongs to" question
         Given It's day 1, 8 hour
         And I do these initial reviews in sequence:
@@ -25,5 +24,5 @@ Feature: Repetition Link Quiz
         Examples:
         | answer   | result               |
         | Mars     | "Mars" is wrong      |
-        | Moon     | is correct           |
+        | Earth    | is correct           |
 

@@ -103,14 +103,15 @@ Then("I choose to do it again", () => {
 
 
 Then("I should be asked cloze deletion question {string} with options {string}", (question, options) => {
-    cy.findByText(question).should('be.visible');
-    options.commonSenseSplit(",").forEach(
-        option => cy.findByText(option).should('be.visible')
-    );
+    cy.shouldSeeQuizWithOptions([question], options);
 });
 
 Then("I should be asked spelling question {string}", (question) => {
     cy.findByText(question).should('be.visible');
+});
+
+Then("I should be asked link question {string} {string} with options {string}", (noteTitle, linkType, options) => {
+    cy.shouldSeeQuizWithOptions([noteTitle, linkType], options);
 });
 
 Then("I type my answer {string}", (answer) => {

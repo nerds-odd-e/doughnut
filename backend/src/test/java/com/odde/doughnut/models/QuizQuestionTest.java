@@ -1,7 +1,6 @@
 package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.NoteEntity;
-import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.models.randomizers.RealRandomizer;
 import com.odde.doughnut.testability.MakeMe;
@@ -9,8 +8,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.api.Nested;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -46,7 +43,7 @@ class QuizQuestionTest {
     void useClozeDescription() {
         NoteEntity noteEntity = makeMe.aNote().title("abc").description("abc has 3 letters").please();
         QuizQuestion quizQuestion = getQuizQuestion(noteEntity);
-        assertThat(quizQuestion.getClozeDescription(), equalTo("[...] has 3 letters"));
+        assertThat(quizQuestion.getDescription(), equalTo("[...] has 3 letters"));
     }
 
     @Nested

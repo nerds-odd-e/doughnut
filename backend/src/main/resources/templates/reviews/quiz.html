@@ -1,13 +1,14 @@
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
 <layout th:replace="_fragments/basic_layout :: application_layout(~{ :: .content})">
     <div class="container content">
-        <div th:replace="_fragments/note_fragments :: noteOwnerBreadcrumb(${reviewPointEntity.noteEntity}, ~{})"/>
-        <h2 class="display-5" th:text="${quizQuestion.getClozeDescription()}"/>
+        <div th:replace="_fragments/note_fragments :: noteOwnerBreadcrumb(${reviewPointEntity.getSourceNote()}, ~{})"/>
+        <h2 class="display-5" th:text="${quizQuestion.getDescription()}"/>
 
-        <div class="row" th:if="${quizQuestion.getQuestionType().label=='cloze_selection'}">
+        <div class="row" th:unless="${quizQuestion.getQuestionType().label=='spelling'}">
             <div class="col-sm-6 mb-3" th:each="option:${quizQuestion.getOptions()}">
                 <form th:action="@{/reviews/{id}/answer(id=${reviewPointEntity.id})}" th:object="${emptyAnswer}" method="post">
                     <input type="hidden" name="answer" th:value="${option}"/>
+                    <input type="hidden" th:field="*{questionType}"/>
                     <input type="hidden" th:field="*{reviewPointEntity}"/>
                     <input type="submit" th:value="${option}" class="btn btn-secondary btn-lg btn-block"/>
                 </form>
@@ -17,6 +18,7 @@
         <div th:if="${quizQuestion.getQuestionType().label=='spelling'}">
             <form th:action="@{/reviews/{id}/answer(id=${reviewPointEntity.id})}" th:object="${emptyAnswer}" method="post">
                 <input type="hidden" th:field="*{reviewPointEntity}"/>
+                <input type="hidden" th:field="*{questionType}"/>
                 <div class="aaa" th:insert="_fragments/forms :: textInput('review_point', 'answer', 'put your answer here', true)"/>
                 <input type="submit" value="OK" class="btn btn-primary btn-lg btn-block"/>
             </form>

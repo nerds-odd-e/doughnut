@@ -4,7 +4,6 @@ import com.odde.doughnut.algorithms.SpacedRepetition;
 import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.entities.ReviewSettingEntity;
 import com.odde.doughnut.services.ModelFactoryService;
-import org.apache.logging.log4j.util.Strings;
 
 import java.sql.Timestamp;
 
@@ -51,15 +50,7 @@ public class ReviewPointModel extends ModelForEntity<ReviewPointEntity> {
     }
 
     public QuizQuestion generateAQuizQuestion(Randomizer randomizer) {
-        QuizQuestionGenerator quizQuestionGenerator = new QuizQuestionGenerator(entity, randomizer);
-
-        QuizQuestion quizQuestion = new QuizQuestion(entity, randomizer, modelFactoryService);
-        QuizQuestion.QuestionType questionType = quizQuestionGenerator.generateQuestionType();
-        if (questionType == null) {
-            return null;
-        }
-        quizQuestion.setQuestionType(questionType);
-
-        return quizQuestion;
+        return new QuizQuestionGenerator(entity, randomizer).generateQuestion(randomizer, entity, modelFactoryService);
     }
+
 }

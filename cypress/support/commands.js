@@ -233,3 +233,12 @@ Cypress.Commands.add("repeatReviewNotes", (noteTitles) => {
     });
 });
 
+Cypress.Commands.add("shouldSeeQuizWithOptions", (questionParts, options) => {
+    questionParts.forEach(part => {
+        cy.get(".display-5").contains(part);
+    })
+    options.commonSenseSplit(",").forEach(
+        option => cy.findByText(option).should('be.visible')
+    );
+});
+

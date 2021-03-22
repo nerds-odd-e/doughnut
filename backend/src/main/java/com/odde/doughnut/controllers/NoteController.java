@@ -1,26 +1,26 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
-import com.odde.doughnut.entities.LinkEntity;
+import com.odde.doughnut.entities.NoteEntity;
+import com.odde.doughnut.entities.NoteMotionEntity;
 import com.odde.doughnut.entities.ReviewSettingEntity;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.NoAccessRightException;
-import com.odde.doughnut.entities.NoteEntity;
-import com.odde.doughnut.entities.NoteMotionEntity;
 import com.odde.doughnut.models.NoteContentModel;
 import com.odde.doughnut.models.TreeNodeModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ModelFactoryService;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.view.RedirectView;
 
 import javax.validation.Valid;
-import java.util.List;
 
 @Controller
 @RequestMapping("/notes")
