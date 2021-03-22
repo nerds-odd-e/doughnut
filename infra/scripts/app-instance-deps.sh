@@ -115,4 +115,4 @@ cat <<'EOF' > /opt/traefik/dynamic/conf/dynamic.toml
 EOF
 
 # define db-server entry pointing to IP address of mysql db instance
-echo "10.111.16.4	db-server" >> /etc/hosts
+echo "10.111.16.12	db-server" >> /etc/hosts
