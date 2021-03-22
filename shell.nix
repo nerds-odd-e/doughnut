@@ -21,11 +21,11 @@ in mkShell {
     binutils-unwrapped hostname inetutils openssh pkg-config rsync
     autojump bat duf fasd fzf gnupg htop jq less lesspipe lsof lzma
     most progress ps pstree ripgrep tree vgrep which
-    libmysqlclient libpcap libressl
+    libmysqlclient libpcap libressl patchelf
     cacert curlie glances httpie
     mysql80 mysql-client mysql_jdbc python38Packages.pip
     chromedriver geckodriver google-cloud-sdk packer
-    vim vimpager vscodium
+    dbeaver vim vimpager vscodium
   ] ++ lib.optionals stdenv.isDarwin [
     darwin.apple_sdk.libs.utmp darwin.apple_sdk.libs.Xplugin
     apple_sdk.AppKit apple_sdk.AGL apple_sdk.ApplicationServices apple_sdk.AudioToolbox
@@ -34,7 +34,7 @@ in mkShell {
     apple_sdk.Foundation apple_sdk.ImageIO apple_sdk.IOKit apple_sdk.Kernel apple_sdk.MediaToolbox apple_sdk.OpenGL
     apple_sdk.QTKit apple_sdk.Security apple_sdk.SystemConfiguration xcodebuild
   ] ++ lib.optionals (!stdenv.isDarwin) [
-    dbeaver chromium firefox gitter intellij patchelf
+    chromium firefox gitter intellij
   ];
   shellHook = ''
     export JAVA_HOME="${pkgs.jdk}"
