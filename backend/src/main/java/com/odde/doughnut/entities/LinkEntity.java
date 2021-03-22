@@ -70,7 +70,7 @@ public class LinkEntity {
     @Column(name = "created_at")
     @Getter
     @Setter
-    private Timestamp createAt;
+    private Timestamp createAt = new Timestamp(System.currentTimeMillis());
 
     public String getQuizDescription() {
         return "`" + getSourceNote().getTitle() + "` " + getType() + ":";

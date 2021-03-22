@@ -122,7 +122,7 @@ public class NoteEntity {
   @Column(name = "updated_datetime")
   @Getter
   @Setter
-  private Date updatedDatetime;
+  private Date updatedDatetime = new Date();
 
   @OneToMany(mappedBy = "sourceNote", cascade = CascadeType.ALL,
              orphanRemoval = true)

@@ -48,17 +48,17 @@ public class ReviewPointEntity {
   @Column(name = "last_reviewed_at")
   @Getter
   @Setter
-  private Timestamp lastReviewedAt = new Timestamp(71, 0, 0, 0, 0, 0, 0);
+  private Timestamp lastReviewedAt = new Timestamp(System.currentTimeMillis());
 
   @Column(name = "next_review_at")
   @Getter
   @Setter
-  private Timestamp nextReviewAt = new Timestamp(71, 0, 0, 0, 0, 0, 0);
+  private Timestamp nextReviewAt = new Timestamp(System.currentTimeMillis());
 
   @Column(name = "initial_reviewed_at")
   @Getter
   @Setter
-  private Timestamp initialReviewedAt = new Timestamp(71, 0, 0, 0, 0, 0, 0);
+  private Timestamp initialReviewedAt = new Timestamp(System.currentTimeMillis());
 
   @Column(name = "forgetting_curve_index")
   @Getter
