@@ -85,7 +85,9 @@ class TestabilityRestController {
     public String linkNotes(@RequestBody HashMap<String, String> userInfo) {
         LinkEntity linkEntity = new LinkEntity();
         linkEntity.setTargetNote(noteRepository.findById(Integer.valueOf(userInfo.get("target_id"))).get());
-        linkEntity.setSourceNote(noteRepository.findById(Integer.valueOf(userInfo.get("source_id"))).get());
+        NoteEntity sourceNote = noteRepository.findById(Integer.valueOf(userInfo.get("source_id"))).get();
+        linkEntity.setSourceNote(sourceNote);
+        linkEntity.setUserEntity(sourceNote.getUserEntity());
         linkEntity.setType(userInfo.get("type"));
         linkRepository.save(linkEntity);
         return "OK";

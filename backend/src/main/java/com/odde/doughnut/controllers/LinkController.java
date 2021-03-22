@@ -56,6 +56,7 @@ public class LinkController {
             return "links/link_choose_type";
         }
         currentUserFetcher.getUser().assertAuthorization(linkEntity.getSourceNote());
+        linkEntity.setUserEntity(currentUserFetcher.getUser().getEntity());
         modelFactoryService.linkRepository.save(linkEntity);
         return "redirect:/notes/" + linkEntity.getSourceNote().getId();
     }

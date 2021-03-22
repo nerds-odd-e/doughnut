@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
 
@@ -61,6 +62,15 @@ public class LinkEntity {
     @Getter
     @Setter
     private String type;
+
+    @ManyToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @Getter @Setter private UserEntity userEntity;
+
+    @Column(name = "created_at")
+    @Getter
+    @Setter
+    private Timestamp createAt;
 
     public String getQuizDescription() {
         return "`" + getSourceNote().getTitle() + "` " + getType() + ":";

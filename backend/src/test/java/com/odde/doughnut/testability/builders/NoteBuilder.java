@@ -48,6 +48,7 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
         linkEntity.setTargetNote(referTo);
         linkEntity.setSourceNote(entity);
         linkEntity.setType(linkType.label);
+        linkEntity.setUserEntity(entity.getUserEntity());
         entity.getLinks().add(linkEntity);
         referTo.getRefers().add(linkEntity);
         return this;
