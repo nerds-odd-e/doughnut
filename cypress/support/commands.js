@@ -50,6 +50,16 @@ Cypress.Commands.add("seedNotes", (notes, externalIdentifier='') => {
   })
 })
 
+Cypress.Commands.add("createLink", (type, fromNoteTitle, toNoteTitle) => {
+  cy.get('@seededNoteIdMap').then(seededNoteIdMap=>
+      cy.request({
+        method: "POST",
+        url: "/api/testability/link_notes",
+        body: {type, source_id: seededNoteIdMap[fromNoteTitle], target_id: seededNoteIdMap[toNoteTitle]}
+      }).its("body").should("contain", "OK")
+  )
+});
+
 Cypress.Commands.add("submitNoteFormWith", (notes) => {
   notes.forEach((elem) => {
     for (var propName in elem) {

@@ -11,11 +11,15 @@ When("I am creating link for note {string}", (noteTitle) => {
     cy.creatingLinkFor(noteTitle);
 });
 
-When("I link note {string} as {string} note {string}", (fromNoteTitle, relation, toNoteTitle) => {
+When("I link note {string} as {string} note {string}", (fromNoteTitle, linkType, toNoteTitle) => {
     cy.creatingLinkFor(fromNoteTitle);
     cy.clickButtonOnCardBody(toNoteTitle, "Select");
-    cy.get('select').select(relation);
+    cy.get('select').select(linkType);
     cy.findByRole('button', {name: "Link"}).click();
+})
+
+When("there is {string} link between note {string} and {string}", (linkType, fromNoteTitle, toNoteTitle) => {
+    cy.createLink(linkType, fromNoteTitle, toNoteTitle);
 })
 
 And("I should see the source note as {string}",(noteTitle) => {
@@ -31,8 +35,8 @@ And("I should see {string} as targets only",(noteTitlesAsString) => {
     cy.expectExactLinkTargets(noteTitlesAsString.commonSenseSplit(",").map(i=>i.trim()));
 })
 
-Then("I should see {string} has link {string} {string}",(noteTitle, relation, targetNoteTitles) => {
-    cy.findByText(relation).should('be.visible');
+Then("I should see {string} has link {string} {string}",(noteTitle, linkType, targetNoteTitles) => {
+    cy.findByText(linkType).should('be.visible');
     targetNoteTitles.commonSenseSplit(",").forEach(
         targetNoteTitle => cy.findByText(targetNoteTitle).should('be.visible')
     );

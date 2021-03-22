@@ -3,8 +3,10 @@ package com.odde.doughnut.testability;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcherFromRequest;
 import com.odde.doughnut.entities.CircleEntity;
+import com.odde.doughnut.entities.LinkEntity;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.UserEntity;
+import com.odde.doughnut.entities.repositories.LinkRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
 import com.odde.doughnut.models.CircleModel;
@@ -37,6 +39,8 @@ class TestabilityRestController {
     EntityManagerFactory emf;
     @Autowired
     NoteRepository noteRepository;
+    @Autowired
+    LinkRepository linkRepository;
     @Autowired
     UserRepository userRepository;
     @Autowired
@@ -74,6 +78,17 @@ class TestabilityRestController {
         }
         noteRepository.saveAll(notes);
         return notes.stream().map(NoteEntity::getId).collect(Collectors.toList());
+    }
+
+    @PostMapping("/link_notes")
+    @Transactional
+    public String linkNotes(@RequestBody HashMap<String, String> userInfo) {
+        LinkEntity linkEntity = new LinkEntity();
+        linkEntity.setTargetNote(noteRepository.findById(Integer.valueOf(userInfo.get("target_id"))).get());
+        linkEntity.setSourceNote(noteRepository.findById(Integer.valueOf(userInfo.get("source_id"))).get());
+        linkEntity.setType(userInfo.get("type"));
+        linkRepository.save(linkEntity);
+        return "OK";
     }
 
     private UserModel getUserModelByExternalIdentifierOrCurrentUser(String externalIdentifier) {

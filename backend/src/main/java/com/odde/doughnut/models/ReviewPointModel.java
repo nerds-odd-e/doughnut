@@ -51,13 +51,14 @@ public class ReviewPointModel extends ModelForEntity<ReviewPointEntity> {
     }
 
     public QuizQuestion generateAQuizQuestion(Randomizer randomizer) {
-        if (Strings.isEmpty(entity.getNoteEntity().getDescription())) {
-            return null;
-        }
         QuizQuestionGenerator quizQuestionGenerator = new QuizQuestionGenerator(entity, randomizer);
 
         QuizQuestion quizQuestion = new QuizQuestion(entity, randomizer, modelFactoryService);
-        quizQuestion.setQuestionType(quizQuestionGenerator.generateQuestionType());
+        QuizQuestion.QuestionType questionType = quizQuestionGenerator.generateQuestionType();
+        if (questionType == null) {
+            return null;
+        }
+        quizQuestion.setQuestionType(questionType);
 
         return quizQuestion;
     }

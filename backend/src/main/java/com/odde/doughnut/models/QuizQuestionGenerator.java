@@ -5,6 +5,7 @@ import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.entities.ReviewSettingEntity;
 import com.odde.doughnut.services.ModelFactoryService;
+import org.apache.logging.log4j.util.Strings;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -22,6 +23,9 @@ public class QuizQuestionGenerator {
     }
 
     public QuizQuestion.QuestionType generateQuestionType() {
+        if (noteEntity == null || Strings.isEmpty(noteEntity.getDescription())) {
+            return null;
+        }
         ReviewSettingEntity reviewSettingEntity = noteEntity.getMasterReviewSettingEntity();
         List<QuizQuestion.QuestionType> questionTypes = new ArrayList<>();
         if(reviewSettingEntity != null && reviewSettingEntity.getRememberSpelling()) {

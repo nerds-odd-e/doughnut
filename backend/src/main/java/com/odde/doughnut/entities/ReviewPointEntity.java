@@ -95,6 +95,11 @@ public class ReviewPointEntity {
         return userLocalDateTime.getYear() * 366 + userLocalDateTime.getDayOfYear();
     }
 
+    public NoteEntity getSourceNote() {
+        if (linkEntity != null) return linkEntity.getSourceNote();
+        return noteEntity;
+    }
+
 }
 
 
