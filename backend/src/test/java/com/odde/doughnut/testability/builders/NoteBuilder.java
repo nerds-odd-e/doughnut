@@ -10,6 +10,7 @@ import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 
 import java.beans.BeanProperty;
+import java.sql.Timestamp;
 import java.time.LocalDate;
 
 public class NoteBuilder extends EntityBuilder<NoteEntity> {
@@ -19,7 +20,7 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
         super(makeMe, noteEntity);
         entity.setTitle(titleCounter.generate());
         entity.setDescription("descrption");
-        entity.setUpdatedDatetime(java.sql.Date.valueOf(LocalDate.now()));
+        entity.setUpdatedDatetime(new Timestamp(System.currentTimeMillis()));
     }
 
     public NoteBuilder byUser(UserEntity userEntity) {

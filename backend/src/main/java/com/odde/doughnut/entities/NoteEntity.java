@@ -4,6 +4,8 @@ import static java.util.stream.Collectors.toList;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.algorithms.ClozeDescription;
+
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -117,12 +119,12 @@ public class NoteEntity {
   @Column(name = "created_datetime")
   @Getter
   @Setter
-  private Date createdDatetime = new Date();
+  private Timestamp createdDatetime = new Timestamp(System.currentTimeMillis());
 
   @Column(name = "updated_datetime")
   @Getter
   @Setter
-  private Date updatedDatetime = new Date();
+  private Timestamp updatedDatetime = new Timestamp(System.currentTimeMillis());
 
   @OneToMany(mappedBy = "sourceNote", cascade = CascadeType.ALL,
              orphanRemoval = true)

@@ -48,6 +48,15 @@ public class Reviewing {
             return reviewPointEntity2;
         }
 
+        if (reviewPointEntity2 == null) {
+            return reviewPointEntity1;
+        }
+
+        if(reviewPointEntity1.getNoteEntity().getCreatedDatetime().compareTo(reviewPointEntity2.getLinkEntity().getCreateAt()) > 0) {
+            return reviewPointEntity2;
+        }
+
+
         return reviewPointEntity1;
     }
 
