@@ -23,7 +23,7 @@ in mkShell {
     most progress ps pstree ripgrep tree vgrep which
     libmysqlclient libpcap libressl
     cacert curlie glances httpie
-    mysql57 mysql-client mysql_jdbc python38Packages.pip
+    mysql80 mysql-client mysql_jdbc python38Packages.pip
     chromedriver geckodriver google-cloud-sdk packer
     vim vimpager vscodium
   ] ++ lib.optionals stdenv.isDarwin [
@@ -39,11 +39,12 @@ in mkShell {
   shellHook = ''
     export JAVA_HOME="${pkgs.jdk}"
     export PATH=$PATH:$JAVA_HOME/bin
-    export MYSQL_BASEDIR=${pkgs.mysql57}
+    export MYSQL_BASEDIR=${pkgs.mysql80}
     export MYSQL_HOME="''${MYSQL_HOME:-''$PWD/mysql}"
     export MYSQL_DATADIR="''${MYSQL_DATADIR:-''$MYSQL_HOME/data}"
 
     export MYSQL_UNIX_PORT=$MYSQL_HOME/mysql.sock
+    export MYSQLX_UNIX_PORT=$MYSQL_HOME/mysqlx.sock
     export MYSQL_PID_FILE=$MYSQL_HOME/mysql.pid
 
     echo "#######################################################################"
@@ -54,7 +55,7 @@ in mkShell {
     mkdir -p $MYSQL_DATADIR
     
     mysqld --initialize-insecure --user=`whoami` --datadir=$MYSQL_DATADIR --basedir=$MYSQL_BASEDIR --explicit_defaults_for_timestamp
-    mysqld --datadir=$MYSQL_DATADIR --pid-file=$MYSQL_PID_FILE --socket=$MYSQL_UNIX_PORT &
+    mysqld --datadir=$MYSQL_DATADIR --pid-file=$MYSQL_PID_FILE --socket=$MYSQL_UNIX_PORT --mysqlx-socket=$MYSQLX_UNIX_PORT &
     export MYSQL_PID=$!
 
 cat <<EOF > $MYSQL_HOME/init_doughnut_db.sql

@@ -22,7 +22,7 @@ For more background info you can read:
 - [JavaScript](https://www.javascript.com)
 - [Cucumber](https://cucumber.io/docs/guides/)
 - [Flyway](https://flywaydb.org)
-- [MySQL 5.7](https://dev.mysql.com/doc/refman/5.7/en/)
+- [MySQL 8.0](https://dev.mysql.com/doc/refman/8.0/en/)
 - [Google Cloud](https://cloud.google.com/gcp/getting-started)
 - [Traefik](https://traefik.io/)
 - [Github Actions](https://docs.github.com/en/actions)
@@ -196,22 +196,26 @@ git secret killperson <user_to_be_removed_email>@odd-e.com
 - Check you can see the project as login user: `gcloud config list`
 
 ### 6. View doughnut app instance startup logs
+
 ```
 infra/scripts/view-doughnut-app-instance-logs.sh
 ```
 
 ### 7. Shutdown running gcloud compute instance VMs (does not include Google Cloud SQL)
+
 ```
 infra/scripts/stop-gcloud-doughnut-compute-instances.sh
 ```
 
 ### 8. Build/Refresh base image used to spawn doughnut app compute instance VM
+
 ```
 cd infra
 PACKER_LOGS=1 packer build packer.json`
 ```
 
 ### 9. Check gcloud compute instance startup logs
+
 ```
 gcloud compute instances get-serial-port-output doughnut-app-instance --zone us-east1-b
 ```

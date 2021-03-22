@@ -18,15 +18,15 @@ chmod 640 -R /etc/ssl/private/*
 
 cat <<'EOF' > /etc/apt/sources.list.d/mysql.list
 deb http://repo.mysql.com/apt/debian/ buster mysql-apt-config
-deb http://repo.mysql.com/apt/debian/ buster mysql-5.7
+deb http://repo.mysql.com/apt/debian/ buster mysql-8.0
 deb http://repo.mysql.com/apt/debian/ buster mysql-tools
-deb-src http://repo.mysql.com/apt/debian/ buster mysql-5.7
+deb-src http://repo.mysql.com/apt/debian/ buster mysql-8.0
 EOF
 
 # Install dependencies
 apt-key adv --keyserver hkp://pool.sks-keyservers.net:80 --recv-keys 8C718D3B5072E1F5
 apt-get -y update && apt-get upgrade && apt-get dist-upgrade
-apt-get -y install jq openjdk-11-jre gnupg gnupg-agent libmysqlclient20 mysql-community-client ca-certificates openssl readline-common
+apt-get -y install jq openjdk-11-jre gnupg gnupg-agent libmysqlclient21 mysql-community-client ca-certificates openssl readline-common
 apt-get -y autoremove
 
 # Make Java 11 default
