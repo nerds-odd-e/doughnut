@@ -14,7 +14,9 @@ public class ReviewPointModel extends ModelForEntity<ReviewPointEntity> {
     }
 
     public void initialReview(UserModel userModel, ReviewSettingEntity reviewSettingEntity, Timestamp currentUTCTimestamp) {
-        getNoteModel().setAndSaveMasterReviewSetting(reviewSettingEntity);
+        if (getNoteModel() != null) {
+            getNoteModel().setAndSaveMasterReviewSetting(reviewSettingEntity);
+        }
         entity.setUserEntity(userModel.getEntity());
         entity.setInitialReviewedAt(currentUTCTimestamp);
         repeat(currentUTCTimestamp);

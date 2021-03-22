@@ -33,6 +33,9 @@ public class ModelFactoryService {
     }
 
     public NoteContentModel toNoteModel(NoteEntity note) {
+        if(note == null) {
+            return null;
+        }
         return new NoteContentModel(note, this);
     }
 

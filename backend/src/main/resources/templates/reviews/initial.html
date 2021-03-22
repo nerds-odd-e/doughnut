@@ -1,15 +1,36 @@
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
 <layout th:replace="_fragments/basic_layout :: application_layout(~{ :: .content})">
     <div class="container content">
-        <h2 class="display-5">Review your notes</h2>
+        <h2 class="display-5">Initial Review</h2>
 
-        <div th:replace="_fragments/note_fragments :: noteOwnerBreadcrumb(${reviewPointEntity.noteEntity}, ~{})"/>
-        <div th:replace="_fragments/note_fragments :: noteShow(${reviewPointEntity.noteEntity}, 1)"/>
+        <div th:if="${reviewPointEntity.noteEntity}">
+            <div th:replace="_fragments/note_fragments :: noteOwnerBreadcrumb(${reviewPointEntity.noteEntity}, ~{})"/>
+            <div th:replace="_fragments/note_fragments :: noteShow(${reviewPointEntity.noteEntity}, 1)"/>
+        </div>
+
+        <div th:if="${reviewPointEntity.linkEntity}">
+            <div class="row">
+                <div class="col-12 col-md-4">
+                    <div th:replace="_fragments/note_fragments :: noteOwnerBreadcrumb(${reviewPointEntity.linkEntity.sourceNote}, ~{})"/>
+                    <div th:replace="_fragments/note_fragments :: noteShow(${reviewPointEntity.linkEntity.sourceNote}, 1)"/>
+                </div>
+                <div class="col-12 col-md-4 text-center">
+                    <span class="badge badge-warning mr-1" th:text="${reviewPointEntity.linkEntity.type}"/>
+                </div>
+                <div class="col-12 col-md-4">
+                    <div th:replace="_fragments/note_fragments :: noteOwnerBreadcrumb(${reviewPointEntity.linkEntity.targetNote}, ~{})"/>
+                    <div th:replace="_fragments/note_fragments :: noteShow(${reviewPointEntity.linkEntity.targetNote}, 1)"/>
+                </div>
+            </div>
+        </div>
 
         <form id="review-setting" ction="#" th:action="@{/reviews/}" th:object="${reviewPointEntity}" method="post">
             <input th:field="*{noteEntity}" type="hidden"/>
-            <div th:replace="_fragments/note_fragments :: reviewSettingForm(${reviewSettingEntity})"/>
+            <input th:field="*{linkEntity}" type="hidden"/>
+            <div th:if="${reviewSettingEntity}">
+                <div th:replace="_fragments/note_fragments :: reviewSettingForm(${reviewSettingEntity})"/>
+            </div>
             <input type="submit" value="Next" class="btn btn-primary"/>
-        </div>
+        </form>
     </div>
 </layout>

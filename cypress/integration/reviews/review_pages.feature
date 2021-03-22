@@ -8,6 +8,7 @@ Feature: Review Pages
             | Sedition   | Incite violence   |                    |
             | Sedation   | Put to sleep      |                    |
             | Sedative   | Sleep medicine    | a_slide.jpg        |
+        And I link note "Sedition" as "is similar to" note "Sedation"
 
     Scenario: Different review pages for different notes
         * I do these initial reviews in sequence:
@@ -15,6 +16,7 @@ Feature: Review Pages
             | single note   | Sedition   |   Incite violence             |
             | single note   | Sedation   |   Put to sleep                |
             | picture note  | Sedative   |   Sleep medicine; a_slide.jpg |
+            | link          | Sedition   |   is similar to; Sedation     |
             | initial done  |            |                               |
 
     Scenario: Index page

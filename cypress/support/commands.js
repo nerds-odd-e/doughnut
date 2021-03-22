@@ -155,6 +155,16 @@ Cypress.Commands.add("initialReviewOneNoteIfThereIs", ({review_type, title, addi
             break;
         }
 
+        case  "link": {
+            if(additional_info) {
+                const [linkType, targetNote] = additional_info.commonSenseSplit("; ")
+                cy.get(".h1").contains(title);
+                cy.get(".h1").contains(targetNote);
+                cy.get(".badge").contains(linkType);
+            }
+            break;
+        }
+
         default:
             expect(review_type).equal("a known review page type");
         }

@@ -107,6 +107,9 @@ public class Reviewing {
     }
 
     public ReviewSettingEntity getReviewSettingEntity(NoteEntity noteEntity) {
+        if(noteEntity == null) {
+            return null;
+        }
         ReviewSettingEntity reviewSettingEntity = noteEntity.getMasterReviewSettingEntity();
         if (reviewSettingEntity == null) {
             reviewSettingEntity = new ReviewSettingEntity();
