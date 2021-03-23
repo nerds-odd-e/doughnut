@@ -123,7 +123,7 @@ public class NoteEntityTest {
         class Related {
             @BeforeEach
             void setup() {
-                makeMe.theNote(noteEntityA).linkTo(noteEntityB, RELATED_TO).please();
+                makeMe.theNote(noteEntityA).linkTo(noteEntityB, RELATED_TO, null).please();
             }
 
 
@@ -145,7 +145,7 @@ public class NoteEntityTest {
         class BelongsTo {
             @BeforeEach
             void setup() {
-                makeMe.theNote(noteEntityA).linkTo(noteEntityB, BELONGS_TO).please();
+                makeMe.theNote(noteEntityA).linkTo(noteEntityB, BELONGS_TO, null).please();
             }
 
             @Test
@@ -166,7 +166,7 @@ public class NoteEntityTest {
         class Has {
             @BeforeEach
             void setup() {
-                makeMe.theNote(noteEntityA).linkTo(noteEntityB, HAS).please();
+                makeMe.theNote(noteEntityA).linkTo(noteEntityB, HAS, null).please();
             }
 
             @Test

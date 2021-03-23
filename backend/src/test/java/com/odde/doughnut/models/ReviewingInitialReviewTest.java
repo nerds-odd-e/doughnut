@@ -1,5 +1,6 @@
 package com.odde.doughnut.models;
 
+import com.odde.doughnut.entities.LinkEntity;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.testability.MakeMe;
@@ -70,21 +71,31 @@ public class ReviewingInitialReviewTest {
             assertThat(getOneInitialReviewPointEntity(day1).getNoteEntity(), equalTo(note2));
         }
 
-        @Test
-        void shouldReturnReviewPointForLink() {
-            makeMe.theNote(note1).skipReview().linkTo(note2).please();
-            makeMe.theNote(note2).skipReview().please();
-            assertThat(getOneInitialReviewPointEntity(day1).getLinkEntity().getSourceNote(), equalTo(note1));
-            assertThat(getOneInitialReviewPointEntity(day1).getNoteEntity(), is(nullValue()));
-        }
+        @Nested
+        class ReviewPointFromLink {
+            @Test
+            void shouldReturnReviewPointForLink() {
+                makeMe.theNote(note2).skipReview().please();
+                makeMe.theNote(note1).skipReview().linkTo(note2).please();
+                assertThat(getOneInitialReviewPointEntity(day1).getLinkEntity().getSourceNote(), equalTo(note1));
+                assertThat(getOneInitialReviewPointEntity(day1).getNoteEntity(), is(nullValue()));
+            }
 
-        @Test
-        void shouldReturnReviewPointForLinkIfCreatedEarlierThanNote() {
-            makeMe.theNote(note1).skipReview().linkTo(note2).please();
-            makeMe.theNote(note2).skipReview().please();
-            NoteEntity note3 = makeMe.aNote().byUser(userModel).please();
-            assertThat(getOneInitialReviewPointEntity(day1).getLinkEntity().getSourceNote(), equalTo(note1));
-            assertThat(getOneInitialReviewPointEntity(day1).getNoteEntity(), is(nullValue()));
+            @Test
+            void shouldReturnReviewPointForLinkIfCreatedEarlierThanNote() {
+                makeMe.theNote(note2).skipReview().please();
+                makeMe.theNote(note1).skipReview().linkTo(note2).please();
+                NoteEntity note3 = makeMe.aNote().byUser(userModel).please();
+                assertThat(getOneInitialReviewPointEntity(day1).getLinkEntity().getSourceNote(), equalTo(note1));
+                assertThat(getOneInitialReviewPointEntity(day1).getNoteEntity(), is(nullValue()));
+            }
+
+            @Test
+            void shouldNotReturnReviewPointForLinkIfCreatedByOtherPeople() {
+                makeMe.theNote(note2).skipReview().please();
+                makeMe.theNote(note1).skipReview().linkTo(note2, LinkEntity.LinkType.BELONGS_TO, makeMe.aUser().please()).please();
+                assertThat(getOneInitialReviewPointEntity(day1), is(nullValue()));
+            }
         }
 
         @Nested

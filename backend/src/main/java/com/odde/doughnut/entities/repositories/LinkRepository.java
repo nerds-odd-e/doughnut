@@ -21,6 +21,7 @@ public interface LinkRepository extends CrudRepository<LinkEntity, Integer> {
             + " ) as rp"
             + " ON link.id = rp.link_id "
             + " WHERE "
+            + "   link.user_id = :userId AND "
             + "   rp.id IS NULL ";
 
 }
