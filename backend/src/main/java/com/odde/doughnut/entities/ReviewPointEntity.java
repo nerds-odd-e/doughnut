@@ -7,6 +7,8 @@ import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import javax.persistence.*;
+import javax.validation.constraints.AssertTrue;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -100,4 +102,15 @@ public class ReviewPointEntity {
       return linkEntity.getSourceNote();
     return noteEntity;
   }
+
+  @AssertTrue(message = "link and note cannot be both empty")
+  private boolean isNotBothLinkAndNoteEmpty() {
+    return noteEntity != null || linkEntity != null;
+  }
+
+  @AssertTrue(message = "cannot have both link and note")
+  private boolean isNotBothLinkAndNoteNotEmpty() {
+    return noteEntity == null || linkEntity == null;
+  }
+
 }
