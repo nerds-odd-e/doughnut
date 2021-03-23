@@ -20,14 +20,14 @@
     </p>
 </div>
 
-<div th:fragment="linkShow(linkEntity)" th:object="${linkEntity}">
+<div th:fragment="linkShow(linkEntity, linkContent)" th:object="${linkEntity}">
     <div class="row">
         <div class="col-12 col-md-4">
             <div th:replace="_fragments/note_fragments :: noteOwnerBreadcrumb(*{sourceNote}, ~{})"/>
             <div th:replace="_fragments/note_fragments :: noteShow(*{sourceNote}, 2)"/>
         </div>
         <div class="col-12 col-md-4 text-center">
-            <span class="badge badge-warning mr-1" th:text="*{type}"/>
+            <div th:replace="${linkContent}"/>
         </div>
         <div class="col-12 col-md-4">
             <div th:replace="_fragments/note_fragments :: noteOwnerBreadcrumb(*{targetNote}, ~{})"/>

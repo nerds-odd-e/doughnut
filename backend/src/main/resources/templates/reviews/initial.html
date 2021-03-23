@@ -9,7 +9,9 @@
         </div>
 
         <div th:if="${reviewPointEntity.linkEntity}">
-            <div th:replace="_fragments/link_fragments :: linkShow(${reviewPointEntity.linkEntity})"/>
+            <div th:replace="_fragments/link_fragments :: linkShow(${reviewPointEntity.linkEntity}, ~{:: .link-content})">
+                <span class="link-content badge badge-warning mr-1" th:text="*{type}"/>
+            </div>
         </div>
 
         <form id="review-setting" ction="#" th:action="@{/reviews/}" th:object="${reviewPointEntity}" method="post">

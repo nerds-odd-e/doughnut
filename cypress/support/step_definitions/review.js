@@ -147,9 +147,3 @@ Then("I am changing note {string}'s review setting", (noteTitle) => {
   );
 });
 
-Then("I should be able to change the link to {string}", (linkType) => {
-});
-
-Then("I should be able to delete the link", () => {
-});
-

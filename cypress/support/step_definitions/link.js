@@ -46,3 +46,11 @@ When("I open link {string}", (linkTitle) => {
     cy.findByText(linkTitle).click();
 })
 
+Then("I should be able to change the link to {string}", (linkType) => {
+    cy.get('select').select(linkType);
+    cy.findByRole('button', {name: "Update"}).click();
+});
+
+Then("I should be able to delete the link", () => {
+});
+

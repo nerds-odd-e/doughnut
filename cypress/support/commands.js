@@ -168,8 +168,8 @@ Cypress.Commands.add("initialReviewOneNoteIfThereIs", ({review_type, title, addi
         case  "link": {
             if(additional_info) {
                 const [linkType, targetNote] = additional_info.commonSenseSplit("; ")
-                cy.get(".h1").contains(title);
-                cy.get(".h1").contains(targetNote);
+                cy.get(".h2").contains(title);
+                cy.get(".h2").contains(targetNote);
                 cy.get(".badge").contains(linkType);
             }
             break;
