@@ -10,7 +10,10 @@
                     </select>
                     <input type="submit" value="Update" class="btn btn-primary"/>
                 </form>
-
+                <form action="#" th:action="@{/links/{id}/delete(id=${linkEntity.id})}" th:object="${linkEntity}" method="post"
+                      onsubmit="return confirm('Are you sure to delete this link?')">
+                    <input type="submit" value="Delete" class="btn btn-danger"/>
+                </form>
             </div>
         </div>
 </layout>

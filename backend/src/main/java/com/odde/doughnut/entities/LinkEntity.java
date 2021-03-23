@@ -51,11 +51,11 @@ public class LinkEntity {
     @Getter
     @GeneratedValue(strategy = GenerationType.IDENTITY) private Integer id;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "source_id", referencedColumnName = "id")
     @Getter @Setter private NoteEntity sourceNote;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "target_id", referencedColumnName = "id")
     @Getter @Setter private NoteEntity targetNote;
 
@@ -64,7 +64,7 @@ public class LinkEntity {
     @Setter
     private String type;
 
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @Getter @Setter private UserEntity userEntity;
 

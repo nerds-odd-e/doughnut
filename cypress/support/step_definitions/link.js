@@ -49,8 +49,12 @@ When("I open link {string}", (linkTitle) => {
 Then("I should be able to change the link to {string}", (linkType) => {
     cy.get('select').select(linkType);
     cy.findByRole('button', {name: "Update"}).click();
+    cy.findByText(linkType).should('be.visible');
 });
 
-Then("I should be able to delete the link", () => {
+Then("I should be able to delete the link to note {string}", (noteTitle) => {
+    cy.findByText(noteTitle).click();
+    cy.findByRole('button', {name: "Delete"}).click();
+    cy.contains(noteTitle).should('not.exist')
 });
 

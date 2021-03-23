@@ -66,4 +66,22 @@ public class LinkController {
         modelFactoryService.linkRepository.save(linkEntity);
         return "redirect:/notes/" + linkEntity.getSourceNote().getId();
     }
+
+    @PostMapping(value = "/{linkEntity}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public String updateLink(@Valid LinkEntity linkEntity, BindingResult bindingResult) throws NoAccessRightException {
+        if (bindingResult.hasErrors()) {
+            return "links/show";
+        }
+        currentUserFetcher.getUser().assertAuthorization(linkEntity.getSourceNote());
+        modelFactoryService.linkRepository.save(linkEntity);
+        return "redirect:/notes/" + linkEntity.getSourceNote().getId();
+    }
+
+    @PostMapping(value = "/{linkEntity}/delete", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public String deleteLink(@Valid LinkEntity linkEntity) throws NoAccessRightException {
+        currentUserFetcher.getUser().assertAuthorization(linkEntity.getSourceNote());
+        modelFactoryService.linkRepository.delete(linkEntity);
+        return "redirect:/notes/" + linkEntity.getSourceNote().getId();
+    }
+
 }
