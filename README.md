@@ -78,6 +78,12 @@ any-nix-shell zsh --info-right | source /dev/stdin
 The default spring profile is 'test' unless you explicitly set it to 'dev'. Tip: Add `--Dspring.profiles.active=${profile}"` to gradle task command.
 MySQL DB server is started and initialised on entering the `nix-shell`.
 
+Update/refresh your installed nix state and version
+
+```bash
+nix-channel --update; nix-env -iA nixpkgs.nix && nix-env -u --always
+```
+
 Clone and launch local development environment
 
 ```bash
@@ -87,7 +93,7 @@ nix-shell --pure
 # OR `nix-shell --pure --command "zsh"` if you want to drop down to zsh in nix-shell (uses your OS' ~/.zshrc)
 gradle wrapper --distribution-type all
 backend/gradlew -p backend bootRunDev"
-# open localhost:8080 in your browser
+open http://localhost:8081
 ```
 
 #### IntelliJ IDEA (Community) IDE project import
