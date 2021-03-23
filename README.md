@@ -242,18 +242,41 @@ We use cucumber + cypress + Java library to do end to end test.
 | feature files    | `/cypress/integration/**`           |
 | step definitions | `/cypress/support/step_definitions` |
 
-#### How to
+#### How-to
 
 The Cypress+Cucumber tests are written in JavaScript.
 
 - [Cucumber](https://cucumber.io/)
 - [cypress-cucumber-preprocessor](https://github.com/TheBrainFamily/cypress-cucumber-preprocessor)
 
-### 11. [Product Backlog](https://docs.google.com/spreadsheets/d/1_GofvpnV1tjy2F_aaoOiYTZUOO-8t_qf3twIKMQyGV4/edit?ts=600e6711&pli=1#gid=0)
+### 11, Building/refreshing doughnut-app-instance VM base image with Packer + GoogleCompute builder
+
+We use packer + googlecompute builder + shell provisioner to construct and materialise base VM image to speed up deployment and control our OS patches and dependent packages and libraries upgrades
+
+- [Packer](https://www.packer.io)
+- [googlecompute](https://www.packer.io/docs/builders/googlecompute)
+
+#### How-to
+
+From `infra` directory, run the following:
+
+Login to dough GCP project account with `gcloud auth login`
+Configure gcloud CLI to project ID with `gcloud config set project carbon-syntax-298809`
+
+```bash
+export GCLOUDSDK_CORE_PROJECT="$(gcloud config get-value project)"
+export GOOGLE_APPLICATION_CREDENTIALS=$(pwd)/carbon-syntax-298809-f31377ba77a9.json
+PACKER_LOG=1 packer build packer.json
+```
+
+Expect to see following log line towards end of Packer build stdout log:
+`--> googlecompute: A disk image was created: doughnut-debian10-mysql80-base`
+
+### 12. [Product Backlog](https://docs.google.com/spreadsheets/d/1_GofvpnV1tjy2F_aaoOiYTZUOO-8t_qf3twIKMQyGV4/edit?ts=600e6711&pli=1#gid=0)
 
 [Story Map](https://miro.com/app/board/o9J_lTB77Mc=/)
 
-### 12. How to Contribute
+### 13. How to Contribute
 
 - We welcome product ideas and code contribution.
 - Collaborate over:
