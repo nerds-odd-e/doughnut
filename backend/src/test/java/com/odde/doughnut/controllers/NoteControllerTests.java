@@ -172,20 +172,6 @@ class NoteControllerTests {
         }
 
         @Test
-        void shouldDeleteTheLinkToAndFromThisNote() throws NoAccessRightException {
-            NoteEntity referTo = makeMe.aNote().byUser(userModel).please();
-            NoteEntity subject = makeMe.aNote().byUser(userModel).linkTo(referTo).please();
-            NoteEntity referFrom = makeMe.aNote().byUser(userModel).linkTo(subject).linkTo(referTo).please();
-            long oldCount = linkRepository.count();
-
-            controller.deleteNote(subject);
-
-//            assertTrue(modelFactoryService.findNoteById(referFrom.getId()).isPresent());
-            assertFalse(modelFactoryService.findNoteById(referTo.getId()).isPresent());
-//            assertThat(linkRepository.count(), equalTo(oldCount - 2));
-        }
-
-        @Test
         void shouldDeleteTheReviewPoints() throws NoAccessRightException {
             NoteEntity subject = makeMe.aNote().byUser(userModel).please();
             NoteEntity child = makeMe.aNote().byUser(userModel).under(subject).please();
