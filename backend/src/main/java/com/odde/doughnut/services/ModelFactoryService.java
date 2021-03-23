@@ -95,4 +95,8 @@ public class ModelFactoryService {
     public AnswerModel toAnswerModel(AnswerEntity answerEntity) {
         return new AnswerModel(answerEntity, this);
     }
+
+    public LinkModel toLinkModel(LinkEntity linkEntity) {
+        return new LinkModel(linkEntity, this);
+    }
 }

@@ -26,3 +26,9 @@ Feature: Repetition Link Quiz
         | Mars     | "Mars" is wrong      |
         | Earth    | is correct           |
 
+    Scenario: Delete link with review record
+        Given I do these initial reviews in sequence:
+            | review_type   | title      |
+            | link          | Moon       |
+        When I open "Space/Moon" note from top level
+        Then I should be able to delete the link to note "Earth"

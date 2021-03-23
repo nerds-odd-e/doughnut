@@ -1,10 +1,12 @@
 package com.odde.doughnut.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -72,6 +74,11 @@ public class LinkEntity {
     @Getter
     @Setter
     private Timestamp createAt = new Timestamp(System.currentTimeMillis());
+
+    @OneToMany(mappedBy = "linkEntity", cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    @JsonIgnore
+    private final List<ReviewPointEntity> reviewPointEntities = new ArrayList<>();
 
     public String getQuizDescription() {
         return "`" + getSourceNote().getTitle() + "` " + getType() + ":";
