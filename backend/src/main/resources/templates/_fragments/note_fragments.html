@@ -1,4 +1,5 @@
 <a th:fragment="noteTitleWithLink(note)" th:href="'/notes/' + ${note.id}" th:text="${note.title}"/>
+<a th:fragment="linkWithHtmlLink(link, note)" th:href="'/links/' + ${link.id}" th:text="${note.title}"/>
 
 <div th:fragment="noteBreadcrumb(topLink, untilNote, additional)" th:with="linkFragment=${linkFragment} ?: ':: noteTitleWithLink'">
     <ol class="breadcrumb">
@@ -107,9 +108,12 @@
         <img class="img-fluid" th:src="*{picture}"/>
     </p>
     <p th:each="linkType:${noteEntity.linkTypes()}">
-        <span th:text="${linkType}"/>
-        <span class="badge badge-warning mr-1" th:each="note:${noteEntity.linksOfType(linkType)}">
-            <span th:replace=":: noteTitleWithLink(${note})"/>
+        <span th:text="${linkType.label}"/>
+        <span class="badge badge-warning mr-1" th:each="link:${noteEntity.linksOfTypeThroughDirect(linkType)}">
+            <span th:replace=":: linkWithHtmlLink(${link}, ${link.targetNote})"/>
+        </span>
+        <span class="badge badge-info mr-1" th:each="link:${noteEntity.linksOfTypeThroughReverse(linkType)}">
+            <span th:replace=":: linkWithHtmlLink(${link}, ${link.sourceNote})"/>
         </span>
     </p>
 </div>

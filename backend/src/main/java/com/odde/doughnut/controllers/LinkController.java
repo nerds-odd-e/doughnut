@@ -32,6 +32,12 @@ public class LinkController {
         this.modelFactoryService = modelFactoryService;
     }
 
+    @GetMapping("/{linkEntity}")
+    public String show( @PathVariable("linkEntity") LinkEntity linkEntity, Model model) throws NoAccessRightException {
+        currentUserFetcher.getUser().assertAuthorization(linkEntity);
+        return "links/show";
+    }
+
     @GetMapping("/{noteEntity}/link")
     public String link( @PathVariable("noteEntity") NoteEntity noteEntity, @RequestParam(required = false) String searchTerm, Model model) {
         List<NoteEntity> linkableNotes = currentUserFetcher.getUser().filterLinkableNotes(noteEntity, searchTerm);

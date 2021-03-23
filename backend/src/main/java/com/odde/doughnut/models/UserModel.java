@@ -55,6 +55,13 @@ public class UserModel extends ModelForEntity<UserEntity> {
             throw new NoAccessRightException();
         }
     }
+
+    public void assertAuthorization(LinkEntity linkEntity) throws NoAccessRightException {
+        if(linkEntity.getUserEntity().getId() != entity.getId()) {
+            throw new NoAccessRightException();
+        }
+    }
+
     public boolean inCircle(CircleEntity circleEntity) {
         return circleEntity.getMembers().contains(entity);
     }
@@ -129,4 +136,5 @@ public class UserModel extends ModelForEntity<UserEntity> {
     public Reviewing createReviewing(Timestamp currentUTCTimestamp) {
         return new Reviewing(this, currentUTCTimestamp, modelFactoryService);
     }
+
 }

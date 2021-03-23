@@ -42,3 +42,7 @@ Then("I should see {string} has link {string} {string}",(noteTitle, linkType, ta
     );
 })
 
+When("I open link {string}", (linkTitle) => {
+    cy.findByText(linkTitle).click();
+})
+

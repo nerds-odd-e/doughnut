@@ -1,0 +1,38 @@
+<div th:fragment="noteShow(noteEntity, level)" th:object="${noteEntity}">
+    <h2 th:class="'h' + ${level}" id="note-title" th:text="*{title}"/>
+    <pre id="note-description" th:text="*{description}" style="white-space: pre-wrap;"/>
+    <div th:unless="${#strings.isEmpty(noteEntity.url)}">
+        <label th:unless="*{urlIsVideo}">Url:</label>
+        <label th:if="*{urlIsVideo}">Video Url:</label>
+        <a th:href="*{url}" th:text="*{url}"/>
+    </div>
+    <p id="note-picture" class="text-center" th:if="*{picture}">
+        <img class="img-fluid" th:src="*{picture}"/>
+    </p>
+    <p th:each="linkType:${noteEntity.linkTypes()}">
+        <span th:text="${linkType.label}"/>
+        <span class="badge badge-warning mr-1" th:each="link:${noteEntity.linksOfTypeThroughDirect(linkType)}">
+            <span th:replace=":: linkWithHtmlLink(${link}, ${link.targetNote})"/>
+        </span>
+        <span class="badge badge-info mr-1" th:each="link:${noteEntity.linksOfTypeThroughReverse(linkType)}">
+            <span th:replace=":: linkWithHtmlLink(${link}, ${link.sourceNote})"/>
+        </span>
+    </p>
+</div>
+
+<div th:fragment="linkShow(linkEntity)" th:object="${linkEntity}">
+    <div class="row">
+        <div class="col-12 col-md-4">
+            <div th:replace="_fragments/note_fragments :: noteOwnerBreadcrumb(*{sourceNote}, ~{})"/>
+            <div th:replace="_fragments/note_fragments :: noteShow(*{sourceNote}, 2)"/>
+        </div>
+        <div class="col-12 col-md-4 text-center">
+            <span class="badge badge-warning mr-1" th:text="*{type}"/>
+        </div>
+        <div class="col-12 col-md-4">
+            <div th:replace="_fragments/note_fragments :: noteOwnerBreadcrumb(*{targetNote}, ~{})"/>
+            <div th:replace="_fragments/note_fragments :: noteShow(*{targetNote}, 2)"/>
+        </div>
+    </div>
+</div>
+

@@ -48,6 +48,7 @@ public class LinkEntity {
     }
 
     @Id
+    @Getter
     @GeneratedValue(strategy = GenerationType.IDENTITY) private Integer id;
 
     @ManyToOne(cascade = CascadeType.ALL)

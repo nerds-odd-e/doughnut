@@ -146,31 +146,28 @@ public class NoteEntity {
     return links.stream().map(LinkEntity::getTargetNote).collect(toList());
   }
 
-  public List<String> linkTypes() {
+  public List<LinkEntity.LinkType> linkTypes() {
     return Arrays.stream(LinkEntity.LinkType.values())
-        .filter(t -> !linksOfType(t.label).isEmpty())
-        .map(t -> t.label)
+        .filter(t -> !linksOfType(t).isEmpty())
         .collect(Collectors.toUnmodifiableList());
   }
 
-  public List<NoteEntity> linksOfType(String type) {
-    return linksOfType(LinkEntity.LinkType.fromString(type));
+  private List<LinkEntity> linksOfType(LinkEntity.LinkType linkType) {
+    List<LinkEntity> linkEntities = linksOfTypeThroughDirect(linkType);
+    linkEntities.addAll(linksOfTypeThroughReverse(linkType));
+    return linkEntities;
   }
 
-  public List<NoteEntity> linksOfType(LinkEntity.LinkType linkType) {
-    List<NoteEntity> linkedNotes =
-        links.stream()
+  public List<LinkEntity> linksOfTypeThroughDirect(LinkEntity.LinkType linkType) {
+    return this.links.stream()
             .filter(l -> l.getLinkType().equals(linkType))
-            .map(LinkEntity::getTargetNote)
             .collect(Collectors.toList());
-    List<NoteEntity> referredNotes =
-        refers.stream()
-            .filter(l -> l.getLinkType().equals(linkType.reverseType()))
-            .map(LinkEntity::getSourceNote)
-            .collect(Collectors.toUnmodifiableList());
-    linkedNotes.addAll(referredNotes);
+  }
 
-    return linkedNotes;
+  public List<LinkEntity> linksOfTypeThroughReverse(LinkEntity.LinkType linkType) {
+    return refers.stream()
+                    .filter(l -> l.getLinkType().equals(linkType.reverseType()))
+                    .collect(Collectors.toUnmodifiableList());
   }
 
   public boolean isFromCircle() { return circle() != null; }

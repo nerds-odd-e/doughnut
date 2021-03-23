@@ -85,7 +85,7 @@ public class ReviewingInitialReviewTest {
             void shouldReturnReviewPointForLinkIfCreatedEarlierThanNote() {
                 makeMe.theNote(note2).skipReview().please();
                 makeMe.theNote(note1).skipReview().linkTo(note2).please();
-                NoteEntity note3 = makeMe.aNote().byUser(userModel).please();
+                NoteEntity note3 = makeMe.aNote().byUser(userModel).createdAt(new Timestamp(System.currentTimeMillis() + 1000)).please();
                 assertThat(getOneInitialReviewPointEntity(day1).getLinkEntity().getSourceNote(), equalTo(note1));
                 assertThat(getOneInitialReviewPointEntity(day1).getNoteEntity(), is(nullValue()));
             }

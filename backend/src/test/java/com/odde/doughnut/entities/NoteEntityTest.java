@@ -1,15 +1,11 @@
 package com.odde.doughnut.entities;
 
-import com.odde.doughnut.models.QuizQuestion;
 import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.MakeMe;
-import com.odde.doughnut.testability.builders.NoteBuilder;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -21,6 +17,7 @@ import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.odde.doughnut.entities.LinkEntity.LinkType.*;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -129,14 +126,14 @@ public class NoteEntityTest {
 
             @Test
             void AIsRelatedToB() {
-                assertThat(noteEntityA.linkTypes(), contains(RELATED_TO.label));
-                assertThat(noteEntityA.linksOfType(RELATED_TO.label), contains(noteEntityB));
+                assertThat(noteEntityA.linkTypes(), contains(RELATED_TO));
+                assertThat(getLinkedNoteOfLinkType(LinkTypes.this.noteEntityA, RELATED_TO), contains(noteEntityB));
             }
 
             @Test
             void BIsAlsoRelatedToA() {
-                assertThat(noteEntityB.linkTypes(), contains(RELATED_TO.label));
-                assertThat(noteEntityB.linksOfType(RELATED_TO.label), contains(noteEntityA));
+                assertThat(noteEntityB.linkTypes(), contains(RELATED_TO));
+                assertThat(getLinkedNoteOfLinkType(noteEntityB, RELATED_TO), contains(noteEntityA));
             }
 
         }
@@ -150,14 +147,14 @@ public class NoteEntityTest {
 
             @Test
             void ABelongToB() {
-                assertThat(noteEntityA.linkTypes(), contains(BELONGS_TO.label));
-                assertThat(noteEntityA.linksOfType(BELONGS_TO.label), contains(noteEntityB));
+                assertThat(noteEntityA.linkTypes(), contains(BELONGS_TO));
+                assertThat(getLinkedNoteOfLinkType(noteEntityA, BELONGS_TO), contains(noteEntityB));
             }
 
             @Test
             void BHasA() {
-                assertThat(noteEntityB.linkTypes(), contains(HAS.label));
-                assertThat(noteEntityB.linksOfType(HAS.label), contains(noteEntityA));
+                assertThat(noteEntityB.linkTypes(), contains(HAS));
+                assertThat(getLinkedNoteOfLinkType(noteEntityB, HAS), contains(noteEntityA));
             }
 
         }
@@ -171,17 +168,24 @@ public class NoteEntityTest {
 
             @Test
             void AHasB() {
-                assertThat(noteEntityA.linkTypes(), contains(HAS.label));
-                assertThat(noteEntityA.linksOfType(HAS.label), contains(noteEntityB));
+                assertThat(noteEntityA.linkTypes(), contains(HAS));
+                assertThat(getLinkedNoteOfLinkType(noteEntityA, HAS), contains(noteEntityB));
             }
 
             @Test
             void BBelongsToA() {
-                assertThat(noteEntityB.linkTypes(), contains(BELONGS_TO.label));
-                assertThat(noteEntityB.linksOfType(BELONGS_TO.label), contains(noteEntityA));
+                assertThat(noteEntityB.linkTypes(), contains(BELONGS_TO));
+                assertThat(getLinkedNoteOfLinkType(noteEntityB, BELONGS_TO), contains(noteEntityA));
             }
 
         }
 
+    }
+
+    private List<NoteEntity> getLinkedNoteOfLinkType(NoteEntity noteEntityA, LinkEntity.LinkType relatedTo) {
+        List<NoteEntity> direct = noteEntityA.linksOfTypeThroughDirect(relatedTo).stream().map(LinkEntity::getTargetNote).collect(Collectors.toList());
+        List<NoteEntity> reverse = noteEntityA.linksOfTypeThroughReverse(relatedTo).stream().map(LinkEntity::getSourceNote).collect(Collectors.toUnmodifiableList());
+        direct.addAll(reverse);
+        return direct;
     }
 }

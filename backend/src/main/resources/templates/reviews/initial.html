@@ -9,19 +9,7 @@
         </div>
 
         <div th:if="${reviewPointEntity.linkEntity}">
-            <div class="row">
-                <div class="col-12 col-md-4">
-                    <div th:replace="_fragments/note_fragments :: noteOwnerBreadcrumb(${reviewPointEntity.linkEntity.sourceNote}, ~{})"/>
-                    <div th:replace="_fragments/note_fragments :: noteShow(${reviewPointEntity.linkEntity.sourceNote}, 1)"/>
-                </div>
-                <div class="col-12 col-md-4 text-center">
-                    <span class="badge badge-warning mr-1" th:text="${reviewPointEntity.linkEntity.type}"/>
-                </div>
-                <div class="col-12 col-md-4">
-                    <div th:replace="_fragments/note_fragments :: noteOwnerBreadcrumb(${reviewPointEntity.linkEntity.targetNote}, ~{})"/>
-                    <div th:replace="_fragments/note_fragments :: noteShow(${reviewPointEntity.linkEntity.targetNote}, 1)"/>
-                </div>
-            </div>
+            <div th:replace="_fragments/link_fragments :: linkShow(${reviewPointEntity.linkEntity})"/>
         </div>
 
         <form id="review-setting" ction="#" th:action="@{/reviews/}" th:object="${reviewPointEntity}" method="post">

@@ -114,4 +114,9 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
         entity.getMasterReviewSettingEntity().setRememberSpelling(true);
         return this;
     }
+
+    public NoteBuilder createdAt(Timestamp timestamp) {
+        entity.setCreatedDatetime(timestamp);
+        return this;
+    }
 }

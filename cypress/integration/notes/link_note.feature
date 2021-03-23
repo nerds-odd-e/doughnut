@@ -34,3 +34,6 @@ Feature: link note
         When I link note "Sedition" as "is similar to" note "Sedation"
         And I link note "Sedition" as "is similar to" note "Sedative"
         Then I should see "Sedition" has link "is similar to" "Sedation, Sedative"
+        When I open link "Sedation"
+        Then I should be able to change the link to "belongs to"
+        And I should be able to delete the link
