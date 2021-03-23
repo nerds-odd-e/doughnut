@@ -37,8 +37,9 @@ in mkShell {
     chromium firefox gitter intellij
   ];
   shellHook = ''
-    export JAVA_HOME="${pkgs.jdk}"
-    export PATH=$PATH:$JAVA_HOME/bin
+    export JAVA_HOME="${pkgs.zulu}"
+    export GRADLE_HOME="${pkgs.gradle}"
+    export PATH=$PATH:$JAVA_HOME/bin:$GRADLE_HOME/bin
     export MYSQL_BASEDIR=${pkgs.mysql80}
     export MYSQL_HOME="''${MYSQL_HOME:-''$PWD/mysql}"
     export MYSQL_DATADIR="''${MYSQL_DATADIR:-''$MYSQL_HOME/data}"
@@ -47,10 +48,13 @@ in mkShell {
     export MYSQLX_UNIX_PORT=$MYSQL_HOME/mysqlx.sock
     export MYSQL_PID_FILE=$MYSQL_HOME/mysql.pid
 
-    echo "#######################################################################"
-    echo ">>>>> MYSQL_HOME: $MYSQL_HOME "
-    echo ">>>>> MYSQL_DATADIR: $MYSQL_DATADIR "
-    echo "#######################################################################"
+    echo "################################################################################"
+    echo "##    !! DOUGHNUT NIX-SHELL !!      "
+    echo "##    JAVA_HOME: $JAVA_HOME         "
+    echo "##    GRADLE_HOME: $GRADLE_HOME     "
+    echo "##    MYSQL_HOME: $MYSQL_HOME       "
+    echo "##    MYSQL_DATADIR: $MYSQL_DATADIR "
+    echo "################################################################################"
     mkdir -p $MYSQL_HOME
     mkdir -p $MYSQL_DATADIR
     
