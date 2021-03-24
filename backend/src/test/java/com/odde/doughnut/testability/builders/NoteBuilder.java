@@ -9,9 +9,7 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 
-import java.beans.BeanProperty;
 import java.sql.Timestamp;
-import java.time.LocalDate;
 
 public class NoteBuilder extends EntityBuilder<NoteEntity> {
     static final TestObjectCounter titleCounter = new TestObjectCounter(n->"title" + n);
@@ -117,6 +115,16 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
 
     public NoteBuilder createdAt(Timestamp timestamp) {
         entity.setCreatedDatetime(timestamp);
+        return this;
+    }
+
+    public NoteBuilder withPicture(String picture) {
+        entity.setPicture(picture);
+        return this;
+    }
+
+    public NoteBuilder useParentPicture() {
+        entity.setUseParentPicture(true);
         return this;
     }
 }

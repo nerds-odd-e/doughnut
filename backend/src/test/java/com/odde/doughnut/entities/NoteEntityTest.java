@@ -26,7 +26,6 @@ import static org.hamcrest.Matchers.*;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
-
 public class NoteEntityTest {
 
     @Autowired MakeMe makeMe;
@@ -37,6 +36,17 @@ public class NoteEntityTest {
         NoteEntity note1 = makeMe.aNote().inMemoryPlease();
         NoteEntity note2 = makeMe.aNote().inMemoryPlease();
         assertThat(note1.getSiblingOrder(), is(lessThan(note2.getSiblingOrder())));
+    }
+
+    @Nested
+    class Picture {
+
+        @Test
+        void useParentPicture() {
+            NoteEntity parent = makeMe.aNote().withPicture("https://img.com/xxx.jpg").inMemoryPlease();
+            NoteEntity child = makeMe.aNote().under(parent).useParentPicture().inMemoryPlease();
+            assertThat(child.getNotePicture(), equalTo(parent.getPicture()));
+        }
     }
 
     @Nested

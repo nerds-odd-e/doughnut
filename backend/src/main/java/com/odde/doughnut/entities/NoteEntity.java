@@ -39,6 +39,11 @@ public class NoteEntity {
   @Setter
   private Boolean skipReview = false;
 
+  @Column(name = "use_parent_picture")
+  @Getter
+  @Setter
+  private Boolean useParentPicture = false;
+
   @Column(name = "sibling_order")
   @Getter
   @Setter
@@ -188,10 +193,14 @@ public class NoteEntity {
   }
 
   public String getNotePicture() {
+    if (useParentPicture && parentNote != null) {
+        return parentNote.getNotePicture();
+    }
+
     if (uploadPicture != null) {
       return "/images/" + uploadPicture.getId() + "/" + uploadPicture.getName();
-
     }
+
     return picture;
   }
 }
