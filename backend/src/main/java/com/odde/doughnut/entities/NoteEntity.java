@@ -1,21 +1,20 @@
 package com.odde.doughnut.entities;
 
-import static java.util.stream.Collectors.toList;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.algorithms.ClozeDescription;
+import lombok.Getter;
+import lombok.Setter;
 
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.stream.Collectors;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static java.util.stream.Collectors.toList;
 
 @Entity
 @Table(name = "note")
@@ -116,6 +115,13 @@ public class NoteEntity {
   @Setter
   private UserEntity userEntity;
 
+  @ManyToOne(cascade = CascadeType.PERSIST)
+  @JoinColumn(name = "image_id", referencedColumnName = "id")
+  @JsonIgnore
+  @Getter
+  @Setter
+  private ImageEntity uploadPicture;
+
   @Column(name = "created_datetime")
   @Getter
   @Setter
@@ -141,6 +147,8 @@ public class NoteEntity {
   private List<LinkEntity> refers = new ArrayList<>();
 
   @Transient @Getter @Setter private String testingParent;
+
+  @Transient @Getter @Setter private String uploadImage;
 
   public List<NoteEntity> getTargetNotes() {
     return links.stream().map(LinkEntity::getTargetNote).collect(toList());

@@ -11,6 +11,17 @@
     />
 </div>
 
+<div th:fragment="imageInput(scopeName, field, placeholder)" th:replace=":: inputWithType(~{ :: .file-input-control}, ${scopeName}, ${field})">
+    <input
+            class="file-input-control"
+            type="file"
+            th:class="'form-control' + ${#fields.hasErrors(field) ? ' is-invalid' : ''}"
+            th:id="${scopeName + '-' + field}"
+            th:name="${field}"
+            th:placeholder="${placeholder}"
+    />
+</div>
+
 <div th:fragment="selectControl(scopeName, field, options)" th:replace=":: inputWithType(~{ :: .select-control}, ${scopeName}, ${field})">
     <select
             class="select-control"

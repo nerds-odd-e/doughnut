@@ -65,11 +65,11 @@ Cypress.Commands.add("submitNoteFormWith", (notes) => {
     for (var propName in elem) {
       const value = elem[propName];
       if (value) {
-        cy.get(`#${propName}`).clear().then(($input)=> {
-            if($input.type === 'file') {
+        cy.get(`#${propName}`).then(($input)=> {
+            if($input.attr('type') === 'file') {
             }
             else {
-              cy.wrap($input).type(value);
+              cy.wrap($input).clear().type(value);
             }
         });
       }
