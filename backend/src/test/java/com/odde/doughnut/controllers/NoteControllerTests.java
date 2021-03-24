@@ -21,6 +21,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.servlet.view.RedirectView;
 
 import javax.persistence.EntityManager;
+import java.io.IOException;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -82,7 +83,7 @@ class NoteControllerTests {
     @Nested
     class createNoteTest {
         @Test
-        void shouldBeAbleToSaveNoteWhenValid() throws NoAccessRightException {
+        void shouldBeAbleToSaveNoteWhenValid() throws NoAccessRightException, IOException {
             NoteEntity newNote = makeMe.aNote().byUser(userModel).inMemoryPlease();
             BindingResult bindingResult = makeMe.successfulBindingResult();
 
@@ -91,7 +92,7 @@ class NoteControllerTests {
         }
 
         @Test
-        void shouldNotBeAbleToSaveNoteWhenInvalid() throws NoAccessRightException {
+        void shouldNotBeAbleToSaveNoteWhenInvalid() throws NoAccessRightException, IOException {
             NoteEntity newNote = new NoteEntity();
             BindingResult bindingResult = makeMe.failedBindingResult();
 

@@ -186,4 +186,12 @@ public class NoteEntity {
     return new ClozeDescription().getClozeDescription(this.title,
                                                       this.description);
   }
+
+  public String getNotePicture() {
+    if (uploadPicture != null) {
+      return "/images/" + uploadPicture.getId() + "/" + uploadPicture.getName();
+
+    }
+    return picture;
+  }
 }

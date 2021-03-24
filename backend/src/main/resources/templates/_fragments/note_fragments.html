@@ -105,8 +105,8 @@
         <label th:if="*{urlIsVideo}">Video Url:</label>
         <a th:href="*{url}" th:text="*{url}"/>
     </div>
-    <p id="note-picture" class="text-center" th:if="*{picture}">
-        <img class="img-fluid" th:src="*{picture}"/>
+    <p id="note-picture" class="text-center" th:if="*{notePicture}">
+        <img class="img-fluid" th:src="*{notePicture}"/>
     </p>
     <p th:each="linkType:${noteEntity.linkTypes()}">
         <span th:text="${linkType.label}"/>

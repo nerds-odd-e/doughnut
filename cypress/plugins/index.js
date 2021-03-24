@@ -21,7 +21,10 @@ module.exports = (on, config) => {
 }
 
 const cucumber = require('cypress-cucumber-preprocessor').default
+const { initPlugin } = require('cypress-plugin-snapshots/plugin');
 
 module.exports = (on, config) => {
+  initPlugin(on, config);
   on('file:preprocessor', cucumber())
+  return config;
 }

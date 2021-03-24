@@ -15,6 +15,7 @@
 
 // Import commands.js using ES2015 syntax:
 import './commands'
+import 'cypress-plugin-snapshots/commands';
 
 String.prototype.commonSenseSplit = function(separator) {
    return this.trim().split(separator).filter(s => s !== "").map(s => s.trim());

@@ -1,5 +1,6 @@
 package com.odde.doughnut.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,6 +22,22 @@ public class ImageEntity {
     @Getter @Setter private String type;
     @Column(name="storage_type")
     @Getter @Setter private String storageType;
-    @Column(name="image_blob_id")
-    @Getter @Setter private Integer imageBlobId;
+
+    @Column(name= "image_blob_id", insertable = false, updatable = false)
+    @Getter
+    private Integer imageBlobEntityId;
+
+    @OneToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
+    @JoinColumn(name = "image_blob_id", referencedColumnName = "id")
+    @JsonIgnore
+    @Getter
+    @Setter
+    private ImageBlobEntity imageBlobEntity;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", referencedColumnName = "id")
+    @JsonIgnore
+    @Getter
+    @Setter
+    private UserEntity userEntity;
 }

@@ -70,7 +70,7 @@ Cypress.Commands.add("submitNoteFormWith", (notes) => {
             if($input.attr('type') === 'file') {
                 cy.fixture(value).then(img => {
                   cy.wrap($input).attachFile({
-                              fileContent: img.toString(),
+                              fileContent: Cypress.Blob.base64StringToBlob(img),
                               fileName: value,
                               mimeType: 'image/png'
                   });

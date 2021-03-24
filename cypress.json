@@ -4,5 +4,9 @@
     "TAGS": "not @ignore"
   },
   "testFiles": "**/*.{feature,features}",
-  "chromeWebSecurity": false
+  "chromeWebSecurity": false,
+  "ignoreTestFiles": [
+    "**/__snapshots__/*",
+    "**/__image_snapshots__/*"
+  ]
 }
