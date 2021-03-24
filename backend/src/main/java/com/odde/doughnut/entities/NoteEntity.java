@@ -148,7 +148,7 @@ public class NoteEntity {
 
   @Transient @Getter @Setter private String testingParent;
 
-  @Transient @Getter @Setter private String uploadImage;
+  @Transient @Getter @Setter private String uploadPictureProxy;
 
   public List<NoteEntity> getTargetNotes() {
     return links.stream().map(LinkEntity::getTargetNote).collect(toList());

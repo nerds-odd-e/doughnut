@@ -23,6 +23,7 @@
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 
 import '@testing-library/cypress/add-commands'
+import 'cypress-file-upload';
 
 Cypress.Commands.add("cleanDBAndSeedData", () => {
   cy.request("/api/testability/clean_db_and_seed_data").its("body").should("contain", "OK");
@@ -67,6 +68,13 @@ Cypress.Commands.add("submitNoteFormWith", (notes) => {
       if (value) {
         cy.get(`#${propName}`).then(($input)=> {
             if($input.attr('type') === 'file') {
+                cy.fixture(value).then(img => {
+                  cy.wrap($input).attachFile({
+                              fileContent: img.toString(),
+                              fileName: value,
+                              mimeType: 'image/png'
+                  });
+                });
             }
             else {
               cy.wrap($input).clear().type(value);
