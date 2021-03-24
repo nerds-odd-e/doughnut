@@ -8,8 +8,8 @@ Feature: Note CRUD
         @ignore
     Scenario: Create a new note
         When I create top level note with:
-            | note-title      | note-description  | note-uploadPicture |
-            | Sedation        | Put to sleep      | example-large.png         |
+            | note-title      | note-description  | note-uploadPicture | note-pictureMask    |
+            | Sedation        | Put to sleep      | example-large.png  | 20 40 70 30         |
         And I create top level note with:
             | note-title      | note-description  | note-picture |
             | Sedition        | Incite violence   | a_slide.jpg  |

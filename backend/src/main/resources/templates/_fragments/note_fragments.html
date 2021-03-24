@@ -75,6 +75,8 @@
     <div th:replace="_fragments/forms :: textarea('note', 'description', null)"/>
     <div th:replace="_fragments/forms :: imageInput('note', 'uploadPicture', 'Optional. upload own picture.')"/>
     <div th:replace="_fragments/forms :: textInput('note', 'picture', 'Or, use full url of picture on the Internet.', false)"/>
+    <div th:replace="_fragments/forms :: checkInput('note', 'useParentPicture')"/>
+    <div th:replace="_fragments/forms :: textInput('note', 'pictureMask', null, false)"/>
     <div th:replace="_fragments/forms :: textInput('note', 'url', null, false)"/>
     <div th:replace="_fragments/forms :: checkInput('note', 'urlIsVideo')"/>
     <div th:replace="_fragments/forms :: checkInput('note', 'skipReview')"/>
@@ -105,9 +107,16 @@
         <label th:if="*{urlIsVideo}">Video Url:</label>
         <a th:href="*{url}" th:text="*{url}"/>
     </div>
-    <p id="note-picture" class="text-center" th:if="*{notePicture}">
+    <div id="note-picture" class="text-center" th:if="*{notePicture}">
+        <div style="position: relative; display: inline-block;">
+
         <img class="img-fluid" th:src="*{notePicture}"/>
-    </p>
+        <svg viewBox="0 0 100 100" style="  position: absolute; top: 0; left: 0; color: #11f1f1; width: 100%; height: 100%;">
+            <rect th:remove="tag" th:utext="*{pictureMaskSvg}"/>
+        </svg>
+        </div>
+
+    </div>
     <p th:each="linkType:${noteEntity.linkTypes()}">
         <span th:text="${linkType.label}"/>
         <span class="badge badge-warning mr-1" th:each="link:${noteEntity.linksOfTypeThroughDirect(linkType)}">

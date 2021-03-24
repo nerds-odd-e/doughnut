@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.algorithms.ClozeDescription;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
@@ -43,6 +44,11 @@ public class NoteEntity {
   @Getter
   @Setter
   private Boolean useParentPicture = false;
+
+  @Column(name = "picture_mask")
+  @Getter
+  @Setter
+  private String pictureMask;
 
   @Column(name = "sibling_order")
   @Getter
@@ -203,4 +209,13 @@ public class NoteEntity {
 
     return picture;
   }
+
+  public String getPictureMaskSvg() {
+    if(Strings.isEmpty(pictureMask)) {
+      return "";
+    }
+    List<String> list = Arrays.stream(pictureMask.split("\\s+")).collect(Collectors.toUnmodifiableList());
+    return String.format("<rect x=\"%s\" y=\"%s\" width=\"%s\" height=\"%s\" style=\"fill:blue;stroke:pink;stroke-width:1;fill-opacity:0.2;stroke-opacity:0.8\" />", list.get(0), list.get(1), list.get(2), list.get(3));
+  }
+
 }
