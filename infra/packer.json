@@ -1,36 +1,33 @@
 {
-  "variables": {
-    "repo_path": "https://github.com/nerds-odd-e/doughnut",
-    "project_id": "carbon-syntax-298809",
-    "source_image_family": "debian-10",
-    "machine_type": "e2-medium",
-    "region": "us-east1",
-    "zone": "us-east1-b",
-    "ssh_username": "root"
-  },
+    "variables": {
+        "repo_path": "https://github.com/nerds-odd-e/doughnut",
+        "project_id": "carbon-syntax-298809",
+        "source_image_family": "debian-10",
+        "machine_type": "e2-medium",
+        "region": "us-east1",
+        "zone": "us-east1-b",
+        "ssh_username": "root"
+    },
 
-  "builders": [
-    {
-      "type": "googlecompute",
-      "project_id": "{{ user `project_id` }}",
-      "state_timeout": "10m",
-      "machine_type": "{{ user `machine_type` }}",
-      "source_image_family": "{{ user `source_image_family` }}",
-      "region": "{{ user `region` }}",
-      "zone": "{{ user `zone` }}",
-      "image_description": "doughnut Debian10 MySQL80 base image",
-      "image_name": "doughnut-debian10-mysql80-base",
-      "ssh_username": "{{ user `ssh_username` }}",
-      "disk_size": 15,
-      "disk_type": "pd-ssd",
-      "account_file": "{{ user `service_account_json` }}"
-    }
-  ],
+    "builders": [{
+        "type": "googlecompute",
+        "project_id": "{{ user `project_id` }}",
+        "state_timeout": "10m",
+        "machine_type": "{{ user `machine_type` }}",
+        "source_image_family": "{{ user `source_image_family` }}",
+        "region": "{{ user `region` }}",
+        "zone": "{{ user `zone` }}",
+        "image_description": "doughnut Debian10 MySQL80 base image provisioned wit saltstack",
+        "image_name": "doughnut-debian10-mysql80-base-saltstack",
+        "ssh_username": "{{ user `ssh_username` }}",
+        "disk_size": 15,
+        "disk_type": "pd-ssd",
+        "account_file": "{{ user `service_account_json` }}"
+    }],
 
-  "provisioners": [
-    {
-      "type": "shell",
-      "script": "scripts/app-instance-deps.sh"
-    }
-  ]
+    "provisioners": [{
+        "type": "salt-masterless",
+        "local_state_tree": "salt/root/",
+        "remote_state_tree": "/srv/salt/"
+    }]
 }

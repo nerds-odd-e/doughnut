@@ -1,0 +1,40 @@
+[tls.stores]
+  [tls.stores.default]
+
+[tls.options]
+  [tls.options.default]
+    minVersion = "VersionTLS12"
+    cipherSuites = [
+      "TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256"
+    ]
+  [tls.options.mintls13]
+    minVersion = "VersionTLS13"
+
+[[tls.certificates]]
+  certFile = "/etc/ssl/private/star_odd-e_com.crt"
+  keyFile = "/etc/ssl/private/odde.key"
+  stores = ["default"]
+
+[http]
+  [http.routers]
+    # Define a connection between requests and services
+    [http.routers.doughnut-app-http]
+      entryPoints = "web"
+      rule = "Host(`dough.odd-e.com`) || Host(`35.237.98.250`) && PathPrefix(`/`)"
+      service = "doughnut-app"
+      middlewares = "doughnut-app-https"
+    [http.routers.doughnut-app]
+      entryPoints = "websecure"
+      rule = "Host(`dough.odd-e.com`) || Host(`35.237.98.250`) && PathPrefix(`/`)"
+      service = "doughnut-app"
+      [[http.routers.doughnut-app.tls.domains]]
+        main = "odd-e.com"
+        sans = ["*.odd-e.com"]
+  [http.middlewares.doughnut-app-https.redirectScheme]
+    scheme = "https"
+    permanent = true
+
+  [http.services]
+    [http.services.doughnut-app.loadBalancer]
+      [[http.services.doughnut-app.loadBalancer.servers]]
+        url = "http://127.0.0.1:8081"
