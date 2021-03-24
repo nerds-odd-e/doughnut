@@ -7,7 +7,7 @@
             <li class="breadcrumb-item additional-item" th:text="${noteEntity.title}"/>
         </div>
 
-        <form action="#" th:action="@{/notes/{id}(id=${noteEntity.id})}" th:object="${noteEntity}" method="post">
+        <form action="#" th:action="@{/notes/{id}(id=${noteEntity.id})}" th:object="${noteEntity}" method="post" enctype="multipart/form-data">
             <div th:replace="_fragments/note_fragments :: noteFormBody(${noteEntity})"/>
             <input type="submit" value="Submit" class="btn btn-primary"/>
         </form>

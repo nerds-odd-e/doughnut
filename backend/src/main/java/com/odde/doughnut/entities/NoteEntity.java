@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.algorithms.ClozeDescription;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -147,8 +148,7 @@ public class NoteEntity {
   private List<LinkEntity> refers = new ArrayList<>();
 
   @Transient @Getter @Setter private String testingParent;
-
-  @Transient @Getter @Setter private String uploadPictureProxy;
+  @Transient @Getter @Setter private MultipartFile uploadPictureProxy;
 
   public List<NoteEntity> getTargetNotes() {
     return links.stream().map(LinkEntity::getTargetNote).collect(toList());
