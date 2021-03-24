@@ -28,6 +28,9 @@ For more background info you can read:
 - [Github Actions](https://docs.github.com/en/actions)
 - [Nix](https://nixos.org/)
 - [git-secret](https://git-secret.io)
+- [packer](https://www.packer.io)
+- [packer googlecompute builder](https://www.packer.io/docs/builders/googlecompute)
+- [SaltStack](https://docs.saltproject.io/en/latest/)
 
 ## Getting started
 
@@ -260,7 +263,8 @@ The Cypress+Cucumber tests are written in JavaScript.
 We use packer + googlecompute builder + shell provisioner to construct and materialise base VM image to speed up deployment and control our OS patches and dependent packages and libraries upgrades
 
 - [Packer](https://www.packer.io)
-- [googlecompute](https://www.packer.io/docs/builders/googlecompute)
+- [packer googlecompute builder](https://www.packer.io/docs/builders/googlecompute)
+- [SaltStack](https://docs.saltproject.io/en/latest/)
 
 #### How-to
 
@@ -276,7 +280,7 @@ PACKER_LOG=1 packer build packer.json
 ```
 
 Expect to see following log line towards end of Packer build stdout log:
-`--> googlecompute: A disk image was created: doughnut-debian10-mysql80-base`
+`--> googlecompute: A disk image was created: doughnut-debian10-mysql80-base-saltstack`
 
 ### 12. [Product Backlog](https://docs.google.com/spreadsheets/d/1_GofvpnV1tjy2F_aaoOiYTZUOO-8t_qf3twIKMQyGV4/edit?ts=600e6711&pli=1#gid=0)
 
