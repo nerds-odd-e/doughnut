@@ -4,7 +4,7 @@
 PROJECTID=$(gcloud config get-value project)
 BUCKET="dough-01"
 ARCH="linux_amd64"
-TRAEFIK_VERSION="v2.4.7"
+TRAEFIK_VERSION="v2.4.8"
 
 echo "Project ID: ${PROJECTID} Bucket: ${BUCKET}"
 
