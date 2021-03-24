@@ -5,10 +5,11 @@ Feature: Note CRUD
     Background:
         Given I've logged in as an existing user
 
+        @ignore
     Scenario: Create a new note
         When I create top level note with:
-            | note-title      | note-description  |
-            | Sedation        | Put to sleep      |
+            | note-title      | note-description  | note-upload-picture |
+            | Sedation        | Put to sleep      | example.png         |
         And I create top level note with:
             | note-title      | note-description  | note-picture |
             | Sedition        | Incite violence   | a_slide.jpg  |

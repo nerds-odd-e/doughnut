@@ -63,8 +63,15 @@ Cypress.Commands.add("createLink", (type, fromNoteTitle, toNoteTitle) => {
 Cypress.Commands.add("submitNoteFormWith", (notes) => {
   notes.forEach((elem) => {
     for (var propName in elem) {
-      if (elem[propName]) {
-        cy.get(`#${propName}`).clear().type(elem[propName]);
+      const value = elem[propName];
+      if (value) {
+        cy.get(`#${propName}`).clear().then(($input)=> {
+            if($input.type === 'file') {
+            }
+            else {
+              cy.wrap($input).type(value);
+            }
+        });
       }
     }
     cy.get('input[value="Submit"]').click();
