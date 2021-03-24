@@ -23,6 +23,7 @@ public abstract class EntityBuilder<T> {
             makeMe.modelFactoryService.entityManager.persist(entity);
         }
         return entity;
+
     }
 
     protected abstract void beforeCreate(boolean needPersist);

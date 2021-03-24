@@ -1,5 +1,6 @@
 package com.odde.doughnut.testability;
 
+import com.odde.doughnut.entities.ImageEntity;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.models.CircleModel;
@@ -73,5 +74,9 @@ public class MakeMe {
 
     public CircleBuilder theCircle(CircleModel circleModel) {
         return new CircleBuilder(circleModel, this);
+    }
+
+    public ImageBuilder anImage() {
+        return new ImageBuilder(new ImageEntity(), this);
     }
 }
