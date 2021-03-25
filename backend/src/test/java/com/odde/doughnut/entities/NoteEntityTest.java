@@ -11,15 +11,13 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
+import javax.validation.*;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.odde.doughnut.entities.LinkEntity.LinkType.*;
+import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
@@ -93,6 +91,17 @@ public class NoteEntityTest {
         public void masksNeedToBeFourNumbers() {
             note.setPictureMask("1 2 3 4 5 6 7");
             assertThat(getViolations(), is(not(empty())));
+            Path propertyPath = getViolations().stream().findFirst().get().getPropertyPath();
+            assertThat(propertyPath.toString(), equalTo("pictureMask"));
+        }
+
+        @Test
+        public void withBothUploadPictureProxyAndPicture() {
+            note.setUploadPictureProxy(makeMe.anUploadedPicture().toMultiplePartFilePlease());
+            note.setPicture("http://url/img");
+            assertThat(getViolations(), is(not(empty())));
+            List<String> errorFields = getViolations().stream().map(v->v.getPropertyPath().toString()).collect(toList());
+            assertThat(errorFields, containsInAnyOrder("uploadPicture", "picture"));
         }
 
         private Set<ConstraintViolation<NoteEntity>> getViolations() {
@@ -211,7 +220,7 @@ public class NoteEntityTest {
     }
 
     private List<NoteEntity> getLinkedNoteOfLinkType(NoteEntity noteEntityA, LinkEntity.LinkType relatedTo) {
-        List<NoteEntity> direct = noteEntityA.linksOfTypeThroughDirect(relatedTo).stream().map(LinkEntity::getTargetNote).collect(Collectors.toList());
+        List<NoteEntity> direct = noteEntityA.linksOfTypeThroughDirect(relatedTo).stream().map(LinkEntity::getTargetNote).collect(toList());
         List<NoteEntity> reverse = noteEntityA.linksOfTypeThroughReverse(relatedTo).stream().map(LinkEntity::getSourceNote).collect(Collectors.toUnmodifiableList());
         direct.addAll(reverse);
         return direct;

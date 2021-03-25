@@ -2,6 +2,7 @@ package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.algorithms.ClozeDescription;
+import com.odde.doughnut.entities.validators.ValidateNotePicture;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.util.Strings;
@@ -21,6 +22,7 @@ import static java.util.stream.Collectors.toList;
 
 @Entity
 @Table(name = "note")
+@ValidateNotePicture
 public class NoteEntity {
   @Id
   @Getter
