@@ -1,6 +1,6 @@
 base:
   '*':
-    - os_jre_mysql_packages
+    - base_os
     - traefik
     - doughnut_app
     - sanitise

@@ -27,7 +27,9 @@
 
     "provisioners": [{
         "type": "salt-masterless",
-        "local_state_tree": "salt/root/",
-        "remote_state_tree": "/srv/salt/"
+        "local_state_tree": "salt/states",
+        "local_pillar_roots": "salt/pillar",
+        "remote_state_tree": "/srv/salt",
+        "remote_pillar_roots": "/srv/pillar"
     }]
 }

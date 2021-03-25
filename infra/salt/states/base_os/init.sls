@@ -4,12 +4,12 @@
 
 /etc/profile.d/env.sh:
   file.managed:
-    - source: salt://os_jre_mysql_packages/templates/env.sh
+    - source: salt://base_os/templates/env.sh
     - mode: 755
 
 /etc/apt/sources.list.d/mysql.list:
   file.managed:
-    - source: salt://os_jre_mysql_packages/templates/mysql.list
+    - source: salt://base_os/templates/mysql.list
     - require_in:
         - pkg: doughnut-app-deps
 
@@ -40,6 +40,8 @@ doughnut-app-deps:
         - openjdk-11-jre
         - libmysqlclient21
         - mysql-community-client
+        - google-cloud-packages-archive-keyring
+        - google-cloud-sdk
     - require_in:
         - cmd: doughnut-jre
         - file: /etc/profile.d/env.sh
