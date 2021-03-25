@@ -106,6 +106,10 @@ Then("I should be asked cloze deletion question {string} with options {string}",
     cy.shouldSeeQuizWithOptions([question], options);
 });
 
+Then("I should be asked picture question {string} with options {string}", (pictureInQuestion, options) => {
+    cy.shouldSeeQuizWithOptions([], options);
+});
+
 Then("I should be asked spelling question {string}", (question) => {
     cy.findByText(question).should('be.visible');
 });

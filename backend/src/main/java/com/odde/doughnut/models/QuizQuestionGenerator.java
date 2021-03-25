@@ -1,5 +1,6 @@
 package com.odde.doughnut.models;
 
+import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.entities.ReviewSettingEntity;
 import com.odde.doughnut.services.ModelFactoryService;
@@ -22,12 +23,18 @@ public class QuizQuestionGenerator {
         if (reviewPointEntity.getLinkEntity() != null) {
             questionTypes.add(QuizQuestion.QuestionType.LINK_TARGET);
         }
-        else if (!Strings.isEmpty(reviewPointEntity.getNoteEntity().getDescription())) {
-            ReviewSettingEntity reviewSettingEntity = reviewPointEntity.getNoteEntity().getMasterReviewSettingEntity();
-            if (reviewSettingEntity != null && reviewSettingEntity.getRememberSpelling()) {
-                questionTypes.add(QuizQuestion.QuestionType.SPELLING);
+        else {
+            NoteEntity noteEntity = reviewPointEntity.getNoteEntity();
+            if (!Strings.isEmpty(noteEntity.getDescription())) {
+                ReviewSettingEntity reviewSettingEntity = noteEntity.getMasterReviewSettingEntity();
+                if (reviewSettingEntity != null && reviewSettingEntity.getRememberSpelling()) {
+                    questionTypes.add(QuizQuestion.QuestionType.SPELLING);
+                }
+                questionTypes.add(QuizQuestion.QuestionType.CLOZE_SELECTION);
             }
-            questionTypes.add(QuizQuestion.QuestionType.CLOZE_SELECTION);
+            if (!Strings.isEmpty(noteEntity.getNotePicture())) {
+                questionTypes.add(QuizQuestion.QuestionType.PICTURE_TITLE);
+            }
         }
         return randomizer.chooseOneRandomly(questionTypes);
     }

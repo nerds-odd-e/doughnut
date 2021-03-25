@@ -214,12 +214,17 @@ public class NoteEntity {
     return picture;
   }
 
-  public String getPictureMaskSvg() {
+  public String getPictureMaskSvg(String opacity) {
     if(Strings.isEmpty(pictureMask)) {
       return "";
     }
     List<String> list = Arrays.stream(pictureMask.split("\\s+")).collect(Collectors.toUnmodifiableList());
-    return String.format("<rect x=\"%s\" y=\"%s\" width=\"%s\" height=\"%s\" style=\"fill:blue;stroke:pink;stroke-width:1;fill-opacity:0.2;stroke-opacity:0.8\" />", list.get(0), list.get(1), list.get(2), list.get(3));
+    List<String> results = new ArrayList<>();
+    for (int i = 0; i < list.size(); i+=4) {
+      results.add(String.format("<rect x=\"%s\" y=\"%s\" width=\"%s\" height=\"%s\" style=\"fill:blue;stroke:pink;stroke-width:1;fill-opacity:%s;stroke-opacity:0.8\" />", list.get(i), list.get(i+1), list.get(i+2), list.get(i+3), opacity));
+    }
+
+    return String.join("", results);
   }
 
 }

@@ -2,9 +2,10 @@
 <layout th:replace="_fragments/basic_layout :: application_layout(~{ :: .content})">
     <div class="container content">
         <div th:replace="_fragments/note_fragments :: noteOwnerBreadcrumb(${reviewPointEntity.getSourceNote()}, ~{})"/>
-        <h2 class="display-5" th:text="${quizQuestion.getDescription()}"/>
+        <h2 th:if="${quizQuestion.isPictureQuestion()}" th:replace="_fragments/note_fragments :: showPicture(${reviewPointEntity.getSourceNote()}, 1)"/>
+        <h2 th:unless="${quizQuestion.isPictureQuestion()}" class="display-5" th:text="${quizQuestion.getDescription()}"/>
 
-        <div class="row" th:unless="${quizQuestion.getQuestionType().label=='spelling'}">
+        <div class="row mt-2" th:unless="${quizQuestion.getQuestionType().label=='spelling'}">
             <div class="col-sm-6 mb-3" th:each="option:${quizQuestion.getOptions()}">
                 <form th:action="@{/reviews/{id}/answer(id=${reviewPointEntity.id})}" th:object="${emptyAnswer}" method="post">
                     <input type="hidden" name="answer" th:value="${option}"/>

@@ -15,6 +15,7 @@ public class QuizQuestion {
     public enum QuestionType {
         CLOZE_SELECTION("cloze_selection"),
         SPELLING("spelling"),
+        PICTURE_TITLE("picture_title"),
         LINK_TARGET("link_target");
 
         public final String label;
@@ -34,6 +35,10 @@ public class QuizQuestion {
         this.reviewPointEntity = reviewPointEntity;
         this.randomizer = randomizer;
         this.modelFactoryService = modelFactoryService;
+    }
+
+    public boolean isPictureQuestion() {
+        return questionType == QuestionType.PICTURE_TITLE;
     }
 
     public String getDescription() {

@@ -99,6 +99,17 @@
     </a>
 </div>
 
+<div th:fragment="showPicture(noteEntity, opacity)" th:object="${noteEntity}">
+    <div id="note-picture" class="text-center" th:if="*{notePicture}">
+        <div style="position: relative; display: inline-block;">
+            <img class="img-fluid" th:src="*{notePicture}"/>
+            <svg viewBox="0 0 100 100" style="  position: absolute; top: 0; left: 0; color: #11f1f1; width: 100%; height: 100%;">
+                <rect th:remove="tag" th:utext="${noteEntity.getPictureMaskSvg(opacity)}"/>
+            </svg>
+        </div>
+    </div>
+</div>
+
 <div th:fragment="noteShow(noteEntity, level)" th:object="${noteEntity}">
     <h2 th:class="'h' + ${level}" id="note-title" th:text="*{title}"/>
     <pre id="note-description" th:text="*{description}" style="white-space: pre-wrap;"/>
@@ -107,16 +118,9 @@
         <label th:if="*{urlIsVideo}">Video Url:</label>
         <a th:href="*{url}" th:text="*{url}"/>
     </div>
-    <div id="note-picture" class="text-center" th:if="*{notePicture}">
-        <div style="position: relative; display: inline-block;">
 
-        <img class="img-fluid" th:src="*{notePicture}"/>
-        <svg viewBox="0 0 100 100" style="  position: absolute; top: 0; left: 0; color: #11f1f1; width: 100%; height: 100%;">
-            <rect th:remove="tag" th:utext="*{pictureMaskSvg}"/>
-        </svg>
-        </div>
+    <div th:replace=":: showPicture(${noteEntity}, 0.2)"/>
 
-    </div>
     <p th:each="linkType:${noteEntity.linkTypes()}">
         <span th:text="${linkType.label}"/>
         <span class="badge badge-warning mr-1" th:each="link:${noteEntity.linksOfTypeThroughDirect(linkType)}">
