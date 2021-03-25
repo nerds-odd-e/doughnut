@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.sql.Timestamp;
 import java.util.ArrayList;
@@ -45,6 +46,7 @@ public class NoteEntity {
   @Setter
   private Boolean useParentPicture = false;
 
+  @Pattern(regexp="^((-?[0-9.]+\\s+){3}-?[0-9.]+\\s+)*((-?[0-9.]+\\s+){3}-?[0-9.]+)$",message="must be 'x y width height [x y width height...]'")
   @Column(name = "picture_mask")
   @Getter
   @Setter

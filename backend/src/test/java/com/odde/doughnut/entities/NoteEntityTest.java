@@ -77,6 +77,24 @@ public class NoteEntityTest {
             assertThat(getViolations(), is(not(empty())));
         }
 
+        @Test
+        public void goodMask() {
+            note.setPictureMask("1 -2.3 3 -4");
+            assertThat(getViolations(), is(empty()));
+        }
+
+        @Test
+        public void goodMaskWith2Rect() {
+            note.setPictureMask("-1 2 3 4 11 22 33 44");
+            assertThat(getViolations(), is(empty()));
+        }
+
+        @Test
+        public void masksNeedToBeFourNumbers() {
+            note.setPictureMask("1 2 3 4 5 6 7");
+            assertThat(getViolations(), is(not(empty())));
+        }
+
         private Set<ConstraintViolation<NoteEntity>> getViolations() {
             return validator.validate(note);
         }
