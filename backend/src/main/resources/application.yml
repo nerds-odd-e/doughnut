@@ -2,6 +2,10 @@ spring:
   config:
     activate:
       on-profile: dev
+  resources:
+    cache:
+      cachecontrol:
+        max-age: 365d
   datasource:
     url: jdbc:mysql://localhost:3306/doughnut_development
     username: doughnut
@@ -27,6 +31,10 @@ spring:
   config:
     activate:
       on-profile: prod
+  resources:
+    cache:
+      cachecontrol:
+        max-age: 365d
   datasource:
     url: jdbc:mysql://db-server:3306/doughnut
     username: doughnut
@@ -53,6 +61,10 @@ spring:
     import: db-test.properties
   profiles:
     active: test
+  resources:
+    cache:
+      cachecontrol:
+        max-age: 365d
   datasource:
     url: ${db.url}
     username: ${db.user}

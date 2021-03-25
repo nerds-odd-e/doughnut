@@ -46,7 +46,7 @@ public class NoteEntity {
   @Setter
   private Boolean useParentPicture = false;
 
-  @Pattern(regexp="^((-?[0-9.]+\\s+){3}-?[0-9.]+\\s+)*((-?[0-9.]+\\s+){3}-?[0-9.]+)$",message="must be 'x y width height [x y width height...]'")
+  @Pattern(regexp="^(((-?[0-9.]+\\s+){3}-?[0-9.]+\\s+)*((-?[0-9.]+\\s+){3}-?[0-9.]+))?$",message="must be 'x y width height [x y width height...]'")
   @Column(name = "picture_mask")
   @Getter
   @Setter
