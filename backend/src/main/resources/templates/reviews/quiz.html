@@ -2,7 +2,9 @@
 <layout th:replace="_fragments/basic_layout :: application_layout(~{ :: .content})">
     <div class="container content">
         <div th:replace="_fragments/note_fragments :: noteOwnerBreadcrumb(${reviewPointEntity.getSourceNote()}, ~{})"/>
-        <h2 th:if="${quizQuestion.isPictureQuestion()}" th:replace="_fragments/note_fragments :: showPicture(${reviewPointEntity.getSourceNote()}, 1)"/>
+        <div th:if="${quizQuestion.isPictureQuestion()}">
+            <div th:replace="_fragments/note_fragments :: showPicture(${reviewPointEntity.getSourceNote()}, 1)"/>
+        </div>
         <h2 th:unless="${quizQuestion.isPictureQuestion()}" class="display-5" th:text="${quizQuestion.getDescription()}"/>
 
         <div class="row mt-2" th:unless="${quizQuestion.getQuestionType().label=='spelling'}">
