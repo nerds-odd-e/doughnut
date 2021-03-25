@@ -79,4 +79,8 @@ public class MakeMe {
     public ImageBuilder anImage() {
         return new ImageBuilder(new ImageEntity(), this);
     }
+
+    public UploadedPictureBuilder anUploadedPicture() {
+        return new UploadedPictureBuilder();
+    }
 }

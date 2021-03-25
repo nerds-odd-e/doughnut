@@ -77,12 +77,13 @@ public class NoteController {
     }
 
     @PostMapping("/{noteEntity}")
-    public String updateNote(@Valid NoteEntity noteEntity, BindingResult bindingResult) throws NoAccessRightException {
+    public String updateNote(@Valid NoteEntity noteEntity, BindingResult bindingResult) throws NoAccessRightException, IOException {
         currentUserFetcher.getUser().assertAuthorization(noteEntity);
         if (bindingResult.hasErrors()) {
             return "notes/edit";
         }
-        modelFactoryService.noteRepository.save(noteEntity);
+        NoteContentModel noteContentModel = modelFactoryService.toNoteModel(noteEntity);
+        noteContentModel.update(currentUserFetcher.getUser());
         return "redirect:/notes/" + noteEntity.getId();
     }
 

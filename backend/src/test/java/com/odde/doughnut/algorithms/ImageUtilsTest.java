@@ -1,20 +1,19 @@
 package com.odde.doughnut.algorithms;
 
+import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.Test;
 import org.springframework.core.io.InputStreamSource;
 
 import javax.imageio.ImageIO;
-import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 class ImageUtilsTest {
+    MakeMe makeMe = new MakeMe();
 
     @Test
     void shouldNotTouchSmallImage() throws IOException {
@@ -47,17 +46,7 @@ class ImageUtilsTest {
     }
 
     private InputStreamSource buildImage(int width, int height) throws IOException {
-        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        Graphics2D g2 = image.createGraphics();
-        g2.drawString("Welcome to img", 0, 0);
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        ImageIO.write(image, "png", stream);
-        return new InputStreamSource() {
-            @Override
-            public InputStream getInputStream() throws IOException {
-                return new ByteArrayInputStream(stream.toByteArray());
-            }
-        };
+        return makeMe.anUploadedPicture().metrics(width, height).toInputSteamSource();
     }
 
 }

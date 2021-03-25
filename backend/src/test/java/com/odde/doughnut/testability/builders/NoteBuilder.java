@@ -127,4 +127,9 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
         entity.setUseParentPicture(true);
         return this;
     }
+
+    public NoteBuilder withNewlyUploadedPicture() {
+        entity.setUploadPictureProxy(makeMe.anUploadedPicture().toMultiplePartFilePlease());
+        return this;
+    }
 }

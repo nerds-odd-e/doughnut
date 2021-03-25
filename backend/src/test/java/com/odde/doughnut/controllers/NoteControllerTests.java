@@ -114,21 +114,28 @@ class NoteControllerTests {
         }
 
         @Test
-        void shouldBeAbleToSaveNoteWhenValid() throws NoAccessRightException {
+        void shouldBeAbleToSaveNoteWhenValid() throws NoAccessRightException, IOException {
             BindingResult bindingResult = makeMe.successfulBindingResult();
-
             String response = controller.updateNote(note, bindingResult);
             assertEquals("redirect:/notes/" + note.getId(), response);
         }
 
         @Test
-        void shouldNotBeAbleToSaveNoteWhenInvalid() throws NoAccessRightException {
+        void shouldNotBeAbleToSaveNoteWhenInvalid() throws NoAccessRightException, IOException {
             note.setTitle("new");
             BindingResult bindingResult = makeMe.failedBindingResult();
-
             String response = controller.updateNote(note, bindingResult);
             assertEquals("notes/edit", response);
         }
+
+        @Test
+        void shouldAddUploadedPicture() throws NoAccessRightException, IOException {
+            makeMe.theNote(note).withNewlyUploadedPicture();
+            BindingResult bindingResult = makeMe.successfulBindingResult();
+            String response = controller.updateNote(note, bindingResult);
+            assertThat(note.getUploadPicture(), is(not(nullValue())));
+        }
+
     }
 
     @Nested

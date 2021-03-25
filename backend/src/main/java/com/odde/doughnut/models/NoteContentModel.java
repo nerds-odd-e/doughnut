@@ -21,12 +21,21 @@ public class NoteContentModel extends ModelForEntity<NoteEntity> {
 
     public void createByUser(UserModel userModel) throws IOException {
         entity.setUserEntity(userModel.getEntity());
+        fetchUploadedPicture(userModel);
+        modelFactoryService.noteRepository.save(entity);
+    }
+
+    private void fetchUploadedPicture(UserModel userModel) throws IOException {
         MultipartFile file = entity.getUploadPictureProxy();
         if (file != null && !file.isEmpty()) {
             ImageEntity imageEntity = new ImageEntityBuilder().buildImageEntityFromUploadedPicture(userModel, file);
             entity.setUploadPicture(imageEntity);
         }
-        this.modelFactoryService.noteRepository.save(entity);
+    }
+
+    public void update(UserModel userModel) throws IOException {
+        fetchUploadedPicture(userModel);
+        modelFactoryService.noteRepository.save(entity);
     }
 
     public void setAndSaveMasterReviewSetting(ReviewSettingEntity reviewSettingEntity) {
@@ -39,4 +48,5 @@ public class NoteContentModel extends ModelForEntity<NoteEntity> {
         }
         save();
     }
+
 }
