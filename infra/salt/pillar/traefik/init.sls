@@ -6,4 +6,5 @@ traefik:
   static_conf: /opt/traefik/traefik.toml
   dynamic_conf: /opt/traefik/dynamic.toml
   logs_dir: /opt/traefik/logs
+  gcp_bucket_ssl_store: gs://dough-01/ssl/private
   https_ssl_dir: /etc/ssl/private

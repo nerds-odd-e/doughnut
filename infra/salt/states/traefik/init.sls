@@ -35,15 +35,15 @@ ssl_dir:
 
 get_odde_ssl_pem:
   cmd.run:
-    - name: gsutil cp gs://dough-01/ssl/private/odde.pem {{ pillar['traefik']['https_ssl_dir']}}/odde.pem
+    - name: gsutil cp {{ pillar['traefik']['gcp_bucket_ssl_store'] }}/odde.pem {{ pillar['traefik']['https_ssl_dir']}}/odde.pem
 
 get_odde_ssl_key:
   cmd.run:
-    - name: gsutil cp gs://dough-01/ssl/private/odde.key {{ pillar['traefik']['https_ssl_dir']}}/odde.key
+    - name: gsutil cp {{ pillar['traefik']['gcp_bucket_ssl_store'] }}/odde.key {{ pillar['traefik']['https_ssl_dir']}}/odde.key
 
 get_odde_ssl_star_crt:
   cmd.run:
-    - name: gsutil cp gs://dough-01/ssl/private/star_odd-e_com.crt {{ pillar['traefik']['https_ssl_dir']}}/star_odd-e_com.crt
+    - name: gsutil cp {{ pillar['traefik']['gcp_bucket_ssl_store'] }}/star_odd-e_com.crt {{ pillar['traefik']['https_ssl_dir']}}/star_odd-e_com.crt
 
 traefik_app_archive_download:
   archive.extracted:
