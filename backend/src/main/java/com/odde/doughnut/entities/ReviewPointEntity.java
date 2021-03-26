@@ -113,4 +113,7 @@ public class ReviewPointEntity {
     return noteEntity == null || linkEntity == null;
   }
 
+  public String getExclusiveQuestion() {
+    return getLinkEntity().getLinkType().exclusiveQuestion;
+  }
 }

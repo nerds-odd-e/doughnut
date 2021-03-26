@@ -50,7 +50,7 @@ public class ReviewPointModel extends ModelForEntity<ReviewPointEntity> {
     }
 
     public QuizQuestion generateAQuizQuestion(Randomizer randomizer) {
-        return new QuizQuestionGenerator(entity, randomizer, modelFactoryService).generateQuestion(randomizer, entity);
+        return new QuizQuestionGenerator(entity, randomizer).generateQuestion(modelFactoryService);
     }
 
 }

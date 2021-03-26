@@ -15,19 +15,21 @@ import java.util.List;
 public class LinkEntity {
 
     public enum LinkType {
-        BELONGS_TO("belongs to"),
-        HAS("has"),
-        RELATED_TO("is related to"),
-        OPPOSITE_OF("is the opposite of"),
-        BROUGHT_BY("is brought by"),
-        AUTHOR_OF("is author of"),
-        SIMILAR_TO("is similar to"),
-        CONFUSE_WITH("confuses with");
+        BELONGS_TO("belongs to", "does not belong to"),
+        HAS("has", "does not have"),
+        RELATED_TO("is related to", "is not related to"),
+        OPPOSITE_OF("is the opposite of", "is not the opposite of"),
+        BROUGHT_BY("is brought by", "is not brought by"),
+        AUTHOR_OF("is author of", "is not author of"),
+        SIMILAR_TO("is similar to", "is not simlilr to"),
+        CONFUSE_WITH("confuses with", "does not confuse with");
 
         public final String label;
+        public final String exclusiveQuestion;
 
-        private LinkType(String label) {
+        private LinkType(String label, String exclusiveQuestion) {
             this.label = label;
+            this.exclusiveQuestion = exclusiveQuestion;
         }
 
         public static LinkType fromString(String text) {

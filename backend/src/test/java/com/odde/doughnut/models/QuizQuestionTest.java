@@ -51,7 +51,7 @@ class QuizQuestionTest {
     class ClozeSelectionQuiz {
         private List<String> getOptions(NoteEntity noteEntity) {
             QuizQuestion quizQuestion = getQuizQuestion(noteEntity);
-            List<String> options = quizQuestion.getOptions().stream().map(o -> o.getDisplay()).collect(Collectors.toUnmodifiableList());
+            List<String> options = quizQuestion.getOptions().stream().map(QuizQuestion.Option::getDisplay).collect(Collectors.toUnmodifiableList());
             return options;
         }
 

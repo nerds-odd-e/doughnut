@@ -8,23 +8,14 @@ import org.apache.logging.log4j.util.Strings;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class QuizQuestionGenerator {
     private final ReviewPointEntity reviewPointEntity;
     private final Randomizer randomizer;
-    private final ModelFactoryService modelFactoryService;
 
-    public QuizQuestionGenerator(ReviewPointEntity reviewPointEntity, Randomizer randomizer, ModelFactoryService modelFactoryService) {
+    public QuizQuestionGenerator(ReviewPointEntity reviewPointEntity, Randomizer randomizer) {
         this.reviewPointEntity = reviewPointEntity;
         this.randomizer = randomizer;
-        this.modelFactoryService = modelFactoryService;
-    }
-
-    public QuizQuestion.QuestionType generateQuestionType() {
-        List<QuizQuestion.QuestionType> questionTypes = availableQuestionTypes();
-        return randomizer.chooseOneRandomly(questionTypes);
     }
 
     List<QuizQuestion.QuestionType> availableQuestionTypes() {
@@ -50,59 +41,22 @@ public class QuizQuestionGenerator {
         return questionTypes;
     }
 
-    QuizQuestion generateQuestion(Randomizer randomizer, ReviewPointEntity entity) {
+    QuizQuestion generateQuestion(ModelFactoryService modelFactoryService) {
         QuizQuestion.QuestionType questionType = generateQuestionType();
-        return generateQuestionOfType(randomizer, entity, questionType);
+        return generateQuestionOfType(questionType, modelFactoryService);
     }
 
-    QuizQuestion generateQuestionOfType(Randomizer randomizer, ReviewPointEntity entity, QuizQuestion.QuestionType questionType) {
-        QuizQuestion quizQuestion = new QuizQuestion(entity, randomizer, modelFactoryService);
+    QuizQuestion generateQuestionOfType(QuizQuestion.QuestionType questionType, ModelFactoryService modelFactoryService) {
         if (questionType == null) {
             return null;
         }
-        quizQuestion.setQuestionType(questionType);
-        quizQuestion.setOptions(generateOptions(questionType));
-
-        return quizQuestion;
+        QuizQuestionBuilder quizQuestionBuilder = new QuizQuestionBuilder(questionType, randomizer, reviewPointEntity, modelFactoryService);
+        return quizQuestionBuilder.buildQuizQuestion();
     }
 
-    public List<QuizQuestion.Option> generateOptions(QuizQuestion.QuestionType questionType) {
-        TreeNodeModel treeNodeModel = getAnswerTreeNodeModel(questionType);
-        Stream<NoteEntity> noteEntityStream = treeNodeModel.getSiblings().stream()
-                .filter(t -> !t.getTitle().equals(getAnswerNote(questionType).getTitle()));
-        if(questionType == QuizQuestion.QuestionType.PICTURE_SELECTION) {
-            noteEntityStream = noteEntityStream.filter(n -> Strings.isNotEmpty(n.getNotePicture()));
-        }
-        List<NoteEntity> list = noteEntityStream.collect(Collectors.toList());
-        randomizer.shuffle(list);
-        List<NoteEntity> selectedList = list.stream().limit(5).collect(Collectors.toList());
-        selectedList.add(getAnswerNote(questionType));
-        randomizer.shuffle(selectedList);
-
-        if (questionType == QuizQuestion.QuestionType.PICTURE_SELECTION) {
-            return toPictureOptions(selectedList);
-        }
-
-        return toTitleOptions(selectedList);
-    }
-
-    private List<QuizQuestion.Option> toPictureOptions(List<NoteEntity> selectedList) {
-        return selectedList.stream().map(QuizQuestion.Option::createPictureOption).collect(Collectors.toUnmodifiableList());
-    }
-
-    private List<QuizQuestion.Option> toTitleOptions(List<NoteEntity> selectedList) {
-        return selectedList.stream().map(QuizQuestion.Option::createTitleOption).collect(Collectors.toUnmodifiableList());
-    }
-
-    private TreeNodeModel getAnswerTreeNodeModel(QuizQuestion.QuestionType questionType) {
-        return modelFactoryService.toTreeNodeModel(getAnswerNote(questionType));
-    }
-
-    private NoteEntity getAnswerNote(QuizQuestion.QuestionType questionType) {
-        if (questionType == QuizQuestion.QuestionType.LINK_TARGET) {
-            return reviewPointEntity.getLinkEntity().getTargetNote();
-        }
-        return reviewPointEntity.getNoteEntity();
+    private QuizQuestion.QuestionType generateQuestionType() {
+        List<QuizQuestion.QuestionType> questionTypes = availableQuestionTypes();
+        return randomizer.chooseOneRandomly(questionTypes);
     }
 
 }

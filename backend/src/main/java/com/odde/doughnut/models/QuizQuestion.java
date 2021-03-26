@@ -36,6 +36,8 @@ public class QuizQuestion {
     private QuestionType questionType = null;
     @Getter @Setter
     public List<Option> options;
+    @Getter @Setter
+    public String description;
 
     public QuizQuestion(ReviewPointEntity reviewPointEntity, Randomizer randomizer, ModelFactoryService modelFactoryService) {
         this.reviewPointEntity = reviewPointEntity;
@@ -47,28 +49,11 @@ public class QuizQuestion {
         return questionType == QuestionType.PICTURE_TITLE;
     }
 
-    public String getDescription() {
-        if (questionType.equals(QuestionType.PICTURE_SELECTION)) {
-            return getAnswerNote().getTitle();
-        }
-        if (questionType.equals(QuestionType.LINK_TARGET)) {
-            return reviewPointEntity.getLinkEntity().getQuizDescription();
-        }
-        return getAnswerNote().getClozeDescription();
-    }
-
     public AnswerEntity buildAnswer() {
         AnswerEntity answerEntity = new AnswerEntity();
         answerEntity.setReviewPointEntity(reviewPointEntity);
         answerEntity.setQuestionType(questionType);
         return answerEntity;
-    }
-
-    private NoteEntity getAnswerNote() {
-        if (questionType == QuestionType.LINK_TARGET) {
-            return reviewPointEntity.getLinkEntity().getTargetNote();
-        }
-        return reviewPointEntity.getNoteEntity();
     }
 
     static class Option {

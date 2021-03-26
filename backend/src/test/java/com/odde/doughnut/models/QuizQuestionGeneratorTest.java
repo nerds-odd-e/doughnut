@@ -21,9 +21,18 @@ class QuizQuestionGeneratorTest {
     void clozeSelection() {
         NoteEntity note = makeMe.aNote().inMemoryPlease();
         ReviewPointEntity reviewPoint = makeMe.aReviewPointFor(note).inMemoryPlease();
-        QuizQuestionGenerator generator = new QuizQuestionGenerator(reviewPoint, randomizer, null);
+        QuizQuestionGenerator generator = new QuizQuestionGenerator(reviewPoint, randomizer);
         List<QuizQuestion.QuestionType> questionTypes = generator.availableQuestionTypes();
         assertThat(questionTypes, contains(CLOZE_SELECTION));
+    }
+
+    @Test
+    void spelling() {
+        NoteEntity note = makeMe.aNote().rememberSpelling().inMemoryPlease();
+        ReviewPointEntity reviewPoint = makeMe.aReviewPointFor(note).inMemoryPlease();
+        QuizQuestionGenerator generator = new QuizQuestionGenerator(reviewPoint, randomizer);
+        List<QuizQuestion.QuestionType> questionTypes = generator.availableQuestionTypes();
+        assertThat(questionTypes, contains(SPELLING, CLOZE_SELECTION));
     }
 
     @Test
@@ -31,7 +40,7 @@ class QuizQuestionGeneratorTest {
         NoteEntity note1 = makeMe.aNote().inMemoryPlease();
         NoteEntity note2 = makeMe.aNote().linkTo(note1).inMemoryPlease();
         ReviewPointEntity reviewPoint = makeMe.aReviewPointFor(note2.getLinks().get(0)).inMemoryPlease();
-        QuizQuestionGenerator generator = new QuizQuestionGenerator(reviewPoint, randomizer, null);
+        QuizQuestionGenerator generator = new QuizQuestionGenerator(reviewPoint, randomizer);
         List<QuizQuestion.QuestionType> questionTypes = generator.availableQuestionTypes();
         assertThat(questionTypes, containsInAnyOrder(LINK_TARGET, LINK_SOURCE_EXCLUSIVE));
     }
