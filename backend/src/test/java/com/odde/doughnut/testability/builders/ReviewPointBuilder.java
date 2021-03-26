@@ -1,5 +1,6 @@
 package com.odde.doughnut.testability.builders;
 
+import com.odde.doughnut.entities.LinkEntity;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.models.ReviewPointModel;
@@ -20,6 +21,11 @@ public class ReviewPointBuilder extends EntityBuilder<ReviewPointEntity> {
 
     public ReviewPointBuilder forNote(NoteEntity noteEntity) {
         entity.setNoteEntity(noteEntity);
+        return this;
+    }
+
+    public ReviewPointBuilder forLink(LinkEntity linkEntity) {
+        entity.setLinkEntity(linkEntity);
         return this;
     }
 
@@ -50,4 +56,5 @@ public class ReviewPointBuilder extends EntityBuilder<ReviewPointEntity> {
     protected void beforeCreate(boolean needPersist) {
 
     }
+
 }

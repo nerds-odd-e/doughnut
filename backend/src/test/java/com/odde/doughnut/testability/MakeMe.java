@@ -1,6 +1,7 @@
 package com.odde.doughnut.testability;
 
 import com.odde.doughnut.entities.ImageEntity;
+import com.odde.doughnut.entities.LinkEntity;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.models.CircleModel;
@@ -62,6 +63,11 @@ public class MakeMe {
     public ReviewPointBuilder aReviewPointFor(NoteEntity noteEntity) {
         ReviewPointEntity reviewPointEntity = new ReviewPointEntity();
         return new ReviewPointBuilder(reviewPointEntity, this).forNote(noteEntity);
+    }
+
+    public ReviewPointBuilder aReviewPointFor(LinkEntity linkEntity) {
+        ReviewPointEntity reviewPointEntity = new ReviewPointEntity();
+        return new ReviewPointBuilder(reviewPointEntity, this).forLink(linkEntity);
     }
 
     public TimestampBuilder aTimestamp() {

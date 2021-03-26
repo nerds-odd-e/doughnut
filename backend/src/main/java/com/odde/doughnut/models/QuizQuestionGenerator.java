@@ -19,6 +19,11 @@ public class QuizQuestionGenerator {
     }
 
     public QuizQuestion.QuestionType generateQuestionType() {
+        List<QuizQuestion.QuestionType> questionTypes = availableQuestionTypes();
+        return randomizer.chooseOneRandomly(questionTypes);
+    }
+
+    List<QuizQuestion.QuestionType> availableQuestionTypes() {
         List<QuizQuestion.QuestionType> questionTypes = new ArrayList<>();
         if (reviewPointEntity.getLinkEntity() != null) {
             questionTypes.add(QuizQuestion.QuestionType.LINK_TARGET);
@@ -37,7 +42,7 @@ public class QuizQuestionGenerator {
                 questionTypes.add(QuizQuestion.QuestionType.PICTURE_SELECTION);
             }
         }
-        return randomizer.chooseOneRandomly(questionTypes);
+        return questionTypes;
     }
 
     QuizQuestion generateQuestion(Randomizer randomizer, ReviewPointEntity entity, ModelFactoryService modelFactoryService) {
