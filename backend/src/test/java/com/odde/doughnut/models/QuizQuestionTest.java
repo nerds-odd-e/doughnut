@@ -14,6 +14,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -48,12 +49,17 @@ class QuizQuestionTest {
 
     @Nested
     class ClozeSelectionQuiz {
+        private List<String> getOptions(NoteEntity noteEntity) {
+            QuizQuestion quizQuestion = getQuizQuestion(noteEntity);
+            List<String> options = quizQuestion.getOptions().stream().map(o -> o.getDisplay()).collect(Collectors.toUnmodifiableList());
+            return options;
+        }
 
         @Test
         void aNoteWithNoSiblings() {
             NoteEntity noteEntity = makeMe.aNote().please();
-            QuizQuestion quizQuestion = getQuizQuestion(noteEntity);
-            assertThat(quizQuestion.getOptions(), contains(noteEntity.getTitle()));
+            List<String> options = getOptions(noteEntity);
+            assertThat(options, contains(noteEntity.getTitle()));
         }
 
         @Test
@@ -61,8 +67,8 @@ class QuizQuestionTest {
             NoteEntity top = makeMe.aNote().please();
             NoteEntity noteEntity1 = makeMe.aNote().under(top).please();
             NoteEntity noteEntity2 = makeMe.aNote().under(top).please();
-            QuizQuestion quizQuestion = getQuizQuestion(noteEntity1);
-            assertThat(quizQuestion.getOptions(), containsInAnyOrder(noteEntity1.getTitle(), noteEntity2.getTitle()));
+            List<String> options = getOptions(noteEntity1);
+            assertThat(options, containsInAnyOrder(noteEntity1.getTitle(), noteEntity2.getTitle()));
         }
 
         @Test
@@ -70,9 +76,9 @@ class QuizQuestionTest {
             NoteEntity top = makeMe.aNote().please();
             makeMe.theNote(top).with10Children().please();
             NoteEntity noteEntity = makeMe.aNote().under(top).please();
-            QuizQuestion quizQuestion = getQuizQuestion(noteEntity);
-            assertThat(quizQuestion.getOptions().size(), equalTo(6));
-            assertThat(quizQuestion.getOptions().contains(noteEntity.getTitle()), is(true));
+            List<String> options = getOptions(noteEntity);
+            assertThat(options.size(), equalTo(6));
+            assertThat(options.contains(noteEntity.getTitle()), is(true));
         }
     }
 
@@ -115,8 +121,7 @@ class QuizQuestionTest {
     }
 
     private QuizQuestion getQuizQuestion(NoteEntity noteEntity) {
-        ReviewPointModel reviewPoint = getReviewPointModel(noteEntity);
-        return reviewPoint.generateAQuizQuestion(randomizer);
+        return getReviewPointModel(noteEntity).generateAQuizQuestion(randomizer);
     }
 
     private ReviewPointModel getReviewPointModel(NoteEntity noteEntity) {

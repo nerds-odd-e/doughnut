@@ -100,7 +100,7 @@ public class QuizQuestion {
         return reviewPointEntity.getNoteEntity();
     }
 
-    private static class Option {
+    static class Option {
         @Getter private String value;
         @Getter private String display;
         @Getter private NoteEntity note;
