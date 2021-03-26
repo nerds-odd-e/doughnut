@@ -6,6 +6,7 @@
             <div th:replace="_fragments/note_fragments :: showPicture(${reviewPointEntity.getSourceNote()}, 1)"/>
         </div>
         <h2 th:unless="${quizQuestion.isPictureQuestion()}" class="display-5" th:text="${quizQuestion.getDescription()}"/>
+        <h2 th:unless="${#strings.isEmpty(quizQuestion.mainTopic)}" class="display-5 text-center" th:text="${quizQuestion.mainTopic}"/>
 
         <div class="row mt-2" th:unless="${quizQuestion.getQuestionType().label=='spelling'}">
             <div class="col-sm-6 mb-3" th:each="option:${quizQuestion.getOptions()}">

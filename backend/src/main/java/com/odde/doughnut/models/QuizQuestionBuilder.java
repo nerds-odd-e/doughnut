@@ -28,7 +28,8 @@ public class QuizQuestionBuilder {
         QuizQuestion quizQuestion = new QuizQuestion(reviewPointEntity, randomizer, modelFactoryService);
         quizQuestion.setQuestionType(questionType);
         quizQuestion.setOptions(generateOptions());
-        quizQuestion.setDescription(buildDescription());
+        quizQuestion.setDescription(generateDescription());
+        quizQuestion.setMainTopic(generateMainTopic());
         return quizQuestion;
     }
 
@@ -52,9 +53,9 @@ public class QuizQuestionBuilder {
         return toTitleOptions(selectedList);
     }
 
-    private String buildDescription() {
+    private String generateDescription() {
         if (questionType.equals(PICTURE_SELECTION)) {
-            return getAnswerNote().getTitle();
+            return "";
         }
         if (questionType.equals(LINK_TARGET)) {
             return reviewPointEntity.getLinkEntity().getQuizDescription();
@@ -63,6 +64,13 @@ public class QuizQuestionBuilder {
             return String.format("Which of the following %s", reviewPointEntity.getExclusiveQuestion());
         }
         return getAnswerNote().getClozeDescription();
+    }
+
+    private String generateMainTopic() {
+        if (questionType.equals(PICTURE_SELECTION) || questionType.equals(LINK_SOURCE_EXCLUSIVE)) {
+            return getAnswerNote().getTitle();
+        }
+        return "";
     }
 
     private List<QuizQuestion.Option> toPictureOptions(List<NoteEntity> selectedList) {

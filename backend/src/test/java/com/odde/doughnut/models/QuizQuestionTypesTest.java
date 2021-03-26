@@ -45,6 +45,7 @@ class QuizQuestionTypesTest {
             QuizQuestionBuilder builder = new QuizQuestionBuilder(LINK_SOURCE_EXCLUSIVE, randomizer, reviewPointEntity, makeMe.modelFactoryService);
             QuizQuestion quizQuestion = builder.buildQuizQuestion();
             assertThat(quizQuestion.getDescription(), equalTo("Which of the following does not belong to"));
+            assertThat(quizQuestion.getMainTopic(), equalTo(note1.getTitle()));
         }
     }
 }

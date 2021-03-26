@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class QuizQuestion {
+
     public enum QuestionType {
         CLOZE_SELECTION("cloze_selection"),
         SPELLING("spelling"),
@@ -38,6 +39,8 @@ public class QuizQuestion {
     public List<Option> options;
     @Getter @Setter
     public String description;
+    @Getter @Setter
+    public String mainTopic;
 
     public QuizQuestion(ReviewPointEntity reviewPointEntity, Randomizer randomizer, ModelFactoryService modelFactoryService) {
         this.reviewPointEntity = reviewPointEntity;

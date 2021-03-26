@@ -40,9 +40,6 @@ public class ModelFactoryService {
     }
 
     public TreeNodeModel toTreeNodeModel(NoteEntity note) {
-        if (note == null) {
-            return null;
-        }
         return new TreeNodeModel(note, this);
     }
 
