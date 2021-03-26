@@ -12,9 +12,13 @@ import java.sql.Timestamp;
 @SessionScope
 public class TimeTraveler {
     private Timestamp timestamp = null;
+    private NonRandomizer nonRandomizer = null;
 
     public void timeTravelTo(Timestamp timestamp) {
         this.timestamp = timestamp;
+        if (nonRandomizer == null) {
+            nonRandomizer = new NonRandomizer();
+        }
     }
 
     public Timestamp getCurrentUTCTimestamp() {
@@ -25,9 +29,16 @@ public class TimeTraveler {
     }
 
     public Randomizer getRandomizer() {
-        if (timestamp == null) {
+        if (nonRandomizer == null) {
             return new RealRandomizer();
         }
-        return new NonRandomizer();
+        return nonRandomizer;
+    }
+
+    public void setAlwaysChoose(String option) {
+        if (nonRandomizer == null) {
+            nonRandomizer = new NonRandomizer();
+        }
+        nonRandomizer.setAlwaysChoose(option);
     }
 }

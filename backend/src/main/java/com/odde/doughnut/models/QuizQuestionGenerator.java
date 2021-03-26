@@ -34,6 +34,7 @@ public class QuizQuestionGenerator {
             }
             if (!Strings.isEmpty(noteEntity.getNotePicture())) {
                 questionTypes.add(QuizQuestion.QuestionType.PICTURE_TITLE);
+                questionTypes.add(QuizQuestion.QuestionType.PICTURE_SELECTION);
             }
         }
         return randomizer.chooseOneRandomly(questionTypes);

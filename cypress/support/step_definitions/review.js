@@ -110,6 +110,12 @@ Then("I should be asked picture question {string} with options {string}", (pictu
     cy.shouldSeeQuizWithOptions([], options);
 });
 
+Then("I should be asked picture selection question {string} with {string}", (question, options) => {
+    cy.shouldSeeQuizWithOptions([question], "");
+});
+
+
+
 Then("I should be asked spelling question {string}", (question) => {
     cy.findByText(question).should('be.visible');
 });
@@ -149,5 +155,9 @@ Then("I am changing note {string}'s review setting", (noteTitle) => {
   cy.get('@seededNoteIdMap').then(seededNoteIdMap=>
     cy.visit(`/notes/${seededNoteIdMap[noteTitle]}/review_setting`)
   );
+});
+
+Then("The randomizer always choose the last", (yesNo) => {
+    cy.randomizerAlwaysChooseLast();
 });
 

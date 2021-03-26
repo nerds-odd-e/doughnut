@@ -31,6 +31,13 @@ class TestabilityController {
         return "redirect:panel";
     }
 
+    @PostMapping(value="/randomizer")
+    public String randomizer(@RequestParam Map<String, String> userInfo) {
+        String option = userInfo.get("choose");
+        timeTraveler.setAlwaysChoose(option);
+        return "redirect:panel";
+    }
+
     @GetMapping("/panel")
     public String panel(Model model) {
         String currentTime = timeTraveler.getCurrentUTCTimestamp().toLocalDateTime().format(TestabilityRestController.getDateTimeFormatter());

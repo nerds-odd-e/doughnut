@@ -157,6 +157,15 @@ Cypress.Commands.add("timeTravelTo", (day, hour) => {
   }).its("status").should("equal", 200);
 });
 
+Cypress.Commands.add("randomizerAlwaysChooseLast", (day, hour) => {
+  cy.request({
+    method: "POST",
+    url: "/testability/randomizer",
+    form: true,
+    body: { choose: "last" }
+  }).its("status").should("equal", 200);
+});
+
 Cypress.Commands.add("initialReviewOneNoteIfThereIs", ({review_type, title, additional_info}) => {
     if(review_type == "initial done") {
         cy.findByText("You have achieved your daily new notes goal.").should("be.visible");

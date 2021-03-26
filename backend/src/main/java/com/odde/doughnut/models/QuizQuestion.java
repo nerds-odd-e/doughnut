@@ -16,6 +16,7 @@ public class QuizQuestion {
         CLOZE_SELECTION("cloze_selection"),
         SPELLING("spelling"),
         PICTURE_TITLE("picture_title"),
+        PICTURE_SELECTION("picture_selection"),
         LINK_TARGET("link_target");
 
         public final String label;
@@ -42,6 +43,9 @@ public class QuizQuestion {
     }
 
     public String getDescription() {
+        if (questionType.equals(QuestionType.PICTURE_SELECTION)) {
+            return getAnswerNote().getTitle();
+        }
         if (questionType.equals(QuestionType.LINK_TARGET)) {
             return reviewPointEntity.getLinkEntity().getQuizDescription();
         }
