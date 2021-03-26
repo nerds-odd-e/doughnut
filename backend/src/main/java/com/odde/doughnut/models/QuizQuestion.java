@@ -6,10 +6,12 @@ import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.services.ModelFactoryService;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.logging.log4j.util.Strings;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class QuizQuestion {
     public enum QuestionType {
@@ -52,18 +54,32 @@ public class QuizQuestion {
         return getAnswerNote().getClozeDescription();
     }
 
-    public List<String> getOptions() {
+    public List<Option> getOptions() {
         TreeNodeModel treeNodeModel = getAnswerTreeNodeModel();
-        List<String> list = treeNodeModel.getSiblings().stream().map(NoteEntity::getTitle)
-                .filter(t->!t.equals(getAnswerNote().getTitle()))
-                .collect(Collectors.toList());
+        Stream<NoteEntity> noteEntityStream = treeNodeModel.getSiblings().stream()
+                .filter(t -> !t.getTitle().equals(getAnswerNote().getTitle()));
+        if(questionType == QuestionType.PICTURE_SELECTION) {
+            noteEntityStream = noteEntityStream.filter(n -> Strings.isNotEmpty(n.getNotePicture()));
+        }
+        List<NoteEntity> list = noteEntityStream.collect(Collectors.toList());
         randomizer.shuffle(list);
-        List<String> selectedList = list.stream().limit(5).collect(Collectors.toList());
-        selectedList.add(getAnswerNote().getTitle());
-        Collections.shuffle(selectedList);
+        List<NoteEntity> selectedList = list.stream().limit(5).collect(Collectors.toList());
+        selectedList.add(getAnswerNote());
+        randomizer.shuffle(selectedList);
 
-        return selectedList;
+        if (questionType == QuestionType.PICTURE_SELECTION) {
+            return toPictureOptions(selectedList);
+        }
 
+        return toTitleOptions(selectedList);
+    }
+
+    private List<Option> toPictureOptions(List<NoteEntity> selectedList) {
+        return selectedList.stream().map(Option::createPictureOption).collect(Collectors.toUnmodifiableList());
+    }
+
+    private List<Option> toTitleOptions(List<NoteEntity> selectedList) {
+        return selectedList.stream().map(Option::createTitleOption).collect(Collectors.toUnmodifiableList());
     }
 
     public AnswerEntity buildAnswer() {
@@ -82,5 +98,31 @@ public class QuizQuestion {
             return reviewPointEntity.getLinkEntity().getTargetNote();
         }
         return reviewPointEntity.getNoteEntity();
+    }
+
+    private static class Option {
+        @Getter private String value;
+        @Getter private String display;
+        @Getter private NoteEntity note;
+        @Getter private boolean isPicture = false;
+
+        private Option() {
+        }
+
+        static Option createTitleOption(NoteEntity note) {
+            Option option = new Option();
+            option.value = note.getTitle();
+            option.display = option.value;
+            return option;
+        }
+
+        static Option createPictureOption(NoteEntity note) {
+            Option option = new Option();
+            option.value = note.getTitle();
+            option.note = note;
+            option.isPicture = true;
+            return option;
+        }
+
     }
 }

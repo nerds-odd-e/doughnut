@@ -10,10 +10,16 @@
         <div class="row mt-2" th:unless="${quizQuestion.getQuestionType().label=='spelling'}">
             <div class="col-sm-6 mb-3" th:each="option:${quizQuestion.getOptions()}">
                 <form th:action="@{/reviews/{id}/answer(id=${reviewPointEntity.id})}" th:object="${emptyAnswer}" method="post">
-                    <input type="hidden" name="answer" th:value="${option}"/>
+                    <input type="hidden" name="answer" th:value="${option.value}"/>
                     <input type="hidden" th:field="*{questionType}"/>
                     <input type="hidden" th:field="*{reviewPointEntity}"/>
-                    <input type="submit" th:value="${option}" class="btn btn-secondary btn-lg btn-block"/>
+                    <button class="btn btn-secondary btn-lg btn-block">
+                        <div th:text="${option.display}" th:unless="${option.isPicture}"/>
+                        <div th:if="${option.isPicture}">
+                            <div th:replace="_fragments/note_fragments :: showPicture(${option.note}, 1)"/>
+                        </div>
+                    </button>
+
                 </form>
             </div>
         </div>
