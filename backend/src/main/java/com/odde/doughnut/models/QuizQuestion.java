@@ -19,7 +19,8 @@ public class QuizQuestion {
         SPELLING("spelling"),
         PICTURE_TITLE("picture_title"),
         PICTURE_SELECTION("picture_selection"),
-        LINK_TARGET("link_target");
+        LINK_TARGET("link_target"),
+        LINK_SOURCE_EXCLUSIVE("link_source_exclusive");
 
         public final String label;
 
@@ -33,6 +34,8 @@ public class QuizQuestion {
     private final ReviewPointEntity reviewPointEntity;
     @Getter @Setter
     private QuestionType questionType = null;
+    @Getter @Setter
+    public List<Option> options;
 
     public QuizQuestion(ReviewPointEntity reviewPointEntity, Randomizer randomizer, ModelFactoryService modelFactoryService) {
         this.reviewPointEntity = reviewPointEntity;
@@ -54,43 +57,11 @@ public class QuizQuestion {
         return getAnswerNote().getClozeDescription();
     }
 
-    public List<Option> getOptions() {
-        TreeNodeModel treeNodeModel = getAnswerTreeNodeModel();
-        Stream<NoteEntity> noteEntityStream = treeNodeModel.getSiblings().stream()
-                .filter(t -> !t.getTitle().equals(getAnswerNote().getTitle()));
-        if(questionType == QuestionType.PICTURE_SELECTION) {
-            noteEntityStream = noteEntityStream.filter(n -> Strings.isNotEmpty(n.getNotePicture()));
-        }
-        List<NoteEntity> list = noteEntityStream.collect(Collectors.toList());
-        randomizer.shuffle(list);
-        List<NoteEntity> selectedList = list.stream().limit(5).collect(Collectors.toList());
-        selectedList.add(getAnswerNote());
-        randomizer.shuffle(selectedList);
-
-        if (questionType == QuestionType.PICTURE_SELECTION) {
-            return toPictureOptions(selectedList);
-        }
-
-        return toTitleOptions(selectedList);
-    }
-
-    private List<Option> toPictureOptions(List<NoteEntity> selectedList) {
-        return selectedList.stream().map(Option::createPictureOption).collect(Collectors.toUnmodifiableList());
-    }
-
-    private List<Option> toTitleOptions(List<NoteEntity> selectedList) {
-        return selectedList.stream().map(Option::createTitleOption).collect(Collectors.toUnmodifiableList());
-    }
-
     public AnswerEntity buildAnswer() {
         AnswerEntity answerEntity = new AnswerEntity();
         answerEntity.setReviewPointEntity(reviewPointEntity);
         answerEntity.setQuestionType(questionType);
         return answerEntity;
-    }
-
-    private TreeNodeModel getAnswerTreeNodeModel() {
-        return modelFactoryService.toTreeNodeModel(getAnswerNote());
     }
 
     private NoteEntity getAnswerNote() {

@@ -12,7 +12,6 @@ import static com.odde.doughnut.models.QuizQuestion.QuestionType.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
-import static org.junit.jupiter.api.Assertions.*;
 
 class QuizQuestionGeneratorTest {
     MakeMe makeMe = new MakeMe();
@@ -22,7 +21,7 @@ class QuizQuestionGeneratorTest {
     void clozeSelection() {
         NoteEntity note = makeMe.aNote().inMemoryPlease();
         ReviewPointEntity reviewPoint = makeMe.aReviewPointFor(note).inMemoryPlease();
-        QuizQuestionGenerator generator = new QuizQuestionGenerator(reviewPoint, randomizer);
+        QuizQuestionGenerator generator = new QuizQuestionGenerator(reviewPoint, randomizer, null);
         List<QuizQuestion.QuestionType> questionTypes = generator.availableQuestionTypes();
         assertThat(questionTypes, contains(CLOZE_SELECTION));
     }
@@ -32,9 +31,9 @@ class QuizQuestionGeneratorTest {
         NoteEntity note1 = makeMe.aNote().inMemoryPlease();
         NoteEntity note2 = makeMe.aNote().linkTo(note1).inMemoryPlease();
         ReviewPointEntity reviewPoint = makeMe.aReviewPointFor(note2.getLinks().get(0)).inMemoryPlease();
-        QuizQuestionGenerator generator = new QuizQuestionGenerator(reviewPoint, randomizer);
+        QuizQuestionGenerator generator = new QuizQuestionGenerator(reviewPoint, randomizer, null);
         List<QuizQuestion.QuestionType> questionTypes = generator.availableQuestionTypes();
-        assertThat(questionTypes, containsInAnyOrder(LINK_TARGET));
+        assertThat(questionTypes, containsInAnyOrder(LINK_TARGET, LINK_SOURCE_EXCLUSIVE));
     }
 
 }
