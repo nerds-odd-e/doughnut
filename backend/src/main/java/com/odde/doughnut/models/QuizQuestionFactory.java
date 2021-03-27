@@ -34,10 +34,16 @@ public class QuizQuestionFactory {
     }
 
     private List<QuizQuestion.Option> generateOptions() {
+        List<NoteEntity> selectedList;
         Stream<NoteEntity> noteEntityStream;
         if (questionType == LINK_SOURCE_EXCLUSIVE) {
             List<NoteEntity> noteEntities = reviewPointEntity.getLinkEntity().getBackwardPeers();
-            noteEntityStream = noteEntities.stream();
+            NoteEntity sourceNote = reviewPointEntity.getLinkEntity().getSourceNote();
+            noteEntityStream = noteEntities.stream()
+                    .filter(n-> !n.equals(sourceNote));
+            List<NoteEntity> list = noteEntityStream.collect(Collectors.toList());
+            selectedList = randomizer.randomlyChoose(4, list);
+            selectedList.add(sourceNote);
         }
         else {
             noteEntityStream = getAnswerTreeNodeModel().getSiblings().stream()
@@ -45,10 +51,9 @@ public class QuizQuestionFactory {
             if (questionType == PICTURE_SELECTION) {
                 noteEntityStream = noteEntityStream.filter(NoteEntity::hasPicture);
             }
+            List<NoteEntity> list = noteEntityStream.collect(Collectors.toList());
+            selectedList = randomizer.randomlyChoose(5, list);
         }
-        List<NoteEntity> list = noteEntityStream.collect(Collectors.toList());
-        List<NoteEntity> selectedList;
-        selectedList = randomizer.randomlyChoose(5, list);
         selectedList.add(getAnswerNote());
         randomizer.shuffle(selectedList);
 

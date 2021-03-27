@@ -51,18 +51,51 @@ class QuizQuestionTypesTest {
             reviewPointEntity = makeMe.aReviewPointFor(source.getLinks().get(0)).inMemoryPlease();
         }
 
-        @Test
-        void shouldIncludeRightAnswers() {
-            NoteEntity notRelated = makeMe.aNote("noteRelated").under(top).please();
+        @Nested
+        class WithValidExclusiveAnswer {
+            NoteEntity notRelated;
+
+            @BeforeEach
+            void setup() {
+                notRelated = makeMe.aNote("noteRelated").under(top).please();
+            }
+
+            @Test
+            void shouldIncludeRightAnswers() {
+                QuizQuestion quizQuestion = buildLinSourceExclusiveQuizQuestion();
+                assertThat(quizQuestion.getDescription(), equalTo("Which of the following does not belong to"));
+                assertThat(quizQuestion.getMainTopic(), equalTo(target.getTitle()));
+                List<String> options = toOptionStrings(quizQuestion);
+                assertThat(anotherSource.getTitle(), in(options));
+                assertThat(notRelated.getTitle(), in(options));
+                assertThat(source.getTitle(), in(options));
+            }
+
+            @Test
+            void mustIncludeSourceNote() {
+                makeMe.aNote("anotherSource1").under(top).byUser(userModel.getEntity()).linkTo(target).please();
+                makeMe.aNote("anotherSource2").under(top).byUser(userModel.getEntity()).linkTo(target).please();
+                makeMe.aNote("anotherSource3").under(top).byUser(userModel.getEntity()).linkTo(target).please();
+                makeMe.aNote("anotherSource4").under(top).byUser(userModel.getEntity()).linkTo(target).please();
+                makeMe.aNote("anotherSource5").under(top).byUser(userModel.getEntity()).linkTo(target).please();
+                source = makeMe.aNote("anotherSource6").under(top).byUser(userModel.getEntity()).linkTo(target).please();
+                reviewPointEntity = makeMe.aReviewPointFor(source.getLinks().get(0)).inMemoryPlease();
+                QuizQuestion quizQuestion = buildLinSourceExclusiveQuizQuestion();
+                List<String> options = toOptionStrings(quizQuestion);
+                assertThat(notRelated.getTitle(), in(options));
+                assertThat(source.getTitle(), in(options));
+            }
+        }
+
+        private QuizQuestion buildLinSourceExclusiveQuizQuestion() {
             QuizQuestionFactory builder = new QuizQuestionFactory(LINK_SOURCE_EXCLUSIVE, randomizer, reviewPointEntity, makeMe.modelFactoryService);
             QuizQuestion quizQuestion = builder.buildQuizQuestion();
-            assertThat(quizQuestion.getDescription(), equalTo("Which of the following does not belong to"));
-            assertThat(quizQuestion.getMainTopic(), equalTo(target.getTitle()));
-            List<String> options = quizQuestion.getOptions().stream().map(QuizQuestion.Option::getDisplay).collect(Collectors.toUnmodifiableList());
-            assertThat(anotherSource.getTitle(), in(options));
-            assertThat(notRelated.getTitle(), in(options));
-            assertThat(source.getTitle(), in(options));
+            return quizQuestion;
         }
+    }
+
+    private List<String> toOptionStrings(QuizQuestion quizQuestion) {
+        return quizQuestion.getOptions().stream().map(QuizQuestion.Option::getDisplay).collect(Collectors.toUnmodifiableList());
     }
 }
 
