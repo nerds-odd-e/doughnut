@@ -4,29 +4,23 @@ import com.odde.doughnut.entities.LinkEntity;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.models.QuizQuestion;
-import com.odde.doughnut.models.Randomizer;
-import com.odde.doughnut.services.ModelFactoryService;
 
 import java.util.List;
-
-import static com.odde.doughnut.models.QuizQuestion.QuestionType.LINK_TARGET;
 
 public class LinkTargetQuizFactory implements QuizQuestionFactory {
     private final LinkEntity linkEntity;
     private final NoteEntity answerNote;
-    private final Randomizer randomizer;
     private final QuizQuestionServant servant;
 
-    public LinkTargetQuizFactory(ReviewPointEntity reviewPointEntity, Randomizer randomizer, ModelFactoryService modelFactoryService) {
+    public LinkTargetQuizFactory(QuizQuestionServant servant, ReviewPointEntity reviewPointEntity) {
         this.linkEntity = reviewPointEntity.getLinkEntity();
-        this.randomizer = randomizer;
-        servant = new QuizQuestionServant(randomizer, modelFactoryService);
+        this.servant = servant;
         this.answerNote = getAnswerNote();
     }
 
     @Override
     public List<NoteEntity> generateFillingOptions() {
-        return servant.choose5FromSiblings(answerNote, randomizer, n -> !n.equals(answerNote));
+        return servant.choose5FromSiblings(answerNote, n -> !n.equals(answerNote));
     }
 
     @Override

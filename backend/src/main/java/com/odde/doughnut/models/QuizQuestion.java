@@ -3,26 +3,30 @@ package com.odde.doughnut.models;
 import com.odde.doughnut.entities.AnswerEntity;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.ReviewPointEntity;
+import com.odde.doughnut.models.quizFacotries.*;
 import com.odde.doughnut.services.ModelFactoryService;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.function.BiFunction;
 
 public class QuizQuestion {
 
     public enum QuestionType {
-        CLOZE_SELECTION("cloze_selection"),
-        SPELLING("spelling"),
-        PICTURE_TITLE("picture_title"),
-        PICTURE_SELECTION("picture_selection"),
-        LINK_TARGET("link_target"),
-        LINK_SOURCE_EXCLUSIVE("link_source_exclusive");
+        CLOZE_SELECTION("cloze_selection", DefaultQuizFactory::new),
+        SPELLING("spelling", DefaultQuizFactory::new),
+        PICTURE_TITLE("picture_title", DefaultQuizFactory::new),
+        PICTURE_SELECTION("picture_selection", PictureSelectionQuizFactory::new),
+        LINK_TARGET("link_target", LinkTargetQuizFactory::new),
+        LINK_SOURCE_EXCLUSIVE("link_source_exclusive", LinkTargetExclusiveQuizFactory::new);
 
         public final String label;
+        public final BiFunction<QuizQuestionServant, ReviewPointEntity, QuizQuestionFactory> factory;
 
-        QuestionType(String label) {
+        QuestionType(String label, BiFunction<QuizQuestionServant, ReviewPointEntity, QuizQuestionFactory> factory) {
             this.label = label;
+            this.factory = factory;
         }
     }
 

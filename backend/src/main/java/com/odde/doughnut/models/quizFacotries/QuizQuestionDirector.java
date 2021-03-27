@@ -21,22 +21,8 @@ public class QuizQuestionDirector {
         this.randomizer = randomizer;
         this.reviewPointEntity = reviewPointEntity;
         this.modelFactoryService = modelFactoryService;
-        switch (questionType) {
-            case LINK_SOURCE_EXCLUSIVE:
-                this.linkTargetExclusiveQuizFactory = new LinkTargetExclusiveQuizFactory(reviewPointEntity, randomizer, modelFactoryService);
-                break;
-            case PICTURE_SELECTION:
-                this.linkTargetExclusiveQuizFactory = new PictureSelectTitleQuizFactory(reviewPointEntity, randomizer, modelFactoryService);
-                break;
-            case LINK_TARGET:
-                this.linkTargetExclusiveQuizFactory = new LinkTargetQuizFactory(reviewPointEntity, randomizer, modelFactoryService);
-                break;
-            default:
-                DefaultQuizFactory defaultQuizFactory = new DefaultQuizFactory(reviewPointEntity, randomizer, modelFactoryService);
-                defaultQuizFactory.setQuestionType(questionType);
-                this.linkTargetExclusiveQuizFactory = defaultQuizFactory;
-                break;
-        }
+        QuizQuestionServant servant = new QuizQuestionServant(randomizer, modelFactoryService);
+        this.linkTargetExclusiveQuizFactory = questionType.factory.apply(servant, reviewPointEntity);
         this.answerNote = linkTargetExclusiveQuizFactory.generateAnswerNote();
     }
 

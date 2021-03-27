@@ -11,8 +11,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class QuizQuestionServant {
-    private final Randomizer randomizer;
-    private final ModelFactoryService modelFactoryService;
+    final Randomizer randomizer;
+    final ModelFactoryService modelFactoryService;
 
     public QuizQuestionServant(Randomizer randomizer, ModelFactoryService modelFactoryService) {
         this.randomizer = randomizer;
@@ -27,7 +27,7 @@ public class QuizQuestionServant {
         return selectedList.stream().map(QuizQuestion.Option::createTitleOption).collect(Collectors.toUnmodifiableList());
     }
 
-    List<NoteEntity> choose5FromSiblings(NoteEntity answerNote, Randomizer randomizer, Predicate<NoteEntity> noteEntityPredicate) {
+    List<NoteEntity> choose5FromSiblings(NoteEntity answerNote, Predicate<NoteEntity> noteEntityPredicate) {
         List<NoteEntity> siblings = modelFactoryService.toTreeNodeModel(answerNote).getSiblings();
         Stream<NoteEntity> noteEntityStream = siblings.stream()
                 .filter(noteEntityPredicate);
@@ -36,4 +36,11 @@ public class QuizQuestionServant {
     }
 
 
+    List<NoteEntity> randomlyChooseAndEnsure(List<NoteEntity> candidates, NoteEntity ensure, int maxSize) {
+        List<NoteEntity> list = candidates.stream()
+                .filter(n -> !n.equals(ensure)).collect(Collectors.toList());
+        List<NoteEntity> selectedList = this.randomizer.randomlyChoose(maxSize - 1, list);
+        selectedList.add(ensure);
+        return selectedList;
+    }
 }
