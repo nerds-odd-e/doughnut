@@ -51,6 +51,12 @@ class QuizQuestionTypesTest {
             reviewPointEntity = makeMe.aReviewPointFor(source.getLinks().get(0)).inMemoryPlease();
         }
 
+        @Test
+        void shouldReturnNullIfCannotFindCandidateAnswer() {
+            QuizQuestion quizQuestion = buildLinSourceExclusiveQuizQuestion();
+            assertThat(quizQuestion, is(nullValue()));
+        }
+
         @Nested
         class WithValidExclusiveAnswer {
             NoteEntity notRelated;

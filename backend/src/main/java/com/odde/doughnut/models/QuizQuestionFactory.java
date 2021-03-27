@@ -25,6 +25,9 @@ public class QuizQuestionFactory {
     }
 
     QuizQuestion buildQuizQuestion() {
+        if (getAnswerNote() == null) {
+            return null;
+        }
         QuizQuestion quizQuestion = new QuizQuestion(reviewPointEntity, randomizer, modelFactoryService);
         quizQuestion.setQuestionType(questionType);
         quizQuestion.setOptions(generateOptions());

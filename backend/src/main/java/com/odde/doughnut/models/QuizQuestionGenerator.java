@@ -42,21 +42,14 @@ public class QuizQuestionGenerator {
     }
 
     QuizQuestion generateQuestion(ModelFactoryService modelFactoryService) {
-        QuizQuestion.QuestionType questionType = generateQuestionType();
-        return generateQuestionOfType(questionType, modelFactoryService);
-    }
-
-    QuizQuestion generateQuestionOfType(QuizQuestion.QuestionType questionType, ModelFactoryService modelFactoryService) {
-        if (questionType == null) {
-            return null;
-        }
-        QuizQuestionFactory quizQuestionFactory = new QuizQuestionFactory(questionType, randomizer, reviewPointEntity, modelFactoryService);
-        return quizQuestionFactory.buildQuizQuestion();
-    }
-
-    private QuizQuestion.QuestionType generateQuestionType() {
         List<QuizQuestion.QuestionType> questionTypes = availableQuestionTypes();
-        return randomizer.chooseOneRandomly(questionTypes);
+        randomizer.shuffle(questionTypes);
+        for(QuizQuestion.QuestionType type: questionTypes) {
+            QuizQuestionFactory quizQuestionFactory = new QuizQuestionFactory(type, randomizer, reviewPointEntity, modelFactoryService);
+            QuizQuestion quizQuestion = quizQuestionFactory.buildQuizQuestion();
+            if (quizQuestion != null) return quizQuestion;
+        }
+        return null;
     }
 
 }
