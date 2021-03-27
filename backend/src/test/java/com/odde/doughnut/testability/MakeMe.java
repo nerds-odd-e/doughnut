@@ -1,9 +1,6 @@
 package com.odde.doughnut.testability;
 
-import com.odde.doughnut.entities.ImageEntity;
-import com.odde.doughnut.entities.LinkEntity;
-import com.odde.doughnut.entities.NoteEntity;
-import com.odde.doughnut.entities.ReviewPointEntity;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.ModelForEntity;
 import com.odde.doughnut.services.ModelFactoryService;
@@ -12,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 
+import java.lang.invoke.CallSite;
 import java.nio.CharBuffer;
 
 @Component
@@ -90,5 +88,9 @@ public class MakeMe {
 
     public UploadedPictureBuilder anUploadedPicture() {
         return new UploadedPictureBuilder();
+    }
+
+    public AnswerBuilder anAnswerFor(ReviewPointEntity reviewPointEntity) {
+        return new AnswerBuilder(new AnswerEntity(), this).forReviewPoint(reviewPointEntity);
     }
 }

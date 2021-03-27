@@ -3,6 +3,7 @@ package com.odde.doughnut.models.randomizers;
 import com.odde.doughnut.models.Randomizer;
 import lombok.Setter;
 
+import java.util.Collections;
 import java.util.List;
 
 public class NonRandomizer implements Randomizer {
@@ -11,6 +12,9 @@ public class NonRandomizer implements Randomizer {
 
     @Override
     public <T> void shuffle(List<T> list) {
+        if (alwaysChoose.equals("last")) {
+            Collections.reverse(list);
+        }
     }
 
     @Override

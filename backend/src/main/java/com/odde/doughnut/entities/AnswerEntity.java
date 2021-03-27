@@ -7,6 +7,8 @@ import lombok.Setter;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
+import static com.odde.doughnut.models.QuizQuestion.QuestionType.*;
+
 public class AnswerEntity {
     @NotNull
     @Getter
@@ -22,8 +24,12 @@ public class AnswerEntity {
     QuizQuestion.QuestionType questionType;
 
     public boolean checkAnswer() {
-        if (questionType == QuizQuestion.QuestionType.LINK_TARGET) {
+        if (questionType == LINK_TARGET) {
             return (answer.equals(reviewPointEntity.getLinkEntity().getTargetNote().getTitle()));
+        }
+        if (questionType == LINK_SOURCE_EXCLUSIVE) {
+            return reviewPointEntity.getLinkEntity().getBackwardPeers().stream()
+                    .map(NoteEntity::getTitle).noneMatch(t->t.equals(answer));
         }
         return (
                 answer.toLowerCase().trim().equals(
