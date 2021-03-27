@@ -6,12 +6,8 @@ import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.services.ModelFactoryService;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.logging.log4j.util.Strings;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class QuizQuestion {
 
