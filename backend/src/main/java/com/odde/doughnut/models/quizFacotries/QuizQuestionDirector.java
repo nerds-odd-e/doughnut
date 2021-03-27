@@ -25,6 +25,9 @@ public class QuizQuestionDirector {
             case LINK_SOURCE_EXCLUSIVE:
                 this.linkTargetExclusiveQuizFactory = new LinkTargetExclusiveQuizFactory(reviewPointEntity, randomizer, modelFactoryService);
                 break;
+            case PICTURE_SELECTION:
+                this.linkTargetExclusiveQuizFactory = new PictureSelectTitleQuizFactory(reviewPointEntity, randomizer, modelFactoryService);
+                break;
             default:
                 DefaultQuizFactory defaultQuizFactory = new DefaultQuizFactory(reviewPointEntity, randomizer, modelFactoryService);
                 defaultQuizFactory.setQuestionType(questionType);
