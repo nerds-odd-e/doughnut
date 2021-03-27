@@ -2,6 +2,7 @@ package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.ReviewPointEntity;
+import com.odde.doughnut.models.quizFacotries.QuizQuestionDirector;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
@@ -94,9 +95,8 @@ class QuizQuestionTypesTest {
         }
 
         private QuizQuestion buildLinSourceExclusiveQuizQuestion() {
-            QuizQuestionFactory builder = new QuizQuestionFactory(LINK_SOURCE_EXCLUSIVE, randomizer, reviewPointEntity, makeMe.modelFactoryService);
-            QuizQuestion quizQuestion = builder.buildQuizQuestion();
-            return quizQuestion;
+            QuizQuestionDirector builder = new QuizQuestionDirector(LINK_SOURCE_EXCLUSIVE, randomizer, reviewPointEntity, makeMe.modelFactoryService);
+            return builder.buildQuizQuestion();
         }
     }
 

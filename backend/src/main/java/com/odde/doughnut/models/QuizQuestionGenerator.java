@@ -3,6 +3,7 @@ package com.odde.doughnut.models;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.entities.ReviewSettingEntity;
+import com.odde.doughnut.models.quizFacotries.QuizQuestionDirector;
 import com.odde.doughnut.services.ModelFactoryService;
 import org.apache.logging.log4j.util.Strings;
 
@@ -45,8 +46,8 @@ public class QuizQuestionGenerator {
         List<QuizQuestion.QuestionType> questionTypes = availableQuestionTypes();
         randomizer.shuffle(questionTypes);
         for(QuizQuestion.QuestionType type: questionTypes) {
-            QuizQuestionFactory quizQuestionFactory = new QuizQuestionFactory(type, randomizer, reviewPointEntity, modelFactoryService);
-            QuizQuestion quizQuestion = quizQuestionFactory.buildQuizQuestion();
+            QuizQuestionDirector quizQuestionDirector = new QuizQuestionDirector(type, randomizer, reviewPointEntity, modelFactoryService);
+            QuizQuestion quizQuestion = quizQuestionDirector.buildQuizQuestion();
             if (quizQuestion != null) return quizQuestion;
         }
         return null;

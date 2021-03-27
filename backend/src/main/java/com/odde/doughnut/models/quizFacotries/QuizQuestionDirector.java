@@ -1,7 +1,10 @@
-package com.odde.doughnut.models;
+package com.odde.doughnut.models.quizFacotries;
 
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.ReviewPointEntity;
+import com.odde.doughnut.models.QuizQuestion;
+import com.odde.doughnut.models.Randomizer;
+import com.odde.doughnut.models.TreeNodeModel;
 import com.odde.doughnut.services.ModelFactoryService;
 
 import java.util.List;
@@ -10,22 +13,25 @@ import java.util.stream.Stream;
 
 import static com.odde.doughnut.models.QuizQuestion.QuestionType.*;
 
-public class QuizQuestionFactory {
+public class QuizQuestionDirector {
     private final QuizQuestion.QuestionType questionType;
     private final Randomizer randomizer;
     private final ReviewPointEntity reviewPointEntity;
-    private NoteEntity answerNote = null;
+    private final NoteEntity answerNote;
     final ModelFactoryService modelFactoryService;
+    private final LinkTargetExclusiveQuizFactory linkTargetExclusiveQuizFactory;
 
-    public QuizQuestionFactory(QuizQuestion.QuestionType questionType, Randomizer randomizer, ReviewPointEntity reviewPointEntity, ModelFactoryService modelFactoryService) {
+    public QuizQuestionDirector(QuizQuestion.QuestionType questionType, Randomizer randomizer, ReviewPointEntity reviewPointEntity, ModelFactoryService modelFactoryService) {
         this.questionType = questionType;
         this.randomizer = randomizer;
         this.reviewPointEntity = reviewPointEntity;
         this.modelFactoryService = modelFactoryService;
+        this.linkTargetExclusiveQuizFactory = new LinkTargetExclusiveQuizFactory(reviewPointEntity, randomizer, modelFactoryService);
+        this.answerNote = getAnswerNote();
     }
 
-    QuizQuestion buildQuizQuestion() {
-        if (getAnswerNote() == null) {
+    public QuizQuestion buildQuizQuestion() {
+        if (answerNote == null) {
             return null;
         }
         QuizQuestion quizQuestion = new QuizQuestion(reviewPointEntity, randomizer, modelFactoryService);
@@ -38,26 +44,19 @@ public class QuizQuestionFactory {
 
     private List<QuizQuestion.Option> generateOptions() {
         List<NoteEntity> selectedList;
-        Stream<NoteEntity> noteEntityStream;
         if (questionType == LINK_SOURCE_EXCLUSIVE) {
-            List<NoteEntity> noteEntities = reviewPointEntity.getLinkEntity().getBackwardPeers();
-            NoteEntity sourceNote = reviewPointEntity.getLinkEntity().getSourceNote();
-            noteEntityStream = noteEntities.stream()
-                    .filter(n-> !n.equals(sourceNote));
-            List<NoteEntity> list = noteEntityStream.collect(Collectors.toList());
-            selectedList = randomizer.randomlyChoose(4, list);
-            selectedList.add(sourceNote);
-        }
-        else {
+            selectedList = linkTargetExclusiveQuizFactory.generateFillingOptions();
+        } else {
+            Stream<NoteEntity> noteEntityStream;
             noteEntityStream = getAnswerTreeNodeModel().getSiblings().stream()
-                .filter(n->!n.equals(getAnswerNote()));
+                    .filter(n -> !n.equals(answerNote));
             if (questionType == PICTURE_SELECTION) {
                 noteEntityStream = noteEntityStream.filter(NoteEntity::hasPicture);
             }
             List<NoteEntity> list = noteEntityStream.collect(Collectors.toList());
             selectedList = randomizer.randomlyChoose(5, list);
         }
-        selectedList.add(getAnswerNote());
+        selectedList.add(answerNote);
         randomizer.shuffle(selectedList);
 
         if (questionType == PICTURE_SELECTION) {
@@ -65,6 +64,10 @@ public class QuizQuestionFactory {
         }
 
         return toTitleOptions(selectedList);
+    }
+
+    private List<NoteEntity> generateFillingOptions() {
+        return linkTargetExclusiveQuizFactory.generateFillingOptions();
     }
 
     private String generateDescription() {
@@ -75,19 +78,27 @@ public class QuizQuestionFactory {
             return reviewPointEntity.getLinkEntity().getQuizDescription();
         }
         if (questionType.equals(LINK_SOURCE_EXCLUSIVE)) {
-            return String.format("Which of the following %s", reviewPointEntity.getExclusiveQuestion());
+            return linkTargetExclusiveQuizFactory.generateInstruction();
         }
-        return getAnswerNote().getClozeDescription();
+        return answerNote.getClozeDescription();
+    }
+
+    private String generateInstruction() {
+        return linkTargetExclusiveQuizFactory.generateInstruction();
     }
 
     private String generateMainTopic() {
         if (questionType.equals(PICTURE_SELECTION)) {
-            return getAnswerNote().getTitle();
+            return answerNote.getTitle();
         }
         if (questionType.equals(LINK_SOURCE_EXCLUSIVE)) {
-            return reviewPointEntity.getLinkEntity().getTargetNote().getTitle();
+            return linkTargetExclusiveQuizFactory.generateMainTopic();
         }
         return "";
+    }
+
+    private String generateMainTopic1() {
+        return linkTargetExclusiveQuizFactory.generateMainTopic();
     }
 
     private List<QuizQuestion.Option> toPictureOptions(List<NoteEntity> selectedList) {
@@ -99,26 +110,17 @@ public class QuizQuestionFactory {
     }
 
     private TreeNodeModel getAnswerTreeNodeModel() {
-        return modelFactoryService.toTreeNodeModel(getAnswerNote());
+        return modelFactoryService.toTreeNodeModel(answerNote);
     }
 
     private NoteEntity getAnswerNote() {
-        if (answerNote == null) {
-            if (questionType == LINK_TARGET) {
-                answerNote = reviewPointEntity.getLinkEntity().getTargetNote();
-            }
-            else if (questionType == LINK_SOURCE_EXCLUSIVE) {
-                NoteEntity note = reviewPointEntity.getLinkEntity().getSourceNote();
-                TreeNodeModel node = modelFactoryService.toTreeNodeModel(note);
-                List<NoteEntity> siblings = node.getSiblings();
-                siblings.removeAll(reviewPointEntity.getLinkEntity().getBackwardPeers());
-                siblings.remove(reviewPointEntity.getLinkEntity().getTargetNote());
-                answerNote = randomizer.chooseOneRandomly(siblings);
-            }
-            else {
-                answerNote = reviewPointEntity.getNoteEntity();
-            }
+        if (questionType == LINK_TARGET) {
+            return reviewPointEntity.getLinkEntity().getTargetNote();
         }
-        return answerNote;
+        if (questionType == LINK_SOURCE_EXCLUSIVE) {
+            return linkTargetExclusiveQuizFactory.generateAnswerNote();
+        }
+        return reviewPointEntity.getNoteEntity();
     }
+
 }

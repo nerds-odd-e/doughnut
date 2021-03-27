@@ -59,7 +59,7 @@ public class QuizQuestion {
         return answerEntity;
     }
 
-    static class Option {
+    public static class Option {
         @Getter private String value;
         @Getter private String display;
         @Getter private NoteEntity note;
@@ -68,14 +68,14 @@ public class QuizQuestion {
         private Option() {
         }
 
-        static Option createTitleOption(NoteEntity note) {
+        public static Option createTitleOption(NoteEntity note) {
             Option option = new Option();
             option.value = note.getTitle();
             option.display = option.value;
             return option;
         }
 
-        static Option createPictureOption(NoteEntity note) {
+        public static Option createPictureOption(NoteEntity note) {
             Option option = new Option();
             option.value = note.getTitle();
             option.note = note;

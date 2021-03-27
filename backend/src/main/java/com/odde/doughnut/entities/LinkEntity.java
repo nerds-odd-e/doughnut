@@ -94,4 +94,8 @@ public class LinkEntity {
         return targetNote.linkedNotesOfType(getLinkType().reverseType());
     }
 
+    public String getExclusiveQuestion() {
+        return getLinkType().exclusiveQuestion;
+    }
+
 }
