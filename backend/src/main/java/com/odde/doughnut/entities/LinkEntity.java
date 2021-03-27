@@ -86,7 +86,12 @@ public class LinkEntity {
         return "`" + getSourceNote().getTitle() + "` " + getType() + ":";
     }
 
-    LinkType getLinkType() {
+    public LinkType getLinkType() {
         return LinkType.fromString(type);
     }
+
+    public List<NoteEntity> getBackwardPeers() {
+        return targetNote.linkedNotesOfType(getLinkType().reverseType());
+    }
+
 }

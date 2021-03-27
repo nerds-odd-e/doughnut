@@ -20,4 +20,5 @@ public class RealRandomizer implements Randomizer {
         Random rand = new Random();
         return list.get(rand.nextInt(list.size()));
     }
+
 }

@@ -50,8 +50,8 @@ public class QuizQuestionGenerator {
         if (questionType == null) {
             return null;
         }
-        QuizQuestionBuilder quizQuestionBuilder = new QuizQuestionBuilder(questionType, randomizer, reviewPointEntity, modelFactoryService);
-        return quizQuestionBuilder.buildQuizQuestion();
+        QuizQuestionFactory quizQuestionFactory = new QuizQuestionFactory(questionType, randomizer, reviewPointEntity, modelFactoryService);
+        return quizQuestionFactory.buildQuizQuestion();
     }
 
     private QuizQuestion.QuestionType generateQuestionType() {

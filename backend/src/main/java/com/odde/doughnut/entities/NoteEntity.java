@@ -171,14 +171,8 @@ public class NoteEntity {
 
   public List<LinkEntity.LinkType> linkTypes() {
     return Arrays.stream(LinkEntity.LinkType.values())
-        .filter(t -> !linksOfType(t).isEmpty())
+        .filter(t -> !linkedNotesOfType(t).isEmpty())
         .collect(Collectors.toUnmodifiableList());
-  }
-
-  private List<LinkEntity> linksOfType(LinkEntity.LinkType linkType) {
-    List<LinkEntity> linkEntities = linksOfTypeThroughDirect(linkType);
-    linkEntities.addAll(linksOfTypeThroughReverse(linkType));
-    return linkEntities;
   }
 
   public List<LinkEntity> linksOfTypeThroughDirect(LinkEntity.LinkType linkType) {
@@ -191,6 +185,13 @@ public class NoteEntity {
     return refers.stream()
                     .filter(l -> l.getLinkType().equals(linkType.reverseType()))
                     .collect(Collectors.toUnmodifiableList());
+  }
+
+  public List<NoteEntity> linkedNotesOfType(LinkEntity.LinkType linkType) {
+      List<NoteEntity> notes = new ArrayList<>();
+      linksOfTypeThroughDirect(linkType).forEach(lk->notes.add(lk.getTargetNote()));
+      linksOfTypeThroughReverse(linkType).forEach(lk->notes.add(lk.getSourceNote()));
+      return notes;
   }
 
   public boolean isFromCircle() { return circle() != null; }
@@ -227,4 +228,7 @@ public class NoteEntity {
     return String.join("", results);
   }
 
+  public boolean hasPicture() {
+    return Strings.isNotBlank(picture) || uploadPicture != null || useParentPicture;
+  }
 }

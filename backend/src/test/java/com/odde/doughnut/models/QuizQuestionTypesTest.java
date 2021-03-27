@@ -18,8 +18,7 @@ import java.util.stream.Collectors;
 
 import static com.odde.doughnut.models.QuizQuestion.QuestionType.LINK_SOURCE_EXCLUSIVE;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.*;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
@@ -37,15 +36,32 @@ class QuizQuestionTypesTest {
 
     @Nested
     class LinkSourceExclusive {
+        NoteEntity top;
+        NoteEntity target;
+        NoteEntity source;
+        NoteEntity anotherSource;
+        ReviewPointEntity reviewPointEntity;
+
+        @BeforeEach
+        void setup() {
+            top = makeMe.aNote().please();
+            target = makeMe.aNote("target").under(top).please();
+            source = makeMe.aNote("source").under(top).byUser(userModel.getEntity()).linkTo(target).please();
+            anotherSource = makeMe.aNote("anotherSource").under(top).byUser(userModel.getEntity()).linkTo(target).please();
+            reviewPointEntity = makeMe.aReviewPointFor(source.getLinks().get(0)).inMemoryPlease();
+        }
+
         @Test
-        void shouldIncluveRightAnswers() {
-            NoteEntity note1 = makeMe.aNote().please();
-            NoteEntity note2 = makeMe.aNote().byUser(userModel.getEntity()).linkTo(note1).please();
-            ReviewPointEntity reviewPointEntity = makeMe.aReviewPointFor(note2.getLinks().get(0)).inMemoryPlease();
-            QuizQuestionBuilder builder = new QuizQuestionBuilder(LINK_SOURCE_EXCLUSIVE, randomizer, reviewPointEntity, makeMe.modelFactoryService);
+        void shouldIncludeRightAnswers() {
+            NoteEntity notRelated = makeMe.aNote("noteRelated").under(top).please();
+            QuizQuestionFactory builder = new QuizQuestionFactory(LINK_SOURCE_EXCLUSIVE, randomizer, reviewPointEntity, makeMe.modelFactoryService);
             QuizQuestion quizQuestion = builder.buildQuizQuestion();
             assertThat(quizQuestion.getDescription(), equalTo("Which of the following does not belong to"));
-            assertThat(quizQuestion.getMainTopic(), equalTo(note1.getTitle()));
+            assertThat(quizQuestion.getMainTopic(), equalTo(target.getTitle()));
+            List<String> options = quizQuestion.getOptions().stream().map(QuizQuestion.Option::getDisplay).collect(Collectors.toUnmodifiableList());
+            assertThat(anotherSource.getTitle(), in(options));
+            assertThat(notRelated.getTitle(), in(options));
+            assertThat(source.getTitle(), in(options));
         }
     }
 }

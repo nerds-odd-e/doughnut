@@ -26,7 +26,9 @@ public class MakeMe {
         return new NoteBuilder(new NoteEntity(), this);
     }
 
-
+    public NoteBuilder aNote(String title) {
+        return aNote().withTitle(title);
+    }
     public NoteBuilder theNote(NoteEntity noteEntity) {
         return new NoteBuilder(noteEntity, this);
     }

@@ -132,4 +132,9 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
         entity.setUploadPictureProxy(makeMe.anUploadedPicture().toMultiplePartFilePlease());
         return this;
     }
+
+    public NoteBuilder withTitle(String title) {
+        entity.setTitle(title);
+        return this;
+    }
 }
