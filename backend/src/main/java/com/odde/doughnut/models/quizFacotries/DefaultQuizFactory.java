@@ -4,13 +4,9 @@ import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.models.QuizQuestion;
 import com.odde.doughnut.models.Randomizer;
-import com.odde.doughnut.models.TreeNodeModel;
 import com.odde.doughnut.services.ModelFactoryService;
-import lombok.Setter;
 
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.odde.doughnut.models.QuizQuestion.QuestionType.LINK_TARGET;
 import static com.odde.doughnut.models.QuizQuestion.QuestionType.PICTURE_SELECTION;
@@ -19,14 +15,13 @@ public class DefaultQuizFactory implements QuizQuestionFactory {
     private final ReviewPointEntity reviewPointEntity;
     private NoteEntity answerNote;
     private final Randomizer randomizer;
-    private final ModelFactoryService modelFactoryService;
     private QuizQuestion.QuestionType questionType;
-    private final QuizQuestionServant quizQuestionServant = new QuizQuestionServant();
+    private final QuizQuestionServant servant;
 
     public DefaultQuizFactory(ReviewPointEntity reviewPointEntity, Randomizer randomizer, ModelFactoryService modelFactoryService) {
         this.reviewPointEntity = reviewPointEntity;
         this.randomizer = randomizer;
-        this.modelFactoryService = modelFactoryService;
+        servant = new QuizQuestionServant(randomizer, modelFactoryService);
     }
 
     public void setQuestionType(QuizQuestion.QuestionType questionType) {
@@ -36,18 +31,13 @@ public class DefaultQuizFactory implements QuizQuestionFactory {
 
     @Override
     public List<NoteEntity> generateFillingOptions() {
-        List<NoteEntity> selectedList;
-        Stream<NoteEntity> noteEntityStream;
-        noteEntityStream = getAnswerTreeNodeModel().getSiblings().stream()
-                .filter(n -> !n.equals(answerNote));
-        if (questionType == PICTURE_SELECTION) {
-            noteEntityStream = noteEntityStream.filter(NoteEntity::hasPicture);
-        }
-        List<NoteEntity> list = noteEntityStream.collect(Collectors.toList());
-        selectedList = randomizer.randomlyChoose(5, list);
-        return selectedList;
+        return servant.choose5FromSiblings(answerNote, randomizer, n -> {
+            if (questionType == PICTURE_SELECTION) {
+                if (!n.hasPicture()) return false;
+            }
+            return !n.equals(answerNote);
+        });
     }
-
 
     @Override
     public String generateInstruction() {
@@ -76,14 +66,10 @@ public class DefaultQuizFactory implements QuizQuestionFactory {
     @Override
     public List<QuizQuestion.Option> toQuestionOptions(List<NoteEntity> noteEntities) {
         if (questionType == PICTURE_SELECTION) {
-            return quizQuestionServant.toPictureOptions(noteEntities);
+            return servant.toPictureOptions(noteEntities);
         }
 
-        return quizQuestionServant.toTitleOptions(noteEntities);
-    }
-
-    private TreeNodeModel getAnswerTreeNodeModel() {
-        return modelFactoryService.toTreeNodeModel(answerNote);
+        return servant.toTitleOptions(noteEntities);
     }
 
     private NoteEntity getAnswerNote() {

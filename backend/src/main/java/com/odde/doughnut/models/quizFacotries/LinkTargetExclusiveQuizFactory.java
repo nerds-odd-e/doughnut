@@ -14,12 +14,13 @@ public class LinkTargetExclusiveQuizFactory implements QuizQuestionFactory {
     private final LinkEntity linkEntity;
     private final Randomizer randomizer;
     private final ModelFactoryService modelFactoryService;
-    private final QuizQuestionServant quizQuestionServant = new QuizQuestionServant();
+    private final QuizQuestionServant servant;
 
     public LinkTargetExclusiveQuizFactory(ReviewPointEntity reviewPointEntity, Randomizer randomizer, ModelFactoryService modelFactoryService) {
         this.linkEntity = reviewPointEntity.getLinkEntity();
         this.randomizer = randomizer;
         this.modelFactoryService = modelFactoryService;
+        servant = new QuizQuestionServant(randomizer, modelFactoryService);
     }
 
     @Override
@@ -53,6 +54,6 @@ public class LinkTargetExclusiveQuizFactory implements QuizQuestionFactory {
 
     @Override
     public List<QuizQuestion.Option> toQuestionOptions(List<NoteEntity> noteEntities) {
-        return quizQuestionServant.toTitleOptions(noteEntities);
+        return servant.toTitleOptions(noteEntities);
     }
 }
