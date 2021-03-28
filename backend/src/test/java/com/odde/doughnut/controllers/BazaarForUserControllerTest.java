@@ -46,7 +46,7 @@ class BazaarForUserControllerTest {
     }
 
     @Test
-    void subscribeToNoteSuccessfully() {
+    void subscribeToNoteSuccessfully() throws NoAccessRightException {
         SubscriptionEntity subscriptionEntity = makeMe.aSubscriptionFor().inMemoryPlease();
         String result = controller.createSubscription(
                 topNote,
@@ -58,7 +58,7 @@ class BazaarForUserControllerTest {
     }
 
     @Test
-    void shouldShowTheFormAgainIfError() {
+    void shouldShowTheFormAgainIfError() throws NoAccessRightException {
         SubscriptionEntity subscriptionEntity = makeMe.aSubscriptionFor().inMemoryPlease();
         String result = controller.createSubscription(
                 topNote,
@@ -67,4 +67,13 @@ class BazaarForUserControllerTest {
         assertEquals("bazaar/add_to_learning", result);
     }
 
+    @Test
+    void notAllowToSubscribeToNoneBazaarNote() {
+        NoteEntity anotherNote = makeMe.aNote().byUser(userModel).please();
+        SubscriptionEntity subscriptionEntity = makeMe.aSubscriptionFor().inMemoryPlease();
+        assertThrows(NoAccessRightException.class, ()-> controller.createSubscription(
+                anotherNote,
+                subscriptionEntity,
+                makeMe.successfulBindingResult(), model));
+    }
 }

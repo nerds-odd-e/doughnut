@@ -3,6 +3,7 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.SubscriptionEntity;
+import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.models.BazaarModel;
 import com.odde.doughnut.services.ModelFactoryService;
 import org.springframework.stereotype.Controller;
@@ -32,9 +33,12 @@ public class BazaarForUserController extends ApplicationMvcController {
     }
 
     @GetMapping("/notes/{noteEntity}/subscribe")
-    public String createSubscription(@PathVariable(name = "noteEntity") NoteEntity noteEntity, @Valid SubscriptionEntity subscriptionEntity, BindingResult bindingResult, Model model) {
+    public String createSubscription(@PathVariable(name = "noteEntity") NoteEntity noteEntity, @Valid SubscriptionEntity subscriptionEntity, BindingResult bindingResult, Model model) throws NoAccessRightException {
         if (bindingResult.hasErrors()) {
             return "bazaar/add_to_learning";
+        }
+        if (modelFactoryService.bazaarNoteRepository.findByNoteId(noteEntity.getId()) == null) {
+            throw new NoAccessRightException();
         }
         subscriptionEntity.setNoteEntity(noteEntity);
         subscriptionEntity.setUserEntity(currentUserFetcher.getUser().getEntity());
