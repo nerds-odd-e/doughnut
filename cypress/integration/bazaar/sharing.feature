@@ -13,5 +13,4 @@ Feature: Bazaar sharing
       | Triangle        | three sides shape          | Shape         |
     When I choose to share my note "Shape"
     Then I should see "Shape" is shared in the Bazaar
-    #And I can see the children of note "shape" incluing "Square, Triangle" in the Bazaar.
 

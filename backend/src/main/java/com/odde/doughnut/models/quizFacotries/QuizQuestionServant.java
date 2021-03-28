@@ -35,7 +35,6 @@ public class QuizQuestionServant {
         return randomizer.randomlyChoose(5, list);
     }
 
-
     List<NoteEntity> randomlyChooseAndEnsure(List<NoteEntity> candidates, NoteEntity ensure, int maxSize) {
         List<NoteEntity> list = candidates.stream()
                 .filter(n -> !n.equals(ensure)).collect(Collectors.toList());
