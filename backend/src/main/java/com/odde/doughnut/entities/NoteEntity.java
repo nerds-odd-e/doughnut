@@ -231,4 +231,8 @@ public class NoteEntity {
   public boolean hasPicture() {
     return Strings.isNotBlank(picture) || uploadPicture != null || useParentPicture;
   }
+
+  public boolean isHead() {
+    return parentNote == null;
+  }
 }

@@ -11,15 +11,7 @@ Feature: Bazaar subscription
       | Big Square      | Square        |
     And note "Shape" is shared to the Bazaar
 
-  @ignore
-  Scenario: Cannot add to learning if not logged in
-    Given I haven't login
-    When I go to the bazaar
-    Then I should not see the "add-to-learning" button on note "Shape"
-
-  @ignore
   Scenario: No "add to learning" button for child note
-    Given I've logged in as an existing user
     When I go to the bazaar
     Then I should see the "add-to-learning" button on note "Shape"
     When I open the note "Shape" in the Bazaar
