@@ -6,7 +6,7 @@
          headerButtons=~{ :: .b-card-header-buttons},
          linkFragment='_fragments/bazaar_fragments::noteTitleWithBazaarLink'
          )">
-    <div class="b-card-header-buttons"></div>
+    <div class="b-card-header-buttons" th:replace=":: bazaarNoteButtons(${note})"/>
     <span class="b-card-button"></div>
 </div>
 
@@ -17,5 +17,11 @@
          linkFragment='_fragments/bazaar_fragments::noteTitleWithBazaarLink'
          )">
     <li class="breadcrumb-item b-top-link"><a href="/bazaar">Bazaar</a></lid>
+</div>
+
+<div th:fragment="bazaarNoteButtons(note)" class="btn-group btn-group-sm">
+    <a class="btn btn-sm add-to-learning" th:href="@{/bazaar/notes/{id}/add_to_learning(id=${note.id})}" title="Add to my learning">
+        <svg th:replace="_fragments/svgs :: add"/>
+    </a>
 </div>
 

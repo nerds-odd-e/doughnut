@@ -46,6 +46,8 @@ When("I should see in the article:", (data) => {
 });
 
 When("I subscribe to note {string} in the bazaar, with target of learning {int} notes per day", (noteTitle, count) => {
+  cy.visit("/bazaar");
+  cy.findNoteCardButton(noteTitle, ".add-to-learning");
 });
 
 
