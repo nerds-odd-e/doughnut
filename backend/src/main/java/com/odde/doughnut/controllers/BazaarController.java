@@ -1,14 +1,18 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
+import com.odde.doughnut.entities.SubscriptionEntity;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.models.BazaarModel;
 import com.odde.doughnut.services.ModelFactoryService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
+
+import javax.validation.Valid;
 
 @Controller
 @RequestMapping("/bazaar")
@@ -38,11 +42,4 @@ public class BazaarController extends ApplicationMvcController {
         model.addAttribute("treeNodeModel", modelFactoryService.toTreeNodeModel(noteEntity));
         return "bazaar/article";
     }
-
-    @GetMapping("/notes/{noteEntity}/add_to_learning")
-    public String addToLearning(@PathVariable(name = "noteEntity") NoteEntity noteEntity, Model model) {
-        model.addAttribute("treeNodeModel", modelFactoryService.toTreeNodeModel(noteEntity));
-        return "bazaar/add_to_learning";
-    }
-
 }
