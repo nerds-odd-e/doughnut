@@ -17,12 +17,11 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/links")
-public class LinkController {
-    private final CurrentUserFetcher currentUserFetcher;
+public class LinkController extends ApplicationMvcController  {
     private final ModelFactoryService modelFactoryService;
 
     public LinkController(CurrentUserFetcher currentUserFetcher, ModelFactoryService modelFactoryService) {
-        this.currentUserFetcher = currentUserFetcher;
+        super(currentUserFetcher);
         this.modelFactoryService = modelFactoryService;
     }
 

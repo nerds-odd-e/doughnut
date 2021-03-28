@@ -10,12 +10,11 @@ import org.springframework.web.bind.annotation.GetMapping;
 import java.security.Principal;
 
 @Controller
-public class IndexController {
-    private final CurrentUserFetcher currentUserFetcher;
+public class IndexController extends ApplicationMvcController {
     private final ModelFactoryService modelFactoryService;
 
     public IndexController(CurrentUserFetcher currentUserFetcher, ModelFactoryService modelFactoryService) {
-        this.currentUserFetcher = currentUserFetcher;
+        super(currentUserFetcher);
         this.modelFactoryService = modelFactoryService;
     }
 

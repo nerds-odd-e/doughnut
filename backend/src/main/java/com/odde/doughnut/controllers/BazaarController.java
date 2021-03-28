@@ -7,46 +7,42 @@ import com.odde.doughnut.models.BazaarModel;
 import com.odde.doughnut.services.ModelFactoryService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.view.RedirectView;
 
 @Controller
-public class BazaarController {
-    private final CurrentUserFetcher currentUserFetcher;
+@RequestMapping("/bazaar")
+public class BazaarController extends ApplicationMvcController {
     private final ModelFactoryService modelFactoryService;
 
     public BazaarController(CurrentUserFetcher currentUserFetcher, ModelFactoryService modelFactoryService) {
-        this.currentUserFetcher = currentUserFetcher;
+        super(currentUserFetcher);
         this.modelFactoryService = modelFactoryService;
     }
 
-    @GetMapping("/bazaar")
+    @GetMapping("")
     public String bazaar(Model model) {
         BazaarModel bazaar = modelFactoryService.toBazaarModel();
         model.addAttribute("notes", bazaar.getAllNotes());
         return "bazaar/index";
     }
 
-    @PostMapping(value = "/notes/{note}/share")
-    public RedirectView shareNote(@PathVariable("note") NoteEntity note) throws NoAccessRightException {
-        currentUserFetcher.getUser().assertAuthorization(note);
-        BazaarModel bazaar = modelFactoryService.toBazaarModel();
-        bazaar.shareNote(note);
-        return new RedirectView("/notes");
-    }
-
-    @GetMapping("/bazaar/notes/{noteEntity}")
+    @GetMapping("/notes/{noteEntity}")
     public String showBazaarNote(@PathVariable(name = "noteEntity") NoteEntity noteEntity, Model model) {
         model.addAttribute("treeNodeModel", modelFactoryService.toTreeNodeModel(noteEntity));
         return "bazaar/show";
     }
 
-    @GetMapping("/bazaar/articles/{noteEntity}")
+    @GetMapping("/articles/{noteEntity}")
     public String showBazaarNoteAsArticle(@PathVariable(name = "noteEntity") NoteEntity noteEntity, Model model) {
         model.addAttribute("treeNodeModel", modelFactoryService.toTreeNodeModel(noteEntity));
         return "bazaar/article";
+    }
+
+    @GetMapping("/notes/{noteEntity}/add_to_learning")
+    public String addToLearning(@PathVariable(name = "noteEntity") NoteEntity noteEntity, Model model) {
+        model.addAttribute("treeNodeModel", modelFactoryService.toTreeNodeModel(noteEntity));
+        return "bazaar/add_to_learning";
     }
 
 }

@@ -17,13 +17,12 @@ import java.security.Principal;
 
 @Controller
 @RequestMapping("/users")
-public class UserController {
+public class UserController extends ApplicationMvcController  {
     private final ModelFactoryService modelFactoryService;
-    private final CurrentUserFetcher currentUserFetcher;
 
     public UserController(ModelFactoryService modelFactoryService, CurrentUserFetcher currentUserFetcher) {
+        super(currentUserFetcher);
         this.modelFactoryService = modelFactoryService;
-        this.currentUserFetcher = currentUserFetcher;
     }
 
     @PostMapping("")

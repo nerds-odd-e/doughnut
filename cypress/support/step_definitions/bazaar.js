@@ -45,10 +45,32 @@ When("I should see in the article:", (data) => {
   });
 });
 
+When("I go to the bazaar", () => {
+  cy.visit("/bazaar");
+});
+
+
 When("I subscribe to note {string} in the bazaar, with target of learning {int} notes per day", (noteTitle, count) => {
   cy.visit("/bazaar");
   cy.findNoteCardButton(noteTitle, ".add-to-learning");
 });
+
+Then("I should not see the {string} button on note {string}", (btnClass, noteTitle) => {
+  cy.findNoteCardButton(noteTitle, "." + btnClass).should("not.exist");
+});
+
+Then("I should see the {string} button on note {string}", (btnClass, noteTitle) => {
+  cy.findNoteCardButton(noteTitle, "." + btnClass).should("exist");
+});
+
+
+
+
+
+
+
+
+
 
 
 

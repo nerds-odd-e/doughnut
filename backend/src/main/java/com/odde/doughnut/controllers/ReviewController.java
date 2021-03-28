@@ -20,8 +20,7 @@ import javax.validation.Valid;
 
 @Controller
 @RequestMapping("/reviews")
-public class ReviewController {
-    private final CurrentUserFetcher currentUserFetcher;
+public class ReviewController extends ApplicationMvcController  {
     private final ModelFactoryService modelFactoryService;
 
 
@@ -29,7 +28,7 @@ public class ReviewController {
     private final TimeTraveler timeTraveler;
 
     public ReviewController(CurrentUserFetcher currentUserFetcher, ModelFactoryService modelFactoryService, TimeTraveler timeTraveler) {
-        this.currentUserFetcher = currentUserFetcher;
+        super(currentUserFetcher);
         this.modelFactoryService = modelFactoryService;
         this.timeTraveler = timeTraveler;
     }

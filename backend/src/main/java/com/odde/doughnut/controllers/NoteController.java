@@ -6,6 +6,7 @@ import com.odde.doughnut.entities.NoteMotionEntity;
 import com.odde.doughnut.entities.ReviewSettingEntity;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.NoAccessRightException;
+import com.odde.doughnut.models.BazaarModel;
 import com.odde.doughnut.models.NoteContentModel;
 import com.odde.doughnut.models.TreeNodeModel;
 import com.odde.doughnut.models.UserModel;
@@ -25,12 +26,11 @@ import java.io.IOException;
 
 @Controller
 @RequestMapping("/notes")
-public class NoteController {
-    private final CurrentUserFetcher currentUserFetcher;
+public class NoteController extends ApplicationMvcController  {
     private final ModelFactoryService modelFactoryService;
 
     public NoteController(CurrentUserFetcher currentUserFetcher, ModelFactoryService modelFactoryService) {
-        this.currentUserFetcher = currentUserFetcher;
+        super(currentUserFetcher);
         this.modelFactoryService = modelFactoryService;
     }
 
@@ -147,6 +147,14 @@ public class NoteController {
         modelFactoryService.toNoteModel(noteEntity).setAndSaveMasterReviewSetting(reviewSettingEntity);
 
         return "redirect:/notes/" + noteEntity.getId();
+    }
+
+    @PostMapping(value = "/{note}/share")
+    public RedirectView shareNote(@PathVariable("note") NoteEntity note) throws NoAccessRightException {
+        currentUserFetcher.getUser().assertAuthorization(note);
+        BazaarModel bazaar = modelFactoryService.toBazaarModel();
+        bazaar.shareNote(note);
+        return new RedirectView("/notes");
     }
 
 }

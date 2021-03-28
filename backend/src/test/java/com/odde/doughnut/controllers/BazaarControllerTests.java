@@ -31,7 +31,7 @@ class BazaarControllerTests {
     @Autowired private MakeMe makeMe;
     private UserModel userModel;
     private NoteEntity topNote;
-    private BazaarController controller;
+    private NoteController controller;
     final ExtendedModelMap model = new ExtendedModelMap();
 
 
@@ -39,12 +39,7 @@ class BazaarControllerTests {
     void setup() {
         userModel = makeMe.aUser().toModelPlease();
         topNote = makeMe.aNote().byUser(userModel).please();
-        controller = new BazaarController(new TestCurrentUserFetcher(userModel), modelFactoryService);
-    }
-
-    @Test
-    void renderTheTemplate() {
-        assertEquals("bazaar/index", controller.bazaar(model));
+        controller = new NoteController(new TestCurrentUserFetcher(userModel), modelFactoryService);
     }
 
     @Nested
@@ -67,5 +62,4 @@ class BazaarControllerTests {
         }
 
     }
-
 }

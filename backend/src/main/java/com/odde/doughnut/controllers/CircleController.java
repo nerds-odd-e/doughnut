@@ -20,13 +20,12 @@ import javax.validation.Valid;
 
 @Controller
 @RequestMapping("/circles")
-public class CircleController {
-    private final CurrentUserFetcher currentUserFetcher;
+public class CircleController extends ApplicationMvcController  {
     private final ModelFactoryService modelFactoryService;
 
 
     public CircleController(CurrentUserFetcher currentUserFetcher, ModelFactoryService modelFactoryService) {
-        this.currentUserFetcher = currentUserFetcher;
+        super(currentUserFetcher);
         this.modelFactoryService = modelFactoryService;
     }
 
