@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
 
-import java.lang.invoke.CallSite;
 import java.nio.CharBuffer;
 
 @Component
@@ -92,5 +91,9 @@ public class MakeMe {
 
     public AnswerBuilder anAnswerFor(ReviewPointEntity reviewPointEntity) {
         return new AnswerBuilder(new AnswerEntity(), this).forReviewPoint(reviewPointEntity);
+    }
+
+    public SubscriptionBuilder aSubscriptionFor() {
+        return new SubscriptionBuilder(this, new SubscriptionEntity());
     }
 }

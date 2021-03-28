@@ -1,8 +1,9 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.entities.NoteEntity;
+import com.odde.doughnut.entities.SubscriptionEntity;
 import com.odde.doughnut.entities.UserEntity;
+import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.MakeMe;
@@ -17,21 +18,22 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ExtendedModelMap;
 import org.springframework.web.servlet.view.RedirectView;
 
+import javax.validation.Valid;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
-class BazaarControllerTests {
-    @Autowired ModelFactoryService modelFactoryService;
-    @Autowired private MakeMe makeMe;
+class BazaarForUserControllerTest {
+    @Autowired
+    private MakeMe makeMe;
     private UserModel userModel;
     private NoteEntity topNote;
-    private NoteController controller;
+    private BazaarForUserController controller;
     final ExtendedModelMap model = new ExtendedModelMap();
 
 
@@ -39,27 +41,30 @@ class BazaarControllerTests {
     void setup() {
         userModel = makeMe.aUser().toModelPlease();
         topNote = makeMe.aNote().byUser(userModel).please();
-        controller = new NoteController(new TestCurrentUserFetcher(userModel), modelFactoryService);
+        makeMe.aBazaarNode(topNote).please();
+        controller = new BazaarForUserController(new TestCurrentUserFetcher(userModel), makeMe.modelFactoryService);
     }
 
-    @Nested
-    class ShareMyNote {
-        @Test
-        void shareMyNote() throws NoAccessRightException {
-            long oldCount = modelFactoryService.bazaarNoteRepository.count();
-            RedirectView rv = controller.shareNote(topNote);
-            assertEquals("/notes", rv.getUrl());
-            assertThat(modelFactoryService.bazaarNoteRepository.count(), equalTo(oldCount + 1));
-        }
-
-        @Test
-        void shouldNotBeAbleToShareNoteThatBelongsToOtherUser() {
-            UserEntity anotherUserEntity = makeMe.aUser().please();
-            NoteEntity note = makeMe.aNote().byUser(anotherUserEntity).please();
-            assertThrows(NoAccessRightException.class, ()->
-                    controller.shareNote(note)
-            );
-        }
-
+    @Test
+    void subscribeToNoteSuccessfully() {
+        SubscriptionEntity subscriptionEntity = makeMe.aSubscriptionFor().inMemoryPlease();
+        String result = controller.createSubscription(
+                topNote,
+                subscriptionEntity,
+                makeMe.successfulBindingResult(), model);
+        assertEquals("redirect:/notes/" + topNote.getId(), result);
+        assertEquals(topNote, subscriptionEntity.getNoteEntity());
+        assertEquals(userModel.getEntity(), subscriptionEntity.getUserEntity());
     }
+
+    @Test
+    void shouldShowTheFormAgainIfError() {
+        SubscriptionEntity subscriptionEntity = makeMe.aSubscriptionFor().inMemoryPlease();
+        String result = controller.createSubscription(
+                topNote,
+                subscriptionEntity,
+                makeMe.failedBindingResult(), model);
+        assertEquals("bazaar/add_to_learning", result);
+    }
+
 }

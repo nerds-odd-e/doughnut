@@ -39,7 +39,7 @@ public class BazaarForUserController extends ApplicationMvcController {
         subscriptionEntity.setNoteEntity(noteEntity);
         subscriptionEntity.setUserEntity(currentUserFetcher.getUser().getEntity());
         modelFactoryService.entityManager.persist(subscriptionEntity);
-        return "redirect:/bazaar/notes/" + noteEntity.getId();
+        return "redirect:/notes/" + noteEntity.getId();
     }
 
 }

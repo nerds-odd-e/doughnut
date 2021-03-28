@@ -19,7 +19,7 @@ public class SubscriptionEntity {
     @Column(name = "daily_target_of_new_notes")
     @Getter
     @Setter
-    private String dailyTargetOfNewNotes;
+    private Integer dailyTargetOfNewNotes = 5;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
