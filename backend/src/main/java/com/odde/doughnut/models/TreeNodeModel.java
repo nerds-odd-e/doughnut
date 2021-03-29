@@ -17,7 +17,7 @@ public class TreeNodeModel extends ModelForEntity<NoteEntity> {
         this.noteRepository = modelFactoryService.noteRepository;
     }
 
-    public List<NoteEntity> getAncestors() {
+    public List<NoteEntity> getAncestorsIncludingMe() {
         if (entity == null) {
             return new ArrayList<>();
         }
@@ -127,7 +127,7 @@ public class TreeNodeModel extends ModelForEntity<NoteEntity> {
         NoteEntity parentNote = entity.getParentNote();
         TreeNodeModel parent = modelFactoryService.toTreeNodeModel(parentNote);
         if (parent != null) {
-            List<NoteEntity> ancestors = parent.getAncestors();
+            List<NoteEntity> ancestors = parent.getAncestorsIncludingMe();
             Collections.reverse(ancestors);
             NoteEntity entity = this.entity;
             entity.addAncestors(ancestors);

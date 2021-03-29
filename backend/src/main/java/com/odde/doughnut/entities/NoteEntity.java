@@ -89,6 +89,7 @@ public class NoteEntity {
     return "Note{"
         + "id=" + id + ", title='" + title + '\'' + '}';
   }
+
   @ManyToOne
   @JoinColumn(name = "parent_id")
   @JsonIgnore
