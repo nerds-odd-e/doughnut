@@ -20,11 +20,6 @@ public class CheapBackupController {
     @GetMapping("/api/backup")
     @Transactional
     public HashMap<String, Object> backup(Model model) {
-        modelFactoryService.noteRepository.findAll().forEach(n->{
-            TreeNodeModel note = modelFactoryService.toTreeNodeModel(n);
-            note.buildNotesClosures();
-            note.save();
-        });
         HashMap<String, Object> hash = new HashMap<>();
         hash.put("users", modelFactoryService.userRepository.findAll());
         return hash;

@@ -242,4 +242,16 @@ public class NoteEntity {
   public boolean isHead() {
     return parentNote == null;
   }
+
+  public void addAncestors(List<NoteEntity> ancestors) {
+      int[] counter = {1};
+      ancestors.forEach(anc -> {
+          NotesClosureEntity notesClosureEntity = new NotesClosureEntity();
+          notesClosureEntity.setNoteEntity(this);
+          notesClosureEntity.setAncestorEntity(anc);
+          notesClosureEntity.setDepth(counter[0]);
+          getNotesClosures().add(notesClosureEntity);
+          counter[0] += 1;
+      });
+  }
 }
