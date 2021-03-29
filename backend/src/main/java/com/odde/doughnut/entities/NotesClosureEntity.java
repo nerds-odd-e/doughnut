@@ -24,7 +24,6 @@ public class NotesClosureEntity {
     @JoinColumn(name = "ancestor_id", referencedColumnName = "id")
     @Getter @Setter private NoteEntity ancestorEntity;
 
-    @Column(name = "type")
     @Getter
     @Setter
     private Integer depth;

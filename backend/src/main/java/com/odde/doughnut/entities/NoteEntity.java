@@ -162,6 +162,13 @@ public class NoteEntity {
   @Setter
   private List<LinkEntity> refers = new ArrayList<>();
 
+  @OneToMany(mappedBy = "noteEntity", cascade = CascadeType.ALL,
+          orphanRemoval = true)
+  @JsonIgnore
+  @Getter
+  @Setter
+  private List<NotesClosureEntity> notesClosures = new ArrayList<>();
+
   @Transient @Getter @Setter private String testingParent;
   @Transient @Getter @Setter private MultipartFile uploadPictureProxy;
 

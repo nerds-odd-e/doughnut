@@ -20,9 +20,15 @@ public class NoteContentModel extends ModelForEntity<NoteEntity> {
     }
 
     public void createByUser(UserModel userModel) throws IOException {
+        buildByUser(userModel);
+        modelFactoryService.noteRepository.save(entity);
+    }
+
+    public void buildByUser(UserModel userModel) throws IOException {
         entity.setUserEntity(userModel.getEntity());
         fetchUploadedPicture(userModel);
-        modelFactoryService.noteRepository.save(entity);
+        TreeNodeModel treeNodeModel = modelFactoryService.toTreeNodeModel(entity);
+        treeNodeModel.buildNotesClosures();
     }
 
     private void fetchUploadedPicture(UserModel userModel) throws IOException {

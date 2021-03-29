@@ -72,9 +72,10 @@ class TestabilityRestController {
 
         for (NoteEntity note : notes) {
             earlyNotes.put(note.getTitle(), note);
-            note.setUserEntity(userModel.getEntity());
             note.setOwnershipEntity(userModel.getEntity().getOwnershipEntity());
             note.setParentNote(earlyNotes.get(note.getTestingParent()));
+            NoteContentModel noteContentModel = modelFactoryService.toNoteModel(note);
+            noteContentModel.buildByUser(userModel);
         }
         noteRepository.saveAll(notes);
         return notes.stream().map(NoteEntity::getId).collect(Collectors.toList());

@@ -1,6 +1,7 @@
 package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.NoteEntity;
+import com.odde.doughnut.entities.NotesClosureEntity;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.services.ModelFactoryService;
 
@@ -121,6 +122,20 @@ public class TreeNodeModel extends ModelForEntity<NoteEntity> {
 
     public List<NoteEntity> getSiblings() {
         return noteRepository.findAllByParentNote(entity.getParentNote());
+    }
+
+    public void buildNotesClosures() {
+        int[] counter = {0};
+        getAncestors().forEach(anc -> {
+            if (counter[0] > 0) {
+                NotesClosureEntity notesClosureEntity = new NotesClosureEntity();
+                notesClosureEntity.setNoteEntity(entity);
+                notesClosureEntity.setAncestorEntity(anc);
+                notesClosureEntity.setDepth(counter[0]);
+                entity.getNotesClosures().add(notesClosureEntity);
+            }
+            counter[0] += 1;
+        });
     }
 
     //

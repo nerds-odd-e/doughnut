@@ -1,7 +1,5 @@
 package com.odde.doughnut.testability;
 
-import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
-import com.odde.doughnut.entities.NotesClosureEntity;
 import com.odde.doughnut.models.TreeNodeModel;
 import com.odde.doughnut.services.ModelFactoryService;
 import org.springframework.ui.Model;
@@ -21,19 +19,9 @@ public class CheapBackupController {
     @GetMapping("/api/backup")
     public HashMap<String, Object> backup(Model model) {
         modelFactoryService.noteRepository.findAll().forEach(n->{
-            TreeNodeModel node = modelFactoryService.toTreeNodeModel(n);
-            int[] counter = {0};
-            node.getAncestors().forEach(anc->{
-                if(counter[0] > 0) {
-                    NotesClosureEntity notesClosureEntity = new NotesClosureEntity();
-                    notesClosureEntity.setNoteEntity(n);
-                    notesClosureEntity.setAncestorEntity(anc);
-                    notesClosureEntity.setDepth(counter[0]);
-                    modelFactoryService.entityManager.persist(notesClosureEntity);
-                }
-                counter[0] += 1;
-
-            });
+            TreeNodeModel note = modelFactoryService.toTreeNodeModel(n);
+            note.buildNotesClosures();
+            note.save();
         });
         HashMap<String, Object> hash = new HashMap<>();
         hash.put("users", modelFactoryService.userRepository.findAll());
