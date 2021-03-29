@@ -126,7 +126,9 @@ public class TreeNodeModel extends ModelForEntity<NoteEntity> {
 
     public void buildNotesClosures() {
         int[] counter = {0};
-        getAncestors().forEach(anc -> {
+        List<NoteEntity> ancestors = getAncestors();
+        Collections.reverse(ancestors);
+        ancestors.forEach(anc -> {
             if (counter[0] > 0) {
                 NotesClosureEntity notesClosureEntity = new NotesClosureEntity();
                 notesClosureEntity.setNoteEntity(entity);

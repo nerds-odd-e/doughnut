@@ -2,6 +2,7 @@ package com.odde.doughnut.testability;
 
 import com.odde.doughnut.models.TreeNodeModel;
 import com.odde.doughnut.services.ModelFactoryService;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +18,7 @@ public class CheapBackupController {
     }
 
     @GetMapping("/api/backup")
+    @Transactional
     public HashMap<String, Object> backup(Model model) {
         modelFactoryService.noteRepository.findAll().forEach(n->{
             TreeNodeModel note = modelFactoryService.toTreeNodeModel(n);
@@ -25,8 +27,6 @@ public class CheapBackupController {
         });
         HashMap<String, Object> hash = new HashMap<>();
         hash.put("users", modelFactoryService.userRepository.findAll());
-        hash.put("notes", modelFactoryService.noteRepository.findAll());
-        hash.put("review_points", modelFactoryService.reviewPointRepository.findAll());
         return hash;
     }
 
