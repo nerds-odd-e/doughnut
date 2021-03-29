@@ -21,8 +21,6 @@ public class TreeNodeModel extends ModelForEntity<NoteEntity> {
         if (entity == null) {
             return new ArrayList<>();
         }
-//        waiting for switching to MySQL 8
-//        List<NoteEntity> ancestry = noteRepository.findAncestry(entity.getId().longValue());
         List<NoteEntity> ancestry = new ArrayList<>();
         NoteEntity e = entity;
         while(e != null) {
