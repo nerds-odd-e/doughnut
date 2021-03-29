@@ -123,7 +123,7 @@ nohup idea-community &
   - Locate specific test method to run and look out for green run arrow icon in line number gutter.
   - Click on the green run arrow icon to kick off incremental build and single test run.
 
-#### MySQL DB UI Client - DBeaver (ONLY available to Linux users - Non-macOS)
+#### MySQL DB UI Client - DBeaver
 
 ```
 nohup dbeaver &
