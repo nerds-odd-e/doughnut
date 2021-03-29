@@ -14,7 +14,7 @@ in mkShell {
   MYSQL_HOME = builtins.getEnv "MYSQL_HOME";
   MYSQL_DATADIR = builtins.getEnv "MYSQL_DATADIR";
   buildInputs = [
-    autoconf automake cmake coreutils-full gcc10 gcc10Stdenv gnumake
+    autoconf automake cmake coreutils-full gcc10 gnumake libgccjit
     gradle nodejs-15_x python3 yarn zulu
     any-nix-shell zsh zsh-powerlevel10k
     git git-secret gitAndTools.delta locale lsd platinum-searcher
