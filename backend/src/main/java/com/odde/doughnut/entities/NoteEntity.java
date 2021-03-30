@@ -7,6 +7,8 @@ import com.odde.doughnut.entities.validators.ValidateNotePicture;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.util.Strings;
+import org.hibernate.annotations.Where;
+import org.hibernate.annotations.WhereJoinTable;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
@@ -86,13 +88,6 @@ public class NoteEntity {
   @Setter
   private ReviewSettingEntity masterReviewSettingEntity;
 
-  @OneToMany(mappedBy = "parentNote", cascade = CascadeType.ALL,
-             orphanRemoval = true)
-  @OrderBy("sibling_order")
-  @JsonIgnore
-  @Getter
-  private final List<NoteEntity> children = new ArrayList<>();
-
   @ManyToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "user_id", referencedColumnName = "id")
   @JsonIgnore
@@ -144,6 +139,17 @@ public class NoteEntity {
   @Getter
   @Setter
   private List<NotesClosureEntity> descendantNCs = new ArrayList<>();
+
+  @JoinTable(name = "notes_closure", joinColumns = {
+          @JoinColumn(name = "ancestor_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)}, inverseJoinColumns = {
+          @JoinColumn(name = "note_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
+  })
+  @OneToMany( cascade = CascadeType.DETACH)
+  @JsonIgnore
+  @WhereJoinTable(clause="depth = 1")
+  @OrderBy("sibling_order")
+  @Getter
+  private final List<NoteEntity> children = new ArrayList<>();
 
   @Transient @Getter @Setter private String testingParent;
   @Transient @Getter @Setter private MultipartFile uploadPictureProxy;

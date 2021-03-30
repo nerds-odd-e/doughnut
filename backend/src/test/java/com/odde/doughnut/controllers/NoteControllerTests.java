@@ -172,6 +172,7 @@ class NoteControllerTests {
             NoteEntity subject = makeMe.aNote().under(parent).byUser(userModel).please();
             NoteEntity sibling = makeMe.aNote().under(parent).byUser(userModel).please();
             NoteEntity child = makeMe.aNote().under(subject).byUser(userModel).please();
+            makeMe.refresh(subject);
 
             controller.deleteNote(subject);
 
