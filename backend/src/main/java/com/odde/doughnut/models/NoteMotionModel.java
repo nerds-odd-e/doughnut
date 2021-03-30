@@ -27,7 +27,7 @@ public class NoteMotionModel extends ModelForEntity<NoteMotionEntity>{
             this.subject.setSiblingOrder(newSiblingOrder);
         }
         modelFactoryService.noteRepository.save(subject);
-        subject.traverseBreathFirst(desc-> {
+        subject.traverseBreadthFirst(desc-> {
             updateAncestors(desc, desc.getParentNote());
             modelFactoryService.noteRepository.save(desc);
         });

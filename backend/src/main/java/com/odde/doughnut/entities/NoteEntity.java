@@ -2,8 +2,8 @@ package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.algorithms.ClozeDescription;
+import com.odde.doughnut.algorithms.SiblingOrder;
 import com.odde.doughnut.entities.validators.ValidateNotePicture;
-import com.odde.doughnut.models.TreeNodeModel;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.util.Strings;
@@ -60,32 +60,7 @@ public class NoteEntity {
   @Column(name = "sibling_order")
   @Getter
   @Setter
-  private Long siblingOrder = getGoodEnoughOrderNumber();
-
-  //
-  // SiblingOrder is used to decide the order among the notes under the same
-  // parent. In a real life situation, using millisecond * 1000 is good enough
-  // for ordering and also leave enough space for inserting items in between.
-  // However, in extreme cases like unit testing or importing batch of notes,
-  // there is still a chance of duplicated order number. Since this will likely
-  // to happy within the same java running instance, a simple static variable
-  // `localLastOrderNumberForGoodEnoughSiblingOrder` is introduced to detect and
-  // remove the duplicates.
-  //
-  static long localLastOrderNumberForGoodEnoughSiblingOrder;
-  public static final long MINIMUM_SIBLING_ORDER_INCREMENT = 1000;
-
-  private static Long getGoodEnoughOrderNumber() {
-    long newNumber =
-        System.currentTimeMillis() * MINIMUM_SIBLING_ORDER_INCREMENT;
-    if (newNumber <= localLastOrderNumberForGoodEnoughSiblingOrder) {
-      localLastOrderNumberForGoodEnoughSiblingOrder +=
-          MINIMUM_SIBLING_ORDER_INCREMENT;
-    } else {
-      localLastOrderNumberForGoodEnoughSiblingOrder = newNumber;
-    }
-    return localLastOrderNumberForGoodEnoughSiblingOrder;
-  }
+  private Long siblingOrder = SiblingOrder.getGoodEnoughOrderNumber();
 
   @Override
   public String toString() {
@@ -96,7 +71,6 @@ public class NoteEntity {
   @ManyToOne
   @JoinColumn(name = "parent_id")
   @JsonIgnore
-  @Getter
   private NoteEntity parentNote;
 
   @ManyToOne(cascade = CascadeType.PERSIST)
@@ -267,13 +241,25 @@ public class NoteEntity {
   }
 
   public List<NoteEntity> getAncestorsIncludingMe() {
-      List<NoteEntity> ancestors = getNotesClosures().stream().map(NotesClosureEntity::getAncestorEntity).collect(toList());
-      ancestors.add(this);
+    List<NoteEntity> ancestors = getAncestors();
+    ancestors.add(this);
       return ancestors;
   }
 
-  public void traverseBreathFirst(Consumer<NoteEntity> noteEntityConsumer) {
+  private List<NoteEntity> getAncestors() {
+    return getNotesClosures().stream().map(NotesClosureEntity::getAncestorEntity).collect(toList());
+  }
+
+  public void traverseBreadthFirst(Consumer<NoteEntity> noteEntityConsumer) {
       getChildren().forEach(noteEntityConsumer);
-      getChildren().forEach(desc->desc.traverseBreathFirst(noteEntityConsumer));
+      getChildren().forEach(desc->desc.traverseBreadthFirst(noteEntityConsumer));
+  }
+
+  public NoteEntity getParentNote() {
+    List<NoteEntity> ancestors = getAncestors();
+    if (ancestors.size() == 0) {
+      return null;
+    }
+    return ancestors.get(ancestors.size() - 1);
   }
 }

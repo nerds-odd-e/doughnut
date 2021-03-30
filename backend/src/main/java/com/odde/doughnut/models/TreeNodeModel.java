@@ -1,5 +1,6 @@
 package com.odde.doughnut.models;
 
+import com.odde.doughnut.algorithms.SiblingOrder;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.services.ModelFactoryService;
@@ -78,7 +79,7 @@ public class TreeNodeModel extends ModelForEntity<NoteEntity> {
         NoteEntity nextSiblingNote = getNextSiblingNote();
         Long relativeToSiblingOrder = entity.getSiblingOrder();
         if (nextSiblingNote == null) {
-            return relativeToSiblingOrder + NoteEntity.MINIMUM_SIBLING_ORDER_INCREMENT;
+            return relativeToSiblingOrder + SiblingOrder.MINIMUM_SIBLING_ORDER_INCREMENT;
         }
         return (relativeToSiblingOrder + nextSiblingNote.getSiblingOrder()) / 2;
     }
@@ -86,7 +87,7 @@ public class TreeNodeModel extends ModelForEntity<NoteEntity> {
     private Long getSiblingOrderToBecomeMyFirstChild() {
         NoteEntity firstChild = getFirstChild();
         if (firstChild != null) {
-            return firstChild.getSiblingOrder() - NoteEntity.MINIMUM_SIBLING_ORDER_INCREMENT;
+            return firstChild.getSiblingOrder() - SiblingOrder.MINIMUM_SIBLING_ORDER_INCREMENT;
         }
         return null;
     }
@@ -99,7 +100,7 @@ public class TreeNodeModel extends ModelForEntity<NoteEntity> {
     }
 
     public void destroy() {
-        entity.traverseBreathFirst(child ->
+        entity.traverseBreadthFirst(child ->
                 modelFactoryService.toTreeNodeModel(child).destroy());
         modelFactoryService.reviewPointRepository.deleteAllByNoteEntity(getEntity());
         modelFactoryService.noteRepository.delete(getEntity());
