@@ -62,13 +62,13 @@ class NoteControllerTests {
         @Test
         void shouldUseTheRigthTemplateForCreatingNote() throws NoAccessRightException {
             assertEquals("notes/new", controller.newNote(null, model));
-            assertThat(((NoteEntity) model.getAttribute("noteEntity")).getParentNote(), is(nullValue()));
+            assertThat(((NoteEntity) model.getAttribute("noteEntity")).getParentNote1(), is(nullValue()));
         }
 
         @Test
         void shouldGetTheParentNoteIfIdProvided() throws NoAccessRightException {
             controller.newNote(parentNote, model);
-            assertThat(((NoteEntity) model.getAttribute("noteEntity")).getParentNote(), equalTo(parentNote));
+            assertThat(((NoteEntity) model.getAttribute("noteEntity")).getParentNote1(), equalTo(parentNote));
         }
 
         @Test
@@ -87,7 +87,7 @@ class NoteControllerTests {
             NoteEntity newNote = makeMe.aNote().byUser(userModel).inMemoryPlease();
             BindingResult bindingResult = makeMe.successfulBindingResult();
 
-            String response = controller.createNote(newNote, bindingResult, model);
+            String response = controller.createNote(null, newNote, bindingResult, model);
             assertEquals("redirect:/notes/" + newNote.getId(), response);
         }
 
@@ -96,7 +96,7 @@ class NoteControllerTests {
             NoteEntity newNote = new NoteEntity();
             BindingResult bindingResult = makeMe.failedBindingResult();
 
-            String response = controller.createNote(newNote, bindingResult, model);
+            String response = controller.createNote(null, newNote, bindingResult, model);
             assertNull(newNote.getId());
             assertEquals("notes/new", response);
         }

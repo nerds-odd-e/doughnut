@@ -51,13 +51,13 @@ public class NoteController extends ApplicationMvcController  {
         return "notes/new";
     }
 
-    @PostMapping("")
-    public String createNote(@Valid NoteEntity noteEntity, BindingResult bindingResult, Model model) throws NoAccessRightException, IOException {
+    @PostMapping({"/create", "/{parentNote}/create"})
+    public String createNote(@PathVariable(name = "parentNote", required = false) NoteEntity parentNote, @Valid NoteEntity noteEntity, BindingResult bindingResult, Model model) throws NoAccessRightException, IOException {
         if (bindingResult.hasErrors()) {
             return "notes/new";
         }
-        if (noteEntity.getParentNote() != null) {
-            currentUserFetcher.getUser().assertAuthorization(noteEntity.getParentNote());
+        if (parentNote != null) {
+            currentUserFetcher.getUser().assertAuthorization(parentNote);
         }
         UserModel userModel = currentUserFetcher.getUser();
         NoteContentModel noteContentModel = modelFactoryService.toNoteModel(noteEntity);
@@ -101,7 +101,7 @@ public class NoteController extends ApplicationMvcController  {
         TreeNodeModel prev = this.modelFactoryService.toTreeNodeModel(previousSiblingNote);
         NoteEntity prevprev = prev.getPreviousSiblingNote();
         if (prevprev == null) {
-            return new NoteMotionEntity(noteEntity.getParentNote(), true);
+            return new NoteMotionEntity(noteEntity.getParentNote1(), true);
         }
         return new NoteMotionEntity(prevprev, false);
     }

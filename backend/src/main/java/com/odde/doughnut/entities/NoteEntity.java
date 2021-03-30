@@ -7,7 +7,6 @@ import com.odde.doughnut.entities.validators.ValidateNotePicture;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.util.Strings;
-import org.hibernate.annotations.Where;
 import org.hibernate.annotations.WhereJoinTable;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -73,7 +72,7 @@ public class NoteEntity {
   @ManyToOne
   @JoinColumn(name = "parent_id")
   @JsonIgnore
-  private NoteEntity parentNote;
+  private NoteEntity parentNoteDeprecating;
 
   @ManyToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "ownership_id", referencedColumnName = "id")
@@ -193,8 +192,8 @@ public class NoteEntity {
   }
 
   public String getNotePicture() {
-    if (useParentPicture && getParentNote() != null) {
-        return getParentNote().getNotePicture();
+    if (useParentPicture && getParentNote1() != null) {
+        return getParentNote1().getNotePicture();
     }
 
     if (uploadPicture != null) {
@@ -222,7 +221,7 @@ public class NoteEntity {
   }
 
   public boolean isHead() {
-    return getParentNote() == null;
+    return getParentNote1() == null;
   }
 
   public void addAncestors(List<NoteEntity> ancestors) {
@@ -238,7 +237,7 @@ public class NoteEntity {
   }
 
   public void setParentNote(NoteEntity parentNote) {
-    this.parentNote = parentNote;
+    this.parentNoteDeprecating = parentNote;
     if (parentNote == null) return;
     List<NoteEntity> ancestorsIncludingMe = parentNote.getAncestorsIncludingMe();
     Collections.reverse(ancestorsIncludingMe);
@@ -251,7 +250,7 @@ public class NoteEntity {
       return ancestors;
   }
 
-  private List<NoteEntity> getAncestors() {
+  public List<NoteEntity> getAncestors() {
     return getNotesClosures().stream().map(NotesClosureEntity::getAncestorEntity).collect(toList());
   }
 
@@ -259,7 +258,7 @@ public class NoteEntity {
     descendantNCs.stream().map(NotesClosureEntity::getNoteEntity).forEach(noteEntityConsumer);
   }
 
-  public NoteEntity getParentNote() {
+  public NoteEntity getParentNote1() {
     List<NoteEntity> ancestors = getAncestors();
     if (ancestors.size() == 0) {
       return null;
@@ -268,9 +267,9 @@ public class NoteEntity {
   }
 
   public List<NoteEntity> getSiblings() {
-      if (getParentNote() == null) {
+      if (getParentNote1() == null) {
           return new ArrayList<>();
       }
-      return getParentNote().getChildren();
+      return getParentNote1().getChildren();
   }
 }

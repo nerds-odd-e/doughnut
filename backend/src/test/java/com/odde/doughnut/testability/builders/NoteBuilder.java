@@ -64,7 +64,7 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
     @Override
     protected void beforeCreate(boolean needPersist) {
         if (entity.getUserEntity() == null) {
-            NoteEntity parent = entity.getParentNote();
+            NoteEntity parent = entity.getParentNote1();
             if (parent != null && parent.getUserEntity() != null) {
                 byUser(parent.getUserEntity());
             }else{

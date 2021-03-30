@@ -5,7 +5,7 @@
     <ol class="breadcrumb">
         <li class="breadcrumb-item" th:replace="${topLink}"/>
         <li class="breadcrumb-item"
-            th:each="note:${@modelFactoryService.toTreeNodeModel(untilNote.parentNote).ancestorsIncludingMe}"
+            th:each="note:${untilNote.ancestors}"
             th:insert="__${linkFragment}__(${note})"/>
         <li class="breadcrumb-item" th:replace="${additional}"/>
     </ol>

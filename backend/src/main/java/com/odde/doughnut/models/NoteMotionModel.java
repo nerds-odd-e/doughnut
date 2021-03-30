@@ -28,7 +28,7 @@ public class NoteMotionModel extends ModelForEntity<NoteMotionEntity>{
         }
         modelFactoryService.noteRepository.save(subject);
         subject.traverseBreadthFirst(desc-> {
-            updateAncestors(desc, desc.getParentNote());
+            updateAncestors(desc, desc.getParentNote1());
             modelFactoryService.noteRepository.save(desc);
         });
     }

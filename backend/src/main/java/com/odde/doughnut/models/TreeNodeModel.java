@@ -24,11 +24,10 @@ public class TreeNodeModel extends ModelForEntity<NoteEntity> {
     }
 
     public NoteEntity getPreviousSiblingNote() {
-        if (entity == null || entity.getParentNote() == null) {
+        if (entity == null) {
             return null;
         }
-        return entity.getParentNote()
-                .getChildren().stream()
+        return entity.getSiblings().stream()
                 .filter(nc->nc.getSiblingOrder() < entity.getSiblingOrder())
                 .reduce((f, s)-> s).orElse(null);
     }
@@ -40,7 +39,7 @@ public class TreeNodeModel extends ModelForEntity<NoteEntity> {
     public NoteEntity getPreviousNote() {
         NoteEntity result = getPreviousSiblingNote();
         if (result == null) {
-            return entity.getParentNote();
+            return entity.getParentNote1();
         }
         while (true) {
             List<NoteEntity> children = result.getChildren();
@@ -62,17 +61,13 @@ public class TreeNodeModel extends ModelForEntity<NoteEntity> {
             if (sibling != null) {
                 return sibling;
             }
-            next = next.getParentNote();
+            next = next.getParentNote1();
         }
         return null;
     }
 
     private NoteEntity nextSiblingOfNote(NoteEntity note) {
-        if (note.getParentNote() == null) {
-            return null;
-        }
-        return note.getParentNote()
-                .getChildren().stream()
+        return note.getSiblings().stream()
                 .filter(nc->nc.getSiblingOrder() > note.getSiblingOrder())
                 .findFirst().orElse(null);
     }

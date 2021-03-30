@@ -8,7 +8,6 @@ import com.odde.doughnut.services.ModelFactoryService;
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class UserModel extends ModelForEntity<UserEntity> {
