@@ -31,7 +31,7 @@ public class NoteContentModelTest {
 
     @BeforeEach
     void setup() {
-        topLevel = makeMe.aNote().please();
+        topLevel = makeMe.aNote("topLevel").please();
     }
 
     @Test
@@ -57,8 +57,8 @@ public class NoteContentModelTest {
 
         @Test
         void childHasParentInAncestors() {
-            NoteEntity subject = makeMe.aNote().under(topLevel).please();
-            NoteEntity sibling = makeMe.aNote().under(topLevel).please();
+            NoteEntity subject = makeMe.aNote("subject").under(topLevel).please();
+            NoteEntity sibling = makeMe.aNote("sibling").under(topLevel).please();
 
             TreeNodeModel decoratedNote = toModel(subject);
             List<NoteEntity> ancestry = decoratedNote.getAncestorsIncludingMe();

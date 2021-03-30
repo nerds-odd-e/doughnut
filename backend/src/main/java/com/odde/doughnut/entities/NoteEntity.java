@@ -3,6 +3,7 @@ package com.odde.doughnut.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.algorithms.ClozeDescription;
 import com.odde.doughnut.entities.validators.ValidateNotePicture;
+import com.odde.doughnut.models.TreeNodeModel;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.util.Strings;
@@ -15,6 +16,7 @@ import javax.validation.constraints.Size;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -94,7 +96,6 @@ public class NoteEntity {
   @JoinColumn(name = "parent_id")
   @JsonIgnore
   @Getter
-  @Setter
   private NoteEntity parentNote;
 
   @ManyToOne(cascade = CascadeType.PERSIST)
@@ -163,9 +164,9 @@ public class NoteEntity {
   @Setter
   private List<LinkEntity> refers = new ArrayList<>();
 
-  @OneToMany(mappedBy = "noteEntity", cascade = CascadeType.ALL,
-          orphanRemoval = true)
+  @OneToMany(mappedBy = "noteEntity", cascade = CascadeType.ALL)
   @JsonIgnore
+  @OrderBy("depth DESC")
   @Getter
   @Setter
   private List<NotesClosureEntity> notesClosures = new ArrayList<>();
@@ -254,5 +255,19 @@ public class NoteEntity {
           getNotesClosures().add(notesClosureEntity);
           counter[0] += 1;
       });
+  }
+
+  public void setParentNote(NoteEntity parentNote) {
+    this.parentNote = parentNote;
+    if (parentNote == null) return;
+    List<NoteEntity> ancestorsIncludingMe = parentNote.getAncestorsIncludingMe();
+    Collections.reverse(ancestorsIncludingMe);
+    addAncestors(ancestorsIncludingMe);
+  }
+
+  public List<NoteEntity> getAncestorsIncludingMe() {
+      List<NoteEntity> ancestors = getNotesClosures().stream().map(NotesClosureEntity::getAncestorEntity).collect(toList());
+      ancestors.add(this);
+      return ancestors;
   }
 }

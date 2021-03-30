@@ -112,6 +112,7 @@ public class NoteController extends ApplicationMvcController  {
     }
 
     @PostMapping("/{noteEntity}/move")
+    @Transactional
     public String moveNote(NoteEntity noteEntity, NoteMotionEntity noteMotionEntity) throws CyclicLinkDetectedException, NoAccessRightException {
         currentUserFetcher.getUser().assertAuthorization(noteEntity);
         currentUserFetcher.getUser().assertAuthorization(noteMotionEntity.getRelativeToNote());
