@@ -50,7 +50,7 @@ class CircleControllerTests {
         void itShouldNotAllowNonMemberToSeeACircle() {
             CircleEntity circleEntity = makeMe.aCircle().please();
             assertThrows(NoAccessRightException.class, ()->{
-                controller.showCircle(circleEntity);
+                controller.showCircle(circleEntity, model);
             });
         }
     }

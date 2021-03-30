@@ -187,8 +187,8 @@ public class NoteEntity {
   }
 
   public String getNotePicture() {
-    if (useParentPicture && getParentNote1() != null) {
-        return getParentNote1().getNotePicture();
+    if (useParentPicture && getParentNote() != null) {
+        return getParentNote().getNotePicture();
     }
 
     if (uploadPicture != null) {
@@ -216,7 +216,7 @@ public class NoteEntity {
   }
 
   public boolean isHead() {
-    return getParentNote1() == null;
+    return getParentNote() == null;
   }
 
   public void addAncestors(List<NoteEntity> ancestors) {
@@ -252,7 +252,7 @@ public class NoteEntity {
     descendantNCs.stream().map(NotesClosureEntity::getNoteEntity).forEach(noteEntityConsumer);
   }
 
-  public NoteEntity getParentNote1() {
+  public NoteEntity getParentNote() {
     List<NoteEntity> ancestors = getAncestors();
     if (ancestors.size() == 0) {
       return null;
@@ -261,9 +261,9 @@ public class NoteEntity {
   }
 
   public List<NoteEntity> getSiblings() {
-      if (getParentNote1() == null) {
+      if (getParentNote() == null) {
           return new ArrayList<>();
       }
-      return getParentNote1().getChildren();
+      return getParentNote().getChildren();
   }
 }

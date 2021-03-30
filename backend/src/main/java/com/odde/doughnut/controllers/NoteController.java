@@ -20,7 +20,6 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.List;
 
 @Controller
 @RequestMapping("/notes")
@@ -99,7 +98,7 @@ public class NoteController extends ApplicationMvcController  {
         TreeNodeModel prev = this.modelFactoryService.toTreeNodeModel(previousSiblingNote);
         NoteEntity prevprev = prev.getPreviousSiblingNote();
         if (prevprev == null) {
-            return new NoteMotionEntity(noteEntity.getParentNote1(), true);
+            return new NoteMotionEntity(noteEntity.getParentNote(), true);
         }
         return new NoteMotionEntity(prevprev, false);
     }

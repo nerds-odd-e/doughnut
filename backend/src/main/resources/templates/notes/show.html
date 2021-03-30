@@ -10,7 +10,7 @@
 
         <div th:if="${!noteEntity.isHead()}">
             <svg th:replace="_fragments/svgs :: downRight"/>
-            <a th:if="${!noteEntity.isHead()}" th:href="@{/notes/{id}/new(id=${noteEntity.parentNote1.id})}">Add Sibling
+            <a th:if="${!noteEntity.isHead()}" th:href="@{/notes/{id}/new(id=${noteEntity.parentNote.id})}">Add Sibling
                 Note</a>
         </div>
         <div class="jumbotron py-4 mb-2">

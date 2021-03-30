@@ -16,7 +16,7 @@ public class NoteMotionEntity {
         if (asFirstChildOfNote) {
             return relativeToNote;
         }
-        return relativeToNote.getParentNote1();
+        return relativeToNote.getParentNote();
     }
 
 }

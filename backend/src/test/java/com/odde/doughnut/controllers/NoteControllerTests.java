@@ -62,13 +62,13 @@ class NoteControllerTests {
         @Test
         void shouldUseTheRigthTemplateForCreatingNote() throws NoAccessRightException {
             assertEquals("notes/new", controller.newNote(null, model));
-            assertThat(((NoteEntity) model.getAttribute("noteEntity")).getParentNote1(), is(nullValue()));
+            assertThat(((NoteEntity) model.getAttribute("noteEntity")).getParentNote(), is(nullValue()));
         }
 
         @Test
         void shouldGetTheParentNoteIfIdProvided() throws NoAccessRightException {
             controller.newNote(parentNote, model);
-            assertThat(((NoteEntity) model.getAttribute("noteEntity")).getParentNote1(), equalTo(parentNote));
+            assertThat(((NoteEntity) model.getAttribute("noteEntity")).getParentNote(), equalTo(parentNote));
         }
 
         @Test

@@ -67,7 +67,7 @@ public class NoteMotionModelTest {
     @Test
     void moveUnder() throws CyclicLinkDetectedException {
         move(firstChild, secondChild, true);
-        assertThat(firstChild.getParentNote1(), equalTo(secondChild));
+        assertThat(firstChild.getParentNote(), equalTo(secondChild));
     }
 
     @Test
@@ -91,7 +91,7 @@ public class NoteMotionModelTest {
         @Test
         void moveAfterNoteOfDifferentLevel() throws CyclicLinkDetectedException {
             move(secondChild, thirdLevel, false);
-            assertThat(secondChild.getParentNote1(), equalTo(firstChild));
+            assertThat(secondChild.getParentNote(), equalTo(firstChild));
         }
 
         @Test

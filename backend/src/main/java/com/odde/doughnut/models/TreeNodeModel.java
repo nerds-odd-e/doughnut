@@ -39,7 +39,7 @@ public class TreeNodeModel extends ModelForEntity<NoteEntity> {
     public NoteEntity getPreviousNote() {
         NoteEntity result = getPreviousSiblingNote();
         if (result == null) {
-            return entity.getParentNote1();
+            return entity.getParentNote();
         }
         while (true) {
             List<NoteEntity> children = result.getChildren();
@@ -61,7 +61,7 @@ public class TreeNodeModel extends ModelForEntity<NoteEntity> {
             if (sibling != null) {
                 return sibling;
             }
-            next = next.getParentNote1();
+            next = next.getParentNote();
         }
         return null;
     }
