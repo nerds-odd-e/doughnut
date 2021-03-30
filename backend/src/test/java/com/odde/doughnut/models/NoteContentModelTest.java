@@ -123,6 +123,7 @@ public class NoteContentModelTest {
                     makeMe.refresh(nephew);
                     makeMe.refresh(topLevel);
                     makeMe.refresh(child);
+                    makeMe.refresh(grandchild);
                 }
 
                 @Test

@@ -8,9 +8,6 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface NoteRepository extends CrudRepository<NoteEntity, Integer> {
-    NoteEntity findFirstByParentNoteAndSiblingOrderLessThanOrderBySiblingOrderDesc(NoteEntity parentNote, Long siblingOrder);
-    NoteEntity findFirstByParentNoteAndSiblingOrderGreaterThanOrderBySiblingOrder(NoteEntity parentNote, Long siblingOrder);
-
     @Query( value = "SELECT note.* from note " + byUserWhereThereIsNoReviewPoint, nativeQuery = true)
     List<NoteEntity> findByUserWhereThereIsNoReviewPoint(@Param("userId") Integer userId);
     @Query( value = "SELECT count(1) as count from note " + byUserWhereThereIsNoReviewPoint, nativeQuery = true)
