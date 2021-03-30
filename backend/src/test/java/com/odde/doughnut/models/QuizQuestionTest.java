@@ -67,6 +67,7 @@ class QuizQuestionTest {
             NoteEntity top = makeMe.aNote().please();
             NoteEntity noteEntity1 = makeMe.aNote().under(top).please();
             NoteEntity noteEntity2 = makeMe.aNote().under(top).please();
+            makeMe.refresh(top);
             List<String> options = getOptions(noteEntity1);
             assertThat(options, containsInAnyOrder(noteEntity1.getTitle(), noteEntity2.getTitle()));
         }
@@ -76,6 +77,7 @@ class QuizQuestionTest {
             NoteEntity top = makeMe.aNote().please();
             makeMe.theNote(top).with10Children().please();
             NoteEntity noteEntity = makeMe.aNote().under(top).please();
+            makeMe.refresh(top);
             List<String> options = getOptions(noteEntity);
             assertThat(options.size(), equalTo(6));
             assertThat(options.contains(noteEntity.getTitle()), is(true));

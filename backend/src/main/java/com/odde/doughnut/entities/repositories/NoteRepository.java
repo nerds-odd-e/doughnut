@@ -14,7 +14,6 @@ public interface NoteRepository extends CrudRepository<NoteEntity, Integer> {
     int countByUserWhereThereIsNoReviewPoint(@Param("userId") Integer userId);
 
     NoteEntity findFirstByTitle(String noteTitle);
-    List<NoteEntity> findAllByParentNote(NoteEntity parentNote);
 
     String byUserWhereThereIsNoReviewPoint = " LEFT JOIN ("
                 + "     SELECT id, note_id FROM review_point WHERE user_id = :userId"

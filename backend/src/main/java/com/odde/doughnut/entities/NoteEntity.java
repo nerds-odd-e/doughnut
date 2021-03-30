@@ -266,4 +266,11 @@ public class NoteEntity {
     }
     return ancestors.get(ancestors.size() - 1);
   }
+
+  public List<NoteEntity> getSiblings() {
+      if (getParentNote() == null) {
+          return new ArrayList<>();
+      }
+      return getParentNote().getChildren();
+  }
 }

@@ -36,7 +36,7 @@ public class LinkTargetExclusiveQuizFactory implements QuizQuestionFactory {
     @Override
     public NoteEntity generateAnswerNote() {
         NoteEntity note = linkEntity.getSourceNote();
-        List<NoteEntity> siblings = servant.modelFactoryService.toTreeNodeModel(note).getSiblings();
+        List<NoteEntity> siblings = note.getSiblings();
         siblings.removeAll(linkEntity.getBackwardPeers());
         siblings.remove(linkEntity.getTargetNote());
         return servant.randomizer.chooseOneRandomly(siblings);

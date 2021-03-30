@@ -28,7 +28,7 @@ public class QuizQuestionServant {
     }
 
     List<NoteEntity> choose5FromSiblings(NoteEntity answerNote, Predicate<NoteEntity> noteEntityPredicate) {
-        List<NoteEntity> siblings = modelFactoryService.toTreeNodeModel(answerNote).getSiblings();
+        List<NoteEntity> siblings = answerNote.getSiblings();
         Stream<NoteEntity> noteEntityStream = siblings.stream()
                 .filter(noteEntityPredicate);
         List<NoteEntity> list = noteEntityStream.collect(Collectors.toList());

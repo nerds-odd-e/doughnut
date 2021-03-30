@@ -69,6 +69,7 @@ class QuizQuestionTypesTest {
 
             @Test
             void shouldIncludeRightAnswers() {
+                makeMe.refresh(top);
                 QuizQuestion quizQuestion = buildLinSourceExclusiveQuizQuestion();
                 assertThat(quizQuestion.getDescription(), equalTo("Which of the following does not belong to"));
                 assertThat(quizQuestion.getMainTopic(), equalTo(target.getTitle()));
@@ -86,6 +87,7 @@ class QuizQuestionTypesTest {
                 makeMe.aNote("anotherSource4").under(top).byUser(userModel.getEntity()).linkTo(target).please();
                 makeMe.aNote("anotherSource5").under(top).byUser(userModel.getEntity()).linkTo(target).please();
                 source = makeMe.aNote("anotherSource6").under(top).byUser(userModel.getEntity()).linkTo(target).please();
+                makeMe.refresh(top);
                 reviewPointEntity = makeMe.aReviewPointFor(source.getLinks().get(0)).inMemoryPlease();
                 QuizQuestion quizQuestion = buildLinSourceExclusiveQuizQuestion();
                 List<String> options = toOptionStrings(quizQuestion);
