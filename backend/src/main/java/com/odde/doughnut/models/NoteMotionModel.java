@@ -21,15 +21,23 @@ public class NoteMotionModel extends ModelForEntity<NoteMotionEntity>{
         if(treeNodeModel.getAncestorsIncludingMe().contains(subject)) {
             throw new CyclicLinkDetectedException();
         }
-        subject.getNotesClosures().forEach(modelFactoryService.notesClosureRepository::delete);
-        subject.setNotesClosures(new ArrayList<>());
-        modelFactoryService.entityManager.flush();
-        subject.setParentNote(entity.getNewParent());
+        updateAncestors(subject, this.entity.getNewParent());
         Long newSiblingOrder = treeNodeModel.theSiblingOrderItTakesToMoveRelativeToMe(entity.isAsFirstChildOfNote());
         if (newSiblingOrder != null) {
-            subject.setSiblingOrder(newSiblingOrder);
+            this.subject.setSiblingOrder(newSiblingOrder);
         }
         modelFactoryService.noteRepository.save(subject);
+        subject.traverseBreathFirst(desc-> {
+            updateAncestors(desc, desc.getParentNote());
+            modelFactoryService.noteRepository.save(desc);
+        });
+    }
+
+    private void updateAncestors(NoteEntity note, NoteEntity parent) {
+        note.getNotesClosures().forEach(modelFactoryService.notesClosureRepository::delete);
+        note.setNotesClosures(new ArrayList<>());
+        modelFactoryService.entityManager.flush();
+        note.setParentNote(parent);
     }
 
 }

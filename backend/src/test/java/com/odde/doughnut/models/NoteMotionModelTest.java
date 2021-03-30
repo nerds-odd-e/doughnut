@@ -32,9 +32,9 @@ public class NoteMotionModelTest {
 
     @BeforeEach
     void setup() {
-        topNote = makeMe.aNote().please();
-        firstChild = makeMe.aNote().under(topNote).please();
-        secondChild = makeMe.aNote().under(topNote).please();
+        topNote = makeMe.aNote("topNote").please();
+        firstChild = makeMe.aNote("firstChild").under(topNote).please();
+        secondChild = makeMe.aNote("secondChild").under(topNote).please();
     }
 
     void move(NoteEntity subject, NoteEntity relativeNote, boolean asFirstChildOfNote) throws CyclicLinkDetectedException {
@@ -80,7 +80,7 @@ public class NoteMotionModelTest {
 
         @BeforeEach
         void setup() {
-            thirdLevel = makeMe.aNote().under(firstChild).please();
+            thirdLevel = makeMe.aNote("thirdLevel").under(firstChild).please();
         }
 
         @Test
@@ -95,6 +95,15 @@ public class NoteMotionModelTest {
                 move(topNote, thirdLevel, false)
             );
         }
+
+        @Test
+        void moveWithOwnChild() throws CyclicLinkDetectedException {
+            assertThat(thirdLevel.getAncestorsIncludingMe(), contains(topNote, firstChild, thirdLevel));
+            move(firstChild, secondChild, true);
+            assertThat(firstChild.getAncestorsIncludingMe(), contains(topNote, secondChild, firstChild));
+            assertThat(thirdLevel.getAncestorsIncludingMe(), contains(topNote, secondChild, firstChild, thirdLevel));
+        }
+
     }
 
     @Nested

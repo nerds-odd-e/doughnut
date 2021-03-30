@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
@@ -252,7 +253,7 @@ public class NoteEntity {
           notesClosureEntity.setNoteEntity(this);
           notesClosureEntity.setAncestorEntity(anc);
           notesClosureEntity.setDepth(counter[0]);
-          getNotesClosures().add(notesClosureEntity);
+          getNotesClosures().add(0, notesClosureEntity);
           counter[0] += 1;
       });
   }
@@ -269,5 +270,11 @@ public class NoteEntity {
       List<NoteEntity> ancestors = getNotesClosures().stream().map(NotesClosureEntity::getAncestorEntity).collect(toList());
       ancestors.add(this);
       return ancestors;
+  }
+
+  public void traverseBreathFirst(Consumer<NoteEntity> noteEntityConsumer) {
+      getChildren().forEach(
+              noteEntityConsumer
+      );
   }
 }
