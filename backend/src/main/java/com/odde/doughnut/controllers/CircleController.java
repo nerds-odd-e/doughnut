@@ -55,8 +55,10 @@ public class CircleController extends ApplicationMvcController  {
     }
 
     @GetMapping("/{circleEntity}")
-    public String showCircle(@PathVariable("circleEntity") CircleEntity circleEntity) throws NoAccessRightException {
+    public String showCircle(@PathVariable("circleEntity") CircleEntity circleEntity, Model model) throws NoAccessRightException {
         currentUserFetcher.getUser().assertAuthorization(circleEntity);
+        CircleModel circleModel = modelFactoryService.toCircleModel(circleEntity);
+        model.addAttribute("notes", circleModel.getOwnershipEntity().getOrphanedNotes());
         return "circles/show";
     }
 

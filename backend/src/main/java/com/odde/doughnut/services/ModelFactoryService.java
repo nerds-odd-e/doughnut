@@ -100,4 +100,8 @@ public class ModelFactoryService {
     public LinkModel toLinkModel(LinkEntity linkEntity) {
         return new LinkModel(linkEntity, this);
     }
+
+    public OwnershipModel toOwnershipModel(OwnershipEntity ownershipEntity) {
+        return new OwnershipModel(ownershipEntity, this);
+    }
 }

@@ -69,11 +69,6 @@ public class NoteEntity {
         + "id=" + id + ", title='" + title + '\'' + '}';
   }
 
-  @ManyToOne
-  @JoinColumn(name = "parent_id")
-  @JsonIgnore
-  private NoteEntity parentNoteDeprecating;
-
   @ManyToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "ownership_id", referencedColumnName = "id")
   @JsonIgnore
@@ -237,7 +232,6 @@ public class NoteEntity {
   }
 
   public void setParentNote(NoteEntity parentNote) {
-    this.parentNoteDeprecating = parentNote;
     if (parentNote == null) return;
     List<NoteEntity> ancestorsIncludingMe = parentNote.getAncestorsIncludingMe();
     Collections.reverse(ancestorsIncludingMe);

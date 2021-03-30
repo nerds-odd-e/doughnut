@@ -58,7 +58,4 @@ public class UserEntity {
         return note.getOwnershipEntity().ownsBy(this);
     }
 
-    public List<NoteEntity> orphanedNotes() {
-        return ownershipEntity.getOrphanedNotes();
-    }
 }

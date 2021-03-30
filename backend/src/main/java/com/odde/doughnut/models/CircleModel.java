@@ -12,4 +12,9 @@ public class CircleModel extends ModelForEntity<CircleEntity> {
         entity.getMembers().add(userModel.getEntity());
         modelFactoryService.circleRepository.save(entity);
     }
+
+    public OwnershipModel getOwnershipEntity() {
+        return modelFactoryService.toOwnershipModel(entity.getOwnershipEntity());
+    }
+
 }

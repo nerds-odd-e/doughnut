@@ -4,7 +4,7 @@
         <h1 th:text="${circleEntity.name}"/>
         <p> <a class="nav-link" th:href="@{/circles/{id}/notes/new(id=${circleEntity.id})}">Add Top Level Note In This Circle</a> </p>
 
-        <div th:replace="_fragments/note_fragments :: noteOwnerViewCards(${circleEntity.orphanedNotes()})"/>
+        <div th:replace="_fragments/note_fragments :: noteOwnerViewCards(${notes})"/>
 
         <nav class="nav justify-content-end">
             <div class="nav-item circle-member" th:each="member:${circleEntity.members}">

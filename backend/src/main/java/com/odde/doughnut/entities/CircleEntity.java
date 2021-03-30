@@ -58,7 +58,4 @@ public class CircleEntity {
                 .toString();
     }
 
-    public List<NoteEntity> orphanedNotes() {
-        return ownershipEntity.getOrphanedNotes();
-    }
 }

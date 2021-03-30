@@ -6,10 +6,7 @@ import com.odde.doughnut.entities.NoteMotionEntity;
 import com.odde.doughnut.entities.ReviewSettingEntity;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.NoAccessRightException;
-import com.odde.doughnut.models.BazaarModel;
-import com.odde.doughnut.models.NoteContentModel;
-import com.odde.doughnut.models.TreeNodeModel;
-import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.models.*;
 import com.odde.doughnut.services.ModelFactoryService;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,6 +20,7 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.List;
 
 @Controller
 @RequestMapping("/notes")
@@ -36,7 +34,7 @@ public class NoteController extends ApplicationMvcController  {
 
     @GetMapping("")
     public String myNotes(Model model) {
-        model.addAttribute("notes", currentUserFetcher.getUser().getOrphanedNotes());
+        model.addAttribute("notes", currentUserFetcher.getUser().getOwnershipEntity().getOrphanedNotes());
         return "notes/index";
     }
 

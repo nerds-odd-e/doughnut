@@ -29,10 +29,6 @@ public class UserModel extends ModelForEntity<UserEntity> {
         save();
     }
 
-    public List<NoteEntity> getOrphanedNotes() {
-        return entity.orphanedNotes();
-    }
-
     public void assertAuthorization(NoteEntity noteEntity) throws NoAccessRightException {
         if (!hasAuthority(noteEntity)) {
             throw new NoAccessRightException();
@@ -134,6 +130,10 @@ public class UserModel extends ModelForEntity<UserEntity> {
 
     public Reviewing createReviewing(Timestamp currentUTCTimestamp) {
         return new Reviewing(this, currentUTCTimestamp, modelFactoryService);
+    }
+
+    public OwnershipModel getOwnershipEntity() {
+        return modelFactoryService.toOwnershipModel(entity.getOwnershipEntity());
     }
 
 }

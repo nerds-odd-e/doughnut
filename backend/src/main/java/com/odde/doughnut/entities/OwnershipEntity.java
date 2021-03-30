@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Where;
+import org.hibernate.annotations.WhereJoinTable;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -23,11 +24,6 @@ public class OwnershipEntity {
     @JoinColumn(name = "circle_id")
     @JsonIgnore
     @Getter @Setter private CircleEntity circleEntity;
-
-    @OneToMany(mappedBy = "ownershipEntity")
-    @Where(clause = "parent_id IS NULL")
-    @JsonIgnore
-    @Getter private List<NoteEntity> orphanedNotes;
 
     public boolean ownsBy(UserEntity user) {
         if(userEntity != null) {
