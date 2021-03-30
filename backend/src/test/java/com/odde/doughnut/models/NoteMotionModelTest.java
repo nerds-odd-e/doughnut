@@ -77,10 +77,12 @@ public class NoteMotionModelTest {
     @Nested
     class WhenThereIsAThirdLevel {
         NoteEntity thirdLevel;
+        NoteEntity forthLevel;
 
         @BeforeEach
         void setup() {
             thirdLevel = makeMe.aNote("thirdLevel").under(firstChild).please();
+            forthLevel = makeMe.aNote("forthLevel").under(thirdLevel).please();
         }
 
         @Test
@@ -98,10 +100,10 @@ public class NoteMotionModelTest {
 
         @Test
         void moveWithOwnChild() throws CyclicLinkDetectedException {
-            assertThat(thirdLevel.getAncestorsIncludingMe(), contains(topNote, firstChild, thirdLevel));
             move(firstChild, secondChild, true);
             assertThat(firstChild.getAncestorsIncludingMe(), contains(topNote, secondChild, firstChild));
             assertThat(thirdLevel.getAncestorsIncludingMe(), contains(topNote, secondChild, firstChild, thirdLevel));
+            assertThat(forthLevel.getAncestorsIncludingMe(), contains(topNote, secondChild, firstChild, thirdLevel, forthLevel));
         }
 
     }

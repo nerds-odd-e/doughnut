@@ -273,8 +273,7 @@ public class NoteEntity {
   }
 
   public void traverseBreathFirst(Consumer<NoteEntity> noteEntityConsumer) {
-      getChildren().forEach(
-              noteEntityConsumer
-      );
+      getChildren().forEach(noteEntityConsumer);
+      getChildren().forEach(desc->desc.traverseBreathFirst(noteEntityConsumer));
   }
 }
