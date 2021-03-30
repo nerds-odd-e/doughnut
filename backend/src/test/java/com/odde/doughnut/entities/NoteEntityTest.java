@@ -101,7 +101,7 @@ public class NoteEntityTest {
             note.setPictureUrl("http://url/img");
             assertThat(getViolations(), is(not(empty())));
             List<String> errorFields = getViolations().stream().map(v->v.getPropertyPath().toString()).collect(toList());
-            assertThat(errorFields, containsInAnyOrder("uploadPicture", "picture"));
+            assertThat(errorFields, containsInAnyOrder("uploadPicture", "pictureUrl"));
         }
 
         private Set<ConstraintViolation<NoteEntity>> getViolations() {
