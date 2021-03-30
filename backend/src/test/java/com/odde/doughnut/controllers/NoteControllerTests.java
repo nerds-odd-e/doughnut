@@ -185,6 +185,7 @@ class NoteControllerTests {
             NoteEntity child = makeMe.aNote().byUser(userModel).under(subject).please();
             makeMe.aReviewPointFor(child).by(userModel).please();
             long oldCount = makeMe.modelFactoryService.reviewPointRepository.count();
+            makeMe.refresh(subject);
             controller.deleteNote(subject);
 
             assertThat(makeMe.modelFactoryService.reviewPointRepository.count(), equalTo(oldCount - 1));

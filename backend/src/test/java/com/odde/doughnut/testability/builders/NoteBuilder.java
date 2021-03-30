@@ -32,7 +32,6 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
 
     public NoteBuilder under(NoteEntity parentNote) {
         entity.setParentNote(parentNote);
-        parentNote.getChildren().add(entity);
         return this;
     }
 

@@ -86,14 +86,6 @@ public class NoteEntity {
   @Setter
   private ReviewSettingEntity masterReviewSettingEntity;
 
-  @Column(name = "parent_id", insertable = false, updatable = false)
-  @Getter
-  private Integer parentId;
-
-  @Column(name = "user_id", insertable = false, updatable = false)
-  @Getter
-  private Integer userId;
-
   @OneToMany(mappedBy = "parentNote", cascade = CascadeType.ALL,
              orphanRemoval = true)
   @OrderBy("sibling_order")
@@ -145,6 +137,13 @@ public class NoteEntity {
   @Getter
   @Setter
   private List<NotesClosureEntity> notesClosures = new ArrayList<>();
+
+  @OneToMany(mappedBy = "ancestorEntity", cascade = CascadeType.DETACH)
+  @JsonIgnore
+  @OrderBy("depth")
+  @Getter
+  @Setter
+  private List<NotesClosureEntity> descendantNCs = new ArrayList<>();
 
   @Transient @Getter @Setter private String testingParent;
   @Transient @Getter @Setter private MultipartFile uploadPictureProxy;
@@ -251,8 +250,7 @@ public class NoteEntity {
   }
 
   public void traverseBreadthFirst(Consumer<NoteEntity> noteEntityConsumer) {
-      getChildren().forEach(noteEntityConsumer);
-      getChildren().forEach(desc->desc.traverseBreadthFirst(noteEntityConsumer));
+    descendantNCs.stream().map(NotesClosureEntity::getNoteEntity).forEach(noteEntityConsumer);
   }
 
   public NoteEntity getParentNote() {
