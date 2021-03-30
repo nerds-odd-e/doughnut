@@ -118,7 +118,7 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
     }
 
     public NoteBuilder withPicture(String picture) {
-        entity.setPicture(picture);
+        entity.setPictureUrl(picture);
         return this;
     }
 

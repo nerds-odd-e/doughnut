@@ -43,7 +43,7 @@ public class NoteEntityTest {
         void useParentPicture() {
             NoteEntity parent = makeMe.aNote().withPicture("https://img.com/xxx.jpg").inMemoryPlease();
             NoteEntity child = makeMe.aNote().under(parent).useParentPicture().inMemoryPlease();
-            assertThat(child.getNotePicture(), equalTo(parent.getPicture()));
+            assertThat(child.getNotePicture(), equalTo(parent.getPictureUrl()));
         }
     }
 
@@ -98,7 +98,7 @@ public class NoteEntityTest {
         @Test
         public void withBothUploadPictureProxyAndPicture() {
             note.setUploadPictureProxy(makeMe.anUploadedPicture().toMultiplePartFilePlease());
-            note.setPicture("http://url/img");
+            note.setPictureUrl("http://url/img");
             assertThat(getViolations(), is(not(empty())));
             List<String> errorFields = getViolations().stream().map(v->v.getPropertyPath().toString()).collect(toList());
             assertThat(errorFields, containsInAnyOrder("uploadPicture", "picture"));

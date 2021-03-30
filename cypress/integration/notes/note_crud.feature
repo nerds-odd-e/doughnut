@@ -10,8 +10,8 @@ Feature: Note CRUD
             | note-title      | note-description  | note-uploadPicture | note-pictureMask    |
             | Sedation        | Put to sleep      | example-large.png  | 20 40 70 30         |
         And I create top level note with:
-            | note-title      | note-description  | note-picture |
-            | Sedition        | Incite violence   | a_slide.jpg  |
+            | note-title      | note-description  | note-pictureUrl |
+            | Sedition        | Incite violence   | a_slide.jpg     |
         Then I should see these notes belonging to the user at the top level of all my notes
             | note-title      |
             | Sedation        |

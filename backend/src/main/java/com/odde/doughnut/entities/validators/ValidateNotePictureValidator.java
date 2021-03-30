@@ -17,8 +17,8 @@ public class ValidateNotePictureValidator implements ConstraintValidator<Validat
         if (noteEntity.getUploadPictureProxy() != null && !noteEntity.getUploadPictureProxy().isEmpty()) {
             fieldsWithValue.add("uploadPicture");
         }
-        if (!Strings.isEmpty(noteEntity.getPicture())) {
-            fieldsWithValue.add("picture");
+        if (!Strings.isEmpty(noteEntity.getPictureUrl())) {
+            fieldsWithValue.add("pictureUrl");
         }
         if (noteEntity.getUseParentPicture()) {
             fieldsWithValue.add("useParentPicture");

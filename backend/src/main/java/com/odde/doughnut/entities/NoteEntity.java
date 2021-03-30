@@ -34,7 +34,8 @@ public class NoteEntity {
   private Integer id;
   @NotNull @Size(min = 1, max = 100) @Getter @Setter private String title;
   @Getter @Setter private String description;
-  @Getter @Setter private String picture;
+  @Column(name="picture_url")
+  @Getter @Setter private String pictureUrl;
   @Getter @Setter private String url;
 
   @Column(name = "url_is_video")
@@ -195,7 +196,7 @@ public class NoteEntity {
       return "/images/" + uploadPicture.getId() + "/" + uploadPicture.getName();
     }
 
-    return picture;
+    return pictureUrl;
   }
 
   public String getPictureMaskSvg(String opacity) {
@@ -212,7 +213,7 @@ public class NoteEntity {
   }
 
   public boolean hasPicture() {
-    return Strings.isNotBlank(picture) || uploadPicture != null || useParentPicture;
+    return Strings.isNotBlank(pictureUrl) || uploadPicture != null || useParentPicture;
   }
 
   public boolean isHead() {
