@@ -8,9 +8,6 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface NoteRepository extends CrudRepository<NoteEntity, Integer> {
-
-    NoteEntity findFirstByParentNoteOrderBySiblingOrderDesc(NoteEntity parentNote);
-    NoteEntity findFirstByParentNoteOrderBySiblingOrder(NoteEntity parentNote);
     NoteEntity findFirstByParentNoteAndSiblingOrderLessThanOrderBySiblingOrderDesc(NoteEntity parentNote, Long siblingOrder);
     NoteEntity findFirstByParentNoteAndSiblingOrderGreaterThanOrderBySiblingOrder(NoteEntity parentNote, Long siblingOrder);
 

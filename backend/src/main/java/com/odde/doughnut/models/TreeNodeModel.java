@@ -40,11 +40,11 @@ public class TreeNodeModel extends ModelForEntity<NoteEntity> {
             return entity.getParentNote();
         }
         while (true) {
-            NoteEntity lastChild = noteRepository.findFirstByParentNoteOrderBySiblingOrderDesc(result);
-            if (lastChild == null) {
+            List<NoteEntity> children = result.getChildren();
+            if(children.size() == 0) {
                 return result;
             }
-            result = lastChild;
+            result = children.get(children.size() - 1);
         }
     }
 
@@ -72,7 +72,7 @@ public class TreeNodeModel extends ModelForEntity<NoteEntity> {
     }
 
     public NoteEntity getFirstChild() {
-        return noteRepository.findFirstByParentNoteOrderBySiblingOrder(entity);
+        return entity.getChildren().stream().findFirst().orElse(null);
     }
 
     private long getSiblingOrderToInsertBehindMe() {

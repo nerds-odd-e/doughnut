@@ -35,6 +35,9 @@ public class NoteMotionModelTest {
         topNote = makeMe.aNote("topNote").please();
         firstChild = makeMe.aNote("firstChild").under(topNote).please();
         secondChild = makeMe.aNote("secondChild").under(topNote).please();
+        makeMe.refresh(topNote);
+        makeMe.refresh(firstChild);
+        makeMe.refresh(secondChild);
     }
 
     void move(NoteEntity subject, NoteEntity relativeNote, boolean asFirstChildOfNote) throws CyclicLinkDetectedException {
@@ -100,7 +103,6 @@ public class NoteMotionModelTest {
 
         @Test
         void moveWithOwnChild() throws CyclicLinkDetectedException {
-            makeMe.refresh(firstChild);
             move(firstChild, secondChild, true);
             assertThat(firstChild.getAncestorsIncludingMe(), contains(topNote, secondChild, firstChild));
             assertThat(thirdLevel.getAncestorsIncludingMe(), contains(topNote, secondChild, firstChild, thirdLevel));

@@ -42,6 +42,8 @@ public class NoteContentModelTest {
     @Test
     void topLevelNoteWithOneChild() {
         NoteEntity child = makeMe.aNote().under(topLevel).please();
+        makeMe.refresh(topLevel);
+        makeMe.refresh(child);
         assertThat(toModel(topLevel).getFirstChild(), equalTo(child));
     }
 
@@ -88,6 +90,9 @@ public class NoteContentModelTest {
             void setup() {
                 child = makeMe.aNote().under(topLevel).please();
                 nephew = makeMe.aNote().under(topLevel).please();
+                makeMe.refresh(nephew);
+                makeMe.refresh(topLevel);
+                makeMe.refresh(child);
             }
 
             @Test
@@ -115,6 +120,9 @@ public class NoteContentModelTest {
                 @BeforeEach
                 void setup() {
                     grandchild = makeMe.aNote().under(child).please();
+                    makeMe.refresh(nephew);
+                    makeMe.refresh(topLevel);
+                    makeMe.refresh(child);
                 }
 
                 @Test

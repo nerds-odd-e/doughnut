@@ -193,8 +193,8 @@ public class NoteEntity {
   }
 
   public String getNotePicture() {
-    if (useParentPicture && parentNote != null) {
-        return parentNote.getNotePicture();
+    if (useParentPicture && getParentNote() != null) {
+        return getParentNote().getNotePicture();
     }
 
     if (uploadPicture != null) {
@@ -222,7 +222,7 @@ public class NoteEntity {
   }
 
   public boolean isHead() {
-    return parentNote == null;
+    return getParentNote() == null;
   }
 
   public void addAncestors(List<NoteEntity> ancestors) {
