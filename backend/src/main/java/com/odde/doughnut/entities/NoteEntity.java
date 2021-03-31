@@ -244,7 +244,7 @@ public class NoteEntity {
         }
     }
 
-    public NoteEntity getFirstChild() {
+    private NoteEntity getFirstChild() {
         return getChildren().stream().findFirst().orElse(null);
     }
 
@@ -262,5 +262,29 @@ public class NoteEntity {
             next = next.getParentNote();
         }
         return null;
+    }
+
+    private long getSiblingOrderToInsertBehindMe() {
+        NoteEntity nextSiblingNote = getNextSibling();
+        Long relativeToSiblingOrder = getSiblingOrder();
+        if (nextSiblingNote == null) {
+            return relativeToSiblingOrder + SiblingOrder.MINIMUM_SIBLING_ORDER_INCREMENT;
+        }
+        return (relativeToSiblingOrder + nextSiblingNote.getSiblingOrder()) / 2;
+    }
+
+    private Long getSiblingOrderToBecomeMyFirstChild() {
+        NoteEntity firstChild = getFirstChild();
+        if (firstChild != null) {
+            return firstChild.getSiblingOrder() - SiblingOrder.MINIMUM_SIBLING_ORDER_INCREMENT;
+        }
+        return null;
+    }
+
+    public Long theSiblingOrderItTakesToMoveRelativeToMe(boolean asFirstChildOfNote) {
+        if (!asFirstChildOfNote) {
+            return getSiblingOrderToInsertBehindMe();
+        }
+        return getSiblingOrderToBecomeMyFirstChild();
     }
 }

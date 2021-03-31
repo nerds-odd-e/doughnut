@@ -27,19 +27,6 @@ public class NoteEntityAsTreeNodeTest {
         topLevel = makeMe.aNote("topLevel").please();
     }
 
-    @Test
-    void emptyTopLevelNote() {
-        assertThat(topLevel.getFirstChild(), is(nullValue()));
-    }
-
-    @Test
-    void topLevelNoteWithOneChild() {
-        NoteEntity child = makeMe.aNote().under(topLevel).please();
-        makeMe.refresh(topLevel);
-        makeMe.refresh(child);
-        assertThat(topLevel.getFirstChild(), equalTo(child));
-    }
-
     @Nested
     class GetAncestors {
 

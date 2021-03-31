@@ -16,15 +16,13 @@ public class NoteMotionModel extends ModelForEntity<NoteMotionEntity>{
     }
 
     public void execute() throws CyclicLinkDetectedException {
-        TreeNodeModel treeNodeModel = modelFactoryService.toTreeNodeModel(entity.getRelativeToNote());
-
         if(entity.getRelativeToNote().getAncestors().contains(subject)) {
             throw new CyclicLinkDetectedException();
         }
-        updateAncestors(subject, this.entity.getNewParent());
-        Long newSiblingOrder = treeNodeModel.theSiblingOrderItTakesToMoveRelativeToMe(entity.isAsFirstChildOfNote());
+        updateAncestors(subject, entity.getNewParent());
+        Long newSiblingOrder = entity.getRelativeToNote().theSiblingOrderItTakesToMoveRelativeToMe(entity.isAsFirstChildOfNote());
         if (newSiblingOrder != null) {
-            this.subject.setSiblingOrder(newSiblingOrder);
+            subject.setSiblingOrder(newSiblingOrder);
         }
         modelFactoryService.noteRepository.save(subject);
         subject.traverseBreadthFirst(desc-> {
