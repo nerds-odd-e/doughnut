@@ -1,6 +1,7 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.odde.doughnut.algorithms.ClozeDescription;
 import com.odde.doughnut.entities.validators.ValidateNotePicture;
 import com.odde.doughnut.models.ImageEntityBuilder;
 import lombok.Getter;
@@ -115,5 +116,9 @@ public class NoteContentEntity {
             ImageEntity imageEntity = new ImageEntityBuilder().buildImageEntityFromUploadedPicture(userEntity, file);
             setUploadPicture(imageEntity);
         }
+    }
+
+    public String getClozeDescription() {
+        return new ClozeDescription().getClozeDescription(title, description);
     }
 }

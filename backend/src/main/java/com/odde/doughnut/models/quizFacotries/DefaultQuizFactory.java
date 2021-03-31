@@ -24,7 +24,7 @@ public class DefaultQuizFactory implements QuizQuestionFactory {
 
     @Override
     public String generateInstruction() {
-        return answerNote.getClozeDescription();
+        return answerNote.getNoteContent().getClozeDescription();
     }
 
     @Override
