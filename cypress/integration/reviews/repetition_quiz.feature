@@ -4,10 +4,10 @@ Feature: Repetition Quiz
   Background:
     Given I've logged in as an existing user
     And there are some notes for the current user
-      | noteContent.title | noteContent.description        | noteContent.skipReview | noteContent.testingParent |
-      | English           |                                | true       |               |
-      | sedition          | Sedition means incite violence | false      | English       |
-      | sedation          | Put to sleep is sedation       | false      | English       |
+      | title    | description                    | skipReview | testingParent |
+      | English  |                                | true       |               |
+      | sedition | Sedition means incite violence | false      | English       |
+      | sedation | Put to sleep is sedation       | false      | English       |
 
   Scenario Outline: Auto generate cloze deletion
     Given I learned one note "sedition" on day 1

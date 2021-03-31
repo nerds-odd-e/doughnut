@@ -7,10 +7,10 @@ Feature: Bazaar sharing
 
   Scenario: Contributing To Bazaar
     Given there are some notes for the current user
-      | noteContent.title | noteContent.description   | noteContent.testingParent |
-      | Shape             | The form of something     |               |
-      | Square            | four equal straight sides | Shape         |
-      | Triangle          | three sides shape         | Shape         |
+      | title    | description               | testingParent |
+      | Shape    | The form of something     |               |
+      | Square   | four equal straight sides | Shape         |
+      | Triangle | three sides shape         | Shape         |
     When I choose to share my note "Shape"
     Then I should see "Shape" is shared in the Bazaar
 

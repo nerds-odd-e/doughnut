@@ -52,7 +52,7 @@ Then("I initial review {string}", (noteTitle) => {
 });
 
 Then("I added and learned one note {string} on day {int}", (noteTitle, day) => {
-    cy.seedNotes([{'noteContent.title': noteTitle}]);
+    cy.seedNotes([{'title': noteTitle}]);
     cy.timeTravelTo(day, 8);
     cy.initialReviewNotes(noteTitle);
 });

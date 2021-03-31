@@ -4,11 +4,11 @@ Feature: Repetition Link Quiz
   Background:
     Given I've logged in as an existing user
     And there are some notes for the current user
-      | noteContent.title | noteContent.skipReview | noteContent.testingParent |
-      | Space             | true       |               |
-      | Moon              | true       | Space         |
-      | Earth             | true       | Space         |
-      | Mars              | true       | Space         |
+      | title | skipReview | testingParent |
+      | Space | true       |               |
+      | Moon  | true       | Space         |
+      | Earth | true       | Space         |
+      | Mars  | true       | Space         |
     And there is "belongs to" link between note "Moon" and "Earth"
 
   Scenario Outline: "Belongs to" question

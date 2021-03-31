@@ -2,10 +2,7 @@
 package com.odde.doughnut.testability;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcherFromRequest;
-import com.odde.doughnut.entities.CircleEntity;
-import com.odde.doughnut.entities.LinkEntity;
-import com.odde.doughnut.entities.NoteEntity;
-import com.odde.doughnut.entities.UserEntity;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.LinkRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
@@ -20,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManagerFactory;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -61,18 +59,22 @@ class TestabilityRestController {
     }
 
     @PostMapping("/seed_notes")
-    public List<Integer> seedNote(@RequestBody List<NoteEntity> notes, @RequestParam(name = "external_identifier") String externalIdentifier) throws Exception {
+    public List<Integer> seedNote(@RequestBody List<NoteContentEntity> noteContents, @RequestParam(name = "external_identifier") String externalIdentifier) throws Exception {
         UserModel userModel = getUserModelByExternalIdentifierOrCurrentUser(externalIdentifier);
         HashMap<String, NoteEntity> earlyNotes = new HashMap<>();
+        List<NoteEntity> noteList = new ArrayList<>();
 
-        for (NoteEntity note : notes) {
-            earlyNotes.put(note.getTitle(), note);
+        for (NoteContentEntity content : noteContents) {
+            NoteEntity note = new NoteEntity();
+            note.setNoteContent(content);
+            earlyNotes.put(content.getTitle(), note);
+            noteList.add(note);
             note.setOwnershipEntity(userModel.getEntity().getOwnershipEntity());
             note.setParentNote(earlyNotes.get(note.getNoteContent().getTestingParent()));
             note.setUserEntity(userModel.getEntity());
         }
-        noteRepository.saveAll(notes);
-        return notes.stream().map(NoteEntity::getId).collect(Collectors.toList());
+        noteRepository.saveAll(noteList);
+        return noteList.stream().map(NoteEntity::getId).collect(Collectors.toList());
     }
 
     @PostMapping("/link_notes")

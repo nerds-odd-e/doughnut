@@ -3,11 +3,11 @@ Feature: Bazaar browsing
 
   Background:
     Given there are some notes for existing user "old_learner"
-      | noteContent.title | noteContent.description   | noteContent.testingParent |
-      | Shape             | The form of something     |               |
-      | Square            | four equal straight sides | Shape         |
-      | Triangle          | three sides shape         | Shape         |
-      | Big Square        | a square but big          | Square        |
+      | title      | description               | testingParent |
+      | Shape      | The form of something     |               |
+      | Square     | four equal straight sides | Shape         |
+      | Triangle   | three sides shape         | Shape         |
+      | Big Square | a square but big          | Square        |
     And note "Shape" is shared to the Bazaar
 
   Scenario: Browsing as non-user

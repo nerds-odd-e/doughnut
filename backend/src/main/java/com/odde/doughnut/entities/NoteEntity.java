@@ -30,7 +30,8 @@ public class NoteEntity {
   @Embedded
   @Valid
   @Getter
-  private final NoteContentEntity noteContent = new NoteContentEntity();
+  @Setter
+  private NoteContentEntity noteContent = new NoteContentEntity();
 
   @Column(name = "sibling_order")
   @Getter

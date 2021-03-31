@@ -41,34 +41,11 @@ Cypress.Commands.add("loginAs", (username) => {
   });
 });
 
-function deepen(obj) {
-  const result = {};
-
-  // For each object path (property key) in the object
-  for (const objectPath in obj) {
-    // Split path into component parts
-    const parts = objectPath.split('.');
-
-    // Create sub-objects along path as needed
-    let target = result;
-    while (parts.length > 1) {
-      const part = parts.shift();
-      target = target[part] = target[part] || {};
-    }
-
-    // Set value at end of path
-    target[parts[0]] = obj[objectPath]
-  }
-
-  return result;
-}
-
-Cypress.Commands.add("seedNotes", (flatNotes, externalIdentifier='') => {
-  const nestedNotes = flatNotes.map(fn=>deepen(fn));
-  cy.request({method: "POST", url: `/api/testability/seed_notes?external_identifier=${externalIdentifier}`, body: nestedNotes})
+Cypress.Commands.add("seedNotes", (notes, externalIdentifier='') => {
+  cy.request({method: "POST", url: `/api/testability/seed_notes?external_identifier=${externalIdentifier}`, body: notes})
   .then((response) => {
-     expect(response.body.length).to.equal(nestedNotes.length);
-     const titles = nestedNotes.map(n=>n["noteContent"]["title"]);
+     expect(response.body.length).to.equal(notes.length);
+     const titles = notes.map(n=>n["title"]);
      const noteMap = Object.assign({}, ...titles.map((t, index) => ({[t]: response.body[index]})));
      cy.wrap(noteMap).as("seededNoteIdMap");
   })
