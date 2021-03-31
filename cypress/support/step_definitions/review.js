@@ -73,17 +73,17 @@ Then("I am learning new note on day {int}", (day) => {
 });
 
 Then("I have selected the option {string}", (option) => {
-    cy.get("#review_setting-" + option).check();
+    cy.get("[name='" + option + "']").check();
     cy.get('form#review-setting').submit();
 });
 
 Then("I have unselected the option {string}", (option) => {
-    cy.get("#review_setting-" + option).uncheck();
+    cy.get("[name='" + option + "']").uncheck();
     cy.get('form#review-setting').submit();
 });
 
 Then("I should see the option {string} is {string}", (option, status) => {
-  const elm = cy.get("#review_setting-" + option);
+  const elm = cy.get("[name='" + option + "']");
   if ((status === "on")) {
       elm.should("be.checked")
   }
@@ -125,7 +125,7 @@ Then("I should be asked link question {string} {string} with options {string}", 
 });
 
 Then("I type my answer {string}", (answer) => {
-    cy.get("#review_point-answer").type(answer);
+    cy.get("[name='answer']").type(answer);
     cy.findByRole('button', {name: 'OK'}).click();
 });
 

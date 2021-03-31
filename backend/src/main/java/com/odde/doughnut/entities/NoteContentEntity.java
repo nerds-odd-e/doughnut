@@ -19,6 +19,10 @@ import java.util.stream.Collectors;
 @Embeddable
 @ValidateNotePicture
 public class NoteContentEntity {
+    @Column(name = "id", insertable = false, updatable = false)
+    @Getter
+    private Integer id;
+
     @NotNull
     @Size(min = 1, max = 100)
     @Getter
