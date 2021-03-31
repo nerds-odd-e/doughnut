@@ -18,7 +18,7 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
         super(makeMe, noteEntity);
         title(titleCounter.generate());
         description("descrption");
-        entity.setUpdatedDatetime(new Timestamp(System.currentTimeMillis()));
+        createdAt(new Timestamp(System.currentTimeMillis()));
     }
 
     public NoteBuilder byUser(UserEntity userEntity) {
@@ -112,7 +112,7 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
     }
 
     public NoteBuilder createdAt(Timestamp timestamp) {
-        entity.setCreatedDatetime(timestamp);
+        entity.getNoteContent().setCreatedDatetime(timestamp);
         return this;
     }
 

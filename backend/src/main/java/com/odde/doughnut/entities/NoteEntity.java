@@ -40,12 +40,6 @@ public class NoteEntity {
   @Setter
   private Long siblingOrder = SiblingOrder.getGoodEnoughOrderNumber();
 
-  @Override
-  public String toString() {
-    return "Note{"
-        + "id=" + id + ", title='" + noteContent.getTitle() + '\'' + '}';
-  }
-
   @ManyToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "ownership_id", referencedColumnName = "id")
   @JsonIgnore
@@ -65,16 +59,6 @@ public class NoteEntity {
   @Getter
   @Setter
   private UserEntity userEntity;
-
-  @Column(name = "created_datetime")
-  @Getter
-  @Setter
-  private Timestamp createdDatetime = new Timestamp(System.currentTimeMillis());
-
-  @Column(name = "updated_datetime")
-  @Getter
-  @Setter
-  private Timestamp updatedDatetime = new Timestamp(System.currentTimeMillis());
 
   @OneToMany(mappedBy = "sourceNote", cascade = CascadeType.ALL,
              orphanRemoval = true)
@@ -115,7 +99,12 @@ public class NoteEntity {
   @Getter
   private final List<NoteEntity> children = new ArrayList<>();
 
-  public List<NoteEntity> getTargetNotes() {
+    @Override
+    public String toString() {
+        return "Note{" + "id=" + id + ", title='" + noteContent.getTitle() + '\'' + '}';
+    }
+
+    public List<NoteEntity> getTargetNotes() {
     return links.stream().map(LinkEntity::getTargetNote).collect(toList());
   }
 

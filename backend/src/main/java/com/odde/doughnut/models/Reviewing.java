@@ -38,7 +38,7 @@ public class Reviewing {
             return null;
         }
         if (noteEntity != null && linkEntity != null) {
-            if (noteEntity.getCreatedDatetime().compareTo(linkEntity.getCreateAt()) > 0) {
+            if (noteEntity.getNoteContent().getCreatedDatetime().compareTo(linkEntity.getCreateAt()) > 0) {
                 noteEntity = null;
             } else {
                 linkEntity = null;

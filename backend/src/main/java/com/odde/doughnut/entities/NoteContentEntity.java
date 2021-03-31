@@ -13,6 +13,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -73,6 +74,16 @@ public class NoteContentEntity {
     @Transient @Getter @Setter private MultipartFile uploadPictureProxy;
 
     @Transient @Getter @Setter private String testingParent;
+
+    @Column(name = "created_datetime")
+    @Getter
+    @Setter
+    private Timestamp createdDatetime = new Timestamp(System.currentTimeMillis());
+
+    @Column(name = "updated_datetime")
+    @Getter
+    @Setter
+    private Timestamp updatedDatetime = new Timestamp(System.currentTimeMillis());
 
     public String getNotePicture() {
         if (uploadPicture != null) {
