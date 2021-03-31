@@ -1,10 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
-import com.odde.doughnut.entities.NoteEntity;
-import com.odde.doughnut.entities.NoteMotionEntity;
-import com.odde.doughnut.entities.OwnershipEntity;
-import com.odde.doughnut.entities.ReviewSettingEntity;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.models.*;
@@ -44,21 +41,24 @@ public class NoteController extends ApplicationMvcController  {
         if (parentNote != null) {
             userModel.assertAuthorization(parentNote);
         }
-        NoteEntity noteEntity = new NoteEntity();
-        noteEntity.setParentNote(parentNote);
+        NoteContentEntity noteContentEntity = new NoteContentEntity();
         model.addAttribute("ownershipEntity", userModel.getEntity().getOwnershipEntity());
-        model.addAttribute("noteEntity", noteEntity);
+        model.addAttribute("noteContentEntity", noteContentEntity);
         return "notes/new";
     }
 
     @PostMapping({"/{ownershipEntity}/create_top", "/{parentNote}/create"})
-    public String createNote(@PathVariable(name = "ownershipEntity", required = false) OwnershipEntity ownershipEntity, @PathVariable(name = "parentNote", required = false) NoteEntity parentNote, @Valid NoteEntity noteEntity, BindingResult bindingResult, Model model) throws NoAccessRightException, IOException {
+    public String createNote(@PathVariable(name = "ownershipEntity", required = false) OwnershipEntity ownershipEntity, @PathVariable(name = "parentNote", required = false) NoteEntity parentNote, @Valid NoteContentEntity noteContentEntity, BindingResult bindingResult, Model model) throws NoAccessRightException, IOException {
         if (bindingResult.hasErrors()) {
             return "notes/new";
         }
         if (parentNote != null) {
             currentUserFetcher.getUser().assertAuthorization(parentNote);
         }
+        NoteEntity noteEntity = new NoteEntity();
+        noteEntity.setNoteContent(noteContentEntity);
+        noteEntity.setParentNote(parentNote);
+        noteEntity.setOwnershipEntity(ownershipEntity);
         if(ownershipEntity == null) {
             noteEntity.setOwnershipEntity(parentNote.getOwnershipEntity());
         }
@@ -76,16 +76,18 @@ public class NoteController extends ApplicationMvcController  {
     }
 
     @GetMapping("/{noteEntity}/edit")
-    public String editNote(NoteEntity noteEntity) {
+    public String editNote(NoteEntity noteEntity, Model model) {
+        model.addAttribute("noteContentEntity", noteEntity.getNoteContent());
         return "notes/edit";
     }
 
     @PostMapping("/{noteEntity}")
-    public String updateNote(@Valid NoteEntity noteEntity, BindingResult bindingResult) throws NoAccessRightException, IOException {
+    public String updateNote(@PathVariable(name = "noteEntity") NoteEntity noteEntity, @Valid NoteContentEntity noteContentEntity, BindingResult bindingResult) throws NoAccessRightException, IOException {
         currentUserFetcher.getUser().assertAuthorization(noteEntity);
         if (bindingResult.hasErrors()) {
             return "notes/edit";
         }
+        noteEntity.setNoteContent(noteContentEntity);
         NoteContentModel noteContentModel = modelFactoryService.toNoteModel(noteEntity);
         noteContentModel.update(currentUserFetcher.getUser());
         return "redirect:/notes/" + noteEntity.getId();

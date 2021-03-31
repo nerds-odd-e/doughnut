@@ -54,8 +54,8 @@ class NoteControllerTests {
             NoteEntity newNote = makeMe.aNote().byUser(userModel).inMemoryPlease();
             BindingResult bindingResult = makeMe.successfulBindingResult();
 
-            String response = controller.createNote(userModel.getOwnershipModel().getEntity(), null, newNote, bindingResult, model);
-            assertEquals("redirect:/notes/" + newNote.getId(), response);
+            String response = controller.createNote(userModel.getOwnershipModel().getEntity(), null, newNote.getNoteContent(), bindingResult, model);
+            assertThat(response, matchesPattern("redirect:/notes/\\d+"));
         }
 
         @Test
@@ -63,7 +63,7 @@ class NoteControllerTests {
             NoteEntity newNote = new NoteEntity();
             BindingResult bindingResult = makeMe.failedBindingResult();
 
-            String response = controller.createNote(userModel.getOwnershipModel().getEntity(), null, newNote, bindingResult, model);
+            String response = controller.createNote(userModel.getOwnershipModel().getEntity(), null, newNote.getNoteContent(), bindingResult, model);
             assertNull(newNote.getId());
             assertEquals("notes/new", response);
         }
@@ -82,14 +82,14 @@ class NoteControllerTests {
         @Test
         void shouldBeAbleToSaveNoteWhenValid() throws NoAccessRightException, IOException {
             BindingResult bindingResult = makeMe.successfulBindingResult();
-            String response = controller.updateNote(note, bindingResult);
+            String response = controller.updateNote(note, note.getNoteContent(), bindingResult);
             assertEquals("redirect:/notes/" + note.getId(), response);
         }
 
         @Test
         void shouldNotBeAbleToSaveNoteWhenInvalid() throws NoAccessRightException, IOException {
             BindingResult bindingResult = makeMe.failedBindingResult();
-            String response = controller.updateNote(note, bindingResult);
+            String response = controller.updateNote(note, note.getNoteContent(), bindingResult);
             assertEquals("notes/edit", response);
         }
 
@@ -97,7 +97,7 @@ class NoteControllerTests {
         void shouldAddUploadedPicture() throws NoAccessRightException, IOException {
             makeMe.theNote(note).withNewlyUploadedPicture();
             BindingResult bindingResult = makeMe.successfulBindingResult();
-            String response = controller.updateNote(note, bindingResult);
+            String response = controller.updateNote(note, note.getNoteContent(), bindingResult);
             assertThat(note.getNoteContent().getUploadPicture(), is(not(nullValue())));
         }
 

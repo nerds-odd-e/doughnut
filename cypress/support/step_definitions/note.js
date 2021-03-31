@@ -28,7 +28,7 @@ When("I create top level note with:", (data) => {
 When("I am editing note {string} the title is expected to be pre-filled with {string}", (noteTitle, oldTitle) => {
   cy.visit("/notes");
   cy.findNoteCardButton(noteTitle, ".edit-card").click();
-  cy.getFormControl('noteContent.title').should('have.value', oldTitle);
+  cy.getFormControl('title').should('have.value', oldTitle);
 });
 
 When("I update it to become:", (data) => {
