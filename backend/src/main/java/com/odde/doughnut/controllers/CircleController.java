@@ -86,7 +86,7 @@ public class CircleController extends ApplicationMvcController  {
     public String newNoteInCircle(@PathVariable("circleEntity") CircleEntity circleEntity, Model model) {
         NoteEntity noteEntity = new NoteEntity();
         noteEntity.setOwnershipEntity(circleEntity.getOwnershipEntity());
-        model.addAttribute("ownershipEntity", currentUserFetcher.getUser().getEntity().getOwnershipEntity());
+        model.addAttribute("ownershipEntity", circleEntity.getOwnershipEntity());
         model.addAttribute("noteEntity", noteEntity);
         return "notes/new";
     }

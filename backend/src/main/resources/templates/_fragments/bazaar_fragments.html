@@ -12,7 +12,7 @@
 
 <lid th:fragment="noteBazaarBreadcrumb(untilNote, additional)" th:replace="_fragments/note_fragments::noteBreadcrumb(
          topLink=~{:: .b-top-link},
-         untilNote=${untilNote},
+         ancestors=${untilNote.ancestors},
          additional=${additional},
          linkFragment='_fragments/bazaar_fragments::noteTitleWithBazaarLink'
          )">

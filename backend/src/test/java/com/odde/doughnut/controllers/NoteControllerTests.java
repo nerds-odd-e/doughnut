@@ -48,46 +48,13 @@ class NoteControllerTests {
     }
 
     @Nested
-    class GetNotes {
-        private NoteEntity childNote;
-
-        @BeforeEach
-        void setup() {
-            parentNote = makeMe.aNote().byUser(userModel).please();
-            childNote = makeMe.aNote().byUser(userModel).under(parentNote).please();
-            makeMe.refresh(userModel.getEntity());
-            makeMe.refresh(parentNote);
-        }
-
-        @Test
-        void shouldUseTheRigthTemplateForCreatingNote() throws NoAccessRightException {
-            assertEquals("notes/new", controller.newNote(null, model));
-            assertThat(((NoteEntity) model.getAttribute("noteEntity")).getParentNote(), is(nullValue()));
-        }
-
-        @Test
-        void shouldGetTheParentNoteIfIdProvided() throws NoAccessRightException {
-            controller.newNote(parentNote, model);
-            assertThat(((NoteEntity) model.getAttribute("noteEntity")).getParentNote(), equalTo(parentNote));
-        }
-
-        @Test
-        void shouldReturnAllParentlessNotesForMyNotes() {
-            assertEquals("notes/index", controller.myNotes(model));
-            assertThat(model.getAttribute("note"), is(nullValue()));
-            assertThat((List<NoteEntity>) model.getAttribute("notes"), hasSize(equalTo(1)));
-            assertThat((List<NoteEntity>) model.getAttribute("notes"), contains(parentNote));
-        }
-    }
-
-    @Nested
     class createNoteTest {
         @Test
         void shouldBeAbleToSaveNoteWhenValid() throws NoAccessRightException, IOException {
             NoteEntity newNote = makeMe.aNote().byUser(userModel).inMemoryPlease();
             BindingResult bindingResult = makeMe.successfulBindingResult();
 
-            String response = controller.createNote(null, newNote, bindingResult, model);
+            String response = controller.createNote(userModel.getOwnershipModel().getEntity(), null, newNote, bindingResult, model);
             assertEquals("redirect:/notes/" + newNote.getId(), response);
         }
 
@@ -96,7 +63,7 @@ class NoteControllerTests {
             NoteEntity newNote = new NoteEntity();
             BindingResult bindingResult = makeMe.failedBindingResult();
 
-            String response = controller.createNote(null, newNote, bindingResult, model);
+            String response = controller.createNote(userModel.getOwnershipModel().getEntity(), null, newNote, bindingResult, model);
             assertNull(newNote.getId());
             assertEquals("notes/new", response);
         }

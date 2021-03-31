@@ -1,27 +1,3 @@
-<div th:fragment="noteShowxxxx(noteEntity, level)" th:object="${noteEntity}">
-    <h2 th:class="'h' + ${level}" id="note-title" th:text="*{title}"/>
-    <pre id="note-description" th:text="*{description}" style="white-space: pre-wrap;"/>
-    <div th:object="${noteEntity.noteContent}">
-        <div th:unless="${#strings.isEmpty(noteEntity.noteContent.url)}">
-            <label th:unless="*{urlIsVideo}">Url:</label>
-            <label th:if="*{urlIsVideo}">Video Url:</label>
-            <a th:href="*{url}" th:text="*{url}"/>
-        </div>
-    </div>
-    <p id="note-picture" class="text-center" th:if="*{picture}">
-        <img class="img-fluid" th:src="*{picture}"/>
-    </p>
-    <p th:each="linkType:${noteEntity.linkTypes()}">
-        <span th:text="${linkType.label}"/>
-        <span class="badge badge-warning mr-1" th:each="link:${noteEntity.linksOfTypeThroughDirect(linkType)}">
-            <span th:replace=":: linkWithHtmlLink(${link}, ${link.targetNote})"/>
-        </span>
-        <span class="badge badge-info mr-1" th:each="link:${noteEntity.linksOfTypeThroughReverse(linkType)}">
-            <span th:replace=":: linkWithHtmlLink(${link}, ${link.sourceNote})"/>
-        </span>
-    </p>
-</div>
-
 <div th:fragment="linkShow(linkEntity, linkContent)" th:object="${linkEntity}">
     <div class="row">
         <div class="col-12 col-md-4">

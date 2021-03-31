@@ -31,4 +31,7 @@ public class OwnershipEntity {
         }
         return circleEntity.getMembers().contains(user);
     }
+
+    public boolean isFromCircle() { return circleEntity != null; }
+
 }

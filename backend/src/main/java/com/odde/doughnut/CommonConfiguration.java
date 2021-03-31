@@ -6,7 +6,7 @@ public class CommonConfiguration {
     HttpSecurity commonConfig(HttpSecurity http) throws Exception {
         return http.authorizeRequests()
                 .mvcMatchers("/robots.txt").permitAll()
-                .antMatchers("/", "/login", "/error", "/js/**", "/webjars/**", "/bazaar", "/bazaar/**/**")
+                .antMatchers("/", "/login", "/error", "/js/**", "/img/**", "/webjars/**", "/bazaar", "/bazaar/**/**")
                 .permitAll()
                 .anyRequest()
                 .authenticated()

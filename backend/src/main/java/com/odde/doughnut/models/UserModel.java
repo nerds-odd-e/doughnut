@@ -112,18 +112,6 @@ public class UserModel extends ModelForEntity<UserEntity> {
         return new SpacedRepetition(entity.getSpaceIntervals());
     }
 
-    public NoteEntity newNote(NoteEntity parentNote) {
-        NoteEntity noteEntity = new NoteEntity();
-        noteEntity.setParentNote(parentNote);
-        if (parentNote != null) {
-            noteEntity.setOwnershipEntity(parentNote.getOwnershipEntity());
-        }
-        else {
-            noteEntity.setOwnershipEntity(getEntity().getOwnershipEntity());
-        }
-        return noteEntity;
-    }
-
     int learntCount() {
         return modelFactoryService.reviewPointRepository.countByUserEntityNotRemoved(entity);
     }
@@ -132,7 +120,7 @@ public class UserModel extends ModelForEntity<UserEntity> {
         return new Reviewing(this, currentUTCTimestamp, modelFactoryService);
     }
 
-    public OwnershipModel getOwnershipEntity() {
+    public OwnershipModel getOwnershipModel() {
         return modelFactoryService.toOwnershipModel(entity.getOwnershipEntity());
     }
 

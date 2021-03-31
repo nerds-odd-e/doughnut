@@ -34,7 +34,7 @@ public class NoteController extends ApplicationMvcController  {
 
     @GetMapping("")
     public String myNotes(Model model) {
-        model.addAttribute("notes", currentUserFetcher.getUser().getOwnershipEntity().getOrphanedNotes());
+        model.addAttribute("notes", currentUserFetcher.getUser().getOwnershipModel().getOrphanedNotes());
         return "notes/index";
     }
 
@@ -44,20 +44,25 @@ public class NoteController extends ApplicationMvcController  {
         if (parentNote != null) {
             userModel.assertAuthorization(parentNote);
         }
-        NoteEntity noteEntity = userModel.newNote(parentNote);
+        NoteEntity noteEntity = new NoteEntity();
+        noteEntity.setParentNote(parentNote);
         model.addAttribute("ownershipEntity", userModel.getEntity().getOwnershipEntity());
         model.addAttribute("noteEntity", noteEntity);
         return "notes/new";
     }
 
     @PostMapping({"/{ownershipEntity}/create_top", "/{parentNote}/create"})
-    public String createNote(@PathVariable(name = "parentNote", required = false) OwnershipEntity ownershipEntity, @PathVariable(name = "parentNote", required = false) NoteEntity parentNote, @Valid NoteEntity noteEntity, BindingResult bindingResult, Model model) throws NoAccessRightException, IOException {
+    public String createNote(@PathVariable(name = "ownershipEntity", required = false) OwnershipEntity ownershipEntity, @PathVariable(name = "parentNote", required = false) NoteEntity parentNote, @Valid NoteEntity noteEntity, BindingResult bindingResult, Model model) throws NoAccessRightException, IOException {
         if (bindingResult.hasErrors()) {
             return "notes/new";
         }
         if (parentNote != null) {
             currentUserFetcher.getUser().assertAuthorization(parentNote);
         }
+        if(ownershipEntity == null) {
+            noteEntity.setOwnershipEntity(parentNote.getOwnershipEntity());
+        }
+
         UserModel userModel = currentUserFetcher.getUser();
         NoteContentModel noteContentModel = modelFactoryService.toNoteModel(noteEntity);
         noteContentModel.createByUser(userModel);

@@ -142,10 +142,6 @@ public class NoteEntity {
       return notes;
   }
 
-  public boolean isFromCircle() { return circle() != null; }
-
-  public CircleEntity circle() { return ownershipEntity.getCircleEntity(); }
-
   public String getClozeDescription() {
     return new ClozeDescription().getClozeDescription(this.noteContent.getTitle(),
                                                       this.noteContent.getDescription());
