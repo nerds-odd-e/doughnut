@@ -66,6 +66,8 @@ public class NoteContentEntity {
 
     @Transient @Getter @Setter private MultipartFile uploadPictureProxy;
 
+    @Transient @Getter @Setter private String testingParent;
+
     public String getNotePicture() {
         if (uploadPicture != null) {
             return "/images/" + uploadPicture.getId() + "/" + uploadPicture.getName();

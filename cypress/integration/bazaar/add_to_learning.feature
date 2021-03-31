@@ -4,7 +4,7 @@ Feature: Bazaar subscription
 
   Background:
     Given there are some notes for existing user "another_old_learner"
-      | noteContent.title | testingParent |
+      | noteContent.title | noteContent.testingParent |
       | Shape             |               |
       | Square            | Shape         |
       | Triangle          | Shape         |

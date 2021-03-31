@@ -112,8 +112,6 @@ public class NoteEntity {
   @Getter
   private final List<NoteEntity> children = new ArrayList<>();
 
-  @Transient @Getter @Setter private String testingParent;
-
   public List<NoteEntity> getTargetNotes() {
     return links.stream().map(LinkEntity::getTargetNote).collect(toList());
   }

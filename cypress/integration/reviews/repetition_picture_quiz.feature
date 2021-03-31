@@ -4,7 +4,7 @@ Feature: Repetition Picture Quiz
   Background:
     Given I've logged in as an existing user
     And there are some notes for the current user
-      | noteContent.title | noteContent.skipReview | testingParent |
+      | noteContent.title | noteContent.skipReview | noteContent.testingParent |
       | Space             | true                   |               |
       | Mars              | true                   | Space         |
     When I create note belonging to "Space":

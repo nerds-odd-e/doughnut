@@ -4,7 +4,7 @@ Feature: Tree editing
   Background:
     Given I've logged in as an existing user
     And there are some notes for the current user
-      | noteContent.title    | testingParent |
+      | noteContent.title    | noteContent.testingParent |
       | Shape                |               |
       | Rectangle            | Shape         |
       | Square               | Rectangle     |
