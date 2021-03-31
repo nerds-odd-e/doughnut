@@ -223,4 +223,44 @@ public class NoteEntity {
                 .filter(nc->nc.getSiblingOrder() < getSiblingOrder())
                 .reduce((f, s)-> s).orElse(null);
     }
+
+    public NoteEntity getNextSibling() {
+        return getSiblings().stream()
+                .filter(nc->nc.getSiblingOrder() > getSiblingOrder())
+                .findFirst().orElse(null);
+    }
+
+    public NoteEntity getPrevious() {
+        NoteEntity result = getPreviousSibling();
+        if (result == null) {
+            return getParentNote();
+        }
+        while (true) {
+            List<NoteEntity> children = result.getChildren();
+            if(children.size() == 0) {
+                return result;
+            }
+            result = children.get(children.size() - 1);
+        }
+    }
+
+    public NoteEntity getFirstChild() {
+        return getChildren().stream().findFirst().orElse(null);
+    }
+
+    public NoteEntity getNext() {
+        NoteEntity firstChild = getFirstChild();
+        if (firstChild != null) {
+            return firstChild;
+        }
+        NoteEntity next = this;
+        while (next != null) {
+            NoteEntity sibling = next.getNextSibling();
+            if (sibling != null) {
+                return sibling;
+            }
+            next = next.getParentNote();
+        }
+        return null;
+    }
 }

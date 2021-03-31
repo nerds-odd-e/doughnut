@@ -1,7 +1,5 @@
-package com.odde.doughnut.models;
+package com.odde.doughnut.entities;
 
-import com.odde.doughnut.entities.NoteEntity;
-import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -20,14 +18,9 @@ import static org.hamcrest.Matchers.*;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
-public class NoteContentModelTest {
+public class NoteEntityAsTreeNodeTest {
     NoteEntity topLevel;
-    @Autowired ModelFactoryService modelFactoryService;
     @Autowired MakeMe makeMe;
-
-    TreeNodeModel toModel(NoteEntity subjectNote) {
-        return modelFactoryService.toTreeNodeModel(subjectNote);
-    }
 
     @BeforeEach
     void setup() {
@@ -36,7 +29,7 @@ public class NoteContentModelTest {
 
     @Test
     void emptyTopLevelNote() {
-        assertThat(toModel(topLevel).getFirstChild(), is(nullValue()));
+        assertThat(topLevel.getFirstChild(), is(nullValue()));
     }
 
     @Test
@@ -44,7 +37,7 @@ public class NoteContentModelTest {
         NoteEntity child = makeMe.aNote().under(topLevel).please();
         makeMe.refresh(topLevel);
         makeMe.refresh(child);
-        assertThat(toModel(topLevel).getFirstChild(), equalTo(child));
+        assertThat(topLevel.getFirstChild(), equalTo(child));
     }
 
     @Nested
@@ -74,9 +67,8 @@ public class NoteContentModelTest {
         void topNoteHasNoSiblings() {
             NoteEntity subjectNote = makeMe.aNote().please();
             NoteEntity nextTopLevel = makeMe.aNote().please();
-            TreeNodeModel subject = toModel(subjectNote);
 
-            assertNavigation(subject, null, null, null, null);
+            assertNavigation(subjectNote, null, null, null, null);
         }
 
         @Nested
@@ -95,20 +87,17 @@ public class NoteContentModelTest {
 
             @Test
             void topLevelHasChildAsNext() {
-                TreeNodeModel subject = toModel(topLevel);
-                assertNavigation(subject, null, null, child, null);
+                assertNavigation(topLevel, null, null, child, null);
             }
 
             @Test
             void firstChildNote() {
-                TreeNodeModel subject = toModel(child);
-                assertNavigation(subject, null, topLevel, nephew, nephew);
+                assertNavigation(child, null, topLevel, nephew, nephew);
             }
 
             @Test
             void secondChild() {
-                TreeNodeModel subject = toModel(nephew);
-                assertNavigation(subject, child, child, null, null);
+                assertNavigation(nephew, child, child, null, null);
             }
 
             @Nested
@@ -126,30 +115,27 @@ public class NoteContentModelTest {
 
                 @Test
                 void firstChildNote() {
-                    TreeNodeModel subject = toModel(child);
-                    assertNavigation(subject, null, topLevel, grandchild, nephew);
+                    assertNavigation(child, null, topLevel, grandchild, nephew);
                 }
 
                 @Test
                 void secondChild() {
-                    TreeNodeModel subject = toModel(nephew);
-                    assertNavigation(subject, child, grandchild, null, null);
+                    assertNavigation(nephew, child, grandchild, null, null);
                 }
 
                 @Test
                 void grandchildView() {
-                    TreeNodeModel subject = toModel(grandchild);
-                    assertNavigation(subject, null, child, nephew, null);
+                    assertNavigation(grandchild, null, child, nephew, null);
                 }
 
             }
         }
 
-        private void assertNavigation(TreeNodeModel subject, NoteEntity previousSibling, NoteEntity previous, NoteEntity next, NoteEntity nextSibling) {
-            assertThat(subject.entity.getPreviousSibling(), equalTo(previousSibling));
-            assertThat(subject.getPreviousNote(), equalTo(previous));
-            assertThat(subject.getNextNote(), equalTo(next));
-            assertThat(subject.getNextSiblingNote(), equalTo(nextSibling));
+        private void assertNavigation(NoteEntity entity, NoteEntity previousSibling, NoteEntity previous, NoteEntity next, NoteEntity nextSibling) {
+            assertThat(entity.getPreviousSibling(), equalTo(previousSibling));
+            assertThat(entity.getPrevious(), equalTo(previous));
+            assertThat(entity.getNext(), equalTo(next));
+            assertThat(entity.getNextSibling(), equalTo(nextSibling));
         }
 
     }

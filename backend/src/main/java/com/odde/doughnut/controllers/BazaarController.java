@@ -33,13 +33,11 @@ public class BazaarController extends ApplicationMvcController {
 
     @GetMapping("/notes/{noteEntity}")
     public String showBazaarNote(@PathVariable(name = "noteEntity") NoteEntity noteEntity, Model model) {
-        model.addAttribute("treeNodeModel", modelFactoryService.toTreeNodeModel(noteEntity));
         return "bazaar/show";
     }
 
     @GetMapping("/articles/{noteEntity}")
     public String showBazaarNoteAsArticle(@PathVariable(name = "noteEntity") NoteEntity noteEntity, Model model) {
-        model.addAttribute("treeNodeModel", modelFactoryService.toTreeNodeModel(noteEntity));
         return "bazaar/article";
     }
 }

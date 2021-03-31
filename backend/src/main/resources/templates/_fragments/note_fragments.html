@@ -93,11 +93,11 @@
     </a>
 </div>
 
-<div th:fragment="noteLinkButtons(urlPrefix, treeNodeModel)" class="btn-group btn-group-sm">
-    <a th:replace="_fragments/note_fragments :: noteLinkButton(${urlPrefix}, ${treeNodeModel.entity.previousSibling}, 'fastBackward', 'previous sibling')"/>
-    <a th:replace="_fragments/note_fragments :: noteLinkButton(${urlPrefix}, ${treeNodeModel.previousNote}, 'backward', 'previous')"/>
-    <a th:replace="_fragments/note_fragments :: noteLinkButton(${urlPrefix}, ${treeNodeModel.nextNote}, 'forward', 'next')"/>
-    <a th:replace="_fragments/note_fragments :: noteLinkButton(${urlPrefix}, ${treeNodeModel.nextSiblingNote}, 'fastForward', 'next sibling')"/>
+<div th:fragment="noteLinkButtons(urlPrefix, entity)" class="btn-group btn-group-sm">
+    <a th:replace="_fragments/note_fragments :: noteLinkButton(${urlPrefix}, ${entity.previousSibling}, 'fastBackward', 'previous sibling')"/>
+    <a th:replace="_fragments/note_fragments :: noteLinkButton(${urlPrefix}, ${entity.previous}, 'backward', 'previous')"/>
+    <a th:replace="_fragments/note_fragments :: noteLinkButton(${urlPrefix}, ${entity.next}, 'forward', 'next')"/>
+    <a th:replace="_fragments/note_fragments :: noteLinkButton(${urlPrefix}, ${entity.nextSibling}, 'fastForward', 'next sibling')"/>
     </a>
 </div>
 

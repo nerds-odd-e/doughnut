@@ -18,7 +18,7 @@
         </div>
 
         <nav class="nav d-flex flex-row-reverse p-0 mb-2">
-            <a th:replace="_fragments/note_fragments :: noteLinkButtons('/bazaar', ${treeNodeModel})"/>
+            <a th:replace="_fragments/note_fragments :: noteLinkButtons('/bazaar', ${noteEntity})"/>
         </nav>
 
         <div th:replace="_fragments/bazaar_fragments :: noteBazaarViewCards(${noteEntity.children})"/>

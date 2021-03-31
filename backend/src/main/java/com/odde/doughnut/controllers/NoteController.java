@@ -64,7 +64,6 @@ public class NoteController extends ApplicationMvcController  {
 
     @GetMapping("/{noteEntity}")
     public String showNote(@PathVariable(name = "noteEntity") NoteEntity noteEntity, Model model) {
-        model.addAttribute("treeNodeModel", modelFactoryService.toTreeNodeModel(noteEntity));
         return "notes/show";
     }
 
@@ -106,8 +105,7 @@ public class NoteController extends ApplicationMvcController  {
     }
 
     private NoteMotionEntity getRightNoteMotion(NoteEntity noteEntity) {
-        TreeNodeModel treeNodeModel = this.modelFactoryService.toTreeNodeModel(noteEntity);
-        return new NoteMotionEntity(treeNodeModel.getNextSiblingNote(), false);
+        return new NoteMotionEntity(noteEntity.getNextSibling(), false);
     }
 
     @PostMapping("/{noteEntity}/move")

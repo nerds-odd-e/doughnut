@@ -5,8 +5,6 @@ import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.services.ModelFactoryService;
 
-import java.util.List;
-
 public class TreeNodeModel extends ModelForEntity<NoteEntity> {
     protected final NoteRepository noteRepository;
 
@@ -15,52 +13,8 @@ public class TreeNodeModel extends ModelForEntity<NoteEntity> {
         this.noteRepository = modelFactoryService.noteRepository;
     }
 
-    public NoteEntity getNextSiblingNote() {
-        return nextSiblingOfNote(entity);
-    }
-
-    public NoteEntity getPreviousNote() {
-        NoteEntity result = entity.getPreviousSibling();
-        if (result == null) {
-            return entity.getParentNote();
-        }
-        while (true) {
-            List<NoteEntity> children = result.getChildren();
-            if(children.size() == 0) {
-                return result;
-            }
-            result = children.get(children.size() - 1);
-        }
-    }
-
-    public NoteEntity getNextNote() {
-        NoteEntity firstChild = getFirstChild();
-        if (firstChild != null) {
-            return firstChild;
-        }
-        NoteEntity next = entity;
-        while (next != null) {
-            NoteEntity sibling = nextSiblingOfNote(next);
-            if (sibling != null) {
-                return sibling;
-            }
-            next = next.getParentNote();
-        }
-        return null;
-    }
-
-    private NoteEntity nextSiblingOfNote(NoteEntity note) {
-        return note.getSiblings().stream()
-                .filter(nc->nc.getSiblingOrder() > note.getSiblingOrder())
-                .findFirst().orElse(null);
-    }
-
-    public NoteEntity getFirstChild() {
-        return entity.getChildren().stream().findFirst().orElse(null);
-    }
-
     private long getSiblingOrderToInsertBehindMe() {
-        NoteEntity nextSiblingNote = getNextSiblingNote();
+        NoteEntity nextSiblingNote = entity.getNextSibling();
         Long relativeToSiblingOrder = entity.getSiblingOrder();
         if (nextSiblingNote == null) {
             return relativeToSiblingOrder + SiblingOrder.MINIMUM_SIBLING_ORDER_INCREMENT;
@@ -69,7 +23,7 @@ public class TreeNodeModel extends ModelForEntity<NoteEntity> {
     }
 
     private Long getSiblingOrderToBecomeMyFirstChild() {
-        NoteEntity firstChild = getFirstChild();
+        NoteEntity firstChild = this.entity.getFirstChild();
         if (firstChild != null) {
             return firstChild.getSiblingOrder() - SiblingOrder.MINIMUM_SIBLING_ORDER_INCREMENT;
         }

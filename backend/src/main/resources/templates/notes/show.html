@@ -15,9 +15,6 @@
         </div>
         <div class="jumbotron py-4 mb-2">
             <nav class="nav d-flex flex-row-reverse p-0">
-                <!--                the following commented code is for demo purpose -->
-                <!--                <span class="descendant-counter" th:text="${treeNodeModel.descendantCount()}"/>-->
-                <!--                <span class="descendant-counter" th:text="0"/>-->
                 <div th:replace="_fragments/note_fragments :: noteButtons(${noteEntity})"/>
             </nav>
 
@@ -29,7 +26,7 @@
             <div class="btn-group btn-group-sm">
                 <a th:href="@{/notes/{id}/move(id=${noteEntity.id})}">Move This Note</a>
             </div>
-            <a th:replace="_fragments/note_fragments :: noteLinkButtons('', ${treeNodeModel})"/>
+            <a th:replace="_fragments/note_fragments :: noteLinkButtons('', ${noteEntity})"/>
         </nav>
 
         <div th:replace="_fragments/note_fragments :: noteOwnerViewCards(${noteEntity.children})"/>
