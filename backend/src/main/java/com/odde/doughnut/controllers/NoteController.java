@@ -94,14 +94,15 @@ public class NoteController extends ApplicationMvcController  {
     }
 
     private NoteMotionEntity getLeftNoteMotion(NoteEntity noteEntity) {
-        TreeNodeModel treeNodeModel = this.modelFactoryService.toTreeNodeModel(noteEntity);
-        NoteEntity previousSiblingNote = treeNodeModel.getPreviousSiblingNote();
-        TreeNodeModel prev = this.modelFactoryService.toTreeNodeModel(previousSiblingNote);
-        NoteEntity prevprev = prev.getPreviousSiblingNote();
-        if (prevprev == null) {
-            return new NoteMotionEntity(noteEntity.getParentNote(), true);
+        NoteEntity previousSiblingNote = noteEntity.getPreviousSibling();
+        if(previousSiblingNote != null) {
+            NoteEntity prevprev = previousSiblingNote.getPreviousSibling();
+            if (prevprev == null) {
+                return new NoteMotionEntity(noteEntity.getParentNote(), true);
+            }
+            return new NoteMotionEntity(prevprev, false);
         }
-        return new NoteMotionEntity(prevprev, false);
+        return new NoteMotionEntity(null, false);
     }
 
     private NoteMotionEntity getRightNoteMotion(NoteEntity noteEntity) {

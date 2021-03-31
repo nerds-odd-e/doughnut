@@ -146,7 +146,7 @@ public class NoteContentModelTest {
         }
 
         private void assertNavigation(TreeNodeModel subject, NoteEntity previousSibling, NoteEntity previous, NoteEntity next, NoteEntity nextSibling) {
-            assertThat(subject.getPreviousSiblingNote(), equalTo(previousSibling));
+            assertThat(subject.entity.getPreviousSibling(), equalTo(previousSibling));
             assertThat(subject.getPreviousNote(), equalTo(previous));
             assertThat(subject.getNextNote(), equalTo(next));
             assertThat(subject.getNextSiblingNote(), equalTo(nextSibling));

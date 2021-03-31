@@ -217,4 +217,10 @@ public class NoteEntity {
         setNoteContent(noteContentEntity);
         noteContent.fetchUploadedPicture(userEntity);
     }
+
+    public NoteEntity getPreviousSibling() {
+        return getSiblings().stream()
+                .filter(nc->nc.getSiblingOrder() < getSiblingOrder())
+                .reduce((f, s)-> s).orElse(null);
+    }
 }

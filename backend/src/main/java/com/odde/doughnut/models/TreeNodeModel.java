@@ -5,7 +5,6 @@ import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.services.ModelFactoryService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class TreeNodeModel extends ModelForEntity<NoteEntity> {
@@ -16,21 +15,12 @@ public class TreeNodeModel extends ModelForEntity<NoteEntity> {
         this.noteRepository = modelFactoryService.noteRepository;
     }
 
-    public NoteEntity getPreviousSiblingNote() {
-        if (entity == null) {
-            return null;
-        }
-        return entity.getSiblings().stream()
-                .filter(nc->nc.getSiblingOrder() < entity.getSiblingOrder())
-                .reduce((f, s)-> s).orElse(null);
-    }
-
     public NoteEntity getNextSiblingNote() {
         return nextSiblingOfNote(entity);
     }
 
     public NoteEntity getPreviousNote() {
-        NoteEntity result = getPreviousSiblingNote();
+        NoteEntity result = entity.getPreviousSibling();
         if (result == null) {
             return entity.getParentNote();
         }
