@@ -1,15 +1,14 @@
 <div th:fragment="textInput(scopeName, field, placeholder, autofocus)" th:replace=":: inputWithType(~{ :: .text-input-control}, ${scopeName}, ${field})">
-
     <input
             class="text-input-control"
             th:class="'form-control' + ${#fields.hasErrors(field) ? ' is-invalid' : ''}"
+            th:id="${scopeName + '-' + field}"
             th:field="*{__${field}__}"
             th:placeholder="${placeholder}"
             th:autofocus="${autofocus}"
             autocomplete="off"
             autocapitalize="off"
     />
-
 </div>
 
 <div th:fragment="imageInput(scopeName, field, placeholder)" th:replace=":: inputWithType(~{ :: .file-input-control}, ${scopeName}, ${field})">
@@ -17,6 +16,7 @@
             class="file-input-control"
             type="file"
             th:class="'form-control' + ${#fields.hasErrors(field) ? ' is-invalid' : ''}"
+            th:id="${scopeName + '-' + field}"
             th:name="${field} + 'Proxy'"
             th:placeholder="${placeholder}"
     />
@@ -26,6 +26,7 @@
     <select
             class="select-control"
             th:class="'form-control' + ${#fields.hasErrors(field) ? ' is-invalid' : ''}"
+            th:id="${scopeName + '-' + field}"
             th:field="*{__${field}__}"
     >
         <option th:replace="${options}"/>
@@ -36,6 +37,7 @@
     <input
             type="checkbox"
             th:class="'form-check-input' + ${#fields.hasErrors(field) ? ' is-invalid' : ''}"
+            th:id="${scopeName + '-' + field}"
             th:field="*{__${field}__}"
     />
     <label class="form-check-label" th:for="${scopeName + '-' + field}" th:text="${#strings.capitalize(field)}"/>
@@ -46,6 +48,7 @@
     <textarea
             class="area-control"
             th:class="'form-control' + ${#fields.hasErrors(field) ? ' is-invalid' : ''}"
+            th:id="${scopeName + '-' + field}"
             th:field="*{__${field}__}"
             th:placeholder="${placeholder}"
     />

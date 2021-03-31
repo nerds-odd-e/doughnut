@@ -7,7 +7,7 @@
             <li class="breadcrumb-item additional-item">(adding here)</li>
         </div>
 
-        <form action="#" th:action="${parentNote == null ? '/notes/create' : '/notes/' + parentNote.id + '/create'}" th:object="${noteEntity}" method="post" enctype="multipart/form-data">
+        <form action="#" th:action="${parentNote == null ? '/notes/'+ ownershipEntity.id +'/create_top' : '/notes/' + parentNote.id + '/create'}" th:object="${noteEntity}" method="post" enctype="multipart/form-data">
             <input data-cy="note-ownership-id" th:field="*{ownershipEntity}" type="hidden"/>
             <div th:replace="_fragments/note_fragments :: noteFormBody(${noteEntity})"/>
             <input type="submit" value="Submit" class="btn btn-primary"/>

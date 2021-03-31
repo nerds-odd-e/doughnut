@@ -3,6 +3,7 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.NoteMotionEntity;
+import com.odde.doughnut.entities.OwnershipEntity;
 import com.odde.doughnut.entities.ReviewSettingEntity;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.NoAccessRightException;
@@ -44,12 +45,13 @@ public class NoteController extends ApplicationMvcController  {
             userModel.assertAuthorization(parentNote);
         }
         NoteEntity noteEntity = userModel.newNote(parentNote);
+        model.addAttribute("ownershipEntity", userModel.getEntity().getOwnershipEntity());
         model.addAttribute("noteEntity", noteEntity);
         return "notes/new";
     }
 
-    @PostMapping({"/create", "/{parentNote}/create"})
-    public String createNote(@PathVariable(name = "parentNote", required = false) NoteEntity parentNote, @Valid NoteEntity noteEntity, BindingResult bindingResult, Model model) throws NoAccessRightException, IOException {
+    @PostMapping({"/{ownershipEntity}/create_top", "/{parentNote}/create"})
+    public String createNote(@PathVariable(name = "parentNote", required = false) OwnershipEntity ownershipEntity, @PathVariable(name = "parentNote", required = false) NoteEntity parentNote, @Valid NoteEntity noteEntity, BindingResult bindingResult, Model model) throws NoAccessRightException, IOException {
         if (bindingResult.hasErrors()) {
             return "notes/new";
         }
