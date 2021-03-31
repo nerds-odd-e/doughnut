@@ -1,5 +1,5 @@
-<a th:fragment="noteTitleWithLink(note)" th:href="'/notes/' + ${note.id}" th:text="${note.title}"/>
-<a th:fragment="linkWithHtmlLink(link, note)" th:href="'/links/' + ${link.id}" th:text="${note.title}"/>
+<a th:fragment="noteTitleWithLink(note)" th:href="'/notes/' + ${note.id}" th:text="${note.noteContent.title}"/>
+<a th:fragment="linkWithHtmlLink(link, note)" th:href="'/links/' + ${link.id}" th:text="${note.noteContent.title}"/>
 
 <div th:fragment="noteBreadcrumb(topLink, untilNote, additional)" th:with="linkFragment=${linkFragment} ?: ':: noteTitleWithLink'">
     <ol class="breadcrumb">
@@ -71,7 +71,7 @@
 </div>
 
 <div th:fragment="noteFormBody(note)">
-    <div th:replace="_fragments/forms :: textInput('note', 'title', null, false)"/>
+    <div th:replace="_fragments/forms :: textInput('note', 'noteContent.title', null, false)"/>
     <div th:replace="_fragments/forms :: textarea('note', 'noteContent.description', null)"/>
     <div th:replace="_fragments/forms :: imageInput('note', 'uploadPicture', 'Optional. upload own picture.')"/>
     <div th:replace="_fragments/forms :: textInput('note', 'pictureUrl', 'Or, use full url of picture on the Internet.', false)"/>
@@ -111,8 +111,8 @@
 </div>
 
 <div th:fragment="noteShow(noteEntity, level)" th:object="${noteEntity}">
-    <h2 th:class="'h' + ${level}" id="note-title" th:text="*{title}"/>
     <div th:object="${noteEntity.noteContent}">
+        <h2 th:class="'h' + ${level}" id="note-title" th:text="*{title}"/>
         <pre id="note-description" th:text="*{description}" style="white-space: pre-wrap;"/>
         <div th:unless="${#strings.isEmpty(noteEntity.noteContent.url)}">
             <label th:unless="*{urlIsVideo}">Url:</label>

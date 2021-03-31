@@ -68,7 +68,7 @@ Cypress.Commands.add("seedNotes", (flatNotes, externalIdentifier='') => {
   cy.request({method: "POST", url: `/api/testability/seed_notes?external_identifier=${externalIdentifier}`, body: nestedNotes})
   .then((response) => {
      expect(response.body.length).to.equal(nestedNotes.length);
-     const titles = nestedNotes.map(n=>n["title"]);
+     const titles = nestedNotes.map(n=>n["noteContent"]["title"]);
      const noteMap = Object.assign({}, ...titles.map((t, index) => ({[t]: response.body[index]})));
      cy.wrap(noteMap).as("seededNoteIdMap");
   })

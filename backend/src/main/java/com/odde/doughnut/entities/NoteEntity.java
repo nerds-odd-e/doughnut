@@ -11,9 +11,8 @@ import org.hibernate.annotations.WhereJoinTable;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import javax.validation.Valid;
 import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,10 +33,9 @@ public class NoteEntity {
   private Integer id;
 
   @Embedded
+  @Valid
   @Getter
   private final NoteContentEntity noteContent = new NoteContentEntity();
-
-  @NotNull @Size(min = 1, max = 100) @Getter @Setter private String title;
 
   @Column(name="picture_url")
   @Getter @Setter private String pictureUrl;
@@ -66,7 +64,7 @@ public class NoteEntity {
   @Override
   public String toString() {
     return "Note{"
-        + "id=" + id + ", title='" + title + '\'' + '}';
+        + "id=" + id + ", title='" + noteContent.getTitle() + '\'' + '}';
   }
 
   @ManyToOne(cascade = CascadeType.PERSIST)
@@ -182,7 +180,7 @@ public class NoteEntity {
   public CircleEntity circle() { return ownershipEntity.getCircleEntity(); }
 
   public String getClozeDescription() {
-    return new ClozeDescription().getClozeDescription(this.title,
+    return new ClozeDescription().getClozeDescription(this.noteContent.getTitle(),
                                                       this.noteContent.getDescription());
   }
 
@@ -265,5 +263,9 @@ public class NoteEntity {
           return new ArrayList<>();
       }
       return getParentNote().getChildren();
+  }
+
+  public String getTitle() {
+    return noteContent.getTitle();
   }
 }

@@ -65,13 +65,13 @@ public class NoteEntityTest {
 
         @Test
         public void titleIsNotOptional() {
-            note.setTitle("");
+            makeMe.theNote(note).title("");
             assertThat(getViolations(), is(not(empty())));
         }
 
         @Test
         public void titleCannotBeTooLong() {
-            note.setTitle(makeMe.aStringOfLength(101));
+            makeMe.theNote(note).title(makeMe.aStringOfLength(101));
             assertThat(getViolations(), is(not(empty())));
         }
 

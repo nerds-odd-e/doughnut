@@ -16,7 +16,7 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
 
     public NoteBuilder(NoteEntity noteEntity, MakeMe makeMe){
         super(makeMe, noteEntity);
-        entity.setTitle(titleCounter.generate());
+        title(titleCounter.generate());
         description("descrption");
         entity.setUpdatedDatetime(new Timestamp(System.currentTimeMillis()));
     }
@@ -87,7 +87,7 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
     }
 
     public NoteBuilder title(String text) {
-        entity.setTitle(text);
+        entity.getNoteContent().setTitle(text);
         return this;
     }
 
@@ -128,11 +128,6 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
 
     public NoteBuilder withNewlyUploadedPicture() {
         entity.setUploadPictureProxy(makeMe.anUploadedPicture().toMultiplePartFilePlease());
-        return this;
-    }
-
-    public NoteBuilder withTitle(String title) {
-        entity.setTitle(title);
         return this;
     }
 }

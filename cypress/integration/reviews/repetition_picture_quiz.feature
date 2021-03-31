@@ -4,15 +4,15 @@ Feature: Repetition Picture Quiz
   Background:
     Given I've logged in as an existing user
     And there are some notes for the current user
-      | title | skipReview | testingParent |
-      | Space | true       |               |
-      | Mars  | true       | Space         |
+      | noteContent.title | skipReview | testingParent |
+      | Space             | true       |               |
+      | Mars              | true       | Space         |
     When I create note belonging to "Space":
-      | title | uploadPictureProxy | pictureMask           |
-      | Earth | example.png        | 20 40 70 30 40 80 5 8 |
+      | noteContent.title | uploadPictureProxy | pictureMask           |
+      | Earth             | example.png        | 20 40 70 30 40 80 5 8 |
     And I create note belonging to "Space":
-      | title | uploadPictureProxy | pictureMask |
-      | Moon  | moon.jpg           | 30 40 20 30 |
+      | noteContent.title | uploadPictureProxy | pictureMask |
+      | Moon              | moon.jpg           | 30 40 20 30 |
 
   Scenario: Picture question
     Given I learned one note "Earth" on day 1

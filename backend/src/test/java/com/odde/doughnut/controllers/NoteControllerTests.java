@@ -109,8 +109,7 @@ class NoteControllerTests {
 
         @BeforeEach
         void setup() {
-            note = makeMe.aNote().byUser(userModel).please();
-            note.setTitle("new");
+            note = makeMe.aNote("new").byUser(userModel).please();
         }
 
         @Test
@@ -122,7 +121,6 @@ class NoteControllerTests {
 
         @Test
         void shouldNotBeAbleToSaveNoteWhenInvalid() throws NoAccessRightException, IOException {
-            note.setTitle("new");
             BindingResult bindingResult = makeMe.failedBindingResult();
             String response = controller.updateNote(note, bindingResult);
             assertEquals("notes/edit", response);

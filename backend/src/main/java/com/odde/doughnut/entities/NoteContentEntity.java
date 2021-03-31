@@ -10,7 +10,15 @@ import javax.validation.constraints.Size;
 
 @Embeddable
 public class NoteContentEntity {
-    @Getter @Setter private String description;
+    @NotNull
+    @Size(min = 1, max = 100)
+    @Getter
+    @Setter
+    private String title;
+
+    @Getter
+    @Setter
+    private String description;
 
     @Getter
     @Setter

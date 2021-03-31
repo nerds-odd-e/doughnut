@@ -4,10 +4,10 @@ Feature: Review Pages
   Background:
     Given I've logged in as an existing user
     And there are some notes for the current user
-      | title    | noteContent.description | pictureUrl  |
-      | Sedition | Incite violence         |             |
-      | Sedation | Put to sleep            |             |
-      | Sedative | Sleep medicine          | a_slide.jpg |
+      | noteContent.title | noteContent.description | pictureUrl  |
+      | Sedition          | Incite violence         |             |
+      | Sedation          | Put to sleep            |             |
+      | Sedative          | Sleep medicine          | a_slide.jpg |
     And there is "is similar to" link between note "Sedition" and "Sedation"
 
   Scenario: Different review pages for different notes

@@ -18,7 +18,8 @@ public interface NoteRepository extends CrudRepository<NoteEntity, Integer> {
     @Query(nativeQuery = true, value = "SELECT nt.* from note as nt JOIN ownership os ON nt.ownership_id = os.id LEFT JOIN notes_closure nc ON nt.id=nc.note_id WHERE nc.id is NULL and os.id = :ownership")
     List<NoteEntity> orphanedNotesOf(@Param("ownership") OwnershipEntity ownershipEntity);
 
-    NoteEntity findFirstByTitle(String noteTitle);
+    @Query( value = "SELECT note.* from note where title = :noteTitle limit 1", nativeQuery = true)
+    NoteEntity findFirstByTitle(@Param("noteTitle") String noteTitle);
 
     String byUserWhereThereIsNoReviewPoint = " LEFT JOIN ("
                 + "     SELECT id, note_id FROM review_point WHERE user_id = :userId"
