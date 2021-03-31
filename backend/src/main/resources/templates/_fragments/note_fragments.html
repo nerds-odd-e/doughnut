@@ -24,7 +24,7 @@
                 <div th:replace="${cardHeader}"/>
                 <div class="card-body">
                     <h5 th:insert="__${linkFragment}__(${note})" class="card-title"/>
-                    <p th:text="${#strings.abbreviate(note.description, 50)}"/>
+                    <p th:text="${#strings.abbreviate(note.noteContent.description, 50)}"/>
                     <div th:replace="${button}">Put your button here</div>
                 </div>
             </div>
@@ -72,7 +72,7 @@
 
 <div th:fragment="noteFormBody(note)">
     <div th:replace="_fragments/forms :: textInput('note', 'title', null, false)"/>
-    <div th:replace="_fragments/forms :: textarea('note', 'description', null)"/>
+    <div th:replace="_fragments/forms :: textarea('note', 'noteContent.description', null)"/>
     <div th:replace="_fragments/forms :: imageInput('note', 'uploadPicture', 'Optional. upload own picture.')"/>
     <div th:replace="_fragments/forms :: textInput('note', 'pictureUrl', 'Or, use full url of picture on the Internet.', false)"/>
     <div th:replace="_fragments/forms :: checkInput('note', 'useParentPicture')"/>
@@ -112,8 +112,8 @@
 
 <div th:fragment="noteShow(noteEntity, level)" th:object="${noteEntity}">
     <h2 th:class="'h' + ${level}" id="note-title" th:text="*{title}"/>
-    <pre id="note-description" th:text="*{description}" style="white-space: pre-wrap;"/>
     <div th:object="${noteEntity.noteContent}">
+        <pre id="note-description" th:text="*{description}" style="white-space: pre-wrap;"/>
         <div th:unless="${#strings.isEmpty(noteEntity.noteContent.url)}">
             <label th:unless="*{urlIsVideo}">Url:</label>
             <label th:if="*{urlIsVideo}">Video Url:</label>

@@ -27,7 +27,7 @@ public class QuizQuestionGenerator {
         }
         else {
             NoteEntity noteEntity = reviewPointEntity.getNoteEntity();
-            if (!Strings.isEmpty(noteEntity.getDescription())) {
+            if (!Strings.isEmpty(noteEntity.getNoteContent().getDescription())) {
                 ReviewSettingEntity reviewSettingEntity = noteEntity.getMasterReviewSettingEntity();
                 if (reviewSettingEntity != null && reviewSettingEntity.getRememberSpelling()) {
                     questionTypes.add(QuizQuestion.QuestionType.SPELLING);

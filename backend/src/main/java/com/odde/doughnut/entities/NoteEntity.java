@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.algorithms.ClozeDescription;
 import com.odde.doughnut.algorithms.SiblingOrder;
 import com.odde.doughnut.entities.validators.ValidateNotePicture;
-import com.odde.doughnut.models.NoteContentModel;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.util.Strings;
@@ -36,10 +35,10 @@ public class NoteEntity {
 
   @Embedded
   @Getter
-  private NoteContentEntity noteContent = new NoteContentEntity();
+  private final NoteContentEntity noteContent = new NoteContentEntity();
 
   @NotNull @Size(min = 1, max = 100) @Getter @Setter private String title;
-  @Getter @Setter private String description;
+
   @Column(name="picture_url")
   @Getter @Setter private String pictureUrl;
 
@@ -184,7 +183,7 @@ public class NoteEntity {
 
   public String getClozeDescription() {
     return new ClozeDescription().getClozeDescription(this.title,
-                                                      this.description);
+                                                      this.noteContent.getDescription());
   }
 
   public String getNotePicture() {

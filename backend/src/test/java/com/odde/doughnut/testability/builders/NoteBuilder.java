@@ -17,7 +17,7 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
     public NoteBuilder(NoteEntity noteEntity, MakeMe makeMe){
         super(makeMe, noteEntity);
         entity.setTitle(titleCounter.generate());
-        entity.setDescription("descrption");
+        description("descrption");
         entity.setUpdatedDatetime(new Timestamp(System.currentTimeMillis()));
     }
 
@@ -83,8 +83,7 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
     }
 
     public NoteBuilder withNoDescription() {
-        entity.setDescription("");
-        return this;
+        return description("");
     }
 
     public NoteBuilder title(String text) {
@@ -93,7 +92,7 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
     }
 
     public NoteBuilder description(String text) {
-        entity.setDescription(text);
+        entity.getNoteContent().setDescription(text);
         return this;
     }
 
