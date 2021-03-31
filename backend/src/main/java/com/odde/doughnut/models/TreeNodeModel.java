@@ -16,13 +16,6 @@ public class TreeNodeModel extends ModelForEntity<NoteEntity> {
         this.noteRepository = modelFactoryService.noteRepository;
     }
 
-    public List<NoteEntity> getAncestorsIncludingMe() {
-        if (entity == null) {
-            return new ArrayList<>();
-        }
-        return entity.getAncestorsIncludingMe();
-    }
-
     public NoteEntity getPreviousSiblingNote() {
         if (entity == null) {
             return null;

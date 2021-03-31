@@ -18,7 +18,7 @@ public class NoteMotionModel extends ModelForEntity<NoteMotionEntity>{
     public void execute() throws CyclicLinkDetectedException {
         TreeNodeModel treeNodeModel = modelFactoryService.toTreeNodeModel(entity.getRelativeToNote());
 
-        if(treeNodeModel.getAncestorsIncludingMe().contains(subject)) {
+        if(entity.getRelativeToNote().getAncestors().contains(subject)) {
             throw new CyclicLinkDetectedException();
         }
         updateAncestors(subject, this.entity.getNewParent());

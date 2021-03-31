@@ -52,8 +52,7 @@ public class NoteContentModelTest {
 
         @Test
         void topLevelNoteHaveEmptyAncestors() {
-            TreeNodeModel decoratedNote = toModel(topLevel);
-            List<NoteEntity> ancestors = decoratedNote.getAncestorsIncludingMe();
+            List<NoteEntity> ancestors = topLevel.getAncestorsIncludingMe();
             assertThat(ancestors, contains(topLevel));
         }
 
@@ -62,8 +61,7 @@ public class NoteContentModelTest {
             NoteEntity subject = makeMe.aNote("subject").under(topLevel).please();
             NoteEntity sibling = makeMe.aNote("sibling").under(topLevel).please();
 
-            TreeNodeModel decoratedNote = toModel(subject);
-            List<NoteEntity> ancestry = decoratedNote.getAncestorsIncludingMe();
+            List<NoteEntity> ancestry = subject.getAncestorsIncludingMe();
             assertThat(ancestry, contains(topLevel, subject));
             assertThat(ancestry, not(contains(sibling)));
         }
