@@ -8,7 +8,7 @@ import {
 
 When("I create a new circle {string} and copy the invitation code", (circleName) => {
   cy.visit("/circles/new");
-  cy.get("[name='name']").type(circleName);
+  cy.getFormControl('name').type(circleName);
   cy.get('input[value="Submit"]').click();
 
   cy.get("#invitation-code").invoke('val').then((text)=>{
@@ -18,7 +18,7 @@ When("I create a new circle {string} and copy the invitation code", (circleName)
 
 When("I join the circle with the invitation code", () => {
   cy.visit("/circles");
-  cy.get("@savedInvitationCode").then((invitationCode) => cy.get("[name='invitationCode']").type(invitationCode));
+  cy.get("@savedInvitationCode").then((invitationCode) => cy.getFormControl("invitationCode").type(invitationCode));
   cy.get('input[value="Submit"]').click();
 });
 

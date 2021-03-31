@@ -66,7 +66,7 @@ Cypress.Commands.add("submitNoteFormWith", (notes) => {
     for (var propName in elem) {
       const value = elem[propName];
       if (value) {
-        cy.get(`[name='${propName}']`).then(($input)=> {
+        cy.getFormControl(propName).then(($input)=> {
             if($input.attr('type') === 'file') {
                 cy.fixture(value).then(img => {
                   cy.wrap($input).attachFile({
@@ -266,3 +266,6 @@ Cypress.Commands.add("shouldSeeQuizWithOptions", (questionParts, options) => {
     );
 });
 
+Cypress.Commands.add("getFormControl", (name) => {
+    return cy.get("[name='" + name + "']");
+});

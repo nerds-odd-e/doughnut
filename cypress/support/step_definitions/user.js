@@ -34,7 +34,7 @@ When("I should be asked to create my profile", () => {
 When("I save my profile with:", (data) => {
   data.hashes().forEach((elem) => {
     for (var propName in elem) {
-      cy.get("#" + propName).type(elem[propName]);
+      cy.getFormControl(propName).type(elem[propName]);
     }
   });
   cy.get('input[value="Submit"]').click();
