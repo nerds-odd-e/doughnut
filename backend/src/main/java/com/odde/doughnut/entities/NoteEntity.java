@@ -6,9 +6,11 @@ import com.odde.doughnut.algorithms.SiblingOrder;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.WhereJoinTable;
+import org.springframework.beans.BeanUtils;
 
 import javax.persistence.*;
 import javax.validation.Valid;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -209,4 +211,29 @@ public class NoteEntity {
   public String getTitle() {
     return noteContent.getTitle();
   }
+
+  public void mergeMasterReviewSetting(ReviewSettingEntity reviewSettingEntity) {
+      ReviewSettingEntity current = getMasterReviewSettingEntity();
+      if(current == null) {
+          setMasterReviewSettingEntity(reviewSettingEntity);
+      }
+      else {
+          BeanUtils.copyProperties(reviewSettingEntity, getMasterReviewSettingEntity());
+      }
+  }
+
+  public void populate(OwnershipEntity ownershipEntity, NoteEntity parentNote, NoteContentEntity noteContentEntity, UserEntity userEntity) throws IOException {
+      updateNoteContent(noteContentEntity, userEntity);
+      setParentNote(parentNote);
+      setOwnershipEntity(ownershipEntity);
+      if(ownershipEntity == null) {
+          setOwnershipEntity(parentNote.getOwnershipEntity());
+      }
+      setUserEntity(userEntity);
+  }
+
+    public void updateNoteContent(NoteContentEntity noteContentEntity, UserEntity userEntity) throws IOException {
+        setNoteContent(noteContentEntity);
+        noteContent.fetchUploadedPicture(userEntity);
+    }
 }

@@ -2,6 +2,7 @@ package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.entities.validators.ValidateNotePicture;
+import com.odde.doughnut.models.ImageEntityBuilder;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.util.Strings;
@@ -11,6 +12,7 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -96,4 +98,11 @@ public class NoteContentEntity {
         return Strings.isNotBlank(pictureUrl) || uploadPicture != null || useParentPicture;
     }
 
+    public void fetchUploadedPicture(UserEntity userEntity) throws IOException {
+        MultipartFile file = getUploadPictureProxy();
+        if (file != null && !file.isEmpty()) {
+            ImageEntity imageEntity = new ImageEntityBuilder().buildImageEntityFromUploadedPicture(userEntity, file);
+            setUploadPicture(imageEntity);
+        }
+    }
 }

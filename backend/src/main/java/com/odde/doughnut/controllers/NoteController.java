@@ -52,20 +52,13 @@ public class NoteController extends ApplicationMvcController  {
         if (bindingResult.hasErrors()) {
             return "notes/new";
         }
+        UserModel userModel = currentUserFetcher.getUser();
         if (parentNote != null) {
-            currentUserFetcher.getUser().assertAuthorization(parentNote);
+            userModel.assertAuthorization(parentNote);
         }
         NoteEntity noteEntity = new NoteEntity();
-        noteEntity.setNoteContent(noteContentEntity);
-        noteEntity.setParentNote(parentNote);
-        noteEntity.setOwnershipEntity(ownershipEntity);
-        if(ownershipEntity == null) {
-            noteEntity.setOwnershipEntity(parentNote.getOwnershipEntity());
-        }
-
-        UserModel userModel = currentUserFetcher.getUser();
-        NoteContentModel noteContentModel = modelFactoryService.toNoteModel(noteEntity);
-        noteContentModel.createByUser(userModel);
+        noteEntity.populate(ownershipEntity, parentNote, noteContentEntity, userModel.getEntity());
+        modelFactoryService.noteRepository.save(noteEntity);
         return "redirect:/notes/" + noteEntity.getId();
     }
 
@@ -87,9 +80,8 @@ public class NoteController extends ApplicationMvcController  {
         if (bindingResult.hasErrors()) {
             return "notes/edit";
         }
-        noteEntity.setNoteContent(noteContentEntity);
-        NoteContentModel noteContentModel = modelFactoryService.toNoteModel(noteEntity);
-        noteContentModel.update(currentUserFetcher.getUser());
+        noteEntity.updateNoteContent(noteContentEntity, currentUserFetcher.getUser().getEntity());
+        modelFactoryService.noteRepository.save(noteEntity);
         return "redirect:/notes/" + noteEntity.getId();
     }
 
@@ -151,7 +143,8 @@ public class NoteController extends ApplicationMvcController  {
             return "notes/edit_review_setting";
         }
         currentUserFetcher.getUser().assertAuthorization(noteEntity);
-        modelFactoryService.toNoteModel(noteEntity).setAndSaveMasterReviewSetting(reviewSettingEntity);
+        noteEntity.mergeMasterReviewSetting(reviewSettingEntity);
+        modelFactoryService.noteRepository.save(noteEntity);
 
         return "redirect:/notes/" + noteEntity.getId();
     }

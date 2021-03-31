@@ -33,13 +33,6 @@ public class ModelFactoryService {
         this.entityManager = entityManager;
     }
 
-    public NoteContentModel toNoteModel(NoteEntity note) {
-        if(note == null) {
-            return null;
-        }
-        return new NoteContentModel(note, this);
-    }
-
     public TreeNodeModel toTreeNodeModel(NoteEntity note) {
         return new TreeNodeModel(note, this);
     }
