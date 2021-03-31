@@ -1,4 +1,5 @@
 <div th:fragment="textInput(scopeName, field, placeholder, autofocus)" th:replace=":: inputWithType(~{ :: .text-input-control}, ${scopeName}, ${field})">
+
     <input
             class="text-input-control"
             th:class="'form-control' + ${#fields.hasErrors(field) ? ' is-invalid' : ''}"
@@ -9,6 +10,7 @@
             autocomplete="off"
             autocapitalize="off"
     />
+
 </div>
 
 <div th:fragment="imageInput(scopeName, field, placeholder)" th:replace=":: inputWithType(~{ :: .file-input-control}, ${scopeName}, ${field})">

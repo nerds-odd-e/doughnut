@@ -77,8 +77,8 @@
     <div th:replace="_fragments/forms :: textInput('note', 'pictureUrl', 'Or, use full url of picture on the Internet.', false)"/>
     <div th:replace="_fragments/forms :: checkInput('note', 'useParentPicture')"/>
     <div th:replace="_fragments/forms :: textInput('note', 'pictureMask', null, false)"/>
-    <div th:replace="_fragments/forms :: textInput('note', 'url', null, false)"/>
-    <div th:replace="_fragments/forms :: checkInput('note', 'urlIsVideo')"/>
+    <div th:replace="_fragments/forms :: textInput('note', 'noteContent.url', null, false)"/>
+    <div th:replace="_fragments/forms :: checkInput('note', 'noteContent.urlIsVideo')"/>
     <div th:replace="_fragments/forms :: checkInput('note', 'skipReview')"/>
 </div>
 
@@ -113,10 +113,12 @@
 <div th:fragment="noteShow(noteEntity, level)" th:object="${noteEntity}">
     <h2 th:class="'h' + ${level}" id="note-title" th:text="*{title}"/>
     <pre id="note-description" th:text="*{description}" style="white-space: pre-wrap;"/>
-    <div th:unless="${#strings.isEmpty(noteEntity.url)}">
-        <label th:unless="*{urlIsVideo}">Url:</label>
-        <label th:if="*{urlIsVideo}">Video Url:</label>
-        <a th:href="*{url}" th:text="*{url}"/>
+    <div th:object="${noteEntity.noteContent}">
+        <div th:unless="${#strings.isEmpty(noteEntity.noteContent.url)}">
+            <label th:unless="*{urlIsVideo}">Url:</label>
+            <label th:if="*{urlIsVideo}">Video Url:</label>
+            <a th:href="*{url}" th:text="*{url}"/>
+        </div>
     </div>
 
     <div th:replace=":: showPicture(${noteEntity}, 0.2)"/>

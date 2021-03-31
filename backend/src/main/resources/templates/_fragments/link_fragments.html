@@ -1,10 +1,12 @@
-<div th:fragment="noteShow(noteEntity, level)" th:object="${noteEntity}">
+<div th:fragment="noteShowxxxx(noteEntity, level)" th:object="${noteEntity}">
     <h2 th:class="'h' + ${level}" id="note-title" th:text="*{title}"/>
     <pre id="note-description" th:text="*{description}" style="white-space: pre-wrap;"/>
-    <div th:unless="${#strings.isEmpty(noteEntity.url)}">
-        <label th:unless="*{urlIsVideo}">Url:</label>
-        <label th:if="*{urlIsVideo}">Video Url:</label>
-        <a th:href="*{url}" th:text="*{url}"/>
+    <div th:object="${noteEntity.noteContent}">
+        <div th:unless="${#strings.isEmpty(noteEntity.noteContent.url)}">
+            <label th:unless="*{urlIsVideo}">Url:</label>
+            <label th:if="*{urlIsVideo}">Video Url:</label>
+            <a th:href="*{url}" th:text="*{url}"/>
+        </div>
     </div>
     <p id="note-picture" class="text-center" th:if="*{picture}">
         <img class="img-fluid" th:src="*{picture}"/>
