@@ -131,7 +131,7 @@ class NoteControllerTests {
             makeMe.theNote(note).withNewlyUploadedPicture();
             BindingResult bindingResult = makeMe.successfulBindingResult();
             String response = controller.updateNote(note, bindingResult);
-            assertThat(note.getUploadPicture(), is(not(nullValue())));
+            assertThat(note.getNoteContent().getUploadPicture(), is(not(nullValue())));
         }
 
     }

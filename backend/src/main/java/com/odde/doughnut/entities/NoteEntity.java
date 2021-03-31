@@ -3,16 +3,12 @@ package com.odde.doughnut.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.algorithms.ClozeDescription;
 import com.odde.doughnut.algorithms.SiblingOrder;
-import com.odde.doughnut.entities.validators.ValidateNotePicture;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.logging.log4j.util.Strings;
 import org.hibernate.annotations.WhereJoinTable;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.persistence.*;
 import javax.validation.Valid;
-import javax.validation.constraints.Pattern;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -25,7 +21,6 @@ import static java.util.stream.Collectors.toList;
 
 @Entity
 @Table(name = "note")
-@ValidateNotePicture
 public class NoteEntity {
   @Id
   @Getter
@@ -36,25 +31,6 @@ public class NoteEntity {
   @Valid
   @Getter
   private final NoteContentEntity noteContent = new NoteContentEntity();
-
-  @Column(name="picture_url")
-  @Getter @Setter private String pictureUrl;
-
-  @Column(name = "skip_review")
-  @Getter
-  @Setter
-  private Boolean skipReview = false;
-
-  @Column(name = "use_parent_picture")
-  @Getter
-  @Setter
-  private Boolean useParentPicture = false;
-
-  @Pattern(regexp="^(((-?[0-9.]+\\s+){3}-?[0-9.]+\\s+)*((-?[0-9.]+\\s+){3}-?[0-9.]+))?$",message="must be 'x y width height [x y width height...]'")
-  @Column(name = "picture_mask")
-  @Getter
-  @Setter
-  private String pictureMask;
 
   @Column(name = "sibling_order")
   @Getter
@@ -86,13 +62,6 @@ public class NoteEntity {
   @Getter
   @Setter
   private UserEntity userEntity;
-
-  @ManyToOne(cascade = CascadeType.PERSIST)
-  @JoinColumn(name = "image_id", referencedColumnName = "id")
-  @JsonIgnore
-  @Getter
-  @Setter
-  private ImageEntity uploadPicture;
 
   @Column(name = "created_datetime")
   @Getter
@@ -144,7 +113,6 @@ public class NoteEntity {
   private final List<NoteEntity> children = new ArrayList<>();
 
   @Transient @Getter @Setter private String testingParent;
-  @Transient @Getter @Setter private MultipartFile uploadPictureProxy;
 
   public List<NoteEntity> getTargetNotes() {
     return links.stream().map(LinkEntity::getTargetNote).collect(toList());
@@ -185,32 +153,10 @@ public class NoteEntity {
   }
 
   public String getNotePicture() {
-    if (useParentPicture && getParentNote() != null) {
+    if (noteContent.getUseParentPicture() && getParentNote() != null) {
         return getParentNote().getNotePicture();
     }
-
-    if (uploadPicture != null) {
-      return "/images/" + uploadPicture.getId() + "/" + uploadPicture.getName();
-    }
-
-    return pictureUrl;
-  }
-
-  public String getPictureMaskSvg(String opacity) {
-    if(Strings.isEmpty(pictureMask)) {
-      return "";
-    }
-    List<String> list = Arrays.stream(pictureMask.split("\\s+")).collect(Collectors.toUnmodifiableList());
-    List<String> results = new ArrayList<>();
-    for (int i = 0; i < list.size(); i+=4) {
-      results.add(String.format("<rect x=\"%s\" y=\"%s\" width=\"%s\" height=\"%s\" style=\"fill:blue;stroke:pink;stroke-width:1;fill-opacity:%s;stroke-opacity:0.8\" />", list.get(i), list.get(i+1), list.get(i+2), list.get(i+3), opacity));
-    }
-
-    return String.join("", results);
-  }
-
-  public boolean hasPicture() {
-    return Strings.isNotBlank(pictureUrl) || uploadPicture != null || useParentPicture;
+    return noteContent.getNotePicture();
   }
 
   public boolean isHead() {

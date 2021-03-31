@@ -78,7 +78,7 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
     }
 
     public NoteBuilder skipReview() {
-        entity.setSkipReview(true);
+        entity.getNoteContent().setSkipReview(true);
         return this;
     }
 
@@ -117,17 +117,17 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
     }
 
     public NoteBuilder withPicture(String picture) {
-        entity.setPictureUrl(picture);
+        entity.getNoteContent().setPictureUrl(picture);
         return this;
     }
 
     public NoteBuilder useParentPicture() {
-        entity.setUseParentPicture(true);
+        entity.getNoteContent().setUseParentPicture(true);
         return this;
     }
 
     public NoteBuilder withNewlyUploadedPicture() {
-        entity.setUploadPictureProxy(makeMe.anUploadedPicture().toMultiplePartFilePlease());
+        entity.getNoteContent().setUploadPictureProxy(makeMe.anUploadedPicture().toMultiplePartFilePlease());
         return this;
     }
 }

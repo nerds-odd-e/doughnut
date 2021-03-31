@@ -43,7 +43,7 @@ public class NoteEntityTest {
         void useParentPicture() {
             NoteEntity parent = makeMe.aNote().withPicture("https://img.com/xxx.jpg").inMemoryPlease();
             NoteEntity child = makeMe.aNote().under(parent).useParentPicture().inMemoryPlease();
-            assertThat(child.getNotePicture(), equalTo(parent.getPictureUrl()));
+            assertThat(child.getNotePicture(), equalTo(parent.getNoteContent().getPictureUrl()));
         }
     }
 
@@ -77,31 +77,31 @@ public class NoteEntityTest {
 
         @Test
         public void goodMask() {
-            note.setPictureMask("1 -2.3 3 -4");
+            note.getNoteContent().setPictureMask("1 -2.3 3 -4");
             assertThat(getViolations(), is(empty()));
         }
 
         @Test
         public void goodMaskWith2Rect() {
-            note.setPictureMask("-1 2 3 4 11 22 33 44");
+            note.getNoteContent().setPictureMask("-1 2 3 4 11 22 33 44");
             assertThat(getViolations(), is(empty()));
         }
 
         @Test
         public void masksNeedToBeFourNumbers() {
-            note.setPictureMask("1 2 3 4 5 6 7");
+            note.getNoteContent().setPictureMask("1 2 3 4 5 6 7");
             assertThat(getViolations(), is(not(empty())));
             Path propertyPath = getViolations().stream().findFirst().get().getPropertyPath();
-            assertThat(propertyPath.toString(), equalTo("pictureMask"));
+            assertThat(propertyPath.toString(), equalTo("noteContent.pictureMask"));
         }
 
         @Test
         public void withBothUploadPictureProxyAndPicture() {
-            note.setUploadPictureProxy(makeMe.anUploadedPicture().toMultiplePartFilePlease());
-            note.setPictureUrl("http://url/img");
+            note.getNoteContent().setUploadPictureProxy(makeMe.anUploadedPicture().toMultiplePartFilePlease());
+            note.getNoteContent().setPictureUrl("http://url/img");
             assertThat(getViolations(), is(not(empty())));
             List<String> errorFields = getViolations().stream().map(v->v.getPropertyPath().toString()).collect(toList());
-            assertThat(errorFields, containsInAnyOrder("uploadPicture", "pictureUrl"));
+            assertThat(errorFields, containsInAnyOrder("noteContent.uploadPicture", "noteContent.pictureUrl"));
         }
 
         private Set<ConstraintViolation<NoteEntity>> getViolations() {

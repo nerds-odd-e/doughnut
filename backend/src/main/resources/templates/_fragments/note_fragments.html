@@ -73,13 +73,13 @@
 <div th:fragment="noteFormBody(note)">
     <div th:replace="_fragments/forms :: textInput('note', 'noteContent.title', null, false)"/>
     <div th:replace="_fragments/forms :: textarea('note', 'noteContent.description', null)"/>
-    <div th:replace="_fragments/forms :: imageInput('note', 'uploadPicture', 'Optional. upload own picture.')"/>
-    <div th:replace="_fragments/forms :: textInput('note', 'pictureUrl', 'Or, use full url of picture on the Internet.', false)"/>
-    <div th:replace="_fragments/forms :: checkInput('note', 'useParentPicture')"/>
-    <div th:replace="_fragments/forms :: textInput('note', 'pictureMask', null, false)"/>
+    <div th:replace="_fragments/forms :: imageInput('note', 'noteContent.uploadPicture', 'Optional. upload own picture.')"/>
+    <div th:replace="_fragments/forms :: textInput('note', 'noteContent.pictureUrl', 'Or, use full url of picture on the Internet.', false)"/>
+    <div th:replace="_fragments/forms :: checkInput('note', 'noteContent.useParentPicture')"/>
+    <div th:replace="_fragments/forms :: textInput('note', 'noteContent.pictureMask', null, false)"/>
     <div th:replace="_fragments/forms :: textInput('note', 'noteContent.url', null, false)"/>
     <div th:replace="_fragments/forms :: checkInput('note', 'noteContent.urlIsVideo')"/>
-    <div th:replace="_fragments/forms :: checkInput('note', 'skipReview')"/>
+    <div th:replace="_fragments/forms :: checkInput('note', 'noteContent.skipReview')"/>
 </div>
 
 <div th:fragment="noteLinkButton(urlPrefix, note, svg, title)">
@@ -100,11 +100,11 @@
 </div>
 
 <div th:fragment="showPicture(noteEntity, opacity)" th:object="${noteEntity}">
-    <div id="note-picture" class="text-center" th:if="*{notePicture}">
         <div style="position: relative; display: inline-block;">
+            <div id="note-picture" class="text-center" th:if="*{notePicture}">
             <img class="img-fluid" th:src="*{notePicture}"/>
             <svg viewBox="0 0 100 100" style="  position: absolute; top: 0; left: 0; color: #11f1f1; width: 100%; height: 100%;">
-                <rect th:remove="tag" th:utext="${noteEntity.getPictureMaskSvg(opacity)}"/>
+                <rect th:remove="tag" th:utext="${noteEntity.noteContent.getPictureMaskSvg(opacity)}"/>
             </svg>
         </div>
     </div>

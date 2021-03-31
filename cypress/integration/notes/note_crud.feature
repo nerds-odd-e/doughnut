@@ -7,10 +7,10 @@ Feature: Note CRUD
 
   Scenario: Create a new note
     When I create top level note with:
-      | noteContent.title | noteContent.description | uploadPictureProxy | pictureMask |
+      | noteContent.title | noteContent.description | noteContent.uploadPictureProxy | noteContent.pictureMask |
       | Sedation          | Put to sleep            | example-large.png  | 20 40 70 30 |
     And I create top level note with:
-      | noteContent.title | noteContent.description | pictureUrl  |
+      | noteContent.title | noteContent.description | noteContent.pictureUrl  |
       | Sedition          | Incite violence         | a_slide.jpg |
     Then I should see these notes belonging to the user at the top level of all my notes
       | title    |

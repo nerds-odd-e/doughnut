@@ -26,10 +26,10 @@ public class NoteContentModel extends ModelForEntity<NoteEntity> {
     }
 
     private void fetchUploadedPicture(UserModel userModel) throws IOException {
-        MultipartFile file = entity.getUploadPictureProxy();
+        MultipartFile file = entity.getNoteContent().getUploadPictureProxy();
         if (file != null && !file.isEmpty()) {
             ImageEntity imageEntity = new ImageEntityBuilder().buildImageEntityFromUploadedPicture(userModel, file);
-            entity.setUploadPicture(imageEntity);
+            entity.getNoteContent().setUploadPicture(imageEntity);
         }
     }
 

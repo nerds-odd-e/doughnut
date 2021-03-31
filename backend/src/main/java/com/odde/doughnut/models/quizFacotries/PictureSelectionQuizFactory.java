@@ -17,7 +17,7 @@ public class PictureSelectionQuizFactory implements QuizQuestionFactory {
 
     @Override
     public List<NoteEntity> generateFillingOptions() {
-        return servant.choose5FromSiblings(answerNote, n -> n.hasPicture() && !n.equals(answerNote));
+        return servant.choose5FromSiblings(answerNote, n -> n.getNoteContent().hasPicture() && !n.equals(answerNote));
     }
 
     @Override
