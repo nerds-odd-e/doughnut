@@ -56,9 +56,6 @@ spring:
           github:
             clientId: ${OAUTH2_github_client_id}
             clientSecret: ${OAUTH2_github_client_secret}
-            pre-established-redirect-uri: https://doughnut.odd-e.com/login/oauth2/code/github
-            registered-redirect-uri: https://doughnut.odd-e.com/login/oauth2/code/github
-            use-current-uri: false
 server:
   forward-headers-strategy: FRAMEWORK
 ---
