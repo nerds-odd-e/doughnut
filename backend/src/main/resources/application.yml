@@ -63,8 +63,9 @@ spring:
           github:
             clientId: ${OAUTH2_github_client_id}
             clientSecret: ${OAUTH2_github_client_secret}
-server:
-  use-forward-headers: true
+        pre-established-redirect-uri: https://doughnut.odd-e.com/login/oauth2/code/github
+        registered-redirect-uri: https://doughnut.odd-e.com/login/oauth2/code/github
+        use-current-uri: false
 ---
 spring:
   config:
@@ -92,5 +93,4 @@ spring:
     properties.hibernate:
       enable_lazy_load_no_trans: true
 server:
-  use-forward-headers: true
   port: 8081
