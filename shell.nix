@@ -58,9 +58,11 @@ in mkShell {
     mkdir -p $MYSQL_HOME
     mkdir -p $MYSQL_DATADIR
     
-    mysqld --initialize-insecure --user=`whoami` --datadir=$MYSQL_DATADIR --basedir=$MYSQL_BASEDIR --explicit_defaults_for_timestamp
-    mysqld --datadir=$MYSQL_DATADIR --pid-file=$MYSQL_PID_FILE --socket=$MYSQL_UNIX_PORT --mysqlx-socket=$MYSQLX_UNIX_PORT &
-    export MYSQL_PID=$!
+    export MYSQLD_PID=$(lsof -t -i tcp:3306)
+    if [[ -z "$MYSQLD_PID" ]]; then
+      mysqld --initialize-insecure --user=`whoami` --datadir=$MYSQL_DATADIR --basedir=$MYSQL_BASEDIR --explicit_defaults_for_timestamp
+      mysqld --datadir=$MYSQL_DATADIR --pid-file=$MYSQL_PID_FILE --socket=$MYSQL_UNIX_PORT --mysqlx-socket=$MYSQLX_UNIX_PORT &
+      export MYSQLD_PID=$!
 
 cat <<EOF > $MYSQL_HOME/init_doughnut_db.sql
 CREATE USER IF NOT EXISTS 'doughnut'@'localhost' IDENTIFIED BY 'doughnut';
@@ -71,30 +73,24 @@ GRANT ALL PRIVILEGES ON doughnut_test.*        TO 'doughnut'@'localhost';
 FLUSH PRIVILEGES;
 EOF
 
+      sleep 2 && mysql -u root < $MYSQL_HOME/init_doughnut_db.sql
+    fi
+
+
     export GPG_TTY=$(tty)
     export NIX_SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
     if [[ "$OSTYPE" == "darwin"* ]]; then
        export NIX_SSL_CERT_FILE=/etc/ssl/cert.pem
     fi
 
-    # Import environment variables defined in env.sh (first decrypt the secrets with your GPG key)
-    set -a
-    sleep 2 && git secret reveal
-    source env.sh
-    set +a
-
-    mysql -u root < $MYSQL_HOME/init_doughnut_db.sql
     export GPG_TTY='(tty)'
 
     cleanup()
     {
-      git secret hide -d
       rm -f $MYSQL_HOME/init_doughnut_db.sql
-      mysqladmin -u root --socket=$MYSQL_UNIX_PORT shutdown
-      wait $MYSQL_PID
-      MYSQL_PID=$(lsof -t -i:3306)
-      if [ ! -z "$MYSQL_PID" ]; then
-        kill -9 $MYSQL_PID
+      if [[ ! -z "$MYSQLD_PID" ]]; then
+        mysqladmin -u root --socket=$MYSQL_UNIX_PORT shutdown
+        wait $MYSQL_PID
       fi
     }
     trap cleanup EXIT

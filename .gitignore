@@ -57,5 +57,6 @@ nohup.out
 # OS
 **/.DS_Store
 
-# infra SSL certs
+# infra secrets
 infra/ssl/
+!infra/salt/states/base_os/templates/doughnut_env.sh
