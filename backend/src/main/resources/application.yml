@@ -63,6 +63,8 @@ spring:
           github:
             clientId: ${OAUTH2_github_client_id}
             clientSecret: ${OAUTH2_github_client_secret}
+server:
+  use-forward-headers: true
 ---
 spring:
   config:
