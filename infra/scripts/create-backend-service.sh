@@ -1,4 +1,4 @@
 #!/bin/bash
-gcloud compute backend-services create doughnut-service \
-	--http-health-checks doughnut-health-check \
+gcloud compute backend-services create doughnut-app-service \
+	--http-health-checks doughnut-app-health-check \
 	--global

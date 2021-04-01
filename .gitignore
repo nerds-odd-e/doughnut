@@ -56,3 +56,6 @@ nohup.out
 
 # OS
 **/.DS_Store
+
+# infra SSL certs
+infra/ssl/

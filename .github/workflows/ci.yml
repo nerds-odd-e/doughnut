@@ -57,10 +57,8 @@ jobs:
         with:
           path: backend/build/libs/doughnut-0.0.1-SNAPSHOT.jar
           destination: dough-01/backend_app_jar
-      - name: Create Google Cloud Compute VM doughnut-app instance
-        run: infra/scripts/create-gcloud-app-compute.sh
-      - name: Healthcheck doughnut-app instance
-        run: infra/scripts/app-instance-healthcheck.sh
+      - name: Perform rolling replace to GCP MIG doughnut-app-group
+        run: infra/scripts/perform-rolling-replace-app-mig.sh
       - name: Slack notify dough_ci_cd channel of CI/CD results
         uses: adamkdean/simple-slack-notify@master
         if: always()
