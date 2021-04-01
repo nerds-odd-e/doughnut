@@ -2,9 +2,9 @@
   file.append:
     - text: 10.111.16.12      db-server
 
-/etc/profile.d/env.sh:
+/etc/profile.d/doughnut_env.sh:
   file.managed:
-    - source: salt://base_os/templates/env.sh
+    - source: salt://base_os/templates/doughnut_env.sh
     - mode: 755
 
 /etc/apt/sources.list.d/mysql.list:
@@ -43,9 +43,14 @@ doughnut-app-deps:
         - google-cloud-packages-archive-keyring
         - google-cloud-sdk
     - require_in:
+        - cmd: os-dist-upgrade
         - cmd: doughnut-jre
-        - file: /etc/profile.d/env.sh
+        - file: /etc/profile.d/doughnut_env.sh
 
 doughnut-jre:
   cmd.run:
     - name: update-alternatives --set java /usr/lib/jvm/java-11-openjdk-amd64/bin/java
+
+os-dist-upgrade:
+  cmd.run:
+    - name: apt-get -y update && apt-get -y dist-upgrade

@@ -17,10 +17,10 @@
         "source_image_family": "{{ user `source_image_family` }}",
         "region": "{{ user `region` }}",
         "zone": "{{ user `zone` }}",
-        "image_description": "doughnut Debian10 MySQL80 base image provisioned wit saltstack",
+        "image_description": "doughnut Debian10 MySQL80 base image provisioned with saltstack",
         "image_name": "doughnut-debian10-mysql80-base-saltstack",
         "ssh_username": "{{ user `ssh_username` }}",
-        "disk_size": 15,
+        "disk_size": 20,
         "disk_type": "pd-ssd",
         "account_file": "{{ user `service_account_json` }}"
     }],
