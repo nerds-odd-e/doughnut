@@ -1,8 +1,10 @@
+<a th:fragment="subscriptionTitleWithBazaarLink(subscription)" th:href="'/bazaar/notes/' + ${subscription.noteEntity.id}" th:text="${subscription.noteEntity.title}"/>
+
 <div th:fragment="noteSubscriptionCards(subscriptions)"  th:replace="_fragments/note_fragments::noteCardWithHeaderAndButton(
          notes=${subscriptions},
          bodyButton=~{},
          headerButtons=~{ :: .s-card-header-buttons},
-         linkFragment='_fragments/bazaar_fragments::noteTitleWithBazaarLink'
+         linkFragment='::subscriptionTitleWithBazaarLink'
          )">
     <div class="s-card-header-buttons" th:replace=":: subscriptionNoteButtons(${note})"/>
 </div>
