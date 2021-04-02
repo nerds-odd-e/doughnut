@@ -20,7 +20,7 @@ public class SubscriptionModel extends ModelForEntity<SubscriptionEntity> implem
 
     @Override
     public int getNotesHaveNotBeenReviewedAtAllCount() {
-        return 0;
+        return modelFactoryService.noteRepository.countByAncestorWhereThereIsNoReviewPoint(entity.getUserEntity().getId(), entity.getNoteEntity().getId());
     }
 
     @Override

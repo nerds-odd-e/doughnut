@@ -26,6 +26,9 @@ public interface NoteRepository extends CrudRepository<NoteEntity, Integer> {
     @Query( value = "SELECT note.* from note " + byAncestorWhereThereIsNoReviewPoint, nativeQuery = true)
     List<NoteEntity> findByAncestorWhereThereIsNoReviewPoint(@Param("userId") Integer userId, @Param("ancestorId") Integer ancestorId);
 
+    @Query( value = "SELECT count(1) as count from note " + byAncestorWhereThereIsNoReviewPoint, nativeQuery = true)
+    int countByAncestorWhereThereIsNoReviewPoint(@Param("userId") Integer userId, @Param("ancestorId") Integer ancestorId);
+
     @Query( value = "SELECT count(1) as count from note " + joinClosure + " WHERE note.id in :noteIds", nativeQuery = true)
     int countByAncestorAndInTheList(@Param("ancestorId") Integer ancestorId, @Param("noteIds") List<Integer> noteIds);
 
@@ -44,5 +47,4 @@ public interface NoteRepository extends CrudRepository<NoteEntity, Integer> {
 
     String byAncestorWhereThereIsNoReviewPoint = joinClosure
             + whereThereIsNoReviewPoint;
-
 }

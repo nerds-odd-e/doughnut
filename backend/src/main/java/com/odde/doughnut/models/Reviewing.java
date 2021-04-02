@@ -24,15 +24,20 @@ public class Reviewing {
     }
 
     public ReviewPointEntity getOneInitialReviewPointEntity() {
+        return memoizer.call("getOneInitialReviewPointEntity", this::getOneInitialReviewPointEntity_);
+    }
+
+    private ReviewPointEntity getOneInitialReviewPointEntity_() {
         int count = remainingDailyNewNotesCount();
         if (count == 0) {
             return null;
         }
         List<Integer> initialReviewedNotesOfToday = getNewReviewPointEntitiesOfToday().stream().map(rp -> rp.getSourceNote().getId()).collect(Collectors.toUnmodifiableList());
-        return userModel.entity.getSubscriptionEntities().stream().map(modelFactoryService::toSubscriptionModel)
-        .filter(sub->{
-           return sub.needToLearnMoreToday(initialReviewedNotesOfToday);
-        }).map(this::getOneNewReviewPointEntity).filter(Objects::nonNull).findFirst().orElse(getOneNewReviewPointEntity(userModel));
+        return userModel.entity.getSubscriptionEntities().stream()
+                .map(modelFactoryService::toSubscriptionModel)
+                .filter(sub-> sub.needToLearnMoreToday(initialReviewedNotesOfToday))
+                .map(this::getOneNewReviewPointEntity)
+                .filter(Objects::nonNull).findFirst().orElseGet(()->getOneNewReviewPointEntity(userModel));
     }
 
     private ReviewPointEntity getOneNewReviewPointEntity(ReviewScope reviewScope) {
@@ -57,34 +62,42 @@ public class Reviewing {
     }
 
     public int toRepeatCount() {
-        return memoizer.call("toRepeatCount", this::getToRepeatCount);
+        return memoizer.call("toRepeatCount", this::getToRepeatCount_);
     }
 
-    private Integer getToRepeatCount() {
+    private Integer getToRepeatCount_() {
         return userModel.getReviewPointsNeedToRepeat(currentUTCTimestamp).size();
     }
 
     public int learntCount() {
-        return memoizer.call("learntCount", this::getLearntCount);
+        return memoizer.call("learntCount", this::getLearntCount_);
     }
 
-    public int getLearntCount() {
+    public int getLearntCount_() {
         return userModel.learntCount();
     }
 
     public int notLearntCount() {
-        return memoizer.call("notLearntCount", this::getNotLearntCount);
+        return memoizer.call("notLearntCount", this::getNotLearntCount_);
     }
 
-    public int getNotLearntCount() {
-        return userModel.getNotesHaveNotBeenReviewedAtAllCount();
+    public int getNotLearntCount_() {
+        Integer subscribedCount = userModel.entity.getSubscriptionEntities().stream()
+                .map(modelFactoryService::toSubscriptionModel)
+                .map(SubscriptionModel::getNotesHaveNotBeenReviewedAtAllCount)
+                .reduce(Integer::sum).orElse(0);
+        return subscribedCount + userModel.getNotesHaveNotBeenReviewedAtAllCount();
     }
 
     public int toInitialReviewCount() {
-        return memoizer.call("toInitialReviewCount", this::getToInitialReviewCount);
+        return memoizer.call("toInitialReviewCount", this::getToInitialReviewCount_);
     }
 
-    public int getToInitialReviewCount() {
+    public int getToInitialReviewCount_() {
+        ReviewPointEntity oneInitialReviewPointEntity = getOneInitialReviewPointEntity();
+        if (oneInitialReviewPointEntity == null) {
+            return 0;
+        }
         return Math.min(remainingDailyNewNotesCount(), notLearntCount());
     }
 
