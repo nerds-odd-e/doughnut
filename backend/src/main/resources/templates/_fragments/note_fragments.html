@@ -87,6 +87,8 @@
     <div th:replace="_fragments/forms :: textInput('note', 'pictureMask', null, false)"/>
     <div th:replace="_fragments/forms :: textInput('note', 'url', null, false)"/>
     <div th:replace="_fragments/forms :: checkInput('note', 'urlIsVideo')"/>
+    <div th:replace="_fragments/forms :: checkInput('note', 'hideTitleInArticle')"/>
+    <div th:replace="_fragments/forms :: checkInput('note', 'showAsBulletInArticle')"/>
     <div th:replace="_fragments/forms :: checkInput('note', 'skipReview')"/>
 </div>
 
@@ -117,9 +119,9 @@
     </div>
 </div>
 
-<div th:fragment="noteShow(noteEntity, level)" th:object="${noteEntity}">
+<div th:fragment="noteShowWithTitle(noteEntity, level, titleHtml)" th:object="${noteEntity}">
     <div th:object="${noteEntity.noteContent}">
-        <h2 th:class="'h' + ${level}" id="note-title" th:text="*{title}"/>
+        <h2 th:replace="${titleHtml}"/>
         <pre id="note-description" th:text="*{description}" style="white-space: pre-wrap;"/>
         <div th:unless="${#strings.isEmpty(noteEntity.noteContent.url)}">
             <label th:unless="*{urlIsVideo}">Url:</label>
@@ -141,8 +143,16 @@
     </p>
 </div>
 
+<div th:fragment="noteShow(noteEntity, level)" th:replace=":: noteShowWithTitle(${noteEntity}, ${level}, ~{:: .note-title-show})">
+    <h2 class="note-title-show" th:class="'h' + ${level}" th:text="${noteEntity.title}"/>
+</div>
+
 <div th:fragment="noteAsArticle(noteEntity, level)">
-    <div th:replace="_fragments/note_fragments :: noteShow(${noteEntity}, ${level})"/>
+    <div th:replace=":: noteShowWithTitle(${noteEntity}, ${level}, ~{::.note-title-article})">
+        <h2 class="note-title-article" th:class="'h' + ${level}" th:text="${noteEntity.title}" th:unless="${noteEntity.noteContent.hideTitleInArticle}"/>
+        <span class="note-title-article" th:if="${noteEntity.noteContent.hideTitleInArticle}"/>
+    </div>
+
     <div class="" th:each="child:${noteEntity.children}">
         <div th:replace="_fragments/note_fragments :: noteAsArticle(${child}, ${1 + level})"/>
     </div>

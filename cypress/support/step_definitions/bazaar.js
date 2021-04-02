@@ -45,9 +45,17 @@ When("I should see in the article:", (data) => {
   });
 });
 
+When("I should not see {string} in the article", (content) => {
+  cy.findByText(content).should("not.exist");
+});
+
 When("I go to the bazaar", () => {
   cy.visit("/bazaar");
 });
+
+When("I should see two bullets in the article", (content) => {
+});
+
 
 
 When("I subscribe to note {string} in the bazaar, with target of learning {int} notes per day", (noteTitle, count) => {

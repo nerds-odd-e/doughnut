@@ -72,6 +72,16 @@ public class NoteContentEntity {
     @Setter
     private Boolean skipReview = false;
 
+    @Column(name = "hide_title_in_article")
+    @Getter
+    @Setter
+    private Boolean hideTitleInArticle = false;
+
+    @Column(name = "show_as_bullet_in_article")
+    @Getter
+    @Setter
+    private Boolean showAsBulletInArticle = false;
+
     @Transient @Getter @Setter private MultipartFile uploadPictureProxy;
 
     @Transient @Getter @Setter private String testingParent;
