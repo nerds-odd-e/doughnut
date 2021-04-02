@@ -66,7 +66,7 @@ class TestabilityRestController {
 
         for (NoteContentEntity content : noteContents) {
             NoteEntity note = new NoteEntity();
-            note.setNoteContent(content);
+            note.mergeNoteContent(content);
             earlyNotes.put(content.getTitle(), note);
             noteList.add(note);
             note.setOwnershipEntity(userModel.getEntity().getOwnershipEntity());

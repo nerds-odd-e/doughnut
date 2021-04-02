@@ -30,12 +30,10 @@ public class NoteEntity {
     @Embedded
     @Valid
     @Getter
-    @Setter
     private NoteContentEntity noteContent = new NoteContentEntity();
 
     @Column(name = "sibling_order")
     @Getter
-    @Setter
     private Long siblingOrder = SiblingOrder.getGoodEnoughOrderNumber();
 
     @ManyToOne(cascade = CascadeType.PERSIST)
@@ -215,6 +213,10 @@ public class NoteEntity {
 
     public void updateNoteContent(NoteContentEntity noteContentEntity, UserEntity userEntity) throws IOException {
         noteContentEntity.fetchUploadedPicture(userEntity);
+        mergeNoteContent(noteContentEntity);
+    }
+
+    public void mergeNoteContent(NoteContentEntity noteContentEntity) {
         if(noteContentEntity.getUploadPicture() == null) {
             noteContentEntity.setUploadPicture(getNoteContent().getUploadPicture());
         }
@@ -223,13 +225,13 @@ public class NoteEntity {
 
     public NoteEntity getPreviousSibling() {
         return getSiblings().stream()
-                .filter(nc->nc.getSiblingOrder() < getSiblingOrder())
+                .filter(nc -> nc.siblingOrder < siblingOrder)
                 .reduce((f, s)-> s).orElse(null);
     }
 
     public NoteEntity getNextSibling() {
         return getSiblings().stream()
-                .filter(nc->nc.getSiblingOrder() > getSiblingOrder())
+                .filter(nc -> nc.siblingOrder > siblingOrder)
                 .findFirst().orElse(null);
     }
 
@@ -269,17 +271,17 @@ public class NoteEntity {
 
     private long getSiblingOrderToInsertBehindMe() {
         NoteEntity nextSiblingNote = getNextSibling();
-        Long relativeToSiblingOrder = getSiblingOrder();
+        Long relativeToSiblingOrder = siblingOrder;
         if (nextSiblingNote == null) {
             return relativeToSiblingOrder + SiblingOrder.MINIMUM_SIBLING_ORDER_INCREMENT;
         }
-        return (relativeToSiblingOrder + nextSiblingNote.getSiblingOrder()) / 2;
+        return (relativeToSiblingOrder + nextSiblingNote.siblingOrder) / 2;
     }
 
     private Long getSiblingOrderToBecomeMyFirstChild() {
         NoteEntity firstChild = getFirstChild();
         if (firstChild != null) {
-            return firstChild.getSiblingOrder() - SiblingOrder.MINIMUM_SIBLING_ORDER_INCREMENT;
+            return firstChild.siblingOrder - SiblingOrder.MINIMUM_SIBLING_ORDER_INCREMENT;
         }
         return null;
     }
@@ -289,5 +291,12 @@ public class NoteEntity {
             return getSiblingOrderToInsertBehindMe();
         }
         return getSiblingOrderToBecomeMyFirstChild();
+    }
+
+    public void updateSiblingOrder(NoteEntity relativeToNote, boolean asFirstChildOfNote) {
+        Long newSiblingOrder = relativeToNote.theSiblingOrderItTakesToMoveRelativeToMe(asFirstChildOfNote);
+        if (newSiblingOrder != null) {
+            siblingOrder = newSiblingOrder;
+        }
     }
 }

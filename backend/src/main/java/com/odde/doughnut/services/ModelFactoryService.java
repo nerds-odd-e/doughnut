@@ -38,7 +38,8 @@ public class ModelFactoryService {
     }
 
     public NoteMotionModel toNoteMotionModel(NoteMotionEntity noteMotionEntity, NoteEntity noteEntity) {
-        return new NoteMotionModel(noteMotionEntity, noteEntity, this);
+        noteMotionEntity.setSubject(noteEntity);
+        return new NoteMotionModel(noteMotionEntity, this);
     }
 
     public BazaarModel toBazaarModel() {

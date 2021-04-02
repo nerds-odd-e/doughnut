@@ -8,24 +8,16 @@ import com.odde.doughnut.services.ModelFactoryService;
 import java.util.ArrayList;
 
 public class NoteMotionModel extends ModelForEntity<NoteMotionEntity>{
-    private final NoteEntity subject;
 
-    public NoteMotionModel(NoteMotionEntity noteMotionEntity, NoteEntity subject, ModelFactoryService modelFactoryService) {
+    public NoteMotionModel(NoteMotionEntity noteMotionEntity, ModelFactoryService modelFactoryService) {
         super(noteMotionEntity, modelFactoryService);
-        this.subject = subject;
     }
 
     public void execute() throws CyclicLinkDetectedException {
-        if(entity.getRelativeToNote().getAncestors().contains(subject)) {
-            throw new CyclicLinkDetectedException();
-        }
-        updateAncestors(subject, entity.getNewParent());
-        Long newSiblingOrder = entity.getRelativeToNote().theSiblingOrderItTakesToMoveRelativeToMe(entity.isAsFirstChildOfNote());
-        if (newSiblingOrder != null) {
-            subject.setSiblingOrder(newSiblingOrder);
-        }
-        modelFactoryService.noteRepository.save(subject);
-        subject.traverseBreadthFirst(desc-> {
+        entity.moveHeadNoteOnly();
+        updateAncestors(entity.getSubject(), entity.getNewParent());
+        modelFactoryService.noteRepository.save(entity.getSubject());
+        entity.getSubject().traverseBreadthFirst(desc-> {
             updateAncestors(desc, desc.getParentNote());
             modelFactoryService.noteRepository.save(desc);
         });
@@ -37,5 +29,4 @@ public class NoteMotionModel extends ModelForEntity<NoteMotionEntity>{
         modelFactoryService.entityManager.flush();
         note.setParentNote(parent);
     }
-
 }
