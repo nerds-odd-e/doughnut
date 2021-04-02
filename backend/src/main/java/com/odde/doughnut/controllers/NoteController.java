@@ -63,7 +63,8 @@ public class NoteController extends ApplicationMvcController  {
     }
 
     @GetMapping("/{noteEntity}")
-    public String showNote(@PathVariable(name = "noteEntity") NoteEntity noteEntity, Model model) {
+    public String showNote(@PathVariable(name = "noteEntity") NoteEntity noteEntity) throws NoAccessRightException {
+        currentUserFetcher.getUser().assertAuthorization(noteEntity);
         return "notes/show";
     }
 

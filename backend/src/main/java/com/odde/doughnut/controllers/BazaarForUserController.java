@@ -7,10 +7,12 @@ import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.models.BazaarModel;
 import com.odde.doughnut.services.ModelFactoryService;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.validation.Valid;
@@ -32,7 +34,8 @@ public class BazaarForUserController extends ApplicationMvcController {
         return "bazaar/add_to_learning";
     }
 
-    @GetMapping("/notes/{noteEntity}/subscribe")
+    @PostMapping("/notes/{noteEntity}/subscribe")
+    @Transactional
     public String createSubscription(@PathVariable(name = "noteEntity") NoteEntity noteEntity, @Valid SubscriptionEntity subscriptionEntity, BindingResult bindingResult, Model model) throws NoAccessRightException {
         if (bindingResult.hasErrors()) {
             return "bazaar/add_to_learning";

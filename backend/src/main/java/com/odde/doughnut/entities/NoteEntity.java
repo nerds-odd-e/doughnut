@@ -268,6 +268,13 @@ public class NoteEntity {
         return null;
     }
 
+    public void updateSiblingOrder(NoteEntity relativeToNote, boolean asFirstChildOfNote) {
+        Long newSiblingOrder = relativeToNote.theSiblingOrderItTakesToMoveRelativeToMe(asFirstChildOfNote);
+        if (newSiblingOrder != null) {
+            siblingOrder = newSiblingOrder;
+        }
+    }
+
     private long getSiblingOrderToInsertBehindMe() {
         NoteEntity nextSiblingNote = getNextSibling();
         Long relativeToSiblingOrder = siblingOrder;
@@ -285,17 +292,11 @@ public class NoteEntity {
         return null;
     }
 
-    public Long theSiblingOrderItTakesToMoveRelativeToMe(boolean asFirstChildOfNote) {
+    private Long theSiblingOrderItTakesToMoveRelativeToMe(boolean asFirstChildOfNote) {
         if (!asFirstChildOfNote) {
             return getSiblingOrderToInsertBehindMe();
         }
         return getSiblingOrderToBecomeMyFirstChild();
     }
 
-    public void updateSiblingOrder(NoteEntity relativeToNote, boolean asFirstChildOfNote) {
-        Long newSiblingOrder = relativeToNote.theSiblingOrderItTakesToMoveRelativeToMe(asFirstChildOfNote);
-        if (newSiblingOrder != null) {
-            siblingOrder = newSiblingOrder;
-        }
-    }
 }

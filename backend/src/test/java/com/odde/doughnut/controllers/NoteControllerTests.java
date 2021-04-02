@@ -48,6 +48,16 @@ class NoteControllerTests {
     }
 
     @Nested
+    class showNoteTest {
+        @Test
+        void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
+            UserEntity otherUser = makeMe.aUser().please();
+            NoteEntity note = makeMe.aNote().byUser(otherUser).please();
+            assertThrows(NoAccessRightException.class, ()-> controller.showNote(note));
+        }
+    }
+
+    @Nested
     class createNoteTest {
         @Test
         void shouldBeAbleToSaveNoteWhenValid() throws NoAccessRightException, IOException {
