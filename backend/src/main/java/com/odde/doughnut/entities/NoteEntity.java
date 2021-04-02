@@ -33,7 +33,6 @@ public class NoteEntity {
     private NoteContentEntity noteContent = new NoteContentEntity();
 
     @Column(name = "sibling_order")
-    @Getter
     private Long siblingOrder = SiblingOrder.getGoodEnoughOrderNumber();
 
     @ManyToOne(cascade = CascadeType.PERSIST)
@@ -140,7 +139,7 @@ public class NoteEntity {
         return getParentNote() == null;
     }
 
-    public void addAncestors(List<NoteEntity> ancestors) {
+    private void addAncestors(List<NoteEntity> ancestors) {
         int[] counter = {1};
         ancestors.forEach(anc -> {
             NotesClosureEntity notesClosureEntity = new NotesClosureEntity();

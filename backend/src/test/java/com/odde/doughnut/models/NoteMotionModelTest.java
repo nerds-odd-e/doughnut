@@ -49,19 +49,25 @@ public class NoteMotionModelTest {
     @Test
     void moveBehind() throws CyclicLinkDetectedException {
         move(firstChild, secondChild, false);
-        assertThat(secondChild.getSiblingOrder(), is(lessThan(firstChild.getSiblingOrder())));
+        assertOrder(secondChild, firstChild);
+    }
+
+    private void assertOrder(NoteEntity note1, NoteEntity note2) {
+        NoteEntity parentNote = note1.getParentNote();
+        makeMe.refresh(parentNote);
+        assertThat(parentNote.getChildren(), containsInRelativeOrder(note1, note2));
     }
 
     @Test
     void moveSecondBehindFirst() throws CyclicLinkDetectedException {
         move(secondChild, firstChild, false);
-        assertThat(firstChild.getSiblingOrder(), is(lessThan(secondChild.getSiblingOrder())));
+        assertOrder(firstChild, secondChild);
     }
 
     @Test
     void moveSecondToBeTheFirstSibling() throws CyclicLinkDetectedException {
         move(secondChild, topNote, true);
-        assertThat(secondChild.getSiblingOrder(), is(lessThan(firstChild.getSiblingOrder())));
+        assertOrder(secondChild, firstChild);
     }
 
     @Test
@@ -74,7 +80,7 @@ public class NoteMotionModelTest {
     void moveBothToTheEndInSequence() throws CyclicLinkDetectedException {
         move(firstChild, secondChild, false);
         move(secondChild, firstChild, false);
-        assertThat(firstChild.getSiblingOrder(), is(lessThan(secondChild.getSiblingOrder())));
+        assertOrder(firstChild, secondChild);
     }
 
     @Nested
@@ -123,8 +129,8 @@ public class NoteMotionModelTest {
         @Test
         void moveBetweenSecondAndThird() throws CyclicLinkDetectedException {
             move(firstChild, secondChild, false);
-            assertThat(secondChild.getSiblingOrder(), is(lessThan(firstChild.getSiblingOrder())));
-            assertThat(firstChild.getSiblingOrder(), is(lessThan(thirdChild.getSiblingOrder())));
+            assertOrder(secondChild, firstChild);
+            assertOrder(firstChild, thirdChild);
         }
     }
 

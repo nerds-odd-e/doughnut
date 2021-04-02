@@ -7,7 +7,7 @@ import lombok.Setter;
 public class NoteMotionEntity {
     @Getter @Setter NoteEntity subject;
     @Getter @Setter NoteEntity relativeToNote;
-    @Setter private boolean asFirstChildOfNote;
+    @Getter @Setter private boolean asFirstChildOfNote;
 
     public NoteMotionEntity(NoteEntity relativeToNote, boolean asFirstChildOfNote) {
         this.relativeToNote = relativeToNote;

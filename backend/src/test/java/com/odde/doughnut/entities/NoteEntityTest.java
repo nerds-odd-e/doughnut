@@ -31,9 +31,11 @@ public class NoteEntityTest {
 
     @Test
     void timeOrder() {
-        NoteEntity note1 = makeMe.aNote().inMemoryPlease();
-        NoteEntity note2 = makeMe.aNote().inMemoryPlease();
-        assertThat(note1.getSiblingOrder(), is(lessThan(note2.getSiblingOrder())));
+        NoteEntity parent = makeMe.aNote().please();
+        NoteEntity note1 = makeMe.aNote().under(parent).please();
+        NoteEntity note2 = makeMe.aNote().under(parent).please();
+        makeMe.refresh(parent);
+        assertThat(parent.getChildren(), containsInRelativeOrder(note1, note2));
     }
 
     @Nested
