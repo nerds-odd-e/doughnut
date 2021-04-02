@@ -116,7 +116,7 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
         return this;
     }
 
-    public NoteBuilder withPicture(String picture) {
+    public NoteBuilder pictureUrl(String picture) {
         entity.getNoteContent().setPictureUrl(picture);
         return this;
     }
@@ -129,5 +129,9 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
     public NoteBuilder withNewlyUploadedPicture() {
         entity.getNoteContent().setUploadPictureProxy(makeMe.anUploadedPicture().toMultiplePartFilePlease());
         return this;
+    }
+
+    public void withUploadedPicture() {
+        entity.getNoteContent().setUploadPicture(makeMe.anImage().please());
     }
 }

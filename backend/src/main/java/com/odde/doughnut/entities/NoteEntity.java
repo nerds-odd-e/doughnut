@@ -214,8 +214,11 @@ public class NoteEntity {
     }
 
     public void updateNoteContent(NoteContentEntity noteContentEntity, UserEntity userEntity) throws IOException {
-        setNoteContent(noteContentEntity);
-        noteContent.fetchUploadedPicture(userEntity);
+        noteContentEntity.fetchUploadedPicture(userEntity);
+        if(noteContentEntity.getUploadPicture() == null) {
+            noteContentEntity.setUploadPicture(getNoteContent().getUploadPicture());
+        }
+        BeanUtils.copyProperties(noteContentEntity, getNoteContent());
     }
 
     public NoteEntity getPreviousSibling() {

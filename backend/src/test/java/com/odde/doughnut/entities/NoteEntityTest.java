@@ -41,7 +41,7 @@ public class NoteEntityTest {
 
         @Test
         void useParentPicture() {
-            NoteEntity parent = makeMe.aNote().withPicture("https://img.com/xxx.jpg").inMemoryPlease();
+            NoteEntity parent = makeMe.aNote().pictureUrl("https://img.com/xxx.jpg").inMemoryPlease();
             NoteEntity child = makeMe.aNote().under(parent).useParentPicture().inMemoryPlease();
             assertThat(child.getNotePicture(), equalTo(parent.getNoteContent().getPictureUrl()));
         }

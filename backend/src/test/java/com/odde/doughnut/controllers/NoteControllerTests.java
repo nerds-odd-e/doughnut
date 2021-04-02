@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.entities.NoteContentEntity;
 import com.odde.doughnut.entities.NoteMotionEntity;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.entities.NoteEntity;
@@ -22,7 +23,6 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import javax.persistence.EntityManager;
 import java.io.IOException;
-import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -97,7 +97,15 @@ class NoteControllerTests {
         void shouldAddUploadedPicture() throws NoAccessRightException, IOException {
             makeMe.theNote(note).withNewlyUploadedPicture();
             BindingResult bindingResult = makeMe.successfulBindingResult();
-            String response = controller.updateNote(note, note.getNoteContent(), bindingResult);
+            controller.updateNote(note, note.getNoteContent(), bindingResult);
+            assertThat(note.getNoteContent().getUploadPicture(), is(not(nullValue())));
+        }
+
+        @Test
+        void shouldNotRemoveThePictureIfNoNewPictureInTheUpdate() throws NoAccessRightException, IOException {
+            makeMe.theNote(note).withUploadedPicture();
+            NoteContentEntity newContent = makeMe.aNote().inMemoryPlease().getNoteContent();
+            controller.updateNote(note, newContent, makeMe.successfulBindingResult());
             assertThat(note.getNoteContent().getUploadPicture(), is(not(nullValue())));
         }
 
