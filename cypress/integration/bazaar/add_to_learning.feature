@@ -20,7 +20,8 @@ Feature: Bazaar subscription
   Scenario: subscribe to a note and browse
     Given I've logged in as an existing user
     When I subscribe to note "Shape" in the bazaar, with target of learning 1 notes per day
-    Then I should see readonly note "Shape" in my notes
+    Then I should see I've subscribed to "Shape"
+    And I should see readonly note "Shape" in my notes
 
   Scenario: subscribe to a note and review
     Given I've logged in as an existing user

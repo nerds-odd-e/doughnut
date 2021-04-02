@@ -19,12 +19,17 @@ import javax.validation.Valid;
 
 @Controller
 @RequestMapping("/subscriptions")
-public class BazaarForUserController extends ApplicationMvcController {
+public class SubscriptionController extends ApplicationMvcController {
     private final ModelFactoryService modelFactoryService;
 
-    public BazaarForUserController(CurrentUserFetcher currentUserFetcher, ModelFactoryService modelFactoryService) {
+    public SubscriptionController(CurrentUserFetcher currentUserFetcher, ModelFactoryService modelFactoryService) {
         super(currentUserFetcher);
         this.modelFactoryService = modelFactoryService;
+    }
+
+    @GetMapping("/{subscriptionEntity}")
+    public String show(@PathVariable(name = "subscriptionEntity") SubscriptionEntity subscriptionEntity) {
+        return "subscriptions/show";
     }
 
     @GetMapping("/notes/{noteEntity}/add_to_learning")

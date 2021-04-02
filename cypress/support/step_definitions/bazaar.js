@@ -70,4 +70,9 @@ Then("I should see readonly note {string} in my notes", (noteTitle) => {
   cy.findNoteCardButton(noteTitle, ".edit-card").should("not.exist");
 });
 
+Then("I should see I've subscribed to {string}", (noteTitle) => {
+  cy.findByText(noteTitle).should("be.visible");
+});
+
+
 

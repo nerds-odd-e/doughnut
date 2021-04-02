@@ -1,5 +1,3 @@
-<a th:fragment="noteTitleWithBazaarLink(note)" th:href="'/bazaar/notes/' + ${note.id}" th:text="${note.title}"/>
-
 <div th:fragment="noteSubscriptionCards(subscriptions)"  th:replace="_fragments/note_fragments::noteCardWithHeaderAndButton(
          notes=${subscriptions},
          bodyButton=~{},
@@ -10,5 +8,14 @@
 </div>
 
 <div th:fragment="subscriptionNoteButtons(note)" class="btn-group btn-group-sm">
+</div>
+
+<lid th:fragment="noteSubscriptionBreadcrumb(untilNote, additional)" th:replace="_fragments/note_fragments::noteBreadcrumb(
+         topLink=~{:: .b-top-link},
+         ancestors=${untilNote.ancestors},
+         additional=${additional},
+         linkFragment='_fragments/bazaar_fragments::noteTitleWithBazaarLink'
+         )">
+    <li class="breadcrumb-item b-top-link"><a href="/notes">Subscriptions</a></lid>
 </div>
 
