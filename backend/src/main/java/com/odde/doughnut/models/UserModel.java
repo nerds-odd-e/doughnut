@@ -10,7 +10,7 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class UserModel extends ModelForEntity<UserEntity> {
+public class UserModel extends ModelForEntity<UserEntity> implements ReviewScope {
     public UserModel(UserEntity userEntity, ModelFactoryService modelFactoryService) {
         super(userEntity, modelFactoryService);
     }
@@ -71,14 +71,17 @@ public class UserModel extends ModelForEntity<UserEntity> {
         return linkableNotes;
     }
 
+    @Override
     public List<NoteEntity> getNotesHaveNotBeenReviewedAtAll() {
         return modelFactoryService.noteRepository.findByUserWhereThereIsNoReviewPoint(entity.getId());
     }
 
+    @Override
     public int getNotesHaveNotBeenReviewedAtAllCount() {
         return modelFactoryService.noteRepository.countByUserWhereThereIsNoReviewPoint(entity.getId());
     }
 
+    @Override
     public List<LinkEntity> getLinksHaveNotBeenReviewedAtAll() {
         return modelFactoryService.linkRepository.findByUserWhereThereIsNoReviewPoint(entity.getId());
     }

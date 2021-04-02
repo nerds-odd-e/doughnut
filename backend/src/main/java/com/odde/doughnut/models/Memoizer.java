@@ -5,8 +5,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
 public class Memoizer {
-    private final Map<String, Integer> cache = new ConcurrentHashMap<>();
-    public int call(String toRepeatCount, Supplier<Integer> getToRepeatCount) {
-        return cache.computeIfAbsent(toRepeatCount, (a)->{return getToRepeatCount.get();});
+    private final Map<String, Object> cache = new ConcurrentHashMap<>();
+    public <T> T call(String name, Supplier<T> method) {
+        return (T) cache.computeIfAbsent(name, (a)->{return method.get();});
     }
 }

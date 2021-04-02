@@ -22,7 +22,6 @@ Feature: Bazaar subscription
     When I subscribe to note "Shape" in the bazaar, with target of learning 1 notes per day
     Then I should see readonly note "Shape" in my notes
 
-    @ignore
   Scenario: subscribe to a note and review
     Given I've logged in as an existing user
     And there are some notes for the current user
@@ -30,5 +29,5 @@ Feature: Bazaar subscription
       | My memo |
     And my daily new notes to review is set to 2
     When I subscribe to note "Shape" in the bazaar, with target of learning 1 notes per day
-    Then On day 1 I repeat old "end                 " and initial review new "Shape, My memo, end  "
-    And  On day 2 I repeat old "Shape, My memo, end " and initial review new "Square, Triangle, end"
+    Then On day 1 I repeat old "end                  " and initial review new "Square, My memo, end"
+    And  On day 2 I repeat old "Square, My memo, end " and initial review new "Triangle, end       "

@@ -53,7 +53,7 @@ When("I go to the bazaar", () => {
 When("I subscribe to note {string} in the bazaar, with target of learning {int} notes per day", (noteTitle, count) => {
   cy.visit("/bazaar");
   cy.findNoteCardButton(noteTitle, ".add-to-learning").click();
-  cy.get("#subscription-dailyTargetOfNewNotes").type(count);
+  cy.get("#subscription-dailyTargetOfNewNotes").clear().type(count);
   cy.findByRole('button', {name: "Add to my learning"}).click();
 });
 

@@ -8,7 +8,8 @@ import com.odde.doughnut.services.ModelFactoryService;
 
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Optional;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class Reviewing {
     private final UserModel userModel;
@@ -27,12 +28,16 @@ public class Reviewing {
         if (count == 0) {
             return null;
         }
-        return getOneNewReviewPointEntity();
+        List<Integer> initialReviewedNotesOfToday = getNewReviewPointEntitiesOfToday().stream().map(rp -> rp.getSourceNote().getId()).collect(Collectors.toUnmodifiableList());
+        return userModel.entity.getSubscriptionEntities().stream().map(modelFactoryService::toSubscriptionModel)
+        .filter(sub->{
+           return sub.needToLearnMoreToday(initialReviewedNotesOfToday);
+        }).map(this::getOneNewReviewPointEntity).filter(Objects::nonNull).findFirst().orElse(getOneNewReviewPointEntity(userModel));
     }
 
-    private ReviewPointEntity getOneNewReviewPointEntity() {
-        NoteEntity noteEntity = getOneFreshNoteToReview().orElse(null);
-        LinkEntity linkEntity = getOneFreshLinkToReview().orElse(null);
+    private ReviewPointEntity getOneNewReviewPointEntity(ReviewScope reviewScope) {
+        NoteEntity noteEntity = reviewScope.getNotesHaveNotBeenReviewedAtAll().stream().findFirst().orElse(null);
+        LinkEntity linkEntity = reviewScope.getLinksHaveNotBeenReviewedAtAll().stream().findFirst().orElse(null);
 
         if (noteEntity == null && linkEntity == null) {
             return null;
@@ -83,18 +88,19 @@ public class Reviewing {
         return Math.min(remainingDailyNewNotesCount(), notLearntCount());
     }
 
-    private Optional<NoteEntity> getOneFreshNoteToReview() {
-        return userModel.getNotesHaveNotBeenReviewedAtAll().stream().findFirst();
-    }
-
-    private Optional<LinkEntity> getOneFreshLinkToReview() {
-        return userModel.getLinksHaveNotBeenReviewedAtAll().stream().findFirst();
-    }
-
     public int remainingDailyNewNotesCount() {
-        Timestamp oneDayAgo = TimestampOperations.addDaysToTimestamp(currentUTCTimestamp, -1);
-        long sameDayCount = userModel.getRecentReviewPoints(oneDayAgo).stream().filter(p -> p.isInitialReviewOnSameDay(currentUTCTimestamp, userModel.getTimeZone())).count();
+        long sameDayCount = getNewReviewPointEntitiesOfToday().size();
         return (int) (userModel.entity.getDailyNewNotesCount() - sameDayCount);
+    }
+
+    private List<ReviewPointEntity> getNewReviewPointEntitiesOfToday() {
+        return memoizer.call("getNewReviewPointEntitiesOfToday", this::getNewReviewPointEntitiesOfToday_);
+    }
+
+    private List<ReviewPointEntity> getNewReviewPointEntitiesOfToday_() {
+        Timestamp oneDayAgo = TimestampOperations.addDaysToTimestamp(currentUTCTimestamp, -1);
+        List<ReviewPointEntity> collect = userModel.getRecentReviewPoints(oneDayAgo).stream().filter(p -> p.isInitialReviewOnSameDay(currentUTCTimestamp, userModel.getTimeZone())).collect(Collectors.toUnmodifiableList());
+        return collect;
     }
 
     public ReviewPointModel getOneReviewPointNeedToRepeat(Randomizer randomizer) {
