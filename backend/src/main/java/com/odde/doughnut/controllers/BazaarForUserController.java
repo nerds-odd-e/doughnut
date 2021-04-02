@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import javax.validation.Valid;
 
 @Controller
-@RequestMapping("/bazaar_for_user")
+@RequestMapping("/subscription")
 public class BazaarForUserController extends ApplicationMvcController {
     private final ModelFactoryService modelFactoryService;
 
@@ -46,7 +46,7 @@ public class BazaarForUserController extends ApplicationMvcController {
         subscriptionEntity.setNoteEntity(noteEntity);
         subscriptionEntity.setUserEntity(currentUserFetcher.getUser().getEntity());
         modelFactoryService.entityManager.persist(subscriptionEntity);
-        return "redirect:/notes/" + noteEntity.getId();
+        return "redirect:/subscription/notes/" + noteEntity.getId();
     }
 
 }

@@ -31,13 +31,14 @@ public class NoteController extends ApplicationMvcController  {
 
     @GetMapping("")
     public String myNotes(Model model) {
-        model.addAttribute("notes", currentUserFetcher.getUser().getOwnershipModel().getOrphanedNotes());
+        model.addAttribute("notes", getCurrentUser().getTopLevelNotes());
+        model.addAttribute("subscriptions", getCurrentUser().getEntity().getSubscriptionEntities());
         return "notes/index";
     }
 
     @GetMapping({"/new", "/{parentNote}/new"})
     public String newNote(@PathVariable(name = "parentNote", required = false) NoteEntity parentNote, Model model) throws NoAccessRightException {
-        UserModel userModel = currentUserFetcher.getUser();
+        UserModel userModel = getCurrentUser();
         if (parentNote != null) {
             userModel.assertAuthorization(parentNote);
         }
@@ -52,7 +53,7 @@ public class NoteController extends ApplicationMvcController  {
         if (bindingResult.hasErrors()) {
             return "notes/new";
         }
-        UserModel userModel = currentUserFetcher.getUser();
+        UserModel userModel = getCurrentUser();
         if (parentNote != null) {
             userModel.assertAuthorization(parentNote);
         }
@@ -64,7 +65,7 @@ public class NoteController extends ApplicationMvcController  {
 
     @GetMapping("/{noteEntity}")
     public String showNote(@PathVariable(name = "noteEntity") NoteEntity noteEntity) throws NoAccessRightException {
-        currentUserFetcher.getUser().assertAuthorization(noteEntity);
+        getCurrentUser().assertAuthorization(noteEntity);
         return "notes/show";
     }
 
@@ -76,11 +77,11 @@ public class NoteController extends ApplicationMvcController  {
 
     @PostMapping("/{noteEntity}")
     public String updateNote(@PathVariable(name = "noteEntity") NoteEntity noteEntity, @Valid NoteContentEntity noteContentEntity, BindingResult bindingResult) throws NoAccessRightException, IOException {
-        currentUserFetcher.getUser().assertAuthorization(noteEntity);
+        getCurrentUser().assertAuthorization(noteEntity);
         if (bindingResult.hasErrors()) {
             return "notes/edit";
         }
-        noteEntity.updateNoteContent(noteContentEntity, currentUserFetcher.getUser().getEntity());
+        noteEntity.updateNoteContent(noteContentEntity, getCurrentUser().getEntity());
         modelFactoryService.noteRepository.save(noteEntity);
         return "redirect:/notes/" + noteEntity.getId();
     }
@@ -112,8 +113,8 @@ public class NoteController extends ApplicationMvcController  {
     @PostMapping("/{noteEntity}/move")
     @Transactional
     public String moveNote(NoteEntity noteEntity, NoteMotionEntity noteMotionEntity) throws CyclicLinkDetectedException, NoAccessRightException {
-        currentUserFetcher.getUser().assertAuthorization(noteEntity);
-        currentUserFetcher.getUser().assertAuthorization(noteMotionEntity.getRelativeToNote());
+        getCurrentUser().assertAuthorization(noteEntity);
+        getCurrentUser().assertAuthorization(noteMotionEntity.getRelativeToNote());
         modelFactoryService.toNoteMotionModel(noteMotionEntity, noteEntity).execute();
         return "redirect:/notes/" + noteEntity.getId();
     }
@@ -121,7 +122,7 @@ public class NoteController extends ApplicationMvcController  {
     @PostMapping(value = "/{noteEntity}/delete")
     @Transactional
     public RedirectView deleteNote(@PathVariable("noteEntity") NoteEntity noteEntity) throws NoAccessRightException {
-        currentUserFetcher.getUser().assertAuthorization(noteEntity);
+        getCurrentUser().assertAuthorization(noteEntity);
         modelFactoryService.toTreeNodeModel(noteEntity).destroy();
         return new RedirectView("/notes");
     }
@@ -142,7 +143,7 @@ public class NoteController extends ApplicationMvcController  {
         if (bindingResult.hasErrors()) {
             return "notes/edit_review_setting";
         }
-        currentUserFetcher.getUser().assertAuthorization(noteEntity);
+        getCurrentUser().assertAuthorization(noteEntity);
         noteEntity.mergeMasterReviewSetting(reviewSettingEntity);
         modelFactoryService.noteRepository.save(noteEntity);
 
@@ -151,10 +152,13 @@ public class NoteController extends ApplicationMvcController  {
 
     @PostMapping(value = "/{note}/share")
     public RedirectView shareNote(@PathVariable("note") NoteEntity note) throws NoAccessRightException {
-        currentUserFetcher.getUser().assertAuthorization(note);
+        getCurrentUser().assertAuthorization(note);
         BazaarModel bazaar = modelFactoryService.toBazaarModel();
         bazaar.shareNote(note);
         return new RedirectView("/notes");
     }
 
+    private UserModel getCurrentUser() {
+        return currentUserFetcher.getUser();
+    }
 }

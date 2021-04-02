@@ -124,4 +124,7 @@ public class UserModel extends ModelForEntity<UserEntity> {
         return modelFactoryService.toOwnershipModel(entity.getOwnershipEntity());
     }
 
+    public List<NoteEntity> getTopLevelNotes() {
+        return getOwnershipModel().getOrphanedNotes();
+    }
 }

@@ -65,15 +65,9 @@ Then("I should see the {string} button on note {string}", (btnClass, noteTitle) 
   cy.findNoteCardButton(noteTitle, "." + btnClass).should("exist");
 });
 
-
-
-
-
-
-
-
-
-
-
+Then("I should see readonly note {string} in my notes", (noteTitle) => {
+  cy.visit("/notes");
+  cy.findNoteCardButton(noteTitle, ".edit-card").should("not.exist");
+});
 
 

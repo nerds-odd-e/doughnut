@@ -17,7 +17,6 @@ Feature: Bazaar subscription
     When I open the note "Shape" in the Bazaar
     Then I should not see the "add-to-learning" button on note "Square"
 
-    @ignore
   Scenario: subscribe to a note and browse
     Given I've logged in as an existing user
     When I subscribe to note "Shape" in the bazaar, with target of learning 1 notes per day

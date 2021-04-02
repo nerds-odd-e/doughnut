@@ -29,4 +29,11 @@ public class SubscriptionEntity {
     @JoinColumn(name = "note_id", referencedColumnName = "id")
     @Getter @Setter private NoteEntity noteEntity;
 
+    public String getTitle() {
+        return noteEntity.getTitle();
+    }
+
+    public NoteContentEntity getNoteContent() {
+        return noteEntity.getNoteContent();
+    }
 }

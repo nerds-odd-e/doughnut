@@ -4,5 +4,7 @@
         <h2>Top Level Notes</h2>
         <p> <a class="nav-link" href="/notes/new">Add Top Level Note</a> </p>
         <div th:replace="_fragments/note_fragments :: noteOwnerViewCards(${notes})"/>
+        <h2>Subscribed Notes</h2>
+        <div th:replace="_fragments/subscription_fragments :: noteSubscriptionCards(${subscriptions})"/>
     </div>
 </layout>

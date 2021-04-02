@@ -5,7 +5,7 @@
             <li class="breadcrumb-item additional-item" th:text="${noteEntity.title}"/>
         </div>
 
-        <form action="#" th:action="@{/bazaar_for_user/notes/{id}/subscribe(id=${noteEntity.id})}" th:object="${subscriptionEntity}" method="post">
+        <form action="#" th:action="@{/subscription/notes/{id}/subscribe(id=${noteEntity.id})}" th:object="${subscriptionEntity}" method="post">
             <input type="hidden" th:value="*{noteEntity}"/>
             <div th:replace="_fragments/forms :: textInput('subscription', 'dailyTargetOfNewNotes', null, true)"/>
             <input type="submit" value="Add to my learning" class="btn btn-primary"/>

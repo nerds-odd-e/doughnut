@@ -50,6 +50,11 @@ public class UserEntity {
     @Getter
     private final List<CircleEntity> circles = new ArrayList<>();
 
+    @OneToMany(mappedBy = "userEntity", cascade = CascadeType.DETACH)
+    @JsonIgnore
+    @Getter
+    private final List<SubscriptionEntity> subscriptionEntities = new ArrayList<>();
+
     public UserEntity() {
         ownershipEntity.setUserEntity(this);
     }

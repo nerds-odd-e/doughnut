@@ -22,7 +22,7 @@
 <div th:fragment="bazaarNoteButtons(note)" class="btn-group btn-group-sm">
     <a
             th:if="${note.isHead()}"
-            class="btn btn-sm add-to-learning" th:href="@{/bazaar_for_user/notes/{id}/add_to_learning(id=${note.id})}" title="Add to my learning">
+            class="btn btn-sm add-to-learning" th:href="@{/subscription/notes/{id}/add_to_learning(id=${note.id})}" title="Add to my learning">
         <svg th:replace="_fragments/svgs :: add"/>
     </a>
 </div>
