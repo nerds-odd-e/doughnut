@@ -22,6 +22,7 @@ import javax.validation.Valid;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.matchesPattern;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -52,7 +53,7 @@ class BazaarForUserControllerTest {
                 topNote,
                 subscriptionEntity,
                 makeMe.successfulBindingResult(), model);
-        assertEquals("redirect:/notes/" + topNote.getId(), result);
+        assertThat(result, matchesPattern("redirect:/subscriptions/\\d+"));
         assertEquals(topNote, subscriptionEntity.getNoteEntity());
         assertEquals(userModel.getEntity(), subscriptionEntity.getUserEntity());
     }
@@ -64,7 +65,7 @@ class BazaarForUserControllerTest {
                 topNote,
                 subscriptionEntity,
                 makeMe.failedBindingResult(), model);
-        assertEquals("bazaar/add_to_learning", result);
+        assertEquals("subscriptions/add_to_learning", result);
     }
 
     @Test

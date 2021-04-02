@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import javax.validation.Valid;
 
 @Controller
-@RequestMapping("/subscription")
+@RequestMapping("/subscriptions")
 public class BazaarForUserController extends ApplicationMvcController {
     private final ModelFactoryService modelFactoryService;
 
@@ -31,14 +31,14 @@ public class BazaarForUserController extends ApplicationMvcController {
     public String addToLearning(@PathVariable(name = "noteEntity") NoteEntity noteEntity, Model model) {
         SubscriptionEntity subscriptionEntity = new SubscriptionEntity();
         model.addAttribute("subscriptionEntity", subscriptionEntity);
-        return "bazaar/add_to_learning";
+        return "subscriptions/add_to_learning";
     }
 
     @PostMapping("/notes/{noteEntity}/subscribe")
     @Transactional
     public String createSubscription(@PathVariable(name = "noteEntity") NoteEntity noteEntity, @Valid SubscriptionEntity subscriptionEntity, BindingResult bindingResult, Model model) throws NoAccessRightException {
         if (bindingResult.hasErrors()) {
-            return "bazaar/add_to_learning";
+            return "subscriptions/add_to_learning";
         }
         if (modelFactoryService.bazaarNoteRepository.findByNoteId(noteEntity.getId()) == null) {
             throw new NoAccessRightException();
@@ -46,7 +46,7 @@ public class BazaarForUserController extends ApplicationMvcController {
         subscriptionEntity.setNoteEntity(noteEntity);
         subscriptionEntity.setUserEntity(currentUserFetcher.getUser().getEntity());
         modelFactoryService.entityManager.persist(subscriptionEntity);
-        return "redirect:/subscription/notes/" + noteEntity.getId();
+        return "redirect:/subscriptions/" + subscriptionEntity.getId();
     }
 
 }
