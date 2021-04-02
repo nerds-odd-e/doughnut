@@ -195,7 +195,7 @@ git secret killperson <user_to_be_removed_email>@odd-e.com
 - Decrypt secrets to local filesystem: `git secret reveal`
 - Decrypt secrets to stdout: `git secret cat`
 
-### 5. Create gcloud compute instance
+### 5. Interacting with gcloud CLI for cloud infrastructure management
 
 - [Install `Google Cloud SDK`](https://cloud.google.com/sdk/docs/install)
 - [Create App Server in GCloud Compute](infra/scripts/create-gcloud-app-compute.sh)
@@ -204,32 +204,7 @@ git secret killperson <user_to_be_removed_email>@odd-e.com
 - Set/Point to gcloud dough project: `gcloud config set project carbon-syntax-298809`
 - Check you can see the project as login user: `gcloud config list`
 
-### 6. View doughnut app instance startup logs
-
-```
-infra/scripts/view-doughnut-app-instance-logs.sh
-```
-
-### 7. Shutdown running gcloud compute instance VMs (does not include Google Cloud SQL)
-
-```
-infra/scripts/stop-gcloud-doughnut-compute-instances.sh
-```
-
-### 8. Build/Refresh base image used to spawn doughnut app compute instance VM
-
-```
-cd infra
-PACKER_LOGS=1 packer build packer.json`
-```
-
-### 9. Check gcloud compute instance startup logs
-
-```
-gcloud compute instances get-serial-port-output doughnut-app-instance --zone us-east1-b
-```
-
-### 10. End-to-End Test / Features / Cucumber / SbE / ATDD
+### 6. End-to-End Test / Features / Cucumber / SbE / ATDD
 
 We use cucumber + cypress + Java library to do end to end test.
 
@@ -258,7 +233,7 @@ The Cypress+Cucumber tests are written in JavaScript.
 - [Cucumber](https://cucumber.io/)
 - [cypress-cucumber-preprocessor](https://github.com/TheBrainFamily/cypress-cucumber-preprocessor)
 
-### 11, Building/refreshing doughnut-app-instance VM base image with Packer + GoogleCompute builder
+### 7, Building/refreshing doughnut-app MIG VM instance/s base image with Packer + GoogleCompute builder
 
 We use packer + googlecompute builder + shell provisioner to construct and materialise base VM image to speed up deployment and control our OS patches and dependent packages and libraries upgrades
 
@@ -282,11 +257,11 @@ PACKER_LOG=1 packer build packer.json
 Expect to see following log line towards end of Packer build stdout log:
 `--> googlecompute: A disk image was created: doughnut-debian10-mysql80-base-saltstack`
 
-### 12. [Product Backlog](https://docs.google.com/spreadsheets/d/1_GofvpnV1tjy2F_aaoOiYTZUOO-8t_qf3twIKMQyGV4/edit?ts=600e6711&pli=1#gid=0)
+### 8. [Product Backlog](https://docs.google.com/spreadsheets/d/1_GofvpnV1tjy2F_aaoOiYTZUOO-8t_qf3twIKMQyGV4/edit?ts=600e6711&pli=1#gid=0)
 
 [Story Map](https://miro.com/app/board/o9J_lTB77Mc=/)
 
-### 13. How to Contribute
+### 9. How to Contribute
 
 - We welcome product ideas and code contribution.
 - Collaborate over:
