@@ -12,7 +12,7 @@ env:
 
 jobs:
   unit-e2e-tests-run:
-    name: Unit & E2E tests then Deploy with Healthcheck
+    name: Unit & E2E tests then GCP MIG rolling-update
     runs-on: ubuntu-20.04
     steps:
       - name: Setup MySQL DB Server 8.0
