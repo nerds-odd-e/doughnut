@@ -1,9 +1,6 @@
 package com.odde.doughnut.models;
 
-import com.odde.doughnut.entities.LinkEntity;
-import com.odde.doughnut.entities.NoteEntity;
-import com.odde.doughnut.entities.ReviewPointEntity;
-import com.odde.doughnut.entities.UserEntity;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -94,7 +91,7 @@ public class ReviewingInitialReviewTest {
             @Test
             void shouldNotReturnReviewPointForLinkIfCreatedByOtherPeople() {
                 makeMe.theNote(note2).skipReview().please();
-                makeMe.theNote(note1).byUser(makeMe.aUser().please()).skipReview().linkTo(note2, LinkEntity.LinkType.BELONGS_TO).please();
+                makeMe.theNote(note1).ownership(makeMe.aUser().please()).skipReview().linkTo(note2, LinkEntity.LinkType.BELONGS_TO).please();
                 assertThat(getOneInitialReviewPointEntity(day1), is(nullValue()));
             }
         }
@@ -171,4 +168,23 @@ public class ReviewingInitialReviewTest {
         }
 
     }
+
+    @Nested
+    class NotesInCircle {
+        NoteEntity top;
+        NoteEntity note2;
+
+        @BeforeEach
+        void setup() {
+            CircleEntity please = makeMe.aCircle().hasMember(userModel).please();
+            top = makeMe.aNote().byUser(userModel).inCircle(please).please();
+            makeMe.refresh(userModel);
+        }
+
+        @Test
+        void shouldNotBeReviewed() {
+            assertThat(getOneInitialReviewPointEntity(day1), is(nullValue()));
+        }
+    }
+
 }

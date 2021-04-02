@@ -5,7 +5,6 @@ import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.SubscriptionEntity;
 import com.odde.doughnut.services.ModelFactoryService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class SubscriptionModel extends ModelForEntity<SubscriptionEntity> implements ReviewScope {

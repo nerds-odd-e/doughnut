@@ -1,9 +1,6 @@
 package com.odde.doughnut.testability.builders;
 
-import com.odde.doughnut.entities.LinkEntity;
-import com.odde.doughnut.entities.NoteEntity;
-import com.odde.doughnut.entities.ReviewSettingEntity;
-import com.odde.doughnut.entities.UserEntity;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.EntityBuilder;
@@ -54,7 +51,11 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
     }
 
     public NoteBuilder inCircle(CircleModel circleModel) {
-        entity.setOwnershipEntity(circleModel.getEntity().getOwnershipEntity());
+        return inCircle(circleModel.getEntity());
+    }
+
+    public NoteBuilder inCircle(CircleEntity circleEntity) {
+        entity.setOwnershipEntity(circleEntity.getOwnershipEntity());
         return this;
     }
 
@@ -69,7 +70,7 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
             }
         }
         if (entity.getOwnershipEntity() == null) {
-            entity.setOwnershipEntity(entity.getUserEntity().getOwnershipEntity());
+            ownership(entity.getUserEntity());
         }
 
     }
@@ -130,5 +131,10 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
 
     public void withUploadedPicture() {
         entity.getNoteContent().setUploadPicture(makeMe.anImage().please());
+    }
+
+    public NoteBuilder ownership(UserEntity userEntity) {
+        entity.setOwnershipEntity(userEntity.getOwnershipEntity());
+        return this;
     }
 }

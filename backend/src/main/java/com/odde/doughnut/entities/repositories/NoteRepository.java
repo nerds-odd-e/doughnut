@@ -1,9 +1,7 @@
 package com.odde.doughnut.entities.repositories;
 
-import com.odde.doughnut.entities.NoteContentEntity;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.OwnershipEntity;
-import com.odde.doughnut.entities.UserEntity;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -11,11 +9,11 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface NoteRepository extends CrudRepository<NoteEntity, Integer> {
-    @Query( value = "SELECT note.* from note " + byUserWhereThereIsNoReviewPoint, nativeQuery = true)
-    List<NoteEntity> findByUserWhereThereIsNoReviewPoint(@Param("userId") Integer userId);
+    @Query( value = "SELECT note.* from note " + byOwnershipWhereThereIsNoReviewPoint, nativeQuery = true)
+    List<NoteEntity> findByOwnershipWhereThereIsNoReviewPoint(@Param("userId") Integer userId, @Param("ownershipId") Integer ownershipId);
 
-    @Query( value = "SELECT count(1) as count from note " + byUserWhereThereIsNoReviewPoint, nativeQuery = true)
-    int countByUserWhereThereIsNoReviewPoint(@Param("userId") Integer userId);
+    @Query( value = "SELECT count(1) as count from note " + byOwnershipWhereThereIsNoReviewPoint, nativeQuery = true)
+    int countByOwnershipWhereThereIsNoReviewPoint(@Param("userId") Integer userId, @Param("ownershipId") Integer ownershipId);
 
     @Query(nativeQuery = true, value = "SELECT nt.* from note as nt JOIN ownership os ON nt.ownership_id = os.id LEFT JOIN notes_closure nc ON nt.id=nc.note_id WHERE nc.id is NULL and os.id = :ownership")
     List<NoteEntity> orphanedNotesOf(@Param("ownership") OwnershipEntity ownershipEntity);
@@ -38,8 +36,8 @@ public interface NoteRepository extends CrudRepository<NoteEntity, Integer> {
             + " WHERE note.skip_review IS FALSE "
             + "   AND rp.id IS NULL ";
 
-    String byUserWhereThereIsNoReviewPoint = whereThereIsNoReviewPoint
-                + " AND note.user_id = :userId ";
+    String byOwnershipWhereThereIsNoReviewPoint = whereThereIsNoReviewPoint
+                + " AND note.ownership_id = :ownershipId ";
 
     String joinClosure = " JOIN notes_closure ON notes_closure.note_id = note.id "
             + "   AND notes_closure.ancestor_id = :ancestorId ";
