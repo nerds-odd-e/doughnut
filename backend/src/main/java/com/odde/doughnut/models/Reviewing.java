@@ -10,6 +10,7 @@ import java.sql.Timestamp;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Reviewing {
     private final UserModel userModel;
@@ -33,8 +34,7 @@ public class Reviewing {
             return null;
         }
         List<Integer> initialReviewedNotesOfToday = getNewReviewPointEntitiesOfToday().stream().map(rp -> rp.getSourceNote().getId()).collect(Collectors.toUnmodifiableList());
-        return userModel.entity.getSubscriptionEntities().stream()
-                .map(modelFactoryService::toSubscriptionModel)
+        return getSubscriptionModelStream()
                 .filter(sub-> sub.needToLearnMoreToday(initialReviewedNotesOfToday))
                 .map(this::getOneNewReviewPointEntity)
                 .filter(Objects::nonNull).findFirst().orElseGet(()->getOneNewReviewPointEntity(userModel));
@@ -82,8 +82,7 @@ public class Reviewing {
     }
 
     public int getNotLearntCount_() {
-        Integer subscribedCount = userModel.entity.getSubscriptionEntities().stream()
-                .map(modelFactoryService::toSubscriptionModel)
+        Integer subscribedCount = getSubscriptionModelStream()
                 .map(SubscriptionModel::getNotesHaveNotBeenReviewedAtAllCount)
                 .reduce(Integer::sum).orElse(0);
         return subscribedCount + userModel.getNotesHaveNotBeenReviewedAtAllCount();
@@ -112,8 +111,7 @@ public class Reviewing {
 
     private List<ReviewPointEntity> getNewReviewPointEntitiesOfToday_() {
         Timestamp oneDayAgo = TimestampOperations.addDaysToTimestamp(currentUTCTimestamp, -1);
-        List<ReviewPointEntity> collect = userModel.getRecentReviewPoints(oneDayAgo).stream().filter(p -> p.isInitialReviewOnSameDay(currentUTCTimestamp, userModel.getTimeZone())).collect(Collectors.toUnmodifiableList());
-        return collect;
+        return userModel.getRecentReviewPoints(oneDayAgo).stream().filter(p -> p.isInitialReviewOnSameDay(currentUTCTimestamp, userModel.getTimeZone())).collect(Collectors.toUnmodifiableList());
     }
 
     public ReviewPointModel getOneReviewPointNeedToRepeat(Randomizer randomizer) {
@@ -135,4 +133,9 @@ public class Reviewing {
         }
         return reviewSettingEntity;
     }
+
+    private Stream<SubscriptionModel> getSubscriptionModelStream() {
+        return userModel.entity.getSubscriptionEntities().stream().map(modelFactoryService::toSubscriptionModel);
+    }
+
 }

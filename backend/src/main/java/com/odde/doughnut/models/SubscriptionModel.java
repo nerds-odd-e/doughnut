@@ -25,7 +25,7 @@ public class SubscriptionModel extends ModelForEntity<SubscriptionEntity> implem
 
     @Override
     public List<LinkEntity> getLinksHaveNotBeenReviewedAtAll() {
-        return new ArrayList<>();
+        return modelFactoryService.linkRepository.findByAncestorWhereThereIsNoReviewPoint(entity.getUserEntity().getId(), entity.getNoteEntity().getId());
     }
 
     public boolean needToLearnMoreToday(List<Integer> noteIds) {

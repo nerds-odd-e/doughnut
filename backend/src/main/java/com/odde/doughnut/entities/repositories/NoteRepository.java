@@ -32,10 +32,9 @@ public interface NoteRepository extends CrudRepository<NoteEntity, Integer> {
     @Query( value = "SELECT count(1) as count from note " + joinClosure + " WHERE note.id in :noteIds", nativeQuery = true)
     int countByAncestorAndInTheList(@Param("ancestorId") Integer ancestorId, @Param("noteIds") List<Integer> noteIds);
 
-    String whereThereIsNoReviewPoint = " LEFT JOIN ("
-            + "     SELECT id, note_id FROM review_point WHERE user_id = :userId"
-            + " ) as rp"
+    String whereThereIsNoReviewPoint = " LEFT JOIN review_point rp"
             + " ON note.id = rp.note_id "
+            + "   AND rp.user_id = :userId "
             + " WHERE note.skip_review IS FALSE "
             + "   AND rp.id IS NULL ";
 

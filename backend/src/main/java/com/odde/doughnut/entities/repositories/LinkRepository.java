@@ -13,15 +13,20 @@ public interface LinkRepository extends CrudRepository<LinkEntity, Integer> {
     @Query( value = "SELECT link.* from link " + byUserWhereThereIsNoReviewPoint, nativeQuery = true)
     List<LinkEntity> findByUserWhereThereIsNoReviewPoint(@Param("userId") Integer userId);
 
-    @Query( value = "SELECT count(1) as count from link " + byUserWhereThereIsNoReviewPoint, nativeQuery = true)
-    int countByUserWhereThereIsNoReviewPoint(@Param("userId") Integer userId);
+    @Query( value = "SELECT link.* from link " + byAncestorWhereThereIsNoReviewPoint, nativeQuery = true)
+    List<LinkEntity> findByAncestorWhereThereIsNoReviewPoint(@Param("userId") Integer userId, @Param("ancestorId") Integer ancestorId);
 
-    String byUserWhereThereIsNoReviewPoint = " LEFT JOIN ("
-            + "     SELECT id, link_id FROM review_point WHERE user_id = :userId"
-            + " ) as rp"
+    String whereThereIsNoReviewPoint = " LEFT JOIN review_point rp"
             + " ON link.id = rp.link_id "
+            + "   AND rp.user_id = :userId"
             + " WHERE "
-            + "   link.user_id = :userId AND "
             + "   rp.id IS NULL ";
 
+    String byUserWhereThereIsNoReviewPoint = " JOIN note ON note.id = source_id"
+            + "   AND note.user_id = :userId "
+            + whereThereIsNoReviewPoint;
+
+    String byAncestorWhereThereIsNoReviewPoint = "JOIN notes_closure ON notes_closure.note_id = source_id "
+            + "   AND notes_closure.ancestor_id = :ancestorId "
+            + whereThereIsNoReviewPoint;
 }
