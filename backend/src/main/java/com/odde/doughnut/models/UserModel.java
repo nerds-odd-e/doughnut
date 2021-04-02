@@ -73,17 +73,17 @@ public class UserModel extends ModelForEntity<UserEntity> implements ReviewScope
 
     @Override
     public List<NoteEntity> getNotesHaveNotBeenReviewedAtAll() {
-        return modelFactoryService.noteRepository.findByOwnershipWhereThereIsNoReviewPoint(entity.getId(), entity.getOwnershipEntity().getId());
+        return modelFactoryService.noteRepository.findByOwnershipWhereThereIsNoReviewPoint(entity);
     }
 
     @Override
     public int getNotesHaveNotBeenReviewedAtAllCount() {
-        return modelFactoryService.noteRepository.countByOwnershipWhereThereIsNoReviewPoint(entity.getId(), entity.getOwnershipEntity().getId());
+        return modelFactoryService.noteRepository.countByOwnershipWhereThereIsNoReviewPoint(entity);
     }
 
     @Override
     public List<LinkEntity> getLinksHaveNotBeenReviewedAtAll() {
-        return modelFactoryService.linkRepository.findByOwnershipWhereThereIsNoReviewPoint(entity.getId(), entity.getOwnershipEntity().getId());
+        return modelFactoryService.linkRepository.findByOwnershipWhereThereIsNoReviewPoint(entity);
     }
 
     public List<ReviewPointEntity> getRecentReviewPoints(Timestamp since) {
