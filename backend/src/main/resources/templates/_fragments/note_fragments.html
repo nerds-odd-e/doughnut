@@ -143,19 +143,24 @@
     </p>
 </div>
 
-<div th:fragment="noteShow(noteEntity, level)" th:replace=":: noteShowWithTitle(${noteEntity}, ${level}, ~{:: .note-title-show})">
+<div th:fragment="noteShow(noteEntity, level)"
+     th:replace=":: noteShowWithTitle(${noteEntity}, ${level}, ~{:: .note-title-show})">
     <h2 class="note-title-show" th:class="'h' + ${level}" th:text="${noteEntity.title}"/>
 </div>
 
 <div th:fragment="noteAsArticle(noteEntity, level)">
     <div th:replace=":: noteShowWithTitle(${noteEntity}, ${level}, ~{::.note-title-article})">
-        <h2 class="note-title-article" th:class="'h' + ${level}" th:text="${noteEntity.title}" th:unless="${noteEntity.noteContent.hideTitleInArticle}"/>
+        <h2 class="note-title-article" th:class="'h' + ${level}" th:text="${noteEntity.title}"
+            th:unless="${noteEntity.noteContent.hideTitleInArticle}"/>
         <span class="note-title-article" th:if="${noteEntity.noteContent.hideTitleInArticle}"/>
     </div>
 
-    <div class="" th:each="child:${noteEntity.children}">
-        <div th:replace="_fragments/note_fragments :: noteAsArticle(${child}, ${1 + level})"/>
-    </div>
+    <ul style="padding-left: 0px;">
+        <th:block th:each="child:${noteEntity.children}">
+            <li style="margin-left:25px;" class="article-view" th:if="${child.noteContent.showAsBulletInArticle}" th:insert=" :: noteAsArticle(${child}, ${1 + level})"/>
+            <div th:unless="${child.noteContent.showAsBulletInArticle}" th:insert=" :: noteAsArticle(${child}, ${1 + level})"/>
+        </th:block>
+    </ul>
 </div>
 
 <div th:fragment="reviewSettingForm(reviewSettingEntity)" th:object="${reviewSettingEntity}">

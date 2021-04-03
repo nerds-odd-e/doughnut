@@ -53,7 +53,8 @@ When("I go to the bazaar", () => {
   cy.visit("/bazaar");
 });
 
-When("I should see two bullets in the article", (content) => {
+When("I should see two bullets in the article", () => {
+  cy.get("body").find('li.article-view').should('have.length', 2);
 });
 
 
