@@ -109,8 +109,8 @@
     </a>
 </div>
 
-<div th:fragment="showPicture(noteEntity, opacity)" th:object="${noteEntity}" class="text-center">
-    <div style="position: relative; display: inline-block;" id="note-picture" th:if="*{notePicture}">
+<div th:fragment="showPicture(noteEntity, opacity)" th:object="${noteEntity}" class="text-center" th:if="${noteEntity.notePicture}">
+    <div style="position: relative; display: inline-block;" id="note-picture">
         <img class="img-fluid" th:src="*{notePicture}"/>
         <svg viewBox="0 0 100 100"
              style="  position: absolute; top: 0; left: 0; color: #11f1f1; width: 100%; height: 100%;">
@@ -119,10 +119,10 @@
     </div>
 </div>
 
-<div th:fragment="noteShowWithTitle(noteEntity, level, titleHtml)" th:object="${noteEntity}">
+<div th:fragment="noteShowWithTitle(noteEntity, level, titleHtml, bodyHtml)" th:object="${noteEntity}">
     <div th:object="${noteEntity.noteContent}">
         <h2 th:replace="${titleHtml}"/>
-        <pre class="note-body" th:text="*{displayBody}" style="white-space: pre-wrap;"/>
+        <pre th:replace="${bodyHtml}"/>
         <div th:unless="${#strings.isEmpty(noteEntity.noteContent.url)}">
             <label th:unless="*{urlIsVideo}">Url:</label>
             <label th:if="*{urlIsVideo}">Video Url:</label>
@@ -144,15 +144,17 @@
 </div>
 
 <div th:fragment="noteShow(noteEntity, level)"
-     th:replace=":: noteShowWithTitle(${noteEntity}, ${level}, ~{:: .note-title-show})">
-    <h2 class="note-title-show" th:class="'h' + ${level}" th:text="${noteEntity.noteContent.displayTitle}"/>
+     th:replace=":: noteShowWithTitle(${noteEntity}, ${level}, ~{:: .note-title-show}, ~{:: .note-body-show})">
+    <h2 class="note-title-show" th:class="'h' + ${level}" th:text="${noteEntity.noteContent.title}"/>
+    <pre class="note-body-show note-body" th:text="${noteEntity.noteContent.description}" style="white-space: pre-wrap;"/>
 </div>
 
 <div th:fragment="noteAsArticle(noteEntity, level)">
-    <div th:replace=":: noteShowWithTitle(${noteEntity}, ${level}, ~{::.note-title-article})">
+    <div th:replace=":: noteShowWithTitle(${noteEntity}, ${level}, ~{::.note-title-article}, ~{::.note-body-article})">
         <h2 class="note-title-article" th:class="'h' + ${level}" th:text="${noteEntity.noteContent.displayTitle}"
             th:unless="${noteEntity.noteContent.hideTitleInArticle}"/>
         <span class="note-title-article" th:if="${noteEntity.noteContent.hideTitleInArticle}"/>
+        <pre class="note-body-article note-body" th:text="${noteEntity.noteContent.displayBody}" style="white-space: pre-wrap; margin-bottom: 0;"/>
     </div>
 
     <ul style="padding-left: 0px;">

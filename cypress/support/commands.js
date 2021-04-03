@@ -175,7 +175,7 @@ Cypress.Commands.add("initialReviewOneNoteIfThereIs", ({review_type, title, addi
         switch(review_type) {
         case "single note": {
             if(additional_info) {
-                cy.get('#note-description').should("contain", additional_info);
+                cy.get('.note-body').should("contain", additional_info);
             }
             break;
         }
@@ -183,7 +183,7 @@ Cypress.Commands.add("initialReviewOneNoteIfThereIs", ({review_type, title, addi
         case  "picture note": {
             if(additional_info) {
                 const [expectedDescription, expectedPicture] = additional_info.commonSenseSplit("; ")
-                cy.get('#note-description').should("contain", expectedDescription);
+                cy.get('.note-body').should("contain", expectedDescription);
                 cy.get('#note-picture').find('img').should('have.attr', 'src').should('include',expectedPicture);
             }
             break;
@@ -216,7 +216,7 @@ Cypress.Commands.add("repeatReviewOneNoteIfThereIs", ({review_type, title, addit
         switch(review_type) {
         case "single note": {
             if(additional_info) {
-                cy.get('#note-description').should("contain", additional_info);
+                cy.get('.note-body').should("contain", additional_info);
             }
             break;
         }
