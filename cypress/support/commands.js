@@ -171,7 +171,7 @@ Cypress.Commands.add("initialReviewOneNoteIfThereIs", ({review_type, title, addi
         cy.findByText("You have achieved your daily new notes goal.").should("be.visible");
     }
     else {
-        cy.findByText(title, {selector: '#note-title'})
+        cy.findByText(title, {selector: 'h2'})
         switch(review_type) {
         case "single note": {
             if(additional_info) {
@@ -212,7 +212,7 @@ Cypress.Commands.add("repeatReviewOneNoteIfThereIs", ({review_type, title, addit
         cy.findByText("You have reviewed all the old notes for today.").should("be.visible");
     }
     else {
-        cy.findByText(title, {selector: '#note-title'})
+        cy.findByText(title, {selector: 'h2'})
         switch(review_type) {
         case "single note": {
             if(additional_info) {
