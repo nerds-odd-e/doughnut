@@ -72,14 +72,19 @@ Then("I am learning new note on day {int}", (day) => {
     cy.visit('/reviews/initial');
 });
 
+Then("I have selected the option {string} in review setting", (option) => {
+    cy.getFormControl(option).check();
+    cy.findByRole('button', {name: 'Update'}).click();
+});
+
 Then("I have selected the option {string}", (option) => {
     cy.getFormControl(option).check();
-    cy.get('form#review-setting').submit();
+    cy.findByRole('button', {name: 'Keep for repetition'}).click();
 });
 
 Then("I have unselected the option {string}", (option) => {
     cy.getFormControl(option).uncheck();
-    cy.get('form#review-setting').submit();
+    cy.findByRole('button', {name: 'Keep for repetition'}).click();
 });
 
 Then("I should see the option {string} is {string}", (option, status) => {
