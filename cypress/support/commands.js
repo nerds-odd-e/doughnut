@@ -203,7 +203,7 @@ Cypress.Commands.add("initialReviewOneNoteIfThereIs", ({review_type, title, addi
             expect(review_type).equal("a known review page type");
         }
 
-        cy.findByText("Next").click();
+        cy.findByText("Keep for repetition").click();
     }
 });
 

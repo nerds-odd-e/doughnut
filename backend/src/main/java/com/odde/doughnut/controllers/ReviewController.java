@@ -54,11 +54,21 @@ public class ReviewController extends ApplicationMvcController  {
         return "reviews/initial";
     }
 
-    @PostMapping("")
+    @PostMapping(path="", params="submit")
     @Transactional
     public String create(@Valid ReviewPointEntity reviewPointEntity, @Valid ReviewSettingEntity reviewSettingEntity) {
         UserModel userModel = currentUserFetcher.getUser();
         ReviewPointModel reviewPointModel = modelFactoryService.toReviewPointModel(reviewPointEntity);
+        reviewPointModel.initialReview(userModel, reviewSettingEntity, timeTraveler.getCurrentUTCTimestamp());
+        return "redirect:/reviews/initial";
+    }
+
+    @PostMapping(path="", params="skip")
+    @Transactional
+    public String skip(@Valid ReviewPointEntity reviewPointEntity, @Valid ReviewSettingEntity reviewSettingEntity) {
+        UserModel userModel = currentUserFetcher.getUser();
+        ReviewPointModel reviewPointModel = modelFactoryService.toReviewPointModel(reviewPointEntity);
+        reviewPointEntity.setRemovedFromReview(true);
         reviewPointModel.initialReview(userModel, reviewSettingEntity, timeTraveler.getCurrentUTCTimestamp());
         return "redirect:/reviews/initial";
     }

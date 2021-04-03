@@ -26,7 +26,9 @@
                     <div th:replace="_fragments/note_fragments :: reviewSettingForm(${reviewSettingEntity})"/>
                 </div>
             </div>
-            <input type="submit" value="Next" class="btn btn-primary"/>
+            <input type="submit" name="submit" value="Keep for repetition" class="btn btn-primary"/>
+            <input type="submit" name="skip" value="Skip repetition" class="btn btn-secondary"
+               onclick="return confirm('Are you sure to hide this note from reviewing in the future?')">
         </form>
     </div>
 </layout>
