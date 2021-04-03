@@ -132,6 +132,13 @@ public class NoteContentEntity {
         return new ClozeDescription().getClozeDescription(title, description);
     }
 
+    public boolean hasTitleInArticle() {
+        if (Strings.isBlank(description)) {
+            return false;
+        }
+        return hideTitleInArticle;
+    }
+
     public String getDisplayTitle() {
         if (Strings.isBlank(description)) {
             return null;
