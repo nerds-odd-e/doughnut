@@ -87,5 +87,13 @@ Then("I should see I've subscribed to {string}", (noteTitle) => {
   cy.findByText(noteTitle).should("be.visible");
 });
 
+Then("I should be able to edit the subscription to note {string}", (noteTitle) => {
+  cy.visit("/notes");
+  cy.findNoteCardButton(noteTitle, ".edit-subscription").click();
+  cy.findByRole('button', {name: "Update"}).click();
+});
+
+
+
 
 

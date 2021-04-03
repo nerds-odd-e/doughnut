@@ -32,6 +32,21 @@ public class SubscriptionController extends ApplicationMvcController {
         return "subscriptions/show";
     }
 
+    @GetMapping("/{subscriptionEntity}/edit")
+    public String edit(@PathVariable(name = "subscriptionEntity") SubscriptionEntity subscriptionEntity) {
+        return "subscriptions/edit";
+    }
+
+    @PostMapping("/{subscriptionEntity}")
+    @Transactional
+    public String update(@Valid SubscriptionEntity subscriptionEntity, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return "subscriptions/edit";
+        }
+        modelFactoryService.entityManager.persist(subscriptionEntity);
+        return "redirect:/subscriptions/" + subscriptionEntity.getId();
+    }
+
     @GetMapping("/notes/{noteEntity}/add_to_learning")
     public String addToLearning(@PathVariable(name = "noteEntity") NoteEntity noteEntity, Model model) {
         SubscriptionEntity subscriptionEntity = new SubscriptionEntity();

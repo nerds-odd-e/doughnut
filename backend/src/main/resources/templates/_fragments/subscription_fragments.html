@@ -9,7 +9,11 @@
     <div class="s-card-header-buttons" th:replace=":: subscriptionNoteButtons(${note})"/>
 </div>
 
-<div th:fragment="subscriptionNoteButtons(note)" class="btn-group btn-group-sm">
+<div th:fragment="subscriptionNoteButtons(subscription)" class="btn-group btn-group-sm">
+    <a
+            class="btn btn-sm edit-subscription" th:href="@{/subscriptions/{id}/edit(id=${subscription.id})}" title="Edit subscription">
+        <svg th:replace="_fragments/svgs :: edit"/>
+    </a>
 </div>
 
 <lid th:fragment="noteSubscriptionBreadcrumb(untilNote, additional)" th:replace="_fragments/note_fragments::noteBreadcrumb(
@@ -21,3 +25,6 @@
     <li class="breadcrumb-item b-top-link"><a href="/notes">Subscriptions</a></lid>
 </div>
 
+<div th:fragment="subscriptionFormFields(subscriptionEntity)" th:object="${subscriptionEntity}">
+    <div th:replace="_fragments/forms :: textInput('subscription', 'dailyTargetOfNewNotes', null, true)"/>
+</div>

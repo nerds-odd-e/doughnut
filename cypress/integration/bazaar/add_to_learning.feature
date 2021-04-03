@@ -33,3 +33,4 @@ Feature: Bazaar subscription
     Then On day 1 I should have "2/4" note for initial review and "0/0" for repeat
     And  On day 1 I repeat old "end                  " and initial review new "Square, My memo, end"
     And  On day 2 I repeat old "Square, My memo, end " and initial review new "Triangle, end       "
+    And  I should be able to edit the subscription to note "Shape"

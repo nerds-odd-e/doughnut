@@ -7,7 +7,7 @@
 
         <form action="#" th:action="@{/subscriptions/notes/{id}/subscribe(id=${noteEntity.id})}" th:object="${subscriptionEntity}" method="post">
             <input type="hidden" th:value="*{noteEntity}"/>
-            <div th:replace="_fragments/forms :: textInput('subscription', 'dailyTargetOfNewNotes', null, true)"/>
+            <div th:replace="_fragments/subscription_fragments :: subscriptionFormFields(${subscriptionEntity})"/>
             <input type="submit" value="Add to my learning" class="btn btn-primary"/>
         </form>
 
