@@ -132,24 +132,4 @@ public class NoteContentEntity {
         return new ClozeDescription().getClozeDescription(title, description);
     }
 
-    public boolean hasTitleInArticle() {
-        if (Strings.isBlank(description)) {
-            return false;
-        }
-        return hideTitleInArticle;
-    }
-
-    public String getDisplayTitle() {
-        if (Strings.isBlank(description)) {
-            return null;
-        }
-        return title;
-    }
-
-    public String getDisplayBody() {
-        if (Strings.isBlank(description)) {
-            return title;
-        }
-        return description;
-    }
 }

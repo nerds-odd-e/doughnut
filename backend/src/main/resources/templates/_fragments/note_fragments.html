@@ -151,10 +151,10 @@
 
 <div th:fragment="noteAsArticle(noteEntity, level)">
     <div th:replace=":: noteShowWithTitle(${noteEntity}, ${level}, ~{::.note-title-article}, ~{::.note-body-article})">
-        <h2 class="note-title-article" th:class="'h' + ${level}" th:text="${noteEntity.noteContent.displayTitle}"
-            th:unless="${noteEntity.noteContent.hasTitleInArticle}"/>
-        <span class="note-title-article" th:if="${noteEntity.noteContent.hasTitleInArticle}"/>
-        <pre class="note-body-article note-body" th:text="${noteEntity.noteContent.displayBody}" style="white-space: pre-wrap; margin-bottom: 0;"/>
+        <h2 class="note-title-article" th:class="'h' + ${level}" th:text="${noteEntity.articleTitle}"
+            th:if="${noteEntity.hasTitleInArticle}"/>
+        <span class="note-title-article" th:unless="${noteEntity.hasTitleInArticle}"/>
+        <pre class="note-body-article note-body" th:text="${noteEntity.articleBody}" style="white-space: pre-wrap; margin-bottom: 0;"/>
     </div>
 
     <ul style="padding-left: 0px;">

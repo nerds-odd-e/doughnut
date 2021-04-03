@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.algorithms.SiblingOrder;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.logging.log4j.util.Strings;
 import org.hibernate.annotations.WhereJoinTable;
 import org.springframework.beans.BeanUtils;
 
@@ -297,6 +298,31 @@ public class NoteEntity {
             return getSiblingOrderToInsertBehindMe();
         }
         return getSiblingOrderToBecomeMyFirstChild();
+    }
+
+    public boolean hasTitleInArticle() {
+        if (hasNoDescriptionAndChild()) {
+            return false;
+        }
+        return !noteContent.getHideTitleInArticle();
+    }
+
+    public String getArticleTitle() {
+        if (hasNoDescriptionAndChild()) {
+            return null;
+        }
+        return getTitle();
+    }
+
+    public String getArticleBody() {
+        if (hasNoDescriptionAndChild()) {
+            return getTitle();
+        }
+        return noteContent.getDescription();
+    }
+
+    private boolean hasNoDescriptionAndChild() {
+        return Strings.isBlank(noteContent.getDescription()) && children.isEmpty();
     }
 
 }
