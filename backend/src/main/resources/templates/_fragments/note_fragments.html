@@ -122,7 +122,7 @@
 <div th:fragment="noteShowWithTitle(noteEntity, level, titleHtml)" th:object="${noteEntity}">
     <div th:object="${noteEntity.noteContent}">
         <h2 th:replace="${titleHtml}"/>
-        <pre id="note-description" th:text="*{description}" style="white-space: pre-wrap;"/>
+        <pre class="note-body" th:text="*{displayBody}" style="white-space: pre-wrap;"/>
         <div th:unless="${#strings.isEmpty(noteEntity.noteContent.url)}">
             <label th:unless="*{urlIsVideo}">Url:</label>
             <label th:if="*{urlIsVideo}">Video Url:</label>
@@ -145,12 +145,12 @@
 
 <div th:fragment="noteShow(noteEntity, level)"
      th:replace=":: noteShowWithTitle(${noteEntity}, ${level}, ~{:: .note-title-show})">
-    <h2 class="note-title-show" th:class="'h' + ${level}" th:text="${noteEntity.title}"/>
+    <h2 class="note-title-show" th:class="'h' + ${level}" th:text="${noteEntity.noteContent.displayTitle}"/>
 </div>
 
 <div th:fragment="noteAsArticle(noteEntity, level)">
     <div th:replace=":: noteShowWithTitle(${noteEntity}, ${level}, ~{::.note-title-article})">
-        <h2 class="note-title-article" th:class="'h' + ${level}" th:text="${noteEntity.title}"
+        <h2 class="note-title-article" th:class="'h' + ${level}" th:text="${noteEntity.noteContent.displayTitle}"
             th:unless="${noteEntity.noteContent.hideTitleInArticle}"/>
         <span class="note-title-article" th:if="${noteEntity.noteContent.hideTitleInArticle}"/>
     </div>

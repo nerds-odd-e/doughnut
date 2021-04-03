@@ -3,14 +3,15 @@ Feature: Bazaar browsing
 
   Background:
     Given there are some notes for existing user "old_learner"
-      | title        | description                      | testingParent | hideTitleInArticle | showAsBulletInArticle |
-      | Shape        | The form of something            |               | false              | false                 |
-      | Rectangle    | four equal straight sides        | Shape         | false              | false                 |
-      | Triangle     | three sides shape                | Shape         | false              | false                 |
-      | Square       | a square but big                 | Rectangle     | false              | false                 |
-      | In OOP       | a square is not a Rectangle      | Rectangle     | true               | false                 |
-      | interface    | their interfaces are different   | In OOP        | true               | true                  |
-      | precondition | square has stronger precondition | In OOP        | true               | true                  |
+      | title           | description                      | testingParent | hideTitleInArticle | showAsBulletInArticle |
+      | Shape           | The form of something            |               | false              | false                 |
+      | Rectangle       | four equal straight sides        | Shape         | false              | false                 |
+      | Triangle        | three sides shape                | Shape         | false              | false                 |
+      | Square          | a square but big                 | Rectangle     | false              | false                 |
+      | In OOP          | a square is not a Rectangle      | Rectangle     | true               | false                 |
+      | interface       | their interfaces are different   | In OOP        | true               | true                  |
+      | precondition    | square has stronger precondition | In OOP        | true               | true                  |
+      | Shapes are good |                                  | Shape         | false              | false                 |
     And note "Shape" is shared to the Bazaar
 
   Scenario: Browsing as non-user
@@ -33,5 +34,6 @@ Feature: Bazaar browsing
       | h3    | Square   |
     And  I should not see "In OOP" in the article
     And  I should see two bullets in the article
+    And  I should see "Shapes are good" as non-title in the article
 
 #  Scenario: Breadcrumb should be until the share point

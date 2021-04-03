@@ -57,6 +57,10 @@ When("I should see two bullets in the article", () => {
   cy.get("body").find('li.article-view').should('have.length', 2);
 });
 
+When("I should see {string} as non-title in the article", (content) => {
+      cy.findByText(content, {selector: '.note-body'});
+});
+
 
 
 When("I subscribe to note {string} in the bazaar, with target of learning {int} notes per day", (noteTitle, count) => {

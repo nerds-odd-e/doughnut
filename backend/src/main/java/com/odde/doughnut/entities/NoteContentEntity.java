@@ -131,4 +131,18 @@ public class NoteContentEntity {
     public String getClozeDescription() {
         return new ClozeDescription().getClozeDescription(title, description);
     }
+
+    public String getDisplayTitle() {
+        if (Strings.isBlank(description)) {
+            return null;
+        }
+        return title;
+    }
+
+    public String getDisplayBody() {
+        if (Strings.isBlank(description)) {
+            return title;
+        }
+        return description;
+    }
 }
