@@ -1,4 +1,4 @@
-<a th:fragment="noteTitleWithLink(note)" th:href="'/notes/' + ${note.id}" th:text="${note.noteContent.title}"/>
+<a th:fragment="noteTitleWithLink(note)" th:href="'/notes/' + ${note?.id}" th:text="${note?.noteContent?.title}"/>
 <a th:fragment="linkWithHtmlLink(link, note)" th:href="'/links/' + ${link.id}" th:text="${note.noteContent.title}"/>
 
 <div th:fragment="noteBreadcrumb(topLink, ancestors, additional)"

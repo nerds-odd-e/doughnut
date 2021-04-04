@@ -1,6 +1,6 @@
 <div th:fragment="showReviewPoint(reviewPointEntity)" th:object="${reviewPointEntity}">
     <div th:if="*{noteEntity}">
-        <div th:replace="_fragments/note_fragments :: noteOwnerBreadcrumb(*{noteEntity}, ~{})"/>
+        <div th:replace=":: noteBreadcrumbForReview(*{noteEntity})"/>
         <div class="jumbotron py-4 mb-2">
             <div th:replace="_fragments/note_fragments :: noteShow(*{noteEntity}, 1)"/>
         </div>
@@ -12,6 +12,15 @@
                 <span class="link-content badge badge-warning mr-1" th:text="*{type}"/>
             </div>
         </div>
+    </div>
+</div>
+
+<div th:fragment="noteBreadcrumbForReview(untilNote)"
+     th:replace="_fragments/note_fragments ::noteBreadcrumb(~{}, ${untilNote.parentNote?.ancestors},  ~{:: .additional-item-for-review})">
+    <div th:if="${untilNote.parentNote}">
+        <li class="breadcrumb-item additional-item-for-review">
+            <strong th:insert="_fragments/note_fragments :: noteTitleWithLink(${untilNote.parentNote})"/>
+        </li>
     </div>
 </div>
 
