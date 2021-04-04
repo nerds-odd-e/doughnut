@@ -8,11 +8,9 @@
                     <select th:replace="_fragments/forms :: selectControl('link', 'type', ~{:: .options})">
                         <option class="options" th:each="i : ${T(com.odde.doughnut.entities.LinkEntity.LinkType).values()}" th:value="${i.label}" th:text="${i.label}"/>
                     </select>
-                    <input type="submit" value="Update" class="btn btn-primary"/>
-                </form>
-                <form action="#" th:action="@{/links/{id}/delete(id=${linkEntity.id})}" th:object="${linkEntity}" method="post"
-                      onsubmit="return confirm('Are you sure to delete this link?')">
-                    <input type="submit" value="Delete" class="btn btn-danger"/>
+                    <input type="submit" name="submit" value="Update" class="btn btn-primary"/>
+                    <input type="submit" name="delete" value="Delete" class="btn btn-danger"
+                           onclick="return confirm('Are you sure to delete this link?')"/>
                 </form>
             </div>
         </div>

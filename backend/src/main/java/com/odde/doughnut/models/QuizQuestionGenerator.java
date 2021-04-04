@@ -8,6 +8,7 @@ import com.odde.doughnut.services.ModelFactoryService;
 import org.apache.logging.log4j.util.Strings;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class QuizQuestionGenerator {
@@ -22,8 +23,7 @@ public class QuizQuestionGenerator {
     List<QuizQuestion.QuestionType> availableQuestionTypes() {
         List<QuizQuestion.QuestionType> questionTypes = new ArrayList<>();
         if (reviewPointEntity.getLinkEntity() != null) {
-            questionTypes.add(QuizQuestion.QuestionType.LINK_TARGET);
-            questionTypes.add(QuizQuestion.QuestionType.LINK_SOURCE_EXCLUSIVE);
+            Collections.addAll(questionTypes, reviewPointEntity.getLinkEntity().getLinkType().getQuestionTypes());
         }
         else {
             NoteEntity noteEntity = reviewPointEntity.getNoteEntity();

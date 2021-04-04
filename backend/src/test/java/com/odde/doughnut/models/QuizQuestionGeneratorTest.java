@@ -1,5 +1,6 @@
 package com.odde.doughnut.models;
 
+import com.odde.doughnut.entities.LinkEntity;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
@@ -12,37 +13,47 @@ import static com.odde.doughnut.models.QuizQuestion.QuestionType.*;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class QuizQuestionGeneratorTest {
     MakeMe makeMe = new MakeMe();
     private Randomizer randomizer = new NonRandomizer();
+    NoteEntity note = makeMe.aNote().inMemoryPlease();
 
     @Test
     void clozeSelection() {
-        NoteEntity note = makeMe.aNote().inMemoryPlease();
         ReviewPointEntity reviewPoint = makeMe.aReviewPointFor(note).inMemoryPlease();
-        QuizQuestionGenerator generator = new QuizQuestionGenerator(reviewPoint, randomizer);
-        List<QuizQuestion.QuestionType> questionTypes = generator.availableQuestionTypes();
+        List<QuizQuestion.QuestionType> questionTypes = getQuestionTypes(reviewPoint);
         assertThat(questionTypes, contains(CLOZE_SELECTION));
     }
 
     @Test
     void spelling() {
-        NoteEntity note = makeMe.aNote().rememberSpelling().inMemoryPlease();
+        makeMe.theNote(note).rememberSpelling();
         ReviewPointEntity reviewPoint = makeMe.aReviewPointFor(note).inMemoryPlease();
-        QuizQuestionGenerator generator = new QuizQuestionGenerator(reviewPoint, randomizer);
-        List<QuizQuestion.QuestionType> questionTypes = generator.availableQuestionTypes();
+        List<QuizQuestion.QuestionType> questionTypes = getQuestionTypes(reviewPoint);
         assertThat(questionTypes, contains(SPELLING, CLOZE_SELECTION));
     }
 
     @Test
     void linkExclusive() {
-        NoteEntity note1 = makeMe.aNote().inMemoryPlease();
-        NoteEntity note2 = makeMe.aNote().linkTo(note1).inMemoryPlease();
+        NoteEntity note2 = makeMe.aNote().linkTo(note).inMemoryPlease();
         ReviewPointEntity reviewPoint = makeMe.aReviewPointFor(note2.getLinks().get(0)).inMemoryPlease();
-        QuizQuestionGenerator generator = new QuizQuestionGenerator(reviewPoint, randomizer);
-        List<QuizQuestion.QuestionType> questionTypes = generator.availableQuestionTypes();
+        List<QuizQuestion.QuestionType> questionTypes = getQuestionTypes(reviewPoint);
         assertThat(questionTypes, containsInAnyOrder(LINK_TARGET, LINK_SOURCE_EXCLUSIVE));
+    }
+
+    @Test
+    void notAllLinkQuestionAreAvailableToAllLinkTypes() {
+        NoteEntity note2 = makeMe.aNote().linkTo(note, LinkEntity.LinkType.RELATED_TO).inMemoryPlease();
+        ReviewPointEntity reviewPoint = makeMe.aReviewPointFor(note2.getLinks().get(0)).inMemoryPlease();
+        List<QuizQuestion.QuestionType> questionTypes = getQuestionTypes(reviewPoint);
+        assertTrue(questionTypes.isEmpty());
+    }
+
+    private List<QuizQuestion.QuestionType> getQuestionTypes(ReviewPointEntity reviewPoint) {
+        QuizQuestionGenerator generator = new QuizQuestionGenerator(reviewPoint, randomizer);
+        return generator.availableQuestionTypes();
     }
 
 }

@@ -60,7 +60,7 @@ public class LinkController extends ApplicationMvcController  {
         return "redirect:/notes/" + linkEntity.getSourceNote().getId();
     }
 
-    @PostMapping(value = "/{linkEntity}", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    @PostMapping(value = "/{linkEntity}", params="submit", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public String updateLink(@Valid LinkEntity linkEntity, BindingResult bindingResult) throws NoAccessRightException {
         if (bindingResult.hasErrors()) {
             return "links/show";
@@ -70,7 +70,7 @@ public class LinkController extends ApplicationMvcController  {
         return "redirect:/notes/" + linkEntity.getSourceNote().getId();
     }
 
-    @PostMapping(value = "/{linkEntity}/delete", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    @PostMapping(value = "/{linkEntity}", params="delete", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public String deleteLink(@Valid LinkEntity linkEntity) throws NoAccessRightException {
         currentUserFetcher.getUser().assertAuthorization(linkEntity.getSourceNote());
         LinkModel linkModel = modelFactoryService.toLinkModel(linkEntity);

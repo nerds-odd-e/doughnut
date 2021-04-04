@@ -1,35 +1,45 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.odde.doughnut.models.QuizQuestion;
+import com.odde.doughnut.models.QuizQuestion.QuestionType;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
+
+import static com.odde.doughnut.models.QuizQuestion.QuestionType.*;
 
 @Entity
 @Table(name = "link")
 public class LinkEntity {
 
     public enum LinkType {
-        BELONGS_TO("belongs to", "does not belong to"),
-        HAS("has", "does not have"),
-        RELATED_TO("is related to", "is not related to"),
-        OPPOSITE_OF("is the opposite of", "is not the opposite of"),
-        BROUGHT_BY("is brought by", "is not brought by"),
-        AUTHOR_OF("is author of", "is not author of"),
-        SIMILAR_TO("is similar to", "is not simlilr to"),
-        CONFUSE_WITH("confuses with", "does not confuse with");
+        BELONGS_TO("belongs to", "does not belong to", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        HAS("has", "does not have", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        RELATED_TO("is related to", "is not related to", new QuestionType[0]),
+        OPPOSITE_OF("is the opposite of", "is not the opposite of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        BROUGHT_BY("is brought by", "is not brought by", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        AUTHOR_OF("is author of", "is not author of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        USES("uses", "does not use", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        USED_BY("is used by", "is not used by", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        EXAMPLE_OF("is an example of", "is not an example of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        HAS_AS_EXAMPLE("has as example", "does not have as example", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        SIMILAR_TO("is similar to", "is not similar to", new QuestionType[0]),
+        CONFUSE_WITH("confuses with", "does not confuse with", new QuestionType[0]);
 
         public final String label;
         public final String exclusiveQuestion;
+        @Getter
+        private final QuestionType[] questionTypes;
 
-        private LinkType(String label, String exclusiveQuestion) {
+        LinkType(String label, String exclusiveQuestion, QuestionType[] questionTypes) {
             this.label = label;
             this.exclusiveQuestion = exclusiveQuestion;
+            this.questionTypes = questionTypes;
         }
 
         public static LinkType fromString(String text) {
@@ -46,6 +56,10 @@ public class LinkEntity {
             if (this.equals(HAS)) return BELONGS_TO;
             if (this.equals(BROUGHT_BY)) return AUTHOR_OF;
             if (this.equals(AUTHOR_OF)) return BROUGHT_BY;
+            if (this.equals(USES)) return USED_BY;
+            if (this.equals(USED_BY)) return USES;
+            if (this.equals(HAS_AS_EXAMPLE)) return EXAMPLE_OF;
+            if (this.equals(EXAMPLE_OF)) return HAS_AS_EXAMPLE;
             return this;
         }
 
