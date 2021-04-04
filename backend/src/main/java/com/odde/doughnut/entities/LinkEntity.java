@@ -82,10 +82,6 @@ public class LinkEntity {
     @JsonIgnore
     private final List<ReviewPointEntity> reviewPointEntities = new ArrayList<>();
 
-    public String getQuizDescription() {
-        return "`" + getSourceNote().getTitle() + "` " + getType() + ":";
-    }
-
     public LinkType getLinkType() {
         return LinkType.fromString(type);
     }

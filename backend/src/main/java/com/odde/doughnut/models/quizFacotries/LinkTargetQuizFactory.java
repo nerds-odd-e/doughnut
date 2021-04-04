@@ -25,7 +25,7 @@ public class LinkTargetQuizFactory implements QuizQuestionFactory {
 
     @Override
     public String generateInstruction() {
-        return linkEntity.getQuizDescription();
+        return "<mark>" + linkEntity.getSourceNote().getTitle() + "</mark> " + linkEntity.getType() + ":";
     }
 
     @Override

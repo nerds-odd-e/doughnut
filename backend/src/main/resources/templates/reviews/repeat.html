@@ -9,8 +9,7 @@
                  th:text="'Your answer `' + ${answer.answer} + '` is wrong.'"/>
         </div>
 
-        <div th:replace="_fragments/note_fragments :: noteOwnerBreadcrumb(${reviewPointEntity.getSourceNote()}, ~{})"/>
-        <div th:replace="_fragments/note_fragments :: noteShow(${reviewPointEntity.getSourceNote()}, 1)"/>
+        <div th:replace="_fragments/review_fragments :: showReviewPoint(${reviewPointEntity})"/>
 
         <div class="btn-toolbar justify-content-between">
             <div class="btn-group" role="group" aria-label="First group">
