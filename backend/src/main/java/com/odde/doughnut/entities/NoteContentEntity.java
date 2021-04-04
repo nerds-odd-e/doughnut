@@ -129,7 +129,11 @@ public class NoteContentEntity {
     }
 
     public String getClozeDescription() {
-        return new ClozeDescription().getClozeDescription(title, description);
+        return new ClozeDescription(
+                "<mark title='Hidden text that is partially matching the answer'>[..~]</mark>",
+                "<mark title='Hidden text that is matching the answer'>[...]</mark>",
+                "<mark title='Hidden pronunciation'>/.../</mark>"
+        ).getClozeDescription(title, description);
     }
 
 }

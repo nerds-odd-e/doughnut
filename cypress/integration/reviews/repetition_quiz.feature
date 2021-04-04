@@ -26,7 +26,7 @@ Feature: Repetition Quiz
     Given I am learning new note on day 1
     And I have selected the option "rememberSpelling"
     When I am repeat-reviewing my old note on day 2
-    Then I should be asked spelling question "[...] means incite violence"
+    Then I should be asked spelling question "means incite violence"
     When I type my answer "<answer>"
     Then I should see that my answer <result>
 

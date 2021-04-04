@@ -16,7 +16,7 @@
                         <p class="card-text">Do the initial review for your notes. You may try to remember them for the first time. Or, you can mark some as no repetition needed.
                         </p>
                         <a th:if="${reviewing.toInitialReviewCount() > 0}" role="button" class="btn btn-light" href="/reviews/initial"> Start reviewing new notes </a>
-                        <h2  th:unless="${reviewing.toInitialReviewCount() > 0}" class="display-5">You have achieved your daily new notes goal.</h2>
+                        <h2  th:unless="${reviewing.toInitialReviewCount() > 0}" class="">You have achieved your daily new notes goal.</h2>
                     </div>
                 </div>
             </div>
@@ -31,7 +31,7 @@
                     <div class="card-body">
                         <p class="card-text">Using spaced repetition technique, you only need to review the old notes you have learned at the optimal time. </p>
                         <a th:if="${reviewing.toRepeatCount() > 0}" role="button" class="btn btn-light" href="/reviews/repeat"> Start reviewing old notes </a>
-                        <h2  th:unless="${reviewing.toRepeatCount() > 0}" class="display-5">You have reviewed all the old notes for today.</h2>
+                        <h2  th:unless="${reviewing.toRepeatCount() > 0}" class="">You have reviewed all the old notes for today.</h2>
                     </div>
                 </div>
             </div>

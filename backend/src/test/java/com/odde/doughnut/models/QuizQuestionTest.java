@@ -44,7 +44,7 @@ class QuizQuestionTest {
     void useClozeDescription() {
         NoteEntity noteEntity = makeMe.aNote().title("abc").description("abc has 3 letters").please();
         QuizQuestion quizQuestion = getQuizQuestion(noteEntity);
-        assertThat(quizQuestion.getDescription(), equalTo("[...] has 3 letters"));
+        assertThat(quizQuestion.getDescription(), equalTo("<mark title='Hidden text that is matching the answer'>[...]</mark> has 3 letters"));
     }
 
     @Nested
