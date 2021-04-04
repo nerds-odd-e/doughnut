@@ -9,7 +9,7 @@
     <div th:if="*{linkEntity}">
         <div class="jumbotron py-4 mb-2">
             <div th:replace="_fragments/link_fragments :: linkShow(*{linkEntity}, ~{:: .link-content})">
-                <span class="link-content badge badge-warning mr-1" th:text="*{type}"/>
+                <span class="link-content badge badge-light mr-1" th:text="*{type}"/>
             </div>
         </div>
     </div>

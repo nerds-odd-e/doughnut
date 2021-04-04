@@ -28,6 +28,8 @@ public class LinkEntity {
         USED_BY("is used by", "is not used by", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
         EXAMPLE_OF("is an example of", "is not an example of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
         HAS_AS_EXAMPLE("has as example", "does not have as example", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        PRECEDES("precedes", "does not precede", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        SUCCEEDS("succeeds", "does not succeeds", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
         SIMILAR_TO("is similar to", "is not similar to", new QuestionType[0]),
         CONFUSE_WITH("confuses with", "does not confuse with", new QuestionType[0]);
 
@@ -60,6 +62,8 @@ public class LinkEntity {
             if (this.equals(USED_BY)) return USES;
             if (this.equals(HAS_AS_EXAMPLE)) return EXAMPLE_OF;
             if (this.equals(EXAMPLE_OF)) return HAS_AS_EXAMPLE;
+            if (this.equals(PRECEDES)) return SUCCEEDS;
+            if (this.equals(SUCCEEDS)) return PRECEDES;
             return this;
         }
     }
