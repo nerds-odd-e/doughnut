@@ -1,16 +1,21 @@
+<div th:fragment="linkNoteShow(note)">
+    <div th:replace="_fragments/note_fragments :: noteOwnerBreadcrumb(${note}, ~{})"/>
+    <div th:replace="_fragments/note_fragments :: card(${note}, ~{:: .source_btn}, ~{}, ':: noteTitleWithLink')">
+        <button class="source_btn btn btn-sm btn-secondary" data-toggle="collapse" th:data-target="'#note-collapse-' + ${note.id}" aria-expanded="false">
+            Toggle Details
+        </button>
+    </div>
+    <div th:id="'note-collapse-' + ${note.id}" class="collapse" th:insert="_fragments/note_fragments :: noteShow(${note}, 2)"/>
+</div>
+
 <div th:fragment="linkShow(linkEntity, linkContent)" th:object="${linkEntity}">
     <div class="row">
-        <div class="col-12 col-md-4">
-            <div th:replace="_fragments/note_fragments :: noteOwnerBreadcrumb(*{sourceNote}, ~{})"/>
-            <div th:replace="_fragments/note_fragments :: noteShow(*{sourceNote}, 2)"/>
-        </div>
+
+        <div class="col-12 col-md-4" th:insert=":: linkNoteShow(*{sourceNote})"/>
         <div class="col-12 col-md-4 text-center">
             <div th:replace="${linkContent}"/>
         </div>
-        <div class="col-12 col-md-4">
-            <div th:replace="_fragments/note_fragments :: noteOwnerBreadcrumb(*{targetNote}, ~{})"/>
-            <div th:replace="_fragments/note_fragments :: noteShow(*{targetNote}, 2)"/>
-        </div>
+        <div class="col-12 col-md-4" th:insert=":: linkNoteShow(*{targetNote})"/>
     </div>
 </div>
 

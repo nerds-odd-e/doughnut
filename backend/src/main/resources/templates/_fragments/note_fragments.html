@@ -23,17 +23,21 @@
 <div th:fragment="noteOwnerBreadcrumb(untilNote, additional)"
      th:replace="::noteBreadcrumbForOwnOrCircle(${untilNote.ancestors}, ${untilNote.ownershipEntity}, ${additional})"/>
 
+<div th:fragment="card(note, button, cardHeader, linkFragment)">
+    <div class="card">
+        <div th:replace="${cardHeader}"/>
+        <div class="card-body">
+            <h5 th:insert="__${linkFragment}__(${note})" class="card-title"/>
+            <p th:text="${#strings.abbreviate(note.noteContent.description, 50)}"/>
+            <div th:replace="${button}">Put your button here</div>
+        </div>
+    </div>
+</div>
+
 <div th:fragment="cards(notes, button, cardHeader)" th:with="linkFragment=${linkFragment} ?: ':: noteTitleWithLink'">
     <div class="row">
         <div class="col-12 col-sm-6 col-md-4 col-lg-3" th:each="note:${notes}">
-            <div class="card">
-                <div th:replace="${cardHeader}"/>
-                <div class="card-body">
-                    <h5 th:insert="__${linkFragment}__(${note})" class="card-title"/>
-                    <p th:text="${#strings.abbreviate(note.noteContent.description, 50)}"/>
-                    <div th:replace="${button}">Put your button here</div>
-                </div>
-            </div>
+            <div th:replace=":: card(${note}, ${button}, ${cardHeader}, ${linkFragment})"/>
         </div>
     </div>
 </div>
