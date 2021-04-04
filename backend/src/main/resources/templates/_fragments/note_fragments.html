@@ -137,7 +137,7 @@
         <span class="badge badge-warning mr-1" th:each="link:${noteEntity.linksOfTypeThroughDirect(linkType)}">
             <span th:replace=":: linkWithHtmlLink(${link}, ${link.targetNote})"/>
         </span>
-        <span class="badge badge-info mr-1" th:each="link:${noteEntity.linksOfTypeThroughReverse(linkType)}">
+        <span class="badge badge-secondary mr-1" th:each="link:${noteEntity.linksOfTypeThroughReverse(linkType)}">
             <span th:replace=":: linkWithHtmlLink(${link}, ${link.sourceNote})"/>
         </span>
     </p>
