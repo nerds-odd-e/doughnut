@@ -1,7 +1,6 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.odde.doughnut.models.QuizQuestion;
 import com.odde.doughnut.models.QuizQuestion.QuestionType;
 import lombok.Getter;
 import lombok.Setter;
@@ -11,7 +10,8 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.odde.doughnut.models.QuizQuestion.QuestionType.*;
+import static com.odde.doughnut.models.QuizQuestion.QuestionType.LINK_SOURCE_EXCLUSIVE;
+import static com.odde.doughnut.models.QuizQuestion.QuestionType.LINK_TARGET;
 
 @Entity
 @Table(name = "link")
@@ -62,7 +62,6 @@ public class LinkEntity {
             if (this.equals(EXAMPLE_OF)) return HAS_AS_EXAMPLE;
             return this;
         }
-
     }
 
     @Id

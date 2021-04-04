@@ -6,7 +6,7 @@
             <div th:replace="_fragments/note_fragments :: showPicture(${reviewPointEntity.getSourceNote()}, 1)"/>
         </div>
         <div class="quiz-instruction">
-        <pre th:unless="${quizQuestion.isPictureQuestion()}" th:utext="${quizQuestion.getDescription()}"/>
+        <pre style="white-space: pre-wrap;" th:unless="${quizQuestion.isPictureQuestion()}" th:utext="${quizQuestion.getDescription()}"/>
         <h2 th:unless="${#strings.isEmpty(quizQuestion.mainTopic)}" class="text-center" th:text="${quizQuestion.mainTopic}"/>
         </div>
 

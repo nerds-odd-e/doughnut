@@ -126,7 +126,7 @@
 <div th:fragment="noteShowWithTitle(noteEntity, level, titleHtml, bodyHtml)" th:object="${noteEntity}">
     <div th:object="${noteEntity.noteContent}">
         <h2 th:replace="${titleHtml}"/>
-        <pre th:replace="${bodyHtml}"/>
+        <div th:replace="${bodyHtml}"/>
         <div th:unless="${#strings.isEmpty(noteEntity.noteContent.url)}">
             <label th:unless="*{urlIsVideo}">Url:</label>
             <label th:if="*{urlIsVideo}">Video Url:</label>
