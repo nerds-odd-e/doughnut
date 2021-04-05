@@ -1,7 +1,7 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.odde.doughnut.algorithms.SpacedRepetition;
+import com.odde.doughnut.algorithms.SpacedRepetitionAlgorithm;
 import com.odde.doughnut.models.TimestampOperations;
 import java.sql.Timestamp;
 import java.time.ZoneId;
@@ -66,7 +66,7 @@ public class ReviewPointEntity {
   @Getter
   @Setter
   private Integer forgettingCurveIndex =
-      SpacedRepetition.DEFAULT_FORGETTING_CURVE_INDEX;
+      SpacedRepetitionAlgorithm.DEFAULT_FORGETTING_CURVE_INDEX;
 
   @Column(name = "removed_from_review")
   @Getter
@@ -113,4 +113,9 @@ public class ReviewPointEntity {
     return noteEntity == null || linkEntity == null;
   }
 
+  public void updateMemoryState(Timestamp currentUTCTimestamp, SpacedRepetitionAlgorithm.MemoryStateChange memoryStateChange) {
+      setForgettingCurveIndex(memoryStateChange.getNextForgettingCurveIndex());
+      setNextReviewAt(TimestampOperations.addDaysToTimestamp(currentUTCTimestamp, memoryStateChange.getNextRepeatInDays()));
+      setLastReviewedAt(currentUTCTimestamp);
+  }
 }

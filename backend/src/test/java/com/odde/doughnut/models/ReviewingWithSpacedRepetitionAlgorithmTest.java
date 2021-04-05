@@ -24,7 +24,7 @@ import static org.hamcrest.Matchers.nullValue;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
-public class ReviewingWithSpacedRepetitionTest {
+public class ReviewingWithSpacedRepetitionAlgorithmTest {
     @Autowired
     MakeMe makeMe;
     UserModel userModel;

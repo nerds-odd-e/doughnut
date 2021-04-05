@@ -1,6 +1,6 @@
 package com.odde.doughnut.models;
 
-import com.odde.doughnut.algorithms.SpacedRepetition;
+import com.odde.doughnut.algorithms.SpacedRepetitionAlgorithm;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.services.ModelFactoryService;
@@ -111,8 +111,8 @@ public class UserModel extends ModelForEntity<UserEntity> implements ReviewScope
                 );
     }
 
-    public SpacedRepetition getSpacedRepetition() {
-        return new SpacedRepetition(entity.getSpaceIntervals());
+    public SpacedRepetitionAlgorithm getSpacedRepetitionAlgorithm() {
+        return new SpacedRepetitionAlgorithm(entity.getSpaceIntervals());
     }
 
     int learntCount() {

@@ -1,6 +1,6 @@
 package com.odde.doughnut.models;
 
-import com.odde.doughnut.algorithms.SpacedRepetition;
+import com.odde.doughnut.algorithms.SpacedRepetitionAlgorithm;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.entities.ReviewSettingEntity;
@@ -29,23 +29,17 @@ public class ReviewPointModel extends ModelForEntity<ReviewPointEntity> {
             entity.setNextReviewAt(currentUTCTimestamp);
         }
         else {
-            entity.setLastReviewedAt(currentUTCTimestamp);
-            entity.setForgettingCurveIndex(getSpacedRepetition().getNextForgettingCurveIndex(entity.getForgettingCurveIndex()));
-            entity.setNextReviewAt(calculateNextReviewAt(getSpacedRepetition()));
+            entity.updateMemoryState(currentUTCTimestamp, getMemoryStateChange());
         }
         this.modelFactoryService.reviewPointRepository.save(entity);
     }
 
-    private SpacedRepetition getSpacedRepetition() {
-        return getUserModel().getSpacedRepetition();
+    private SpacedRepetitionAlgorithm.MemoryStateChange getMemoryStateChange() {
+        return getUserModel().getSpacedRepetitionAlgorithm().getMemoryStateChange(this.entity.getForgettingCurveIndex());
     }
 
     private UserModel getUserModel() {
         return modelFactoryService.toUserModel(entity.getUserEntity());
-    }
-
-    private Timestamp calculateNextReviewAt(SpacedRepetition spacedRepetition) {
-        return TimestampOperations.addDaysToTimestamp(entity.getLastReviewedAt(), spacedRepetition.getNextRepeatInDays(entity.getForgettingCurveIndex()));
     }
 
     public QuizQuestion generateAQuizQuestion(Randomizer randomizer) {
