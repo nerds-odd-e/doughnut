@@ -36,7 +36,7 @@ public class UserEntity {
     @PrimaryKeyJoinColumn
     @Getter @Setter private OwnershipEntity ownershipEntity = new OwnershipEntity();
 
-    @Column(name = "daily_new_notes_count") @Getter @Setter private Integer dailyNewNotesCount = 10;
+    @Column(name = "daily_new_notes_count") @Getter @Setter private Integer dailyNewNotesCount = 15;
 
     @Pattern(regexp="^\\d+(,\\s*\\d+)*$",message="must be numbers separated by ','")
     @Column(name = "space_intervals") @Getter @Setter private String spaceIntervals = "0, 1, 1, 2, 3, 5, 8, 13, 21, 34, 55";
