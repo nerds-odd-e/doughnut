@@ -46,7 +46,7 @@ public class ClozeDescription {
     private Pattern getPatternForLiteralMatch(String wordToHide) {
         String ptn;
         if (wordToHide.length() < 4) {
-            ptn = "(?<!\\S)" + Pattern.quote(wordToHide) + "(?!\\S)";
+            ptn = "(?<!\\w)" + Pattern.quote(wordToHide) + "(?!\\w)";
             if (wordToHide.matches("^\\d+$")) {
                 ptn = "(?<!\\d)" + Pattern.quote(wordToHide) + "(?!\\d)";
             }

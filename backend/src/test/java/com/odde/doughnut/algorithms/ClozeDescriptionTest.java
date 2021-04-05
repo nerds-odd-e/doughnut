@@ -28,6 +28,8 @@ public class ClozeDescriptionTest {
             "cat,             /kat/,                               /.../",
             "cat,             moody / narcissism / apathetic,      moody / narcissism / apathetic",
             "t,               the t twins,                         the [...] twins",
+            "t,               (t),                                 ([...])",
+            "鳴く,             羊はなんて鳴くの？,                     羊はなんて[...]の？",
             "6,               6year,                               [...]year",
     })
     void clozeDescription(String title, String description, String expectedClozeDescription) {
