@@ -10,27 +10,31 @@
         <div th:replace="_fragments/review_fragments :: showReviewPoint(${reviewPointEntity})"/>
 
         <div class="btn-toolbar justify-content-between">
-            <div class="btn-group" role="group" aria-label="First group">
-                <form th:action="@{/reviews/{id}(id=${reviewPointEntity.id})}" th:object="${reviewPointEntity}"
-                      method="post">
-                    <button type="submit" class="btn btn-light" id="repeat-again" name="again">
+            <form th:action="@{/reviews/{id}(id=${reviewPointEntity.id})}" th:object="${reviewPointEntity}"
+                  method="post">
+                <div class="btn-group" role="group" aria-label="First group">
+                    <button type="submit" class="btn btn-light" id="repeat-again" name="again"
+                            title="repeat immediately">
                         <svg th:replace="_fragments/svgs :: failed"/>
                     </button>
                     <button type="submit" class="btn btn-light" id="repeat-sad" name="sad"
+                            title="reduce next repeat interval (days) by half"
                             th:unless="${answer!=null && !answer.isCorrect()}">
                         <svg th:replace="_fragments/svgs :: sad"/>
                     </button>
                     <button type="submit" class="btn btn-light" id="repeat-satisfied" name="satisfying"
+                            title="use normal repeat interval (days)"
                             th:unless="${answer!=null && !answer.isCorrect()}">
                         <svg th:replace="_fragments/svgs :: satisfying"/>
                     </button>
                     <button type="submit" class="btn btn-light" id="repeat-happy" name="happy"
+                            title="add to next repeat interval (days) by half"
                             th:unless="${answer!=null && !answer.isCorrect()}">
                         <svg th:replace="_fragments/svgs :: happy"/>
                     </button>
-                </form>
 
-            </div>
+                </div>
+            </form>
             <div class="btn-group dropup">
                 <button type="button" id="more-action-for-repeat" class="btn btn-light dropdown-toggle"
                         data-toggle="dropdown" aria-haspopup="true"
