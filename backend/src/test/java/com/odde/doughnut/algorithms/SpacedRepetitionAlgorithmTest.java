@@ -12,7 +12,7 @@ public class SpacedRepetitionAlgorithmTest {
     void defaultSetting() {
         SpacedRepetitionAlgorithm spacedRepetitionAlgorithm = new SpacedRepetitionAlgorithm(null);
 
-        assertThat(spacedRepetitionAlgorithm.getMemoryStateChange(0).getNextRepeatInDays(), equalTo(0));
+        assertThat(spacedRepetitionAlgorithm.getMemoryStateChange(0, 0).getNextRepeatInDays(), equalTo(0));
     }
 
     @Nested
@@ -49,12 +49,12 @@ public class SpacedRepetitionAlgorithmTest {
         }
 
         private Integer getNextRepeatInDays(int index) {
-            return spacedRepetitionAlgorithm.getMemoryStateChange(index).getNextRepeatInDays();
+            return spacedRepetitionAlgorithm.getMemoryStateChange(index, 0).getNextRepeatInDays();
 
         }
 
         private int getNextForgettingCurveIndex(Integer index) {
-            return spacedRepetitionAlgorithm.getMemoryStateChange(index).getNextForgettingCurveIndex();
+            return spacedRepetitionAlgorithm.getMemoryStateChange(index, 0).getNextForgettingCurveIndex();
         }
 
     }

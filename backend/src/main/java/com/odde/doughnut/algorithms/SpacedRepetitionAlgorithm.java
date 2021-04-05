@@ -35,8 +35,13 @@ public class SpacedRepetitionAlgorithm {
         }
     }
 
-    public MemoryStateChange getMemoryStateChange(Integer oldForgettingCurveIndex) {
-        final int nextForgettingCurveIndex = oldForgettingCurveIndex + DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT;
+    //
+    // adjustment:
+    //   -1: reduce the increase of index by 1/2
+    //   +1: add to the increase of index by 1/2
+    //
+    public MemoryStateChange getMemoryStateChange(Integer oldForgettingCurveIndex, int adjustment) {
+        final int nextForgettingCurveIndex = oldForgettingCurveIndex + DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT * (2 + adjustment) / 2;
         return new MemoryStateChange(nextForgettingCurveIndex, getRepeatInDays(nextForgettingCurveIndex));
     }
 

@@ -74,8 +74,14 @@ class ReviewControllerTest {
 
         @Test
         void repeatSad() {
-            controller.doRepeat(rp);
-            assertThat(rp.getForgettingCurveIndex(), equalTo(expectedSatisfyingForgettingCurveIndex));
+            controller.doRepeatSad(rp);
+            assertThat(rp.getForgettingCurveIndex(), lessThan(expectedSatisfyingForgettingCurveIndex));
+        }
+
+        @Test
+        void repeatHappy() {
+            controller.doRepeatHappy(rp);
+            assertThat(rp.getForgettingCurveIndex(), greaterThan(expectedSatisfyingForgettingCurveIndex));
         }
 
     }

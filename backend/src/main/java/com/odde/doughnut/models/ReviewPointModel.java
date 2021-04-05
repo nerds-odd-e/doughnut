@@ -25,20 +25,24 @@ public class ReviewPointModel extends ModelForEntity<ReviewPointEntity> {
     }
 
     public void repeat(Timestamp currentUTCTimestamp) {
-        entity.updateMemoryState(currentUTCTimestamp, getMemoryStateChange());
-        this.modelFactoryService.reviewPointRepository.save(entity);
+        repeatWithAdjust(currentUTCTimestamp, 0);
     }
 
     public void repeatSad(Timestamp currentUTCTimestamp) {
-        repeat(currentUTCTimestamp);
+        repeatWithAdjust(currentUTCTimestamp, -1);
     }
 
     public void repeatHappy(Timestamp currentUTCTimestamp) {
-        repeat(currentUTCTimestamp);
+        repeatWithAdjust(currentUTCTimestamp, 1);
     }
 
-    private SpacedRepetitionAlgorithm.MemoryStateChange getMemoryStateChange() {
-        return getUserModel().getSpacedRepetitionAlgorithm().getMemoryStateChange(this.entity.getForgettingCurveIndex());
+    public void repeatWithAdjust(Timestamp currentUTCTimestamp, int adjustment) {
+        entity.updateMemoryState(currentUTCTimestamp, getMemoryStateChange(adjustment));
+        this.modelFactoryService.reviewPointRepository.save(entity);
+    }
+
+    private SpacedRepetitionAlgorithm.MemoryStateChange getMemoryStateChange(int adjustment) {
+        return getUserModel().getSpacedRepetitionAlgorithm().getMemoryStateChange(this.entity.getForgettingCurveIndex(), adjustment);
     }
 
     private UserModel getUserModel() {
