@@ -98,10 +98,33 @@ public class ReviewController extends ApplicationMvcController  {
         return "reviews/repeat";
     }
 
-    @PostMapping("/{reviewPointEntity}")
-    public String update(@Valid ReviewPointEntity reviewPointEntity) {
-        ReviewPointModel reviewPointModel = modelFactoryService.toReviewPointModel(reviewPointEntity);
-        reviewPointModel.repeat(timeTraveler.getCurrentUTCTimestamp());
+    @PostMapping(path="/{reviewPointEntity}", params="remove")
+    public String removeFromRepeating(@Valid ReviewPointEntity reviewPointEntity) {
+        reviewPointEntity.setRemovedFromReview(true);
+        modelFactoryService.reviewPointRepository.save(reviewPointEntity);
+        return "redirect:/reviews/repeat";
+    }
+
+    @PostMapping(path="/{reviewPointEntity}", params="again")
+    public String doRepeatAgain(@Valid ReviewPointEntity reviewPointEntity) {
+        return "redirect:/reviews/repeat";
+    }
+
+    @PostMapping(path="/{reviewPointEntity}", params="satisfying")
+    public String doRepeat(@Valid ReviewPointEntity reviewPointEntity) {
+        modelFactoryService.toReviewPointModel(reviewPointEntity).repeat(timeTraveler.getCurrentUTCTimestamp());
+        return "redirect:/reviews/repeat";
+    }
+
+    @PostMapping(path="/{reviewPointEntity}", params="sad")
+    public String doRepeatSad(@Valid ReviewPointEntity reviewPointEntity) {
+        modelFactoryService.toReviewPointModel(reviewPointEntity).repeatSad(timeTraveler.getCurrentUTCTimestamp());
+        return "redirect:/reviews/repeat";
+    }
+
+    @PostMapping(path="/{reviewPointEntity}", params="happy")
+    public String doRepeatHappy(@Valid ReviewPointEntity reviewPointEntity) {
+        modelFactoryService.toReviewPointModel(reviewPointEntity).repeatHappy(timeTraveler.getCurrentUTCTimestamp());
         return "redirect:/reviews/repeat";
     }
 
