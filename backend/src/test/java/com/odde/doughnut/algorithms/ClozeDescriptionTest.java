@@ -28,6 +28,7 @@ public class ClozeDescriptionTest {
             "cat,             /kat/,                               /.../",
             "cat,             moody / narcissism / apathetic,      moody / narcissism / apathetic",
             "t,               the t twins,                         the [...] twins",
+            "6,               6year,                               [...]year",
     })
     void clozeDescription(String title, String description, String expectedClozeDescription) {
         assertThat(clozeDescription.getClozeDescription(title, description), equalTo(expectedClozeDescription));

@@ -47,6 +47,9 @@ public class ClozeDescription {
         String ptn;
         if (wordToHide.length() < 4) {
             ptn = "(?<!\\S)" + Pattern.quote(wordToHide) + "(?!\\S)";
+            if (wordToHide.matches("^\\d+$")) {
+                ptn = "(?<!\\d)" + Pattern.quote(wordToHide) + "(?!\\d)";
+            }
         }
         else {
             ptn = String.join("([\\s-]+)((and\\s+)|(the\\s+)|(a\\s+)|(an\\s+))?",
