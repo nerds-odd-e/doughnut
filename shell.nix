@@ -15,7 +15,7 @@ in mkShell {
   MYSQL_DATADIR = builtins.getEnv "MYSQL_DATADIR";
   buildInputs = [
     autoconf automake cmake coreutils-full gcc10 gnumake libgccjit
-    gradle nodejs-15_x python3 yarn zulu
+    gradle nodejs python3 yarn zulu
     any-nix-shell zsh zsh-powerlevel10k
     git git-secret gitAndTools.delta locale lsd platinum-searcher
     binutils-unwrapped hostname inetutils openssh pkg-config rsync
@@ -58,12 +58,6 @@ in mkShell {
     mkdir -p $MYSQL_HOME
     mkdir -p $MYSQL_DATADIR
     
-    export MYSQLD_PID=$(lsof -t -i tcp:3306)
-    if [[ -z "$MYSQLD_PID" ]]; then
-      mysqld --initialize-insecure --user=`whoami` --datadir=$MYSQL_DATADIR --basedir=$MYSQL_BASEDIR --explicit_defaults_for_timestamp
-      mysqld --datadir=$MYSQL_DATADIR --pid-file=$MYSQL_PID_FILE --socket=$MYSQL_UNIX_PORT --mysqlx-socket=$MYSQLX_UNIX_PORT &
-      export MYSQLD_PID=$!
-
 cat <<EOF > $MYSQL_HOME/init_doughnut_db.sql
 CREATE USER IF NOT EXISTS 'doughnut'@'localhost' IDENTIFIED BY 'doughnut';
 CREATE DATABASE IF NOT EXISTS doughnut_development DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -72,6 +66,12 @@ GRANT ALL PRIVILEGES ON doughnut_development.* TO 'doughnut'@'localhost';
 GRANT ALL PRIVILEGES ON doughnut_test.*        TO 'doughnut'@'localhost';
 FLUSH PRIVILEGES;
 EOF
+
+    export MYSQLD_PID=$(lsof -t -i tcp:3306)
+    if [[ -z "$MYSQLD_PID" ]]; then
+      mysqld --initialize-insecure --user=`whoami` --datadir=$MYSQL_DATADIR --basedir=$MYSQL_BASEDIR --explicit_defaults_for_timestamp
+      mysqld --datadir=$MYSQL_DATADIR --pid-file=$MYSQL_PID_FILE --socket=$MYSQL_UNIX_PORT --mysqlx-socket=$MYSQLX_UNIX_PORT &
+      export MYSQLD_PID=$!
 
       sleep 2 && mysql -u root < $MYSQL_HOME/init_doughnut_db.sql
     fi
