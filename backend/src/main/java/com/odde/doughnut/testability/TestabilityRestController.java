@@ -43,7 +43,7 @@ class TestabilityRestController {
     @Autowired
     TimeTraveler timeTraveler;
 
-    @GetMapping("/clean_db_and_seed_data")
+    @PostMapping("/clean_db_and_seed_data")
     public String cleanDBAndSeedData() {
         new DBCleanerWorker(emf).truncateAllTables();
         createUser("old_learner", "Old Learner");

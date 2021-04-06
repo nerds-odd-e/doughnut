@@ -26,7 +26,7 @@ import '@testing-library/cypress/add-commands'
 import 'cypress-file-upload';
 
 Cypress.Commands.add("cleanDBAndSeedData", () => {
-  cy.request("/api/testability/clean_db_and_seed_data").its("body").should("contain", "OK");
+  cy.request({method: 'POST', url: "/api/testability/clean_db_and_seed_data"}).its("body").should("contain", "OK");
 });
 
 Cypress.Commands.add("loginAs", (username) => {
