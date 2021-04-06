@@ -5,6 +5,7 @@ function say(sentence) {
   if(sentence === "") {
     return;
   }
+  console.error(sentence);
   exec("say \""+sentence+"\"", (err, stdout, stderr) => {
     if (err) {
       console.error(err)
@@ -19,9 +20,9 @@ function for_build_status(url, action) {
       }
       else {
         action(
-            body.match(/check_suite_\d+/).shift(),
-            body.match(/This workflow run ([^\.]+\.)/).pop(),
-            body.match(/aria\-label\=\"Run \d+ of[^\>]+\>(.*)\<\/a\>/).pop()
+            body.match(/check_suite_\d+/)?.shift(),
+            body.match(/This workflow run ([^\.]+\.)/)?.pop(),
+            body.match(/aria\-label\=\"Run \d+ of[^\>]+\>(.*)\<\/a\>/)?.pop()
         );
       }
     });
@@ -33,32 +34,36 @@ class BuildState {
     this.status = status;
   }
 
-  nextState(sayCallBack) {
-    for_build_status("https://github.com/nerds-odd-e/doughnut/actions", (currentBuild, currentStatus, gitLog)=>{
-        console.error(gitLog + " ... " + currentStatus);
-        var toSay = "";
-        var nextBuildName = this.buildName;
-        var nextStatus = this.status;
-        if (this.buildName !== currentBuild) {
-            nextBuildName = currentBuild;
-            nextStatus = "";
-            toSay = "A new push: " + gitLog;
-        }
-        if (nextStatus !== currentStatus) {
-            nextStatus = currentStatus;
-            if (toSay === "") {
-              toSay = "The build ";
-            }
-            toSay += currentStatus;
-        }
-        sayCallBack(toSay, new BuildState(nextBuildName, nextStatus));
-    });
+  nextState() {
+    return new Promise((resolve, reject) => {
+      for_build_status("https://github.com/nerds-odd-e/doughnut/actions", (currentBuild, currentStatus, gitLog)=>{
+          var toSay = "";
+          var nextBuildName = this.buildName;
+          var nextStatus = this.status;
+          if (this.buildName !== currentBuild) {
+              nextBuildName = currentBuild;
+              nextStatus = "";
+              toSay = "A new push: " + gitLog;
+          }
+          if (nextStatus !== currentStatus) {
+              nextStatus = currentStatus;
+              if (toSay === "") {
+                toSay = "The build ";
+              }
+              toSay += currentStatus;
+          }
+          resolve({toSay, newState: new BuildState(nextBuildName, nextStatus)});
+      });
+    })
   }
 }
 
 var buildState = new BuildState("", "");
 
-setInterval(()=>{ buildState.nextState((toSay, nextState) => { say(toSay); buildState = nextState;} ) }, 5000);
+setInterval(()=>{ buildState.nextState().then(({toSay, newState}) => {
+   say(toSay);
+    buildState = newState;
+  } ) }, 5000);
 
 module.exports = {
   BuildState, say
