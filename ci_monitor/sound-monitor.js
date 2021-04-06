@@ -2,11 +2,14 @@ const { exec } = require('child_process');
 const request = require('request');
 
 function say(sentence) {
-    exec("say \""+sentence+"\"", (err, stdout, stderr) => {
-      if (err) {
-        console.error(err)
-      }
-    });
+  if(sentence === "") {
+    return;
+  }
+  exec("say \""+sentence+"\"", (err, stdout, stderr) => {
+    if (err) {
+      console.error(err)
+    }
+  });
 }
 
 function for_build_status(url, action) {
@@ -29,30 +32,34 @@ class BuildState {
     this.buildName = buildName;
     this.status = status;
   }
-}
-var buildState = [new BuildState("", "")];
-function soundMonitor(sayCallBack) {
+
+  nextState(sayCallBack) {
     for_build_status("https://github.com/nerds-odd-e/doughnut/actions", (currentBuild, currentStatus, gitLog)=>{
         console.error(gitLog + " ... " + currentStatus);
-        var toSay = "The build ";
-        var lastBuild = buildState[0].buildName;
-        var lastStatus = buildState[0].status;
-        if (buildState[0].buildName !== currentBuild) {
-            lastBuild = currentBuild;
-            lastStatus = "";
+        var toSay = "";
+        var nextBuildName = this.buildName;
+        var nextStatus = this.status;
+        if (this.buildName !== currentBuild) {
+            nextBuildName = currentBuild;
+            nextStatus = "";
             toSay = "A new push: " + gitLog;
         }
-        if (lastStatus !== currentStatus) {
-            lastStatus = currentStatus;
+        if (nextStatus !== currentStatus) {
+            nextStatus = currentStatus;
+            if (toSay === "") {
+              toSay = "The build ";
+            }
             toSay += currentStatus;
-            sayCallBack(toSay);
         }
-        buildState[0] = new BuildState(lastBuild, lastStatus);
+        sayCallBack(toSay, new BuildState(nextBuildName, nextStatus));
     });
+  }
 }
 
-setInterval(()=>soundMonitor(say), 5000);
+var buildState = new BuildState("", "");
+
+setInterval(()=>{ buildState.nextState((toSay, nextState) => { say(toSay); buildState = nextState;} ) }, 5000);
 
 module.exports = {
-  soundMonitor, say
+  BuildState, say
 };
