@@ -34,7 +34,7 @@ public class ClozeDescription {
     }
 
     private String replacePronunciation(String description) {
-        Pattern pattern = Pattern.compile("\\/[^\\s^\\/][^\\/]*\\/", Pattern.CASE_INSENSITIVE);
+        Pattern pattern = Pattern.compile("\\/[^\\s^\\/][^\\/]*\\/(?!\\w)", Pattern.CASE_INSENSITIVE);
         return pattern.matcher(description).replaceAll(internalPronunciationReplacement);
     }
 
