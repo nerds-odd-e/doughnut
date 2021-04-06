@@ -69,7 +69,7 @@ EOF
 
     export MYSQLD_PID=$(lsof -t -i tcp:3306)
     if [[ -z "$MYSQLD_PID" ]]; then
-      mysqld --initialize-insecure --user=`whoami` --datadir=$MYSQL_DATADIR --basedir=$MYSQL_BASEDIR --explicit_defaults_for_timestamp
+      [ ! "$(ls -A mysql/data)" ] && mysqld --initialize-insecure --user=`whoami` --datadir=$MYSQL_DATADIR --basedir=$MYSQL_BASEDIR --explicit_defaults_for_timestamp
       mysqld --datadir=$MYSQL_DATADIR --pid-file=$MYSQL_PID_FILE --socket=$MYSQL_UNIX_PORT --mysqlx-socket=$MYSQLX_UNIX_PORT &
       export MYSQLD_PID=$!
 
