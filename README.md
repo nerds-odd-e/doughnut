@@ -257,11 +257,43 @@ PACKER_LOG=1 packer build packer.json
 Expect to see following log line towards end of Packer build stdout log:
 `--> googlecompute: A disk image was created: doughnut-debian10-mysql80-base-saltstack`
 
-### 8. [Product Backlog](https://docs.google.com/spreadsheets/d/1_GofvpnV1tjy2F_aaoOiYTZUOO-8t_qf3twIKMQyGV4/edit?ts=600e6711&pli=1#gid=0)
+### 8. [Flutter web-app frontend](https://flutter.dev/docs/get-started/web)
+
+We chose flutter + dart to build our light frontend, as it supports compile and release to Web, Android and iOS deployment targets.
+
+#### How-to
+
+From `frontend` directory, in your native OS shell (not in nix-shell),
+Check you have all pre-requisite/s flutter + dart tooling:
+
+```
+flutter doctor
+```
+
+Expect to see something similar to (e.g. macOS Big Sur 11.2.3 with Xcode 12.0.1):
+```bash
+❯ flutter doctor
+Doctor summary (to see all details, run flutter doctor -v):
+[✓] Flutter (Channel stable, 2.0.4, on macOS 11.2.3 20D91 darwin-x64, locale en-SG)
+[✓] Android toolchain - develop for Android devices (Android SDK version 30.0.2)
+[✓] Xcode - develop for iOS and macOS
+[✓] Chrome - develop for the web
+[!] Android Studio (not installed)
+[✓] Connected device (1 available)
+
+! Doctor found issues in 1 category.
+```
+
+#### Run frontend flutter app in debug mode with Chrome browser
+```bash
+flutter run -d chrome
+```
+
+### 9. [Product Backlog](https://docs.google.com/spreadsheets/d/1_GofvpnV1tjy2F_aaoOiYTZUOO-8t_qf3twIKMQyGV4/edit?ts=600e6711&pli=1#gid=0)
 
 [Story Map](https://miro.com/app/board/o9J_lTB77Mc=/)
 
-### 9. How to Contribute
+### 10. How to Contribute
 
 - We welcome product ideas and code contribution.
 - Collaborate over:
