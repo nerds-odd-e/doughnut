@@ -24,23 +24,35 @@ function for_build_status(url, action) {
     });
 }
 
-var lastStatus = [""];
-var lastBuild = [""];
-function soundMonitor() {
+class BuildState {
+  constructor(buildName, status) {
+    this.buildName = buildName;
+    this.status = status;
+  }
+}
+var buildState = [new BuildState("", "")];
+function soundMonitor(sayCallBack) {
     for_build_status("https://github.com/nerds-odd-e/doughnut/actions", (currentBuild, currentStatus, gitLog)=>{
         console.error(gitLog + " ... " + currentStatus);
         var toSay = "The build ";
-        if (lastBuild[0] !== currentBuild) {
-            lastBuild[0] = currentBuild;
-            lastStatus[0] = "";
+        var lastBuild = buildState[0].buildName;
+        var lastStatus = buildState[0].status;
+        if (buildState[0].buildName !== currentBuild) {
+            lastBuild = currentBuild;
+            lastStatus = "";
             toSay = "A new push: " + gitLog;
         }
-        if (lastStatus[0] !== currentStatus) {
-            lastStatus[0] = currentStatus;
+        if (lastStatus !== currentStatus) {
+            lastStatus = currentStatus;
             toSay += currentStatus;
-            say(toSay);
+            sayCallBack(toSay);
         }
+        buildState[0] = new BuildState(lastBuild, lastStatus);
     });
 }
 
-setInterval(soundMonitor, 5000);
+setInterval(()=>soundMonitor(say), 5000);
+
+module.exports = {
+  soundMonitor, say
+};
