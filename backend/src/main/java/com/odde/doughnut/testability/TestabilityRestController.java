@@ -73,7 +73,15 @@ class TestabilityRestController {
             note.setParentNote(earlyNotes.get(note.getNoteContent().getTestingParent()));
             note.setUserEntity(userModel.getEntity());
         }
+        noteList.stream().filter(n->n.getParentNote() == null).forEach(n->{
+            final NotebookEntity notebookEntity = new NotebookEntity();
+            notebookEntity.setCreatorEntity(userModel.getEntity());
+            notebookEntity.setHeadNoteEntity(n);
+            notebookEntity.setOwnershipEntity(userModel.getEntity().getOwnershipEntity());
+            n.setNotebookEntity(notebookEntity);
+        });
         noteRepository.saveAll(noteList);
+
         return noteList.stream().map(NoteEntity::getId).collect(Collectors.toList());
     }
 

@@ -24,35 +24,6 @@ public class CheapBackupController {
     public HashMap<String, Object> backup() {
         HashMap<String, Object> hash = new HashMap<>();
 
-        modelFactoryService.noteRepository.findAll().forEach(note->{
-            if (note.getParentNote() == null && note.getNotebookEntity() == null) {
-                NotebookEntity noteBookEntity = new NotebookEntity();
-                noteBookEntity.setOwnershipEntity(note.getOwnershipEntity());
-                noteBookEntity.setCreatorEntity(note.getUserEntity());
-                noteBookEntity.setHeadNoteEntity(note);
-                note.setNotebookEntity(noteBookEntity);
-                modelFactoryService.noteRepository.save(note);
-            }
-        });
-
-        modelFactoryService.noteRepository.findAll().forEach(note->{
-            if (note.getParentNote() == null) {
-                note.getDescendantNCs().forEach(nc->{
-                    NoteEntity n = nc.getNoteEntity();
-                    n.setNotebookEntity(note.getNotebookEntity());
-                    modelFactoryService.noteRepository.save(n);
-                });
-            }
-        });
-
-        int cnt[] = {0};
-        modelFactoryService.noteRepository.findAll().forEach(note->{
-            if (note.getNotebookEntity() == null) {
-                cnt[0]+=1;
-            }
-        });
-        hash.put("dangling", cnt[0]);
-
         return hash;
     }
 

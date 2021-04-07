@@ -3,7 +3,7 @@
     <div class="container content">
         <h2>Top Level Notes</h2>
         <p> <a class="nav-link" href="/notes/new_notebook">Add New Notebook</a> </p>
-        <div th:replace="_fragments/note_fragments :: noteOwnerViewCards(${notes})"/>
+        <div th:replace="_fragments/notebook_fragments :: notebookViewCards(${notebooks})"/>
         <h2>Subscribed Notes</h2>
         <div th:replace="_fragments/subscription_fragments :: noteSubscriptionCards(${subscriptions})"/>
     </div>
