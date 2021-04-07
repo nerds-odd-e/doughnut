@@ -29,6 +29,7 @@ public class CheapBackupController {
                 NotebookEntity noteBookEntity = new NotebookEntity();
                 noteBookEntity.setOwnershipEntity(note.getOwnershipEntity());
                 noteBookEntity.setCreatorEntity(note.getUserEntity());
+                noteBookEntity.setHeadNoteEntity(note);
                 note.setNotebookEntity(noteBookEntity);
                 modelFactoryService.noteRepository.save(note);
             }
