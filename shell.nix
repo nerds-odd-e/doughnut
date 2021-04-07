@@ -20,12 +20,12 @@ in mkShell {
     git git-secret gitAndTools.delta locale lsd platinum-searcher
     binutils-unwrapped hostname inetutils openssh pkg-config rsync
     autojump bat duf fasd fzf gnupg htop jq less lesspipe lsof lzma
-    most progress ps pstree ripgrep tree vgrep which
+    most progress ps pstree ripgrep tree vgrep unixtools.whereis which
     libmysqlclient libpcap libressl patchelf
     cacert curlie glances httpie
     mysql80 mysql-client mysql_jdbc python38Packages.pip
     chromedriver geckodriver google-cloud-sdk packer
-    dbeaver vim vimpager vscodium
+    dbeaver vim vimpager vscode-with-extensions
   ] ++ lib.optionals stdenv.isDarwin [
     darwin.apple_sdk.libs.utmp darwin.apple_sdk.libs.Xplugin
     apple_sdk.AppKit apple_sdk.AGL apple_sdk.ApplicationServices apple_sdk.AudioToolbox
@@ -34,12 +34,11 @@ in mkShell {
     apple_sdk.Foundation apple_sdk.ImageIO apple_sdk.IOKit apple_sdk.Kernel apple_sdk.MediaToolbox apple_sdk.OpenGL
     apple_sdk.QTKit apple_sdk.Security apple_sdk.SystemConfiguration xcodebuild
   ] ++ lib.optionals (!stdenv.isDarwin) [
-    chromium firefox flutter gitter intellij
+    dart firefox google-chrome flutter gitter intellij
   ];
   shellHook = ''
     export JAVA_HOME="${pkgs.zulu}"
     export GRADLE_HOME="${pkgs.gradle}"
-    export PATH=$PATH:$JAVA_HOME/bin:$GRADLE_HOME/bin
     export MYSQL_BASEDIR=${pkgs.mysql80}
     export MYSQL_HOME="''${MYSQL_HOME:-''$PWD/mysql}"
     export MYSQL_DATADIR="''${MYSQL_DATADIR:-''$MYSQL_HOME/data}"
@@ -47,6 +46,10 @@ in mkShell {
     export MYSQL_UNIX_PORT=$MYSQL_HOME/mysql.sock
     export MYSQLX_UNIX_PORT=$MYSQL_HOME/mysqlx.sock
     export MYSQL_PID_FILE=$MYSQL_HOME/mysql.pid
+
+    export NIXPKGS_ALLOW_UNFREE=1
+    export CHROME_EXECUTABLE=$(whereis -b google-chrome-stable | awk '{print $2}')
+    export PATH=$PATH:$JAVA_HOME/bin:$GRADLE_HOME/bin:$CHROME_EXECUTABLE
 
     echo "################################################################################"
     echo "##    !! DOUGHNUT NIX-SHELL !!      "

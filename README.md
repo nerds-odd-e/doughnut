@@ -31,6 +31,7 @@ For more background info you can read:
 - [packer](https://www.packer.io)
 - [packer googlecompute builder](https://www.packer.io/docs/builders/googlecompute)
 - [SaltStack](https://docs.saltproject.io/en/latest/)
+- [Flutter web-app frontend](https://flutter.dev/docs/get-started/web)
 
 ## Getting started
 
@@ -92,6 +93,7 @@ Clone and launch local development environment
 ```bash
 git clone $this_repo
 cd doughnut
+export NIXPKGS_ALLOW_UNFREE=1
 nix-shell --pure
 # OR `nix-shell --pure --command "zsh"` if you want to drop down to zsh in nix-shell (uses your OS' ~/.zshrc)
 gradle wrapper --distribution-type all
@@ -287,6 +289,45 @@ Doctor summary (to see all details, run flutter doctor -v):
 #### Run frontend flutter app in debug mode with Chrome browser
 ```bash
 flutter run -d chrome
+```
+
+#### Build & Bundle Flutter frontend web-app and startup local web-server to server flutter web-app static assets
+```bash
+flutter build web
+```
+
+Expect to find minified and uglified web bundle assets in `frontend/build/web` directory:
+```bash
+❯ pwd
+/home/csd/csd/doughnut/frontend/build/web
+❯ tree
+.
+|-- assets
+|   |-- AssetManifest.json
+|   |-- FontManifest.json
+|   |-- NOTICES
+|   |-- fonts
+|   |   `-- MaterialIcons-Regular.otf
+|   `-- packages
+|       `-- cupertino_icons
+|           `-- assets
+|               `-- CupertinoIcons.ttf
+|-- favicon.png
+|-- flutter_service_worker.js
+|-- icons
+|   |-- Icon-192.png
+|   `-- Icon-512.png
+|-- index.html
+|-- main.dart.js
+|-- manifest.json
+`-- version.json
+
+6 directories, 13 files
+```
+
+Run a simple local web server to serve flutter frontend web-app, from `frontend/build/web` directory run:
+```bash
+python -m http.server 8000
 ```
 
 ### 9. [Product Backlog](https://docs.google.com/spreadsheets/d/1_GofvpnV1tjy2F_aaoOiYTZUOO-8t_qf3twIKMQyGV4/edit?ts=600e6711&pli=1#gid=0)

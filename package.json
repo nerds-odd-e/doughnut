@@ -11,7 +11,9 @@
     "sut": "backend/gradlew bootRun -p backend -Dspring.profiles.active=test",
     "open": "run-p -clnr sut cy:open",
     "test": "run-p -clnr sut cy:run",
-    "sound": "node scripts/sound-monitor.js"
+    "sound": "node scripts/sound-monitor.js",
+    "frontend:build": "cd frontend; flutter build web; cd -",
+    "frontend:run": "cd frontend/build/web; python -m http.server 8000; cd -"
   },
   "cypress-cucumber-preprocessor": {
     "nonGlobalStepDefinitions": false
