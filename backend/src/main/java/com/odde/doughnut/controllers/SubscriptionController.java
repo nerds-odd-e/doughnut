@@ -4,7 +4,6 @@ import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.SubscriptionEntity;
 import com.odde.doughnut.exceptions.NoAccessRightException;
-import com.odde.doughnut.models.BazaarModel;
 import com.odde.doughnut.services.ModelFactoryService;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -60,7 +59,7 @@ public class SubscriptionController extends ApplicationMvcController {
         if (bindingResult.hasErrors()) {
             return "subscriptions/add_to_learning";
         }
-        if (modelFactoryService.bazaarNoteRepository.findByNoteId(noteEntity.getId()) == null) {
+        if (modelFactoryService.bazaarNotebookRepository.findByNoteId(noteEntity.getId()) == null) {
             throw new NoAccessRightException();
         }
         subscriptionEntity.setNoteEntity(noteEntity);

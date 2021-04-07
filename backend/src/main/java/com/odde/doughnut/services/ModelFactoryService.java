@@ -14,7 +14,7 @@ import java.util.Optional;
 public class ModelFactoryService {
     @Autowired public NoteRepository noteRepository;
     @Autowired public UserRepository userRepository;
-    @Autowired public BazaarNoteRepository bazaarNoteRepository;
+    @Autowired public BazaarNotebookRepository bazaarNotebookRepository;
     @Autowired public ReviewPointRepository reviewPointRepository;
     @Autowired public CircleRepository circleRepository;
     @Autowired public LinkRepository linkRepository;

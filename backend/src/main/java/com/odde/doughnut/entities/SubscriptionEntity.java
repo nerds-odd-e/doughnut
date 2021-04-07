@@ -25,6 +25,10 @@ public class SubscriptionEntity {
     @JoinColumn(name = "note_id", referencedColumnName = "id")
     @Getter @Setter private NoteEntity noteEntity;
 
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "notebook_id", referencedColumnName = "id")
+    @Getter @Setter private NotebookEntity notebookEntity;
+
     public String getTitle() {
         return noteEntity.getTitle();
     }
