@@ -137,4 +137,14 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
         entity.setOwnershipEntity(userEntity.getOwnershipEntity());
         return this;
     }
+
+    public NoteBuilder asTheHeadNoteOfANotebook() {
+        NotebookEntity notebookEntity = new NotebookEntity();
+        notebookEntity.setOwnershipEntity(entity.getUserEntity().getOwnershipEntity());
+        notebookEntity.setCreatorEntity(entity.getUserEntity());
+        notebookEntity.setHeadNoteEntity(entity);
+        entity.setNotebookEntity(notebookEntity);
+
+        return this;
+    }
 }

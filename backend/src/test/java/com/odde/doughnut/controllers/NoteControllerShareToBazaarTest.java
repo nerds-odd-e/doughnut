@@ -38,7 +38,7 @@ class NoteControllerShareToBazaarTest {
     @BeforeEach
     void setup() {
         userModel = makeMe.aUser().toModelPlease();
-        topNote = makeMe.aNote().byUser(userModel).please();
+        topNote = makeMe.aNote().byUser(userModel).asTheHeadNoteOfANotebook().please();
         controller = new NoteController(new TestCurrentUserFetcher(userModel), modelFactoryService);
     }
 

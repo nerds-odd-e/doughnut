@@ -2,6 +2,7 @@ package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.BazaarNotebookEntity;
 import com.odde.doughnut.entities.NoteEntity;
+import com.odde.doughnut.entities.NotebookEntity;
 import com.odde.doughnut.entities.repositories.BazaarNotebookRepository;
 import com.odde.doughnut.services.ModelFactoryService;
 
@@ -22,9 +23,10 @@ public class BazaarModel {
         return notes;
     }
 
-    public void shareNote(NoteEntity note) {
+    public void shareNote(NotebookEntity notebookEntity) {
         BazaarNotebookEntity bazaarNotebookEntity = new BazaarNotebookEntity();
-        bazaarNotebookEntity.setNote(note);
+        bazaarNotebookEntity.setNotebookEntity(notebookEntity);
+        bazaarNotebookEntity.setNote(notebookEntity.getHeadNoteEntity());
         bazaarNotebookRepository.save(bazaarNotebookEntity);
     }
 }

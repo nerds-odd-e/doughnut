@@ -70,16 +70,20 @@ class TestabilityRestController {
             earlyNotes.put(content.getTitle(), note);
             noteList.add(note);
             note.setOwnershipEntity(userModel.getEntity().getOwnershipEntity());
-            note.setParentNote(earlyNotes.get(note.getNoteContent().getTestingParent()));
+            final String testingParent = note.getNoteContent().getTestingParent();
+            if (Strings.isBlank(testingParent)) {
+                final NotebookEntity notebookEntity = new NotebookEntity();
+                notebookEntity.setCreatorEntity(userModel.getEntity());
+                notebookEntity.setHeadNoteEntity(note);
+                notebookEntity.setOwnershipEntity(userModel.getEntity().getOwnershipEntity());
+                note.setNotebookEntity(notebookEntity);
+            }
+            else {
+                note.setParentNote(earlyNotes.get(testingParent));
+            }
             note.setUserEntity(userModel.getEntity());
         }
-        noteList.stream().filter(n->n.getParentNote() == null).forEach(n->{
-            final NotebookEntity notebookEntity = new NotebookEntity();
-            notebookEntity.setCreatorEntity(userModel.getEntity());
-            notebookEntity.setHeadNoteEntity(n);
-            notebookEntity.setOwnershipEntity(userModel.getEntity().getOwnershipEntity());
-            n.setNotebookEntity(notebookEntity);
-        });
+
         noteRepository.saveAll(noteList);
 
         return noteList.stream().map(NoteEntity::getId).collect(Collectors.toList());
@@ -111,7 +115,7 @@ class TestabilityRestController {
     @PostMapping("/share_to_bazaar")
     public String shareToBazaar(@RequestBody HashMap<String, String> map) {
         NoteEntity noteEntity = noteRepository.findFirstByTitle(map.get("noteTitle"));
-        modelFactoryService.toBazaarModel().shareNote(noteEntity);
+        modelFactoryService.toBazaarModel().shareNote(noteEntity.getNotebookEntity());
         return "OK";
     }
 

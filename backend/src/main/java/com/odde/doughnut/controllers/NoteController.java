@@ -146,7 +146,7 @@ public class NoteController extends ApplicationMvcController  {
     public RedirectView shareNote(@PathVariable("note") NoteEntity note) throws NoAccessRightException {
         getCurrentUser().assertAuthorization(note);
         BazaarModel bazaar = modelFactoryService.toBazaarModel();
-        bazaar.shareNote(note);
+        bazaar.shareNote(note.getNotebookEntity());
         return new RedirectView("/notes");
     }
 
