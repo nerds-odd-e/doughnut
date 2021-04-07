@@ -9,11 +9,12 @@
     "cy:open": "cypress open",
     "cy:run": "cypress run",
     "sut": "backend/gradlew bootRun -p backend -Dspring.profiles.active=test",
-    "open": "run-p -clnr sut cy:open",
-    "test": "run-p -clnr sut cy:run",
+    "open": "run-p -clnr sut frontend:build_run cy:open",
+    "test": "run-p -clnr sut frontend:build_run cy:run",
     "sound": "node scripts/sound-monitor.js",
     "frontend:build": "cd frontend; flutter build web; cd -",
-    "frontend:run": "cd frontend/build/web; python -m http.server 8000; cd -"
+    "frontend:run": "cd frontend/build/web; python -m http.server 8000; cd -",
+    "frontend:build_run": "yarn frontend:build && yarn frontend:run"
   },
   "cypress-cucumber-preprocessor": {
     "nonGlobalStepDefinitions": false
