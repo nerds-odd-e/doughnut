@@ -61,10 +61,11 @@ class NoteControllerTests {
     class createNoteTest {
         @Test
         void shouldBeAbleToSaveNoteWhenValid() throws NoAccessRightException, IOException {
-            NoteEntity newNote = makeMe.aNote().byUser(userModel).inMemoryPlease();
+            NoteEntity parent = makeMe.aNote().byUser(userModel).please();
+            NoteEntity newNote = makeMe.aNote().inMemoryPlease();
             BindingResult bindingResult = makeMe.successfulBindingResult();
 
-            String response = controller.createNote(userModel.getOwnershipModel().getEntity(), null, newNote.getNoteContent(), bindingResult, model);
+            String response = controller.createNote(parent, newNote.getNoteContent(), bindingResult, model);
             assertThat(response, matchesPattern("redirect:/notes/\\d+"));
         }
 
@@ -73,7 +74,7 @@ class NoteControllerTests {
             NoteEntity newNote = new NoteEntity();
             BindingResult bindingResult = makeMe.failedBindingResult();
 
-            String response = controller.createNote(userModel.getOwnershipModel().getEntity(), null, newNote.getNoteContent(), bindingResult, model);
+            String response = controller.createNote(null, newNote.getNoteContent(), bindingResult, model);
             assertNull(newNote.getId());
             assertEquals("notes/new", response);
         }
@@ -123,11 +124,6 @@ class NoteControllerTests {
 
     @Nested
     class DeleteNoteTest {
-        @Autowired
-        private LinkRepository linkRepository;
-        @Autowired
-        EntityManager entityManager;
-
         @Test
         void shouldNotBeAbleToDeleteNoteThatBelongsToOtherUser() {
             UserEntity anotherUserEntity = makeMe.aUser().please();
