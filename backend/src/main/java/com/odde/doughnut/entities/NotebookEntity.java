@@ -5,7 +5,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import javax.validation.Valid;
 
 @Entity
 @Table(name = "notebook")
@@ -21,6 +20,16 @@ public class NotebookEntity {
     @JoinColumn(name = "ownership_id")
     @JsonIgnore
     @Getter @Setter private OwnershipEntity ownershipEntity;
+
+    @JoinTable(name = "notebook_head_note", joinColumns = {
+            @JoinColumn(name = "notebook_id", referencedColumnName = "id")}, inverseJoinColumns = {
+            @JoinColumn(name = "head_note_id", referencedColumnName = "id")
+    })
+    @OneToOne(cascade = CascadeType.ALL)
+    @JsonIgnore
+    @Getter
+    @Setter
+    private NoteEntity headNoteEntity;
 
     @Column(name="skip_review_entirely")
     @Getter @Setter Boolean skipReviewEntirely = false;

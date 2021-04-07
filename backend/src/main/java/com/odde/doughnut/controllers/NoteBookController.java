@@ -47,6 +47,8 @@ public class NoteBookController extends ApplicationMvcController  {
         notebookEntity.setCreatorEntity(getCurrentUser().getEntity());
         notebookEntity.setOwnershipEntity(getCurrentUser().getOwnershipModel().getEntity());
         modelFactoryService.noteRepository.save(noteEntity);
+        notebookEntity.setHeadNoteEntity(noteEntity);
+        modelFactoryService.notebookRepository.save(notebookEntity);
         return "redirect:/notes/" + noteEntity.getId();
     }
 

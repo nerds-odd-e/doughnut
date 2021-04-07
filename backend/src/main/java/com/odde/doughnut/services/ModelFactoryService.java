@@ -12,26 +12,15 @@ import java.util.Optional;
 
 @Service
 public class ModelFactoryService {
-    @Autowired public final NoteRepository noteRepository;
-    @Autowired public final UserRepository userRepository;
-    @Autowired public final BazaarNoteRepository bazaarNoteRepository;
-    @Autowired public final ReviewPointRepository reviewPointRepository;
-    @Autowired public final CircleRepository circleRepository;
-    @Autowired public final LinkRepository linkRepository;
-    @Autowired public final NotesClosureRepository notesClosureRepository;
-    @Autowired public final EntityManager entityManager;
-
-    public ModelFactoryService(NoteRepository noteRepository, UserRepository userRepository, BazaarNoteRepository bazaarNoteRepository, ReviewPointRepository reviewPointRepository, CircleRepository circleRepository, LinkRepository linkRepository, NotesClosureRepository notesClosureRepository, EntityManager entityManager)
-    {
-        this.noteRepository = noteRepository;
-        this.userRepository = userRepository;
-        this.bazaarNoteRepository = bazaarNoteRepository;
-        this.reviewPointRepository = reviewPointRepository;
-        this.circleRepository = circleRepository;
-        this.linkRepository = linkRepository;
-        this.notesClosureRepository = notesClosureRepository;
-        this.entityManager = entityManager;
-    }
+    @Autowired public NoteRepository noteRepository;
+    @Autowired public UserRepository userRepository;
+    @Autowired public BazaarNoteRepository bazaarNoteRepository;
+    @Autowired public ReviewPointRepository reviewPointRepository;
+    @Autowired public CircleRepository circleRepository;
+    @Autowired public LinkRepository linkRepository;
+    @Autowired public NotesClosureRepository notesClosureRepository;
+    @Autowired public NotebookRepository notebookRepository;
+    @Autowired public EntityManager entityManager;
 
     public TreeNodeModel toTreeNodeModel(NoteEntity note) {
         return new TreeNodeModel(note, this);
