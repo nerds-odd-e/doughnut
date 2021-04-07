@@ -25,6 +25,14 @@ public class NoteBookController extends ApplicationMvcController  {
         this.modelFactoryService = modelFactoryService;
     }
 
+    @GetMapping("")
+    public String myNotebooks(Model model) {
+        model.addAttribute("notebooks", getCurrentUser().getEntity().getOwnershipEntity().getNotebookEntities());
+        model.addAttribute("notes", getCurrentUser().getTopLevelNotes());
+        model.addAttribute("subscriptions", getCurrentUser().getEntity().getSubscriptionEntities());
+        return "notes/index";
+    }
+
     @GetMapping({"/new_notebook"})
     public String newNote(Model model) {
         UserModel userModel = getCurrentUser();
@@ -41,12 +49,17 @@ public class NoteBookController extends ApplicationMvcController  {
         }
         UserModel userModel = getCurrentUser();
         final NoteEntity noteEntity = new NoteEntity();
-        noteEntity.populate(ownershipEntity, null, noteContentEntity, userModel.getEntity());
         final NotebookEntity notebookEntity = new NotebookEntity();
+        UserEntity userEntity = userModel.getEntity();
+        noteEntity.updateNoteContent(noteContentEntity, userEntity);
+        noteEntity.setOwnershipEntity(ownershipEntity);
+        noteEntity.setUserEntity(userEntity);
         noteEntity.setNotebookEntity(notebookEntity);
-        notebookEntity.setCreatorEntity(getCurrentUser().getEntity());
-        notebookEntity.setOwnershipEntity(getCurrentUser().getOwnershipModel().getEntity());
+
+        notebookEntity.setCreatorEntity(userEntity);
+        notebookEntity.setOwnershipEntity(userEntity.getOwnershipEntity());
         modelFactoryService.noteRepository.save(noteEntity);
+
         notebookEntity.setHeadNoteEntity(noteEntity);
         modelFactoryService.notebookRepository.save(notebookEntity);
         return "redirect:/notes/" + noteEntity.getId();

@@ -25,6 +25,10 @@ public class OwnershipEntity {
     @JsonIgnore
     @Getter @Setter private CircleEntity circleEntity;
 
+    @OneToMany(mappedBy = "ownershipEntity")
+    @JsonIgnore
+    @Getter @Setter private List<NotebookEntity> notebookEntities = new ArrayList<>();
+
     public boolean ownsBy(UserEntity user) {
         if(userEntity != null) {
             return userEntity.equals(user);

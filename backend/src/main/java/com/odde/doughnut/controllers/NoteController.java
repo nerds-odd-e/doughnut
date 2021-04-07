@@ -29,13 +29,6 @@ public class NoteController extends ApplicationMvcController  {
         this.modelFactoryService = modelFactoryService;
     }
 
-    @GetMapping("")
-    public String myNotes(Model model) {
-        model.addAttribute("notes", getCurrentUser().getTopLevelNotes());
-        model.addAttribute("subscriptions", getCurrentUser().getEntity().getSubscriptionEntities());
-        return "notes/index";
-    }
-
     @GetMapping("/{parentNote}/new")
     public String newNote(@PathVariable(name = "parentNote") NoteEntity parentNote, Model model) throws NoAccessRightException {
         UserModel userModel = getCurrentUser();
@@ -54,7 +47,10 @@ public class NoteController extends ApplicationMvcController  {
         UserModel userModel = getCurrentUser();
         userModel.assertAuthorization(parentNote);
         NoteEntity noteEntity = new NoteEntity();
-        noteEntity.populate(null, parentNote, noteContentEntity, userModel.getEntity());
+        UserEntity userEntity = userModel.getEntity();
+        noteEntity.updateNoteContent(noteContentEntity, userEntity);
+        noteEntity.setParentNote(parentNote);
+        noteEntity.setUserEntity(userEntity);
         modelFactoryService.noteRepository.save(noteEntity);
         return "redirect:/notes/" + noteEntity.getId();
     }

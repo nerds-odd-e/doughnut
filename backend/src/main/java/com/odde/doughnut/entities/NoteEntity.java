@@ -161,6 +161,8 @@ public class NoteEntity {
 
     public void setParentNote(NoteEntity parentNote) {
         if (parentNote == null) return;
+        setOwnershipEntity(parentNote.getOwnershipEntity());
+        setNotebookEntity(parentNote.getNotebookEntity());
         List<NoteEntity> ancestorsIncludingMe = parentNote.getAncestorsIncludingMe();
         Collections.reverse(ancestorsIncludingMe);
         addAncestors(ancestorsIncludingMe);
@@ -206,19 +208,6 @@ public class NoteEntity {
         } else {
             BeanUtils.copyProperties(reviewSettingEntity, getMasterReviewSettingEntity());
         }
-    }
-
-    public void populate(OwnershipEntity ownershipEntity, NoteEntity parentNote, NoteContentEntity noteContentEntity, UserEntity userEntity) throws IOException {
-        updateNoteContent(noteContentEntity, userEntity);
-        setParentNote(parentNote);
-        setOwnershipEntity(ownershipEntity);
-        if (ownershipEntity == null) {
-            setOwnershipEntity(parentNote.getOwnershipEntity());
-        }
-        if (parentNote != null) {
-            setNotebookEntity(parentNote.getNotebookEntity());
-        }
-        setUserEntity(userEntity);
     }
 
     public void updateNoteContent(NoteContentEntity noteContentEntity, UserEntity userEntity) throws IOException {
