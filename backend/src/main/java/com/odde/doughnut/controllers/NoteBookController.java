@@ -28,7 +28,6 @@ public class NoteBookController extends ApplicationMvcController  {
     @GetMapping("")
     public String myNotebooks(Model model) {
         model.addAttribute("notebooks", getCurrentUser().getEntity().getOwnershipEntity().getNotebookEntities());
-        model.addAttribute("notes", getCurrentUser().getTopLevelNotes());
         model.addAttribute("subscriptions", getCurrentUser().getEntity().getSubscriptionEntities());
         return "notes/index";
     }
@@ -57,7 +56,7 @@ public class NoteBookController extends ApplicationMvcController  {
         noteEntity.setNotebookEntity(notebookEntity);
 
         notebookEntity.setCreatorEntity(userEntity);
-        notebookEntity.setOwnershipEntity(userEntity.getOwnershipEntity());
+        notebookEntity.setOwnershipEntity(ownershipEntity);
         modelFactoryService.noteRepository.save(noteEntity);
 
         notebookEntity.setHeadNoteEntity(noteEntity);

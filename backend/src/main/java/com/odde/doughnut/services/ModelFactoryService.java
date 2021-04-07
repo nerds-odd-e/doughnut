@@ -84,10 +84,6 @@ public class ModelFactoryService {
         return new LinkModel(linkEntity, this);
     }
 
-    public OwnershipModel toOwnershipModel(OwnershipEntity ownershipEntity) {
-        return new OwnershipModel(ownershipEntity, this);
-    }
-
     public SubscriptionModel toSubscriptionModel(SubscriptionEntity sub) {
         return new SubscriptionModel(sub, this);
     }

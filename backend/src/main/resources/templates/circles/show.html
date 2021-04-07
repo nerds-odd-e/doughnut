@@ -4,7 +4,7 @@
         <h1 th:text="${circleEntity.name}"/>
         <p> <a class="nav-link" th:href="@{/circles/{id}/notes/new_notebook(id=${circleEntity.id})}">Add New Notebook In This Circle</a> </p>
 
-        <div th:replace="_fragments/note_fragments :: noteOwnerViewCards(${notes})"/>
+        <div th:replace="_fragments/notebook_fragments :: notebookViewCards(${notebooks})"/>
 
         <nav class="nav justify-content-end">
             <div class="nav-item circle-member" th:each="member:${circleEntity.members}">

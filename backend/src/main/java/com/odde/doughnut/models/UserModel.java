@@ -122,12 +122,4 @@ public class UserModel extends ModelForEntity<UserEntity> implements ReviewScope
     public Reviewing createReviewing(Timestamp currentUTCTimestamp) {
         return new Reviewing(this, currentUTCTimestamp, modelFactoryService);
     }
-
-    public OwnershipModel getOwnershipModel() {
-        return modelFactoryService.toOwnershipModel(entity.getOwnershipEntity());
-    }
-
-    public List<NoteEntity> getTopLevelNotes() {
-        return getOwnershipModel().getOrphanedNotes();
-    }
 }

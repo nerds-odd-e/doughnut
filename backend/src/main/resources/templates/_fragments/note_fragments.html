@@ -53,12 +53,7 @@
        title="edit review settings">
         <svg th:replace="_fragments/svgs :: reviewSetting"/>
     </a>
-    <form th:action="@{/notes/{id}/share(id=${note.id})}" th:method="post"
-          onsubmit="return confirm('Are you sure to share?')">
-        <button class="btn btn-sm share-card" title="Share node to bazaar">
-            <svg th:replace="_fragments/svgs :: bazaarShare"/>
-        </button>
-    </form>
+
     <form th:action="@{/notes/{id}/delete(id=${note.id})}" th:method="delete"
           onsubmit="return confirm('Are you sure to delete?')">
         <input type="hidden" name="_method" value="delete"/>
