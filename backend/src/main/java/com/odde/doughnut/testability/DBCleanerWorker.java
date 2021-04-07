@@ -35,17 +35,18 @@ public class DBCleanerWorker {
         EntityManager manager = createEntityManager();
         EntityTransaction transaction = manager.getTransaction();
         transaction.begin();
+
+        manager.createNativeQuery("SET FOREIGN_KEY_CHECKS=0").executeUpdate();
         consumer.accept(manager);
+        manager.createNativeQuery("SET FOREIGN_KEY_CHECKS=1").executeUpdate();
         transaction.commit();
         manager.close();
     }
 
     private void truncateTable(String tableName, EntityManager entityManager) {
-        entityManager.createNativeQuery("SET FOREIGN_KEY_CHECKS=0").executeUpdate();
-        entityManager.createNativeQuery("TRUNCATE TABLE `" + tableName + "`").executeUpdate();
-        entityManager.createNativeQuery("TRUNCATE TABLE `" + tableName + "`").executeUpdate();
+        entityManager.createNativeQuery("DELETE FROM `" + tableName + "`").executeUpdate();
         entityManager.createNativeQuery("ALTER TABLE `" + tableName + "` AUTO_INCREMENT=1").executeUpdate();
-        entityManager.createNativeQuery("SET FOREIGN_KEY_CHECKS=1").executeUpdate();
+
     }
 
     private List<String> getAnnotatedTableNames(EntityManager manager) {
