@@ -8,7 +8,7 @@ import {
 
 When("I create a new circle {string} and copy the invitation code", (circleName) => {
   cy.visit("/circles/new");
-  cy.getFormControl('name').type(circleName);
+  cy.getFormControl('Name').type(circleName);
   cy.get('input[value="Submit"]').click();
 
   cy.get("#invitation-code").invoke('val').then((text)=>{
@@ -18,7 +18,7 @@ When("I create a new circle {string} and copy the invitation code", (circleName)
 
 When("I join the circle with the invitation code", () => {
   cy.visit("/circles");
-  cy.get("@savedInvitationCode").then((invitationCode) => cy.getFormControl("invitationCode").type(invitationCode));
+  cy.get("@savedInvitationCode").then((invitationCode) => cy.getFormControl("InvitationCode").type(invitationCode));
   cy.get('input[value="Submit"]').click();
 });
 
@@ -38,8 +38,8 @@ Given("There is a circle {string} with {string} members", (circleName, members) 
 
 When("I create a note {string} in circle {string}", (noteTitle, circleName) => {
   cy.navigateToCircle(circleName);
-  cy.findByText("Add Top Level Note In This Circle").click();
-  cy.submitNoteFormWith([{'title': noteTitle}]);
+  cy.findByText("Add New Notebook In This Circle").click();
+  cy.submitNoteFormWith([{'Title': noteTitle}]);
 });
 
 When("I should see the note {string} in circle {string}", (noteTitle, circleName) => {
@@ -50,7 +50,7 @@ When("I should see the note {string} in circle {string}", (noteTitle, circleName
 When("I add a note {string} under {string}", (noteTitle, parentNoteTitle) => {
   cy.findByText(parentNoteTitle).click();
   cy.findByText("(Add Child Note)").click();
-  cy.submitNoteFormWith([{'title': noteTitle}]);
+  cy.submitNoteFormWith([{'Title': noteTitle}]);
 });
 
 

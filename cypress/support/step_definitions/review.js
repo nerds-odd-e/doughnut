@@ -130,7 +130,7 @@ Then("I should be asked link question {string} {string} with options {string}", 
 });
 
 Then("I type my answer {string}", (answer) => {
-    cy.getFormControl('answer').type(answer);
+    cy.getFormControl('Answer').type(answer);
     cy.findByRole('button', {name: 'OK'}).click();
 });
 

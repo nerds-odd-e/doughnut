@@ -21,14 +21,14 @@ Given("there are notes from Note {int} to Note {int}", (from, to) => {
 
 When("I create top level note with:", (data) => {
   cy.visit("/notes");
-  cy.findByText("Add Top Level Note").click();
+  cy.findByText("Add New Notebook").click();
   cy.submitNoteFormWith(data.hashes());
 });
 
 When("I am editing note {string} the title is expected to be pre-filled with {string}", (noteTitle, oldTitle) => {
   cy.visit("/notes");
   cy.findNoteCardButton(noteTitle, ".edit-card").click();
-  cy.getFormControl('title').should('have.value', oldTitle);
+  cy.getFormControl('Title').should('have.value', oldTitle);
 });
 
 When("I update it to become:", (data) => {
@@ -106,7 +106,7 @@ When("I move note {string} left", (noteTitle) => {
 });
 
 When("I should see the screenshot matches", () => {
-//  cy.get('.content').toMatchImageSnapshot({ imageConfig: { threshold: 0.001, }, });
+  // cy.get('.content').toMatchImageSnapshot({ imageConfig: { threshold: 0.001, }, });
 });
 
 

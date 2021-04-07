@@ -41,7 +41,7 @@ public class NoteEntity {
     @JsonIgnore
     @Getter
     @Setter
-    private NoteBookEntity noteBookEntity;
+    private NotebookEntity notebookEntity;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "ownership_id", referencedColumnName = "id")

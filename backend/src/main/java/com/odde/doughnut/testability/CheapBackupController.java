@@ -1,6 +1,6 @@
 package com.odde.doughnut.testability;
 
-import com.odde.doughnut.entities.NoteBookEntity;
+import com.odde.doughnut.entities.NotebookEntity;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.services.ModelFactoryService;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,12 +25,11 @@ public class CheapBackupController {
         HashMap<String, Object> hash = new HashMap<>();
 
         modelFactoryService.noteRepository.findAll().forEach(note->{
-            if (note.getParentNote() == null && note.getNoteBookEntity() == null) {
-                NoteBookEntity noteBookEntity = new NoteBookEntity();
+            if (note.getParentNote() == null && note.getNotebookEntity() == null) {
+                NotebookEntity noteBookEntity = new NotebookEntity();
                 noteBookEntity.setOwnershipEntity(note.getOwnershipEntity());
                 noteBookEntity.setCreatorEntity(note.getUserEntity());
-                noteBookEntity.setTopNoteEntity(note);
-                note.setNoteBookEntity(noteBookEntity);
+                note.setNotebookEntity(noteBookEntity);
                 modelFactoryService.noteRepository.save(note);
             }
         });
@@ -39,7 +38,7 @@ public class CheapBackupController {
             if (note.getParentNote() == null) {
                 note.getDescendantNCs().forEach(nc->{
                     NoteEntity n = nc.getNoteEntity();
-                    n.setNoteBookEntity(note.getNoteBookEntity());
+                    n.setNotebookEntity(note.getNotebookEntity());
                     modelFactoryService.noteRepository.save(n);
                 });
             }
@@ -47,7 +46,7 @@ public class CheapBackupController {
 
         int cnt[] = {0};
         modelFactoryService.noteRepository.findAll().forEach(note->{
-            if (note.getNoteBookEntity() == null) {
+            if (note.getNotebookEntity() == null) {
                 cnt[0]+=1;
             }
         });

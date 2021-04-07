@@ -2,7 +2,7 @@
 <layout th:replace="_fragments/basic_layout :: application_layout(~{ :: .content})">
     <div class="container content">
         <h1 th:text="${circleEntity.name}"/>
-        <p> <a class="nav-link" th:href="@{/circles/{id}/notes/new(id=${circleEntity.id})}">Add Top Level Note In This Circle</a> </p>
+        <p> <a class="nav-link" th:href="@{/circles/{id}/notes/new(id=${circleEntity.id})}">Add New Notebook In This Circle</a> </p>
 
         <div th:replace="_fragments/note_fragments :: noteOwnerViewCards(${notes})"/>
 

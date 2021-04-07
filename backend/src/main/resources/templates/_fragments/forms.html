@@ -17,7 +17,7 @@
             type="file"
             th:class="'form-control' + ${#fields.hasErrors(field) ? ' is-invalid' : ''}"
             th:id="${scopeName + '-' + field}"
-            th:name="${field} + 'Proxy'"
+            th:field="*{__${field + 'Proxy'}__}"
             th:placeholder="${placeholder}"
     />
 </div>

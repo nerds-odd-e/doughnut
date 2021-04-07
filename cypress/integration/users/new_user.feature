@@ -4,7 +4,7 @@ Feature: new user
     When I identify myself as a new user
     Then I should be asked to create my profile
     When I save my profile with:
-      | name      |
+      | Name      |
       | Learner A |
     Then I should see "Welcome Learner A" in the page
     And My name "Learner A" is in the top bar

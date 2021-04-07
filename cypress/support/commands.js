@@ -266,6 +266,6 @@ Cypress.Commands.add("shouldSeeQuizWithOptions", (questionParts, options) => {
     );
 });
 
-Cypress.Commands.add("getFormControl", (name) => {
-    return cy.get("[name='" + name + "']");
+Cypress.Commands.add("getFormControl", (label) => {
+    return cy.findByLabelText(label);
 });

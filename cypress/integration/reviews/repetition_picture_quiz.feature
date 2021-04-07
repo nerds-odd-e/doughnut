@@ -8,11 +8,11 @@ Feature: Repetition Picture Quiz
       | Space | true       |               |
       | Mars  | true       | Space         |
     When I create note belonging to "Space":
-      | title | uploadPictureProxy | pictureMask           |
-      | Earth | example.png        | 20 40 70 30 40 80 5 8 |
+      | Title | UploadPicture | PictureMask           |
+      | Earth | example.png   | 20 40 70 30 40 80 5 8 |
     And I create note belonging to "Space":
-      | title | uploadPictureProxy | pictureMask |
-      | Moon  | moon.jpg           | 30 40 20 30 |
+      | Title | UploadPicture | PictureMask |
+      | Moon  | moon.jpg      | 30 40 20 30 |
 
   Scenario: Picture question
     Given I learned one note "Earth" on day 1
