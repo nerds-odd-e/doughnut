@@ -37,6 +37,13 @@ public class NoteEntity {
     private Long siblingOrder = SiblingOrder.getGoodEnoughOrderNumber();
 
     @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "note_book_id", referencedColumnName = "id")
+    @JsonIgnore
+    @Getter
+    @Setter
+    private NoteBookEntity noteBookEntity;
+
+    @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "ownership_id", referencedColumnName = "id")
     @JsonIgnore
     @Getter
