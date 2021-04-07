@@ -36,29 +36,25 @@ public class NoteController extends ApplicationMvcController  {
         return "notes/index";
     }
 
-    @GetMapping({"/new", "/{parentNote}/new"})
-    public String newNote(@PathVariable(name = "parentNote", required = false) NoteEntity parentNote, Model model) throws NoAccessRightException {
+    @GetMapping("/{parentNote}/new")
+    public String newNote(@PathVariable(name = "parentNote") NoteEntity parentNote, Model model) throws NoAccessRightException {
         UserModel userModel = getCurrentUser();
-        if (parentNote != null) {
-            userModel.assertAuthorization(parentNote);
-        }
+        userModel.assertAuthorization(parentNote);
         NoteContentEntity noteContentEntity = new NoteContentEntity();
         model.addAttribute("ownershipEntity", userModel.getEntity().getOwnershipEntity());
         model.addAttribute("noteContentEntity", noteContentEntity);
         return "notes/new";
     }
 
-    @PostMapping({"/{ownershipEntity}/create_top", "/{parentNote}/create"})
-    public String createNote(@PathVariable(name = "ownershipEntity", required = false) OwnershipEntity ownershipEntity, @PathVariable(name = "parentNote", required = false) NoteEntity parentNote, @Valid NoteContentEntity noteContentEntity, BindingResult bindingResult, Model model) throws NoAccessRightException, IOException {
+    @PostMapping("/{parentNote}/create")
+    public String createNote(@PathVariable(name = "parentNote") NoteEntity parentNote, @Valid NoteContentEntity noteContentEntity, BindingResult bindingResult, Model model) throws NoAccessRightException, IOException {
         if (bindingResult.hasErrors()) {
             return "notes/new";
         }
         UserModel userModel = getCurrentUser();
-        if (parentNote != null) {
-            userModel.assertAuthorization(parentNote);
-        }
+        userModel.assertAuthorization(parentNote);
         NoteEntity noteEntity = new NoteEntity();
-        noteEntity.populate(ownershipEntity, parentNote, noteContentEntity, userModel.getEntity());
+        noteEntity.populate(null, parentNote, noteContentEntity, userModel.getEntity());
         modelFactoryService.noteRepository.save(noteEntity);
         return "redirect:/notes/" + noteEntity.getId();
     }

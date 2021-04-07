@@ -215,6 +215,9 @@ public class NoteEntity {
         if (ownershipEntity == null) {
             setOwnershipEntity(parentNote.getOwnershipEntity());
         }
+        if (parentNote != null) {
+            setNotebookEntity(parentNote.getNotebookEntity());
+        }
         setUserEntity(userEntity);
     }
 

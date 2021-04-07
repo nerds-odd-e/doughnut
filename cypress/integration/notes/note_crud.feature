@@ -56,22 +56,3 @@ Feature: Note CRUD
       | title        |
       | Re-quirement |
       | Re-Design    |
-
-  Scenario: Edit a note
-    Given there are some notes for the current user
-      | title     | description       |
-      | Odd-e CSD | Our best training |
-    When I am editing note "Odd-e CSD" the title is expected to be pre-filled with "Odd-e CSD"
-    And I update it to become:
-      | Title          | Description         |
-      | LeSS in Action | An awesome training |
-    Then I should see these notes belonging to the user at the top level of all my notes
-      | title          |
-      | LeSS in Action |
-
-  Scenario: Delete a note
-    Given there are some notes for the current user
-      | title          | description         |
-      | LeSS in Action | An awesome training |
-    When I delete top level note "LeSS in Action"
-    Then I should not see note "LeSS in Action" at the top level of all my notes
