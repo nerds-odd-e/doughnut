@@ -23,17 +23,26 @@ public class SubscriptionEntity {
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "note_id", referencedColumnName = "id")
-    @Getter @Setter private NoteEntity noteEntity;
+    private NoteEntity noteEntity;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "notebook_id", referencedColumnName = "id")
-    @Getter @Setter private NotebookEntity notebookEntity;
+    @Getter private NotebookEntity notebookEntity;
 
     public String getTitle() {
-        return noteEntity.getTitle();
+        return notebookEntity.getHeadNoteEntity().getTitle();
     }
 
     public NoteContentEntity getNoteContent() {
-        return noteEntity.getNoteContent();
+        return notebookEntity.getHeadNoteEntity().getNoteContent();
+    }
+
+    public void setNotebookEntity(NotebookEntity notebookEntity) {
+        this.notebookEntity = notebookEntity;
+        this.noteEntity = notebookEntity.getHeadNoteEntity();
+    }
+
+    public NoteEntity getHeadNoteEntity() {
+        return notebookEntity.getHeadNoteEntity();
     }
 }

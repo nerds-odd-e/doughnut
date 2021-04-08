@@ -1,8 +1,8 @@
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
 <layout th:replace="_fragments/basic_layout :: application_layout(~{ :: .content})">
     <div class="container content">
-        <div th:replace="_fragments/subscription_fragments :: noteSubscriptionBreadcrumb(${subscriptionEntity.noteEntity}, ~{:: .additional-item})">
-            <li class="breadcrumb-item additional-item" th:text="${subscriptionEntity.noteEntity.title}"/>
+        <div th:replace="_fragments/subscription_fragments :: noteSubscriptionBreadcrumb(${subscriptionEntity.headNoteEntity}, ~{:: .additional-item})">
+            <li class="breadcrumb-item additional-item" th:text="${subscriptionEntity.headNoteEntity.title}"/>
         </div>
 
         <form action="#" th:action="@{/subscriptions/{id}(id=${subscriptionEntity.id})}" th:object="${subscriptionEntity}" method="post">

@@ -148,10 +148,10 @@ public class ReviewingInitialReviewTest {
         @BeforeEach
         void setup() {
             UserEntity anotherUser = makeMe.aUser().please();
-            NoteEntity top = makeMe.aNote().byUser(anotherUser).please();
+            NoteEntity top = makeMe.aNote().byUser(anotherUser).asTheHeadNoteOfANotebook().please();
             note1 = makeMe.aNote().under(top).please();
             note2 = makeMe.aNote().under(top).please();
-            makeMe.aSubscriptionFor().forNote(top).forUser(userModel.entity).please();
+            makeMe.aSubscriptionFor().forNotebook(top.getNotebookEntity()).forUser(userModel.entity).please();
             makeMe.refresh(userModel);
         }
 

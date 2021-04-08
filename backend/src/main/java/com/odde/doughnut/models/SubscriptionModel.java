@@ -14,21 +14,21 @@ public class SubscriptionModel extends ModelForEntity<SubscriptionEntity> implem
 
     @Override
     public List<NoteEntity> getNotesHaveNotBeenReviewedAtAll() {
-        return modelFactoryService.noteRepository.findByAncestorWhereThereIsNoReviewPoint(entity.getUserEntity(), entity.getNoteEntity());
+        return modelFactoryService.noteRepository.findByAncestorWhereThereIsNoReviewPoint(entity.getUserEntity(), entity.getHeadNoteEntity());
     }
 
     @Override
     public int getNotesHaveNotBeenReviewedAtAllCount() {
-        return modelFactoryService.noteRepository.countByAncestorWhereThereIsNoReviewPoint(entity.getUserEntity(), entity.getNoteEntity());
+        return modelFactoryService.noteRepository.countByAncestorWhereThereIsNoReviewPoint(entity.getUserEntity(), entity.getHeadNoteEntity());
     }
 
     @Override
     public List<LinkEntity> getLinksHaveNotBeenReviewedAtAll() {
-        return modelFactoryService.linkRepository.findByAncestorWhereThereIsNoReviewPoint(entity.getUserEntity(), entity.getNoteEntity());
+        return modelFactoryService.linkRepository.findByAncestorWhereThereIsNoReviewPoint(entity.getUserEntity(), entity.getHeadNoteEntity());
     }
 
     public boolean needToLearnMoreToday(List<Integer> noteIds) {
-        int count = modelFactoryService.noteRepository.countByAncestorAndInTheList(entity.getNoteEntity(), noteIds);
+        int count = modelFactoryService.noteRepository.countByAncestorAndInTheList(entity.getHeadNoteEntity(), noteIds);
         return count < entity.getDailyTargetOfNewNotes();
     }
 }

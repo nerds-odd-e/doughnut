@@ -1,4 +1,4 @@
-<a th:fragment="subscriptionTitleWithBazaarLink(subscription)" th:href="'/bazaar/notes/' + ${subscription.noteEntity.id}" th:text="${subscription.noteEntity.title}"/>
+<a th:fragment="subscriptionTitleWithBazaarLink(subscription)" th:href="'/bazaar/notes/' + ${subscription.headNoteEntity.id}" th:text="${subscription.headNoteEntity.title}"/>
 
 <div th:fragment="noteSubscriptionCards(subscriptions)"  th:replace="_fragments/note_fragments::noteCardWithHeaderAndButton(
          notes=${subscriptions},
