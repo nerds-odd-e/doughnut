@@ -118,8 +118,12 @@ Cypress.Commands.add("visitMyNotebooks", (noteTitle) => {
 });
 
 Cypress.Commands.add("creatingLinkFor", (noteTitle) => {
-    cy.visitMyNotebooks();
-    cy.findNoteCardButton(noteTitle, ".link-card").click();
+    cy.clickNotePageButton(noteTitle, ".link-card");
+});
+
+Cypress.Commands.add("clickNotePageButton", (noteTitle, btnSelector) => {
+    cy.jumpToNotePage(noteTitle);
+    cy.get(".jumbotron").find(btnSelector).click();
 });
 
 Cypress.Commands.add("expectExactLinkTargets", (targets) => {
