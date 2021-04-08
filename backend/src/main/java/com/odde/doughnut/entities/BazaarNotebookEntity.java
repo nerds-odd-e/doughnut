@@ -12,17 +12,8 @@ public class BazaarNotebookEntity {
     @Getter
     @GeneratedValue(strategy = GenerationType.IDENTITY) private Integer id;
 
-    @ManyToOne
-    @JoinColumn(name = "note_id", referencedColumnName = "id")
-    private NoteEntity note;
-
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "notebook_id", referencedColumnName = "id")
-    @Getter private NotebookEntity notebookEntity;
+    @Getter @Setter private NotebookEntity notebookEntity;
 
-    public void setNotebookEntity(NotebookEntity notebookEntity) {
-
-        this.notebookEntity = notebookEntity;
-        this.note = notebookEntity.getHeadNoteEntity();
-    }
 }

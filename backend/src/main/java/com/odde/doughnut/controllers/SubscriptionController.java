@@ -59,7 +59,7 @@ public class SubscriptionController extends ApplicationMvcController {
         if (bindingResult.hasErrors()) {
             return "subscriptions/add_to_learning";
         }
-        if (modelFactoryService.bazaarNotebookRepository.findByNoteId(noteEntity.getId()) == null) {
+        if (modelFactoryService.bazaarNotebookRepository.findByNotebookEntity(noteEntity.getNotebookEntity()) == null) {
             throw new NoAccessRightException();
         }
         subscriptionEntity.setNotebookEntity(noteEntity.getNotebookEntity());
