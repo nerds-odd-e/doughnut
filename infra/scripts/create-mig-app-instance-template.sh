@@ -13,4 +13,5 @@ gcloud compute instance-templates create doughnut-mig-app-template \
 	--machine-type e2-medium \
 	--metadata-from-file startup-script=${SCRIPTPATH}/mig-app-instance-startup.sh \
 	--metadata BUCKET=dough-01 \
+  --no-address \
 	--tags mig-app-srv
