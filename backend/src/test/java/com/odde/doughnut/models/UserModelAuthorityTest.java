@@ -38,7 +38,7 @@ public class UserModelAuthorityTest {
         @BeforeEach
         void setup() {
             circleModel = makeMe.aCircle().toModelPlease();
-            noteEntity = makeMe.aNote().inCircle(circleModel).please();
+            noteEntity = makeMe.aNote().byUser(makeMe.aUser().please()).inCircle(circleModel).please();
         }
 
         @Test
@@ -51,9 +51,6 @@ public class UserModelAuthorityTest {
             makeMe.theCircle(circleModel).hasMember(userModel).please();
             assertTrue(userModel.hasAuthority(noteEntity));
         }
-
-
-
     }
 }
 

@@ -55,7 +55,8 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
     }
 
     public NoteBuilder inCircle(CircleEntity circleEntity) {
-        entity.setOwnershipEntity(circleEntity.getOwnershipEntity());
+        buildNotebookUnlessExist();
+        entity.getNotebookEntity().setOwnershipEntity(circleEntity.getOwnershipEntity());
         return this;
     }
 
@@ -73,9 +74,7 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
             ownership(entity.getUserEntity());
         }
 
-        if (entity.getNotebookEntity() == null) {
-            buildNotebook();
-        }
+        buildNotebookUnlessExist();
 
     }
 
@@ -142,12 +141,15 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
         return this;
     }
 
-    private void buildNotebook() {
+    private void buildNotebookUnlessExist() {
+        if (entity.getNotebookEntity() != null) {
+            return;
+        }
         NotebookEntity notebookEntity = new NotebookEntity();
         if (entity.getOwnershipEntity() != null) {
             notebookEntity.setOwnershipEntity(entity.getOwnershipEntity());
         }
-        else {
+        else if(entity.getUserEntity() != null) {
             notebookEntity.setOwnershipEntity(entity.getUserEntity().getOwnershipEntity());
         }
         notebookEntity.setCreatorEntity(entity.getUserEntity());

@@ -16,9 +16,6 @@ public interface NoteRepository extends CrudRepository<NoteEntity, Integer> {
     @Query( value = "SELECT count(1) as count from note " + byOwnershipWhereThereIsNoReviewPoint, nativeQuery = true)
     int countByOwnershipWhereThereIsNoReviewPoint(@Param("userEntity") UserEntity userEntity);
 
-    @Query(nativeQuery = true, value = "SELECT nt.* from note as nt JOIN ownership os ON nt.ownership_id = os.id LEFT JOIN notes_closure nc ON nt.id=nc.note_id WHERE nc.id is NULL and os.id = :ownership")
-    List<NoteEntity> orphanedNotesOf(@Param("ownership") OwnershipEntity ownershipEntity);
-
     @Query( value = "SELECT note.* from note where title = :noteTitle limit 1", nativeQuery = true)
     NoteEntity findFirstByTitle(@Param("noteTitle") String noteTitle);
 
@@ -37,8 +34,9 @@ public interface NoteRepository extends CrudRepository<NoteEntity, Integer> {
             + " WHERE note.skip_review IS FALSE "
             + "   AND rp.id IS NULL ";
 
-    String byOwnershipWhereThereIsNoReviewPoint = whereThereIsNoReviewPoint
-                + " AND note.ownership_id = :#{#userEntity.ownershipEntity.id} ";
+    String byOwnershipWhereThereIsNoReviewPoint = "JOIN notebook ON notebook.id = note.notebook_id "
+            + whereThereIsNoReviewPoint
+            + " AND notebook.ownership_id = :#{#userEntity.ownershipEntity.id} ";
 
     String joinClosure = " JOIN notes_closure ON notes_closure.note_id = note.id "
             + "   AND notes_closure.ancestor_id = :ancestor ";
