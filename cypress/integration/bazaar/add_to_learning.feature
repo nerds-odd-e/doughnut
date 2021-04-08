@@ -11,12 +11,6 @@ Feature: Bazaar subscription
       | Big Square | Square        |
     And note "Shape" is shared to the Bazaar
 
-  Scenario: No "add to learning" button for child note
-    When I go to the bazaar
-    Then I should see the "add-to-learning" button on note "Shape"
-    When I open the note "Shape" in the Bazaar
-    Then I should not see the "add-to-learning" button on note "Square"
-
   Scenario: subscribe to a note and browse
     Given I've logged in as an existing user
     When I subscribe to note "Shape" in the bazaar, with target of learning 1 notes per day
@@ -34,4 +28,11 @@ Feature: Bazaar subscription
     And  On day 1 I repeat old "end                  " and initial review new "Square, My memo, end"
     And  On day 2 I repeat old "Square, My memo, end " and initial review new "Triangle, end       "
     And  I should be able to edit the subscription to note "Shape"
+
+    @ignore
+  Scenario: No "add to learning" button for skip-review notebook
+    Given I've logged in as "another_old_learner"
+    When I change notebook "Shape" to skip review
+    Then I go to the bazaar
+    And I should not see the "add-to-learning" button on note "Shape"
 
