@@ -20,13 +20,13 @@ Given("there are notes from Note {int} to Note {int}", (from, to) => {
 })
 
 When("I create top level note with:", (data) => {
-  cy.visit("/notebooks");
+  cy.visitMyNotebooks();
   cy.findByText("Add New Notebook").click();
   cy.submitNoteFormWith(data.hashes());
 });
 
 When("I am editing note {string} the title is expected to be pre-filled with {string}", (noteTitle, oldTitle) => {
-  cy.visit("/notebooks");
+  cy.visitMyNotebooks();
   cy.findNoteCardButton(noteTitle, ".edit-card").click();
   cy.getFormControl('Title').should('have.value', oldTitle);
 });
@@ -54,7 +54,7 @@ Then("I should see {string} in breadcrumb", (noteTitles) => {
 });
 
 Then("I should see these notes belonging to the user at the top level of all my notes", (data) => {
-    cy.visit("/notebooks");
+    cy.visitMyNotebooks();
     cy.expectNoteCards(data.hashes());
 });
 
@@ -63,7 +63,7 @@ Then("I should see these notes belonging to the user", (data) => {
 });
 
 When("I delete top level note {string}", (noteTitle) => {
-  cy.visit("/notebooks");
+  cy.visitMyNotebooks();
   cy.findNoteCardButton(noteTitle, ".delete-card").click();
 });
 
@@ -83,7 +83,7 @@ Then("I should see {string} in note title", (noteTitle) => {
 });
 
 Then("I should not see note {string} at the top level of all my notes", (noteTitle) => {
-    cy.visit("/notebooks");
+    cy.visitMyNotebooks();
     cy.findByText("Top Level Notes");
     cy.findByText(noteTitle).should('not.exist');
 });

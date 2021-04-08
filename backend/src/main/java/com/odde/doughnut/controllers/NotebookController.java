@@ -2,6 +2,8 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.exceptions.NoAccessRightException;
+import com.odde.doughnut.models.BazaarModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ModelFactoryService;
 import org.springframework.stereotype.Controller;
@@ -11,16 +13,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.view.RedirectView;
 
 import javax.validation.Valid;
 import java.io.IOException;
 
 @Controller
 @RequestMapping("/notebooks")
-public class NoteBookController extends ApplicationMvcController  {
+public class NotebookController extends ApplicationMvcController  {
     private final ModelFactoryService modelFactoryService;
 
-    public NoteBookController(CurrentUserFetcher currentUserFetcher, ModelFactoryService modelFactoryService) {
+    public NotebookController(CurrentUserFetcher currentUserFetcher, ModelFactoryService modelFactoryService) {
         super(currentUserFetcher);
         this.modelFactoryService = modelFactoryService;
     }
@@ -62,6 +65,14 @@ public class NoteBookController extends ApplicationMvcController  {
         notebookEntity.setHeadNoteEntity(noteEntity);
         modelFactoryService.notebookRepository.save(notebookEntity);
         return "redirect:/notes/" + noteEntity.getId();
+    }
+
+    @PostMapping(value = "/{notebookEntity}/share")
+    public RedirectView shareNote(@PathVariable("notebookEntity") NotebookEntity notebookEntity) throws NoAccessRightException {
+        getCurrentUser().assertAuthorization(notebookEntity);
+        BazaarModel bazaar = modelFactoryService.toBazaarModel();
+        bazaar.shareNote(notebookEntity);
+        return new RedirectView("/notebooks");
     }
 
     private UserModel getCurrentUser() {

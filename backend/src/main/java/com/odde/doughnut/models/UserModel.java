@@ -57,6 +57,10 @@ public class UserModel extends ModelForEntity<UserEntity> implements ReviewScope
         }
     }
 
+    public void assertAuthorization(NotebookEntity notebookEntity) throws NoAccessRightException {
+        assertAuthorization(notebookEntity.getHeadNoteEntity());
+    }
+
     public boolean inCircle(CircleEntity circleEntity) {
         return circleEntity.getMembers().contains(entity);
     }
@@ -122,4 +126,5 @@ public class UserModel extends ModelForEntity<UserEntity> implements ReviewScope
     public Reviewing createReviewing(Timestamp currentUTCTimestamp) {
         return new Reviewing(this, currentUTCTimestamp, modelFactoryService);
     }
+
 }

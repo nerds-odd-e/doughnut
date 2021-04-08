@@ -142,14 +142,6 @@ public class NoteController extends ApplicationMvcController  {
         return "redirect:/notes/" + noteEntity.getId();
     }
 
-    @PostMapping(value = "/{note}/share")
-    public RedirectView shareNote(@PathVariable("note") NoteEntity note) throws NoAccessRightException {
-        getCurrentUser().assertAuthorization(note);
-        BazaarModel bazaar = modelFactoryService.toBazaarModel();
-        bazaar.shareNote(note.getNotebookEntity());
-        return new RedirectView("/notebooks");
-    }
-
     private UserModel getCurrentUser() {
         return currentUserFetcher.getUser();
     }

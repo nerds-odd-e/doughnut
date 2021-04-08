@@ -26,12 +26,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
-class NoteControllerShareToBazaarTest {
+class NotebookControllerShareToBazaarTest {
     @Autowired ModelFactoryService modelFactoryService;
     @Autowired private MakeMe makeMe;
     private UserModel userModel;
     private NoteEntity topNote;
-    private NoteController controller;
+    private NotebookController controller;
     final ExtendedModelMap model = new ExtendedModelMap();
 
 
@@ -39,7 +39,7 @@ class NoteControllerShareToBazaarTest {
     void setup() {
         userModel = makeMe.aUser().toModelPlease();
         topNote = makeMe.aNote().byUser(userModel).asTheHeadNoteOfANotebook().please();
-        controller = new NoteController(new TestCurrentUserFetcher(userModel), modelFactoryService);
+        controller = new NotebookController(new TestCurrentUserFetcher(userModel), modelFactoryService);
     }
 
     @Nested
@@ -47,7 +47,7 @@ class NoteControllerShareToBazaarTest {
         @Test
         void shareMyNote() throws NoAccessRightException {
             long oldCount = modelFactoryService.bazaarNotebookRepository.count();
-            RedirectView rv = controller.shareNote(topNote);
+            RedirectView rv = controller.shareNote(topNote.getNotebookEntity());
             assertEquals("/notebooks", rv.getUrl());
             assertThat(modelFactoryService.bazaarNotebookRepository.count(), equalTo(oldCount + 1));
         }
@@ -55,9 +55,9 @@ class NoteControllerShareToBazaarTest {
         @Test
         void shouldNotBeAbleToShareNoteThatBelongsToOtherUser() {
             UserEntity anotherUserEntity = makeMe.aUser().please();
-            NoteEntity note = makeMe.aNote().byUser(anotherUserEntity).please();
+            NoteEntity note = makeMe.aNote().byUser(anotherUserEntity).asTheHeadNoteOfANotebook().please();
             assertThrows(NoAccessRightException.class, ()->
-                    controller.shareNote(note)
+                    controller.shareNote(note.getNotebookEntity())
             );
         }
 

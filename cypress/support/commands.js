@@ -95,7 +95,7 @@ Cypress.Commands.add("expectNoteCards", (expectedCards) => {
 });
 
 Cypress.Commands.add("navigateToNotePage", (noteTitlesDividedBySlash) => {
-  cy.visit("/notebooks");
+  cy.visitMyNotebooks();
   noteTitlesDividedBySlash.commonSenseSplit("/").forEach(noteTitle => cy.findByText(noteTitle).click());
 });
 
@@ -113,8 +113,12 @@ Cypress.Commands.add("clickButtonOnCardBody", (noteTitle, buttonTitle) => {
     button.click();
 });
 
-Cypress.Commands.add("creatingLinkFor", (noteTitle) => {
+Cypress.Commands.add("visitMyNotebooks", (noteTitle) => {
     cy.visit("/notebooks");
+});
+
+Cypress.Commands.add("creatingLinkFor", (noteTitle) => {
+    cy.visitMyNotebooks();
     cy.findNoteCardButton(noteTitle, ".link-card").click();
 });
 
