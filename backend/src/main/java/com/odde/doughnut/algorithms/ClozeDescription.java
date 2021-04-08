@@ -19,7 +19,7 @@ public class ClozeDescription {
     }
 
     public String getClozeDescription(String title, String description) {
-        return Arrays.stream(title.split("/"))
+        return Arrays.stream(title.split("(?<!/)/(?!/)"))
                 .map(String::trim)
                 .reduce(description, this::clozeString)
                 .replace(internalFullMatchReplacement, fullMatchReplacement)
