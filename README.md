@@ -206,7 +206,37 @@ git secret killperson <user_to_be_removed_email>@odd-e.com
 - Set/Point to gcloud dough project: `gcloud config set project carbon-syntax-298809`
 - Check you can see the project as login user: `gcloud config list`
 
-### 6. End-to-End Test / Features / Cucumber / SbE / ATDD
+### 6. View/tail GCP VM instance logs
+
+```bash
+gcloud auth login
+gcloud config set project carbon-syntax-298809
+# Query GCP MIG instance/s health state and grep instance id of each GCP VM in MIG
+infra/scripts/check-mig-doughnut-app-service-health.sh
+# Expected output
+# ❯ ./check-mig-doughnut-app-service-health.sh
+# ---
+# backend: https://www.googleapis.com/compute/v1/projects/carbon-syntax-298809/zones/us-east1-b/instanceGroups/doughnut-app-group
+# status:
+#  healthStatus:
+#  - healthState: HEALTHY
+#    instance: https://www.googleapis.com/compute/v1/projects/carbon-syntax-298809/zones/us-east1-b/instances/doughnut-app-group-0c2b
+#    ipAddress: 10.142.0.7
+#    port: 8081
+#  - healthState: HEALTHY
+#    instance: https://www.googleapis.com/compute/v1/projects/carbon-syntax-298809/zones/us-east1-b/instances/doughnut-app-group-2j9f
+#    ipAddress: 10.142.0.8
+#    port: 8081
+#  kind: compute#backendServiceGroupHealth
+
+# View instance logs - Take/use one of the above healthcheck report instance id for next command (e.g. doughnut-app-group-2j9f)
+infra/scripts/view-mig-doughnut-app-instance-logs.sh doughnut-app-group-2j9f
+
+# Tail instance logs - Take/use one of the above healthcheck report instance id for next command (e.g. doughnut-app-group-2j9f)
+infra/scripts/tail-mig-doughnut-app-instance-logs.sh doughnut-app-group-2j9f
+```
+
+### 7. End-to-End Test / Features / Cucumber / SbE / ATDD
 
 We use cucumber + cypress + Java library to do end to end test.
 
@@ -235,7 +265,7 @@ The Cypress+Cucumber tests are written in JavaScript.
 - [Cucumber](https://cucumber.io/)
 - [cypress-cucumber-preprocessor](https://github.com/TheBrainFamily/cypress-cucumber-preprocessor)
 
-### 7, Building/refreshing doughnut-app MIG VM instance/s base image with Packer + GoogleCompute builder
+### 8, Building/refreshing doughnut-app MIG VM instance/s base image with Packer + GoogleCompute builder
 
 We use packer + googlecompute builder + shell provisioner to construct and materialise base VM image to speed up deployment and control our OS patches and dependent packages and libraries upgrades
 
@@ -259,7 +289,7 @@ PACKER_LOG=1 packer build packer.json
 Expect to see following log line towards end of Packer build stdout log:
 `--> googlecompute: A disk image was created: doughnut-debian10-mysql80-base-saltstack`
 
-### 8. [Flutter web-app frontend](https://flutter.dev/docs/get-started/web)
+### 9. [Flutter web-app frontend](https://flutter.dev/docs/get-started/web)
 
 We chose flutter + dart to build our light frontend, as it supports compile and release to Web, Android and iOS deployment targets.
 
@@ -330,11 +360,11 @@ Run a simple local web server to serve flutter frontend web-app, from `frontend/
 python -m http.server 8000
 ```
 
-### 9. [Product Backlog](https://docs.google.com/spreadsheets/d/1_GofvpnV1tjy2F_aaoOiYTZUOO-8t_qf3twIKMQyGV4/edit?ts=600e6711&pli=1#gid=0)
+### 10. [Product Backlog](https://docs.google.com/spreadsheets/d/1_GofvpnV1tjy2F_aaoOiYTZUOO-8t_qf3twIKMQyGV4/edit?ts=600e6711&pli=1#gid=0)
 
 [Story Map](https://miro.com/app/board/o9J_lTB77Mc=/)
 
-### 10. How to Contribute
+### 11. How to Contribute
 
 - We welcome product ideas and code contribution.
 - Collaborate over:

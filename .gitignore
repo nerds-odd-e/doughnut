@@ -36,6 +36,10 @@ mysql/
 
 # java
 .gradle
+backend/.classpath
+backend/.project
+backend/.settings/
+backend/bin/
 backend/build/
 
 # Jetbrains
@@ -100,6 +104,12 @@ frontend/app.*.map.json
 **/android/app/debug
 **/android/app/profile
 **/android/app/release
+**/android/.project
+**/android/.settings
+**/android/app/.classpath
+**/android/app/.project
+**/android/app/.settings
+
 
 # iOS/XCode related
 **/ios/**/*.mode1v3

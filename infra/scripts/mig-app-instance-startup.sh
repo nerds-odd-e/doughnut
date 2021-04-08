@@ -40,5 +40,8 @@ export OAUTH2_github_client_secret=$(curl "https://secretmanager.googleapis.com/
 	--header "x-goog-user-project: ${PROJECTID}" |
 	jq -r ".payload.data" | base64 --decode)
 
+# Stop unneeded salt-minion
+systemctl stop salt-minion
+
 # Start server
 bash -c "java -jar -Dspring-boot.run.profiles=prod -Dspring.profiles.active=prod -Dspring.datasource.url='jdbc:mysql://db-server:3306/doughnut' -Dspring.datasource.password=${MYSQL_PASSWORD} /opt/doughnut_app/${ARTIFACT}-${VERSION}.jar" &
