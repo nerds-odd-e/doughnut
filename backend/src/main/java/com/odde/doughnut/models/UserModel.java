@@ -30,14 +30,27 @@ public class UserModel extends ModelForEntity<UserEntity> implements ReviewScope
     }
 
     public void assertAuthorization(NoteEntity noteEntity) throws NoAccessRightException {
-        if (!hasAuthority(noteEntity)) {
+        if (!hasFullAuthority(noteEntity)) {
             throw new NoAccessRightException();
         }
     }
 
-    public boolean hasAuthority(NoteEntity noteEntity) {
+    public boolean hasFullAuthority(NoteEntity noteEntity) {
         return entity.owns(noteEntity);
     }
+
+    public boolean hasReadAuthority(NoteEntity noteEntity) {
+        if(hasFullAuthority(noteEntity)) return true;
+
+        return entity.getSubscriptionEntities().stream().anyMatch(s->s.getNotebookEntity() == noteEntity.getNotebookEntity());
+    }
+
+    public void assertReadAuthorization(NoteEntity noteEntity) throws NoAccessRightException {
+        if (!hasReadAuthority(noteEntity)) {
+            throw new NoAccessRightException();
+        }
+    }
+
 
     public void assertAuthorization(CircleEntity circleEntity) throws NoAccessRightException {
         if(!inCircle(circleEntity)) {

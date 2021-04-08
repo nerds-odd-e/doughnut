@@ -44,7 +44,7 @@ class SubscriptionControllerTest {
 
     @Test
     void subscribeToNoteSuccessfully() throws NoAccessRightException {
-        SubscriptionEntity subscriptionEntity = makeMe.aSubscriptionFor().inMemoryPlease();
+        SubscriptionEntity subscriptionEntity = makeMe.aSubscription().inMemoryPlease();
         String result = controller.createSubscription(
                 notebook,
                 subscriptionEntity,
@@ -56,7 +56,7 @@ class SubscriptionControllerTest {
 
     @Test
     void shouldShowTheFormAgainIfError() throws NoAccessRightException {
-        SubscriptionEntity subscriptionEntity = makeMe.aSubscriptionFor().inMemoryPlease();
+        SubscriptionEntity subscriptionEntity = makeMe.aSubscription().inMemoryPlease();
         String result = controller.createSubscription(
                 notebook,
                 subscriptionEntity,
@@ -67,7 +67,7 @@ class SubscriptionControllerTest {
     @Test
     void notAllowToSubscribeToNoneBazaarNote() {
         NoteEntity anotherNote = makeMe.aNote().byUser(userModel).please();
-        SubscriptionEntity subscriptionEntity = makeMe.aSubscriptionFor().inMemoryPlease();
+        SubscriptionEntity subscriptionEntity = makeMe.aSubscription().inMemoryPlease();
         assertThrows(NoAccessRightException.class, ()-> controller.createSubscription(
                 anotherNote.getNotebookEntity(),
                 subscriptionEntity,

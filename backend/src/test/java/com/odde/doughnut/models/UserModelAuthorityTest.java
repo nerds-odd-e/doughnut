@@ -43,13 +43,13 @@ public class UserModelAuthorityTest {
 
         @Test
         void userCanNotAccessNotesBelongToCircle() {
-            assertFalse(userModel.hasAuthority(noteEntity));
+            assertFalse(userModel.hasFullAuthority(noteEntity));
         }
 
         @Test
         void userCanAccessNotesBelongToCircleIfIsAMember() {
             makeMe.theCircle(circleModel).hasMember(userModel).please();
-            assertTrue(userModel.hasAuthority(noteEntity));
+            assertTrue(userModel.hasFullAuthority(noteEntity));
         }
     }
 }

@@ -5,7 +5,6 @@ import com.odde.doughnut.entities.NoteMotionEntity;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.UserEntity;
-import com.odde.doughnut.entities.repositories.LinkRepository;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.MakeMe;
@@ -21,7 +20,6 @@ import org.springframework.ui.ExtendedModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.servlet.view.RedirectView;
 
-import javax.persistence.EntityManager;
 import java.io.IOException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -49,11 +47,21 @@ class NoteControllerTests {
 
     @Nested
     class showNoteTest {
+
         @Test
         void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
             UserEntity otherUser = makeMe.aUser().please();
             NoteEntity note = makeMe.aNote().byUser(otherUser).please();
             assertThrows(NoAccessRightException.class, ()-> controller.showNote(note));
+        }
+
+        @Test
+        void shouldRedirectToBazaarIfIHaveReadonlyAccess() throws NoAccessRightException {
+            UserEntity otherUser = makeMe.aUser().please();
+            NoteEntity note = makeMe.aNote().byUser(otherUser).please();
+            makeMe.aSubscription().forUser(userModel.getEntity()).forNotebook(note.getNotebookEntity()).please();
+            makeMe.refresh(userModel.getEntity());
+            assertThat(controller.showNote(note), equalTo("redirect:/bazaar/notes/" + note.getId()));
         }
     }
 

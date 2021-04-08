@@ -93,7 +93,7 @@ public class MakeMe {
         return new AnswerBuilder(new AnswerEntity(), this).forReviewPoint(reviewPointEntity);
     }
 
-    public SubscriptionBuilder aSubscriptionFor() {
+    public SubscriptionBuilder aSubscription() {
         return new SubscriptionBuilder(this, new SubscriptionEntity());
     }
 }

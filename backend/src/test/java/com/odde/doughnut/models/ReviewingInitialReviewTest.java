@@ -151,7 +151,7 @@ public class ReviewingInitialReviewTest {
             NoteEntity top = makeMe.aNote().byUser(anotherUser).please();
             note1 = makeMe.aNote().under(top).please();
             note2 = makeMe.aNote().under(top).please();
-            makeMe.aSubscriptionFor().forNotebook(top.getNotebookEntity()).forUser(userModel.entity).please();
+            makeMe.aSubscription().forNotebook(top.getNotebookEntity()).forUser(userModel.entity).please();
             makeMe.refresh(userModel);
         }
 
