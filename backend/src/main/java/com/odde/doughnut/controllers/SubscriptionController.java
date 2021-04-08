@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.NoteEntity;
+import com.odde.doughnut.entities.NotebookEntity;
 import com.odde.doughnut.entities.SubscriptionEntity;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.services.ModelFactoryService;
@@ -46,23 +47,23 @@ public class SubscriptionController extends ApplicationMvcController {
         return "redirect:/subscriptions/" + subscriptionEntity.getId();
     }
 
-    @GetMapping("/notes/{noteEntity}/add_to_learning")
-    public String addToLearning(@PathVariable(name = "noteEntity") NoteEntity noteEntity, Model model) {
+    @GetMapping("/notebooks/{notebookEntity}/add_to_learning")
+    public String addToLearning(@PathVariable(name = "notebookEntity") NotebookEntity notebookEntity, Model model) {
         SubscriptionEntity subscriptionEntity = new SubscriptionEntity();
         model.addAttribute("subscriptionEntity", subscriptionEntity);
         return "subscriptions/add_to_learning";
     }
 
-    @PostMapping("/notes/{noteEntity}/subscribe")
+    @PostMapping("/notebooks/{notebookEntity}/subscribe")
     @Transactional
-    public String createSubscription(@PathVariable(name = "noteEntity") NoteEntity noteEntity, @Valid SubscriptionEntity subscriptionEntity, BindingResult bindingResult, Model model) throws NoAccessRightException {
+    public String createSubscription(@PathVariable(name = "notebookEntity") NotebookEntity notebookEntity, @Valid SubscriptionEntity subscriptionEntity, BindingResult bindingResult, Model model) throws NoAccessRightException {
         if (bindingResult.hasErrors()) {
             return "subscriptions/add_to_learning";
         }
-        if (modelFactoryService.bazaarNotebookRepository.findByNotebookEntity(noteEntity.getNotebookEntity()) == null) {
+        if (modelFactoryService.bazaarNotebookRepository.findByNotebookEntity(notebookEntity) == null) {
             throw new NoAccessRightException();
         }
-        subscriptionEntity.setNotebookEntity(noteEntity.getNotebookEntity());
+        subscriptionEntity.setNotebookEntity(notebookEntity);
         subscriptionEntity.setUserEntity(currentUserFetcher.getUser().getEntity());
         modelFactoryService.entityManager.persist(subscriptionEntity);
         return "redirect:/subscriptions/" + subscriptionEntity.getId();

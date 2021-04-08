@@ -43,7 +43,7 @@ class SubscriptionControllerTest {
     void subscribeToNoteSuccessfully() throws NoAccessRightException {
         SubscriptionEntity subscriptionEntity = makeMe.aSubscriptionFor().inMemoryPlease();
         String result = controller.createSubscription(
-                topNote,
+                topNote.getNotebookEntity(),
                 subscriptionEntity,
                 makeMe.successfulBindingResult(), model);
         assertThat(result, matchesPattern("redirect:/subscriptions/\\d+"));
@@ -55,7 +55,7 @@ class SubscriptionControllerTest {
     void shouldShowTheFormAgainIfError() throws NoAccessRightException {
         SubscriptionEntity subscriptionEntity = makeMe.aSubscriptionFor().inMemoryPlease();
         String result = controller.createSubscription(
-                topNote,
+                topNote.getNotebookEntity(),
                 subscriptionEntity,
                 makeMe.failedBindingResult(), model);
         assertEquals("subscriptions/add_to_learning", result);
@@ -66,7 +66,7 @@ class SubscriptionControllerTest {
         NoteEntity anotherNote = makeMe.aNote().byUser(userModel).please();
         SubscriptionEntity subscriptionEntity = makeMe.aSubscriptionFor().inMemoryPlease();
         assertThrows(NoAccessRightException.class, ()-> controller.createSubscription(
-                anotherNote,
+                anotherNote.getNotebookEntity(),
                 subscriptionEntity,
                 makeMe.successfulBindingResult(), model));
     }

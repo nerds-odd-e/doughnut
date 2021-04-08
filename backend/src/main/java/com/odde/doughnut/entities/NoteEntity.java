@@ -40,7 +40,6 @@ public class NoteEntity {
     @JoinColumn(name = "notebook_id", referencedColumnName = "id")
     @JsonIgnore
     @Getter
-    @Setter
     private NotebookEntity notebookEntity;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
@@ -324,4 +323,10 @@ public class NoteEntity {
         return Strings.isBlank(noteContent.getDescription()) && children.isEmpty();
     }
 
+    public void setNotebookEntity(NotebookEntity notebookEntity) {
+        this.notebookEntity = notebookEntity;
+        if (notebookEntity != null) {
+            this.ownershipEntity = notebookEntity.getOwnershipEntity();
+        }
+    }
 }

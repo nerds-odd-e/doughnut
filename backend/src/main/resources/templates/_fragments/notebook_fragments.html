@@ -24,19 +24,22 @@
     </form>
 </div>
 
-<div th:fragment="notebookCardWithHeaderAndButton(notebooks, cardHeader)">
+<div th:fragment="notebookCardWithHeaderAndButton(notebooks, cardHeaderButtons)">
     <div th:with="linkFragment=${linkFragment} ?: '_fragments/note_fragments :: noteTitleWithLink'">
         <div class="row">
             <div class="col-12 col-sm-6 col-md-4 col-lg-3" th:each="notebook:${notebooks}">
-                <div th:replace="_fragments/note_fragments :: card(${notebook.headNoteEntity}, ~{}, ${cardHeader}, ${linkFragment})"/>
+                <div th:replace="_fragments/note_fragments :: card(${notebook.headNoteEntity}, ~{}, ~{:: .card-header}, ${linkFragment})">
+                    <span class="card-header d-flex flex-row-reverse p-0">
+                        <div th:replace="${cardHeaderButtons}"/>
+                    </span>
+                </div>
             </div>
         </div>
+
     </div>
 </div>
 
 <div th:fragment="notebookViewCards(notebooks)"
-     th:replace=":: notebookCardWithHeaderAndButton(${notebooks}, ~{ :: .card-header})">
-        <span class="card-header d-flex flex-row-reverse p-0">
-            <div th:replace=":: noteButtons(${notebook}, ${notebook.headNoteEntity})"/>
-        </span>
+     th:replace=":: notebookCardWithHeaderAndButton(${notebooks}, ~{ :: .card-header-btn})">
+            <div class="card-header-btn" th:replace=":: noteButtons(${notebook}, ${notebook.headNoteEntity})"/>
 </div>

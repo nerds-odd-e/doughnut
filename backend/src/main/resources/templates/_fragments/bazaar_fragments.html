@@ -2,10 +2,10 @@
 
 <div th:fragment="notebookBazaarViewCards(notebooks)"  th:replace="_fragments/notebook_fragments::notebookCardWithHeaderAndButton(
          notebooks=${notebooks},
-         cardHeader=~{ :: .b-card-header-buttons},
+         cardHeaderButtons=~{ :: .b-card-header-buttons},
          linkFragment='_fragments/bazaar_fragments::noteTitleWithBazaarLink'
          )">
-    <div class="b-card-header-buttons" th:replace=":: bazaarNoteButtons(${notebook.headNoteEntity})"/>
+    <div class="b-card-header-buttons" th:replace=":: bazaarNotebookButtons(${notebook})"/>
 </div>
 
 <div th:fragment="noteBazaarViewCards(notes)"  th:replace="_fragments/note_fragments::noteCardWithHeaderAndButton(
@@ -25,10 +25,8 @@
     <li class="breadcrumb-item b-top-link"><a href="/bazaar">Bazaar</a></lid>
 </div>
 
-<div th:fragment="bazaarNoteButtons(note)" class="btn-group btn-group-sm">
-    <a
-            th:if="${note.isHead()}"
-            class="btn btn-sm add-to-learning" th:href="@{/subscriptions/notes/{id}/add_to_learning(id=${note.id})}" title="Add to my learning">
+<div th:fragment="bazaarNotebookButtons(notebook)" class="btn-group btn-group-sm">
+    <a class="btn btn-sm add-to-learning" th:href="@{/subscriptions/notebooks/{id}/add_to_learning(id=${notebook.id})}" title="Add to my learning">
         <svg th:replace="_fragments/svgs :: add"/>
     </a>
 </div>
