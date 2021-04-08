@@ -1,13 +1,19 @@
 <a th:fragment="noteTitleWithBazaarLink(note)" th:href="'/bazaar/notes/' + ${note.id}" th:text="${note.title}"/>
 
-<div th:fragment="noteBazaarViewCards(notes)"  th:replace="_fragments/note_fragments::noteCardWithHeaderAndButton(
-         notes=${notes},
-         bodyButton=~{ :: .b-card-button},
-         headerButtons=~{ :: .b-card-header-buttons},
+<div th:fragment="notebookBazaarViewCards(notebooks)"  th:replace="_fragments/notebook_fragments::notebookCardWithHeaderAndButton(
+         notebooks=${notebooks},
+         cardHeader=~{ :: .b-card-header-buttons},
          linkFragment='_fragments/bazaar_fragments::noteTitleWithBazaarLink'
          )">
-    <div class="b-card-header-buttons" th:replace=":: bazaarNoteButtons(${note})"/>
-    <span class="b-card-button"></div>
+    <div class="b-card-header-buttons" th:replace=":: bazaarNoteButtons(${notebook.headNoteEntity})"/>
+</div>
+
+<div th:fragment="noteBazaarViewCards(notes)"  th:replace="_fragments/note_fragments::noteCardWithHeaderAndButton(
+         notes=${notes},
+         bodyButton=~{},
+         headerButtons=~{},
+         linkFragment='_fragments/bazaar_fragments::noteTitleWithBazaarLink'
+         )">
 </div>
 
 <lid th:fragment="noteBazaarBreadcrumb(untilNote, additional)" th:replace="_fragments/note_fragments::noteBreadcrumb(
