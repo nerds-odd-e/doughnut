@@ -18,6 +18,11 @@ public class BazaarNotebookEntity {
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "notebook_id", referencedColumnName = "id")
-    @Getter @Setter private NotebookEntity notebookEntity;
+    @Getter private NotebookEntity notebookEntity;
 
+    public void setNotebookEntity(NotebookEntity notebookEntity) {
+
+        this.notebookEntity = notebookEntity;
+        this.note = notebookEntity.getHeadNoteEntity();
+    }
 }

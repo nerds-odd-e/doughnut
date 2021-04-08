@@ -25,18 +25,6 @@ public class CheapBackupController {
     public HashMap<String, Object> backup() {
         HashMap<String, Object> hash = new HashMap<>();
 
-        subscriptionRepository.findAll().forEach(s->{
-            s.setNotebookEntity(s.getNoteEntity().getNotebookEntity());
-            subscriptionRepository.save(s);
-            hash.put("sb"+ s.getId(), s.getNotebookEntity());
-        });
-
-        modelFactoryService.bazaarNotebookRepository.findAll().forEach(bn->{
-            bn.setNotebookEntity(bn.getNote().getNotebookEntity());
-            modelFactoryService.bazaarNotebookRepository.save(bn);
-            hash.put("bz"+ bn.getId(), bn.getNotebookEntity());
-        });
-
         return hash;
     }
 

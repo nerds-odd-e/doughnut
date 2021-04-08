@@ -29,8 +29,8 @@ public class MakeMe {
     public NoteBuilder theNote(NoteEntity noteEntity) {
         return new NoteBuilder(noteEntity, this);
     }
-    public BazaarNoteBuilder aBazaarNode(NoteEntity note) {
-        return new BazaarNoteBuilder(this, note);
+    public BazaarNotebookBuilder aBazaarNodebook(NotebookEntity notebookEntity) {
+        return new BazaarNotebookBuilder(this, notebookEntity);
     }
 
     public <T> T refresh(T object) {

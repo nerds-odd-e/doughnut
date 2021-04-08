@@ -19,14 +19,13 @@ public class BazaarModel {
     public List<NoteEntity> getAllNotes() {
         Iterable<BazaarNotebookEntity> all = bazaarNotebookRepository.findAll();
         List<NoteEntity> notes = new ArrayList<>();
-        all.forEach(bn->notes.add(bn.getNote()));
+        all.forEach(bn->notes.add(bn.getNotebookEntity().getHeadNoteEntity()));
         return notes;
     }
 
     public void shareNote(NotebookEntity notebookEntity) {
         BazaarNotebookEntity bazaarNotebookEntity = new BazaarNotebookEntity();
         bazaarNotebookEntity.setNotebookEntity(notebookEntity);
-        bazaarNotebookEntity.setNote(notebookEntity.getHeadNoteEntity());
         bazaarNotebookRepository.save(bazaarNotebookEntity);
     }
 }

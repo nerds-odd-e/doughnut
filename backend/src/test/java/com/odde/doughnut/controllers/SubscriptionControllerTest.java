@@ -34,8 +34,8 @@ class SubscriptionControllerTest {
     @BeforeEach
     void setup() {
         userModel = makeMe.aUser().toModelPlease();
-        topNote = makeMe.aNote().byUser(userModel).please();
-        makeMe.aBazaarNode(topNote).please();
+        topNote = makeMe.aNote().byUser(userModel).asTheHeadNoteOfANotebook().please();
+        makeMe.aBazaarNodebook(topNote.getNotebookEntity()).please();
         controller = new SubscriptionController(new TestCurrentUserFetcher(userModel), makeMe.modelFactoryService);
     }
 

@@ -2,14 +2,15 @@ package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.BazaarNotebookEntity;
 import com.odde.doughnut.entities.NoteEntity;
+import com.odde.doughnut.entities.NotebookEntity;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 
-public class BazaarNoteBuilder extends EntityBuilder<BazaarNotebookEntity> {
+public class BazaarNotebookBuilder extends EntityBuilder<BazaarNotebookEntity> {
 
-    public BazaarNoteBuilder(MakeMe makeMe, NoteEntity note) {
+    public BazaarNotebookBuilder(MakeMe makeMe, NotebookEntity notebookEntity) {
         super(makeMe, new BazaarNotebookEntity());
-        entity.setNote(note);
+        entity.setNotebookEntity(notebookEntity);
     }
 
     @Override
