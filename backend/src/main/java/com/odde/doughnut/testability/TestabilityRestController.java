@@ -60,7 +60,7 @@ class TestabilityRestController {
 
     @PostMapping("/seed_notes")
     public List<Integer> seedNote(@RequestBody List<NoteContentEntity> noteContents, @RequestParam(name = "external_identifier") String externalIdentifier) throws Exception {
-        UserModel userModel = getUserModelByExternalIdentifierOrCurrentUser(externalIdentifier);
+        final UserEntity userEntity = getUserModelByExternalIdentifierOrCurrentUser(externalIdentifier).getEntity();
         HashMap<String, NoteEntity> earlyNotes = new HashMap<>();
         List<NoteEntity> noteList = new ArrayList<>();
 
@@ -71,16 +71,12 @@ class TestabilityRestController {
             noteList.add(note);
             final String testingParent = note.getNoteContent().getTestingParent();
             if (Strings.isBlank(testingParent)) {
-                final NotebookEntity notebookEntity = new NotebookEntity();
-                notebookEntity.setCreatorEntity(userModel.getEntity());
-                notebookEntity.setHeadNoteEntity(note);
-                notebookEntity.setOwnershipEntity(userModel.getEntity().getOwnershipEntity());
-                note.setNotebookEntity(notebookEntity);
+                note.buildNotebookEntityForHeadNote(userEntity.getOwnershipEntity(), userEntity);
             }
             else {
                 note.setParentNote(earlyNotes.get(testingParent));
             }
-            note.setUserEntity(userModel.getEntity());
+            note.setUserEntity(userEntity);
         }
 
         noteRepository.saveAll(noteList);
