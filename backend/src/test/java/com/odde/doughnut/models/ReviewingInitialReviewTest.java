@@ -91,7 +91,7 @@ public class ReviewingInitialReviewTest {
             @Test
             void shouldNotReturnReviewPointForLinkIfCreatedByOtherPeople() {
                 makeMe.theNote(note2).skipReview().please();
-                makeMe.theNote(note1).ownership(makeMe.aUser().please()).skipReview().linkTo(note2, LinkEntity.LinkType.BELONGS_TO).please();
+                makeMe.theNote(note1).notebookOwnership(makeMe.aUser().please()).skipReview().linkTo(note2, LinkEntity.LinkType.BELONGS_TO).please();
                 assertThat(getOneInitialReviewPointEntity(day1), is(nullValue()));
             }
         }

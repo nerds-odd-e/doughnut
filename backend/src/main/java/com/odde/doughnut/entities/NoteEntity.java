@@ -40,14 +40,8 @@ public class NoteEntity {
     @JoinColumn(name = "notebook_id", referencedColumnName = "id")
     @JsonIgnore
     @Getter
-    private NotebookEntity notebookEntity;
-
-    @ManyToOne(cascade = CascadeType.PERSIST)
-    @JoinColumn(name = "ownership_id", referencedColumnName = "id")
-    @JsonIgnore
-    @Getter
     @Setter
-    private OwnershipEntity ownershipEntity;
+    private NotebookEntity notebookEntity;
 
     @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "master_review_setting_id", referencedColumnName = "id")
@@ -214,7 +208,7 @@ public class NoteEntity {
     }
 
     public void mergeNoteContent(NoteContentEntity noteContentEntity) {
-        if(noteContentEntity.getUploadPicture() == null) {
+        if (noteContentEntity.getUploadPicture() == null) {
             noteContentEntity.setUploadPicture(getNoteContent().getUploadPicture());
         }
         BeanUtils.copyProperties(noteContentEntity, getNoteContent());
@@ -223,7 +217,7 @@ public class NoteEntity {
     public NoteEntity getPreviousSibling() {
         return getSiblings().stream()
                 .filter(nc -> nc.siblingOrder < siblingOrder)
-                .reduce((f, s)-> s).orElse(null);
+                .reduce((f, s) -> s).orElse(null);
     }
 
     public NoteEntity getNextSibling() {
@@ -239,7 +233,7 @@ public class NoteEntity {
         }
         while (true) {
             List<NoteEntity> children = result.getChildren();
-            if(children.size() == 0) {
+            if (children.size() == 0) {
                 return result;
             }
             result = children.get(children.size() - 1);
@@ -321,11 +315,5 @@ public class NoteEntity {
     private boolean hasNoDescriptionAndChild() {
         return Strings.isBlank(noteContent.getDescription()) && children.isEmpty();
     }
-
-    public void setNotebookEntity(NotebookEntity notebookEntity) {
-        this.notebookEntity = notebookEntity;
-        if (notebookEntity != null) {
-            this.ownershipEntity = notebookEntity.getOwnershipEntity();
-        }
-    }
 }
+

@@ -70,9 +70,6 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
                 byUser(makeMe.aUser().please(needPersist));
             }
         }
-        if (entity.getOwnershipEntity() == null) {
-            ownership(entity.getUserEntity());
-        }
 
         buildNotebookUnlessExist();
 
@@ -136,24 +133,21 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
         entity.getNoteContent().setUploadPicture(makeMe.anImage().please());
     }
 
-    public NoteBuilder ownership(UserEntity userEntity) {
-        entity.setOwnershipEntity(userEntity.getOwnershipEntity());
-        return this;
-    }
-
     private void buildNotebookUnlessExist() {
         if (entity.getNotebookEntity() != null) {
             return;
         }
         NotebookEntity notebookEntity = new NotebookEntity();
-        if (entity.getOwnershipEntity() != null) {
-            notebookEntity.setOwnershipEntity(entity.getOwnershipEntity());
-        }
-        else if(entity.getUserEntity() != null) {
+        if(entity.getUserEntity() != null) {
             notebookEntity.setOwnershipEntity(entity.getUserEntity().getOwnershipEntity());
         }
         notebookEntity.setCreatorEntity(entity.getUserEntity());
         notebookEntity.setHeadNoteEntity(entity);
         entity.setNotebookEntity(notebookEntity);
+    }
+
+    public NoteBuilder notebookOwnership(UserEntity user) {
+        entity.getNotebookEntity().setOwnershipEntity(user.getOwnershipEntity());
+        return this;
     }
 }
