@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.NoteEntity;
+import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.models.BazaarModel;
 import com.odde.doughnut.services.ModelFactoryService;
 import org.springframework.stereotype.Controller;
@@ -26,7 +27,8 @@ public class BazaarController extends ApplicationMvcController {
     }
 
     @GetMapping("/notes/{noteEntity}")
-    public String showBazaarNote(@PathVariable(name = "noteEntity") NoteEntity noteEntity, Model model) {
+    public String showBazaarNote(@PathVariable(name = "noteEntity") NoteEntity noteEntity) throws NoAccessRightException {
+        modelFactoryService.toBazaarModel().assertAuthentication(noteEntity);
         return "bazaar/show";
     }
 

@@ -1,8 +1,10 @@
 package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.BazaarNotebookEntity;
+import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.NotebookEntity;
 import com.odde.doughnut.entities.repositories.BazaarNotebookRepository;
+import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.services.ModelFactoryService;
 
 import java.util.ArrayList;
@@ -26,5 +28,11 @@ public class BazaarModel {
         BazaarNotebookEntity bazaarNotebookEntity = new BazaarNotebookEntity();
         bazaarNotebookEntity.setNotebookEntity(notebookEntity);
         bazaarNotebookRepository.save(bazaarNotebookEntity);
+    }
+
+    public void assertAuthentication(NoteEntity noteEntity) throws NoAccessRightException {
+        if(bazaarNotebookRepository.findByNotebookEntity(noteEntity.getNotebookEntity()) == null) {
+            throw new NoAccessRightException();
+        }
     }
 }
