@@ -48,7 +48,7 @@ class NoteControllerShareToBazaarTest {
         void shareMyNote() throws NoAccessRightException {
             long oldCount = modelFactoryService.bazaarNotebookRepository.count();
             RedirectView rv = controller.shareNote(topNote);
-            assertEquals("/notes", rv.getUrl());
+            assertEquals("/notebooks", rv.getUrl());
             assertThat(modelFactoryService.bazaarNotebookRepository.count(), equalTo(oldCount + 1));
         }
 

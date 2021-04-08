@@ -140,7 +140,7 @@ class NoteControllerTests {
             NoteEntity note = makeMe.aNote().byUser(userModel).please();
             Integer noteId = note.getId();
             RedirectView response = controller.deleteNote(note);
-            assertEquals("/notes", response.getUrl());
+            assertEquals("/notebooks", response.getUrl());
             assertFalse(modelFactoryService.findNoteById(noteId).isPresent());
             assertTrue(modelFactoryService.findUserById(userModel.getEntity().getId()).isPresent());
         }
