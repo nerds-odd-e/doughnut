@@ -63,6 +63,7 @@ public class SubscriptionController extends ApplicationMvcController {
             throw new NoAccessRightException();
         }
         subscriptionEntity.setNoteEntity(noteEntity);
+        subscriptionEntity.setNotebookEntity(noteEntity.getNotebookEntity());
         subscriptionEntity.setUserEntity(currentUserFetcher.getUser().getEntity());
         modelFactoryService.entityManager.persist(subscriptionEntity);
         return "redirect:/subscriptions/" + subscriptionEntity.getId();
