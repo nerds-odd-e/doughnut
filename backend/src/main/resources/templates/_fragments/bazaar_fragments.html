@@ -26,7 +26,9 @@
 </div>
 
 <div th:fragment="bazaarNotebookButtons(notebook)" class="btn-group btn-group-sm">
-    <a class="btn btn-sm add-to-learning" th:href="@{/subscriptions/notebooks/{id}/add_to_learning(id=${notebook.id})}" title="Add to my learning">
+    <a
+            th:unless="${notebook.skipReviewEntirely}"
+            class="btn btn-sm add-to-learning" th:href="@{/subscriptions/notebooks/{id}/add_to_learning(id=${notebook.id})}" title="Add to my learning">
         <svg th:replace="_fragments/svgs :: add"/>
     </a>
 </div>

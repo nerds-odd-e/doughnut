@@ -36,7 +36,11 @@ public class UserModel extends ModelForEntity<UserEntity> implements ReviewScope
     }
 
     public boolean hasFullAuthority(NoteEntity noteEntity) {
-        return entity.owns(noteEntity);
+        return hasFullAuthority(noteEntity.getNotebookEntity());
+    }
+
+    public boolean hasFullAuthority(NotebookEntity notebookEntity) {
+        return entity.owns(notebookEntity);
     }
 
     public boolean hasReadAuthority(NoteEntity noteEntity) {
@@ -51,6 +55,11 @@ public class UserModel extends ModelForEntity<UserEntity> implements ReviewScope
         }
     }
 
+    public void assertAuthorization(NotebookEntity notebookEntity) throws NoAccessRightException {
+        if (!hasFullAuthority(notebookEntity)) {
+            throw new NoAccessRightException();
+        }
+    }
 
     public void assertAuthorization(CircleEntity circleEntity) throws NoAccessRightException {
         if(!inCircle(circleEntity)) {
@@ -68,10 +77,6 @@ public class UserModel extends ModelForEntity<UserEntity> implements ReviewScope
         if(linkEntity.getUserEntity().getId() != entity.getId()) {
             throw new NoAccessRightException();
         }
-    }
-
-    public void assertAuthorization(NotebookEntity notebookEntity) throws NoAccessRightException {
-        assertAuthorization(notebookEntity.getHeadNoteEntity());
     }
 
     public boolean inCircle(CircleEntity circleEntity) {

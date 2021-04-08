@@ -7,6 +7,7 @@ import com.odde.doughnut.models.BazaarModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ModelFactoryService;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -55,6 +56,24 @@ public class NotebookController extends ApplicationMvcController  {
         noteEntity.buildNotebookEntityForHeadNote(ownershipEntity, userEntity);
         modelFactoryService.noteRepository.save(noteEntity);
         return "redirect:/notes/" + noteEntity.getId();
+    }
+
+    @GetMapping({"/{notebookEntity}/edit"})
+    public String edit(@PathVariable(name = "notebookEntity") NotebookEntity notebookEntity) throws NoAccessRightException {
+        UserModel userModel = getCurrentUser();
+        userModel.assertAuthorization(notebookEntity);
+        return "notebooks/edit";
+    }
+
+    @PostMapping(value = "/{notebookEntity}")
+    @Transactional
+    public String update(@Valid NotebookEntity notebookEntity, BindingResult bindingResult) throws NoAccessRightException {
+        if (bindingResult.hasErrors()) {
+            return "notebooks/edit";
+        }
+        getCurrentUser().assertAuthorization(notebookEntity);
+        modelFactoryService.notebookRepository.save(notebookEntity);
+        return "redirect:/notebooks";
     }
 
     @PostMapping(value = "/{notebookEntity}/share")

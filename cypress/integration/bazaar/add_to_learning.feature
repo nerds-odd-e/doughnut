@@ -29,7 +29,6 @@ Feature: Bazaar subscription
     And  On day 2 I repeat old "Square, My memo, end " and initial review new "Triangle, end       "
     And  I should be able to edit the subscription to note "Shape"
 
-    @ignore
   Scenario: No "add to learning" button for skip-review notebook
     Given I've logged in as "another_old_learner"
     When I change notebook "Shape" to skip review

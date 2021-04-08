@@ -3,7 +3,6 @@ package com.odde.doughnut.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Where;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -59,8 +58,8 @@ public class UserEntity {
         ownershipEntity.setUserEntity(this);
     }
 
-    public boolean owns(NoteEntity note) {
-        return note.getNotebookEntity().getOwnershipEntity().ownsBy(this);
+    public boolean owns(NotebookEntity notebookEntity) {
+        return notebookEntity.getOwnershipEntity().ownsBy(this);
     }
 
 }

@@ -2,7 +2,7 @@
 <layout th:replace="_fragments/basic_layout :: application_layout(~{ :: .content})">
 
     <div class="container content">
-        <h2>Edit note</h2>
+        <h2>Edit Note</h2>
         <div th:replace="_fragments/note_fragments :: noteOwnerBreadcrumb(${noteEntity}, ~{:: .additional-item})">
             <li class="breadcrumb-item additional-item" th:text="${noteEntity.title}"/>
         </div>

@@ -1,0 +1,15 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<layout th:replace="_fragments/basic_layout :: application_layout(~{ :: .content})">
+    <div class="container content">
+        <h2>Edit Notebook Settings</h2>
+        <div th:replace="_fragments/note_fragments :: noteOwnerBreadcrumb(${notebookEntity.headNoteEntity}, ~{:: .additional-item})">
+            <li class="breadcrumb-item additional-item strong" th:text="${notebookEntity.headNoteEntity.title}"/>
+        </div>
+
+        <form action="#" th:action="@{/notebooks/{id}(id=${notebookEntity.id})}" th:object="${notebookEntity}" method="post">
+            <div th:replace="_fragments/forms :: checkInput('notebook', 'skipReviewEntirely')"/>
+            <input type="submit" value="Update" class="btn btn-primary"/>
+        </form>
+
+    </div>
+</layout>
