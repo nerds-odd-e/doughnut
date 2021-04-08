@@ -26,9 +26,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
-class NotebookControllerShareToBazaarTest {
-    @Autowired ModelFactoryService modelFactoryService;
-    @Autowired private MakeMe makeMe;
+class NotebookControllerTest {
+    @Autowired
+    ModelFactoryService modelFactoryService;
+    @Autowired
+    private MakeMe makeMe;
     private UserModel userModel;
     private NoteEntity topNote;
     private NotebookController controller;
@@ -43,7 +45,8 @@ class NotebookControllerShareToBazaarTest {
     }
 
     @Nested
-    class ShareMyNote {
+    class ShareMyNotebook {
+
         @Test
         void shareMyNote() throws NoAccessRightException {
             long oldCount = modelFactoryService.bazaarNotebookRepository.count();
@@ -56,10 +59,24 @@ class NotebookControllerShareToBazaarTest {
         void shouldNotBeAbleToShareNoteThatBelongsToOtherUser() {
             UserEntity anotherUserEntity = makeMe.aUser().please();
             NoteEntity note = makeMe.aNote().byUser(anotherUserEntity).please();
-            assertThrows(NoAccessRightException.class, ()->
+            assertThrows(NoAccessRightException.class, () ->
                     controller.shareNote(note.getNotebookEntity())
             );
         }
+
+    }
+
+    @Nested
+    class updateNotebook {
+        @Test
+        void shouldNotBeAbleToUpdateNotebookThatBelongsToOtherUser() {
+            UserEntity anotherUserEntity = makeMe.aUser().please();
+            NoteEntity note = makeMe.aNote().byUser(anotherUserEntity).please();
+            assertThrows(NoAccessRightException.class, () ->
+                    controller.update(note.getNotebookEntity(), makeMe.successfulBindingResult())
+            );
+        }
+
 
     }
 }
