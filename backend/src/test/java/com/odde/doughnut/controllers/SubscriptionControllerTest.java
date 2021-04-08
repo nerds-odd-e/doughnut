@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.NoteEntity;
+import com.odde.doughnut.entities.NotebookEntity;
 import com.odde.doughnut.entities.SubscriptionEntity;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.models.UserModel;
@@ -27,6 +28,7 @@ class SubscriptionControllerTest {
     private MakeMe makeMe;
     private UserModel userModel;
     private NoteEntity topNote;
+    private NotebookEntity notebook;
     private SubscriptionController controller;
     final ExtendedModelMap model = new ExtendedModelMap();
 
@@ -34,7 +36,8 @@ class SubscriptionControllerTest {
     @BeforeEach
     void setup() {
         userModel = makeMe.aUser().toModelPlease();
-        topNote = makeMe.aNote().byUser(userModel).asTheHeadNoteOfANotebook().please();
+        topNote = makeMe.aNote().byUser(userModel).please();
+        notebook = topNote.getNotebookEntity();
         makeMe.aBazaarNodebook(topNote.getNotebookEntity()).please();
         controller = new SubscriptionController(new TestCurrentUserFetcher(userModel), makeMe.modelFactoryService);
     }
@@ -43,7 +46,7 @@ class SubscriptionControllerTest {
     void subscribeToNoteSuccessfully() throws NoAccessRightException {
         SubscriptionEntity subscriptionEntity = makeMe.aSubscriptionFor().inMemoryPlease();
         String result = controller.createSubscription(
-                topNote.getNotebookEntity(),
+                notebook,
                 subscriptionEntity,
                 makeMe.successfulBindingResult(), model);
         assertThat(result, matchesPattern("redirect:/subscriptions/\\d+"));
@@ -55,7 +58,7 @@ class SubscriptionControllerTest {
     void shouldShowTheFormAgainIfError() throws NoAccessRightException {
         SubscriptionEntity subscriptionEntity = makeMe.aSubscriptionFor().inMemoryPlease();
         String result = controller.createSubscription(
-                topNote.getNotebookEntity(),
+                notebook,
                 subscriptionEntity,
                 makeMe.failedBindingResult(), model);
         assertEquals("subscriptions/add_to_learning", result);

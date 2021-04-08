@@ -160,7 +160,6 @@ public class NoteEntity {
 
     public void setParentNote(NoteEntity parentNote) {
         if (parentNote == null) return;
-        setOwnershipEntity(parentNote.getOwnershipEntity());
         setNotebookEntity(parentNote.getNotebookEntity());
         List<NoteEntity> ancestorsIncludingMe = parentNote.getAncestorsIncludingMe();
         Collections.reverse(ancestorsIncludingMe);

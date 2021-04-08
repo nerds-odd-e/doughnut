@@ -60,7 +60,7 @@ public class UserEntity {
     }
 
     public boolean owns(NoteEntity note) {
-        return note.getOwnershipEntity().ownsBy(this);
+        return note.getNotebookEntity().getOwnershipEntity().ownsBy(this);
     }
 
 }

@@ -18,8 +18,8 @@ public class UserBuilder extends EntityBuilder<UserEntity> {
     }
 
     public UserBuilder with2Notes() {
-        entity.getNotes().add(makeMe.aNote().inMemoryPlease());
-        entity.getNotes().add(makeMe.aNote().inMemoryPlease());
+        entity.getNotes().add(makeMe.aNote().byUser(entity).inMemoryPlease());
+        entity.getNotes().add(makeMe.aNote().byUser(entity).inMemoryPlease());
         return this;
     }
 

@@ -69,7 +69,6 @@ class TestabilityRestController {
             note.mergeNoteContent(content);
             earlyNotes.put(content.getTitle(), note);
             noteList.add(note);
-            note.setOwnershipEntity(userModel.getEntity().getOwnershipEntity());
             final String testingParent = note.getNoteContent().getTestingParent();
             if (Strings.isBlank(testingParent)) {
                 final NotebookEntity notebookEntity = new NotebookEntity();

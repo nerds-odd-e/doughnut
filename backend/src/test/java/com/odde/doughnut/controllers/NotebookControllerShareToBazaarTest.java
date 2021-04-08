@@ -38,7 +38,7 @@ class NotebookControllerShareToBazaarTest {
     @BeforeEach
     void setup() {
         userModel = makeMe.aUser().toModelPlease();
-        topNote = makeMe.aNote().byUser(userModel).asTheHeadNoteOfANotebook().please();
+        topNote = makeMe.aNote().byUser(userModel).please();
         controller = new NotebookController(new TestCurrentUserFetcher(userModel), modelFactoryService);
     }
 
@@ -55,7 +55,7 @@ class NotebookControllerShareToBazaarTest {
         @Test
         void shouldNotBeAbleToShareNoteThatBelongsToOtherUser() {
             UserEntity anotherUserEntity = makeMe.aUser().please();
-            NoteEntity note = makeMe.aNote().byUser(anotherUserEntity).asTheHeadNoteOfANotebook().please();
+            NoteEntity note = makeMe.aNote().byUser(anotherUserEntity).please();
             assertThrows(NoAccessRightException.class, ()->
                     controller.shareNote(note.getNotebookEntity())
             );

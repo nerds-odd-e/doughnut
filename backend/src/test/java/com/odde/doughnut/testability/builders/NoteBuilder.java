@@ -73,6 +73,10 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
             ownership(entity.getUserEntity());
         }
 
+        if (entity.getNotebookEntity() == null) {
+            buildNotebook();
+        }
+
     }
 
     public NoteBuilder skipReview() {
@@ -138,13 +142,16 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
         return this;
     }
 
-    public NoteBuilder asTheHeadNoteOfANotebook() {
+    private void buildNotebook() {
         NotebookEntity notebookEntity = new NotebookEntity();
-        notebookEntity.setOwnershipEntity(entity.getUserEntity().getOwnershipEntity());
+        if (entity.getOwnershipEntity() != null) {
+            notebookEntity.setOwnershipEntity(entity.getOwnershipEntity());
+        }
+        else {
+            notebookEntity.setOwnershipEntity(entity.getUserEntity().getOwnershipEntity());
+        }
         notebookEntity.setCreatorEntity(entity.getUserEntity());
         notebookEntity.setHeadNoteEntity(entity);
         entity.setNotebookEntity(notebookEntity);
-
-        return this;
     }
 }
