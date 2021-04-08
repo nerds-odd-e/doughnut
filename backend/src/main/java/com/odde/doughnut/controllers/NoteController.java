@@ -116,7 +116,7 @@ public class NoteController extends ApplicationMvcController  {
     public RedirectView deleteNote(@PathVariable("noteEntity") NoteEntity noteEntity) throws NoAccessRightException {
         getCurrentUser().assertAuthorization(noteEntity);
         modelFactoryService.toTreeNodeModel(noteEntity).destroy();
-        return new RedirectView("/notes");
+        return new RedirectView("/notebooks");
     }
 
     @GetMapping("/{noteEntity}/review_setting")
@@ -147,7 +147,7 @@ public class NoteController extends ApplicationMvcController  {
         getCurrentUser().assertAuthorization(note);
         BazaarModel bazaar = modelFactoryService.toBazaarModel();
         bazaar.shareNote(note.getNotebookEntity());
-        return new RedirectView("/notes");
+        return new RedirectView("/notebooks");
     }
 
     private UserModel getCurrentUser() {

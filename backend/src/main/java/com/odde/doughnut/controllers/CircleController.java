@@ -81,11 +81,11 @@ public class CircleController extends ApplicationMvcController  {
         return "redirect:/circles/" + circleModel.getEntity().getId();
     }
 
-    @GetMapping("/{circleEntity}/notes/new_notebook")
+    @GetMapping("/{circleEntity}/notebooks/new")
     public String newNoteInCircle(@PathVariable("circleEntity") CircleEntity circleEntity, Model model) {
         model.addAttribute("ownershipEntity", circleEntity.getOwnershipEntity());
         model.addAttribute("noteContentEntity", new NoteContentEntity());
-        return "notes/new_notebook";
+        return "notebooks/new";
     }
 
 }

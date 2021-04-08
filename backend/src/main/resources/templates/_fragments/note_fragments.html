@@ -14,7 +14,7 @@
 
 <div th:fragment="noteBreadcrumbForOwnOrCircle(ancestors, ownership, additional)"
      th:replace="::noteBreadcrumb(~{:: .top-link}, ${ancestors}, ${additional})">
-    <li class="breadcrumb-item top-link" th:unless="${ownership.isFromCircle}"><a href="/notes">Top</a></li>
+    <li class="breadcrumb-item top-link" th:unless="${ownership.isFromCircle}"><a href="/notebooks">Top</a></li>
     <li class="breadcrumb-item top-link" th:if="${ownership.isFromCircle}"><a href="/circles">Circles</a></li>
     <li class="breadcrumb-item top-link" th:if="${ownership.isFromCircle}"><a
             th:href="@{/circles/{id}(id=${ownership.circleEntity.id})}" th:text="${ownership.circleEntity.name}"/></li>

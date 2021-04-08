@@ -16,7 +16,7 @@ import javax.validation.Valid;
 import java.io.IOException;
 
 @Controller
-@RequestMapping("/notes")
+@RequestMapping("/notebooks")
 public class NoteBookController extends ApplicationMvcController  {
     private final ModelFactoryService modelFactoryService;
 
@@ -29,22 +29,22 @@ public class NoteBookController extends ApplicationMvcController  {
     public String myNotebooks(Model model) {
         model.addAttribute("notebooks", getCurrentUser().getEntity().getOwnershipEntity().getNotebookEntities());
         model.addAttribute("subscriptions", getCurrentUser().getEntity().getSubscriptionEntities());
-        return "notes/index";
+        return "notebooks/index";
     }
 
-    @GetMapping({"/new_notebook"})
+    @GetMapping({"/new"})
     public String newNote(Model model) {
         UserModel userModel = getCurrentUser();
         NoteContentEntity noteContentEntity = new NoteContentEntity();
         model.addAttribute("ownershipEntity", userModel.getEntity().getOwnershipEntity());
         model.addAttribute("noteContentEntity", noteContentEntity);
-        return "notes/new_notebook";
+        return "notebooks/new";
     }
 
-    @PostMapping({"/{ownershipEntity}/create_notebook"})
+    @PostMapping({"/{ownershipEntity}/create"})
     public String createNote(@PathVariable(name = "ownershipEntity", required = false) OwnershipEntity ownershipEntity, @Valid NoteContentEntity noteContentEntity, BindingResult bindingResult) throws IOException {
         if (bindingResult.hasErrors()) {
-            return "notes/new_notebook";
+            return "notebooks/new";
         }
         UserModel userModel = getCurrentUser();
         final NoteEntity noteEntity = new NoteEntity();

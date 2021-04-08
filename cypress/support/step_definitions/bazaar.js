@@ -7,7 +7,7 @@ import {
 } from "cypress-cucumber-preprocessor/steps";
 
 Given("I choose to share my note {string}", (noteTitle) => {
-  cy.visit("/notes");
+  cy.visit("/notebooks");
   cy.findNoteCardButton(noteTitle, ".share-card").click();
 })
 
@@ -79,7 +79,7 @@ Then("I should see the {string} button on note {string}", (btnClass, noteTitle) 
 });
 
 Then("I should see readonly note {string} in my notes", (noteTitle) => {
-  cy.visit("/notes");
+  cy.visit("/notebooks");
   cy.findNoteCardButton(noteTitle, ".edit-card").should("not.exist");
 });
 
@@ -88,7 +88,7 @@ Then("I should see I've subscribed to {string}", (noteTitle) => {
 });
 
 Then("I should be able to edit the subscription to note {string}", (noteTitle) => {
-  cy.visit("/notes");
+  cy.visit("/notebooks");
   cy.findNoteCardButton(noteTitle, ".edit-subscription").click();
   cy.findByRole('button', {name: "Update"}).click();
 });
