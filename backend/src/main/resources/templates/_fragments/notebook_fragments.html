@@ -9,14 +9,6 @@
             <svg th:replace="_fragments/svgs :: bazaarShare"/>
         </button>
     </form>
-
-    <form th:action="@{/notes/{id}/delete(id=${note.id})}" th:method="delete"
-          onsubmit="return confirm('Are you sure to delete?')">
-        <input type="hidden" name="_method" value="delete"/>
-        <button class="btn btn-sm delete-card" title="delete note">
-            <svg th:replace="_fragments/svgs :: remove"/>
-        </button>
-    </form>
 </div>
 
 <div th:fragment="notebookCardWithHeaderAndButton(notebooks, cardHeaderButtons)">
