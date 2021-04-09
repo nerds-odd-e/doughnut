@@ -90,7 +90,7 @@ public class MakeMe {
     }
 
     public AnswerBuilder anAnswerFor(ReviewPointEntity reviewPointEntity) {
-        return new AnswerBuilder(new AnswerEntity(), this).forReviewPoint(reviewPointEntity);
+        return new AnswerBuilder(new Answer(), this).forReviewPoint(reviewPointEntity);
     }
 
     public SubscriptionBuilder aSubscription() {

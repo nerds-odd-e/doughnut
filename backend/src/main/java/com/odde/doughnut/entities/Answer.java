@@ -8,7 +8,7 @@ import javax.validation.constraints.NotNull;
 
 import static com.odde.doughnut.models.QuizQuestion.QuestionType.*;
 
-public class AnswerEntity {
+public class Answer {
     @NotNull
     @Getter
     @Setter

@@ -1,7 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
-import com.odde.doughnut.entities.AnswerEntity;
+import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.entities.ReviewSettingEntity;
 import com.odde.doughnut.models.*;
@@ -91,8 +91,8 @@ public class ReviewController extends ApplicationMvcController  {
     }
 
     @PostMapping("/{reviewPointEntity}/answer")
-    public String answerQuiz(ReviewPointEntity reviewPointEntity, @Valid AnswerEntity answerEntity, Model model) {
-        AnswerModel answerModel = modelFactoryService.toAnswerModel(answerEntity);
+    public String answerQuiz(ReviewPointEntity reviewPointEntity, @Valid Answer answer, Model model) {
+        AnswerModel answerModel = modelFactoryService.toAnswerModel(answer);
         model.addAttribute("answer", answerModel);
         return "reviews/repeat";
     }

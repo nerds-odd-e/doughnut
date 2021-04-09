@@ -1,6 +1,6 @@
 package com.odde.doughnut.models;
 
-import com.odde.doughnut.entities.AnswerEntity;
+import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.models.quizFacotries.*;
@@ -52,11 +52,11 @@ public class QuizQuestion {
         return questionType == QuestionType.PICTURE_TITLE;
     }
 
-    public AnswerEntity buildAnswer() {
-        AnswerEntity answerEntity = new AnswerEntity();
-        answerEntity.setReviewPointEntity(reviewPointEntity);
-        answerEntity.setQuestionType(questionType);
-        return answerEntity;
+    public Answer buildAnswer() {
+        Answer answer = new Answer();
+        answer.setReviewPointEntity(reviewPointEntity);
+        answer.setQuestionType(questionType);
+        return answer;
     }
 
     public static class Option {

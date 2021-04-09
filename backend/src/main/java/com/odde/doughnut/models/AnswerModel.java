@@ -1,13 +1,13 @@
 package com.odde.doughnut.models;
 
-import com.odde.doughnut.entities.AnswerEntity;
+import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.services.ModelFactoryService;
 
-public class AnswerModel extends ModelForEntity<AnswerEntity> {
+public class AnswerModel extends ModelForEntity<Answer> {
     private Boolean cachedIsCorrect;
 
-    public AnswerModel(AnswerEntity answerEntity, ModelFactoryService modelFactoryService) {
-        super(answerEntity, modelFactoryService);
+    public AnswerModel(Answer answer, ModelFactoryService modelFactoryService) {
+        super(answer, modelFactoryService);
     }
 
     public boolean isCorrect() {

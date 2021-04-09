@@ -9,7 +9,7 @@ import static com.odde.doughnut.models.QuizQuestion.QuestionType.LINK_SOURCE_EXC
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class AnswerEntityTest {
+class AnswerTest {
     MakeMe makeMe = new MakeMe();
     Note target;
     Note source;
@@ -30,20 +30,20 @@ class AnswerEntityTest {
 
         @Test
         void correct () {
-            AnswerEntity answerEntity = makeMe.anAnswerFor(reviewPointEntity)
+            Answer answer = makeMe.anAnswerFor(reviewPointEntity)
                     .type(LINK_SOURCE_EXCLUSIVE)
                     .answer("blah")
                     .inMemoryPlease();
-            assertTrue(answerEntity.checkAnswer());
+            assertTrue(answer.checkAnswer());
         }
 
         @Test
         void wrong () {
-            AnswerEntity answerEntity = makeMe.anAnswerFor(reviewPointEntity)
+            Answer answer = makeMe.anAnswerFor(reviewPointEntity)
                     .type(LINK_SOURCE_EXCLUSIVE)
                     .answer(source.getTitle())
                     .inMemoryPlease();
-            assertFalse(answerEntity.checkAnswer());
+            assertFalse(answer.checkAnswer());
         }
 
     }

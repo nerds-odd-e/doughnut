@@ -1,15 +1,14 @@
 package com.odde.doughnut.testability.builders;
 
-import com.odde.doughnut.entities.AnswerEntity;
+import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.ReviewPointEntity;
-import com.odde.doughnut.models.AnswerModel;
 import com.odde.doughnut.models.QuizQuestion;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 
-public class AnswerBuilder  extends EntityBuilder<AnswerEntity> {
-    public AnswerBuilder(AnswerEntity answerEntity, MakeMe makeMe) {
-        super(makeMe, answerEntity);
+public class AnswerBuilder  extends EntityBuilder<Answer> {
+    public AnswerBuilder(Answer answer, MakeMe makeMe) {
+        super(makeMe, answer);
         entity.setQuestionType(QuizQuestion.QuestionType.SPELLING);
     }
 
