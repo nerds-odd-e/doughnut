@@ -1,7 +1,7 @@
 package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.ReviewSettingEntity;
+import com.odde.doughnut.entities.ReviewSetting;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -40,7 +40,7 @@ public class ReviewPointModelTest {
         void initialReviewShouldSetBothInitialAndLastReviewAt() {
             Note note = makeMe.aNote().byUser(userModel).please();
             ReviewPointModel reviewPoint = makeMe.aReviewPointFor(note).by(userModel).toModelPlease();
-            reviewPoint.initialReview(userModel, new ReviewSettingEntity(), day1);
+            reviewPoint.initialReview(userModel, new ReviewSetting(), day1);
             assertThat(reviewPoint.getEntity().getInitialReviewedAt(), equalTo(day1));
             assertThat(reviewPoint.getEntity().getLastReviewedAt(), equalTo(day1));
         }

@@ -124,22 +124,22 @@ public class NoteController extends ApplicationMvcController  {
 
     @GetMapping("/{note}/review_setting")
     public String editReviewSetting(Note note, Model model) {
-        ReviewSettingEntity reviewSettingEntity = note.getMasterReviewSettingEntity();
-        if(reviewSettingEntity == null) {
-            reviewSettingEntity = new ReviewSettingEntity();
+        ReviewSetting reviewSetting = note.getMasterReviewSetting();
+        if(reviewSetting == null) {
+            reviewSetting = new ReviewSetting();
         }
-        model.addAttribute("reviewSettingEntity", reviewSettingEntity);
+        model.addAttribute("reviewSetting", reviewSetting);
         return "notes/edit_review_setting";
     }
 
     @PostMapping(value = "/{note}/review_setting")
     @Transactional
-    public String updateReviewSetting(@PathVariable("note") Note note, @Valid ReviewSettingEntity reviewSettingEntity, BindingResult bindingResult) throws NoAccessRightException {
+    public String updateReviewSetting(@PathVariable("note") Note note, @Valid ReviewSetting reviewSetting, BindingResult bindingResult) throws NoAccessRightException {
         if (bindingResult.hasErrors()) {
             return "notes/edit_review_setting";
         }
         getCurrentUser().assertAuthorization(note);
-        note.mergeMasterReviewSetting(reviewSettingEntity);
+        note.mergeMasterReviewSetting(reviewSetting);
         modelFactoryService.noteRepository.save(note);
 
         return "redirect:/notes/" + note.getId();

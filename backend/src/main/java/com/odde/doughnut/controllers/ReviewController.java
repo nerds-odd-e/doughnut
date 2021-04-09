@@ -2,8 +2,8 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.Answer;
-import com.odde.doughnut.entities.ReviewPointEntity;
-import com.odde.doughnut.entities.ReviewSettingEntity;
+import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.ReviewSetting;
 import com.odde.doughnut.models.*;
 import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.TimeTraveler;
@@ -44,31 +44,31 @@ public class ReviewController extends ApplicationMvcController  {
     public String initialReview(Model model) {
         UserModel user = currentUserFetcher.getUser();
         Reviewing reviewing = user.createReviewing(timeTraveler.getCurrentUTCTimestamp());
-        ReviewPointEntity reviewPointEntity = reviewing.getOneInitialReviewPointEntity();
-        if (reviewPointEntity == null) {
+        ReviewPoint reviewPoint = reviewing.getOneInitialReviewPoint();
+        if (reviewPoint == null) {
             return "redirect:/reviews";
         }
-        model.addAttribute("reviewPointEntity", reviewPointEntity);
-        model.addAttribute("reviewSettingEntity", reviewing.getReviewSettingEntity(reviewPointEntity.getNote()));
+        model.addAttribute("reviewPoint", reviewPoint);
+        model.addAttribute("reviewSetting", reviewing.getReviewSetting(reviewPoint.getNote()));
         return "reviews/initial";
     }
 
     @PostMapping(path="", params="submit")
     @Transactional
-    public String create(@Valid ReviewPointEntity reviewPointEntity, @Valid ReviewSettingEntity reviewSettingEntity) {
+    public String create(@Valid ReviewPoint reviewPoint, @Valid ReviewSetting reviewSetting) {
         UserModel userModel = currentUserFetcher.getUser();
-        ReviewPointModel reviewPointModel = modelFactoryService.toReviewPointModel(reviewPointEntity);
-        reviewPointModel.initialReview(userModel, reviewSettingEntity, timeTraveler.getCurrentUTCTimestamp());
+        ReviewPointModel reviewPointModel = modelFactoryService.toReviewPointModel(reviewPoint);
+        reviewPointModel.initialReview(userModel, reviewSetting, timeTraveler.getCurrentUTCTimestamp());
         return "redirect:/reviews/initial";
     }
 
     @PostMapping(path="", params="skip")
     @Transactional
-    public String skip(@Valid ReviewPointEntity reviewPointEntity, @Valid ReviewSettingEntity reviewSettingEntity) {
+    public String skip(@Valid ReviewPoint reviewPoint, @Valid ReviewSetting reviewSetting) {
         UserModel userModel = currentUserFetcher.getUser();
-        ReviewPointModel reviewPointModel = modelFactoryService.toReviewPointModel(reviewPointEntity);
-        reviewPointEntity.setRemovedFromReview(true);
-        reviewPointModel.initialReview(userModel, reviewSettingEntity, timeTraveler.getCurrentUTCTimestamp());
+        ReviewPointModel reviewPointModel = modelFactoryService.toReviewPointModel(reviewPoint);
+        reviewPoint.setRemovedFromReview(true);
+        reviewPointModel.initialReview(userModel, reviewSetting, timeTraveler.getCurrentUTCTimestamp());
         return "redirect:/reviews/initial";
     }
 
@@ -78,7 +78,7 @@ public class ReviewController extends ApplicationMvcController  {
         Reviewing reviewing = user.createReviewing(timeTraveler.getCurrentUTCTimestamp());
         ReviewPointModel reviewPointModel = reviewing.getOneReviewPointNeedToRepeat(timeTraveler.getRandomizer());
         if(reviewPointModel != null) {
-            model.addAttribute("reviewPointEntity", reviewPointModel.getEntity());
+            model.addAttribute("reviewPoint", reviewPointModel.getEntity());
             QuizQuestion quizQuestion = reviewPointModel.generateAQuizQuestion(timeTraveler.getRandomizer());
             if (quizQuestion == null) {
                 return "reviews/repeat";
@@ -90,40 +90,40 @@ public class ReviewController extends ApplicationMvcController  {
         return "redirect:/reviews";
     }
 
-    @PostMapping("/{reviewPointEntity}/answer")
-    public String answerQuiz(ReviewPointEntity reviewPointEntity, @Valid Answer answer, Model model) {
+    @PostMapping("/{reviewPoint}/answer")
+    public String answerQuiz(ReviewPoint reviewPoint, @Valid Answer answer, Model model) {
         AnswerModel answerModel = modelFactoryService.toAnswerModel(answer);
         model.addAttribute("answer", answerModel);
         return "reviews/repeat";
     }
 
-    @PostMapping(path="/{reviewPointEntity}", params="remove")
-    public String removeFromRepeating(@Valid ReviewPointEntity reviewPointEntity) {
-        reviewPointEntity.setRemovedFromReview(true);
-        modelFactoryService.reviewPointRepository.save(reviewPointEntity);
+    @PostMapping(path="/{reviewPoint}", params="remove")
+    public String removeFromRepeating(@Valid ReviewPoint reviewPoint) {
+        reviewPoint.setRemovedFromReview(true);
+        modelFactoryService.reviewPointRepository.save(reviewPoint);
         return "redirect:/reviews/repeat";
     }
 
-    @PostMapping(path="/{reviewPointEntity}", params="again")
-    public String doRepeatAgain(@Valid ReviewPointEntity reviewPointEntity) {
+    @PostMapping(path="/{reviewPoint}", params="again")
+    public String doRepeatAgain(@Valid ReviewPoint reviewPoint) {
         return "redirect:/reviews/repeat";
     }
 
-    @PostMapping(path="/{reviewPointEntity}", params="satisfying")
-    public String doRepeat(@Valid ReviewPointEntity reviewPointEntity) {
-        modelFactoryService.toReviewPointModel(reviewPointEntity).repeat(timeTraveler.getCurrentUTCTimestamp());
+    @PostMapping(path="/{reviewPoint}", params="satisfying")
+    public String doRepeat(@Valid ReviewPoint reviewPoint) {
+        modelFactoryService.toReviewPointModel(reviewPoint).repeat(timeTraveler.getCurrentUTCTimestamp());
         return "redirect:/reviews/repeat";
     }
 
-    @PostMapping(path="/{reviewPointEntity}", params="sad")
-    public String doRepeatSad(@Valid ReviewPointEntity reviewPointEntity) {
-        modelFactoryService.toReviewPointModel(reviewPointEntity).repeatSad(timeTraveler.getCurrentUTCTimestamp());
+    @PostMapping(path="/{reviewPoint}", params="sad")
+    public String doRepeatSad(@Valid ReviewPoint reviewPoint) {
+        modelFactoryService.toReviewPointModel(reviewPoint).repeatSad(timeTraveler.getCurrentUTCTimestamp());
         return "redirect:/reviews/repeat";
     }
 
-    @PostMapping(path="/{reviewPointEntity}", params="happy")
-    public String doRepeatHappy(@Valid ReviewPointEntity reviewPointEntity) {
-        modelFactoryService.toReviewPointModel(reviewPointEntity).repeatHappy(timeTraveler.getCurrentUTCTimestamp());
+    @PostMapping(path="/{reviewPoint}", params="happy")
+    public String doRepeatHappy(@Valid ReviewPoint reviewPoint) {
+        modelFactoryService.toReviewPointModel(reviewPoint).repeatHappy(timeTraveler.getCurrentUTCTimestamp());
         return "redirect:/reviews/repeat";
     }
 

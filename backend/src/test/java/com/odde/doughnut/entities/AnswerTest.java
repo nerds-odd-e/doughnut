@@ -22,15 +22,15 @@ class AnswerTest {
 
     @Nested
     class LinkTargetExclusiveQuestion {
-        ReviewPointEntity reviewPointEntity;
+        ReviewPoint reviewPoint;
         @BeforeEach
         void setup() {
-            reviewPointEntity = makeMe.aReviewPointFor(source.getLinks().get(0)).inMemoryPlease();
+            reviewPoint = makeMe.aReviewPointFor(source.getLinks().get(0)).inMemoryPlease();
         }
 
         @Test
         void correct () {
-            Answer answer = makeMe.anAnswerFor(reviewPointEntity)
+            Answer answer = makeMe.anAnswerFor(reviewPoint)
                     .type(LINK_SOURCE_EXCLUSIVE)
                     .answer("blah")
                     .inMemoryPlease();
@@ -39,7 +39,7 @@ class AnswerTest {
 
         @Test
         void wrong () {
-            Answer answer = makeMe.anAnswerFor(reviewPointEntity)
+            Answer answer = makeMe.anAnswerFor(reviewPoint)
                     .type(LINK_SOURCE_EXCLUSIVE)
                     .answer(source.getTitle())
                     .inMemoryPlease();

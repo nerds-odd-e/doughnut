@@ -33,15 +33,15 @@ public class ReviewingInitialReviewTest {
         day1 = makeMe.aTimestamp().of(1, 8).forWhereTheUserIs(userModel).please();
     }
 
-    private ReviewPointEntity getOneInitialReviewPointEntity(Timestamp timestamp) {
+    private ReviewPoint getOneInitialReviewPoint(Timestamp timestamp) {
         Reviewing reviewing = userModel.createReviewing(timestamp);
-        return reviewing.getOneInitialReviewPointEntity();
+        return reviewing.getOneInitialReviewPoint();
     }
 
     @Test
     void whenThereIsNoNotesForUser() {
         makeMe.aNote().byUser(anotherUser).please();
-        assertThat(getOneInitialReviewPointEntity(day1), is(nullValue()));
+        assertThat(getOneInitialReviewPoint(day1), is(nullValue()));
     }
 
     @Nested
@@ -58,15 +58,15 @@ public class ReviewingInitialReviewTest {
 
         @Test
         void shouldReturnTheFirstNoteAndThenTheSecondWhenThereAreTwo() {
-            assertThat(getOneInitialReviewPointEntity(day1).getNote(), equalTo(note1));
+            assertThat(getOneInitialReviewPoint(day1).getNote(), equalTo(note1));
             makeMe.aReviewPointFor(note1).by(userModel).initiallyReviewedOn(day1).please();
-            assertThat(getOneInitialReviewPointEntity(day1).getNote(), equalTo(note2));
+            assertThat(getOneInitialReviewPoint(day1).getNote(), equalTo(note2));
         }
 
         @Test
         void shouldNotIncludeNoteThatIsSkippedForReview() {
             makeMe.theNote(note1).skipReview().linkTo(note2).please();
-            assertThat(getOneInitialReviewPointEntity(day1).getNote(), equalTo(note2));
+            assertThat(getOneInitialReviewPoint(day1).getNote(), equalTo(note2));
         }
 
         @Nested
@@ -75,8 +75,8 @@ public class ReviewingInitialReviewTest {
             void shouldReturnReviewPointForLink() {
                 makeMe.theNote(note2).skipReview().please();
                 makeMe.theNote(note1).skipReview().linkTo(note2).please();
-                assertThat(getOneInitialReviewPointEntity(day1).getLink().getSourceNote(), equalTo(note1));
-                assertThat(getOneInitialReviewPointEntity(day1).getNote(), is(nullValue()));
+                assertThat(getOneInitialReviewPoint(day1).getLink().getSourceNote(), equalTo(note1));
+                assertThat(getOneInitialReviewPoint(day1).getNote(), is(nullValue()));
             }
 
             @Test
@@ -84,15 +84,15 @@ public class ReviewingInitialReviewTest {
                 makeMe.theNote(note2).skipReview().please();
                 makeMe.theNote(note1).skipReview().linkTo(note2).please();
                 Note note3 = makeMe.aNote().byUser(userModel).createdAt(new Timestamp(System.currentTimeMillis() + 1000)).please();
-                assertThat(getOneInitialReviewPointEntity(day1).getLink().getSourceNote(), equalTo(note1));
-                assertThat(getOneInitialReviewPointEntity(day1).getNote(), is(nullValue()));
+                assertThat(getOneInitialReviewPoint(day1).getLink().getSourceNote(), equalTo(note1));
+                assertThat(getOneInitialReviewPoint(day1).getNote(), is(nullValue()));
             }
 
             @Test
             void shouldNotReturnReviewPointForLinkIfCreatedByOtherPeople() {
                 makeMe.theNote(note2).skipReview().please();
                 makeMe.theNote(note1).notebookOwnership(makeMe.aUser().please()).skipReview().linkTo(note2, Link.LinkType.BELONGS_TO).please();
-                assertThat(getOneInitialReviewPointEntity(day1), is(nullValue()));
+                assertThat(getOneInitialReviewPoint(day1), is(nullValue()));
             }
         }
 
@@ -106,34 +106,34 @@ public class ReviewingInitialReviewTest {
 
             @Test
             void shouldReturnOneIfUsersDailySettignIsOne() {
-                assertThat(getOneInitialReviewPointEntity(day1).getNote(), equalTo(note1));
+                assertThat(getOneInitialReviewPoint(day1).getNote(), equalTo(note1));
             }
 
 
             @Test
             void shouldNotIncludeNotesThatAreAlreadyReviewed() {
                 makeMe.aReviewPointFor(note1).by(userModel).initiallyReviewedOn(day1).please();
-                assertThat(getOneInitialReviewPointEntity(day1), is(nullValue()));
+                assertThat(getOneInitialReviewPoint(day1), is(nullValue()));
             }
 
             @Test
             void shouldIncludeNotesThatAreReviewedByOtherPeople() {
                 makeMe.aReviewPointFor(note1).by(anotherUser).initiallyReviewedOn(day1).please();
-                assertThat(getOneInitialReviewPointEntity(day1).getNote(), equalTo(note1));
+                assertThat(getOneInitialReviewPoint(day1).getNote(), equalTo(note1));
             }
 
             @Test
             void theDailyCountShouldNotBeResetOnSameDayDifferentHour() {
                 makeMe.aReviewPointFor(note1).by(userModel).initiallyReviewedOn(day1).please();
                 Timestamp day1_23 = makeMe.aTimestamp().of(1, 23).forWhereTheUserIs(userModel).please();
-                assertThat(getOneInitialReviewPointEntity(day1_23), is(nullValue()));
+                assertThat(getOneInitialReviewPoint(day1_23), is(nullValue()));
             }
 
             @Test
             void theDailyCountShouldBeResetOnNextDay() {
                 makeMe.aReviewPointFor(note1).by(userModel).initiallyReviewedOn(day1).please();
                 Timestamp day2 = makeMe.aTimestamp().of(2, 1).forWhereTheUserIs(userModel).please();
-                assertThat(getOneInitialReviewPointEntity(day2).getNote(), equalTo(note2));
+                assertThat(getOneInitialReviewPoint(day2).getNote(), equalTo(note2));
             }
 
         }
@@ -157,14 +157,14 @@ public class ReviewingInitialReviewTest {
 
         @Test
         void shouldReturnReviewPointForNote() {
-            assertThat(getOneInitialReviewPointEntity(day1).getNote(), equalTo(note1));
+            assertThat(getOneInitialReviewPoint(day1).getNote(), equalTo(note1));
         }
 
         @Test
         void shouldReturnReviewPointForLink() {
             makeMe.theNote(note2).skipReview().please();
             makeMe.theNote(note1).skipReview().linkTo(note2).please();
-            assertThat(getOneInitialReviewPointEntity(day1).getLink().getSourceNote(), equalTo(note1));
+            assertThat(getOneInitialReviewPoint(day1).getLink().getSourceNote(), equalTo(note1));
         }
 
     }
@@ -183,7 +183,7 @@ public class ReviewingInitialReviewTest {
 
         @Test
         void shouldNotBeReviewed() {
-            assertThat(getOneInitialReviewPointEntity(day1), is(nullValue()));
+            assertThat(getOneInitialReviewPoint(day1), is(nullValue()));
         }
     }
 

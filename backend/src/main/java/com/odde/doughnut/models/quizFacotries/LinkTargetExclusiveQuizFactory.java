@@ -2,7 +2,7 @@ package com.odde.doughnut.models.quizFacotries;
 
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.ReviewPointEntity;
+import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.models.QuizQuestion;
 
 import java.util.List;
@@ -11,8 +11,8 @@ public class LinkTargetExclusiveQuizFactory implements QuizQuestionFactory {
     private final Link link;
     private final QuizQuestionServant servant;
 
-    public LinkTargetExclusiveQuizFactory(QuizQuestionServant servant, ReviewPointEntity reviewPointEntity) {
-        this.link = reviewPointEntity.getLink();
+    public LinkTargetExclusiveQuizFactory(QuizQuestionServant servant, ReviewPoint reviewPoint) {
+        this.link = reviewPoint.getLink();
         this.servant = servant;
     }
 

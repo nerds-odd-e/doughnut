@@ -5,8 +5,8 @@
             <li class="breadcrumb-item additional-item" th:text="${notebook.headNote.title}"/>
         </div>
 
-        <form action="#" th:action="@{/subscriptions/notebooks/{id}/subscribe(id=${notebook.id})}" th:object="${subscriptionEntity}" method="post">
-            <div th:replace="_fragments/subscription_fragments :: subscriptionFormFields(${subscriptionEntity})"/>
+        <form action="#" th:action="@{/subscriptions/notebooks/{id}/subscribe(id=${notebook.id})}" th:object="${subscription}" method="post">
+            <div th:replace="_fragments/subscription_fragments :: subscriptionFormFields(${subscription})"/>
             <input type="submit" value="Add to my learning" class="btn btn-primary"/>
         </form>
 

@@ -2,13 +2,13 @@ package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.SubscriptionEntity;
+import com.odde.doughnut.entities.Subscription;
 import com.odde.doughnut.services.ModelFactoryService;
 
 import java.util.List;
 
-public class SubscriptionModel extends ModelForEntity<SubscriptionEntity> implements ReviewScope {
-    public SubscriptionModel(SubscriptionEntity sub, ModelFactoryService modelFactoryService) {
+public class SubscriptionModel extends ModelForEntity<Subscription> implements ReviewScope {
+    public SubscriptionModel(Subscription sub, ModelFactoryService modelFactoryService) {
         super(sub, modelFactoryService);
     }
 

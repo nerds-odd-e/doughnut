@@ -1,4 +1,4 @@
-<div th:fragment="showReviewPoint(reviewPointEntity)" th:object="${reviewPointEntity}">
+<div th:fragment="showReviewPoint(reviewPoint)" th:object="${reviewPoint}">
     <div th:if="*{note}">
         <div th:replace=":: noteBreadcrumbForReview(*{note})"/>
         <div class="jumbotron py-4 mb-2">

@@ -16,7 +16,7 @@ public class Answer {
 
     @Getter
     @Setter
-    ReviewPointEntity reviewPointEntity;
+    ReviewPoint reviewPoint;
 
     @Getter
     @Setter
@@ -24,14 +24,14 @@ public class Answer {
 
     public boolean checkAnswer() {
         if (questionType == LINK_TARGET) {
-            return (answer.equals(reviewPointEntity.getLink().getTargetNote().getTitle()));
+            return (answer.equals(reviewPoint.getLink().getTargetNote().getTitle()));
         }
         if (questionType == LINK_SOURCE_EXCLUSIVE) {
-            return reviewPointEntity.getLink().getBackwardPeers().stream()
+            return reviewPoint.getLink().getBackwardPeers().stream()
                     .map(Note::getTitle).noneMatch(t->t.equals(answer));
         }
         return (
                 answer.toLowerCase().trim().equals(
-                        reviewPointEntity.getNote().getTitle().toLowerCase().trim()));
+                        reviewPoint.getNote().getTitle().toLowerCase().trim()));
     }
 }

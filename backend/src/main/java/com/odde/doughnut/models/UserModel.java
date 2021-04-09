@@ -46,7 +46,7 @@ public class UserModel extends ModelForEntity<UserEntity> implements ReviewScope
     public boolean hasReadAuthority(Note note) {
         if(hasFullAuthority(note)) return true;
 
-        return entity.getSubscriptionEntities().stream().anyMatch(s->s.getNotebook() == note.getNotebook());
+        return entity.getSubscriptions().stream().anyMatch(s->s.getNotebook() == note.getNotebook());
     }
 
     public void assertReadAuthorization(Note note) throws NoAccessRightException {
@@ -108,7 +108,7 @@ public class UserModel extends ModelForEntity<UserEntity> implements ReviewScope
         return modelFactoryService.linkRepository.findByOwnershipWhereThereIsNoReviewPoint(entity);
     }
 
-    public List<ReviewPointEntity> getRecentReviewPoints(Timestamp since) {
+    public List<ReviewPoint> getRecentReviewPoints(Timestamp since) {
         return modelFactoryService.reviewPointRepository.findAllByUserEntityAndInitialReviewedAtGreaterThan(entity, since);
     }
 
@@ -125,7 +125,7 @@ public class UserModel extends ModelForEntity<UserEntity> implements ReviewScope
         return ZoneId.of("Asia/Shanghai");
     }
 
-    public List<ReviewPointEntity> getReviewPointsNeedToRepeat(Timestamp currentUTCTimestamp) {
+    public List<ReviewPoint> getReviewPointsNeedToRepeat(Timestamp currentUTCTimestamp) {
         return modelFactoryService.reviewPointRepository
                 .findAllByUserEntityAndNextReviewAtLessThanEqualOrderByNextReviewAt(
                         getEntity(),

@@ -164,7 +164,7 @@
     </ul>
 </div>
 
-<div th:fragment="reviewSettingForm(reviewSettingEntity)" th:object="${reviewSettingEntity}">
+<div th:fragment="reviewSettingForm(reviewSetting)" th:object="${reviewSetting}">
     <div th:replace="_fragments/forms :: checkInput('review_setting', 'rememberSpelling')">
     </div>
 </div>

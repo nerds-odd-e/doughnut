@@ -2,7 +2,7 @@ package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.ReviewPointEntity;
+import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,7 @@ class QuizQuestionGeneratorTest {
 
     @Test
     void clozeSelection() {
-        ReviewPointEntity reviewPoint = makeMe.aReviewPointFor(note).inMemoryPlease();
+        ReviewPoint reviewPoint = makeMe.aReviewPointFor(note).inMemoryPlease();
         List<QuizQuestion.QuestionType> questionTypes = getQuestionTypes(reviewPoint);
         assertThat(questionTypes, contains(CLOZE_SELECTION));
     }
@@ -30,7 +30,7 @@ class QuizQuestionGeneratorTest {
     @Test
     void spelling() {
         makeMe.theNote(note).rememberSpelling();
-        ReviewPointEntity reviewPoint = makeMe.aReviewPointFor(note).inMemoryPlease();
+        ReviewPoint reviewPoint = makeMe.aReviewPointFor(note).inMemoryPlease();
         List<QuizQuestion.QuestionType> questionTypes = getQuestionTypes(reviewPoint);
         assertThat(questionTypes, contains(SPELLING, CLOZE_SELECTION));
     }
@@ -38,7 +38,7 @@ class QuizQuestionGeneratorTest {
     @Test
     void linkExclusive() {
         Note note2 = makeMe.aNote().linkTo(note).inMemoryPlease();
-        ReviewPointEntity reviewPoint = makeMe.aReviewPointFor(note2.getLinks().get(0)).inMemoryPlease();
+        ReviewPoint reviewPoint = makeMe.aReviewPointFor(note2.getLinks().get(0)).inMemoryPlease();
         List<QuizQuestion.QuestionType> questionTypes = getQuestionTypes(reviewPoint);
         assertThat(questionTypes, containsInAnyOrder(LINK_TARGET, LINK_SOURCE_EXCLUSIVE));
     }
@@ -46,12 +46,12 @@ class QuizQuestionGeneratorTest {
     @Test
     void notAllLinkQuestionAreAvailableToAllLinkTypes() {
         Note note2 = makeMe.aNote().linkTo(note, Link.LinkType.RELATED_TO).inMemoryPlease();
-        ReviewPointEntity reviewPoint = makeMe.aReviewPointFor(note2.getLinks().get(0)).inMemoryPlease();
+        ReviewPoint reviewPoint = makeMe.aReviewPointFor(note2.getLinks().get(0)).inMemoryPlease();
         List<QuizQuestion.QuestionType> questionTypes = getQuestionTypes(reviewPoint);
         assertTrue(questionTypes.isEmpty());
     }
 
-    private List<QuizQuestion.QuestionType> getQuestionTypes(ReviewPointEntity reviewPoint) {
+    private List<QuizQuestion.QuestionType> getQuestionTypes(ReviewPoint reviewPoint) {
         QuizQuestionGenerator generator = new QuizQuestionGenerator(reviewPoint, randomizer);
         return generator.availableQuestionTypes();
     }

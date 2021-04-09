@@ -2,7 +2,7 @@ package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.ReviewPointEntity;
+import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.models.quizFacotries.*;
 import com.odde.doughnut.services.ModelFactoryService;
 import lombok.Getter;
@@ -22,9 +22,9 @@ public class QuizQuestion {
         LINK_SOURCE_EXCLUSIVE("link_source_exclusive", LinkTargetExclusiveQuizFactory::new);
 
         public final String label;
-        public final BiFunction<QuizQuestionServant, ReviewPointEntity, QuizQuestionFactory> factory;
+        public final BiFunction<QuizQuestionServant, ReviewPoint, QuizQuestionFactory> factory;
 
-        QuestionType(String label, BiFunction<QuizQuestionServant, ReviewPointEntity, QuizQuestionFactory> factory) {
+        QuestionType(String label, BiFunction<QuizQuestionServant, ReviewPoint, QuizQuestionFactory> factory) {
             this.label = label;
             this.factory = factory;
         }
@@ -32,7 +32,7 @@ public class QuizQuestion {
 
     private final Randomizer randomizer;
     private final ModelFactoryService modelFactoryService;
-    private final ReviewPointEntity reviewPointEntity;
+    private final ReviewPoint reviewPoint;
     @Getter @Setter
     private QuestionType questionType = null;
     @Getter @Setter
@@ -42,8 +42,8 @@ public class QuizQuestion {
     @Getter @Setter
     public String mainTopic;
 
-    public QuizQuestion(ReviewPointEntity reviewPointEntity, Randomizer randomizer, ModelFactoryService modelFactoryService) {
-        this.reviewPointEntity = reviewPointEntity;
+    public QuizQuestion(ReviewPoint reviewPoint, Randomizer randomizer, ModelFactoryService modelFactoryService) {
+        this.reviewPoint = reviewPoint;
         this.randomizer = randomizer;
         this.modelFactoryService = modelFactoryService;
     }
@@ -54,7 +54,7 @@ public class QuizQuestion {
 
     public Answer buildAnswer() {
         Answer answer = new Answer();
-        answer.setReviewPointEntity(reviewPointEntity);
+        answer.setReviewPoint(reviewPoint);
         answer.setQuestionType(questionType);
         return answer;
     }

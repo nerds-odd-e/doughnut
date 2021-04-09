@@ -2,8 +2,8 @@ package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.ReviewPointEntity;
-import com.odde.doughnut.entities.ReviewSettingEntity;
+import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.ReviewSetting;
 import com.odde.doughnut.services.ModelFactoryService;
 
 import java.sql.Timestamp;
@@ -24,11 +24,11 @@ public class Reviewing {
         this.modelFactoryService = modelFactoryService;
     }
 
-    public ReviewPointEntity getOneInitialReviewPointEntity() {
-        return memoizer.call("getOneInitialReviewPointEntity", this::getOneInitialReviewPointEntity_);
+    public ReviewPoint getOneInitialReviewPoint() {
+        return memoizer.call("getOneInitialReviewPoint", this::getOneInitialReviewPoint_);
     }
 
-    private ReviewPointEntity getOneInitialReviewPointEntity_() {
+    private ReviewPoint getOneInitialReviewPoint_() {
         int count = remainingDailyNewNotesCount();
         if (count == 0) {
             return null;
@@ -36,11 +36,11 @@ public class Reviewing {
         List<Integer> initialReviewedNotesOfToday = getNewReviewPointEntitiesOfToday().stream().map(rp -> rp.getSourceNote().getId()).collect(Collectors.toUnmodifiableList());
         return getSubscriptionModelStream()
                 .filter(sub-> sub.needToLearnMoreToday(initialReviewedNotesOfToday))
-                .map(this::getOneNewReviewPointEntity)
-                .filter(Objects::nonNull).findFirst().orElseGet(()->getOneNewReviewPointEntity(userModel));
+                .map(this::getOneNewReviewPoint)
+                .filter(Objects::nonNull).findFirst().orElseGet(()-> getOneNewReviewPoint(userModel));
     }
 
-    private ReviewPointEntity getOneNewReviewPointEntity(ReviewScope reviewScope) {
+    private ReviewPoint getOneNewReviewPoint(ReviewScope reviewScope) {
         Note note = reviewScope.getNotesHaveNotBeenReviewedAtAll().stream().findFirst().orElse(null);
         Link link = reviewScope.getLinksHaveNotBeenReviewedAtAll().stream().findFirst().orElse(null);
 
@@ -55,10 +55,10 @@ public class Reviewing {
             }
         }
 
-        ReviewPointEntity reviewPointEntity = new ReviewPointEntity();
-        reviewPointEntity.setNote(note);
-        reviewPointEntity.setLink(link);
-        return reviewPointEntity;
+        ReviewPoint reviewPoint = new ReviewPoint();
+        reviewPoint.setNote(note);
+        reviewPoint.setLink(link);
+        return reviewPoint;
     }
 
     public int toRepeatCount() {
@@ -93,8 +93,8 @@ public class Reviewing {
     }
 
     public int getToInitialReviewCount_() {
-        ReviewPointEntity oneInitialReviewPointEntity = getOneInitialReviewPointEntity();
-        if (oneInitialReviewPointEntity == null) {
+        ReviewPoint oneInitialReviewPoint = getOneInitialReviewPoint();
+        if (oneInitialReviewPoint == null) {
             return 0;
         }
         return Math.min(remainingDailyNewNotesCount(), notLearntCount());
@@ -105,37 +105,37 @@ public class Reviewing {
         return (int) (userModel.entity.getDailyNewNotesCount() - sameDayCount);
     }
 
-    private List<ReviewPointEntity> getNewReviewPointEntitiesOfToday() {
+    private List<ReviewPoint> getNewReviewPointEntitiesOfToday() {
         return memoizer.call("getNewReviewPointEntitiesOfToday", this::getNewReviewPointEntitiesOfToday_);
     }
 
-    private List<ReviewPointEntity> getNewReviewPointEntitiesOfToday_() {
+    private List<ReviewPoint> getNewReviewPointEntitiesOfToday_() {
         Timestamp oneDayAgo = TimestampOperations.addDaysToTimestamp(currentUTCTimestamp, -1);
         return userModel.getRecentReviewPoints(oneDayAgo).stream().filter(p -> p.isInitialReviewOnSameDay(currentUTCTimestamp, userModel.getTimeZone())).collect(Collectors.toUnmodifiableList());
     }
 
     public ReviewPointModel getOneReviewPointNeedToRepeat(Randomizer randomizer) {
-        List<ReviewPointEntity> reviewPointsNeedToRepeat = userModel.getReviewPointsNeedToRepeat(currentUTCTimestamp);
+        List<ReviewPoint> reviewPointsNeedToRepeat = userModel.getReviewPointsNeedToRepeat(currentUTCTimestamp);
         if (reviewPointsNeedToRepeat.size() == 0) {
             return null;
         }
-        ReviewPointEntity reviewPointEntity = randomizer.chooseOneRandomly(reviewPointsNeedToRepeat);
-        return modelFactoryService.toReviewPointModel(reviewPointEntity);
+        ReviewPoint reviewPoint = randomizer.chooseOneRandomly(reviewPointsNeedToRepeat);
+        return modelFactoryService.toReviewPointModel(reviewPoint);
     }
 
-    public ReviewSettingEntity getReviewSettingEntity(Note note) {
+    public ReviewSetting getReviewSetting(Note note) {
         if(note == null) {
             return null;
         }
-        ReviewSettingEntity reviewSettingEntity = note.getMasterReviewSettingEntity();
-        if (reviewSettingEntity == null) {
-            reviewSettingEntity = new ReviewSettingEntity();
+        ReviewSetting reviewSetting = note.getMasterReviewSetting();
+        if (reviewSetting == null) {
+            reviewSetting = new ReviewSetting();
         }
-        return reviewSettingEntity;
+        return reviewSetting;
     }
 
     private Stream<SubscriptionModel> getSubscriptionModelStream() {
-        return userModel.entity.getSubscriptionEntities().stream().map(modelFactoryService::toSubscriptionModel);
+        return userModel.entity.getSubscriptions().stream().map(modelFactoryService::toSubscriptionModel);
     }
 
 }

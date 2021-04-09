@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 @Transactional
-public class ReviewPointEntityTest {
+public class ReviewPointTest {
 
     @Autowired
     MakeMe makeMe;
@@ -25,7 +25,7 @@ public class ReviewPointEntityTest {
     UserEntity userEntity;
     Note note;
     Link link;
-    ReviewPointEntity reviewPointEntity = new ReviewPointEntity();
+    ReviewPoint reviewPoint = new ReviewPoint();
 
     @BeforeEach
     void setup() {
@@ -33,12 +33,12 @@ public class ReviewPointEntityTest {
         note = makeMe.aNote().byUser(userEntity).please();
         Note note2 = makeMe.aNote().byUser(userEntity).linkTo(note).please();
         link = note2.getLinks().get(0);
-        reviewPointEntity.setUserEntity(userEntity);
+        reviewPoint.setUserEntity(userEntity);
     }
 
     @Test
     void validate() {
-        reviewPointEntity.setNote(note);
+        reviewPoint.setNote(note);
         Set<ConstraintViolation<UserEntity>> violations = validator.validate(userEntity);
         assertEquals(0, violations.size());
     }

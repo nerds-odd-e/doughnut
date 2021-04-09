@@ -1,14 +1,14 @@
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
 <layout th:replace="_fragments/basic_layout :: application_layout(~{ :: .content})">
     <div class="container content">
-        <div th:replace="_fragments/review_fragments :: showReviewPoint(${reviewPointEntity})"/>
+        <div th:replace="_fragments/review_fragments :: showReviewPoint(${reviewPoint})"/>
 
-        <form id="review-setting" ction="#" th:action="@{/reviews/}" th:object="${reviewPointEntity}" method="post">
+        <form id="review-setting" ction="#" th:action="@{/reviews/}" th:object="${reviewPoint}" method="post">
             <div class="mb-2">
                 <input th:field="*{note}" type="hidden"/>
                 <input th:field="*{link}" type="hidden"/>
-                <div th:if="${reviewSettingEntity}">
-                    <div th:replace="_fragments/note_fragments :: reviewSettingForm(${reviewSettingEntity})"/>
+                <div th:if="${reviewSetting}">
+                    <div th:replace="_fragments/note_fragments :: reviewSettingForm(${reviewSetting})"/>
                 </div>
             </div>
             <input type="submit" name="submit" value="Keep for repetition" class="btn btn-primary"/>

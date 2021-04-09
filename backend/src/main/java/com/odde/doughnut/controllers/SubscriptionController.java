@@ -2,7 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.entities.SubscriptionEntity;
+import com.odde.doughnut.entities.Subscription;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.services.ModelFactoryService;
 import org.springframework.stereotype.Controller;
@@ -26,46 +26,46 @@ public class SubscriptionController extends ApplicationMvcController {
         this.modelFactoryService = modelFactoryService;
     }
 
-    @GetMapping("/{subscriptionEntity}")
-    public String show(@PathVariable(name = "subscriptionEntity") SubscriptionEntity subscriptionEntity) {
+    @GetMapping("/{subscription}")
+    public String show(@PathVariable(name = "subscription") Subscription subscription) {
         return "subscriptions/show";
     }
 
-    @GetMapping("/{subscriptionEntity}/edit")
-    public String edit(@PathVariable(name = "subscriptionEntity") SubscriptionEntity subscriptionEntity) {
+    @GetMapping("/{subscription}/edit")
+    public String edit(@PathVariable(name = "subscription") Subscription subscription) {
         return "subscriptions/edit";
     }
 
-    @PostMapping("/{subscriptionEntity}")
+    @PostMapping("/{subscription}")
     @Transactional
-    public String update(@Valid SubscriptionEntity subscriptionEntity, BindingResult bindingResult) {
+    public String update(@Valid Subscription subscription, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return "subscriptions/edit";
         }
-        modelFactoryService.entityManager.persist(subscriptionEntity);
-        return "redirect:/subscriptions/" + subscriptionEntity.getId();
+        modelFactoryService.entityManager.persist(subscription);
+        return "redirect:/subscriptions/" + subscription.getId();
     }
 
     @GetMapping("/notebooks/{notebook}/add_to_learning")
     public String addToLearning(@PathVariable(name = "notebook") Notebook notebook, Model model) {
-        SubscriptionEntity subscriptionEntity = new SubscriptionEntity();
-        model.addAttribute("subscriptionEntity", subscriptionEntity);
+        Subscription subscription = new Subscription();
+        model.addAttribute("subscription", subscription);
         return "subscriptions/add_to_learning";
     }
 
     @PostMapping("/notebooks/{notebook}/subscribe")
     @Transactional
-    public String createSubscription(@PathVariable(name = "notebook") Notebook notebook, @Valid SubscriptionEntity subscriptionEntity, BindingResult bindingResult, Model model) throws NoAccessRightException {
+    public String createSubscription(@PathVariable(name = "notebook") Notebook notebook, @Valid Subscription subscription, BindingResult bindingResult, Model model) throws NoAccessRightException {
         if (bindingResult.hasErrors()) {
             return "subscriptions/add_to_learning";
         }
         if (modelFactoryService.bazaarNotebookRepository.findByNotebook(notebook) == null) {
             throw new NoAccessRightException();
         }
-        subscriptionEntity.setNotebook(notebook);
-        subscriptionEntity.setUserEntity(currentUserFetcher.getUser().getEntity());
-        modelFactoryService.entityManager.persist(subscriptionEntity);
-        return "redirect:/subscriptions/" + subscriptionEntity.getId();
+        subscription.setNotebook(notebook);
+        subscription.setUserEntity(currentUserFetcher.getUser().getEntity());
+        modelFactoryService.entityManager.persist(subscription);
+        return "redirect:/subscriptions/" + subscription.getId();
     }
 
 }

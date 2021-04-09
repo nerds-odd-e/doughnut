@@ -1,7 +1,7 @@
 package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.ReviewPointEntity;
+import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionDirector;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.testability.MakeMe;
@@ -41,7 +41,7 @@ class QuizQuestionTypesTest {
         Note target;
         Note source;
         Note anotherSource;
-        ReviewPointEntity reviewPointEntity;
+        ReviewPoint reviewPoint;
 
         @BeforeEach
         void setup() {
@@ -49,7 +49,7 @@ class QuizQuestionTypesTest {
             target = makeMe.aNote("target").under(top).please();
             source = makeMe.aNote("source").under(top).byUser(userModel.getEntity()).linkTo(target).please();
             anotherSource = makeMe.aNote("anotherSource").under(top).byUser(userModel.getEntity()).linkTo(target).please();
-            reviewPointEntity = makeMe.aReviewPointFor(source.getLinks().get(0)).inMemoryPlease();
+            reviewPoint = makeMe.aReviewPointFor(source.getLinks().get(0)).inMemoryPlease();
         }
 
         @Test
@@ -88,7 +88,7 @@ class QuizQuestionTypesTest {
                 makeMe.aNote("anotherSource5").under(top).byUser(userModel.getEntity()).linkTo(target).please();
                 source = makeMe.aNote("anotherSource6").under(top).byUser(userModel.getEntity()).linkTo(target).please();
                 makeMe.refresh(top);
-                reviewPointEntity = makeMe.aReviewPointFor(source.getLinks().get(0)).inMemoryPlease();
+                reviewPoint = makeMe.aReviewPointFor(source.getLinks().get(0)).inMemoryPlease();
                 QuizQuestion quizQuestion = buildLinSourceExclusiveQuizQuestion();
                 List<String> options = toOptionStrings(quizQuestion);
                 assertThat(notRelated.getTitle(), in(options));
@@ -97,7 +97,7 @@ class QuizQuestionTypesTest {
         }
 
         private QuizQuestion buildLinSourceExclusiveQuizQuestion() {
-            QuizQuestionDirector builder = new QuizQuestionDirector(LINK_SOURCE_EXCLUSIVE, randomizer, reviewPointEntity, makeMe.modelFactoryService);
+            QuizQuestionDirector builder = new QuizQuestionDirector(LINK_SOURCE_EXCLUSIVE, randomizer, reviewPoint, makeMe.modelFactoryService);
             return builder.buildQuizQuestion();
         }
     }

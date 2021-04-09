@@ -7,7 +7,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "review_setting")
-public class ReviewSettingEntity {
+public class ReviewSetting {
     @Id
     @Getter
     @GeneratedValue(strategy = GenerationType.IDENTITY)

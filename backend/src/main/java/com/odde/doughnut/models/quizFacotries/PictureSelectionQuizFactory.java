@@ -1,7 +1,7 @@
 package com.odde.doughnut.models.quizFacotries;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.ReviewPointEntity;
+import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.models.QuizQuestion;
 
 import java.util.List;
@@ -10,9 +10,9 @@ public class PictureSelectionQuizFactory implements QuizQuestionFactory {
     private final Note answerNote;
     private final QuizQuestionServant servant;
 
-    public PictureSelectionQuizFactory(QuizQuestionServant servant, ReviewPointEntity reviewPointEntity) {
+    public PictureSelectionQuizFactory(QuizQuestionServant servant, ReviewPoint reviewPoint) {
         this.servant = servant;
-        this.answerNote = reviewPointEntity.getNote();
+        this.answerNote = reviewPoint.getNote();
     }
 
     @Override

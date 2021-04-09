@@ -29,7 +29,7 @@ public class UserEntity {
 
     @OneToMany(mappedBy = "userEntity")
     @JsonIgnore
-    @Getter @Setter private List<ReviewPointEntity> reviewPoints = new ArrayList<>();
+    @Getter @Setter private List<ReviewPoint> reviewPoints = new ArrayList<>();
 
     @OneToOne(mappedBy = "userEntity", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
@@ -52,7 +52,7 @@ public class UserEntity {
     @OneToMany(mappedBy = "userEntity", cascade = CascadeType.DETACH)
     @JsonIgnore
     @Getter
-    private final List<SubscriptionEntity> subscriptionEntities = new ArrayList<>();
+    private final List<Subscription> subscriptions = new ArrayList<>();
 
     public UserEntity() {
         ownership.setUserEntity(this);

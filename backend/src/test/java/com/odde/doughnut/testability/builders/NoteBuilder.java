@@ -102,10 +102,10 @@ public class NoteBuilder extends EntityBuilder<Note> {
     }
 
     public NoteBuilder rememberSpelling() {
-        if(entity.getMasterReviewSettingEntity() == null) {
-            entity.setMasterReviewSettingEntity(new ReviewSettingEntity());
+        if(entity.getMasterReviewSetting() == null) {
+            entity.setMasterReviewSetting(new ReviewSetting());
         }
-        entity.getMasterReviewSettingEntity().setRememberSpelling(true);
+        entity.getMasterReviewSetting().setRememberSpelling(true);
         return this;
     }
 

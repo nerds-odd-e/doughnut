@@ -25,6 +25,6 @@
     <li class="breadcrumb-item b-top-link"><a href="/notebooks">Subscriptions</a></lid>
 </div>
 
-<div th:fragment="subscriptionFormFields(subscriptionEntity)" th:object="${subscriptionEntity}">
+<div th:fragment="subscriptionFormFields(subscription)" th:object="${subscription}">
     <div th:replace="_fragments/forms :: textInput('subscription', 'dailyTargetOfNewNotes', null, true)"/>
 </div>

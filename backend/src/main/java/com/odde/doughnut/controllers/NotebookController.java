@@ -32,7 +32,7 @@ public class NotebookController extends ApplicationMvcController  {
     @GetMapping("")
     public String myNotebooks(Model model) {
         model.addAttribute("notebooks", getCurrentUser().getEntity().getOwnership().getNotebooks());
-        model.addAttribute("subscriptions", getCurrentUser().getEntity().getSubscriptionEntities());
+        model.addAttribute("subscriptions", getCurrentUser().getEntity().getSubscriptions());
         return "notebooks/index";
     }
 

@@ -7,10 +7,10 @@
                  th:text="'Your answer `' + ${answer.answer} + '` is wrong.'"/>
         </div>
 
-        <div th:replace="_fragments/review_fragments :: showReviewPoint(${reviewPointEntity})"/>
+        <div th:replace="_fragments/review_fragments :: showReviewPoint(${reviewPoint})"/>
 
         <div class="btn-toolbar justify-content-between">
-            <form th:action="@{/reviews/{id}(id=${reviewPointEntity.id})}" th:object="${reviewPointEntity}"
+            <form th:action="@{/reviews/{id}(id=${reviewPoint.id})}" th:object="${reviewPoint}"
                   method="post">
                 <div class="btn-group" role="group" aria-label="First group">
                     <button type="submit" class="btn btn-light" id="repeat-again" name="again"
@@ -43,20 +43,20 @@
                 </button>
                 <div class="dropdown-menu dropdown-menu-right">
                     <a class="dropdown-item"
-                       th:href="@{/notes/{id}/review_setting(id=${reviewPointEntity.getSourceNote().id})}">
+                       th:href="@{/notes/{id}/review_setting(id=${reviewPoint.getSourceNote().id})}">
                         <svg th:replace="_fragments/svgs :: reviewSetting"/>
                         Edit Review Settings
                     </a>
-                    <a class="dropdown-item" th:href="@{/links/{id}/link(id=${reviewPointEntity.getSourceNote().id})}">
+                    <a class="dropdown-item" th:href="@{/links/{id}/link(id=${reviewPoint.getSourceNote().id})}">
                         <svg th:replace="_fragments/svgs :: linkNote"/>
                         Make Link
                         <a class="dropdown-item"
-                           th:href="@{/notes/{id}/edit(id=${reviewPointEntity.getSourceNote().id})}">
+                           th:href="@{/notes/{id}/edit(id=${reviewPoint.getSourceNote().id})}">
                             <svg th:replace="_fragments/svgs :: edit"/>
                             Edit Note
                         </a>
                         <div class="dropdown-divider"></div>
-                        <form th:action="@{/reviews/{id}(id=${reviewPointEntity.id})}" th:object="${reviewPointEntity}"
+                        <form th:action="@{/reviews/{id}(id=${reviewPoint.id})}" th:object="${reviewPoint}"
                               method="post"
                               onsubmit="return confirm('Are you sure to hide this note from reviewing in the future?')">
                             <button type="submit" class="dropdown-item" name="remove">

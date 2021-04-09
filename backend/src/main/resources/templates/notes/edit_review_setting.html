@@ -7,8 +7,8 @@
             <li class="breadcrumb-item additional-item" th:text="${note.title}"/>
         </div>
 
-        <form id="review-setting" action="#" th:action="@{/notes/{id}/review_setting(id=${note.id})}" th:object="${reviewSettingEntity}" method="post">
-            <div th:replace="_fragments/note_fragments :: reviewSettingForm(${reviewSettingEntity})"/>
+        <form id="review-setting" action="#" th:action="@{/notes/{id}/review_setting(id=${note.id})}" th:object="${reviewSetting}" method="post">
+            <div th:replace="_fragments/note_fragments :: reviewSettingForm(${reviewSetting})"/>
             <input type="submit" value="Update" class="btn btn-primary"/>
         </div>
     </div>

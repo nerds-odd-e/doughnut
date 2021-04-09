@@ -1,8 +1,8 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.ReviewPointEntity;
-import com.odde.doughnut.entities.ReviewSettingEntity;
+import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.ReviewSetting;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.MakeMe;
@@ -42,15 +42,15 @@ class ReviewControllerTest {
 
     @Test
     void skip() {
-        ReviewPointEntity rp = makeMe.aReviewPointFor(makeMe.aNote().please()).inMemoryPlease();
-        controller.skip(rp, new ReviewSettingEntity());
+        ReviewPoint rp = makeMe.aReviewPointFor(makeMe.aNote().please()).inMemoryPlease();
+        controller.skip(rp, new ReviewSetting());
         assertThat(rp.getId(), is(not(nullValue())));
         assertThat(rp.getRemovedFromReview(), is(true));
     }
 
     @Nested
     class WhenThereIsAReviewPoint {
-        ReviewPointEntity rp;
+        ReviewPoint rp;
         final int expectedSatisfyingForgettingCurveIndex = 110;
 
         @BeforeEach

@@ -2,7 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.entities.SubscriptionEntity;
+import com.odde.doughnut.entities.Subscription;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
@@ -44,22 +44,22 @@ class SubscriptionControllerTest {
 
     @Test
     void subscribeToNoteSuccessfully() throws NoAccessRightException {
-        SubscriptionEntity subscriptionEntity = makeMe.aSubscription().inMemoryPlease();
+        Subscription subscription = makeMe.aSubscription().inMemoryPlease();
         String result = controller.createSubscription(
                 notebook,
-                subscriptionEntity,
+                subscription,
                 makeMe.successfulBindingResult(), model);
         assertThat(result, matchesPattern("redirect:/subscriptions/\\d+"));
-        assertEquals(topNote, subscriptionEntity.getHeadNote());
-        assertEquals(userModel.getEntity(), subscriptionEntity.getUserEntity());
+        assertEquals(topNote, subscription.getHeadNote());
+        assertEquals(userModel.getEntity(), subscription.getUserEntity());
     }
 
     @Test
     void shouldShowTheFormAgainIfError() throws NoAccessRightException {
-        SubscriptionEntity subscriptionEntity = makeMe.aSubscription().inMemoryPlease();
+        Subscription subscription = makeMe.aSubscription().inMemoryPlease();
         String result = controller.createSubscription(
                 notebook,
-                subscriptionEntity,
+                subscription,
                 makeMe.failedBindingResult(), model);
         assertEquals("subscriptions/add_to_learning", result);
     }
@@ -67,10 +67,10 @@ class SubscriptionControllerTest {
     @Test
     void notAllowToSubscribeToNoneBazaarNote() {
         Note anotherNote = makeMe.aNote().byUser(userModel).please();
-        SubscriptionEntity subscriptionEntity = makeMe.aSubscription().inMemoryPlease();
+        Subscription subscription = makeMe.aSubscription().inMemoryPlease();
         assertThrows(NoAccessRightException.class, ()-> controller.createSubscription(
                 anotherNote.getNotebook(),
-                subscriptionEntity,
+                subscription,
                 makeMe.successfulBindingResult(), model));
     }
 }

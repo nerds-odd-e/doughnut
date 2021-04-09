@@ -46,7 +46,7 @@ public class Note {
     @JoinColumn(name = "master_review_setting_id", referencedColumnName = "id")
     @Getter
     @Setter
-    private ReviewSettingEntity masterReviewSettingEntity;
+    private ReviewSetting masterReviewSetting;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
@@ -192,12 +192,12 @@ public class Note {
         return noteContent.getTitle();
     }
 
-    public void mergeMasterReviewSetting(ReviewSettingEntity reviewSettingEntity) {
-        ReviewSettingEntity current = getMasterReviewSettingEntity();
+    public void mergeMasterReviewSetting(ReviewSetting reviewSetting) {
+        ReviewSetting current = getMasterReviewSetting();
         if (current == null) {
-            setMasterReviewSettingEntity(reviewSettingEntity);
+            setMasterReviewSetting(reviewSetting);
         } else {
-            BeanUtils.copyProperties(reviewSettingEntity, getMasterReviewSettingEntity());
+            BeanUtils.copyProperties(reviewSetting, getMasterReviewSetting());
         }
     }
 

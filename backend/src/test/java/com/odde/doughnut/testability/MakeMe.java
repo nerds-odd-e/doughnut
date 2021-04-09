@@ -60,13 +60,13 @@ public class MakeMe {
     }
 
     public ReviewPointBuilder aReviewPointFor(Note note) {
-        ReviewPointEntity reviewPointEntity = new ReviewPointEntity();
-        return new ReviewPointBuilder(reviewPointEntity, this).forNote(note);
+        ReviewPoint reviewPoint = new ReviewPoint();
+        return new ReviewPointBuilder(reviewPoint, this).forNote(note);
     }
 
     public ReviewPointBuilder aReviewPointFor(Link link) {
-        ReviewPointEntity reviewPointEntity = new ReviewPointEntity();
-        return new ReviewPointBuilder(reviewPointEntity, this).forLink(link);
+        ReviewPoint reviewPoint = new ReviewPoint();
+        return new ReviewPointBuilder(reviewPoint, this).forLink(link);
     }
 
     public TimestampBuilder aTimestamp() {
@@ -89,11 +89,11 @@ public class MakeMe {
         return new UploadedPictureBuilder();
     }
 
-    public AnswerBuilder anAnswerFor(ReviewPointEntity reviewPointEntity) {
-        return new AnswerBuilder(new Answer(), this).forReviewPoint(reviewPointEntity);
+    public AnswerBuilder anAnswerFor(ReviewPoint reviewPoint) {
+        return new AnswerBuilder(new Answer(), this).forReviewPoint(reviewPoint);
     }
 
     public SubscriptionBuilder aSubscription() {
-        return new SubscriptionBuilder(this, new SubscriptionEntity());
+        return new SubscriptionBuilder(this, new Subscription());
     }
 }

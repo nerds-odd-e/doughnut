@@ -97,7 +97,7 @@ public class Link {
     @OneToMany(mappedBy = "link", cascade = CascadeType.ALL,
             orphanRemoval = true)
     @JsonIgnore
-    private final List<ReviewPointEntity> reviewPointEntities = new ArrayList<>();
+    private final List<ReviewPoint> reviewPointEntities = new ArrayList<>();
 
     public LinkType getLinkType() {
         return LinkType.fromString(type);

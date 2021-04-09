@@ -50,13 +50,13 @@ public class ModelFactoryService {
         return new UserModel(userEntity, this);
     }
 
-    public ReviewPointModel toReviewPointModel(@Valid ReviewPointEntity reviewPointEntity) {
-        return new ReviewPointModel(reviewPointEntity, this);
+    public ReviewPointModel toReviewPointModel(@Valid ReviewPoint reviewPoint) {
+        return new ReviewPointModel(reviewPoint, this);
     }
 
     public <T, M extends ModelForEntity<T>> M toModel(T entity, Class<M> klass){
         if (klass == ReviewPointModel.class) {
-            return (M) toReviewPointModel((ReviewPointEntity) entity);
+            return (M) toReviewPointModel((ReviewPoint) entity);
         }
         if (klass == UserModel.class) {
             return (M) toUserModel((UserEntity) entity);
@@ -84,7 +84,7 @@ public class ModelFactoryService {
         return new LinkModel(link, this);
     }
 
-    public SubscriptionModel toSubscriptionModel(SubscriptionEntity sub) {
+    public SubscriptionModel toSubscriptionModel(Subscription sub) {
         return new SubscriptionModel(sub, this);
     }
 }

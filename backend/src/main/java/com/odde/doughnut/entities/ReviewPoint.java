@@ -14,7 +14,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "review_point")
-public class ReviewPointEntity {
+public class ReviewPoint {
   @Id
   @Getter
   @GeneratedValue(strategy = GenerationType.IDENTITY)

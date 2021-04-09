@@ -1,7 +1,7 @@
 package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.ReviewPointEntity;
+import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
@@ -77,13 +77,13 @@ public class ReviewingWithSpacedRepetitionAlgorithmTest {
                     .by(userModel)
                     .nthStrictRepetitionOn(repetitionDone, baseDay)
                     .please();
-            ReviewPointEntity mostUrgentReviewPointEntity = getOneReviewPointNeedToRepeat(reviewDay);
-            assertThat(mostUrgentReviewPointEntity != null, is(expectedToRepeat));
+            ReviewPoint mostUrgentReviewPoint = getOneReviewPointNeedToRepeat(reviewDay);
+            assertThat(mostUrgentReviewPoint != null, is(expectedToRepeat));
         }
 
     }
 
-    private ReviewPointEntity getOneReviewPointNeedToRepeat(Integer reviewDay) {
+    private ReviewPoint getOneReviewPointNeedToRepeat(Integer reviewDay) {
         Reviewing reviewing = userModel.createReviewing(daysAfterBase(reviewDay));
         ReviewPointModel model = reviewing.getOneReviewPointNeedToRepeat(randomizer);
         if(model == null) return null;

@@ -1,18 +1,18 @@
 package com.odde.doughnut.models.quizFacotries;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.ReviewPointEntity;
+import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.models.QuizQuestion;
 
 import java.util.List;
 
 public class DefaultQuizFactory implements QuizQuestionFactory {
-    private final ReviewPointEntity reviewPointEntity;
+    private final ReviewPoint reviewPoint;
     private final Note answerNote;
     private final QuizQuestionServant servant;
 
-    public DefaultQuizFactory(QuizQuestionServant servant, ReviewPointEntity reviewPointEntity) {
-        this.reviewPointEntity = reviewPointEntity;
+    public DefaultQuizFactory(QuizQuestionServant servant, ReviewPoint reviewPoint) {
+        this.reviewPoint = reviewPoint;
         this.servant = servant;
         this.answerNote = getAnswerNote();
     }
@@ -43,7 +43,7 @@ public class DefaultQuizFactory implements QuizQuestionFactory {
     }
 
     private Note getAnswerNote() {
-        return reviewPointEntity.getNote();
+        return reviewPoint.getNote();
     }
 
 }
