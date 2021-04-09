@@ -29,7 +29,7 @@ public class SubscriptionEntity {
         return notebook.getHeadNote().getTitle();
     }
 
-    public NoteContentEntity getNoteContent() {
+    public NoteContent getNoteContent() {
         return notebook.getHeadNote().getNoteContent();
     }
 

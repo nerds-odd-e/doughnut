@@ -39,20 +39,20 @@ public class NotebookController extends ApplicationMvcController  {
     @GetMapping({"/new"})
     public String newNote(Model model) {
         UserModel userModel = getCurrentUser();
-        NoteContentEntity noteContentEntity = new NoteContentEntity();
+        NoteContent noteContent = new NoteContent();
         model.addAttribute("ownershipEntity", userModel.getEntity().getOwnershipEntity());
-        model.addAttribute("noteContentEntity", noteContentEntity);
+        model.addAttribute("noteContent", noteContent);
         return "notebooks/new";
     }
 
     @PostMapping({"/{ownershipEntity}/create"})
-    public String createNote(@PathVariable(name = "ownershipEntity", required = false) OwnershipEntity ownershipEntity, @Valid NoteContentEntity noteContentEntity, BindingResult bindingResult) throws IOException {
+    public String createNote(@PathVariable(name = "ownershipEntity", required = false) OwnershipEntity ownershipEntity, @Valid NoteContent noteContent, BindingResult bindingResult) throws IOException {
         if (bindingResult.hasErrors()) {
             return "notebooks/new";
         }
         final Note note = new Note();
         UserEntity userEntity = getCurrentUser().getEntity();
-        note.updateNoteContent(noteContentEntity, userEntity);
+        note.updateNoteContent(noteContent, userEntity);
         note.buildNotebookForHeadNote(ownershipEntity, userEntity);
         modelFactoryService.noteRepository.save(note);
         return "redirect:/notes/" + note.getId();

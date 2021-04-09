@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 @Embeddable
 @ValidateNotePicture
-public class NoteContentEntity {
+public class NoteContent {
     @Column(name = "id", insertable = false, updatable = false)
     @Getter
     private Integer id;

@@ -1,7 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.NoteContentEntity;
+import com.odde.doughnut.entities.NoteContent;
 import com.odde.doughnut.entities.NoteMotionEntity;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.entities.UserEntity;
@@ -123,7 +123,7 @@ class NoteControllerTests {
         @Test
         void shouldNotRemoveThePictureIfNoNewPictureInTheUpdate() throws NoAccessRightException, IOException {
             makeMe.theNote(note).withUploadedPicture();
-            NoteContentEntity newContent = makeMe.aNote().inMemoryPlease().getNoteContent();
+            NoteContent newContent = makeMe.aNote().inMemoryPlease().getNoteContent();
             controller.updateNote(note, newContent, makeMe.successfulBindingResult());
             assertThat(note.getNoteContent().getUploadPicture(), is(not(nullValue())));
         }

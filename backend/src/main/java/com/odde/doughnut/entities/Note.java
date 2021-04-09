@@ -31,7 +31,7 @@ public class Note {
     @Embedded
     @Valid
     @Getter
-    private NoteContentEntity noteContent = new NoteContentEntity();
+    private NoteContent noteContent = new NoteContent();
 
     @Column(name = "sibling_order")
     private Long siblingOrder = SiblingOrder.getGoodEnoughOrderNumber();
@@ -201,16 +201,16 @@ public class Note {
         }
     }
 
-    public void updateNoteContent(NoteContentEntity noteContentEntity, UserEntity userEntity) throws IOException {
-        noteContentEntity.fetchUploadedPicture(userEntity);
-        mergeNoteContent(noteContentEntity);
+    public void updateNoteContent(NoteContent noteContent, UserEntity userEntity) throws IOException {
+        noteContent.fetchUploadedPicture(userEntity);
+        mergeNoteContent(noteContent);
     }
 
-    public void mergeNoteContent(NoteContentEntity noteContentEntity) {
-        if (noteContentEntity.getUploadPicture() == null) {
-            noteContentEntity.setUploadPicture(getNoteContent().getUploadPicture());
+    public void mergeNoteContent(NoteContent noteContent) {
+        if (noteContent.getUploadPicture() == null) {
+            noteContent.setUploadPicture(getNoteContent().getUploadPicture());
         }
-        BeanUtils.copyProperties(noteContentEntity, getNoteContent());
+        BeanUtils.copyProperties(noteContent, getNoteContent());
     }
 
     public Note getPreviousSibling() {

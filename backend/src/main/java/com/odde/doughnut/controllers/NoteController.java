@@ -33,14 +33,14 @@ public class NoteController extends ApplicationMvcController  {
     public String newNote(@PathVariable(name = "parentNote") Note parentNote, Model model) throws NoAccessRightException {
         UserModel userModel = getCurrentUser();
         userModel.assertAuthorization(parentNote);
-        NoteContentEntity noteContentEntity = new NoteContentEntity();
+        NoteContent noteContent = new NoteContent();
         model.addAttribute("ownershipEntity", userModel.getEntity().getOwnershipEntity());
-        model.addAttribute("noteContentEntity", noteContentEntity);
+        model.addAttribute("noteContent", noteContent);
         return "notes/new";
     }
 
     @PostMapping("/{parentNote}/create")
-    public String createNote(@PathVariable(name = "parentNote") Note parentNote, @Valid NoteContentEntity noteContentEntity, BindingResult bindingResult, Model model) throws NoAccessRightException, IOException {
+    public String createNote(@PathVariable(name = "parentNote") Note parentNote, @Valid NoteContent noteContent, BindingResult bindingResult, Model model) throws NoAccessRightException, IOException {
         if (bindingResult.hasErrors()) {
             return "notes/new";
         }
@@ -48,7 +48,7 @@ public class NoteController extends ApplicationMvcController  {
         userModel.assertAuthorization(parentNote);
         Note note = new Note();
         UserEntity userEntity = userModel.getEntity();
-        note.updateNoteContent(noteContentEntity, userEntity);
+        note.updateNoteContent(noteContent, userEntity);
         note.setParentNote(parentNote);
         note.setUserEntity(userEntity);
         modelFactoryService.noteRepository.save(note);
@@ -66,17 +66,17 @@ public class NoteController extends ApplicationMvcController  {
 
     @GetMapping("/{note}/edit")
     public String editNote(Note note, Model model) {
-        model.addAttribute("noteContentEntity", note.getNoteContent());
+        model.addAttribute("noteContent", note.getNoteContent());
         return "notes/edit";
     }
 
     @PostMapping("/{note}")
-    public String updateNote(@PathVariable(name = "note") Note note, @Valid NoteContentEntity noteContentEntity, BindingResult bindingResult) throws NoAccessRightException, IOException {
+    public String updateNote(@PathVariable(name = "note") Note note, @Valid NoteContent noteContent, BindingResult bindingResult) throws NoAccessRightException, IOException {
         getCurrentUser().assertAuthorization(note);
         if (bindingResult.hasErrors()) {
             return "notes/edit";
         }
-        note.updateNoteContent(noteContentEntity, getCurrentUser().getEntity());
+        note.updateNoteContent(noteContent, getCurrentUser().getEntity());
         modelFactoryService.noteRepository.save(note);
         return "redirect:/notes/" + note.getId();
     }

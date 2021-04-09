@@ -59,12 +59,12 @@ class TestabilityRestController {
     }
 
     @PostMapping("/seed_notes")
-    public List<Integer> seedNote(@RequestBody List<NoteContentEntity> noteContents, @RequestParam(name = "external_identifier") String externalIdentifier) throws Exception {
+    public List<Integer> seedNote(@RequestBody List<NoteContent> noteContents, @RequestParam(name = "external_identifier") String externalIdentifier) throws Exception {
         final UserEntity userEntity = getUserModelByExternalIdentifierOrCurrentUser(externalIdentifier).getEntity();
         HashMap<String, Note> earlyNotes = new HashMap<>();
         List<Note> noteList = new ArrayList<>();
 
-        for (NoteContentEntity content : noteContents) {
+        for (NoteContent content : noteContents) {
             Note note = new Note();
             note.mergeNoteContent(content);
             earlyNotes.put(content.getTitle(), note);
