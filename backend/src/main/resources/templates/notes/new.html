@@ -3,11 +3,11 @@
 
     <div class="container content">
         <h2>Adding new note</h2>
-        <div th:replace="_fragments/note_fragments ::noteBreadcrumbForOwnOrCircle(${parentNote?.ancestorsIncludingMe}, ${ownershipEntity} , ~{:: .additional-item})">
+        <div th:replace="_fragments/note_fragments ::noteBreadcrumbForOwnOrCircle(${parentNote?.ancestorsIncludingMe}, ${ownership} , ~{:: .additional-item})">
             <li class="breadcrumb-item additional-item">(adding here)</li>
         </div>
 
-        <form action="#" th:action="${parentNote == null ? '/notes/'+ ownershipEntity.id +'/create_top' : '/notes/' + parentNote.id + '/create'}" th:object="${noteContent}" method="post" enctype="multipart/form-data">
+        <form action="#" th:action="${parentNote == null ? '/notes/'+ ownership.id +'/create_top' : '/notes/' + parentNote.id + '/create'}" th:object="${noteContent}" method="post" enctype="multipart/form-data">
             <div th:replace="_fragments/note_fragments :: noteFormBody()"/>
             <input type="submit" value="Submit" class="btn btn-primary"/>
         </form>

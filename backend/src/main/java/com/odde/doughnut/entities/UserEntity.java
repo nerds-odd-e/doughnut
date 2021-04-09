@@ -33,7 +33,7 @@ public class UserEntity {
 
     @OneToOne(mappedBy = "userEntity", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
-    @Getter @Setter private OwnershipEntity ownershipEntity = new OwnershipEntity();
+    @Getter @Setter private Ownership ownership = new Ownership();
 
     @Column(name = "daily_new_notes_count") @Getter @Setter private Integer dailyNewNotesCount = 15;
 
@@ -55,11 +55,11 @@ public class UserEntity {
     private final List<SubscriptionEntity> subscriptionEntities = new ArrayList<>();
 
     public UserEntity() {
-        ownershipEntity.setUserEntity(this);
+        ownership.setUserEntity(this);
     }
 
     public boolean owns(Notebook notebook) {
-        return notebook.getOwnershipEntity().ownsBy(this);
+        return notebook.getOwnership().ownsBy(this);
     }
 
 }

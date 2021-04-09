@@ -10,7 +10,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "ownership")
-public class OwnershipEntity {
+public class Ownership {
     @Id @Getter @GeneratedValue(strategy = GenerationType.IDENTITY) private Integer id;
 
     @OneToOne
@@ -23,7 +23,7 @@ public class OwnershipEntity {
     @JsonIgnore
     @Getter @Setter private Circle circle;
 
-    @OneToMany(mappedBy = "ownershipEntity")
+    @OneToMany(mappedBy = "ownership")
     @JsonIgnore
     @Getter @Setter private List<Notebook> notebooks = new ArrayList<>();
 

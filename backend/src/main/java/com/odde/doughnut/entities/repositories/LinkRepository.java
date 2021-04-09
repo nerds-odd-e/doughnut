@@ -24,7 +24,7 @@ public interface LinkRepository extends CrudRepository<Link, Integer> {
 
     String byOwnershipWhereThereIsNoReviewPoint = " JOIN note ON note.id = source_id"
             + " JOIN notebook ON notebook.id = note.notebook_id "
-            + "   AND notebook.ownership_id = :#{#userEntity.ownershipEntity.id} "
+            + "   AND notebook.ownership_id = :#{#userEntity.ownership.id} "
             + whereThereIsNoReviewPoint;
 
     String byAncestorWhereThereIsNoReviewPoint = "JOIN notes_closure ON notes_closure.note_id = source_id "

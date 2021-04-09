@@ -2,7 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteContent;
-import com.odde.doughnut.entities.NoteMotionEntity;
+import com.odde.doughnut.entities.NoteMotion;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.entities.UserEntity;
 import com.odde.doughnut.models.UserModel;
@@ -196,7 +196,7 @@ class NoteControllerTests {
 
         @Test
         void shouldNotAllowMoveOtherPeoplesNote() {
-            NoteMotionEntity motion = new NoteMotionEntity(note2, false);
+            NoteMotion motion = new NoteMotion(note2, false);
             assertThrows(NoAccessRightException.class, ()->
                     controller.moveNote(note1, motion)
             );
@@ -204,7 +204,7 @@ class NoteControllerTests {
 
         @Test
         void shouldNotAllowMoveToOtherPeoplesNote() {
-            NoteMotionEntity motion = new NoteMotionEntity(note1, false);
+            NoteMotion motion = new NoteMotion(note1, false);
             assertThrows(NoAccessRightException.class, ()->
                     controller.moveNote(note2, motion)
             );

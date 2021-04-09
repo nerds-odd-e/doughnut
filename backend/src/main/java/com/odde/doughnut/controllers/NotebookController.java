@@ -31,7 +31,7 @@ public class NotebookController extends ApplicationMvcController  {
 
     @GetMapping("")
     public String myNotebooks(Model model) {
-        model.addAttribute("notebooks", getCurrentUser().getEntity().getOwnershipEntity().getNotebooks());
+        model.addAttribute("notebooks", getCurrentUser().getEntity().getOwnership().getNotebooks());
         model.addAttribute("subscriptions", getCurrentUser().getEntity().getSubscriptionEntities());
         return "notebooks/index";
     }
@@ -40,20 +40,20 @@ public class NotebookController extends ApplicationMvcController  {
     public String newNote(Model model) {
         UserModel userModel = getCurrentUser();
         NoteContent noteContent = new NoteContent();
-        model.addAttribute("ownershipEntity", userModel.getEntity().getOwnershipEntity());
+        model.addAttribute("ownership", userModel.getEntity().getOwnership());
         model.addAttribute("noteContent", noteContent);
         return "notebooks/new";
     }
 
-    @PostMapping({"/{ownershipEntity}/create"})
-    public String createNote(@PathVariable(name = "ownershipEntity", required = false) OwnershipEntity ownershipEntity, @Valid NoteContent noteContent, BindingResult bindingResult) throws IOException {
+    @PostMapping({"/{ownership}/create"})
+    public String createNote(@PathVariable(name = "ownership", required = false) Ownership ownership, @Valid NoteContent noteContent, BindingResult bindingResult) throws IOException {
         if (bindingResult.hasErrors()) {
             return "notebooks/new";
         }
         final Note note = new Note();
         UserEntity userEntity = getCurrentUser().getEntity();
         note.updateNoteContent(noteContent, userEntity);
-        note.buildNotebookForHeadNote(ownershipEntity, userEntity);
+        note.buildNotebookForHeadNote(ownership, userEntity);
         modelFactoryService.noteRepository.save(note);
         return "redirect:/notes/" + note.getId();
     }

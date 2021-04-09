@@ -4,14 +4,14 @@ import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import lombok.Getter;
 import lombok.Setter;
 
-public class NoteMotionEntity {
+public class NoteMotion {
     @Getter @Setter
     Note subject;
     @Getter @Setter
     Note relativeToNote;
     @Getter @Setter private boolean asFirstChildOfNote;
 
-    public NoteMotionEntity(Note relativeToNote, boolean asFirstChildOfNote) {
+    public NoteMotion(Note relativeToNote, boolean asFirstChildOfNote) {
         this.relativeToNote = relativeToNote;
         this.asFirstChildOfNote = asFirstChildOfNote;
     }

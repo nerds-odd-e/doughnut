@@ -40,10 +40,10 @@ public class Circle {
 
     @OneToOne(mappedBy = "circle", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
-    @Getter @Setter private OwnershipEntity ownershipEntity = new OwnershipEntity();
+    @Getter @Setter private Ownership ownership = new Ownership();
 
     public Circle() {
-        ownershipEntity.setCircle(this);
+        ownership.setCircle(this);
     }
 
     private static String generateRandomInvitationCode(int targetStringLength) {

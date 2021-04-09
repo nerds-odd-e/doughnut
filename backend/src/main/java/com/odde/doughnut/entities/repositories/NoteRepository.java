@@ -35,7 +35,7 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
 
     String byOwnershipWhereThereIsNoReviewPoint = "JOIN notebook ON notebook.id = note.notebook_id "
             + whereThereIsNoReviewPoint
-            + " AND notebook.ownership_id = :#{#userEntity.ownershipEntity.id} ";
+            + " AND notebook.ownership_id = :#{#userEntity.ownership.id} ";
 
     String joinClosure = " JOIN notes_closure ON notes_closure.note_id = note.id "
             + "   AND notes_closure.ancestor_id = :ancestor ";

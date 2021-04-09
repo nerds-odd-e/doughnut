@@ -1,7 +1,7 @@
 package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.NoteMotionEntity;
+import com.odde.doughnut.entities.NoteMotion;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.MakeMe;
@@ -41,7 +41,7 @@ public class NoteMotionModelTest {
     }
 
     void move(Note subject, Note relativeNote, boolean asFirstChildOfNote) throws CyclicLinkDetectedException {
-        NoteMotionEntity motion = new NoteMotionEntity(relativeNote, asFirstChildOfNote);
+        NoteMotion motion = new NoteMotion(relativeNote, asFirstChildOfNote);
         NoteMotionModel noteMotionModel = modelFactoryService.toNoteMotionModel(motion, subject);
         noteMotionModel.execute();
     }

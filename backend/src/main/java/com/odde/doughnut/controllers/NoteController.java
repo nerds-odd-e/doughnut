@@ -34,7 +34,7 @@ public class NoteController extends ApplicationMvcController  {
         UserModel userModel = getCurrentUser();
         userModel.assertAuthorization(parentNote);
         NoteContent noteContent = new NoteContent();
-        model.addAttribute("ownershipEntity", userModel.getEntity().getOwnershipEntity());
+        model.addAttribute("ownership", userModel.getEntity().getOwnership());
         model.addAttribute("noteContent", noteContent);
         return "notes/new";
     }
@@ -85,32 +85,32 @@ public class NoteController extends ApplicationMvcController  {
     public String prepareToMove(Note note, Model model) {
         model.addAttribute("noteMotion", getLeftNoteMotion(note));
         model.addAttribute("noteMotionRight", getRightNoteMotion(note));
-        model.addAttribute("noteMotionUnder", new NoteMotionEntity(null, true));
+        model.addAttribute("noteMotionUnder", new NoteMotion(null, true));
         return "notes/move";
     }
 
-    private NoteMotionEntity getLeftNoteMotion(Note note) {
+    private NoteMotion getLeftNoteMotion(Note note) {
         Note previousSiblingNote = note.getPreviousSibling();
         if(previousSiblingNote != null) {
             Note prevprev = previousSiblingNote.getPreviousSibling();
             if (prevprev == null) {
-                return new NoteMotionEntity(note.getParentNote(), true);
+                return new NoteMotion(note.getParentNote(), true);
             }
-            return new NoteMotionEntity(prevprev, false);
+            return new NoteMotion(prevprev, false);
         }
-        return new NoteMotionEntity(null, false);
+        return new NoteMotion(null, false);
     }
 
-    private NoteMotionEntity getRightNoteMotion(Note note) {
-        return new NoteMotionEntity(note.getNextSibling(), false);
+    private NoteMotion getRightNoteMotion(Note note) {
+        return new NoteMotion(note.getNextSibling(), false);
     }
 
     @PostMapping("/{note}/move")
     @Transactional
-    public String moveNote(Note note, NoteMotionEntity noteMotionEntity) throws CyclicLinkDetectedException, NoAccessRightException {
+    public String moveNote(Note note, NoteMotion noteMotion) throws CyclicLinkDetectedException, NoAccessRightException {
         getCurrentUser().assertAuthorization(note);
-        getCurrentUser().assertAuthorization(noteMotionEntity.getRelativeToNote());
-        modelFactoryService.toNoteMotionModel(noteMotionEntity, note).execute();
+        getCurrentUser().assertAuthorization(noteMotion.getRelativeToNote());
+        modelFactoryService.toNoteMotionModel(noteMotion, note).execute();
         return "redirect:/notes/" + note.getId();
     }
 

@@ -71,7 +71,7 @@ class TestabilityRestController {
             noteList.add(note);
             final String testingParent = note.getNoteContent().getTestingParent();
             if (Strings.isBlank(testingParent)) {
-                note.buildNotebookForHeadNote(userEntity.getOwnershipEntity(), userEntity);
+                note.buildNotebookForHeadNote(userEntity.getOwnership(), userEntity);
             }
             else {
                 note.setParentNote(earlyNotes.get(testingParent));

@@ -74,14 +74,14 @@ public class Note {
     @OrderBy("depth DESC")
     @Getter
     @Setter
-    private List<NotesClosureEntity> notesClosures = new ArrayList<>();
+    private List<NotesClosure> notesClosures = new ArrayList<>();
 
     @OneToMany(mappedBy = "ancestorEntity", cascade = CascadeType.DETACH)
     @JsonIgnore
     @OrderBy("depth")
     @Getter
     @Setter
-    private List<NotesClosureEntity> descendantNCs = new ArrayList<>();
+    private List<NotesClosure> descendantNCs = new ArrayList<>();
 
     @JoinTable(name = "notes_closure", joinColumns = {
             @JoinColumn(name = "ancestor_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)}, inverseJoinColumns = {
@@ -142,11 +142,11 @@ public class Note {
     private void addAncestors(List<Note> ancestors) {
         int[] counter = {1};
         ancestors.forEach(anc -> {
-            NotesClosureEntity notesClosureEntity = new NotesClosureEntity();
-            notesClosureEntity.setNote(this);
-            notesClosureEntity.setAncestorEntity(anc);
-            notesClosureEntity.setDepth(counter[0]);
-            getNotesClosures().add(0, notesClosureEntity);
+            NotesClosure notesClosure = new NotesClosure();
+            notesClosure.setNote(this);
+            notesClosure.setAncestorEntity(anc);
+            notesClosure.setDepth(counter[0]);
+            getNotesClosures().add(0, notesClosure);
             counter[0] += 1;
         });
     }
@@ -166,11 +166,11 @@ public class Note {
     }
 
     public List<Note> getAncestors() {
-        return getNotesClosures().stream().map(NotesClosureEntity::getAncestorEntity).collect(toList());
+        return getNotesClosures().stream().map(NotesClosure::getAncestorEntity).collect(toList());
     }
 
     public void traverseBreadthFirst(Consumer<Note> noteConsumer) {
-        descendantNCs.stream().map(NotesClosureEntity::getNote).forEach(noteConsumer);
+        descendantNCs.stream().map(NotesClosure::getNote).forEach(noteConsumer);
     }
 
     public Note getParentNote() {
@@ -315,10 +315,10 @@ public class Note {
         return Strings.isBlank(noteContent.getDescription()) && children.isEmpty();
     }
 
-    public void buildNotebookForHeadNote(OwnershipEntity ownershipEntity, UserEntity creator) {
+    public void buildNotebookForHeadNote(Ownership ownership, UserEntity creator) {
         final Notebook notebook = new Notebook();
         notebook.setCreatorEntity(creator);
-        notebook.setOwnershipEntity(ownershipEntity);
+        notebook.setOwnership(ownership);
         notebook.setHeadNote(this);
 
         this.userEntity = creator;

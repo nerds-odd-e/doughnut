@@ -26,9 +26,9 @@ public class ModelFactoryService {
         return new TreeNodeModel(note, this);
     }
 
-    public NoteMotionModel toNoteMotionModel(NoteMotionEntity noteMotionEntity, Note note) {
-        noteMotionEntity.setSubject(note);
-        return new NoteMotionModel(noteMotionEntity, this);
+    public NoteMotionModel toNoteMotionModel(NoteMotion noteMotion, Note note) {
+        noteMotion.setSubject(note);
+        return new NoteMotionModel(noteMotion, this);
     }
 
     public BazaarModel toBazaarModel() {

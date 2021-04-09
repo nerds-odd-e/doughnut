@@ -1,16 +1,16 @@
 package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.NoteMotionEntity;
+import com.odde.doughnut.entities.NoteMotion;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.services.ModelFactoryService;
 
 import java.util.ArrayList;
 
-public class NoteMotionModel extends ModelForEntity<NoteMotionEntity>{
+public class NoteMotionModel extends ModelForEntity<NoteMotion>{
 
-    public NoteMotionModel(NoteMotionEntity noteMotionEntity, ModelFactoryService modelFactoryService) {
-        super(noteMotionEntity, modelFactoryService);
+    public NoteMotionModel(NoteMotion noteMotion, ModelFactoryService modelFactoryService) {
+        super(noteMotion, modelFactoryService);
     }
 
     public void execute() throws CyclicLinkDetectedException {
