@@ -25,7 +25,7 @@ public class OwnershipEntity {
 
     @OneToMany(mappedBy = "ownershipEntity")
     @JsonIgnore
-    @Getter @Setter private List<NotebookEntity> notebookEntities = new ArrayList<>();
+    @Getter @Setter private List<Notebook> notebooks = new ArrayList<>();
 
     public boolean ownsBy(UserEntity user) {
         if(userEntity != null) {

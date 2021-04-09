@@ -21,7 +21,7 @@
 </div>
 
 <div th:fragment="noteOwnerBreadcrumb(untilNote, additional)"
-     th:replace="::noteBreadcrumbForOwnOrCircle(${untilNote.ancestors}, ${untilNote.notebookEntity.ownershipEntity}, ${additional})"/>
+     th:replace="::noteBreadcrumbForOwnOrCircle(${untilNote.ancestors}, ${untilNote.notebook.ownershipEntity}, ${additional})"/>
 
 <div th:fragment="card(noteElement, button, cardHeader, linkFragment)">
     <div class="card">

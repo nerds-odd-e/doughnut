@@ -2,11 +2,11 @@
 <layout th:replace="_fragments/basic_layout :: application_layout(~{ :: .content})">
     <div class="container content">
         <h2>Edit Notebook Settings</h2>
-        <div th:replace="_fragments/note_fragments :: noteOwnerBreadcrumb(${notebookEntity.headNote}, ~{:: .additional-item})">
-            <li class="breadcrumb-item additional-item strong" th:text="${notebookEntity.headNote.title}"/>
+        <div th:replace="_fragments/note_fragments :: noteOwnerBreadcrumb(${notebook.headNote}, ~{:: .additional-item})">
+            <li class="breadcrumb-item additional-item strong" th:text="${notebook.headNote.title}"/>
         </div>
 
-        <form action="#" th:action="@{/notebooks/{id}(id=${notebookEntity.id})}" th:object="${notebookEntity}" method="post">
+        <form action="#" th:action="@{/notebooks/{id}(id=${notebook.id})}" th:object="${notebook}" method="post">
             <div th:replace="_fragments/forms :: checkInput('notebook', 'skipReviewEntirely')"/>
             <input type="submit" value="Update" class="btn btn-primary"/>
         </form>

@@ -31,7 +31,7 @@ public class NotebookController extends ApplicationMvcController  {
 
     @GetMapping("")
     public String myNotebooks(Model model) {
-        model.addAttribute("notebooks", getCurrentUser().getEntity().getOwnershipEntity().getNotebookEntities());
+        model.addAttribute("notebooks", getCurrentUser().getEntity().getOwnershipEntity().getNotebooks());
         model.addAttribute("subscriptions", getCurrentUser().getEntity().getSubscriptionEntities());
         return "notebooks/index";
     }
@@ -53,34 +53,34 @@ public class NotebookController extends ApplicationMvcController  {
         final Note note = new Note();
         UserEntity userEntity = getCurrentUser().getEntity();
         note.updateNoteContent(noteContentEntity, userEntity);
-        note.buildNotebookEntityForHeadNote(ownershipEntity, userEntity);
+        note.buildNotebookForHeadNote(ownershipEntity, userEntity);
         modelFactoryService.noteRepository.save(note);
         return "redirect:/notes/" + note.getId();
     }
 
-    @GetMapping({"/{notebookEntity}/edit"})
-    public String edit(@PathVariable(name = "notebookEntity") NotebookEntity notebookEntity) throws NoAccessRightException {
+    @GetMapping({"/{notebook}/edit"})
+    public String edit(@PathVariable(name = "notebook") Notebook notebook) throws NoAccessRightException {
         UserModel userModel = getCurrentUser();
-        userModel.assertAuthorization(notebookEntity);
+        userModel.assertAuthorization(notebook);
         return "notebooks/edit";
     }
 
-    @PostMapping(value = "/{notebookEntity}")
+    @PostMapping(value = "/{notebook}")
     @Transactional
-    public String update(@Valid NotebookEntity notebookEntity, BindingResult bindingResult) throws NoAccessRightException {
+    public String update(@Valid Notebook notebook, BindingResult bindingResult) throws NoAccessRightException {
         if (bindingResult.hasErrors()) {
             return "notebooks/edit";
         }
-        getCurrentUser().assertAuthorization(notebookEntity);
-        modelFactoryService.notebookRepository.save(notebookEntity);
+        getCurrentUser().assertAuthorization(notebook);
+        modelFactoryService.notebookRepository.save(notebook);
         return "redirect:/notebooks";
     }
 
-    @PostMapping(value = "/{notebookEntity}/share")
-    public RedirectView shareNote(@PathVariable("notebookEntity") NotebookEntity notebookEntity) throws NoAccessRightException {
-        getCurrentUser().assertAuthorization(notebookEntity);
+    @PostMapping(value = "/{notebook}/share")
+    public RedirectView shareNote(@PathVariable("notebook") Notebook notebook) throws NoAccessRightException {
+        getCurrentUser().assertAuthorization(notebook);
         BazaarModel bazaar = modelFactoryService.toBazaarModel();
-        bazaar.shareNote(notebookEntity);
+        bazaar.shareNote(notebook);
         return new RedirectView("/notebooks");
     }
 

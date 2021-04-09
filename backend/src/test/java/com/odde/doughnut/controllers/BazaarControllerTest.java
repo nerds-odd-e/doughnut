@@ -37,7 +37,7 @@ class BazaarControllerTest {
     @Test
     void itShouldAllowVisitingBazaarNote() throws NoAccessRightException {
         Note note = makeMe.aNote().please();
-        makeMe.aBazaarNodebook(note.getNotebookEntity()).please();
+        makeMe.aBazaarNodebook(note.getNotebook()).please();
         assertThat(controller.showBazaarNote(note), equalTo("bazaar/show"));
     }
 

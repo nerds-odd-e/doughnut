@@ -59,7 +59,7 @@ class NoteControllerTests {
         void shouldRedirectToBazaarIfIHaveReadonlyAccess() throws NoAccessRightException {
             UserEntity otherUser = makeMe.aUser().please();
             Note note = makeMe.aNote().byUser(otherUser).please();
-            makeMe.aSubscription().forUser(userModel.getEntity()).forNotebook(note.getNotebookEntity()).please();
+            makeMe.aSubscription().forUser(userModel.getEntity()).forNotebook(note.getNotebook()).please();
             makeMe.refresh(userModel.getEntity());
             assertThat(controller.showNote(note), equalTo("redirect:/bazaar/notes/" + note.getId()));
         }

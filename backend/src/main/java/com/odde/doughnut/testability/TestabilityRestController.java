@@ -71,7 +71,7 @@ class TestabilityRestController {
             noteList.add(note);
             final String testingParent = note.getNoteContent().getTestingParent();
             if (Strings.isBlank(testingParent)) {
-                note.buildNotebookEntityForHeadNote(userEntity.getOwnershipEntity(), userEntity);
+                note.buildNotebookForHeadNote(userEntity.getOwnershipEntity(), userEntity);
             }
             else {
                 note.setParentNote(earlyNotes.get(testingParent));
@@ -110,7 +110,7 @@ class TestabilityRestController {
     @PostMapping("/share_to_bazaar")
     public String shareToBazaar(@RequestBody HashMap<String, String> map) {
         Note note = noteRepository.findFirstByTitle(map.get("noteTitle"));
-        modelFactoryService.toBazaarModel().shareNote(note.getNotebookEntity());
+        modelFactoryService.toBazaarModel().shareNote(note.getNotebook());
         return "OK";
     }
 

@@ -14,6 +14,6 @@ public class BazaarNotebook {
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "notebook_id", referencedColumnName = "id")
-    @Getter @Setter private NotebookEntity notebookEntity;
+    @Getter @Setter private Notebook notebook;
 
 }

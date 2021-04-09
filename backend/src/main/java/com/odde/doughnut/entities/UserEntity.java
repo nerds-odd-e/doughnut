@@ -58,8 +58,8 @@ public class UserEntity {
         ownershipEntity.setUserEntity(this);
     }
 
-    public boolean owns(NotebookEntity notebookEntity) {
-        return notebookEntity.getOwnershipEntity().ownsBy(this);
+    public boolean owns(Notebook notebook) {
+        return notebook.getOwnershipEntity().ownsBy(this);
     }
 
 }

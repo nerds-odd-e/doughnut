@@ -50,7 +50,7 @@ class NotebookControllerTest {
         @Test
         void shareMyNote() throws NoAccessRightException {
             long oldCount = modelFactoryService.bazaarNotebookRepository.count();
-            RedirectView rv = controller.shareNote(topNote.getNotebookEntity());
+            RedirectView rv = controller.shareNote(topNote.getNotebook());
             assertEquals("/notebooks", rv.getUrl());
             assertThat(modelFactoryService.bazaarNotebookRepository.count(), equalTo(oldCount + 1));
         }
@@ -60,7 +60,7 @@ class NotebookControllerTest {
             UserEntity anotherUserEntity = makeMe.aUser().please();
             Note note = makeMe.aNote().byUser(anotherUserEntity).please();
             assertThrows(NoAccessRightException.class, () ->
-                    controller.shareNote(note.getNotebookEntity())
+                    controller.shareNote(note.getNotebook())
             );
         }
 
@@ -73,7 +73,7 @@ class NotebookControllerTest {
             UserEntity anotherUserEntity = makeMe.aUser().please();
             Note note = makeMe.aNote().byUser(anotherUserEntity).please();
             assertThrows(NoAccessRightException.class, () ->
-                    controller.update(note.getNotebookEntity(), makeMe.successfulBindingResult())
+                    controller.update(note.getNotebook(), makeMe.successfulBindingResult())
             );
         }
 

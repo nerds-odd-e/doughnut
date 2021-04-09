@@ -40,7 +40,7 @@ public class Note {
     @JoinColumn(name = "notebook_id", referencedColumnName = "id")
     @JsonIgnore
     @Getter
-    private NotebookEntity notebookEntity;
+    private Notebook notebook;
 
     @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "master_review_setting_id", referencedColumnName = "id")
@@ -153,7 +153,7 @@ public class Note {
 
     public void setParentNote(Note parentNote) {
         if (parentNote == null) return;
-        notebookEntity = parentNote.getNotebookEntity();
+        notebook = parentNote.getNotebook();
         List<Note> ancestorsIncludingMe = parentNote.getAncestorsIncludingMe();
         Collections.reverse(ancestorsIncludingMe);
         addAncestors(ancestorsIncludingMe);
@@ -315,14 +315,14 @@ public class Note {
         return Strings.isBlank(noteContent.getDescription()) && children.isEmpty();
     }
 
-    public void buildNotebookEntityForHeadNote(OwnershipEntity ownershipEntity, UserEntity creator) {
-        final NotebookEntity notebookEntity = new NotebookEntity();
-        notebookEntity.setCreatorEntity(creator);
-        notebookEntity.setOwnershipEntity(ownershipEntity);
-        notebookEntity.setHeadNote(this);
+    public void buildNotebookForHeadNote(OwnershipEntity ownershipEntity, UserEntity creator) {
+        final Notebook notebook = new Notebook();
+        notebook.setCreatorEntity(creator);
+        notebook.setOwnershipEntity(ownershipEntity);
+        notebook.setHeadNote(this);
 
         this.userEntity = creator;
-        this.notebookEntity = notebookEntity;
+        this.notebook = notebook;
     }
 }
 

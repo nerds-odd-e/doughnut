@@ -1,7 +1,7 @@
 package com.odde.doughnut.entities.repositories;
 
-import com.odde.doughnut.entities.NotebookEntity;
+import com.odde.doughnut.entities.Notebook;
 import org.springframework.data.repository.CrudRepository;
 
-public interface NotebookRepository extends CrudRepository<NotebookEntity, Integer> {
+public interface NotebookRepository extends CrudRepository<Notebook, Integer> {
 }

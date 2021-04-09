@@ -16,9 +16,9 @@ public class TreeNodeModel extends ModelForEntity<Note> {
         entity.traverseBreadthFirst(child ->
                 modelFactoryService.toTreeNodeModel(child).destroy());
         modelFactoryService.reviewPointRepository.deleteAllByNote(getEntity());
-        if (entity.getNotebookEntity() != null) {
-            if (entity.getNotebookEntity().getHeadNote() == entity) {
-                modelFactoryService.notebookRepository.delete(entity.getNotebookEntity());
+        if (entity.getNotebook() != null) {
+            if (entity.getNotebook().getHeadNote() == entity) {
+                modelFactoryService.notebookRepository.delete(entity.getNotebook());
             }
         }
         modelFactoryService.noteRepository.delete(getEntity());

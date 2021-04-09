@@ -36,17 +36,17 @@ public class UserModel extends ModelForEntity<UserEntity> implements ReviewScope
     }
 
     public boolean hasFullAuthority(Note note) {
-        return hasFullAuthority(note.getNotebookEntity());
+        return hasFullAuthority(note.getNotebook());
     }
 
-    public boolean hasFullAuthority(NotebookEntity notebookEntity) {
-        return entity.owns(notebookEntity);
+    public boolean hasFullAuthority(Notebook notebook) {
+        return entity.owns(notebook);
     }
 
     public boolean hasReadAuthority(Note note) {
         if(hasFullAuthority(note)) return true;
 
-        return entity.getSubscriptionEntities().stream().anyMatch(s->s.getNotebookEntity() == note.getNotebookEntity());
+        return entity.getSubscriptionEntities().stream().anyMatch(s->s.getNotebook() == note.getNotebook());
     }
 
     public void assertReadAuthorization(Note note) throws NoAccessRightException {
@@ -55,8 +55,8 @@ public class UserModel extends ModelForEntity<UserEntity> implements ReviewScope
         }
     }
 
-    public void assertAuthorization(NotebookEntity notebookEntity) throws NoAccessRightException {
-        if (!hasFullAuthority(notebookEntity)) {
+    public void assertAuthorization(Notebook notebook) throws NoAccessRightException {
+        if (!hasFullAuthority(notebook)) {
             throw new NoAccessRightException();
         }
     }
