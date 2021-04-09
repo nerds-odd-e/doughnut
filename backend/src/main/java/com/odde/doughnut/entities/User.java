@@ -62,4 +62,8 @@ public class User {
         return notebook.getOwnership().ownsBy(this);
     }
 
+    public boolean inCircle(Circle circle) {
+        return circle.getMembers().contains(this);
+    }
+
 }

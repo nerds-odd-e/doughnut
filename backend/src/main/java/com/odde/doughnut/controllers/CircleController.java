@@ -59,7 +59,7 @@ public class CircleController extends ApplicationMvcController  {
 
     @GetMapping("/{circle}")
     public String showCircle(@PathVariable("circle") Circle circle, Model model) throws NoAccessRightException {
-        currentUserFetcher.getUser().assertAuthorization(circle);
+        currentUserFetcher.getUser().getAuthorization().assertAuthorization(circle);
         model.addAttribute("notebooks", circle.getOwnership().getNotebooks());
         return "circles/show";
     }
@@ -76,7 +76,7 @@ public class CircleController extends ApplicationMvcController  {
             return "circles/join";
         }
         UserModel userModel = currentUserFetcher.getUser();
-        if (userModel.inCircle(circleModel.getEntity())) {
+        if (userModel.getEntity().inCircle(circleModel.getEntity())) {
             bindingResult.rejectValue("invitationCode", "error.error", "You are already in this circle");
             return "circles/join";
         }

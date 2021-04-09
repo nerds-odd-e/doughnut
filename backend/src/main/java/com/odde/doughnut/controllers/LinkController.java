@@ -27,7 +27,7 @@ public class LinkController extends ApplicationMvcController  {
 
     @GetMapping("/{link}")
     public String show(@PathVariable("link") Link link, Model model) throws NoAccessRightException {
-        currentUserFetcher.getUser().assertAuthorization(link);
+        currentUserFetcher.getUser().getAuthorization().assertAuthorization(link);
         return "links/show";
     }
 
@@ -54,7 +54,7 @@ public class LinkController extends ApplicationMvcController  {
         if (bindingResult.hasErrors()) {
             return "links/link_choose_type";
         }
-        currentUserFetcher.getUser().assertAuthorization(link.getSourceNote());
+        currentUserFetcher.getUser().getAuthorization().assertAuthorization(link.getSourceNote());
         link.setUser(currentUserFetcher.getUser().getEntity());
         modelFactoryService.linkRepository.save(link);
         return "redirect:/notes/" + link.getSourceNote().getId();
@@ -65,14 +65,14 @@ public class LinkController extends ApplicationMvcController  {
         if (bindingResult.hasErrors()) {
             return "links/show";
         }
-        currentUserFetcher.getUser().assertAuthorization(link.getSourceNote());
+        currentUserFetcher.getUser().getAuthorization().assertAuthorization(link.getSourceNote());
         modelFactoryService.linkRepository.save(link);
         return "redirect:/notes/" + link.getSourceNote().getId();
     }
 
     @PostMapping(value = "/{link}", params="delete", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public String deleteLink(@Valid Link link) throws NoAccessRightException {
-        currentUserFetcher.getUser().assertAuthorization(link.getSourceNote());
+        currentUserFetcher.getUser().getAuthorization().assertAuthorization(link.getSourceNote());
         LinkModel linkModel = modelFactoryService.toLinkModel(link);
         linkModel.destroy();
         return "redirect:/notes/" + link.getSourceNote().getId();

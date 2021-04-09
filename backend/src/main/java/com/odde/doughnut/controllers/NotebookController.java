@@ -61,7 +61,7 @@ public class NotebookController extends ApplicationMvcController  {
     @GetMapping({"/{notebook}/edit"})
     public String edit(@PathVariable(name = "notebook") Notebook notebook) throws NoAccessRightException {
         UserModel userModel = getCurrentUser();
-        userModel.assertAuthorization(notebook);
+        userModel.getAuthorization().assertAuthorization(notebook);
         return "notebooks/edit";
     }
 
@@ -71,14 +71,14 @@ public class NotebookController extends ApplicationMvcController  {
         if (bindingResult.hasErrors()) {
             return "notebooks/edit";
         }
-        getCurrentUser().assertAuthorization(notebook);
+        getCurrentUser().getAuthorization().assertAuthorization(notebook);
         modelFactoryService.notebookRepository.save(notebook);
         return "redirect:/notebooks";
     }
 
     @PostMapping(value = "/{notebook}/share")
     public RedirectView shareNote(@PathVariable("notebook") Notebook notebook) throws NoAccessRightException {
-        getCurrentUser().assertAuthorization(notebook);
+        getCurrentUser().getAuthorization().assertAuthorization(notebook);
         BazaarModel bazaar = modelFactoryService.toBazaarModel();
         bazaar.shareNote(notebook);
         return new RedirectView("/notebooks");

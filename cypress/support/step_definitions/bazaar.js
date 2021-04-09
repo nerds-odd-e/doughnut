@@ -65,9 +65,7 @@ When("I should see {string} as non-title in the article", (content) => {
 
 When("I subscribe to note {string} in the bazaar, with target of learning {int} notes per day", (noteTitle, count) => {
   cy.visit("/bazaar");
-  cy.findNoteCardButton(noteTitle, ".add-to-learning").click();
-  cy.get("#subscription-dailyTargetOfNewNotes").clear().type(count);
-  cy.findByRole('button', {name: "Add to my learning"}).click();
+  cy.subscribeToNote(noteTitle, count);
 });
 
 Then("I should not see the {string} button on note {string}", (btnClass, noteTitle) => {
@@ -99,12 +97,4 @@ When("I change notebook {string} to skip review", (noteTitle) => {
   cy.getFormControl("SkipReviewEntirely").check();
   cy.findByRole('button', {name: "Update"}).click();
 });
-
-
-
-
-
-
-
-
 

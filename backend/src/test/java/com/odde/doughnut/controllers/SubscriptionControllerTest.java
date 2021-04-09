@@ -66,7 +66,7 @@ class SubscriptionControllerTest {
 
     @Test
     void notAllowToSubscribeToNoneBazaarNote() {
-        Note anotherNote = makeMe.aNote().byUser(userModel).please();
+        Note anotherNote = makeMe.aNote().byUser(makeMe.aUser().please()).please();
         Subscription subscription = makeMe.aSubscription().inMemoryPlease();
         assertThrows(NoAccessRightException.class, ()-> controller.createSubscription(
                 anotherNote.getNotebook(),

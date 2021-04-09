@@ -1,8 +1,10 @@
 package com.odde.doughnut.models;
 
 import com.odde.doughnut.algorithms.SpacedRepetitionAlgorithm;
-import com.odde.doughnut.entities.*;
-import com.odde.doughnut.exceptions.NoAccessRightException;
+import com.odde.doughnut.entities.Link;
+import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.services.ModelFactoryService;
 
 import java.sql.Timestamp;
@@ -13,6 +15,10 @@ import java.util.stream.Collectors;
 public class UserModel extends ModelForEntity<User> implements ReviewScope {
     public UserModel(User user, ModelFactoryService modelFactoryService) {
         super(user, modelFactoryService);
+    }
+
+    public Authorization getAuthorization() {
+        return modelFactoryService.toAuthorization(entity);
     }
 
     public String getName() {
@@ -27,60 +33,6 @@ public class UserModel extends ModelForEntity<User> implements ReviewScope {
     public void setAndSaveSpaceIntervals(String spaceIntervals) {
         entity.setSpaceIntervals(spaceIntervals);
         save();
-    }
-
-    public void assertAuthorization(Note note) throws NoAccessRightException {
-        if (!hasFullAuthority(note)) {
-            throw new NoAccessRightException();
-        }
-    }
-
-    public boolean hasFullAuthority(Note note) {
-        return hasFullAuthority(note.getNotebook());
-    }
-
-    public boolean hasFullAuthority(Notebook notebook) {
-        return entity.owns(notebook);
-    }
-
-    public boolean hasReadAuthority(Note note) {
-        if(hasFullAuthority(note)) return true;
-
-        return entity.getSubscriptions().stream().anyMatch(s->s.getNotebook() == note.getNotebook());
-    }
-
-    public void assertReadAuthorization(Note note) throws NoAccessRightException {
-        if (!hasReadAuthority(note)) {
-            throw new NoAccessRightException();
-        }
-    }
-
-    public void assertAuthorization(Notebook notebook) throws NoAccessRightException {
-        if (!hasFullAuthority(notebook)) {
-            throw new NoAccessRightException();
-        }
-    }
-
-    public void assertAuthorization(Circle circle) throws NoAccessRightException {
-        if(!inCircle(circle)) {
-            throw new NoAccessRightException();
-        }
-    }
-
-    public void assertAuthorization(User user) throws NoAccessRightException {
-        if(entity.getId() != user.getId()) {
-            throw new NoAccessRightException();
-        }
-    }
-
-    public void assertAuthorization(Link link) throws NoAccessRightException {
-        if(link.getUser().getId() != entity.getId()) {
-            throw new NoAccessRightException();
-        }
-    }
-
-    public boolean inCircle(Circle circle) {
-        return circle.getMembers().contains(entity);
     }
 
     public List<Note> filterLinkableNotes(Note note, String searchTerm) {

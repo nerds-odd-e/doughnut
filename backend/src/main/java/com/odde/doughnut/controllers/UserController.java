@@ -40,7 +40,7 @@ public class UserController extends ApplicationMvcController  {
 
     @PostMapping("/{user}")
     public String updateUser(@Valid User user, BindingResult bindingResult) throws NoAccessRightException {
-        currentUserFetcher.getUser().assertAuthorization(user);
+        currentUserFetcher.getUser().getAuthorization().assertAuthorization(user);
         if (bindingResult.hasErrors()) {
             return "users/edit";
         }

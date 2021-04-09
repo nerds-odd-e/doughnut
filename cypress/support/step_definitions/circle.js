@@ -53,21 +53,7 @@ When("I add a note {string} under {string}", (noteTitle, parentNoteTitle) => {
   cy.submitNoteFormWith([{'Title': noteTitle}]);
 });
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+When("I subscribe to note {string} in the circle {string}, with target of learning {int} notes per day", (noteTitle, circleName, count) => {
+  cy.navigateToCircle(circleName);
+  cy.subscribeToNote(noteTitle, count);
+});

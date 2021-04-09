@@ -32,7 +32,7 @@ public class NoteController extends ApplicationMvcController  {
     @GetMapping("/{parentNote}/new")
     public String newNote(@PathVariable(name = "parentNote") Note parentNote, Model model) throws NoAccessRightException {
         UserModel userModel = getCurrentUser();
-        userModel.assertAuthorization(parentNote);
+        userModel.getAuthorization().assertAuthorization(parentNote);
         NoteContent noteContent = new NoteContent();
         model.addAttribute("ownership", userModel.getEntity().getOwnership());
         model.addAttribute("noteContent", noteContent);
@@ -45,7 +45,7 @@ public class NoteController extends ApplicationMvcController  {
             return "notes/new";
         }
         UserModel userModel = getCurrentUser();
-        userModel.assertAuthorization(parentNote);
+        userModel.getAuthorization().assertAuthorization(parentNote);
         Note note = new Note();
         User user = userModel.getEntity();
         note.updateNoteContent(noteContent, user);
@@ -57,8 +57,8 @@ public class NoteController extends ApplicationMvcController  {
 
     @GetMapping("/{note}")
     public String showNote(@PathVariable(name = "note") Note note) throws NoAccessRightException {
-        getCurrentUser().assertReadAuthorization(note);
-        if (!getCurrentUser().hasFullAuthority(note)) {
+        getCurrentUser().getAuthorization().assertReadAuthorization(note);
+        if (!getCurrentUser().getAuthorization().hasFullAuthority(note)) {
             return "redirect:/bazaar/notes/" + note.getId();
         }
         return "notes/show";
@@ -72,7 +72,7 @@ public class NoteController extends ApplicationMvcController  {
 
     @PostMapping("/{note}")
     public String updateNote(@PathVariable(name = "note") Note note, @Valid NoteContent noteContent, BindingResult bindingResult) throws NoAccessRightException, IOException {
-        getCurrentUser().assertAuthorization(note);
+        getCurrentUser().getAuthorization().assertAuthorization(note);
         if (bindingResult.hasErrors()) {
             return "notes/edit";
         }
@@ -108,8 +108,8 @@ public class NoteController extends ApplicationMvcController  {
     @PostMapping("/{note}/move")
     @Transactional
     public String moveNote(Note note, NoteMotion noteMotion) throws CyclicLinkDetectedException, NoAccessRightException {
-        getCurrentUser().assertAuthorization(note);
-        getCurrentUser().assertAuthorization(noteMotion.getRelativeToNote());
+        getCurrentUser().getAuthorization().assertAuthorization(note);
+        getCurrentUser().getAuthorization().assertAuthorization(noteMotion.getRelativeToNote());
         modelFactoryService.toNoteMotionModel(noteMotion, note).execute();
         return "redirect:/notes/" + note.getId();
     }
@@ -117,7 +117,7 @@ public class NoteController extends ApplicationMvcController  {
     @PostMapping(value = "/{note}/delete")
     @Transactional
     public RedirectView deleteNote(@PathVariable("note") Note note) throws NoAccessRightException {
-        getCurrentUser().assertAuthorization(note);
+        getCurrentUser().getAuthorization().assertAuthorization(note);
         modelFactoryService.toTreeNodeModel(note).destroy();
         return new RedirectView("/notebooks");
     }
@@ -138,7 +138,7 @@ public class NoteController extends ApplicationMvcController  {
         if (bindingResult.hasErrors()) {
             return "notes/edit_review_setting";
         }
-        getCurrentUser().assertAuthorization(note);
+        getCurrentUser().getAuthorization().assertAuthorization(note);
         note.mergeMasterReviewSetting(reviewSetting);
         modelFactoryService.noteRepository.save(note);
 

@@ -4,6 +4,7 @@ import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.Subscription;
 import com.odde.doughnut.exceptions.NoAccessRightException;
+import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ModelFactoryService;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
@@ -59,11 +60,10 @@ public class SubscriptionController extends ApplicationMvcController {
         if (bindingResult.hasErrors()) {
             return "subscriptions/add_to_learning";
         }
-        if (modelFactoryService.bazaarNotebookRepository.findByNotebook(notebook) == null) {
-            throw new NoAccessRightException();
-        }
+        final UserModel userModel = currentUserFetcher.getUser();
+        userModel.getAuthorization().assertPotentialReadAuthorization(notebook);
         subscription.setNotebook(notebook);
-        subscription.setUser(currentUserFetcher.getUser().getEntity());
+        subscription.setUser(userModel.getEntity());
         modelFactoryService.entityManager.persist(subscription);
         return "redirect:/subscriptions/" + subscription.getId();
     }

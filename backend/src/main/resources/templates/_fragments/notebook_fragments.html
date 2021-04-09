@@ -1,8 +1,8 @@
 <div th:fragment="noteButtons(notebook)" class="btn-group btn-group-sm">
-    <a class="btn btn-sm edit-notebook" th:href="@{/notebooks/{id}/edit(id=${notebook.id})}" title="edit notebook settings">
+    <a class="btn btn-sm edit-notebook" th:href="@{/notebooks/{id}/edit(id=${notebook.id})}"
+       title="edit notebook settings">
         <svg th:replace="_fragments/svgs :: editNotebook"/>
     </a>
-
     <form th:action="@{/notebooks/{id}/share(id=${notebook.id})}" th:method="post"
           onsubmit="return confirm('Are you sure to share?')">
         <button class="btn btn-sm share-card" title="Share nodebook to bazaar">
@@ -22,11 +22,11 @@
                 </div>
             </div>
         </div>
-
     </div>
 </div>
 
-<div th:fragment="notebookViewCards(notebooks)"
+<div th:fragment="notebookViewCards(notebooks, additionHeadButtons)"
      th:replace=":: notebookCardWithHeaderAndButton(${notebooks}, ~{ :: .card-header-btn})">
-            <div class="card-header-btn" th:replace=":: noteButtons(${notebook})"/>
+    <div class="card-header-btn" th:replace=":: noteButtons(${notebook})"/>
+    <div class="card-header-btn" th:replace="${additionHeadButtons}"/>
 </div>
