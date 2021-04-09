@@ -22,8 +22,8 @@ public class QuizQuestionGenerator {
 
     List<QuizQuestion.QuestionType> availableQuestionTypes() {
         List<QuizQuestion.QuestionType> questionTypes = new ArrayList<>();
-        if (reviewPointEntity.getLinkEntity() != null) {
-            Collections.addAll(questionTypes, reviewPointEntity.getLinkEntity().getLinkType().getQuestionTypes());
+        if (reviewPointEntity.getLink() != null) {
+            Collections.addAll(questionTypes, reviewPointEntity.getLink().getLinkType().getQuestionTypes());
         }
         else {
             Note note = reviewPointEntity.getNote();

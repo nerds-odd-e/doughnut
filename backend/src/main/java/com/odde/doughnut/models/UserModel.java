@@ -73,8 +73,8 @@ public class UserModel extends ModelForEntity<UserEntity> implements ReviewScope
         }
     }
 
-    public void assertAuthorization(LinkEntity linkEntity) throws NoAccessRightException {
-        if(linkEntity.getUserEntity().getId() != entity.getId()) {
+    public void assertAuthorization(Link link) throws NoAccessRightException {
+        if(link.getUserEntity().getId() != entity.getId()) {
             throw new NoAccessRightException();
         }
     }
@@ -104,7 +104,7 @@ public class UserModel extends ModelForEntity<UserEntity> implements ReviewScope
     }
 
     @Override
-    public List<LinkEntity> getLinksHaveNotBeenReviewedAtAll() {
+    public List<Link> getLinksHaveNotBeenReviewedAtAll() {
         return modelFactoryService.linkRepository.findByOwnershipWhereThereIsNoReviewPoint(entity);
     }
 

@@ -38,7 +38,7 @@ public class ReviewPointEntity {
   @JsonIgnore
   @Getter
   @Setter
-  private LinkEntity linkEntity;
+  private Link link;
 
   @ManyToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "user_id", referencedColumnName = "id")
@@ -98,19 +98,19 @@ public class ReviewPointEntity {
   }
 
   public Note getSourceNote() {
-    if (linkEntity != null)
-      return linkEntity.getSourceNote();
+    if (link != null)
+      return link.getSourceNote();
     return note;
   }
 
   @AssertTrue(message = "link and note cannot be both empty")
   private boolean isNotBothLinkAndNoteEmpty() {
-    return note != null || linkEntity != null;
+    return note != null || link != null;
   }
 
   @AssertTrue(message = "cannot have both link and note")
   private boolean isNotBothLinkAndNoteNotEmpty() {
-    return note == null || linkEntity == null;
+    return note == null || link == null;
   }
 
   public void updateMemoryState(Timestamp currentUTCTimestamp, SpacedRepetitionAlgorithm.MemoryStateChange memoryStateChange) {

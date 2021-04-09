@@ -64,9 +64,9 @@ public class MakeMe {
         return new ReviewPointBuilder(reviewPointEntity, this).forNote(note);
     }
 
-    public ReviewPointBuilder aReviewPointFor(LinkEntity linkEntity) {
+    public ReviewPointBuilder aReviewPointFor(Link link) {
         ReviewPointEntity reviewPointEntity = new ReviewPointEntity();
-        return new ReviewPointBuilder(reviewPointEntity, this).forLink(linkEntity);
+        return new ReviewPointBuilder(reviewPointEntity, this).forLink(link);
     }
 
     public TimestampBuilder aTimestamp() {

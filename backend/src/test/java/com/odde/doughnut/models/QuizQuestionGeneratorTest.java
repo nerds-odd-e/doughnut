@@ -1,6 +1,6 @@
 package com.odde.doughnut.models;
 
-import com.odde.doughnut.entities.LinkEntity;
+import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
@@ -45,7 +45,7 @@ class QuizQuestionGeneratorTest {
 
     @Test
     void notAllLinkQuestionAreAvailableToAllLinkTypes() {
-        Note note2 = makeMe.aNote().linkTo(note, LinkEntity.LinkType.RELATED_TO).inMemoryPlease();
+        Note note2 = makeMe.aNote().linkTo(note, Link.LinkType.RELATED_TO).inMemoryPlease();
         ReviewPointEntity reviewPoint = makeMe.aReviewPointFor(note2.getLinks().get(0)).inMemoryPlease();
         List<QuizQuestion.QuestionType> questionTypes = getQuestionTypes(reviewPoint);
         assertTrue(questionTypes.isEmpty());

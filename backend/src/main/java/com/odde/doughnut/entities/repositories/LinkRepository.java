@@ -1,6 +1,6 @@
 package com.odde.doughnut.entities.repositories;
 
-import com.odde.doughnut.entities.LinkEntity;
+import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.UserEntity;
 import org.springframework.data.jpa.repository.Query;
@@ -9,12 +9,12 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface LinkRepository extends CrudRepository<LinkEntity, Integer> {
+public interface LinkRepository extends CrudRepository<Link, Integer> {
     @Query( value = "SELECT link.* from link " + byOwnershipWhereThereIsNoReviewPoint, nativeQuery = true)
-    List<LinkEntity> findByOwnershipWhereThereIsNoReviewPoint(@Param("userEntity") UserEntity userEntity);
+    List<Link> findByOwnershipWhereThereIsNoReviewPoint(@Param("userEntity") UserEntity userEntity);
 
     @Query( value = "SELECT link.* from link " + byAncestorWhereThereIsNoReviewPoint, nativeQuery = true)
-    List<LinkEntity> findByAncestorWhereThereIsNoReviewPoint(@Param("userEntity") UserEntity userEntity, @Param("ancestor") Note ancestor);
+    List<Link> findByAncestorWhereThereIsNoReviewPoint(@Param("userEntity") UserEntity userEntity, @Param("ancestor") Note ancestor);
 
     String whereThereIsNoReviewPoint = " LEFT JOIN review_point rp"
             + " ON link.id = rp.link_id "

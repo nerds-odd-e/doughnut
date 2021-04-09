@@ -1,6 +1,6 @@
 package com.odde.doughnut.models.quizFacotries;
 
-import com.odde.doughnut.entities.LinkEntity;
+import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.models.QuizQuestion;
@@ -8,37 +8,37 @@ import com.odde.doughnut.models.QuizQuestion;
 import java.util.List;
 
 public class LinkTargetExclusiveQuizFactory implements QuizQuestionFactory {
-    private final LinkEntity linkEntity;
+    private final Link link;
     private final QuizQuestionServant servant;
 
     public LinkTargetExclusiveQuizFactory(QuizQuestionServant servant, ReviewPointEntity reviewPointEntity) {
-        this.linkEntity = reviewPointEntity.getLinkEntity();
+        this.link = reviewPointEntity.getLink();
         this.servant = servant;
     }
 
     @Override
     public List<Note> generateFillingOptions() {
-        Note sourceNote = linkEntity.getSourceNote();
-        List<Note> backwardPeers = linkEntity.getBackwardPeers();
+        Note sourceNote = link.getSourceNote();
+        List<Note> backwardPeers = link.getBackwardPeers();
         return servant.randomlyChooseAndEnsure(backwardPeers, sourceNote, 5);
     }
 
     @Override
     public String generateInstruction() {
-        return String.format("Which of the following %s", linkEntity.getExclusiveQuestion());
+        return String.format("Which of the following %s", link.getExclusiveQuestion());
     }
 
     @Override
     public String generateMainTopic() {
-        return linkEntity.getTargetNote().getTitle();
+        return link.getTargetNote().getTitle();
     }
 
     @Override
     public Note generateAnswerNote() {
-        Note note = linkEntity.getSourceNote();
+        Note note = link.getSourceNote();
         List<Note> siblings = note.getSiblings();
-        siblings.removeAll(linkEntity.getBackwardPeers());
-        siblings.remove(linkEntity.getTargetNote());
+        siblings.removeAll(link.getBackwardPeers());
+        siblings.remove(link.getTargetNote());
         return servant.randomizer.chooseOneRandomly(siblings);
     }
 

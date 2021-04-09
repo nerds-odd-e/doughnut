@@ -8,7 +8,7 @@
     <div th:id="'note-collapse-' + ${note.id}" class="collapse" th:insert="_fragments/note_fragments :: noteShow(${note}, 2)"/>
 </div>
 
-<div th:fragment="linkShow(linkEntity, linkContent)" th:object="${linkEntity}">
+<div th:fragment="linkShow(link, linkContent)" th:object="${link}">
     <div class="row">
 
         <div class="col-12 col-md-4" th:insert=":: linkNoteShow(*{sourceNote})"/>

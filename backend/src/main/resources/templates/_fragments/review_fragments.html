@@ -6,9 +6,9 @@
         </div>
     </div>
 
-    <div th:if="*{linkEntity}">
+    <div th:if="*{link}">
         <div class="jumbotron py-4 mb-2">
-            <div th:replace="_fragments/link_fragments :: linkShow(*{linkEntity}, ~{:: .link-content})">
+            <div th:replace="_fragments/link_fragments :: linkShow(*{link}, ~{:: .link-content})">
                 <span class="link-content badge badge-light mr-1" th:text="*{type}"/>
             </div>
         </div>

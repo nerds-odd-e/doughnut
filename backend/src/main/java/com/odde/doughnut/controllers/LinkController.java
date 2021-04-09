@@ -1,7 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
-import com.odde.doughnut.entities.LinkEntity;
+import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.models.LinkModel;
@@ -25,9 +25,9 @@ public class LinkController extends ApplicationMvcController  {
         this.modelFactoryService = modelFactoryService;
     }
 
-    @GetMapping("/{linkEntity}")
-    public String show( @PathVariable("linkEntity") LinkEntity linkEntity, Model model) throws NoAccessRightException {
-        currentUserFetcher.getUser().assertAuthorization(linkEntity);
+    @GetMapping("/{link}")
+    public String show(@PathVariable("link") Link link, Model model) throws NoAccessRightException {
+        currentUserFetcher.getUser().assertAuthorization(link);
         return "links/show";
     }
 
@@ -41,41 +41,41 @@ public class LinkController extends ApplicationMvcController  {
     @PostMapping(value = "/{note}/link", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     public String linkNote(@PathVariable("note") Note note, Integer targetNoteId, Model model) throws NoAccessRightException {
         Note targetNote = modelFactoryService.noteRepository.findById(targetNoteId).get();
-        LinkEntity linkEntity = new LinkEntity();
-        linkEntity.setSourceNote(note);
-        linkEntity.setTargetNote(targetNote);
-        linkEntity.setType(LinkEntity.LinkType.RELATED_TO.label);
-        model.addAttribute("linkEntity", linkEntity);
+        Link link = new Link();
+        link.setSourceNote(note);
+        link.setTargetNote(targetNote);
+        link.setType(Link.LinkType.RELATED_TO.label);
+        model.addAttribute("link", link);
         return "links/link_choose_type";
     }
 
     @PostMapping(value = "/create_link", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public String linkNoteFinalize(@Valid LinkEntity linkEntity, BindingResult bindingResult) throws NoAccessRightException {
+    public String linkNoteFinalize(@Valid Link link, BindingResult bindingResult) throws NoAccessRightException {
         if (bindingResult.hasErrors()) {
             return "links/link_choose_type";
         }
-        currentUserFetcher.getUser().assertAuthorization(linkEntity.getSourceNote());
-        linkEntity.setUserEntity(currentUserFetcher.getUser().getEntity());
-        modelFactoryService.linkRepository.save(linkEntity);
-        return "redirect:/notes/" + linkEntity.getSourceNote().getId();
+        currentUserFetcher.getUser().assertAuthorization(link.getSourceNote());
+        link.setUserEntity(currentUserFetcher.getUser().getEntity());
+        modelFactoryService.linkRepository.save(link);
+        return "redirect:/notes/" + link.getSourceNote().getId();
     }
 
-    @PostMapping(value = "/{linkEntity}", params="submit", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public String updateLink(@Valid LinkEntity linkEntity, BindingResult bindingResult) throws NoAccessRightException {
+    @PostMapping(value = "/{link}", params="submit", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public String updateLink(@Valid Link link, BindingResult bindingResult) throws NoAccessRightException {
         if (bindingResult.hasErrors()) {
             return "links/show";
         }
-        currentUserFetcher.getUser().assertAuthorization(linkEntity.getSourceNote());
-        modelFactoryService.linkRepository.save(linkEntity);
-        return "redirect:/notes/" + linkEntity.getSourceNote().getId();
+        currentUserFetcher.getUser().assertAuthorization(link.getSourceNote());
+        modelFactoryService.linkRepository.save(link);
+        return "redirect:/notes/" + link.getSourceNote().getId();
     }
 
-    @PostMapping(value = "/{linkEntity}", params="delete", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public String deleteLink(@Valid LinkEntity linkEntity) throws NoAccessRightException {
-        currentUserFetcher.getUser().assertAuthorization(linkEntity.getSourceNote());
-        LinkModel linkModel = modelFactoryService.toLinkModel(linkEntity);
+    @PostMapping(value = "/{link}", params="delete", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public String deleteLink(@Valid Link link) throws NoAccessRightException {
+        currentUserFetcher.getUser().assertAuthorization(link.getSourceNote());
+        LinkModel linkModel = modelFactoryService.toLinkModel(link);
         linkModel.destroy();
-        return "redirect:/notes/" + linkEntity.getSourceNote().getId();
+        return "redirect:/notes/" + link.getSourceNote().getId();
     }
 
 }

@@ -75,7 +75,7 @@ public class ReviewingInitialReviewTest {
             void shouldReturnReviewPointForLink() {
                 makeMe.theNote(note2).skipReview().please();
                 makeMe.theNote(note1).skipReview().linkTo(note2).please();
-                assertThat(getOneInitialReviewPointEntity(day1).getLinkEntity().getSourceNote(), equalTo(note1));
+                assertThat(getOneInitialReviewPointEntity(day1).getLink().getSourceNote(), equalTo(note1));
                 assertThat(getOneInitialReviewPointEntity(day1).getNote(), is(nullValue()));
             }
 
@@ -84,14 +84,14 @@ public class ReviewingInitialReviewTest {
                 makeMe.theNote(note2).skipReview().please();
                 makeMe.theNote(note1).skipReview().linkTo(note2).please();
                 Note note3 = makeMe.aNote().byUser(userModel).createdAt(new Timestamp(System.currentTimeMillis() + 1000)).please();
-                assertThat(getOneInitialReviewPointEntity(day1).getLinkEntity().getSourceNote(), equalTo(note1));
+                assertThat(getOneInitialReviewPointEntity(day1).getLink().getSourceNote(), equalTo(note1));
                 assertThat(getOneInitialReviewPointEntity(day1).getNote(), is(nullValue()));
             }
 
             @Test
             void shouldNotReturnReviewPointForLinkIfCreatedByOtherPeople() {
                 makeMe.theNote(note2).skipReview().please();
-                makeMe.theNote(note1).notebookOwnership(makeMe.aUser().please()).skipReview().linkTo(note2, LinkEntity.LinkType.BELONGS_TO).please();
+                makeMe.theNote(note1).notebookOwnership(makeMe.aUser().please()).skipReview().linkTo(note2, Link.LinkType.BELONGS_TO).please();
                 assertThat(getOneInitialReviewPointEntity(day1), is(nullValue()));
             }
         }
@@ -164,7 +164,7 @@ public class ReviewingInitialReviewTest {
         void shouldReturnReviewPointForLink() {
             makeMe.theNote(note2).skipReview().please();
             makeMe.theNote(note1).skipReview().linkTo(note2).please();
-            assertThat(getOneInitialReviewPointEntity(day1).getLinkEntity().getSourceNote(), equalTo(note1));
+            assertThat(getOneInitialReviewPointEntity(day1).getLink().getSourceNote(), equalTo(note1));
         }
 
     }

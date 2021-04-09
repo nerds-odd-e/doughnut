@@ -80,8 +80,8 @@ public class ModelFactoryService {
         return new AnswerModel(answer, this);
     }
 
-    public LinkModel toLinkModel(LinkEntity linkEntity) {
-        return new LinkModel(linkEntity, this);
+    public LinkModel toLinkModel(Link link) {
+        return new LinkModel(link, this);
     }
 
     public SubscriptionModel toSubscriptionModel(SubscriptionEntity sub) {

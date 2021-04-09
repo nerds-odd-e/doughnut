@@ -33,19 +33,19 @@ public class NoteBuilder extends EntityBuilder<Note> {
     }
 
     public NoteBuilder linkTo(Note referTo) {
-        return linkTo(referTo, LinkEntity.LinkType.BELONGS_TO);
+        return linkTo(referTo, Link.LinkType.BELONGS_TO);
 
     }
 
 
-    public NoteBuilder linkTo(Note referTo, LinkEntity.LinkType linkType) {
-        LinkEntity linkEntity = new LinkEntity();
-        linkEntity.setTargetNote(referTo);
-        linkEntity.setSourceNote(entity);
-        linkEntity.setType(linkType.label);
-        linkEntity.setUserEntity(entity.getUserEntity());
-        entity.getLinks().add(linkEntity);
-        referTo.getRefers().add(linkEntity);
+    public NoteBuilder linkTo(Note referTo, Link.LinkType linkType) {
+        Link link = new Link();
+        link.setTargetNote(referTo);
+        link.setSourceNote(entity);
+        link.setType(linkType.label);
+        link.setUserEntity(entity.getUserEntity());
+        entity.getLinks().add(link);
+        referTo.getRefers().add(link);
         return this;
 
     }

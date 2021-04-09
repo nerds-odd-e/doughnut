@@ -1,6 +1,6 @@
 package com.odde.doughnut.models;
 
-import com.odde.doughnut.entities.LinkEntity;
+import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.SubscriptionEntity;
 import com.odde.doughnut.services.ModelFactoryService;
@@ -23,7 +23,7 @@ public class SubscriptionModel extends ModelForEntity<SubscriptionEntity> implem
     }
 
     @Override
-    public List<LinkEntity> getLinksHaveNotBeenReviewedAtAll() {
+    public List<Link> getLinksHaveNotBeenReviewedAtAll() {
         return modelFactoryService.linkRepository.findByAncestorWhereThereIsNoReviewPoint(entity.getUserEntity(), entity.getHeadNote());
     }
 

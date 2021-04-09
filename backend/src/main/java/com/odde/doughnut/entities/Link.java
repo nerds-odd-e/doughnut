@@ -15,7 +15,7 @@ import static com.odde.doughnut.models.QuizQuestion.QuestionType.LINK_TARGET;
 
 @Entity
 @Table(name = "link")
-public class LinkEntity {
+public class Link {
 
     public enum LinkType {
         BELONGS_TO("belongs to", "does not belong to", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
@@ -94,7 +94,7 @@ public class LinkEntity {
     @Setter
     private Timestamp createAt = new Timestamp(System.currentTimeMillis());
 
-    @OneToMany(mappedBy = "linkEntity", cascade = CascadeType.ALL,
+    @OneToMany(mappedBy = "link", cascade = CascadeType.ALL,
             orphanRemoval = true)
     @JsonIgnore
     private final List<ReviewPointEntity> reviewPointEntities = new ArrayList<>();

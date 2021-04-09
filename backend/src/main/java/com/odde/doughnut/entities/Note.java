@@ -60,14 +60,14 @@ public class Note {
     @JsonIgnore
     @Getter
     @Setter
-    private List<LinkEntity> links = new ArrayList<>();
+    private List<Link> links = new ArrayList<>();
 
     @OneToMany(mappedBy = "targetNote", cascade = CascadeType.ALL,
             orphanRemoval = true)
     @JsonIgnore
     @Getter
     @Setter
-    private List<LinkEntity> refers = new ArrayList<>();
+    private List<Link> refers = new ArrayList<>();
 
     @OneToMany(mappedBy = "note", cascade = CascadeType.ALL)
     @JsonIgnore
@@ -100,28 +100,28 @@ public class Note {
     }
 
     public List<Note> getTargetNotes() {
-        return links.stream().map(LinkEntity::getTargetNote).collect(toList());
+        return links.stream().map(Link::getTargetNote).collect(toList());
     }
 
-    public List<LinkEntity.LinkType> linkTypes() {
-        return Arrays.stream(LinkEntity.LinkType.values())
+    public List<Link.LinkType> linkTypes() {
+        return Arrays.stream(Link.LinkType.values())
                 .filter(t -> !linkedNotesOfType(t).isEmpty())
                 .collect(Collectors.toUnmodifiableList());
     }
 
-    public List<LinkEntity> linksOfTypeThroughDirect(LinkEntity.LinkType linkType) {
+    public List<Link> linksOfTypeThroughDirect(Link.LinkType linkType) {
         return this.links.stream()
                 .filter(l -> l.getLinkType().equals(linkType))
                 .collect(Collectors.toList());
     }
 
-    public List<LinkEntity> linksOfTypeThroughReverse(LinkEntity.LinkType linkType) {
+    public List<Link> linksOfTypeThroughReverse(Link.LinkType linkType) {
         return refers.stream()
                 .filter(l -> l.getLinkType().equals(linkType.reverseType()))
                 .collect(Collectors.toUnmodifiableList());
     }
 
-    public List<Note> linkedNotesOfType(LinkEntity.LinkType linkType) {
+    public List<Note> linkedNotesOfType(Link.LinkType linkType) {
         List<Note> notes = new ArrayList<>();
         linksOfTypeThroughDirect(linkType).forEach(lk -> notes.add(lk.getTargetNote()));
         linksOfTypeThroughReverse(linkType).forEach(lk -> notes.add(lk.getSourceNote()));

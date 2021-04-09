@@ -24,7 +24,7 @@ public class ReviewPointEntityTest {
     private Validator validator;
     UserEntity userEntity;
     Note note;
-    LinkEntity linkEntity;
+    Link link;
     ReviewPointEntity reviewPointEntity = new ReviewPointEntity();
 
     @BeforeEach
@@ -32,7 +32,7 @@ public class ReviewPointEntityTest {
         userEntity = makeMe.aUser().please();
         note = makeMe.aNote().byUser(userEntity).please();
         Note note2 = makeMe.aNote().byUser(userEntity).linkTo(note).please();
-        linkEntity = note2.getLinks().get(0);
+        link = note2.getLinks().get(0);
         reviewPointEntity.setUserEntity(userEntity);
     }
 

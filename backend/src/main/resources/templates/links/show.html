@@ -2,11 +2,11 @@
 <layout th:replace="_fragments/basic_layout :: application_layout(~{ :: .content})">
 
     <div class="container content">
-        <div th:replace="_fragments/link_fragments :: linkShow(${linkEntity}, ~{:: .link-content})">
+        <div th:replace="_fragments/link_fragments :: linkShow(${link}, ~{:: .link-content})">
             <div class="link-content">
-                <form action="#" th:action="@{/links/{id}(id=${linkEntity.id})}" th:object="${linkEntity}" method="post">
+                <form action="#" th:action="@{/links/{id}(id=${link.id})}" th:object="${link}" method="post">
                     <select th:replace="_fragments/forms :: selectControl('link', 'type', ~{:: .options})">
-                        <option class="options" th:each="i : ${T(com.odde.doughnut.entities.LinkEntity.LinkType).values()}" th:value="${i.label}" th:text="${i.label}"/>
+                        <option class="options" th:each="i : ${T(com.odde.doughnut.entities.Link.LinkType).values()}" th:value="${i.label}" th:text="${i.label}"/>
                     </select>
                     <input type="submit" name="submit" value="Update" class="btn btn-primary"/>
                     <input type="submit" name="delete" value="Delete" class="btn btn-danger"

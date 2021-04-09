@@ -7,15 +7,15 @@
             <li class="breadcrumb-item additional-item">(adding here)</li>
         </div>
         <div>
-            From: <span th:text="${linkEntity.sourceNote.title}"/>
-            To: <span th:text="${linkEntity.targetNote.title}"/>
+            From: <span th:text="${link.sourceNote.title}"/>
+            To: <span th:text="${link.targetNote.title}"/>
         </div>
 
-        <form action="#" th:action="@{/links/create_link}" th:object="${linkEntity}" method="post">
+        <form action="#" th:action="@{/links/create_link}" th:object="${link}" method="post">
             <input th:field="*{sourceNote}" type="hidden"/>
             <input th:field="*{targetNote}" type="hidden"/>
             <select th:replace="_fragments/forms :: selectControl('link', 'type', ~{:: .options})">
-                <option class="options" th:each="i : ${T(com.odde.doughnut.entities.LinkEntity.LinkType).values()}" th:value="${i.label}" th:text="${i.label}"/>
+                <option class="options" th:each="i : ${T(com.odde.doughnut.entities.Link.LinkType).values()}" th:value="${i.label}" th:text="${i.label}"/>
             </select>
             <input type="submit" value="Link" class="btn btn-primary"/>
         </form>

@@ -1,6 +1,6 @@
 package com.odde.doughnut.models;
 
-import com.odde.doughnut.entities.LinkEntity;
+import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.entities.ReviewSettingEntity;
@@ -42,22 +42,22 @@ public class Reviewing {
 
     private ReviewPointEntity getOneNewReviewPointEntity(ReviewScope reviewScope) {
         Note note = reviewScope.getNotesHaveNotBeenReviewedAtAll().stream().findFirst().orElse(null);
-        LinkEntity linkEntity = reviewScope.getLinksHaveNotBeenReviewedAtAll().stream().findFirst().orElse(null);
+        Link link = reviewScope.getLinksHaveNotBeenReviewedAtAll().stream().findFirst().orElse(null);
 
-        if (note == null && linkEntity == null) {
+        if (note == null && link == null) {
             return null;
         }
-        if (note != null && linkEntity != null) {
-            if (note.getNoteContent().getCreatedDatetime().compareTo(linkEntity.getCreateAt()) > 0) {
+        if (note != null && link != null) {
+            if (note.getNoteContent().getCreatedDatetime().compareTo(link.getCreateAt()) > 0) {
                 note = null;
             } else {
-                linkEntity = null;
+                link = null;
             }
         }
 
         ReviewPointEntity reviewPointEntity = new ReviewPointEntity();
         reviewPointEntity.setNote(note);
-        reviewPointEntity.setLinkEntity(linkEntity);
+        reviewPointEntity.setLink(link);
         return reviewPointEntity;
     }
 

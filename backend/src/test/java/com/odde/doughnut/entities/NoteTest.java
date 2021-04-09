@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.odde.doughnut.entities.LinkEntity.LinkType.*;
+import static com.odde.doughnut.entities.Link.LinkType.*;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -221,9 +221,9 @@ public class NoteTest {
 
     }
 
-    private List<Note> getLinkedNoteOfLinkType(Note noteA, LinkEntity.LinkType relatedTo) {
-        List<Note> direct = noteA.linksOfTypeThroughDirect(relatedTo).stream().map(LinkEntity::getTargetNote).collect(toList());
-        List<Note> reverse = noteA.linksOfTypeThroughReverse(relatedTo).stream().map(LinkEntity::getSourceNote).collect(Collectors.toUnmodifiableList());
+    private List<Note> getLinkedNoteOfLinkType(Note noteA, Link.LinkType relatedTo) {
+        List<Note> direct = noteA.linksOfTypeThroughDirect(relatedTo).stream().map(Link::getTargetNote).collect(toList());
+        List<Note> reverse = noteA.linksOfTypeThroughReverse(relatedTo).stream().map(Link::getSourceNote).collect(Collectors.toUnmodifiableList());
         direct.addAll(reverse);
         return direct;
     }
