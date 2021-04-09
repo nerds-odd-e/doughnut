@@ -23,7 +23,7 @@ public class ImageController {
         return ResponseEntity.ok()
                 .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + imageEntity.getName() + "\"")
                 .header(HttpHeaders.CONTENT_TYPE, imageEntity.getType())
-                .body(imageBlobRepository.findById(imageEntity.getImageBlobEntityId()).get().getData());
+                .body(imageBlobRepository.findById(imageEntity.getImageBlobId()).get().getData());
     }
 }
 

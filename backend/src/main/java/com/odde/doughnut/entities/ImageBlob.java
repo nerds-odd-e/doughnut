@@ -7,7 +7,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "image_blob")
-public class ImageBlobEntity {
+public class ImageBlob {
     @Id
     @Getter
     @GeneratedValue(strategy = GenerationType.IDENTITY)

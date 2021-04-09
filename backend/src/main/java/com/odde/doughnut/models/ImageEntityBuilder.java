@@ -1,13 +1,11 @@
 package com.odde.doughnut.models;
 
 import com.odde.doughnut.algorithms.ImageUtils;
-import com.odde.doughnut.entities.ImageBlobEntity;
+import com.odde.doughnut.entities.ImageBlob;
 import com.odde.doughnut.entities.ImageEntity;
 import com.odde.doughnut.entities.UserEntity;
-import org.springframework.core.io.InputStreamSource;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 public class ImageEntityBuilder {
@@ -22,15 +20,15 @@ public class ImageEntityBuilder {
         imageEntity.setStorageType("db");
         imageEntity.setName(file.getOriginalFilename());
         imageEntity.setType(file.getContentType());
-        ImageBlobEntity imageBlobEntity = getImageBlobEntity(file);
-        imageEntity.setImageBlobEntity(imageBlobEntity);
+        ImageBlob imageBlob = getImageBlob(file);
+        imageEntity.setImageBlob(imageBlob);
         return imageEntity;
     }
 
-    ImageBlobEntity getImageBlobEntity(MultipartFile file) throws IOException {
+    ImageBlob getImageBlob(MultipartFile file) throws IOException {
         byte[] data = imageUtils.toResizedImageByteArray(file, file.getOriginalFilename());
-        ImageBlobEntity imageBlobEntity = new ImageBlobEntity();
-        imageBlobEntity.setData(data);
-        return imageBlobEntity;
+        ImageBlob imageBlob = new ImageBlob();
+        imageBlob.setData(data);
+        return imageBlob;
     }
 }

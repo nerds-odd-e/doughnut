@@ -59,7 +59,7 @@ class CircleControllerTests {
     class JoinCircle {
         @Test
         void validationFailed() {
-            CircleJoiningByInvitationEntity entity = new CircleJoiningByInvitationEntity();
+            CircleController.CircleJoiningByInvitationEntity entity = new CircleController.CircleJoiningByInvitationEntity();
             entity.setInvitationCode("not exist");
             BindingResult bindingResult = makeMe.failedBindingResult();
             assertThat(controller.joinCircle(entity, bindingResult), equalTo("circles/join"));
@@ -67,7 +67,7 @@ class CircleControllerTests {
 
         @Test
         void circleDoesNotExist() {
-            CircleJoiningByInvitationEntity entity = new CircleJoiningByInvitationEntity();
+            CircleController.CircleJoiningByInvitationEntity entity = new CircleController.CircleJoiningByInvitationEntity();
             entity.setInvitationCode("not exist");
             BindingResult bindingResult = mock(BindingResult.class);
             assertThat(controller.joinCircle(entity, bindingResult), equalTo("circles/join"));
@@ -78,7 +78,7 @@ class CircleControllerTests {
         @Test
         void userAlreadyInCircle() {
             Circle circle = makeMe.aCircle().hasMember(userModel).please();
-            CircleJoiningByInvitationEntity entity = new CircleJoiningByInvitationEntity();
+            CircleController.CircleJoiningByInvitationEntity entity = new CircleController.CircleJoiningByInvitationEntity();
             entity.setInvitationCode(circle.getInvitationCode());
             BindingResult bindingResult = mock(BindingResult.class);
             assertThat(controller.joinCircle(entity, bindingResult), equalTo("circles/join"));

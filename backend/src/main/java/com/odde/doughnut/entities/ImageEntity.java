@@ -25,14 +25,14 @@ public class ImageEntity {
 
     @Column(name= "image_blob_id", insertable = false, updatable = false)
     @Getter
-    private Integer imageBlobEntityId;
+    private Integer imageBlobId;
 
     @OneToOne(cascade = CascadeType.PERSIST, fetch = FetchType.LAZY)
     @JoinColumn(name = "image_blob_id", referencedColumnName = "id")
     @JsonIgnore
     @Getter
     @Setter
-    private ImageBlobEntity imageBlobEntity;
+    private ImageBlob imageBlob;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", referencedColumnName = "id")

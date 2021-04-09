@@ -7,7 +7,7 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "circle_user")
-public class CircleUserEntity {
+public class CircleUser {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;

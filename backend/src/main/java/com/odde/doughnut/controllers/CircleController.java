@@ -6,6 +6,8 @@ import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ModelFactoryService;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -16,6 +18,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 @Controller
 @RequestMapping("/circles")
@@ -87,4 +91,11 @@ public class CircleController extends ApplicationMvcController  {
         return "notebooks/new";
     }
 
+    public static class CircleJoiningByInvitationEntity {
+        @NotNull
+        @Size(min = 10, max = 20)
+        @Getter
+        @Setter
+        String invitationCode;
+    }
 }

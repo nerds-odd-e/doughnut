@@ -1,6 +1,6 @@
 package com.odde.doughnut.testability.builders;
 
-import com.odde.doughnut.entities.ImageBlobEntity;
+import com.odde.doughnut.entities.ImageBlob;
 import com.odde.doughnut.entities.ImageEntity;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
@@ -12,10 +12,10 @@ public class ImageBuilder extends EntityBuilder<ImageEntity> {
 
     @Override
     protected void beforeCreate(boolean needPersist) {
-        if (entity.getImageBlobEntity() == null) {
-            ImageBlobEntity imageBlobEntity = new ImageBlobEntity();
-            imageBlobEntity.setData("DEADBEEF".getBytes());
-            entity.setImageBlobEntity(imageBlobEntity);
+        if (entity.getImageBlob() == null) {
+            ImageBlob imageBlob = new ImageBlob();
+            imageBlob.setData("DEADBEEF".getBytes());
+            entity.setImageBlob(imageBlob);
         }
 
         if (entity.getStorageType() == null) {
