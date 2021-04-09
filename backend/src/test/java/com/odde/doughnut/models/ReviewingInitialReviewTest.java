@@ -176,7 +176,7 @@ public class ReviewingInitialReviewTest {
 
         @BeforeEach
         void setup() {
-            CircleEntity please = makeMe.aCircle().hasMember(userModel).please();
+            Circle please = makeMe.aCircle().hasMember(userModel).please();
             top = makeMe.aNote().byUser(userModel).inCircle(please).please();
             makeMe.refresh(userModel);
         }

@@ -3,8 +3,6 @@ package com.odde.doughnut.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.annotations.Where;
-import org.hibernate.annotations.WhereJoinTable;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -23,7 +21,7 @@ public class OwnershipEntity {
     @OneToOne
     @JoinColumn(name = "circle_id")
     @JsonIgnore
-    @Getter @Setter private CircleEntity circleEntity;
+    @Getter @Setter private Circle circle;
 
     @OneToMany(mappedBy = "ownershipEntity")
     @JsonIgnore
@@ -33,9 +31,9 @@ public class OwnershipEntity {
         if(userEntity != null) {
             return userEntity.equals(user);
         }
-        return circleEntity.getMembers().contains(user);
+        return circle.getMembers().contains(user);
     }
 
-    public boolean isFromCircle() { return circleEntity != null; }
+    public boolean isFromCircle() { return circle != null; }
 
 }

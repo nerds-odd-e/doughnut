@@ -64,16 +64,16 @@ public class ModelFactoryService {
         return null;
     }
 
-    public CircleModel toCircleModel(CircleEntity circleEntity) {
-        return new CircleModel(circleEntity, this);
+    public CircleModel toCircleModel(Circle circle) {
+        return new CircleModel(circle, this);
     }
 
     public CircleModel findCircleByInvitationCode(String invitationCode) {
-        CircleEntity circleEntity = circleRepository.findFirstByInvitationCode(invitationCode);
-        if (circleEntity == null) {
+        Circle circle = circleRepository.findFirstByInvitationCode(invitationCode);
+        if (circle == null) {
             return null;
         }
-        return toCircleModel(circleEntity);
+        return toCircleModel(circle);
     }
 
     public AnswerModel toAnswerModel(Answer answer) {

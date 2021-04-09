@@ -54,9 +54,9 @@ public class NoteBuilder extends EntityBuilder<Note> {
         return inCircle(circleModel.getEntity());
     }
 
-    public NoteBuilder inCircle(CircleEntity circleEntity) {
+    public NoteBuilder inCircle(Circle circle) {
         buildNotebookUnlessExist();
-        entity.getNotebookEntity().setOwnershipEntity(circleEntity.getOwnershipEntity());
+        entity.getNotebookEntity().setOwnershipEntity(circle.getOwnershipEntity());
         return this;
     }
 

@@ -17,7 +17,7 @@
     <li class="breadcrumb-item top-link" th:unless="${ownership.isFromCircle}"><a href="/notebooks">Top</a></li>
     <li class="breadcrumb-item top-link" th:if="${ownership.isFromCircle}"><a href="/circles">Circles</a></li>
     <li class="breadcrumb-item top-link" th:if="${ownership.isFromCircle}"><a
-            th:href="@{/circles/{id}(id=${ownership.circleEntity.id})}" th:text="${ownership.circleEntity.name}"/></li>
+            th:href="@{/circles/{id}(id=${ownership.circle.id})}" th:text="${ownership.circle.name}"/></li>
 </div>
 
 <div th:fragment="noteOwnerBreadcrumb(untilNote, additional)"

@@ -61,8 +61,8 @@ public class UserModel extends ModelForEntity<UserEntity> implements ReviewScope
         }
     }
 
-    public void assertAuthorization(CircleEntity circleEntity) throws NoAccessRightException {
-        if(!inCircle(circleEntity)) {
+    public void assertAuthorization(Circle circle) throws NoAccessRightException {
+        if(!inCircle(circle)) {
             throw new NoAccessRightException();
         }
     }
@@ -79,8 +79,8 @@ public class UserModel extends ModelForEntity<UserEntity> implements ReviewScope
         }
     }
 
-    public boolean inCircle(CircleEntity circleEntity) {
-        return circleEntity.getMembers().contains(entity);
+    public boolean inCircle(Circle circle) {
+        return circle.getMembers().contains(entity);
     }
 
     public List<Note> filterLinkableNotes(Note note, String searchTerm) {

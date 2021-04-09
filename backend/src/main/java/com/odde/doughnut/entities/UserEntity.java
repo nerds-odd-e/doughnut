@@ -47,7 +47,7 @@ public class UserEntity {
     @ManyToMany
     @JsonIgnore
     @Getter
-    private final List<CircleEntity> circles = new ArrayList<>();
+    private final List<Circle> circles = new ArrayList<>();
 
     @OneToMany(mappedBy = "userEntity", cascade = CascadeType.DETACH)
     @JsonIgnore

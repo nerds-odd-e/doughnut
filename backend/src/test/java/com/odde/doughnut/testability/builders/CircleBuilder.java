@@ -1,16 +1,16 @@
 package com.odde.doughnut.testability.builders;
 
-import com.odde.doughnut.entities.CircleEntity;
+import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 
-public class CircleBuilder extends EntityBuilder<CircleEntity> {
+public class CircleBuilder extends EntityBuilder<Circle> {
     static final TestObjectCounter nameCounter = new TestObjectCounter(n->"circle" + n);
 
     public CircleBuilder(CircleModel circleModel, MakeMe makeMe) {
-        super(makeMe, circleModel == null ? new CircleEntity() : circleModel.getEntity());
+        super(makeMe, circleModel == null ? new Circle() : circleModel.getEntity());
         entity.setName(nameCounter.generate());
     }
 

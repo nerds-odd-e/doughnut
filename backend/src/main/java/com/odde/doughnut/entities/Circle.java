@@ -13,7 +13,7 @@ import java.util.Random;
 
 @Entity
 @Table(name = "circle")
-public class CircleEntity {
+public class Circle {
     @Id
     @Getter
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,12 +38,12 @@ public class CircleEntity {
     @Getter
     private final List<UserEntity> members = new ArrayList<>();
 
-    @OneToOne(mappedBy = "circleEntity", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "circle", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
     @Getter @Setter private OwnershipEntity ownershipEntity = new OwnershipEntity();
 
-    public CircleEntity() {
-        ownershipEntity.setCircleEntity(this);
+    public Circle() {
+        ownershipEntity.setCircle(this);
     }
 
     private static String generateRandomInvitationCode(int targetStringLength) {

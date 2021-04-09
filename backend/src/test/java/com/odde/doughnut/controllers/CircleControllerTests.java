@@ -48,9 +48,9 @@ class CircleControllerTests {
     class ShowCircle {
         @Test
         void itShouldNotAllowNonMemberToSeeACircle() {
-            CircleEntity circleEntity = makeMe.aCircle().please();
+            Circle circle = makeMe.aCircle().please();
             assertThrows(NoAccessRightException.class, ()->{
-                controller.showCircle(circleEntity, model);
+                controller.showCircle(circle, model);
             });
         }
     }
@@ -77,9 +77,9 @@ class CircleControllerTests {
 
         @Test
         void userAlreadyInCircle() {
-            CircleEntity circleEntity = makeMe.aCircle().hasMember(userModel).please();
+            Circle circle = makeMe.aCircle().hasMember(userModel).please();
             CircleJoiningByInvitationEntity entity = new CircleJoiningByInvitationEntity();
-            entity.setInvitationCode(circleEntity.getInvitationCode());
+            entity.setInvitationCode(circle.getInvitationCode());
             BindingResult bindingResult = mock(BindingResult.class);
             assertThat(controller.joinCircle(entity, bindingResult), equalTo("circles/join"));
             ArgumentCaptor<ObjectError> errorArgumentCaptor = ArgumentCaptor.forClass(ObjectError.class);

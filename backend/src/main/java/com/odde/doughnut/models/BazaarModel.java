@@ -1,6 +1,6 @@
 package com.odde.doughnut.models;
 
-import com.odde.doughnut.entities.BazaarNotebookEntity;
+import com.odde.doughnut.entities.BazaarNotebook;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NotebookEntity;
 import com.odde.doughnut.entities.repositories.BazaarNotebookRepository;
@@ -18,16 +18,16 @@ public class BazaarModel {
     }
 
     public List<NotebookEntity> getAllNotebooks() {
-        Iterable<BazaarNotebookEntity> all = bazaarNotebookRepository.findAll();
+        Iterable<BazaarNotebook> all = bazaarNotebookRepository.findAll();
         List<NotebookEntity> notes = new ArrayList<>();
         all.forEach(bn->notes.add(bn.getNotebookEntity()));
         return notes;
     }
 
     public void shareNote(NotebookEntity notebookEntity) {
-        BazaarNotebookEntity bazaarNotebookEntity = new BazaarNotebookEntity();
-        bazaarNotebookEntity.setNotebookEntity(notebookEntity);
-        bazaarNotebookRepository.save(bazaarNotebookEntity);
+        BazaarNotebook bazaarNotebook = new BazaarNotebook();
+        bazaarNotebook.setNotebookEntity(notebookEntity);
+        bazaarNotebookRepository.save(bazaarNotebook);
     }
 
     public void assertAuthentication(Note note) throws NoAccessRightException {

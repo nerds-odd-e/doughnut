@@ -129,7 +129,7 @@ class TestabilityRestController {
 
     @PostMapping("/seed_circle")
     public String seedCircle(@RequestBody HashMap<String, String> circleInfo) {
-        CircleEntity entity = new CircleEntity();
+        Circle entity = new Circle();
         entity.setName(circleInfo.get("circleName"));
         CircleModel circleModel = modelFactoryService.toCircleModel(entity);
         Arrays.stream(circleInfo.get("members").split(",")).map(String::trim).forEach(s->{
