@@ -14,17 +14,17 @@ public class SubscriptionModel extends ModelForEntity<Subscription> implements R
 
     @Override
     public List<Note> getNotesHaveNotBeenReviewedAtAll() {
-        return modelFactoryService.noteRepository.findByAncestorWhereThereIsNoReviewPoint(entity.getUserEntity(), entity.getHeadNote());
+        return modelFactoryService.noteRepository.findByAncestorWhereThereIsNoReviewPoint(entity.getUser(), entity.getHeadNote());
     }
 
     @Override
     public int getNotesHaveNotBeenReviewedAtAllCount() {
-        return modelFactoryService.noteRepository.countByAncestorWhereThereIsNoReviewPoint(entity.getUserEntity(), entity.getHeadNote());
+        return modelFactoryService.noteRepository.countByAncestorWhereThereIsNoReviewPoint(entity.getUser(), entity.getHeadNote());
     }
 
     @Override
     public List<Link> getLinksHaveNotBeenReviewedAtAll() {
-        return modelFactoryService.linkRepository.findByAncestorWhereThereIsNoReviewPoint(entity.getUserEntity(), entity.getHeadNote());
+        return modelFactoryService.linkRepository.findByAncestorWhereThereIsNoReviewPoint(entity.getUser(), entity.getHeadNote());
     }
 
     public boolean needToLearnMoreToday(List<Integer> noteIds) {

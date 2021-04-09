@@ -16,7 +16,7 @@ public class Ownership {
     @OneToOne
     @JoinColumn(name = "user_id")
     @JsonIgnore
-    @Getter @Setter private UserEntity userEntity;
+    @Getter @Setter private User user;
 
     @OneToOne
     @JoinColumn(name = "circle_id")
@@ -27,9 +27,9 @@ public class Ownership {
     @JsonIgnore
     @Getter @Setter private List<Notebook> notebooks = new ArrayList<>();
 
-    public boolean ownsBy(UserEntity user) {
-        if(userEntity != null) {
-            return userEntity.equals(user);
+    public boolean ownsBy(User user) {
+        if(this.user != null) {
+            return this.user.equals(user);
         }
         return circle.getMembers().contains(user);
     }

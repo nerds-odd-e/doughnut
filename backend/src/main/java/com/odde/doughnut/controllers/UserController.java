@@ -1,7 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
-import com.odde.doughnut.entities.UserEntity;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.services.ModelFactoryService;
 import org.springframework.stereotype.Controller;
@@ -26,25 +26,25 @@ public class UserController extends ApplicationMvcController  {
     }
 
     @PostMapping("")
-    public RedirectView createUser(Principal principal, UserEntity userEntity) {
-        userEntity.setExternalIdentifier(principal.getName());
-        modelFactoryService.userRepository.save(userEntity);
+    public RedirectView createUser(Principal principal, User user) {
+        user.setExternalIdentifier(principal.getName());
+        modelFactoryService.userRepository.save(user);
         return new RedirectView("/");
     }
 
     @GetMapping("/edit")
     public String editUser(Model model) {
-        model.addAttribute("userEntity", currentUserFetcher.getUser().getEntity());
+        model.addAttribute("user", currentUserFetcher.getUser().getEntity());
         return "users/edit";
     }
 
-    @PostMapping("/{userEntity}")
-    public String updateUser(@Valid UserEntity userEntity, BindingResult bindingResult) throws NoAccessRightException {
-        currentUserFetcher.getUser().assertAuthorization(userEntity);
+    @PostMapping("/{user}")
+    public String updateUser(@Valid User user, BindingResult bindingResult) throws NoAccessRightException {
+        currentUserFetcher.getUser().assertAuthorization(user);
         if (bindingResult.hasErrors()) {
             return "users/edit";
         }
-        modelFactoryService.userRepository.save(userEntity);
+        modelFactoryService.userRepository.save(user);
         return "redirect:/";
     }
 

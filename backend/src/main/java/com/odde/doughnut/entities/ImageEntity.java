@@ -39,5 +39,5 @@ public class ImageEntity {
     @JsonIgnore
     @Getter
     @Setter
-    private UserEntity userEntity;
+    private User user;
 }

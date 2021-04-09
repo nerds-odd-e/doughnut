@@ -18,8 +18,8 @@ public class NoteBuilder extends EntityBuilder<Note> {
         createdAt(new Timestamp(System.currentTimeMillis()));
     }
 
-    public NoteBuilder byUser(UserEntity userEntity) {
-        entity.setUserEntity(userEntity);
+    public NoteBuilder byUser(User user) {
+        entity.setUser(user);
         return this;
     }
 
@@ -43,7 +43,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
         link.setTargetNote(referTo);
         link.setSourceNote(entity);
         link.setType(linkType.label);
-        link.setUserEntity(entity.getUserEntity());
+        link.setUser(entity.getUser());
         entity.getLinks().add(link);
         referTo.getRefers().add(link);
         return this;
@@ -62,10 +62,10 @@ public class NoteBuilder extends EntityBuilder<Note> {
 
     @Override
     protected void beforeCreate(boolean needPersist) {
-        if (entity.getUserEntity() == null) {
+        if (entity.getUser() == null) {
             Note parent = entity.getParentNote();
-            if (parent != null && parent.getUserEntity() != null) {
-                byUser(parent.getUserEntity());
+            if (parent != null && parent.getUser() != null) {
+                byUser(parent.getUser());
             }else{
                 byUser(makeMe.aUser().please(needPersist));
             }
@@ -138,13 +138,13 @@ public class NoteBuilder extends EntityBuilder<Note> {
             return;
         }
         Ownership ownership = null;
-        if(entity.getUserEntity() != null) {
-            ownership = entity.getUserEntity().getOwnership();
+        if(entity.getUser() != null) {
+            ownership = entity.getUser().getOwnership();
         }
-        entity.buildNotebookForHeadNote(ownership, entity.getUserEntity());
+        entity.buildNotebookForHeadNote(ownership, entity.getUser());
     }
 
-    public NoteBuilder notebookOwnership(UserEntity user) {
+    public NoteBuilder notebookOwnership(User user) {
         entity.getNotebook().setOwnership(user.getOwnership());
         return this;
     }

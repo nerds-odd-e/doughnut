@@ -120,10 +120,10 @@ public class NoteContent {
         return Strings.isNotBlank(pictureUrl) || uploadPicture != null || useParentPicture;
     }
 
-    public void fetchUploadedPicture(UserEntity userEntity) throws IOException {
+    public void fetchUploadedPicture(User user) throws IOException {
         MultipartFile file = getUploadPictureProxy();
         if (file != null && !file.isEmpty()) {
-            ImageEntity imageEntity = new ImageEntityBuilder().buildImageEntityFromUploadedPicture(userEntity, file);
+            ImageEntity imageEntity = new ImageEntityBuilder().buildImageEntityFromUploadedPicture(user, file);
             setUploadPicture(imageEntity);
         }
     }

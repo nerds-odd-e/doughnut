@@ -10,9 +10,9 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class UserModel extends ModelForEntity<UserEntity> implements ReviewScope {
-    public UserModel(UserEntity userEntity, ModelFactoryService modelFactoryService) {
-        super(userEntity, modelFactoryService);
+public class UserModel extends ModelForEntity<User> implements ReviewScope {
+    public UserModel(User user, ModelFactoryService modelFactoryService) {
+        super(user, modelFactoryService);
     }
 
     public String getName() {
@@ -67,14 +67,14 @@ public class UserModel extends ModelForEntity<UserEntity> implements ReviewScope
         }
     }
 
-    public void assertAuthorization(UserEntity userEntity) throws NoAccessRightException {
-        if(entity.getId() != userEntity.getId()) {
+    public void assertAuthorization(User user) throws NoAccessRightException {
+        if(entity.getId() != user.getId()) {
             throw new NoAccessRightException();
         }
     }
 
     public void assertAuthorization(Link link) throws NoAccessRightException {
-        if(link.getUserEntity().getId() != entity.getId()) {
+        if(link.getUser().getId() != entity.getId()) {
             throw new NoAccessRightException();
         }
     }
@@ -109,7 +109,7 @@ public class UserModel extends ModelForEntity<UserEntity> implements ReviewScope
     }
 
     public List<ReviewPoint> getRecentReviewPoints(Timestamp since) {
-        return modelFactoryService.reviewPointRepository.findAllByUserEntityAndInitialReviewedAtGreaterThan(entity, since);
+        return modelFactoryService.reviewPointRepository.findAllByUserAndInitialReviewedAtGreaterThan(entity, since);
     }
 
     private List<Note> getAllLinkableNotes(Note source) {
@@ -127,7 +127,7 @@ public class UserModel extends ModelForEntity<UserEntity> implements ReviewScope
 
     public List<ReviewPoint> getReviewPointsNeedToRepeat(Timestamp currentUTCTimestamp) {
         return modelFactoryService.reviewPointRepository
-                .findAllByUserEntityAndNextReviewAtLessThanEqualOrderByNextReviewAt(
+                .findAllByUserAndNextReviewAtLessThanEqualOrderByNextReviewAt(
                         getEntity(),
                         currentUTCTimestamp
                 );
@@ -138,7 +138,7 @@ public class UserModel extends ModelForEntity<UserEntity> implements ReviewScope
     }
 
     int learntCount() {
-        return modelFactoryService.reviewPointRepository.countByUserEntityNotRemoved(entity);
+        return modelFactoryService.reviewPointRepository.countByUserNotRemoved(entity);
     }
 
     public Reviewing createReviewing(Timestamp currentUTCTimestamp) {

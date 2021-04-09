@@ -14,7 +14,7 @@ public class Notebook {
     @OneToOne
     @JoinColumn(name = "creator_id")
     @JsonIgnore
-    @Getter @Setter private UserEntity creatorEntity;
+    @Getter @Setter private User creatorEntity;
 
     @OneToOne
     @JoinColumn(name = "ownership_id")

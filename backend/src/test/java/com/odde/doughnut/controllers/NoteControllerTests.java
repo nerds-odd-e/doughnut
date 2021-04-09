@@ -3,8 +3,8 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteContent;
 import com.odde.doughnut.entities.NoteMotion;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.NoAccessRightException;
-import com.odde.doughnut.entities.UserEntity;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.MakeMe;
@@ -50,14 +50,14 @@ class NoteControllerTests {
 
         @Test
         void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
-            UserEntity otherUser = makeMe.aUser().please();
+            User otherUser = makeMe.aUser().please();
             Note note = makeMe.aNote().byUser(otherUser).please();
             assertThrows(NoAccessRightException.class, ()-> controller.showNote(note));
         }
 
         @Test
         void shouldRedirectToBazaarIfIHaveReadonlyAccess() throws NoAccessRightException {
-            UserEntity otherUser = makeMe.aUser().please();
+            User otherUser = makeMe.aUser().please();
             Note note = makeMe.aNote().byUser(otherUser).please();
             makeMe.aSubscription().forUser(userModel.getEntity()).forNotebook(note.getNotebook()).please();
             makeMe.refresh(userModel.getEntity());
@@ -134,8 +134,8 @@ class NoteControllerTests {
     class DeleteNoteTest {
         @Test
         void shouldNotBeAbleToDeleteNoteThatBelongsToOtherUser() {
-            UserEntity anotherUserEntity = makeMe.aUser().please();
-            Note note = makeMe.aNote().byUser(anotherUserEntity).please();
+            User anotherUser = makeMe.aUser().please();
+            Note note = makeMe.aNote().byUser(anotherUser).please();
             Integer noteId = note.getId();
             assertThrows(NoAccessRightException.class, () ->
                     controller.deleteNote(note)
@@ -183,7 +183,7 @@ class NoteControllerTests {
 
     @Nested
     class MoveNoteTest {
-        UserEntity anotherUser;
+        User anotherUser;
         Note note1;
         Note note2;
 

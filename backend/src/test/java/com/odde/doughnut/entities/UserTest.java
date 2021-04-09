@@ -15,43 +15,43 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringBootTest
 @Transactional
-public class UserEntityTest {
+public class UserTest {
 
     @Autowired
     MakeMe makeMe;
     @Autowired
     private Validator validator;
-    UserEntity userEntity;
+    User user;
 
     @BeforeEach
     void setup() {
-        userEntity = makeMe.aUser().please();
+        user = makeMe.aUser().please();
     }
 
     @Test
     void validate() {
-        Set<ConstraintViolation<UserEntity>> violations = validator.validate(userEntity);
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
         assertEquals(0, violations.size());
     }
 
     @Test
     void validateName() {
-        userEntity.setName("");
-        Set<ConstraintViolation<UserEntity>> violations = validator.validate(userEntity);
+        user.setName("");
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
         assertEquals(1, violations.size());
     }
 
     @Test
     void validateSpacing() {
-        userEntity.setSpaceIntervals("1,2a");
-        Set<ConstraintViolation<UserEntity>> violations = validator.validate(userEntity);
+        user.setSpaceIntervals("1,2a");
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
         assertEquals(1, violations.size());
     }
 
     @Test
     void validateSpacingValid() {
-        userEntity.setSpaceIntervals("1,2,33, 444");
-        Set<ConstraintViolation<UserEntity>> violations = validator.validate(userEntity);
+        user.setSpaceIntervals("1,2,33, 444");
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
         assertEquals(0, violations.size());
     }
 

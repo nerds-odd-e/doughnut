@@ -45,7 +45,7 @@ public class ReviewPoint {
   @JsonIgnore
   @Getter
   @Setter
-  private UserEntity userEntity;
+  private User user;
 
   @Column(name = "last_reviewed_at")
   @Getter

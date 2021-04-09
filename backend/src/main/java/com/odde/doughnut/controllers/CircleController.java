@@ -35,7 +35,7 @@ public class CircleController extends ApplicationMvcController  {
     @GetMapping("")
     public String index(Model model) {
         UserModel user = currentUserFetcher.getUser();
-        model.addAttribute("userEntity", user.getEntity());
+        model.addAttribute("user", user.getEntity());
         model.addAttribute("circleJoiningByInvitationEntity", new CircleJoiningByInvitationEntity());
         return "circles/index";
     }

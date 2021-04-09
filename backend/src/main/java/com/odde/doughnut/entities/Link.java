@@ -87,7 +87,7 @@ public class Link {
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
-    @Getter @Setter private UserEntity userEntity;
+    @Getter @Setter private User user;
 
     @Column(name = "created_at")
     @Getter

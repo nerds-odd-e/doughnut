@@ -2,7 +2,7 @@ package com.odde.doughnut.entities.repositories;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.UserEntity;
+import com.odde.doughnut.entities.User;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -11,18 +11,18 @@ import java.sql.Timestamp;
 import java.util.List;
 
 public interface ReviewPointRepository extends CrudRepository<ReviewPoint, Integer> {
-    List<ReviewPoint> findAllByUserEntityAndInitialReviewedAtGreaterThan(UserEntity userEntity, Timestamp since);
+    List<ReviewPoint> findAllByUserAndInitialReviewedAtGreaterThan(User user, Timestamp since);
 
-    @Query( value = "SELECT count(*) " + byUserEntity, nativeQuery = true)
-    int countByUserEntityNotRemoved(@Param("userEntity") UserEntity userEntity);
+    @Query( value = "SELECT count(*) " + byUser, nativeQuery = true)
+    int countByUserNotRemoved(@Param("user") User user);
 
-    @Query( value = "SELECT * " + byUserEntity + " AND rp.next_review_at <= :nextReviewAt ORDER BY rp.next_review_at", nativeQuery = true)
-    List<ReviewPoint> findAllByUserEntityAndNextReviewAtLessThanEqualOrderByNextReviewAt(@Param("userEntity") UserEntity userEntity, @Param("nextReviewAt") Timestamp nextReviewAt);
+    @Query( value = "SELECT * " + byUser + " AND rp.next_review_at <= :nextReviewAt ORDER BY rp.next_review_at", nativeQuery = true)
+    List<ReviewPoint> findAllByUserAndNextReviewAtLessThanEqualOrderByNextReviewAt(@Param("user") User user, @Param("nextReviewAt") Timestamp nextReviewAt);
 
     void deleteAllByNote(Note note);
 
-    String byUserEntity = " FROM review_point rp "
-            + " WHERE rp.user_id = :userEntity "
+    String byUser = " FROM review_point rp "
+            + " WHERE rp.user_id = :user "
             + "   AND rp.removed_from_review IS FALSE ";
 
 }

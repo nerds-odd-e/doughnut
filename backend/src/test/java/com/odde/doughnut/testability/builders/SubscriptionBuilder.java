@@ -2,7 +2,7 @@ package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.Subscription;
-import com.odde.doughnut.entities.UserEntity;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 
@@ -20,8 +20,8 @@ public class SubscriptionBuilder extends EntityBuilder<Subscription> {
         return this;
     }
 
-    public SubscriptionBuilder forUser(UserEntity user) {
-        entity.setUserEntity(user);
+    public SubscriptionBuilder forUser(User user) {
+        entity.setUser(user);
         return this;
     }
 }

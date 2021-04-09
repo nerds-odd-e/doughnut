@@ -30,8 +30,8 @@ public class ImageBuilder extends EntityBuilder<ImageEntity> {
             entity.setType("image/png");
         }
 
-        if (entity.getUserEntity() == null) {
-            entity.setUserEntity(makeMe.aUser().please());
+        if (entity.getUser() == null) {
+            entity.setUser(makeMe.aUser().please());
         }
     }
 }

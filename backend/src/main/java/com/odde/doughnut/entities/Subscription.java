@@ -19,7 +19,7 @@ public class Subscription {
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
-    @Getter @Setter private UserEntity userEntity;
+    @Getter @Setter private User user;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "notebook_id", referencedColumnName = "id")

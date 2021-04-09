@@ -30,7 +30,7 @@ public class ReviewPointBuilder extends EntityBuilder<ReviewPoint> {
     }
 
     public ReviewPointBuilder by(UserModel userModel) {
-        entity.setUserEntity(userModel.getEntity());
+        entity.setUser(userModel.getEntity());
         return this;
     }
 

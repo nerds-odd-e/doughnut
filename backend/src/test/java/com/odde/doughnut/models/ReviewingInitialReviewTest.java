@@ -147,7 +147,7 @@ public class ReviewingInitialReviewTest {
 
         @BeforeEach
         void setup() {
-            UserEntity anotherUser = makeMe.aUser().please();
+            User anotherUser = makeMe.aUser().please();
             Note top = makeMe.aNote().byUser(anotherUser).please();
             note1 = makeMe.aNote().under(top).please();
             note2 = makeMe.aNote().under(top).please();

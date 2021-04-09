@@ -1,6 +1,6 @@
 package com.odde.doughnut.controllers.currentUser;
 
-import com.odde.doughnut.entities.UserEntity;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.UserRepository;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ModelFactoryService;
@@ -19,7 +19,7 @@ public class CurrentUserFetcherFromRequest implements CurrentUserFetcher {
     @Autowired
     ModelFactoryService modelFactoryService;
     String externalId = null;
-    UserEntity userEntity = null;
+    User user = null;
 
     public CurrentUserFetcherFromRequest(HttpServletRequest request) {
         Principal userPrincipal = request.getUserPrincipal();
@@ -31,9 +31,9 @@ public class CurrentUserFetcherFromRequest implements CurrentUserFetcher {
 
     @Override
     public UserModel getUser() {
-        if (userEntity == null && externalId != null) {
-            userEntity = userRepository.findByExternalIdentifier(externalId);
+        if (user == null && externalId != null) {
+            user = userRepository.findByExternalIdentifier(externalId);
         }
-        return modelFactoryService.toUserModel(userEntity);
+        return modelFactoryService.toUserModel(user);
     }
 }

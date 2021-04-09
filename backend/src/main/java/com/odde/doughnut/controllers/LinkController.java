@@ -55,7 +55,7 @@ public class LinkController extends ApplicationMvcController  {
             return "links/link_choose_type";
         }
         currentUserFetcher.getUser().assertAuthorization(link.getSourceNote());
-        link.setUserEntity(currentUserFetcher.getUser().getEntity());
+        link.setUser(currentUserFetcher.getUser().getEntity());
         modelFactoryService.linkRepository.save(link);
         return "redirect:/notes/" + link.getSourceNote().getId();
     }

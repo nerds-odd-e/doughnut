@@ -51,9 +51,9 @@ public class NotebookController extends ApplicationMvcController  {
             return "notebooks/new";
         }
         final Note note = new Note();
-        UserEntity userEntity = getCurrentUser().getEntity();
-        note.updateNoteContent(noteContent, userEntity);
-        note.buildNotebookForHeadNote(ownership, userEntity);
+        User user = getCurrentUser().getEntity();
+        note.updateNoteContent(noteContent, user);
+        note.buildNotebookForHeadNote(ownership, user);
         modelFactoryService.noteRepository.save(note);
         return "redirect:/notes/" + note.getId();
     }

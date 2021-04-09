@@ -47,10 +47,10 @@ public class NoteController extends ApplicationMvcController  {
         UserModel userModel = getCurrentUser();
         userModel.assertAuthorization(parentNote);
         Note note = new Note();
-        UserEntity userEntity = userModel.getEntity();
-        note.updateNoteContent(noteContent, userEntity);
+        User user = userModel.getEntity();
+        note.updateNoteContent(noteContent, user);
         note.setParentNote(parentNote);
-        note.setUserEntity(userEntity);
+        note.setUser(user);
         modelFactoryService.noteRepository.save(note);
         return "redirect:/notes/" + note.getId();
     }

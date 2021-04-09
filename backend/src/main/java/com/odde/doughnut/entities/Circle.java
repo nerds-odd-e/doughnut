@@ -36,7 +36,7 @@ public class Circle {
     @ManyToMany
     @JsonIgnore
     @Getter
-    private final List<UserEntity> members = new ArrayList<>();
+    private final List<User> members = new ArrayList<>();
 
     @OneToOne(mappedBy = "circle", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn

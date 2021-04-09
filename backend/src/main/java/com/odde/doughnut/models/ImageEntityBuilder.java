@@ -3,7 +3,7 @@ package com.odde.doughnut.models;
 import com.odde.doughnut.algorithms.ImageUtils;
 import com.odde.doughnut.entities.ImageBlob;
 import com.odde.doughnut.entities.ImageEntity;
-import com.odde.doughnut.entities.UserEntity;
+import com.odde.doughnut.entities.User;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -14,9 +14,9 @@ public class ImageEntityBuilder {
     public ImageEntityBuilder() {
     }
 
-    public ImageEntity buildImageEntityFromUploadedPicture(UserEntity userEntity, MultipartFile file) throws IOException {
+    public ImageEntity buildImageEntityFromUploadedPicture(User user, MultipartFile file) throws IOException {
         ImageEntity imageEntity = new ImageEntity();
-        imageEntity.setUserEntity(userEntity);
+        imageEntity.setUser(user);
         imageEntity.setStorageType("db");
         imageEntity.setName(file.getOriginalFilename());
         imageEntity.setType(file.getContentType());

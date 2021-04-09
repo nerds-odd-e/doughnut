@@ -52,15 +52,15 @@ class TestabilityRestController {
     }
 
     private void createUser(String externalIdentifier, String name) {
-        UserEntity userEntity = new UserEntity();
-        userEntity.setExternalIdentifier(externalIdentifier);
-        userEntity.setName(name);
-        userRepository.save(userEntity);
+        User user = new User();
+        user.setExternalIdentifier(externalIdentifier);
+        user.setName(name);
+        userRepository.save(user);
     }
 
     @PostMapping("/seed_notes")
     public List<Integer> seedNote(@RequestBody List<NoteContent> noteContents, @RequestParam(name = "external_identifier") String externalIdentifier) throws Exception {
-        final UserEntity userEntity = getUserModelByExternalIdentifierOrCurrentUser(externalIdentifier).getEntity();
+        final User user = getUserModelByExternalIdentifierOrCurrentUser(externalIdentifier).getEntity();
         HashMap<String, Note> earlyNotes = new HashMap<>();
         List<Note> noteList = new ArrayList<>();
 
@@ -71,12 +71,12 @@ class TestabilityRestController {
             noteList.add(note);
             final String testingParent = note.getNoteContent().getTestingParent();
             if (Strings.isBlank(testingParent)) {
-                note.buildNotebookForHeadNote(userEntity.getOwnership(), userEntity);
+                note.buildNotebookForHeadNote(user.getOwnership(), user);
             }
             else {
                 note.setParentNote(earlyNotes.get(testingParent));
             }
-            note.setUserEntity(userEntity);
+            note.setUser(user);
         }
 
         noteRepository.saveAll(noteList);
@@ -91,7 +91,7 @@ class TestabilityRestController {
         link.setTargetNote(noteRepository.findById(Integer.valueOf(userInfo.get("target_id"))).get());
         Note sourceNote = noteRepository.findById(Integer.valueOf(userInfo.get("source_id"))).get();
         link.setSourceNote(sourceNote);
-        link.setUserEntity(sourceNote.getUserEntity());
+        link.setUser(sourceNote.getUser());
         link.setType(userInfo.get("type"));
         linkRepository.save(link);
         return "OK";
@@ -139,9 +139,9 @@ class TestabilityRestController {
     }
 
     private UserModel getUserModelByExternalIdentifier(String externalIdentifier) {
-        UserEntity userEntity = userRepository.findByExternalIdentifier(externalIdentifier);
-        if (userEntity != null) {
-            return modelFactoryService.toUserModel(userEntity);
+        User user = userRepository.findByExternalIdentifier(externalIdentifier);
+        if (user != null) {
+            return modelFactoryService.toUserModel(user);
         }
         throw new RuntimeException("User with external identifier `" + externalIdentifier + "` does not exist");
     }

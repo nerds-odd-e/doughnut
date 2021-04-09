@@ -4,7 +4,7 @@
     <div class="container content">
         <h2>Edit User Setting</h2>
 
-        <form action="#" th:action="@{/users/{id}(id=${userEntity.id})}" th:object="${userEntity}" method="post">
+        <form action="#" th:action="@{/users/{id}(id=${user.id})}" th:object="${user}" method="post">
             <div th:replace="_fragments/forms :: textInput('user', 'name', null, false)"/>
             <div th:replace="_fragments/forms :: textInput('user', 'dailyNewNotesCount', null, false)"/>
             <div th:replace="_fragments/forms :: textInput('user', 'spaceIntervals', null, false)"/>

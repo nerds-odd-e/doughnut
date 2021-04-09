@@ -35,7 +35,7 @@ public class ModelFactoryService {
         return new BazaarModel(this);
     }
 
-    public Optional<UserEntity> findUserById(Integer id) {
+    public Optional<User> findUserById(Integer id) {
         return userRepository.findById(id);
     }
 
@@ -43,11 +43,11 @@ public class ModelFactoryService {
         return noteRepository.findById(noteId);
     }
 
-    public UserModel toUserModel(UserEntity userEntity) {
-        if (userEntity == null) {
+    public UserModel toUserModel(User user) {
+        if (user == null) {
             return null;
         }
-        return new UserModel(userEntity, this);
+        return new UserModel(user, this);
     }
 
     public ReviewPointModel toReviewPointModel(@Valid ReviewPoint reviewPoint) {
@@ -59,7 +59,7 @@ public class ModelFactoryService {
             return (M) toReviewPointModel((ReviewPoint) entity);
         }
         if (klass == UserModel.class) {
-            return (M) toUserModel((UserEntity) entity);
+            return (M) toUserModel((User) entity);
         }
         return null;
     }

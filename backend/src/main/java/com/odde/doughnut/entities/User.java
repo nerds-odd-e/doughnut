@@ -13,7 +13,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "user")
-public class UserEntity {
+public class User {
 
     @Id @Getter @GeneratedValue(strategy = GenerationType.IDENTITY) private Integer id;
 
@@ -23,15 +23,15 @@ public class UserEntity {
 
     @Column(name = "external_identifier") @Getter @Setter private String externalIdentifier;
 
-    @OneToMany(mappedBy = "userEntity")
+    @OneToMany(mappedBy = "user")
     @JsonIgnore
     @Getter @Setter private List<Note> notes = new ArrayList<>();
 
-    @OneToMany(mappedBy = "userEntity")
+    @OneToMany(mappedBy = "user")
     @JsonIgnore
     @Getter @Setter private List<ReviewPoint> reviewPoints = new ArrayList<>();
 
-    @OneToOne(mappedBy = "userEntity", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
     @Getter @Setter private Ownership ownership = new Ownership();
 
@@ -49,13 +49,13 @@ public class UserEntity {
     @Getter
     private final List<Circle> circles = new ArrayList<>();
 
-    @OneToMany(mappedBy = "userEntity", cascade = CascadeType.DETACH)
+    @OneToMany(mappedBy = "user", cascade = CascadeType.DETACH)
     @JsonIgnore
     @Getter
     private final List<Subscription> subscriptions = new ArrayList<>();
 
-    public UserEntity() {
-        ownership.setUserEntity(this);
+    public User() {
+        ownership.setUser(this);
     }
 
     public boolean owns(Notebook notebook) {

@@ -51,7 +51,7 @@ class SubscriptionControllerTest {
                 makeMe.successfulBindingResult(), model);
         assertThat(result, matchesPattern("redirect:/subscriptions/\\d+"));
         assertEquals(topNote, subscription.getHeadNote());
-        assertEquals(userModel.getEntity(), subscription.getUserEntity());
+        assertEquals(userModel.getEntity(), subscription.getUser());
     }
 
     @Test

@@ -27,7 +27,7 @@ import static org.hamcrest.Matchers.*;
 public class NoteTest {
 
     @Autowired MakeMe makeMe;
-    UserEntity userEntity;
+    User user;
 
     @Test
     void timeOrder() {
@@ -118,25 +118,25 @@ public class NoteTest {
 
         @BeforeEach
         void setup() {
-            userEntity = makeMe.aUser().with2Notes().please();
+            user = makeMe.aUser().with2Notes().please();
         }
 
         @Test
         void thereShouldBe2NodesForUser() {
-            List<Note> notes = userEntity.getNotes();
+            List<Note> notes = user.getNotes();
             assertThat(notes, hasSize(equalTo(2)));
         }
 
         @Test
         void targetIsEmptyByDefault() {
-            Note note = userEntity.getNotes().get(0);
+            Note note = user.getNotes().get(0);
             assertThat(note.getTargetNotes(), is(empty()));
         }
 
         @Test
         void targetOfLinkedNotes() {
-            Note note = userEntity.getNotes().get(0);
-            Note targetNote = userEntity.getNotes().get(1);
+            Note note = user.getNotes().get(0);
+            Note targetNote = user.getNotes().get(1);
             makeMe.theNote(note).linkTo(targetNote).please();
             List<Note> targetNotes = note.getTargetNotes();
             assertThat(targetNotes, hasSize(equalTo(1)));

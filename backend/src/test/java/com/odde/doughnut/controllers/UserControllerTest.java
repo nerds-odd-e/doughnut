@@ -1,6 +1,6 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.entities.UserEntity;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
@@ -46,7 +46,7 @@ class UserControllerTest {
 
     @Test
     void updateOtherUserProfile() {
-        UserEntity anotherUser = makeMe.aUser().please();
+        User anotherUser = makeMe.aUser().please();
         assertThrows(
                 NoAccessRightException.class,
                 ()-> controller.updateUser(anotherUser, makeMe.successfulBindingResult()));

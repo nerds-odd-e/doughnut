@@ -22,24 +22,24 @@ public class ReviewPointTest {
     MakeMe makeMe;
     @Autowired
     private Validator validator;
-    UserEntity userEntity;
+    User user;
     Note note;
     Link link;
     ReviewPoint reviewPoint = new ReviewPoint();
 
     @BeforeEach
     void setup() {
-        userEntity = makeMe.aUser().please();
-        note = makeMe.aNote().byUser(userEntity).please();
-        Note note2 = makeMe.aNote().byUser(userEntity).linkTo(note).please();
+        user = makeMe.aUser().please();
+        note = makeMe.aNote().byUser(user).please();
+        Note note2 = makeMe.aNote().byUser(user).linkTo(note).please();
         link = note2.getLinks().get(0);
-        reviewPoint.setUserEntity(userEntity);
+        reviewPoint.setUser(user);
     }
 
     @Test
     void validate() {
         reviewPoint.setNote(note);
-        Set<ConstraintViolation<UserEntity>> violations = validator.validate(userEntity);
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
         assertEquals(0, violations.size());
     }
 

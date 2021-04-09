@@ -53,7 +53,7 @@ public class Note {
     @JsonIgnore
     @Getter
     @Setter
-    private UserEntity userEntity;
+    private User user;
 
     @OneToMany(mappedBy = "sourceNote", cascade = CascadeType.ALL,
             orphanRemoval = true)
@@ -201,8 +201,8 @@ public class Note {
         }
     }
 
-    public void updateNoteContent(NoteContent noteContent, UserEntity userEntity) throws IOException {
-        noteContent.fetchUploadedPicture(userEntity);
+    public void updateNoteContent(NoteContent noteContent, User user) throws IOException {
+        noteContent.fetchUploadedPicture(user);
         mergeNoteContent(noteContent);
     }
 
@@ -315,13 +315,13 @@ public class Note {
         return Strings.isBlank(noteContent.getDescription()) && children.isEmpty();
     }
 
-    public void buildNotebookForHeadNote(Ownership ownership, UserEntity creator) {
+    public void buildNotebookForHeadNote(Ownership ownership, User creator) {
         final Notebook notebook = new Notebook();
         notebook.setCreatorEntity(creator);
         notebook.setOwnership(ownership);
         notebook.setHeadNote(this);
 
-        this.userEntity = creator;
+        this.user = creator;
         this.notebook = notebook;
     }
 }

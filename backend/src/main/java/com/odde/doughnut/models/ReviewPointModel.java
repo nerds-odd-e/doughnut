@@ -19,7 +19,7 @@ public class ReviewPointModel extends ModelForEntity<ReviewPoint> {
             note.mergeMasterReviewSetting(reviewSetting);
             modelFactoryService.noteRepository.save(note);
         }
-        entity.setUserEntity(userModel.getEntity());
+        entity.setUser(userModel.getEntity());
         entity.setInitialReviewedAt(currentUTCTimestamp);
         repeat(currentUTCTimestamp);
     }
@@ -46,7 +46,7 @@ public class ReviewPointModel extends ModelForEntity<ReviewPoint> {
     }
 
     private UserModel getUserModel() {
-        return modelFactoryService.toUserModel(entity.getUserEntity());
+        return modelFactoryService.toUserModel(entity.getUser());
     }
 
     public QuizQuestion generateAQuizQuestion(Randomizer randomizer) {
