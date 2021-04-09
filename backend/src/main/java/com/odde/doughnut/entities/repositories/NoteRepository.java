@@ -1,7 +1,6 @@
 package com.odde.doughnut.entities.repositories;
 
-import com.odde.doughnut.entities.NoteEntity;
-import com.odde.doughnut.entities.OwnershipEntity;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.UserEntity;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -9,24 +8,24 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface NoteRepository extends CrudRepository<NoteEntity, Integer> {
+public interface NoteRepository extends CrudRepository<Note, Integer> {
     @Query( value = "SELECT note.* from note " + byOwnershipWhereThereIsNoReviewPoint, nativeQuery = true)
-    List<NoteEntity> findByOwnershipWhereThereIsNoReviewPoint(@Param("userEntity") UserEntity userEntity);
+    List<Note> findByOwnershipWhereThereIsNoReviewPoint(@Param("userEntity") UserEntity userEntity);
 
     @Query( value = "SELECT count(1) as count from note " + byOwnershipWhereThereIsNoReviewPoint, nativeQuery = true)
     int countByOwnershipWhereThereIsNoReviewPoint(@Param("userEntity") UserEntity userEntity);
 
     @Query( value = "SELECT note.* from note where title = :noteTitle limit 1", nativeQuery = true)
-    NoteEntity findFirstByTitle(@Param("noteTitle") String noteTitle);
+    Note findFirstByTitle(@Param("noteTitle") String noteTitle);
 
     @Query( value = "SELECT note.* from note " + byAncestorWhereThereIsNoReviewPoint, nativeQuery = true)
-    List<NoteEntity> findByAncestorWhereThereIsNoReviewPoint(@Param("userEntity") UserEntity userEntity, @Param("ancestor") NoteEntity ancestor);
+    List<Note> findByAncestorWhereThereIsNoReviewPoint(@Param("userEntity") UserEntity userEntity, @Param("ancestor") Note ancestor);
 
     @Query( value = "SELECT count(1) as count from note " + byAncestorWhereThereIsNoReviewPoint, nativeQuery = true)
-    int countByAncestorWhereThereIsNoReviewPoint(@Param("userEntity") UserEntity userEntity, @Param("ancestor") NoteEntity ancestor);
+    int countByAncestorWhereThereIsNoReviewPoint(@Param("userEntity") UserEntity userEntity, @Param("ancestor") Note ancestor);
 
     @Query( value = "SELECT count(1) as count from note " + joinClosure + " WHERE note.id in :noteIds", nativeQuery = true)
-    int countByAncestorAndInTheList(@Param("ancestor") NoteEntity ancestor, @Param("noteIds") List<Integer> noteIds);
+    int countByAncestorAndInTheList(@Param("ancestor") Note ancestor, @Param("noteIds") List<Integer> noteIds);
 
     String whereThereIsNoReviewPoint = " LEFT JOIN review_point rp"
             + " ON note.id = rp.note_id "

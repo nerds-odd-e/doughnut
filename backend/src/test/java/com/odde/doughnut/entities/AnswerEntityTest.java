@@ -11,8 +11,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class AnswerEntityTest {
     MakeMe makeMe = new MakeMe();
-    NoteEntity target;
-    NoteEntity source;
+    Note target;
+    Note source;
 
     @BeforeEach
     void setup() {

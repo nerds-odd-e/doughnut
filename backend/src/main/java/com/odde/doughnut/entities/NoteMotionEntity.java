@@ -5,16 +5,18 @@ import lombok.Getter;
 import lombok.Setter;
 
 public class NoteMotionEntity {
-    @Getter @Setter NoteEntity subject;
-    @Getter @Setter NoteEntity relativeToNote;
+    @Getter @Setter
+    Note subject;
+    @Getter @Setter
+    Note relativeToNote;
     @Getter @Setter private boolean asFirstChildOfNote;
 
-    public NoteMotionEntity(NoteEntity relativeToNote, boolean asFirstChildOfNote) {
+    public NoteMotionEntity(Note relativeToNote, boolean asFirstChildOfNote) {
         this.relativeToNote = relativeToNote;
         this.asFirstChildOfNote = asFirstChildOfNote;
     }
 
-    public NoteEntity getNewParent() {
+    public Note getNewParent() {
         if (asFirstChildOfNote) {
             return relativeToNote;
         }

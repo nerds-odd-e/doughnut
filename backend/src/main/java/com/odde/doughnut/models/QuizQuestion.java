@@ -1,7 +1,7 @@
 package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.AnswerEntity;
-import com.odde.doughnut.entities.NoteEntity;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.models.quizFacotries.*;
 import com.odde.doughnut.services.ModelFactoryService;
@@ -62,20 +62,20 @@ public class QuizQuestion {
     public static class Option {
         @Getter private String value;
         @Getter private String display;
-        @Getter private NoteEntity note;
+        @Getter private Note note;
         @Getter private boolean isPicture = false;
 
         private Option() {
         }
 
-        public static Option createTitleOption(NoteEntity note) {
+        public static Option createTitleOption(Note note) {
             Option option = new Option();
             option.value = note.getTitle();
             option.display = option.value;
             return option;
         }
 
-        public static Option createPictureOption(NoteEntity note) {
+        public static Option createPictureOption(Note note) {
             Option option = new Option();
             option.value = note.getTitle();
             option.note = note;

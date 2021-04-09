@@ -5,7 +5,7 @@
 
         <form id="review-setting" ction="#" th:action="@{/reviews/}" th:object="${reviewPointEntity}" method="post">
             <div class="mb-2">
-                <input th:field="*{noteEntity}" type="hidden"/>
+                <input th:field="*{note}" type="hidden"/>
                 <input th:field="*{linkEntity}" type="hidden"/>
                 <div th:if="${reviewSettingEntity}">
                     <div th:replace="_fragments/note_fragments :: reviewSettingForm(${reviewSettingEntity})"/>

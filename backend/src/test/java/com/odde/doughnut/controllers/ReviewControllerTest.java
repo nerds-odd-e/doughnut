@@ -1,6 +1,6 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.entities.NoteEntity;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.entities.ReviewSettingEntity;
 import com.odde.doughnut.models.UserModel;
@@ -19,7 +19,6 @@ import org.springframework.ui.ExtendedModelMap;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
@@ -31,7 +30,7 @@ class ReviewControllerTest {
     MakeMe makeMe;
     private TimeTraveler timeTraveler = new TimeTraveler();
     private UserModel userModel;
-    private NoteEntity parentNote;
+    private Note parentNote;
     final ExtendedModelMap model = new ExtendedModelMap();
     ReviewController controller;
 

@@ -26,14 +26,14 @@ public class SubscriptionEntity {
     @Getter @Setter private NotebookEntity notebookEntity;
 
     public String getTitle() {
-        return notebookEntity.getHeadNoteEntity().getTitle();
+        return notebookEntity.getHeadNote().getTitle();
     }
 
     public NoteContentEntity getNoteContent() {
-        return notebookEntity.getHeadNoteEntity().getNoteContent();
+        return notebookEntity.getHeadNote().getNoteContent();
     }
 
-    public NoteEntity getHeadNoteEntity() {
-        return notebookEntity.getHeadNoteEntity();
+    public Note getHeadNote() {
+        return notebookEntity.getHeadNote();
     }
 }

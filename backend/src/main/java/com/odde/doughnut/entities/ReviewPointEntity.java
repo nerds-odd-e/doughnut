@@ -31,7 +31,7 @@ public class ReviewPointEntity {
   @JsonIgnore
   @Getter
   @Setter
-  private NoteEntity noteEntity;
+  private Note note;
 
   @ManyToOne
   @JoinColumn(name = "link_id")
@@ -97,20 +97,20 @@ public class ReviewPointEntity {
     return userLocalDateTime.getYear() * 366 + userLocalDateTime.getDayOfYear();
   }
 
-  public NoteEntity getSourceNote() {
+  public Note getSourceNote() {
     if (linkEntity != null)
       return linkEntity.getSourceNote();
-    return noteEntity;
+    return note;
   }
 
   @AssertTrue(message = "link and note cannot be both empty")
   private boolean isNotBothLinkAndNoteEmpty() {
-    return noteEntity != null || linkEntity != null;
+    return note != null || linkEntity != null;
   }
 
   @AssertTrue(message = "cannot have both link and note")
   private boolean isNotBothLinkAndNoteNotEmpty() {
-    return noteEntity == null || linkEntity == null;
+    return note == null || linkEntity == null;
   }
 
   public void updateMemoryState(Timestamp currentUTCTimestamp, SpacedRepetitionAlgorithm.MemoryStateChange memoryStateChange) {

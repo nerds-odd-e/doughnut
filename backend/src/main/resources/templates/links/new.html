@@ -2,11 +2,11 @@
 <layout th:replace="_fragments/basic_layout :: application_layout(~{ :: .content})">
     <div class="p-5 content">
         <div>
-            <h2 th:text="'Link ' + ${noteEntity.title} + ' to:'"></h2>
+            <h2 th:text="'Link ' + ${note.title} + ' to:'"></h2>
 
             <div class="row">
                 <div class="my-3 col-6">
-                    <form th:action="@{/links/{id}/link(id=${noteEntity.id})}" method="get">
+                    <form th:action="@{/links/{id}/link(id=${note.id})}" method="get">
                         <input type="text" class="form-control " placeholder="Search" name="searchTerm">
                         <button type="submit" class="btn btn-primary">Search</button>
                     </form>
@@ -16,8 +16,8 @@
 
         <div th:replace="_fragments/note_fragments :: cards(${linkableNotes}, ~{ :: .card-button}, ~{ :: .card-header})">
             <span class="card-header"></span>
-            <form th:action="@{/links/{id}/link(id=${noteEntity.id})}" method="post" class="card-button">
-                <input type="hidden" name="targetNoteId" th:value="${note.id}"/>
+            <form th:action="@{/links/{id}/link(id=${note.id})}" method="post" class="card-button">
+                <input type="hidden" name="targetNoteId" th:value="${noteElement.id}"/>
                 <Button class="btn btn-primary" type="submit">Select</Button>
             </form>
         </div>

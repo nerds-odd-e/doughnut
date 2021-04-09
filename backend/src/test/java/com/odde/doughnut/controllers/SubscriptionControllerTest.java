@@ -1,6 +1,6 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.entities.NoteEntity;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NotebookEntity;
 import com.odde.doughnut.entities.SubscriptionEntity;
 import com.odde.doughnut.exceptions.NoAccessRightException;
@@ -27,7 +27,7 @@ class SubscriptionControllerTest {
     @Autowired
     private MakeMe makeMe;
     private UserModel userModel;
-    private NoteEntity topNote;
+    private Note topNote;
     private NotebookEntity notebook;
     private SubscriptionController controller;
     final ExtendedModelMap model = new ExtendedModelMap();
@@ -50,7 +50,7 @@ class SubscriptionControllerTest {
                 subscriptionEntity,
                 makeMe.successfulBindingResult(), model);
         assertThat(result, matchesPattern("redirect:/subscriptions/\\d+"));
-        assertEquals(topNote, subscriptionEntity.getHeadNoteEntity());
+        assertEquals(topNote, subscriptionEntity.getHeadNote());
         assertEquals(userModel.getEntity(), subscriptionEntity.getUserEntity());
     }
 
@@ -66,7 +66,7 @@ class SubscriptionControllerTest {
 
     @Test
     void notAllowToSubscribeToNoneBazaarNote() {
-        NoteEntity anotherNote = makeMe.aNote().byUser(userModel).please();
+        Note anotherNote = makeMe.aNote().byUser(userModel).please();
         SubscriptionEntity subscriptionEntity = makeMe.aSubscription().inMemoryPlease();
         assertThrows(NoAccessRightException.class, ()-> controller.createSubscription(
                 anotherNote.getNotebookEntity(),

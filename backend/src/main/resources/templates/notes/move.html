@@ -3,22 +3,22 @@
 
     <div class="container content">
         <h2>Move note (Experimental)</h2>
-        <div th:replace="_fragments/note_fragments :: noteOwnerBreadcrumb(${noteEntity}, ~{:: .additional-item})">
-            <li class="breadcrumb-item additional-item" th:text="${noteEntity.title}"/>
+        <div th:replace="_fragments/note_fragments :: noteOwnerBreadcrumb(${note}, ~{:: .additional-item})">
+            <li class="breadcrumb-item additional-item" th:text="${note.title}"/>
         </div>
 
-        <form action="#" th:action="@{/notes/{id}/move(id=${noteEntity.id})}" th:object="${noteMotion}" method="post">
+        <form action="#" th:action="@{/notes/{id}/move(id=${note.id})}" th:object="${noteMotion}" method="post">
             <input type="hidden" th:field="*{relativeToNote}"/>
             <input type="hidden" th:field="*{asFirstChildOfNote}"/>
             <input type="submit" value="Move Left" class="btn btn-primary"/>
         </form>
-        <form action="#" th:action="@{/notes/{id}/move(id=${noteEntity.id})}" th:object="${noteMotionRight}" method="post">
+        <form action="#" th:action="@{/notes/{id}/move(id=${note.id})}" th:object="${noteMotionRight}" method="post">
             <input type="hidden" th:field="*{relativeToNote}"/>
             <input type="hidden" th:field="*{asFirstChildOfNote}"/>
             <input type="submit" value="Move Right" class="btn btn-primary"/>
         </form>
         <p>Or move under another note as first child (experimental feature, please input the note id here)</p>
-        <form action="#" th:action="@{/notes/{id}/move(id=${noteEntity.id})}" th:object="${noteMotionUnder}" method="post">
+        <form action="#" th:action="@{/notes/{id}/move(id=${note.id})}" th:object="${noteMotionUnder}" method="post">
             <input th:field="*{relativeToNote}"/>
             <input type="hidden" th:field="*{asFirstChildOfNote}"/>
             <input type="submit" value="Move Under" class="btn btn-primary"/>

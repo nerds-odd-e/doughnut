@@ -15,7 +15,7 @@
     <div th:with="linkFragment=${linkFragment} ?: '_fragments/note_fragments :: noteTitleWithLink'">
         <div class="row">
             <div class="col-12 col-sm-6 col-md-4 col-lg-3" th:each="notebook:${notebooks}">
-                <div th:replace="_fragments/note_fragments :: card(${notebook.headNoteEntity}, ~{}, ~{:: .card-header}, ${linkFragment})">
+                <div th:replace="_fragments/note_fragments :: card(${notebook.headNote}, ~{}, ~{:: .card-header}, ${linkFragment})">
                     <span class="card-header d-flex flex-row-reverse p-0">
                         <div th:replace="${cardHeaderButtons}"/>
                     </span>

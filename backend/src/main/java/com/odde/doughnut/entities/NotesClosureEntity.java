@@ -1,13 +1,9 @@
 package com.odde.doughnut.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.List;
 
 @Entity
 @Table(name = "notes_closure")
@@ -18,11 +14,11 @@ public class NotesClosureEntity {
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "note_id", referencedColumnName = "id")
-    @Getter @Setter private NoteEntity noteEntity;
+    @Getter @Setter private Note note;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "ancestor_id", referencedColumnName = "id")
-    @Getter @Setter private NoteEntity ancestorEntity;
+    @Getter @Setter private Note ancestorEntity;
 
     @Getter
     @Setter

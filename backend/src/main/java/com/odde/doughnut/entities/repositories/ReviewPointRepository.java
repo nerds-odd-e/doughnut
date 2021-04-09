@@ -1,6 +1,6 @@
 package com.odde.doughnut.entities.repositories;
 
-import com.odde.doughnut.entities.NoteEntity;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.entities.UserEntity;
 import org.springframework.data.jpa.repository.Query;
@@ -19,7 +19,7 @@ public interface ReviewPointRepository extends CrudRepository<ReviewPointEntity,
     @Query( value = "SELECT * " + byUserEntity + " AND rp.next_review_at <= :nextReviewAt ORDER BY rp.next_review_at", nativeQuery = true)
     List<ReviewPointEntity> findAllByUserEntityAndNextReviewAtLessThanEqualOrderByNextReviewAt(@Param("userEntity") UserEntity userEntity, @Param("nextReviewAt") Timestamp nextReviewAt);
 
-    void deleteAllByNoteEntity(NoteEntity entity);
+    void deleteAllByNote(Note note);
 
     String byUserEntity = " FROM review_point rp "
             + " WHERE rp.user_id = :userEntity "

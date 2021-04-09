@@ -1,7 +1,7 @@
 package com.odde.doughnut.models.quizFacotries;
 
 import com.odde.doughnut.entities.LinkEntity;
-import com.odde.doughnut.entities.NoteEntity;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.models.QuizQuestion;
 
@@ -9,7 +9,7 @@ import java.util.List;
 
 public class LinkTargetQuizFactory implements QuizQuestionFactory {
     private final LinkEntity linkEntity;
-    private final NoteEntity answerNote;
+    private final Note answerNote;
     private final QuizQuestionServant servant;
 
     public LinkTargetQuizFactory(QuizQuestionServant servant, ReviewPointEntity reviewPointEntity) {
@@ -19,7 +19,7 @@ public class LinkTargetQuizFactory implements QuizQuestionFactory {
     }
 
     @Override
-    public List<NoteEntity> generateFillingOptions() {
+    public List<Note> generateFillingOptions() {
         return servant.choose5FromSiblings(answerNote, n -> !n.equals(answerNote));
     }
 
@@ -34,16 +34,16 @@ public class LinkTargetQuizFactory implements QuizQuestionFactory {
     }
 
     @Override
-    public NoteEntity generateAnswerNote() {
+    public Note generateAnswerNote() {
         return answerNote;
     }
 
     @Override
-    public List<QuizQuestion.Option> toQuestionOptions(List<NoteEntity> noteEntities) {
+    public List<QuizQuestion.Option> toQuestionOptions(List<Note> noteEntities) {
         return servant.toTitleOptions(noteEntities);
     }
 
-    private NoteEntity getAnswerNote() {
+    private Note getAnswerNote() {
         return linkEntity.getTargetNote();
     }
 

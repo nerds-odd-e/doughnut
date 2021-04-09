@@ -1,7 +1,6 @@
 package com.odde.doughnut.entities.validators;
 
 import com.odde.doughnut.entities.NoteContentEntity;
-import com.odde.doughnut.entities.NoteEntity;
 import org.apache.logging.log4j.util.Strings;
 
 import javax.validation.ConstraintValidator;

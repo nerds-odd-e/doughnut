@@ -7,7 +7,6 @@ import com.odde.doughnut.entities.ReviewSettingEntity;
 import com.odde.doughnut.models.*;
 import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.TimeTraveler;
-import org.apache.logging.log4j.util.Strings;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -50,7 +49,7 @@ public class ReviewController extends ApplicationMvcController  {
             return "redirect:/reviews";
         }
         model.addAttribute("reviewPointEntity", reviewPointEntity);
-        model.addAttribute("reviewSettingEntity", reviewing.getReviewSettingEntity(reviewPointEntity.getNoteEntity()));
+        model.addAttribute("reviewSettingEntity", reviewing.getReviewSettingEntity(reviewPointEntity.getNote()));
         return "reviews/initial";
     }
 

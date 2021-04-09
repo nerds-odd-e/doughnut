@@ -29,7 +29,7 @@ public class NotebookEntity {
     @JsonIgnore
     @Getter
     @Setter
-    private NoteEntity headNoteEntity;
+    private Note headNote;
 
     @Column(name="skip_review_entirely")
     @Getter @Setter Boolean skipReviewEntirely = false;

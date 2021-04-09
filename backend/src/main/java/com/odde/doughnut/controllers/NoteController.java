@@ -30,7 +30,7 @@ public class NoteController extends ApplicationMvcController  {
     }
 
     @GetMapping("/{parentNote}/new")
-    public String newNote(@PathVariable(name = "parentNote") NoteEntity parentNote, Model model) throws NoAccessRightException {
+    public String newNote(@PathVariable(name = "parentNote") Note parentNote, Model model) throws NoAccessRightException {
         UserModel userModel = getCurrentUser();
         userModel.assertAuthorization(parentNote);
         NoteContentEntity noteContentEntity = new NoteContentEntity();
@@ -40,91 +40,91 @@ public class NoteController extends ApplicationMvcController  {
     }
 
     @PostMapping("/{parentNote}/create")
-    public String createNote(@PathVariable(name = "parentNote") NoteEntity parentNote, @Valid NoteContentEntity noteContentEntity, BindingResult bindingResult, Model model) throws NoAccessRightException, IOException {
+    public String createNote(@PathVariable(name = "parentNote") Note parentNote, @Valid NoteContentEntity noteContentEntity, BindingResult bindingResult, Model model) throws NoAccessRightException, IOException {
         if (bindingResult.hasErrors()) {
             return "notes/new";
         }
         UserModel userModel = getCurrentUser();
         userModel.assertAuthorization(parentNote);
-        NoteEntity noteEntity = new NoteEntity();
+        Note note = new Note();
         UserEntity userEntity = userModel.getEntity();
-        noteEntity.updateNoteContent(noteContentEntity, userEntity);
-        noteEntity.setParentNote(parentNote);
-        noteEntity.setUserEntity(userEntity);
-        modelFactoryService.noteRepository.save(noteEntity);
-        return "redirect:/notes/" + noteEntity.getId();
+        note.updateNoteContent(noteContentEntity, userEntity);
+        note.setParentNote(parentNote);
+        note.setUserEntity(userEntity);
+        modelFactoryService.noteRepository.save(note);
+        return "redirect:/notes/" + note.getId();
     }
 
-    @GetMapping("/{noteEntity}")
-    public String showNote(@PathVariable(name = "noteEntity") NoteEntity noteEntity) throws NoAccessRightException {
-        getCurrentUser().assertReadAuthorization(noteEntity);
-        if (!getCurrentUser().hasFullAuthority(noteEntity)) {
-            return "redirect:/bazaar/notes/" + noteEntity.getId();
+    @GetMapping("/{note}")
+    public String showNote(@PathVariable(name = "note") Note note) throws NoAccessRightException {
+        getCurrentUser().assertReadAuthorization(note);
+        if (!getCurrentUser().hasFullAuthority(note)) {
+            return "redirect:/bazaar/notes/" + note.getId();
         }
         return "notes/show";
     }
 
-    @GetMapping("/{noteEntity}/edit")
-    public String editNote(NoteEntity noteEntity, Model model) {
-        model.addAttribute("noteContentEntity", noteEntity.getNoteContent());
+    @GetMapping("/{note}/edit")
+    public String editNote(Note note, Model model) {
+        model.addAttribute("noteContentEntity", note.getNoteContent());
         return "notes/edit";
     }
 
-    @PostMapping("/{noteEntity}")
-    public String updateNote(@PathVariable(name = "noteEntity") NoteEntity noteEntity, @Valid NoteContentEntity noteContentEntity, BindingResult bindingResult) throws NoAccessRightException, IOException {
-        getCurrentUser().assertAuthorization(noteEntity);
+    @PostMapping("/{note}")
+    public String updateNote(@PathVariable(name = "note") Note note, @Valid NoteContentEntity noteContentEntity, BindingResult bindingResult) throws NoAccessRightException, IOException {
+        getCurrentUser().assertAuthorization(note);
         if (bindingResult.hasErrors()) {
             return "notes/edit";
         }
-        noteEntity.updateNoteContent(noteContentEntity, getCurrentUser().getEntity());
-        modelFactoryService.noteRepository.save(noteEntity);
-        return "redirect:/notes/" + noteEntity.getId();
+        note.updateNoteContent(noteContentEntity, getCurrentUser().getEntity());
+        modelFactoryService.noteRepository.save(note);
+        return "redirect:/notes/" + note.getId();
     }
 
-    @GetMapping("/{noteEntity}/move")
-    public String prepareToMove(NoteEntity noteEntity, Model model) {
-        model.addAttribute("noteMotion", getLeftNoteMotion(noteEntity));
-        model.addAttribute("noteMotionRight", getRightNoteMotion(noteEntity));
+    @GetMapping("/{note}/move")
+    public String prepareToMove(Note note, Model model) {
+        model.addAttribute("noteMotion", getLeftNoteMotion(note));
+        model.addAttribute("noteMotionRight", getRightNoteMotion(note));
         model.addAttribute("noteMotionUnder", new NoteMotionEntity(null, true));
         return "notes/move";
     }
 
-    private NoteMotionEntity getLeftNoteMotion(NoteEntity noteEntity) {
-        NoteEntity previousSiblingNote = noteEntity.getPreviousSibling();
+    private NoteMotionEntity getLeftNoteMotion(Note note) {
+        Note previousSiblingNote = note.getPreviousSibling();
         if(previousSiblingNote != null) {
-            NoteEntity prevprev = previousSiblingNote.getPreviousSibling();
+            Note prevprev = previousSiblingNote.getPreviousSibling();
             if (prevprev == null) {
-                return new NoteMotionEntity(noteEntity.getParentNote(), true);
+                return new NoteMotionEntity(note.getParentNote(), true);
             }
             return new NoteMotionEntity(prevprev, false);
         }
         return new NoteMotionEntity(null, false);
     }
 
-    private NoteMotionEntity getRightNoteMotion(NoteEntity noteEntity) {
-        return new NoteMotionEntity(noteEntity.getNextSibling(), false);
+    private NoteMotionEntity getRightNoteMotion(Note note) {
+        return new NoteMotionEntity(note.getNextSibling(), false);
     }
 
-    @PostMapping("/{noteEntity}/move")
+    @PostMapping("/{note}/move")
     @Transactional
-    public String moveNote(NoteEntity noteEntity, NoteMotionEntity noteMotionEntity) throws CyclicLinkDetectedException, NoAccessRightException {
-        getCurrentUser().assertAuthorization(noteEntity);
+    public String moveNote(Note note, NoteMotionEntity noteMotionEntity) throws CyclicLinkDetectedException, NoAccessRightException {
+        getCurrentUser().assertAuthorization(note);
         getCurrentUser().assertAuthorization(noteMotionEntity.getRelativeToNote());
-        modelFactoryService.toNoteMotionModel(noteMotionEntity, noteEntity).execute();
-        return "redirect:/notes/" + noteEntity.getId();
+        modelFactoryService.toNoteMotionModel(noteMotionEntity, note).execute();
+        return "redirect:/notes/" + note.getId();
     }
 
-    @PostMapping(value = "/{noteEntity}/delete")
+    @PostMapping(value = "/{note}/delete")
     @Transactional
-    public RedirectView deleteNote(@PathVariable("noteEntity") NoteEntity noteEntity) throws NoAccessRightException {
-        getCurrentUser().assertAuthorization(noteEntity);
-        modelFactoryService.toTreeNodeModel(noteEntity).destroy();
+    public RedirectView deleteNote(@PathVariable("note") Note note) throws NoAccessRightException {
+        getCurrentUser().assertAuthorization(note);
+        modelFactoryService.toTreeNodeModel(note).destroy();
         return new RedirectView("/notebooks");
     }
 
-    @GetMapping("/{noteEntity}/review_setting")
-    public String editReviewSetting(NoteEntity noteEntity, Model model) {
-        ReviewSettingEntity reviewSettingEntity = noteEntity.getMasterReviewSettingEntity();
+    @GetMapping("/{note}/review_setting")
+    public String editReviewSetting(Note note, Model model) {
+        ReviewSettingEntity reviewSettingEntity = note.getMasterReviewSettingEntity();
         if(reviewSettingEntity == null) {
             reviewSettingEntity = new ReviewSettingEntity();
         }
@@ -132,17 +132,17 @@ public class NoteController extends ApplicationMvcController  {
         return "notes/edit_review_setting";
     }
 
-    @PostMapping(value = "/{noteEntity}/review_setting")
+    @PostMapping(value = "/{note}/review_setting")
     @Transactional
-    public String updateReviewSetting(@PathVariable("noteEntity") NoteEntity noteEntity, @Valid ReviewSettingEntity reviewSettingEntity, BindingResult bindingResult) throws NoAccessRightException {
+    public String updateReviewSetting(@PathVariable("note") Note note, @Valid ReviewSettingEntity reviewSettingEntity, BindingResult bindingResult) throws NoAccessRightException {
         if (bindingResult.hasErrors()) {
             return "notes/edit_review_setting";
         }
-        getCurrentUser().assertAuthorization(noteEntity);
-        noteEntity.mergeMasterReviewSetting(reviewSettingEntity);
-        modelFactoryService.noteRepository.save(noteEntity);
+        getCurrentUser().assertAuthorization(note);
+        note.mergeMasterReviewSetting(reviewSettingEntity);
+        modelFactoryService.noteRepository.save(note);
 
-        return "redirect:/notes/" + noteEntity.getId();
+        return "redirect:/notes/" + note.getId();
     }
 
     private UserModel getCurrentUser() {

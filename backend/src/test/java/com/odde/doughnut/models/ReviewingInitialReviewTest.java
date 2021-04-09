@@ -46,8 +46,8 @@ public class ReviewingInitialReviewTest {
 
     @Nested
     class WhenThereAreTwoNotesForUser {
-        NoteEntity note1;
-        NoteEntity note2;
+        Note note1;
+        Note note2;
 
         @BeforeEach
         void setup() {
@@ -58,15 +58,15 @@ public class ReviewingInitialReviewTest {
 
         @Test
         void shouldReturnTheFirstNoteAndThenTheSecondWhenThereAreTwo() {
-            assertThat(getOneInitialReviewPointEntity(day1).getNoteEntity(), equalTo(note1));
+            assertThat(getOneInitialReviewPointEntity(day1).getNote(), equalTo(note1));
             makeMe.aReviewPointFor(note1).by(userModel).initiallyReviewedOn(day1).please();
-            assertThat(getOneInitialReviewPointEntity(day1).getNoteEntity(), equalTo(note2));
+            assertThat(getOneInitialReviewPointEntity(day1).getNote(), equalTo(note2));
         }
 
         @Test
         void shouldNotIncludeNoteThatIsSkippedForReview() {
             makeMe.theNote(note1).skipReview().linkTo(note2).please();
-            assertThat(getOneInitialReviewPointEntity(day1).getNoteEntity(), equalTo(note2));
+            assertThat(getOneInitialReviewPointEntity(day1).getNote(), equalTo(note2));
         }
 
         @Nested
@@ -76,16 +76,16 @@ public class ReviewingInitialReviewTest {
                 makeMe.theNote(note2).skipReview().please();
                 makeMe.theNote(note1).skipReview().linkTo(note2).please();
                 assertThat(getOneInitialReviewPointEntity(day1).getLinkEntity().getSourceNote(), equalTo(note1));
-                assertThat(getOneInitialReviewPointEntity(day1).getNoteEntity(), is(nullValue()));
+                assertThat(getOneInitialReviewPointEntity(day1).getNote(), is(nullValue()));
             }
 
             @Test
             void shouldReturnReviewPointForLinkIfCreatedEarlierThanNote() {
                 makeMe.theNote(note2).skipReview().please();
                 makeMe.theNote(note1).skipReview().linkTo(note2).please();
-                NoteEntity note3 = makeMe.aNote().byUser(userModel).createdAt(new Timestamp(System.currentTimeMillis() + 1000)).please();
+                Note note3 = makeMe.aNote().byUser(userModel).createdAt(new Timestamp(System.currentTimeMillis() + 1000)).please();
                 assertThat(getOneInitialReviewPointEntity(day1).getLinkEntity().getSourceNote(), equalTo(note1));
-                assertThat(getOneInitialReviewPointEntity(day1).getNoteEntity(), is(nullValue()));
+                assertThat(getOneInitialReviewPointEntity(day1).getNote(), is(nullValue()));
             }
 
             @Test
@@ -106,7 +106,7 @@ public class ReviewingInitialReviewTest {
 
             @Test
             void shouldReturnOneIfUsersDailySettignIsOne() {
-                assertThat(getOneInitialReviewPointEntity(day1).getNoteEntity(), equalTo(note1));
+                assertThat(getOneInitialReviewPointEntity(day1).getNote(), equalTo(note1));
             }
 
 
@@ -119,7 +119,7 @@ public class ReviewingInitialReviewTest {
             @Test
             void shouldIncludeNotesThatAreReviewedByOtherPeople() {
                 makeMe.aReviewPointFor(note1).by(anotherUser).initiallyReviewedOn(day1).please();
-                assertThat(getOneInitialReviewPointEntity(day1).getNoteEntity(), equalTo(note1));
+                assertThat(getOneInitialReviewPointEntity(day1).getNote(), equalTo(note1));
             }
 
             @Test
@@ -133,7 +133,7 @@ public class ReviewingInitialReviewTest {
             void theDailyCountShouldBeResetOnNextDay() {
                 makeMe.aReviewPointFor(note1).by(userModel).initiallyReviewedOn(day1).please();
                 Timestamp day2 = makeMe.aTimestamp().of(2, 1).forWhereTheUserIs(userModel).please();
-                assertThat(getOneInitialReviewPointEntity(day2).getNoteEntity(), equalTo(note2));
+                assertThat(getOneInitialReviewPointEntity(day2).getNote(), equalTo(note2));
             }
 
         }
@@ -142,13 +142,13 @@ public class ReviewingInitialReviewTest {
 
     @Nested
     class ReviewSubscribedNote {
-        NoteEntity note1;
-        NoteEntity note2;
+        Note note1;
+        Note note2;
 
         @BeforeEach
         void setup() {
             UserEntity anotherUser = makeMe.aUser().please();
-            NoteEntity top = makeMe.aNote().byUser(anotherUser).please();
+            Note top = makeMe.aNote().byUser(anotherUser).please();
             note1 = makeMe.aNote().under(top).please();
             note2 = makeMe.aNote().under(top).please();
             makeMe.aSubscription().forNotebook(top.getNotebookEntity()).forUser(userModel.entity).please();
@@ -157,7 +157,7 @@ public class ReviewingInitialReviewTest {
 
         @Test
         void shouldReturnReviewPointForNote() {
-            assertThat(getOneInitialReviewPointEntity(day1).getNoteEntity(), equalTo(note1));
+            assertThat(getOneInitialReviewPointEntity(day1).getNote(), equalTo(note1));
         }
 
         @Test
@@ -171,8 +171,8 @@ public class ReviewingInitialReviewTest {
 
     @Nested
     class NotesInCircle {
-        NoteEntity top;
-        NoteEntity note2;
+        Note top;
+        Note note2;
 
         @BeforeEach
         void setup() {

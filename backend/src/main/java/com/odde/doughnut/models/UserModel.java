@@ -29,28 +29,28 @@ public class UserModel extends ModelForEntity<UserEntity> implements ReviewScope
         save();
     }
 
-    public void assertAuthorization(NoteEntity noteEntity) throws NoAccessRightException {
-        if (!hasFullAuthority(noteEntity)) {
+    public void assertAuthorization(Note note) throws NoAccessRightException {
+        if (!hasFullAuthority(note)) {
             throw new NoAccessRightException();
         }
     }
 
-    public boolean hasFullAuthority(NoteEntity noteEntity) {
-        return hasFullAuthority(noteEntity.getNotebookEntity());
+    public boolean hasFullAuthority(Note note) {
+        return hasFullAuthority(note.getNotebookEntity());
     }
 
     public boolean hasFullAuthority(NotebookEntity notebookEntity) {
         return entity.owns(notebookEntity);
     }
 
-    public boolean hasReadAuthority(NoteEntity noteEntity) {
-        if(hasFullAuthority(noteEntity)) return true;
+    public boolean hasReadAuthority(Note note) {
+        if(hasFullAuthority(note)) return true;
 
-        return entity.getSubscriptionEntities().stream().anyMatch(s->s.getNotebookEntity() == noteEntity.getNotebookEntity());
+        return entity.getSubscriptionEntities().stream().anyMatch(s->s.getNotebookEntity() == note.getNotebookEntity());
     }
 
-    public void assertReadAuthorization(NoteEntity noteEntity) throws NoAccessRightException {
-        if (!hasReadAuthority(noteEntity)) {
+    public void assertReadAuthorization(Note note) throws NoAccessRightException {
+        if (!hasReadAuthority(note)) {
             throw new NoAccessRightException();
         }
     }
@@ -83,18 +83,18 @@ public class UserModel extends ModelForEntity<UserEntity> implements ReviewScope
         return circleEntity.getMembers().contains(entity);
     }
 
-    public List<NoteEntity> filterLinkableNotes(NoteEntity noteEntity, String searchTerm) {
-        List<NoteEntity> linkableNotes = getAllLinkableNotes(noteEntity);
+    public List<Note> filterLinkableNotes(Note note, String searchTerm) {
+        List<Note> linkableNotes = getAllLinkableNotes(note);
         if (searchTerm != null) {
             return linkableNotes.stream()
-                    .filter(note -> note.getTitle().contains(searchTerm))
+                    .filter(n -> n.getTitle().contains(searchTerm))
                     .collect(Collectors.toList());
         }
         return linkableNotes;
     }
 
     @Override
-    public List<NoteEntity> getNotesHaveNotBeenReviewedAtAll() {
+    public List<Note> getNotesHaveNotBeenReviewedAtAll() {
         return modelFactoryService.noteRepository.findByOwnershipWhereThereIsNoReviewPoint(entity);
     }
 
@@ -112,9 +112,9 @@ public class UserModel extends ModelForEntity<UserEntity> implements ReviewScope
         return modelFactoryService.reviewPointRepository.findAllByUserEntityAndInitialReviewedAtGreaterThan(entity, since);
     }
 
-    private List<NoteEntity> getAllLinkableNotes(NoteEntity source) {
-        List<NoteEntity> targetNotes = source.getTargetNotes();
-        List<NoteEntity> allNotes = entity.getNotes();
+    private List<Note> getAllLinkableNotes(Note source) {
+        List<Note> targetNotes = source.getTargetNotes();
+        List<Note> allNotes = entity.getNotes();
         return allNotes.stream()
                 .filter(i -> !targetNotes.contains(i))
                 .filter(i -> !i.equals(source))

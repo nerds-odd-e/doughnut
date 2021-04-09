@@ -61,11 +61,11 @@ class TestabilityRestController {
     @PostMapping("/seed_notes")
     public List<Integer> seedNote(@RequestBody List<NoteContentEntity> noteContents, @RequestParam(name = "external_identifier") String externalIdentifier) throws Exception {
         final UserEntity userEntity = getUserModelByExternalIdentifierOrCurrentUser(externalIdentifier).getEntity();
-        HashMap<String, NoteEntity> earlyNotes = new HashMap<>();
-        List<NoteEntity> noteList = new ArrayList<>();
+        HashMap<String, Note> earlyNotes = new HashMap<>();
+        List<Note> noteList = new ArrayList<>();
 
         for (NoteContentEntity content : noteContents) {
-            NoteEntity note = new NoteEntity();
+            Note note = new Note();
             note.mergeNoteContent(content);
             earlyNotes.put(content.getTitle(), note);
             noteList.add(note);
@@ -81,7 +81,7 @@ class TestabilityRestController {
 
         noteRepository.saveAll(noteList);
 
-        return noteList.stream().map(NoteEntity::getId).collect(Collectors.toList());
+        return noteList.stream().map(Note::getId).collect(Collectors.toList());
     }
 
     @PostMapping("/link_notes")
@@ -89,7 +89,7 @@ class TestabilityRestController {
     public String linkNotes(@RequestBody HashMap<String, String> userInfo) {
         LinkEntity linkEntity = new LinkEntity();
         linkEntity.setTargetNote(noteRepository.findById(Integer.valueOf(userInfo.get("target_id"))).get());
-        NoteEntity sourceNote = noteRepository.findById(Integer.valueOf(userInfo.get("source_id"))).get();
+        Note sourceNote = noteRepository.findById(Integer.valueOf(userInfo.get("source_id"))).get();
         linkEntity.setSourceNote(sourceNote);
         linkEntity.setUserEntity(sourceNote.getUserEntity());
         linkEntity.setType(userInfo.get("type"));
@@ -109,8 +109,8 @@ class TestabilityRestController {
 
     @PostMapping("/share_to_bazaar")
     public String shareToBazaar(@RequestBody HashMap<String, String> map) {
-        NoteEntity noteEntity = noteRepository.findFirstByTitle(map.get("noteTitle"));
-        modelFactoryService.toBazaarModel().shareNote(noteEntity.getNotebookEntity());
+        Note note = noteRepository.findFirstByTitle(map.get("noteTitle"));
+        modelFactoryService.toBazaarModel().shareNote(note.getNotebookEntity());
         return "OK";
     }
 

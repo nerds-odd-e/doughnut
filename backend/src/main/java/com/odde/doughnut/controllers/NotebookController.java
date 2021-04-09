@@ -50,12 +50,12 @@ public class NotebookController extends ApplicationMvcController  {
         if (bindingResult.hasErrors()) {
             return "notebooks/new";
         }
-        final NoteEntity noteEntity = new NoteEntity();
+        final Note note = new Note();
         UserEntity userEntity = getCurrentUser().getEntity();
-        noteEntity.updateNoteContent(noteContentEntity, userEntity);
-        noteEntity.buildNotebookEntityForHeadNote(ownershipEntity, userEntity);
-        modelFactoryService.noteRepository.save(noteEntity);
-        return "redirect:/notes/" + noteEntity.getId();
+        note.updateNoteContent(noteContentEntity, userEntity);
+        note.buildNotebookEntityForHeadNote(ownershipEntity, userEntity);
+        modelFactoryService.noteRepository.save(note);
+        return "redirect:/notes/" + note.getId();
     }
 
     @GetMapping({"/{notebookEntity}/edit"})

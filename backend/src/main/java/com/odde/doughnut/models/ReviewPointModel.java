@@ -1,7 +1,7 @@
 package com.odde.doughnut.models;
 
 import com.odde.doughnut.algorithms.SpacedRepetitionAlgorithm;
-import com.odde.doughnut.entities.NoteEntity;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.entities.ReviewSettingEntity;
 import com.odde.doughnut.services.ModelFactoryService;
@@ -14,10 +14,10 @@ public class ReviewPointModel extends ModelForEntity<ReviewPointEntity> {
     }
 
     public void initialReview(UserModel userModel, ReviewSettingEntity reviewSettingEntity, Timestamp currentUTCTimestamp) {
-        NoteEntity noteEntity = entity.getNoteEntity();
-        if (noteEntity != null) {
-            noteEntity.mergeMasterReviewSetting(reviewSettingEntity);
-            modelFactoryService.noteRepository.save(noteEntity);
+        Note note = entity.getNote();
+        if (note != null) {
+            note.mergeMasterReviewSetting(reviewSettingEntity);
+            modelFactoryService.noteRepository.save(note);
         }
         entity.setUserEntity(userModel.getEntity());
         entity.setInitialReviewedAt(currentUTCTimestamp);

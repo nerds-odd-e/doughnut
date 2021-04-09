@@ -23,12 +23,12 @@
 <div th:fragment="noteOwnerBreadcrumb(untilNote, additional)"
      th:replace="::noteBreadcrumbForOwnOrCircle(${untilNote.ancestors}, ${untilNote.notebookEntity.ownershipEntity}, ${additional})"/>
 
-<div th:fragment="card(note, button, cardHeader, linkFragment)">
+<div th:fragment="card(noteElement, button, cardHeader, linkFragment)">
     <div class="card">
         <div th:replace="${cardHeader}"/>
         <div class="card-body">
-            <h5 th:insert="__${linkFragment}__(${note})" class="card-title"/>
-            <p th:text="${#strings.abbreviate(note.noteContent.description, 50)}"/>
+            <h5 th:insert="__${linkFragment}__(${noteElement})" class="card-title"/>
+            <p th:text="${#strings.abbreviate(noteElement.noteContent.description, 50)}"/>
             <div th:replace="${button}">Put your button here</div>
         </div>
     </div>
@@ -36,8 +36,8 @@
 
 <div th:fragment="cards(notes, button, cardHeader)" th:with="linkFragment=${linkFragment} ?: ':: noteTitleWithLink'">
     <div class="row">
-        <div class="col-12 col-sm-6 col-md-4 col-lg-3" th:each="note:${notes}">
-            <div th:replace=":: card(${note}, ${button}, ${cardHeader}, ${linkFragment})"/>
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3" th:each="noteElement:${notes}">
+            <div th:replace=":: card(${noteElement}, ${button}, ${cardHeader}, ${linkFragment})"/>
         </div>
     </div>
 </div>
@@ -108,56 +108,56 @@
     </a>
 </div>
 
-<div th:fragment="showPicture(noteEntity, opacity)" th:object="${noteEntity}" class="text-center" th:unless="${#strings.isEmpty(noteEntity.notePicture)}">
+<div th:fragment="showPicture(note, opacity)" th:object="${note}" class="text-center" th:unless="${#strings.isEmpty(note.notePicture)}">
     <div style="position: relative; display: inline-block;" id="note-picture">
         <img class="img-fluid" th:src="*{notePicture}"/>
         <svg viewBox="0 0 100 100"
              style="  position: absolute; top: 0; left: 0; color: #11f1f1; width: 100%; height: 100%;">
-            <rect th:remove="tag" th:utext="${noteEntity.noteContent.getPictureMaskSvg(opacity)}"/>
+            <rect th:remove="tag" th:utext="${note.noteContent.getPictureMaskSvg(opacity)}"/>
         </svg>
     </div>
 </div>
 
-<div th:fragment="noteShowWithTitle(noteEntity, level, titleHtml, bodyHtml)" th:object="${noteEntity}">
-    <div th:object="${noteEntity.noteContent}">
+<div th:fragment="noteShowWithTitle(note, level, titleHtml, bodyHtml)" th:object="${note}">
+    <div th:object="${note.noteContent}">
         <h2 th:replace="${titleHtml}"/>
         <div th:replace="${bodyHtml}"/>
-        <div th:unless="${#strings.isEmpty(noteEntity.noteContent.url)}">
+        <div th:unless="${#strings.isEmpty(note.noteContent.url)}">
             <label th:unless="*{urlIsVideo}">Url:</label>
             <label th:if="*{urlIsVideo}">Video Url:</label>
             <a th:href="*{url}" th:text="*{url}"/>
         </div>
     </div>
 
-    <div th:replace=":: showPicture(${noteEntity}, 0.2)"/>
+    <div th:replace=":: showPicture(${note}, 0.2)"/>
 
-    <p th:each="linkType:${noteEntity.linkTypes()}">
+    <p th:each="linkType:${note.linkTypes()}">
         <span th:text="${linkType.label}"/>
-        <span class="badge badge-light mr-1" th:each="link:${noteEntity.linksOfTypeThroughDirect(linkType)}">
+        <span class="badge badge-light mr-1" th:each="link:${note.linksOfTypeThroughDirect(linkType)}">
             <span th:replace=":: linkWithHtmlLink(${link}, ${link.targetNote})"/>
         </span>
-        <span class="badge badge-warning mr-1" th:each="link:${noteEntity.linksOfTypeThroughReverse(linkType)}">
+        <span class="badge badge-warning mr-1" th:each="link:${note.linksOfTypeThroughReverse(linkType)}">
             <span th:replace=":: linkWithHtmlLink(${link}, ${link.sourceNote})"/>
         </span>
     </p>
 </div>
 
-<div th:fragment="noteShow(noteEntity, level)"
-     th:replace=":: noteShowWithTitle(${noteEntity}, ${level}, ~{:: .note-title-show}, ~{:: .note-body-show})">
-    <h2 class="note-title-show" th:class="'h' + ${level}" th:text="${noteEntity.noteContent.title}"/>
-    <pre class="note-body-show note-body" th:text="${noteEntity.noteContent.description}" style="white-space: pre-wrap;"/>
+<div th:fragment="noteShow(note, level)"
+     th:replace=":: noteShowWithTitle(${note}, ${level}, ~{:: .note-title-show}, ~{:: .note-body-show})">
+    <h2 class="note-title-show" th:class="'h' + ${level}" th:text="${note.noteContent.title}"/>
+    <pre class="note-body-show note-body" th:text="${note.noteContent.description}" style="white-space: pre-wrap;"/>
 </div>
 
-<div th:fragment="noteAsArticle(noteEntity, level)">
-    <div th:replace=":: noteShowWithTitle(${noteEntity}, ${level}, ~{::.note-title-article}, ~{::.note-body-article})">
-        <h2 class="note-title-article" th:class="'h' + ${level}" th:text="${noteEntity.articleTitle}"
-            th:if="${noteEntity.hasTitleInArticle}"/>
-        <span class="note-title-article" th:unless="${noteEntity.hasTitleInArticle}"/>
-        <pre class="note-body-article note-body" th:text="${noteEntity.articleBody}" style="white-space: pre-wrap; margin-bottom: 0;"/>
+<div th:fragment="noteAsArticle(note, level)">
+    <div th:replace=":: noteShowWithTitle(${note}, ${level}, ~{::.note-title-article}, ~{::.note-body-article})">
+        <h2 class="note-title-article" th:class="'h' + ${level}" th:text="${note.articleTitle}"
+            th:if="${note.hasTitleInArticle}"/>
+        <span class="note-title-article" th:unless="${note.hasTitleInArticle}"/>
+        <pre class="note-body-article note-body" th:text="${note.articleBody}" style="white-space: pre-wrap; margin-bottom: 0;"/>
     </div>
 
     <ul style="padding-left: 0px;">
-        <th:block th:each="child:${noteEntity.children}">
+        <th:block th:each="child:${note.children}">
             <li style="margin-left:25px;" class="article-view" th:if="${child.noteContent.showAsBulletInArticle}" th:insert=" :: noteAsArticle(${child}, ${1 + level})"/>
             <div style="margin-bottom:5px;" th:unless="${child.noteContent.showAsBulletInArticle}" th:insert=" :: noteAsArticle(${child}, ${1 + level})"/>
         </th:block>

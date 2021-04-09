@@ -1,6 +1,6 @@
 package com.odde.doughnut.models;
 
-import com.odde.doughnut.entities.NoteEntity;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionDirector;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
@@ -37,10 +37,10 @@ class QuizQuestionTypesTest {
 
     @Nested
     class LinkSourceExclusive {
-        NoteEntity top;
-        NoteEntity target;
-        NoteEntity source;
-        NoteEntity anotherSource;
+        Note top;
+        Note target;
+        Note source;
+        Note anotherSource;
         ReviewPointEntity reviewPointEntity;
 
         @BeforeEach
@@ -60,7 +60,7 @@ class QuizQuestionTypesTest {
 
         @Nested
         class WithValidExclusiveAnswer {
-            NoteEntity notRelated;
+            Note notRelated;
 
             @BeforeEach
             void setup() {

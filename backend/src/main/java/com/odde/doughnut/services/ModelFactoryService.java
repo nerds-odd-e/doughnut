@@ -22,12 +22,12 @@ public class ModelFactoryService {
     @Autowired public NotebookRepository notebookRepository;
     @Autowired public EntityManager entityManager;
 
-    public TreeNodeModel toTreeNodeModel(NoteEntity note) {
+    public TreeNodeModel toTreeNodeModel(Note note) {
         return new TreeNodeModel(note, this);
     }
 
-    public NoteMotionModel toNoteMotionModel(NoteMotionEntity noteMotionEntity, NoteEntity noteEntity) {
-        noteMotionEntity.setSubject(noteEntity);
+    public NoteMotionModel toNoteMotionModel(NoteMotionEntity noteMotionEntity, Note note) {
+        noteMotionEntity.setSubject(note);
         return new NoteMotionModel(noteMotionEntity, this);
     }
 
@@ -39,7 +39,7 @@ public class ModelFactoryService {
         return userRepository.findById(id);
     }
 
-    public Optional<NoteEntity> findNoteById(Integer noteId) {
+    public Optional<Note> findNoteById(Integer noteId) {
         return noteRepository.findById(noteId);
     }
 

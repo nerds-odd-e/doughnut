@@ -1,6 +1,5 @@
 package com.odde.doughnut.testability.builders;
 
-import com.odde.doughnut.entities.NoteEntity;
 import com.odde.doughnut.entities.NotebookEntity;
 import com.odde.doughnut.entities.SubscriptionEntity;
 import com.odde.doughnut.entities.UserEntity;

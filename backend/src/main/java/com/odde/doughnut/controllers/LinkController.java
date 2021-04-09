@@ -2,7 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.LinkEntity;
-import com.odde.doughnut.entities.NoteEntity;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.models.LinkModel;
 import com.odde.doughnut.services.ModelFactoryService;
@@ -31,18 +31,18 @@ public class LinkController extends ApplicationMvcController  {
         return "links/show";
     }
 
-    @GetMapping("/{noteEntity}/link")
-    public String link( @PathVariable("noteEntity") NoteEntity noteEntity, @RequestParam(required = false) String searchTerm, Model model) {
-        List<NoteEntity> linkableNotes = currentUserFetcher.getUser().filterLinkableNotes(noteEntity, searchTerm);
+    @GetMapping("/{note}/link")
+    public String link(@PathVariable("note") Note note, @RequestParam(required = false) String searchTerm, Model model) {
+        List<Note> linkableNotes = currentUserFetcher.getUser().filterLinkableNotes(note, searchTerm);
         model.addAttribute("linkableNotes", linkableNotes);
         return "links/new";
     }
 
-    @PostMapping(value = "/{noteEntity}/link", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public String linkNote(@PathVariable("noteEntity") NoteEntity noteEntity, Integer targetNoteId, Model model) throws NoAccessRightException {
-        NoteEntity targetNote = modelFactoryService.noteRepository.findById(targetNoteId).get();
+    @PostMapping(value = "/{note}/link", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    public String linkNote(@PathVariable("note") Note note, Integer targetNoteId, Model model) throws NoAccessRightException {
+        Note targetNote = modelFactoryService.noteRepository.findById(targetNoteId).get();
         LinkEntity linkEntity = new LinkEntity();
-        linkEntity.setSourceNote(noteEntity);
+        linkEntity.setSourceNote(note);
         linkEntity.setTargetNote(targetNote);
         linkEntity.setType(LinkEntity.LinkType.RELATED_TO.label);
         model.addAttribute("linkEntity", linkEntity);

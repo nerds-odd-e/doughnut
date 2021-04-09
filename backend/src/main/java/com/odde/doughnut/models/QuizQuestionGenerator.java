@@ -1,6 +1,6 @@
 package com.odde.doughnut.models;
 
-import com.odde.doughnut.entities.NoteEntity;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.entities.ReviewSettingEntity;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionDirector;
@@ -26,15 +26,15 @@ public class QuizQuestionGenerator {
             Collections.addAll(questionTypes, reviewPointEntity.getLinkEntity().getLinkType().getQuestionTypes());
         }
         else {
-            NoteEntity noteEntity = reviewPointEntity.getNoteEntity();
-            if (!Strings.isEmpty(noteEntity.getNoteContent().getDescription())) {
-                ReviewSettingEntity reviewSettingEntity = noteEntity.getMasterReviewSettingEntity();
+            Note note = reviewPointEntity.getNote();
+            if (!Strings.isEmpty(note.getNoteContent().getDescription())) {
+                ReviewSettingEntity reviewSettingEntity = note.getMasterReviewSettingEntity();
                 if (reviewSettingEntity != null && reviewSettingEntity.getRememberSpelling()) {
                     questionTypes.add(QuizQuestion.QuestionType.SPELLING);
                 }
                 questionTypes.add(QuizQuestion.QuestionType.CLOZE_SELECTION);
             }
-            if (!Strings.isEmpty(noteEntity.getNotePicture())) {
+            if (!Strings.isEmpty(note.getNotePicture())) {
                 questionTypes.add(QuizQuestion.QuestionType.PICTURE_TITLE);
                 questionTypes.add(QuizQuestion.QuestionType.PICTURE_SELECTION);
             }

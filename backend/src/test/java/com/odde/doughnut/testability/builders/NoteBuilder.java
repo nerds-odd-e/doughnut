@@ -8,11 +8,11 @@ import com.odde.doughnut.testability.MakeMe;
 
 import java.sql.Timestamp;
 
-public class NoteBuilder extends EntityBuilder<NoteEntity> {
+public class NoteBuilder extends EntityBuilder<Note> {
     static final TestObjectCounter titleCounter = new TestObjectCounter(n->"title" + n);
 
-    public NoteBuilder(NoteEntity noteEntity, MakeMe makeMe){
-        super(makeMe, noteEntity);
+    public NoteBuilder(Note note, MakeMe makeMe){
+        super(makeMe, note);
         title(titleCounter.generate());
         description("descrption");
         createdAt(new Timestamp(System.currentTimeMillis()));
@@ -27,18 +27,18 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
         return byUser(userModel.getEntity());
     }
 
-    public NoteBuilder under(NoteEntity parentNote) {
+    public NoteBuilder under(Note parentNote) {
         entity.setParentNote(parentNote);
         return this;
     }
 
-    public NoteBuilder linkTo(NoteEntity referTo) {
+    public NoteBuilder linkTo(Note referTo) {
         return linkTo(referTo, LinkEntity.LinkType.BELONGS_TO);
 
     }
 
 
-    public NoteBuilder linkTo(NoteEntity referTo, LinkEntity.LinkType linkType) {
+    public NoteBuilder linkTo(Note referTo, LinkEntity.LinkType linkType) {
         LinkEntity linkEntity = new LinkEntity();
         linkEntity.setTargetNote(referTo);
         linkEntity.setSourceNote(entity);
@@ -63,7 +63,7 @@ public class NoteBuilder extends EntityBuilder<NoteEntity> {
     @Override
     protected void beforeCreate(boolean needPersist) {
         if (entity.getUserEntity() == null) {
-            NoteEntity parent = entity.getParentNote();
+            Note parent = entity.getParentNote();
             if (parent != null && parent.getUserEntity() != null) {
                 byUser(parent.getUserEntity());
             }else{

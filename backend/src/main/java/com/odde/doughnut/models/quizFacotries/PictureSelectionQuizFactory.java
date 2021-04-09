@@ -1,22 +1,22 @@
 package com.odde.doughnut.models.quizFacotries;
 
-import com.odde.doughnut.entities.NoteEntity;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.models.QuizQuestion;
 
 import java.util.List;
 
 public class PictureSelectionQuizFactory implements QuizQuestionFactory {
-    private final NoteEntity answerNote;
+    private final Note answerNote;
     private final QuizQuestionServant servant;
 
     public PictureSelectionQuizFactory(QuizQuestionServant servant, ReviewPointEntity reviewPointEntity) {
         this.servant = servant;
-        this.answerNote = reviewPointEntity.getNoteEntity();
+        this.answerNote = reviewPointEntity.getNote();
     }
 
     @Override
-    public List<NoteEntity> generateFillingOptions() {
+    public List<Note> generateFillingOptions() {
         return servant.choose5FromSiblings(answerNote, n -> n.getNoteContent().hasPicture() && !n.equals(answerNote));
     }
 
@@ -31,12 +31,12 @@ public class PictureSelectionQuizFactory implements QuizQuestionFactory {
     }
 
     @Override
-    public NoteEntity generateAnswerNote() {
+    public Note generateAnswerNote() {
         return answerNote;
     }
 
     @Override
-    public List<QuizQuestion.Option> toQuestionOptions(List<NoteEntity> noteEntities) {
+    public List<QuizQuestion.Option> toQuestionOptions(List<Note> noteEntities) {
         return servant.toPictureOptions(noteEntities);
     }
 

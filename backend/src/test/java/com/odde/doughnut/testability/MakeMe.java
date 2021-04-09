@@ -20,14 +20,14 @@ public class MakeMe {
     }
 
     public NoteBuilder aNote() {
-        return new NoteBuilder(new NoteEntity(), this);
+        return new NoteBuilder(new Note(), this);
     }
 
     public NoteBuilder aNote(String title) {
         return aNote().title(title);
     }
-    public NoteBuilder theNote(NoteEntity noteEntity) {
-        return new NoteBuilder(noteEntity, this);
+    public NoteBuilder theNote(Note note) {
+        return new NoteBuilder(note, this);
     }
     public BazaarNotebookBuilder aBazaarNodebook(NotebookEntity notebookEntity) {
         return new BazaarNotebookBuilder(this, notebookEntity);
@@ -59,9 +59,9 @@ public class MakeMe {
         return new FakeBindingResult(true);
     }
 
-    public ReviewPointBuilder aReviewPointFor(NoteEntity noteEntity) {
+    public ReviewPointBuilder aReviewPointFor(Note note) {
         ReviewPointEntity reviewPointEntity = new ReviewPointEntity();
-        return new ReviewPointBuilder(reviewPointEntity, this).forNote(noteEntity);
+        return new ReviewPointBuilder(reviewPointEntity, this).forNote(note);
     }
 
     public ReviewPointBuilder aReviewPointFor(LinkEntity linkEntity) {

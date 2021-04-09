@@ -1,6 +1,6 @@
 package com.odde.doughnut.models;
 
-import com.odde.doughnut.entities.NoteEntity;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteMotionEntity;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.services.ModelFactoryService;
@@ -26,9 +26,9 @@ public class NoteMotionModelTest {
     ModelFactoryService modelFactoryService;
 
     @Autowired MakeMe makeMe;
-    NoteEntity topNote;
-    NoteEntity firstChild;
-    NoteEntity secondChild;
+    Note topNote;
+    Note firstChild;
+    Note secondChild;
 
     @BeforeEach
     void setup() {
@@ -40,7 +40,7 @@ public class NoteMotionModelTest {
         makeMe.refresh(secondChild);
     }
 
-    void move(NoteEntity subject, NoteEntity relativeNote, boolean asFirstChildOfNote) throws CyclicLinkDetectedException {
+    void move(Note subject, Note relativeNote, boolean asFirstChildOfNote) throws CyclicLinkDetectedException {
         NoteMotionEntity motion = new NoteMotionEntity(relativeNote, asFirstChildOfNote);
         NoteMotionModel noteMotionModel = modelFactoryService.toNoteMotionModel(motion, subject);
         noteMotionModel.execute();
@@ -52,8 +52,8 @@ public class NoteMotionModelTest {
         assertOrder(secondChild, firstChild);
     }
 
-    private void assertOrder(NoteEntity note1, NoteEntity note2) {
-        NoteEntity parentNote = note1.getParentNote();
+    private void assertOrder(Note note1, Note note2) {
+        Note parentNote = note1.getParentNote();
         makeMe.refresh(parentNote);
         assertThat(parentNote.getChildren(), containsInRelativeOrder(note1, note2));
     }
@@ -85,8 +85,8 @@ public class NoteMotionModelTest {
 
     @Nested
     class WhenThereIsAThirdLevel {
-        NoteEntity thirdLevel;
-        NoteEntity forthLevel;
+        Note thirdLevel;
+        Note forthLevel;
 
         @BeforeEach
         void setup() {
@@ -119,7 +119,7 @@ public class NoteMotionModelTest {
 
     @Nested
     class WhenThereIsAThirdChild {
-        NoteEntity thirdChild;
+        Note thirdChild;
 
         @BeforeEach
         void setup() {

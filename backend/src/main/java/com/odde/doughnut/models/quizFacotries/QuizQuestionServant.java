@@ -1,6 +1,6 @@
 package com.odde.doughnut.models.quizFacotries;
 
-import com.odde.doughnut.entities.NoteEntity;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.models.QuizQuestion;
 import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.services.ModelFactoryService;
@@ -19,26 +19,26 @@ public class QuizQuestionServant {
         this.modelFactoryService = modelFactoryService;
     }
 
-    List<QuizQuestion.Option> toPictureOptions(List<NoteEntity> selectedList) {
+    List<QuizQuestion.Option> toPictureOptions(List<Note> selectedList) {
         return selectedList.stream().map(QuizQuestion.Option::createPictureOption).collect(Collectors.toUnmodifiableList());
     }
 
-    List<QuizQuestion.Option> toTitleOptions(List<NoteEntity> selectedList) {
+    List<QuizQuestion.Option> toTitleOptions(List<Note> selectedList) {
         return selectedList.stream().map(QuizQuestion.Option::createTitleOption).collect(Collectors.toUnmodifiableList());
     }
 
-    List<NoteEntity> choose5FromSiblings(NoteEntity answerNote, Predicate<NoteEntity> noteEntityPredicate) {
-        List<NoteEntity> siblings = answerNote.getSiblings();
-        Stream<NoteEntity> noteEntityStream = siblings.stream()
-                .filter(noteEntityPredicate);
-        List<NoteEntity> list = noteEntityStream.collect(Collectors.toList());
+    List<Note> choose5FromSiblings(Note answerNote, Predicate<Note> notePredicate) {
+        List<Note> siblings = answerNote.getSiblings();
+        Stream<Note> noteStream = siblings.stream()
+                .filter(notePredicate);
+        List<Note> list = noteStream.collect(Collectors.toList());
         return randomizer.randomlyChoose(5, list);
     }
 
-    List<NoteEntity> randomlyChooseAndEnsure(List<NoteEntity> candidates, NoteEntity ensure, int maxSize) {
-        List<NoteEntity> list = candidates.stream()
+    List<Note> randomlyChooseAndEnsure(List<Note> candidates, Note ensure, int maxSize) {
+        List<Note> list = candidates.stream()
                 .filter(n -> !n.equals(ensure)).collect(Collectors.toList());
-        List<NoteEntity> selectedList = this.randomizer.randomlyChoose(maxSize - 1, list);
+        List<Note> selectedList = this.randomizer.randomlyChoose(maxSize - 1, list);
         selectedList.add(ensure);
         return selectedList;
     }

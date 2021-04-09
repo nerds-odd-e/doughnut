@@ -25,7 +25,7 @@ public class UserEntity {
 
     @OneToMany(mappedBy = "userEntity")
     @JsonIgnore
-    @Getter @Setter private List<NoteEntity> notes = new ArrayList<>();
+    @Getter @Setter private List<Note> notes = new ArrayList<>();
 
     @OneToMany(mappedBy = "userEntity")
     @JsonIgnore

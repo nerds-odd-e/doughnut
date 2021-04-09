@@ -1,6 +1,6 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.entities.NoteEntity;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,13 +30,13 @@ class BazaarControllerTest {
 
     @Test
     void itShouldNotAllowVisitingAnyNote() {
-        NoteEntity note = makeMe.aNote().please();
+        Note note = makeMe.aNote().please();
         assertThrows(NoAccessRightException.class, ()-> controller.showBazaarNote(note));
     }
 
     @Test
     void itShouldAllowVisitingBazaarNote() throws NoAccessRightException {
-        NoteEntity note = makeMe.aNote().please();
+        Note note = makeMe.aNote().please();
         makeMe.aBazaarNodebook(note.getNotebookEntity()).please();
         assertThat(controller.showBazaarNote(note), equalTo("bazaar/show"));
     }

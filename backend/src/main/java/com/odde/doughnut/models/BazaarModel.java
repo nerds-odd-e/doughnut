@@ -1,7 +1,7 @@
 package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.BazaarNotebookEntity;
-import com.odde.doughnut.entities.NoteEntity;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NotebookEntity;
 import com.odde.doughnut.entities.repositories.BazaarNotebookRepository;
 import com.odde.doughnut.exceptions.NoAccessRightException;
@@ -30,8 +30,8 @@ public class BazaarModel {
         bazaarNotebookRepository.save(bazaarNotebookEntity);
     }
 
-    public void assertAuthentication(NoteEntity noteEntity) throws NoAccessRightException {
-        if(bazaarNotebookRepository.findByNotebookEntity(noteEntity.getNotebookEntity()) == null) {
+    public void assertAuthentication(Note note) throws NoAccessRightException {
+        if(bazaarNotebookRepository.findByNotebookEntity(note.getNotebookEntity()) == null) {
             throw new NoAccessRightException();
         }
     }

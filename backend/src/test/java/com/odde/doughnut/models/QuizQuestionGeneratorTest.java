@@ -1,7 +1,7 @@
 package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.LinkEntity;
-import com.odde.doughnut.entities.NoteEntity;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.testability.MakeMe;
@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class QuizQuestionGeneratorTest {
     MakeMe makeMe = new MakeMe();
     private Randomizer randomizer = new NonRandomizer();
-    NoteEntity note = makeMe.aNote().inMemoryPlease();
+    Note note = makeMe.aNote().inMemoryPlease();
 
     @Test
     void clozeSelection() {
@@ -37,7 +37,7 @@ class QuizQuestionGeneratorTest {
 
     @Test
     void linkExclusive() {
-        NoteEntity note2 = makeMe.aNote().linkTo(note).inMemoryPlease();
+        Note note2 = makeMe.aNote().linkTo(note).inMemoryPlease();
         ReviewPointEntity reviewPoint = makeMe.aReviewPointFor(note2.getLinks().get(0)).inMemoryPlease();
         List<QuizQuestion.QuestionType> questionTypes = getQuestionTypes(reviewPoint);
         assertThat(questionTypes, containsInAnyOrder(LINK_TARGET, LINK_SOURCE_EXCLUSIVE));
@@ -45,7 +45,7 @@ class QuizQuestionGeneratorTest {
 
     @Test
     void notAllLinkQuestionAreAvailableToAllLinkTypes() {
-        NoteEntity note2 = makeMe.aNote().linkTo(note, LinkEntity.LinkType.RELATED_TO).inMemoryPlease();
+        Note note2 = makeMe.aNote().linkTo(note, LinkEntity.LinkType.RELATED_TO).inMemoryPlease();
         ReviewPointEntity reviewPoint = makeMe.aReviewPointFor(note2.getLinks().get(0)).inMemoryPlease();
         List<QuizQuestion.QuestionType> questionTypes = getQuestionTypes(reviewPoint);
         assertTrue(questionTypes.isEmpty());

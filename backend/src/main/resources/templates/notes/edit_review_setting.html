@@ -3,11 +3,11 @@
 
     <div class="container content">
         <h2>Edit Review Setting</h2>
-        <div th:replace="_fragments/note_fragments :: noteOwnerBreadcrumb(${noteEntity}, ~{:: .additional-item})">
-            <li class="breadcrumb-item additional-item" th:text="${noteEntity.title}"/>
+        <div th:replace="_fragments/note_fragments :: noteOwnerBreadcrumb(${note}, ~{:: .additional-item})">
+            <li class="breadcrumb-item additional-item" th:text="${note.title}"/>
         </div>
 
-        <form id="review-setting" action="#" th:action="@{/notes/{id}/review_setting(id=${noteEntity.id})}" th:object="${reviewSettingEntity}" method="post">
+        <form id="review-setting" action="#" th:action="@{/notes/{id}/review_setting(id=${note.id})}" th:object="${reviewSettingEntity}" method="post">
             <div th:replace="_fragments/note_fragments :: reviewSettingForm(${reviewSettingEntity})"/>
             <input type="submit" value="Update" class="btn btn-primary"/>
         </div>

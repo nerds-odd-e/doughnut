@@ -74,11 +74,11 @@ public class LinkEntity {
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "source_id", referencedColumnName = "id")
-    @Getter @Setter private NoteEntity sourceNote;
+    @Getter @Setter private Note sourceNote;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "target_id", referencedColumnName = "id")
-    @Getter @Setter private NoteEntity targetNote;
+    @Getter @Setter private Note targetNote;
 
     @Column(name = "type")
     @Getter
@@ -103,7 +103,7 @@ public class LinkEntity {
         return LinkType.fromString(type);
     }
 
-    public List<NoteEntity> getBackwardPeers() {
+    public List<Note> getBackwardPeers() {
         return targetNote.linkedNotesOfType(getLinkType().reverseType());
     }
 

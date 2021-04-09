@@ -1,6 +1,6 @@
 package com.odde.doughnut.models;
 
-import com.odde.doughnut.entities.NoteEntity;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -33,23 +33,23 @@ public class UserModelAuthorityTest {
     @Nested
     class noteBelongsToACircle {
         CircleModel circleModel;
-        NoteEntity noteEntity;
+        Note note;
 
         @BeforeEach
         void setup() {
             circleModel = makeMe.aCircle().toModelPlease();
-            noteEntity = makeMe.aNote().byUser(makeMe.aUser().please()).inCircle(circleModel).please();
+            note = makeMe.aNote().byUser(makeMe.aUser().please()).inCircle(circleModel).please();
         }
 
         @Test
         void userCanNotAccessNotesBelongToCircle() {
-            assertFalse(userModel.hasFullAuthority(noteEntity));
+            assertFalse(userModel.hasFullAuthority(note));
         }
 
         @Test
         void userCanAccessNotesBelongToCircleIfIsAMember() {
             makeMe.theCircle(circleModel).hasMember(userModel).please();
-            assertTrue(userModel.hasFullAuthority(noteEntity));
+            assertTrue(userModel.hasFullAuthority(note));
         }
     }
 }

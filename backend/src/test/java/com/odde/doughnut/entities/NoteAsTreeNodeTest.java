@@ -18,8 +18,8 @@ import static org.hamcrest.Matchers.*;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
-public class NoteEntityAsTreeNodeTest {
-    NoteEntity topLevel;
+public class NoteAsTreeNodeTest {
+    Note topLevel;
     @Autowired MakeMe makeMe;
 
     @BeforeEach
@@ -32,16 +32,16 @@ public class NoteEntityAsTreeNodeTest {
 
         @Test
         void topLevelNoteHaveEmptyAncestors() {
-            List<NoteEntity> ancestors = topLevel.getAncestorsIncludingMe();
+            List<Note> ancestors = topLevel.getAncestorsIncludingMe();
             assertThat(ancestors, contains(topLevel));
         }
 
         @Test
         void childHasParentInAncestors() {
-            NoteEntity subject = makeMe.aNote("subject").under(topLevel).please();
-            NoteEntity sibling = makeMe.aNote("sibling").under(topLevel).please();
+            Note subject = makeMe.aNote("subject").under(topLevel).please();
+            Note sibling = makeMe.aNote("sibling").under(topLevel).please();
 
-            List<NoteEntity> ancestry = subject.getAncestorsIncludingMe();
+            List<Note> ancestry = subject.getAncestorsIncludingMe();
             assertThat(ancestry, contains(topLevel, subject));
             assertThat(ancestry, not(contains(sibling)));
         }
@@ -52,16 +52,16 @@ public class NoteEntityAsTreeNodeTest {
 
         @Test
         void topNoteHasNoSiblings() {
-            NoteEntity subjectNote = makeMe.aNote().please();
-            NoteEntity nextTopLevel = makeMe.aNote().please();
+            Note subjectNote = makeMe.aNote().please();
+            Note nextTopLevel = makeMe.aNote().please();
 
             assertNavigation(subjectNote, null, null, null, null);
         }
 
         @Nested
         class TopLevelNoteHasAChild {
-            NoteEntity child;
-            NoteEntity nephew;
+            Note child;
+            Note nephew;
 
             @BeforeEach
             void setup() {
@@ -89,7 +89,7 @@ public class NoteEntityAsTreeNodeTest {
 
             @Nested
             class ChildHasGrandchild {
-                NoteEntity grandchild;
+                Note grandchild;
 
                 @BeforeEach
                 void setup() {
@@ -118,7 +118,7 @@ public class NoteEntityAsTreeNodeTest {
             }
         }
 
-        private void assertNavigation(NoteEntity entity, NoteEntity previousSibling, NoteEntity previous, NoteEntity next, NoteEntity nextSibling) {
+        private void assertNavigation(Note entity, Note previousSibling, Note previous, Note next, Note nextSibling) {
             assertThat(entity.getPreviousSibling(), equalTo(previousSibling));
             assertThat(entity.getPrevious(), equalTo(previous));
             assertThat(entity.getNext(), equalTo(next));

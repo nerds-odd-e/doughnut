@@ -1,7 +1,7 @@
 package com.odde.doughnut.models.quizFacotries;
 
 import com.odde.doughnut.entities.LinkEntity;
-import com.odde.doughnut.entities.NoteEntity;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.models.QuizQuestion;
 
@@ -17,9 +17,9 @@ public class LinkTargetExclusiveQuizFactory implements QuizQuestionFactory {
     }
 
     @Override
-    public List<NoteEntity> generateFillingOptions() {
-        NoteEntity sourceNote = linkEntity.getSourceNote();
-        List<NoteEntity> backwardPeers = linkEntity.getBackwardPeers();
+    public List<Note> generateFillingOptions() {
+        Note sourceNote = linkEntity.getSourceNote();
+        List<Note> backwardPeers = linkEntity.getBackwardPeers();
         return servant.randomlyChooseAndEnsure(backwardPeers, sourceNote, 5);
     }
 
@@ -34,16 +34,16 @@ public class LinkTargetExclusiveQuizFactory implements QuizQuestionFactory {
     }
 
     @Override
-    public NoteEntity generateAnswerNote() {
-        NoteEntity note = linkEntity.getSourceNote();
-        List<NoteEntity> siblings = note.getSiblings();
+    public Note generateAnswerNote() {
+        Note note = linkEntity.getSourceNote();
+        List<Note> siblings = note.getSiblings();
         siblings.removeAll(linkEntity.getBackwardPeers());
         siblings.remove(linkEntity.getTargetNote());
         return servant.randomizer.chooseOneRandomly(siblings);
     }
 
     @Override
-    public List<QuizQuestion.Option> toQuestionOptions(List<NoteEntity> noteEntities) {
-        return servant.toTitleOptions(noteEntities);
+    public List<QuizQuestion.Option> toQuestionOptions(List<Note> notes) {
+        return servant.toTitleOptions(notes);
     }
 }

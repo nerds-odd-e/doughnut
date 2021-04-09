@@ -22,7 +22,7 @@ import static java.util.stream.Collectors.toList;
 
 @Entity
 @Table(name = "note")
-public class NoteEntity {
+public class Note {
     @Id
     @Getter
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -69,7 +69,7 @@ public class NoteEntity {
     @Setter
     private List<LinkEntity> refers = new ArrayList<>();
 
-    @OneToMany(mappedBy = "noteEntity", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "note", cascade = CascadeType.ALL)
     @JsonIgnore
     @OrderBy("depth DESC")
     @Getter
@@ -92,14 +92,14 @@ public class NoteEntity {
     @WhereJoinTable(clause = "depth = 1")
     @OrderBy("sibling_order")
     @Getter
-    private final List<NoteEntity> children = new ArrayList<>();
+    private final List<Note> children = new ArrayList<>();
 
     @Override
     public String toString() {
         return "Note{" + "id=" + id + ", title='" + noteContent.getTitle() + '\'' + '}';
     }
 
-    public List<NoteEntity> getTargetNotes() {
+    public List<Note> getTargetNotes() {
         return links.stream().map(LinkEntity::getTargetNote).collect(toList());
     }
 
@@ -121,8 +121,8 @@ public class NoteEntity {
                 .collect(Collectors.toUnmodifiableList());
     }
 
-    public List<NoteEntity> linkedNotesOfType(LinkEntity.LinkType linkType) {
-        List<NoteEntity> notes = new ArrayList<>();
+    public List<Note> linkedNotesOfType(LinkEntity.LinkType linkType) {
+        List<Note> notes = new ArrayList<>();
         linksOfTypeThroughDirect(linkType).forEach(lk -> notes.add(lk.getTargetNote()));
         linksOfTypeThroughReverse(linkType).forEach(lk -> notes.add(lk.getSourceNote()));
         return notes;
@@ -139,11 +139,11 @@ public class NoteEntity {
         return getParentNote() == null;
     }
 
-    private void addAncestors(List<NoteEntity> ancestors) {
+    private void addAncestors(List<Note> ancestors) {
         int[] counter = {1};
         ancestors.forEach(anc -> {
             NotesClosureEntity notesClosureEntity = new NotesClosureEntity();
-            notesClosureEntity.setNoteEntity(this);
+            notesClosureEntity.setNote(this);
             notesClosureEntity.setAncestorEntity(anc);
             notesClosureEntity.setDepth(counter[0]);
             getNotesClosures().add(0, notesClosureEntity);
@@ -151,37 +151,37 @@ public class NoteEntity {
         });
     }
 
-    public void setParentNote(NoteEntity parentNote) {
+    public void setParentNote(Note parentNote) {
         if (parentNote == null) return;
         notebookEntity = parentNote.getNotebookEntity();
-        List<NoteEntity> ancestorsIncludingMe = parentNote.getAncestorsIncludingMe();
+        List<Note> ancestorsIncludingMe = parentNote.getAncestorsIncludingMe();
         Collections.reverse(ancestorsIncludingMe);
         addAncestors(ancestorsIncludingMe);
     }
 
-    public List<NoteEntity> getAncestorsIncludingMe() {
-        List<NoteEntity> ancestors = getAncestors();
+    public List<Note> getAncestorsIncludingMe() {
+        List<Note> ancestors = getAncestors();
         ancestors.add(this);
         return ancestors;
     }
 
-    public List<NoteEntity> getAncestors() {
+    public List<Note> getAncestors() {
         return getNotesClosures().stream().map(NotesClosureEntity::getAncestorEntity).collect(toList());
     }
 
-    public void traverseBreadthFirst(Consumer<NoteEntity> noteEntityConsumer) {
-        descendantNCs.stream().map(NotesClosureEntity::getNoteEntity).forEach(noteEntityConsumer);
+    public void traverseBreadthFirst(Consumer<Note> noteConsumer) {
+        descendantNCs.stream().map(NotesClosureEntity::getNote).forEach(noteConsumer);
     }
 
-    public NoteEntity getParentNote() {
-        List<NoteEntity> ancestors = getAncestors();
+    public Note getParentNote() {
+        List<Note> ancestors = getAncestors();
         if (ancestors.size() == 0) {
             return null;
         }
         return ancestors.get(ancestors.size() - 1);
     }
 
-    public List<NoteEntity> getSiblings() {
+    public List<Note> getSiblings() {
         if (getParentNote() == null) {
             return new ArrayList<>();
         }
@@ -213,25 +213,25 @@ public class NoteEntity {
         BeanUtils.copyProperties(noteContentEntity, getNoteContent());
     }
 
-    public NoteEntity getPreviousSibling() {
+    public Note getPreviousSibling() {
         return getSiblings().stream()
                 .filter(nc -> nc.siblingOrder < siblingOrder)
                 .reduce((f, s) -> s).orElse(null);
     }
 
-    public NoteEntity getNextSibling() {
+    public Note getNextSibling() {
         return getSiblings().stream()
                 .filter(nc -> nc.siblingOrder > siblingOrder)
                 .findFirst().orElse(null);
     }
 
-    public NoteEntity getPrevious() {
-        NoteEntity result = getPreviousSibling();
+    public Note getPrevious() {
+        Note result = getPreviousSibling();
         if (result == null) {
             return getParentNote();
         }
         while (true) {
-            List<NoteEntity> children = result.getChildren();
+            List<Note> children = result.getChildren();
             if (children.size() == 0) {
                 return result;
             }
@@ -239,18 +239,18 @@ public class NoteEntity {
         }
     }
 
-    private NoteEntity getFirstChild() {
+    private Note getFirstChild() {
         return getChildren().stream().findFirst().orElse(null);
     }
 
-    public NoteEntity getNext() {
-        NoteEntity firstChild = getFirstChild();
+    public Note getNext() {
+        Note firstChild = getFirstChild();
         if (firstChild != null) {
             return firstChild;
         }
-        NoteEntity next = this;
+        Note next = this;
         while (next != null) {
-            NoteEntity sibling = next.getNextSibling();
+            Note sibling = next.getNextSibling();
             if (sibling != null) {
                 return sibling;
             }
@@ -259,7 +259,7 @@ public class NoteEntity {
         return null;
     }
 
-    public void updateSiblingOrder(NoteEntity relativeToNote, boolean asFirstChildOfNote) {
+    public void updateSiblingOrder(Note relativeToNote, boolean asFirstChildOfNote) {
         Long newSiblingOrder = relativeToNote.theSiblingOrderItTakesToMoveRelativeToMe(asFirstChildOfNote);
         if (newSiblingOrder != null) {
             siblingOrder = newSiblingOrder;
@@ -267,7 +267,7 @@ public class NoteEntity {
     }
 
     private long getSiblingOrderToInsertBehindMe() {
-        NoteEntity nextSiblingNote = getNextSibling();
+        Note nextSiblingNote = getNextSibling();
         Long relativeToSiblingOrder = siblingOrder;
         if (nextSiblingNote == null) {
             return relativeToSiblingOrder + SiblingOrder.MINIMUM_SIBLING_ORDER_INCREMENT;
@@ -276,7 +276,7 @@ public class NoteEntity {
     }
 
     private Long getSiblingOrderToBecomeMyFirstChild() {
-        NoteEntity firstChild = getFirstChild();
+        Note firstChild = getFirstChild();
         if (firstChild != null) {
             return firstChild.siblingOrder - SiblingOrder.MINIMUM_SIBLING_ORDER_INCREMENT;
         }
@@ -319,7 +319,7 @@ public class NoteEntity {
         final NotebookEntity notebookEntity = new NotebookEntity();
         notebookEntity.setCreatorEntity(creator);
         notebookEntity.setOwnershipEntity(ownershipEntity);
-        notebookEntity.setHeadNoteEntity(this);
+        notebookEntity.setHeadNote(this);
 
         this.userEntity = creator;
         this.notebookEntity = notebookEntity;

@@ -1,6 +1,6 @@
 package com.odde.doughnut.models.quizFacotries;
 
-import com.odde.doughnut.entities.NoteEntity;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.models.QuizQuestion;
 import com.odde.doughnut.models.Randomizer;
@@ -12,7 +12,7 @@ public class QuizQuestionDirector {
     private final QuizQuestion.QuestionType questionType;
     private final Randomizer randomizer;
     private final ReviewPointEntity reviewPointEntity;
-    private final NoteEntity answerNote;
+    private final Note answerNote;
     final ModelFactoryService modelFactoryService;
     private final QuizQuestionFactory linkTargetExclusiveQuizFactory;
 
@@ -39,7 +39,7 @@ public class QuizQuestionDirector {
     }
 
     private List<QuizQuestion.Option> generateOptions() {
-        List<NoteEntity> selectedList = linkTargetExclusiveQuizFactory.generateFillingOptions();
+        List<Note> selectedList = linkTargetExclusiveQuizFactory.generateFillingOptions();
         selectedList.add(answerNote);
         randomizer.shuffle(selectedList);
         return linkTargetExclusiveQuizFactory.toQuestionOptions(selectedList);

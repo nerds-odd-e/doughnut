@@ -24,16 +24,16 @@ import static org.hamcrest.Matchers.*;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
-public class NoteEntityTest {
+public class NoteTest {
 
     @Autowired MakeMe makeMe;
     UserEntity userEntity;
 
     @Test
     void timeOrder() {
-        NoteEntity parent = makeMe.aNote().please();
-        NoteEntity note1 = makeMe.aNote().under(parent).please();
-        NoteEntity note2 = makeMe.aNote().under(parent).please();
+        Note parent = makeMe.aNote().please();
+        Note note1 = makeMe.aNote().under(parent).please();
+        Note note2 = makeMe.aNote().under(parent).please();
         makeMe.refresh(parent);
         assertThat(parent.getChildren(), containsInRelativeOrder(note1, note2));
     }
@@ -43,8 +43,8 @@ public class NoteEntityTest {
 
         @Test
         void useParentPicture() {
-            NoteEntity parent = makeMe.aNote().pictureUrl("https://img.com/xxx.jpg").inMemoryPlease();
-            NoteEntity child = makeMe.aNote().under(parent).useParentPicture().inMemoryPlease();
+            Note parent = makeMe.aNote().pictureUrl("https://img.com/xxx.jpg").inMemoryPlease();
+            Note child = makeMe.aNote().under(parent).useParentPicture().inMemoryPlease();
             assertThat(child.getNotePicture(), equalTo(parent.getNoteContent().getPictureUrl()));
         }
     }
@@ -52,7 +52,7 @@ public class NoteEntityTest {
     @Nested
     class ValidationTest {
         private Validator validator;
-        private final NoteEntity note = makeMe.aNote().inMemoryPlease();
+        private final Note note = makeMe.aNote().inMemoryPlease();
 
         @BeforeEach
         public void setUp() {
@@ -106,14 +106,14 @@ public class NoteEntityTest {
             assertThat(errorFields, containsInAnyOrder("noteContent.uploadPicture", "noteContent.pictureUrl"));
         }
 
-        private Set<ConstraintViolation<NoteEntity>> getViolations() {
+        private Set<ConstraintViolation<Note>> getViolations() {
             return validator.validate(note);
         }
 
     }
 
     @Nested
-    class NoteEntityWithUserEntity {
+    class NoteWithUser {
         @Autowired private ModelFactoryService modelFactoryService;
 
         @BeforeEach
@@ -123,22 +123,22 @@ public class NoteEntityTest {
 
         @Test
         void thereShouldBe2NodesForUser() {
-            List<NoteEntity> notes = userEntity.getNotes();
+            List<Note> notes = userEntity.getNotes();
             assertThat(notes, hasSize(equalTo(2)));
         }
 
         @Test
         void targetIsEmptyByDefault() {
-            NoteEntity note = userEntity.getNotes().get(0);
+            Note note = userEntity.getNotes().get(0);
             assertThat(note.getTargetNotes(), is(empty()));
         }
 
         @Test
         void targetOfLinkedNotes() {
-            NoteEntity note = userEntity.getNotes().get(0);
-            NoteEntity targetNote = userEntity.getNotes().get(1);
+            Note note = userEntity.getNotes().get(0);
+            Note targetNote = userEntity.getNotes().get(1);
             makeMe.theNote(note).linkTo(targetNote).please();
-            List<NoteEntity> targetNotes = note.getTargetNotes();
+            List<Note> targetNotes = note.getTargetNotes();
             assertThat(targetNotes, hasSize(equalTo(1)));
             assertThat(targetNotes, contains(targetNote));
         }
@@ -146,33 +146,33 @@ public class NoteEntityTest {
 
     @Nested
     class LinkTypes {
-        NoteEntity noteEntityA;
-        NoteEntity noteEntityB;
+        Note noteA;
+        Note noteB;
 
         @BeforeEach
         void setup() {
-            noteEntityA = makeMe.aNote().please();
-            noteEntityB = makeMe.aNote().please();
+            noteA = makeMe.aNote().please();
+            noteB = makeMe.aNote().please();
         }
 
         @Nested
         class Related {
             @BeforeEach
             void setup() {
-                makeMe.theNote(noteEntityA).linkTo(noteEntityB, RELATED_TO).please();
+                makeMe.theNote(noteA).linkTo(noteB, RELATED_TO).please();
             }
 
 
             @Test
             void AIsRelatedToB() {
-                assertThat(noteEntityA.linkTypes(), contains(RELATED_TO));
-                assertThat(getLinkedNoteOfLinkType(LinkTypes.this.noteEntityA, RELATED_TO), contains(noteEntityB));
+                assertThat(noteA.linkTypes(), contains(RELATED_TO));
+                assertThat(getLinkedNoteOfLinkType(LinkTypes.this.noteA, RELATED_TO), contains(noteB));
             }
 
             @Test
             void BIsAlsoRelatedToA() {
-                assertThat(noteEntityB.linkTypes(), contains(RELATED_TO));
-                assertThat(getLinkedNoteOfLinkType(noteEntityB, RELATED_TO), contains(noteEntityA));
+                assertThat(noteB.linkTypes(), contains(RELATED_TO));
+                assertThat(getLinkedNoteOfLinkType(noteB, RELATED_TO), contains(noteA));
             }
 
         }
@@ -181,19 +181,19 @@ public class NoteEntityTest {
         class BelongsTo {
             @BeforeEach
             void setup() {
-                makeMe.theNote(noteEntityA).linkTo(noteEntityB, BELONGS_TO).please();
+                makeMe.theNote(noteA).linkTo(noteB, BELONGS_TO).please();
             }
 
             @Test
             void ABelongToB() {
-                assertThat(noteEntityA.linkTypes(), contains(BELONGS_TO));
-                assertThat(getLinkedNoteOfLinkType(noteEntityA, BELONGS_TO), contains(noteEntityB));
+                assertThat(noteA.linkTypes(), contains(BELONGS_TO));
+                assertThat(getLinkedNoteOfLinkType(noteA, BELONGS_TO), contains(noteB));
             }
 
             @Test
             void BHasA() {
-                assertThat(noteEntityB.linkTypes(), contains(HAS));
-                assertThat(getLinkedNoteOfLinkType(noteEntityB, HAS), contains(noteEntityA));
+                assertThat(noteB.linkTypes(), contains(HAS));
+                assertThat(getLinkedNoteOfLinkType(noteB, HAS), contains(noteA));
             }
 
         }
@@ -202,28 +202,28 @@ public class NoteEntityTest {
         class Has {
             @BeforeEach
             void setup() {
-                makeMe.theNote(noteEntityA).linkTo(noteEntityB, HAS).please();
+                makeMe.theNote(noteA).linkTo(noteB, HAS).please();
             }
 
             @Test
             void AHasB() {
-                assertThat(noteEntityA.linkTypes(), contains(HAS));
-                assertThat(getLinkedNoteOfLinkType(noteEntityA, HAS), contains(noteEntityB));
+                assertThat(noteA.linkTypes(), contains(HAS));
+                assertThat(getLinkedNoteOfLinkType(noteA, HAS), contains(noteB));
             }
 
             @Test
             void BBelongsToA() {
-                assertThat(noteEntityB.linkTypes(), contains(BELONGS_TO));
-                assertThat(getLinkedNoteOfLinkType(noteEntityB, BELONGS_TO), contains(noteEntityA));
+                assertThat(noteB.linkTypes(), contains(BELONGS_TO));
+                assertThat(getLinkedNoteOfLinkType(noteB, BELONGS_TO), contains(noteA));
             }
 
         }
 
     }
 
-    private List<NoteEntity> getLinkedNoteOfLinkType(NoteEntity noteEntityA, LinkEntity.LinkType relatedTo) {
-        List<NoteEntity> direct = noteEntityA.linksOfTypeThroughDirect(relatedTo).stream().map(LinkEntity::getTargetNote).collect(toList());
-        List<NoteEntity> reverse = noteEntityA.linksOfTypeThroughReverse(relatedTo).stream().map(LinkEntity::getSourceNote).collect(Collectors.toUnmodifiableList());
+    private List<Note> getLinkedNoteOfLinkType(Note noteA, LinkEntity.LinkType relatedTo) {
+        List<Note> direct = noteA.linksOfTypeThroughDirect(relatedTo).stream().map(LinkEntity::getTargetNote).collect(toList());
+        List<Note> reverse = noteA.linksOfTypeThroughReverse(relatedTo).stream().map(LinkEntity::getSourceNote).collect(Collectors.toUnmodifiableList());
         direct.addAll(reverse);
         return direct;
     }

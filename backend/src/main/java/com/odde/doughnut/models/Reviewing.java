@@ -1,7 +1,7 @@
 package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.LinkEntity;
-import com.odde.doughnut.entities.NoteEntity;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.entities.ReviewSettingEntity;
 import com.odde.doughnut.services.ModelFactoryService;
@@ -41,22 +41,22 @@ public class Reviewing {
     }
 
     private ReviewPointEntity getOneNewReviewPointEntity(ReviewScope reviewScope) {
-        NoteEntity noteEntity = reviewScope.getNotesHaveNotBeenReviewedAtAll().stream().findFirst().orElse(null);
+        Note note = reviewScope.getNotesHaveNotBeenReviewedAtAll().stream().findFirst().orElse(null);
         LinkEntity linkEntity = reviewScope.getLinksHaveNotBeenReviewedAtAll().stream().findFirst().orElse(null);
 
-        if (noteEntity == null && linkEntity == null) {
+        if (note == null && linkEntity == null) {
             return null;
         }
-        if (noteEntity != null && linkEntity != null) {
-            if (noteEntity.getNoteContent().getCreatedDatetime().compareTo(linkEntity.getCreateAt()) > 0) {
-                noteEntity = null;
+        if (note != null && linkEntity != null) {
+            if (note.getNoteContent().getCreatedDatetime().compareTo(linkEntity.getCreateAt()) > 0) {
+                note = null;
             } else {
                 linkEntity = null;
             }
         }
 
         ReviewPointEntity reviewPointEntity = new ReviewPointEntity();
-        reviewPointEntity.setNoteEntity(noteEntity);
+        reviewPointEntity.setNote(note);
         reviewPointEntity.setLinkEntity(linkEntity);
         return reviewPointEntity;
     }
@@ -123,11 +123,11 @@ public class Reviewing {
         return modelFactoryService.toReviewPointModel(reviewPointEntity);
     }
 
-    public ReviewSettingEntity getReviewSettingEntity(NoteEntity noteEntity) {
-        if(noteEntity == null) {
+    public ReviewSettingEntity getReviewSettingEntity(Note note) {
+        if(note == null) {
             return null;
         }
-        ReviewSettingEntity reviewSettingEntity = noteEntity.getMasterReviewSettingEntity();
+        ReviewSettingEntity reviewSettingEntity = note.getMasterReviewSettingEntity();
         if (reviewSettingEntity == null) {
             reviewSettingEntity = new ReviewSettingEntity();
         }

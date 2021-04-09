@@ -1,18 +1,18 @@
 package com.odde.doughnut.models.quizFacotries;
 
-import com.odde.doughnut.entities.NoteEntity;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.models.QuizQuestion;
 
 import java.util.List;
 
 public interface QuizQuestionFactory {
-    List<NoteEntity> generateFillingOptions();
+    List<Note> generateFillingOptions();
 
     String generateInstruction();
 
     String generateMainTopic();
 
-    NoteEntity generateAnswerNote();
+    Note generateAnswerNote();
 
-    List<QuizQuestion.Option> toQuestionOptions(List<NoteEntity> noteEntities);
+    List<QuizQuestion.Option> toQuestionOptions(List<Note> notes);
 }

@@ -1,6 +1,6 @@
 package com.odde.doughnut.models;
 
-import com.odde.doughnut.entities.NoteEntity;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.models.randomizers.RealRandomizer;
 import com.odde.doughnut.testability.MakeMe;
@@ -35,58 +35,58 @@ class QuizQuestionTest {
 
     @Test
     void aNoteWithNoDescriptionHasNoQuiz() {
-        NoteEntity noteEntity = makeMe.aNote().withNoDescription().byUser(userModel).please();
-        QuizQuestion quizQuestion = getQuizQuestion(noteEntity);
+        Note note = makeMe.aNote().withNoDescription().byUser(userModel).please();
+        QuizQuestion quizQuestion = getQuizQuestion(note);
         assertThat(quizQuestion, is(nullValue()));
     }
 
     @Test
     void useClozeDescription() {
-        NoteEntity noteEntity = makeMe.aNote().title("abc").description("abc has 3 letters").please();
-        QuizQuestion quizQuestion = getQuizQuestion(noteEntity);
+        Note note = makeMe.aNote().title("abc").description("abc has 3 letters").please();
+        QuizQuestion quizQuestion = getQuizQuestion(note);
         assertThat(quizQuestion.getDescription(), equalTo("<mark title='Hidden text that is matching the answer'>[...]</mark> has 3 letters"));
     }
 
     @Nested
     class ClozeSelectionQuiz {
-        private List<String> getOptions(NoteEntity noteEntity) {
-            QuizQuestion quizQuestion = getQuizQuestion(noteEntity);
+        private List<String> getOptions(Note note) {
+            QuizQuestion quizQuestion = getQuizQuestion(note);
             List<String> options = quizQuestion.getOptions().stream().map(QuizQuestion.Option::getDisplay).collect(Collectors.toUnmodifiableList());
             return options;
         }
 
         @Test
         void aNoteWithNoSiblings() {
-            NoteEntity noteEntity = makeMe.aNote().please();
-            List<String> options = getOptions(noteEntity);
-            assertThat(options, contains(noteEntity.getTitle()));
+            Note note = makeMe.aNote().please();
+            List<String> options = getOptions(note);
+            assertThat(options, contains(note.getTitle()));
         }
 
         @Test
         void aNoteWithOneSibling() {
-            NoteEntity top = makeMe.aNote().please();
-            NoteEntity noteEntity1 = makeMe.aNote().under(top).please();
-            NoteEntity noteEntity2 = makeMe.aNote().under(top).please();
+            Note top = makeMe.aNote().please();
+            Note note1 = makeMe.aNote().under(top).please();
+            Note note2 = makeMe.aNote().under(top).please();
             makeMe.refresh(top);
-            List<String> options = getOptions(noteEntity1);
-            assertThat(options, containsInAnyOrder(noteEntity1.getTitle(), noteEntity2.getTitle()));
+            List<String> options = getOptions(note1);
+            assertThat(options, containsInAnyOrder(note1.getTitle(), note2.getTitle()));
         }
 
         @Test
         void aNoteWithManySiblings() {
-            NoteEntity top = makeMe.aNote().please();
+            Note top = makeMe.aNote().please();
             makeMe.theNote(top).with10Children().please();
-            NoteEntity noteEntity = makeMe.aNote().under(top).please();
+            Note note = makeMe.aNote().under(top).please();
             makeMe.refresh(top);
-            List<String> options = getOptions(noteEntity);
+            List<String> options = getOptions(note);
             assertThat(options.size(), equalTo(6));
-            assertThat(options.contains(noteEntity.getTitle()), is(true));
+            assertThat(options.contains(note.getTitle()), is(true));
         }
     }
 
     @Nested
     class SpellingQuiz {
-        NoteEntity note;
+        Note note;
 
         @BeforeEach
         void setup() {
@@ -122,12 +122,12 @@ class QuizQuestionTest {
 
     }
 
-    private QuizQuestion getQuizQuestion(NoteEntity noteEntity) {
-        return getReviewPointModel(noteEntity).generateAQuizQuestion(randomizer);
+    private QuizQuestion getQuizQuestion(Note note) {
+        return getReviewPointModel(note).generateAQuizQuestion(randomizer);
     }
 
-    private ReviewPointModel getReviewPointModel(NoteEntity noteEntity) {
-        return makeMe.aReviewPointFor(noteEntity).by(userModel).toModelPlease();
+    private ReviewPointModel getReviewPointModel(Note note) {
+        return makeMe.aReviewPointFor(note).by(userModel).toModelPlease();
     }
 
 }

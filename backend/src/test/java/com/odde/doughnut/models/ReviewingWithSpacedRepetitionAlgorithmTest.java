@@ -1,6 +1,6 @@
 package com.odde.doughnut.models;
 
-import com.odde.doughnut.entities.NoteEntity;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPointEntity;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.testability.MakeMe;
@@ -41,16 +41,16 @@ public class ReviewingWithSpacedRepetitionAlgorithmTest {
 
     @Nested
     class WhenThereIsOneNote {
-        NoteEntity noteEntity;
+        Note note;
 
         @BeforeEach
         void setup() {
-            noteEntity = makeMe.aNote().byUser(userModel).please();
+            note = makeMe.aNote().byUser(userModel).please();
         }
 
         @Test
         void whenThereIsNoReviewedNotesForUser() {
-            makeMe.aReviewPointFor(noteEntity).by(anotherUser).please();
+            makeMe.aReviewPointFor(note).by(anotherUser).please();
             assertThat(getOneReviewPointNeedToRepeat(1), is(nullValue()));
         }
 
@@ -73,7 +73,7 @@ public class ReviewingWithSpacedRepetitionAlgorithmTest {
                 })
         void whenThereIsOneReviewedNotesForUser(Integer repetitionDone, Integer reviewDay, Boolean expectedToRepeat) {
             makeMe
-                    .aReviewPointFor(noteEntity)
+                    .aReviewPointFor(note)
                     .by(userModel)
                     .nthStrictRepetitionOn(repetitionDone, baseDay)
                     .please();

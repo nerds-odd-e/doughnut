@@ -1,7 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.exceptions.NoAccessRightException;
-import com.odde.doughnut.entities.NoteEntity;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.UserEntity;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ModelFactoryService;
@@ -32,7 +32,7 @@ class NotebookControllerTest {
     @Autowired
     private MakeMe makeMe;
     private UserModel userModel;
-    private NoteEntity topNote;
+    private Note topNote;
     private NotebookController controller;
     final ExtendedModelMap model = new ExtendedModelMap();
 
@@ -58,7 +58,7 @@ class NotebookControllerTest {
         @Test
         void shouldNotBeAbleToShareNoteThatBelongsToOtherUser() {
             UserEntity anotherUserEntity = makeMe.aUser().please();
-            NoteEntity note = makeMe.aNote().byUser(anotherUserEntity).please();
+            Note note = makeMe.aNote().byUser(anotherUserEntity).please();
             assertThrows(NoAccessRightException.class, () ->
                     controller.shareNote(note.getNotebookEntity())
             );
@@ -71,7 +71,7 @@ class NotebookControllerTest {
         @Test
         void shouldNotBeAbleToUpdateNotebookThatBelongsToOtherUser() {
             UserEntity anotherUserEntity = makeMe.aUser().please();
-            NoteEntity note = makeMe.aNote().byUser(anotherUserEntity).please();
+            Note note = makeMe.aNote().byUser(anotherUserEntity).please();
             assertThrows(NoAccessRightException.class, () ->
                     controller.update(note.getNotebookEntity(), makeMe.successfulBindingResult())
             );

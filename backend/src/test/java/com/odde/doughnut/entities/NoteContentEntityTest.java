@@ -11,19 +11,19 @@ class NoteContentEntityTest {
 
     @Test
     void hasTitleInArticle() {
-        NoteEntity note = makeMe.aNote().inMemoryPlease();
+        Note note = makeMe.aNote().inMemoryPlease();
         assertTrue(note.hasTitleInArticle());
     }
 
     @Test
     void hasNoTitleInArticleBecauseOfNoDescription() {
-        NoteEntity note = makeMe.aNote().withNoDescription().inMemoryPlease();
+        Note note = makeMe.aNote().withNoDescription().inMemoryPlease();
         assertFalse(note.hasTitleInArticle());
     }
 
     @Test
     void hasTitleInArticleBecauseOfChild() {
-        NoteEntity note = makeMe.aNote().withNoDescription().inMemoryPlease();
+        Note note = makeMe.aNote().withNoDescription().inMemoryPlease();
         note.getChildren().add(makeMe.aNote().inMemoryPlease());
         assertTrue(note.hasTitleInArticle());
     }

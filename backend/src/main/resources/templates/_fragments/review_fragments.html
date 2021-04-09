@@ -1,8 +1,8 @@
 <div th:fragment="showReviewPoint(reviewPointEntity)" th:object="${reviewPointEntity}">
-    <div th:if="*{noteEntity}">
-        <div th:replace=":: noteBreadcrumbForReview(*{noteEntity})"/>
+    <div th:if="*{note}">
+        <div th:replace=":: noteBreadcrumbForReview(*{note})"/>
         <div class="jumbotron py-4 mb-2">
-            <div th:replace="_fragments/note_fragments :: noteShow(*{noteEntity}, 1)"/>
+            <div th:replace="_fragments/note_fragments :: noteShow(*{note}, 1)"/>
         </div>
     </div>
 
