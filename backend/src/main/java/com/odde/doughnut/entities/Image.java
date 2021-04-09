@@ -10,7 +10,7 @@ import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "image")
-public class ImageEntity {
+public class Image {
     @Id
     @Getter
     @GeneratedValue(strategy = GenerationType.IDENTITY)

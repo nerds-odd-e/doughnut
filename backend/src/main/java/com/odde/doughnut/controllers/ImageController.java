@@ -1,6 +1,6 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.entities.ImageEntity;
+import com.odde.doughnut.entities.Image;
 import com.odde.doughnut.entities.repositories.ImageBlobRepository;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
@@ -18,12 +18,12 @@ public class ImageController {
         this.imageBlobRepository = imageBlobRepository;
     }
 
-    @GetMapping("/{imageEntity}/{fileName}")
-    public ResponseEntity<byte[]> show(@PathVariable("imageEntity") ImageEntity imageEntity, @PathVariable("fileName") String filename) {
+    @GetMapping("/{image}/{fileName}")
+    public ResponseEntity<byte[]> show(@PathVariable("image") Image image, @PathVariable("fileName") String filename) {
         return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + imageEntity.getName() + "\"")
-                .header(HttpHeaders.CONTENT_TYPE, imageEntity.getType())
-                .body(imageBlobRepository.findById(imageEntity.getImageBlobId()).get().getData());
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + image.getName() + "\"")
+                .header(HttpHeaders.CONTENT_TYPE, image.getType())
+                .body(imageBlobRepository.findById(image.getImageBlobId()).get().getData());
     }
 }
 

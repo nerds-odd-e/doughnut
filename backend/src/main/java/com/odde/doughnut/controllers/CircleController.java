@@ -36,7 +36,7 @@ public class CircleController extends ApplicationMvcController  {
     public String index(Model model) {
         UserModel user = currentUserFetcher.getUser();
         model.addAttribute("user", user.getEntity());
-        model.addAttribute("circleJoiningByInvitationEntity", new CircleJoiningByInvitationEntity());
+        model.addAttribute("circleJoiningByInvitation", new CircleJoiningByInvitation());
         return "circles/index";
     }
 
@@ -66,11 +66,11 @@ public class CircleController extends ApplicationMvcController  {
 
     @PostMapping("/join")
     @Transactional
-    public String joinCircle(@Valid CircleJoiningByInvitationEntity circleJoiningByInvitationEntity, BindingResult bindingResult) {
+    public String joinCircle(@Valid CircleController.CircleJoiningByInvitation circleJoiningByInvitation, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             return "circles/join";
         }
-        CircleModel circleModel = modelFactoryService.findCircleByInvitationCode(circleJoiningByInvitationEntity.getInvitationCode());
+        CircleModel circleModel = modelFactoryService.findCircleByInvitationCode(circleJoiningByInvitation.getInvitationCode());
         if (circleModel == null) {
             bindingResult.rejectValue("invitationCode", "error.error", "Does not match any circle");
             return "circles/join";
@@ -91,7 +91,7 @@ public class CircleController extends ApplicationMvcController  {
         return "notebooks/new";
     }
 
-    public static class CircleJoiningByInvitationEntity {
+    public static class CircleJoiningByInvitation {
         @NotNull
         @Size(min = 10, max = 20)
         @Getter

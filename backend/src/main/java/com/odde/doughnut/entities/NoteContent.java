@@ -3,7 +3,7 @@ package com.odde.doughnut.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.algorithms.ClozeDescription;
 import com.odde.doughnut.entities.validators.ValidateNotePicture;
-import com.odde.doughnut.models.ImageEntityBuilder;
+import com.odde.doughnut.models.ImageBuilder;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.util.Strings;
@@ -60,7 +60,7 @@ public class NoteContent {
     @JsonIgnore
     @Getter
     @Setter
-    private ImageEntity uploadPicture;
+    private Image uploadPicture;
 
     @Column(name = "use_parent_picture")
     @Getter
@@ -123,8 +123,8 @@ public class NoteContent {
     public void fetchUploadedPicture(User user) throws IOException {
         MultipartFile file = getUploadPictureProxy();
         if (file != null && !file.isEmpty()) {
-            ImageEntity imageEntity = new ImageEntityBuilder().buildImageEntityFromUploadedPicture(user, file);
-            setUploadPicture(imageEntity);
+            Image image = new ImageBuilder().buildImageFromUploadedPicture(user, file);
+            setUploadPicture(image);
         }
     }
 

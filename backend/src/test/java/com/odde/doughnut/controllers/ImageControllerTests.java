@@ -1,6 +1,6 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.entities.ImageEntity;
+import com.odde.doughnut.entities.Image;
 import com.odde.doughnut.entities.repositories.ImageBlobRepository;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
@@ -38,9 +38,9 @@ class ImageControllerTests {
 
     @Test
     void contentType() {
-        ImageEntity imageEntity = makeMe.anImage().please();
-        makeMe.refresh(imageEntity);
-        ResponseEntity<byte[]> resp = controller.show(imageEntity, "filename");
+        Image image = makeMe.anImage().please();
+        makeMe.refresh(image);
+        ResponseEntity<byte[]> resp = controller.show(image, "filename");
         assertThat(resp.getStatusCode(), equalTo(HttpStatus.OK));
         assertThat(resp.getHeaders().getContentType().toString(), equalTo("image/png"));
         assertThat(resp.getHeaders().getContentDisposition().toString(), equalTo("inline; filename=\"example.png\""));

@@ -1,12 +1,12 @@
 package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.ImageBlob;
-import com.odde.doughnut.entities.ImageEntity;
+import com.odde.doughnut.entities.Image;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 
-public class ImageBuilder extends EntityBuilder<ImageEntity> {
-    public ImageBuilder(ImageEntity entity, MakeMe makeMe) {
+public class ImageBuilder extends EntityBuilder<Image> {
+    public ImageBuilder(Image entity, MakeMe makeMe) {
         super(makeMe, entity);
     }
 

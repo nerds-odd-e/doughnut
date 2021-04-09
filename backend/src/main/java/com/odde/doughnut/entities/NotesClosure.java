@@ -18,7 +18,7 @@ public class NotesClosure {
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "ancestor_id", referencedColumnName = "id")
-    @Getter @Setter private Note ancestorEntity;
+    @Getter @Setter private Note ancestor;
 
     @Getter
     @Setter

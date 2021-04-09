@@ -76,7 +76,7 @@ public class Note {
     @Setter
     private List<NotesClosure> notesClosures = new ArrayList<>();
 
-    @OneToMany(mappedBy = "ancestorEntity", cascade = CascadeType.DETACH)
+    @OneToMany(mappedBy = "ancestor", cascade = CascadeType.DETACH)
     @JsonIgnore
     @OrderBy("depth")
     @Getter
@@ -144,7 +144,7 @@ public class Note {
         ancestors.forEach(anc -> {
             NotesClosure notesClosure = new NotesClosure();
             notesClosure.setNote(this);
-            notesClosure.setAncestorEntity(anc);
+            notesClosure.setAncestor(anc);
             notesClosure.setDepth(counter[0]);
             getNotesClosures().add(0, notesClosure);
             counter[0] += 1;
@@ -166,7 +166,7 @@ public class Note {
     }
 
     public List<Note> getAncestors() {
-        return getNotesClosures().stream().map(NotesClosure::getAncestorEntity).collect(toList());
+        return getNotesClosures().stream().map(NotesClosure::getAncestor).collect(toList());
     }
 
     public void traverseBreadthFirst(Consumer<Note> noteConsumer) {

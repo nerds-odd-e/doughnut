@@ -33,7 +33,7 @@ public class Reviewing {
         if (count == 0) {
             return null;
         }
-        List<Integer> initialReviewedNotesOfToday = getNewReviewPointEntitiesOfToday().stream().map(rp -> rp.getSourceNote().getId()).collect(Collectors.toUnmodifiableList());
+        List<Integer> initialReviewedNotesOfToday = getNewReviewPointsOfToday().stream().map(rp -> rp.getSourceNote().getId()).collect(Collectors.toUnmodifiableList());
         return getSubscriptionModelStream()
                 .filter(sub-> sub.needToLearnMoreToday(initialReviewedNotesOfToday))
                 .map(this::getOneNewReviewPoint)
@@ -101,15 +101,15 @@ public class Reviewing {
     }
 
     public int remainingDailyNewNotesCount() {
-        long sameDayCount = getNewReviewPointEntitiesOfToday().size();
+        long sameDayCount = getNewReviewPointsOfToday().size();
         return (int) (userModel.entity.getDailyNewNotesCount() - sameDayCount);
     }
 
-    private List<ReviewPoint> getNewReviewPointEntitiesOfToday() {
-        return memoizer.call("getNewReviewPointEntitiesOfToday", this::getNewReviewPointEntitiesOfToday_);
+    private List<ReviewPoint> getNewReviewPointsOfToday() {
+        return memoizer.call("getNewReviewPointsOfToday", this::getNewReviewPointsOfToday_);
     }
 
-    private List<ReviewPoint> getNewReviewPointEntitiesOfToday_() {
+    private List<ReviewPoint> getNewReviewPointsOfToday_() {
         Timestamp oneDayAgo = TimestampOperations.addDaysToTimestamp(currentUTCTimestamp, -1);
         return userModel.getRecentReviewPoints(oneDayAgo).stream().filter(p -> p.isInitialReviewOnSameDay(currentUTCTimestamp, userModel.getTimeZone())).collect(Collectors.toUnmodifiableList());
     }

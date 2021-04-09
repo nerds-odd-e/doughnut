@@ -82,7 +82,7 @@ public class MakeMe {
     }
 
     public ImageBuilder anImage() {
-        return new ImageBuilder(new ImageEntity(), this);
+        return new ImageBuilder(new Image(), this);
     }
 
     public UploadedPictureBuilder anUploadedPicture() {
