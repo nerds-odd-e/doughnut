@@ -25,11 +25,6 @@ Feature: link note
       | Sed        | Sedation, Sedative |
       | Sedatio    | Sedation           |
 
-  Scenario: linkable notes should not include notes already linked
-    Given I link note "Sedition" as "belongs to" note "Sedation"
-    When I am creating link for note "Sedition"
-    And I should see "Sedative" as targets only when searching "Se"
-
   Scenario: links should show in the view
     When I link note "Sedition" as "is similar to" note "Sedation"
     And I link note "Sedition" as "is similar to" note "Sedative"

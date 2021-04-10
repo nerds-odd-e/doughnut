@@ -3,11 +3,10 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.SearchTerm;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.models.LinkModel;
 import com.odde.doughnut.services.ModelFactoryService;
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -33,17 +32,6 @@ public class LinkController extends ApplicationMvcController  {
         return "links/show";
     }
 
-    class SearchTerm {
-        @Getter
-        @Setter
-        private String searchKey = "";
-        @Getter
-        @Setter
-        private Boolean searchGlobally = false;
-
-        public SearchTerm() {}
-    }
-
     @GetMapping("/{note}/link")
     public String newLink(@PathVariable("note") Note note, Model model) {
         model.addAttribute("searchTerm", new SearchTerm());
@@ -52,7 +40,7 @@ public class LinkController extends ApplicationMvcController  {
 
     @PostMapping("/{note}/search_for_target")
     public String searchForLinkTarget(@PathVariable("note") Note note, @Valid SearchTerm searchTerm, Model model) {
-        List<Note> linkableNotes = currentUserFetcher.getUser().filterLinkableNotes(note, searchTerm.searchKey);
+        List<Note> linkableNotes = currentUserFetcher.getUser().filterLinkableNotes(note, searchTerm);
         model.addAttribute("linkableNotes", linkableNotes);
         return "links/new";
     }
@@ -63,7 +51,7 @@ public class LinkController extends ApplicationMvcController  {
         Link link = new Link();
         link.setSourceNote(note);
         link.setTargetNote(targetNote);
-        link.setType(Link.LinkType.RELATED_TO.label);
+        link.setLinkType(link.getPossibleLinkTypes().stream().findFirst().orElse(null));
         model.addAttribute("link", link);
         return "links/link_choose_type";
     }

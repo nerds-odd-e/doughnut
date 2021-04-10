@@ -8,7 +8,9 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.odde.doughnut.models.QuizQuestion.QuestionType.LINK_SOURCE_EXCLUSIVE;
 import static com.odde.doughnut.models.QuizQuestion.QuestionType.LINK_TARGET;
@@ -18,9 +20,9 @@ import static com.odde.doughnut.models.QuizQuestion.QuestionType.LINK_TARGET;
 public class Link {
 
     public enum LinkType {
+        RELATED_TO("is related to", "is not related to", new QuestionType[0]),
         BELONGS_TO("belongs to", "does not belong to", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
         HAS("has", "does not have", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        RELATED_TO("is related to", "is not related to", new QuestionType[0]),
         OPPOSITE_OF("is the opposite of", "is not the opposite of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
         BROUGHT_BY("is brought by", "is not brought by", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
         AUTHOR_OF("is author of", "is not author of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
@@ -103,6 +105,13 @@ public class Link {
         return LinkType.fromString(type);
     }
 
+    public void setLinkType(LinkType linkType) {
+        if (linkType == null) {
+            type = null;
+        }
+        type = linkType.label;
+    }
+
     public List<Note> getBackwardPeers() {
         return targetNote.linkedNotesOfType(getLinkType().reverseType());
     }
@@ -111,4 +120,9 @@ public class Link {
         return getLinkType().exclusiveQuestion;
     }
 
+    public List<LinkType> getPossibleLinkTypes() {
+        final List<LinkType> existingTypes = sourceNote.getLinks().stream().filter(l -> l.targetNote == targetNote).map(Link::getLinkType).collect(Collectors.toUnmodifiableList());
+        return Arrays.stream(LinkType.values()).filter(lt->
+                lt == getLinkType() || !existingTypes.contains(lt)).collect(Collectors.toList());
+    }
 }

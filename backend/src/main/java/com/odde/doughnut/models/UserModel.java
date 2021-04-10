@@ -1,13 +1,11 @@
 package com.odde.doughnut.models;
 
 import com.odde.doughnut.algorithms.SpacedRepetitionAlgorithm;
-import com.odde.doughnut.entities.Link;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.services.ModelFactoryService;
 import org.apache.logging.log4j.util.Strings;
 
+import javax.validation.Valid;
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.util.List;
@@ -36,13 +34,13 @@ public class UserModel extends ModelForEntity<User> implements ReviewScope {
         save();
     }
 
-    public List<Note> filterLinkableNotes(Note note, String searchTerm) {
-        if (Strings.isBlank(searchTerm)) {
+    public List<Note> filterLinkableNotes(Note note, @Valid SearchTerm searchTerm) {
+        if (Strings.isBlank(searchTerm.getSearchKey())) {
             return null;
         }
         List<Note> linkableNotes = getAllLinkableNotes(note);
         return linkableNotes.stream()
-                .filter(n -> n.getTitle().contains(searchTerm))
+                .filter(n -> n.getTitle().contains(searchTerm.getSearchKey()))
                 .collect(Collectors.toList());
     }
 
@@ -66,10 +64,8 @@ public class UserModel extends ModelForEntity<User> implements ReviewScope {
     }
 
     private List<Note> getAllLinkableNotes(Note source) {
-        List<Note> targetNotes = source.getTargetNotes();
         List<Note> allNotes = entity.getNotes();
         return allNotes.stream()
-                .filter(i -> !targetNotes.contains(i))
                 .filter(i -> !i.equals(source))
                 .collect(Collectors.toList());
     }
