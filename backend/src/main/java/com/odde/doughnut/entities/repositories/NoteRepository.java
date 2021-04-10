@@ -45,10 +45,16 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
             + whereThereIsNoReviewPoint;
 
     @Query( value = "SELECT note.* from note"
-            + "  JOIN circle_user ON circle_user.user_id = :user "
-            + "  JOIN circle ON circle.id = circle_user.circle_id "
-            + "  JOIN ownership ON circle.id = ownership.circle_id "
-            + "  JOIN notebook ON notebook.ownership_id = ownership.id AND notebook.id = note.notebook_id "
+            + "  JOIN ("
+            + "          SELECT notebook.id FROM notebook "
+            + "             LEFT JOIN circle_user ON circle_user.user_id = :user "
+            + "             LEFT JOIN circle ON circle.id = circle_user.circle_id "
+            + "             JOIN ownership ON circle.id = ownership.circle_id OR ownership.user_id = :user "
+            + "             WHERE notebook.ownership_id = ownership.id "
+            + "          UNION "
+            + "          SELECT notebook_id FROM subscription "
+            + "             WHERE subscription.user_id = :user "
+            + "       ) nb ON nb.id = note.notebook_id "
             , nativeQuery = true)
-    List<Note> findByUserAsOwner(@Param("user") User user);
+    List<Note> findByUserAsReader(@Param("user") User user);
 }

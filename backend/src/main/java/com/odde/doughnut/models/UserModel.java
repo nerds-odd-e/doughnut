@@ -42,7 +42,7 @@ public class UserModel extends ModelForEntity<User> implements ReviewScope {
         final String searchKey = searchTerm.getSearchKey().toLowerCase();
         Stream<Note> linkableNotes;
         if (searchTerm.getSearchGlobally()) {
-            linkableNotes = getVisibleNoteStream();
+            linkableNotes = modelFactoryService.noteRepository.findByUserAsReader(entity).stream();
         }
         else {
             linkableNotes = note.getNotebook().getNotes().stream();
@@ -52,19 +52,6 @@ public class UserModel extends ModelForEntity<User> implements ReviewScope {
                 .filter(n -> !n.equals(note))
                 .filter(n -> n.getTitle().toLowerCase().contains(searchKey))
                 .collect(Collectors.toList());
-    }
-
-    private Stream<Note> getVisibleNoteStream() {
-        Stream<Note> linkableNotes;
-        linkableNotes = entity.getNotes().stream();
-        linkableNotes = entity.getSubscriptions().stream().map(s->s.getNotebook().getNotes().stream())
-                .reduce(linkableNotes, Stream::concat);
-        linkableNotes = Stream.concat(
-                linkableNotes,
-                modelFactoryService.noteRepository.findByUserAsOwner(entity).stream()
-
-        );
-        return linkableNotes;
     }
 
     @Override

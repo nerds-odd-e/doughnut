@@ -39,7 +39,6 @@ public class UserModelSearchTest {
     }
 
     private List<Note> search() {
-        makeMe.refresh(userModel.getEntity());
         makeMe.refresh(note.getNotebook());
         return userModel.filterLinkableNotes(note, searchTerm);
     }
@@ -90,7 +89,6 @@ public class UserModelSearchTest {
         void setup() {
             bazaarNote = makeMe.aNote().byUser(anotherUser).please();
             makeMe.aBazaarNodebook(bazaarNote.getNotebook()).please();
-            makeMe.refresh(bazaarNote.getNotebook());
         }
 
         @Test
@@ -120,7 +118,6 @@ public class UserModelSearchTest {
         void setup() {
             Circle circle = makeMe.aCircle().hasMember(userModel).hasMember(anotherUser).please();
             circleNote = makeMe.aNote().byUser(anotherUser).inCircle(circle).please();
-            makeMe.refresh(circleNote.getNotebook());
         }
 
         @Test
