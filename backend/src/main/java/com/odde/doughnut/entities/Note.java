@@ -103,9 +103,9 @@ public class Note {
         return links.stream().map(Link::getTargetNote).collect(toList());
     }
 
-    public List<Link.LinkType> linkTypes() {
+    public List<Link.LinkType> linkTypes(User viewer) {
         return Arrays.stream(Link.LinkType.values())
-                .filter(t -> !linkedNotesOfType(t).isEmpty())
+                .filter(t -> !linkedNotesOfType(t, viewer).isEmpty())
                 .collect(Collectors.toUnmodifiableList());
     }
 
@@ -115,16 +115,16 @@ public class Note {
                 .collect(Collectors.toList());
     }
 
-    public List<Link> linksOfTypeThroughReverse(Link.LinkType linkType) {
+    public List<Link> linksOfTypeThroughReverse(Link.LinkType linkType, User viewer) {
         return refers.stream()
                 .filter(l -> l.getLinkType().equals(linkType.reverseType()))
                 .collect(Collectors.toUnmodifiableList());
     }
 
-    public List<Note> linkedNotesOfType(Link.LinkType linkType) {
+    public List<Note> linkedNotesOfType(Link.LinkType linkType, User viewer) {
         List<Note> notes = new ArrayList<>();
         linksOfTypeThroughDirect(linkType).forEach(lk -> notes.add(lk.getTargetNote()));
-        linksOfTypeThroughReverse(linkType).forEach(lk -> notes.add(lk.getSourceNote()));
+        linksOfTypeThroughReverse(linkType, viewer).forEach(lk -> notes.add(lk.getSourceNote()));
         return notes;
     }
 

@@ -113,7 +113,7 @@ public class Link {
     }
 
     public List<Note> getBackwardPeers() {
-        return targetNote.linkedNotesOfType(getLinkType().reverseType());
+        return targetNote.linkedNotesOfType(getLinkType().reverseType(), null);
     }
 
     public String getExclusiveQuestion() {

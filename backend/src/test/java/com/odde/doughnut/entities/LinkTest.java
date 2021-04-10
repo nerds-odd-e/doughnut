@@ -58,13 +58,13 @@ public class LinkTest {
 
             @Test
             void AIsRelatedToB() {
-                assertThat(noteA.linkTypes(), contains(RELATED_TO));
+                assertThat(noteA.linkTypes(null), contains(RELATED_TO));
                 assertThat(getLinkedNoteOfLinkType(LinkTypes.this.noteA, RELATED_TO), contains(noteB));
             }
 
             @Test
             void BIsAlsoRelatedToA() {
-                assertThat(noteB.linkTypes(), contains(RELATED_TO));
+                assertThat(noteB.linkTypes(null), contains(RELATED_TO));
                 assertThat(getLinkedNoteOfLinkType(noteB, RELATED_TO), contains(noteA));
             }
 
@@ -79,13 +79,13 @@ public class LinkTest {
 
             @Test
             void ABelongToB() {
-                assertThat(noteA.linkTypes(), contains(BELONGS_TO));
+                assertThat(noteA.linkTypes(null), contains(BELONGS_TO));
                 assertThat(getLinkedNoteOfLinkType(noteA, BELONGS_TO), contains(noteB));
             }
 
             @Test
             void BHasA() {
-                assertThat(noteB.linkTypes(), contains(HAS));
+                assertThat(noteB.linkTypes(null), contains(HAS));
                 assertThat(getLinkedNoteOfLinkType(noteB, HAS), contains(noteA));
             }
 
@@ -110,13 +110,13 @@ public class LinkTest {
 
             @Test
             void AHasB() {
-                assertThat(noteA.linkTypes(), contains(HAS));
+                assertThat(noteA.linkTypes(null), contains(HAS));
                 assertThat(getLinkedNoteOfLinkType(noteA, HAS), contains(noteB));
             }
 
             @Test
             void BBelongsToA() {
-                assertThat(noteB.linkTypes(), contains(BELONGS_TO));
+                assertThat(noteB.linkTypes(null), contains(BELONGS_TO));
                 assertThat(getLinkedNoteOfLinkType(noteB, BELONGS_TO), contains(noteA));
             }
 
@@ -126,7 +126,7 @@ public class LinkTest {
 
     private List<Note> getLinkedNoteOfLinkType(Note noteA, Link.LinkType relatedTo) {
         List<Note> direct = noteA.linksOfTypeThroughDirect(relatedTo).stream().map(Link::getTargetNote).collect(toList());
-        List<Note> reverse = noteA.linksOfTypeThroughReverse(relatedTo).stream().map(Link::getSourceNote).collect(Collectors.toUnmodifiableList());
+        List<Note> reverse = noteA.linksOfTypeThroughReverse(relatedTo, null).stream().map(Link::getSourceNote).collect(Collectors.toUnmodifiableList());
         direct.addAll(reverse);
         return direct;
     }
