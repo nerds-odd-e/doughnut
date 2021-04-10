@@ -16,8 +16,9 @@ class AnswerTest {
 
     @BeforeEach
     void setup() {
-        target = makeMe.aNote("target").inMemoryPlease();
-        source = makeMe.aNote("source").linkTo(target).inMemoryPlease();
+        Note top = makeMe.aNote().inMemoryPlease();
+        target = makeMe.aNote("target").under(top).inMemoryPlease();
+        source = makeMe.aNote("source").under(top).linkTo(target).inMemoryPlease();
     }
 
     @Nested

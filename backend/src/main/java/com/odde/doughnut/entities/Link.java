@@ -125,4 +125,12 @@ public class Link {
         return Arrays.stream(LinkType.values()).filter(lt->
                 lt == getLinkType() || !existingTypes.contains(lt)).collect(Collectors.toList());
     }
+
+    public boolean sourceVisibleAsTargetOrTo(User viewer) {
+        if (sourceNote.getNotebook() == targetNote.getNotebook()) return true;
+        if (viewer == null) return false;
+
+        return viewer.canRead(sourceNote.getNotebook());
+    }
+
 }

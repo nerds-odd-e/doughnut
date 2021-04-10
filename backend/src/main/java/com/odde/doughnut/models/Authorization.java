@@ -24,9 +24,7 @@ public class Authorization extends ModelForEntity<User> {
     }
 
     public boolean hasReadAuthority(Note note) {
-        if (hasFullAuthority(note)) return true;
-
-        return entity.getSubscriptions().stream().anyMatch(s -> s.getNotebook() == note.getNotebook());
+        return this.entity.canRead(note.getNotebook());
     }
 
     public void assertReadAuthorization(Note note) throws NoAccessRightException {

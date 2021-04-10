@@ -26,7 +26,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class LinkTest {
 
     @Autowired MakeMe makeMe;
-    User user;
 
     @Nested
     class LinkTypes {
@@ -35,8 +34,9 @@ public class LinkTest {
 
         @BeforeEach
         void setup() {
-            noteA = makeMe.aNote("noteA").please();
-            noteB = makeMe.aNote("noteB").please();
+            Note top = makeMe.aNote().please();
+            noteA = makeMe.aNote("noteA").under(top).please();
+            noteB = makeMe.aNote("noteB").under(top).please();
         }
 
         @Test
@@ -120,6 +120,39 @@ public class LinkTest {
                 assertThat(getLinkedNoteOfLinkType(noteB, BELONGS_TO), contains(noteA));
             }
 
+        }
+
+    }
+
+    @Nested
+    class ReverseLink {
+        User user;
+        Note target;
+
+        @BeforeEach
+        void setup() {
+            user = makeMe.aUser().please();
+            target = makeMe.aNote().byUser(user).please();
+
+        }
+
+        @Test
+        void shouldGetReversedLinkIfItBelongsToTheUser() {
+            Note source = makeMe.aNote().byUser(user).please();
+            assertTrue(hasReverseLinkFor(source, user));
+        }
+
+        @Test
+        void shouldNotGetReversedLinkIfItDoesNotBelongsToTheUser() {
+            User anotherUser = makeMe.aUser().please();
+            Note source = makeMe.aNote().byUser(anotherUser).please();
+            assertFalse(hasReverseLinkFor(source, user));
+        }
+
+        private boolean hasReverseLinkFor(Note source, User viewer) {
+            makeMe.theNote(source).linkTo(target, HAS).please();
+            final List<Link> links = target.linksOfTypeThroughReverse(BELONGS_TO, viewer);
+            return !links.isEmpty();
         }
 
     }

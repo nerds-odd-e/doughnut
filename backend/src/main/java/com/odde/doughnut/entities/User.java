@@ -62,6 +62,11 @@ public class User {
         return notebook.getOwnership().ownsBy(this);
     }
 
+    public boolean canRead(Notebook notebook) {
+        if (owns(notebook)) return true;
+        return getSubscriptions().stream().anyMatch(s -> s.getNotebook() == notebook);
+    }
+
     public boolean inCircle(Circle circle) {
         return circle.getMembers().contains(this);
     }

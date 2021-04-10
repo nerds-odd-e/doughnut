@@ -118,6 +118,7 @@ public class Note {
     public List<Link> linksOfTypeThroughReverse(Link.LinkType linkType, User viewer) {
         return refers.stream()
                 .filter(l -> l.getLinkType().equals(linkType.reverseType()))
+                .filter(l -> l.sourceVisibleAsTargetOrTo(viewer))
                 .collect(Collectors.toUnmodifiableList());
     }
 
