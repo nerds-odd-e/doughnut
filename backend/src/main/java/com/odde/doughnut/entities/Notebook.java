@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "notebook")
@@ -30,6 +32,10 @@ public class Notebook {
     @Getter
     @Setter
     private Note headNote;
+
+    @OneToMany(mappedBy = "notebook")
+    @JsonIgnore
+    @Getter @Setter private List<Note> notes = new ArrayList<>();
 
     @Column(name="skip_review_entirely")
     @Getter @Setter Boolean skipReviewEntirely = false;

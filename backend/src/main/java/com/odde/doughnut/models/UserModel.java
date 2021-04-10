@@ -38,9 +38,18 @@ public class UserModel extends ModelForEntity<User> implements ReviewScope {
         if (Strings.isBlank(searchTerm.getSearchKey())) {
             return null;
         }
-        List<Note> linkableNotes = getAllLinkableNotes(note);
+        final String searchKey = searchTerm.getSearchKey().toLowerCase();
+        List<Note> linkableNotes;
+        if (searchTerm.getSearchGlobally()) {
+            linkableNotes = entity.getNotes();
+        }
+        else {
+            linkableNotes = note.getNotebook().getNotes();
+        }
+
         return linkableNotes.stream()
-                .filter(n -> n.getTitle().contains(searchTerm.getSearchKey()))
+                .filter(n -> !n.equals(note))
+                .filter(n -> n.getTitle().toLowerCase().contains(searchKey))
                 .collect(Collectors.toList());
     }
 
@@ -61,13 +70,6 @@ public class UserModel extends ModelForEntity<User> implements ReviewScope {
 
     public List<ReviewPoint> getRecentReviewPoints(Timestamp since) {
         return modelFactoryService.reviewPointRepository.findAllByUserAndInitialReviewedAtGreaterThan(entity, since);
-    }
-
-    private List<Note> getAllLinkableNotes(Note source) {
-        List<Note> allNotes = entity.getNotes();
-        return allNotes.stream()
-                .filter(i -> !i.equals(source))
-                .collect(Collectors.toList());
     }
 
     public ZoneId getTimeZone() {

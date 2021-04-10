@@ -286,6 +286,7 @@ Cypress.Commands.add("subscribeToNote", (noteTitle, dailyLearningCount) => {
 
 Cypress.Commands.add("searchNote", (searchKey) => {
     cy.findByPlaceholderText("Search").type(searchKey);
+    cy.getFormControl("SearchGlobally").check();
     cy.findByText("Search").click();
 })
 
