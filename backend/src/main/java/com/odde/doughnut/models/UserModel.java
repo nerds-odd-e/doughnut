@@ -9,6 +9,7 @@ import javax.validation.Valid;
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -35,23 +36,16 @@ public class UserModel extends ModelForEntity<User> implements ReviewScope {
         save();
     }
 
-    public List<Note> filterLinkableNotes(Note note, @Valid SearchTerm searchTerm) {
+    public List<Note> getLinkableNotes(Note note, SearchTerm searchTerm) {
         if (Strings.isBlank(searchTerm.getSearchKey())) {
             return null;
         }
-        final String searchKey = searchTerm.getSearchKey().toLowerCase();
-        Stream<Note> linkableNotes;
+        final String pattern = Pattern.quote(searchTerm.getSearchKey());
         if (searchTerm.getSearchGlobally()) {
-            linkableNotes = modelFactoryService.noteRepository.findByUserAsReader(entity).stream();
+            return  modelFactoryService.noteRepository.searchForUserInVisibleScope(entity, note, pattern);
         }
-        else {
-            linkableNotes = note.getNotebook().getNotes().stream();
-        }
+        return  modelFactoryService.noteRepository.searchInNotebook(note.getNotebook(), note, pattern);
 
-        return linkableNotes
-                .filter(n -> !n.equals(note))
-                .filter(n -> n.getTitle().toLowerCase().contains(searchKey))
-                .collect(Collectors.toList());
     }
 
     @Override

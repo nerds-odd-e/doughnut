@@ -39,8 +39,7 @@ public class UserModelSearchTest {
     }
 
     private List<Note> search() {
-        makeMe.refresh(note.getNotebook());
-        return userModel.filterLinkableNotes(note, searchTerm);
+        return userModel.getLinkableNotes(note, searchTerm);
     }
 
     @Test

@@ -1,6 +1,7 @@
 package com.odde.doughnut.entities.repositories;
 
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -44,7 +45,13 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
     String byAncestorWhereThereIsNoReviewPoint = joinClosure
             + whereThereIsNoReviewPoint;
 
-    @Query( value = "SELECT note.* from note"
+    @Query( value = notesVisibleToAUser + searchForLinkTarget , nativeQuery = true)
+    List<Note> searchForUserInVisibleScope(@Param("user") User user, @Param("noteToAvoid") Note noteToAvoid, @Param("pattern") String pattern);
+
+    @Query( value = "SELECT note.* from note WHERE note.notebook_id = :notebook " + searchForLinkTarget , nativeQuery = true)
+    List<Note> searchInNotebook(@Param("notebook") Notebook notebook, @Param("noteToAvoid") Note noteToAvoid, @Param("pattern") String pattern);
+
+    String notesVisibleToAUser = "SELECT note.* from note"
             + "  JOIN ("
             + "          SELECT notebook.id FROM notebook "
             + "             LEFT JOIN circle_user ON circle_user.user_id = :user "
@@ -55,6 +62,8 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
             + "          SELECT notebook_id FROM subscription "
             + "             WHERE subscription.user_id = :user "
             + "       ) nb ON nb.id = note.notebook_id "
-            , nativeQuery = true)
-    List<Note> findByUserAsReader(@Param("user") User user);
+            + "  WHERE 1=1 ";
+
+    String searchForLinkTarget = "  AND note.id != :noteToAvoid "
+                    + "      AND REGEXP_LIKE(note.title, :pattern) ";
 }
