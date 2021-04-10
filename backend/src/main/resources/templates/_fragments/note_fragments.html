@@ -108,7 +108,8 @@
     </a>
 </div>
 
-<div th:fragment="showPicture(note, opacity)" th:object="${note}" class="text-center" th:unless="${#strings.isEmpty(note.notePicture)}">
+<div th:fragment="showPicture(note, opacity)" th:object="${note}" class="text-center"
+     th:unless="${#strings.isEmpty(note.notePicture)}">
     <div style="position: relative; display: inline-block;" id="note-picture">
         <img class="img-fluid" th:src="*{notePicture}"/>
         <svg viewBox="0 0 100 100"
@@ -118,7 +119,7 @@
     </div>
 </div>
 
-<div th:fragment="noteShowWithTitle(note, level, titleHtml, bodyHtml)" th:object="${note}">
+<div th:fragment="noteShowWithTitle(note, level, forBazaar, titleHtml, bodyHtml)" th:object="${note}">
     <div th:object="${note.noteContent}">
         <h2 th:replace="${titleHtml}"/>
         <div th:replace="${bodyHtml}"/>
@@ -131,35 +132,49 @@
 
     <div th:replace=":: showPicture(${note}, 0.2)"/>
 
-    <p th:each="linkType:${note.linkTypes(currentUser?.entity)}">
-        <span th:text="${linkType.label}"/>
-        <span class="badge badge-light mr-1" th:each="link:${note.linksOfTypeThroughDirect(linkType)}">
-            <span th:replace=":: linkWithHtmlLink(${link}, ${link.targetNote})"/>
-        </span>
-        <span class="badge badge-warning mr-1" th:each="link:${note.linksOfTypeThroughReverse(linkType, currentUser?.entity)}">
-            <span th:replace=":: linkWithHtmlLink(${link}, ${link.sourceNote})"/>
-        </span>
-    </p>
+    <ul>
+
+        <li th:each="linkType:${note.linkTypes(currentUser?.entity)}">
+            <span th:text="${linkType.label}"/>
+            <span class="badge badge-light mr-1" th:each="link:${note.linksOfTypeThroughDirect(linkType)}">
+                <span th:unless="${forBazaar}" th:remove="tag">
+                    <span th:replace=":: linkWithHtmlLink(${link}, ${link.targetNote})"/>
+                </span>
+                <a th:href="'/bazaar/notes/' + ${link.targetNote.id}" th:text="${link.targetNote.noteContent.title}"
+                   th:if="${forBazaar}"/>
+            </span>
+            <span class="badge badge-warning mr-1"
+                  th:each="link:${note.linksOfTypeThroughReverse(linkType, currentUser?.entity)}">
+                <span th:unless="${forBazaar}" th:remove="tag">
+                    <span th:replace=":: linkWithHtmlLink(${link}, ${link.sourceNote})"/>
+                </span>
+                <a th:href="'/bazaar/notes/' + ${link.sourceNote.id}" th:text="${link.sourceNote.noteContent.title}" th:if="${forBazaar}"/>
+            </span>
+        </li>
+    </ul>
 </div>
 
-<div th:fragment="noteShow(note, level)"
-     th:replace=":: noteShowWithTitle(${note}, ${level}, ~{:: .note-title-show}, ~{:: .note-body-show})">
+<div th:fragment="noteShow(note, level, forBazaar)"
+     th:replace=":: noteShowWithTitle(${note}, ${level}, ${forBazaar}, ~{:: .note-title-show}, ~{:: .note-body-show})">
     <h2 class="note-title-show" th:class="'h' + ${level}" th:text="${note.noteContent.title}"/>
     <pre class="note-body-show note-body" th:text="${note.noteContent.description}" style="white-space: pre-wrap;"/>
 </div>
 
-<div th:fragment="noteAsArticle(note, level)">
-    <div th:replace=":: noteShowWithTitle(${note}, ${level}, ~{::.note-title-article}, ~{::.note-body-article})">
+<div th:fragment="noteAsArticle(note, level, forBazaar)">
+    <div th:replace=":: noteShowWithTitle(${note}, ${level}, ${forBazaar}, ~{::.note-title-article}, ~{::.note-body-article})">
         <h2 class="note-title-article" th:class="'h' + ${level}" th:text="${note.articleTitle}"
             th:if="${note.hasTitleInArticle}"/>
         <span class="note-title-article" th:unless="${note.hasTitleInArticle}"/>
-        <pre class="note-body-article note-body" th:text="${note.articleBody}" style="white-space: pre-wrap; margin-bottom: 0;"/>
+        <pre class="note-body-article note-body" th:text="${note.articleBody}"
+             style="white-space: pre-wrap; margin-bottom: 0;"/>
     </div>
 
     <ul style="padding-left: 0px;">
         <th:block th:each="child:${note.children}">
-            <li style="margin-left:25px;" class="article-view" th:if="${child.noteContent.showAsBulletInArticle}" th:insert=" :: noteAsArticle(${child}, ${1 + level})"/>
-            <div style="margin-bottom:5px;" th:unless="${child.noteContent.showAsBulletInArticle}" th:insert=" :: noteAsArticle(${child}, ${1 + level})"/>
+            <li style="margin-left:25px;" class="article-view" th:if="${child.noteContent.showAsBulletInArticle}"
+                th:insert=" :: noteAsArticle(${child}, ${1 + level}, ${forBazaar})"/>
+            <div style="margin-bottom:5px;" th:unless="${child.noteContent.showAsBulletInArticle}"
+                 th:insert=" :: noteAsArticle(${child}, ${1 + level}, ${forBazaar})"/>
         </th:block>
     </ul>
 </div>
