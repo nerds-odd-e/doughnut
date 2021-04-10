@@ -6,6 +6,8 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.models.LinkModel;
 import com.odde.doughnut.services.ModelFactoryService;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -31,14 +33,23 @@ public class LinkController extends ApplicationMvcController  {
         return "links/show";
     }
 
+    class SearchTerm {
+        @Getter
+        @Setter
+        private String key = "";
+
+        public SearchTerm() {}
+    }
+
     @GetMapping("/{note}/link")
     public String newLink(@PathVariable("note") Note note, Model model) {
+        model.addAttribute("searchTerm", new SearchTerm());
         return "links/new";
     }
 
     @PostMapping("/{note}/search_for_target")
-    public String searchForLinkTarget(@PathVariable("note") Note note, @RequestParam(required = false) String searchTerm, Model model) {
-        List<Note> linkableNotes = currentUserFetcher.getUser().filterLinkableNotes(note, searchTerm);
+    public String searchForLinkTarget(@PathVariable("note") Note note, @Valid SearchTerm searchTerm, Model model) {
+        List<Note> linkableNotes = currentUserFetcher.getUser().filterLinkableNotes(note, searchTerm.key);
         model.addAttribute("linkableNotes", linkableNotes);
         return "links/new";
     }
