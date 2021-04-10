@@ -34,7 +34,8 @@ in mkShell {
     apple_sdk.Foundation apple_sdk.ImageIO apple_sdk.IOKit apple_sdk.Kernel apple_sdk.MediaToolbox apple_sdk.OpenGL
     apple_sdk.QTKit apple_sdk.Security apple_sdk.SystemConfiguration xcodebuild
   ] ++ lib.optionals (!stdenv.isDarwin) [
-    dart firefox google-chrome flutter gitter intellij vscode-with-extensions
+    dart firefox google-chrome flutter sequeler
+    gitter intellij vscode-with-extensions
   ];
   shellHook = ''
     export JAVA_HOME="${pkgs.zulu}"
