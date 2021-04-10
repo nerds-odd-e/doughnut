@@ -26,7 +26,7 @@
             <div class="btn-group btn-group-sm">
                 <a th:href="@{/notes/{id}/move(id=${note.id})}">Move This Note</a>
             </div>
-            <a th:replace="_fragments/note_fragments :: noteLinkButtons('', ${note})"/>
+            <a th:replace="_fragments/note_fragments :: noteNavigationButtons('', ${note})"/>
         </nav>
 
         <div th:replace="_fragments/note_fragments :: noteOwnerViewCards(${note.children})"/>

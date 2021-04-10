@@ -25,7 +25,7 @@ in mkShell {
     cacert curlie glances httpie
     mysql80 mysql-client mysql_jdbc python38Packages.pip
     chromedriver geckodriver google-cloud-sdk packer
-    dbeaver vim vimpager vscode-with-extensions
+    dbeaver vim vimpager
   ] ++ lib.optionals stdenv.isDarwin [
     darwin.apple_sdk.libs.utmp darwin.apple_sdk.libs.Xplugin
     apple_sdk.AppKit apple_sdk.AGL apple_sdk.ApplicationServices apple_sdk.AudioToolbox
@@ -34,7 +34,7 @@ in mkShell {
     apple_sdk.Foundation apple_sdk.ImageIO apple_sdk.IOKit apple_sdk.Kernel apple_sdk.MediaToolbox apple_sdk.OpenGL
     apple_sdk.QTKit apple_sdk.Security apple_sdk.SystemConfiguration xcodebuild
   ] ++ lib.optionals (!stdenv.isDarwin) [
-    dart firefox google-chrome flutter gitter intellij
+    dart firefox google-chrome flutter gitter intellij vscode-with-extensions
   ];
   shellHook = ''
     export JAVA_HOME="${pkgs.zulu}"

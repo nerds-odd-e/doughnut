@@ -73,7 +73,7 @@
 
 <div th:fragment="noteOwnerViewCards(notes)"
      th:replace=":: noteCardWithHeaderAndButton(${notes}, ~{ :: .card-button},  ~{ :: .card-header-buttons})">
-    <div class="card-header-buttons" th:replace=":: noteButtons(${note})"/>
+    <div class="card-header-buttons" th:replace=":: noteButtons(${noteElement})"/>
     <span class="card-button"/>
 </div>
 
@@ -100,7 +100,7 @@
     </a>
 </div>
 
-<div th:fragment="noteLinkButtons(urlPrefix, entity)" class="btn-group btn-group-sm">
+<div th:fragment="noteNavigationButtons(urlPrefix, entity)" class="btn-group btn-group-sm">
     <a th:replace="_fragments/note_fragments :: noteLinkButton(${urlPrefix}, ${entity.previousSibling}, 'fastBackward', 'previous sibling')"/>
     <a th:replace="_fragments/note_fragments :: noteLinkButton(${urlPrefix}, ${entity.previous}, 'backward', 'previous')"/>
     <a th:replace="_fragments/note_fragments :: noteLinkButton(${urlPrefix}, ${entity.next}, 'forward', 'next')"/>
