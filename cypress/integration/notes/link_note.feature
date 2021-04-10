@@ -14,12 +14,11 @@ Feature: link note
   Scenario: View all linkable notes for a note when no link exists
     When I am creating link for note "Sedition"
     And I should see the source note as "Sedition"
-    And I should see "Sedation, Sedative" as targets only
+    And I should see "Sedation, Sedative" as targets only when searching "Se"
 
   Scenario Outline: Search note for linking with partial input
     Given I am creating link for note "Sedition"
-    When I search for notes with title "<search key>"
-    And I should see "<targets>" as targets only
+    And I should see "<targets>" as targets only when searching "<search key>"
     Examples:
       | search key | targets            |
       | Sed        | Sedation, Sedative |
@@ -28,7 +27,7 @@ Feature: link note
   Scenario: linkable notes should not include notes already linked
     Given I link note "Sedition" as "belongs to" note "Sedation"
     When I am creating link for note "Sedition"
-    And I should see "Sedative" as targets only
+    And I should see "Sedative" as targets only when searching "Se"
 
   Scenario: links should show in the view
     When I link note "Sedition" as "is similar to" note "Sedation"

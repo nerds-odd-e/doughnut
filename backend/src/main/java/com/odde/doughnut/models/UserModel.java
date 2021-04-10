@@ -6,6 +6,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.services.ModelFactoryService;
+import org.apache.logging.log4j.util.Strings;
 
 import java.sql.Timestamp;
 import java.time.ZoneId;
@@ -36,13 +37,13 @@ public class UserModel extends ModelForEntity<User> implements ReviewScope {
     }
 
     public List<Note> filterLinkableNotes(Note note, String searchTerm) {
-        List<Note> linkableNotes = getAllLinkableNotes(note);
-        if (searchTerm != null) {
-            return linkableNotes.stream()
-                    .filter(n -> n.getTitle().contains(searchTerm))
-                    .collect(Collectors.toList());
+        if (Strings.isBlank(searchTerm)) {
+            return null;
         }
-        return linkableNotes;
+        List<Note> linkableNotes = getAllLinkableNotes(note);
+        return linkableNotes.stream()
+                .filter(n -> n.getTitle().contains(searchTerm))
+                .collect(Collectors.toList());
     }
 
     @Override

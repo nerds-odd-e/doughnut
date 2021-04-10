@@ -13,6 +13,7 @@ When("I am creating link for note {string}", (noteTitle) => {
 
 When("I link note {string} as {string} note {string}", (fromNoteTitle, linkType, toNoteTitle) => {
     cy.creatingLinkFor(fromNoteTitle);
+    cy.searchNote(toNoteTitle);
     cy.clickButtonOnCardBody(toNoteTitle, "Select");
     cy.get('select').select(linkType);
     cy.findByRole('button', {name: "Link"}).click();
@@ -26,12 +27,8 @@ And("I should see the source note as {string}",(noteTitle) => {
     cy.findByText(`Link ${noteTitle} to:`).should("be.visible");
 })
 
-When("I search for notes with title {string}", (searchKey) => {
-    cy.findByPlaceholderText("Search").type(searchKey);
-    cy.findByText("Search").click();
-})
-
-And("I should see {string} as targets only",(noteTitlesAsString) => {
+And("I should see {string} as targets only when searching {string}",(noteTitlesAsString, searchKey) => {
+    cy.searchNote(searchKey);
     cy.expectExactLinkTargets(noteTitlesAsString.commonSenseSplit(",").map(i=>i.trim()));
 })
 
