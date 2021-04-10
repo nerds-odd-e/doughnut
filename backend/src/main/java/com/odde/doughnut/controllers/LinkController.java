@@ -32,7 +32,12 @@ public class LinkController extends ApplicationMvcController  {
     }
 
     @GetMapping("/{note}/link")
-    public String link(@PathVariable("note") Note note, @RequestParam(required = false) String searchTerm, Model model) {
+    public String newLink(@PathVariable("note") Note note, Model model) {
+        return "links/new";
+    }
+
+    @PostMapping("/{note}/search_for_target")
+    public String searchForLinkTarget(@PathVariable("note") Note note, @RequestParam(required = false) String searchTerm, Model model) {
         List<Note> linkableNotes = currentUserFetcher.getUser().filterLinkableNotes(note, searchTerm);
         model.addAttribute("linkableNotes", linkableNotes);
         return "links/new";

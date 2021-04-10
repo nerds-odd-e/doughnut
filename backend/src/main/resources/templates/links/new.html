@@ -6,7 +6,7 @@
 
             <div class="row">
                 <div class="my-3 col-6">
-                    <form th:action="@{/links/{id}/link(id=${note.id})}" method="get">
+                    <form th:action="@{/links/{id}/search_for_target(id=${note.id})}" method="post">
                         <input type="text" class="form-control " placeholder="Search" name="searchTerm">
                         <button type="submit" class="btn btn-primary">Search</button>
                     </form>
