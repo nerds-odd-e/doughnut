@@ -14,6 +14,9 @@
             </div>
         </div>
 
+        <div th:if="${linkableNotes?.isEmpty}">
+            <em>No linkable notes found.</em>
+        </div>
         <div th:replace="_fragments/note_fragments :: cards(${linkableNotes}, ~{ :: .card-button}, ~{ :: .card-header})">
             <span class="card-header"></span>
             <form th:action="@{/links/{id}/link(id=${note.id})}" method="post" class="card-button">

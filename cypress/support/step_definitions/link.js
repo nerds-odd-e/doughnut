@@ -32,6 +32,11 @@ And("I should see {string} as targets only when searching {string}",(noteTitlesA
     cy.expectExactLinkTargets(noteTitlesAsString.commonSenseSplit(",").map(i=>i.trim()));
 })
 
+And("I should see note cannot be found when searching {string}",(searchKey) => {
+    cy.searchNote(searchKey);
+    cy.findByText('No linkable notes found.').should("be.visible");
+})
+
 Then("I should see {string} has link {string} {string}",(noteTitle, linkType, targetNoteTitles) => {
     cy.findByText(linkType).should('be.visible');
     targetNoteTitles.commonSenseSplit(",").forEach(
