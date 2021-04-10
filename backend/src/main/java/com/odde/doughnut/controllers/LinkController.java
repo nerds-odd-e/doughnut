@@ -36,7 +36,10 @@ public class LinkController extends ApplicationMvcController  {
     class SearchTerm {
         @Getter
         @Setter
-        private String key = "";
+        private String searchKey = "";
+        @Getter
+        @Setter
+        private Boolean searchGlobally = false;
 
         public SearchTerm() {}
     }
@@ -49,7 +52,7 @@ public class LinkController extends ApplicationMvcController  {
 
     @PostMapping("/{note}/search_for_target")
     public String searchForLinkTarget(@PathVariable("note") Note note, @Valid SearchTerm searchTerm, Model model) {
-        List<Note> linkableNotes = currentUserFetcher.getUser().filterLinkableNotes(note, searchTerm.key);
+        List<Note> linkableNotes = currentUserFetcher.getUser().filterLinkableNotes(note, searchTerm.searchKey);
         model.addAttribute("linkableNotes", linkableNotes);
         return "links/new";
     }

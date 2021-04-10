@@ -7,7 +7,8 @@
             <div class="row">
                 <div class="my-3 col-6">
                     <form th:action="@{/links/{id}/search_for_target(id=${note.id})}" th:object="${searchTerm}" method="post">
-                        <div th:replace="_fragments/forms :: textInput('searchTerm', 'key', 'Search', true)"/>
+                        <div th:replace="_fragments/forms :: textInput('searchTerm', 'searchKey', 'Search', true)"/>
+                        <div th:replace="_fragments/forms :: checkInput('searchTerm', 'searchGlobally')"/>
                         <button type="submit" class="btn btn-primary">Search</button>
                     </form>
                 </div>
