@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Arrays;
 import java.util.List;
 
 public interface NoteRepository extends CrudRepository<Note, Integer> {
@@ -42,4 +43,12 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
 
     String byAncestorWhereThereIsNoReviewPoint = joinClosure
             + whereThereIsNoReviewPoint;
+
+    @Query( value = "SELECT note.* from note"
+            + "  JOIN circle_user ON circle_user.user_id = :user "
+            + "  JOIN circle ON circle.id = circle_user.circle_id "
+            + "  JOIN ownership ON circle.id = ownership.circle_id "
+            + "  JOIN notebook ON notebook.ownership_id = ownership.id AND notebook.id = note.notebook_id "
+            , nativeQuery = true)
+    List<Note> findByUserAsOwner(@Param("user") User user);
 }

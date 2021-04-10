@@ -10,6 +10,7 @@ import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class UserModel extends ModelForEntity<User> implements ReviewScope {
     public UserModel(User user, ModelFactoryService modelFactoryService) {
@@ -39,18 +40,31 @@ public class UserModel extends ModelForEntity<User> implements ReviewScope {
             return null;
         }
         final String searchKey = searchTerm.getSearchKey().toLowerCase();
-        List<Note> linkableNotes;
+        Stream<Note> linkableNotes;
         if (searchTerm.getSearchGlobally()) {
-            linkableNotes = entity.getNotes();
+            linkableNotes = getVisibleNoteStream();
         }
         else {
-            linkableNotes = note.getNotebook().getNotes();
+            linkableNotes = note.getNotebook().getNotes().stream();
         }
 
-        return linkableNotes.stream()
+        return linkableNotes
                 .filter(n -> !n.equals(note))
                 .filter(n -> n.getTitle().toLowerCase().contains(searchKey))
                 .collect(Collectors.toList());
+    }
+
+    private Stream<Note> getVisibleNoteStream() {
+        Stream<Note> linkableNotes;
+        linkableNotes = entity.getNotes().stream();
+        linkableNotes = entity.getSubscriptions().stream().map(s->s.getNotebook().getNotes().stream())
+                .reduce(linkableNotes, Stream::concat);
+        linkableNotes = Stream.concat(
+                linkableNotes,
+                modelFactoryService.noteRepository.findByUserAsOwner(entity).stream()
+
+        );
+        return linkableNotes;
     }
 
     @Override

@@ -1,5 +1,6 @@
 package com.odde.doughnut.models;
 
+import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.SearchTerm;
 import com.odde.doughnut.testability.MakeMe;
@@ -81,5 +82,55 @@ public class UserModelSearchTest {
         assertThat(notes, contains(anotherNote));
     }
 
+    @Nested
+    class ThereIsANoteBookInBazaar {
+        Note bazaarNote;
+
+        @BeforeEach
+        void setup() {
+            bazaarNote = makeMe.aNote().byUser(anotherUser).please();
+            makeMe.aBazaarNodebook(bazaarNote.getNotebook()).please();
+            makeMe.refresh(bazaarNote.getNotebook());
+        }
+
+        @Test
+        void theSearchShouldNotIncludeNoteInBazaar() {
+            searchTerm.setSearchKey(bazaarNote.getTitle());
+            searchTerm.setSearchGlobally(true);
+            final List<Note> notes = search();
+            assertTrue(notes.isEmpty());
+        }
+
+        @Test
+        void theSearchShouldIncludeNoteISubscribed() {
+            makeMe.aSubscription().forNotebook(bazaarNote.getNotebook()).forUser(userModel.getEntity()).please();
+            searchTerm.setSearchKey(bazaarNote.getTitle());
+            searchTerm.setSearchGlobally(true);
+            final List<Note> notes = search();
+            assertThat(notes, contains(bazaarNote));
+        }
+
+    }
+
+    @Nested
+    class ThereIsANoteBookInMyCircle {
+        Note circleNote;
+
+        @BeforeEach
+        void setup() {
+            Circle circle = makeMe.aCircle().hasMember(userModel).hasMember(anotherUser).please();
+            circleNote = makeMe.aNote().byUser(anotherUser).inCircle(circle).please();
+            makeMe.refresh(circleNote.getNotebook());
+        }
+
+        @Test
+        void theSearchShouldIncludeNote() {
+            searchTerm.setSearchKey(circleNote.getTitle());
+            searchTerm.setSearchGlobally(true);
+            final List<Note> notes = search();
+            assertThat(notes, contains(circleNote));
+        }
+
+    }
 }
 
