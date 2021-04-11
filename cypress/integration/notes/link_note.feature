@@ -14,7 +14,7 @@ Feature: link note
   Scenario: View all linkable notes for a note when no link exists
     When I am creating link for note "Sedition"
     Then I should see the source note as "Sedition"
-    And I should see "Sedation, Sedative" as targets only when searching "Se"
+    And I should see "Sedation, Sedative" as targets only when searching " se "
     And I should see note cannot be found when searching "Sedition"
 
   Scenario Outline: Search note for linking with partial input
