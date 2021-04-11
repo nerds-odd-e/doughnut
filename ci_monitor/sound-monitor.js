@@ -37,18 +37,18 @@ class BuildState {
   }
 
   diffToSentence(previousState, dictionary) {
-    var toSay = "";
     if (this.buildName != previousState.buildName) {
-      toSay = dictionary.translate("new_build") + `"${this.gitLog}"` + dictionary.translate(this.status);
+      return dictionary.translate("new_build") + `"${this.gitLog}"` + dictionary.translate(this.status);
     }
     if (this.status != previousState.status) {
-      toSay = dictionary.translate("the_build") + dictionary.translate(this.status);
+      return dictionary.translate("the_build") + dictionary.translate(this.status);
     }
-    return toSay;
+    return "";
   }
 }
 
 var lastBuildState = new BuildState("", "");
+
 const englishDictionary = {
   translate: function(phrase) {
     return {
@@ -58,8 +58,21 @@ const englishDictionary = {
   }
 };
 
+const japaneseDictionary = {
+  translate: function(phrase) {
+    return {
+      new_build: "新規プッシュがありました：",
+      the_build: "現プッシュが",
+      "has been queued.": "準備中。",
+      "is currently running.": "運転中。",
+      "completed successfully.": "成功しました！",
+      "faild.": "失敗しました！直してください",
+    }[phrase] || ` ${phrase}`;
+  }
+};
+
 setInterval(()=>{ buildState("https://github.com/nerds-odd-e/doughnut/actions").then((newState) => {
-   say(newState.diffToSentence(lastBuildState, englishDictionary));
+   say(newState.diffToSentence(lastBuildState, japaneseDictionary));
    lastBuildState = newState;
   } ) }, 5000);
 
