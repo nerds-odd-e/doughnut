@@ -1,5 +1,5 @@
 const request = require('request');
-const {BuildState, englishDictionary} = require('../sound-monitor');
+const {buildState, BuildState, englishDictionary} = require('../sound-monitor');
 
 jest.mock('request');
 
@@ -11,8 +11,7 @@ const html = `
 
 test('get content from github action', () => {
   request.mockImplementation((url, cb)=>cb(null, null, html));
-  const state = new BuildState("", "");
-  return expect(state.nextState()).resolves.toMatchObject({
+  return expect(buildState()).resolves.toMatchObject({
     status: 'completed successfully.',
     gitLog: "move code",
     buildName: "check_suite_2467107019"
@@ -29,4 +28,10 @@ test('found a new build', () => {
   const state = new BuildState("build1", "completed successfully", "do something");
   const state2 = new BuildState("build2", "completed successfully", "do something");
   expect(state.diffToSentence(state2, englishDictionary)).toBe(`A new build "do something" completed successfully`);
+});
+
+test('found a new status', () => {
+  const state = new BuildState("build1", "is currently running", "do something");
+  const state2 = new BuildState("build1", "completed successfully", "do something");
+  expect(state.diffToSentence(state2, englishDictionary)).toBe(`The build is currently running`);
 });

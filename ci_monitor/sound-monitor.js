@@ -13,19 +13,20 @@ function say(sentence) {
   });
 }
 
-function for_build_status(url, action) {
+function buildState(url) {
+  return new Promise((resolve, reject) => {
     request(url, function(err, res, body) {
       if (err) {
         console.error(err)
       }
       else {
-        action(
-            body.match(/check_suite_\d+/)?.shift(),
-            body.match(/This workflow run ([^\.]+\.)/)?.pop(),
-            body.match(/aria\-label\=\"Run \d+ of[^\>]+\>(.*)\<\/a\>/)?.pop()
-        );
+        const currentBuild = body.match(/check_suite_\d+/)?.shift();
+        const currentStatus = body.match(/This workflow run ([^\.]+\.)/)?.pop();
+        const gitLog = body.match(/aria\-label\=\"Run \d+ of[^\>]+\>(.*)\<\/a\>/)?.pop();
+        resolve(new BuildState(currentBuild, currentStatus, gitLog));
       }
     });
+  });
 }
 
 class BuildState {
@@ -35,51 +36,33 @@ class BuildState {
     this.gitLog = gitLog;
   }
 
-  nextState() {
-    return new Promise((resolve, reject) => {
-      for_build_status("https://github.com/nerds-odd-e/doughnut/actions", (currentBuild, currentStatus, gitLog)=>{
-          var toSay = "";
-          var nextStatus = this.status;
-          var newBuild = false;
-          if (this.buildName !== currentBuild) {
-            newBuild = true;
-              nextStatus = "";
-              toSay = "A new push: " + gitLog;
-          }
-          if (nextStatus !== currentStatus) {
-              if (! newBuild) {
-                toSay = "The build ";
-              }
-              toSay += currentStatus;
-          }
-          resolve(new BuildState(currentBuild, currentStatus, gitLog));
-      });
-    })
-  }
-
   diffToSentence(previousState, dictionary) {
     var toSay = "";
     if (this.buildName != previousState.buildName) {
       toSay = dictionary.translate("new_build") + `"${this.gitLog}"` + dictionary.translate(this.status);
     }
+    if (this.status != previousState.status) {
+      toSay = dictionary.translate("the_build") + dictionary.translate(this.status);
+    }
     return toSay;
   }
 }
 
-var buildState = new BuildState("", "");
+var lastBuildState = new BuildState("", "");
 const englishDictionary = {
   translate: function(phrase) {
     return {
-      new_build: "A new build "
+      new_build: "A new build ",
+      the_build: "The build",
     }[phrase] || ` ${phrase}`;
   }
 };
 
-setInterval(()=>{ buildState.nextState().then((newState) => {
-   say(newState.diffToSentence(buildState, englishDictionary));
-   buildState = newState;
+setInterval(()=>{ buildState("https://github.com/nerds-odd-e/doughnut/actions").then((newState) => {
+   say(newState.diffToSentence(lastBuildState, englishDictionary));
+   lastBuildState = newState;
   } ) }, 5000);
 
 module.exports = {
-  BuildState, say, englishDictionary
+  buildState, BuildState, say, englishDictionary
 };
