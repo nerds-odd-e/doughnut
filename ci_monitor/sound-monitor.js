@@ -1,34 +1,6 @@
 const { exec } = require('child_process');
 const request = require('request');
 
-function say(sentence) {
-  if(sentence === "") {
-    return;
-  }
-  console.error(sentence);
-  exec("say \""+sentence+"\"", (err, stdout, stderr) => {
-    if (err) {
-      console.error(err)
-    }
-  });
-}
-
-function buildState(url) {
-  return new Promise((resolve, reject) => {
-    request(url, function(err, res, body) {
-      if (err) {
-        console.error(err)
-      }
-      else {
-        const currentBuild = body.match(/check_suite_\d+/)?.shift();
-        const currentStatus = body.match(/This workflow run ([^\.]+\.)/)?.pop();
-        const gitLog = body.match(/aria\-label\=\"Run \d+ of[^\>]+\>(.*)\<\/a\>/)?.pop();
-        resolve(new BuildState(currentBuild, currentStatus, gitLog));
-      }
-    });
-  });
-}
-
 const Reset = "\x1b[0m"
 const Bright = "\x1b[1m"
 const Dim = "\x1b[2m"
@@ -55,6 +27,34 @@ const BgMagenta = "\x1b[45m"
 const BgCyan = "\x1b[46m"
 const BgWhite = "\x1b[47m"
 
+function say(sentence, colorCode) {
+  if(sentence === "") {
+    return;
+  }
+  console.error(colorCode + sentence + Reset);
+  exec("say \""+sentence+"\"", (err, stdout, stderr) => {
+    if (err) {
+      console.error(err)
+    }
+  });
+}
+
+function buildState(url) {
+  return new Promise((resolve, reject) => {
+    request(url, function(err, res, body) {
+      if (err) {
+        console.error(err)
+      }
+      else {
+        const currentBuild = body.match(/check_suite_\d+/)?.shift();
+        const currentStatus = body.match(/This workflow run ([^\.]+\.)/)?.pop();
+        const gitLog = body.match(/aria\-label\=\"Run \d+ of[^\>]+\>(.*)\<\/a\>/)?.pop();
+        resolve(new BuildState(currentBuild, currentStatus, gitLog));
+      }
+    });
+  });
+}
+
 class BuildState {
   constructor(buildName, status, gitLog) {
     this.buildName = buildName;
@@ -64,10 +64,10 @@ class BuildState {
 
   diffToSentence(previousState, dictionary) {
     if (this.buildName != previousState.buildName) {
-      return this.colorCode() + dictionary.translate("new_build") + `"${this.gitLog}"` + dictionary.translate(this.status);
+      return dictionary.translate("new_build") + `"${this.gitLog}"` + dictionary.translate(this.status);
     }
     if (this.status != previousState.status) {
-      return this.colorCode() + dictionary.translate("the_build") + dictionary.translate(this.status);
+      return dictionary.translate("the_build") + dictionary.translate(this.status);
     }
     return "";
   }
@@ -107,7 +107,7 @@ const japaneseDictionary = {
 };
 
 setInterval(()=>{ buildState("https://github.com/nerds-odd-e/doughnut/actions").then((newState) => {
-   say(newState.diffToSentence(lastBuildState, japaneseDictionary));
+   say(newState.diffToSentence(lastBuildState, japaneseDictionary), newState.colorCode());
    lastBuildState = newState;
   } ) }, 5000);
 
