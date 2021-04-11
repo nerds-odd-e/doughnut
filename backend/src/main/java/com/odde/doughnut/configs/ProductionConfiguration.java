@@ -1,5 +1,6 @@
-package com.odde.doughnut;
+package com.odde.doughnut.configs;
 
+import com.odde.doughnut.configs.CommonConfiguration;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

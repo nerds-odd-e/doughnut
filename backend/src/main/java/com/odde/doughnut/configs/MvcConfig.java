@@ -1,4 +1,4 @@
-package com.odde.doughnut;
+package com.odde.doughnut.configs;
 
 import org.springframework.http.CacheControl;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;

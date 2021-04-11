@@ -1,4 +1,4 @@
-package com.odde.doughnut;
+package com.odde.doughnut.configs;
 
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 
