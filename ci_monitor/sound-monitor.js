@@ -56,16 +56,30 @@ class BuildState {
       });
     })
   }
+
+  diffToSentence(previousState, dictionary) {
+    var toSay = "";
+    if (this.buildName != previousState.buildName) {
+      toSay = dictionary.translate("new_build") + `"${this.gitLog}"` + dictionary.translate(this.status);
+    }
+    return toSay;
+  }
 }
 
 var buildState = new BuildState("", "");
-const dictionary = {"as": "asd"};
+const englishDictionary = {
+  translate: function(phrase) {
+    return {
+      new_build: "A new build "
+    }[phrase] || ` ${phrase}`;
+  }
+};
 
 setInterval(()=>{ buildState.nextState().then((newState) => {
-   say(newState.diffToSentence(buildState, dictionary));
+   say(newState.diffToSentence(buildState, englishDictionary));
    buildState = newState;
   } ) }, 5000);
 
 module.exports = {
-  BuildState, say
+  BuildState, say, englishDictionary
 };

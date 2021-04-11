@@ -1,5 +1,5 @@
 const request = require('request');
-const {BuildState} = require('../sound-monitor');
+const {BuildState, englishDictionary} = require('../sound-monitor');
 
 jest.mock('request');
 
@@ -20,4 +20,13 @@ test('get content from github action', () => {
 });
 
 test('should not say anything is state not changed', () => {
+  const state = new BuildState("build1", "completed successfully", "do something");
+  const state2 = new BuildState("build1", "completed successfully", "do something");
+  expect(state.diffToSentence(state2, englishDictionary)).toBe("");
+});
+
+test('found a new build', () => {
+  const state = new BuildState("build1", "completed successfully", "do something");
+  const state2 = new BuildState("build2", "completed successfully", "do something");
+  expect(state.diffToSentence(state2, englishDictionary)).toBe(`A new build "do something" completed successfully`);
 });
