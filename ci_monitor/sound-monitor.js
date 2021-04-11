@@ -29,40 +29,41 @@ function for_build_status(url, action) {
 }
 
 class BuildState {
-  constructor(buildName, status) {
+  constructor(buildName, status, gitLog) {
     this.buildName = buildName;
     this.status = status;
+    this.gitLog = gitLog;
   }
 
   nextState() {
     return new Promise((resolve, reject) => {
       for_build_status("https://github.com/nerds-odd-e/doughnut/actions", (currentBuild, currentStatus, gitLog)=>{
           var toSay = "";
-          var nextBuildName = this.buildName;
           var nextStatus = this.status;
+          var newBuild = false;
           if (this.buildName !== currentBuild) {
-              nextBuildName = currentBuild;
+            newBuild = true;
               nextStatus = "";
               toSay = "A new push: " + gitLog;
           }
           if (nextStatus !== currentStatus) {
-              nextStatus = currentStatus;
-              if (toSay === "") {
+              if (! newBuild) {
                 toSay = "The build ";
               }
               toSay += currentStatus;
           }
-          resolve({toSay, newState: new BuildState(nextBuildName, nextStatus)});
+          resolve(new BuildState(currentBuild, currentStatus, gitLog));
       });
     })
   }
 }
 
 var buildState = new BuildState("", "");
+const dictionary = {"as": "asd"};
 
-setInterval(()=>{ buildState.nextState().then(({toSay, newState}) => {
-   say(toSay);
-    buildState = newState;
+setInterval(()=>{ buildState.nextState().then((newState) => {
+   say(newState.diffToSentence(buildState, dictionary));
+   buildState = newState;
   } ) }, 5000);
 
 module.exports = {
