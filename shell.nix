@@ -34,8 +34,8 @@ in mkShell {
     apple_sdk.Foundation apple_sdk.ImageIO apple_sdk.IOKit apple_sdk.Kernel apple_sdk.MediaToolbox apple_sdk.OpenGL
     apple_sdk.QTKit apple_sdk.Security apple_sdk.SystemConfiguration xcodebuild
   ] ++ lib.optionals (!stdenv.isDarwin) [
-    dart firefox google-chrome flutter sequeler
-    gitter intellij vscode-with-extensions
+    dart firefox google-chrome flutter
+    gitter intellij mysql-workbench vscode-with-extensions
   ];
   shellHook = ''
     export JAVA_HOME="${pkgs.zulu}"
@@ -71,7 +71,7 @@ GRANT ALL PRIVILEGES ON doughnut_test.*        TO 'doughnut'@'localhost';
 FLUSH PRIVILEGES;
 EOF
 
-    export MYSQLD_PID=$(lsof -t -i tcp:3306)
+    export MYSQLD_PID=$(pgrep mysqld)
     if [[ -z "$MYSQLD_PID" ]]; then
       [ ! "$(ls -A mysql/data)" ] && mysqld --initialize-insecure --user=`whoami` --datadir=$MYSQL_DATADIR --basedir=$MYSQL_BASEDIR --explicit_defaults_for_timestamp
       mysqld --datadir=$MYSQL_DATADIR --pid-file=$MYSQL_PID_FILE --socket=$MYSQL_UNIX_PORT --mysqlx-socket=$MYSQLX_UNIX_PORT &
