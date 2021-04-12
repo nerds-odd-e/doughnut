@@ -49,7 +49,7 @@ in mkShell {
     export MYSQL_PID_FILE=$MYSQL_HOME/mysql.pid
 
     export NIXPKGS_ALLOW_UNFREE=1
-    export CHROME_EXECUTABLE=$(whereis -b google-chrome-stable | awk '{print $2}')
+    export CHROME_EXECUTABLE=$(type google-chrome-stable | awk '{print $3}')
     export PATH=$PATH:$JAVA_HOME/bin:$GRADLE_HOME/bin:$CHROME_EXECUTABLE
 
     echo "################################################################################"
