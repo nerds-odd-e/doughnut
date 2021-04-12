@@ -4,7 +4,7 @@ SCRIPTPATH="$(
 	pwd -P
 )"
 
-gcloud compute instance-templates create doughnut-mig-app-template \
+gcloud compute instance-templates create doughnut-app-template \
 	--image doughnut-debian10-mysql80-base-saltstack \
 	--service-account 220715781008-compute@developer.gserviceaccount.com \
 	--service-account doughnut-gcp-svc-acct@carbon-syntax-298809.iam.gserviceaccount.com \
