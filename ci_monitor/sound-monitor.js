@@ -27,11 +27,21 @@ const BgMagenta = "\x1b[45m"
 const BgCyan = "\x1b[46m"
 const BgWhite = "\x1b[47m"
 
+function now() {
+  var currentdate = new Date();
+  return currentdate.getDate() + "/"
+    + (currentdate.getMonth()+1)  + "/"
+    + currentdate.getFullYear() + "@"
+    + currentdate.getHours() + ":"
+    + currentdate.getMinutes() + ":"
+    + currentdate.getSeconds();
+}
+
 function say(sentence, colorCode) {
   if(sentence === "") {
     return;
   }
-  console.error(colorCode + sentence + Reset);
+  console.error(colorCode + now() + ": " + sentence + Reset);
   exec("say \""+sentence+"\"", (err, stdout, stderr) => {
     if (err) {
       console.error(err)
