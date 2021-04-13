@@ -3,12 +3,17 @@
 
 
 
-<div th:fragment="failureReportViewlist(failureReports)"  th:replace="_fragments/failure_report::failureReportDetailWithHeaderAndButton()">
+<div th:fragment="failureReportViewlist(failureReports)"
+     th:replace="_fragments/failure_report::failureReportDetailWithHeaderAndButton(
+         failureReports=${failureReports}
+     )">
 
 </div>
 
-<div th:fragment="failureReportDetailWithHeaderAndButton()">
-    abc
+<div th:fragment="failureReportDetailWithHeaderAndButton(failureReports)">
+    <div class="col-12 col-sm-6 col-md-4 col-lg-3" th:each="element:${failureReports}">
+        <p th:text="${element}"/>
+    </div>
 </div>
 
 
