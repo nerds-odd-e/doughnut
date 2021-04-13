@@ -13,19 +13,18 @@ Feature: Note display
       | note-title                              | note-description                                   |
       | Potentially shippable product increment | The output of every Sprint is called a Potentia... |
 
-    #
-    # The following part is commented out for demo purpose
-    #
-
-#    Scenario: The note display page should contain the total descendant count
-#        Given there are some notes for the current user
-#            | title                | testingParent |
-#            | Shape                |               |
-#            | Rectangle            | Shape         |
-#            | Square               | Rectangle     |
-#            | Triangle             | Shape         |
-#            | Equilateral triangle | Triangle      |
-#            | Circle               | Shape         |
-#        When I open "Shape" note from top level
-#        Then I should see there are 5 descendants
+  Scenario: Article view
+    Given there are some notes for the current user
+      | title                | testingParent |
+      | Shape                |               |
+      | Rectangle            | Shape         |
+      | Square               | Rectangle     |
+      | Triangle             | Shape         |
+      | Equilateral triangle | Triangle      |
+      | Circle               | Shape         |
+    When I open the note "Shape" in my notes in article view
+    Then I should see in the article:
+      | level | title    |
+      | h1    | Shape    |
+      | h2    | Triangle |
 

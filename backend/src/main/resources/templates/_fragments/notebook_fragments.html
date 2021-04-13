@@ -1,4 +1,8 @@
 <div th:fragment="noteButtons(notebook)" class="btn-group btn-group-sm">
+    <a role="button" class="btn btn-sm" title="Article View"
+       th:href="@{/notes/articles/{id}(id=${notebook.headNote.id})}">
+        <svg th:replace="_fragments/svgs :: article"/>
+    </a>
     <a class="btn btn-sm edit-notebook" th:href="@{/notebooks/{id}/edit(id=${notebook.id})}"
        title="edit notebook settings">
         <svg th:replace="_fragments/svgs :: editNotebook"/>
@@ -30,3 +34,4 @@
     <div class="card-header-btn" th:replace=":: noteButtons(${notebook})"/>
     <div class="card-header-btn" th:replace="${additionHeadButtons}"/>
 </div>
+

@@ -184,3 +184,17 @@
     </div>
 </div>
 
+<div th:fragment="noteControlHeader(note)">
+    <div th:replace=":: noteOwnerBreadcrumb(${note}, ~{:: .additional-item})">
+        <li class="breadcrumb-item additional-item" th:text="${note.title}"/>
+        <li class="breadcrumb-item additional-item">
+            <a class="text-secondary" th:href="@{/notes/{id}/new(id=${note.id})}">(Add Child Note)</a>
+        </li>
+    </div>
+    <div th:if="${!note.isHead()}">
+        <svg th:replace="_fragments/svgs :: downRight"/>
+        <a th:if="${!note.isHead()}" th:href="@{/notes/{id}/new(id=${note.parentNote.id})}">Add Sibling
+            Note</a>
+    </div>
+</div>
+

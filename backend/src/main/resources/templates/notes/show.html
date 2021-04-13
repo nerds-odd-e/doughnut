@@ -1,18 +1,9 @@
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
 <layout th:replace="_fragments/basic_layout :: application_layout(~{ :: .content})">
     <div class="container content">
-        <div th:replace="_fragments/note_fragments :: noteOwnerBreadcrumb(${note}, ~{:: .additional-item})">
-            <li class="breadcrumb-item additional-item" th:text="${note.title}"/>
-            <li class="breadcrumb-item additional-item">
-                <a class="text-secondary" th:href="@{/notes/{id}/new(id=${note.id})}">(Add Child Note)</a>
-            </li>
-        </div>
 
-        <div th:if="${!note.isHead()}">
-            <svg th:replace="_fragments/svgs :: downRight"/>
-            <a th:if="${!note.isHead()}" th:href="@{/notes/{id}/new(id=${note.parentNote.id})}">Add Sibling
-                Note</a>
-        </div>
+        <div th:replace="_fragments/note_fragments :: noteControlHeader(${note})"/>
+
         <div class="jumbotron py-4 mb-2">
             <nav class="nav d-flex flex-row-reverse p-0">
                 <div th:replace="_fragments/note_fragments :: noteButtons(${note})"/>

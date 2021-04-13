@@ -122,12 +122,15 @@ When("I should see {string} is before {string} in {string}", (noteTitle1, noteTi
     const texts = Array.from($els, el => el.innerText);
     expect(texts).to.match(matcher);
   });
-
-
 });
 
 // This step definition is for demo purpose
 Then("*for demo* I should see there are {int} descendants", (numberOfDescendants) => {
   cy.findByText('' + numberOfDescendants, {selector: '.descendant-counter'})
+});
+
+When("I open the note {string} in my notes in article view", (noteTitle) => {
+  cy.visitMyNotebooks();
+  cy.findByRole('button', {name: "Article View"}).click();
 });
 

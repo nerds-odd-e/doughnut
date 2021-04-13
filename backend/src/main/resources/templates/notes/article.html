@@ -1,0 +1,8 @@
+<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
+<layout th:replace="_fragments/basic_layout :: application_layout(~{ :: .content})">
+    <div class="container content">
+
+        <div th:replace="_fragments/note_fragments :: noteControlHeader(${note})"/>
+        <div th:replace="_fragments/note_fragments :: noteAsArticle(${note}, 1, true)"/>
+    </div>
+</layout>

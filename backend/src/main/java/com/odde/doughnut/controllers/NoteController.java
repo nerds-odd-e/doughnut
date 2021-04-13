@@ -64,6 +64,12 @@ public class NoteController extends ApplicationMvcController  {
         return "notes/show";
     }
 
+    @GetMapping("/articles/{note}")
+    public String showNoteAsArticle(@PathVariable(name = "note") Note note) throws NoAccessRightException {
+        getCurrentUser().getAuthorization().assertAuthorization(note);
+        return "notes/article";
+    }
+
     @GetMapping("/{note}/edit")
     public String editNote(Note note, Model model) {
         model.addAttribute("noteContent", note.getNoteContent());
