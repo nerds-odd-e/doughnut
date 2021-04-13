@@ -1,6 +1,6 @@
-# frontend
+# doughnut frontend
 
-A new Flutter project.
+Flutter doughnut frontend project.
 
 ## Getting Started
 
