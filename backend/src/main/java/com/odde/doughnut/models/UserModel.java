@@ -8,14 +8,21 @@ import org.apache.logging.log4j.util.Strings;
 import javax.validation.Valid;
 import java.sql.Timestamp;
 import java.time.ZoneId;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class UserModel extends ModelForEntity<User> implements ReviewScope {
+    private boolean isDev = false;
+
+    private static List<String> allowUsers = Arrays.asList("satou", "matsumura");
+
+
     public UserModel(User user, ModelFactoryService modelFactoryService) {
         super(user, modelFactoryService);
+        this.setDeveloper(allowUsers.contains(user.getName()));
     }
 
     public Authorization getAuthorization() {
@@ -91,4 +98,11 @@ public class UserModel extends ModelForEntity<User> implements ReviewScope {
         return new Reviewing(this, currentUTCTimestamp, modelFactoryService);
     }
 
+    public boolean isDeveloper() {
+        return this.isDev;
+    }
+
+    public void setDeveloper(boolean dev) {
+        this.isDev = dev;
+    }
 }
