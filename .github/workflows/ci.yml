@@ -35,6 +35,16 @@ jobs:
         run: backend/gradlew -p backend testDBMigrate -Dspring.profiles.active=test
       - name: Unit tests with Gradle
         run: backend/gradlew -p backend test -Dspring.profiles.active=test
+      - name: Flutter frontend test and build
+        uses: subosito/flutter-action@v1
+        with:
+          flutter-version: '2.0.4'
+          channel: 'stable'
+        run: cd frontend && flutter config --enable-web
+        run: cd frontend && flutter clean
+        run: cd frontend && flutter pub get
+        run: cd frontend && flutter test
+        run: cd frontend && flutter build web
       - name: E2E tests with Cypress
         uses: cypress-io/github-action@v2
         with:
