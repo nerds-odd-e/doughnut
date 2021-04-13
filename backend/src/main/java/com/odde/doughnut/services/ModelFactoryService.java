@@ -21,6 +21,7 @@ public class ModelFactoryService {
     @Autowired public NotesClosureRepository notesClosureRepository;
     @Autowired public NotebookRepository notebookRepository;
     @Autowired public EntityManager entityManager;
+//    @Autowired public FailureReportRepository failureReportRepository;
 
     public TreeNodeModel toTreeNodeModel(Note note) {
         return new TreeNodeModel(note, this);
@@ -34,6 +35,10 @@ public class ModelFactoryService {
     public BazaarModel toBazaarModel() {
         return new BazaarModel(this);
     }
+
+//    public FailureReportModel toFailureReportModel(FailureReport failureReport) {
+//        return new FailureReportModel(failureReport, this);
+//    }
 
     public Optional<User> findUserById(Integer id) {
         return userRepository.findById(id);
