@@ -27,7 +27,7 @@ test('should not say anything is state not changed', () => {
 test('found a new build', () => {
   const state = new BuildState("build1", "completed successfully.", "do something");
   const state2 = new BuildState("build2", "completed successfully.", "do something");
-  expect(state.diffToSentence(state2, englishDictionary)).toContain(`A new build "do something" completed successfully`);
+  expect(state.diffToSentence(state2, englishDictionary)).toContain(`A new build 'do something' completed successfully`);
 });
 
 test('found a new status', () => {

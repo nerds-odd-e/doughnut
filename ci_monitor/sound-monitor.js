@@ -74,7 +74,7 @@ class BuildState {
 
   diffToSentence(previousState, dictionary) {
     if (this.buildName != previousState.buildName) {
-      return dictionary.translate("new_build") + `"${this.gitLog}"` + dictionary.translate(this.status);
+      return dictionary.translate("new_build") + `'${this.gitLog}'` + dictionary.translate(this.status);
     }
     if (this.status != previousState.status) {
       return dictionary.translate("the_build") + dictionary.translate(this.status);
