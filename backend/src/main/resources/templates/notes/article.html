@@ -3,6 +3,9 @@
     <div class="container content">
 
         <div th:replace="_fragments/note_fragments :: noteControlHeader(${note})"/>
+        <nav class="nav d-flex flex-row-reverse p-0">
+            <div th:replace="_fragments/note_fragments :: noteButtonsArticleView(${note})"/>
+        </nav>
         <div th:replace="_fragments/note_fragments :: noteAsArticle(${note}, 1, true)"/>
     </div>
 </layout>

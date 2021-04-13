@@ -46,6 +46,9 @@
     <a class="btn btn-sm edit-card" th:href="@{/notes/{id}/edit(id=${note.id})}" title="edit note">
         <svg th:replace="_fragments/svgs :: edit"/>
     </a>
+    <a role="button" class="btn btn-sm" title="Cards View" th:href="@{/notes/articles/{id}(id=${note.id})}">
+        <svg th:replace="_fragments/svgs :: article"/>
+    </a>
     <a class="btn btn-sm link-card" th:href="@{/links/{id}/link(id=${note.id})}" title="link note">
         <svg th:replace="_fragments/svgs :: linkNote"/>
     </a>
@@ -53,7 +56,6 @@
        title="edit review settings">
         <svg th:replace="_fragments/svgs :: reviewSetting"/>
     </a>
-
     <form th:action="@{/notes/{id}/delete(id=${note.id})}" th:method="delete"
           onsubmit="return confirm('Are you sure to delete?')">
         <input type="hidden" name="_method" value="delete"/>
@@ -61,6 +63,15 @@
             <svg th:replace="_fragments/svgs :: remove"/>
         </button>
     </form>
+</div>
+
+<div th:fragment="noteButtonsArticleView(note)" class="btn-group btn-group-sm">
+    <a class="btn btn-sm edit-card" th:href="@{/notes/{id}/edit(id=${note.id})}" title="edit note">
+        <svg th:replace="_fragments/svgs :: edit"/>
+    </a>
+    <a role="button" class="btn btn-sm" title="Cards View" th:href="@{/notes/{id}(id=${note.id})}">
+        <svg th:replace="_fragments/svgs :: cards"/>
+    </a>
 </div>
 
 <div th:fragment="noteCardWithHeaderAndButton(notes, bodyButton, headerButtons)">
