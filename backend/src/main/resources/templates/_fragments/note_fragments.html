@@ -173,9 +173,11 @@
 
 <div th:fragment="noteAsArticle(note, level, forBazaar)">
     <div th:replace=":: noteShowWithTitle(${note}, ${level}, ${forBazaar}, ~{::.note-title-article}, ~{::.note-body-article})">
-        <h2 class="note-title-article" th:class="'h' + ${level}" th:text="${note.articleTitle}"
-            th:if="${note.hasTitleInArticle}"/>
-        <span class="note-title-article" th:unless="${note.hasTitleInArticle}"/>
+        <h2 class="note-title-article" th:class="'h' + ${level}" th:if="${note.hasTitleInArticle}">
+            <span th:text="${note.articleTitle}" th:if="${forBazaar}"/>
+            <a th:href="'/notes/articles/' + ${note.id}" th:text="${note.articleTitle}" th:unless="${forBazaar}"/>
+        </h2>
+
         <pre class="note-body-article note-body" th:text="${note.articleBody}"
              style="white-space: pre-wrap; margin-bottom: 0;"/>
     </div>

@@ -41,7 +41,7 @@ When("I open the note {string} in the Bazaar in article view", (noteTitle) => {
 
 When("I should see in the article:", (data) => {
   data.hashes().forEach(({level, title}) => {
-      cy.findByText(title, {selector: '.'+level}).should("be.visible");
+    cy.get('.' + level).contains(title).should("be.visible");
   });
 });
 

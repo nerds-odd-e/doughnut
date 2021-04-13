@@ -134,3 +134,7 @@ When("I open the note {string} in my notes in article view", (noteTitle) => {
   cy.findByRole('button', {name: "Article View"}).click();
 });
 
+When("I click {string} in article view", (noteTitle) => {
+  cy.findByText(noteTitle).click();
+});
+
