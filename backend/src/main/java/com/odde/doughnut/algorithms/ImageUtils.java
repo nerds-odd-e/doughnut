@@ -9,8 +9,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 public class ImageUtils {
-    private final int MAX_WIDTH = 600;
-    private final int MAX_HEIGHT = 600;
+    private final int MAX_WIDTH = 1000;
+    private final int MAX_HEIGHT = 1000;
     public ImageUtils() {
     }
 
