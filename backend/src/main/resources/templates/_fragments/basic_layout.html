@@ -34,7 +34,7 @@
                         <a class="nav-link" href="/bazaar">Bazaar</a>
                     </li>
                     <li class="nav-item active" th:if="${currentUser != null && currentUser.isDeveloper()}">
-                        <a class="nav-link" href="/failure_report">Failure Reports</a>
+                        <a class="nav-link" href="/failure-report-list">Failure Reports</a>
                     </li>
                     <li class="nav-item active" th:unless="${#arrays.contains(@environment.getActiveProfiles(), 'prod')}">
                         <a class="nav-link text-warning" href="/testability/panel">Testing Tools</a>

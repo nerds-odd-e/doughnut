@@ -64,28 +64,16 @@ public class UserModelAuthorityTest {
             this.userModel = makeMe.aUser().toModelPlease();
         }
 
-        @Test
-        void userCanAccessFailureReports() {
-            this.userModel.setDeveloper(true);
-            assertTrue(this.userModel.isDeveloper());
-        }
-
-        @Test
-        void userCanNotAccessFailureReports() {
-            this.userModel.setDeveloper(false);
-            assertFalse(this.userModel.isDeveloper());
-        }
-
         @ParameterizedTest
         @CsvSource({
-            "satou, true",
-            "matsumura, true",
-            "hoge, false",
-            "fuga, false"
+            "t-machu, true",
+            "hisashidds, false",
+            "developer, true",
+            "non_developer, false"
         })
-        void developerCanAccessFailureReports(String name, boolean isDev) {
+        void developerCanAccessFailureReports(String exid, boolean isDev) {
             User user = new User();
-            user.setName(name);
+            user.setExternalIdentifier(exid);
             this.userModel = makeMe.modelFactoryService.toUserModel(user);
             assertEquals(isDev, this.userModel.isDeveloper());
         }

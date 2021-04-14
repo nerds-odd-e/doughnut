@@ -1,25 +1,14 @@
-Feature: Developer Only Use
+Feature: Access control failure report
 
   @ignore
-  Scenario: Failure report browsing as non-user
-    Given I haven't login
-    When I access "failure_report"
-    Then I should see "Please sign in"
-
-  @ignore
-  Scenario: Failure report browsing as developer-user
-    Given I've logged in as "developer"
-    When I access "failure_report"
-    Then I should see "FailureReport"
-
-  @ignore
-  Scenario: Top browsing as developer-user
-    Given I've logged in as "developer"
-    When I access "/"
-    Then I should see "Failure Reports"
-
-  @ignore
-  Scenario: Top browsing as non_developer-user
-    Given I've logged in as "non_developer"
-    When I access "/"
-    Then I should see "Failure Reportsss"
+  Scenario Outline: Only available to developer users
+    Given Login state is "<login state>"
+    When Access to failure report page
+    Then The "<page>" page is displayed
+    When Access to top page
+    Then Failure reports menu is "<displayed>" in the header
+    Examples:
+      | login state     | page              | displayed     |
+      | None            | LoginPage         | NotDisplayed  |
+      | Developer       | FailureReportPage | Displayed     |
+      | NonDeveloper    | ErrorPage         | NotDisplayed  |
