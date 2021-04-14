@@ -5,24 +5,30 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.services.ModelFactoryService;
 import org.apache.logging.log4j.util.Strings;
 
-import javax.validation.Valid;
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class UserModel extends ModelForEntity<User> implements ReviewScope {
-    private boolean isDev = false;
+    private final boolean isDev;
 
-    private static List<String> allowUsers = Arrays.asList("satou", "matsumura");
-
+    private static final List<String> allowUsers = Arrays.asList(
+            "terryyin",
+            "tokage3156",
+            "legacy1979yy",
+            "taka.k718",
+            "mid427",
+            "t-machu",
+            "mid417",
+            "tanaka8823",
+            "developer"
+    );
 
     public UserModel(User user, ModelFactoryService modelFactoryService) {
         super(user, modelFactoryService);
-        this.setDeveloper(allowUsers.contains(user.getName()));
+        this.isDev = allowUsers.contains(user.getExternalIdentifier());
     }
 
     public Authorization getAuthorization() {
@@ -100,9 +106,5 @@ public class UserModel extends ModelForEntity<User> implements ReviewScope {
 
     public boolean isDeveloper() {
         return this.isDev;
-    }
-
-    public void setDeveloper(boolean dev) {
-        this.isDev = dev;
     }
 }
