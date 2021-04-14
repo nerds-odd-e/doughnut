@@ -13,9 +13,11 @@
 <div th:fragment="failureReportDetailWithHeaderAndButton(failureReports)">
 
     <div class="col-12 col-sm-6 col-md-4 col-lg-3" th:each="element:${failureReports}">
+        <a class="btn btn-sm edit-card" th:href="@{/failure-report-list/show/{id}(id=${element.id})}" title="edit note">
+            <p th:text="${element.getErrorName}"/>
+        </a>
 
 
-        <p th:text="${element.getErrorName}"/>
         <p th:text="${element.getErrorDetail}"/>
         <p th:text="${element.getCreateDatetime}"/>
 
