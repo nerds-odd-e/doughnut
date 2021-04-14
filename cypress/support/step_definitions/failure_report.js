@@ -10,6 +10,12 @@ Given("I've logged in as {string}", (externalIdentifier) => {
   cy.loginAs(externalIdentifier);
 });
 
+Given("I've failure report", () => {
+  cy.seedFailureReport();
+});
+
+
+
 When("I open the {string} set address bar", (url) => {
   cy.visit('http://localhost:8081/' + url)
 });

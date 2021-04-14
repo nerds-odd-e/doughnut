@@ -3,6 +3,7 @@ package com.odde.doughnut.testability;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcherFromRequest;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.repositories.FailureReportRepository;
 import com.odde.doughnut.entities.repositories.LinkRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
@@ -16,11 +17,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManagerFactory;
+import java.sql.Timestamp;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -38,10 +37,13 @@ class TestabilityRestController {
     UserRepository userRepository;
     @Autowired
     CurrentUserFetcherFromRequest currentUser;
+
     @Autowired
     ModelFactoryService modelFactoryService;
     @Autowired
     TimeTraveler timeTraveler;
+    @Autowired
+    FailureReportRepository failureReportRepository;
 
     @PostMapping("/clean_db_and_seed_data")
     public String cleanDBAndSeedData() {
@@ -152,6 +154,25 @@ class TestabilityRestController {
         String pattern = "\"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'\"";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
         return formatter;
+    }
+
+
+    @PostMapping("/seed_failure_report")
+    public String seedFailureReport() {
+        createFailureReport("errorName1", "errorDetail1");
+        createFailureReport("errorName2", "errorDetail2");
+
+        return "OK";
+
+    }
+
+    private void createFailureReport(String errorName, String errorDetail) {
+        FailureReport failureReport = new FailureReport();
+        failureReport.setErrorName(errorName);
+        failureReport.setErrorDetail(errorDetail);
+        failureReport.setCreateDatetime(new Timestamp(new Date().getTime()));
+
+        failureReportRepository.save(failureReport);
     }
 
 }

@@ -291,3 +291,9 @@ Cypress.Commands.add("searchNote", (searchKey) => {
 })
 
 
+Cypress.Commands.add("seedFailureReport", () => {
+  cy.request({method: 'POST', url: "/api/testability/seed_failure_report"}).its("body").should("contain", "OK");
+});
+
+
+
