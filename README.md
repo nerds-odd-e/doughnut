@@ -24,7 +24,6 @@ For more background info you can read:
 - [Flyway](https://flywaydb.org)
 - [MySQL 8.0](https://dev.mysql.com/doc/refman/8.0/en/)
 - [Google Cloud](https://cloud.google.com/gcp/getting-started)
-- [Traefik](https://traefik.io/)
 - [Github Actions](https://docs.github.com/en/actions)
 - [Nix](https://nixos.org/)
 - [git-secret](https://git-secret.io)

@@ -16,20 +16,14 @@ public class UserModel extends ModelForEntity<User> implements ReviewScope {
     private final boolean isDev;
 
     private static final List<String> allowUsers = Arrays.asList(
-            "terryyin",
-            "tokage3156",
-            "legacy1979yy",
-            "taka.k718",
-            "mid427",
+            "Terry",
             "t-machu",
-            "mid417",
-            "tanaka8823",
-            "developer"
+            "Developer"
     );
 
     public UserModel(User user, ModelFactoryService modelFactoryService) {
         super(user, modelFactoryService);
-        this.isDev = allowUsers.contains(user.getExternalIdentifier());
+        this.isDev = allowUsers.contains(user.getName());
     }
 
     public Authorization getAuthorization() {
@@ -113,9 +107,5 @@ public class UserModel extends ModelForEntity<User> implements ReviewScope {
         if(!isDeveloper()) {
             throw new NoAccessRightException();
         }
-    }
-
-    public String getExternalIdentifier() {
-        return entity.getExternalIdentifier();
     }
 }

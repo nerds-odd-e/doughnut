@@ -41,7 +41,7 @@
                     </li>
                 </ul>
                 <span style="margin-right:10px;" class="navbar-text" th:unless="${currentUser == null}">
-                    <a href="/users/edit" th:text="|${currentUser.getName()} : ${currentUser.getExternalIdentifier()}|"/>
+                    <a href="/users/edit" th:text="${currentUser.getName()}"/>
                 </span>
                 <form class="form-inline my-2 my-lg-0" th:action="@{/logout}" method="post" th:unless="${currentUser == null}">
                     <input class= "btn btn-outline-success my-2 my-sm-0" type= "submit" value="Logout">
