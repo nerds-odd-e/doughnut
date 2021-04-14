@@ -2,6 +2,7 @@ package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -76,6 +77,26 @@ public class UserModelAuthorityTest {
             user.setName(name);
             this.userModel = makeMe.modelFactoryService.toUserModel(user);
             assertEquals(isDev, this.userModel.isDeveloper());
+        }
+
+        @ParameterizedTest
+        @CsvSource({
+                "Developer, false",
+                "Non Developer, true"
+        })
+        void throwExceptionNonDeveloper(String name, boolean isThrowsException) {
+            User user = new User();
+            user.setName(name);
+            this.userModel = makeMe.modelFactoryService.toUserModel(user);
+
+            boolean hasException = false;
+            try {
+                this.userModel.assertDeveloperAuthorization();
+            } catch(NoAccessRightException ex) {
+                hasException = true;
+            }
+
+            assertEquals(isThrowsException, hasException);
         }
     }
 }

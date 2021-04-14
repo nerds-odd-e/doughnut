@@ -106,7 +106,7 @@ Then("The {string} page is displayed", (pageName) => {
             cy.findAllByText("Please sign in");
             break;
         case "FailureReportPage":
-            cy.findAllByText("Welcome To The Failure report list");
+            cy.findAllByText("Failure report list");
             break;
         case "ErrorPage":
             cy.findAllByText("Whitelabel Error Page");

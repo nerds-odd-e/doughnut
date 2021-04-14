@@ -15,6 +15,7 @@ public class FailureReport {
     @Id @Getter @GeneratedValue(strategy = GenerationType.IDENTITY) private Integer id;
 
     @NotNull
+    @Column(name = "error_name")
     @Size(min = 1, max = 100)
     @Column(name = "error_name")
     @Getter
@@ -22,6 +23,7 @@ public class FailureReport {
     private String errorName;
 
     @NotNull
+    @Column(name = "error_detail")
     @Size(min = 1, max = 1000)
     @Column(name = "error_detail")
     @Getter

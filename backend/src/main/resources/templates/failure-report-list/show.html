@@ -1,11 +1,10 @@
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
 <layout th:replace="_fragments/basic_layout :: application_layout(~{ :: .content})">
     <div class="container content">
-        <h2>Welcome To The Failure Report Detail</h2>
+        <h2>Failure report</h2>
 
-        <p th:text="${failureReport.getErrorName}"/>
-        <p th:text="${failureReport.getErrorDetail}"/>
-        <p th:text="${failureReport.getCreateDatetime}"/>
+        <div th:replace="_fragments/failure_report :: failureReportDetail(${failureReport})"/>
+
 
 
    </div>
