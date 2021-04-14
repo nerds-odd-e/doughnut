@@ -14,6 +14,10 @@ When("I open the {string} set address bar", (url) => {
   cy.visit('http://localhost:8081/' + url)
 });
 
+When("Someone open the {string} set address bar", (url) => {
+  cy.visit('http://localhost:8081/' + url, {failOnStatusCode: false})
+});
+
 Then("there shouldn't be any note edit button for {string}", (noteTitle) => {
   cy.findNoteCardEditButton(noteTitle).should("not.exist");
 });
