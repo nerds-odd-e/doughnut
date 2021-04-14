@@ -68,12 +68,12 @@ public class UserModelAuthorityTest {
         @CsvSource({
             "t-machu, true",
             "hisashidds, false",
-            "developer, true",
-            "non_developer, false"
+            "Developer, true",
+            "Non Developer, false"
         })
-        void developerCanAccessFailureReports(String exid, boolean isDev) {
+        void developerCanAccessFailureReports(String name, boolean isDev) {
             User user = new User();
-            user.setExternalIdentifier(exid);
+            user.setName(name);
             this.userModel = makeMe.modelFactoryService.toUserModel(user);
             assertEquals(isDev, this.userModel.isDeveloper());
         }
