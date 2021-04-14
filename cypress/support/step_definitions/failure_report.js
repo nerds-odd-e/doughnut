@@ -74,6 +74,10 @@ Then("I haven't login", () => {
 });
 
 
+When("I access {string}", (name) => {
+  cy.visit("/" + name);
+});
 
-
-
+Then("I should see {string}", (text) => {
+    cy.findAllByText(text);
+});
