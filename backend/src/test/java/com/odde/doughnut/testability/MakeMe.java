@@ -19,6 +19,10 @@ public class MakeMe {
         return new UserBuilder(this);
     }
 
+    public UserBuilder aDeveloper() {
+        return new UserBuilder(this, "Developer");
+    }
+
     public NoteBuilder aNote() {
         return new NoteBuilder(new Note(), this);
     }

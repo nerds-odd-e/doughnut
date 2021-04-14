@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.ExtendedModelMap;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -23,33 +24,26 @@ class FailureReportControllerTest {
     @Autowired
     MakeMe makeMe;
     UserModel userModel;
-    UserController controller;
-
+    FailureReportController controller;
+    final ExtendedModelMap model = new ExtendedModelMap();
 
     @BeforeEach
     void setup() {
-        userModel = makeMe.aUser().toModelPlease();
-        controller = new UserController(makeMe.modelFactoryService, new TestCurrentUserFetcher(userModel));
+        userModel = makeMe.aDeveloper().toModelPlease();
+        controller = new FailureReportController(makeMe.modelFactoryService,
+                        new TestCurrentUserFetcher(userModel));
     }
 
     @Test
-    void updateUserSuccessfully() throws NoAccessRightException {
-        String response = controller.updateUser(userModel.getEntity(), makeMe.successfulBindingResult());
-        assertThat(response, equalTo("redirect:/"));
+    void failureReportListSuccessfully() throws NoAccessRightException {
+        String response = controller.failureReport(model);
+        assertThat(response, equalTo("failure-report-list/index"));
     }
 
-    @Test
-    void updateUserValidationFailed() throws NoAccessRightException {
-        String response = controller.updateUser(userModel.getEntity(), makeMe.failedBindingResult());
-        assertThat(response, equalTo("users/edit"));
-    }
-
-    @Test
-    void updateOtherUserProfile() {
-        User anotherUser = makeMe.aUser().please();
-        assertThrows(
-                NoAccessRightException.class,
-                ()-> controller.updateUser(anotherUser, makeMe.successfulBindingResult()));
-    }
+//    @Test
+//    void updateUserValidationFailed() throws NoAccessRightException {
+//        String response = controller.updateUser(userModel.getEntity(), makeMe.failedBindingResult());
+//        assertThat(response, equalTo("users/edit"));
+//    }
 
 }

@@ -13,8 +13,19 @@ public class UserBuilder extends EntityBuilder<User> {
     public UserBuilder(MakeMe makeMe) {
         super(makeMe, new User());
         this.mClass = UserModel.class;
+        setInfo(makeMe, nameCounter.generate());
+    }
+
+    public UserBuilder(MakeMe makeMe, String userName) {
+        super(makeMe, new User());
+        this.mClass = UserModel.class;
+        setInfo(makeMe, userName);
+    }
+
+    private void setInfo(MakeMe makeMe, String userName)
+    {
         entity.setExternalIdentifier(exIdCounter.generate());
-        entity.setName(nameCounter.generate());
+        entity.setName(userName);
     }
 
     public UserBuilder with2Notes() {

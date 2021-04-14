@@ -13,7 +13,7 @@ Feature: failure report display
   Scenario: show failure report page
     Given I've failure report
     When I open the "failure-report-list/show/1" set address bar
-    Then I should see "Failure Report Detail" in the page
+    Then I should see "Failure report" in the page
 
   @ignore
   Scenario: show failure report page
