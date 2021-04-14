@@ -107,4 +107,8 @@ public class UserModel extends ModelForEntity<User> implements ReviewScope {
     public boolean isDeveloper() {
         return this.isDev;
     }
+
+    public String getExternalIdentifier() {
+        return entity.getExternalIdentifier();
+    }
 }
