@@ -32,7 +32,7 @@ When("I open the {string} set address bar", (url) => {
 
 
 Given("I've logged in as an existing user", () => {
-  cy.loginAs('old_learner');
+  cy.loginAs('developer');
 });
 
 Given("I've logged in as another existing user", () => {
