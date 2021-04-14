@@ -22,6 +22,13 @@ When("I open the detail {string} in the top bar", (noteTitle) => {
   cy.findByText(noteTitle).click();
 });
 
+Given("I've failure report", () => {
+  cy.seedFailureReport();
+});
+
+When("I open the {string} set address bar", (url) => {
+  cy.visit('http://localhost:8081/' + url)
+});
 
 
 Given("I've logged in as an existing user", () => {
