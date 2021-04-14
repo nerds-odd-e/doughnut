@@ -24,19 +24,16 @@ public class FailureReportController extends ApplicationMvcController  {
     @GetMapping("")
     public String failureReport(Model model) {
         Iterable<FailureReport> reports = modelFactoryService.failureReportRepository.findAll();
-
-     
         model.addAttribute("failureReports", reports);
-        //String[] hoge = new String[]{"1", "2","1", "2","1", "2","1", "2","1", "2","1", "2","1", "2","1", "2","1", "2","1", "2","1", "2","1", "2"};
-        //model.addAttribute("failureReports", hoge);
         return "failure-report-list/index";
     }
 
-//    @GetMapping("/show/{id}")
-//    public String show(@PathVariable(name = "id") FailureReport failureReport, Model model) {
-////        FailureReportModel failureReportModel =  modelFactoryService.toFailureReportModel(failureReport);
-////        model.addAttribute("reports", failureReportModel);
-//        return "failure-report-list/show";
-//    }
+    @GetMapping("/show/{failureReport}")
+    public String show(@PathVariable(name = "failureReport") FailureReport failureReport,     Model model) {
+//        FailureReportModel failureReportModel =  modelFactoryService.toFailureReportModel(failureReport);
+//        model.addAttribute("failureReports", failureReportModel);
+        model.addAttribute("failureReport", failureReport);
+        return "failure-report-list/show";
+    }
 }
 

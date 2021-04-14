@@ -6,13 +6,19 @@ Feature: failure report display
 
 
   Scenario: show failure report list page
+    Given I've failure report
     When I open the "failure-report-list" set address bar
     Then I should see "Failure report list" in the page
+
+  Scenario: show failure report page
+    Given I've failure report
+    When I open the "failure-report-list/show/1" set address bar
+    Then I should see "Failure Report Detail" in the page
 
   @ignore
   Scenario: show failure report page
     When I open the detail "failure-report" in the failure-report-list
-    Then I should see "Failure report {id}" in the page
+    Then I should see "Failure report" in the page
 
   @ignore
   Scenario: show non failure report

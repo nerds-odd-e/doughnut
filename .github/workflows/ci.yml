@@ -11,10 +11,17 @@ env:
   GCS_BUCKET: "dough-01"
 
 jobs:
-  unit-e2e-tests-run:
-    name: Unit & E2E tests then GCP MIG rolling-update
+  backend-unit-tests:
+    name: Backend Unit tests with Database
     runs-on: ubuntu-20.04
     steps:
+      - name: Code Checkout
+        uses: actions/checkout@v2
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+          architecture: x64
       - name: Setup MySQL DB Server 8.0
         uses: mirromutth/mysql-action@v1.1
         with:
@@ -24,17 +31,29 @@ jobs:
           mysql database: "doughnut_test"
           mysql user: ${{ secrets.DBUSER }}
           mysql password: ${{ secrets.DBPASSWORD }}
-      - name: Code Checkout
-        uses: actions/checkout@v2
-      - name: Set up JDK 11
-        uses: actions/setup-java@v1
-        with:
-          java-version: 11
-          architecture: x64
       - name: DB Migration unit test
         run: backend/gradlew -p backend testDBMigrate -Dspring.profiles.active=test
       - name: Unit tests with Gradle
         run: backend/gradlew -p backend test -Dspring.profiles.active=test
+      - name: Slack notify dough_ci_cd channel of backend unit tests results
+        uses: adamkdean/simple-slack-notify@master
+        if: always()
+        with:
+          channel: "#dough_ci_cd"
+          status: ${{ job.status }}
+          success_text: "doughnut backend unit tests (#${env.GITHUB_RUN_NUMBER}) completed Successfully"
+          failure_text: "doughnut backend unit tests (#${env.GITHUB_RUN_NUMBER}) Failed"
+          cancelled_text: "doughnut backend unit tests (#${env.GITHUB_RUN_NUMBER}) was Cancelled"
+          fields: |
+            [{ "title": "Action URL", "value": "${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/actions/runs/${env.GITHUB_RUN_ID}"}]
+
+
+  frontend-unit-tests:
+    name: Frontend Unit tests and build
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Code Checkout
+        uses: actions/checkout@v2
       - name: Flutter frontend test and build
         uses: subosito/flutter-action@v1
         with:
@@ -43,7 +62,40 @@ jobs:
       - run: cd frontend && flutter clean
       - run: cd frontend && flutter pub get
       - run: cd frontend && flutter test
-      - run: cd frontend && flutter build web
+      - run: cd frontend && flutter build web --release
+      - name: Slack notify dough_ci_cd channel of frontend unit tests results
+        uses: adamkdean/simple-slack-notify@master
+        if: always()
+        with:
+          channel: "#dough_ci_cd"
+          status: ${{ job.status }}
+          success_text: "doughnut frontend unit tests (#${env.GITHUB_RUN_NUMBER}) completed Successfully"
+          failure_text: "doughnut frontend unit tests (#${env.GITHUB_RUN_NUMBER}) Failed"
+          cancelled_text: "doughnut frontend unit tests (#${env.GITHUB_RUN_NUMBER}) was Cancelled"
+          fields: |
+            [{ "title": "Action URL", "value": "${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/actions/runs/${env.GITHUB_RUN_ID}"}]
+
+
+  e2e-tests:
+    name: End-to-End tests with Database
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Code Checkout
+        uses: actions/checkout@v2
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+          architecture: x64
+      - name: Setup MySQL DB Server 8.0
+        uses: mirromutth/mysql-action@v1.1
+        with:
+          mysql version: "8.0"
+          character set server: "utf8mb4"
+          collation server: "utf8mb4_unicode_ci"
+          mysql database: "doughnut_test"
+          mysql user: ${{ secrets.DBUSER }}
+          mysql password: ${{ secrets.DBPASSWORD }}
       - name: E2E tests with Cypress
         uses: cypress-io/github-action@v2
         with:
@@ -52,6 +104,31 @@ jobs:
           config: pageLoadTimeout=100000,video=false
           install-command: yarn
           start: yarn sut
+      - name: Slack notify dough_ci_cd channel of e2e tests results
+        uses: adamkdean/simple-slack-notify@master
+        if: always()
+        with:
+          channel: "#dough_ci_cd"
+          status: ${{ job.status }}
+          success_text: "doughnut e2e tests (#${env.GITHUB_RUN_NUMBER}) completed Successfully"
+          failure_text: "doughnut e2e tests (#${env.GITHUB_RUN_NUMBER}) Failed"
+          cancelled_text: "doughnut e2e tests (#${env.GITHUB_RUN_NUMBER}) was Cancelled"
+          fields: |
+            [{ "title": "Action URL", "value": "${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/actions/runs/${env.GITHUB_RUN_ID}"}]
+
+
+  package-n-deploy:
+    name: Package & GCP MIG Rolling Update Deploy
+    runs-on: ubuntu-20.04
+    needs: [backend-unit-tests, frontend-unit-tests, e2e-tests]
+    steps:
+      - name: Code Checkout
+        uses: actions/checkout@v2
+      - name: Set up JDK 11
+        uses: actions/setup-java@v1
+        with:
+          java-version: 11
+          architecture: x64
       - name: Build production application jar artifact
         run: backend/gradlew -p backend build -x test -Dspring.profiles.active=prod
       - name: Setup Google Cloud SDK with Service Account
@@ -74,8 +151,8 @@ jobs:
         with:
           channel: "#dough_ci_cd"
           status: ${{ job.status }}
-          success_text: "doughnut CI/CD (#${env.GITHUB_RUN_NUMBER}) completed Successfully"
-          failure_text: "doughnut CI/CD (#${env.GITHUB_RUN_NUMBER}) Failed"
-          cancelled_text: "doughnut CI/CD (#${env.GITHUB_RUN_NUMBER}) was Cancelled"
+          success_text: "doughnut CD (#${env.GITHUB_RUN_NUMBER}) completed Successfully"
+          failure_text: "doughnut CD (#${env.GITHUB_RUN_NUMBER}) Failed"
+          cancelled_text: "doughnut CD (#${env.GITHUB_RUN_NUMBER}) was Cancelled"
           fields: |
             [{ "title": "Action URL", "value": "${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/actions/runs/${env.GITHUB_RUN_ID}"}]
