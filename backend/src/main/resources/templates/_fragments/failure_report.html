@@ -11,8 +11,14 @@
 </div>
 
 <div th:fragment="failureReportDetailWithHeaderAndButton(failureReports)">
+
     <div class="col-12 col-sm-6 col-md-4 col-lg-3" th:each="element:${failureReports}">
-        <p th:text="${element}"/>
+
+
+        <p th:text="${element.getErrorName}"/>
+        <p th:text="${element.getErrorDetail}"/>
+        <p th:text="${element.getCreateDatetime}"/>
+
     </div>
 </div>
 

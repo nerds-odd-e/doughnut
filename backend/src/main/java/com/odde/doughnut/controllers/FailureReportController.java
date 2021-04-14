@@ -24,9 +24,11 @@ public class FailureReportController extends ApplicationMvcController  {
     @GetMapping("")
     public String failureReport(Model model) {
         Iterable<FailureReport> reports = modelFactoryService.failureReportRepository.findAll();
-//        model.addAttribute("reports", reports);
-        String[] hoge = new String[]{"1", "2","1", "2","1", "2","1", "2","1", "2","1", "2","1", "2","1", "2","1", "2","1", "2","1", "2","1", "2"};
-        model.addAttribute("failureReports", hoge);
+
+     
+        model.addAttribute("failureReports", reports);
+        //String[] hoge = new String[]{"1", "2","1", "2","1", "2","1", "2","1", "2","1", "2","1", "2","1", "2","1", "2","1", "2","1", "2","1", "2"};
+        //model.addAttribute("failureReports", hoge);
         return "failure-report-list/index";
     }
 
