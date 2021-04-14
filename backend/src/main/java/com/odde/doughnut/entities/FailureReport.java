@@ -17,7 +17,6 @@ public class FailureReport {
     @NotNull
     @Column(name = "error_name")
     @Size(min = 1, max = 100)
-    @Column(name = "error_name")
     @Getter
     @Setter
     private String errorName;
@@ -25,7 +24,6 @@ public class FailureReport {
     @NotNull
     @Column(name = "error_detail")
     @Size(min = 1, max = 1000)
-    @Column(name = "error_detail")
     @Getter
     @Setter
     private String errorDetail;
