@@ -91,7 +91,9 @@ Given("Login state is {string}", (loginState) => {
 });
 
 When("Access to failure report page", () => {
-  cy.visit("/failure-report-list");
+  cy.visit("/failure-report-list", {
+    failOnStatusCode: false
+  });
 });
 
 Then("The {string} page is displayed", (pageName) => {
@@ -103,7 +105,7 @@ Then("The {string} page is displayed", (pageName) => {
             cy.findAllByText("Welcome To The Failure report list");
             break;
         case "ErrorPage":
-            cy.findAllByText("Error");
+            cy.findAllByText("Whitelabel Error Page");
             break;
         default:
             cy.failure();

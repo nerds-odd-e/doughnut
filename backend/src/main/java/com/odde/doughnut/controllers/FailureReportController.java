@@ -3,6 +3,7 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.FailureReport;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.models.ModelForEntity;
 import com.odde.doughnut.services.ModelFactoryService;
 import org.springframework.stereotype.Controller;
@@ -22,7 +23,8 @@ public class FailureReportController extends ApplicationMvcController  {
     }
 
     @GetMapping("")
-    public String failureReport(Model model) {
+    public String failureReport(Model model) throws NoAccessRightException {
+        currentUserFetcher.getUser().assertDeveloperAuthorization();
         Iterable<FailureReport> reports = modelFactoryService.failureReportRepository.findAll();
         model.addAttribute("failureReports", reports);
         return "failure-report-list/index";

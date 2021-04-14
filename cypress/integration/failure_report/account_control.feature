@@ -1,6 +1,5 @@
 Feature: Access control failure report
 
-  @ignore
   Scenario Outline: Only available to developer users
     Given Login state is "<login state>"
     When Access to failure report page

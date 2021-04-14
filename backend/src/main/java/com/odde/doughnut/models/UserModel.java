@@ -2,6 +2,7 @@ package com.odde.doughnut.models;
 
 import com.odde.doughnut.algorithms.SpacedRepetitionAlgorithm;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.services.ModelFactoryService;
 import org.apache.logging.log4j.util.Strings;
 
@@ -106,6 +107,12 @@ public class UserModel extends ModelForEntity<User> implements ReviewScope {
 
     public boolean isDeveloper() {
         return this.isDev;
+    }
+
+    public void assertDeveloperAuthorization() throws NoAccessRightException {
+        if(!isDeveloper()) {
+            throw new NoAccessRightException();
+        }
     }
 
     public String getExternalIdentifier() {
