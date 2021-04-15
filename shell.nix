@@ -52,16 +52,19 @@ in mkShell {
     export CHROME_EXECUTABLE=$(type google-chrome-stable | awk '{print $3}')
     export PATH=$PATH:$JAVA_HOME/bin:$GRADLE_HOME/bin:$CHROME_EXECUTABLE
 
+    export DOUGHNUT_BAZAAR_NOTES_API_URL="http://localhost:8081/api/bazaar_notes"
+
     echo "################################################################################"
     echo "##    !! DOUGHNUT NIX-SHELL !!      "
     echo "##    JAVA_HOME: $JAVA_HOME         "
     echo "##    GRADLE_HOME: $GRADLE_HOME     "
     echo "##    MYSQL_HOME: $MYSQL_HOME       "
     echo "##    MYSQL_DATADIR: $MYSQL_DATADIR "
+    echo "##    DOUGHNUT_BAZAAR_NOTES_API_URL: $DOUGHNUT_BAZAAR_NOTES_API_URL "
     echo "################################################################################"
     mkdir -p $MYSQL_HOME
     mkdir -p $MYSQL_DATADIR
-    
+
 cat <<EOF > $MYSQL_HOME/init_doughnut_db.sql
 CREATE USER IF NOT EXISTS 'doughnut'@'localhost' IDENTIFIED BY 'doughnut';
 CREATE DATABASE IF NOT EXISTS doughnut_development DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
