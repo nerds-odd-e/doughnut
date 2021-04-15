@@ -36,9 +36,6 @@ public class ModelFactoryService {
         return new BazaarModel(this);
     }
 
-//    public FailureReportModel toFailureReportModel(FailureReport failureReport) {
-//        return new FailureReportModel(failureReport, this);
-//    }
 
     public Optional<User> findUserById(Integer id) {
         return userRepository.findById(id);
@@ -95,5 +92,9 @@ public class ModelFactoryService {
 
     public Authorization toAuthorization(User entity) {
         return new Authorization(entity, this);
+    }
+
+    public FailureReport findFailureReportByErrorDetail(String errorDetail) {
+        return failureReportRepository.findByErrorDetail(errorDetail);
     }
 }

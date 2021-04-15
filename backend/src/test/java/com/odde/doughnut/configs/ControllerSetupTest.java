@@ -43,7 +43,5 @@ public class ControllerSetupTest {
                 assertEquals(Arrays.stream(e.getStackTrace()).findFirst().get().toString(), failureReport.getErrorDetail());
             }
         }
-
-
     }
 }
