@@ -73,7 +73,7 @@ packages:
       name: get_it
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "6.0.0"
+    version: "6.1.1"
   http:
     dependency: "direct main"
     description:

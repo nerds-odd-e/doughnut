@@ -8,15 +8,16 @@ import 'base_model.dart';
 class BazaarNotesModel extends BaseModel {
   API api = dependencyAssembler<API>();
 
-  late List<Note> _notes;
+  List<Note> _notes = List.empty();
 
   List<Note> get notes {
     return _notes;
   }
 
-  Future getBazaarNotes() async {
+  Future<List<Note>> retrieveBazaarNotes() async {
     applyState(ViewState.Busy);
-    _notes = await api.getBazaarNotes();
+    _notes = await api.fetchBazaarNotes();
     applyState(ViewState.Idle);
+    return _notes;
   }
 }
