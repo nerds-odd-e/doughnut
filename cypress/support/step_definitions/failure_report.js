@@ -64,6 +64,10 @@ Then("I should see {string} in the page", (content) => {
   cy.get("body").should("contain", content);
 });
 
+Then("I should not see failure report in the page", () => {
+  cy.get(".report-list").children().should('have.length', 0);
+});
+
 Then("My name {string} is in the top bar", (name) => {
   cy.get("nav").should("contain", name);
 });

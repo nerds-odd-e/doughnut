@@ -14,12 +14,11 @@ Feature: failure report display
     When I open the "failure-report-list/show/1" set address bar
     Then I should see "Failure report" in the page
 
-  @ignore
   Scenario: not add failure
-    When I open "bad request page" set address bar
-    Then I should see "404" in the page
-    When I open "failure-report-list" in the top bar
-    Then I should see "non failure-report" in the page
+    Given Someone open the "bad-request-page" set address bar
+    Given Login state is "Developer"
+    When I open the "failure-report-list" set address bar
+    Then I should not see failure report in the page
 
   Scenario: add failure
     Given Someone open the "testability/exception" set address bar
