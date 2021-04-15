@@ -322,7 +322,8 @@ flutter run -d chrome
 
 #### Build & Bundle Flutter frontend web-app and startup local web-server to server flutter web-app static assets
 ```bash
-flutter build web
+flutter clean && flutter pub get && \
+flutter build web --release --dart-define DOUGHNUT_BAZAAR_NOTES_API_URL=$DOUGHNUT_BAZAAR_NOTES_API_URL
 ```
 
 Expect to find minified and uglified web bundle assets in `frontend/build/web` directory:
@@ -373,9 +374,3 @@ python -m http.server 8000
 - FOSS style; Fork and submit Github PR.
   - Please keep the PR small and on only one topic
   - The code need to come with tests
-
-### 12. XXX
-- SandBox Github
-  - https://github.com/nerds-odd-e/doughnut_sandbox
-  - personal access token: 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
-  - personal access token2: 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
