@@ -9,6 +9,7 @@
         "cy:open": "cypress open",
         "cy:run": "cypress run",
         "sut": "backend/gradlew bootRun -p backend -Dspring.profiles.active=test",
+        "backend_n_frontend_sut": "run-p -clnr sut frontend:sut",
         "open": "run-p -clnr sut frontend:sut cy:open",
         "test": "run-p -clnr sut frontend:sut cy:run",
         "sound": "node scripts/sound-monitor.js",
