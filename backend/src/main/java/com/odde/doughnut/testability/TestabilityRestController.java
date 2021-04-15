@@ -156,14 +156,11 @@ class TestabilityRestController {
         return formatter;
     }
 
-
     @PostMapping("/seed_failure_report")
     public String seedFailureReport() {
         createFailureReport("errorName1", "errorDetail1");
         createFailureReport("errorName2", "errorDetail2");
-
         return "OK";
-
     }
 
     private void createFailureReport(String errorName, String errorDetail) {
