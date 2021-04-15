@@ -1,6 +1,6 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
@@ -12,6 +12,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ExtendedModelMap;
+
+import java.sql.Timestamp;
+import java.util.Date;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -40,10 +43,10 @@ class FailureReportControllerTest {
         assertThat(response, equalTo("failure-report-list/index"));
     }
 
-//    @Test
-//    void updateUserValidationFailed() throws NoAccessRightException {
-//        String response = controller.updateUser(userModel.getEntity(), makeMe.failedBindingResult());
-//        assertThat(response, equalTo("users/edit"));
-//    }
-
+    @Test
+    void failureReportSuccessfully() throws NoAccessRightException {
+        FailureReport failureReport = new FailureReport();
+        String response = controller.show(failureReport, model);
+        assertThat(response, equalTo("failure-report-list/show"));
+    }
 }

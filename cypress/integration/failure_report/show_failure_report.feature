@@ -4,7 +4,6 @@ Feature: failure report display
   Background:
     Given I've logged in as an existing user
 
-
   Scenario: show failure report list page
     Given I've failure report
     When I open the "failure-report-list" set address bar
@@ -14,21 +13,6 @@ Feature: failure report display
     Given I've failure report
     When I open the "failure-report-list/show/1" set address bar
     Then I should see "Failure report" in the page
-
-  @ignore
-  Scenario: show failure report page
-    When I open the detail "failure-report" in the failure-report-list
-    Then I should see "Failure report" in the page
-
-  @ignore
-  Scenario: show non failure report
-    When I open "failure-report" in the top bar
-    Then I should see "non failure-report" in the page
-
-  @ignore
-  Scenario: show all failure reports
-    When I open "failure-report-list" in the top bar
-    Then I should see "non failure-report" in the page
 
   @ignore
   Scenario: not add failure

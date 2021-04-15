@@ -1,27 +1,20 @@
 <a th:fragment="noteTitleWithLink(note)" th:href="'/notes/' + ${note?.id}" th:text="${note?.noteContent?.title}"/>
 <a th:fragment="linkWithHtmlLink(link, note)" th:href="'/links/' + ${link.id}" th:text="${note.noteContent.title}"/>
 
-
-
 <div th:fragment="failureReportViewlist(failureReports)"
      th:replace="_fragments/failure_report::failureReportDetailWithHeaderAndButton(
          failureReports=${failureReports}
      )">
-
 </div>
 
 <div th:fragment="failureReportDetailWithHeaderAndButton(failureReports)">
-
     <div class="" th:each="element:${failureReports}">
-
+        [[${element.getCreateDatetime}]] :
         <a th:href="@{/failure-report-list/show/{id}(id=${element.id})}" title="edit note">
-            [[${element.getCreateDatetime}]] : [[${element.getErrorName}]]
-
+            [[${element.getErrorName}]]
         </a>
-
     </div>
 </div>
-
 
 <div th:fragment="failureReportDetail(failureReport)">
     <div class="jumbotron py-4 mb-2">
@@ -29,6 +22,4 @@
         <p th:text="${failureReport.getErrorDetail}"/>
         <p th:text="${failureReport.getCreateDatetime}"/>
     </div>
-
 </div>
-

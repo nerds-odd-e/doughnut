@@ -31,9 +31,7 @@ public class FailureReportController extends ApplicationMvcController  {
     }
 
     @GetMapping("/show/{failureReport}")
-    public String show(@PathVariable(name = "failureReport") FailureReport failureReport,     Model model) {
-//        FailureReportModel failureReportModel =  modelFactoryService.toFailureReportModel(failureReport);
-//        model.addAttribute("failureReports", failureReportModel);
+    public String show(@PathVariable(name = "failureReport") FailureReport failureReport, Model model) {
         model.addAttribute("failureReport", failureReport);
         return "failure-report-list/show";
     }
