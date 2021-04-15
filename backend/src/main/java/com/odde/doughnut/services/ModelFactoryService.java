@@ -94,7 +94,7 @@ public class ModelFactoryService {
         return new Authorization(entity, this);
     }
 
-    public FailureReport findFailureReportByErrorDetail(String errorDetail) {
-        return failureReportRepository.findByErrorDetail(errorDetail);
-    }
+    // public FailureReport findFailureReportByErrorDetail(String errorDetail) {
+    //     return failureReportRepository.findByErrorDetail(errorDetail);
+    // }
 }
