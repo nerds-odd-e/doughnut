@@ -40,7 +40,7 @@ export OAUTH2_github_client_secret=$(curl "https://secretmanager.googleapis.com/
 	--header "x-goog-user-project: ${PROJECTID}" |
 	jq -r ".payload.data" | base64 --decode)
 
-export GITHUB_DOUGHNUT_REPO_ACCESS_TOKEN=$(curl "https://secretmanager.googleapis.com/v1/projects/${PROJECTID}/secrets/github_doughnut_repo_access_token/versions/1:access" \
+export GITHUB_DOUGHNUT_REPO_ACCESS_TOKEN=$(curl "https://secretmanager.googleapis.com/v1/projects/${PROJECTID}/secrets/github_doughnut_repo_access_token/versions/2:access" \
 	--request "GET" \
 	--header "authorization: Bearer ${ACCESS_TOKEN}" \
 	--header "content-type: application/json" \
