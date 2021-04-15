@@ -23,6 +23,26 @@ import static java.util.stream.Collectors.toList;
 @Entity
 @Table(name = "note")
 public class Note {
+
+    public static class NoteApiResult {
+        @Getter
+        @Setter
+        private String title;
+
+        @Getter
+        @Setter
+        private String description;
+
+        @Getter
+        @Setter
+        private String auther;
+
+        @Getter
+        @Setter
+        private String updateDatetime;
+    }
+
+
     @Id
     @Getter
     @GeneratedValue(strategy = GenerationType.IDENTITY)

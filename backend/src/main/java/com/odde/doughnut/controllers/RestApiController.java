@@ -1,6 +1,7 @@
 
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.models.BazaarModel;
@@ -38,9 +39,14 @@ class RestApiController {
       return bazaarModel.getAllNotebooks();
   }
 
-  @GetMapping("/note/860")
-  public String getNote(User entity) {
+  @GetMapping("/note/blog")
+  public Note.NoteApiResult getNote(User entity) {
+      Note note = modelFactoryService.noteRepository.findFirstByTitle("odd-e blog");
+      Note.NoteApiResult result = new Note.NoteApiResult();
 
-      return "blogblog";
+      result.setTitle(note.getTitle());
+      result.setDescription(note.getArticleBody());
+
+      return result;
   }
 }
