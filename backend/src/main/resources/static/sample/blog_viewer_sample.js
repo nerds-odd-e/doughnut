@@ -2,14 +2,18 @@
 var app = new Vue({
   el: '#app',
   data: {
-    blogInfo: {}
+    blogInfo: {},
+    apiUrl: "../api/note/blog"
   },
   methods: {
     callApi: function () {
         axios
-            .get('../api/note/blog')
+            .get(this.apiUrl)
                 .then((res) => {
                     this.blogInfo = res.data;
+                })
+                .catch((res) => {
+                    alert("Error");
                 });
     }
   }

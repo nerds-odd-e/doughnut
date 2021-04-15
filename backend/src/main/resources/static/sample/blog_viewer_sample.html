@@ -7,7 +7,11 @@
 <body>
     <h1>This is Blog Viewer!!!</h1>
     <div id="app">
-        <input type="button" v-on:click="callApi" value="API CALL" />
+        <div>
+            URL
+            <input type="text" v-model="apiUrl" />
+            <input type="button" v-on:click="callApi" value="CALL" />
+        </div>
         <div>
             <h2>Title:</h2>
             <p>{{ blogInfo.title }}</p>
