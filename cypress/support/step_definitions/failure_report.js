@@ -131,3 +131,21 @@ Then("Failure reports menu is {string} in the header", (visible) => {
             cy.failure();
     }
 });
+
+When("I open the Github issue set address bar", () => {
+    cy.visit('http://localhost:8081/testability/issue');
+});
+
+Then("I should see Exception in Github issue", () => {
+    cy.seedGithubIssueFind().as("issue");
+});
+
+When("I click the Doughnut Failure Report link in Github issue", () => {
+    cy.get("@issue").should((response) => {
+       assert.equal(response.body.body, "http://localhost:8081/failure-report-list/show/1");
+     });
+});
+
+Then("I should see Exception in the page", () => {
+    cy.visit('http://localhost:8081/failure-report-list/show/1');
+});

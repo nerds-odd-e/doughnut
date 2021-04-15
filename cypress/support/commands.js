@@ -293,3 +293,18 @@ Cypress.Commands.add("searchNote", (searchKey) => {
 Cypress.Commands.add("seedFailureReport", () => {
   cy.request({method: 'POST', url: "/api/testability/seed_failure_report"}).its("body").should("contain", "OK");
 });
+
+Cypress.Commands.add("seedGithubIssueFind", (hash) => {
+  cy.request({
+    method: "GET",
+    url: "https://api.github.com/repos/mid417/hoge/issues/1",
+    headers:{
+        Authorization: "token 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",
+        Accept: "application/vnd.github.v3+json"
+    }
+  }).then((response) => {
+      expect(response.status).to.equal(200);
+      });
+});
+
+// url: "https://api.github.com/repos/nerds-odd-e/doughnut_sandbox/issue/1",

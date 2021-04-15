@@ -25,3 +25,11 @@ Feature: failure report display
     Given Login state is "Developer"
     When I open the "failure-report-list" set address bar
     Then I should see "RuntimeException" in the page
+
+   Scenario: add issue and failure-report
+     Given Someone open the "testability/exception" set address bar
+     Given Login state is "Developer"
+     When I open the Github issue set address bar
+     Then I should see Exception in Github issue
+     When I click the Doughnut Failure Report link in Github issue
+     Then I should see Exception in the page

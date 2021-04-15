@@ -52,4 +52,9 @@ class TestabilityController {
     public String exception(Model model) {
         throw new RuntimeException("for failure report");
     }
+
+    @GetMapping("/issue")
+    public String issue(Model model) {
+        return "testability/issue";
+    }
 }
