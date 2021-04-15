@@ -2,6 +2,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.Notebook;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.models.BazaarModel;
 import com.odde.doughnut.services.ModelFactoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,5 +36,11 @@ class RestApiController {
   public List<Notebook> getBazaarNotes() {
       BazaarModel bazaarModel = modelFactoryService.toBazaarModel();;
       return bazaarModel.getAllNotebooks();
+  }
+
+  @GetMapping("/note/860")
+  public String getNote(User entity) {
+
+      return "blogblog";
   }
 }
