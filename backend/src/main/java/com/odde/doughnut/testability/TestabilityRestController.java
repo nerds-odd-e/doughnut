@@ -167,6 +167,8 @@ class TestabilityRestController {
         FailureReport failureReport = new FailureReport();
         failureReport.setErrorName(errorName);
         failureReport.setErrorDetail(errorDetail);
+        failureReport.setIssueNumber(1);
+
         failureReport.setCreateDatetime(new Timestamp(new Date().getTime()));
 
         failureReportRepository.save(failureReport);

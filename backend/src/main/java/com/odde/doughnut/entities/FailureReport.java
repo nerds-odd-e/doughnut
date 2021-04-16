@@ -29,6 +29,12 @@ public class FailureReport {
     private String errorDetail;
 
     @NotNull
+    @Column(name = "issue_number")
+    @Getter
+    @Setter
+    private Integer issueNumber;
+
+    @NotNull
     @Column(name = "created_datetime")
     @Getter
     @Setter
