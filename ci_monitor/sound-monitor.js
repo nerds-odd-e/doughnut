@@ -117,7 +117,7 @@ const japaneseDictionary = {
 };
 
 setInterval(()=>{ buildState("https://github.com/nerds-odd-e/doughnut/actions").then((newState) => {
-   say(newState.diffToSentence(lastBuildState, japaneseDictionary), newState.colorCode());
+   say(newState.diffToSentence(lastBuildState, englishDictionary), newState.colorCode());
    lastBuildState = newState;
   } ) }, 5000);
 
