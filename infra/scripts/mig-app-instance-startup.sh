@@ -8,9 +8,11 @@ VERSION="0.0.1-SNAPSHOT"
 
 echo "Project ID: ${PROJECTID} Bucket: ${BUCKET}"
 
-# Get the files we need
-# mkdir -p /opt/doughnut_app
+# Download doughnut-app jar
 gsutil cp gs://"${BUCKET}/backend_app_jar/${ARTIFACT}-${VERSION}.jar" "/opt/doughnut_app/${ARTIFACT}-${VERSION}.jar"
+
+# Stop unneeded salt-minion
+systemctl stop salt-minion
 
 # Make Java 11 default
 export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
@@ -46,9 +48,6 @@ export GITHUB_DOUGHNUT_REPO_ACCESS_TOKEN=$(curl "https://secretmanager.googleapi
 	--header "content-type: application/json" \
 	--header "x-goog-user-project: ${PROJECTID}" |
 	jq -r ".payload.data" | base64 --decode)
-
-# Stop unneeded salt-minion
-systemctl stop salt-minion
 
 # Start server
 bash -c "java -jar -Dspring-boot.run.profiles=prod -Dspring.profiles.active=prod -Dspring.datasource.url='jdbc:mysql://db-server:3306/doughnut' -Dspring.datasource.password=${MYSQL_PASSWORD} /opt/doughnut_app/${ARTIFACT}-${VERSION}.jar" &
