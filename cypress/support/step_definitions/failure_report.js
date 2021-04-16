@@ -160,3 +160,11 @@ When("I click the Doughnut Failure Report link in Github issue", () => {
 Then("I should see Exception in the page", () => {
     cy.get("body").should("contain", "RuntimeException");
 });
+
+And("I should see issue url {string}", (id) => {
+    cy.get(".issue_link").should("have.text", "https://github.com/nerds-odd-e/doughnut_sandbox/issues/" + id);
+});
+
+When("I visit failure-report {string} page", (id) => {
+    cy.visit('http://localhost:8081/failure-report-list/show/' + id);
+});

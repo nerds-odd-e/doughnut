@@ -11,8 +11,9 @@ Feature: failure report display
 
   Scenario: show failure report page
     Given I've failure report
-    When I open the "failure-report-list/show/1" set address bar
+    When I visit failure-report "1" page
     Then I should see "Failure report" in the page
+    And I should see issue url "1"
 
   Scenario: not add failure
     Given Someone open the "bad-request-page" set address bar

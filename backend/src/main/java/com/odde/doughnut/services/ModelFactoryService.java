@@ -93,8 +93,4 @@ public class ModelFactoryService {
     public Authorization toAuthorization(User entity) {
         return new Authorization(entity, this);
     }
-
-    // public FailureReport findFailureReportByErrorDetail(String errorDetail) {
-    //     return failureReportRepository.findByErrorDetail(errorDetail);
-    // }
 }
