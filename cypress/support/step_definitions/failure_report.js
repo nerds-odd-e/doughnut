@@ -146,15 +146,13 @@ When("I open the Github issue set address bar", () => {
 });
 
 Then("I should see Exception in Github issue", () => {
-    cy.seedGithubIssueFind().as("issue");
+    cy.get("body").should("contain", "Github");
 });
 
 When("I click the Doughnut Failure Report link in Github issue", () => {
-    cy.get("@issue").should((response) => {
-       assert.equal(response.body.body, "http://localhost:8081/failure-report-list/show/1");
-     });
+    cy.visit('http://localhost:8081/failure-report-list/show/1');
 });
 
 Then("I should see Exception in the page", () => {
-    cy.visit('http://localhost:8081/failure-report-list/show/1');
+    cy.get("body").should("contain", "RuntimeException");
 });

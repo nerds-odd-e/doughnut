@@ -53,6 +53,7 @@ class TestabilityController {
         throw new RuntimeException("for failure report");
     }
 
+    // Cross Domain Test Screen
     @GetMapping("/issue")
     public String issue(Model model) {
         return "testability/issue";
