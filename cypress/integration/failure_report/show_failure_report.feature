@@ -21,14 +21,12 @@ Feature: failure report display
     When I open the "failure-report-list" set address bar
     Then I should not see failure report in the page
 
-  @ignore
   Scenario: add failure
     Given Someone open the "testability/exception" set address bar
     Given Login state is "Developer"
     When I open the "failure-report-list" set address bar
     Then I should see "RuntimeException" in the page
 
-  @ignore
   Scenario: add issue and failure-report
      Given Someone open the "testability/exception" set address bar
      Given Login state is "Developer"

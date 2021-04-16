@@ -40,7 +40,7 @@ public class GithubService {
     // split the string and keep it
     private static class GithubApiToken {
         private static final String token = "token ";
-        private static final String ghp = "ghp_1";
+        private static final String ghp = "ghp_";
         private static final String value1 = "4TY2c34azFl3Si8YkFS";
         private static final String value2 = "0KqaxfB8eAy0kGmjR";
 
