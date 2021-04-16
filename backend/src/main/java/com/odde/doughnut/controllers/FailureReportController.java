@@ -31,7 +31,8 @@ public class FailureReportController extends ApplicationMvcController  {
     }
 
     @GetMapping("/show/{failureReport}")
-    public String show(@PathVariable(name = "failureReport") FailureReport failureReport, Model model) {
+    public String show(@PathVariable(name = "failureReport") FailureReport failureReport, Model model) throws NoAccessRightException {
+        currentUserFetcher.getUser().assertDeveloperAuthorization();
         model.addAttribute("failureReport", failureReport);
         return "failure-report-list/show";
     }
