@@ -28,7 +28,6 @@ public class FailureReport {
     @Setter
     private String errorDetail;
 
-    @NotNull
     @Column(name = "issue_number")
     @Getter
     @Setter
