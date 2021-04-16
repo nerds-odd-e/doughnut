@@ -1,6 +1,7 @@
 package com.odde.doughnut.configs;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.FailureReport;
 import com.odde.doughnut.services.ModelFactoryService;
@@ -15,13 +16,13 @@ import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.Map;
 
 @ControllerAdvice
 public class ControllerSetup
@@ -64,6 +65,7 @@ public class ControllerSetup
 
         HttpResponse.BodyHandler<String> bodyHandler = HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8);
         HttpResponse<String> response = null;
+
         try {
             response = HttpClient.newBuilder().build().send(request, bodyHandler);
         } catch (IOException ioException) {
@@ -71,8 +73,18 @@ public class ControllerSetup
         } catch (InterruptedException interruptedException) {
             interruptedException.printStackTrace();
         }
-        System.out.println(response.body());
-        System.out.println(InetAddress.getLocalHost().getHostName());
+
+        Map<String, Object> map = null;
+        ObjectMapper mapper2 = new ObjectMapper();
+
+        try {
+            map = mapper2.readValue(response.body(), new TypeReference<Map<String, Object>>(){});
+        } catch (Exception e2) {
+            e.printStackTrace();
+        }
+
+        failureReport.setIssueNumber(Integer.valueOf(String.valueOf(map.get("number"))));
+        this.modelFactoryService.failureReportRepository.save(failureReport);
 
         throw e;
     }

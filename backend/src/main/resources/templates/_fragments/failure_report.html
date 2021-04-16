@@ -21,6 +21,6 @@
         <h2><p th:text="${failureReport.getErrorName}"/></h2>
         <p th:text="${failureReport.getErrorDetail}"/>
         <p th:text="${failureReport.getCreateDatetime}"/>
-        <a class="issue_link" th:href="@{https://github.com/nerds-odd-e/doughnut_sandbox/issue/{id} (id=${failureReport.getIssueNumber.toString})}" title="show issue">https://github.com/nerds-odd-e/doughnut_sandbox/issue/[[${failureReport.getIssueNumber.toString}]]</a>
+        <a class="issue_link" th:href="@{https://github.com/nerds-odd-e/doughnut_sandbox/issues/{id} (id=${failureReport.getIssueNumber.toString})}" title="show issue">https://github.com/nerds-odd-e/doughnut_sandbox/issues/[[${failureReport.getIssueNumber.toString}]]</a>
     </div>
 </div>
