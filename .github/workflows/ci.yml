@@ -88,11 +88,11 @@ jobs:
           - |
             cypress/integration/c*/**
             cypress/integration/f*/**
+            cypress/integration/u*/**
           - |
             cypress/integration/n*/**
           - |
             cypress/integration/r*/**
-            cypress/integration/u*/**
     steps:
       - name: Code Checkout
         uses: actions/checkout@v2
