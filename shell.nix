@@ -55,12 +55,14 @@ in mkShell {
     export DOUGHNUT_BAZAAR_NOTES_API_URL="http://localhost:8081/api/bazaar_notes"
 
     echo "################################################################################"
+    echo "                                                                                "
     echo "##    !! DOUGHNUT NIX-SHELL !!      "
     echo "##    JAVA_HOME: $JAVA_HOME         "
     echo "##    GRADLE_HOME: $GRADLE_HOME     "
     echo "##    MYSQL_HOME: $MYSQL_HOME       "
     echo "##    MYSQL_DATADIR: $MYSQL_DATADIR "
     echo "##    DOUGHNUT_BAZAAR_NOTES_API_URL: $DOUGHNUT_BAZAAR_NOTES_API_URL "
+    echo "                                                                                "
     echo "################################################################################"
     mkdir -p $MYSQL_HOME
     mkdir -p $MYSQL_DATADIR

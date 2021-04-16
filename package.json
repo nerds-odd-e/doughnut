@@ -22,7 +22,7 @@
         "nonGlobalStepDefinitions": false
     },
     "devDependencies": {
-        "@testing-library/cypress": "^7.0.4",
+        "@testing-library/cypress": "^7.0.6",
         "cypress": "^7.0",
         "cypress-cucumber-preprocessor": "^4.0",
         "cypress-file-upload": "^5.0.3",
