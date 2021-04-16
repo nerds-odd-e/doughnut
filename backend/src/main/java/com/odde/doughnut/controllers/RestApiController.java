@@ -35,18 +35,26 @@ class RestApiController {
 
   @GetMapping("/bazaar_notes")
   public List<Notebook> getBazaarNotes() {
-      BazaarModel bazaarModel = modelFactoryService.toBazaarModel();;
+      BazaarModel bazaarModel = modelFactoryService.toBazaarModel();
       return bazaarModel.getAllNotebooks();
   }
 
   @GetMapping("/note/blog")
   public Note.NoteApiResult getNote(User entity) {
       Note note = modelFactoryService.noteRepository.findFirstByTitle("odd-e blog");
-      Note.NoteApiResult result = new Note.NoteApiResult();
+      if(note != null) {
+          List<Note> listNote = note.getChildren();
+          Note targetNote = listNote.stream().filter(child ->
+              "how to do Scrum".equals(child.getTitle())
+          ).findFirst().orElse(new Note());
 
-      result.setTitle(note.getTitle());
-      result.setDescription(note.getArticleBody());
+          Note.NoteApiResult result = new Note.NoteApiResult();
+          result.setTitle(targetNote.getTitle());
+          result.setDescription(targetNote.getArticleBody());
 
-      return result;
+          return result;
+      } else {
+          return new Note.NoteApiResult();
+      }
   }
 }
