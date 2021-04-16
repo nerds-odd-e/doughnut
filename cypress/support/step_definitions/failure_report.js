@@ -93,18 +93,6 @@ Given("Login state is {string}", (loginState) => {
     }
 });
 
-When("Access to failure report page", () => {
-  cy.visit("/failure-report-list", {
-    failOnStatusCode: false
-  });
-});
-
-When("Access to failure report detail page", () => {
-  cy.visit("/failure-report-list/show/1", {
-    failOnStatusCode: false
-  });
-});
-
 Then("The {string} page is displayed", (pageName) => {
     switch(pageName) {
         case "LoginPage":
@@ -128,12 +116,29 @@ When("Access to top page", () => {
   cy.visit("/");
 });
 
-Then("Failure reports menu is {string} in the header", (visible) => {
+When("Access to {string} page", (pageName) => {
+switch(pageName) {
+        case "FailureReportPage":
+            cy.visit("/failure-report-list", {
+                failOnStatusCode: false
+            });
+            break;
+        case "FailureReportDetailPage":
+            cy.visit("/failure-report-list/show/1", {
+                failOnStatusCode: false
+            });
+            break;
+        default:
+            cy.failure();
+    }
+});
+
+Then("The FailureReportsLink is {string}", (visible) => {
     switch(visible) {
-        case "Displayed":
+        case "visible":
             cy.findAllByText("Failure Reports");
             break;
-        case "NotDisplayed":
+        case "invisible":
             cy.findByText("Failure Reports").should('not.exist');
             break;
         default:
