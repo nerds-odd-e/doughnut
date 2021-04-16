@@ -3,15 +3,15 @@ import {
   And,
   Then,
   When,
-  Before,
+  Before
 } from "cypress-cucumber-preprocessor/steps";
 
 Given("There is a Blog Notebook called odd-e blog", (data) => {
-     cy.loginAs('developer');
+  cy.loginAs('developer');
 
-     cy.visitMyNotebooks();
-     cy.findByText("Add New Notebook").click();
-     cy.submitNoteFormWith(data.hashes());
+  cy.visitMyNotebooks();
+  cy.findByText("Add New Notebook").click();
+  cy.submitNoteFormWith(data.hashes());
 });
 
 And("A blog called how to do Scrum is posted", (data) => {
@@ -39,9 +39,9 @@ When("Request an odd-e blog api", () => {
 });
 
 Then("Can get the note object", () => {
-    cy.readFile('cypress/support/step_definitions/api_note.json').then(obj => {
-        cy.wrap(obj).its('title').should("eq", responseJsonObj.title);
-        cy.wrap(obj).its('description').should("eq", responseJsonObj.description);
+    cy.fixture("json/api_note.json").then(apiNote => {
+      expect(apiNote.title).to.equal(responseJsonObj.title);
+      expect(apiNote.description).to.equal(responseJsonObj.description);
     });
 });
 
