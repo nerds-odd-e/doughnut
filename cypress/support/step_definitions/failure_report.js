@@ -112,12 +112,11 @@ Then("The {string} page is displayed", (pageName) => {
     }
 });
 
-When("Access to top page", () => {
-  cy.visit("/");
-});
-
 When("Access to {string} page", (pageName) => {
 switch(pageName) {
+        case "TopPage":
+            cy.visit("/");
+            break;
         case "FailureReportPage":
             cy.visit("/failure-report-list", {
                 failOnStatusCode: false

@@ -17,7 +17,7 @@ Feature: Access control failure report
   Scenario Outline: Only developers can see failure report link
     Given I've failure report
     And Login state is "<login state>"
-    When Access to top page
+    When Access to "TopPage" page
     Then The <target function> is "<expected>"
     Examples:
       | login state  | target function    | expected  |
