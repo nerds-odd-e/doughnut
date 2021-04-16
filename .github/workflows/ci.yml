@@ -84,11 +84,15 @@ jobs:
       matrix:
         spec:
           - |
-            cypress/integration/[[a-gA-G]]*/**
+            cypress/integration/b*/**
           - |
-            cypress/integration/[[h-nH-N]]*/**
+            cypress/integration/c*/**
+            cypress/integration/f*/**
           - |
-            cypress/integration/[[o-ZO-Z]]*/**
+            cypress/integration/n*/**
+          - |
+            cypress/integration/r*/**
+            cypress/integration/u*/**
     steps:
       - name: Code Checkout
         uses: actions/checkout@v2
