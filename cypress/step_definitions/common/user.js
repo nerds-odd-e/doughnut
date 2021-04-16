@@ -7,6 +7,9 @@ import {
 } from "cypress-cucumber-preprocessor/steps";
 
 Given("I've logged in as {string}", (externalIdentifier) => {
+  if (externalIdentifier === 'none') {
+    return;
+  }
   cy.loginAs(externalIdentifier);
 });
 
@@ -59,7 +62,33 @@ Then("my space setting is {string}", (number) => {
 Then("I haven't login", () => {
 });
 
+When("I visit {string} page", (pageName) => {
+switch(pageName) {
+        case "FailureReportPage":
+            cy.visit("/failure-report-list", {
+                failOnStatusCode: false
+            });
+            break;
+        default:
+            cy.failure();
+    }
+});
 
+Then("The {string} page is displayed", (pageName) => {
+    switch(pageName) {
+        case "LoginPage":
+            cy.findAllByText("Please sign in");
+            break;
+        case "FailureReportPage":
+            cy.findAllByText("Failure report list");
+            break;
+        case "ErrorPage":
+            cy.findAllByText("Whitelabel Error Page");
+            break;
+        default:
+            cy.failure();
+    }
+});
 
 
 
