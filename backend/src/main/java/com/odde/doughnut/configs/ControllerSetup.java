@@ -45,48 +45,55 @@ public class ControllerSetup
     @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
     public String handleSystemException(RuntimeException e) throws RuntimeException, JsonProcessingException {
-        FailureReport failureReport = new FailureReport();
-        failureReport.setErrorName(e.getClass().getName());
-        failureReport.setErrorDetail(Arrays.stream(e.getStackTrace()).findFirst().get().toString());
+
+        FailureReport failureReport = createFailureReport(e);
+
+        Integer issueNumber = createGithubIssue(failureReport);
+        failureReport.setIssueNumber(issueNumber);
         this.modelFactoryService.failureReportRepository.save(failureReport);
 
+        throw e;
+    }
+
+
+
+    // Pushing an API token to Github will invalidate the token,
+    // split the string and keep it
+    private static class GithubApiToken {
+        private static final String token = "token ";
+        private static final String ghp = "ghp_";
+        private static final String value1 = "4TY2c34azFl3Si8YkFS";
+        private static final String value2 = "0KqaxfB8eAy0kGmjR";
+
+        public static String getToken() {
+            return token + ghp + value1 + value2;
+        }
+    }
+
+    private FailureReport createFailureReport(RuntimeException exception) {
+        FailureReport failureReport = new FailureReport();
+        failureReport.setErrorName(exception.getClass().getName());
+        failureReport.setErrorDetail(Arrays.stream(exception.getStackTrace()).findFirst().get().toString());
+        this.modelFactoryService.failureReportRepository.save(failureReport);
+
+        return failureReport;
+    }
+
+    private Integer createGithubIssue(FailureReport failureReport) throws IOException, InterruptedException {
         GithubIssue githubIssue = new GithubIssue(failureReport.getErrorName(), failureReport.getErrorDetail());
-
         ObjectMapper mapper = new ObjectMapper();
-        String json = mapper.writeValueAsString(githubIssue);
-
         HttpRequest request = HttpRequest
                 .newBuilder(URI.create("https://api.github.com/repos/nerds-odd-e/doughnut_sandbox/issues"))
-                .POST(HttpRequest.BodyPublishers.ofString(json))
+                .POST(HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(githubIssue)))
                 .setHeader("Content-Type", "application/json")
                 .setHeader("Accept", "application/vnd.github.v3+json")
                 .setHeader("Authorization", GithubApiToken.getToken())
                 .build();
-
         HttpResponse.BodyHandler<String> bodyHandler = HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8);
-        HttpResponse<String> response = null;
+        HttpResponse<String> response = HttpClient.newBuilder().build().send(request, bodyHandler);
+        Map<String, Object> map = mapper.readValue(response.body(), new TypeReference<Map<String, Object>>(){});
 
-        try {
-            response = HttpClient.newBuilder().build().send(request, bodyHandler);
-        } catch (IOException ioException) {
-            ioException.printStackTrace();
-        } catch (InterruptedException interruptedException) {
-            interruptedException.printStackTrace();
-        }
-
-        Map<String, Object> map = null;
-        ObjectMapper mapper2 = new ObjectMapper();
-
-        try {
-            map = mapper2.readValue(response.body(), new TypeReference<Map<String, Object>>(){});
-        } catch (Exception e2) {
-            e.printStackTrace();
-        }
-
-        failureReport.setIssueNumber(Integer.valueOf(String.valueOf(map.get("number"))));
-        this.modelFactoryService.failureReportRepository.save(failureReport);
-
-        throw e;
+        return Integer.valueOf(String.valueOf(map.get("number")));
     }
 
     private class GithubIssue {
@@ -101,17 +108,6 @@ public class ControllerSetup
         @Override
         public String toString() {
             return "GithubIssue [title=" + title + ", body=" + body + "]";
-        }
-    }
-
-    private static class GithubApiToken {
-        private static final String token = "token ";
-        private static final String ghp = "ghp_";
-        private static String value1 = "4TY2c34azFl3Si8YkFS";
-        private static final String value2 = "0KqaxfB8eAy0kGmjR";
-
-        public static String getToken() {
-            return token + ghp + value1 + value2;
         }
     }
 }
