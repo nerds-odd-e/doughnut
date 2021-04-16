@@ -3,7 +3,6 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.entities.User;
 import com.odde.doughnut.models.BazaarModel;
 import com.odde.doughnut.services.ModelFactoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +39,7 @@ class RestApiController {
   }
 
   @GetMapping("/note/blog")
-  public Note.NoteApiResult getNote(User entity) {
+  public Note.NoteApiResult getNote() {
       Note note = modelFactoryService.noteRepository.findFirstByTitle("odd-e blog");
       if(note != null) {
           List<Note> listNote = note.getChildren();
@@ -51,6 +50,8 @@ class RestApiController {
           Note.NoteApiResult result = new Note.NoteApiResult();
           result.setTitle(targetNote.getTitle());
           result.setDescription(targetNote.getArticleBody());
+          result.setAuthor(targetNote.getUser().getName());
+          result.setUpdateDatetime(targetNote.getNoteContent().getUpdatedDatetime().toString());
 
           return result;
       } else {

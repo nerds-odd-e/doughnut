@@ -35,7 +35,7 @@ public class Note {
 
         @Getter
         @Setter
-        private String auther;
+        private String author;
 
         @Getter
         @Setter

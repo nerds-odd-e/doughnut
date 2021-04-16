@@ -5,13 +5,13 @@ Feature: Provisioning Blog from Note
 
 
   Scenario: provisioning Blog from Note
-    Given odd-e blog という Blog Notebookがある
+    Given There is a Blog Notebook called odd-e blog
       | Title    | Description     |
       | odd-e blog | test |
-    And  how to do Scrum という Blogがpostされている
+    And  A blog called how to do Scrum is posted
       | Title    | Description     |
       | how to do Scrum | Scrum |
-    When サードパーティアプリから odd-e blog api を使う
-    Then サードパーティアプリから how to do Scrum というブログが見られる
-    When odd-e blog api をリクエストすると
-    Then ノートオブジェクトが取得できること
+    When Use odd-e blog api from a third party app
+    Then You can see a blog called how to do Scrum from a third party app
+    When Request an odd-e blog api
+    Then Can get the note object

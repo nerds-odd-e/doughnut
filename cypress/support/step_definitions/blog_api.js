@@ -6,7 +6,7 @@ import {
   Before,
 } from "cypress-cucumber-preprocessor/steps";
 
-Given("odd-e blog という Blog Notebookがある", (data) => {
+Given("There is a Blog Notebook called odd-e blog", (data) => {
      cy.loginAs('developer');
 
      cy.visitMyNotebooks();
@@ -14,26 +14,31 @@ Given("odd-e blog という Blog Notebookがある", (data) => {
      cy.submitNoteFormWith(data.hashes());
 });
 
-And("how to do Scrum という Blogがpostされている", (data) => {
+And("A blog called how to do Scrum is posted", (data) => {
     cy.findByText("(Add Child Note)").click();
     cy.submitNoteFormWith(data.hashes());
 });
 
-When("サードパーティアプリから odd-e blog api を使う", () => {
+When("Use odd-e blog api from a third party app", () => {
+    cy.visit("http://localhost:8081/sample/blog_viewer_sample.html");
+    cy.get("#app > div:nth-child(1) > input[type=button]:nth-child(2)").click();
 });
 
-Then("サードパーティアプリから how to do Scrum というブログが見られる", () => {
+Then("You can see a blog called how to do Scrum from a third party app", () => {
+    cy.get("#app > div:nth-child(2) > p:nth-child(2)").should('have.text', "how to do Scrum");
+    cy.get("#app > div:nth-child(2) > p:nth-child(4)").should('have.text', "Scrum");
+    cy.get("#app > div:nth-child(2) > p:nth-child(6)").should('have.text', "Developer");
+    cy.get("#app > div:nth-child(2) > p:nth-child(8)").invoke('text').should('match', /\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d.+/);
 });
-
 
 var responseJsonObj;
-When("odd-e blog api をリクエストすると", () => {
+When("Request an odd-e blog api", () => {
     cy.request('http://localhost:8081/api/note/blog').then((response) => {
         responseJsonObj = response.body;
     });
 });
 
-Then("ノートオブジェクトが取得できること", () => {
+Then("Can get the note object", () => {
     cy.readFile('cypress/support/step_definitions/api_note.json').then(obj => {
         cy.wrap(obj).its('title').should("eq", responseJsonObj.title);
         cy.wrap(obj).its('description').should("eq", responseJsonObj.description);
