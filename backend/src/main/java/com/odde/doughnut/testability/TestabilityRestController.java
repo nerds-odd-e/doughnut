@@ -45,8 +45,7 @@ class TestabilityRestController {
     ModelFactoryService modelFactoryService;
     @Autowired
     TimeTraveler timeTraveler;
-    @Autowired
-    FailureReportRepository failureReportRepository;
+
     @Autowired
     GithubService githubService;
 
@@ -159,24 +158,6 @@ class TestabilityRestController {
         String pattern = "\"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'\"";
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
         return formatter;
-    }
-
-    @PostMapping("/seed_failure_report")
-    public String seedFailureReport() {
-        createFailureReport("errorName1", "errorDetail1");
-        createFailureReport("errorName2", "errorDetail2");
-        return "OK";
-    }
-
-    private void createFailureReport(String errorName, String errorDetail) {
-        FailureReport failureReport = new FailureReport();
-        failureReport.setErrorName(errorName);
-        failureReport.setErrorDetail(errorDetail);
-        failureReport.setIssueNumber(1);
-
-        failureReport.setCreateDatetime(new Timestamp(new Date().getTime()));
-
-        failureReportRepository.save(failureReport);
     }
 
     @PostMapping("/trigger_exception")
