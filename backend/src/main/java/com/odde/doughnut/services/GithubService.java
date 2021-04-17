@@ -25,12 +25,10 @@ public class GithubService {
 
     public Integer createGithubIssue(FailureReport failureReport) throws IOException, InterruptedException {
         GithubIssue githubIssue = new GithubIssue(failureReport.getErrorName(), failureReport.getErrorDetail());
-        ObjectMapper mapper = new ObjectMapper();
-        final String body = mapper.writeValueAsString(githubIssue);
-        Map<String, Object> map = apiRequestWithMapAsResult("issues",
-                (builder) -> builder.POST(BodyPublishers.ofString(body)));
+        final String body = new ObjectMapper().writeValueAsString(githubIssue);
+        Map<String, Object> map = apiRequestWithMapAsResult("issues", (builder) -> builder.POST(BodyPublishers.ofString(body)));
 
-        return Integer.valueOf(String.valueOf(map.get("number")));
+        return (Integer) map.get("number");
     }
 
     public List<Map<String, Object>> getOpenIssues() throws IOException, InterruptedException {
@@ -38,28 +36,22 @@ public class GithubService {
     }
 
     public void closeAllOpenIssues() throws IOException, InterruptedException {
-        getOpenIssues().forEach(issue-> {
-            closeIssue((Integer) issue.get("number"));
-        });
+        getOpenIssues().forEach(issue-> closeIssue((Integer) issue.get("number")));
     }
 
     @SneakyThrows
-    private String closeIssue(Integer issueNumber) {
-        final HttpResponse<String> stringHttpResponse = apiRequest("issues/" + issueNumber, builder -> builder.POST(BodyPublishers.ofString("{\"state\":\"closed\"}")));
-        final String body = stringHttpResponse.body();
-        return body;
+    private void closeIssue(Integer issueNumber) {
+        apiRequest("issues/" + issueNumber, builder -> builder.POST(BodyPublishers.ofString("{\"state\":\"closed\"}")));
     }
 
     private List<Map<String, Object>> apiRequestWithArrayAsResult(String action, Function<HttpRequest.Builder, HttpRequest.Builder> callback) throws IOException, InterruptedException {
         HttpResponse<String> response = apiRequest(action, callback);
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper.readValue(response.body(), new TypeReference<>(){ });
+        return new ObjectMapper().readValue(response.body(), new TypeReference<>(){ });
     }
 
     private Map<String, Object> apiRequestWithMapAsResult(String action, Function<HttpRequest.Builder, HttpRequest.Builder> callback) throws IOException, InterruptedException {
         HttpResponse<String> response = apiRequest(action, callback);
-        ObjectMapper mapper = new ObjectMapper();
-        return mapper.readValue(response.body(), new TypeReference<>(){ });
+        return new ObjectMapper().readValue(response.body(), new TypeReference<>(){ });
     }
 
     private HttpResponse<String> apiRequest(String action, Function<HttpRequest.Builder, HttpRequest.Builder> callback) throws IOException, InterruptedException {
