@@ -1,14 +1,12 @@
 Feature: failure report
 
   Scenario: add failure
-    Given Someone triggered an exception
-    Given I've logged in as "developer"
-    When I open the "failure-report-list" set address bar
-    Then I should see "RuntimeException" in the page
+    When Someone triggered an exception
+    And I've logged in as "developer"
+    Then I should see "RuntimeException" in the failure report
 
+  @slow
   Scenario: add issue and failure-report
     Given There are no open issues on github
-    Given Someone triggered an exception
-    Given I've logged in as "developer"
-     When I click the Doughnut Failure Report link in Github issue
-     Then I should see Exception in the page
+    When Someone triggered an exception
+    Then I should see a new open issue on github
