@@ -16,14 +16,12 @@ public class FailureReport {
 
     @NotNull
     @Column(name = "error_name")
-    @Size(min = 1, max = 100)
     @Getter
     @Setter
     private String errorName;
 
     @NotNull
     @Column(name = "error_detail")
-    @Size(min = 1, max = 1000)
     @Getter
     @Setter
     private String errorDetail;
@@ -39,6 +37,4 @@ public class FailureReport {
     @Setter
     private Timestamp createDatetime = new Timestamp(System.currentTimeMillis());
 
-    public FailureReport() {
-    }
 }
