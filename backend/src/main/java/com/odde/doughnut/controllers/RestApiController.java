@@ -18,44 +18,37 @@ import java.util.List;
 @CrossOrigin(origins = "http://localhost:8000")
 @RequestMapping("/api")
 class RestApiController {
-  @Autowired
-  private Environment environment;
+    @Autowired
+    private Environment environment;
 
-  private final ModelFactoryService modelFactoryService;
+    private final ModelFactoryService modelFactoryService;
 
-  public RestApiController(ModelFactoryService modelFactoryService) {
-      this.modelFactoryService = modelFactoryService;
-  }
+    public RestApiController(ModelFactoryService modelFactoryService) {
+        this.modelFactoryService = modelFactoryService;
+    }
 
-  @GetMapping("/healthcheck")
-  public String ping() {
-    return "OK. Active Profile: " + String.join(", ", environment.getActiveProfiles());
-  }
+    @GetMapping("/healthcheck")
+    public String ping() {
+        return "OK. Active Profile: " + String.join(", ", environment.getActiveProfiles());
+    }
 
-  @GetMapping("/bazaar_notes")
-  public List<Notebook> getBazaarNotes() {
-      BazaarModel bazaarModel = modelFactoryService.toBazaarModel();
-      return bazaarModel.getAllNotebooks();
-  }
+    @GetMapping("/bazaar_notes")
+    public List<Notebook> getBazaarNotes() {
+        BazaarModel bazaarModel = modelFactoryService.toBazaarModel();
+        return bazaarModel.getAllNotebooks();
+    }
 
-  @GetMapping("/note/blog")
-  public Note.NoteApiResult getNote() {
-      Note note = modelFactoryService.noteRepository.findFirstByTitle("odd-e blog");
-      if(note != null) {
-          List<Note> listNote = note.getChildren();
-          Note targetNote = listNote.stream().filter(child ->
-              "how to do Scrum".equals(child.getTitle())
-          ).findFirst().orElse(new Note());
+    @GetMapping("/note/blog")
+    public Note.NoteApiResult getNote() {
+        Note note = modelFactoryService.noteRepository.findFirstByTitle("odd-e blog");
+        Note targetNote = note.getChildren().stream().findFirst().orElse(new Note());
 
-          Note.NoteApiResult result = new Note.NoteApiResult();
-          result.setTitle(targetNote.getTitle());
-          result.setDescription(targetNote.getArticleBody());
-          result.setAuthor(targetNote.getUser().getName());
-          result.setUpdateDatetime(targetNote.getNoteContent().getUpdatedDatetime().toString());
+        Note.NoteApiResult result = new Note.NoteApiResult();
+        result.setTitle(targetNote.getTitle());
+        result.setDescription(targetNote.getArticleBody());
+        result.setAuthor(targetNote.getUser().getName());
+        result.setUpdateDatetime(targetNote.getNoteContent().getUpdatedDatetime().toString());
 
-          return result;
-      } else {
-          return new Note.NoteApiResult();
-      }
-  }
+        return result;
+    }
 }

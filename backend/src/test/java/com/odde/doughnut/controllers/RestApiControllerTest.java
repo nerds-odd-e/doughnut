@@ -30,15 +30,13 @@ public class RestApiControllerTest {
 
     RestApiController controller;
 
-    @Autowired
-    ModelFactoryService modelFactoryService;
     private Note topNote;
     private Note firstChild;
     private Timestamp firstChildUpdatetime;
     private String userName;
 
     @BeforeEach
-    void setup() throws NoAccessRightException, IOException {
+    void setup() {
         userModel = makeMe.aUser().toModelPlease();
         controller = new RestApiController(makeMe.modelFactoryService);
 
