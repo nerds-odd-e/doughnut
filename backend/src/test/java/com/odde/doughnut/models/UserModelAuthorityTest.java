@@ -55,49 +55,5 @@ public class UserModelAuthorityTest {
             assertTrue(userModel.getAuthorization().hasFullAuthority(note));
         }
     }
-
-    @Nested
-    class failureReportNotAccess{
-
-        UserModel userModel;
-        @BeforeEach
-        void setup() {
-            this.userModel = makeMe.aUser().toModelPlease();
-        }
-
-        @ParameterizedTest
-        @CsvSource({
-            "t-machu, true",
-            "hisashidds, false",
-            "Developer, true",
-            "Non Developer, false"
-        })
-        void developerCanAccessFailureReports(String name, boolean isDev) {
-            User user = new User();
-            user.setName(name);
-            this.userModel = makeMe.modelFactoryService.toUserModel(user);
-            assertEquals(isDev, this.userModel.isDeveloper());
-        }
-
-        @ParameterizedTest
-        @CsvSource({
-                "Developer, false",
-                "Non Developer, true"
-        })
-        void throwExceptionNonDeveloper(String name, boolean isThrowsException) {
-            User user = new User();
-            user.setName(name);
-            this.userModel = makeMe.modelFactoryService.toUserModel(user);
-
-            boolean hasException = false;
-            try {
-                this.userModel.assertDeveloperAuthorization();
-            } catch(NoAccessRightException ex) {
-                hasException = true;
-            }
-
-            assertEquals(isThrowsException, hasException);
-        }
-    }
 }
 

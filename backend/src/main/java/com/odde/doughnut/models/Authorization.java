@@ -4,6 +4,9 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.services.ModelFactoryService;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class Authorization extends ModelForEntity<User> {
     public Authorization(User entity, ModelFactoryService modelFactoryService) {
         super(entity, modelFactoryService);
@@ -62,4 +65,21 @@ public class Authorization extends ModelForEntity<User> {
             throw new NoAccessRightException();
         }
     }
+
+    public void assertDeveloperAuthorization() throws NoAccessRightException {
+        if(!isDeveloper()) {
+            throw new NoAccessRightException();
+        }
+    }
+
+    private static final List<String> allowUsers = Arrays.asList(
+            "Terry",
+            "t-machu",
+            "Developer"
+    );
+
+    public boolean isDeveloper() {
+        return allowUsers.contains(entity.getName());
+    }
+
 }

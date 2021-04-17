@@ -33,7 +33,7 @@
                     <li class="nav-item active">
                         <a class="nav-link" href="/bazaar">Bazaar</a>
                     </li>
-                    <li class="nav-item active" th:if="${currentUser != null && currentUser.isDeveloper()}">
+                    <li class="nav-item active" th:if="${currentUser != null && currentUser.authorization.isDeveloper()}">
                         <a class="nav-link" href="/failure-report-list">Failure Reports</a>
                     </li>
                     <li class="nav-item active" th:unless="${#arrays.contains(@environment.getActiveProfiles(), 'prod')}">

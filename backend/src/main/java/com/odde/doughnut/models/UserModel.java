@@ -2,28 +2,18 @@ package com.odde.doughnut.models;
 
 import com.odde.doughnut.algorithms.SpacedRepetitionAlgorithm;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.services.ModelFactoryService;
 import org.apache.logging.log4j.util.Strings;
 
 import java.sql.Timestamp;
 import java.time.ZoneId;
-import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
 public class UserModel extends ModelForEntity<User> implements ReviewScope {
-    private final boolean isDev;
-
-    private static final List<String> allowUsers = Arrays.asList(
-            "Terry",
-            "t-machu",
-            "Developer"
-    );
 
     public UserModel(User user, ModelFactoryService modelFactoryService) {
         super(user, modelFactoryService);
-        this.isDev = allowUsers.contains(user.getName());
     }
 
     public Authorization getAuthorization() {
@@ -99,13 +89,4 @@ public class UserModel extends ModelForEntity<User> implements ReviewScope {
         return new Reviewing(this, currentUTCTimestamp, modelFactoryService);
     }
 
-    public boolean isDeveloper() {
-        return this.isDev;
-    }
-
-    public void assertDeveloperAuthorization() throws NoAccessRightException {
-        if(!isDeveloper()) {
-            throw new NoAccessRightException();
-        }
-    }
 }
