@@ -1,6 +1,5 @@
 package com.odde.doughnut.configs;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.odde.doughnut.entities.FailureReport;
 import com.odde.doughnut.services.GithubService;
 import com.odde.doughnut.services.ModelFactoryService;
@@ -10,7 +9,6 @@ import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
@@ -30,19 +28,17 @@ public class ControllerSetup
     }
 
     @InitBinder
-    public void initBinder ( WebDataBinder binder )
+    public void initBinder( WebDataBinder binder )
     {
+        // trimming all strings coming from any user form
         StringTrimmerEditor stringTrimmerEditor = new StringTrimmerEditor(false);
         binder.registerCustomEditor(String.class, stringTrimmerEditor);
     }
 
     @SneakyThrows
-    @ExceptionHandler(RuntimeException.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public String handleSystemException(RuntimeException e) throws RuntimeException, JsonProcessingException {
-
+    public String handleSystemException(Exception e) {
         FailureReport failureReport = createFailureReport(e);
-
         Integer issueNumber = githubService.createGithubIssue(failureReport);
         failureReport.setIssueNumber(issueNumber);
         this.modelFactoryService.failureReportRepository.save(failureReport);
@@ -50,8 +46,7 @@ public class ControllerSetup
         throw e;
     }
 
-
-    private FailureReport createFailureReport(RuntimeException exception) {
+    private FailureReport createFailureReport(Exception exception) {
         FailureReport failureReport = new FailureReport();
         failureReport.setErrorName(exception.getClass().getName());
         failureReport.setErrorDetail(Arrays.stream(exception.getStackTrace()).findFirst().get().toString());
