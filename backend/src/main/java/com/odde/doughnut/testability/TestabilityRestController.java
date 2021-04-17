@@ -9,14 +9,17 @@ import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
 import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.GithubService;
 import com.odde.doughnut.services.ModelFactoryService;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManagerFactory;
+import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
@@ -44,6 +47,8 @@ class TestabilityRestController {
     TimeTraveler timeTraveler;
     @Autowired
     FailureReportRepository failureReportRepository;
+    @Autowired
+    GithubService githubService;
 
     @PostMapping("/clean_db_and_seed_data")
     public String cleanDBAndSeedData() {
@@ -174,4 +179,19 @@ class TestabilityRestController {
         failureReportRepository.save(failureReport);
     }
 
+    @PostMapping("/trigger_exception")
+    public String triggerException(Model model) {
+        throw new RuntimeException("for failure report");
+    }
+
+    @PostMapping("/close_all_github_issues")
+    public String closeAllGithubIssues(Model model) throws IOException, InterruptedException {
+        githubService.closeAllOpenIssues();
+        return "OK";
+    }
+
+    @GetMapping("/github_issues")
+    public List<Map<String, Object>> githubIssues() throws IOException, InterruptedException {
+        return githubService.getOpenIssues();
+    }
 }

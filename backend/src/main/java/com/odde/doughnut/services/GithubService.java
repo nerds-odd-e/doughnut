@@ -2,17 +2,20 @@ package com.odde.doughnut.services;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.odde.doughnut.configs.ControllerSetup;
 import com.odde.doughnut.entities.FailureReport;
+import lombok.SneakyThrows;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
+import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 @Service
 public class GithubService {
@@ -22,22 +25,55 @@ public class GithubService {
     public Integer createGithubIssue(FailureReport failureReport) throws IOException, InterruptedException {
         GithubIssue githubIssue = new GithubIssue(failureReport.getErrorName(), failureReport.getErrorDetail());
         ObjectMapper mapper = new ObjectMapper();
-        HttpRequest request = HttpRequest
-                .newBuilder(URI.create("https://api.github.com/repos/nerds-odd-e/doughnut_sandbox/issues"))
-                .POST(HttpRequest.BodyPublishers.ofString(mapper.writeValueAsString(githubIssue)))
+        final String body = mapper.writeValueAsString(githubIssue);
+        Map<String, Object> map = apiRequestWithMapAsResult("issues",
+                (builder) -> builder.POST(BodyPublishers.ofString(body)));
+
+        return Integer.valueOf(String.valueOf(map.get("number")));
+    }
+
+    public List<Map<String, Object>> getOpenIssues() throws IOException, InterruptedException {
+        return apiRequestWithArrayAsResult("issues?state=open", HttpRequest.Builder::GET);
+    }
+
+    public void closeAllOpenIssues() throws IOException, InterruptedException {
+        getOpenIssues().forEach(issue-> {
+            closeIssue((Integer) issue.get("number"));
+        });
+    }
+
+    @SneakyThrows
+    private String closeIssue(Integer issueNumber) {
+        final HttpResponse<String> stringHttpResponse = apiRequest("issues/" + issueNumber, builder -> builder.POST(BodyPublishers.ofString("{\"state\":\"closed\"}")));
+        final String body = stringHttpResponse.body();
+        return body;
+    }
+
+    private List<Map<String, Object>> apiRequestWithArrayAsResult(String action, Function<HttpRequest.Builder, HttpRequest.Builder> callback) throws IOException, InterruptedException {
+        HttpResponse<String> response = apiRequest(action, callback);
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.readValue(response.body(), new TypeReference<>(){ });
+    }
+
+    private Map<String, Object> apiRequestWithMapAsResult(String action, Function<HttpRequest.Builder, HttpRequest.Builder> callback) throws IOException, InterruptedException {
+        HttpResponse<String> response = apiRequest(action, callback);
+        ObjectMapper mapper = new ObjectMapper();
+        return mapper.readValue(response.body(), new TypeReference<>(){ });
+    }
+
+    private HttpResponse<String> apiRequest(String action, Function<HttpRequest.Builder, HttpRequest.Builder> callback) throws IOException, InterruptedException {
+        final HttpRequest.Builder builder = HttpRequest
+                .newBuilder(URI.create("https://api.github.com/repos/nerds-odd-e/doughnut_sandbox/" + action));
+        final HttpRequest.Builder builderWithRequest = callback.apply(builder);
+        HttpRequest request = builderWithRequest
                 .setHeader("Content-Type", "application/json")
                 .setHeader("Accept", "application/vnd.github.v3+json")
                 .setHeader("Authorization", GithubApiToken.getToken())
                 .build();
         HttpResponse.BodyHandler<String> bodyHandler = HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8);
-        HttpResponse<String> response = HttpClient.newBuilder().build().send(request, bodyHandler);
-        Map<String, Object> map = mapper.readValue(response.body(), new TypeReference<Map<String, Object>>() {
-        });
+        return HttpClient.newBuilder().build().send(request, bodyHandler);
+    }
 
-        return Integer.valueOf(String.valueOf(map.get("number")));
-    }// Pushing an API token to Github will invalidate the token,
-
-    // split the string and keep it
     private static class GithubApiToken {
         private static final String token = "token ";
         private static final String ghp = "ghp_";

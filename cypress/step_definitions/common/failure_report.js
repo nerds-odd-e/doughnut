@@ -14,16 +14,12 @@ When("I open the {string} set address bar", (url) => {
   cy.visit('http://localhost:8081/' + url)
 });
 
-When("Someone open the {string} set address bar", (url) => {
-  cy.visit('http://localhost:8081/' + url, {failOnStatusCode: false})
+When("Someone triggered an exception", (url) => {
+  cy.triggerException();
 });
 
 Then("there shouldn't be any note edit button for {string}", (noteTitle) => {
   cy.findNoteCardEditButton(noteTitle).should("not.exist");
-});
-
-Given("I've failure report", () => {
-  cy.seedFailureReport();
 });
 
 When("I open the {string} set address bar", (url) => {
@@ -64,10 +60,6 @@ Then("I should see {string} in the page", (content) => {
   cy.get("body").should("contain", content);
 });
 
-Then("I should not see failure report in the page", () => {
-  cy.get(".report-list").children().should('have.length', 0);
-});
-
 Then("My name {string} is in the top bar", (name) => {
   cy.get("nav").should("contain", name);
 });
@@ -81,7 +73,7 @@ Then("my space setting is {string}", (number) => {
 });
 
 When("I open the Github issue set address bar", () => {
-    cy.visit('http://localhost:8081/testability/issue');
+    cy.visit('http://localhost:8081/testability/github_issues');
 });
 
 Then("I should see Exception in Github issue", () => {
@@ -89,7 +81,9 @@ Then("I should see Exception in Github issue", () => {
 });
 
 When("I click the Doughnut Failure Report link in Github issue", () => {
-    cy.visit('http://localhost:8081/failure-report-list/show/1');
+  cy.request({method: "GET", url: `/api/testability/github_issues`}).then(response=>{
+    expect(response.body.length).to.equal(1);
+  });
 });
 
 Then("I should see Exception in the page", () => {
@@ -102,4 +96,9 @@ And("I should see issue url {string}", (id) => {
 
 When("I visit failure-report {string} page", (id) => {
     cy.visit('http://localhost:8081/failure-report-list/show/' + id);
+});
+
+Given("There are no open issues on github", (id) => {
+  cy.request({method: "POST", url: `/api/testability/close_all_github_issues`})
+     .its("body").should("contain", "OK");
 });
