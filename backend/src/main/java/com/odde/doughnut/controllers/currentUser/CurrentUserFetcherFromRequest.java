@@ -36,4 +36,9 @@ public class CurrentUserFetcherFromRequest implements CurrentUserFetcher {
         }
         return modelFactoryService.toUserModel(user);
     }
+
+    @Override
+    public String getExternalIdentifier() {
+        return externalId;
+    }
 }

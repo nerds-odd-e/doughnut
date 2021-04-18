@@ -4,4 +4,6 @@ import com.odde.doughnut.models.UserModel;
 
 public interface CurrentUserFetcher {
     UserModel getUser();
+
+    String getExternalIdentifier();
 }

@@ -1,5 +1,6 @@
 package com.odde.doughnut.configs;
 
+import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.FailureReport;
 import com.odde.doughnut.services.GithubService;
 import com.odde.doughnut.services.ModelFactoryService;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Arrays;
 
 @ControllerAdvice
 public class ControllerSetup
@@ -23,11 +23,14 @@ public class ControllerSetup
     @Autowired
     private final GithubService githubService;
     @Autowired
-    public ModelFactoryService modelFactoryService;
+    private ModelFactoryService modelFactoryService;
+    @Autowired
+    private CurrentUserFetcher currentUserFetcher;
 
-    public ControllerSetup(GithubService githubService, ModelFactoryService modelFactoryService) {
+    public ControllerSetup(GithubService githubService, ModelFactoryService modelFactoryService, CurrentUserFetcher currentUserFetcher) {
         this.githubService = githubService;
         this.modelFactoryService = modelFactoryService;
+        this.currentUserFetcher = currentUserFetcher;
     }
 
     @InitBinder
@@ -56,10 +59,18 @@ public class ControllerSetup
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         exception.printStackTrace(pw);
-        failureReport.setErrorDetail(sw.toString());
+        failureReport.setErrorDetail(getUserInfo() + sw.toString());
         this.modelFactoryService.failureReportRepository.save(failureReport);
 
         return failureReport;
+    }
+
+    private String getUserInfo() {
+        String result = "user external Id: " + currentUserFetcher.getExternalIdentifier() + "\n";
+        if (currentUserFetcher.getUser() != null) {
+            result += "user name: " + currentUserFetcher.getUser().getName() + "\n";
+        }
+        return result;
     }
 
 }

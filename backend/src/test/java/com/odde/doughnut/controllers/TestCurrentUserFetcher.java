@@ -14,4 +14,12 @@ public class TestCurrentUserFetcher implements CurrentUserFetcher {
     public UserModel getUser() {
         return userModel;
     }
+
+    @Override
+    public String getExternalIdentifier() {
+        if(userModel == null) {
+            return null;
+        }
+        return userModel.getEntity().getExternalIdentifier();
+    }
 }

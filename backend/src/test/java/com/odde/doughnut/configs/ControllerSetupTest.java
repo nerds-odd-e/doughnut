@@ -1,9 +1,13 @@
 package com.odde.doughnut.configs;
 
+import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.FailureReport;
+import com.odde.doughnut.entities.User;
+import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GithubService;
 import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.MakeMe;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -31,16 +35,43 @@ public class ControllerSetupTest {
     ModelFactoryService modelFactoryService;
     @Mock
     GithubService githubService;
+    @Mock
+    CurrentUserFetcher currentUserFetcher;
+
+    ControllerSetup controllerSetup;
+
+    @BeforeEach
+    void setup() {
+        controllerSetup = new ControllerSetup(githubService, this.modelFactoryService, currentUserFetcher);
+    }
 
     @Test
-    void catchException () throws IOException, InterruptedException {
-        ControllerSetup controllerSetup = new ControllerSetup(githubService, this.modelFactoryService);
-        when(githubService.createGithubIssue(any())).thenReturn(123);
-        assertThrows(RuntimeException.class, ()-> controllerSetup.handleSystemException(new RuntimeException()));
-        FailureReport failureReport = makeMe.modelFactoryService.failureReportRepository.findAll().iterator().next();
+    void shouldRecordExceptionDetails() {
+        FailureReport failureReport = catchExceptionAndGetFailureReport();
         assertEquals("java.lang.RuntimeException", failureReport.getErrorName());
         assertThat(failureReport.getErrorDetail(), containsString("ControllerSetupTest.java"));
+    }
+
+    @Test
+    void shouldCreateGithubIssue() throws IOException, InterruptedException {
+        when(githubService.createGithubIssue(any())).thenReturn(123);
+        FailureReport failureReport = catchExceptionAndGetFailureReport();
         assertEquals(123, failureReport.getIssueNumber());
     }
 
+    @Test
+    void shouldRecordUserInfo() {
+        UserModel userModel = makeMe.aUser().toModelPlease();
+        String externalId = userModel.getEntity().getExternalIdentifier();
+        when(currentUserFetcher.getExternalIdentifier()).thenReturn(externalId);
+        when(currentUserFetcher.getUser()).thenReturn(userModel);
+        FailureReport failureReport = catchExceptionAndGetFailureReport();
+        assertThat(failureReport.getErrorDetail(), containsString(externalId));
+        assertThat(failureReport.getErrorDetail(), containsString(userModel.getName()));
+    }
+
+    private FailureReport catchExceptionAndGetFailureReport() {
+        assertThrows(RuntimeException.class, ()-> controllerSetup.handleSystemException(new RuntimeException()));
+        return makeMe.modelFactoryService.failureReportRepository.findAll().iterator().next();
+    }
 }
