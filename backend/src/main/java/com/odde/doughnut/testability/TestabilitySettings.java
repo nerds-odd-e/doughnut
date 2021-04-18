@@ -56,6 +56,6 @@ public class TestabilitySettings {
         if(useRealGithub) {
             return new RealGithubService(githubForIssuesRepo);
         }
-        return new RealGithubService(githubForIssuesRepo);
+        return new NullGithubService(githubForIssuesRepo);
     }
 }

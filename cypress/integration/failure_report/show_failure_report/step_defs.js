@@ -21,7 +21,7 @@ When("I should see a new open issue on github", () => {
   });
 });
 
-Given("There are no open issues on github", (id) => {
-  cy.request({method: "POST", url: `/api/testability/close_all_github_issues`})
+Given("Use real github sandbox and there are no open issues on github", (id) => {
+  cy.request({method: "POST", url: `/api/testability/use_real_sandbox_github_and_close_all_github_issues`})
      .its("body").should("contain", "OK");
 });

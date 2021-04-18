@@ -163,8 +163,9 @@ class TestabilityRestController {
         throw new RuntimeException("for failure report");
     }
 
-    @PostMapping("/close_all_github_issues")
+    @PostMapping("/use_real_sandbox_github_and_close_all_github_issues")
     public String closeAllGithubIssues(Model model) throws IOException, InterruptedException {
+        testabilitySettings.setUseRealGithub(true);
         getGithubService().closeAllOpenIssues();
         return "OK";
     }
