@@ -12,10 +12,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -37,6 +39,7 @@ public class ControllerSetupTest {
     GithubService githubService;
     @Mock
     CurrentUserFetcher currentUserFetcher;
+    MockHttpServletRequest request = new MockHttpServletRequest();
 
     ControllerSetup controllerSetup;
 
@@ -70,8 +73,15 @@ public class ControllerSetupTest {
         assertThat(failureReport.getErrorDetail(), containsString(userModel.getName()));
     }
 
+    @Test
+    void shouldRecordRequestInfo() {
+        request.setRequestURI("/path");
+        FailureReport failureReport = catchExceptionAndGetFailureReport();
+        assertThat(failureReport.getErrorDetail(), containsString("/path"));
+    }
+
     private FailureReport catchExceptionAndGetFailureReport() {
-        assertThrows(RuntimeException.class, ()-> controllerSetup.handleSystemException(new RuntimeException()));
+        assertThrows(RuntimeException.class, ()-> controllerSetup.handleSystemException(request, new RuntimeException()));
         return makeMe.modelFactoryService.failureReportRepository.findAll().iterator().next();
     }
 }
