@@ -3,6 +3,7 @@ package com.odde.doughnut.testability;
 import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.models.randomizers.RealRandomizer;
+import com.odde.doughnut.services.GithubService;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.stereotype.Component;
@@ -45,5 +46,9 @@ public class TestabilitySettings {
             nonRandomizer = new NonRandomizer();
         }
         nonRandomizer.setAlwaysChoose(option);
+    }
+
+    public GithubService getGithubService(String githubForIssuesRepo) {
+        return new GithubService(githubForIssuesRepo);
     }
 }

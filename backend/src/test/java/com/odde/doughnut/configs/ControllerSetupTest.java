@@ -24,6 +24,7 @@ import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -39,13 +40,15 @@ public class ControllerSetupTest {
     @Mock
     CurrentUserFetcher currentUserFetcher;
     MockHttpServletRequest request = new MockHttpServletRequest();
-    TestabilitySettings timeTraveler = new TestabilitySettings();
+    @Mock
+    TestabilitySettings testabilitySettings;
 
     ControllerSetup controllerSetup;
 
     @BeforeEach
     void setup() {
-        controllerSetup = new ControllerSetup(githubService, this.modelFactoryService, currentUserFetcher, timeTraveler);
+        when(testabilitySettings.getGithubService(any())).thenReturn(githubService);
+        controllerSetup = new ControllerSetup(this.modelFactoryService, currentUserFetcher, testabilitySettings);
     }
 
     @Test

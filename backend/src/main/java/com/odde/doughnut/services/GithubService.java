@@ -17,12 +17,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-@Service
 public class GithubService {
-    private String githubForIssuesRepo;
+    private final String githubForIssuesRepo;
 
-    public GithubService() {
-        githubForIssuesRepo = "nerds-odd-e/doughnut_sandbox";
+    public GithubService(String githubForIssuesRepo) {
+        this.githubForIssuesRepo = githubForIssuesRepo;
     }
 
     public String getIssueUrl(Integer issueNumber) {

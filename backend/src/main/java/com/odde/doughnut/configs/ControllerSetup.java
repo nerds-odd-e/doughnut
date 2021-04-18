@@ -24,16 +24,13 @@ public class ControllerSetup
     @Value("${spring.github-for-issues.repo}")
     private String githubForIssuesRepo;
     @Autowired
-    private final GithubService githubService;
-    @Autowired
     private ModelFactoryService modelFactoryService;
     @Autowired
     private CurrentUserFetcher currentUserFetcher;
     @Autowired
     private TestabilitySettings testabilitySettings;
 
-    public ControllerSetup(GithubService githubService, ModelFactoryService modelFactoryService, CurrentUserFetcher currentUserFetcher, TestabilitySettings testabilitySettings) {
-        this.githubService = githubService;
+    public ControllerSetup(ModelFactoryService modelFactoryService, CurrentUserFetcher currentUserFetcher, TestabilitySettings testabilitySettings) {
         this.modelFactoryService = modelFactoryService;
         this.currentUserFetcher = currentUserFetcher;
         this.testabilitySettings = testabilitySettings;
@@ -50,12 +47,15 @@ public class ControllerSetup
     @SneakyThrows
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public String handleSystemException(HttpServletRequest req, Exception e) {
-        FailureReportFactory failureReportFactory = new FailureReportFactory(req, e, currentUserFetcher, githubService, modelFactoryService);
+    public String handleSystemException(HttpServletRequest req, Exception exception) {
+        FailureReportFactory failureReportFactory = new FailureReportFactory(
+                req,
+                exception,
+                currentUserFetcher,
+                testabilitySettings.getGithubService(githubForIssuesRepo),
+                modelFactoryService);
         failureReportFactory.create();
 
-        throw e;
+        throw exception;
     }
-
-
 }

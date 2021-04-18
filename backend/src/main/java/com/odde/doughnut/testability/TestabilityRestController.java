@@ -12,6 +12,7 @@ import com.odde.doughnut.services.GithubService;
 import com.odde.doughnut.services.ModelFactoryService;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -28,6 +29,9 @@ import java.util.stream.Collectors;
 @Profile({"test", "dev"})
 @RequestMapping("/api/testability")
 class TestabilityRestController {
+    @Value("${spring.github-for-issues.repo}")
+    private String githubForIssuesRepo;
+
     @Autowired
     EntityManagerFactory emf;
     @Autowired
@@ -43,9 +47,6 @@ class TestabilityRestController {
     ModelFactoryService modelFactoryService;
     @Autowired
     TestabilitySettings testabilitySettings;
-
-    @Autowired
-    GithubService githubService;
 
     @PostMapping("/clean_db_and_seed_data")
     public String cleanDBAndSeedData() {
@@ -165,12 +166,16 @@ class TestabilityRestController {
 
     @PostMapping("/close_all_github_issues")
     public String closeAllGithubIssues(Model model) throws IOException, InterruptedException {
-        githubService.closeAllOpenIssues();
+        getGithubService().closeAllOpenIssues();
         return "OK";
+    }
+
+    private GithubService getGithubService() {
+        return testabilitySettings.getGithubService(githubForIssuesRepo);
     }
 
     @GetMapping("/github_issues")
     public List<Map<String, Object>> githubIssues() throws IOException, InterruptedException {
-        return githubService.getOpenIssues();
+        return getGithubService().getOpenIssues();
     }
 }
