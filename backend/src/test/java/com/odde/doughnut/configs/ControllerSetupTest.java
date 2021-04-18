@@ -4,7 +4,7 @@ import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.FailureReport;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.RealGithubService;
-import com.odde.doughnut.services.ModelFactoryService;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import org.junit.jupiter.api.BeforeEach;

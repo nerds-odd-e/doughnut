@@ -6,7 +6,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.SearchTerm;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.models.LinkModel;
-import com.odde.doughnut.services.ModelFactoryService;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

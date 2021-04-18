@@ -1,9 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,7 +11,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.sql.Timestamp;
 
 import static org.hamcrest.MatcherAssert.assertThat;

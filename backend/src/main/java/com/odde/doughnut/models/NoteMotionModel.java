@@ -3,7 +3,7 @@ package com.odde.doughnut.models;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteMotion;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
-import com.odde.doughnut.services.ModelFactoryService;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
 
 import java.util.ArrayList;
 

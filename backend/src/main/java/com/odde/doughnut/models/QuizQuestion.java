@@ -4,7 +4,7 @@ import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.models.quizFacotries.*;
-import com.odde.doughnut.services.ModelFactoryService;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
 import lombok.Getter;
 import lombok.Setter;
 

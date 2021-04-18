@@ -1,7 +1,7 @@
 package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.Link;
-import com.odde.doughnut.services.ModelFactoryService;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
 
 public class LinkModel extends ModelForEntity<Link>{
     public LinkModel(Link link, ModelFactoryService modelFactoryService) {

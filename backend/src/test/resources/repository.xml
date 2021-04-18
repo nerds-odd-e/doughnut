@@ -11,7 +11,7 @@ xsi:schemaLocation="http://www.springframework.org/schema/jdbc http://www.spring
 
     <!--        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller" />-->
   </context:component-scan>
-  <context:component-scan base-package="com.odde.doughnut.services">
+  <context:component-scan base-package="com.odde.doughnut.factoryServices">
   </context:component-scan>
   <context:component-scan base-package="com.odde.doughnut.testability">
   </context:component-scan>

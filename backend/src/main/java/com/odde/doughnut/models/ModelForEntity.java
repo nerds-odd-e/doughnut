@@ -1,6 +1,6 @@
 package com.odde.doughnut.models;
 
-import com.odde.doughnut.services.ModelFactoryService;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
 import lombok.Getter;
 
 public abstract class ModelForEntity<T> {

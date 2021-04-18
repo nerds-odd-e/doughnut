@@ -3,7 +3,7 @@ package com.odde.doughnut.testability;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.ModelForEntity;
-import com.odde.doughnut.services.ModelFactoryService;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.testability.builders.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

@@ -6,7 +6,7 @@ import static org.mockito.Mockito.mock;
 import com.odde.doughnut.controllers.IndexController;
 import com.odde.doughnut.controllers.TestCurrentUserFetcher;
 import com.odde.doughnut.entities.repositories.NoteRepository;
-import com.odde.doughnut.services.ModelFactoryService;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;

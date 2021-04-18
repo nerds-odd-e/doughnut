@@ -3,7 +3,7 @@ package com.odde.doughnut.models.quizFacotries;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.models.QuizQuestion;
 import com.odde.doughnut.models.Randomizer;
-import com.odde.doughnut.services.ModelFactoryService;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
 
 import java.util.List;
 import java.util.function.Predicate;

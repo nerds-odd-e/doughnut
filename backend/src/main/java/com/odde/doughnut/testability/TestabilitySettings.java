@@ -21,8 +21,6 @@ public class TestabilitySettings {
     @Getter
     @Setter
     Boolean useRealGithub = true;
-    @Value("${spring.github-for-issues.repo}")
-    private String githubForIssuesRepo;
 
     public void timeTravelTo(Timestamp timestamp) {
         this.timestamp = timestamp;
@@ -54,8 +52,8 @@ public class TestabilitySettings {
 
     public GithubService getGithubService() {
         if(useRealGithub) {
-            return new RealGithubService(githubForIssuesRepo);
+            return new RealGithubService();
         }
-        return new NullGithubService(githubForIssuesRepo);
+        return new NullGithubService();
     }
 }

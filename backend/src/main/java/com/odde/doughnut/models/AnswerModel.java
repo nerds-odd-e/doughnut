@@ -1,7 +1,7 @@
 package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.Answer;
-import com.odde.doughnut.services.ModelFactoryService;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
 
 public class AnswerModel extends ModelForEntity<Answer> {
     private Boolean cachedIsCorrect;

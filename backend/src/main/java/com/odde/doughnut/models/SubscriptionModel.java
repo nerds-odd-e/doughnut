@@ -3,7 +3,7 @@ package com.odde.doughnut.models;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Subscription;
-import com.odde.doughnut.services.ModelFactoryService;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
 
 import java.util.List;
 

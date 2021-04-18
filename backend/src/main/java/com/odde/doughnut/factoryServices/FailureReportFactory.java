@@ -1,7 +1,8 @@
-package com.odde.doughnut.services;
+package com.odde.doughnut.factoryServices;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.FailureReport;
+import com.odde.doughnut.services.GithubService;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;

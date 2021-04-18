@@ -2,7 +2,7 @@ package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.repositories.NoteRepository;
-import com.odde.doughnut.services.ModelFactoryService;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
 
 public class TreeNodeModel extends ModelForEntity<Note> {
     protected final NoteRepository noteRepository;

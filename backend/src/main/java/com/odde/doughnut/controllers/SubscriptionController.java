@@ -5,7 +5,7 @@ import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.Subscription;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.ModelFactoryService;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;

@@ -5,7 +5,7 @@ import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.ReviewSetting;
 import com.odde.doughnut.models.*;
-import com.odde.doughnut.services.ModelFactoryService;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;

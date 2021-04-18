@@ -1,7 +1,7 @@
 package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.Circle;
-import com.odde.doughnut.services.ModelFactoryService;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
 
 public class CircleModel extends ModelForEntity<Circle> {
     public CircleModel(Circle entity, ModelFactoryService modelFactoryService) {

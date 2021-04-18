@@ -1,4 +1,4 @@
-package com.odde.doughnut.services;
+package com.odde.doughnut.factoryServices;
 
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.repositories.*;

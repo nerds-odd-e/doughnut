@@ -1,7 +1,7 @@
 package com.odde.doughnut.testability;
 
 import com.odde.doughnut.entities.repositories.SubscriptionRepository;
-import com.odde.doughnut.services.ModelFactoryService;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;

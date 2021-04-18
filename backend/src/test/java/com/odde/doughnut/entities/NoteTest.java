@@ -1,6 +1,6 @@
 package com.odde.doughnut.entities;
 
-import com.odde.doughnut.services.ModelFactoryService;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -14,9 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.validation.*;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
-import static com.odde.doughnut.entities.Link.LinkType.*;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;

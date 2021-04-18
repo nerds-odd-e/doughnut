@@ -3,7 +3,7 @@ package com.odde.doughnut.controllers.currentUser;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.UserRepository;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.ModelFactoryService;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.RequestScope;

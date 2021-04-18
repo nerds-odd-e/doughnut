@@ -5,7 +5,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.repositories.BazaarNotebookRepository;
 import com.odde.doughnut.exceptions.NoAccessRightException;
-import com.odde.doughnut.services.ModelFactoryService;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
 
 import java.util.ArrayList;
 import java.util.List;

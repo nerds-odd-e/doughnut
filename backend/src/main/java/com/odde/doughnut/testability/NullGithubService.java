@@ -8,7 +8,9 @@ import java.util.List;
 import java.util.Map;
 
 public class NullGithubService implements GithubService {
-    public NullGithubService(String githubForIssuesRepo) {
+    @Override
+    public String getIssueUrl(Integer issueNumber) {
+        return "not using real github.";
     }
 
     @Override

@@ -2,7 +2,7 @@ package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.NoAccessRightException;
-import com.odde.doughnut.services.ModelFactoryService;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
 
 import java.util.Arrays;
 import java.util.List;

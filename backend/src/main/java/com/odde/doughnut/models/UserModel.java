@@ -2,7 +2,7 @@ package com.odde.doughnut.models;
 
 import com.odde.doughnut.algorithms.SpacedRepetitionAlgorithm;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.services.ModelFactoryService;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
 import org.apache.logging.log4j.util.Strings;
 
 import java.sql.Timestamp;

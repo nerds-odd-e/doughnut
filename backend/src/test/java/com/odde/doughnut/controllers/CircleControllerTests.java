@@ -3,7 +3,7 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.ModelFactoryService;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;

@@ -4,7 +4,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.ReviewSetting;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionDirector;
-import com.odde.doughnut.services.ModelFactoryService;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
 import org.apache.logging.log4j.util.Strings;
 
 import java.util.ArrayList;
