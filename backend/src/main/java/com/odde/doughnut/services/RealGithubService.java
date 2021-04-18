@@ -30,7 +30,7 @@ public class RealGithubService implements GithubService {
 
     @Override
     public Integer createGithubIssue(FailureReport failureReport) throws IOException, InterruptedException {
-        GithubIssue githubIssue = new GithubIssue(failureReport.getErrorName(), failureReport.getErrorDetail());
+        FailureReport.GithubIssue githubIssue = failureReport.getGithubIssue();
         final String body = new ObjectMapper().writeValueAsString(githubIssue);
         Map<String, Object> map = apiRequestWithMapAsResult("issues", (builder) -> builder.POST(BodyPublishers.ofString(body)));
 
@@ -86,18 +86,4 @@ public class RealGithubService implements GithubService {
         }
     }
 
-    private class GithubIssue {
-        public String title;
-        public String body;
-
-        public GithubIssue(String errorName, String errorDetail) {
-            this.title = errorName;
-            this.body = errorDetail;
-        }
-
-        @Override
-        public String toString() {
-            return "GithubIssue [title=" + title + ", body=" + body + "]";
-        }
-    }
 }
