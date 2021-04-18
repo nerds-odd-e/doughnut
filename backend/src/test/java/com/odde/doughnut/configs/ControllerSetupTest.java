@@ -14,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -37,6 +39,7 @@ public class ControllerSetupTest {
         assertThrows(RuntimeException.class, ()-> controllerSetup.handleSystemException(new RuntimeException()));
         FailureReport failureReport = makeMe.modelFactoryService.failureReportRepository.findAll().iterator().next();
         assertEquals("java.lang.RuntimeException", failureReport.getErrorName());
+        assertThat(failureReport.getErrorDetail(), containsString("ControllerSetupTest.java"));
         assertEquals(123, failureReport.getIssueNumber());
     }
 

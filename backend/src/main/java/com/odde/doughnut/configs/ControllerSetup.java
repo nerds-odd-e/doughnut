@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Arrays;
 
 @ControllerAdvice
@@ -51,7 +53,10 @@ public class ControllerSetup
     private FailureReport createFailureReport(Exception exception) {
         FailureReport failureReport = new FailureReport();
         failureReport.setErrorName(exception.getClass().getName());
-        failureReport.setErrorDetail(Arrays.stream(exception.getStackTrace()).findFirst().get().toString());
+        StringWriter sw = new StringWriter();
+        PrintWriter pw = new PrintWriter(sw);
+        exception.printStackTrace(pw);
+        failureReport.setErrorDetail(sw.toString());
         this.modelFactoryService.failureReportRepository.save(failureReport);
 
         return failureReport;
