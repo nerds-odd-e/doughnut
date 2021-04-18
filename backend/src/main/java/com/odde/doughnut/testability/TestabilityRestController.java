@@ -29,8 +29,6 @@ import java.util.stream.Collectors;
 @Profile({"test", "dev"})
 @RequestMapping("/api/testability")
 class TestabilityRestController {
-    @Value("${spring.github-for-issues.repo}")
-    private String githubForIssuesRepo;
 
     @Autowired
     EntityManagerFactory emf;
@@ -55,6 +53,7 @@ class TestabilityRestController {
         createUser("another_old_learner", "Another Old Learner");
         createUser("developer", "Developer");
         createUser("non_developer", "Non Developer");
+        testabilitySettings.setUseRealGithub(false);
         return "OK";
     }
 
@@ -170,12 +169,13 @@ class TestabilityRestController {
         return "OK";
     }
 
-    private GithubService getGithubService() {
-        return testabilitySettings.getGithubService(githubForIssuesRepo);
-    }
-
     @GetMapping("/github_issues")
     public List<Map<String, Object>> githubIssues() throws IOException, InterruptedException {
         return getGithubService().getOpenIssues();
     }
+
+    private GithubService getGithubService() {
+        return testabilitySettings.getGithubService();
+    }
+
 }

@@ -3,7 +3,7 @@ package com.odde.doughnut.configs;
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.FailureReport;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.services.GithubService;
+import com.odde.doughnut.services.RealGithubService;
 import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -24,7 +24,6 @@ import static org.hamcrest.Matchers.containsString;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -36,7 +35,7 @@ public class ControllerSetupTest {
     @Autowired
     ModelFactoryService modelFactoryService;
     @Mock
-    GithubService githubService;
+    RealGithubService githubService;
     @Mock
     CurrentUserFetcher currentUserFetcher;
     MockHttpServletRequest request = new MockHttpServletRequest();
@@ -47,7 +46,7 @@ public class ControllerSetupTest {
 
     @BeforeEach
     void setup() {
-        when(testabilitySettings.getGithubService(any())).thenReturn(githubService);
+        when(testabilitySettings.getGithubService()).thenReturn(githubService);
         controllerSetup = new ControllerSetup(this.modelFactoryService, currentUserFetcher, testabilitySettings);
     }
 

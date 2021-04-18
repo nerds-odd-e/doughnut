@@ -2,7 +2,6 @@ package com.odde.doughnut.configs;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.services.FailureReportFactory;
-import com.odde.doughnut.services.GithubService;
 import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import lombok.SneakyThrows;
@@ -21,8 +20,6 @@ import javax.servlet.http.HttpServletRequest;
 @ControllerAdvice
 public class ControllerSetup
 {
-    @Value("${spring.github-for-issues.repo}")
-    private String githubForIssuesRepo;
     @Autowired
     private ModelFactoryService modelFactoryService;
     @Autowired
@@ -52,7 +49,7 @@ public class ControllerSetup
                 req,
                 exception,
                 currentUserFetcher,
-                testabilitySettings.getGithubService(githubForIssuesRepo),
+                testabilitySettings.getGithubService(),
                 modelFactoryService);
         failureReportFactory.create();
 
