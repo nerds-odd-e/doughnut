@@ -4,10 +4,9 @@ import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.models.randomizers.RealRandomizer;
 import com.odde.doughnut.services.GithubService;
-import com.odde.doughnut.services.RealGithubService;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.SessionScope;
 
@@ -21,6 +20,8 @@ public class TestabilitySettings {
     @Getter
     @Setter
     Boolean useRealGithub = true;
+    @Autowired
+    GithubService githubService;
 
     public void timeTravelTo(Timestamp timestamp) {
         this.timestamp = timestamp;
@@ -52,7 +53,7 @@ public class TestabilitySettings {
 
     public GithubService getGithubService() {
         if(useRealGithub) {
-            return new RealGithubService();
+            return githubService;
         }
         return new NullGithubService();
     }

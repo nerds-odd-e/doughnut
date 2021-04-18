@@ -19,9 +19,9 @@
 <div th:fragment="failureReportDetail(failureReport)">
     <div class="jumbotron py-4 mb-2" th:object="${failureReport}">
         <h2><p th:text="*{errorName}"/></h2>
-        <p th:text="*{errorDetail}"/>
+        <pre th:text="*{errorDetail}"/>
         <p th:text="*{createDatetime}"/>
-        <a class="issue_link" th:href="${@githubService.getIssueUrl(failureReport.issueNumber)}" title="show issue"
-           th:text="${@githubService.getIssueUrl(failureReport.issueNumber)}"/>
+        <a class="issue_link" th:href="${@realGithubService.getIssueUrl(failureReport.issueNumber)}" title="show issue"
+           th:text="${@realGithubService.getIssueUrl(failureReport.issueNumber)}"/>
     </div>
 </div>
