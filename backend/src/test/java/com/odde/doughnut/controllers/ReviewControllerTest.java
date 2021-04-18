@@ -6,7 +6,7 @@ import com.odde.doughnut.entities.ReviewSetting;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.MakeMe;
-import com.odde.doughnut.testability.TimeTraveler;
+import com.odde.doughnut.testability.TestabilitySettings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -28,7 +28,7 @@ class ReviewControllerTest {
     ModelFactoryService modelFactoryService;
     @Autowired
     MakeMe makeMe;
-    private TimeTraveler timeTraveler = new TimeTraveler();
+    private TestabilitySettings testabilitySettings = new TestabilitySettings();
     private UserModel userModel;
     private Note parentNote;
     final ExtendedModelMap model = new ExtendedModelMap();
@@ -37,7 +37,7 @@ class ReviewControllerTest {
     @BeforeEach
     void setup() {
         userModel = makeMe.aUser().toModelPlease();
-        controller = new ReviewController(new TestCurrentUserFetcher(userModel), modelFactoryService, timeTraveler);
+        controller = new ReviewController(new TestCurrentUserFetcher(userModel), modelFactoryService, testabilitySettings);
     }
 
     @Test

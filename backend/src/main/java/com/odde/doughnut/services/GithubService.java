@@ -4,7 +4,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.FailureReport;
 import lombok.SneakyThrows;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -20,10 +19,10 @@ import java.util.function.Function;
 
 @Service
 public class GithubService {
-    @Value("${spring.github-for-issues.repo}")
     private String githubForIssuesRepo;
 
     public GithubService() {
+        githubForIssuesRepo = "nerds-odd-e/doughnut_sandbox";
     }
 
     public String getIssueUrl(Integer issueNumber) {

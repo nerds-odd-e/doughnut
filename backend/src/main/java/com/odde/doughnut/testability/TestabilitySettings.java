@@ -3,6 +3,8 @@ package com.odde.doughnut.testability;
 import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.models.randomizers.RealRandomizer;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.SessionScope;
 
@@ -10,9 +12,12 @@ import java.sql.Timestamp;
 
 @Component
 @SessionScope
-public class TimeTraveler {
+public class TestabilitySettings {
     private Timestamp timestamp = null;
     private NonRandomizer nonRandomizer = null;
+    @Getter
+    @Setter
+    Boolean useRealGithub = true;
 
     public void timeTravelTo(Timestamp timestamp) {
         this.timestamp = timestamp;

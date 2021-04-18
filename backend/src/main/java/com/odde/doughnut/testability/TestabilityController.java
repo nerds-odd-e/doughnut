@@ -21,7 +21,7 @@ import java.util.Map;
 @RequestMapping("/testability")
 class TestabilityController {
     @Autowired
-    TimeTraveler timeTraveler;
+    TestabilitySettings testabilitySettings;
 
     @PostMapping(value="/time_travel")
     public String timeTravel(@RequestParam Map<String, String> userInfo) {
@@ -29,20 +29,20 @@ class TestabilityController {
         DateTimeFormatter formatter = TestabilityRestController.getDateTimeFormatter();
         LocalDateTime localDateTime = LocalDateTime.from(formatter.parse(travelTo));
         Timestamp timestamp = Timestamp.valueOf(localDateTime);
-        timeTraveler.timeTravelTo(timestamp);
+        testabilitySettings.timeTravelTo(timestamp);
         return "redirect:panel";
     }
 
     @PostMapping(value="/randomizer")
     public String randomizer(@RequestParam Map<String, String> userInfo) {
         String option = userInfo.get("choose");
-        timeTraveler.setAlwaysChoose(option);
+        testabilitySettings.setAlwaysChoose(option);
         return "redirect:panel";
     }
 
     @GetMapping("/panel")
     public String panel(Model model) {
-        String currentTime = timeTraveler.getCurrentUTCTimestamp().toLocalDateTime().format(TestabilityRestController.getDateTimeFormatter());
+        String currentTime = testabilitySettings.getCurrentUTCTimestamp().toLocalDateTime().format(TestabilityRestController.getDateTimeFormatter());
         model.addAttribute("currentTime", currentTime);
 
         return "testability/panel";

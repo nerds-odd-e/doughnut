@@ -2,11 +2,11 @@ package com.odde.doughnut.configs;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.FailureReport;
-import com.odde.doughnut.entities.User;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GithubService;
 import com.odde.doughnut.services.ModelFactoryService;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.TestabilitySettings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,7 +17,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -40,12 +39,13 @@ public class ControllerSetupTest {
     @Mock
     CurrentUserFetcher currentUserFetcher;
     MockHttpServletRequest request = new MockHttpServletRequest();
+    TestabilitySettings timeTraveler = new TestabilitySettings();
 
     ControllerSetup controllerSetup;
 
     @BeforeEach
     void setup() {
-        controllerSetup = new ControllerSetup(githubService, this.modelFactoryService, currentUserFetcher);
+        controllerSetup = new ControllerSetup(githubService, this.modelFactoryService, currentUserFetcher, timeTraveler);
     }
 
     @Test

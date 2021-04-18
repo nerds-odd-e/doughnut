@@ -3,7 +3,6 @@ package com.odde.doughnut.testability;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcherFromRequest;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.repositories.FailureReportRepository;
 import com.odde.doughnut.entities.repositories.LinkRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
@@ -20,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManagerFactory;
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -44,7 +42,7 @@ class TestabilityRestController {
     @Autowired
     ModelFactoryService modelFactoryService;
     @Autowired
-    TimeTraveler timeTraveler;
+    TestabilitySettings testabilitySettings;
 
     @Autowired
     GithubService githubService;
