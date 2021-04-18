@@ -17,10 +17,11 @@
 </div>
 
 <div th:fragment="failureReportDetail(failureReport)">
-    <div class="jumbotron py-4 mb-2">
-        <h2><p th:text="${failureReport.getErrorName}"/></h2>
-        <p th:text="${failureReport.getErrorDetail}"/>
-        <p th:text="${failureReport.getCreateDatetime}"/>
-        <a class="issue_link" th:href="@{https://github.com/nerds-odd-e/doughnut_sandbox/issues/{id} (id=${failureReport.getIssueNumber.toString})}" title="show issue">https://github.com/nerds-odd-e/doughnut_sandbox/issues/[[${failureReport.getIssueNumber.toString}]]</a>
+    <div class="jumbotron py-4 mb-2" th:object="${failureReport}">
+        <h2><p th:text="*{errorName}"/></h2>
+        <p th:text="*{errorDetail}"/>
+        <p th:text="*{createDatetime}"/>
+        <a class="issue_link" th:href="${@githubService.getIssueUrl(failureReport.issueNumber)}" title="show issue"
+           th:text="${@githubService.getIssueUrl(failureReport.issueNumber)}"/>
     </div>
 </div>

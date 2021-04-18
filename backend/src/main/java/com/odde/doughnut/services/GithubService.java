@@ -4,10 +4,10 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.FailureReport;
 import lombok.SneakyThrows;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.net.NoRouteToHostException;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -20,7 +20,14 @@ import java.util.function.Function;
 
 @Service
 public class GithubService {
+    @Value("${github-for-issues.repo}")
+    private String githubForIssuesRepo;
+
     public GithubService() {
+    }
+
+    public String getIssueUrl(Integer issueNumber) {
+        return "https://github.com/"+githubForIssuesRepo+"/issues/"+ issueNumber;
     }
 
     public Integer createGithubIssue(FailureReport failureReport) throws IOException, InterruptedException {
@@ -56,7 +63,7 @@ public class GithubService {
 
     private HttpResponse<String> apiRequest(String action, Function<HttpRequest.Builder, HttpRequest.Builder> callback) throws IOException, InterruptedException {
         final HttpRequest.Builder builder = HttpRequest
-                .newBuilder(URI.create("https://api.github.com/repos/nerds-odd-e/doughnut_sandbox/" + action));
+                .newBuilder(URI.create("https://api.github.com/repos/"+ githubForIssuesRepo +"/" + action));
         final HttpRequest.Builder builderWithRequest = callback.apply(builder);
         HttpRequest request = builderWithRequest
                 .setHeader("Content-Type", "application/json")

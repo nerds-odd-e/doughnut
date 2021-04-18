@@ -36,5 +36,4 @@ public class FailureReport {
     @Getter
     @Setter
     private Timestamp createDatetime = new Timestamp(System.currentTimeMillis());
-
 }
