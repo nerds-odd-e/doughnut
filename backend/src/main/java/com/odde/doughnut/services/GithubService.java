@@ -20,7 +20,7 @@ import java.util.function.Function;
 
 @Service
 public class GithubService {
-    @Value("${github-for-issues.repo}")
+    @Value("${spring.github-for-issues.repo}")
     private String githubForIssuesRepo;
 
     public GithubService() {

@@ -23,8 +23,8 @@ spring:
     show-sql: false
     properties.hibernate:
       enable_lazy_load_no_trans: true
-github-for-issues:
-  repo: nerds-odd-e/doughnut_sandbox
+  github-for-issues:
+    repo: nerds-odd-e/doughnut_sandbox
 ---
 spring:
   config:
@@ -58,8 +58,8 @@ spring:
           github:
             clientId: ${OAUTH2_github_client_id}
             clientSecret: ${OAUTH2_github_client_secret}
-github-for-issues:
-  repo: nerds-odd-e/doughnut
+  github-for-issues:
+    repo: nerds-odd-e/doughnut
 server:
   forward-headers-strategy: FRAMEWORK
 ---
@@ -88,8 +88,8 @@ spring:
     show-sql: false
     properties.hibernate:
       enable_lazy_load_no_trans: true
-github-for-issues:
-  repo: nerds-odd-e/doughnut_sandbox
+  github-for-issues:
+    repo: nerds-odd-e/doughnut_sandbox
 
 server:
   forward-headers-strategy: FRAMEWORK
