@@ -1,4 +1,10 @@
 spring:
+  profiles:
+    active: "test"
+
+---
+
+spring:
   config:
     activate:
       on-profile: dev
@@ -67,7 +73,8 @@ spring:
   config:
     import: db-test.properties
   profiles:
-    active: test
+    activate:
+      on-profile: test
   resources:
     cache:
       cachecontrol:
