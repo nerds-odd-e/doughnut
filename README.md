@@ -18,9 +18,10 @@ For more background info you can read:
 - [Thymeleaf](https://www.thymeleaf.org/)
 - [Gradle](https://gradle.org/)
 - [Junit5](https://junit.org/junit5/)
-- [Cypress](https://www.cypress.io/)
 - [JavaScript](https://www.javascript.com)
+- [Cypress](https://www.cypress.io/)
 - [Cucumber](https://cucumber.io/docs/guides/)
+- [cypress-cucumber-preprocessor](https://github.com/TheBrainFamily/cypress-cucumber-preprocessor#cypress-configuration)
 - [Flyway](https://flywaydb.org)
 - [MySQL 8.0](https://dev.mysql.com/doc/refman/8.0/en/)
 - [Google Cloud](https://cloud.google.com/gcp/getting-started)
@@ -302,6 +303,7 @@ flutter doctor
 ```
 
 Expect to see something similar to (e.g. macOS Big Sur 11.2.3 with Xcode 12.0.1):
+
 ```bash
 ❯ flutter doctor
 Doctor summary (to see all details, run flutter doctor -v):
@@ -316,17 +318,20 @@ Doctor summary (to see all details, run flutter doctor -v):
 ```
 
 #### Run frontend flutter app in debug mode with Chrome browser
+
 ```bash
 flutter run -d chrome
 ```
 
 #### Build & Bundle Flutter frontend web-app and startup local web-server to server flutter web-app static assets
+
 ```bash
 flutter clean && flutter pub get && \
 flutter build web --release --dart-define DOUGHNUT_BAZAAR_NOTES_API_URL=$DOUGHNUT_BAZAAR_NOTES_API_URL
 ```
 
 Expect to find minified and uglified web bundle assets in `frontend/build/web` directory:
+
 ```bash
 ❯ pwd
 /home/csd/csd/doughnut/frontend/build/web
@@ -356,6 +361,7 @@ Expect to find minified and uglified web bundle assets in `frontend/build/web` d
 ```
 
 Run a simple local web server to serve flutter frontend web-app, from `frontend/build/web` directory run:
+
 ```bash
 python -m http.server 8000
 ```
