@@ -380,3 +380,5 @@ python -m http.server 8000
 - FOSS style; Fork and submit Github PR.
   - Please keep the PR small and on only one topic
   - The code need to come with tests
+
+April SG CSD Circle Invitation code: rPSG5ZOD5lnK4Oc
