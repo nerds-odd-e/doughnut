@@ -9,16 +9,16 @@
         "cy:open": "cypress open",
         "cy:run": "cypress run",
         "sut": "backend/gradlew bootRun -p backend -Dspring.profiles.active=test",
-        "backend_n_frontend_sut": "run-p -clnr sut frontend:sut",
+        "backend_n_mobile_sut": "run-p -clnr sut mobile:sut",
         "open": "run-p -clnr sut cy:open",
         "test": "run-p -clnr sut cy:run",
-        "open:with_frontend": "run-p -clnr backend_n_frontend_sut cy:open",
-        "test:with_frontend": "run-p -clnr backend_n_frontend_sut cy:run",
+        "open:with_mobile": "run-p -clnr backend_n_mobile_sut cy:open",
+        "test:with_mobile": "run-p -clnr backend_n_mboile_sut cy:run",
         "sound": "node scripts/sound-monitor.js",
-        "frontend:sut": "yarn frontend:build_run",
-        "frontend:build": "cd frontend; flutter clean && flutter pub get && flutter build web --release --dart-define DOUGHNUT_BAZAAR_NOTES_API_URL=$DOUGHNUT_BAZAAR_NOTES_API_URL ;cd - ",
-        "frontend:run": "cd frontend/build/web; python -m http.server 8000; cd -",
-        "frontend:build_run": "yarn frontend:build && yarn frontend:run"
+        "mobile:sut": "yarn mobile:build_run",
+        "mobile:build": "cd mobile; flutter clean && flutter pub get && flutter build web --release --dart-define DOUGHNUT_BAZAAR_NOTES_API_URL=$DOUGHNUT_BAZAAR_NOTES_API_URL ;cd - ",
+        "mobile:run": "cd mobile/build/web; python -m http.server 8000; cd -",
+        "mobile:build_run": "yarn mobile:build && yarn mobile:run"
     },
     "cypress-cucumber-preprocessor": {
         "nonGlobalStepDefinitions": true,
