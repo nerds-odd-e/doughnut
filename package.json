@@ -21,7 +21,8 @@
         "frontend:build_run": "yarn frontend:build && yarn frontend:run"
     },
     "cypress-cucumber-preprocessor": {
-        "nonGlobalStepDefinitions": true
+        "nonGlobalStepDefinitions": true,
+        "nonGlobalStepBaseDir": "cypress/step_definitions"
     },
     "devDependencies": {
         "@testing-library/cypress": "^7.0.6",
