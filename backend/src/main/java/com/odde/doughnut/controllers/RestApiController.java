@@ -7,10 +7,7 @@ import com.odde.doughnut.models.BazaarModel;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -48,6 +45,21 @@ class RestApiController {
         result.setDescription(targetNote.getArticleBody());
         result.setAuthor(targetNote.getUser().getName());
         result.setUpdateDatetime(targetNote.getNoteContent().getUpdatedDatetime().toString());
+
+        return result;
+    }
+
+    @GetMapping("/note/blog/{notebookId}")
+    public Note.NoteApiResult getNote(@PathVariable Integer notebookId) {
+
+        Notebook notebook = modelFactoryService.notebookRepository.findById(notebookId).get();
+        Note notebookHeadNote = notebook.getHeadNote();
+
+        Note.NoteApiResult result = new Note.NoteApiResult();
+        result.setTitle(notebookHeadNote.getTitle());
+        result.setDescription(notebookHeadNote.getArticleBody());
+        result.setAuthor(notebookHeadNote.getUser().getName());
+        result.setUpdateDatetime(notebookHeadNote.getNoteContent().getUpdatedDatetime().toString());
 
         return result;
     }
