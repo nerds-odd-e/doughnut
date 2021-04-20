@@ -41,5 +41,5 @@ public class Notebook {
     @Getter @Setter Boolean skipReviewEntirely = false;
 
     @Column(name="notebook_type")
-    @Getter @Setter NotebookType notebookType;
+    @Getter @Setter String notebookType;
 }
