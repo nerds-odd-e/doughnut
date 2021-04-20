@@ -40,6 +40,7 @@ public class Notebook {
     @Column(name="skip_review_entirely")
     @Getter @Setter Boolean skipReviewEntirely = false;
 
+    @Enumerated(EnumType.STRING)
     @Column(name="notebook_type")
-    @Getter @Setter String notebookType;
+    @Getter @Setter NotebookType notebookType;
 }
