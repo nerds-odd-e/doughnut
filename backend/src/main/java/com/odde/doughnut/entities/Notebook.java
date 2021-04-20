@@ -39,4 +39,7 @@ public class Notebook {
 
     @Column(name="skip_review_entirely")
     @Getter @Setter Boolean skipReviewEntirely = false;
+
+    @Column(name="notebook_type")
+    @Getter @Setter NotebookType notebookType;
 }
