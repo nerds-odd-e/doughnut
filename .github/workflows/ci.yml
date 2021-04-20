@@ -115,7 +115,7 @@ jobs:
           wait-on: "http://localhost:8081"
           spec: ${{matrix.spec}}
       - name: Slack notify dough_ci_cd channel of e2e tests results
-        uses: aravsamhq/notify-slack-action@master
+        uses: ravsamhq/notify-slack-action@master
         if: always()
         with:
           channel: "#dough_ci_cd"
@@ -153,7 +153,7 @@ jobs:
       - name: Perform rolling replace to GCP MIG doughnut-app-group
         run: infra/scripts/perform-rolling-replace-app-mig.sh
       - name: Slack notify dough_ci_cd channel of CI/CD results
-        uses: aaravsamhq/notify-slack-action@master
+        uses: ravsamhq/notify-slack-action@master
         if: always()
         with:
           channel: "#dough_ci_cd"
