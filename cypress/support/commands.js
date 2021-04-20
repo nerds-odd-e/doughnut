@@ -288,9 +288,17 @@ Cypress.Commands.add("subscribeToNote", (noteTitle, dailyLearningCount) => {
   cy.findByRole('button', {name: "Add to my learning"}).click();
 });
 
+
 Cypress.Commands.add("searchNote", (searchKey) => {
     cy.findByPlaceholderText("Search").type(searchKey);
     cy.getFormControl("SearchGlobally").check();
     cy.findByText("Search").click();
 })
 
+Cypress.Commands.add("visitBlog", () => {
+    cy.visit("/blog_landing.html");
+});
+
+Cypress.Commands.add("getYearList", () => {
+    return cy.get(".yearList");
+});

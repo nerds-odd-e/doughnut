@@ -31,3 +31,25 @@ Then("You can see a blog {string} from a third party app", (blogTitle) => {
     cy.get("#app > div:nth-child(2) > p:nth-child(8)").invoke('text').should('match', /\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d.+/);
 });
 
+Given("There is no Notebook type blog", () => {
+
+});
+
+When("I open the blog page", () => {
+  cy.visitBlog();
+});
+
+Then("the left panel should show empty", () => {
+  cy.getYearList().should('be.empty');
+});
+
+Given("There is a Notebook type blog with title 'odd-e-blog'", () => {
+
+});
+
+
+Then("the left panel should show Years list", () => {
+  cy.get('.yearList').should(($lis) => {
+  expect($lis).to.have.length(5)
+  });
+});
