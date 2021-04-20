@@ -76,7 +76,8 @@ public class Authorization extends ModelForEntity<User> {
   }
 
   private static final List<String> allowUsers =
-      Arrays.asList("Terry", "t-machu", "Developer", "thuzar", "Yeong Sheng");
+      Arrays.asList("Terry", "t-machu", "Developer", "thuzar", "Yeong Sheng",
+                    "yeongsheng-tan");
 
   public boolean isDeveloper() { return allowUsers.contains(entity.getName()); }
 }
