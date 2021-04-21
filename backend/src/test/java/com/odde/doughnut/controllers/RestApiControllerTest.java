@@ -58,7 +58,7 @@ public class RestApiControllerTest {
     }
 
     @Test
-    void getBlogArticlesByNotebookId() {
+    void getBlogArticlesByWebsiteName() {
         Note headNote = makeMe.aNote("odd-e blog").please();
         Note note = makeMe.aNote("Hello World").under(headNote).please();
         Notebook notebook = headNote.getNotebook();
@@ -66,7 +66,7 @@ public class RestApiControllerTest {
         makeMe.refresh(headNote);
         makeMe.refresh(note);
 
-        List<Note> articles = controller.getBlogArticlesByNotebookId(headNote.getNotebook().getId());
+        List<Note> articles = controller.getBlogArticlesByWebsiteName(headNote.getTitle());
 
         assertThat(articles.size(), equalTo(1));
         assertThat(articles.get(0).getArticleTitle(), equalTo(note.getArticleTitle()));

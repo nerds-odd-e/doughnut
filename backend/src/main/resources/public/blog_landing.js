@@ -4,7 +4,7 @@ var app = new Vue({
   data: {
     blogInfo: [],
     articleList: [],
-    apiUrl: "../api/note/blog"
+    apiUrl: "../api/blog_articles_by_website_name/odd-e-blog"
   },
   created: function() {
     this.blogInfo.push(
@@ -38,13 +38,13 @@ var app = new Vue({
         "createdAt" : "20th December 2021",
         "content" : "This is first article's content"
     });
-    /*axios
-        .get(this.apiUrl)
-            .then((res) => {
-                this.blogInfo = res.data;
-            })
-            .catch((res) => {
-                alert("Error");
-            });*/
+//    axios
+//        .get(this.apiUrl)
+//            .then((res) => {
+//                this.articleList = res.data;
+//            })
+//            .catch((res) => {
+//                alert("Error");
+//            });
   }
 });

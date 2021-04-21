@@ -51,15 +51,10 @@ class RestApiController {
         return result;
     }
 
-    @GetMapping("/blog_articles_by_notebook_id/{notebookId}")
-    public List<Note> getBlogArticlesByNotebookId(@PathVariable Integer notebookId) {
+    @GetMapping("/blog_articles_by_website_name/{websiteName}")
+    public List<Note> getBlogArticlesByWebsiteName(@PathVariable String websiteName) {
         List<Note> articles = new ArrayList<>();
-        Optional<Notebook> notebookById = modelFactoryService.notebookRepository.findById(notebookId);
-        if (notebookById.isPresent()){
-            Notebook notebook = notebookById.get();
-
-            articles = notebook.getArticles();
-        }
-        return articles;
+        Notebook notebook = modelFactoryService.noteRepository.findFirstByTitle(websiteName).getNotebook();
+        return notebook.getArticles();
     }
 }
