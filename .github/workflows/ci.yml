@@ -55,15 +55,19 @@ jobs:
       matrix:
         spec:
           - |
+            cypress/integration/a*/**
             cypress/integration/b*/**
           - |
             cypress/integration/c*/**
+            cypress/integration/d*/**
             cypress/integration/f*/**
             cypress/integration/u*/**
           - |
             cypress/integration/n*/**
+            cypress/integration/m*/**
           - |
             cypress/integration/r*/**
+            cypress/integration/s*/**
     steps:
       - name: Code Checkout
         uses: actions/checkout@v2
