@@ -3,7 +3,7 @@ Feature: Create Blog with Year-Date Structure
   Background:
     Given I've logged in as an existing user
 
-#  @ignore
+  @ignore
   Scenario: Create a new blog
     Given I add a new blog notebook "Blog One"
     And there is a blog site links to blog notebook "Blog One"
