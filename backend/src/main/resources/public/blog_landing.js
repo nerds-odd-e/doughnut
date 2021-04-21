@@ -3,6 +3,7 @@ var app = new Vue({
   el: '#app',
   data: {
     blogInfo: [],
+    articleList: [],
     apiUrl: "../api/note/blog"
   },
   created: function() {
@@ -30,6 +31,12 @@ var app = new Vue({
     {
         "year": "2021",
         "link": "abc"
+    });
+    this.articleList.push({
+        "title" : "Hello World",
+        "authorName" : "John Doe",
+        "createdAt" : "20th December 2021",
+        "content" : "This is first article's content"
     });
     /*axios
         .get(this.apiUrl)
