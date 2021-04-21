@@ -6,6 +6,7 @@ name: doughnut CI
 on: push
 env:
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   ARTIFACT: "doughnut"
   VERSION: "0.0.1-SNAPSHOT"
   GCS_BUCKET: "dough-01"
@@ -36,17 +37,6 @@ jobs:
         run: backend/gradlew -p backend testDBMigrate -Dspring.profiles.active=test
       - name: Unit tests with Gradle
         run: backend/gradlew -p backend test -Dspring.profiles.active=test
-      - name: Slack notify dough_ci_cd channel of backend unit tests results
-        uses: adamkdean/simple-slack-notify@master
-        if: always()
-        with:
-          channel: "#dough_ci_cd"
-          status: ${{ job.status }}
-          success_text: "Backend unit tests (#${env.GITHUB_RUN_NUMBER}) completed Successfully"
-          failure_text: "Backend unit tests (#${env.GITHUB_RUN_NUMBER}) Failed"
-          cancelled_text: "Backend unit tests (#${env.GITHUB_RUN_NUMBER}) was Cancelled"
-          fields: |
-            [{ "title": "Action URL", "value": "${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/actions/runs/${env.GITHUB_RUN_ID}"}]
 
   Mobile-unit-tests:
     name: Mobile Unit tests and build
@@ -63,17 +53,6 @@ jobs:
       - run: cd mobile && flutter pub get
       - run: cd mobile && flutter test
       - run: cd mobile && flutter build web --release
-      - name: Slack notify dough_ci_cd channel of mobile unit tests results
-        uses: adamkdean/simple-slack-notify@master
-        if: always()
-        with:
-          channel: "#dough_ci_cd"
-          status: ${{ job.status }}
-          success_text: "Mobile unit tests (#${env.GITHUB_RUN_NUMBER}) completed Successfully"
-          failure_text: "Mobile unit tests (#${env.GITHUB_RUN_NUMBER}) Failed"
-          cancelled_text: "Mobile unit tests (#${env.GITHUB_RUN_NUMBER}) was Cancelled"
-          fields: |
-            [{ "title": "Action URL", "value": "${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/actions/runs/${env.GITHUB_RUN_ID}"}]
 
   E2E-tests:
     name: End-to-End tests with Database
@@ -118,17 +97,6 @@ jobs:
           start: yarn sut
           wait-on: "http://localhost:8081"
           spec: ${{ matrix.spec }}
-      - name: Slack notify dough_ci_cd channel of e2e tests results
-        uses: adamkdean/simple-slack-notify@master
-        if: always()
-        with:
-          channel: "#dough_ci_cd"
-          status: ${{ job.status }}
-          success_text: "End-to-End tests (#${env.GITHUB_RUN_NUMBER}) completed Successfully"
-          failure_text: "End-to-End tests (#${env.GITHUB_RUN_NUMBER}) Failed"
-          cancelled_text: "End-to-End tests (#${env.GITHUB_RUN_NUMBER}) was Cancelled"
-          fields: |
-            [{ "title": "Action URL", "value": "${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/actions/runs/${env.GITHUB_RUN_ID}"}]
 
   Package-n-Deploy:
     name: Package & GCP MIG Rolling Update Deploy
@@ -158,14 +126,16 @@ jobs:
           destination: dough-01/backend_app_jar
       - name: Perform rolling replace to GCP MIG doughnut-app-group
         run: infra/scripts/perform-rolling-replace-app-mig.sh
-      - name: Slack notify dough_ci_cd channel of CI/CD results
-        uses: adamkdean/simple-slack-notify@master
-        if: always()
+
+  Slack-Notify:
+    name: Single summary slack notification for entire workflow
+    runs-on: ubuntu-20.04
+    needs: [Backend-unit-tests, Mobile-unit-tests, E2E-tests, Package-n-Deploy]
+    if: always()
+    steps:
+      - uses: technote-space/workflow-conclusion-action@v2
+      - uses: 8398a7/action-slack@v3
+        if: env.WORKFLOW_CONCLUSION == 'failure'
         with:
-          channel: "#dough_ci_cd"
-          status: ${{ job.status }}
-          success_text: "doughnut CD (#${env.GITHUB_RUN_NUMBER}) completed Successfully"
-          failure_text: "doughnut CD (#${env.GITHUB_RUN_NUMBER}) Failed"
-          cancelled_text: "doughnut CD (#${env.GITHUB_RUN_NUMBER}) was Cancelled"
-          fields: |
-            [{ "title": "Action URL", "value": "${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/actions/runs/${env.GITHUB_RUN_ID}"}]
+          status: failure
+          fields: all
