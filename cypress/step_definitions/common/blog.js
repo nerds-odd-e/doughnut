@@ -14,6 +14,14 @@ Given("There is a Blog Notebook called odd-e blog", (data) => {
   cy.submitNoteFormWith(data.hashes());
 });
 
+Given("There is a notebook titled {string} with type Blog in Doughnut", (title) => {
+  cy.loginAs('developer');
+  cy.visitMyNotebooks();
+  cy.findByText("Add New Notebook").click();
+  //TODO need to set the notebook type to blog
+  cy.submitNoteFormWith([{Title:title}]);
+});
+
 And("A blog is posted in {string}", (blogNotebook, data) => {
     cy.findByText("(Add Child Note)").click();
     cy.submitNoteFormWith(data.hashes());
@@ -53,3 +61,12 @@ Then("the left panel should show Years list", () => {
   expect($lis).to.have.length(5)
   });
 });
+And("There are some notes in the notebook", () => {
+    cy.findByText("(Add Child Note)").click();
+    cy.submitNoteFormWith([{Title:"Hello World", Description: "Hello World"}]);
+});
+
+Then("I should see a blog post titled {string} on the Blog page", (title) => {
+    cy.findArticleInWebsiteByTitle(title).should('be.visible');
+});
+

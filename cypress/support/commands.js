@@ -302,3 +302,9 @@ Cypress.Commands.add("visitBlog", () => {
 Cypress.Commands.add("getYearList", () => {
     return cy.get(".yearList");
 });
+
+Cypress.Commands.add("findArticleInWebsiteByTitle", (title) => {
+   cy.get('#article-container').within(() => {
+    cy.get('.article').first().find('.title').first().should('have.text',title);
+   });
+});
