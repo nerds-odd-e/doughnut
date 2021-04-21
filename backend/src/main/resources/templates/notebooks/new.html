@@ -8,8 +8,15 @@
         </div>
 
         <form action="#" th:action="${'/notebooks/'+ ownership.id +'/create'}" th:object="${noteContent}" method="post" enctype="multipart/form-data">
-            <div th:replace="_fragments/note_fragments :: noteFormBody()"/>
+            <div class="form-group">
+                <label class="form-label" th:for="note-notebookType" th:text="${#strings.capitalize('notebookType')}"/>
+                <select name="notebookType" id="note-notebookType">
+                    <option th:each="notebookTypeOpt : ${T(com.odde.doughnut.entities.NotebookType).values()}" th:value="${notebookTypeOpt}" th:text="${notebookTypeOpt}"></option>
+                </select>
+            </div>
+
+            <div th:replace="_fragments/note_fragments :: noteFormBody()"></div>
             <input type="submit" value="Submit" class="btn btn-primary"/>
-        </div>
+        </form>
     </div>
 </layout>
