@@ -1,6 +1,5 @@
 Feature: Publish a note from doughnut to odd-e blog site
 
-  @ignore
   Scenario: There is a notebook with type Blog with one note in Doughnut
     Given There is a notebook titled 'odd-e-blog' with type Blog in Doughnut
     And There are some notes in the notebook
