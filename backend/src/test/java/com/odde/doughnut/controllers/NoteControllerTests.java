@@ -1,12 +1,9 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.NoteContent;
-import com.odde.doughnut.entities.NoteMotion;
-import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.NoAccessRightException;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -21,6 +18,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.IOException;
+import java.time.LocalDate;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -33,7 +31,8 @@ class NoteControllerTests {
     @Autowired
     ModelFactoryService modelFactoryService;
 
-    @Autowired MakeMe makeMe;
+    @Autowired
+    MakeMe makeMe;
     private UserModel userModel;
     private Note parentNote;
     final ExtendedModelMap model = new ExtendedModelMap();
@@ -52,7 +51,7 @@ class NoteControllerTests {
         void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
             User otherUser = makeMe.aUser().please();
             Note note = makeMe.aNote().byUser(otherUser).please();
-            assertThrows(NoAccessRightException.class, ()-> controller.showNote(note));
+            assertThrows(NoAccessRightException.class, () -> controller.showNote(note));
         }
 
         @Test
@@ -85,6 +84,24 @@ class NoteControllerTests {
             String response = controller.createNote(null, newNote.getNoteContent(), bindingResult, model);
             assertNull(newNote.getId());
             assertEquals("notes/new", response);
+        }
+
+        @Test
+        void shouldCreateDateNotesWhenNotebookIsABlog() throws NoAccessRightException, IOException {
+            Note blog = makeMe.aBlog("This is a blog").byUser(userModel).inBlog(new Notebook(NotebookType.BLOG)).please();
+            BindingResult bindingResult = makeMe.successfulBindingResult();
+            String response = controller.createNote(blog, blog.getNoteContent(), bindingResult, model);
+
+            String[] split = response.split("/");
+            int id = Integer.parseInt(split[split.length-1]);
+            Note createdArticle = modelFactoryService.findNoteById(id).stream().findFirst().orElse(null);
+            assertNotNull(createdArticle);
+
+            LocalDate d = LocalDate.now();
+            String y = String.valueOf(d.getYear());
+            Note parentNote = createdArticle.getParentNote();
+            assertNotNull(parentNote);
+            assertEquals(y, parentNote.getTitle());
         }
 
     }
@@ -197,7 +214,7 @@ class NoteControllerTests {
         @Test
         void shouldNotAllowMoveOtherPeoplesNote() {
             NoteMotion motion = new NoteMotion(note2, false);
-            assertThrows(NoAccessRightException.class, ()->
+            assertThrows(NoAccessRightException.class, () ->
                     controller.moveNote(note1, motion)
             );
         }
@@ -205,7 +222,7 @@ class NoteControllerTests {
         @Test
         void shouldNotAllowMoveToOtherPeoplesNote() {
             NoteMotion motion = new NoteMotion(note1, false);
-            assertThrows(NoAccessRightException.class, ()->
+            assertThrows(NoAccessRightException.class, () ->
                     controller.moveNote(note2, motion)
             );
         }

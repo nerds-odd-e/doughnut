@@ -43,4 +43,12 @@ public class Notebook {
     @Enumerated(EnumType.STRING)
     @Column(name="notebook_type")
     @Getter @Setter NotebookType notebookType;
+
+    public Notebook() {
+        this(NotebookType.GENERAL);
+    }
+
+    public Notebook(NotebookType type) {
+        notebookType = type;
+    }
 }

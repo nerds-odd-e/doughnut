@@ -338,6 +338,10 @@ public class Note {
 
     public void buildNotebookForHeadNote(Ownership ownership, User creator) {
         final Notebook notebook = new Notebook();
+        assignNotebookForHeadNote(notebook, ownership, creator);
+    }
+
+    public void assignNotebookForHeadNote(Notebook notebook, Ownership ownership, User creator) {
         notebook.setCreatorEntity(creator);
         notebook.setOwnership(ownership);
         notebook.setHeadNote(this);

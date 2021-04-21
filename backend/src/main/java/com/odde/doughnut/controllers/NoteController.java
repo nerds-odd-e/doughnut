@@ -4,8 +4,8 @@ import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.NoAccessRightException;
-import com.odde.doughnut.models.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.models.UserModel;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
@@ -18,6 +18,9 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.TextStyle;
+import java.util.Locale;
 
 @Controller
 @RequestMapping("/notes")
@@ -48,6 +51,23 @@ public class NoteController extends ApplicationMvcController  {
         userModel.getAuthorization().assertAuthorization(parentNote);
         Note note = new Note();
         User user = userModel.getEntity();
+
+        if (parentNote.getNotebook().getNotebookType().equals(NotebookType.BLOG)) {
+            LocalDate now = LocalDate.now();
+            int year = now.getYear();
+            String month = now.getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH);
+            int day = now.getDayOfMonth();
+
+            NoteContent yearNoteContent = new NoteContent();
+            yearNoteContent.setTitle(String.valueOf(year));
+            Note yearNote = new Note();
+            yearNote.updateNoteContent(yearNoteContent, user);
+            yearNote.setParentNote(parentNote);
+            yearNote.setUser(user);
+            modelFactoryService.noteRepository.save(yearNote);
+            parentNote = yearNote;
+        }
+
         note.updateNoteContent(noteContent, user);
         note.setParentNote(parentNote);
         note.setUser(user);

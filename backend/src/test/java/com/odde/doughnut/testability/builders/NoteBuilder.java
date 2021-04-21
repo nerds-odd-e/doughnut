@@ -60,6 +60,15 @@ public class NoteBuilder extends EntityBuilder<Note> {
         return this;
     }
 
+    public NoteBuilder inBlog(Notebook blog) {
+        Ownership ownership = null;
+        if(entity.getUser() != null) {
+            ownership = entity.getUser().getOwnership();
+        }
+        entity.assignNotebookForHeadNote(blog, ownership, entity.getUser());
+        return this;
+    }
+
     @Override
     protected void beforeCreate(boolean needPersist) {
         if (entity.getUser() == null) {

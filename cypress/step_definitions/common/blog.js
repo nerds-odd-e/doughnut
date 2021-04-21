@@ -70,3 +70,20 @@ Then("I should see a blog post titled {string} on the Blog page", (title) => {
     cy.findArticleInWebsiteByTitle(title).should('be.visible');
 });
 
+
+
+When("after creating a blog article {string}", (articleTitle, data) => {
+  cy.findByText("(Add Child Note)").click();
+  cy.submitNoteFormWith(data.hashes());
+});
+
+Then("I should see {string} in breadcrumb", (expectedBreadcrumb) => {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = d.toLocaleString("default", {month: 'short'});
+  const bc = expectedBreadcrumb.replace("{YYYY}", y).replace("{MMM}", m);
+
+  cy.get('.breadcrumb').within( ()=>
+      bc.commonSenseSplit(", ").forEach(s => cy.findByText(s))
+  );
+});
