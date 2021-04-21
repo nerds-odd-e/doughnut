@@ -37,13 +37,43 @@ jobs:
       - name: Unit tests with Gradle
         run: backend/gradlew -p backend test -Dspring.profiles.active=test
       - name: Slack notify dough_ci_cd channel of backend unit tests results
-        uses: ravsamhq/notify-slack-action@master
+        uses: adamkdean/simple-slack-notify@master
         if: always()
         with:
+          channel: "#dough_ci_cd"
           status: ${{ job.status }}
-          notify_when: "failure"
-          notification_title: "Backend unit tests has {status_message}"
-          footer: "Doughnut Repo <{repo_url}|{repo}>"
+          success_text: "Backend unit tests (#${env.GITHUB_RUN_NUMBER}) completed Successfully"
+          failure_text: "Backend unit tests (#${env.GITHUB_RUN_NUMBER}) Failed"
+          cancelled_text: "Backend unit tests (#${env.GITHUB_RUN_NUMBER}) was Cancelled"
+          fields: |
+            [{ "title": "Action URL", "value": "${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/actions/runs/${env.GITHUB_RUN_ID}"}]
+
+  mobile-unit-tests:
+    name: Flutter Unit tests and build
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Code Checkout
+        uses: actions/checkout@v2
+      - name: Flutter test and build
+        uses: subosito/flutter-action@v1
+        with:
+          flutter-version: "2.0.4"
+      - run: cd mobile && flutter config --enable-web
+      - run: cd mobile && flutter clean
+      - run: cd mobile && flutter pub get
+      - run: cd mobile && flutter test
+      - run: cd mobile && flutter build web --release
+      - name: Slack notify dough_ci_cd channel of mobile unit tests results
+        uses: adamkdean/simple-slack-notify@master
+        if: always()
+        with:
+          channel: "#dough_ci_cd"
+          status: ${{ job.status }}
+          success_text: "Mobile unit tests (#${env.GITHUB_RUN_NUMBER}) completed Successfully"
+          failure_text: "Mobile unit tests (#${env.GITHUB_RUN_NUMBER}) Failed"
+          cancelled_text: "Mobile unit tests (#${env.GITHUB_RUN_NUMBER}) was Cancelled"
+          fields: |
+            [{ "title": "Action URL", "value": "${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/actions/runs/${env.GITHUB_RUN_ID}"}]
 
   e2e-tests:
     name: End-to-End tests with Database
@@ -89,18 +119,21 @@ jobs:
           wait-on: "http://localhost:8081"
           spec: ${{matrix.spec}}
       - name: Slack notify dough_ci_cd channel of e2e tests results
-        uses: ravsamhq/notify-slack-action@master
+        uses: adamkdean/simple-slack-notify@master
         if: always()
         with:
+          channel: "#dough_ci_cd"
           status: ${{ job.status }}
-          notify_when: "failure"
-          notification_title: "End-to-End tests has {status_message}"
-          footer: "Doughnut Repo <{repo_url}|{repo}>"
+          success_text: "End-to-End tests (#${env.GITHUB_RUN_NUMBER}) completed Successfully"
+          failure_text: "End-to-End tests (#${env.GITHUB_RUN_NUMBER}) Failed"
+          cancelled_text: "End-to-End tests (#${env.GITHUB_RUN_NUMBER}) was Cancelled"
+          fields: |
+            [{ "title": "Action URL", "value": "${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/actions/runs/${env.GITHUB_RUN_ID}"}]
 
   package-n-deploy:
     name: Package & GCP MIG Rolling Update Deploy
     runs-on: ubuntu-20.04
-    needs: [backend-unit-tests, e2e-tests]
+    needs: [backend-unit-tests, mobile-unit-tests, e2e-tests]
     steps:
       - name: Code Checkout
         uses: actions/checkout@v2
@@ -126,10 +159,13 @@ jobs:
       - name: Perform rolling replace to GCP MIG doughnut-app-group
         run: infra/scripts/perform-rolling-replace-app-mig.sh
       - name: Slack notify dough_ci_cd channel of CI/CD results
-        uses: ravsamhq/notify-slack-action@master
+        uses: adamkdean/simple-slack-notify@master
         if: always()
         with:
+          channel: "#dough_ci_cd"
           status: ${{ job.status }}
-          notify_when: "failure"
-          notification_title: "Package & GCP MIG Rolling Update Deploy has {status_message}"
-          footer: "Doughnut Repo <{repo_url}|{repo}>"
+          success_text: "doughnut CD (#${env.GITHUB_RUN_NUMBER}) completed Successfully"
+          failure_text: "doughnut CD (#${env.GITHUB_RUN_NUMBER}) Failed"
+          cancelled_text: "doughnut CD (#${env.GITHUB_RUN_NUMBER}) was Cancelled"
+          fields: |
+            [{ "title": "Action URL", "value": "${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/actions/runs/${env.GITHUB_RUN_ID}"}]
