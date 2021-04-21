@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -18,10 +19,26 @@ import org.springframework.transaction.annotation.Transactional;
 public class BlogYearMonthTest {
   @Autowired MakeMe makeMe;
 
-  @Test
-  void shouldGetYearMonthList() {
-    BlogModel blogModel = new BlogModel();
-    Notebook notebook = makeMe.aNotebook().please();
-    assertTrue(blogModel.getBlogYearMonths(notebook.getId()).isEmpty());
-  }
+    @Autowired
+    ModelFactoryService modelFactoryService;
+
+    @Test
+    void shouldGetYearMonthEmptyList() {
+        Notebook notebook = makeMe.aNotebook().please();
+        Note headNote = notebook.getHeadNote();
+        BlogModel blogModel = new BlogModel(headNote, modelFactoryService);
+        assertTrue(blogModel.getBlogYearMonths(headNote.getId()).isEmpty());
+    }
+
+    @Test
+    void shouldGetYearMonthList() {
+        Notebook notebook = makeMe.aNotebook().please();
+        Note headNote = notebook.getHeadNote();
+        BlogModel blogModel = new BlogModel(headNote, modelFactoryService);
+        makeMe.aNote("2021").under(headNote).please();
+        makeMe.aNote("2020").under(headNote).please();
+        makeMe.aNote("2019").under(headNote).please();
+
+        assertTrue(blogModel.getBlogYearMonths(headNote.getId()).size()==0);
+    }
 }
