@@ -22,7 +22,7 @@ public class BlogYearMonthTest {
 
     @Test
     void shouldGetYearMonthList() {
-        BlogModel blogModel = new BlogModel();
+        BlogModel blogModel = new BlogModelS();
         Notebook notebook = makeMe.aNotebook().please();
         assertTrue(blogModel.getBlogYearMonths(notebook.getId()).isEmpty());
     }
