@@ -19,6 +19,8 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.format.TextStyle;
+import java.util.Locale;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -99,9 +101,21 @@ class NoteControllerTests {
 
             LocalDate d = LocalDate.now();
             String y = String.valueOf(d.getYear());
-            Note parentNote = createdArticle.getParentNote();
-            assertNotNull(parentNote);
-            assertEquals(y, parentNote.getTitle());
+            String day = String.valueOf(d.getDayOfMonth());
+            String m = d.getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH);
+
+            Note dateNote = createdArticle.getParentNote();
+            assertNotNull(dateNote);
+            assertEquals(day, dateNote.getTitle());
+
+            Note monthNote = dateNote.getParentNote();
+            assertNotNull(monthNote);
+            assertEquals(m, monthNote.getTitle());
+
+            Note yearNote = monthNote.getParentNote();
+            assertNotNull(yearNote);
+            assertEquals(y, yearNote.getTitle());
+
         }
 
     }
