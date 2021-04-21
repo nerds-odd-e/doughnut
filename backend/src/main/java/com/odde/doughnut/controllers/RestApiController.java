@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:8000")
@@ -49,18 +51,15 @@ class RestApiController {
         return result;
     }
 
-    @GetMapping("/note/blog/{notebookId}")
-    public Note.NoteApiResult getNote(@PathVariable Integer notebookId) {
+    @GetMapping("/blog_articles_by_notebook_id/{notebookId}")
+    public List<Note> getBlogArticlesByNotebookId(@PathVariable Integer notebookId) {
+        List<Note> articles = new ArrayList<>();
+        Optional<Notebook> notebookById = modelFactoryService.notebookRepository.findById(notebookId);
+        if (notebookById.isPresent()){
+            Notebook notebook = notebookById.get();
 
-        Notebook notebook = modelFactoryService.notebookRepository.findById(notebookId).get();
-        Note notebookHeadNote = notebook.getHeadNote();
-
-        Note.NoteApiResult result = new Note.NoteApiResult();
-        result.setTitle(notebookHeadNote.getTitle());
-        result.setDescription(notebookHeadNote.getArticleBody());
-        result.setAuthor(notebookHeadNote.getUser().getName());
-        result.setUpdateDatetime(notebookHeadNote.getNoteContent().getUpdatedDatetime().toString());
-
-        return result;
+            articles = notebook.getArticles();
+        }
+        return articles;
     }
 }

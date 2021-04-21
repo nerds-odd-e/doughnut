@@ -7,6 +7,7 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "notebook")
@@ -50,5 +51,9 @@ public class Notebook {
 
     public Notebook(NotebookType type) {
         notebookType = type;
+    }
+
+    public List<Note> getArticles(){
+        return getNotes().stream().filter(Note::isArticle).collect(Collectors.toList());
     }
 }

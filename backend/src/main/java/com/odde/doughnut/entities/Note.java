@@ -349,5 +349,9 @@ public class Note {
         this.user = creator;
         this.notebook = notebook;
     }
+
+    public Boolean isArticle(){
+        return !isHead();
+    }
 }
 

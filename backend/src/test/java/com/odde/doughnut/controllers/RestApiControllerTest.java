@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,6 +13,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -27,27 +29,21 @@ public class RestApiControllerTest {
 
     RestApiController controller;
 
-    private Note topNote;
-    private Note firstChild;
-    private Timestamp firstChildUpdatetime;
-    private String userName;
-
     @BeforeEach
     void setup() {
         userModel = makeMe.aUser().toModelPlease();
         controller = new RestApiController(makeMe.modelFactoryService);
-
-        topNote = makeMe.aNote("odd-e blog").please();
-        firstChild = makeMe.aNote("how to do Scrum").description("Scrum").under(topNote).please();
-        makeMe.refresh(topNote);
-        makeMe.refresh(firstChild);
-        firstChildUpdatetime = firstChild.getNoteContent().getUpdatedDatetime();
-
-        userName = firstChild.getUser().getName();
     }
 
     @Test
     void noteApiResult() {
+        Note topNote = makeMe.aNote("odd-e blog").please();
+        Note firstChild = makeMe.aNote("how to do Scrum").description("Scrum").under(topNote).please();
+        makeMe.refresh(topNote);
+        makeMe.refresh(firstChild);
+        Timestamp firstChildUpdatetime = firstChild.getNoteContent().getUpdatedDatetime();
+        String userName = firstChild.getUser().getName();
+
         Note.NoteApiResult note = controller.getNote();
         Note.NoteApiResult expected = new Note.NoteApiResult();
         expected.setTitle("how to do Scrum");
@@ -59,5 +55,20 @@ public class RestApiControllerTest {
         assertThat(note.getDescription(), equalTo(expected.getDescription()));
         assertThat(note.getAuthor(), equalTo(expected.getAuthor()));
         assertThat(note.getUpdateDatetime(), equalTo(expected.getUpdateDatetime()));
+    }
+
+    @Test
+    void getBlogArticlesByNotebookId() {
+        Note headNote = makeMe.aNote("odd-e blog").please();
+        Note note = makeMe.aNote("Hello World").under(headNote).please();
+        Notebook notebook = headNote.getNotebook();
+        makeMe.refresh(notebook);
+        makeMe.refresh(headNote);
+        makeMe.refresh(note);
+
+        List<Note> articles = controller.getBlogArticlesByNotebookId(headNote.getNotebook().getId());
+
+        assertThat(articles.size(), equalTo(1));
+        assertThat(articles.get(0).getArticleTitle(), equalTo(note.getArticleTitle()));
     }
 }
