@@ -1,7 +1,7 @@
 # This workflow will build a package using Gradle and then publish it to GitHub packages when a release is created
 # For more information see: https://github.com/actions/setup-java#publishing-using-gradle
 
-name: doughnut CI CD
+name: doughnut CI
 
 on: push
 env:
@@ -48,6 +48,33 @@ jobs:
           fields: |
             [{ "title": "Action URL", "value": "${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/actions/runs/${env.GITHUB_RUN_ID}"}]
 
+  Mobile-unit-tests:
+    name: Mobile Unit tests and build
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Code Checkout
+        uses: actions/checkout@v2
+      - name: Flutter frontend test and build
+        uses: subosito/flutter-action@v1
+        with:
+          flutter-version: "2.0.5"
+      - run: cd mobile && flutter config --enable-web
+      - run: cd mobile && flutter clean
+      - run: cd mobile && flutter pub get
+      - run: cd mobile && flutter test
+      - run: cd mobile && flutter build web --release
+      - name: Slack notify dough_ci_cd channel of mobile unit tests results
+        uses: adamkdean/simple-slack-notify@master
+        if: always()
+        with:
+          channel: "#dough_ci_cd"
+          status: ${{ job.status }}
+          success_text: "Mobile unit tests (#${env.GITHUB_RUN_NUMBER}) completed Successfully"
+          failure_text: "Mobile unit tests (#${env.GITHUB_RUN_NUMBER}) Failed"
+          cancelled_text: "Mobile unit tests (#${env.GITHUB_RUN_NUMBER}) was Cancelled"
+          fields: |
+            [{ "title": "Action URL", "value": "${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/actions/runs/${env.GITHUB_RUN_ID}"}]
+
   E2E-tests:
     name: End-to-End tests with Database
     runs-on: ubuntu-20.04
@@ -90,6 +117,7 @@ jobs:
           install-command: yarn
           start: yarn sut
           wait-on: "http://localhost:8081"
+          spec: ${{matrix.spec}}
       - name: Slack notify dough_ci_cd channel of e2e tests results
         uses: adamkdean/simple-slack-notify@master
         if: always()
@@ -102,10 +130,10 @@ jobs:
           fields: |
             [{ "title": "Action URL", "value": "${env.GITHUB_SERVER_URL}/${env.GITHUB_REPOSITORY}/actions/runs/${env.GITHUB_RUN_ID}"}]
 
-  package-n-deploy:
+  Package-n-Deploy:
     name: Package & GCP MIG Rolling Update Deploy
     runs-on: ubuntu-20.04
-    needs: [Backend-unit-tests, E2E-tests]
+    needs: [Backend-unit-tests, Mobile-unit-tests, E2E-tests]
     steps:
       - name: Code Checkout
         uses: actions/checkout@v2
