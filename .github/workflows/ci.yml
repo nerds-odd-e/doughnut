@@ -90,7 +90,6 @@ jobs:
           install-command: yarn
           start: yarn sut
           wait-on: "http://localhost:8081"
-          spec: ${{matrix.spec}}
       - name: Slack notify dough_ci_cd channel of e2e tests results
         uses: adamkdean/simple-slack-notify@master
         if: always()
