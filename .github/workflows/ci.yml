@@ -78,19 +78,6 @@ jobs:
   E2E-tests:
     name: End-to-End tests with Database
     runs-on: ubuntu-20.04
-    strategy:
-      matrix:
-        spec:
-          - |
-            cypress/integration/b*/**
-          - |
-            cypress/integration/c*/**
-            cypress/integration/f*/**
-            cypress/integration/u*/**
-          - |
-            cypress/integration/n*/**
-          - |
-            cypress/integration/r*/**
     steps:
       - name: Code Checkout
         uses: actions/checkout@v2
@@ -117,7 +104,6 @@ jobs:
           install-command: yarn
           start: yarn sut
           wait-on: "http://localhost:8081"
-          spec: ${{matrix.spec}}
       - name: Slack notify dough_ci_cd channel of e2e tests results
         uses: adamkdean/simple-slack-notify@master
         if: always()
