@@ -45,30 +45,6 @@ jobs:
           notification_title: "Backend unit tests has {status_message}"
           footer: "Doughnut Repo <{repo_url}|{repo}>"
 
-  mobile-unit-tests:
-    name: Flutter Unit tests and build
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Code Checkout
-        uses: actions/checkout@v2
-      - name: Flutter test and build
-        uses: subosito/flutter-action@v1
-        with:
-          flutter-version: "2.0.4"
-      - run: cd mobile && flutter config --enable-web
-      - run: cd mobile && flutter clean
-      - run: cd mobile && flutter pub get
-      - run: cd mobile && flutter test
-      - run: cd mobile && flutter build web --release
-      - name: Slack notify dough_ci_cd channel of mobile unit tests results
-        uses: ravsamhq/notify-slack-action@master
-        if: always()
-        with:
-          status: ${{ job.status }}
-          notify_when: "failure"
-          notification_title: "Mobile unit tests has {status_message}"
-          footer: "Doughnut Repo <{repo_url}|{repo}>"
-
   e2e-tests:
     name: End-to-End tests with Database
     runs-on: ubuntu-20.04
@@ -124,7 +100,7 @@ jobs:
   package-n-deploy:
     name: Package & GCP MIG Rolling Update Deploy
     runs-on: ubuntu-20.04
-    needs: [backend-unit-tests, mobile-unit-tests, e2e-tests]
+    needs: [backend-unit-tests, e2e-tests]
     steps:
       - name: Code Checkout
         uses: actions/checkout@v2
