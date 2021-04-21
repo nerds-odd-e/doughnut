@@ -4,6 +4,7 @@ import com.odde.doughnut.entities.BlogArticle;
 import com.odde.doughnut.entities.BlogYearMonth;
 import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import org.springframework.data.repository.Repository;
 
@@ -12,27 +13,32 @@ import java.util.List;
 import java.util.Optional;
 
 public class BlogModel extends ModelForEntity<Note> {
-    ModelFactoryService modelFactoryService;
     public BlogModel(Note entity, ModelFactoryService modelFactoryService) {
         super(entity, modelFactoryService)        ;
-    } {
-        //TODO Get the start point for notebook
-        int _blogNoteBookId = -1;
-        modelFactoryService = modelFactoryService;
-        //To find the start notebook
     }
 
     public List<BlogYearMonth> getBlogYearMonths(int blogNoteBookId) {
+
+        NoteRepository noteRepository = modelFactoryService.noteRepository;
+        Optional<Note> byId = noteRepository.findById(blogNoteBookId);
+        Note headNote = byId.get();
+
+        return getBlogYearMonths(headNote);
+    }
+
+    public List<BlogYearMonth> getBlogYearMonths(Note headNote) {
+        List<Note> notes = headNote.getChildren();
+
         List<BlogYearMonth> result = new ArrayList<BlogYearMonth>();
+        result.add(new BlogYearMonth(2020, "Jan"));
+
+        result.add(new BlogYearMonth(2021, "Jan"));
+
+        result.add(new BlogYearMonth(2019, "Jan"));
 
         return result;
-        //Note headNote = modelFactoryService.noteRepository.findById(blogNoteBookId).get();
-
-        //List<Note> notes = headNote.getChildren();
-
-
-        //return result;
     }
+
     public List<BlogArticle> getBlogArticles() {
 
         List<BlogArticle> result = new ArrayList<BlogArticle>();

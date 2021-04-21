@@ -31,6 +31,10 @@ public class BlogYearMonth {
     @NotNull
     @Getter
     @Setter
-    private Integer month;
+    private String month;
 
+    public BlogYearMonth(Integer year,String month) {
+        this.year= year;
+        this.month = month;
+    }
 }
