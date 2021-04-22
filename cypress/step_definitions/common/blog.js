@@ -80,8 +80,8 @@ When("I add a new blog article with this information", (data) => {
 
     //blogTitle = data.hashes()[0]['Title'];
     //blogDesc = data.hashes()[0]['Description'];
-    cy.visitMyNotebooks();
-    cy.navigateToNotePage(data.hashes()[0]['Title']);
+    //cy.visitMyNotebooks();
+    //cy.navigateToNotePage(data.hashes()[0]['Title']);
     cy.addArticle([{Title: data.hashes()[0]['Title'], Description: data.hashes()[0]['Description']}]);
 });
 
