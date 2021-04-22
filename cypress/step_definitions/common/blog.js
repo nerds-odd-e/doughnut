@@ -22,7 +22,7 @@ And("there is a blog site links to blog notebook {string}", (title) => {
 When("I add a new blog article in {string} with title {string}", (blogTitle,articleTitle) => {
     cy.visitMyNotebooks();
     cy.navigateToNotePage(blogTitle);
-    cy.findByText("(Add New Article)").click();
+    cy.findByText("(Add Article)").click();
     cy.findByLabelText("Title").type(articleTitle);
     cy.get('input[value="Submit"]').click();
 });
@@ -83,7 +83,7 @@ Then("the left panel should show Years list", () => {
   });
 });
 And("There are some notes in the notebook", (data) => {
-    cy.findByText("(Add New Article)").click();
+    cy.findByText("(Add Article)").click();
     cy.submitNoteFormWith(data.hashes());
 });
 
