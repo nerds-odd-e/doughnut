@@ -63,7 +63,7 @@ Given("There is a Notebook type blog with title 'odd-e-blog'", () => {
 
 Then("the left panel should show Years list", () => {
   cy.get('.yearList').should((lis) => {
-  expect(lis).to.have.length(3)
+  expect(lis).to.have.length(1)
   });
 });
 And("There are some notes in the notebook", (data) => {

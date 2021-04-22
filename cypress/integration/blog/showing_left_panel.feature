@@ -1,22 +1,13 @@
 Feature: Showing left panel in the blog
 
-  @ignore
-  Scenario: There is no any notebook type blog
-    Given There is no Notebook type blog
-    When I open the blog page
-    Then the left panel should show empty
+  Background:
+    Given I've logged in as an existing user
 
-  @ignore
+
   Scenario: There is a notebook type blog with title 'odd-e-blog'
 
-    Given There is a Blog Notebook called odd-e blog
-    When I open the blog page
+    Given There is a blog titled 'odd-e-blog' in Doughnut
+    When I add a new blog article in "odd-e-blog" with title "Why it is so confusing #1?"
+    And I open the Blog page
     Then the left panel should show Years list
-
-  @ignore
-  Scenario: There is a notebook type blog with title 'odd-e-blog' without a year note linked
-
-    Given There is a Notebook type blog with title 'odd-e-blog' without a year note linked to it
-    When I open the blog page
-    Then the left panel should show empty
 
