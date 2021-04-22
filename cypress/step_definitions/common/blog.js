@@ -76,13 +76,13 @@ When("I add a new blog article in {string} with title {string}", (blogTitle,arti
     cy.addArticle([{Title: articleTitle }]);
 });
 
-Then("I should see a blog post on the Blog page", (data) => {
-
+Then("I should see a blog post on the Blog page created today", (data) => {
     cy.assertArticleInWebsiteByTitle(
         {
             title: data.hashes()[0]['Title'],
             description: data.hashes()[0]['Description'],
-            authorName: data.hashes()[0]['AuthorName']
+            authorName: data.hashes()[0]['AuthorName'],
+            createdAt: new Date().toLocaleString('default', {day:'numeric', month: 'short', year:'numeric'})
         }
     );
 });

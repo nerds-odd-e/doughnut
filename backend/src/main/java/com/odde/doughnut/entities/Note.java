@@ -28,7 +28,15 @@ public class Note {
         article.setTitle(getTitle());
         article.setDescription(getNoteContent().getDescription());
         article.setAuthor(getUser().getName());
+        article.setCreatedDatetime(getArticleDate());
         return article;
+    }
+
+    public String getArticleDate() {
+        var dateNote = getParentNote();
+        var monthNote = dateNote.getParentNote();
+        var yearNote = monthNote.getParentNote();
+        return String.format("%s %s %s", dateNote.getTitle(), monthNote.getTitle(), yearNote.getTitle());
     }
 
     public static class NoteApiResult {
@@ -364,7 +372,7 @@ public class Note {
     }
 
     public Boolean isArticle(){
-        return !isHead() && noteContent.getDescription() != null;
+        return !isHead() && noteContent.getDescription() != null && !noteContent.getDescription().isEmpty();
     }
 }
 

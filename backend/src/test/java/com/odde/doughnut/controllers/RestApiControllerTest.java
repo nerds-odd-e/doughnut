@@ -14,7 +14,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Timestamp;
+import java.time.LocalDate;
+import java.time.format.TextStyle;
 import java.util.List;
+import java.util.Locale;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -60,19 +63,34 @@ public class RestApiControllerTest {
 
     @Test
     void getBlogArticlesByWebsiteName() {
-        Note headNote = makeMe.aNote("odd-e blog").please();
-        Note note = makeMe.aNote("Hello World").under(headNote).please();
+        LocalDate now = LocalDate.now();
+        int year = now.getYear();
+
+        int day = now.getDayOfMonth();
+        String yearNoteTitle = String.valueOf(year);
+        String monthNoteTitle = now.getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH);
+        String dayNoteTitle = String.valueOf(day);
+
+        Note headNote = makeMe.aNote("odd-e-blog").withNoDescription().please();
+        Note yearNote = makeMe.aNote(yearNoteTitle).withNoDescription().under(headNote).please();
+        Note monthNote = makeMe.aNote(monthNoteTitle).withNoDescription().under(yearNote).please();
+        Note dayNote = makeMe.aNote(dayNoteTitle).withNoDescription().under(monthNote).please();
+        Note note = makeMe.aNote("Hello World").description("Hello World").under(dayNote).please();
         Notebook notebook = headNote.getNotebook();
         makeMe.refresh(notebook);
         makeMe.refresh(headNote);
+        makeMe.refresh(yearNote);
+        makeMe.refresh(monthNote);
+        makeMe.refresh(dayNote);
         makeMe.refresh(note);
 
         List<BlogArticle> articles = controller.getBlogArticlesByWebsiteName(headNote.getTitle());
 
         assertThat(articles.size(), equalTo(1));
         BlogArticle article = articles.get(0);
-        assertThat(article.getTitle(), equalTo(note.getArticleTitle()));
-        assertThat(article.getDescription(), equalTo(note.getArticleBody()));
+        assertThat(article.getTitle(), equalTo(note.getTitle()));
+        assertThat(article.getDescription(), equalTo(note.getNoteContent().getDescription()));
         assertThat(article.getAuthor(), equalTo(note.getUser().getName()));
+        assertThat(article.getCreatedDatetime(), equalTo(note.getArticleDate()));
     }
 }

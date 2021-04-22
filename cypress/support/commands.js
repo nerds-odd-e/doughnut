@@ -315,6 +315,7 @@ Cypress.Commands.add("assertArticleInWebsiteByTitle", (article) => {
         cy.get('.title').first().should('have.text',article.title);
         cy.get('.content').first().should('have.text', article.description);
         cy.get('.authorName').first().should('have.text', article.authorName);
+        cy.get('.createdAt').first().should('have.text', article.createdAt);
     });
    });
 });
