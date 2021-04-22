@@ -67,24 +67,27 @@ public class NoteController extends ApplicationMvcController  {
         if (parentNote.getNotebook().getNotebookType().equals(NotebookType.BLOG)) {
             LocalDate now = LocalDate.now();
             int year = now.getYear();
-            String month = now.getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH);
+
             int day = now.getDayOfMonth();
+            String yearNoteTitle = String.valueOf(year);
+            String monthNoteTitle = now.getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH);
+            String dayNoteTitle = String.valueOf(day);
 
-            NoteContent yearNoteContent = new NoteContent();
-            yearNoteContent.setTitle(String.valueOf(year));
-            Note yearNote = createNoteWithParentUserAndContent(parentNote, user, yearNoteContent);
+            Note yearNote = createChildNote(parentNote, user, yearNoteTitle);
 
-            NoteContent monthNoteContent = new NoteContent();
-            monthNoteContent.setTitle(month);
-            Note monthNote = createNoteWithParentUserAndContent(yearNote, user, monthNoteContent);
+            Note monthNote = createChildNote(yearNote, user, monthNoteTitle);
 
-            NoteContent dateNoteContent = new NoteContent();
-            dateNoteContent.setTitle(String.valueOf(day));
-            Note dateNote = createNoteWithParentUserAndContent(monthNote, user, dateNoteContent);
+            Note dateNote = createChildNote(monthNote, user, dayNoteTitle);
 
             return dateNote;
         }
         return parentNote;
+    }
+
+    private Note createChildNote(Note parentNote, User user, String noteTitle) throws IOException {
+        NoteContent noteContent = new NoteContent();
+        noteContent.setTitle(noteTitle);
+        return createNoteWithParentUserAndContent(parentNote, user, noteContent);
     }
 
     private Note createNoteWithParentUserAndContent(@PathVariable(name = "parentNote") Note parentNote, User user, NoteContent yearNoteContent) throws IOException {
