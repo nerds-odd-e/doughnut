@@ -83,7 +83,7 @@ Then("the left panel should show Years list", () => {
   });
 });
 And("There are some notes in the notebook", (data) => {
-    cy.findByText("(Add Child Note)").click();
+    cy.findByText("(Add New Article)").click();
     cy.submitNoteFormWith(data.hashes());
 });
 
