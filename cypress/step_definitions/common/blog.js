@@ -89,7 +89,13 @@ And("There are some notes in the notebook", (data) => {
 
 Then("I should see a blog post on the Blog page", (data) => {
 
-    cy.assertArticleInWebsiteByTitle({title: data.hashes()[0]['Title'], description: data.hashes()[0]['Description']});
+    cy.assertArticleInWebsiteByTitle(
+        {
+            title: data.hashes()[0]['Title'],
+            description: data.hashes()[0]['Description'],
+            authorName: data.hashes()[0]['AuthorName']
+        }
+    );
 });
 
 

@@ -70,6 +70,9 @@ public class RestApiControllerTest {
         List<BlogArticle> articles = controller.getBlogArticlesByWebsiteName(headNote.getTitle());
 
         assertThat(articles.size(), equalTo(1));
-        assertThat(articles.get(0).getTitle(), equalTo(note.getArticleTitle()));
+        BlogArticle article = articles.get(0);
+        assertThat(article.getTitle(), equalTo(note.getArticleTitle()));
+        assertThat(article.getDescription(), equalTo(note.getArticleBody()));
+        assertThat(article.getAuthor(), equalTo(note.getUser().getName()));
     }
 }

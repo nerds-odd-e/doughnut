@@ -6,8 +6,8 @@ Feature: Publish a note from doughnut to odd-e blog site
     | Hello World | Content Article 1 |
     When I open the Blog page
     Then I should see a blog post on the Blog page
-    | Title       | Description       |
-    | Hello World | Content Article 1 |
+    | Title       | Description       | AuthorName  |
+    | Hello World | Content Article 1 | Developer |
 
   @ignore
   Scenario: There is no notebook with type Blog in Doughnut

@@ -27,6 +27,7 @@ public class Note {
         BlogArticle article = new BlogArticle();
         article.setTitle(getArticleTitle());
         article.setDescription(getArticleBody());
+        article.setAuthor(getUser().getName());
         return article;
     }
 
