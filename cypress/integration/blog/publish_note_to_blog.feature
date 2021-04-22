@@ -3,8 +3,12 @@ Feature: Publish a note from doughnut to odd-e blog site
   Scenario: There is a notebook with type Blog with one note in Doughnut
     Given There is a notebook titled 'odd-e-blog' with type Blog in Doughnut
     And There are some notes in the notebook
+    | Title       | Description       |
+    | Hello World | Content Article 1 |
     When I open the blog page
-    Then I should see a blog post titled 'Hello World' on the Blog page
+    Then I should see a blog post on the Blog page
+    | Title       | Description       |
+    | Hello World | Content Article 1 |
 
   @ignore
   Scenario: There is no notebook with type Blog in Doughnut

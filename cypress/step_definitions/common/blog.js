@@ -82,13 +82,14 @@ Then("the left panel should show Years list", () => {
   expect($lis).to.have.length(5)
   });
 });
-And("There are some notes in the notebook", () => {
+And("There are some notes in the notebook", (data) => {
     cy.findByText("(Add Child Note)").click();
-    cy.submitNoteFormWith([{Title:"Hello World", Description: "Hello World"}]);
+    cy.submitNoteFormWith(data.hashes());
 });
 
-Then("I should see a blog post titled {string} on the Blog page", (title) => {
-    cy.findArticleInWebsiteByTitle(title).should('be.visible');
+Then("I should see a blog post on the Blog page", (data) => {
+
+    cy.assertArticleInWebsiteByTitle({title: data.hashes()[0]['Title'], description: data.hashes()[0]['Description']});
 });
 
 

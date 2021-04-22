@@ -303,8 +303,11 @@ Cypress.Commands.add("getYearList", () => {
     return cy.get(".yearList");
 });
 
-Cypress.Commands.add("findArticleInWebsiteByTitle", (title) => {
+Cypress.Commands.add("assertArticleInWebsiteByTitle", (article) => {
    cy.get('#article-container').within(() => {
-    cy.get('.article').first().find('.title').first().should('have.text',title);
+    cy.get('.article').first().within(() => {
+        cy.get('.title').first().should('have.text',article.title);
+        cy.get('.content').first().should('have.text', article.description);
+    });
    });
 });
