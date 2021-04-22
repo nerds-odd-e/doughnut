@@ -13,9 +13,6 @@ Given("There is a blog titled {string} in Doughnut", (title) => {
   cy.submitNoteFormWith([{Title:title}]);
 });
 
-And("there is a blog site links to blog notebook {string}", (title) => {
-
-});
 
 Given("There is a Blog Notebook called odd-e blog", (data) => {
   cy.loginAs('developer');
@@ -25,7 +22,10 @@ Given("There is a Blog Notebook called odd-e blog", (data) => {
   cy.submitNoteFormWith(data.hashes());
 });
 
-
+Then("I should see the current year on the blog-site's side navbar", ()=>{
+     var yearList = cy.get('.yearList');
+     cy.log(yearList);
+});
 
 And("A blog is posted in {string}", (blogNotebook, data) => {
     cy.findByText("(Add Child Note)").click();
