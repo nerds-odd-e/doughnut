@@ -11,7 +11,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
@@ -24,16 +24,18 @@ public class BlogYearMonthTest {
 
     @Test
     void shouldGetYearMonthEmptyList() {
-        Notebook notebook = makeMe.aNotebook().please();
-        Note headNote = notebook.getHeadNote();
+        UserModel userModel = makeMe.aUser().toModelPlease();
+        Notebook notebook = makeMe.aNotebook().byUser(userModel).please();
+        Note headNote = makeMe.aNote().byUser(userModel).underNotebook(notebook).please();
         BlogModel blogModel = new BlogModel(headNote, modelFactoryService);
         assertTrue(blogModel.getBlogYearMonths(headNote).isEmpty());
     }
 
     @Test
     void shouldGetYearMonthList() {
-        Notebook notebook = makeMe.aNotebook().please();
-        Note headNote = notebook.getHeadNote();
+        UserModel userModel = makeMe.aUser().toModelPlease();
+        Notebook notebook = makeMe.aNotebook().byUser(userModel).please();
+        Note headNote = makeMe.aNote().byUser(userModel).underNotebook(notebook).please();
         BlogModel blogModel = new BlogModel(headNote, modelFactoryService);
         Note note1 = makeMe.aNote("2021").under(headNote).please();
         Note note2 = makeMe.aNote("2020").under(headNote).please();

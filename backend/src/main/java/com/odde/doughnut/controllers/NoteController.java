@@ -20,6 +20,7 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
+import java.util.List;
 import java.util.Locale;
 
 @Controller
@@ -71,31 +72,32 @@ public class NoteController extends ApplicationMvcController  {
             String monthNoteTitle = now.getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH);
             String dayNoteTitle = String.valueOf(day);
 
-            Note yearNote = createChildNote(parentNote, user, yearNoteTitle);
+            Note yearNote = getOrCreateNoteInNotebook(parentNote, user, yearNoteTitle);
 
-            Note monthNote = createChildNote(yearNote, user, monthNoteTitle);
+            Note monthNote = getOrCreateNoteInNotebook(yearNote, user, monthNoteTitle);
 
-            Note dateNote = createChildNote(monthNote, user, dayNoteTitle);
-
-            return dateNote;
+            return getOrCreateNoteInNotebook(monthNote, user, dayNoteTitle);
         }
         return parentNote;
     }
 
-    private Note createChildNote(Note parentNote, User user, String noteTitle) throws IOException {
+    private Note getOrCreateNoteInNotebook(Note parentNote, User user, String noteTitle) throws IOException {
+        Note existingNote = parentNote.getNotebook().getNotes().stream().filter(note -> note.getTitle().equals(noteTitle)).findFirst().orElse(null);
+        List<Note> existingNotes = modelFactoryService.noteRepository.searchInNotebook(parentNote.getNotebook(),null, noteTitle);
+        if(existingNote != null){
+            return existingNote;
+        }
+
         NoteContent noteContent = new NoteContent();
         noteContent.setTitle(noteTitle);
-        return createNoteWithParentUserAndContent(parentNote, user, noteContent);
+        Note note = new Note();
+        note.updateNoteContent(noteContent, user);
+        note.setParentNote(parentNote);
+        note.setUser(user);
+        modelFactoryService.noteRepository.save(note);
+        return note;
     }
 
-    private Note createNoteWithParentUserAndContent(@PathVariable(name = "parentNote") Note parentNote, User user, NoteContent yearNoteContent) throws IOException {
-        Note yearNote = new Note();
-        yearNote.updateNoteContent(yearNoteContent, user);
-        yearNote.setParentNote(parentNote);
-        yearNote.setUser(user);
-        modelFactoryService.noteRepository.save(yearNote);
-        return yearNote;
-    }
 
     @GetMapping("/{note}")
     public String showNote(@PathVariable(name = "note") Note note) throws NoAccessRightException {
