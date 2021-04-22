@@ -82,7 +82,7 @@ Then("I should see a blog post on the Blog page created today", (data) => {
             title: data.hashes()[0]['Title'],
             description: data.hashes()[0]['Description'],
             authorName: data.hashes()[0]['AuthorName'],
-            createdAt: new Date().toLocaleString('default', {day:'numeric', month: 'short', year:'numeric'})
+            createdAt: new Date().toLocaleString('en-GB', {day:'numeric', month: 'short', year:'numeric'})
         }
     );
 });
