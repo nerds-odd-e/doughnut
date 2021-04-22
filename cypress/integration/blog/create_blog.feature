@@ -7,7 +7,7 @@ Feature: Create Blog with Year-Date Structure
     Given I add a new blog notebook "odd-e blog"
     And there is a blog site links to blog notebook "odd-e blog"
     When I add a new blog article in "odd-e blog" with title "Why it is so confusing?"
-    Then I open the blog page
+    Then I open the Blog page
 #    And I should see a blog post titled 'Hello World' on the Blog page
 
   @ignore
