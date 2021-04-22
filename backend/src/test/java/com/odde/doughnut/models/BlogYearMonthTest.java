@@ -27,7 +27,7 @@ public class BlogYearMonthTest {
         Notebook notebook = makeMe.aNotebook().please();
         Note headNote = notebook.getHeadNote();
         BlogModel blogModel = new BlogModel(headNote, modelFactoryService);
-        assertFalse(blogModel.getBlogYearMonths(headNote).isEmpty());
+        assertTrue(blogModel.getBlogYearMonths(headNote).isEmpty());
     }
 
     @Test

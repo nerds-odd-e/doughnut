@@ -6,10 +6,10 @@ Feature: Showing left panel in the blog
     When I open the blog page
     Then the left panel should show empty
 
-
+  @ignore
   Scenario: There is a notebook type blog with title 'odd-e-blog'
 
-    Given There is a Notebook type blog with title 'odd-e-blog'
+    Given There is a Blog Notebook called odd-e blog
     When I open the blog page
     Then the left panel should show Years list
 

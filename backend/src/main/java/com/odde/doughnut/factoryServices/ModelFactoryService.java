@@ -35,7 +35,9 @@ public class ModelFactoryService {
     public BazaarModel toBazaarModel() {
         return new BazaarModel(this);
     }
-
+    public BlogModel toBlogModel(Note note) {
+        return new BlogModel(note,this);
+    }
 
     public Optional<User> findUserById(Integer id) {
         return userRepository.findById(id);

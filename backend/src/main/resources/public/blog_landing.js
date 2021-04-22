@@ -3,35 +3,12 @@ var app = new Vue({
   el: '#app',
   data: {
     blogInfo: [],
+    yearMonthList: [],
     articleList: [],
     apiUrl: "../api/blog_articles_by_website_name/odd-e-blog"
+    apiYearsUrl: "../api/blog/yearmonth"
   },
   created: function() {
-    this.blogInfo.push(
-    {
-        "year": "2017",
-        "link": "abc"
-    });
-    this.blogInfo.push(
-    {
-        "year": "2018",
-        "link": "abc"
-    });
-    this.blogInfo.push(
-    {
-        "year": "2019",
-        "link": "abc"
-    });
-    this.blogInfo.push(
-    {
-        "year": "2020",
-        "link": "abc"
-    });
-    this.blogInfo.push(
-    {
-        "year": "2021",
-        "link": "abc"
-    });
     axios
         .get(this.apiUrl)
             .then((res) => {
@@ -40,5 +17,14 @@ var app = new Vue({
             .catch((res) => {
                 alert("Error");
             });
+    axios
+        .get(this.apiYearsUrl)
+            .then((res) => {
+                this.yearMonthList = res.data;
+            })
+            .catch((res) => {
+                alert("Error");
+            });
+    });
   }
 });

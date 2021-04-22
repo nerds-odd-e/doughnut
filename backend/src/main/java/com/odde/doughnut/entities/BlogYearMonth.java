@@ -26,14 +26,14 @@ public class BlogYearMonth {
 
     @Getter
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer year;
+    private String year;
 
     @NotNull
     @Getter
     @Setter
     private String month;
 
-    public BlogYearMonth(Integer year,String month) {
+    public BlogYearMonth(String year,String month) {
         this.year= year;
         this.month = month;
     }

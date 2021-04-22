@@ -64,8 +64,9 @@ Given("There is no Notebook type blog", () => {
 
 });
 
-When("I open the blog page", () => {
-  cy.visitBlog();
+When("I open the Blog page", () => {
+  //cy.visitBlog();
+  cy.visit("http://localhost:8081/blog_landing.html");
 });
 
 Then("the left panel should show empty", () => {
@@ -78,8 +79,8 @@ Given("There is a Notebook type blog with title 'odd-e-blog'", () => {
 
 
 Then("the left panel should show Years list", () => {
-  cy.get('.yearList').should(($lis) => {
-  expect($lis).to.have.length(5)
+  cy.get('.yearList').should((lis) => {
+  expect(lis).to.have.length(3)
   });
 });
 And("There are some notes in the notebook", (data) => {

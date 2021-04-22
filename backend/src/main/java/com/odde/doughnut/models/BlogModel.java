@@ -27,16 +27,13 @@ public class BlogModel extends ModelForEntity<Note> {
     }
 
     public List<BlogYearMonth> getBlogYearMonths(Note headNote) {
-        List<Note> notes = headNote.getChildren();
+        List<BlogYearMonth> years = new ArrayList<BlogYearMonth>();
 
-        List<BlogYearMonth> result = new ArrayList<BlogYearMonth>();
-        result.add(new BlogYearMonth(2020, "Jan"));
+        List<Note> noteYears = headNote.getChildren();
 
-        result.add(new BlogYearMonth(2021, "Jan"));
+        noteYears.forEach(note-> years.add(new BlogYearMonth(note.getTitle(), "Jan"))); //ToDo for dynamic month
 
-        result.add(new BlogYearMonth(2019, "Jan"));
-
-        return result;
+        return years;
     }
 
     public List<BlogArticle> getBlogArticles() {

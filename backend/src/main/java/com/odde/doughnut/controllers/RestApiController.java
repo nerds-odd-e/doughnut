@@ -2,10 +2,12 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.BlogArticle;
+import com.odde.doughnut.entities.BlogYearMonth;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.models.BazaarModel;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.models.BlogModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.*;
@@ -54,5 +56,15 @@ class RestApiController {
     public List<BlogArticle> getBlogArticlesByWebsiteName(@PathVariable String websiteName) {
         Notebook notebook = modelFactoryService.noteRepository.findFirstByTitle(websiteName).getNotebook();
         return notebook.getArticles();
+    }
+
+    @GetMapping("/blog/yearmonth")
+    public List<BlogYearMonth> getBlogYearMonthList() {
+        Note note = modelFactoryService.noteRepository.findFirstByTitle("odd-e blog");
+
+        BlogModel blogModel = modelFactoryService.toBlogModel(note);
+        List<BlogYearMonth> yearMonths = blogModel.getBlogYearMonths(note);
+
+        return yearMonths;
     }
 }
