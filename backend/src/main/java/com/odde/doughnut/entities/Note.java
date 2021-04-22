@@ -25,8 +25,8 @@ import static java.util.stream.Collectors.toList;
 public class Note {
     public BlogArticle toBlogArticle() {
         BlogArticle article = new BlogArticle();
-        article.setTitle(getArticleTitle());
-        article.setDescription(getArticleBody());
+        article.setTitle(getTitle());
+        article.setDescription(getNoteContent().getDescription());
         article.setAuthor(getUser().getName());
         return article;
     }

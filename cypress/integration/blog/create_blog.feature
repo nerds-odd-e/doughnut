@@ -8,9 +8,9 @@ Feature: Create Blog with Year-Date Structure
     And there is a blog site links to blog notebook "odd-e-blog"
     When I add a new blog article in "odd-e-blog" with title "Why it is so confusing?"
     And I open the Blog page
-#    Then I should see a blog post on the Blog page
-#      | Title       | Description       | AuthorName  |
-#      | Why it is so confusing? |  | old_learner |
+    Then I should see a blog post on the Blog page
+      | Title       | Description       | AuthorName  |
+      | Why it is so confusing? |  | Old Learner |
 
   @ignore
   Scenario: After a blog post is created, the blog post's year should appear on blog-site's side navbar
