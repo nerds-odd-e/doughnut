@@ -24,10 +24,6 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 public class BlogArticle {
-    @Id
-    @Getter
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
 
     @Getter
     @Setter

@@ -23,6 +23,12 @@ import static java.util.stream.Collectors.toList;
 @Entity
 @Table(name = "note")
 public class Note {
+    public BlogArticle toBlogArticle() {
+        BlogArticle article = new BlogArticle();
+        article.setTitle(getArticleTitle());
+        article.setDescription(getArticleBody());
+        return article;
+    }
 
     public static class NoteApiResult {
         @Getter

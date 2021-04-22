@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.entities.BlogArticle;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.models.UserModel;
@@ -66,9 +67,9 @@ public class RestApiControllerTest {
         makeMe.refresh(headNote);
         makeMe.refresh(note);
 
-        List<Note> articles = controller.getBlogArticlesByWebsiteName(headNote.getTitle());
+        List<BlogArticle> articles = controller.getBlogArticlesByWebsiteName(headNote.getTitle());
 
         assertThat(articles.size(), equalTo(1));
-        assertThat(articles.get(0).getArticleTitle(), equalTo(note.getArticleTitle()));
+        assertThat(articles.get(0).getTitle(), equalTo(note.getArticleTitle()));
     }
 }

@@ -32,19 +32,13 @@ var app = new Vue({
         "year": "2021",
         "link": "abc"
     });
-    this.articleList.push({
-        "title" : "Hello World",
-        "authorName" : "John Doe",
-        "createdAt" : "20th December 2021",
-        "content" : "This is first article's content"
-    });
-//    axios
-//        .get(this.apiUrl)
-//            .then((res) => {
-//                this.articleList = res.data;
-//            })
-//            .catch((res) => {
-//                alert("Error");
-//            });
+    axios
+        .get(this.apiUrl)
+            .then((res) => {
+                this.articleList = res.data;
+            })
+            .catch((res) => {
+                alert("Error");
+            });
   }
 });

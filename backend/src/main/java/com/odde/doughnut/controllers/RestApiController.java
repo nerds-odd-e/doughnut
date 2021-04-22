@@ -1,6 +1,7 @@
 
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.entities.BlogArticle;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.models.BazaarModel;
@@ -9,9 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:8000")
@@ -52,8 +51,7 @@ class RestApiController {
     }
 
     @GetMapping("/blog_articles_by_website_name/{websiteName}")
-    public List<Note> getBlogArticlesByWebsiteName(@PathVariable String websiteName) {
-        List<Note> articles = new ArrayList<>();
+    public List<BlogArticle> getBlogArticlesByWebsiteName(@PathVariable String websiteName) {
         Notebook notebook = modelFactoryService.noteRepository.findFirstByTitle(websiteName).getNotebook();
         return notebook.getArticles();
     }
