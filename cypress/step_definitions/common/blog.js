@@ -73,7 +73,7 @@ And("There are some notes in the notebook", (data) => {
 When("I add a new blog article in {string} with title {string}", (blogTitle,articleTitle) => {
     cy.visitMyNotebooks();
     cy.navigateToNotePage(blogTitle);
-    cy.addArticle([{Title: articleTitle }]);
+    cy.addArticle([{Title: articleTitle, Description: "description" }]);
 });
 
 Then("I should see a blog post on the Blog page created today", (data) => {
