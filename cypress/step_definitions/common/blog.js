@@ -39,7 +39,7 @@ Given("There is a notebook titled {string} with type Blog in Doughnut", (title) 
   cy.loginAs('developer');
   cy.visitMyNotebooks();
   cy.findByText("Add New Notebook").click();
-  //TODO need to set the notebook type to blog
+  cy.get("#note-notebookType").select("BLOG");
   cy.submitNoteFormWith([{Title:title}]);
 });
 

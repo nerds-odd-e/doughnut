@@ -360,7 +360,7 @@ public class Note {
     }
 
     public Boolean isArticle(){
-        return !isHead();
+        return !isHead() && noteContent.getDescription() != null;
     }
 }
 

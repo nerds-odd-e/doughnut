@@ -60,7 +60,7 @@ class RestApiController {
 
     @GetMapping("/blog/yearmonth")
     public List<BlogYearMonth> getBlogYearMonthList() {
-        Note note = modelFactoryService.noteRepository.findFirstByTitle("odd-e blog");
+        Note note = modelFactoryService.noteRepository.findFirstByTitle("odd-e-blog");
 
         BlogModel blogModel = modelFactoryService.toBlogModel(note);
         List<BlogYearMonth> yearMonths = blogModel.getBlogYearMonths(note);
