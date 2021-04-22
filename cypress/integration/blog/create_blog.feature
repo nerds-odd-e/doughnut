@@ -4,7 +4,7 @@ Feature: Create Blog with Year-Date Structure
     Given I've logged in as an existing user
 
   Scenario: Create a new blog article in odd-e-blog
-    Given I add a new blog "odd-e-blog"
+    Given There is a blog titled 'odd-e-blog' in Doughnut
     And there is a blog site links to blog notebook "odd-e-blog"
     When I add a new blog article in "odd-e-blog" with title "Why it is so confusing?"
     And I open the Blog page

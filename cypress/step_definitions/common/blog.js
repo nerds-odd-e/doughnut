@@ -6,25 +6,15 @@ import {
   Before
 } from "cypress-cucumber-preprocessor/steps";
 
-
-Given("I add a new blog {string}", (title) => {
+Given("There is a blog titled {string} in Doughnut", (title) => {
   cy.visitMyNotebooks();
   cy.findByText("Add New Notebook").click();
   cy.get('select').select("BLOG");
-  cy.findByLabelText("Title").type(title);
-  cy.get('input[value="Submit"]').click();
+  cy.submitNoteFormWith([{Title:title}]);
 });
 
 And("there is a blog site links to blog notebook {string}", (title) => {
 
-});
-
-When("I add a new blog article in {string} with title {string}", (blogTitle,articleTitle) => {
-    cy.visitMyNotebooks();
-    cy.navigateToNotePage(blogTitle);
-    cy.findByText("(Add Article)").click();
-    cy.findByLabelText("Title").type(articleTitle);
-    cy.get('input[value="Submit"]').click();
 });
 
 Given("There is a Blog Notebook called odd-e blog", (data) => {
@@ -35,13 +25,7 @@ Given("There is a Blog Notebook called odd-e blog", (data) => {
   cy.submitNoteFormWith(data.hashes());
 });
 
-Given("There is a notebook titled {string} with type Blog in Doughnut", (title) => {
-  cy.loginAs('developer');
-  cy.visitMyNotebooks();
-  cy.findByText("Add New Notebook").click();
-  cy.get("#note-notebookType").select("BLOG");
-  cy.submitNoteFormWith([{Title:title}]);
-});
+
 
 And("A blog is posted in {string}", (blogNotebook, data) => {
     cy.findByText("(Add Child Note)").click();
@@ -83,8 +67,13 @@ Then("the left panel should show Years list", () => {
   });
 });
 And("There are some notes in the notebook", (data) => {
-    cy.findByText("(Add Article)").click();
-    cy.submitNoteFormWith(data.hashes());
+    cy.addArticle(data.hashes());
+});
+
+When("I add a new blog article in {string} with title {string}", (blogTitle,articleTitle) => {
+    cy.visitMyNotebooks();
+    cy.navigateToNotePage(blogTitle);
+    cy.addArticle([{Title: articleTitle }]);
 });
 
 Then("I should see a blog post on the Blog page", (data) => {
