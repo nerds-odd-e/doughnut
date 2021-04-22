@@ -96,6 +96,11 @@ public class NoteContent {
     @Setter
     private Timestamp updatedDatetime = new Timestamp(System.currentTimeMillis());
 
+    @Transient
+    @Getter
+    @Setter
+    private NotebookType notebookType = NotebookType.GENERAL;
+
     public String getNotePicture() {
         if (uploadPicture != null) {
             return "/images/" + uploadPicture.getId() + "/" + uploadPicture.getName();

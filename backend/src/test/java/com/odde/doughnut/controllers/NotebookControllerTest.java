@@ -1,8 +1,7 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.NoAccessRightException;
-import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.testability.MakeMe;
@@ -15,11 +14,13 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ExtendedModelMap;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.servlet.view.RedirectView;
 
+import java.io.IOException;
+
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -76,7 +77,31 @@ class NotebookControllerTest {
                     controller.update(note.getNotebook(), makeMe.successfulBindingResult())
             );
         }
+    }
 
+    @Nested
+    class createNotebook {
+        @Test
+        void shouldCreateNotebookAsABlogWhenBlogTypeIsSelected() throws IOException {
 
+            User user = makeMe.aUser().please();
+            Ownership ownership = user.getOwnership();
+            Note note = makeMe.aNote().byUser(user).please(false);
+
+            NoteContent noteContent = note.getNoteContent();
+            noteContent.setNotebookType(NotebookType.BLOG);
+
+            BindingResult bindingResult = makeMe.successfulBindingResult();
+            String response = controller.createNote(ownership, noteContent, bindingResult);
+
+            assertThat(response, matchesPattern("redirect:/notes/\\d+"));
+
+            String[] split = response.split("/");
+            Integer id = Integer.valueOf(split[split.length - 1]);
+            Note createdNote = modelFactoryService.findNoteById(id).get();
+
+            Notebook blogNotebook = createdNote.getNotebook();
+            assertEquals(NotebookType.BLOG, blogNotebook.getNotebookType());
+        }
     }
 }

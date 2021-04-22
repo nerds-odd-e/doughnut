@@ -344,6 +344,8 @@ public class Note {
 
     public void buildNotebookForHeadNote(Ownership ownership, User creator) {
         final Notebook notebook = new Notebook();
+        NotebookType notebookType = this.getNoteContent().getNotebookType();
+        notebook.setNotebookType(notebookType);
         assignNotebookForHeadNote(notebook, ownership, creator);
     }
 

@@ -61,8 +61,6 @@ public class NoteController extends ApplicationMvcController  {
         return "redirect:/notes/" + note.getId();
     }
 
-
-
     private Note injectTimeStampStructureIfNeeded(final Note parentNote, User user) throws IOException {
         if (parentNote.getNotebook().getNotebookType().equals(NotebookType.BLOG)) {
             LocalDate now = LocalDate.now();
