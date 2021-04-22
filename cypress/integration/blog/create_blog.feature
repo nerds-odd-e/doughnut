@@ -3,12 +3,12 @@ Feature: Create Blog with Year-Date Structure
   Background:
     Given I've logged in as an existing user
 
-  @ignore
-  Scenario: Create a new blog
-    Given I add a new blog notebook "Blog One"
-    And there is a blog site links to blog notebook "Blog One"
-    When I add a new blog article in "Blog One" with title "Why it is so confusing?"
-    Then I should see the new blog "Why it is so confusing?" in the blog site
+  Scenario: Create a new blog article in odd-e blog
+    Given I add a new blog notebook "odd-e blog"
+    And there is a blog site links to blog notebook "odd-e blog"
+    When I add a new blog article in "odd-e blog" with title "Why it is so confusing?"
+    Then I open the blog page
+#    And I should see a blog post titled 'Hello World' on the Blog page
 
   @ignore
   Scenario: After a blog post is created, the blog post's year should appear on blog-site's side navbar
