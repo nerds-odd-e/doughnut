@@ -76,6 +76,15 @@ When("I add a new blog article in {string} with title {string}", (blogTitle,arti
     cy.addArticle([{Title: articleTitle, Description: "description" }]);
 });
 
+When("I add a new blog article with this information", (data) => {
+
+    //blogTitle = data.hashes()[0]['Title'];
+    //blogDesc = data.hashes()[0]['Description'];
+    cy.visitMyNotebooks();
+    cy.navigateToNotePage(data.hashes()[0]['Title']);
+    cy.addArticle([{Title: data.hashes()[0]['Title'], Description: data.hashes()[0]['Description']}]);
+});
+
 Then("I should see a blog post on the Blog page created today", (data) => {
     cy.assertArticleInWebsiteByTitle(
         {
