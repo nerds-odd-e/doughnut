@@ -7,7 +7,7 @@ import {
 } from "cypress-cucumber-preprocessor/steps";
 
 
-Given("I add a new blog notebook {string}", (title) => {
+Given("I add a new blog {string}", (title) => {
   cy.visitMyNotebooks();
   cy.findByText("Add New Notebook").click();
   cy.get('select').select("BLOG");
@@ -22,7 +22,7 @@ And("there is a blog site links to blog notebook {string}", (title) => {
 When("I add a new blog article in {string} with title {string}", (blogTitle,articleTitle) => {
     cy.visitMyNotebooks();
     cy.navigateToNotePage(blogTitle);
-    cy.findByText("(Add Child Note)").click();
+    cy.findByText("(Add New Article)").click();
     cy.findByLabelText("Title").type(articleTitle);
     cy.get('input[value="Submit"]').click();
 });

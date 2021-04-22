@@ -167,6 +167,10 @@ public class Note {
         return getParentNote() == null;
     }
 
+    public boolean isBlogType() {
+        return this.getNotebook().getNotebookType() == NotebookType.BLOG;
+    }
+
     private void addAncestors(List<Note> ancestors) {
         int[] counter = {1};
         ancestors.forEach(anc -> {

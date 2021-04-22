@@ -201,7 +201,12 @@
     <div th:replace=":: noteOwnerBreadcrumb(${note}, ~{:: .additional-item})">
         <li class="breadcrumb-item additional-item" th:text="${note.title}"/>
         <li class="breadcrumb-item additional-item">
-            <a class="text-secondary" th:href="@{/notes/{id}/new(id=${note.id})}">(Add Child Note)</a>
+            <a class="text-secondary" th:href="@{/notes/{id}/new(id=${note.id})}" th:if="${note.isBlogType}">
+                (Add New Article)
+            </a>
+            <a class="text-secondary" th:href="@{/notes/{id}/new(id=${note.id})}" th:unless="${note.isBlogType}">
+                (Add Child Note)
+            </a>
         </li>
     </div>
     <div th:if="${!note.isHead()}">
