@@ -4,7 +4,7 @@ Feature: Publish a note from doughnut to odd-e blog site
     And There are some notes in the notebook
     | Title       | Description       |
     | Hello World | Content Article 1 |
-    When I open the blog page
+    When I open the Blog page
     Then I should see a blog post on the Blog page
     | Title       | Description       |
     | Hello World | Content Article 1 |

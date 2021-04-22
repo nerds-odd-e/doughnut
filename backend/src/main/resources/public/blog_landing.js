@@ -5,7 +5,7 @@ var app = new Vue({
     blogInfo: [],
     yearMonthList: [],
     articleList: [],
-    apiUrl: "../api/blog_articles_by_website_name/odd-e-blog"
+    apiUrl: "../api/blog_articles_by_website_name/odd-e-blog",
     apiYearsUrl: "../api/blog/yearmonth"
   },
   created: function() {
@@ -25,6 +25,5 @@ var app = new Vue({
             .catch((res) => {
                 alert("Error");
             });
-    });
   }
 });

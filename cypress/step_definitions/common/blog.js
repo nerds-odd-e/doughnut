@@ -65,8 +65,7 @@ Given("There is no Notebook type blog", () => {
 });
 
 When("I open the Blog page", () => {
-  //cy.visitBlog();
-  cy.visit("http://localhost:8081/blog_landing.html");
+  cy.visitBlog();
 });
 
 Then("the left panel should show empty", () => {
