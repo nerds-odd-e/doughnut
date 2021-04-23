@@ -11,12 +11,11 @@ Feature: Create Blog with Year-Date Structure
       | Title       | Description       | AuthorName  |
       | My First Blog Post |  | Old Learner |
 
-  @ignore
   Scenario: After a blog post is created, the blog post's year should appear on blog-site's side navbar
-    Given There are no existing blog created in 2021
-    And I create a new blog post "How to use Donut" on 20 Apr 2021
-    When I visit the blog-site
-    Then I should see 2021 on the blog-site's side navbar
+    Given There is a blog titled 'odd-e-blog' in Doughnut
+    When I add a new blog article in "odd-e-blog" with title "My First Blog Post"
+    And I open the Blog page
+    Then I should see the current year on the blog-site's side navbar
 
   @ignore
   Scenario:  After two blog posts with different years are created, two years should appear on blog-site's side navbar

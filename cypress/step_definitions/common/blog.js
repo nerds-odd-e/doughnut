@@ -23,8 +23,7 @@ Given("There is a Blog Notebook called odd-e blog", (data) => {
 });
 
 Then("I should see the current year on the blog-site's side navbar", ()=>{
-     var yearList = cy.get('.yearList');
-     cy.log(yearList);
+    cy.get('.yearList').children().contains(new Date().getFullYear()).should('have.length', 1);
 });
 
 And("A blog is posted in {string}", (blogNotebook, data) => {
