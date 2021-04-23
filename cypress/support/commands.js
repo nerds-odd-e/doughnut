@@ -85,8 +85,9 @@ Cypress.Commands.add("submitNoteFormWith", (notes) => {
                               mimeType: 'image/png'
                   });
                 });
-            }
-            else {
+            } else if ($input.is('select')) {
+              cy.wrap($input).select(value);
+            } else {
               cy.wrap($input).clear().type(value);
             }
         });

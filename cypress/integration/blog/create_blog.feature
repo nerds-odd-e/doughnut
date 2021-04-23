@@ -24,12 +24,11 @@ Feature: Create Blog with Year-Date Structure
     When I visit the blog-site
     Then I should see 2019 and 2021 on the blog-site's side navbar
 
-  @ignore
   Scenario: After creating a blog article, the year note is automatically created
     Given There is a Blog Notebook called odd-e blog
       | Title      | Description |
       | odd-e blog | test        |
     When after creating a blog article "First Article"
-      | Title      | Description |
+      | Title         | Description |
       | First Article | test        |
     Then I should see "odd-e blog, {YYYY}, {MMM}, First Article" in breadcrumb
