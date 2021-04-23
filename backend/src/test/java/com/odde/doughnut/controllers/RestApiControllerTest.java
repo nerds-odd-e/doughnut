@@ -1,8 +1,6 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.entities.BlogArticle;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.Notebook;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
@@ -71,12 +69,13 @@ public class RestApiControllerTest {
         String monthNoteTitle = now.getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH);
         String dayNoteTitle = String.valueOf(day);
 
-        Note headNote = makeMe.aNote("odd-e-blog").withNoDescription().please();
+        Notebook notebook = makeMe.aNotebook().please();
+        Note headNote = notebook.getHeadNote();
+        headNote.getNoteContent().setTitle("odd-e-blog");
         Note yearNote = makeMe.aNote(yearNoteTitle).withNoDescription().under(headNote).please();
         Note monthNote = makeMe.aNote(monthNoteTitle).withNoDescription().under(yearNote).please();
         Note dayNote = makeMe.aNote(dayNoteTitle).withNoDescription().under(monthNote).please();
         Note note = makeMe.aNote("Hello World").description("Hello World").under(dayNote).please();
-        Notebook notebook = headNote.getNotebook();
         makeMe.refresh(notebook);
         makeMe.refresh(headNote);
         makeMe.refresh(yearNote);

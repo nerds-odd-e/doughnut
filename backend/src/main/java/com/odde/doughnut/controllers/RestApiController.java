@@ -1,10 +1,7 @@
 
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.entities.BlogArticle;
-import com.odde.doughnut.entities.BlogYearMonth;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.Notebook;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.models.BazaarModel;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.BlogModel;
@@ -13,6 +10,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:8000")
@@ -54,14 +52,15 @@ class RestApiController {
 
     @GetMapping("/blog_articles_by_website_name/{websiteName}")
     public List<BlogArticle> getBlogArticlesByWebsiteName(@PathVariable String websiteName) {
-        Notebook notebook = modelFactoryService.noteRepository.findFirstByTitle(websiteName).getNotebook();
-        return notebook.getArticles();
+        Note headNote = modelFactoryService.noteRepository.findFirstByTitle(websiteName);
+        List<NotesClosure> noteClosures = headNote.getDescendantNCs();
+        List<NotesClosure> filteredClosures = noteClosures.stream().filter(closure -> closure.getDepth() >= 4).collect(Collectors.toList());
+        return filteredClosures.stream().map(x -> x.getNote().toBlogArticle()).collect(Collectors.toList());
     }
 
     @GetMapping("/blog/yearmonth")
     public List<BlogYearMonth> getBlogYearMonthList() {
         Note note = modelFactoryService.noteRepository.findFirstByTitle("odd-e-blog");
-
         BlogModel blogModel = modelFactoryService.toBlogModel(note);
         List<BlogYearMonth> yearMonths = blogModel.getBlogYearMonths(note);
 

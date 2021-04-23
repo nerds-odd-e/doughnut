@@ -9,7 +9,7 @@ Feature: Create Blog with Year-Date Structure
     And I open the Blog page
     Then I should see a blog post on the Blog page created today
       | Title       | Description       | AuthorName  |
-      | My First Blog Post | description | Old Learner |
+      | My First Blog Post |  | Old Learner |
 
   @ignore
   Scenario: After a blog post is created, the blog post's year should appear on blog-site's side navbar
