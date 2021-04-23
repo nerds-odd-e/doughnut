@@ -41,5 +41,7 @@ public class BlogArticle {
     @Setter
     private String createdDatetime;
 
-
+    @Getter
+    @Setter
+    private BlogYearMonth yearMonth;
 }

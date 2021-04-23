@@ -129,6 +129,17 @@ public class Note {
     @Getter
     private final List<Note> children = new ArrayList<>();
 
+    @JoinTable(name = "notes_closure", joinColumns = {
+            @JoinColumn(name = "ancestor_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)}, inverseJoinColumns = {
+            @JoinColumn(name = "note_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
+    })
+    @OneToMany(cascade = CascadeType.DETACH)
+    @JsonIgnore
+    @WhereJoinTable(clause = "depth = 4")
+    @OrderBy("sibling_order")
+    @Getter
+    private final List<Note> greatGreatGrandChildren = new ArrayList<>();
+
     @Override
     public String toString() {
         return "Note{" + "id=" + id + ", title='" + noteContent.getTitle() + '\'' + '}';

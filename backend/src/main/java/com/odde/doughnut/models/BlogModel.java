@@ -11,6 +11,7 @@ import org.springframework.data.repository.Repository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class BlogModel extends ModelForEntity<Note> {
     public BlogModel(Note entity, ModelFactoryService modelFactoryService) {
@@ -36,14 +37,37 @@ public class BlogModel extends ModelForEntity<Note> {
         return years;
     }
 
-    public List<BlogArticle> getBlogArticles() {
-
-        List<BlogArticle> result = new ArrayList<BlogArticle>();
-
-
-        return result;
+    public List<BlogArticle> getBlogArticles(Note parentNote, BlogYearMonth targetYearMonth) {
+        return getArticlesFromHeadNote(parentNote, targetYearMonth);
     }
-    public void getBlogArticle(int blogNoteBookId) {
+
+    private List<BlogArticle> getArticlesFromHeadNote(Note parentNote, BlogYearMonth targetYearMonth){
+        List<BlogArticle> articles = new ArrayList<BlogArticle>();
+        if(parentNote !=null){
+            articles.addAll(parentNote.getGreatGreatGrandChildren().stream().filter(article -> isRealArticle(article, targetYearMonth)).map(note -> note.toBlogArticle()).collect(Collectors.toList()));
+        }
+        return articles;
+    }
+
+    private boolean isRealArticle(Note note, BlogYearMonth targetYearMonth){
+        BlogYearMonth articleYearMonth = getArticleYearMonth(note);
+        return articleYearMonth.getYear().equals(targetYearMonth.getYear()) && articleYearMonth.getMonth().equals(targetYearMonth.getMonth());
 
     }
+
+    private BlogYearMonth getArticleYearMonth(Note article) {
+
+        if(article != null) {
+            Note date = article.getParentNote();
+            Note month = article.getParentNote().getParentNote();
+            Note year = article.getParentNote().getParentNote().getParentNote();
+
+            BlogYearMonth yearMonth = new BlogYearMonth(year.getTitle(), month.getTitle());
+
+            return yearMonth;
+        }
+
+        return new BlogYearMonth("all","all");
+    }
+
 }

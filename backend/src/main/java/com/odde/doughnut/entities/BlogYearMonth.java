@@ -25,10 +25,9 @@ import static java.util.stream.Collectors.toList;
 public class BlogYearMonth {
 
     @Getter
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Setter
     private String year;
 
-    @NotNull
     @Getter
     @Setter
     private String month;

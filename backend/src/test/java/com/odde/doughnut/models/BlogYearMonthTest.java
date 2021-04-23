@@ -1,5 +1,6 @@
 package com.odde.doughnut.models;
 
+import com.odde.doughnut.entities.BlogYearMonth;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -10,6 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
+import java.time.format.TextStyle;
+import java.util.Locale;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -48,6 +53,33 @@ public class BlogYearMonthTest {
         assertTrue(blogModel.getBlogYearMonths(headNote.getId()).size()==3);
     }
 
+    @Test
+    void shouldGetArticleList() {
 
+        LocalDate now = LocalDate.now();
+        int year = now.getYear();
+
+        int day = now.getDayOfMonth();
+        String yearNoteTitle = String.valueOf(year);
+        String monthNoteTitle = now.getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH);
+        String dayNoteTitle = String.valueOf(day);
+
+        Note headNote = makeMe.aNote("odd-e-blog").withNoDescription().please();
+        Note yearNote = makeMe.aNote(yearNoteTitle).withNoDescription().under(headNote).please();
+        Note monthNote = makeMe.aNote(monthNoteTitle).withNoDescription().under(yearNote).please();
+        Note dayNote = makeMe.aNote(dayNoteTitle).withNoDescription().under(monthNote).please();
+        Note note1 = makeMe.aNote("Article #1").description("Hello World").under(dayNote).please();
+        Note note2 = makeMe.aNote("Article #2").description("Hello World").under(dayNote).please();
+
+        BlogModel blogModel = new BlogModel(headNote, modelFactoryService);
+        makeMe.refresh(headNote);
+        makeMe.refresh(yearNote);
+        makeMe.refresh(monthNote);
+        makeMe.refresh(dayNote);
+        makeMe.refresh(note2);
+        makeMe.refresh(note1);
+        BlogYearMonth targetYearMonth = new BlogYearMonth("2021", "Apr");
+        assertTrue(blogModel.getBlogArticles(headNote,targetYearMonth).size()==2);
+    }
 
 }
