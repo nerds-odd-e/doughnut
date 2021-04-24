@@ -38,20 +38,8 @@ public class RestApiControllerTest {
 
     @Test
     void getBlogArticlesByWebsiteName() {
-        LocalDate now = LocalDate.now();
-        int year = now.getYear();
-
-        int day = now.getDayOfMonth();
-        String yearNoteTitle = String.valueOf(year);
-        String monthNoteTitle = now.getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH);
-        String dayNoteTitle = String.valueOf(day);
-
-
         Note headNote = makeMe.aNote("odd-e-blog").withNoDescription().please();
-        Note yearNote = makeMe.aNote(yearNoteTitle).withNoDescription().under(headNote).please();
-        Note monthNote = makeMe.aNote(monthNoteTitle).withNoDescription().under(yearNote).please();
-        Note dayNote = makeMe.aNote(dayNoteTitle).withNoDescription().under(monthNote).please();
-        Note note = makeMe.aNote("1989/06/04: Hello World").description("Hello World").under(dayNote).please();
+        Note note = makeMe.aNote("1989/06/04: Hello World").description("Hello World").under(headNote).please();
         makeMe.refresh(headNote);
 
         List<BlogArticle> articles = controller.getBlogPostsByWebsiteName(headNote.getTitle());
@@ -61,6 +49,5 @@ public class RestApiControllerTest {
         assertThat(article.getTitle(), equalTo("Hello World"));
         assertThat(article.getDescription(), equalTo(note.getNoteContent().getDescription()));
         assertThat(article.getAuthor(), equalTo(note.getUser().getName()));
-        assertThat(article.getCreatedDatetime(), equalTo(note.getArticleDate()));
     }
 }

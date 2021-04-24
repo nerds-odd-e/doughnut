@@ -104,13 +104,4 @@ public class MakeMe {
     public NotebookBuilder aNotebook() {
         return new NotebookBuilder(this);
     }
-
-    public NoteBuilder aBlog() {
-        Note note = new Note();
-        return new NoteBuilder(note, this);
-    }
-
-    public NoteBuilder aBlog(String title) {
-        return aNote(title);
-    }
 }

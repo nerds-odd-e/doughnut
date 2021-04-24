@@ -52,8 +52,4 @@ public class Notebook {
     public Notebook(NotebookType type) {
         notebookType = type;
     }
-
-    public List<BlogArticle> getArticles(){
-        return getNotes().stream().filter(Note::isArticle).map(Note::toBlogPost).collect(Collectors.toList());
-    }
 }

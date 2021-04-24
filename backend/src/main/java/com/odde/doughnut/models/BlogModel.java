@@ -26,7 +26,7 @@ public class BlogModel extends ModelForEntity<Note> {
     }
 
     public List<BlogYearMonth> getBlogYearMonths(Note headNote) {
-        List<BlogYearMonth> years = new ArrayList<BlogYearMonth>();
+        List<BlogYearMonth> years = new ArrayList<>();
 
         List<Note> noteYears = headNote.getChildren();
 
@@ -35,33 +35,22 @@ public class BlogModel extends ModelForEntity<Note> {
         return years;
     }
 
-    public List<BlogArticle> getBlogPosts(Note parentNote, BlogYearMonth targetYearMonth) {
+    public List<BlogArticle> getBlogPosts(Note parentNote) {
         if (parentNote == null) {
             return new ArrayList<>();
         }
-        return parentNote.getGreatGreatGrandChildren().stream()
-                .filter(post -> isRealBlogPost(post, targetYearMonth))
-                .map(Note::toBlogPost)
+        return parentNote.getChildren().stream()
+                .map(this::toBlogPost)
                 .collect(Collectors.toList());
     }
 
-    private boolean isRealBlogPost(Note note, BlogYearMonth targetYearMonth){
-        BlogYearMonth articleYearMonth = getArticleYearMonth(note);
-        return articleYearMonth.getYear().equals(targetYearMonth.getYear()) && articleYearMonth.getMonth().equals(targetYearMonth.getMonth());
-
-    }
-
-    private BlogYearMonth getArticleYearMonth(Note article) {
-
-        if (article == null) {
-            return new BlogYearMonth("all","all");
-        }
-        Note date = article.getParentNote();
-        Note month = article.getParentNote().getParentNote();
-        Note year = article.getParentNote().getParentNote().getParentNote();
-
-        return new BlogYearMonth(year.getTitle(), month.getTitle());
-
+    public BlogArticle toBlogPost(Note note) {
+        BlogArticle article = new BlogArticle();
+        article.setTitle(note.getTitle().split(": ")[1]);
+        article.setDescription(note.getNoteContent().getDescription());
+        article.setAuthor(note.getUser().getName());
+        article.setCreatedDatetime(note.getTitle().split(": ")[0]);
+        return article;
     }
 
 }

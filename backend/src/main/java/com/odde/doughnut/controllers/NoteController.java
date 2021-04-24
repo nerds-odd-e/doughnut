@@ -18,9 +18,6 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import javax.validation.Valid;
 import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.TextStyle;
-import java.util.Locale;
 
 @Controller
 @RequestMapping("/notes")
@@ -50,49 +47,12 @@ public class NoteController extends ApplicationMvcController  {
         UserModel userModel = getCurrentUser();
         userModel.getAuthorization().assertAuthorization(parentNote);
         User user = userModel.getEntity();
-
-        if (parentNote.getNotebook().getNotebookType().equals(NotebookType.BLOG)) {
-            parentNote = injectingYearAndMonth(parentNote, user);
-        }
-
         Note note = new Note();
         note.updateNoteContent(noteContent, user);
         note.setParentNote(parentNote);
         note.setUser(user);
         modelFactoryService.noteRepository.save(note);
         return "redirect:/notes/" + note.getId();
-    }
-
-    private Note injectingYearAndMonth(Note parentNote, User user) throws IOException {
-        LocalDate now = LocalDate.now();
-        int year = now.getYear();
-
-        int day = now.getDayOfMonth();
-        String yearNoteTitle = String.valueOf(year);
-        String monthNoteTitle = now.getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH);
-        String dayNoteTitle = String.valueOf(day);
-
-        Note yearNote = getOrCreateNoteInNotebook(parentNote, user, yearNoteTitle);
-
-        Note monthNote = getOrCreateNoteInNotebook(yearNote, user, monthNoteTitle);
-
-        return getOrCreateNoteInNotebook(monthNote, user, dayNoteTitle);
-    }
-
-    private Note getOrCreateNoteInNotebook(Note parentNote, User user, String noteTitle) throws IOException {
-        Note existingNote = parentNote.getNotebook().getNotes().stream().filter(note -> note.getTitle().equals(noteTitle)).findFirst().orElse(null);
-        if(existingNote != null){
-            return existingNote;
-        }
-
-        NoteContent noteContent = new NoteContent();
-        noteContent.setTitle(noteTitle);
-        Note note = new Note();
-        note.updateNoteContent(noteContent, user);
-        note.setParentNote(parentNote);
-        note.setUser(user);
-        modelFactoryService.noteRepository.save(note);
-        return note;
     }
 
 

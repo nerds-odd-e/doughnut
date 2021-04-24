@@ -16,6 +16,7 @@ import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.Locale;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(SpringExtension.class)
@@ -50,31 +51,18 @@ public class BlogYearMonthTest {
         makeMe.refresh(note1);
         makeMe.refresh(note2);
         makeMe.refresh(note3);
-        assertTrue(blogModel.getBlogYearMonths(headNote.getId()).size()==3);
+        assertEquals(3, blogModel.getBlogYearMonths(headNote.getId()).size());
     }
 
     @Test
     void shouldGetBlogPostList() {
-
-        LocalDate now = LocalDate.now();
-        int year = now.getYear();
-
-        int day = now.getDayOfMonth();
-        String yearNoteTitle = String.valueOf(year);
-        String monthNoteTitle = now.getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH);
-        String dayNoteTitle = String.valueOf(day);
-
         Note headNote = makeMe.aNote("odd-e-blog").withNoDescription().please();
-        Note yearNote = makeMe.aNote(yearNoteTitle).withNoDescription().under(headNote).please();
-        Note monthNote = makeMe.aNote(monthNoteTitle).withNoDescription().under(yearNote).please();
-        Note dayNote = makeMe.aNote(dayNoteTitle).withNoDescription().under(monthNote).please();
-        Note note1 = makeMe.aNote("1999/11/31: Article #1").description("Hello World").under(dayNote).please();
-        Note note2 = makeMe.aNote("1999/12/31: Article #2").description("Hello World").under(dayNote).please();
+        Note note1 = makeMe.aNote("1999/11/31: Article #1").description("Hello World").under(headNote).please();
+        Note note2 = makeMe.aNote("1999/12/31: Article #2").description("Hello World").under(headNote).please();
 
         BlogModel blogModel = new BlogModel(headNote, modelFactoryService);
         makeMe.refresh(headNote);
-        BlogYearMonth targetYearMonth = new BlogYearMonth("2021", "Apr");
-        assertTrue(blogModel.getBlogPosts(headNote,targetYearMonth).size()==2);
+        assertEquals(2, blogModel.getBlogPosts(headNote).size());
     }
 
 }

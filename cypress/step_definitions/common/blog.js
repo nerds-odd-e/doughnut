@@ -14,8 +14,8 @@ Given("There is a blog titled {string} in Doughnut", (title) => {
 });
 
 
-Then("I should see the current year on the blog-site's side navbar", ()=>{
-    cy.get('.yearList').children().contains(new Date().getFullYear()).should('have.length', 1);
+Then("I should see year {int} on the blog-site's side navbar", (year)=>{
+    cy.get('.yearList').children().contains(`${year}`).should('have.length', 1);
 });
 
 And("A blog is posted in {string}", (blogNotebook, data) => {
@@ -48,13 +48,7 @@ And("There are some posts in the blog", (data) => {
     cy.addBlogPost(data.hashes());
 });
 
-When("I add a new blog article in {string} with title {string}", (blogTitle,articleTitle) => {
-    cy.visitMyNotebooks();
-    cy.navigateToNotePage(blogTitle);
-    cy.addBlogPost([{Title: articleTitle }]);
-});
-
-When("I add a new blog article in {string} on {string} with title {string}", (blogTitle, date, articleTitle) => {
+When("I add a new blog post in {string} on {string} with title {string}", (blogTitle, date, articleTitle) => {
     cy.visitMyNotebooks();
     cy.navigateToNotePage(blogTitle);
     cy.addBlogPost([{Title: articleTitle, date}]);
@@ -64,13 +58,13 @@ When("I add a new blog article with this information", (data) => {
     cy.addBlogPost([{Title: data.hashes()[0]['Title'], Description: data.hashes()[0]['Description']}]);
 });
 
-Then("I should see a blog post on the Blog page created today", (data) => {
+Then("I should see a blog post on the Blog page", (data) => {
     cy.assertArticleInWebsiteByTitle(
         {
             title: data.hashes()[0]['Title'],
             description: data.hashes()[0]['Description'],
             authorName: data.hashes()[0]['AuthorName'],
-            createdAt: new Date().toLocaleString('en-GB', {day:'numeric', month: 'short', year:'numeric'})
+            createdAt: data.hashes()[0]['Date']
         }
     );
 });

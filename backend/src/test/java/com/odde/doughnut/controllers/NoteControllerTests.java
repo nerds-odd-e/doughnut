@@ -88,62 +88,6 @@ class NoteControllerTests {
             assertEquals("notes/new", response);
         }
 
-        @Test
-        void shouldCreateDateNotesWhenNotebookIsABlog() throws NoAccessRightException, IOException {
-            Note blog = makeMe.aBlog("This is a blog").byUser(userModel).inBlog(new Notebook(NotebookType.BLOG)).please();
-            BindingResult bindingResult = makeMe.successfulBindingResult();
-            String response = controller.createNote(blog, blog.getNoteContent(), bindingResult);
-
-            String[] split = response.split("/");
-            int id = Integer.parseInt(split[split.length - 1]);
-            Note createdArticle = modelFactoryService.findNoteById(id).get();
-            assertNotNull(createdArticle);
-
-            LocalDate d = LocalDate.now();
-            String y = String.valueOf(d.getYear());
-            String day = String.valueOf(d.getDayOfMonth());
-            String m = d.getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH);
-
-            Note dateNote = createdArticle.getParentNote();
-            assertNotNull(dateNote);
-            assertEquals(day, dateNote.getTitle());
-
-            Note monthNote = dateNote.getParentNote();
-            assertNotNull(monthNote);
-            assertEquals(m, monthNote.getTitle());
-
-            Note yearNote = monthNote.getParentNote();
-            assertNotNull(yearNote);
-            assertEquals(y, yearNote.getTitle());
-        }
-
-        @Test
-        void shouldNotCreateDateNotesWhenNotebookIsABlogIfExists() throws NoAccessRightException, IOException {
-
-            Notebook nb = makeMe.aNotebook().byUser(userModel).withType(NotebookType.BLOG).please();
-            makeMe.refresh(nb);
-            Note blog = makeMe.aNote("this is a blog head note").byUser(userModel).underNotebook(nb).please();
-            makeMe.refresh(blog);
-
-            BindingResult bindingResult = makeMe.successfulBindingResult();
-
-            String response = controller.createNote(blog, blog.getNoteContent(), bindingResult);
-            makeMe.refresh(nb);
-            makeMe.refresh(blog);
-            String[] split = response.split("/");
-            int id = Integer.parseInt(split[split.length - 1]);
-            Note createdArticle = modelFactoryService.findNoteById(id).get();
-
-            String response2 = controller.createNote(blog, blog.getNoteContent(), bindingResult);
-            makeMe.refresh(nb);
-            makeMe.refresh(blog);
-            String[] split2 = response2.split("/");
-            int id2 = Integer.parseInt(split2[split2.length - 1]);
-            Note createdArticle2 = modelFactoryService.findNoteById(id2).get();
-
-            assertEquals(createdArticle.getParentNote().getId(), createdArticle2.getParentNote().getId());
-        }
-
         @Nested
         class updateNoteTest {
             Note note;

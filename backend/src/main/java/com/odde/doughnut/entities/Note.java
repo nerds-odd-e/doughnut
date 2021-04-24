@@ -23,21 +23,6 @@ import static java.util.stream.Collectors.toList;
 @Entity
 @Table(name = "note")
 public class Note {
-    public BlogArticle toBlogPost() {
-        BlogArticle article = new BlogArticle();
-        article.setTitle(getTitle().split(": ")[1]);
-        article.setDescription(getNoteContent().getDescription());
-        article.setAuthor(getUser().getName());
-        article.setCreatedDatetime(getArticleDate());
-        return article;
-    }
-
-    public String getArticleDate() {
-        var dateNote = getParentNote();
-        var monthNote = dateNote.getParentNote();
-        var yearNote = monthNote.getParentNote();
-        return String.format("%s %s %s", dateNote.getTitle(), monthNote.getTitle(), yearNote.getTitle());
-    }
 
     public static class NoteApiResult {
         @Getter
@@ -128,17 +113,6 @@ public class Note {
     @OrderBy("sibling_order")
     @Getter
     private final List<Note> children = new ArrayList<>();
-
-    @JoinTable(name = "notes_closure", joinColumns = {
-            @JoinColumn(name = "ancestor_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)}, inverseJoinColumns = {
-            @JoinColumn(name = "note_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
-    })
-    @OneToMany(cascade = CascadeType.DETACH)
-    @JsonIgnore
-    @WhereJoinTable(clause = "depth = 4")
-    @OrderBy("sibling_order")
-    @Getter
-    private final List<Note> greatGreatGrandChildren = new ArrayList<>();
 
     @Override
     public String toString() {
@@ -385,5 +359,6 @@ public class Note {
     public Boolean isArticle(){
         return !isHead() && noteContent.getDescription() != null && !noteContent.getDescription().isEmpty();
     }
+
 }
 
