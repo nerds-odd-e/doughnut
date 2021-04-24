@@ -4,6 +4,6 @@ public enum NotebookType {
     GENERAL, BLOG;
 
     String getDisplay() {
-        return this == BLOG ? "Article" : "Child Note";
+        return this == BLOG ? "Blog Post" : "Child Note";
     }
 }

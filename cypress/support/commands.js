@@ -65,9 +65,12 @@ Cypress.Commands.add("triggerException", () => {
   cy.request({method: "POST", url: `/api/testability/trigger_exception`, failOnStatusCode: false});
 })
 
-Cypress.Commands.add("addArticle", (noteAttributes) => {
-    cy.findByText("(Add Article)").click();
-    cy.submitNoteFormsWith(noteAttributes);
+Cypress.Commands.add("addBlogPost", (hashes) => {
+    cy.findByText("(Add Blog Post)").click();
+    cy.submitNoteFormsWith(hashes.map(blogPostAttributes=>{
+        const {date, Title, rest} = blogPostAttributes;
+        return {...rest, Title: `${Title}`};
+    }));
 })
 
 Cypress.Commands.add("submitNoteFormWith", (noteAttributes) => {

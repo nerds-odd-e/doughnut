@@ -31,8 +31,7 @@ Then("I should see the current year on the blog-site's side navbar", ()=>{
 });
 
 And("A blog is posted in {string}", (blogNotebook, data) => {
-    cy.findByText("(Add Article)").click();
-    cy.submitNoteFormsWith(data.hashes());
+    cy.addBlogPost(data.hashes());
 });
 
 Given("There is no Notebook type blog", () => {
@@ -51,7 +50,6 @@ Given("There is a Notebook type blog with title 'odd-e-blog'", () => {
 
 });
 
-
 Then("the left panel should show Years list", () => {
   cy.get('.yearList').should((lis) => {
   expect(lis).to.have.length(1)
@@ -59,28 +57,23 @@ Then("the left panel should show Years list", () => {
 });
 
 And("There are some posts in the blog", (data) => {
-    cy.addArticle(data.hashes());
+    cy.addBlogPost(data.hashes());
 });
 
 When("I add a new blog article in {string} with title {string}", (blogTitle,articleTitle) => {
     cy.visitMyNotebooks();
     cy.navigateToNotePage(blogTitle);
-    cy.addArticle([{Title: articleTitle }]);
+    cy.addBlogPost([{Title: articleTitle }]);
 });
 
 When("I add a new blog article in {string} on {string} with title {string}", (blogTitle, date, articleTitle) => {
     cy.visitMyNotebooks();
     cy.navigateToNotePage(blogTitle);
-    cy.addArticle([{Title: articleTitle }]);
+    cy.addBlogPost([{Title: articleTitle, date}]);
 });
 
 When("I add a new blog article with this information", (data) => {
-
-    //blogTitle = data.hashes()[0]['Title'];
-    //blogDesc = data.hashes()[0]['Description'];
-    //cy.visitMyNotebooks();
-    //cy.navigateToNotePage(data.hashes()[0]['Title']);
-    cy.addArticle([{Title: data.hashes()[0]['Title'], Description: data.hashes()[0]['Description']}]);
+    cy.addBlogPost([{Title: data.hashes()[0]['Title'], Description: data.hashes()[0]['Description']}]);
 });
 
 Then("I should see a blog post on the Blog page created today", (data) => {
@@ -97,8 +90,7 @@ Then("I should see a blog post on the Blog page created today", (data) => {
 
 
 When("after creating a blog article {string}", (articleTitle, data) => {
-  cy.findByText("(Add Article)").click();
-  cy.submitNoteFormsWith(data.hashes());
+  cy.addBlogPost(data.hashes());
 });
 
 Then("I should see {string} in breadcrumb", (expectedBreadcrumb) => {
