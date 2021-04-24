@@ -36,13 +36,8 @@ class RestApiController {
         return bazaarModel.getAllNotebooks();
     }
 
-    @GetMapping("/blog_articles_by_website_name/{websiteName}")
+    @GetMapping("/blog_posts_by_website_name/{websiteName}")
     public List<BlogArticle> getBlogArticlesByWebsiteName(@PathVariable String websiteName) {
-//        Note headNote = modelFactoryService.noteRepository.findFirstByTitle(websiteName);
-//        List<NotesClosure> noteClosures = headNote.getDescendantNCs();
-//        List<NotesClosure> filteredClosures = noteClosures.stream().filter(closure -> closure.getDepth() >= 4).collect(Collectors.toList());
-//        return filteredClosures.stream().map(x -> x.getNote().toBlogArticle()).collect(Collectors.toList());
-
         Note note = modelFactoryService.noteRepository.findFirstByTitle("odd-e-blog");
         BlogModel blogModel = modelFactoryService.toBlogModel(note);
         BlogYearMonth targetYearMonth = new BlogYearMonth("2021", "Apr");

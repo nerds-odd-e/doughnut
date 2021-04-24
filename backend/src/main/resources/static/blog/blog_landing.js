@@ -5,7 +5,7 @@ var app = new Vue({
     blogInfo: [],
     yearMonthList: [],
     articleList: [],
-    apiUrl: "../api/blog_articles_by_website_name/odd-e-blog",
+    apiUrl: "../api/blog_posts_by_website_name/odd-e-blog",
     apiYearsUrl: "../api/blog/yearmonth"
   },
   created: function() {
