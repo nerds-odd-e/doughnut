@@ -38,28 +38,6 @@ public class RestApiControllerTest {
     }
 
     @Test
-    void noteApiResult() {
-        Note topNote = makeMe.aNote("odd-e blog").please();
-        Note firstChild = makeMe.aNote("how to do Scrum").description("Scrum").under(topNote).please();
-        makeMe.refresh(topNote);
-        makeMe.refresh(firstChild);
-        Timestamp firstChildUpdatetime = firstChild.getNoteContent().getUpdatedDatetime();
-        String userName = firstChild.getUser().getName();
-
-        Note.NoteApiResult note = controller.getNote();
-        Note.NoteApiResult expected = new Note.NoteApiResult();
-        expected.setTitle("how to do Scrum");
-        expected.setDescription("Scrum");
-        expected.setAuthor(userName);
-        expected.setUpdateDatetime(firstChildUpdatetime.toString());
-
-        assertThat(note.getTitle(), equalTo(expected.getTitle()));
-        assertThat(note.getDescription(), equalTo(expected.getDescription()));
-        assertThat(note.getAuthor(), equalTo(expected.getAuthor()));
-        assertThat(note.getUpdateDatetime(), equalTo(expected.getUpdateDatetime()));
-    }
-
-    @Test
     void getBlogArticlesByWebsiteName() {
         LocalDate now = LocalDate.now();
         int year = now.getYear();

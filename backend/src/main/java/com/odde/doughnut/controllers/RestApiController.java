@@ -36,20 +36,6 @@ class RestApiController {
         return bazaarModel.getAllNotebooks();
     }
 
-    @GetMapping("/note/blog")
-    public Note.NoteApiResult getNote() {
-        Note note = modelFactoryService.noteRepository.findFirstByTitle("odd-e blog");
-        Note targetNote = note.getChildren().stream().findFirst().orElse(new Note());
-
-        Note.NoteApiResult result = new Note.NoteApiResult();
-        result.setTitle(targetNote.getTitle());
-        result.setDescription(targetNote.getArticleBody());
-        result.setAuthor(targetNote.getUser().getName());
-        result.setUpdateDatetime(targetNote.getNoteContent().getUpdatedDatetime().toString());
-
-        return result;
-    }
-
     @GetMapping("/blog_articles_by_website_name/{websiteName}")
     public List<BlogArticle> getBlogArticlesByWebsiteName(@PathVariable String websiteName) {
 //        Note headNote = modelFactoryService.noteRepository.findFirstByTitle(websiteName);
