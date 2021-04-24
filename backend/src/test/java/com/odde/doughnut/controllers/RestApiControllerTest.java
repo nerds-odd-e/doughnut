@@ -11,7 +11,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.sql.Timestamp;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
 import java.util.List;
@@ -59,7 +58,7 @@ public class RestApiControllerTest {
         makeMe.refresh(dayNote);
         makeMe.refresh(note);
 
-        List<BlogArticle> articles = controller.getBlogArticlesByWebsiteName(headNote.getTitle());
+        List<BlogArticle> articles = controller.getBlogPostsByWebsiteName(headNote.getTitle());
 
         assertThat(articles.size(), equalTo(1));
         BlogArticle article = articles.get(0);

@@ -2,11 +2,9 @@ package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.BlogArticle;
 import com.odde.doughnut.entities.BlogYearMonth;
-import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import org.springframework.data.repository.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,19 +35,17 @@ public class BlogModel extends ModelForEntity<Note> {
         return years;
     }
 
-    public List<BlogArticle> getBlogArticles(Note parentNote, BlogYearMonth targetYearMonth) {
-        return getArticlesFromHeadNote(parentNote, targetYearMonth);
-    }
-
-    private List<BlogArticle> getArticlesFromHeadNote(Note parentNote, BlogYearMonth targetYearMonth){
-        List<BlogArticle> articles = new ArrayList<BlogArticle>();
-        if(parentNote !=null){
-            articles.addAll(parentNote.getGreatGreatGrandChildren().stream().filter(article -> isRealArticle(article, targetYearMonth)).map(note -> note.toBlogArticle()).collect(Collectors.toList()));
+    public List<BlogArticle> getBlogPosts(Note parentNote, BlogYearMonth targetYearMonth) {
+        if (parentNote == null) {
+            return new ArrayList<>();
         }
-        return articles;
+        return parentNote.getGreatGreatGrandChildren().stream()
+                .filter(post -> isRealBlogPost(post, targetYearMonth))
+                .map(Note::toBlogPost)
+                .collect(Collectors.toList());
     }
 
-    private boolean isRealArticle(Note note, BlogYearMonth targetYearMonth){
+    private boolean isRealBlogPost(Note note, BlogYearMonth targetYearMonth){
         BlogYearMonth articleYearMonth = getArticleYearMonth(note);
         return articleYearMonth.getYear().equals(targetYearMonth.getYear()) && articleYearMonth.getMonth().equals(targetYearMonth.getMonth());
 

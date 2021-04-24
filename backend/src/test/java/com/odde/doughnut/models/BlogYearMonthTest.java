@@ -79,7 +79,7 @@ public class BlogYearMonthTest {
         makeMe.refresh(note2);
         makeMe.refresh(note1);
         BlogYearMonth targetYearMonth = new BlogYearMonth("2021", "Apr");
-        assertTrue(blogModel.getBlogArticles(headNote,targetYearMonth).size()==2);
+        assertTrue(blogModel.getBlogPosts(headNote,targetYearMonth).size()==2);
     }
 
 }

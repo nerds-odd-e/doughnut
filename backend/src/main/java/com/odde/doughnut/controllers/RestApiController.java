@@ -10,7 +10,6 @@ import org.springframework.core.env.Environment;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin(origins = "http://localhost:8000")
@@ -37,11 +36,11 @@ class RestApiController {
     }
 
     @GetMapping("/blog_posts_by_website_name/{websiteName}")
-    public List<BlogArticle> getBlogArticlesByWebsiteName(@PathVariable String websiteName) {
+    public List<BlogArticle> getBlogPostsByWebsiteName(@PathVariable String websiteName) {
         Note note = modelFactoryService.noteRepository.findFirstByTitle("odd-e-blog");
         BlogModel blogModel = modelFactoryService.toBlogModel(note);
         BlogYearMonth targetYearMonth = new BlogYearMonth("2021", "Apr");
-        return blogModel.getBlogArticles(note,targetYearMonth);
+        return blogModel.getBlogPosts(note,targetYearMonth);
     }
 
     @GetMapping("/blog/yearmonth")

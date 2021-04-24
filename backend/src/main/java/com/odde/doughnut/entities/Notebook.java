@@ -54,6 +54,6 @@ public class Notebook {
     }
 
     public List<BlogArticle> getArticles(){
-        return getNotes().stream().filter(Note::isArticle).map(Note::toBlogArticle).collect(Collectors.toList());
+        return getNotes().stream().filter(Note::isArticle).map(Note::toBlogPost).collect(Collectors.toList());
     }
 }

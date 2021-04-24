@@ -23,7 +23,7 @@ import static java.util.stream.Collectors.toList;
 @Entity
 @Table(name = "note")
 public class Note {
-    public BlogArticle toBlogArticle() {
+    public BlogArticle toBlogPost() {
         BlogArticle article = new BlogArticle();
         article.setTitle(getTitle());
         article.setDescription(getNoteContent().getDescription());
