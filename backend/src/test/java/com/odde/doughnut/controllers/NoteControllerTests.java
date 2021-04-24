@@ -74,7 +74,7 @@ class NoteControllerTests {
             Note newNote = makeMe.aNote().inMemoryPlease();
             BindingResult bindingResult = makeMe.successfulBindingResult();
 
-            String response = controller.createNote(parent, newNote.getNoteContent(), bindingResult, model);
+            String response = controller.createNote(parent, newNote.getNoteContent(), bindingResult);
             assertThat(response, matchesPattern("redirect:/notes/\\d+"));
         }
 
@@ -83,7 +83,7 @@ class NoteControllerTests {
             Note newNote = new Note();
             BindingResult bindingResult = makeMe.failedBindingResult();
 
-            String response = controller.createNote(null, newNote.getNoteContent(), bindingResult, model);
+            String response = controller.createNote(null, newNote.getNoteContent(), bindingResult);
             assertNull(newNote.getId());
             assertEquals("notes/new", response);
         }
@@ -92,7 +92,7 @@ class NoteControllerTests {
         void shouldCreateDateNotesWhenNotebookIsABlog() throws NoAccessRightException, IOException {
             Note blog = makeMe.aBlog("This is a blog").byUser(userModel).inBlog(new Notebook(NotebookType.BLOG)).please();
             BindingResult bindingResult = makeMe.successfulBindingResult();
-            String response = controller.createNote(blog, blog.getNoteContent(), bindingResult, model);
+            String response = controller.createNote(blog, blog.getNoteContent(), bindingResult);
 
             String[] split = response.split("/");
             int id = Integer.parseInt(split[split.length - 1]);
@@ -127,14 +127,14 @@ class NoteControllerTests {
 
             BindingResult bindingResult = makeMe.successfulBindingResult();
 
-            String response = controller.createNote(blog, blog.getNoteContent(), bindingResult, model);
+            String response = controller.createNote(blog, blog.getNoteContent(), bindingResult);
             makeMe.refresh(nb);
             makeMe.refresh(blog);
             String[] split = response.split("/");
             int id = Integer.parseInt(split[split.length - 1]);
             Note createdArticle = modelFactoryService.findNoteById(id).get();
 
-            String response2 = controller.createNote(blog, blog.getNoteContent(), bindingResult, model);
+            String response2 = controller.createNote(blog, blog.getNoteContent(), bindingResult);
             makeMe.refresh(nb);
             makeMe.refresh(blog);
             String[] split2 = response2.split("/");

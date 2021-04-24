@@ -20,7 +20,6 @@ import javax.validation.Valid;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.TextStyle;
-import java.util.List;
 import java.util.Locale;
 
 @Controller
@@ -44,7 +43,7 @@ public class NoteController extends ApplicationMvcController  {
     }
 
     @PostMapping("/{parentNote}/create")
-    public String createNote(@PathVariable(name = "parentNote") Note parentNote, @Valid NoteContent noteContent, BindingResult bindingResult, Model model) throws NoAccessRightException, IOException {
+    public String createNote(@PathVariable(name = "parentNote") Note parentNote, @Valid NoteContent noteContent, BindingResult bindingResult) throws NoAccessRightException, IOException {
         if (bindingResult.hasErrors()) {
             return "notes/new";
         }
@@ -53,7 +52,9 @@ public class NoteController extends ApplicationMvcController  {
         Note note = new Note();
         User user = userModel.getEntity();
 
-        parentNote = injectTimeStampStructureIfNeeded(parentNote, user);
+        if (parentNote.getNotebook().getNotebookType().equals(NotebookType.BLOG)) {
+            parentNote = injectingYearAndMonth(parentNote, user);
+        }
 
         note.updateNoteContent(noteContent, user);
         note.setParentNote(parentNote);
@@ -62,28 +63,24 @@ public class NoteController extends ApplicationMvcController  {
         return "redirect:/notes/" + note.getId();
     }
 
-    private Note injectTimeStampStructureIfNeeded(final Note parentNote, User user) throws IOException {
-        if (parentNote.getNotebook().getNotebookType().equals(NotebookType.BLOG)) {
-            LocalDate now = LocalDate.now();
-            int year = now.getYear();
+    private Note injectingYearAndMonth(Note parentNote, User user) throws IOException {
+        LocalDate now = LocalDate.now();
+        int year = now.getYear();
 
-            int day = now.getDayOfMonth();
-            String yearNoteTitle = String.valueOf(year);
-            String monthNoteTitle = now.getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH);
-            String dayNoteTitle = String.valueOf(day);
+        int day = now.getDayOfMonth();
+        String yearNoteTitle = String.valueOf(year);
+        String monthNoteTitle = now.getMonth().getDisplayName(TextStyle.SHORT, Locale.ENGLISH);
+        String dayNoteTitle = String.valueOf(day);
 
-            Note yearNote = getOrCreateNoteInNotebook(parentNote, user, yearNoteTitle);
+        Note yearNote = getOrCreateNoteInNotebook(parentNote, user, yearNoteTitle);
 
-            Note monthNote = getOrCreateNoteInNotebook(yearNote, user, monthNoteTitle);
+        Note monthNote = getOrCreateNoteInNotebook(yearNote, user, monthNoteTitle);
 
-            return getOrCreateNoteInNotebook(monthNote, user, dayNoteTitle);
-        }
-        return parentNote;
+        return getOrCreateNoteInNotebook(monthNote, user, dayNoteTitle);
     }
 
     private Note getOrCreateNoteInNotebook(Note parentNote, User user, String noteTitle) throws IOException {
         Note existingNote = parentNote.getNotebook().getNotes().stream().filter(note -> note.getTitle().equals(noteTitle)).findFirst().orElse(null);
-        List<Note> existingNotes = modelFactoryService.noteRepository.searchInNotebook(parentNote.getNotebook(),null, noteTitle);
         if(existingNote != null){
             return existingNote;
         }
