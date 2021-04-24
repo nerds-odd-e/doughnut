@@ -51,18 +51,14 @@ public class RestApiControllerTest {
         Note yearNote = makeMe.aNote(yearNoteTitle).withNoDescription().under(headNote).please();
         Note monthNote = makeMe.aNote(monthNoteTitle).withNoDescription().under(yearNote).please();
         Note dayNote = makeMe.aNote(dayNoteTitle).withNoDescription().under(monthNote).please();
-        Note note = makeMe.aNote("Hello World").description("Hello World").under(dayNote).please();
+        Note note = makeMe.aNote("1989/06/04: Hello World").description("Hello World").under(dayNote).please();
         makeMe.refresh(headNote);
-        makeMe.refresh(yearNote);
-        makeMe.refresh(monthNote);
-        makeMe.refresh(dayNote);
-        makeMe.refresh(note);
 
         List<BlogArticle> articles = controller.getBlogPostsByWebsiteName(headNote.getTitle());
 
         assertThat(articles.size(), equalTo(1));
         BlogArticle article = articles.get(0);
-        assertThat(article.getTitle(), equalTo(note.getTitle()));
+        assertThat(article.getTitle(), equalTo("Hello World"));
         assertThat(article.getDescription(), equalTo(note.getNoteContent().getDescription()));
         assertThat(article.getAuthor(), equalTo(note.getUser().getName()));
         assertThat(article.getCreatedDatetime(), equalTo(note.getArticleDate()));

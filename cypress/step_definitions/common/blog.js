@@ -14,18 +14,6 @@ Given("There is a blog titled {string} in Doughnut", (title) => {
 });
 
 
-Given("There is a Blog Notebook called odd-e blog", (data) => {
-  cy.loginAs('developer');
-
-  cy.visitMyNotebooks();
-  cy.findByText("Add New Notebook").click();
-  const dataHashes = data.hashes().map(data => {
-      data["NotebookType"]= "BLOG"
-      return data;
-  })
-  cy.submitNoteFormsWith(dataHashes);
-});
-
 Then("I should see the current year on the blog-site's side navbar", ()=>{
     cy.get('.yearList').children().contains(new Date().getFullYear()).should('have.length', 1);
 });
@@ -87,19 +75,3 @@ Then("I should see a blog post on the Blog page created today", (data) => {
     );
 });
 
-
-
-When("after creating a blog article {string}", (articleTitle, data) => {
-  cy.addBlogPost(data.hashes());
-});
-
-Then("I should see {string} in breadcrumb", (expectedBreadcrumb) => {
-  const d = new Date();
-  const y = d.getFullYear();
-  const m = d.toLocaleString("default", {month: 'short'});
-  const bc = expectedBreadcrumb.replace("{YYYY}", y).replace("{MMM}", m);
-
-  cy.get('.breadcrumb').within( ()=>
-      bc.commonSenseSplit(", ").forEach(s => cy.findByText(s))
-  );
-});

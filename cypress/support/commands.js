@@ -69,7 +69,7 @@ Cypress.Commands.add("addBlogPost", (hashes) => {
     cy.findByText("(Add Blog Post)").click();
     cy.submitNoteFormsWith(hashes.map(blogPostAttributes=>{
         const {date, Title, ...rest} = blogPostAttributes;
-        return {...rest, Title: `${Title}`};
+        return {...rest, Title: `${date}: ${Title}`};
     }));
 })
 

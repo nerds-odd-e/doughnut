@@ -53,17 +53,15 @@ public class BlogModel extends ModelForEntity<Note> {
 
     private BlogYearMonth getArticleYearMonth(Note article) {
 
-        if(article != null) {
-            Note date = article.getParentNote();
-            Note month = article.getParentNote().getParentNote();
-            Note year = article.getParentNote().getParentNote().getParentNote();
-
-            BlogYearMonth yearMonth = new BlogYearMonth(year.getTitle(), month.getTitle());
-
-            return yearMonth;
+        if (article == null) {
+            return new BlogYearMonth("all","all");
         }
+        Note date = article.getParentNote();
+        Note month = article.getParentNote().getParentNote();
+        Note year = article.getParentNote().getParentNote().getParentNote();
 
-        return new BlogYearMonth("all","all");
+        return new BlogYearMonth(year.getTitle(), month.getTitle());
+
     }
 
 }

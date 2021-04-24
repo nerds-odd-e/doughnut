@@ -25,7 +25,7 @@ import static java.util.stream.Collectors.toList;
 public class Note {
     public BlogArticle toBlogPost() {
         BlogArticle article = new BlogArticle();
-        article.setTitle(getTitle());
+        article.setTitle(getTitle().split(": ")[1]);
         article.setDescription(getNoteContent().getDescription());
         article.setAuthor(getUser().getName());
         article.setCreatedDatetime(getArticleDate());
