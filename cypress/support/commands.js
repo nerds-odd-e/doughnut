@@ -303,7 +303,7 @@ Cypress.Commands.add("searchNote", (searchKey) => {
 })
 
 Cypress.Commands.add("visitBlog", () => {
-    cy.visit("/blog_landing.html");
+    cy.visit("/blog/blog_landing.html");
 });
 
 Cypress.Commands.add("getYearList", () => {
