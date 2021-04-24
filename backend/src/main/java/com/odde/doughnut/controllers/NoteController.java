@@ -49,13 +49,13 @@ public class NoteController extends ApplicationMvcController  {
         }
         UserModel userModel = getCurrentUser();
         userModel.getAuthorization().assertAuthorization(parentNote);
-        Note note = new Note();
         User user = userModel.getEntity();
 
         if (parentNote.getNotebook().getNotebookType().equals(NotebookType.BLOG)) {
             parentNote = injectingYearAndMonth(parentNote, user);
         }
 
+        Note note = new Note();
         note.updateNoteContent(noteContent, user);
         note.setParentNote(parentNote);
         note.setUser(user);

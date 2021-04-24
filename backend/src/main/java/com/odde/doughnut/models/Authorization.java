@@ -70,7 +70,7 @@ public class Authorization extends ModelForEntity<User> {
   }
 
   public void assertDeveloperAuthorization() throws NoAccessRightException {
-    if (!allowUsers.contains(entity.getName())) {
+    if (!isDeveloper()) {
       throw new NoAccessRightException();
     }
   }
@@ -79,4 +79,5 @@ public class Authorization extends ModelForEntity<User> {
       Arrays.asList("Terry", "t-machu", "Developer", "thuzar", "Yeong Sheng",
                     "yeongsheng-tan");
 
+  public boolean isDeveloper() { return allowUsers.contains(entity.getName()); }
 }
