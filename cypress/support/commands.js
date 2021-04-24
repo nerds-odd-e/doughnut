@@ -65,16 +65,14 @@ Cypress.Commands.add("triggerException", () => {
   cy.request({method: "POST", url: `/api/testability/trigger_exception`, failOnStatusCode: false});
 })
 
-Cypress.Commands.add("addArticle", (hashes) => {
+Cypress.Commands.add("addArticle", (noteAttributes) => {
     cy.findByText("(Add Article)").click();
-    cy.submitNoteFormsWith(hashes);
+    cy.submitNoteFormsWith(noteAttributes);
 })
 
-
-Cypress.Commands.add("submitNoteFormsWith", (notes) => {
-  notes.forEach((elem) => {
-    for (var propName in elem) {
-      const value = elem[propName];
+Cypress.Commands.add("submitNoteFormWith", (noteAttributes) => {
+    for (var propName in noteAttributes) {
+      const value = noteAttributes[propName];
       if (value) {
         cy.getFormControl(propName).then(($input)=> {
             if($input.attr('type') === 'file') {
@@ -94,7 +92,10 @@ Cypress.Commands.add("submitNoteFormsWith", (notes) => {
       }
     }
     cy.get('input[value="Submit"]').click();
-  });
+});
+
+Cypress.Commands.add("submitNoteFormsWith", (notes) => {
+  notes.forEach((noteAttributes) => cy.submitNoteFormWith(noteAttributes));
 });
 
 Cypress.Commands.add("expectNoteCards", (expectedCards) => {

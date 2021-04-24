@@ -57,7 +57,8 @@ Then("the left panel should show Years list", () => {
   expect(lis).to.have.length(1)
   });
 });
-And("There are some notes in the notebook", (data) => {
+
+And("There are some posts in the blog", (data) => {
     cy.addArticle(data.hashes());
 });
 

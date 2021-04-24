@@ -5,7 +5,7 @@ Feature: Publish a note from doughnut to odd-e blog site
 
   Scenario: There is a notebook with type Blog with one note in Doughnut
     Given There is a blog titled 'odd-e-blog' in Doughnut
-    And There are some notes in the notebook
+    And There are some posts in the blog
     | Title       | Description       |
     | Hello World | Content Article 1 |
     When I open the Blog page
@@ -31,7 +31,7 @@ Feature: Publish a note from doughnut to odd-e blog site
   @ignore
   Scenario: There is a notebook with type Blog with multiple notes in Doughnut
     Given There is a blog titled 'odd-e-blog' in Doughnut
-    And There are some notes in the notebook
+    And There are some posts in the blog
       | title       | description |
       | hello world | hello world |
       | scrum intro | scrum intro |
