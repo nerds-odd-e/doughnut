@@ -22,7 +22,7 @@ Given("there are notes from Note {int} to Note {int}", (from, to) => {
 When("I create top level note with:", (data) => {
   cy.visitMyNotebooks();
   cy.findByText("Add New Notebook").click();
-  cy.submitNoteFormWith(data.hashes());
+  cy.submitNoteFormsWith(data.hashes());
 });
 
 When("I am editing note {string} the title is expected to be pre-filled with {string}", (noteTitle, oldTitle) => {
@@ -31,13 +31,13 @@ When("I am editing note {string} the title is expected to be pre-filled with {st
 });
 
 When("I update it to become:", (data) => {
-  cy.submitNoteFormWith(data.hashes());
+  cy.submitNoteFormsWith(data.hashes());
 });
 
 When("I create note belonging to {string}:", (noteTitle, data) => {
   cy.jumpToNotePage(noteTitle);
   cy.findByText("(Add Child Note)").click();
-  cy.submitNoteFormWith(data.hashes());
+  cy.submitNoteFormsWith(data.hashes());
 });
 
 
@@ -69,7 +69,7 @@ When("I delete top level note {string}", (noteTitle) => {
 When("I create a sibling note of {string}:", (noteTitle, data) => {
   cy.findByText(noteTitle, {selector: ".h1"});
   cy.findByText("Add Sibling Note").click();
-  cy.submitNoteFormWith(data.hashes());
+  cy.submitNoteFormsWith(data.hashes());
 });
 
 When("I should see that the note creation is not successful", (noteTitle, data) => {

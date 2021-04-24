@@ -67,11 +67,11 @@ Cypress.Commands.add("triggerException", () => {
 
 Cypress.Commands.add("addArticle", (hashes) => {
     cy.findByText("(Add Article)").click();
-    cy.submitNoteFormWith(hashes);
+    cy.submitNoteFormsWith(hashes);
 })
 
 
-Cypress.Commands.add("submitNoteFormWith", (notes) => {
+Cypress.Commands.add("submitNoteFormsWith", (notes) => {
   notes.forEach((elem) => {
     for (var propName in elem) {
       const value = elem[propName];

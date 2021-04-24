@@ -10,7 +10,7 @@ Given("There is a blog titled {string} in Doughnut", (title) => {
   cy.visitMyNotebooks();
   cy.findByText("Add New Notebook").click();
   cy.get('select').select("BLOG");
-  cy.submitNoteFormWith([{Title:title}]);
+  cy.submitNoteFormsWith([{Title:title}]);
 });
 
 
@@ -23,7 +23,7 @@ Given("There is a Blog Notebook called odd-e blog", (data) => {
       data["NotebookType"]= "BLOG"
       return data;
   })
-  cy.submitNoteFormWith(dataHashes);
+  cy.submitNoteFormsWith(dataHashes);
 });
 
 Then("I should see the current year on the blog-site's side navbar", ()=>{
@@ -32,7 +32,7 @@ Then("I should see the current year on the blog-site's side navbar", ()=>{
 
 And("A blog is posted in {string}", (blogNotebook, data) => {
     cy.findByText("(Add Article)").click();
-    cy.submitNoteFormWith(data.hashes());
+    cy.submitNoteFormsWith(data.hashes());
 });
 
 Given("There is no Notebook type blog", () => {
@@ -67,6 +67,12 @@ When("I add a new blog article in {string} with title {string}", (blogTitle,arti
     cy.addArticle([{Title: articleTitle }]);
 });
 
+When("I add a new blog article in {string} on {string} with title {string}", (blogTitle, date, articleTitle) => {
+    cy.visitMyNotebooks();
+    cy.navigateToNotePage(blogTitle);
+    cy.addArticle([{Title: articleTitle }]);
+});
+
 When("I add a new blog article with this information", (data) => {
 
     //blogTitle = data.hashes()[0]['Title'];
@@ -91,7 +97,7 @@ Then("I should see a blog post on the Blog page created today", (data) => {
 
 When("after creating a blog article {string}", (articleTitle, data) => {
   cy.findByText("(Add Article)").click();
-  cy.submitNoteFormWith(data.hashes());
+  cy.submitNoteFormsWith(data.hashes());
 });
 
 Then("I should see {string} in breadcrumb", (expectedBreadcrumb) => {

@@ -5,7 +5,7 @@ Feature: Create Blog with Year-Date Structure
 
   Scenario: Create a new blog article in odd-e-blog
     Given There is a blog titled 'odd-e-blog' in Doughnut
-    When I add a new blog article in "odd-e-blog" with title "My First Blog Post"
+    When I add a new blog article in "odd-e-blog" on "2020/04/21" with title "My First Blog Post"
     And I open the Blog page
     Then I should see a blog post on the Blog page created today
       | Title       | Description       | AuthorName  |

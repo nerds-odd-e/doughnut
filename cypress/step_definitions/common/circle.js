@@ -39,7 +39,7 @@ Given("There is a circle {string} with {string} members", (circleName, members) 
 When("I create a note {string} in circle {string}", (noteTitle, circleName) => {
   cy.navigateToCircle(circleName);
   cy.findByText("Add New Notebook In This Circle").click();
-  cy.submitNoteFormWith([{'Title': noteTitle}]);
+  cy.submitNoteFormsWith([{'Title': noteTitle}]);
 });
 
 When("I should see the note {string} in circle {string}", (noteTitle, circleName) => {
@@ -50,7 +50,7 @@ When("I should see the note {string} in circle {string}", (noteTitle, circleName
 When("I add a note {string} under {string}", (noteTitle, parentNoteTitle) => {
   cy.findByText(parentNoteTitle).click();
   cy.findByText("(Add Child Note)").click();
-  cy.submitNoteFormWith([{'Title': noteTitle}]);
+  cy.submitNoteFormsWith([{'Title': noteTitle}]);
 });
 
 When("I subscribe to note {string} in the circle {string}, with target of learning {int} notes per day", (noteTitle, circleName, count) => {
