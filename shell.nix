@@ -52,8 +52,6 @@ in mkShell {
     export CHROME_EXECUTABLE=$(type google-chrome-stable | awk '{print $3}')
     export PATH=$PATH:$JAVA_HOME/bin:$GRADLE_HOME/bin:$CHROME_EXECUTABLE
 
-    export DOUGHNUT_BAZAAR_NOTES_API_URL="http://localhost:8081/api/bazaar_notes"
-
     echo "################################################################################"
     echo "                                                                                "
     echo "##    !! DOUGHNUT NIX-SHELL !!      "

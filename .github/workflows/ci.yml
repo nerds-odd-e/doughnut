@@ -38,22 +38,6 @@ jobs:
       - name: Unit tests with Gradle
         run: backend/gradlew -p backend test -Dspring.profiles.active=test
 
-  Mobile-unit-tests:
-    name: Mobile Unit tests and build
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Code Checkout
-        uses: actions/checkout@v2
-      - name: Flutter frontend test and build
-        uses: subosito/flutter-action@v1
-        with:
-          flutter-version: "2.0.5"
-      - run: cd mobile && flutter config --enable-web
-      - run: cd mobile && flutter clean
-      - run: cd mobile && flutter pub get
-      - run: cd mobile && flutter test
-      - run: cd mobile && flutter build web --release
-
   E2E-tests:
     name: End-to-End tests with Database
     runs-on: ubuntu-20.04
@@ -101,7 +85,7 @@ jobs:
   Package-n-Deploy:
     name: Package & GCP MIG Rolling Update Deploy
     runs-on: ubuntu-20.04
-    needs: [Backend-unit-tests, Mobile-unit-tests, E2E-tests]
+    needs: [Backend-unit-tests, E2E-tests]
     steps:
       - name: Code Checkout
         uses: actions/checkout@v2
@@ -130,7 +114,7 @@ jobs:
   Slack-Notify:
     name: Single summary slack notification for entire workflow
     runs-on: ubuntu-20.04
-    needs: [Backend-unit-tests, Mobile-unit-tests, E2E-tests, Package-n-Deploy]
+    needs: [Backend-unit-tests, E2E-tests, Package-n-Deploy]
     if: always()
     steps:
       - uses: technote-space/workflow-conclusion-action@v2
