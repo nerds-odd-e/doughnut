@@ -1,9 +1,7 @@
 package com.odde.doughnut.models;
 
-import com.odde.doughnut.entities.BlogArticle;
-import com.odde.doughnut.entities.BlogYearMonth;
+import com.odde.doughnut.entities.BlogPost;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 
 import java.util.*;
@@ -27,7 +25,7 @@ public class BlogModel extends ModelForEntity<Note> {
         return list;
     }
 
-    public List<BlogArticle> getBlogPosts(Note parentNote) {
+    public List<BlogPost> getBlogPosts(Note parentNote) {
         if (parentNote == null) {
             return new ArrayList<>();
         }
@@ -36,8 +34,8 @@ public class BlogModel extends ModelForEntity<Note> {
                 .collect(Collectors.toList());
     }
 
-    public BlogArticle toBlogPost(Note note) {
-        BlogArticle article = new BlogArticle();
+    public BlogPost toBlogPost(Note note) {
+        BlogPost article = new BlogPost();
         article.setTitle(note.getTitle().split(": ")[1]);
         article.setDescription(note.getNoteContent().getDescription());
         article.setAuthor(note.getUser().getName());

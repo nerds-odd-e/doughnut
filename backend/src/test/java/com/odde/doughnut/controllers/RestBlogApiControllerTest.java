@@ -11,10 +11,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.format.TextStyle;
 import java.util.List;
-import java.util.Locale;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -22,18 +19,18 @@ import static org.hamcrest.Matchers.equalTo;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
-public class RestApiControllerTest {
+public class RestBlogApiControllerTest {
     @Autowired
     MakeMe makeMe;
 
     UserModel userModel;
 
-    RestApiController controller;
+    RestBlogApiController controller;
 
     @BeforeEach
     void setup() {
         userModel = makeMe.aUser().toModelPlease();
-        controller = new RestApiController(makeMe.modelFactoryService);
+        controller = new RestBlogApiController(makeMe.modelFactoryService);
     }
 
     @Test
@@ -42,10 +39,10 @@ public class RestApiControllerTest {
         Note note = makeMe.aNote("1989/06/04: Hello World").description("Hello World").under(headNote).please();
         makeMe.refresh(headNote);
 
-        List<BlogArticle> articles = controller.getBlogPostsByWebsiteName();
+        List<BlogPost> articles = controller.getBlogPostsByWebsiteName();
 
         assertThat(articles.size(), equalTo(1));
-        BlogArticle article = articles.get(0);
+        BlogPost article = articles.get(0);
         assertThat(article.getTitle(), equalTo("Hello World"));
         assertThat(article.getDescription(), equalTo(note.getNoteContent().getDescription()));
         assertThat(article.getAuthor(), equalTo(note.getUser().getName()));
