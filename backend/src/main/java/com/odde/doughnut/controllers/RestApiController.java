@@ -35,19 +35,18 @@ class RestApiController {
         return bazaarModel.getAllNotebooks();
     }
 
-    @GetMapping("/blog_posts_by_website_name/{websiteName}")
-    public List<BlogArticle> getBlogPostsByWebsiteName(@PathVariable String websiteName) {
+    @GetMapping("/blog/posts_by_website_name/{websiteName}")
+    public List<BlogArticle> getBlogPostsByWebsiteName() {
         Note note = modelFactoryService.noteRepository.findFirstByTitle("odd-e-blog");
         BlogModel blogModel = modelFactoryService.toBlogModel(note);
         return blogModel.getBlogPosts(note);
     }
 
-    @GetMapping("/blog/yearmonth")
-    public List<BlogYearMonth> getBlogYearMonthList() {
+    @GetMapping("/blog/year_list")
+    public List<String> getBlogYearMonthList() {
         Note note = modelFactoryService.noteRepository.findFirstByTitle("odd-e-blog");
         BlogModel blogModel = modelFactoryService.toBlogModel(note);
-        List<BlogYearMonth> yearMonths = blogModel.getBlogYearMonths(note);
 
-        return yearMonths;
+        return blogModel.getBlogYears(note);
     }
 }

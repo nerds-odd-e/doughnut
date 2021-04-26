@@ -3,10 +3,10 @@ var app = new Vue({
   el: '#app',
   data: {
     blogInfo: [],
-    yearMonthList: [],
+    yearList: [],
     articleList: [],
-    apiUrl: "../api/blog_posts_by_website_name/odd-e-blog",
-    apiYearsUrl: "../api/blog/yearmonth"
+    apiUrl: "../api/blog/posts_by_website_name/odd-e-blog",
+    apiYearsUrl: "../api/blog/year_list"
   },
   created: function() {
     axios
@@ -20,7 +20,7 @@ var app = new Vue({
     axios
         .get(this.apiYearsUrl)
             .then((res) => {
-                this.yearMonthList = res.data;
+                this.yearList = res.data;
             })
             .catch((res) => {
                 alert("Error");

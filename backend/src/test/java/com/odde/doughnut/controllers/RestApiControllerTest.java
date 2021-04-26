@@ -42,7 +42,7 @@ public class RestApiControllerTest {
         Note note = makeMe.aNote("1989/06/04: Hello World").description("Hello World").under(headNote).please();
         makeMe.refresh(headNote);
 
-        List<BlogArticle> articles = controller.getBlogPostsByWebsiteName(headNote.getTitle());
+        List<BlogArticle> articles = controller.getBlogPostsByWebsiteName();
 
         assertThat(articles.size(), equalTo(1));
         BlogArticle article = articles.get(0);

@@ -6,33 +6,25 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
+
+import static java.util.Collections.*;
 
 public class BlogModel extends ModelForEntity<Note> {
     public BlogModel(Note entity, ModelFactoryService modelFactoryService) {
         super(entity, modelFactoryService)        ;
     }
 
-    public List<BlogYearMonth> getBlogYearMonths(int blogNoteBookId) {
+    public List<String> getBlogYears(Note headNote) {
+        Set<String> years = new HashSet<>();
 
-        NoteRepository noteRepository = modelFactoryService.noteRepository;
-        Optional<Note> byId = noteRepository.findById(blogNoteBookId);
-        Note headNote = byId.get();
-
-        return getBlogYearMonths(headNote);
-    }
-
-    public List<BlogYearMonth> getBlogYearMonths(Note headNote) {
-        List<BlogYearMonth> years = new ArrayList<>();
-
-        List<Note> noteYears = headNote.getChildren();
-
-        noteYears.forEach(note-> years.add(new BlogYearMonth(note.getTitle(), "Jan"))); //ToDo for dynamic month
-
-        return years;
+        headNote.getChildren().stream().map(n->getCreatedDatetime(n).split("/")[0]).forEach(
+                years::add
+        );
+        final ArrayList<String> list = new ArrayList<>(years);
+        sort(list);
+        return list;
     }
 
     public List<BlogArticle> getBlogPosts(Note parentNote) {
@@ -49,8 +41,12 @@ public class BlogModel extends ModelForEntity<Note> {
         article.setTitle(note.getTitle().split(": ")[1]);
         article.setDescription(note.getNoteContent().getDescription());
         article.setAuthor(note.getUser().getName());
-        article.setCreatedDatetime(note.getTitle().split(": ")[0]);
+        article.setCreatedDatetime(getCreatedDatetime(note));
         return article;
+    }
+
+    private String getCreatedDatetime(Note note) {
+        return note.getTitle().split(": ")[0];
     }
 
 }
