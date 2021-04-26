@@ -7,7 +7,6 @@ import lombok.Setter;
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "notebook")
@@ -43,13 +42,5 @@ public class Notebook {
 
     @Enumerated(EnumType.STRING)
     @Column(name="notebook_type")
-    @Getter @Setter NotebookType notebookType;
-
-    public Notebook() {
-        this(NotebookType.GENERAL);
-    }
-
-    public Notebook(NotebookType type) {
-        notebookType = type;
-    }
+    @Getter @Setter NotebookType notebookType = NotebookType.GENERAL;
 }

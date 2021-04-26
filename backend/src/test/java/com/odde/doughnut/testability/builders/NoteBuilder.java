@@ -148,9 +148,4 @@ public class NoteBuilder extends EntityBuilder<Note> {
         entity.getNotebook().setOwnership(user.getOwnership());
         return this;
     }
-
-    public NoteBuilder underNotebook(Notebook nb) {
-        entity.assignNotebookForHeadNote(nb, entity.getUser().getOwnership(), entity.getUser());
-        return this;
-    }
 }

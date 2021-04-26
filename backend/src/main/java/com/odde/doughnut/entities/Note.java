@@ -347,17 +347,13 @@ public class Note {
         assignNotebookForHeadNote(notebook, ownership, creator);
     }
 
-    public void assignNotebookForHeadNote(Notebook notebook, Ownership ownership, User creator) {
+    private void assignNotebookForHeadNote(Notebook notebook, Ownership ownership, User creator) {
         notebook.setCreatorEntity(creator);
         notebook.setOwnership(ownership);
         notebook.setHeadNote(this);
 
         this.user = creator;
         this.notebook = notebook;
-    }
-
-    public Boolean isArticle(){
-        return !isHead() && noteContent.getDescription() != null && !noteContent.getDescription().isEmpty();
     }
 
 }

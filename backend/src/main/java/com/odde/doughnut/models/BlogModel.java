@@ -2,6 +2,7 @@ package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.BlogPost;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 
 import java.util.*;
@@ -9,9 +10,10 @@ import java.util.stream.Collectors;
 
 import static java.util.Collections.*;
 
-public class BlogModel extends ModelForEntity<Note> {
-    public BlogModel(Note entity, ModelFactoryService modelFactoryService) {
-        super(entity, modelFactoryService)        ;
+public class BlogModel {
+    private final Note headNote;
+    public BlogModel(Notebook entity) {
+        this.headNote = entity.getHeadNote();
     }
 
     public List<String> getBlogYears(Note headNote) {

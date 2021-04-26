@@ -21,14 +21,14 @@ class RestBlogApiController {
     @GetMapping("/posts_by_website_name/{websiteName}")
     public List<BlogPost> getBlogPostsByWebsiteName() {
         Note note = modelFactoryService.noteRepository.findFirstByTitle("odd-e-blog");
-        BlogModel blogModel = modelFactoryService.toBlogModel(note);
+        BlogModel blogModel = modelFactoryService.toBlogModel(note.getNotebook());
         return blogModel.getBlogPosts(note);
     }
 
     @GetMapping("/year_list")
     public List<String> getBlogYearMonthList() {
         Note note = modelFactoryService.noteRepository.findFirstByTitle("odd-e-blog");
-        BlogModel blogModel = modelFactoryService.toBlogModel(note);
+        BlogModel blogModel = modelFactoryService.toBlogModel(note.getNotebook());
 
         return blogModel.getBlogYears(note);
     }
