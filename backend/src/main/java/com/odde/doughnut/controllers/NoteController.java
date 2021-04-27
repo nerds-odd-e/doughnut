@@ -125,7 +125,7 @@ public class NoteController extends ApplicationMvcController  {
     @Transactional
     public RedirectView deleteNote(@PathVariable("note") Note note) throws NoAccessRightException {
         getCurrentUser().getAuthorization().assertAuthorization(note);
-        modelFactoryService.toTreeNodeModel(note).destroy();
+        modelFactoryService.toNoteModel(note).destroy();
         return new RedirectView("/notebooks");
     }
 

@@ -4,12 +4,17 @@ import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Subscription;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import lombok.Getter;
 
 import java.util.List;
 
-public class SubscriptionModel extends ModelForEntity<Subscription> implements ReviewScope {
+public class SubscriptionModel implements ReviewScope {
+    protected final Subscription entity;
+    protected final ModelFactoryService modelFactoryService;
+
     public SubscriptionModel(Subscription sub, ModelFactoryService modelFactoryService) {
-        super(sub, modelFactoryService);
+        this.entity = sub;
+        this.modelFactoryService = modelFactoryService;
     }
 
     @Override

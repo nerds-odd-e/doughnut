@@ -53,7 +53,7 @@ public class ReviewingInitialReviewTest {
         void setup() {
             note1 = makeMe.aNote().byUser(userModel).please();
             note2 = makeMe.aNote().byUser(userModel).please();
-            makeMe.refresh(userModel);
+            makeMe.refresh(userModel.getEntity());
         }
 
         @Test
@@ -152,7 +152,7 @@ public class ReviewingInitialReviewTest {
             note1 = makeMe.aNote().under(top).please();
             note2 = makeMe.aNote().under(top).please();
             makeMe.aSubscription().forNotebook(top.getNotebook()).forUser(userModel.entity).please();
-            makeMe.refresh(userModel);
+            makeMe.refresh(userModel.getEntity());
         }
 
         @Test
@@ -172,13 +172,12 @@ public class ReviewingInitialReviewTest {
     @Nested
     class NotesInCircle {
         Note top;
-        Note note2;
 
         @BeforeEach
         void setup() {
             Circle please = makeMe.aCircle().hasMember(userModel).please();
             top = makeMe.aNote().byUser(userModel).inCircle(please).please();
-            makeMe.refresh(userModel);
+            makeMe.refresh(userModel.getEntity());
         }
 
         @Test

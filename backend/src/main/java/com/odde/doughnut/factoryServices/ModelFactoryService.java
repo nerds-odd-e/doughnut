@@ -23,8 +23,8 @@ public class ModelFactoryService {
     @Autowired public EntityManager entityManager;
     @Autowired public FailureReportRepository failureReportRepository;
 
-    public TreeNodeModel toTreeNodeModel(Note note) {
-        return new TreeNodeModel(note, this);
+    public NoteModel toNoteModel(Note note) {
+        return new NoteModel(note, this);
     }
 
     public NoteMotionModel toNoteMotionModel(NoteMotion noteMotion, Note note) {

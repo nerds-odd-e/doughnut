@@ -3,6 +3,7 @@ package com.odde.doughnut.models;
 import com.odde.doughnut.algorithms.SpacedRepetitionAlgorithm;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import lombok.Getter;
 import org.apache.logging.log4j.util.Strings;
 
 import java.sql.Timestamp;
@@ -10,10 +11,15 @@ import java.time.ZoneId;
 import java.util.List;
 import java.util.regex.Pattern;
 
-public class UserModel extends ModelForEntity<User> implements ReviewScope {
+public class UserModel implements ReviewScope {
+
+    @Getter
+    protected final User entity;
+    protected final ModelFactoryService modelFactoryService;
 
     public UserModel(User user, ModelFactoryService modelFactoryService) {
-        super(user, modelFactoryService);
+        this.entity = user;
+        this.modelFactoryService = modelFactoryService;
     }
 
     public Authorization getAuthorization() {
@@ -89,4 +95,7 @@ public class UserModel extends ModelForEntity<User> implements ReviewScope {
         return new Reviewing(this, currentUTCTimestamp, modelFactoryService);
     }
 
+    private void save() {
+        modelFactoryService.entityManager.persist(entity);
+    }
 }
