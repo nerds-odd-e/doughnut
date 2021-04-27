@@ -1,7 +1,7 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.odde.doughnut.models.QuizQuestion.QuestionType;
+import com.odde.doughnut.entities.QuizQuestion.QuestionType;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,8 +12,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.odde.doughnut.models.QuizQuestion.QuestionType.LINK_SOURCE_EXCLUSIVE;
-import static com.odde.doughnut.models.QuizQuestion.QuestionType.LINK_TARGET;
+import static com.odde.doughnut.entities.QuizQuestion.QuestionType.LINK_SOURCE_EXCLUSIVE;
+import static com.odde.doughnut.entities.QuizQuestion.QuestionType.LINK_TARGET;
 
 @Entity
 @Table(name = "link")

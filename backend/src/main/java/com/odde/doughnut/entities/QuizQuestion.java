@@ -1,4 +1,4 @@
-package com.odde.doughnut.models;
+package com.odde.doughnut.entities;
 
 import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.Note;
@@ -30,8 +30,6 @@ public class QuizQuestion {
         }
     }
 
-    private final Randomizer randomizer;
-    private final ModelFactoryService modelFactoryService;
     private final ReviewPoint reviewPoint;
     @Getter @Setter
     private QuestionType questionType = null;
@@ -42,10 +40,8 @@ public class QuizQuestion {
     @Getter @Setter
     public String mainTopic;
 
-    public QuizQuestion(ReviewPoint reviewPoint, Randomizer randomizer, ModelFactoryService modelFactoryService) {
+    public QuizQuestion(ReviewPoint reviewPoint) {
         this.reviewPoint = reviewPoint;
-        this.randomizer = randomizer;
-        this.modelFactoryService = modelFactoryService;
     }
 
     public boolean isPictureQuestion() {

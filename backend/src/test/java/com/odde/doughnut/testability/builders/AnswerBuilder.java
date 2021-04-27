@@ -2,7 +2,7 @@ package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.models.QuizQuestion;
+import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 

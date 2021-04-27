@@ -2,7 +2,7 @@ package com.odde.doughnut.models.quizFacotries;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.models.QuizQuestion;
+import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 
@@ -30,7 +30,7 @@ public class QuizQuestionDirector {
         if (answerNote == null) {
             return null;
         }
-        QuizQuestion quizQuestion = new QuizQuestion(reviewPoint, randomizer, modelFactoryService);
+        QuizQuestion quizQuestion = new QuizQuestion(reviewPoint);
         quizQuestion.setQuestionType(questionType);
         quizQuestion.setOptions(generateOptions());
         quizQuestion.setDescription(linkTargetExclusiveQuizFactory.generateInstruction());

@@ -1,7 +1,7 @@
 package com.odde.doughnut.models.quizFacotries;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.models.QuizQuestion;
+import com.odde.doughnut.entities.QuizQuestion;
 
 import java.util.List;
 

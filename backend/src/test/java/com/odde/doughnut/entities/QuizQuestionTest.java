@@ -1,6 +1,9 @@
-package com.odde.doughnut.models;
+package com.odde.doughnut.entities;
 
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.QuizQuestion;
+import com.odde.doughnut.models.ReviewPointModel;
+import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.models.randomizers.RealRandomizer;
 import com.odde.doughnut.testability.MakeMe;

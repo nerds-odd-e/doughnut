@@ -1,12 +1,11 @@
 package com.odde.doughnut.entities;
 
-import com.odde.doughnut.models.QuizQuestion;
 import lombok.Getter;
 import lombok.Setter;
 
 import javax.validation.constraints.NotNull;
 
-import static com.odde.doughnut.models.QuizQuestion.QuestionType.*;
+import static com.odde.doughnut.entities.QuizQuestion.QuestionType.*;
 
 public class Answer {
     @NotNull
