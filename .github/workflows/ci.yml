@@ -10,7 +10,6 @@ env:
   ARTIFACT: "doughnut"
   VERSION: "0.0.1-SNAPSHOT"
   GCS_BUCKET: "dough-01"
-  DOUGHNUT_BAZAAR_NOTES_API_URL: "http://localhost:8081/api/bazaar_notes"
 
 jobs:
   Backend-unit-tests:
@@ -33,6 +32,8 @@ jobs:
           mysql database: "doughnut_test"
           mysql user: ${{ secrets.DBUSER }}
           mysql password: ${{ secrets.DBPASSWORD }}
+          host port: 3309
+          container port: 3309
       - name: DB Migration unit test
         run: backend/gradlew -p backend testDBMigrate -Dspring.profiles.active=test
       - name: Unit tests with Gradle
@@ -71,6 +72,8 @@ jobs:
           mysql database: "doughnut_test"
           mysql user: ${{ secrets.DBUSER }}
           mysql password: ${{ secrets.DBPASSWORD }}
+          host port: 3309
+          container port: 3309
       - name: End-to-End tests with Cypress
         uses: cypress-io/github-action@v2
         with:

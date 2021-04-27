@@ -17,7 +17,7 @@ import java.util.Map;
 
 
 @Controller
-@Profile({"test", "dev"})
+@Profile({ "e2e", "test", "dev" })
 @RequestMapping("/testability")
 class TestabilityController {
     @Autowired

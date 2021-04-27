@@ -7,7 +7,7 @@ let
     allowUnsupportedSystem=true;
   };
   apple_sdk = darwin.apple_sdk.frameworks;
-  nodejs = nodejs-15_x;
+  nodejs = nodejs-16_x;
   intellij = jetbrains.idea-community;
 in mkShell {
   name = "doughnut";
@@ -34,23 +34,24 @@ in mkShell {
     apple_sdk.Foundation apple_sdk.ImageIO apple_sdk.IOKit apple_sdk.Kernel apple_sdk.MediaToolbox apple_sdk.OpenGL
     apple_sdk.QTKit apple_sdk.Security apple_sdk.SystemConfiguration xcodebuild
   ] ++ lib.optionals (!stdenv.isDarwin) [
-    dart firefox google-chrome flutter
+    firefox google-chrome 
     gitter intellij mysql-workbench vscode-with-extensions
   ];
   shellHook = ''
+    export NIXPKGS_ALLOW_UNFREE=1
     export JAVA_HOME="${pkgs.zulu}"
     export GRADLE_HOME="${pkgs.gradle}"
+
     export MYSQL_BASEDIR=${pkgs.mysql80}
     export MYSQL_HOME="''${MYSQL_HOME:-''$PWD/mysql}"
     export MYSQL_DATADIR="''${MYSQL_DATADIR:-''$MYSQL_HOME/data}"
-
-    export MYSQL_UNIX_PORT=$MYSQL_HOME/mysql.sock
-    export MYSQLX_UNIX_PORT=$MYSQL_HOME/mysqlx.sock
+    export MYSQL_UNIX_SOCKET=$MYSQL_HOME/mysql.sock
+    export MYSQLX_UNIX_SOCKET=$MYSQL_HOME/mysqlx.sock
     export MYSQL_PID_FILE=$MYSQL_HOME/mysql.pid
+    export MYSQL_TCP_PORT=3309
+    export MYSQLX_TCP_PORT=33090
 
-    export NIXPKGS_ALLOW_UNFREE=1
-    export CHROME_EXECUTABLE=$(type google-chrome-stable | awk '{print $3}')
-    export PATH=$PATH:$JAVA_HOME/bin:$GRADLE_HOME/bin:$CHROME_EXECUTABLE
+    export PATH=$PATH:$JAVA_HOME/bin:$GRADLE_HOME/bin
 
     echo "################################################################################"
     echo "                                                                                "
@@ -59,7 +60,6 @@ in mkShell {
     echo "##    GRADLE_HOME: $GRADLE_HOME     "
     echo "##    MYSQL_HOME: $MYSQL_HOME       "
     echo "##    MYSQL_DATADIR: $MYSQL_DATADIR "
-    echo "##    DOUGHNUT_BAZAAR_NOTES_API_URL: $DOUGHNUT_BAZAAR_NOTES_API_URL "
     echo "                                                                                "
     echo "################################################################################"
     mkdir -p $MYSQL_HOME
@@ -69,20 +69,21 @@ cat <<EOF > $MYSQL_HOME/init_doughnut_db.sql
 CREATE USER IF NOT EXISTS 'doughnut'@'localhost' IDENTIFIED BY 'doughnut';
 CREATE DATABASE IF NOT EXISTS doughnut_development DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE DATABASE IF NOT EXISTS doughnut_test        DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS doughnut_e2e_test    DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 GRANT ALL PRIVILEGES ON doughnut_development.* TO 'doughnut'@'localhost';
 GRANT ALL PRIVILEGES ON doughnut_test.*        TO 'doughnut'@'localhost';
+GRANT ALL PRIVILEGES ON doughnut_e2e_test.*    TO 'doughnut'@'localhost';
 FLUSH PRIVILEGES;
 EOF
 
     export MYSQLD_PID=$(pgrep mysqld)
     if [[ -z "$MYSQLD_PID" ]]; then
-      [ ! "$(ls -A mysql/data)" ] && mysqld --initialize-insecure --user=`whoami` --datadir=$MYSQL_DATADIR --basedir=$MYSQL_BASEDIR --explicit_defaults_for_timestamp
-      mysqld --datadir=$MYSQL_DATADIR --pid-file=$MYSQL_PID_FILE --socket=$MYSQL_UNIX_PORT --mysqlx-socket=$MYSQLX_UNIX_PORT &
+      [ ! "$(ls -A mysql/data)" ] && mysqld --initialize-insecure --port=$MYSQL_TCP_PORT --user=`whoami` --datadir=$MYSQL_DATADIR --basedir=$MYSQL_BASEDIR --explicit_defaults_for_timestamp
+      mysqld --datadir=$MYSQL_DATADIR --pid-file=$MYSQL_PID_FILE --port=$MYSQL_TCP_PORT --socket=$MYSQL_UNIX_SOCKET --mysqlx-socket=$MYSQLX_UNIX_SOCKET --mysqlx_port=$MYSQLX_TCP_PORT &
       export MYSQLD_PID=$!
 
-      sleep 2 && mysql -u root < $MYSQL_HOME/init_doughnut_db.sql
+      sleep 2 && mysql -u root -S $MYSQL_UNIX_SOCKET < $MYSQL_HOME/init_doughnut_db.sql
     fi
-
 
     export GPG_TTY=$(tty)
     export NIX_SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
@@ -96,7 +97,7 @@ EOF
     {
       rm -f $MYSQL_HOME/init_doughnut_db.sql
       if [[ ! -z "$MYSQLD_PID" ]]; then
-        mysqladmin -u root --socket=$MYSQL_UNIX_PORT shutdown
+        mysqladmin -u root --socket=$MYSQL_UNIX_SOCKET shutdown
         wait $MYSQL_PID
       fi
     }

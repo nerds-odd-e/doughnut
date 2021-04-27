@@ -25,7 +25,7 @@ import java.util.stream.Collectors;
 
 
 @RestController
-@Profile({"test", "dev"})
+@Profile({ "e2e", "test", "dev" })
 @RequestMapping("/api/testability")
 class TestabilityRestController {
 

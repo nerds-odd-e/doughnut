@@ -7,7 +7,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
 @Configuration
-@Profile({"prod"})
+@Profile({ "prod" })
 public class ProductionConfiguration extends WebSecurityConfigurerAdapter {
 
     private final CommonConfiguration commonConfiguration = new CommonConfiguration();
