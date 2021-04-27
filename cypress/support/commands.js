@@ -310,11 +310,7 @@ Cypress.Commands.add("visitBlog", () => {
     cy.visit("/blog/blog_landing.html");
 });
 
-Cypress.Commands.add("getYearList", () => {
-    return cy.get(".yearList");
-});
-
-Cypress.Commands.add("assertArticleInWebsiteByTitle", (article) => {
+Cypress.Commands.add("assertBlogPostInWebsiteByTitle", (article) => {
    cy.get('#article-container').within(() => {
     cy.get('.article').first().within(() => {
         cy.get('.title').first().should('have.text',article.title);
