@@ -19,9 +19,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 public class BlogYearMonthTest {
   @Autowired MakeMe makeMe;
 
-    @Autowired
-    ModelFactoryService modelFactoryService;
-
     @Test
     void shouldGetYearMonthEmptyList() {
         UserModel userModel = makeMe.aUser().toModelPlease();

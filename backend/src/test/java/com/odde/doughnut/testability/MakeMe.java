@@ -100,8 +100,4 @@ public class MakeMe {
     public SubscriptionBuilder aSubscription() {
         return new SubscriptionBuilder(this, new Subscription());
     }
-
-    public NotebookBuilder aNotebook() {
-        return new NotebookBuilder(this);
-    }
 }
