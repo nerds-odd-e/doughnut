@@ -3,12 +3,17 @@ package com.odde.doughnut.models;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+
 import java.util.Arrays;
 import java.util.List;
 
-public class Authorization extends ModelForEntity<User> {
-  public Authorization(User entity, ModelFactoryService modelFactoryService) {
-    super(entity, modelFactoryService);
+public class Authorization {
+  protected final User user;
+  protected final ModelFactoryService modelFactoryService;
+
+  public Authorization(User user, ModelFactoryService modelFactoryService) {
+    this.user = user;
+    this.modelFactoryService = modelFactoryService;
   }
 
   public void assertAuthorization(Note note) throws NoAccessRightException {
@@ -22,11 +27,11 @@ public class Authorization extends ModelForEntity<User> {
   }
 
   public boolean hasFullAuthority(Notebook notebook) {
-    return entity.owns(notebook);
+    return user.owns(notebook);
   }
 
   public boolean hasReadAuthority(Note note) {
-    return this.entity.canRead(note.getNotebook());
+    return this.user.canRead(note.getNotebook());
   }
 
   public void assertReadAuthorization(Note note) throws NoAccessRightException {
@@ -43,19 +48,19 @@ public class Authorization extends ModelForEntity<User> {
   }
 
   public void assertAuthorization(Circle circle) throws NoAccessRightException {
-    if (!entity.inCircle(circle)) {
+    if (!user.inCircle(circle)) {
       throw new NoAccessRightException();
     }
   }
 
   public void assertAuthorization(User user) throws NoAccessRightException {
-    if (!entity.getId().equals(user.getId())) {
+    if (!this.user.getId().equals(user.getId())) {
       throw new NoAccessRightException();
     }
   }
 
   public void assertAuthorization(Link link) throws NoAccessRightException {
-    if (link.getUser().getId() != entity.getId()) {
+    if (link.getUser().getId() != user.getId()) {
       throw new NoAccessRightException();
     }
   }
@@ -79,5 +84,5 @@ public class Authorization extends ModelForEntity<User> {
       Arrays.asList("Terry", "t-machu", "Developer", "thuzar", "Yeong Sheng",
                     "yeongsheng-tan");
 
-  public boolean isDeveloper() { return allowUsers.contains(entity.getName()); }
+  public boolean isDeveloper() { return allowUsers.contains(user.getName()); }
 }
