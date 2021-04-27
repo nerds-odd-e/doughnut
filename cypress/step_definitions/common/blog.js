@@ -7,9 +7,7 @@ import {
 } from "cypress-cucumber-preprocessor/steps";
 
 Given("There is a blog titled {string} in Doughnut", (title) => {
-  cy.visitMyNotebooks();
-  cy.findByText("Add New Notebook").click();
-  cy.get('select').select("BLOG");
+  cy.visit('/notebooks/new_blog');
   cy.submitNoteFormsWith([{Title:title}]);
 });
 

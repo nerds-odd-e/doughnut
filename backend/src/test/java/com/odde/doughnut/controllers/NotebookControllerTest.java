@@ -80,28 +80,34 @@ class NotebookControllerTest {
     }
 
     @Nested
-    class createNotebook {
+    class createBlog {
+
         @Test
         void shouldCreateNotebookAsABlogWhenBlogTypeIsSelected() throws IOException {
-
             User user = makeMe.aUser().please();
-            Ownership ownership = user.getOwnership();
-            Note note = makeMe.aNote().byUser(user).please(false);
+            Note note = makeMe.aNote().byUser(user).inMemoryPlease();
 
             NoteContent noteContent = note.getNoteContent();
-            noteContent.setNotebookType(NotebookType.BLOG);
-
             BindingResult bindingResult = makeMe.successfulBindingResult();
-            String response = controller.createNote(ownership, noteContent, bindingResult);
+            String response = controller.createBlog(user.getOwnership(), noteContent, bindingResult);
 
             assertThat(response, matchesPattern("redirect:/notes/\\d+"));
-
-            String[] split = response.split("/");
-            Integer id = Integer.valueOf(split[split.length - 1]);
-            Note createdNote = modelFactoryService.findNoteById(id).get();
-
-            Notebook blogNotebook = createdNote.getNotebook();
-            assertEquals(NotebookType.BLOG, blogNotebook.getNotebookType());
+            assertEquals(NotebookType.BLOG, getNotebookJustCreated(response).getNotebookType());
         }
+
+        @Test
+        void shouldUseTheRightTemplate() throws IOException {
+            String response = controller.createBlog(null, null, makeMe.failedBindingResult());
+
+            assertThat(response, equalTo("notebooks/new_blog"));
+        }
+
+    }
+
+    private Notebook getNotebookJustCreated(String response) {
+        String[] split = response.split("/");
+        Integer id = Integer.valueOf(split[split.length - 1]);
+        Note createdNote = modelFactoryService.findNoteById(id).get();
+        return createdNote.getNotebook();
     }
 }

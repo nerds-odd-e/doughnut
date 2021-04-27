@@ -39,10 +39,17 @@ public class NotebookController extends ApplicationMvcController  {
     @GetMapping({"/new"})
     public String newNote(Model model) {
         UserModel userModel = getCurrentUser();
-        NoteContent noteContent = new NoteContent();
         model.addAttribute("ownership", userModel.getEntity().getOwnership());
-        model.addAttribute("noteContent", noteContent);
+        model.addAttribute("noteContent", new NoteContent());
         return "notebooks/new";
+    }
+
+    @GetMapping({"/new_blog"})
+    public String newBlog(Model model) {
+        UserModel userModel = getCurrentUser();
+        model.addAttribute("ownership", userModel.getEntity().getOwnership());
+        model.addAttribute("noteContent", new NoteContent());
+        return "notebooks/new_blog";
     }
 
     @PostMapping({"/{ownership}/create"})
@@ -50,10 +57,18 @@ public class NotebookController extends ApplicationMvcController  {
         if (bindingResult.hasErrors()) {
             return "notebooks/new";
         }
-        final Note note = new Note();
-        User user = getCurrentUser().getEntity();
-        note.updateNoteContent(noteContent, user);
-        note.buildNotebookForHeadNote(ownership, user);
+        final Note note = createHeadNote(ownership, noteContent);
+        modelFactoryService.noteRepository.save(note);
+        return "redirect:/notes/" + note.getId();
+    }
+
+    @PostMapping({"/{ownership}/create_blog"})
+    public String createBlog(@PathVariable(name = "ownership", required = false) Ownership ownership, @Valid NoteContent noteContent, BindingResult bindingResult) throws IOException {
+        if (bindingResult.hasErrors()) {
+            return "notebooks/new_blog";
+        }
+        final Note note = createHeadNote(ownership, noteContent);
+        note.getNotebook().setNotebookType(NotebookType.BLOG);
         modelFactoryService.noteRepository.save(note);
         return "redirect:/notes/" + note.getId();
     }
@@ -82,6 +97,14 @@ public class NotebookController extends ApplicationMvcController  {
         BazaarModel bazaar = modelFactoryService.toBazaarModel();
         bazaar.shareNote(notebook);
         return new RedirectView("/notebooks");
+    }
+
+    private Note createHeadNote(Ownership ownership, NoteContent noteContent) throws IOException {
+        final Note note = new Note();
+        User user = getCurrentUser().getEntity();
+        note.updateNoteContent(noteContent, user);
+        note.buildNotebookForHeadNote(ownership, user);
+        return note;
     }
 
     private UserModel getCurrentUser() {
