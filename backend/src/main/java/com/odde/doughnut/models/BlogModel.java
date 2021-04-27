@@ -27,16 +27,13 @@ public class BlogModel {
         return list;
     }
 
-    public List<BlogPost> getBlogPosts(Note parentNote) {
-        if (parentNote == null) {
-            return new ArrayList<>();
-        }
-        return parentNote.getChildren().stream()
+    public List<BlogPost> getBlogPosts() {
+        return headNote.getChildren().stream()
                 .map(this::toBlogPost)
                 .collect(Collectors.toList());
     }
 
-    public BlogPost toBlogPost(Note note) {
+    private BlogPost toBlogPost(Note note) {
         BlogPost article = new BlogPost();
         article.setTitle(note.getTitle().split(": ")[1]);
         article.setDescription(note.getNoteContent().getDescription());

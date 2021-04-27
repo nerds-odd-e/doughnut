@@ -1,7 +1,6 @@
 package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.Test;
@@ -51,7 +50,7 @@ public class BlogYearMonthTest {
 
         BlogModel blogModel = new BlogModel(headNote.getNotebook());
         makeMe.refresh(headNote);
-        assertEquals(2, blogModel.getBlogPosts(headNote).size());
+        assertEquals(2, blogModel.getBlogPosts().size());
     }
 
 }

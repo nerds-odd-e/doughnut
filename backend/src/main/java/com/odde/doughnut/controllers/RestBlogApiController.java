@@ -22,7 +22,7 @@ class RestBlogApiController {
     public List<BlogPost> getBlogPostsByWebsiteName() {
         Note note = modelFactoryService.noteRepository.findFirstByTitle("odd-e-blog");
         BlogModel blogModel = modelFactoryService.toBlogModel(note.getNotebook());
-        return blogModel.getBlogPosts(note);
+        return blogModel.getBlogPosts();
     }
 
     @GetMapping("/year_list")
