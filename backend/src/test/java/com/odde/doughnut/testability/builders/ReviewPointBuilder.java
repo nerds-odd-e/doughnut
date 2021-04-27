@@ -12,11 +12,8 @@ import java.sql.Timestamp;
 
 public class ReviewPointBuilder extends EntityBuilder<ReviewPoint> {
 
-    protected final Class<ReviewPointModel> mClass;
-
     public ReviewPointBuilder(ReviewPoint reviewPoint, MakeMe makeMe) {
         super(makeMe, reviewPoint);
-        this.mClass = ReviewPointModel.class;
     }
 
     public ReviewPointBuilder forNote(Note note) {
@@ -49,7 +46,7 @@ public class ReviewPointBuilder extends EntityBuilder<ReviewPoint> {
     }
 
     public ReviewPointModel toModelPlease() {
-        return makeMe.modelFactoryService.toModel(please(), mClass);
+        return makeMe.modelFactoryService.toReviewPointModel(please());
     }
 
     @Override

@@ -58,16 +58,6 @@ public class ModelFactoryService {
         return new ReviewPointModel(reviewPoint, this);
     }
 
-    public <T, M extends ModelForEntity<T>> M toModel(T entity, Class<M> klass){
-        if (klass == ReviewPointModel.class) {
-            return (M) toReviewPointModel((ReviewPoint) entity);
-        }
-        if (klass == UserModel.class) {
-            return (M) toUserModel((User) entity);
-        }
-        return null;
-    }
-
     public CircleModel toCircleModel(Circle circle) {
         return new CircleModel(circle, this);
     }

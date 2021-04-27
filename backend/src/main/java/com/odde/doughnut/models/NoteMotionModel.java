@@ -4,13 +4,17 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteMotion;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import lombok.Getter;
 
 import java.util.ArrayList;
 
-public class NoteMotionModel extends ModelForEntity<NoteMotion>{
+public class NoteMotionModel {
+    protected final NoteMotion entity;
+    protected final ModelFactoryService modelFactoryService;
 
     public NoteMotionModel(NoteMotion noteMotion, ModelFactoryService modelFactoryService) {
-        super(noteMotion, modelFactoryService);
+        this.entity = noteMotion;
+        this.modelFactoryService = modelFactoryService;
     }
 
     public void execute() throws CyclicLinkDetectedException {

@@ -8,17 +8,14 @@ import com.odde.doughnut.testability.MakeMe;
 public class UserBuilder extends EntityBuilder<User> {
     static final TestObjectCounter exIdCounter = new TestObjectCounter(n -> "exid" + n);
     static final TestObjectCounter nameCounter = new TestObjectCounter(n -> "user" + n);
-    protected final Class<UserModel> mClass;
 
     public UserBuilder(MakeMe makeMe) {
         super(makeMe, new User());
-        this.mClass = UserModel.class;
         setInfo(nameCounter.generate());
     }
 
     public UserBuilder(MakeMe makeMe, String userName) {
         super(makeMe, new User());
-        this.mClass = UserModel.class;
         setInfo(userName);
     }
 
@@ -40,7 +37,7 @@ public class UserBuilder extends EntityBuilder<User> {
     }
 
     public UserModel toModelPlease() {
-        return makeMe.modelFactoryService.toModel(please(), mClass);
+        return makeMe.modelFactoryService.toUserModel(please());
     }
 
     @Override
