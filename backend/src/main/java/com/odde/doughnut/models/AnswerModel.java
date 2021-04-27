@@ -2,12 +2,14 @@ package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import lombok.Getter;
 
-public class AnswerModel extends ModelForEntity<Answer> {
+public class AnswerModel {
+    protected final Answer entity;
     private Boolean cachedIsCorrect;
 
-    public AnswerModel(Answer answer, ModelFactoryService modelFactoryService) {
-        super(answer, modelFactoryService);
+    public AnswerModel(Answer answer) {
+        this.entity = answer;
     }
 
     public boolean isCorrect() {

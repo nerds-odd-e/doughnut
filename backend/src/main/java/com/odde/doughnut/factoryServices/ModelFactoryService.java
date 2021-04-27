@@ -81,7 +81,7 @@ public class ModelFactoryService {
     }
 
     public AnswerModel toAnswerModel(Answer answer) {
-        return new AnswerModel(answer, this);
+        return new AnswerModel(answer);
     }
 
     public LinkModel toLinkModel(Link link) {
