@@ -39,25 +39,21 @@ public class ClozeDescription {
     }
 
     private String replaceLiteralWords(String wordToHide, String description) {
-        Pattern pattern = getPatternForLiteralMatch(wordToHide);
+        Pattern pattern = Pattern.compile(getPatternStringForLiteralMatch(wordToHide), Pattern.CASE_INSENSITIVE);
         return pattern.matcher(description).replaceAll(internalFullMatchReplacement);
     }
 
-    private Pattern getPatternForLiteralMatch(String wordToHide) {
-        String ptn;
-        if (wordToHide.length() < 4) {
-            ptn = "(?<!\\w)" + Pattern.quote(wordToHide) + "(?!\\w)";
-            if (wordToHide.matches("^\\d+$")) {
-                ptn = "(?<!\\d)" + Pattern.quote(wordToHide) + "(?!\\d)";
-            }
-        }
-        else {
-            ptn = String.join("([\\s-]+)((and\\s+)|(the\\s+)|(a\\s+)|(an\\s+))?",
+    private String getPatternStringForLiteralMatch(String wordToHide) {
+        if (wordToHide.length() >= 4) {
+            return String.join("([\\s-]+)((and\\s+)|(the\\s+)|(a\\s+)|(an\\s+))?",
                     Arrays.stream(wordToHide.split("[\\s-]+"))
                             .filter(x -> !Arrays.asList("the", "a", "an").contains(x))
                             .map(Pattern::quote).collect(Collectors.toUnmodifiableList()));
         }
-        return Pattern.compile(ptn, Pattern.CASE_INSENSITIVE);
+        if (wordToHide.matches("^\\d+$")) {
+            return "(?<!\\d)" + Pattern.quote(wordToHide) + "(?!\\d)";
+        }
+        return "(?<!\\w)" + Pattern.quote(wordToHide) + "(?!\\w)";
     }
 
     private String replaceSimilar(String wordToHide, String literal) {
