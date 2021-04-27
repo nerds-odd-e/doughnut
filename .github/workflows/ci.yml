@@ -69,7 +69,7 @@ jobs:
           mysql version: "8.0"
           character set server: "utf8mb4"
           collation server: "utf8mb4_unicode_ci"
-          mysql database: "doughnut_test"
+          mysql database: "doughnut_e2e_test"
           mysql user: ${{ secrets.DBUSER }}
           mysql password: ${{ secrets.DBPASSWORD }}
           host port: 3309
