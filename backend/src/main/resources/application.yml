@@ -56,6 +56,11 @@ spring:
       enable_lazy_load_no_trans: true
   github-for-issues:
     repo: nerds-odd-e/doughnut_sandbox
+
+server:
+  forward-headers-strategy: FRAMEWORK
+  port: 9081
+
 ---
 spring:
   profiles: dev
@@ -80,6 +85,11 @@ spring:
     show-sql: false
     properties.hibernate:
       enable_lazy_load_no_trans: true
+
+server:
+  forward-headers-strategy: FRAMEWORK
+  port: 9082
+
 ---
 spring:
   profiles: prod

@@ -1,13 +1,10 @@
 {
-  "baseUrl": "http://localhost:8081",
+  "baseUrl": "http://localhost:9081",
   "env": {
     "TAGS": "not @ignore"
   },
   "testFiles": "**/*.{feature,features}",
   "chromeWebSecurity": false,
-  "ignoreTestFiles": [
-    "**/__snapshots__/*",
-    "**/__image_snapshots__/*"
-  ],
+  "ignoreTestFiles": ["**/__snapshots__/*", "**/__image_snapshots__/*"],
   "video": false
 }
