@@ -1,39 +1,39 @@
 plugins {
-	id 'org.springframework.boot' version '2.4.5'
-	id 'io.spring.dependency-management' version '1.0.11.RELEASE'
-	id 'java'
+    id 'org.springframework.boot' version '2.4.5'
+    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'java'
 }
 
 group = 'com.odd-e'
 version = '0.0.1-SNAPSHOT'
 
 configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.flywaydb:flyway-core:7.8.1'
-	implementation 'org.springframework.session:spring-session-core'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.flywaydb:flyway-core:7.8.1'
+    implementation 'org.springframework.session:spring-session-core'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
-	implementation group: 'org.webjars', name: 'bootstrap', version: '4.6.0-1'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+    implementation group: 'org.webjars', name: 'bootstrap', version: '4.6.0-1'
     implementation group: 'org.webjars', name: 'jquery', version: '3.6.0'
     implementation group: 'org.webjars', name: 'popper.js', version: '1.16.1-lts'
-	compileOnly 'org.projectlombok:lombok'
-	developmentOnly 'org.springframework.boot:spring-boot-devtools'
-	runtimeOnly 'mysql:mysql-connector-java'
-	annotationProcessor 'org.projectlombok:lombok'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    compileOnly 'org.projectlombok:lombok'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    runtimeOnly 'mysql:mysql-connector-java'
+    annotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
 
 task testDBMigrate(type: Test) {
@@ -43,7 +43,7 @@ task testDBMigrate(type: Test) {
 }
 
 test {
-	useJUnitPlatform()
+    useJUnitPlatform()
     testLogging {
         exceptionFormat = 'full'
     }
@@ -63,9 +63,23 @@ tasks.register("bootRunDev") {
     finalizedBy("bootRun")
 }
 
+tasks.register("bootRunTest") {
+  group = "application"
+    description = "Runs Doughnut SpringBoot application in test profile"
+    doFirst {
+      tasks.bootRun.configure {
+        systemProperty("spring.profiles.active", "test")
+        systemProperty("spring.datasource.url", "jdbc:mysql://localhost:3309/doughnut_test")
+        systemProperty("spring.datasource.username", "doughnut")
+        systemProperty("spring.datasource.username", "doughnut")
+      }
+    }
+    finalizedBy("bootRun")
+}
+
 tasks.register("bootRunE2E") {
   group = "application"
-    description = "Runs Doughnut SpringBoot application in dev profile"
+    description = "Runs Doughnut SpringBoot application in e2e profile"
     doFirst {
       tasks.bootRun.configure {
         systemProperty("spring.profiles.active", "e2e")
