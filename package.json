@@ -6,6 +6,8 @@
     "author": "Terry Yin <terry.yinzhe@gmail.com>",
     "license": "MIT",
     "scripts": {
+        "backend:build": "backend/gradlew -p backend build -x test",
+        "backend:prod_build": "backend/gradlew -p backend build -x test -Dspring.profiles.active=prod",
         "cy:open": "cypress open",
         "cy:run": "cypress run",
         "sut": "backend/gradlew bootRunE2E -p backend",
