@@ -78,7 +78,7 @@ Then("I should see the {string} button on note {string}", (btnClass, noteTitle) 
 
 Then("I should see readonly notebook {string} in my notes", (noteTitle) => {
   cy.visitMyNotebooks();
-  cy.findNoteCardButton(noteTitle, ".edit-card").should("not.exist");
+  cy.findNoteCardButton1(noteTitle, "edit note").should("not.exist");
 });
 
 Then("I should see I've subscribed to {string}", (noteTitle) => {

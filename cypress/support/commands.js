@@ -133,12 +133,12 @@ Cypress.Commands.add("visitMyNotebooks", (noteTitle) => {
 });
 
 Cypress.Commands.add("creatingLinkFor", (noteTitle) => {
-    cy.clickNotePageButton(noteTitle, ".link-card");
+    cy.clickNotePageButton(noteTitle, "link note");
 });
 
-Cypress.Commands.add("clickNotePageButton", (noteTitle, btnSelector) => {
+Cypress.Commands.add("clickNotePageButton", (noteTitle, btnTextOrTitle) => {
     cy.jumpToNotePage(noteTitle);
-    cy.get(".jumbotron").find(btnSelector).click();
+    cy.get(".jumbotron").findByRole("button", { name: btnTextOrTitle}).click();
 });
 
 Cypress.Commands.add("expectExactLinkTargets", (targets) => {
@@ -158,7 +158,7 @@ Cypress.Commands.add("findNoteCardButton1", (noteTitle, btnTextOrTitle) => {
 
 
 Cypress.Commands.add("findNoteCardEditButton", (noteTitle) => {
-  return cy.findNoteCardButton(noteTitle, ".edit-card");
+  return cy.findNoteCardButton1(noteTitle, "edit note");
 });
 
 Cypress.Commands.add("updateCurrentUserSettingsWith", (hash) => {

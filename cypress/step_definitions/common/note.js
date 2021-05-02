@@ -26,7 +26,7 @@ When("I create top level note with:", (data) => {
 });
 
 When("I am editing note {string} the title is expected to be pre-filled with {string}", (noteTitle, oldTitle) => {
-  cy.clickNotePageButton(noteTitle, ".edit-card");
+  cy.clickNotePageButton(noteTitle, "edit note");
   cy.getFormControl('Title').should('have.value', oldTitle);
 });
 
@@ -62,7 +62,7 @@ Then("I should see these notes belonging to the user", (data) => {
 });
 
 When("I delete top level note {string}", (noteTitle) => {
-  cy.clickNotePageButton(noteTitle, ".delete-card");
+  cy.clickNotePageButton(noteTitle, "delete note");
 });
 
 
