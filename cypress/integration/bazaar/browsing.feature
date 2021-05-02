@@ -13,13 +13,13 @@ Feature: Bazaar browsing
       | precondition    | square has stronger precondition | In OOP        | true               | true                  |
       | Shapes are good |                                  | Shape         | false              | false                 |
     And there is "belongs to" link between note "Square" and "Rectangle"
-    And note "Shape" is shared to the Bazaar
+    And notebook "Shape" is shared to the Bazaar
 
   Scenario: Browsing as non-user
     When I haven't login
     Then I should see "Shape" is shared in the Bazaar
     And there shouldn't be any note edit button for "Shape"
-    When I open the note "Shape" in the Bazaar
+    When I open the notebook "Shape" in the Bazaar
     Then there shouldn't be any note edit button for "Rectangle"
     And I should see "Bazaar, Shape" in breadcrumb
     And I should be able to go to the "next" note "Rectangle"
@@ -28,7 +28,7 @@ Feature: Bazaar browsing
   Scenario: Browsing as non-user in article view
     When I haven't login
     Then I should see "Shape" is shared in the Bazaar
-    When I open the note "Shape" in the Bazaar in article view
+    When I open the notebook "Shape" in the Bazaar in article view
     Then I should see in the article:
       | level | title    |
       | h1    | Shape    |

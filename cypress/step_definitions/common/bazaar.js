@@ -6,7 +6,7 @@ import {
   Before,
 } from "cypress-cucumber-preprocessor/steps";
 
-Given("I choose to share my note {string}", (noteTitle) => {
+Given("I choose to share my notebook {string}", (noteTitle) => {
   cy.visitMyNotebooks();
   cy.findNoteCardButton(noteTitle, ".share-card").click();
 })
@@ -16,7 +16,7 @@ Then("I should see {string} is shared in the Bazaar", (noteTitle) => {
   cy.findByText(noteTitle);
 })
 
-Then("note {string} is shared to the Bazaar", (noteTitle) => {
+Then("notebook {string} is shared to the Bazaar", (noteTitle) => {
   cy.request({
       method: "POST",
       url: "/api/testability/share_to_bazaar",
@@ -30,11 +30,11 @@ Then("there shouldn't be any note edit button for {string}", (noteTitle) => {
   cy.findNoteCardEditButton(noteTitle).should("not.exist");
 });
 
-When("I open the note {string} in the Bazaar", (noteTitle) => {
+When("I open the notebook {string} in the Bazaar", (noteTitle) => {
   cy.findByText(noteTitle).click();
 });
 
-When("I open the note {string} in the Bazaar in article view", (noteTitle) => {
+When("I open the notebook {string} in the Bazaar in article view", (noteTitle) => {
   cy.findByText(noteTitle).click();
   cy.findByRole('button', {name: "Article View"}).click();
 });
@@ -63,12 +63,12 @@ When("I should see {string} as non-title in the article", (content) => {
 
 
 
-When("I subscribe to note {string} in the bazaar, with target of learning {int} notes per day", (noteTitle, count) => {
+When("I subscribe to notebook {string} in the bazaar, with target of learning {int} notes per day", (noteTitle, count) => {
   cy.visit("/bazaar");
   cy.subscribeToNote(noteTitle, count);
 });
 
-Then("I should not see the {string} button on note {string}", (btnClass, noteTitle) => {
+Then("I should not see the {string} button on notebook {string}", (btnClass, noteTitle) => {
   cy.findNoteCardButton(noteTitle, "." + btnClass).should("not.exist");
 });
 
@@ -76,7 +76,7 @@ Then("I should see the {string} button on note {string}", (btnClass, noteTitle) 
   cy.findNoteCardButton(noteTitle, "." + btnClass).should("exist");
 });
 
-Then("I should see readonly note {string} in my notes", (noteTitle) => {
+Then("I should see readonly notebook {string} in my notes", (noteTitle) => {
   cy.visitMyNotebooks();
   cy.findNoteCardButton(noteTitle, ".edit-card").should("not.exist");
 });
@@ -89,7 +89,7 @@ Then("I should see I've not subscribed to {string}", (noteTitle) => {
   cy.findByText(noteTitle).should("not.exist");
 });
 
-Then("I should be able to edit the subscription to note {string}", (noteTitle) => {
+Then("I should be able to edit the subscription to notebook {string}", (noteTitle) => {
   cy.visitMyNotebooks();
   cy.findNoteCardButton(noteTitle, ".edit-subscription").click();
   cy.findByRole('button', {name: "Update"}).click();
