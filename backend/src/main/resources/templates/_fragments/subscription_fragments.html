@@ -1,6 +1,7 @@
-<a th:fragment="subscriptionTitleWithBazaarLink(subscription)" th:href="'/notes/' + ${subscription.headNote.id}" th:text="${subscription.headNote.title}"/>
+<a th:fragment="subscriptionTitleWithBazaarLink(subscription)" th:href="'/notes/' + ${subscription.headNote.id}"
+   th:text="${subscription.headNote.title}"/>
 
-<div th:fragment="noteSubscriptionCards(subscriptions)"  th:replace="_fragments/note_fragments::noteCardWithHeaderAndButton(
+<div th:fragment="noteSubscriptionCards(subscriptions)" th:replace="_fragments/note_fragments::noteCardWithHeaderAndButton(
          notes=${subscriptions},
          bodyButton=~{},
          headerButtons=~{ :: .s-card-header-buttons},
@@ -10,8 +11,8 @@
 </div>
 
 <div th:fragment="subscriptionNoteButtons(subscription)" class="btn-group btn-group-sm">
-    <a
-            class="btn btn-sm edit-subscription" th:href="@{/subscriptions/{id}/edit(id=${subscription.id})}" title="Edit subscription">
+    <a class="btn btn-sm edit-subscription" th:href="@{/subscriptions/{id}/edit(id=${subscription.id})}"
+       title="Edit subscription">
         <svg th:replace="_fragments/svgs :: edit"/>
     </a>
 </div>
@@ -22,7 +23,8 @@
          additional=${additional},
          linkFragment='_fragments/bazaar_fragments::noteTitleWithBazaarLink'
          )">
-    <li class="breadcrumb-item b-top-link"><a href="/notebooks">Subscriptions</a></lid>
+    <li class="breadcrumb-item b-top-link"><a href="/notebooks">Subscriptions</a>
+</lid>
 </div>
 
 <div th:fragment="subscriptionFormFields(subscription)" th:object="${subscription}">

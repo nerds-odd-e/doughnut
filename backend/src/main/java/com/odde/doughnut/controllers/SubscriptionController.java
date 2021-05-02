@@ -68,4 +68,13 @@ public class SubscriptionController extends ApplicationMvcController {
         return "redirect:/subscriptions/" + subscription.getId();
     }
 
+    @PostMapping("/{subscription}/destroy")
+    @Transactional
+    public String destroySubscription(@Valid Subscription subscription) throws NoAccessRightException {
+        final UserModel userModel = currentUserFetcher.getUser();
+        userModel.getAuthorization().assertAuthorization(subscription);
+        modelFactoryService.entityManager.remove(subscription);
+        return "redirect:/notebooks/";
+    }
+
 }

@@ -3,10 +3,13 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.Subscription;
+import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.repositories.SubscriptionRepository;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ExtendedModelMap;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.matchesPattern;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -26,6 +30,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class SubscriptionControllerTest {
     @Autowired
     private MakeMe makeMe;
+    @Autowired
+    private SubscriptionRepository subscriptionRepository;
     private UserModel userModel;
     private Note topNote;
     private Notebook notebook;
@@ -72,5 +78,26 @@ class SubscriptionControllerTest {
                 anotherNote.getNotebook(),
                 subscription,
                 makeMe.successfulBindingResult(), model));
+    }
+
+    @Nested
+    class Unsubscribe {
+        @Test
+        void shouldRemoveTheSubscription() throws NoAccessRightException {
+            Subscription subscription = makeMe.aSubscription().forUser(userModel.getEntity()).please();
+            long beforeDestroy = subscriptionRepository.count();
+            String result = controller.destroySubscription(subscription);
+            assertThat(subscriptionRepository.count(), equalTo(beforeDestroy - 1));
+            assertThat(result, equalTo("redirect:/notebooks/"));
+        }
+
+        @Test
+        void notAllowToUnsubscribeForOtherPeople() {
+            User anotherUser = makeMe.aUser().please();
+            Subscription subscription = makeMe.aSubscription().forUser(anotherUser).please();
+            assertThrows(NoAccessRightException.class, ()-> controller.destroySubscription(subscription));
+        }
+
+
     }
 }

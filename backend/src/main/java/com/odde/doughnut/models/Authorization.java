@@ -53,6 +53,12 @@ public class Authorization {
     }
   }
 
+  public void assertAuthorization(Subscription subscription) throws NoAccessRightException {
+    if (subscription.getUser() != user) {
+      throw new NoAccessRightException();
+    }
+  }
+
   public void assertAuthorization(User user) throws NoAccessRightException {
     if (!this.user.getId().equals(user.getId())) {
       throw new NoAccessRightException();
@@ -85,4 +91,5 @@ public class Authorization {
                     "yeongsheng-tan");
 
   public boolean isDeveloper() { return allowUsers.contains(user.getName()); }
+
 }
