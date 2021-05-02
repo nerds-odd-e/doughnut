@@ -299,7 +299,7 @@ Cypress.Commands.add("getFormControl", (label) => {
 });
 
 Cypress.Commands.add("subscribeToNote", (noteTitle, dailyLearningCount) => {
-  cy.findNoteCardButton(noteTitle, ".add-to-learning").click();
+  cy.findNoteCardButton1(noteTitle, "Add to my learning").click();
   cy.get("#subscription-dailyTargetOfNewNotes").clear().type(dailyLearningCount);
   cy.findByRole('button', {name: "Add to my learning"}).click();
 });

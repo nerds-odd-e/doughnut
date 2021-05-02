@@ -68,8 +68,8 @@ When("I subscribe to notebook {string} in the bazaar, with target of learning {i
   cy.subscribeToNote(noteTitle, count);
 });
 
-Then("I should not see the {string} button on notebook {string}", (btnClass, noteTitle) => {
-  cy.findNoteCardButton(noteTitle, "." + btnClass).should("not.exist");
+Then("I should not see the {string} button on notebook {string}", (btnTitle, noteTitle) => {
+  cy.findNoteCardButton1(noteTitle, btnTitle).should("not.exist");
 });
 
 Then("I should see the {string} button on note {string}", (btnClass, noteTitle) => {
