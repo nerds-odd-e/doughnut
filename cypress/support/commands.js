@@ -152,6 +152,11 @@ Cypress.Commands.add("findNoteCardButton", (noteTitle, selector) => {
   return cy.findByText(noteTitle).parent().parent().parent().find(selector);
 });
 
+Cypress.Commands.add("findNoteCardButton1", (noteTitle, btnTextOrTitle) => {
+  return cy.findByText(noteTitle).parent().parent().parent().findByRole('button', {name: btnTextOrTitle});
+});
+
+
 Cypress.Commands.add("findNoteCardEditButton", (noteTitle) => {
   return cy.findNoteCardButton(noteTitle, ".edit-card");
 });
@@ -301,7 +306,7 @@ Cypress.Commands.add("subscribeToNote", (noteTitle, dailyLearningCount) => {
 
 Cypress.Commands.add("unsubscribeFromNotebook", (noteTitle) => {
   cy.visitMyNotebooks();
-  cy.findNoteCardButton(noteTitle, ".unsubscribe").click();
+  cy.findNoteCardButton1(noteTitle, "Unsubscribe").click();
 });
 
 Cypress.Commands.add("searchNote", (searchKey) => {

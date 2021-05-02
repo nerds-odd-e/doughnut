@@ -17,7 +17,7 @@
     </a>
     <form th:action="@{/subscriptions/{id}/delete(id=${subscription.id})}" th:method="delete"
           onsubmit="return confirm('Are you sure to unsubscribe from this notebook??')">
-        <button class="btn btn-sm unsubscribe" title="Unsubscribe">
+        <button class="btn btn-sm" title="Unsubscribe">
             <svg th:replace="_fragments/svgs :: unsubscribe"/>
         </button>
     </form>

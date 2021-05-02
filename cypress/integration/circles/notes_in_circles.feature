@@ -16,5 +16,5 @@ Feature: Notes in circles
   Scenario: subscribe to a note and review
     When I create a note "Team agreement" in circle "Odd-e SG Team"
     Then I subscribe to note "Team agreement" in the circle "Odd-e SG Team", with target of learning 1 notes per day
-    And  I should be able to edit the subscription to note "Team agreement"
+    And  I should be able to edit the subscription to notebook "Team agreement"
 
