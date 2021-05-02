@@ -16,6 +16,8 @@ Feature: Bazaar subscription
     When I subscribe to note "Shape" in the bazaar, with target of learning 1 notes per day
     Then I should see I've subscribed to "Shape"
     And I should see readonly note "Shape" in my notes
+    When I unsubscribe from notebook "Shape"
+    Then I should see I've not subscribed to "Shape"
 
   Scenario: subscribe to a note and review
     Given I've logged in as an existing user

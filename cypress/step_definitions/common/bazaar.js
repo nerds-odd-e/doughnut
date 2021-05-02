@@ -85,6 +85,10 @@ Then("I should see I've subscribed to {string}", (noteTitle) => {
   cy.findByText(noteTitle).should("be.visible");
 });
 
+Then("I should see I've not subscribed to {string}", (noteTitle) => {
+  cy.findByText(noteTitle).should("not.exist");
+});
+
 Then("I should be able to edit the subscription to note {string}", (noteTitle) => {
   cy.visitMyNotebooks();
   cy.findNoteCardButton(noteTitle, ".edit-subscription").click();
@@ -102,4 +106,10 @@ Then("I should see it has link to {string}", (noteTitle) => {
   cy.findByText(noteTitle, {selector: ".badge a"}).click();
   cy.findByText(noteTitle, { selector: ".h1" }).should("be.visible");
 });
+
+Then("I unsubscribe from notebook {string}", (noteTitle) => {
+  cy.unsubscribeFromNotebook(noteTitle);
+});
+
+
 

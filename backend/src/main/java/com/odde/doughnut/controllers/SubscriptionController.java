@@ -68,7 +68,7 @@ public class SubscriptionController extends ApplicationMvcController {
         return "redirect:/subscriptions/" + subscription.getId();
     }
 
-    @PostMapping("/{subscription}/destroy")
+    @PostMapping("/{subscription}/delete")
     @Transactional
     public String destroySubscription(@Valid Subscription subscription) throws NoAccessRightException {
         final UserModel userModel = currentUserFetcher.getUser();
