@@ -8,7 +8,7 @@ import {
 
 Given("I choose to share my notebook {string}", (noteTitle) => {
   cy.visitMyNotebooks();
-  cy.findNoteCardButton(noteTitle, ".share-card").click();
+  cy.findNoteCardButton1(noteTitle, "Share notebook to bazaar").click();
 })
 
 Then("I should see {string} is shared in the Bazaar", (noteTitle) => {
@@ -70,10 +70,6 @@ When("I subscribe to notebook {string} in the bazaar, with target of learning {i
 
 Then("I should not see the {string} button on notebook {string}", (btnTitle, noteTitle) => {
   cy.findNoteCardButton1(noteTitle, btnTitle).should("not.exist");
-});
-
-Then("I should see the {string} button on note {string}", (btnClass, noteTitle) => {
-  cy.findNoteCardButton(noteTitle, "." + btnClass).should("exist");
 });
 
 Then("I should see readonly notebook {string} in my notes", (noteTitle) => {

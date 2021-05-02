@@ -9,7 +9,7 @@
     </a>
     <form th:action="@{/notebooks/{id}/share(id=${notebook.id})}" th:method="post"
           onsubmit="return confirm('Are you sure to share?')">
-        <button class="btn btn-sm share-card" title="Share nodebook to bazaar">
+        <button class="btn btn-sm" title="Share notebook to bazaar">
             <svg th:replace="_fragments/svgs :: bazaarShare"/>
         </button>
     </form>
