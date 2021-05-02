@@ -11,7 +11,7 @@
 </div>
 
 <div th:fragment="subscriptionNoteButtons(subscription)" class="btn-group btn-group-sm">
-    <a class="btn btn-sm edit-subscription" th:href="@{/subscriptions/{id}/edit(id=${subscription.id})}"
+    <a class="btn btn-sm" role="button" th:href="@{/subscriptions/{id}/edit(id=${subscription.id})}"
        title="Edit subscription">
         <svg th:replace="_fragments/svgs :: edit"/>
     </a>

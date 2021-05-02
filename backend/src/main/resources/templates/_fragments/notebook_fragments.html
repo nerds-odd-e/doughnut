@@ -3,7 +3,7 @@
        th:href="@{/notes/articles/{id}(id=${notebook.headNote.id})}">
         <svg th:replace="_fragments/svgs :: article"/>
     </a>
-    <a class="btn btn-sm edit-notebook" th:href="@{/notebooks/{id}/edit(id=${notebook.id})}"
+    <a class="btn btn-sm" role="button" th:href="@{/notebooks/{id}/edit(id=${notebook.id})}"
        title="edit notebook settings">
         <svg th:replace="_fragments/svgs :: editNotebook"/>
     </a>

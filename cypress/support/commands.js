@@ -148,17 +148,13 @@ Cypress.Commands.add("expectExactLinkTargets", (targets) => {
     cy.findAllByText(/.*/, {selector: '.card-title a'}).should("have.length", targets.length);
 });
 
-Cypress.Commands.add("findNoteCardButton", (noteTitle, selector) => {
-  return cy.findByText(noteTitle).parent().parent().parent().find(selector);
-});
-
-Cypress.Commands.add("findNoteCardButton1", (noteTitle, btnTextOrTitle) => {
+Cypress.Commands.add("findNoteCardButton", (noteTitle, btnTextOrTitle) => {
   return cy.findByText(noteTitle).parent().parent().parent().findByRole('button', {name: btnTextOrTitle});
 });
 
 
 Cypress.Commands.add("findNoteCardEditButton", (noteTitle) => {
-  return cy.findNoteCardButton1(noteTitle, "edit note");
+  return cy.findNoteCardButton(noteTitle, "edit note");
 });
 
 Cypress.Commands.add("updateCurrentUserSettingsWith", (hash) => {
@@ -299,14 +295,14 @@ Cypress.Commands.add("getFormControl", (label) => {
 });
 
 Cypress.Commands.add("subscribeToNote", (noteTitle, dailyLearningCount) => {
-  cy.findNoteCardButton1(noteTitle, "Add to my learning").click();
+  cy.findNoteCardButton(noteTitle, "Add to my learning").click();
   cy.get("#subscription-dailyTargetOfNewNotes").clear().type(dailyLearningCount);
   cy.findByRole('button', {name: "Add to my learning"}).click();
 });
 
 Cypress.Commands.add("unsubscribeFromNotebook", (noteTitle) => {
   cy.visitMyNotebooks();
-  cy.findNoteCardButton1(noteTitle, "Unsubscribe").click();
+  cy.findNoteCardButton(noteTitle, "Unsubscribe").click();
 });
 
 Cypress.Commands.add("searchNote", (searchKey) => {

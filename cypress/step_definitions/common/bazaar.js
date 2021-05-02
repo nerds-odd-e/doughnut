@@ -8,7 +8,7 @@ import {
 
 Given("I choose to share my notebook {string}", (noteTitle) => {
   cy.visitMyNotebooks();
-  cy.findNoteCardButton1(noteTitle, "Share notebook to bazaar").click();
+  cy.findNoteCardButton(noteTitle, "Share notebook to bazaar").click();
 })
 
 Then("I should see {string} is shared in the Bazaar", (noteTitle) => {
@@ -69,12 +69,12 @@ When("I subscribe to notebook {string} in the bazaar, with target of learning {i
 });
 
 Then("I should not see the {string} button on notebook {string}", (btnTitle, noteTitle) => {
-  cy.findNoteCardButton1(noteTitle, btnTitle).should("not.exist");
+  cy.findNoteCardButton(noteTitle, btnTitle).should("not.exist");
 });
 
 Then("I should see readonly notebook {string} in my notes", (noteTitle) => {
   cy.visitMyNotebooks();
-  cy.findNoteCardButton1(noteTitle, "edit note").should("not.exist");
+  cy.findNoteCardButton(noteTitle, "edit note").should("not.exist");
 });
 
 Then("I should see I've subscribed to {string}", (noteTitle) => {
@@ -87,13 +87,13 @@ Then("I should see I've not subscribed to {string}", (noteTitle) => {
 
 Then("I should be able to edit the subscription to notebook {string}", (noteTitle) => {
   cy.visitMyNotebooks();
-  cy.findNoteCardButton(noteTitle, ".edit-subscription").click();
+  cy.findNoteCardButton(noteTitle, "Edit subscription").click();
   cy.findByRole('button', {name: "Update"}).click();
 });
 
 When("I change notebook {string} to skip review", (noteTitle) => {
   cy.visitMyNotebooks();
-  cy.findNoteCardButton(noteTitle, ".edit-notebook").click();
+  cy.findNoteCardButton(noteTitle, "edit notebook settings").click();
   cy.getFormControl("SkipReviewEntirely").check();
   cy.findByRole('button', {name: "Update"}).click();
 });
