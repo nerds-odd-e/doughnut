@@ -23,7 +23,7 @@ in mkShell {
     most progress ps pstree ripgrep tree vgrep unixtools.whereis which
     libmysqlclient libpcap libressl patchelf
     cacert curlie glances httpie
-    mysql80 mysql-client mysql_jdbc python38Packages.pip
+    mysql80 mysql-client mysql_jdbc python39Packages.pip
     chromedriver geckodriver google-cloud-sdk packer
     dbeaver vim vimpager
   ] ++ lib.optionals stdenv.isDarwin [
@@ -76,7 +76,7 @@ GRANT ALL PRIVILEGES ON doughnut_e2e_test.*    TO 'doughnut'@'localhost';
 FLUSH PRIVILEGES;
 EOF
 
-    export MYSQLD_PID=$(pgrep mysqld)
+    export MYSQLD_PID=$(ps -ax | grep -v " grep " | grep mysqld | awk '{ print $1 }')
     if [[ -z "$MYSQLD_PID" ]]; then
       [ ! "$(ls -A mysql/data)" ] && mysqld --initialize-insecure --port=$MYSQL_TCP_PORT --user=`whoami` --datadir=$MYSQL_DATADIR --basedir=$MYSQL_BASEDIR --explicit_defaults_for_timestamp
       mysqld --datadir=$MYSQL_DATADIR --pid-file=$MYSQL_PID_FILE --port=$MYSQL_TCP_PORT --socket=$MYSQL_UNIX_SOCKET --mysqlx-socket=$MYSQLX_UNIX_SOCKET --mysqlx_port=$MYSQLX_TCP_PORT &
