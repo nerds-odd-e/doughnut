@@ -25,7 +25,7 @@ in mkShell {
     cacert curlie glances httpie
     mysql80 mysql-client mysql_jdbc python39Packages.pip
     chromedriver geckodriver google-cloud-sdk packer
-    dbeaver vim vimpager
+    dbeaver vim vimpager vscodium
   ] ++ lib.optionals stdenv.isDarwin [
     darwin.apple_sdk.libs.utmp darwin.apple_sdk.libs.Xplugin
     apple_sdk.AppKit apple_sdk.AGL apple_sdk.ApplicationServices apple_sdk.AudioToolbox
@@ -35,7 +35,7 @@ in mkShell {
     apple_sdk.QTKit apple_sdk.Security apple_sdk.SystemConfiguration xcodebuild
   ] ++ lib.optionals (!stdenv.isDarwin) [
     firefox google-chrome 
-    gitter intellij mysql-workbench vscode-with-extensions
+    gitter intellij mysql-workbench
   ];
   shellHook = ''
     export NIXPKGS_ALLOW_UNFREE=1
