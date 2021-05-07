@@ -16,6 +16,7 @@ For more background info you can read:
 - [OpenJDK 11](https://openjdk.java.net/projects/jdk/11/)
 - [Spring Boot](https://spring.io/projects/spring-boot)
 - [Thymeleaf](https://www.thymeleaf.org/)
+- [Vue3](https://v3.vuejs.org/guide/introduction.html)
 - [Gradle](https://gradle.org/)
 - [Junit5](https://junit.org/junit5/)
 - [JavaScript](https://www.javascript.com)
@@ -31,7 +32,6 @@ For more background info you can read:
 - [packer](https://www.packer.io)
 - [packer googlecompute builder](https://www.packer.io/docs/builders/googlecompute)
 - [SaltStack](https://docs.saltproject.io/en/latest/)
-- [Flutter web-app frontend](https://flutter.dev/docs/get-started/web)
 
 ## Getting started
 
