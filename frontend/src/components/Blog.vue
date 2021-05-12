@@ -1,0 +1,81 @@
+<template>
+    <div class="blog-container">
+        <h1 style="padding-top:10px">NERDs Blog</h1>
+        <div class="row" style="height:100%;padding-top:20px">
+            <div id="blog-left-panel" class="col-lg-3" style=
+            "background-color:#deefff;padding-top:20px">
+                <ul v-if="yearList.length">
+                    <li>
+                        <a href="#recent">Recent</a>
+                    </li>
+                    <li v-for="item in yearList" class="yearList">
+                        <a href="#">{{item}}</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-lg-9" id="article-container" style=
+            "width:100%;padding-left:50px; margin-bottom:50px;">
+                <div v-if="articleList.length" v-for=
+                "article in articleList" class="row article">
+                    <div class="row title" style=
+                    "width:100%;padding:10px;font-size:24px;font-weight:bold;">
+                        {{article.title}}
+                    </div>
+                    <div class="row authorName" style=
+                    "width:100%;padding:10px">
+                        {{article.author}}
+                    </div>
+                    <div class="row createdAt" style=
+                    "width:100%;padding:10px">
+                        {{article.createdDatetime}}
+                    </div>
+                    <div class="row content" style=
+                    "width:100%;padding:10px">
+                        {{article.description}}
+                    </div>
+                    <div style="width:100%; height: 30px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<script>
+export default {
+    name: 'Blog',
+    data() {
+        return {
+            blogInfo: [],
+            yearList: [],
+            articleList: [],
+            apiUrl: "http://localhost:8081/api/blog/posts_by_website_name/odd-e-blog",
+            apiYearsUrl: "http://localhost:8081/api/blog/year_list"
+        };
+    },
+    mounted() {
+        fetch(this.apiUrl)
+        .then(res => {
+            console.table(res);
+            return res.json();
+        })
+        .then(articles => {
+            console.table(articles);
+            this.articleList = articles;
+        })
+        .catch(error => {
+            alert(error);
+        });
+
+        fetch(this.apiYearsUrl)
+        .then(res => {
+            return res.json();
+        })
+        .then(years => {
+            this.yearList = years;
+        })
+        .catch(error => {
+            alert(error);
+        });
+    }
+}
+</script>

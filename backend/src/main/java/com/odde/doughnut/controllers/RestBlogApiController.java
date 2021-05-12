@@ -8,6 +8,9 @@ import java.util.List;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
+@CrossOrigin(origins = {"http://localhost:3000", "http://localhost:3001",
+                        "http://localhost:5000"},
+             maxAge = 6000)
 @RequestMapping("/api/blog")
 class RestBlogApiController {
   private final ModelFactoryService modelFactoryService;

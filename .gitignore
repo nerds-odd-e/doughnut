@@ -75,72 +75,15 @@ nohup.out
 infra/ssl/
 !infra/salt/states/base_os/templates/doughnut_env.sh
 
-# Flutter/Dart/Pub related
-**/doc/api/
-frontend/.dart_tool/
-frontend/.flutter-plugins
-frontend/.packages
-frontend/.pub-cache/
-frontend/.pub/
-frontend/build/
-
-# Flutter-Web related
-frontend/lib/generated_plugin_registrant.dart
+# Frontend Vue/Vite related
+frontend/node_modules
+frontend/dist/
+backend/src/main/resources/static/favicon.ico
+backend/src/main/resources/static/index.html
+backend/src/main/resources/static/assets/
 
 # Symbolication related
 frontend/app.*.symbols
 
 # Obfuscation related
 frontend/app.*.map.json
-
-# Android related
-**/android/**/gradle-wrapper.jar
-**/android/.gradle
-**/android/captures/
-**/android/gradlew
-**/android/gradlew.bat
-**/android/local.properties
-**/android/**/GeneratedPluginRegistrant.java
-**/android/app/debug
-**/android/app/profile
-**/android/app/release
-**/android/.project
-**/android/.settings
-**/android/app/.classpath
-**/android/app/.project
-**/android/app/.settings
-
-
-# iOS/XCode related
-**/ios/**/*.mode1v3
-**/ios/**/*.mode2v3
-**/ios/**/*.moved-aside
-**/ios/**/*.pbxuser
-**/ios/**/*.perspectivev3
-**/ios/**/*sync/
-**/ios/**/.sconsign.dblite
-**/ios/**/.tags*
-**/ios/**/.vagrant/
-**/ios/**/DerivedData/
-**/ios/**/Icon?
-**/ios/**/Pods/
-**/ios/**/.symlinks/
-**/ios/**/profile
-**/ios/**/xcuserdata
-**/ios/.generated/
-**/ios/Flutter/.last_build_id
-**/ios/Flutter/App.framework
-**/ios/Flutter/Flutter.framework
-**/ios/Flutter/Generated.xcconfig
-**/ios/Flutter/app.flx
-**/ios/Flutter/app.zip
-**/ios/Flutter/flutter_assets/
-**/ios/ServiceDefinitions.json
-**/ios/Runner/GeneratedPluginRegistrant.*
-
-# Exceptions to above rules.
-!**/ios/**/default.mode1v3
-!**/ios/**/default.mode2v3
-!**/ios/**/default.pbxuser
-!**/ios/**/default.perspectivev3
-!/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages

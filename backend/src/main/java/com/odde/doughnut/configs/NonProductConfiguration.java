@@ -51,7 +51,7 @@ public class NonProductConfiguration extends WebSecurityConfigurerAdapter {
     http.csrf()
         .disable()
         .authorizeRequests()
-        .antMatchers("/api/healthcheck", "/api/testability/**")
+        .antMatchers("/api/blog/**", "/api/healthcheck", "/api/testability/**")
         .permitAll();
 
     commonConfiguration.commonConfig(http).formLogin().and().httpBasic();
