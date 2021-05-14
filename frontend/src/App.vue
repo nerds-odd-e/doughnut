@@ -1,5 +1,4 @@
 <template>
-  <img alt="Odd-e Company Logo" src="./assets/odd-e.png" />
   <Blog />
 </template>
 

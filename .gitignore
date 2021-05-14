@@ -80,6 +80,7 @@ infra/ssl/
 frontend/node_modules
 frontend/dist/
 backend/src/main/resources/static/favicon.ico
+backend/src/main/resources/static/odd-e.ico
 backend/src/main/resources/static/index.html
 backend/src/main/resources/static/assets/
 

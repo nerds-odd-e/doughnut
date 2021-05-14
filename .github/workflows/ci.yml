@@ -74,6 +74,10 @@ jobs:
           mysql password: ${{ secrets.DBPASSWORD }}
           host port: 3309
           container port: 3309
+      - name: Build frontend
+        uses: borales/actions-yarn@v2.0.0
+        with:
+          cmd: frontend:build
       - name: End-to-End tests with Cypress
         uses: cypress-io/github-action@v2
         with:

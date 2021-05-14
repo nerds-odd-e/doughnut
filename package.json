@@ -6,13 +6,14 @@
   "author": "Terry Yin <terry.yinzhe@gmail.com>",
   "license": "MIT",
   "scripts": {
+    "frontend:build": "cd frontend && yarn build && cd -",
     "backend:build": "backend/gradlew -p backend build -x test",
     "backend:prod_build": "backend/gradlew -p backend build -x test -Dspring.profiles.active=prod",
     "cy:open": "cypress open",
     "cy:run": "cypress run",
     "sut": "./gradlew bootRunE2E",
-    "open": "run-p -clnr sut cy:open",
-    "test": "run-p -clnr sut cy:run",
+    "open": "yarn frontend:build && run-p -clnr sut cy:open",
+    "test": "yarn frontend:build && run-p -clnr sut cy:run",
     "sound": "node scripts/sound-monitor.js"
   },
   "cypress-cucumber-preprocessor": {
