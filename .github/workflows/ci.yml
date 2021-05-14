@@ -35,9 +35,9 @@ jobs:
           host port: 3309
           container port: 3309
       - name: DB Migration unit test
-        run: backend/gradlew -p backend testDBMigrate -Dspring.profiles.active=test
+        run: ./gradlew testDBMigrate -Dspring.profiles.active=test
       - name: Unit tests with Gradle
-        run: backend/gradlew -p backend test -Dspring.profiles.active=test
+        run: ./gradlew test -Dspring.profiles.active=test
 
   E2E-tests:
     name: End-to-End tests with Database
