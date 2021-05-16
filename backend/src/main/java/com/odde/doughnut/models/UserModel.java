@@ -71,10 +71,6 @@ public class UserModel implements ReviewScope {
         return modelFactoryService.reviewPointRepository.findAllByUserAndInitialReviewedAtGreaterThan(entity, since);
     }
 
-    public ZoneId getTimeZone() {
-        return ZoneId.of("Asia/Shanghai");
-    }
-
     public List<ReviewPoint> getReviewPointsNeedToRepeat(Timestamp currentUTCTimestamp) {
         return modelFactoryService.reviewPointRepository
                 .findAllByUserAndNextReviewAtLessThanEqualOrderByNextReviewAt(
@@ -98,4 +94,13 @@ public class UserModel implements ReviewScope {
     private void save() {
         modelFactoryService.entityManager.persist(entity);
     }
+
+    boolean isInitialReviewOnSameDay(ReviewPoint reviewPoint, Timestamp currentUTCTimestamp) {
+        return reviewPoint.isInitialReviewOnSameDay(currentUTCTimestamp, getTimeZone());
+    }
+
+    public ZoneId getTimeZone() {
+        return ZoneId.of("Asia/Shanghai");
+    }
+
 }
