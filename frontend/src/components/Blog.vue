@@ -61,12 +61,31 @@ export default {
             apiYearsUrl: "/api/blog/year_list"
         };
     },
+
+    mounted() {
+      this.fetchBlogPostsYearList();
+      this.fetchBlogPosts();
+    },
+
     methods: {
       toggle() {
         this.open = !this.open
-      }
-    },
-    mounted() {
+      },
+      
+      fetchBlogPostsYearList() {
+        fetch(this.apiYearsUrl)
+        .then(res => {
+            return res.json();
+        })
+        .then(years => {
+            this.yearList = years;
+        })
+        .catch(error => {
+            alert(error);
+        });
+      },
+      
+      fetchBlogPosts() {
         fetch(this.apiUrl)
         .then(res => {
             console.table(res);
@@ -79,17 +98,7 @@ export default {
         .catch(error => {
             alert(error);
         });
-
-        fetch(this.apiYearsUrl)
-        .then(res => {
-            return res.json();
-        })
-        .then(years => {
-            this.yearList = years;
-        })
-        .catch(error => {
-            alert(error);
-        });
+      }
     }
 }
 </script>
