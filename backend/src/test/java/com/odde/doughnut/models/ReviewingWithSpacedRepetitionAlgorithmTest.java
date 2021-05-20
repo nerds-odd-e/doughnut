@@ -51,7 +51,7 @@ public class ReviewingWithSpacedRepetitionAlgorithmTest {
         @Test
         void whenThereIsNoReviewedNotesForUser() {
             makeMe.aReviewPointFor(note).by(anotherUser).please();
-            assertThat(getOneReviewPointNeedToRepeat(1), is(nullValue()));
+            assertThat(getOneReviewPointNeedToRepeat(daysAfterBase(1)), is(nullValue()));
         }
 
         @ParameterizedTest
@@ -77,14 +77,36 @@ public class ReviewingWithSpacedRepetitionAlgorithmTest {
                     .by(userModel)
                     .nthStrictRepetitionOn(repetitionDone, baseDay)
                     .please();
-            ReviewPoint mostUrgentReviewPoint = getOneReviewPointNeedToRepeat(reviewDay);
+            ReviewPoint mostUrgentReviewPoint = getOneReviewPointNeedToRepeat(daysAfterBase(reviewDay));
             assertThat(mostUrgentReviewPoint != null, is(expectedToRepeat));
+        }
+
+        @Nested
+        class ReviewTimeIsAlignedByHalfADay {
+            @ParameterizedTest
+            @CsvSource({
+                    "9,  6,    true",
+                    "16, 0,    false",
+                    "16, 15,   true",
+                    "16, 17,   true",
+            })
+            void atHourInTheNextDay(Integer lastRepeatHour, Integer currentHour, Boolean expectedToRepeat) {
+                baseDay = makeMe.aTimestamp().of(1, lastRepeatHour).forWhereTheUserIs(userModel).please();
+                makeMe
+                        .aReviewPointFor(note)
+                        .by(userModel)
+                        .nthStrictRepetitionOn(0, baseDay)
+                        .please();
+                final Timestamp timestamp = baseDay = makeMe.aTimestamp().of(2, currentHour).forWhereTheUserIs(userModel).please();
+                ReviewPoint mostUrgentReviewPoint = getOneReviewPointNeedToRepeat(timestamp);
+                assertThat(mostUrgentReviewPoint != null, is(expectedToRepeat));
+            }
         }
 
     }
 
-    private ReviewPoint getOneReviewPointNeedToRepeat(Integer reviewDay) {
-        Reviewing reviewing = userModel.createReviewing(daysAfterBase(reviewDay));
+    private ReviewPoint getOneReviewPointNeedToRepeat(Timestamp timestamp) {
+        Reviewing reviewing = userModel.createReviewing(timestamp);
         ReviewPointModel model = reviewing.getOneReviewPointNeedToRepeat(randomizer);
         if(model == null) return null;
         return model.getEntity();

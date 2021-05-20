@@ -8,6 +8,7 @@ import org.apache.logging.log4j.util.Strings;
 
 import java.sql.Timestamp;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -72,10 +73,12 @@ public class UserModel implements ReviewScope {
     }
 
     public List<ReviewPoint> getReviewPointsNeedToRepeat(Timestamp currentUTCTimestamp) {
+        final ZoneId timeZone = getTimeZone();
+        final Timestamp timestamp = TimestampOperations.alignByHalfADay(currentUTCTimestamp, timeZone);
         return modelFactoryService.reviewPointRepository
                 .findAllByUserAndNextReviewAtLessThanEqualOrderByNextReviewAt(
                         getEntity(),
-                        currentUTCTimestamp
+                        timestamp
                 );
     }
 

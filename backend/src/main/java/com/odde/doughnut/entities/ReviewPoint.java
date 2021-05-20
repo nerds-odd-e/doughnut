@@ -85,16 +85,8 @@ public class ReviewPoint {
 
   public boolean isInitialReviewOnSameDay(Timestamp currentTime,
                                           ZoneId timeZone) {
-    return getDayId(getInitialReviewedAt(), timeZone) ==
-        getDayId(currentTime, timeZone);
-  }
-
-  public static int getDayId(Timestamp timestamp, ZoneId timeZone) {
-    ZonedDateTime systemLocalDateTime =
-        TimestampOperations.getSystemLocalDateTime(timestamp);
-    ZonedDateTime userLocalDateTime =
-        systemLocalDateTime.withZoneSameInstant(timeZone);
-    return userLocalDateTime.getYear() * 366 + userLocalDateTime.getDayOfYear();
+    return TimestampOperations.getDayId(getInitialReviewedAt(), timeZone) ==
+        TimestampOperations.getDayId(currentTime, timeZone);
   }
 
   public Note getSourceNote() {
