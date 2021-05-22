@@ -1,8 +1,10 @@
 <template>
+  <NavBar />
   <Blog />
 </template>
 
 <script setup>
+import NavBar from "./components/NavBar.vue";
 import Blog from "./components/Blog.vue";
 
 // This starter template is using Vue 3 experimental <script setup> SFCs
