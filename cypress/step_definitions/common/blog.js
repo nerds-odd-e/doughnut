@@ -11,7 +11,7 @@ Given('There is a blog titled {string} in Doughnut', title => {
   cy.submitNoteFormsWith([{ Title: title }]);
 });
 
-Then('I should see year {int} on the blog-site's side navbar', year => {
+Then("I should see year {int} on the blog-site's side navbar", year => {
   cy.get('.yearList')
     .contains(`${year}`)
     .should('have.length', 1);
