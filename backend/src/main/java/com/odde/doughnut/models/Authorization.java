@@ -3,7 +3,6 @@ package com.odde.doughnut.models;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -53,7 +52,8 @@ public class Authorization {
     }
   }
 
-  public void assertAuthorization(Subscription subscription) throws NoAccessRightException {
+  public void assertAuthorization(Subscription subscription)
+      throws NoAccessRightException {
     if (subscription.getUser() != user) {
       throw new NoAccessRightException();
     }
@@ -87,9 +87,7 @@ public class Authorization {
   }
 
   private static final List<String> allowUsers =
-      Arrays.asList("Terry", "t-machu", "Developer", "thuzar", "Yeong Sheng",
-                    "yeongsheng-tan");
+      Arrays.asList("Terry", "t-machu", "Developer", "Yeong Sheng");
 
   public boolean isDeveloper() { return allowUsers.contains(user.getName()); }
-
 }
