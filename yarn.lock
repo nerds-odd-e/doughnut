@@ -2373,9 +2373,9 @@ cucumber@^4.2.1:
     verror "^1.9.0"
 
 cypress-cucumber-preprocessor@^4.1:
-  version "4.1.0"
-  resolved "https://registry.yarnpkg.com/cypress-cucumber-preprocessor/-/cypress-cucumber-preprocessor-4.1.0.tgz#cced1796ffd0221591dcf7a35cfa7ca6a4280fc2"
-  integrity sha512-lTbqMXEoDBiQo5jh7z8lFNELyXB35I3d9FSEOP/A6L/TaxfmIVySzNbeWPZbk3AsVjYYThoHelSO5clo9yfRfQ==
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/cypress-cucumber-preprocessor/-/cypress-cucumber-preprocessor-4.1.1.tgz#d730620c1b57f379677b29baff4f07a0180959c6"
+  integrity sha512-YBUrCfYsbC7QIWTwajd4L861GBMO3ybub3920+GXgiPnCOevrrY4QL670yHMZRv1d15h4yC0rbb3rDkgWDxMYA==
   dependencies:
     "@cypress/browserify-preprocessor" "^3.0.1"
     chai "^4.2.0"
@@ -2685,9 +2685,9 @@ ecc-jsbn@~0.1.1:
     safer-buffer "^2.1.0"
 
 electron-to-chromium@^1.3.723:
-  version "1.3.740"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.740.tgz#e38b7d2b848f632191b643e6dabca51be2162922"
-  integrity sha512-Mi2m55JrX2BFbNZGKYR+2ItcGnR4O5HhrvgoRRyZQlaMGQULqDhoGkLWHzJoshSzi7k1PUofxcDbNhlFrDZNhg==
+  version "1.3.741"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.741.tgz#dc1024b19b31e27fb2c8c0a1f120cb05fc6ca695"
+  integrity sha512-4i3T0cwnHo1O4Mnp9JniEco8bZiXoqbm3PhW5hv7uu8YLg35iajYrRnNyKFaN8/8SSTskU2hYqVTeYVPceSpUA==
 
 elegant-spinner@^1.0.1:
   version "1.0.1"
@@ -2774,9 +2774,9 @@ error-stack-parser@^2.0.6:
     stackframe "^1.1.1"
 
 es-abstract@^1.18.0-next.2:
-  version "1.18.2"
-  resolved "https://registry.yarnpkg.com/es-abstract/-/es-abstract-1.18.2.tgz#6eb518b640262e8ddcbd48e0bc8549f82efd48a7"
-  integrity sha512-byRiNIQXE6HWNySaU6JohoNXzYgbBjztwFnBLUTiJmWXjaU9bSq3urQLUlNLQ292tc+gc07zYZXNZjaOoAX3sw==
+  version "1.18.3"
+  resolved "https://registry.yarnpkg.com/es-abstract/-/es-abstract-1.18.3.tgz#25c4c3380a27aa203c44b2b685bba94da31b63e0"
+  integrity sha512-nQIr12dxV7SSxE6r6f1l3DtAeEYdsGpps13dR0TwJg1S8gyp4ZPgy3FZcHBgbiQqnoqSTb+oC+kO4UQ0C/J8vw==
   dependencies:
     call-bind "^1.0.2"
     es-to-primitive "^1.2.1"
