@@ -25,6 +25,8 @@ For more background info you can read:
 - [cypress-cucumber-preprocessor](https://github.com/TheBrainFamily/cypress-cucumber-preprocessor#cypress-configuration)
 - [Vue3](https://v3.vuejs.org/guide/introduction.html)
 - [Vite](https://vitejs.dev)
+- [Jest](https://jestjs.io/)
+- [Vue Testing Library](https://testing-library.com/docs/vue-testing-library/intro/)
 - [TailwindCSS](https://tailwindcss.com)
 - [MySQL 8.0](https://dev.mysql.com/doc/refman/8.0/en/)
 - [Google Cloud](https://cloud.google.com/gcp/getting-started)
@@ -61,15 +63,6 @@ _Install `any-nix-shell` for using `fish` or `zsh` in nix-shell_
 nix-env -i any-nix-shell -f https://github.com/NixOS/nixpkgs/archive/master.tar.gz
 ```
 
-##### `fish`
-
-Add the following to your _~/.config/fish/config.fish_.
-Create it if it doesn't exist.
-
-```
-any-nix-shell fish --info-right | source
-```
-
 ##### `zsh`
 
 Add the following to your _~/.zshrc_.
@@ -90,17 +83,16 @@ Update/refresh your installed nix state and version
 nix-channel --update; nix-env -iA nixpkgs.nix && nix-env -u --always
 ```
 
-Clone and launch local development environment
+Clone and launch local development environment (backend app started on port 9082)
 
 ```bash
 git clone $this_repo
 cd doughnut
 export NIXPKGS_ALLOW_UNFREE=1
-nix-shell --pure
-# OR `nix-shell --pure --command "zsh"` if you want to drop down to zsh in nix-shell (uses your OS' ~/.zshrc)
+nix-shell --pure --command "zsh"
 gradle wrapper --distribution-type all
-backend/gradlew -p backend bootRunDev"
-open http://localhost:8081
+./gradlew bootRunDev"
+open http://localhost:9082
 ```
 
 #### IntelliJ IDEA (Community) IDE project import
@@ -133,13 +125,190 @@ nohup idea-community &
 nohup dbeaver &
 ```
 
-### 3. Setup and run doughnut with migrations in 'test' profile
+### 3. Setup and run doughnut with migrations in 'test' profile (backend app started on port 8081)
 
 ```bash
-backend/gradlew -p backend bootRun
+./gradlew bootRunTest
 ```
 
-### 4. Secrets via [git-secret](https://git-secret.io) and [GnuPG](https://www.devdungeon.com/content/gpg-tutorial)
+#### Run full backend unit tests suite
+
+```bash
+./gradlew test
+```
+
+### 4. End-to-End Test / Features / Cucumber / SbE / ATDD
+
+We use cucumber + cypress + Javascript library to do end to end test.
+
+- [Cucumber](https://cucumber.io/)
+
+#### Commands
+
+| Purpose                       | Command                               |
+| ----------------------------- | ------------------------------------- |
+| run all e2e test              | `yarn test`                           |
+| run cypress IDE               | `yarn cy:open`                        |
+| start SUT (system under test) | `yarn sut` (Not needed for yarn test) |
+
+#### Structure
+
+| Purpose          | Location                            |
+| ---------------- | ----------------------------------- |
+| feature files    | `/cypress/integration/**`           |
+| step definitions | `/cypress/support/step_definitions` |
+
+#### How-to
+
+The Cypress+Cucumber tests are written in JavaScript.
+
+[cypress](https://docs.cypress.io/guides/getting-started/writing-your-first-test#Add-a-test-file) + [cypress-cucumber-preprocessor](https://github.com/TheBrainFamily/cypress-cucumber-preprocessor)
+
+##### Run doughnut E2E tests in 'e2e' profile with Cypress IDE activated (backend app started on port 9081)
+
+```bash
+yarn open
+```
+
+##### Run doughnut E2E tests in 'e2e' profile headless (backend app started on port 9081)
+
+```bash
+yarn test
+```
+
+### 5. [Vue3 web-app frontend](https://flutter.dev/docs/get-started/web)
+
+We chose Vue3 + Vite to build our light frontend.
+
+#### How-to
+
+From `frontend` directory
+
+```bash
+cd frontend
+yarn
+```
+
+##### Run frontend unit tests
+
+```bash
+cd frontend
+yarn test
+```
+
+##### Build & Bundle Vue3 frontend web-app assets and startup backend app (backend app started on port 8081)
+
+```bash
+cd frontend
+yarn build
+cd ..
+./gradlew bootRun
+```
+
+Expect to find minified and uglified web bundle assets in `backend/src/main/resources/static` directory:
+
+```bash
+❯ pwd
+/home/csd/csd/doughnut/backend/src/main/resources/static
+❯ tree
+.
+├── assets
+│   ├── index.2cfdfd84.js
+│   ├── index.805e3910.css
+│   └── vendor.7a53bc23.js
+├── blog
+│   ├── blog_landing.html
+│   └── blog_landing.js
+├── favicon.ico
+├── img
+│   └── odd-e.png
+├── index.html
+└── odd-e.ico
+
+3 directories, 9 files
+```
+
+### 6. Interacting with gcloud CLI for cloud infrastructure management
+
+- [Install `Google Cloud SDK`](https://cloud.google.com/sdk/docs/install)
+- [Create App Server in GCloud Compute](infra/scripts/create-gcloud-app-compute.sh)
+- Login to gcloud sdk: `gcloud auth login`
+- Check your login: `gcloud auth list`
+- Set/Point to gcloud dough project: `gcloud config set project carbon-syntax-298809`
+- Check you can see the project as login user: `gcloud config list`
+
+### 7. View/tail GCP VM instance logs
+
+```bash
+gcloud auth login
+gcloud config set project carbon-syntax-298809
+# Query GCP MIG instance/s health state and grep instance id of each GCP VM in MIG
+infra/scripts/check-mig-doughnut-app-service-health.sh
+# Expected output
+# ❯ ./check-mig-doughnut-app-service-health.sh
+# ---
+# backend: https://www.googleapis.com/compute/v1/projects/carbon-syntax-298809/zones/us-east1-b/instanceGroups/doughnut-app-group
+# status:
+#  healthStatus:
+#  - healthState: HEALTHY
+#    instance: https://www.googleapis.com/compute/v1/projects/carbon-syntax-298809/zones/us-east1-b/instances/doughnut-app-group-0c2b
+#    ipAddress: 10.142.0.7
+#    port: 8081
+#  - healthState: HEALTHY
+#    instance: https://www.googleapis.com/compute/v1/projects/carbon-syntax-298809/zones/us-east1-b/instances/doughnut-app-group-2j9f
+#    ipAddress: 10.142.0.8
+#    port: 8081
+#  kind: compute#backendServiceGroupHealth
+
+# View instance logs - Take/use one of the above healthcheck report instance id for next command (e.g. doughnut-app-group-2j9f)
+infra/scripts/view-mig-doughnut-app-instance-logs.sh doughnut-app-group-2j9f
+
+# Tail instance logs - Take/use one of the above healthcheck report instance id for next command (e.g. doughnut-app-group-2j9f)
+infra/scripts/tail-mig-doughnut-app-instance-logs.sh doughnut-app-group-2j9f
+```
+
+### 8. Building/refreshing doughnut-app MIG VM instance/s base image with Packer + GoogleCompute builder
+
+We use packer + googlecompute builder + shell provisioner to construct and materialise base VM image to speed up deployment and control our OS patches and dependent packages and libraries upgrades
+
+- [Packer](https://www.packer.io)
+- [packer googlecompute builder](https://www.packer.io/docs/builders/googlecompute)
+- [SaltStack](https://docs.saltproject.io/en/latest/)
+
+#### How-to
+
+From `infra` directory, run the following:
+
+Login to dough GCP project account with `gcloud auth login`
+Configure gcloud CLI to project ID with `gcloud config set project carbon-syntax-298809`
+
+```bash
+export GCLOUDSDK_CORE_PROJECT="$(gcloud config get-value project)"
+export GOOGLE_APPLICATION_CREDENTIALS=$(pwd)/carbon-syntax-298809-f31377ba77a9.json
+PACKER_LOG=1 packer build packer.json
+```
+
+Expect to see following log line towards end of Packer build stdout log:
+`--> googlecompute: A disk image was created: doughnut-debian10-mysql80-base-saltstack`
+
+### 9. [Product Backlog](https://docs.google.com/spreadsheets/d/1_GofvpnV1tjy2F_aaoOiYTZUOO-8t_qf3twIKMQyGV4/edit?ts=600e6711&pli=1#gid=0)
+
+[Story Map](https://miro.com/app/board/o9J_lTB77Mc=/)
+
+### 10. How to Contribute
+
+- We welcome product ideas and code contribution.
+- Collaborate over:
+  - [GitHub Discussions](https://github.com/nerds-odd-e/doughnut/discussions) for product ideas/features,
+  - [GitHub Issues](https://github.com/nerds-odd-e/doughnut/issues) for reporting issues or bugs, OR
+  - [doughnut gitter.im](https://gitter.im/Odd-e-doughnut/community)
+- FOSS style; Fork and submit Github PR.
+  - Please keep the PR small and on only one topic
+  - The code need to come with tests
+
+April SG CSD Circle Invitation code: rPSG5ZOD5lnK4Oc
+
+### 11. Secrets via [git-secret](https://git-secret.io) and [GnuPG](https://www.devdungeon.com/content/gpg-tutorial)
 
 #### Generate your local GnuPG key
 
@@ -198,189 +367,3 @@ git secret killperson <user_to_be_removed_email>@odd-e.com
 - Upon hitting `enter/return` for each decrypt command below, enter secret passphrase you used when you generated your GnuPG key-pair.
 - Decrypt secrets to local filesystem: `git secret reveal`
 - Decrypt secrets to stdout: `git secret cat`
-
-### 5. Interacting with gcloud CLI for cloud infrastructure management
-
-- [Install `Google Cloud SDK`](https://cloud.google.com/sdk/docs/install)
-- [Create App Server in GCloud Compute](infra/scripts/create-gcloud-app-compute.sh)
-- Login to gcloud sdk: `gcloud auth login`
-- Check your login: `gcloud auth list`
-- Set/Point to gcloud dough project: `gcloud config set project carbon-syntax-298809`
-- Check you can see the project as login user: `gcloud config list`
-
-### 6. View/tail GCP VM instance logs
-
-```bash
-gcloud auth login
-gcloud config set project carbon-syntax-298809
-# Query GCP MIG instance/s health state and grep instance id of each GCP VM in MIG
-infra/scripts/check-mig-doughnut-app-service-health.sh
-# Expected output
-# ❯ ./check-mig-doughnut-app-service-health.sh
-# ---
-# backend: https://www.googleapis.com/compute/v1/projects/carbon-syntax-298809/zones/us-east1-b/instanceGroups/doughnut-app-group
-# status:
-#  healthStatus:
-#  - healthState: HEALTHY
-#    instance: https://www.googleapis.com/compute/v1/projects/carbon-syntax-298809/zones/us-east1-b/instances/doughnut-app-group-0c2b
-#    ipAddress: 10.142.0.7
-#    port: 8081
-#  - healthState: HEALTHY
-#    instance: https://www.googleapis.com/compute/v1/projects/carbon-syntax-298809/zones/us-east1-b/instances/doughnut-app-group-2j9f
-#    ipAddress: 10.142.0.8
-#    port: 8081
-#  kind: compute#backendServiceGroupHealth
-
-# View instance logs - Take/use one of the above healthcheck report instance id for next command (e.g. doughnut-app-group-2j9f)
-infra/scripts/view-mig-doughnut-app-instance-logs.sh doughnut-app-group-2j9f
-
-# Tail instance logs - Take/use one of the above healthcheck report instance id for next command (e.g. doughnut-app-group-2j9f)
-infra/scripts/tail-mig-doughnut-app-instance-logs.sh doughnut-app-group-2j9f
-```
-
-### 7. End-to-End Test / Features / Cucumber / SbE / ATDD
-
-We use cucumber + cypress + Java library to do end to end test.
-
-- [Cucumber](https://cucumber.io/)
-- [cypress-cucumber-preprocessor](https://github.com/TheBrainFamily/cypress-cucumber-preprocessor)
-
-#### Commands
-
-| Purpose                       | Command                               |
-| ----------------------------- | ------------------------------------- |
-| run all e2e test              | `yarn test`                           |
-| run cypress IDE               | `yarn cy:open`                        |
-| start SUT (system under test) | `yarn sut` (Not needed for yarn test) |
-
-#### Structure
-
-| Purpose          | Location                            |
-| ---------------- | ----------------------------------- |
-| feature files    | `/cypress/integration/**`           |
-| step definitions | `/cypress/support/step_definitions` |
-
-#### How-to
-
-The Cypress+Cucumber tests are written in JavaScript.
-
-- [Cucumber](https://cucumber.io/)
-- [cypress-cucumber-preprocessor](https://github.com/TheBrainFamily/cypress-cucumber-preprocessor)
-
-### 8, Building/refreshing doughnut-app MIG VM instance/s base image with Packer + GoogleCompute builder
-
-We use packer + googlecompute builder + shell provisioner to construct and materialise base VM image to speed up deployment and control our OS patches and dependent packages and libraries upgrades
-
-- [Packer](https://www.packer.io)
-- [packer googlecompute builder](https://www.packer.io/docs/builders/googlecompute)
-- [SaltStack](https://docs.saltproject.io/en/latest/)
-
-#### How-to
-
-From `infra` directory, run the following:
-
-Login to dough GCP project account with `gcloud auth login`
-Configure gcloud CLI to project ID with `gcloud config set project carbon-syntax-298809`
-
-```bash
-export GCLOUDSDK_CORE_PROJECT="$(gcloud config get-value project)"
-export GOOGLE_APPLICATION_CREDENTIALS=$(pwd)/carbon-syntax-298809-f31377ba77a9.json
-PACKER_LOG=1 packer build packer.json
-```
-
-Expect to see following log line towards end of Packer build stdout log:
-`--> googlecompute: A disk image was created: doughnut-debian10-mysql80-base-saltstack`
-
-### 9. [Flutter web-app frontend](https://flutter.dev/docs/get-started/web)
-
-We chose flutter + dart to build our light frontend, as it supports compile and release to Web, Android and iOS deployment targets.
-
-#### How-to
-
-From `frontend` directory, in your native OS shell (not in nix-shell),
-Check you have all pre-requisite/s flutter + dart tooling:
-
-```
-flutter doctor
-```
-
-Expect to see something similar to (e.g. macOS Big Sur 11.2.3 with Xcode 12.0.1):
-
-```bash
-❯ flutter doctor
-Doctor summary (to see all details, run flutter doctor -v):
-[✓] Flutter (Channel stable, 2.0.4, on macOS 11.2.3 20D91 darwin-x64, locale en-SG)
-[✓] Android toolchain - develop for Android devices (Android SDK version 30.0.2)
-[✓] Xcode - develop for iOS and macOS
-[✓] Chrome - develop for the web
-[!] Android Studio (not installed)
-[✓] Connected device (1 available)
-
-! Doctor found issues in 1 category.
-```
-
-#### Run frontend flutter app in debug mode with Chrome browser
-
-```bash
-flutter run -d chrome
-```
-
-#### Build & Bundle Flutter frontend web-app and startup local web-server to server flutter web-app static assets
-
-```bash
-flutter clean && flutter pub get && \
-flutter build web --release --dart-define DOUGHNUT_BAZAAR_NOTES_API_URL=$DOUGHNUT_BAZAAR_NOTES_API_URL
-```
-
-Expect to find minified and uglified web bundle assets in `frontend/build/web` directory:
-
-```bash
-❯ pwd
-/home/csd/csd/doughnut/frontend/build/web
-❯ tree
-.
-|-- assets
-|   |-- AssetManifest.json
-|   |-- FontManifest.json
-|   |-- NOTICES
-|   |-- fonts
-|   |   `-- MaterialIcons-Regular.otf
-|   `-- packages
-|       `-- cupertino_icons
-|           `-- assets
-|               `-- CupertinoIcons.ttf
-|-- favicon.png
-|-- flutter_service_worker.js
-|-- icons
-|   |-- Icon-192.png
-|   `-- Icon-512.png
-|-- index.html
-|-- main.dart.js
-|-- manifest.json
-`-- version.json
-
-6 directories, 13 files
-```
-
-Run a simple local web server to serve flutter frontend web-app, from `frontend/build/web` directory run:
-
-```bash
-python -m http.server 8000
-```
-
-### 10. [Product Backlog](https://docs.google.com/spreadsheets/d/1_GofvpnV1tjy2F_aaoOiYTZUOO-8t_qf3twIKMQyGV4/edit?ts=600e6711&pli=1#gid=0)
-
-[Story Map](https://miro.com/app/board/o9J_lTB77Mc=/)
-
-### 11. How to Contribute
-
-- We welcome product ideas and code contribution.
-- Collaborate over:
-  - [GitHub Discussions](https://github.com/nerds-odd-e/doughnut/discussions) for product ideas/features,
-  - [GitHub Issues](https://github.com/nerds-odd-e/doughnut/issues) for reporting issues or bugs, OR
-  - [doughnut gitter.im](https://gitter.im/Odd-e-doughnut/community)
-- FOSS style; Fork and submit Github PR.
-  - Please keep the PR small and on only one topic
-  - The code need to come with tests
-
-April SG CSD Circle Invitation code: rPSG5ZOD5lnK4Oc
