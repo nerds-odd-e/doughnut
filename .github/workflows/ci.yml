@@ -39,6 +39,18 @@ jobs:
       - name: Unit tests with Gradle
         run: ./gradlew test -Dspring.profiles.active=test
 
+  Frontend-unit-tests:
+    name: Frontend Unit tests
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Code Checkout
+        uses: actions/checkout@v2
+      - name: Unit tests with jest & vue-jest
+        uses: actions/setup-node@v2
+        with:
+          node-version: "14"
+      - run: yarn frontend:test
+
   E2E-tests:
     name: End-to-End tests with Database
     runs-on: ubuntu-20.04
