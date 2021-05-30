@@ -8,10 +8,10 @@ Doughnut is a Personal Knowledge Management ([PKM](https://en.wikipedia.org/wiki
 
 For more background info you can read:
 
-- <https://www.lesswrong.com/tag/scholarship-and-learning>
-- <https://en.m.wikipedia.org/wiki/Knowledge_Acquisition_and_Documentation_Structuring>
+- [Scholarship & Learning](https://www.lesswrong.com/tag/scholarship-and-learning)
+- [Knowledge Acquisition & Documentation Structuring](https://en.m.wikipedia.org/wiki/Knowledge_Acquisition_and_Documentation_Structuring)
 
-### Tech Stack
+### Technology Stack
 
 - [OpenJDK 11](https://openjdk.java.net/projects/jdk/11/)
 - [Spring Boot](https://spring.io/projects/spring-boot)
