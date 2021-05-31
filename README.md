@@ -28,13 +28,13 @@ For more background info you can read:
 
 ## Technology Stack
 
+- [Nix](https://nixos.org/)
 - [OpenJDK 11](https://openjdk.java.net/projects/jdk/11/)
 - [Spring Boot](https://spring.io/projects/spring-boot)
 - [Flyway](https://flywaydb.org)
 - [Thymeleaf](https://www.thymeleaf.org/)
 - [Gradle](https://gradle.org/)
 - [Junit5](https://junit.org/junit5/)
-- [JavaScript](https://www.javascript.com)
 - [Cypress](https://www.cypress.io/)
 - [Cucumber](https://cucumber.io/docs/guides/)
 - [cypress-cucumber-preprocessor](https://github.com/TheBrainFamily/cypress-cucumber-preprocessor#cypress-configuration)
@@ -44,20 +44,20 @@ For more background info you can read:
 - [Vue Testing Library](https://testing-library.com/docs/vue-testing-library/intro/)
 - [TailwindCSS](https://tailwindcss.com)
 - [MySQL 8.0](https://dev.mysql.com/doc/refman/8.0/en/)
-- [Google Cloud](https://cloud.google.com/gcp/getting-started)
 - [Github Actions](https://docs.github.com/en/actions)
-- [Nix](https://nixos.org/)
 - [git-secret](https://git-secret.io)
+- [SaltStack](https://docs.saltproject.io/en/latest/)
 - [packer](https://www.packer.io)
 - [packer googlecompute builder](https://www.packer.io/docs/builders/googlecompute)
-- [SaltStack](https://docs.saltproject.io/en/latest/)
+- [Google Cloud](https://cloud.google.com/gcp/getting-started)
+- [Google Cloud Managed Instance Group](https://cloud.google.com/compute/docs/instance-groups/)
+- [Google Cloud SQL](https://cloud.google.com/sql/docs/mysql/introduction)
 
 ## Getting started
 
 ### 1. Install nix
 
-We use nix to manage and ensure a reproducible development environment.
-Find instruction at nixos.org (multi-user installation).
+We use nix to manage and ensure a reproducible development environment ([nixos.org](https://nixos.org)).
 
 #### For macOS:
 
