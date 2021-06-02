@@ -92,9 +92,7 @@ public class ReviewController extends ApplicationMvcController  {
     }
 
     @PostMapping("/{reviewPoint}/answer")
-    public String answerQuiz(ReviewPoint reviewPoint, @Valid Answer answer, Model model) {
-        AnswerModel answerModel = modelFactoryService.toAnswerModel(answer);
-        model.addAttribute("answer", answerModel);
+    public String answerQuiz(ReviewPoint reviewPoint, @Valid Answer answer) {
         return "reviews/repeat";
     }
 

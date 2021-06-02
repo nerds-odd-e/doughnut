@@ -2,7 +2,6 @@ package com.odde.doughnut.entities;
 
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.logging.log4j.util.Strings;
 
 import static com.odde.doughnut.entities.QuizQuestion.QuestionType.LINK_SOURCE_EXCLUSIVE;
 import static com.odde.doughnut.entities.QuizQuestion.QuestionType.LINK_TARGET;
@@ -24,7 +23,14 @@ public class Answer {
     @Setter
     QuizQuestion.QuestionType questionType;
 
-    public boolean checkAnswer() {
+    public String getAnswerDisplay() {
+        if (answerNote != null) {
+            return answerNote.getTitle();
+        }
+        return answer;
+    }
+
+    public boolean isCorrect() {
         if (questionType == LINK_TARGET) {
             return (matchAnswer(reviewPoint.getLink().getTargetNote()));
         }

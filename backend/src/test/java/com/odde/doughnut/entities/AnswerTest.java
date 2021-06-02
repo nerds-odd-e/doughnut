@@ -30,7 +30,7 @@ class AnswerTest {
                     .type(CLOZE_SELECTION)
                     .answer("this")
                     .inMemoryPlease();
-            assertFalse(answer.checkAnswer());
+            assertFalse(answer.isCorrect());
         }
     }
 
@@ -54,7 +54,7 @@ class AnswerTest {
                     .type(LINK_SOURCE_EXCLUSIVE)
                     .answer("blah")
                     .inMemoryPlease();
-            assertTrue(answer.checkAnswer());
+            assertTrue(answer.isCorrect());
         }
 
         @Test
@@ -63,7 +63,7 @@ class AnswerTest {
                     .type(LINK_SOURCE_EXCLUSIVE)
                     .answer(source.getTitle())
                     .inMemoryPlease();
-            assertFalse(answer.checkAnswer());
+            assertFalse(answer.isCorrect());
         }
     }
 

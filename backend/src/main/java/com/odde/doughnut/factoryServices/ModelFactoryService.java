@@ -70,10 +70,6 @@ public class ModelFactoryService {
         return toCircleModel(circle);
     }
 
-    public AnswerModel toAnswerModel(Answer answer) {
-        return new AnswerModel(answer);
-    }
-
     public LinkModel toLinkModel(Link link) {
         return new LinkModel(link, this);
     }
