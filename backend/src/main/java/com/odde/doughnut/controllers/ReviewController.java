@@ -93,6 +93,8 @@ public class ReviewController extends ApplicationMvcController  {
 
     @PostMapping("/{reviewPoint}/answer")
     public String answerQuiz(ReviewPoint reviewPoint, @Valid Answer answer) {
+        reviewPoint.setRepetitionCount(reviewPoint.getRepetitionCount() + 1);
+        modelFactoryService.reviewPointRepository.save(reviewPoint);
         return "reviews/repeat";
     }
 

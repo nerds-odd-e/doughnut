@@ -62,6 +62,11 @@ public class ReviewPoint {
   @Setter
   private Timestamp initialReviewedAt = new Timestamp(System.currentTimeMillis());
 
+  @Column(name = "repetition_count")
+  @Getter
+  @Setter
+  private Integer repetitionCount = 0;
+
   @Column(name = "forgetting_curve_index")
   @Getter
   @Setter
