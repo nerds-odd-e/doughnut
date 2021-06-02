@@ -56,28 +56,26 @@ public class QuizQuestion {
     }
 
     public static class Option {
-        @Getter private String value;
-        @Getter private String display;
         @Getter private Note note;
         @Getter private boolean isPicture = false;
 
-        private Option() {
-        }
+        private Option() { }
 
         public static Option createTitleOption(Note note) {
             Option option = new Option();
-            option.value = note.getTitle();
-            option.display = option.value;
+            option.note = note;
             return option;
         }
 
         public static Option createPictureOption(Note note) {
             Option option = new Option();
-            option.value = note.getTitle();
             option.note = note;
             option.isPicture = true;
             return option;
         }
 
+        public String getDisplay() {
+            return note.getTitle();
+        }
     }
 }

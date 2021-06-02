@@ -2,16 +2,19 @@ package com.odde.doughnut.entities;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.logging.log4j.util.Strings;
 
-import javax.validation.constraints.NotNull;
-
-import static com.odde.doughnut.entities.QuizQuestion.QuestionType.*;
+import static com.odde.doughnut.entities.QuizQuestion.QuestionType.LINK_SOURCE_EXCLUSIVE;
+import static com.odde.doughnut.entities.QuizQuestion.QuestionType.LINK_TARGET;
 
 public class Answer {
-    @NotNull
     @Getter
     @Setter
     String answer;
+
+    @Getter
+    @Setter
+    Note answerNote;
 
     @Getter
     @Setter
@@ -32,8 +35,11 @@ public class Answer {
         return matchAnswer(reviewPoint.getNote());
     }
 
-    private boolean matchAnswer(Note note) {
-        return answer.toLowerCase().equals(
-                note.getTitle().toLowerCase().trim());
+    private boolean matchAnswer(Note matchingNote) {
+        if (answerNote != null) {
+            return matchingNote.equals(answerNote);
+        }
+
+        return matchingNote.getTitle().toLowerCase().trim().equals(answer.toLowerCase());
     }
 }

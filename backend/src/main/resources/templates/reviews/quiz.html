@@ -13,7 +13,7 @@
         <div class="row mt-2" th:unless="${quizQuestion.getQuestionType().label=='spelling'}">
             <div class="col-sm-6 mb-3" th:each="option:${quizQuestion.getOptions()}">
                 <form th:action="@{/reviews/{id}/answer(id=${reviewPoint.id})}" th:object="${emptyAnswer}" method="post">
-                    <input type="hidden" name="answer" th:value="${option.value}"/>
+                    <input type="hidden" name="answerNote" th:value="${option.note.id}"/>
                     <input type="hidden" th:field="*{questionType}"/>
                     <input type="hidden" th:field="*{reviewPoint}"/>
                     <button class="btn btn-secondary btn-lg btn-block">

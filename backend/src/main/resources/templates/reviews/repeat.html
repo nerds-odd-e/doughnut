@@ -4,7 +4,7 @@
         <div th:if="${answer}">
             <div class="alert alert-success" th:if="${answer.isCorrect()}">Correct!</div>
             <div class="alert alert-danger" th:unless="${answer.isCorrect()}"
-                 th:text="'Your answer `' + ${answer.answer} + '` is wrong.'"/>
+                 th:text="'Your answer `' + ${answer.answerDisplay} + '` is wrong.'"/>
         </div>
 
         <div th:replace="_fragments/review_fragments :: showReviewPoint(${reviewPoint})"/>
