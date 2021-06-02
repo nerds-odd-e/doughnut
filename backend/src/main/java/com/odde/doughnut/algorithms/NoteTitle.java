@@ -17,4 +17,11 @@ public class NoteTitle {
         return Arrays.stream(title.split("(?<!/)/(?!/)"))
                 .map(String::trim);
     }
+
+    public boolean matches(String answer) {
+        if(title.trim().equalsIgnoreCase(answer)) {
+            return true;
+        }
+        return getTitles().anyMatch(t-> t.equalsIgnoreCase(answer));
+    }
 }

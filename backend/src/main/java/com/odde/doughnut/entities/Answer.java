@@ -50,7 +50,7 @@ public class Answer {
             return correctAnswerNote.equals(answerNote);
         }
 
-        return correctAnswerNote.getTitle().toLowerCase().trim().equals(answer.toLowerCase());
+        return correctAnswerNote.getNoteContent().getNoteTitle().matches(answer);
     }
 
 }

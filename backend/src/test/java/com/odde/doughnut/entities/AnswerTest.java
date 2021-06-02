@@ -30,8 +30,18 @@ class AnswerTest {
                     .type(CLOZE_SELECTION)
                     .answer("this")
                     .inMemoryPlease();
-            assertFalse(answer.isCorrect());
+            assertTrue(answer.isCorrect());
         }
+
+        @Test
+        void literalAnswer() {
+            Answer answer = makeMe.anAnswerFor(reviewPoint)
+                    .type(CLOZE_SELECTION)
+                    .answer("this / that")
+                    .inMemoryPlease();
+            assertTrue(answer.isCorrect());
+        }
+
     }
 
     @Nested

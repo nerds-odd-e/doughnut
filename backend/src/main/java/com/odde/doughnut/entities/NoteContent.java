@@ -137,7 +137,7 @@ public class NoteContent {
         ).getClozeDescription(getNoteTitle(), description);
     }
 
-    private NoteTitle getNoteTitle() {
+    public NoteTitle getNoteTitle() {
         return new NoteTitle(title);
     }
 
