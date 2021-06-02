@@ -23,14 +23,17 @@ public class Answer {
 
     public boolean checkAnswer() {
         if (questionType == LINK_TARGET) {
-            return (answer.equals(reviewPoint.getLink().getTargetNote().getTitle()));
+            return (matchAnswer(reviewPoint.getLink().getTargetNote()));
         }
         if (questionType == LINK_SOURCE_EXCLUSIVE) {
             return reviewPoint.getLink().getBackwardPeers().stream()
-                    .map(Note::getTitle).noneMatch(t->t.equals(answer));
+                    .noneMatch(this::matchAnswer);
         }
-        return (
-                answer.toLowerCase().equals(
-                        reviewPoint.getNote().getTitle().toLowerCase().trim()));
+        return matchAnswer(reviewPoint.getNote());
+    }
+
+    private boolean matchAnswer(Note note) {
+        return answer.toLowerCase().equals(
+                note.getTitle().toLowerCase().trim());
     }
 }
