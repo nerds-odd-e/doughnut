@@ -18,9 +18,9 @@ public class ClozeDescription {
         this.pronunciationReplacement = pronunciationReplacement;
     }
 
-    public String getClozeDescription(String title, String description) {
-        return Arrays.stream(title.split("(?<!/)/(?!/)"))
-                .map(String::trim)
+    public String getClozeDescription(NoteTitle noteTitle, String description) {
+        return noteTitle
+                .getTitles()
                 .reduce(description, this::clozeString)
                 .replace(internalFullMatchReplacement, fullMatchReplacement)
                 .replace(internalPartialMatchReplacement, partialMatchReplacement)

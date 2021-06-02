@@ -31,21 +31,26 @@ public class Answer {
     }
 
     public boolean isCorrect() {
-        if (questionType == LINK_TARGET) {
-            return (matchAnswer(reviewPoint.getLink().getTargetNote()));
-        }
         if (questionType == LINK_SOURCE_EXCLUSIVE) {
             return reviewPoint.getLink().getBackwardPeers().stream()
                     .noneMatch(this::matchAnswer);
         }
-        return matchAnswer(reviewPoint.getNote());
+        return matchAnswer(getCorrectAnswerNote());
     }
 
-    private boolean matchAnswer(Note matchingNote) {
+    private Note getCorrectAnswerNote() {
+        if (questionType == LINK_TARGET) {
+            return reviewPoint.getLink().getTargetNote();
+        }
+        return reviewPoint.getNote();
+    }
+
+    private boolean matchAnswer(Note correctAnswerNote) {
         if (answerNote != null) {
-            return matchingNote.equals(answerNote);
+            return correctAnswerNote.equals(answerNote);
         }
 
-        return matchingNote.getTitle().toLowerCase().trim().equals(answer.toLowerCase());
+        return correctAnswerNote.getTitle().toLowerCase().trim().equals(answer.toLowerCase());
     }
+
 }

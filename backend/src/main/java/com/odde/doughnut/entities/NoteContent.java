@@ -2,6 +2,7 @@ package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.algorithms.ClozeDescription;
+import com.odde.doughnut.algorithms.NoteTitle;
 import com.odde.doughnut.entities.validators.ValidateNotePicture;
 import com.odde.doughnut.models.ImageBuilder;
 import lombok.Getter;
@@ -133,7 +134,11 @@ public class NoteContent {
                 "<mark title='Hidden text that is partially matching the answer'>[..~]</mark>",
                 "<mark title='Hidden text that is matching the answer'>[...]</mark>",
                 "<mark title='Hidden pronunciation'>/.../</mark>"
-        ).getClozeDescription(title, description);
+        ).getClozeDescription(getNoteTitle(), description);
+    }
+
+    private NoteTitle getNoteTitle() {
+        return new NoteTitle(title);
     }
 
 }

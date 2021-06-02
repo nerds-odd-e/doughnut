@@ -36,7 +36,7 @@ public class ClozeDescriptionTest {
             "6,               6year,                               [...]year",
     })
     void clozeDescription(String title, String description, String expectedClozeDescription) {
-        assertThat(clozeDescription.getClozeDescription(title, description), equalTo(expectedClozeDescription));
+        assertThat(clozeDescription.getClozeDescription(new NoteTitle(title), description), equalTo(expectedClozeDescription));
     }
 
     @Test
@@ -45,8 +45,7 @@ public class ClozeDescriptionTest {
                 "/..~/",
                 "/.../",
                 "(...)");
-        assertThat(clozeDescription.getClozeDescription("abc", "abc"), equalTo("/.../"));
-
+        assertThat(clozeDescription.getClozeDescription(new NoteTitle("abc"), "abc"), equalTo("/.../"));
     }
 
 }
