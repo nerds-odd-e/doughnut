@@ -30,7 +30,7 @@ public class Answer {
                     .map(Note::getTitle).noneMatch(t->t.equals(answer));
         }
         return (
-                answer.toLowerCase().trim().equals(
+                answer.toLowerCase().equals(
                         reviewPoint.getNote().getTitle().toLowerCase().trim()));
     }
 }
