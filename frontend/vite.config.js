@@ -25,6 +25,14 @@ export default defineConfig({
   },
   base: './',
   build: {
-    outDir: '../backend/src/main/resources/static'
+    outDir: '../backend/src/main/resources/static',
+    rollupOptions: {
+        input: {
+          main: path.resolve(__dirname, 'index.html'),
+          partial: path.resolve(__dirname, 'partial.html')
+        }
+    }
+
   }
+
 });
