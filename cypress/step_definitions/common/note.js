@@ -62,7 +62,7 @@ Then("I should see these notes belonging to the user", (data) => {
 });
 
 When("I delete top level note {string}", (noteTitle) => {
-  cy.clickNotePageButton(noteTitle, "delete note");
+  cy.clickNotePageMoreOptionsButton(noteTitle, "delete note");
 });
 
 

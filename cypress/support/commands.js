@@ -171,6 +171,16 @@ Cypress.Commands.add('clickNotePageButton', (noteTitle, btnTextOrTitle) => {
     .click();
 });
 
+Cypress.Commands.add('clickNotePageMoreOptionsButton', (noteTitle, btnTextOrTitle) => {
+  cy.jumpToNotePage(noteTitle);
+  cy.get('.jumbotron')
+    .findByRole('button', { name: 'more options' })
+    .click();
+  cy.get('.jumbotron')
+    .findByRole('button', { name: btnTextOrTitle })
+    .click();
+});
+
 Cypress.Commands.add('expectExactLinkTargets', targets => {
   targets.forEach(elem => {
     cy.findByText(elem, { selector: '.card-title a' }).should('be.visible');

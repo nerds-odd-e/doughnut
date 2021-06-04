@@ -15,3 +15,6 @@ Feature: Repetition
         When I am repeat-reviewing my old note on day 2
         And I choose to do it again
         Then I should have "1/1" for repeat now
+        Then I should see the statistics of note "Fungible"
+           | Repetation Count | 2 |
+           | xxx              | 3 |

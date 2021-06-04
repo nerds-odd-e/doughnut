@@ -169,3 +169,8 @@ Then("The randomizer always choose the last", (yesNo) => {
     cy.randomizerAlwaysChooseLast();
 });
 
+Then("I should see the statistics of note {string}", (noteTitle, data) => {
+  cy.visitMyNotebooks();
+  cy.clickNotePageButton(noteTitle, "statistics");
+});
+
