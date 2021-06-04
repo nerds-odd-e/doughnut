@@ -45,9 +45,11 @@ export default {
     fetchBlogPostsYearList() {
       fetch(this.apiYearsUrl)
         .then(res => {
+          console.table(res);
           return res.json();
         })
         .then(years => {
+          console.table(years);
           this.yearList = years;
         })
         .catch(error => {
