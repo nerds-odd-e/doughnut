@@ -11,9 +11,8 @@
 
             <div th:replace="_fragments/note_fragments :: noteShow(${note}, 1, false)"/>
             <nav class="nav d-flex flex-row-reverse p-0">
-            <a class="btn btn-sm" th:href="@{/links/{id}/link(id=${note.id})}" role="button" title="statistics">
-                <svg th:replace="_fragments/svgs :: statistics"/>
-            </a>
+               <div id="note-statistics"></div>
+
             </nav>
 
         </div>

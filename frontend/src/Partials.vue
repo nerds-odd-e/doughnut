@@ -1,23 +1,30 @@
 <template>
-  <NavBar />
-  <Blog />
+  <a @click="toggleStatistics()" class="btn btn-sm" th:href="@{/links/{id}/link(id=${note.id})}" role="button" title="statistics">
+  Statistics
+  </a>
+  <div>
+     <component :is="children"></component>
+  </div>
 </template>
 
-<script setup>
-import NavBar from "./components/NavBar.vue";
-import Blog from "./components/Blog.vue";
+<script>
 
-// This starter template is using Vue 3 experimental <script setup> SFCs
-// Check out https://github.com/vuejs/rfcs/blob/script-setup-2/active-rfcs/0000-script-setup.md
+import { defineAsyncComponent, defineComponent, ref } from "vue"
+
+export default defineComponent({
+components: {     
+      NoteStatistics: defineAsyncComponent(() => import("./components/NoteStatistics.vue"))
+    },
+ setup() {
+      const children = ref(null)
+
+      const toggleStatistics = () => {
+        children.value = 'NoteStatistics'
+      }
+return {
+        toggleStatistics,
+        children        
+      }
+    },
+  })
 </script>
-
-<style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
-</style>
