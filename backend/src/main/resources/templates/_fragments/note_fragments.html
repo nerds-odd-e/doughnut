@@ -52,15 +52,13 @@
     <a class="btn btn-sm" th:href="@{/links/{id}/link(id=${note.id})}" role="button" title="link note">
         <svg th:replace="_fragments/svgs :: linkNote"/>
     </a>
-    <a class="btn btn-sm" th:href="@{/links/{id}/link(id=${note.id})}" role="button" title="statistics">
-        <svg th:replace="_fragments/svgs :: statistics"/>
-    </a>
 
     <a class="btn btn-light dropdown-toggle"
             data-toggle="dropdown" aria-haspopup="true"
             aria-expanded="false" role="button" title="more options">
         <svg th:replace="_fragments/svgs :: cog"/>
     </a>
+
     <div class="dropdown-menu dropdown-menu-right">
         <a  class="dropdown-item" th:href="@{/notes/{id}/review_setting(id=${note.id})}"
            title="edit review settings">
