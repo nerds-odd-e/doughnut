@@ -4,7 +4,8 @@
         "es2021": true
     },
     "extends": [
-        "plugin:vue/essential",
+        "plugin:vue/vue3-recommended",
+        "prettier",
         "airbnb-base"
     ],
     "parserOptions": {

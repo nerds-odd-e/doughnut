@@ -246,10 +246,9 @@ Expect to find minified and uglified web bundle assets in `backend/src/main/reso
 │   ├── blog_landing.html
 │   └── blog_landing.js
 ├── favicon.ico
-├── img
-│   └── odd-e.png
 ├── index.html
-└── odd-e.ico
+├── odd-e.ico
+└── odd-e.png
 
 3 directories, 9 files
 ```
