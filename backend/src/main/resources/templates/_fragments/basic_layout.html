@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <title>Doughnut - Knowledge Repo</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <extra th:replace="../static/partial::vuejsScript"/>
     <link th:rel="stylesheet" th:href=
                   "@{/webjars/bootstrap/4.6.0-1/css/bootstrap.min.css}">
     <link rel="icon" type="image/png" href="https://www.odd-e.com/img/odd-e.png"/>
@@ -58,6 +57,7 @@
         </div>
     </div>
     <foot th:fragment="foot">
+        <extra th:replace="../static/partial::vuejsScript"/>
         <script th:src= "@{/webjars/popper.js/1.16.1-lts/umd/popper.min.js}"></script>
         <script th:src= "@{/webjars/jquery/3.6.0/jquery.min.js}"></script>
         <script th:src= "@{/webjars/bootstrap/4.6.0-1/js/bootstrap.min.js}"></script>

@@ -1,4 +1,6 @@
-import { createApp } from 'vue';
-import Partials from './Partials.vue';
+import { createApp } from 'vue'
+import Partials from './Partials.vue'
 
-createApp(Partials).mount('#note-statistics');
+const app = createApp(Partials);
+app.provide('noteid', document.getElementById('partials').dataset.noteid)
+app.mount('#partials')
