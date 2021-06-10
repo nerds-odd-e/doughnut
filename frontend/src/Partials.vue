@@ -7,7 +7,5 @@ const noteid = inject('noteid')
 </script>
 
 <template>
-this is {{noteid}}
-
   <NoteStatisticsButton :noteid="noteid"/>
 </template>
