@@ -5,13 +5,13 @@
 </template>
 
 <script setup>
-import { ref, onMounted, defineProps } from "vue"
+import { ref, defineProps } from "vue"
 
 const props = defineProps({noteid: Number})
 const bbb = ref({
     bbb: '1',
     })
-const fetchData = () => {
+const fetchData = async () => {
       fetch(`/api/notes/${props.noteid}/statistics`)
         .then(res => {
           return res.json();
@@ -24,5 +24,5 @@ const fetchData = () => {
         });
     }
 
-onMounted(fetchData);
+fetchData()
 </script>

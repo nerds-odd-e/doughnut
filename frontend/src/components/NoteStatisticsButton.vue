@@ -4,6 +4,7 @@ import { defineAsyncComponent, defineComponent, ref } from "vue"
 import NoteStatistics from "./NoteStatistics.vue"
 
 export default defineComponent({
+  props: { noteid: Number },
   components: {     
       NoteStatistics
     },
@@ -26,6 +27,6 @@ return {
   Statistics
   </a>
   <div>
-     <component :is="children"></component>
+     <component :is="children" :noteid="noteid"></component>
   </div>
 </template>
