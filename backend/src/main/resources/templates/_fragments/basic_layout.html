@@ -6,13 +6,13 @@
     <title>Doughnut - Knowledge Repo</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link th:rel="stylesheet" th:href=
-                  "@{/webjars/bootstrap/4.6.0-1/css/bootstrap.min.css}">
+                  "@{/webjars/bootstrap/5.0.1/css/bootstrap.min.css}">
     <link rel="icon" type="image/png" href="https://www.odd-e.com/img/odd-e.png"/>
 </head>
 <body>
     <div th:fragment="header">
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <a class="navbar-brand" href="/#">
@@ -58,9 +58,9 @@
     </div>
     <foot th:fragment="foot">
         <extra th:replace="../static/partial::vuejsScript"/>
-        <script th:src= "@{/webjars/popper.js/1.16.1-lts/umd/popper.min.js}"></script>
+        <script th:src= "@{/webjars/popper.js/2.9.2/umd/popper.min.js}"></script>
         <script th:src= "@{/webjars/jquery/3.6.0/jquery.min.js}"></script>
-        <script th:src= "@{/webjars/bootstrap/4.6.0-1/js/bootstrap.min.js}"></script>
+        <script th:src= "@{/webjars/bootstrap/5.0.1/js/bootstrap.min.js}"></script>
     </foot>
 </body>
 
