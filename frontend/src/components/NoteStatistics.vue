@@ -1,9 +1,13 @@
 <template>
-  <div >
-    Coming soon... {{bbb}}
-    <div v-for="(value, name) in bbb">
-      <label>{{ name }}</label>: <span>{{ value }} </span>
-    </div>
+  <div v-if="statistics">
+  <div v-if="statistics.reviewPoint">
+    <label>Repetition Count:</label>
+    <span class="statistics-value">{{statistics.reviewPoint.repetitionCount}}</span>
+    <label>Forgetting Curive Index:</label>
+    <span class="statistics-value">{{statistics.reviewPoint.forgettingCurveIndex}}</span>
+    <label>Next Review:</label>
+    <span class="statistics-value">{{statistics.reviewPoint.nextReviewAt}}</span>
+  </div>
   </div>
 </template>
 
@@ -11,16 +15,14 @@
 import { ref, defineProps } from "vue"
 
 const props = defineProps({noteid: Number})
-const bbb = ref({
-    bbb: '1',
-    })
+const statistics = ref(null)
 const fetchData = async () => {
       fetch(`/api/notes/${props.noteid}/statistics`)
         .then(res => {
           return res.json();
         })
         .then(articles => {
-          bbb.value = articles;
+          statistics.value = articles;
         })
         .catch(error => {
           alert(error);

@@ -72,28 +72,21 @@ class ReviewControllerTest {
         void repeat() {
             controller.doRepeat(rp);
             assertThat(rp.getForgettingCurveIndex(), equalTo(expectedSatisfyingForgettingCurveIndex));
+            assertThat(rp.getRepetitionCount(), equalTo(1));
         }
 
         @Test
         void repeatSad() {
             controller.doRepeatSad(rp);
             assertThat(rp.getForgettingCurveIndex(), lessThan(expectedSatisfyingForgettingCurveIndex));
+            assertThat(rp.getRepetitionCount(), equalTo(1));
         }
 
         @Test
         void repeatHappy() {
             controller.doRepeatHappy(rp);
             assertThat(rp.getForgettingCurveIndex(), greaterThan(expectedSatisfyingForgettingCurveIndex));
-        }
-
-        @Nested
-        class PostTheAnswer {
-            @Test
-            void postAnswer() {
-                Answer answer = new Answer();
-                controller.answerQuiz(rp, answer);
-                assertThat(rp.getRepetitionCount(), equalTo(1));
-            }
+            assertThat(rp.getRepetitionCount(), equalTo(1));
         }
 
     }

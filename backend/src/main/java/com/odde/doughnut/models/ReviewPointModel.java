@@ -28,23 +28,28 @@ public class ReviewPointModel {
         }
         entity.setUser(userModel.getEntity());
         entity.setInitialReviewedAt(currentUTCTimestamp);
-        repeat(currentUTCTimestamp);
+        repeated(currentUTCTimestamp);
     }
 
-    public void repeat(Timestamp currentUTCTimestamp) {
-        repeatWithAdjust(currentUTCTimestamp, 0);
+    public void repeated(Timestamp currentUTCTimestamp) {
+        updateNextRepetitionWithAdjustment(currentUTCTimestamp, 0);
     }
 
-    public void repeatSad(Timestamp currentUTCTimestamp) {
-        repeatWithAdjust(currentUTCTimestamp, -1);
+    public void repeatedSad(Timestamp currentUTCTimestamp) {
+        updateNextRepetitionWithAdjustment(currentUTCTimestamp, -1);
     }
 
-    public void repeatHappy(Timestamp currentUTCTimestamp) {
-        repeatWithAdjust(currentUTCTimestamp, 1);
+    public void repeatedHappy(Timestamp currentUTCTimestamp) {
+        updateNextRepetitionWithAdjustment(currentUTCTimestamp, 1);
     }
 
-    public void repeatWithAdjust(Timestamp currentUTCTimestamp, int adjustment) {
+    private void updateNextRepetitionWithAdjustment(Timestamp currentUTCTimestamp, int adjustment) {
         entity.updateMemoryState(currentUTCTimestamp, getMemoryStateChange(adjustment));
+        increaseRepetitionCountAndSave();
+    }
+
+    public void increaseRepetitionCountAndSave() {
+        entity.setRepetitionCount(entity.getRepetitionCount() + 1);
         this.modelFactoryService.reviewPointRepository.save(entity);
     }
 
@@ -59,4 +64,5 @@ public class ReviewPointModel {
     public QuizQuestion generateAQuizQuestion(Randomizer randomizer) {
         return new QuizQuestionGenerator(entity, randomizer).generateQuestion(modelFactoryService);
     }
+
 }

@@ -93,8 +93,6 @@ public class ReviewController extends ApplicationMvcController  {
 
     @PostMapping("/{reviewPoint}/answer")
     public String answerQuiz(ReviewPoint reviewPoint, @Valid Answer answer) {
-        reviewPoint.setRepetitionCount(reviewPoint.getRepetitionCount() + 1);
-        modelFactoryService.reviewPointRepository.save(reviewPoint);
         return "reviews/repeat";
     }
 
@@ -107,24 +105,25 @@ public class ReviewController extends ApplicationMvcController  {
 
     @PostMapping(path="/{reviewPoint}", params="again")
     public String doRepeatAgain(@Valid ReviewPoint reviewPoint) {
+        modelFactoryService.toReviewPointModel(reviewPoint).increaseRepetitionCountAndSave();
         return "redirect:/reviews/repeat";
     }
 
     @PostMapping(path="/{reviewPoint}", params="satisfying")
     public String doRepeat(@Valid ReviewPoint reviewPoint) {
-        modelFactoryService.toReviewPointModel(reviewPoint).repeat(testabilitySettings.getCurrentUTCTimestamp());
+        modelFactoryService.toReviewPointModel(reviewPoint).repeated(testabilitySettings.getCurrentUTCTimestamp());
         return "redirect:/reviews/repeat";
     }
 
     @PostMapping(path="/{reviewPoint}", params="sad")
     public String doRepeatSad(@Valid ReviewPoint reviewPoint) {
-        modelFactoryService.toReviewPointModel(reviewPoint).repeatSad(testabilitySettings.getCurrentUTCTimestamp());
+        modelFactoryService.toReviewPointModel(reviewPoint).repeatedSad(testabilitySettings.getCurrentUTCTimestamp());
         return "redirect:/reviews/repeat";
     }
 
     @PostMapping(path="/{reviewPoint}", params="happy")
     public String doRepeatHappy(@Valid ReviewPoint reviewPoint) {
-        modelFactoryService.toReviewPointModel(reviewPoint).repeatHappy(testabilitySettings.getCurrentUTCTimestamp());
+        modelFactoryService.toReviewPointModel(reviewPoint).repeatedHappy(testabilitySettings.getCurrentUTCTimestamp());
         return "redirect:/reviews/repeat";
     }
 

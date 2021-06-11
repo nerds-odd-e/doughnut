@@ -80,12 +80,15 @@ public class ReviewPoint {
 
   @Column(name = "note_id", insertable = false, updatable = false)
   @Getter
+  @JsonIgnore
   private Integer noteId;
 
   @Column(name = "user_id", insertable = false, updatable = false)
   @Getter
+  @JsonIgnore
   private Integer userId;
 
+  @JsonIgnore
   @Transient @Getter @Setter private Boolean repeatAgainToday = false;
 
   public boolean isInitialReviewOnSameDay(Timestamp currentTime,
@@ -94,6 +97,7 @@ public class ReviewPoint {
         TimestampOperations.getDayId(currentTime, timeZone);
   }
 
+  @JsonIgnore
   public Note getSourceNote() {
     if (link != null)
       return link.getSourceNote();

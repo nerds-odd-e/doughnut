@@ -24,7 +24,7 @@ class RestNoteController {
   class NoteStatistics {
     @Getter
     @Setter
-    private Integer repetitionCount = null;
+    private ReviewPoint reviewPoint;
 
   }
 
@@ -32,11 +32,7 @@ class RestNoteController {
   public NoteStatistics statistics(@PathVariable("note") Note note) {
     final UserModel user = currentUserFetcher.getUser();
     NoteStatistics statistics = new NoteStatistics();
-    final ReviewPoint reviewPoint = user.getReviewPointFor(note);
-    if (reviewPoint != null) {
-      statistics.setRepetitionCount(reviewPoint.getRepetitionCount());
-    }
-    statistics.setRepetitionCount(2);
+    statistics.setReviewPoint(user.getReviewPointFor(note));
     return statistics;
   }
 }
