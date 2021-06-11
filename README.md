@@ -171,18 +171,18 @@ We use cucumber + cypress + Javascript library to do end to end test.
 
 #### Commands
 
-| Purpose                       | Command                               |
-| ----------------------------- | ------------------------------------- |
-| run all e2e test              | `yarn test`                           |
-| run cypress IDE               | `yarn cy:open`                        |
-| start SUT (system under test) | `yarn sut` (Not needed for yarn test) |
+| Purpose                       | Command                                       |
+| ----------------------------- | --------------------------------------------- |
+| start SUT (system under test) | `yarn sut`                                    |
+| run all e2e test              | `yarn test` (starts SUT and cypress headless) |
+| run cypress IDE               | `yarn cy:open` (starts SUT and cypress IDE)   |
 
 #### Structure
 
-| Purpose          | Location                            |
-| ---------------- | ----------------------------------- |
-| feature files    | `/cypress/integration/**`           |
-| step definitions | `/cypress/support/step_definitions` |
+| Purpose          | Location                           |
+| ---------------- | ---------------------------------- |
+| feature files    | `/cypress/integration/**`          |
+| step definitions | `/cypress/step_definitions/common` |
 
 #### How-to
 
