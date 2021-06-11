@@ -172,5 +172,9 @@ Then("The randomizer always choose the last", (yesNo) => {
 Then("I should see the statistics of note {string}", (noteTitle, data) => {
   cy.visitMyNotebooks();
   cy.clickNotePageButton(noteTitle, "statistics");
+  const attrs = data.hashes()[0]
+  for(var k in attrs) {
+    cy.findByText(attrs[k]).should('be.visible')
+  }
 });
 

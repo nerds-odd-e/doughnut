@@ -1,6 +1,9 @@
 <template>
   <div >
     Coming soon... {{bbb}}
+    <div v-for="(value, name) in bbb">
+      <label>{{ name }}</label>: <span>{{ value }} </span>
+    </div>
   </div>
 </template>
 

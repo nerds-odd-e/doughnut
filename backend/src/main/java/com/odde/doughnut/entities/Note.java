@@ -184,12 +184,14 @@ public class Note {
         addAncestors(ancestorsIncludingMe);
     }
 
+    @JsonIgnore
     public List<Note> getAncestorsIncludingMe() {
         List<Note> ancestors = getAncestors();
         ancestors.add(this);
         return ancestors;
     }
 
+    @JsonIgnore
     public List<Note> getAncestors() {
         return getNotesClosures().stream().map(NotesClosure::getAncestor).collect(toList());
     }
@@ -198,6 +200,7 @@ public class Note {
         descendantNCs.stream().map(NotesClosure::getNote).forEach(noteConsumer);
     }
 
+    @JsonIgnore
     public Note getParentNote() {
         List<Note> ancestors = getAncestors();
         if (ancestors.size() == 0) {
@@ -206,6 +209,7 @@ public class Note {
         return ancestors.get(ancestors.size() - 1);
     }
 
+    @JsonIgnore
     public List<Note> getSiblings() {
         if (getParentNote() == null) {
             return new ArrayList<>();
@@ -238,18 +242,21 @@ public class Note {
         BeanUtils.copyProperties(noteContent, getNoteContent());
     }
 
+    @JsonIgnore
     public Note getPreviousSibling() {
         return getSiblings().stream()
                 .filter(nc -> nc.siblingOrder < siblingOrder)
                 .reduce((f, s) -> s).orElse(null);
     }
 
+    @JsonIgnore
     public Note getNextSibling() {
         return getSiblings().stream()
                 .filter(nc -> nc.siblingOrder > siblingOrder)
                 .findFirst().orElse(null);
     }
 
+    @JsonIgnore
     public Note getPrevious() {
         Note result = getPreviousSibling();
         if (result == null) {
@@ -264,10 +271,12 @@ public class Note {
         }
     }
 
+    @JsonIgnore
     private Note getFirstChild() {
         return getChildren().stream().findFirst().orElse(null);
     }
 
+    @JsonIgnore
     public Note getNext() {
         Note firstChild = getFirstChild();
         if (firstChild != null) {
@@ -322,6 +331,7 @@ public class Note {
         return !noteContent.getHideTitleInArticle();
     }
 
+    @JsonIgnore
     public String getArticleTitle() {
         if (hasNoDescriptionAndChild()) {
             return null;
@@ -329,6 +339,7 @@ public class Note {
         return getTitle();
     }
 
+    @JsonIgnore
     public String getArticleBody() {
         if (hasNoDescriptionAndChild()) {
             return getTitle();

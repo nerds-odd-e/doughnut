@@ -19,6 +19,9 @@ public interface ReviewPointRepository extends CrudRepository<ReviewPoint, Integ
     @Query( value = "SELECT * " + byUser + " AND rp.next_review_at <= :nextReviewAt ORDER BY rp.next_review_at", nativeQuery = true)
     List<ReviewPoint> findAllByUserAndNextReviewAtLessThanEqualOrderByNextReviewAt(@Param("user") User user, @Param("nextReviewAt") Timestamp nextReviewAt);
 
+    @Query( value = "SELECT * " + byUser + "AND rp.note_id =:#{#note.id}", nativeQuery = true)
+    ReviewPoint findByUserAndNote(User user, Note note);
+
     void deleteAllByNote(Note note);
 
     String byUser = " FROM review_point rp "

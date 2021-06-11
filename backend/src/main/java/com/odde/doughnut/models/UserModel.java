@@ -106,4 +106,7 @@ public class UserModel implements ReviewScope {
         return ZoneId.of("Asia/Shanghai");
     }
 
+    public ReviewPoint getReviewPointFor(Note note) {
+        return modelFactoryService.reviewPointRepository.findByUserAndNote(entity, note);
+    }
 }
