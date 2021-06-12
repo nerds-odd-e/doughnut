@@ -7,10 +7,27 @@ beforeEach(() => {
 });
 
 const stubResponse = {
-    reviewPoint: {
-      repetitionCount: 5
-    }
+  "reviewPoint":{
+    "id":1,
+    "lastReviewedAt":"1976-06-01T17:00:00.000+00:00",
+    "nextReviewAt":"1976-06-01T17:00:00.000+00:00",
+    "initialReviewedAt":"1976-06-01T17:00:00.000+00:00",
+    "repetitionCount":2,
+    "forgettingCurveIndex":110,
+    "removedFromReview":false
+  },
+  "note":{
+    "id":1,
+    "noteContent":{
+      "id":1,"title":"Fungible","description":null,"url":null,"urlIsVideo":false,
+      "pictureUrl":null,"pictureMask":null,"useParentPicture":false,
+      "skipReview":false,"hideTitleInArticle":false,"showAsBulletInArticle":false,
+      "updatedDatetime":"2021-06-12T04:17:51.000+00:00","notePicture":null
+    },
+    "createdDatetime":"2021-06-12T04:17:51.000+00:00",
+    "title":"Fungible","head":true
   }
+}
 
 describe('note statistics', () => {
 
@@ -28,7 +45,7 @@ describe('note statistics', () => {
     const wrapper = mount(NoteStatistics, {propsData: {noteid: 123}});
     await flushPromises()
 
-    expect(wrapper.findAll(".statistics-value")).toHaveLength(3)
+    expect(wrapper.findAll(".statistics-value")).toHaveLength(5)
   });
 
 });

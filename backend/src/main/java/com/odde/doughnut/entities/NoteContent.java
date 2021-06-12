@@ -83,20 +83,18 @@ public class NoteContent {
     @Setter
     private Boolean showAsBulletInArticle = false;
 
+    @JsonIgnore
     @Transient @Getter @Setter private MultipartFile uploadPictureProxy;
 
+    @JsonIgnore
     @Transient @Getter @Setter private String testingParent;
-
-    @Column(name = "created_datetime")
-    @Getter
-    @Setter
-    private Timestamp createdDatetime = new Timestamp(System.currentTimeMillis());
 
     @Column(name = "updated_datetime")
     @Getter
     @Setter
     private Timestamp updatedDatetime = new Timestamp(System.currentTimeMillis());
 
+    @JsonIgnore
     public String getNotePicture() {
         if (uploadPicture != null) {
             return "/images/" + uploadPicture.getId() + "/" + uploadPicture.getName();
@@ -129,6 +127,7 @@ public class NoteContent {
         }
     }
 
+    @JsonIgnore
     public String getClozeDescription() {
         return new ClozeDescription(
                 "<mark title='Hidden text that is partially matching the answer'>[..~]</mark>",
@@ -137,6 +136,7 @@ public class NoteContent {
         ).getClozeDescription(getNoteTitle(), description);
     }
 
+    @JsonIgnore
     public NoteTitle getNoteTitle() {
         return new NoteTitle(title);
     }

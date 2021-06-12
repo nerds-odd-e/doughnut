@@ -1,5 +1,6 @@
 <template>
   <div v-if="statistics">
+
   <div v-if="statistics.reviewPoint">
     <label>Repetition Count:</label>
     <span class="statistics-value">{{statistics.reviewPoint.repetitionCount}}</span>
@@ -8,6 +9,14 @@
     <label>Next Review:</label>
     <span class="statistics-value">{{statistics.reviewPoint.nextReviewAt}}</span>
   </div>
+
+  <div v-if="statistics.note">
+    <label>Created:</label>
+    <span class="statistics-value">{{statistics.note.createdDatetime}}</span>
+    <label>Last Content Updated:</label>
+    <span class="statistics-value">{{statistics.note.noteContent.updatedDatetime}}</span>
+  </div>
+
   </div>
 </template>
 

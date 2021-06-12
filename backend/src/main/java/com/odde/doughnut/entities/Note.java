@@ -11,6 +11,7 @@ import org.springframework.beans.BeanUtils;
 import javax.persistence.*;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -23,25 +24,6 @@ import static java.util.stream.Collectors.toList;
 @Entity
 @Table(name = "note")
 public class Note {
-
-    public static class NoteApiResult {
-        @Getter
-        @Setter
-        private String title;
-
-        @Getter
-        @Setter
-        private String description;
-
-        @Getter
-        @Setter
-        private String author;
-
-        @Getter
-        @Setter
-        private String updateDatetime;
-    }
-
 
     @Id
     @Getter
@@ -62,8 +44,14 @@ public class Note {
     @Getter
     private Notebook notebook;
 
+    @Column(name = "created_datetime")
+    @Getter
+    @Setter
+    private Timestamp createdDatetime = new Timestamp(System.currentTimeMillis());
+
     @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "master_review_setting_id", referencedColumnName = "id")
+    @JsonIgnore
     @Getter
     @Setter
     private ReviewSetting masterReviewSetting;
@@ -119,6 +107,7 @@ public class Note {
         return "Note{" + "id=" + id + ", title='" + noteContent.getTitle() + '\'' + '}';
     }
 
+    @JsonIgnore
     public List<Note> getTargetNotes() {
         return links.stream().map(Link::getTargetNote).collect(toList());
     }
@@ -149,6 +138,7 @@ public class Note {
         return notes;
     }
 
+    @JsonIgnore
     public String getNotePicture() {
         if (noteContent.getUseParentPicture() && getParentNote() != null) {
             return getParentNote().getNotePicture();
@@ -160,6 +150,7 @@ public class Note {
         return getParentNote() == null;
     }
 
+    @JsonIgnore
     public String getNoteTypeDisplay(){
         return this.getNotebook().getNotebookType().getDisplay();
     }

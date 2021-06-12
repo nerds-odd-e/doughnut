@@ -25,6 +25,9 @@ class RestNoteController {
     @Getter
     @Setter
     private ReviewPoint reviewPoint;
+    @Getter
+    @Setter
+    private Note note;
 
   }
 
@@ -33,6 +36,7 @@ class RestNoteController {
     final UserModel user = currentUserFetcher.getUser();
     NoteStatistics statistics = new NoteStatistics();
     statistics.setReviewPoint(user.getReviewPointFor(note));
+    statistics.setNote(note);
     return statistics;
   }
 }
