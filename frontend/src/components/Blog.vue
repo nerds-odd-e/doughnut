@@ -48,11 +48,9 @@ export default {
     fetchBlogPosts() {
       fetch(this.apiUrl)
         .then(res => {
-          console.table(res);
           return res.json();
         })
         .then(articles => {
-          console.table(articles);
           this.articleList = articles;
         })
         .catch(error => {

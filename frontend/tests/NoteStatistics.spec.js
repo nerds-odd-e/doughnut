@@ -6,13 +6,11 @@ beforeEach(() => {
   fetch.resetMocks();
 });
 
-const stubResponse = [
-  {
+const stubResponse = {
     reviewPoint: {
       repetitionCount: 5
     }
   }
-];
 
 describe('note statistics', () => {
 
@@ -25,14 +23,12 @@ describe('note statistics', () => {
     expect(wrapper.findAll(".statistics-value")).toHaveLength(0)
   });
 
-  xtest('should render values', async () => {
+  test('should render values', async () => {
     fetch.mockResponseOnce(JSON.stringify(stubResponse));
     const wrapper = mount(NoteStatistics, {propsData: {noteid: 123}});
     await flushPromises()
 
-    expect(wrapper.findAll(".statistics-value")).toHaveLength(1)
-
-
+    expect(wrapper.findAll(".statistics-value")).toHaveLength(3)
   });
 
 });
