@@ -10,7 +10,7 @@
     "lint:fix": "eslint src --fix"
   },
   "dependencies": {
-    "vue": "^3.0.5"
+    "vue": "^3.1.1"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0",
@@ -18,7 +18,7 @@
     "@testing-library/vue": "^6.4.2",
     "@vitejs/plugin-vue": "^1.2.2",
     "@vitejs/plugin-vue-jsx": "^1.1.4",
-    "@vue/compiler-sfc": "^3.0.5",
+    "@vue/compiler-sfc": "^3.1.1",
     "autoprefixer": "^10.2.5",
     "babel-core": "^7.0.0-bridge.0",
     "babel-jest": "^23.4.2",
