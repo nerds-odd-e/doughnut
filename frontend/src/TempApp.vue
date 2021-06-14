@@ -3,9 +3,8 @@ import NoteStatisticsButton from './components/NoteStatisticsButton.vue'
 import { inject } from 'vue'
 
 const noteid = inject('noteid')
-const linkid = inject('linkid')
 </script>
 
 <template>
-  <NoteStatisticsButton :noteid="noteid" :linkid="linkid"/>
+  <NoteStatisticsButton :noteid="noteid"/>
 </template>
