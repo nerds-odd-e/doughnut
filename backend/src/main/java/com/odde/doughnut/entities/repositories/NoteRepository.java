@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
-import java.util.Arrays;
 import java.util.List;
 
 public interface NoteRepository extends CrudRepository<Note, Integer> {
@@ -29,22 +28,22 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
     @Query( value = "SELECT count(1) as count from note " + joinClosure + " WHERE note.id in :noteIds", nativeQuery = true)
     int countByAncestorAndInTheList(@Param("ancestor") Note ancestor, @Param("noteIds") List<Integer> noteIds);
 
-    String whereThereIsNoReviewPoint = " LEFT JOIN review_point rp"
+    String whereThereIsNoReviewPointAndOrderByTime = " LEFT JOIN review_point rp"
             + " ON note.id = rp.note_id "
             + "   AND rp.user_id = :#{#user.id} "
             + " WHERE note.skip_review IS FALSE "
-            + "   AND rp.id IS NULL ";
+            + "   AND rp.id IS NULL "
+            + "ORDER BY note.created_datetime ";
 
     String byOwnershipWhereThereIsNoReviewPoint = "JOIN notebook ON notebook.id = note.notebook_id "
-            + whereThereIsNoReviewPoint
             + " AND notebook.ownership_id = :#{#user.ownership.id} "
-            + "ORDER BY note.created_datetime ";
+            + whereThereIsNoReviewPointAndOrderByTime;
 
     String joinClosure = " JOIN notes_closure ON notes_closure.note_id = note.id "
             + "   AND notes_closure.ancestor_id = :ancestor ";
 
     String byAncestorWhereThereIsNoReviewPoint = joinClosure
-            + whereThereIsNoReviewPoint;
+            + whereThereIsNoReviewPointAndOrderByTime;
 
     @Query( value = notesVisibleToAUser + searchForLinkTarget , nativeQuery = true)
     List<Note> searchForUserInVisibleScope(@Param("user") User user, @Param("noteToAvoid") Note noteToAvoid, @Param("pattern") String pattern);

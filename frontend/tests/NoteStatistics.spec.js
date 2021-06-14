@@ -40,7 +40,7 @@ const stubLinkResponse = {
     "removedFromReview":false
   },
   "link":{
-    "createAt":"2021-06-12T04:17:51.000+00:00",
+    "createdAt":"2021-06-12T04:17:51.000+00:00",
   }
 }
 

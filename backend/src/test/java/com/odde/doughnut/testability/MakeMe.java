@@ -94,4 +94,8 @@ public class MakeMe {
     public SubscriptionBuilder aSubscription() {
         return new SubscriptionBuilder(this, new Subscription());
     }
+
+    public LinkBuilder aLink() {
+        return new LinkBuilder(this);
+    }
 }

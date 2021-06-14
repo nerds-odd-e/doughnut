@@ -48,7 +48,7 @@ public class Reviewing {
             return null;
         }
         if (note != null && link != null) {
-            if (note.getCreatedDatetime().compareTo(link.getCreateAt()) > 0) {
+            if (note.getCreatedDatetime().compareTo(link.getCreatedAt()) > 0) {
                 note = null;
             } else {
                 link = null;

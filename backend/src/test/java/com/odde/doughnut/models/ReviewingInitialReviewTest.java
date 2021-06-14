@@ -74,8 +74,7 @@ public class ReviewingInitialReviewTest {
             @BeforeEach
             void Note1And2SkippedReview_AndThereIsALink() {
                 makeMe.theNote(note2).skipReview().please();
-                makeMe.theNote(note1).skipReview().please();
-                makeMe.theNote(note1).linkTo(note2).please();
+                makeMe.theNote(note1).skipReview().linkTo(note2).please();
             }
 
             @Test
@@ -96,6 +95,12 @@ public class ReviewingInitialReviewTest {
                 Note note3 = makeMe.aNote().byUser(userModel).createdAt(new Timestamp(System.currentTimeMillis() + 10000)).please();
                 Note note4 = makeMe.aNote().byUser(userModel).createdAt(new Timestamp(System.currentTimeMillis() - 10000)).please();
                 assertThat(getOneInitialReviewPoint(day1).getNote(), equalTo(note4));
+            }
+
+            @Test
+            void shouldReturnReviewPointForLinkInCreatedOrder() {
+                makeMe.aLink().between(note2, note1).createdAt(new Timestamp(System.currentTimeMillis() - 10000)).please();
+                assertThat(getOneInitialReviewPoint(day1).getLink().getSourceNote(), equalTo(note2));
             }
 
             @Test

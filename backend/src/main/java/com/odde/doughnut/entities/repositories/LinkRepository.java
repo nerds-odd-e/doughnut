@@ -20,7 +20,8 @@ public interface LinkRepository extends CrudRepository<Link, Integer> {
             + " ON link.id = rp.link_id "
             + "   AND rp.user_id = :user"
             + " WHERE "
-            + "   rp.id IS NULL ";
+            + "   rp.id IS NULL "
+            + " ORDER BY link.created_at";
 
     String byOwnershipWhereThereIsNoReviewPoint = " JOIN note ON note.id = source_id"
             + " JOIN notebook ON notebook.id = note.notebook_id "

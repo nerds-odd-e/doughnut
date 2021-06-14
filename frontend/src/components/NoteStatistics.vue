@@ -19,7 +19,7 @@
 
   <div v-if="statistics.link">
     <label>Created:</label>
-    <span class="statistics-value">{{new Date(statistics.link.createAt).toLocaleString()}}</span>
+    <span class="statistics-value">{{new Date(statistics.link.createdAt).toLocaleString()}}</span>
   </div>
 
   </div>

@@ -95,7 +95,7 @@ public class Link {
     @Column(name = "created_at")
     @Getter
     @Setter
-    private Timestamp createAt = new Timestamp(System.currentTimeMillis());
+    private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
     @OneToMany(mappedBy = "link", cascade = CascadeType.ALL,
             orphanRemoval = true)
