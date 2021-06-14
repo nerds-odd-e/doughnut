@@ -32,6 +32,13 @@ class RestNoteController {
 
   }
 
+  @GetMapping("/{note}")
+  public Note show(@PathVariable("note") Note note) throws NoAccessRightException {
+    final UserModel user = currentUserFetcher.getUser();
+    user.getAuthorization().assertReadAuthorization(note);
+    return note;
+  }
+
   @GetMapping("/{note}/statistics")
   public NoteStatistics statistics(@PathVariable("note") Note note) throws NoAccessRightException {
     final UserModel user = currentUserFetcher.getUser();
@@ -41,4 +48,5 @@ class RestNoteController {
     statistics.setNote(note);
     return statistics;
   }
+
 }

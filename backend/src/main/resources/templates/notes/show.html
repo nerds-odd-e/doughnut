@@ -9,9 +9,6 @@
             </nav>
 
             <div th:replace="_fragments/note_fragments :: noteShow(${note}, 1, false)"/>
-            <nav class="nav d-flex flex-row-reverse p-0">
-               <div id="partials-noteshow" th:data-noteid="${note.id}"> </div>
-            </nav>
 
         </div>
 
