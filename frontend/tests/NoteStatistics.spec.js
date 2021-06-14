@@ -29,6 +29,21 @@ const stubResponse = {
   }
 }
 
+const stubLinkResponse = {
+  "reviewPoint":{
+    "id":1,
+    "lastReviewedAt":"1976-06-01T17:00:00.000+00:00",
+    "nextReviewAt":"1976-06-01T17:00:00.000+00:00",
+    "initialReviewedAt":"1976-06-01T17:00:00.000+00:00",
+    "repetitionCount":2,
+    "forgettingCurveIndex":110,
+    "removedFromReview":false
+  },
+  "link":{
+    "createAt":"2021-06-12T04:17:51.000+00:00",
+  }
+}
+
 describe('note statistics', () => {
 
   test('fetchBlogPosts API to be called ONCE with article rendered', async () => {
@@ -44,8 +59,15 @@ describe('note statistics', () => {
     fetch.mockResponseOnce(JSON.stringify(stubResponse));
     const wrapper = mount(NoteStatistics, {propsData: {noteid: 123}});
     await flushPromises()
-
     expect(wrapper.findAll(".statistics-value")).toHaveLength(5)
+  });
+
+  test('should render values for link as well', async () => {
+    fetch.mockResponseOnce(JSON.stringify(stubLinkResponse));
+    const wrapper = mount(NoteStatistics, {propsData: {linkid: 123}});
+    await flushPromises()
+    expect(fetch).toHaveBeenCalledWith('/api/links/123/statistics');
+    expect(wrapper.findAll(".statistics-value")).toHaveLength(4)
   });
 
 });

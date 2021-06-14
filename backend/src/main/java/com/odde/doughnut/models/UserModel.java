@@ -109,4 +109,8 @@ public class UserModel implements ReviewScope {
     public ReviewPoint getReviewPointFor(Note note) {
         return modelFactoryService.reviewPointRepository.findByUserAndNote(entity, note);
     }
+
+    public ReviewPoint getReviewPointFor(Link link) {
+        return modelFactoryService.reviewPointRepository.findByUserAndLink(entity, link);
+    }
 }

@@ -1,5 +1,6 @@
 package com.odde.doughnut.entities.repositories;
 
+import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.User;
@@ -21,6 +22,9 @@ public interface ReviewPointRepository extends CrudRepository<ReviewPoint, Integ
 
     @Query( value = "SELECT * " + byUser + "AND rp.note_id =:#{#note.id}", nativeQuery = true)
     ReviewPoint findByUserAndNote(User user, Note note);
+
+    @Query( value = "SELECT * " + byUser + "AND rp.link_id =:#{#link.id}", nativeQuery = true)
+    ReviewPoint findByUserAndLink(User user, Link link);
 
     void deleteAllByNote(Note note);
 

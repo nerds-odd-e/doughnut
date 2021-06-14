@@ -87,6 +87,7 @@ public class Link {
     @Setter
     private String type;
 
+    @JsonIgnore
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     @Getter @Setter private User user;
@@ -112,14 +113,17 @@ public class Link {
         type = linkType.label;
     }
 
+    @JsonIgnore
     public List<Note> getBackwardPeers() {
         return targetNote.linkedNotesOfType(getLinkType().reverseType(), null);
     }
 
+    @JsonIgnore
     public String getExclusiveQuestion() {
         return getLinkType().exclusiveQuestion;
     }
 
+    @JsonIgnore
     public List<LinkType> getPossibleLinkTypes() {
         final List<LinkType> existingTypes = sourceNote.getLinks().stream().filter(l -> l.targetNote == targetNote).map(Link::getLinkType).collect(Collectors.toUnmodifiableList());
         return Arrays.stream(LinkType.values()).filter(lt->

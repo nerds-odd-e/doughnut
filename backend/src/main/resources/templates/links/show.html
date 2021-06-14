@@ -12,6 +12,9 @@
                     <input type="submit" name="delete" value="Delete" class="btn btn-danger"
                            onclick="return confirm('Are you sure to delete this link?')"/>
                 </form>
+                <nav class="nav d-flex flex-row-reverse p-0">
+                    <div id="partials" th:data-linkid="${link.id}"> </div>
+                </nav>
             </div>
         </div>
 </layout>
