@@ -149,11 +149,8 @@
             <a th:href="*{url}" th:text="*{url}"/>
         </div>
     </div>
-
     <div th:replace=":: showPicture(${note}, 0.2)"/>
-
     <ul>
-
         <li th:each="linkType:${note.linkTypes(currentUser?.entity)}">
             <span th:text="${linkType.label}"/>
             <span class="badge badge-light mr-1" th:each="link:${note.linksOfTypeThroughDirect(linkType)}">
