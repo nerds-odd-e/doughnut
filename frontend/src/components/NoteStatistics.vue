@@ -7,14 +7,14 @@
     <label>Forgetting Curive Index:</label>
     <span class="statistics-value">{{statistics.reviewPoint.forgettingCurveIndex}}</span>
     <label>Next Review:</label>
-    <span class="statistics-value">{{statistics.reviewPoint.nextReviewAt}}</span>
+    <span class="statistics-value">{{new Date(statistics.reviewPoint.nextReviewAt).toLocaleDateString()}}</span>
   </div>
 
   <div v-if="statistics.note">
     <label>Created:</label>
-    <span class="statistics-value">{{statistics.note.createdDatetime}}</span>
+    <span class="statistics-value">{{new Date(statistics.note.createdDatetime).toLocaleDateString()}}</span>
     <label>Last Content Updated:</label>
-    <span class="statistics-value">{{statistics.note.noteContent.updatedDatetime}}</span>
+    <span class="statistics-value">{{new Date(statistics.note.noteContent.updatedDatetime).toLocaleDateString()}}</span>
   </div>
 
   </div>
@@ -34,7 +34,7 @@ const fetchData = async () => {
           statistics.value = articles;
         })
         .catch(error => {
-          alert(error);
+          window.alert(error);
         });
     }
 
