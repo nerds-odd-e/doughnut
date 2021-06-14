@@ -71,27 +71,36 @@ public class ReviewingInitialReviewTest {
 
         @Nested
         class ReviewPointFromLink {
+            @BeforeEach
+            void Note1And2SkippedReview_AndThereIsALink() {
+                makeMe.theNote(note2).skipReview().please();
+                makeMe.theNote(note1).skipReview().please();
+                makeMe.theNote(note1).linkTo(note2).please();
+            }
+
             @Test
             void shouldReturnReviewPointForLink() {
-                makeMe.theNote(note2).skipReview().please();
-                makeMe.theNote(note1).skipReview().linkTo(note2).please();
                 assertThat(getOneInitialReviewPoint(day1).getLink().getSourceNote(), equalTo(note1));
                 assertThat(getOneInitialReviewPoint(day1).getNote(), is(nullValue()));
             }
 
             @Test
             void shouldReturnReviewPointForLinkIfCreatedEarlierThanNote() {
-                makeMe.theNote(note2).skipReview().please();
-                makeMe.theNote(note1).skipReview().linkTo(note2).please();
                 Note note3 = makeMe.aNote().byUser(userModel).createdAt(new Timestamp(System.currentTimeMillis() + 10000)).please();
                 assertThat(getOneInitialReviewPoint(day1).getLink().getSourceNote(), equalTo(note1));
                 assertThat(getOneInitialReviewPoint(day1).getNote(), is(nullValue()));
             }
 
             @Test
+            void shouldGetNoteInCreatedOrder() {
+                Note note3 = makeMe.aNote().byUser(userModel).createdAt(new Timestamp(System.currentTimeMillis() + 10000)).please();
+                Note note4 = makeMe.aNote().byUser(userModel).createdAt(new Timestamp(System.currentTimeMillis() - 10000)).please();
+                assertThat(getOneInitialReviewPoint(day1).getNote(), equalTo(note4));
+            }
+
+            @Test
             void shouldNotReturnReviewPointForLinkIfCreatedByOtherPeople() {
-                makeMe.theNote(note2).skipReview().please();
-                makeMe.theNote(note1).notebookOwnership(makeMe.aUser().please()).skipReview().linkTo(note2, Link.LinkType.BELONGS_TO).please();
+                makeMe.theNote(note1).notebookOwnership(makeMe.aUser().please()).please();
                 assertThat(getOneInitialReviewPoint(day1), is(nullValue()));
             }
         }
