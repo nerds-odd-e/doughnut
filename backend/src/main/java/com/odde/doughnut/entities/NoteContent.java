@@ -1,6 +1,7 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.odde.doughnut.algorithms.ClozeDescription;
 import com.odde.doughnut.algorithms.NoteTitle;
 import com.odde.doughnut.entities.validators.ValidateNotePicture;
@@ -86,7 +87,7 @@ public class NoteContent {
     @JsonIgnore
     @Transient @Getter @Setter private MultipartFile uploadPictureProxy;
 
-    @JsonIgnore
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Transient @Getter @Setter private String testingParent;
 
     @Column(name = "updated_datetime")
