@@ -9,7 +9,8 @@
             </nav>
 
             <div th:replace="_fragments/note_fragments :: noteShow(${note}, 1, false)"/>
-            <div id="partials-noteshow" th:data-noteid="${note.id}"> </div>
+            <div id="partials" th:data-noteid="${note.id}"> </div>
+<!--            <div id="partials-noteshow" th:data-noteid="${note.id}"> </div>-->
 
         </div>
 

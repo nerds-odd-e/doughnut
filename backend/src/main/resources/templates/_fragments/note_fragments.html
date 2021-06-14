@@ -140,16 +140,7 @@
     </div>
 </div>
 
-<div th:fragment="noteShowWithTitle(note, level, forBazaar, titleBodyHtml)" th:object="${note}">
-    <div th:object="${note.noteContent}">
-        <div th:replace="${titleBodyHtml}"/>
-        <div th:unless="${#strings.isEmpty(note.noteContent.url)}">
-            <label th:unless="*{urlIsVideo}">Url:</label>
-            <label th:if="*{urlIsVideo}">Video Url:</label>
-            <a th:href="*{url}" th:text="*{url}"/>
-        </div>
-    </div>
-    <div th:replace=":: showPicture(${note}, 0.2)"/>
+<div th:fragment="noteShowTemp(note)" th:object="${note}">
     <ul>
         <li th:each="linkType:${note.linkTypes(currentUser?.entity)}">
             <span th:text="${linkType.label}"/>
@@ -169,6 +160,19 @@
             </span>
         </li>
     </ul>
+</div>
+
+<div th:fragment="noteShowWithTitle(note, level, forBazaar, titleBodyHtml)" th:object="${note}">
+    <div th:object="${note.noteContent}">
+        <div th:replace="${titleBodyHtml}"/>
+        <div th:unless="${#strings.isEmpty(note.noteContent.url)}">
+            <label th:unless="*{urlIsVideo}">Url:</label>
+            <label th:if="*{urlIsVideo}">Video Url:</label>
+            <a th:href="*{url}" th:text="*{url}"/>
+        </div>
+    </div>
+    <div th:replace=":: showPicture(${note}, 0.2)"/>
+    <div th:replace=":: noteShowTemp(${note})"/>
 </div>
 
 <div th:fragment="noteShow(note, level, forBazaar)"
