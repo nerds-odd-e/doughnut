@@ -1,6 +1,6 @@
 <script setup>
-import NoteShow from './components/NoteShow.vue'
-import NoteStatisticsButton from './components/NoteStatisticsButton.vue'
+import NoteShow from './components/notes/NoteShow.vue'
+import NoteStatisticsButton from './components/notes/NoteStatisticsButton.vue'
 import { inject } from 'vue'
 
 const noteid = inject('noteid')

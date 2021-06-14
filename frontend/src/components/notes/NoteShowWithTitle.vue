@@ -7,8 +7,8 @@
             <a :href="note.noteContent.url">{{note.noteContent.url}}</a>
         </div>
     </div>
-    <!-- <div th:replace=":: showPicture(${note}, 0.2)"/>
-    <ul>
+    <ShowPicture :note="note" :opacity="0.2"/>
+    <!-- <ul>
         <li th:each="linkType:${note.linkTypes(currentUser?.entity)}">
             <span th:text="${linkType.label}"/>
             <span class="badge badge-light mr-1" th:each="link:${note.linksOfTypeThroughDirect(linkType)}">
@@ -30,5 +30,6 @@
 </template>
 
 <script setup>
+  import ShowPicture from "./ShowPicture.vue"
   const props = defineProps({note: Object, level: Number, forBazaar: Boolean})
 </script>

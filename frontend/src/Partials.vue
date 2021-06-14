@@ -1,5 +1,5 @@
 <script setup>
-import NoteStatisticsButton from './components/NoteStatisticsButton.vue'
+import NoteStatisticsButton from './components/notes/NoteStatisticsButton.vue'
 import { inject } from 'vue'
 
 const noteid = inject('noteid')

@@ -139,7 +139,6 @@ public class Note {
         return notes;
     }
 
-    @JsonIgnore
     public String getNotePicture() {
         if (noteContent.getUseParentPicture() && getParentNote() != null) {
             return getParentNote().getNotePicture();
