@@ -142,9 +142,9 @@
 
 <div th:fragment="noteShowTemp(note)" th:object="${note}">
     <ul>
-        <li th:each="linkType:${note.linkTypes(currentUser?.entity)}">
-            <span th:text="${linkType.label}"/>
-            <span class="badge badge-light mr-1" th:each="link:${note.linksOfTypeThroughDirect(linkType)}">
+        <li th:each="linksOfType:${note.getAllLinks(currentUser?.entity)}">
+            <span th:text="${linksOfType.key.label}"/>
+            <span class="badge badge-light mr-1" th:each="link:${linksOfType.value['direct']}">
                 <span th:unless="${forBazaar}" th:remove="tag">
                     <span th:replace=":: linkWithHtmlLink(${link}, ${link.targetNote})"/>
                 </span>
@@ -152,7 +152,7 @@
                    th:if="${forBazaar}"/>
             </span>
             <span class="badge badge-warning mr-1"
-                  th:each="link:${note.linksOfTypeThroughReverse(linkType, currentUser?.entity)}">
+                  th:each="link:${linksOfType.value['reverse']}">
                 <span th:unless="${forBazaar}" th:remove="tag">
                     <span th:replace=":: linkWithHtmlLink(${link}, ${link.sourceNote})"/>
                 </span>

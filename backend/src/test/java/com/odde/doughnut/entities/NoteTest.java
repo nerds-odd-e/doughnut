@@ -1,5 +1,7 @@
 package com.odde.doughnut.entities;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
@@ -12,7 +14,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.validation.*;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static java.util.stream.Collectors.toList;
@@ -140,6 +144,14 @@ public class NoteTest {
             assertThat(targetNotes, hasSize(equalTo(1)));
             assertThat(targetNotes, contains(targetNote));
         }
+    }
+
+    @Test
+    public void json() throws JsonProcessingException {
+        Note note = makeMe.aNote().please();
+        Note note1 = makeMe.aNote().please();
+        makeMe.aLink().between(note, note1).please();
+        HashMap<String, Object> deserialized = new ObjectMapper().readerForMapOf(Object.class).readValue(new ObjectMapper().writeValueAsString(note));
     }
 
 }

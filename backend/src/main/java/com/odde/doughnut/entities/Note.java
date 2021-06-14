@@ -2,6 +2,7 @@ package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.odde.doughnut.algorithms.SiblingOrder;
 import lombok.Getter;
 import lombok.Setter;
@@ -13,10 +14,7 @@ import javax.persistence.*;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -111,6 +109,14 @@ public class Note {
     @JsonIgnore
     public List<Note> getTargetNotes() {
         return links.stream().map(Link::getTargetNote).collect(toList());
+    }
+
+    @JsonIgnore
+    public Map<Link.LinkType, Map<String, List<Link>>> getAllLinks(User viewer) {
+        return linkTypes(viewer).stream().collect(Collectors.toMap(x->x, x->new HashMap<String, List<Link>>(){{
+                put("direct", linksOfTypeThroughDirect(x));
+                put("reverse", linksOfTypeThroughReverse(x, viewer));
+        }}));
     }
 
     public List<Link.LinkType> linkTypes(User viewer) {
