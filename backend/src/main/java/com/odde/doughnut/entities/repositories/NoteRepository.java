@@ -33,7 +33,7 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
             + "   AND rp.user_id = :#{#user.id} "
             + " WHERE note.skip_review IS FALSE "
             + "   AND rp.id IS NULL "
-            + "ORDER BY note.created_datetime ";
+            + "ORDER BY note.created_at ";
 
     String byOwnershipWhereThereIsNoReviewPoint = "JOIN notebook ON notebook.id = note.notebook_id "
             + " AND notebook.ownership_id = :#{#user.ownership.id} "

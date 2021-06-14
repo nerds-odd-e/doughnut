@@ -90,10 +90,10 @@ public class NoteContent {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Transient @Getter @Setter private String testingParent;
 
-    @Column(name = "updated_datetime")
+    @Column(name = "updated_at")
     @Getter
     @Setter
-    private Timestamp updatedDatetime = new Timestamp(System.currentTimeMillis());
+    private Timestamp updatedAt = new Timestamp(System.currentTimeMillis());
 
     @JsonIgnore
     public String getNotePicture() {

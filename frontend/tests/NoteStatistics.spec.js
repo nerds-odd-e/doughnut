@@ -22,9 +22,9 @@ const stubResponse = {
       "id":1,"title":"Fungible","description":null,"url":null,"urlIsVideo":false,
       "pictureUrl":null,"pictureMask":null,"useParentPicture":false,
       "skipReview":false,"hideTitleInArticle":false,"showAsBulletInArticle":false,
-      "updatedDatetime":"2021-06-12T04:17:51.000+00:00","notePicture":null
+      "updatedAt":"2021-06-12T04:17:51.000+00:00","notePicture":null
     },
-    "createdDatetime":"2021-06-12T04:17:51.000+00:00",
+    "createdAt":"2021-06-12T04:17:51.000+00:00",
     "title":"Fungible","head":true
   }
 }

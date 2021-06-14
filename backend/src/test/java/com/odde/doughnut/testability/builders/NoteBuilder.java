@@ -102,7 +102,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
     }
 
     public NoteBuilder createdAt(Timestamp timestamp) {
-        entity.setCreatedDatetime(timestamp);
+        entity.setCreatedAt(timestamp);
         return this;
     }
 

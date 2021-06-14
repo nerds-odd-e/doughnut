@@ -45,10 +45,10 @@ public class Note {
     @Getter
     private Notebook notebook;
 
-    @Column(name = "created_datetime")
+    @Column(name = "created_at")
     @Getter
     @Setter
-    private Timestamp createdDatetime = new Timestamp(System.currentTimeMillis());
+    private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
     @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "master_review_setting_id", referencedColumnName = "id")
