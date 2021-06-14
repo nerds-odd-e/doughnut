@@ -36,8 +36,6 @@ class NoteControllerTests {
     @Autowired
     MakeMe makeMe;
     private UserModel userModel;
-    private Note parentNote;
-    final ExtendedModelMap model = new ExtendedModelMap();
     NoteController controller;
 
     @BeforeEach
