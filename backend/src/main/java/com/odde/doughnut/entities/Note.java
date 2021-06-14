@@ -119,19 +119,19 @@ public class Note {
         }}));
     }
 
-    public List<Link.LinkType> linkTypes(User viewer) {
+    private List<Link.LinkType> linkTypes(User viewer) {
         return Arrays.stream(Link.LinkType.values())
                 .filter(t -> !linkedNotesOfType(t, viewer).isEmpty())
                 .collect(Collectors.toUnmodifiableList());
     }
 
-    public List<Link> linksOfTypeThroughDirect(Link.LinkType linkType) {
+    private List<Link> linksOfTypeThroughDirect(Link.LinkType linkType) {
         return this.links.stream()
                 .filter(l -> l.getLinkType().equals(linkType))
                 .collect(Collectors.toList());
     }
 
-    public List<Link> linksOfTypeThroughReverse(Link.LinkType linkType, User viewer) {
+    private List<Link> linksOfTypeThroughReverse(Link.LinkType linkType, User viewer) {
         return refers.stream()
                 .filter(l -> l.getLinkType().equals(linkType.reverseType()))
                 .filter(l -> l.sourceVisibleAsTargetOrTo(viewer))
