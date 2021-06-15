@@ -46,7 +46,7 @@ const stubLinkResponse = {
 
 describe('note statistics', () => {
 
-  test('fetchBlogPosts API to be called ONCE with article rendered', async () => {
+  test('fetch API to be called ONCE', async () => {
     fetch.mockResponseOnce(JSON.stringify({}));
     const wrapper = mount(NoteStatistics, {propsData: {noteid: 123}});
     await flushPromises()

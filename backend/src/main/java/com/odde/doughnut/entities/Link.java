@@ -2,6 +2,7 @@ package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.odde.doughnut.entities.QuizQuestion.QuestionType;
 import lombok.Getter;
 import lombok.Setter;
@@ -36,6 +37,7 @@ public class Link {
         SIMILAR_TO("is similar to", "is not similar to", new QuestionType[0]),
         CONFUSE_WITH("confuses with", "does not confuse with", new QuestionType[0]);
 
+        @JsonValue
         public final String label;
         public final String exclusiveQuestion;
         @Getter

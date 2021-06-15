@@ -1,6 +1,6 @@
 <template>
   <div v-if="note">
-      <NoteShowWithTitle :note="note" :level="level" :forBazaar="forBazaar">
+      <NoteShowWithTitle :note="note" :links="links" :level="level" :forBazaar="forBazaar">
         <h2 :class="'h' + level"> {{note.noteContent.title}}</h2>
         <pre class="note-body" style="white-space: pre-wrap;">{{note.noteContent.description}}</pre>
       </NoteShowWithTitle>
@@ -14,6 +14,7 @@ import { ref, defineProps } from "vue"
 
 const props = defineProps({noteid: Number, level: Number, forBazaar: Boolean})
 const note = ref(null)
+const links = ref(null)
 const url = () => {
   return `/api/notes/${props.noteid}`
 }
@@ -24,6 +25,7 @@ const fetchData = async () => {
         })
         .then(articles => {
           note.value = articles.note;
+          links.value = articles.links;
         })
         .catch(error => {
           window.alert(error);

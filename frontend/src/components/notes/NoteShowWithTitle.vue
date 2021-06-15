@@ -1,5 +1,5 @@
 <template>
-    <div th:object="${note.noteContent}">
+    <div>
         <slot></slot>
         <div v-if="!!note.noteContent.url">
             <label v-if="note.noteContent.urlIsVideo">Video Url:</label>
@@ -8,28 +8,27 @@
         </div>
     </div>
     <ShowPicture :note="note" :opacity="0.2"/>
-    <!-- <ul>
-        <li th:each="linkType:${note.linkTypes(currentUser?.entity)}">
-            <span th:text="${linkType.label}"/>
-            <span class="badge badge-light mr-1" th:each="link:${note.linksOfTypeThroughDirect(linkType)}">
-                <span th:unless="${forBazaar}" th:remove="tag">
-                    <span th:replace=":: linkWithHtmlLink(${link}, ${link.targetNote})"/>
-                </span>
-                <a th:href="'/bazaar/notes/' + ${link.targetNote.id}" th:text="${link.targetNote.noteContent.title}"
-                   th:if="${forBazaar}"/>
+    <ul>
+        <li v-for="(linksOfType, linkType) in links" :key="linkType">
+            <span>{{linkType}} </span>
+            <span class="badge badge-light ml-1 mr-1" v-for="link in linksOfType.direct" :key="link.id">
+                <template v-if="!forBazaar">
+                    <LinkWithHtmlLink :link="link" :note="link.targetNote"/>
+                </template>
+                <a v-else :href="`/bazaar/notes/${link.targetNote.id}`">{{link.targetNote.title}}</a>
             </span>
-            <span class="badge badge-warning mr-1"
-                  th:each="link:${note.linksOfTypeThroughReverse(linkType, currentUser?.entity)}">
-                <span th:unless="${forBazaar}" th:remove="tag">
-                    <span th:replace=":: linkWithHtmlLink(${link}, ${link.sourceNote})"/>
-                </span>
-                <a th:href="'/bazaar/notes/' + ${link.sourceNote.id}" th:text="${link.sourceNote.noteContent.title}" th:if="${forBazaar}"/>
+            <span class="badge badge-warning ml-1 mr-1" v-for="link in linksOfType.reverse" :key="link.id">
+                <template v-if="!forBazaar">
+                    <LinkWithHtmlLink :link="link" :note="link.sourceNote"/>
+                </template>
+                <a v-else :href="`/bazaar/notes/${link.sourceNote.id}`">{{link.sourceNote.title}}</a>
             </span>
         </li>
-    </ul> -->
+    </ul>
 </template>
 
 <script setup>
   import ShowPicture from "./ShowPicture.vue"
-  const props = defineProps({note: Object, level: Number, forBazaar: Boolean})
+  import LinkWithHtmlLink from "./LinkWithHtmlLink.vue"
+  const props = defineProps({note: Object, links: Object, level: Number, forBazaar: Boolean})
 </script>
