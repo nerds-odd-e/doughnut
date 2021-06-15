@@ -4,10 +4,6 @@
         <div th:replace="_fragments/note_fragments :: noteControlHeader(${note})"/>
 
         <div class="jumbotron py-4 mb-2">
-            <nav class="nav d-flex flex-row-reverse p-0">
-                <div th:replace="_fragments/note_fragments :: noteButtons(${note})"/>
-            </nav>
-
             <div id="partials-noteshow" th:data-noteid="${note.id}"> </div>
         </div>
 
