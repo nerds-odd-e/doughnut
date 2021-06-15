@@ -18,6 +18,7 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.Optional;
 
 @Controller
 @RequestMapping("/notes")
@@ -97,19 +98,16 @@ public class NoteController extends ApplicationMvcController  {
     }
 
     private NoteMotion getLeftNoteMotion(Note note) {
-        Note previousSiblingNote = note.getPreviousSibling();
-        if(previousSiblingNote != null) {
-            Note prevprev = previousSiblingNote.getPreviousSibling();
-            if (prevprev == null) {
-                return new NoteMotion(note.getParentNote(), true);
-            }
-            return new NoteMotion(prevprev, false);
-        }
-        return new NoteMotion(null, false);
+        return note.getPreviousSibling()
+                .map(prev->
+                    prev.getPreviousSibling()
+                            .map(n-> new NoteMotion(n, false))
+                            .orElseGet(()->new NoteMotion(note.getParentNote(), true))
+                ).orElseGet(()->new NoteMotion(null, false));
     }
 
     private NoteMotion getRightNoteMotion(Note note) {
-        return new NoteMotion(note.getNextSibling(), false);
+        return new NoteMotion(note.getNextSibling().orElse(null), false);
     }
 
     @PostMapping("/{note}/move")

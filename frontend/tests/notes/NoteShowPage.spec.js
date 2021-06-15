@@ -7,6 +7,9 @@ beforeEach(() => {
 });
 
 const stubResponse = {
+    "navigation": {
+
+    },
     "note": {
         "id": 2,
         "noteContent": {

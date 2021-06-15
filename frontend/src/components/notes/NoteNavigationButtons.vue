@@ -3,13 +3,13 @@
     <NoteLinkButton :urlPrefix="urlPrefix" :noteid="navigation.previousSiblingId" :title="'previous sibling'">
         <SvgFastBackward />
     </NoteLinkButton>
-    <NoteLinkButton :urlPrefix="urlPrefix" :noteid="navigation.previousId"  :title="'previous'">
+    <NoteLinkButton :urlPrefix="urlPrefix" :noteid="navigation.previousId" :title="'previous'">
         <SvgBackward />
     </NoteLinkButton>
-    <NoteLinkButton :urlPrefix="urlPrefix" :noteid="navigation.nextId"  :title="'next'">
+    <NoteLinkButton :urlPrefix="urlPrefix" :noteid="navigation.nextId" :title="'next'">
         <SvgForward />
     </NoteLinkButton>
-    <NoteLinkButton :urlPrefix="urlPrefix" :noteid="navigation.nextSiblingId"  :title="'fast forward'">
+    <NoteLinkButton :urlPrefix="urlPrefix" :noteid="navigation.nextSiblingId" :title="'fast forward'">
         <SvgFastForward />
     </NoteLinkButton>
 </div>

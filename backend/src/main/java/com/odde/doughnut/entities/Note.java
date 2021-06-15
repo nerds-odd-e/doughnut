@@ -116,6 +116,12 @@ public class Note {
         NoteViewedByUser nvb = new NoteViewedByUser();
         nvb.setNote(this);
         nvb.setLinks(getAllLinks(viewer));
+        NoteViewedByUser.NoteNavigation navigation = new NoteViewedByUser.NoteNavigation();
+        navigation.setNextId(getNext().map(Note::getId).orElse(null));
+        navigation.setNextSiblingId(getNextSibling().map(Note::getId).orElse(null));
+        navigation.setPreviousSiblingId(getPreviousSibling().map(Note::getId).orElse(null));
+        navigation.setPreviousId(getPrevious().map(Note::getId).orElse(null));
+        nvb.setNavigation(navigation);
         return nvb;
     }
 
@@ -247,32 +253,31 @@ public class Note {
     }
 
     @JsonIgnore
-    public Note getPreviousSibling() {
+    public Optional<Note> getPreviousSibling() {
         return getSiblings().stream()
                 .filter(nc -> nc.siblingOrder < siblingOrder)
-                .reduce((f, s) -> s).orElse(null);
+                .reduce((f, s) -> s);
     }
 
     @JsonIgnore
-    public Note getNextSibling() {
+    public Optional<Note> getNextSibling() {
         return getSiblings().stream()
                 .filter(nc -> nc.siblingOrder > siblingOrder)
-                .findFirst().orElse(null);
+                .findFirst();
     }
 
     @JsonIgnore
-    public Note getPrevious() {
-        Note result = getPreviousSibling();
-        if (result == null) {
-            return getParentNote();
-        }
-        while (true) {
-            List<Note> children = result.getChildren();
-            if (children.size() == 0) {
-                return result;
+    public Optional<Note> getPrevious() {
+        Note result = getPreviousSibling().map(n->{
+            while (true) {
+                List<Note> children = n.getChildren();
+                if (children.size() == 0) {
+                    return n;
+                }
+                n = children.get(children.size() - 1);
             }
-            result = children.get(children.size() - 1);
-        }
+        }).orElseGet(this::getParentNote);
+        return Optional.ofNullable(result);
     }
 
     @JsonIgnore
@@ -281,20 +286,20 @@ public class Note {
     }
 
     @JsonIgnore
-    public Note getNext() {
+    public Optional<Note> getNext() {
         Note firstChild = getFirstChild();
         if (firstChild != null) {
-            return firstChild;
+            return Optional.of(firstChild);
         }
         Note next = this;
         while (next != null) {
-            Note sibling = next.getNextSibling();
-            if (sibling != null) {
+            Optional<Note> sibling = next.getNextSibling();
+            if (sibling.isPresent()) {
                 return sibling;
             }
             next = next.getParentNote();
         }
-        return null;
+        return Optional.empty();
     }
 
     public void updateSiblingOrder(Note relativeToNote, boolean asFirstChildOfNote) {
@@ -305,12 +310,9 @@ public class Note {
     }
 
     private long getSiblingOrderToInsertBehindMe() {
-        Note nextSiblingNote = getNextSibling();
-        Long relativeToSiblingOrder = siblingOrder;
-        if (nextSiblingNote == null) {
-            return relativeToSiblingOrder + SiblingOrder.MINIMUM_SIBLING_ORDER_INCREMENT;
-        }
-        return (relativeToSiblingOrder + nextSiblingNote.siblingOrder) / 2;
+        Optional<Note> nextSiblingNote = getNextSibling();
+        return nextSiblingNote.map(x-> (siblingOrder + x.siblingOrder) / 2)
+                .orElse( siblingOrder + SiblingOrder.MINIMUM_SIBLING_ORDER_INCREMENT);
     }
 
     private Long getSiblingOrderToBecomeMyFirstChild() {
