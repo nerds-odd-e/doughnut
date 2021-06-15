@@ -1,20 +1,25 @@
 <template>
   <div class="jumbotron py-4 mb-2">
   <div v-if="note">
-
-
       <nav class="nav d-flex flex-row-reverse p-0">
           <NoteButtons :note="note"/>
       </nav>
       <NoteShow :note="note" :links="links" :level="level" :forBazaar="forBazaar"/>
   </div>
   </div>
+  <nav class="nav d-flex justify-content-between p-0 mb-2">
+    <div class="btn-group btn-group-sm">
+        <a :href="`/notes/{id}/move(id=${note.id}`">Move This Note</a>
+    </div>
+    <NoteNavigationButtons :urlPrefix="''" :note="note"/>
+  </nav>
 
 </template>
 
 <script setup>
 import NoteShow from "./NoteShow.vue"
 import NoteButtons from "./NoteButtons.vue"
+import NoteNavigationButtons from "./NoteNavigationButtons.vue"
 import { ref, defineProps } from "vue"
 
 const props = defineProps({noteid: Number, level: Number, forBazaar: Boolean})

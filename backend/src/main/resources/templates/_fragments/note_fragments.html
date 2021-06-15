@@ -124,7 +124,6 @@
     <a th:replace="_fragments/note_fragments :: noteLinkButton(${urlPrefix}, ${entity.previous}, 'backward', 'previous')"/>
     <a th:replace="_fragments/note_fragments :: noteLinkButton(${urlPrefix}, ${entity.next}, 'forward', 'next')"/>
     <a th:replace="_fragments/note_fragments :: noteLinkButton(${urlPrefix}, ${entity.nextSibling}, 'fastForward', 'next sibling')"/>
-    </a>
 </div>
 
 <div th:fragment="showPicture(note, opacity)" th:object="${note}" class="text-center"
