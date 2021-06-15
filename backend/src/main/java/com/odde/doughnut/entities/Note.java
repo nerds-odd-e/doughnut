@@ -1,6 +1,7 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.odde.doughnut.algorithms.SiblingOrder;
 import com.odde.doughnut.entities.json.LinkViewedByUser;
 import com.odde.doughnut.entities.json.NoteViewedByUser;
@@ -101,6 +102,10 @@ public class Note {
     @Getter
     private final List<Note> children = new ArrayList<>();
 
+    public Ownership getOwnership() {
+      return notebook.getOwnership();
+    }
+
     @Override
     public String toString() {
         return "Note{" + "id=" + id + ", title='" + noteContent.getTitle() + '\'' + '}';
@@ -169,7 +174,6 @@ public class Note {
         return getParentNote() == null;
     }
 
-    @JsonIgnore
     public String getNoteTypeDisplay(){
         return this.getNotebook().getNotebookType().getDisplay();
     }
@@ -201,7 +205,7 @@ public class Note {
         return ancestors;
     }
 
-    @JsonIgnore
+    @JsonIgnoreProperties({"noteContent", "ownership"})
     public List<Note> getAncestors() {
         return getNotesClosures().stream().map(NotesClosure::getAncestor).collect(toList());
     }

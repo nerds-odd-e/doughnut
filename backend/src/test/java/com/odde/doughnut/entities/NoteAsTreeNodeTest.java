@@ -119,10 +119,10 @@ public class NoteAsTreeNodeTest {
         }
 
         private void assertNavigation(Note entity, Note previousSibling, Note previous, Note next, Note nextSibling) {
-            assertThat(entity.getPreviousSibling(), equalTo(previousSibling));
-            assertThat(entity.getPrevious(), equalTo(previous));
-            assertThat(entity.getNext(), equalTo(next));
-            assertThat(entity.getNextSibling(), equalTo(nextSibling));
+            assertThat(entity.getPreviousSibling().orElse(null), equalTo(previousSibling));
+            assertThat(entity.getPrevious().orElse(null), equalTo(previous));
+            assertThat(entity.getNext().orElse(null), equalTo(next));
+            assertThat(entity.getNextSibling().orElse(null), equalTo(nextSibling));
         }
 
     }

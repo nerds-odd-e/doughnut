@@ -20,7 +20,6 @@ public class Ownership {
 
     @OneToOne
     @JoinColumn(name = "circle_id")
-    @JsonIgnore
     @Getter @Setter private Circle circle;
 
     @OneToMany(mappedBy = "ownership")

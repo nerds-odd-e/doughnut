@@ -1,5 +1,6 @@
 <template>
   <div v-if="note">
+  <NoteControlHeader :note="note"/>
   <div class="jumbotron py-4 mb-2">
       <nav class="nav d-flex flex-row-reverse p-0">
           <NoteButtons :note="note"/>
@@ -20,6 +21,7 @@
 import NoteShow from "./NoteShow.vue"
 import NoteButtons from "./NoteButtons.vue"
 import NoteNavigationButtons from "./NoteNavigationButtons.vue"
+import NoteControlHeader from "./NoteControlHeader.vue"
 import { ref, defineProps } from "vue"
 
 const props = defineProps({noteid: Number, level: Number, forBazaar: Boolean})

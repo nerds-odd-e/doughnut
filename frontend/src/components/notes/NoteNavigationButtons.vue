@@ -9,7 +9,7 @@
     <NoteLinkButton :urlPrefix="urlPrefix" :noteid="navigation.nextId" :title="'next'">
         <SvgForward />
     </NoteLinkButton>
-    <NoteLinkButton :urlPrefix="urlPrefix" :noteid="navigation.nextSiblingId" :title="'fast forward'">
+    <NoteLinkButton :urlPrefix="urlPrefix" :noteid="navigation.nextSiblingId" :title="'next sibling'">
         <SvgFastForward />
     </NoteLinkButton>
 </div>
@@ -23,3 +23,4 @@
   import NoteLinkButton from "./NoteLinkButton.vue"
   const props = defineProps({urlPrefix: String, navigation: Object})
 </script>
+

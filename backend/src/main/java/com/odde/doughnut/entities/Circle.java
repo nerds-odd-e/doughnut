@@ -27,6 +27,7 @@ public class Circle {
 
     @Getter
     @Column(name = "invitation_code")
+    @JsonIgnore
     private final String invitationCode = generateRandomInvitationCode(15);
 
     @JoinTable(name = "circle_user", joinColumns = {
@@ -40,6 +41,7 @@ public class Circle {
 
     @OneToOne(mappedBy = "circle", cascade = CascadeType.ALL)
     @PrimaryKeyJoinColumn
+    @JsonIgnore
     @Getter @Setter private Ownership ownership = new Ownership();
 
     public Circle() {

@@ -43,8 +43,9 @@ public class NoteViewedByUserTest {
 
         @BeforeEach
         void thereAreTwoNotesWithALinkInBetween() {
-            note1 = makeMe.aNote().description("note1description").inMemoryPlease();
-            note2 = makeMe.aNote().description("note2description").inMemoryPlease();
+            Note top = makeMe.aNote().inMemoryPlease();
+            note1 = makeMe.aNote().under(top).description("note1description").inMemoryPlease();
+            note2 = makeMe.aNote().under(top).description("note2description").inMemoryPlease();
             link = makeMe.aLink().between(note1, note2).inMemoryPlease();
         }
 
