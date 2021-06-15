@@ -1,9 +1,9 @@
 package com.odde.doughnut.entities;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.odde.doughnut.algorithms.SiblingOrder;
+import com.odde.doughnut.entities.json.LinkViewedByUser;
+import com.odde.doughnut.entities.json.NoteViewedByUser;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.util.Strings;
@@ -112,10 +112,17 @@ public class Note {
     }
 
     @JsonIgnore
-    public Map<Link.LinkType, Map<String, List<Link>>> getAllLinks(User viewer) {
-        return linkTypes(viewer).stream().collect(Collectors.toMap(x->x, x->new HashMap<String, List<Link>>(){{
-                put("direct", linksOfTypeThroughDirect(x));
-                put("reverse", linksOfTypeThroughReverse(x, viewer));
+    public NoteViewedByUser jsonObjectViewedBy(User viewer) {
+        NoteViewedByUser nvb = new NoteViewedByUser();
+        nvb.setNote(this);
+        nvb.setLinks(getAllLinks(viewer));
+        return nvb;
+    }
+
+    public Map<Link.LinkType, LinkViewedByUser> getAllLinks(User viewer) {
+        return linkTypes(viewer).stream().collect(Collectors.toMap(x->x, x->new LinkViewedByUser(){{
+                setDirect(linksOfTypeThroughDirect(x));
+                setReverse(linksOfTypeThroughReverse(x, viewer));
         }}));
     }
 

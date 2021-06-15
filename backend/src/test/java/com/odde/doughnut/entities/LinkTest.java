@@ -1,5 +1,6 @@
 package com.odde.doughnut.entities;
 
+import com.odde.doughnut.entities.json.LinkViewedByUser;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -59,14 +60,14 @@ public class LinkTest {
 
             @Test
             void AIsRelatedToB() {
-                final Map<Link.LinkType, Map<String, List<Link>>> allLinks = noteA.getAllLinks(null);
+                final Map<Link.LinkType, LinkViewedByUser> allLinks = noteA.getAllLinks(null);
                 assertThat(allLinks.keySet(), contains(RELATED_TO));
                 assertThat(getLinksOfBothDirection(RELATED_TO, allLinks), contains(noteB));
             }
 
             @Test
             void BIsAlsoRelatedToA() {
-                final Map<Link.LinkType, Map<String, List<Link>>> allLinks = noteB.getAllLinks(null);
+                final Map<Link.LinkType, LinkViewedByUser> allLinks = noteB.getAllLinks(null);
                 assertThat(allLinks.keySet(), contains(RELATED_TO));
                 assertThat(getLinksOfBothDirection(RELATED_TO, allLinks), contains(noteA));
             }
@@ -82,14 +83,14 @@ public class LinkTest {
 
             @Test
             void ABelongToB() {
-                final Map<Link.LinkType, Map<String, List<Link>>> allLinks = noteA.getAllLinks(null);
+                final Map<Link.LinkType, LinkViewedByUser> allLinks = noteA.getAllLinks(null);
                 assertThat(allLinks.keySet(), contains(BELONGS_TO));
                 assertThat(getLinksOfBothDirection(BELONGS_TO, allLinks), contains(noteB));
             }
 
             @Test
             void BHasA() {
-                final Map<Link.LinkType, Map<String, List<Link>>> allLinks = noteB.getAllLinks(null);
+                final Map<Link.LinkType, LinkViewedByUser> allLinks = noteB.getAllLinks(null);
                 assertThat(allLinks.keySet(), contains(HAS));
                 assertThat(getLinksOfBothDirection(HAS, allLinks), contains(noteA));
             }
@@ -115,14 +116,14 @@ public class LinkTest {
 
             @Test
             void AHasB() {
-                final Map<Link.LinkType, Map<String, List<Link>>> allLinks = noteA.getAllLinks(null);
+                final Map<Link.LinkType, LinkViewedByUser> allLinks = noteA.getAllLinks(null);
                 assertThat(allLinks.keySet(), contains(HAS));
                 assertThat(getLinksOfBothDirection(HAS, allLinks), contains(noteB));
             }
 
             @Test
             void BBelongsToA() {
-                final Map<Link.LinkType, Map<String, List<Link>>> allLinks = noteB.getAllLinks(null);
+                final Map<Link.LinkType, LinkViewedByUser> allLinks = noteB.getAllLinks(null);
                 assertThat(allLinks.keySet(), contains(BELONGS_TO));
                 assertThat(getLinksOfBothDirection(BELONGS_TO, allLinks), contains(noteA));
             }
@@ -158,17 +159,17 @@ public class LinkTest {
 
         private boolean hasReverseLinkFor(Note source, User viewer) {
             makeMe.theNote(source).linkTo(target, HAS).please();
-            final Map<String, List<Link>> linksMap = target.getAllLinks(viewer).get(BELONGS_TO);
+            final LinkViewedByUser linksMap = target.getAllLinks(viewer).get(BELONGS_TO);
             if (linksMap == null) return false;
-            final List<Link> links = linksMap.get("reverse");
+            final List<Link> links = linksMap.getReverse();
             return !links.isEmpty();
         }
 
     }
 
-    private List<Note> getLinksOfBothDirection(Link.LinkType linkType, Map<Link.LinkType, Map<String, List<Link>>> allLinks) {
-        List<Note> direct = allLinks.get(linkType).get("direct").stream().map(Link::getTargetNote).collect(toList());
-        List<Note> reverse =allLinks.get(linkType).get("reverse").stream().map(Link::getSourceNote).collect(Collectors.toUnmodifiableList());
+    private List<Note> getLinksOfBothDirection(Link.LinkType linkType, Map<Link.LinkType, LinkViewedByUser> allLinks) {
+        List<Note> direct = allLinks.get(linkType).getDirect().stream().map(Link::getTargetNote).collect(toList());
+        List<Note> reverse =allLinks.get(linkType).getReverse().stream().map(Link::getSourceNote).collect(Collectors.toUnmodifiableList());
         direct.addAll(reverse);
         return direct;
     }

@@ -23,7 +23,7 @@ const fetchData = async () => {
           return res.json();
         })
         .then(articles => {
-          note.value = articles;
+          note.value = articles.note;
         })
         .catch(error => {
           window.alert(error);

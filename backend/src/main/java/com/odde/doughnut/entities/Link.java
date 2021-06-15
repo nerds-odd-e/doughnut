@@ -1,6 +1,7 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.odde.doughnut.entities.QuizQuestion.QuestionType;
 import lombok.Getter;
 import lombok.Setter;
@@ -76,10 +77,12 @@ public class Link {
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "source_id", referencedColumnName = "id")
+    @JsonIgnoreProperties("noteContent")
     @Getter @Setter private Note sourceNote;
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "target_id", referencedColumnName = "id")
+    @JsonIgnoreProperties("noteContent")
     @Getter @Setter private Note targetNote;
 
     @Column(name = "type")

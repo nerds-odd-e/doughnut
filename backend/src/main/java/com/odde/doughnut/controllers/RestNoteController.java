@@ -4,6 +4,7 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.json.NoteViewedByUser;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
@@ -33,10 +34,10 @@ class RestNoteController {
   }
 
   @GetMapping("/{note}")
-  public Note show(@PathVariable("note") Note note) throws NoAccessRightException {
+  public NoteViewedByUser show(@PathVariable("note") Note note) throws NoAccessRightException {
     final UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertReadAuthorization(note);
-    return note;
+    return note.jsonObjectViewedBy(user.getEntity());
   }
 
   @GetMapping("/{note}/statistics")

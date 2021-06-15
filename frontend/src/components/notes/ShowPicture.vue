@@ -25,8 +25,6 @@
   const getMasks = () => {
       return createGroups(props.note.noteContent.pictureMask.split(/\s+/), 4).map((arr, index) => {
         const [x, y, width, height] = arr
-          console.log(arr)
-        console.log({index, x, y, width, height})
         return {index, x, y, width, height}
       })
   }
