@@ -1,4 +1,4 @@
-import NoteShow from '@/components/notes/NoteShow.vue';
+import NoteShowPage from '@/components/notes/NoteShowPage.vue';
 import { mount } from '@vue/test-utils';
 import flushPromises from 'flush-promises';
 
@@ -54,7 +54,7 @@ describe('note show', () => {
 
   test('fetch API to be called ONCE', async () => {
     fetch.mockResponseOnce(JSON.stringify(stubResponse));
-    const wrapper = mount(NoteShow, {propsData: {noteid: 123}});
+    const wrapper = mount(NoteShowPage, {propsData: {noteid: 123}});
     await flushPromises()
     expect(fetch).toHaveBeenCalledTimes(1);
     expect(fetch).toHaveBeenCalledWith('/api/notes/123');
