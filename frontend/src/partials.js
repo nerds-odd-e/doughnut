@@ -13,7 +13,7 @@ if (partialEl) {
 }
 
 const routes = [
-    { path: '/notes/:noteid', component: TempApp, props: true },
+    { path: '/notes/:noteid', name: 'noteShow', component: TempApp, props: true },
   ]
   
 const router = createRouter({

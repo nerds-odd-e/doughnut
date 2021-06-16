@@ -1,6 +1,6 @@
 <template>
   <template v-if="!!note">
-    <a :href="`/notes/${note.id}`">{{note.title}}</a>
+    <router-link :to="{name: 'noteShow', params: {noteid: note.id}}">{{note.title}}</router-link>
   </template>
 </template>
 
