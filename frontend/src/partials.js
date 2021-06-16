@@ -1,6 +1,8 @@
 import { createApp } from 'vue'
+import {createRouter,createWebHistory} from 'vue-router'
 import Partials from './Partials.vue'
 import TempApp from './TempApp.vue'
+import NoteApp from './NoteApp.vue'
 
 const partialApp = createApp(Partials);
 const partialEl = document.getElementById('partials');
@@ -10,9 +12,15 @@ if (partialEl) {
     partialApp.mount('#partials')
 }
 
-const app = createApp(TempApp);
-const el = document.getElementById('partials-noteshow');
-if (el) {
-    app.provide('noteid', el.dataset.noteid)
-    app.mount('#partials-noteshow')
-}
+const routes = [
+    { path: '/notes/:noteid', component: TempApp, props: true },
+  ]
+  
+const router = createRouter({
+    history: createWebHistory(),
+    routes,
+})
+
+const app = createApp(NoteApp)
+app.use(router)
+app.mount('#partials-noteshow')
