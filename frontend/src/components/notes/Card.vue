@@ -5,8 +5,8 @@
             <h5 class="card-title">
                 <component :is="linkFragment" :note="note" class="card-title"/>
             </h5>
-            <p>{{note.noteContent.description.substring(0, 50)}}</p>
-            <slot name="button"/>
+            <p>{{note.shortDescription}}</p>
+            <slot name="button"  :note="note"/>
         </div>
     </div>
 </template>

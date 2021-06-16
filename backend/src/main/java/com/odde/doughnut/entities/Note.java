@@ -107,6 +107,10 @@ public class Note {
         return "Note{" + "id=" + id + ", title='" + noteContent.getTitle() + '\'' + '}';
     }
 
+    public String getShortDescription() {
+        return noteContent.getShortDescription();
+    }
+
     @JsonIgnore
     public List<Note> getTargetNotes() {
         return links.stream().map(Link::getTargetNote).collect(toList());

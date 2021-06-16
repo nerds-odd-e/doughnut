@@ -45,7 +45,7 @@ const fetchData = async () => {
           note.value = noteViewedByUser.note;
           links.value = noteViewedByUser.links;
           navigation.value = noteViewedByUser.navigation;
-          childrenNotes.value = noteViewedByUser.childrenNotes;
+          childrenNotes.value = noteViewedByUser.children;
           ownership.value = noteViewedByUser.ownership;
           ancestors.value = noteViewedByUser.ancestors;
         })

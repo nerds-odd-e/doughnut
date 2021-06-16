@@ -1,7 +1,7 @@
 <template>
 <NoteCardWithHeaderAndButton :notes="notes">
-     <template v-slot:headerButton="slotProps">
-      <NoteButtons :note="slotProps.note"/>
+     <template #headerButtons="{note}">
+      <NoteButtons :note="note"/>
      </template>
 </NoteCardWithHeaderAndButton>
 </template>

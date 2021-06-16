@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.web.multipart.MultipartFile;
+import org.thymeleaf.util.StringUtils;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -142,4 +143,8 @@ public class NoteContent {
         return new NoteTitle(title);
     }
 
+    @JsonIgnore
+    public String getShortDescription() {
+        return StringUtils.abbreviate(description, 50);
+    }
 }

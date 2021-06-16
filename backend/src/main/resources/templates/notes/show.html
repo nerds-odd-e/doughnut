@@ -2,7 +2,5 @@
 <layout th:replace="_fragments/basic_layout :: application_layout(~{ :: .content})">
     <div class="container content">
         <div id="partials-noteshow" th:data-noteid="${note.id}"> </div>
-
-        <div th:replace="_fragments/note_fragments :: noteOwnerViewCards(${note.children})"/>
     </div>
 </layout>

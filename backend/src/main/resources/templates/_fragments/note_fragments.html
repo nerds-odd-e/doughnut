@@ -90,12 +90,6 @@
     </div>
 </div>
 
-<div th:fragment="noteOwnerViewCards(notes)"
-     th:replace=":: noteCardWithHeaderAndButton(${notes}, ~{ :: .card-button},  ~{ :: .card-header-buttons})">
-    <div class="card-header-buttons" th:replace=":: noteButtons(${noteElement})"/>
-    <span class="card-button"/>
-</div>
-
 <div th:fragment="noteFormBody()">
     <div th:replace="_fragments/forms :: textInput('note', 'title', null, false)"/>
     <div th:replace="_fragments/forms :: textarea('note', 'description', null)"/>

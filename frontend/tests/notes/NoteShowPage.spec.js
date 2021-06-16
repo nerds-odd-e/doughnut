@@ -11,42 +11,53 @@ const stubResponse = {
 
     },
 
-        ownership: {
-            isFromCircle: true,
-            circle: {
-                name: "a circle"
-            }
+    ownership: {
+        isFromCircle: true,
+        circle: {
+            name: "a circle"
+        }
+    },
+    ancestors: [
+        {
+            "id": 1,
+            "createdAt": "2021-06-15T07:18:58.000+00:00",
+            "notePicture": "",
+            "head": true,
+            "noteTypeDisplay": "Child Note",
+            "ancestors": [],
+            "title": "asdf"
         },
-        ancestors: [
+        {
+            "id": 3,
+            "createdAt": "2021-06-15T07:22:00.000+00:00",
+            "notePicture": "",
+            "head": false,
+            "noteTypeDisplay": "Child Note",
+            "ancestors": [
             {
-              "id": 1,
-              "createdAt": "2021-06-15T07:18:58.000+00:00",
-              "notePicture": "",
-              "head": true,
-              "noteTypeDisplay": "Child Note",
-              "ancestors": [],
-              "title": "asdf"
-            },
-            {
-              "id": 3,
-              "createdAt": "2021-06-15T07:22:00.000+00:00",
-              "notePicture": "",
-              "head": false,
-              "noteTypeDisplay": "Child Note",
-              "ancestors": [
-                {
-                  "id": 1,
-                  "createdAt": "2021-06-15T07:18:58.000+00:00",
-                  "notePicture": "",
-                  "head": true,
-                  "noteTypeDisplay": "Child Note",
-                  "ancestors": [],
-                  "title": "asdf"
-                }
-              ],
-              "title": "2"
+                "id": 1,
+                "createdAt": "2021-06-15T07:18:58.000+00:00",
+                "notePicture": "",
+                "head": true,
+                "noteTypeDisplay": "Child Note",
+                "ancestors": [],
+                "title": "asdf"
             }
-          ],
+            ],
+            "title": "2"
+        }
+    ],
+
+    children: [
+        {
+          "id": 3,
+          "createdAt": "2021-06-16T03:33:44.000+00:00",
+          "title": "2",
+          "notePicture": "",
+          "head": false,
+          "noteTypeDisplay": "Child Note"
+        }
+    ],
 
     "note": {
         "id": 2,
