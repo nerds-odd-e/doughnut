@@ -10,15 +10,12 @@ const stubResponse = {
     "navigation": {
 
     },
-    "note": {
-        "id": 2,
-        noteTypeDisplay: "note",
+
         ownership: {
             isFromCircle: true,
             circle: {
                 name: "a circle"
             }
-
         },
         ancestors: [
             {
@@ -50,6 +47,11 @@ const stubResponse = {
               "title": "2"
             }
           ],
+
+    "note": {
+        "id": 2,
+        noteTypeDisplay: "note",
+
         "noteContent": {
             "id": 2,
             "title": "asdf",

@@ -102,10 +102,6 @@ public class Note {
     @Getter
     private final List<Note> children = new ArrayList<>();
 
-    public Ownership getOwnership() {
-      return notebook.getOwnership();
-    }
-
     @Override
     public String toString() {
         return "Note{" + "id=" + id + ", title='" + noteContent.getTitle() + '\'' + '}';
@@ -127,6 +123,8 @@ public class Note {
         navigation.setPreviousSiblingId(getPreviousSibling().map(Note::getId).orElse(null));
         navigation.setPreviousId(getPrevious().map(Note::getId).orElse(null));
         nvb.setNavigation(navigation);
+        nvb.setOwnership(notebook.getOwnership());
+        nvb.setAncestors(getAncestors());
         return nvb;
     }
 
@@ -205,7 +203,7 @@ public class Note {
         return ancestors;
     }
 
-    @JsonIgnoreProperties({"noteContent", "ownership"})
+    @JsonIgnore
     public List<Note> getAncestors() {
         return getNotesClosures().stream().map(NotesClosure::getAncestor).collect(toList());
     }

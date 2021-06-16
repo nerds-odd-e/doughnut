@@ -1,6 +1,6 @@
 <template>
 <div >
-    <NoteOwnerBreadcrumb :untilNote="note">
+    <NoteOwnerBreadcrumb :ancestors="ancestors" :ownership="ownership">
         <li class="breadcrumb-item">{{note.title}}</li>
         <li class="breadcrumb-item">
             <a class="text-secondary" :href="`/notes/${note.id}/new`">{{`(Add ${note.noteTypeDisplay})`}}</a>
@@ -8,7 +8,7 @@
     </NoteOwnerBreadcrumb>
     <div v-if="!note.head">
         <SvgDownRight/>
-        <a :href="`/notes/${note.ancestors[note.ancestors.length -1].id}/new`">Add Sibling Note</a>
+        <a :href="`/notes/${ancestors[ancestors.length -1].id}/new`">Add Sibling Note</a>
     </div>
 </div>
 </template>
@@ -21,5 +21,5 @@
   import SvgDownRight from "../svgs/SvgDownRight.vue"
   import SvgReviewSetting from "../svgs/SvgReviewSetting.vue"
   import NoteOwnerBreadcrumb from "./NoteOwnerBreadcrumb.vue"
-  const props = defineProps({note: Object})
+  const props = defineProps({note: Object, ancestors: Array, ownership: Object})
 </script>
