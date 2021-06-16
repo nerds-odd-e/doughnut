@@ -1,4 +1,5 @@
 <template>
+  <LoadingThinBar v-if="loading"/>
   <div v-if="note">
     <NoteControlHeader :note="note" :ancestors="ancestors" :ownership="ownership"/>
     <div class="jumbotron py-4 mb-2">
@@ -26,6 +27,7 @@ import NoteNavigationButtons from "./NoteNavigationButtons.vue"
 import NoteControlHeader from "./NoteControlHeader.vue"
 import NoteOwnerViewCards from "./NoteOwnerViewCards.vue"
 import ContentLoader from "../ContentLoader.vue"
+import LoadingThinBar from "../LoadingThinBar.vue"
 import { ref, watch, defineProps } from "vue"
 
 const props = defineProps({noteid: Number, level: Number, forBazaar: Boolean})
@@ -35,8 +37,10 @@ const navigation = ref(null)
 const childrenNotes = ref(null)
 const ownership = ref(null)
 const ancestors = ref(null)
+const loading = ref(false)
 
 const fetchData = async () => {
+  loading.value = true
   fetch(`/api/notes/${props.noteid}`)
     .then(res => {
       return res.json();
@@ -48,6 +52,7 @@ const fetchData = async () => {
       childrenNotes.value = noteViewedByUser.children;
       ownership.value = noteViewedByUser.ownership;
       ancestors.value = noteViewedByUser.ancestors;
+      loading.value = false
     })
     .catch(error => {
       window.alert(error);
