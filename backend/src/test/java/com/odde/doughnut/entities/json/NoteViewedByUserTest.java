@@ -57,7 +57,7 @@ public class NoteViewedByUserTest {
             Map<String, Object> deserialized = getJsonString(value);
             final Object o = deserialized.get("links");
             assertThat(o.toString(), containsString(note2.getTitle()));
-            assertThat(o.toString(), not(containsString(note2.getNoteContent().getDescription())));
+            assertThat(o.toString(), not(containsString("noteContent")));
             assertThat(o.toString(), containsString("targetNote"));
             assertThat(o.toString(), not(containsString("sourceNote")));
         }
@@ -68,7 +68,7 @@ public class NoteViewedByUserTest {
             Map<String, Object> deserialized = getJsonString(value);
             final Object o = deserialized.get("links");
             assertThat(o.toString(), containsString(note1.getTitle()));
-            assertThat(o.toString(), not(containsString(note1.getNoteContent().getDescription())));
+            assertThat(o.toString(), not(containsString("noteContent")));
             assertThat(o.toString(), containsString("sourceNote"));
             assertThat(o.toString(), not(containsString("targetNote")));
         }
