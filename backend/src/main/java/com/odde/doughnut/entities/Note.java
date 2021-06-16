@@ -125,6 +125,7 @@ public class Note {
         nvb.setNavigation(navigation);
         nvb.setOwnership(notebook.getOwnership());
         nvb.setAncestors(getAncestors());
+        nvb.setChildren(getChildren());
         return nvb;
     }
 

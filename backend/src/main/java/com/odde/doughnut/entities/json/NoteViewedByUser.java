@@ -34,4 +34,8 @@ public class NoteViewedByUser {
     @Getter
     @Setter
     private Ownership ownership;
+    @Getter
+    @Setter
+    @JsonIgnoreProperties({"noteContent"})
+    private List<Note> children;
 }
