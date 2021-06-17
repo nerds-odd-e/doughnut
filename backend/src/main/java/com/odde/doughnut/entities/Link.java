@@ -23,8 +23,18 @@ public class Link {
 
     public enum LinkType {
         RELATED_TO("is related to", "is not related to", new QuestionType[0]),
-        BELONGS_TO("belongs to", "does not belong to", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        HAS("has", "does not have", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        /* a subclass of */ BELONGS_TO("belongs to", "does not belong to", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        /* a superclass of */ HAS("has", "does not have", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+
+        INSTANCE("is an instance of", "is not an instance of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        HAS_INSTANCE("has as an instance", "not has as an instance", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        INTEGRATED_PART("is an integrated part of", "is not an integrated part of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        HAS_INTEGRATED_PART("has as an integrated part", "not has as an integrated part", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        NON_INTEGRATED_MEMBER("is an non-integrated member of", "is not an non-integrated member of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        HAS_NON_INTEGRATED_MEMBER("has as an non-integrated member", "not has as an non-integrated member", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        ATTRIBUTE("is an attribute of", "is not an attribute of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        HAS_ATTRIBUTE("has as an attribute", "not has as an attribute", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+
         OPPOSITE_OF("is the opposite of", "is not the opposite of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
         BROUGHT_BY("is brought by", "is not brought by", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
         AUTHOR_OF("is author of", "is not author of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
@@ -69,6 +79,14 @@ public class Link {
             if (this.equals(EXAMPLE_OF)) return HAS_AS_EXAMPLE;
             if (this.equals(PRECEDES)) return SUCCEEDS;
             if (this.equals(SUCCEEDS)) return PRECEDES;
+            if (this.equals(INSTANCE)) return HAS_INSTANCE;
+            if (this.equals(HAS_INSTANCE)) return INSTANCE;
+            if (this.equals(INTEGRATED_PART)) return HAS_INTEGRATED_PART;
+            if (this.equals(HAS_INTEGRATED_PART)) return INTEGRATED_PART;
+            if (this.equals(NON_INTEGRATED_MEMBER)) return HAS_NON_INTEGRATED_MEMBER;
+            if (this.equals(HAS_NON_INTEGRATED_MEMBER)) return NON_INTEGRATED_MEMBER;
+            if (this.equals(ATTRIBUTE)) return HAS_ATTRIBUTE;
+            if (this.equals(HAS_ATTRIBUTE)) return ATTRIBUTE;
             return this;
         }
     }

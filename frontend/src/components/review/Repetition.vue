@@ -64,6 +64,7 @@
   import SvgFailed from "../svgs/SvgFailed.vue"
   import SvgHappy from "../svgs/SvgHappy.vue"
   import SvgCog from "../svgs/SvgCog.vue"
+  import SvgEdit from "../svgs/SvgEdit.vue"
   import SvgReviewSetting from "../svgs/SvgReviewSetting.vue"
   import SvgLinkNote from "../svgs/SvgLinkNote.vue"
   import SvgNoReview from "../svgs/SvgNoReview.vue"
