@@ -45,26 +45,6 @@ class NoteControllerTests {
     }
 
     @Nested
-    class showNoteTest {
-
-        @Test
-        void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
-            User otherUser = makeMe.aUser().please();
-            Note note = makeMe.aNote().byUser(otherUser).please();
-            assertThrows(NoAccessRightException.class, () -> controller.showNote(note));
-        }
-
-        @Test
-        void shouldRedirectToBazaarIfIHaveReadonlyAccess() throws NoAccessRightException {
-            User otherUser = makeMe.aUser().please();
-            Note note = makeMe.aNote().byUser(otherUser).please();
-            makeMe.aSubscription().forUser(userModel.getEntity()).forNotebook(note.getNotebook()).please();
-            makeMe.refresh(userModel.getEntity());
-            assertThat(controller.showNote(note), equalTo("redirect:/bazaar/notes/" + note.getId()));
-        }
-    }
-
-    @Nested
     class createNoteTest {
         @Test
         void shouldBeAbleToSaveNoteWhenValid() throws NoAccessRightException, IOException {

@@ -27,18 +27,4 @@ class BazaarControllerTest {
     void setup() {
         controller = new BazaarController(null, makeMe.modelFactoryService);
     }
-
-    @Test
-    void itShouldNotAllowVisitingAnyNote() {
-        Note note = makeMe.aNote().please();
-        assertThrows(NoAccessRightException.class, ()-> controller.showBazaarNote(note));
-    }
-
-    @Test
-    void itShouldAllowVisitingBazaarNote() throws NoAccessRightException {
-        Note note = makeMe.aNote().please();
-        makeMe.aBazaarNodebook(note.getNotebook()).please();
-        assertThat(controller.showBazaarNote(note), equalTo("bazaar/show"));
-    }
-
 }

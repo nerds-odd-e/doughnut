@@ -58,11 +58,7 @@ public class NoteController extends ApplicationMvcController  {
 
 
     @GetMapping("/{note}")
-    public String showNote(@PathVariable(name = "note") Note note) throws NoAccessRightException {
-        getCurrentUser().getAuthorization().assertPotentialReadAuthorization(note.getNotebook());
-        if (!getCurrentUser().getAuthorization().hasFullAuthority(note)) {
-            return "redirect:/bazaar/notes/" + note.getId();
-        }
+    public String showNote(@PathVariable(name = "note") Integer noteId) {
         return "notes/show";
     }
 
