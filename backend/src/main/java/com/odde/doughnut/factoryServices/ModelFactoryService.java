@@ -48,9 +48,6 @@ public class ModelFactoryService {
     }
 
     public UserModel toUserModel(User user) {
-        if (user == null) {
-            return null;
-        }
         return new UserModel(user, this);
     }
 

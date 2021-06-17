@@ -129,7 +129,7 @@ public class Note {
         nvb.setNotebook(notebook);
         nvb.setAncestors(getAncestors());
         nvb.setChildren(getChildren());
-        nvb.setOwns(viewer.owns(notebook));
+        nvb.setOwns(viewer==null ? false : viewer.owns(notebook));
         return nvb;
     }
 

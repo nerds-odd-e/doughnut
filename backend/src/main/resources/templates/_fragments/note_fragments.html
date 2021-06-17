@@ -104,22 +104,6 @@
     <div th:replace="_fragments/forms :: checkInput('note', 'skipReview')"/>
 </div>
 
-<div th:fragment="noteLinkButton(urlPrefix, note, svg, title)">
-    <a role="button" class="btn btn-sm" th:title="${title}" th:if="${note.isPresent()}" th:href="${urlPrefix}+'/notes/'+${note.get().id}">
-        <svg th:replace="_fragments/svgs :: __${svg}__"/>
-    </a>
-    <a role="button" class="btn btn-sm disabled" th:unless="${note.isPresent()}">
-        <svg th:replace="_fragments/svgs :: __${svg}__"/>
-    </a>
-</div>
-
-<div th:fragment="noteNavigationButtons(urlPrefix, entity)" class="btn-group btn-group-sm">
-    <a th:replace="_fragments/note_fragments :: noteLinkButton(${urlPrefix}, ${entity.previousSibling}, 'fastBackward', 'previous sibling')"/>
-    <a th:replace="_fragments/note_fragments :: noteLinkButton(${urlPrefix}, ${entity.previous}, 'backward', 'previous')"/>
-    <a th:replace="_fragments/note_fragments :: noteLinkButton(${urlPrefix}, ${entity.next}, 'forward', 'next')"/>
-    <a th:replace="_fragments/note_fragments :: noteLinkButton(${urlPrefix}, ${entity.nextSibling}, 'fastForward', 'next sibling')"/>
-</div>
-
 <div th:fragment="showPicture(note, opacity)" th:object="${note}" class="text-center"
      th:unless="${#strings.isEmpty(note.notePicture)}">
     <div style="position: relative; display: inline-block;" id="note-picture">

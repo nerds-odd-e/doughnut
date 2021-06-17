@@ -29,12 +29,13 @@ public class Authorization {
     return user.owns(notebook);
   }
 
-  public boolean hasReadAuthority(Note note) {
-    return this.user.canRead(note.getNotebook());
+  public boolean hasReferenceAuthority(Note note) {
+    if (user == null) return false;
+    return user.canReferTo(note.getNotebook());
   }
 
   public void assertReadAuthorization(Note note) throws NoAccessRightException {
-    if (!hasReadAuthority(note)) {
+    if (!hasReferenceAuthority(note)) {
       throw new NoAccessRightException();
     }
   }
@@ -73,7 +74,7 @@ public class Authorization {
 
   public void assertPotentialReadAuthorization(Notebook notebook)
       throws NoAccessRightException {
-    if (!hasReadAuthority(notebook.getHeadNote()) &&
+    if (!hasReferenceAuthority(notebook.getHeadNote()) &&
         modelFactoryService.bazaarNotebookRepository.findByNotebook(notebook) ==
             null) {
       throw new NoAccessRightException();
@@ -89,5 +90,8 @@ public class Authorization {
   private static final List<String> allowUsers =
       Arrays.asList("Terry", "t-machu", "Developer", "Yeong Sheng");
 
-  public boolean isDeveloper() { return allowUsers.contains(user.getName()); }
+  public boolean isDeveloper() {
+    if (user == null) return false;
+    return allowUsers.contains(user.getName());
+  }
 }

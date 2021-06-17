@@ -25,7 +25,7 @@ public class IndexController extends ApplicationMvcController {
             return "ask_to_login";
         }
 
-        if (currentUserFetcher.getUser() == null) {
+        if (!currentUserFetcher.getUser().loggedIn()) {
             model.addAttribute("user", new User());
             return "register";
         }

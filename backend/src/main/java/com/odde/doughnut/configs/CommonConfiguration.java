@@ -8,7 +8,9 @@ public class CommonConfiguration {
         .mvcMatchers("/robots.txt")
         .permitAll()
         .antMatchers("/", "/login", "/error", "/images/**", "/img/**",
-                     "/webjars/**", "/assets/**","/bazaar", "/bazaar/**/**", "/blog/**/**")
+                     "/webjars/**", "/assets/**","/bazaar", "/bazaar/**/**", "/blog/**/**",
+                     "/api/notes/**"
+                )
         .permitAll()
         .anyRequest()
         .authenticated()

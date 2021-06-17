@@ -139,7 +139,7 @@ public class Link {
         if (sourceNote.getNotebook() == targetNote.getNotebook()) return true;
         if (viewer == null) return false;
 
-        return viewer.canRead(sourceNote.getNotebook());
+        return viewer.canReferTo(sourceNote.getNotebook());
     }
 
 }

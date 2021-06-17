@@ -33,20 +33,20 @@
                     <li class="nav-item active">
                         <a class="nav-link" href="/bazaar">Bazaar</a>
                     </li>
-                    <li class="nav-item active" th:if="${currentUser != null && currentUser.authorization.isDeveloper()}">
+                    <li class="nav-item active" th:if="${currentUser?.authorization?.isDeveloper()}">
                         <a class="nav-link" href="/failure-report-list">Failure Reports</a>
                     </li>
                     <li class="nav-item active" th:unless="${#arrays.contains(@environment.getActiveProfiles(), 'prod')}">
                         <a class="nav-link text-warning" href="/testability/panel">Testing Tools</a>
                     </li>
                 </ul>
-                <span style="margin-right:10px;" class="navbar-text" th:unless="${currentUser == null}">
+                <span style="margin-right:10px;" class="navbar-text" th:if="${currentUser?.loggedIn}">
                     <a href="/users/edit" th:text="${currentUser.getName()}"/>
                 </span>
-                <form class="form-inline my-2 my-lg-0" th:action="@{/logout}" method="post" th:unless="${currentUser == null}">
+                <form class="form-inline my-2 my-lg-0" th:action="@{/logout}" method="post" th:if="${currentUser?.loggedIn}">
                     <input class= "btn btn-outline-success my-2 my-sm-0" type= "submit" value="Logout">
                 </form>
-                <a class= "btn btn-outline-primary my-2 my-sm-0" href="/login" th:if="${currentUser == null}">Login via Github</a>
+                <a class= "btn btn-outline-primary my-2 my-sm-0" href="/login" th:unless="${currentUser?.loggedIn}">Login via Github</a>
             </div>
         </nav>
     </div>
