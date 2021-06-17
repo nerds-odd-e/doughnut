@@ -44,7 +44,8 @@ public class Link {
         HAS_AS_EXAMPLE("has as example", "does not have as example", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
         PRECEDES("precedes", "does not precede", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
         SUCCEEDS("succeeds", "does not succeeds", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        SIMILAR_TO("is similar to", "is not similar to", new QuestionType[0]),
+        SAME_AS("is the same as", "is not the same as", new QuestionType[]{LINK_TARGET}),
+        SIMILAR_TO("is similar to", "is not similar to", new QuestionType[]{LINK_TARGET}),
         CONFUSE_WITH("confuses with", "does not confuse with", new QuestionType[0]);
 
         @JsonValue
