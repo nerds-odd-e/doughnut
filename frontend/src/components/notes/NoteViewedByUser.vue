@@ -6,23 +6,23 @@
     <div class="jumbotron py-4 mb-2">
         <nav class="nav d-flex flex-row-reverse p-0">
             <NoteButtons v-if="owns" :note="note"/>
-            <BazaarNotebookButtons v-else :notebook="notebook" />
+            <BazaarNoteButtons v-else :note="note" :notebook="notebook" />
         </nav>
         <NoteShow :note="note" :links="links" :level="1" :forBazaar="!owns"/>
     </div>
     <nav class="nav d-flex justify-content-between p-0 mb-2">
       <div class="btn-group btn-group-sm">
-          <a :href="`/notes/${note.id}/move`">Move This Note</a>
+          <a  v-if="owns" :href="`/notes/${note.id}/move`">Move This Note</a>
       </div>
-      <NoteNavigationButtons :urlPrefix="''" :navigation="navigation"/>
+      <NoteNavigationButtons :navigation="navigation"/>
     </nav>
-    <NoteOwnerViewCards :notes="children"/>
+    <NoteOwnerViewCards :owns="owns" :notes="children"/>
 </template>
 
 <script setup>
 import NoteShow from "./NoteShow.vue"
 import NoteBazaarBreadcrumb from "../bazaar/NoteBazaarBreadcrumb.vue"
-import BazaarNotebookButtons from "../notebook/BazaarNotebookButtons.vue"
+import BazaarNoteButtons from "../bazaar/BazaarNoteButtons.vue"
 import NoteButtons from "./NoteButtons.vue"
 import NoteNavigationButtons from "./NoteNavigationButtons.vue"
 import NoteControlHeader from "./NoteControlHeader.vue"

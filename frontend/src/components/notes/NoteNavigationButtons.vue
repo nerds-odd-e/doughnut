@@ -1,15 +1,15 @@
 <template>
 <div class="btn-group btn-group-sm">
-    <NoteLinkButton :urlPrefix="urlPrefix" :noteid="navigation.previousSiblingId" :title="'previous sibling'">
+    <NoteLinkButton  :noteid="navigation.previousSiblingId" :title="'previous sibling'">
         <SvgFastBackward />
     </NoteLinkButton>
-    <NoteLinkButton :urlPrefix="urlPrefix" :noteid="navigation.previousId" :title="'previous'">
+    <NoteLinkButton  :noteid="navigation.previousId" :title="'previous'">
         <SvgBackward />
     </NoteLinkButton>
-    <NoteLinkButton :urlPrefix="urlPrefix" :noteid="navigation.nextId" :title="'next'">
+    <NoteLinkButton  :noteid="navigation.nextId" :title="'next'">
         <SvgForward />
     </NoteLinkButton>
-    <NoteLinkButton :urlPrefix="urlPrefix" :noteid="navigation.nextSiblingId" :title="'next sibling'">
+    <NoteLinkButton  :noteid="navigation.nextSiblingId" :title="'next sibling'">
         <SvgFastForward />
     </NoteLinkButton>
 </div>
@@ -21,6 +21,6 @@
   import SvgForward from "../svgs/SvgForward.vue"
   import SvgFastForward from "../svgs/SvgFastForward.vue"
   import NoteLinkButton from "./NoteLinkButton.vue"
-  const props = defineProps({urlPrefix: String, navigation: Object})
+  const props = defineProps({navigation: Object})
 </script>
 

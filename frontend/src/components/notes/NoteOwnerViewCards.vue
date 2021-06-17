@@ -1,6 +1,6 @@
 <template>
 <NoteCardWithHeaderAndButton :notes="notes">
-     <template #headerButtons="{note}">
+     <template v-if="owns" #headerButtons="{note}">
       <NoteButtons :note="note"/>
      </template>
 </NoteCardWithHeaderAndButton>
@@ -11,5 +11,5 @@ import NoteCardWithHeaderAndButton from "./NoteCardWithHeaderAndButton.vue"
 import NoteButtons from "./NoteButtons.vue"
 import { ref, defineProps } from "vue"
 
-const props = defineProps({notes: Array})
+const props = defineProps({notes: Array, owns: Boolean})
 </script>

@@ -8,5 +8,5 @@
 </template>
 
 <script setup>
-  const props = defineProps({urlPrefix: String, noteid: Number, title: String})
+  const props = defineProps({noteid: Number, title: String})
 </script>
