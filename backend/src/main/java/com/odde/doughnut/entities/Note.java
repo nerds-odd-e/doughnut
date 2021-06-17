@@ -1,7 +1,6 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.odde.doughnut.algorithms.SiblingOrder;
 import com.odde.doughnut.entities.json.LinkViewedByUser;
 import com.odde.doughnut.entities.json.NoteViewedByUser;
@@ -130,6 +129,7 @@ public class Note {
         nvb.setOwnership(notebook.getOwnership());
         nvb.setAncestors(getAncestors());
         nvb.setChildren(getChildren());
+        nvb.setOwns(viewer.owns(notebook));
         return nvb;
     }
 

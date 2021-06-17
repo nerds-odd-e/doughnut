@@ -16,13 +16,13 @@
          )">
 </div>
 
-<lid th:fragment="noteBazaarBreadcrumb(untilNote, additional)" th:replace="_fragments/note_fragments::noteBreadcrumb(
+<li th:fragment="noteBazaarBreadcrumb(untilNote, additional)" th:replace="_fragments/note_fragments::noteBreadcrumb(
          topLink=~{:: .b-top-link},
          ancestors=${untilNote.ancestors},
          additional=${additional},
          linkFragment='_fragments/bazaar_fragments::noteTitleWithBazaarLink'
          )">
-    <li class="breadcrumb-item b-top-link"><a href="/bazaar">Bazaar</a></lid>
+    <li class="breadcrumb-item b-top-link"><a href="/bazaar">Bazaar</a></li>
 </div>
 
 <div th:fragment="bazaarNotebookButtons(notebook)" class="btn-group btn-group-sm">

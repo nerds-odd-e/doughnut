@@ -36,7 +36,7 @@ class RestNoteController {
   @GetMapping("/{note}")
   public NoteViewedByUser show(@PathVariable("note") Note note) throws NoAccessRightException {
     final UserModel user = currentUserFetcher.getUser();
-    user.getAuthorization().assertReadAuthorization(note);
+    user.getAuthorization().assertPotentialReadAuthorization(note.getNotebook());
     return note.jsonObjectViewedBy(user.getEntity());
   }
 

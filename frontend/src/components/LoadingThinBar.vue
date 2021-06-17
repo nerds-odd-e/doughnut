@@ -1,7 +1,7 @@
 <template>
 <div class="loading-bar">
   <div>
-    <content-loader height="2" speed="1" primaryColor="#00c"></content-loader>
+    <content-loader height="2" :speed="1" primaryColor="#00c"></content-loader>
   </div>
 </div>
 </template>

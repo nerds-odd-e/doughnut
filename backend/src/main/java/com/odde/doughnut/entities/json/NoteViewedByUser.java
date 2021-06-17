@@ -38,4 +38,7 @@ public class NoteViewedByUser {
     @Setter
     @JsonIgnoreProperties({"noteContent"})
     private List<Note> children;
+    @Getter
+    @Setter
+    private Boolean owns;
 }

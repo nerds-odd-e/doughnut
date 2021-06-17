@@ -4,6 +4,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteContent;
 import com.odde.doughnut.entities.NoteMotion;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.json.NoteViewedByUser;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
@@ -46,7 +47,37 @@ class RestNoteControllerTests {
 
     @Nested
     class showNoteTest {
+        @Test
+        void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
+            User otherUser = makeMe.aUser().please();
+            Note note = makeMe.aNote().byUser(otherUser).please();
+            assertThrows(NoAccessRightException.class, () -> controller.show(note));
+        }
 
+        @Test
+        void shouldReturnTheNoteInfoIfHavingReadingAuth() throws NoAccessRightException {
+            User otherUser = makeMe.aUser().please();
+            Note note = makeMe.aNote().byUser(otherUser).please();
+            makeMe.aBazaarNodebook(note.getNotebook()).please();
+            makeMe.refresh(userModel.getEntity());
+            final NoteViewedByUser show = controller.show(note);
+            assertThat(show.getNote(), equalTo(note));
+            assertThat(show.getOwns(), is(false));
+        }
+
+        @Test
+        void shouldBeAbleToSeeOwnNote() throws NoAccessRightException {
+            Note note = makeMe.aNote().byUser(userModel).please();
+            makeMe.refresh(userModel.getEntity());
+            final NoteViewedByUser show = controller.show(note);
+            assertThat(show.getNote(), equalTo(note));
+            assertThat(show.getOwns(), is(true));
+        }
+
+    }
+
+    @Nested
+    class showStatistics {
         @Test
         void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
             User otherUser = makeMe.aUser().please();
