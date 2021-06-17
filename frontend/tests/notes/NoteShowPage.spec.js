@@ -11,11 +11,13 @@ beforeEach(() => {
 
 const stubResponse = _.merge(noteViewedByUser,
     {
-        ownership: {
-            isFromCircle: true,
-            circle: {
-                name: "a circle"
-            }
+        notebook: {
+            ownership: {
+                isFromCircle: true,
+                circle: {
+                    name: "a circle"
+                }
+            },
         },
     }
   )

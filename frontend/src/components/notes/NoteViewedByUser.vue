@@ -1,5 +1,5 @@
 <template>
-    <NoteControlHeader v-if="owns" :note="note" :ancestors="ancestors" :ownership="ownership"/>
+    <NoteControlHeader v-if="owns" :note="note" :ancestors="ancestors" :notebook="notebook"/>
     <NoteBazaarBreadcrumb v-else :ancestors="ancestors">
       <li class="breadcrumb-item">{{note.title}}</li>
     </NoteBazaarBreadcrumb>
@@ -35,7 +35,6 @@ const props = defineProps({
   links: Object,
   navigation: Object,
   children: Array,
-  ownership: Object,
   ancestors: Array,
   notebook: Object,
   owns: Boolean})

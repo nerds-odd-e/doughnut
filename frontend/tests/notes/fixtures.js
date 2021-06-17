@@ -3,13 +3,13 @@ const noteViewedByUser = {
     notebook: {
         id: 5,
         skipReviewEntirely: false,
+        ownership: {
+            isFromCircle: false,
+        },
     },
     "navigation": {
     },
 
-    ownership: {
-        isFromCircle: false,
-    },
     ancestors: [
         {
             "id": 1,

@@ -1,6 +1,6 @@
 <template>
 <div >
-    <NoteOwnerBreadcrumb :ancestors="ancestors" :ownership="ownership">
+    <NoteOwnerBreadcrumb :ancestors="ancestors" :notebook="notebook">
         <li class="breadcrumb-item">{{note.title}}</li>
         <li class="breadcrumb-item">
             <a class="text-secondary" :href="`/notes/${note.id}/new`">{{`(Add ${note.noteTypeDisplay})`}}</a>
@@ -21,5 +21,5 @@
   import SvgDownRight from "../svgs/SvgDownRight.vue"
   import SvgReviewSetting from "../svgs/SvgReviewSetting.vue"
   import NoteOwnerBreadcrumb from "./NoteOwnerBreadcrumb.vue"
-  const props = defineProps({note: Object, ancestors: Array, ownership: Object})
+  const props = defineProps({note: Object, ancestors: Array, notebook: Object})
 </script>
