@@ -6,6 +6,7 @@ import com.odde.doughnut.models.TimestampOperations;
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.List;
 import javax.persistence.*;
 import javax.validation.constraints.AssertTrue;
 
@@ -28,14 +29,12 @@ public class ReviewPoint {
 
   @ManyToOne
   @JoinColumn(name = "note_id")
-  @JsonIgnore
   @Getter
   @Setter
   private Note note;
 
   @ManyToOne
   @JoinColumn(name = "link_id")
-  @JsonIgnore
   @Getter
   @Setter
   private Link link;
@@ -97,6 +96,7 @@ public class ReviewPoint {
         TimestampOperations.getDayId(currentTime, timeZone);
   }
 
+  @JsonIgnore
   public Note getSourceNote() {
     if (link != null)
       return link.getSourceNote();

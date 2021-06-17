@@ -2,7 +2,6 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
-import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.NoteViewedByUser;
 import com.odde.doughnut.exceptions.NoAccessRightException;
@@ -26,20 +25,23 @@ class RestReviewPointController {
     this.currentUserFetcher = currentUserFetcher;
   }
 
-  class NoteStatistics {
+  class ReviewPointViewedByUser {
     @Getter
     @Setter
     private ReviewPoint reviewPoint;
     @Getter
     @Setter
-    private Note note;
+    private NoteViewedByUser sourceNoteViewedByUser;
 
   }
 
   @GetMapping("/{reviewPoint}")
-  public ReviewPoint show(@PathVariable("reviewPoint") ReviewPoint reviewPoint) throws NoAccessRightException {
+  public ReviewPointViewedByUser show(@PathVariable("reviewPoint") ReviewPoint reviewPoint) throws NoAccessRightException {
     final UserModel user = currentUserFetcher.getUser();
     //user.getAuthorization().assertAuthorization(reviewPoint);
-    return reviewPoint;
+    ReviewPointViewedByUser result = new ReviewPointViewedByUser();
+    result.setReviewPoint(reviewPoint);
+    result.setSourceNoteViewedByUser(reviewPoint.getSourceNote().jsonObjectViewedBy(user.getEntity()));
+    return result;
   }
 }

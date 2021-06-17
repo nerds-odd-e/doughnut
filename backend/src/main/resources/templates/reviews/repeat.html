@@ -7,7 +7,7 @@
                  th:text="'Your answer `' + ${answer.answerDisplay} + '` is wrong.'"/>
         </div>
 
-        <div th:replace="_fragments/review_fragments :: showReviewPoint(${reviewPoint})"/>
+        <div th:replace="_fragments/review_fragments :: showReviewPointTemp(${reviewPoint})"/>
 
         <div id="partials"
              th:data-noteid="${reviewPoint.note?.id}"

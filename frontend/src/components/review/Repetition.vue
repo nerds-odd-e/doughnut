@@ -1,4 +1,5 @@
 <template>
+        <ShowReviewPoint v-bind="{reviewPoint, sourceNoteViewedByUser}" />
         <div class="btn-toolbar justify-content-between">
             <form :action="`/reviews/${reviewPoint.id}`" method="post">
                 <div class="btn-group" role="group" aria-label="First group">
@@ -31,16 +32,16 @@
                 </button>
                 <div class="dropdown-menu dropdown-menu-right">
                     <a class="dropdown-item"
-                       :href="`/notes/${reviewPoint.sourceNote.id}/review_setting`">
+                       :href="`/notes/${sourceNoteViewedByUser.note.id}/review_setting`">
                         <SvgReviewSetting/>
                         Edit Review Settings
                     </a>
-                    <a class="dropdown-item" :href="`/links/${reviewPoint.sourceNote.id}/link`">
+                    <a class="dropdown-item" :href="`/links/${sourceNoteViewedByUser.note.id}/link`">
                         <SvgLinkNote/>
                         Make Link
                       </a>
                       <a class="dropdown-item"
-                          href="`/notes/${reviewPoint.sourceNote.id}/edit`">
+                          :href="`/notes/${sourceNoteViewedByUser.note.id}/edit`">
                           <SvgEdit/>
                           Edit Note
                       </a>
@@ -66,5 +67,6 @@
   import SvgReviewSetting from "../svgs/SvgReviewSetting.vue"
   import SvgLinkNote from "../svgs/SvgLinkNote.vue"
   import SvgNoReview from "../svgs/SvgNoReview.vue"
-  const props = defineProps({reviewPoint: Object, sadOnly: Boolean})
+  import ShowReviewPoint from "./ShowReviewPoint.vue"
+  const props = defineProps({reviewPoint: Object, sadOnly: Boolean, sourceNoteViewedByUser: Object})
 </script>

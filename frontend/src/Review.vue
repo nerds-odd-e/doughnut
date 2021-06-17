@@ -10,7 +10,7 @@ const linkid = inject('linkid')
 const sadOnly = inject('sadOnly')
 const reviewPointId = inject('reviewPointId')
 const loading = ref(false)
-const reviewPoint = ref(null)
+const reviewPointForView = ref(null)
 
 const fetchData = async () => {
   loading.value = true
@@ -19,7 +19,7 @@ const fetchData = async () => {
       return res.json();
     })
     .then(resp => {
-      reviewPoint.value = resp;
+      reviewPointForView.value = resp;
       loading.value = false
     })
     .catch(error => {
@@ -33,11 +33,11 @@ fetchData()
 
 <template>
   <LoadingThinBar v-if="loading"/>
-  <div v-if="!!reviewPoint">
-    <Repetition :reviewPoint="reviewPoint" :sadOnly="sadOnly"/>
+  <div v-if="!!reviewPointForView">
+    <Repetition v-bind="{...reviewPointForView, sadOnly}"/>
   </div>
   <div v-else><ContentLoader /></div>
   <nav class="nav d-flex flex-row-reverse p-0">
-    <NoteStatisticsButton :noteid="noteid" :linkid="linkid"/>
+    <NoteStatisticsButton v-blin="{noteid, linkid}"/>
   </nav>
 </template>
