@@ -7,6 +7,6 @@ const props = defineProps({noteid: Number})
 </script>
 
 <template>
-  <NoteShowPage :noteid="noteid" :level="1" :forBazaar="false"/>
+  <NoteShowPage :noteid="noteid"/>
   <NoteStatisticsButton :noteid="noteid"/>
 </template>

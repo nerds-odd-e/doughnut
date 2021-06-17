@@ -48,7 +48,7 @@ export default {
     fetchBlogPosts() {
       fetch(this.apiUrl)
         .then(res => {
-          return res.json();
+        return res.json();
         })
         .then(articles => {
           this.articleList = articles;

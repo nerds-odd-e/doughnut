@@ -13,7 +13,7 @@ import ContentLoader from "../ContentLoader.vue"
 import LoadingThinBar from "../LoadingThinBar.vue"
 import { ref, watch, defineProps } from "vue"
 
-const props = defineProps({noteid: Number, level: Number, forBazaar: Boolean})
+const props = defineProps({noteid: Number})
 const noteViewedByUser = ref(null)
 const loading = ref(false)
 

@@ -1,10 +1,7 @@
 package com.odde.doughnut.entities.json;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.odde.doughnut.entities.Link;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.NoteContent;
-import com.odde.doughnut.entities.Ownership;
+import com.odde.doughnut.entities.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -21,6 +18,9 @@ public class NoteViewedByUser {
     @Getter
     @Setter
     private Note note;
+    @Getter
+    @Setter
+    private Notebook notebook;
     @Getter
     @Setter
     private Map<Link.LinkType, LinkViewedByUser> links;

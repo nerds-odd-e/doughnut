@@ -20,7 +20,6 @@ public class Notebook {
 
     @OneToOne
     @JoinColumn(name = "ownership_id")
-    @JsonIgnore
     @Getter @Setter private Ownership ownership;
 
     @JoinTable(name = "notebook_head_note", joinColumns = {

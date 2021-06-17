@@ -127,6 +127,7 @@ public class Note {
         navigation.setPreviousId(getPrevious().map(Note::getId).orElse(null));
         nvb.setNavigation(navigation);
         nvb.setOwnership(notebook.getOwnership());
+        nvb.setNotebook(notebook);
         nvb.setAncestors(getAncestors());
         nvb.setChildren(getChildren());
         nvb.setOwns(viewer.owns(notebook));

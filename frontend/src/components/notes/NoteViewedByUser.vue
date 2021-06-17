@@ -5,9 +5,10 @@
     </NoteBazaarBreadcrumb>
     <div class="jumbotron py-4 mb-2">
         <nav class="nav d-flex flex-row-reverse p-0">
-            <NoteButtons :note="note"/>
+            <NoteButtons v-if="owns" :note="note"/>
+            <BazaarNotebookButtons v-else :notebook="notebook" />
         </nav>
-        <NoteShow :note="note" :links="links" :level="level" :forBazaar="forBazaar"/>
+        <NoteShow :note="note" :links="links" :level="1" :forBazaar="!owns"/>
     </div>
     <nav class="nav d-flex justify-content-between p-0 mb-2">
       <div class="btn-group btn-group-sm">
@@ -21,6 +22,7 @@
 <script setup>
 import NoteShow from "./NoteShow.vue"
 import NoteBazaarBreadcrumb from "../bazaar/NoteBazaarBreadcrumb.vue"
+import BazaarNotebookButtons from "../notebook/BazaarNotebookButtons.vue"
 import NoteButtons from "./NoteButtons.vue"
 import NoteNavigationButtons from "./NoteNavigationButtons.vue"
 import NoteControlHeader from "./NoteControlHeader.vue"
@@ -28,5 +30,13 @@ import NoteOwnerViewCards from "./NoteOwnerViewCards.vue"
 import ContentLoader from "../ContentLoader.vue"
 import LoadingThinBar from "../LoadingThinBar.vue"
 
-const props = defineProps({note: Object, links: Object, navigation: Object, children: Array, ownership: Object, ancestors: Array, owns: Boolean})
+const props = defineProps({
+  note: Object,
+  links: Object,
+  navigation: Object,
+  children: Array,
+  ownership: Object,
+  ancestors: Array,
+  notebook: Object,
+  owns: Boolean})
 </script>

@@ -1,4 +1,9 @@
 const noteViewedByUser = {
+    owns: true,
+    notebook: {
+        id: 5,
+        skipReviewEntirely: false,
+    },
     "navigation": {
     },
 
