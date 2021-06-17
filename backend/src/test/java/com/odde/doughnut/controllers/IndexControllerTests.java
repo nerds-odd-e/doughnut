@@ -29,13 +29,13 @@ class IndexControllerTests {
 
   @Test
   void visitWithNoUserSession() {
-    controller = new IndexController(new TestCurrentUserFetcher(null), modelFactoryService);
+    controller = new IndexController(new TestCurrentUserFetcher(modelFactoryService.toUserModel(null)), modelFactoryService);
     assertEquals("ask_to_login", controller.home(null, model));
   }
 
   @Test
   void visitWithUserSessionButNoSuchARegisteredUserYet() {
-    controller = new IndexController(new TestCurrentUserFetcher(null), modelFactoryService);
+    controller = new IndexController(new TestCurrentUserFetcher(modelFactoryService.toUserModel(null)), modelFactoryService);
     Principal principal = (UserPrincipal) () -> "1234567";
     assertEquals("register", controller.home(principal, model));
   }

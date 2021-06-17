@@ -17,7 +17,7 @@ public class TestCurrentUserFetcher implements CurrentUserFetcher {
 
     @Override
     public String getExternalIdentifier() {
-        if(userModel == null) {
+        if(!userModel.loggedIn()) {
             return null;
         }
         return userModel.getEntity().getExternalIdentifier();
