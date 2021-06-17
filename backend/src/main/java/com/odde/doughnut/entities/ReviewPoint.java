@@ -97,7 +97,6 @@ public class ReviewPoint {
         TimestampOperations.getDayId(currentTime, timeZone);
   }
 
-  @JsonIgnore
   public Note getSourceNote() {
     if (link != null)
       return link.getSourceNote();

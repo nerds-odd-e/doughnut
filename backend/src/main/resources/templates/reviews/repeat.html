@@ -9,66 +9,6 @@
 
         <div th:replace="_fragments/review_fragments :: showReviewPoint(${reviewPoint})"/>
 
-        <div class="btn-toolbar justify-content-between">
-            <form th:action="@{/reviews/{id}(id=${reviewPoint.id})}" th:object="${reviewPoint}"
-                  method="post">
-                <div class="btn-group" role="group" aria-label="First group">
-                    <button type="submit" class="btn btn-light" id="repeat-again" name="again"
-                            title="repeat immediately">
-                        <svg th:replace="_fragments/svgs :: failed"/>
-                    </button>
-                    <button type="submit" class="btn btn-light" id="repeat-sad" name="sad"
-                            title="reduce next repeat interval (days) by half"
-                            th:unless="${answer!=null && !answer.isCorrect()}">
-                        <svg th:replace="_fragments/svgs :: sad"/>
-                    </button>
-                    <button type="submit" class="btn btn-light" id="repeat-satisfied" name="satisfying"
-                            title="use normal repeat interval (days)"
-                            th:unless="${answer!=null && !answer.isCorrect()}">
-                        <svg th:replace="_fragments/svgs :: satisfying"/>
-                    </button>
-                    <button type="submit" class="btn btn-light" id="repeat-happy" name="happy"
-                            title="add to next repeat interval (days) by half"
-                            th:unless="${answer!=null && !answer.isCorrect()}">
-                        <svg th:replace="_fragments/svgs :: happy"/>
-                    </button>
-
-                </div>
-            </form>
-            <div class="btn-group dropup">
-                <button type="button" id="more-action-for-repeat" class="btn btn-light dropdown-toggle"
-                        data-toggle="dropdown" aria-haspopup="true"
-                        aria-expanded="false">
-                    <svg th:replace="_fragments/svgs :: cog"/>
-                </button>
-                <div class="dropdown-menu dropdown-menu-right">
-                    <a class="dropdown-item"
-                       th:href="@{/notes/{id}/review_setting(id=${reviewPoint.getSourceNote().id})}">
-                        <svg th:replace="_fragments/svgs :: reviewSetting"/>
-                        Edit Review Settings
-                    </a>
-                    <a class="dropdown-item" th:href="@{/links/{id}/link(id=${reviewPoint.getSourceNote().id})}">
-                        <svg th:replace="_fragments/svgs :: linkNote"/>
-                        Make Link
-                    </a>
-                    <a class="dropdown-item"
-                       th:href="@{/notes/{id}/edit(id=${reviewPoint.getSourceNote().id})}">
-                        <svg th:replace="_fragments/svgs :: edit"/>
-                        Edit Note
-                    </a>
-                    <div class="dropdown-divider"></div>
-                    <form th:action="@{/reviews/{id}(id=${reviewPoint.id})}" th:object="${reviewPoint}"
-                          method="post"
-                          onsubmit="return confirm('Are you sure to hide this note from reviewing in the future?')">
-                        <button type="submit" class="dropdown-item" name="remove">
-                            <svg th:replace="_fragments/svgs :: noReview"/>
-                            Remove This Note from Review
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-
         <div id="partials"
              th:data-noteid="${reviewPoint.note?.id}"
              th:data-linkid="${reviewPoint.link?.id}"

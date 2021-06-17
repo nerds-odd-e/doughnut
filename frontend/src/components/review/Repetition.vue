@@ -27,32 +27,31 @@
                 <button type="button" id="more-action-for-repeat" class="btn btn-light dropdown-toggle"
                         data-toggle="dropdown" aria-haspopup="true"
                         aria-expanded="false">
-                    <svg th:replace="_fragments/svgs :: cog"/>
+                    <SvgCog/>
                 </button>
                 <div class="dropdown-menu dropdown-menu-right">
                     <a class="dropdown-item"
-                       th:href="@{/notes/{id}/review_setting(id=${reviewPoint.getSourceNote().id})}">
-                        <svg th:replace="_fragments/svgs :: reviewSetting"/>
+                       :href="`/notes/${reviewPoint.sourceNote.id}/review_setting`">
+                        <SvgReviewSetting/>
                         Edit Review Settings
                     </a>
-                    <a class="dropdown-item" th:href="@{/links/{id}/link(id=${reviewPoint.getSourceNote().id})}">
-                        <svg th:replace="_fragments/svgs :: linkNote"/>
+                    <a class="dropdown-item" :href="`/links/${reviewPoint.sourceNote.id}/link`">
+                        <SvgLinkNote/>
                         Make Link
-                        </a>
-                        <a class="dropdown-item"
-                           th:href="@{/notes/{id}/edit(id=${reviewPoint.getSourceNote().id})}">
-                            <svg th:replace="_fragments/svgs :: edit"/>
-                            Edit Note
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <form th:action="@{/reviews/{id}(id=${reviewPoint.id})}" th:object="${reviewPoint}"
-                              method="post"
-                              onsubmit="return confirm('Are you sure to hide this note from reviewing in the future?')">
-                            <button type="submit" class="dropdown-item" name="remove">
-                                <svg th:replace="_fragments/svgs :: noReview"/>
-                                Remove This Note from Review
-                            </button>
-                        </form>
+                      </a>
+                      <a class="dropdown-item"
+                          href="`/notes/${reviewPoint.sourceNote.id}/edit`">
+                          <SvgEdit/>
+                          Edit Note
+                      </a>
+                      <div class="dropdown-divider"></div>
+                      <form :action="`/reviews/${reviewPoint.id}`" method="post"
+                            onsubmit="return confirm('Are you sure to hide this note from reviewing in the future?')">
+                          <button type="submit" class="dropdown-item" name="remove">
+                              <SvgNoReview/>
+                              Remove This Note from Review
+                          </button>
+                      </form>
                 </div>
             </div>
         </div>
@@ -63,5 +62,9 @@
   import SvgSatisfying from "../svgs/SvgSatisfying.vue"
   import SvgFailed from "../svgs/SvgFailed.vue"
   import SvgHappy from "../svgs/SvgHappy.vue"
+  import SvgCog from "../svgs/SvgCog.vue"
+  import SvgReviewSetting from "../svgs/SvgReviewSetting.vue"
+  import SvgLinkNote from "../svgs/SvgLinkNote.vue"
+  import SvgNoReview from "../svgs/SvgNoReview.vue"
   const props = defineProps({reviewPoint: Object, sadOnly: Boolean})
 </script>

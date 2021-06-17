@@ -3,6 +3,9 @@ import { mount } from '@vue/test-utils';
 
 const reviewPoint = {
   id: 3,
+  sourceNote: {
+    id: 5,
+  }
 }
 describe('repetition page', () => {
 
