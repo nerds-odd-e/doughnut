@@ -51,7 +51,7 @@ public class FailureReportFactory {
 
     private String getUserInfo() {
         String result = "# user external Id: " + currentUserFetcher.getExternalIdentifier() + "\n";
-        if (currentUserFetcher.getUser().loggedIn()) {
+        if (currentUserFetcher.getUser() != null && currentUserFetcher.getUser().loggedIn()) {
             result += "# user name: " + currentUserFetcher.getUser().getName() + "\n";
         }
         return result;

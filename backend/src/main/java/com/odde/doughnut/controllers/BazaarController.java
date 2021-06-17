@@ -27,9 +27,8 @@ public class BazaarController extends ApplicationMvcController {
     }
 
     @GetMapping("/notes/{note}")
-    public String showBazaarNote(@PathVariable(name = "note") Note note) throws NoAccessRightException {
-        modelFactoryService.toBazaarModel().assertAuthentication(note);
-        return "bazaar/show";
+    public String showBazaarNote(@PathVariable(name = "note") Integer noteId) throws NoAccessRightException {
+        return "notes/show";
     }
 
     @GetMapping("/articles/{note}")
