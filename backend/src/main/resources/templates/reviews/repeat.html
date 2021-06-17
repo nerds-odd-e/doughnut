@@ -50,27 +50,30 @@
                     <a class="dropdown-item" th:href="@{/links/{id}/link(id=${reviewPoint.getSourceNote().id})}">
                         <svg th:replace="_fragments/svgs :: linkNote"/>
                         Make Link
-                        <a class="dropdown-item"
-                           th:href="@{/notes/{id}/edit(id=${reviewPoint.getSourceNote().id})}">
-                            <svg th:replace="_fragments/svgs :: edit"/>
-                            Edit Note
-                        </a>
-                        <div class="dropdown-divider"></div>
-                        <form th:action="@{/reviews/{id}(id=${reviewPoint.id})}" th:object="${reviewPoint}"
-                              method="post"
-                              onsubmit="return confirm('Are you sure to hide this note from reviewing in the future?')">
-                            <button type="submit" class="dropdown-item" name="remove">
-                                <svg th:replace="_fragments/svgs :: noReview"/>
-                                Remove This Note from Review
-                            </button>
-                        </form>
+                    </a>
+                    <a class="dropdown-item"
+                       th:href="@{/notes/{id}/edit(id=${reviewPoint.getSourceNote().id})}">
+                        <svg th:replace="_fragments/svgs :: edit"/>
+                        Edit Note
+                    </a>
+                    <div class="dropdown-divider"></div>
+                    <form th:action="@{/reviews/{id}(id=${reviewPoint.id})}" th:object="${reviewPoint}"
+                          method="post"
+                          onsubmit="return confirm('Are you sure to hide this note from reviewing in the future?')">
+                        <button type="submit" class="dropdown-item" name="remove">
+                            <svg th:replace="_fragments/svgs :: noReview"/>
+                            Remove This Note from Review
+                        </button>
+                    </form>
                 </div>
             </div>
-
         </div>
-        <nav class="nav d-flex flex-row-reverse p-0">
-            <div id="partials" th:data-noteid="${reviewPoint.note?.id}" th:data-linkid="${reviewPoint.link?.id}"> </div>
-        </nav>
+
+        <div id="partials"
+             th:data-noteid="${reviewPoint.note?.id}"
+             th:data-linkid="${reviewPoint.link?.id}"
+             th:data-sadonly="${answer!=null && !answer.isCorrect()}"
+             th:data-reviewPointId="${reviewPoint.id}"></div>
 
     </div>
 </layout>

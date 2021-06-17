@@ -9,7 +9,7 @@ public class CommonConfiguration {
         .permitAll()
         .antMatchers("/", "/login", "/error", "/images/**", "/img/**",
                      "/webjars/**", "/assets/**","/bazaar", "/bazaar/**/**", "/blog/**/**",
-                     "/api/notes/**"
+                     "/api/notes/**", "/api/review-points/**"
                 )
         .permitAll()
         .anyRequest()
