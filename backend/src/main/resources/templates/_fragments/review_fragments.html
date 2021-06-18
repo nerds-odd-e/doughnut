@@ -1,16 +1,3 @@
-<div th:fragment="showReviewPointTemp(reviewPoint)" th:object="${reviewPoint}">
-    <div th:if="*{note}">
-        <div th:replace=":: noteBreadcrumbForReview(*{note})"/>
-    </div>
-    <div th:if="*{link}">
-        <div class="jumbotron py-4 mb-2">
-            <div th:replace="_fragments/link_fragments :: linkShow(*{link}, ~{:: .link-content})">
-                <span class="link-content badge badge-light mr-1" th:text="*{linkTypeLabel}"/>
-            </div>
-        </div>
-    </div>
-</div>
-
 <div th:fragment="showReviewPoint(reviewPoint)" th:object="${reviewPoint}">
     <div th:if="*{note}">
         <div th:replace=":: noteBreadcrumbForReview(*{note})"/>
