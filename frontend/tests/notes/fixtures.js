@@ -66,7 +66,9 @@ const noteViewedByUser = {
 }
 
 const linkViewedByUser = {
-    sourceNoteViewedByUser: noteViewedByUser
+    linkTypeLabel: "a link",
+    sourceNoteViewedByUser: noteViewedByUser,
+    targetNoteViewedByUser: noteViewedByUser
 }
 
 export {noteViewedByUser, linkViewedByUser}
