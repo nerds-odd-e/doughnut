@@ -1,7 +1,7 @@
 <template>
         <NoteBreadcrumbForReview v-bind="sourceNote"/>
-        <div th:if="${quizQuestion.isPictureQuestion()}">
-            <div th:replace="_fragments/note_fragments :: showPicture(${reviewPoint.getSourceNote()}, 1)"/>
+        <div v-if="quizQuestion.pictureQuestion">
+            <ShowPicture :note="sourceNote.note" :opacity="1"/>
         </div>
         <div class="quiz-instruction">
         <pre style="white-space: pre-wrap;" th:unless="${quizQuestion.isPictureQuestion()}" th:utext="${quizQuestion.getDescription()}"/>
@@ -35,9 +35,10 @@
 
 <script setup>
   import NoteBreadcrumbForReview from "./NoteBreadcrumbForReview.vue"
+  import ShowPicture from "../notes/ShowPicture.vue"
   import { computed } from 'vue'
 
-  const props = defineProps({reviewPointViewedByUser: Object})
+  const props = defineProps({reviewPointViewedByUser: Object, quizQuestion: Object})
   const sourceNote = computed(()=>{
     if (!!props.reviewPointViewedByUser.noteViewedByUser) return props.reviewPointViewedByUser.noteViewedByUser
     return props.reviewPointViewedByUser.linkViewedByUser.sourceNoteViewedByUser
