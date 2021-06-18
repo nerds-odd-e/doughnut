@@ -50,12 +50,12 @@ public class Link {
 
         @JsonValue
         public final String label;
-        public final Number id;
+        public final Integer id;
         public final String exclusiveQuestion;
         @Getter
         private final QuestionType[] questionTypes;
 
-        LinkType(Number id, String label, String exclusiveQuestion, QuestionType[] questionTypes) {
+        LinkType(Integer id, String label, String exclusiveQuestion, QuestionType[] questionTypes) {
             this.label = label;
             this.id = id;
             this.exclusiveQuestion = exclusiveQuestion;
@@ -112,6 +112,12 @@ public class Link {
     @Getter
     @Setter
     private String type;
+
+    @Column(name = "type_id")
+    @Getter
+    @Setter
+    @JsonIgnore
+    private Integer typeId;
 
     @JsonIgnore
     @ManyToOne(cascade = CascadeType.PERSIST)
