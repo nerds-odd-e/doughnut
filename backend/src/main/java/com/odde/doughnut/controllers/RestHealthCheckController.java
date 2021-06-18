@@ -46,10 +46,8 @@ class RestHealthCheckController {
     public Res backdoor() {
 
         Res r= new Res();
-        r.note8 = modelFactoryService.notebookRepository.findById(8).orElse(null).getHeadNote();
-        r.note9 = modelFactoryService.notebookRepository.findById(9).orElse(null).getHeadNote();
-        r.note55 = modelFactoryService.notebookRepository.findById(55).orElse(null).getHeadNote();
-        r.note56 = modelFactoryService.notebookRepository.findById(56).orElse(null).getHeadNote();
+        final Notebook notebook = modelFactoryService.notebookRepository.findById(8).orElse(null);
+        modelFactoryService.notebookRepository.delete(notebook);
         return r;
     }
 }
