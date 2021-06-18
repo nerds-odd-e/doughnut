@@ -28,10 +28,10 @@ public class Link {
 
         INSTANCE("is an instance of", "is not an instance of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
         HAS_INSTANCE("has instances", "not have as an instance", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        /*INTEGRATED*/ MEMBER("is a member of", "is not a member of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        HAS_MEMBER("has members", "not have as a member part", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        /*NON INTEGRATED*/ INVOLVED_IN("is involved in", "is not involved in", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        INVOLVE("involves", "does not involve", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        /*INTEGRATED*/ PART("is a part of", "is not a part of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        HAS_PART("has parts", "not have as a part", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        /*NON INTEGRATED*/ TAGGED_BY("is tagged by", "is not tagged by", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        TAGGING("tagging", "is not tagging", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
         ATTRIBUTE("is an attribute of", "is not an attribute of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
         HAS_ATTRIBUTE("has attributes", "not has as an attribute", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
 
@@ -82,10 +82,10 @@ public class Link {
             if (this.equals(SUCCEEDS)) return PRECEDES;
             if (this.equals(INSTANCE)) return HAS_INSTANCE;
             if (this.equals(HAS_INSTANCE)) return INSTANCE;
-            if (this.equals(MEMBER)) return HAS_MEMBER;
-            if (this.equals(HAS_MEMBER)) return MEMBER;
-            if (this.equals(INVOLVED_IN)) return INVOLVE;
-            if (this.equals(INVOLVE)) return INVOLVED_IN;
+            if (this.equals(PART)) return HAS_PART;
+            if (this.equals(HAS_PART)) return PART;
+            if (this.equals(WITH_TAG)) return TAGGING;
+            if (this.equals(TAGGING)) return WITH_TAG;
             if (this.equals(ATTRIBUTE)) return HAS_ATTRIBUTE;
             if (this.equals(HAS_ATTRIBUTE)) return ATTRIBUTE;
             return this;
