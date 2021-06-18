@@ -43,7 +43,7 @@ class RestHealthCheckController {
             return "not existing any more";
         }
         modelFactoryService.notebookRepository.delete(notebook);
-        return r;
+        return "Done";
     }
 
 }
