@@ -17,5 +17,7 @@
 import LinkNoteShow from "./LinkNoteShow.vue"
 import { ref, defineProps } from "vue"
 
-  const props = defineProps({ sourceNoteViewedByUser: Object, targetNoteViewedByUser: Object })
+  const props = defineProps({
+    sourceNoteViewedByUser: {tyep: Object, required: true },
+    targetNoteViewedByUser: {type: Object, required: true }})
 </script>

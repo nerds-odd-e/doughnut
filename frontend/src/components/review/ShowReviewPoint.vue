@@ -21,5 +21,5 @@
   import NoteBreadcrumbForReview from "./NoteBreadcrumbForReview.vue"
   import NoteShow from "../notes/NoteShow.vue"
   import LinkShow from "../links/LinkShow.vue"
-  const props = defineProps({reviewPoint: Object, noteViewedByUser: Object, linkViewedByUser: Object })
+  const props = defineProps({ noteViewedByUser: Object, linkViewedByUser: Object })
 </script>

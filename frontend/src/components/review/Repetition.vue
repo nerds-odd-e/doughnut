@@ -6,7 +6,7 @@
             </div>
         </div>
 
-        <ShowReviewPoint v-bind="{reviewPoint, noteViewedByUser, linkViewedByUser}" />
+        <ShowReviewPoint v-bind="{ noteViewedByUser, linkViewedByUser}" />
         <div class="btn-toolbar justify-content-between">
                 <div class="btn-group" role="group" aria-label="First group">
                     <button type="submit" class="btn btn-light" id="repeat-again" name="again"
@@ -80,7 +80,7 @@
   import ShowReviewPoint from "./ShowReviewPoint.vue"
   import { computed } from 'vue'
   const props = defineProps({
-    reviewPoint: Object,
+    reviewPoint: { type: Object, required: true },
     answerResult: Object,
     noteViewedByUser: Object,
     linkViewedByUser: Object})

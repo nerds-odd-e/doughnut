@@ -1,5 +1,6 @@
 import Repetition from '@/components/review/Repetition.vue';
 import { mount } from '@vue/test-utils';
+import { router } from '@/routes'
 import { noteViewedByUser, linkViewedByUser } from "../notes/fixtures"
 
 describe('repetition page', () => {
@@ -11,7 +12,7 @@ describe('repetition page', () => {
       },
       noteViewedByUser: noteViewedByUser,
     }
-    const wrapper = mount(Repetition, {propsData: {...reviewPointForView}});
+    const wrapper = mount(Repetition, {propsData: {...reviewPointForView}, global: { plugins: [router] }});
     expect(wrapper.findAll(".btn-toolbar")).toHaveLength(1)
   });
 
@@ -22,7 +23,7 @@ describe('repetition page', () => {
       },
       linkViewedByUser: linkViewedByUser,
     }
-    const wrapper = mount(Repetition, {propsData: {...reviewPointForView}});
+    const wrapper = mount(Repetition, {propsData: {...reviewPointForView}, global: { plugins: [router] }});
     expect(wrapper.findAll(".btn-toolbar")).toHaveLength(1)
   });
 
