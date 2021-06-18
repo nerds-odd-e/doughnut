@@ -71,21 +71,8 @@ public class ReviewController extends ApplicationMvcController  {
     }
 
     @GetMapping("/repeat")
-    public String repeatReview(Model model) {
-        UserModel user = currentUserFetcher.getUser();
-        Reviewing reviewing = user.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
-        ReviewPointModel reviewPointModel = reviewing.getOneReviewPointNeedToRepeat(testabilitySettings.getRandomizer());
-        if(reviewPointModel != null) {
-            model.addAttribute("reviewPoint", reviewPointModel.getEntity());
-            QuizQuestion quizQuestion = reviewPointModel.generateAQuizQuestion(testabilitySettings.getRandomizer());
-            if (quizQuestion == null) {
-                return "reviews/repeat";
-            }
-            model.addAttribute("quizQuestion", quizQuestion);
-            model.addAttribute("emptyAnswer", quizQuestion.buildAnswer());
-            return "reviews/quiz";
-        }
-        return "redirect:/reviews";
+    public String repeatReview() {
+        return "vuejsed";
     }
 
     @PostMapping("/{reviewPoint}/answer")

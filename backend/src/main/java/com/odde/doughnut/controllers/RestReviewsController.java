@@ -2,9 +2,11 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
+import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.NoteViewedByUser;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.models.ReviewPointModel;
 import com.odde.doughnut.models.Reviewing;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -37,4 +39,23 @@ class RestReviewsController {
     UserModel user = currentUserFetcher.getUser();
     return user.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
   }
+
+  @GetMapping("/repeat")
+  public String repeatReview(Model model) {
+    UserModel user = currentUserFetcher.getUser();
+    Reviewing reviewing = user.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
+    ReviewPointModel reviewPointModel = reviewing.getOneReviewPointNeedToRepeat(testabilitySettings.getRandomizer());
+    if(reviewPointModel != null) {
+      model.addAttribute("reviewPoint", reviewPointModel.getEntity());
+      QuizQuestion quizQuestion = reviewPointModel.generateAQuizQuestion(testabilitySettings.getRandomizer());
+      if (quizQuestion == null) {
+        return "reviews/repeat";
+      }
+      model.addAttribute("quizQuestion", quizQuestion);
+      model.addAttribute("emptyAnswer", quizQuestion.buildAnswer());
+      return "reviews/quiz";
+    }
+    return "redirect:/reviews";
+  }
+
 }

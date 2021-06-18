@@ -28,7 +28,7 @@
                     </div>
                     <div class="card-body">
                         <p class="card-text">Using spaced repetition technique, you only need to review the old notes you have learned at the optimal time. </p>
-                        <a v-if="reviewing.toRepeatCount > 0" role="button" class="btn btn-light" href="/reviews/repeat"> Start reviewing old notes </a>
+                        <router-link v-if="reviewing.toRepeatCount > 0" role="button" class="btn btn-light" :to="{name: 'repeat'}"> Start reviewing old notes </router-link>
                         <h2 v-else class="">You have reviewed all the old notes for today.</h2>
                     </div>
                 </div>
