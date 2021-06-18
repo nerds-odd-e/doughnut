@@ -8,15 +8,15 @@
           <h2 v-if="!!quizQuestion.mainTopic" class="text-center">{{quizQuestion.mainTopic}}</h2>
         </div>
 
-        <div class="row mt-2" th:unless="${quizQuestion.getQuestionType().label=='spelling'}">
-            <div class="col-sm-6 mb-3" th:each="option:${quizQuestion.getOptions()}">
-                <form th:action="@{/reviews/{id}/answer(id=${reviewPoint.id})}" th:object="${emptyAnswer}" method="post">
-                    <input type="hidden" name="answerNote" th:value="${option.note.id}"/>
-                    <input type="hidden" th:field="*{questionType}"/>
+        <div class="row mt-2" v-if="quizQuestion.questionType!=='SPELLING'">
+            <div class="col-sm-6 mb-3" v-for="option in quizQuestion.options" :key="option.note.id">
+                <form :action="`/reviews/${reviewPointViewedByUser.reviewPoint.id}/answer`" method="post">
+                    <input type="hidden" name="answerNote" :value="option.note.id"/>
+                    <input type="hidden" name="questionType" :value="emptyAnswer.questionType"/>
                     <button class="btn btn-secondary btn-lg btn-block">
-                        <div th:text="${option.display}" th:unless="${option.isPicture}"/>
-                        <div th:if="${option.isPicture}">
-                            <div th:replace="_fragments/note_fragments :: showPicture(${option.note}, 1)"/>
+                        <div v-if="!option.picture">{{option.display}}</div>
+                        <div v-else>
+                            <ShowPicture :note="option.note" :opacity="1"/>
                         </div>
                     </button>
 
@@ -24,7 +24,7 @@
             </div>
         </div>
 
-        <div th:if="${quizQuestion.getQuestionType().label=='spelling'}">
+        <div v-else>
             <form th:action="@{/reviews/{id}/answer(id=${reviewPoint.id})}" th:object="${emptyAnswer}" method="post">
                 <input type="hidden" th:field="*{questionType}"/>
                 <div class="aaa" th:insert="_fragments/forms :: textInput('review_point', 'answer', 'put your answer here', true)"/>
@@ -38,7 +38,7 @@
   import ShowPicture from "../notes/ShowPicture.vue"
   import { computed } from 'vue'
 
-  const props = defineProps({reviewPointViewedByUser: Object, quizQuestion: Object})
+  const props = defineProps({reviewPointViewedByUser: Object, quizQuestion: Object, emptyAnswer: Object})
   const sourceNote = computed(()=>{
     if (!!props.reviewPointViewedByUser.noteViewedByUser) return props.reviewPointViewedByUser.noteViewedByUser
     return props.reviewPointViewedByUser.linkViewedByUser.sourceNoteViewedByUser
