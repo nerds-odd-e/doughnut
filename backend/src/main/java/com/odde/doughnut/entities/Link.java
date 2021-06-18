@@ -112,12 +112,6 @@ public class Link {
     @JsonIgnoreProperties("noteContent")
     @Getter @Setter private Note targetNote;
 
-    @Column(name = "type")
-    @Getter
-    @Setter
-    @JsonIgnore
-    private String typeLabel = "xxx";
-
     @Column(name = "type_id")
     @Getter
     @Setter
@@ -153,7 +147,6 @@ public class Link {
             typeId = null;
         }
         typeId = linkType.id;
-        typeLabel = linkType.label;
     }
 
     @JsonIgnore
