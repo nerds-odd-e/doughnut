@@ -1,10 +1,14 @@
 package com.odde.doughnut.models;
 
+import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.ReviewSetting;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import net.minidev.json.annotate.JsonIgnore;
 
 import java.sql.Timestamp;
 import java.util.List;
@@ -12,6 +16,8 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE,
+        isGetterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Reviewing {
     private final UserModel userModel;
     private final Timestamp currentUTCTimestamp;
@@ -61,6 +67,7 @@ public class Reviewing {
         return reviewPoint;
     }
 
+    @JsonProperty
     public int toRepeatCount() {
         return memoizer.call("toRepeatCount", this::getToRepeatCount_);
     }
@@ -69,6 +76,7 @@ public class Reviewing {
         return userModel.getReviewPointsNeedToRepeat(currentUTCTimestamp).size();
     }
 
+    @JsonProperty
     public int learntCount() {
         return memoizer.call("learntCount", this::getLearntCount_);
     }
@@ -77,6 +85,7 @@ public class Reviewing {
         return userModel.learntCount();
     }
 
+    @JsonProperty
     public int notLearntCount() {
         return memoizer.call("notLearntCount", this::getNotLearntCount_);
     }
@@ -88,6 +97,7 @@ public class Reviewing {
         return subscribedCount + userModel.getNotesHaveNotBeenReviewedAtAllCount();
     }
 
+    @JsonProperty
     public int toInitialReviewCount() {
         return memoizer.call("toInitialReviewCount", this::getToInitialReviewCount_);
     }
@@ -100,6 +110,7 @@ public class Reviewing {
         return Math.min(remainingDailyNewNotesCount(), notLearntCount());
     }
 
+    @JsonProperty
     public int remainingDailyNewNotesCount() {
         long sameDayCount = getNewReviewPointsOfToday().size();
         return (int) (userModel.entity.getDailyNewNotesCount() - sameDayCount);

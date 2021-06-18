@@ -1,8 +1,8 @@
 <script setup>
-import NoteStatisticsButton from './components/notes/NoteStatisticsButton.vue'
-import Repetition from './components/review/Repetition.vue'
-import ContentLoader from "./components/ContentLoader.vue"
-import LoadingThinBar from "./components/LoadingThinBar.vue"
+import NoteStatisticsButton from '../components/notes/NoteStatisticsButton.vue'
+import Repetition from '../components/review/Repetition.vue'
+import ContentLoader from "../components/ContentLoader.vue"
+import LoadingThinBar from "../components/LoadingThinBar.vue"
 import { ref, inject, watch } from 'vue'
 
 const noteid = inject('noteid')

@@ -1,5 +1,5 @@
 import { createApp } from 'vue'
-import Review from './Review.vue'
+import Review from './pages/Review.vue'
 import NoteApp from './NoteApp.vue'
 import {router} from './routes'
 

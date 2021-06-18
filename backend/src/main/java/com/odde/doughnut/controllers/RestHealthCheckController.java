@@ -20,30 +20,12 @@ import java.util.stream.StreamSupport;
 @RestController
 @RequestMapping("/api")
 class RestHealthCheckController {
-    private final ModelFactoryService modelFactoryService;
-
     @Autowired
     private Environment environment;
-
-    RestHealthCheckController(ModelFactoryService modelFactoryService) {
-        this.modelFactoryService = modelFactoryService;
-    }
 
     @GetMapping("/healthcheck")
     public String ping() {
         return "OK. Active Profile: " + String.join(", ", environment.getActiveProfiles());
-    }
-
-    @GetMapping("/backdoor")
-    @Transactional
-    public String backdoor() {
-
-        final Notebook notebook = modelFactoryService.notebookRepository.findById(8).orElse(null);
-        if (notebook == null) {
-            return "not existing any more";
-        }
-        modelFactoryService.notebookRepository.delete(notebook);
-        return "Done";
     }
 
 }

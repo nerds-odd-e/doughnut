@@ -59,7 +59,7 @@ public class NoteController extends ApplicationMvcController  {
 
     @GetMapping("/{note}")
     public String showNote(@PathVariable(name = "note") Integer noteId) {
-        return "notes/show";
+        return "vuejsed";
     }
 
     @GetMapping("/articles/{note}")

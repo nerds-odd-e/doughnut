@@ -28,7 +28,7 @@ public class BazaarController extends ApplicationMvcController {
 
     @GetMapping("/notes/{note}")
     public String showBazaarNote(@PathVariable(name = "note") Integer noteId) throws NoAccessRightException {
-        return "notes/show";
+        return "vuejsed";
     }
 
     @GetMapping("/articles/{note}")

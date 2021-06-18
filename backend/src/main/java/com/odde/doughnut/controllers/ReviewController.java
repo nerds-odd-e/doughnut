@@ -34,11 +34,8 @@ public class ReviewController extends ApplicationMvcController  {
     }
 
     @GetMapping("")
-    public String index(Model model) {
-        UserModel user = currentUserFetcher.getUser();
-        Reviewing reviewing = user.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
-        model.addAttribute("reviewing", reviewing);
-        return "reviews/index";
+    public String index() {
+        return "vuejsed";
     }
 
     @GetMapping("/initial")
