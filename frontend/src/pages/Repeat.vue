@@ -1,7 +1,7 @@
 <template>
   <LoadingThinBar v-if="loading"/>
   <template v-if="!!repetition" v-bind="{repetition}">
-    <Quiz v-if="!!repetition.quizQuestion" v-bind="{repetition}"/>
+    <Quiz v-if="!!repetition.quizQuestion" v-bind="repetition"/>
     <Repetition v-else v-bind="{...repetition.reviewPointViewedByUser, sadOnly: false}"/>
   </template>
   <div v-else><ContentLoader /></div>

@@ -1,5 +1,5 @@
 <template>
-        <NoteBreadcrumbForReview(${reviewPoint.getSourceNote()})"/>
+        <NoteBreadcrumbForReview v-bind="sourceNote"/>
         <div th:if="${quizQuestion.isPictureQuestion()}">
             <div th:replace="_fragments/note_fragments :: showPicture(${reviewPoint.getSourceNote()}, 1)"/>
         </div>
@@ -34,5 +34,12 @@
 </template>
 
 <script setup>
-  const props = defineProps({ancestors: Array})
+  import NoteBreadcrumbForReview from "./NoteBreadcrumbForReview.vue"
+  import { computed } from 'vue'
+
+  const props = defineProps({reviewPointViewedByUser: Object})
+  const sourceNote = computed(()=>{
+    if (!!props.reviewPointViewedByUser.noteViewedByUser) return props.reviewPointViewedByUser.noteViewedByUser
+    return props.reviewPointViewedByUser.linkViewedByUser.sourceNoteViewedByUser
+  })
 </script>
