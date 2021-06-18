@@ -1,6 +1,7 @@
 
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -34,7 +35,10 @@ class RestHealthCheckController {
     }
 
     class Res {
-        public List<Notebook> notebooks;
+        public Note note8;
+        public Note note9;
+        public Note note55;
+        public Note note56;
 
     }
     @GetMapping("/backdoor")
@@ -42,8 +46,10 @@ class RestHealthCheckController {
     public Res backdoor() {
 
         Res r= new Res();
-        final User user = modelFactoryService.userRepository.findById(3).get();
-        r.notebooks = user.getOwnership().getNotebooks();
+        r.note8 = modelFactoryService.noteRepository.findById(8).orElse(null);
+        r.note9 = modelFactoryService.noteRepository.findById(9).orElse(null);
+        r.note55 = modelFactoryService.noteRepository.findById(55).orElse(null);
+        r.note56 = modelFactoryService.noteRepository.findById(56).orElse(null);
         return r;
     }
 }
