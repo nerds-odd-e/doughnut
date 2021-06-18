@@ -27,13 +27,13 @@ public class Link {
         /* a superclass of */ HAS("has", "does not have", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
 
         INSTANCE("is an instance of", "is not an instance of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        HAS_INSTANCE("has as an instance", "not has as an instance", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        INTEGRATED_PART("is an integrated part of", "is not an integrated part of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        HAS_INTEGRATED_PART("has as an integrated part", "not has as an integrated part", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        HAS_INSTANCE("has instances", "not have as an instance", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        /*INTEGRATED*/ MEMBER("is a member of", "is not a member of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        HAS_MEMBER("has members", "not have as a member part", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
         /*NON INTEGRATED*/ INVOLVED_IN("is involved in", "is not involved in", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
         INVOLVE("involves", "does not involve", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
         ATTRIBUTE("is an attribute of", "is not an attribute of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        HAS_ATTRIBUTE("has as an attribute", "not has as an attribute", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        HAS_ATTRIBUTE("has attributes", "not has as an attribute", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
 
         OPPOSITE_OF("is the opposite of", "is not the opposite of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
         BROUGHT_BY("is brought by", "is not brought by", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
@@ -82,8 +82,8 @@ public class Link {
             if (this.equals(SUCCEEDS)) return PRECEDES;
             if (this.equals(INSTANCE)) return HAS_INSTANCE;
             if (this.equals(HAS_INSTANCE)) return INSTANCE;
-            if (this.equals(INTEGRATED_PART)) return HAS_INTEGRATED_PART;
-            if (this.equals(HAS_INTEGRATED_PART)) return INTEGRATED_PART;
+            if (this.equals(MEMBER)) return HAS_MEMBER;
+            if (this.equals(HAS_MEMBER)) return MEMBER;
             if (this.equals(INVOLVED_IN)) return INVOLVE;
             if (this.equals(INVOLVE)) return INVOLVED_IN;
             if (this.equals(ATTRIBUTE)) return HAS_ATTRIBUTE;
