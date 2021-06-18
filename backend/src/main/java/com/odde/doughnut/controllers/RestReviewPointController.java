@@ -31,7 +31,12 @@ class RestReviewPointController {
     @Getter
     @Setter
     private NoteViewedByUser sourceNoteViewedByUser;
-
+    @Getter
+    @Setter
+    private String linkTypeLabel;
+    @Getter
+    @Setter
+    private NoteViewedByUser targetNoteViewedByUser;
   }
 
   class ReviewPointViewedByUser {
@@ -66,6 +71,8 @@ class RestReviewPointController {
     else {
       LinkViewedByUser linkViewedByUser = new LinkViewedByUser();
       linkViewedByUser.setSourceNoteViewedByUser(reviewPoint.getLink().getSourceNote().jsonObjectViewedBy(entity));
+      linkViewedByUser.setTargetNoteViewedByUser(reviewPoint.getLink().getTargetNote().jsonObjectViewedBy(entity));
+      linkViewedByUser.setLinkTypeLabel(reviewPoint.getLink().getLinkTypeLabel());
       result.setLinkViewedByUser(linkViewedByUser);
     }
     return result;

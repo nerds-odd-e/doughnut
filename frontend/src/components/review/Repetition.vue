@@ -1,5 +1,5 @@
 <template>
-        <ShowReviewPoint v-bind="{reviewPoint, sourceNoteViewedByUser, linkViewedByUser}" />
+        <ShowReviewPoint v-bind="{reviewPoint, noteViewedByUser, linkViewedByUser}" />
         <div class="btn-toolbar justify-content-between">
             <form :action="`/reviews/${reviewPoint.id}`" method="post">
                 <div class="btn-group" role="group" aria-label="First group">
@@ -73,7 +73,6 @@
   const props = defineProps({reviewPoint: Object, sadOnly: Boolean, noteViewedByUser: Object, linkViewedByUser: Object})
 
   const sourceNoteViewedByUser = computed(()=> {
-    console.log(props)
     if(!!props.noteViewedByUser) {
       return props.noteViewedByUser
     }
