@@ -22,40 +22,42 @@ import static com.odde.doughnut.entities.QuizQuestion.QuestionType.LINK_TARGET;
 public class Link {
 
     public enum LinkType {
-        RELATED_TO("is related to", "is not related to", new QuestionType[0]),
-        /* a subclass of */ BELONGS_TO("belongs to", "does not belong to", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        /* a superclass of */ HAS("has", "does not have", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        RELATED_TO(1, "is related to", "is not related to", new QuestionType[0]),
+        /* a subclass of */ BELONGS_TO(2, "belongs to", "does not belong to", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        /* a superclass of */ HAS(3, "has", "does not have", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
 
-        INSTANCE("is an instance of", "is not an instance of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        HAS_INSTANCE("has instances", "not have as an instance", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        /*INTEGRATED*/ PART("is a part of", "is not a part of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        HAS_PART("has parts", "not have as a part", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        /*NON INTEGRATED*/ TAGGED_BY("is tagged by", "is not tagged by", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        TAGGING("tagging", "is not tagging", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        ATTRIBUTE("is an attribute of", "is not an attribute of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        HAS_ATTRIBUTE("has attributes", "not has as an attribute", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        INSTANCE(4, "is an instance of", "is not an instance of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        HAS_INSTANCE(5, "has instances", "not have as an instance", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        /*INTEGRATED*/ PART(6, "is a part of", "is not a part of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        HAS_PART(7, "has parts", "not have as a part", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        /*NON INTEGRATED*/ TAGGED_BY(8, "is tagged by", "is not tagged by", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        TAGGING(9, "tagging", "is not tagging", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        ATTRIBUTE(10, "is an attribute of", "is not an attribute of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        HAS_ATTRIBUTE(11, "has attributes", "not has as an attribute", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
 
-        OPPOSITE_OF("is the opposite of", "is not the opposite of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        BROUGHT_BY("is brought by", "is not brought by", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        AUTHOR_OF("is author of", "is not author of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        USES("uses", "does not use", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        USED_BY("is used by", "is not used by", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        EXAMPLE_OF("is an example of", "is not an example of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        HAS_AS_EXAMPLE("has as example", "does not have as example", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        PRECEDES("precedes", "does not precede", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        SUCCEEDS("succeeds", "does not succeeds", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        SAME_AS("is the same as", "is not the same as", new QuestionType[]{LINK_TARGET}),
-        SIMILAR_TO("is similar to", "is not similar to", new QuestionType[]{LINK_TARGET}),
-        CONFUSE_WITH("confuses with", "does not confuse with", new QuestionType[0]);
+        OPPOSITE_OF(12, "is the opposite of", "is not the opposite of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        BROUGHT_BY(13, "is brought by", "is not brought by", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        AUTHOR_OF(14, "is author of", "is not author of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        USES(15, "uses", "does not use", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        USED_BY(16, "is used by", "is not used by", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        EXAMPLE_OF(17, "is an example of", "is not an example of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        HAS_AS_EXAMPLE(18, "has as example", "does not have as example", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        PRECEDES(19, "precedes", "does not precede", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        SUCCEEDS(20, "succeeds", "does not succeeds", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        SAME_AS(21, "is the same as", "is not the same as", new QuestionType[]{LINK_TARGET}),
+        SIMILAR_TO(22, "is similar to", "is not similar to", new QuestionType[]{LINK_TARGET}),
+        CONFUSE_WITH(23, "confuses with", "does not confuse with", new QuestionType[0]);
 
         @JsonValue
         public final String label;
+        public final Number id;
         public final String exclusiveQuestion;
         @Getter
         private final QuestionType[] questionTypes;
 
-        LinkType(String label, String exclusiveQuestion, QuestionType[] questionTypes) {
+        LinkType(Number id, String label, String exclusiveQuestion, QuestionType[] questionTypes) {
             this.label = label;
+            this.id = id;
             this.exclusiveQuestion = exclusiveQuestion;
             this.questionTypes = questionTypes;
         }
@@ -84,8 +86,8 @@ public class Link {
             if (this.equals(HAS_INSTANCE)) return INSTANCE;
             if (this.equals(PART)) return HAS_PART;
             if (this.equals(HAS_PART)) return PART;
-            if (this.equals(WITH_TAG)) return TAGGING;
-            if (this.equals(TAGGING)) return WITH_TAG;
+            if (this.equals(TAGGED_BY)) return TAGGING;
+            if (this.equals(TAGGING)) return TAGGED_BY;
             if (this.equals(ATTRIBUTE)) return HAS_ATTRIBUTE;
             if (this.equals(HAS_ATTRIBUTE)) return ATTRIBUTE;
             return this;

@@ -10,9 +10,9 @@
     <!-- <div v-if="!!reviewPoint.link"> -->
     <div v-if="false">
         <div class="jumbotron py-4 mb-2">
-            <div th:replace="_fragments/link_fragments :: linkShow(*{link}, ~{:: .link-content})">
-                <span class="link-content badge badge-light mr-1" th:text="*{type}"/>
-            </div>
+            <LinkShow v-bind="linkViewedByUser">
+                <span class="badge badge-light mr-1"> {{link.type}}</span>
+            </LinkShow>
         </div>
     </div>
 </div>

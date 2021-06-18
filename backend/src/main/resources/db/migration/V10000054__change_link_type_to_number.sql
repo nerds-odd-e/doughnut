@@ -1,0 +1,2 @@
+ALTER TABLE link
+    ADD COLUMN type_id INT UNSIGNED;
