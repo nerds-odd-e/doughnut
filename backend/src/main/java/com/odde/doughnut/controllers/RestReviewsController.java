@@ -2,10 +2,10 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
+import com.odde.doughnut.entities.AnswerResult;
 import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.json.NoteViewedByUser;
 import com.odde.doughnut.entities.json.ReviewPointViewedByUser;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.ReviewPointModel;
@@ -15,11 +15,10 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/reviews")
@@ -52,7 +51,7 @@ class RestReviewsController {
   }
 
   @GetMapping("/repeat")
-  public RepetitionForUser repeatReview(Model model) {
+  public RepetitionForUser repeatReview() {
     UserModel user = currentUserFetcher.getUser();
     Reviewing reviewing = user.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
     ReviewPointModel reviewPointModel = reviewing.getOneReviewPointNeedToRepeat(testabilitySettings.getRandomizer());
@@ -68,6 +67,18 @@ class RestReviewsController {
       }
     }
     return repetitionForUser;
+  }
+
+  @PostMapping("/{reviewPoint}/answer")
+  public AnswerResult answerQuiz(ReviewPoint reviewPoint, @Valid @RequestBody Answer answer) {
+    AnswerResult answerResult = new AnswerResult();
+    answerResult.setReviewPoint(reviewPoint);
+    answerResult.setQuestionType(answer.getQuestionType());
+    answerResult.setAnswer(answer.getAnswer());
+    if (answer.getAnswerNoteId() != null) {
+      answerResult.setAnswerNote(modelFactoryService.noteRepository.findById(answer.getAnswerNoteId()).orElse(null));
+    }
+    return answerResult;
   }
 
 }

@@ -1,8 +1,8 @@
 <template>
   <LoadingThinBar v-if="loading"/>
   <template v-if="!!repetition" v-bind="{repetition}">
-    <Quiz v-if="!!repetition.quizQuestion" v-bind="repetition"/>
-    <Repetition v-else v-bind="{...repetition.reviewPointViewedByUser, sadOnly: false}"/>
+    <Quiz v-if="!!repetition.quizQuestion && !answerResult" v-bind="repetition" @answered="answerResult=$event"/>
+    <Repetition v-else v-bind="{...repetition.reviewPointViewedByUser, answerResult, sadOnly: false}"/>
   </template>
   <div v-else><ContentLoader /></div>
 </template>
@@ -21,6 +21,7 @@ export default {
   data() {
     return {
       repetition: ref(null),
+      answerResult: ref(null),
       loading: ref(false)
     }
   },

@@ -10,7 +10,7 @@ import static com.odde.doughnut.entities.QuizQuestion.QuestionType.LINK_SOURCE_E
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class AnswerTest {
+class AnswerResultTest {
     MakeMe makeMe = new MakeMe();
 
     @Nested
@@ -26,7 +26,7 @@ class AnswerTest {
 
         @Test
         void correct() {
-            Answer answer = makeMe.anAnswerFor(reviewPoint)
+            AnswerResult answer = makeMe.anAnswerFor(reviewPoint)
                     .type(CLOZE_SELECTION)
                     .answer("this")
                     .inMemoryPlease();
@@ -35,11 +35,11 @@ class AnswerTest {
 
         @Test
         void literalAnswer() {
-            Answer answer = makeMe.anAnswerFor(reviewPoint)
+            AnswerResult answerResult = makeMe.anAnswerFor(reviewPoint)
                     .type(CLOZE_SELECTION)
                     .answer("this / that")
                     .inMemoryPlease();
-            assertTrue(answer.isCorrect());
+            assertTrue(answerResult.isCorrect());
         }
 
     }
@@ -60,20 +60,20 @@ class AnswerTest {
 
         @Test
         void correct () {
-            Answer answer = makeMe.anAnswerFor(reviewPoint)
+            AnswerResult answerResult = makeMe.anAnswerFor(reviewPoint)
                     .type(LINK_SOURCE_EXCLUSIVE)
                     .answer("blah")
                     .inMemoryPlease();
-            assertTrue(answer.isCorrect());
+            assertTrue(answerResult.isCorrect());
         }
 
         @Test
         void wrong () {
-            Answer answer = makeMe.anAnswerFor(reviewPoint)
+            AnswerResult answerResult = makeMe.anAnswerFor(reviewPoint)
                     .type(LINK_SOURCE_EXCLUSIVE)
                     .answer(source.getTitle())
                     .inMemoryPlease();
-            assertFalse(answer.isCorrect());
+            assertFalse(answerResult.isCorrect());
         }
     }
 
