@@ -81,7 +81,12 @@ class RestReviewsController {
   }
 
   @PostMapping(path="/{reviewPoint}/self-evaluate")
-  public Integer selfEvaluate(ReviewPoint reviewPoint, @RequestBody String selfEvaluation) {
+  public RepetitionForUser selfEvaluate(ReviewPoint reviewPoint, @RequestBody String selfEvaluation) {
+     evaluate(reviewPoint, selfEvaluation);
+     return repeatReview();
+  }
+
+  private int evaluate(ReviewPoint reviewPoint, String selfEvaluation) {
     if (selfEvaluation.equals("again")) {
         return modelFactoryService.toReviewPointModel(reviewPoint).increaseRepetitionCountAndSave();
     }

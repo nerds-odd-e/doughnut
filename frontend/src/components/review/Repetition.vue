@@ -116,7 +116,6 @@
           return res.json();
         })
         .then(resp => {
-          console.log(resp)
           emit('evaluated', resp)
         })
         .catch(error => {
