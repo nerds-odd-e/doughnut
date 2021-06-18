@@ -1,4 +1,11 @@
 <template>
+        <div v-if="answerResult">
+            <div class="alert alert-success" v-if="answerResult.correct">Correct!</div>
+            <div class="alert alert-danger" v-else>
+                 {{'Your answer `' + answerResult.answerDisplay + '` is wrong.'}}
+            </div>
+        </div>
+
         <ShowReviewPoint v-bind="{reviewPoint, noteViewedByUser, linkViewedByUser}" />
         <div class="btn-toolbar justify-content-between">
             <form :action="`/reviews/${reviewPoint.id}`" method="post">
@@ -70,7 +77,11 @@
   import SvgNoReview from "../svgs/SvgNoReview.vue"
   import ShowReviewPoint from "./ShowReviewPoint.vue"
   import { computed } from 'vue'
-  const props = defineProps({reviewPoint: Object, sadOnly: Boolean, noteViewedByUser: Object, linkViewedByUser: Object})
+  const props = defineProps({
+    reviewPoint: Object,
+    answerResult: Object,
+    noteViewedByUser: Object,
+    linkViewedByUser: Object})
 
   const sourceNoteViewedByUser = computed(()=> {
     if(!!props.noteViewedByUser) {
@@ -79,6 +90,13 @@
     else {
       return props.linkViewedByUser.sourceNoteViewedByUser
     }
+  })
+
+  const sadOnly = computed(()=> {
+    if(!!props.answerResult) {
+      return !props.answerResult.correct
+    }
+    return false
   })
 
 </script>
