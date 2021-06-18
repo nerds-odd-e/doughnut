@@ -1,4 +1,5 @@
 <template>
+    <NoteOwnerBreadcrumb v-bind="noteViewedByUser"/>
     <div th:id="'note-collapse-' + ${note.id}" class="collapse" th:insert="_fragments/note_fragments :: noteShow(${note}, 2, false)"/>
 </template>
 
