@@ -65,4 +65,8 @@ const noteViewedByUser = {
     }
 }
 
-export {noteViewedByUser}
+const linkViewedByUser = {
+    sourceNoteViewedByUser: noteViewedByUser
+}
+
+export {noteViewedByUser, linkViewedByUser}

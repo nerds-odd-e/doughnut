@@ -7,11 +7,10 @@
         </div>
     </div>
 
-    <!-- <div v-if="!!reviewPoint.link"> -->
-    <div v-if="false">
+    <div v-if="!!reviewPoint.link">
         <div class="jumbotron py-4 mb-2">
             <LinkShow v-bind="linkViewedByUser">
-                <span class="badge badge-light mr-1"> {{link.type}}</span>
+                <span class="badge badge-light mr-1"> {{link.linkTypeLabel}}</span>
             </LinkShow>
         </div>
     </div>
@@ -21,5 +20,5 @@
 <script setup>
   import NoteBreadcrumbForReview from "./NoteBreadcrumbForReview.vue"
   import NoteShow from "../notes/NoteShow.vue"
-  const props = defineProps({reviewPoint: Object, sourceNoteViewedByUser: Object})
+  const props = defineProps({reviewPoint: Object, sourceNoteViewedByUser: Object, linkViewedByUser: Object })
 </script>

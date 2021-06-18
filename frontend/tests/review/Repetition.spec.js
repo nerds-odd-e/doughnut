@@ -1,17 +1,29 @@
 import Repetition from '@/components/review/Repetition.vue';
 import { mount } from '@vue/test-utils';
-import { noteViewedByUser } from "../notes/fixtures"
+import { noteViewedByUser, linkViewedByUser } from "../notes/fixtures"
 
-const reviewPointForView = {
-  reviewPoint: {
-    id: 3,
-  },
-  sourceNoteViewedByUser: noteViewedByUser,
-}
 describe('repetition page', () => {
 
-  test('', async () => {
+  test('for note', async () => {
+    const reviewPointForView = {
+      reviewPoint: {
+        id: 3,
+      },
+      noteViewedByUser: noteViewedByUser,
+    }
     const wrapper = mount(Repetition, {propsData: {...reviewPointForView}});
     expect(wrapper.findAll(".btn-toolbar")).toHaveLength(1)
   });
+
+  test('for link', async () => {
+    const reviewPointForView = {
+      reviewPoint: {
+        id: 3,
+      },
+      linkViewedByUser: linkViewedByUser,
+    }
+    const wrapper = mount(Repetition, {propsData: {...reviewPointForView}});
+    expect(wrapper.findAll(".btn-toolbar")).toHaveLength(1)
+  });
+
 });
