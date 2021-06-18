@@ -4,8 +4,8 @@
             <ShowPicture :note="sourceNote.note" :opacity="1"/>
         </div>
         <div class="quiz-instruction">
-        <pre style="white-space: pre-wrap;" th:unless="${quizQuestion.isPictureQuestion()}" th:utext="${quizQuestion.getDescription()}"/>
-        <h2 th:unless="${#strings.isEmpty(quizQuestion.mainTopic)}" class="text-center" th:text="${quizQuestion.mainTopic}"/>
+          <pre style="white-space: pre-wrap;" v-if="!quizQuestion.pictureQuestion" v-html="quizQuestion.description"/>
+          <h2 v-if="!!quizQuestion.mainTopic" class="text-center">{{quizQuestion.mainTopic}}</h2>
         </div>
 
         <div class="row mt-2" th:unless="${quizQuestion.getQuestionType().label=='spelling'}">
