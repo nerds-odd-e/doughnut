@@ -31,26 +31,28 @@ public class ReviewPointModel {
         repeated(currentUTCTimestamp);
     }
 
-    public void repeated(Timestamp currentUTCTimestamp) {
-        updateNextRepetitionWithAdjustment(currentUTCTimestamp, 0);
+    public int repeated(Timestamp currentUTCTimestamp) {
+        return updateNextRepetitionWithAdjustment(currentUTCTimestamp, 0);
     }
 
-    public void repeatedSad(Timestamp currentUTCTimestamp) {
-        updateNextRepetitionWithAdjustment(currentUTCTimestamp, -1);
+    public int repeatedSad(Timestamp currentUTCTimestamp) {
+        return updateNextRepetitionWithAdjustment(currentUTCTimestamp, -1);
     }
 
-    public void repeatedHappy(Timestamp currentUTCTimestamp) {
-        updateNextRepetitionWithAdjustment(currentUTCTimestamp, 1);
+    public int repeatedHappy(Timestamp currentUTCTimestamp) {
+        return updateNextRepetitionWithAdjustment(currentUTCTimestamp, 1);
     }
 
-    private void updateNextRepetitionWithAdjustment(Timestamp currentUTCTimestamp, int adjustment) {
+    private int updateNextRepetitionWithAdjustment(Timestamp currentUTCTimestamp, int adjustment) {
         entity.updateMemoryState(currentUTCTimestamp, getMemoryStateChange(adjustment));
-        increaseRepetitionCountAndSave();
+        return increaseRepetitionCountAndSave();
     }
 
-    public void increaseRepetitionCountAndSave() {
-        entity.setRepetitionCount(entity.getRepetitionCount() + 1);
+    public int increaseRepetitionCountAndSave() {
+        final int repetitionCount = entity.getRepetitionCount() + 1;
+        entity.setRepetitionCount(repetitionCount);
         this.modelFactoryService.reviewPointRepository.save(entity);
+        return repetitionCount;
     }
 
     private SpacedRepetitionAlgorithm.MemoryStateChange getMemoryStateChange(int adjustment) {

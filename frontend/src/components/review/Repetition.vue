@@ -8,29 +8,31 @@
 
         <ShowReviewPoint v-bind="{reviewPoint, noteViewedByUser, linkViewedByUser}" />
         <div class="btn-toolbar justify-content-between">
-            <form :action="`/reviews/${reviewPoint.id}`" method="post">
                 <div class="btn-group" role="group" aria-label="First group">
                     <button type="submit" class="btn btn-light" id="repeat-again" name="again"
+                           v-on:click="processForm('again')"
                             title="repeat immediately">
                         <SvgFailed/>
                     </button>
                     <template v-if="!sadOnly">
                       <button type="submit" class="btn btn-light" id="repeat-sad" name="sad"
+                           v-on:click="processForm('sad')"
                               title="reduce next repeat interval (days) by half">
                           <SvgSad/>
                       </button>
                       <button type="submit" class="btn btn-light" id="repeat-satisfied" name="satisfying"
+                           v-on:click="processForm('satisfying')"
                               title="use normal repeat interval (days)">
                           <SvgSatisfying/>
                       </button>
                       <button type="submit" class="btn btn-light" id="repeat-happy" name="happy"
+                           v-on:click="processForm('happy')"
                               title="add to next repeat interval (days) by half">
                           <SvgHappy/>
                       </button>
                     </template>
 
                 </div>
-            </form>
             <div class="btn-group dropup">
                 <button type="button" id="more-action-for-repeat" class="btn btn-light dropdown-toggle"
                         data-toggle="dropdown" aria-haspopup="true"
@@ -83,6 +85,8 @@
     noteViewedByUser: Object,
     linkViewedByUser: Object})
 
+  const emit = defineEmit(['evaluated'])
+
   const sourceNoteViewedByUser = computed(()=> {
     if(!!props.noteViewedByUser) {
       return props.noteViewedByUser
@@ -98,5 +102,26 @@
     }
     return false
   })
+
+  const processForm = function(selfEvaluate) {
+      fetch(`/api/reviews/${props.reviewPoint.id}/self-evaluate`, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: selfEvaluate
+      })
+        .then(res => {
+          return res.json();
+        })
+        .then(resp => {
+          console.log(resp)
+          emit('evaluated', resp)
+        })
+        .catch(error => {
+          window.alert(error);
+        });
+    }
 
 </script>

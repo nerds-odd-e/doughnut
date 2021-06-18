@@ -14,7 +14,6 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -79,6 +78,23 @@ class RestReviewsController {
       answerResult.setAnswerNote(modelFactoryService.noteRepository.findById(answer.getAnswerNoteId()).orElse(null));
     }
     return answerResult;
+  }
+
+  @PostMapping(path="/{reviewPoint}/self-evaluate")
+  public Integer selfEvaluate(ReviewPoint reviewPoint, @RequestBody String selfEvaluation) {
+    if (selfEvaluation.equals("again")) {
+        return modelFactoryService.toReviewPointModel(reviewPoint).increaseRepetitionCountAndSave();
+    }
+    if (selfEvaluation.equals("satisfying")) {
+        return modelFactoryService.toReviewPointModel(reviewPoint).repeated(testabilitySettings.getCurrentUTCTimestamp());
+    }
+    if (selfEvaluation.equals("sad")) {
+        return modelFactoryService.toReviewPointModel(reviewPoint).repeatedSad(testabilitySettings.getCurrentUTCTimestamp());
+    }
+    if (selfEvaluation.equals("happy")) {
+        return modelFactoryService.toReviewPointModel(reviewPoint).repeatedHappy(testabilitySettings.getCurrentUTCTimestamp());
+    }
+    return -1;
   }
 
 }

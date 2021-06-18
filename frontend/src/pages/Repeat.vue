@@ -2,7 +2,7 @@
   <LoadingThinBar v-if="loading"/>
   <template v-if="!!repetition" v-bind="{repetition}">
     <Quiz v-if="!!repetition.quizQuestion && !answerResult" v-bind="repetition" @answered="answerResult=$event"/>
-    <Repetition v-else v-bind="{...repetition.reviewPointViewedByUser, answerResult, sadOnly: false}"/>
+    <Repetition v-else v-bind="{...repetition.reviewPointViewedByUser, answerResult, sadOnly: false}" @evaluated="loadNew()"/>
   </template>
   <div v-else><ContentLoader /></div>
 </template>
@@ -39,6 +39,7 @@ export default {
         })
         .then(resp => {
           this.repetition = resp;
+          this.answerResult = null;
           this.loading = false
           if (!this.repetition.reviewPointViewedByUser) {
             this.$router.push({name: "reviews"})
@@ -47,6 +48,9 @@ export default {
         .catch(error => {
           window.alert(error);
         });
+    },
+    loadNew() {
+      this.fetchData()
     }
   }
 

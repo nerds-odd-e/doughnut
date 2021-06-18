@@ -74,11 +74,6 @@ public class ReviewController extends ApplicationMvcController  {
         return "vuejsed";
     }
 
-    @PostMapping("/{reviewPoint}/answer")
-    public String answerQuiz(ReviewPoint reviewPoint, @Valid AnswerResult answerResult) {
-        return "reviews/repeat";
-    }
-
     @PostMapping(path="/{reviewPoint}", params="remove")
     public String removeFromRepeating(@Valid ReviewPoint reviewPoint) {
         reviewPoint.setRemovedFromReview(true);

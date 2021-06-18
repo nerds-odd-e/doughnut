@@ -15,7 +15,7 @@ describe('repetition page', () => {
     expect(wrapper.findAll(".btn-toolbar")).toHaveLength(1)
   });
 
-  xtest('for link', async () => {
+  test('for link', async () => {
     const reviewPointForView = {
       reviewPoint: {
         id: 3,

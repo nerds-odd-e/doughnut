@@ -46,7 +46,6 @@
   })
 
   const processForm = function() {
-          console.log(props.emptyAnswer);
       fetch(`/api/reviews/${props.reviewPointViewedByUser.reviewPoint.id}/answer`, {
         method: 'POST',
         headers: {
