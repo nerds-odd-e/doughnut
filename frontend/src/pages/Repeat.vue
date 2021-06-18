@@ -1,36 +1,54 @@
 <template>
   <LoadingThinBar v-if="loading"/>
-  <ReviewWelcome v-if="!!repetition" v-bind="{repetition}"/>
+  <template v-if="!!repetition" v-bind="{repetition}">
+    <Quiz v-if="!!repetition.quizQuestion" v-bind="{repetition}"/>
+    <Repetition v-else v-bind="{...repetition.reviewPointViewedByUser, sadOnly: false}"/>
+  </template>
   <div v-else><ContentLoader /></div>
 </template>
 
-<script setup>
-import ReviewWelcome from '../components/review/ReviewWelcome.vue'
+<script>
+import Quiz from '../components/review/Quiz.vue'
+import Repetition from '../components/review/Repetition.vue'
 import ContentLoader from "../components/ContentLoader.vue"
 import LoadingThinBar from "../components/LoadingThinBar.vue"
 import { ref, inject } from 'vue'
 
-const repetition = ref(null)
-const loading = ref(false)
+export default {
+  components: {
+    Quiz, Repetition, ContentLoader, LoadingThinBar
+  },
+  data() {
+    return {
+      repetition: ref(null),
+      loading: ref(false)
+    }
+  },
 
-const fetchData = async () => {
-  loading.value = true
-  fetch(`/api/reviews/repeat`)
-    .then(res => {
-      return res.json();
-    })
-    .then(resp => {
-      repetition.value = resp;
-      loading.value = false
-      if (!repetition.ReviewPointViewedByUser) {
-        $router.push({name: "reviews"})
-      }
-    })
-    .catch(error => {
-      window.alert(error);
-    });
+  mounted() {
+    this.fetchData();
+  },
+
+  methods: {
+    fetchData() {
+      this.loading = true
+      fetch(`/api/reviews/repeat`)
+        .then(res => {
+          return res.json();
+        })
+        .then(resp => {
+          this.repetition = resp;
+          this.loading = false
+          if (!this.repetition.reviewPointViewedByUser) {
+            this.$router.push({name: "reviews"})
+          }
+        })
+        .catch(error => {
+          window.alert(error);
+        });
+    }
+  }
+
 }
-
-fetchData()
 
 </script>
