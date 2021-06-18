@@ -1,6 +1,7 @@
 
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -32,26 +34,16 @@ class RestHealthCheckController {
     }
 
     class Res {
-        public List<User> users;
-        public Integer badcount = 0;
+        public List<Notebook> notebooks;
 
     }
     @GetMapping("/backdoor")
     @Transactional
     public Res backdoor() {
 
-        modelFactoryService.linkRepository.findAll().forEach(link-> {
-            link.setTypeId(link.getLinkType().id);
-            modelFactoryService.linkRepository.save(link);
-        });
-
-        Res r = new Res();
-        modelFactoryService.linkRepository.findAll().forEach(link-> {
-            if (link.getTypeId() == null)
-                r.badcount += 1;
-        });
-
-        r.users = StreamSupport.stream(modelFactoryService.userRepository.findAll().spliterator(), false).collect(Collectors.toList());
+        Res r= new Res();
+        final User user = modelFactoryService.userRepository.findById(3).get();
+        r.notebooks = user.getOwnership().getNotebooks();
         return r;
     }
 }

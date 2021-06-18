@@ -9,9 +9,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.odde.doughnut.entities.QuizQuestion.QuestionType.LINK_SOURCE_EXCLUSIVE;
@@ -62,13 +60,19 @@ public class Link {
             this.questionTypes = questionTypes;
         }
 
-        public static LinkType fromString(String text) {
+        private static final Map<Integer, LinkType> idMap = Collections.unmodifiableMap(Arrays.stream(values()).collect(Collectors.toMap(x->x.id, x->x)));
+
+        public static LinkType fromLabel(String text) {
             for (LinkType b : LinkType.values()) {
                 if (b.label.equalsIgnoreCase(text)) {
                     return b;
                 }
             }
             return null;
+        }
+
+        public static LinkType fromId(Integer id) {
+            return idMap.getOrDefault(id, null);
         }
 
         public LinkType reverseType() {
@@ -111,7 +115,8 @@ public class Link {
     @Column(name = "type")
     @Getter
     @Setter
-    private String type;
+    @JsonIgnore
+    private String typeLabel = "xxx";
 
     @Column(name = "type_id")
     @Getter
@@ -134,15 +139,21 @@ public class Link {
     @JsonIgnore
     private final List<ReviewPoint> reviewPointEntities = new ArrayList<>();
 
+    @JsonIgnore
     public LinkType getLinkType() {
-        return LinkType.fromString(type);
+        return LinkType.fromId(typeId);
+    }
+
+    public String getLinkTypeLabel() {
+        return getLinkType().label;
     }
 
     public void setLinkType(LinkType linkType) {
         if (linkType == null) {
-            type = null;
+            typeId = null;
         }
-        type = linkType.label;
+        typeId = linkType.id;
+        typeLabel = linkType.label;
     }
 
     @JsonIgnore

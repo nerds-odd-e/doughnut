@@ -14,8 +14,8 @@
         <form action="#" th:action="@{/links/create_link}" th:object="${link}" method="post">
             <input th:field="*{sourceNote}" type="hidden"/>
             <input th:field="*{targetNote}" type="hidden"/>
-            <select th:replace="_fragments/forms :: selectControl('link', 'type', ~{:: .options})">
-                <option class="options" th:each="i : ${link.possibleLinkTypes}" th:value="${i.label}" th:text="${i.label}"/>
+            <select th:replace="_fragments/forms :: selectControl('link', 'typeId', ~{:: .options})">
+                <option class="options" th:each="i : ${link.possibleLinkTypes}" th:value="${i.id}" th:text="${i.label}"/>
             </select>
             <input type="submit" value="Link" class="btn btn-primary"/>
         </form>

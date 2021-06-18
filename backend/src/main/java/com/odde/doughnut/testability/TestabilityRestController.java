@@ -91,13 +91,13 @@ class TestabilityRestController {
 
     @PostMapping("/link_notes")
     @Transactional
-    public String linkNotes(@RequestBody HashMap<String, String> userInfo) {
+    public String linkNotes(@RequestBody HashMap<String, String> linkInfo) {
         Link link = new Link();
-        link.setTargetNote(noteRepository.findById(Integer.valueOf(userInfo.get("target_id"))).get());
-        Note sourceNote = noteRepository.findById(Integer.valueOf(userInfo.get("source_id"))).get();
+        link.setTargetNote(noteRepository.findById(Integer.valueOf(linkInfo.get("target_id"))).get());
+        Note sourceNote = noteRepository.findById(Integer.valueOf(linkInfo.get("source_id"))).get();
         link.setSourceNote(sourceNote);
         link.setUser(sourceNote.getUser());
-        link.setType(userInfo.get("type"));
+        link.setLinkType(Link.LinkType.fromLabel(linkInfo.get("type")));
         linkRepository.save(link);
         return "OK";
     }
