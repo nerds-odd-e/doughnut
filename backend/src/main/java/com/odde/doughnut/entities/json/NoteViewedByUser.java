@@ -23,7 +23,7 @@ public class NoteViewedByUser {
     private Notebook notebook;
     @Getter
     @Setter
-    private Map<Link.LinkType, LinkViewedByUser> links;
+    private Map<Link.LinkType, LinkViewed> links;
     @Getter
     @Setter
     private NoteNavigation navigation;

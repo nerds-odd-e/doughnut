@@ -2,9 +2,11 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
+import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.NoteViewedByUser;
+import com.odde.doughnut.entities.json.ReviewPointViewedByUser;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.ReviewPointModel;
 import com.odde.doughnut.models.Reviewing;
@@ -40,22 +42,32 @@ class RestReviewsController {
     return user.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
   }
 
+  class RepetitionForUser {
+    @Getter @Setter
+    private ReviewPointViewedByUser reviewPointViewedByUser;
+    @Getter @Setter
+    private QuizQuestion quizQuestion;
+    @Getter @Setter
+    private Answer emptyAnswer;
+  }
+
   @GetMapping("/repeat")
-  public String repeatReview(Model model) {
+  public RepetitionForUser repeatReview(Model model) {
     UserModel user = currentUserFetcher.getUser();
     Reviewing reviewing = user.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
     ReviewPointModel reviewPointModel = reviewing.getOneReviewPointNeedToRepeat(testabilitySettings.getRandomizer());
+
+    RepetitionForUser repetitionForUser = new RepetitionForUser();
+
     if(reviewPointModel != null) {
-      model.addAttribute("reviewPoint", reviewPointModel.getEntity());
+      repetitionForUser.setReviewPointViewedByUser(ReviewPointViewedByUser.getReviewPointViewedByUser(reviewPointModel.getEntity(), user.getEntity()));
       QuizQuestion quizQuestion = reviewPointModel.generateAQuizQuestion(testabilitySettings.getRandomizer());
-      if (quizQuestion == null) {
-        return "reviews/repeat";
+      if (quizQuestion != null) {
+          repetitionForUser.setQuizQuestion(quizQuestion);
+          repetitionForUser.setEmptyAnswer(quizQuestion.buildAnswer());
       }
-      model.addAttribute("quizQuestion", quizQuestion);
-      model.addAttribute("emptyAnswer", quizQuestion.buildAnswer());
-      return "reviews/quiz";
     }
-    return "redirect:/reviews";
+    return repetitionForUser;
   }
 
 }

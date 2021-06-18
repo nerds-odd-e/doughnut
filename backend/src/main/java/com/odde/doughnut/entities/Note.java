@@ -2,7 +2,7 @@ package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.algorithms.SiblingOrder;
-import com.odde.doughnut.entities.json.LinkViewedByUser;
+import com.odde.doughnut.entities.json.LinkViewed;
 import com.odde.doughnut.entities.json.NoteViewedByUser;
 import lombok.Getter;
 import lombok.Setter;
@@ -133,8 +133,8 @@ public class Note {
         return nvb;
     }
 
-    public Map<Link.LinkType, LinkViewedByUser> getAllLinks(User viewer) {
-        return linkTypes(viewer).stream().collect(Collectors.toMap(x->x, x->new LinkViewedByUser(){{
+    public Map<Link.LinkType, LinkViewed> getAllLinks(User viewer) {
+        return linkTypes(viewer).stream().collect(Collectors.toMap(x->x, x->new LinkViewed(){{
                 setDirect(linksOfTypeThroughDirect(x));
                 setReverse(linksOfTypeThroughReverse(x, viewer));
         }}));
