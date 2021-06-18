@@ -25,9 +25,11 @@
         </div>
 
         <div v-else>
-            <form th:action="@{/reviews/{id}/answer(id=${reviewPoint.id})}" th:object="${emptyAnswer}" method="post">
-                <input type="hidden" th:field="*{questionType}"/>
-                <div class="aaa" th:insert="_fragments/forms :: textInput('review_point', 'answer', 'put your answer here', true)"/>
+            <form :action="`/reviews/${reviewPointViewedByUser.reviewPoint.id}/answer`" method="post">
+                <input type="hidden" name="questionType" :value="emptyAnswer.questionType"/>
+                <div class="aaa">
+                   <TextInput scopeName='review_point' field='answer' placeholder='put your answer here' :autofocus="true"/>
+                </div>
                 <input type="submit" value="OK" class="btn btn-primary btn-lg btn-block"/>
             </form>
         </div>
@@ -36,6 +38,7 @@
 <script setup>
   import NoteBreadcrumbForReview from "./NoteBreadcrumbForReview.vue"
   import ShowPicture from "../notes/ShowPicture.vue"
+  import TextInput from "../form/TextInput.vue"
   import { computed } from 'vue'
 
   const props = defineProps({reviewPointViewedByUser: Object, quizQuestion: Object, emptyAnswer: Object})
