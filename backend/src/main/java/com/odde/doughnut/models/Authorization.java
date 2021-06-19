@@ -3,6 +3,9 @@ package com.odde.doughnut.models;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -93,5 +96,12 @@ public class Authorization {
   public boolean isDeveloper() {
     if (user == null) return false;
     return allowUsers.contains(user.getName());
+  }
+
+  public void assertLoggedIn() {
+      if (user == null) {
+        throw new ResponseStatusException(
+                HttpStatus.UNAUTHORIZED, "Foo Not Found");
+      }
   }
 }

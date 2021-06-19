@@ -37,6 +37,7 @@ class RestReviewsController {
   @GetMapping("/overview")
   public Reviewing overview() {
     UserModel user = currentUserFetcher.getUser();
+    user.getAuthorization().assertLoggedIn();
     return user.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
   }
 
@@ -52,6 +53,7 @@ class RestReviewsController {
   @GetMapping("/repeat")
   public RepetitionForUser repeatReview() {
     UserModel user = currentUserFetcher.getUser();
+    user.getAuthorization().assertLoggedIn();
     Reviewing reviewing = user.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
     ReviewPointModel reviewPointModel = reviewing.getOneReviewPointNeedToRepeat(testabilitySettings.getRandomizer());
 
@@ -70,6 +72,8 @@ class RestReviewsController {
 
   @PostMapping("/{reviewPoint}/answer")
   public AnswerResult answerQuiz(ReviewPoint reviewPoint, @Valid @RequestBody Answer answer) {
+    UserModel user = currentUserFetcher.getUser();
+    user.getAuthorization().assertLoggedIn();
     AnswerResult answerResult = new AnswerResult();
     answerResult.setReviewPoint(reviewPoint);
     answerResult.setQuestionType(answer.getQuestionType());
@@ -82,6 +86,8 @@ class RestReviewsController {
 
   @PostMapping(path="/{reviewPoint}/self-evaluate")
   public RepetitionForUser selfEvaluate(ReviewPoint reviewPoint, @RequestBody String selfEvaluation) {
+    UserModel user = currentUserFetcher.getUser();
+    user.getAuthorization().assertLoggedIn();
      evaluate(reviewPoint, selfEvaluation);
      return repeatReview();
   }
