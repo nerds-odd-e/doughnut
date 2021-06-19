@@ -27,7 +27,7 @@ public class NoteViewedByUserTest {
         Link link;
         final LinkViewed linkViewedByUser = new LinkViewed();
         Map<Link.LinkType, LinkViewed> links = new HashMap<>(){{
-            put(Link.LinkType.BELONGS_TO, linkViewedByUser);
+            put(Link.LinkType.SPECIALIZE, linkViewedByUser);
         }};
         NoteViewedByUser value;
 

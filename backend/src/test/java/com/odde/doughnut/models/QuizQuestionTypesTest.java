@@ -72,7 +72,7 @@ class QuizQuestionTypesTest {
             void shouldIncludeRightAnswers() {
                 makeMe.refresh(top);
                 QuizQuestion quizQuestion = buildLinSourceExclusiveQuizQuestion();
-                assertThat(quizQuestion.getDescription(), equalTo("Which of the following does not belong to"));
+                assertThat(quizQuestion.getDescription(), equalTo("Which of the following is <em>NOT</em> a specialization of"));
                 assertThat(quizQuestion.getMainTopic(), equalTo(target.getTitle()));
                 List<String> options = toOptionStrings(quizQuestion);
                 assertThat(anotherSource.getTitle(), in(options));

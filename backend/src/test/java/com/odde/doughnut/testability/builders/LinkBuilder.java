@@ -28,7 +28,7 @@ public class LinkBuilder extends EntityBuilder<Link> {
     }
 
     public LinkBuilder between(Note from, Note to) {
-        return between(from, to, Link.LinkType.BELONGS_TO);
+        return between(from, to, Link.LinkType.SPECIALIZE);
     }
 
     public LinkBuilder createdAt(Timestamp timestamp) {

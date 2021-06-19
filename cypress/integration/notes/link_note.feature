@@ -30,4 +30,4 @@ Feature: link note
     And I link note "Sedition" as "is similar to" note "Sedative"
     Then I should see "Sedition" has link "is similar to" "Sedation, Sedative"
     When I open link "Sedation"
-    Then I should be able to change the link to "belongs to"
+    Then I should be able to change the link to "is a specialization of"

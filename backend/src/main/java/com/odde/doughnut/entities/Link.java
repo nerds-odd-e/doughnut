@@ -21,8 +21,8 @@ public class Link {
 
     public enum LinkType {
         RELATED_TO(1, "is related to", "is not related to", new QuestionType[0]),
-        /* a subclass of */ BELONGS_TO(2, "belongs to", "does not belong to", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        /* a superclass of */ HAS(3, "has", "does not have", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        SPECIALIZE(2, "is a specialization of", "is not a specialization of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        GENERALIZE(3, "is a generalization of", "is not a generalization of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
 
         INSTANCE(4, "is an instance of", "is not an instance of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
         HAS_INSTANCE(5, "has instances", "not have as an instance", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
@@ -76,8 +76,8 @@ public class Link {
         }
 
         public LinkType reverseType() {
-            if (this.equals(BELONGS_TO)) return HAS;
-            if (this.equals(HAS)) return BELONGS_TO;
+            if (this.equals(SPECIALIZE)) return GENERALIZE;
+            if (this.equals(GENERALIZE)) return SPECIALIZE;
             if (this.equals(BROUGHT_BY)) return AUTHOR_OF;
             if (this.equals(AUTHOR_OF)) return BROUGHT_BY;
             if (this.equals(USES)) return USED_BY;
@@ -156,7 +156,7 @@ public class Link {
 
     @JsonIgnore
     public String getExclusiveQuestion() {
-        return getLinkType().exclusiveQuestion;
+        return getLinkType().exclusiveQuestion.replace("not ", "<em>NOT</em> ");
     }
 
     @JsonIgnore

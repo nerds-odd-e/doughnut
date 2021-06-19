@@ -56,7 +56,7 @@ const noteViewedByUser = {
                         "head": false,
                         "title": "bbb"
                     },
-                    "type": "belongs to",
+                    "type": "iw a specialization of",
                     "createdAt": "2021-06-14T11:01:26.000+00:00",
                     "linkType": "BELONGS_TO"
                 }

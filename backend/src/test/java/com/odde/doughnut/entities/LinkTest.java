@@ -47,7 +47,7 @@ public class LinkTest {
             link.setSourceNote(noteA);
             link.setTargetNote(noteB);
             assertTrue(link.getPossibleLinkTypes().contains(RELATED_TO));
-            assertTrue(link.getPossibleLinkTypes().contains(BELONGS_TO));
+            assertTrue(link.getPossibleLinkTypes().contains(SPECIALIZE));
         }
 
         @Nested
@@ -78,21 +78,21 @@ public class LinkTest {
         class BelongsTo {
             @BeforeEach
             void setup() {
-                makeMe.theNote(noteA).linkTo(noteB, BELONGS_TO).please();
+                makeMe.theNote(noteA).linkTo(noteB, SPECIALIZE).please();
             }
 
             @Test
             void ABelongToB() {
                 final Map<Link.LinkType, LinkViewed> allLinks = noteA.getAllLinks(null);
-                assertThat(allLinks.keySet(), contains(BELONGS_TO));
-                assertThat(getLinksOfBothDirection(BELONGS_TO, allLinks), contains(noteB));
+                assertThat(allLinks.keySet(), contains(SPECIALIZE));
+                assertThat(getLinksOfBothDirection(SPECIALIZE, allLinks), contains(noteB));
             }
 
             @Test
             void BHasA() {
                 final Map<Link.LinkType, LinkViewed> allLinks = noteB.getAllLinks(null);
-                assertThat(allLinks.keySet(), contains(HAS));
-                assertThat(getLinksOfBothDirection(HAS, allLinks), contains(noteA));
+                assertThat(allLinks.keySet(), contains(GENERALIZE));
+                assertThat(getLinksOfBothDirection(GENERALIZE, allLinks), contains(noteA));
             }
 
             @Test
@@ -102,7 +102,7 @@ public class LinkTest {
                 link.setSourceNote(noteA);
                 link.setTargetNote(noteB);
                 assertTrue(link.getPossibleLinkTypes().contains(RELATED_TO));
-                assertFalse(link.getPossibleLinkTypes().contains(BELONGS_TO));
+                assertFalse(link.getPossibleLinkTypes().contains(SPECIALIZE));
             }
 
         }
@@ -111,21 +111,21 @@ public class LinkTest {
         class Has {
             @BeforeEach
             void setup() {
-                makeMe.theNote(noteA).linkTo(noteB, HAS).please();
+                makeMe.theNote(noteA).linkTo(noteB, GENERALIZE).please();
             }
 
             @Test
             void AHasB() {
                 final Map<Link.LinkType, LinkViewed> allLinks = noteA.getAllLinks(null);
-                assertThat(allLinks.keySet(), contains(HAS));
-                assertThat(getLinksOfBothDirection(HAS, allLinks), contains(noteB));
+                assertThat(allLinks.keySet(), contains(GENERALIZE));
+                assertThat(getLinksOfBothDirection(GENERALIZE, allLinks), contains(noteB));
             }
 
             @Test
             void BBelongsToA() {
                 final Map<Link.LinkType, LinkViewed> allLinks = noteB.getAllLinks(null);
-                assertThat(allLinks.keySet(), contains(BELONGS_TO));
-                assertThat(getLinksOfBothDirection(BELONGS_TO, allLinks), contains(noteA));
+                assertThat(allLinks.keySet(), contains(SPECIALIZE));
+                assertThat(getLinksOfBothDirection(SPECIALIZE, allLinks), contains(noteA));
             }
 
         }
@@ -158,8 +158,8 @@ public class LinkTest {
         }
 
         private boolean hasReverseLinkFor(Note source, User viewer) {
-            makeMe.theNote(source).linkTo(target, HAS).please();
-            final LinkViewed linksMap = target.getAllLinks(viewer).get(BELONGS_TO);
+            makeMe.theNote(source).linkTo(target, GENERALIZE).please();
+            final LinkViewed linksMap = target.getAllLinks(viewer).get(SPECIALIZE);
             if (linksMap == null) return false;
             final List<Link> links = linksMap.getReverse();
             return !links.isEmpty();

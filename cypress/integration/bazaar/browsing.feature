@@ -12,7 +12,7 @@ Feature: Bazaar browsing
       | interface       | their interfaces are different   | In OOP        | true               | true                  |
       | precondition    | square has stronger precondition | In OOP        | true               | true                  |
       | Shapes are good |                                  | Shape         | false              | false                 |
-    And there is "belongs to" link between note "Square" and "Rectangle"
+    And there is "is a specialization of" link between note "Square" and "Rectangle"
     And notebook "Shape" is shared to the Bazaar
 
   Scenario: Browsing as non-user

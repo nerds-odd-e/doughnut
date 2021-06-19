@@ -33,7 +33,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
     }
 
     public NoteBuilder linkTo(Note referTo) {
-        return linkTo(referTo, Link.LinkType.BELONGS_TO);
+        return linkTo(referTo, Link.LinkType.SPECIALIZE);
     }
 
 

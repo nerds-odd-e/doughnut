@@ -9,7 +9,7 @@ Feature: Repetition Link Quiz
       | Moon  | true       | Space         |
       | Earth | true       | Space         |
       | Mars  | true       | Space         |
-    And there is "belongs to" link between note "Moon" and "Earth"
+    And there is "is a specialization of" link between note "Moon" and "Earth"
 
   Scenario Outline: "Belongs to" question
     Given It's day 1, 8 hour
@@ -17,7 +17,7 @@ Feature: Repetition Link Quiz
       | review_type | title |
       | link        | Moon  |
     When I am repeat-reviewing my old note on day 2
-    Then I should be asked link question "Moon" "belongs to" with options "Earth, Mars"
+    Then I should be asked link question "Moon" "is a specialization of" with options "Earth, Mars"
     When I choose answer "<answer>"
     Then I should see that my answer <result>
 
