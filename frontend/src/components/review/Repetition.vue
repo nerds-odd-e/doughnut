@@ -85,7 +85,7 @@
     noteViewedByUser: Object,
     linkViewedByUser: Object})
 
-  const emit = defineEmit(['evaluated'])
+  const emit = defineEmit(['selfEvaluate'])
 
   const sourceNoteViewedByUser = computed(()=> {
     if(!!props.noteViewedByUser) {
@@ -103,24 +103,8 @@
     return false
   })
 
-  const processForm = function(selfEvaluate) {
-      fetch(`/api/reviews/${props.reviewPoint.id}/self-evaluate`, {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: selfEvaluate
-      })
-        .then(res => {
-          return res.json();
-        })
-        .then(resp => {
-          emit('evaluated', resp)
-        })
-        .catch(error => {
-          window.alert(error);
-        });
+  const processForm = function(evaluation) {
+      emit('selfEvaluate', evaluation)
     }
 
 </script>

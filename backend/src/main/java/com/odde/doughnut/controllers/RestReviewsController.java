@@ -14,7 +14,9 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -93,19 +95,20 @@ class RestReviewsController {
   }
 
   private int evaluate(ReviewPoint reviewPoint, String selfEvaluation) {
-    if (selfEvaluation.equals("again")) {
+    if (selfEvaluation.equals("\"again\"")) {
         return modelFactoryService.toReviewPointModel(reviewPoint).increaseRepetitionCountAndSave();
     }
-    if (selfEvaluation.equals("satisfying")) {
+    if (selfEvaluation.equals("\"satisfying\"")) {
         return modelFactoryService.toReviewPointModel(reviewPoint).repeated(testabilitySettings.getCurrentUTCTimestamp());
     }
-    if (selfEvaluation.equals("sad")) {
+    if (selfEvaluation.equals("\"sad\"")) {
         return modelFactoryService.toReviewPointModel(reviewPoint).repeatedSad(testabilitySettings.getCurrentUTCTimestamp());
     }
-    if (selfEvaluation.equals("happy")) {
+    if (selfEvaluation.equals("\"happy\"")) {
         return modelFactoryService.toReviewPointModel(reviewPoint).repeatedHappy(testabilitySettings.getCurrentUTCTimestamp());
     }
-    return -1;
+
+    throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
   }
 
 }

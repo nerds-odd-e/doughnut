@@ -19,13 +19,14 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.validation.Valid;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
-class RestReviewingControllerTests {
+class RestReviewsControllerTests {
     @Autowired
     ModelFactoryService modelFactoryService;
 
@@ -80,6 +81,44 @@ class RestReviewingControllerTests {
             ReviewPoint reviewPoint = new ReviewPoint();
             assertThrows(ResponseStatusException.class, () -> controller().selfEvaluate(reviewPoint, "happy"));
         }
+    }
+    @Nested
+    class WhenThereIsAReviewPoint {
+        ReviewPoint rp;
+        final int expectedSatisfyingForgettingCurveIndex = 110;
+
+        @BeforeEach
+        void setup() {
+            rp = makeMe.aReviewPointFor(makeMe.aNote().please()).by(userModel).please();
+        }
+
+
+        @Test
+        void repeat() {
+            controller().selfEvaluate(rp, "\"satisfying\"");
+            assertThat(rp.getForgettingCurveIndex(), equalTo(expectedSatisfyingForgettingCurveIndex));
+            assertThat(rp.getRepetitionCount(), equalTo(1));
+        }
+
+        @Test
+        void repeatSad() {
+            controller().selfEvaluate(rp, "\"sad\"");
+            assertThat(rp.getForgettingCurveIndex(), lessThan(expectedSatisfyingForgettingCurveIndex));
+            assertThat(rp.getRepetitionCount(), equalTo(1));
+        }
+
+        @Test
+        void repeatHappy() {
+            controller().selfEvaluate(rp, "\"happy\"");
+            assertThat(rp.getForgettingCurveIndex(), greaterThan(expectedSatisfyingForgettingCurveIndex));
+            assertThat(rp.getRepetitionCount(), equalTo(1));
+        }
+
+        @Test
+        void repeatUnknown() {
+            assertThrows(ResponseStatusException.class, ()-> controller().selfEvaluate(rp, "unknown"));
+        }
+
     }
 
 }

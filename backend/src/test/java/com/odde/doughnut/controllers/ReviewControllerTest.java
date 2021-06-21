@@ -64,28 +64,6 @@ class ReviewControllerTest {
             controller.removeFromRepeating(rp);
             assertThat(rp.getRemovedFromReview(), is(true));
         }
-
-        @Test
-        void repeat() {
-            controller.doRepeat(rp);
-            assertThat(rp.getForgettingCurveIndex(), equalTo(expectedSatisfyingForgettingCurveIndex));
-            assertThat(rp.getRepetitionCount(), equalTo(1));
-        }
-
-        @Test
-        void repeatSad() {
-            controller.doRepeatSad(rp);
-            assertThat(rp.getForgettingCurveIndex(), lessThan(expectedSatisfyingForgettingCurveIndex));
-            assertThat(rp.getRepetitionCount(), equalTo(1));
-        }
-
-        @Test
-        void repeatHappy() {
-            controller.doRepeatHappy(rp);
-            assertThat(rp.getForgettingCurveIndex(), greaterThan(expectedSatisfyingForgettingCurveIndex));
-            assertThat(rp.getRepetitionCount(), equalTo(1));
-        }
-
     }
 
 }

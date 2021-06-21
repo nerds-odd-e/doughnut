@@ -39,30 +39,14 @@
   import { computed, defineEmit, ref } from 'vue'
 
   const props = defineProps({reviewPointViewedByUser: Object, quizQuestion: Object, emptyAnswer: Object})
-  const emit = defineEmit(['answered'])
+  const emit = defineEmit(['answer'])
   const sourceNote = computed(()=>{
     if (!!props.reviewPointViewedByUser.noteViewedByUser) return props.reviewPointViewedByUser.noteViewedByUser
     return props.reviewPointViewedByUser.linkViewedByUser.sourceNoteViewedByUser
   })
 
   const processForm = function() {
-      fetch(`/api/reviews/${props.reviewPointViewedByUser.reviewPoint.id}/answer`, {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(props.emptyAnswer)
-      })
-        .then(res => {
-          return res.json();
-        })
-        .then(resp => {
-          emit('answered', resp)
-        })
-        .catch(error => {
-          window.alert(error);
-        });
-    }
+      emit('answer', props.emptyAnswer)
+  }
 
 </script>
