@@ -10,10 +10,10 @@ const reloadSession = () => {
     window.location.reload();
 }
 
-const restGet = (url, loadingRef, callback) => {
+const restRequest = (url, params, loadingRef, callback) => {
   if (loadingRef instanceof Function) {loadingRef(true)}
   else { loadingRef.value = true }
-  fetch(url)
+  fetch(url, params)
     .then(res => {
       if (res.status !== 200) {
           throw new HttpResponseError(res.status)
@@ -34,4 +34,19 @@ const restGet = (url, loadingRef, callback) => {
     });
 }
 
-export {restGet}
+const restGet = (url, loadingRef, callback) => {
+    restRequest(url, {}, loadingRef, callback)
+}
+
+const restPost = (url, data, loadingRef, callback) => {
+    restRequest(url, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    }, loadingRef, callback)
+}
+
+export {restGet, restPost}

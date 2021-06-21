@@ -18,3 +18,4 @@ Feature: Logged in status
     When I am repeat-reviewing my old note on day 2
     And my session is logged out
     When I choose to do it again
+    And when I login as "old_learner" I should see "Fungible"

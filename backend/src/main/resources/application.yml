@@ -94,6 +94,7 @@ server:
   port: 9082
 
 ---
+
 spring:
   profiles: prod
   resources:
@@ -127,4 +128,6 @@ spring:
   github-for-issues:
     repo: nerds-odd-e/doughnut
 server:
+  error:
+    include-stacktrace: never
   forward-headers-strategy: FRAMEWORK

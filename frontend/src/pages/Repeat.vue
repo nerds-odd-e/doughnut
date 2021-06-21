@@ -14,7 +14,7 @@ import Quiz from '../components/review/Quiz.vue'
 import Repetition from '../components/review/Repetition.vue'
 import ContentLoader from "../components/ContentLoader.vue"
 import LoadingThinBar from "../components/LoadingThinBar.vue"
-import {restGet} from "../restful/restful"
+import { restGet, restPost } from "../restful/restful"
 import { ref, inject } from 'vue'
 
 export default {
@@ -39,47 +39,19 @@ export default {
     },
 
     processAnswer(answerData) {
-      this.loading = true
-      fetch(`/api/reviews/${this.repetition.reviewPointViewedByUser.reviewPoint.id}/answer`, {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(answerData)
-      })
-        .then(res => {
-          return res.json();
-        })
-        .then(resp => {
-          this.answerResult = resp
-          this.loading = false
-        })
-        .catch(error => {
-          window.alert(error);
-        });
+      restPost(
+        `/api/reviews/${this.repetition.reviewPointViewedByUser.reviewPoint.id}/answer`,
+        answerData,
+         (val)=>this.loading=val,
+         (res)=>this.answerResult = res)
     },
 
     selfEvaluate(data) {
-      this.loading = true
-      fetch(`/api/reviews/${this.repetition.reviewPointViewedByUser.reviewPoint.id}/self-evaluate`, {
-        method: 'POST',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-      })
-        .then(res => {
-          return res.json();
-        })
-        .then(resp => {
-          this.loadNew(resp)
-          this.loading = false
-        })
-        .catch(error => {
-          window.alert(error);
-        });
+      restPost(
+        `/api/reviews/${this.repetition.reviewPointViewedByUser.reviewPoint.id}/self-evaluate`,
+        data,
+         (val)=>this.loading=val,
+         this.loadNew)
     },
 
     loadNew(resp) {
