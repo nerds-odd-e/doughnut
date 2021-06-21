@@ -1,16 +1,14 @@
 <template>
-  <LoadingThinBar v-if="loading"/>
-  <div v-if="noteViewedByUser">
-    <NoteViewedByUser v-bind="noteViewedByUser"/>
-  </div>
-  <div v-else><ContentLoader /></div>
-
+  <LoadingPage v-bind="{loading, contentExists: !!noteViewedByUser}">
+    <div v-if="noteViewedByUser">
+      <NoteViewedByUser v-bind="noteViewedByUser"/>
+    </div>
+  </LoadingPage>
 </template>
 
 <script setup>
 import NoteViewedByUser from "../components/notes/NoteViewedByUser.vue"
-import ContentLoader from "../components/ContentLoader.vue"
-import LoadingThinBar from "../components/LoadingThinBar.vue"
+import LoadingPage from "./LoadingPage.vue"
 import {restGet} from "../restful/restful"
 import { ref, watch, defineProps } from "vue"
 

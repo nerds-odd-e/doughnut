@@ -1,11 +1,19 @@
 <template>
-  <LoadingPage v-bind="{loading, contentExists: !!repetition}">
-    <template v-if="!!repetition" v-bind="{repetition}">
-      <Quiz v-if="!!repetition.quizQuestion && !answerResult" v-bind="repetition" @answer="processAnswer($event)"/>
-      <template v-else>
-      <Repetition v-if="repetition.reviewPointViewedByUser" v-bind="{...repetition.reviewPointViewedByUser, answerResult, sadOnly: false}" @selfEvaluate="selfEvaluate($event)"/>
-      </template>
-    </template>
+  <LoadingPage v-bind="{loading, contentExists: !!noteViewedByUser}">
+  <div th:replace="_fragments/review_fragments :: showReviewPoint(${reviewPoint})"/>
+
+  <form id="review-setting" ction="#" th:action="@{/reviews/}" th:object="${reviewPoint}" method="post">
+      <div class="mb-2">
+          <input th:field="*{note}" type="hidden"/>
+          <input th:field="*{link}" type="hidden"/>
+          <div th:if="${reviewSetting}">
+              <div th:replace="_fragments/note_fragments :: reviewSettingForm(${reviewSetting})"/>
+          </div>
+      </div>
+      <input type="submit" name="submit" value="Keep for repetition" class="btn btn-primary"/>
+      <input type="submit" name="skip" value="Skip repetition" class="btn btn-secondary"
+          onclick="return confirm('Are you sure to hide this note from reviewing in the future?')">
+  </form>
   </LoadingPage>
 </template>
 
@@ -18,7 +26,7 @@ import { ref, inject } from 'vue'
 
 export default {
   components: {
-    Quiz, Repetition, LoadingPage
+    Quiz, Repetition, ContentLoader, LoadingThinBar
   },
   data() {
     return {

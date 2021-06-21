@@ -1,13 +1,12 @@
 <template>
-  <LoadingThinBar v-if="loading"/>
-  <ReviewWelcome v-if="!!reviewing" v-bind="{reviewing}"/>
-  <div v-else><ContentLoader /></div>
+  <LoadingPage v-bind="{loading, contentExists: !!reviewing}">
+    <ReviewWelcome v-if="!!reviewing" v-bind="{reviewing}"/>
+  </LoadingPage>
 </template>
 
 <script setup>
 import ReviewWelcome from '../components/review/ReviewWelcome.vue'
-import ContentLoader from "../components/ContentLoader.vue"
-import LoadingThinBar from "../components/LoadingThinBar.vue"
+import LoadingPage from "./LoadingPage.vue"
 import {restGet} from "../restful/restful"
 import { ref, inject } from 'vue'
 

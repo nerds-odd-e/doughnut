@@ -1,8 +1,18 @@
+<template>
+  <LoadingPage v-bind="{loading, contentExists: !!reviewPointForView}">
+    <div v-if="!!reviewPointForView">
+      <Repetition v-bind="{...reviewPointForView, sadOnly}"/>
+    </div>
+  </LoadingPage>
+  <nav class="nav d-flex flex-row-reverse p-0">
+    <NoteStatisticsButton v-blin="{noteid, linkid}"/>
+  </nav>
+</template>
+
 <script setup>
 import NoteStatisticsButton from '../components/notes/NoteStatisticsButton.vue'
 import Repetition from '../components/review/Repetition.vue'
-import ContentLoader from "../components/ContentLoader.vue"
-import LoadingThinBar from "../components/LoadingThinBar.vue"
+import LoadingPage from "./LoadingPage.vue"
 import {restGet} from "../restful/restful"
 import { ref, inject, watch } from 'vue'
 
@@ -20,14 +30,3 @@ const fetchData = async () => {
 fetchData()
 
 </script>
-
-<template>
-  <LoadingThinBar v-if="loading"/>
-  <div v-if="!!reviewPointForView">
-    <Repetition v-bind="{...reviewPointForView, sadOnly}"/>
-  </div>
-  <div v-else><ContentLoader /></div>
-  <nav class="nav d-flex flex-row-reverse p-0">
-    <NoteStatisticsButton v-blin="{noteid, linkid}"/>
-  </nav>
-</template>
