@@ -8,24 +8,14 @@
 import ReviewWelcome from '../components/review/ReviewWelcome.vue'
 import ContentLoader from "../components/ContentLoader.vue"
 import LoadingThinBar from "../components/LoadingThinBar.vue"
+import {restGet} from "../restful/restful"
 import { ref, inject } from 'vue'
 
 const reviewing = ref(null)
 const loading = ref(false)
 
 const fetchData = async () => {
-  loading.value = true
-  fetch(`/api/reviews/overview`)
-    .then(res => {
-      return res.json();
-    })
-    .then(resp => {
-      reviewing.value = resp;
-      loading.value = false
-    })
-    .catch(error => {
-      window.alert(error);
-    });
+  restGet(`/api/reviews/overview`, loading, (res)=>reviewing.value = res)
 }
 
 fetchData()

@@ -12,6 +12,7 @@ import Quiz from '../components/review/Quiz.vue'
 import Repetition from '../components/review/Repetition.vue'
 import ContentLoader from "../components/ContentLoader.vue"
 import LoadingThinBar from "../components/LoadingThinBar.vue"
+import {restGet} from "../restful/restful"
 import { ref, inject } from 'vue'
 
 export default {
@@ -32,18 +33,7 @@ export default {
 
   methods: {
     fetchData() {
-      this.loading = true
-      fetch(`/api/reviews/repeat`)
-        .then(res => {
-          return res.json();
-        })
-        .then(resp => {
-          this.loadNew(resp)
-          this.loading = false
-        })
-        .catch(error => {
-          window.alert(error);
-        });
+      restGet(`/api/reviews/repeat`, (val)=>this.loading=val, this.loadNew)
     },
     loadNew(resp) {
       this.repetition = resp;

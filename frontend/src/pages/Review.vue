@@ -3,6 +3,7 @@ import NoteStatisticsButton from '../components/notes/NoteStatisticsButton.vue'
 import Repetition from '../components/review/Repetition.vue'
 import ContentLoader from "../components/ContentLoader.vue"
 import LoadingThinBar from "../components/LoadingThinBar.vue"
+import {restGet} from "../restful/restful"
 import { ref, inject, watch } from 'vue'
 
 const noteid = inject('noteid')
@@ -13,18 +14,7 @@ const loading = ref(false)
 const reviewPointForView = ref(null)
 
 const fetchData = async () => {
-  loading.value = true
-  fetch(`/api/review-points/${reviewPointId}`)
-    .then(res => {
-      return res.json();
-    })
-    .then(resp => {
-      reviewPointForView.value = resp;
-      loading.value = false
-    })
-    .catch(error => {
-      window.alert(error);
-    });
+  restGet(`/api/review-points/${reviewPointId}`, loading, (res)=>reviewPointForView.value = res)
 }
 
 fetchData()
