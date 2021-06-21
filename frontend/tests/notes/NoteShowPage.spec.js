@@ -29,7 +29,7 @@ describe('note show', () => {
     const wrapper = mount(NoteShowPage, {propsData: {noteid: 123}, global: { plugins: [router] }});
     await flushPromises()
     expect(fetch).toHaveBeenCalledTimes(1);
-    expect(fetch).toHaveBeenCalledWith('/api/notes/123');
+    expect(fetch).toHaveBeenCalledWith('/api/notes/123', {});
     expect(wrapper.findAll(".nav a[title='Add to my learning']")).toHaveLength(0)
     expect(wrapper.findAll(".statistics-value")).toHaveLength(0)
   });
