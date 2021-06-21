@@ -1,4 +1,4 @@
-import NoteShowPage from '@/components/notes/NoteShowPage.vue';
+import NoteShowPage from '@/pages/NoteShowPage.vue';
 import { mount } from '@vue/test-utils';
 import flushPromises from 'flush-promises';
 import {noteViewedByUser} from './fixtures'

@@ -1,5 +1,5 @@
 <script setup>
-import NoteShowPage from '../components/notes/NoteShowPage.vue'
+import NoteShowPage from '../pages/NoteShowPage.vue'
 import NoteStatisticsButton from '../components/notes/NoteStatisticsButton.vue'
 import { inject } from 'vue'
 

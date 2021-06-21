@@ -8,9 +8,9 @@
 </template>
 
 <script setup>
-import NoteViewedByUser from "./NoteViewedByUser.vue"
-import ContentLoader from "../ContentLoader.vue"
-import LoadingThinBar from "../LoadingThinBar.vue"
+import NoteViewedByUser from "../components/notes/NoteViewedByUser.vue"
+import ContentLoader from "../components/ContentLoader.vue"
+import LoadingThinBar from "../components/LoadingThinBar.vue"
 import { ref, watch, defineProps } from "vue"
 
 const props = defineProps({noteid: Number})
