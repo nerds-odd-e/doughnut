@@ -9,60 +9,47 @@
   </LoadingPage>
 </template>
 
-<script>
+<script setup>
 import Quiz from '../components/review/Quiz.vue'
 import Repetition from '../components/review/Repetition.vue'
 import LoadingPage from "./LoadingPage.vue"
 import { restGet, restPost } from "../restful/restful"
 import { ref, inject } from 'vue'
 
-export default {
-  components: {
-    Quiz, Repetition, LoadingPage
-  },
-  data() {
-    return {
-      repetition: ref(null),
-      answerResult: ref(null),
-      loading: ref(false)
-    }
-  },
+const emit = defineEmit(['redirect'])
 
-  mounted() {
-    this.fetchData();
-  },
+const repetition = ref(null)
+const answerResult = ref(null)
+const loading = ref(false)
 
-  methods: {
-    fetchData() {
-      restGet(`/api/reviews/repeat`, (val)=>this.loading=val, this.loadNew)
-    },
-
-    processAnswer(answerData) {
-      restPost(
-        `/api/reviews/${this.repetition.reviewPointViewedByUser.reviewPoint.id}/answer`,
-        answerData,
-         (val)=>this.loading=val,
-         (res)=>this.answerResult = res)
-    },
-
-    selfEvaluate(data) {
-      restPost(
-        `/api/reviews/${this.repetition.reviewPointViewedByUser.reviewPoint.id}/self-evaluate`,
-        data,
-         (val)=>this.loading=val,
-         this.loadNew)
-    },
-
-    loadNew(resp) {
-      this.repetition = resp;
-      this.answerResult = null;
-      if (!this.repetition.reviewPointViewedByUser) {
-        this.$router.push({name: "reviews"})
-      }
-    }
-
+const loadNew = (resp) => {
+  repetition.value = resp;
+  answerResult.value = null;
+  if (!repetition.value.reviewPointViewedByUser) {
+    emit("redirect", {name: "reviews"})
   }
-
 }
+
+const fetchData = () => {
+  restGet(`/api/reviews/repeat`, loading, loadNew)
+}
+
+const processAnswer = (answerData) => {
+  restPost(
+    `/api/reviews/${repetition.value.reviewPointViewedByUser.reviewPoint.id}/answer`,
+    answerData,
+      loading,
+      (res)=>answerResult.value = res)
+}
+
+const selfEvaluate = (data) => {
+  restPost(
+    `/api/reviews/${repetition.value.reviewPointViewedByUser.reviewPoint.id}/self-evaluate`,
+    data,
+    loading,
+    loadNew)
+}
+
+fetchData()
 
 </script>

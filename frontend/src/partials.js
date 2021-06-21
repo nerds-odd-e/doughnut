@@ -1,7 +1,7 @@
 import { createApp } from 'vue'
-import NoteApp from './NoteApp.vue'
+import DoughnutApp from './DoughnutApp.vue'
 import {router} from './routes'
 
-const app = createApp(NoteApp)
+const app = createApp(DoughnutApp)
 app.use(router)
 app.mount('#partials-noteshow')

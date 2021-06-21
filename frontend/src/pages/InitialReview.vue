@@ -1,6 +1,6 @@
 <template>
   <LoadingPage v-bind="{loading, contentExists: !!noteViewedByUser}">
-  <div th:replace="_fragments/review_fragments :: showReviewPoint(${reviewPoint})"/>
+  <ShowReviewPoint v-bind="reviewPoint"/>
 
   <form id="review-setting" ction="#" th:action="@{/reviews/}" th:object="${reviewPoint}" method="post">
       <div class="mb-2">
