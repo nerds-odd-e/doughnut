@@ -11,6 +11,7 @@
 import NoteViewedByUser from "../components/notes/NoteViewedByUser.vue"
 import ContentLoader from "../components/ContentLoader.vue"
 import LoadingThinBar from "../components/LoadingThinBar.vue"
+import {restGet} from "../restful/restful"
 import { ref, watch, defineProps } from "vue"
 
 const props = defineProps({noteid: Number})
@@ -18,18 +19,7 @@ const noteViewedByUser = ref(null)
 const loading = ref(false)
 
 const fetchData = async () => {
-  loading.value = true
-  fetch(`/api/notes/${props.noteid}`)
-    .then(res => {
-      return res.json();
-    })
-    .then(resp => {
-      noteViewedByUser.value = resp;
-      loading.value = false
-    })
-    .catch(error => {
-      window.alert(error);
-    });
+  restGet(`/api/notes/${props.noteid}`, loading, (res) => noteViewedByUser.value = res)
 }
 
 watch(()=>props.noteid, ()=>fetchData())
