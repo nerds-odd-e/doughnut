@@ -43,6 +43,15 @@ Cypress.Commands.add('loginAs', username => {
   });
 });
 
+Cypress.Commands.add('logout', username => {
+  cy.request({
+    method: 'POST',
+    url: '/logout',
+  }).then(response => {
+    expect(response.status).to.equal(204);
+  });
+});
+
 Cypress.Commands.add('seedNotes', (notes, externalIdentifier = '') => {
   cy.request({
     method: 'POST',

@@ -10,9 +10,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
@@ -50,6 +50,23 @@ public class UserModelAuthorityTest {
             makeMe.theCircle(circleModel).hasMember(userModel).please();
             assertTrue(userModel.getAuthorization().hasFullAuthority(note));
         }
+    }
+
+
+    @Nested
+    class readAuthority {
+        Note note;
+
+        @BeforeEach
+        void setup() {
+            note = makeMe.aNote().please();
+        }
+
+        @Test
+        void userCanNotAccessNotesBelongToCircle() {
+            assertThrows(ResponseStatusException.class, ()->makeMe.aNullUserModel().getAuthorization().assertReadAuthorization(note));
+        }
+
     }
 }
 

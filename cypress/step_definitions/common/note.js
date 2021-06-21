@@ -138,3 +138,9 @@ When("I click {string} in article view", (noteTitle) => {
   cy.findByText(noteTitle).click();
 });
 
+When("I should be asked to log in again when I click the link {string}", (noteTitle)=> {
+  cy.on('window:alert', (str) => {
+    expect(str).to.equal(`You login session is expired, let's refresh.`)
+  })
+  cy.findByText(noteTitle).click();
+})

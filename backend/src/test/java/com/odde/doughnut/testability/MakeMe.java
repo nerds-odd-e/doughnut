@@ -3,6 +3,7 @@ package com.odde.doughnut.testability;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.CircleModel;
+import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.builders.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -97,5 +98,9 @@ public class MakeMe {
 
     public LinkBuilder aLink() {
         return new LinkBuilder(this);
+    }
+
+    public UserModel aNullUserModel() {
+        return modelFactoryService.toUserModel(null);
     }
 }

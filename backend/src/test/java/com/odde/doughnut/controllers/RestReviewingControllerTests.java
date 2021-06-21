@@ -1,11 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.Answer;
-import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.json.NoteViewedByUser;
-import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
@@ -23,7 +19,6 @@ import org.springframework.web.server.ResponseStatusException;
 import javax.validation.Valid;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
@@ -52,7 +47,7 @@ class RestReviewingControllerTests {
     class overall {
         @Test
         void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
-            userModel = makeMe.modelFactoryService.toUserModel(null);
+            userModel = makeMe.aNullUserModel();
             assertThrows(ResponseStatusException.class, () -> controller().overview());
         }
     }
@@ -61,7 +56,7 @@ class RestReviewingControllerTests {
     class repeat {
         @Test
         void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
-            userModel = makeMe.modelFactoryService.toUserModel(null);
+            userModel = makeMe.aNullUserModel();
             assertThrows(ResponseStatusException.class, () -> controller().repeatReview());
         }
     }
@@ -70,7 +65,7 @@ class RestReviewingControllerTests {
     class answer {
         @Test
         void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
-            userModel = makeMe.modelFactoryService.toUserModel(null);
+            userModel = makeMe.aNullUserModel();
             ReviewPoint reviewPoint = new ReviewPoint();
             @Valid Answer answer = new Answer();
             assertThrows(ResponseStatusException.class, () -> controller().answerQuiz(reviewPoint, answer));
@@ -81,7 +76,7 @@ class RestReviewingControllerTests {
     class evaluate {
         @Test
         void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
-            userModel = makeMe.modelFactoryService.toUserModel(null);
+            userModel = makeMe.aNullUserModel();
             ReviewPoint reviewPoint = new ReviewPoint();
             assertThrows(ResponseStatusException.class, () -> controller().selfEvaluate(reviewPoint, "happy"));
         }

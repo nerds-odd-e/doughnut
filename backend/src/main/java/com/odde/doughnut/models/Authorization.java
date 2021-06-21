@@ -10,98 +10,99 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Authorization {
-  protected final User user;
-  protected final ModelFactoryService modelFactoryService;
+    protected final User user;
+    protected final ModelFactoryService modelFactoryService;
 
-  public Authorization(User user, ModelFactoryService modelFactoryService) {
-    this.user = user;
-    this.modelFactoryService = modelFactoryService;
-  }
-
-  public void assertAuthorization(Note note) throws NoAccessRightException {
-    if (!hasFullAuthority(note)) {
-      throw new NoAccessRightException();
+    public Authorization(User user, ModelFactoryService modelFactoryService) {
+        this.user = user;
+        this.modelFactoryService = modelFactoryService;
     }
-  }
 
-  public boolean hasFullAuthority(Note note) {
-    return hasFullAuthority(note.getNotebook());
-  }
-
-  public boolean hasFullAuthority(Notebook notebook) {
-    return user.owns(notebook);
-  }
-
-  public boolean hasReferenceAuthority(Note note) {
-    if (user == null) return false;
-    return user.canReferTo(note.getNotebook());
-  }
-
-  public void assertReadAuthorization(Note note) throws NoAccessRightException {
-    if (!hasReferenceAuthority(note)) {
-      throw new NoAccessRightException();
+    public void assertAuthorization(Note note) throws NoAccessRightException {
+        if (!hasFullAuthority(note)) {
+            throw new NoAccessRightException();
+        }
     }
-  }
 
-  public void assertAuthorization(Notebook notebook)
-      throws NoAccessRightException {
-    if (!hasFullAuthority(notebook)) {
-      throw new NoAccessRightException();
+    public boolean hasFullAuthority(Note note) {
+        return hasFullAuthority(note.getNotebook());
     }
-  }
 
-  public void assertAuthorization(Circle circle) throws NoAccessRightException {
-    if (!user.inCircle(circle)) {
-      throw new NoAccessRightException();
+    public boolean hasFullAuthority(Notebook notebook) {
+        return user.owns(notebook);
     }
-  }
 
-  public void assertAuthorization(Subscription subscription)
-      throws NoAccessRightException {
-    if (subscription.getUser() != user) {
-      throw new NoAccessRightException();
+    public boolean hasReferenceAuthority(Note note) {
+        if (user == null) return false;
+        return user.canReferTo(note.getNotebook());
     }
-  }
 
-  public void assertAuthorization(User user) throws NoAccessRightException {
-    if (!this.user.getId().equals(user.getId())) {
-      throw new NoAccessRightException();
+    public void assertReadAuthorization(Note note) throws NoAccessRightException {
+        assertReadAuthorization(note.getNotebook());
     }
-  }
 
-  public void assertAuthorization(Link link) throws NoAccessRightException {
-    if (link.getUser().getId() != user.getId()) {
-      throw new NoAccessRightException();
+    public void assertReadAuthorization(Notebook notebook)
+            throws NoAccessRightException {
+        if (hasReferenceAuthority(notebook.getHeadNote())) {
+            return;
+        }
+        if (modelFactoryService.bazaarNotebookRepository.findByNotebook(notebook) != null) {
+            return;
+        }
+        modelFactoryService.toUserModel(user).getAuthorization().assertLoggedIn();
+        throw new NoAccessRightException();
     }
-  }
 
-  public void assertPotentialReadAuthorization(Notebook notebook)
-      throws NoAccessRightException {
-    if (!hasReferenceAuthority(notebook.getHeadNote()) &&
-        modelFactoryService.bazaarNotebookRepository.findByNotebook(notebook) ==
-            null) {
-      throw new NoAccessRightException();
+    public void assertAuthorization(Notebook notebook)
+            throws NoAccessRightException {
+        if (!hasFullAuthority(notebook)) {
+            throw new NoAccessRightException();
+        }
     }
-  }
 
-  public void assertDeveloperAuthorization() throws NoAccessRightException {
-    if (!isDeveloper()) {
-      throw new NoAccessRightException();
+    public void assertAuthorization(Circle circle) throws NoAccessRightException {
+        if (!user.inCircle(circle)) {
+            throw new NoAccessRightException();
+        }
     }
-  }
 
-  private static final List<String> allowUsers =
-      Arrays.asList("Terry", "t-machu", "Developer", "Yeong Sheng");
+    public void assertAuthorization(Subscription subscription)
+            throws NoAccessRightException {
+        if (subscription.getUser() != user) {
+            throw new NoAccessRightException();
+        }
+    }
 
-  public boolean isDeveloper() {
-    if (user == null) return false;
-    return allowUsers.contains(user.getName());
-  }
+    public void assertAuthorization(User user) throws NoAccessRightException {
+        if (!this.user.getId().equals(user.getId())) {
+            throw new NoAccessRightException();
+        }
+    }
 
-  public void assertLoggedIn() {
-      if (user == null) {
-        throw new ResponseStatusException(
-                HttpStatus.UNAUTHORIZED, "Foo Not Found");
-      }
-  }
+    public void assertAuthorization(Link link) throws NoAccessRightException {
+        if (link.getUser().getId() != user.getId()) {
+            throw new NoAccessRightException();
+        }
+    }
+
+    public void assertDeveloperAuthorization() throws NoAccessRightException {
+        if (!isDeveloper()) {
+            throw new NoAccessRightException();
+        }
+    }
+
+    private static final List<String> allowUsers =
+            Arrays.asList("Terry", "t-machu", "Developer", "Yeong Sheng");
+
+    public boolean isDeveloper() {
+        if (user == null) return false;
+        return allowUsers.contains(user.getName());
+    }
+
+    public void assertLoggedIn() {
+        if (user == null) {
+            throw new ResponseStatusException(
+                    HttpStatus.UNAUTHORIZED, "Foo Not Found");
+        }
+    }
 }

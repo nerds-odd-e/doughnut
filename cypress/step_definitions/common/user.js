@@ -21,6 +21,10 @@ Given("I've logged in as another existing user", () => {
   cy.loginAs('another_old_learner');
 });
 
+Given("my session is logged out", () => {
+  cy.logout();
+});
+
 When("I identify myself as a new user", () => {
   cy.visit("/login");
 
@@ -90,6 +94,14 @@ Then("The {string} page is displayed", (pageName) => {
     }
 });
 
+Then("I should be asked to log in again.", ()=> {
+})
 
+Then("when I login as {string} I should see {string}", (username, expectation)=>{
+  cy.get("#username").type(username);
+  cy.get("#password").type("password");
+  cy.get("form.form-signin").submit();
+  cy.findByText(expectation, { selector: '.h1'}).should("be.visible");
+})
 
 

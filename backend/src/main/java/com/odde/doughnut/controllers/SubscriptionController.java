@@ -61,7 +61,7 @@ public class SubscriptionController extends ApplicationMvcController {
             return "subscriptions/add_to_learning";
         }
         final UserModel userModel = currentUserFetcher.getUser();
-        userModel.getAuthorization().assertPotentialReadAuthorization(notebook);
+        userModel.getAuthorization().assertReadAuthorization(notebook);
         subscription.setNotebook(notebook);
         subscription.setUser(userModel.getEntity());
         modelFactoryService.entityManager.persist(subscription);
