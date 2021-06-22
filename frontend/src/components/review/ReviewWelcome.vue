@@ -12,7 +12,7 @@
                     <div class="card-body">
                         <p class="card-text">Do the initial review for your notes. You may try to remember them for the first time. Or, you can mark some as no repetition needed.
                         </p>
-                        <a v-if="reviewing.toInitialReviewCount > 0" role="button" class="btn btn-light" href="/reviews/initial"> Start reviewing new notes </a>
+                        <router-link v-if="reviewing.toInitialReviewCount > 0" role="button" class="btn btn-light" :to="{name: 'initial'}"> Start reviewing new notes </router-link>
                         <h2  v-else class="">You have achieved your daily new notes goal.</h2>
                     </div>
                 </div>

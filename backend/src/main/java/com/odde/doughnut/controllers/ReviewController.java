@@ -47,7 +47,7 @@ public class ReviewController extends ApplicationMvcController  {
         }
         model.addAttribute("reviewPoint", reviewPoint);
         model.addAttribute("reviewSetting", reviewing.getReviewSetting(reviewPoint.getNote()));
-        return "reviews/initial";
+        return "vuejsed";
     }
 
     @PostMapping(path="", params="submit")
