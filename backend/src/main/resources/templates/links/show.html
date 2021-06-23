@@ -2,6 +2,7 @@
 <layout th:replace="_fragments/basic_layout :: application_layout(~{ :: .content})">
 
     <div class="container content">
+
         <div th:replace="_fragments/link_fragments :: linkShow(${link}, ~{:: .link-content})">
             <div class="link-content">
                 <form action="#" th:action="@{/links/{id}(id=${link.id})}" th:object="${link}" method="post">
@@ -17,4 +18,5 @@
                 </nav>
             </div>
         </div>
+
 </layout>

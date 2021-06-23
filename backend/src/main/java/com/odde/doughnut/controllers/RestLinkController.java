@@ -4,6 +4,7 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.json.LinkViewedByUser;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
@@ -23,6 +24,13 @@ class RestLinkController {
   public RestLinkController(ModelFactoryService modelFactoryService, CurrentUserFetcher currentUserFetcher) {
     this.modelFactoryService = modelFactoryService;
     this.currentUserFetcher = currentUserFetcher;
+  }
+
+  @GetMapping("/{link}")
+  public LinkViewedByUser show(@PathVariable("link") Link link) throws NoAccessRightException {
+    UserModel user = currentUserFetcher.getUser();
+    user.getAuthorization().assertAuthorization(link);
+    return LinkViewedByUser.from(link, user.getEntity());
   }
 
   class LinkStatistics {

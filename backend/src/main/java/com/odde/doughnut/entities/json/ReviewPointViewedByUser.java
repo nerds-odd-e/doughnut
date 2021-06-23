@@ -1,10 +1,6 @@
 package com.odde.doughnut.entities.json;
 
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.ReviewSetting;
-import com.odde.doughnut.entities.User;
-import com.odde.doughnut.models.Reviewing;
+import com.odde.doughnut.entities.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -32,10 +28,8 @@ public class ReviewPointViewedByUser {
             result.setReviewSetting(getReviewSetting(reviewPoint.getNote()));
         }
         else {
-            LinkViewedByUser linkViewedByUser = new LinkViewedByUser();
-            linkViewedByUser.setSourceNoteViewedByUser(reviewPoint.getLink().getSourceNote().jsonObjectViewedBy(entity));
-            linkViewedByUser.setTargetNoteViewedByUser(reviewPoint.getLink().getTargetNote().jsonObjectViewedBy(entity));
-            linkViewedByUser.setLinkTypeLabel(reviewPoint.getLink().getLinkTypeLabel());
+            Link link = reviewPoint.getLink();
+            LinkViewedByUser linkViewedByUser = LinkViewedByUser.from(link, entity);
             result.setLinkViewedByUser(linkViewedByUser);
         }
         return result;

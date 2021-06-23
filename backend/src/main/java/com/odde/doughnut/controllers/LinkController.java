@@ -29,7 +29,7 @@ public class LinkController extends ApplicationMvcController  {
     @GetMapping("/{link}")
     public String show(@PathVariable("link") Link link, Model model) throws NoAccessRightException {
         currentUserFetcher.getUser().getAuthorization().assertAuthorization(link);
-        return "links/show";
+        return "vuejsed";
     }
 
     @GetMapping("/{note}/link")
