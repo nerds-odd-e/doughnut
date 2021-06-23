@@ -1,6 +1,7 @@
 package com.odde.doughnut.entities.json;
 
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.models.UserModel;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,18 +19,18 @@ public class ReviewPointViewedByUser {
     @Setter
     private ReviewSetting reviewSetting;
 
-    public static ReviewPointViewedByUser getReviewPointViewedByUser(ReviewPoint reviewPoint, User entity) {
+    public static ReviewPointViewedByUser from(ReviewPoint reviewPoint, UserModel user) {
         ReviewPointViewedByUser result = new ReviewPointViewedByUser();
         if (reviewPoint == null) return result;
 
         result.setReviewPoint(reviewPoint);
         if (reviewPoint.getNote() != null) {
-            result.setNoteViewedByUser(reviewPoint.getNote().jsonObjectViewedBy(entity));
+            result.setNoteViewedByUser(reviewPoint.getNote().jsonObjectViewedBy(user.getEntity()));
             result.setReviewSetting(getReviewSetting(reviewPoint.getNote()));
         }
         else {
             Link link = reviewPoint.getLink();
-            LinkViewedByUser linkViewedByUser = LinkViewedByUser.from(link, entity);
+            LinkViewedByUser linkViewedByUser = LinkViewedByUser.from(link, user);
             result.setLinkViewedByUser(linkViewedByUser);
         }
         return result;

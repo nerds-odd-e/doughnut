@@ -4,6 +4,7 @@ import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.NoAccessRightException;
+import com.odde.doughnut.entities.json.LinkViewedByUser;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
@@ -30,25 +31,63 @@ class RestLinkControllerTests {
     @Autowired
     MakeMe makeMe;
     private UserModel userModel;
-    RestLinkController controller;
 
     @BeforeEach
     void setup() {
         userModel = makeMe.aUser().toModelPlease();
-        controller = new RestLinkController(modelFactoryService, new TestCurrentUserFetcher(userModel));
+    }
+
+    RestLinkController controller() {
+        return new RestLinkController(modelFactoryService, new TestCurrentUserFetcher(userModel));
     }
 
     @Nested
-    class showNoteTest {
+    class showLinkTest {
+        User otherUser;
+        Note note1;
+        Note note2;
+        Link link;
 
+        @BeforeEach
+        void setup() {
+            otherUser = makeMe.aUser().please();
+            note1 = makeMe.aNote().byUser(otherUser).please();
+            note2 = makeMe.aNote().byUser(otherUser).linkTo(note1).please();
+            link = note2.getLinks().get(0);
+        }
+
+        @Test
+        void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
+            assertThrows(NoAccessRightException.class, () -> controller().show(link));
+        }
+
+        @Test
+        void shouldNotBeAbleToSeeItIfICanReadOneNote() throws NoAccessRightException {
+            makeMe.aBazaarNodebook(note1.getNotebook()).please();
+            assertThrows(NoAccessRightException.class, () -> controller().show(link));
+        }
+
+        @Test
+        void shouldBeAbleToSeeItIfICanReadBothNote() throws NoAccessRightException {
+            makeMe.aBazaarNodebook(note1.getNotebook()).please();
+            makeMe.aBazaarNodebook(note2.getNotebook()).please();
+            LinkViewedByUser linkViewedByUser = controller().show(link);
+            assertThat(linkViewedByUser.getReadonly(), equalTo(true));
+
+        }
+
+    }
+
+    @Nested
+    class showLinkStatisticsTest {
         @Test
         void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
             User otherUser = makeMe.aUser().please();
             Note note1 = makeMe.aNote().byUser(otherUser).please();
             Note note2 = makeMe.aNote().byUser(otherUser).linkTo(note1).please();
             Link link = note2.getLinks().get(0);
-            assertThrows(NoAccessRightException.class, () -> controller.statistics(link));
+            assertThrows(NoAccessRightException.class, () -> controller().statistics(link));
         }
-
     }
+
 }

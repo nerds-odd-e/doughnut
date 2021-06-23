@@ -46,7 +46,7 @@ class RestReviewsController {
     UserModel user = currentUserFetcher.getUser();
     Reviewing reviewing = user.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
     ReviewPoint reviewPoint = reviewing.getOneInitialReviewPoint();
-    return ReviewPointViewedByUser.getReviewPointViewedByUser(reviewPoint, user.getEntity());
+    return ReviewPointViewedByUser.from(reviewPoint, user);
   }
 
   static class InitialInfo {
@@ -89,7 +89,7 @@ class RestReviewsController {
     RepetitionForUser repetitionForUser = new RepetitionForUser();
 
     if(reviewPointModel != null) {
-      repetitionForUser.setReviewPointViewedByUser(ReviewPointViewedByUser.getReviewPointViewedByUser(reviewPointModel.getEntity(), user.getEntity()));
+      repetitionForUser.setReviewPointViewedByUser(ReviewPointViewedByUser.from(reviewPointModel.getEntity(), user));
       QuizQuestion quizQuestion = reviewPointModel.generateAQuizQuestion(testabilitySettings.getRandomizer());
       if (quizQuestion != null) {
           repetitionForUser.setQuizQuestion(quizQuestion);

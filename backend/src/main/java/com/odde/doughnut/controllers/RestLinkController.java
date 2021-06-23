@@ -29,8 +29,8 @@ class RestLinkController {
   @GetMapping("/{link}")
   public LinkViewedByUser show(@PathVariable("link") Link link) throws NoAccessRightException {
     UserModel user = currentUserFetcher.getUser();
-    user.getAuthorization().assertAuthorization(link);
-    return LinkViewedByUser.from(link, user.getEntity());
+    user.getAuthorization().assertReadAuthorization(link.getSourceNote());
+    return LinkViewedByUser.from(link, user);
   }
 
   class LinkStatistics {

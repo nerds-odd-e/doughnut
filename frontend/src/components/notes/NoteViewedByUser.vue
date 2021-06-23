@@ -8,7 +8,7 @@
             <NoteButtons v-if="owns" :note="note"/>
             <BazaarNoteButtons v-else :note="note" :notebook="notebook" />
         </nav>
-        <NoteShow :note="note" :links="links" :level="1"/>
+        <NoteShow :note="note" :links="links" :level="1" :owns="owns"/>
     </div>
     <nav class="nav d-flex justify-content-between p-0 mb-2">
       <div class="btn-group btn-group-sm">

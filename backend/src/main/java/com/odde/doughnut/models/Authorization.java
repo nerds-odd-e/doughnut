@@ -29,6 +29,7 @@ public class Authorization {
     }
 
     public boolean hasFullAuthority(Notebook notebook) {
+        if(user == null) return false;
         return user.owns(notebook);
     }
 
