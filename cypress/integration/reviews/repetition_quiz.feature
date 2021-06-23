@@ -24,7 +24,7 @@ Feature: Repetition Quiz
 
   Scenario Outline: Spelling quiz
     Given I am learning new note on day 1
-    And I have selected the option "RememberSpelling"
+    And I have selected the option "Remember Spelling"
     When I am repeat-reviewing my old note on day 2
     Then I should be asked spelling question "means incite violence"
     When I type my answer "<answer>"
@@ -39,8 +39,8 @@ Feature: Repetition Quiz
     Given I am changing note "sedition"'s review setting
     And I have selected the option "RememberSpelling" in review setting
     When I am learning new note on day 1
-    Then I should see the option "RememberSpelling" is "on"
-    When I have unselected the option "RememberSpelling"
+    Then I should see the option "Remember Spelling" is "on"
+    When I have unselected the option "Remember Spelling"
     And I am changing note "sedition"'s review setting
     Then I should see the option "RememberSpelling" is "off"
 

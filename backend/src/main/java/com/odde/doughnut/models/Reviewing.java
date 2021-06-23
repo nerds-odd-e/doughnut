@@ -134,17 +134,6 @@ public class Reviewing {
         return modelFactoryService.toReviewPointModel(reviewPoint);
     }
 
-    public ReviewSetting getReviewSetting(Note note) {
-        if(note == null) {
-            return null;
-        }
-        ReviewSetting reviewSetting = note.getMasterReviewSetting();
-        if (reviewSetting == null) {
-            reviewSetting = new ReviewSetting();
-        }
-        return reviewSetting;
-    }
-
     private Stream<SubscriptionModel> getSubscriptionModelStream() {
         return userModel.entity.getSubscriptions().stream().map(modelFactoryService::toSubscriptionModel);
     }

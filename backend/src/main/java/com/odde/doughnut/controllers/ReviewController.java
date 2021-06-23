@@ -46,7 +46,6 @@ public class ReviewController extends ApplicationMvcController  {
             return "redirect:/reviews";
         }
         model.addAttribute("reviewPoint", reviewPoint);
-        model.addAttribute("reviewSetting", reviewing.getReviewSetting(reviewPoint.getNote()));
         return "vuejsed";
     }
 

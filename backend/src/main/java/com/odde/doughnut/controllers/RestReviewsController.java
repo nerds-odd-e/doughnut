@@ -15,6 +15,7 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.http.HttpStatus;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -41,6 +42,14 @@ class RestReviewsController {
     UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertLoggedIn();
     return user.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
+  }
+
+  @GetMapping("/initial")
+  public ReviewPointViewedByUser initialReview(Model model) {
+    UserModel user = currentUserFetcher.getUser();
+    Reviewing reviewing = user.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
+    ReviewPoint reviewPoint = reviewing.getOneInitialReviewPoint();
+    return ReviewPointViewedByUser.getReviewPointViewedByUser(reviewPoint, user.getEntity());
   }
 
   class RepetitionForUser {

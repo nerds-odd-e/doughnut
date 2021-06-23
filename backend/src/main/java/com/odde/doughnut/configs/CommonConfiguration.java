@@ -7,7 +7,7 @@ public class CommonConfiguration {
     return http.authorizeRequests()
         .mvcMatchers("/robots.txt")
         .permitAll()
-        .antMatchers("/", "/login", "/error", "/images/**", "/img/**",
+        .antMatchers("/", "/login", "/error", "/images/**", "/odd-e.png",
                      "/webjars/**", "/assets/**","/bazaar", "/bazaar/**/**", "/blog/**/**",
                      "/api/notes/**", "/api/review-points/**", "/api/backdoor",
                      "/api/reviews/**"

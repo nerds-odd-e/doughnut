@@ -2,13 +2,11 @@
   <LoadingPage v-bind="{loading, contentExists: !!reviewPointViewedByUser}">
     <ShowReviewPoint v-bind="reviewPointViewedByUser"/>
 
-    <form id="review-setting" ction="#" th:action="@{/reviews/}" th:object="${reviewPoint}" method="post">
+    <form id="review-setting" action="/reviews/" method="post">
         <div class="mb-2">
-            <input th:field="*{note}" type="hidden"/>
-            <input th:field="*{link}" type="hidden"/>
-            <div th:if="${reviewSetting}">
-                <div th:replace="_fragments/note_fragments :: reviewSettingForm(${reviewSetting})"/>
-            </div>
+            <input name="note" v-if="reviewPoint.note" :value="reviewPoint.note.id" type="hidden"/>
+            <input name="link" v-if="reviewPoint.link" :value="reviewPoint.link.id" type="hidden"/>
+            <ReviewSettingForm v-if="!!reviewPointViewedByUser.reviewSetting" :reviewSetting="reviewPointViewedByUser.reviewSetting"/>
         </div>
         <input type="submit" name="submit" value="Keep for repetition" class="btn btn-primary"/>
         <input type="submit" name="skip" value="Skip repetition" class="btn btn-secondary"
@@ -19,18 +17,21 @@
 
 <script setup>
 import ShowReviewPoint from '../components/review/ShowReviewPoint.vue'
+import ReviewSettingForm from '../components/review/ReviewSettingForm.vue'
 import LoadingPage from "./LoadingPage.vue"
 import { restGet, restPost } from "../restful/restful"
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 const emit = defineEmit(['redirect'])
 
 const reviewPointViewedByUser = ref(null)
 const loading = ref(false)
 
+const reviewPoint = computed(()=>reviewPointViewedByUser.value.reviewPoint)
+
 const loadNew = (resp) => {
   reviewPointViewedByUser.value = resp;
-  if (!eviewPointViewedByUser.value.reviewPoint) {
+  if (!reviewPointViewedByUser.value.reviewPoint) {
     emit("redirect", {name: "reviews"})
   }
 }

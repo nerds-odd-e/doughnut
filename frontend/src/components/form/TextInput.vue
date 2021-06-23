@@ -4,7 +4,7 @@
               class="text-input-control form-control put_error_class_here"
               :id="`${scopeName}-${field}`"
               :name="field"
-              :value="modelValue"
+              v-model="modelValue"
               @input="$emit('update:modelValue', $event.target.value)"
               :placeholder="placeholder"
               :autofocus="autofocus"
