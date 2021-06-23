@@ -5,21 +5,18 @@
             class="form-check-input"
             :id="`${scopeName}-${field}`"
             :name="field"
-            v-model="modelValue"
+            :checked="modelValue"
+            @change="$emit('update:modelValue', $event.target.checked)"
     />
     <label class="form-check-label" :for="`${scopeName}-${field}`">{{startCase(camelCase(field))}}</label>
 </div>
 
 </template>
 
-<script>
+<script setup>
 import { startCase, camelCase } from "lodash"
 
-    export  default {
-    props: {modelValue: String, scopeName: String, field: String, errors: Object},
-    emits: ['update:modelValue'],
-    methods: {startCase, camelCase}
-    }
-  
+const props = defineProps({modelValue: String, scopeName: String, field: String, errors: Object})
+const emit = defineEmit(['update:modelValue'])
 
 </script>

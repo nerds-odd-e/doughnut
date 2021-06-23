@@ -4,7 +4,7 @@
               class="text-input-control form-control put_error_class_here"
               :id="`${scopeName}-${field}`"
               :name="field"
-              v-model="modelValue"
+              :value="modelValue"
               @input="$emit('update:modelValue', $event.target.value)"
               :placeholder="placeholder"
               :autofocus="autofocus"
@@ -14,13 +14,10 @@
   </InputWithType>
 </template>
 
-<script>
-  import InputWithType from "./InputWithType.vue"
-  import { computed } from 'vue'
-  export  default {
-    props: {modelValue: String, scopeName: String, field: String, placeholder: String, autofocus: Boolean, errors: Object},
-    emits: ['update:modelValue'],
-    components: {InputWithType},
-  }
+<script setup>
+import { defineEmit } from "@vue/runtime-core"
+import InputWithType from "./InputWithType.vue"
+  const props = defineProps({modelValue: String, scopeName: String, field: String, placeholder: String, autofocus: Boolean, errors: Object})
+  const emit = defineEmit(['update:modelValue'])
 
 </script>
