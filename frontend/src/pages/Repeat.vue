@@ -3,7 +3,11 @@
     <template v-if="!!repetition" v-bind="{repetition}">
       <Quiz v-if="!!repetition.quizQuestion && !answerResult" v-bind="repetition" @answer="processAnswer($event)"/>
       <template v-else>
-      <Repetition v-if="repetition.reviewPointViewedByUser" v-bind="{...repetition.reviewPointViewedByUser, answerResult, sadOnly: false}" @selfEvaluate="selfEvaluate($event)"/>
+        <template v-if="reviewPointViewedByUser">
+          <Repetition v-bind="{...reviewPointViewedByUser, answerResult, sadOnly: false}" @selfEvaluate="selfEvaluate($event)"/>
+          <NoteStatisticsButton v-if="reviewPointViewedByUser.noteViewedByUser" :noteid="reviewPointViewedByUser.noteViewedByUser.note.id"/>
+          <NoteStatisticsButton v-else :link="reviewPointViewedByUser.linkViewedByUser.id"/>
+        </template>
       </template>
     </template>
   </LoadingPage>
@@ -13,15 +17,16 @@
 import Quiz from '../components/review/Quiz.vue'
 import Repetition from '../components/review/Repetition.vue'
 import LoadingPage from "./LoadingPage.vue"
+import NoteStatisticsButton from '../components/notes/NoteStatisticsButton.vue'
 import { restGet, restPost } from "../restful/restful"
-import { ref, inject } from 'vue'
+import { ref, inject, computed } from 'vue'
 
 const emit = defineEmit(['redirect'])
 
 const repetition = ref(null)
 const answerResult = ref(null)
 const loading = ref(false)
-
+const reviewPointViewedByUser = computed(()=>repetition.value.reviewPointViewedByUser)
 const loadNew = (resp) => {
   repetition.value = resp;
   answerResult.value = null;
@@ -36,7 +41,7 @@ const fetchData = () => {
 
 const processAnswer = (answerData) => {
   restPost(
-    `/api/reviews/${repetition.value.reviewPointViewedByUser.reviewPoint.id}/answer`,
+    `/api/reviews/${reviewPointViewedByUser.value.reviewPoint.id}/answer`,
     answerData,
       loading,
       (res)=>answerResult.value = res)
@@ -44,7 +49,7 @@ const processAnswer = (answerData) => {
 
 const selfEvaluate = (data) => {
   restPost(
-    `/api/reviews/${repetition.value.reviewPointViewedByUser.reviewPoint.id}/self-evaluate`,
+    `/api/reviews/${reviewPointViewedByUser.value.reviewPoint.id}/self-evaluate`,
     data,
     loading,
     loadNew)

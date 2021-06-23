@@ -10,7 +10,7 @@
                            onclick="return confirm('Are you sure to delete this link?')"/>
                 </form>
                 <nav class="nav d-flex flex-row-reverse p-0">
-                    <div id="partials" th:data-linkid="${link.id}"> </div>
+                  <NoteStatisticsButton :linkid="linkViewedByUser.id"/>
                 </nav>
             </div>
         </LinkShow>
@@ -21,6 +21,7 @@
 <script setup>
 import LinkShow from "../components/links/LinkShow.vue"
 import Select from "../components/form/Select.vue"
+import NoteStatisticsButton from '../components/notes/NoteStatisticsButton.vue'
 import LoadingPage from "./LoadingPage.vue"
 import {restGet} from "../restful/restful"
 import { ref, watch, defineProps } from "vue"

@@ -4,7 +4,7 @@
               class="select-control form-control"
               :id="`${scopeName}-${field}`"
               :name="field"
-              v-model="modelValue"
+              :value="modelValue"
               @input="$emit('update:modelValue', $event.target.value)"
       >
 

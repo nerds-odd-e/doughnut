@@ -2,7 +2,7 @@
   <LoadingPage v-bind="{loading, contentExists: !!reviewPointViewedByUser}">
     <ShowReviewPoint v-bind="reviewPointViewedByUser"/>
 
-    <form>
+    <div>
         <div class="mb-2">
             <input name="note" v-if="reviewPoint.note" :value="reviewPoint.note.id" type="hidden"/>
             <input name="link" v-if="reviewPoint.link" :value="reviewPoint.link.id" type="hidden"/>
@@ -12,7 +12,7 @@
             v-on:click="processForm(false)"/>
         <input type="submit" name="skip" value="Skip repetition" class="btn btn-secondary"
             v-on:click="processForm(true)">
-    </form>
+    </div>
   </LoadingPage>
 </template>
 

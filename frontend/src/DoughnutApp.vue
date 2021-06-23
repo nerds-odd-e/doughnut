@@ -1,18 +1,23 @@
-<script setup>
-import { ref } from "@vue/reactivity"
+<script>
 import {restGet} from "./restful/restful"
 
-const staticInfo = ref(null)
-const loading = ref(null)
-const redirectTo = (params) => {
-        this.$router.push(params)
-      }
+export default {
+  data() {
+    return {
+  staticInfo: null,
+  loading: null,
+    }},
+  
+  methods: {
+    redirectTo(params) { this.$router.push(params) },
+    fetchStaticInfo() {
+    },
+  },
 
-const fetchStaticInfo = async () => {
-  restGet(`/api/static-info`, loading, (res) => staticInfo.value = res)
+  mounted() {
+      restGet(`/api/static-info`, (v)=>this.loading = v, (res) => this.staticInfo = res)
+  }
 }
-
-fetchStaticInfo()
 
 </script>
 
