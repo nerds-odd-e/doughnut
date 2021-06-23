@@ -31,3 +31,10 @@ Feature: Initial Review
             | single note   | Note 2     |
             | initial done  |            |
 
+    Scenario: Skip review
+        Given It's day 1, 8 hour
+        When I do these initial reviews in sequence:
+            | review_type   | title      | skip |
+            | single note   | Note 1     | true |
+        Then On day 1 I should have "1/4" note for initial review and "0/0" for repeat
+

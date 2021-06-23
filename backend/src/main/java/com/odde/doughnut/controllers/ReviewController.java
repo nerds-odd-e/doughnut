@@ -39,23 +39,7 @@ public class ReviewController extends ApplicationMvcController  {
 
     @GetMapping("/initial")
     public String initialReview(Model model) {
-        UserModel user = currentUserFetcher.getUser();
-        Reviewing reviewing = user.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
-        ReviewPoint reviewPoint = reviewing.getOneInitialReviewPoint();
-        if (reviewPoint == null) {
-            return "redirect:/reviews";
-        }
-        model.addAttribute("reviewPoint", reviewPoint);
         return "vuejsed";
-    }
-
-    @PostMapping(path="", params="submit")
-    @Transactional
-    public String create(@Valid ReviewPoint reviewPoint, @Valid ReviewSetting reviewSetting) {
-        UserModel userModel = currentUserFetcher.getUser();
-        ReviewPointModel reviewPointModel = modelFactoryService.toReviewPointModel(reviewPoint);
-        reviewPointModel.initialReview(userModel, reviewSetting, testabilitySettings.getCurrentUTCTimestamp());
-        return "redirect:/reviews/initial";
     }
 
     @PostMapping(path="", params="skip")

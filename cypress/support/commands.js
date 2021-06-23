@@ -254,7 +254,7 @@ Cypress.Commands.add('randomizerAlwaysChooseLast', (day, hour) => {
 
 Cypress.Commands.add(
   'initialReviewOneNoteIfThereIs',
-  ({ review_type, title, additional_info }) => {
+  ({ review_type, title, additional_info, skip }) => {
     if (review_type == 'initial done') {
       cy.findByText('You have achieved your daily new notes goal.').should(
         'be.visible'
@@ -299,8 +299,12 @@ Cypress.Commands.add(
         default:
           expect(review_type).equal('a known review page type');
       }
-
-      cy.findByText('Keep for repetition').click();
+      if (skip) {
+          cy.findByText('Skip repetition').click();
+      }
+      else {
+          cy.findByText('Keep for repetition').click();
+      }
     }
   }
 );

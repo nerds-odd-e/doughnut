@@ -2,15 +2,16 @@
   <LoadingPage v-bind="{loading, contentExists: !!reviewPointViewedByUser}">
     <ShowReviewPoint v-bind="reviewPointViewedByUser"/>
 
-    <form id="review-setting" @submit.prevent="processForm">
+    <form>
         <div class="mb-2">
             <input name="note" v-if="reviewPoint.note" :value="reviewPoint.note.id" type="hidden"/>
             <input name="link" v-if="reviewPoint.link" :value="reviewPoint.link.id" type="hidden"/>
             <ReviewSettingForm v-if="!!reviewPointViewedByUser.reviewSetting" v-model="reviewSetting"/>
         </div>
-        <input type="submit" name="submit" value="Keep for repetition" class="btn btn-primary"/>
+        <input type="submit" name="submit" value="Keep for repetition" class="btn btn-primary"
+            v-on:click="processForm(false)"/>
         <input type="submit" name="skip" value="Skip repetition" class="btn btn-secondary"
-            onclick="return confirm('Are you sure to hide this note from reviewing in the future?')">
+            v-on:click="processForm(true)">
     </form>
   </LoadingPage>
 </template>
@@ -37,8 +38,12 @@ const loadNew = (resp) => {
   }
 }
 
-const processForm = function() {
-    restPost(
+const processForm = function(skipReview) {
+  if(skipReview) {
+    if(!confirm('Are you sure to hide this note from reviewing in the future?')) return;
+  }
+  reviewPoint.value.removedFromReview = skipReview
+  restPost(
       `/api/reviews`,
       {reviewPoint: reviewPoint.value, reviewSetting: reviewSetting.value},
         loading,
