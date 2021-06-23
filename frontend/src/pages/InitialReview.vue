@@ -2,11 +2,11 @@
   <LoadingPage v-bind="{loading, contentExists: !!reviewPointViewedByUser}">
     <ShowReviewPoint v-bind="reviewPointViewedByUser"/>
 
-    <form id="review-setting" action="/reviews/" method="post">
+    <form id="review-setting" @submit.prevent="processForm">
         <div class="mb-2">
             <input name="note" v-if="reviewPoint.note" :value="reviewPoint.note.id" type="hidden"/>
             <input name="link" v-if="reviewPoint.link" :value="reviewPoint.link.id" type="hidden"/>
-            <ReviewSettingForm v-if="!!reviewPointViewedByUser.reviewSetting" :reviewSetting="reviewPointViewedByUser.reviewSetting"/>
+            <ReviewSettingForm v-if="!!reviewPointViewedByUser.reviewSetting" v-model="reviewSetting"/>
         </div>
         <input type="submit" name="submit" value="Keep for repetition" class="btn btn-primary"/>
         <input type="submit" name="skip" value="Skip repetition" class="btn btn-secondary"
@@ -28,12 +28,21 @@ const reviewPointViewedByUser = ref(null)
 const loading = ref(false)
 
 const reviewPoint = computed(()=>reviewPointViewedByUser.value.reviewPoint)
+const reviewSetting = computed(()=>reviewPointViewedByUser.value.reviewSetting)
 
 const loadNew = (resp) => {
   reviewPointViewedByUser.value = resp;
   if (!reviewPointViewedByUser.value.reviewPoint) {
     emit("redirect", {name: "reviews"})
   }
+}
+
+const processForm = function() {
+    restPost(
+      `/api/reviews`,
+      {reviewPoint: reviewPoint.value, reviewSetting: reviewSetting.value},
+        loading,
+        loadNew)
 }
 
 

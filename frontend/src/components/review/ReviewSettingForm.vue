@@ -1,8 +1,13 @@
 <template>
-    <CheckInput scopeName='review_setting' field='rememberSpelling' v-model="reviewSetting.rememberSpelling"/>
+    <CheckInput scopeName='review_setting' field='rememberSpelling' v-model="modelValue.rememberSpelling"/>
 </template>
 
 <script setup>
-  import CheckInput from "../form/CheckInput.vue"
-  const props = defineProps({ reviewSetting: Object})
+  import { watch } from "@vue/runtime-core"
+import CheckInput from "../form/CheckInput.vue"
+  const props = defineProps({ modelValue: Object})
+  const emit = defineEmit(['update:modelValue'])
+  watch(()=>({...props.modelValue.value}),
+    ()=> emit("update:modelValue", props.modelValue.value)
+  )
 </script>

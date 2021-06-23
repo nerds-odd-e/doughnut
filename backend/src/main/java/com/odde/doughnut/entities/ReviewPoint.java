@@ -30,13 +30,13 @@ public class ReviewPoint {
   @ManyToOne
   @JoinColumn(name = "note_id")
   @Getter
-  @Setter
+  @JsonIgnore
   private Note note;
 
   @ManyToOne
   @JoinColumn(name = "link_id")
   @Getter
-  @Setter
+  @JsonIgnore
   private Link link;
 
   @ManyToOne(cascade = CascadeType.PERSIST)
@@ -79,8 +79,11 @@ public class ReviewPoint {
 
   @Column(name = "note_id", insertable = false, updatable = false)
   @Getter
-  @JsonIgnore
   private Integer noteId;
+
+  @Column(name = "link_id", insertable = false, updatable = false)
+  @Getter
+  private Integer linkId;
 
   @Column(name = "user_id", insertable = false, updatable = false)
   @Getter
@@ -89,6 +92,18 @@ public class ReviewPoint {
 
   @JsonIgnore
   @Transient @Getter @Setter private Boolean repeatAgainToday = false;
+
+  public void setNote(Note note) {
+    this.note = note;
+    this.noteId = null;
+    if (note != null) this.noteId = note.getId();
+  }
+
+  public void setLink(Link link) {
+    this.link = link;
+    this.linkId = null;
+    if (link != null) this.linkId = link.getId();
+  }
 
   public boolean isInitialReviewOnSameDay(Timestamp currentTime,
                                           ZoneId timeZone) {
