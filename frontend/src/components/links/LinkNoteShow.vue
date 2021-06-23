@@ -9,7 +9,7 @@
         </template>
     </Card>
     <div :id="`note-collapse-${noteViewedByUser.note.id}`" class="collapse">
-        <NoteShow v-bind="noteViewedByUser" :level="2" :forBazaar="false"/>
+        <NoteShow v-bind="noteViewedByUser" :level="2"/>
     </div>
 </template>
 

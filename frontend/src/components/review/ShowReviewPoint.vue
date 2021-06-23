@@ -3,7 +3,7 @@
     <div v-if="!!noteViewedByUser">
         <NoteBreadcrumbForReview :ancestors="noteViewedByUser.ancestors" />
         <div class="jumbotron py-4 mb-2">
-            <NoteShow v-bind="{...noteViewedByUser, level: 1, forBazaar: false}"/>
+            <NoteShow v-bind="{...noteViewedByUser, level: 1}"/>
         </div>
     </div>
 
