@@ -6,10 +6,10 @@
         <div th:replace="_fragments/note_fragments :: noteOwnerBreadcrumb(${note}, ~{:: .additional-item})">
             <li class="breadcrumb-item additional-item" th:text="${note.title}"/>
         </div>
-
         <form action="#" th:action="@{/notes/{id}(id=${note.id})}" th:object="${noteContent}" method="post" enctype="multipart/form-data">
             <div th:replace="_fragments/note_fragments :: noteFormBody()"/>
             <input type="submit" value="Submit" class="btn btn-primary"/>
         </form>
+
     </div>
 </layout>

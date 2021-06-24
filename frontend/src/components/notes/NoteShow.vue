@@ -10,5 +10,5 @@
 import NoteShowWithTitle from "./NoteShowWithTitle.vue"
 import { ref, defineProps } from "vue"
 
-const props = defineProps({note: {tyep: Object, required: true }, links: Object, level: Number, owns: Boolean})
+const props = defineProps({note: {type: Object, required: true }, links: Object, level: Number, owns: Boolean})
 </script>

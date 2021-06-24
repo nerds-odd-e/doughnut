@@ -69,9 +69,8 @@ public class NoteController extends ApplicationMvcController  {
     }
 
     @GetMapping("/{note}/edit")
-    public String editNote(Note note, Model model) {
-        model.addAttribute("noteContent", note.getNoteContent());
-        return "notes/edit";
+    public String editNote(Note note) {
+        return "vuejsed";
     }
 
     @PostMapping("/{note}")

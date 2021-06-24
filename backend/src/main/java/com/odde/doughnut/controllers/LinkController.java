@@ -68,22 +68,4 @@ public class LinkController extends ApplicationMvcController  {
         return "redirect:/notes/" + link.getSourceNote().getId();
     }
 
-    @PostMapping(value = "/{link}", params="submit", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public String updateLink(@Valid Link link, BindingResult bindingResult) throws NoAccessRightException {
-        if (bindingResult.hasErrors()) {
-            return "links/show";
-        }
-        currentUserFetcher.getUser().getAuthorization().assertAuthorization(link.getSourceNote());
-        modelFactoryService.linkRepository.save(link);
-        return "redirect:/notes/" + link.getSourceNote().getId();
-    }
-
-    @PostMapping(value = "/{link}", params="delete", consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public String deleteLink(@Valid Link link) throws NoAccessRightException {
-        currentUserFetcher.getUser().getAuthorization().assertAuthorization(link.getSourceNote());
-        LinkModel linkModel = modelFactoryService.toLinkModel(link);
-        linkModel.destroy();
-        return "redirect:/notes/" + link.getSourceNote().getId();
-    }
-
 }
