@@ -4,7 +4,7 @@
         <LinkShow v-bind="linkViewedByUser">
             <div class="link-content">
                 <form :action="`/links/${linkViewedByUser.id}`" method="post">
-                    <Select v-if="!!staticInfo" scopeName='link' field='linkType' v-model="linkViewedByUser.linkTypeId" :options="staticInfo.linkTypeOptions"/>
+                    <Select v-if="!!staticInfo" scopeName='link' field='typeId' v-model="linkViewedByUser.linkTypeId" :options="staticInfo.linkTypeOptions"/>
                     <input type="submit" name="submit" value="Update" class="btn btn-primary"/>
                     <input type="submit" name="delete" value="Delete" class="btn btn-danger"
                            onclick="return confirm('Are you sure to delete this link?')"/>

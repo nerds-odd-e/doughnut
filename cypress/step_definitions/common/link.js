@@ -38,10 +38,17 @@ And("I should see note cannot be found when searching {string}",(searchKey) => {
 })
 
 Then("I should see {string} has link {string} {string}",(noteTitle, linkType, targetNoteTitles) => {
-    cy.findByText(linkType).should('be.visible');
-    targetNoteTitles.commonSenseSplit(",").forEach(
-        targetNoteTitle => cy.findByText(targetNoteTitle).should('be.visible')
-    );
+    cy.jumpToNotePage(noteTitle)
+    cy.findByText(linkType).parent().within(()=> {
+            targetNoteTitles.commonSenseSplit(",").forEach(
+                targetNoteTitle => cy.findByText(targetNoteTitle).should('be.visible')
+        )
+    })
+})
+
+Then("I should see {string} has no link of type {string}",(noteTitle, linkType) => {
+    cy.jumpToNotePage(noteTitle)
+    cy.findByText(linkType).should("not.exist")
 })
 
 When("I open link {string}", (linkTitle) => {
@@ -52,6 +59,10 @@ Then("I should be able to change the link to {string}", (linkType) => {
     cy.get('select').select(linkType);
     cy.findByRole('button', {name: "Update"}).click();
     cy.findByText(linkType).should('be.visible');
+});
+
+Then("I should be able to delete the link", () => {
+    cy.findByRole('button', {name: "Delete"}).click();
 });
 
 Then("I should be able to delete the link to note {string}", (noteTitle) => {
