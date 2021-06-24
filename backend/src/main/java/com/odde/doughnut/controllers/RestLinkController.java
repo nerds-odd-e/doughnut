@@ -5,6 +5,7 @@ import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.LinkViewedByUser;
+import com.odde.doughnut.entities.json.RedirectToNoteResponse;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.LinkModel;
@@ -12,8 +13,6 @@ import com.odde.doughnut.models.UserModel;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.bind.annotation.*;
-
-import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/links")
@@ -37,28 +36,20 @@ class RestLinkController {
     public Integer typeId;
   }
 
-  static class LinkUpdateResponse {
-    public Integer noteId;
-
-    public LinkUpdateResponse(Integer noteId) {
-      this.noteId = noteId;
-    }
-  }
-
   @PostMapping(value = "/{link}")
-  public LinkUpdateResponse updateLink(Link link, @RequestBody LinkRequest linkRequest) throws NoAccessRightException {
+  public RedirectToNoteResponse updateLink(Link link, @RequestBody LinkRequest linkRequest) throws NoAccessRightException {
     currentUserFetcher.getUser().getAuthorization().assertAuthorization(link.getSourceNote());
     link.setTypeId(linkRequest.typeId);
     modelFactoryService.linkRepository.save(link);
-    return new LinkUpdateResponse(link.getSourceNote().getId());
+    return new RedirectToNoteResponse(link.getSourceNote().getId());
   }
 
   @PostMapping(value = "/{link}/delete")
-  public LinkUpdateResponse deleteLink(Link link) throws NoAccessRightException {
+  public RedirectToNoteResponse deleteLink(Link link) throws NoAccessRightException {
     currentUserFetcher.getUser().getAuthorization().assertAuthorization(link.getSourceNote());
     LinkModel linkModel = modelFactoryService.toLinkModel(link);
     linkModel.destroy();
-    return new LinkUpdateResponse(link.getSourceNote().getId());
+    return new RedirectToNoteResponse(link.getSourceNote().getId());
   }
 
   class LinkStatistics {

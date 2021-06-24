@@ -17,8 +17,10 @@ import TextInput from "../form/TextInput.vue"
 import CheckInput from "../form/CheckInput.vue"
 import TextArea from "../form/TextArea.vue"
 import ImageInput from "../form/ImageInput.vue"
-import { ref, defineProps } from "vue"
+import { watch, defineProps } from "vue"
 
 const props = defineProps({modelValue: {type: Object, required: true }})
-const v=ref("abc")
+watch(()=>({...props.modelValue.value}),
+  ()=> emit("update:modelValue", props.modelValue.value)
+)
 </script>
