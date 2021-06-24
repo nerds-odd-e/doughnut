@@ -18,7 +18,6 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import javax.validation.Valid;
 import java.io.IOException;
-import java.util.Optional;
 
 @Controller
 @RequestMapping("/notes")
@@ -31,13 +30,8 @@ public class NoteController extends ApplicationMvcController  {
     }
 
     @GetMapping("/{parentNote}/new")
-    public String newNote(@PathVariable(name = "parentNote") Note parentNote, Model model) throws NoAccessRightException {
-        UserModel userModel = getCurrentUser();
-        userModel.getAuthorization().assertAuthorization(parentNote);
-        NoteContent noteContent = new NoteContent();
-        model.addAttribute("ownership", userModel.getEntity().getOwnership());
-        model.addAttribute("noteContent", noteContent);
-        return "notes/new";
+    public String newNote(@PathVariable(name = "parentNote") Integer parentNoteId) {
+        return "vuejsed";
     }
 
     @PostMapping("/{parentNote}/create")
@@ -69,7 +63,7 @@ public class NoteController extends ApplicationMvcController  {
     }
 
     @GetMapping("/{note}/edit")
-    public String editNote(Note note) {
+    public String editNote(Integer noteId) {
         return "vuejsed";
     }
 

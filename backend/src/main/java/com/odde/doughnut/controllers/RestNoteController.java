@@ -5,6 +5,7 @@ import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteContent;
 import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.json.NoteViewedByUser;
 import com.odde.doughnut.entities.json.RedirectToNoteResponse;
 import com.odde.doughnut.exceptions.NoAccessRightException;
@@ -38,6 +39,23 @@ class RestNoteController {
     private Note note;
 
   }
+
+  @PostMapping("/{parentNote}/create")
+  public RedirectToNoteResponse createNote(@PathVariable(name = "parentNote") Note parentNote, @Valid @RequestBody NoteContent noteContent, BindingResult bindingResult) throws NoAccessRightException, IOException {
+    if (bindingResult.hasErrors()) {
+      return null;
+    }
+    final UserModel userModel = currentUserFetcher.getUser();
+    userModel.getAuthorization().assertAuthorization(parentNote);
+    User user = userModel.getEntity();
+    Note note = new Note();
+    note.updateNoteContent(noteContent, user);
+    note.setParentNote(parentNote);
+    note.setUser(user);
+    modelFactoryService.noteRepository.save(note);
+    return new RedirectToNoteResponse(note.getId());
+  }
+
 
   @GetMapping("/{note}")
   public NoteViewedByUser show(@PathVariable("note") Note note) throws NoAccessRightException {
