@@ -1,4 +1,5 @@
 import {createRouter,createWebHistory} from 'vue-router'
+import NotebookNewPage from './pages/NotebookNewPage.vue'
 import NoteShowPage from './pages/NoteShowPage.vue'
 import NoteNewPage from './pages/NoteNewPage.vue'
 import NoteEditPage from './pages/NoteEditPage.vue'
@@ -9,6 +10,7 @@ import InitialReview from './pages/InitialReview.vue'
 
 const routes = [
     { path: '/', name: 'root', component: ReviewHome },
+    { path: '/notebooks/new', name: 'notebookNew', component: NotebookNewPage },
     { path: '/notes/:noteid', name: 'noteShow', component: NoteShowPage, props: true },
     { path: '/bazaar/notes/:noteid', name: 'bnoteShow', component: NoteShowPage, props: true },
     { path: '/notes/:noteid/new', name: 'noteNew', component: NoteNewPage, props: true },

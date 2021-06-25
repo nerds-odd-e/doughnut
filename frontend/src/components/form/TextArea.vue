@@ -1,7 +1,7 @@
 <template>
   <InputWithType v-bind="{scopeName, field, errors}">
       <textarea
-              class="text-input-control form-control put_error_class_here"
+              :class="`area-control form-control ${!!errors ? 'is-invalid' : ''}`"
               :id="`${scopeName}-${field}`"
               :name="field"
               v-model="modelValue"

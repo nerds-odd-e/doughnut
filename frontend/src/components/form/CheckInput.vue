@@ -1,19 +1,19 @@
 <template>
-<div class="form-check">
+  <InputWithType v-bind="{scopeName, field, errors, beforeLabel: true}">
     <input
             type="checkbox"
-            class="form-check-input"
+            :class="`form-check-input ${!!errors ? 'is-invalid' : ''}`"
             :id="`${scopeName}-${field}`"
             :name="field"
             :checked="modelValue"
             @change="$emit('update:modelValue', $event.target.checked)"
     />
-    <label class="form-check-label" :for="`${scopeName}-${field}`">{{startCase(camelCase(field))}}</label>
-</div>
+  </InputWithType>
 
 </template>
 
 <script setup>
+import InputWithType from "./InputWithType.vue"
 import { startCase, camelCase } from "lodash"
 
 const props = defineProps({modelValue: String, scopeName: String, field: String, errors: Object})

@@ -1,7 +1,7 @@
 <template>
   <InputWithType v-bind="{scopeName, field, errors}">
       <input
-              class="text-input-control form-control put_error_class_here"
+              :class="`file-input-control form-control ${!!errors ? 'is-invalid' : ''}`"
               :id="`${scopeName}-${field}`"
               type="file"
               :name="field"

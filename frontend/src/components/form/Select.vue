@@ -1,7 +1,7 @@
 <template>
   <InputWithType v-bind="{scopeName, field, errors}">
       <select
-              class="select-control form-control"
+              :class="`select-control form-control ${!!errors ? 'is-invalid' : ''}`"
               :id="`${scopeName}-${field}`"
               :name="field"
               :value="modelValue"

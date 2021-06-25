@@ -13,7 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.thymeleaf.util.StringUtils;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.io.IOException;
@@ -30,7 +30,7 @@ public class NoteContent {
     @Getter
     private Integer id;
 
-    @NotNull
+    @NotEmpty
     @Size(min = 1, max = 100)
     @Getter
     @Setter

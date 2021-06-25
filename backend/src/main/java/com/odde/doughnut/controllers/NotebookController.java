@@ -38,10 +38,7 @@ public class NotebookController extends ApplicationMvcController  {
 
     @GetMapping({"/new"})
     public String newNote(Model model) {
-        UserModel userModel = getCurrentUser();
-        model.addAttribute("ownership", userModel.getEntity().getOwnership());
-        model.addAttribute("noteContent", new NoteContent());
-        return "notebooks/new";
+        return "vuejsed";
     }
 
     @GetMapping({"/new_blog"})
