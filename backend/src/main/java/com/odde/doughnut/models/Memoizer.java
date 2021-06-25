@@ -7,6 +7,6 @@ import java.util.function.Supplier;
 public class Memoizer {
     private final Map<String, Object> cache = new ConcurrentHashMap<>();
     public <T> T call(String name, Supplier<T> method) {
-        return (T) cache.computeIfAbsent(name, (a)->{return method.get();});
+        return (T) cache.computeIfAbsent(name, (a)-> method.get());
     }
 }

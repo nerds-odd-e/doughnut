@@ -20,7 +20,7 @@ const restRequest = (url, params, loadingRef, callback, errorCallback) => {
       }
       return res.json().then(resp => {
         if(res.status === 200) callback(resp)
-        if(res.status === 400) errorCallback(Object.fromEntries(resp.errors.map(err=>[err.field, err.defaultMessage])))
+        if(res.status === 400) errorCallback(resp.errors)
       })
     })
     .catch(error => {
