@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "lodash": "^4.17.21",
-    "vue": "^3.1.1",
+    "vue": "^3.1.2",
     "vue-content-loader": "^2.0.0",
     "vue-router": "4"
   },
@@ -35,7 +35,7 @@
     "jest-fetch-mock": "^3.0.3",
     "postcss": "^8.2.15",
     "prettier": "^2.3.1",
-    "tailwindcss": "^2.1.2",
+    "tailwindcss": "^2.2",
     "vite": "^2.2.4",
     "vue-jest": "^5.0.0-alpha.9"
   }
