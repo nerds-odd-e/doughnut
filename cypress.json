@@ -1,7 +1,7 @@
 {
   "baseUrl": "http://localhost:9081",
   "env": {
-    "TAGS": "not @ignore"
+    "TAGS": "not @ignore and not @slow"
   },
   "testFiles": "**/*.{feature,features}",
   "chromeWebSecurity": false,
