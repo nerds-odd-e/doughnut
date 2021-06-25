@@ -6,7 +6,7 @@
             <li class="breadcrumb-item">{{noteViewedByUser.note.title}}</li>
         </NoteOwnerBreadcrumb>
         <form @submit.prevent="processForm">
-            <NoteFormBody v-model="noteFormData"/>
+            <NoteFormBody v-model="noteFormData" :errors="noteFormErrors"/>
             <input type="submit" value="Submit" class="btn btn-primary"/>
         </form>
     </div>
@@ -24,6 +24,7 @@ const props = defineProps({noteid: Number})
 const emit = defineEmit(['redirect'])
 const noteViewedByUser = ref(null)
 const loading = ref(false)
+const noteFormErrors = ref()
 const noteFormData = computed(()=>{
   const {updatedAt, ...rest} = noteViewedByUser.value.note.noteContent
   return rest
@@ -34,7 +35,13 @@ const fetchData = () => {
 }
 
 const processForm = () => {
-  restPostMultiplePartForm(`/api/notes/${props.noteid}`, noteFormData.value, loading, (res) => emit("redirect", {name: "noteShow", params: { noteid: res.noteId}}))
+  restPostMultiplePartForm(
+    `/api/notes/${props.noteid}`,
+    noteFormData.value,
+    loading,
+    (res) => emit("redirect", {name: "noteShow", params: { noteid: res.noteId}}),
+    (res) => noteFormErrors.value = res,
+  )
 }
 
 watch(()=>props.noteid, ()=>fetchData())

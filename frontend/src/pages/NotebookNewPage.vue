@@ -31,7 +31,7 @@ const processForm = () => {
      noteFormData.value,
      loading,
      (res) => emit("redirect", {name: "noteShow", params: { noteid: res.noteId}}),
-     (res) => noteFormErrors.value = Object.fromEntries(res.errors.map(err=>[err.field, err.defaultMessage])),
+     (res) => noteFormErrors.value = res,
     )
 }
 </script>

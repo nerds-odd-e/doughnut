@@ -4,7 +4,7 @@
         <LinkShow v-bind="linkViewedByUser">
             <div class="link-content">
               <div>
-                <Select v-if="!!staticInfo" scopeName='link' field='linkType' v-model="formData.typeId" :options="staticInfo.linkTypeOptions"/>
+                <Select v-if="!!staticInfo" scopeName='link' field='linkType' v-model="formData.typeId" :errors="formErrors.typeId" :options="staticInfo.linkTypeOptions"/>
                 <button class="btn btn-primary" v-on:click="updateLink()">Update</button>
                 <button class="btn btn-danger" v-on:click="deleteLink()">Delete</button>
               </div>
@@ -31,13 +31,19 @@ const linkViewedByUser = ref(null)
 const loading = ref(false)
 
 const formData = computed(()=>!linkViewedByUser.value ? null : {typeId: linkViewedByUser.value.linkTypeId})
+const formErrors = ref({})
 
 const fetchData = async () => {
   restGet(`/api/links/${props.linkid}`, loading, (res) => linkViewedByUser.value = res)
 }
 
 const updateLink = async () => {
-  restPost(`/api/links/${props.linkid}`, formData.value, loading, (res) => emit("redirect", {name: "noteShow", params: { noteid: res.noteId}}))
+  restPost(
+    `/api/links/${props.linkid}`,
+    formData.value, loading,
+    (res) => emit("redirect", {name: "noteShow", params: { noteid: res.noteId}}),
+    (res) => formErrors.value = res,
+  )
 }
 
 const deleteLink = async () => {
