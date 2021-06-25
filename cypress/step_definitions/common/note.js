@@ -91,11 +91,11 @@ When("I open {string} note from top level", (noteTitles) => {
 });
 
 When("I should be able to go to the {string} note {string}", (button, noteTitle) => {
-    cy.wait(250).findByRole('button', { name: button }).click();
+  cy.findByRole('button', { name: button }).click();
 
-    cy.get('.jumbotron').within( ()=>
-      cy.findByText(noteTitle).should('exist')
-    );
+  cy.get('.jumbotron').within( ()=>
+    cy.findByText(noteTitle).should('exist')
+  );
 });
 
 When("I move note {string} left", (noteTitle) => {
