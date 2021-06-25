@@ -3,7 +3,7 @@
     <div v-if="!!noteViewedByUser">
         <NoteBreadcrumbForReview :ancestors="noteViewedByUser.ancestors" />
         <div class="jumbotron py-4 mb-2">
-            <NoteShow v-bind="{...noteViewedByUser, level: 1}"/>
+            <NoteShow v-bind="{note: noteViewedByUser.note, links: noteViewedByUser.links, level: 1}"/>
         </div>
     </div>
 
@@ -16,6 +16,10 @@
     </div>
 </div>
 </template>
+
+<script>
+export default { name: "ShowReviewPoint" };
+</script>
 
 <script setup>
   import NoteBreadcrumbForReview from "./NoteBreadcrumbForReview.vue"

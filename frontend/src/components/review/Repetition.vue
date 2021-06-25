@@ -67,6 +67,10 @@
         </div>
 </template>
 
+<script>
+export default { name: "Repetition" };
+</script>
+
 <script setup>
   import SvgSad from "../svgs/SvgSad.vue"
   import SvgSatisfying from "../svgs/SvgSatisfying.vue"

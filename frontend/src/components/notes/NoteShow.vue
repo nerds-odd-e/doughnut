@@ -6,6 +6,10 @@
 
 </template>
 
+<script>
+export default { name: "NoteShow" };
+</script>
+
 <script setup>
 import NoteShowWithTitle from "./NoteShowWithTitle.vue"
 import { ref, defineProps } from "vue"

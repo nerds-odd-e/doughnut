@@ -8,6 +8,7 @@ import Repeat from './pages/Repeat.vue'
 import InitialReview from './pages/InitialReview.vue'
 
 const routes = [
+    { path: '/', name: 'root', component: ReviewHome },
     { path: '/notes/:noteid', name: 'noteShow', component: NoteShowPage, props: true },
     { path: '/bazaar/notes/:noteid', name: 'bnoteShow', component: NoteShowPage, props: true },
     { path: '/notes/:noteid/new', name: 'noteNew', component: NoteNewPage, props: true },

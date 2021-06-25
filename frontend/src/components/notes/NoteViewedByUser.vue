@@ -19,6 +19,10 @@
     <NoteOwnerViewCards :owns="owns" :notes="children"/>
 </template>
 
+<script>
+export default { name: "NoteViewedByUser" };
+</script>
+
 <script setup>
 import NoteShow from "./NoteShow.vue"
 import NoteBazaarBreadcrumb from "../bazaar/NoteBazaarBreadcrumb.vue"

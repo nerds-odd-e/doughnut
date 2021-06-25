@@ -21,6 +21,10 @@
     </ul>
 </template>
 
+<script>
+export default { name: "NoteShowWithTitle" };
+</script>
+
 <script setup>
   import ShowPicture from "./ShowPicture.vue"
   import LinkWithHtmlLink from "../links/LinkWithHtmlLink.vue"
