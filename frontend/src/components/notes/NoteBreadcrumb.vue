@@ -13,7 +13,13 @@
 </div>
 </template>
 
+<script>
+export default { name: "NoteBreadcrumb" };
+</script>
+
 <script setup>
   import NoteTitleWithLink from "./NoteTitleWithLink.vue"
   const props = defineProps({ancestors: Array, linkFragment: Object})
+  const name = ""
 </script>
+

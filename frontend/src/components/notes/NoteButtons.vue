@@ -1,8 +1,8 @@
 <template>
 <div class="btn-group btn-group-sm">
-    <a class="btn btn-sm" :href="`/notes/${note.id}/edit`" role="button" title="edit note">
+    <router-link class="btn btn-sm" :to="{name: 'noteEdit', params: {noteid: note.id}}" role="button" title="edit note">
         <SvgEdit/>
-    </a>
+    </router-link>
     <a role="button" class="btn btn-sm" title="Cards View" :href="`/notes/articles/${note.id}`">
         <SvgArticle/>
     </a>
