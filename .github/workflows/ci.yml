@@ -94,8 +94,6 @@ jobs:
       - name: End-to-End tests with Cypress
         uses: cypress-io/github-action@v2
         with:
-          browser: chrome
-          headless: true
           config: pageLoadTimeout=100000,video=false
           install-command: yarn
           start: yarn sut
