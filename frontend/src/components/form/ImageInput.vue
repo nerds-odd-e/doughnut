@@ -5,7 +5,7 @@
               :id="`${scopeName}-${field}`"
               type="file"
               :name="field"
-              @input="$emit('update:modelValue', $event.target.value)"
+              @change="update($event.target.files[0])"
               :placeholder="placeholder"
               :autofocus="autofocus"
               autocomplete="off"
@@ -26,7 +26,12 @@ export default {
       errors: Object
       },
   emits: ['update:modelValue'],
-  components: {InputWithType}
+  components: {InputWithType},
+  methods: {
+    update(data) {
+      this.$emit('update:modelValue', data)
+    }
+  }
 }
 
 </script>

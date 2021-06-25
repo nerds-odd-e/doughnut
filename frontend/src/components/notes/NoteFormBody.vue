@@ -1,7 +1,7 @@
 <template>
     <TextInput scopeName='note' field='title' v-model="modelValue.title"/>
     <TextArea scopeName='note' field='description' v-model="modelValue.description"/>
-    <ImageInput scopeName='note' field='uploadPictureProxy' placeholder="Optional. upload own picture." v-model="modelValue.uploadPictureProxy"/>
+    <ImageInput scopeName='note' field='uploadPicture' placeholder="Optional. upload own picture." v-model="modelValue.uploadPictureProxy"/>
     <TextInput scopeName='note' field='pictureUrl' placeholder="Full url of existing picture." v-model="modelValue.pictureUrl"/>
     <CheckInput scopeName='note' field='useParentPicture' v-model="modelValue.useParentPicture"/>
     <TextInput scopeName='note' field='pictureMask' v-model="modelValue.pictureMask"/>
@@ -17,10 +17,6 @@ import TextInput from "../form/TextInput.vue"
 import CheckInput from "../form/CheckInput.vue"
 import TextArea from "../form/TextArea.vue"
 import ImageInput from "../form/ImageInput.vue"
-import { watch, defineProps } from "vue"
 
 const props = defineProps({modelValue: {type: Object, required: true }})
-watch(()=>({...props.modelValue.value}),
-  ()=> emit("update:modelValue", props.modelValue.value)
-)
 </script>

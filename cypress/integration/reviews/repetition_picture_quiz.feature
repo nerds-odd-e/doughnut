@@ -8,10 +8,10 @@ Feature: Repetition Picture Quiz
       | Space | true       |               |
       | Mars  | true       | Space         |
     When I create note belonging to "Space":
-      | Title | UploadPicture | PictureMask           |
+      | Title | Upload Picture | Picture Mask           |
       | Earth | example.png   | 20 40 70 30 40 80 5 8 |
     And I create note belonging to "Space":
-      | Title | UploadPicture | PictureMask |
+      | Title | Upload Picture | Picture Mask |
       | Moon  | moon.jpg      | 30 40 20 30 |
 
   Scenario: Picture question

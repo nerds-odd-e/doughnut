@@ -3,12 +3,12 @@
     <NoteOwnerBreadcrumb :ancestors="ancestors" :notebook="notebook">
         <li class="breadcrumb-item">{{note.title}}</li>
         <li class="breadcrumb-item">
-            <a class="text-secondary" :href="`/notes/${note.id}/new`">{{`(Add ${note.noteTypeDisplay})`}}</a>
+            <router-link class="text-secondary" :to="{name: 'noteNew', params: {noteid: note.id}}">{{`(Add ${note.noteTypeDisplay})`}}</router-link>
         </li>
     </NoteOwnerBreadcrumb>
     <div v-if="!note.head">
         <SvgDownRight/>
-        <a :href="`/notes/${ancestors[ancestors.length -1].id}/new`">Add Sibling Note</a>
+        <router-link :to="{name: 'noteNew', params: {noteid: ancestors[ancestors.length -1].id}}">Add Sibling Note</router-link>
     </div>
 </div>
 </template>

@@ -13,7 +13,6 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -41,10 +40,7 @@ class RestNoteController {
   }
 
   @PostMapping("/{parentNote}/create")
-  public RedirectToNoteResponse createNote(@PathVariable(name = "parentNote") Note parentNote, @Valid @RequestBody NoteContent noteContent, BindingResult bindingResult) throws NoAccessRightException, IOException {
-    if (bindingResult.hasErrors()) {
-      return null;
-    }
+  public RedirectToNoteResponse createNote(@PathVariable(name = "parentNote") Note parentNote, @Valid NoteContent noteContent) throws NoAccessRightException, IOException {
     final UserModel userModel = currentUserFetcher.getUser();
     userModel.getAuthorization().assertAuthorization(parentNote);
     User user = userModel.getEntity();
@@ -64,13 +60,10 @@ class RestNoteController {
     return note.jsonObjectViewedBy(user.getEntity());
   }
 
-  @PostMapping("/{note}")
-  public RedirectToNoteResponse updateNote(@PathVariable(name = "note") Note note, @Valid @RequestBody NoteContent noteContent, BindingResult bindingResult) throws NoAccessRightException, IOException {
+  @PostMapping(path="/{note}")
+  public RedirectToNoteResponse updateNote(@PathVariable(name = "note") Note note, @Valid @ModelAttribute NoteContent noteContent) throws NoAccessRightException, IOException {
     final UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertAuthorization(note);
-    if (bindingResult.hasErrors()) {
-      return null;
-    }
     note.updateNoteContent(noteContent, user.getEntity());
     modelFactoryService.noteRepository.save(note);
     return new RedirectToNoteResponse(note.getId());

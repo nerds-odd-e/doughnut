@@ -17,7 +17,7 @@
 import NoteBreadcrumbForOwnOrCircle from "../components/notes/NoteBreadcrumbForOwnOrCircle.vue"
 import NoteFormBody from "../components/notes/NoteFormBody.vue"
 import LoadingPage from "./LoadingPage.vue"
-import {restGet, restPost} from "../restful/restful"
+import {restGet, restPostMultiplePartForm} from "../restful/restful"
 import { computed, ref, watch, defineProps } from "vue"
 
 const props = defineProps({noteid: Number})
@@ -31,7 +31,7 @@ const fetchData = () => {
 }
 
 const processForm = () => {
-  restPost(`/api/notes/${props.noteid}/create`, noteFormData.value, loading, (res) => emit("redirect", {name: "noteShow", params: { noteid: res.noteId}}))
+  restPostMultiplePartForm(`/api/notes/${props.noteid}/create`, noteFormData.value, loading, (res) => emit("redirect", {name: "noteShow", params: { noteid: res.noteId}}))
 }
 
 watch(()=>props.noteid, ()=>fetchData())

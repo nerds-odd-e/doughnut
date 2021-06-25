@@ -49,4 +49,19 @@ const restPost = (url, data, loadingRef, callback) => {
     }, loadingRef, callback)
 }
 
-export {restGet, restPost}
+const restPostMultiplePartForm = (url, data, loadingRef, callback) => {
+    const formData = new FormData()
+    Object.keys(data).forEach(function(key,index) {
+      formData.append(key, data[key] === null ? "" : data[key])
+    });
+
+    restRequest(url, {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+        },
+        body: formData
+    }, loadingRef, callback)
+}
+
+export {restGet, restPost, restPostMultiplePartForm}
