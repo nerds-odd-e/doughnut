@@ -1,9 +1,13 @@
 <template>
-  <router-link :to="{name: 'noteShow', params: {noteid}}"  v-if="!!noteid" role="button" class="btn btn-sm" :title="title">
+  <RelativeRouterLink :to="{name: 'noteShow', params: {noteid}}"  v-if="!!noteid" role="button" class="btn btn-sm" :title="title">
     <slot/>
-  </router-link>
+  </RelativeRouterLink>
+  <a v-else role="button" class="btn btn-sm disabled" :title="title">
+    <slot/>
+  </a>
 </template>
 
 <script setup>
+  import RelativeRouterLink from "../RelativeRouterLink.vue"
   const props = defineProps({noteid: Number, title: String})
 </script>

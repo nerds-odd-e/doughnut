@@ -3,12 +3,12 @@
     <NoteOwnerBreadcrumb :ancestors="ancestors" :notebook="notebook">
         <li class="breadcrumb-item">{{note.title}}</li>
         <li class="breadcrumb-item">
-            <router-link class="text-secondary" :to="{name: 'noteNew', params: {noteid: note.id}}">{{`(Add ${note.noteTypeDisplay})`}}</router-link>
+            <RelativeRouterLink class="text-secondary" :to="{name: 'noteNew', params: {noteid: note.id}}">{{`(Add ${note.noteTypeDisplay})`}}</RelativeRouterLink>
         </li>
     </NoteOwnerBreadcrumb>
     <div v-if="!note.head">
         <SvgDownRight/>
-        <router-link :to="{name: 'noteNew', params: {noteid: ancestors[ancestors.length -1].id}}">Add Sibling Note</router-link>
+        <RelativeRouterLink :to="{name: 'noteNew', params: {noteid: ancestors[ancestors.length -1].id}}">Add Sibling Note</RelativeRouterLink>
     </div>
 </div>
 </template>
@@ -21,5 +21,6 @@
   import SvgDownRight from "../svgs/SvgDownRight.vue"
   import SvgReviewSetting from "../svgs/SvgReviewSetting.vue"
   import NoteOwnerBreadcrumb from "./NoteOwnerBreadcrumb.vue"
+  import RelativeRouterLink from "../RelativeRouterLink.vue"
   const props = defineProps({note: Object, ancestors: Array, notebook: Object})
 </script>

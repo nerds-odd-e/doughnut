@@ -8,17 +8,23 @@ import ReviewHome from './pages/ReviewHome.vue'
 import Repeat from './pages/Repeat.vue'
 import InitialReview from './pages/InitialReview.vue'
 
+const noteAndLinkRoutes = [
+    { path: 'notes/:noteid', name: 'noteShow', component: NoteShowPage, props: true },
+    { path: 'notes/:noteid/new', name: 'noteNew', component: NoteNewPage, props: true },
+    { path: 'notes/:noteid/edit', name: 'noteEdit', component: NoteEditPage, props: true },
+    { path: 'links/:linkid', name: 'linkShow', component: LinkShowPage, props: true },
+  ]
+  
+const nestedNoteAndLinkRoutes = (prefix) => noteAndLinkRoutes.map(route=>({...route, name: prefix + route.name}))
+
 const routes = [
+    ...noteAndLinkRoutes.map(route=>({...route, path: `/${route.path}`})),
     { path: '/', name: 'root', component: ReviewHome },
     { path: '/notebooks/new', name: 'notebookNew', component: NotebookNewPage },
-    { path: '/notes/:noteid', name: 'noteShow', component: NoteShowPage, props: true },
     { path: '/bazaar/notes/:noteid', name: 'bnoteShow', component: NoteShowPage, props: true },
-    { path: '/notes/:noteid/new', name: 'noteNew', component: NoteNewPage, props: true },
-    { path: '/notes/:noteid/edit', name: 'noteEdit', component: NoteEditPage, props: true },
-    { path: '/links/:linkid', name: 'linkShow', component: LinkShowPage, props: true },
     { path: '/reviews', name: 'reviews', component: ReviewHome },
     { path: '/reviews/initial', name: 'initial', component: InitialReview },
-    { path: '/reviews/repeat', name: 'repeat', component: Repeat },
+    { path: '/reviews/repeat', name: 'repeat', component: Repeat, children: nestedNoteAndLinkRoutes('repeat-') },
   ]
   
 const router = createRouter({
@@ -26,4 +32,4 @@ const router = createRouter({
     routes,
 })
 
-export {router}
+export {router, routes}

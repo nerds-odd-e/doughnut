@@ -12,7 +12,7 @@
                     <div class="card-body">
                         <p class="card-text">Do the initial review for your notes. You may try to remember them for the first time. Or, you can mark some as no repetition needed.
                         </p>
-                        <router-link v-if="reviewing.toInitialReviewCount > 0" role="button" class="btn btn-light" :to="{name: 'initial'}"> Start reviewing new notes </router-link>
+                        <RelativeRouterLink v-if="reviewing.toInitialReviewCount > 0" role="button" class="btn btn-light" :to="{name: 'initial'}"> Start reviewing new notes </RelativeRouterLink>
                         <h2  v-else class="">You have achieved your daily new notes goal.</h2>
                     </div>
                 </div>
@@ -28,7 +28,7 @@
                     </div>
                     <div class="card-body">
                         <p class="card-text">Using spaced repetition technique, you only need to review the old notes you have learned at the optimal time. </p>
-                        <router-link v-if="reviewing.toRepeatCount > 0" role="button" class="btn btn-light" :to="{name: 'repeat'}"> Start reviewing old notes </router-link>
+                        <RelativeRouterLink v-if="reviewing.toRepeatCount > 0" role="button" class="btn btn-light" :to="{name: 'repeat'}"> Start reviewing old notes </RelativeRouterLink>
                         <h2 v-else class="">You have reviewed all the old notes for today.</h2>
                     </div>
                 </div>
@@ -38,6 +38,7 @@
 </template>
 
 <script setup>
+  import RelativeRouterLink from "../RelativeRouterLink.vue"
   const props = defineProps({reviewing: Object})
 
 </script>

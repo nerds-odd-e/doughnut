@@ -3,7 +3,7 @@ import { mount } from '@vue/test-utils';
 import flushPromises from 'flush-promises';
 import {noteViewedByUser} from './fixtures'
 import _ from 'lodash'
-import { router } from '@/routes'
+import { createTestRouter } from '../testing_routes'
 
 beforeEach(() => {
   fetch.resetMocks();
@@ -25,8 +25,9 @@ const stubResponse = _.merge(noteViewedByUser,
 describe('note show', () => {
 
   test('fetch API to be called ONCE', async () => {
+    const testingRouter = await createTestRouter();
     fetch.mockResponseOnce(JSON.stringify(stubResponse));
-    const wrapper = mount(NoteShowPage, {propsData: {noteid: 123}, global: { plugins: [router] }});
+    const wrapper = mount(NoteShowPage, {propsData: {noteid: 123}, global: { plugins: [testingRouter] }});
     await flushPromises()
     expect(fetch).toHaveBeenCalledTimes(1);
     expect(fetch).toHaveBeenCalledWith('/api/notes/123', {});

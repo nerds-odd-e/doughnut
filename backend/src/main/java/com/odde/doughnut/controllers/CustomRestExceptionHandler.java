@@ -41,8 +41,7 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @Override
     protected ResponseEntity<Object> handleBindException(final BindException ex, final HttpHeaders headers, final HttpStatus status, final WebRequest request) {
-        //
-        final ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, ex.getLocalizedMessage());
+        final ApiError apiError = new ApiError(HttpStatus.BAD_REQUEST, "binding error");
         for (final FieldError error : ex.getBindingResult().getFieldErrors()) {
             apiError.add(error.getField(), error.getDefaultMessage());
         }

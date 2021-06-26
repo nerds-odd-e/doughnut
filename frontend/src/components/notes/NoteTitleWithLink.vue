@@ -1,9 +1,12 @@
 <template>
   <template v-if="!!note">
-    <router-link :to="{name: 'noteShow', params: {noteid: note.id}}">{{note.title}}</router-link>
+    <RelativeRouterLink :to="{name: 'noteShow', params: {noteid: note.id}}">
+      {{note.title}}
+    </RelativeRouterLink>
   </template>
 </template>
 
 <script setup>
+  import RelativeRouterLink from "../RelativeRouterLink.vue"
   const props = defineProps({note: Object})
 </script>

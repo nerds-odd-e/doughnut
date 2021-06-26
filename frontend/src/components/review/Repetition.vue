@@ -49,11 +49,11 @@
                         <SvgLinkNote/>
                         Make Link
                       </a>
-                      <a class="dropdown-item"
-                          :href="`/notes/${sourceNoteViewedByUser.note.id}/edit`">
+                      <RelativeRouterLink class="dropdown-item"
+                          :to="{name: 'noteEdit', params: {noteid: sourceNoteViewedByUser.note.id}}">
                           <SvgEdit/>
                           Edit Note
-                      </a>
+                      </RelativeRouterLink>
                       <div class="dropdown-divider"></div>
                       <form :action="`/reviews/${reviewPoint.id}`" method="post"
                             onsubmit="return confirm('Are you sure to hide this note from reviewing in the future?')">
@@ -65,6 +65,7 @@
                 </div>
             </div>
         </div>
+        <router-view/>
 </template>
 
 <script>
@@ -82,6 +83,7 @@ export default { name: "Repetition" };
   import SvgLinkNote from "../svgs/SvgLinkNote.vue"
   import SvgNoReview from "../svgs/SvgNoReview.vue"
   import ShowReviewPoint from "./ShowReviewPoint.vue"
+  import RelativeRouterLink from "../RelativeRouterLink.vue"
   import { computed } from 'vue'
   const props = defineProps({
     reviewPoint: { type: Object, required: true },

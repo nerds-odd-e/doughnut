@@ -1,5 +1,5 @@
 <template>
-    <NoteOwnerBreadcrumb v-bind="noteViewedByUser"/>
+    <NoteOwnerBreadcrumb v-bind="{ancestors: noteViewedByUser.ancestors, notebook: noteViewedByUser.notebook}"/>
     <Card :note="noteViewedByUser.note">
         <template #button="{note}">
             <button class="source_btn btn btn-sm btn-secondary" data-toggle="collapse"
@@ -9,7 +9,7 @@
         </template>
     </Card>
     <div :id="`note-collapse-${noteViewedByUser.note.id}`" class="collapse">
-        <NoteShow v-bind="noteViewedByUser" :level="2"/>
+        <NoteShow v-bind="{note: noteViewedByUser.note, links: noteViewedByUser.links}" :level="2"/>
     </div>
 </template>
 
