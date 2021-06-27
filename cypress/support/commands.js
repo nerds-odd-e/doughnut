@@ -31,6 +31,10 @@ Cypress.Commands.add('cleanDBAndSeedData', () => {
     .should('contain', 'OK');
 });
 
+Cypress.Commands.add('pageIsLoaded', () => {
+  cy.get('.loading-bar').should('not.exist')
+});
+
 Cypress.Commands.add('loginAs', username => {
   const password = 'password';
   cy.request({
