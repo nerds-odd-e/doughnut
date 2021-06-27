@@ -59,7 +59,7 @@ Then('I should see {string} in breadcrumb', noteTitles => {
   cy.get('.breadcrumb').within(() =>
     noteTitles
       .commonSenseSplit(', ')
-      .forEach(noteTitle => cy.findByText(noteTitle, { timeout: 1000 }))
+      .forEach(noteTitle => cy.findByText(noteTitle, { timeout: 2000 }))
   );
 });
 
