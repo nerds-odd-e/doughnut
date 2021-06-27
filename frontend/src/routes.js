@@ -1,4 +1,3 @@
-import {createRouter,createWebHistory} from 'vue-router'
 import NotebookNewPage from './pages/NotebookNewPage.vue'
 import NoteShowPage from './pages/NoteShowPage.vue'
 import NoteNewPage from './pages/NoteNewPage.vue'
@@ -26,10 +25,5 @@ const routes = [
     { path: '/reviews/initial', name: 'initial', component: InitialReview },
     { path: '/reviews/repeat', name: 'repeat', component: Repeat, children: nestedNoteAndLinkRoutes('repeat-') },
   ]
-  
-const router = createRouter({
-    history: createWebHistory(),
-    routes,
-})
 
-export {router, routes}
+export {routes}

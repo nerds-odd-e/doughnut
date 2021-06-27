@@ -4,7 +4,7 @@
       <Quiz v-if="!!repetition.quizQuestion && !answerResult" v-bind="repetition" @answer="processAnswer($event)"/>
       <template v-else>
         <template v-if="reviewPointViewedByUser">
-          <Repetition v-bind="{...reviewPointViewedByUser, answerResult, sadOnly: false}" @selfEvaluate="selfEvaluate($event)"/>
+          <Repetition v-bind="{...reviewPointViewedByUser, answerResult, sadOnly: false}" @selfEvaluate="selfEvaluate($event)" @redirect="emit('redirect', $event)"/>
           <NoteStatisticsButton v-if="reviewPointViewedByUser.noteViewedByUser" :noteid="reviewPointViewedByUser.noteViewedByUser.note.id"/>
           <NoteStatisticsButton v-else :link="reviewPointViewedByUser.linkViewedByUser.id"/>
         </template>

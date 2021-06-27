@@ -1,5 +1,6 @@
 <script>
 import {restGet} from "./restful/restful"
+import {relativeRoute} from "./relative_routes"
 
 export default {
   data() {
@@ -9,7 +10,7 @@ export default {
     }},
   
   methods: {
-    redirectTo(params) { this.$router.push(params) },
+    redirectTo(params) { this.$router.push(relativeRoute(this.$router, params)) },
     fetchStaticInfo() {
     },
   },

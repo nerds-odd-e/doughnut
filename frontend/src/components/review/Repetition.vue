@@ -65,7 +65,7 @@
                 </div>
             </div>
         </div>
-        <router-view/>
+        <router-view @redirect="emit('redirect', $event)"/>
 </template>
 
 <script>
@@ -91,7 +91,7 @@ export default { name: "Repetition" };
     noteViewedByUser: Object,
     linkViewedByUser: Object})
 
-  const emit = defineEmit(['selfEvaluate'])
+  const emit = defineEmit(['selfEvaluate', 'redirect'])
 
   const sourceNoteViewedByUser = computed(()=> {
     if(!!props.noteViewedByUser) {
