@@ -41,7 +41,7 @@ export default {
     loadNew(resp){
       this.reviewPointViewedByUser = resp;
       if (!this.reviewPointViewedByUser.reviewPoint) {
-        relativeRoutePush(this.$router, {name: "reviews"})
+        relativeRoutePush(this, {name: "reviews"})
       }
     },
 

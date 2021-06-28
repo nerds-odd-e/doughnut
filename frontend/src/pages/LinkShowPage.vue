@@ -33,7 +33,7 @@ export default {
     return {
       linkViewedByUser: null,
       loading: null,
-      formErrors: null
+      formErrors: {}
     }
   },
   computed: { formData(){ return !this.linkViewedByUser ? null : {typeId: this.linkViewedByUser.linkTypeId} }},
@@ -47,7 +47,7 @@ export default {
         `/api/links/${this.linkid}`,
         this.formData,
         r=>this.loading=r,
-        (res) => relativeRoutePush(this.$router, {name: "noteShow", params: { noteid: res.noteId}}),
+        (res) => relativeRoutePush(this, {name: "noteShow", params: { noteid: res.noteId}}),
         (res) => this.formErrors = res,
       )
     },
@@ -56,7 +56,7 @@ export default {
       if(!confirm('Are you sure to delete this link?')) return;
       restPost(
         `/api/links/${this.linkid}/delete`, null, r=>this.loading=r,
-        (res) => relativeRoutePush(this.$router, {name: "noteShow", replace: true, params: { noteid: res.noteId}}))
+        (res) => relativeRoutePush(this, {name: "noteShow", replace: true, params: { noteid: res.noteId}}))
     }
   },
   watch: {

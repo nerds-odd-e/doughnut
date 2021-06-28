@@ -2,6 +2,7 @@ import Repetition from '@/components/review/Repetition.vue';
 import { mount } from '@vue/test-utils';
 import { createTestRouter } from '../testing_routes'
 import { noteViewedByUser, linkViewedByUser } from "../notes/fixtures"
+import { merge } from "lodash"
 
 describe('repetition page', () => {
   beforeEach(async () => {
@@ -35,16 +36,39 @@ describe('repetition page', () => {
       expect(wrapper.findAll(".btn-toolbar")).toHaveLength(1)
     });
 
-    xtest('click on note when doing review', async () => {
-      const testingRouter = await createTestRouter({name: 'repeat'});
-      const wrapper = mount(Repetition, {propsData: reviewPointForView, global: { plugins: [testingRouter] }});
-      expect(wrapper.find(".link-source .card-title a").attributes().href).toEqual("/reviews/repeat/notes/2")
+    const mountWithMockRoute = (comp, options, currentRoute) => {
+      const mockRoute = currentRoute
+
+      const mockRouter = {
+        push: jest.fn()
+      }
+
+      const wrapper = mount(
+        Repetition,
+        merge(
+          options,
+          {
+            global: {
+              mocks: {
+                $route: mockRoute,
+                $router: mockRouter
+              },
+              stubs: {'router-view': true, 'router-link': {props: ['to'], template: `<a class="router-link" :to='JSON.stringify(to)'><slot/></a>`}}
+            },
+          }));
+
+      return wrapper
+    }
+
+    test('click on note when doing review', async () => {
+      const wrapper = mountWithMockRoute(Repetition, {propsData: reviewPointForView}, {name: 'repeat'});
+
+      expect(JSON.parse(wrapper.find(".link-source .router-link").attributes().to).name).toEqual("repeat-noteShow")
     });
 
-    xtest('click on note when doing review and in a nested page', async () => {
-      const testingRouter = await createTestRouter({name: 'repeat-noteShow', params: {noteid: 123}});
-      const wrapper = mount(Repetition, {propsData: reviewPointForView, global: { plugins: [testingRouter] }});
-      expect(wrapper.find(".link-source .card-title a").attributes().href).toEqual("/reviews/repeat/notes/2")
+    test('click on note when doing review and in a nested page', async () => {
+      const wrapper = mountWithMockRoute(Repetition, {propsData: reviewPointForView}, {name: 'repeat-noteShow', params: {noteid: 123}});
+      expect(JSON.parse(wrapper.find(".link-source .router-link").attributes().to)).toEqual({name: 'repeat-noteShow', params: {noteid: 1}})
     });
 
   });

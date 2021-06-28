@@ -39,7 +39,7 @@ export default {
       this.repetition = resp;
       this.answerResult = null;
       if (!this.repetition.reviewPointViewedByUser) {
-        relativeRoutePush(this.$router, {name: "reviews"})
+        relativeRoutePush(this, {name: "reviews"})
       }
     },
 
@@ -50,7 +50,7 @@ export default {
     processAnswer(answerData) {
       restPost(
         `/api/reviews/${this.reviewPointViewedByUser.reviewPoint.id}/answer`,
-        this.answerData,
+        answerData,
         r=>this.loading = r,
         res=>this.answerResult = res)
     },

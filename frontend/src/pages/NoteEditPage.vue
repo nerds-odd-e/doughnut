@@ -47,7 +47,7 @@ export default {
         `/api/notes/${this.noteid}`,
         this.noteFormData,
         r=>this.loading=r,
-        (res) => relativeRoutePush(this.$router, {name: "noteShow", params: { noteid: res.noteId}}),
+        (res) => relativeRoutePush(this, {name: "noteShow", params: { noteid: res.noteId}}),
         (res) => this.noteFormErrors = res,
       )
     }
