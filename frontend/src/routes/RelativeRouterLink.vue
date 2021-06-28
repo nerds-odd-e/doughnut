@@ -5,7 +5,7 @@
 </template>
 
 <script setup>
-  import {relativeRoute} from "../relative_routes"
+  import {relativeRoute} from "./relative_routes"
   const props = defineProps({to: Object})
   const prefix = (router) => {
     const currentRouteName = router.currentRoute._rawValue.name

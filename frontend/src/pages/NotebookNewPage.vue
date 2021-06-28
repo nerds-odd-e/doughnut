@@ -9,29 +9,39 @@
             <NoteFormBody v-model="noteFormData" :errors="noteFormErrors"/>
             <input type="submit" value="Submit" class="btn btn-primary"/>
         </form>
+        {{noteFormErrors}}
     </div>
   </LoadingPage>
 </template>
 
-<script setup>
+<script>
 import NoteBreadcrumbForOwnOrCircle from "../components/notes/NoteBreadcrumbForOwnOrCircle.vue"
 import NoteFormBody from "../components/notes/NoteFormBody.vue"
 import LoadingPage from "./LoadingPage.vue"
 import {restPostMultiplePartForm} from "../restful/restful"
 import { ref } from "vue"
+import { relativeRoutePush } from "../routes/relative_routes"
 
-const emit = defineEmit(['redirect'])
-const loading = ref(false)
-const noteFormData = ref({})
-const noteFormErrors = ref()
-
-const processForm = () => {
-  restPostMultiplePartForm(
-    `/api/notebooks/create`,
-     noteFormData.value,
-     loading,
-     (res) => emit("redirect", {name: "noteShow", params: { noteid: res.noteId}}),
-     (res) => noteFormErrors.value = res,
-    )
+export default {
+  name: 'NotebookNewPage',
+  components: { NoteBreadcrumbForOwnOrCircle, NoteFormBody, LoadingPage},
+  data() {
+    return {
+      loading: false,
+      noteFormData: {},
+      noteFormErrors: {}
+    }
+  },
+  methods: {
+    processForm() {
+      restPostMultiplePartForm(
+        `/api/notebooks/create`,
+        this.noteFormData,
+        r=>this.loading=r,
+        (res) => relativeRoutePush(this.$router, {name: "noteShow", params: { noteid: res.noteId}}),
+        (res) => this.noteFormErrors = res,
+        )
+    }
+  }
 }
 </script>

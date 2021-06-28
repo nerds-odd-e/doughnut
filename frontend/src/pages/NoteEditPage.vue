@@ -13,37 +13,47 @@
   </LoadingPage>
 </template>
 
-<script setup>
+<script>
 import NoteOwnerBreadcrumb from "../components/notes/NoteOwnerBreadcrumb.vue"
 import NoteFormBody from "../components/notes/NoteFormBody.vue"
 import LoadingPage from "./LoadingPage.vue"
 import {restGet, restPostMultiplePartForm} from "../restful/restful"
-import { computed, ref, watch, defineProps } from "vue"
+import { relativeRoutePush } from "../routes/relative_routes"
 
-const props = defineProps({noteid: Number})
-const emit = defineEmit(['redirect'])
-const noteViewedByUser = ref(null)
-const loading = ref(false)
-const noteFormErrors = ref()
-const noteFormData = computed(()=>{
-  const {updatedAt, ...rest} = noteViewedByUser.value.note.noteContent
-  return rest
-})
+export default {
+  name: 'NoteEditPage',
+  components: { NoteOwnerBreadcrumb, NoteFormBody, LoadingPage},
+  props: { noteid: Number},
+  data() {
+    return {
+      noteViewedByUser: null,
+      loading: false,
+      noteFormErrors: {}
+    }
+  },
+  computed: {
+    noteFormData(){
+      const {updatedAt, ...rest} = this.noteViewedByUser.note.noteContent
+      return rest
+    },
+  },
+  methods: {
+    fetchData() {
+      restGet(`/api/notes/${this.noteid}`, r=>this.loading=r, (res) => this.noteViewedByUser = res)
+    },
 
-const fetchData = () => {
-  restGet(`/api/notes/${props.noteid}`, loading, (res) => noteViewedByUser.value = res)
+    processForm() {
+      restPostMultiplePartForm(
+        `/api/notes/${this.noteid}`,
+        this.noteFormData,
+        r=>this.loading=r,
+        (res) => relativeRoutePush(this.$router, {name: "noteShow", params: { noteid: res.noteId}}),
+        (res) => this.noteFormErrors = res,
+      )
+    }
+  },
+  mounted() {
+    this.fetchData()
+  }
 }
-
-const processForm = () => {
-  restPostMultiplePartForm(
-    `/api/notes/${props.noteid}`,
-    noteFormData.value,
-    loading,
-    (res) => emit("redirect", {name: "noteShow", params: { noteid: res.noteId}}),
-    (res) => noteFormErrors.value = res,
-  )
-}
-
-watch(()=>props.noteid, ()=>fetchData())
-fetchData()
 </script>

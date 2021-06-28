@@ -5,6 +5,6 @@
 
 <script setup>
   import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue"
-  import RelativeRouterLink from "../RelativeRouterLink.vue"
+  import RelativeRouterLink from "../../routes/RelativeRouterLink.vue"
   const props = defineProps({note: Object, link: Object, owns: Boolean})
 </script>

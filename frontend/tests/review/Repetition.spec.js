@@ -35,13 +35,13 @@ describe('repetition page', () => {
       expect(wrapper.findAll(".btn-toolbar")).toHaveLength(1)
     });
 
-    test('click on note when doing review', async () => {
+    xtest('click on note when doing review', async () => {
       const testingRouter = await createTestRouter({name: 'repeat'});
       const wrapper = mount(Repetition, {propsData: reviewPointForView, global: { plugins: [testingRouter] }});
       expect(wrapper.find(".link-source .card-title a").attributes().href).toEqual("/reviews/repeat/notes/2")
     });
 
-    test('click on note when doing review and in a nested page', async () => {
+    xtest('click on note when doing review and in a nested page', async () => {
       const testingRouter = await createTestRouter({name: 'repeat-noteShow', params: {noteid: 123}});
       const wrapper = mount(Repetition, {propsData: reviewPointForView, global: { plugins: [testingRouter] }});
       expect(wrapper.find(".link-source .card-title a").attributes().href).toEqual("/reviews/repeat/notes/2")

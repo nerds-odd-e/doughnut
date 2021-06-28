@@ -28,14 +28,15 @@ const restRequest = (url, params, loadingRef, callback, errorCallback) => {
     })
     .catch((error) => {
       if (error.status === 401) {
-        reloadSession();
+        reloadSession()
         return;
       }
-      window.alert(error);
+      console.log(error)
+      window.alert(error)
     })
     .finally(() => {
       if (loadingRef instanceof Function) {
-        loadingRef(false);
+        loadingRef(false)
       } else {
         loadingRef.value = false;
       }

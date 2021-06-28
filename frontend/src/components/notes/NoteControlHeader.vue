@@ -21,6 +21,6 @@
   import SvgDownRight from "../svgs/SvgDownRight.vue"
   import SvgReviewSetting from "../svgs/SvgReviewSetting.vue"
   import NoteOwnerBreadcrumb from "./NoteOwnerBreadcrumb.vue"
-  import RelativeRouterLink from "../RelativeRouterLink.vue"
+  import RelativeRouterLink from "../../routes/RelativeRouterLink.vue"
   const props = defineProps({note: Object, ancestors: Array, notebook: Object})
 </script>

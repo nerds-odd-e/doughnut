@@ -7,6 +7,6 @@
 </template>
 
 <script setup>
-  import RelativeRouterLink from "../RelativeRouterLink.vue"
+  import RelativeRouterLink from "../../routes/RelativeRouterLink.vue"
   const props = defineProps({note: Object})
 </script>

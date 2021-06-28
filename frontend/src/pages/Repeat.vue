@@ -4,7 +4,7 @@
       <Quiz v-if="!!repetition.quizQuestion && !answerResult" v-bind="repetition" @answer="processAnswer($event)"/>
       <template v-else>
         <template v-if="reviewPointViewedByUser">
-          <Repetition v-bind="{...reviewPointViewedByUser, answerResult, sadOnly: false}" @selfEvaluate="selfEvaluate($event)" @redirect="emit('redirect', $event)"/>
+          <Repetition v-bind="{...reviewPointViewedByUser, answerResult, sadOnly: false}" @selfEvaluate="selfEvaluate($event)"/>
           <NoteStatisticsButton v-if="reviewPointViewedByUser.noteViewedByUser" :noteid="reviewPointViewedByUser.noteViewedByUser.note.id"/>
           <NoteStatisticsButton v-else :link="reviewPointViewedByUser.linkViewedByUser.id"/>
         </template>
@@ -13,48 +13,58 @@
   </LoadingPage>
 </template>
 
-<script setup>
+<script>
 import Quiz from '../components/review/Quiz.vue'
 import Repetition from '../components/review/Repetition.vue'
 import LoadingPage from "./LoadingPage.vue"
 import NoteStatisticsButton from '../components/notes/NoteStatisticsButton.vue'
 import { restGet, restPost } from "../restful/restful"
-import { ref, inject, computed } from 'vue'
+import { relativeRoutePush } from "../routes/relative_routes"
 
-const emit = defineEmit(['redirect'])
+export default {
+  name: 'Repeat',
+  components: { Quiz, Repetition, LoadingPage, NoteStatisticsButton },
+  data() {
+    return {
+      repetition: null,
+      answerResult: null,
+      loading: false,
+    }
+  },
+  computed: {
+    reviewPointViewedByUser(){ return this.repetition.reviewPointViewedByUser }
+  },
+  methods: {
+    loadNew(resp) {
+      this.repetition = resp;
+      this.answerResult = null;
+      if (!this.repetition.reviewPointViewedByUser) {
+        relativeRoutePush(this.$router, {name: "reviews"})
+      }
+    },
 
-const repetition = ref(null)
-const answerResult = ref(null)
-const loading = ref(false)
-const reviewPointViewedByUser = computed(()=>repetition.value.reviewPointViewedByUser)
-const loadNew = (resp) => {
-  repetition.value = resp;
-  answerResult.value = null;
-  if (!repetition.value.reviewPointViewedByUser) {
-    emit("redirect", {name: "reviews"})
+    fetchData() {
+      restGet(`/api/reviews/repeat`, (r)=>this.loading=r, this.loadNew)
+    },
+
+    processAnswer(answerData) {
+      restPost(
+        `/api/reviews/${this.reviewPointViewedByUser.reviewPoint.id}/answer`,
+        this.answerData,
+        r=>this.loading = r,
+        res=>this.answerResult = res)
+    },
+
+    selfEvaluate(data) {
+      restPost(
+        `/api/reviews/${this.reviewPointViewedByUser.reviewPoint.id}/self-evaluate`,
+        data,
+        r=>this.loading=r,
+        this.loadNew)
+    }
+  },
+  mounted() {
+    this.fetchData()
   }
 }
-
-const fetchData = () => {
-  restGet(`/api/reviews/repeat`, loading, loadNew)
-}
-
-const processAnswer = (answerData) => {
-  restPost(
-    `/api/reviews/${reviewPointViewedByUser.value.reviewPoint.id}/answer`,
-    answerData,
-      loading,
-      (res)=>answerResult.value = res)
-}
-
-const selfEvaluate = (data) => {
-  restPost(
-    `/api/reviews/${reviewPointViewedByUser.value.reviewPoint.id}/self-evaluate`,
-    data,
-    loading,
-    loadNew)
-}
-
-fetchData()
-
 </script>

@@ -37,6 +37,6 @@
   import SvgCog from "../svgs/SvgCog.vue"
   import SvgReviewSetting from "../svgs/SvgReviewSetting.vue"
   import SvgRemove from "../svgs/SvgRemove.vue"
-  import RelativeRouterLink from "../RelativeRouterLink.vue"
+  import RelativeRouterLink from "../../routes/RelativeRouterLink.vue"
   const props = defineProps({note: Object})
 </script>

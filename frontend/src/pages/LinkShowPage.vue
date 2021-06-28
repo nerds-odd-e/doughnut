@@ -17,41 +17,55 @@
   </LoadingPage>
 </template>
 
-<script setup>
+<script>
 import LinkShow from "../components/links/LinkShow.vue"
 import Select from "../components/form/Select.vue"
 import NoteStatisticsButton from '../components/notes/NoteStatisticsButton.vue'
 import LoadingPage from "./LoadingPage.vue"
 import {restGet, restPost } from "../restful/restful"
-import { computed, ref, watch, defineProps } from "vue"
+import { relativeRoutePush } from "../routes/relative_routes"
 
-const props = defineProps({linkid: Number, staticInfo: Array})
-const emit = defineEmit(['redirect'])
-const linkViewedByUser = ref(null)
-const loading = ref(false)
+export default {
+  name: "LinkShowPage",
+  components: {LinkShow, Select, NoteStatisticsButton, LoadingPage},
+  props: {linkid: Number, staticInfo: Array},
+  data() {
+    return {
+      linkViewedByUser: null,
+      loading: null,
+      formErrors: null
+    }
+  },
+  computed: { formData(){ return !this.linkViewedByUser ? null : {typeId: this.linkViewedByUser.linkTypeId} }},
+  methods: {
+    fetchData() {
+      restGet(`/api/links/${this.linkid}`, r=>this.loading=r, (res) => this.linkViewedByUser = res)
+    },
 
-const formData = computed(()=>!linkViewedByUser.value ? null : {typeId: linkViewedByUser.value.linkTypeId})
-const formErrors = ref({})
+    updateLink() {
+      restPost(
+        `/api/links/${this.linkid}`,
+        this.formData,
+        r=>this.loading=r,
+        (res) => relativeRoutePush(this.$router, {name: "noteShow", params: { noteid: res.noteId}}),
+        (res) => this.formErrors = res,
+      )
+    },
 
-const fetchData = async () => {
-  restGet(`/api/links/${props.linkid}`, loading, (res) => linkViewedByUser.value = res)
+    deleteLink() {
+      if(!confirm('Are you sure to delete this link?')) return;
+      restPost(
+        `/api/links/${this.linkid}/delete`, null, r=>this.loading=r,
+        (res) => relativeRoutePush(this.$router, {name: "noteShow", replace: true, params: { noteid: res.noteId}}))
+    }
+  },
+  watch: {
+    linkid() {
+      this.fetchData()
+    }
+  },
+  mounted() {
+    this.fetchData()
+  }
 }
-
-const updateLink = async () => {
-  restPost(
-    `/api/links/${props.linkid}`,
-    formData.value, loading,
-    (res) => emit("redirect", {name: "noteShow", params: { noteid: res.noteId}}),
-    (res) => formErrors.value = res,
-  )
-}
-
-const deleteLink = async () => {
-  if(!confirm('Are you sure to delete this link?')) return;
-  restPost(`/api/links/${props.linkid}/delete`, null, loading, (res) => emit("redirect", {name: "noteShow", replace: true, params: { noteid: res.noteId}}))
-}
-
-watch(()=>props.linkid, ()=>fetchData())
-fetchData()
-
 </script>

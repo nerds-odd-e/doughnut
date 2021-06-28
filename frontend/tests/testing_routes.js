@@ -1,4 +1,4 @@
-import { routes } from '@/routes'
+import { routes } from '@/routes/routes'
 import {createMemoryHistory, createRouter} from 'vue-router'
 
   

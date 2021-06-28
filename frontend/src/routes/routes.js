@@ -1,11 +1,11 @@
-import NotebookNewPage from './pages/NotebookNewPage.vue'
-import NoteShowPage from './pages/NoteShowPage.vue'
-import NoteNewPage from './pages/NoteNewPage.vue'
-import NoteEditPage from './pages/NoteEditPage.vue'
-import LinkShowPage from './pages/LinkShowPage.vue'
-import ReviewHome from './pages/ReviewHome.vue'
-import Repeat from './pages/Repeat.vue'
-import InitialReview from './pages/InitialReview.vue'
+import NotebookNewPage from '@/pages/NotebookNewPage.vue'
+import NoteShowPage from '@/pages/NoteShowPage.vue'
+import NoteNewPage from '@/pages/NoteNewPage.vue'
+import NoteEditPage from '@/pages/NoteEditPage.vue'
+import LinkShowPage from '@/pages/LinkShowPage.vue'
+import ReviewHome from '@/pages/ReviewHome.vue'
+import Repeat from '@/pages/Repeat.vue'
+import InitialReview from '@/pages/InitialReview.vue'
 
 const noteAndLinkRoutes = [
     { path: 'notes/:noteid', name: 'noteShow', component: NoteShowPage, props: true },

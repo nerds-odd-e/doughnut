@@ -65,7 +65,7 @@
                 </div>
             </div>
         </div>
-        <router-view @redirect="emit('redirect', $event)"/>
+        <RelativeRouterView/>
 </template>
 
 <script>
@@ -83,7 +83,8 @@ export default { name: "Repetition" };
   import SvgLinkNote from "../svgs/SvgLinkNote.vue"
   import SvgNoReview from "../svgs/SvgNoReview.vue"
   import ShowReviewPoint from "./ShowReviewPoint.vue"
-  import RelativeRouterLink from "../RelativeRouterLink.vue"
+  import RelativeRouterLink from "../../routes/RelativeRouterLink.vue"
+  import RelativeRouterView from "../../routes/RelativeRouterView.vue"
   import { computed } from 'vue'
   const props = defineProps({
     reviewPoint: { type: Object, required: true },
@@ -91,7 +92,7 @@ export default { name: "Repetition" };
     noteViewedByUser: Object,
     linkViewedByUser: Object})
 
-  const emit = defineEmit(['selfEvaluate', 'redirect'])
+  const emit = defineEmit(['selfEvaluate'])
 
   const sourceNoteViewedByUser = computed(()=> {
     if(!!props.noteViewedByUser) {

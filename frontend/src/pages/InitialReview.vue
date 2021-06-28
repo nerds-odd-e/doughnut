@@ -16,53 +16,62 @@
   </LoadingPage>
 </template>
 
-<script setup>
+<script>
 import ShowReviewPoint from '../components/review/ShowReviewPoint.vue'
 import ReviewSettingForm from '../components/review/ReviewSettingForm.vue'
 import LoadingPage from "./LoadingPage.vue"
 import { restGet, restPost } from "../restful/restful"
-import { ref, computed } from 'vue'
+import { relativeRoutePush } from "../routes/relative_routes"
 
-const emit = defineEmit(['redirect'])
-
-const reviewPointViewedByUser = ref(null)
-const loading = ref(false)
-
-const reviewPoint = computed(()=>reviewPointViewedByUser.value.reviewPoint)
-const reviewSetting = computed(()=>reviewPointViewedByUser.value.reviewSetting)
-
-const loadNew = (resp) => {
-  reviewPointViewedByUser.value = resp;
-  if (!reviewPointViewedByUser.value.reviewPoint) {
-    emit("redirect", {name: "reviews"})
-  }
-}
-
-const processForm = function(skipReview) {
-  if(skipReview) {
-    if(!confirm('Are you sure to hide this note from reviewing in the future?')) return;
-  }
-  reviewPoint.value.removedFromReview = skipReview
-  restPost(
-      `/api/reviews`,
-      {reviewPoint: reviewPoint.value, reviewSetting: reviewSetting.value},
-        loading,
-        loadNew)
-}
-
-
-const fetchData = () => {
-      restGet(`/api/reviews/initial`, loading, loadNew)
+export default {
+  name: 'InitialReview',
+  components: {ShowReviewPoint, ReviewSettingForm, LoadingPage},
+  data() {
+    return {
+      reviewPointViewedByUser: null,
+      loading: null
     }
+  },
+  computed: {
+    reviewPoint() { return this.reviewPointViewedByUser.reviewPoint },
+    reviewSetting() { return this.reviewPointViewedByUser.reviewSetting },
+  },
 
-const submitInitialReview = () => {
+  methods: {
+    loadNew(resp){
+      this.reviewPointViewedByUser = resp;
+      if (!this.reviewPointViewedByUser.reviewPoint) {
+        relativeRoutePush(this.$router, {name: "reviews"})
+      }
+    },
+
+    processForm(skipReview) {
+      if(skipReview) {
+        if(!confirm('Are you sure to hide this note from reviewing in the future?')) return;
+      }
+      this.reviewPoint.removedFromReview = skipReview
+      restPost(
+          `/api/reviews`,
+          {reviewPoint: this.reviewPoint, reviewSetting: this.reviewSetting},
+          r=>this.loading=r,
+          this.loadNew)
+    },
+
+    fetchData() {
+      restGet(`/api/reviews/initial`, r=>this.loading=r, this.loadNew)
+    },
+
+    submitInitialReview() {
       restPost(
         `/api/reviews/${this.repetition.reviewPointViewedByUser.reviewPoint.id}/self-evaluate`,
         data,
-         (val)=>this.loading=val,
-         this.loadNew)
+        (val)=>this.loading=val,
+        this.loadNew)
     }
-
-fetchData();
+  },
+  mounted(){
+    this.fetchData();
+  }
+}
 
 </script>
