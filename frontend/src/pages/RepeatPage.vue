@@ -4,7 +4,7 @@
       <Quiz v-if="!!repetition.quizQuestion && !answerResult" v-bind="repetition" @answer="processAnswer($event)"/>
       <template v-else>
         <template v-if="reviewPointViewedByUser">
-          <Repetition v-bind="{...reviewPointViewedByUser, answerResult, sadOnly: false}" @selfEvaluate="selfEvaluate($event)"/>
+          <Repetition v-bind="{...reviewPointViewedByUser, answerResult, compact: $route.name.split('-').length>1}" @selfEvaluate="selfEvaluate($event)"/>
           <NoteStatisticsButton v-if="reviewPointViewedByUser.noteViewedByUser" :noteid="reviewPointViewedByUser.noteViewedByUser.note.id"/>
           <NoteStatisticsButton v-else :link="reviewPointViewedByUser.linkViewedByUser.id"/>
         </template>
@@ -44,7 +44,13 @@ export default {
       }
       if (!!this.repetition.quizQuestion) {
         relativeRoutePush(this, {name: "quiz"})
+        return;
       }
+      this.resetRoute()
+    },
+
+    resetRoute() {
+      relativeRoutePush(this, {name: "repeat", replace: true})
     },
 
     fetchData() {
@@ -56,7 +62,7 @@ export default {
         `/api/reviews/${this.reviewPointViewedByUser.reviewPoint.id}/answer`,
         answerData,
         r=>this.loading = r,
-        res=>this.answerResult = res)
+        res=>{ this.answerResult = res; this.resetRoute() })
     },
 
     selfEvaluate(data) {

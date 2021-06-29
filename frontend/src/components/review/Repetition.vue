@@ -1,12 +1,12 @@
 <template>
-        <div v-if="answerResult">
+        <div v-if="answerResult && !compact">
             <div class="alert alert-success" v-if="answerResult.correct">Correct!</div>
             <div class="alert alert-danger" v-else>
                  {{'Your answer `' + answerResult.answerDisplay + '` is wrong.'}}
             </div>
         </div>
 
-        <ShowReviewPoint v-bind="{ noteViewedByUser, linkViewedByUser}" />
+        <ShowReviewPoint v-if="!compact" v-bind="{ noteViewedByUser, linkViewedByUser}" />
         <div class="btn-toolbar justify-content-between">
                 <div class="btn-group" role="group" aria-label="First group">
                     <button type="submit" class="btn btn-light" id="repeat-again" name="again"
@@ -33,7 +33,7 @@
                     </template>
 
                 </div>
-            <div class="btn-group dropup">
+            <div v-if="!compact" class="btn-group dropup">
                 <button type="button" id="more-action-for-repeat" class="btn btn-light dropdown-toggle"
                         data-toggle="dropdown" aria-haspopup="true"
                         aria-expanded="false">
@@ -90,7 +90,9 @@ export default { name: "Repetition" };
     reviewPoint: { type: Object, required: true },
     answerResult: Object,
     noteViewedByUser: Object,
-    linkViewedByUser: Object})
+    linkViewedByUser: Object,
+    compact: Boolean
+    })
 
   const emit = defineEmit(['selfEvaluate'])
 

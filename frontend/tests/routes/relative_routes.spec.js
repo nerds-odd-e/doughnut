@@ -13,5 +13,4 @@ describe('relative routes', () => {
     const fullRoute = relativeRoute(comp, {name: 'review', params: {noteid: 3}})
     expect(fullRoute).toEqual({name: 'review', params: {noteid: 3}})
   });
-
 });
