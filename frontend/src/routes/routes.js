@@ -4,7 +4,7 @@ import NoteNewPage from '@/pages/NoteNewPage.vue'
 import NoteEditPage from '@/pages/NoteEditPage.vue'
 import LinkShowPage from '@/pages/LinkShowPage.vue'
 import ReviewHome from '@/pages/ReviewHome.vue'
-import Repeat from '@/pages/Repeat.vue'
+import RepeatPage from '@/pages/RepeatPage.vue'
 import InitialReview from '@/pages/InitialReview.vue'
 
 const noteAndLinkRoutes = [
@@ -23,7 +23,7 @@ const routes = [
     { path: '/bazaar/notes/:noteid', name: 'bnoteShow', component: NoteShowPage, props: true },
     { path: '/reviews', name: 'reviews', component: ReviewHome },
     { path: '/reviews/initial', name: 'initial', component: InitialReview },
-    { path: '/reviews/repeat', name: 'repeat', component: Repeat, children: nestedNoteAndLinkRoutes('repeat-') },
+    { path: '/reviews/repeat', name: 'repeat', component: RepeatPage, children: nestedNoteAndLinkRoutes('repeat-') },
   ]
 
 export {routes}

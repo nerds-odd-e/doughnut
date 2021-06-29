@@ -22,7 +22,7 @@ import { restGet, restPost } from "../restful/restful"
 import { relativeRoutePush } from "../routes/relative_routes"
 
 export default {
-  name: 'Repeat',
+  name: 'RepeatPage',
   components: { Quiz, Repetition, LoadingPage, NoteStatisticsButton },
   data() {
     return {

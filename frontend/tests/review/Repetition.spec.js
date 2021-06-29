@@ -1,8 +1,8 @@
 import Repetition from '@/components/review/Repetition.vue';
-import { mount } from '@vue/test-utils';
 import { createTestRouter } from '../testing_routes'
 import { noteViewedByUser, linkViewedByUser } from "../notes/fixtures"
-import { merge } from "lodash"
+import { mount } from '@vue/test-utils';
+import { mountWithMockRoute } from '../helpers'
 
 describe('repetition page', () => {
   beforeEach(async () => {
@@ -35,30 +35,6 @@ describe('repetition page', () => {
       const wrapper = mount(Repetition, {propsData: reviewPointForView, global: { plugins: [testingRouter] }});
       expect(wrapper.findAll(".btn-toolbar")).toHaveLength(1)
     });
-
-    const mountWithMockRoute = (comp, options, currentRoute) => {
-      const mockRoute = currentRoute
-
-      const mockRouter = {
-        push: jest.fn()
-      }
-
-      const wrapper = mount(
-        Repetition,
-        merge(
-          options,
-          {
-            global: {
-              mocks: {
-                $route: mockRoute,
-                $router: mockRouter
-              },
-              stubs: {'router-view': true, 'router-link': {props: ['to'], template: `<a class="router-link" :to='JSON.stringify(to)'><slot/></a>`}}
-            },
-          }));
-
-      return wrapper
-    }
 
     test('click on note when doing review', async () => {
       const wrapper = mountWithMockRoute(Repetition, {propsData: reviewPointForView}, {name: 'repeat'});
