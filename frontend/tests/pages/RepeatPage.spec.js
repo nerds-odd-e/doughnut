@@ -23,11 +23,50 @@ const stubResponse = _.merge(noteViewedByUser,
 
 describe('note show', () => {
 
-  test('fetch API to be called ONCE', async () => {
-    fetch.mockResponseOnce(JSON.stringify(stubResponse));
-    const wrapper = mountWithMockRoute(RepeatPage, {}, {name: 'repeat'});
+  test('redirect to review page if nothing to repeat', async () => {
+    fetch.mockResponseOnce(JSON.stringify({}));
+    const { wrapper, mockRouter} = mountWithMockRoute(RepeatPage, {}, {name: 'repeat'});
     await flushPromises()
     expect(fetch).toHaveBeenCalledTimes(1);
     expect(fetch).toHaveBeenCalledWith('/api/reviews/repeat', {});
+    expect(mockRouter.push).toHaveBeenCalledWith({name: 'reviews'});
   });
+
+  const reviewPointViewedByUser = {
+    reviewPoint: {
+      id: 3,
+    },
+    noteViewedByUser: noteViewedByUser,
+  }
+
+  test('replace route with repeat/quiz if there is a quiz', async () => {
+    fetch.mockResponseOnce(JSON.stringify({
+      quizQuestion: {
+        "questionType": "CLOZE_SELECTION",
+        "options": [
+          {
+            "note": {
+              "id": 1,
+              "notePicture": null,
+              "head": true,
+              "noteTypeDisplay": "Child Note",
+              "title": "question",
+              "shortDescription": "answer"
+            },
+            "picture": false,
+            "display": "question"
+          }
+        ],
+        "description": "answer",
+        "mainTopic": "",
+        "pictureQuestion": false
+      },
+      reviewPointViewedByUser}));
+    const { wrapper, mockRouter} = mountWithMockRoute(RepeatPage, {}, {name: 'repeat'});
+    await flushPromises()
+    expect(fetch).toHaveBeenCalledTimes(1);
+    expect(fetch).toHaveBeenCalledWith('/api/reviews/repeat', {});
+    expect(mockRouter.push).toHaveBeenCalledWith({name: 'quiz'});
+  });
+
 });

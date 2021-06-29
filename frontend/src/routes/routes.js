@@ -5,6 +5,7 @@ import NoteEditPage from '@/pages/NoteEditPage.vue'
 import LinkShowPage from '@/pages/LinkShowPage.vue'
 import ReviewHome from '@/pages/ReviewHome.vue'
 import RepeatPage from '@/pages/RepeatPage.vue'
+import DoingQuiz from '@/pages/DoingQuiz.vue'
 import InitialReview from '@/pages/InitialReview.vue'
 
 const noteAndLinkRoutes = [
@@ -23,7 +24,9 @@ const routes = [
     { path: '/bazaar/notes/:noteid', name: 'bnoteShow', component: NoteShowPage, props: true },
     { path: '/reviews', name: 'reviews', component: ReviewHome },
     { path: '/reviews/initial', name: 'initial', component: InitialReview },
-    { path: '/reviews/repeat', name: 'repeat', component: RepeatPage, children: nestedNoteAndLinkRoutes('repeat-') },
+    { path: '/reviews/repeat', name: 'repeat', component: RepeatPage, children: [
+              ...nestedNoteAndLinkRoutes('repeat-'),
+              { path: 'quiz', name: 'quiz', component: DoingQuiz }] },
   ]
 
 export {routes}

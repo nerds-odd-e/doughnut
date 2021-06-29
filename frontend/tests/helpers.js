@@ -22,7 +22,7 @@ const mountWithMockRoute = (comp, options, currentRoute) => {
         },
         }));
 
-    return wrapper
+    return { wrapper, mockRouter }
 }
 
 export { mountWithMockRoute }

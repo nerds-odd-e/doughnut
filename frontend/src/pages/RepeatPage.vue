@@ -40,6 +40,10 @@ export default {
       this.answerResult = null;
       if (!this.repetition.reviewPointViewedByUser) {
         relativeRoutePush(this, {name: "reviews"})
+        return
+      }
+      if (!!this.repetition.quizQuestion) {
+        relativeRoutePush(this, {name: "quiz"})
       }
     },
 
