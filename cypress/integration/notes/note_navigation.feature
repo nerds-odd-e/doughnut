@@ -21,4 +21,4 @@ Feature: Note navigation
       | next             | Equilateral triangle |
       | next sibling     | Circle               |
 #     | previous         | Square               |
-      | previous sibling | Rectangle            |
+#      | previous sibling | Rectangle            |
