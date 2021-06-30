@@ -23,7 +23,6 @@ import Select from "../components/form/Select.vue"
 import NoteStatisticsButton from '../components/notes/NoteStatisticsButton.vue'
 import LoadingPage from "./LoadingPage.vue"
 import {restGet, restPost } from "../restful/restful"
-import { relativeRoutePush } from "../routes/relative_routes"
 
 export default {
   name: "LinkShowPage",
@@ -47,7 +46,7 @@ export default {
         `/api/links/${this.linkid}`,
         this.formData,
         r=>this.loading=r,
-        (res) => relativeRoutePush(this, {name: "noteShow", params: { noteid: res.noteId}}),
+        (res) => this.$router.push({name: "noteShow", params: { noteid: res.noteId}}),
         (res) => this.formErrors = res,
       )
     },
@@ -56,7 +55,7 @@ export default {
       if(!confirm('Are you sure to delete this link?')) return;
       restPost(
         `/api/links/${this.linkid}/delete`, null, r=>this.loading=r,
-        (res) => relativeRoutePush(this, {name: "noteShow", replace: true, params: { noteid: res.noteId}}))
+        (res) => this.$router.push({name: "noteShow", replace: true, params: { noteid: res.noteId}}))
     }
   },
   watch: {

@@ -19,7 +19,6 @@ import NoteFormBody from "../components/notes/NoteFormBody.vue"
 import LoadingPage from "./LoadingPage.vue"
 import {restPostMultiplePartForm} from "../restful/restful"
 import { ref } from "vue"
-import { relativeRoutePush } from "../routes/relative_routes"
 
 export default {
   name: 'NotebookNewPage',
@@ -37,7 +36,7 @@ export default {
         `/api/notebooks/create`,
         this.noteFormData,
         r=>this.loading=r,
-        (res) => relativeRoutePush(this, {name: "noteShow", params: { noteid: res.noteId}}),
+        (res) => this.$router.push({name: "noteShow", params: { noteid: res.noteId}}),
         (res) => this.noteFormErrors = res,
         )
     }

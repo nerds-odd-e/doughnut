@@ -19,7 +19,7 @@ import Repetition from '../components/review/Repetition.vue'
 import LoadingPage from "./LoadingPage.vue"
 import NoteStatisticsButton from '../components/notes/NoteStatisticsButton.vue'
 import { restGet, restPost } from "../restful/restful"
-import { relativeRoutePush, routerScopeGuard } from "../routes/relative_routes"
+import { routerScopeGuard } from "../routes/relative_routes"
 
 export default {
   name: 'RepeatPage',
@@ -40,18 +40,18 @@ export default {
       this.repetition = resp;
       this.answerResult = null;
       if (!this.repetition.reviewPointViewedByUser) {
-        relativeRoutePush(this, {name: "reviews"})
+        this.$router.push({name: "reviews"})
         return
       }
       if (!!this.repetition.quizQuestion) {
-        relativeRoutePush(this, {name: "quiz"})
+        this.$router.push({name: "quiz"})
         return;
       }
       this.resetRoute()
     },
 
     resetRoute() {
-      relativeRoutePush(this, {name: "repeat", replace: true})
+      this.$router.push({name: "repeat", replace: true})
     },
 
     fetchData() {

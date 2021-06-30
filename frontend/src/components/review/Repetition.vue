@@ -31,11 +31,11 @@
                   <SvgLinkNote/>
                   Make Link
                 </a>
-                <RelativeRouterLink class="dropdown-item"
+                <router-link class="dropdown-item"
                     :to="{name: 'noteEdit', params: {noteid: sourceNoteViewedByUser.note.id}}">
                     <SvgEdit/>
                     Edit Note
-                </RelativeRouterLink>
+                </router-link>
                 <div class="dropdown-divider"></div>
                 <form :action="`/reviews/${reviewPoint.id}`" method="post"
                       onsubmit="return confirm('Are you sure to hide this note from reviewing in the future?')">
@@ -60,9 +60,7 @@
   import ShowReviewPoint from "./ShowReviewPoint.vue"
   import StickTopBar from "../StickTopBar.vue"
   import SelfEvaluateButtons from "./SelfEvaluateButtons.vue"
-  import RelativeRouterLink from "../../routes/RelativeRouterLink.vue"
   import RelativeRouterView from "../../routes/RelativeRouterView.vue"
-  import { relativeRoutePush } from "../../routes/relative_routes"
 
   export default {
     name: "Repetition",
@@ -75,7 +73,7 @@
       compact: Boolean
     },
     emits: ['selfEvaluate'],
-    components: {SvgCog, SvgEdit, SvgReviewSetting, SvgLinkNote, SvgNoReview, ShowReviewPoint, StickTopBar, SelfEvaluateButtons, RelativeRouterLink, RelativeRouterView},
+    components: {SvgCog, SvgEdit, SvgReviewSetting, SvgLinkNote, SvgNoReview, ShowReviewPoint, StickTopBar, SelfEvaluateButtons, RelativeRouterView},
     computed: {
       sourceNoteViewedByUser() {
         if(!!this.noteViewedByUser) {
@@ -94,7 +92,7 @@
     },
     methods: {
       backToRepeat(){
-        relativeRoutePush(this, {name: "repeat"})
+        this.$router.push({name: "repeat"})
       }
     }
   };

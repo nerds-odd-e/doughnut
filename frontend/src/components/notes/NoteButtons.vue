@@ -1,8 +1,8 @@
 <template>
 <div class="btn-group btn-group-sm">
-    <RelativeRouterLink class="btn btn-sm" :to="{name: 'noteEdit', params: {noteid: note.id}}" role="button" title="edit note">
+    <router-link class="btn btn-sm" :to="{name: 'noteEdit', params: {noteid: note.id}}" role="button" title="edit note">
         <SvgEdit/>
-    </RelativeRouterLink>
+    </router-link>
     <a role="button" class="btn btn-sm" title="Cards View" :href="`/notes/articles/${note.id}`">
         <SvgArticle/>
     </a>
@@ -37,6 +37,5 @@
   import SvgCog from "../svgs/SvgCog.vue"
   import SvgReviewSetting from "../svgs/SvgReviewSetting.vue"
   import SvgRemove from "../svgs/SvgRemove.vue"
-  import RelativeRouterLink from "../../routes/RelativeRouterLink.vue"
   const props = defineProps({note: Object})
 </script>

@@ -18,7 +18,6 @@ import NoteOwnerBreadcrumb from "../components/notes/NoteOwnerBreadcrumb.vue"
 import NoteFormBody from "../components/notes/NoteFormBody.vue"
 import LoadingPage from "./LoadingPage.vue"
 import {restGet, restPostMultiplePartForm} from "../restful/restful"
-import { relativeRoutePush } from "../routes/relative_routes"
 
 export default {
   name: 'NoteEditPage',
@@ -47,7 +46,7 @@ export default {
         `/api/notes/${this.noteid}`,
         this.noteFormData,
         r=>this.loading=r,
-        (res) => relativeRoutePush(this, {name: "noteShow", params: { noteid: res.noteId}}),
+        (res) => this.$router.push({name: "noteShow", params: { noteid: res.noteId}}),
         (res) => this.noteFormErrors = res,
       )
     }

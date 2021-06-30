@@ -21,7 +21,6 @@ import ShowReviewPoint from '../components/review/ShowReviewPoint.vue'
 import ReviewSettingForm from '../components/review/ReviewSettingForm.vue'
 import LoadingPage from "./LoadingPage.vue"
 import { restGet, restPost } from "../restful/restful"
-import { relativeRoutePush } from "../routes/relative_routes"
 
 export default {
   name: 'InitialReview',
@@ -41,7 +40,7 @@ export default {
     loadNew(resp){
       this.reviewPointViewedByUser = resp;
       if (!this.reviewPointViewedByUser.reviewPoint) {
-        relativeRoutePush(this, {name: "reviews"})
+        this.$router.push({name: "reviews"})
       }
     },
 
