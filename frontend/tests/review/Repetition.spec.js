@@ -49,6 +49,12 @@ describe('repetition page', () => {
       expect(JSON.parse(wrapper.find(".link-source .router-link").attributes().to)).toEqual({name: 'repeat-noteShow', params: {noteid: 1}})
     });
 
+    test('compact view', async () => {
+      const { wrapper } = mountWithMockRoute(Repetition, {propsData: {...reviewPointForView, compact: true}}, {name: 'repeat-noteShow', params: {noteid: 123}});
+      expect(wrapper.find(".back-to-repeat").exists()).toBe(true)
+      expect(wrapper.find(".link-source .router-link").exists()).toBe(false)
+    });
+
   });
 
 });
