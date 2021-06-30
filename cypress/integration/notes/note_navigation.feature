@@ -20,5 +20,5 @@ Feature: Note navigation
       | button           | expected title       |
       | next             | Equilateral triangle |
       | next sibling     | Circle               |
-#     | previous         | Square               |
-#      | previous sibling | Rectangle            |
+      | previous         | Square               |
+      | previous sibling | Rectangle            |

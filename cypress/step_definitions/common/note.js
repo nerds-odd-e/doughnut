@@ -112,6 +112,7 @@ When('I open {string} note from top level', noteTitles => {
 When(
   'I should be able to go to the {string} note {string}',
   (button, noteTitle) => {
+    cy.pageIsLoaded()
     cy.findByRole('button', { name: button }).click();
 
     cy.get('.jumbotron').within(() => cy.findByText(noteTitle).should('exist'));
