@@ -66,7 +66,7 @@ describe('note show', () => {
     await flushPromises()
     expect(fetch).toHaveBeenCalledTimes(1);
     expect(fetch).toHaveBeenCalledWith('/api/reviews/repeat', {});
-    expect(mockRouter.push).toHaveBeenCalledWith({name: 'quiz'});
+    expect(mockRouter.push).toHaveBeenCalledWith({name: 'repeat-quiz'});
   });
 
 });

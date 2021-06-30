@@ -32,21 +32,28 @@
         </div>
 </template>
 
-<script setup>
+<script>
   import NoteBreadcrumbForReview from "./NoteBreadcrumbForReview.vue"
   import ShowPicture from "../notes/ShowPicture.vue"
   import TextInput from "../form/TextInput.vue"
-  import { computed, defineEmit, ref } from 'vue'
+  import { routerProtectGuard } from "../../routes/relative_routes"
 
-  const props = defineProps({reviewPointViewedByUser: Object, quizQuestion: Object, emptyAnswer: Object})
-  const emit = defineEmit(['answer'])
-  const sourceNote = computed(()=>{
-    if (!!props.reviewPointViewedByUser.noteViewedByUser) return props.reviewPointViewedByUser.noteViewedByUser
-    return props.reviewPointViewedByUser.linkViewedByUser.sourceNoteViewedByUser
-  })
-
-  const processForm = function() {
-      emit('answer', props.emptyAnswer)
+export default {
+  name: "Quiz",
+  props: {reviewPointViewedByUser: Object, quizQuestion: Object, emptyAnswer: Object},
+  emits:['answer'],
+  components: {NoteBreadcrumbForReview, ShowPicture, TextInput},
+  computed: {
+    sourceNote(){
+        if (!!this.reviewPointViewedByUser.noteViewedByUser) return this.reviewPointViewedByUser.noteViewedByUser
+        return this.reviewPointViewedByUser.linkViewedByUser.sourceNoteViewedByUser
+    }
+  },
+  methods: {
+    processForm() {
+      this.$emit('answer', this.emptyAnswer)
+    }
   }
+}
 
 </script>

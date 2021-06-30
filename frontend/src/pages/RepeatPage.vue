@@ -44,7 +44,7 @@ export default {
         return
       }
       if (!!this.repetition.quizQuestion) {
-        this.$router.push({name: "quiz"})
+        this.$router.push({name: "repeat-quiz"})
         return;
       }
       this.resetRoute()
@@ -77,8 +77,8 @@ export default {
   mounted() {
     this.fetchData()
   },
-  beforeRouteEnter(to, from, next) {routerScopeGuard('repeat')(to, from, next)},
-  beforeRouteUpdate(to, from, next) {routerScopeGuard('repeat')(to, from, next)},
-  beforeRouteLeave(to, from, next) {routerScopeGuard('repeat')(to, from, next)},
+  beforeRouteEnter(to, from, next) {routerScopeGuard('repeat', ['reviews'], 'This will leave the current review, are you sure?')(to, from, next)},
+  beforeRouteUpdate(to, from, next) {routerScopeGuard('repeat', ['reviews'], 'This will leave the current review, are you sure?')(to, from, next)},
+  beforeRouteLeave(to, from, next) {routerScopeGuard('repeat', ['reviews'], 'This will leave the current review, are you sure?')(to, from, next)},
 }
 </script>

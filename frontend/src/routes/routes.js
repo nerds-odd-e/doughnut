@@ -26,7 +26,7 @@ const routes = [
     { path: '/reviews/initial', name: 'initial', component: InitialReview },
     { path: '/reviews/repeat', name: 'repeat', component: RepeatPage, children: [
               ...nestedNoteAndLinkRoutes('repeat-'),
-              { path: 'quiz', name: 'quiz', component: DoingQuiz }] },
+              { path: 'quiz', name: 'repeat-quiz', component: DoingQuiz }] },
   ]
 
 export { routes }
