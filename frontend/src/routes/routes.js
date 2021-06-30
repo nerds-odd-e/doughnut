@@ -29,4 +29,4 @@ const routes = [
               { path: 'quiz', name: 'quiz', component: DoingQuiz }] },
   ]
 
-export {routes}
+export { routes }

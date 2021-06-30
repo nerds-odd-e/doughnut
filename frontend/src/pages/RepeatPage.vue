@@ -19,7 +19,7 @@ import Repetition from '../components/review/Repetition.vue'
 import LoadingPage from "./LoadingPage.vue"
 import NoteStatisticsButton from '../components/notes/NoteStatisticsButton.vue'
 import { restGet, restPost } from "../restful/restful"
-import { relativeRoutePush } from "../routes/relative_routes"
+import { relativeRoutePush, routerScopeGuard } from "../routes/relative_routes"
 
 export default {
   name: 'RepeatPage',
@@ -76,6 +76,9 @@ export default {
   },
   mounted() {
     this.fetchData()
-  }
+  },
+  beforeRouteEnter(to, from, next) {routerScopeGuard('repeat')(to, from, next)},
+  beforeRouteUpdate(to, from, next) {routerScopeGuard('repeat')(to, from, next)},
+  beforeRouteLeave(to, from, next) {routerScopeGuard('repeat')(to, from, next)},
 }
 </script>

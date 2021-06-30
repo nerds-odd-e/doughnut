@@ -1,29 +1,26 @@
 import { routes } from './routes'
 
-const routeNames = (routes) => {
-  return routes.map(r=>r.name).concat(routes.map(r=>r.children).filter(c=>c).map(c=>routeNames(c)).flat())
-}
-
-const prefix = (route) => {
-  const currentRouteName = route.name
-  if(!!currentRouteName) {
-    if(currentRouteName.split("-").shift() === 'repeat') return 'repeat-'
-  }
-  return ''
-}
-
-const nestedName = (route, name) => {
-  return `${prefix(route)}${name}`
-}
-
 const relativeRoute = (comp, to) =>{
-  const nested = nestedName(comp.$route, to.name)
-  if(routeNames(routes).includes(nested)) {
-    return {...to, name: nested}
-  }
   return to
 }
 
 const relativeRoutePush = (comp, params) => { comp.$router.push(relativeRoute(comp, params)) }
 
-export { relativeRoute, relativeRoutePush }
+const routerScopeGuard = (scopeName) =>{
+  const routeNames = routes.find(r=>r.name===scopeName).children.map(r=>r.name)
+
+  return (to, from, next) => {
+    if(to.name.split("-").shift() !== scopeName) {
+      if(from.name.split("-").shift() === scopeName) {
+        const nestedName = `${scopeName}-${to.name}`
+        if(routeNames.includes(nestedName)) {
+          next({...to, name: nestedName})
+          return
+        }
+      }
+    }
+    next()
+  }
+}
+
+export { relativeRoute, relativeRoutePush, routerScopeGuard }
