@@ -4,7 +4,7 @@
       <Quiz v-if="!!repetition.quizQuestion && !answerResult" v-bind="repetition" @answer="processAnswer($event)"/>
       <template v-else>
         <template v-if="reviewPointViewedByUser">
-          <Repetition v-bind="{...reviewPointViewedByUser, answerResult, compact: $route.name.split('-').length>1}" @selfEvaluate="selfEvaluate($event)"/>
+          <Repetition v-bind="{...reviewPointViewedByUser, answerResult, staticInfo, compact: $route.name.split('-').length>1}" @selfEvaluate="selfEvaluate($event)"/>
           <NoteStatisticsButton v-if="reviewPointViewedByUser.noteViewedByUser" :noteid="reviewPointViewedByUser.noteViewedByUser.note.id"/>
           <NoteStatisticsButton v-else :link="reviewPointViewedByUser.linkViewedByUser.id"/>
         </template>
@@ -23,6 +23,7 @@ import { relativeRoutePush } from "../routes/relative_routes"
 
 export default {
   name: 'RepeatPage',
+  props: { staticInfo: Object },
   components: { Quiz, Repetition, LoadingPage, NoteStatisticsButton },
   data() {
     return {

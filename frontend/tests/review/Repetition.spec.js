@@ -50,9 +50,10 @@ describe('repetition page', () => {
     });
 
     test('compact view', async () => {
-      const { wrapper } = mountWithMockRoute(Repetition, {propsData: {...reviewPointForView, compact: true}}, {name: 'repeat-noteShow', params: {noteid: 123}});
-      expect(wrapper.find(".back-to-repeat").exists()).toBe(true)
+      const { wrapper, mockRouter } = mountWithMockRoute(Repetition, {propsData: {...reviewPointForView, compact: true}}, {name: 'repeat-noteShow', params: {noteid: 123}});
       expect(wrapper.find(".link-source .router-link").exists()).toBe(false)
+      await wrapper.find(".repeat-container").trigger('click')
+      expect(mockRouter.push).toHaveBeenCalledWith({name: 'repeat'})
     });
 
   });

@@ -1,7 +1,7 @@
 <template>
-  <StickTopBar v-if="compact" class="back-to-repeat">
-    <div class="repeat-container">
-      <SelfEvaluateButtons v-bind="{sadOnly}" @selfEvaluate="emit('selfEvaluate', $event)"/>
+  <StickTopBar v-if="compact">
+    <div class="repeat-container" v-on:click="backToRepeat()">
+      <SelfEvaluateButtons v-bind="{sadOnly}" @selfEvaluate="$emit('selfEvaluate', $event)"/>
     </div>
   </StickTopBar>
   <div v-else>
@@ -14,7 +14,7 @@
 
     <ShowReviewPoint v-bind="{ noteViewedByUser, linkViewedByUser}" />
     <div class="btn-toolbar justify-content-between">
-      <SelfEvaluateButtons v-bind="{sadOnly}" @selfEvaluate="emit('selfEvaluate', $event)"/>
+      <SelfEvaluateButtons v-bind="{sadOnly}" @selfEvaluate="$emit('selfEvaluate', $event)"/>
       <div class="btn-group dropup">
           <button type="button" id="more-action-for-repeat" class="btn btn-light dropdown-toggle"
                   data-toggle="dropdown" aria-haspopup="true"
@@ -48,18 +48,10 @@
         </div>
     </div>
   </div>
-  <RelativeRouterView/>
+  <RelativeRouterView v-bind="{staticInfo}"/>
 </template>
 
 <script>
-export default { name: "Repetition" };
-</script>
-
-<script setup>
-  import SvgSad from "../svgs/SvgSad.vue"
-  import SvgSatisfying from "../svgs/SvgSatisfying.vue"
-  import SvgFailed from "../svgs/SvgFailed.vue"
-  import SvgHappy from "../svgs/SvgHappy.vue"
   import SvgCog from "../svgs/SvgCog.vue"
   import SvgEdit from "../svgs/SvgEdit.vue"
   import SvgReviewSetting from "../svgs/SvgReviewSetting.vue"
@@ -70,33 +62,42 @@ export default { name: "Repetition" };
   import SelfEvaluateButtons from "./SelfEvaluateButtons.vue"
   import RelativeRouterLink from "../../routes/RelativeRouterLink.vue"
   import RelativeRouterView from "../../routes/RelativeRouterView.vue"
-  import { computed } from 'vue'
-  const props = defineProps({
-    reviewPoint: { type: Object, required: true },
-    answerResult: Object,
-    noteViewedByUser: Object,
-    linkViewedByUser: Object,
-    compact: Boolean
-    })
+  import { relativeRoutePush } from "../../routes/relative_routes"
 
-  const emit = defineEmit(['selfEvaluate'])
-
-  const sourceNoteViewedByUser = computed(()=> {
-    if(!!props.noteViewedByUser) {
-      return props.noteViewedByUser
+  export default {
+    name: "Repetition",
+    props: {
+      reviewPoint: { type: Object, required: true },
+      answerResult: Object,
+      noteViewedByUser: Object,
+      linkViewedByUser: Object,
+      staticInfo: Object,
+      compact: Boolean
+    },
+    emits: ['selfEvaluate'],
+    components: {SvgCog, SvgEdit, SvgReviewSetting, SvgLinkNote, SvgNoReview, ShowReviewPoint, StickTopBar, SelfEvaluateButtons, RelativeRouterLink, RelativeRouterView},
+    computed: {
+      sourceNoteViewedByUser() {
+        if(!!this.noteViewedByUser) {
+          return this.noteViewedByUser
+        }
+        else {
+          return this.linkViewedByUser.sourceNoteViewedByUser
+        }
+      },
+      sadOnly() {
+        if(!!this.answerResult) {
+          return !this.answerResult.correct
+        }
+        return false
+      },
+    },
+    methods: {
+      backToRepeat(){
+        relativeRoutePush(this, {name: "repeat"})
+      }
     }
-    else {
-      return props.linkViewedByUser.sourceNoteViewedByUser
-    }
-  })
-
-  const sadOnly = computed(()=> {
-    if(!!props.answerResult) {
-      return !props.answerResult.correct
-    }
-    return false
-  })
-
+  };
 </script>
 
 <style>
@@ -104,6 +105,5 @@ export default { name: "Repetition" };
   background-color: rgba(50, 150, 50, 0.8);
   padding: 5px;
   border-radius: 10px;
-
 }
 </style>
