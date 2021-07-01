@@ -8,11 +8,24 @@ export default {
   data() {
     return { statisticComponentName: null }
   },
-  method: {
+  methods: {
     toggleStatistics() {
-      this.statisticComponentName = 'NoteStatistics'
+      if(!this.statisticComponentName) {
+        this.statisticComponentName = 'NoteStatistics'
+      }
+      else {
+        this.statisticComponentName = null
+      }
     }
   },
+  watch: {
+    noteid() {
+      this.statisticComponentName = null
+    },
+    linkid() {
+      this.statisticComponentName = null
+    }
+  }
 }
 </script>
 
