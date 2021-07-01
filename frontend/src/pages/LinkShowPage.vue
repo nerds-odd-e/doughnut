@@ -4,7 +4,7 @@
         <LinkShow v-bind="linkViewedByUser">
             <div class="link-content">
               <div>
-                <Select v-if="!!staticInfo" scopeName='link' field='linkType' v-model="formData.typeId" :errors="formErrors.typeId" :options="staticInfo.linkTypeOptions"/>
+                <Select v-if="!!$staticInfo" scopeName='link' field='linkType' v-model="formData.typeId" :errors="formErrors.typeId" :options="$staticInfo.linkTypeOptions"/>
                 <button class="btn btn-primary" v-on:click="updateLink()">Update</button>
                 <button class="btn btn-danger" v-on:click="deleteLink()">Delete</button>
               </div>
@@ -27,7 +27,7 @@ import {restGet, restPost } from "../restful/restful"
 export default {
   name: "LinkShowPage",
   components: {LinkShow, Select, NoteStatisticsButton, LoadingPage},
-  props: {linkid: Number, staticInfo: Array},
+  props: {linkid: Number},
   data() {
     return {
       linkViewedByUser: null,

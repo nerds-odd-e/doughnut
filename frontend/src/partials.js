@@ -10,5 +10,6 @@ const router = createRouter({
 })
 
 const app = createApp(DoughnutApp)
+app.config.globalProperties.$staticInfo = {}
 app.use(router)
 app.mount('#partials-noteshow')

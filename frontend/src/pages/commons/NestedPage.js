@@ -5,9 +5,6 @@ import { routerScopeGuard } from "../../routes/relative_routes"
 function NestedPage(WrappedComponent, scopeName, exceptRoutes, navigateOutWarningMessage){
   return  {
     name: 'NestedPage',
-    props: {
-      staticInfo: Object,
-    },
     components: { RelativeRouterView },
     computed: {
       isNested() {
@@ -22,7 +19,7 @@ function NestedPage(WrappedComponent, scopeName, exceptRoutes, navigateOutWarnin
     render() {
       return h('div', {}, [
         h(WrappedComponent, {...this.$props, nested: this.isNested}),
-        h(RelativeRouterView, {staticInfo: this.staticInfo}),
+        h(RelativeRouterView, {}),
       ])
     }
   }

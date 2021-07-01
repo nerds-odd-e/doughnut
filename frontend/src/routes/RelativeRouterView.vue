@@ -1,10 +1,9 @@
 <template>
-  <router-view v-bind="{staticInfo}"/>
+  <router-view />
 </template>
 
 <script>
 export default {
-  props: { staticInfo: Object }
 }
 </script>
 

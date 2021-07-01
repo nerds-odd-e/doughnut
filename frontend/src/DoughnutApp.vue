@@ -11,12 +11,15 @@ export default {
     }},
   
   mounted() {
-    restGet(`/api/static-info`, (v)=>this.loading = v, (res) => this.staticInfo = res)
+    restGet(`/api/static-info`, (v)=>this.loading = v, (res) => {
+      this.staticInfo = res
+      Object.assign(this.$staticInfo, res)
+    })
   }
 }
 
 </script>
 
 <template>
-  <RelativeRouterView v-bind="{staticInfo}"></RelativeRouterView>
+  <RelativeRouterView />
 </template>
