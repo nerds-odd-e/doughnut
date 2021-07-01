@@ -1,15 +1,14 @@
 <template>
   <LoadingPage v-bind="{loading, contentExists: !!repetition}">
     <template v-if="!!repetition">
-      <Quiz v-if="!!repetition.quizQuestion && !answerResult" v-bind="repetition" @answer="processAnswer($event)"/>
-      <template v-else>
-        <template v-if="reviewPointViewedByUser">
-          <Repetition v-bind="{...reviewPointViewedByUser, answerResult, staticInfo, compact: $route.name.split('-').length>1}" @selfEvaluate="selfEvaluate($event)"/>
-          <NoteStatisticsButton v-if="reviewPointViewedByUser.noteViewedByUser" :noteid="reviewPointViewedByUser.noteViewedByUser.note.id"/>
-          <NoteStatisticsButton v-else :link="reviewPointViewedByUser.linkViewedByUser.id"/>
-        </template>
-      </template>
-      <RelativeRouterView v-bind="{staticInfo}"/>
+          <Quiz v-if="!!repetition.quizQuestion && !answerResult" v-bind="repetition" @answer="processAnswer($event)"/>
+          <template v-else>
+            <template v-if="reviewPointViewedByUser">
+              <Repetition v-bind="{...reviewPointViewedByUser, answerResult, staticInfo, compact: nested}" @selfEvaluate="selfEvaluate($event)"/>
+              <NoteStatisticsButton v-if="reviewPointViewedByUser.noteViewedByUser" :noteid="reviewPointViewedByUser.noteViewedByUser.note.id"/>
+              <NoteStatisticsButton v-else :link="reviewPointViewedByUser.linkViewedByUser.id"/>
+            </template>
+          </template>
     </template>
   </LoadingPage>
 </template>
@@ -19,14 +18,12 @@ import Quiz from '../components/review/Quiz.vue'
 import Repetition from '../components/review/Repetition.vue'
 import LoadingPage from "./commons/LoadingPage.vue"
 import NoteStatisticsButton from '../components/notes/NoteStatisticsButton.vue'
-import RelativeRouterView from "../routes/RelativeRouterView.vue"
 import { restGet, restPost } from "../restful/restful"
-import { routerScopeGuard } from "../routes/relative_routes"
 
 export default {
   name: 'RepeatPage',
-  props: { staticInfo: Object },
-  components: { Quiz, Repetition, LoadingPage, NoteStatisticsButton, RelativeRouterView },
+  props: { staticInfo: Object, nested: Boolean },
+  components: { Quiz, Repetition, LoadingPage, NoteStatisticsButton },
   data() {
     return {
       repetition: null,
@@ -79,8 +76,5 @@ export default {
   mounted() {
     this.fetchData()
   },
-  beforeRouteEnter(to, from, next) {routerScopeGuard('repeat', ['reviews'], 'This will leave the current review, are you sure?')(to, from, next)},
-  beforeRouteUpdate(to, from, next) {routerScopeGuard('repeat', ['reviews'], 'This will leave the current review, are you sure?')(to, from, next)},
-  beforeRouteLeave(to, from, next) {routerScopeGuard('repeat', ['reviews'], 'This will leave the current review, are you sure?')(to, from, next)},
 }
 </script>

@@ -7,6 +7,14 @@ import ReviewHome from '@/pages/ReviewHome.vue'
 import RepeatPage from '@/pages/RepeatPage.vue'
 import DoingQuiz from '@/pages/DoingQuiz.vue'
 import InitialReview from '@/pages/InitialReview.vue'
+import NestedPage from "@/pages/commons/NestedPage"
+
+const NestedRepeatPage = NestedPage(
+  RepeatPage,
+  `repeat`,
+  ['reviews'],
+  `This will leave the current review, are you sure?`,
+  )
 
 const noteAndLinkRoutes = [
     { path: 'notes/:noteid', name: 'noteShow', component: NoteShowPage, props: true },
@@ -24,7 +32,7 @@ const routes = [
     { path: '/bazaar/notes/:noteid', name: 'bnoteShow', component: NoteShowPage, props: true },
     { path: '/reviews', name: 'reviews', component: ReviewHome },
     { path: '/reviews/initial', name: 'initial', component: InitialReview },
-    { path: '/reviews/repeat', name: 'repeat', component: RepeatPage, children: [
+    { path: '/reviews/repeat', name: 'repeat', component: NestedRepeatPage, children: [
               ...nestedNoteAndLinkRoutes('repeat-'),
               { path: 'quiz', name: 'repeat-quiz', component: DoingQuiz }] },
   ]
