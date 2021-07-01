@@ -12,7 +12,7 @@
 <script setup>
 import NoteStatisticsButton from '../components/notes/NoteStatisticsButton.vue'
 import Repetition from '../components/review/Repetition.vue'
-import LoadingPage from "./LoadingPage.vue"
+import LoadingPage from "./commons/LoadingPage.vue"
 import {restGet} from "../restful/restful"
 import { ref, inject, watch } from 'vue'
 

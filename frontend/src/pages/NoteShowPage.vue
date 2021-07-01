@@ -10,7 +10,7 @@
 <script setup>
 import NoteViewedByUser from "../components/notes/NoteViewedByUser.vue"
 import NoteStatisticsButton from '../components/notes/NoteStatisticsButton.vue'
-import LoadingPage from "./LoadingPage.vue"
+import LoadingPage from "./commons/LoadingPage.vue"
 import {restGet} from "../restful/restful"
 import { ref, watch, defineProps } from "vue"
 

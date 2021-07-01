@@ -16,7 +16,7 @@
 <script>
 import NoteOwnerBreadcrumb from "../components/notes/NoteOwnerBreadcrumb.vue"
 import NoteFormBody from "../components/notes/NoteFormBody.vue"
-import LoadingPage from "./LoadingPage.vue"
+import LoadingPage from "./commons/LoadingPage.vue"
 import {restGet, restPostMultiplePartForm} from "../restful/restful"
 
 export default {

@@ -1,6 +1,6 @@
 <template>
   <LoadingPage v-bind="{loading, contentExists: !!repetition}">
-    <template v-if="!!repetition" v-bind="{repetition}">
+    <template v-if="!!repetition">
       <Quiz v-if="!!repetition.quizQuestion && !answerResult" v-bind="repetition" @answer="processAnswer($event)"/>
       <template v-else>
         <template v-if="reviewPointViewedByUser">
@@ -17,7 +17,7 @@
 <script>
 import Quiz from '../components/review/Quiz.vue'
 import Repetition from '../components/review/Repetition.vue'
-import LoadingPage from "./LoadingPage.vue"
+import LoadingPage from "./commons/LoadingPage.vue"
 import NoteStatisticsButton from '../components/notes/NoteStatisticsButton.vue'
 import RelativeRouterView from "../routes/RelativeRouterView.vue"
 import { restGet, restPost } from "../restful/restful"

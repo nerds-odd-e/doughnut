@@ -8,20 +8,7 @@ beforeEach(() => {
   fetch.resetMocks();
 });
 
-const stubResponse = _.merge(noteViewedByUser,
-    {
-        notebook: {
-            ownership: {
-                isFromCircle: true,
-                circle: {
-                    name: "a circle"
-                }
-            },
-        },
-    }
-  )
-
-describe('note show', () => {
+describe('repeat page', () => {
 
   test('redirect to review page if nothing to repeat', async () => {
     fetch.mockResponseOnce(JSON.stringify({}));

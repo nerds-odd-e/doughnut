@@ -19,7 +19,7 @@
 <script>
 import ShowReviewPoint from '../components/review/ShowReviewPoint.vue'
 import ReviewSettingForm from '../components/review/ReviewSettingForm.vue'
-import LoadingPage from "./LoadingPage.vue"
+import LoadingPage from "./commons/LoadingPage.vue"
 import { restGet, restPost } from "../restful/restful"
 
 export default {

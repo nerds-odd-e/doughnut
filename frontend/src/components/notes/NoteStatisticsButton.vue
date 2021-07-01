@@ -1,25 +1,19 @@
 <script>
-
-import { defineAsyncComponent, defineComponent, ref } from "vue"
 import NoteStatistics from "./NoteStatistics.vue"
 
-export default defineComponent({
+export default {
+  name: 'NoteStatisticsButton',
   props: { noteid: Number, linkid: Number },
-  components: {     
-      NoteStatistics
-    },
-  setup() {
-      const children = ref(null)
-
-      const toggleStatistics = () => {
-        children.value = 'NoteStatistics'
-      }
-return {
-        toggleStatistics,
-        children        
-      }
-    },
-  })
+  components: { NoteStatistics },
+  data() {
+    return { statisticComponentName: null }
+  },
+  method: {
+    toggleStatistics() {
+      this.statisticComponentName = 'NoteStatistics'
+    }
+  },
+}
 </script>
 
 <template>
@@ -27,6 +21,6 @@ return {
   Statistics
   </a>
   <div>
-     <component :is="children" :noteid="noteid" :linkid="linkid"></component>
+     <component :is="statisticComponentName" :noteid="noteid" :linkid="linkid"></component>
   </div>
 </template>

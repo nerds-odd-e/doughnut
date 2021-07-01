@@ -6,7 +6,7 @@
 
 <script setup>
 import ReviewWelcome from '../components/review/ReviewWelcome.vue'
-import LoadingPage from "./LoadingPage.vue"
+import LoadingPage from "./commons/LoadingPage.vue"
 import {restGet} from "../restful/restful"
 import { ref, inject } from 'vue'
 

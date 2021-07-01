@@ -21,7 +21,7 @@
 import LinkShow from "../components/links/LinkShow.vue"
 import Select from "../components/form/Select.vue"
 import NoteStatisticsButton from '../components/notes/NoteStatisticsButton.vue'
-import LoadingPage from "./LoadingPage.vue"
+import LoadingPage from "./commons/LoadingPage.vue"
 import {restGet, restPost } from "../restful/restful"
 
 export default {
