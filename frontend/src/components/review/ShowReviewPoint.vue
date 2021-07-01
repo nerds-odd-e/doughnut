@@ -21,12 +21,13 @@
 </template>
 
 <script>
-export default { name: "ShowReviewPoint" };
-</script>
+import NoteBreadcrumbForReview from "./NoteBreadcrumbForReview.vue"
+import NoteViewedByUserWithoutChildren from "../notes/NoteViewedByUserWithoutChildren.vue"
+import LinkShow from "../links/LinkShow.vue"
 
-<script setup>
-  import NoteBreadcrumbForReview from "./NoteBreadcrumbForReview.vue"
-  import NoteViewedByUserWithoutChildren from "../notes/NoteViewedByUserWithoutChildren.vue"
-  import LinkShow from "../links/LinkShow.vue"
-  const props = defineProps({ noteViewedByUser: Object, linkViewedByUser: Object })
+export default {
+  name: "ShowReviewPoint",
+  props: { noteViewedByUser: Object, linkViewedByUser: Object },
+  components: {NoteBreadcrumbForReview, NoteViewedByUserWithoutChildren, LinkShow}
+};
 </script>

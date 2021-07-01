@@ -24,7 +24,7 @@ When("there is {string} link between note {string} and {string}", (linkType, fro
 })
 
 And("I should see the source note as {string}",(noteTitle) => {
-    cy.findByText(`Link ${noteTitle} to:`).should("be.visible");
+    cy.findByText(noteTitle, {selector: 'strong'}).should("be.visible");
 })
 
 And("I should see {string} as targets only when searching {string}",(noteTitlesAsString, searchKey) => {

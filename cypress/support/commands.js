@@ -397,7 +397,7 @@ Cypress.Commands.add('unsubscribeFromNotebook', noteTitle => {
 
 Cypress.Commands.add('searchNote', searchKey => {
   cy.findByPlaceholderText('Search').type(searchKey);
-  cy.getFormControl('SearchGlobally').check();
+  cy.getFormControl('Search Globally').check();
   cy.findByText('Search').click();
 });
 
