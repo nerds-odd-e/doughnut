@@ -9,18 +9,20 @@ const mountWithMockRoute = (comp, options, currentRoute) => {
     }
 
     const wrapper = mount(
-    comp,
-    merge(
-        options,
-        {
-        global: {
-            mocks: {
-            $route: mockRoute,
-            $router: mockRouter
+        comp,
+        merge(
+            options,
+            {
+            global: {
+                mocks: {
+                $route: mockRoute,
+                $router: mockRouter
+                },
+                stubs: {'router-view': true, 'router-link': {props: ['to'], template: `<a class="router-link" :to='JSON.stringify(to)'><slot/></a>`}}
             },
-            stubs: {'router-view': true, 'router-link': {props: ['to'], template: `<a class="router-link" :to='JSON.stringify(to)'><slot/></a>`}}
-        },
-        }));
+            }
+        )
+    );
 
     return { wrapper, mockRouter }
 }

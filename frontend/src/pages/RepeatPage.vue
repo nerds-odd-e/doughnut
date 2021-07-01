@@ -9,6 +9,7 @@
           <NoteStatisticsButton v-else :link="reviewPointViewedByUser.linkViewedByUser.id"/>
         </template>
       </template>
+      <RelativeRouterView v-bind="{staticInfo}"/>
     </template>
   </LoadingPage>
 </template>
@@ -18,13 +19,14 @@ import Quiz from '../components/review/Quiz.vue'
 import Repetition from '../components/review/Repetition.vue'
 import LoadingPage from "./LoadingPage.vue"
 import NoteStatisticsButton from '../components/notes/NoteStatisticsButton.vue'
+import RelativeRouterView from "../routes/RelativeRouterView.vue"
 import { restGet, restPost } from "../restful/restful"
 import { routerScopeGuard } from "../routes/relative_routes"
 
 export default {
   name: 'RepeatPage',
   props: { staticInfo: Object },
-  components: { Quiz, Repetition, LoadingPage, NoteStatisticsButton },
+  components: { Quiz, Repetition, LoadingPage, NoteStatisticsButton, RelativeRouterView },
   data() {
     return {
       repetition: null,

@@ -48,7 +48,6 @@
         </div>
     </div>
   </div>
-  <RelativeRouterView v-bind="{staticInfo}"/>
 </template>
 
 <script>
@@ -60,7 +59,6 @@
   import ShowReviewPoint from "./ShowReviewPoint.vue"
   import StickTopBar from "../StickTopBar.vue"
   import SelfEvaluateButtons from "./SelfEvaluateButtons.vue"
-  import RelativeRouterView from "../../routes/RelativeRouterView.vue"
 
   export default {
     name: "Repetition",
@@ -73,13 +71,13 @@
       compact: Boolean
     },
     emits: ['selfEvaluate'],
-    components: {SvgCog, SvgEdit, SvgReviewSetting, SvgLinkNote, SvgNoReview, ShowReviewPoint, StickTopBar, SelfEvaluateButtons, RelativeRouterView},
+    components: {SvgCog, SvgEdit, SvgReviewSetting, SvgLinkNote, SvgNoReview, ShowReviewPoint, StickTopBar, SelfEvaluateButtons},
     computed: {
       sourceNoteViewedByUser() {
         if(!!this.noteViewedByUser) {
           return this.noteViewedByUser
         }
-        else {
+        if(this.linkViewedByUser){
           return this.linkViewedByUser.sourceNoteViewedByUser
         }
       },

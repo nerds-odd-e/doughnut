@@ -56,6 +56,7 @@ When('I am creating note under {string}', noteTitles => {
 });
 
 Then('I should see {string} in breadcrumb', noteTitles => {
+  cy.pageIsLoaded()
   cy.get('.breadcrumb').within(() =>
     noteTitles
       .commonSenseSplit(', ')

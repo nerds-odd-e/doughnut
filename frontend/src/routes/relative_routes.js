@@ -2,7 +2,6 @@ import { routes } from './routes'
 
 const routerProtectGuard = (except, message) =>{
   return (to, from, next) => {
-    alert(to.name)
     if(!except.includes(to.name)) {
       if(!confirm(message)) return
     }
