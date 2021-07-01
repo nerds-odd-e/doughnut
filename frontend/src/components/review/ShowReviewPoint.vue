@@ -1,10 +1,13 @@
 <template>
 <div>
     <div v-if="!!noteViewedByUser">
-        <NoteBreadcrumbForReview :ancestors="noteViewedByUser.ancestors" />
-        <div class="jumbotron py-4 mb-2">
-            <NoteShow v-bind="{note: noteViewedByUser.note, links: noteViewedByUser.links, level: 1}"/>
-        </div>
+        <NoteViewedByUserWithoutChildren v-bind="{
+            note: noteViewedByUser.note,
+            links: noteViewedByUser.links,
+            ancestors: noteViewedByUser.ancestors,
+            notebook: noteViewedByUser.notebook,
+            owns: noteViewedByUser.owns,
+        }"/>
     </div>
 
     <div v-if="!!linkViewedByUser">
@@ -23,7 +26,7 @@ export default { name: "ShowReviewPoint" };
 
 <script setup>
   import NoteBreadcrumbForReview from "./NoteBreadcrumbForReview.vue"
-  import NoteShow from "../notes/NoteShow.vue"
+  import NoteViewedByUserWithoutChildren from "../notes/NoteViewedByUserWithoutChildren.vue"
   import LinkShow from "../links/LinkShow.vue"
   const props = defineProps({ noteViewedByUser: Object, linkViewedByUser: Object })
 </script>
