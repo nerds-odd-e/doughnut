@@ -2,10 +2,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.NoteContent;
-import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.json.NoteViewedByUser;
 import com.odde.doughnut.entities.json.RedirectToNoteResponse;
 import com.odde.doughnut.exceptions.NoAccessRightException;
@@ -17,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/notes")
@@ -77,6 +75,11 @@ class RestNoteController {
     statistics.setReviewPoint(user.getReviewPointFor(note));
     statistics.setNote(note);
     return statistics;
+  }
+
+  @PostMapping("/{note}/search")
+  public List<Note> searchForLinkTarget(@PathVariable("note") Note note, @Valid @RequestBody SearchTerm searchTerm) {
+    return currentUserFetcher.getUser().getLinkableNotes(note, searchTerm);
   }
 
 }
