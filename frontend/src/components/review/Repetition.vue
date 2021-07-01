@@ -67,7 +67,6 @@
       answerResult: Object,
       noteViewedByUser: Object,
       linkViewedByUser: Object,
-      staticInfo: Object,
       compact: Boolean
     },
     emits: ['selfEvaluate'],

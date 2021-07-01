@@ -4,7 +4,7 @@
           <Quiz v-if="!!repetition.quizQuestion && !answerResult" v-bind="repetition" @answer="processAnswer($event)"/>
           <template v-else>
             <template v-if="reviewPointViewedByUser">
-              <Repetition v-bind="{...reviewPointViewedByUser, answerResult, staticInfo, compact: nested}" @selfEvaluate="selfEvaluate($event)"/>
+              <Repetition v-bind="{...reviewPointViewedByUser, answerResult, compact: nested}" @selfEvaluate="selfEvaluate($event)"/>
               <NoteStatisticsButton v-if="reviewPointViewedByUser.noteViewedByUser" :noteid="reviewPointViewedByUser.noteViewedByUser.note.id"/>
               <NoteStatisticsButton v-else :link="reviewPointViewedByUser.linkViewedByUser.id"/>
             </template>
@@ -22,7 +22,7 @@ import { restGet, restPost } from "../restful/restful"
 
 export default {
   name: 'RepeatPage',
-  props: { staticInfo: Object, nested: Boolean },
+  props: { nested: Boolean },
   components: { Quiz, Repetition, LoadingPage, NoteStatisticsButton },
   data() {
     return {

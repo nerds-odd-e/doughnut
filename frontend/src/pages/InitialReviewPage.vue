@@ -1,30 +1,37 @@
 <template>
-  <LoadingPage v-bind="{loading, contentExists: !!reviewPointViewedByUser}">
-    <ShowReviewPoint v-bind="reviewPointViewedByUser"/>
-
-    <div>
-        <div class="mb-2">
-            <input name="note" v-if="reviewPoint.note" :value="reviewPoint.note.id" type="hidden"/>
-            <input name="link" v-if="reviewPoint.link" :value="reviewPoint.link.id" type="hidden"/>
-            <ReviewSettingForm v-if="!!reviewPointViewedByUser.reviewSetting" v-model="reviewSetting"/>
-        </div>
-        <input type="submit" name="submit" value="Keep for repetition" class="btn btn-primary"
-            v-on:click="processForm(false)"/>
-        <input type="submit" name="skip" value="Skip repetition" class="btn btn-secondary"
-            v-on:click="processForm(true)">
+  <StickTopBar v-if="nested">
+    <div class="initial-review-container" v-on:click="$router.push({name: 'initial'})">
+      <InitialReviewButtons @doInitialReview="processForm($event)"/>
     </div>
-  </LoadingPage>
+  </StickTopBar>
+  <div v-else>
+    <LoadingPage v-bind="{loading, contentExists: !!reviewPointViewedByUser}">
+      <ShowReviewPoint v-bind="reviewPointViewedByUser"/>
+
+      <div>
+          <div class="mb-2">
+              <input name="note" v-if="reviewPoint.note" :value="reviewPoint.note.id" type="hidden"/>
+              <input name="link" v-if="reviewPoint.link" :value="reviewPoint.link.id" type="hidden"/>
+              <ReviewSettingForm v-if="!!reviewPointViewedByUser.reviewSetting" v-model="reviewSetting"/>
+          </div>
+          <InitialReviewButtons @doInitialReview="processForm($event)"/>
+      </div>
+    </LoadingPage>
+  </div>
 </template>
 
 <script>
 import ShowReviewPoint from '../components/review/ShowReviewPoint.vue'
 import ReviewSettingForm from '../components/review/ReviewSettingForm.vue'
+import InitialReviewButtons from '../components/review/InitialReviewButtons.vue'
 import LoadingPage from "./commons/LoadingPage.vue"
+  import StickTopBar from "../components/StickTopBar.vue"
 import { restGet, restPost } from "../restful/restful"
 
 export default {
-  name: 'InitialReview',
-  components: {ShowReviewPoint, ReviewSettingForm, LoadingPage},
+  name: 'InitialReviewPage',
+  props: { nested: Boolean },
+  components: {ShowReviewPoint, ReviewSettingForm, LoadingPage, InitialReviewButtons, StickTopBar},
   data() {
     return {
       reviewPointViewedByUser: null,
@@ -59,18 +66,17 @@ export default {
     fetchData() {
       restGet(`/api/reviews/initial`, r=>this.loading=r, this.loadNew)
     },
-
-    submitInitialReview() {
-      restPost(
-        `/api/reviews/${this.repetition.reviewPointViewedByUser.reviewPoint.id}/self-evaluate`,
-        data,
-        (val)=>this.loading=val,
-        this.loadNew)
-    }
   },
   mounted(){
     this.fetchData();
   }
 }
-
 </script>
+
+<style>
+.initial-review-container {
+  background-color: rgba(50, 50, 150, 0.8);
+  padding: 5px;
+  border-radius: 10px;
+}
+</style>
