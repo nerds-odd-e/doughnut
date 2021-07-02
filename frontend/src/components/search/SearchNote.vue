@@ -7,7 +7,7 @@
   <div v-if="searchResult.length === 0">
       <em>No linkable notes found.</em>
   </div>
-  <Cards v-else :notes="searchResult">
+  <Cards v-else class="search-result" :notes="searchResult" columns="3">
     <template #button="{note}">
         <button class="btn btn-primary" v-on:click="$emit('selected', note)">Select</button>
     </template>
@@ -56,3 +56,10 @@ export default {
 }
 
 </script>
+
+<style scoped>
+.search-result {
+  max-height: 300px;
+  overflow-y: auto;
+}
+</style>

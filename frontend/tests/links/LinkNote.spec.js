@@ -1,16 +1,14 @@
-import LinkNote from '@/components/links/LinkNote.vue';
-import { mountWithMockRoute } from '../helpers'
+import LinkNoteFinalize from '@/components/links/LinkNoteFinalize.vue';
+import { mount } from '@vue/test-utils';
+import {noteViewedByUser} from '../notes/fixtures'
 
-describe('LinkNote', () => {
-  beforeEach(async () => {
-    fetch.resetMocks();
-    fetch.mockResponseOnce(JSON.stringify({}));
-  });
+describe('LinkNoteFinalize', () => {
 
-  xtest('click on note when doing review', async () => {
-    const { wrapper } = mountWithMockRoute(LinkNote, {propsData: reviewPointForView}, {name: 'repeat'});
+  test('going back', async () => {
+    const wrapper = mount(LinkNoteFinalize, {propsData: {noteId: 345, targetNote: noteViewedByUser.note}});
+    await wrapper.find(".go-back-button").trigger("click")
+    expect(wrapper.emitted().goBack).toHaveLength(1)
 
-    expect(JSON.parse(wrapper.find(".link-source .router-link").attributes().to).name).toEqual("noteShow")
   });
 
 });

@@ -3,18 +3,20 @@
 
   <div>
       <Select v-if="!!$staticInfo" scopeName='link' field='typeId' v-model="formData.typeId" :options="$staticInfo.linkTypeOptions" :errors="formErrors.pictureMask"/>
+      <button class="btn btn-secondary go-back-button" v-on:click="$emit('goBack')"><SvgGoBack/></button>
       <button class="btn btn-primary" v-on:click="createLink()">Create Link</button>
   </div>
 </template>
 
 <script>
 import Select from "../form/Select.vue"
+import SvgGoBack from "../svgs/SvgGoBack.vue"
 import { restPost } from "../../restful/restful"
 
 export default {
   name: 'LinkNoteFinalize',
-  props: { noteId: String, targetNote: {type: Object, required: true} },
-  components: {Select},
+  props: { noteId: Number, targetNote: {type: Object, required: true} },
+  components: {Select, SvgGoBack},
   emits: [ 'success', 'goBack' ],
   data() {
     return {

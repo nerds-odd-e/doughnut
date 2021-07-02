@@ -1,7 +1,7 @@
 <template>
 
 <SearchNote v-if="!targetNote" v-bind="{noteId}" @selected="targetNote=$event"/>
-<LinkNoteFinalize v-else v-bind="{targetNote, noteId}" @success="$emit('done')"/>
+<LinkNoteFinalize v-else v-bind="{targetNote, noteId}" @success="$emit('done')" @goBack="targetNote=null"/>
 
 </template>
 
