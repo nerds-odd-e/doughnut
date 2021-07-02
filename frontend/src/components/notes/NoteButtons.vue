@@ -6,7 +6,7 @@
     <a role="button" class="btn btn-sm" title="Cards View" :href="`/notes/articles/${note.id}`">
         <SvgArticle/>
     </a>
-    <SearchNoteButton :noteTitle="note.title" :noteId="note.id"/>
+    <LinkNoteButton :noteTitle="note.title" :noteId="note.id"/>
     <a class="btn btn-light dropdown-toggle"
             data-toggle="dropdown" aria-haspopup="true"
             aria-expanded="false" role="button" title="more options">
@@ -34,6 +34,6 @@
   import SvgCog from "../svgs/SvgCog.vue"
   import SvgReviewSetting from "../svgs/SvgReviewSetting.vue"
   import SvgRemove from "../svgs/SvgRemove.vue"
-  import SearchNoteButton from "../search/SearchNoteButton.vue"
+  import LinkNoteButton from "../links/LinkNoteButton.vue"
   const props = defineProps({note: Object})
 </script>

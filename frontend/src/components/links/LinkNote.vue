@@ -3,12 +3,10 @@
 <div v-if="!!targetNote">
         <div> To <strong>{{targetNote.title}}</strong> </div>
 
-        <form :action="`/links/create_link`" method="post">
-            <input name="sourceNote" :value="noteId" type="hidden"/>
-            <input name="targetNote" :value="targetNote.id" type="hidden"/>
-            <Select v-if="!!$staticInfo" scopeName='link' field='typeId' v-model="formData.typeId" :options="$staticInfo.linkTypeOptions"/>
-            <input type="submit" value="Link" class="btn btn-primary"/>
-        </form>
+        <div>
+            <Select v-if="!!$staticInfo" scopeName='link' field='typeId' v-model="formData.typeId" :options="$staticInfo.linkTypeOptions" :errors="formErrors.pictureMask"/>
+            <button class="btn btn-primary" v-on:link="createLink()">Link</button>
+        </div>
 </div>
 <div v-else>
   <div>
@@ -36,9 +34,10 @@ import Cards from "../notes/Cards.vue"
 import { restPost } from "../../restful/restful"
 
 export default {
-  name: 'SearchNote',
+  name: 'LinkNote',
   props: { noteId: String },
   components: {TextInput, CheckInput, Cards, Select},
+  emits: [ 'done' ],
   data() {
     return {
       searchTerm: {
@@ -48,6 +47,7 @@ export default {
       searchResult: [],
       targetNote: null,
       formData: {},
+      formErrors: {},
     }
   },
   watch: {
@@ -67,6 +67,12 @@ export default {
   methods: {
     search() {
       restPost(`/api/notes/${this.noteId}/search`, {...this.searchTerm, searchKey: this.searchTerm.searchKey.trim()}, (r)=>{}, (r)=>this.searchResult=r)
+    },
+    createLink() {
+      restPost(`/api/notes/${this.noteId}/link`, this.formData, (r)=>{},
+        (r)=>this.$emit('done', true),
+        (res) => this.formErrors = res,
+      )
     }
   }
 

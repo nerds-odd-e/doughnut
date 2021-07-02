@@ -9,20 +9,20 @@
       <h3>Link <strong>{{noteTitle}}</strong> to</h3>
     </template>
     <template v-slot:body>
-      <SearchNote v-bind="{noteId}"/>
+      <LinkNote v-bind="{noteId}"/>
     </template>
   </ModalWithButton>
 </template>
 
 <script>
-import ModalWithButton from "./ModalWithButton.vue"
-import SearchNote from "./SearchNote.vue"
+import ModalWithButton from "../search/ModalWithButton.vue"
+import LinkNote from "./LinkNote.vue"
 import SvgLinkNote from "../svgs/SvgLinkNote.vue"
 
 export default {
-  name: 'SearchNoteButton',
+  name: 'LinkNoteButton',
   props: { noteTitle: String, noteId: Number },
-  components: { ModalWithButton, SearchNote, SvgLinkNote },
+  components: { ModalWithButton, LinkNote, SvgLinkNote },
 }
 
 </script>
