@@ -25,4 +25,11 @@ describe('Modal', () => {
     expect(wrapper.emitted().close_request).toHaveLength(1)
   });
 
+  test('click on note when doing review', async () => {
+    const wrapper = mount(TestComponent);
+    await wrapper.find(".modal-wrapper").trigger('click')
+    console.log(wrapper.emitted())
+    expect(wrapper.emitted().close_request).toHaveLength(1)
+  });
+
 });

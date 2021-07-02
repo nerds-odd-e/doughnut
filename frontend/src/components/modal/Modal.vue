@@ -1,29 +1,16 @@
 <template>
   <transition name="modal">
     <div class="modal-mask">
-      <div class="modal-wrapper">
+      <div class="modal-wrapper" v-on:click.self="$emit('close_request')">
         <div class="modal-container">
           <button class="close-button" @click="$emit('close_request')"><SvgClose/></button>
 
           <div class="modal-header">
-            <slot name="header">
-              default header
-            </slot>
+            <slot name="header"/>
           </div>
 
           <div class="modal-body">
-            <slot name="body">
-              default body
-            </slot>
-          </div>
-
-          <div class="modal-footer">
-            <slot name="footer">
-              default footer
-              <button class="modal-default-button" @click="$emit('close_request')">
-                OK
-              </button>
-            </slot>
+            <slot name="body"/>
           </div>
         </div>
       </div>
@@ -77,11 +64,6 @@ export default {
 
 .modal-body {
   margin: 20px 0;
-}
-
-.modal-default-button {
-  display: block;
-  margin-top: 1rem;
 }
 
 /*

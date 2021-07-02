@@ -7,9 +7,6 @@
     <template v-slot:body>
       <slot name="body" :close="()=>showModal=false"/>
     </template>
-    <template v-slot:footer>
-      <slot name="footer"/>
-    </template>
   </Modal>
 </template>
 
