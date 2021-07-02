@@ -16,7 +16,7 @@ When("I link note {string} as {string} note {string}", (fromNoteTitle, linkType,
     cy.searchNote(toNoteTitle);
     cy.clickButtonOnCardBody(toNoteTitle, "Select");
     cy.get('select').select(linkType);
-    cy.findByRole('button', {name: "Link"}).click();
+    cy.findByRole('button', {name: "Create Link"}).click();
 })
 
 When("there is {string} link between note {string} and {string}", (linkType, fromNoteTitle, toNoteTitle) => {
