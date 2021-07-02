@@ -3,6 +3,7 @@
     <div class="modal-mask">
       <div class="modal-wrapper">
         <div class="modal-container">
+          <button class="close-button" @click="$emit('close_request')"><SvgClose/></button>
 
           <div class="modal-header">
             <slot name="header">
@@ -19,7 +20,7 @@
           <div class="modal-footer">
             <slot name="footer">
               default footer
-              <button class="modal-default-button" @click="$emit('close')">
+              <button class="modal-default-button" @click="$emit('close_request')">
                 OK
               </button>
             </slot>
@@ -32,7 +33,10 @@
 </template>
 
 <script>
+import SvgClose from "../svgs/SvgClose.vue"
 export default {
+  emits: ['close_request'],
+  components: { SvgClose }
 }
 </script>
 
@@ -55,6 +59,7 @@ export default {
 }
 
 .modal-container {
+  position: relative;
   max-width: 600px;
   margin: 0px auto;
   padding: 20px 30px;
@@ -100,5 +105,16 @@ export default {
 .modal-leave-active .modal-container {
   -webkit-transform: scale(1.1);
   transform: scale(1.1);
+}
+
+.close-button {
+  position: absolute;
+  right: .3em;
+  top: .3em;
+  width: 26px;
+  padding: 1px;
+  height: 26px;
+  border: none;
+  background: none;
 }
 </style>

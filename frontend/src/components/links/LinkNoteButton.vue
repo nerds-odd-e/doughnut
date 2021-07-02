@@ -15,7 +15,7 @@
 </template>
 
 <script>
-import ModalWithButton from "../search/ModalWithButton.vue"
+import ModalWithButton from "../modal/ModalWithButton.vue"
 import LinkNote from "./LinkNote.vue"
 import SvgLinkNote from "../svgs/SvgLinkNote.vue"
 
