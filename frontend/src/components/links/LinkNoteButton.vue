@@ -5,11 +5,11 @@
         <SvgLinkNote/>
       </button>
     </template>
-    <template v-slot:header>
+    <template #header>
       <h3>Link <strong>{{noteTitle}}</strong> to</h3>
     </template>
-    <template v-slot:body>
-      <LinkNote v-bind="{noteId}"/>
+    <template #body="{close}">
+      <LinkNote v-bind="{noteId}" @done="close();$emit('updated')"/>
     </template>
   </ModalWithButton>
 </template>
@@ -22,6 +22,7 @@ import SvgLinkNote from "../svgs/SvgLinkNote.vue"
 export default {
   name: 'LinkNoteButton',
   props: { noteTitle: String, noteId: Number },
+  emits: ['updated'],
   components: { ModalWithButton, LinkNote, SvgLinkNote },
 }
 

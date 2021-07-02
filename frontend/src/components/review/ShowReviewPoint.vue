@@ -1,7 +1,7 @@
 <template>
 <div>
     <div v-if="!!noteViewedByUser">
-        <NoteViewedByUserWithoutChildren v-bind="{
+        <NoteRefreshable v-bind="{
             note: noteViewedByUser.note,
             links: noteViewedByUser.links,
             ancestors: noteViewedByUser.ancestors,
@@ -22,12 +22,12 @@
 
 <script>
 import NoteBreadcrumbForReview from "./NoteBreadcrumbForReview.vue"
-import NoteViewedByUserWithoutChildren from "../notes/NoteViewedByUserWithoutChildren.vue"
+import NoteRefreshable from "../notes/NoteRefreshable.vue"
 import LinkShow from "../links/LinkShow.vue"
 
 export default {
   name: "ShowReviewPoint",
   props: { noteViewedByUser: Object, linkViewedByUser: Object },
-  components: {NoteBreadcrumbForReview, NoteViewedByUserWithoutChildren, LinkShow}
+  components: {NoteBreadcrumbForReview, NoteRefreshable, LinkShow}
 };
 </script>

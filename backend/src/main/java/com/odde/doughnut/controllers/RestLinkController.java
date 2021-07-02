@@ -3,6 +3,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.Link;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.LinkViewedByUser;
 import com.odde.doughnut.entities.json.RedirectToNoteResponse;
@@ -13,6 +14,8 @@ import com.odde.doughnut.models.UserModel;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.bind.annotation.*;
+
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping("/api/links")
@@ -50,6 +53,19 @@ class RestLinkController {
     LinkModel linkModel = modelFactoryService.toLinkModel(link);
     linkModel.destroy();
     return new RedirectToNoteResponse(link.getSourceNote().getId());
+  }
+
+  @PostMapping(value = "/create/{sourceNote}/{targetNote}")
+  public Integer linkNoteFinalize(@PathVariable Note sourceNote, @PathVariable Note targetNote, @Valid @RequestBody  LinkRequest linkRequest) throws NoAccessRightException {
+    currentUserFetcher.getUser().getAuthorization().assertAuthorization(sourceNote);
+    currentUserFetcher.getUser().getAuthorization().assertReadAuthorization(targetNote);
+    Link link = new Link();
+    link.setSourceNote(sourceNote);
+    link.setTargetNote(targetNote);
+    link.setTypeId(linkRequest.typeId);
+    link.setUser(currentUserFetcher.getUser().getEntity());
+    modelFactoryService.linkRepository.save(link);
+    return link.getId();
   }
 
   class LinkStatistics {

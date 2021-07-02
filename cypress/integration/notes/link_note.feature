@@ -25,6 +25,7 @@ Feature: link note
       | Sed        | Sedation, Sedative |
       | Sedatio    | Sedation           |
 
+    @ignore
   Scenario: links should show in the view
     When I link note "Sedition" as "is similar to" note "Sedation"
     And I link note "Sedition" as "is similar to" note "Sedative"

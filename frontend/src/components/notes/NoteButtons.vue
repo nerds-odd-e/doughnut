@@ -6,7 +6,7 @@
     <a role="button" class="btn btn-sm" title="Cards View" :href="`/notes/articles/${note.id}`">
         <SvgArticle/>
     </a>
-    <LinkNoteButton :noteTitle="note.title" :noteId="note.id"/>
+    <LinkNoteButton :noteTitle="note.title" :noteId="note.id" @updated="$emit('updated')"/>
     <a class="btn btn-light dropdown-toggle"
             data-toggle="dropdown" aria-haspopup="true"
             aria-expanded="false" role="button" title="more options">
@@ -28,12 +28,17 @@
 </div>
 </template>
 
-<script setup>
+<script>
   import SvgEdit from "../svgs/SvgEdit.vue"
   import SvgArticle from "../svgs/SvgArticle.vue"
   import SvgCog from "../svgs/SvgCog.vue"
   import SvgReviewSetting from "../svgs/SvgReviewSetting.vue"
   import SvgRemove from "../svgs/SvgRemove.vue"
   import LinkNoteButton from "../links/LinkNoteButton.vue"
-  const props = defineProps({note: Object})
+  export default {
+    name: 'NoteButtons',
+    props: {note: Object},
+    emits: ['updated'],
+    components: { SvgEdit, SvgArticle, SvgCog, SvgReviewSetting, SvgReviewSetting, SvgRemove, LinkNoteButton }
+  }
 </script>

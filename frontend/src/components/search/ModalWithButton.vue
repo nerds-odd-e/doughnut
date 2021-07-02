@@ -1,11 +1,11 @@
 <template>
   <slot name="button" :open="()=>showModal=true"/>
-  <Modal v-if="showModal" @close="showModal = false">
+  <Modal v-if="showModal">
     <template v-slot:header>
       <slot name="header"/>
     </template>
     <template v-slot:body>
-      <slot name="body"/>
+      <slot name="body" :close="()=>showModal=false"/>
     </template>
     <template v-slot:footer>
       <slot name="footer"/>

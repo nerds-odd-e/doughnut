@@ -7,21 +7,35 @@
   </LoadingPage>
 </template>
 
-<script setup>
+<script>
 import NoteViewedByUser from "../components/notes/NoteViewedByUser.vue"
 import NoteStatisticsButton from '../components/notes/NoteStatisticsButton.vue'
 import LoadingPage from "./commons/LoadingPage.vue"
 import {restGet} from "../restful/restful"
-import { ref, watch, defineProps } from "vue"
 
-const props = defineProps({noteid: Number})
-const noteViewedByUser = ref(null)
-const loading = ref(false)
-
-const fetchData = async () => {
-  restGet(`/api/notes/${props.noteid}`, loading, (res) => noteViewedByUser.value = res)
+export default {
+  name: "NoteShowPage",
+  props: {noteid: Number},
+  data() {
+    return {
+      noteViewedByUser: null,
+      loading: false,
+    }
+  },
+  components: { NoteViewedByUser, NoteStatisticsButton, LoadingPage },
+  methods: {
+    fetchData() {
+      restGet(`/api/notes/${this.noteid}`, (r)=>this.loading=r, (res) => this.noteViewedByUser = res)
+    }
+  },
+  watch: {
+    noteid() {
+      this.fetchData()
+    }
+  },
+  mounted() {
+    this.fetchData()
+  }
 }
 
-watch(()=>props.noteid, ()=>fetchData())
-fetchData()
 </script>
