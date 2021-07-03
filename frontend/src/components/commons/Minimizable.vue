@@ -1,29 +1,38 @@
 <template>
-  <transition name="fade">
-    <StickTopBar v-if="minimized">
+  <div class="stick-top-bar">
+  <transition name="mini">
+    <div v-if="minimized" class="container">
         <slot name="minimizedContent"/>
-    </StickTopBar>
+    </div>
   </transition>
+  </div>
   <slot v-if="!minimized" name="fullContent"/>
 </template>
 
 <script>
-import StickTopBar from "./StickTopBar.vue"
 
 export default {
   name: 'Minimizable',
   props: { minimized: Boolean },
-  components: { StickTopBar },
 }
 </script>
 
 <style lang="scss">
-.fade-enter-active, .fade-leave-active {
+.mini-enter-active, .mini-leave-active {
   transition: all .5s ease;
 }
 
-.fade-enter-from, .fade-leave-to {
+.mini-enter-from, .mini-leave-to {
   transform: translateY(60vh);
   opacity: 0;
 }
+.stick-top-bar {
+  overflow: visible;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+}
+
 </style>
