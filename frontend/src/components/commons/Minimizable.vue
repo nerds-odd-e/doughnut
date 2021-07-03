@@ -17,12 +17,13 @@ export default {
 }
 </script>
 
-<style scoped>
+<style lang="scss">
 .fade-enter-active, .fade-leave-active {
-  transition: opacity 2s ease;
+  transition: all .5s ease;
 }
 
 .fade-enter-from, .fade-leave-to {
+  transform: translateY(60vh);
   opacity: 0;
 }
 </style>
