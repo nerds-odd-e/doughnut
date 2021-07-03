@@ -6,7 +6,13 @@
     </div>
   </transition>
   </div>
-  <slot v-if="!minimized" name="fullContent"/>
+  <transition name="max">
+    <div v-if="!minimized">
+      here it is:
+      <slot v-if="!minimized" name="fullContent"/>
+    </div>
+  </transition>
+
 </template>
 
 <script>
@@ -18,6 +24,7 @@ export default {
 </script>
 
 <style lang="scss">
+
 .mini-enter-active, .mini-leave-active {
   transition: all .5s ease;
 }
@@ -26,6 +33,16 @@ export default {
   transform: translateY(60vh);
   opacity: 0;
 }
+
+.max-enter-active, .max-leave-active {
+  transition: all .5s ease;
+}
+
+.max-enter-from, .max-leave-to {
+  transform: translateY(-80vh);
+  opacity: 0.8;
+}
+
 .stick-top-bar {
   overflow: visible;
   position: fixed;
