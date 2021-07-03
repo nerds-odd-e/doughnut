@@ -66,6 +66,17 @@ export default {
   margin: 20px 0;
 }
 
+.close-button {
+  position: absolute;
+  right: .3em;
+  top: .3em;
+  width: 26px;
+  padding: 1px;
+  height: 26px;
+  border: none;
+  background: none;
+}
+
 /*
  * The following styles are auto-applied to elements with
  * transition="modal" when their visibility is toggled
@@ -89,14 +100,4 @@ export default {
   transform: scale(1.1);
 }
 
-.close-button {
-  position: absolute;
-  right: .3em;
-  top: .3em;
-  width: 26px;
-  padding: 1px;
-  height: 26px;
-  border: none;
-  background: none;
-}
 </style>

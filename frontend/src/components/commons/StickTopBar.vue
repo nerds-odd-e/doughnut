@@ -1,9 +1,9 @@
 <template>
-<div class="stick-top-bar">
-  <div class="container">
-    <slot />
-  </div>
-</div>
+    <div class="stick-top-bar">
+      <div class="container">
+        <slot />
+      </div>
+    </div>
 </template>
 
 <script>
@@ -11,7 +11,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 .stick-top-bar {
   overflow: hidden;
   position: fixed;

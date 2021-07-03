@@ -1,23 +1,25 @@
 <template>
-  <StickTopBar v-if="nested">
-    <div class="initial-review-container" v-on:click="$router.push({name: 'initial'})">
-      <InitialReviewButtons @doInitialReview="processForm($event)"/>
-    </div>
-  </StickTopBar>
-  <div v-else>
-    <LoadingPage v-bind="{loading, contentExists: !!reviewPointViewedByUser}">
-      <ShowReviewPoint v-bind="reviewPointViewedByUser"/>
-
-      <div>
-          <div class="mb-2">
-              <input name="note" v-if="reviewPoint.note" :value="reviewPoint.note.id" type="hidden"/>
-              <input name="link" v-if="reviewPoint.link" :value="reviewPoint.link.id" type="hidden"/>
-              <ReviewSettingForm v-if="!!reviewPointViewedByUser.reviewSetting" v-model="reviewSetting"/>
-          </div>
-          <InitialReviewButtons @doInitialReview="processForm($event)"/>
+  <Minimizable :minimized="nested">
+    <template #minimizedContent>
+      <div class="initial-review-container" v-on:click="$router.push({name: 'initial'})">
+        <InitialReviewButtons @doInitialReview="processForm($event)"/>
       </div>
-    </LoadingPage>
-  </div>
+    </template>
+    <template #fullContent>
+      <LoadingPage v-bind="{loading, contentExists: !!reviewPointViewedByUser}">
+        <ShowReviewPoint v-bind="reviewPointViewedByUser"/>
+
+        <div>
+            <div class="mb-2">
+                <input name="note" v-if="reviewPoint.note" :value="reviewPoint.note.id" type="hidden"/>
+                <input name="link" v-if="reviewPoint.link" :value="reviewPoint.link.id" type="hidden"/>
+                <ReviewSettingForm v-if="!!reviewPointViewedByUser.reviewSetting" v-model="reviewSetting"/>
+            </div>
+            <InitialReviewButtons @doInitialReview="processForm($event)"/>
+        </div>
+      </LoadingPage>
+    </template>
+  </Minimizable>
 </template>
 
 <script>
@@ -25,13 +27,13 @@ import ShowReviewPoint from '../components/review/ShowReviewPoint.vue'
 import ReviewSettingForm from '../components/review/ReviewSettingForm.vue'
 import InitialReviewButtons from '../components/review/InitialReviewButtons.vue'
 import LoadingPage from "./commons/LoadingPage.vue"
-  import StickTopBar from "../components/StickTopBar.vue"
+  import Minimizable from "../components/commons/Minimizable.vue"
 import { restGet, restPost } from "../restful/restful"
 
 export default {
   name: 'InitialReviewPage',
   props: { nested: Boolean },
-  components: {ShowReviewPoint, ReviewSettingForm, LoadingPage, InitialReviewButtons, StickTopBar},
+  components: {ShowReviewPoint, ReviewSettingForm, LoadingPage, InitialReviewButtons, Minimizable},
   data() {
     return {
       reviewPointViewedByUser: null,

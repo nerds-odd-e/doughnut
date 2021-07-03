@@ -1,4 +1,4 @@
-import Modal from '@/components/modal/Modal.vue';
+import Modal from '@/components/commons/Modal.vue';
 import { mount } from '@vue/test-utils';
 
 describe('Modal', () => {

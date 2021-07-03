@@ -9,7 +9,8 @@ function NestedPage(WrappedComponent, scopeName, exceptRoutes, navigateOutWarnin
     computed: {
       isNested() {
         if(this.$route) {
-          return this.$route.name.split('-').length>1
+          const routeParts = this.$route.name.split('-')
+          return routeParts.length>1 && routeParts[1] != "quiz"
         }
       }
     },
