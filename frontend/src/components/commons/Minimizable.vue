@@ -8,7 +8,6 @@
   </div>
   <transition name="max">
     <div v-if="!minimized">
-      here it is:
       <slot v-if="!minimized" name="fullContent"/>
     </div>
   </transition>
@@ -26,7 +25,7 @@ export default {
 <style lang="scss">
 
 .mini-enter-active, .mini-leave-active {
-  transition: all .5s ease;
+  transition: all .3s ease;
 }
 
 .mini-enter-from, .mini-leave-to {
@@ -35,7 +34,7 @@ export default {
 }
 
 .max-enter-active, .max-leave-active {
-  transition: all .5s ease;
+  transition: all .3s ease;
 }
 
 .max-enter-from, .max-leave-to {
