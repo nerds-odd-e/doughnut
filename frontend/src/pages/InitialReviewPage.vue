@@ -7,7 +7,7 @@
     </template>
     <template #fullContent>
       <LoadingPage v-bind="{loading, contentExists: !!reviewPointViewedByUser}">
-        <ShowReviewPoint v-bind="reviewPointViewedByUser"/>
+        <ShowReviewPoint v-bind="reviewPointViewedByUser" @updated="fetchData()"/>
 
         <div>
             <div class="mb-2">

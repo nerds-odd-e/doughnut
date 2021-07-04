@@ -13,7 +13,7 @@
           </div>
       </div>
 
-      <ShowReviewPoint v-bind="{ noteViewedByUser, linkViewedByUser}" />
+      <ShowReviewPoint v-bind="{ noteViewedByUser, linkViewedByUser}" @updated="$emit('updated')"/>
       <div class="btn-toolbar justify-content-between">
         <SelfEvaluateButtons v-bind="{sadOnly}" @selfEvaluate="$emit('selfEvaluate', $event)"/>
         <div class="btn-group dropup">
@@ -71,7 +71,7 @@
       linkViewedByUser: Object,
       compact: Boolean
     },
-    emits: ['selfEvaluate'],
+    emits: ['selfEvaluate', 'updated'],
     components: {SvgCog, SvgEdit, SvgReviewSetting, SvgLinkNote, SvgNoReview, ShowReviewPoint, Minimizable, SelfEvaluateButtons},
     computed: {
       sourceNoteViewedByUser() {

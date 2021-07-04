@@ -1,13 +1,13 @@
 <template>
 <div>
     <div v-if="!!noteViewedByUser">
-        <NoteRefreshable v-bind="{
+        <NoteViewedByUserWithoutChildren v-bind="{
             note: noteViewedByUser.note,
             links: noteViewedByUser.links,
             ancestors: noteViewedByUser.ancestors,
             notebook: noteViewedByUser.notebook,
             owns: noteViewedByUser.owns,
-        }"/>
+        }" @updated="$emit('updated')"/>
     </div>
 
     <div v-if="!!linkViewedByUser">
@@ -22,12 +22,13 @@
 
 <script>
 import NoteBreadcrumbForReview from "./NoteBreadcrumbForReview.vue"
-import NoteRefreshable from "../notes/NoteRefreshable.vue"
+import NoteViewedByUserWithoutChildren from "../notes/NoteViewedByUserWithoutChildren.vue"
 import LinkShow from "../links/LinkShow.vue"
 
 export default {
   name: "ShowReviewPoint",
   props: { noteViewedByUser: Object, linkViewedByUser: Object },
-  components: {NoteBreadcrumbForReview, NoteRefreshable, LinkShow}
+  emits: ['updated'],
+  components: {NoteBreadcrumbForReview, NoteViewedByUserWithoutChildren, LinkShow}
 };
 </script>

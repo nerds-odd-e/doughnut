@@ -4,7 +4,11 @@
           <Quiz v-if="!!repetition.quizQuestion && !answerResult" v-bind="repetition" @answer="processAnswer($event)"/>
           <template v-else>
             <template v-if="reviewPointViewedByUser">
-              <Repetition v-bind="{...reviewPointViewedByUser, answerResult, compact: nested}" @selfEvaluate="selfEvaluate($event)"/>
+              <Repetition
+                v-bind="{...reviewPointViewedByUser, answerResult, compact: nested}"
+                @selfEvaluate="selfEvaluate($event)"
+                @updated="refresh()"
+                />
               <NoteStatisticsButton v-if="reviewPointViewedByUser.noteViewedByUser" :noteid="reviewPointViewedByUser.noteViewedByUser.note.id"/>
               <NoteStatisticsButton v-else :link="reviewPointViewedByUser.linkViewedByUser.id"/>
             </template>
@@ -55,6 +59,16 @@ export default {
 
     fetchData() {
       restGet(`/api/reviews/repeat`, (r)=>this.loading=r, this.loadNew)
+    },
+
+    refresh() {
+      const reviewPoint = this.repetition.reviewPointViewedByUser
+      if (!!reviewPoint.noteViewedByUser) {
+        restGet(`/api/notes/${reviewPoint.noteViewedByUser.id}`, r=>this.loading=r, (res) => reviewPoint.noteViewedByUser = res)
+      }
+      if (!!reviewPoint.linkViewedByUser) {
+        restGet(`/api/notes/${reviewPoint.linkViewedByUser.id}`, r=>this.loading=r, (res) => reviewPoint.linkViewedByUser = res)
+      }
     },
 
     processAnswer(answerData) {
