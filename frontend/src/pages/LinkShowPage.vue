@@ -4,7 +4,7 @@
         <LinkShow v-bind="linkViewedByUser">
             <div class="link-content">
               <div>
-                <Select v-if="!!$staticInfo" scopeName='link' field='linkType' v-model="formData.typeId" :errors="formErrors.typeId" :options="$staticInfo.linkTypeOptions"/>
+                <LinkTypeSelect scopeName='link' v-model="formData.typeId" :errors="formErrors.typeId"/>
                 <button class="btn btn-primary" v-on:click="updateLink()">Update</button>
                 <button class="btn btn-danger" v-on:click="deleteLink()">Delete</button>
               </div>
@@ -19,14 +19,14 @@
 
 <script>
 import LinkShow from "../components/links/LinkShow.vue"
-import Select from "../components/form/Select.vue"
+import LinkTypeSelect from "../components/links/LinkTypeSelect.vue"
 import NoteStatisticsButton from '../components/notes/NoteStatisticsButton.vue'
 import LoadingPage from "./commons/LoadingPage.vue"
 import {restGet, restPost } from "../restful/restful"
 
 export default {
   name: "LinkShowPage",
-  components: {LinkShow, Select, NoteStatisticsButton, LoadingPage},
+  components: {LinkShow, LinkTypeSelect, NoteStatisticsButton, LoadingPage},
   props: {linkid: Number},
   data() {
     return {
