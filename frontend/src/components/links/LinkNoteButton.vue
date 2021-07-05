@@ -1,17 +1,19 @@
 <template>
-  <ModalWithButton>
-    <template #button="{open}">
-      <button class="btn btn-small" title="link note" @click="open()">
+
+  <ModalWithButton v-model="show">
+    <template #button>
+      <button class="btn btn-small" title="link note" @click="show=true">
         <SvgLinkNote/>
       </button>
     </template>
     <template #header>
       <h3>Link <strong>{{noteTitle}}</strong> to</h3>
     </template>
-    <template #body="{close}">
-      <LinkNote v-bind="{noteId}" @done="close();$emit('updated')"/>
+    <template #body>
+      <LinkNote v-bind="{noteId}" @done="show=false;$emit('updated')"/>
     </template>
   </ModalWithButton>
+
 </template>
 
 <script>
@@ -24,6 +26,7 @@ export default {
   props: { noteTitle: String, noteId: Number },
   emits: ['updated'],
   components: { ModalWithButton, LinkNote, SvgLinkNote },
+  data() { return { show: false }}
 }
 
 </script>
