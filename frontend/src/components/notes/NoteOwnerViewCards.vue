@@ -1,15 +1,19 @@
 <template>
 <NoteCardWithHeaderAndButton :notes="notes">
      <template v-if="owns" #headerButtons="{note}">
-      <NoteButtons :note="note"/>
+      <NoteButtons :note="note" @updated="$emit('updated')"/>
      </template>
 </NoteCardWithHeaderAndButton>
 </template>
 
-<script setup>
+<script>
 import NoteCardWithHeaderAndButton from "./NoteCardWithHeaderAndButton.vue"
 import NoteButtons from "./NoteButtons.vue"
-import { ref, defineProps } from "vue"
 
-const props = defineProps({notes: Array, owns: Boolean})
+export default {
+  name: "NoteOwnerViewCards",
+  props: {notes: Array, owns: Boolean},
+  emits: ['updated'],
+  components: {NoteCardWithHeaderAndButton, NoteButtons}
+}
 </script>

@@ -1,17 +1,17 @@
 <template>
 <div class="btn-group btn-group-sm">
-    <NoteLinkButton  :noteid="navigation.previousSiblingId" :title="'previous sibling'">
+    <NoteNavigationButton  :noteid="navigation.previousSiblingId" :title="'previous sibling'">
         <SvgFastBackward />
-    </NoteLinkButton>
-    <NoteLinkButton  :noteid="navigation.previousId" :title="'previous'">
+    </NoteNavigationButton>
+    <NoteNavigationButton  :noteid="navigation.previousId" :title="'previous'">
         <SvgBackward />
-    </NoteLinkButton>
-    <NoteLinkButton  :noteid="navigation.nextId" :title="'next'">
+    </NoteNavigationButton>
+    <NoteNavigationButton  :noteid="navigation.nextId" :title="'next'">
         <SvgForward />
-    </NoteLinkButton>
-    <NoteLinkButton  :noteid="navigation.nextSiblingId" :title="'next sibling'">
+    </NoteNavigationButton>
+    <NoteNavigationButton  :noteid="navigation.nextSiblingId" :title="'next sibling'">
         <SvgFastForward />
-    </NoteLinkButton>
+    </NoteNavigationButton>
 </div>
 </template>
 
@@ -20,7 +20,7 @@
   import SvgBackward from "../svgs/SvgBackward.vue"
   import SvgForward from "../svgs/SvgForward.vue"
   import SvgFastForward from "../svgs/SvgFastForward.vue"
-  import NoteLinkButton from "./NoteLinkButton.vue"
+  import NoteNavigationButton from "./NoteNavigationButton.vue"
   const props = defineProps({navigation: Object})
 </script>
 

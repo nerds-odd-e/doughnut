@@ -10,7 +10,7 @@
       <h3>Link <strong>{{noteTitle}}</strong> to</h3>
     </template>
     <template #body>
-      <LinkNote v-bind="{noteId}" @done="show=false;$emit('updated')"/>
+      <LinkNote v-bind="{noteId}" @done="done()"/>
     </template>
   </ModalWithButton>
 
@@ -26,7 +26,13 @@ export default {
   props: { noteTitle: String, noteId: Number },
   emits: ['updated'],
   components: { ModalWithButton, LinkNote, SvgLinkNote },
-  data() { return { show: false }}
+  data() { return { show: false }},
+  methods: {
+    done() {
+      this.show=false
+      this.$emit('updated')
+    }
+  }
 }
 
 </script>

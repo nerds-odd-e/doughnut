@@ -37,8 +37,7 @@ And("I should see note cannot be found when searching {string}",(searchKey) => {
     cy.findByText('No linkable notes found.').should("be.visible");
 })
 
-Then("I should see {string} has link {string} {string}",(noteTitle, linkType, targetNoteTitles) => {
-    cy.jumpToNotePage(noteTitle)
+Then("On the current page, I should see {string} has link {string} {string}",(noteTitle, linkType, targetNoteTitles) => {
     cy.findByText(linkType).parent().within(()=> {
             targetNoteTitles.commonSenseSplit(",").forEach(
                 targetNoteTitle => cy.findByText(targetNoteTitle).should('be.visible')
