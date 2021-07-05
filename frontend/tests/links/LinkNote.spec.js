@@ -1,6 +1,8 @@
 import LinkNoteFinalize from '@/components/links/LinkNoteFinalize.vue';
-import { mount } from '@vue/test-utils';
+import { mount, config } from '@vue/test-utils';
 import {noteViewedByUser} from '../notes/fixtures'
+
+config.global.mocks['$staticInfo'] = {linkTypeOptions:[]}
 
 describe('LinkNoteFinalize', () => {
 
