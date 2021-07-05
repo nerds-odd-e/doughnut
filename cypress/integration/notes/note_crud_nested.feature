@@ -15,7 +15,7 @@ Feature: Nested Note CRUD
     Then I should not see note "Re-quirement" at the top level of all my notes
     When I open "LeSS in Action" note from top level
     Then I should see "LeSS in Action" in note title
-    And I should see these notes belonging to the user
+    And I should see these notes as children
       | title        |
       | Re-quirement |
     When I am creating note under "LeSS in Action/Re-quirement"
@@ -31,13 +31,14 @@ Feature: Nested Note CRUD
       | Title        | Description                        |
       | Re-quirement | Re-think the way we do requirement |
     When I create a sibling note of "Re-quirement":
-      | Title     | Description                   |
-      | Re-Design | Re-think the way we do design |
+      | Title     | Description                   | Link Type To Parent    |
+      | Re-Design | Re-think the way we do design | is a specialization of |
     When I open "LeSS in Action" note from top level
-    And I should see these notes belonging to the user
+    And I should see these notes as children
       | title        |
       | Re-quirement |
       | Re-Design    |
+    And On the current page, I should see "LeSS in Action" has link "is a generalization of" "Re-Design"
 
   Scenario: Edit a note
     When I am editing note "LeSS in Action" the title is expected to be pre-filled with "LeSS in Action"

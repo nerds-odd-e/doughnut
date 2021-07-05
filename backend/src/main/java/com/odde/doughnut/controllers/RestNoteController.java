@@ -11,6 +11,7 @@ import com.odde.doughnut.models.UserModel;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.http.MediaType;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -49,6 +50,7 @@ class RestNoteController {
   }
 
   @PostMapping(value="/{parentNote}/create")
+  @Transactional
   public RedirectToNoteResponse createNote(@PathVariable(name = "parentNote") Note parentNote, @Valid @ModelAttribute NoteCreation noteCreation) throws NoAccessRightException, IOException {
     final UserModel userModel = currentUserFetcher.getUser();
     userModel.getAuthorization().assertAuthorization(parentNote);
@@ -58,6 +60,14 @@ class RestNoteController {
     note.setParentNote(parentNote);
     note.setUser(user);
     modelFactoryService.noteRepository.save(note);
+    if(noteCreation.getLinkTypeToParent() != null) {
+      Link link = new Link();
+      link.setUser(user);
+      link.setSourceNote(note);
+      link.setTargetNote(parentNote);
+      link.setTypeId(noteCreation.getLinkTypeToParent());
+      modelFactoryService.linkRepository.save(link);
+    }
     return new RedirectToNoteResponse(note.getId());
   }
 
@@ -70,6 +80,7 @@ class RestNoteController {
   }
 
   @PostMapping(path="/{note}")
+  @Transactional
   public RedirectToNoteResponse updateNote(@PathVariable(name = "note") Note note, @Valid @ModelAttribute NoteContent noteContent) throws NoAccessRightException, IOException {
     final UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertAuthorization(note);
@@ -89,6 +100,7 @@ class RestNoteController {
   }
 
   @PostMapping("/{note}/search")
+  @Transactional
   public List<Note> searchForLinkTarget(@PathVariable("note") Note note, @Valid @RequestBody SearchTerm searchTerm) {
     return currentUserFetcher.getUser().getLinkableNotes(note, searchTerm);
   }

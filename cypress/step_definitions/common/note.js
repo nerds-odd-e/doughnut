@@ -72,7 +72,7 @@ Then(
   }
 );
 
-Then('I should see these notes belonging to the user', data => {
+Then('I should see these notes as children', data => {
   cy.expectNoteCards(data.hashes());
 });
 
