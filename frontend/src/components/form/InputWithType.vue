@@ -1,13 +1,21 @@
 <template>
 <div class="form-group">
     <slot v-if="beforeLabel" />
-    <label :for="`${scopeName}-${field}`">{{ startCase(camelCase( field))}}</label>
+    <label :for="`${scopeName}-${field}`">{{titlized}}</label>
     <slot v-if="!beforeLabel" />
     <div class="invalid-feedback" v-if="!!errors">{{errors}}</div>
 </div>
 </template>
 
-<script setup>
+<script>
   import {startCase, camelCase } from "lodash"
-  const props = defineProps({ scopeName: String, field: String, errors: Object, beforeLabel: {type: Boolean, default: false}})
+  export default {
+    props: { scopeName: String, field: String, errors: Object, beforeLabel: {type: Boolean, default: false}},
+    methods: {
+      titlized() {
+        return startCase(camelCase(this.field))
+      }
+    }
+
+  }
 </script>

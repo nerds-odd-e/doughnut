@@ -31,7 +31,6 @@ const restRequest = (url, params, loadingRef, callback, errorCallback) => {
         reloadSession()
         return;
       }
-      console.log(error)
       window.alert(error)
     })
     .finally(() => {
