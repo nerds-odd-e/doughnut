@@ -16,7 +16,7 @@ Feature: Nested Note CRUD
     When I open "LeSS in Action" note from top level
     Then I should see "LeSS in Action" in note title
     And I should see these notes as children
-      | title        |
+      | note-title        |
       | Re-quirement |
     When I am creating note under "LeSS in Action/Re-quirement"
 
@@ -35,7 +35,7 @@ Feature: Nested Note CRUD
       | Re-Design | Re-think the way we do design | is a specialization of |
     When I open "LeSS in Action" note from top level
     And I should see these notes as children
-      | title        |
+      | note-title        |
       | Re-quirement |
       | Re-Design    |
     And On the current page, I should see "LeSS in Action" has link "is a generalization of" "Re-Design"
