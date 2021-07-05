@@ -32,11 +32,6 @@
                     <SvgLinkNote/>
                     Make Link
                   </a>
-                  <router-link class="dropdown-item"
-                      :to="{name: 'noteEdit', params: {noteid: sourceNoteViewedByUser.note.id}}">
-                      <SvgEdit/>
-                      Edit Note
-                  </router-link>
                   <div class="dropdown-divider"></div>
                   <form :action="`/reviews/${reviewPoint.id}`" method="post"
                         onsubmit="return confirm('Are you sure to hide this note from reviewing in the future?')">
@@ -54,7 +49,6 @@
 
 <script>
   import SvgCog from "../svgs/SvgCog.vue"
-  import SvgEdit from "../svgs/SvgEdit.vue"
   import SvgReviewSetting from "../svgs/SvgReviewSetting.vue"
   import SvgLinkNote from "../svgs/SvgLinkNote.vue"
   import SvgNoReview from "../svgs/SvgNoReview.vue"
@@ -72,7 +66,7 @@
       compact: Boolean
     },
     emits: ['selfEvaluate', 'updated'],
-    components: {SvgCog, SvgEdit, SvgReviewSetting, SvgLinkNote, SvgNoReview, ShowReviewPoint, Minimizable, SelfEvaluateButtons},
+    components: {SvgCog, SvgReviewSetting, SvgLinkNote, SvgNoReview, ShowReviewPoint, Minimizable, SelfEvaluateButtons},
     computed: {
       sourceNoteViewedByUser() {
         if(!!this.noteViewedByUser) {
