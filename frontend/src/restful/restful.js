@@ -63,6 +63,25 @@ const restPost = (url, data, loadingRef, callback) => {
   );
 };
 
+function objectToFormData(data){
+  const formData = new FormData();
+  Object.keys(data).forEach(function (key) {
+    if (data[key] === null) {
+      formData.append(key, '')
+    }
+    else if(data[key] instanceof Object) {
+      Object.keys(data[key]).forEach(function (subKey) {
+        formData.append(`${key}.${subKey}`, data[key][subKey] === null ? '' : data[key][subKey]);
+      })
+    }
+    else {
+        formData.append(key, data[key])
+      }
+  });
+  return formData
+}
+
+
 const restPostMultiplePartForm = (
   url,
   data,
@@ -70,11 +89,6 @@ const restPostMultiplePartForm = (
   callback,
   errorCallback
 ) => {
-  const formData = new FormData();
-  Object.keys(data).forEach(function (key, index) {
-    formData.append(key, data[key] === null ? '' : data[key]);
-  });
-
   restRequest(
     url,
     {
@@ -82,7 +96,7 @@ const restPostMultiplePartForm = (
       headers: {
         Accept: 'application/json',
       },
-      body: formData,
+      body: objectToFormData(data),
     },
     loadingRef,
     callback,

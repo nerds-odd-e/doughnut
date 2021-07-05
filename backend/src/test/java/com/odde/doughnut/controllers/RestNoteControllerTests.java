@@ -102,8 +102,10 @@ class RestNoteControllerTests {
         void shouldBeAbleToSaveNoteWhenValid() throws NoAccessRightException, IOException {
             Note parent = makeMe.aNote().byUser(userModel).please();
             Note newNote = makeMe.aNote().inMemoryPlease();
+            RestNoteController.NoteCreation noteCreation = new RestNoteController.NoteCreation();
+            noteCreation.setNoteContent(newNote.getNoteContent());
 
-            RedirectToNoteResponse response = controller.createNote(parent, newNote.getNoteContent());
+            RedirectToNoteResponse response = controller.createNote(parent, noteCreation);
             assertThat(response.noteId, notNullValue());
         }
     }

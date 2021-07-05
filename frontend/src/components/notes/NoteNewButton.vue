@@ -10,7 +10,8 @@
       </template>
       <template #body>
         <form @submit.prevent="processForm">
-            <NoteFormBody v-model="noteFormData" :errors="noteFormErrors"/>
+            <LinkTypeSelect scopeName='note' field='linkTypeToParent' :allowEmpty="true" v-model="creationData.linkTypeToParent" :errors="formErrors.linkTypeToParent"/>
+            <NoteFormBody v-model="creationData.noteContent" :errors="formErrors.noteContent"/>
             <input type="submit" value="Submit" class="btn btn-primary"/>
         </form>
       </template>
@@ -22,24 +23,28 @@
 import NoteBreadcrumbForOwnOrCircle from "./NoteBreadcrumbForOwnOrCircle.vue"
 import NoteFormBody from "./NoteFormBody.vue"
 import ModalWithButton from "../commons/ModalWithButton.vue"
+import LinkTypeSelect from "../links/LinkTypeSelect.vue"
 import { restPostMultiplePartForm } from "../../restful/restful"
 
 export default {
   name: 'NoteNewButton',
-  components: {NoteBreadcrumbForOwnOrCircle, NoteFormBody, ModalWithButton},
+  components: { NoteBreadcrumbForOwnOrCircle, NoteFormBody, ModalWithButton, LinkTypeSelect },
   props: {notebook: Object, ancestors: Array},
   data() {
     return {
       show: false,
-      noteFormErrors: {},
-      noteFormData: {}
+      creationData: {
+        linkTypeToParent: '',
+        noteContent: {},
+      },
+      formErrors: {},
     }
   },
   methods: {
     processForm() {
       restPostMultiplePartForm(
         `/api/notes/${this.ancestors[this.ancestors.length - 1].id}/create`,
-        this.noteFormData,
+        this.creationData,
         r=>this.loading=r,
         (res) => {
           this.show = false;

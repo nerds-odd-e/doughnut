@@ -1,7 +1,7 @@
 <template>
 <div class="form-group">
     <slot v-if="beforeLabel" />
-    <label :for="`${scopeName}-${field}`">{{titlized}}</label>
+    <label :for="controlId">{{titlized}}</label>
     <slot v-if="!beforeLabel" />
     <div class="invalid-feedback" v-if="!!errors">{{errors}}</div>
 </div>
@@ -11,9 +11,12 @@
   import {startCase, camelCase } from "lodash"
   export default {
     props: { scopeName: String, field: String, errors: Object, beforeLabel: {type: Boolean, default: false}},
-    methods: {
+    computed: {
       titlized() {
         return startCase(camelCase(this.field))
+      },
+      controlId() {
+        return `${this.scopeName}-${this.field}`
       }
     }
 
