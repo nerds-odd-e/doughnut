@@ -6,11 +6,11 @@
         </button>
       </template>
       <template #header>
-        <h3>{{note.title}}</h3>
+        <h3>{{oldTitle}}</h3>
       </template>
       <template #body>
         <form @submit.prevent="processForm">
-            <NoteFormBody v-model="formData" :errors="formErrors"/>
+            <NoteFormBody v-if="!!formData" v-model="formData" :errors="formErrors"/>
             <input type="submit" value="Submit" class="btn btn-primary"/>
         </form>
       </template>
@@ -23,32 +23,42 @@ import NoteBreadcrumbForOwnOrCircle from "./NoteBreadcrumbForOwnOrCircle.vue"
 import NoteFormBody from "./NoteFormBody.vue"
 import ModalWithButton from "../commons/ModalWithButton.vue"
 import SvgEdit from "../svgs/SvgEdit.vue"
-import { restPostMultiplePartForm } from "../../restful/restful"
+import { restGet, restPostMultiplePartForm } from "../../restful/restful"
 
 export default {
   name: 'NoteNewButton',
   components: { NoteBreadcrumbForOwnOrCircle, NoteFormBody, ModalWithButton, SvgEdit },
-  props: {note: Object},
+  props: {noteId: Number, oldTitle: String},
   emits: ['updated'],
   data() {
     return {
       show: false,
-      formData: {...this.note},
+      formData: null,
       formErrors: {},
       loading: false
     }
   },
   watch: {
     show() {
-      Object.assign(this.formData, this.note)
-      this.formErrors = {}
-      this.loading = false
+      if(this.show) {
+        this.formErrors = {}
+        this.formData = null
+        this.fetchData()
+      }
     }
   },
   methods: {
+    fetchData() {
+      restGet(`/api/notes/${this.noteId}`,
+        (r)=>this.loading=r,
+        (res) => {
+          const { updatedAt, ...rest} = res.note.noteContent
+          this.formData = rest
+        })
+    },
     processForm() {
       restPostMultiplePartForm(
-        `/api/notes/${this.note.id}`,
+        `/api/notes/${this.noteId}`,
         this.formData,
         r=>this.loading=r,
         (res) => {

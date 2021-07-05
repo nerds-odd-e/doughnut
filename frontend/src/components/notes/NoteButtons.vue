@@ -1,6 +1,6 @@
 <template>
 <div class="btn-group btn-group-sm">
-    <NoteEditButton :note="note" @updated="$emit('updated')"/>
+    <NoteEditButton :noteId="note.id" :oldTitle="note.title" @updated="$emit('updated')"/>
     <a role="button" class="btn btn-sm" title="Cards View" :href="`/notes/articles/${note.id}`">
         <SvgArticle/>
     </a>

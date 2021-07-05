@@ -16,14 +16,14 @@ Feature: Nested Note CRUD
     When I open "LeSS in Action" note from top level
     Then I should see "LeSS in Action" in note title
     And I should see these notes as children
-      | note-title        |
+      | note-title   |
       | Re-quirement |
     When I am creating note under "LeSS in Action/Re-quirement"
 
   Scenario: Create a new note with wrong info
     When I create note belonging to "LeSS in Action":
-      | Title        | Description                        |
-      |              |                                    |
+      | Title | Description |
+      |       |             |
     Then I should see that the note creation is not successful
 
   Scenario: Create a new sibling note
@@ -35,18 +35,20 @@ Feature: Nested Note CRUD
       | Re-Design | Re-think the way we do design | is a specialization of |
     When I open "LeSS in Action" note from top level
     And I should see these notes as children
-      | note-title        |
+      | note-title   |
       | Re-quirement |
       | Re-Design    |
     And On the current page, I should see "LeSS in Action" has link "is a generalization of" "Re-Design"
 
   Scenario: Edit a note
-    When I am editing note "LeSS in Action" the title is expected to be pre-filled with "LeSS in Action"
-    And I update it to become:
+    When I am editing note "LeSS in Action" the field should be pre-filled with
       | Title          | Description         |
-      | Odd-e CSD      | Our best training   |
+      | LeSS in Action | An awesome training |
+    And I update it to become:
+      | Title     | Description       |
+      | Odd-e CSD | Our best training |
     Then I should see these notes belonging to the user at the top level of all my notes
-      | title          |
+      | title     |
       | Odd-e CSD |
 
   Scenario: Delete a note

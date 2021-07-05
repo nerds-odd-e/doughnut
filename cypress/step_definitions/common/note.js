@@ -33,10 +33,12 @@ When('I create top level note with:', data => {
 });
 
 When(
-  'I am editing note {string} the title is expected to be pre-filled with {string}',
-  (noteTitle, oldTitle) => {
+  'I am editing note {string} the field should be pre-filled with',
+  (noteTitle, data) => {
     cy.clickNotePageButton(noteTitle, 'edit note');
-    cy.getFormControl('Title').should('have.value', oldTitle);
+    const expects = data.hashes()[0]
+    for(var field in expects)
+    cy.getFormControl(field).should('have.value', expects[field]);
   }
 );
 
