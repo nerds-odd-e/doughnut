@@ -26,6 +26,16 @@ import ModalWithButton from "../commons/ModalWithButton.vue"
 import LinkTypeSelect from "../links/LinkTypeSelect.vue"
 import { restPostMultiplePartForm } from "../../restful/restful"
 
+function initialState() {
+  return {
+    creationData: {
+      linkTypeToParent: '',
+      noteContent: {},
+    },
+    formErrors: {},
+  }
+}
+
 export default {
   name: 'NoteNewButton',
   components: { NoteBreadcrumbForOwnOrCircle, NoteFormBody, ModalWithButton, LinkTypeSelect },
@@ -33,11 +43,12 @@ export default {
   data() {
     return {
       show: false,
-      creationData: {
-        linkTypeToParent: '',
-        noteContent: {},
-      },
-      formErrors: {},
+      ...initialState(),
+    }
+  },
+  watch: {
+    show() {
+      Object.assign(this.$data, initialState())
     }
   },
   methods: {
