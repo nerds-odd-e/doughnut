@@ -5,6 +5,7 @@ import com.odde.doughnut.entities.NoteContent;
 import com.odde.doughnut.entities.NoteMotion;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.json.NoteViewedByUser;
+import com.odde.doughnut.entities.json.RedirectToNoteResponse;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
@@ -94,4 +95,48 @@ class RestNoteControllerTests {
             assertThat(controller.statistics(note).getNote(), equalTo(note));
         }
     }
+
+    @Nested
+    class createNoteTest {
+        @Test
+        void shouldBeAbleToSaveNoteWhenValid() throws NoAccessRightException, IOException {
+            Note parent = makeMe.aNote().byUser(userModel).please();
+            Note newNote = makeMe.aNote().inMemoryPlease();
+
+            RedirectToNoteResponse response = controller.createNote(parent, newNote.getNoteContent());
+            assertThat(response.noteId, notNullValue());
+        }
+    }
+
+    @Nested
+    class updateNoteTest {
+        Note note;
+
+        @BeforeEach
+        void setup() {
+            note = makeMe.aNote("new").byUser(userModel).please();
+        }
+
+        @Test
+        void shouldBeAbleToSaveNoteWhenValid() throws NoAccessRightException, IOException {
+            RedirectToNoteResponse response = controller.updateNote(note, note.getNoteContent());
+            assertThat(response.noteId, equalTo(note.getId()));
+        }
+
+        @Test
+        void shouldAddUploadedPicture() throws NoAccessRightException, IOException {
+            makeMe.theNote(note).withNewlyUploadedPicture();
+            controller.updateNote(note, note.getNoteContent());
+            assertThat(note.getNoteContent().getUploadPicture(), is(not(nullValue())));
+        }
+
+        @Test
+        void shouldNotRemoveThePictureIfNoNewPictureInTheUpdate() throws NoAccessRightException, IOException {
+            makeMe.theNote(note).withUploadedPicture();
+            NoteContent newContent = makeMe.aNote().inMemoryPlease().getNoteContent();
+            controller.updateNote(note, newContent);
+            assertThat(note.getNoteContent().getUploadPicture(), is(not(nullValue())));
+        }
+    }
+
 }

@@ -29,28 +29,6 @@ public class NoteController extends ApplicationMvcController  {
         this.modelFactoryService = modelFactoryService;
     }
 
-    @GetMapping("/{parentNote}/new")
-    public String newNote(@PathVariable(name = "parentNote") Integer parentNoteId) {
-        return "vuejsed";
-    }
-
-    @PostMapping("/{parentNote}/create")
-    public String createNote(@PathVariable(name = "parentNote") Note parentNote, @Valid NoteContent noteContent, BindingResult bindingResult) throws NoAccessRightException, IOException {
-        if (bindingResult.hasErrors()) {
-            return "notes/new";
-        }
-        UserModel userModel = getCurrentUser();
-        userModel.getAuthorization().assertAuthorization(parentNote);
-        User user = userModel.getEntity();
-        Note note = new Note();
-        note.updateNoteContent(noteContent, user);
-        note.setParentNote(parentNote);
-        note.setUser(user);
-        modelFactoryService.noteRepository.save(note);
-        return "redirect:/notes/" + note.getId();
-    }
-
-
     @GetMapping("/{note}")
     public String showNote(@PathVariable(name = "note") Integer noteId) {
         return "vuejsed";
@@ -65,17 +43,6 @@ public class NoteController extends ApplicationMvcController  {
     @GetMapping("/{note}/edit")
     public String editNote(Integer noteId) {
         return "vuejsed";
-    }
-
-    @PostMapping("/{note}")
-    public String updateNote(@PathVariable(name = "note") Note note, @Valid NoteContent noteContent, BindingResult bindingResult) throws NoAccessRightException, IOException {
-        getCurrentUser().getAuthorization().assertAuthorization(note);
-        if (bindingResult.hasErrors()) {
-            return "notes/edit";
-        }
-        note.updateNoteContent(noteContent, getCurrentUser().getEntity());
-        modelFactoryService.noteRepository.save(note);
-        return "redirect:/notes/" + note.getId();
     }
 
     @GetMapping("/{note}/move")

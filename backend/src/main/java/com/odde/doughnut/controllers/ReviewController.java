@@ -38,8 +38,13 @@ public class ReviewController extends ApplicationMvcController  {
         return "vuejsed";
     }
 
-    @GetMapping("/initial")
+    @GetMapping("/initial/**")
     public String initialReview(Model model) {
+        return "vuejsed";
+    }
+
+    @GetMapping("/repeat/**")
+    public String repeatReview() {
         return "vuejsed";
     }
 
@@ -53,40 +58,10 @@ public class ReviewController extends ApplicationMvcController  {
         return "redirect:/reviews/initial";
     }
 
-    @GetMapping("/repeat/**")
-    public String repeatReview() {
-        return "vuejsed";
-    }
-
     @PostMapping(path="/{reviewPoint}", params="remove")
     public String removeFromRepeating(@Valid ReviewPoint reviewPoint) {
         reviewPoint.setRemovedFromReview(true);
         modelFactoryService.reviewPointRepository.save(reviewPoint);
         return "redirect:/reviews/repeat";
     }
-
-    @PostMapping(path="/{reviewPoint}", params="again")
-    public String doRepeatAgain(@Valid ReviewPoint reviewPoint) {
-        modelFactoryService.toReviewPointModel(reviewPoint).increaseRepetitionCountAndSave();
-        return "redirect:/reviews/repeat";
-    }
-
-    @PostMapping(path="/{reviewPoint}", params="satisfying")
-    public String doRepeat(@Valid ReviewPoint reviewPoint) {
-        modelFactoryService.toReviewPointModel(reviewPoint).repeated(testabilitySettings.getCurrentUTCTimestamp());
-        return "redirect:/reviews/repeat";
-    }
-
-    @PostMapping(path="/{reviewPoint}", params="sad")
-    public String doRepeatSad(@Valid ReviewPoint reviewPoint) {
-        modelFactoryService.toReviewPointModel(reviewPoint).repeatedSad(testabilitySettings.getCurrentUTCTimestamp());
-        return "redirect:/reviews/repeat";
-    }
-
-    @PostMapping(path="/{reviewPoint}", params="happy")
-    public String doRepeatHappy(@Valid ReviewPoint reviewPoint) {
-        modelFactoryService.toReviewPointModel(reviewPoint).repeatedHappy(testabilitySettings.getCurrentUTCTimestamp());
-        return "redirect:/reviews/repeat";
-    }
-
 }

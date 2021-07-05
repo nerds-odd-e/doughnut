@@ -1,6 +1,5 @@
 import NotebookNewPage from '@/pages/NotebookNewPage.vue'
 import NoteShowPage from '@/pages/NoteShowPage.vue'
-import NoteNewPage from '@/pages/NoteNewPage.vue'
 import NoteEditPage from '@/pages/NoteEditPage.vue'
 import LinkShowPage from '@/pages/LinkShowPage.vue'
 import ReviewHome from '@/pages/ReviewHome.vue'
@@ -25,7 +24,6 @@ const NestedRepeatPage = NestedPage(
 
 const noteAndLinkRoutes = [
     { path: 'notes/:noteid', name: 'noteShow', component: NoteShowPage, props: true },
-    { path: 'notes/:noteid/new', name: 'noteNew', component: NoteNewPage, props: true },
     { path: 'notes/:noteid/edit', name: 'noteEdit', component: NoteEditPage, props: true },
     { path: 'links/:linkid', name: 'linkShow', component: LinkShowPage, props: true },
   ]

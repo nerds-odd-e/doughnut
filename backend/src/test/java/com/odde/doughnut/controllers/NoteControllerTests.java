@@ -44,119 +44,56 @@ class NoteControllerTests {
         controller = new NoteController(new TestCurrentUserFetcher(userModel), modelFactoryService);
     }
 
+
     @Nested
-    class createNoteTest {
+    class DeleteNoteTest {
         @Test
-        void shouldBeAbleToSaveNoteWhenValid() throws NoAccessRightException, IOException {
+        void shouldNotBeAbleToDeleteNoteThatBelongsToOtherUser() {
+            User anotherUser = makeMe.aUser().please();
+            Note note = makeMe.aNote().byUser(anotherUser).please();
+            Integer noteId = note.getId();
+            assertThrows(NoAccessRightException.class, () ->
+                    controller.deleteNote(note)
+            );
+            assertTrue(modelFactoryService.findNoteById(noteId).isPresent());
+        }
+
+        @Test
+        void shouldDeleteTheNoteButNotTheUser() throws NoAccessRightException {
+            Note note = makeMe.aNote().byUser(userModel).please();
+            Integer noteId = note.getId();
+            RedirectView response = controller.deleteNote(note);
+            assertEquals("/notebooks", response.getUrl());
+            assertFalse(modelFactoryService.findNoteById(noteId).isPresent());
+            assertTrue(modelFactoryService.findUserById(userModel.getEntity().getId()).isPresent());
+        }
+
+        @Test
+        void shouldDeleteTheChildNoteButNotSiblingOrParent() throws NoAccessRightException {
             Note parent = makeMe.aNote().byUser(userModel).please();
-            Note newNote = makeMe.aNote().inMemoryPlease();
-            BindingResult bindingResult = makeMe.successfulBindingResult();
+            Note subject = makeMe.aNote().under(parent).byUser(userModel).please();
+            Note sibling = makeMe.aNote().under(parent).byUser(userModel).please();
+            Note child = makeMe.aNote().under(subject).byUser(userModel).please();
+            makeMe.refresh(subject);
 
-            String response = controller.createNote(parent, newNote.getNoteContent(), bindingResult);
-            assertThat(response, matchesPattern("redirect:/notes/\\d+"));
+            controller.deleteNote(subject);
+
+            assertTrue(modelFactoryService.findNoteById(sibling.getId()).isPresent());
+            assertFalse(modelFactoryService.findNoteById(child.getId()).isPresent());
         }
 
         @Test
-        void shouldNotBeAbleToSaveNoteWhenInvalid() throws NoAccessRightException, IOException {
-            Note newNote = new Note();
-            BindingResult bindingResult = makeMe.failedBindingResult();
+        void shouldDeleteTheReviewPoints() throws NoAccessRightException {
+            Note subject = makeMe.aNote().byUser(userModel).please();
+            Note child = makeMe.aNote().byUser(userModel).under(subject).please();
+            makeMe.aReviewPointFor(child).by(userModel).please();
+            long oldCount = makeMe.modelFactoryService.reviewPointRepository.count();
+            makeMe.refresh(subject);
+            controller.deleteNote(subject);
 
-            String response = controller.createNote(null, newNote.getNoteContent(), bindingResult);
-            assertNull(newNote.getId());
-            assertEquals("notes/new", response);
+            assertThat(makeMe.modelFactoryService.reviewPointRepository.count(), equalTo(oldCount - 1));
         }
 
-        @Nested
-        class updateNoteTest {
-            Note note;
-
-            @BeforeEach
-            void setup() {
-                note = makeMe.aNote("new").byUser(userModel).please();
-            }
-
-            @Test
-            void shouldBeAbleToSaveNoteWhenValid() throws NoAccessRightException, IOException {
-                BindingResult bindingResult = makeMe.successfulBindingResult();
-                String response = controller.updateNote(note, note.getNoteContent(), bindingResult);
-                assertEquals("redirect:/notes/" + note.getId(), response);
-            }
-
-            @Test
-            void shouldNotBeAbleToSaveNoteWhenInvalid() throws NoAccessRightException, IOException {
-                BindingResult bindingResult = makeMe.failedBindingResult();
-                String response = controller.updateNote(note, note.getNoteContent(), bindingResult);
-                assertEquals("notes/edit", response);
-            }
-
-            @Test
-            void shouldAddUploadedPicture() throws NoAccessRightException, IOException {
-                makeMe.theNote(note).withNewlyUploadedPicture();
-                BindingResult bindingResult = makeMe.successfulBindingResult();
-                controller.updateNote(note, note.getNoteContent(), bindingResult);
-                assertThat(note.getNoteContent().getUploadPicture(), is(not(nullValue())));
-            }
-
-            @Test
-            void shouldNotRemoveThePictureIfNoNewPictureInTheUpdate() throws NoAccessRightException, IOException {
-                makeMe.theNote(note).withUploadedPicture();
-                NoteContent newContent = makeMe.aNote().inMemoryPlease().getNoteContent();
-                controller.updateNote(note, newContent, makeMe.successfulBindingResult());
-                assertThat(note.getNoteContent().getUploadPicture(), is(not(nullValue())));
-            }
-
-        }
-
-        @Nested
-        class DeleteNoteTest {
-            @Test
-            void shouldNotBeAbleToDeleteNoteThatBelongsToOtherUser() {
-                User anotherUser = makeMe.aUser().please();
-                Note note = makeMe.aNote().byUser(anotherUser).please();
-                Integer noteId = note.getId();
-                assertThrows(NoAccessRightException.class, () ->
-                        controller.deleteNote(note)
-                );
-                assertTrue(modelFactoryService.findNoteById(noteId).isPresent());
-            }
-
-            @Test
-            void shouldDeleteTheNoteButNotTheUser() throws NoAccessRightException {
-                Note note = makeMe.aNote().byUser(userModel).please();
-                Integer noteId = note.getId();
-                RedirectView response = controller.deleteNote(note);
-                assertEquals("/notebooks", response.getUrl());
-                assertFalse(modelFactoryService.findNoteById(noteId).isPresent());
-                assertTrue(modelFactoryService.findUserById(userModel.getEntity().getId()).isPresent());
-            }
-
-            @Test
-            void shouldDeleteTheChildNoteButNotSiblingOrParent() throws NoAccessRightException {
-                Note parent = makeMe.aNote().byUser(userModel).please();
-                Note subject = makeMe.aNote().under(parent).byUser(userModel).please();
-                Note sibling = makeMe.aNote().under(parent).byUser(userModel).please();
-                Note child = makeMe.aNote().under(subject).byUser(userModel).please();
-                makeMe.refresh(subject);
-
-                controller.deleteNote(subject);
-
-                assertTrue(modelFactoryService.findNoteById(sibling.getId()).isPresent());
-                assertFalse(modelFactoryService.findNoteById(child.getId()).isPresent());
-            }
-
-            @Test
-            void shouldDeleteTheReviewPoints() throws NoAccessRightException {
-                Note subject = makeMe.aNote().byUser(userModel).please();
-                Note child = makeMe.aNote().byUser(userModel).under(subject).please();
-                makeMe.aReviewPointFor(child).by(userModel).please();
-                long oldCount = makeMe.modelFactoryService.reviewPointRepository.count();
-                makeMe.refresh(subject);
-                controller.deleteNote(subject);
-
-                assertThat(makeMe.modelFactoryService.reviewPointRepository.count(), equalTo(oldCount - 1));
-            }
-
-        }
 
         @Nested
         class MoveNoteTest {
