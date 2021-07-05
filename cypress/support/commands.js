@@ -140,7 +140,12 @@ Cypress.Commands.add('submitNoteFormsWith', notes => {
 Cypress.Commands.add('expectNoteCards', expectedCards => {
   expectedCards.forEach(elem => {
     for (var propName in elem) {
-      cy.findByText(elem[propName], {selector: ".card-title a"}).should('be.visible');
+      if(propName === 'note-title') {
+          cy.findByText(elem[propName], {selector: ".card-title a"}).should('be.visible');
+      }
+      else {
+          cy.findByText(elem[propName]);
+      }
     }
   });
 });

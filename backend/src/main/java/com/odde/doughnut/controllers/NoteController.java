@@ -40,11 +40,6 @@ public class NoteController extends ApplicationMvcController  {
         return "notes/article";
     }
 
-    @GetMapping("/{note}/edit")
-    public String editNote(Integer noteId) {
-        return "vuejsed";
-    }
-
     @GetMapping("/{note}/move")
     public String prepareToMove(Note note, Model model) {
         model.addAttribute("noteMotion", getLeftNoteMotion(note));
