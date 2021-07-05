@@ -61,7 +61,7 @@ export default {
           this.show = false;
           this.$router.push({name: "noteShow", params: { noteid: res.noteId}})
         },
-        (res) => this.noteFormErrors = res
+        (res) => this.formErrors = res
       )
     }
   },

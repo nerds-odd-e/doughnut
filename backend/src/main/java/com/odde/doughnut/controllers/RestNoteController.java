@@ -45,7 +45,7 @@ class RestNoteController {
     @Getter @Setter
     @Valid
     @NotNull
-    private NoteContent noteContent;
+    private NoteContent noteContent = new NoteContent();
   }
 
   @PostMapping(value="/{parentNote}/create")

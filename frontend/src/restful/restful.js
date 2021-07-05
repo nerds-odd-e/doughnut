@@ -10,6 +10,22 @@ const reloadSession = () => {
   window.location.reload();
 };
 
+function toNested(data) {
+  const result = {}
+  Object.keys(data).forEach(function (key) {
+    if(key.includes(".")) {
+      const [namespace, subkey] = key.split('.')
+      if(!result[namespace]) result[namespace] = {}
+      result[namespace][subkey] = data[key]
+    }
+    else {
+      result[key] = data[key]
+    }
+  })
+
+  return result
+}
+
 const restRequest = (url, params, loadingRef, callback, errorCallback) => {
   if (loadingRef instanceof Function) {
     loadingRef(true);
@@ -23,7 +39,7 @@ const restRequest = (url, params, loadingRef, callback, errorCallback) => {
       }
       return res.json().then((resp) => {
         if (res.status === 200) callback(resp);
-        if (res.status === 400) errorCallback(resp.errors);
+        if (res.status === 400) errorCallback(toNested(resp.errors));
       });
     })
     .catch((error) => {
