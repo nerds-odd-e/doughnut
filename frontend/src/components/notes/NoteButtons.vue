@@ -1,8 +1,6 @@
 <template>
 <div class="btn-group btn-group-sm">
-    <router-link class="btn btn-sm" :to="{name: 'noteEdit', params: {noteid: note.id}}" role="button" title="edit note">
-        <SvgEdit/>
-    </router-link>
+    <NoteEditButton :note="note" @updated="$emit('updated')"/>
     <a role="button" class="btn btn-sm" title="Cards View" :href="`/notes/articles/${note.id}`">
         <SvgArticle/>
     </a>
@@ -29,16 +27,16 @@
 </template>
 
 <script>
-  import SvgEdit from "../svgs/SvgEdit.vue"
   import SvgArticle from "../svgs/SvgArticle.vue"
   import SvgCog from "../svgs/SvgCog.vue"
   import SvgReviewSetting from "../svgs/SvgReviewSetting.vue"
   import SvgRemove from "../svgs/SvgRemove.vue"
   import LinkNoteButton from "../links/LinkNoteButton.vue"
+  import NoteEditButton from "./NoteEditButton.vue"
   export default {
     name: 'NoteButtons',
     props: {note: Object},
     emits: ['updated'],
-    components: { SvgEdit, SvgArticle, SvgCog, SvgReviewSetting, SvgReviewSetting, SvgRemove, LinkNoteButton }
+    components: { SvgArticle, SvgCog, SvgReviewSetting, SvgReviewSetting, SvgRemove, LinkNoteButton, NoteEditButton }
   }
 </script>

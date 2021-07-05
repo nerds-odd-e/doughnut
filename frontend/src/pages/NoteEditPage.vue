@@ -50,6 +50,7 @@ export default {
         (res) => this.noteFormErrors = res,
       )
     }
+
   },
   mounted() {
     this.fetchData()
