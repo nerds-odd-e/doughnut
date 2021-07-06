@@ -23,15 +23,6 @@
                 <SvgCog/>
             </button>
             <div class="dropdown-menu dropdown-menu-right">
-                <a class="dropdown-item"
-                    :href="`/notes/${sourceNoteViewedByUser.note.id}/review_setting`">
-                    <SvgReviewSetting/>
-                    Edit Review Settings
-                </a>
-                <a class="dropdown-item" :href="`/links/${sourceNoteViewedByUser.note.id}/link`">
-                    <SvgLinkNote/>
-                    Make Link
-                  </a>
                   <div class="dropdown-divider"></div>
                   <form :action="`/reviews/${reviewPoint.id}`" method="post"
                         onsubmit="return confirm('Are you sure to hide this note from reviewing in the future?')">
@@ -49,8 +40,6 @@
 
 <script>
   import SvgCog from "../svgs/SvgCog.vue"
-  import SvgReviewSetting from "../svgs/SvgReviewSetting.vue"
-  import SvgLinkNote from "../svgs/SvgLinkNote.vue"
   import SvgNoReview from "../svgs/SvgNoReview.vue"
   import ShowReviewPoint from "./ShowReviewPoint.vue"
   import Minimizable from "../commons/Minimizable.vue"
@@ -66,7 +55,7 @@
       compact: Boolean
     },
     emits: ['selfEvaluate', 'updated'],
-    components: {SvgCog, SvgReviewSetting, SvgLinkNote, SvgNoReview, ShowReviewPoint, Minimizable, SelfEvaluateButtons},
+    components: {SvgCog, SvgNoReview, ShowReviewPoint, Minimizable, SelfEvaluateButtons},
     computed: {
       sourceNoteViewedByUser() {
         if(!!this.noteViewedByUser) {
