@@ -7,7 +7,12 @@
 </div>
 </template>
 
-<script setup>
+<script>
   import SvgAdd from "../svgs/SvgAdd.vue"
-  const props = defineProps({notebook: Object})
+  export default {
+    name: "BazaarNotebookButtons",
+    props: {notebook: Object},
+    components: { SvgAdd }
+
+  }
 </script>

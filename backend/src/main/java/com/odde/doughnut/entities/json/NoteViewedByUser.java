@@ -20,6 +20,7 @@ public class NoteViewedByUser {
     private Note note;
     @Getter
     @Setter
+    @JsonIgnoreProperties({"headNote"})
     private Notebook notebook;
     @Getter
     @Setter

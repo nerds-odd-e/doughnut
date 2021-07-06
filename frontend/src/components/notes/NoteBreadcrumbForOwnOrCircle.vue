@@ -6,7 +6,7 @@
       <li class="breadcrumb-item">
         <a :href="`/circles/${notebook.ownership.circle.id}`">{{notebook.ownership.circle.name}}</a></li>
     </template>
-    <li class="breadcrumb-item" v-else><a href="/notebooks">Top</a></li>
+    <li class="breadcrumb-item" v-else><router-link :to="{name: 'notebooks'}">Top</router-link></li>
   </template>
   <template v-slot:additional>
     <slot />

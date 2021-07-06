@@ -23,25 +23,16 @@ public class NoteViewedByUserTest {
     @Nested
     class JsonTest {
         Note note1;
-        Note note2;
-        Link link;
-        final LinkViewed linkViewedByUser = new LinkViewed();
-        Map<Link.LinkType, LinkViewed> links = new HashMap<>(){{
-            put(Link.LinkType.SPECIALIZE, linkViewedByUser);
-        }};
         NoteViewedByUser value;
 
         @BeforeEach
         void thereAreTwoNotesWithALinkInBetween() {
             Note top = makeMe.aNote().inMemoryPlease();
             note1 = makeMe.aNote().under(top).description("note1description").inMemoryPlease();
-            note2 = makeMe.aNote().under(top).description("note2description").inMemoryPlease();
-            link = makeMe.aLink().between(note1, note2).inMemoryPlease();
             value = new NoteViewedByUser(){{
                 setNote(note1);
-                setLinks(links);
+                setNotebook(note1.getNotebook());
             }};
-
         }
 
         @Test
@@ -52,25 +43,10 @@ public class NoteViewedByUserTest {
         }
 
         @Test
-        public void directLink() throws JsonProcessingException {
-            linkViewedByUser.setDirect(Collections.singletonList(link));
+        public void notebookInfo() throws JsonProcessingException {
             Map<String, Object> deserialized = getJsonString(value);
-            final Object o = deserialized.get("links");
-            assertThat(o.toString(), containsString(note2.getTitle()));
-            assertThat(o.toString(), not(containsString("noteContent")));
-            assertThat(o.toString(), containsString("targetNote"));
-            assertThat(o.toString(), not(containsString("sourceNote")));
-        }
-
-        @Test
-        public void reverseLink() throws JsonProcessingException {
-            linkViewedByUser.setReverse(Collections.singletonList(link));
-            Map<String, Object> deserialized = getJsonString(value);
-            final Object o = deserialized.get("links");
-            assertThat(o.toString(), containsString(note1.getTitle()));
-            assertThat(o.toString(), not(containsString("noteContent")));
-            assertThat(o.toString(), containsString("sourceNote"));
-            assertThat(o.toString(), not(containsString("targetNote")));
+            final Object deNotebook = deserialized.get("notebook");
+            assertThat(deNotebook.toString(), not(containsString("headNote")));
         }
 
         private Map<String, Object> getJsonString(NoteViewedByUser value) throws JsonProcessingException {

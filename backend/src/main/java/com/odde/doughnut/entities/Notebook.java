@@ -27,7 +27,6 @@ public class Notebook {
             @JoinColumn(name = "head_note_id", referencedColumnName = "id")
     })
     @OneToOne(cascade = CascadeType.ALL)
-    @JsonIgnore
     @Getter
     @Setter
     private Note headNote;
