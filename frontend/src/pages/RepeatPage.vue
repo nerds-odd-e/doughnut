@@ -62,12 +62,11 @@ export default {
     },
 
     refresh() {
-      const reviewPoint = this.repetition.reviewPointViewedByUser
-      if (!!reviewPoint.noteViewedByUser) {
-        restGet(`/api/notes/${reviewPoint.noteViewedByUser.id}`, r=>this.loading=r, (res) => reviewPoint.noteViewedByUser = res)
+      if (!!this.reviewPointViewedByUser.noteViewedByUser) {
+        restGet(`/api/notes/${this.reviewPointViewedByUser.noteViewedByUser.note.id}`, r=>this.loading=r, (res) => this.reviewPointViewedByUser.noteViewedByUser = res)
       }
-      if (!!reviewPoint.linkViewedByUser) {
-        restGet(`/api/notes/${reviewPoint.linkViewedByUser.id}`, r=>this.loading=r, (res) => reviewPoint.linkViewedByUser = res)
+      if (!!this.reviewPointViewedByUser.linkViewedByUser) {
+        restGet(`/api/notes/${this.reviewPointViewedByUser.linkViewedByUser.link.id}`, r=>this.loading=r, (res) => this.reviewPointViewedByUser.linkViewedByUser = res)
       }
     },
 
