@@ -5,20 +5,20 @@
       <p> <router-link class="nav-link" :to="{name: 'notebookNew'}">Add New Notebook</router-link> </p>
       <NotebookViewCards :notebooks="notebooksViewedByUser.notebooks"/>
       <h2>Subscribed Notes</h2>
-      <div th:replace="_fragments/subscription_fragments :: noteSubscriptionCards(${subscriptions})"/>
-      <div id="app"></div>
+      <NotebookSubscriptionCards :subscriptions="notebooksViewedByUser.subscriptions"/>
     </div>
   </LoadingPage>
 </template>
 
 <script>
 import NotebookViewCards from "../components/notebook/NotebookViewCards.vue"
+import NotebookSubscriptionCards from "../components/subscriptions/NotebookSubscriptionCards.vue"
 import LoadingPage from "./commons/LoadingPage.vue"
 import {restGet} from "../restful/restful"
 
 export default {
   name: 'NotebooksPage',
-  components: { LoadingPage, NotebookViewCards },
+  components: { LoadingPage, NotebookViewCards, NotebookSubscriptionCards },
   data() {
     return {
       loading: false,

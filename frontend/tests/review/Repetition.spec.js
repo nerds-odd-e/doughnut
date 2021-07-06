@@ -41,12 +41,12 @@ describe('repetition page', () => {
     test('click on note when doing review', async () => {
       const { wrapper } = mountWithMockRoute(Repetition, {propsData: reviewPointForView}, {name: 'repeat'});
 
-      expect(JSON.parse(wrapper.find(".link-source .router-link").attributes().to).name).toEqual("noteShow")
+      expect(JSON.parse(wrapper.find(".link-source .router-link").attributes().to).name).toEqual("notebooks")
     });
 
     test('click on note when doing review and in a nested page', async () => {
       const { wrapper } = mountWithMockRoute(Repetition, {propsData: reviewPointForView}, {name: 'repeat-noteShow', params: {noteid: 123}});
-      expect(JSON.parse(wrapper.find(".link-source .router-link").attributes().to)).toEqual({name: 'noteShow', params: {noteid: 1}})
+      expect(JSON.parse(wrapper.find(".link-source .router-link").attributes().to)).toEqual({name: 'notebooks'})
     });
 
     test('compact view', async () => {

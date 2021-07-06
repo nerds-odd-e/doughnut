@@ -29,6 +29,10 @@ public class Subscription {
         return notebook.getHeadNote().getTitle();
     }
 
+    public String getShortDescription() {
+        return notebook.getHeadNote().getShortDescription();
+    }
+
     public NoteContent getNoteContent() {
         return notebook.getHeadNote().getNoteContent();
     }

@@ -23,6 +23,7 @@ const NestedRepeatPage = NestedPage(
   )
 
 const noteAndLinkRoutes = [
+    { path: 'notebooks', name: 'notebooks', component: NotebooksPage },
     { path: 'notes/:noteid', name: 'noteShow', component: NoteShowPage, props: true },
     { path: 'links/:linkid', name: 'linkShow', component: LinkShowPage, props: true },
   ]
@@ -32,7 +33,6 @@ const nestedNoteAndLinkRoutes = (prefix) => noteAndLinkRoutes.map(route=>({...ro
 const routes = [
     ...noteAndLinkRoutes.map(route=>({...route, path: `/${route.path}`})),
     { path: '/', name: 'root', component: ReviewHome },
-    { path: '/notebooks', name: 'notebooks', component: NotebooksPage },
     { path: '/notebooks/new', name: 'notebookNew', component: NotebookNewPage },
     { path: '/bazaar/notes/:noteid', name: 'bnoteShow', component: NoteShowPage, props: true },
     { path: '/reviews', name: 'reviews', component: ReviewHome },

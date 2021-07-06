@@ -8,7 +8,7 @@
        title="edit notebook settings">
         <SvgEditNotebook/>
     </a>
-    <form :action="`/notebooks/${notebook.id}/share`" :method="post"
+    <form :action="`/notebooks/${notebook.id}/share`" method="post"
           onsubmit="return confirm('Are you sure to share?')">
         <button class="btn btn-sm" title="Share notebook to bazaar">
             <SvgBazaarShare/>

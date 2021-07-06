@@ -13,9 +13,13 @@
 </div>
 </template>
 
-<script setup>
+<script>
 import Cards from "./Cards.vue"
-import { ref, defineProps } from "vue"
 
-const props = defineProps({notes: Array})
+export default {
+  name: "NoteCardWithHeaderAndButton",
+  props: {notes: Array},
+  components: { Cards }
+
+}
 </script>
