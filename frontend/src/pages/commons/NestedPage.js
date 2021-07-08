@@ -19,7 +19,7 @@ function NestedPage(WrappedComponent, scopeName, exceptRoutes, navigateOutWarnin
       }
 
     },
-    beforeRouteEnter(to, from, next) {routerScopeGuard(scopeName, exceptRoutes, this.confirm)(to, from, next)},
+    beforeRouteEnter(to, from, next) {next(vm=>routerScopeGuard(scopeName, exceptRoutes, vm.confirm)(to, from, next))},
     beforeRouteUpdate(to, from, next) {routerScopeGuard(scopeName, exceptRoutes, this.confirm)(to, from, next)},
     beforeRouteLeave(to, from, next) {routerScopeGuard(scopeName, exceptRoutes, this.confirm)(to, from, next)},
     render() {

@@ -2,10 +2,11 @@ import { routerScopeGuard } from '@/routes/relative_routes'
 
 describe('router guards', () => {
   var confirm;
-  const guard = routerScopeGuard("repeat", ["review"], async ()=>confirm())
+  var guard;
 
   beforeEach(async () => {
     confirm = jest.fn()
+    guard = routerScopeGuard("repeat", ["review"], async ()=>confirm())
   });
   test('when in repeat, go to nested noteShow', async () => {
     const next = jest.fn()

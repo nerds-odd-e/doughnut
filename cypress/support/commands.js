@@ -310,6 +310,7 @@ Cypress.Commands.add(
       }
       if (skip) {
           cy.findByText('Skip repetition').click();
+          cy.findByRole('button', { name: 'OK' }).click();
       }
       else {
           cy.findByText('Keep for repetition').click();
