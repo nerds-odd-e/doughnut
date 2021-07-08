@@ -48,7 +48,7 @@ describe('note statistics', () => {
 
   test('fetch API to be called ONCE', async () => {
     fetch.mockResponseOnce(JSON.stringify({}));
-    const wrapper = mount(NoteStatistics, {propsData: {noteid: 123}});
+    const wrapper = mount(NoteStatistics, {propsData: {noteId: 123}});
     await flushPromises()
     expect(fetch).toHaveBeenCalledTimes(1);
     expect(fetch).toHaveBeenCalledWith('/api/notes/123/statistics');
@@ -57,7 +57,7 @@ describe('note statistics', () => {
 
   test('should render values', async () => {
     fetch.mockResponseOnce(JSON.stringify(stubResponse));
-    const wrapper = mount(NoteStatistics, {propsData: {noteid: 123}});
+    const wrapper = mount(NoteStatistics, {propsData: {noteId: 123}});
     await flushPromises()
     expect(wrapper.findAll(".statistics-value")).toHaveLength(5)
   });

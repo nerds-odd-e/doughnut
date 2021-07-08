@@ -140,5 +140,55 @@ class RestNoteControllerTests {
             assertThat(note.getNoteContent().getUploadPicture(), is(not(nullValue())));
         }
     }
+    @Nested
+    class DeleteNoteTest {
+        @Test
+        void shouldNotBeAbleToDeleteNoteThatBelongsToOtherUser() {
+            User anotherUser = makeMe.aUser().please();
+            Note note = makeMe.aNote().byUser(anotherUser).please();
+            Integer noteId = note.getId();
+            assertThrows(NoAccessRightException.class, () ->
+                    controller.deleteNote(note)
+            );
+            assertTrue(modelFactoryService.findNoteById(noteId).isPresent());
+        }
+
+        @Test
+        void shouldDeleteTheNoteButNotTheUser() throws NoAccessRightException {
+            Note note = makeMe.aNote().byUser(userModel).please();
+            Integer noteId = note.getId();
+            RedirectToNoteResponse response = controller.deleteNote(note);
+            assertEquals(null, response.noteId);
+            assertFalse(modelFactoryService.findNoteById(noteId).isPresent());
+            assertTrue(modelFactoryService.findUserById(userModel.getEntity().getId()).isPresent());
+        }
+
+        @Test
+        void shouldDeleteTheChildNoteButNotSiblingOrParent() throws NoAccessRightException {
+            Note parent = makeMe.aNote().byUser(userModel).please();
+            Note subject = makeMe.aNote().under(parent).byUser(userModel).please();
+            Note sibling = makeMe.aNote().under(parent).byUser(userModel).please();
+            Note child = makeMe.aNote().under(subject).byUser(userModel).please();
+            makeMe.refresh(subject);
+
+            controller.deleteNote(subject);
+
+            assertTrue(modelFactoryService.findNoteById(sibling.getId()).isPresent());
+            assertFalse(modelFactoryService.findNoteById(child.getId()).isPresent());
+        }
+
+        @Test
+        void shouldDeleteTheReviewPoints() throws NoAccessRightException {
+            Note subject = makeMe.aNote().byUser(userModel).please();
+            Note child = makeMe.aNote().byUser(userModel).under(subject).please();
+            makeMe.aReviewPointFor(child).by(userModel).please();
+            long oldCount = makeMe.modelFactoryService.reviewPointRepository.count();
+            makeMe.refresh(subject);
+            controller.deleteNote(subject);
+
+            assertThat(makeMe.modelFactoryService.reviewPointRepository.count(), equalTo(oldCount - 1));
+        }
+    }
+
 
 }

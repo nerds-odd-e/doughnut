@@ -15,13 +15,10 @@
             <SvgReviewSetting/>
             Edit review settings
         </a>
-        <form :action="`/notes/${note.id}/delete`" method="post"
-                      onsubmit="return confirm('Are you sure to delete?')">
-            <button class="dropdown-item" title="delete note">
-                <SvgRemove/>
-                Delete
-            </button>
-        </form>
+        <button class="dropdown-item" title="delete note" v-on:click="deleteNote()">
+          <SvgRemove/>
+          Delete
+        </button>
     </div>
 </div>
 </template>
@@ -33,10 +30,25 @@
   import SvgRemove from "../svgs/SvgRemove.vue"
   import LinkNoteButton from "../links/LinkNoteButton.vue"
   import NoteEditButton from "./NoteEditButton.vue"
+  import { restPost } from '../../restful/restful'
   export default {
     name: 'NoteButtons',
     props: {note: Object},
     emits: ['updated'],
-    components: { SvgArticle, SvgCog, SvgReviewSetting, SvgReviewSetting, SvgRemove, LinkNoteButton, NoteEditButton }
+    components: { SvgArticle, SvgCog, SvgReviewSetting, SvgReviewSetting, SvgRemove, LinkNoteButton, NoteEditButton },
+    methods: {
+        async deleteNote() {
+            if(await this.$popups.confirm(`Are you sure to delete this note?`)) {
+                restPost(`/api/notes/${this.note.id}/delete`, {}, r=>{}, r=>{
+                  if (!!r.noteId) {
+                      this.$router.push({name: 'noteShow', params: {noteId: r.noteId}})
+                  }
+                  else {
+                      this.$router.push({name: 'notebooks'})
+                  }
+                })
+            }
+        }
+    }
   }
 </script>

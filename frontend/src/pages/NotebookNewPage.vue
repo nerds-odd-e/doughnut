@@ -36,7 +36,7 @@ export default {
         `/api/notebooks/create`,
         this.noteFormData,
         r=>this.loading=r,
-        (res) => this.$router.push({name: "noteShow", params: { noteid: res.noteId}}),
+        (res) => this.$router.push({name: "noteShow", params: { noteId: res.noteId}}),
         (res) => this.noteFormErrors = res,
         )
     }

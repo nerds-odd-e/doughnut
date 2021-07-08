@@ -3,7 +3,7 @@ import NoteStatistics from "./NoteStatistics.vue"
 
 export default {
   name: 'NoteStatisticsButton',
-  props: { noteid: Number, linkid: Number },
+  props: { noteId: Number, linkid: Number },
   components: { NoteStatistics },
   data() {
     return { statisticComponentName: null }
@@ -19,7 +19,7 @@ export default {
     }
   },
   watch: {
-    noteid() {
+    noteId() {
       this.statisticComponentName = null
     },
     linkid() {
@@ -34,6 +34,6 @@ export default {
   Statistics
   </a>
   <div>
-     <component :is="statisticComponentName" :noteid="noteid" :linkid="linkid"></component>
+     <component :is="statisticComponentName" :noteId="noteId" :linkid="linkid"></component>
   </div>
 </template>

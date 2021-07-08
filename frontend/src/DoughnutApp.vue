@@ -15,8 +15,6 @@ export default {
 
   methods: {
     done(result) {
-      console.log(result)
-
       this.doneResolve(result)
       this.popupInfo = null
       this.doneResolve = null

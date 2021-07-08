@@ -27,7 +27,7 @@ describe('note show', () => {
   test('fetch API to be called ONCE', async () => {
     const testingRouter = await createTestRouter();
     fetch.mockResponseOnce(JSON.stringify(stubResponse));
-    const wrapper = mount(NoteShowPage, {propsData: {noteid: 123}, global: { plugins: [testingRouter] }});
+    const wrapper = mount(NoteShowPage, {propsData: {noteId: 123}, global: { plugins: [testingRouter] }});
     await flushPromises()
     expect(fetch).toHaveBeenCalledTimes(1);
     expect(fetch).toHaveBeenCalledWith('/api/notes/123', {});

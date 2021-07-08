@@ -45,12 +45,12 @@ describe('repetition page', () => {
     });
 
     test('click on note when doing review and in a nested page', async () => {
-      const { wrapper } = mountWithMockRoute(Repetition, {propsData: reviewPointForView}, {name: 'repeat-noteShow', params: {noteid: 123}});
+      const { wrapper } = mountWithMockRoute(Repetition, {propsData: reviewPointForView}, {name: 'repeat-noteShow', params: {noteId: 123}});
       expect(JSON.parse(wrapper.find(".link-source .router-link").attributes().to)).toEqual({name: 'notebooks'})
     });
 
     test('compact view', async () => {
-      const { wrapper, mockRouter } = mountWithMockRoute(Repetition, {propsData: {...reviewPointForView, compact: true}}, {name: 'repeat-noteShow', params: {noteid: 123}});
+      const { wrapper, mockRouter } = mountWithMockRoute(Repetition, {propsData: {...reviewPointForView, compact: true}}, {name: 'repeat-noteShow', params: {noteId: 123}});
       expect(wrapper.find(".link-source .router-link").exists()).toBe(false)
       await wrapper.find(".repeat-container").trigger('click')
       expect(mockRouter.push).toHaveBeenCalledWith({name: 'repeat'})

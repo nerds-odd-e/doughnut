@@ -2,7 +2,7 @@
   <LoadingPage v-bind="{loading, contentExists: !!noteViewedByUser}">
     <div v-if="noteViewedByUser">
       <NoteViewedByUser v-bind="noteViewedByUser" @updated="fetchData()"/>
-      <NoteStatisticsButton :noteid="noteid"/>
+      <NoteStatisticsButton :noteId="noteId"/>
     </div>
   </LoadingPage>
 </template>
@@ -15,7 +15,7 @@ import {restGet} from "../restful/restful"
 
 export default {
   name: "NoteShowPage",
-  props: {noteid: Number},
+  props: {noteId: Number},
   data() {
     return {
       noteViewedByUser: null,
@@ -25,11 +25,11 @@ export default {
   components: { NoteViewedByUser, NoteStatisticsButton, LoadingPage },
   methods: {
     fetchData() {
-      restGet(`/api/notes/${this.noteid}`, (r)=>this.loading=r, (res) => this.noteViewedByUser = res)
+      restGet(`/api/notes/${this.noteId}`, (r)=>this.loading=r, (res) => this.noteViewedByUser = res)
     }
   },
   watch: {
-    noteid() {
+    noteId() {
       this.fetchData()
     }
   },

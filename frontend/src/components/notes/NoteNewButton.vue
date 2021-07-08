@@ -59,7 +59,7 @@ export default {
         r=>this.loading=r,
         (res) => {
           this.show = false;
-          this.$router.push({name: "noteShow", params: { noteid: res.noteId}})
+          this.$router.push({name: "noteShow", params: { noteId: res.noteId}})
         },
         (res) => this.formErrors = res
       )

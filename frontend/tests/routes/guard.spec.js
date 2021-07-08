@@ -10,20 +10,20 @@ describe('router guards', () => {
   });
   test('when in repeat, go to nested noteShow', async () => {
     const next = jest.fn()
-    await guard({name: 'noteShow', params: {noteid: 3}}, {name: 'repeat'}, next)
-    expect(next).toHaveBeenCalledWith({name: 'repeat-noteShow', params: {noteid: 3}});
+    await guard({name: 'noteShow', params: {noteId: 3}}, {name: 'repeat'}, next)
+    expect(next).toHaveBeenCalledWith({name: 'repeat-noteShow', params: {noteId: 3}});
   })
 
   test('when in repeat, and going to already nested route', async () => {
     const next = jest.fn()
-    await guard({name: 'repeat-noteShow', params: {noteid: 3}}, {name: 'repeat'}, next)
+    await guard({name: 'repeat-noteShow', params: {noteId: 3}}, {name: 'repeat'}, next)
     expect(next).toHaveBeenCalledWith();
   })
 
   test('when in repeat, and going to a route that doesnot have nested route', async () => {
     const next = jest.fn()
     confirm.mockReturnValue(true);
-    await guard({name: 'initial', params: {noteid: 3}}, {name: 'repeat'}, next)
+    await guard({name: 'initial', params: {noteId: 3}}, {name: 'repeat'}, next)
     expect(next).toHaveBeenCalledWith();
   })
 

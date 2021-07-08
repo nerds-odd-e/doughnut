@@ -28,11 +28,11 @@
 <script setup>
 import { ref, defineProps } from "vue"
 
-const props = defineProps({noteid: Number, linkid: Number})
+const props = defineProps({noteId: Number, linkid: Number})
 const statistics = ref(null)
 const url = () => {
-  if (!!props.noteid) {
-    return `/api/notes/${props.noteid}/statistics`
+  if (!!props.noteId) {
+    return `/api/notes/${props.noteId}/statistics`
   }
   return `/api/links/${props.linkid}/statistics`
 }

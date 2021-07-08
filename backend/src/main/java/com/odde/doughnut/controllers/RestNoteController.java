@@ -10,7 +10,6 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.http.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -103,6 +102,15 @@ class RestNoteController {
   @Transactional
   public List<Note> searchForLinkTarget(@PathVariable("note") Note note, @Valid @RequestBody SearchTerm searchTerm) {
     return currentUserFetcher.getUser().getLinkableNotes(note, searchTerm);
+  }
+
+  @PostMapping(value = "/{note}/delete")
+  @Transactional
+  public RedirectToNoteResponse deleteNote(@PathVariable("note") Note note) throws NoAccessRightException {
+    currentUserFetcher.getUser().getAuthorization().assertAuthorization(note);
+    Integer parentId = note.getParentId();
+    modelFactoryService.toNoteModel(note).destroy();
+    return new RedirectToNoteResponse(parentId);
   }
 
 }

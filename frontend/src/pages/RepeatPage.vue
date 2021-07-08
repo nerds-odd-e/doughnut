@@ -9,7 +9,7 @@
                 @selfEvaluate="selfEvaluate($event)"
                 @updated="refresh()"
                 />
-              <NoteStatisticsButton v-if="reviewPointViewedByUser.noteViewedByUser" :noteid="reviewPointViewedByUser.noteViewedByUser.note.id"/>
+              <NoteStatisticsButton v-if="reviewPointViewedByUser.noteViewedByUser" :noteId="reviewPointViewedByUser.noteViewedByUser.note.id"/>
               <NoteStatisticsButton v-else :link="reviewPointViewedByUser.linkViewedByUser.id"/>
             </template>
           </template>

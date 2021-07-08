@@ -45,85 +45,35 @@ class NoteControllerTests {
     }
 
 
+
     @Nested
-    class DeleteNoteTest {
+    class MoveNoteTest {
+        User anotherUser;
+        Note note1;
+        Note note2;
+
+        @BeforeEach
+        void setup() {
+            anotherUser = makeMe.aUser().please();
+            note1 = makeMe.aNote().byUser(anotherUser).please();
+            note2 = makeMe.aNote().byUser(userModel).please();
+        }
+
         @Test
-        void shouldNotBeAbleToDeleteNoteThatBelongsToOtherUser() {
-            User anotherUser = makeMe.aUser().please();
-            Note note = makeMe.aNote().byUser(anotherUser).please();
-            Integer noteId = note.getId();
+        void shouldNotAllowMoveOtherPeoplesNote() {
+            NoteMotion motion = new NoteMotion(note2, false);
             assertThrows(NoAccessRightException.class, () ->
-                    controller.deleteNote(note)
+                    controller.moveNote(note1, motion)
             );
-            assertTrue(modelFactoryService.findNoteById(noteId).isPresent());
         }
 
         @Test
-        void shouldDeleteTheNoteButNotTheUser() throws NoAccessRightException {
-            Note note = makeMe.aNote().byUser(userModel).please();
-            Integer noteId = note.getId();
-            RedirectView response = controller.deleteNote(note);
-            assertEquals("/notebooks", response.getUrl());
-            assertFalse(modelFactoryService.findNoteById(noteId).isPresent());
-            assertTrue(modelFactoryService.findUserById(userModel.getEntity().getId()).isPresent());
+        void shouldNotAllowMoveToOtherPeoplesNote() {
+            NoteMotion motion = new NoteMotion(note1, false);
+            assertThrows(NoAccessRightException.class, () ->
+                    controller.moveNote(note2, motion)
+            );
         }
-
-        @Test
-        void shouldDeleteTheChildNoteButNotSiblingOrParent() throws NoAccessRightException {
-            Note parent = makeMe.aNote().byUser(userModel).please();
-            Note subject = makeMe.aNote().under(parent).byUser(userModel).please();
-            Note sibling = makeMe.aNote().under(parent).byUser(userModel).please();
-            Note child = makeMe.aNote().under(subject).byUser(userModel).please();
-            makeMe.refresh(subject);
-
-            controller.deleteNote(subject);
-
-            assertTrue(modelFactoryService.findNoteById(sibling.getId()).isPresent());
-            assertFalse(modelFactoryService.findNoteById(child.getId()).isPresent());
-        }
-
-        @Test
-        void shouldDeleteTheReviewPoints() throws NoAccessRightException {
-            Note subject = makeMe.aNote().byUser(userModel).please();
-            Note child = makeMe.aNote().byUser(userModel).under(subject).please();
-            makeMe.aReviewPointFor(child).by(userModel).please();
-            long oldCount = makeMe.modelFactoryService.reviewPointRepository.count();
-            makeMe.refresh(subject);
-            controller.deleteNote(subject);
-
-            assertThat(makeMe.modelFactoryService.reviewPointRepository.count(), equalTo(oldCount - 1));
-        }
-
-
-        @Nested
-        class MoveNoteTest {
-            User anotherUser;
-            Note note1;
-            Note note2;
-
-            @BeforeEach
-            void setup() {
-                anotherUser = makeMe.aUser().please();
-                note1 = makeMe.aNote().byUser(anotherUser).please();
-                note2 = makeMe.aNote().byUser(userModel).please();
-            }
-
-            @Test
-            void shouldNotAllowMoveOtherPeoplesNote() {
-                NoteMotion motion = new NoteMotion(note2, false);
-                assertThrows(NoAccessRightException.class, () ->
-                        controller.moveNote(note1, motion)
-                );
-            }
-
-            @Test
-            void shouldNotAllowMoveToOtherPeoplesNote() {
-                NoteMotion motion = new NoteMotion(note1, false);
-                assertThrows(NoAccessRightException.class, () ->
-                        controller.moveNote(note2, motion)
-                );
-            }
-        }
-
     }
+
 }

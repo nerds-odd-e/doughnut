@@ -374,5 +374,10 @@ public class Note {
         this.notebook = notebook;
     }
 
+    public Integer getParentId() {
+        Note parent = getParentNote();
+        if (parent == null) return null;
+        return parent.id;
+    }
 }
 

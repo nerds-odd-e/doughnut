@@ -70,14 +70,6 @@ public class NoteController extends ApplicationMvcController  {
         return "redirect:/notes/" + note.getId();
     }
 
-    @PostMapping(value = "/{note}/delete")
-    @Transactional
-    public RedirectView deleteNote(@PathVariable("note") Note note) throws NoAccessRightException {
-        getCurrentUser().getAuthorization().assertAuthorization(note);
-        modelFactoryService.toNoteModel(note).destroy();
-        return new RedirectView("/notebooks");
-    }
-
     @GetMapping("/{note}/review_setting")
     public String editReviewSetting(Note note, Model model) {
         ReviewSetting reviewSetting = note.getMasterReviewSetting();

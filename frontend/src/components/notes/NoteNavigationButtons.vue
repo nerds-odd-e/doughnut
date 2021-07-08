@@ -1,15 +1,15 @@
 <template>
 <div class="btn-group btn-group-sm">
-    <NoteNavigationButton  :noteid="navigation.previousSiblingId" :title="'previous sibling'">
+    <NoteNavigationButton  :noteId="navigation.previousSiblingId" :title="'previous sibling'">
         <SvgFastBackward />
     </NoteNavigationButton>
-    <NoteNavigationButton  :noteid="navigation.previousId" :title="'previous'">
+    <NoteNavigationButton  :noteId="navigation.previousId" :title="'previous'">
         <SvgBackward />
     </NoteNavigationButton>
-    <NoteNavigationButton  :noteid="navigation.nextId" :title="'next'">
+    <NoteNavigationButton  :noteId="navigation.nextId" :title="'next'">
         <SvgForward />
     </NoteNavigationButton>
-    <NoteNavigationButton  :noteid="navigation.nextSiblingId" :title="'next sibling'">
+    <NoteNavigationButton  :noteId="navigation.nextSiblingId" :title="'next sibling'">
         <SvgFastForward />
     </NoteNavigationButton>
 </div>

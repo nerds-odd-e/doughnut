@@ -1,5 +1,5 @@
 <template>
-  <router-link :to="{name: 'noteShow', params: {noteid}}"  v-if="!!noteid" role="button" class="btn btn-sm" :title="title">
+  <router-link :to="{name: 'noteShow', params: {noteId}}"  v-if="!!noteId" role="button" class="btn btn-sm" :title="title">
     <slot/>
   </router-link>
   <a v-else role="button" class="btn btn-sm disabled" :title="title">
@@ -8,5 +8,5 @@
 </template>
 
 <script setup>
-  const props = defineProps({noteid: Number, title: String})
+  const props = defineProps({noteId: Number, title: String})
 </script>
