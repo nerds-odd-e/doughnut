@@ -24,7 +24,7 @@ export default {
     children: Array,
     ancestors: Array,
     notebook: Object,
-    owns: Boolean
+    owns: { type: Boolean, required: true }
   },
   emits: ['updated'],
   components: { NoteViewedByUserWithoutChildren, NoteNavigationButtons, NoteControlHeader, NoteOwnerViewCards },

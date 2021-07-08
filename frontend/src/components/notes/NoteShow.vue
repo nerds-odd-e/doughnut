@@ -7,12 +7,16 @@
 </template>
 
 <script>
-export default { name: "NoteShow" };
-</script>
-
-<script setup>
 import NoteShowWithTitle from "./NoteShowWithTitle.vue"
-import { ref, defineProps } from "vue"
 
-const props = defineProps({note: {type: Object, required: true }, links: Object, level: Number, owns: Boolean})
+export default {
+  name: "NoteShow",
+  props: {
+    note: {type: Object, required: true },
+    links: Object,
+    level: { type: Number, default: 2 },
+    owns: {type: Boolean, required: true} },
+  components: { NoteShowWithTitle }
+
+}
 </script>

@@ -26,7 +26,7 @@ export default {
     links: Object,
     ancestors: Array,
     notebook: Object,
-    owns: Boolean
+    owns: { type: Boolean, required: true }
   },
   emits: ['updated'],
   components: {NoteShow, NoteBazaarBreadcrumb, BazaarNoteButtons, NoteButtons, NoteControlHeader},

@@ -22,11 +22,11 @@
 </template>
 
 <script>
-export default { name: "NoteShowWithTitle" };
-</script>
-
-<script setup>
   import ShowPicture from "./ShowPicture.vue"
   import LinkWithHtmlLink from "../links/LinkWithHtmlLink.vue"
-  const props = defineProps({note: Object, links: Object, level: Number, owns: Boolean})
+  export default {
+    name: "NoteShowWithTitle",
+    props: { note: Object, links: Object, level: Number, owns: { type: Boolean, required: true } },
+    components: { ShowPicture, LinkWithHtmlLink }
+  }
 </script>
