@@ -2,6 +2,7 @@
   <LoadingPage v-bind="{loading, contentExists: !!linkViewedByUser}">
     <div v-if="linkViewedByUser">
         <LinkShow v-bind="linkViewedByUser">
+
             <div class="link-content">
               <div>
                 <LinkTypeSelect scopeName='link' v-model="formData.typeId" :errors="formErrors.typeId"/>
@@ -12,6 +13,7 @@
                 <NoteStatisticsButton :linkid="linkViewedByUser.id"/>
               </nav>
             </div>
+
         </LinkShow>
     </div>
   </LoadingPage>
@@ -51,8 +53,8 @@ export default {
       )
     },
 
-    deleteLink() {
-      if(!confirm('Are you sure to delete this link?')) return;
+    async deleteLink() {
+      if(!await this.$popups.confirm('Are you sure to delete this link?')) return;
       restPost(
         `/api/links/${this.linkid}/delete`, null, r=>this.loading=r,
         (res) => this.$router.push({name: "noteShow", replace: true, params: { noteid: res.noteId}}))

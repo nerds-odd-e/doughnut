@@ -1,4 +1,5 @@
 import { h } from "vue"
+import { RouterView } from "vue-router"
 import { routerScopeGuard } from "../../routes/relative_routes"
 
 function NestedPage(WrappedComponent, scopeName, exceptRoutes, navigateOutWarningMessage){
@@ -18,7 +19,7 @@ function NestedPage(WrappedComponent, scopeName, exceptRoutes, navigateOutWarnin
     render() {
       return h('div', {}, [
         h(WrappedComponent, {...this.$props, nested: this.isNested}),
-        h('router-view', {}),
+        h(RouterView, {}),
       ])
     }
   }

@@ -11,5 +11,7 @@ const router = createRouter({
 
 const app = createApp(DoughnutApp)
 app.config.globalProperties.$staticInfo = {}
+app.config.globalProperties.$popups = {}
+
 app.use(router)
 app.mount('#partials-noteshow')
