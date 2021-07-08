@@ -13,11 +13,15 @@
 
 </template>
 
-<script setup>
+<script>
 import LinkNoteShow from "./LinkNoteShow.vue"
-import { ref, defineProps } from "vue"
 
-  const props = defineProps({
+export default {
+  props: {
     sourceNoteViewedByUser: {tyep: Object, required: true },
-    targetNoteViewedByUser: {type: Object, required: true }})
+    targetNoteViewedByUser: {type: Object, required: true }
+  },
+  components: { LinkNoteShow }
+}
+
 </script>

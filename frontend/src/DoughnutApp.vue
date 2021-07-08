@@ -1,13 +1,11 @@
 <script>
 import {restGet} from "./restful/restful"
-import RelativeRouterView from "./routes/RelativeRouterView.vue"
 
 export default {
-  components: {RelativeRouterView},
   data() {
     return {
-  staticInfo: null,
-  loading: null,
+      staticInfo: null,
+      loading: null,
     }},
   
   mounted() {
@@ -21,5 +19,5 @@ export default {
 </script>
 
 <template>
-  <RelativeRouterView />
+  <router-view />
 </template>
