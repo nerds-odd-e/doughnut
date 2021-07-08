@@ -53,9 +53,9 @@ export default {
       }
     },
 
-    processForm(skipReview) {
+    async processForm(skipReview) {
       if(skipReview) {
-        if(!confirm('Are you sure to hide this note from reviewing in the future?')) return;
+        if(!await this.$popups.confirm('Are you sure to hide this note from reviewing in the future?')) return;
       }
       this.reviewPoint.removedFromReview = skipReview
       restPost(

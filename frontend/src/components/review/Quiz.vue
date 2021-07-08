@@ -36,7 +36,6 @@
   import NoteBreadcrumbForReview from "./NoteBreadcrumbForReview.vue"
   import ShowPicture from "../notes/ShowPicture.vue"
   import TextInput from "../form/TextInput.vue"
-  import { routerProtectGuard } from "../../routes/relative_routes"
 
 export default {
   name: "Quiz",
