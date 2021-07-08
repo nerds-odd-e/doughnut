@@ -154,7 +154,7 @@ Cypress.Commands.add('navigateToNotePage', noteTitlesDividedBySlash => {
   cy.visitMyNotebooks();
   noteTitlesDividedBySlash
     .commonSenseSplit('/')
-    .forEach(noteTitle => cy.findByText(noteTitle).click());
+    .forEach(noteTitle => cy.findByText(noteTitle, { selector: '.card-title' }).click());
 });
 
 // jumptoNotePage is faster than navigateToNotePage

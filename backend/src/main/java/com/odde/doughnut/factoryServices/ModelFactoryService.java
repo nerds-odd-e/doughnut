@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -30,6 +31,16 @@ public class ModelFactoryService {
     public NoteMotionModel toNoteMotionModel(NoteMotion noteMotion, Note note) {
         noteMotion.setSubject(note);
         return new NoteMotionModel(noteMotion, this);
+    }
+
+    public NoteMotionModel toNoteMotionModel(Note sourceNote, Note targetNote, Boolean asFirstChild) {
+        if(!asFirstChild) {
+            List<Note> children = targetNote.getChildren();
+            if (children.size()> 0) {
+                return toNoteMotionModel(new NoteMotion(children.get(children.size() - 1), false), sourceNote);
+            }
+        }
+        return toNoteMotionModel(new NoteMotion(targetNote, true), sourceNote);
     }
 
     public BazaarModel toBazaarModel() {
@@ -78,4 +89,5 @@ public class ModelFactoryService {
     public Authorization toAuthorization(User entity) {
         return new Authorization(entity, this);
     }
+
 }

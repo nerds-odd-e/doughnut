@@ -12,11 +12,13 @@
 
 </template>
 
-<script setup>
+<script>
 import InputWithType from "./InputWithType.vue"
-import { startCase, camelCase } from "lodash"
 
-const props = defineProps({modelValue: String, scopeName: String, field: String, errors: Object})
-const emit = defineEmit(['update:modelValue'])
+export default {
+  props: {modelValue: String, scopeName: String, field: String, errors: Object},
+  emits: ['update:modelValue'],
+  components: { InputWithType },
+}
 
 </script>

@@ -7,12 +7,14 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.LinkViewedByUser;
 import com.odde.doughnut.entities.json.RedirectToNoteResponse;
+import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.LinkModel;
 import com.odde.doughnut.models.UserModel;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -37,9 +39,12 @@ class RestLinkController {
 
   static class LinkRequest {
     public Integer typeId;
+    public Boolean moveUnder;
+    public Boolean asFirstChild;
   }
 
   @PostMapping(value = "/{link}")
+  @Transactional
   public RedirectToNoteResponse updateLink(Link link, @RequestBody LinkRequest linkRequest) throws NoAccessRightException {
     currentUserFetcher.getUser().getAuthorization().assertAuthorization(link.getSourceNote());
     link.setTypeId(linkRequest.typeId);
@@ -48,6 +53,7 @@ class RestLinkController {
   }
 
   @PostMapping(value = "/{link}/delete")
+  @Transactional
   public RedirectToNoteResponse deleteLink(Link link) throws NoAccessRightException {
     currentUserFetcher.getUser().getAuthorization().assertAuthorization(link.getSourceNote());
     LinkModel linkModel = modelFactoryService.toLinkModel(link);
@@ -56,9 +62,14 @@ class RestLinkController {
   }
 
   @PostMapping(value = "/create/{sourceNote}/{targetNote}")
-  public Integer linkNoteFinalize(@PathVariable Note sourceNote, @PathVariable Note targetNote, @Valid @RequestBody  LinkRequest linkRequest) throws NoAccessRightException {
+  @Transactional
+  public Integer linkNoteFinalize(@PathVariable Note sourceNote, @PathVariable Note targetNote, @Valid @RequestBody  LinkRequest linkRequest) throws NoAccessRightException, CyclicLinkDetectedException {
     currentUserFetcher.getUser().getAuthorization().assertAuthorization(sourceNote);
     currentUserFetcher.getUser().getAuthorization().assertReadAuthorization(targetNote);
+    if (linkRequest != null && linkRequest.moveUnder != null && linkRequest.moveUnder) {
+      currentUserFetcher.getUser().getAuthorization().assertAuthorization(targetNote);
+      modelFactoryService.toNoteMotionModel(sourceNote, targetNote, linkRequest.asFirstChild).execute();
+    }
     Link link = new Link();
     link.setSourceNote(sourceNote);
     link.setTargetNote(targetNote);

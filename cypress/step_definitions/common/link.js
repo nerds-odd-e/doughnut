@@ -11,13 +11,23 @@ When("I am creating link for note {string}", (noteTitle) => {
     cy.creatingLinkFor(noteTitle);
 });
 
-When("I link note {string} as {string} note {string}", (fromNoteTitle, linkType, toNoteTitle) => {
+function makingLink(cy, fromNoteTitle, linkType, toNoteTitle) {
     cy.creatingLinkFor(fromNoteTitle);
     cy.searchNote(toNoteTitle);
     cy.clickButtonOnCardBody(toNoteTitle, "Select");
     cy.get('select').select(linkType);
+}
+
+When("I link note {string} as {string} note {string}", (fromNoteTitle, linkType, toNoteTitle) => {
+    makingLink(cy, fromNoteTitle, linkType, toNoteTitle);
     cy.findByRole('button', {name: "Create Link"}).click();
 })
+
+When("I link note {string} as {string} note {string} and move under it", (fromNoteTitle, linkType, toNoteTitle) => {
+    makingLink(cy, fromNoteTitle, linkType, toNoteTitle)
+    cy.getFormControl('Also Move To Under Target Note').check();
+    cy.findByRole('button', {name: "Create Link"}).click();
+});
 
 When("there is {string} link between note {string} and {string}", (linkType, fromNoteTitle, toNoteTitle) => {
     cy.createLink(linkType, fromNoteTitle, toNoteTitle);
