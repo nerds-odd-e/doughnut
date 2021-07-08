@@ -4,7 +4,7 @@
     <a role="button" class="btn btn-sm" title="Cards View" :href="`/notes/articles/${note.id}`">
         <SvgArticle/>
     </a>
-    <LinkNoteButton :noteTitle="note.title" :noteId="note.id" @updated="$emit('updated')"/>
+    <LinkNoteButton :note="note" @updated="$emit('updated')"/>
     <a class="btn btn-light dropdown-toggle"
             data-toggle="dropdown" aria-haspopup="true"
             aria-expanded="false" role="button" title="more options">

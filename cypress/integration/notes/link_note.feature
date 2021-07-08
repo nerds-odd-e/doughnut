@@ -40,3 +40,4 @@ Feature: link note
     Given I link note "Sedition" as "is similar to" note "Sedation" and move under it
     When I open "Sedation/Sedition" note from top level
     Then On the current page, I should see "Sedition" has link "is similar to" "Sedation"
+    And I should not see note "Sedition" at the top level of all my notes

@@ -2,6 +2,7 @@ package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteMotion;
+import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import lombok.Getter;
@@ -18,6 +19,7 @@ public class NoteMotionModel {
     }
 
     public void execute() throws CyclicLinkDetectedException {
+        Notebook notebook = entity.getSubject().getNotebook();
         entity.moveHeadNoteOnly();
         updateAncestors(entity.getSubject(), entity.getNewParent());
         modelFactoryService.noteRepository.save(entity.getSubject());
@@ -25,6 +27,9 @@ public class NoteMotionModel {
             updateAncestors(desc, desc.getParentNote());
             modelFactoryService.noteRepository.save(desc);
         });
+        if(notebook.getHeadNote() == entity.getSubject()) {
+            modelFactoryService.notebookRepository.delete(notebook);
+        }
     }
 
     private void updateAncestors(Note note, Note parent) {

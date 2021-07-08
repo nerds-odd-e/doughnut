@@ -80,6 +80,7 @@ Then('I should see these notes as children', data => {
 
 When('I delete top level note {string}', noteTitle => {
   cy.clickNotePageMoreOptionsButton(noteTitle, 'delete note');
+  cy.findByRole('button', {name: 'OK'}).click()
 });
 
 When('I create a sibling note of {string}:', (noteTitle, data) => {
@@ -104,6 +105,7 @@ Then(
   noteTitle => {
     cy.visitMyNotebooks();
     cy.findByText('Notebooks');
+    cy.pageIsLoaded();
     cy.findByText(noteTitle).should('not.exist');
   }
 );

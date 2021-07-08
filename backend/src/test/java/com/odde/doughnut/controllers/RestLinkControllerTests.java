@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.NoteMotion;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.entities.json.LinkViewedByUser;
@@ -16,6 +17,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
+
+import javax.validation.Valid;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -89,5 +92,36 @@ class RestLinkControllerTests {
             assertThrows(NoAccessRightException.class, () -> controller().statistics(link));
         }
     }
+    @Nested
+    class MoveNoteTest {
+        User anotherUser;
+        Note note1;
+        Note note2;
+        RestLinkController.LinkRequest linkRequest = new RestLinkController.LinkRequest();
+
+        @BeforeEach
+        void setup() {
+            anotherUser = makeMe.aUser().please();
+            note1 = makeMe.aNote().byUser(anotherUser).please();
+            note2 = makeMe.aNote().byUser(userModel).please();
+            linkRequest.typeId = 1;
+            linkRequest.moveUnder = true;
+        }
+
+        @Test
+        void shouldNotAllowMoveOtherPeoplesNote() {
+            assertThrows(NoAccessRightException.class, () ->
+                    controller().linkNoteFinalize(note1, note2, linkRequest)
+            );
+        }
+
+        @Test
+        void shouldNotAllowMoveToOtherPeoplesNote() {
+            assertThrows(NoAccessRightException.class, () ->
+                    controller().linkNoteFinalize(note2, note1, linkRequest)
+            );
+        }
+    }
+
 
 }

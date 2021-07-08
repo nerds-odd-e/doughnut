@@ -7,10 +7,10 @@
       </button>
     </template>
     <template #header>
-      <h3>Link <strong>{{noteTitle}}</strong> to</h3>
+      <h3>Link <strong>{{note.title}}</strong> to</h3>
     </template>
     <template #body>
-      <LinkNote v-bind="{noteId}" @done="done()"/>
+      <LinkNote v-bind="{note}" @done="done()"/>
     </template>
   </ModalWithButton>
 
@@ -23,7 +23,7 @@ import SvgLinkNote from "../svgs/SvgLinkNote.vue"
 
 export default {
   name: 'LinkNoteButton',
-  props: { noteTitle: String, noteId: Number },
+  props: { note: Object },
   emits: ['updated'],
   components: { ModalWithButton, LinkNote, SvgLinkNote },
   data() { return { show: false }},

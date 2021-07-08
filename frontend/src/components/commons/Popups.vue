@@ -1,5 +1,5 @@
 <template>
-  <Modal v-if="popupInfo && popupInfo.type==='confirm'" @close_request="resolve(false)">
+  <Modal v-if="popupInfo && popupInfo.type==='confirm'" class="popups" @close_request="resolve(false)">
     <template v-slot:header>
       <h2> Please confirm </h2>
     </template>
@@ -28,3 +28,9 @@ export default {
 }
 
 </script>
+
+<style lang="scss" scoped>
+.popups {
+  z-index: 9998;
+}
+</style>

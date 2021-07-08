@@ -2,7 +2,6 @@
     <NoteViewedByUserWithoutChildren v-bind="{note, links, ancestors, notebook, owns}" @updated="$emit('updated')"/>
     <nav class="nav d-flex justify-content-between p-0 mb-2">
       <div class="btn-group btn-group-sm">
-          <a  v-if="owns" :href="`/notes/${note.id}/move`">Move This Note</a>
       </div>
       <NoteNavigationButtons :navigation="navigation"/>
     </nav>

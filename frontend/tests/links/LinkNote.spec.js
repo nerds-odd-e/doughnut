@@ -7,7 +7,7 @@ config.global.mocks['$staticInfo'] = {linkTypeOptions:[]}
 describe('LinkNoteFinalize', () => {
 
   test('going back', async () => {
-    const wrapper = mount(LinkNoteFinalize, {propsData: {noteId: 345, targetNote: noteViewedByUser.note}});
+    const wrapper = mount(LinkNoteFinalize, {propsData: {note: noteViewedByUser.note, targetNote: noteViewedByUser.note}});
     await wrapper.find(".go-back-button").trigger("click")
     expect(wrapper.emitted().goBack).toHaveLength(1)
 

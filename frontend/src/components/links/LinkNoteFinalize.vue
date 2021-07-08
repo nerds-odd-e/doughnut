@@ -22,7 +22,7 @@ import { restPost } from "../../restful/restful"
 
 export default {
   name: 'LinkNoteFinalize',
-  props: { noteId: Number, targetNote: {type: Object, required: true} },
+  props: { note: Object, targetNote: {type: Object, required: true} },
   components: { LinkTypeSelect, SvgGoBack, CheckInput, RadioButtons },
   emits: [ 'success', 'goBack' ],
   data() {
@@ -32,8 +32,13 @@ export default {
     }
   },
   methods: {
-    createLink() {
-      restPost(`/api/links/create/${this.noteId}/${this.targetNote.id}`, this.formData,
+    async createLink() {
+      if(this.formData.moveUnder && this.note.parentId === null) {
+        if(!await this.$popups.confirm(`"${this.note.title}" is a top level notebook, do you want to move it under other notebook?`)) {
+          return;
+        }
+      }
+      restPost(`/api/links/create/${this.note.id}/${this.targetNote.id}`, this.formData,
         (r)=>{},
         (r)=>this.$emit('success'),
         (res) => this.formErrors = res,

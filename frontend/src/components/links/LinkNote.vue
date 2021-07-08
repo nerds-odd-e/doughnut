@@ -1,7 +1,7 @@
 <template>
 
-<SearchNote v-if="!targetNote" v-bind="{noteId}" @selected="targetNote=$event"/>
-<LinkNoteFinalize v-else v-bind="{targetNote, noteId}" @success="$emit('done')" @goBack="targetNote=null"/>
+<SearchNote v-if="!targetNote" v-bind="{noteId: note.id}" @selected="targetNote=$event"/>
+<LinkNoteFinalize v-else v-bind="{targetNote, note}" @success="$emit('done')" @goBack="targetNote=null"/>
 
 </template>
 
@@ -11,7 +11,7 @@ import SearchNote from "../search/SearchNote.vue"
 
 export default {
   name: 'LinkNote',
-  props: { noteId: String },
+  props: { note: Object },
   components: {LinkNoteFinalize, SearchNote},
   emits: [ 'done' ],
   data() {

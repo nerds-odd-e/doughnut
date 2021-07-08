@@ -61,15 +61,6 @@ public class NoteController extends ApplicationMvcController  {
         return new NoteMotion(note.getNextSibling().orElse(null), false);
     }
 
-    @PostMapping("/{note}/move")
-    @Transactional
-    public String moveNote(Note note, NoteMotion noteMotion) throws CyclicLinkDetectedException, NoAccessRightException {
-        getCurrentUser().getAuthorization().assertAuthorization(note);
-        getCurrentUser().getAuthorization().assertAuthorization(noteMotion.getRelativeToNote());
-        modelFactoryService.toNoteMotionModel(noteMotion, note).execute();
-        return "redirect:/notes/" + note.getId();
-    }
-
     @GetMapping("/{note}/review_setting")
     public String editReviewSetting(Note note, Model model) {
         ReviewSetting reviewSetting = note.getMasterReviewSetting();
