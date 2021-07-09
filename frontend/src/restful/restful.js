@@ -85,7 +85,7 @@ function objectToFormData(data){
     if (data[key] === null) {
       formData.append(key, '')
     }
-    else if(data[key] instanceof Object) {
+    else if(data[key] instanceof Object && !(data[key] instanceof File)) {
       Object.keys(data[key]).forEach(function (subKey) {
         formData.append(`${key}.${subKey}`, data[key][subKey] === null ? '' : data[key][subKey]);
       })
