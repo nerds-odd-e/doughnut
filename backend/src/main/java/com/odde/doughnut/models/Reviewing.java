@@ -2,13 +2,10 @@ package com.odde.doughnut.models;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonValue;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.ReviewSetting;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import net.minidev.json.annotate.JsonIgnore;
 
 import java.sql.Timestamp;
 import java.util.List;

@@ -40,50 +40,6 @@ public class NoteController extends ApplicationMvcController  {
         return "notes/article";
     }
 
-    @GetMapping("/{note}/move")
-    public String prepareToMove(Note note, Model model) {
-        model.addAttribute("noteMotion", getLeftNoteMotion(note));
-        model.addAttribute("noteMotionRight", getRightNoteMotion(note));
-        model.addAttribute("noteMotionUnder", new NoteMotion(null, true));
-        return "notes/move";
-    }
-
-    private NoteMotion getLeftNoteMotion(Note note) {
-        return note.getPreviousSibling()
-                .map(prev->
-                    prev.getPreviousSibling()
-                            .map(n-> new NoteMotion(n, false))
-                            .orElseGet(()->new NoteMotion(note.getParentNote(), true))
-                ).orElseGet(()->new NoteMotion(null, false));
-    }
-
-    private NoteMotion getRightNoteMotion(Note note) {
-        return new NoteMotion(note.getNextSibling().orElse(null), false);
-    }
-
-    @GetMapping("/{note}/review_setting")
-    public String editReviewSetting(Note note, Model model) {
-        ReviewSetting reviewSetting = note.getMasterReviewSetting();
-        if(reviewSetting == null) {
-            reviewSetting = new ReviewSetting();
-        }
-        model.addAttribute("reviewSetting", reviewSetting);
-        return "notes/edit_review_setting";
-    }
-
-    @PostMapping(value = "/{note}/review_setting")
-    @Transactional
-    public String updateReviewSetting(@PathVariable("note") Note note, @Valid ReviewSetting reviewSetting, BindingResult bindingResult) throws NoAccessRightException {
-        if (bindingResult.hasErrors()) {
-            return "notes/edit_review_setting";
-        }
-        getCurrentUser().getAuthorization().assertAuthorization(note);
-        note.mergeMasterReviewSetting(reviewSetting);
-        modelFactoryService.noteRepository.save(note);
-
-        return "redirect:/notes/" + note.getId();
-    }
-
     private UserModel getCurrentUser() {
         return currentUserFetcher.getUser();
     }

@@ -113,4 +113,22 @@ class RestNoteController {
     return new RedirectToNoteResponse(parentId);
   }
 
+  @GetMapping("/{note}/review-setting")
+  public ReviewSetting editReviewSetting(Note note) {
+    ReviewSetting reviewSetting = note.getMasterReviewSetting();
+    if(reviewSetting == null) {
+      reviewSetting = new ReviewSetting();
+    }
+    return reviewSetting;
+  }
+
+  @PostMapping(value = "/{note}/review-setting")
+  @Transactional
+  public RedirectToNoteResponse updateReviewSetting(@PathVariable("note") Note note, @Valid @RequestBody ReviewSetting reviewSetting) throws NoAccessRightException {
+    currentUserFetcher.getUser().getAuthorization().assertAuthorization(note);
+    note.mergeMasterReviewSetting(reviewSetting);
+    modelFactoryService.noteRepository.save(note);
+    return new RedirectToNoteResponse(note.getId());
+  }
+
 }

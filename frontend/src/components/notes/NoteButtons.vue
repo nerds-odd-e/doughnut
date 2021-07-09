@@ -11,10 +11,9 @@
         <SvgCog/>
     </a>
     <div class="dropdown-menu dropdown-menu-right">
-        <a  class="dropdown-item" :href="`/notes/${note.id}/review_setting`" title="edit review settings">
-            <SvgReviewSetting/>
+        <ReviewSettingEditButton :noteId="note.id" :oldTitle="note.title" @updated="$emit('updated')">
             Edit review settings
-        </a>
+        </ReviewSettingEditButton>
         <button class="dropdown-item" title="delete note" v-on:click="deleteNote()">
           <SvgRemove/>
           Delete
@@ -26,16 +25,16 @@
 <script>
   import SvgArticle from "../svgs/SvgArticle.vue"
   import SvgCog from "../svgs/SvgCog.vue"
-  import SvgReviewSetting from "../svgs/SvgReviewSetting.vue"
   import SvgRemove from "../svgs/SvgRemove.vue"
   import LinkNoteButton from "../links/LinkNoteButton.vue"
+  import ReviewSettingEditButton from "../review/ReviewSettingEditButton.vue"
   import NoteEditButton from "./NoteEditButton.vue"
   import { restPost } from '../../restful/restful'
   export default {
     name: 'NoteButtons',
     props: {note: Object},
     emits: ['updated'],
-    components: { SvgArticle, SvgCog, SvgReviewSetting, SvgReviewSetting, SvgRemove, LinkNoteButton, NoteEditButton },
+    components: { SvgArticle, SvgCog, ReviewSettingEditButton, SvgRemove, LinkNoteButton, NoteEditButton },
     methods: {
         async deleteNote() {
             if(await this.$popups.confirm(`Are you sure to delete this note?`)) {

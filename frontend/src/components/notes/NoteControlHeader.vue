@@ -22,16 +22,11 @@
 </template>
 
 <script>
-  import SvgEdit from "../svgs/SvgEdit.vue"
-  import SvgArticle from "../svgs/SvgArticle.vue"
-  import SvgLinkNote from "../svgs/SvgLinkNote.vue"
-  import SvgCog from "../svgs/SvgCog.vue"
   import SvgDownRight from "../svgs/SvgDownRight.vue"
-  import SvgReviewSetting from "../svgs/SvgReviewSetting.vue"
   import NoteOwnerBreadcrumb from "./NoteOwnerBreadcrumb.vue"
   import NoteNewButton from "./NoteNewButton.vue"
   export default {
     props: {note: Object, ancestors: Array, notebook: Object},
-    components: { SvgEdit, SvgArticle, SvgLinkNote, SvgCog, SvgDownRight, SvgReviewSetting, NoteOwnerBreadcrumb, NoteNewButton }
+    components: { SvgDownRight, NoteOwnerBreadcrumb, NoteNewButton }
   }
 </script>
