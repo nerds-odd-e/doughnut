@@ -174,9 +174,7 @@ Then('I should see the satisfied button: {string}', yesNo => {
 });
 
 Then("I am changing note {string}'s review setting", noteTitle => {
-  cy.get('@seededNoteIdMap').then(seededNoteIdMap =>
-    cy.visit(`/notes/${seededNoteIdMap[noteTitle]}/review_setting`)
-  );
+  cy.clickNotePageMoreOptionsButton(noteTitle, 'edit review setting')
 });
 
 Then('The randomizer always choose the last', yesNo => {

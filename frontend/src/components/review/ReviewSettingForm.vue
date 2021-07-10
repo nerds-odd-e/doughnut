@@ -1,8 +1,11 @@
 <template>
-    <CheckInput scopeName='review_setting' field='rememberSpelling' v-model="modelValue.rememberSpelling"/>
+    <CheckInput scopeName='review_setting' field='rememberSpelling' v-model="modelValue.rememberSpelling" :errors="errors.rememberSpelling"/>
 </template>
 
-<script setup>
+<script>
 import CheckInput from "../form/CheckInput.vue"
-  const props = defineProps({ modelValue: Object})
+export default {
+  props: { modelValue: Object, errors: Object},
+  components: { CheckInput }
+}
 </script>

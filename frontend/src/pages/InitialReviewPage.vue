@@ -8,12 +8,9 @@
     <template #fullContent>
       <LoadingPage v-bind="{loading, contentExists: !!reviewPointViewedByUser}">
         <ShowReviewPoint v-bind="reviewPointViewedByUser" @updated="fetchData()"/>
-
         <div>
             <div class="mb-2">
-                <input name="note" v-if="reviewPoint.note" :value="reviewPoint.note.id" type="hidden"/>
-                <input name="link" v-if="reviewPoint.link" :value="reviewPoint.link.id" type="hidden"/>
-                <ReviewSettingForm v-if="!!reviewPointViewedByUser.reviewSetting" v-model="reviewSetting"/>
+                <ReviewSettingForm v-if="!!reviewPointViewedByUser.reviewSetting" v-model="reviewSetting" :errors="{}"/>
             </div>
             <InitialReviewButtons @doInitialReview="processForm($event)"/>
         </div>

@@ -7,7 +7,7 @@ export default {
     return {
       staticInfo: null,
       loading: null,
-      popupInfo: null,
+      popupInfo: [],
       doneResolve: null,
     }},
 
@@ -29,15 +29,20 @@ export default {
 
     this.$popups.confirm = msg => {
       this.popupInfo = { type: "confirm", message: msg }
-      this.popupPromise = new Promise((resolve, reject) => { this.doneResolve = resolve})
-      return this.popupPromise
+      return new Promise((resolve, reject) => { this.doneResolve = resolve})
     }
+
+    this.$popups.dialog = (component, attrs) => {
+      this.popupInfo = { type: "dialog", component, attrs }
+      return new Promise((resolve, reject) => { this.doneResolve = resolve})
+    }
+
   }
 }
 
 </script>
 
 <template>
-  <Popups :popupInfo="popupInfo" :popUpPromise="popupPromise" @done="done($event)"/>
+  <Popups :popupInfo="popupInfo" @done="done($event)"/>
   <router-view />
 </template>

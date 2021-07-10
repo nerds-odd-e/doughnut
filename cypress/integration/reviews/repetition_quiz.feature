@@ -37,10 +37,10 @@ Feature: Repetition Quiz
 
   Scenario: Update review setting
     Given I am changing note "sedition"'s review setting
-    And I have selected the option "RememberSpelling" in review setting
+    And I have selected the option "Remember Spelling" in review setting
     When I am learning new note on day 1
     Then I should see the option "Remember Spelling" is "on"
     When I have unselected the option "Remember Spelling"
     And I am changing note "sedition"'s review setting
-    Then I should see the option "RememberSpelling" is "off"
+    Then I should see the option "Remember Spelling" is "off"
 

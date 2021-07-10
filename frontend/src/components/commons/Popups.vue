@@ -1,4 +1,5 @@
 <template>
+
   <Modal v-if="popupInfo && popupInfo.type==='confirm'" class="popups" @close_request="resolve(false)">
     <template v-slot:header>
       <h2> Please confirm </h2>
@@ -11,6 +12,13 @@
       <button class="btn btn-secondary" v-on:click="resolve(false)">Cancel</button>
     </template>
   </Modal>
+
+  <Modal v-if="popupInfo && popupInfo.type==='dialog'" class="popups" @close_request="resolve(null)">
+    <template v-slot:body>
+      <component :is="popupInfo.component" v-bind="popupInfo.attrs" @done="resolve($event)"/>
+    </template>
+  </Modal>
+
 </template>
 
 <script>
