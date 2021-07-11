@@ -72,7 +72,7 @@ export default {
         r=>this.loading=r,
 
         res => {
-          if(!res || !!res.reviewPoint.removedFromReview) { this.noLOngerExist() }
+          if(!res || !!res.reviewPoint.removedFromReview) { this.noLongerExist() }
           this.reviewPointViewedByUser = res
         },
 
