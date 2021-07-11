@@ -54,8 +54,8 @@ Then('I should have {string} for repeat now', numberOfRepeats => {
 });
 
 Then('choose to remove it from reviews', () => {
-  cy.get('#more-action-for-repeat').click();
-  cy.findByRole('button', { name: 'Remove This Note from Review' }).click();
+  cy.findByRole('button', { name: 'remove this note from review' }).click();
+  cy.findByRole('button', { name: 'OK' }).click();
 });
 
 Then('I initial review {string}', noteTitle => {

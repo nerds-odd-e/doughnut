@@ -1,17 +1,16 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
-import com.odde.doughnut.entities.AnswerResult;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.ReviewSetting;
-import com.odde.doughnut.models.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.models.ReviewPointModel;
+import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -58,10 +57,4 @@ public class ReviewController extends ApplicationMvcController  {
         return "redirect:/reviews/initial";
     }
 
-    @PostMapping(path="/{reviewPoint}", params="remove")
-    public String removeFromRepeating(@Valid ReviewPoint reviewPoint) {
-        reviewPoint.setRemovedFromReview(true);
-        modelFactoryService.reviewPointRepository.save(reviewPoint);
-        return "redirect:/reviews/repeat";
-    }
 }

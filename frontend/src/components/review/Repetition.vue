@@ -16,23 +16,9 @@
       <ShowReviewPoint v-bind="{ noteViewedByUser, linkViewedByUser}" @updated="$emit('updated')"/>
       <div class="btn-toolbar justify-content-between">
         <SelfEvaluateButtons v-bind="{sadOnly}" @selfEvaluate="$emit('selfEvaluate', $event)"/>
-        <div class="btn-group dropup">
-            <button type="button" id="more-action-for-repeat" class="btn btn-light dropdown-toggle"
-                    data-toggle="dropdown" aria-haspopup="true"
-                    aria-expanded="false">
-                <SvgCog/>
-            </button>
-            <div class="dropdown-menu dropdown-menu-right">
-                  <div class="dropdown-divider"></div>
-                  <form :action="`/reviews/${reviewPoint.id}`" method="post"
-                        onsubmit="return confirm('Are you sure to hide this note from reviewing in the future?')">
-                      <button type="submit" class="dropdown-item" name="remove">
-                          <SvgNoReview/>
-                          Remove This Note from Review
-                      </button>
-                  </form>
-            </div>
-          </div>
+        <button class="btn" title="remove this note from review" @click="removeFromReview()">
+            <SvgNoReview/>
+        </button>
       </div>
     </template>
   </Minimizable>
@@ -44,6 +30,7 @@
   import ShowReviewPoint from "./ShowReviewPoint.vue"
   import Minimizable from "../commons/Minimizable.vue"
   import SelfEvaluateButtons from "./SelfEvaluateButtons.vue"
+  import { restPost} from "../../restful/restful"
 
   export default {
     name: "Repetition",
@@ -56,6 +43,11 @@
     },
     emits: ['selfEvaluate', 'updated'],
     components: {SvgCog, SvgNoReview, ShowReviewPoint, Minimizable, SelfEvaluateButtons},
+    data() {
+      return {
+        loading: false
+      }
+    },
     computed: {
       sourceNoteViewedByUser() {
         if(!!this.noteViewedByUser) {
@@ -75,7 +67,20 @@
     methods: {
       backToRepeat(){
         this.$router.push({name: "repeat"})
+      },
+      async removeFromReview() {
+        if (!await this.$popups.confirm(`Are you sure to hide this from reviewing in the future?`)) {
+          return
+        }
+        restPost(
+          `/api/review-points/${this.reviewPoint.id}/remove`,
+          {},
+          r=>this.loading = r,
+          r=>this.$emit('updated')
+        )
+
       }
+
     }
   };
 </script>
