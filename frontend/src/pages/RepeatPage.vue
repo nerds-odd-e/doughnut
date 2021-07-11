@@ -61,16 +61,23 @@ export default {
       restGet(`/api/reviews/repeat`, (r)=>this.loading=r, this.loadNew)
     },
 
+    async noLongerExist() {
+      await this.$popups.alert("This review point doesn't exist any more or is being skipped now. Moving on to the next review point...")
+      return this.fetchData()
+    },
+
     refresh() {
       restGet(
         `/api/review-points/${this.reviewPointViewedByUser.reviewPoint.id}`,
         r=>this.loading=r,
-        async (res) => {
-          if(!res || !!res.reviewPoint.removedFromReview) {
-            await this.$popups.alert("This review point doesn't exist any more or is being skipped now. Moving on to the next review point...")
-            return this.fetchData()
-          }
+
+        res => {
+          if(!res || !!res.reviewPoint.removedFromReview) { this.noLOngerExist() }
           this.reviewPointViewedByUser = res
+        },
+
+        err => {
+          if (err.statusCode === 404) { this.noLongerExist() }
         }
       )
     },

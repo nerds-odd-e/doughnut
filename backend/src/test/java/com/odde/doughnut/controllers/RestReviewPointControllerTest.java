@@ -14,10 +14,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
@@ -47,8 +48,13 @@ class RestReviewPointControllerTest {
 
         @Test
         void show() throws NoAccessRightException {
-            ReviewPointViewedByUser result = controller.show(rp);
+            ReviewPointViewedByUser result = controller.show(rp.getId());
             assertThat(result, notNullValue());
+        }
+
+        @Test
+        void showNonExist() {
+            assertThrows(ResponseStatusException.class, ()->controller.show(rp.getId() + 1000));
         }
 
         @Test

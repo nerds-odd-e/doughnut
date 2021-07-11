@@ -47,6 +47,10 @@ const restRequest = (url, params, loadingRef, callback, errorCallback) => {
         reloadSession()
         return;
       }
+      if (error.status === 404) {
+        errorCallback({statusCode: 404})
+        return;
+      }
       window.alert(error)
     })
     .finally(() => {
@@ -58,8 +62,10 @@ const restRequest = (url, params, loadingRef, callback, errorCallback) => {
     });
 };
 
-const restGet = (url, loadingRef, callback) => {
-  restRequest(url, {}, loadingRef, callback, () => {});
+const restGet = (url, loadingRef, callback, errorCallback) => {
+  var ec = errorCallback
+  if (ec === undefined) ec = () => {}
+  restRequest(url, {}, loadingRef, callback, ec);
 };
 
 const restPost = (url, data, loadingRef, callback) => {

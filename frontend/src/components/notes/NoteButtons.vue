@@ -45,6 +45,7 @@
                   else {
                       this.$router.push({name: 'notebooks'})
                   }
+                  this.$emit('updated')
                 })
             }
         }
