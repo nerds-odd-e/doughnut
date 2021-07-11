@@ -62,12 +62,17 @@ export default {
     },
 
     refresh() {
-      if (!!this.reviewPointViewedByUser.noteViewedByUser) {
-        restGet(`/api/notes/${this.reviewPointViewedByUser.noteViewedByUser.note.id}`, r=>this.loading=r, (res) => this.reviewPointViewedByUser.noteViewedByUser = res)
-      }
-      if (!!this.reviewPointViewedByUser.linkViewedByUser) {
-        restGet(`/api/notes/${this.reviewPointViewedByUser.linkViewedByUser.link.id}`, r=>this.loading=r, (res) => this.reviewPointViewedByUser.linkViewedByUser = res)
-      }
+      restGet(
+        `/api/review-points/${this.reviewPointViewedByUser.reviewPoint.id}`,
+        r=>this.loading=r,
+        async (res) => {
+          if(!res || !!res.reviewPoint.removedFromReview) {
+            await this.$popups.alert("This review point doesn't exist any more or is being skipped now. Moving on to the next review point...")
+            return this.fetchData()
+          }
+          this.reviewPointViewedByUser = res
+        }
+      )
     },
 
     processAnswer(answerData) {

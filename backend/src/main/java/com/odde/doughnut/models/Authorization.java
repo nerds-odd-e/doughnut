@@ -106,4 +106,8 @@ public class Authorization {
                     HttpStatus.UNAUTHORIZED, "Foo Not Found");
         }
     }
+
+    public void assertAuthorization(ReviewPoint reviewPoint) {
+
+    }
 }

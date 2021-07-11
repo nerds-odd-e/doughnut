@@ -27,6 +27,11 @@ export default {
       Object.assign(this.$staticInfo, res)
     })
 
+    this.$popups.alert = msg => {
+      this.popupInfo = { type: "alert", message: msg }
+      return new Promise((resolve, reject) => { this.doneResolve = resolve})
+    }
+
     this.$popups.confirm = msg => {
       this.popupInfo = { type: "confirm", message: msg }
       return new Promise((resolve, reject) => { this.doneResolve = resolve})

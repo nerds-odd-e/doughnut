@@ -1,5 +1,17 @@
 <template>
 
+  <Modal v-if="popupInfo && popupInfo.type==='alert'" class="popups" @close_request="resolve(true)">
+    <template v-slot:header>
+      <h2> Information </h2>
+    </template>
+    <template v-slot:body>
+      <div>
+      <span>{{popupInfo.message}}</span>
+      </div>
+      <button class="btn btn-success" v-on:click="resolve(true)">OK</button>
+    </template>
+  </Modal>
+
   <Modal v-if="popupInfo && popupInfo.type==='confirm'" class="popups" @close_request="resolve(false)">
     <template v-slot:header>
       <h2> Please confirm </h2>
