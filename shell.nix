@@ -15,7 +15,7 @@ in mkShell {
   MYSQL_DATADIR = builtins.getEnv "MYSQL_DATADIR";
   buildInputs = [
     autoconf automake cmake coreutils-full gcc10 gnumake libgccjit
-    gradle nodejs python3 yarn zulu
+    gradle nodejs python3 yarn jdk16
     any-nix-shell zsh zsh-powerlevel10k
     git git-secret gitAndTools.delta locale lsd platinum-searcher
     binutils-unwrapped hostname inetutils openssh pkg-config rsync
@@ -39,7 +39,7 @@ in mkShell {
   ];
   shellHook = ''
     export NIXPKGS_ALLOW_UNFREE=1
-    export JAVA_HOME="${pkgs.zulu}"
+    export JAVA_HOME="${pkgs.jdk16}"
     export GRADLE_HOME="${pkgs.gradle}"
 
     export MYSQL_BASEDIR=${pkgs.mysql80}
