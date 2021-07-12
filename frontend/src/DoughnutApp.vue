@@ -22,10 +22,11 @@ export default {
   },
   
   mounted() {
-    restGet(`/api/static-info`, (v)=>this.loading = v, (res) => {
+    restGet(`/api/static-info`, (v)=>this.loading = v)
+      .then((res) => {
       this.staticInfo = res
       Object.assign(this.$staticInfo, res)
-    })
+      })
 
     this.$popups.alert = msg => {
       this.popupInfo = { type: "alert", message: msg }

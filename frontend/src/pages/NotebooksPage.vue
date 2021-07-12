@@ -27,11 +27,8 @@ export default {
   },
   methods: {
     fetchData() {
-      restGet(
-        `/api/notebooks`,
-        r=>this.loading=r,
-        (res) => this.notebooksViewedByUser = res
-      )
+      restGet(`/api/notebooks`, r=>this.loading=r)
+        .then( res => this.notebooksViewedByUser = res)
     }
   },
   mounted() {

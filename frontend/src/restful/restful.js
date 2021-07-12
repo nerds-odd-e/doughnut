@@ -26,7 +26,13 @@ function toNested(data) {
   return result
 }
 
-const restRequest1 = (url, params) => {
+const restRequest1 = (url, params, loadingRef) => {
+  if (loadingRef instanceof Function) {
+    loadingRef(true);
+  } else {
+    loadingRef.value = true;
+  }
+
   return new Promise((resolve, reject)=>{
     fetch(url, params)
       .then((res) => {
@@ -50,31 +56,25 @@ const restRequest1 = (url, params) => {
         window.alert(error)
       })
   })
+  .finally(() => {
+    if (loadingRef instanceof Function) {
+      loadingRef(false)
+    } else {
+      loadingRef.value = false;
+    }
+  });
+
 
 };
 
 const restRequest = (url, params, loadingRef, callback, errorCallback) => {
-  if (loadingRef instanceof Function) {
-    loadingRef(true);
-  } else {
-    loadingRef.value = true;
-  }
-  restRequest1(url, params)
+  restRequest1(url, params, loadingRef)
     .then(res=>callback(res))
     .catch(err=>errorCallback(err))
-    .finally(() => {
-      if (loadingRef instanceof Function) {
-        loadingRef(false)
-      } else {
-        loadingRef.value = false;
-      }
-    });
 };
 
-const restGet = (url, loadingRef, callback, errorCallback) => {
-  var ec = errorCallback
-  if (ec === undefined) ec = () => {}
-  restRequest(url, {}, loadingRef, callback, ec);
+const restGet = (url, loadingRef) => {
+  return restRequest1(url, {}, loadingRef);
 };
 
 const restPost = (url, data, loadingRef, callback) => {

@@ -25,7 +25,8 @@ export default {
   components: { NoteViewedByUser, NoteStatisticsButton, LoadingPage },
   methods: {
     fetchData() {
-      restGet(`/api/notes/${this.noteId}`, (r)=>this.loading=r, (res) => this.noteViewedByUser = res)
+      restGet(`/api/notes/${this.noteId}`, (r)=>this.loading=r)
+        .then(res => this.noteViewedByUser = res)
     }
   },
   watch: {

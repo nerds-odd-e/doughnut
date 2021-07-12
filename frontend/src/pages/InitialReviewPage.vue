@@ -63,7 +63,7 @@ export default {
     },
 
     fetchData() {
-      restGet(`/api/reviews/initial`, r=>this.loading=r, this.loadNew)
+      restGet(`/api/reviews/initial`, r=>this.loading=r).then(this.loadNew)
     },
   },
   mounted(){

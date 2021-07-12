@@ -40,7 +40,7 @@ export default {
   computed: { formData(){ return !this.linkViewedByUser ? null : {typeId: this.linkViewedByUser.linkTypeId} }},
   methods: {
     fetchData() {
-      restGet(`/api/links/${this.linkid}`, r=>this.loading=r, (res) => this.linkViewedByUser = res)
+      restGet(`/api/links/${this.linkid}`, r=>this.loading=r).then(res => this.linkViewedByUser = res)
     },
 
     updateLink() {

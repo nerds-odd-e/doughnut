@@ -4,19 +4,28 @@
   </LoadingPage>
 </template>
 
-<script setup>
+<script>
 import ReviewWelcome from '../components/review/ReviewWelcome.vue'
 import LoadingPage from "./commons/LoadingPage.vue"
 import {restGet} from "../restful/restful"
-import { ref, inject } from 'vue'
 
-const reviewing = ref(null)
-const loading = ref(false)
-
-const fetchData = async () => {
-  restGet(`/api/reviews/overview`, loading, (res)=>reviewing.value = res)
+export default {
+  data() {
+    return {
+      reviewing: null,
+      loading: null
+    }
+  },
+  components: { ReviewWelcome, LoadingPage },
+  methods: {
+    fetchData() {
+      restGet(`/api/reviews/overview`, r=>this.loading=r)
+        .then(res=>this.reviewing = res)
+    }
+  },
+  mounted() {
+    this.fetchData()
+  }
 }
-
-fetchData()
 
 </script>

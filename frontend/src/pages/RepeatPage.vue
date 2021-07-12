@@ -58,7 +58,7 @@ export default {
     },
 
     fetchData() {
-      restGet(`/api/reviews/repeat`, (r)=>this.loading=r, this.loadNew)
+      restGet(`/api/reviews/repeat`, (r)=>this.loading=r).then(this.loadNew)
     },
 
     async noLongerExist() {
@@ -67,19 +67,14 @@ export default {
     },
 
     refresh() {
-      restGet(
-        `/api/review-points/${this.reviewPointViewedByUser.reviewPoint.id}`,
-        r=>this.loading=r,
-
-        res => {
+      restGet(`/api/review-points/${this.reviewPointViewedByUser.reviewPoint.id}`, r=>this.loading=r)
+        .then(res => {
           if(!res || !!res.reviewPoint.removedFromReview) { this.noLongerExist() }
           this.reviewPointViewedByUser = res
-        },
-
-        err => {
+        })
+        .catch(err => {
           if (err.statusCode === 404) { this.noLongerExist() }
-        }
-      )
+        })
     },
 
     processAnswer(answerData) {

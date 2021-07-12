@@ -49,9 +49,8 @@ export default {
   },
   methods: {
     fetchData() {
-      restGet(`/api/notes/${this.noteId}`,
-        (r)=>this.loading=r,
-        (res) => {
+      restGet(`/api/notes/${this.noteId}`, (r)=>this.loading=r)
+        .then( res => {
           const { updatedAt, ...rest} = res.note.noteContent
           this.formData = rest
         })
