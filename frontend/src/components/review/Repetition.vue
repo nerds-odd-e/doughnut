@@ -75,8 +75,8 @@
         restPost(
           `/api/review-points/${this.reviewPoint.id}/remove`,
           {},
-          r=>this.loading = r,
-          r=>this.$emit('updated')
+          r=>this.loading = r)
+          .then(r=>this.$emit('updated')
         )
 
       }

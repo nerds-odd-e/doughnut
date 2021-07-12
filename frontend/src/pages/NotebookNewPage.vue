@@ -35,10 +35,9 @@ export default {
       restPostMultiplePartForm(
         `/api/notebooks/create`,
         this.noteFormData,
-        r=>this.loading=r,
-        (res) => this.$router.push({name: "noteShow", params: { noteId: res.noteId}}),
-        (res) => this.noteFormErrors = res,
-        )
+        r=>this.loading=r)
+        .then(res => this.$router.push({name: "noteShow", params: { noteId: res.noteId}}))
+        .catch(res => this.noteFormErrors = res)
     }
   }
 }

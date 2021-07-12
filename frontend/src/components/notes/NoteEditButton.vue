@@ -56,17 +56,13 @@ export default {
         })
     },
     processForm() {
-      restPostMultiplePartForm(
-        `/api/notes/${this.noteId}`,
-        this.formData,
-        r=>this.loading=r,
-        (res) => {
+      restPostMultiplePartForm( `/api/notes/${this.noteId}`, this.formData, r=>this.loading=r)
+        .then(res => {
           this.$emit('updated')
           this.show = false;
           this.$router.push({name: "noteShow", params: { noteId: res.noteId}})
-        },
-        (res) => this.formErrors = res
-      )
+        })
+        .catch(res => this.formErrors = res)
     }
 
   },

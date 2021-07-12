@@ -38,15 +38,16 @@
     methods: {
         async deleteNote() {
             if(await this.$popups.confirm(`Are you sure to delete this note?`)) {
-                restPost(`/api/notes/${this.note.id}/delete`, {}, r=>{}, r=>{
-                  if (!!r.noteId) {
-                      this.$router.push({name: 'noteShow', params: {noteId: r.noteId}})
-                  }
-                  else {
-                      this.$router.push({name: 'notebooks'})
-                  }
-                  this.$emit('updated')
-                })
+                restPost(`/api/notes/${this.note.id}/delete`, {}, r=>{})
+                  .then( r=>{
+                    if (!!r.noteId) {
+                        this.$router.push({name: 'noteShow', params: {noteId: r.noteId}})
+                    }
+                    else {
+                        this.$router.push({name: 'notebooks'})
+                    }
+                    this.$emit('updated')
+                  })
             }
         }
     }

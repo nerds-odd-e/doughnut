@@ -38,11 +38,9 @@ export default {
           return;
         }
       }
-      restPost(`/api/links/create/${this.note.id}/${this.targetNote.id}`, this.formData,
-        (r)=>{},
-        (r)=>this.$emit('success'),
-        (res) => this.formErrors = res,
-      )
+      restPost(`/api/links/create/${this.note.id}/${this.targetNote.id}`, this.formData, (r)=>{})
+        .then(r=>this.$emit('success'))
+        .catch(res => this.formErrors = res)
     }
   }
 

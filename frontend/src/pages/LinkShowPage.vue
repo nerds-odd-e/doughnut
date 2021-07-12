@@ -47,17 +47,15 @@ export default {
       restPost(
         `/api/links/${this.linkid}`,
         this.formData,
-        r=>this.loading=r,
-        (res) => this.$router.push({name: "noteShow", params: { noteId: res.noteId}}),
-        (res) => this.formErrors = res,
-      )
+        r=>this.loading=r)
+        .then(res => this.$router.push({name: "noteShow", params: { noteId: res.noteId}}))
+        .catch(res => this.formErrors = res)
     },
 
     async deleteLink() {
       if(!await this.$popups.confirm('Are you sure to delete this link?')) return;
-      restPost(
-        `/api/links/${this.linkid}/delete`, null, r=>this.loading=r,
-        (res) => this.$router.push({name: "noteShow", replace: true, params: { noteId: res.noteId}}))
+      restPost(`/api/links/${this.linkid}/delete`, null, r=>this.loading=r)
+        .then(res => this.$router.push({name: "noteShow", replace: true, params: { noteId: res.noteId}}))
     }
   },
   watch: {

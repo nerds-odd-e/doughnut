@@ -81,16 +81,16 @@ export default {
       restPost(
         `/api/reviews/${this.reviewPointViewedByUser.reviewPoint.id}/answer`,
         answerData,
-        r=>this.loading = r,
-        res=>{ this.answerResult = res; this.resetRoute() })
+        r=>this.loading = r)
+        .then(res=>{ this.answerResult = res; this.resetRoute() })
     },
 
     selfEvaluate(data) {
       restPost(
         `/api/reviews/${this.reviewPointViewedByUser.reviewPoint.id}/self-evaluate`,
         data,
-        r=>this.loading=r,
-        this.loadNew)
+        r=>this.loading=r)
+        .then(this.loadNew)
     }
   },
   mounted() {

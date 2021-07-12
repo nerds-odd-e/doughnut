@@ -58,8 +58,8 @@ export default {
       restPost(
           `/api/reviews`,
           {reviewPoint: this.reviewPoint, reviewSetting: this.reviewSetting},
-          r=>this.loading=r,
-          this.loadNew)
+          r=>this.loading=r)
+        .then(this.loadNew)
     },
 
     fetchData() {

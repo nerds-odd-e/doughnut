@@ -56,13 +56,12 @@ export default {
       restPostMultiplePartForm(
         `/api/notes/${this.ancestors[this.ancestors.length - 1].id}/create`,
         this.creationData,
-        r=>this.loading=r,
-        (res) => {
-          this.show = false;
-          this.$router.push({name: "noteShow", params: { noteId: res.noteId}})
-        },
-        (res) => this.formErrors = res
-      )
+        r=>this.loading=r)
+          .then(res => {
+            this.show = false;
+            this.$router.push({name: "noteShow", params: { noteId: res.noteId}})
+          })
+          .catch(res => this.formErrors = res)
     }
   },
 }

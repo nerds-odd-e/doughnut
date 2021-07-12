@@ -50,7 +50,8 @@ export default {
   },
   methods: {
     search() {
-      restPost(`/api/notes/${this.noteId}/search`, {...this.searchTerm, searchKey: this.searchTerm.searchKey.trim()}, (r)=>{}, (r)=>this.searchResult=r)
+      restPost(`/api/notes/${this.noteId}/search`, {...this.searchTerm, searchKey: this.searchTerm.searchKey.trim()}, (r)=>{})
+        .then(r=>this.searchResult=r)
     },
   }
 }

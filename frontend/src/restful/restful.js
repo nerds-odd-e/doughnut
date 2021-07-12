@@ -26,7 +26,7 @@ function toNested(data) {
   return result
 }
 
-const restRequest1 = (url, params, loadingRef) => {
+const restRequest = (url, params, loadingRef) => {
   if (loadingRef instanceof Function) {
     loadingRef(true);
   } else {
@@ -67,18 +67,12 @@ const restRequest1 = (url, params, loadingRef) => {
 
 };
 
-const restRequest = (url, params, loadingRef, callback, errorCallback) => {
-  restRequest1(url, params, loadingRef)
-    .then(res=>callback(res))
-    .catch(err=>errorCallback(err))
-};
-
 const restGet = (url, loadingRef) => {
-  return restRequest1(url, {}, loadingRef);
+  return restRequest(url, {}, loadingRef);
 };
 
-const restPost = (url, data, loadingRef, callback) => {
-  restRequest(
+const restPost = (url, data, loadingRef) => {
+  return restRequest(
     url,
     {
       method: 'POST',
@@ -89,9 +83,7 @@ const restPost = (url, data, loadingRef, callback) => {
       body: JSON.stringify(data),
     },
     loadingRef,
-    callback,
-    () => {}
-  );
+  )
 };
 
 function objectToFormData(data){
@@ -113,14 +105,8 @@ function objectToFormData(data){
 }
 
 
-const restPostMultiplePartForm = (
-  url,
-  data,
-  loadingRef,
-  callback,
-  errorCallback
-) => {
-  restRequest(
+const restPostMultiplePartForm = (url, data, loadingRef) => {
+  return restRequest(
     url,
     {
       method: 'POST',
@@ -129,9 +115,7 @@ const restPostMultiplePartForm = (
       },
       body: objectToFormData(data),
     },
-    loadingRef,
-    callback,
-    errorCallback
+    loadingRef
   );
 };
 

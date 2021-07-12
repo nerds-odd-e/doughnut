@@ -32,13 +32,12 @@ export default {
       restPost(
         `/api/notes/${this.noteId}/review-setting`,
         this.formData,
-        r=>this.loading=r,
-        (res) => {
+        r=>this.loading=r)
+        .then(res => {
           this.$emit('done')
           this.show = false
-        },
-        (res) => this.formErrors = res
-      )
+        })
+        .catch(res => this.formErrors = res)
     }
 
   },
