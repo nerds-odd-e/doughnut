@@ -26,33 +26,42 @@ function toNested(data) {
   return result
 }
 
+const restRequest1 = (url, params) => {
+  return new Promise((resolve, reject)=>{
+    fetch(url, params)
+      .then((res) => {
+        if (res.status !== 200 && res.status != 400) {
+          throw new HttpResponseError(res.status);
+        }
+        return res.json().then((resp) => {
+          if (res.status === 200) resolve(resp);
+          if (res.status === 400) reject(toNested(resp.errors));
+        });
+      })
+      .catch((error) => {
+        if (error.status === 401) {
+          reloadSession()
+          return;
+        }
+        if (error.status === 404) {
+          reject({statusCode: 404})
+          return;
+        }
+        window.alert(error)
+      })
+  })
+
+};
+
 const restRequest = (url, params, loadingRef, callback, errorCallback) => {
   if (loadingRef instanceof Function) {
     loadingRef(true);
   } else {
     loadingRef.value = true;
   }
-  fetch(url, params)
-    .then((res) => {
-      if (res.status !== 200 && res.status != 400) {
-        throw new HttpResponseError(res.status);
-      }
-      return res.json().then((resp) => {
-        if (res.status === 200) callback(resp);
-        if (res.status === 400) errorCallback(toNested(resp.errors));
-      });
-    })
-    .catch((error) => {
-      if (error.status === 401) {
-        reloadSession()
-        return;
-      }
-      if (error.status === 404) {
-        errorCallback({statusCode: 404})
-        return;
-      }
-      window.alert(error)
-    })
+  restRequest1(url, params)
+    .then(res=>callback(res))
+    .catch(err=>errorCallback(err))
     .finally(() => {
       if (loadingRef instanceof Function) {
         loadingRef(false)
