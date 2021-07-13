@@ -40,6 +40,10 @@ public class ClozeDescriptionTest {
     }
 
     @Test
+    void clozeDescriptionWithMultipleLink() {
+        assertThat(clozeDescription.getClozeDescription(new NoteTitle("title"), "a /b\nc/ d"), equalTo("a /b\nc/ d"));
+    }
+    @Test
     void theReplacementsShouldNotInterfereEachOther() {
         ClozeDescription clozeDescription = new ClozeDescription(
                 "/..~/",
