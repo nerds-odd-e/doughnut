@@ -11,14 +11,14 @@ import NestedPage from "@/pages/commons/NestedPage"
 const NestedInitialReviewPage = NestedPage(
   InitialReviewPage,
   `initial`,
-  ['reviews'],
+  [],
   `This will leave the initial review, are you sure?`,
   )
 
 const NestedRepeatPage = NestedPage(
   RepeatPage,
   `repeat`,
-  ['reviews'],
+  ['repeat-quiz'],
   `This will leave the current review, are you sure?`,
   )
 
