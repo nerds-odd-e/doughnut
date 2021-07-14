@@ -1,7 +1,16 @@
 <template>
+<div class="review-info-bar">
+
   <StopRepeatButton />
   <PauseRepeatButton v-bind="{noteId, linkId, allowPause}"/>
-  <span v-if="toRepeatCount !== null">{{finished}}/{{finished + toRepeatCount}} </span>
+  <span class="progress-bar" v-if="toRepeatCount !== null">
+    <span class="progress" :style="`width: ${finished * 100 / (finished + toRepeatCount)}%`">
+    </span>
+    <span class="progress-text">
+    {{finished}}/{{finished + toRepeatCount}}
+    </span>
+  </span>
+</div>
 </template>
 <script>
 import StopRepeatButton from "./StopRepeatButton.vue"
@@ -14,3 +23,31 @@ export default {
   },
 }
 </script>
+
+<style lang="scss" scoped>
+.review-info-bar {
+  display: flex;
+}
+
+.progress-bar {
+  flex-grow: 1;
+  background-color: gray;
+  height: 25px;
+  border-radius: 10px;
+  position: relative;
+}
+
+.progress {
+  background-color: blue;
+  height: 100%;
+}
+
+.progress-text {
+  position:absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: white;
+}
+
+</style>
