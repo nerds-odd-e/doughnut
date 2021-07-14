@@ -66,6 +66,7 @@ const noteViewedByUser = {
 }
 
 const linkViewedByUser = {
+    id: 8,
     linkTypeLabel: "a link",
     sourceNoteViewedByUser: noteViewedByUser,
     targetNoteViewedByUser: noteViewedByUser

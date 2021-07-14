@@ -6,6 +6,7 @@
       </div>
     </template>
     <template #fullContent>
+      <PauseRepeatButton :linkId="!!linkViewedByUser ? linkViewedByUser.id : null" :noteId="!!noteViewedByUser ? noteViewedByUser.note.id : null"/>
       <div v-if="answerResult">
           <div class="alert alert-success" v-if="answerResult.correct">Correct!</div>
           <div class="alert alert-danger" v-else>
@@ -30,6 +31,7 @@
   import ShowReviewPoint from "./ShowReviewPoint.vue"
   import Minimizable from "../commons/Minimizable.vue"
   import SelfEvaluateButtons from "./SelfEvaluateButtons.vue"
+  import PauseRepeatButton from "./PauseRepeatButton.vue"
   import { restPost} from "../../restful/restful"
 
   export default {
@@ -42,7 +44,7 @@
       compact: Boolean
     },
     emits: ['selfEvaluate', 'updated'],
-    components: {SvgCog, SvgNoReview, ShowReviewPoint, Minimizable, SelfEvaluateButtons},
+    components: {SvgCog, SvgNoReview, ShowReviewPoint, Minimizable, SelfEvaluateButtons, PauseRepeatButton },
     data() {
       return {
         loading: false

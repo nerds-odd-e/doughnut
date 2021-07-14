@@ -28,7 +28,7 @@ public class ClozeDescriptionTest {
             "cat the dog,     cat dog,                             [...]",
             "cat,             /kat/,                               /.../",
             "cat,             (/kat/),                             (/.../)",
-            "cat,             http:/xxx/ooo,                       http:/xxx/ooo",
+            "cat,             http://xxx/ooo,                      http://xxx/ooo",
             "cat,             moody / narcissism / apathetic,      moody / narcissism / apathetic",
             "t,               the t twins,                         the [...] twins",
             "t,               (t),                                 ([...])",

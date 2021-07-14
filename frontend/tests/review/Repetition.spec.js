@@ -10,9 +10,7 @@ describe('repetition page', () => {
     fetch.mockResponseOnce(JSON.stringify({}));
   });
 
-  test('for note', async () => {
-    const testingRouter = await createTestRouter("/");
-
+  describe('repetition page for a note', () => {
     const reviewPointForView = {
       reviewPoint: {
         id: 3,
@@ -20,8 +18,17 @@ describe('repetition page', () => {
       noteViewedByUser: noteViewedByUser,
     }
 
-    const wrapper = mount(Repetition, {propsData: reviewPointForView, global: { plugins: [testingRouter] }});
-    expect(wrapper.findAll(".btn-toolbar")).toHaveLength(1)
+    test('for note', async () => {
+      const testingRouter = await createTestRouter("/");
+      const wrapper = mount(Repetition, {propsData: reviewPointForView, global: { plugins: [testingRouter] }});
+      expect(wrapper.findAll(".btn-toolbar")).toHaveLength(1)
+    });
+
+    test('click pause with show the note', async () => {
+      const { wrapper } = mountWithMockRoute(Repetition, {propsData: reviewPointForView}, {name: 'repeat'});
+      expect(JSON.parse(wrapper.find(".pause-repeat").attributes().to)).toEqual({name: 'noteShow', params: {noteId: 2}})
+    });
+
   });
 
   describe('repetition page for a link', () => {
@@ -38,9 +45,13 @@ describe('repetition page', () => {
       expect(wrapper.findAll(".btn-toolbar")).toHaveLength(1)
     });
 
+    test('click pause will go to nested page of showing the link', async () => {
+      const { wrapper } = mountWithMockRoute(Repetition, {propsData: reviewPointForView}, {name: 'repeat-noteShow', params: {noteId: 123}});
+      expect(JSON.parse(wrapper.find(".pause-repeat").attributes().to)).toEqual({name: 'linkShow', params: {linkid: 8}})
+    });
+
     test('click on note when doing review', async () => {
       const { wrapper } = mountWithMockRoute(Repetition, {propsData: reviewPointForView}, {name: 'repeat'});
-
       expect(JSON.parse(wrapper.find(".link-source .router-link").attributes().to).name).toEqual("notebooks")
     });
 
