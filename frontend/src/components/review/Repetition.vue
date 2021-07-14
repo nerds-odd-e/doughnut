@@ -6,7 +6,6 @@
       </div>
     </template>
     <template #fullContent>
-      <ProgressBar :linkId="!!linkViewedByUser ? linkViewedByUser.id : null" :noteId="!!noteViewedByUser ? noteViewedByUser.note.id : null"/>
       <div v-if="answerResult">
           <div class="alert alert-success" v-if="answerResult.correct">Correct!</div>
           <div class="alert alert-danger" v-else>
@@ -31,7 +30,6 @@
   import ShowReviewPoint from "./ShowReviewPoint.vue"
   import Minimizable from "../commons/Minimizable.vue"
   import SelfEvaluateButtons from "./SelfEvaluateButtons.vue"
-  import ProgressBar from "./ProgressBar.vue"
   import { restPost} from "../../restful/restful"
 
   export default {
@@ -44,7 +42,7 @@
       compact: Boolean
     },
     emits: ['selfEvaluate', 'updated'],
-    components: {SvgCog, SvgNoReview, ShowReviewPoint, Minimizable, SelfEvaluateButtons, ProgressBar },
+    components: {SvgCog, SvgNoReview, ShowReviewPoint, Minimizable, SelfEvaluateButtons },
     data() {
       return {
         loading: false

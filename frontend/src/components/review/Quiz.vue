@@ -1,5 +1,4 @@
 <template>
-    <ProgressBar :allowPause="false"/>
     <NoteBreadcrumbForReview :ancestors="sourceNote.ancestors"/>
     <div v-if="quizQuestion.pictureQuestion">
         <ShowPicture :note="sourceNote.note" :opacity="1"/>
@@ -37,13 +36,12 @@
   import NoteBreadcrumbForReview from "./NoteBreadcrumbForReview.vue"
   import ShowPicture from "../notes/ShowPicture.vue"
   import TextInput from "../form/TextInput.vue"
-  import ProgressBar from "./ProgressBar.vue"
 
 export default {
   name: "Quiz",
   props: {reviewPointViewedByUser: Object, quizQuestion: Object, emptyAnswer: Object},
   emits:['answer'],
-  components: {NoteBreadcrumbForReview, ShowPicture, TextInput, ProgressBar },
+  components: {NoteBreadcrumbForReview, ShowPicture, TextInput },
   computed: {
     sourceNote(){
         if (!!this.reviewPointViewedByUser.noteViewedByUser) return this.reviewPointViewedByUser.noteViewedByUser

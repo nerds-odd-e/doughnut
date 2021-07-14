@@ -1,18 +1,19 @@
 <template>
   <LoadingPage v-bind="{loading, contentExists: !!repetition}">
     <template v-if="!!repetition">
-          <Quiz v-if="!!repetition.quizQuestion && !answerResult" v-bind="repetition" @answer="processAnswer($event)"/>
-          <template v-else>
-            <template v-if="reviewPointViewedByUser">
-              <Repetition
-                v-bind="{...reviewPointViewedByUser, answerResult, compact: nested}"
-                @selfEvaluate="selfEvaluate($event)"
-                @updated="refresh()"
-                />
-              <NoteStatisticsButton v-if="reviewPointViewedByUser.noteViewedByUser" :noteId="reviewPointViewedByUser.noteViewedByUser.note.id"/>
-              <NoteStatisticsButton v-else :link="reviewPointViewedByUser.linkViewedByUser.id"/>
-            </template>
-          </template>
+      <ProgressBar :allowPause="!quizMode" v-bind="{linkId, noteId, finished, toRepeatCount: repetition.toRepeatCount}"/>
+      <Quiz v-if="quizMode" v-bind="repetition" @answer="processAnswer($event)"/>
+      <template v-else>
+        <template v-if="reviewPointViewedByUser">
+          <Repetition
+            v-bind="{...reviewPointViewedByUser, answerResult, compact: nested}"
+            @selfEvaluate="selfEvaluate($event)"
+            @updated="refresh()"
+            />
+          <NoteStatisticsButton v-if="noteId" :noteId="noteId"/>
+          <NoteStatisticsButton v-else :link="linkId"/>
+        </template>
+      </template>
     </template>
   </LoadingPage>
 </template>
@@ -22,21 +23,26 @@ import Quiz from '../components/review/Quiz.vue'
 import Repetition from '../components/review/Repetition.vue'
 import LoadingPage from "./commons/LoadingPage.vue"
 import NoteStatisticsButton from '../components/notes/NoteStatisticsButton.vue'
+import ProgressBar from "../components/review/ProgressBar.vue"
 import { restGet, restPost } from "../restful/restful"
 
 export default {
   name: 'RepeatPage',
   props: { nested: Boolean },
-  components: { Quiz, Repetition, LoadingPage, NoteStatisticsButton },
+  components: { Quiz, Repetition, LoadingPage, NoteStatisticsButton, ProgressBar },
   data() {
     return {
       repetition: null,
       answerResult: null,
       loading: false,
+      finished: 0
     }
   },
   computed: {
-    reviewPointViewedByUser(){ return this.repetition.reviewPointViewedByUser }
+    reviewPointViewedByUser(){ return this.repetition.reviewPointViewedByUser },
+    quizMode() {return !!this.repetition.quizQuestion && !this.answerResult},
+    linkId() {if(this.reviewPointViewedByUser.linkViewedByUser) return this.reviewPointViewedByUser.linkViewedByUser.id},
+    noteId() {if(this.reviewPointViewedByUser.noteViewedByUser) return this.reviewPointViewedByUser.noteViewedByUser.note.id},
   },
   methods: {
     loadNew(resp) {
@@ -86,6 +92,7 @@ export default {
     },
 
     selfEvaluate(data) {
+      if (data !== 'again') this.finished += 1
       restPost(
         `/api/reviews/${this.reviewPointViewedByUser.reviewPoint.id}/self-evaluate`,
         data,

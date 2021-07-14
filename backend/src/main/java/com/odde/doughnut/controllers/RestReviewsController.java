@@ -77,6 +77,8 @@ class RestReviewsController {
     private QuizQuestion quizQuestion;
     @Getter @Setter
     private Answer emptyAnswer;
+    @Getter @Setter
+    private Integer toRepeatCount;
   }
 
   @GetMapping("/repeat")
@@ -96,6 +98,7 @@ class RestReviewsController {
           repetitionForUser.setEmptyAnswer(quizQuestion.buildAnswer());
       }
     }
+    repetitionForUser.setToRepeatCount(reviewing.toRepeatCount());
     return repetitionForUser;
   }
 
