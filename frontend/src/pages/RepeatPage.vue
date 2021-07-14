@@ -111,7 +111,10 @@ export default {
     },
 
     selfEvaluate(data) {
-      if (data !== 'again') this.finished += 1
+      if (data !== 'again') {
+        this.finished += 1
+        this.toRepeatCount -= 1
+      }
       restPost(
         `/api/reviews/${this.reviewPointViewedByUser.reviewPoint.id}/self-evaluate`,
         data,
