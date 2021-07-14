@@ -19,7 +19,7 @@ const NestedRepeatPage = NestedPage(
   RepeatPage,
   `repeat`,
   ['repeat-quiz'],
-  `This will leave the current review, are you sure?`,
+  `Please answer the question first before you explore the notes.`,
   )
 
 const noteAndLinkRoutes = [

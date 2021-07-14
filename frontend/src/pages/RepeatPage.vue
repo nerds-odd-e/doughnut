@@ -1,7 +1,7 @@
 <template>
   <LoadingPage v-bind="{loading, contentExists: !!repetition}">
     <template v-if="!!repetition">
-      <Minimizable :minimized="nested" staticHeight="100px">
+      <Minimizable :minimized="nested" staticHeight="75px">
         <template #minimizedContent>
           <div class="repeat-container" v-on:click="backToRepeat()">
             <ProgressBar :allowPause="!quizMode" :btn="`play`" v-bind="{linkId, noteId, finished, toRepeatCount: repetition.toRepeatCount}">

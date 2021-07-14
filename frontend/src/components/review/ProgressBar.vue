@@ -2,9 +2,9 @@
 <div class="review-info-bar">
 
   <StopRepeatButton />
-  <PauseRepeatButton v-bind="{noteId, linkId, allowPause}"/>
+  <PauseRepeatButton v-bind="{noteId, linkId, allowPause, btn}"/>
   <div class="review-info-bar-right">
-    <span class="progress-bar" v-if="toRepeatCount !== null">
+    <span :class="`progress-bar ${!!$slots.default ? 'thin' : ''}`" v-if="toRepeatCount !== null">
       <span class="progress" :style="`width: ${finished * 100 / (finished + toRepeatCount)}%`">
       </span>
       <span class="progress-text">
@@ -21,7 +21,7 @@ import PauseRepeatButton from "./PauseRepeatButton.vue"
 
 export default {
   components: { StopRepeatButton, PauseRepeatButton },
-  props: {noteId: Number, linkId: Number, allowPause: { type: Boolean, default: true }, finished: Number, toRepeatCount: Number},
+  props: {noteId: Number, linkId: Number, allowPause: { type: Boolean, default: true }, finished: Number, toRepeatCount: Number, btn: {type: String, default: "pause"}},
   methods: {
   },
 }
@@ -42,6 +42,14 @@ export default {
   height: 25px;
   border-radius: 10px;
   position: relative;
+
+  &.thin {
+    height: 5px;
+
+    .progress-text {
+      display: none;
+    }
+  }
 }
 
 .progress {
