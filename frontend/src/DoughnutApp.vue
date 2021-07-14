@@ -1,17 +1,25 @@
 <script>
 import {restGet} from "./restful/restful"
 import Popups from "./components/commons/Popups.vue"
+import MainMenu from "./components/commons/MainMenu.vue"
 
 export default {
   data() {
     return {
+      showNavBar: true,
       staticInfo: null,
       loading: null,
       popupInfo: [],
       doneResolve: null,
     }},
 
-  components: { Popups },
+  components: { Popups, MainMenu },
+
+  watch: {
+    $route(to, from) {
+      this.showNavBar = !['repeat'].includes(to.name.split('-').shift())
+    }
+  },
 
   methods: {
     done(result) {
@@ -50,5 +58,8 @@ export default {
 
 <template>
   <Popups :popupInfo="popupInfo" @done="done($event)"/>
-  <router-view />
+  <MainMenu v-if="showNavBar" :user="staticInfo ? staticInfo.user : null"/>
+  <div class="container content">
+    <router-view />
+  </div>
 </template>

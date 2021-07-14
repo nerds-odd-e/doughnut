@@ -1,15 +1,10 @@
 
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.Link;
-import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.json.LinkViewedByUser;
-import com.odde.doughnut.exceptions.NoAccessRightException;
-import com.odde.doughnut.models.UserModel;
-import lombok.Getter;
-import lombok.Setter;
+import com.odde.doughnut.entities.User;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -19,12 +14,15 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/")
 class RestStaticInfoController {
+    private final CurrentUserFetcher currentUserFetcher;
 
-  public RestStaticInfoController() {
+  public RestStaticInfoController(CurrentUserFetcher currentUserFetcher) {
+      this.currentUserFetcher = currentUserFetcher;
   }
 
   static class StaticInfo {
     public List<Map<String, String>> linkTypeOptions = new ArrayList<>();
+    public User user;
   }
 
   @GetMapping("/static-info")
@@ -36,6 +34,7 @@ class RestStaticInfoController {
                         put("label", linkType.label);
                     }})
             .collect(Collectors.toList());
+    staticInfo.user = currentUserFetcher.getUser().getEntity();
     return staticInfo;
   }
 }

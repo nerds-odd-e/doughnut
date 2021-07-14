@@ -1,5 +1,5 @@
 <template>
-<a class="pause-stop" @click="goHome()"><SvgStop/></a>
+<a class="pause-stop" href="/" @click.prevent="goHome()"><SvgStop/></a>
 </template>
 
 <script>
@@ -23,8 +23,8 @@ export default {
 .pause-stop {
   margin-right: -8px;
   svg {
-    width: 30px;
-    height: 30px;
+    width: 35px;
+    height: 35px;
     margin-top: -16px;
   }
 }

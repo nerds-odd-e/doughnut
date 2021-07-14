@@ -1,6 +1,9 @@
 <!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
-<layout th:replace="_fragments/basic_layout :: application_layout(~{ :: .content})">
-    <div class="container content">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+    <head th:replace="_fragments/basic_layout :: head"/>
+    <body>
         <div id="partials-noteshow"> </div>
-    </div>
-</layout>
+        <footer th:replace="_fragments/basic_layout :: footer"/>
+        <foot th:replace="_fragments/basic_layout :: foot"/>
+    </body>
+</html>
