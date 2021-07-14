@@ -1,24 +1,40 @@
 <template>
   <LoadingPage v-bind="{loading, contentExists: !!repetition}">
     <template v-if="!!repetition">
-      <ProgressBar :allowPause="!quizMode" v-bind="{linkId, noteId, finished, toRepeatCount: repetition.toRepeatCount}"/>
-      <Quiz v-if="quizMode" v-bind="repetition" @answer="processAnswer($event)"/>
-      <template v-else>
-        <template v-if="reviewPointViewedByUser">
-          <Repetition
-            v-bind="{...reviewPointViewedByUser, answerResult, compact: nested}"
-            @selfEvaluate="selfEvaluate($event)"
-            @updated="refresh()"
-            />
-          <NoteStatisticsButton v-if="noteId" :noteId="noteId"/>
-          <NoteStatisticsButton v-else :link="linkId"/>
+      <Minimizable :minimized="nested" staticHeight="100px">
+        <template #minimizedContent>
+          <div class="repeat-container" v-on:click="backToRepeat()">
+            <ProgressBar :allowPause="!quizMode" :btn="`play`" v-bind="{linkId, noteId, finished, toRepeatCount: repetition.toRepeatCount}">
+              <Repetition
+                v-bind="{...reviewPointViewedByUser, answerResult, compact: true}"
+                @selfEvaluate="selfEvaluate($event)"
+                @updated="refresh()"
+                />
+            </ProgressBar>
+          </div>
         </template>
-      </template>
+        <template #fullContent>
+          <ProgressBar :allowPause="!quizMode" v-bind="{linkId, noteId, finished, toRepeatCount: repetition.toRepeatCount}"/>
+          <Quiz v-if="quizMode" v-bind="repetition" @answer="processAnswer($event)"/>
+          <template v-else>
+            <template v-if="reviewPointViewedByUser">
+              <Repetition
+                v-bind="{...reviewPointViewedByUser, answerResult}"
+                @selfEvaluate="selfEvaluate($event)"
+                @updated="refresh()"
+                />
+              <NoteStatisticsButton v-if="noteId" :noteId="noteId"/>
+              <NoteStatisticsButton v-else :link="linkId"/>
+            </template>
+          </template>
+        </template>
+      </Minimizable>
     </template>
   </LoadingPage>
 </template>
 
 <script>
+import Minimizable from "../components/commons/Minimizable.vue"
 import Quiz from '../components/review/Quiz.vue'
 import Repetition from '../components/review/Repetition.vue'
 import LoadingPage from "./commons/LoadingPage.vue"
@@ -29,7 +45,7 @@ import { restGet, restPost } from "../restful/restful"
 export default {
   name: 'RepeatPage',
   props: { nested: Boolean },
-  components: { Quiz, Repetition, LoadingPage, NoteStatisticsButton, ProgressBar },
+  components: { Minimizable, Quiz, Repetition, LoadingPage, NoteStatisticsButton, ProgressBar },
   data() {
     return {
       repetition: null,
@@ -41,10 +57,13 @@ export default {
   computed: {
     reviewPointViewedByUser(){ return this.repetition.reviewPointViewedByUser },
     quizMode() {return !!this.repetition.quizQuestion && !this.answerResult},
-    linkId() {if(this.reviewPointViewedByUser.linkViewedByUser) return this.reviewPointViewedByUser.linkViewedByUser.id},
-    noteId() {if(this.reviewPointViewedByUser.noteViewedByUser) return this.reviewPointViewedByUser.noteViewedByUser.note.id},
+    linkId() {if(this.reviewPointViewedByUser && this.reviewPointViewedByUser.linkViewedByUser) return this.reviewPointViewedByUser.linkViewedByUser.id},
+    noteId() {if(this.reviewPointViewedByUser && this.reviewPointViewedByUser.noteViewedByUser) return this.reviewPointViewedByUser.noteViewedByUser.note.id},
   },
   methods: {
+    backToRepeat(){
+      this.$router.push({name: "repeat"})
+    },
     loadNew(resp) {
       this.repetition = resp;
       this.answerResult = null;
@@ -105,3 +124,11 @@ export default {
   },
 }
 </script>
+
+<style>
+.repeat-container {
+  background-color: rgba(50, 150, 50, 0.8);
+  padding: 5px;
+  border-radius: 10px;
+}
+</style>

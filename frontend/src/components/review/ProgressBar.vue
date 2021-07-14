@@ -3,13 +3,16 @@
 
   <StopRepeatButton />
   <PauseRepeatButton v-bind="{noteId, linkId, allowPause}"/>
-  <span class="progress-bar" v-if="toRepeatCount !== null">
-    <span class="progress" :style="`width: ${finished * 100 / (finished + toRepeatCount)}%`">
+  <div class="review-info-bar-right">
+    <span class="progress-bar" v-if="toRepeatCount !== null">
+      <span class="progress" :style="`width: ${finished * 100 / (finished + toRepeatCount)}%`">
+      </span>
+      <span class="progress-text">
+      {{finished}}/{{finished + toRepeatCount}}
+      </span>
     </span>
-    <span class="progress-text">
-    {{finished}}/{{finished + toRepeatCount}}
-    </span>
-  </span>
+    <slot />
+  </div>
 </div>
 </template>
 <script>
@@ -29,8 +32,12 @@ export default {
   display: flex;
 }
 
-.progress-bar {
+.review-info-bar-right {
   flex-grow: 1;
+}
+
+.progress-bar {
+  width: 100%;
   background-color: gray;
   height: 25px;
   border-radius: 10px;

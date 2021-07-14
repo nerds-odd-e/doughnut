@@ -1,34 +1,29 @@
 <template>
-  <Minimizable :minimized="compact">
-    <template #minimizedContent>
-      <div class="repeat-container" v-on:click="backToRepeat()">
-        <SelfEvaluateButtons v-bind="{sadOnly}" @selfEvaluate="$emit('selfEvaluate', $event)"/>
-      </div>
-    </template>
-    <template #fullContent>
-      <div v-if="answerResult">
-          <div class="alert alert-success" v-if="answerResult.correct">Correct!</div>
-          <div class="alert alert-danger" v-else>
-                {{'Your answer `' + answerResult.answerDisplay + '` is wrong.'}}
-          </div>
-      </div>
+  <template v-if="compact">
+      <SelfEvaluateButtons v-bind="{sadOnly}" @selfEvaluate="$emit('selfEvaluate', $event)"/>
+  </template>
+  <template v-else>
+    <div v-if="answerResult">
+        <div class="alert alert-success" v-if="answerResult.correct">Correct!</div>
+        <div class="alert alert-danger" v-else>
+              {{'Your answer `' + answerResult.answerDisplay + '` is wrong.'}}
+        </div>
+    </div>
 
-      <ShowReviewPoint v-bind="{ noteViewedByUser, linkViewedByUser}" @updated="$emit('updated')"/>
-      <div class="btn-toolbar justify-content-between">
-        <SelfEvaluateButtons v-bind="{sadOnly}" @selfEvaluate="$emit('selfEvaluate', $event)"/>
-        <button class="btn" title="remove this note from review" @click="removeFromReview()">
-            <SvgNoReview/>
-        </button>
-      </div>
-    </template>
-  </Minimizable>
+    <ShowReviewPoint v-bind="{ noteViewedByUser, linkViewedByUser}" @updated="$emit('updated')"/>
+    <div class="btn-toolbar justify-content-between">
+      <SelfEvaluateButtons v-bind="{sadOnly}" @selfEvaluate="$emit('selfEvaluate', $event)"/>
+      <button class="btn" title="remove this note from review" @click="removeFromReview()">
+          <SvgNoReview/>
+      </button>
+    </div>
+  </template>
 </template>
 
 <script>
   import SvgCog from "../svgs/SvgCog.vue"
   import SvgNoReview from "../svgs/SvgNoReview.vue"
   import ShowReviewPoint from "./ShowReviewPoint.vue"
-  import Minimizable from "../commons/Minimizable.vue"
   import SelfEvaluateButtons from "./SelfEvaluateButtons.vue"
   import { restPost} from "../../restful/restful"
 
@@ -42,7 +37,7 @@
       compact: Boolean
     },
     emits: ['selfEvaluate', 'updated'],
-    components: {SvgCog, SvgNoReview, ShowReviewPoint, Minimizable, SelfEvaluateButtons },
+    components: {SvgCog, SvgNoReview, ShowReviewPoint, SelfEvaluateButtons },
     data() {
       return {
         loading: false
@@ -65,9 +60,6 @@
       },
     },
     methods: {
-      backToRepeat(){
-        this.$router.push({name: "repeat"})
-      },
       async removeFromReview() {
         if (!await this.$popups.confirm(`Are you sure to hide this from reviewing in the future?`)) {
           return
@@ -84,11 +76,3 @@
     }
   };
 </script>
-
-<style>
-.repeat-container {
-  background-color: rgba(50, 150, 50, 0.8);
-  padding: 5px;
-  border-radius: 10px;
-}
-</style>

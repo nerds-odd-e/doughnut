@@ -6,6 +6,8 @@
     </div>
   </transition>
   </div>
+  <div v-if="minimized" :style="`height: ${staticHeight};`">
+  </div>
   <transition name="max">
     <div v-if="!minimized">
       <slot v-if="!minimized" name="fullContent"/>
@@ -18,7 +20,7 @@
 
 export default {
   name: 'Minimizable',
-  props: { minimized: Boolean },
+  props: { minimized: Boolean, staticHeight: {type: String, default: "40px"} },
 }
 </script>
 
