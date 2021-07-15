@@ -19,7 +19,9 @@ import TextInput from "../form/TextInput.vue"
 import CheckInput from "../form/CheckInput.vue"
 import Cards from "../notes/Cards.vue"
 import { restPost } from "../../restful/restful"
-import { debounce } from "lodash"
+import _ from "lodash"
+
+const debounced = _.debounce(callback=>callback(), 200)
 
 export default {
   name: 'SearchNote',
@@ -33,6 +35,7 @@ export default {
         searchGlobally: false,
       },
       cache: {true: {}, false: {}},
+      recentResult: null,
     }
   },
   watch: {
@@ -48,17 +51,23 @@ export default {
     }
   },
   computed: {
-    searchResult() { return this.cache[this.searchTerm.searchGlobally][this.searchTerm.searchKey.trim()] }
+    cachedResult() { return this.cache[this.searchTerm.searchGlobally][this.searchTerm.searchKey.trim()] },
+    searchResult() { return !!this.cachedResult ? this.cachedResult : this.recentResult}
   },
   methods: {
     search(searchGlobally, trimedSearchKey) {
       if (this.cache[searchGlobally].hasOwnProperty(trimedSearchKey)) {
         return
       }
-      restPost(`/api/notes/${this.noteId}/search`, {searchGlobally, searchKey: trimedSearchKey}, (r)=>{})
-        .then(r=>{
-          this.cache[searchGlobally][trimedSearchKey] = r
-        })
+
+      debounced(()=>{
+        restPost(`/api/notes/${this.noteId}/search`, {searchGlobally, searchKey: trimedSearchKey}, (r)=>{})
+          .then(r=>{
+            this.cache[searchGlobally][trimedSearchKey] = r
+            this.recentResult = r
+          })
+      })
+
     },
   }
 }
