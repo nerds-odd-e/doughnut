@@ -13,8 +13,8 @@ public class QuizQuestion {
 
     public enum QuestionType {
         CLOZE_SELECTION("cloze_selection", DefaultQuizFactory::new),
-        SPELLING("spelling", DefaultQuizFactory::new),
-        PICTURE_TITLE("picture_title", DefaultQuizFactory::new),
+        SPELLING("spelling", SpellingQuizFactory::new),
+        PICTURE_TITLE("picture_title", PictureTitleSelectionQuizFactory::new),
         PICTURE_SELECTION("picture_selection", PictureSelectionQuizFactory::new),
         LINK_TARGET("link_target", LinkTargetQuizFactory::new),
         LINK_SOURCE_EXCLUSIVE("link_source_exclusive", LinkTargetExclusiveQuizFactory::new);

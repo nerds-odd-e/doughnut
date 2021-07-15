@@ -12,9 +12,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class DefaultQuizFactory implements QuizQuestionFactory {
-    private final ReviewPoint reviewPoint;
-    private final Note answerNote;
-    private final QuizQuestionServant servant;
+    protected final ReviewPoint reviewPoint;
+    protected final Note answerNote;
+    protected final QuizQuestionServant servant;
 
     public DefaultQuizFactory(QuizQuestionServant servant, ReviewPoint reviewPoint) {
         this.reviewPoint = reviewPoint;

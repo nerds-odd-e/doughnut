@@ -27,12 +27,9 @@ public class QuizQuestionGenerator {
             Collections.addAll(questionTypes, reviewPoint.getLink().getLinkType().getQuestionTypes());
         }
         else {
+            questionTypes.add(QuizQuestion.QuestionType.SPELLING);
             Note note = reviewPoint.getNote();
             if (!Strings.isEmpty(note.getNoteContent().getDescription())) {
-                ReviewSetting reviewSetting = note.getMasterReviewSetting();
-                if (reviewSetting != null && reviewSetting.getRememberSpelling()) {
-                    questionTypes.add(QuizQuestion.QuestionType.SPELLING);
-                }
                 questionTypes.add(QuizQuestion.QuestionType.CLOZE_SELECTION);
             }
             if (!Strings.isEmpty(note.getNotePicture())) {

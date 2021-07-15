@@ -20,4 +20,8 @@ public interface QuizQuestionFactory {
     List<QuizQuestion.Option> toQuestionOptions(List<Note> notes);
 
     Map<Link.LinkType, LinkViewed> generateHintLinks();
+
+    default boolean isValidQuestion() {
+        return true;
+    }
 }

@@ -14,7 +14,7 @@ public class QuizQuestionDirector {
     private final ReviewPoint reviewPoint;
     private final Note answerNote;
     final ModelFactoryService modelFactoryService;
-    private final QuizQuestionFactory linkTargetExclusiveQuizFactory;
+    private final QuizQuestionFactory quizQuestionFactory;
 
     public QuizQuestionDirector(QuizQuestion.QuestionType questionType, Randomizer randomizer, ReviewPoint reviewPoint, ModelFactoryService modelFactoryService) {
         this.questionType = questionType;
@@ -22,27 +22,30 @@ public class QuizQuestionDirector {
         this.reviewPoint = reviewPoint;
         this.modelFactoryService = modelFactoryService;
         QuizQuestionServant servant = new QuizQuestionServant(randomizer, modelFactoryService);
-        this.linkTargetExclusiveQuizFactory = questionType.factory.apply(servant, reviewPoint);
-        this.answerNote = linkTargetExclusiveQuizFactory.generateAnswerNote();
+        this.quizQuestionFactory = questionType.factory.apply(servant, reviewPoint);
+        this.answerNote = quizQuestionFactory.generateAnswerNote();
     }
 
     public QuizQuestion buildQuizQuestion() {
         if (answerNote == null) {
             return null;
         }
+        if (!quizQuestionFactory.isValidQuestion()) {
+            return null;
+        }
         QuizQuestion quizQuestion = new QuizQuestion(reviewPoint);
         quizQuestion.setQuestionType(questionType);
         quizQuestion.setOptions(generateOptions());
-        quizQuestion.setDescription(linkTargetExclusiveQuizFactory.generateInstruction());
-        quizQuestion.setMainTopic(linkTargetExclusiveQuizFactory.generateMainTopic());
-        quizQuestion.setHintLinks(linkTargetExclusiveQuizFactory.generateHintLinks());
+        quizQuestion.setDescription(quizQuestionFactory.generateInstruction());
+        quizQuestion.setMainTopic(quizQuestionFactory.generateMainTopic());
+        quizQuestion.setHintLinks(quizQuestionFactory.generateHintLinks());
         return quizQuestion;
     }
 
     private List<QuizQuestion.Option> generateOptions() {
-        List<Note> selectedList = linkTargetExclusiveQuizFactory.generateFillingOptions();
+        List<Note> selectedList = quizQuestionFactory.generateFillingOptions();
         selectedList.add(answerNote);
         randomizer.shuffle(selectedList);
-        return linkTargetExclusiveQuizFactory.toQuestionOptions(selectedList);
+        return quizQuestionFactory.toQuestionOptions(selectedList);
     }
 }

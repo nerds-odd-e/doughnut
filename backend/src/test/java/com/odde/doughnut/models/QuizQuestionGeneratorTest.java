@@ -22,13 +22,6 @@ class QuizQuestionGeneratorTest {
     Note note = makeMe.aNote().inMemoryPlease();
 
     @Test
-    void clozeSelection() {
-        ReviewPoint reviewPoint = makeMe.aReviewPointFor(note).inMemoryPlease();
-        List<QuizQuestion.QuestionType> questionTypes = getQuestionTypes(reviewPoint);
-        assertThat(questionTypes, contains(CLOZE_SELECTION));
-    }
-
-    @Test
     void spelling() {
         makeMe.theNote(note).rememberSpelling();
         ReviewPoint reviewPoint = makeMe.aReviewPointFor(note).inMemoryPlease();

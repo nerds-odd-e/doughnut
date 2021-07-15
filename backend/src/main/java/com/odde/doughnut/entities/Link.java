@@ -31,8 +31,8 @@ public class Link {
         HAS_PART(7, "has parts", "not have as a part", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
         /*NON INTEGRATED*/ TAGGED_BY(8, "is tagged by", "is not tagged by", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
         TAGGING(9, "tagging", "is not tagging", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        ATTRIBUTE(10, "is an attribute of", "is not an attribute of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        HAS_ATTRIBUTE(11, "has attributes", "not has as an attribute", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        ATTRIBUTE(10, "is an attribute of", "is not an attribute of", new QuestionType[]{LINK_TARGET }),
+        HAS_ATTRIBUTE(11, "has attributes", "not has as an attribute", new QuestionType[]{LINK_TARGET }),
 
         OPPOSITE_OF(12, "is the opposite of", "is not the opposite of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
         BROUGHT_BY(13, "is brought by", "is not brought by", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
