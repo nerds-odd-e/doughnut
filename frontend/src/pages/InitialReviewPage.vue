@@ -2,7 +2,7 @@
   <Minimizable :minimized="nested">
     <template #minimizedContent>
       <div class="initial-review-container" v-on:click="$router.push({name: 'initial'})">
-        <InitialReviewButtons @doInitialReview="processForm($event)"/>
+        <InitialReviewButtons :key="buttonKey" @doInitialReview="processForm($event)"/>
       </div>
     </template>
     <template #fullContent>
@@ -12,7 +12,7 @@
             <div class="mb-2">
                 <ReviewSettingForm v-if="!!reviewPointViewedByUser.reviewSetting" v-model="reviewSetting" :errors="{}"/>
             </div>
-            <InitialReviewButtons @doInitialReview="processForm($event)"/>
+            <InitialReviewButtons :key="buttonKey" @doInitialReview="processForm($event)"/>
         </div>
       </LoadingPage>
     </template>
@@ -40,6 +40,7 @@ export default {
   computed: {
     reviewPoint() { return this.reviewPointViewedByUser.reviewPoint },
     reviewSetting() { return this.reviewPointViewedByUser.reviewSetting },
+    buttonKey() {return !!this.reviewPoint.noteId ? `note-${this.reviewPoint.noteId}` : `link-${this.reviewPoint.linkId}`}
   },
 
   methods: {
