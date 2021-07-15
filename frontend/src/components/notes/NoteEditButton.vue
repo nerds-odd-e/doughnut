@@ -9,7 +9,7 @@
         <h3>{{oldTitle}}</h3>
       </template>
       <template #body>
-        <form @submit.prevent="processForm">
+        <form @submit.prevent.once="processForm">
             <NoteFormBody v-if="!!formData" v-model="formData" :errors="formErrors"/>
             <input type="submit" value="Submit" class="btn btn-primary"/>
         </form>

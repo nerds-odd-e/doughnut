@@ -5,7 +5,7 @@
         <NoteBreadcrumbForOwnOrCircle v-bind="{ancestors: []}">
             <li class="breadcrumb-item">(adding here)</li>
         </NoteBreadcrumbForOwnOrCircle>
-        <form @submit.prevent="processForm">
+        <form @submit.prevent.once="processForm">
             <NoteFormBody v-model="noteFormData" :errors="noteFormErrors"/>
             <input type="submit" value="Submit" class="btn btn-primary"/>
         </form>
@@ -18,7 +18,6 @@ import NoteBreadcrumbForOwnOrCircle from "../components/notes/NoteBreadcrumbForO
 import NoteFormBody from "../components/notes/NoteFormBody.vue"
 import LoadingPage from "./commons/LoadingPage.vue"
 import {restPostMultiplePartForm} from "../restful/restful"
-import { ref } from "vue"
 
 export default {
   name: 'NotebookNewPage',

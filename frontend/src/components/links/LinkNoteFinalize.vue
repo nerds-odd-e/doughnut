@@ -9,7 +9,7 @@
       />
 
       <button class="btn btn-secondary go-back-button" v-on:click="$emit('goBack')"><SvgGoBack/></button>
-      <button class="btn btn-primary" v-on:click="createLink()">Create Link</button>
+      <button class="btn btn-primary" @click.once="createLink()">Create Link</button>
   </div>
 </template>
 
