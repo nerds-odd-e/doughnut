@@ -28,11 +28,8 @@ public class QuizQuestionGenerator {
         else {
             questionTypes.add(QuizQuestion.QuestionType.SPELLING);
             questionTypes.add(QuizQuestion.QuestionType.CLOZE_SELECTION);
-            Note note = reviewPoint.getNote();
-            if (!Strings.isEmpty(note.getNotePicture())) {
-                questionTypes.add(QuizQuestion.QuestionType.PICTURE_TITLE);
-                questionTypes.add(QuizQuestion.QuestionType.PICTURE_SELECTION);
-            }
+            questionTypes.add(QuizQuestion.QuestionType.PICTURE_TITLE);
+            questionTypes.add(QuizQuestion.QuestionType.PICTURE_SELECTION);
         }
         return questionTypes;
     }

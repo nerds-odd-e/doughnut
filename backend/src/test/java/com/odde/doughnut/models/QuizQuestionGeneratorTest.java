@@ -22,11 +22,11 @@ class QuizQuestionGeneratorTest {
     Note note = makeMe.aNote().inMemoryPlease();
 
     @Test
-    void spelling() {
+    void note() {
         makeMe.theNote(note).rememberSpelling();
         ReviewPoint reviewPoint = makeMe.aReviewPointFor(note).inMemoryPlease();
         List<QuizQuestion.QuestionType> questionTypes = getQuestionTypes(reviewPoint);
-        assertThat(questionTypes, contains(SPELLING, CLOZE_SELECTION));
+        assertThat(questionTypes, contains(SPELLING, CLOZE_SELECTION, PICTURE_TITLE));
     }
 
     @Test

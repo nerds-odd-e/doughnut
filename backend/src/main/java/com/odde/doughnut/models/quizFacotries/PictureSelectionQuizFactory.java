@@ -5,6 +5,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.json.LinkViewed;
+import org.apache.logging.log4j.util.Strings;
 
 import java.util.List;
 import java.util.Map;
@@ -46,6 +47,11 @@ public class PictureSelectionQuizFactory implements QuizQuestionFactory {
     @Override
     public Map<Link.LinkType, LinkViewed> generateHintLinks() {
         return null;
+    }
+
+    @Override
+    public boolean isValidQuestion() {
+        return !Strings.isEmpty(answerNote.getNotePicture());
     }
 
 }
