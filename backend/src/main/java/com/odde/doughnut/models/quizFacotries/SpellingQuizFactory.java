@@ -1,13 +1,27 @@
 package com.odde.doughnut.models.quizFacotries;
 
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.ReviewSetting;
 import org.apache.logging.log4j.util.Strings;
 
-public class SpellingQuizFactory extends DefaultQuizFactory{
+import java.util.ArrayList;
+import java.util.List;
+
+public class SpellingQuizFactory extends ClozeDescriptonQuizFactory {
     public SpellingQuizFactory(QuizQuestionServant servant, ReviewPoint reviewPoint) {
         super(servant, reviewPoint);
+    }
+
+    @Override
+    public List<Note> generateFillingOptions() {
+        return new ArrayList<>();
+    }
+
+    @Override
+    public List<QuizQuestion.Option> toQuestionOptions(List<Note> notes) {
+        return new ArrayList<>();
     }
 
     @Override

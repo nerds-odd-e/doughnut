@@ -26,7 +26,7 @@ class QuizQuestionGeneratorTest {
         makeMe.theNote(note).rememberSpelling();
         ReviewPoint reviewPoint = makeMe.aReviewPointFor(note).inMemoryPlease();
         List<QuizQuestion.QuestionType> questionTypes = getQuestionTypes(reviewPoint);
-        assertThat(questionTypes, contains(SPELLING, CLOZE_SELECTION, PICTURE_TITLE));
+        assertThat(questionTypes, contains(SPELLING, CLOZE_SELECTION, PICTURE_TITLE, PICTURE_SELECTION));
     }
 
     @Test

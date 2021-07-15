@@ -12,7 +12,7 @@ import java.util.function.BiFunction;
 public class QuizQuestion {
 
     public enum QuestionType {
-        CLOZE_SELECTION("cloze_selection", DefaultQuizFactory::new),
+        CLOZE_SELECTION("cloze_selection", ClozeTitleSelectionQuizFactory::new),
         SPELLING("spelling", SpellingQuizFactory::new),
         PICTURE_TITLE("picture_title", PictureTitleSelectionQuizFactory::new),
         PICTURE_SELECTION("picture_selection", PictureSelectionQuizFactory::new),

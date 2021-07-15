@@ -1,11 +1,9 @@
 package com.odde.doughnut.models;
 
-import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionDirector;
-import org.apache.logging.log4j.util.Strings;
 
 import java.util.ArrayList;
 import java.util.Collections;
