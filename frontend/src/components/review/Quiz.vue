@@ -8,6 +8,8 @@
         <h2 v-if="!!quizQuestion.mainTopic" class="text-center">{{quizQuestion.mainTopic}}</h2>
     </div>
 
+    <LinkList v-bind="{links: quizQuestion.hintLinks, owns: true}" />
+
     <div class="row mt-2" v-if="quizQuestion.questionType!=='SPELLING'">
         <div class="col-sm-6 mb-3" v-for="option in quizQuestion.options" :key="option.note.id">
             <form @submit.prevent.once="processForm">
@@ -35,13 +37,14 @@
 <script>
   import NoteBreadcrumbForReview from "./NoteBreadcrumbForReview.vue"
   import ShowPicture from "../notes/ShowPicture.vue"
+  import LinkList from "../links/LinkList.vue"
   import TextInput from "../form/TextInput.vue"
 
 export default {
   name: "Quiz",
   props: {reviewPointViewedByUser: Object, quizQuestion: Object, emptyAnswer: Object},
   emits:['answer'],
-  components: {NoteBreadcrumbForReview, ShowPicture, TextInput },
+  components: {NoteBreadcrumbForReview, ShowPicture, LinkList, TextInput },
   computed: {
     sourceNote(){
         if (!!this.reviewPointViewedByUser.noteViewedByUser) return this.reviewPointViewedByUser.noteViewedByUser

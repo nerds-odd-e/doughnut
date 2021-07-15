@@ -1,10 +1,12 @@
 package com.odde.doughnut.entities;
 
+import com.odde.doughnut.entities.json.LinkViewed;
 import com.odde.doughnut.models.quizFacotries.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.Map;
 import java.util.function.BiFunction;
 
 public class QuizQuestion {
@@ -35,6 +37,8 @@ public class QuizQuestion {
     public String description;
     @Getter @Setter
     public String mainTopic;
+    @Getter @Setter
+    private Map<Link.LinkType, LinkViewed> hintLinks;
 
     public QuizQuestion(ReviewPoint reviewPoint) {
         this.reviewPoint = reviewPoint;

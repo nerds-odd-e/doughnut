@@ -2,8 +2,10 @@ package com.odde.doughnut.models.quizFacotries;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestion;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import lombok.Getter;
 
 import java.util.List;
 import java.util.function.Predicate;

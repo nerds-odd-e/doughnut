@@ -11,6 +11,7 @@ import javax.persistence.*;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.odde.doughnut.entities.QuizQuestion.QuestionType.LINK_SOURCE_EXCLUSIVE;
 import static com.odde.doughnut.entities.QuizQuestion.QuestionType.LINK_TARGET;
@@ -61,6 +62,11 @@ public class Link {
         }
 
         private static final Map<Integer, LinkType> idMap = Collections.unmodifiableMap(Arrays.stream(values()).collect(Collectors.toMap(x->x.id, x->x)));
+
+        public static Stream<LinkType> openTypes() {
+            final Link.LinkType[] openTypes = {Link.LinkType.TAGGED_BY, Link.LinkType.INSTANCE, Link.LinkType.PART};
+            return Arrays.stream(openTypes);
+        }
 
         public static LinkType fromLabel(String text) {
             for (LinkType b : LinkType.values()) {

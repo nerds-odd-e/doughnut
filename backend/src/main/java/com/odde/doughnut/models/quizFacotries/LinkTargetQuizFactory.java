@@ -4,8 +4,10 @@ import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.QuizQuestion;
+import com.odde.doughnut.entities.json.LinkViewed;
 
 import java.util.List;
+import java.util.Map;
 
 public class LinkTargetQuizFactory implements QuizQuestionFactory {
     private final Link link;
@@ -41,6 +43,11 @@ public class LinkTargetQuizFactory implements QuizQuestionFactory {
     @Override
     public List<QuizQuestion.Option> toQuestionOptions(List<Note> noteEntities) {
         return servant.toTitleOptions(noteEntities);
+    }
+
+    @Override
+    public Map<Link.LinkType, LinkViewed> generateHintLinks() {
+        return null;
     }
 
     private Note getAnswerNote() {

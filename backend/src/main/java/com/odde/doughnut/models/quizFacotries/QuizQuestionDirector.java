@@ -35,6 +35,7 @@ public class QuizQuestionDirector {
         quizQuestion.setOptions(generateOptions());
         quizQuestion.setDescription(linkTargetExclusiveQuizFactory.generateInstruction());
         quizQuestion.setMainTopic(linkTargetExclusiveQuizFactory.generateMainTopic());
+        quizQuestion.setHintLinks(linkTargetExclusiveQuizFactory.generateHintLinks());
         return quizQuestion;
     }
 
