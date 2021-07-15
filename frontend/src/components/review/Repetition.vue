@@ -1,6 +1,6 @@
 <template>
   <template v-if="compact">
-      <SelfEvaluateButtons v-bind="{sadOnly}" @selfEvaluate="$emit('selfEvaluate', $event)"/>
+      <SelfEvaluateButtons v-bind="{sadOnly}" :key="buttonKey" @selfEvaluate="selfEvaluate($event)"/>
   </template>
   <template v-else>
     <div v-if="answerResult">
@@ -12,7 +12,7 @@
 
     <ShowReviewPoint v-bind="{ noteViewedByUser, linkViewedByUser}" @updated="$emit('updated')"/>
     <div class="btn-toolbar justify-content-between">
-      <SelfEvaluateButtons v-bind="{sadOnly}" @selfEvaluate="$emit('selfEvaluate', $event)"/>
+      <SelfEvaluateButtons v-bind="{sadOnly}" :key="buttonKey"  @selfEvaluate="selfEvaluate($event)"/>
       <button class="btn" title="remove this note from review" @click="removeFromReview()">
           <SvgNoReview/>
       </button>
@@ -34,13 +34,14 @@
       answerResult: Object,
       noteViewedByUser: Object,
       linkViewedByUser: Object,
-      compact: Boolean
+      compact: Boolean,
     },
     emits: ['selfEvaluate', 'updated'],
     components: {SvgCog, SvgNoReview, ShowReviewPoint, SelfEvaluateButtons },
     data() {
       return {
-        loading: false
+        loading: false,
+        buttonKey: 1,
       }
     },
     computed: {
@@ -60,6 +61,11 @@
       },
     },
     methods: {
+      selfEvaluate(event) {
+        this.buttonKey += 1
+        this.$emit('selfEvaluate', event)
+      },
+
       async removeFromReview() {
         if (!await this.$popups.confirm(`Are you sure to hide this from reviewing in the future?`)) {
           return

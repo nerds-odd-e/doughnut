@@ -3,9 +3,8 @@ package com.odde.doughnut.models;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.ReviewSetting;
-import com.odde.doughnut.models.quizFacotries.QuizQuestionDirector;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.models.quizFacotries.QuizQuestionDirector;
 import org.apache.logging.log4j.util.Strings;
 
 import java.util.ArrayList;
@@ -28,10 +27,8 @@ public class QuizQuestionGenerator {
         }
         else {
             questionTypes.add(QuizQuestion.QuestionType.SPELLING);
+            questionTypes.add(QuizQuestion.QuestionType.CLOZE_SELECTION);
             Note note = reviewPoint.getNote();
-            if (!Strings.isEmpty(note.getNoteContent().getDescription())) {
-                questionTypes.add(QuizQuestion.QuestionType.CLOZE_SELECTION);
-            }
             if (!Strings.isEmpty(note.getNotePicture())) {
                 questionTypes.add(QuizQuestion.QuestionType.PICTURE_TITLE);
                 questionTypes.add(QuizQuestion.QuestionType.PICTURE_SELECTION);

@@ -1,5 +1,6 @@
 <template>
   <div class="btn-group" role="group" aria-label="First group">
+    {{clicked}}
       <button class="btn btn-light" id="repeat-again" name="again"
               @click.once="processForm('again')"
               title="repeat immediately">
@@ -26,19 +27,20 @@
 </template>
 
 <script>
-export default { name: "SelfEvaluateButtons" };
-</script>
-
-<script setup>
   import SvgSad from "../svgs/SvgSad.vue"
   import SvgSatisfying from "../svgs/SvgSatisfying.vue"
   import SvgFailed from "../svgs/SvgFailed.vue"
   import SvgHappy from "../svgs/SvgHappy.vue"
-  const props = defineProps({ sadOnly: Boolean })
-  const emit = defineEmit(['selfEvaluate'])
 
-  const processForm = function(evaluation) {
-      emit('selfEvaluate', evaluation)
+  export default {
+    props: { sadOnly: Boolean },
+    emits: ['selfEvaluate'],
+    components: { SvgSad, SvgSatisfying, SvgFailed, SvgHappy },
+    methods: {
+      processForm(evaluation) {
+        this.$emit('selfEvaluate', evaluation)
+      }
     }
+  }
 
 </script>

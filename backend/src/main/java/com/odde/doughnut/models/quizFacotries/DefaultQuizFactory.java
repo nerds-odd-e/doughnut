@@ -2,11 +2,11 @@ package com.odde.doughnut.models.quizFacotries;
 
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.QuizQuestion;
+import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.LinkViewed;
+import org.apache.logging.log4j.util.Strings;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -52,6 +52,11 @@ public class DefaultQuizFactory implements QuizQuestionFactory {
         return answerNote.getAllLinks(reviewPoint.getUser()).entrySet().stream()
                 .filter(x -> Link.LinkType.openTypes().anyMatch((y)->x.getKey().equals(y)))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    @Override
+    public boolean isValidQuestion() {
+        return !Strings.isEmpty(reviewPoint.getNote().getNoteContent().getDescription());
     }
 
     private Note getAnswerNote() {
