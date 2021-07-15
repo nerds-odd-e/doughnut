@@ -4,7 +4,7 @@
     <CheckInput scopeName='searchTerm' field='searchGlobally' v-model="searchTerm.searchGlobally"/>
   </div>
 
-  <div v-if="searchResult.length === 0">
+  <div v-if="!searchResult || searchResult.length === 0">
       <em>No linkable notes found.</em>
   </div>
   <Cards v-else class="search-result" :notes="searchResult" columns="3">
@@ -19,6 +19,7 @@ import TextInput from "../form/TextInput.vue"
 import CheckInput from "../form/CheckInput.vue"
 import Cards from "../notes/Cards.vue"
 import { restPost } from "../../restful/restful"
+import { debounce } from "lodash"
 
 export default {
   name: 'SearchNote',
@@ -29,29 +30,35 @@ export default {
     return {
       searchTerm: {
         searchKey: '',
-        searchGlobally: false
+        searchGlobally: false,
       },
-      searchResult: [],
+      cache: {true: {}, false: {}},
     }
   },
   watch: {
     searchTerm: {
       handler(newSearchTerm) {
         if (newSearchTerm.searchKey.trim() === '') {
-          this.searchResult = []
         }
         else {
-          this.search()
+          this.search(newSearchTerm.searchGlobally, newSearchTerm.searchKey.trim())
         }
-
       },
       deep: true
     }
   },
+  computed: {
+    searchResult() { return this.cache[this.searchTerm.searchGlobally][this.searchTerm.searchKey.trim()] }
+  },
   methods: {
-    search() {
-      restPost(`/api/notes/${this.noteId}/search`, {...this.searchTerm, searchKey: this.searchTerm.searchKey.trim()}, (r)=>{})
-        .then(r=>this.searchResult=r)
+    search(searchGlobally, trimedSearchKey) {
+      if (this.cache[searchGlobally].hasOwnProperty(trimedSearchKey)) {
+        return
+      }
+      restPost(`/api/notes/${this.noteId}/search`, {searchGlobally, searchKey: trimedSearchKey}, (r)=>{})
+        .then(r=>{
+          this.cache[searchGlobally][trimedSearchKey] = r
+        })
     },
   }
 }
