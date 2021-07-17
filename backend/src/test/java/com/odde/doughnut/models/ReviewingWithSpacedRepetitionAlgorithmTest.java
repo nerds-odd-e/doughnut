@@ -113,6 +113,6 @@ public class ReviewingWithSpacedRepetitionAlgorithmTest {
     }
 
     private Timestamp daysAfterBase(Integer reviewDay) {
-        return TimestampOperations.addDaysToTimestamp(baseDay, reviewDay);
+        return TimestampOperations.addHoursToTimestamp(baseDay, reviewDay * 24);
     }
 }

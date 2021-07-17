@@ -25,12 +25,15 @@ public class SpacedRepetitionAlgorithm {
     public static class MemoryStateChange {
         @Getter
         private final int nextForgettingCurveIndex;
-        @Getter
         private final int nextRepeatInDays;
 
         public MemoryStateChange(int nextForgettingCurveIndex, int nextRepeatInDays) {
             this.nextForgettingCurveIndex = nextForgettingCurveIndex;
             this.nextRepeatInDays = nextRepeatInDays;
+        }
+
+        public int getNextRepeatInHours() {
+            return nextRepeatInDays * 24;
         }
     }
 

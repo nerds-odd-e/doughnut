@@ -130,7 +130,7 @@ public class ReviewPoint {
 
   public void updateMemoryState(Timestamp currentUTCTimestamp, SpacedRepetitionAlgorithm.MemoryStateChange memoryStateChange) {
       setForgettingCurveIndex(memoryStateChange.getNextForgettingCurveIndex());
-      setNextReviewAt(TimestampOperations.addDaysToTimestamp(currentUTCTimestamp, memoryStateChange.getNextRepeatInDays()));
+      setNextReviewAt(TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, memoryStateChange.getNextRepeatInHours()));
       setLastReviewedAt(currentUTCTimestamp);
   }
 }

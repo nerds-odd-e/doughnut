@@ -118,7 +118,7 @@ public class Reviewing {
     }
 
     private List<ReviewPoint> getNewReviewPointsOfToday_() {
-        Timestamp oneDayAgo = TimestampOperations.addDaysToTimestamp(currentUTCTimestamp, -1);
+        Timestamp oneDayAgo = TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, -24);
         return userModel.getRecentReviewPoints(oneDayAgo).stream().filter(p -> userModel.isInitialReviewOnSameDay(p, currentUTCTimestamp)).collect(Collectors.toUnmodifiableList());
     }
 

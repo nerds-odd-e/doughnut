@@ -5,9 +5,9 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
 public abstract class TimestampOperations {
-    public static Timestamp addDaysToTimestamp(Timestamp timestamp, int daysToAdd) {
+    public static Timestamp addHoursToTimestamp(Timestamp timestamp, int hoursToAdd) {
         ZonedDateTime zonedDateTime = timestamp.toInstant().atZone(ZoneId.of("UTC"));
-        return Timestamp.from(zonedDateTime.plusDays(daysToAdd).toInstant());
+        return Timestamp.from(zonedDateTime.plusHours(hoursToAdd).toInstant());
     }
 
     public static int getDayId(Timestamp timestamp, ZoneId timeZone) {

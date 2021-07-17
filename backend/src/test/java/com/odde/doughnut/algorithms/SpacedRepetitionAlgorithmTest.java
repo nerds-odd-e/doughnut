@@ -14,7 +14,7 @@ public class SpacedRepetitionAlgorithmTest {
     void defaultSetting() {
         SpacedRepetitionAlgorithm spacedRepetitionAlgorithm = new SpacedRepetitionAlgorithm(null);
 
-        assertThat(spacedRepetitionAlgorithm.getMemoryStateChange(0, 0).getNextRepeatInDays(), equalTo(0));
+        assertThat(spacedRepetitionAlgorithm.getMemoryStateChange(0, 0).getNextRepeatInHours(), equalTo(0));
     }
 
     @Nested
@@ -24,26 +24,26 @@ public class SpacedRepetitionAlgorithmTest {
         @Test
         void fallBeforeTheFirstRepeatLevel() {
             int index = DEFAULT_FORGETTING_CURVE_INDEX - 1;
-            assertThat(getNextRepeatInDays(index), equalTo(0));
+            assertThat(getNextRepeatInHours(index), equalTo(0));
         }
 
         @Test
         void fallOnTheFirstRepeatLevel() {
             int index = DEFAULT_FORGETTING_CURVE_INDEX;
-            assertThat(getNextRepeatInDays(index), equalTo(3));
+            assertThat(getNextRepeatInHours(index), equalTo(3 * 24));
         }
 
         @Test
         void betweenTheFirstAndSecond() {
             int index = DEFAULT_FORGETTING_CURVE_INDEX + DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT / 2;
-            assertThat(getNextRepeatInDays(index), greaterThan(3));
-            assertThat(getNextRepeatInDays(index), lessThan(6));
+            assertThat(getNextRepeatInHours(index), greaterThan(3 * 24));
+            assertThat(getNextRepeatInHours(index), lessThan(6 * 24));
         }
 
         @Test
         void fallOnTheSecondRepeatLevel() {
             int index = getNextForgettingCurveIndex(DEFAULT_FORGETTING_CURVE_INDEX);
-            assertThat(getNextRepeatInDays(index), equalTo(6));
+            assertThat(getNextRepeatInHours(index), equalTo(6 * 24));
         }
 
         @Test
@@ -54,11 +54,11 @@ public class SpacedRepetitionAlgorithmTest {
             index = getNextForgettingCurveIndex(index);
             index = getNextForgettingCurveIndex(index);
             index = getNextForgettingCurveIndex(index);
-            assertThat(getNextRepeatInDays(index), equalTo(8));
+            assertThat(getNextRepeatInHours(index), equalTo(8 * 24));
         }
 
-        private Integer getNextRepeatInDays(int index) {
-            return spacedRepetitionAlgorithm.getMemoryStateChange(index, 0).getNextRepeatInDays();
+        private Integer getNextRepeatInHours(int index) {
+            return spacedRepetitionAlgorithm.getMemoryStateChange(index, 0).getNextRepeatInHours();
 
         }
 
