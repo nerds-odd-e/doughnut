@@ -25,15 +25,12 @@ public class SpacedRepetitionAlgorithm {
     public static class MemoryStateChange {
         @Getter
         private final int nextForgettingCurveIndex;
-        private final int nextRepeatInDays;
+        @Getter
+        private final int nextRepeatInHours;
 
-        public MemoryStateChange(int nextForgettingCurveIndex, int nextRepeatInDays) {
+        public MemoryStateChange(int nextForgettingCurveIndex, int nextRepeatInHours) {
             this.nextForgettingCurveIndex = nextForgettingCurveIndex;
-            this.nextRepeatInDays = nextRepeatInDays;
-        }
-
-        public int getNextRepeatInHours() {
-            return nextRepeatInDays * 24;
+            this.nextRepeatInHours = nextRepeatInHours;
         }
     }
 
@@ -44,7 +41,7 @@ public class SpacedRepetitionAlgorithm {
     //
     public MemoryStateChange getMemoryStateChange(Integer oldForgettingCurveIndex, int adjustment) {
         final int nextForgettingCurveIndex = oldForgettingCurveIndex + forgettingCurveIndexIncrement(adjustment);
-        return new MemoryStateChange(nextForgettingCurveIndex, getRepeatInDays(nextForgettingCurveIndex));
+        return new MemoryStateChange(nextForgettingCurveIndex, getRepeatInHours(nextForgettingCurveIndex));
     }
 
     private int forgettingCurveIndexIncrement(int adjustment) {
@@ -54,7 +51,7 @@ public class SpacedRepetitionAlgorithm {
         return DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT * (1 + adjustment);
     }
 
-    private Integer getRepeatInDays(Integer forgettingCurveIndex) {
+    private Integer getRepeatInHours(Integer forgettingCurveIndex) {
         int index = (forgettingCurveIndex - DEFAULT_FORGETTING_CURVE_INDEX) / DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT - 1;
         if (index < 0) {
             return 0;
@@ -62,7 +59,7 @@ public class SpacedRepetitionAlgorithm {
         final int remainder = forgettingCurveIndex % DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT;
         final Integer floor = getSpacing(index);
         final Integer ceiling = getSpacing(index + 1);
-        return floor + (ceiling - floor) * remainder / DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT;
+        return floor * 24 + (ceiling - floor) * remainder * 24 / DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT;
     }
 
     private Integer getSpacing(int index) {
