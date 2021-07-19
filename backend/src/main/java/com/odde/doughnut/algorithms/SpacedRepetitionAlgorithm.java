@@ -24,14 +24,12 @@ public class SpacedRepetitionAlgorithm {
 
     public static class MemoryStateChange {
         @Getter
-        private final int nextForgettingCurveIndex;
-        @Getter
-        private final int nextRepeatInHours;
+        public final int nextForgettingCurveIndex;
 
-        public MemoryStateChange(int nextForgettingCurveIndex, int nextRepeatInHours) {
+        public MemoryStateChange(int nextForgettingCurveIndex) {
             this.nextForgettingCurveIndex = nextForgettingCurveIndex;
-            this.nextRepeatInHours = nextRepeatInHours;
         }
+
     }
 
     //
@@ -39,9 +37,8 @@ public class SpacedRepetitionAlgorithm {
     //   -1: reduce the index by 1/2 of default increment
     //   +1: add to the index by twice of default increment
     //
-    public MemoryStateChange getMemoryStateChange(Integer oldForgettingCurveIndex, int adjustment) {
-        final int nextForgettingCurveIndex = oldForgettingCurveIndex + forgettingCurveIndexIncrement(adjustment);
-        return new MemoryStateChange(nextForgettingCurveIndex, getRepeatInHours(nextForgettingCurveIndex));
+    public int getNextForgettingCurveIndex(Integer oldForgettingCurveIndex, int adjustment) {
+        return oldForgettingCurveIndex + forgettingCurveIndexIncrement(adjustment);
     }
 
     private int forgettingCurveIndexIncrement(int adjustment) {
@@ -51,7 +48,7 @@ public class SpacedRepetitionAlgorithm {
         return DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT * (1 + adjustment);
     }
 
-    private Integer getRepeatInHours(Integer forgettingCurveIndex) {
+    public Integer getRepeatInHours(Integer forgettingCurveIndex) {
         int index = (forgettingCurveIndex - DEFAULT_FORGETTING_CURVE_INDEX) / DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT - 1;
         if (index < 0) {
             return 0;

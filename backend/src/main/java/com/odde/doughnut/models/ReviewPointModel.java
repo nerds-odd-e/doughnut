@@ -44,7 +44,11 @@ public class ReviewPointModel {
     }
 
     private int updateNextRepetitionWithAdjustment(Timestamp currentUTCTimestamp, int adjustment) {
-        entity.updateMemoryState(currentUTCTimestamp, getMemoryStateChange(adjustment));
+
+        SpacedRepetitionAlgorithm spacedRepetitionAlgorithm = getUserModel().getSpacedRepetitionAlgorithm();
+        final int nextForgettingCurveIndex = spacedRepetitionAlgorithm.getNextForgettingCurveIndex(this.entity.getForgettingCurveIndex(), adjustment);
+        final int nextRepeatInHours = spacedRepetitionAlgorithm.getRepeatInHours(nextForgettingCurveIndex);
+        entity.updateMemoryState(currentUTCTimestamp, nextRepeatInHours, nextForgettingCurveIndex);
         return increaseRepetitionCountAndSave();
     }
 
@@ -53,10 +57,6 @@ public class ReviewPointModel {
         entity.setRepetitionCount(repetitionCount);
         this.modelFactoryService.reviewPointRepository.save(entity);
         return repetitionCount;
-    }
-
-    private SpacedRepetitionAlgorithm.MemoryStateChange getMemoryStateChange(int adjustment) {
-        return getUserModel().getSpacedRepetitionAlgorithm().getMemoryStateChange(this.entity.getForgettingCurveIndex(), adjustment);
     }
 
     private UserModel getUserModel() {

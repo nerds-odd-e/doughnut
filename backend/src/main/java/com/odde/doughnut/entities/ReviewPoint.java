@@ -5,8 +5,6 @@ import com.odde.doughnut.algorithms.SpacedRepetitionAlgorithm;
 import com.odde.doughnut.models.TimestampOperations;
 import java.sql.Timestamp;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.util.List;
 import javax.persistence.*;
 import javax.validation.constraints.AssertTrue;
 
@@ -128,9 +126,9 @@ public class ReviewPoint {
     return note == null || link == null;
   }
 
-  public void updateMemoryState(Timestamp currentUTCTimestamp, SpacedRepetitionAlgorithm.MemoryStateChange memoryStateChange) {
-      setForgettingCurveIndex(memoryStateChange.getNextForgettingCurveIndex());
-      setNextReviewAt(TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, memoryStateChange.getNextRepeatInHours()));
+  public void updateMemoryState(Timestamp currentUTCTimestamp, int nextRepeatInHours, int nextForgettingCurveIndex) {
+    setForgettingCurveIndex(nextForgettingCurveIndex);
+    setNextReviewAt(TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, nextRepeatInHours));
       setLastReviewedAt(currentUTCTimestamp);
   }
 }
