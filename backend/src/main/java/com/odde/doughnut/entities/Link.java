@@ -35,7 +35,7 @@ public class Link {
 
         OPPOSITE_OF                           (12, "is the opposite of", "is not the opposite of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
         BROUGHT_BY                            (13, "is brought by", "is not brought by", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        AUTHOR_OF                             (14, "is author of", "is not author of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        AUTHOR_OF                             (14, "is author of", "is not author of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE, DESCRIPTION_LINK_TARGET}),
         USES                                  (15, "uses", "does not use", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
         USED_BY                               (16, "is used by", "is not used by", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
         EXAMPLE_OF                            (17, "is an example of", "is not an example of", new QuestionType[]{LINK_SOURCE_EXCLUSIVE, CLOZE_LINK_TARGET}),

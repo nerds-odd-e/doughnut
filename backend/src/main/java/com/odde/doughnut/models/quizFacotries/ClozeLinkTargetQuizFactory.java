@@ -11,8 +11,8 @@ public class ClozeLinkTargetQuizFactory extends LinkTargetQuizFactory {
 
     @Override
     public String generateInstruction() {
-        String clozeDescription = ClozeDescription.htmlClosedDescription().getClozeDescription(answerNote.getNoteContent().getNoteTitle(), link.getSourceNote().getTitle());
-        return "<mark>" + clozeDescription + "</mark> " + link.getLinkTypeLabel() + ":";
+        String clozeTitle = ClozeDescription.htmlClosedDescription().getClozeDescription(answerNote.getNoteContent().getNoteTitle(), link.getSourceNote().getTitle());
+        return "<mark>" + clozeTitle + "</mark> " + link.getLinkTypeLabel() + ":";
     }
 
 }
