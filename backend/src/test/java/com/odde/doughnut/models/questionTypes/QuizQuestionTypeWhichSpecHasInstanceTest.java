@@ -45,7 +45,7 @@ class QuizQuestionTypeWhichSpecHasInstanceTest {
         target = makeMe.aNote("element").under(top).please();
         source = makeMe.aNote("noble gas").under(top).linkTo(target, Link.LinkType.SPECIALIZE).please();
         anotherSource = makeMe.aNote("non-official name").under(top).please();
-        reviewPoint = makeMe.aReviewPointFor(source.getLinks().get(0)).inMemoryPlease();
+        reviewPoint = makeMe.aReviewPointFor(source.getLinks().get(0)).by(userModel).inMemoryPlease();
         makeMe.refresh(top);
     }
 
@@ -78,64 +78,80 @@ class QuizQuestionTypeWhichSpecHasInstanceTest {
             }
 
             @Test
-            void shouldIncludeRightAnswers() {
+            void shouldBeInvalidWhenNoViceReviewPoint() {
                 QuizQuestion quizQuestion = buildQuestion();
-                assertThat(quizQuestion.getDescription(), containsString("<p>Which one is a specialization of <mark>element</mark> <em>and</em> is an instance of <mark>non-official name</mark>:"));
-                List<String> strings = toOptionStrings(quizQuestion);
-                assertThat("metal", in(strings));
-                assertThat(source.getTitle(), in(strings));
+                assertThat(quizQuestion, nullValue());
             }
 
             @Nested
-            class Answer {
-                @Test
-                void correct () {
-                    AnswerResult answerResult = makeMe.anAnswerFor(reviewPoint)
-                            .type(WHICH_SPEC_HAS_INSTANCE)
-                            .answer(source.getTitle())
-                            .inMemoryPlease();
-                    assertTrue(answerResult.isCorrect());
-                }
-
-                @Test
-                void wrong () {
-                    AnswerResult answerResult = makeMe.anAnswerFor(reviewPoint)
-                            .type(WHICH_SPEC_HAS_INSTANCE)
-                            .answer("metal")
-                            .inMemoryPlease();
-                    assertFalse(answerResult.isCorrect());
-                }
-            }
-
-            @Nested
-            class PersonAlsoHasTheSameNoteAsInstance {
+            class WhenTheSecondLinkHasReviewPoint {
 
                 @BeforeEach
                 void setup() {
-                    makeMe.theNote(metal).linkTo(anotherSource, Link.LinkType.INSTANCE).please();
+                    makeMe.aReviewPointFor(source.getLinks().get(1)).by(userModel).please();
+                    makeMe.refresh(userModel.getEntity());
                 }
 
                 @Test
-                void shouldBeInvalid() {
+                void shouldIncludeRightAnswers() {
                     QuizQuestion quizQuestion = buildQuestion();
-                    assertThat(quizQuestion, nullValue());
-                }
-            }
-
-            @Nested
-            class OptionFromInstance {
-
-                @BeforeEach
-                void setup() {
-                    makeMe.aNote("something else").under(top).linkTo(anotherSource, Link.LinkType.INSTANCE).please();
-                    makeMe.refresh(top);
-                }
-
-                @Test
-                void options() {
-                    QuizQuestion quizQuestion = buildQuestion();
+                    assertThat(quizQuestion.getDescription(), containsString("<p>Which one is a specialization of <mark>element</mark> <em>and</em> is an instance of <mark>non-official name</mark>:"));
                     List<String> strings = toOptionStrings(quizQuestion);
-                    assertThat("something else", in(strings));
+                    assertThat("metal", in(strings));
+                    assertThat(source.getTitle(), in(strings));
+                }
+
+                @Nested
+                class Answer {
+                    @Test
+                    void correct() {
+                        AnswerResult answerResult = makeMe.anAnswerFor(reviewPoint)
+                                .type(WHICH_SPEC_HAS_INSTANCE)
+                                .answer(source.getTitle())
+                                .inMemoryPlease();
+                        assertTrue(answerResult.isCorrect());
+                    }
+
+                    @Test
+                    void wrong() {
+                        AnswerResult answerResult = makeMe.anAnswerFor(reviewPoint)
+                                .type(WHICH_SPEC_HAS_INSTANCE)
+                                .answer("metal")
+                                .inMemoryPlease();
+                        assertFalse(answerResult.isCorrect());
+                    }
+                }
+
+                @Nested
+                class PersonAlsoHasTheSameNoteAsInstance {
+
+                    @BeforeEach
+                    void setup() {
+                        makeMe.theNote(metal).linkTo(anotherSource, Link.LinkType.INSTANCE).please();
+                    }
+
+                    @Test
+                    void shouldBeInvalid() {
+                        QuizQuestion quizQuestion = buildQuestion();
+                        assertThat(quizQuestion, nullValue());
+                    }
+                }
+
+                @Nested
+                class OptionFromInstance {
+
+                    @BeforeEach
+                    void setup() {
+                        makeMe.aNote("something else").under(top).linkTo(anotherSource, Link.LinkType.INSTANCE).please();
+                        makeMe.refresh(top);
+                    }
+
+                    @Test
+                    void options() {
+                        QuizQuestion quizQuestion = buildQuestion();
+                        List<String> strings = toOptionStrings(quizQuestion);
+                        assertThat("something else", in(strings));
+                    }
                 }
             }
 
