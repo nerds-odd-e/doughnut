@@ -18,8 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.sql.Timestamp;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
@@ -54,20 +53,20 @@ public class ReviewingWithSpacedRepetitionAlgorithmTest {
 
         @ParameterizedTest
         @CsvSource({
-                "0,   0, false",
-                "0,   1, true",
-                "0,   2, true",
-                "0,  10, true",
-
                 "1,   0, false",
-                "1,   1, false",
+                "1,   1, true",
                 "1,   2, true",
                 "1,  10, true",
 
                 "2,   0, false",
                 "2,   1, false",
-                "2,   3, false",
-                "2,   4, true",
+                "2,   2, true",
+                "2,  10, true",
+
+                "3,   0, false",
+                "3,   1, false",
+                "3,   3, false",
+                "3,   4, true",
                 })
         void whenThereIsOneReviewedNotesForUser(Integer repetitionDone, Integer reviewDay, Boolean expectedToRepeat) {
             ReviewPoint reviewPoint = makeMe
@@ -94,6 +93,28 @@ public class ReviewingWithSpacedRepetitionAlgorithmTest {
                 final Timestamp timestamp = makeMe.aTimestamp().of(2, currentHour).forWhereTheUserIs(userModel).please();
                 ReviewPoint mostUrgentReviewPoint = getOneReviewPointNeedToRepeat(timestamp);
                 assertThat(mostUrgentReviewPoint != null, is(expectedToRepeat));
+            }
+        }
+
+        @Nested
+        class EarlyAndLateReview {
+            @ParameterizedTest
+            @CsvSource({
+                    "0, 0,  110",
+                    "0, 1,  110",
+                    "2, -1,  125",
+                    "2, 0, 130",
+                    "2, 1, 125",
+                    "2, 100, 100",
+            })
+            void aReviewPointHasBeenReviewedStrictly(int ntimes, Integer daysDelay, int expectedForgettingCurveIndex) {
+                ReviewPointModel reviewPoint = makeMe
+                        .aReviewPointFor(note)
+                        .by(userModel)
+                        .nthStrictRepetitionOn(ntimes)
+                        .toModelPlease();
+                reviewPoint.repeated(TimestampOperations.addHoursToTimestamp(reviewPoint.entity.getNextReviewAt(), daysDelay * 24));
+                assertThat(reviewPoint.entity.getForgettingCurveIndex(), equalTo(expectedForgettingCurveIndex));
             }
         }
 
