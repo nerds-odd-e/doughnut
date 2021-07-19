@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class WhichSpecHasInstanceQuizFactory implements QuizQuestionFactory {
     private Link cachedInstanceLink = null;
@@ -31,13 +32,9 @@ public class WhichSpecHasInstanceQuizFactory implements QuizQuestionFactory {
             return cachedFillingOptions;
         }
         List<Note> instanceReverse = getInstanceLink().getBackwardPeers();
-        Note sourceNote = link.getSourceNote();
-        List<Note> backwardPeers = link.getBackwardPeers().stream().filter(n->{
-            if(n == null) return false;
-            if(n.equals(sourceNote)) return false;
-            if(instanceReverse.contains(n)) return false;
-            return true;
-        }).collect(Collectors.toList());
+        List<Note> specReverse = link.getBackwardPeers();
+        List<Note> backwardPeers = Stream.concat(instanceReverse.stream(), specReverse.stream())
+                .filter(n-> !(instanceReverse.contains(n) && specReverse.contains(n))).collect(Collectors.toList());
         cachedFillingOptions = servant.randomizer.randomlyChoose(5, backwardPeers);
         return cachedFillingOptions;
     }
@@ -76,11 +73,14 @@ public class WhichSpecHasInstanceQuizFactory implements QuizQuestionFactory {
     private Link getInstanceLink() {
         if(cachedInstanceLink == null) {
             List<Link> candidates = new ArrayList<>();
+            candidates.add(servant.randomizer.chooseOneRandomly(link.getSourceNote().linksOfTypeThroughDirect(Link.LinkType.SPECIALIZE)));
             candidates.add(servant.randomizer.chooseOneRandomly(link.getSourceNote().linksOfTypeThroughDirect(Link.LinkType.INSTANCE)));
             candidates.add(servant.randomizer.chooseOneRandomly(link.getSourceNote().linksOfTypeThroughDirect(Link.LinkType.TAGGED_BY)));
             candidates.add(servant.randomizer.chooseOneRandomly(link.getSourceNote().linksOfTypeThroughDirect(Link.LinkType.ATTRIBUTE)));
-            candidates.add(servant.randomizer.chooseOneRandomly(link.getSourceNote().linksOfTypeThroughDirect(Link.LinkType.SPECIALIZE)));
-            cachedInstanceLink = servant.randomizer.chooseOneRandomly(candidates.stream().filter(Objects::nonNull).collect(Collectors.toList()));
+            cachedInstanceLink = servant.randomizer.chooseOneRandomly(candidates.stream().filter(l->{
+                if(l==null) return false;
+                return !link.equals(l);
+            }).collect(Collectors.toList()));
         }
         return cachedInstanceLink;
     }

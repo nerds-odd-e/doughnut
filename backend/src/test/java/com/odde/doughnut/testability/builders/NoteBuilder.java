@@ -5,6 +5,7 @@ import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
+import org.apache.logging.log4j.util.Strings;
 
 import java.sql.Timestamp;
 
@@ -13,7 +14,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
 
     public NoteBuilder(Note note, MakeMe makeMe){
         super(makeMe, note);
-        title(titleCounter.generate());
+        if(Strings.isEmpty(note.getTitle())) title(titleCounter.generate());
         description("descrption");
         createdAt(new Timestamp(System.currentTimeMillis()));
     }

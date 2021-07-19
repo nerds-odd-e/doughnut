@@ -107,14 +107,15 @@ class QuizQuestionTypeWhichSpecHasInstanceTest {
 
                 @BeforeEach
                 void setup() {
-                    makeMe.aNote("something else").under(top).linkTo(target, Link.LinkType.INSTANCE).please();
+                    makeMe.aNote("something else").under(top).linkTo(anotherSource, Link.LinkType.INSTANCE).please();
+                    makeMe.refresh(top);
                 }
 
                 @Test
                 void options() {
                     QuizQuestion quizQuestion = buildQuestion();
                     List<String> strings = toOptionStrings(quizQuestion);
-//                    assertThat("something else", in(strings));
+                    assertThat("something else", in(strings));
                 }
             }
 
