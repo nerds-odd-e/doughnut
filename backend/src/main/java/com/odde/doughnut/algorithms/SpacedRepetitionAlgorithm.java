@@ -38,14 +38,18 @@ public class SpacedRepetitionAlgorithm {
     //   +1: add to the index by twice of default increment
     //
     public int getNextForgettingCurveIndex(Integer oldForgettingCurveIndex, int adjustment, int delayInHours) {
-        return oldForgettingCurveIndex + withDelayAdjustment(oldForgettingCurveIndex, delayInHours, forgettingCurveIndexIncrement(adjustment));
+        int newIndex = oldForgettingCurveIndex + withDelayAdjustment(oldForgettingCurveIndex, delayInHours, forgettingCurveIndexIncrement(adjustment));
+        if (newIndex < DEFAULT_FORGETTING_CURVE_INDEX) {
+            return DEFAULT_FORGETTING_CURVE_INDEX;
+        }
+        return newIndex;
     }
 
     private int withDelayAdjustment(Integer oldForgettingCurveIndex, int delayInHours, int forgettingCurveIndexIncrement) {
         int delayAdjustment = forgettingCurveIndexIncrement;
         Integer oldRepeatInHours = getRepeatInHours(oldForgettingCurveIndex);
         if(oldRepeatInHours > 0) {
-            delayAdjustment = forgettingCurveIndexIncrement + delayInHours * forgettingCurveIndexIncrement / oldRepeatInHours;
+            delayAdjustment = forgettingCurveIndexIncrement - Math.abs(delayInHours) * forgettingCurveIndexIncrement / oldRepeatInHours;
         }
         return delayAdjustment;
     }

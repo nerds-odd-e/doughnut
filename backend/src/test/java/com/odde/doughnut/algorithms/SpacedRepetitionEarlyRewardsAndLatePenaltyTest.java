@@ -38,6 +38,33 @@ public class SpacedRepetitionEarlyRewardsAndLatePenaltyTest {
         assertThat(index, lessThanOrEqualTo(baselineForgettingCurveIndex));
     }
 
+    @Test
+    void repeatLate_byOneHour() {
+        int index = getNextForgettingCurveIndexWithDelay(1);
+        assertThat(index, greaterThan(currentForgettingCurveIndex));
+        assertThat(index, lessThanOrEqualTo(baselineForgettingCurveIndex));
+    }
+
+    @Test
+    void repeatLate_byOneDay() {
+        int index = getNextForgettingCurveIndexWithDelay(24);
+        assertThat(index, greaterThan(currentForgettingCurveIndex));
+        assertThat(index, lessThan(baselineForgettingCurveIndex));
+    }
+
+    @Test
+    void repeatLate_by10Days() {
+        int index = getNextForgettingCurveIndexWithDelay(10 * 24);
+        assertThat(index, lessThan(currentForgettingCurveIndex));
+        assertThat(index, greaterThan(DEFAULT_FORGETTING_CURVE_INDEX));
+    }
+
+    @Test
+    void repeatLate_byOneHundredDays() {
+        int index = getNextForgettingCurveIndexWithDelay(100 * 24);
+        assertThat(index, equalTo(DEFAULT_FORGETTING_CURVE_INDEX));
+    }
+
     private int getNextForgettingCurveIndexWithDelay(int delayInHours) {
         return spacedRepetitionAlgorithm.getNextForgettingCurveIndex(currentForgettingCurveIndex, 0, delayInHours);
     }
