@@ -38,7 +38,7 @@ public class Link {
         AUTHOR_OF                             (14, "is author of", "is not author of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
         USES                                  (15, "uses", "does not use", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
         USED_BY                               (16, "is used by", "is not used by", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        EXAMPLE_OF                            (17, "is an example of", "is not an example of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE, CLOZE_LINK_TARGET}),
+        EXAMPLE_OF                            (17, "is an example of", "is not an example of", new QuestionType[]{LINK_SOURCE_EXCLUSIVE, CLOZE_LINK_TARGET}),
         HAS_AS_EXAMPLE                        (18, "has as example", "does not have as example", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
         PRECEDES                              (19, "precedes", "does not precede", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
         SUCCEEDS                              (20, "succeeds", "does not succeeds", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
