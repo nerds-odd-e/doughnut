@@ -1,12 +1,10 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 
-import static com.odde.doughnut.entities.QuizQuestion.QuestionType.LINK_SOURCE_EXCLUSIVE;
-import static com.odde.doughnut.entities.QuizQuestion.QuestionType.LINK_TARGET;
+import static com.odde.doughnut.entities.QuizQuestion.QuestionType.*;
 
 public class AnswerResult {
     @Getter
@@ -41,8 +39,11 @@ public class AnswerResult {
     }
 
     private Note getCorrectAnswerNote() {
-        if (questionType == LINK_TARGET) {
+        if (questionType == LINK_TARGET || questionType == CLOZE_LINK_TARGET) {
             return reviewPoint.getLink().getTargetNote();
+        }
+        if (questionType == WHICH_SPEC_HAS_INSTANCE) {
+            return reviewPoint.getLink().getSourceNote();
         }
         return reviewPoint.getNote();
     }

@@ -1,9 +1,6 @@
 package com.odde.doughnut.models.questionTypes;
 
-import com.odde.doughnut.entities.Link;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestion;
-import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionDirector;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
@@ -23,6 +20,8 @@ import java.util.stream.Collectors;
 import static com.odde.doughnut.entities.QuizQuestion.QuestionType.WHICH_SPEC_HAS_INSTANCE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
@@ -85,6 +84,27 @@ class QuizQuestionTypeWhichSpecHasInstanceTest {
                 List<String> strings = toOptionStrings(quizQuestion);
                 assertThat("metal", in(strings));
                 assertThat(source.getTitle(), in(strings));
+            }
+
+            @Nested
+            class Answer {
+                @Test
+                void correct () {
+                    AnswerResult answerResult = makeMe.anAnswerFor(reviewPoint)
+                            .type(WHICH_SPEC_HAS_INSTANCE)
+                            .answer(source.getTitle())
+                            .inMemoryPlease();
+                    assertTrue(answerResult.isCorrect());
+                }
+
+                @Test
+                void wrong () {
+                    AnswerResult answerResult = makeMe.anAnswerFor(reviewPoint)
+                            .type(WHICH_SPEC_HAS_INSTANCE)
+                            .answer("metal")
+                            .inMemoryPlease();
+                    assertFalse(answerResult.isCorrect());
+                }
             }
 
             @Nested
