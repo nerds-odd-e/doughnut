@@ -16,4 +16,6 @@ public class Answer {
     @Setter
     QuizQuestion.QuestionType questionType;
 
+    @Getter @Setter
+    private Integer viceReviewPointId;
 }

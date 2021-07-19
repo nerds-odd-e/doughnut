@@ -39,7 +39,14 @@ public class QuizQuestionDirector {
         quizQuestion.setDescription(quizQuestionFactory.generateInstruction());
         quizQuestion.setMainTopic(quizQuestionFactory.generateMainTopic());
         quizQuestion.setHintLinks(quizQuestionFactory.generateHintLinks());
+        quizQuestion.setViceReviewPointId(getViceReviewPoinId());
         return quizQuestion;
+    }
+
+    private Integer getViceReviewPoinId() {
+        ReviewPoint viceReviewPoint = quizQuestionFactory.getViceReviewPoint();
+        if (viceReviewPoint == null) return null;
+        return viceReviewPoint.getId();
     }
 
     private List<QuizQuestion.Option> generateOptions() {

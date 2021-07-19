@@ -40,6 +40,9 @@ public class QuizQuestion {
     public String mainTopic;
     @Getter @Setter
     private Map<Link.LinkType, LinkViewed> hintLinks;
+    @Getter @Setter
+    private Integer viceReviewPointId;
+
 
     public QuizQuestion(ReviewPoint reviewPoint) {
         this.reviewPoint = reviewPoint;
@@ -52,6 +55,7 @@ public class QuizQuestion {
     public Answer buildAnswer() {
         Answer answer = new Answer();
         answer.setQuestionType(questionType);
+        answer.setViceReviewPointId(viceReviewPointId);
         return answer;
     }
 
