@@ -13,6 +13,7 @@ public class LinkTargetQuizFactory implements QuizQuestionFactory {
     private final Link link;
     private final Note answerNote;
     private final QuizQuestionServant servant;
+    private List<Note> cachedFillingOptions = null;
 
     public LinkTargetQuizFactory(QuizQuestionServant servant, ReviewPoint reviewPoint) {
         this.link = reviewPoint.getLink();
@@ -22,7 +23,10 @@ public class LinkTargetQuizFactory implements QuizQuestionFactory {
 
     @Override
     public List<Note> generateFillingOptions() {
-        return servant.choose5FromSiblings(answerNote, n -> !n.equals(answerNote));
+        if(cachedFillingOptions == null) {
+            cachedFillingOptions = servant.choose5FromSiblings(answerNote, n -> !n.equals(answerNote) && !n.equals(link.getSourceNote()));
+        }
+        return cachedFillingOptions;
     }
 
     @Override
@@ -48,6 +52,11 @@ public class LinkTargetQuizFactory implements QuizQuestionFactory {
     @Override
     public Map<Link.LinkType, LinkViewed> generateHintLinks() {
         return null;
+    }
+
+    @Override
+    public boolean isValidQuestion() {
+        return generateFillingOptions().size() > 0;
     }
 
     private Note getAnswerNote() {

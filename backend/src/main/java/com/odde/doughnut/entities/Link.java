@@ -21,31 +21,31 @@ import static com.odde.doughnut.entities.QuizQuestion.QuestionType.LINK_TARGET;
 public class Link {
 
     public enum LinkType {
-        RELATED_TO(1, "is related to", "is not related to", new QuestionType[0]),
-        SPECIALIZE(2, "is a specialization of", "is not a specialization of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        GENERALIZE(3, "is a generalization of", "is not a generalization of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        RELATED_TO                            (1, "is related to", "is not related to", new QuestionType[0]),
+        SPECIALIZE                            (2, "is a specialization of", "is not a specialization of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        GENERALIZE                            (3, "is a generalization of", "is not a generalization of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
 
-        INSTANCE(4, "is an instance of", "is not an instance of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        HAS_INSTANCE(5, "has instances", "not have as an instance", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        /*INTEGRATED*/ PART(6, "is a part of", "is not a part of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        HAS_PART(7, "has parts", "not have as a part", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        /*NON INTEGRATED*/ TAGGED_BY(8, "is tagged by", "is not tagged by", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        TAGGING(9, "tagging", "is not tagging", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        ATTRIBUTE(10, "is an attribute of", "is not an attribute of", new QuestionType[]{LINK_TARGET }),
-        HAS_ATTRIBUTE(11, "has attributes", "not has as an attribute", new QuestionType[]{LINK_TARGET }),
+        INSTANCE                              (4, "is an instance of", "is not an instance of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        HAS_INSTANCE                          (5, "has instances", "not have as an instance", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        /*INTEGRATED*/ PART                   (6, "is a part of", "is not a part of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        HAS_PART                              (7, "has parts", "not have as a part", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        /*NON INTEGRATED*/ TAGGED_BY          (8, "is tagged by", "is not tagged by", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        TAGGING                               (9, "tagging", "is not tagging", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        ATTRIBUTE                             (10, "is an attribute of", "is not an attribute of", new QuestionType[]{LINK_TARGET }),
+        HAS_ATTRIBUTE                         (11, "has attributes", "not has as an attribute", new QuestionType[]{LINK_TARGET }),
 
-        OPPOSITE_OF(12, "is the opposite of", "is not the opposite of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        BROUGHT_BY(13, "is brought by", "is not brought by", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        AUTHOR_OF(14, "is author of", "is not author of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        USES(15, "uses", "does not use", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        USED_BY(16, "is used by", "is not used by", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        EXAMPLE_OF(17, "is an example of", "is not an example of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        HAS_AS_EXAMPLE(18, "has as example", "does not have as example", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        PRECEDES(19, "precedes", "does not precede", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        SUCCEEDS(20, "succeeds", "does not succeeds", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        SAME_AS(21, "is the same as", "is not the same as", new QuestionType[]{LINK_TARGET}),
-        SIMILAR_TO(22, "is similar to", "is not similar to", new QuestionType[]{LINK_TARGET}),
-        CONFUSE_WITH(23, "confuses with", "does not confuse with", new QuestionType[0]);
+        OPPOSITE_OF                           (12, "is the opposite of", "is not the opposite of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        BROUGHT_BY                            (13, "is brought by", "is not brought by", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        AUTHOR_OF                             (14, "is author of", "is not author of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        USES                                  (15, "uses", "does not use", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        USED_BY                               (16, "is used by", "is not used by", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        EXAMPLE_OF                            (17, "is an example of", "is not an example of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        HAS_AS_EXAMPLE                        (18, "has as example", "does not have as example", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        PRECEDES                              (19, "precedes", "does not precede", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        SUCCEEDS                              (20, "succeeds", "does not succeeds", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
+        SAME_AS                               (21, "is the same as", "is not the same as", new QuestionType[]{LINK_TARGET}),
+        SIMILAR_TO                            (22, "is similar to", "is not similar to", new QuestionType[]{LINK_TARGET}),
+        CONFUSE_WITH                          (23, "confuses with", "does not confuse with", new QuestionType[0]);
 
         @JsonValue
         public final String label;

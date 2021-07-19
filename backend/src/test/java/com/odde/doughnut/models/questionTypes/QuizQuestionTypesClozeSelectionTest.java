@@ -1,10 +1,11 @@
-package com.odde.doughnut.models;
+package com.odde.doughnut.models.questionTypes;
 
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.LinkViewed;
+import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionDirector;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.testability.MakeMe;
@@ -54,7 +55,6 @@ class QuizQuestionTypesClozeSelectionTest {
             note2 = makeMe.aNote("source").under(top).byUser(userModel).please();
             reviewPoint = makeMe.aReviewPointFor(note1).inMemoryPlease();
         }
-
 
         @Test
         void shouldIncludeRightAnswers() {

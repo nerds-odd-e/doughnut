@@ -1,8 +1,9 @@
-package com.odde.doughnut.models;
+package com.odde.doughnut.models.questionTypes;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionDirector;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.testability.MakeMe;
@@ -25,7 +26,7 @@ import static org.hamcrest.Matchers.*;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
-class QuizQuestionTypesTest {
+class QuizQuestionTypeLinkSourceExclusiveTest {
     @Autowired
     MakeMe makeMe;
     UserModel userModel;
