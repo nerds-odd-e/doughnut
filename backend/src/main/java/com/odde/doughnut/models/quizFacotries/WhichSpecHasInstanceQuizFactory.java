@@ -27,16 +27,18 @@ public class WhichSpecHasInstanceQuizFactory implements QuizQuestionFactory {
 
     @Override
     public List<Note> generateFillingOptions() {
-        if(cachedFillingOptions == null) {
-            List<Note> instanceReverse = getInstanceLink().getBackwardPeers();
-            Note sourceNote = link.getSourceNote();
-            List<Note> backwardPeers = link.getBackwardPeers().stream().filter(n->{
-                if(n.equals(sourceNote)) return false;
-                if(instanceReverse.contains(n)) return false;
-                return true;
-            }).collect(Collectors.toList());
-            cachedFillingOptions = servant.randomizer.randomlyChoose(5, backwardPeers);
+        if (cachedFillingOptions != null) {
+            return cachedFillingOptions;
         }
+        List<Note> instanceReverse = getInstanceLink().getBackwardPeers();
+        Note sourceNote = link.getSourceNote();
+        List<Note> backwardPeers = link.getBackwardPeers().stream().filter(n->{
+            if(n == null) return false;
+            if(n.equals(sourceNote)) return false;
+            if(instanceReverse.contains(n)) return false;
+            return true;
+        }).collect(Collectors.toList());
+        cachedFillingOptions = servant.randomizer.randomlyChoose(5, backwardPeers);
         return cachedFillingOptions;
     }
 
@@ -53,12 +55,12 @@ public class WhichSpecHasInstanceQuizFactory implements QuizQuestionFactory {
     @Override
     public Note generateAnswerNote() {
         if(getInstanceLink() == null) return null;
-        return getInstanceLink().getTargetNote();
+        return getInstanceLink().getSourceNote();
     }
 
     @Override
     public List<QuizQuestion.Option> toQuestionOptions(List<Note> notes) {
-        return null;
+        return servant.toTitleOptions(notes);
     }
 
     @Override
