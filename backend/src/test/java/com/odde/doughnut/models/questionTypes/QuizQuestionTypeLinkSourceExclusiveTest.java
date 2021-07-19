@@ -50,7 +50,6 @@ class QuizQuestionTypeLinkSourceExclusiveTest {
             top = makeMe.aNote().please();
             target = makeMe.aNote("target").under(top).please();
             source = makeMe.aNote("source").under(top).byUser(userModel.getEntity()).linkTo(target).please();
-            anotherSource = makeMe.aNote("anotherSource").under(top).byUser(userModel.getEntity()).linkTo(target).please();
             reviewPoint = makeMe.aReviewPointFor(source.getLinks().get(0)).inMemoryPlease();
         }
 
@@ -70,31 +69,46 @@ class QuizQuestionTypeLinkSourceExclusiveTest {
             }
 
             @Test
-            void shouldIncludeRightAnswers() {
-                makeMe.refresh(top);
+            void shouldReturnNullIfNoEnoughOptions() {
                 QuizQuestion quizQuestion = buildLinSourceExclusiveQuizQuestion();
-                assertThat(quizQuestion.getDescription(), equalTo("Which of the following is <em>NOT</em> a specialization of"));
-                assertThat(quizQuestion.getMainTopic(), equalTo(target.getTitle()));
-                List<String> options = toOptionStrings(quizQuestion);
-                assertThat(anotherSource.getTitle(), in(options));
-                assertThat(notRelated.getTitle(), in(options));
-                assertThat(source.getTitle(), in(options));
+                assertThat(quizQuestion, is(nullValue()));
             }
 
-            @Test
-            void mustIncludeSourceNote() {
-                makeMe.aNote("anotherSource1").under(top).byUser(userModel.getEntity()).linkTo(target).please();
-                makeMe.aNote("anotherSource2").under(top).byUser(userModel.getEntity()).linkTo(target).please();
-                makeMe.aNote("anotherSource3").under(top).byUser(userModel.getEntity()).linkTo(target).please();
-                makeMe.aNote("anotherSource4").under(top).byUser(userModel.getEntity()).linkTo(target).please();
-                makeMe.aNote("anotherSource5").under(top).byUser(userModel.getEntity()).linkTo(target).please();
-                source = makeMe.aNote("anotherSource6").under(top).byUser(userModel.getEntity()).linkTo(target).please();
-                makeMe.refresh(top);
-                reviewPoint = makeMe.aReviewPointFor(source.getLinks().get(0)).inMemoryPlease();
-                QuizQuestion quizQuestion = buildLinSourceExclusiveQuizQuestion();
-                List<String> options = toOptionStrings(quizQuestion);
-                assertThat(notRelated.getTitle(), in(options));
-                assertThat(source.getTitle(), in(options));
+            @Nested
+            class WithEnoughOptions {
+                @BeforeEach
+                void setup() {
+                    anotherSource = makeMe.aNote("anotherSource").under(top).byUser(userModel.getEntity()).linkTo(target).please();
+                }
+
+
+                @Test
+                void shouldIncludeRightAnswers() {
+                    makeMe.refresh(top);
+                    QuizQuestion quizQuestion = buildLinSourceExclusiveQuizQuestion();
+                    assertThat(quizQuestion.getDescription(), equalTo("Which of the following is <em>NOT</em> a specialization of"));
+                    assertThat(quizQuestion.getMainTopic(), equalTo(target.getTitle()));
+                    List<String> options = toOptionStrings(quizQuestion);
+                    assertThat(anotherSource.getTitle(), in(options));
+                    assertThat(notRelated.getTitle(), in(options));
+                    assertThat(source.getTitle(), in(options));
+                }
+
+                @Test
+                void mustIncludeSourceNote() {
+                    makeMe.aNote("anotherSource1").under(top).byUser(userModel.getEntity()).linkTo(target).please();
+                    makeMe.aNote("anotherSource2").under(top).byUser(userModel.getEntity()).linkTo(target).please();
+                    makeMe.aNote("anotherSource3").under(top).byUser(userModel.getEntity()).linkTo(target).please();
+                    makeMe.aNote("anotherSource4").under(top).byUser(userModel.getEntity()).linkTo(target).please();
+                    makeMe.aNote("anotherSource5").under(top).byUser(userModel.getEntity()).linkTo(target).please();
+                    source = makeMe.aNote("anotherSource6").under(top).byUser(userModel.getEntity()).linkTo(target).please();
+                    makeMe.refresh(top);
+                    reviewPoint = makeMe.aReviewPointFor(source.getLinks().get(0)).inMemoryPlease();
+                    QuizQuestion quizQuestion = buildLinSourceExclusiveQuizQuestion();
+                    List<String> options = toOptionStrings(quizQuestion);
+                    assertThat(notRelated.getTitle(), in(options));
+                    assertThat(source.getTitle(), in(options));
+                }
             }
         }
 

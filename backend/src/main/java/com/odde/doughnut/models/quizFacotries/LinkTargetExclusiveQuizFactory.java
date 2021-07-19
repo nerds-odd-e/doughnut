@@ -12,6 +12,7 @@ import java.util.Map;
 public class LinkTargetExclusiveQuizFactory implements QuizQuestionFactory {
     private final Link link;
     private final QuizQuestionServant servant;
+    private List<Note> cachedFillingOptions = null;
 
     public LinkTargetExclusiveQuizFactory(QuizQuestionServant servant, ReviewPoint reviewPoint) {
         this.link = reviewPoint.getLink();
@@ -20,9 +21,12 @@ public class LinkTargetExclusiveQuizFactory implements QuizQuestionFactory {
 
     @Override
     public List<Note> generateFillingOptions() {
-        Note sourceNote = link.getSourceNote();
-        List<Note> backwardPeers = link.getBackwardPeers();
-        return servant.randomlyChooseAndEnsure(backwardPeers, sourceNote, 5);
+        if(cachedFillingOptions == null) {
+            Note sourceNote = link.getSourceNote();
+            List<Note> backwardPeers = link.getBackwardPeers();
+            cachedFillingOptions = servant.randomlyChooseAndEnsure(backwardPeers, sourceNote, 5);
+        }
+        return cachedFillingOptions;
     }
 
     @Override
@@ -52,5 +56,10 @@ public class LinkTargetExclusiveQuizFactory implements QuizQuestionFactory {
     @Override
     public Map<Link.LinkType, LinkViewed> generateHintLinks() {
         return null;
+    }
+
+    @Override
+    public boolean isValidQuestion() {
+        return generateFillingOptions().size() > 0;
     }
 }
