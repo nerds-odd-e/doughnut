@@ -3,6 +3,7 @@ package com.odde.doughnut.models;
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.concurrent.TimeUnit;
 
 public abstract class TimestampOperations {
     public static Timestamp addHoursToTimestamp(Timestamp timestamp, int hoursToAdd) {
@@ -36,4 +37,8 @@ public abstract class TimestampOperations {
         return userLocalDateTime;
     }
 
+    public static long getDiffInHours(Timestamp currentUTCTimestamp, Timestamp nextReviewAt) {
+        long diff = currentUTCTimestamp.getTime() - nextReviewAt.getTime();
+        return TimeUnit.HOURS.convert(diff, TimeUnit.MILLISECONDS);
+    }
 }

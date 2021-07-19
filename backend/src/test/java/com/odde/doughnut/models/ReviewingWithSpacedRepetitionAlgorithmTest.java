@@ -29,14 +29,12 @@ public class ReviewingWithSpacedRepetitionAlgorithmTest {
     MakeMe makeMe;
     UserModel userModel;
     UserModel anotherUser;
-    Timestamp baseDay;
     private Randomizer randomizer = new NonRandomizer();
 
     @BeforeEach
     void setup() {
         userModel = makeMe.aUser().withSpaceIntervals("1, 2, 4, 8").toModelPlease();
         anotherUser = makeMe.aUser().toModelPlease();
-        baseDay = makeMe.aTimestamp().of(1, 8).forWhereTheUserIs(userModel).please();
     }
 
     @Nested
@@ -50,8 +48,8 @@ public class ReviewingWithSpacedRepetitionAlgorithmTest {
 
         @Test
         void whenThereIsNoReviewedNotesForUser() {
-            makeMe.aReviewPointFor(note).by(anotherUser).please();
-            assertThat(getOneReviewPointNeedToRepeat(daysAfterBase(1)), is(nullValue()));
+            ReviewPoint reviewPoint = makeMe.aReviewPointFor(note).by(anotherUser).please();
+            assertThat(getOneReviewPointNeedToRepeat(daysAfterBase(reviewPoint, 1)), is(nullValue()));
         }
 
         @ParameterizedTest
@@ -72,12 +70,12 @@ public class ReviewingWithSpacedRepetitionAlgorithmTest {
                 "2,   4, true",
                 })
         void whenThereIsOneReviewedNotesForUser(Integer repetitionDone, Integer reviewDay, Boolean expectedToRepeat) {
-            makeMe
+            ReviewPoint reviewPoint = makeMe
                     .aReviewPointFor(note)
                     .by(userModel)
-                    .nthStrictRepetitionOn(repetitionDone, baseDay)
+                    .nthStrictRepetitionOn(repetitionDone)
                     .please();
-            ReviewPoint mostUrgentReviewPoint = getOneReviewPointNeedToRepeat(daysAfterBase(reviewDay));
+            ReviewPoint mostUrgentReviewPoint = getOneReviewPointNeedToRepeat(daysAfterBase(reviewPoint, reviewDay));
             assertThat(mostUrgentReviewPoint != null, is(expectedToRepeat));
         }
 
@@ -91,13 +89,9 @@ public class ReviewingWithSpacedRepetitionAlgorithmTest {
                     "16, 17,   true",
             })
             void atHourInTheNextDay(Integer lastRepeatHour, Integer currentHour, Boolean expectedToRepeat) {
-                baseDay = makeMe.aTimestamp().of(1, lastRepeatHour).forWhereTheUserIs(userModel).please();
-                makeMe
-                        .aReviewPointFor(note)
-                        .by(userModel)
-                        .nthStrictRepetitionOn(0, baseDay)
-                        .please();
-                final Timestamp timestamp = baseDay = makeMe.aTimestamp().of(2, currentHour).forWhereTheUserIs(userModel).please();
+                ReviewPoint reviewPoint = makeMe .aReviewPointFor(note) .by(userModel) .please();
+                reviewPoint.setNextReviewAt(makeMe.aTimestamp().of(2, lastRepeatHour).forWhereTheUserIs(userModel).please());
+                final Timestamp timestamp = makeMe.aTimestamp().of(2, currentHour).forWhereTheUserIs(userModel).please();
                 ReviewPoint mostUrgentReviewPoint = getOneReviewPointNeedToRepeat(timestamp);
                 assertThat(mostUrgentReviewPoint != null, is(expectedToRepeat));
             }
@@ -112,7 +106,7 @@ public class ReviewingWithSpacedRepetitionAlgorithmTest {
         return model.getEntity();
     }
 
-    private Timestamp daysAfterBase(Integer reviewDay) {
-        return TimestampOperations.addHoursToTimestamp(baseDay, reviewDay * 24);
+    private Timestamp daysAfterBase(ReviewPoint reviewPoint, Integer reviewDay) {
+        return TimestampOperations.addHoursToTimestamp(reviewPoint.getLastReviewedAt(), reviewDay * 24);
     }
 }
