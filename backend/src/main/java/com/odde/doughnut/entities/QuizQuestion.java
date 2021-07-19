@@ -12,20 +12,19 @@ import java.util.function.BiFunction;
 public class QuizQuestion {
 
     public enum QuestionType {
-        CLOZE_SELECTION("cloze_selection", ClozeTitleSelectionQuizFactory::new),
-        SPELLING("spelling", SpellingQuizFactory::new),
-        PICTURE_TITLE("picture_title", PictureTitleSelectionQuizFactory::new),
-        PICTURE_SELECTION("picture_selection", PictureSelectionQuizFactory::new),
-        LINK_TARGET("link_target", LinkTargetQuizFactory::new),
-        CLOZE_LINK_TARGET("cloze_link_target", ClozeLinkTargetQuizFactory::new),
-        DESCRIPTION_LINK_TARGET("description_link_target", DescriptionLinkTargetQuizFactory::new),
-        LINK_SOURCE_EXCLUSIVE("link_source_exclusive", LinkTargetExclusiveQuizFactory::new);
+        CLOZE_SELECTION(ClozeTitleSelectionQuizFactory::new),
+        SPELLING(SpellingQuizFactory::new),
+        PICTURE_TITLE(PictureTitleSelectionQuizFactory::new),
+        PICTURE_SELECTION(PictureSelectionQuizFactory::new),
+        LINK_TARGET(LinkTargetQuizFactory::new),
+        CLOZE_LINK_TARGET(ClozeLinkTargetQuizFactory::new),
+        DESCRIPTION_LINK_TARGET(DescriptionLinkTargetQuizFactory::new),
+        WHICH_SPEC_HAS_INSTANCE(WhichSpecHasInstanceQuizFactory::new),
+        LINK_SOURCE_EXCLUSIVE(LinkTargetExclusiveQuizFactory::new);
 
-        public final String label;
         public final BiFunction<QuizQuestionServant, ReviewPoint, QuizQuestionFactory> factory;
 
-        QuestionType(String label, BiFunction<QuizQuestionServant, ReviewPoint, QuizQuestionFactory> factory) {
-            this.label = label;
+        QuestionType(BiFunction<QuizQuestionServant, ReviewPoint, QuizQuestionFactory> factory) {
             this.factory = factory;
         }
     }

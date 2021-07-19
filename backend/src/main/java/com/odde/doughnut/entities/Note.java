@@ -146,7 +146,7 @@ public class Note {
                 .collect(Collectors.toUnmodifiableList());
     }
 
-    private List<Link> linksOfTypeThroughDirect(Link.LinkType linkType) {
+    public List<Link> linksOfTypeThroughDirect(Link.LinkType linkType) {
         return this.links.stream()
                 .filter(l -> l.getLinkType().equals(linkType))
                 .collect(Collectors.toList());
@@ -379,5 +379,6 @@ public class Note {
         if (parent == null) return null;
         return parent.id;
     }
+
 }
 

@@ -12,7 +12,7 @@ import java.util.Map;
 public class LinkTargetQuizFactory implements QuizQuestionFactory {
     protected final Link link;
     protected final Note answerNote;
-    private final QuizQuestionServant servant;
+    protected final QuizQuestionServant servant;
     private List<Note> cachedFillingOptions = null;
 
     public LinkTargetQuizFactory(QuizQuestionServant servant, ReviewPoint reviewPoint) {
