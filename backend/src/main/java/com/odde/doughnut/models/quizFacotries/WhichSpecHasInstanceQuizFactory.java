@@ -9,6 +9,7 @@ import com.odde.doughnut.entities.json.LinkViewed;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class WhichSpecHasInstanceQuizFactory implements QuizQuestionFactory {
@@ -27,8 +28,13 @@ public class WhichSpecHasInstanceQuizFactory implements QuizQuestionFactory {
     @Override
     public List<Note> generateFillingOptions() {
         if(cachedFillingOptions == null) {
+            List<Note> instanceReverse = getInstanceLink().getBackwardPeers();
             Note sourceNote = link.getSourceNote();
-            List<Note> backwardPeers = link.getBackwardPeers().stream().filter(n->!n.equals(sourceNote)).collect(Collectors.toList());
+            List<Note> backwardPeers = link.getBackwardPeers().stream().filter(n->{
+                if(n.equals(sourceNote)) return false;
+                if(instanceReverse.contains(n)) return false;
+                return true;
+            }).collect(Collectors.toList());
             cachedFillingOptions = servant.randomizer.randomlyChoose(5, backwardPeers);
         }
         return cachedFillingOptions;
@@ -36,7 +42,7 @@ public class WhichSpecHasInstanceQuizFactory implements QuizQuestionFactory {
 
     @Override
     public String generateInstruction() {
-        return "<p>Which one " + link.getLinkTypeLabel() + " <mark>"+link.getTargetNote().getTitle()+"</mark> <em>And</em> " + getInstanceLink().getLinkTypeLabel() + " <mark>" + getInstanceLink().getTargetNote().getTitle() + "</mark>:" ;
+        return "<p>Which one " + link.getLinkTypeLabel() + " <mark>"+link.getTargetNote().getTitle()+"</mark> <em>and</em> " + getInstanceLink().getLinkTypeLabel() + " <mark>" + getInstanceLink().getTargetNote().getTitle() + "</mark>:" ;
     }
 
     @Override
@@ -67,7 +73,12 @@ public class WhichSpecHasInstanceQuizFactory implements QuizQuestionFactory {
 
     private Link getInstanceLink() {
         if(cachedInstanceLink == null) {
-            cachedInstanceLink = servant.randomizer.chooseOneRandomly(link.getSourceNote().linksOfTypeThroughDirect(Link.LinkType.INSTANCE));
+            List<Link> candidates = new ArrayList<>();
+            candidates.add(servant.randomizer.chooseOneRandomly(link.getSourceNote().linksOfTypeThroughDirect(Link.LinkType.INSTANCE)));
+            candidates.add(servant.randomizer.chooseOneRandomly(link.getSourceNote().linksOfTypeThroughDirect(Link.LinkType.TAGGED_BY)));
+            candidates.add(servant.randomizer.chooseOneRandomly(link.getSourceNote().linksOfTypeThroughDirect(Link.LinkType.ATTRIBUTE)));
+            candidates.add(servant.randomizer.chooseOneRandomly(link.getSourceNote().linksOfTypeThroughDirect(Link.LinkType.SPECIALIZE)));
+            cachedInstanceLink = servant.randomizer.chooseOneRandomly(candidates.stream().filter(Objects::nonNull).collect(Collectors.toList()));
         }
         return cachedInstanceLink;
     }

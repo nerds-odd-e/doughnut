@@ -17,7 +17,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
-import static com.odde.doughnut.entities.QuizQuestion.QuestionType.DESCRIPTION_LINK_TARGET;
 import static com.odde.doughnut.entities.QuizQuestion.QuestionType.WHICH_SPEC_HAS_INSTANCE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -42,9 +41,9 @@ class QuizQuestionTypeWhichSpecHasInstanceTest {
     void setup() {
         userModel = makeMe.aUser().toModelPlease();
         top = makeMe.aNote().byUser(userModel).please();
-        target = makeMe.aNote("client").under(top).please();
-        source = makeMe.aNote("company").under(top).linkTo(target, Link.LinkType.SPECIALIZE).please();
-        anotherSource = makeMe.aNote("nokia").under(top).please();
+        target = makeMe.aNote("element").under(top).please();
+        source = makeMe.aNote("noble gas").under(top).linkTo(target, Link.LinkType.SPECIALIZE).please();
+        anotherSource = makeMe.aNote("non-official name").under(top).please();
         reviewPoint = makeMe.aReviewPointFor(source.getLinks().get(0)).inMemoryPlease();
         makeMe.refresh(top);
     }
@@ -70,15 +69,32 @@ class QuizQuestionTypeWhichSpecHasInstanceTest {
 
         @Nested
         class WhenTheNoteHasMoreSpecificationSiblings {
+            Note metal;
+
             @BeforeEach
             void setup() {
-                makeMe.aNote("person").under(top).linkTo(target, Link.LinkType.SPECIALIZE).please();
+                metal = makeMe.aNote("metal").under(top).linkTo(target, Link.LinkType.SPECIALIZE).please();
             }
 
             @Test
             void shouldIncludeRightAnswers() {
                 QuizQuestion quizQuestion = buildQuestion();
-                assertThat(quizQuestion.getDescription(), containsString("<p>Which one is a specialization of <mark>client</mark> <em>And</em> is an instance of <mark>nokia</mark>:"));
+                assertThat(quizQuestion.getDescription(), containsString("<p>Which one is a specialization of <mark>element</mark> <em>and</em> is an instance of <mark>non-official name</mark>:"));
+            }
+
+            @Nested
+            class PersonAlsoHasTheSameNoteAsInstance {
+
+                @BeforeEach
+                void setup() {
+                    makeMe.theNote(metal).linkTo(anotherSource, Link.LinkType.INSTANCE).please();
+                }
+
+                @Test
+                void shouldBeInvalid() {
+                    QuizQuestion quizQuestion = buildQuestion();
+                    assertThat(quizQuestion, nullValue());
+                }
             }
         }
     }
