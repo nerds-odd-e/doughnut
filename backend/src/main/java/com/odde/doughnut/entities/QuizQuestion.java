@@ -17,6 +17,7 @@ public class QuizQuestion {
         PICTURE_TITLE("picture_title", PictureTitleSelectionQuizFactory::new),
         PICTURE_SELECTION("picture_selection", PictureSelectionQuizFactory::new),
         LINK_TARGET("link_target", LinkTargetQuizFactory::new),
+        CLOZE_LINK_TARGET("cloze_link_target", ClozeLinkTargetQuizFactory::new),
         LINK_SOURCE_EXCLUSIVE("link_source_exclusive", LinkTargetExclusiveQuizFactory::new);
 
         public final String label;

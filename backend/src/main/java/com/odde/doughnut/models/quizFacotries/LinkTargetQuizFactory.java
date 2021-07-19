@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Map;
 
 public class LinkTargetQuizFactory implements QuizQuestionFactory {
-    private final Link link;
-    private final Note answerNote;
+    protected final Link link;
+    protected final Note answerNote;
     private final QuizQuestionServant servant;
     private List<Note> cachedFillingOptions = null;
 

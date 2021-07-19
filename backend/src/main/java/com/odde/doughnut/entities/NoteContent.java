@@ -133,11 +133,7 @@ public class NoteContent {
     public String getClozeDescription() {
         if(Strings.isEmpty(description)) return "";
 
-        return new ClozeDescription(
-                "<mark title='Hidden text that is partially matching the answer'>[..~]</mark>",
-                "<mark title='Hidden text that is matching the answer'>[...]</mark>",
-                "<mark title='Hidden pronunciation'>/.../</mark>"
-        ).getClozeDescription(getNoteTitle(), description);
+        return ClozeDescription.htmlClosedDescription().getClozeDescription(getNoteTitle(), description);
     }
 
     @JsonIgnore

@@ -18,6 +18,14 @@ public class ClozeDescription {
         this.pronunciationReplacement = pronunciationReplacement;
     }
 
+    static public ClozeDescription htmlClosedDescription() {
+        return new ClozeDescription(
+                "<mark title='Hidden text that is partially matching the answer'>[..~]</mark>",
+                "<mark title='Hidden text that is matching the answer'>[...]</mark>",
+                "<mark title='Hidden pronunciation'>/.../</mark>"
+        );
+    }
+
     public String getClozeDescription(NoteTitle noteTitle, String description) {
         return noteTitle
                 .getTitles()
