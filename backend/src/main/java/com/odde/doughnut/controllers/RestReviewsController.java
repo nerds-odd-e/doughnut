@@ -114,13 +114,20 @@ class RestReviewsController {
     if (answer.getAnswerNoteId() != null) {
       answerResult.setAnswerNote(modelFactoryService.noteRepository.findById(answer.getAnswerNoteId()).orElse(null));
     }
+    if(answer.getViceReviewPointId() != null) {
+      modelFactoryService.reviewPointRepository.findById(answer.getViceReviewPointId()).ifPresent(vice->updateReviewPoint(vice, answerResult));
+    }
+    updateReviewPoint(reviewPoint, answerResult);
+    return answerResult;
+  }
+
+  private void updateReviewPoint(ReviewPoint reviewPoint, final AnswerResult answerResult) {
     if (answerResult.isCorrect()) {
       modelFactoryService.toReviewPointModel(reviewPoint).repeated(testabilitySettings.getCurrentUTCTimestamp());
     }
     else {
       modelFactoryService.toReviewPointModel(reviewPoint).increaseRepetitionCountAndSave();
     }
-    return answerResult;
   }
 
   @PostMapping(path="/{reviewPoint}/self-evaluate")

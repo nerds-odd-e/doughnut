@@ -65,19 +65,18 @@ class RestReviewsControllerTests {
     class answer {
         ReviewPoint reviewPoint;
         Note note1;
+        Answer answer = new Answer();
+
         @BeforeEach
         void setup() {
             note1 = makeMe.aNote().please();
-//            Note note2 = makeMe.aNote().please();
-//            Link link = makeMe.aLink().between(note1, note2).please();
             reviewPoint = makeMe.aReviewPointFor(note1).by(userModel).please();
+            answer.setQuestionType(QuizQuestion.QuestionType.CLOZE_SELECTION);
+            answer.setAnswerNoteId(note1.getId());
         }
 
         @Test
         void shouldValidateTheAnswerAndUpdateReviewPoint() {
-            Answer answer = new Answer();
-            answer.setQuestionType(QuizQuestion.QuestionType.CLOZE_SELECTION);
-            answer.setAnswerNoteId(note1.getId());
             Integer oldForgettingCurveIndex = reviewPoint.getForgettingCurveIndex();
             Integer oldRepetitionCount = reviewPoint.getRepetitionCount();
             AnswerResult answerResult = controller().answerQuiz(reviewPoint, answer);
@@ -88,8 +87,8 @@ class RestReviewsControllerTests {
 
         @Test
         void shouldValidateTheWrongAnswer() {
-            Answer answer = new Answer();
             answer.setQuestionType(QuizQuestion.QuestionType.SPELLING);
+            answer.setAnswerNoteId(null);
             answer.setAnswer("wrong");
             Integer oldForgettingCurveIndex = reviewPoint.getForgettingCurveIndex();
             Integer oldRepetitionCount = reviewPoint.getRepetitionCount();
@@ -97,6 +96,21 @@ class RestReviewsControllerTests {
             assertFalse(answerResult.isCorrect());
             assertThat(reviewPoint.getForgettingCurveIndex(), equalTo(oldForgettingCurveIndex));
             assertThat(reviewPoint.getRepetitionCount(), greaterThan(oldRepetitionCount));
+        }
+
+        @Test
+        void shouldIncreaseTheViceReviewPointToo() {
+            Note note2 = makeMe.aNote().please();
+            ReviewPoint anotherReviewPoint = makeMe.aReviewPointFor(note2).by(userModel).please();
+            answer.setViceReviewPointId(anotherReviewPoint.getId());
+            makeMe.refresh(anotherReviewPoint);
+
+            Integer oldForgettingCurveIndex = anotherReviewPoint.getForgettingCurveIndex();
+            Integer oldRepetitionCount = anotherReviewPoint.getRepetitionCount();
+            AnswerResult answerResult = controller().answerQuiz(reviewPoint, answer);
+            assertTrue(answerResult.isCorrect());
+            assertThat(anotherReviewPoint.getForgettingCurveIndex(), greaterThan(oldForgettingCurveIndex));
+            assertThat(anotherReviewPoint.getRepetitionCount(), greaterThan(oldRepetitionCount));
         }
 
         @Test
