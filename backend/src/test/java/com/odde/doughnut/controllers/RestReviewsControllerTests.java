@@ -20,8 +20,7 @@ import javax.validation.Valid;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
@@ -75,12 +74,29 @@ class RestReviewsControllerTests {
         }
 
         @Test
-        void shouldValidateTheAnswer() {
+        void shouldValidateTheAnswerAndUpdateReviewPoint() {
             Answer answer = new Answer();
             answer.setQuestionType(QuizQuestion.QuestionType.CLOZE_SELECTION);
             answer.setAnswerNoteId(note1.getId());
+            Integer oldForgettingCurveIndex = reviewPoint.getForgettingCurveIndex();
+            Integer oldRepetitionCount = reviewPoint.getRepetitionCount();
             AnswerResult answerResult = controller().answerQuiz(reviewPoint, answer);
             assertTrue(answerResult.isCorrect());
+            assertThat(reviewPoint.getForgettingCurveIndex(), greaterThan(oldForgettingCurveIndex));
+            assertThat(reviewPoint.getRepetitionCount(), greaterThan(oldRepetitionCount));
+        }
+
+        @Test
+        void shouldValidateTheWrongAnswer() {
+            Answer answer = new Answer();
+            answer.setQuestionType(QuizQuestion.QuestionType.SPELLING);
+            answer.setAnswer("wrong");
+            Integer oldForgettingCurveIndex = reviewPoint.getForgettingCurveIndex();
+            Integer oldRepetitionCount = reviewPoint.getRepetitionCount();
+            AnswerResult answerResult = controller().answerQuiz(reviewPoint, answer);
+            assertFalse(answerResult.isCorrect());
+            assertThat(reviewPoint.getForgettingCurveIndex(), equalTo(oldForgettingCurveIndex));
+            assertThat(reviewPoint.getRepetitionCount(), greaterThan(oldRepetitionCount));
         }
 
         @Test

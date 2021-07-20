@@ -103,6 +103,7 @@ class RestReviewsController {
   }
 
   @PostMapping("/{reviewPoint}/answer")
+  @Transactional
   public AnswerResult answerQuiz(ReviewPoint reviewPoint, @Valid @RequestBody Answer answer) {
     UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertLoggedIn();
@@ -112,6 +113,12 @@ class RestReviewsController {
     answerResult.setAnswer(answer.getAnswer());
     if (answer.getAnswerNoteId() != null) {
       answerResult.setAnswerNote(modelFactoryService.noteRepository.findById(answer.getAnswerNoteId()).orElse(null));
+    }
+    if (answerResult.isCorrect()) {
+      modelFactoryService.toReviewPointModel(reviewPoint).repeated(testabilitySettings.getCurrentUTCTimestamp());
+    }
+    else {
+      modelFactoryService.toReviewPointModel(reviewPoint).increaseRepetitionCountAndSave();
     }
     return answerResult;
   }
