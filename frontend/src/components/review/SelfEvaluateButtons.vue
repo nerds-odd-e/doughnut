@@ -1,12 +1,11 @@
 <template>
   <div class="btn-group" role="group" aria-label="First group">
-    {{clicked}}
-      <button class="btn btn-light" id="repeat-again" name="again"
+      <button v-if="sadButton" class="btn btn-light" id="repeat-again" name="again"
               @click.once="processForm('again')"
               title="repeat immediately">
           <SvgFailed/>
       </button>
-      <template v-if="!sadOnly">
+      <template v-if="otherButtons">
         <button class="btn btn-light" id="repeat-sad" name="sad"
               @click.once="processForm('sad')"
                 title="reduce next repeat interval (days) by half">
@@ -33,7 +32,7 @@
   import SvgHappy from "../svgs/SvgHappy.vue"
 
   export default {
-    props: { sadOnly: Boolean },
+    props: { sadButton: Boolean, otherButtons: Boolean },
     emits: ['selfEvaluate'],
     components: { SvgSad, SvgSatisfying, SvgFailed, SvgHappy },
     methods: {
