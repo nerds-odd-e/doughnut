@@ -1,7 +1,6 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.entities.Answer;
-import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
@@ -22,6 +21,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
@@ -64,13 +64,32 @@ class RestReviewsControllerTests {
 
     @Nested
     class answer {
+        ReviewPoint reviewPoint;
+        Note note1;
+        @BeforeEach
+        void setup() {
+            note1 = makeMe.aNote().please();
+//            Note note2 = makeMe.aNote().please();
+//            Link link = makeMe.aLink().between(note1, note2).please();
+            reviewPoint = makeMe.aReviewPointFor(note1).by(userModel).please();
+        }
+
+        @Test
+        void shouldValidateTheAnswer() {
+            Answer answer = new Answer();
+            answer.setQuestionType(QuizQuestion.QuestionType.CLOZE_SELECTION);
+            answer.setAnswerNoteId(note1.getId());
+            AnswerResult answerResult = controller().answerQuiz(reviewPoint, answer);
+            assertTrue(answerResult.isCorrect());
+        }
+
         @Test
         void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
             userModel = makeMe.aNullUserModel();
-            ReviewPoint reviewPoint = new ReviewPoint();
-            @Valid Answer answer = new Answer();
+            Answer answer = new Answer();
             assertThrows(ResponseStatusException.class, () -> controller().answerQuiz(reviewPoint, answer));
         }
+
     }
 
     @Nested

@@ -84,6 +84,7 @@ public class WhichSpecHasInstanceQuizFactory implements QuizQuestionFactory {
             candidates.add(servant.randomizer.chooseOneRandomly(link.getSourceNote().linksOfTypeThroughDirect(Link.LinkType.INSTANCE)));
             candidates.add(servant.randomizer.chooseOneRandomly(link.getSourceNote().linksOfTypeThroughDirect(Link.LinkType.TAGGED_BY)));
             candidates.add(servant.randomizer.chooseOneRandomly(link.getSourceNote().linksOfTypeThroughDirect(Link.LinkType.ATTRIBUTE)));
+            candidates.add(servant.randomizer.chooseOneRandomly(link.getSourceNote().linksOfTypeThroughDirect(Link.LinkType.RELATED_TO)));
             cachedInstanceLink = servant.randomizer.chooseOneRandomly(candidates.stream().filter(l->{
                 if(l==null) return false;
                 return !link.equals(l);
