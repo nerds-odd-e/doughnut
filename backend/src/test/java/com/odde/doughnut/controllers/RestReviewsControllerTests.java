@@ -15,8 +15,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import javax.validation.Valid;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.equalTo;
@@ -128,7 +126,10 @@ class RestReviewsControllerTests {
         void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
             userModel = makeMe.aNullUserModel();
             ReviewPoint reviewPoint = new ReviewPoint();
-            assertThrows(ResponseStatusException.class, () -> controller().selfEvaluate(reviewPoint, "happy"));
+            RestReviewsController.SelfEvaluation selfEvaluation = new RestReviewsController.SelfEvaluation(){{
+                this.selfEvaluation = "happy";
+            }};
+            assertThrows(ResponseStatusException.class, () -> controller().selfEvaluate(reviewPoint, selfEvaluation));
         }
     }
     @Nested
@@ -144,28 +145,35 @@ class RestReviewsControllerTests {
 
         @Test
         void repeat() {
-            controller().selfEvaluate(rp, "\"satisfying\"");
+            evaluate("satisfying");
             assertThat(rp.getForgettingCurveIndex(), equalTo(expectedSatisfyingForgettingCurveIndex));
-            assertThat(rp.getRepetitionCount(), equalTo(1));
+            assertThat(rp.getRepetitionCount(), equalTo(0));
+        }
+
+        private void evaluate(String evaluation) {
+            RestReviewsController.SelfEvaluation selfEvaluation = new RestReviewsController.SelfEvaluation(){{
+                this.selfEvaluation = evaluation;
+            }};
+            controller().selfEvaluate(rp, selfEvaluation);
         }
 
         @Test
         void repeatSad() {
-            controller().selfEvaluate(rp, "\"sad\"");
+            evaluate("sad");
             assertThat(rp.getForgettingCurveIndex(), lessThan(expectedSatisfyingForgettingCurveIndex));
-            assertThat(rp.getRepetitionCount(), equalTo(1));
+            assertThat(rp.getRepetitionCount(), equalTo(0));
         }
 
         @Test
         void repeatHappy() {
-            controller().selfEvaluate(rp, "\"happy\"");
+            evaluate("happy");
             assertThat(rp.getForgettingCurveIndex(), greaterThan(expectedSatisfyingForgettingCurveIndex));
-            assertThat(rp.getRepetitionCount(), equalTo(1));
+            assertThat(rp.getRepetitionCount(), equalTo(0));
         }
 
         @Test
         void repeatUnknown() {
-            assertThrows(ResponseStatusException.class, ()-> controller().selfEvaluate(rp, "unknown"));
+            assertThrows(ResponseStatusException.class, ()-> evaluate("unknown"));
         }
 
     }

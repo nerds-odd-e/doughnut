@@ -117,7 +117,7 @@ export default {
       }
       restPost(
         `/api/reviews/${this.reviewPointViewedByUser.reviewPoint.id}/self-evaluate`,
-        data,
+        {selfEvaluation: data, increaseRepeatCount: !this.answerResult},
         r=>this.loading=r)
         .then(this.loadNew)
     }

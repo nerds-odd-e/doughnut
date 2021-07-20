@@ -18,4 +18,4 @@ Feature: Repetition
         Then I should have "1/1" for repeat now
         Then I should see the statistics of note "Fungible"
            | RepetitionCount |
-           | 2 |
+           | 1 |

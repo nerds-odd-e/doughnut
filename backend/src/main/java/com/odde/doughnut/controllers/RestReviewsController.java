@@ -122,34 +122,44 @@ class RestReviewsController {
   }
 
   private void updateReviewPoint(ReviewPoint reviewPoint, final AnswerResult answerResult) {
+    modelFactoryService.toReviewPointModel(reviewPoint).increaseRepetitionCountAndSave();
     if (answerResult.isCorrect()) {
       modelFactoryService.toReviewPointModel(reviewPoint).repeated(testabilitySettings.getCurrentUTCTimestamp());
     }
-    else {
-      modelFactoryService.toReviewPointModel(reviewPoint).increaseRepetitionCountAndSave();
-    }
+  }
+
+  static class SelfEvaluation {
+    public String selfEvaluation;
+    public Boolean increaseRepeatCount;
   }
 
   @PostMapping(path="/{reviewPoint}/self-evaluate")
-  public RepetitionForUser selfEvaluate(ReviewPoint reviewPoint, @RequestBody String selfEvaluation) {
+  public RepetitionForUser selfEvaluate(ReviewPoint reviewPoint, @RequestBody SelfEvaluation selfEvaluation) {
     UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertLoggedIn();
      evaluate(reviewPoint, selfEvaluation);
      return repeatReview();
   }
 
-  private int evaluate(ReviewPoint reviewPoint, String selfEvaluation) {
-    if (selfEvaluation.equals("\"again\"")) {
-        return modelFactoryService.toReviewPointModel(reviewPoint).increaseRepetitionCountAndSave();
+  private void evaluate(ReviewPoint reviewPoint, SelfEvaluation selfEvaluation) {
+    ReviewPointModel reviewPointModel = modelFactoryService.toReviewPointModel(reviewPoint);
+    if(selfEvaluation.increaseRepeatCount != null && selfEvaluation.increaseRepeatCount) {
+      reviewPointModel.increaseRepetitionCountAndSave();
     }
-    if (selfEvaluation.equals("\"satisfying\"")) {
-        return modelFactoryService.toReviewPointModel(reviewPoint).repeated(testabilitySettings.getCurrentUTCTimestamp());
+    if ("again".equals(selfEvaluation.selfEvaluation)) {
+      return;
     }
-    if (selfEvaluation.equals("\"sad\"")) {
-        return modelFactoryService.toReviewPointModel(reviewPoint).repeatedSad(testabilitySettings.getCurrentUTCTimestamp());
+    if ("satisfying".equals(selfEvaluation.selfEvaluation)) {
+      reviewPointModel.repeated(testabilitySettings.getCurrentUTCTimestamp());
+      return;
     }
-    if (selfEvaluation.equals("\"happy\"")) {
-        return modelFactoryService.toReviewPointModel(reviewPoint).repeatedHappy(testabilitySettings.getCurrentUTCTimestamp());
+    if ("sad".equals(selfEvaluation.selfEvaluation)) {
+      reviewPointModel.repeatedSad(testabilitySettings.getCurrentUTCTimestamp());
+      return;
+    }
+    if ("happy".equals(selfEvaluation.selfEvaluation)) {
+      reviewPointModel.repeatedHappy(testabilitySettings.getCurrentUTCTimestamp());
+      return;
     }
 
     throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
