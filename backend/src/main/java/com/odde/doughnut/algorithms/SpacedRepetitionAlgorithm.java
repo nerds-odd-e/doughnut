@@ -33,32 +33,29 @@ public class SpacedRepetitionAlgorithm {
     }
 
     //
-    // adjustment:
+    // selfEvaluationIndex:
     //   -1: reduce the index by 1/2 of default increment
     //   +1: add to the index by twice of default increment
     //
-    public int getNextForgettingCurveIndex(Integer oldForgettingCurveIndex, int adjustment, long delayInHours) {
-        int newIndex = oldForgettingCurveIndex + withDelayAdjustment(oldForgettingCurveIndex, delayInHours, forgettingCurveIndexIncrement(adjustment));
+    public int getNextForgettingCurveIndex(Integer oldForgettingCurveIndex, int selfEvaluationIndex, long delayInHours) {
+        int newIndex = oldForgettingCurveIndex + withDelayAdjustment(oldForgettingCurveIndex, delayInHours) + withSelfEvaluationAdjustment(selfEvaluationIndex);
         if (newIndex < DEFAULT_FORGETTING_CURVE_INDEX) {
             return DEFAULT_FORGETTING_CURVE_INDEX;
         }
         return newIndex;
     }
 
-    private int withDelayAdjustment(Integer oldForgettingCurveIndex, long delayInHours, int forgettingCurveIndexIncrement) {
-        int delayAdjustment = forgettingCurveIndexIncrement;
+    private int withDelayAdjustment(Integer oldForgettingCurveIndex, long delayInHours) {
+        int delayAdjustment = DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT;
         Integer oldRepeatInHours = getRepeatInHours(oldForgettingCurveIndex);
         if(oldRepeatInHours > 0) {
-            delayAdjustment = (int) (forgettingCurveIndexIncrement - Math.abs(delayInHours) * forgettingCurveIndexIncrement / oldRepeatInHours);
+            delayAdjustment = (int) (DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT - Math.abs(delayInHours) * DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT / oldRepeatInHours);
         }
         return delayAdjustment;
     }
 
-    private int forgettingCurveIndexIncrement(int adjustment) {
-        if (adjustment == -1) {
-            return -DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT / 2;
-        }
-        return DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT * (1 + adjustment);
+    private int withSelfEvaluationAdjustment(int adjustment) {
+        return DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT * adjustment;
     }
 
     public Integer getRepeatInHours(Integer forgettingCurveIndex) {
