@@ -34,7 +34,7 @@ class QuizQuestionGeneratorTest {
         Note note2 = makeMe.aNote().linkTo(note).inMemoryPlease();
         ReviewPoint reviewPoint = makeMe.aReviewPointFor(note2.getLinks().get(0)).inMemoryPlease();
         List<QuizQuestion.QuestionType> questionTypes = getQuestionTypes(reviewPoint);
-        assertThat(questionTypes, containsInAnyOrder(LINK_TARGET, LINK_SOURCE_EXCLUSIVE, WHICH_SPEC_HAS_INSTANCE));
+        assertThat(questionTypes, containsInAnyOrder(LINK_TARGET, LINK_SOURCE_EXCLUSIVE, WHICH_SPEC_HAS_INSTANCE, WHICH_SPEC_HAS_INSTANCE));
     }
 
     @Test
@@ -42,7 +42,8 @@ class QuizQuestionGeneratorTest {
         Note note2 = makeMe.aNote().linkTo(note, Link.LinkType.RELATED_TO).inMemoryPlease();
         ReviewPoint reviewPoint = makeMe.aReviewPointFor(note2.getLinks().get(0)).inMemoryPlease();
         List<QuizQuestion.QuestionType> questionTypes = getQuestionTypes(reviewPoint);
-        assertTrue(questionTypes.isEmpty());
+        assertThat(questionTypes, containsInAnyOrder(WHICH_SPEC_HAS_INSTANCE));
+        //assertTrue(questionTypes.isEmpty());
     }
 
     private List<QuizQuestion.QuestionType> getQuestionTypes(ReviewPoint reviewPoint) {
