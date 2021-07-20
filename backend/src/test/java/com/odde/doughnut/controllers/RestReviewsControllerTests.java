@@ -77,7 +77,7 @@ class RestReviewsControllerTests {
         void shouldValidateTheAnswerAndUpdateReviewPoint() {
             Integer oldForgettingCurveIndex = reviewPoint.getForgettingCurveIndex();
             Integer oldRepetitionCount = reviewPoint.getRepetitionCount();
-            AnswerResult answerResult = controller().answerQuiz(reviewPoint, answer);
+            AnswerResult answerResult = controller().answerQuiz(reviewPoint, answer).answerResult;
             assertTrue(answerResult.isCorrect());
             assertThat(reviewPoint.getForgettingCurveIndex(), greaterThan(oldForgettingCurveIndex));
             assertThat(reviewPoint.getRepetitionCount(), greaterThan(oldRepetitionCount));
@@ -90,7 +90,7 @@ class RestReviewsControllerTests {
             answer.setAnswer("wrong");
             Integer oldForgettingCurveIndex = reviewPoint.getForgettingCurveIndex();
             Integer oldRepetitionCount = reviewPoint.getRepetitionCount();
-            AnswerResult answerResult = controller().answerQuiz(reviewPoint, answer);
+            AnswerResult answerResult = controller().answerQuiz(reviewPoint, answer).answerResult;
             assertFalse(answerResult.isCorrect());
             assertThat(reviewPoint.getForgettingCurveIndex(), equalTo(oldForgettingCurveIndex));
             assertThat(reviewPoint.getRepetitionCount(), greaterThan(oldRepetitionCount));
@@ -105,7 +105,7 @@ class RestReviewsControllerTests {
 
             Integer oldForgettingCurveIndex = anotherReviewPoint.getForgettingCurveIndex();
             Integer oldRepetitionCount = anotherReviewPoint.getRepetitionCount();
-            AnswerResult answerResult = controller().answerQuiz(reviewPoint, answer);
+            AnswerResult answerResult = controller().answerQuiz(reviewPoint, answer).answerResult;
             assertTrue(answerResult.isCorrect());
             assertThat(anotherReviewPoint.getForgettingCurveIndex(), greaterThan(oldForgettingCurveIndex));
             assertThat(anotherReviewPoint.getRepetitionCount(), greaterThan(oldRepetitionCount));
