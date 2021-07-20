@@ -107,11 +107,18 @@ export default {
         `/api/reviews/${this.reviewPointViewedByUser.reviewPoint.id}/answer`,
         answerData,
         r=>this.loading = r)
-        .then(res=>{ this.answerResult = res; this.resetRoute() })
+        .then(res=>{
+          this.answerResult = res
+          if(res.correct) {
+            this.finished += 1
+            this.repetition.toRepeatCount -= 1
+          }
+          this.resetRoute()
+        })
     },
 
     selfEvaluate(data) {
-      if (data !== 'again') {
+      if (data !== 'again' && !this.answerResult) {
         this.finished += 1
         this.repetition.toRepeatCount -= 1
       }
