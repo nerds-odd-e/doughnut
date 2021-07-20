@@ -102,14 +102,9 @@ class RestReviewsController {
     return repetitionForUser;
   }
 
-  class AnswerResultAndNextRepetition {
-    public AnswerResult answerResult;
-    public RepetitionForUser repetition;
-  }
-
   @PostMapping("/{reviewPoint}/answer")
   @Transactional
-  public AnswerResultAndNextRepetition answerQuiz(ReviewPoint reviewPoint, @Valid @RequestBody Answer answer) {
+  public AnswerResult answerQuiz(ReviewPoint reviewPoint, @Valid @RequestBody Answer answer) {
     UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertLoggedIn();
     AnswerResult answerResult = new AnswerResult();
@@ -123,10 +118,7 @@ class RestReviewsController {
       modelFactoryService.reviewPointRepository.findById(answer.getViceReviewPointId()).ifPresent(vice->updateReviewPoint(vice, answerResult));
     }
     updateReviewPoint(reviewPoint, answerResult);
-    AnswerResultAndNextRepetition ann = new AnswerResultAndNextRepetition();
-    ann.answerResult = answerResult;
-    ann.repetition = repeatReview();
-    return ann;
+    return answerResult;
   }
 
   private void updateReviewPoint(ReviewPoint reviewPoint, final AnswerResult answerResult) {

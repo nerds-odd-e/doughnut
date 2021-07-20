@@ -107,7 +107,7 @@ export default {
         `/api/reviews/${this.reviewPointViewedByUser.reviewPoint.id}/answer`,
         answerData,
         r=>this.loading = r)
-        .then(res=>{ this.answerResult = res.answerResult; this.resetRoute() })
+        .then(res=>{ this.answerResult = res; this.resetRoute() })
     },
 
     selfEvaluate(data) {
