@@ -47,15 +47,23 @@ class TitleFragment {
 
     private String getPatternStringForLiteralMatch() {
         if (content.length() >= 4 || suffix) {
-            return String.join("([\\s-]+)((and\\s+)|(the\\s+)|(a\\s+)|(an\\s+))?",
+            String ignoreConjunctions = String.join("([\\s-]+)((and\\s+)|(the\\s+)|(a\\s+)|(an\\s+))?",
                     Arrays.stream(content.split("[\\s-]+"))
                             .filter(x -> !Arrays.asList("the", "a", "an").contains(x))
                             .map(Pattern::quote).collect(Collectors.toUnmodifiableList()));
+            return suffixIfNeeded(ignoreConjunctions);
         }
         if (content.matches("^\\d+$")) {
             return "(?<!\\d)" + Pattern.quote(content) + "(?!\\d)";
         }
         return "(?<!\\w)" + Pattern.quote(content) + "(?!\\w)";
+    }
+
+    private String suffixIfNeeded(String pattern) {
+        if(suffix) {
+            return "(?U)(?<=\\p{Alnum})" + pattern;
+        }
+        return pattern;
     }
 
     private String replaceLiteralWords(String description) {
