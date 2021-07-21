@@ -1,15 +1,11 @@
 package com.odde.doughnut.algorithms;
 
-import java.util.Arrays;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 public class ClozeDescription {
     private final String partialMatchReplacement;
     private final String fullMatchReplacement;
     private final String pronunciationReplacement;
-    private final String internalPartialMatchReplacement = "__p_a_r_t_i_a_l__";
-    private final String internalFullMatchReplacement = "__f_u_l_l__";
     private final String internalPronunciationReplacement = "__p_r_o_n_u_n_c__";
 
     public ClozeDescription(String partialMatchReplacement, String fullMatchReplacement, String pronunciationReplacement) {
@@ -28,17 +24,15 @@ public class ClozeDescription {
 
     public String getClozeDescription(NoteTitle noteTitle, String description) {
         return noteTitle
-                .getTitles()
-                .reduce(description, this::clozeString, (x, y)->y)
-                .replace(internalFullMatchReplacement, fullMatchReplacement)
-                .replace(internalPartialMatchReplacement, partialMatchReplacement)
-                .replace(internalPronunciationReplacement, pronunciationReplacement);
+                    .getTitles()
+                    .reduce(replacePronunciation(description), this::clozeString, (x, y)->y)
+                    .replace(TitleFragment.internalFullMatchReplacement, fullMatchReplacement)
+                    .replace(TitleFragment.internalPartialMatchReplacement, partialMatchReplacement)
+                    .replace(internalPronunciationReplacement, pronunciationReplacement);
     }
 
     public String clozeString(String description, TitleFragment titleFragment) {
-        return replacePronunciation(
-                replaceSimilar(titleFragment,
-                replaceLiteralWords(titleFragment, description)));
+        return titleFragment.clozeIt(description);
     }
 
     private String replacePronunciation(String description) {
@@ -46,31 +40,4 @@ public class ClozeDescription {
         return pattern.matcher(description).replaceAll(internalPronunciationReplacement);
     }
 
-    private String replaceLiteralWords(TitleFragment titleFragment, String description) {
-        Pattern pattern = Pattern.compile(getPatternStringForLiteralMatch(titleFragment.presence()), Pattern.CASE_INSENSITIVE);
-        return pattern.matcher(description).replaceAll(internalFullMatchReplacement);
-    }
-
-    private String getPatternStringForLiteralMatch(String wordToHide) {
-        if (wordToHide.length() >= 4) {
-            return String.join("([\\s-]+)((and\\s+)|(the\\s+)|(a\\s+)|(an\\s+))?",
-                    Arrays.stream(wordToHide.split("[\\s-]+"))
-                            .filter(x -> !Arrays.asList("the", "a", "an").contains(x))
-                            .map(Pattern::quote).collect(Collectors.toUnmodifiableList()));
-        }
-        if (wordToHide.matches("^\\d+$")) {
-            return "(?<!\\d)" + Pattern.quote(wordToHide) + "(?!\\d)";
-        }
-        return "(?<!\\w)" + Pattern.quote(wordToHide) + "(?!\\w)";
-    }
-
-    private String replaceSimilar(TitleFragment titleFragment, String literal) {
-        String wordToHide = titleFragment.presence();
-        if (wordToHide.length() < 4) {
-            return literal;
-        }
-        String substring = wordToHide.substring(0, (wordToHide.length() + 1) * 3 / 4);
-        Pattern pattern = Pattern.compile(Pattern.quote(substring), Pattern.CASE_INSENSITIVE);
-        return pattern.matcher(literal).replaceAll(internalPartialMatchReplacement);
-    }
 }
