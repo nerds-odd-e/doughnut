@@ -19,6 +19,12 @@ class TitleFragment {
         }
     }
 
+    static String replaceMasks(String titleMasked, String fullMatchReplacement, String partialMatchReplacement) {
+        return titleMasked
+                .replace(internalFullMatchReplacement, fullMatchReplacement)
+                .replace(internalPartialMatchReplacement, partialMatchReplacement);
+    }
+
     String clozeIt(String description) {
         return replaceSimilar(replaceLiteralWords(description));
     }
