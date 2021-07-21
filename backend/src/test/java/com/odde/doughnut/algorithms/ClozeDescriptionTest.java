@@ -36,7 +36,7 @@ public class ClozeDescriptionTest {
             "鳴く,             羊はなんて鳴くの？,                     羊はなんて[...]の？",
             "cattle,          ironcattle,                          iron[...]",
             "~cato,           concato,                             con[...]",
-//            "~cat,            concat,                              con[...]",
+            "~cat,            concat,                              con[...]",
 //            "~cat,            cat,                                 cat",
             //"cat(animal),      cat is an animal,                  [...] is an (...)",
             //"cat/dog(animal/weather), dog day is a hot weather,   [...] day is a hot (...)",

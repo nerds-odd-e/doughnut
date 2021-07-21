@@ -8,14 +8,17 @@ class TitleFragment {
     final static String internalPartialMatchReplacement = "__p_a_r_t_i_a_l__";
     final static String internalFullMatchReplacement = "__f_u_l_l__";
     private final String content;
+    private final boolean suffix;
 
     TitleFragment(String content) {
         String trimmed = content.trim();
         if(content.startsWith("~")) {
             this.content = trimmed.substring(1);
+            this.suffix = true;
         }
         else {
             this.content = trimmed;
+            this.suffix = false;
         }
     }
 
@@ -43,7 +46,7 @@ class TitleFragment {
     }
 
     private String getPatternStringForLiteralMatch() {
-        if (content.length() >= 4) {
+        if (content.length() >= 4 || suffix) {
             return String.join("([\\s-]+)((and\\s+)|(the\\s+)|(a\\s+)|(an\\s+))?",
                     Arrays.stream(content.split("[\\s-]+"))
                             .filter(x -> !Arrays.asList("the", "a", "an").contains(x))
