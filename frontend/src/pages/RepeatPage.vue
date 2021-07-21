@@ -112,6 +112,9 @@ export default {
           if(res.correct) {
             this.finished += 1
             this.repetition.toRepeatCount -= 1
+            if(this.repetition.toRepeatCount > 0) {
+              this.fetchData()
+            }
           }
           this.resetRoute()
         })

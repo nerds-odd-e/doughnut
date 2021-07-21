@@ -44,7 +44,7 @@ public class ClozeDescriptionTest {
             "~cat,            a cat,                               a cat",
             "~よう,            どのよう,                              どの[...]",
             "cat(animal),      cat is an animal,                  [...] is an <...>",
-            //"cat/dog(animal/weather), dog day is a hot weather,   [...] day is a hot (...)",
+            "cat/dog(animal/weather), dog day is a hot weather,   [...] day is a hot <...>",
             "6,               6year,                               [...]year",
     })
     void clozeDescription(String title, String description, String expectedClozeDescription) {
