@@ -11,7 +11,9 @@ public class ClozeDescriptionTest {
     ClozeDescription clozeDescription = new ClozeDescription(
             "[..~]",
             "[...]",
-            "/.../");
+            "/.../",
+            "<..~>",
+            "<...>");
 
     @ParameterizedTest
     @CsvSource({
@@ -41,7 +43,7 @@ public class ClozeDescriptionTest {
             "~cat,            cat,                                 cat",
             "~cat,            a cat,                               a cat",
             "~よう,            どのよう,                              どの[...]",
-            //"cat(animal),      cat is an animal,                  [...] is an (...)",
+            "cat(animal),      cat is an animal,                  [...] is an <...>",
             //"cat/dog(animal/weather), dog day is a hot weather,   [...] day is a hot (...)",
             "6,               6year,                               [...]year",
     })
@@ -58,7 +60,7 @@ public class ClozeDescriptionTest {
         ClozeDescription clozeDescription = new ClozeDescription(
                 "/..~/",
                 "/.../",
-                "(...)");
+                "(...)", "<.._>", "<...>");
         assertThat(clozeDescription.getClozeDescription(new NoteTitle("abc"), "abc"), equalTo("/.../"));
     }
 
