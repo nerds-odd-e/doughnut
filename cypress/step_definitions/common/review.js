@@ -195,3 +195,7 @@ Then('I should see the statistics of note {string}', (noteTitle, data) => {
     cy.findByText(attrs[k]).should('be.visible');
   }
 });
+
+Then('I view the last result', () => {
+  cy.findByRole('button', { name: 'view last result' }).click();
+})

@@ -4,7 +4,7 @@
       <Minimizable :minimized="nested" staticHeight="75px">
         <template #minimizedContent>
           <div class="repeat-container" v-on:click="backToRepeat()">
-            <ProgressBar :allowPause="!quizMode" :btn="`play`" v-bind="{linkId, noteId, finished, toRepeatCount: repetition.toRepeatCount}">
+            <ProgressBar :allowPause="!quizMode" :btn="`play`" v-bind="{linkId, noteId, finished, toRepeatCount: repetition.toRepeatCount, lastResult}" @viewLastResult="viewLastResult()">
               <Repetition
                 v-bind="{...reviewPointViewedByUser, answerResult, compact: true}"
                 @selfEvaluate="selfEvaluate($event)"
@@ -14,7 +14,7 @@
           </div>
         </template>
         <template #fullContent>
-          <ProgressBar :allowPause="!quizMode" v-bind="{linkId, noteId, finished, toRepeatCount: repetition.toRepeatCount}"/>
+          <ProgressBar :allowPause="!quizMode" v-bind="{linkId, noteId, finished, toRepeatCount: repetition.toRepeatCount, lastResult}" @viewLastResult="viewLastResult()"/>
           <Quiz v-if="quizMode" v-bind="repetition" @answer="processAnswer($event)"/>
           <template v-else>
             <template v-if="reviewPointViewedByUser">
@@ -50,6 +50,7 @@ export default {
     return {
       repetition: null,
       answerResult: null,
+      lastResult: null,
       loading: false,
       finished: 0
     }
@@ -66,6 +67,7 @@ export default {
     },
     loadNew(resp) {
       this.repetition = resp;
+      this.lastResult = {...this.answerResult}
       this.answerResult = null;
       if (!this.repetition.reviewPointViewedByUser) {
         this.$router.push({name: "reviews"})
@@ -75,6 +77,12 @@ export default {
         this.$router.push({name: "repeat-quiz"})
         return;
       }
+      this.resetRoute()
+    },
+
+    viewLastResult() {
+      this.answerResult = this.lastResult
+      this.lastResult = null
       this.resetRoute()
     },
 

@@ -2,6 +2,7 @@
 <div class="review-info-bar">
 
   <StopRepeatButton />
+  <ViewLastResultButton v-bind="{lastResult}" @viewLastResult="$emit('viewLastResult')"/>
   <PauseRepeatButton v-bind="{noteId, linkId, allowPause, btn}"/>
   <div class="review-info-bar-right">
     <span :class="`progress-bar ${!!$slots.default ? 'thin' : ''}`" v-if="toRepeatCount !== null">
@@ -18,10 +19,20 @@
 <script>
 import StopRepeatButton from "./StopRepeatButton.vue"
 import PauseRepeatButton from "./PauseRepeatButton.vue"
+import ViewLastResultButton from "./ViewLastResultButton.vue"
 
 export default {
-  components: { StopRepeatButton, PauseRepeatButton },
-  props: {noteId: Number, linkId: Number, allowPause: { type: Boolean, default: true }, finished: Number, toRepeatCount: Number, btn: {type: String, default: "pause"}},
+  components: { StopRepeatButton, PauseRepeatButton, ViewLastResultButton },
+  props: {
+    noteId: Number,
+    linkId: Number,
+    allowPause: { type: Boolean, default: true },
+    finished: Number,
+    toRepeatCount: Number,
+    btn: {type: String, default: "pause"},
+    lastResult: Object,
+    },
+  emits: ['viewLastResult'],
   methods: {
   },
 }
