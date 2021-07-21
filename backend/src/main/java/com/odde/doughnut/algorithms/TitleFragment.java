@@ -4,7 +4,13 @@ class TitleFragment {
     private final String content;
 
     TitleFragment(String content) {
-        this.content = content.trim();
+        String trimmed = content.trim();
+        if(content.startsWith("~")) {
+            this.content = trimmed.substring(1);
+        }
+        else {
+            this.content = trimmed;
+        }
     }
 
     String presence() {

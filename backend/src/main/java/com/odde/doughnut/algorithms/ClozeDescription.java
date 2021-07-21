@@ -29,17 +29,16 @@ public class ClozeDescription {
     public String getClozeDescription(NoteTitle noteTitle, String description) {
         return noteTitle
                 .getTitles()
-                .map(TitleFragment::presence)
-                .reduce(description, this::clozeString)
+                .reduce(description, this::clozeString, (x, y)->y)
                 .replace(internalFullMatchReplacement, fullMatchReplacement)
                 .replace(internalPartialMatchReplacement, partialMatchReplacement)
                 .replace(internalPronunciationReplacement, pronunciationReplacement);
     }
 
-    public String clozeString(String description, String wordToHide) {
+    public String clozeString(String description, TitleFragment titleFragment) {
         return replacePronunciation(
-                replaceSimilar(wordToHide,
-                replaceLiteralWords(wordToHide, description)));
+                replaceSimilar(titleFragment,
+                replaceLiteralWords(titleFragment, description)));
     }
 
     private String replacePronunciation(String description) {
@@ -47,8 +46,8 @@ public class ClozeDescription {
         return pattern.matcher(description).replaceAll(internalPronunciationReplacement);
     }
 
-    private String replaceLiteralWords(String wordToHide, String description) {
-        Pattern pattern = Pattern.compile(getPatternStringForLiteralMatch(wordToHide), Pattern.CASE_INSENSITIVE);
+    private String replaceLiteralWords(TitleFragment titleFragment, String description) {
+        Pattern pattern = Pattern.compile(getPatternStringForLiteralMatch(titleFragment.presence()), Pattern.CASE_INSENSITIVE);
         return pattern.matcher(description).replaceAll(internalFullMatchReplacement);
     }
 
@@ -65,7 +64,8 @@ public class ClozeDescription {
         return "(?<!\\w)" + Pattern.quote(wordToHide) + "(?!\\w)";
     }
 
-    private String replaceSimilar(String wordToHide, String literal) {
+    private String replaceSimilar(TitleFragment titleFragment, String literal) {
+        String wordToHide = titleFragment.presence();
         if (wordToHide.length() < 4) {
             return literal;
         }
