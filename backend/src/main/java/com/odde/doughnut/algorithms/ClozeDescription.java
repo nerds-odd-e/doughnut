@@ -29,6 +29,7 @@ public class ClozeDescription {
     public String getClozeDescription(NoteTitle noteTitle, String description) {
         return noteTitle
                 .getTitles()
+                .map(TitleFragment::presence)
                 .reduce(description, this::clozeString)
                 .replace(internalFullMatchReplacement, fullMatchReplacement)
                 .replace(internalPartialMatchReplacement, partialMatchReplacement)

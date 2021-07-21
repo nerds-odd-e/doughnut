@@ -1,8 +1,6 @@
 package com.odde.doughnut.algorithms;
 
 import java.util.Arrays;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class NoteTitle {
@@ -13,15 +11,16 @@ public class NoteTitle {
         this.title = title;
     }
 
-    public Stream<String> getTitles() {
+    public Stream<TitleFragment> getTitles() {
         return Arrays.stream(title.split("(?<!/)/(?!/)"))
-                .map(String::trim);
+                .map(TitleFragment::new);
     }
 
     public boolean matches(String answer) {
         if(title.trim().equalsIgnoreCase(answer)) {
             return true;
         }
-        return getTitles().anyMatch(t-> t.equalsIgnoreCase(answer));
+        return getTitles().anyMatch(t-> t.matches(answer));
     }
+
 }

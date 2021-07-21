@@ -26,6 +26,7 @@ public class ClozeDescriptionTest {
             "cat dog,         cat a dog,                           [...]",
             "cat dog,         cat the dog,                         [...]",
             "cat the dog,     cat dog,                             [...]",
+            "cat,             concat,                              concat",
             "cat,             /kat/,                               /.../",
             "cat,             (/kat/),                             (/.../)",
             "cat,             http://xxx/ooo,                      http://xxx/ooo",
@@ -33,6 +34,11 @@ public class ClozeDescriptionTest {
             "t,               the t twins,                         the [...] twins",
             "t,               (t),                                 ([...])",
             "鳴く,             羊はなんて鳴くの？,                     羊はなんて[...]の？",
+            "cattle,          ironcattle,                          iron[...]",
+//            "~cat,            concat,                              con[...]",
+//            "~よう,            行くよう,                             行く[...]",
+            //"cat(animal),      cat is an animal,                  [...] is an (...)",
+            //"cat/dog(animal/weather), dog day is a hot weather,   [...] day is a hot (...)",
             "6,               6year,                               [...]year",
     })
     void clozeDescription(String title, String description, String expectedClozeDescription) {
