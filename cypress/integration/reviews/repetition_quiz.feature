@@ -15,7 +15,7 @@ Feature: Repetition Quiz
     And I link note "sedition" as "is tagged by" note "medical"
     When I am repeat-reviewing my old note on day 2
     Then I should be asked cloze deletion question "[...] means incite violence" with options "sedition, sedation"
-    Then On the current page, I should see "Sedition" has link "is tagged by" "medical"
+    And On the current page, I should see "Sedition" has link "is tagged by" "medical"
 
   Scenario Outline: Answering cloze question
     Given I learned one note "sedition" on day 1
@@ -36,6 +36,7 @@ Feature: Repetition Quiz
     And I choose answer "sedition"
     Then I view the last result
     And I should see that my answer is correct
+    Then I should see "sedition" in note title
 
 
   Scenario Outline: Spelling quiz

@@ -4,7 +4,7 @@
       <Minimizable :minimized="nested" staticHeight="75px">
         <template #minimizedContent>
           <div class="repeat-container" v-on:click="backToRepeat()">
-            <ProgressBar :allowPause="!quizMode" :btn="`play`" v-bind="{linkId, noteId, finished, toRepeatCount: repetition.toRepeatCount, lastResult}" @viewLastResult="viewLastResult()">
+            <ProgressBar :allowPause="!quizMode" :btn="`play`" v-bind="{linkId, noteId, finished, toRepeatCount: repetition.toRepeatCount, hasLastResult}" @viewLastResult="viewLastResult()">
               <Repetition
                 v-bind="{...reviewPointViewedByUser, answerResult, compact: true}"
                 @selfEvaluate="selfEvaluate($event)"
@@ -14,7 +14,7 @@
           </div>
         </template>
         <template #fullContent>
-          <ProgressBar :allowPause="!quizMode" v-bind="{linkId, noteId, finished, toRepeatCount: repetition.toRepeatCount, lastResult}" @viewLastResult="viewLastResult()"/>
+          <ProgressBar :allowPause="!quizMode" v-bind="{linkId, noteId, finished, toRepeatCount: repetition.toRepeatCount, hasLastResult}" @viewLastResult="viewLastResult()"/>
           <Quiz v-if="quizMode" v-bind="repetition" @answer="processAnswer($event)"/>
           <template v-else>
             <template v-if="reviewPointViewedByUser">
@@ -60,14 +60,19 @@ export default {
     quizMode() {return !!this.repetition.quizQuestion && !this.answerResult},
     linkId() {if(this.reviewPointViewedByUser && this.reviewPointViewedByUser.linkViewedByUser) return this.reviewPointViewedByUser.linkViewedByUser.id},
     noteId() {if(this.reviewPointViewedByUser && this.reviewPointViewedByUser.noteViewedByUser) return this.reviewPointViewedByUser.noteViewedByUser.note.id},
+    hasLastResult() {return this.lastResult && !!this.lastResult.answerResult}
   },
   methods: {
     backToRepeat(){
       this.$router.push({name: "repeat"})
     },
     loadNew(resp) {
+      this.lastResult = {
+        answerResult: this.answerResult,
+        repetition: this.repetition,
+      }
+
       this.repetition = resp;
-      this.lastResult = {...this.answerResult}
       this.answerResult = null;
       if (!this.repetition.reviewPointViewedByUser) {
         this.$router.push({name: "reviews"})
@@ -81,7 +86,8 @@ export default {
     },
 
     viewLastResult() {
-      this.answerResult = this.lastResult
+      this.answerResult = this.lastResult.answerResult
+      this.repetition = this.lastResult.repetition
       this.lastResult = null
       this.resetRoute()
     },

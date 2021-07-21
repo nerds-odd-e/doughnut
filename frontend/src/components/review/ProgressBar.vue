@@ -2,7 +2,7 @@
 <div class="review-info-bar">
 
   <StopRepeatButton />
-  <ViewLastResultButton v-bind="{lastResult}" @viewLastResult="$emit('viewLastResult')"/>
+  <ViewLastResultButton v-bind="{hasLastResult}" @viewLastResult="$emit('viewLastResult')"/>
   <PauseRepeatButton v-bind="{noteId, linkId, allowPause, btn}"/>
   <div class="review-info-bar-right">
     <span :class="`progress-bar ${!!$slots.default ? 'thin' : ''}`" v-if="toRepeatCount !== null">
@@ -30,7 +30,7 @@ export default {
     finished: Number,
     toRepeatCount: Number,
     btn: {type: String, default: "pause"},
-    lastResult: Object,
+    hasLastResult: Boolean,
     },
   emits: ['viewLastResult'],
   methods: {
