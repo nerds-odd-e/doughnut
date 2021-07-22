@@ -2,6 +2,7 @@ package com.odde.doughnut.models;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public interface Randomizer {
     <T> void shuffle(List<T> list);
@@ -11,5 +12,4 @@ public interface Randomizer {
         shuffle(list);
         return list.stream().limit(maxSize).collect(Collectors.toList());
     }
-
 }

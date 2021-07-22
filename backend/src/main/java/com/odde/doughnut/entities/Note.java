@@ -136,7 +136,7 @@ public class Note {
 
     public Map<Link.LinkType, LinkViewed> getAllLinks(User viewer) {
         return linkTypes(viewer).stream().collect(Collectors.toMap(x->x, x->new LinkViewed(){{
-                setDirect(linksOfTypeThroughDirect(x));
+                setDirect(linksOfTypeThroughDirect(x).collect(Collectors.toUnmodifiableList()));
                 setReverse(linksOfTypeThroughReverse(x.reverseType(), viewer).collect(Collectors.toUnmodifiableList()));
         }}));
     }
@@ -147,10 +147,9 @@ public class Note {
                 .collect(Collectors.toUnmodifiableList());
     }
 
-    public List<Link> linksOfTypeThroughDirect(Link.LinkType linkType) {
+    public Stream<Link> linksOfTypeThroughDirect(Link.LinkType linkType) {
         return this.links.stream()
-                .filter(l -> l.getLinkType().equals(linkType))
-                .collect(Collectors.toList());
+                .filter(l -> l.getLinkType().equals(linkType));
     }
 
     public Stream<Link> linksOfTypeThroughReverse(Link.LinkType linkType, User viewer) {

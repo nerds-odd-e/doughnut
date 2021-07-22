@@ -6,6 +6,7 @@ import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.LinkViewed;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -26,14 +27,17 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory {
 
     @Override
     public List<Note> generateFillingOptions() {
-        if (cachedFillingOptions != null) {
-            return cachedFillingOptions;
+        if (cachedFillingOptions == null) {
+            cachedFillingOptions = new ArrayList<>();
+            Link otherPart = this.link.getTargetNote().linksOfTypeThroughDirect(Link.LinkType.PART).findFirst().map(l -> {
+                return servant.randomizer.chooseOneRandomly(l.getCousinLinks(reviewPoint.getUser()));
+            }).orElse(null);
+            if (otherPart != null) {
+               otherPart.getSourceNote().linksOfTypeThroughReverse(link.getLinkType(), reviewPoint.getUser()).forEach(l->{
+                   cachedFillingOptions.add(l.getSourceNote());
+               });
+            }
         }
-        List<Note> instanceReverse = getAnswerLink().getCousinOfSameLinkType();
-        List<Note> specReverse = link.getCousinOfSameLinkType();
-        List<Note> backwardPeers = Stream.concat(instanceReverse.stream(), specReverse.stream())
-                .filter(n-> !(instanceReverse.contains(n) && specReverse.contains(n))).collect(Collectors.toList());
-        cachedFillingOptions = servant.randomizer.randomlyChoose(5, backwardPeers);
         return cachedFillingOptions;
     }
 
