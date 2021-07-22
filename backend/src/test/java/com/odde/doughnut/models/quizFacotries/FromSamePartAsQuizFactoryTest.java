@@ -4,7 +4,6 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.testability.MakeMe;
-import org.hibernate.validator.internal.IgnoreForbiddenApisErrors;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -21,8 +20,8 @@ import static com.odde.doughnut.entities.QuizQuestion.QuestionType.FROM_SAME_PAR
 import static com.odde.doughnut.entities.QuizQuestion.QuestionType.WHICH_SPEC_HAS_INSTANCE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.hamcrest.Matchers.in;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
@@ -132,11 +131,30 @@ class FromSamePartAsQuizFactoryTest {
                     }
 
                 }
+                @Nested
+                class Answer {
+                    @Test
+                    void correct() {
+                        AnswerResult answerResult = makeMe.anAnswerFor(reviewPoint)
+                                .type(FROM_SAME_PART_AS)
+                                .answer(pretty.getTitle())
+                                .inMemoryPlease();
+                        assertTrue(answerResult.isCorrect());
+                    }
+
+                    @Test
+                    void wrong() {
+                        AnswerResult answerResult = makeMe.anAnswerFor(reviewPoint)
+                                .type(FROM_SAME_PART_AS)
+                                .answer("metal")
+                                .inMemoryPlease();
+                        assertFalse(answerResult.isCorrect());
+                    }
+                }
             }
 
         }
     }
-
 
     private QuizQuestion buildQuestion() {
         QuizQuestionDirector builder = new QuizQuestionDirector(FROM_SAME_PART_AS, randomizer, reviewPoint, makeMe.modelFactoryService);

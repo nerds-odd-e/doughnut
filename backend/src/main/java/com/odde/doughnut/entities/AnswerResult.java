@@ -35,6 +35,10 @@ public class AnswerResult {
             return reviewPoint.getLink().getCousinOfSameLinkType().stream()
                     .noneMatch(this::matchAnswer);
         }
+        if (questionType == FROM_SAME_PART_AS) {
+            return reviewPoint.getLink().getCousinOfSameLinkType().stream()
+                    .anyMatch(this::matchAnswer);
+        }
         return matchAnswer(getCorrectAnswerNote());
     }
 
