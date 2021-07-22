@@ -20,6 +20,7 @@ public class QuizQuestion {
         CLOZE_LINK_TARGET(ClozeLinkTargetQuizFactory::new),
         DESCRIPTION_LINK_TARGET(DescriptionLinkTargetQuizFactory::new),
         WHICH_SPEC_HAS_INSTANCE(WhichSpecHasInstanceQuizFactory::new),
+        FROM_SAME_PART_AS(FromSamePartAsQuizFactory::new),
         LINK_SOURCE_EXCLUSIVE(LinkTargetExclusiveQuizFactory::new);
 
         public final BiFunction<QuizQuestionServant, ReviewPoint, QuizQuestionFactory> factory;

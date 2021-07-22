@@ -1,4 +1,4 @@
-package com.odde.doughnut.models.questionTypes;
+package com.odde.doughnut.models.quizFacotries;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestion;
@@ -19,14 +19,14 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.odde.doughnut.entities.QuizQuestion.QuestionType.LINK_TARGET;
+import static com.odde.doughnut.entities.QuizQuestion.QuestionType.CLOZE_LINK_TARGET;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
-class QuizQuestionTypeLinkTargetTest {
+class QuizQuestionTypeClozeLinkTargetTest {
     @Autowired
     MakeMe makeMe;
     UserModel userModel;
@@ -42,45 +42,26 @@ class QuizQuestionTypeLinkTargetTest {
     void setup() {
         userModel = makeMe.aUser().toModelPlease();
         top = makeMe.aNote().byUser(userModel).please();
-        target = makeMe.aNote("target").under(top).please();
-        source = makeMe.aNote("source").under(top).linkTo(target).please();
+        target = makeMe.aNote("rome").under(top).please();
+        source = makeMe.aNote("Rome is not built in a day").under(top).linkTo(target).please();
         reviewPoint = makeMe.aReviewPointFor(source.getLinks().get(0)).inMemoryPlease();
+        anotherSource = makeMe.aNote("pompeii").under(top).please();
         makeMe.refresh(top);
-    }
-
-    @Test
-    void shouldReturnNullIfCannotFindEnoughOptions() {
-        QuizQuestion quizQuestion = buildLinkTargetQuizQuestion();
-        assertThat(quizQuestion, is(nullValue()));
     }
 
     @Nested
     class WhenThereAreMoreThanOneOptions {
-        @BeforeEach
-        void setup() {
-            anotherSource = makeMe.aNote("another note").under(top).please();
-            makeMe.refresh(top);
-        }
-
-
         @Test
         void shouldIncludeRightAnswers() {
-            QuizQuestion quizQuestion = buildLinkTargetQuizQuestion();
-            assertThat(quizQuestion.getDescription(), equalTo("<mark>source</mark> is a specialization of:"));
-            assertThat(quizQuestion.getMainTopic(), equalTo(""));
-            List<String> options = toOptionStrings(quizQuestion);
-            assertThat(anotherSource.getTitle(), in(options));
-            assertThat(target.getTitle(), in(options));
+            QuizQuestion quizQuestion = buildQuestion();
+            assertThat(quizQuestion.getDescription(), equalTo("<mark><mark title='Hidden text that is matching the answer'>[...]</mark> is not built in a day</mark> is a specialization of:"));
         }
     }
 
-    private QuizQuestion buildLinkTargetQuizQuestion() {
-        QuizQuestionDirector builder = new QuizQuestionDirector(LINK_TARGET, randomizer, reviewPoint, makeMe.modelFactoryService);
+    private QuizQuestion buildQuestion() {
+        QuizQuestionDirector builder = new QuizQuestionDirector(CLOZE_LINK_TARGET, randomizer, reviewPoint, makeMe.modelFactoryService);
         return builder.buildQuizQuestion();
     }
 
-    private List<String> toOptionStrings(QuizQuestion quizQuestion) {
-        return quizQuestion.getOptions().stream().map(QuizQuestion.Option::getDisplay).collect(Collectors.toUnmodifiableList());
-    }
 }
 

@@ -32,7 +32,7 @@ public class AnswerResult {
 
     public boolean isCorrect() {
         if (questionType == LINK_SOURCE_EXCLUSIVE) {
-            return reviewPoint.getLink().getBackwardPeers().stream()
+            return reviewPoint.getLink().getCousinOfSameLinkType().stream()
                     .noneMatch(this::matchAnswer);
         }
         return matchAnswer(getCorrectAnswerNote());

@@ -24,7 +24,7 @@ public class LinkTargetExclusiveQuizFactory implements QuizQuestionFactory {
     public List<Note> generateFillingOptions() {
         if(cachedFillingOptions == null) {
             Note sourceNote = link.getSourceNote();
-            List<Note> backwardPeers = link.getBackwardPeers();
+            List<Note> backwardPeers = link.getCousinOfSameLinkType();
             cachedFillingOptions = servant.randomlyChooseAndEnsure(backwardPeers, sourceNote, 5);
         }
         return cachedFillingOptions;
@@ -45,7 +45,7 @@ public class LinkTargetExclusiveQuizFactory implements QuizQuestionFactory {
         if (answerNote == null) {
             Note note = link.getSourceNote();
             List<Note> siblings = note.getSiblings();
-            siblings.removeAll(link.getBackwardPeers());
+            siblings.removeAll(link.getCousinOfSameLinkType());
             siblings.remove(link.getTargetNote());
             answerNote = servant.randomizer.chooseOneRandomly(siblings);
         }

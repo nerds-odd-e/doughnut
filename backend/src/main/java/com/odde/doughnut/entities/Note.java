@@ -17,6 +17,7 @@ import java.sql.Timestamp;
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 
@@ -136,7 +137,7 @@ public class Note {
     public Map<Link.LinkType, LinkViewed> getAllLinks(User viewer) {
         return linkTypes(viewer).stream().collect(Collectors.toMap(x->x, x->new LinkViewed(){{
                 setDirect(linksOfTypeThroughDirect(x));
-                setReverse(linksOfTypeThroughReverse(x, viewer));
+                setReverse(linksOfTypeThroughReverse(x.reverseType(), viewer).collect(Collectors.toUnmodifiableList()));
         }}));
     }
 
@@ -152,17 +153,16 @@ public class Note {
                 .collect(Collectors.toList());
     }
 
-    private List<Link> linksOfTypeThroughReverse(Link.LinkType linkType, User viewer) {
+    public Stream<Link> linksOfTypeThroughReverse(Link.LinkType linkType, User viewer) {
         return refers.stream()
-                .filter(l -> l.getLinkType().equals(linkType.reverseType()))
-                .filter(l -> l.sourceVisibleAsTargetOrTo(viewer))
-                .collect(Collectors.toUnmodifiableList());
+                .filter(l -> l.getLinkType().equals(linkType))
+                .filter(l -> l.sourceVisibleAsTargetOrTo(viewer));
     }
 
     public List<Note> linkedNotesOfType(Link.LinkType linkType, User viewer) {
         List<Note> notes = new ArrayList<>();
         linksOfTypeThroughDirect(linkType).forEach(lk -> notes.add(lk.getTargetNote()));
-        linksOfTypeThroughReverse(linkType, viewer).forEach(lk -> notes.add(lk.getSourceNote()));
+        linksOfTypeThroughReverse(linkType.reverseType(), viewer).forEach(lk -> notes.add(lk.getSourceNote()));
         return notes;
     }
 

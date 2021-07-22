@@ -1,4 +1,4 @@
-package com.odde.doughnut.models.questionTypes;
+package com.odde.doughnut.models.quizFacotries;
 
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.models.UserModel;

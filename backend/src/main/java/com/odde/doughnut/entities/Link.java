@@ -161,8 +161,13 @@ public class Link {
     }
 
     @JsonIgnore
-    public List<Note> getBackwardPeers() {
+    public List<Note> getCousinOfSameLinkType() {
         return targetNote.linkedNotesOfType(getLinkType().reverseType(), null);
+    }
+
+    @JsonIgnore
+    public List<Link> getCousinLinks(User viewer) {
+        return targetNote.linksOfTypeThroughReverse(getLinkType(), viewer).filter(l->!l.equals(this)).collect(Collectors.toList());
     }
 
     @JsonIgnore
