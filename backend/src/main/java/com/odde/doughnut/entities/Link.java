@@ -24,7 +24,7 @@ public class Link {
         SPECIALIZE                            (2, "specification", "is a specialization of", "is not a specialization of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE, WHICH_SPEC_HAS_INSTANCE, WHICH_SPEC_HAS_INSTANCE}),
         GENERALIZE                            (3, "generalization", "is a generalization of", "is not a generalization of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
 
-        INSTANCE                              (4, "instance", "is an instance of", "is not an instance of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE, WHICH_SPEC_HAS_INSTANCE, WHICH_SPEC_HAS_INSTANCE}),
+        INSTANCE                              (4, "instance", "is an instance of", "is not an instance of", new QuestionType[]{LINK_TARGET, WHICH_SPEC_HAS_INSTANCE, WHICH_SPEC_HAS_INSTANCE}),
         HAS_INSTANCE                          (5, "instance owner", "has instances", "not have as an instance", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
         /*INTEGRATED*/ PART                   (6, "part", "is a part of", "is not a part of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
         HAS_PART                              (7, "part owner", "has parts", "not have as a part", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
