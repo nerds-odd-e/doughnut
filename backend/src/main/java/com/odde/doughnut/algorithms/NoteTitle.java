@@ -3,6 +3,8 @@ package com.odde.doughnut.algorithms;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -29,17 +31,17 @@ public class NoteTitle {
 
     private Stream<TitleFragment> getTitles() {
         List<TitleFragment> result = new ArrayList<>();
-        String[] split = title.split("\\(", 2);
-        IntStream.range(0, split.length).forEach(idx->
-                getFragments(split[idx], idx != 0).forEach(result::add));
+        Pattern pattern = Pattern.compile("(.*?)(\\((.*)\\))?$");
+        Matcher matcher = pattern.matcher(title);
+        if(matcher.find()) {
+            getFragments(matcher.group(1), false).forEach(result::add);
+            getFragments(matcher.group(3), true).forEach(result::add);
+        }
         return result.stream();
     }
 
     private Stream<TitleFragment> getFragments(String subString, boolean subtitle) {
-        if(subtitle) {
-            subString = subString.substring(0, subString.length() - 1);
-        }
-        return Arrays.stream(subString.split("(?<!/)/(?!/)"))
+        return Arrays.stream(subString !=null ? subString.split("(?<!/)/(?!/)") : new String[]{})
                 .map(s->new TitleFragment(s, subtitle));
     }
 

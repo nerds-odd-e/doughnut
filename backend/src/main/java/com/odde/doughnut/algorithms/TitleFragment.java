@@ -16,7 +16,7 @@ class TitleFragment {
     TitleFragment(String content, boolean subtitle) {
         this.subtitle = subtitle;
         String trimmed = content.trim();
-        if(content.startsWith("~")) {
+        if(content.startsWith("~") || content.startsWith("〜")) {
             this.content = trimmed.substring(1);
             this.suffix = true;
         }
