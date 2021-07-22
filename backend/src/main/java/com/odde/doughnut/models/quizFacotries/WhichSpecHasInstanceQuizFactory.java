@@ -8,6 +8,7 @@ import com.odde.doughnut.entities.json.LinkViewed;
 import com.odde.doughnut.models.UserModel;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -67,14 +68,19 @@ public class WhichSpecHasInstanceQuizFactory implements QuizQuestionFactory {
 
     @Override
     public boolean isValidQuestion() {
-        return getViceReviewPoint() != null && generateFillingOptions().size() > 0;
+        return !getViceReviewPoints().isEmpty() && generateFillingOptions().size() > 0;
     }
 
     @Override
-    public ReviewPoint getViceReviewPoint() {
-        if(getInstanceLink() == null) return null;
-        UserModel userModel = servant.modelFactoryService.toUserModel(reviewPoint.getUser());
-        return userModel.getReviewPointFor(getInstanceLink());
+    public List<ReviewPoint> getViceReviewPoints() {
+        if(getInstanceLink() != null) {
+            UserModel userModel = servant.modelFactoryService.toUserModel(reviewPoint.getUser());
+            ReviewPoint reviewPointFor = userModel.getReviewPointFor(getInstanceLink());
+            if (reviewPointFor != null) {
+                return List.of(reviewPointFor);
+            }
+        }
+        return Collections.emptyList();
     }
 
     private Link getInstanceLink() {

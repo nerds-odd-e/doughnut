@@ -114,8 +114,11 @@ class RestReviewsController {
     if (answer.getAnswerNoteId() != null) {
       answerResult.setAnswerNote(modelFactoryService.noteRepository.findById(answer.getAnswerNoteId()).orElse(null));
     }
-    if(answer.getViceReviewPointId() != null) {
-      modelFactoryService.reviewPointRepository.findById(answer.getViceReviewPointId()).ifPresent(vice->updateReviewPoint(vice, answerResult));
+    if(answer.getViceReviewPointIds() != null) {
+      answer.getViceReviewPointIds().forEach(rPid->
+              modelFactoryService.reviewPointRepository
+                      .findById(rPid).ifPresent(vice->updateReviewPoint(vice, answerResult))
+              );
     }
     updateReviewPoint(reviewPoint, answerResult);
     return answerResult;

@@ -67,10 +67,11 @@ class FromSamePartAsQuizFactoryTest {
 
     @Nested
     class WhenThereIsAnCousin {
+        Link cousin;
 
         @BeforeEach
         void setup() {
-            makeMe.aLink().between(pretty, subjective, Link.LinkType.TAGGED_BY).please();
+            cousin = makeMe.aLink().between(pretty, subjective, Link.LinkType.TAGGED_BY).please();
             makeMe.refresh(userModel.getEntity());
         }
 
@@ -90,14 +91,30 @@ class FromSamePartAsQuizFactoryTest {
             }
 
             @Test
-            void shouldIncludeRightAnswersAndFillingOptions() {
+            void shouldBeInvalidWhenNoViceReviewPoint() {
                 QuizQuestion quizQuestion = buildQuestion();
-                assertThat(quizQuestion.getDescription(), containsString("<p>Which one's <mark>perspective</mark> is the same as:"));
-                assertThat(quizQuestion.getMainTopic(), containsString(ugly.getTitle()));
-                List<String> strings = toOptionStrings(quizQuestion);
-                assertThat(pretty.getTitle(), in(strings));
-                assertThat(tall.getTitle(), in(strings));
-                assertThat(ugly.getTitle(), not(in(strings)));
+                assertThat(quizQuestion, nullValue());
+            }
+
+            @Nested
+            class WhenThereIsViceReviewPoint {
+
+                @BeforeEach
+                void setup() {
+                    makeMe.aReviewPointFor(cousin).by(userModel).please();
+                    makeMe.refresh(userModel.getEntity());
+                }
+
+                @Test
+                void shouldIncludeRightAnswersAndFillingOptions() {
+                    QuizQuestion quizQuestion = buildQuestion();
+                    assertThat(quizQuestion.getDescription(), containsString("<p>Which one's <mark>perspective</mark> is the same as:"));
+                    assertThat(quizQuestion.getMainTopic(), containsString(ugly.getTitle()));
+                    List<String> strings = toOptionStrings(quizQuestion);
+                    assertThat(pretty.getTitle(), in(strings));
+                    assertThat(tall.getTitle(), in(strings));
+                    assertThat(ugly.getTitle(), not(in(strings)));
+                }
             }
 
         }

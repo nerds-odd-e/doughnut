@@ -26,7 +26,7 @@ public interface QuizQuestionFactory {
         return true;
     }
 
-    default ReviewPoint getViceReviewPoint() {
+    default List<ReviewPoint> getViceReviewPoints() {
         return null;
     }
 }

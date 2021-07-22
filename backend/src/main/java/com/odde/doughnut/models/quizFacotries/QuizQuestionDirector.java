@@ -7,6 +7,7 @@ import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class QuizQuestionDirector {
     private final QuizQuestion.QuestionType questionType;
@@ -34,14 +35,14 @@ public class QuizQuestionDirector {
         quizQuestion.setDescription(quizQuestionFactory.generateInstruction());
         quizQuestion.setMainTopic(quizQuestionFactory.generateMainTopic());
         quizQuestion.setHintLinks(quizQuestionFactory.generateHintLinks());
-        quizQuestion.setViceReviewPointId(getViceReviewPoinId());
+        quizQuestion.setViceReviewPointIds(getViceReviewPoinIds());
         return quizQuestion;
     }
 
-    private Integer getViceReviewPoinId() {
-        ReviewPoint viceReviewPoint = quizQuestionFactory.getViceReviewPoint();
-        if (viceReviewPoint == null) return null;
-        return viceReviewPoint.getId();
+    private List<Integer> getViceReviewPoinIds() {
+        List<ReviewPoint> viceReviewPoints = quizQuestionFactory.getViceReviewPoints();
+        if (viceReviewPoints == null) return null;
+        return viceReviewPoints.stream().map(ReviewPoint::getId).collect(Collectors.toUnmodifiableList());
     }
 
     private List<QuizQuestion.Option> generateOptions() {

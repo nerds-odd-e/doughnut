@@ -3,6 +3,8 @@ package com.odde.doughnut.entities;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 public class Answer {
     @Getter
     @Setter
@@ -17,5 +19,5 @@ public class Answer {
     QuizQuestion.QuestionType questionType;
 
     @Getter @Setter
-    private Integer viceReviewPointId;
+    private List<Integer> viceReviewPointIds;
 }

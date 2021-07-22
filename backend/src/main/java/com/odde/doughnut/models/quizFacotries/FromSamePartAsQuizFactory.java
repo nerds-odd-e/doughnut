@@ -5,13 +5,9 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.LinkViewed;
+import com.odde.doughnut.models.UserModel;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.*;
 
 public class FromSamePartAsQuizFactory implements QuizQuestionFactory {
     private Link cachedAnswerLink = null;
@@ -20,6 +16,7 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory {
     private final ReviewPoint reviewPoint;
     private final Link link;
     private Optional<Link> cachedCategoryLink = null;
+    private ReviewPoint cachedAnswerLinkReviewPoint = null;
 
     public FromSamePartAsQuizFactory(QuizQuestionServant servant, ReviewPoint reviewPoint) {
         this.servant = servant;
@@ -78,12 +75,16 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory {
 
     @Override
     public boolean isValidQuestion() {
-        return generateAnswerNote() != null && generateFillingOptions().size() > 0;
+        return generateAnswerNote() != null && !getViceReviewPoints().isEmpty() && generateFillingOptions().size() > 0;
     }
 
     @Override
-    public ReviewPoint getViceReviewPoint() {
-        return null;
+    public List<ReviewPoint> getViceReviewPoints() {
+        getAnswerLink();
+        if(cachedAnswerLinkReviewPoint != null) {
+            return List.of(cachedAnswerLinkReviewPoint);
+        }
+        return Collections.emptyList();
     }
 
     private Link getAnswerLink() {
@@ -91,6 +92,10 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory {
             List<Link> backwardPeers = link.getCousinLinks(reviewPoint.getUser());
             backwardPeers.remove(link);
             cachedAnswerLink = servant.randomizer.chooseOneRandomly(backwardPeers);
+            if(cachedAnswerLink != null) {
+                UserModel userModel = servant.modelFactoryService.toUserModel(reviewPoint.getUser());
+                this.cachedAnswerLinkReviewPoint = userModel.getReviewPointFor(cachedAnswerLink);
+            }
         }
         return cachedAnswerLink;
     }

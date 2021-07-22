@@ -15,6 +15,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.equalTo;
@@ -100,7 +102,7 @@ class RestReviewsControllerTests {
         void shouldIncreaseTheViceReviewPointToo() {
             Note note2 = makeMe.aNote().please();
             ReviewPoint anotherReviewPoint = makeMe.aReviewPointFor(note2).by(userModel).please();
-            answer.setViceReviewPointId(anotherReviewPoint.getId());
+            answer.setViceReviewPointIds(List.of(anotherReviewPoint.getId()));
             makeMe.refresh(anotherReviewPoint);
 
             Integer oldForgettingCurveIndex = anotherReviewPoint.getForgettingCurveIndex();
