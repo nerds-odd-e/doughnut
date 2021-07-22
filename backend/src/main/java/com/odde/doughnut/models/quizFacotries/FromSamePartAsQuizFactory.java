@@ -8,6 +8,7 @@ import com.odde.doughnut.entities.json.LinkViewed;
 import com.odde.doughnut.models.UserModel;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class FromSamePartAsQuizFactory implements QuizQuestionFactory {
     private Link cachedAnswerLink = null;
@@ -32,9 +33,8 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory {
                 return servant.randomizer.chooseOneRandomly(l.getCousinLinks(reviewPoint.getUser()));
             }).orElse(null);
             if (otherPart != null) {
-               otherPart.getSourceNote().linksOfTypeThroughReverse(link.getLinkType(), reviewPoint.getUser()).forEach(l->{
-                   cachedFillingOptions.add(l.getSourceNote());
-               });
+                List<Link> list = otherPart.getSourceNote().linksOfTypeThroughReverse(link.getLinkType(), reviewPoint.getUser()).collect(Collectors.toUnmodifiableList());
+                cachedFillingOptions.addAll( servant.randomizer.randomlyChoose(5, list).stream().map(Link::getSourceNote).collect(Collectors.toUnmodifiableList()));
             }
         }
         return cachedFillingOptions;
