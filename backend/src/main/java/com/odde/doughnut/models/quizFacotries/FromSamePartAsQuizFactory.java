@@ -82,7 +82,16 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory {
     public List<ReviewPoint> getViceReviewPoints() {
         getAnswerLink();
         if(cachedAnswerLinkReviewPoint != null) {
-            return List.of(cachedAnswerLinkReviewPoint);
+            List<ReviewPoint> result = new ArrayList<>();
+            result.add(cachedAnswerLinkReviewPoint);
+            UserModel userModel = servant.modelFactoryService.toUserModel(reviewPoint.getUser());
+            categoryLink().ifPresent(l-> {
+                ReviewPoint reviewPointFor = userModel.getReviewPointFor(l);
+                if(reviewPointFor != null) {
+                    result.add(reviewPointFor);
+                }
+            });
+            return result;
         }
         return Collections.emptyList();
     }

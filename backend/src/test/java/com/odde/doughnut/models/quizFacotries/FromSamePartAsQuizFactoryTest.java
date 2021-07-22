@@ -39,6 +39,7 @@ class FromSamePartAsQuizFactoryTest {
     Note ugly;
     Note pretty;
     Note tall;
+    Link subjectivePerspective;
     ReviewPoint reviewPoint;
 
 
@@ -52,7 +53,7 @@ class FromSamePartAsQuizFactoryTest {
         ugly = makeMe.aNote("ugly").under(top).please();
         pretty = makeMe.aNote("pretty").under(top).please();
         tall = makeMe.aNote("tall").under(top).please();
-        makeMe.aLink().between(subjective, perspective, Link.LinkType.PART).please();
+        subjectivePerspective = makeMe.aLink().between(subjective, perspective, Link.LinkType.PART).please();
         makeMe.aLink().between(objective, perspective, Link.LinkType.PART).please();
         Link uglySubjective = makeMe.aLink().between(ugly, subjective, Link.LinkType.TAGGED_BY).please();
         reviewPoint = makeMe.aReviewPointFor(uglySubjective).by(userModel).inMemoryPlease();
@@ -98,7 +99,6 @@ class FromSamePartAsQuizFactoryTest {
 
             @Nested
             class WhenThereIsViceReviewPoint {
-
                 @BeforeEach
                 void setup() {
                     makeMe.aReviewPointFor(cousin).by(userModel).please();
@@ -114,6 +114,23 @@ class FromSamePartAsQuizFactoryTest {
                     assertThat(pretty.getTitle(), in(strings));
                     assertThat(tall.getTitle(), in(strings));
                     assertThat(ugly.getTitle(), not(in(strings)));
+                }
+
+                @Nested
+                class WhenThereIsReviewPointOfTheCategory {
+                    ReviewPoint additionalReviewPoint;
+                    @BeforeEach
+                    void setup() {
+                        additionalReviewPoint = makeMe.aReviewPointFor(subjectivePerspective).by(userModel).please();
+                    }
+
+                    @Test
+                    void shouldInclude2ViceReviewPoints() {
+                        QuizQuestion quizQuestion = buildQuestion();
+                        List<Integer> viceReviewPointIds = quizQuestion.getViceReviewPointIds();
+                        assertThat(additionalReviewPoint.getId(), in(viceReviewPointIds));
+                    }
+
                 }
             }
 
