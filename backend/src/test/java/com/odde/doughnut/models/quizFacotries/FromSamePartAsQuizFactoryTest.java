@@ -55,13 +55,12 @@ class FromSamePartAsQuizFactoryTest {
         makeMe.aLink().between(subjective, perspective, Link.LinkType.PART).please();
         makeMe.aLink().between(objective, perspective, Link.LinkType.PART).please();
         Link uglySubjective = makeMe.aLink().between(ugly, subjective, Link.LinkType.TAGGED_BY).please();
-        makeMe.aLink().between(tall, objective, Link.LinkType.TAGGED_BY).please();
         reviewPoint = makeMe.aReviewPointFor(uglySubjective).by(userModel).inMemoryPlease();
         makeMe.refresh(top);
     }
 
     @Test
-    void shouldBeInvalidWhenNoInsatnceOfLink() {
+    void shouldBeInvalidWhenNoCousin() {
         QuizQuestion quizQuestion = buildQuestion();
         assertThat(quizQuestion, nullValue());
     }
@@ -76,15 +75,32 @@ class FromSamePartAsQuizFactoryTest {
         }
 
         @Test
-        void shouldIncludeRightAnswersAndFillingOptions() {
+        void shouldBeInvalidWhenNoFillingOptions() {
             QuizQuestion quizQuestion = buildQuestion();
-            //assertThat(quizQuestion.getDescription(), containsString("<p>Which one is a specialization of <mark>element</mark> <em>and</em> is an instance of <mark>non-official name</mark>:"));
-            List<String> strings = toOptionStrings(quizQuestion);
-            assertThat(pretty.getTitle(), in(strings));
-            assertThat(tall.getTitle(), in(strings));
-            assertThat(ugly.getTitle(), not(in(strings)));
+            assertThat(quizQuestion, nullValue());
         }
 
+        @Nested
+        class WhenThereIsFillingOption {
+
+            @BeforeEach
+            void setup() {
+                makeMe.aLink().between(tall, objective, Link.LinkType.TAGGED_BY).please();
+                makeMe.refresh(userModel.getEntity());
+            }
+
+            @Test
+            void shouldIncludeRightAnswersAndFillingOptions() {
+                QuizQuestion quizQuestion = buildQuestion();
+                assertThat(quizQuestion.getDescription(), containsString("<p>Which one's <mark>perspective</mark> is the same as:"));
+                assertThat(quizQuestion.getMainTopic(), containsString(ugly.getTitle()));
+                List<String> strings = toOptionStrings(quizQuestion);
+                assertThat(pretty.getTitle(), in(strings));
+                assertThat(tall.getTitle(), in(strings));
+                assertThat(ugly.getTitle(), not(in(strings)));
+            }
+
+        }
     }
 
 
