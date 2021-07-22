@@ -13,6 +13,7 @@ public class LinkTargetExclusiveQuizFactory implements QuizQuestionFactory {
     private final Link link;
     private final QuizQuestionServant servant;
     private List<Note> cachedFillingOptions = null;
+    private Note answerNote = null;
 
     public LinkTargetExclusiveQuizFactory(QuizQuestionServant servant, ReviewPoint reviewPoint) {
         this.link = reviewPoint.getLink();
@@ -41,11 +42,14 @@ public class LinkTargetExclusiveQuizFactory implements QuizQuestionFactory {
 
     @Override
     public Note generateAnswerNote() {
-        Note note = link.getSourceNote();
-        List<Note> siblings = note.getSiblings();
-        siblings.removeAll(link.getBackwardPeers());
-        siblings.remove(link.getTargetNote());
-        return servant.randomizer.chooseOneRandomly(siblings);
+        if (answerNote == null) {
+            Note note = link.getSourceNote();
+            List<Note> siblings = note.getSiblings();
+            siblings.removeAll(link.getBackwardPeers());
+            siblings.remove(link.getTargetNote());
+            answerNote = servant.randomizer.chooseOneRandomly(siblings);
+        }
+        return answerNote;
     }
 
     @Override
@@ -60,6 +64,6 @@ public class LinkTargetExclusiveQuizFactory implements QuizQuestionFactory {
 
     @Override
     public boolean isValidQuestion() {
-        return generateFillingOptions().size() > 0;
+        return generateAnswerNote() !=null && generateFillingOptions().size() > 0;
     }
 }

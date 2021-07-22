@@ -27,9 +27,6 @@ public class QuizQuestionDirector {
     }
 
     public QuizQuestion buildQuizQuestion() {
-        if (answerNote == null) {
-            return null;
-        }
         if (!quizQuestionFactory.isValidQuestion()) {
             return null;
         }
