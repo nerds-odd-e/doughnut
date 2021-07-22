@@ -44,6 +44,7 @@ public class ClozeDescriptionTest {
             "~cat,            a cat,                               a cat",
             "〜よう,            どのよう,                              どの[...]",
             "cat(animal),      cat is an animal,                  [...] is an <...>",
+            "cat（animal),      cat is an animal,                  [...] is an <...>",
             "cat(animal) dog,  cat is an animal,                  cat is an animal",
             "cat/dog(animal/weather), dog day is a hot weather,   [...] day is a hot <...>",
             "6,               6year,                               [...]year",

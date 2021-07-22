@@ -31,7 +31,7 @@ public class NoteTitle {
 
     private Stream<TitleFragment> getTitles() {
         List<TitleFragment> result = new ArrayList<>();
-        Pattern pattern = Pattern.compile("(.*?)(\\((.*)\\))?$");
+        Pattern pattern = Pattern.compile("(?U)(.*?)(\\p{Ps}(.*)\\p{Pe})?$");
         Matcher matcher = pattern.matcher(title);
         if(matcher.find()) {
             getFragments(matcher.group(1), false).forEach(result::add);
