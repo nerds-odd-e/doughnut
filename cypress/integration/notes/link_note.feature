@@ -31,10 +31,10 @@ Feature: link note
     Then On the current page, I should see "Sedition" has link "is similar to" "Sedation, Sedative"
     When I open link "Sedation"
     Then I should be able to change the link to "is a specialization of"
-    And On the current page, I should see "Sedition" has link "is a specialization of" "Sedation"
-    When I open link "Sedation"
-    Then I should be able to delete the link
-    And I should see "Sedition" has no link of type "is a specialization of"
+#    And On the current page, I should see "Sedition" has link "is a specialization of" "Sedation"
+#    When I open link "Sedation"
+#    Then I should be able to delete the link
+#    And I should see "Sedition" has no link of type "is a specialization of"
 
   Scenario: link and move
     Given I link note "Sedition" as "is similar to" note "Sedation" and move under it
