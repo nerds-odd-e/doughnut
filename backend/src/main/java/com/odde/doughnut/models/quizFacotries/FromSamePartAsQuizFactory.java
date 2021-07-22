@@ -9,6 +9,7 @@ import com.odde.doughnut.models.UserModel;
 
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class FromSamePartAsQuizFactory implements QuizQuestionFactory {
     private Link cachedAnswerLink = null;
@@ -28,14 +29,14 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory {
     @Override
     public List<Note> generateFillingOptions() {
         if (cachedFillingOptions == null) {
-            cachedFillingOptions = new ArrayList<>();
-            Link otherPart = categoryLink().map(l -> {
-                return servant.randomizer.chooseOneRandomly(l.getCousinLinks(reviewPoint.getUser()));
-            }).orElse(null);
-            if (otherPart != null) {
-                List<Link> list = otherPart.getSourceNote().linksOfTypeThroughReverse(link.getLinkType(), reviewPoint.getUser()).collect(Collectors.toUnmodifiableList());
-                cachedFillingOptions.addAll( servant.randomizer.randomlyChoose(5, list).stream().map(Link::getSourceNote).collect(Collectors.toUnmodifiableList()));
-            }
+            cachedFillingOptions = categoryLink().map(l -> l.getCousinLinks(reviewPoint.getUser()))
+                    .map(otherParts -> otherParts.stream()
+                            .flatMap(p -> p.getSourceNote().linksOfTypeThroughReverse(link.getLinkType(), reviewPoint.getUser()))
+                            .collect(Collectors.toUnmodifiableList()))
+                    .map(links ->
+                        servant.randomizer.randomlyChoose(5, links).stream()
+                                .map(Link::getSourceNote).collect(Collectors.toList())
+                    ).orElse(Collections.emptyList());
         }
         return cachedFillingOptions;
     }
@@ -49,7 +50,7 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory {
 
     @Override
     public String generateInstruction() {
-        return "<p>Which one's <mark>" + categoryLink().map(l->l.getTargetNote().getTitle()).orElse("") + "</mark> is the same as:";
+        return "<p>Which one's <mark>" + categoryLink().map(l -> l.getTargetNote().getTitle()).orElse("") + "</mark> is the same as:";
     }
 
     @Override
@@ -59,7 +60,7 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory {
 
     @Override
     public Note generateAnswerNote() {
-        if(getAnswerLink() == null) return null;
+        if (getAnswerLink() == null) return null;
         return getAnswerLink().getSourceNote();
     }
 
@@ -81,13 +82,13 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory {
     @Override
     public List<ReviewPoint> getViceReviewPoints() {
         getAnswerLink();
-        if(cachedAnswerLinkReviewPoint != null) {
+        if (cachedAnswerLinkReviewPoint != null) {
             List<ReviewPoint> result = new ArrayList<>();
             result.add(cachedAnswerLinkReviewPoint);
             UserModel userModel = servant.modelFactoryService.toUserModel(reviewPoint.getUser());
-            categoryLink().ifPresent(l-> {
+            categoryLink().ifPresent(l -> {
                 ReviewPoint reviewPointFor = userModel.getReviewPointFor(l);
-                if(reviewPointFor != null) {
+                if (reviewPointFor != null) {
                     result.add(reviewPointFor);
                 }
             });
@@ -97,11 +98,11 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory {
     }
 
     private Link getAnswerLink() {
-        if(cachedAnswerLink == null) {
+        if (cachedAnswerLink == null) {
             List<Link> backwardPeers = link.getCousinLinks(reviewPoint.getUser());
             backwardPeers.remove(link);
             cachedAnswerLink = servant.randomizer.chooseOneRandomly(backwardPeers);
-            if(cachedAnswerLink != null) {
+            if (cachedAnswerLink != null) {
                 UserModel userModel = servant.modelFactoryService.toUserModel(reviewPoint.getUser());
                 this.cachedAnswerLinkReviewPoint = userModel.getReviewPointFor(cachedAnswerLink);
             }
