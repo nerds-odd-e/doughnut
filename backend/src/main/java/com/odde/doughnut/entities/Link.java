@@ -194,7 +194,6 @@ public class Link {
         return getTargetNote().linksOfTypeThroughDirect(LinkType.PART).findFirst();
     }
 
-    @JsonIgnore
     public Optional<List<Link>> getRemoteCousinOfDifferentCategory(User user) {
         return categoryLink().map(l -> l.getCousinLinks(user))
                 .map(otherParts -> otherParts.stream()

@@ -1,18 +1,18 @@
 <template>
-  <NoteCardWithHeaderAndButton :notes="subscriptions">
-    <template #headerButtons="{note}">
-      <SubscriptionNoteButtons :subscription="note"/>
+  <NotebookCardsWithButtons :notebooks="subscriptions.map(s=>s.notebook)">
+    <template #default="{notebook}">
+      <SubscriptionNoteButtons :subscription="subscriptions.find(s=>s.notebook === notebook)"/>
     </template>
-  </NoteCardWithHeaderAndButton>
+  </NotebookCardsWithButtons>
 </template>
 
 <script>
-import NoteCardWithHeaderAndButton from "../notes/NoteCardWithHeaderAndButton.vue"
+import NotebookCardsWithButtons from "../notebook/NotebookCardsWithButtons.vue"
 import SubscriptionNoteButtons from "./SubscriptionNoteButtons.vue"
 
 export default {
   name: 'NotebookSubscriptionCards',
   props: { subscriptions: Array },
-  components: { NoteCardWithHeaderAndButton, SubscriptionNoteButtons }
+  components: { NotebookCardsWithButtons, SubscriptionNoteButtons }
 }
 </script>
