@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.odde.doughnut.entities.QuizQuestion.QuestionType;
+import com.odde.doughnut.models.quizFacotries.FromSamePartAsQuizFactory;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -187,6 +188,18 @@ public class Link {
         if (viewer == null) return false;
 
         return viewer.canReferTo(sourceNote.getNotebook());
+    }
+
+    public Optional<Link> categoryLink() {
+        return getTargetNote().linksOfTypeThroughDirect(LinkType.PART).findFirst();
+    }
+
+    @JsonIgnore
+    public Optional<List<Link>> getRemoteCousinOfDifferentCategory(User user) {
+        return categoryLink().map(l -> l.getCousinLinks(user))
+                .map(otherParts -> otherParts.stream()
+                        .flatMap(p -> p.getSourceNote().linksOfTypeThroughReverse(getLinkType(), user))
+                        .collect(Collectors.toUnmodifiableList()));
     }
 
 }

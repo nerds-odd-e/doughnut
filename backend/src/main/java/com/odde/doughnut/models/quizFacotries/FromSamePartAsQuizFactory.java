@@ -1,24 +1,18 @@
 package com.odde.doughnut.models.quizFacotries;
 
-import com.odde.doughnut.entities.Link;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestion;
-import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.json.LinkViewed;
 import com.odde.doughnut.models.UserModel;
 
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class FromSamePartAsQuizFactory implements QuizQuestionFactory {
     private Link cachedAnswerLink = null;
     private List<Note> cachedFillingOptions = null;
-    private final QuizQuestionServant servant;
-    private final ReviewPoint reviewPoint;
-    private final Link link;
-    private Optional<Link> cachedCategoryLink = null;
-    private ReviewPoint cachedAnswerLinkReviewPoint = null;
+    protected final QuizQuestionServant servant;
+    protected final ReviewPoint reviewPoint;
+    protected final Link link;
 
     public FromSamePartAsQuizFactory(QuizQuestionServant servant, ReviewPoint reviewPoint) {
         this.servant = servant;
@@ -29,28 +23,18 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory {
     @Override
     public List<Note> generateFillingOptions() {
         if (cachedFillingOptions == null) {
-            cachedFillingOptions = categoryLink().map(l -> l.getCousinLinks(reviewPoint.getUser()))
-                    .map(otherParts -> otherParts.stream()
-                            .flatMap(p -> p.getSourceNote().linksOfTypeThroughReverse(link.getLinkType(), reviewPoint.getUser()))
-                            .collect(Collectors.toUnmodifiableList()))
+            cachedFillingOptions = link.getRemoteCousinOfDifferentCategory(reviewPoint.getUser())
                     .map(links ->
-                        servant.randomizer.randomlyChoose(5, links).stream()
-                                .map(Link::getSourceNote).collect(Collectors.toList())
+                            servant.randomizer.randomlyChoose(5, links).stream()
+                                    .map(Link::getSourceNote).collect(Collectors.toList())
                     ).orElse(Collections.emptyList());
         }
         return cachedFillingOptions;
     }
 
-    private Optional<Link> categoryLink() {
-        if (cachedCategoryLink == null) {
-            cachedCategoryLink = this.link.getTargetNote().linksOfTypeThroughDirect(Link.LinkType.PART).findFirst();
-        }
-        return cachedCategoryLink;
-    }
-
     @Override
     public String generateInstruction() {
-        return "<p>Which one's <mark>" + categoryLink().map(l -> l.getTargetNote().getTitle()).orElse("") + "</mark> is the same as:";
+        return "<p>Which one's <mark>" + link.categoryLink().map(l -> l.getTargetNote().getTitle()).orElse("") + "</mark> is the same as:";
     }
 
     @Override
@@ -81,12 +65,13 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory {
 
     @Override
     public List<ReviewPoint> getViceReviewPoints() {
-        getAnswerLink();
-        if (cachedAnswerLinkReviewPoint != null) {
-            List<ReviewPoint> result = new ArrayList<>();
-            result.add(cachedAnswerLinkReviewPoint);
+        Link answerLink = getAnswerLink();
+        if (answerLink != null) {
             UserModel userModel = servant.modelFactoryService.toUserModel(reviewPoint.getUser());
-            categoryLink().ifPresent(l -> {
+            ReviewPoint answerLinkReviewPoint = userModel.getReviewPointFor(cachedAnswerLink);
+            List<ReviewPoint> result = new ArrayList<>();
+            result.add(answerLinkReviewPoint);
+            link.categoryLink().ifPresent(l -> {
                 ReviewPoint reviewPointFor = userModel.getReviewPointFor(l);
                 if (reviewPointFor != null) {
                     result.add(reviewPointFor);
@@ -97,15 +82,12 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory {
         return Collections.emptyList();
     }
 
-    private Link getAnswerLink() {
+    protected Link getAnswerLink() {
         if (cachedAnswerLink == null) {
-            List<Link> backwardPeers = link.getCousinLinks(reviewPoint.getUser());
-            backwardPeers.remove(link);
+            UserModel userModel = servant.modelFactoryService.toUserModel(reviewPoint.getUser());
+            List<Link> backwardPeers = link.getCousinLinks(reviewPoint.getUser()).stream()
+                    .filter(l->userModel.getReviewPointFor(l) != null).collect(Collectors.toUnmodifiableList());
             cachedAnswerLink = servant.randomizer.chooseOneRandomly(backwardPeers);
-            if (cachedAnswerLink != null) {
-                UserModel userModel = servant.modelFactoryService.toUserModel(reviewPoint.getUser());
-                this.cachedAnswerLinkReviewPoint = userModel.getReviewPointFor(cachedAnswerLink);
-            }
         }
         return cachedAnswerLink;
     }
