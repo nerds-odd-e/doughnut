@@ -93,14 +93,15 @@ class FromDifferentPartAsQuizFactoryTest {
                 makeMe.refresh(userModel.getEntity());
             }
 
+            @Test
             void shouldIncludeRightAnswersAndFillingOptions() {
                 QuizQuestion quizQuestion = buildQuestion();
-                assertThat(quizQuestion.getDescription(), containsString("<p>Which one's <mark>perspective</mark> is the same as:"));
+                assertThat(quizQuestion.getDescription(), containsString("<p>Which one's <mark>perspective</mark> is <em>different</em> from:"));
                 assertThat(quizQuestion.getMainTopic(), containsString(ugly.getTitle()));
                 List<String> strings = toOptionStrings(quizQuestion);
                 assertThat(pretty.getTitle(), in(strings));
                 assertThat(tall.getTitle(), in(strings));
-                assertThat(kind.getTitle(), not(in(strings)));
+                assertThat(kind.getTitle(), in(strings));
                 assertThat(ugly.getTitle(), not(in(strings)));
             }
 
@@ -127,19 +128,19 @@ class FromDifferentPartAsQuizFactoryTest {
                 @Test
                 void correct() {
                     AnswerResult answerResult = makeMe.anAnswerFor(reviewPoint)
-                            .type(FROM_SAME_PART_AS)
+                            .type(FROM_DIFFERENT_PART_AS)
                             .answer(pretty.getTitle())
                             .inMemoryPlease();
-                    assertTrue(answerResult.isCorrect());
+                    assertFalse(answerResult.isCorrect());
                 }
 
                 @Test
                 void wrong() {
                     AnswerResult answerResult = makeMe.anAnswerFor(reviewPoint)
-                            .type(FROM_SAME_PART_AS)
+                            .type(FROM_DIFFERENT_PART_AS)
                             .answer("metal")
                             .inMemoryPlease();
-                    assertFalse(answerResult.isCorrect());
+                    assertTrue(answerResult.isCorrect());
                 }
             }
         }

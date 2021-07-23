@@ -31,7 +31,7 @@ public class AnswerResult {
     }
 
     public boolean isCorrect() {
-        if (questionType == LINK_SOURCE_EXCLUSIVE) {
+        if (questionType == LINK_SOURCE_EXCLUSIVE || questionType == FROM_DIFFERENT_PART_AS) {
             return reviewPoint.getLink().getCousinOfSameLinkType().stream()
                     .noneMatch(this::matchAnswer);
         }
