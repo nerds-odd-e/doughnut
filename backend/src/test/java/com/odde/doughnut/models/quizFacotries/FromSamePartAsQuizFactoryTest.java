@@ -107,7 +107,7 @@ class FromSamePartAsQuizFactoryTest {
                 @Test
                 void shouldIncludeRightAnswersAndFillingOptions() {
                     QuizQuestion quizQuestion = buildQuestion();
-                    assertThat(quizQuestion.getDescription(), containsString("<p>Which one's <mark>perspective</mark> is the same as:"));
+                    assertThat(quizQuestion.getDescription(), containsString("<p>Which one <mark>is tagged by</mark> the same <mark>perspective</mark> as:"));
                     assertThat(quizQuestion.getMainTopic(), containsString(ugly.getTitle()));
                     List<String> strings = toOptionStrings(quizQuestion);
                     assertThat(pretty.getTitle(), in(strings));

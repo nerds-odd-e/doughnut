@@ -64,7 +64,7 @@ public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory {
 
     @Override
     public String generateInstruction() {
-        return "<p>Which one's <mark>" + link.categoryLink().map(l -> l.getTargetNote().getTitle()).orElse("") + "</mark> is <em>different</em> from:";
+        return "<p>Which one <mark>" + link.getLinkTypeLabel()+"</mark> a <em>DIFFERENT</em> <mark>" + link.categoryLink().map(l -> l.getTargetNote().getTitle()).orElse("") + "</mark> than:";
     }
 
     @Override
