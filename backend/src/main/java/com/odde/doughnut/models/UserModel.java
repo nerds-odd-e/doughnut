@@ -86,10 +86,6 @@ public class UserModel implements ReviewScope {
                 );
     }
 
-    public SpacedRepetitionAlgorithm getSpacedRepetitionAlgorithm() {
-        return new SpacedRepetitionAlgorithm(entity.getSpaceIntervals());
-    }
-
     int learntCount() {
         return modelFactoryService.reviewPointRepository.countByUserNotRemoved(entity);
     }

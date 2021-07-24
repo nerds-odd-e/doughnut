@@ -103,7 +103,7 @@ public class Authorization {
     public void assertLoggedIn() {
         if (user == null) {
             throw new ResponseStatusException(
-                    HttpStatus.UNAUTHORIZED, "Foo Not Found");
+                    HttpStatus.UNAUTHORIZED, "User Not Found");
         }
     }
 

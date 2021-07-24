@@ -1,6 +1,7 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.odde.doughnut.algorithms.SpacedRepetitionAlgorithm;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -69,6 +70,10 @@ public class User {
 
     public boolean inCircle(Circle circle) {
         return circle.getMembers().contains(this);
+    }
+
+    public SpacedRepetitionAlgorithm getSpacedRepetitionAlgorithm() {
+        return new SpacedRepetitionAlgorithm(getSpaceIntervals());
     }
 
 }

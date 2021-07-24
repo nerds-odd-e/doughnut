@@ -1,6 +1,5 @@
 package com.odde.doughnut.models;
 
-import com.odde.doughnut.algorithms.SpacedRepetitionAlgorithm;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
@@ -44,11 +43,7 @@ public class ReviewPointModel {
     }
 
     private void updateNextRepetitionWithAdjustment(Timestamp currentUTCTimestamp, int adjustment) {
-        SpacedRepetitionAlgorithm spacedRepetitionAlgorithm = getUserModel().getSpacedRepetitionAlgorithm();
-        long delayInHours = TimestampOperations.getDiffInHours(currentUTCTimestamp, entity.getNextReviewAt());
-        final int nextForgettingCurveIndex = spacedRepetitionAlgorithm.getNextForgettingCurveIndex(this.entity.getForgettingCurveIndex(), adjustment, delayInHours);
-        final int nextRepeatInHours = spacedRepetitionAlgorithm.getRepeatInHours(nextForgettingCurveIndex);
-        entity.updateMemoryState(currentUTCTimestamp, nextRepeatInHours, nextForgettingCurveIndex);
+        entity.changeNextRepetitionWithAdjustment(currentUTCTimestamp, adjustment);
         this.modelFactoryService.reviewPointRepository.save(entity);
     }
 
@@ -56,10 +51,6 @@ public class ReviewPointModel {
         final int repetitionCount = entity.getRepetitionCount() + 1;
         entity.setRepetitionCount(repetitionCount);
         this.modelFactoryService.reviewPointRepository.save(entity);
-    }
-
-    private UserModel getUserModel() {
-        return modelFactoryService.toUserModel(entity.getUser());
     }
 
     public QuizQuestion generateAQuizQuestion(Randomizer randomizer) {

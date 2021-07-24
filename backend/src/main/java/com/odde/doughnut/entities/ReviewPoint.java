@@ -2,6 +2,7 @@ package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.algorithms.SpacedRepetitionAlgorithm;
+import com.odde.doughnut.models.ReviewPointModel;
 import com.odde.doughnut.models.TimestampOperations;
 import java.sql.Timestamp;
 import java.time.ZoneId;
@@ -130,5 +131,13 @@ public class ReviewPoint {
     setForgettingCurveIndex(nextForgettingCurveIndex);
     setNextReviewAt(TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, nextRepeatInHours));
       setLastReviewedAt(currentUTCTimestamp);
+  }
+
+  public void changeNextRepetitionWithAdjustment(Timestamp currentUTCTimestamp, int adjustment) {
+      SpacedRepetitionAlgorithm spacedRepetitionAlgorithm = getUser().getSpacedRepetitionAlgorithm();
+      long delayInHours = TimestampOperations.getDiffInHours(currentUTCTimestamp, getNextReviewAt());
+      final int nextForgettingCurveIndex = spacedRepetitionAlgorithm.getNextForgettingCurveIndex(getForgettingCurveIndex(), adjustment, delayInHours);
+      final int nextRepeatInHours = spacedRepetitionAlgorithm.getRepeatInHours(nextForgettingCurveIndex);
+      updateMemoryState(currentUTCTimestamp, nextRepeatInHours, nextForgettingCurveIndex);
   }
 }
