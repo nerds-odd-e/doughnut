@@ -198,7 +198,7 @@ public class Link {
         return categoryLink().map(l -> l.getCousinLinks(user))
                 .map(otherParts -> otherParts.stream()
                         .flatMap(p -> p.getSourceNote().linksOfTypeThroughReverse(getLinkType(), user))
-                        .collect(Collectors.toUnmodifiableList()));
+                        .collect(Collectors.toList()));
     }
 
 }
