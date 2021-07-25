@@ -28,7 +28,7 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory {
                     .map(lk->
                     servant.randomizer.randomlyChoose(
                     5, link.getRemoteCousinOfDifferentCategory(lk, reviewPoint.getUser()))
-                            .stream().map(Link::getSourceNote).collect(Collectors.toList())).orElse(null);
+                            .stream().map(Link::getSourceNote).collect(Collectors.toList())).orElse(Collections.emptyList());
         }
         return cachedFillingOptions;
     }
