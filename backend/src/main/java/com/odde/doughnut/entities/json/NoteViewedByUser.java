@@ -27,6 +27,9 @@ public class NoteViewedByUser {
     private Map<Link.LinkType, LinkViewed> links;
     @Getter
     @Setter
+    private Map<Link.LinkType, LinkViewed> reversedLinks;
+    @Getter
+    @Setter
     private NoteNavigation navigation;
     @Getter
     @Setter

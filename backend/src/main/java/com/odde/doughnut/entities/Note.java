@@ -121,6 +121,7 @@ public class Note {
         NoteViewedByUser nvb = new NoteViewedByUser();
         nvb.setNote(this);
         nvb.setLinks(getAllLinks(viewer));
+        nvb.setReversedLinks(getReversedLinks(viewer));
         NoteViewedByUser.NoteNavigation navigation = new NoteViewedByUser.NoteNavigation();
         navigation.setNextId(getNext().map(Note::getId).orElse(null));
         navigation.setNextSiblingId(getNextSibling().map(Note::getId).orElse(null));
@@ -130,15 +131,25 @@ public class Note {
         nvb.setNotebook(notebook);
         nvb.setAncestors(getAncestors());
         nvb.setChildren(getChildren());
-        nvb.setOwns(viewer==null ? false : viewer.owns(notebook));
+        nvb.setOwns(viewer != null && viewer.owns(notebook));
         return nvb;
     }
 
     public Map<Link.LinkType, LinkViewed> getAllLinks(User viewer) {
-        return linkTypes(viewer).stream().collect(Collectors.toMap(x->x, x->new LinkViewed(){{
-                setDirect(linksOfTypeThroughDirect(x).collect(Collectors.toUnmodifiableList()));
-                setReverse(linksOfTypeThroughReverse(x.reverseType(), viewer).collect(Collectors.toUnmodifiableList()));
+        return linkTypes(viewer).stream().collect(Collectors.toMap(x -> x, x -> new LinkViewed() {{
+            setDirect(linksOfTypeThroughDirect(x).collect(Collectors.toUnmodifiableList()));
+            setReverse(linksOfTypeThroughReverse(x.reverseType(), viewer).collect(Collectors.toUnmodifiableList()));
         }}));
+    }
+
+    public Map<Link.LinkType, LinkViewed> getReversedLinks(User viewer) {
+        return Arrays.stream(Link.LinkType.values())
+                .filter(lt -> linksOfTypeThroughReverse(lt.reverseType(), viewer).findAny().isPresent())
+                .collect(Collectors.toMap(x -> x, x -> new LinkViewed() {
+                    {
+                        setDirect(linksOfTypeThroughReverse(x.reverseType(), viewer).collect(Collectors.toUnmodifiableList()));
+                    }
+                }));
     }
 
     private List<Link.LinkType> linkTypes(User viewer) {
@@ -176,7 +187,7 @@ public class Note {
         return getParentNote() == null;
     }
 
-    public String getNoteTypeDisplay(){
+    public String getNoteTypeDisplay() {
         return this.getNotebook().getNotebookType().getDisplay();
     }
 
@@ -274,7 +285,7 @@ public class Note {
 
     @JsonIgnore
     public Optional<Note> getPrevious() {
-        Note result = getPreviousSibling().map(n->{
+        Note result = getPreviousSibling().map(n -> {
             while (true) {
                 List<Note> children = n.getChildren();
                 if (children.size() == 0) {
@@ -317,8 +328,8 @@ public class Note {
 
     private long getSiblingOrderToInsertBehindMe() {
         Optional<Note> nextSiblingNote = getNextSibling();
-        return nextSiblingNote.map(x-> (siblingOrder + x.siblingOrder) / 2)
-                .orElse( siblingOrder + SiblingOrder.MINIMUM_SIBLING_ORDER_INCREMENT);
+        return nextSiblingNote.map(x -> (siblingOrder + x.siblingOrder) / 2)
+                .orElse(siblingOrder + SiblingOrder.MINIMUM_SIBLING_ORDER_INCREMENT);
     }
 
     private Long getSiblingOrderToBecomeMyFirstChild() {
