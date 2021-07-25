@@ -1,13 +1,12 @@
 package com.odde.doughnut.models.quizFacotries;
 
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestion;
-import com.odde.doughnut.entities.User;
-import com.odde.doughnut.models.Randomizer;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import lombok.Getter;
+import com.odde.doughnut.models.Randomizer;
+import com.odde.doughnut.models.UserModel;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -43,5 +42,12 @@ public class QuizQuestionServant {
         List<Note> selectedList = this.randomizer.randomlyChoose(maxSize - 1, list);
         selectedList.add(ensure);
         return selectedList;
+    }
+
+    Optional<Link> chooseOneCategoryLink(User user, Link link) {
+        UserModel userModel = modelFactoryService.toUserModel(user);
+        Link result = randomizer.chooseOneRandomly(
+                link.categoryLinks(userModel.getEntity()).collect(Collectors.toList()));
+        return Optional.ofNullable(result);
     }
 }

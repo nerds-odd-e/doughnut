@@ -13,6 +13,7 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory {
     protected final QuizQuestionServant servant;
     protected final ReviewPoint reviewPoint;
     protected final Link link;
+    private Optional<Link> categoryLink = null;
 
     public FromSamePartAsQuizFactory(QuizQuestionServant servant, ReviewPoint reviewPoint) {
         this.servant = servant;
@@ -23,18 +24,18 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory {
     @Override
     public List<Note> generateFillingOptions() {
         if (cachedFillingOptions == null) {
-            cachedFillingOptions = link.getRemoteCousinOfDifferentCategory(reviewPoint.getUser())
-                    .map(links ->
-                            servant.randomizer.randomlyChoose(5, links).stream()
-                                    .map(Link::getSourceNote).collect(Collectors.toList())
-                    ).orElse(Collections.emptyList());
+            cachedFillingOptions = getCategoryLink()
+                    .map(lk->
+                    servant.randomizer.randomlyChoose(
+                    5, link.getRemoteCousinOfDifferentCategory(lk, reviewPoint.getUser()))
+                            .stream().map(Link::getSourceNote).collect(Collectors.toList())).orElse(null);
         }
         return cachedFillingOptions;
     }
 
     @Override
     public String generateInstruction() {
-        return "<p>Which one <mark>" +link.getLinkTypeLabel() +"</mark> the same <mark>" + link.categoryLinks(reviewPoint.getUser()).map(l -> l.getTargetNote().getTitle()).orElse("") + "</mark> as:";
+        return "<p>Which one <mark>" +link.getLinkTypeLabel() +"</mark> the same <mark>" + getCategoryLink().map(lk->lk.getTargetNote().getTitle()).orElse("") + "</mark> as:";
     }
 
     @Override
@@ -71,15 +72,17 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory {
             ReviewPoint answerLinkReviewPoint = userModel.getReviewPointFor(cachedAnswerLink);
             List<ReviewPoint> result = new ArrayList<>();
             result.add(answerLinkReviewPoint);
-            link.categoryLinks(userModel.getEntity()).ifPresent(l -> {
-                ReviewPoint reviewPointFor = userModel.getReviewPointFor(l);
-                if (reviewPointFor != null) {
-                    result.add(reviewPointFor);
-                }
-            });
+            getCategoryLink().map(userModel::getReviewPointFor).filter(Objects::nonNull).ifPresent(result::add);
             return result;
         }
         return Collections.emptyList();
+    }
+
+    private Optional<Link> getCategoryLink() {
+        if(categoryLink == null) {
+            categoryLink = servant.chooseOneCategoryLink(reviewPoint.getUser(), link);
+        }
+        return categoryLink;
     }
 
     protected Link getAnswerLink() {

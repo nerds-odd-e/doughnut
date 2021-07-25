@@ -136,7 +136,7 @@ public class Note {
 
     public Map<Link.LinkType, LinkViewed> getAllLinks(User viewer) {
         return linkTypes(viewer).stream().collect(Collectors.toMap(x -> x, x -> new LinkViewed() {{
-            setDirect(linksOfTypeThroughDirect(x).collect(Collectors.toUnmodifiableList()));
+            setDirect(linksOfTypeThroughDirect(x, viewer).collect(Collectors.toUnmodifiableList()));
         }}));
     }
 
@@ -158,7 +158,7 @@ public class Note {
 
     public Stream<Link> linksOfTypeThroughDirect(Link.LinkType linkType, User viewer) {
         return this.links.stream()
-                .filter(l -> l.targetVisibleAsSourceOrTo(viewer));
+                .filter(l -> l.targetVisibleAsSourceOrTo(viewer))
                 .filter(l -> l.getLinkType().equals(linkType));
     }
 
@@ -170,7 +170,7 @@ public class Note {
 
     public List<Note> linkedNotesOfType(Link.LinkType linkType, User viewer) {
         List<Note> notes = new ArrayList<>();
-        linksOfTypeThroughDirect(linkType).forEach(lk -> notes.add(lk.getTargetNote()));
+        linksOfTypeThroughDirect(linkType, viewer).forEach(lk -> notes.add(lk.getTargetNote()));
         linksOfTypeThroughReverse(linkType.reverseType(), viewer).forEach(lk -> notes.add(lk.getSourceNote()));
         return notes;
     }
