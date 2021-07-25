@@ -156,13 +156,6 @@ public class Note {
                 .filter(l -> l.sourceVisibleAsTargetOrTo(viewer));
     }
 
-    public List<Note> linkedNotesOfType(Link.LinkType linkType, User viewer) {
-        List<Note> notes = new ArrayList<>();
-        linksOfTypeThroughDirect(linkType, viewer).forEach(lk -> notes.add(lk.getTargetNote()));
-        linksOfTypeThroughReverse(linkType.reverseType(), viewer).forEach(lk -> notes.add(lk.getSourceNote()));
-        return notes;
-    }
-
     public String getNotePicture() {
         if (noteContent.getUseParentPicture() && getParentNote() != null) {
             return getParentNote().getNotePicture();

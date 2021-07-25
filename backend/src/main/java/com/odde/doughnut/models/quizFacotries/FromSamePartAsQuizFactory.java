@@ -88,7 +88,7 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory {
     protected Link getAnswerLink() {
         if (cachedAnswerLink == null) {
             UserModel userModel = servant.modelFactoryService.toUserModel(reviewPoint.getUser());
-            List<Link> backwardPeers = link.getCousinLinks(reviewPoint.getUser()).stream()
+            List<Link> backwardPeers = link.getCousinLinksOfSameLinkType(reviewPoint.getUser()).stream()
                     .filter(l->userModel.getReviewPointFor(l) != null).collect(Collectors.toUnmodifiableList());
             cachedAnswerLink = servant.randomizer.chooseOneRandomly(backwardPeers);
         }

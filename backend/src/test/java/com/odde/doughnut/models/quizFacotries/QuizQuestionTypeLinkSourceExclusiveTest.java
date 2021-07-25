@@ -90,8 +90,8 @@ class QuizQuestionTypeLinkSourceExclusiveTest {
                     assertThat(quizQuestion.getMainTopic(), equalTo(target.getTitle()));
                     List<String> options = toOptionStrings(quizQuestion);
                     assertThat(anotherSource.getTitle(), in(options));
-                    assertThat(notRelated.getTitle(), in(options));
                     assertThat(source.getTitle(), in(options));
+                    assertThat(notRelated.getTitle(), in(options));
                 }
 
                 @Test

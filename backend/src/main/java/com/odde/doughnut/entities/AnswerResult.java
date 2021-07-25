@@ -32,11 +32,11 @@ public class AnswerResult {
 
     public boolean isCorrect() {
         if (questionType == LINK_SOURCE_EXCLUSIVE || questionType == FROM_DIFFERENT_PART_AS) {
-            return reviewPoint.getLink().getCousinOfSameLinkType().stream()
+            return !matchAnswer(reviewPoint.getLink().getSourceNote()) && reviewPoint.getLink().getCousinOfSameLinkType(reviewPoint.getUser()).stream()
                     .noneMatch(this::matchAnswer);
         }
         if (questionType == FROM_SAME_PART_AS) {
-            return reviewPoint.getLink().getCousinOfSameLinkType().stream()
+            return reviewPoint.getLink().getCousinOfSameLinkType(reviewPoint.getUser()).stream()
                     .anyMatch(this::matchAnswer);
         }
         return matchAnswer(getCorrectAnswerNote());

@@ -32,8 +32,8 @@ public class WhichSpecHasInstanceQuizFactory implements QuizQuestionFactory {
         if (cachedFillingOptions != null) {
             return cachedFillingOptions;
         }
-        List<Note> instanceReverse = getInstanceLink().getCousinOfSameLinkType();
-        List<Note> specReverse = link.getCousinOfSameLinkType();
+        List<Note> instanceReverse = getInstanceLink().getCousinOfSameLinkType(reviewPoint.getUser());
+        List<Note> specReverse = link.getCousinOfSameLinkType(reviewPoint.getUser());
         List<Note> backwardPeers = Stream.concat(instanceReverse.stream(), specReverse.stream())
                 .filter(n-> !(instanceReverse.contains(n) && specReverse.contains(n))).collect(Collectors.toList());
         cachedFillingOptions = servant.randomizer.randomlyChoose(5, backwardPeers);

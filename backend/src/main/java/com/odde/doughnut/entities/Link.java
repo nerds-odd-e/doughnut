@@ -22,26 +22,17 @@ public class Link {
     public enum LinkType {
         RELATED_TO                            (1, "related note", "is related to", "is not related to", "is related to", new QuestionType[]{}),
         SPECIALIZE                            (2, "specification", "is a specialization of", "is not a specialization of", "is a generalization of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE, WHICH_SPEC_HAS_INSTANCE, FROM_SAME_PART_AS, FROM_DIFFERENT_PART_AS}),
-        GENERALIZE                            (3, "specification1", "is a generalization of", "is not a generalization of", "is a generalization of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE, WHICH_SPEC_HAS_INSTANCE, FROM_SAME_PART_AS, FROM_DIFFERENT_PART_AS}),
 
         INSTANCE                              (4, "instance", "is an instance of", "is not an instance of", "has instances", new QuestionType[]{LINK_TARGET, WHICH_SPEC_HAS_INSTANCE, FROM_SAME_PART_AS, FROM_DIFFERENT_PART_AS}),
-        HAS_INSTANCE                          (5, "instance owner", "has instances", "not have as an instance", "", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
         /*INTEGRATED*/ PART                   (6, "part", "is a part of", "is not a part of", "has parts", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE, WHICH_SPEC_HAS_INSTANCE, FROM_SAME_PART_AS, FROM_DIFFERENT_PART_AS}),
-        HAS_PART                              (7, "part owner", "has parts", "not have as a part", "", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
         /*NON INTEGRATED*/ TAGGED_BY          (8, "tag target", "is tagged by", "is not tagged by", "tagging", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE, WHICH_SPEC_HAS_INSTANCE, WHICH_SPEC_HAS_INSTANCE}),
-        TAGGING                               (9, "tag", "tagging", "is not tagging", "", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
         ATTRIBUTE                             (10, "attribute", "is an attribute of", "is not an attribute of", "has attributes", new QuestionType[]{LINK_TARGET, WHICH_SPEC_HAS_INSTANCE, WHICH_SPEC_HAS_INSTANCE }),
-        HAS_ATTRIBUTE                         (11, "attribute owner", "has attributes", "not has as an attribute", "", new QuestionType[]{LINK_TARGET }),
 
         OPPOSITE_OF                           (12, "opposition", "is the opposite of", "is not the opposite of", "", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        BROUGHT_BY                            (13, "masterpiece", "is brought by", "is not brought by", "", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
         AUTHOR_OF                             (14, "author", "is author of", "is not author of", "is brought by", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE, DESCRIPTION_LINK_TARGET}),
         USES                                  (15, "user", "uses", "does not use", "is used by", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE, WHICH_SPEC_HAS_INSTANCE, FROM_SAME_PART_AS, FROM_DIFFERENT_PART_AS}),
-        USED_BY                               (16, "used", "is used by", "is not used by", "", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
         EXAMPLE_OF                            (17, "example", "is an example of", "is not an example of", "has as examples", new QuestionType[]{LINK_SOURCE_EXCLUSIVE, CLOZE_LINK_TARGET, FROM_SAME_PART_AS, FROM_DIFFERENT_PART_AS}),
-        HAS_AS_EXAMPLE                        (18, "example owner", "has as example", "does not have as example", "", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
         PRECEDES                              (19, "precedence", "precedes", "does not precede", "succeeds", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
-        SUCCEEDS                              (20, "succession", "succeeds", "does not succeeds", "", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
         SAME_AS                               (21, "thing", "is the same as", "is not the same as", "", new QuestionType[]{LINK_TARGET}),
         SIMILAR_TO                            (22, "thing", "is similar to", "is not similar to", "", new QuestionType[]{LINK_TARGET}),
         CONFUSE_WITH                          (23, "thing", "confuses with", "does not confuse with", "", new QuestionType[0]);
@@ -82,26 +73,6 @@ public class Link {
 
         public static LinkType fromId(Integer id) {
             return idMap.getOrDefault(id, null);
-        }
-
-        public LinkType reverseType() {
-            if (this.equals(BROUGHT_BY)) return AUTHOR_OF;
-            if (this.equals(AUTHOR_OF)) return BROUGHT_BY;
-            if (this.equals(USES)) return USED_BY;
-            if (this.equals(USED_BY)) return USES;
-            if (this.equals(HAS_AS_EXAMPLE)) return EXAMPLE_OF;
-            if (this.equals(EXAMPLE_OF)) return HAS_AS_EXAMPLE;
-            if (this.equals(PRECEDES)) return SUCCEEDS;
-            if (this.equals(SUCCEEDS)) return PRECEDES;
-            if (this.equals(INSTANCE)) return HAS_INSTANCE;
-            if (this.equals(HAS_INSTANCE)) return INSTANCE;
-            if (this.equals(PART)) return HAS_PART;
-            if (this.equals(HAS_PART)) return PART;
-            if (this.equals(TAGGED_BY)) return TAGGING;
-            if (this.equals(TAGGING)) return TAGGED_BY;
-            if (this.equals(ATTRIBUTE)) return HAS_ATTRIBUTE;
-            if (this.equals(HAS_ATTRIBUTE)) return ATTRIBUTE;
-            return this;
         }
     }
 
@@ -161,12 +132,13 @@ public class Link {
     }
 
     @JsonIgnore
-    public List<Note> getCousinOfSameLinkType() {
-        return targetNote.linkedNotesOfType(getLinkType().reverseType(), null);
+    public List<Note> getCousinOfSameLinkType(User viewer) {
+        //return targetNote.linksOfTypeThroughReverse(getLinkType(), viewer).map(Link::getSourceNote).collect(Collectors.toUnmodifiableList());
+        return getCousinLinksOfSameLinkType(viewer).stream().map(Link::getSourceNote).collect(Collectors.toUnmodifiableList());
     }
 
     @JsonIgnore
-    public List<Link> getCousinLinks(User viewer) {
+    public List<Link> getCousinLinksOfSameLinkType(User viewer) {
         return targetNote.linksOfTypeThroughReverse(getLinkType(), viewer).filter(l->!l.equals(this)).collect(Collectors.toList());
     }
 
@@ -201,7 +173,7 @@ public class Link {
     }
 
     public List<Link> getRemoteCousinOfDifferentCategory(Link categoryLink, User user) {
-        return categoryLink.getCousinLinks(user).stream()
+        return categoryLink.getCousinLinksOfSameLinkType(user).stream()
                         .flatMap(p -> p.getSourceNote().linksOfTypeThroughReverse(getLinkType(), user))
                         .collect(Collectors.toList());
     }

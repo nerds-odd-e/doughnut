@@ -51,7 +51,7 @@ public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory {
     @Override
     public List<Note> generateFillingOptions() {
         if (cachedFillingOptions == null) {
-            List<Link> cousinLinks = link.getCousinLinks(reviewPoint.getUser());
+            List<Link> cousinLinks = link.getCousinLinksOfSameLinkType(reviewPoint.getUser());
             cachedFillingOptions = servant.randomizer.randomlyChoose(5, cousinLinks).stream()
                     .map(Link::getSourceNote).collect(Collectors.toList());
         }
