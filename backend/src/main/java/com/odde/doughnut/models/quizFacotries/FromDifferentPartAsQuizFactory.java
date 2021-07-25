@@ -38,7 +38,7 @@ public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory {
     @Override
     public List<ReviewPoint> getViceReviewPoints() {
         UserModel userModel = servant.modelFactoryService.toUserModel(reviewPoint.getUser());
-        return getCategoryLink().map(userModel::getReviewPointFor).filter(Objects::nonNull).map(List::of).orElse(Collections.emptyList());
+        return getCategoryLink().map(userModel::getReviewPointFor).map(List::of).orElse(Collections.emptyList());
     }
 
     private Optional<Link> getCategoryLink() {

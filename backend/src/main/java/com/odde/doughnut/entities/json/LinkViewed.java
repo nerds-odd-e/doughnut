@@ -16,4 +16,8 @@ public class LinkViewed {
     @Setter
     @JsonIgnoreProperties("targetNote")
     private List<Link> reverse;
+
+    public boolean notEmpty() {
+        return (direct!=null && !direct.isEmpty()) || (reverse!=null && !reverse.isEmpty());
+    }
 }

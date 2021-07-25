@@ -72,7 +72,7 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory {
             ReviewPoint answerLinkReviewPoint = userModel.getReviewPointFor(cachedAnswerLink);
             List<ReviewPoint> result = new ArrayList<>();
             result.add(answerLinkReviewPoint);
-            getCategoryLink().map(userModel::getReviewPointFor).filter(Objects::nonNull).ifPresent(result::add);
+            getCategoryLink().map(userModel::getReviewPointFor).ifPresent(result::add);
             return result;
         }
         return Collections.emptyList();

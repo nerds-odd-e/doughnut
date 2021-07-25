@@ -32,7 +32,8 @@ class RestStaticInfoController {
             .map( (linkType)->new HashMap<String, String>(){{
                         put("value", linkType.id.toString());
                         put("label", linkType.label);
-                    }})
+                        put("reversedLabel", linkType.reversedLabel);
+            }})
             .collect(Collectors.toList());
     staticInfo.user = currentUserFetcher.getUser().getEntity();
     return staticInfo;

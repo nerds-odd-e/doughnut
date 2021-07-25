@@ -82,9 +82,9 @@ public class LinkTest {
 
             @Test
             void BHasA() {
-                final Map<Link.LinkType, LinkViewed> allLinks = noteB.getReversedLinks(null);
+                final Map<Link.LinkType, LinkViewed> allLinks = noteB.getAllLinks(null);
                 assertThat(allLinks.keySet(), contains(SPECIALIZE));
-                assertThat(getLinkedNotes(SPECIALIZE, allLinks), contains(noteB));
+                assertThat(allLinks.get(SPECIALIZE).getReverse(), hasSize(1));
             }
 
             @Test
@@ -129,9 +129,9 @@ public class LinkTest {
 
         private boolean hasReverseLinkFor(Note source, User viewer) {
             makeMe.theNote(source).linkTo(target, SPECIALIZE).please();
-            final LinkViewed linksMap = target.getReversedLinks(viewer).get(SPECIALIZE);
+            final LinkViewed linksMap = target.getAllLinks(viewer).get(SPECIALIZE);
             if (linksMap == null) return false;
-            final List<Link> links = linksMap.getDirect();
+            final List<Link> links = linksMap.getReverse();
             return !links.isEmpty();
         }
 

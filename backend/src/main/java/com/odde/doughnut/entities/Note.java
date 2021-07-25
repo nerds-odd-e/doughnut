@@ -135,25 +135,13 @@ public class Note {
     }
 
     public Map<Link.LinkType, LinkViewed> getAllLinks(User viewer) {
-        return linkTypes(viewer).stream().collect(Collectors.toMap(x -> x, x -> new LinkViewed() {{
-            setDirect(linksOfTypeThroughDirect(x, viewer).collect(Collectors.toUnmodifiableList()));
-        }}));
-    }
-
-    public Map<Link.LinkType, LinkViewed> getReversedLinks(User viewer) {
         return Arrays.stream(Link.LinkType.values())
-                .filter(lt -> linksOfTypeThroughReverse(lt.reverseType(), viewer).findAny().isPresent())
-                .collect(Collectors.toMap(x -> x, x -> new LinkViewed() {
-                    {
-                        setDirect(linksOfTypeThroughReverse(x.reverseType(), viewer).collect(Collectors.toUnmodifiableList()));
-                    }
-                }));
-    }
-
-    private List<Link.LinkType> linkTypes(User viewer) {
-        return Arrays.stream(Link.LinkType.values())
-                .filter(t -> !linkedNotesOfType(t, viewer).isEmpty())
-                .collect(Collectors.toUnmodifiableList());
+                .map(type->Map.entry(type, new LinkViewed() {{
+                            setDirect(linksOfTypeThroughDirect(type, viewer).collect(Collectors.toUnmodifiableList()));
+                            setReverse(linksOfTypeThroughReverse(type, viewer).collect(Collectors.toUnmodifiableList()));
+                        }}))
+                .filter(x -> x.getValue().notEmpty())
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
     public Stream<Link> linksOfTypeThroughDirect(Link.LinkType linkType, User viewer) {
