@@ -25,6 +25,9 @@
     components: { LinkWithHtmlLink },
     methods: {
         reverseLabel(lbl) {
+            if(!this.$staticInfo) {
+                 return
+            }
             const {reversedLabel} = this.$staticInfo.linkTypeOptions.find(({label})=>lbl === label);
             return reversedLabel;
         }
