@@ -72,6 +72,7 @@ public class User {
         return circle.getMembers().contains(this);
     }
 
+    @JsonIgnore
     public SpacedRepetitionAlgorithm getSpacedRepetitionAlgorithm() {
         return new SpacedRepetitionAlgorithm(getSpaceIntervals());
     }

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.odde.doughnut.entities.QuizQuestion.QuestionType;
-import com.odde.doughnut.models.quizFacotries.FromSamePartAsQuizFactory;
 import lombok.Getter;
 import lombok.Setter;
 
