@@ -22,6 +22,7 @@ public class Link {
     public enum LinkType {
         RELATED_TO                            (1, "related note", "is related to", "is not related to", "is related to", new QuestionType[]{}),
         SPECIALIZE                            (2, "specification", "is a specialization of", "is not a specialization of", "is a generalization of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE, WHICH_SPEC_HAS_INSTANCE, FROM_SAME_PART_AS, FROM_DIFFERENT_PART_AS}),
+        GENERALIZE                            (3, "specification", "is a specialization of", "is not a specialization of", "is a generalization of", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE, WHICH_SPEC_HAS_INSTANCE, FROM_SAME_PART_AS, FROM_DIFFERENT_PART_AS}),
 
         INSTANCE                              (4, "instance", "is an instance of", "is not an instance of", "has instances", new QuestionType[]{LINK_TARGET, WHICH_SPEC_HAS_INSTANCE, FROM_SAME_PART_AS, FROM_DIFFERENT_PART_AS}),
         HAS_INSTANCE                          (5, "instance owner", "has instances", "not have as an instance", "", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE}),
