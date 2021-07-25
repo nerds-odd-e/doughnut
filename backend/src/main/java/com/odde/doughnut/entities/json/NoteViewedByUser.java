@@ -27,7 +27,12 @@ public class NoteViewedByUser {
     private Map<Link.LinkType, LinkViewed> links;
     @Getter
     @Setter
-    private Map<Link.LinkType, LinkViewed> reversedLinks;
+    @JsonIgnoreProperties("sourceNote")
+    private List<Link> directLinks;
+    @Getter
+    @Setter
+    @JsonIgnoreProperties("targetNote")
+    private List<Link> reverseLinks;
     @Getter
     @Setter
     private NoteNavigation navigation;

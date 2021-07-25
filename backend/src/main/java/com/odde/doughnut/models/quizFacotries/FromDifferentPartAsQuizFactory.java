@@ -7,7 +7,7 @@ import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.LinkViewed;
 import com.odde.doughnut.models.UserModel;
 
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -18,6 +18,7 @@ public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory {
     protected final Link link;
     private Link cachedAnswerLink = null;
     private List<Note> cachedFillingOptions = null;
+    private ReviewPoint categoryLinkAsViceReviewPoint = null;
 
     public FromDifferentPartAsQuizFactory(QuizQuestionServant servant, ReviewPoint reviewPoint) {
         this.servant = servant;
@@ -27,9 +28,7 @@ public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory {
 
     protected Link getAnswerLink() {
         if (cachedAnswerLink == null) {
-            cachedAnswerLink = link.getRemoteCousinOfDifferentCategory(reviewPoint.getUser())
-                    .map(servant.randomizer::chooseOneRandomly)
-                    .orElse(null);
+            cachedAnswerLink = servant.randomizer.chooseOneRandomly(link.getRemoteCousinOfDifferentCategory(getCategoryLinkAsViceReviewPoint().getLink(), reviewPoint.getUser()));
         }
         return cachedAnswerLink;
     }
@@ -41,15 +40,19 @@ public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory {
 
     @Override
     public List<ReviewPoint> getViceReviewPoints() {
-        List<ReviewPoint> result = new ArrayList<>();
-        UserModel userModel = servant.modelFactoryService.toUserModel(reviewPoint.getUser());
-        link.categoryLink().ifPresent(l -> {
-            ReviewPoint reviewPointFor = userModel.getReviewPointFor(l);
-            if (reviewPointFor != null) {
-                result.add(reviewPointFor);
-            }
-        });
-        return result;
+        ReviewPoint vrp = getCategoryLinkAsViceReviewPoint();
+        if (vrp != null) {
+            return List.of(vrp);
+        }
+        return Collections.emptyList();
+    }
+
+    private ReviewPoint getCategoryLinkAsViceReviewPoint() {
+        if(categoryLinkAsViceReviewPoint == null) {
+            UserModel userModel = servant.modelFactoryService.toUserModel(reviewPoint.getUser());
+            categoryLinkAsViceReviewPoint = servant.randomizer.chooseOneRandomly(link.categoryLinks(userModel.getEntity()).map(userModel::getReviewPointFor).collect(Collectors.toList()));
+        }
+        return categoryLinkAsViceReviewPoint;
     }
 
     @Override
@@ -64,7 +67,7 @@ public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory {
 
     @Override
     public String generateInstruction() {
-        return "<p>Which one <mark>" + link.getLinkTypeLabel()+"</mark> a <em>DIFFERENT</em> <mark>" + link.categoryLink().map(l -> l.getTargetNote().getTitle()).orElse("") + "</mark> than:";
+        return "<p>Which one <mark>" + link.getLinkTypeLabel()+"</mark> a <em>DIFFERENT</em> <mark>" + getCategoryLinkAsViceReviewPoint().getLink().getTargetNote().getTitle() + "</mark> than:";
     }
 
     @Override

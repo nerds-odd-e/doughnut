@@ -34,7 +34,7 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory {
 
     @Override
     public String generateInstruction() {
-        return "<p>Which one <mark>" +link.getLinkTypeLabel() +"</mark> the same <mark>" + link.categoryLink().map(l -> l.getTargetNote().getTitle()).orElse("") + "</mark> as:";
+        return "<p>Which one <mark>" +link.getLinkTypeLabel() +"</mark> the same <mark>" + link.categoryLinks(reviewPoint.getUser()).map(l -> l.getTargetNote().getTitle()).orElse("") + "</mark> as:";
     }
 
     @Override
@@ -71,7 +71,7 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory {
             ReviewPoint answerLinkReviewPoint = userModel.getReviewPointFor(cachedAnswerLink);
             List<ReviewPoint> result = new ArrayList<>();
             result.add(answerLinkReviewPoint);
-            link.categoryLink().ifPresent(l -> {
+            link.categoryLinks(userModel.getEntity()).ifPresent(l -> {
                 ReviewPoint reviewPointFor = userModel.getReviewPointFor(l);
                 if (reviewPointFor != null) {
                     result.add(reviewPointFor);

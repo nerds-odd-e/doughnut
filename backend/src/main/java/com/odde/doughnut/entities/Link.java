@@ -188,15 +188,21 @@ public class Link {
         return viewer.canReferTo(sourceNote.getNotebook());
     }
 
-    public Optional<Link> categoryLink() {
-        return getTargetNote().linksOfTypeThroughDirect(LinkType.PART).findFirst();
+    public boolean targetVisibleAsSourceOrTo(User viewer) {
+        if (sourceNote.getNotebook() == targetNote.getNotebook()) return true;
+        if (viewer == null) return false;
+
+        return viewer.canReferTo(targetNote.getNotebook());
     }
 
-    public Optional<List<Link>> getRemoteCousinOfDifferentCategory(User user) {
-        return categoryLink().map(l -> l.getCousinLinks(user))
-                .map(otherParts -> otherParts.stream()
+    public Stream<Link> categoryLinks(User viewer) {
+        return getTargetNote().linksOfTypeThroughDirect(LinkType.PART, viewer);
+    }
+
+    public List<Link> getRemoteCousinOfDifferentCategory(Link categoryLink, User user) {
+        return categoryLink.getCousinLinks(user).stream()
                         .flatMap(p -> p.getSourceNote().linksOfTypeThroughReverse(getLinkType(), user))
-                        .collect(Collectors.toList()));
+                        .collect(Collectors.toList());
     }
 
 }

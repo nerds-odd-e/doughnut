@@ -121,7 +121,6 @@ public class Note {
         NoteViewedByUser nvb = new NoteViewedByUser();
         nvb.setNote(this);
         nvb.setLinks(getAllLinks(viewer));
-        nvb.setReversedLinks(getReversedLinks(viewer));
         NoteViewedByUser.NoteNavigation navigation = new NoteViewedByUser.NoteNavigation();
         navigation.setNextId(getNext().map(Note::getId).orElse(null));
         navigation.setNextSiblingId(getNextSibling().map(Note::getId).orElse(null));
@@ -138,7 +137,6 @@ public class Note {
     public Map<Link.LinkType, LinkViewed> getAllLinks(User viewer) {
         return linkTypes(viewer).stream().collect(Collectors.toMap(x -> x, x -> new LinkViewed() {{
             setDirect(linksOfTypeThroughDirect(x).collect(Collectors.toUnmodifiableList()));
-            setReverse(linksOfTypeThroughReverse(x.reverseType(), viewer).collect(Collectors.toUnmodifiableList()));
         }}));
     }
 
@@ -158,8 +156,9 @@ public class Note {
                 .collect(Collectors.toUnmodifiableList());
     }
 
-    public Stream<Link> linksOfTypeThroughDirect(Link.LinkType linkType) {
+    public Stream<Link> linksOfTypeThroughDirect(Link.LinkType linkType, User viewer) {
         return this.links.stream()
+                .filter(l -> l.targetVisibleAsSourceOrTo(viewer));
                 .filter(l -> l.getLinkType().equals(linkType));
     }
 
