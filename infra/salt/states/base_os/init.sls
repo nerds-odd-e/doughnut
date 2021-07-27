@@ -16,11 +16,11 @@
 mysql-deb-apt-repo:
   pkgrepo.managed:
     - humanname: MySQL
-    - name: deb http://repo.mysql.com/apt/debian/ buster mysql-8.0
+    - name: deb http://repo.mysql.com/apt/debian/ Buster mysql-8.0
     - dist: buster
     - file: /etc/apt/sources.list.d/mysql.list
-    - keyid: 8C718D3B5072E1F5
-    - keyserver: keys.gnupg.net
+    - keyid: 5072E1F5
+    - keyserver: keyserver.ubuntu.com
     - require_in:
         - file: /etc/apt/sources.list.d/mysql.list
 
@@ -37,7 +37,6 @@ doughnut-app-deps:
         - gnupg-agent
         - readline-common
         - jq
-        - openjdk-11-jre
         - libmysqlclient21
         - mysql-community-client
         - google-cloud-packages-archive-keyring
@@ -47,10 +46,25 @@ doughnut-app-deps:
         - cmd: doughnut-jre
         - file: /etc/profile.d/doughnut_env.sh
 
+zulu16.32.15-ca-jre16.0.2-linux_amd64.deb:
+  file.managed:
+    - name: /tmp/zulu16.32.15-ca-jre16.0.2-linux_amd64.deb
+    - source: https://cdn.azul.com/zulu/bin/zulu16.32.15-ca-jre16.0.2-linux_amd64.deb
+    - skip_verify: True
+    - require_in:
+        - cmd: install-jre
+
+
+install-jre:
+  cmd.run:
+    - name: apt install -y /tmp/zulu16.32.15-ca-jre16.0.2-linux_amd64.deb
+    - require_in:
+        - cmd: doughnut-jre
+
 doughnut-jre:
   cmd.run:
-    - name: update-alternatives --set java /usr/lib/jvm/java-11-openjdk-amd64/bin/java
+    - name: update-alternatives --set java /usr/lib/jvm/zre-16-amd64/bin/java
 
 os-dist-upgrade:
   cmd.run:
-    - name: apt-get -y update && apt-get -y dist-upgrade
+    - name: apt -y update && apt -y dist-upgrade

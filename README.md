@@ -29,7 +29,7 @@ For more background info you can read:
 ## Technology Stack
 
 - [Nix](https://nixos.org/)
-- [OpenJDK 11](https://openjdk.java.net/projects/jdk/11/)
+- [Zulu OpenJDK 16](https://docs.azul.com/core/zulu-openjdk/release-notes/july-2021)
 - [Spring Boot](https://spring.io/projects/spring-boot)
 - [Flyway](https://flywaydb.org)
 - [Thymeleaf](https://www.thymeleaf.org/)
@@ -131,12 +131,12 @@ nohup idea-community &
 # restore gradle wrapper if missing
 ```
 
-#### Setup IntelliJ IDEA with JDK11 SDK
+#### Setup IntelliJ IDEA with JDK16 SDK
 
-- Locate your `nix` installed JDK11 path location with `which java`.
-  e.g. `/nix/store/5ib97va5ngfacdqzzcvxff62rjwkxajg-zulu11.2.3-jdk11.0.1/bin/java`.
+- Locate your `nix` installed JDK16 path location with `which java`.
+  e.g. `/nix/store/5ib97va5ngfacdqzzcvxff62rjwkxajg-zulu16.2.3-jdk16.0.1/bin/java`.
 - **File -> Project Structure -> Platform Settings -> SDKs -> Add JDK...**
-  - Enter the full path of above (e.g. `/nix/store/5ib97va5ngfacdqzzcvxff62rjwkxajg-zulu11.2.3-jdk11.0.1`).
+  - Enter the full path of above (e.g. `/nix/store/5ib97va5ngfacdqzzcvxff62rjwkxajg-zulu16.2.3-jdk16.0.1`).
 
 #### Run a single targetted JUnit5 test in IntelliJ IDEA
 
