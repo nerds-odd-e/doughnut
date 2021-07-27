@@ -50,7 +50,7 @@ public class ControllerSetup
                 currentUserFetcher,
                 testabilitySettings.getGithubService(),
                 modelFactoryService);
-        failureReportFactory.create();
+        failureReportFactory.createUnlessAllowed();
 
         throw exception;
     }

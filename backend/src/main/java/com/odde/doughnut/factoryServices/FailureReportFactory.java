@@ -3,6 +3,7 @@ package com.odde.doughnut.factoryServices;
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.FailureReport;
 import com.odde.doughnut.services.GithubService;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
@@ -24,7 +25,9 @@ public class FailureReportFactory {
         this.modelFactoryService = modelFactoryService;
     }
 
-    public void create() throws IOException, InterruptedException {
+    public void createUnlessAllowed() throws IOException, InterruptedException {
+        if(exception instanceof ResponseStatusException) return;
+
         FailureReport failureReport = createFailureReport();
         Integer issueNumber = githubService.createGithubIssue(failureReport);
         failureReport.setIssueNumber(issueNumber);

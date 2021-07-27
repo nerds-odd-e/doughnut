@@ -12,17 +12,19 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
@@ -48,6 +50,13 @@ public class ControllerSetupTest {
     void setup() {
         when(testabilitySettings.getGithubService()).thenReturn(githubService);
         controllerSetup = new ControllerSetup(this.modelFactoryService, currentUserFetcher, testabilitySettings);
+    }
+
+    @Test
+    void shouldNotRecordResponseStatusException() {
+        long count = makeMe.modelFactoryService.failureReportRepository.count();
+        assertThrows(ResponseStatusException.class, ()-> controllerSetup.handleSystemException(request, new ResponseStatusException(HttpStatus.UNAUTHORIZED, "xx")));
+        assertThat(makeMe.modelFactoryService.failureReportRepository.count(), equalTo(count));
     }
 
     @Test
