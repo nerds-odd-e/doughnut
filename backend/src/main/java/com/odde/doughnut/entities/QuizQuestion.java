@@ -17,6 +17,7 @@ public class QuizQuestion {
         PICTURE_TITLE(PictureTitleSelectionQuizFactory::new),
         PICTURE_SELECTION(PictureSelectionQuizFactory::new),
         LINK_TARGET(LinkTargetQuizFactory::new),
+        LINK_SOURCE(LinkSourceQuizFactory::new),
         CLOZE_LINK_TARGET(ClozeLinkTargetQuizFactory::new),
         DESCRIPTION_LINK_TARGET(DescriptionLinkTargetQuizFactory::new),
         WHICH_SPEC_HAS_INSTANCE(WhichSpecHasInstanceQuizFactory::new),

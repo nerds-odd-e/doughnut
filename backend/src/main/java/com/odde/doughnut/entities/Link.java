@@ -29,7 +29,7 @@ public class Link {
         /*NON INTEGRATED*/ TAGGED_BY    (8, "tag target", "is tagged by", "is not tagged by", "tagging", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE, WHICH_SPEC_HAS_INSTANCE, WHICH_SPEC_HAS_INSTANCE, DESCRIPTION_LINK_TARGET}),
         ATTRIBUTE                       (10, "attribute", "is an attribute of", "is not an attribute of", "has attributes", new QuestionType[]{LINK_TARGET, WHICH_SPEC_HAS_INSTANCE, WHICH_SPEC_HAS_INSTANCE, DESCRIPTION_LINK_TARGET }),
 
-        OPPOSITE_OF                     (12, "opposition", "is the opposite of", "is not the opposite of", "is the opposite", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE, DESCRIPTION_LINK_TARGET}),
+        OPPOSITE_OF                     (12, "opposition", "is the opposite of", "is not the opposite of", "is the opposite", new QuestionType[]{LINK_TARGET, LINK_SOURCE, DESCRIPTION_LINK_TARGET}),
         AUTHOR_OF                       (14, "author", "is author of", "is not author of", "is brought by", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE, DESCRIPTION_LINK_TARGET}),
         USES                            (15, "user", "uses", "does not use", "is used by", new QuestionType[]{LINK_TARGET, LINK_SOURCE_EXCLUSIVE, WHICH_SPEC_HAS_INSTANCE, FROM_SAME_PART_AS, FROM_DIFFERENT_PART_AS, DESCRIPTION_LINK_TARGET}),
         EXAMPLE_OF                      (17, "example", "is an example of", "is not an example of", "has as examples", new QuestionType[]{LINK_SOURCE_EXCLUSIVE, CLOZE_LINK_TARGET, FROM_SAME_PART_AS, FROM_DIFFERENT_PART_AS, DESCRIPTION_LINK_TARGET}),
@@ -134,7 +134,6 @@ public class Link {
 
     @JsonIgnore
     public List<Note> getCousinOfSameLinkType(User viewer) {
-        //return targetNote.linksOfTypeThroughReverse(getLinkType(), viewer).map(Link::getSourceNote).collect(Collectors.toUnmodifiableList());
         return getCousinLinksOfSameLinkType(viewer).stream().map(Link::getSourceNote).collect(Collectors.toUnmodifiableList());
     }
 
