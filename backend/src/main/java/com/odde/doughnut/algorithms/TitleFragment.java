@@ -53,11 +53,7 @@ class TitleFragment {
 
     private String getPatternStringForLiteralMatch() {
         if (content.length() >= 4 || suffix) {
-            String ignoreConjunctions = String.join("([\\s-]+)((and\\s+)|(the\\s+)|(a\\s+)|(an\\s+))?",
-                    Arrays.stream(content.split("[\\s-]+"))
-                            .filter(x -> !Arrays.asList("the", "a", "an").contains(x))
-                            .map(Pattern::quote).collect(Collectors.toUnmodifiableList()));
-            return suffixIfNeeded(ignoreConjunctions);
+            return ignoreConjunctions();
         }
         if (content.matches("^\\d+$")) {
             return "(?<!\\d)" + Pattern.quote(content) + "(?!\\d)";
@@ -65,15 +61,21 @@ class TitleFragment {
         return "(?<!\\w)" + Pattern.quote(content) + "(?!\\w)";
     }
 
+    private String ignoreConjunctions() {
+        return Arrays.stream(content.split("[\\s-]+"))
+                .filter(x -> !Arrays.asList("the", "a", "an").contains(x))
+                .map(Pattern::quote).collect(Collectors.joining("([\\s-]+)((and\\s+)|(the\\s+)|(a\\s+)|(an\\s+))?"));
+    }
+
     private String suffixIfNeeded(String pattern) {
         if(suffix) {
-            return "(?U)(?<=\\p{Alnum})" + pattern;
+            return "(?U)(?<=[^\\s])" + pattern;
         }
         return pattern;
     }
 
     private String replaceLiteralWords(String description) {
-        Pattern pattern = Pattern.compile(getPatternStringForLiteralMatch(), Pattern.CASE_INSENSITIVE);
+        Pattern pattern = Pattern.compile(suffixIfNeeded(getPatternStringForLiteralMatch()), Pattern.CASE_INSENSITIVE);
         return pattern.matcher(description).replaceAll(getInternalFullMatchReplacement());
     }
 
