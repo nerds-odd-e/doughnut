@@ -30,7 +30,7 @@ public class NoteTitle {
 
     private List<TitleFragment> getTitles() {
         List<TitleFragment> result = new ArrayList<>();
-        Pattern pattern = Pattern.compile("(?U)(.*?)(\\p{Ps}(.*)\\p{Pe})?$");
+        Pattern pattern = Pattern.compile("(?U)(.+?)(\\p{Ps}([^\\p{Ps}\\p{Pe}]+)\\p{Pe})?$");
         Matcher matcher = pattern.matcher(title);
         if(matcher.find()) {
             getFragments(matcher.group(1), false).forEach(result::add);
