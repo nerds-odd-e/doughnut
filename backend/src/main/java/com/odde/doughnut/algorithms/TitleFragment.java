@@ -34,15 +34,11 @@ class TitleFragment {
                 .replace(internalPartialMatchReplacementForSubtitle, clozeReplacement.partialMatchSubtitleReplacement);
     }
 
-    String clozeIt(String description) {
-        return replaceSimilar(replaceLiteralWords(description));
-    }
-
     boolean matches(String answer) {
         return content.equalsIgnoreCase(answer);
     }
 
-    private String replaceSimilar(String literal) {
+    public String replaceSimilar(String literal) {
         if (content.length() < 4) {
             return literal;
         }
@@ -74,7 +70,7 @@ class TitleFragment {
         return pattern;
     }
 
-    private String replaceLiteralWords(String description) {
+    public String replaceLiteralWords(String description) {
         Pattern pattern = Pattern.compile(suffixIfNeeded(getPatternStringForLiteralMatch()), Pattern.CASE_INSENSITIVE);
         return pattern.matcher(description).replaceAll(getInternalFullMatchReplacement());
     }

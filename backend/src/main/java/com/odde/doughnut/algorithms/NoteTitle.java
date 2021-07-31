@@ -3,7 +3,6 @@ package com.odde.doughnut.algorithms;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class NoteTitle {
@@ -18,16 +17,18 @@ public class NoteTitle {
         if(title.trim().equalsIgnoreCase(answer)) {
             return true;
         }
-        return getTitles().anyMatch(t-> t.matches(answer));
+        return getTitles().stream().anyMatch(t-> t.matches(answer));
     }
 
     String replaceTitleFragments(String pronunciationMasked, ClozeReplacement clozeReplacement) {
-        String titleMasked = getTitles()
-                .reduce(pronunciationMasked, (d, t) -> t.clozeIt(d), (x, y) -> y);
-        return TitleFragment.replaceMasks(titleMasked, clozeReplacement);
+        String literalMatchPreMasked = getTitles().stream()
+                .reduce(pronunciationMasked, (d, t) -> t.replaceLiteralWords(d), (x, y) -> y);
+        String titlePreMasked = getTitles().stream()
+                .reduce(literalMatchPreMasked, (d, t) -> t.replaceSimilar(d), (x, y) -> y);
+        return TitleFragment.replaceMasks(titlePreMasked, clozeReplacement);
     }
 
-    private Stream<TitleFragment> getTitles() {
+    private List<TitleFragment> getTitles() {
         List<TitleFragment> result = new ArrayList<>();
         Pattern pattern = Pattern.compile("(?U)(.*?)(\\p{Ps}(.*)\\p{Pe})?$");
         Matcher matcher = pattern.matcher(title);
@@ -37,7 +38,7 @@ public class NoteTitle {
         }
         result.sort(Comparator.comparing(TitleFragment::length));
         Collections.reverse(result);
-        return result.stream();
+        return result;
     }
 
     private Stream<TitleFragment> getFragments(String subString, boolean subtitle) {
