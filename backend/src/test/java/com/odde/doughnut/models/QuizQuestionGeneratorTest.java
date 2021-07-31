@@ -34,7 +34,7 @@ class QuizQuestionGeneratorTest {
         Note note2 = makeMe.aNote().linkTo(note).inMemoryPlease();
         ReviewPoint reviewPoint = makeMe.aReviewPointFor(note2.getLinks().get(0)).inMemoryPlease();
         List<QuizQuestion.QuestionType> questionTypes = getQuestionTypes(reviewPoint);
-        assertThat(questionTypes, containsInAnyOrder(LINK_TARGET, LINK_SOURCE_EXCLUSIVE, WHICH_SPEC_HAS_INSTANCE, FROM_SAME_PART_AS, FROM_DIFFERENT_PART_AS));
+        assertThat(questionTypes, containsInAnyOrder(LINK_TARGET, LINK_SOURCE_EXCLUSIVE, WHICH_SPEC_HAS_INSTANCE, FROM_SAME_PART_AS, FROM_DIFFERENT_PART_AS, DESCRIPTION_LINK_TARGET));
     }
 
     @Test

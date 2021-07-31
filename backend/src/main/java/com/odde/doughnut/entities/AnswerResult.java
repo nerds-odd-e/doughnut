@@ -43,7 +43,7 @@ public class AnswerResult {
     }
 
     private Note getCorrectAnswerNote() {
-        if (questionType == LINK_TARGET || questionType == CLOZE_LINK_TARGET) {
+        if (questionType == LINK_TARGET || questionType == CLOZE_LINK_TARGET || questionType == DESCRIPTION_LINK_TARGET) {
             return reviewPoint.getLink().getTargetNote();
         }
         if (questionType == WHICH_SPEC_HAS_INSTANCE) {
