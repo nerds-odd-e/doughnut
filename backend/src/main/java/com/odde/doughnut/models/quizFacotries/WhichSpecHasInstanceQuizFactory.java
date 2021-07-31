@@ -87,6 +87,7 @@ public class WhichSpecHasInstanceQuizFactory implements QuizQuestionFactory {
         if(cachedInstanceLink == null) {
             List<Link> candidates = new ArrayList<>();
             populateCandidate(candidates, Link.LinkType.SPECIALIZE);
+            populateCandidate(candidates, Link.LinkType.APPLICATION);
             populateCandidate(candidates, Link.LinkType.INSTANCE);
             populateCandidate(candidates, Link.LinkType.TAGGED_BY);
             populateCandidate(candidates, Link.LinkType.ATTRIBUTE);
