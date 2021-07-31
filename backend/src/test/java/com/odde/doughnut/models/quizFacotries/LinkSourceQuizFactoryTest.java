@@ -46,12 +46,15 @@ class LinkSourceQuizFactoryTest {
         top = makeMe.aNote().byUser(userModel).please();
         target = makeMe.aNote("target").under(top).please();
         source = makeMe.aNote("source").under(top).linkTo(target).please();
+        anotherSource = makeMe.aNote("another note").under(top).please();
         reviewPoint = makeMe.aReviewPointFor(source.getLinks().get(0)).inMemoryPlease();
         makeMe.refresh(top);
     }
 
     @Test
     void shouldReturnNullIfCannotFindEnoughOptions() {
+        makeMe.aLink().between(anotherSource, target).please();
+        makeMe.refresh(top);
         QuizQuestion quizQuestion = buildLinkTargetQuizQuestion();
         assertThat(quizQuestion, is(nullValue()));
     }
@@ -60,7 +63,6 @@ class LinkSourceQuizFactoryTest {
     class WhenThereAreMoreThanOneOptions {
         @BeforeEach
         void setup() {
-            anotherSource = makeMe.aNote("another note").under(top).please();
             makeMe.refresh(top);
         }
 

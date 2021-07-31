@@ -4,7 +4,6 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.models.quizFacotries.QuizQuestionDirector;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
@@ -26,7 +25,7 @@ import static org.hamcrest.Matchers.*;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
-class QuizQuestionTypeLinkTargetTest {
+class LinkTargetQuizFactoryTest {
     @Autowired
     MakeMe makeMe;
     UserModel userModel;
@@ -34,7 +33,7 @@ class QuizQuestionTypeLinkTargetTest {
     Note top;
     Note target;
     Note source;
-    Note anotherSource;
+    Note anotherTarget;
     ReviewPoint reviewPoint;
 
 
@@ -44,12 +43,16 @@ class QuizQuestionTypeLinkTargetTest {
         top = makeMe.aNote().byUser(userModel).please();
         target = makeMe.aNote("target").under(top).please();
         source = makeMe.aNote("source").under(top).linkTo(target).please();
+        anotherTarget = makeMe.aNote("another note").under(top).please();
         reviewPoint = makeMe.aReviewPointFor(source.getLinks().get(0)).inMemoryPlease();
         makeMe.refresh(top);
     }
 
     @Test
     void shouldReturnNullIfCannotFindEnoughOptions() {
+        makeMe.aLink().between(source, anotherTarget).please();
+        makeMe.refresh(top);
+
         QuizQuestion quizQuestion = buildLinkTargetQuizQuestion();
         assertThat(quizQuestion, is(nullValue()));
     }
@@ -58,7 +61,6 @@ class QuizQuestionTypeLinkTargetTest {
     class WhenThereAreMoreThanOneOptions {
         @BeforeEach
         void setup() {
-            anotherSource = makeMe.aNote("another note").under(top).please();
             makeMe.refresh(top);
         }
 
@@ -69,7 +71,7 @@ class QuizQuestionTypeLinkTargetTest {
             assertThat(quizQuestion.getDescription(), equalTo("<mark>source</mark> is a specialization of:"));
             assertThat(quizQuestion.getMainTopic(), equalTo(""));
             List<String> options = toOptionStrings(quizQuestion);
-            assertThat(anotherSource.getTitle(), in(options));
+            assertThat(anotherTarget.getTitle(), in(options));
             assertThat(target.getTitle(), in(options));
         }
     }

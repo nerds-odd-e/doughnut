@@ -16,7 +16,7 @@ public class LinkSourceQuizFactory implements QuizQuestionFactory {
     public LinkSourceQuizFactory(QuizQuestionServant servant, ReviewPoint reviewPoint) {
         this.link = reviewPoint.getLink();
         this.servant = servant;
-        this.answerNote = getAnswerNote();
+        this.answerNote = link.getSourceNote();
         this.user = reviewPoint.getUser();
     }
 
@@ -24,7 +24,7 @@ public class LinkSourceQuizFactory implements QuizQuestionFactory {
     public List<Note> generateFillingOptions() {
         if(cachedFillingOptions == null) {
             List<Note> cousinOfSameLinkType = link.getCousinOfSameLinkType(user);
-            cachedFillingOptions = servant.choose5FromSiblings(answerNote, n -> /*!cousinOfSameLinkType.contains(n) &&*/ !n.equals(answerNote) && !n.equals(link.getTargetNote()));
+            cachedFillingOptions = servant.choose5FromSiblings(answerNote, n -> !n.equals(answerNote) && !n.equals(link.getTargetNote()) && !cousinOfSameLinkType.contains(n));
         }
         return cachedFillingOptions;
     }
@@ -57,10 +57,6 @@ public class LinkSourceQuizFactory implements QuizQuestionFactory {
     @Override
     public boolean isValidQuestion() {
         return generateFillingOptions().size() > 0;
-    }
-
-    private Note getAnswerNote() {
-        return link.getSourceNote();
     }
 
 }

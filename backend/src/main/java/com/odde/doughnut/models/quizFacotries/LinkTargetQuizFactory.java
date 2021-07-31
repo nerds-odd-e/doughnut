@@ -1,9 +1,6 @@
 package com.odde.doughnut.models.quizFacotries;
 
-import com.odde.doughnut.entities.Link;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.QuizQuestion;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.json.LinkViewed;
 
 import java.util.List;
@@ -13,18 +10,21 @@ public class LinkTargetQuizFactory implements QuizQuestionFactory {
     protected final Link link;
     protected final Note answerNote;
     protected final QuizQuestionServant servant;
+    private final User user;
     private List<Note> cachedFillingOptions = null;
 
     public LinkTargetQuizFactory(QuizQuestionServant servant, ReviewPoint reviewPoint) {
         this.link = reviewPoint.getLink();
         this.servant = servant;
         this.answerNote = getAnswerNote();
+        this.user = reviewPoint.getUser();
     }
 
     @Override
     public List<Note> generateFillingOptions() {
         if(cachedFillingOptions == null) {
-            cachedFillingOptions = servant.choose5FromSiblings(answerNote, n -> !n.equals(answerNote) && !n.equals(link.getSourceNote()));
+            List<Note> uncles = link.getPiblingOfTheSameLinkType(user);
+            cachedFillingOptions = servant.choose5FromSiblings(answerNote, n -> !n.equals(answerNote) && !n.equals(link.getSourceNote()) && !uncles.contains(n));
         }
         return cachedFillingOptions;
     }

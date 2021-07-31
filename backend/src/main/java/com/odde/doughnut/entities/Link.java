@@ -143,6 +143,16 @@ public class Link {
     }
 
     @JsonIgnore
+    public List<Note> getPiblingOfTheSameLinkType(User viewer) {
+        return getPiblingLinksOfSameLinkType(viewer).stream().map(Link::getTargetNote).collect(Collectors.toUnmodifiableList());
+    }
+
+    @JsonIgnore
+    public List<Link> getPiblingLinksOfSameLinkType(User viewer) {
+        return sourceNote.linksOfTypeThroughDirect(getLinkType(), viewer).filter(l->!l.equals(this)).collect(Collectors.toList());
+    }
+
+    @JsonIgnore
     public String getExclusiveQuestion() {
         return getLinkType().exclusiveQuestion.replace("not ", "<em>NOT</em> ");
     }
