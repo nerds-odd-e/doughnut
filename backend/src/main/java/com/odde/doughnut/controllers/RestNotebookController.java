@@ -32,6 +32,7 @@ class RestNotebookController {
   @GetMapping("")
   public NotebooksViewedByUser myNotebooks() {
     UserModel user = currentUserFetcher.getUser();
+    user.getAuthorization().assertLoggedIn();
     NotebooksViewedByUser notebooksViewedByUser = new NotebooksViewedByUser();
     notebooksViewedByUser.notebooks = user.getEntity().getOwnership().getNotebooks();
     notebooksViewedByUser.subscriptions = user.getEntity().getSubscriptions();
