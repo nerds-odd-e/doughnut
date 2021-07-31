@@ -1,5 +1,5 @@
 <template>
-    <NoteBreadcrumbForReview :ancestors="sourceNote.ancestors"/>
+    <NoteBreadcrumbForReview :ancestors="quizQuestion.scope"/>
     <div v-if="quizQuestion.pictureQuestion">
         <ShowPicture :note="sourceNote.note" :opacity="1"/>
     </div>

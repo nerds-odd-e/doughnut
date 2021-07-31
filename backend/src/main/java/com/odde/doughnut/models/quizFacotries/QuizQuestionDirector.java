@@ -35,8 +35,15 @@ public class QuizQuestionDirector {
         quizQuestion.setDescription(quizQuestionFactory.generateInstruction());
         quizQuestion.setMainTopic(quizQuestionFactory.generateMainTopic());
         quizQuestion.setHintLinks(quizQuestionFactory.generateHintLinks());
+        quizQuestion.setScope(getScope());
         quizQuestion.setViceReviewPointIds(getViceReviewPoinIds());
         return quizQuestion;
+    }
+
+    private List<Note> getScope() {
+        List<Note> scope = quizQuestionFactory.generateScope();
+        if (scope != null) return scope;
+        return List.of(reviewPoint.getSourceNote().getNotebook().getHeadNote());
     }
 
     private List<Integer> getViceReviewPoinIds() {

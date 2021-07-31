@@ -44,6 +44,8 @@ public class QuizQuestion {
     private Map<Link.LinkType, LinkViewed> hintLinks;
     @Getter @Setter
     private List<Integer> viceReviewPointIds;
+    @Getter @Setter
+    private List<Note> scope;
 
 
     public QuizQuestion(ReviewPoint reviewPoint) {

@@ -29,4 +29,8 @@ public interface QuizQuestionFactory {
     default List<ReviewPoint> getViceReviewPoints() {
         return null;
     }
+
+    default List<Note> generateScope() {
+        return null;
+    }
 }
