@@ -20,6 +20,7 @@ public class ClozeDescriptionTest {
             "moon,            partner of earth,                    partner of earth",
             "Sedition,        word sedition means this,            word [...] means this",
             "north / up,      it's on the north or up side,        it's on the [...] or [...] side",
+            "hort / horticulture,   horticulture is about,         [...] is about",
             "http://xxx,      xxx,                                 xxx",
             "cats,            a cat,                               a [..~]",
             "cat-dog,         cat dog,                             [...]",

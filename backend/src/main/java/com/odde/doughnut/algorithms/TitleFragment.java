@@ -89,4 +89,7 @@ class TitleFragment {
         return internalPartialMatchReplacement;
     }
 
+    public int length() {
+        return content.length();
+    }
 }

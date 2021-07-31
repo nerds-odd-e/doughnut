@@ -1,8 +1,6 @@
 package com.odde.doughnut.algorithms;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.IntStream;
@@ -37,6 +35,8 @@ public class NoteTitle {
             getFragments(matcher.group(1), false).forEach(result::add);
             getFragments(matcher.group(3), true).forEach(result::add);
         }
+        result.sort(Comparator.comparing(TitleFragment::length));
+        Collections.reverse(result);
         return result.stream();
     }
 
