@@ -46,10 +46,10 @@ public class QuizQuestionDirector {
         }
         quizQuestion.setViceReviewPointIds(viceReviewPoinIds);
         quizQuestion.setOptions(generateOptions(fillingOptions, answerNote));
-        quizQuestion.setDescription(quizQuestionFactory.generateInstruction());
         quizQuestion.setMainTopic(quizQuestionFactory.generateMainTopic());
         quizQuestion.setHintLinks(quizQuestionFactory.generateHintLinks());
         quizQuestion.setScope(getScope());
+        quizQuestion.setDescription(quizQuestionFactory.generateInstruction());
         return quizQuestion;
     }
 

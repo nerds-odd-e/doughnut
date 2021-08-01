@@ -10,13 +10,11 @@ import java.util.stream.Collectors;
 public class FromSamePartAsQuizFactory implements QuizQuestionFactory {
     private Link cachedAnswerLink = null;
     private List<Note> cachedFillingOptions = null;
-    protected final QuizQuestionServant servant;
     protected final ReviewPoint reviewPoint;
     protected final Link link;
     private Optional<Link> categoryLink = null;
 
     public FromSamePartAsQuizFactory(QuizQuestionServant servant, ReviewPoint reviewPoint) {
-        this.servant = servant;
         this.reviewPoint = reviewPoint;
         this.link = reviewPoint.getLink();
     }
@@ -24,7 +22,8 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory {
     @Override
     public List<Note> generateFillingOptions(QuizQuestionServant servant) {
         if (cachedFillingOptions == null) {
-            cachedFillingOptions = getCategoryLink()
+            categoryLink = servant.chooseOneCategoryLink(reviewPoint.getUser(), link);
+            cachedFillingOptions = categoryLink
                     .map(lk->
                     servant.randomizer.randomlyChoose(
                     5, link.getRemoteCousinOfDifferentCategory(lk, reviewPoint.getUser()))
@@ -35,7 +34,7 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory {
 
     @Override
     public String generateInstruction() {
-        return "<p>Which one <mark>" +link.getLinkTypeLabel() +"</mark> the same <mark>" + getCategoryLink().map(lk->lk.getTargetNote().getTitle()).orElse("") + "</mark> as:";
+        return "<p>Which one <mark>" +link.getLinkTypeLabel() +"</mark> the same <mark>" + categoryLink.map(lk->lk.getTargetNote().getTitle()).orElse("") + "</mark> as:";
     }
 
     @Override
@@ -45,8 +44,8 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory {
 
     @Override
     public Note generateAnswerNote(QuizQuestionServant servant) {
-        if (getAnswerLink() == null) return null;
-        return getAnswerLink().getSourceNote();
+        if (getAnswerLink(servant) == null) return null;
+        return getAnswerLink(servant).getSourceNote();
     }
 
     @Override
@@ -66,25 +65,17 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory {
 
     @Override
     public List<ReviewPoint> getViceReviewPoints(UserModel userModel) {
-        Link answerLink = getAnswerLink();
-        if (answerLink != null) {
+        if (cachedAnswerLink != null) {
             ReviewPoint answerLinkReviewPoint = userModel.getReviewPointFor(cachedAnswerLink);
             List<ReviewPoint> result = new ArrayList<>();
             result.add(answerLinkReviewPoint);
-            getCategoryLink().map(userModel::getReviewPointFor).ifPresent(result::add);
+            categoryLink.map(userModel::getReviewPointFor).ifPresent(result::add);
             return result;
         }
         return Collections.emptyList();
     }
 
-    private Optional<Link> getCategoryLink() {
-        if(categoryLink == null) {
-            categoryLink = servant.chooseOneCategoryLink(reviewPoint.getUser(), link);
-        }
-        return categoryLink;
-    }
-
-    protected Link getAnswerLink() {
+    protected Link getAnswerLink(QuizQuestionServant servant) {
         if (cachedAnswerLink == null) {
             UserModel userModel = servant.modelFactoryService.toUserModel(reviewPoint.getUser());
             List<Link> backwardPeers = link.getCousinLinksOfSameLinkType(reviewPoint.getUser()).stream()
