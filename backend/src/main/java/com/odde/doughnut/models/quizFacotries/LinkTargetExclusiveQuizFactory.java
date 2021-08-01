@@ -23,7 +23,7 @@ public class LinkTargetExclusiveQuizFactory implements QuizQuestionFactory {
     }
 
     @Override
-    public List<Note> generateFillingOptions() {
+    public List<Note> generateFillingOptions(QuizQuestionServant servant) {
         if(cachedFillingOptions == null) {
             Note sourceNote = link.getSourceNote();
             List<Note> backwardPeers = link.getCousinOfSameLinkType(reviewPoint.getUser());
@@ -67,6 +67,6 @@ public class LinkTargetExclusiveQuizFactory implements QuizQuestionFactory {
 
     @Override
     public boolean isValidQuestion() {
-        return generateAnswerNote() !=null && generateFillingOptions().size() > 0;
+        return generateAnswerNote() !=null && generateFillingOptions(servant).size() > 0;
     }
 }

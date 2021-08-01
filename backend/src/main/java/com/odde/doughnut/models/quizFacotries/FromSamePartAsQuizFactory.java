@@ -22,7 +22,7 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory {
     }
 
     @Override
-    public List<Note> generateFillingOptions() {
+    public List<Note> generateFillingOptions(QuizQuestionServant servant) {
         if (cachedFillingOptions == null) {
             cachedFillingOptions = getCategoryLink()
                     .map(lk->
@@ -61,7 +61,7 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory {
 
     @Override
     public boolean isValidQuestion() {
-        return generateAnswerNote() != null && !getViceReviewPoints().isEmpty() && generateFillingOptions().size() > 0;
+        return generateAnswerNote() != null && !getViceReviewPoints().isEmpty() && generateFillingOptions(this.servant).size() > 0;
     }
 
     @Override

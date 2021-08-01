@@ -32,7 +32,7 @@ public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory {
 
     @Override
     public boolean isValidQuestion() {
-        return generateAnswerNote() != null && generateFillingOptions().size() > 0;
+        return generateAnswerNote() != null && generateFillingOptions(this.servant).size() > 0;
     }
 
     @Override
@@ -49,7 +49,7 @@ public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory {
     }
 
     @Override
-    public List<Note> generateFillingOptions() {
+    public List<Note> generateFillingOptions(QuizQuestionServant servant) {
         if (cachedFillingOptions == null) {
             List<Link> cousinLinks = link.getCousinLinksOfSameLinkType(reviewPoint.getUser());
             cachedFillingOptions = servant.randomizer.randomlyChoose(5, cousinLinks).stream()

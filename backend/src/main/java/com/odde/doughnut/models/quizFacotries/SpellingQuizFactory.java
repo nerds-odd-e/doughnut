@@ -15,7 +15,7 @@ public class SpellingQuizFactory extends ClozeDescriptonQuizFactory {
     }
 
     @Override
-    public List<Note> generateFillingOptions() {
+    public List<Note> generateFillingOptions(QuizQuestionServant servant) {
         return new ArrayList<>();
     }
 

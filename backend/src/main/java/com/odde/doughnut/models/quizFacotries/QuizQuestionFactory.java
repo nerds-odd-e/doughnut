@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 public interface QuizQuestionFactory {
-    List<Note> generateFillingOptions();
+    List<Note> generateFillingOptions(QuizQuestionServant servant);
 
     String generateInstruction();
 

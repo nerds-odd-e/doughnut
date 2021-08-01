@@ -21,7 +21,7 @@ public class LinkSourceQuizFactory implements QuizQuestionFactory {
     }
 
     @Override
-    public List<Note> generateFillingOptions() {
+    public List<Note> generateFillingOptions(QuizQuestionServant servant) {
         if(cachedFillingOptions == null) {
             List<Note> cousinOfSameLinkType = link.getCousinOfSameLinkType(user);
             cachedFillingOptions = servant.choose5FromSiblings(answerNote, n -> !n.equals(answerNote) && !n.equals(link.getTargetNote()) && !cousinOfSameLinkType.contains(n));
@@ -56,7 +56,7 @@ public class LinkSourceQuizFactory implements QuizQuestionFactory {
 
     @Override
     public boolean isValidQuestion() {
-        return generateFillingOptions().size() > 0;
+        return generateFillingOptions(this.servant).size() > 0;
     }
 
 }

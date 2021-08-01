@@ -28,7 +28,7 @@ public class WhichSpecHasInstanceQuizFactory implements QuizQuestionFactory {
     }
 
     @Override
-    public List<Note> generateFillingOptions() {
+    public List<Note> generateFillingOptions(QuizQuestionServant servant) {
         if (cachedFillingOptions != null) {
             return cachedFillingOptions;
         }
@@ -68,7 +68,7 @@ public class WhichSpecHasInstanceQuizFactory implements QuizQuestionFactory {
 
     @Override
     public boolean isValidQuestion() {
-        return !getViceReviewPoints().isEmpty() && generateFillingOptions().size() > 0;
+        return !getViceReviewPoints().isEmpty() && generateFillingOptions(this.servant).size() > 0;
     }
 
     @Override
