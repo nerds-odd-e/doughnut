@@ -55,8 +55,13 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory {
     }
 
     @Override
-    public boolean isValidQuestion() {
-        return !getViceReviewPoints(this.servant.modelFactoryService.toUserModel(this.reviewPoint.getUser())).isEmpty() && generateFillingOptions(this.servant).size() > 0;
+    public int minimumFillingOptionCount() {
+        return 1;
+    }
+
+    @Override
+    public int minimumViceReviewPointCount() {
+        return 1;
     }
 
     @Override

@@ -40,12 +40,16 @@ public class QuizQuestionDirector {
         if(quizQuestionFactory.minimumFillingOptionCount() > 0 && fillingOptions.size() < quizQuestionFactory.minimumFillingOptionCount()) {
             return null;
         }
+        List<Integer> viceReviewPoinIds = getViceReviewPoinIds();
+        if(quizQuestionFactory.minimumViceReviewPointCount() > 0 && viceReviewPoinIds.size() < quizQuestionFactory.minimumViceReviewPointCount()) {
+            return null;
+        }
+        quizQuestion.setViceReviewPointIds(viceReviewPoinIds);
         quizQuestion.setOptions(generateOptions(fillingOptions, answerNote));
         quizQuestion.setDescription(quizQuestionFactory.generateInstruction());
         quizQuestion.setMainTopic(quizQuestionFactory.generateMainTopic());
         quizQuestion.setHintLinks(quizQuestionFactory.generateHintLinks());
         quizQuestion.setScope(getScope());
-        quizQuestion.setViceReviewPointIds(getViceReviewPoinIds());
         return quizQuestion;
     }
 

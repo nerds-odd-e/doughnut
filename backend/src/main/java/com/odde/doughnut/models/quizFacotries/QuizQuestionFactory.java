@@ -33,6 +33,10 @@ public interface QuizQuestionFactory {
         return 0;
     }
 
+    default int minimumViceReviewPointCount() {
+        return 0;
+    }
+
     default List<ReviewPoint> getViceReviewPoints(UserModel userModel) {
         return null;
     }
