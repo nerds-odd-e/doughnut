@@ -9,7 +9,7 @@ import java.util.List;
 
 public class ClozeTitleSelectionQuizFactory extends ClozeDescriptonQuizFactory {
     public ClozeTitleSelectionQuizFactory(QuizQuestionServant servant, ReviewPoint reviewPoint) {
-        super(servant, reviewPoint);
+        super(null, reviewPoint);
     }
 
     @Override

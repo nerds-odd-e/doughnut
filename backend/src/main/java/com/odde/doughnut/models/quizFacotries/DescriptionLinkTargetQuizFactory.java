@@ -11,11 +11,8 @@ import java.util.List;
 
 public class DescriptionLinkTargetQuizFactory extends LinkTargetQuizFactory {
 
-    private final User user;
-
     public DescriptionLinkTargetQuizFactory(QuizQuestionServant servant, ReviewPoint reviewPoint) {
-        super(servant, reviewPoint);
-        this.user = reviewPoint.getUser();
+        super(null, reviewPoint);
     }
 
     @Override

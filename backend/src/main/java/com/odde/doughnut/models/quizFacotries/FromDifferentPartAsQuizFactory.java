@@ -8,33 +8,24 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory {
-    protected final QuizQuestionServant servant;
     protected final ReviewPoint reviewPoint;
     protected final Link link;
     private List<Note> cachedFillingOptions = null;
     private Optional<Link> categoryLink = null;
 
     public FromDifferentPartAsQuizFactory(QuizQuestionServant servant, ReviewPoint reviewPoint) {
-        this.servant = servant;
         this.reviewPoint = reviewPoint;
         this.link = reviewPoint.getLink();
     }
 
     @Override
-    public boolean isValidQuestion() {
-        return generateFillingOptions(this.servant).size() > 0;
+    public int minimumFillingOptionCount() {
+        return 1;
     }
 
     @Override
     public List<ReviewPoint> getViceReviewPoints(UserModel userModel) {
-        return getCategoryLink().map(userModel::getReviewPointFor).map(List::of).orElse(Collections.emptyList());
-    }
-
-    private Optional<Link> getCategoryLink() {
-        if (categoryLink == null) {
-            categoryLink = servant.chooseOneCategoryLink(reviewPoint.getUser(), link);
-        }
-        return categoryLink;
+        return categoryLink.map(userModel::getReviewPointFor).map(List::of).orElse(Collections.emptyList());
     }
 
     @Override
@@ -49,7 +40,7 @@ public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory {
 
     @Override
     public String generateInstruction() {
-        return "<p>Which one <mark>" + link.getLinkTypeLabel() + "</mark> a <em>DIFFERENT</em> <mark>" + getCategoryLink().map(lk->lk.getTargetNote().getTitle()).orElse("") + "</mark> than:";
+        return "<p>Which one <mark>" + link.getLinkTypeLabel() + "</mark> a <em>DIFFERENT</em> <mark>" + categoryLink.map(lk->lk.getTargetNote().getTitle()).orElse("") + "</mark> than:";
     }
 
     @Override
@@ -59,7 +50,8 @@ public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory {
 
     @Override
     public Note generateAnswerNote(QuizQuestionServant servant) {
-        return getCategoryLink()
+        categoryLink = servant.chooseOneCategoryLink(reviewPoint.getUser(), link);
+        return categoryLink
                 .map(lk -> servant.randomizer.chooseOneRandomly(link.getRemoteCousinOfDifferentCategory(lk, reviewPoint.getUser())))
                 .map(Link::getSourceNote)
                 .orElse(null);

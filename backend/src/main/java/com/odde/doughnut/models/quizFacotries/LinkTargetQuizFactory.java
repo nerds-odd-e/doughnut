@@ -9,13 +9,11 @@ import java.util.Map;
 public class LinkTargetQuizFactory implements QuizQuestionFactory {
     protected final Link link;
     protected final Note answerNote;
-    protected final QuizQuestionServant servant;
     private final User user;
     private List<Note> cachedFillingOptions = null;
 
     public LinkTargetQuizFactory(QuizQuestionServant servant, ReviewPoint reviewPoint) {
         this.link = reviewPoint.getLink();
-        this.servant = servant;
         this.answerNote = getAnswerNote();
         this.user = reviewPoint.getUser();
     }
