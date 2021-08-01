@@ -7,7 +7,7 @@ import lombok.Setter;
 
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public class QuizQuestion {
 
@@ -25,9 +25,9 @@ public class QuizQuestion {
         FROM_DIFFERENT_PART_AS(FromDifferentPartAsQuizFactory::new),
         LINK_SOURCE_EXCLUSIVE(LinkTargetExclusiveQuizFactory::new);
 
-        public final BiFunction<QuizQuestionServant, ReviewPoint, QuizQuestionFactory> factory;
+        public final Function<ReviewPoint, QuizQuestionFactory> factory;
 
-        QuestionType(BiFunction<QuizQuestionServant, ReviewPoint, QuizQuestionFactory> factory) {
+        QuestionType(Function<ReviewPoint, QuizQuestionFactory> factory) {
             this.factory = factory;
         }
     }

@@ -13,7 +13,7 @@ public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory {
     private List<Note> cachedFillingOptions = null;
     private Optional<Link> categoryLink = null;
 
-    public FromDifferentPartAsQuizFactory(QuizQuestionServant servant, ReviewPoint reviewPoint) {
+    public FromDifferentPartAsQuizFactory(ReviewPoint reviewPoint) {
         this.reviewPoint = reviewPoint;
         this.link = reviewPoint.getLink();
     }

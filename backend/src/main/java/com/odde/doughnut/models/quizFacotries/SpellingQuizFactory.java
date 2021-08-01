@@ -1,7 +1,6 @@
 package com.odde.doughnut.models.quizFacotries;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.ReviewSetting;
 import org.apache.logging.log4j.util.Strings;
@@ -10,8 +9,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SpellingQuizFactory extends ClozeDescriptonQuizFactory {
-    public SpellingQuizFactory(QuizQuestionServant servant, ReviewPoint reviewPoint) {
-        super(servant, reviewPoint);
+    public SpellingQuizFactory(ReviewPoint reviewPoint) {
+        super(reviewPoint);
     }
 
     @Override

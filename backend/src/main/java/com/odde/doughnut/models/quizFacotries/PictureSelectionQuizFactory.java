@@ -13,7 +13,7 @@ import java.util.Map;
 public class PictureSelectionQuizFactory implements QuizQuestionFactory {
     private final Note answerNote;
 
-    public PictureSelectionQuizFactory(QuizQuestionServant servant, ReviewPoint reviewPoint) {
+    public PictureSelectionQuizFactory(ReviewPoint reviewPoint) {
         this.answerNote = reviewPoint.getNote();
     }
 

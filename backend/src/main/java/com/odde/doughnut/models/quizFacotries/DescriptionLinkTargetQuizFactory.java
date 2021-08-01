@@ -2,7 +2,6 @@ package com.odde.doughnut.models.quizFacotries;
 
 import com.odde.doughnut.algorithms.ClozeDescription;
 import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.User;
 import com.odde.doughnut.models.UserModel;
 import org.apache.logging.log4j.util.Strings;
 
@@ -11,8 +10,8 @@ import java.util.List;
 
 public class DescriptionLinkTargetQuizFactory extends LinkTargetQuizFactory {
 
-    public DescriptionLinkTargetQuizFactory(QuizQuestionServant servant, ReviewPoint reviewPoint) {
-        super(null, reviewPoint);
+    public DescriptionLinkTargetQuizFactory(ReviewPoint reviewPoint) {
+        super(reviewPoint);
     }
 
     @Override

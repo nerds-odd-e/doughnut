@@ -4,8 +4,8 @@ import com.odde.doughnut.entities.ReviewPoint;
 import org.apache.logging.log4j.util.Strings;
 
 public class PictureTitleSelectionQuizFactory extends ClozeTitleSelectionQuizFactory {
-    public PictureTitleSelectionQuizFactory(QuizQuestionServant servant, ReviewPoint reviewPoint) {
-        super(null, reviewPoint);
+    public PictureTitleSelectionQuizFactory(ReviewPoint reviewPoint) {
+        super(reviewPoint);
     }
 
     @Override

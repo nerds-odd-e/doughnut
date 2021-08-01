@@ -19,7 +19,7 @@ public class WhichSpecHasInstanceQuizFactory implements QuizQuestionFactory {
     private final ReviewPoint reviewPoint;
     private final Link link;
 
-    public WhichSpecHasInstanceQuizFactory(QuizQuestionServant servant, ReviewPoint reviewPoint) {
+    public WhichSpecHasInstanceQuizFactory(ReviewPoint reviewPoint) {
         this.reviewPoint = reviewPoint;
         this.link = reviewPoint.getLink();
     }

@@ -15,7 +15,7 @@ public class LinkTargetExclusiveQuizFactory implements QuizQuestionFactory {
     private List<Note> cachedFillingOptions = null;
     private Note answerNote = null;
 
-    public LinkTargetExclusiveQuizFactory(QuizQuestionServant servant, ReviewPoint reviewPoint) {
+    public LinkTargetExclusiveQuizFactory(ReviewPoint reviewPoint) {
         this.reviewPoint = reviewPoint;
         this.link = reviewPoint.getLink();
     }

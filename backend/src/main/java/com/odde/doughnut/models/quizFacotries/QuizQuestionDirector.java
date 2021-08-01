@@ -23,7 +23,7 @@ public class QuizQuestionDirector {
         this.reviewPoint = reviewPoint;
         this.modelFactoryService = modelFactoryService;
         this.servant = new QuizQuestionServant(randomizer, modelFactoryService);
-        this.quizQuestionFactory = questionType.factory.apply(servant, reviewPoint);
+        this.quizQuestionFactory = questionType.factory.apply(reviewPoint);
     }
 
     public QuizQuestion buildQuizQuestion() {

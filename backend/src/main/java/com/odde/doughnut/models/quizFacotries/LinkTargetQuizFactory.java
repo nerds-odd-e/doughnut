@@ -12,7 +12,7 @@ public class LinkTargetQuizFactory implements QuizQuestionFactory {
     private final User user;
     private List<Note> cachedFillingOptions = null;
 
-    public LinkTargetQuizFactory(QuizQuestionServant servant, ReviewPoint reviewPoint) {
+    public LinkTargetQuizFactory(ReviewPoint reviewPoint) {
         this.link = reviewPoint.getLink();
         this.answerNote = getAnswerNote();
         this.user = reviewPoint.getUser();
