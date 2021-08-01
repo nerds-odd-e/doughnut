@@ -62,6 +62,6 @@ public class LinkTargetExclusiveQuizFactory implements QuizQuestionFactory {
 
     @Override
     public boolean isValidQuestion() {
-        return generateAnswerNote(servant) !=null && generateFillingOptions(servant).size() > 0;
+        return generateFillingOptions(servant).size() > 0;
     }
 }

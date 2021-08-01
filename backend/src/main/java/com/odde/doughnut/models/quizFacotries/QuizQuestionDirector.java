@@ -27,12 +27,16 @@ public class QuizQuestionDirector {
     }
 
     public QuizQuestion buildQuizQuestion() {
+        Note answerNote = quizQuestionFactory.generateAnswerNote(servant);
+        if (answerNote == null) {
+            return null;
+        }
         if (!quizQuestionFactory.isValidQuestion()) {
             return null;
         }
         QuizQuestion quizQuestion = new QuizQuestion(reviewPoint);
         quizQuestion.setQuestionType(questionType);
-        quizQuestion.setOptions(generateOptions());
+        quizQuestion.setOptions(generateOptions(answerNote));
         quizQuestion.setDescription(quizQuestionFactory.generateInstruction());
         quizQuestion.setMainTopic(quizQuestionFactory.generateMainTopic());
         quizQuestion.setHintLinks(quizQuestionFactory.generateHintLinks());
@@ -53,9 +57,9 @@ public class QuizQuestionDirector {
         return viceReviewPoints.stream().map(ReviewPoint::getId).collect(Collectors.toUnmodifiableList());
     }
 
-    private List<QuizQuestion.Option> generateOptions() {
+    private List<QuizQuestion.Option> generateOptions(Note answerNote) {
         List<Note> selectedList = quizQuestionFactory.generateFillingOptions(servant);
-        selectedList.add(quizQuestionFactory.generateAnswerNote(servant));
+        selectedList.add(answerNote);
         randomizer.shuffle(selectedList);
         QuizQuestion.OptionCreator optionCreator = quizQuestionFactory.optionCreator();
         return selectedList.stream().map(optionCreator::optionFromNote).collect(Collectors.toUnmodifiableList());

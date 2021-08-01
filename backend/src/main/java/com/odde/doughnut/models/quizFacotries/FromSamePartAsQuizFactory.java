@@ -56,7 +56,7 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory {
 
     @Override
     public boolean isValidQuestion() {
-        return generateAnswerNote(servant) != null && !getViceReviewPoints().isEmpty() && generateFillingOptions(this.servant).size() > 0;
+        return !getViceReviewPoints().isEmpty() && generateFillingOptions(this.servant).size() > 0;
     }
 
     @Override

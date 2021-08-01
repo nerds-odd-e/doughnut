@@ -22,7 +22,7 @@ public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory {
 
     @Override
     public boolean isValidQuestion() {
-        return generateAnswerNote(this.servant) != null && generateFillingOptions(this.servant).size() > 0;
+        return generateFillingOptions(this.servant).size() > 0;
     }
 
     @Override
