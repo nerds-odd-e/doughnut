@@ -21,7 +21,7 @@ public class DescriptionLinkTargetQuizFactory extends LinkTargetQuizFactory {
     }
 
     private String getSourceDescription() {
-        return link.getSourceNote().getNoteContent().getDescription();
+        return link.getSourceNote().getNoteContent().getClozeDescription();
     }
 
     @Override
