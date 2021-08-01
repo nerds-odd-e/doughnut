@@ -99,7 +99,7 @@ public class WhichSpecHasInstanceQuizFactory implements QuizQuestionFactory {
     }
 
     private void populateCandidate(QuizQuestionServant servant, List<Link> candidates, Link.LinkType specialize) {
-        candidates.add(servant.randomizer.chooseOneRandomly(link.getSourceNote().linksOfTypeThroughDirect(specialize, reviewPoint.getUser()).collect(Collectors.toUnmodifiableList())));
+        candidates.add(servant.randomizer.chooseOneRandomly(link.getSourceNote().linksOfTypeThroughDirect(List.of(specialize), reviewPoint.getUser()).collect(Collectors.toUnmodifiableList())));
     }
 
     @Override

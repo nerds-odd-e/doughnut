@@ -24,10 +24,10 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory {
         if (cachedFillingOptions == null) {
             categoryLink = servant.chooseOneCategoryLink(reviewPoint.getUser(), link);
             cachedFillingOptions = categoryLink
-                    .map(lk->
-                    servant.randomizer.randomlyChoose(
-                    5, link.getRemoteCousinOfDifferentCategory(lk, reviewPoint.getUser()))
-                            .stream().map(Link::getSourceNote).collect(Collectors.toList())).orElse(Collections.emptyList());
+                    .map(lk -> lk.getReverseLinksOfCousins(reviewPoint.getUser(), link.getLinkType()))
+                    .map(remoteCousins -> servant.randomizer.randomlyChoose(5, remoteCousins)
+                                    .stream().map(Link::getSourceNote).collect(Collectors.toList()))
+                    .orElse(Collections.emptyList());
         }
         return cachedFillingOptions;
     }

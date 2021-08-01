@@ -149,7 +149,7 @@ public class Link {
 
     @JsonIgnore
     public List<Link> getPiblingLinksOfSameLinkType(User viewer) {
-        return sourceNote.linksOfTypeThroughDirect(getLinkType(), viewer).filter(l->!l.equals(this)).collect(Collectors.toList());
+        return sourceNote.linksOfTypeThroughDirect(List.of(getLinkType()), viewer).filter(l->!l.equals(this)).collect(Collectors.toList());
     }
 
     @JsonIgnore
@@ -164,6 +164,7 @@ public class Link {
                 lt == getLinkType() || !existingTypes.contains(lt)).collect(Collectors.toList());
     }
 
+    @JsonIgnore
     public boolean sourceVisibleAsTargetOrTo(User viewer) {
         if (sourceNote.getNotebook() == targetNote.getNotebook()) return true;
         if (viewer == null) return false;
@@ -171,6 +172,7 @@ public class Link {
         return viewer.canReferTo(sourceNote.getNotebook());
     }
 
+    @JsonIgnore
     public boolean targetVisibleAsSourceOrTo(User viewer) {
         if (sourceNote.getNotebook() == targetNote.getNotebook()) return true;
         if (viewer == null) return false;
@@ -178,14 +180,16 @@ public class Link {
         return viewer.canReferTo(targetNote.getNotebook());
     }
 
-    public Stream<Link> categoryLinks(User viewer) {
-        return getTargetNote().linksOfTypeThroughDirect(LinkType.PART, viewer);
+    @JsonIgnore
+    public Stream<Link> categoryLinksOfTarget(User viewer) {
+        return getTargetNote().linksOfTypeThroughDirect(List.of(LinkType.PART, LinkType.INSTANCE, LinkType.SPECIALIZE, LinkType.APPLICATION), viewer);
     }
 
-    public List<Link> getRemoteCousinOfDifferentCategory(Link categoryLink, User user) {
-        return categoryLink.getCousinLinksOfSameLinkType(user).stream()
-                        .flatMap(p -> p.getSourceNote().linksOfTypeThroughReverse(getLinkType(), user))
-                        .collect(Collectors.toList());
+    @JsonIgnore
+    public List<Link> getReverseLinksOfCousins(User user, LinkType linkType) {
+        return getCousinLinksOfSameLinkType(user).stream()
+                .flatMap(p -> p.getSourceNote().linksOfTypeThroughReverse(linkType, user))
+                .collect(Collectors.toList());
     }
 
 }

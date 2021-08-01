@@ -1,9 +1,11 @@
 package com.odde.doughnut.models.quizFacotries;
 
-import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.Link;
+import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.NotesClosure;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.Randomizer;
-import com.odde.doughnut.models.UserModel;
 
 import java.util.List;
 import java.util.Optional;
@@ -40,9 +42,8 @@ public class QuizQuestionServant {
     }
 
     Optional<Link> chooseOneCategoryLink(User user, Link link) {
-        UserModel userModel = modelFactoryService.toUserModel(user);
         Link result = randomizer.chooseOneRandomly(
-                link.categoryLinks(userModel.getEntity()).collect(Collectors.toList()));
+                link.categoryLinksOfTarget(user).collect(Collectors.toList()));
         return Optional.ofNullable(result);
     }
 }

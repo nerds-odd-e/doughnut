@@ -24,11 +24,6 @@ public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory {
     }
 
     @Override
-    public List<ReviewPoint> getViceReviewPoints(UserModel userModel) {
-        return categoryLink.map(userModel::getReviewPointFor).map(List::of).orElse(Collections.emptyList());
-    }
-
-    @Override
     public List<Note> knownWrongAnswers() {
         List<Note> result = new ArrayList<>(reviewPoint.getLink().getCousinOfSameLinkType(reviewPoint.getUser()));
         result.add(link.getSourceNote());
@@ -59,9 +54,15 @@ public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory {
     public Note generateAnswerNote(QuizQuestionServant servant) {
         categoryLink = servant.chooseOneCategoryLink(reviewPoint.getUser(), link);
         return categoryLink
-                .map(lk -> servant.randomizer.chooseOneRandomly(link.getRemoteCousinOfDifferentCategory(lk, reviewPoint.getUser())))
+                .map(lk -> lk.getReverseLinksOfCousins(reviewPoint.getUser(), link.getLinkType()))
+                .map(remoteCousins -> servant.randomizer.chooseOneRandomly(remoteCousins))
                 .map(Link::getSourceNote)
                 .orElse(null);
+    }
+
+    @Override
+    public List<ReviewPoint> getViceReviewPoints(UserModel userModel) {
+        return categoryLink.map(userModel::getReviewPointFor).map(List::of).orElse(Collections.emptyList());
     }
 
     @Override

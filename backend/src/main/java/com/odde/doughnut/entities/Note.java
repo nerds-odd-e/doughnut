@@ -137,17 +137,17 @@ public class Note {
     public Map<Link.LinkType, LinkViewed> getAllLinks(User viewer) {
         return Arrays.stream(Link.LinkType.values())
                 .map(type->Map.entry(type, new LinkViewed() {{
-                            setDirect(linksOfTypeThroughDirect(type, viewer).collect(Collectors.toUnmodifiableList()));
+                    setDirect(linksOfTypeThroughDirect(List.of(type), viewer).collect(Collectors.toUnmodifiableList()));
                             setReverse(linksOfTypeThroughReverse(type, viewer).collect(Collectors.toUnmodifiableList()));
                         }}))
                 .filter(x -> x.getValue().notEmpty())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
-    public Stream<Link> linksOfTypeThroughDirect(Link.LinkType linkType, User viewer) {
+    public Stream<Link> linksOfTypeThroughDirect(List<Link.LinkType> linkTypes, User viewer) {
         return this.links.stream()
                 .filter(l -> l.targetVisibleAsSourceOrTo(viewer))
-                .filter(l -> l.getLinkType().equals(linkType));
+                .filter(l -> linkTypes.contains(l.getLinkType()));
     }
 
     public Stream<Link> linksOfTypeThroughReverse(Link.LinkType linkType, User viewer) {
