@@ -34,8 +34,7 @@ public class DescriptionLinkTargetQuizFactory extends LinkTargetQuizFactory {
     }
 
     @Override
-    public List<ReviewPoint> getViceReviewPoints() {
-        UserModel userModel = servant.modelFactoryService.toUserModel(user);
+    public List<ReviewPoint> getViceReviewPoints(UserModel userModel) {
         ReviewPoint reviewPointFor = userModel.getReviewPointFor(link.getSourceNote());
         if(reviewPointFor != null) return List.of(reviewPointFor);
         return Collections.emptyList();

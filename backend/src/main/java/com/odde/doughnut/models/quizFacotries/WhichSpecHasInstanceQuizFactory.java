@@ -63,13 +63,12 @@ public class WhichSpecHasInstanceQuizFactory implements QuizQuestionFactory {
 
     @Override
     public boolean isValidQuestion() {
-        return !getViceReviewPoints().isEmpty() && generateFillingOptions(this.servant).size() > 0;
+        return !getViceReviewPoints(this.servant.modelFactoryService.toUserModel(this.reviewPoint.getUser())).isEmpty() && generateFillingOptions(this.servant).size() > 0;
     }
 
     @Override
-    public List<ReviewPoint> getViceReviewPoints() {
+    public List<ReviewPoint> getViceReviewPoints(UserModel userModel) {
         if(getInstanceLink() != null) {
-            UserModel userModel = servant.modelFactoryService.toUserModel(reviewPoint.getUser());
             ReviewPoint reviewPointFor = userModel.getReviewPointFor(getInstanceLink());
             if (reviewPointFor != null) {
                 return List.of(reviewPointFor);

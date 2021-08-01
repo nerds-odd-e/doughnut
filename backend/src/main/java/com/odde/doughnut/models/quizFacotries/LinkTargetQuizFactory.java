@@ -50,8 +50,8 @@ public class LinkTargetQuizFactory implements QuizQuestionFactory {
     }
 
     @Override
-    public boolean isValidQuestion() {
-        return generateFillingOptions(this.servant).size() > 0;
+    public int minimumFillingOptionCount() {
+        return 1;
     }
 
     private Note getAnswerNote() {

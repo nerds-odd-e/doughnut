@@ -5,6 +5,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.LinkViewed;
+import com.odde.doughnut.models.UserModel;
 
 import java.util.List;
 import java.util.Map;
@@ -32,7 +33,7 @@ public interface QuizQuestionFactory {
         return 0;
     }
 
-    default List<ReviewPoint> getViceReviewPoints() {
+    default List<ReviewPoint> getViceReviewPoints(UserModel userModel) {
         return null;
     }
 

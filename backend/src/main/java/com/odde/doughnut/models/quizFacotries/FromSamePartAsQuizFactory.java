@@ -56,14 +56,13 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory {
 
     @Override
     public boolean isValidQuestion() {
-        return !getViceReviewPoints().isEmpty() && generateFillingOptions(this.servant).size() > 0;
+        return !getViceReviewPoints(this.servant.modelFactoryService.toUserModel(this.reviewPoint.getUser())).isEmpty() && generateFillingOptions(this.servant).size() > 0;
     }
 
     @Override
-    public List<ReviewPoint> getViceReviewPoints() {
+    public List<ReviewPoint> getViceReviewPoints(UserModel userModel) {
         Link answerLink = getAnswerLink();
         if (answerLink != null) {
-            UserModel userModel = servant.modelFactoryService.toUserModel(reviewPoint.getUser());
             ReviewPoint answerLinkReviewPoint = userModel.getReviewPointFor(cachedAnswerLink);
             List<ReviewPoint> result = new ArrayList<>();
             result.add(answerLinkReviewPoint);

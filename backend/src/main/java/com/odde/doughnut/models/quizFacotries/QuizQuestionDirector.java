@@ -56,7 +56,7 @@ public class QuizQuestionDirector {
     }
 
     private List<Integer> getViceReviewPoinIds() {
-        List<ReviewPoint> viceReviewPoints = quizQuestionFactory.getViceReviewPoints();
+        List<ReviewPoint> viceReviewPoints = quizQuestionFactory.getViceReviewPoints(modelFactoryService.toUserModel(reviewPoint.getUser()));
         if (viceReviewPoints == null) return null;
         return viceReviewPoints.stream().map(ReviewPoint::getId).collect(Collectors.toUnmodifiableList());
     }
