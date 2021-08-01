@@ -21,8 +21,8 @@ public class Link {
 
     public enum LinkType {
         RELATED_TO                      (1, "related note", "is related to", "is not related to", "is related to", new QuestionType[]{}),
-        SPECIALIZE                      (2, "specification", "is a specialization of", "is not a specialization of", "is a generalization of", new QuestionType[]{LINK_TARGET, LINK_SOURCE, LINK_SOURCE_EXCLUSIVE, WHICH_SPEC_HAS_INSTANCE, FROM_SAME_PART_AS, FROM_DIFFERENT_PART_AS, DESCRIPTION_LINK_TARGET}),
-        APPLICATION                     (3, "application", "is an application of", "is not an application of", "is a summary of", new QuestionType[]{LINK_TARGET, LINK_SOURCE, LINK_SOURCE_EXCLUSIVE, WHICH_SPEC_HAS_INSTANCE, FROM_SAME_PART_AS, FROM_DIFFERENT_PART_AS, DESCRIPTION_LINK_TARGET}),
+        SPECIALIZE                      (2, "specification", "is a specialization of", "is not a specialization of", "is a generalization of", new QuestionType[]{LINK_TARGET, LINK_SOURCE, WHICH_SPEC_HAS_INSTANCE, FROM_SAME_PART_AS, FROM_DIFFERENT_PART_AS, DESCRIPTION_LINK_TARGET}),
+        APPLICATION                     (3, "application", "is an application of", "is not an application of", "is a summary of", new QuestionType[]{LINK_TARGET, LINK_SOURCE, WHICH_SPEC_HAS_INSTANCE, FROM_SAME_PART_AS, FROM_DIFFERENT_PART_AS, DESCRIPTION_LINK_TARGET}),
 
         INSTANCE                        (4, "instance", "is an instance of", "is not an instance of", "has instances", new QuestionType[]{LINK_TARGET, LINK_SOURCE, WHICH_SPEC_HAS_INSTANCE, FROM_SAME_PART_AS, FROM_DIFFERENT_PART_AS, DESCRIPTION_LINK_TARGET}),
         /*INTEGRATED*/ PART             (6, "part", "is a part of", "is not a part of", "has parts", new QuestionType[]{LINK_TARGET, LINK_SOURCE, LINK_SOURCE_EXCLUSIVE, WHICH_SPEC_HAS_INSTANCE, FROM_SAME_PART_AS, FROM_DIFFERENT_PART_AS, DESCRIPTION_LINK_TARGET}),
