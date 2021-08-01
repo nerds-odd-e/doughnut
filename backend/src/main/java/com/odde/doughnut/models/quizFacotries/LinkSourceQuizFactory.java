@@ -22,7 +22,7 @@ public class LinkSourceQuizFactory implements QuizQuestionFactory {
     public List<Note> generateFillingOptions(QuizQuestionServant servant) {
         if(cachedFillingOptions == null) {
             List<Note> cousinOfSameLinkType = link.getCousinOfSameLinkType(user);
-            cachedFillingOptions = servant.choose5FromSiblings(answerNote, n -> !n.equals(answerNote) && !n.equals(link.getTargetNote()) && !cousinOfSameLinkType.contains(n));
+            cachedFillingOptions = servant.choose5FromCohort(answerNote, n -> !n.equals(answerNote) && !n.equals(link.getTargetNote()) && !cousinOfSameLinkType.contains(n));
         }
         return cachedFillingOptions;
     }

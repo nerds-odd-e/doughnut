@@ -42,16 +42,6 @@ public class AnswerResult {
         return rightAnswers.stream().anyMatch(this::matchAnswer);
     }
 
-    private Note getCorrectAnswerNote() {
-        if (questionType == LINK_TARGET || questionType == CLOZE_LINK_TARGET || questionType == DESCRIPTION_LINK_TARGET) {
-            return reviewPoint.getLink().getTargetNote();
-        }
-        if (questionType == WHICH_SPEC_HAS_INSTANCE || questionType == LINK_SOURCE) {
-            return reviewPoint.getLink().getSourceNote();
-        }
-        return reviewPoint.getNote();
-    }
-
     private boolean matchAnswer(Note correctAnswerNote) {
         if (answerNote != null) {
             return correctAnswerNote.equals(answerNote);

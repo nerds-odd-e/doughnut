@@ -370,5 +370,13 @@ public class Note {
         return parent.id;
     }
 
+    @JsonIgnore
+    public Note getGrandAsPossilbe() {
+        Note grand = this;
+        for(int i = 0; i < 2; i ++)
+            if(grand.getParentNote() != null)
+                grand = grand.getParentNote();
+        return grand;
+    }
 }
 

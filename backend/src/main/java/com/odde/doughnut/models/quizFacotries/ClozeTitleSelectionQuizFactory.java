@@ -13,7 +13,7 @@ public class ClozeTitleSelectionQuizFactory extends ClozeDescriptonQuizFactory {
 
     @Override
     public List<Note> generateFillingOptions(QuizQuestionServant servant) {
-        return servant.choose5FromSiblings(answerNote, n -> !n.equals(answerNote));
+        return servant.choose5FromCohort(answerNote, n -> !n.equals(answerNote));
     }
 
     @Override

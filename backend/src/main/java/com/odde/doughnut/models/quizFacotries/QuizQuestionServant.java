@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class QuizQuestionServant {
     final Randomizer randomizer;
@@ -20,12 +19,16 @@ public class QuizQuestionServant {
         this.modelFactoryService = modelFactoryService;
     }
 
-    List<Note> choose5FromSiblings(Note answerNote, Predicate<Note> notePredicate) {
-        List<Note> siblings = answerNote.getSiblings();
-        Stream<Note> noteStream = siblings.stream()
-                .filter(notePredicate);
-        List<Note> list = noteStream.collect(Collectors.toList());
+    List<Note> choose5FromCohort(Note answerNote, Predicate<Note> notePredicate) {
+        List<Note> list = getCohort(answerNote, notePredicate);
         return randomizer.randomlyChoose(5, list);
+    }
+
+    private List<Note> getCohort(Note answerNote, Predicate<Note> notePredicate) {
+        List<Note> list = answerNote.getSiblings().stream().filter(notePredicate).collect(Collectors.toList());
+        if (list.size() > 1) return list;
+
+        return answerNote.getGrandAsPossilbe().getDescendantNCs().stream().map(NotesClosure::getNote).filter(notePredicate).collect(Collectors.toList());
     }
 
     List<Note> randomlyChooseAndEnsure(List<Note> candidates, Note ensure, int maxSize) {

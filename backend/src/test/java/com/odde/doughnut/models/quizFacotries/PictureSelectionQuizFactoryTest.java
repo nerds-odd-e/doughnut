@@ -19,7 +19,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.odde.doughnut.entities.QuizQuestion.QuestionType.LINK_SOURCE;
 import static com.odde.doughnut.entities.QuizQuestion.QuestionType.PICTURE_SELECTION;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -35,9 +34,10 @@ class PictureSelectionQuizFactoryTest {
     UserModel userModel;
     NonRandomizer randomizer = new NonRandomizer();
     Note top;
-    Note target;
+    Note father;
     Note source;
-    Note anotherSource;
+    Note brother;
+    Note uncle;
     ReviewPoint reviewPoint;
 
 
@@ -45,10 +45,13 @@ class PictureSelectionQuizFactoryTest {
     void setup() {
         userModel = makeMe.aUser().toModelPlease();
         top = makeMe.aNote().byUser(userModel).please();
-        source = makeMe.aNote("source").under(top).please();
-        anotherSource = makeMe.aNote("another note").under(top).please();
+        father = makeMe.aNote("second level").under(top).please();
+        uncle = makeMe.aNote("uncle").under(top).please();
+        source = makeMe.aNote("source").under(father).please();
+        brother = makeMe.aNote("another note").under(father).please();
         reviewPoint = makeMe.aReviewPointFor(source).inMemoryPlease();
         makeMe.refresh(top);
+        makeMe.refresh(father);
     }
 
     @Test
@@ -65,12 +68,41 @@ class PictureSelectionQuizFactoryTest {
         }
 
         @Test
-        void shouldIncludeRightAnswers() {
+        void shouldReturnNullIfCannotFindPicture() {
             QuizQuestion quizQuestion = buildLinkTargetQuizQuestion();
-            assertThat(quizQuestion.getDescription(), equalTo(""));
-            assertThat(quizQuestion.getMainTopic(), equalTo("source"));
-            List<String> options = toOptionStrings(quizQuestion);
-            assertThat(source.getTitle(), in(options));
+            assertThat(quizQuestion, is(nullValue()));
+        }
+
+        @Nested
+        class WhenThereIsAnotherPictureNote {
+            @BeforeEach
+            void setup() {
+                makeMe.theNote(brother).pictureUrl("http://img/img2.jpg").please();
+            }
+
+            @Test
+            void shouldIncludeRightAnswers() {
+                QuizQuestion quizQuestion = buildLinkTargetQuizQuestion();
+                assertThat(quizQuestion.getDescription(), equalTo(""));
+                assertThat(quizQuestion.getMainTopic(), equalTo("source"));
+                List<String> options = toOptionStrings(quizQuestion);
+                assertThat(source.getTitle(), in(options));
+            }
+        }
+
+        @Nested
+        class WhenThereIsAnotherPictureInUncleNote {
+            @BeforeEach
+            void setup() {
+                makeMe.theNote(uncle).pictureUrl("http://img/img2.jpg").please();
+            }
+
+            @Test
+            void shouldIncludeUncle() {
+                QuizQuestion quizQuestion = buildLinkTargetQuizQuestion();
+                List<String> options = toOptionStrings(quizQuestion);
+                assertThat(uncle.getTitle(), in(options));
+            }
         }
 
         @Nested
