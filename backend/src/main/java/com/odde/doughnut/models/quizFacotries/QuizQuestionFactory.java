@@ -28,6 +28,10 @@ public interface QuizQuestionFactory {
         return true;
     }
 
+    default int minimumFillingOptionCount() {
+        return 0;
+    }
+
     default List<ReviewPoint> getViceReviewPoints() {
         return null;
     }
