@@ -18,7 +18,7 @@ public interface QuizQuestionFactory {
 
     Note generateAnswerNote();
 
-    List<QuizQuestion.Option> toQuestionOptions(List<Note> notes);
+    List<QuizQuestion.Option> toQuestionOptions(QuizQuestionServant servant, List<Note> notes);
 
     Map<Link.LinkType, LinkViewed> generateHintLinks();
 

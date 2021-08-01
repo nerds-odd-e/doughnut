@@ -75,7 +75,7 @@ public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory {
     }
 
     @Override
-    public List<QuizQuestion.Option> toQuestionOptions(List<Note> notes) {
+    public List<QuizQuestion.Option> toQuestionOptions(QuizQuestionServant servant, List<Note> notes) {
         return servant.toTitleOptions(notes);
     }
 

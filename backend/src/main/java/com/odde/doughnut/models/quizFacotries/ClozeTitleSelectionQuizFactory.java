@@ -18,7 +18,7 @@ public class ClozeTitleSelectionQuizFactory extends ClozeDescriptonQuizFactory {
     }
 
     @Override
-    public List<QuizQuestion.Option> toQuestionOptions(List<Note> noteEntities) {
+    public List<QuizQuestion.Option> toQuestionOptions(QuizQuestionServant servant, List<Note> noteEntities) {
         return servant.toTitleOptions(noteEntities);
     }
 

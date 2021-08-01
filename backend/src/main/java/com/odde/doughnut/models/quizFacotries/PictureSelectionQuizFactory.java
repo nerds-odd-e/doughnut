@@ -40,7 +40,7 @@ public class PictureSelectionQuizFactory implements QuizQuestionFactory {
     }
 
     @Override
-    public List<QuizQuestion.Option> toQuestionOptions(List<Note> noteEntities) {
+    public List<QuizQuestion.Option> toQuestionOptions(QuizQuestionServant servant, List<Note> noteEntities) {
         return servant.toPictureOptions(noteEntities);
     }
 

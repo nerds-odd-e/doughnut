@@ -20,7 +20,7 @@ public class SpellingQuizFactory extends ClozeDescriptonQuizFactory {
     }
 
     @Override
-    public List<QuizQuestion.Option> toQuestionOptions(List<Note> notes) {
+    public List<QuizQuestion.Option> toQuestionOptions(QuizQuestionServant servant, List<Note> notes) {
         return new ArrayList<>();
     }
 
