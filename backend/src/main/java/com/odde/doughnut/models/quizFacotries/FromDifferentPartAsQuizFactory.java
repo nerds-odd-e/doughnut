@@ -75,11 +75,6 @@ public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory {
     }
 
     @Override
-    public List<QuizQuestion.Option> toQuestionOptions(QuizQuestionServant servant, List<Note> notes) {
-        return servant.toTitleOptions(notes);
-    }
-
-    @Override
     public Map<Link.LinkType, LinkViewed> generateHintLinks() {
         return null;
     }

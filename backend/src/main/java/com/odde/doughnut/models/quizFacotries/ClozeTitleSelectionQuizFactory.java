@@ -18,11 +18,6 @@ public class ClozeTitleSelectionQuizFactory extends ClozeDescriptonQuizFactory {
     }
 
     @Override
-    public List<QuizQuestion.Option> toQuestionOptions(QuizQuestionServant servant, List<Note> noteEntities) {
-        return servant.toTitleOptions(noteEntities);
-    }
-
-    @Override
     public boolean isValidQuestion() {
         return !Strings.isEmpty(reviewPoint.getNote().getNoteContent().getDescription());
     }

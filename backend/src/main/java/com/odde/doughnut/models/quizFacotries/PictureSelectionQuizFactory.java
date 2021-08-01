@@ -40,13 +40,13 @@ public class PictureSelectionQuizFactory implements QuizQuestionFactory {
     }
 
     @Override
-    public List<QuizQuestion.Option> toQuestionOptions(QuizQuestionServant servant, List<Note> noteEntities) {
-        return servant.toPictureOptions(noteEntities);
+    public Map<Link.LinkType, LinkViewed> generateHintLinks() {
+        return null;
     }
 
     @Override
-    public Map<Link.LinkType, LinkViewed> generateHintLinks() {
-        return null;
+    public QuizQuestion.OptionCreator optionCreator() {
+        return new QuizQuestion.PictureOptionCreator();
     }
 
     @Override

@@ -18,9 +18,11 @@ public interface QuizQuestionFactory {
 
     Note generateAnswerNote();
 
-    List<QuizQuestion.Option> toQuestionOptions(QuizQuestionServant servant, List<Note> notes);
-
     Map<Link.LinkType, LinkViewed> generateHintLinks();
+
+    default QuizQuestion.OptionCreator optionCreator() {
+        return new QuizQuestion.TitleOptionCreator();
+    }
 
     default boolean isValidQuestion() {
         return true;

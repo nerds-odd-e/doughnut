@@ -53,10 +53,6 @@ public class QuizQuestion {
         this.reviewPoint = reviewPoint;
     }
 
-    public boolean isPictureQuestion() {
-        return questionType == QuestionType.PICTURE_TITLE;
-    }
-
     public Answer buildAnswer() {
         Answer answer = new Answer();
         answer.setQuestionType(questionType);
@@ -85,6 +81,24 @@ public class QuizQuestion {
 
         public String getDisplay() {
             return note.getTitle();
+        }
+    }
+
+    public interface OptionCreator {
+        Option optionFromNote(Note note);
+    }
+
+    public static class TitleOptionCreator implements OptionCreator {
+        @Override
+        public Option optionFromNote(Note note) {
+            return Option.createTitleOption(note);
+        }
+    }
+
+    public static class PictureOptionCreator implements OptionCreator {
+        @Override
+        public Option optionFromNote(Note note) {
+            return Option.createPictureOption(note);
         }
     }
 }

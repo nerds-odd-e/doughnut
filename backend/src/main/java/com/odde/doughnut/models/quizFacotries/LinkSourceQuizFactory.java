@@ -45,11 +45,6 @@ public class LinkSourceQuizFactory implements QuizQuestionFactory {
     }
 
     @Override
-    public List<QuizQuestion.Option> toQuestionOptions(QuizQuestionServant servant, List<Note> noteEntities) {
-        return servant.toTitleOptions(noteEntities);
-    }
-
-    @Override
     public Map<Link.LinkType, LinkViewed> generateHintLinks() {
         return null;
     }

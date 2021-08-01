@@ -20,14 +20,6 @@ public class QuizQuestionServant {
         this.modelFactoryService = modelFactoryService;
     }
 
-    List<QuizQuestion.Option> toPictureOptions(List<Note> selectedList) {
-        return selectedList.stream().map(QuizQuestion.Option::createPictureOption).collect(Collectors.toUnmodifiableList());
-    }
-
-    List<QuizQuestion.Option> toTitleOptions(List<Note> selectedList) {
-        return selectedList.stream().map(QuizQuestion.Option::createTitleOption).collect(Collectors.toUnmodifiableList());
-    }
-
     List<Note> choose5FromSiblings(Note answerNote, Predicate<Note> notePredicate) {
         List<Note> siblings = answerNote.getSiblings();
         Stream<Note> noteStream = siblings.stream()
