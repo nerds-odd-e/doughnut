@@ -63,4 +63,9 @@ public class LinkTargetExclusiveQuizFactory implements QuizQuestionFactory {
         return 1;
     }
 
+    @Override
+    public List<Note> knownWrongAnswers() {
+        return List.of(link.getSourceNote());
+    }
+
 }

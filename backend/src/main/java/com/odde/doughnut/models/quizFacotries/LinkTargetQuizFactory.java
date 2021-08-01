@@ -14,7 +14,7 @@ public class LinkTargetQuizFactory implements QuizQuestionFactory {
 
     public LinkTargetQuizFactory(ReviewPoint reviewPoint) {
         this.link = reviewPoint.getLink();
-        this.answerNote = getAnswerNote();
+        this.answerNote = link.getTargetNote();
         this.user = reviewPoint.getUser();
     }
 
@@ -52,8 +52,9 @@ public class LinkTargetQuizFactory implements QuizQuestionFactory {
         return 1;
     }
 
-    private Note getAnswerNote() {
-        return link.getTargetNote();
+    @Override
+    public List<Note> knownRightAnswers() {
+        return List.of(answerNote);
     }
 
 }

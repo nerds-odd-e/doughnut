@@ -29,6 +29,13 @@ public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory {
     }
 
     @Override
+    public List<Note> knownWrongAnswers() {
+        List<Note> result = new ArrayList<>(reviewPoint.getLink().getCousinOfSameLinkType(reviewPoint.getUser()));
+        result.add(link.getSourceNote());
+        return result;
+    }
+
+    @Override
     public List<Note> generateFillingOptions(QuizQuestionServant servant) {
         if (cachedFillingOptions == null) {
             List<Link> cousinLinks = link.getCousinLinksOfSameLinkType(reviewPoint.getUser());

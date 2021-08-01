@@ -5,6 +5,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.LinkViewed;
 
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -30,6 +31,11 @@ public abstract class ClozeDescriptonQuizFactory implements QuizQuestionFactory 
     @Override
     public Note generateAnswerNote(QuizQuestionServant servant) {
         return answerNote;
+    }
+
+    @Override
+    public List<Note> knownRightAnswers() {
+        return List.of(answerNote);
     }
 
     @Override

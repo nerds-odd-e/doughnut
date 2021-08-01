@@ -75,6 +75,11 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory {
         return Collections.emptyList();
     }
 
+    @Override
+    public List<Note> knownRightAnswers() {
+        return reviewPoint.getLink().getCousinOfSameLinkType(reviewPoint.getUser());
+    }
+
     protected Link getAnswerLink(QuizQuestionServant servant) {
         if (cachedAnswerLink == null) {
             UserModel userModel = servant.modelFactoryService.toUserModel(reviewPoint.getUser());

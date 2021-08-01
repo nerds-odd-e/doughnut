@@ -34,8 +34,6 @@ public class QuizQuestionDirector {
         if (!quizQuestionFactory.isValidQuestion()) {
             return null;
         }
-        QuizQuestion quizQuestion = new QuizQuestion(reviewPoint);
-        quizQuestion.setQuestionType(questionType);
         List<Note> fillingOptions = quizQuestionFactory.generateFillingOptions(servant);
         if(quizQuestionFactory.minimumFillingOptionCount() > 0 && fillingOptions.size() < quizQuestionFactory.minimumFillingOptionCount()) {
             return null;
@@ -44,6 +42,8 @@ public class QuizQuestionDirector {
         if(quizQuestionFactory.minimumViceReviewPointCount() > 0 && viceReviewPoinIds.size() < quizQuestionFactory.minimumViceReviewPointCount()) {
             return null;
         }
+        QuizQuestion quizQuestion = new QuizQuestion(reviewPoint);
+        quizQuestion.setQuestionType(questionType);
         quizQuestion.setViceReviewPointIds(viceReviewPoinIds);
         quizQuestion.setOptions(generateOptions(fillingOptions, answerNote));
         quizQuestion.setMainTopic(quizQuestionFactory.generateMainTopic());

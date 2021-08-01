@@ -102,4 +102,9 @@ public class WhichSpecHasInstanceQuizFactory implements QuizQuestionFactory {
         candidates.add(servant.randomizer.chooseOneRandomly(link.getSourceNote().linksOfTypeThroughDirect(specialize, reviewPoint.getUser()).collect(Collectors.toUnmodifiableList())));
     }
 
+    @Override
+    public List<Note> knownRightAnswers() {
+        return List.of(link.getSourceNote());
+    }
+
 }

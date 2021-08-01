@@ -52,4 +52,9 @@ public class LinkSourceQuizFactory implements QuizQuestionFactory {
         return 1;
     }
 
+    @Override
+    public List<Note> knownRightAnswers() {
+        return List.of(answerNote);
+    }
+
 }

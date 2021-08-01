@@ -52,4 +52,9 @@ public class PictureSelectionQuizFactory implements QuizQuestionFactory {
         return !Strings.isEmpty(answerNote.getNotePicture());
     }
 
+    @Override
+    public List<Note> knownRightAnswers() {
+        return List.of(answerNote);
+    }
+
 }
