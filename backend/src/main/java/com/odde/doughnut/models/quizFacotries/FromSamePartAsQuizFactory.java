@@ -44,7 +44,7 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory {
     }
 
     @Override
-    public Note generateAnswerNote() {
+    public Note generateAnswerNote(QuizQuestionServant servant) {
         if (getAnswerLink() == null) return null;
         return getAnswerLink().getSourceNote();
     }
@@ -56,7 +56,7 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory {
 
     @Override
     public boolean isValidQuestion() {
-        return generateAnswerNote() != null && !getViceReviewPoints().isEmpty() && generateFillingOptions(this.servant).size() > 0;
+        return generateAnswerNote(servant) != null && !getViceReviewPoints().isEmpty() && generateFillingOptions(this.servant).size() > 0;
     }
 
     @Override

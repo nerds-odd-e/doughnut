@@ -55,7 +55,7 @@ public class QuizQuestionDirector {
 
     private List<QuizQuestion.Option> generateOptions() {
         List<Note> selectedList = quizQuestionFactory.generateFillingOptions(servant);
-        selectedList.add(quizQuestionFactory.generateAnswerNote());
+        selectedList.add(quizQuestionFactory.generateAnswerNote(servant));
         randomizer.shuffle(selectedList);
         QuizQuestion.OptionCreator optionCreator = quizQuestionFactory.optionCreator();
         return selectedList.stream().map(optionCreator::optionFromNote).collect(Collectors.toUnmodifiableList());

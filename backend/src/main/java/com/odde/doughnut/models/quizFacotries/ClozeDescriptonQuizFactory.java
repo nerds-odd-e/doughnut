@@ -11,11 +11,9 @@ import java.util.stream.Collectors;
 public abstract class ClozeDescriptonQuizFactory implements QuizQuestionFactory {
     protected final ReviewPoint reviewPoint;
     protected final Note answerNote;
-    protected final QuizQuestionServant servant;
 
     public ClozeDescriptonQuizFactory(QuizQuestionServant servant, ReviewPoint reviewPoint) {
         this.reviewPoint = reviewPoint;
-        this.servant = servant;
         this.answerNote = getAnswerNote();
     }
 
@@ -30,7 +28,7 @@ public abstract class ClozeDescriptonQuizFactory implements QuizQuestionFactory 
     }
 
     @Override
-    public Note generateAnswerNote() {
+    public Note generateAnswerNote(QuizQuestionServant servant) {
         return answerNote;
     }
 

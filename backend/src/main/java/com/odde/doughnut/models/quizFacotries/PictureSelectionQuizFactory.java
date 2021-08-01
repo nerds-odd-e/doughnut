@@ -12,10 +12,8 @@ import java.util.Map;
 
 public class PictureSelectionQuizFactory implements QuizQuestionFactory {
     private final Note answerNote;
-    private final QuizQuestionServant servant;
 
     public PictureSelectionQuizFactory(QuizQuestionServant servant, ReviewPoint reviewPoint) {
-        this.servant = servant;
         this.answerNote = reviewPoint.getNote();
     }
 
@@ -35,7 +33,7 @@ public class PictureSelectionQuizFactory implements QuizQuestionFactory {
     }
 
     @Override
-    public Note generateAnswerNote() {
+    public Note generateAnswerNote(QuizQuestionServant servant) {
         return answerNote;
     }
 

@@ -40,7 +40,7 @@ public class LinkTargetQuizFactory implements QuizQuestionFactory {
     }
 
     @Override
-    public Note generateAnswerNote() {
+    public Note generateAnswerNote(QuizQuestionServant servant) {
         return answerNote;
     }
 

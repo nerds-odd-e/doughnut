@@ -11,7 +11,6 @@ public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory {
     protected final QuizQuestionServant servant;
     protected final ReviewPoint reviewPoint;
     protected final Link link;
-    private Link cachedAnswerLink = null;
     private List<Note> cachedFillingOptions = null;
     private Optional<Link> categoryLink = null;
 
@@ -21,18 +20,9 @@ public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory {
         this.link = reviewPoint.getLink();
     }
 
-    protected Link getAnswerLink() {
-        if (cachedAnswerLink == null) {
-            cachedAnswerLink = getCategoryLink()
-                    .map(lk -> servant.randomizer.chooseOneRandomly(link.getRemoteCousinOfDifferentCategory(lk, reviewPoint.getUser())))
-                    .orElse(null);
-        }
-        return cachedAnswerLink;
-    }
-
     @Override
     public boolean isValidQuestion() {
-        return generateAnswerNote() != null && generateFillingOptions(this.servant).size() > 0;
+        return generateAnswerNote(this.servant) != null && generateFillingOptions(this.servant).size() > 0;
     }
 
     @Override
@@ -69,9 +59,11 @@ public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory {
     }
 
     @Override
-    public Note generateAnswerNote() {
-        if (getAnswerLink() == null) return null;
-        return getAnswerLink().getSourceNote();
+    public Note generateAnswerNote(QuizQuestionServant servant) {
+        return getCategoryLink()
+                .map(lk -> servant.randomizer.chooseOneRandomly(link.getRemoteCousinOfDifferentCategory(lk, reviewPoint.getUser())))
+                .map(Link::getSourceNote)
+                .orElse(null);
     }
 
     @Override

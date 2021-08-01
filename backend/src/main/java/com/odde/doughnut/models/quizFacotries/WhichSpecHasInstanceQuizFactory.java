@@ -51,7 +51,7 @@ public class WhichSpecHasInstanceQuizFactory implements QuizQuestionFactory {
     }
 
     @Override
-    public Note generateAnswerNote() {
+    public Note generateAnswerNote(QuizQuestionServant servant) {
         if(getInstanceLink() == null) return null;
         return getInstanceLink().getSourceNote();
     }

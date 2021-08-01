@@ -43,7 +43,7 @@ public class LinkTargetExclusiveQuizFactory implements QuizQuestionFactory {
     }
 
     @Override
-    public Note generateAnswerNote() {
+    public Note generateAnswerNote(QuizQuestionServant servant) {
         if (answerNote == null) {
             Note note = link.getSourceNote();
             List<Note> siblings = note.getSiblings();
@@ -62,6 +62,6 @@ public class LinkTargetExclusiveQuizFactory implements QuizQuestionFactory {
 
     @Override
     public boolean isValidQuestion() {
-        return generateAnswerNote() !=null && generateFillingOptions(servant).size() > 0;
+        return generateAnswerNote(servant) !=null && generateFillingOptions(servant).size() > 0;
     }
 }

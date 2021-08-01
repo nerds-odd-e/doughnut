@@ -16,7 +16,7 @@ public interface QuizQuestionFactory {
 
     String generateMainTopic();
 
-    Note generateAnswerNote();
+    Note generateAnswerNote(QuizQuestionServant servant);
 
     Map<Link.LinkType, LinkViewed> generateHintLinks();
 
