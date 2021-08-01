@@ -11,7 +11,6 @@ import java.util.Map;
 
 public class LinkTargetExclusiveQuizFactory implements QuizQuestionFactory {
     private final Link link;
-    private final QuizQuestionServant servant;
     private final ReviewPoint reviewPoint;
     private List<Note> cachedFillingOptions = null;
     private Note answerNote = null;
@@ -19,7 +18,6 @@ public class LinkTargetExclusiveQuizFactory implements QuizQuestionFactory {
     public LinkTargetExclusiveQuizFactory(QuizQuestionServant servant, ReviewPoint reviewPoint) {
         this.reviewPoint = reviewPoint;
         this.link = reviewPoint.getLink();
-        this.servant = servant;
     }
 
     @Override
@@ -61,7 +59,8 @@ public class LinkTargetExclusiveQuizFactory implements QuizQuestionFactory {
     }
 
     @Override
-    public boolean isValidQuestion() {
-        return generateFillingOptions(servant).size() > 0;
+    public int minimumFillingOptionCount() {
+        return 1;
     }
+
 }

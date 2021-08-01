@@ -5,7 +5,7 @@ import org.apache.logging.log4j.util.Strings;
 
 public class PictureTitleSelectionQuizFactory extends ClozeTitleSelectionQuizFactory {
     public PictureTitleSelectionQuizFactory(QuizQuestionServant servant, ReviewPoint reviewPoint) {
-        super(servant, reviewPoint);
+        super(null, reviewPoint);
     }
 
     @Override

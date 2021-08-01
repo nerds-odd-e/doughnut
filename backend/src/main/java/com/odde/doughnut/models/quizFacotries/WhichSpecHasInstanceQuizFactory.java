@@ -2,7 +2,6 @@ package com.odde.doughnut.models.quizFacotries;
 
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.LinkViewed;
 import com.odde.doughnut.models.UserModel;
@@ -17,12 +16,10 @@ import java.util.stream.Stream;
 public class WhichSpecHasInstanceQuizFactory implements QuizQuestionFactory {
     private Link cachedInstanceLink = null;
     private List<Note> cachedFillingOptions = null;
-    private final QuizQuestionServant servant;
     private final ReviewPoint reviewPoint;
     private final Link link;
 
     public WhichSpecHasInstanceQuizFactory(QuizQuestionServant servant, ReviewPoint reviewPoint) {
-        this.servant = servant;
         this.reviewPoint = reviewPoint;
         this.link = reviewPoint.getLink();
     }
@@ -32,7 +29,7 @@ public class WhichSpecHasInstanceQuizFactory implements QuizQuestionFactory {
         if (cachedFillingOptions != null) {
             return cachedFillingOptions;
         }
-        List<Note> instanceReverse = getInstanceLink().getCousinOfSameLinkType(reviewPoint.getUser());
+        List<Note> instanceReverse = cachedInstanceLink.getCousinOfSameLinkType(reviewPoint.getUser());
         List<Note> specReverse = link.getCousinOfSameLinkType(reviewPoint.getUser());
         List<Note> backwardPeers = Stream.concat(instanceReverse.stream(), specReverse.stream())
                 .filter(n-> !(instanceReverse.contains(n) && specReverse.contains(n))).collect(Collectors.toList());
@@ -42,7 +39,7 @@ public class WhichSpecHasInstanceQuizFactory implements QuizQuestionFactory {
 
     @Override
     public String generateInstruction() {
-        return "<p>Which one " + link.getLinkTypeLabel() + " <mark>"+link.getTargetNote().getTitle()+"</mark> <em>and</em> " + getInstanceLink().getLinkTypeLabel() + " <mark>" + getInstanceLink().getTargetNote().getTitle() + "</mark>:" ;
+        return "<p>Which one " + link.getLinkTypeLabel() + " <mark>"+link.getTargetNote().getTitle()+"</mark> <em>and</em> " + cachedInstanceLink.getLinkTypeLabel() + " <mark>" + cachedInstanceLink.getTargetNote().getTitle() + "</mark>:" ;
     }
 
     @Override
@@ -52,8 +49,9 @@ public class WhichSpecHasInstanceQuizFactory implements QuizQuestionFactory {
 
     @Override
     public Note generateAnswerNote(QuizQuestionServant servant) {
-        if(getInstanceLink() == null) return null;
-        return getInstanceLink().getSourceNote();
+        cachedInstanceLink = getInstanceLink(servant);
+        if(cachedInstanceLink == null) return null;
+        return cachedInstanceLink.getSourceNote();
     }
 
     @Override
@@ -62,14 +60,19 @@ public class WhichSpecHasInstanceQuizFactory implements QuizQuestionFactory {
     }
 
     @Override
-    public boolean isValidQuestion() {
-        return !getViceReviewPoints(this.servant.modelFactoryService.toUserModel(this.reviewPoint.getUser())).isEmpty() && generateFillingOptions(this.servant).size() > 0;
+    public int minimumFillingOptionCount() {
+        return 1;
+    }
+
+    @Override
+    public int minimumViceReviewPointCount() {
+        return 1;
     }
 
     @Override
     public List<ReviewPoint> getViceReviewPoints(UserModel userModel) {
-        if(getInstanceLink() != null) {
-            ReviewPoint reviewPointFor = userModel.getReviewPointFor(getInstanceLink());
+        if(cachedInstanceLink != null) {
+            ReviewPoint reviewPointFor = userModel.getReviewPointFor(cachedInstanceLink);
             if (reviewPointFor != null) {
                 return List.of(reviewPointFor);
             }
@@ -77,16 +80,16 @@ public class WhichSpecHasInstanceQuizFactory implements QuizQuestionFactory {
         return Collections.emptyList();
     }
 
-    private Link getInstanceLink() {
+    private Link getInstanceLink(QuizQuestionServant servant) {
         if(cachedInstanceLink == null) {
             List<Link> candidates = new ArrayList<>();
-            populateCandidate(candidates, Link.LinkType.SPECIALIZE);
-            populateCandidate(candidates, Link.LinkType.APPLICATION);
-            populateCandidate(candidates, Link.LinkType.INSTANCE);
-            populateCandidate(candidates, Link.LinkType.TAGGED_BY);
-            populateCandidate(candidates, Link.LinkType.ATTRIBUTE);
-            populateCandidate(candidates, Link.LinkType.USES);
-            populateCandidate(candidates, Link.LinkType.RELATED_TO);
+            populateCandidate(servant, candidates, Link.LinkType.SPECIALIZE);
+            populateCandidate(servant, candidates, Link.LinkType.APPLICATION);
+            populateCandidate(servant, candidates, Link.LinkType.INSTANCE);
+            populateCandidate(servant, candidates, Link.LinkType.TAGGED_BY);
+            populateCandidate(servant, candidates, Link.LinkType.ATTRIBUTE);
+            populateCandidate(servant, candidates, Link.LinkType.USES);
+            populateCandidate(servant, candidates, Link.LinkType.RELATED_TO);
             cachedInstanceLink = servant.randomizer.chooseOneRandomly(candidates.stream().filter(l->{
                 if(l==null) return false;
                 return !link.equals(l);
@@ -95,7 +98,7 @@ public class WhichSpecHasInstanceQuizFactory implements QuizQuestionFactory {
         return cachedInstanceLink;
     }
 
-    private void populateCandidate(List<Link> candidates, Link.LinkType specialize) {
+    private void populateCandidate(QuizQuestionServant servant, List<Link> candidates, Link.LinkType specialize) {
         candidates.add(servant.randomizer.chooseOneRandomly(link.getSourceNote().linksOfTypeThroughDirect(specialize, reviewPoint.getUser()).collect(Collectors.toUnmodifiableList())));
     }
 
