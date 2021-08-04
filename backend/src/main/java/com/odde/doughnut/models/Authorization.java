@@ -62,7 +62,7 @@ public class Authorization {
     }
 
     public void assertAuthorization(Circle circle) throws NoAccessRightException {
-        if (!user.inCircle(circle)) {
+        if (user == null || !user.inCircle(circle)) {
             throw new NoAccessRightException();
         }
     }
