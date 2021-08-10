@@ -1,6 +1,6 @@
 <template>
     <NoteBreadcrumbForReview :ancestors="quizQuestion.scope"/>
-    <div v-if="quizQuestion.pictureQuestion">
+    <div v-if="quizQuestion.questionType === 'PICTURE_TITLE'">
         <ShowPicture :note="sourceNote.note" :opacity="1"/>
     </div>
     <div class="quiz-instruction">
