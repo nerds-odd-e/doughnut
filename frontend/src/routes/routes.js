@@ -7,6 +7,7 @@ import RepeatPage from '@/pages/RepeatPage.vue'
 import DoingQuiz from '@/pages/DoingQuiz.vue'
 import InitialReviewPage from '@/pages/InitialReviewPage.vue'
 import NestedPage from "@/pages/commons/NestedPage"
+import CircleShowPage from '@/pages/CircleShowPage.vue'
 
 const NestedInitialReviewPage = NestedPage(
   InitialReviewPage,
@@ -34,6 +35,7 @@ const routes = [
     ...noteAndLinkRoutes.map(route=>({...route, path: `/${route.path}`})),
     { path: '/', name: 'root', component: ReviewHome },
     { path: '/notebooks/new', name: 'notebookNew', component: NotebookNewPage },
+    { path: '/circles/:circleId', name: 'circleShow', component: CircleShowPage, props: true },
     { path: '/bazaar/notes/:noteId', name: 'bnoteShow', component: NoteShowPage, props: true },
     { path: '/reviews', name: 'reviews', component: ReviewHome },
     { path: '/reviews/initial', name: 'initial', component: NestedInitialReviewPage, children:

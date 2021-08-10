@@ -17,7 +17,9 @@ export default {
 
   watch: {
     $route(to, from) {
-      this.showNavBar = !['repeat', 'initial'].includes(to.name.split('-').shift())
+      if(to.name) {
+        this.showNavBar = !['repeat', 'initial'].includes(to.name.split('-').shift())
+      }
     }
   },
 

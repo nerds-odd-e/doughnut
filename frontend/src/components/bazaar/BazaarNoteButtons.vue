@@ -5,8 +5,12 @@
     </a>
 </template>
 
-<script setup>
+<script>
   import SvgArticle from "../svgs/SvgArticle.vue"
   import BazaarNotebookButtons from "../notebook/BazaarNotebookButtons.vue"
-  const props = defineProps({note: Object, notebook: Object})
+
+  export default {
+    props: {note: Object, notebook: Object},
+    components: { SvgArticle, BazaarNotebookButtons}
+  }
 </script>

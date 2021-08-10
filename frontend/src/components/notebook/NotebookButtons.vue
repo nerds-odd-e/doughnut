@@ -1,5 +1,6 @@
 <template>
 <div class="btn-group btn-group-sm">
+    <slot name="additional-buttons"/>
     <a role="button" class="btn btn-sm" title="Article View"
        :href="`/notes/articles/${notebook.headNote.id}`">
         <SvgArticle/>
