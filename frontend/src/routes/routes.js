@@ -8,6 +8,7 @@ import DoingQuiz from '@/pages/DoingQuiz.vue'
 import InitialReviewPage from '@/pages/InitialReviewPage.vue'
 import NestedPage from "@/pages/commons/NestedPage"
 import CircleShowPage from '@/pages/CircleShowPage.vue'
+import CircleJoinPage from '@/pages/CircleJoinPage.vue'
 
 const NestedInitialReviewPage = NestedPage(
   InitialReviewPage,
@@ -36,6 +37,7 @@ const routes = [
     { path: '/', name: 'root', component: ReviewHome },
     { path: '/notebooks/new', name: 'notebookNew', component: NotebookNewPage },
     { path: '/circles/:circleId', name: 'circleShow', component: CircleShowPage, props: true },
+    { path: '/circles/join/:invitationCode', name: 'circleJoin', component: CircleJoinPage, props: true },
     { path: '/bazaar/notes/:noteId', name: 'bnoteShow', component: NoteShowPage, props: true },
     { path: '/reviews', name: 'reviews', component: ReviewHome },
     { path: '/reviews/initial', name: 'initial', component: NestedInitialReviewPage, children:

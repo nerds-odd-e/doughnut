@@ -25,7 +25,7 @@
         Please share this invitation code so that they can join your circle:
 
         <div class="jumbotron">
-            <input id="invitation-code" :value="circle.invitationCode" readonly/>
+            <input id="invitation-code" :value="invitationUrl" readonly/>
         </div>
     </div>
   </LoadingPage>
@@ -40,7 +40,6 @@ import BazaarNotebookButtons from "../components/notebook/BazaarNotebookButtons.
 import {restGet, restPost } from "../restful/restful"
 
 export default {
-  name: "LinkShowPage",
   components: {SvgMissingAvatar, NotebookCardsWithButtons, NotebookButtons, BazaarNotebookButtons, LoadingPage},
   props: {circleId: Number},
 
@@ -58,6 +57,13 @@ export default {
     },
   },
 
+  computed: {
+    invitationUrl() {
+      return `${window.location.origin}/circles/join/${this.circle.invitationCode}`
+    }
+
+  },
+
   watch: {
     circleId() {
       this.fetchData()
@@ -69,3 +75,8 @@ export default {
   },
 }
 </script>
+
+<style lang="sass" scoped>
+#invitation-code
+  width: 100%
+</style>

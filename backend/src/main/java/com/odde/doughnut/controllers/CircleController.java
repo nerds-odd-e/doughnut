@@ -64,6 +64,11 @@ public class CircleController extends ApplicationMvcController  {
         return "vuejsed";
     }
 
+    @GetMapping("/join/{code}")
+    public String joining(@PathVariable("code") String code) {
+        return "vuejsed";
+    }
+
     @PostMapping("/join")
     @Transactional
     public String joinCircle(@Valid CircleController.CircleJoiningByInvitation circleJoiningByInvitation, BindingResult bindingResult) {

@@ -17,8 +17,7 @@ When("I create a new circle {string} and copy the invitation code", (circleName)
 });
 
 When("I join the circle with the invitation code", () => {
-  cy.visit("/circles");
-  cy.get("@savedInvitationCode").then((invitationCode) => cy.getFormControl("InvitationCode").type(invitationCode));
+  cy.get("@savedInvitationCode").then((invitationCode) => cy.visit(invitationCode));
   cy.get('input[value="Submit"]').click();
 });
 
