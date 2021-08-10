@@ -16,9 +16,12 @@ When("I create a new circle {string} and copy the invitation code", (circleName)
       });
 });
 
-When("I join the circle with the invitation code", () => {
+When("I visit the invitation link", () => {
   cy.get("@savedInvitationCode").then((invitationCode) => cy.visit(invitationCode));
-  cy.get('input[value="Submit"]').click();
+});
+
+When("I join the circle", () => {
+  cy.get('input[value="Join"]').click();
 });
 
 When("I should see the circle {string} and it has two members in it", (circleName) => {

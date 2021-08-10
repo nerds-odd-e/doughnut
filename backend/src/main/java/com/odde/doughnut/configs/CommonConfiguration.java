@@ -1,10 +1,13 @@
 package com.odde.doughnut.configs;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractAuthenticationFilterConfigurer;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 public class CommonConfiguration {
-  HttpSecurity commonConfig(HttpSecurity http) throws Exception {
-    return http.authorizeRequests()
+  void commonConfig(HttpSecurity http, AbstractAuthenticationFilterConfigurer authenticationFilterConfigurer) throws Exception {
+    HttpSecurity config =  http.authorizeRequests()
         .mvcMatchers("/robots.txt")
         .permitAll()
         .antMatchers("/", "/login", "/error", "/images/**", "/odd-e.png",
@@ -20,5 +23,11 @@ public class CommonConfiguration {
                        .logoutSuccessUrl("/")
                        .invalidateHttpSession(true)
                        .permitAll());
+    authenticationFilterConfigurer.successHandler(myAuthenticationSuccessHandler());
   }
+
+    @Bean
+    public AuthenticationSuccessHandler myAuthenticationSuccessHandler(){
+        return new MySimpleUrlAuthenticationSuccessHandler();
+    }
 }

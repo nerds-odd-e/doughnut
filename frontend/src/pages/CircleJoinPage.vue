@@ -4,7 +4,7 @@
     <form :action="`/circles/join`" method="post">
         <div th:replace="_fragments/forms :: textInput('circle', 'invitationCode', 'Invitation code you got from other people', false)"/>
         <TextInput scopeName='join-circle' field='invitationCode' v-model="invitationCode" :autofocus="true"/>
-        <input type="submit" value="Submit" class="btn btn-primary"/>
+        <input type="submit" value="Join" class="btn btn-primary"/>
     </form>
   </LoadingPage>
 </template>

@@ -54,6 +54,6 @@ public class NonProductConfiguration extends WebSecurityConfigurerAdapter {
         .antMatchers("/api/blog/**", "/api/healthcheck", "/api/testability/**")
         .permitAll();
 
-    commonConfiguration.commonConfig(http).formLogin().and().httpBasic();
+    commonConfiguration.commonConfig(http, http.httpBasic().and().formLogin());
   }
 }
