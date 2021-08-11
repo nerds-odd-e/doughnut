@@ -19,5 +19,5 @@ Feature: Creating circles
     When I save my profile with:
       | Name      |
       | Learner A |
-#    And I join the circle
-#    Then I should see the circle "Odd-e SG Team" and it has two members in it
+    And I join the circle
+    Then I should see the circle "Odd-e SG Team" and it has two members in it

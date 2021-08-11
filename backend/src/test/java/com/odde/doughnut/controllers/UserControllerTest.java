@@ -29,7 +29,7 @@ class UserControllerTest {
     @BeforeEach
     void setup() {
         userModel = makeMe.aUser().toModelPlease();
-        controller = new UserController(makeMe.modelFactoryService, new TestCurrentUserFetcher(userModel));
+        controller = new UserController(makeMe.modelFactoryService, new TestCurrentUserFetcher(userModel), null);
     }
 
     @Test
