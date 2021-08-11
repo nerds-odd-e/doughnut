@@ -17,5 +17,5 @@ Feature: Logged in status
     Given I added and learned one note "Fungible" on day 1
     When I am repeat-reviewing my old note on day 2
     And my session is logged out
-    When I choose to do it again
+    When I choose the happy option
     And when I login as "old_learner" I should see "Fungible"

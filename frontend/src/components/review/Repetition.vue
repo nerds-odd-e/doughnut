@@ -1,5 +1,6 @@
 <template>
   <template v-if="compact">
+      <ReviewPointAbbr v-bind="{ noteViewedByUser, linkViewedByUser}"/>
       <SelfEvaluateButtons v-bind="{sadButton}" :key="buttonKey" @selfEvaluate="selfEvaluate($event)"/>
   </template>
   <template v-else>
@@ -25,6 +26,7 @@
   import SvgNoReview from "../svgs/SvgNoReview.vue"
   import ShowReviewPoint from "./ShowReviewPoint.vue"
   import SelfEvaluateButtons from "./SelfEvaluateButtons.vue"
+  import ReviewPointAbbr from './ReviewPointAbbr.vue'
   import { restPost} from "../../restful/restful"
 
   export default {
@@ -37,7 +39,7 @@
       compact: Boolean,
     },
     emits: ['selfEvaluate', 'updated'],
-    components: {SvgCog, SvgNoReview, ShowReviewPoint, SelfEvaluateButtons },
+    components: {SvgCog, SvgNoReview, ShowReviewPoint, SelfEvaluateButtons, ReviewPointAbbr },
     data() {
       return {
         loading: false,

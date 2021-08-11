@@ -48,11 +48,6 @@ Then(
   }
 );
 
-Then('I should have {string} for repeat now', numberOfRepeats => {
-  cy.visit('/reviews');
-  cy.findByText(numberOfRepeats, { selector: '.number-of-repeats' });
-});
-
 Then('choose to remove it from reviews', () => {
   cy.findByRole('button', { name: 'remove this note from review' }).click();
   cy.findByRole('button', { name: 'OK' }).click();
@@ -118,8 +113,8 @@ Then('choose to remove it fromm reviews', () => {
   cy.findByRole('button', { name: 'Remove This Note from Review' }).click();
 });
 
-Then('I choose to do it again', () => {
-  cy.get('#repeat-again').click();
+Then('I choose the happy option', () => {
+  cy.get('#repeat-happy').click();
 });
 
 Then(

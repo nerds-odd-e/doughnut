@@ -1,10 +1,10 @@
 <template>
-<ProgressBar v-bind="{finished, toRepeatCount}">
+<ProgressBar v-bind="{title: `Repetation: `, finished, toRepeatCount}">
   <template #buttons>
     <ViewLastResultButton v-bind="{hasLastResult}" @viewLastResult="$emit('viewLastResult')"/>
     <PauseRepeatButton v-bind="{noteId, linkId, allowPause, btn}"/>
   </template>
-  <template #default>
+  <template #default v-if="$slots.default">
     <slot />
   </template>
 </ProgressBar>

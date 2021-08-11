@@ -37,6 +37,9 @@ Feature: Repetition Quiz
     Then I view the last result
     And I should see that my answer is correct
     Then I should see "sedition" in note title
+    And I should see the statistics of note "sedition"
+      | RepetitionCount |
+      | 1               |
 
 
   Scenario Outline: Spelling quiz

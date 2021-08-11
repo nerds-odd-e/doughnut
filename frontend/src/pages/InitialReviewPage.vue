@@ -6,6 +6,7 @@
       <Minimizable :minimized="nested">
         <template #minimizedContent>
           <div class="initial-review-container" v-on:click="$router.push({name: 'initial'})">
+            <ReviewPointAbbr v-bind="reviewPointViewedByUser"/>
             <InitialReviewButtons :key="buttonKey" @doInitialReview="processForm($event)"/>
           </div>
         </template>
@@ -26,6 +27,7 @@
 <script>
 import ShowReviewPoint from '../components/review/ShowReviewPoint.vue'
 import ReviewSettingForm from '../components/review/ReviewSettingForm.vue'
+import ReviewPointAbbr from '../components/review/ReviewPointAbbr.vue'
 import InitialReviewButtons from '../components/review/InitialReviewButtons.vue'
 import ProgressBar from "../components/commons/ProgressBar.vue"
 import LoadingPage from "./commons/LoadingPage.vue"
@@ -35,7 +37,7 @@ import { restGet, restPost } from "../restful/restful"
 export default {
   name: 'InitialReviewPage',
   props: { nested: Boolean },
-  components: {ShowReviewPoint, ReviewSettingForm, LoadingPage, InitialReviewButtons, Minimizable, ProgressBar},
+  components: {ShowReviewPoint, ReviewSettingForm, LoadingPage, InitialReviewButtons, Minimizable, ProgressBar, ReviewPointAbbr },
   data() {
     return {
       finished: 0,

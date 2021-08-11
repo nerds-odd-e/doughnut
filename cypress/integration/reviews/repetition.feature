@@ -10,12 +10,3 @@ Feature: Repetition
     When choose to remove it from reviews
     Then it should notice the review point change and move to review page
     And On day 100 I should have "0/0" note for initial review and "0/0" for repeat
-
-  Scenario: Repeat again immediately
-    Given I added and learned one note "Fungible" on day 1
-    When I am repeat-reviewing my old note on day 2
-    And I choose to do it again
-    Then I should have "1/1" for repeat now
-    Then I should see the statistics of note "Fungible"
-      | RepetitionCount |
-      | 1               |

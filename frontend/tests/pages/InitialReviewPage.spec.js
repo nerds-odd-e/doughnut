@@ -37,6 +37,7 @@ describe('repeat page', () => {
     await flushPromises()
     expect(mockRouter.push).toHaveBeenCalledTimes(0)
     expect(wrapper.findAll(".initial-review-container")).toHaveLength(1)
+    expect(wrapper.find(".review-point-abbr span").text()).toContain("asdf")
   });
 
 });
