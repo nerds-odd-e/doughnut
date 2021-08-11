@@ -1,6 +1,6 @@
 import RepeatPage from '@/pages/RepeatPage.vue';
 import flushPromises from 'flush-promises';
-import {noteViewedByUser} from '../notes/fixtures'
+import { reviewPointViewedByUser} from '../notes/fixtures'
 import _ from 'lodash'
 import { mountWithMockRoute } from '../helpers'
 
@@ -18,13 +18,6 @@ describe('repeat page', () => {
     expect(fetch).toHaveBeenCalledWith('/api/reviews/repeat', {});
     expect(mockRouter.push).toHaveBeenCalledWith({name: 'reviews'});
   });
-
-  const reviewPointViewedByUser = {
-    reviewPoint: {
-      id: 3,
-    },
-    noteViewedByUser: noteViewedByUser,
-  }
 
   test('replace route with repeat/quiz if there is a quiz', async () => {
     fetch.mockResponseOnce(JSON.stringify({

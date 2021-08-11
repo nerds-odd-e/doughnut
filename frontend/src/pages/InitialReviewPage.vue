@@ -1,22 +1,24 @@
 <template>
-  <Minimizable :minimized="nested">
-    <template #minimizedContent>
-      <div class="initial-review-container" v-on:click="$router.push({name: 'initial'})">
-        <InitialReviewButtons :key="buttonKey" @doInitialReview="processForm($event)"/>
-      </div>
-    </template>
-    <template #fullContent>
-      <LoadingPage v-bind="{loading, contentExists: !!reviewPointViewedByUser}">
-        <ShowReviewPoint v-bind="reviewPointViewedByUser" @updated="fetchData()"/>
-        <div>
-            <div class="mb-2">
-                <ReviewSettingForm v-if="!!reviewPointViewedByUser.reviewSetting" v-model="reviewSetting" :errors="{}"/>
-            </div>
+  <LoadingPage v-bind="{loading, contentExists: !!reviewPointViewedByUser}">
+    <template v-if="!!reviewPoint">
+      <Minimizable :minimized="nested">
+        <template #minimizedContent>
+          <div class="initial-review-container" v-on:click="$router.push({name: 'initial'})">
             <InitialReviewButtons :key="buttonKey" @doInitialReview="processForm($event)"/>
-        </div>
-      </LoadingPage>
+          </div>
+        </template>
+        <template #fullContent>
+              <ShowReviewPoint v-bind="reviewPointViewedByUser" @updated="fetchData()"/>
+              <div>
+                <div class="mb-2">
+                    <ReviewSettingForm v-if="!!reviewPointViewedByUser.reviewSetting" v-model="reviewSetting" :errors="{}"/>
+                </div>
+                <InitialReviewButtons :key="buttonKey" @doInitialReview="processForm($event)"/>
+              </div>
+        </template>
+      </Minimizable>
     </template>
-  </Minimizable>
+  </LoadingPage>
 </template>
 
 <script>

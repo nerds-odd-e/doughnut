@@ -72,4 +72,11 @@ const linkViewedByUser = {
     targetNoteViewedByUser: noteViewedByUser
 }
 
-export {noteViewedByUser, linkViewedByUser}
+const reviewPointViewedByUser = {
+reviewPoint: {
+    id: 3,
+},
+noteViewedByUser: noteViewedByUser,
+}
+
+export {noteViewedByUser, linkViewedByUser, reviewPointViewedByUser}

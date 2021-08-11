@@ -1,7 +1,5 @@
 import Repetition from '@/components/review/Repetition.vue';
-import { createTestRouter } from '../testing_routes'
-import { noteViewedByUser, linkViewedByUser } from "../notes/fixtures"
-import { mount } from '@vue/test-utils';
+import { noteViewedByUser, linkViewedByUser, reviewPointViewedByUser } from "../notes/fixtures"
 import { mountWithMockRoute } from '../helpers'
 
 describe('repetition page', () => {
@@ -11,27 +9,17 @@ describe('repetition page', () => {
   });
 
   describe('repetition page for a note', () => {
-    const reviewPointForView = {
-      reviewPoint: {
-        id: 3,
-      },
-      noteViewedByUser: noteViewedByUser,
-    }
+    const reviewPointForView = { ...reviewPointViewedByUser, noteViewedByUser: noteViewedByUser }
 
     test('for note', async () => {
       const { wrapper } = mountWithMockRoute(Repetition, {propsData: reviewPointForView}, {name: "root"});
       expect(wrapper.findAll(".btn-toolbar")).toHaveLength(1)
     });
 
-  });
+});
 
   describe('repetition page for a link', () => {
-    const reviewPointForView = {
-      reviewPoint: {
-        id: 3,
-      },
-      linkViewedByUser: linkViewedByUser,
-    }
+    const reviewPointForView = { ...reviewPointViewedByUser, linkViewedByUser: linkViewedByUser }
 
     test('for link', async () => {
       const { wrapper } = mountWithMockRoute(Repetition, {propsData: reviewPointForView}, {name: "root"});
