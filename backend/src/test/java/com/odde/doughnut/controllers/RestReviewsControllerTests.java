@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.json.ReviewPointViewedByUser;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
@@ -49,6 +50,16 @@ class RestReviewsControllerTests {
         void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
             userModel = makeMe.aNullUserModel();
             assertThrows(ResponseStatusException.class, () -> controller().overview());
+        }
+    }
+
+    @Nested
+    class initalReview {
+        @Test
+        void initialReview() {
+            makeMe.aNote().byUser(userModel).please();
+            ReviewPointViewedByUser reviewPointViewedByUser = controller().initialReview();
+            assertThat(reviewPointViewedByUser.getRemainingInitialReviewCountForToday(), equalTo(1));
         }
     }
 

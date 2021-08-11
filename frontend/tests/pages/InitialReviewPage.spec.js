@@ -20,13 +20,15 @@ describe('repeat page', () => {
   });
 
   test('normal view', async () => {
-    fetch.mockResponseOnce(JSON.stringify(reviewPointViewedByUser));
+    fetch.mockResponseOnce(JSON.stringify({...reviewPointViewedByUser, remainingInitialReviewCountForToday: 53}));
     const { wrapper, mockRouter} = mountWithMockRoute(InitialReviewPage, {}, {name: 'initial'});
     await flushPromises()
     expect(fetch).toHaveBeenCalledTimes(1)
     expect(fetch).toHaveBeenCalledWith('/api/reviews/initial', {})
     expect(mockRouter.push).toHaveBeenCalledTimes(0)
     expect(wrapper.findAll(".initial-review-container")).toHaveLength(0)
+    expect(wrapper.findAll(".pause-stop")).toHaveLength(1)
+    expect(wrapper.find(".progress-text").text()).toContain("Initial Review: 0/53")
   });
 
   test('minimized view', async () => {

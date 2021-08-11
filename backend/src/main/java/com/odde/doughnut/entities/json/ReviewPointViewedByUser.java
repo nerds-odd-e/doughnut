@@ -18,6 +18,9 @@ public class ReviewPointViewedByUser {
     @Getter
     @Setter
     private ReviewSetting reviewSetting;
+    @Getter
+    @Setter
+    private Integer remainingInitialReviewCountForToday;
 
     public static ReviewPointViewedByUser from(ReviewPoint reviewPoint, UserModel user) {
         ReviewPointViewedByUser result = new ReviewPointViewedByUser();

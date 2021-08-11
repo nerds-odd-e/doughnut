@@ -1,28 +1,22 @@
 <template>
-<div class="review-info-bar">
-
-  <StopRepeatButton />
-  <ViewLastResultButton v-bind="{hasLastResult}" @viewLastResult="$emit('viewLastResult')"/>
-  <PauseRepeatButton v-bind="{noteId, linkId, allowPause, btn}"/>
-  <div class="review-info-bar-right">
-    <span :class="`progress-bar ${!!$slots.default ? 'thin' : ''}`" v-if="toRepeatCount !== null">
-      <span class="progress" :style="`width: ${finished * 100 / (finished + toRepeatCount)}%`">
-      </span>
-      <span class="progress-text">
-      {{finished}}/{{finished + toRepeatCount}}
-      </span>
-    </span>
+<ProgressBar v-bind="{finished, toRepeatCount}">
+  <template #buttons>
+    <ViewLastResultButton v-bind="{hasLastResult}" @viewLastResult="$emit('viewLastResult')"/>
+    <PauseRepeatButton v-bind="{noteId, linkId, allowPause, btn}"/>
+  </template>
+  <template #default>
     <slot />
-  </div>
-</div>
+  </template>
+</ProgressBar>
 </template>
+
 <script>
-import StopRepeatButton from "./StopRepeatButton.vue"
 import PauseRepeatButton from "./PauseRepeatButton.vue"
 import ViewLastResultButton from "./ViewLastResultButton.vue"
+import ProgressBar from "../commons/ProgressBar.vue"
 
 export default {
-  components: { StopRepeatButton, PauseRepeatButton, ViewLastResultButton },
+  components: { PauseRepeatButton, ViewLastResultButton, ProgressBar },
   props: {
     noteId: Number,
     linkId: Number,

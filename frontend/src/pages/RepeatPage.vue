@@ -4,17 +4,17 @@
       <Minimizable :minimized="nested" staticHeight="75px">
         <template #minimizedContent>
           <div class="repeat-container" v-on:click="backToRepeat()">
-            <ProgressBar :allowPause="!quizMode" :btn="`play`" v-bind="{linkId, noteId, finished, toRepeatCount: repetition.toRepeatCount, hasLastResult}" @viewLastResult="viewLastResult()">
+            <RepeatProgressBar :allowPause="!quizMode" :btn="`play`" v-bind="{linkId, noteId, finished, toRepeatCount: repetition.toRepeatCount, hasLastResult}" @viewLastResult="viewLastResult()">
               <Repetition
                 v-bind="{...reviewPointViewedByUser, answerResult, compact: true}"
                 @selfEvaluate="selfEvaluate($event)"
                 @updated="refresh()"
                 />
-            </ProgressBar>
+            </RepeatProgressBar>
           </div>
         </template>
         <template #fullContent>
-          <ProgressBar :allowPause="!quizMode" v-bind="{linkId, noteId, finished, toRepeatCount: repetition.toRepeatCount, hasLastResult}" @viewLastResult="viewLastResult()"/>
+          <RepeatProgressBar :allowPause="!quizMode" v-bind="{linkId, noteId, finished, toRepeatCount: repetition.toRepeatCount, hasLastResult}" @viewLastResult="viewLastResult()"/>
           <Quiz v-if="quizMode" v-bind="repetition" @answer="processAnswer($event)"/>
           <template v-else>
             <template v-if="reviewPointViewedByUser">
@@ -39,13 +39,13 @@ import Quiz from '../components/review/Quiz.vue'
 import Repetition from '../components/review/Repetition.vue'
 import LoadingPage from "./commons/LoadingPage.vue"
 import NoteStatisticsButton from '../components/notes/NoteStatisticsButton.vue'
-import ProgressBar from "../components/review/ProgressBar.vue"
+import RepeatProgressBar from "../components/review/RepeatProgressBar.vue"
 import { restGet, restPost } from "../restful/restful"
 
 export default {
   name: 'RepeatPage',
   props: { nested: Boolean },
-  components: { Minimizable, Quiz, Repetition, LoadingPage, NoteStatisticsButton, ProgressBar },
+  components: { Minimizable, Quiz, Repetition, LoadingPage, NoteStatisticsButton, RepeatProgressBar },
   data() {
     return {
       repetition: null,

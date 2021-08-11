@@ -46,7 +46,9 @@ class RestReviewsController {
         UserModel user = currentUserFetcher.getUser();
         Reviewing reviewing = user.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
         ReviewPoint reviewPoint = reviewing.getOneInitialReviewPoint();
-        return ReviewPointViewedByUser.from(reviewPoint, user);
+        ReviewPointViewedByUser from = ReviewPointViewedByUser.from(reviewPoint, user);
+        from.setRemainingInitialReviewCountForToday(reviewing.toInitialReviewCount());
+        return from;
     }
 
     static class InitialInfo {
