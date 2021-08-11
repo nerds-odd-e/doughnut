@@ -1,11 +1,15 @@
 package com.odde.doughnut.configs;
 
-import org.springframework.context.annotation.Bean;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractAuthenticationFilterConfigurer;
-import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.stereotype.Component;
 
+@Component
 public class CommonConfiguration {
+    @Autowired
+    public AccountAwareUrlAuthenticationSuccessHandler accountAwareUrlAuthenticationSuccessHandler;
+
   void commonConfig(HttpSecurity http, AbstractAuthenticationFilterConfigurer authenticationFilterConfigurer) throws Exception {
     HttpSecurity config =  http.authorizeRequests()
         .mvcMatchers("/robots.txt")
@@ -23,11 +27,6 @@ public class CommonConfiguration {
                        .logoutSuccessUrl("/")
                        .invalidateHttpSession(true)
                        .permitAll());
-    authenticationFilterConfigurer.successHandler(myAuthenticationSuccessHandler());
+    authenticationFilterConfigurer.successHandler(accountAwareUrlAuthenticationSuccessHandler);
   }
-
-    @Bean
-    public AuthenticationSuccessHandler myAuthenticationSuccessHandler(){
-        return new MySimpleUrlAuthenticationSuccessHandler();
-    }
 }

@@ -6,4 +6,6 @@ public interface CurrentUserFetcher {
     UserModel getUser();
 
     String getExternalIdentifier();
+
+    void setExternalIdentifier(String name);
 }

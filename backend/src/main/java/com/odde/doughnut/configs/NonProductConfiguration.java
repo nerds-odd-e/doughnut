@@ -1,6 +1,6 @@
 package com.odde.doughnut.configs;
 
-import com.odde.doughnut.configs.CommonConfiguration;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
@@ -13,8 +13,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Profile({"e2e", "test", "dev"})
 public class NonProductConfiguration extends WebSecurityConfigurerAdapter {
 
-  private final CommonConfiguration commonConfiguration =
-      new CommonConfiguration();
+  @Autowired
+  private CommonConfiguration commonConfiguration;
 
   @Override
   protected void configure(AuthenticationManagerBuilder auth) throws Exception {
