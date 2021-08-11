@@ -1,7 +1,7 @@
 <template>
   <LoadingPage v-bind="{loading, contentExists: !!reviewPointViewedByUser}">
     <template v-if="!!reviewPoint">
-      <ProgressBar v-bind="{title: `Initial Review: `, finished: 0, toRepeatCount: reviewPointViewedByUser.remainingInitialReviewCountForToday}">
+      <ProgressBar v-bind="{title: `Initial Review: `, finished, toRepeatCount: reviewPointViewedByUser.remainingInitialReviewCountForToday}">
       </ProgressBar>
       <Minimizable :minimized="nested">
         <template #minimizedContent>
@@ -38,6 +38,7 @@ export default {
   components: {ShowReviewPoint, ReviewSettingForm, LoadingPage, InitialReviewButtons, Minimizable, ProgressBar},
   data() {
     return {
+      finished: 0,
       reviewPointViewedByUser: null,
       loading: null
     }
@@ -57,6 +58,8 @@ export default {
     },
 
     async processForm(skipReview) {
+      this.finished += 1
+      this.reviewPointViewedByUser.remainingInitialReviewCountForToday -= 1
       if(skipReview) {
         if(!await this.$popups.confirm('Are you sure to hide this note from reviewing in the future?')) return;
       }
