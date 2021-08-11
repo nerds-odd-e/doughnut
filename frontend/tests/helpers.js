@@ -15,8 +15,9 @@ const mountWithMockRoute = (comp, options, currentRoute) => {
             {
             global: {
                 mocks: {
-                $route: mockRoute,
-                $router: mockRouter
+                    $staticInfo: null,
+                    $route: mockRoute,
+                    $router: mockRouter
                 },
                 stubs: {'router-view': true, 'router-link': {props: ['to'], template: `<a class="router-link" :to='JSON.stringify(to)'><slot/></a>`}}
             },

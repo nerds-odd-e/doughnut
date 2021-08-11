@@ -1,9 +1,8 @@
 import NoteShowPage from '@/pages/NoteShowPage.vue';
-import { mount } from '@vue/test-utils';
+import { mountWithMockRoute } from '../helpers'
 import flushPromises from 'flush-promises';
 import {noteViewedByUser} from '../notes/fixtures'
 import _ from 'lodash'
-import { createTestRouter } from '../testing_routes'
 
 beforeEach(() => {
   fetch.resetMocks();
@@ -25,9 +24,8 @@ const stubResponse = _.merge(noteViewedByUser,
 describe('note show', () => {
 
   test('fetch API to be called ONCE', async () => {
-    const testingRouter = await createTestRouter();
     fetch.mockResponseOnce(JSON.stringify(stubResponse));
-    const wrapper = mount(NoteShowPage, {propsData: {noteId: 123}, global: { plugins: [testingRouter] }});
+    const { wrapper } = mountWithMockRoute(NoteShowPage, {propsData: {noteId: 123}});
     await flushPromises()
     expect(fetch).toHaveBeenCalledTimes(1);
     expect(fetch).toHaveBeenCalledWith('/api/notes/123', {});

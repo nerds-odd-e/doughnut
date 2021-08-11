@@ -19,8 +19,7 @@ describe('repetition page', () => {
     }
 
     test('for note', async () => {
-      const testingRouter = await createTestRouter("/");
-      const wrapper = mount(Repetition, {propsData: reviewPointForView, global: { plugins: [testingRouter] }});
+      const { wrapper } = mountWithMockRoute(Repetition, {propsData: reviewPointForView}, {name: "root"});
       expect(wrapper.findAll(".btn-toolbar")).toHaveLength(1)
     });
 
@@ -35,8 +34,7 @@ describe('repetition page', () => {
     }
 
     test('for link', async () => {
-      const testingRouter = await createTestRouter("/");
-      const wrapper = mount(Repetition, {propsData: reviewPointForView, global: { plugins: [testingRouter] }});
+      const { wrapper } = mountWithMockRoute(Repetition, {propsData: reviewPointForView}, {name: "root"});
       expect(wrapper.findAll(".btn-toolbar")).toHaveLength(1)
     });
 
