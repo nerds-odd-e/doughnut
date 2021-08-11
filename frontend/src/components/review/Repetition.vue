@@ -1,6 +1,6 @@
 <template>
   <template v-if="compact">
-      <SelfEvaluateButtons v-bind="{sadButton, otherButtons}" :key="buttonKey" @selfEvaluate="selfEvaluate($event)"/>
+      <SelfEvaluateButtons v-bind="{sadButton}" :key="buttonKey" @selfEvaluate="selfEvaluate($event)"/>
   </template>
   <template v-else>
     <div v-if="answerResult">
@@ -12,7 +12,7 @@
 
     <ShowReviewPoint v-bind="{ noteViewedByUser, linkViewedByUser}" @updated="$emit('updated')"/>
     <div class="btn-toolbar justify-content-between">
-      <SelfEvaluateButtons v-bind="{sadButton, otherButtons}" :key="buttonKey"  @selfEvaluate="selfEvaluate($event)"/>
+      <SelfEvaluateButtons v-bind="{sadButton}" :key="buttonKey"  @selfEvaluate="selfEvaluate($event)"/>
       <button class="btn" title="remove this note from review" @click="removeFromReview()">
           <SvgNoReview/>
       </button>
@@ -55,11 +55,7 @@
       },
 
       sadButton() {
-        return !this.answerResult || !this.answerResult.correct
-      },
-
-      otherButtons() {
-        return !this.answerResult || this.answerResult.correct
+        return !!this.answerResult && !this.answerResult.correct
       },
 
     },

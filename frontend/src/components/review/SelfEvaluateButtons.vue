@@ -5,7 +5,7 @@
               title="repeat immediately">
           <SvgFailed/>
       </button>
-      <template v-if="otherButtons">
+      <template v-else>
         <button class="btn btn-light" id="repeat-sad" name="sad"
               @click.once="processForm('sad')"
                 title="reduce next repeat interval (days) by half">
@@ -32,7 +32,7 @@
   import SvgHappy from "../svgs/SvgHappy.vue"
 
   export default {
-    props: { sadButton: Boolean, otherButtons: Boolean },
+    props: { sadButton: Boolean },
     emits: ['selfEvaluate'],
     components: { SvgSad, SvgSatisfying, SvgFailed, SvgHappy },
     methods: {
