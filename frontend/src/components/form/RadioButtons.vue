@@ -1,9 +1,9 @@
 <template>
-  <InputWithType v-bind="{scopeName, errors}">
-      <span class="form-check form-check-inline" v-for="option in options" :key="option.value">
+  <InputWithType v-bind="{scopeName, field, errors}">
+      <output :id="`${scopeName}-${field}`" role="radiogroup" v-for="option in options" :key="option.value">
         <input class="form-check-input" type="radio" :value="option.value" :id="`${scopeName}-${option.value}`" v-model="modelValue">
         <label class="form-check-label" :for="`${scopeName}-${option.value}`">{{option.label}}</label>
-      </span>
+      </output>
   </InputWithType>
 </template>
 

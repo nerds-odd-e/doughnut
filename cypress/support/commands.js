@@ -120,8 +120,8 @@ Cypress.Commands.add('submitNoteFormWith', noteAttributes => {
               mimeType: 'image/png'
             });
           });
-        } else if ($input.is('select')) {
-          cy.wrap($input).select(value);
+        } else if ($input.attr('role') ==='radiogroup') {
+            cy.findByRole('radio', {name: value}).click();
         } else {
           cy.wrap($input)
             .clear()
