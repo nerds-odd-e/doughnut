@@ -38,7 +38,7 @@ Feature: Nested Note CRUD
       | note-title   |
       | Re-quirement |
       | Re-Design    |
-    And On the current page, I should see "LeSS in Action" has link "is a generalization of" "Re-Design"
+    And On the current page, I should see "LeSS in Action" has link "a generalization of" "Re-Design"
 
   Scenario: Edit a note
     When I am editing note "LeSS in Action" the field should be pre-filled with

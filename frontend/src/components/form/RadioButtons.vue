@@ -20,9 +20,7 @@ export default {
       this.$emit('update:modelValue', this.modelValue)
     }
   }
-
 }
-
 </script>
 
 <style lang="sass" scoped>
