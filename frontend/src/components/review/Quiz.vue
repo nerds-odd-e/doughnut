@@ -51,7 +51,7 @@ export default {
         return this.reviewPointViewedByUser.linkViewedByUser.sourceNoteViewedByUser
     },
     pictureQuestion() {
-        return quizQuestion.questionType === 'PICTURE_TITLE'
+        return this.quizQuestion.questionType === 'PICTURE_TITLE'
     }
   },
   methods: {
