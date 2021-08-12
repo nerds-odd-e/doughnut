@@ -26,7 +26,7 @@ import static org.hamcrest.Matchers.*;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
-class QuizQuestionTypeLinkSourceExclusiveTest {
+class LinkTargetExclusiveQuizFactoryTest {
     @Autowired
     MakeMe makeMe;
     UserModel userModel;

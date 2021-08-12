@@ -20,37 +20,35 @@ import static com.odde.doughnut.entities.QuizQuestion.QuestionType.*;
 public class Link {
 
     public enum LinkType {
-        RELATED_TO                      (1, "related note", "related to", "is not related to", "is related to", new QuestionType[]{}),
-        SPECIALIZE                      (2, "specification", "a specialization of", "is not a specialization of", "is a generalization of", new QuestionType[]{LINK_TARGET, LINK_SOURCE, WHICH_SPEC_HAS_INSTANCE, FROM_SAME_PART_AS, FROM_DIFFERENT_PART_AS, DESCRIPTION_LINK_TARGET}),
-        APPLICATION                     (3, "application", "an application of", "is not an application of", "is a summary of", new QuestionType[]{LINK_TARGET, LINK_SOURCE, WHICH_SPEC_HAS_INSTANCE, FROM_SAME_PART_AS, FROM_DIFFERENT_PART_AS, DESCRIPTION_LINK_TARGET}),
+        RELATED_TO                      (1, "related note", "related to", "related to", new QuestionType[]{}),
+        SPECIALIZE                      (2, "specification", "a specialization of", "a generalization of", new QuestionType[]{LINK_TARGET, LINK_SOURCE, WHICH_SPEC_HAS_INSTANCE, FROM_SAME_PART_AS, FROM_DIFFERENT_PART_AS, DESCRIPTION_LINK_TARGET}),
+        APPLICATION                     (3, "application", "an application of", "applied to", new QuestionType[]{LINK_TARGET, LINK_SOURCE, WHICH_SPEC_HAS_INSTANCE, FROM_SAME_PART_AS, FROM_DIFFERENT_PART_AS, DESCRIPTION_LINK_TARGET}),
 
-        INSTANCE                        (4, "instance", "an instance of", "is not an instance of", "has instances", new QuestionType[]{LINK_TARGET, LINK_SOURCE, WHICH_SPEC_HAS_INSTANCE, FROM_SAME_PART_AS, FROM_DIFFERENT_PART_AS, DESCRIPTION_LINK_TARGET}),
-        /*INTEGRATED*/ PART             (6, "part", "a part of", "is not a part of", "has parts", new QuestionType[]{LINK_TARGET, LINK_SOURCE, LINK_SOURCE_EXCLUSIVE, WHICH_SPEC_HAS_INSTANCE, FROM_SAME_PART_AS, FROM_DIFFERENT_PART_AS, DESCRIPTION_LINK_TARGET}),
-        /*NON INTEGRATED*/ TAGGED_BY    (8, "tag target", "tagged by", "is not tagged by", "tagging", new QuestionType[]{LINK_TARGET, LINK_SOURCE, LINK_SOURCE_EXCLUSIVE, WHICH_SPEC_HAS_INSTANCE, WHICH_SPEC_HAS_INSTANCE, DESCRIPTION_LINK_TARGET}),
-        ATTRIBUTE                       (10, "attribute", "an attribute of", "is not an attribute of", "has attributes", new QuestionType[]{LINK_TARGET, LINK_SOURCE, WHICH_SPEC_HAS_INSTANCE, WHICH_SPEC_HAS_INSTANCE, DESCRIPTION_LINK_TARGET }),
+        INSTANCE                        (4, "instance", "an instance of", "has instances", new QuestionType[]{LINK_TARGET, LINK_SOURCE, WHICH_SPEC_HAS_INSTANCE, FROM_SAME_PART_AS, FROM_DIFFERENT_PART_AS, DESCRIPTION_LINK_TARGET}),
+        /*INTEGRATED*/ PART             (6, "part", "a part of", "has parts", new QuestionType[]{LINK_TARGET, LINK_SOURCE, LINK_SOURCE_EXCLUSIVE, WHICH_SPEC_HAS_INSTANCE, FROM_SAME_PART_AS, FROM_DIFFERENT_PART_AS, DESCRIPTION_LINK_TARGET}),
+        /*NON INTEGRATED*/ TAGGED_BY    (8, "tag target", "tagged by", "tagging", new QuestionType[]{LINK_TARGET, LINK_SOURCE, LINK_SOURCE_EXCLUSIVE, WHICH_SPEC_HAS_INSTANCE, WHICH_SPEC_HAS_INSTANCE, DESCRIPTION_LINK_TARGET}),
+        ATTRIBUTE                       (10, "attribute", "an attribute of", "has attributes", new QuestionType[]{LINK_TARGET, LINK_SOURCE, WHICH_SPEC_HAS_INSTANCE, WHICH_SPEC_HAS_INSTANCE, DESCRIPTION_LINK_TARGET }),
 
-        OPPOSITE_OF                     (12, "opposition", "the opposite of", "is not the opposite of", "is the opposite", new QuestionType[]{LINK_TARGET, LINK_SOURCE, DESCRIPTION_LINK_TARGET}),
-        AUTHOR_OF                       (14, "author", "author of", "is not author of", "is brought by", new QuestionType[]{LINK_TARGET, LINK_SOURCE, LINK_SOURCE_EXCLUSIVE, DESCRIPTION_LINK_TARGET}),
-        USES                            (15, "user", "using", "is not using", "is used by", new QuestionType[]{LINK_TARGET, LINK_SOURCE, LINK_SOURCE_EXCLUSIVE, WHICH_SPEC_HAS_INSTANCE, FROM_SAME_PART_AS, FROM_DIFFERENT_PART_AS, DESCRIPTION_LINK_TARGET}),
-        EXAMPLE_OF                      (17, "example", "an example of", "is not an example of", "has as examples", new QuestionType[]{LINK_SOURCE, LINK_SOURCE_EXCLUSIVE, CLOZE_LINK_TARGET, FROM_SAME_PART_AS, FROM_DIFFERENT_PART_AS}),
-        PRECEDES                        (19, "precedence", "before", "is not before", "is after", new QuestionType[]{LINK_TARGET, LINK_SOURCE, LINK_SOURCE_EXCLUSIVE, DESCRIPTION_LINK_TARGET}),
-        SIMILAR_TO                      (22, "thing", "similar to", "is not similar to", "is similar to", new QuestionType[]{LINK_TARGET, LINK_SOURCE, DESCRIPTION_LINK_TARGET}),
-        CONFUSE_WITH                    (23, "thing", "confused with", "is not confused with", "is confused with", new QuestionType[]{});
+        OPPOSITE_OF                     (12, "opposition", "the opposite of", "the opposite of", new QuestionType[]{LINK_TARGET, LINK_SOURCE, DESCRIPTION_LINK_TARGET}),
+        AUTHOR_OF                       (14, "author", "author of", "brought by", new QuestionType[]{LINK_TARGET, LINK_SOURCE, LINK_SOURCE_EXCLUSIVE, DESCRIPTION_LINK_TARGET}),
+        USES                            (15, "user", "using", "used by", new QuestionType[]{LINK_TARGET, LINK_SOURCE, LINK_SOURCE_EXCLUSIVE, WHICH_SPEC_HAS_INSTANCE, FROM_SAME_PART_AS, FROM_DIFFERENT_PART_AS, DESCRIPTION_LINK_TARGET}),
+        EXAMPLE_OF                      (17, "example", "an example of", "has examples", new QuestionType[]{LINK_SOURCE, LINK_SOURCE_EXCLUSIVE, CLOZE_LINK_TARGET, FROM_SAME_PART_AS, FROM_DIFFERENT_PART_AS}),
+        PRECEDES                        (19, "precedence", "before", "after", new QuestionType[]{LINK_TARGET, LINK_SOURCE, LINK_SOURCE_EXCLUSIVE, DESCRIPTION_LINK_TARGET}),
+        SIMILAR_TO                      (22, "thing", "similar to", "similar to", new QuestionType[]{LINK_TARGET, LINK_SOURCE, DESCRIPTION_LINK_TARGET}),
+        CONFUSE_WITH                    (23, "thing", "confused with", "confused with", new QuestionType[]{});
 
         @JsonValue
         public final String label;
         public final String nameOfSource;
         public final Integer id;
-        public final String exclusiveQuestion;
         public String reversedLabel;
         @Getter
         private final QuestionType[] questionTypes;
 
-        LinkType(Integer id, String nameOfSource, String label, String exclusiveQuestion, String reversedLabel, QuestionType[] questionTypes) {
+        LinkType(Integer id, String nameOfSource, String label, String reversedLabel, QuestionType[] questionTypes) {
             this.nameOfSource = nameOfSource;
             this.label = label;
             this.id = id;
-            this.exclusiveQuestion = exclusiveQuestion;
             this.reversedLabel = reversedLabel;
             this.questionTypes = questionTypes;
         }
@@ -149,11 +147,6 @@ public class Link {
     @JsonIgnore
     public List<Link> getPiblingLinksOfSameLinkType(User viewer) {
         return sourceNote.linksOfTypeThroughDirect(List.of(getLinkType()), viewer).filter(l->!l.equals(this)).collect(Collectors.toList());
-    }
-
-    @JsonIgnore
-    public String getExclusiveQuestion() {
-        return getLinkType().exclusiveQuestion.replace("not ", "<em>NOT</em> ");
     }
 
     @JsonIgnore
