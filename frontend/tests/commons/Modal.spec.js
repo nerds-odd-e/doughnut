@@ -26,7 +26,7 @@ describe('Modal', () => {
 
   test('click on note when doing review', async () => {
     const wrapper = mount(TestComponent);
-    await wrapper.find(".modal-wrapper").trigger('click')
+    await wrapper.find(".modal-wrapper").trigger('mousedown')
     expect(wrapper.emitted().close_request).toHaveLength(1)
   });
 

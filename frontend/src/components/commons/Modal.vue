@@ -1,7 +1,7 @@
 <template>
   <transition name="modal">
     <div class="modal-mask">
-      <div class="modal-wrapper" v-on:click.self="$emit('close_request')">
+      <div class="modal-wrapper" v-on:mousedown.self="$emit('close_request')">
         <div class="modal-container">
           <button class="close-button" @click="$emit('close_request')"><SvgClose/></button>
 
