@@ -1,5 +1,5 @@
 <template>
-  <Select v-if="!!$staticInfo"
+  <RadioButtons v-if="!!$staticInfo"
     v-model="modelValue"
     @update:modelValue="$emit('update:modelValue', $event)"
     v-bind="{scopeName, field, options, errors}"
@@ -7,12 +7,12 @@
 </template>
 
 <script>
-import Select from "../form/Select.vue"
+import RadioButtons from "../form/RadioButtons.vue"
 
 export default {
   name: 'LinkTypeSelect',
   props: { scopeName: String, modelValue: Object, errors: Object, allowEmpty: {type: Boolean, default: false}, field: {type: String, defalt: 'linkType'} },
-  components: {Select},
+  components: {RadioButtons},
   emits: ['update:modelValue'],
   computed: {
     options() {
