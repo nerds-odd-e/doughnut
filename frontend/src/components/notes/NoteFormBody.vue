@@ -7,8 +7,6 @@
     <TextInput scopeName='note' field='pictureMask' v-model="modelValue.pictureMask" :errors="errors.pictureMask"/>
     <TextInput scopeName='note' field='url' v-model="modelValue.url" :errors="errors.url"/>
     <CheckInput scopeName='note' field='urlIsVideo' v-model="modelValue.urlIsVideo" :errors="errors.urlIsVideo"/>
-    <CheckInput scopeName='note' field='hideTitleInArticle' v-model="modelValue.hideTitleInArticle" :errors="errors.hideTitleInArticle"/>
-    <CheckInput scopeName='note' field='showAsBulletInArticle' v-model="modelValue.showAsBulletInArticle" :errors="errors.showAsBulletInArticle"/>
     <CheckInput scopeName='note' field='skipReview' v-model="modelValue.skipReview" :errors="errors.skipReview"/>
 </template>
 
