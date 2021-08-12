@@ -1,10 +1,10 @@
 <template>
     <NoteBreadcrumbForReview :ancestors="quizQuestion.scope"/>
-    <div v-if="quizQuestion.questionType === 'PICTURE_TITLE'">
+    <div v-if="pictureQuestion">
         <ShowPicture :note="sourceNote.note" :opacity="1"/>
     </div>
     <div class="quiz-instruction">
-        <pre style="white-space: pre-wrap;" v-if="!quizQuestion.pictureQuestion" v-html="quizQuestion.description"/>
+        <pre style="white-space: pre-wrap;" v-if="!pictureQuestion" v-html="quizQuestion.description"/>
         <h2 v-if="!!quizQuestion.mainTopic" class="text-center">{{quizQuestion.mainTopic}}</h2>
     </div>
 
@@ -49,6 +49,9 @@ export default {
     sourceNote(){
         if (!!this.reviewPointViewedByUser.noteViewedByUser) return this.reviewPointViewedByUser.noteViewedByUser
         return this.reviewPointViewedByUser.linkViewedByUser.sourceNoteViewedByUser
+    },
+    pictureQuestion() {
+        return quizQuestion.questionType === 'PICTURE_TITLE'
     }
   },
   methods: {
