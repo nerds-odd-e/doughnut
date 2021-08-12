@@ -31,12 +31,11 @@ public class Link {
 
         OPPOSITE_OF                     (12, "opposition", "is the opposite of", "is not the opposite of", "is the opposite", new QuestionType[]{LINK_TARGET, LINK_SOURCE, DESCRIPTION_LINK_TARGET}),
         AUTHOR_OF                       (14, "author", "is author of", "is not author of", "is brought by", new QuestionType[]{LINK_TARGET, LINK_SOURCE, LINK_SOURCE_EXCLUSIVE, DESCRIPTION_LINK_TARGET}),
-        USES                            (15, "user", "uses", "does not use", "is used by", new QuestionType[]{LINK_TARGET, LINK_SOURCE, LINK_SOURCE_EXCLUSIVE, WHICH_SPEC_HAS_INSTANCE, FROM_SAME_PART_AS, FROM_DIFFERENT_PART_AS, DESCRIPTION_LINK_TARGET}),
+        USES                            (15, "user", "is using", "is not using", "is used by", new QuestionType[]{LINK_TARGET, LINK_SOURCE, LINK_SOURCE_EXCLUSIVE, WHICH_SPEC_HAS_INSTANCE, FROM_SAME_PART_AS, FROM_DIFFERENT_PART_AS, DESCRIPTION_LINK_TARGET}),
         EXAMPLE_OF                      (17, "example", "is an example of", "is not an example of", "has as examples", new QuestionType[]{LINK_SOURCE, LINK_SOURCE_EXCLUSIVE, CLOZE_LINK_TARGET, FROM_SAME_PART_AS, FROM_DIFFERENT_PART_AS}),
-        PRECEDES                        (19, "precedence", "precedes", "does not precede", "succeeds", new QuestionType[]{LINK_TARGET, LINK_SOURCE, LINK_SOURCE_EXCLUSIVE, DESCRIPTION_LINK_TARGET}),
-        SAME_AS                         (21, "thing", "is the same as", "is not the same as", "is the same as", new QuestionType[]{LINK_TARGET, LINK_SOURCE, DESCRIPTION_LINK_TARGET}),
+        PRECEDES                        (19, "precedence", "is before", "is not before", "is after", new QuestionType[]{LINK_TARGET, LINK_SOURCE, LINK_SOURCE_EXCLUSIVE, DESCRIPTION_LINK_TARGET}),
         SIMILAR_TO                      (22, "thing", "is similar to", "is not similar to", "is similar to", new QuestionType[]{LINK_TARGET, LINK_SOURCE, DESCRIPTION_LINK_TARGET}),
-        CONFUSE_WITH                    (23, "thing", "confuses with", "does not confuse with", "confuses with", new QuestionType[]{});
+        CONFUSE_WITH                    (23, "thing", "is confused with", "is not confused with", "is confused with", new QuestionType[]{});
 
         @JsonValue
         public final String label;
