@@ -34,40 +34,10 @@ class RestHealthCheckController {
     public String dataUpgrade() {
         modelFactoryService.linkRepository.findAll().forEach(l->{
 
-            if (l.getLinkType() == GENERALIZE) {
-                l.setLinkType(SPECIALIZE);
-            }
-            if (l.getLinkType() == HAS_INSTANCE) {
-                l.setLinkType(INSTANCE);
-            }
-            if (l.getLinkType() == HAS_PART) {
-                l.setLinkType(PART);
-            }
-            if (l.getLinkType() == TAGGING) {
-                l.setLinkType(TAGGED_BY);
-            }
-            if (l.getLinkType() == HAS_ATTRIBUTE) {
-                l.setLinkType(ATTRIBUTE);
-            }
-            if (l.getLinkType() == BROUGHT_BY) {
-                l.setLinkType(AUTHOR_OF);
-            }
-            if (l.getLinkType() == USED_BY) {
-                l.setLinkType(USES);
-            }
-            if (l.getLinkType() == HAS_AS_EXAMPLE) {
-                l.setLinkType(EXAMPLE_OF);
-            }
-            if (l.getLinkType() == SUCCEEDS) {
-                l.setLinkType(PRECEDES);
-            }
-            if (List.of(GENERALIZE, HAS_INSTANCE, HAS_PART, TAGGING, HAS_INSTANCE, BROUGHT_BY, USED_BY, HAS_AS_EXAMPLE, SUCCEEDS).contains(l.getLinkType())) {
-                Note temp = l.getSourceNote();
-                l.setSourceNote(l.getTargetNote());
-                l.setTargetNote(temp);
+            if (l.getLinkType() == SAME_AS) {
+                l.setLinkType(SIMILAR_TO);
                 modelFactoryService.linkRepository.save(l);
             }
-
         });
 
         return "OK. Active Profile: " + String.join(", ", environment.getActiveProfiles());
