@@ -39,7 +39,7 @@ public class WhichSpecHasInstanceQuizFactory implements QuizQuestionFactory {
 
     @Override
     public String generateInstruction() {
-        return "<p>Which one " + link.getLinkTypeLabel() + " <mark>"+link.getTargetNote().getTitle()+"</mark> <em>and</em> " + cachedInstanceLink.getLinkTypeLabel() + " <mark>" + cachedInstanceLink.getTargetNote().getTitle() + "</mark>:" ;
+        return "<p>Which one is " + link.getLinkTypeLabel() + " <mark>"+link.getTargetNote().getTitle()+"</mark> <em>and</em> is " + cachedInstanceLink.getLinkTypeLabel() + " <mark>" + cachedInstanceLink.getTargetNote().getTitle() + "</mark>:" ;
     }
 
     @Override

@@ -34,7 +34,7 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory {
 
     @Override
     public String generateInstruction() {
-        return "<p>Which one <mark>" +link.getLinkTypeLabel() +"</mark> the same <mark>" + categoryLink.map(lk->lk.getTargetNote().getTitle()).orElse("") + "</mark> as:";
+        return "<p>Which one <mark>is " +link.getLinkTypeLabel() +"</mark> the same <mark>" + categoryLink.map(lk->lk.getTargetNote().getTitle()).orElse("") + "</mark> as:";
     }
 
     @Override

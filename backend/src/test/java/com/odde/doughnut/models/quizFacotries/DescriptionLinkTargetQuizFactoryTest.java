@@ -27,7 +27,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
-class QuizQuestionTypeDescriptionLinkTargetTest {
+class DescriptionLinkTargetQuizFactoryTest {
+
     @Autowired
     MakeMe makeMe;
     UserModel userModel;

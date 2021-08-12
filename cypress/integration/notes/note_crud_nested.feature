@@ -32,7 +32,7 @@ Feature: Nested Note CRUD
       | Re-quirement | Re-think the way we do requirement |
     When I create a sibling note of "Re-quirement":
       | Title     | Description                   | Link Type To Parent    |
-      | Re-Design | Re-think the way we do design | is a specialization of |
+      | Re-Design | Re-think the way we do design | a specialization of |
     When I open "LeSS in Action" note from top level
     And I should see these notes as children
       | note-title   |
