@@ -5,8 +5,8 @@ import SvgLinkTypeApplication from '../components/svgs/link_types/SvgLinkTypeApp
 import SvgLinkTypeInstance from '../components/svgs/link_types/SvgLinkTypeInstance.vue';
 import SvgLinkTypePart from '../components/svgs/link_types/SvgLinkTypePart.vue';
 import SvgLinkTypeSimilar from '../components/svgs/link_types/SvgLinkTypeSimilar.vue';
+import SvgLinkTypeExample from '../components/svgs/link_types/SvgLinkTypeExample.vue';
 import SvgLinkTypePrecede from '../components/svgs/link_types/SvgLinkTypeInstance.vue';
-import SvgLinkTypeExample from '../components/svgs/link_types/SvgLinkTypeInstance.vue';
 import SvgLinkTypeUse from '../components/svgs/link_types/SvgLinkTypeInstance.vue';
 import SvgLinkTypeAuthor from '../components/svgs/link_types/SvgLinkTypeInstance.vue';
 import SvgLinkTypeOpposite from '../components/svgs/link_types/SvgLinkTypeInstance.vue';

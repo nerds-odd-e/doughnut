@@ -91,7 +91,6 @@ public class Link {
     @Column(name = "type_id")
     @Getter
     @Setter
-    @JsonIgnore
     private Integer typeId;
 
     @JsonIgnore

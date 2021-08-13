@@ -1,10 +1,10 @@
 <template>
 
-    <LinkNob v-bind="{owns, link}" v-if="!reverse"/>
-    <span class="badge ml-1 mr-1">
+    <span :class="`badge ml-1 mr-1 ${reverse ? 'badge-warning' : 'badge-light'}`">
+      <LinkNob v-bind="{owns, link}" v-if="!reverse"/>
       <NoteTitleWithLink v-bind="{note}"/>
+      <LinkNob v-bind="{owns, link}" v-if="reverse"/>
     </span>
-    <LinkNob v-bind="{owns, link}" v-if="reverse"/>
 </template>
 
 <script setup>

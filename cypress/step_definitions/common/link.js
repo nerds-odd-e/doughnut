@@ -62,7 +62,7 @@ Then("I should see {string} has no link of type {string}",(noteTitle, linkType) 
 })
 
 When("I open link {string}", (linkTitle) => {
-    cy.findByText(linkTitle).click();
+    cy.findByText(linkTitle).siblings(".link-nob").click();
 })
 
 Then("I should be able to change the link to {string}", (linkType) => {
@@ -76,7 +76,7 @@ Then("I should be able to delete the link", () => {
 });
 
 Then("I should be able to delete the link to note {string}", (noteTitle) => {
-    cy.findByText(noteTitle).click();
+    cy.findByText(noteTitle).siblings(".link-nob").click();
     cy.findByRole('button', {name: "Delete"}).click();
     cy.findByRole('button', {name: "Cancel"}).click();
     cy.findByRole('button', {name: "Delete"}).click();
