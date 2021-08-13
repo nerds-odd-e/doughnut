@@ -1,6 +1,8 @@
 <template>
-  <router-link v-if="!!owns" :to="{name: 'linkShow', params: {linkid: link.id}}">{{note.title}}</router-link>
-  <NoteTitleWithLink v-else v-bind="{note}"/>
+  <span class="badge ml-1 mr-1">
+    <router-link v-if="!!owns" :to="{name: 'linkShow', params: {linkid: link.id}}">{{note.title}}</router-link>
+    <NoteTitleWithLink v-else v-bind="{note}"/>
+  </span>
 </template>
 
 <script setup>
