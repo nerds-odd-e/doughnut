@@ -2,6 +2,16 @@ import Svg from '../components/svgs/link_types/SvgLinkTypeSpecialize.vue';
 import SvgLinkTypeSpecialize from '../components/svgs/link_types/SvgLinkTypeSpecialize.vue';
 import SvgLinkTypeRelated from '../components/svgs/link_types/SvgLinkTypeRelated.vue';
 import SvgLinkTypeApplication from '../components/svgs/link_types/SvgLinkTypeApplication.vue';
+import SvgLinkTypeInstance from '../components/svgs/link_types/SvgLinkTypeInstance.vue';
+import SvgLinkTypePart from '../components/svgs/link_types/SvgLinkTypePart.vue';
+import SvgLinkTypeSimilar from '../components/svgs/link_types/SvgLinkTypeSimilar.vue';
+import SvgLinkTypePrecede from '../components/svgs/link_types/SvgLinkTypeInstance.vue';
+import SvgLinkTypeExample from '../components/svgs/link_types/SvgLinkTypeInstance.vue';
+import SvgLinkTypeUse from '../components/svgs/link_types/SvgLinkTypeInstance.vue';
+import SvgLinkTypeAuthor from '../components/svgs/link_types/SvgLinkTypeInstance.vue';
+import SvgLinkTypeOpposite from '../components/svgs/link_types/SvgLinkTypeInstance.vue';
+import SvgLinkTypeAttr from '../components/svgs/link_types/SvgLinkTypeInstance.vue';
+import SvgLinkTypeTagged from '../components/svgs/link_types/SvgLinkTypeTag.vue';
 
 import { action } from '@storybook/addon-actions';
 
@@ -23,7 +33,9 @@ export const actionsData = {
 };
 
 const Template = args => ({
-  components: { Svg, SvgLinkTypeSpecialize, SvgLinkTypeRelated, SvgLinkTypeApplication },
+  components: { Svg, SvgLinkTypeSpecialize, SvgLinkTypeRelated, SvgLinkTypeApplication, SvgLinkTypeInstance,
+    SvgLinkTypePart, SvgLinkTypeSimilar, SvgLinkTypePrecede, SvgLinkTypeExample, SvgLinkTypeUse, SvgLinkTypeAuthor, SvgLinkTypeOpposite, SvgLinkTypeAttr, SvgLinkTypeTagged
+   },
   setup() {
     return { args, ...actionsData };
   },
@@ -31,6 +43,16 @@ const Template = args => ({
   <SvgLinkTypeSpecialize v-bind="args" />
   <SvgLinkTypeRelated v-bind="args" />
   <SvgLinkTypeApplication v-bind="args" />
+  <SvgLinkTypeInstance v-bind="args" />
+  <SvgLinkTypePart v-bind="args" />
+  <SvgLinkTypeSimilar v-bind="args" />
+  <SvgLinkTypePrecede v-bind="args" />
+  <SvgLinkTypeExample v-bind="args" />
+  <SvgLinkTypeUse v-bind="args" />
+  <SvgLinkTypeAuthor v-bind="args" />
+  <SvgLinkTypeOpposite v-bind="args" />
+  <SvgLinkTypeAttr v-bind="args" />
+  <SvgLinkTypeTagged v-bind="args" />
   `,
 });
 export const Default = Template.bind({});
