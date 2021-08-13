@@ -1,6 +1,7 @@
 import Svg from '../components/svgs/link_types/SvgLinkTypeSpecialize.vue';
 import SvgLinkTypeSpecialize from '../components/svgs/link_types/SvgLinkTypeSpecialize.vue';
 import SvgLinkTypeRelated from '../components/svgs/link_types/SvgLinkTypeRelated.vue';
+import SvgLinkTypeApplication from '../components/svgs/link_types/SvgLinkTypeApplication.vue';
 
 import { action } from '@storybook/addon-actions';
 
@@ -22,13 +23,14 @@ export const actionsData = {
 };
 
 const Template = args => ({
-  components: { Svg, SvgLinkTypeSpecialize, SvgLinkTypeRelated },
+  components: { Svg, SvgLinkTypeSpecialize, SvgLinkTypeRelated, SvgLinkTypeApplication },
   setup() {
     return { args, ...actionsData };
   },
   template: `
   <SvgLinkTypeSpecialize v-bind="args" />
   <SvgLinkTypeRelated v-bind="args" />
+  <SvgLinkTypeApplication v-bind="args" />
   `,
 });
 export const Default = Template.bind({});
