@@ -3,22 +3,22 @@
         <template v-for="(linksOfType, linkType) in links" :key="linkType">
             <li v-if="linksOfType.reverse.length>0">
                 <span>{{reverseLabel(linkType)}} </span>
-                <LinkWithHtmlLink  v-for="link in linksOfType.reverse" :key="link.id" class="badge-warning" :link="link" :reverse="true" :owns="owns"/>
+                <LinkLink  v-for="link in linksOfType.reverse" :key="link.id" class="badge-warning" :link="link" :reverse="true" :owns="owns"/>
             </li>
             <li v-if="!!linksOfType.direct.length>0">
                 <span>{{linkType}} </span>
-                <LinkWithHtmlLink  v-for="link in linksOfType.direct" :key="link.id" class="badge-light" :link="link" :reverse="false" :owns="owns"/>
+                <LinkLink  v-for="link in linksOfType.direct" :key="link.id" class="badge-light" :link="link" :reverse="false" :owns="owns"/>
             </li>
         </template>
     </ul>
 </template>
 
 <script>
-  import LinkWithHtmlLink from "./LinkWithHtmlLink.vue"
+  import LinkLink from "./LinkLink.vue"
   export default {
     name: "NoteShowWithTitle",
     props: { links: Object, owns: Boolean },
-    components: { LinkWithHtmlLink },
+    components: { LinkLink },
     methods: {
         reverseLabel(lbl) {
             if(!this.$staticInfo) {
