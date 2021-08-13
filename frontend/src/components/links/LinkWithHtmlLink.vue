@@ -6,6 +6,9 @@
 </template>
 
 <script setup>
+  import { computed } from "@vue/runtime-core"
   import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue"
-  const props = defineProps({note: Object, link: Object, owns: Boolean})
+
+  const props = defineProps({ link: Object, reverse: Boolean, owns: Boolean})
+  const note = computed(()=>!!props.reverse ? props.link.sourceNote : props.link.targetNote)
 </script>

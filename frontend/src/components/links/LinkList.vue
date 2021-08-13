@@ -3,11 +3,11 @@
         <template v-for="(linksOfType, linkType) in links" :key="linkType">
             <li v-if="linksOfType.reverse.length>0">
                 <span>{{reverseLabel(linkType)}} </span>
-                <LinkWithHtmlLink  v-for="link in linksOfType.reverse" :key="link.id" class="badge-warning" :link="link" :note="link.sourceNote" :owns="owns"/>
+                <LinkWithHtmlLink  v-for="link in linksOfType.reverse" :key="link.id" class="badge-warning" :link="link" :reverse="true" :owns="owns"/>
             </li>
             <li v-if="!!linksOfType.direct.length>0">
                 <span>{{linkType}} </span>
-                <LinkWithHtmlLink  v-for="link in linksOfType.direct" :key="link.id" class="badge-light" :link="link" :note="link.targetNote" :owns="owns"/>
+                <LinkWithHtmlLink  v-for="link in linksOfType.direct" :key="link.id" class="badge-light" :link="link" :reverse="false" :owns="owns"/>
             </li>
         </template>
     </ul>

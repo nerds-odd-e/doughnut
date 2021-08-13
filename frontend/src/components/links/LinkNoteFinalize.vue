@@ -5,11 +5,11 @@
       <RadioButtons v-if="!!formData.moveUnder" scopeName='link' v-model="formData.asFirstChild" :errors="formErrors.asFristChild"
         :options="[{value: true, label: 'as its first child'}, {value: false, label: 'as its last child'}]"
       />
+      <div> Target: <strong>{{targetNote.title}}</strong> </div>
 
       <button class="btn btn-secondary go-back-button" v-on:click="$emit('goBack')"><SvgGoBack/></button>
       <button class="btn btn-primary" @click.once="createLink()">Create Link</button>
   </div>
-  <div> Target: <strong>{{targetNote.title}}</strong> </div>
 
 </template>
 
