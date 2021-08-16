@@ -35,7 +35,7 @@ in mkShell {
     apple_sdk.QTKit apple_sdk.Security apple_sdk.SystemConfiguration xcodebuild
   ] ++ lib.optionals (!stdenv.isDarwin) [
     firefox google-chrome 
-    gitter intellij mysql-workbench
+    gitter intellij
   ];
   shellHook = ''
     export NIXPKGS_ALLOW_UNFREE=1
