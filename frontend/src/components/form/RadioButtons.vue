@@ -2,8 +2,10 @@
   <InputWithType v-bind="{scopeName, field, errors}">
       <output :id="`${scopeName}-${field}`" role="radiogroup" class="filter-switch">
         <span v-for="option in options" :key="option.value" class="filter-switch-item">
-          <label :for="`${scopeName}-${option.value}`">{{option.label}}
-            <input type="radio" :value="option.value" :id="`${scopeName}-${option.value}`" v-model="modelValue">
+          <input type="radio" :value="option.value" :id="`${scopeName}-${option.value}`" v-model="modelValue">
+          <label :for="`${scopeName}-${option.value}`">
+            <slot name="labelAddition" :value="option.value"/>
+            {{option.label}}
           </label>
         </span>
       </output>
@@ -27,10 +29,11 @@ export default {
 <style lang="sass" scoped>
 .filter-switch
   label
+    font-size: small
     cursor: pointer
     margin-right: 5px
     border-radius: 5px
-    padding: 5px
+    padding: 2px
     border: solid 1px #32612D
   .filter-switch-item
     input

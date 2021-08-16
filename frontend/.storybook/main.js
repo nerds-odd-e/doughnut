@@ -5,6 +5,12 @@ module.exports = {
   ],
   "addons": [
     "@storybook/addon-links",
+    "@storybook/preset-scss",
     "@storybook/addon-essentials"
-  ]
+  ],
+  options: {
+    sassOptions: {
+      indentedSyntax: true
+    }
+  }
 }
