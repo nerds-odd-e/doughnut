@@ -18,7 +18,7 @@
     import SvgLinkTypeAuthor from './link_types/SvgLinkTypeAuthor.vue';
     import SvgLinkTypeOpposite from './link_types/SvgLinkTypeOpposite.vue';
     import SvgLinkTypeAttr from './link_types/SvgLinkTypeAttr.vue';
-    import SvgLinkTypeConfuse from './link_types/SvgLinkTypeInstance.vue';
+    import SvgLinkTypeConfuse from './link_types/SvgLinkTypeConfuse.vue';
 import { computed } from '@vue/runtime-core';
 
   const props = defineProps({ linkTypeId: Number, width: String, height: String })
