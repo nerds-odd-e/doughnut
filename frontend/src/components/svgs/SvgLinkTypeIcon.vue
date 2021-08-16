@@ -14,7 +14,7 @@
     import SvgLinkTypeSimilar from './link_types/SvgLinkTypeSimilar.vue';
     import SvgLinkTypeExample from './link_types/SvgLinkTypeExample.vue';
     import SvgLinkTypePrecede from './link_types/SvgLinkTypeInstance.vue';
-    import SvgLinkTypeUse from './link_types/SvgLinkTypeInstance.vue';
+    import SvgLinkTypeUse from './link_types/SvgLinkTypeUse.vue';
     import SvgLinkTypeAuthor from './link_types/SvgLinkTypeAuthor.vue';
     import SvgLinkTypeOpposite from './link_types/SvgLinkTypeOpposite.vue';
     import SvgLinkTypeAttr from './link_types/SvgLinkTypeAttr.vue';
