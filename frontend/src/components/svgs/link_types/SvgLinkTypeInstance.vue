@@ -8,6 +8,5 @@
 
 <script setup>
 import Object1 from "./Object1.vue"
-import Object2 from "./Object2.vue"
 import Arrow from "./Arrow.vue"
 </script>
