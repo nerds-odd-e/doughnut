@@ -1,5 +1,5 @@
 <template>
-    <svg th:fragment="add" width="40px" height="20px">
+    <svg  :width="width ? width : '40px'" :height="height ? height: `20px`">
         <component :is="iconComponent"/>
     </svg>
 </template>
@@ -16,14 +16,14 @@
     import SvgLinkTypePrecede from './link_types/SvgLinkTypeInstance.vue';
     import SvgLinkTypeUse from './link_types/SvgLinkTypeInstance.vue';
     import SvgLinkTypeAuthor from './link_types/SvgLinkTypeInstance.vue';
-    import SvgLinkTypeOpposite from './link_types/SvgLinkTypeInstance.vue';
-    import SvgLinkTypeAttr from './link_types/SvgLinkTypeInstance.vue';
+    import SvgLinkTypeOpposite from './link_types/SvgLinkTypeOpposite.vue';
+    import SvgLinkTypeAttr from './link_types/SvgLinkTypeAttr.vue';
     import SvgLinkTypeConfuse from './link_types/SvgLinkTypeInstance.vue';
 import { computed } from '@vue/runtime-core';
 
-  const props = defineProps({ linkTypeId: Number })
+  const props = defineProps({ linkTypeId: Number, width: String, height: String })
   const iconComponent = computed(()=> {
-      const linkTypeId = props.linkTypeId
+      const linkTypeId = parseInt(props.linkTypeId)
       if (linkTypeId === 1) return SvgLinkTypeRelated
       if (linkTypeId === 2) return SvgLinkTypeSpecialize
       if (linkTypeId === 3) return SvgLinkTypeApplication

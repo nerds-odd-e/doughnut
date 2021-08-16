@@ -1,17 +1,5 @@
 import Svg from '../components/svgs/link_types/SvgLinkTypeSpecialize.vue';
-import SvgLinkTypeSpecialize from '../components/svgs/link_types/SvgLinkTypeSpecialize.vue';
-import SvgLinkTypeRelated from '../components/svgs/link_types/SvgLinkTypeRelated.vue';
-import SvgLinkTypeApplication from '../components/svgs/link_types/SvgLinkTypeApplication.vue';
-import SvgLinkTypeInstance from '../components/svgs/link_types/SvgLinkTypeInstance.vue';
-import SvgLinkTypePart from '../components/svgs/link_types/SvgLinkTypePart.vue';
-import SvgLinkTypeSimilar from '../components/svgs/link_types/SvgLinkTypeSimilar.vue';
-import SvgLinkTypeExample from '../components/svgs/link_types/SvgLinkTypeExample.vue';
-import SvgLinkTypePrecede from '../components/svgs/link_types/SvgLinkTypeInstance.vue';
-import SvgLinkTypeUse from '../components/svgs/link_types/SvgLinkTypeInstance.vue';
-import SvgLinkTypeAuthor from '../components/svgs/link_types/SvgLinkTypeInstance.vue';
-import SvgLinkTypeOpposite from '../components/svgs/link_types/SvgLinkTypeInstance.vue';
-import SvgLinkTypeAttr from '../components/svgs/link_types/SvgLinkTypeInstance.vue';
-import SvgLinkTypeTagged from '../components/svgs/link_types/SvgLinkTypeTag.vue';
+import SvgLinkTypeIcon from '../components/svgs/SvgLinkTypeIcon.vue';
 
 import { action } from '@storybook/addon-actions';
 
@@ -33,26 +21,92 @@ export const actionsData = {
 };
 
 const Template = args => ({
-  components: { Svg, SvgLinkTypeSpecialize, SvgLinkTypeRelated, SvgLinkTypeApplication, SvgLinkTypeInstance,
-    SvgLinkTypePart, SvgLinkTypeSimilar, SvgLinkTypePrecede, SvgLinkTypeExample, SvgLinkTypeUse, SvgLinkTypeAuthor, SvgLinkTypeOpposite, SvgLinkTypeAttr, SvgLinkTypeTagged
+  components: { Svg, SvgLinkTypeIcon
    },
+  data() {
+    return {
+      types: [
+        {
+            "reversedLabel": "related to",
+            "label": "related to",
+            "value": "1"
+        },
+        {
+            "reversedLabel": "a generalization of",
+            "label": "a specialization of",
+            "value": "2"
+        },
+        {
+            "reversedLabel": "applied to",
+            "label": "an application of",
+            "value": "3"
+        },
+        {
+            "reversedLabel": "has instances",
+            "label": "an instance of",
+            "value": "4"
+        },
+        {
+            "reversedLabel": "has parts",
+            "label": "a part of",
+            "value": "6"
+        },
+        {
+            "reversedLabel": "tagging",
+            "label": "tagged by",
+            "value": "8"
+        },
+        {
+            "reversedLabel": "has attributes",
+            "label": "an attribute of",
+            "value": "10"
+        },
+        {
+            "reversedLabel": "the opposite of",
+            "label": "the opposite of",
+            "value": "12"
+        },
+        {
+            "reversedLabel": "brought by",
+            "label": "author of",
+            "value": "14"
+        },
+        {
+            "reversedLabel": "used by",
+            "label": "using",
+            "value": "15"
+        },
+        {
+            "reversedLabel": "has examples",
+            "label": "an example of",
+            "value": "17"
+        },
+        {
+            "reversedLabel": "after",
+            "label": "before",
+            "value": "19"
+        },
+        {
+            "reversedLabel": "similar to",
+            "label": "similar to",
+            "value": "22"
+        },
+        {
+            "reversedLabel": "confused with",
+            "label": "confused with",
+            "value": "23"
+        }
+      ]
+    }
+  },
   setup() {
     return { args, ...actionsData };
   },
   template: `
-  <SvgLinkTypeSpecialize v-bind="args" />
-  <SvgLinkTypeRelated v-bind="args" />
-  <SvgLinkTypeApplication v-bind="args" />
-  <SvgLinkTypeInstance v-bind="args" />
-  <SvgLinkTypePart v-bind="args" />
-  <SvgLinkTypeSimilar v-bind="args" />
-  <SvgLinkTypePrecede v-bind="args" />
-  <SvgLinkTypeExample v-bind="args" />
-  <SvgLinkTypeUse v-bind="args" />
-  <SvgLinkTypeAuthor v-bind="args" />
-  <SvgLinkTypeOpposite v-bind="args" />
-  <SvgLinkTypeAttr v-bind="args" />
-  <SvgLinkTypeTagged v-bind="args" />
+  <div v-for="type in types" :key="type.value">
+  {{type.label}}
+  <SvgLinkTypeIcon :linkTypeId="0+type.value" width="80px" height="40px"/>
+  </div>
   `,
 });
 export const Default = Template.bind({});
