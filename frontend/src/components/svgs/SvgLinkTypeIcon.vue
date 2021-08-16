@@ -1,5 +1,5 @@
 <template>
-    <svg  :width="width ? width : '40px'" :height="height ? height: `20px`">
+    <svg  :width="width ? width : '40px'" :height="height ? height: `20px`" stroke="#000" stroke-width="5%" >
         <component :is="iconComponent"/>
     </svg>
 </template>

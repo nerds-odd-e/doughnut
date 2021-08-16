@@ -4,7 +4,7 @@
   M25,5 a1,1 0 0,1 0,90
   a1,1 0 0,0 0,-45
   a1,1 0 0,1 0,-45
-  "  stroke-width="10" stroke="#000" :fill="fill"/>
+  "  :fill="fill"/>
 </svg>
 </template>
 

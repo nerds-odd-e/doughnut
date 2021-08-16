@@ -1,5 +1,5 @@
 <template>
-<svg viewBox="0 0 100 130" :x="x" :y="y || 50" height="400" stroke="#000" stroke-width="5" :fill="fill">
+<svg viewBox="0 0 100 130" :x="x" :y="y || 50" height="400" :fill="fill">
       <ellipse :ry="40" :rx="40" id="svg_1" cy="85" cx="50"/>
       <ellipse :ry="7" :rx="7" id="svg_1" cy="85" cx="50"/>
       <path d="

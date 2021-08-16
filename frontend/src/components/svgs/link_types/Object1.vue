@@ -1,5 +1,5 @@
 <template>
-<svg viewBox="0 0 100 100" :x="x" :y="y || 50"  stroke-width="5" stroke="#000" height="300">
+<svg viewBox="0 0 100 100" :x="x" :y="y || 50"  height="300">
       <ellipse :ry="size ? size : 45" :rx="size ? size: 45" id="svg_1" cy="50" cx="50" :fill="fill" :stroke-dasharray="strokeDashArray"/>
       <template v-if="stripes">
       <line y1="40" x1="5" y2="95" x2="60" fill="none"/>

@@ -12,7 +12,7 @@
     m -25 -25
     l 25 25
     l 25 -25
-    "  stroke-width="10" stroke="#000" fill="none"/>
+    "  fill="none"/>
     </svg>
 </svg>
 </template>

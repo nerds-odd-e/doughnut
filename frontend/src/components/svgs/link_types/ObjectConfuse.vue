@@ -5,7 +5,7 @@
   M75,10
    a45,45 0 1,0 0,80
    a15,15 0 0,1 0,-80
-  "  stroke-width="10" stroke="#000" :fill="fill"/>
+  "  :fill="fill"/>
 </svg>
 
 </template>
