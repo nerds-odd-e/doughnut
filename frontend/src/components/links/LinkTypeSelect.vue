@@ -6,7 +6,8 @@
     >
    <template #labelAddition="{value}" >
     <div class="text-center">
-      <SvgLinkTypeIcon :linkTypeId="value"/>
+      {{inverseIcon}}
+      <SvgLinkTypeIcon :linkTypeId="value" :inverseIcon="inverseIcon"/>
     </div>
    </template>
     </RadioButtons>
@@ -19,7 +20,7 @@ import SvgLinkTypeIcon from "../svgs/SvgLinkTypeIcon.vue"
 
 export default {
   name: 'LinkTypeSelect',
-  props: { scopeName: String, modelValue: Object, errors: Object, allowEmpty: {type: Boolean, default: false}, field: {type: String, defalt: 'linkType'} },
+  props: { scopeName: String, modelValue: Object, errors: Object, allowEmpty: {type: Boolean, default: false}, field: {type: String, defalt: 'linkType'}, inverseIcon: Boolean },
   components: {RadioButtons, SvgLinkTypeIcon},
   emits: ['update:modelValue'],
   computed: {

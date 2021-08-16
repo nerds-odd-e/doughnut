@@ -1,9 +1,8 @@
 <template>
 
+    <LinkNob class="link-nob" v-bind="{owns, link}" :inverseIcon="!reverse"/>
     <span :class="`badge ml-1 mr-1 ${reverse ? 'badge-warning' : 'badge-light'}`">
-      <LinkNob v-bind="{owns, link}" v-if="!reverse"/>
       <NoteTitleWithLink v-bind="{note}"/>
-      <LinkNob v-bind="{owns, link}" v-if="reverse"/>
     </span>
 </template>
 
@@ -17,5 +16,10 @@
 </script>
 
 <style lang="sass" scoped>
+.link-nob
+  margin-right: -5px
+  padding: 3px
+  border-radius: 10px
+  border: solid 1px #000
 
 </style>

@@ -106,6 +106,7 @@ const Template = args => ({
   <div v-for="type in types" :key="type.value">
   {{type.label}}
   <SvgLinkTypeIcon :linkTypeId="0+type.value" width="80px" height="40px"/>
+  <SvgLinkTypeIcon :linkTypeId="0+type.value" width="80px" height="40px" :inverseIcon="true"/>
   </div>
   `,
 });

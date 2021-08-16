@@ -1,6 +1,6 @@
 <template>
     <svg  :width="width ? width : '40px'" :height="height ? height: `20px`" stroke="#000" stroke-width="5%" >
-        <component :is="iconComponent"/>
+        <component :is="iconComponent" :ifInverse="!!inverseIcon ? -1 : 1"/>
     </svg>
 </template>
 
@@ -21,7 +21,7 @@
     import SvgLinkTypeConfuse from './link_types/SvgLinkTypeConfuse.vue';
 import { computed } from '@vue/runtime-core';
 
-  const props = defineProps({ linkTypeId: Number, width: String, height: String })
+  const props = defineProps({ linkTypeId: Number, width: String, height: String, inverseIcon: Boolean })
   const iconComponent = computed(()=> {
       const linkTypeId = parseInt(props.linkTypeId)
       if (linkTypeId === 1) return SvgLinkTypeRelated

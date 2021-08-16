@@ -1,6 +1,6 @@
 <template>
   <div>
-      <LinkTypeSelect field="linkType" scopeName='link' v-model="formData.typeId" :errors="formErrors.typeId"/>
+      <LinkTypeSelect field="linkType" scopeName='link' v-model="formData.typeId" :errors="formErrors.typeId" :inverseIcon="true"/>
       <CheckInput scopeName='link' v-model="formData.moveUnder" :errors="formErrors.moveUnder" field="alsoMoveToUnderTargetNote"/>
       <RadioButtons v-if="!!formData.moveUnder" scopeName='link' v-model="formData.asFirstChild" :errors="formErrors.asFristChild"
         :options="[{value: true, label: 'as its first child'}, {value: false, label: 'as its last child'}]"

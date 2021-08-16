@@ -1,8 +1,8 @@
 <template>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 800 400">
-<Tool linkRole="source" x="-250"/>
+<Tool linkRole="source" :x="-250 * ifInverse"/>
 <Lnk />
-<Object1 :stripes="false" linkRole="target" x="250"/>
+<Object1 :stripes="false" linkRole="target" :x="250 * ifInverse"/>
 </svg>
 </template>
 
@@ -10,4 +10,5 @@
 import Object1 from "./Object1.vue"
 import Tool from "./Tool.vue"
 import Lnk from "./Lnk.vue"
+const props = defineProps({ ifInverse: {type: Number, default: 1} })
 </script>

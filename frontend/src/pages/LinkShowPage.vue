@@ -5,7 +5,7 @@
 
             <div class="link-content">
               <div>
-                <LinkTypeSelect scopeName='link' v-model="formData.typeId" :errors="formErrors.typeId"/>
+                <LinkTypeSelect scopeName='link' v-model="formData.typeId" :errors="formErrors.typeId" :inverseIcon="true"/>
                 <button class="btn btn-primary" v-on:click="updateLink()">Update</button>
                 <button class="btn btn-danger" v-on:click="deleteLink()">Delete</button>
               </div>
