@@ -2,8 +2,9 @@
   <InputWithType v-bind="{scopeName, field, errors}">
       <output :id="`${scopeName}-${field}`" role="radiogroup" class="filter-switch">
         <span v-for="option in options" :key="option.value" class="filter-switch-item">
-          <input type="radio" :value="option.value" :id="`${scopeName}-${option.value}`" v-model="modelValue">
-          <label :for="`${scopeName}-${option.value}`">{{option.label}}</label>
+          <label :for="`${scopeName}-${option.value}`">{{option.label}}
+            <input type="radio" :value="option.value" :id="`${scopeName}-${option.value}`" v-model="modelValue">
+          </label>
         </span>
       </output>
   </InputWithType>
@@ -33,8 +34,7 @@ export default {
     border: solid 1px #32612D
   .filter-switch-item
     input
-      width: 1px
-      height: 1px
+      display: none
     input:checked + label
       color: white
       background-color: #03AC13

@@ -121,7 +121,7 @@ Cypress.Commands.add('submitNoteFormWith', noteAttributes => {
             });
           });
         } else if ($input.attr('role') ==='radiogroup') {
-            cy.findByRole('radio', {name: value}).click();
+            cy.clickRadioByLabel(value)
         } else {
           cy.wrap($input)
             .clear()
@@ -132,6 +132,10 @@ Cypress.Commands.add('submitNoteFormWith', noteAttributes => {
   }
   cy.get('input[value="Submit"]').click();
 });
+
+Cypress.Commands.add('clickRadioByLabel', labelText => {
+   cy.findByText(labelText, {selector: 'label'}).click({force: true});
+})
 
 Cypress.Commands.add('submitNoteFormsWith', notes => {
   notes.forEach(noteAttributes => cy.submitNoteFormWith(noteAttributes));

@@ -14,7 +14,6 @@
 </template>
 
 <script setup>
-import { defineEmit } from "@vue/runtime-core"
 import InputWithType from "./InputWithType.vue"
   const props = defineProps({modelValue: String, scopeName: String, field: String, options: Array, errors: Object})
   const emit = defineEmit(['update:modelValue'])

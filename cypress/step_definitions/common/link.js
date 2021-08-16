@@ -15,7 +15,7 @@ function makingLink(cy, fromNoteTitle, linkType, toNoteTitle) {
     cy.creatingLinkFor(fromNoteTitle);
     cy.searchNote(toNoteTitle);
     cy.clickButtonOnCardBody(toNoteTitle, "Select");
-    cy.findByRole('radio', {name: linkType}).click();
+    cy.clickRadioByLabel(linkType)
 }
 
 When("I link note {string} as {string} note {string}", (fromNoteTitle, linkType, toNoteTitle) => {
@@ -66,7 +66,7 @@ When("I open link {string}", (linkTitle) => {
 })
 
 Then("I should be able to change the link to {string}", (linkType) => {
-    cy.findByRole('radio', {name: linkType}).click({force: true});
+    cy.clickRadioByLabel(linkType)
     cy.findByRole('button', {name: "Update"}).click();
     cy.findByText(linkType).should('be.visible');
 });
