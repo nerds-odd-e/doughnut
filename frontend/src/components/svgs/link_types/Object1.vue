@@ -4,7 +4,7 @@
       <template v-if="stripes">
       <line y1="40" x1="5" y2="95" x2="60" fill="none"/>
       <line y1="20" x1="20" y2="80" x2="80" fill="none"/>
-      <line y1="5" x1="40" y2="60" x2="95" stroke="#000" fill="none"/>
+      <line y1="5" x1="40" y2="60" x2="95" fill="none"/>
       </template>
 </svg>
 </template>

@@ -8,5 +8,4 @@ xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x=
 
 <script setup>
 import Object1 from "./Object1.vue"
-import Arrow from "./Arrow.vue"
 </script>
