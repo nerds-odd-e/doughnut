@@ -23,7 +23,7 @@
   },
   "devDependencies": {
     "@testing-library/cypress": "^8.0.0",
-    "cypress": "^8.2.0",
+    "cypress": "^8.3.0",
     "cypress-cucumber-preprocessor": "^4.2",
     "cypress-file-upload": "^5.0.3",
     "cypress-plugin-snapshots": "^1.4.4",
