@@ -99,7 +99,7 @@ When("I change notebook {string} to skip review", (noteTitle) => {
 });
 
 Then("I should see it has link to {string}", (noteTitle) => {
-  cy.findByText(noteTitle, {selector: ".badge a"}).click();
+  cy.findByText(noteTitle, {selector: "a.badge"}).click();
   cy.findByText(noteTitle, { selector: ".h1" }).should("be.visible");
 });
 

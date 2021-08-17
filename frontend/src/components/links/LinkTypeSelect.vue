@@ -6,7 +6,6 @@
     >
    <template #labelAddition="{value}" >
     <div class="text-center">
-      {{inverseIcon}}
       <SvgLinkTypeIcon :linkTypeId="value" :inverseIcon="inverseIcon"/>
     </div>
    </template>

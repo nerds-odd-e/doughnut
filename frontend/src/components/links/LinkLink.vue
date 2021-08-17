@@ -1,9 +1,8 @@
 <template>
-
+  <span>
     <LinkNob class="link-nob" v-bind="{owns, link}" :inverseIcon="!reverse"/>
-    <span :class="`badge ml-1 mr-1 ${reverse ? 'badge-warning' : 'badge-light'}`">
-      <NoteTitleWithLink v-bind="{note}"/>
-    </span>
+    <NoteTitleWithLink :class="`badge ml-1 mr-1 ${reverse ? 'badge-warning' : 'badge-light'}`" v-bind="{note}"/>
+  </span>
 </template>
 
 <script setup>
