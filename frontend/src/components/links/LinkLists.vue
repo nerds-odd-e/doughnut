@@ -16,6 +16,7 @@
             </li>
         </template>
     </ul>
+
 </template>
 
 <script>
@@ -25,7 +26,7 @@
     components: { LinkLink },
     methods: {
         reverseLabel(lbl) {
-            if(!this.$staticInfo) {
+            if(!this.$staticInfo || !this.$staticInfo.linkTypeOptions) {
                  return
             }
             const {reversedLabel} = this.$staticInfo.linkTypeOptions.find(({label})=>lbl === label);

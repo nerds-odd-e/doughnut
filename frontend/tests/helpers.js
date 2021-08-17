@@ -15,7 +15,7 @@ const mountWithMockRoute = (comp, options, currentRoute) => {
             {
             global: {
                 mocks: {
-                    $staticInfo: null,
+                    $staticInfo: { colors: {}},
                     $route: mockRoute,
                     $router: mockRouter
                 },
