@@ -3,6 +3,7 @@
     <div v-if="pictureQuestion">
         <ShowPicture :note="sourceNote.note" :opacity="1"/>
     </div>
+    <ParentLinkList v-bind="{links: quizQuestion.hintLinks, owns: true}" />
     <div class="quiz-instruction">
         <pre style="white-space: pre-wrap;" v-if="!pictureQuestion" v-html="quizQuestion.description"/>
         <h2 v-if="!!quizQuestion.mainTopic" class="text-center">{{quizQuestion.mainTopic}}</h2>
@@ -38,13 +39,14 @@
   import NoteBreadcrumbForReview from "./NoteBreadcrumbForReview.vue"
   import ShowPicture from "../notes/ShowPicture.vue"
   import LinkList from "../links/LinkList.vue"
+  import ParentLinkList from "../links/ParentLinkList.vue"
   import TextInput from "../form/TextInput.vue"
 
 export default {
   name: "Quiz",
   props: {reviewPointViewedByUser: Object, quizQuestion: Object, emptyAnswer: Object},
   emits:['answer'],
-  components: {NoteBreadcrumbForReview, ShowPicture, LinkList, TextInput },
+  components: {NoteBreadcrumbForReview, ShowPicture, LinkList, ParentLinkList, TextInput },
   computed: {
     sourceNote(){
         if (!!this.reviewPointViewedByUser.noteViewedByUser) return this.reviewPointViewedByUser.noteViewedByUser

@@ -5,10 +5,6 @@
                 <span>{{reverseLabel(linkType)}} </span>
                 <LinkLink  v-for="link in linksOfType.reverse" :key="link.id" :link="link" :reverse="true" :owns="owns"/>
             </li>
-            <li v-if="!!linksOfType.direct.length>0">
-                <span>{{linkType}} </span>
-                <LinkLink  v-for="link in linksOfType.direct" :key="link.id" :link="link" :reverse="false" :owns="owns"/>
-            </li>
         </template>
     </ul>
 </template>
