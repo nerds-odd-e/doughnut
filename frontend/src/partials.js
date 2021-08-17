@@ -10,7 +10,12 @@ const router = createRouter({
 })
 
 const app = createApp(DoughnutApp)
-app.config.globalProperties.$staticInfo = {}
+app.config.globalProperties.$staticInfo = {
+    colors: {
+        source: "#ffaaaa",
+        target: "#d4ffaa",
+    }
+}
 app.config.globalProperties.$popups = {}
 
 app.use(router)

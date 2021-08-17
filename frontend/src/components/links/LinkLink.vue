@@ -1,8 +1,8 @@
 <template>
-  <span>
-    <LinkNob v-bind="{owns, link}" v-if="!!reverse" :inverseIcon="true"/>
-    <NoteTitleWithLink :class="`badge ml-1 mr-1 ${reverse ? 'badge-warning' : 'badge-light'}`" v-bind="{note}"/>
-    <LinkNob v-bind="{owns, link}" v-if="!reverse" :inverseIcon="false"/>
+  <span class="link-link">
+    <LinkNob v-bind="{owns, link, colors}" v-if="!!reverse" :inverseIcon="true"/>
+    <NoteTitleWithLink class="link-title" v-bind="{note}"/>
+    <LinkNob v-bind="{owns, link, colors}" v-if="!reverse" :inverseIcon="false"/>
   </span>
 </template>
 
@@ -11,10 +11,20 @@
   import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue"
   import LinkNob from "./LinkNob.vue"
 
-  const props = defineProps({ link: Object, reverse: Boolean, owns: Boolean})
+  const props = defineProps({ link: Object, reverse: Boolean, owns: Boolean, colors: Object})
   const note = computed(()=>!!props.reverse ? props.link.sourceNote : props.link.targetNote)
+  const bgcolor = computed(()=>!!props.reverse ? props.colors['target'] : props.colors['source'])
 </script>
 
 <style lang="sass" scoped>
+  .link-link
+    border-bottom: solid 1px black
+    padding-bottom: 3px
+    border-radius: 10px
+    background-color: v-bind(bgcolor)
+    margin-right: 10px
+
+  .link-title
+    padding-bottom: 3px
 
 </style>

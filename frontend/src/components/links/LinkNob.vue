@@ -8,15 +8,11 @@
 
 <script setup>
   import SvgLinkTypeIcon from "../svgs/SvgLinkTypeIcon.vue"
-  const props = defineProps({ link: Object, owns: Boolean, inverseIcon: Boolean})
+  const props = defineProps({ link: Object, owns: Boolean, inverseIcon: Boolean, colors: Object})
 </script>
 
 <style lang="sass" scoped>
 
 .link-nob
-  margin-right: -5px
   padding: 3px
-  border-radius: 10px
-  border: solid 1px #000
-
 </style>

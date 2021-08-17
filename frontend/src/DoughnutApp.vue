@@ -28,7 +28,8 @@ export default {
       this.doneResolve(result)
       this.popupInfo = null
       this.doneResolve = null
-    }
+    },
+
   },
   
   mounted() {
