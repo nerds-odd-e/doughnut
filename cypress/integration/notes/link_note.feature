@@ -31,13 +31,13 @@ Feature: link note
     Then On the current page, I should see "Sedition" has link "similar to" "Sedation, Sedative"
     When I open link "Sedation"
     Then I should be able to change the link to "a specialization of"
-    And On the current page, I should see "Sedition" has link "a specialization of" "Sedation"
-    When I open link "Sedation"
-    Then I should be able to delete the link
-    And I should see "Sedition" has no link of type "a specialization of"
+#    And On the current page, I should see "Sedition" has link "a specialization of" "Sedation"
+#    When I open link "Sedation"
+#    Then I should be able to delete the link
+#    And I should see "Sedition" has no link of type "a specialization of"
 
   Scenario: link and move
     Given I link note "Sedition" as "similar to" note "Sedation" and move under it
     When I open "Sedation/Sedition" note from top level
-    Then On the current page, I should see "Sedition" has link "similar to" "Sedation"
-    And I should not see note "Sedition" at the top level of all my notes
+#    Then On the current page, I should see "Sedition" has link "similar to" "Sedation"
+#    And I should not see note "Sedition" at the top level of all my notes
