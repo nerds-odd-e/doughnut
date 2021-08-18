@@ -1,21 +1,27 @@
 <template>
     <ul class="parent-links">
-        <template v-for="(linksOfType, linkType) in parentLinks" :key="linkType">
+        <template v-for="(linksOfType, linkType) in hierachyLinks" :key="linkType">
             <li  v-for="link in linksOfType.direct" :key="link.id">
                 <LinkLink  v-bind="{link, owns, colors: staticInfo.colors}" :reverse="false"/>
             </li>
         </template>
+        <li v-if="!!groupedLinks && groupedLinks.length > 0">
+        <template v-for="{direct, reverse} in groupedLinks" :key="direct">
+            <LinkLink class="link-multi" v-for="link in direct" :key="link.id" v-bind="{link, owns, colors: staticInfo.colors}" :reverse="false"/>
+            <LinkLink class="link-multi" v-for="link in reverse" :key="link.id" v-bind="{link, owns, colors: staticInfo.colors}" :reverse="true"/>
+        </template>
+        </li>
         <li v-for="(linksOfType, linkType) in tagLinks" :key="linkType">
-            <LinkLink v-for="link in linksOfType.direct" :key="link.id" v-bind="{link, owns, colors: staticInfo.colors}" :reverse="false"/>
+            <LinkLink class="link-multi" v-for="link in linksOfType.direct" :key="link.id" v-bind="{link, owns, colors: staticInfo.colors}" :reverse="false"/>
         </li>
     </ul>
     <slot />
 
-    <ul>
-        <template v-for="(linksOfType, linkType) in links" :key="linkType">
+    <ul class="children-links">
+        <template v-for="(linksOfType, linkType) in hierachyLinks" :key="linkType">
             <li v-if="linksOfType.reverse.length>0">
                 <span>{{reverseLabel(linkType)}} </span>
-                <LinkLink  v-for="link in linksOfType.reverse" :key="link.id" v-bind="{link, owns, colors: staticInfo.colors}" :reverse="true"/>
+                <LinkLink class="link-multi" v-for="link in linksOfType.reverse" :key="link.id" v-bind="{link, owns, colors: staticInfo.colors}" :reverse="true"/>
             </li>
         </template>
     </ul>
@@ -41,16 +47,28 @@
       return props.staticInfo.linkTypeOptions.filter(t=>t.value==8).map(t=>t.label)
   }
 
-  const parentLinks = computed(()=>{
+  const groupedTypes = ()=>{
+      if(!props.staticInfo || !props.staticInfo.linkTypeOptions) return []
+      return props.staticInfo.linkTypeOptions.filter(t=>[1, 12, 22, 23].includes(parseInt(t.value))).map(t=>t.label)
+  }
+
+  const hierachyLinks = computed(()=>{
       const tTypes = taggingTypes()
+      const gTypes = groupedTypes()
       if(!props.links) return
-      return Object.fromEntries(Object.entries(props.links).filter(t=>!tTypes.includes(t[0])))
+      return Object.fromEntries(Object.entries(props.links).filter(t=>!tTypes.includes(t[0]) && !gTypes.includes(t[0])))
   })
 
   const tagLinks = computed(()=>{
       const tTypes = taggingTypes()
       if(!props.links) return
       return Object.fromEntries(Object.entries(props.links).filter(t=>tTypes.includes(t[0])))
+  })
+
+  const groupedLinks = computed(()=>{
+      const tTypes = groupedTypes()
+      if(!props.links) return
+      return Object.entries(props.links).filter(t=>tTypes.includes(t[0])).map(t=>t[1])
   })
 
 </script>
@@ -61,9 +79,28 @@
     padding: 0px;
     margin: 0px;
 }
+
 .parent-links li {
     width: 100%;
     border-radius: 10px;
     border-top: solid 1px black;
+}
+
+.children-links {
+    list-style: none;
+    padding: 0px;
+    margin: 0px;
+}
+
+.children-links li {
+    width: 100%;
+    border-radius: 10px;
+    border-bottom: solid 1px black;
+}
+
+.link-multi+.link-multi::before {
+    padding-right: .5rem;
+    color: #6c757d;
+    content: "|";
 }
 </style>
