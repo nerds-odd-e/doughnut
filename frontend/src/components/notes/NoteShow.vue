@@ -1,6 +1,6 @@
 <template>
   <LinkLists v-bind="{links, owns, staticInfo}">
-    <div>
+    <div class="note-body">
       <h2 :class="'note-title h' + level"> {{note.noteContent.title}}</h2>
       <div class="row">
         <pre :class="`col-12 ${twoColumns ? 'col-md-6' : ''} note-body`" style="white-space: pre-wrap;">{{note.noteContent.description}}</pre>
@@ -33,7 +33,14 @@ const twoColumns = computed(()=>!!props.note.notePicture && !!props.note.noteCon
 </script>
 
 <style scoped>
+.note-body {
+  background-color: #eee;
+  padding-left: 10px;
+  padding-right: 10px;
+}
 .note-title {
-    color: v-bind(staticInfo.colors['target']);
+  margin-top: 0px;
+  padding-top: 10px;
+  color: v-bind(staticInfo.colors['target']);
 }
 </style>

@@ -74,28 +74,39 @@
 </script>
 
 <style scoped>
-.parent-links {
+
+.parent-links, .children-links {
     list-style: none;
     padding: 0px;
     margin: 0px;
+    background-color: #eee;
 }
 
-.parent-links li {
-    width: 100%;
-    border-radius: 10px;
-    border-top: solid 1px black;
+.parent-links {
+    border-top-right-radius: 10px;
+    border-top-left-radius: 10px;
 }
 
 .children-links {
-    list-style: none;
-    padding: 0px;
-    margin: 0px;
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 10px;
+}
+
+.parent-links li {
+    border-top-right-radius: 10px;
+    border-top-left-radius: 10px;
+    border-top: solid 1px black;
+    padding-right: 10px;
+    padding-left: 10px;
 }
 
 .children-links li {
-    width: 100%;
-    border-radius: 10px;
+    border-right: 10px;
+    border-bottom-right-radius: 10px;
+    border-bottom-left-radius: 10px;
     border-bottom: solid 1px black;
+    padding-right: 10px;
+    padding-left: 10px;
 }
 
 .link-multi+.link-multi::before {
