@@ -120,7 +120,7 @@ When(
     cy.pageIsLoaded()
     cy.findByRole('button', { name: button }).click();
 
-    cy.get('.jumbotron').within(() => cy.findByText(noteTitle).should('exist'));
+    cy.get('.note-with-controls').within(() => cy.findByText(noteTitle).should('exist'));
   }
 );
 
