@@ -1,9 +1,6 @@
 <template>
 <div class="btn-group btn-group-sm">
     <NoteEditButton :noteId="note.id" :oldTitle="note.title" @updated="$emit('updated')"/>
-    <a role="button" class="btn btn-sm" title="Cards View" :href="`/notes/articles/${note.id}`">
-        <SvgArticle/>
-    </a>
     <LinkNoteButton :note="note" @updated="$emit('updated')"/>
     <a class="btn btn-light dropdown-toggle"
             data-toggle="dropdown" aria-haspopup="true"
@@ -11,6 +8,10 @@
         <SvgCog/>
     </a>
     <div class="dropdown-menu dropdown-menu-right">
+        <a role="button" class="btn btn-sm" title="Cards View" :href="`/notes/articles/${note.id}`">
+            <SvgArticle/>
+            Article View
+        </a>
         <ReviewSettingEditButton :noteId="note.id" :oldTitle="note.title" @updated="$emit('updated')">
             Edit review settings
         </ReviewSettingEditButton>
