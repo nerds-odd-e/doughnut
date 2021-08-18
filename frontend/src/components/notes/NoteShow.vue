@@ -1,5 +1,5 @@
 <template>
-  <LinkLists v-bind="{links, owns, colors}">
+  <LinkLists v-bind="{links, owns, staticInfo}">
     <div>
       <h2 :class="'note-title h' + level"> {{note.noteContent.title}}</h2>
       <div class="row">
@@ -27,13 +27,13 @@ const props = defineProps({
     links: Object,
     level: { type: Number, default: 2 },
     owns: {type: Boolean, required: true},
-    colors: Object })
+    staticInfo: Object })
 
 const twoColumns = computed(()=>!!props.note.notePicture && !!props.note.noteContent.description)
 </script>
 
 <style scoped>
 .note-title {
-    color: v-bind(colors['target']);
+    color: v-bind(staticInfo.colors['target']);
 }
 </style>

@@ -3,7 +3,7 @@
     <div v-if="pictureQuestion">
         <ShowPicture :note="sourceNote.note" :opacity="1"/>
     </div>
-    <LinkLists v-bind="{links: quizQuestion.hintLinks, owns: true, colors}">
+    <LinkLists v-bind="{links: quizQuestion.hintLinks, owns: true, staticInfo}">
         <div class="quiz-instruction">
             <pre style="white-space: pre-wrap;" v-if="!pictureQuestion" v-html="quizQuestion.description"/>
             <h2 v-if="!!quizQuestion.mainTopic" class="text-center">{{quizQuestion.mainTopic}}</h2>
@@ -43,7 +43,7 @@
 
 export default {
   name: "Quiz",
-  props: {reviewPointViewedByUser: Object, quizQuestion: Object, emptyAnswer: Object, colors: Object},
+  props: {reviewPointViewedByUser: Object, quizQuestion: Object, emptyAnswer: Object, staticInfo: Object},
   emits:['answer'],
   components: {NoteBreadcrumbForReview, ShowPicture, LinkLists, TextInput },
   computed: {

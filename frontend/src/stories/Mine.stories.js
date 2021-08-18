@@ -2,6 +2,7 @@ import Svg from '../components/svgs/link_types/SvgLinkTypeSpecialize.vue';
 import SvgLinkTypeIcon from '../components/svgs/SvgLinkTypeIcon.vue';
 import NoteShow from '../components/notes/NoteShow.vue';
 import {colors} from '../colors';
+import {linkTypeOptions} from '../../tests/notes/fixtures-basic';
 
 import { action } from '@storybook/addon-actions';
 
@@ -26,80 +27,7 @@ const Template = args => ({
   components: { Svg, SvgLinkTypeIcon
    },
   data() {
-    return {
-      types: [
-        {
-            "reversedLabel": "related to",
-            "label": "related to",
-            "value": "1"
-        },
-        {
-            "reversedLabel": "a generalization of",
-            "label": "a specialization of",
-            "value": "2"
-        },
-        {
-            "reversedLabel": "applied to",
-            "label": "an application of",
-            "value": "3"
-        },
-        {
-            "reversedLabel": "has instances",
-            "label": "an instance of",
-            "value": "4"
-        },
-        {
-            "reversedLabel": "has parts",
-            "label": "a part of",
-            "value": "6"
-        },
-        {
-            "reversedLabel": "tagging",
-            "label": "tagged by",
-            "value": "8"
-        },
-        {
-            "reversedLabel": "has attributes",
-            "label": "an attribute of",
-            "value": "10"
-        },
-        {
-            "reversedLabel": "the opposite of",
-            "label": "the opposite of",
-            "value": "12"
-        },
-        {
-            "reversedLabel": "brought by",
-            "label": "author of",
-            "value": "14"
-        },
-        {
-            "reversedLabel": "used by",
-            "label": "using",
-            "value": "15"
-        },
-        {
-            "reversedLabel": "has examples",
-            "label": "an example of",
-            "value": "17"
-        },
-        {
-            "reversedLabel": "after",
-            "label": "before",
-            "value": "19"
-        },
-        {
-            "reversedLabel": "similar to",
-            "label": "similar to",
-            "value": "22"
-        },
-        {
-            "reversedLabel": "confused with",
-            "label": "confused with",
-            "value": "23"
-        }
-      ]
-    }
+    return { types: linkTypeOptions }
   },
   template: `
   <div v-for="type in types" :key="type.value">
@@ -485,13 +413,13 @@ const TemplateNoteShow = args => ({
   components: { NoteShow
    },
   data() {
-    return {noteData: noteData, colors: colors};
+    return {noteData: noteData, colors, linkTypeOptions};
   },
   setup() {
     return { args, ...actionsData };
   },
   template: `
-  <NoteShow v-bind="noteData" :colors="colors"/>
+  <NoteShow v-bind="noteData" :staticInfo="{linkTypeOptions, colors}"/>
   `,
 });
 export const NoteShowStory = TemplateNoteShow.bind({});
