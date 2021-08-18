@@ -15,18 +15,20 @@
 
   const props = defineProps({ link: Object, reverse: Boolean, owns: Boolean, colors: {Object, required: true}})
   const note = computed(()=>!!props.reverse ? props.link.sourceNote : props.link.targetNote)
-  const bgcolor = computed(()=>!!props.reverse ? props.colors['target'] : props.colors['source'])
+  const fontColor = computed(()=>!!props.reverse ? props.colors['target'] : props.colors['source'])
 </script>
 
-<style lang="sass" scoped>
-  .link-link
-    border-bottom: solid 1px black
-    padding-bottom: 3px
-    border-radius: 10px
-    background-color: v-bind(bgcolor)
-    margin-right: 10px
+<style scoped>
+  .link-link {
+    border-bottom: solid 1px black;
+    padding-bottom: 3px;
+    border-radius: 10px;
+    color: v-bind(fontColor);
+    margin-right: 10px;
+  }
 
-  .link-title
-    padding-bottom: 3px
+  .link-title {
+    padding-bottom: 3px;
+  }
 
 </style>

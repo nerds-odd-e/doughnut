@@ -1,5 +1,5 @@
 <template>
-  <NoteShowWithTitle v-bind="{note, links, level, owns}">
+  <NoteShowWithTitle v-bind="{note, links, level, owns, colors}">
     <h2 :class="'h' + level"> {{note.noteContent.title}}</h2>
     <pre class="note-body" style="white-space: pre-wrap;">{{note.noteContent.description}}</pre>
   </NoteShowWithTitle>
@@ -15,7 +15,8 @@ export default {
     note: {type: Object, required: true },
     links: Object,
     level: { type: Number, default: 2 },
-    owns: {type: Boolean, required: true} },
+    owns: {type: Boolean, required: true},
+    colors: Object },
   components: { NoteShowWithTitle }
 
 }

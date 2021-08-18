@@ -12,8 +12,8 @@
 
 <script setup>
 import { computed } from "@vue/runtime-core"
-import colors from "./colors"
+import bgcolors from "../../../colors"
 
   const props = defineProps({ linkRole: String, x: Number, y: Number, oheight: Number})
-  const fill = computed(()=> colors(props.linkRole))
+  const fill = computed(()=> bgcolors(props.linkRole))
 </script>

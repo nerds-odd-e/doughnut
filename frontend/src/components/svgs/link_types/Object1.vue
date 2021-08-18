@@ -11,9 +11,9 @@
 
 <script setup>
 import { computed } from "@vue/runtime-core"
-import colors from "./colors"
+import bgcolors from "../../../colors"
 
   const props = defineProps({ stripes: Boolean, linkRole: String, x: Number, y: Number, abstract: Boolean, size: Number})
-  const fill = computed(()=> colors(props.linkRole))
+  const fill = computed(()=> bgcolors(props.linkRole))
   const strokeDashArray = computed(()=> props.abstract ? '20, 12' : null)
 </script>

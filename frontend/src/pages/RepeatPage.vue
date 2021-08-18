@@ -15,7 +15,7 @@
         </template>
         <template #fullContent>
           <RepeatProgressBar :allowPause="!quizMode" v-bind="{linkId, noteId, finished, toRepeatCount: repetition.toRepeatCount, hasLastResult}" @viewLastResult="viewLastResult()"/>
-          <Quiz v-if="quizMode" v-bind="repetition" @answer="processAnswer($event)"/>
+          <Quiz v-if="quizMode" v-bind="repetition" @answer="processAnswer($event)" :colors="$staticInfo.colors"/>
           <template v-else>
             <template v-if="reviewPointViewedByUser">
               <Repetition

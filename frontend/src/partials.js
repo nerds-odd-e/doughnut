@@ -2,6 +2,7 @@ import { createApp } from 'vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import DoughnutApp from './DoughnutApp.vue'
 import {routes } from './routes/routes'
+import {colors } from './colors'
 
   
 const router = createRouter({
@@ -11,10 +12,7 @@ const router = createRouter({
 
 const app = createApp(DoughnutApp)
 app.config.globalProperties.$staticInfo = {
-    colors: {
-        source: "#ffaaaa",
-        target: "#d4ffaa",
-    }
+    colors: colors 
 }
 app.config.globalProperties.$popups = {}
 

@@ -8,7 +8,7 @@
             <NoteButtons v-if="owns" :note="note" @updated="$emit('updated')"/>
             <BazaarNoteButtons v-else :note="note" :notebook="notebook" />
         </nav>
-        <NoteShow :note="note" :links="links" :level="1" :owns="owns"/>
+        <NoteShow :note="note" :links="links" :level="1" :owns="owns" :colors="$staticInfo.colors"/>
     </div>
 </template>
 

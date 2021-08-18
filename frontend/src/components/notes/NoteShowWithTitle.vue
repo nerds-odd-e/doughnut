@@ -1,5 +1,5 @@
 <template>
-    <LinkLists v-bind="{links, owns}">
+    <LinkLists v-bind="{links, owns, colors}">
       <div>
           <slot></slot>
           <div v-if="!!note.noteContent.url">
@@ -15,5 +15,5 @@
 <script setup>
   import ShowPicture from "./ShowPicture.vue"
   import LinkLists from "../links/LinkLists.vue"
-  const  propsx = defineProps({ note: Object, links: Object, level: Number, owns: { type: Boolean, required: true } })
+  const  propsx = defineProps({ note: Object, links: Object, level: Number, owns: { type: Boolean, required: true }, colors: Object })
 </script>

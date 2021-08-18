@@ -11,8 +11,9 @@
   const props = defineProps({ link: Object, owns: Boolean, inverseIcon: Boolean, colors: Object})
 </script>
 
-<style lang="sass" scoped>
+<style scoped>
 
-.link-nob
-  padding: 3px
+.link-nob {
+  padding: 3px;
+}
 </style>

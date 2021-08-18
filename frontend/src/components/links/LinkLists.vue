@@ -22,7 +22,7 @@
 <script>
   import LinkLink from "./LinkLink.vue"
   export default {
-    props: { links: Object, owns: Boolean },
+    props: { links: Object, owns: Boolean, colors: Object },
     components: { LinkLink },
     methods: {
         reverseLabel(lbl) {
@@ -33,10 +33,5 @@
             return reversedLabel;
         },
     },
-    computed: {
-        colors() {
-            return this.$staticInfo.colors
-        }
-    }
   }
 </script>
