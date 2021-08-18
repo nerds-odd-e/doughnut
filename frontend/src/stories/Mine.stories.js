@@ -152,6 +152,7 @@ const noteData = {
     },
     "createdAt": "2021-06-04T23:21:04.000+00:00",
     "title": "そうだ (伝聞)",
+    "notePicture": "https://livedoor.blogimg.jp/edewakaru/imgs/d/0/d0ec0e9a-s.jpg",
     "parentId": 1503,
     "head": false,
     "noteTypeDisplay": "Child Note",

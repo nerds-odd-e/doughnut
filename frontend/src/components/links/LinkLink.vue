@@ -20,15 +20,13 @@
 
 <style scoped>
   .link-link {
-    border-bottom: solid 1px black;
     padding-bottom: 3px;
-    border-radius: 10px;
-    color: v-bind(fontColor);
     margin-right: 10px;
   }
 
   .link-title {
     padding-bottom: 3px;
+    color: v-bind(fontColor);
   }
 
 </style>

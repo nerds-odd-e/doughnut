@@ -1,5 +1,5 @@
 <template>
-    <ul>
+    <ul class="parent-links">
         <template v-for="(linksOfType, linkType) in links" :key="linkType">
             <li  v-for="link in linksOfType.direct" :key="link.id">
                 <LinkLink  v-bind="{link, owns, colors}" :reverse="false"/>
@@ -35,3 +35,16 @@
     },
   }
 </script>
+
+<style scoped>
+.parent-links {
+    list-style: none;
+    padding: 0px;
+    margin: 0px;
+}
+.parent-links li {
+    width: 100%;
+    border-radius: 5px;
+    border-top: solid 1px black;
+}
+</style>

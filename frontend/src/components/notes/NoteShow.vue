@@ -1,13 +1,25 @@
 <template>
-  <NoteShowWithTitle v-bind="{note, links, level, owns, colors}">
-    <h2 :class="'h' + level"> {{note.noteContent.title}}</h2>
-    <pre class="note-body" style="white-space: pre-wrap;">{{note.noteContent.description}}</pre>
-  </NoteShowWithTitle>
+  <LinkLists v-bind="{links, owns, colors}">
+    <div>
+      <h2 :class="'note-title h' + level"> {{note.noteContent.title}}</h2>
+      <div :class="`grid grid-cols-1 ${!note.notePicture ? '' : 'md:grid-cols-6'}`">
+        <pre class="note-body" style="white-space: pre-wrap;">{{note.noteContent.description}}</pre>
+        <ShowPicture :note="note" :opacity="0.2"/>
+      </div>
+      <div v-if="!!note.noteContent.url">
+          <label v-if="note.noteContent.urlIsVideo">Video Url:</label>
+          <label v-else>Url:</label>
+          <a :href="note.noteContent.url">{{note.noteContent.url}}</a>
+      </div>
+  </div>
+</LinkLists>
+
 
 </template>
 
 <script>
-import NoteShowWithTitle from "./NoteShowWithTitle.vue"
+import LinkLists from "../links/LinkLists.vue"
+import ShowPicture from "./ShowPicture.vue"
 
 export default {
   name: "NoteShow",
@@ -17,7 +29,13 @@ export default {
     level: { type: Number, default: 2 },
     owns: {type: Boolean, required: true},
     colors: Object },
-  components: { NoteShowWithTitle }
+  components: { LinkLists, ShowPicture }
 
 }
 </script>
+
+<style scoped>
+.note-title {
+    color: v-bind(colors['target']);
+}
+</style>
