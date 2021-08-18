@@ -44,7 +44,7 @@
 }
 .parent-links li {
     width: 100%;
-    border-radius: 5px;
+    border-radius: 10px;
     border-top: solid 1px black;
 }
 </style>
