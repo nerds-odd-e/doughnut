@@ -24,7 +24,7 @@ import NoteBreadcrumbForOwnOrCircle from "./NoteBreadcrumbForOwnOrCircle.vue"
 import NoteFormBody from "./NoteFormBody.vue"
 import ModalWithButton from "../commons/ModalWithButton.vue"
 import LinkTypeSelect from "../links/LinkTypeSelect.vue"
-import { restPostMultiplePartForm } from "../../restful/restful"
+import { restGet, restPostMultiplePartForm } from "../../restful/restful"
 
 function initialState() {
   return {
@@ -39,9 +39,12 @@ function initialState() {
 export default {
   name: 'NoteNewButton',
   components: { NoteBreadcrumbForOwnOrCircle, NoteFormBody, ModalWithButton, LinkTypeSelect },
-  props: {notebook: Object, ancestors: Array},
+  props: {parentId: Number},
   data() {
     return {
+      loading: false,
+      ancestors: null,
+      notebook: null,
       show: false,
       ...initialState(),
     }
@@ -49,12 +52,22 @@ export default {
   watch: {
     show() {
       Object.assign(this.$data, initialState())
+      if(this.show) this.fetchData()
     }
   },
   methods: {
+    fetchData() {
+      restGet(`/api/notes/${this.parentId}`, (r)=>this.loading=r)
+        .then( res => {
+          const { ancestors, note, notebook} = res
+          this.ancestors = [...ancestors, note]
+          this.notebook = notebook
+        })
+    }, 
+
     processForm() {
       restPostMultiplePartForm(
-        `/api/notes/${this.ancestors[this.ancestors.length - 1].id}/create`,
+        `/api/notes/${this.parentId}/create`,
         this.creationData,
         r=>this.loading=r)
           .then(res => {

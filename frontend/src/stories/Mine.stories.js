@@ -1,5 +1,6 @@
 import Svg from '../components/svgs/link_types/SvgLinkTypeSpecialize.vue';
 import SvgLinkTypeIcon from '../components/svgs/SvgLinkTypeIcon.vue';
+import SvgAddSibling from '../components/svgs/SvgAddSibling.vue';
 import NoteShow from '../components/notes/NoteShow.vue';
 import {colors} from '../colors';
 import {linkTypeOptions} from '../../tests/notes/fixtures-basic';
@@ -24,12 +25,13 @@ export const actionsData = {
 };
 
 const Template = args => ({
-  components: { Svg, SvgLinkTypeIcon
+  components: { Svg, SvgLinkTypeIcon, SvgAddSibling
    },
   data() {
     return { types: linkTypeOptions }
   },
   template: `
+  <SvgAddSibling/>
   <div v-for="type in types" :key="type.value">
   {{type.label}}
   <SvgLinkTypeIcon :linkTypeId="0+type.value" width="80px" height="40px"/>

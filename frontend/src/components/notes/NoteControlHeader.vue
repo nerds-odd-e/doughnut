@@ -3,7 +3,7 @@
         <NoteOwnerBreadcrumb :ancestors="ancestors" :notebook="notebook">
             <li class="breadcrumb-item">{{note.title}}</li>
             <li class="breadcrumb-item">
-                <NoteNewButton :notebook="notebook" :ancestors="[...ancestors, note]">
+                <NoteNewButton :parentId="note.id">
                     <template #default="{open}">
                         <a class="text-secondary" @click="open()">{{`(Add ${note.noteTypeDisplay})`}}</a>
                     </template>
@@ -11,7 +11,7 @@
             </li>
         </NoteOwnerBreadcrumb>
         <div v-if="!note.head">
-            <NoteNewButton :notebook="notebook" :ancestors="ancestors">
+            <NoteNewButton :parentId="ancestors[ancestors.length - 1].id">
                 <template #default="{open}">
                     <SvgDownRight/>
                     <a class="text-secondary" @click="open()">Add Sibling Note</a>
@@ -22,7 +22,7 @@
 </template>
 
 <script>
-  import SvgDownRight from "../svgs/SvgDownRight.vue"
+  import SvgDownRight from "../svgs/SvgAddSibling.vue"
   import NoteOwnerBreadcrumb from "./NoteOwnerBreadcrumb.vue"
   import NoteNewButton from "./NoteNewButton.vue"
   export default {

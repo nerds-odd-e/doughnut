@@ -1,5 +1,22 @@
 <template>
 <div class="btn-group btn-group-sm">
+
+    <NoteNewButton :parentId="note.id">
+        <template #default="{open}">
+            <a class="btn btn-small" @click="open()" :title="`Add ${note.noteTypeDisplay}`">
+                <SvgAddChild/>
+            </a>
+        </template>
+    </NoteNewButton>
+
+    <NoteNewButton :parentId="note.parentId" v-if="!!note.parentId">
+        <template #default="{open}">
+            <a class="btn btn-small" @click="open()" title="Add Sibling Note">
+                <SvgAddSibling/>
+            </a>
+        </template>
+    </NoteNewButton>
+
     <NoteEditButton :noteId="note.id" :oldTitle="note.title" @updated="$emit('updated')"/>
     <LinkNoteButton :note="note" @updated="$emit('updated')"/>
     <a class="btn btn-light dropdown-toggle"
@@ -24,18 +41,21 @@
 </template>
 
 <script>
+  import SvgAddChild from "../svgs/SvgAddChild.vue"
+  import SvgAddSibling from "../svgs/SvgAddSibling.vue"
   import SvgArticle from "../svgs/SvgArticle.vue"
   import SvgCog from "../svgs/SvgCog.vue"
   import SvgRemove from "../svgs/SvgRemove.vue"
   import LinkNoteButton from "../links/LinkNoteButton.vue"
   import ReviewSettingEditButton from "../review/ReviewSettingEditButton.vue"
   import NoteEditButton from "./NoteEditButton.vue"
+  import NoteNewButton from "./NoteNewButton.vue"
   import { restPost } from '../../restful/restful'
   export default {
     name: 'NoteButtons',
     props: {note: Object},
     emits: ['updated'],
-    components: { SvgArticle, SvgCog, ReviewSettingEditButton, SvgRemove, LinkNoteButton, NoteEditButton },
+    components: { SvgArticle, SvgCog, SvgAddChild, SvgAddSibling, ReviewSettingEditButton, SvgRemove, LinkNoteButton, NoteEditButton, NoteNewButton },
     methods: {
         async deleteNote() {
             if(await this.$popups.confirm(`Are you sure to delete this note?`)) {
