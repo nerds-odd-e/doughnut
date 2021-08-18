@@ -11,7 +11,6 @@
 <script>
 import NoteViewedByUserWithoutChildren from "./NoteViewedByUserWithoutChildren.vue"
 import NoteNavigationButtons from "./NoteNavigationButtons.vue"
-import NoteControlHeader from "./NoteControlHeader.vue"
 import NoteOwnerViewCards from "./NoteOwnerViewCards.vue"
 
 export default {
@@ -26,6 +25,6 @@ export default {
     owns: { type: Boolean, required: true }
   },
   emits: ['updated'],
-  components: { NoteViewedByUserWithoutChildren, NoteNavigationButtons, NoteControlHeader, NoteOwnerViewCards },
+  components: { NoteViewedByUserWithoutChildren, NoteNavigationButtons, NoteOwnerViewCards },
 }
 </script>

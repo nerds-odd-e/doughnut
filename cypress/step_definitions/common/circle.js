@@ -51,7 +51,7 @@ When("I should see the note {string} in circle {string}", (noteTitle, circleName
 
 When("I add a note {string} under {string}", (noteTitle, parentNoteTitle) => {
   cy.findByText(parentNoteTitle).click();
-  cy.findByText("(Add Child Note)").click();
+  cy.clickAddChildNoteButton()
   cy.submitNoteFormsWith([{'Title': noteTitle}]);
 });
 

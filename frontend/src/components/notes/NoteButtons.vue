@@ -3,17 +3,17 @@
 
     <NoteNewButton :parentId="note.id">
         <template #default="{open}">
-            <a class="btn btn-small" @click="open()" :title="`Add ${note.noteTypeDisplay}`">
+            <button class="btn btn-small" @click="open()" :title="`Add ${note.noteTypeDisplay}`">
                 <SvgAddChild/>
-            </a>
+            </button>
         </template>
     </NoteNewButton>
 
     <NoteNewButton :parentId="note.parentId" v-if="!!note.parentId">
         <template #default="{open}">
-            <a class="btn btn-small" @click="open()" title="Add Sibling Note">
+            <button class="btn btn-small" @click="open()" title="Add Sibling Note">
                 <SvgAddSibling/>
-            </a>
+            </button>
         </template>
     </NoteNewButton>
 

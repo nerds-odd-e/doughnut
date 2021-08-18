@@ -1,5 +1,5 @@
 <template>
-    <NoteControlHeader v-if="owns" :note="note" :ancestors="ancestors" :notebook="notebook"/>
+    <NoteOwnerBreadcrumb v-if="owns" :ancestors="ancestors" :notebook="notebook"/>
     <NoteBazaarBreadcrumb v-else :ancestors="ancestors">
       <li class="breadcrumb-item">{{note.title}}</li>
     </NoteBazaarBreadcrumb>
@@ -17,7 +17,7 @@ import NoteShow from "./NoteShow.vue"
 import NoteBazaarBreadcrumb from "../bazaar/NoteBazaarBreadcrumb.vue"
 import BazaarNoteButtons from "../bazaar/BazaarNoteButtons.vue"
 import NoteButtons from "./NoteButtons.vue"
-import NoteControlHeader from "./NoteControlHeader.vue"
+import NoteOwnerBreadcrumb from "./NoteOwnerBreadcrumb.vue"
 
 export default {
   name: "NoteViewedByUserWithoutChildren",
@@ -29,7 +29,7 @@ export default {
     owns: { type: Boolean, required: true }
   },
   emits: ['updated'],
-  components: {NoteShow, NoteBazaarBreadcrumb, BazaarNoteButtons, NoteButtons, NoteControlHeader},
+  components: {NoteShow, NoteBazaarBreadcrumb, BazaarNoteButtons, NoteButtons, NoteOwnerBreadcrumb},
 }
 
 </script>

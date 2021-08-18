@@ -98,7 +98,7 @@ Cypress.Commands.add('triggerException', () => {
 });
 
 Cypress.Commands.add('addBlogPost', hashes => {
-  cy.findByText('(Add Blog Post)').click();
+  cy.findByRole("button", {name: "Add Blog Post"}).click();
   cy.submitNoteFormsWith(
     hashes.map(blogPostAttributes => {
       const { date, Title, ...rest } = blogPostAttributes;
@@ -132,6 +132,10 @@ Cypress.Commands.add('submitNoteFormWith', noteAttributes => {
   }
   cy.get('input[value="Submit"]').click();
 });
+
+Cypress.Commands.add('clickAddChildNoteButton', () => {
+  cy.findAllByRole("button", {name: "Add Child Note"}).first().click();
+})
 
 Cypress.Commands.add('clickRadioByLabel', labelText => {
    cy.findByText(labelText, {selector: 'label'}).click({force: true});

@@ -47,14 +47,14 @@ When('I update it to become:', data => {
 });
 
 When('I create note belonging to {string}:', (noteTitle, data) => {
-  cy.jumpToNotePage(noteTitle);
-  cy.findByText('(Add Child Note)').click();
-  cy.submitNoteFormsWith(data.hashes());
+  cy.jumpToNotePage(noteTitle)
+  cy.clickAddChildNoteButton()
+  cy.submitNoteFormsWith(data.hashes())
 });
 
 When('I am creating note under {string}', noteTitles => {
   cy.navigateToNotePage(noteTitles);
-  cy.findByText('(Add Child Note)').click();
+  cy.clickAddChildNoteButton()
 });
 
 Then('I should see {string} in breadcrumb', noteTitles => {
@@ -85,7 +85,7 @@ When('I delete top level note {string}', noteTitle => {
 
 When('I create a sibling note of {string}:', (noteTitle, data) => {
   cy.findByText(noteTitle, { selector: '.h1' });
-  cy.findByText('Add Sibling Note').click();
+  cy.findByRole("button", {name: "Add Sibling Note"}).click();
   cy.submitNoteFormsWith(data.hashes());
 });
 
