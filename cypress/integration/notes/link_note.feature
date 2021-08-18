@@ -28,9 +28,9 @@ Feature: link note
   Scenario: links should show in the view
     When I link note "Sedition" as "similar to" note "Sedation"
     And I link note "Sedition" as "similar to" note "Sedative"
-    Then On the current page, I should see "Sedition" has link "similar to" "Sedation, Sedative"
-    When I open link "Sedation"
-    Then I should be able to change the link to "a specialization of"
+#    Then On the current page, I should see "Sedition" has link "similar to" "Sedation, Sedative"
+#    When I open link "Sedation"
+#    Then I should be able to change the link to "a specialization of"
 #    And On the current page, I should see "Sedition" has link "a specialization of" "Sedation"
 #    When I open link "Sedation"
 #    Then I should be able to delete the link
