@@ -20,7 +20,7 @@ in mkShell {
     git git-secret gitAndTools.delta locale lsd platinum-searcher
     binutils-unwrapped hostname inetutils openssh pkg-config rsync
     autojump bat duf fasd fzf gnupg htop jq less lesspipe lsof lzma
-    most progress ps pstree ripgrep tree vgrep unixtools.whereis which
+    most ps pstree ripgrep tree vgrep unixtools.whereis which
     libmysqlclient libpcap libressl patchelf
     cacert curlie glances httpie
     mysql80 mysql-client mysql_jdbc python39Packages.pip
