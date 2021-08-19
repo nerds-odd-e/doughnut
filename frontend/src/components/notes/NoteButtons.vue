@@ -3,7 +3,7 @@
 
     <NoteNewButton :parentId="note.id">
         <template #default="{open}">
-            <button class="btn btn-small" @click="open()" :title="`Add ${note.noteTypeDisplay}`">
+            <button class="btn btn-small" @click="open()" :title="`Add Child Note`">
                 <SvgAddChild/>
             </button>
         </template>

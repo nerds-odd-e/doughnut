@@ -167,10 +167,6 @@ public class Note {
         return getParentNote() == null;
     }
 
-    public String getNoteTypeDisplay() {
-        return this.getNotebook().getNotebookType().getDisplay();
-    }
-
     private void addAncestors(List<Note> ancestors) {
         int[] counter = {1};
         ancestors.forEach(anc -> {

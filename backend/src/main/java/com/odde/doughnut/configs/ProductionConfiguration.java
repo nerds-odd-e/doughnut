@@ -21,7 +21,7 @@ public class ProductionConfiguration extends WebSecurityConfigurerAdapter {
     http.csrf()
         .disable()
         .authorizeRequests()
-        .antMatchers("/api/blog/*", "/api/healthcheck")
+        .antMatchers("/api/healthcheck")
         .permitAll();
 
     commonConfiguration.commonConfig(http, http.oauth2Login());

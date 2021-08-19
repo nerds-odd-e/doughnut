@@ -98,7 +98,7 @@ Cypress.Commands.add('triggerException', () => {
 });
 
 Cypress.Commands.add('addBlogPost', hashes => {
-  cy.findByRole("button", {name: "Add Blog Post"}).click();
+  cy.findByRole("button", {name: "Add Child Note"}).click();
   cy.submitNoteFormsWith(
     hashes.map(blogPostAttributes => {
       const { date, Title, ...rest } = blogPostAttributes;
