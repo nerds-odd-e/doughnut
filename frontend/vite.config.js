@@ -29,7 +29,6 @@ export default defineConfig({
     rollupOptions: {
         input: {
           main: path.resolve(__dirname, 'index.html'),
-          partial: path.resolve(__dirname, 'partial.html')
         }
     }
 
