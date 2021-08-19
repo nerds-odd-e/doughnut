@@ -20,7 +20,7 @@
     <NoteEditButton :noteId="note.id" :oldTitle="note.title" @updated="$emit('updated')"/>
     <LinkNoteButton :note="note" @updated="$emit('updated')"/>
     <a class="btn btn-light dropdown-toggle"
-            data-toggle="dropdown" aria-haspopup="true"
+            data-bs-toggle="dropdown" aria-haspopup="true"
             aria-expanded="false" role="button" title="more options">
         <SvgCog/>
     </a>

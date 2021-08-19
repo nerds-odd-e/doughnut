@@ -2,8 +2,8 @@
     <NoteOwnerBreadcrumb v-bind="{ancestors: noteViewedByUser.ancestors, notebook: noteViewedByUser.notebook}"/>
     <Card :note="noteViewedByUser.note">
         <template #button="{note}">
-            <button class="source_btn btn btn-sm btn-secondary" data-toggle="collapse"
-             :data-target="`#note-collapse-${note.id}`" aria-expanded="false">
+            <button class="source_btn btn btn-sm btn-secondary" data-bs-toggle="collapse"
+             :data-bs-target="`#note-collapse-${note.id}`" aria-expanded="false">
                 Toggle Details
             </button>
         </template>

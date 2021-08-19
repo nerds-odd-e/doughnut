@@ -3,7 +3,8 @@ import { createRouter, createWebHistory } from 'vue-router'
 import DoughnutApp from './DoughnutApp.vue'
 import {routes } from './routes/routes'
 import {colors } from './colors'
-
+import "bootstrap/dist/css/bootstrap.min.css"
+import "bootstrap"
   
 const router = createRouter({
     history: createWebHistory(),

@@ -12,6 +12,7 @@
     "build-storybook": "build-storybook"
   },
   "dependencies": {
+    "bootstrap": "^5.1.0",
     "lodash": "^4.17.21",
     "vue": "^3.1.5",
     "vue-content-loader": "^2.0.0",
