@@ -19,7 +19,7 @@ in mkShell {
     any-nix-shell zsh zsh-powerlevel10k
     git git-secret gitAndTools.delta locale lsd platinum-searcher
     binutils-unwrapped hostname inetutils openssh pkg-config rsync
-    autojump bat duf fasd fzf gnupg htop jq less lesspipe lsof lzma
+    autojump bat fasd fzf gnupg htop jq less lesspipe lsof lzma ncdu zoxide
     most ps pstree ripgrep tree vgrep unixtools.whereis which
     libmysqlclient libpcap libressl patchelf
     cacert curlie glances httpie
