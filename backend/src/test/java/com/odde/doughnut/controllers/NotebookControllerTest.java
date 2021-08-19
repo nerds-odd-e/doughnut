@@ -79,35 +79,4 @@ class NotebookControllerTest {
         }
     }
 
-    @Nested
-    class createBlog {
-
-        @Test
-        void shouldCreateNotebookAsABlogWhenBlogTypeIsSelected() throws IOException {
-            User user = makeMe.aUser().please();
-            Note note = makeMe.aNote().byUser(user).inMemoryPlease();
-
-            NoteContent noteContent = note.getNoteContent();
-            BindingResult bindingResult = makeMe.successfulBindingResult();
-            String response = controller.createBlog(user.getOwnership(), noteContent, bindingResult);
-
-            assertThat(response, matchesPattern("redirect:/notes/\\d+"));
-            assertEquals(NotebookType.BLOG, getNotebookJustCreated(response).getNotebookType());
-        }
-
-        @Test
-        void shouldUseTheRightTemplate() throws IOException {
-            String response = controller.createBlog(null, null, makeMe.failedBindingResult());
-
-            assertThat(response, equalTo("notebooks/new_blog"));
-        }
-
-    }
-
-    private Notebook getNotebookJustCreated(String response) {
-        String[] split = response.split("/");
-        Integer id = Integer.valueOf(split[split.length - 1]);
-        Note createdNote = modelFactoryService.findNoteById(id).get();
-        return createdNote.getNotebook();
-    }
 }

@@ -39,31 +39,12 @@ public class NotebookController extends ApplicationMvcController  {
         return "vuejsed";
     }
 
-    @GetMapping({"/new_blog"})
-    public String newBlog(Model model) {
-        UserModel userModel = getCurrentUser();
-        model.addAttribute("ownership", userModel.getEntity().getOwnership());
-        model.addAttribute("noteContent", new NoteContent());
-        return "notebooks/new_blog";
-    }
-
     @PostMapping({"/{ownership}/create"})
     public String createNote(@PathVariable(name = "ownership", required = false) Ownership ownership, @Valid NoteContent noteContent, BindingResult bindingResult) throws IOException {
         if (bindingResult.hasErrors()) {
             return "notebooks/new";
         }
         final Note note = createHeadNote(ownership, noteContent);
-        modelFactoryService.noteRepository.save(note);
-        return "redirect:/notes/" + note.getId();
-    }
-
-    @PostMapping({"/{ownership}/create_blog"})
-    public String createBlog(@PathVariable(name = "ownership", required = false) Ownership ownership, @Valid NoteContent noteContent, BindingResult bindingResult) throws IOException {
-        if (bindingResult.hasErrors()) {
-            return "notebooks/new_blog";
-        }
-        final Note note = createHeadNote(ownership, noteContent);
-        note.getNotebook().setNotebookType(NotebookType.BLOG);
         modelFactoryService.noteRepository.save(note);
         return "redirect:/notes/" + note.getId();
     }

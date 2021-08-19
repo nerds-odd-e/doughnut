@@ -97,16 +97,6 @@ Cypress.Commands.add('triggerException', () => {
   });
 });
 
-Cypress.Commands.add('addBlogPost', hashes => {
-  cy.findByRole("button", {name: "Add Child Note"}).click();
-  cy.submitNoteFormsWith(
-    hashes.map(blogPostAttributes => {
-      const { date, Title, ...rest } = blogPostAttributes;
-      return { ...rest, Title: `${date}: ${Title}` };
-    })
-  );
-});
-
 Cypress.Commands.add('submitNoteFormWith', noteAttributes => {
   for (var propName in noteAttributes) {
     const value = noteAttributes[propName];
