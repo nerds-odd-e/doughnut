@@ -5,7 +5,7 @@
     </NoteBazaarBreadcrumb>
     <div class="note-with-controls">
         <nav class="nav d-flex flex-row-reverse p-0">
-            <NoteButtons v-if="owns" :note="note" @updated="$emit('updated')"/>
+            <NoteButtons v-if="owns" :note="note" @updated="$emit('updated')" :addSibling="true"/>
             <BazaarNoteButtons v-else :note="note" :notebook="notebook" />
         </nav>
         <NoteShow :note="note" :links="links" :level="1" :owns="owns" :staticInfo="$staticInfo"/>

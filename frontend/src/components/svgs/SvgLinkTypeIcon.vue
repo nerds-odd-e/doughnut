@@ -19,6 +19,7 @@
     import SvgLinkTypeOpposite from './link_types/SvgLinkTypeOpposite.vue';
     import SvgLinkTypeAttr from './link_types/SvgLinkTypeAttr.vue';
     import SvgLinkTypeConfuse from './link_types/SvgLinkTypeConfuse.vue';
+    import SvgFolder from './link_types/SvgFolder.vue';
 import { computed } from '@vue/runtime-core';
 
   const props = defineProps({ linkTypeId: Number, width: String, height: String, inverseIcon: Boolean })
@@ -38,5 +39,6 @@ import { computed } from '@vue/runtime-core';
       if (linkTypeId === 19) return SvgLinkTypePrecede
       if (linkTypeId === 22) return SvgLinkTypeSimilar
       if (linkTypeId === 23) return SvgLinkTypeConfuse
+      return SvgFolder
   })
 </script>

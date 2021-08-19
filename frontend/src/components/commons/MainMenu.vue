@@ -9,32 +9,32 @@
                 Doughnut
             </a>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav mr-auto">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <li class="nav-item active ">
                         <router-link class="nav-link" :to="{name: 'notebooks'}">My Notes</router-link>
                     </li>
-                    <li class="nav-item active">
+                    <li class="nav-item ">
                         <router-link class="nav-link" :to="{name: 'reviews'}">Review</router-link>
                     </li>
-                    <li class="nav-item active">
+                    <li class="nav-item ">
                         <a class="nav-link" href="/circles">Circles</a>
                     </li>
-                    <li class="nav-item active">
+                    <li class="nav-item ">
                         <a class="nav-link" href="/bazaar">Bazaar</a>
                     </li>
-                    <li class="nav-item active" v-if="user && user.isDeveloper">
+                    <li class="nav-item " v-if="user && user.isDeveloper">
                         <a class="nav-link" href="/failure-report-list">Failure Reports</a>
                     </li>
                 </ul>
-                <template v-if="user">
+                <div class="d-flex" v-if="user">
                   <span style="margin-right:10px;" class="navbar-text">
                       <a href="/users/edit">{{user.name}}</a>
                   </span>
                   <form class="form-inline my-2 my-lg-0" th:action="@{/logout}" method="post">
-                      <input class= "btn btn-outline-success my-2 my-sm-0" type= "submit" value="Logout">
+                      <input class= "btn btn-outline-success me-2 my-sm-0" type= "submit" value="Logout">
                   </form>
-                </template>
-                <a v-else class= "btn btn-outline-primary my-2 my-sm-0" href="/login">Login via Github</a>
+                </div>
+                <a v-else class= "btn btn-outline-primary me-2 my-sm-0" href="/login">Login via Github</a>
             </div>
         </nav>
     </div>

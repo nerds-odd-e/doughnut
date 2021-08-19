@@ -9,7 +9,7 @@
         </template>
     </NoteNewButton>
 
-    <NoteNewButton :parentId="note.parentId" v-if="!!note.parentId">
+    <NoteNewButton :parentId="note.parentId" v-if="!!note.parentId && addSibling">
         <template #default="{open}">
             <button class="btn btn-small" @click="open()" title="Add Sibling Note">
                 <SvgAddSibling/>
@@ -53,7 +53,7 @@
   import { restPost } from '../../restful/restful'
   export default {
     name: 'NoteButtons',
-    props: {note: Object},
+    props: {note: Object, addSibling: Boolean},
     emits: ['updated'],
     components: { SvgArticle, SvgCog, SvgAddChild, SvgAddSibling, ReviewSettingEditButton, SvgRemove, LinkNoteButton, NoteEditButton, NoteNewButton },
     methods: {
