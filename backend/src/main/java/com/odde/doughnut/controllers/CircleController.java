@@ -34,27 +34,7 @@ public class CircleController extends ApplicationMvcController  {
 
     @GetMapping("")
     public String index(Model model) {
-        UserModel user = currentUserFetcher.getUser();
-        model.addAttribute("user", user.getEntity());
-        model.addAttribute("circleJoiningByInvitation", new CircleJoiningByInvitation());
-        return "circles/index";
-    }
-
-    @GetMapping("/new")
-    public String newCircle(Model model) {
-        model.addAttribute("circle", new Circle());
-        return "circles/new";
-    }
-
-    @PostMapping("")
-    public String createCircle(@Valid Circle circle, BindingResult bindingResult) {
-        if (bindingResult.hasErrors()) {
-            return "circles/new";
-        }
-        UserModel userModel = currentUserFetcher.getUser();
-        CircleModel circleModel = modelFactoryService.toCircleModel(circle);
-        circleModel.joinAndSave(userModel);
-        return "redirect:/circles/" + circle.getId();
+        return "vuejsed";
     }
 
     @GetMapping("/{circle}")

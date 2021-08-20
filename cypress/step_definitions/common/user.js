@@ -33,6 +33,7 @@ When('I identify myself as a new user', () => {
   cy.get('#password').type('password');
   cy.get('form.form-signin').submit();
   cy.location('pathname', { timeout: 10000 }).should('eq', '/');
+  cy.visit('/');
 });
 
 When('I should be asked to create my profile', () => {

@@ -7,7 +7,8 @@ import {
 } from "cypress-cucumber-preprocessor/steps";
 
 When("I create a new circle {string} and copy the invitation code", (circleName) => {
-  cy.visit("/circles/new");
+  cy.visit("/circles");
+  cy.findByRole('button', {name: 'Create a new circle'}).click()
   cy.getFormControl('Name').type(circleName);
   cy.get('input[value="Submit"]').click();
 
