@@ -6,6 +6,7 @@ import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.json.RedirectToNoteResponse;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.models.BazaarModel;
 import com.odde.doughnut.models.UserModel;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -62,6 +63,15 @@ class RestNotebookController {
     UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertAuthorization(notebook);
     modelFactoryService.notebookRepository.save(notebook);
+    return notebook;
+  }
+
+  @PostMapping(value = "/{notebook}/share")
+  public Notebook shareNote(@PathVariable("notebook") Notebook notebook) throws NoAccessRightException {
+    UserModel user = currentUserFetcher.getUser();
+    user.getAuthorization().assertAuthorization(notebook);
+    BazaarModel bazaar = modelFactoryService.toBazaarModel();
+    bazaar.shareNote(notebook);
     return notebook;
   }
 

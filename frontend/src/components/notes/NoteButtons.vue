@@ -51,6 +51,7 @@
     props: {note: Object, addSibling: Boolean},
     emits: ['updated'],
     components: { SvgCog, SvgAddChild, SvgAddSibling, ReviewSettingEditButton, SvgRemove, LinkNoteButton, NoteEditButton, NoteNewButton },
+
     methods: {
         async deleteNote() {
             if(await this.$popups.confirm(`Are you sure to delete this note?`)) {
@@ -68,4 +69,5 @@
         }
     }
   }
+
 </script>

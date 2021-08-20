@@ -2,17 +2,27 @@
 <div class="btn-group btn-group-sm">
     <slot name="additional-buttons"/>
     <NotebookEditButton v-bind="{notebook}"/>
-    <form :action="`/notebooks/${notebook.id}/share`" method="post"
-          onsubmit="return confirm('Are you sure to share?')">
-        <button class="btn btn-sm" title="Share notebook to bazaar">
-            <SvgBazaarShare/>
-        </button>
-    </form>
+    <button class="btn btn-sm" title="Share notebook to bazaar" @click="shareNotebook()"> 
+        <SvgBazaarShare/>
+    </button>
 </div>
 </template>
 
-<script setup>
+<script>
 import NotebookEditButton from "./NotebookEditButton.vue"
 import SvgBazaarShare from "../svgs/SvgBazaarShare.vue"
-const props = defineProps({ notebook: Object })
+import { restPost } from '../../restful/restful'
+
+export default {
+    props: { notebook: Object },
+    components: { NotebookEditButton, SvgBazaarShare },
+    methods: {
+        async shareNotebook() {
+            if(await this.$popups.confirm(`Are you sure to share?`)) {
+                restPost(`/api/notebooks/${this.notebook.id}/share`, {}, r=>{})
+                  .then( r=>this.$router.push({name: 'notebooks'}))
+            }
+        }
+    }
+}
 </script>

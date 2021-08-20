@@ -9,6 +9,7 @@ import {
 Given("I choose to share my notebook {string}", (noteTitle) => {
   cy.visitMyNotebooks();
   cy.findNoteCardButton(noteTitle, "Share notebook to bazaar").click();
+  cy.findByRole('button', { name: 'OK' }).click();
 })
 
 Then("I should see {string} is shared in the Bazaar", (noteTitle) => {
