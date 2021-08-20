@@ -17,7 +17,7 @@ public class DescriptionLinkTargetQuizFactory extends LinkTargetQuizFactory {
     @Override
     public String generateInstruction() {
         String clozeDescription = ClozeDescription.htmlClosedDescription().getClozeDescription(answerNote.getNoteContent().getNoteTitle(), getSourceDescription());
-        return "<p>The following descriptions is " + link.getLinkTypeLabel() + ":</p>" + "<pre>" + clozeDescription + "</pre> " ;
+        return "<p>The following descriptions is " + link.getLinkTypeLabel() + ":</p>" + "<pre style='white-space: pre-wrap;'>" + clozeDescription + "</pre> " ;
     }
 
     private String getSourceDescription() {

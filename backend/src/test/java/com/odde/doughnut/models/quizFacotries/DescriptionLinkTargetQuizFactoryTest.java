@@ -68,7 +68,7 @@ class DescriptionLinkTargetQuizFactoryTest {
     @Test
     void shouldIncludeRightAnswers() {
         QuizQuestion quizQuestion = buildQuestion();
-        assertThat(quizQuestion.getDescription(), containsString("<p>The following descriptions is a specialization of:</p><pre><mark title='Hidden text that is matching the answer'>[...]</mark> is not built in a day</pre>"));
+        assertThat(quizQuestion.getDescription(), containsString("<p>The following descriptions is a specialization of:</p><pre style='white-space: pre-wrap;'><mark title='Hidden text that is matching the answer'>[...]</mark> is not built in a day</pre>"));
     }
 
     @Nested

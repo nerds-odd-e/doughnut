@@ -3,8 +3,8 @@
     <div class="note-body">
       <h2 :class="'note-title h' + level"> {{note.noteContent.title}}</h2>
       <div class="row">
-        <pre :class="`col-12 ${twoColumns ? 'col-md-6' : ''} note-body`" style="white-space: pre-wrap;">{{note.noteContent.description}}</pre>
-        <ShowPicture :class="`col-12 ${twoColumns ? 'col-md-6' : ''} note-body`" :note="note" :opacity="0.2"/>
+        <ShowDescription :class="`col-12 ${twoColumns ? 'col-md-6' : ''}`" :description="note.noteContent.description"/>
+        <ShowPicture :class="`col-12 ${twoColumns ? 'col-md-6' : ''}`" :note="note" :opacity="0.2"/>
       </div>
       <div v-if="!!note.noteContent.url">
           <label v-if="note.noteContent.urlIsVideo">Video Url:</label>
@@ -21,6 +21,7 @@
 import { computed } from "@vue/runtime-core"
 import LinkLists from "../links/LinkLists.vue"
 import ShowPicture from "./ShowPicture.vue"
+import ShowDescription from "./ShowDescription.vue"
 
 const props = defineProps({
     note: {type: Object, required: true },

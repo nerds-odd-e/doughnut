@@ -11,17 +11,14 @@
 
     </LinkLists>
 
-    <div class="row mt-2" v-if="quizQuestion.questionType!=='SPELLING'">
-        <div class="col-sm-6 mb-3" v-for="option in quizQuestion.options" :key="option.note.id">
-            <form @submit.prevent.once="processForm">
-                <button class="btn btn-secondary btn-lg btn-block" v-on:click="emptyAnswer.answerNoteId=option.note.id">
+    <div class="row" v-if="quizQuestion.questionType!=='SPELLING'">
+        <div class="col-sm-6 mb-3 d-grid" v-for="option in quizQuestion.options" :key="option.note.id">
+                <button class="btn btn-secondary btn-lg" v-on:click.once="emptyAnswer.answerNoteId=option.note.id;processForm()">
                     <div v-if="!option.picture">{{option.display}}</div>
                     <div v-else>
                         <ShowPicture :note="option.note" :opacity="1"/>
                     </div>
                 </button>
-
-            </form>
         </div>
     </div>
 
@@ -35,31 +32,24 @@
     </div>
 </template>
 
-<script>
+<script setup>
   import NoteBreadcrumbForReview from "./NoteBreadcrumbForReview.vue"
   import ShowPicture from "../notes/ShowPicture.vue"
   import LinkLists from "../links/LinkLists.vue"
   import TextInput from "../form/TextInput.vue"
+import { computed } from "@vue/runtime-core"
 
-export default {
-  name: "Quiz",
-  props: {reviewPointViewedByUser: Object, quizQuestion: Object, emptyAnswer: Object, staticInfo: Object},
-  emits:['answer'],
-  components: {NoteBreadcrumbForReview, ShowPicture, LinkLists, TextInput },
-  computed: {
-    sourceNote(){
-        if (!!this.reviewPointViewedByUser.noteViewedByUser) return this.reviewPointViewedByUser.noteViewedByUser
-        return this.reviewPointViewedByUser.linkViewedByUser.sourceNoteViewedByUser
-    },
-    pictureQuestion() {
-        return this.quizQuestion.questionType === 'PICTURE_TITLE'
+  const props = defineProps( {reviewPointViewedByUser: Object, quizQuestion: Object, emptyAnswer: Object, staticInfo: Object} )
+  const emits = defineEmits(['answer'])
+  const sourceNote = computed(()=>{
+        if (!!props.reviewPointViewedByUser.noteViewedByUser) return props.reviewPointViewedByUser.noteViewedByUser
+        return props.reviewPointViewedByUser.linkViewedByUser.sourceNoteViewedByUser
+    })
+  const pictureQuestion = computed(() => {
+        return props.quizQuestion.questionType === 'PICTURE_TITLE'
+    })
+  const processForm = () => {
+      emits('answer', props.emptyAnswer)
     }
-  },
-  methods: {
-    processForm() {
-      this.$emit('answer', this.emptyAnswer)
-    }
-  }
-}
 
 </script>
