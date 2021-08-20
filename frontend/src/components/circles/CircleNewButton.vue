@@ -6,7 +6,7 @@
         </button>
       </template>
       <template #header>
-        <h3>Add to my learning</h3>
+        <h3>Creating a new circle</h3>
       </template>
       <template #body>
         <form @submit.prevent.once="processForm">

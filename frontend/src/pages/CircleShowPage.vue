@@ -9,7 +9,7 @@
           <template #default="{notebook}">
             <NotebookButtons v-bind="{notebook}" class="card-header-btn">
               <template #additional-buttons>
-                <BazaarNotebookButtons :notebook="notebook" />
+                <BazaarNotebookButtons :notebook="notebook" :user="true"/>
               </template>
             </NotebookButtons>
           </template>

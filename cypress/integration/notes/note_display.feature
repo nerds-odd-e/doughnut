@@ -13,23 +13,3 @@ Feature: Note display
       | note-title                              | note-description                                   |
       | Potentially shippable product increment | The output of every Sprint is called a Potentia... |
 
-  Scenario: Article view
-    Given there are some notes for the current user
-      | title                | description | testingParent |
-      | Shape                | content     |               |
-      | Rectangle            | content     | Shape         |
-      | Square               | content     | Rectangle     |
-      | Triangle             | content     | Shape         |
-      | Equilateral triangle | content     | Triangle      |
-      | Circle               | content     | Shape         |
-    When I open the note "Shape" in my notes in article view
-    Then I should see in the article:
-      | level | title    |
-      | h1    | Shape    |
-      | h2    | Triangle |
-    When I click "Triangle" in article view
-    Then I should see in the article:
-      | level | title                |
-      | h1    | Triangle             |
-      | h2    | Equilateral triangle |
-

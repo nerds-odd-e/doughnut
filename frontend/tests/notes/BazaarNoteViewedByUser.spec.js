@@ -13,6 +13,6 @@ describe('a note not owned by viewer', () => {
   test('', async () => {
     const { wrapper } = mountWithMockRoute(NoteViewedByUser, {propsData: noteView})
     expect(wrapper.find(".breadcrumb").text()).toContain("Bazaar")
-    expect(wrapper.findAll(".nav a[title='Add to my learning']")).toHaveLength(1)
+    expect(wrapper.findAll(".nav [title='Add to my learning']")).toHaveLength(1)
   });
 });

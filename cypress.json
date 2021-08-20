@@ -1,5 +1,5 @@
 {
-  "baseUrl": "http://localhost:3000",
+  "baseUrl": "http://localhost:9081",
   "env": {
     "TAGS": "not @ignore and not @slow"
   },
