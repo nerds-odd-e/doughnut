@@ -5,10 +5,7 @@
        :href="`/notes/articles/${notebook.headNote.id}`">
         <SvgArticle/>
     </a>
-    <a class="btn btn-sm" role="button" :href="`/notebooks/${notebook.id}/edit`"
-       title="edit notebook settings">
-        <SvgEditNotebook/>
-    </a>
+    <NotebookEditButton v-bind="{notebook}"/>
     <form :action="`/notebooks/${notebook.id}/share`" method="post"
           onsubmit="return confirm('Are you sure to share?')">
         <button class="btn btn-sm" title="Share notebook to bazaar">
@@ -18,13 +15,10 @@
 </div>
 </template>
 
-<script>
+<script setup>
 import SvgArticle from "../svgs/SvgArticle.vue"
+import NotebookEditButton from "./NotebookEditButton.vue"
 import SvgEditNotebook from "../svgs/SvgEditNotebook.vue"
 import SvgBazaarShare from "../svgs/SvgBazaarShare.vue"
-export default {
-  name: 'NotebookCardWithHeaderAndButtons',
-  props: { notebook: Object },
-  components: { SvgArticle, SvgEditNotebook, SvgBazaarShare },
-}
+const props = defineProps({ notebook: Object })
 </script>

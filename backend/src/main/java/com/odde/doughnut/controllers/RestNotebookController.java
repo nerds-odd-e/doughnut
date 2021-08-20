@@ -4,9 +4,10 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.json.RedirectToNoteResponse;
+import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
-import org.springframework.ui.Model;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -53,6 +54,15 @@ class RestNotebookController {
     note.updateNoteContent(noteContent, user);
     note.buildNotebookForHeadNote(user.getOwnership(), user);
     return note;
+  }
+
+  @PostMapping(value = "/{notebook}")
+  @Transactional
+  public Notebook update(@Valid Notebook notebook) throws NoAccessRightException {
+    UserModel user = currentUserFetcher.getUser();
+    user.getAuthorization().assertAuthorization(notebook);
+    modelFactoryService.notebookRepository.save(notebook);
+    return notebook;
   }
 
 

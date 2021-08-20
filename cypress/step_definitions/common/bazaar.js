@@ -93,8 +93,8 @@ Then("I should be able to edit the subscription to notebook {string}", (noteTitl
 
 When("I change notebook {string} to skip review", (noteTitle) => {
   cy.visitMyNotebooks();
-  cy.findNoteCardButton(noteTitle, "edit notebook settings").click();
-  cy.getFormControl("SkipReviewEntirely").check();
+  cy.findNoteCardButton(noteTitle, "Edit notebook settings").click();
+  cy.getFormControl("Skip Review Entirely").check();
   cy.findByRole('button', {name: "Update"}).click();
 });
 
