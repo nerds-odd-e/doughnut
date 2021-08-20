@@ -62,7 +62,7 @@
   const tagLinks = computed(()=>{
       const tTypes = taggingTypes()
       if(!props.links) return
-      return Object.fromEntries(Object.entries(props.links).filter(t=>tTypes.includes(t[0])))
+      return Object.fromEntries(Object.entries(props.links).filter(t=>t[1].direct.length>0).filter(t=>tTypes.includes(t[0])))
   })
 
   const groupedLinks = computed(()=>{

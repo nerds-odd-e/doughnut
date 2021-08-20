@@ -13,22 +13,19 @@
     <div v-if="!!linkViewedByUser">
         <div class="jumbotron py-4 mb-2">
             <LinkShow v-bind="linkViewedByUser">
-                <span class="badge badge-light mr-1"> {{linkViewedByUser.linkTypeLabel}}</span>
+                <LinkNob v-bind="{link: linkViewedByUser}" :owns="true"/>
+                <span class="badge bg-light text-dark"> {{linkViewedByUser.linkTypeLabel}}</span>
             </LinkShow>
         </div>
     </div>
 </div>
 </template>
 
-<script>
+<script setup>
 import NoteBreadcrumbForReview from "./NoteBreadcrumbForReview.vue"
 import NoteViewedByUserWithoutChildren from "../notes/NoteViewedByUserWithoutChildren.vue"
 import LinkShow from "../links/LinkShow.vue"
-
-export default {
-  name: "ShowReviewPoint",
-  props: { noteViewedByUser: Object, linkViewedByUser: Object },
-  emits: ['updated'],
-  components: {NoteBreadcrumbForReview, NoteViewedByUserWithoutChildren, LinkShow}
-};
+import LinkNob from "../links/LinkNob.vue"
+  const props = defineProps({ noteViewedByUser: Object, linkViewedByUser: Object })
+  const emits = defineEmits(['updated'])
 </script>

@@ -17,7 +17,7 @@ public class LinkViewedByUser {
     private String linkTypeLabel;
     @Getter
     @Setter
-    private Integer linkTypeId;
+    private Integer typeId;
     @Getter
     @Setter
     private NoteViewedByUser targetNoteViewedByUser;
@@ -30,7 +30,7 @@ public class LinkViewedByUser {
         linkViewedByUser.setSourceNoteViewedByUser(link.getSourceNote().jsonObjectViewedBy(user.getEntity()));
         linkViewedByUser.setTargetNoteViewedByUser(link.getTargetNote().jsonObjectViewedBy(user.getEntity()));
         linkViewedByUser.setLinkTypeLabel(link.getLinkTypeLabel());
-        linkViewedByUser.setLinkTypeId(link.getLinkType().id);
+        linkViewedByUser.setTypeId(link.getLinkType().id);
         linkViewedByUser.setId(link.getId());
         linkViewedByUser.setReadonly(!user.getAuthorization().hasFullAuthority(link.getSourceNote()));
         return linkViewedByUser;
