@@ -1,3 +1,4 @@
+import HomePage from '@/pages/HomePage.vue'
 import NotebooksPage from '@/pages/NotebooksPage.vue'
 import NotebookNewPage from '@/pages/NotebookNewPage.vue'
 import NoteShowPage from '@/pages/NoteShowPage.vue'
@@ -34,7 +35,8 @@ const nestedNoteAndLinkRoutes = (prefix) => noteAndLinkRoutes.map(route=>({...ro
 
 const routes = [
     ...noteAndLinkRoutes.map(route=>({...route, path: `/${route.path}`})),
-    { path: '/', name: 'root', component: ReviewHome },
+    { path: '/', name: 'root', component: HomePage },
+    { path: '/bazaar', name: 'bazaar', component: HomePage },
     { path: '/notebooks/new', name: 'notebookNew', component: NotebookNewPage },
     { path: '/circles/:circleId', name: 'circleShow', component: CircleShowPage, props: true },
     { path: '/circles/join/:invitationCode', name: 'circleJoin', component: CircleJoinPage, props: true },

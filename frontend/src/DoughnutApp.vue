@@ -6,6 +6,7 @@ import MainMenu from "./components/commons/MainMenu.vue"
 export default {
   data() {
     return {
+      user: null,
       showNavBar: true,
       staticInfo: null,
       loading: null,
@@ -36,6 +37,7 @@ export default {
     restGet(`/api/static-info`, (v)=>this.loading = v)
       .then((res) => {
       this.staticInfo = res
+      this.user = res.user
       Object.assign(this.$staticInfo, res)
       })
 
@@ -61,8 +63,8 @@ export default {
 
 <template>
   <Popups :popupInfo="popupInfo" @done="done($event)"/>
-  <MainMenu v-if="showNavBar" :user="staticInfo ? staticInfo.user : null"/>
+  <MainMenu v-if="showNavBar" :user="user"/>
   <div class="container content">
-    <router-view />
+    <router-view :user="user"/>
   </div>
 </template>

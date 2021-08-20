@@ -15,6 +15,12 @@ export default defineConfig({
     }),
     vueJsx()
   ],
+  server: {
+    proxy: {
+
+    "/api": "http://localhost:9081"
+    }
+  },
   resolve: {
     alias: [
       {
