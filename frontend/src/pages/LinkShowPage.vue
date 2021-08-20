@@ -37,7 +37,7 @@ export default {
       formErrors: {}
     }
   },
-  computed: { formData(){ return !this.linkViewedByUser ? null : {typeId: this.linkViewedByUser.linkTypeId} }},
+  computed: { formData(){ return !this.linkViewedByUser ? null : {typeId: this.linkViewedByUser.typeId} }},
   methods: {
     fetchData() {
       restGet(`/api/links/${this.linkid}`, r=>this.loading=r).then(res => this.linkViewedByUser = res)
@@ -57,7 +57,9 @@ export default {
       restPost(`/api/links/${this.linkid}/delete`, null, r=>this.loading=r)
         .then(res => this.$router.push({name: "noteShow", replace: true, params: { noteId: res.noteId}}))
     }
+
   },
+
   watch: {
     linkid() {
       this.fetchData()

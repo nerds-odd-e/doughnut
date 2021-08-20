@@ -2,17 +2,17 @@
     <ul class="parent-links">
         <template v-for="(linksOfType, linkType) in hierachyLinks" :key="linkType">
             <li  v-for="link in linksOfType.direct" :key="link.id">
-                <LinkLink  v-bind="{link, owns, colors: staticInfo.colors}" :reverse="false"/>
+                <LinkLink  v-bind="{link, owns, colors: staticInfo.colors}" :reverse="false" @updated="$emit('updated')"/>
             </li>
         </template>
         <li v-if="!!groupedLinks && groupedLinks.length > 0">
         <template v-for="{direct, reverse} in groupedLinks" :key="direct">
-            <LinkLink class="link-multi" v-for="link in direct" :key="link.id" v-bind="{link, owns, colors: staticInfo.colors}" :reverse="false"/>
-            <LinkLink class="link-multi" v-for="link in reverse" :key="link.id" v-bind="{link, owns, colors: staticInfo.colors}" :reverse="true"/>
+            <LinkLink class="link-multi" v-for="link in direct" :key="link.id" v-bind="{link, owns, colors: staticInfo.colors}" :reverse="false" @updated="$emit('updated')"/>
+            <LinkLink class="link-multi" v-for="link in reverse" :key="link.id" v-bind="{link, owns, colors: staticInfo.colors}" :reverse="true" @updated="$emit('updated')"/>
         </template>
         </li>
         <li v-for="(linksOfType, linkType) in tagLinks" :key="linkType">
-            <LinkLink class="link-multi" v-for="link in linksOfType.direct" :key="link.id" v-bind="{link, owns, colors: staticInfo.colors}" :reverse="false"/>
+            <LinkLink class="link-multi" v-for="link in linksOfType.direct" :key="link.id" v-bind="{link, owns, colors: staticInfo.colors}" :reverse="false" @updated="$emit('updated')"/>
         </li>
     </ul>
     <slot />
@@ -21,7 +21,7 @@
         <template v-for="(linksOfType, linkType) in hierachyLinks" :key="linkType">
             <li v-if="linksOfType.reverse.length>0">
                 <span>{{reverseLabel(linkType)}} </span>
-                <LinkLink class="link-multi" v-for="link in linksOfType.reverse" :key="link.id" v-bind="{link, owns, colors: staticInfo.colors}" :reverse="true"/>
+                <LinkLink class="link-multi" v-for="link in linksOfType.reverse" :key="link.id" v-bind="{link, owns, colors: staticInfo.colors}" :reverse="true" @updated="$emit('updated')"/>
             </li>
         </template>
     </ul>
@@ -34,6 +34,7 @@
 
 
   const props = defineProps( { links: Object, owns: Boolean, staticInfo: Object } )
+  const emits = defineEmits(['updated'])
   const reverseLabel = function (lbl) {
             if(!props.staticInfo || !props.staticInfo.linkTypeOptions) {
                  return

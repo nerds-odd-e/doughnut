@@ -9,7 +9,7 @@
         </template>
     </Card>
     <div :id="`note-collapse-${noteViewedByUser.note.id}`" class="collapse">
-        <NoteShow v-bind="{note: noteViewedByUser.note, links: noteViewedByUser.links, owns: noteViewedByUser.owns}" :level="2" :staticInfo="$staticInfo"/>
+        <NoteShow v-bind="{note: noteViewedByUser.note, links: noteViewedByUser.links, owns: noteViewedByUser.owns}" :level="2" :staticInfo="$staticInfo" @updated="$emit('updated')"/>
     </div>
 </template>
 
@@ -20,6 +20,7 @@ import Card from "../notes/Card.vue"
 
 export default {
   props: { noteViewedByUser: Object },
+  emits: ['updated'],
   components: { NoteOwnerBreadcrumb, NoteShow, Card }
 
 }

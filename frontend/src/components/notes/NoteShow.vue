@@ -1,5 +1,5 @@
 <template>
-  <LinkLists v-bind="{links, owns, staticInfo}">
+  <LinkLists v-bind="{links, owns, staticInfo}" @updated="$emit('updated')">
     <div class="note-body">
       <h2 :class="'note-title h' + level"> {{note.noteContent.title}}</h2>
       <div class="row">
@@ -29,6 +29,7 @@ const props = defineProps({
     level: { type: Number, default: 2 },
     owns: {type: Boolean, required: true},
     staticInfo: Object })
+const emits = defineEmits(['updated'])
 
 const twoColumns = computed(()=>!!props.note.notePicture && !!props.note.noteContent.description)
 </script>

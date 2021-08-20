@@ -26,22 +26,24 @@ export default {
 }
 </script>
 
-<style lang="sass" scoped>
-.filter-switch
-  label
-    font-size: small
-    cursor: pointer
-    margin-right: 5px
-    border-radius: 5px
-    padding: 2px
-    border: solid 1px #32612D
-  .filter-switch-item
-    input
-      display: none
-    input:checked + label
-      color: white
-      background-color: #03AC13
-    input:not(:checked) + label
-      --bg-opacity: 0
-      box-shadow: none
+<style scoped>
+.filter-switch label {
+  font-size: small;
+  cursor: pointer;
+  margin-right: 5px;
+  border-radius: 5px;
+  padding: 2px;
+  border: solid 1px #32612D; }
+
+.filter-switch .filter-switch-item input {
+  display: none; }
+
+.filter-switch .filter-switch-item input:checked + label {
+  color: white;
+  background-color: #03AC13; }
+
+.filter-switch .filter-switch-item input:not(:checked) + label {
+  --bg-opacity: 0;
+  box-shadow: none; }
+
 </style>

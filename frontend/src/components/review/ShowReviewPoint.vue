@@ -12,8 +12,8 @@
 
     <div v-if="!!linkViewedByUser">
         <div class="jumbotron py-4 mb-2">
-            <LinkShow v-bind="linkViewedByUser">
-                <LinkNob v-bind="{link: linkViewedByUser}" :owns="true"/>
+            <LinkShow v-bind="linkViewedByUser" @updated="$emit('updated')">
+                <LinkNob v-bind="{link: linkViewedByUser}" :owns="true" @updated="$emit('updated')"/>
                 <span class="badge bg-light text-dark"> {{linkViewedByUser.linkTypeLabel}}</span>
             </LinkShow>
         </div>

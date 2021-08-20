@@ -622,7 +622,7 @@ const repetition = {
         "owns": true
       },
       "linkTypeLabel": "an instance of",
-      "linkTypeId": 4,
+      "typeId": 4,
       "targetNoteViewedByUser": {
         "note": {
           "id": 1411,
