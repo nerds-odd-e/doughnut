@@ -36,7 +36,7 @@ import SvgMissingAvatar from "../components/svgs/SvgMissingAvatar.vue"
 import LoadingPage from "./commons/LoadingPage.vue"
 import NotebookCardsWithButtons from "../components/notebook/NotebookCardsWithButtons.vue"
 import NotebookButtons from "../components/notebook/NotebookButtons.vue"
-import BazaarNotebookButtons from "../components/notebook/BazaarNotebookButtons.vue"
+import BazaarNotebookButtons from "../components/bazaar/BazaarNotebookButtons.vue"
 import {restGet, restPost } from "../restful/restful"
 
 export default {

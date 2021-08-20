@@ -395,7 +395,7 @@ Cypress.Commands.add('subscribeToNote', (noteTitle, dailyLearningCount) => {
   cy.get('#subscription-dailyTargetOfNewNotes')
     .clear()
     .type(dailyLearningCount);
-  cy.findByRole('button', { name: 'Add to my learning' }).click();
+  cy.findByRole('button', { name: 'Submit' }).click();
 });
 
 Cypress.Commands.add('unsubscribeFromNotebook', noteTitle => {

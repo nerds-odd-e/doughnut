@@ -7,7 +7,7 @@
 
 <script>
   import SvgArticle from "../svgs/SvgArticle.vue"
-  import BazaarNotebookButtons from "../notebook/BazaarNotebookButtons.vue"
+  import BazaarNotebookButtons from "./BazaarNotebookButtons.vue"
 
   export default {
     props: {note: Object, notebook: Object},

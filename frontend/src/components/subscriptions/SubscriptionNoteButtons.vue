@@ -1,9 +1,6 @@
 <template>
 <div class="btn-group btn-group-sm">
-    <a class="btn btn-sm" role="button" :href="`/subscriptions/${subscription.id}/edit`"
-       title="Edit subscription">
-        <SvgEdit/>
-    </a>
+    <SubscriptionEditButton :subscription="subscription" />
     <form :action="`/subscriptions/${subscription.id}/delete`" method="post"
           onsubmit="return confirm('Are you sure to unsubscribe from this notebook??')">
         <button class="btn btn-sm" title="Unsubscribe">
@@ -14,12 +11,8 @@
 
 </template>
 
-<script>
-import SvgEdit from "../svgs/SvgEdit.vue"
+<script setup>
+import SubscriptionEditButton from "./SubscriptionEditButton.vue"
 import SvgUnsubscribe from "../svgs/SvgUnsubscribe.vue"
-export default {
-  name: 'NotebookCardWithHeaderAndButtons',
-  props: { subscription: Object },
-  components: { SvgEdit, SvgUnsubscribe },
-}
+const props = defineProps({ subscription: Object })
 </script>

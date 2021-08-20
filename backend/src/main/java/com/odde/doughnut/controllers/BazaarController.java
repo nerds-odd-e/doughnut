@@ -21,9 +21,7 @@ public class BazaarController extends ApplicationMvcController {
 
     @GetMapping("")
     public String bazaar(Model model) {
-        BazaarModel bazaar = modelFactoryService.toBazaarModel();
-        model.addAttribute("notebooks", bazaar.getAllNotebooks());
-        return "bazaar/index";
+        return "vuejsed";
     }
 
     @GetMapping("/notes/{note}")
