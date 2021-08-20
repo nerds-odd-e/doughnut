@@ -34,12 +34,6 @@ public class NoteController extends ApplicationMvcController  {
         return "vuejsed";
     }
 
-    @GetMapping("/articles/{note}")
-    public String showNoteAsArticle(@PathVariable(name = "note") Note note) throws NoAccessRightException {
-        getCurrentUser().getAuthorization().assertAuthorization(note);
-        return "notes/article";
-    }
-
     private UserModel getCurrentUser() {
         return currentUserFetcher.getUser();
     }

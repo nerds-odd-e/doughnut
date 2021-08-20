@@ -25,10 +25,6 @@
         <SvgCog/>
     </a>
     <div class="dropdown-menu dropdown-menu-right">
-        <a role="button" class="btn btn-sm" title="Cards View" :href="`/notes/articles/${note.id}`">
-            <SvgArticle/>
-            Article View
-        </a>
         <ReviewSettingEditButton :noteId="note.id" :oldTitle="note.title" @updated="$emit('updated')">
             Edit review settings
         </ReviewSettingEditButton>
@@ -43,7 +39,6 @@
 <script>
   import SvgAddChild from "../svgs/SvgAddChild.vue"
   import SvgAddSibling from "../svgs/SvgAddSibling.vue"
-  import SvgArticle from "../svgs/SvgArticle.vue"
   import SvgCog from "../svgs/SvgCog.vue"
   import SvgRemove from "../svgs/SvgRemove.vue"
   import LinkNoteButton from "../links/LinkNoteButton.vue"
@@ -55,7 +50,7 @@
     name: 'NoteButtons',
     props: {note: Object, addSibling: Boolean},
     emits: ['updated'],
-    components: { SvgArticle, SvgCog, SvgAddChild, SvgAddSibling, ReviewSettingEditButton, SvgRemove, LinkNoteButton, NoteEditButton, NoteNewButton },
+    components: { SvgCog, SvgAddChild, SvgAddSibling, ReviewSettingEditButton, SvgRemove, LinkNoteButton, NoteEditButton, NoteNewButton },
     methods: {
         async deleteNote() {
             if(await this.$popups.confirm(`Are you sure to delete this note?`)) {

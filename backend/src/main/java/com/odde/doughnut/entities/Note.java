@@ -323,33 +323,6 @@ public class Note {
         return getSiblingOrderToBecomeMyFirstChild();
     }
 
-    public boolean hasTitleInArticle() {
-        if (hasNoDescriptionAndChild()) {
-            return false;
-        }
-        return !noteContent.getHideTitleInArticle();
-    }
-
-    @JsonIgnore
-    public String getArticleTitle() {
-        if (hasNoDescriptionAndChild()) {
-            return null;
-        }
-        return getTitle();
-    }
-
-    @JsonIgnore
-    public String getArticleBody() {
-        if (hasNoDescriptionAndChild()) {
-            return getTitle();
-        }
-        return noteContent.getDescription();
-    }
-
-    private boolean hasNoDescriptionAndChild() {
-        return Strings.isBlank(noteContent.getDescription()) && children.isEmpty();
-    }
-
     public void buildNotebookForHeadNote(Ownership ownership, User creator) {
         final Notebook notebook = new Notebook();
         notebook.setCreatorEntity(creator);

@@ -75,16 +75,6 @@ public class NoteContent {
     @Setter
     private Boolean skipReview = false;
 
-    @Column(name = "hide_title_in_article")
-    @Getter
-    @Setter
-    private Boolean hideTitleInArticle = false;
-
-    @Column(name = "show_as_bullet_in_article")
-    @Getter
-    @Setter
-    private Boolean showAsBulletInArticle = false;
-
     @JsonIgnore
     @Transient @Getter @Setter private MultipartFile uploadPictureProxy;
 

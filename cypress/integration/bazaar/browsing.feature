@@ -25,17 +25,3 @@ Feature: Bazaar browsing
     And I should be able to go to the "next" note "Rectangle"
     And I should see it has link to "Square"
 
-  Scenario: Browsing as non-user in article view
-    When I haven't login
-    Then I should see "Shape" is shared in the Bazaar
-    When I open the notebook "Shape" in the Bazaar in article view
-    Then I should see in the article:
-      | level | title    |
-      | h1    | Shape    |
-      | h2    | Triangle |
-      | h3    | Square   |
-    And  I should not see "In OOP" in the article
-    And  I should see two bullets in the article
-    And  I should see "Shapes are good" as non-title in the article
-
-#  Scenario: Breadcrumb should be until the share point

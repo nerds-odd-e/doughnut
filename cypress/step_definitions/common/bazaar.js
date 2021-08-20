@@ -34,34 +34,9 @@ When("I open the notebook {string} in the Bazaar", (noteTitle) => {
   cy.findByText(noteTitle).click();
 });
 
-When("I open the notebook {string} in the Bazaar in article view", (noteTitle) => {
-  cy.findByText(noteTitle).click();
-  cy.findByRole('button', {name: "Article View"}).click();
-});
-
-When("I should see in the article:", (data) => {
-  data.hashes().forEach(({level, title}) => {
-    cy.get('.' + level).contains(title).should("be.visible");
-  });
-});
-
-When("I should not see {string} in the article", (content) => {
-  cy.findByText(content).should("not.exist");
-});
-
 When("I go to the bazaar", () => {
   cy.visit("/bazaar");
 });
-
-When("I should see two bullets in the article", () => {
-  cy.get("body").find('li.article-view').should('have.length', 2);
-});
-
-When("I should see {string} as non-title in the article", (content) => {
-      cy.findByText(content, {selector: '.note-body'});
-});
-
-
 
 When("I subscribe to notebook {string} in the bazaar, with target of learning {int} notes per day", (noteTitle, count) => {
   cy.visit("/bazaar");
