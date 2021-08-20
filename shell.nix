@@ -1,4 +1,11 @@
-{ pkgs ? import <nixpkgs> { } }:
+{ pkgs ? import (
+    builtins.fetchGit {
+      name = "nixos-21.05";
+      url = "https://github.com/nixos/nixpkgs/";
+      ref = "refs/heads/nixos-21.05";
+      rev = "2a96414d7e350160a33ed0978449c9ff5b5a6eb3";
+    }){}
+}:
 with pkgs;
 let
   inherit (pkgs) stdenv;
