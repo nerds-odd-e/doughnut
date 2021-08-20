@@ -6,7 +6,6 @@ class HttpResponseError extends Error {
 }
 
 const reloadSession = () => {
-  return
   window.alert("Your login session has expired, let's refresh.");
   window.location.reload();
 };

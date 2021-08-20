@@ -17,8 +17,8 @@ export default defineConfig({
   ],
   server: {
     proxy: {
-
-    "/api": "http://localhost:9081"
+      "/api": "http://localhost:9081",
+      "/login": "http://localhost:9081"
     }
   },
   resolve: {
