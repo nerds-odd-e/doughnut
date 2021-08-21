@@ -26,6 +26,12 @@ Given('my session is logged out', () => {
   cy.logout();
 });
 
+Given("I'm on the login page", () => {
+  cy.visit("/login");
+});
+
+
+
 When('I identify myself as a new user', () => {
   cy.get('#username').type('user');
   cy.get('#password').type('password');

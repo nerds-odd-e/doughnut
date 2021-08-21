@@ -11,6 +11,8 @@ import InitialReviewPage from '@/pages/InitialReviewPage.vue'
 import NestedPage from "@/pages/commons/NestedPage"
 import CircleShowPage from '@/pages/CircleShowPage.vue'
 import CircleJoinPage from '@/pages/CircleJoinPage.vue'
+import FailureReportListPage from '@/pages/FailureReportListPage.vue'
+import FailureReportPage from '@/pages/FailureReportPage.vue'
 
 const NestedInitialReviewPage = NestedPage(
   InitialReviewPage,
@@ -48,6 +50,8 @@ const routes = [
     { path: '/reviews/repeat', name: 'repeat', component: NestedRepeatPage, children: [
               ...nestedNoteAndLinkRoutes('repeat-'),
               { path: 'quiz', name: 'repeat-quiz', component: DoingQuiz }] },
+    { path: '/failure-report-list', name: 'failureReportList', component: FailureReportListPage },
+    { path: '/failure-report-list/show/:failureReportId', name: 'failureReport', component: FailureReportPage, props: true },
   ]
 
 export { routes }
