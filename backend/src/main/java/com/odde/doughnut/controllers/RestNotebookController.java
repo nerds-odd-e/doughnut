@@ -42,19 +42,13 @@ class RestNotebookController {
   }
 
   @PostMapping({"/create"})
-  public RedirectToNoteResponse createNote(@Valid @ModelAttribute NoteContent noteContent) throws IOException {
+  public RedirectToNoteResponse createNotebook(@Valid @ModelAttribute NoteContent noteContent) throws IOException {
     UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertLoggedIn();
-    final Note note = createHeadNote(user.getEntity(), noteContent);
+    User userEntity = user.getEntity();
+    Note note = userEntity.getOwnership().createNotebook(userEntity, noteContent);
     modelFactoryService.noteRepository.save(note);
     return new RedirectToNoteResponse(note.getId());
-  }
-
-  private Note createHeadNote(User user, NoteContent noteContent) throws IOException {
-    final Note note = new Note();
-    note.updateNoteContent(noteContent, user);
-    note.buildNotebookForHeadNote(user.getOwnership(), user);
-    return note;
   }
 
   @PostMapping(value = "/{notebook}")

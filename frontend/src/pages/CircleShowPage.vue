@@ -2,7 +2,11 @@
   <LoadingPage v-bind="{loading, contentExists: !!circle}">
     <div v-if="circle">
         <h1 v-text="circle.name"/>
-        <p> <a class="nav-link" :href="`/circles/${circle.id}/notebooks/new`">Add New Notebook In This Circle</a> </p>
+        <p>
+          <NotebookNewButton :circle="circle">
+            Add New Notebook In This Circle
+          </NotebookNewButton>
+        </p>
 
 
         <NotebookCardsWithButtons :notebooks="circle.notebooks">
@@ -35,12 +39,13 @@
 import SvgMissingAvatar from "../components/svgs/SvgMissingAvatar.vue"
 import LoadingPage from "./commons/LoadingPage.vue"
 import NotebookCardsWithButtons from "../components/notebook/NotebookCardsWithButtons.vue"
+import NotebookNewButton from "../components/notebook/NotebookNewButton.vue"
 import NotebookButtons from "../components/notebook/NotebookButtons.vue"
 import BazaarNotebookButtons from "../components/bazaar/BazaarNotebookButtons.vue"
 import {restGet, restPost } from "../restful/restful"
 
 export default {
-  components: {SvgMissingAvatar, NotebookCardsWithButtons, NotebookButtons, BazaarNotebookButtons, LoadingPage},
+  components: {SvgMissingAvatar, NotebookCardsWithButtons, NotebookButtons, NotebookNewButton, BazaarNotebookButtons, LoadingPage},
   props: {circleId: Number},
 
   data() {

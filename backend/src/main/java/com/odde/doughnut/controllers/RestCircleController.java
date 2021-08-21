@@ -3,6 +3,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.json.RedirectToNoteResponse;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.CircleModel;
@@ -17,6 +18,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -100,6 +102,16 @@ class RestCircleController {
     }
     circleModel.joinAndSave(userModel);
     return circleModel.getEntity();
+  }
+
+  @PostMapping({"/{circle}/notebooks"})
+  public RedirectToNoteResponse createNotebook(Circle circle, @Valid @ModelAttribute NoteContent noteContent) throws IOException, NoAccessRightException {
+    UserModel user = currentUserFetcher.getUser();
+    user.getAuthorization().assertLoggedIn();
+    currentUserFetcher.getUser().getAuthorization().assertAuthorization(circle);
+    Note note = circle.getOwnership().createNotebook(user.getEntity(), noteContent);
+    modelFactoryService.noteRepository.save(note);
+    return new RedirectToNoteResponse(note.getId());
   }
 
 }

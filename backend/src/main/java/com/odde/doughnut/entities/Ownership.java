@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +34,10 @@ public class Ownership {
         return circle.getMembers().contains(user);
     }
 
-    public boolean isFromCircle() { return circle != null; }
-
+    public Note createNotebook(User user, NoteContent noteContent) throws IOException {
+      final Note note = new Note();
+      note.updateNoteContent(noteContent, user);
+      note.buildNotebookForHeadNote(this, user);
+      return note;
+    }
 }

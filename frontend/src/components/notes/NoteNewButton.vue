@@ -4,7 +4,7 @@
         <slot :open="()=>show=true"/>
       </template>
       <template #header>
-        <NoteBreadcrumbForOwnOrCircle v-bind="{notebook, ancestors}">
+        <NoteBreadcrumbForOwnOrCircle v-bind="{circle: !!notebook ? notebook.ownership.circle : nil, ancestors}">
             <li class="breadcrumb-item">(adding here)</li>
         </NoteBreadcrumbForOwnOrCircle>
       </template>
