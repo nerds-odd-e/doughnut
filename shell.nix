@@ -2,8 +2,8 @@
     builtins.fetchGit {
       name = "nixos-21.05";
       url = "https://github.com/nixos/nixpkgs/";
-      ref = "refs/heads/nixos-21.05";
-      rev = "2a96414d7e350160a33ed0978449c9ff5b5a6eb3";
+      ref = "refs/heads/master";
+      rev = "a87936871bd4edf966fd6d98d7d6ac96a3284b6c";
     }){}
 }:
 with pkgs;
