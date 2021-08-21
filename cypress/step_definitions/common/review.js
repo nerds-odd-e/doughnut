@@ -79,6 +79,11 @@ Then('I am repeat-reviewing my old note on day {int}', day => {
   cy.visit('/reviews/repeat');
 });
 
+Then('I should see the happy option', () => {
+  cy.get('#repeat-happy').should('exist')
+});
+
+
 Then('I am learning new note on day {int}', day => {
   cy.timeTravelTo(day, 8);
   cy.visit('/reviews/initial');

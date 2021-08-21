@@ -16,6 +16,7 @@ Feature: Logged in status
   Scenario: Session logged out when post
     Given I added and learned one note "Fungible" on day 1
     When I am repeat-reviewing my old note on day 2
+    And I should see the happy option
     And my session is logged out
     When I choose the happy option
     And when I login as "old_learner" I should see "Fungible"
