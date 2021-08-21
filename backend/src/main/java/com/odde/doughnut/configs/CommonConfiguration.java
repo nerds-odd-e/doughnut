@@ -16,7 +16,7 @@ public class CommonConfiguration {
         .permitAll()
         .antMatchers("/", "/login", "/error", "/images/**", "/odd-e.png",
                      "/webjars/**", "/assets/**","/bazaar", "/bazaar/**/**",
-                     "/api/**"
+                     "/api/**", "/circles/join"
                 )
         .permitAll()
         .anyRequest()

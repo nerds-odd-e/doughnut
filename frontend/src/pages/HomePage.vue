@@ -12,7 +12,7 @@
                 <p class="card-text">Browse and manage your notes. You can add, reorg and build links between your
                     notes. </p>
                 <p v-if="!user">Please login</p>
-                <router-link v-else :to="{name: 'notebooks'}"> Go To My Notes </router-link>
+                <router-link class="btn btn-light" v-else :to="{name: 'notebooks'}"> Go To My Notes </router-link>
             </div>
         </div>
     </div>
@@ -23,7 +23,7 @@
                 <p class="card-text">Review your notes before you are about to forget. Test your memory and update your
                     notes with new realizations. </p>
                 <p v-if="!user">Please login</p>
-                <router-link v-else :to="{name: 'reviews'}"> Start Review </router-link>
+                <router-link  class="btn btn-light" v-else :to="{name: 'reviews'}"> Start Review </router-link>
             </div>
         </div>
     </div>
@@ -43,7 +43,7 @@
             <div class="card-body">
                 <p class="card-text">Create and join circles. You can own notes together within a circle. </p>
                 <p v-if="!user">Please login</p>
-                <router-link v-else :to="{name: 'cirles'}"> Go To Circles </router-link>
+                <router-link class="btn btn-light" v-else :to="{name: 'circles'}"> Go To Circles </router-link>
             </div>
         </div>
     </div>

@@ -21,11 +21,6 @@ public class AccountAwareUrlAuthenticationSuccessHandler extends SavedRequestAwa
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-        currentUserFetcher.setExternalIdentifier(authentication.getName());
-        if(currentUserFetcher.getUser().loggedIn()) {
             super.onAuthenticationSuccess(request, response, authentication);
-            return;
-        }
-        getRedirectStrategy().sendRedirect(request, response, "/");
     }
 }

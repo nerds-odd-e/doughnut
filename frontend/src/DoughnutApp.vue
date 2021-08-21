@@ -2,11 +2,13 @@
 import {restGet} from "./restful/restful"
 import Popups from "./components/commons/Popups.vue"
 import MainMenu from "./components/commons/MainMenu.vue"
+import UserNewRegisterPage from "./pages/UserNewRegisterPage.vue"
 
 export default {
   data() {
     return {
       user: null,
+      externalIdentifier: null,
       showNavBar: true,
       staticInfo: null,
       loading: null,
@@ -14,7 +16,7 @@ export default {
       doneResolve: null,
     }},
 
-  components: { Popups, MainMenu },
+  components: { Popups, MainMenu, UserNewRegisterPage },
 
   watch: {
     $route(to, from) {
@@ -22,6 +24,13 @@ export default {
         this.showNavBar = !['repeat', 'initial'].includes(to.name.split('-').shift())
       }
     }
+  },
+
+  computed: {
+    newUser() {
+      return !this.user && !!this.externalIdentifier
+    }
+    
   },
 
   methods: {
@@ -38,6 +47,7 @@ export default {
       .then((res) => {
       this.staticInfo = res
       this.user = res.user
+      this.externalIdentifier = res.externalIdentifier
       Object.assign(this.$staticInfo, res)
       })
 
@@ -63,8 +73,11 @@ export default {
 
 <template>
   <Popups :popupInfo="popupInfo" @done="done($event)"/>
+  <UserNewRegisterPage v-if="newUser" @userCreated="user=$event"/>
+  <template v-else>
   <MainMenu v-if="showNavBar" :user="user"/>
-  <div class="container content">
+  <div v-if="!!staticInfo" class="container content">
     <router-view :user="user"/>
   </div>
+  </template>
 </template>

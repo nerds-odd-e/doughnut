@@ -12,6 +12,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.view.RedirectView;
 
 import javax.servlet.ServletException;
@@ -54,6 +55,11 @@ public class UserController extends ApplicationMvcController  {
         }
         modelFactoryService.userRepository.save(user);
         return "redirect:/";
+    }
+
+    @GetMapping("/identify")
+    public RedirectView identify(@RequestParam String from) {
+        return new RedirectView(from);
     }
 
 }

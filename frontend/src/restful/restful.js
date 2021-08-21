@@ -10,6 +10,10 @@ const reloadSession = () => {
   window.location.reload();
 };
 
+const loginOrRegister = () => {
+  window.location = "/users/identify?from=" + window.location.href
+}
+
 function toNested(data) {
   const result = {}
   Object.keys(data).forEach(function (key) {
@@ -119,4 +123,4 @@ const restPostMultiplePartForm = (url, data, loadingRef) => {
   );
 };
 
-export { restGet, restPost, restPostMultiplePartForm };
+export { restGet, restPost, restPostMultiplePartForm, loginOrRegister };

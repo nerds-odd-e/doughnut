@@ -23,6 +23,7 @@ class RestStaticInfoController {
   static class StaticInfo {
     public List<Map<String, String>> linkTypeOptions = new ArrayList<>();
     public User user;
+    public String externalIdentifier;
   }
 
   @GetMapping("/static-info")
@@ -36,6 +37,7 @@ class RestStaticInfoController {
             }})
             .collect(Collectors.toList());
     staticInfo.user = currentUserFetcher.getUser().getEntity();
+    staticInfo.externalIdentifier = currentUserFetcher.getExternalIdentifier();
     return staticInfo;
   }
 }
