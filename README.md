@@ -42,7 +42,7 @@ For more background info you can read:
 - [Vite](https://vitejs.dev)
 - [Jest](https://jestjs.io/)
 - [Vue Testing Library](https://testing-library.com/docs/vue-testing-library/intro/)
-- [TailwindCSS](https://tailwindcss.com)
+- [Bootstrap 5](https://getbootstrap.com/docs/5.0/getting-started/introduction/)
 - [MySQL 8.0](https://dev.mysql.com/doc/refman/8.0/en/)
 - [Github Actions](https://docs.github.com/en/actions)
 - [git-secret](https://git-secret.io)
