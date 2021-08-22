@@ -32,7 +32,9 @@ server:
 
 ---
 spring:
-  profiles: e2e
+  config:
+    activate:
+      on-profile: e2e
   resources:
     cache:
       cachecontrol:
@@ -63,7 +65,9 @@ server:
 
 ---
 spring:
-  profiles: dev
+  config:
+    activate:
+      on-profile: dev
   resources:
     cache:
       cachecontrol:
@@ -94,9 +98,10 @@ server:
   port: 9082
 
 ---
-
 spring:
-  profiles: prod
+  config:
+    activate:
+      on-profile: prod
   resources:
     cache:
       cachecontrol:

@@ -25,12 +25,13 @@ module.exports = (on, config) => {
   initPlugin(on, config);
   on('file:preprocessor', cucumber());
 
-  const file = config.env.configFile || 'development';
+  const file = config.env.configFile || 'ci';
+  console.table(`<<<<<< CYPRESS RUN ENV: ${file} >>>>>>`);
   return getConfigurationByFile(file);
 };
 
 function getConfigurationByFile(file) {
-  const pathToConfigFile = path.resolve('cypress/configFiles', `${file}.json`);
+  const pathToConfigFile = path.resolve('cypress/config', `${file}.json`);
 
   return fs.readJson(pathToConfigFile);
 }
