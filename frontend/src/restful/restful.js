@@ -53,10 +53,11 @@ const restRequest = (url, params, loadingRef) => {
           reloadSession()
           return;
         }
+        reject({statusCode: error.status})
         if (error.status === 404) {
-          reject({statusCode: 404})
           return;
         }
+
         window.alert(error)
       })
   })

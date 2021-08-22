@@ -22,17 +22,12 @@ public class FailureReportController extends ApplicationMvcController  {
 
     @GetMapping("")
     public String failureReport(Model model) throws NoAccessRightException {
-        currentUserFetcher.getUser().getAuthorization().assertDeveloperAuthorization();
-        Iterable<FailureReport> reports = modelFactoryService.failureReportRepository.findAll();
-        model.addAttribute("failureReports", reports);
-        return "failure-report-list/index";
+        return "vuejsed";
     }
 
     @GetMapping("/show/{failureReport}")
     public String show(@PathVariable(name = "failureReport") FailureReport failureReport, Model model) throws NoAccessRightException {
-        currentUserFetcher.getUser().getAuthorization().assertDeveloperAuthorization();
-        model.addAttribute("failureReport", failureReport);
-        return "failure-report-list/show";
+        return "vuejsed";
     }
 }
 

@@ -7,7 +7,7 @@
       </li>
       <li class="breadcrumb-item">
         <router-link
-         :to="{name: 'circle', params: {circleId: circle.id}}">{{circle.name}}</router-link></li>
+         :to="{name: 'circleShow', params: {circleId: circle.id}}">{{circle.name}}</router-link></li>
     </template>
     <li class="breadcrumb-item" v-else><router-link :to="{name: 'notebooks'}">Top</router-link></li>
   </template>

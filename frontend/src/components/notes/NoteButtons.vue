@@ -49,7 +49,7 @@
   export default {
     name: 'NoteButtons',
     props: {note: Object, addSibling: Boolean},
-    emits: ['updated'],
+    emits: ['updated', 'deleted'],
     components: { SvgCog, SvgAddChild, SvgAddSibling, ReviewSettingEditButton, SvgRemove, LinkNoteButton, NoteEditButton, NoteNewButton },
 
     methods: {
@@ -63,7 +63,7 @@
                     else {
                         this.$router.push({name: 'notebooks'})
                     }
-                    this.$emit('updated')
+                    this.$emit('deleted')
                   })
             }
         }

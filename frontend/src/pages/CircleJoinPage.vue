@@ -16,7 +16,6 @@ export default {
         loginOrRegister()
         next(false)
       }
-
       next()
     })
   },

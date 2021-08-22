@@ -90,7 +90,7 @@ Then('The {string} page is displayed', pageName => {
       cy.findAllByText('Failure report list');
       break;
     case 'ErrorPage':
-      cy.findAllByText('Whitelabel Error Page');
+      cy.findAllByText('It seems you cannot access this page.');
       break;
     default:
       cy.failure();

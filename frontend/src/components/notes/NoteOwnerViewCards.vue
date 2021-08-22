@@ -1,7 +1,7 @@
 <template>
 <NoteCardWithHeaderAndButton :notes="notes">
      <template v-if="owns" #headerButtons="{note}">
-      <NoteButtons :note="note" @updated="$emit('updated')"/>
+      <NoteButtons :note="note" @updated="$emit('updated')" @deleted="$emit('updated')"/>
      </template>
 </NoteCardWithHeaderAndButton>
 </template>
