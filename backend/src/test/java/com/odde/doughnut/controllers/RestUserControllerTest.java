@@ -12,6 +12,8 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.validation.Valid;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.*;
@@ -19,29 +21,25 @@ import static org.junit.jupiter.api.Assertions.*;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
-class UserControllerTest {
+class RestUserControllerTest {
     @Autowired
     MakeMe makeMe;
     UserModel userModel;
-    UserController controller;
+    RestUserController controller;
 
 
     @BeforeEach
     void setup() {
         userModel = makeMe.aUser().toModelPlease();
-        controller = new UserController(makeMe.modelFactoryService, new TestCurrentUserFetcher(userModel), null);
+        controller = new RestUserController(
+                makeMe.modelFactoryService,
+                new TestCurrentUserFetcher(userModel));
     }
 
     @Test
     void updateUserSuccessfully() throws NoAccessRightException {
-        String response = controller.updateUser(userModel.getEntity(), makeMe.successfulBindingResult());
-        assertThat(response, equalTo("redirect:/"));
-    }
-
-    @Test
-    void updateUserValidationFailed() throws NoAccessRightException {
-        String response = controller.updateUser(userModel.getEntity(), makeMe.failedBindingResult());
-        assertThat(response, equalTo("users/edit"));
+        User response = controller.updateUser(userModel.getEntity());
+        assertThat(response, equalTo(userModel.getEntity()));
     }
 
     @Test
@@ -49,7 +47,7 @@ class UserControllerTest {
         User anotherUser = makeMe.aUser().please();
         assertThrows(
                 NoAccessRightException.class,
-                ()-> controller.updateUser(anotherUser, makeMe.successfulBindingResult()));
+                ()-> controller.updateUser(anotherUser));
     }
 
 }

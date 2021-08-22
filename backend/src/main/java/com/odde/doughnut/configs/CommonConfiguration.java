@@ -15,7 +15,7 @@ public class CommonConfiguration {
         .mvcMatchers("/robots.txt")
         .permitAll()
         .antMatchers("/", "/login", "/error", "/images/**", "/odd-e.png",
-                     "/webjars/**", "/assets/**","/bazaar", "/bazaar/**/**",
+                     "/webjars/**", "/assets/**","/bazaar", "/bazaar/**",
                      "/api/**", "/circles/join"
                 )
         .permitAll()

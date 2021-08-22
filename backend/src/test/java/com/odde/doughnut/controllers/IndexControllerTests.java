@@ -6,11 +6,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class IndexControllerTests {
 
-  IndexController controller;
+  ApplicationController controller;
 
   @Test
   void visitWithNoUserSession() {
-    controller = new IndexController();
+    controller = new ApplicationController();
     assertEquals("vuejsed", controller.home());
   }
 }

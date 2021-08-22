@@ -2,6 +2,10 @@ package com.odde.doughnut.controllers;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.view.RedirectView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,4 +18,25 @@ public class ApplicationController {
     public void robots(HttpServletRequest request, HttpServletResponse response) throws IOException {
         response.getWriter().write("User-agent: *\n");
     }
+
+    @RequestMapping(value = {
+            "/",
+            "/bazaar/**",
+            "/circles/**",
+            "/notebooks/**",
+            "/notes/**",
+            "/reviews/**",
+            "/users/**",
+            "/failure-report-list/**",
+            "/links/**"
+    }, method = RequestMethod.GET)
+    public String home() {
+        return "vuejsed";
+    }
+
+    @GetMapping("/users/identify")
+    public RedirectView identify(@RequestParam String from) {
+        return new RedirectView(from);
+    }
+
 }
