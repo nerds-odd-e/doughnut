@@ -7,8 +7,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class CommonConfiguration {
-    @Autowired
-    public AccountAwareUrlAuthenticationSuccessHandler accountAwareUrlAuthenticationSuccessHandler;
 
   void commonConfig(HttpSecurity http, AbstractAuthenticationFilterConfigurer authenticationFilterConfigurer) throws Exception {
     HttpSecurity config =  http.authorizeRequests()
@@ -27,6 +25,5 @@ public class CommonConfiguration {
                        .logoutSuccessUrl("/")
                        .invalidateHttpSession(true)
                        .permitAll());
-    authenticationFilterConfigurer.successHandler(accountAwareUrlAuthenticationSuccessHandler);
   }
 }
