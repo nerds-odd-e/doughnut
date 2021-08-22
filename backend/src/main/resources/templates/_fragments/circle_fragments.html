@@ -1,7 +1,0 @@
-<div th:fragment="joinForm(circleJoiningByInvitation)">
-    <h2>Join a circle</h2>
-    <form action="#" th:action="@{/circles/join}" th:object="${circleJoiningByInvitation}" method="post">
-        <div th:replace="_fragments/forms :: textInput('circle', 'invitationCode', 'Invitation code you got from other people', false)"/>
-        <input type="submit" value="Submit" class="btn btn-primary"/>
-    </form>
-</div>

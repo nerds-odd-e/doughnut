@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManagerFactory;
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -176,6 +178,29 @@ class TestabilityRestController {
 
     private GithubService getGithubService() {
         return testabilitySettings.getGithubService();
+    }
+
+    static class TimeTravel {
+        public String travel_to;
+    }
+
+    @PostMapping(value="/time_travel")
+    public List<Object> timeTravel(@RequestBody  TimeTravel timeTravel) {
+        DateTimeFormatter formatter = TestabilityRestController.getDateTimeFormatter();
+        LocalDateTime localDateTime = LocalDateTime.from(formatter.parse(timeTravel.travel_to));
+        Timestamp timestamp = Timestamp.valueOf(localDateTime);
+        testabilitySettings.timeTravelTo(timestamp);
+        return Collections.emptyList();
+    }
+
+    static class Randomization {
+        public String choose;
+    }
+
+    @PostMapping(value="/randomizer")
+    public List<Object> randomizer(@RequestBody  Randomization randomization) {
+        testabilitySettings.setAlwaysChoose(randomization.choose);
+        return Collections.emptyList();
     }
 
 }

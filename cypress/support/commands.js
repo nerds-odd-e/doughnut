@@ -244,8 +244,7 @@ Cypress.Commands.add('timeTravelTo', (day, hour) => {
   const travelTo = new Date(1976, 5, 1, hour).addDays(day);
   cy.request({
     method: 'POST',
-    url: '/testability/time_travel',
-    form: true,
+    url: '/api/testability/time_travel',
     body: { travel_to: JSON.stringify(travelTo) }
   })
     .its('status')
@@ -255,8 +254,7 @@ Cypress.Commands.add('timeTravelTo', (day, hour) => {
 Cypress.Commands.add('randomizerAlwaysChooseLast', (day, hour) => {
   cy.request({
     method: 'POST',
-    url: '/testability/randomizer',
-    form: true,
+    url: '/api/testability/randomizer',
     body: { choose: 'last' }
   })
     .its('status')
