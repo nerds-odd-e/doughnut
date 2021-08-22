@@ -119,4 +119,18 @@ const restPostMultiplePartForm = (url, data, loadingRef) => {
   );
 };
 
-export { restGet, restPost, restPostMultiplePartForm, loginOrRegister };
+const restPatchMultiplePartForm = (url, data, loadingRef) => {
+  return restRequest(
+    url,
+    {
+      method: 'PATCH',
+      headers: {
+        Accept: 'application/json',
+      },
+      body: objectToFormData(data),
+    },
+    loadingRef
+  );
+};
+
+export { restGet, restPost, restPostMultiplePartForm, restPatchMultiplePartForm, loginOrRegister };

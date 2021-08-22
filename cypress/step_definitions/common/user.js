@@ -95,7 +95,7 @@ Then('The {string} page is displayed', pageName => {
     default:
       cy.failure();
   }
-});
+})
 
 Then('I should be asked to log in again.', () => {});
 
@@ -107,4 +107,16 @@ Then(
     cy.get('form.form-signin').submit();
     cy.findByText(expectation, { selector: '.h1' }).should('be.visible');
   }
-);
+)
+
+Then('I edit user profile', () => {
+    cy.visit("/")
+    cy.get(".user-profile-link").click()
+})
+
+Then('I change my name to {string}', (name) => {
+    cy.getFormControl("Name").clear().type(name);
+    cy.findByText("Submit").click()
+})
+
+

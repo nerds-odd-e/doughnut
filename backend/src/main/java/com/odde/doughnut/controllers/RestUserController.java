@@ -3,15 +3,15 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import org.springframework.security.core.Authentication;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.Valid;
 import java.io.IOException;
 import java.security.Principal;
 
@@ -29,6 +29,18 @@ class RestUserController {
     @PostMapping("")
     public User createUser(Principal principal, User user, HttpServletRequest request, HttpServletResponse resp, Authentication auth) throws ServletException, IOException {
         user.setExternalIdentifier(principal.getName());
+        modelFactoryService.userRepository.save(user);
+        return user;
+    }
+
+    @GetMapping("")
+    public User getUserProfile() {
+      return currentUserFetcher.getUser().getEntity();
+    }
+
+    @PatchMapping("/{user}")
+    public @Valid User updateUser(@Valid User user) throws NoAccessRightException {
+        currentUserFetcher.getUser().getAuthorization().assertAuthorization(user);
         modelFactoryService.userRepository.save(user);
         return user;
     }

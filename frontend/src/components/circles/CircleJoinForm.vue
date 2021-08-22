@@ -25,6 +25,7 @@ export default {
   },
 
   methods: {
+
   processForm() {
     restPostMultiplePartForm( `/api/circles/join`, this.formData, r=>this.loading=r)
           .then(res => {

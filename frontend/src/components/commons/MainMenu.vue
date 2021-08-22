@@ -28,7 +28,7 @@
                 </ul>
                 <div class="d-flex" v-if="user">
                   <span style="margin-right:10px;" class="navbar-text">
-                      <a href="/users/edit">{{user.name}}</a>
+                      <router-link class="user-profile-link" :to="{name: 'userProfile'}">{{user.name}}</router-link>
                   </span>
                   <form class="form-inline my-2 my-lg-0" th:action="@{/logout}" method="post">
                       <input class= "btn btn-outline-success me-2 my-sm-0" type= "submit" value="Logout">

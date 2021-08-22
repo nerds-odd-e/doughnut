@@ -77,7 +77,7 @@ export default {
   <template v-else>
   <MainMenu v-if="showNavBar" :user="user"/>
   <div v-if="!!staticInfo" class="container content">
-    <router-view :user="user"/>
+    <router-view :user="user" @userUpdated="user=$event"/>
   </div>
   </template>
 </template>
