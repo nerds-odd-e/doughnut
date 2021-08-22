@@ -18,6 +18,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.ExtendedModelMap;
 
+import javax.validation.Valid;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.matchesPattern;
@@ -27,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
-class SubscriptionControllerTest {
+class RestSubscriptionControllerTest {
     @Autowired
     private MakeMe makeMe;
     @Autowired
@@ -35,8 +37,7 @@ class SubscriptionControllerTest {
     private UserModel userModel;
     private Note topNote;
     private Notebook notebook;
-    private SubscriptionController controller;
-    final ExtendedModelMap model = new ExtendedModelMap();
+    private RestSubscriptionController controller;
 
 
     @BeforeEach
@@ -45,29 +46,17 @@ class SubscriptionControllerTest {
         topNote = makeMe.aNote().byUser(userModel).please();
         notebook = topNote.getNotebook();
         makeMe.aBazaarNodebook(topNote.getNotebook()).please();
-        controller = new SubscriptionController(new TestCurrentUserFetcher(userModel), makeMe.modelFactoryService);
+        controller = new RestSubscriptionController(makeMe.modelFactoryService, new TestCurrentUserFetcher(userModel));
     }
 
     @Test
     void subscribeToNoteSuccessfully() throws NoAccessRightException {
         Subscription subscription = makeMe.aSubscription().inMemoryPlease();
-        String result = controller.createSubscription(
+        Subscription result = controller.createSubscription(
                 notebook,
-                subscription,
-                makeMe.successfulBindingResult(), model);
-        assertThat(result, matchesPattern("redirect:/subscriptions/\\d+"));
-        assertEquals(topNote, subscription.getHeadNote());
-        assertEquals(userModel.getEntity(), subscription.getUser());
-    }
-
-    @Test
-    void shouldShowTheFormAgainIfError() throws NoAccessRightException {
-        Subscription subscription = makeMe.aSubscription().inMemoryPlease();
-        String result = controller.createSubscription(
-                notebook,
-                subscription,
-                makeMe.failedBindingResult(), model);
-        assertEquals("subscriptions/add_to_learning", result);
+                subscription);
+        assertEquals(topNote, result.getHeadNote());
+        assertEquals(userModel.getEntity(), result.getUser());
     }
 
     @Test
@@ -76,8 +65,7 @@ class SubscriptionControllerTest {
         Subscription subscription = makeMe.aSubscription().inMemoryPlease();
         assertThrows(NoAccessRightException.class, ()-> controller.createSubscription(
                 anotherNote.getNotebook(),
-                subscription,
-                makeMe.successfulBindingResult(), model));
+                subscription));
     }
 
     @Nested
@@ -86,9 +74,8 @@ class SubscriptionControllerTest {
         void shouldRemoveTheSubscription() throws NoAccessRightException {
             Subscription subscription = makeMe.aSubscription().forUser(userModel.getEntity()).please();
             long beforeDestroy = subscriptionRepository.count();
-            String result = controller.destroySubscription(subscription);
+            controller.destroySubscription(subscription);
             assertThat(subscriptionRepository.count(), equalTo(beforeDestroy - 1));
-            assertThat(result, equalTo("redirect:/notebooks/"));
         }
 
         @Test
@@ -97,7 +84,5 @@ class SubscriptionControllerTest {
             Subscription subscription = makeMe.aSubscription().forUser(anotherUser).please();
             assertThrows(NoAccessRightException.class, ()-> controller.destroySubscription(subscription));
         }
-
-
     }
 }

@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/subscriptions")
@@ -48,6 +49,15 @@ class RestSubscriptionController {
   public @Valid Subscription update(@Valid Subscription subscription) {
     modelFactoryService.entityManager.persist(subscription);
     return subscription;
+  }
+
+  @PostMapping("/{subscription}/delete")
+  @Transactional
+  public List<Integer> destroySubscription(@Valid Subscription subscription) throws NoAccessRightException {
+    final UserModel userModel = currentUserFetcher.getUser();
+    userModel.getAuthorization().assertAuthorization(subscription);
+    modelFactoryService.entityManager.remove(subscription);
+    return List.of(1);
   }
 
 }
