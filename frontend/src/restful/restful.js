@@ -5,11 +5,6 @@ class HttpResponseError extends Error {
   }
 }
 
-const reloadSession = () => {
-  window.alert("Your login session has expired, let's refresh.");
-  window.location.reload();
-};
-
 const loginOrRegister = () => {
   window.location = "/users/identify?from=" + window.location.href
 }
@@ -50,7 +45,7 @@ const restRequest = (url, params, loadingRef) => {
       })
       .catch((error) => {
         if (error.status === 401) {
-          reloadSession()
+          loginOrRegister()
           return;
         }
         reject({statusCode: error.status})
