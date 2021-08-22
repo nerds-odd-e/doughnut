@@ -22,15 +22,15 @@ public class IndexController extends ApplicationMvcController {
     public String home(Principal principal, Model model) {
         if (principal == null) {
             model.addAttribute("totalNotes", modelFactoryService.noteRepository.count());
-            return "ask_to_login";
+            return "vuejsed";
         }
 
         if (!currentUserFetcher.getUser().loggedIn()) {
             model.addAttribute("user", new User());
-            return "register";
+            return "vuejsed";
         }
 
-        return "index";
+        return "vuejsed";
     }
 
 }
