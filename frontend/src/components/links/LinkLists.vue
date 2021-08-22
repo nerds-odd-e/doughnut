@@ -11,9 +11,11 @@
             <LinkLink class="link-multi" v-for="link in reverse" :key="link.id" v-bind="{link, owns, colors: staticInfo.colors}" :reverse="true" @updated="$emit('updated')"/>
         </template>
         </li>
-        <li v-for="(linksOfType, linkType) in tagLinks" :key="linkType">
-            <LinkLink class="link-multi" v-for="link in linksOfType.direct" :key="link.id" v-bind="{link, owns, colors: staticInfo.colors}" :reverse="false" @updated="$emit('updated')"/>
-        </li>
+        <template v-for="(linksOfType, linkType) in tagLinks" :key="linkType">
+            <li v-if="linksOfType.direct.length > 0">
+                <LinkLink class="link-multi" v-for="link in linksOfType.direct" :key="link.id" v-bind="{link, owns, colors: staticInfo.colors}" :reverse="false" @updated="$emit('updated')"/>
+            </li>
+        </template>
     </ul>
     <slot />
 
@@ -63,7 +65,7 @@
   const tagLinks = computed(()=>{
       const tTypes = taggingTypes()
       if(!props.links) return
-      return Object.fromEntries(Object.entries(props.links).filter(t=>t[1].direct.length>0).filter(t=>tTypes.includes(t[0])))
+      return Object.fromEntries(Object.entries(props.links).filter(t=>tTypes.includes(t[0])))
   })
 
   const groupedLinks = computed(()=>{
