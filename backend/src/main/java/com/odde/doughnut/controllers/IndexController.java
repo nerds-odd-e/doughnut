@@ -10,17 +10,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import java.security.Principal;
 
 @Controller
-public class IndexController extends ApplicationMvcController {
-    private final ModelFactoryService modelFactoryService;
-
-    public IndexController(CurrentUserFetcher currentUserFetcher, ModelFactoryService modelFactoryService) {
-        super(currentUserFetcher);
-        this.modelFactoryService = modelFactoryService;
-    }
-
+public class IndexController {
     @GetMapping("/")
-    public String home(Principal principal, Model model) {
+    public String home() {
         return "vuejsed";
     }
-
 }

@@ -1,4 +1,4 @@
-package com.odde.doughnut.controllers;
+package com.odde.doughnut.configs;
 
 import lombok.Getter;
 import org.springframework.core.Ordered;

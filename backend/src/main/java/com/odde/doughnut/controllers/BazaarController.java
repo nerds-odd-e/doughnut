@@ -10,22 +10,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-@RequestMapping("/bazaar")
-public class BazaarController extends ApplicationMvcController {
-    private final ModelFactoryService modelFactoryService;
+@RequestMapping(value = {"/bazaar", "/circles", "/failure-report-list"})
+public class BazaarController {
 
-    public BazaarController(CurrentUserFetcher currentUserFetcher, ModelFactoryService modelFactoryService) {
-        super(currentUserFetcher);
-        this.modelFactoryService = modelFactoryService;
-    }
-
-    @GetMapping("")
-    public String bazaar(Model model) {
+    @RequestMapping("**")
+    public String any() {
         return "vuejsed";
     }
 
-    @GetMapping("/notes/{note}")
-    public String showBazaarNote(@PathVariable(name = "note") Integer noteId) throws NoAccessRightException {
-        return "vuejsed";
-    }
 }

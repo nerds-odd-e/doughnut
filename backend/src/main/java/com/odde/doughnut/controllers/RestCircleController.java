@@ -18,6 +18,8 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 import java.io.IOException;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -86,7 +88,7 @@ class RestCircleController {
 
   @PostMapping("/join")
   @Transactional
-  public Circle joinCircle(@Valid CircleController.CircleJoiningByInvitation circleJoiningByInvitation) throws BindException {
+  public Circle joinCircle(@Valid RestCircleController.CircleJoiningByInvitation circleJoiningByInvitation) throws BindException {
     CircleModel circleModel = modelFactoryService.findCircleByInvitationCode(circleJoiningByInvitation.getInvitationCode());
     if (circleModel == null) {
       BindingResult bindingResult = new BeanPropertyBindingResult(circleJoiningByInvitation, "circle");
@@ -114,4 +116,11 @@ class RestCircleController {
     return new RedirectToNoteResponse(note.getId());
   }
 
+  public static class CircleJoiningByInvitation {
+      @NotNull
+      @Size(min = 10, max = 20)
+      @Getter
+      @Setter
+      String invitationCode;
+  }
 }
