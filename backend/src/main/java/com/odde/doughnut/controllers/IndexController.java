@@ -19,6 +19,7 @@ public class IndexController {
             "/circles/**",
             "/notebooks/**",
             "/notes/**",
+            "/reviews/**",
             "/failure-report-list/**",
             "/links/**"
     }, method = RequestMethod.GET)
