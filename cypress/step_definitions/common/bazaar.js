@@ -58,6 +58,7 @@ Then("I should see I've subscribed to {string}", (noteTitle) => {
 });
 
 Then("I should see I've not subscribed to {string}", (noteTitle) => {
+  cy.findByText("Subscribed Notes").should("exist");
   cy.findByText(noteTitle).should("not.exist");
 });
 
@@ -81,6 +82,7 @@ Then("I should see it has link to {string}", (noteTitle) => {
 
 Then("I unsubscribe from notebook {string}", (noteTitle) => {
   cy.unsubscribeFromNotebook(noteTitle);
+  cy.findByRole('button', { name: 'OK' }).click();
 });
 
 

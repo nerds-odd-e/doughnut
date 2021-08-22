@@ -7,7 +7,7 @@
       </p>
       <NotebookViewCards :notebooks="notebooksViewedByUser.notebooks"/>
       <h2>Subscribed Notes</h2>
-      <NotebookSubscriptionCards :subscriptions="notebooksViewedByUser.subscriptions"/>
+      <NotebookSubscriptionCards :subscriptions="notebooksViewedByUser.subscriptions" @updated="fetchData()"/>
     </div>
   </LoadingPage>
 </template>
