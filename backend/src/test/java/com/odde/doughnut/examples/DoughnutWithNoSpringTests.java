@@ -30,6 +30,6 @@ class DoughnutWithNoSpringTests {
     Model model = mock(Model.class);
 
     String home = controller.home(null, model);
-    assertEquals("ask_to_login", home);
+    assertEquals("vuejsed", home);
   }
 }

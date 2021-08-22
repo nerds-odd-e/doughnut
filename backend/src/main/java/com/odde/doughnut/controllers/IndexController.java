@@ -20,16 +20,6 @@ public class IndexController extends ApplicationMvcController {
 
     @GetMapping("/")
     public String home(Principal principal, Model model) {
-        if (principal == null) {
-            model.addAttribute("totalNotes", modelFactoryService.noteRepository.count());
-            return "vuejsed";
-        }
-
-        if (!currentUserFetcher.getUser().loggedIn()) {
-            model.addAttribute("user", new User());
-            return "vuejsed";
-        }
-
         return "vuejsed";
     }
 

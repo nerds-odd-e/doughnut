@@ -1,8 +1,0 @@
-<!DOCTYPE html SYSTEM "http://www.thymeleaf.org/dtd/xhtml1-strict-thymeleaf-spring4-4.dtd">
-<layout th:replace="_fragments/basic_layout :: application_layout(~{ :: .content})">
-    <div class="container content">
-        <h2>Failure report list</h2>
-
-        <div th:replace="_fragments/failure_report :: failureReportViewlist(${failureReports})"/>
-    </div>
-</layout>

@@ -16,7 +16,7 @@ class DoughnutApplicationTests {
 
 	@Test
 	void visitWithNoUserSession() {
-		assertEquals("ask_to_login", controller.home(null, model));
+		assertEquals("vuejsed", controller.home(null, model));
 	}
 
 }
