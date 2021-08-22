@@ -22,7 +22,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: 16
-          distribution: 'zulu'
+          distribution: "zulu"
           architecture: x64
       - name: Setup MySQL DB Server 8.0
         uses: mirromutth/mysql-action@v1.1
@@ -75,7 +75,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: 16
-          distribution: 'zulu'
+          distribution: "zulu"
           architecture: x64
       - name: Setup MySQL DB Server 8.0
         uses: mirromutth/mysql-action@v1.1
@@ -96,7 +96,7 @@ jobs:
       - name: End-to-End tests with Cypress
         uses: cypress-io/github-action@v2
         with:
-          config: pageLoadTimeout=100000,video=false
+          config: configFile=ci,pageLoadTimeout=100000,video=false
           install-command: yarn
           start: yarn sut
           wait-on: "http://localhost:9081"
@@ -118,7 +118,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: 16
-          distribution: 'zulu'
+          distribution: "zulu"
           architecture: x64
       - name: Build application jar artifact
         run: backend/gradlew -p backend build -x test -Dspring.profiles.active=prod

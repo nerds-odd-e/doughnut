@@ -8,13 +8,16 @@
   "scripts": {
     "frontend:build": "cd frontend && yarn && yarn build && cd -",
     "frontend:test": "cd frontend && yarn && yarn test && cd -",
+    "frontend:sut": "cd frontend && yarn dev && cd -",
     "backend:build": "backend/gradlew -p backend build -x test",
     "backend:prod_build": "backend/gradlew -p backend build -x test -Dspring.profiles.active=prod",
-    "cy:open": "cypress open",
-    "cy:run": "cypress run",
+    "cy:open": "cypress open --env configFile=development",
+    "cy:run:dev": "cypress run --env configFile=development",
+    "cy:run": "cypress run --env configFile=ci",
     "sut": "./gradlew bootRunE2E",
     "open": "yarn frontend:build && run-p -clnr sut cy:open",
     "test": "yarn frontend:build && run-p -clnr sut cy:run",
+    "test:dev": "yarn frontend:build && run-p -clnr sut frontend:sut cy:run:dev",
     "sound": "node scripts/sound-monitor.js"
   },
   "cypress-cucumber-preprocessor": {
