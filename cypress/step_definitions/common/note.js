@@ -181,3 +181,11 @@ When(
   }
 )
 
+Then(
+  'I should see the title {string} of the notebook',
+  noteTitle => {
+    cy.findByText(noteTitle, {
+      selector: '.h1'
+    }).should("be.visible")
+  }
+)
