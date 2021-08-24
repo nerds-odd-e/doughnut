@@ -4,57 +4,41 @@ Feature: note update
   so that I can focus on only reviewing the newly added notes.
 
   Background:
-    Given there are some notes for existing user "old_learner"
-      | title                | testingParent |
-      | Shape                |               |
-      | Rectangle            | Shape         |
-      | Square               | Rectangle     |
-      | Triangle             | Shape         |
-      | Equilateral triangle | Triangle      |
-      | Circle               | Shape         |
-
-  Scenario: View an indicator when I add a new note
     Given I've logged in as an existing user
-    When I create note belonging to "Equilateral triangle":
+    And there are some notes for the current user
+      | title                | testingParent |
+      | NoteBook                |               |
+      | Note1            | NoteBook         |
+      | Note2               | NoteBook     |
+      | Note1.1             | Note1         |
+      | Note1.2             | Note1      |
+      | Note3               | NoteBook   |
+    And I create note belonging to "Note1.1"
       | Title | Description |
-      | Small Triangle | This is a small equilateral triangle |
-    Then I should see new note banner
-    When I open "Shape" note from the top level
-    And I edit "Shape" note description to become "new description"
-    Then I should see new note banner
-    When I open "Shape" note from the top level
-    Then I should see these notes as children marked as new with a pink border
-      | note-title |
-      | Triangle |
-      | Circle   |
-    When I open "Shape/Triangle" note from top level
-    Then I should see these notes as children marked as new with a pink border
-      | note-title |
-      | Equilateral triangle |
-    When I open "Shape/Triangle/Equilateral triangle" note from top level
-    Then I should see these notes as children marked as new with a pink border
-      | note-title |
-      | Small Triangle |
+      | Note1.1.1 | Desc    |
 
 
-  Scenario: View an indicator for new notes when I view other people's notes
-    Given I've logged in as another existing user
-    And I have access to "old_learner" notebook "Shape"
-    When I open "Shape" note from the top level
-    Then I should see these notes as children marked as new with a pink border
-      | note-title |
-      | Triangle |
-      | Circle   |
-    When I open "Shape/Triangle" note from top level
-    Then I should see these notes as children marked as new with a pink border
-      | note-title |
-      | Equilateral triangle |
-    When I open "Shape/Triangle/Equilateral triangle" note from top level
-    Then I should see these notes as children marked as new with a pink border
-      | note-title |
-      | Small Triangle |
-    When I open "Shape/Triangle/Equilateral triangle/Small Triangle" note from top level
+  Scenario: I should see new note banner on newly created note
     Then I should see new note banner
+
+  Scenario: I should see pink border around sub-notes that are newly created
+    When I open "NoteBook/Note1/Note1.1" note from top level
+    Then I should see these notes as children marked as new with a pink border
+      | note-title |
+      | Note1.1.1 |
+
+
+  Scenario: I should see pink border around sub-notes that have newly created sub-notes
+    When I open "NoteBook" note from the top level
+    Then I should see these notes as children marked as new with a pink border
+      | note-title |
+      | Note1 |
+    When I open "NoteBook/Note1" note from top level
+    Then I should see these notes as children marked as new with a pink border
+      | note-title |
+      | Note1.1 |
+
+
 
 
   Scenario: When 12 hours have lapsed after note was updated it should not be marked as new
