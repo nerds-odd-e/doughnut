@@ -27,8 +27,7 @@ const props = defineProps({
     note: {type: Object, required: true },
     links: Object,
     level: { type: Number, default: 2 },
-    owns: {type: Boolean, required: true},
-    staticInfo: Object })
+    owns: {type: Boolean, required: true}, staticInfo: Object })
 const emits = defineEmits(['updated'])
 
 const twoColumns = computed(()=>!!props.note.notePicture && !!props.note.noteContent.description)

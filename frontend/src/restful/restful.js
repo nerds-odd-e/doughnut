@@ -6,23 +6,22 @@ class HttpResponseError extends Error {
 }
 
 const loginOrRegister = () => {
-  window.location = "/users/identify?from=" + window.location.href
-}
+  window.location = `/users/identify?from=${window.location.href}`;
+};
 
 function toNested(data) {
-  const result = {}
-  Object.keys(data).forEach(function (key) {
-    if(key.includes(".")) {
-      const [namespace, subkey] = key.split('.')
-      if(!result[namespace]) result[namespace] = {}
-      result[namespace][subkey] = data[key]
+  const result = {};
+  Object.keys(data).forEach((key) => {
+    if (key.includes('.')) {
+      const [namespace, subkey] = key.split('.');
+      if (!result[namespace]) result[namespace] = {};
+      result[namespace][subkey] = data[key];
+    } else {
+      result[key] = data[key];
     }
-    else {
-      result[key] = data[key]
-    }
-  })
+  });
 
-  return result
+  return result;
 }
 
 const restRequest = (url, params, loadingRef) => {
@@ -32,7 +31,7 @@ const restRequest = (url, params, loadingRef) => {
     loadingRef.value = true;
   }
 
-  return new Promise((resolve, reject)=>{
+  return new Promise((resolve, reject) => {
     fetch(url, params)
       .then((res) => {
         if (res.status !== 200 && res.status != 400) {
@@ -45,92 +44,81 @@ const restRequest = (url, params, loadingRef) => {
       })
       .catch((error) => {
         if (error.status === 401) {
-          loginOrRegister()
+          loginOrRegister();
           return;
         }
-        reject({statusCode: error.status})
+        reject({ statusCode: error.status });
         if (error.status === 404) {
           return;
         }
 
-        window.alert(error)
-      })
+        window.alert(error);
+      });
   })
-  .finally(() => {
-    if (loadingRef instanceof Function) {
-      loadingRef(false)
-    } else {
-      loadingRef.value = false;
-    }
-  });
-
-
-};
-
-const restGet = (url, loadingRef) => {
-  return restRequest(url, {}, loadingRef);
-};
-
-const restPost = (url, data, loadingRef) => {
-  return restRequest(
-    url,
-    {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    },
-    loadingRef,
-  )
-};
-
-function objectToFormData(data){
-  const formData = new FormData();
-  Object.keys(data).forEach(function (key) {
-    if (data[key] === null) {
-      formData.append(key, '')
-    }
-    else if(data[key] instanceof Object && !(data[key] instanceof File)) {
-      Object.keys(data[key]).forEach(function (subKey) {
-        formData.append(`${key}.${subKey}`, data[key][subKey] === null ? '' : data[key][subKey]);
-      })
-    }
-    else {
-        formData.append(key, data[key])
+    .finally(() => {
+      if (loadingRef instanceof Function) {
+        loadingRef(false);
+      } else {
+        loadingRef.value = false;
       }
+    });
+};
+
+const restGet = (url, loadingRef) => restRequest(url, {}, loadingRef);
+
+const restPost = (url, data, loadingRef) => restRequest(
+  url,
+  {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  },
+  loadingRef,
+);
+
+function objectToFormData(data) {
+  const formData = new FormData();
+  Object.keys(data).forEach((key) => {
+    if (data[key] === null) {
+      formData.append(key, '');
+    } else if (data[key] instanceof Object && !(data[key] instanceof File)) {
+      Object.keys(data[key]).forEach((subKey) => {
+        formData.append(`${key}.${subKey}`, data[key][subKey] === null ? '' : data[key][subKey]);
+      });
+    } else {
+      formData.append(key, data[key]);
+    }
   });
-  return formData
+  return formData;
 }
 
-
-const restPostMultiplePartForm = (url, data, loadingRef) => {
-  return restRequest(
-    url,
-    {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-      },
-      body: objectToFormData(data),
+const restPostMultiplePartForm = (url, data, loadingRef) => restRequest(
+  url,
+  {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
     },
-    loadingRef
-  );
-};
+    body: objectToFormData(data),
+  },
+  loadingRef,
+);
 
-const restPatchMultiplePartForm = (url, data, loadingRef) => {
-  return restRequest(
-    url,
-    {
-      method: 'PATCH',
-      headers: {
-        Accept: 'application/json',
-      },
-      body: objectToFormData(data),
+const restPatchMultiplePartForm = (url, data, loadingRef) => restRequest(
+  url,
+  {
+    method: 'PATCH',
+    headers: {
+      Accept: 'application/json',
     },
-    loadingRef
-  );
-};
+    body: objectToFormData(data),
+  },
+  loadingRef,
+);
 
-export { restGet, restPost, restPostMultiplePartForm, restPatchMultiplePartForm, loginOrRegister };
+export {
+  restGet, restPost, restPostMultiplePartForm, restPatchMultiplePartForm, loginOrRegister,
+};
