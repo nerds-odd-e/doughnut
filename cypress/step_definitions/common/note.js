@@ -173,3 +173,9 @@ When(
     });
   }
 );
+
+When(
+  'I should see new note banner', () => {
+    cy.findByText('This note was changed recently.')
+  }
+)
