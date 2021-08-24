@@ -12,7 +12,6 @@ Feature: Note overview
     And I open "Sedation" note from top level
     And I click on the overview button
 
-  @ignore
   Scenario: View the title of the notebook
     Then I should see the title "Sedation" of the notebook
 

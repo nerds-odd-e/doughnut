@@ -173,3 +173,11 @@ When(
     });
   }
 );
+
+When(
+  'I click on the overview button',
+  () => {
+    cy.findByText('Full view mode').click();
+  }
+)
+
