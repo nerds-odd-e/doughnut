@@ -175,7 +175,23 @@ When(
 );
 
 When(
-  'I should see new note banner', () => {
+'I should see new note banner', () => {
     cy.findByText('This note was changed recently.')
+  }
+)
+
+When(
+  'I click on the overview button',
+  () => {
+    cy.findByText('Full view mode').click();
+  }
+)
+
+Then(
+  'I should see the title {string} of the notebook',
+  noteTitle => {
+    cy.findByText(noteTitle, {
+      selector: '.h1'
+    }).should("be.visible")
   }
 )

@@ -6,6 +6,7 @@
       <NoteNavigationButtons :navigation="navigation"/>
     </nav>
     <NoteOwnerViewCards :owns="owns" :notes="children" @updated="$emit('updated')"/>
+    <button class="btn btn-sm" role="button">Full view mode</button>
 </template>
 
 <script>
