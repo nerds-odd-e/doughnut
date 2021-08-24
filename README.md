@@ -32,7 +32,6 @@ For more background info you can read:
 - [Zulu OpenJDK 16](https://docs.azul.com/core/zulu-openjdk/release-notes/july-2021)
 - [Spring Boot](https://spring.io/projects/spring-boot)
 - [Flyway](https://flywaydb.org)
-- [Thymeleaf](https://www.thymeleaf.org/)
 - [Gradle](https://gradle.org/)
 - [Junit5](https://junit.org/junit5/)
 - [Cypress](https://www.cypress.io/)
