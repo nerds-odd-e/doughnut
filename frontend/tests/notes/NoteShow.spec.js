@@ -13,4 +13,16 @@ describe("new/updated pink banner", () => {
       await wrapper.findByText("This note has been changed recently.")
     ).toBeTruthy();
   });
+
+  test("should show 0 pink banners if the note was updated more than 12 hours ago", async () => {
+    const lastUpdated = moment().subtract(12, "hours").format();
+    const note = createMockNote({
+      note: { noteContent: { updatedAt: lastUpdated } },
+    });
+    const wrapper = render(NoteShow, { props: note });
+
+    expect(
+      await wrapper.queryAllByText("This note has been changed recently.")
+    ).toHaveLength(0);
+  });
 });
