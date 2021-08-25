@@ -1,5 +1,8 @@
 <template>
   <LinkLists v-bind="{links, owns, staticInfo}" @updated="$emit('updated')">
+    <div>
+      This note has been changed recently.
+    </div>
     <div class="note-body">
       <h2 :class="'note-title h' + level"> {{note.noteContent.title}}</h2>
       <div class="row">

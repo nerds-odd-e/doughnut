@@ -1,11 +1,16 @@
-import { render } from '@testing-library/vue'
-import NoteShow from '@/components/notes/NoteShow.vue'
-import {note} from './NoteShow-fixtures'
+import { render } from "@testing-library/vue";
+import moment from "moment";
+import NoteShow from "@/components/notes/NoteShow.vue";
+import { createMockNote } from "./NoteShow-fixtures";
 
-xdescribe('new/updated pink banner', () => {
-  test('should show pink banner', async () => {
-    const wrapper = render(NoteShow, {props: note})
+describe("new/updated pink banner", () => {
+  test("should show pink banner if the note was updated within the last 12 hours", async () => {
+    const now = moment().format();
+    const note = createMockNote({ note: { noteContent: { updatedAt: now } } });
+    const wrapper = render(NoteShow, { props: note });
 
-    expect(await wrapper.findByText('This is a new thing')).toBeTruthy()
+    expect(
+      await wrapper.findByText("This note has been changed recently.")
+    ).toBeTruthy();
   });
 });

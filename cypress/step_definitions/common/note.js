@@ -176,7 +176,7 @@ When(
 
 When(
 'I should see new note banner', () => {
-    cy.findByText('This note was changed recently.')
+    cy.findByText('This note has been changed recently.')
   }
 )
 
