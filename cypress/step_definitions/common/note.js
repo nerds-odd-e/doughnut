@@ -195,3 +195,14 @@ Then(
     }).should("be.visible")
   }
 )
+
+Then(
+  'I should see the child notes {string} in order',
+  notesStr => {
+    const notes = notesStr.split(',');
+    const actualNotes = cy.get('.overview-note-title').then($els => {
+      cy.log('---', $els);
+    })
+
+  }
+)

@@ -7,6 +7,9 @@
     </nav>
     <NoteOwnerViewCards :owns="owns" :notes="children" @updated="$emit('updated')"/>
     <button class="btn btn-sm" role="button">Full view mode</button>
+    <p class="overview-note-title" v-for="child in children">
+      {{child.title}}
+    </p>
 </template>
 
 <script>
