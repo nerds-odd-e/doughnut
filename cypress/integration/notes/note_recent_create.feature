@@ -1,8 +1,10 @@
+@ignore
 Feature: see recent note create
   As a learner, I want to see which of my notes are recently created,
   so that I can focus on only reviewing the newly added notes.
 
   Background:
+    Given It's day 1, 0 hour
     Given I've logged in as an existing user
     And there are some notes for the current user
       | title    | testingParent |
@@ -18,7 +20,7 @@ Feature: see recent note create
 
   Scenario: I should see new note banner on newly created note
     Then I should see new note banner
-    When I wait for 12 hours
+    Given It's day 1, 12 hour
     Then I should see 0 new note banner
 
   @ignore
