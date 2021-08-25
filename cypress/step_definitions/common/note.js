@@ -188,7 +188,7 @@ Then("I should see the title {string} of the notebook", (noteTitle) => {
 
 Then("I should see the child notes {string} in order", (notesStr) => {
   const notes = notesStr.split(",");
-  const actualNotes = cy.get(".overview-note-title").then(($els) => {
-    cy.log("---", $els);
+  cy.findAllByTestId("overview-note-title").each((actualNote, index) => {
+    expect(actualNote[0].innerHTML).to.equal(notes[index]);
   });
 });

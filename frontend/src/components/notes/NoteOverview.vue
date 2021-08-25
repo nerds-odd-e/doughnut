@@ -1,6 +1,6 @@
 <template>
     <NoteViewedByUserWithoutChildren v-bind="{note, links, ancestors, notebook, owns}" @updated="$emit('updated')"/>
-    <p class="overview-note-title" v-for="child in children" :key="child.noteId">
+    <p data-testid="overview-note-title" class="overview-note-title" v-for="child in children" :key="child.noteId">
       {{child.title}}
     </p>
 </template>
