@@ -6,10 +6,10 @@
       <NoteNavigationButtons :navigation="navigation"/>
     </nav>
     <NoteOwnerViewCards :owns="owns" :notes="children" @updated="$emit('updated')"/>
-    <button class="btn btn-sm" role="button">Full view mode</button>
-    <p class="overview-note-title" v-for="child in children">
-      {{child.title}}
-    </p>
+
+    <router-link :to="{name: 'noteOverview', params: {noteId: note.id}}" v-if="!!note.id" role="button" class="btn btn-sm">
+      Full view mode
+    </router-link>
 </template>
 
 <script>

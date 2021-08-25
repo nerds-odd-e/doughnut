@@ -14,6 +14,7 @@ import CircleJoinPage from '@/pages/CircleJoinPage.vue';
 import FailureReportListPage from '@/pages/FailureReportListPage.vue';
 import FailureReportPage from '@/pages/FailureReportPage.vue';
 import UserProfilePage from '@/pages/UserProfilePage.vue';
+import NoteOverviewPage from '@/pages/NoteOverviewPage.vue';
 
 const NestedInitialReviewPage = NestedPage(
   InitialReviewPage,
@@ -36,6 +37,9 @@ const noteAndLinkRoutes = [
   },
   {
     path: 'links/:linkid', name: 'linkShow', component: LinkShowPage, props: true,
+  },
+  {
+    path: 'notes/:noteId/overview', name: 'noteOverview', component: NoteOverviewPage, props: true,
   },
 ];
 
