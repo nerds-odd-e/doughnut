@@ -23,7 +23,7 @@ export default {
   components: { LoadingPage, NoteOverview },
   methods: {
     fetchData() {
-      restGet(`/api/notes/${this.noteId}`, (r)=>this.loading=r)
+      restGet(`/api/notes/${this.noteId}/overview`, (r)=>this.loading=r)
         .then(res => this.noteViewedByUser = res)
     }
   },

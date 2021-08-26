@@ -75,6 +75,13 @@ class RestNoteControllerTests {
             assertThat(show.getOwns(), is(true));
         }
 
+        void shouldBeAbleToSeeOwnNoteOverview() throws NoAccessRightException {
+            Note note = makeMe.aNote().byUser(userModel).with10Children().please();
+            makeMe.refresh(userModel.getEntity());
+            final NoteViewedByUser show = controller.show(note);
+            assertThat(show.getNote(), equalTo(note));
+            assertThat(show.getOwns(), is(true));
+        }
     }
 
     @Nested

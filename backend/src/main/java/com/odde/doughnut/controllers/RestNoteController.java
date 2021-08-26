@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -73,6 +74,13 @@ class RestNoteController {
 
   @GetMapping("/{note}")
   public NoteViewedByUser show(@PathVariable("note") Note note) throws NoAccessRightException {
+    final UserModel user = currentUserFetcher.getUser();
+    user.getAuthorization().assertReadAuthorization(note);
+    return note.jsonObjectViewedBy(user.getEntity());
+  }
+
+  @GetMapping("/{note}/overview")
+  public NoteViewedByUser showOverview(@PathVariable("note") Note note) throws NoAccessRightException {
     final UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertReadAuthorization(note);
     return note.jsonObjectViewedBy(user.getEntity());
