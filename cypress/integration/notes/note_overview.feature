@@ -20,7 +20,7 @@ Feature: Note overview
 
   @ignore
   Scenario: View the child notes of a child note in sequential order
-    When there is a child note for a note
+    When there is a child note in a note in "Singapore" notebook
       | title            | testingParent | description                                |
       | Leaving Malaysia | History       | This is a description for leaving Malaysia |
     Then I should see the child notes "History,Leaving Malaysia,Geography" in order

@@ -193,6 +193,6 @@ Then("I should see the child notes {string} in order", (notesStr) => {
   });
 });
 
-When('there is a child note for a note', (data) => {
-  cy.seedNotes(data.hashes());
+When('there is a child note in a note in {string} notebook', (noteBookStr, data) => {
+  cy.appendNotes(data.hashes());
 })
