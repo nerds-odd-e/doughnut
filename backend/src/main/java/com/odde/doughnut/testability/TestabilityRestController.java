@@ -91,27 +91,6 @@ class TestabilityRestController {
         return noteList.stream().map(Note::getId).collect(Collectors.toList());
     }
 
-    @PostMapping("/append_notes")
-    public void appendNotes(@RequestBody List<NoteContent> noteContents, @RequestParam(name = "external_identifier") String externalIdentifier) throws Exception {
-        final User user = getUserModelByExternalIdentifierOrCurrentUser(externalIdentifier).getEntity();
-
-        List<Note> newNotesList = new ArrayList<>();
-
-        for (NoteContent content : noteContents) {
-            Note note = new Note();
-            note.mergeNoteContent(content);
-            newNotesList.add(note);
-
-            final String testingParent = note.getNoteContent().getTestingParent();
-            Note parent = noteRepository.findFirstByTitle(testingParent);
-            note.setParentNote(parent);
-
-            note.setUser(user);
-
-        }
-        noteRepository.saveAll(newNotesList);
-    }
-
     @PostMapping("/link_notes")
     @Transactional
     public String linkNotes(@RequestBody HashMap<String, String> linkInfo) {
