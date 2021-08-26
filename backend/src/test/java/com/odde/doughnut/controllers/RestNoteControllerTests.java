@@ -10,6 +10,7 @@ import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.TestabilitySettings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -23,6 +24,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -39,11 +41,12 @@ class RestNoteControllerTests {
     MakeMe makeMe;
     private UserModel userModel;
     RestNoteController controller;
+    private TestabilitySettings testabilitySettings = new TestabilitySettings();
 
     @BeforeEach
     void setup() {
         userModel = makeMe.aUser().toModelPlease();
-        controller = new RestNoteController(modelFactoryService, new TestCurrentUserFetcher(userModel));
+        controller = new RestNoteController(modelFactoryService, new TestCurrentUserFetcher(userModel), testabilitySettings);
     }
 
     @Nested

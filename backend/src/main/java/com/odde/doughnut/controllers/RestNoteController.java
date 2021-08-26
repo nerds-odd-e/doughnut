@@ -8,11 +8,13 @@ import com.odde.doughnut.entities.json.RedirectToNoteResponse;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.testability.TestabilitySettings;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
@@ -24,10 +26,13 @@ import java.util.List;
 class RestNoteController {
   private final ModelFactoryService modelFactoryService;
   private final CurrentUserFetcher currentUserFetcher;
+  @Resource(name = "testabilitySettings")
+  private final TestabilitySettings testabilitySettings;
 
-  public RestNoteController(ModelFactoryService modelFactoryService, CurrentUserFetcher currentUserFetcher) {
+  public RestNoteController(ModelFactoryService modelFactoryService, CurrentUserFetcher currentUserFetcher, TestabilitySettings testabilitySettings) {
     this.modelFactoryService = modelFactoryService;
     this.currentUserFetcher = currentUserFetcher;
+    this.testabilitySettings = testabilitySettings;
   }
 
   class NoteStatistics {
@@ -59,6 +64,7 @@ class RestNoteController {
     note.updateNoteContent(noteCreation.getNoteContent(), user);
     note.setParentNote(parentNote);
     note.setUser(user);
+    note.getNoteContent().setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
     modelFactoryService.noteRepository.save(note);
     if(noteCreation.getLinkTypeToParent() != null) {
       Link link = new Link();
