@@ -99,7 +99,7 @@ class TestabilityRestController {
     // Else, set head note
     @PostMapping("/append_notes")
     public List<Integer> seedNote(@RequestBody List<NoteContent> noteContents) throws Exception {
-        return new List<Integer>
+        return new ArrayList();
     }
 
     @PostMapping("/link_notes")
