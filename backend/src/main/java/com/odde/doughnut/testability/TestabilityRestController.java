@@ -91,15 +91,25 @@ class TestabilityRestController {
         return noteList.stream().map(Note::getId).collect(Collectors.toList());
     }
 
-    // { Psuedocode } Java method to append notes
-    // Given list of notes passed to backend
-    // Retrieve all current notes in database
-    // For each note passed, check if testing parent exists 
-    // If exists, set parent note
-    // Else, set head note
     @PostMapping("/append_notes")
-    public List<Integer> seedNote(@RequestBody List<NoteContent> noteContents) throws Exception {
-        return new ArrayList();
+    public void appendNotes(@RequestBody List<NoteContent> noteContents, @RequestParam(name = "external_identifier") String externalIdentifier) throws Exception {
+        final User user = getUserModelByExternalIdentifierOrCurrentUser(externalIdentifier).getEntity();
+
+        List<Note> newNotesList = new ArrayList<>();
+
+        for (NoteContent content : noteContents) {
+            Note note = new Note();
+            note.mergeNoteContent(content);
+            newNotesList.add(note);
+
+            final String testingParent = note.getNoteContent().getTestingParent();
+            Note parent = noteRepository.findFirstByTitle(testingParent);
+            note.setParentNote(parent);
+
+            note.setUser(user);
+
+        }
+        noteRepository.saveAll(newNotesList);
     }
 
     @PostMapping("/link_notes")

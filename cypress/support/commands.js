@@ -75,11 +75,9 @@ Cypress.Commands.add('seedNotes', (notes, externalIdentifier = '') => {
 Cypress.Commands.add('appendNotes', (notes) => {
   cy.request({
     method: 'POST',
-    url: '/api/testability/append_notes',
+    url: '/api/testability/append_notes?external_identifier=',
     body: notes
-  }).then(response => {
-    // expect(response.body.length).to.equal(notes.length);
-  })
+  });
 })
 
 Cypress.Commands.add('createLink', (type, fromNoteTitle, toNoteTitle) => {
