@@ -192,3 +192,7 @@ Then("I should see the child notes {string} in order", (notesStr) => {
     expect(actualNote[0].innerHTML).to.equal(notes[index]);
   });
 });
+
+When('there is a child note for a note', (data) => {
+  cy.seedNotes(data.hashes());
+})
