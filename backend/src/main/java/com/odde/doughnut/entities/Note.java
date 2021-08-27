@@ -347,5 +347,18 @@ public class Note {
                 grand = grand.getParentNote();
         return grand;
     }
+
+    public boolean isRecentlyUpdated(Timestamp currentUTCTimestamp) {
+      Timestamp lastUpdatedAt = getNoteContent().getUpdatedAt();
+      Timestamp twelveHoursAgo = new Timestamp(currentUTCTimestamp.getTime() - 12 * 60 * 60 * 1000);
+      return lastUpdatedAt.compareTo(twelveHoursAgo) >= 0;
+    }
+
+    public NoteViewedByUser getNoteViewedByUser(Timestamp currentUTCTimestamp, User entity) {
+      NoteViewedByUser noteViewedByUser = jsonObjectViewedBy(entity);
+
+      noteViewedByUser.setRecentlyUpdated(isRecentlyUpdated(currentUTCTimestamp));
+      return noteViewedByUser;
+    }
 }
 

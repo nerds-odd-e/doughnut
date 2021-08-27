@@ -18,7 +18,7 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.lang.reflect.Array;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -83,8 +83,11 @@ class RestNoteController {
   public NoteViewedByUser show(@PathVariable("note") Note note) throws NoAccessRightException {
     final UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertReadAuthorization(note);
-    return note.jsonObjectViewedBy(user.getEntity());
+    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
+    NoteViewedByUser noteViewedByUser = note.getNoteViewedByUser(currentUTCTimestamp, user.getEntity());
+    return noteViewedByUser;
   }
+
 
   @GetMapping("/{note}/overview")
   public ArrayList<NoteViewedByUser> showOverview(@PathVariable("note") Note note) throws NoAccessRightException {
