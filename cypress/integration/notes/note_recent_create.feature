@@ -1,4 +1,3 @@
-@ignore
 Feature: see recent note create
   As a learner, I want to see which of my notes are recently created,
   so that I can focus on only reviewing the newly added notes.
