@@ -18,6 +18,7 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -89,7 +90,24 @@ class RestNoteController {
   public ArrayList<NoteViewedByUser> showOverview(@PathVariable("note") Note note) throws NoAccessRightException {
     final UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertReadAuthorization(note);
-    return new ArrayList<>();
+
+    ArrayList<Note> allChildren = getAllChildren(note);
+    return new ArrayList<NoteViewedByUser>();
+  }
+
+  private ArrayList<Note> getAllChildren(Note note) {
+    ArrayList<Note> allChildren = new ArrayList<>();
+    allChildren.add(note);
+
+    if (note.getChildren().size() == 0) {
+      return allChildren;
+    }
+
+    for (Note child : note.getChildren()) {
+      allChildren.addAll(getAllChildren(child));
+    }
+
+    return allChildren;
   }
 
   @PostMapping(path="/{note}")
