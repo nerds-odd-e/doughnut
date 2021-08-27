@@ -1,5 +1,5 @@
 <template>
-    <NoteViewedByUserWithoutChildren v-bind="{note, links, ancestors, notebook, owns}" @updated="$emit('updated')"/>
+    <NoteViewedByUserWithoutChildren v-bind="{note, links, ancestors, notebook, owns, recentlyUpdated}" @updated="$emit('updated')"/>
     <nav class="nav d-flex justify-content-between p-0 mb-2">
       <div class="btn-group btn-group-sm">
       </div>
@@ -26,6 +26,7 @@ export default {
     children: Array,
     ancestors: Array,
     notebook: Object,
+    recentlyUpdated: Boolean,
     owns: { type: Boolean, required: true }
   },
   emits: ['updated'],

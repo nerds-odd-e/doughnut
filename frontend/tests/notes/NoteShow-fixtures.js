@@ -2,6 +2,7 @@ import { merge } from "lodash";
 
 const DEFAULT_NOTE = {
   owns: true,
+  recentlyUpdated: false,
   level: 1,
   note: {
     id: 7,

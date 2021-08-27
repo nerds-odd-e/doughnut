@@ -1,6 +1,6 @@
 <template>
   <LinkLists v-bind="{links, owns, staticInfo}" @updated="$emit('updated')">
-    <div v-if="twelveHoursAgo.isBefore(note.noteContent.updatedAt)">
+    <div v-if="recentlyUpdated">
       This note has been changed recently.
     </div>
     <div class="note-body">
@@ -25,18 +25,17 @@ import { computed } from "@vue/runtime-core"
 import LinkLists from "../links/LinkLists.vue"
 import ShowPicture from "./ShowPicture.vue"
 import ShowDescription from "./ShowDescription.vue"
-import moment from "moment"
 
 const props = defineProps({
     note: {type: Object, required: true },
     links: Object,
     level: { type: Number, default: 2 },
-    owns: {type: Boolean, required: true}, staticInfo: Object })
+    owns: {type: Boolean, required: true}, staticInfo: Object,
+    recentlyUpdated: Boolean})
 const emits = defineEmits(['updated'])
 
 const twoColumns = computed(()=>!!props.note.notePicture && !!props.note.noteContent.description)
 
-const twelveHoursAgo = computed(()=>moment().subtract(12, 'hours'));
 </script>
 
 <style scoped>
