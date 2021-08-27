@@ -99,7 +99,8 @@ class RestNoteControllerTests {
 
         @Test
         void shouldShowIfANoteIsNotRecentlyUpdated() throws NoAccessRightException {
-            Timestamp twelveHoursAgo = new Timestamp(System.currentTimeMillis() - NoteViewedByUser.TWELVE_HOURS_MILLISECONDS);
+            testabilitySettings.timeTravelTo(new Timestamp(System.currentTimeMillis()));
+            Timestamp twelveHoursAgo = new Timestamp(testabilitySettings.getCurrentUTCTimestamp().getTime() - NoteViewedByUser.TWELVE_HOURS_MILLISECONDS);
             Note note = makeMe.aNote().byUser(userModel).withContentUpdatedAt(twelveHoursAgo).please();
             makeMe.refresh(userModel.getEntity());
             final NoteViewedByUser show = controller.show(note);

@@ -142,4 +142,9 @@ public class NoteBuilder extends EntityBuilder<Note> {
         entity.getNotebook().setOwnership(user.getOwnership());
         return this;
     }
+
+    public NoteBuilder withContentUpdatedAt(Timestamp newUpdatedAt) {
+        entity.getNoteContent().setUpdatedAt(newUpdatedAt);
+        return this;
+    }
 }
