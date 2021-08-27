@@ -86,10 +86,10 @@ class RestNoteController {
   }
 
   @GetMapping("/{note}/overview")
-  public NoteViewedByUser showOverview(@PathVariable("note") Note note) throws NoAccessRightException {
+  public ArrayList<NoteViewedByUser> showOverview(@PathVariable("note") Note note) throws NoAccessRightException {
     final UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertReadAuthorization(note);
-    return note.jsonObjectViewedBy(user.getEntity());
+    return new ArrayList<>();
   }
 
   @PostMapping(path="/{note}")

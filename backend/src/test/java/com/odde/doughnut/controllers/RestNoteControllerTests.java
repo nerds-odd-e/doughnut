@@ -21,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -73,13 +74,19 @@ class RestNoteControllerTests {
             assertThat(show.getNote(), equalTo(note));
             assertThat(show.getOwns(), is(true));
         }
-
+        
         void shouldBeAbleToSeeOwnNoteOverview() throws NoAccessRightException {
-            Note note = makeMe.aNote().byUser(userModel).with10Children().please();
-            makeMe.refresh(userModel.getEntity());
-            final NoteViewedByUser show = controller.show(note);
-            assertThat(show.getNote(), equalTo(note));
-            assertThat(show.getOwns(), is(true));
+            Note note = makeMe.aNote().byUser(userModel).please();
+            Note childNote = makeMe.aNote().byUser(userModel).under(note).please();
+            makeMe.theNote(childNote).with10Children().please();
+            makeMe.refresh(note);
+            makeMe.refresh(childNote);
+            Note grandchildNote = childNote.getChildren().get(0);
+            final ArrayList<NoteViewedByUser> showOverview = controller.showOverview(note);
+
+            assertThat(showOverview.get(0).getNote(), equalTo(note));
+            assertThat(showOverview.get(1).getNote(), equalTo(childNote));
+            assertThat(showOverview.get(2).getNote(), equalTo(grandchildNote));
         }
 
         @Test
