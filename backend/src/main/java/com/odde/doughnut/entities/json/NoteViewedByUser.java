@@ -5,10 +5,19 @@ import com.odde.doughnut.entities.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
 public class NoteViewedByUser {
+    public static final int TWELVE_HOURS_MILLISECONDS = 12 * 60 * 60 * 1000;
+
+    public Boolean getIsRecentlyUpdated(Timestamp currentUTCTimestamp) {
+        Timestamp lastUpdatedAt = this.note.getNoteContent().getUpdatedAt();
+        Timestamp twelveHoursAgo = new Timestamp(currentUTCTimestamp.getTime() - TWELVE_HOURS_MILLISECONDS);
+        return lastUpdatedAt.compareTo(twelveHoursAgo) >= 0;
+    }
+
     public static class NoteNavigation {
         @Getter @Setter private Integer previousSiblingId;
         @Getter @Setter private Integer previousId;

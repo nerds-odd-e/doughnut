@@ -2,7 +2,6 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteContent;
-import com.odde.doughnut.entities.NoteMotion;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.json.NoteViewedByUser;
 import com.odde.doughnut.entities.json.RedirectToNoteResponse;
@@ -19,9 +18,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.ui.ExtendedModelMap;
-import org.springframework.validation.BindingResult;
-import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -84,6 +80,23 @@ class RestNoteControllerTests {
             final NoteViewedByUser show = controller.show(note);
             assertThat(show.getNote(), equalTo(note));
             assertThat(show.getOwns(), is(true));
+        }
+
+        @Test
+        void shouldShowNoteThatIsRecentlyUpdated() throws NoAccessRightException {
+            Note note = makeMe.aNote().byUser(userModel).please();
+            makeMe.refresh(userModel.getEntity());
+            final NoteViewedByUser show = controller.show(note);
+            assertThat(show.getIsRecentlyUpdated(testabilitySettings.getCurrentUTCTimestamp()), is(true));
+        }
+
+        @Test
+        void shouldShowNoteThatIsNotRecentlyUpdated() throws NoAccessRightException {
+            Timestamp twelveHoursAgo = new Timestamp(System.currentTimeMillis() - NoteViewedByUser.TWELVE_HOURS_MILLISECONDS);
+            Note note = makeMe.aNote().byUser(userModel).withContentUpdatedAt(twelveHoursAgo).please();
+            makeMe.refresh(userModel.getEntity());
+            final NoteViewedByUser show = controller.show(note);
+            assertThat(show.getIsRecentlyUpdated(testabilitySettings.getCurrentUTCTimestamp()), is(false));
         }
     }
 
