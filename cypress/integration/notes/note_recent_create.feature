@@ -17,6 +17,7 @@ Feature: see recent note create
       | Title | Description |
       | Note1.1.1 | Desc    |
 
+  @ignore
   Scenario: I should see new note banner on newly created note
     Then I should see new note banner
     Given It's day 1, 12 hour
