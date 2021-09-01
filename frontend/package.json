@@ -1,6 +1,7 @@
 {
   "name": "doughnut-frontend",
-  "version": "0.0.2",
+  "version": "1.0.0",
+  "license": "MIT",
   "scripts": {
     "dev": "vite",
     "build": "vite build --emptyOutDir",
