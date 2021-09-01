@@ -34,7 +34,7 @@ const restRequest = (url, params, loadingRef) => {
   return new Promise((resolve, reject) => {
     fetch(url, params)
       .then((res) => {
-        if (res.status !== 200 && res.status != 400) {
+        if (res.status !== 200 && res.status !== 400) {
           throw new HttpResponseError(res.status);
         }
         return res.json().then((resp) => {
@@ -47,37 +47,35 @@ const restRequest = (url, params, loadingRef) => {
           loginOrRegister();
           return;
         }
-        reject({ statusCode: error.status });
+        reject(new Error({ statusCode: error.status }));
         if (error.status === 404) {
           return;
         }
-
-        window.alert(error);
       });
-  })
-    .finally(() => {
-      if (loadingRef instanceof Function) {
-        loadingRef(false);
-      } else {
-        loadingRef.value = false;
-      }
-    });
+  }).finally(() => {
+    if (loadingRef instanceof Function) {
+      loadingRef(false);
+    } else {
+      loadingRef.value = false;
+    }
+  });
 };
 
 const restGet = (url, loadingRef) => restRequest(url, {}, loadingRef);
 
-const restPost = (url, data, loadingRef) => restRequest(
-  url,
-  {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
+const restPost = (url, data, loadingRef) =>
+  restRequest(
+    url,
+    {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
     },
-    body: JSON.stringify(data),
-  },
-  loadingRef,
-);
+    loadingRef
+  );
 
 function objectToFormData(data) {
   const formData = new FormData();
@@ -86,7 +84,10 @@ function objectToFormData(data) {
       formData.append(key, '');
     } else if (data[key] instanceof Object && !(data[key] instanceof File)) {
       Object.keys(data[key]).forEach((subKey) => {
-        formData.append(`${key}.${subKey}`, data[key][subKey] === null ? '' : data[key][subKey]);
+        formData.append(
+          `${key}.${subKey}`,
+          data[key][subKey] === null ? '' : data[key][subKey]
+        );
       });
     } else {
       formData.append(key, data[key]);
@@ -95,30 +96,36 @@ function objectToFormData(data) {
   return formData;
 }
 
-const restPostMultiplePartForm = (url, data, loadingRef) => restRequest(
-  url,
-  {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
+const restPostMultiplePartForm = (url, data, loadingRef) =>
+  restRequest(
+    url,
+    {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+      },
+      body: objectToFormData(data),
     },
-    body: objectToFormData(data),
-  },
-  loadingRef,
-);
+    loadingRef
+  );
 
-const restPatchMultiplePartForm = (url, data, loadingRef) => restRequest(
-  url,
-  {
-    method: 'PATCH',
-    headers: {
-      Accept: 'application/json',
+const restPatchMultiplePartForm = (url, data, loadingRef) =>
+  restRequest(
+    url,
+    {
+      method: 'PATCH',
+      headers: {
+        Accept: 'application/json',
+      },
+      body: objectToFormData(data),
     },
-    body: objectToFormData(data),
-  },
-  loadingRef,
-);
+    loadingRef
+  );
 
 export {
-  restGet, restPost, restPostMultiplePartForm, restPatchMultiplePartForm, loginOrRegister,
+  restGet,
+  restPost,
+  restPostMultiplePartForm,
+  restPatchMultiplePartForm,
+  loginOrRegister,
 };

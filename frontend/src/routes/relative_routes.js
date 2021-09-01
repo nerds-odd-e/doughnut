@@ -1,7 +1,9 @@
-import { routes } from './routes';
+import routes from './routes';
 
 const routerScopeGuard = (scopeName, except, alertCallback) => {
-  const routeNames = routes.find((r) => r.name === scopeName).children.map((r) => r.name);
+  const routeNames = routes
+    .find((r) => r.name === scopeName)
+    .children.map((r) => r.name);
 
   return async (to, from, next) => {
     if (to.name.split('-').shift() !== scopeName) {
@@ -19,4 +21,4 @@ const routerScopeGuard = (scopeName, except, alertCallback) => {
   };
 };
 
-export { routerScopeGuard };
+export default routerScopeGuard;

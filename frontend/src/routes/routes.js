@@ -20,30 +20,40 @@ const NestedInitialReviewPage = NestedPage(
   InitialReviewPage,
   'initial',
   [],
-  'This will leave the initial review, are you sure?',
+  'This will leave the initial review, are you sure?'
 );
 
 const NestedRepeatPage = NestedPage(
   RepeatPage,
   'repeat',
   ['repeat-quiz'],
-  'Please answer the question first before you explore the notes.',
+  'Please answer the question first before you explore the notes.'
 );
 
 const noteAndLinkRoutes = [
   { path: 'notebooks', name: 'notebooks', component: NotebooksPage },
   {
-    path: 'notes/:noteId', name: 'noteShow', component: NoteShowPage, props: true,
+    path: 'notes/:noteId',
+    name: 'noteShow',
+    component: NoteShowPage,
+    props: true,
   },
   {
-    path: 'links/:linkid', name: 'linkShow', component: LinkShowPage, props: true,
+    path: 'links/:linkid',
+    name: 'linkShow',
+    component: LinkShowPage,
+    props: true,
   },
   {
-    path: 'notes/:noteId/overview', name: 'noteOverview', component: NoteOverviewPage, props: true,
+    path: 'notes/:noteId/overview',
+    name: 'noteOverview',
+    component: NoteOverviewPage,
+    props: true,
   },
 ];
 
-const nestedNoteAndLinkRoutes = (prefix) => noteAndLinkRoutes.map((route) => ({ ...route, name: prefix + route.name }));
+const nestedNoteAndLinkRoutes = (prefix) =>
+  noteAndLinkRoutes.map((route) => ({ ...route, name: prefix + route.name }));
 
 const routes = [
   ...noteAndLinkRoutes.map((route) => ({ ...route, path: `/${route.path}` })),
@@ -51,21 +61,29 @@ const routes = [
   { path: '/bazaar', name: 'bazaar', component: BazaarPage },
   { path: '/circles', name: 'circles', component: CirclesPage },
   {
-    path: '/circles/:circleId', name: 'circleShow', component: CircleShowPage, props: true,
+    path: '/circles/:circleId',
+    name: 'circleShow',
+    component: CircleShowPage,
+    props: true,
   },
   {
-    path: '/circles/join/:invitationCode', name: 'circleJoin', component: CircleJoinPage, props: true,
+    path: '/circles/join/:invitationCode',
+    name: 'circleJoin',
+    component: CircleJoinPage,
+    props: true,
   },
   {
-    path: '/bazaar/notes/:noteId', name: 'bnoteShow', component: NoteShowPage, props: true,
+    path: '/bazaar/notes/:noteId',
+    name: 'bnoteShow',
+    component: NoteShowPage,
+    props: true,
   },
   { path: '/reviews', name: 'reviews', component: ReviewHome },
   {
     path: '/reviews/initial',
     name: 'initial',
     component: NestedInitialReviewPage,
-    children:
-              nestedNoteAndLinkRoutes('initial-'),
+    children: nestedNoteAndLinkRoutes('initial-'),
   },
   {
     path: '/reviews/repeat',
@@ -73,13 +91,21 @@ const routes = [
     component: NestedRepeatPage,
     children: [
       ...nestedNoteAndLinkRoutes('repeat-'),
-      { path: 'quiz', name: 'repeat-quiz', component: DoingQuiz }],
+      { path: 'quiz', name: 'repeat-quiz', component: DoingQuiz },
+    ],
   },
-  { path: '/failure-report-list', name: 'failureReportList', component: FailureReportListPage },
   {
-    path: '/failure-report-list/show/:failureReportId', name: 'failureReport', component: FailureReportPage, props: true,
+    path: '/failure-report-list',
+    name: 'failureReportList',
+    component: FailureReportListPage,
+  },
+  {
+    path: '/failure-report-list/show/:failureReportId',
+    name: 'failureReport',
+    component: FailureReportPage,
+    props: true,
   },
   { path: '/user-profile', name: 'userProfile', component: UserProfilePage },
 ];
 
-export { routes };
+export default routes;

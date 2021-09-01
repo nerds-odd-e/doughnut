@@ -40,6 +40,18 @@ jobs:
       - name: Unit tests with Gradle
         run: ./gradlew test -Dspring.profiles.active=test
 
+  Frontend-linting:
+    name: Frontend Lint
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Code Checkout
+        uses: actions/checkout@v2
+      - name: eslint
+        uses: actions/setup-node@v2
+        with:
+          node-version: "16"
+      - run: yarn frontend:lint
+
   Frontend-unit-tests:
     name: Frontend Unit tests
     runs-on: ubuntu-20.04

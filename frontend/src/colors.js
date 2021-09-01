@@ -5,8 +5,6 @@ export const colors = {
   target: '#447733',
 };
 
-export const bgcolors = function (role) {
-  return colors[`${role}Background`];
-};
+const bgcolors = (role) => colors[`${role}Background`];
 
 export default bgcolors;
