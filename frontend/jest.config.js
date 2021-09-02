@@ -2,15 +2,15 @@ module.exports = {
   verbose: true,
   collectCoverage: false,
   globals: {
-    'vue-jest': { babelConfig: true },
+    "vue-jest": { babelConfig: true },
   },
-  moduleFileExtensions: ['js', 'json', 'vue'],
+  moduleFileExtensions: ["js", "json", "vue"],
   transform: {
-    '.*\\.(vue)$': 'vue-jest',
-    '.*\\.(js)$': 'babel-jest',
+    ".*\\.(vue)$": "vue-jest",
+    ".*\\.(js)$": "babel-jest",
   },
   moduleNameMapper: {
-    '^@/(.*)$': '<rootDir>/src/$1',
+    "^@/(.*)$": "<rootDir>/src/$1",
   },
-  setupFiles: ['./tests/setupJest.js'],
+  setupFiles: ["./tests/setupJest.js"],
 };

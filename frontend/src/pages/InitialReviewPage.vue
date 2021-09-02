@@ -1,23 +1,46 @@
 <template>
-  <LoadingPage v-bind="{loading, contentExists: !!reviewPointViewedByUser}">
+  <LoadingPage v-bind="{ loading, contentExists: !!reviewPointViewedByUser }">
     <template v-if="!!reviewPoint">
-      <ProgressBar v-bind="{title: `Initial Review: `, finished, toRepeatCount: reviewPointViewedByUser.remainingInitialReviewCountForToday}">
+      <ProgressBar
+        v-bind="{
+          title: `Initial Review: `,
+          finished,
+          toRepeatCount:
+            reviewPointViewedByUser.remainingInitialReviewCountForToday,
+        }"
+      >
       </ProgressBar>
       <Minimizable :minimized="nested">
         <template #minimizedContent>
-          <div class="initial-review-container" v-on:click="$router.push({name: 'initial'})">
-            <ReviewPointAbbr v-bind="reviewPointViewedByUser"/>
-            <InitialReviewButtons :key="buttonKey" @doInitialReview="processForm($event)"/>
+          <div
+            class="initial-review-container"
+            v-on:click="$router.push({ name: 'initial' })"
+          >
+            <ReviewPointAbbr v-bind="reviewPointViewedByUser" />
+            <InitialReviewButtons
+              :key="buttonKey"
+              @doInitialReview="processForm($event)"
+            />
           </div>
         </template>
         <template #fullContent>
-              <ShowReviewPoint v-bind="reviewPointViewedByUser" @updated="fetchData()"/>
-              <div>
-                <div class="mb-2">
-                    <ReviewSettingForm v-if="!!reviewPointViewedByUser.reviewSetting" v-model="reviewSetting" :errors="{}"/>
-                </div>
-                <InitialReviewButtons :key="buttonKey" @doInitialReview="processForm($event)"/>
-              </div>
+          <ShowReviewPoint
+            v-bind="reviewPointViewedByUser"
+            @updated="fetchData()"
+          />
+          <div>
+            <div class="mb-2">
+              <ReviewSettingForm
+                v-if="!!reviewPointViewedByUser.reviewSetting"
+                v-model="reviewSetting"
+                :errors="{}"
+              />
+            </div>
+            <InitialReviewButtons
+              :key="buttonKey"
+              @doInitialReview="processForm($event)"
+            />
+          </div>
         </template>
       </Minimizable>
     </template>
@@ -25,62 +48,85 @@
 </template>
 
 <script>
-import ShowReviewPoint from '../components/review/ShowReviewPoint.vue'
-import ReviewSettingForm from '../components/review/ReviewSettingForm.vue'
-import ReviewPointAbbr from '../components/review/ReviewPointAbbr.vue'
-import InitialReviewButtons from '../components/review/InitialReviewButtons.vue'
-import ProgressBar from "../components/commons/ProgressBar.vue"
-import LoadingPage from "./commons/LoadingPage.vue"
-  import Minimizable from "../components/commons/Minimizable.vue"
-import { restGet, restPost } from "../restful/restful"
+import ShowReviewPoint from "../components/review/ShowReviewPoint.vue";
+import ReviewSettingForm from "../components/review/ReviewSettingForm.vue";
+import ReviewPointAbbr from "../components/review/ReviewPointAbbr.vue";
+import InitialReviewButtons from "../components/review/InitialReviewButtons.vue";
+import ProgressBar from "../components/commons/ProgressBar.vue";
+import LoadingPage from "./commons/LoadingPage.vue";
+import Minimizable from "../components/commons/Minimizable.vue";
+import { restGet, restPost } from "../restful/restful";
 
 export default {
-  name: 'InitialReviewPage',
+  name: "InitialReviewPage",
   props: { nested: Boolean },
-  components: {ShowReviewPoint, ReviewSettingForm, LoadingPage, InitialReviewButtons, Minimizable, ProgressBar, ReviewPointAbbr },
+  components: {
+    ShowReviewPoint,
+    ReviewSettingForm,
+    LoadingPage,
+    InitialReviewButtons,
+    Minimizable,
+    ProgressBar,
+    ReviewPointAbbr,
+  },
   data() {
     return {
       finished: 0,
       reviewPointViewedByUser: null,
-      loading: null
-    }
+      loading: null,
+    };
   },
   computed: {
-    reviewPoint() { return this.reviewPointViewedByUser.reviewPoint },
-    reviewSetting() { return this.reviewPointViewedByUser.reviewSetting },
-    buttonKey() {return !!this.reviewPoint.noteId ? `note-${this.reviewPoint.noteId}` : `link-${this.reviewPoint.linkId}`}
+    reviewPoint() {
+      return this.reviewPointViewedByUser.reviewPoint;
+    },
+    reviewSetting() {
+      return this.reviewPointViewedByUser.reviewSetting;
+    },
+    buttonKey() {
+      return !!this.reviewPoint.noteId
+        ? `note-${this.reviewPoint.noteId}`
+        : `link-${this.reviewPoint.linkId}`;
+    },
   },
 
   methods: {
-    loadNew(resp){
+    loadNew(resp) {
       this.reviewPointViewedByUser = resp;
       if (!this.reviewPointViewedByUser.reviewPoint) {
-        this.$router.push({name: "reviews"})
+        this.$router.push({ name: "reviews" });
       }
     },
 
     async processForm(skipReview) {
-      this.finished += 1
-      this.reviewPointViewedByUser.remainingInitialReviewCountForToday -= 1
-      if(skipReview) {
-        if(!await this.$popups.confirm('Are you sure to hide this note from reviewing in the future?')) return;
+      this.finished += 1;
+      this.reviewPointViewedByUser.remainingInitialReviewCountForToday -= 1;
+      if (skipReview) {
+        if (
+          !(await this.$popups.confirm(
+            "Are you sure to hide this note from reviewing in the future?"
+          ))
+        )
+          return;
       }
-      this.reviewPoint.removedFromReview = skipReview
+      this.reviewPoint.removedFromReview = skipReview;
       restPost(
-          `/api/reviews`,
-          {reviewPoint: this.reviewPoint, reviewSetting: this.reviewSetting},
-          r=>this.loading=r)
-        .then(this.loadNew)
+        `/api/reviews`,
+        { reviewPoint: this.reviewPoint, reviewSetting: this.reviewSetting },
+        (r) => (this.loading = r)
+      ).then(this.loadNew);
     },
 
     fetchData() {
-      restGet(`/api/reviews/initial`, r=>this.loading=r).then(this.loadNew)
+      restGet(`/api/reviews/initial`, (r) => (this.loading = r)).then(
+        this.loadNew
+      );
     },
   },
-  mounted(){
+  mounted() {
     this.fetchData();
-  }
-}
+  },
+};
 </script>
 
 <style>

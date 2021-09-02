@@ -1,12 +1,12 @@
 <template>
-    <BazaarNotebookButtons :notebook="notebook" />
+  <BazaarNotebookButtons :notebook="notebook" />
 </template>
 
 <script>
-  import BazaarNotebookButtons from "./BazaarNotebookButtons.vue"
+import BazaarNotebookButtons from "./BazaarNotebookButtons.vue";
 
-  export default {
-    props: {note: Object, notebook: Object},
-    components: { BazaarNotebookButtons}
-  }
+export default {
+  props: { note: Object, notebook: Object },
+  components: { BazaarNotebookButtons },
+};
 </script>

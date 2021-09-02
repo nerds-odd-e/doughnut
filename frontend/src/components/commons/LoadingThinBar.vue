@@ -1,28 +1,32 @@
 <template>
-<div class="loading-bar">
-  <div>
-    <content-loader height="2" :speed="1" primaryColor="#00c"></content-loader>
+  <div class="loading-bar">
+    <div>
+      <content-loader
+        height="2"
+        :speed="1"
+        primaryColor="#00c"
+      ></content-loader>
+    </div>
   </div>
-</div>
 </template>
 
 <script>
-import { ContentLoader } from 'vue-content-loader'
+import { ContentLoader } from "vue-content-loader";
 
 export default {
   components: {
-    ContentLoader
-  }
-}
+    ContentLoader,
+  },
+};
 </script>
 <style>
 .loading-bar {
   position: relative;
 }
-.loading-bar>div {
-    position: absolute;
-    width: 100%;
-    height: 2px;
-    top: -12px;
-  }
+.loading-bar > div {
+  position: absolute;
+  width: 100%;
+  height: 2px;
+  top: -12px;
+}
 </style>

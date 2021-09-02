@@ -1,29 +1,48 @@
 <template>
-  <InputWithType v-bind="{scopeName, field, errors}">
-      <output :id="`${scopeName}-${field}`" role="radiogroup" class="filter-switch">
-        <span v-for="option in options" :key="option.value" class="filter-switch-item">
-          <input type="radio" :value="option.value" :id="`${scopeName}-${option.value}`" v-model="modelValue">
-          <label :for="`${scopeName}-${option.value}`">
-            <slot name="labelAddition" :value="option.value"/>
-            {{option.label}}
-          </label>
-        </span>
-      </output>
+  <InputWithType v-bind="{ scopeName, field, errors }">
+    <output
+      :id="`${scopeName}-${field}`"
+      role="radiogroup"
+      class="filter-switch"
+    >
+      <span
+        v-for="option in options"
+        :key="option.value"
+        class="filter-switch-item"
+      >
+        <input
+          type="radio"
+          :value="option.value"
+          :id="`${scopeName}-${option.value}`"
+          v-model="modelValue"
+        />
+        <label :for="`${scopeName}-${option.value}`">
+          <slot name="labelAddition" :value="option.value" />
+          {{ option.label }}
+        </label>
+      </span>
+    </output>
   </InputWithType>
 </template>
 
 <script>
-import InputWithType from "./InputWithType.vue"
+import InputWithType from "./InputWithType.vue";
 export default {
-  props: {modelValue: String, scopeName: String, field: String, options: Array, errors: Object},
-  emits: ['update:modelValue'],
+  props: {
+    modelValue: String,
+    scopeName: String,
+    field: String,
+    options: Array,
+    errors: Object,
+  },
+  emits: ["update:modelValue"],
   components: { InputWithType },
   watch: {
     modelValue() {
-      this.$emit('update:modelValue', this.modelValue)
-    }
-  }
-}
+      this.$emit("update:modelValue", this.modelValue);
+    },
+  },
+};
 </script>
 
 <style scoped>
@@ -33,17 +52,20 @@ export default {
   margin-right: 5px;
   border-radius: 5px;
   padding: 2px;
-  border: solid 1px #32612D; }
+  border: solid 1px #32612d;
+}
 
 .filter-switch .filter-switch-item input {
-  display: none; }
+  display: none;
+}
 
 .filter-switch .filter-switch-item input:checked + label {
   color: white;
-  background-color: #03AC13; }
+  background-color: #03ac13;
+}
 
 .filter-switch .filter-switch-item input:not(:checked) + label {
   --bg-opacity: 0;
-  box-shadow: none; }
-
+  box-shadow: none;
+}
 </style>

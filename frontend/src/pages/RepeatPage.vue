@@ -1,30 +1,60 @@
 <template>
-  <LoadingPage v-bind="{loading, contentExists: !!repetition}">
+  <LoadingPage v-bind="{ loading, contentExists: !!repetition }">
     <template v-if="!!repetition">
       <Minimizable :minimized="nested" staticHeight="75px">
         <template #minimizedContent>
           <div class="repeat-container" v-on:click="backToRepeat()">
-            <RepeatProgressBar :allowPause="!quizMode" :btn="`play`" v-bind="{linkId, noteId, finished, toRepeatCount: repetition.toRepeatCount, hasLastResult}" @viewLastResult="viewLastResult()">
+            <RepeatProgressBar
+              :allowPause="!quizMode"
+              :btn="`play`"
+              v-bind="{
+                linkId,
+                noteId,
+                finished,
+                toRepeatCount: repetition.toRepeatCount,
+                hasLastResult,
+              }"
+              @viewLastResult="viewLastResult()"
+            >
               <Repetition
-                v-bind="{...reviewPointViewedByUser, answerResult, compact: true}"
+                v-bind="{
+                  ...reviewPointViewedByUser,
+                  answerResult,
+                  compact: true,
+                }"
                 @selfEvaluate="selfEvaluate($event)"
                 @updated="refresh()"
-                />
+              />
             </RepeatProgressBar>
           </div>
         </template>
         <template #fullContent>
-          <RepeatProgressBar :allowPause="!quizMode" v-bind="{linkId, noteId, finished, toRepeatCount: repetition.toRepeatCount, hasLastResult}" @viewLastResult="viewLastResult()"/>
-          <Quiz v-if="quizMode" v-bind="repetition" @answer="processAnswer($event)" :staticInfo="$staticInfo"/>
+          <RepeatProgressBar
+            :allowPause="!quizMode"
+            v-bind="{
+              linkId,
+              noteId,
+              finished,
+              toRepeatCount: repetition.toRepeatCount,
+              hasLastResult,
+            }"
+            @viewLastResult="viewLastResult()"
+          />
+          <Quiz
+            v-if="quizMode"
+            v-bind="repetition"
+            @answer="processAnswer($event)"
+            :staticInfo="$staticInfo"
+          />
           <template v-else>
             <template v-if="reviewPointViewedByUser">
               <Repetition
-                v-bind="{...reviewPointViewedByUser, answerResult}"
+                v-bind="{ ...reviewPointViewedByUser, answerResult }"
                 @selfEvaluate="selfEvaluate($event)"
                 @updated="refresh()"
-                />
-              <NoteStatisticsButton v-if="noteId" :noteId="noteId"/>
-              <NoteStatisticsButton v-else :link="linkId"/>
+              />
+              <NoteStatisticsButton v-if="noteId" :noteId="noteId" />
+              <NoteStatisticsButton v-else :link="linkId" />
             </template>
           </template>
         </template>
@@ -34,122 +64,158 @@
 </template>
 
 <script>
-import Minimizable from "../components/commons/Minimizable.vue"
-import Quiz from '../components/review/Quiz.vue'
-import Repetition from '../components/review/Repetition.vue'
-import LoadingPage from "./commons/LoadingPage.vue"
-import NoteStatisticsButton from '../components/notes/NoteStatisticsButton.vue'
-import RepeatProgressBar from "../components/review/RepeatProgressBar.vue"
-import { restGet, restPost } from "../restful/restful"
+import Minimizable from "../components/commons/Minimizable.vue";
+import Quiz from "../components/review/Quiz.vue";
+import Repetition from "../components/review/Repetition.vue";
+import LoadingPage from "./commons/LoadingPage.vue";
+import NoteStatisticsButton from "../components/notes/NoteStatisticsButton.vue";
+import RepeatProgressBar from "../components/review/RepeatProgressBar.vue";
+import { restGet, restPost } from "../restful/restful";
 
 export default {
-  name: 'RepeatPage',
+  name: "RepeatPage",
   props: { nested: Boolean },
-  components: { Minimizable, Quiz, Repetition, LoadingPage, NoteStatisticsButton, RepeatProgressBar },
+  components: {
+    Minimizable,
+    Quiz,
+    Repetition,
+    LoadingPage,
+    NoteStatisticsButton,
+    RepeatProgressBar,
+  },
   data() {
     return {
       repetition: null,
       answerResult: null,
       lastResult: null,
       loading: false,
-      finished: 0
-    }
+      finished: 0,
+    };
   },
   computed: {
-    reviewPointViewedByUser(){ return this.repetition.reviewPointViewedByUser },
-    quizMode() {return !!this.repetition.quizQuestion && !this.answerResult},
-    linkId() {if(this.reviewPointViewedByUser && this.reviewPointViewedByUser.linkViewedByUser) return this.reviewPointViewedByUser.linkViewedByUser.id},
-    noteId() {if(this.reviewPointViewedByUser && this.reviewPointViewedByUser.noteViewedByUser) return this.reviewPointViewedByUser.noteViewedByUser.note.id},
-    hasLastResult() {return this.lastResult && !!this.lastResult.answerResult}
+    reviewPointViewedByUser() {
+      return this.repetition.reviewPointViewedByUser;
+    },
+    quizMode() {
+      return !!this.repetition.quizQuestion && !this.answerResult;
+    },
+    linkId() {
+      if (
+        this.reviewPointViewedByUser &&
+        this.reviewPointViewedByUser.linkViewedByUser
+      )
+        return this.reviewPointViewedByUser.linkViewedByUser.id;
+    },
+    noteId() {
+      if (
+        this.reviewPointViewedByUser &&
+        this.reviewPointViewedByUser.noteViewedByUser
+      )
+        return this.reviewPointViewedByUser.noteViewedByUser.note.id;
+    },
+    hasLastResult() {
+      return this.lastResult && !!this.lastResult.answerResult;
+    },
   },
   methods: {
-    backToRepeat(){
-      this.$router.push({name: "repeat"})
+    backToRepeat() {
+      this.$router.push({ name: "repeat" });
     },
     loadNew(resp) {
       this.lastResult = {
         answerResult: this.answerResult,
         repetition: this.repetition,
-      }
+      };
 
       this.repetition = resp;
       this.answerResult = null;
       if (!this.repetition.reviewPointViewedByUser) {
-        this.$router.push({name: "reviews"})
-        return
-      }
-      if (!!this.repetition.quizQuestion) {
-        this.$router.push({name: "repeat-quiz"})
+        this.$router.push({ name: "reviews" });
         return;
       }
-      this.resetRoute()
+      if (!!this.repetition.quizQuestion) {
+        this.$router.push({ name: "repeat-quiz" });
+        return;
+      }
+      this.resetRoute();
     },
 
     viewLastResult() {
-      this.answerResult = this.lastResult.answerResult
-      this.repetition = this.lastResult.repetition
-      this.lastResult = null
-      this.resetRoute()
+      this.answerResult = this.lastResult.answerResult;
+      this.repetition = this.lastResult.repetition;
+      this.lastResult = null;
+      this.resetRoute();
     },
 
     resetRoute() {
-      this.$router.push({name: "repeat", replace: true})
+      this.$router.push({ name: "repeat", replace: true });
     },
 
     fetchData() {
-      restGet(`/api/reviews/repeat`, (r)=>this.loading=r).then(this.loadNew)
+      restGet(`/api/reviews/repeat`, (r) => (this.loading = r)).then(
+        this.loadNew
+      );
     },
 
     async noLongerExist() {
-      await this.$popups.alert("This review point doesn't exist any more or is being skipped now. Moving on to the next review point...")
-      return this.fetchData()
+      await this.$popups.alert(
+        "This review point doesn't exist any more or is being skipped now. Moving on to the next review point..."
+      );
+      return this.fetchData();
     },
 
     refresh() {
-      restGet(`/api/review-points/${this.reviewPointViewedByUser.reviewPoint.id}`, r=>this.loading=r)
-        .then(res => {
-          if(!res || !!res.reviewPoint.removedFromReview) { this.noLongerExist() }
-          this.reviewPointViewedByUser = res
+      restGet(
+        `/api/review-points/${this.reviewPointViewedByUser.reviewPoint.id}`,
+        (r) => (this.loading = r)
+      )
+        .then((res) => {
+          if (!res || !!res.reviewPoint.removedFromReview) {
+            this.noLongerExist();
+          }
+          this.reviewPointViewedByUser = res;
         })
-        .catch(err => {
-          if (err.statusCode === 404) { this.noLongerExist() }
-        })
+        .catch((err) => {
+          if (err.statusCode === 404) {
+            this.noLongerExist();
+          }
+        });
     },
 
     processAnswer(answerData) {
       restPost(
         `/api/reviews/${this.reviewPointViewedByUser.reviewPoint.id}/answer`,
         answerData,
-        r=>this.loading = r)
-        .then(res=>{
-          this.answerResult = res
-          if(res.correct) {
-            this.finished += 1
-            this.repetition.toRepeatCount -= 1
-            if(this.repetition.toRepeatCount > 0) {
-              this.fetchData()
-            }
+        (r) => (this.loading = r)
+      ).then((res) => {
+        this.answerResult = res;
+        if (res.correct) {
+          this.finished += 1;
+          this.repetition.toRepeatCount -= 1;
+          if (this.repetition.toRepeatCount > 0) {
+            this.fetchData();
           }
-          this.resetRoute()
-        })
+        }
+        this.resetRoute();
+      });
     },
 
     selfEvaluate(data) {
-      if (data !== 'again' && !this.answerResult) {
-        this.finished += 1
-        this.repetition.toRepeatCount -= 1
+      if (data !== "again" && !this.answerResult) {
+        this.finished += 1;
+        this.repetition.toRepeatCount -= 1;
       }
       restPost(
         `/api/reviews/${this.reviewPointViewedByUser.reviewPoint.id}/self-evaluate`,
-        {selfEvaluation: data, increaseRepeatCount: !this.answerResult},
-        r=>this.loading=r)
-        .then(this.loadNew)
-    }
+        { selfEvaluation: data, increaseRepeatCount: !this.answerResult },
+        (r) => (this.loading = r)
+      ).then(this.loadNew);
+    },
   },
   mounted() {
-    this.fetchData()
+    this.fetchData();
   },
-}
+};
 </script>
 
 <style>

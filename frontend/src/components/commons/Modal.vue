@@ -3,28 +3,29 @@
     <div class="modal-mask">
       <div class="modal-wrapper" @mousedown.self="$emit('close_request')">
         <div class="modal-container">
-          <button class="close-button" @click="$emit('close_request')"><SvgClose/></button>
+          <button class="close-button" @click="$emit('close_request')">
+            <SvgClose />
+          </button>
 
           <div class="modal-header">
-            <slot name="header"/>
+            <slot name="header" />
           </div>
 
           <div class="modal-body">
-            <slot name="body"/>
+            <slot name="body" />
           </div>
         </div>
       </div>
     </div>
   </transition>
-    
 </template>
 
 <script>
-import SvgClose from "../svgs/SvgClose.vue"
+import SvgClose from "../svgs/SvgClose.vue";
 export default {
-  emits: ['close_request'],
-  components: { SvgClose }
-}
+  emits: ["close_request"],
+  components: { SvgClose },
+};
 </script>
 
 <style scoped>
@@ -70,8 +71,8 @@ export default {
 
 .close-button {
   position: absolute;
-  right: .3em;
-  top: .3em;
+  right: 0.3em;
+  top: 0.3em;
   width: 26px;
   padding: 1px;
   height: 26px;
@@ -101,5 +102,4 @@ export default {
   -webkit-transform: scale(1.1);
   transform: scale(1.1);
 }
-
 </style>

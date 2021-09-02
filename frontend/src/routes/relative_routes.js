@@ -1,4 +1,4 @@
-import routes from './routes';
+import routes from "./routes";
 
 const routerScopeGuard = (scopeName, except, alertCallback) => {
   const routeNames = routes
@@ -6,7 +6,7 @@ const routerScopeGuard = (scopeName, except, alertCallback) => {
     .children.map((r) => r.name);
 
   return async (to, from, next) => {
-    if (to.name.split('-').shift() !== scopeName) {
+    if (to.name.split("-").shift() !== scopeName) {
       const nestedName = `${scopeName}-${to.name}`;
       if (routeNames.includes(nestedName)) {
         if (except.includes(from.name)) {

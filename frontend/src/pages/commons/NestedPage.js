@@ -1,6 +1,6 @@
-import { h } from 'vue';
-import { RouterView } from 'vue-router';
-import routerScopeGuard from '../../routes/relative_routes';
+import { h } from "vue";
+import { RouterView } from "vue-router";
+import routerScopeGuard from "../../routes/relative_routes";
 
 function NestedPage(
   WrappedComponent,
@@ -9,12 +9,12 @@ function NestedPage(
   notAllowedMessage
 ) {
   return {
-    name: 'NestedPage',
+    name: "NestedPage",
     computed: {
       isNested() {
         if (this.$route) {
-          const routeParts = this.$route.name.split('-');
-          return routeParts.length > 1 && routeParts[1] !== 'quiz';
+          const routeParts = this.$route.name.split("-");
+          return routeParts.length > 1 && routeParts[1] !== "quiz";
         }
         return true;
       },
@@ -36,7 +36,7 @@ function NestedPage(
       routerScopeGuard(scopeName, exceptRoutes, this.alert)(to, from, next);
     },
     render() {
-      return h('div', {}, [
+      return h("div", {}, [
         h(WrappedComponent, { ...this.$props, nested: this.isNested }),
         h(RouterView, {}),
       ]);

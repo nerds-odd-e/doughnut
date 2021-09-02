@@ -1,7 +1,7 @@
-import path from 'path';
-import { defineConfig } from 'vite';
-import vue from '@vitejs/plugin-vue';
-import vueJsx from '@vitejs/plugin-vue-jsx';
+import path from "path";
+import { defineConfig } from "vite";
+import vue from "@vitejs/plugin-vue";
+import vueJsx from "@vitejs/plugin-vue-jsx";
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -9,11 +9,11 @@ export default defineConfig({
     vue({
       template: {
         compilerOptions: {
-          isCustomElement: tag => /^x-/.test(tag)
-        }
-      }
+          isCustomElement: (tag) => /^x-/.test(tag),
+        },
+      },
     }),
-    vueJsx()
+    vueJsx(),
   ],
   server: {
     proxy: {
@@ -21,26 +21,24 @@ export default defineConfig({
       "/login": "http://localhost:9081",
       "/logout": "http://localhost:9081",
       "/users/identify": "http://localhost:9081",
-      "/testability": "http://localhost:9081"
-    }
+      "/testability": "http://localhost:9081",
+    },
   },
   resolve: {
     alias: [
       {
-        find: '@',
-        replacement: path.resolve(__dirname, 'src')
-      }
-    ]
+        find: "@",
+        replacement: path.resolve(__dirname, "src"),
+      },
+    ],
   },
-  base: '/',
+  base: "/",
   build: {
-    outDir: '../backend/src/main/resources/static',
+    outDir: "../backend/src/main/resources/static",
     rollupOptions: {
-        input: {
-          main: path.resolve(__dirname, 'index.html'),
-        }
-    }
-
-  }
-
+      input: {
+        main: path.resolve(__dirname, "index.html"),
+      },
+    },
+  },
 });

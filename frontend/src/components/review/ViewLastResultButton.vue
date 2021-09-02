@@ -1,17 +1,23 @@
 <template>
-    <template v-if="hasLastResult">
-        <a role="button" class="last-result" title="view last result" @click="$emit('viewLastResult')"><SvgLastResult/></a>
-    </template>
-    <span v-else class="last-result disabled"><SvgLastResult/></span>
+  <template v-if="hasLastResult">
+    <a
+      role="button"
+      class="last-result"
+      title="view last result"
+      @click="$emit('viewLastResult')"
+      ><SvgLastResult
+    /></a>
+  </template>
+  <span v-else class="last-result disabled"><SvgLastResult /></span>
 </template>
 
 <script>
-import SvgLastResult from "../svgs/SvgLastResult.vue"
+import SvgLastResult from "../svgs/SvgLastResult.vue";
 
 export default {
   props: { hasLastResult: Boolean },
-  emits: ['viewLastResult'],
-  components: { SvgLastResult }
+  emits: ["viewLastResult"],
+  components: { SvgLastResult },
 };
 </script>
 
@@ -22,7 +28,7 @@ export default {
     height: 50px;
   }
   &.disabled {
-      opacity: .5;
+    opacity: 0.5;
   }
 }
 </style>

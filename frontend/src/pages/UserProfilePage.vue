@@ -1,55 +1,73 @@
 <template>
   <h2>Edit User Setting</h2>
 
-  <LoadingPage v-bind="{loading, contentExists: !!formData}">
+  <LoadingPage v-bind="{ loading, contentExists: !!formData }">
     <div v-if="!!formData">
-
       <form @submit.prevent.once="processForm">
-        <TextInput scopeName='user' field='name' v-model="formData.name" :autofocus="true" :errors="formErrors.name"/>
-        <TextInput scopeName='user' field='dailyNewNotesCount' v-model="formData.dailyNewNotesCount" :errors="formErrors.dailyNewNotesCount"/>
-        <TextInput scopeName='user' field='spaceIntervals' v-model="formData.spaceIntervals" :errors="formErrors.spaceIntervals"/>
-        <input type="submit" value="Submit" class="btn btn-primary"/>
+        <TextInput
+          scopeName="user"
+          field="name"
+          v-model="formData.name"
+          :autofocus="true"
+          :errors="formErrors.name"
+        />
+        <TextInput
+          scopeName="user"
+          field="dailyNewNotesCount"
+          v-model="formData.dailyNewNotesCount"
+          :errors="formErrors.dailyNewNotesCount"
+        />
+        <TextInput
+          scopeName="user"
+          field="spaceIntervals"
+          v-model="formData.spaceIntervals"
+          :errors="formErrors.spaceIntervals"
+        />
+        <input type="submit" value="Submit" class="btn btn-primary" />
       </form>
     </div>
   </LoadingPage>
 </template>
 
 <script>
-import LoadingPage from "./commons/LoadingPage.vue"
-import TextInput from "../components/form/TextInput.vue"
-import {restGet, restPatchMultiplePartForm} from "../restful/restful"
+import LoadingPage from "./commons/LoadingPage.vue";
+import TextInput from "../components/form/TextInput.vue";
+import { restGet, restPatchMultiplePartForm } from "../restful/restful";
 
 export default {
   props: { failureReportId: String },
   components: { LoadingPage, TextInput },
-  emits: ['userUpdated'],
+  emits: ["userUpdated"],
   data() {
     return {
       loading: true,
       formData: null,
       formErrors: {},
-    }
+    };
   },
   methods: {
     fetchData() {
-      restGet(`/api/user`, r=>this.loading=r)
-        .then( res => {
-          this.formData = res
-          this.loading = false
-        })
+      restGet(`/api/user`, (r) => (this.loading = r)).then((res) => {
+        this.formData = res;
+        this.loading = false;
+      });
     },
     processForm() {
-      restPatchMultiplePartForm( `/api/user/${this.formData.id}`, this.formData, r=>this.loading=r)
-          .then(res => {
-            this.$emit('userUpdated', res)
-            this.$router.push({name: "root"})
-          })
-          .catch(res => this.formErrors = res)
-      },
+      restPatchMultiplePartForm(
+        `/api/user/${this.formData.id}`,
+        this.formData,
+        (r) => (this.loading = r)
+      )
+        .then((res) => {
+          this.$emit("userUpdated", res);
+          this.$router.push({ name: "root" });
+        })
+        .catch((res) => (this.formErrors = res));
+    },
   },
- 
+
   mounted() {
-    this.fetchData()
-  }
-}
+    this.fetchData();
+  },
+};
 </script>

@@ -1,42 +1,42 @@
 <template>
-  <LoadingPage v-bind="{loading, contentExists: !!noteViewedByUser}">
+  <LoadingPage v-bind="{ loading, contentExists: !!noteViewedByUser }">
     <div v-if="noteViewedByUser">
-      <NoteViewedByUser v-bind="noteViewedByUser" @updated="fetchData()"/>
-      <NoteStatisticsButton :noteId="noteId"/>
+      <NoteViewedByUser v-bind="noteViewedByUser" @updated="fetchData()" />
+      <NoteStatisticsButton :noteId="noteId" />
     </div>
   </LoadingPage>
 </template>
 
 <script>
-import NoteViewedByUser from "../components/notes/NoteViewedByUser.vue"
-import NoteStatisticsButton from '../components/notes/NoteStatisticsButton.vue'
-import LoadingPage from "./commons/LoadingPage.vue"
-import {restGet} from "../restful/restful"
+import NoteViewedByUser from "../components/notes/NoteViewedByUser.vue";
+import NoteStatisticsButton from "../components/notes/NoteStatisticsButton.vue";
+import LoadingPage from "./commons/LoadingPage.vue";
+import { restGet } from "../restful/restful";
 
 export default {
   name: "NoteShowPage",
-  props: {noteId: Number},
+  props: { noteId: Number },
   data() {
     return {
       noteViewedByUser: null,
       loading: false,
-    }
+    };
   },
   components: { NoteViewedByUser, NoteStatisticsButton, LoadingPage },
   methods: {
     fetchData() {
-      restGet(`/api/notes/${this.noteId}`, (r)=>this.loading=r)
-        .then(res => this.noteViewedByUser = res)
-    }
+      restGet(`/api/notes/${this.noteId}`, (r) => (this.loading = r)).then(
+        (res) => (this.noteViewedByUser = res)
+      );
+    },
   },
   watch: {
     noteId() {
-      this.fetchData()
-    }
+      this.fetchData();
+    },
   },
   mounted() {
-    this.fetchData()
-  }
-}
-
+    this.fetchData();
+  },
+};
 </script>

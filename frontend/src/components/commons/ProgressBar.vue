@@ -1,21 +1,27 @@
 <template>
-<div class="review-info-bar">
-  <StopRepeatButton />
-  <slot name="buttons"/>
-  <div class="review-info-bar-right">
-    <span :class="`progress-bar ${!!$slots.default ? 'thin' : ''}`" v-if="toRepeatCount !== null">
-      <span class="progress" :style="`width: ${finished * 100 / (finished + toRepeatCount)}%`">
+  <div class="review-info-bar">
+    <StopRepeatButton />
+    <slot name="buttons" />
+    <div class="review-info-bar-right">
+      <span
+        :class="`progress-bar ${!!$slots.default ? 'thin' : ''}`"
+        v-if="toRepeatCount !== null"
+      >
+        <span
+          class="progress"
+          :style="`width: ${(finished * 100) / (finished + toRepeatCount)}%`"
+        >
+        </span>
+        <span class="progress-text">
+          {{ title }}{{ finished }}/{{ finished + toRepeatCount }}
+        </span>
       </span>
-      <span class="progress-text">
-        {{title}}{{finished}}/{{finished + toRepeatCount}}
-      </span>
-    </span>
-    <slot />
+      <slot />
+    </div>
   </div>
-</div>
 </template>
 <script>
-import StopRepeatButton from "../review/StopRepeatButton.vue"
+import StopRepeatButton from "../review/StopRepeatButton.vue";
 
 export default {
   components: { StopRepeatButton },
@@ -23,10 +29,9 @@ export default {
     finished: Number,
     toRepeatCount: Number,
     title: String,
-    },
-  methods: {
   },
-}
+  methods: {},
+};
 </script>
 
 <style lang="scss" scoped>
@@ -60,11 +65,10 @@ export default {
 }
 
 .progress-text {
-  position:absolute;
+  position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   color: white;
 }
-
 </style>

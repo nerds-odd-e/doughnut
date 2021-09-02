@@ -1,115 +1,117 @@
-import LinkLists from '@/components/links/LinkLists.vue';
-import {basicNote, staticInfo} from '../notes/fixtures-basic'
-import _ from 'lodash'
-import { mountWithMockRoute } from '../helpers'
+import LinkLists from "@/components/links/LinkLists.vue";
+import { basicNote, staticInfo } from "../notes/fixtures-basic";
+import _ from "lodash";
+import { mountWithMockRoute } from "../helpers";
 
-describe('a link lists of a note', () => {
-
-  test('link to upper level', async () => {
+describe("a link lists of a note", () => {
+  test("link to upper level", async () => {
     const links = {
-      "using": {
-        "direct": [
+      using: {
+        direct: [
           {
-            "id": 1938,
-            "targetNote": {
-              "id": 2423,
-              "title": "a tool",
+            id: 1938,
+            targetNote: {
+              id: 2423,
+              title: "a tool",
             },
-            "typeId": 15,
-            "linkTypeLabel": "using",
-            "linkNameOfSource": "user"
+            typeId: 15,
+            linkTypeLabel: "using",
+            linkNameOfSource: "user",
           },
           {
-            "id": 1938,
-            "targetNote": {
-              "id": 2423,
-              "title": "another tool",
+            id: 1938,
+            targetNote: {
+              id: 2423,
+              title: "another tool",
             },
-            "typeId": 15,
-            "linkTypeLabel": "using",
-            "linkNameOfSource": "user"
-          }
+            typeId: 15,
+            linkTypeLabel: "using",
+            linkNameOfSource: "user",
+          },
         ],
-        "reverse": []
+        reverse: [],
       },
-    }
-    const { wrapper } = mountWithMockRoute(LinkLists, {propsData: { links, owns: true, staticInfo }})
-    expect(wrapper.find(".parent-links").text()).toContain("a tool")
-    expect(wrapper.findAll(".parent-links li").length).toEqual(2)
+    };
+    const { wrapper } = mountWithMockRoute(LinkLists, {
+      propsData: { links, owns: true, staticInfo },
+    });
+    expect(wrapper.find(".parent-links").text()).toContain("a tool");
+    expect(wrapper.findAll(".parent-links li").length).toEqual(2);
   });
 
-  test('tags are grouped', async () => {
+  test("tags are grouped", async () => {
     const links = {
       "tagged by": {
-        "direct": [
+        direct: [
           {
-            "id": 1938,
-            "targetNote": {
-              "id": 2423,
-              "title": "tag1",
+            id: 1938,
+            targetNote: {
+              id: 2423,
+              title: "tag1",
             },
-            "typeId": 8,
-            "linkTypeLabel": "tagged by",
-            "linkNameOfSource": "user"
+            typeId: 8,
+            linkTypeLabel: "tagged by",
+            linkNameOfSource: "user",
           },
           {
-            "id": 1938,
-            "targetNote": {
-              "id": 2423,
-              "title": "tag2",
+            id: 1938,
+            targetNote: {
+              id: 2423,
+              title: "tag2",
             },
-            "typeId": 8,
-            "linkTypeLabel": "tagged by",
-            "linkNameOfSource": "user"
-          }
+            typeId: 8,
+            linkTypeLabel: "tagged by",
+            linkNameOfSource: "user",
+          },
         ],
-        "reverse": []
+        reverse: [],
       },
-    }
-    const { wrapper } = mountWithMockRoute(LinkLists, {propsData: { links, owns: true, staticInfo: staticInfo }})
-    expect(wrapper.findAll(".parent-links li").length).toEqual(1)
+    };
+    const { wrapper } = mountWithMockRoute(LinkLists, {
+      propsData: { links, owns: true, staticInfo: staticInfo },
+    });
+    expect(wrapper.findAll(".parent-links li").length).toEqual(1);
   });
 
-  test('related, opposite, similar, confuse are grouped at top', async () => {
+  test("related, opposite, similar, confuse are grouped at top", async () => {
     const links = {
-
       "confused with": {
-        "direct": [
+        direct: [
           {
-            "id": 1938,
-            "targetNote": {
-              "id": 2423,
-              "title": "tag1",
+            id: 1938,
+            targetNote: {
+              id: 2423,
+              title: "tag1",
             },
-            "typeId": 8,
-            "linkTypeLabel": "confusing",
-            "linkNameOfSource": "user"
+            typeId: 8,
+            linkTypeLabel: "confusing",
+            linkNameOfSource: "user",
           },
         ],
-        "reverse": []
+        reverse: [],
       },
 
       "similar to": {
-        "reverse": [
+        reverse: [
           {
-            "id": 1938,
-            "targetNote": {
-              "id": 2423,
-              "title": "something similar",
+            id: 1938,
+            targetNote: {
+              id: 2423,
+              title: "something similar",
             },
-            "typeId": 8,
-            "linkTypeLabel": "tagged by",
-            "linkNameOfSource": "user"
+            typeId: 8,
+            linkTypeLabel: "tagged by",
+            linkNameOfSource: "user",
           },
         ],
-        "direct": []
+        direct: [],
       },
-
-    }
-    const { wrapper } = mountWithMockRoute(LinkLists, {propsData: { links, owns: true, staticInfo: staticInfo }})
-    expect(wrapper.findAll(".parent-links li").length).toEqual(1)
-    expect(wrapper.findAll(".parent-links li .link-multi").length).toEqual(2)
-    expect(wrapper.findAll(".children-links li").length).toEqual(0)
+    };
+    const { wrapper } = mountWithMockRoute(LinkLists, {
+      propsData: { links, owns: true, staticInfo: staticInfo },
+    });
+    expect(wrapper.findAll(".parent-links li").length).toEqual(1);
+    expect(wrapper.findAll(".parent-links li .link-multi").length).toEqual(2);
+    expect(wrapper.findAll(".children-links li").length).toEqual(0);
   });
-
 });

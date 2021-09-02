@@ -1,14 +1,14 @@
 module.exports = {
-  presets: [['@babel/preset-env', { targets: { node: 'current' } }]],
+  presets: [["@babel/preset-env", { targets: { node: "current" } }]],
   plugins: [
-    function() {
+    function () {
       return {
         visitor: {
           MetaProperty(path) {
-            path.replaceWithSourceString('process');
-          }
-        }
+            path.replaceWithSourceString("process");
+          },
+        },
       };
-    }
-  ]
+    },
+  ],
 };

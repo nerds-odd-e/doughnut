@@ -1,77 +1,97 @@
 <template>
   <div>
-    <TextInput scopeName='searchTerm' field='searchKey' v-model="searchTerm.searchKey" placeholder="Search"/>
-    <CheckInput scopeName='searchTerm' field='searchGlobally' v-model="searchTerm.searchGlobally"/>
+    <TextInput
+      scopeName="searchTerm"
+      field="searchKey"
+      v-model="searchTerm.searchKey"
+      placeholder="Search"
+    />
+    <CheckInput
+      scopeName="searchTerm"
+      field="searchGlobally"
+      v-model="searchTerm.searchGlobally"
+    />
   </div>
 
   <div v-if="!searchResult || searchResult.length === 0">
-      <em>No linkable notes found.</em>
+    <em>No linkable notes found.</em>
   </div>
   <Cards v-else class="search-result" :notes="searchResult" columns="3">
-    <template #button="{note}">
-        <button class="btn btn-primary" v-on:click="$emit('selected', note)">Select</button>
+    <template #button="{ note }">
+      <button class="btn btn-primary" v-on:click="$emit('selected', note)">
+        Select
+      </button>
     </template>
   </Cards>
 </template>
 
 <script>
-import TextInput from "../form/TextInput.vue"
-import CheckInput from "../form/CheckInput.vue"
-import Cards from "../notes/Cards.vue"
-import { restPost } from "../../restful/restful"
-import _ from "lodash"
+import TextInput from "../form/TextInput.vue";
+import CheckInput from "../form/CheckInput.vue";
+import Cards from "../notes/Cards.vue";
+import { restPost } from "../../restful/restful";
+import _ from "lodash";
 
-const debounced = _.debounce(callback=>callback(), 200)
+const debounced = _.debounce((callback) => callback(), 200);
 
 export default {
-  name: 'SearchNote',
+  name: "SearchNote",
   props: { noteId: String },
-  components: {TextInput, CheckInput, Cards},
-  emits: ['selected'],
+  components: { TextInput, CheckInput, Cards },
+  emits: ["selected"],
   data() {
     return {
       searchTerm: {
-        searchKey: '',
+        searchKey: "",
         searchGlobally: false,
       },
-      cache: {true: {}, false: {}},
+      cache: { true: {}, false: {} },
       recentResult: null,
-    }
+    };
   },
   watch: {
     searchTerm: {
       handler(newSearchTerm) {
-        if (newSearchTerm.searchKey.trim() === '') {
-        }
-        else {
-          this.search(newSearchTerm.searchGlobally, newSearchTerm.searchKey.trim())
+        if (newSearchTerm.searchKey.trim() === "") {
+        } else {
+          this.search(
+            newSearchTerm.searchGlobally,
+            newSearchTerm.searchKey.trim()
+          );
         }
       },
-      deep: true
-    }
+      deep: true,
+    },
   },
   computed: {
-    cachedResult() { return this.cache[this.searchTerm.searchGlobally][this.searchTerm.searchKey.trim()] },
-    searchResult() { return !!this.cachedResult ? this.cachedResult : this.recentResult}
+    cachedResult() {
+      return this.cache[this.searchTerm.searchGlobally][
+        this.searchTerm.searchKey.trim()
+      ];
+    },
+    searchResult() {
+      return !!this.cachedResult ? this.cachedResult : this.recentResult;
+    },
   },
   methods: {
     search(searchGlobally, trimedSearchKey) {
       if (this.cache[searchGlobally].hasOwnProperty(trimedSearchKey)) {
-        return
+        return;
       }
 
-      debounced(()=>{
-        restPost(`/api/notes/${this.noteId}/search`, {searchGlobally, searchKey: trimedSearchKey}, (r)=>{})
-          .then(r=>{
-            this.cache[searchGlobally][trimedSearchKey] = r
-            this.recentResult = r
-          })
-      })
-
+      debounced(() => {
+        restPost(
+          `/api/notes/${this.noteId}/search`,
+          { searchGlobally, searchKey: trimedSearchKey },
+          (r) => {}
+        ).then((r) => {
+          this.cache[searchGlobally][trimedSearchKey] = r;
+          this.recentResult = r;
+        });
+      });
     },
-  }
-}
-
+  },
+};
 </script>
 
 <style scoped>

@@ -1,19 +1,22 @@
 <template>
-<ProgressBar v-bind="{title: `Repetation: `, finished, toRepeatCount}">
-  <template #buttons>
-    <ViewLastResultButton v-bind="{hasLastResult}" @viewLastResult="$emit('viewLastResult')"/>
-    <PauseRepeatButton v-bind="{noteId, linkId, allowPause, btn}"/>
-  </template>
-  <template #default v-if="$slots.default">
-    <slot />
-  </template>
-</ProgressBar>
+  <ProgressBar v-bind="{ title: `Repetation: `, finished, toRepeatCount }">
+    <template #buttons>
+      <ViewLastResultButton
+        v-bind="{ hasLastResult }"
+        @viewLastResult="$emit('viewLastResult')"
+      />
+      <PauseRepeatButton v-bind="{ noteId, linkId, allowPause, btn }" />
+    </template>
+    <template #default v-if="$slots.default">
+      <slot />
+    </template>
+  </ProgressBar>
 </template>
 
 <script>
-import PauseRepeatButton from "./PauseRepeatButton.vue"
-import ViewLastResultButton from "./ViewLastResultButton.vue"
-import ProgressBar from "../commons/ProgressBar.vue"
+import PauseRepeatButton from "./PauseRepeatButton.vue";
+import ViewLastResultButton from "./ViewLastResultButton.vue";
+import ProgressBar from "../commons/ProgressBar.vue";
 
 export default {
   components: { PauseRepeatButton, ViewLastResultButton, ProgressBar },
@@ -23,13 +26,12 @@ export default {
     allowPause: { type: Boolean, default: true },
     finished: Number,
     toRepeatCount: Number,
-    btn: {type: String, default: "pause"},
+    btn: { type: String, default: "pause" },
     hasLastResult: Boolean,
-    },
-  emits: ['viewLastResult'],
-  methods: {
   },
-}
+  emits: ["viewLastResult"],
+  methods: {},
+};
 </script>
 
 <style lang="scss" scoped>
@@ -63,11 +65,10 @@ export default {
 }
 
 .progress-text {
-  position:absolute;
+  position: absolute;
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
   color: white;
 }
-
 </style>

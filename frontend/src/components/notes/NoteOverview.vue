@@ -1,12 +1,20 @@
 <template>
-    <NoteViewedByUserWithoutChildren v-bind="{note, links, ancestors, notebook, owns}" @updated="$emit('updated')"/>
-    <p data-testid="overview-note-title" class="overview-note-title" v-for="child in children" :key="child.noteId">
-      {{child.title}}
-    </p>
+  <NoteViewedByUserWithoutChildren
+    v-bind="{ note, links, ancestors, notebook, owns }"
+    @updated="$emit('updated')"
+  />
+  <p
+    data-testid="overview-note-title"
+    class="overview-note-title"
+    v-for="child in children"
+    :key="child.noteId"
+  >
+    {{ child.title }}
+  </p>
 </template>
 
 <script>
-import NoteViewedByUserWithoutChildren from "./NoteViewedByUserWithoutChildren.vue"
+import NoteViewedByUserWithoutChildren from "./NoteViewedByUserWithoutChildren.vue";
 
 export default {
   name: "NoteOverview",
@@ -16,9 +24,9 @@ export default {
     children: Array,
     ancestors: Array,
     notebook: Object,
-    owns: { type: Boolean, required: true }
+    owns: { type: Boolean, required: true },
   },
-  emits: ['updated'],
+  emits: ["updated"],
   components: { NoteViewedByUserWithoutChildren },
-}
+};
 </script>

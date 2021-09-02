@@ -1,52 +1,52 @@
-import HomePage from '@/pages/HomePage.vue';
-import BazaarPage from '@/pages/BazaarPage.vue';
-import CirclesPage from '@/pages/CirclesPage.vue';
-import NotebooksPage from '@/pages/NotebooksPage.vue';
-import NoteShowPage from '@/pages/NoteShowPage.vue';
-import LinkShowPage from '@/pages/LinkShowPage.vue';
-import ReviewHome from '@/pages/ReviewHome.vue';
-import RepeatPage from '@/pages/RepeatPage.vue';
-import DoingQuiz from '@/pages/DoingQuiz.vue';
-import InitialReviewPage from '@/pages/InitialReviewPage.vue';
-import NestedPage from '@/pages/commons/NestedPage';
-import CircleShowPage from '@/pages/CircleShowPage.vue';
-import CircleJoinPage from '@/pages/CircleJoinPage.vue';
-import FailureReportListPage from '@/pages/FailureReportListPage.vue';
-import FailureReportPage from '@/pages/FailureReportPage.vue';
-import UserProfilePage from '@/pages/UserProfilePage.vue';
-import NoteOverviewPage from '@/pages/NoteOverviewPage.vue';
+import HomePage from "@/pages/HomePage.vue";
+import BazaarPage from "@/pages/BazaarPage.vue";
+import CirclesPage from "@/pages/CirclesPage.vue";
+import NotebooksPage from "@/pages/NotebooksPage.vue";
+import NoteShowPage from "@/pages/NoteShowPage.vue";
+import LinkShowPage from "@/pages/LinkShowPage.vue";
+import ReviewHome from "@/pages/ReviewHome.vue";
+import RepeatPage from "@/pages/RepeatPage.vue";
+import DoingQuiz from "@/pages/DoingQuiz.vue";
+import InitialReviewPage from "@/pages/InitialReviewPage.vue";
+import NestedPage from "@/pages/commons/NestedPage";
+import CircleShowPage from "@/pages/CircleShowPage.vue";
+import CircleJoinPage from "@/pages/CircleJoinPage.vue";
+import FailureReportListPage from "@/pages/FailureReportListPage.vue";
+import FailureReportPage from "@/pages/FailureReportPage.vue";
+import UserProfilePage from "@/pages/UserProfilePage.vue";
+import NoteOverviewPage from "@/pages/NoteOverviewPage.vue";
 
 const NestedInitialReviewPage = NestedPage(
   InitialReviewPage,
-  'initial',
+  "initial",
   [],
-  'This will leave the initial review, are you sure?'
+  "This will leave the initial review, are you sure?"
 );
 
 const NestedRepeatPage = NestedPage(
   RepeatPage,
-  'repeat',
-  ['repeat-quiz'],
-  'Please answer the question first before you explore the notes.'
+  "repeat",
+  ["repeat-quiz"],
+  "Please answer the question first before you explore the notes."
 );
 
 const noteAndLinkRoutes = [
-  { path: 'notebooks', name: 'notebooks', component: NotebooksPage },
+  { path: "notebooks", name: "notebooks", component: NotebooksPage },
   {
-    path: 'notes/:noteId',
-    name: 'noteShow',
+    path: "notes/:noteId",
+    name: "noteShow",
     component: NoteShowPage,
     props: true,
   },
   {
-    path: 'links/:linkid',
-    name: 'linkShow',
+    path: "links/:linkid",
+    name: "linkShow",
     component: LinkShowPage,
     props: true,
   },
   {
-    path: 'notes/:noteId/overview',
-    name: 'noteOverview',
+    path: "notes/:noteId/overview",
+    name: "noteOverview",
     component: NoteOverviewPage,
     props: true,
   },
@@ -57,55 +57,55 @@ const nestedNoteAndLinkRoutes = (prefix) =>
 
 const routes = [
   ...noteAndLinkRoutes.map((route) => ({ ...route, path: `/${route.path}` })),
-  { path: '/', name: 'root', component: HomePage },
-  { path: '/bazaar', name: 'bazaar', component: BazaarPage },
-  { path: '/circles', name: 'circles', component: CirclesPage },
+  { path: "/", name: "root", component: HomePage },
+  { path: "/bazaar", name: "bazaar", component: BazaarPage },
+  { path: "/circles", name: "circles", component: CirclesPage },
   {
-    path: '/circles/:circleId',
-    name: 'circleShow',
+    path: "/circles/:circleId",
+    name: "circleShow",
     component: CircleShowPage,
     props: true,
   },
   {
-    path: '/circles/join/:invitationCode',
-    name: 'circleJoin',
+    path: "/circles/join/:invitationCode",
+    name: "circleJoin",
     component: CircleJoinPage,
     props: true,
   },
   {
-    path: '/bazaar/notes/:noteId',
-    name: 'bnoteShow',
+    path: "/bazaar/notes/:noteId",
+    name: "bnoteShow",
     component: NoteShowPage,
     props: true,
   },
-  { path: '/reviews', name: 'reviews', component: ReviewHome },
+  { path: "/reviews", name: "reviews", component: ReviewHome },
   {
-    path: '/reviews/initial',
-    name: 'initial',
+    path: "/reviews/initial",
+    name: "initial",
     component: NestedInitialReviewPage,
-    children: nestedNoteAndLinkRoutes('initial-'),
+    children: nestedNoteAndLinkRoutes("initial-"),
   },
   {
-    path: '/reviews/repeat',
-    name: 'repeat',
+    path: "/reviews/repeat",
+    name: "repeat",
     component: NestedRepeatPage,
     children: [
-      ...nestedNoteAndLinkRoutes('repeat-'),
-      { path: 'quiz', name: 'repeat-quiz', component: DoingQuiz },
+      ...nestedNoteAndLinkRoutes("repeat-"),
+      { path: "quiz", name: "repeat-quiz", component: DoingQuiz },
     ],
   },
   {
-    path: '/failure-report-list',
-    name: 'failureReportList',
+    path: "/failure-report-list",
+    name: "failureReportList",
     component: FailureReportListPage,
   },
   {
-    path: '/failure-report-list/show/:failureReportId',
-    name: 'failureReport',
+    path: "/failure-report-list/show/:failureReportId",
+    name: "failureReport",
     component: FailureReportPage,
     props: true,
   },
-  { path: '/user-profile', name: 'userProfile', component: UserProfilePage },
+  { path: "/user-profile", name: "userProfile", component: UserProfilePage },
 ];
 
 export default routes;

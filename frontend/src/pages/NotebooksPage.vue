@@ -1,41 +1,50 @@
 <template>
   <h2>Notebooks</h2>
-  <LoadingPage v-bind="{loading, contentExists: !!notebooksViewedByUser}">
+  <LoadingPage v-bind="{ loading, contentExists: !!notebooksViewedByUser }">
     <div v-if="!!notebooksViewedByUser">
       <p>
         <NotebookNewButton>Add New Notebook</NotebookNewButton>
       </p>
-      <NotebookViewCards :notebooks="notebooksViewedByUser.notebooks"/>
+      <NotebookViewCards :notebooks="notebooksViewedByUser.notebooks" />
       <h2>Subscribed Notes</h2>
-      <NotebookSubscriptionCards :subscriptions="notebooksViewedByUser.subscriptions" @updated="fetchData()"/>
+      <NotebookSubscriptionCards
+        :subscriptions="notebooksViewedByUser.subscriptions"
+        @updated="fetchData()"
+      />
     </div>
   </LoadingPage>
 </template>
 
 <script>
-import NotebookViewCards from "../components/notebook/NotebookViewCards.vue"
-import NotebookNewButton from "../components/notebook/NotebookNewButton.vue"
-import NotebookSubscriptionCards from "../components/subscriptions/NotebookSubscriptionCards.vue"
-import LoadingPage from "./commons/LoadingPage.vue"
-import {restGet} from "../restful/restful"
+import NotebookViewCards from "../components/notebook/NotebookViewCards.vue";
+import NotebookNewButton from "../components/notebook/NotebookNewButton.vue";
+import NotebookSubscriptionCards from "../components/subscriptions/NotebookSubscriptionCards.vue";
+import LoadingPage from "./commons/LoadingPage.vue";
+import { restGet } from "../restful/restful";
 
 export default {
-  name: 'NotebooksPage',
-  components: { LoadingPage, NotebookViewCards, NotebookSubscriptionCards, NotebookNewButton },
+  name: "NotebooksPage",
+  components: {
+    LoadingPage,
+    NotebookViewCards,
+    NotebookSubscriptionCards,
+    NotebookNewButton,
+  },
   data() {
     return {
       loading: false,
       notebooksViewedByUser: null,
-    }
+    };
   },
   methods: {
     fetchData() {
-      restGet(`/api/notebooks`, r=>this.loading=r)
-        .then( res => this.notebooksViewedByUser = res)
-    }
+      restGet(`/api/notebooks`, (r) => (this.loading = r)).then(
+        (res) => (this.notebooksViewedByUser = res)
+      );
+    },
   },
   mounted() {
-    this.fetchData()
-  }
-}
+    this.fetchData();
+  },
+};
 </script>

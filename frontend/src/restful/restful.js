@@ -12,8 +12,8 @@ const loginOrRegister = () => {
 function toNested(data) {
   const result = {};
   Object.keys(data).forEach((key) => {
-    if (key.includes('.')) {
-      const [namespace, subkey] = key.split('.');
+    if (key.includes(".")) {
+      const [namespace, subkey] = key.split(".");
       if (!result[namespace]) result[namespace] = {};
       result[namespace][subkey] = data[key];
     } else {
@@ -67,10 +67,10 @@ const restPost = (url, data, loadingRef) =>
   restRequest(
     url,
     {
-      method: 'POST',
+      method: "POST",
       headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
+        Accept: "application/json",
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
     },
@@ -81,12 +81,12 @@ function objectToFormData(data) {
   const formData = new FormData();
   Object.keys(data).forEach((key) => {
     if (data[key] === null) {
-      formData.append(key, '');
+      formData.append(key, "");
     } else if (data[key] instanceof Object && !(data[key] instanceof File)) {
       Object.keys(data[key]).forEach((subKey) => {
         formData.append(
           `${key}.${subKey}`,
-          data[key][subKey] === null ? '' : data[key][subKey]
+          data[key][subKey] === null ? "" : data[key][subKey]
         );
       });
     } else {
@@ -100,9 +100,9 @@ const restPostMultiplePartForm = (url, data, loadingRef) =>
   restRequest(
     url,
     {
-      method: 'POST',
+      method: "POST",
       headers: {
-        Accept: 'application/json',
+        Accept: "application/json",
       },
       body: objectToFormData(data),
     },
@@ -113,9 +113,9 @@ const restPatchMultiplePartForm = (url, data, loadingRef) =>
   restRequest(
     url,
     {
-      method: 'PATCH',
+      method: "PATCH",
       headers: {
-        Accept: 'application/json',
+        Accept: "application/json",
       },
       body: objectToFormData(data),
     },

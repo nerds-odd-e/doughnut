@@ -1,9 +1,9 @@
 <template>
-<a class="pause-stop" href="/" @click.prevent="goHome()"><SvgStop/></a>
+  <a class="pause-stop" href="/" @click.prevent="goHome()"><SvgStop /></a>
 </template>
 
 <script>
-import SvgStop from "../svgs/SvgStop.vue"
+import SvgStop from "../svgs/SvgStop.vue";
 
 export default {
   name: "StopRepeatButton",
@@ -11,11 +11,11 @@ export default {
   components: { SvgStop },
   methods: {
     async goHome() {
-      if(await this.$popups.confirm('Are you sure to leave the reviewing?')) {
-        window.location = "/"
+      if (await this.$popups.confirm("Are you sure to leave the reviewing?")) {
+        window.location = "/";
       }
-    }
-  }
+    },
+  },
 };
 </script>
 
