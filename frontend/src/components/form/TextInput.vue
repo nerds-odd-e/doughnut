@@ -24,5 +24,5 @@ const props = defineProps({
   autofocus: { type: Boolean, default: false },
   errors: Object,
 });
-const emit = defineEmit(["update:modelValue"]);
+const emit = defineEmits(["update:modelValue"]);
 </script>

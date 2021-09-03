@@ -28,5 +28,5 @@ const props = defineProps({
   options: Array,
   errors: Object,
 });
-const emit = defineEmit(["update:modelValue"]);
+const emit = defineEmits(["update:modelValue"]);
 </script>
