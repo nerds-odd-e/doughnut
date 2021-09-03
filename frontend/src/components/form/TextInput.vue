@@ -15,7 +15,6 @@
 </template>
 
 <script setup>
-import { defineEmit } from "@vue/runtime-core";
 import InputWithType from "./InputWithType.vue";
 const props = defineProps({
   modelValue: String,

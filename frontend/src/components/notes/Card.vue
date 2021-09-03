@@ -12,7 +12,6 @@
 </template>
 
 <script setup>
-import { defineProps } from "vue";
 import NoteTitleWithLink from "./NoteTitleWithLink.vue";
 const props = defineProps({
   note: Object,

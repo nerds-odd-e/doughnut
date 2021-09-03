@@ -22,7 +22,6 @@
 <script>
 import Card from "./Card.vue";
 import NoteTitleWithLink from "./NoteTitleWithLink.vue";
-import { defineProps } from "vue";
 
 export default {
   props: {
