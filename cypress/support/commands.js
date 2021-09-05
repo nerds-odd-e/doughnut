@@ -25,14 +25,8 @@
 import '@testing-library/cypress/add-commands';
 import 'cypress-file-upload';
 
-Cypress.Commands.add('cleanDBAndSeedData', () => {
-  cy.request({ method: 'POST', url: '/api/testability/clean_db_and_seed_data' })
-    .its('body')
-    .should('contain', 'OK');
-});
-
 Cypress.Commands.add('pageIsLoaded', () => {
-  cy.get('.loading-bar').should('not.exist')
+  cy.get('.loading-bar').should('not.exist');
 });
 
 Cypress.Commands.add('loginAs', username => {
@@ -50,25 +44,9 @@ Cypress.Commands.add('loginAs', username => {
 Cypress.Commands.add('logout', username => {
   cy.request({
     method: 'POST',
-    url: '/logout',
+    url: '/logout'
   }).then(response => {
     expect(response.status).to.equal(204);
-  });
-});
-
-Cypress.Commands.add('seedNotes', (notes, externalIdentifier = '') => {
-  cy.request({
-    method: 'POST',
-    url: `/api/testability/seed_notes?external_identifier=${externalIdentifier}`,
-    body: notes
-  }).then(response => {
-    expect(response.body.length).to.equal(notes.length);
-    const titles = notes.map(n => n['title']);
-    const noteMap = Object.assign(
-      {},
-      ...titles.map((t, index) => ({ [t]: response.body[index] }))
-    );
-    cy.wrap(noteMap).as('seededNoteIdMap');
   });
 });
 
@@ -110,8 +88,8 @@ Cypress.Commands.add('submitNoteFormWith', noteAttributes => {
               mimeType: 'image/png'
             });
           });
-        } else if ($input.attr('role') ==='radiogroup') {
-            cy.clickRadioByLabel(value)
+        } else if ($input.attr('role') === 'radiogroup') {
+          cy.clickRadioByLabel(value);
         } else {
           cy.wrap($input)
             .clear()
@@ -124,12 +102,14 @@ Cypress.Commands.add('submitNoteFormWith', noteAttributes => {
 });
 
 Cypress.Commands.add('clickAddChildNoteButton', () => {
-  cy.findAllByRole("button", {name: "Add Child Note"}).first().click();
-})
+  cy.findAllByRole('button', { name: 'Add Child Note' })
+    .first()
+    .click();
+});
 
 Cypress.Commands.add('clickRadioByLabel', labelText => {
-   cy.findByText(labelText, {selector: 'label'}).click({force: true});
-})
+  cy.findByText(labelText, { selector: 'label' }).click({ force: true });
+});
 
 Cypress.Commands.add('submitNoteFormsWith', notes => {
   notes.forEach(noteAttributes => cy.submitNoteFormWith(noteAttributes));
@@ -138,11 +118,12 @@ Cypress.Commands.add('submitNoteFormsWith', notes => {
 Cypress.Commands.add('expectNoteCards', expectedCards => {
   expectedCards.forEach(elem => {
     for (var propName in elem) {
-      if(propName === 'note-title') {
-          cy.findByText(elem[propName], {selector: ".card-title a"}).should('be.visible');
-      }
-      else {
-          cy.findByText(elem[propName]);
+      if (propName === 'note-title') {
+        cy.findByText(elem[propName], { selector: '.card-title a' }).should(
+          'be.visible'
+        );
+      } else {
+        cy.findByText(elem[propName]);
       }
     }
   });
@@ -152,7 +133,9 @@ Cypress.Commands.add('navigateToNotePage', noteTitlesDividedBySlash => {
   cy.visitMyNotebooks();
   noteTitlesDividedBySlash
     .commonSenseSplit('/')
-    .forEach(noteTitle => cy.findByText(noteTitle, { selector: '.card-title' }).click());
+    .forEach(noteTitle =>
+      cy.findByText(noteTitle, { selector: '.card-title' }).click()
+    );
 });
 
 // jumptoNotePage is faster than navigateToNotePage
@@ -187,19 +170,25 @@ Cypress.Commands.add('clickNotePageButton', (noteTitle, btnTextOrTitle) => {
     .click();
 });
 
-Cypress.Commands.add('clickNotePageMoreOptionsButton', (noteTitle, btnTextOrTitle) => {
-  cy.jumpToNotePage(noteTitle);
-  cy.clickNotePageMoreOptionsButtonOnCurrentPage(btnTextOrTitle)
-});
+Cypress.Commands.add(
+  'clickNotePageMoreOptionsButton',
+  (noteTitle, btnTextOrTitle) => {
+    cy.jumpToNotePage(noteTitle);
+    cy.clickNotePageMoreOptionsButtonOnCurrentPage(btnTextOrTitle);
+  }
+);
 
-Cypress.Commands.add('clickNotePageMoreOptionsButtonOnCurrentPage', (btnTextOrTitle) => {
-  cy.get('.note-with-controls')
-    .findByRole('button', { name: 'more options' })
-    .click();
-  cy.get('.note-with-controls')
-    .findByRole('button', { name: btnTextOrTitle })
-    .click();
-});
+Cypress.Commands.add(
+  'clickNotePageMoreOptionsButtonOnCurrentPage',
+  btnTextOrTitle => {
+    cy.get('.note-with-controls')
+      .findByRole('button', { name: 'more options' })
+      .click();
+    cy.get('.note-with-controls')
+      .findByRole('button', { name: btnTextOrTitle })
+      .click();
+  }
+);
 
 Cypress.Commands.add('expectExactLinkTargets', targets => {
   targets.forEach(elem => {
@@ -239,27 +228,6 @@ Date.prototype.addDays = function(days) {
   date.setDate(date.getDate() + days);
   return date;
 };
-
-Cypress.Commands.add('timeTravelTo', (day, hour) => {
-  const travelTo = new Date(1976, 5, 1, hour).addDays(day);
-  cy.request({
-    method: 'POST',
-    url: '/api/testability/time_travel',
-    body: { travel_to: JSON.stringify(travelTo) }
-  })
-    .its('status')
-    .should('equal', 200);
-});
-
-Cypress.Commands.add('randomizerAlwaysChooseLast', (day, hour) => {
-  cy.request({
-    method: 'POST',
-    url: '/api/testability/randomizer',
-    body: { choose: 'last' }
-  })
-    .its('status')
-    .should('equal', 200);
-});
 
 Cypress.Commands.add(
   'initialReviewOneNoteIfThereIs',
@@ -309,11 +277,10 @@ Cypress.Commands.add(
           expect(review_type).equal('a known review page type');
       }
       if (skip) {
-          cy.findByText('Skip repetition').click();
-          cy.findByRole('button', { name: 'OK' }).click();
-      }
-      else {
-          cy.findByText('Keep for repetition').click();
+        cy.findByText('Skip repetition').click();
+        cy.findByRole('button', { name: 'OK' }).click();
+      } else {
+        cy.findByText('Keep for repetition').click();
       }
     }
   }
@@ -403,7 +370,9 @@ Cypress.Commands.add('unsubscribeFromNotebook', noteTitle => {
 
 Cypress.Commands.add('searchNote', searchKey => {
   cy.getFormControl('Search Globally').check();
-  cy.findByPlaceholderText('Search').clear().type(searchKey);
+  cy.findByPlaceholderText('Search')
+    .clear()
+    .type(searchKey);
 });
 
 Cypress.Commands.add('visitBlog', () => {
