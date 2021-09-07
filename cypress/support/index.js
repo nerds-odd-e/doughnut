@@ -13,16 +13,17 @@
 // https://on.cypress.io/configuration
 // ***********************************************************
 
+/// <reference types="cypress" />
+
 // Import commands.js using ES2015 syntax:
 import './commands';
 import './testability';
-import 'cypress-plugin-snapshots/commands';
 
-String.prototype.commonSenseSplit = function(separator) {
+String.prototype.commonSenseSplit = function (separator) {
   return this.trim()
     .split(separator)
-    .filter(s => s !== '')
-    .map(s => s.trim());
+    .filter((s) => s !== '')
+    .map((s) => s.trim());
 };
 
 // Alternatively you can use CommonJS syntax:

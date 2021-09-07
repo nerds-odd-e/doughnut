@@ -1,3 +1,5 @@
+/// <reference types="cypress" />
+
 Cypress.Commands.add('cleanDBAndSeedData', () => {
   cy.request({ method: 'POST', url: '/api/testability/clean_db_and_seed_data' })
     .its('body')

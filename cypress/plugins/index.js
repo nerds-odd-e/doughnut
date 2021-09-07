@@ -1,4 +1,3 @@
-/// <reference types="cypress" />
 // ***********************************************************
 // This example plugins/index.js can be used to load plugins
 //
@@ -9,11 +8,14 @@
 // https://on.cypress.io/plugins-guide
 // ***********************************************************
 
+/// <reference types="cypress" />
+
 // This function is called when a project is opened or re-opened (e.g. due to
 // the project's config changing)
 
 const cucumber = require('cypress-cucumber-preprocessor').default;
-const { initPlugin } = require('cypress-plugin-snapshots/plugin');
+const browserify = require('@cypress/browserify-preprocessor');
+const getCompareSnapshotsPlugin = require('cypress-image-diff-js/dist/plugin');
 const fs = require('fs-extra');
 const path = require('path');
 /**
@@ -22,8 +24,10 @@ const path = require('path');
 module.exports = (on, config) => {
   // `on` is used to hook into various events Cypress emits
   // `config` is the resolved Cypress config
-  initPlugin(on, config);
-  on('file:preprocessor', cucumber());
+  getCompareSnapshotsPlugin(on, config);
+  const options = browserify.defaultOptions;
+  options.browserifyOptions.plugin.unshift(['tsify']);
+  on('file:preprocessor', cucumber(options));
 
   const file = config.env.configFile || 'ci';
   console.table(`<<<<<< CYPRESS RUN ENV: ${file} >>>>>>`);

@@ -2,8 +2,13 @@
   "env": {
     "TAGS": "not @ignore and not @slow"
   },
+  "pluginsFile": "cypress/plugins/index.js",
   "testFiles": "**/*.{feature,features}",
   "chromeWebSecurity": false,
-  "ignoreTestFiles": ["**/__snapshots__/*", "**/__image_snapshots__/*"],
+  "ignoreTestFiles": [
+    "**/*.{js,ts}",
+    "**/__snapshots__/*",
+    "**/__image_snapshots__/*"
+  ],
   "video": false
 }
