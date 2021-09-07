@@ -1,12 +1,14 @@
+/// <reference types="cypress" />
+// @ts-check
+
 import {
-    Given,
-    And,
-    Then,
-    When,
-    Before,
-  } from "cypress-cucumber-preprocessor/steps";
+  And,
+  Before,
+  Given,
+  Then,
+  When,
+} from "cypress-cucumber-preprocessor/steps";
 
 Before(() => {
   cy.cleanDBAndSeedData();
 });
-
