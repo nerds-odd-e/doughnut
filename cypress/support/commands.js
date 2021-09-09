@@ -384,3 +384,7 @@ Cypress.Commands.add('assertBlogPostInWebsiteByTitle', (article) => {
       });
   });
 });
+
+Cypress.Commands.add('failure', () => {
+  throw new Error('Deliberate CYPRESS test Failure!!!');
+});
