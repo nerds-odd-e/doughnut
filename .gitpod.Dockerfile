@@ -42,3 +42,6 @@ RUN . /home/gitpod/.nix-profile/etc/profile.d/nix.sh \
 
 # Setup any-nix-shell in .zshrc
 RUN echo 'any-nix-shell zsh --info-right | . /dev/stdin' >> /home/gitpod/.zshrc
+
+# Run direnv to trigger `use nix`
+RUN direnv allow
