@@ -117,6 +117,7 @@ in mkShell {
     apple_sdk.SystemConfiguration
     xcodebuild
   ] ++ lib.optionals (!stdenv.isDarwin) [
+    xvfb-run
     firefox
     google-chrome
     gitter
