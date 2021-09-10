@@ -1,10 +1,43 @@
 image:
   file: .gitpod.Dockerfile
+
+ports:
+  # Springboot Backend Server
+  - port: ignore
+    onOpen: open-browser
+  - port: ignore
+    onOpen: open-browser
+  - port: 9082
+    onOpen: ignore
+  # Vite Frontend Dev Server
+  - port: 3000
+    onOpen: open-browser
+  # MySQL 8.0 DB Server
+  - port: 3309
+    onOpen: ignore
+  - port: 33090
+    onOpen: ignore
+
 tasks:
   - init: >
       mkdir -p /home/gitpod/.config/nix &&
-      echo 'sandbox = false' >> /home/gitpod/.config/nix/nix.conf
+      echo 'sandbox = false' >> /home/gitpod/.config/nix/nix.conf &&
+      nix-shell -j auto --cores 0
 
 vscode:
   extensions:
     - bbenoist.Nix
+    - esbenp.prettier-vscode
+    - dbaeumer.vscode-eslint
+    - 2gua.rainbow-brackets
+    - johnsoncodehk.volar
+    - rbbit.typescript-hero
+    - naco-siren.gradle-language
+    - vscjava.vscode-spring-initializr
+    - vscjava.vscode-spring-boot-dashboard
+    - Pivotal.vscode-spring-boot
+    - Shelex.vscode-cy-helper
+    - PatrickElfert.cypress-cucumber-generator
+    - alexkrechik.cucumberautocomplete
+    - xyz.plsql-language
+
