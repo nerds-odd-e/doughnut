@@ -9,6 +9,9 @@ RUN addgroup --system nixbld \
   && mkdir -m 0755 /nix && chown gitpod /nix \
   && mkdir -p /etc/nix && echo 'sandbox = false' > /etc/nix/nix.conf
   
+# Deps needed to run cypress in Debian/Ubuntu
+RUN apt install -y libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb
+
 # Install Nix
 CMD /bin/bash -l
 USER gitpod
@@ -40,6 +43,3 @@ RUN . /home/gitpod/.nix-profile/etc/profile.d/nix.sh \
 RUN . /home/gitpod/.nix-profile/etc/profile.d/nix.sh \
   && nix-env -i any-nix-shell -f https://github.com/NixOS/nixpkgs/archive/master.tar.gz \
   && echo 'any-nix-shell zsh --info-right | . /dev/stdin' >> /home/gitpod/.zshrc
-
-# Deps needed to run cypress in Debian/Ubuntu
-RUN apt install -y libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb
