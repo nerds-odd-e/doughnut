@@ -21,6 +21,7 @@ declare namespace Cypress {
       noteTitle: string,
       dailyLearningCount: number,
     ): Chainable<Element>;
+    triggerException(): void;
     unsubscribeFromNotebook(noteTitle: string): Chainable<Element>;
     updateCurrentUserSettingsWith(settings: userSetting): Chainable<Element>;
     visitMyNotebooks(noteTitle?: string): Chainable<Element>;
