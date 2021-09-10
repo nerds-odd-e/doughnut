@@ -31,7 +31,10 @@ in mkShell {
     python3
     yarn
     jdk16
+    direnv
+    nix-direnv
     any-nix-shell
+    bash_5
     zsh
     zsh-powerlevel10k
     git
