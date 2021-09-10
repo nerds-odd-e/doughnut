@@ -3,10 +3,10 @@ image:
 
 ports:
   # Springboot Backend Server
-  - port: ignore
-    onOpen: open-browser
-  - port: ignore
-    onOpen: open-browser
+  - port: 8081
+    onOpen: ignore
+  - port: 9081
+    onOpen: ignore
   - port: 9082
     onOpen: ignore
   # Vite Frontend Dev Server
