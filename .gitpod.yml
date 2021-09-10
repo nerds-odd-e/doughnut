@@ -21,8 +21,7 @@ ports:
 tasks:
   - init: >
       mkdir -p /home/gitpod/.config/nix &&
-      echo 'sandbox = false' >> /home/gitpod/.config/nix/nix.conf &&
-      nix-shell -j auto --cores 0
+      echo 'sandbox = false' >> /home/gitpod/.config/nix/nix.conf
 
 vscode:
   extensions:
