@@ -1,6 +1,21 @@
-FROM gitpod/workspace-base
+FROM gitpod/workspace-full-vnc
 
 USER root
+
+# Install Cypress dependencies.
+RUN sudo apt-get update \
+ && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
+   libgtk2.0-0 \
+   libgtk-3-0 \
+   libnotify-dev \
+   libgconf-2-4 \
+   libnss3 \
+   libxss1 \
+   libasound2 \
+   libxtst6 \
+   xauth \
+   xvfb \
+ && sudo rm -rf /var/lib/apt/lists/*
 
 # Install Nix
 RUN addgroup --system nixbld \
@@ -9,9 +24,6 @@ RUN addgroup --system nixbld \
   && mkdir -m 0755 /nix && chown gitpod /nix \
   && mkdir -p /etc/nix && echo 'sandbox = false' > /etc/nix/nix.conf
   
-# Deps needed to run cypress in Debian/Ubuntu
-RUN apt install -y libgtk2.0-0 libgtk-3-0 libgbm-dev libnotify-dev libgconf-2-4 libnss3 libxss1 libasound2 libxtst6 xauth xvfb
-
 # Install Nix
 CMD /bin/bash -l
 USER gitpod
