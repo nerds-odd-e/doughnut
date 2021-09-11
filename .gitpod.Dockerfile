@@ -28,7 +28,7 @@ RUN sudo apt-get update \
 
 # Install Jetbrains Mono font
 RUN wget https://download.jetbrains.com/fonts/JetBrainsMono-2.242.zip \
-  && unzip JetBrainsMono-1.0.0.zip \
+  && unzip JetBrainsMono-2.242.zip \
   && mv JetBrainsMono-*.ttf /usr/share/fonts/ \
   && mv JetBrainsMono-*.ttf ~/.local/share/fonts/
 
