@@ -9,8 +9,12 @@
 .history
 .svn/
 
-# cypress screenshots
+# cypress screenshots & videos
 cypress/screenshots/
+cypress/videos/
+
+# cypress local env config
+cypress/config/development.json
 
 # BlueJ files
 *.ctxt

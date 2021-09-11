@@ -70,7 +70,8 @@ RUN . /home/gitpod/.nix-profile/etc/profile.d/nix.sh \
 
 # Make zsh default && install zimfw
 RUN curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh \
-  && echo 'zmodule romkatv/powerlevel10k --use degit' >> /home/gitpod/.zimrc
+  && echo 'zmodule romkatv/powerlevel10k --use degit' >> /home/gitpod/.zimrc \
+  && zsh ~/.zim/zimfw.zsh install
 
 
 # Install any-nix-shell & zimfw
