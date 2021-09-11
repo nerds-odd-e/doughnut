@@ -28,6 +28,7 @@ in mkShell {
     libgccjit
     gradle
     nodejs
+    cypress
     python3
     yarn
     jdk16
@@ -38,6 +39,7 @@ in mkShell {
     zsh
     zsh-powerlevel10k
     git
+    git-extras
     git-secret
     gitAndTools.delta
     locale
@@ -47,6 +49,7 @@ in mkShell {
     hostname
     inetutils
     openssh
+    ssh-tools
     pkg-config
     rsync
     autojump
@@ -125,6 +128,7 @@ in mkShell {
     google-chrome
     gitter
     intellij
+    x11vnc
     xclip
   ];
   shellHook = ''
@@ -172,7 +176,7 @@ in mkShell {
           mysqld --datadir=$MYSQL_DATADIR --pid-file=$MYSQL_PID_FILE --port=$MYSQL_TCP_PORT --socket=$MYSQL_UNIX_SOCKET --mysqlx-socket=$MYSQLX_UNIX_SOCKET --mysqlx_port=$MYSQLX_TCP_PORT &
           export MYSQLD_PID=$!
 
-          sleep 2 && mysql -u root -S $MYSQL_UNIX_SOCKET < $MYSQL_HOME/init_doughnut_db.sql
+          sleep 5 && mysql -u root -S $MYSQL_UNIX_SOCKET < $MYSQL_HOME/init_doughnut_db.sql
         fi
 
         export GPG_TTY=$(tty)

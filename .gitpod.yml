@@ -21,8 +21,6 @@ ports:
     onOpen: ignore
   - port: 6080
     onOpen: open-browser
-  - port: 10000
-    onOpen: ignore
 
 tasks:
   - init: >
@@ -34,15 +32,12 @@ vscode:
     - bbenoist.Nix
     - esbenp.prettier-vscode
     - dbaeumer.vscode-eslint
-    - 2gua.rainbow-brackets
-    - johnsoncodehk.volar
-    - rbbit.typescript-hero
-    - naco-siren.gradle-language
+    - CoenraadS.bracket-pair-colorizer-2
+    - octref.vetur
     - vscjava.vscode-spring-initializr
     - vscjava.vscode-spring-boot-dashboard
     - Pivotal.vscode-spring-boot
     - Shelex.vscode-cy-helper
-    - PatrickElfert.cypress-cucumber-generator
-    - alexkrechik.cucumberautocomplete
     - xyz.plsql-language
-
+    - ms-vscode-remote.remote-ssh
+    - ms-vscode-remote.vscode-remote-extensionpack

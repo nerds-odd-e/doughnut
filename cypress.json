@@ -10,5 +10,6 @@
     "**/__snapshots__/*",
     "**/__image_snapshots__/*"
   ],
+  "pageLoadTimeout": 100000,
   "video": false
 }
