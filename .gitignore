@@ -12,6 +12,8 @@
 # cypress screenshots & videos
 cypress/screenshots/
 cypress/videos/
+cypress-visual-report/
+cypress-visual-screenshots/
 
 # cypress local env config
 cypress/config/development.json
