@@ -34,9 +34,6 @@ RUN wget https://download.jetbrains.com/fonts/JetBrainsMono-2.242.zip \
   && cp fonts/ttf/JetBrainsMono-*.ttf ~/.local/share/fonts/ \
   && rm -rf fonts
 
-# Install zimfw & default to zsh
-RUN curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh
-
 # Install Nix
 RUN addgroup --system nixbld \
   && adduser gitpod nixbld \
@@ -71,13 +68,15 @@ RUN . /home/gitpod/.nix-profile/etc/profile.d/nix.sh \
   && nix-env -i direnv \
   && direnv hook bash >> /home/gitpod/.bashrc
 
-# Make zsh default
-RUN sudo chsh -s /bin/zsh
+# Make zsh default && install zimfw
+RUN sudo chsh -s /bin/zsh \
+  && curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh \
+  && . /home/gitpod/.zshrc \
+  && echo 'zmodule romkatv/powerlevel10k --use degit' >> /home/gitpod/.zimrc \
+  && zimfw install
+
 
 # Install any-nix-shell & zimfw
 RUN . /home/gitpod/.nix-profile/etc/profile.d/nix.sh \
   && nix-env -i any-nix-shell -f https://github.com/NixOS/nixpkgs/archive/master.tar.gz \
-  && echo 'any-nix-shell zsh --info-right | . /dev/stdin' >> /home/gitpod/.zshrc \
-  && . /home/.zshrc \
-  && echo 'zmodule romkatv/powerlevel10k --use degit' >> /home/gitpod/.zimrc \
-  && zimfw install
+  && echo 'any-nix-shell zsh --info-right | . /dev/stdin' >> /home/gitpod/.zshrc
