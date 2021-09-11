@@ -1,8 +1,8 @@
 { pkgs ? import (builtins.fetchGit {
-  name = "nixos-21.05";
+  name = "nixpkgs-unstable";
   url = "https://github.com/nixos/nixpkgs/";
   ref = "refs/heads/master";
-  rev = "a87936871bd4edf966fd6d98d7d6ac96a3284b6c";
+  rev = "0e24c87754430cb6ad2f8c8c8021b29834a8845e";
 }) { } }:
 with pkgs;
 let
@@ -28,7 +28,6 @@ in mkShell {
     libgccjit
     gradle
     nodejs
-    cypress
     python3
     yarn
     jdk16
@@ -123,13 +122,14 @@ in mkShell {
     apple_sdk.SystemConfiguration
     xcodebuild
   ] ++ lib.optionals (!stdenv.isDarwin) [
-    xvfb-run
+    cypress
     firefox
     google-chrome
     gitter
     intellij
     x11vnc
     xclip
+    xvfb-run
   ];
   shellHook = ''
         export NIXPKGS_ALLOW_UNFREE=1
