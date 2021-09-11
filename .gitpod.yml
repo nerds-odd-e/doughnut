@@ -22,6 +22,7 @@ ports:
     visibility: public
   - port: 33090
     onOpen: ignore
+  # Remote VNC
   - port: 5900
     onOpen: ignore
     visibility: public
