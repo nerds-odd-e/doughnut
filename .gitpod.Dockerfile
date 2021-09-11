@@ -69,11 +69,8 @@ RUN . /home/gitpod/.nix-profile/etc/profile.d/nix.sh \
   && direnv hook bash >> /home/gitpod/.bashrc
 
 # Make zsh default && install zimfw
-RUN sudo chsh -s /bin/zsh \
-  && curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh \
-  && . /home/gitpod/.zshrc \
-  && echo 'zmodule romkatv/powerlevel10k --use degit' >> /home/gitpod/.zimrc \
-  && zimfw install
+RUN curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh \
+  && echo 'zmodule romkatv/powerlevel10k --use degit' >> /home/gitpod/.zimrc
 
 
 # Install any-nix-shell & zimfw
