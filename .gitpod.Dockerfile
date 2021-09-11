@@ -30,6 +30,7 @@ RUN sudo apt-get update \
 RUN wget https://download.jetbrains.com/fonts/JetBrainsMono-2.242.zip \
   && unzip JetBrainsMono-2.242.zip \
   && cp fonts/ttf/JetBrainsMono-*.ttf /usr/share/fonts/ \
+  && mkdir -p /home/gitpod/.local/share/fonts/ \
   && cp fonts/ttf/JetBrainsMono-*.ttf ~/.local/share/fonts/ \
   && rm -rf fonts
 
