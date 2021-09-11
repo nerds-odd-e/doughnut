@@ -29,8 +29,9 @@ RUN sudo apt-get update \
 # Install Jetbrains Mono font
 RUN wget https://download.jetbrains.com/fonts/JetBrainsMono-2.242.zip \
   && unzip JetBrainsMono-2.242.zip \
-  && mv JetBrainsMono-*.ttf /usr/share/fonts/ \
-  && mv JetBrainsMono-*.ttf ~/.local/share/fonts/
+  && cp fonts/ttf/JetBrainsMono-*.ttf /usr/share/fonts/ \
+  && cp fonts/ttf/JetBrainsMono-*.ttf ~/.local/share/fonts/ \
+  && rm -rf fonts
 
 # Install zimfw & default to zsh
 RUN curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh
