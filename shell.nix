@@ -66,7 +66,6 @@ in mkShell {
     zoxide
     most
     ps
-    psmisc
     ripgrep
     tree
     vgrep
@@ -77,7 +76,6 @@ in mkShell {
     libressl
     patchelf
     cacert
-    curlie
     glances
     httpie
     mysql80
@@ -121,9 +119,8 @@ in mkShell {
     xcodebuild
   ] ++ lib.optionals (!stdenv.isDarwin) [
     cypress
-    firefox
-    geckodriver
     google-chrome
+    psmisc
     x11vnc
     xclip
     xvfb-run
