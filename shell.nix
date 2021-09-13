@@ -66,7 +66,7 @@ in mkShell {
     zoxide
     most
     ps
-    pstree
+    psmisc
     ripgrep
     tree
     vgrep
@@ -85,10 +85,8 @@ in mkShell {
     mysql_jdbc
     python39Packages.pip
     chromedriver
-    geckodriver
     google-cloud-sdk
     packer
-    dbeaver
     tmux
     tmuxPlugins.tmux-fzf
     vim
@@ -124,9 +122,8 @@ in mkShell {
   ] ++ lib.optionals (!stdenv.isDarwin) [
     cypress
     firefox
+    geckodriver
     google-chrome
-    gitter
-    intellij
     x11vnc
     xclip
     xvfb-run
