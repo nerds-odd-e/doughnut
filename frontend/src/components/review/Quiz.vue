@@ -60,7 +60,7 @@
 <script setup>
 import NoteBreadcrumbForReview from "./NoteBreadcrumbForReview.vue";
 import ShowPicture from "../notes/ShowPicture.vue";
-import LinkLists from "../links/LinkLists.vue";
+import LinkLists from "../links/NoteFrameOfLinks.vue";
 import TextInput from "../form/TextInput.vue";
 import { computed } from "@vue/runtime-core";
 

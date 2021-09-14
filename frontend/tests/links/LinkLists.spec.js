@@ -1,5 +1,5 @@
 import _ from "lodash";
-import LinkLists from "@/components/links/LinkLists.vue";
+import NoteFrameOfLinks from "@/components/links/NoteFrameOfLinks.vue";
 import { staticInfo } from "../notes/fixtures-basic";
 import { mountWithMockRoute } from "../helpers";
 
@@ -32,7 +32,7 @@ describe("a link lists of a note", () => {
         reverse: [],
       },
     };
-    const { wrapper } = mountWithMockRoute(LinkLists, {
+    const { wrapper } = mountWithMockRoute(NoteFrameOfLinks, {
       propsData: { links, owns: true, staticInfo },
     });
     expect(wrapper.find(".parent-links").text()).toContain("a tool");
@@ -67,7 +67,7 @@ describe("a link lists of a note", () => {
         reverse: [],
       },
     };
-    const { wrapper } = mountWithMockRoute(LinkLists, {
+    const { wrapper } = mountWithMockRoute(NoteFrameOfLinks, {
       propsData: { links, owns: true, staticInfo },
     });
     expect(wrapper.findAll(".parent-links li").length).toEqual(1);
@@ -107,7 +107,7 @@ describe("a link lists of a note", () => {
         direct: [],
       },
     };
-    const { wrapper } = mountWithMockRoute(LinkLists, {
+    const { wrapper } = mountWithMockRoute(NoteFrameOfLinks, {
       propsData: { links, owns: true, staticInfo: staticInfo },
     });
     expect(wrapper.findAll(".parent-links li").length).toEqual(1);

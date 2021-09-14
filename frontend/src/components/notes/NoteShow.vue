@@ -25,7 +25,7 @@
 
 <script setup>
 import { computed } from "@vue/runtime-core";
-import LinkLists from "../links/LinkLists.vue";
+import LinkLists from "../links/NoteFrameOfLinks.vue";
 import ShowPicture from "./ShowPicture.vue";
 import ShowDescription from "./ShowDescription.vue";
 
