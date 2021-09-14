@@ -26,13 +26,6 @@ ports:
     onOpen: ignore
   - port: 6080
     onOpen: open-browser
-  # IntelliJ on Remote VNC
-  - port: 6942
-    onOpen: open-browser
-    visibility: private
-  - port: 8887
-    onOpen: open-browser
-    visibility: private
 
 tasks:
   - init: >

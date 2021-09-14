@@ -13,7 +13,6 @@ let
   };
   apple_sdk = darwin.apple_sdk.frameworks;
   nodejs = nodejs-16_x;
-  intellij = jetbrains.idea-community;
 in mkShell {
   name = "doughnut";
   MYSQL_HOME = builtins.getEnv "MYSQL_HOME";
@@ -119,7 +118,6 @@ in mkShell {
   ] ++ lib.optionals (!stdenv.isDarwin) [
     cypress
     google-chrome
-    intellij
     psmisc
     x11vnc
     xclip
