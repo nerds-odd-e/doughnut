@@ -32,8 +32,9 @@ RUN apt-get update \
    libfreetype6 \
    git \
    bash-completion \
-   zsh-completion \
    procps \
+   powerline \
+   fonts-powerline \
  # clean apt to reduce image size:
  && rm -rf /var/lib/apt/lists/* \
  && rm -rf /var/cache/apt
