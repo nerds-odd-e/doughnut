@@ -6,7 +6,7 @@ import { mountWithMockRoute } from "../helpers";
 
 describe("a link lists of a note", () => {
   test("link to upper level", async () => {
-    const links = makeMe.links.of('using').count(2).please();
+    const links = makeMe.links.of("using").count(2).please();
     const { wrapper } = mountWithMockRoute(NoteFrameOfLinks, {
       propsData: { links, owns: true, staticInfo },
     });
@@ -15,7 +15,7 @@ describe("a link lists of a note", () => {
   });
 
   test("tags are grouped", async () => {
-    const links = makeMe.links.of('tagged by').count(2).please();
+    const links = makeMe.links.of("tagged by").count(2).please();
     const { wrapper } = mountWithMockRoute(NoteFrameOfLinks, {
       propsData: { links, owns: true, staticInfo },
     });

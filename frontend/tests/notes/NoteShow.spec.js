@@ -3,7 +3,8 @@ import NoteShow from "@/components/notes/NoteShow.vue";
 import { createMockNote } from "./NoteShow-fixtures";
 
 describe("new/updated pink banner", () => {
-  const getBannerCount = async () => screen.queryAllByText("This note has been changed recently.");
+  const getBannerCount = async () =>
+    screen.queryAllByText("This note has been changed recently.");
 
   test("should show pink banner if the note was updated within the last 12 hours", async () => {
     const note = createMockNote({ recentlyUpdated: true });
