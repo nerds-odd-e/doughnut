@@ -38,6 +38,7 @@ tasks:
   - init: >
       mkdir -p /home/gitpod/.config/nix &&
       echo 'sandbox = false' >> /home/gitpod/.config/nix/nix.conf
+      git config --global init.defaultBranch main
 
 vscode:
   extensions:
