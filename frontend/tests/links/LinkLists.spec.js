@@ -1,6 +1,6 @@
-import LinkLists from "@/components/links/LinkLists.vue";
-import { basicNote, staticInfo } from "../notes/fixtures-basic";
 import _ from "lodash";
+import LinkLists from "@/components/links/LinkLists.vue";
+import { staticInfo } from "../notes/fixtures-basic";
 import { mountWithMockRoute } from "../helpers";
 
 describe("a link lists of a note", () => {
@@ -68,7 +68,7 @@ describe("a link lists of a note", () => {
       },
     };
     const { wrapper } = mountWithMockRoute(LinkLists, {
-      propsData: { links, owns: true, staticInfo: staticInfo },
+      propsData: { links, owns: true, staticInfo },
     });
     expect(wrapper.findAll(".parent-links li").length).toEqual(1);
   });
