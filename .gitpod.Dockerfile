@@ -3,8 +3,8 @@ FROM gitpod/workspace-full-vnc
 USER root
 
 # Install Cypress dependencies.
-RUN sudo apt-get update \
- && sudo DEBIAN_FRONTEND=noninteractive apt-get install -y \
+RUN apt-get update \
+ && DEBIAN_FRONTEND=noninteractive apt-get install -y \
    libgtk2.0-0 \
    libgtk-3-0 \
    libnotify-dev \
@@ -24,14 +24,26 @@ RUN sudo apt-get update \
    unzip \
    wget \
    zip \
- && sudo rm -rf /var/lib/apt/lists/*
+# Dependencies for IntelliJ rendering
+   libxext6 \
+   libxrender1 \
+   libxtst6 \
+   libxi6 \
+   libfreetype6 \
+   git \
+   bash-completion \
+   zsh-completion \
+   procps \
+ # clean apt to reduce image size:
+ && rm -rf /var/lib/apt/lists/* \
+ && rm -rf /var/cache/apt
 
 # Install Jetbrains Mono font
 RUN wget https://download.jetbrains.com/fonts/JetBrainsMono-2.242.zip \
   && unzip JetBrainsMono-2.242.zip \
   && cp fonts/ttf/JetBrainsMono-*.ttf /usr/share/fonts/ \
   && mkdir -p /home/gitpod/.local/share/fonts/ \
-  && cp fonts/ttf/JetBrainsMono-*.ttf ~/.local/share/fonts/ \
+  && cp fonts/ttf/JetBrainsMono-*.ttf /home/gitpod/.local/share/fonts/ \
   && rm -rf fonts
 
 # Install Nix
@@ -78,3 +90,5 @@ RUN curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zs
 RUN . /home/gitpod/.nix-profile/etc/profile.d/nix.sh \
   && nix-env -i any-nix-shell -f https://github.com/NixOS/nixpkgs/archive/master.tar.gz \
   && echo 'any-nix-shell zsh --info-right | . /dev/stdin' >> /home/gitpod/.zshrc
+
+EXPOSE 8887
