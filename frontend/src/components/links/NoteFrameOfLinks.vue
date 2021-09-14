@@ -42,10 +42,11 @@
       </li>
     </template>
   </ul>
+  
   <slot />
 
   <ul class="children-links">
-    <template v-for="(linksOfType, linkType) in hierachyLinks" :key="linkType">
+    <template v-for="(linksOfType, linkType) in childrenLinks" :key="linkType">
       <li v-if="linksOfType.reverse.length > 0">
         <span>{{ reverseLabel(linkType) }} </span>
         <LinkLink
@@ -98,6 +99,17 @@ const hierachyLinks = computed(() => {
   return Object.fromEntries(
     Object.entries(props.links).filter(
       (t) => !tTypes.includes(t[0]) && !gTypes.includes(t[0])
+    )
+  );
+});
+
+const childrenLinks = computed(() => {
+  const tTypes = taggingTypes();
+  const gTypes = groupedTypes();
+  if (!props.links) return;
+  return Object.fromEntries(
+    Object.entries(props.links).filter(
+      (t) => !gTypes.includes(t[0])
     )
   );
 });

@@ -5,11 +5,14 @@ class LinkBuilder extends Builder{
 
     cnt: number
 
+    isReverse: boolean
+
     constructor(parentBuilder: Builder, linkType: string) {
       super(parentBuilder)
       this.parentBuilder = parentBuilder
       this.linkType = linkType
       this.cnt = 1
+      this.isReverse = false
     }
 
     count(cnt: number): LinkBuilder {
@@ -17,10 +20,15 @@ class LinkBuilder extends Builder{
         return this;
     }
 
+    get reverse(): LinkBuilder {
+      this.isReverse = true
+      return this
+    }
+
     do(): any {
         return {
             [this.linkType]: {
-              direct: Array.from({ length: this.cnt }, (x, i) => ({
+              [this.isReverse ? 'reverse' : 'direct']: Array.from({ length: this.cnt }, (x, i) => ({
                   id: 1938,
                   targetNote: {
                     id: 2423,
@@ -30,7 +38,7 @@ class LinkBuilder extends Builder{
                   linkTypeLabel: "using",
                   linkNameOfSource: "user",
                 })),
-              reverse: [],
+              [this.isReverse ? 'direct' : 'reverse']: [],
             },
           }
     }

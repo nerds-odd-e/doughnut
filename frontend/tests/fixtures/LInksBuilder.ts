@@ -9,7 +9,6 @@ class LinksBuilder extends Builder{
     }
 
     do(): any {
-      console.log( this.childrenBuilders.reduce((prev, curr) => ({ ...prev, ...curr.do() }), {}))
       return this.childrenBuilders.reduce((prev, curr) => ({ ...prev, ...curr.do() }), {})
     }
 }
