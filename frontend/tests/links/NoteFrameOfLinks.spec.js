@@ -23,42 +23,9 @@ describe("a link lists of a note", () => {
   });
 
   test("related, opposite, similar, confuse are grouped at top", async () => {
-    // const links = makeMe.links.of('confused with').and.of('similar to').please();
-    const links = {
-      "confused with": {
-        direct: [
-          {
-            id: 1938,
-            targetNote: {
-              id: 2423,
-              title: "tag1",
-            },
-            typeId: 8,
-            linkTypeLabel: "confusing",
-            linkNameOfSource: "user",
-          },
-        ],
-        reverse: [],
-      },
-
-      "similar to": {
-        reverse: [
-          {
-            id: 1938,
-            targetNote: {
-              id: 2423,
-              title: "something similar",
-            },
-            typeId: 8,
-            linkTypeLabel: "tagged by",
-            linkNameOfSource: "user",
-          },
-        ],
-        direct: [],
-      },
-    };
+    const links = makeMe.links.of('confused with').and.of('similar to').please();
     const { wrapper } = mountWithMockRoute(NoteFrameOfLinks, {
-      propsData: { links, owns: true, staticInfo: staticInfo },
+      propsData: { links, owns: true, staticInfo },
     });
     expect(wrapper.findAll(".parent-links li").length).toEqual(1);
     expect(wrapper.findAll(".parent-links li .link-multi").length).toEqual(2);
