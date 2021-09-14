@@ -1,5 +1,6 @@
 module.exports = {
   root: true,
+  parser: '@typescript-eslint/parser',
   env: {
     browser: true,
     es2021: true,
@@ -12,6 +13,8 @@ module.exports = {
     "plugin:vue/vue3-strongly-recommended",
     "plugin:testing-library/vue",
     "prettier",
+    'eslint:recommended',
+    'plugin:@typescript-eslint/recommended',
   ],
   settings: {
     "import/resolver": {
@@ -24,7 +27,7 @@ module.exports = {
     ecmaVersion: 12,
     sourceType: "module",
   },
-  plugins: ["vue", "testing-library"],
+  plugins: ["vue", "testing-library", '@typescript-eslint',],
   overrides: [
     {
       files: ["**/tests/**/*.[jt]s?(x)", "**/?(*.)+(spec|test).[jt]s?(x)"],

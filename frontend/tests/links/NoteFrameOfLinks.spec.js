@@ -1,39 +1,12 @@
 import _ from "lodash";
-import makeMe from "../fixtures/makeMe";
+import makeMe from "../fixtures/makeMe.ts";
 import NoteFrameOfLinks from "@/components/links/NoteFrameOfLinks.vue";
 import { staticInfo } from "../notes/fixtures-basic";
 import { mountWithMockRoute } from "../helpers";
 
 describe("a link lists of a note", () => {
   test("link to upper level", async () => {
-    makeMe.links.of('using') //.count(2).please();
-    const links = {
-      using: {
-        direct: [
-          {
-            id: 1938,
-            targetNote: {
-              id: 2423,
-              title: "a tool",
-            },
-            typeId: 15,
-            linkTypeLabel: "using",
-            linkNameOfSource: "user",
-          },
-          {
-            id: 1938,
-            targetNote: {
-              id: 2423,
-              title: "another tool",
-            },
-            typeId: 15,
-            linkTypeLabel: "using",
-            linkNameOfSource: "user",
-          },
-        ],
-        reverse: [],
-      },
-    };
+    const links = makeMe.links.of('using').count(2).please();
     const { wrapper } = mountWithMockRoute(NoteFrameOfLinks, {
       propsData: { links, owns: true, staticInfo },
     });
@@ -42,33 +15,7 @@ describe("a link lists of a note", () => {
   });
 
   test("tags are grouped", async () => {
-    const links = {
-      "tagged by": {
-        direct: [
-          {
-            id: 1938,
-            targetNote: {
-              id: 2423,
-              title: "tag1",
-            },
-            typeId: 8,
-            linkTypeLabel: "tagged by",
-            linkNameOfSource: "user",
-          },
-          {
-            id: 1938,
-            targetNote: {
-              id: 2423,
-              title: "tag2",
-            },
-            typeId: 8,
-            linkTypeLabel: "tagged by",
-            linkNameOfSource: "user",
-          },
-        ],
-        reverse: [],
-      },
-    };
+    const links = makeMe.links.of('tagged by').count(2).please();
     const { wrapper } = mountWithMockRoute(NoteFrameOfLinks, {
       propsData: { links, owns: true, staticInfo },
     });
@@ -76,6 +23,7 @@ describe("a link lists of a note", () => {
   });
 
   test("related, opposite, similar, confuse are grouped at top", async () => {
+    // const links = makeMe.links.of('confused with').and.of('similar to').please();
     const links = {
       "confused with": {
         direct: [
