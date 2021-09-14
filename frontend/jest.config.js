@@ -4,10 +4,11 @@ module.exports = {
   globals: {
     "vue-jest": { babelConfig: true },
   },
-  moduleFileExtensions: ["js", "json", "vue"],
+  moduleFileExtensions: ["js", "ts", "json", "vue"],
   transform: {
     ".*\\.(vue)$": "vue-jest",
     ".*\\.(js)$": "babel-jest",
+    "^.+\\.(ts|tsx)$": "ts-jest",
   },
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
