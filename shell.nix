@@ -1,8 +1,8 @@
 { pkgs ? import (builtins.fetchGit {
   name = "nixpkgs-unstable";
   url = "https://github.com/nixos/nixpkgs/";
-  ref = "refs/heads/master";
-  rev = "0e24c87754430cb6ad2f8c8c8021b29834a8845e";
+  ref = "refs/heads/nixpkgs-unstable";
+  rev = "071317d543205ee5f5611d391a37582f9b282240";
 }) { } }:
 with pkgs;
 let
@@ -88,6 +88,7 @@ in mkShell {
     vim
     vimpager
     vscodium
+    powerline
   ] ++ lib.optionals stdenv.isDarwin [
     darwin.apple_sdk.libs.utmp
     darwin.apple_sdk.libs.Xplugin
