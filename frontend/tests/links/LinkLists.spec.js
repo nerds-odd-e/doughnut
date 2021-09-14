@@ -1,10 +1,12 @@
 import _ from "lodash";
+import makeMe from "../fixtures/makeMe";
 import NoteFrameOfLinks from "@/components/links/NoteFrameOfLinks.vue";
 import { staticInfo } from "../notes/fixtures-basic";
 import { mountWithMockRoute } from "../helpers";
 
 describe("a link lists of a note", () => {
   test("link to upper level", async () => {
+    makeMe.links.of('using') //.count(2).please();
     const links = {
       using: {
         direct: [
