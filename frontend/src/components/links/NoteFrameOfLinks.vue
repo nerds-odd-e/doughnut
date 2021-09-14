@@ -48,7 +48,7 @@
   <ul class="children-links">
     <template v-for="(linksOfType, linkType) in linksReader.childrenLinks" :key="linkType">
       <li v-if="linksOfType.reverse.length > 0">
-        <span>{{ reverseLabel(linkType) }} </span>
+        <span>{{ linksReader.reverseLabel(linkType) }} </span>
         <LinkLink
           class="link-multi"
           v-for="link in linksOfType.reverse"
@@ -76,16 +76,6 @@ const linksReader = computed(()=> {
   if(!props.links) return {}
   return new LinksReader(props.staticInfo.linkTypeOptions, props.links)
 })
-
-const reverseLabel = function (lbl) {
-  if (!props.staticInfo || !props.staticInfo.linkTypeOptions) {
-    return;
-  }
-  const { reversedLabel } = props.staticInfo.linkTypeOptions.find(
-    ({ label }) => lbl === label
-  );
-  return reversedLabel;
-};
 
 </script>
 

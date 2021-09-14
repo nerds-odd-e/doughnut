@@ -54,6 +54,13 @@ class LinksReader {
         .map((t) => t[1]);
     }
 
+    reverseLabel(lbl: string): string {
+        const { reversedLabel } = this.linkTypeOptions.find(
+            ({ label }) => lbl === label
+        );
+        return reversedLabel;
+    };
+
 
 }
 
