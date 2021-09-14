@@ -13,7 +13,6 @@ let
   };
   apple_sdk = darwin.apple_sdk.frameworks;
   nodejs = nodejs-16_x;
-  intellij = jetbrains.idea-community;
 in mkShell {
   name = "doughnut";
   MYSQL_HOME = builtins.getEnv "MYSQL_HOME";
@@ -28,7 +27,6 @@ in mkShell {
     libgccjit
     gradle
     nodejs
-    python3
     yarn
     jdk16
     direnv
@@ -76,7 +74,6 @@ in mkShell {
     libressl
     patchelf
     cacert
-    glances
     httpie
     mysql80
     mysql-client
