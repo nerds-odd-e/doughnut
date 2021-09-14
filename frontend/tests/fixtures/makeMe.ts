@@ -1,7 +1,7 @@
 
 const makeMe = {
     links: {
-        of: function(linkType){
+        of: function(linkType: string){
 
         }
     }
