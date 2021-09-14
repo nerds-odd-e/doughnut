@@ -9,8 +9,8 @@
         />
       </li>
     </template>
-    <li v-if="!!groupedLinks && groupedLinks.length > 0">
-      <template v-for="{ direct, reverse } in groupedLinks" :key="direct">
+    <li v-if="!!linksReader.groupedLinks && linksReader.groupedLinks.length > 0">
+      <template v-for="{ direct, reverse } in linksReader.groupedLinks" :key="direct">
         <LinkLink
           class="link-multi"
           v-for="link in direct"
@@ -29,7 +29,7 @@
         />
       </template>
     </li>
-    <template v-for="(linksOfType, linkType) in tagLinks" :key="linkType">
+    <template v-for="(linksOfType, linkType) in linksReader.tagLinks" :key="linkType">
       <li v-if="linksOfType.direct.length > 0">
         <LinkLink
           class="link-multi"
@@ -46,7 +46,7 @@
   <slot />
 
   <ul class="children-links">
-    <template v-for="(linksOfType, linkType) in childrenLinks" :key="linkType">
+    <template v-for="(linksOfType, linkType) in linksReader.childrenLinks" :key="linkType">
       <li v-if="linksOfType.reverse.length > 0">
         <span>{{ reverseLabel(linkType) }} </span>
         <LinkLink
@@ -76,6 +76,7 @@ const linksReader = computed(()=> {
   if(!props.links) return {}
   return new LinksReader(props.staticInfo.linkTypeOptions, props.links)
 })
+
 const reverseLabel = function (lbl) {
   if (!props.staticInfo || !props.staticInfo.linkTypeOptions) {
     return;
@@ -86,46 +87,6 @@ const reverseLabel = function (lbl) {
   return reversedLabel;
 };
 
-const taggingTypes = () => {
-  if (!props.staticInfo || !props.staticInfo.linkTypeOptions) return [];
-  return props.staticInfo.linkTypeOptions
-    .filter((t) => t.value == 8)
-    .map((t) => t.label);
-};
-
-const groupedTypes = () => {
-  if (!props.staticInfo || !props.staticInfo.linkTypeOptions) return [];
-  return props.staticInfo.linkTypeOptions
-    .filter((t) => [1, 12, 22, 23].includes(parseInt(t.value)))
-    .map((t) => t.label);
-};
-
-const childrenLinks = computed(() => {
-  const tTypes = taggingTypes();
-  const gTypes = groupedTypes();
-  if (!props.links) return;
-  return Object.fromEntries(
-    Object.entries(props.links).filter(
-      (t) => !gTypes.includes(t[0])
-    )
-  );
-});
-
-const tagLinks = computed(() => {
-  const tTypes = taggingTypes();
-  if (!props.links) return;
-  return Object.fromEntries(
-    Object.entries(props.links).filter((t) => tTypes.includes(t[0]))
-  );
-});
-
-const groupedLinks = computed(() => {
-  const tTypes = groupedTypes();
-  if (!props.links) return;
-  return Object.entries(props.links)
-    .filter((t) => tTypes.includes(t[0]))
-    .map((t) => t[1]);
-});
 </script>
 
 <style scoped>
