@@ -32,7 +32,7 @@ describe("a link lists of a note", () => {
     expect(wrapper.findAll(".children-links li").length).toEqual(0);
   });
 
-  test("taggings are grouped", async () => {
+  test("taggings (reverse of tagged by) are grouped", async () => {
     const links = makeMe.links.of("tagged by").reverse.count(2).please();
     const { wrapper } = mountWithMockRoute(NoteFrameOfLinks, {
       propsData: { links, owns: true, staticInfo },

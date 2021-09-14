@@ -1,6 +1,6 @@
 <template>
   <ul class="parent-links">
-    <template v-for="(linksOfType, linkType) in hierachyLinks" :key="linkType">
+    <template v-for="(linksOfType, linkType) in linksReader.hierachyLinks" :key="linkType">
       <li v-for="link in linksOfType.direct" :key="link.id">
         <LinkLink
           v-bind="{ link, owns, colors: staticInfo.colors }"
@@ -65,9 +65,17 @@
 <script setup>
 import { computed } from "@vue/runtime-core";
 import LinkLink from "./LinkLink.vue";
+import LinksReader from "../../models/LinksReader"
 
 const props = defineProps({ links: Object, owns: Boolean, staticInfo: Object });
 const emits = defineEmits(["updated"]);
+const linksReader = computed(()=> {
+  if (!props.staticInfo || !props.staticInfo.linkTypeOptions) {
+    return {}
+  }
+  if(!props.links) return {}
+  return new LinksReader(props.staticInfo.linkTypeOptions, props.links)
+})
 const reverseLabel = function (lbl) {
   if (!props.staticInfo || !props.staticInfo.linkTypeOptions) {
     return;
@@ -91,17 +99,6 @@ const groupedTypes = () => {
     .filter((t) => [1, 12, 22, 23].includes(parseInt(t.value)))
     .map((t) => t.label);
 };
-
-const hierachyLinks = computed(() => {
-  const tTypes = taggingTypes();
-  const gTypes = groupedTypes();
-  if (!props.links) return;
-  return Object.fromEntries(
-    Object.entries(props.links).filter(
-      (t) => !tTypes.includes(t[0]) && !gTypes.includes(t[0])
-    )
-  );
-});
 
 const childrenLinks = computed(() => {
   const tTypes = taggingTypes();
