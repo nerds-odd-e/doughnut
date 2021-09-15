@@ -91,3 +91,6 @@ frontend/app.*.symbols
 
 # Obfuscation related
 frontend/app.*.map.json
+
+# local nix-shell MySQL DB instance folder/files
+mysql/
