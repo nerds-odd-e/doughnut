@@ -27,8 +27,8 @@
     "nonGlobalStepBaseDir": "cypress/step_definitions"
   },
   "devDependencies": {
-    "@testing-library/cypress": "^8.0.1",
-    "cypress": "^8.4.0",
+    "@testing-library/cypress": "7.0.6",
+    "cypress": "7.4.0",
     "cypress-cucumber-preprocessor": "^4.2",
     "cypress-file-upload": "^5.0.3",
     "cypress-image-diff-js": "^1.14.2",

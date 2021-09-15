@@ -116,7 +116,6 @@ in mkShell {
     apple_sdk.SystemConfiguration
     xcodebuild
   ] ++ lib.optionals (!stdenv.isDarwin) [
-    cypress
     google-chrome
     psmisc
     x11vnc
