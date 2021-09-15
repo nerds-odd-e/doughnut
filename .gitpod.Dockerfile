@@ -41,69 +41,69 @@ RUN install-packages mysql-server \
 
 # Install our own MySQL config
 #COPY infra/gitpod/mysql/mysql.cnf /etc/mysql/mysql.conf.d/mysqld.cnf
-RUN cat <<\EOF > /etc/mysql/mysql.conf.d/mysqld.cnf
-[mysqld_safe]
-socket		= /var/run/mysqld/mysqld.sock
-nice		= 0
+#RUN <<EOF > /etc/mysql/mysql.conf.d/mysqld.cnf
+RUN rm -f /etc/mysql/mysql.conf.d/mysqld.cnf
+RUN rm -f /etc/mysql/mysql.conf.d/client.cnf
+RUN rm -f /etc/mysql/mysql-bashrc-launch.sh
 
-[mysqld]
-user		= gitpod
-pid-file	= /var/run/mysqld/mysqld.pid
-socket		= /var/run/mysqld/mysqld.sock
-port		= 3309
-basedir		= /usr
-datadir		= /workspace/mysql
-tmpdir		= /tmp
-lc-messages-dir	= /usr/share/mysql
-skip-external-locking
-bind-address		= 127.0.0.1
-
-key_buffer_size		= 16M
-max_allowed_packet	= 16M
-thread_stack		= 192K
-thread_cache_size   = 8
-
-myisam-recover-options  = BACKUP
-
-general_log_file        = /var/log/mysql/mysql.log
-general_log             = 1
-log_error               = /var/log/mysql/error.log
+RUN <<EOF
+echo "[mysqld_safe]" >> /etc/mysql/mysql.conf.d/mysqld.cnf
+echo "socket		= /var/run/mysqld/mysqld.sock" >> /etc/mysql/mysql.conf.d/mysqld.cnf
+echo "nice		= 0" >> /etc/mysql/mysql.conf.d/mysqld.cnf
+echo "\n" >> /etc/mysql/mysql.conf.d/mysqld.cnf
+echo "[mysqld]" >> /etc/mysql/mysql.conf.d/mysqld.cnf
+echo "user		= gitpod" >> /etc/mysql/mysql.conf.d/mysqld.cnf
+echo "pid-file	= /var/run/mysqld/mysqld.pid" >> /etc/mysql/mysql.conf.d/mysqld.cnf
+echo "socket		= /var/run/mysqld/mysqld.sock" >> /etc/mysql/mysql.conf.d/mysqld.cnf
+echo "port		= 3309" >> /etc/mysql/mysql.conf.d/mysqld.cnf
+echo "basedir		= /usr" >> /etc/mysql/mysql.conf.d/mysqld.cnf
+echo "datadir		= /workspace/mysql" >> /etc/mysql/mysql.conf.d/mysqld.cnf
+echo "tmpdir		= /tmp" >>/etc/mysql/mysql.conf.d/mysqld.cnf
+echo "lc-messages-dir	= /usr/share/mysql" >> /etc/mysql/mysql.conf.d/mysqld.cnf
+echo "skip-external-locking" >> /etc/mysql/mysql.conf.d/mysqld.cnf
+echo "bind-address		= 127.0.0.1" >> /etc/mysql/mysql.conf.d/mysqld.cnf
+echo "\n" >> /etc/mysql/mysql.conf.d/mysqld.cnf
+echo "key_buffer_size		= 16M" >> /etc/mysql/mysql.conf.d/mysqld.cnf
+echo "max_allowed_packet	= 16M" >> /etc/mysql/mysql.conf.d/mysqld.cnf
+echo "thread_stack		= 192K" >> /etc/mysql/mysql.conf.d/mysqld.cnf
+echo "thread_cache_size   = 8" >> /etc/mysql/mysql.conf.d/mysqld.cnf
+echo "\n" >> /etc/mysql/mysql.conf.d/mysqld.cnf
+echo "myisam-recover-options  = BACKUP" >> /etc/mysql/mysql.conf.d/mysqld.cnf
+echo "\n" >> /etc/mysql/mysql.conf.d/mysqld.cnf
+echo "general_log_file        = /var/log/mysql/mysql.log" >> /etc/mysql/mysql.conf.d/mysqld.cnf
+echo "general_log             = 1" >> /etc/mysql/mysql.conf.d/mysqld.cnf
+echo "log_error               = /var/log/mysql/error.log" >> /etc/mysql/mysql.conf.d/mysqld.cnf
 EOF
 
 # Install default-login for MySQL clients
 #COPY infra/gitpod/mysql/client.cnf /etc/mysql/mysql.conf.d/client.cnf
-RUN cat <<\EOF > /etc/mysql/mysql.conf.d/client.cnf
-[client]
-host     = localhost
-user     = root
-password =
-socket   = /var/run/mysqld/mysqld.sock
-[mysql_upgrade]
-host     = localhost
-user     = root
-password =
-socket   = /var/run/mysqld/mysqld.sock
+#RUN cat <<\EOF > /etc/mysql/mysql.conf.d/client.cnf
+RUN <<EOF
+echo "[client]" >> /etc/mysql/mysql.conf.d/client.cnf
+echo "host     = localhost" >> /etc/mysql/mysql.conf.d/client.cnf
+echo "user     = root" >> /etc/mysql/mysql.conf.d/client.cnf
+echo "password =" >> /etc/mysql/mysql.conf.d/client.cnf
+echo "socket   = /var/run/mysqld/mysqld.sock" >> /etc/mysql/mysql.conf.d/client.cnf
+echo "[mysql_upgrade]" >> /etc/mysql/mysql.conf.d/client.cnf
+echo "host     = localhost" >> /etc/mysql/mysql.conf.d/client.cnf
+echo "user     = root" >> /etc/mysql/mysql.conf.d/client.cnf
+echo "password =" >> /etc/mysql/mysql.conf.d/client.cnf
+echo "socket   = /var/run/mysqld/mysqld.sock" >> /etc/mysql/mysql.conf.d/client.cnf
 EOF
 
 #COPY infra/gitpod/mysql/mysql-bashrc-launch.sh /etc/mysql/mysql-bashrc-launch.sh
-RUN cat <<\EOF > /etc/mysql/mysql-bashrc-launch.sh
-#!/bin/bash
-
-# this script is intended to be called from .bashrc
-# This is a workaround for not having something like supervisord
-
-if [ ! -e /var/run/mysqld/gitpod-init.lock ]
-then
-    touch /var/run/mysqld/gitpod-init.lock
-
-    # initialize database structures on disk, if needed
-    [ ! -d /workspace/mysql ] && mysqld --initialize-insecure
-
-    # launch database, if not running
-    [ ! -e /var/run/mysqld/mysqld.pid ] && mysqld --daemonize
-
-    rm /var/run/mysqld/gitpod-init.lock
-fi
+#RUN cat <<\EOF > /etc/mysql/mysql-bashrc-launch.sh
+RUN <<EOF
+echo "#!/bin/bash" >> /etc/mysql/mysql-bashrc-launch.sh
+echo "\n" >> /etc/mysql/mysql-bashrc-launch.sh
+echo "if [ ! -e /var/run/mysqld/gitpod-init.lock ]" >> /etc/mysql/mysql-bashrc-launch.sh
+echo "then" >> /etc/mysql/mysql-bashrc-launch.sh
+echo "    touch /var/run/mysqld/gitpod-init.lock" >> /etc/mysql/mysql-bashrc-launch.sh
+echo "\n" >> /etc/mysql/mysql-bashrc-launch.sh
+echo "    [ ! -d /workspace/mysql ] && mysqld --initialize-insecure" >> /etc/mysql/mysql-bashrc-launch.sh
+echo "    [ ! -e /var/run/mysqld/mysqld.pid ] && mysqld --daemonize" >> /etc/mysql/mysql-bashrc-launch.sh
+echo "    rm /var/run/mysqld/gitpod-init.lock" >> /etc/mysql/mysql-bashrc-launch.sh
+echo "fi" >> /etc/mysql/mysql-bashrc-launch.sh
 EOF
 
 # Install Jetbrains Mono font
