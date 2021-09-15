@@ -26,6 +26,7 @@ ports:
 
 tasks:
   - init: >
+      UNSET DISPLAY &&
       cp infra/gitpod/.zshrc /home/gitpod/ &&
       cp infra/gitpod/.p10k.zsh /home/gitpod/ &&
       git config --global init.defaultBranch main &&
