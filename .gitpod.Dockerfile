@@ -156,3 +156,5 @@ RUN . /home/gitpod/.nix-profile/etc/profile.d/nix.sh \
 
 # MySQL bash launch in docker container instance without resorting to supervisord
 RUN echo "/etc/mysql/mysql-bashrc-launch.sh" >> ~/.bashrc
+
+EXPOSE 3309
