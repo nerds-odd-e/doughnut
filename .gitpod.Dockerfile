@@ -40,12 +40,12 @@ RUN install-packages mysql-server \
  && chown -R gitpod:gitpod /etc/mysql /var/run/mysqld /var/log/mysql /var/lib/mysql /var/lib/mysql-files /var/lib/mysql-keyring /var/lib/mysql-upgrade
 
 # Install our own MySQL config
-COPY infra/gitpod/mysql/mysql.cnf /etc/mysql/mysql.conf.d/mysqld.cnf
+#COPY infra/gitpod/mysql/mysql.cnf /etc/mysql/mysql.conf.d/mysqld.cnf
 
 # Install default-login for MySQL clients
-COPY infra/gitpod/mysql/client.cnf /etc/mysql/mysql.conf.d/client.cnf
+#COPY infra/gitpod/mysql/client.cnf /etc/mysql/mysql.conf.d/client.cnf
 
-COPY infra/gitpod/mysql/mysql-bashrc-launch.sh /etc/mysql/mysql-bashrc-launch.sh
+#COPY infra/gitpod/mysql/mysql-bashrc-launch.sh /etc/mysql/mysql-bashrc-launch.sh
 
 # Install Jetbrains Mono font
 RUN wget https://download.jetbrains.com/fonts/JetBrainsMono-2.242.zip \
@@ -100,5 +100,6 @@ RUN curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zs
 RUN . /home/gitpod/.nix-profile/etc/profile.d/nix.sh \
   && nix-env -i any-nix-shell -f https://github.com/NixOS/nixpkgs/archive/master.tar.gz \
   && echo 'any-nix-shell zsh --info-right | . /dev/stdin' >> /home/gitpod/.zshrc
+
 # MySQL bash launch in docker container instance without resorting to supervisord
-RUN echo "/etc/mysql/mysql-bashrc-launch.sh" >> ~/.bashrc
+#RUN echo "/etc/mysql/mysql-bashrc-launch.sh" >> ~/.bashrc
