@@ -9,7 +9,6 @@ class LinkBuilder extends Builder{
 
     constructor(parentBuilder: Builder, linkType: string) {
       super(parentBuilder)
-      this.parentBuilder = parentBuilder
       this.linkType = linkType
       this.cnt = 1
       this.isReverse = false

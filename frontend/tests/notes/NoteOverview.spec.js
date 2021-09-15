@@ -1,14 +1,15 @@
-import { render, screen } from "@testing-library/vue";
-import NoteOverview from "@/components/notes/NoteOverview.vue";
-import { createMockNote } from "./NoteShow-fixtures";
-import { renderWithMockRoute } from "../helpers";
+import { screen } from "@testing-library/vue"
+import NoteOverview from "@/components/notes/NoteOverview.vue"
+import { renderWithMockRoute } from "../helpers"
+import makeMe from "../fixtures/makeMe"
 
 describe("note overview", () => {
-  test("should show pink banner if the note was updated within the last 12 hours", async () => {
-    const note = createMockNote({ recentlyUpdated: true });
-    renderWithMockRoute(NoteOverview, { props: note });
+  it("should render one note", async () => {
+    const note = makeMe.aNote.please()
+    renderWithMockRoute(NoteOverview, { props: note })
 
     await screen.findByText('Desc')
   });
 
 });
+
