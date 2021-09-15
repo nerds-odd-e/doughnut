@@ -41,11 +41,70 @@ RUN install-packages mysql-server \
 
 # Install our own MySQL config
 #COPY infra/gitpod/mysql/mysql.cnf /etc/mysql/mysql.conf.d/mysqld.cnf
+RUN cat <<EOF > /etc/mysql/mysql.conf.d/mysqld.cnf
+[mysqld_safe]
+socket		= /var/run/mysqld/mysqld.sock
+nice		= 0
+
+[mysqld]
+user		= gitpod
+pid-file	= /var/run/mysqld/mysqld.pid
+socket		= /var/run/mysqld/mysqld.sock
+port		= 3309
+basedir		= /usr
+datadir		= /workspace/mysql
+tmpdir		= /tmp
+lc-messages-dir	= /usr/share/mysql
+skip-external-locking
+bind-address		= 127.0.0.1
+
+key_buffer_size		= 16M
+max_allowed_packet	= 16M
+thread_stack		= 192K
+thread_cache_size   = 8
+
+myisam-recover-options  = BACKUP
+
+general_log_file        = /var/log/mysql/mysql.log
+general_log             = 1
+log_error               = /var/log/mysql/error.log
+EOF
 
 # Install default-login for MySQL clients
 #COPY infra/gitpod/mysql/client.cnf /etc/mysql/mysql.conf.d/client.cnf
+RUN cat <<EOF > /etc/mysql/mysql.conf.d/client.cnf
+[client]
+host     = localhost
+user     = root
+password =
+socket   = /var/run/mysqld/mysqld.sock
+[mysql_upgrade]
+host     = localhost
+user     = root
+password =
+socket   = /var/run/mysqld/mysqld.sock
+EOF
 
 #COPY infra/gitpod/mysql/mysql-bashrc-launch.sh /etc/mysql/mysql-bashrc-launch.sh
+RUN cat <<EOF > /etc/mysql/mysql-bashrc-launch.sh
+#!/bin/bash
+
+# this script is intended to be called from .bashrc
+# This is a workaround for not having something like supervisord
+
+if [ ! -e /var/run/mysqld/gitpod-init.lock ]
+then
+    touch /var/run/mysqld/gitpod-init.lock
+
+    # initialize database structures on disk, if needed
+    [ ! -d /workspace/mysql ] && mysqld --initialize-insecure
+
+    # launch database, if not running
+    [ ! -e /var/run/mysqld/mysqld.pid ] && mysqld --daemonize
+
+    rm /var/run/mysqld/gitpod-init.lock
+fi
+EOF
 
 # Install Jetbrains Mono font
 RUN wget https://download.jetbrains.com/fonts/JetBrainsMono-2.242.zip \
@@ -102,4 +161,4 @@ RUN . /home/gitpod/.nix-profile/etc/profile.d/nix.sh \
   && echo 'any-nix-shell zsh --info-right | . /dev/stdin' >> /home/gitpod/.zshrc
 
 # MySQL bash launch in docker container instance without resorting to supervisord
-#RUN echo "/etc/mysql/mysql-bashrc-launch.sh" >> ~/.bashrc
+RUN echo "/etc/mysql/mysql-bashrc-launch.sh" >> ~/.bashrc

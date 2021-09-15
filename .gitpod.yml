@@ -24,10 +24,6 @@ ports:
 
 tasks:
   - init: >
-      sudo cp infra/gitpod/mysql/mysql.cnf /etc/mysql/mysql.conf.d/mysqld.cnf &&
-      sudo cp infra/gitpod/mysql/client.cnf /etc/mysql/mysql.conf.d/client.cnf &&
-      sudo cp infra/gitpod/mysql/mysql-bashrc-launch.sh /etc/mysql/mysql-bashrc-launch.sh &&
-      echo '/etc/mysql/mysql-bashrc-launch.sh' >> /home/gitpod/.bashrc &&
       cp infra/gitpod/.zshrc /home/gitpod/ &&
       cp infra/gitpod/.p10k.zsh /home/gitpod/ &&
       git config --global init.defaultBranch main &&
