@@ -31,9 +31,6 @@ RUN apt-get update \
    procps \
    powerline \
    fonts-powerline \
-   snapd \
-  && snap install core \
-  && snap install lsd \
   && rm -rf /var/lib/apt/lists/* \
   && rm -rf /var/cache/apt
 

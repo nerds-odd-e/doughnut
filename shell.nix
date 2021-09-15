@@ -13,6 +13,7 @@ let
   };
   apple_sdk = darwin.apple_sdk.frameworks;
   nodejs = nodejs-16_x;
+  intellij = jetbrains.idea-community;
 in mkShell {
   name = "doughnut";
   MYSQL_HOME = builtins.getEnv "MYSQL_HOME";
@@ -29,6 +30,7 @@ in mkShell {
     nodejs
     yarn
     jdk16
+    python3
     direnv
     nix-direnv
     any-nix-shell
@@ -74,6 +76,7 @@ in mkShell {
     libressl
     patchelf
     cacert
+    glances
     httpie
     mysql80
     mysql-client
@@ -116,7 +119,11 @@ in mkShell {
     apple_sdk.SystemConfiguration
     xcodebuild
   ] ++ lib.optionals (!stdenv.isDarwin) [
+    cypress
+    firefox
+    geckodriver
     google-chrome
+    intellij
     psmisc
     x11vnc
     xclip
