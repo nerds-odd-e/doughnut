@@ -31,6 +31,9 @@ RUN apt-get update \
    procps \
    powerline \
    fonts-powerline \
+   snapd \
+  && snap install core \
+  && snap install lsd \
   && rm -rf /var/lib/apt/lists/* \
   && rm -rf /var/cache/apt
 
@@ -101,8 +104,7 @@ USER gitpod
 ENV USER gitpod
 WORKDIR /home/gitpod
 
-RUN mkdir -p /home/gitpod/.bashrc.d \
-  && echo "UNSET DISPLAY" >> /home/gitpod/.bashrc
+RUN mkdir -p /home/gitpod/.bashrc.d
 
 # Make zsh default && install zimfw
 RUN curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh \
