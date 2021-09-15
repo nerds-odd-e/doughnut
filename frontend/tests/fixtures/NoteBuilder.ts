@@ -9,6 +9,12 @@ class NoteBuilder extends Builder {
     this.data = {}
   }
 
+  get withAChildNote(): NoteBuilder {
+    const childBuilder = new NoteBuilder(this)
+    this.childrenBuilders.push(childBuilder)
+    return childBuilder
+  }
+
   recentlyUpdated(value: boolean): NoteBuilder {
     this.data.recentlyUpdated = value
     return this
