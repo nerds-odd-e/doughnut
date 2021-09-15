@@ -1,6 +1,6 @@
 {
   "baseUrl": "http://localhost:3000",
   "environment": "development",
-  "viewportHeight": 768,
-  "viewportWidth": 1024
+  "viewportWidth": 1000,
+  "viewportHeight": 660
 }
