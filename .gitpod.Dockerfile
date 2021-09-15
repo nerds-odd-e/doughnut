@@ -41,7 +41,7 @@ RUN install-packages mysql-server \
 
 # Install our own MySQL config
 #COPY infra/gitpod/mysql/mysql.cnf /etc/mysql/mysql.conf.d/mysqld.cnf
-RUN cat <<EOF > /etc/mysql/mysql.conf.d/mysqld.cnf
+RUN cat <<\EOF > /etc/mysql/mysql.conf.d/mysqld.cnf
 [mysqld_safe]
 socket		= /var/run/mysqld/mysqld.sock
 nice		= 0
@@ -72,7 +72,7 @@ EOF
 
 # Install default-login for MySQL clients
 #COPY infra/gitpod/mysql/client.cnf /etc/mysql/mysql.conf.d/client.cnf
-RUN cat <<EOF > /etc/mysql/mysql.conf.d/client.cnf
+RUN cat <<\EOF > /etc/mysql/mysql.conf.d/client.cnf
 [client]
 host     = localhost
 user     = root
@@ -86,7 +86,7 @@ socket   = /var/run/mysqld/mysqld.sock
 EOF
 
 #COPY infra/gitpod/mysql/mysql-bashrc-launch.sh /etc/mysql/mysql-bashrc-launch.sh
-RUN cat <<EOF > /etc/mysql/mysql-bashrc-launch.sh
+RUN cat <<\EOF > /etc/mysql/mysql-bashrc-launch.sh
 #!/bin/bash
 
 # this script is intended to be called from .bashrc
