@@ -5,21 +5,16 @@ ports:
   # Springboot Backend Server
   - port: 8081
     onOpen: ignore
-    visibility: public
   - port: 9081
     onOpen: ignore
-    visibility: public
   - port: 9082
     onOpen: ignore
-    visibility: public
   # Vite Frontend Dev Server
   - port: 3000
     onOpen: open-browser
     visibility: public
   # MySQL 8.0 DB Server
   - port: 3309
-    onOpen: ignore
-  - port: 33090
     onOpen: ignore
   # Remote VNC
   - port: 5900
@@ -46,6 +41,7 @@ vscode:
     - Pivotal.vscode-spring-boot
     - Shelex.vscode-cy-helper
     - xyz.plsql-language
+    - bajdzis.vscode-database
     - vscodevim.vim
     - shd101wyy.markdown-preview-enhanced
     - GulajavaMinistudio.mayukaithemevsc

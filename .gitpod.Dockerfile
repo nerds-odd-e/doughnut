@@ -1,5 +1,6 @@
 FROM gitpod/workspace-full-vnc
 
+# -------------------- USER root --------------------
 USER root
 
 # Install Cypress dependencies.
@@ -15,6 +16,7 @@ RUN apt-get update \
    libxtst6 \
    xauth \
    xvfb \
+# Nice to haves
    zsh \
    bat \
    htop \
@@ -24,13 +26,6 @@ RUN apt-get update \
    unzip \
    wget \
    zip \
-# Dependencies for IntelliJ rendering
-   libxext6 \
-   libxrender1 \
-   libxtst6 \
-   libxi6 \
-   libfreetype6 \
-   git \
    bash-completion \
    procps \
    powerline \
@@ -38,6 +33,19 @@ RUN apt-get update \
  # clean apt to reduce image size:
  && rm -rf /var/lib/apt/lists/* \
  && rm -rf /var/cache/apt
+
+# Install MySQL DB
+RUN install-packages mysql-server \
+ && mkdir -p /var/run/mysqld /var/log/mysql \
+ && chown -R gitpod:gitpod /etc/mysql /var/run/mysqld /var/log/mysql /var/lib/mysql /var/lib/mysql-files /var/lib/mysql-keyring /var/lib/mysql-upgrade
+
+# Install our own MySQL config
+COPY infra/gitpod/mysql/mysql.cnf /etc/mysql/mysql.conf.d/mysqld.cnf
+
+# Install default-login for MySQL clients
+COPY infra/gitpod/mysql/client.cnf /etc/mysql/mysql.conf.d/client.cnf
+
+COPY infra/gitpod/mysql/mysql-bashrc-launch.sh /etc/mysql/mysql-bashrc-launch.sh
 
 # Install Jetbrains Mono font
 RUN wget https://download.jetbrains.com/fonts/JetBrainsMono-2.242.zip \
@@ -54,6 +62,7 @@ RUN addgroup --system nixbld \
   && mkdir -m 0755 /nix && chown gitpod /nix \
   && mkdir -p /etc/nix && echo 'sandbox = false' > /etc/nix/nix.conf
   
+# -------------------- USER gitpod --------------------
 # Install Nix
 CMD /bin/bash -l
 USER gitpod
@@ -91,3 +100,5 @@ RUN curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zs
 RUN . /home/gitpod/.nix-profile/etc/profile.d/nix.sh \
   && nix-env -i any-nix-shell -f https://github.com/NixOS/nixpkgs/archive/master.tar.gz \
   && echo 'any-nix-shell zsh --info-right | . /dev/stdin' >> /home/gitpod/.zshrc
+# MySQL bash launch in docker container instance without resorting to supervisord
+RUN echo "/etc/mysql/mysql-bashrc-launch.sh" >> ~/.bashrc
