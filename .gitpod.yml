@@ -32,7 +32,7 @@ tasks:
       sudo touch /var/run/mysqld/gitpod-init.lock &&
       [ ! -d /workspace/mysql ] && mysqld --initialize-insecure &&
       [ ! -e /var/run/mysqld/mysqld.pid ] && mysqld --daemonize &&
-      rm /var/run/mysqld/gitpod-init.lock &&
+      rm -f /var/run/mysqld/gitpod-init.lock &&
       sleep 5 && mysql -u root -S /var/run/mysqld/mysqld.sock < infra/gitpod/mysql/init_doughnut_db.sql
 
 vscode:
