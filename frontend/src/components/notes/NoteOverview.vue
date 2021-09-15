@@ -13,7 +13,7 @@
   </p>
 </template>
 
-<script>
+<script lang="ts">
 import NoteViewedByUserWithoutChildren from "./NoteViewedByUserWithoutChildren.vue";
 
 export default {
@@ -24,6 +24,8 @@ export default {
     children: Array,
     ancestors: Array,
     notebook: Object,
+    level: Number,
+    recentlyUpdated: Boolean,
     owns: { type: Boolean, required: true },
   },
   emits: ["updated"],

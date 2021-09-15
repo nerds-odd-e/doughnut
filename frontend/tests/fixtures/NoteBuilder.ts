@@ -4,7 +4,7 @@ import Builder from "./Builder"
 class NoteBuilder extends Builder {
   data: any
 
-  constructor(parentBuilder: Builder, linkType: string) {
+  constructor(parentBuilder?: Builder) {
     super(parentBuilder)
     this.data = {}
   }

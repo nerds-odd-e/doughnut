@@ -3,10 +3,10 @@ import NoteBuilder from "./NoteBuilder";
 
 class MakeMe {
     get links(): LinksBuilder {
-        return new LinksBuilder(null)
+        return new LinksBuilder()
     }
     get aNote(): NoteBuilder {
-        return new NoteBuilder(null)
+        return new NoteBuilder()
     }
 }
     

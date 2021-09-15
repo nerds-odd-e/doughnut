@@ -1,6 +1,5 @@
 import { render, screen } from "@testing-library/vue";
 import NoteShow from "@/components/notes/NoteShow.vue";
-import { createMockNote } from "./NoteShow-fixtures";
 import makeMe from "../fixtures/makeMe"
 
 describe("new/updated pink banner", () => {

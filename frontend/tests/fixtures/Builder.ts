@@ -1,9 +1,9 @@
 abstract class Builder {
-    protected parentBuilder: Builder
+    protected parentBuilder: Builder | undefined
 
     protected childrenBuilders: Array<Builder>
 
-    constructor(parentBuilder: Builder) {
+    constructor(parentBuilder?: Builder) {
       this.parentBuilder = parentBuilder
       this.childrenBuilders = []
     }
@@ -16,7 +16,7 @@ abstract class Builder {
     }
 
     please(): any {
-      if (this.parentBuilder !== null) {
+      if (this.parentBuilder !== undefined) {
         return this.parentBuilder.please()
       }
       return this.do()

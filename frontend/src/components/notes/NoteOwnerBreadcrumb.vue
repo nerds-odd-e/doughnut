@@ -1,7 +1,7 @@
 <template>
   <NoteBreadcrumbForOwnOrCircle
     :ancestors="ancestors"
-    :circle="!!notebook ? notebook.ownership.circle : nil"
+    :circle="!!notebook ? notebook.ownership.circle : null"
   >
     <slot />
   </NoteBreadcrumbForOwnOrCircle>

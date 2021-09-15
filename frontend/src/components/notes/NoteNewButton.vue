@@ -6,7 +6,7 @@
     <template #header>
       <NoteBreadcrumbForOwnOrCircle
         v-bind="{
-          circle: !!notebook ? notebook.ownership.circle : nil,
+          circle: !!notebook ? notebook.ownership.circle : null,
           ancestors,
         }"
       >

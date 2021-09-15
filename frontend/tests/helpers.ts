@@ -44,7 +44,7 @@ const mountWithMockRoute = (comp: Component, options: Options={}, currentRoute: 
   return withMockRoute(comp, options, currentRoute, mount)
 };
 
-const renderWithMockRoute = (comp: Component, options: Options={}, currentRoute, any) => {
+const renderWithMockRoute = (comp: Component, options: Options={}, currentRoute: any) => {
   return withMockRoute(comp, options, currentRoute, render)
 };
 
