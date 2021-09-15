@@ -35,9 +35,6 @@ cypress-visual-screenshots/
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 
-# DB
-mysql/
-
 # java
 .gradle
 backend/.classpath
@@ -76,9 +73,9 @@ nohup.out
 **/.DS_Store
 
 # infra secrets
-infra/ssl/
 !infra/gitpod
 !infra/salt/states/base_os/templates/doughnut_env.sh
+infra/ssl/
 
 # Frontend Vue/Vite related
 frontend/node_modules
