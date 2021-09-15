@@ -24,7 +24,6 @@ class NoteBuilder extends Builder {
     return merge({
       owns: true,
       recentlyUpdated: false,
-      level: 1,
       note: {
         id: 7,
         noteContent: {

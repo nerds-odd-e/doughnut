@@ -1,8 +1,17 @@
 import { createStore } from 'vuex'
-import note from './modules/note'
 
 export default createStore({
-  modules: {
-    note,
+  state: () => ({
+    all: {}
+  }),
+
+  getters: {
+    getNoteById: (state) => (id) => state.all[id]
+  },
+  
+  mutations: {
+    addNote (state, note) {
+      state.all[note.note.id] = note
+    },
   },
 })

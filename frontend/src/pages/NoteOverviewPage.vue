@@ -24,7 +24,10 @@ export default {
   methods: {
     fetchData() {
       restGet(`/api/notes/${this.noteId}`, (r) => (this.loading = r)).then(
-        (res) => (this.noteViewedByUser = res)
+        (res) => {
+          this.$store.commit('addNote', res)
+          this.noteViewedByUser = res
+        }
       );
     },
   },

@@ -13,11 +13,10 @@ Feature: Note overview with nested children
     And I open "Singapore" note from top level
     And I click on the overview button
 
-  @ignore
   Scenario: View the child notes of a child note in sequential order
     Then I should see the title "Singapore" of the notebook
     Then I should see the child notes "History,Geography" in order
-    Then I should see the child notes "History,Leaving Malaysia,Geography" in order
+    #Then I should see the child notes "History,Leaving Malaysia,Geography" in order
 
     @ignore
   Scenario: View the description of each note under the title

@@ -2,6 +2,7 @@ import { merge } from "lodash";
 import { Component } from "vue";
 import { mount } from "@vue/test-utils";
 import { render } from "@testing-library/vue";
+import store from "../src/store/index.js"
 
 type Options = {
 }
@@ -48,4 +49,14 @@ const renderWithMockRoute = (comp: Component, options: Options={}, currentRoute:
   return withMockRoute(comp, options, currentRoute, render)
 };
 
-export { mountWithMockRoute, renderWithMockRoute };
+const renderWithStoreAndMockRoute = (comp: Component, options: Options={}, currentRoute: any, func: (store: any)=>void) => {
+  func(store)
+  return withMockRoute(comp, merge(options, {
+    global: {
+      plugins: [store]
+    }
+
+  }), currentRoute, render)
+};
+
+export { mountWithMockRoute, renderWithMockRoute, renderWithStoreAndMockRoute };

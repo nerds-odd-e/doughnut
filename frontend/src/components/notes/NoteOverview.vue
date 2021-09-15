@@ -1,6 +1,6 @@
 <template>
   <NoteViewedByUserWithoutChildren
-    v-bind="{ note, links, ancestors, notebook, owns }"
+    v-bind="{ note: notex.note, links, ancestors, notebook, owns }"
     @updated="$emit('updated')"
   />
   <p
@@ -24,11 +24,13 @@ export default {
     children: Array,
     ancestors: Array,
     notebook: Object,
-    level: Number,
     recentlyUpdated: Boolean,
     owns: { type: Boolean, required: true },
   },
   emits: ["updated"],
   components: { NoteViewedByUserWithoutChildren },
+  computed: {
+    notex() { return this.$store.getters.getNoteById(this.note.id)}
+  }
 };
 </script>
