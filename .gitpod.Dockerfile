@@ -35,9 +35,9 @@ RUN apt-get update \
     curl \
     && apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 0xB1998361219BD9C9 \
     && curl -O https://cdn.azul.com/zulu/bin/zulu-repo_1.0.0-2_all.deb \
-    && apt-get install ./zulu-repo_1.0.0-2_all.deb \
-    && apt-get update \
-    && apt-get install zulu16-jdk \
+    && apt-get install -y ./zulu-repo_1.0.0-2_all.deb \
+    && apt-get update -y \
+    && apt-get install -y zulu16-jdk \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /var/cache/apt
 
