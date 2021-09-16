@@ -38,6 +38,7 @@ RUN apt-get update \
     && apt-get install -y ./zulu-repo_1.0.0-2_all.deb \
     && apt-get update -y \
     && apt-get install -y zulu16-jdk \
+    && update-alternatives --set java /usr/lib/jvm/zulu16/bin/java \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /var/cache/apt
 
@@ -122,7 +123,10 @@ RUN echo "if [ ! -e /var/run/mysqld/gitpod-init.lock ]" >> /home/gitpod/.bashrc 
     && echo "  [ ! -d /workspace/mysql ] && mysqld --initialize-insecure" >> /home/gitpod/.bashrc \
     && echo "  [ ! -e /var/run/mysqld/mysqld.pid ] && mysqld --daemonize" >> /home/gitpod/.bashrc \
     && echo "  rm /var/run/mysqld/gitpod-init.lock" >> /home/gitpod/.bashrc \
-    && echo "fi" >> /home/gitpod/.bashrc
+    && echo "fi" >> /home/gitpod/.bashrc \
+    && echo "export JAVA_HOME=/usr/lib/jvm/zulu16" >> /home/gitpod/.bashrc \
+    && echo "export PATH=$PATH:$JAVA_HOME/bin" >> /home/gitpod/.bashrc
+
 
 EXPOSE 3000
 EXPOSE 3309
