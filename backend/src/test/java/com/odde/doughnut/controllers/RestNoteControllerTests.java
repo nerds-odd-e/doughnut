@@ -74,15 +74,17 @@ class RestNoteControllerTests {
             assertThat(show.getNote(), equalTo(note));
             assertThat(show.getOwns(), is(true));
         }
-        
+
+        @Test
         void shouldBeAbleToSeeOwnNoteOverview() throws NoAccessRightException {
             Note note = makeMe.aNote().byUser(userModel).please();
             Note childNote = makeMe.aNote().byUser(userModel).under(note).please();
             makeMe.theNote(childNote).with10Children().please();
             makeMe.refresh(note);
             makeMe.refresh(childNote);
-            Note grandchildNote = childNote.getChildren().get(0);
             final RestNoteController.NotesBulk showOverview = controller.showOverview(note);
+            assertThat(showOverview.notes, hasSize(12));
+            assertThat(showOverview.parentChildren, hasKey(note.getId()));
 
         }
 
