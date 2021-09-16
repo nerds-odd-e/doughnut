@@ -109,14 +109,13 @@ RUN curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zs
     && zsh ~/.zim/zimfw.zsh install \
     && echo "unset DISPLAY" >> /home/gitpod/.zshrc
 
-RUN echo "#!/bin/bash" >> /home/gitpod/.bashrc \
-    && echo "if [ ! -e /var/run/mysqld/gitpod-init.lock ]" >> /home/gitpod/.bashrc \
+RUN echo "if [ ! -e /var/run/mysqld/gitpod-init.lock ]" >> /home/gitpod/.bashrc \
     && echo "then" >> /home/gitpod/.bashrc \
     && echo "  touch /var/run/mysqld/gitpod-init.lock" >> /home/gitpod/.bashrc \
     && echo "  [ ! -d /workspace/mysql ] && mysqld --initialize-insecure" >> /home/gitpod/.bashrc \
     && echo "  [ ! -e /var/run/mysqld/mysqld.pid ] && mysqld --daemonize" >> /home/gitpod/.bashrc \
     && echo "  rm /var/run/mysqld/gitpod-init.lock" >> /home/gitpod/.bashrc \
-    && echo "fi"
+    && echo "fi" >> /home/gitpod/.bashrc
 
 EXPOSE 3000
 EXPOSE 3309

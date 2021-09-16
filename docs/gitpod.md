@@ -2,19 +2,19 @@
 
 ## Pre-requisite
 
-- Google Chrome or Chrome/Chromium derivative browser.
-- A [Github](https://www.github.com).
-- A [Gitpod](https://www.gitpod.io/#gAet-started) signed up using your Github account above.
-- [Chrome extension for Gitpod](https://chrome.google.com/webstore/detail/gitpod-always-ready-to-co/dodmmooeoklaejobgleioelladacbeki). This chrome extension gives you a nice green 'Gitpod' button at the top of [doughnut Github](https://github.com/nerds-odd-e/doughnut) repo to launch your Gitpod workspace. You may also enter the URL `gitpod.io#https://github.com/nerds-odd-e/doughnut` to achieve the same effect.
+- Google Chrome or Chrome/Chromium derivative browser. Ensure the browser is configured to allow new tab spawning/popup for URL pattern `[*.gitpod.io]`.
+- A [Github](https://www.github.com) account (authroised for [doughnut Github](https://github.com/nerds-odd-e/doughnut) repo write access).
+- A [Gitpod](https://gitpod.io/login/) account signed up using your Github account above.
+- *Optional* [Chrome extension for Gitpod](https://chrome.google.com/webstore/detail/gitpod-always-ready-to-co/dodmmooeoklaejobgleioelladacbeki). This chrome extension gives you a nice green 'Gitpod' button at the top of [doughnut Github](https://github.com/nerds-odd-e/doughnut) repo to launch your Gitpod workspace. You may also enter the URL [gitpod.io#https://github.com/nerds-odd-e/doughnut](gitpod.io#https://github.com/nerds-odd-e/doughnut) to achieve the same effect.
 - [More details/info](https://www.gitpod.io/docs/browser-extension/) about starting up your doughnut dev env in Gitpod.
 
 ## Up & running your Gitpod `doughnut` development environment
 
 ### Basic Gitpod VSCode workspace
 
-- Visit [doughnut Github repository](https://github.com/nerds-odd-e/doughnut) from your chrome/chromium-derivative broswer; Click on the `Gitpod` green button (near the top right corner of `doughnut`'s Github page) to launch your development workspace. Or enter in your chomre browser's URL input `gitpod.io#https://github.com/nerds-odd-e/doughnut`
-- From your Gitpod VSCode workspace, bottom left hand corner, locate the `Login to Github` icon/button and perform your login by entering your relevant Github credentials in the new browser tab spawned.
-- Once your Gitpod workspace with VSCode has launched successfully in a new chrome/chromium-derivative browser from above step, open a VSCode 'terminal'. (ensure chrome browser allows tab/s opening)
+- Visit [doughnut Github](https://github.com/nerds-odd-e/doughnut) repo from your chrome/chromium-derivative broswer; Click on the `Gitpod` green button (near the top right corner of `doughnut`'s Github page if you have installed the chrome extension from above prerequisite step) to launch your development workspace. Or enter in your chomre browser's URL input [gitpod.io#https://github.com/nerds-odd-e/doughnut](gitpod.io#https://github.com/nerds-odd-e/doughnut).
+- From your Gitpod VSCode workspace browser tab launched from above step, at the bottom left hand corner of the VSCode IDE, locate the `Login to Github` icon/button and perform your Github login by entering your relevant Github credentials in the new browser tab spawned.
+- Once your Gitpod workspace with VSCode has launched successfully in a new chrome/chromium-derivative browser from above step, open a VSCode 'terminal'. (after VSCode browser tab is launched, another tab will launch which is a VNC connection to your gitpod for Cypress IDE launch for local development E2E testing use).
 
 ### zsh & git config to setup development workspace
 
