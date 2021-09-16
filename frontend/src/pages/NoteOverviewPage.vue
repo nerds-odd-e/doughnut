@@ -1,7 +1,7 @@
 <template>
-  <LoadingPage v-bind="{ loading, contentExists: !!noteViewedByUser }">
-    <div v-if="noteViewedByUser">
-      <NoteOverview v-bind="{...noteViewedByUser, noteId}" />
+  <LoadingPage v-bind="{ loading, contentExists: !!loaded }">
+    <div v-if="loaded">
+      <NoteOverview v-bind="{ noteId }" />
     </div>
   </LoadingPage>
 </template>
@@ -16,7 +16,7 @@ export default {
   props: { noteId: Number },
   data() {
     return {
-      noteViewedByUser: null,
+      loaded: false,
       loading: false,
     };
   },
@@ -27,7 +27,7 @@ export default {
         (res) => {
           this.$store.commit('loadNotes', res.notes)
           this.$store.commit('loadParentChildren', res.parentChildren)
-          this.noteViewedByUser = res
+          this.loaded = true
         }
       );
     },

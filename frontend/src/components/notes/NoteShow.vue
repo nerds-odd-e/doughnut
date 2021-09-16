@@ -1,4 +1,5 @@
 <template>
+<div :style="`margin-left: ${marginLeft}`">
   <NoteFrameOfLinks v-bind="{ links }" @updated="$emit('updated')">
     <div v-if="recentlyUpdated">This note has been changed recently.</div>
     <div class="note-body">
@@ -21,6 +22,7 @@
       </div>
     </div>
   </NoteFrameOfLinks>
+</div>
 </template>
 
 <script setup>
@@ -32,7 +34,7 @@ import ShowDescription from "./ShowDescription.vue";
 const props = defineProps({
   note: { type: Object, required: true },
   links: Object,
-  level: { type: Number, default: 2 },
+  level: { type: Number, default: 1 },
   recentlyUpdated: Boolean,
 });
 const emits = defineEmits(["updated"]);
@@ -40,6 +42,7 @@ const emits = defineEmits(["updated"]);
 const twoColumns = computed(
   () => !!props.note.notePicture && !!props.note.noteContent.description
 );
+const marginLeft = computed(()=>`${(props.level-1) * 10}px`)
 </script>
 
 <style scoped>
@@ -53,4 +56,5 @@ const twoColumns = computed(
   padding-top: 10px;
   color: v-bind($staticInfo.colors[ "target" ]);
 }
+
 </style>

@@ -1,11 +1,11 @@
 <template>
   <NoteShow
-    v-bind="{ ...noteViewedByUser, level: 1 }"
+    v-bind="{ ...noteViewedByUser, level }"
     @updated="$emit('updated')"
   />
   <NoteOverview
     v-for="child in childrenx"
-    v-bind="{ noteId: child.note.id, level: 2 }"
+    v-bind="{ noteId: child.note.id, level: level + 1 }"
     :key="child.note.id"
   />
 </template>
