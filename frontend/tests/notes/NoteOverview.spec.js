@@ -25,5 +25,23 @@ describe("note overview", () => {
     await screen.findByText('child')
   });
 
+  it("should render note with grandchild", async () => {
+    const noteParent = makeMe.aNote.title('parent').please()
+    const noteChild = makeMe.aNote.title('child').please()
+    const noteGrandchild = makeMe.aNote.title('grandchild').please()
+    renderWithStoreAndMockRoute(NoteOverview, { props: {noteId: noteParent.note.id} }, null, (store) => {
+      store.commit('addNote', noteParent)
+      store.commit('addNote', noteChild)
+      store.commit('addNote', noteGrandchild)
+      store.commit('loadParentChildren', {
+        [noteParent.note.id]: [noteChild.note.id],
+        [noteChild.note.id]: [noteGrandchild.note.id],
+      })
+    })
+    await screen.findByText('parent')
+    await screen.findByText('child')
+    await screen.findByText('grandchild')
+  });
+
 });
 

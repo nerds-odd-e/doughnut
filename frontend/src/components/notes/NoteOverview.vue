@@ -3,9 +3,9 @@
     v-bind="{ ...noteViewedByUser, level: 1 }"
     @updated="$emit('updated')"
   />
-  <NoteShow
+  <NoteOverview
     v-for="child in childrenx"
-    v-bind="{ ...child, level: 2 }"
+    v-bind="{ noteId: child.note.id, level: 2 }"
     :key="child.note.id"
   />
 </template>
@@ -17,10 +17,7 @@ export default {
   name: "NoteOverview",
   props: {
     noteId: Number,
-    children: Array,
-    ancestors: Array,
-    notebook: Object,
-    recentlyUpdated: Boolean,
+    level: {type: Number, default: 1},
   },
   emits: ["updated"],
   components: { NoteShow },

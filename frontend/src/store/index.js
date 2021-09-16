@@ -19,9 +19,11 @@ export default createStore({
     },
 
     loadNotes (state, notes) {
-      notes.forEach(note => state.notes[note.note.id] = note)
+      notes.forEach(note => {
+        state.notes[note.note.id] = note
+      })
     },
-    
+
     loadParentChildren (state, parentChildren) {
       merge(state.childrens, parentChildren)
     },
