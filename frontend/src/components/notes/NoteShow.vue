@@ -2,7 +2,7 @@
   <NoteFrameOfLinks v-bind="{ links }" @updated="$emit('updated')">
     <div v-if="recentlyUpdated">This note has been changed recently.</div>
     <div class="note-body">
-      <h2 :class="'note-title h' + level">{{ note.noteContent.title }}</h2>
+      <h2 role="title" :class="'note-title h' + level">{{ note.noteContent.title }}</h2>
       <div class="row">
         <ShowDescription
           :class="`col-12 ${twoColumns ? 'col-md-6' : ''}`"

@@ -1,18 +1,24 @@
 import { merge } from "lodash";
 import Builder from "./Builder"
 
+let idCounter = 1
+
+const generateId = () => {
+  return idCounter++
+}
+
 class NoteBuilder extends Builder {
   data: any
 
   constructor(parentBuilder?: Builder) {
     super(parentBuilder)
-    this.data = {}
+    this.data = {note:{ noteContent: {}}}
   }
 
-  get withAChildNote(): NoteBuilder {
-    const childBuilder = new NoteBuilder(this)
-    this.childrenBuilders.push(childBuilder)
-    return childBuilder
+  title(value: string): NoteBuilder {
+    this.data.note.title = value
+    this.data.note.noteContent.title = value
+    return this
   }
 
   recentlyUpdated(value: boolean): NoteBuilder {
@@ -21,13 +27,15 @@ class NoteBuilder extends Builder {
   }
 
   do(): any {
+    const id = generateId()
+
     return merge({
       owns: true,
       recentlyUpdated: false,
       note: {
-        id: 7,
+        id,
         noteContent: {
-          id: 7,
+          id,
           title: "Note1.1.1",
           description: "Desc",
           url: null,

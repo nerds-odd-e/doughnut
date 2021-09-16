@@ -1,17 +1,29 @@
+import { merge } from 'lodash'
 import { createStore } from 'vuex'
 
 export default createStore({
   state: () => ({
-    all: {}
+    notes: {},
+    childrens: {}
   }),
 
   getters: {
-    getNoteById: (state) => (id) => state.all[id]
+    getNoteById: (state) => (id) => state.notes[id],
+    getChildrenOfParentId: (state) => (parentId) =>
+     (!state.childrens[parentId]) ? [] : state.childrens[parentId].map(c=>state.notes[c]),
   },
   
   mutations: {
     addNote (state, note) {
-      state.all[note.note.id] = note
+      state.notes[note.note.id] = note
+    },
+
+    loadNotes (state, notes) {
+      notes.forEach(note => state.notes[note.note.id] = note)
+    },
+    
+    loadParentChildren (state, parentChildren) {
+      merge(state.childrens, parentChildren)
     },
   },
 })

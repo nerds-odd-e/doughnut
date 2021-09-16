@@ -1,7 +1,7 @@
 <template>
   <LoadingPage v-bind="{ loading, contentExists: !!noteViewedByUser }">
     <div v-if="noteViewedByUser">
-      <NoteOverview v-bind="{...noteViewedByUser, noteId: noteViewedByUser.note.id}" />
+      <NoteOverview v-bind="{...noteViewedByUser, noteId}" />
     </div>
   </LoadingPage>
 </template>
@@ -23,9 +23,10 @@ export default {
   components: { LoadingPage, NoteOverview },
   methods: {
     fetchData() {
-      restGet(`/api/notes/${this.noteId}`, (r) => (this.loading = r)).then(
+      restGet(`/api/notes/${this.noteId}/overview`, (r) => (this.loading = r)).then(
         (res) => {
-          this.$store.commit('addNote', res)
+          this.$store.commit('loadNotes', res.notes)
+          this.$store.commit('loadParentChildren', res.parentChildren)
           this.noteViewedByUser = res
         }
       );

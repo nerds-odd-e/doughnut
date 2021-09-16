@@ -1,6 +1,7 @@
 
 package com.odde.doughnut.controllers;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.json.NoteViewedByUser;
@@ -20,7 +21,9 @@ import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/notes")
@@ -88,29 +91,27 @@ class RestNoteController {
     return noteViewedByUser;
   }
 
+  class NotesBulk {
+    public List<NoteViewedByUser> notes = new ArrayList<>();
+    public Map<Integer, List<Integer>> parentChildren = new HashMap<>();
+  }
 
   @GetMapping("/{note}/overview")
-  public ArrayList<NoteViewedByUser> showOverview(@PathVariable("note") Note note) throws NoAccessRightException {
+  public NotesBulk showOverview(@PathVariable("note") Note note) throws NoAccessRightException {
     final UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertReadAuthorization(note);
 
-    ArrayList<Note> allChildren = getAllChildren(note);
-    return new ArrayList<NoteViewedByUser>();
-  }
+    NotesBulk notesBulk = new NotesBulk();
 
-  private ArrayList<Note> getAllChildren(Note note) {
-    ArrayList<Note> allChildren = new ArrayList<>();
-    allChildren.add(note);
-
-    if (note.getChildren().size() == 0) {
-      return allChildren;
-    }
-
-    for (Note child : note.getChildren()) {
-      allChildren.addAll(getAllChildren(child));
-    }
-
-    return allChildren;
+    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
+    notesBulk.notes.add(note.getNoteViewedByUser(currentUTCTimestamp, user.getEntity() ));
+    note.traverseBreadthFirst(n->{
+      notesBulk.notes.add(n.getNoteViewedByUser(currentUTCTimestamp, user.getEntity() ));
+      List<Integer> children = notesBulk.parentChildren.computeIfAbsent(n.getParentId(), (k)->new ArrayList<>());
+      Integer id = n.getId();
+      children.add(id);
+    });
+    return notesBulk;
   }
 
   @PostMapping(path="/{note}")

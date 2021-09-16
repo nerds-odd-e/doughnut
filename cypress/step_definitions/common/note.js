@@ -192,7 +192,12 @@ Then("I should see the title {string} of the notebook", (noteTitle) => {
 
 Then("I should see the child notes {string} in order", (notesStr) => {
   const notes = notesStr.split(",");
-  cy.findAllByTestId("overview-note-title").each((actualNote, index) => {
-    expect(actualNote[0].innerHTML).to.equal(notes[index]);
-  });
+  cy.findAllByRole("title").then(elms => {
+          let actual =[]
+          elms.map((i, actualNote) => actual.push(actualNote.innerHTML))
+          actual = actual.filter(c=>notes.includes(c))
+          expect(actual.join(",")).to.equal(notes.join(','))
+      }
+  )
+
 });
