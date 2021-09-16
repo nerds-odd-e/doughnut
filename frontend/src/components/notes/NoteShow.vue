@@ -1,5 +1,5 @@
 <template>
-  <LinkLists v-bind="{ links, owns, staticInfo }" @updated="$emit('updated')">
+  <NoteFrameOfLinks v-bind="{ links }" @updated="$emit('updated')">
     <div v-if="recentlyUpdated">This note has been changed recently.</div>
     <div class="note-body">
       <h2 :class="'note-title h' + level">{{ note.noteContent.title }}</h2>
@@ -20,12 +20,12 @@
         <a :href="note.noteContent.url">{{ note.noteContent.url }}</a>
       </div>
     </div>
-  </LinkLists>
+  </NoteFrameOfLinks>
 </template>
 
 <script setup>
 import { computed } from "@vue/runtime-core";
-import LinkLists from "../links/NoteFrameOfLinks.vue";
+import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
 import ShowPicture from "./ShowPicture.vue";
 import ShowDescription from "./ShowDescription.vue";
 
@@ -33,8 +33,6 @@ const props = defineProps({
   note: { type: Object, required: true },
   links: Object,
   level: { type: Number, default: 2 },
-  owns: { type: Boolean, required: true },
-  staticInfo: Object,
   recentlyUpdated: Boolean,
 });
 const emits = defineEmits(["updated"]);
@@ -53,6 +51,6 @@ const twoColumns = computed(
 .note-title {
   margin-top: 0px;
   padding-top: 10px;
-  color: v-bind(staticInfo.colors[ "target" ]);
+  color: v-bind($staticInfo.colors[ "target" ]);
 }
 </style>

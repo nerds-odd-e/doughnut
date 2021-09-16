@@ -4,7 +4,6 @@
       <span class="link-nob">
         <a
           role="button"
-          :disabled="!owns"
           @click="show = true"
           :title="link.linkTypeLabel"
         >
@@ -59,7 +58,7 @@ import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue";
 import { restGet, restPost } from "../../restful/restful";
 
 export default {
-  props: { link: Object, owns: Boolean, inverseIcon: Boolean, colors: Object },
+  props: { link: Object, inverseIcon: Boolean, colors: Object },
   emits: ["updated"],
   components: {
     SvgLinkTypeIcon,

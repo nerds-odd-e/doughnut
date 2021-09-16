@@ -18,7 +18,6 @@
         <LinkShow v-bind="linkViewedByUser" @updated="$emit('updated')">
           <LinkNob
             v-bind="{ link: linkViewedByUser }"
-            :owns="true"
             @updated="$emit('updated')"
           />
           <span class="badge bg-light text-dark">

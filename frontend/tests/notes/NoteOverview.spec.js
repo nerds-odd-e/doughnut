@@ -7,7 +7,7 @@ describe("note overview", () => {
 
   it("should render one note", async () => {
     const note = makeMe.aNote.please()
-    renderWithStoreAndMockRoute(NoteOverview, { props: note }, null, (store) => {
+    renderWithStoreAndMockRoute(NoteOverview, { props: {noteId: note.note.id} }, null, (store) => {
       store.commit('addNote', note)
     })
     await screen.findByText('Desc')
@@ -15,7 +15,7 @@ describe("note overview", () => {
 
   it("should render note with one child", async () => {
     const note = makeMe.aNote.withAChildNote.please()
-    renderWithStoreAndMockRoute(NoteOverview, { props: note }, null, (store) => {
+    renderWithStoreAndMockRoute(NoteOverview, { props: {noteId: note.note.id} }, null, (store) => {
       store.commit('addNote', note)
     })
     await screen.findByText('Desc')

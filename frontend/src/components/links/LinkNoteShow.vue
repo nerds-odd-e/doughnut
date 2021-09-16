@@ -22,7 +22,6 @@
       v-bind="{
         note: noteViewedByUser.note,
         links: noteViewedByUser.links,
-        owns: noteViewedByUser.owns,
       }"
       :level="2"
       :staticInfo="$staticInfo"

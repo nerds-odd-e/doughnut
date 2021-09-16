@@ -22,7 +22,6 @@
       :links="links"
       :recentlyUpdated="recentlyUpdated"
       :level="1"
-      :owns="owns"
       :staticInfo="$staticInfo"
       @updated="$emit('updated')"
     />

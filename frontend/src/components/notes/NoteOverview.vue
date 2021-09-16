@@ -1,6 +1,6 @@
 <template>
-  <NoteViewedByUserWithoutChildren
-    v-bind="{ note: notex.note, links, ancestors, notebook, owns }"
+  <NoteShow
+    v-bind="{ ...noteViewedByUser, ancestors, notebook, level: 1 }"
     @updated="$emit('updated')"
   />
   <p
@@ -14,23 +14,21 @@
 </template>
 
 <script lang="ts">
-import NoteViewedByUserWithoutChildren from "./NoteViewedByUserWithoutChildren.vue";
+import NoteShow from "./NoteShow.vue";
 
 export default {
   name: "NoteOverview",
   props: {
-    note: Object,
-    links: Object,
+    noteId: Number,
     children: Array,
     ancestors: Array,
     notebook: Object,
     recentlyUpdated: Boolean,
-    owns: { type: Boolean, required: true },
   },
   emits: ["updated"],
-  components: { NoteViewedByUserWithoutChildren },
+  components: { NoteShow },
   computed: {
-    notex() { return this.$store.getters.getNoteById(this.note.id)}
+    noteViewedByUser() { return this.$store.getters.getNoteById(this.noteId)}
   }
 };
 </script>

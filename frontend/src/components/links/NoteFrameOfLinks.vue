@@ -3,7 +3,7 @@
     <template v-for="(linksOfType, linkType) in linksReader.hierachyLinks" :key="linkType">
       <li v-for="link in linksOfType.direct" :key="link.id">
         <LinkLink
-          v-bind="{ link, owns, colors: staticInfo.colors }"
+          v-bind="{ link, colors: $staticInfo.colors }"
           :reverse="false"
           @updated="$emit('updated')"
         />
@@ -15,7 +15,7 @@
           class="link-multi"
           v-for="link in direct"
           :key="link.id"
-          v-bind="{ link, owns, colors: staticInfo.colors }"
+          v-bind="{ link, colors: $staticInfo.colors }"
           :reverse="false"
           @updated="$emit('updated')"
         />
@@ -23,7 +23,7 @@
           class="link-multi"
           v-for="link in reverse"
           :key="link.id"
-          v-bind="{ link, owns, colors: staticInfo.colors }"
+          v-bind="{ link, colors: $staticInfo.colors }"
           :reverse="true"
           @updated="$emit('updated')"
         />
@@ -35,7 +35,7 @@
           class="link-multi"
           v-for="link in linksOfType.direct"
           :key="link.id"
-          v-bind="{ link, owns, colors: staticInfo.colors }"
+          v-bind="{ link, colors: $staticInfo.colors }"
           :reverse="false"
           @updated="$emit('updated')"
         />
@@ -53,7 +53,7 @@
           class="link-multi"
           v-for="link in linksOfType.reverse"
           :key="link.id"
-          v-bind="{ link, owns, colors: staticInfo.colors }"
+          v-bind="{ link, colors: $staticInfo.colors }"
           :reverse="true"
           @updated="$emit('updated')"
         />
@@ -67,7 +67,7 @@ import { computed } from "@vue/runtime-core";
 import LinkLink from "./LinkLink.vue";
 import LinksReader from "../../models/LinksReader"
 
-const props = defineProps({ links: Object, owns: Boolean, staticInfo: Object });
+const props = defineProps({ links: Object, staticInfo: Object });
 const emits = defineEmits(["updated"]);
 const linksReader = computed(()=> {
   if (!props.staticInfo || !props.staticInfo.linkTypeOptions) {

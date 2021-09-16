@@ -1,14 +1,14 @@
 <template>
   <span class="link-link">
     <LinkNob
-      v-bind="{ owns, link, colors }"
+      v-bind="{ link, colors }"
       v-if="!!reverse"
       :inverseIcon="true"
       @updated="$emit('updated')"
     />
     <NoteTitleWithLink class="link-title" v-bind="{ note }" />
     <LinkNob
-      v-bind="{ owns, link, colors }"
+      v-bind="{ link, colors }"
       v-if="!reverse"
       :inverseIcon="false"
       @updated="$emit('updated')"
@@ -24,7 +24,6 @@ import LinkNob from "./LinkNob.vue";
 const props = defineProps({
   link: Object,
   reverse: Boolean,
-  owns: Boolean,
   colors: { Object, required: true },
 });
 const emits = defineEmits(["updated"]);
