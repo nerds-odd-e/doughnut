@@ -13,5 +13,5 @@ module.exports = {
   moduleNameMapper: {
     "^@/(.*)$": "<rootDir>/src/$1",
   },
-  setupFiles: ["./tests/setupJest.js"],
+  setupFilesAfterEnv: ["./tests/setupJest.js"],
 };

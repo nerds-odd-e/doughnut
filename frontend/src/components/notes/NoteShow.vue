@@ -1,5 +1,4 @@
 <template>
-<div :style="`margin-left: ${marginLeft}`">
   <NoteFrameOfLinks v-bind="{ links }" @updated="$emit('updated')">
     <div v-if="recentlyUpdated">This note has been changed recently.</div>
     <div class="note-body">
@@ -22,7 +21,6 @@
       </div>
     </div>
   </NoteFrameOfLinks>
-</div>
 </template>
 
 <script setup>

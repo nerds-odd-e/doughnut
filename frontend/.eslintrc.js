@@ -26,7 +26,7 @@ module.exports = {
     ecmaVersion: 12,
     sourceType: "module",
   },
-  plugins: ["vue", "testing-library", "@typescript-eslint"],
+  plugins: ["vue", "testing-library", "@typescript-eslint", "jest-dom"],
   overrides: [
     {
       files: ["**/tests/**/*.[jt]s?(x)", "**/?(*.)+(spec|test).[jt]s?(x)"],

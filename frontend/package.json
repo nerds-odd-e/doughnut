@@ -25,6 +25,7 @@
   "devDependencies": {
     "@babel/core": "^7.15.0",
     "@babel/preset-env": "^7.15.0",
+    "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/vue": "^6.5.0",
     "@types/jest": "^27.0.1",
     "@types/lodash": "^4.14.172",
@@ -43,6 +44,7 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-import-resolver-alias": "^1.1.2",
     "eslint-plugin-import": "^2.24.2",
+    "eslint-plugin-jest-dom": "^3.9.2",
     "eslint-plugin-testing-library": "^4.12.2",
     "eslint-plugin-vue": "^7.9.0",
     "flush-promises": "^1.0.2",

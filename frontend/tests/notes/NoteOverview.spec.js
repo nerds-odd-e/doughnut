@@ -1,4 +1,4 @@
-import { screen } from "@testing-library/vue"
+import { screen, within } from "@testing-library/vue"
 import NoteOverview from "@/components/notes/NoteOverview.vue"
 import { renderWithStoreAndMockRoute } from "../helpers"
 import makeMe from "../fixtures/makeMe"
@@ -10,7 +10,8 @@ describe("note overview", () => {
     renderWithStoreAndMockRoute(NoteOverview, { props: {noteId: note.id} }, null, (store) => {
       store.commit('addNote', note)
     })
-    await screen.findByText('single note')
+    expect(screen.getByRole('title')).toHaveTextContent("single note")
+    expect(screen.getAllByRole('title')).toHaveLength(1)
   });
 
   it("should render note with one child", async () => {
@@ -21,6 +22,7 @@ describe("note overview", () => {
       store.commit('addNote', noteChild)
       store.commit('loadParentChildren', {[noteParent.id]: [noteChild.id]})
     })
+    expect(screen.getAllByRole('title')).toHaveLength(2)
     await screen.findByText('parent')
     await screen.findByText('child')
   });

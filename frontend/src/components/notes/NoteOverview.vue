@@ -3,11 +3,13 @@
     v-bind="{ ...noteViewedByUser, level }"
     @updated="$emit('updated')"
   />
-  <NoteOverview
-    v-for="child in childrenx"
-    v-bind="{ noteId: child.id, level: level + 1 }"
-    :key="child.id"
-  />
+  <div class="note-list">
+    <NoteOverview
+      v-for="child in childrenx"
+      v-bind="{ noteId: child.id, level: level + 1 }"
+      :key="child.id"
+    />
+  </div>
 </template>
 
 <script lang="ts">
@@ -27,3 +29,9 @@ export default {
   }
 };
 </script>
+
+<style lang="sass" scoped>
+  .note-list
+    margin-left: 10px
+
+</style>
