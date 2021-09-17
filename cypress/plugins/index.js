@@ -15,7 +15,7 @@
 
 const cucumber = require('cypress-cucumber-preprocessor').default;
 const browserify = require('@cypress/browserify-preprocessor');
-const getCompareSnapshotsPlugin = require('cypress-image-diff-js/dist/plugin');
+// const getCompareSnapshotsPlugin = require('cypress-image-diff-js/dist/plugin');
 const fs = require('fs-extra');
 const path = require('path');
 /**
@@ -24,7 +24,7 @@ const path = require('path');
 module.exports = (on, config) => {
   // `on` is used to hook into various events Cypress emits
   // `config` is the resolved Cypress config
-  getCompareSnapshotsPlugin(on, config);
+  // getCompareSnapshotsPlugin(on, config);
   const options = browserify.defaultOptions;
   options.browserifyOptions.plugin.unshift(['tsify']);
   on('file:preprocessor', cucumber(options));

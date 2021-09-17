@@ -27,8 +27,8 @@
 import '@testing-library/cypress/add-commands';
 import 'cypress-file-upload';
 
-const compareSnapshotCommand = require('cypress-image-diff-js/dist/command');
-compareSnapshotCommand();
+// const compareSnapshotCommand = require('cypress-image-diff-js/dist/command');
+// compareSnapshotCommand();
 
 Cypress.Commands.add('pageIsLoaded', () => {
   cy.get('.loading-bar').should('not.exist');
