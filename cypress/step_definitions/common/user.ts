@@ -108,7 +108,7 @@ Then(
     cy.get("#username").type(username);
     cy.get("#password").type("password");
     cy.get("form.form-signin").submit();
-    cy.findByText(expectation, { selector: "[role=title]" }).should("be.visible");
+    cy.expectNoteTitle(expectation);
   },
 );
 

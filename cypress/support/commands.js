@@ -261,8 +261,8 @@ Cypress.Commands.add(
           if (additional_info) {
             const [linkType, targetNote] =
               additional_info.commonSenseSplit('; ');
-            cy.get('[role=title]').contains(title);
-            cy.get('[role=title]').contains(targetNote);
+            cy.expectNoteTitle(title);
+            cy.expectNoteTitle(targetNote);
             cy.get('.badge').contains(linkType);
           }
           break;
@@ -279,6 +279,11 @@ Cypress.Commands.add(
       }
     }
   }
+);
+
+Cypress.Commands.add(
+  'expectNoteTitle',
+  title => cy.findByText(title, { selector: "[role=title]" }).should("be.visible")
 );
 
 Cypress.Commands.add(

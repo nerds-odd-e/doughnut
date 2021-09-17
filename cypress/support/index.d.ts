@@ -14,6 +14,7 @@ declare namespace Cypress {
     ): Chainable<Element>;
     findNoteCardEditButton(noteTitle: string): Chainable<Element>;
     getFormControl(label: string): Chainable<Element>;
+    expectNoteTitle(title: string): void;
     loginAs(username: string): void;
     logout(username?: string): void;
     pageIsLoaded(): void;
