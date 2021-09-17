@@ -29,6 +29,18 @@
         />
       </template>
     </li>
+    <template v-for="(linksOfType, linkType) in linksReader.tagLinks" :key="linkType">
+      <li v-if="linksOfType.direct.length > 0">
+        <LinkLink
+          class="link-multi"
+          v-for="link in linksOfType.direct"
+          :key="link.id"
+          v-bind="{ link, colors: $staticInfo.colors }"
+          :reverse="false"
+          @updated="$emit('updated')"
+        />
+      </li>
+    </template>
   </ul>
   
   <slot />
@@ -50,20 +62,24 @@
   </ul>
 </template>
 
-<script setup>
-import { computed } from "@vue/runtime-core";
+<script>
 import LinkLink from "./LinkLink.vue";
 import LinksReader from "../../models/LinksReader"
 
-const props = defineProps({ links: Object, staticInfo: Object });
-const emits = defineEmits(["updated"]);
-const linksReader = computed(()=> {
-  if (!props.staticInfo || !props.staticInfo.linkTypeOptions) {
-    return {}
+export default {
+  props: { links: Object },
+  emits: ["updated"],
+  components: { LinkLink },
+  computed: {
+    linksReader() {
+      if (!this.$staticInfo || !this.$staticInfo.linkTypeOptions) {
+        return {}
+      }
+      if(!this.links) return {}
+      return new LinksReader(this.$staticInfo.linkTypeOptions, this.links)
+    }
   }
-  if(!props.links) return {}
-  return new LinksReader(props.staticInfo.linkTypeOptions, props.links)
-})
+}
 
 </script>
 

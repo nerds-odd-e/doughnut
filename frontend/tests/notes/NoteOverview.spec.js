@@ -15,11 +15,11 @@ describe("note overview", () => {
   });
 
   it("should render one note with links", async () => {
-    const noteLinkTarget = makeMe.aNote.title('target').please()
-    const note = makeMe.aNote.title('source').linkTo(noteLinkTarget).please()
+    const note = makeMe.aNote.title('source').linkTo().please()
     renderWithStoreAndMockRoute(NoteOverview, { props: {noteId: note.id} }, null, (store) => {
       store.commit('loadNotes', [note])
     })
+    await screen.findByText('a tool')
   });
 
   it("should render note with one child", async () => {

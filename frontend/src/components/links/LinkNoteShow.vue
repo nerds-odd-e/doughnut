@@ -23,7 +23,6 @@
         note: noteViewedByUser.note,
         links: noteViewedByUser.links,
       }"
-      :staticInfo="$staticInfo"
       @updated="$emit('updated')"
     />
   </div>
@@ -35,6 +34,7 @@ import NoteShow from "../notes/NoteShow.vue";
 import Card from "../notes/Card.vue";
 
 export default {
+  name: "LinkNoteShow",
   props: { noteViewedByUser: Object },
   emits: ["updated"],
   components: { NoteOwnerBreadcrumb, NoteShow, Card },

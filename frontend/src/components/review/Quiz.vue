@@ -3,7 +3,7 @@
   <div v-if="pictureQuestion">
     <ShowPicture :note="sourceNote.note" :opacity="1" />
   </div>
-  <LinkLists v-bind="{ links: quizQuestion.hintLinks, owns: true, staticInfo }">
+  <NoteFrameOfLinks v-bind="{ links: quizQuestion.hintLinks }">
     <div class="quiz-instruction">
       <pre
         style="white-space: pre-wrap"
@@ -14,7 +14,7 @@
         {{ quizQuestion.mainTopic }}
       </h2>
     </div>
-  </LinkLists>
+  </NoteFrameOfLinks>
 
   <div class="row" v-if="quizQuestion.questionType !== 'SPELLING'">
     <div
@@ -60,7 +60,7 @@
 <script setup>
 import NoteBreadcrumbForReview from "./NoteBreadcrumbForReview.vue";
 import ShowPicture from "../notes/ShowPicture.vue";
-import LinkLists from "../links/NoteFrameOfLinks.vue";
+import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
 import TextInput from "../form/TextInput.vue";
 import { computed } from "@vue/runtime-core";
 
@@ -68,7 +68,6 @@ const props = defineProps({
   reviewPointViewedByUser: Object,
   quizQuestion: Object,
   emptyAnswer: Object,
-  staticInfo: Object,
 });
 const emits = defineEmits(["answer"]);
 const sourceNote = computed(() => {

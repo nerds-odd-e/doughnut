@@ -1,5 +1,6 @@
 import { merge } from "lodash";
 import Builder from "./Builder"
+import LinkBuilder from "./LinkBuilder"
 
 let idCounter = 1
 
@@ -12,7 +13,7 @@ class NoteBuilder extends Builder {
 
   constructor(parentBuilder?: Builder) {
     super(parentBuilder)
-    this.data = {note:{ noteContent: {}}}
+    this.data = {note:{ noteContent: {}}, links: {}}
   }
 
   title(value: string): NoteBuilder {
@@ -26,7 +27,8 @@ class NoteBuilder extends Builder {
     return this
   }
 
-  linkTo(note: any): NoteBuilder {
+  linkTo(): NoteBuilder {
+    merge(this.data.links, new LinkBuilder(undefined, 'using').please())
     return this
   }
 

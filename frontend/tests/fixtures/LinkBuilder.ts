@@ -7,7 +7,7 @@ class LinkBuilder extends Builder{
 
     isReverse: boolean
 
-    constructor(parentBuilder: Builder, linkType: string) {
+    constructor(parentBuilder: Builder | undefined, linkType: string) {
       super(parentBuilder)
       this.linkType = linkType
       this.cnt = 1

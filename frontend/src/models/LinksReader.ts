@@ -9,17 +9,24 @@ class LinksReader {
         this.links = links
     }
 
+    get taggingTypes() {
+        return this.linkTypeOptions
+            .filter((t) => parseInt(t.value, 10) === 8)
+            .map((t) => t.label);
+    }
+
     get groupedTypes() {
     return this.linkTypeOptions
-        .filter((t) => [1, 8, 12, 22, 23].includes(parseInt(t.value, 10)))
+        .filter((t) => [1, 12, 22, 23].includes(parseInt(t.value, 10)))
         .map((t) => t.label);
     };
 
     get hierachyLinks() {
+    const tTypes = this.taggingTypes
     const gTypes = this.groupedTypes
     return Object.fromEntries(
         Object.entries(this.links).filter(
-        (t) => !gTypes.includes(t[0])
+        (t) => !tTypes.includes(t[0]) && !gTypes.includes(t[0])
         )
     )
     }
@@ -33,6 +40,13 @@ class LinksReader {
         )
     }
 
+    get tagLinks(){
+    const tTypes = this.taggingTypes
+    return Object.fromEntries(
+        Object.entries(this.links).filter((t) => tTypes.includes(t[0]))
+    )
+    }
+
     get groupedLinks(){
     const tTypes = this.groupedTypes
     return Object.entries(this.links)
@@ -41,10 +55,11 @@ class LinksReader {
     }
 
     reverseLabel(lbl: string): string {
-        const { reversedLabel } = this.linkTypeOptions.find(
+        const linkType = this.linkTypeOptions.find(
             ({ label }) => lbl === label
         );
-        return reversedLabel;
+        if(linkType) return linkType.reversedLabel
+        return '*unknown link type*';
     };
 
 

@@ -3,6 +3,7 @@ import { Component } from "vue";
 import { mount } from "@vue/test-utils";
 import { render } from "@testing-library/vue";
 import store from "../src/store/index.js"
+import { staticInfo } from "./notes/fixtures-basic.js";
 
 type Options = {
 }
@@ -22,7 +23,7 @@ const withMockRoute = (
     merge(options, {
       global: {
         mocks: {
-          $staticInfo: { colors: {} },
+          $staticInfo: staticInfo,
           $route: currentRoute,
           $router: mockRouter,
         },

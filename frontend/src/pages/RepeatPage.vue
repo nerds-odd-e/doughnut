@@ -44,7 +44,6 @@
             v-if="quizMode"
             v-bind="repetition"
             @answer="processAnswer($event)"
-            :staticInfo="$staticInfo"
           />
           <template v-else>
             <template v-if="reviewPointViewedByUser">
