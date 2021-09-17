@@ -16,6 +16,7 @@ export default {
   props: { noteId: Number },
   data() {
     return {
+      ancestors: null,
       loaded: false,
       loading: false,
     };
@@ -25,6 +26,7 @@ export default {
     fetchData() {
       restGet(`/api/notes/${this.noteId}/overview`, (r) => (this.loading = r)).then(
         (res) => {
+          this.breadcrumb = res.breadcrumb
           this.$store.commit('loadNotes', res.notes)
           this.$store.commit('loadParentChildren', res.parentChildren)
           this.loaded = true

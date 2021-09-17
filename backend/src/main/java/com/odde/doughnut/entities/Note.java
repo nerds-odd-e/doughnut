@@ -3,6 +3,7 @@ package com.odde.doughnut.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.algorithms.SiblingOrder;
 import com.odde.doughnut.entities.json.LinkViewed;
+import com.odde.doughnut.entities.json.NoteBreadcrumbViewedByUser;
 import com.odde.doughnut.entities.json.NoteViewedByUser;
 import com.odde.doughnut.entities.json.NoteViewedByUser1;
 import lombok.Getter;
@@ -130,6 +131,15 @@ public class Note {
         nvb.setNotebook(notebook);
         nvb.setAncestors(getAncestors());
         nvb.setChildren(getChildren());
+        nvb.setOwns(viewer != null && viewer.owns(notebook));
+        return nvb;
+    }
+
+    @JsonIgnore
+    public NoteBreadcrumbViewedByUser jsonBreadcrumbViewedBy(User viewer) {
+        NoteBreadcrumbViewedByUser nvb = new NoteBreadcrumbViewedByUser();
+        nvb.setNotebook(notebook);
+        nvb.setAncestors(getAncestors());
         nvb.setOwns(viewer != null && viewer.owns(notebook));
         return nvb;
     }

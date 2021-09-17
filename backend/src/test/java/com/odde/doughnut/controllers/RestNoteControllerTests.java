@@ -84,6 +84,7 @@ class RestNoteControllerTests {
             makeMe.refresh(childNote);
             final RestNoteController.NotesBulk showOverview = controller.showOverview(note);
             assertThat(showOverview.notes, hasSize(12));
+            assertThat(showOverview.noteBreadcrumbViewedByUser.getOwns(), equalTo(true));
             assertThat(showOverview.parentChildren, hasKey(note.getId()));
 
         }

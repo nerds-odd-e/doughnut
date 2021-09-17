@@ -2,8 +2,10 @@
 package com.odde.doughnut.controllers;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.json.NoteBreadcrumbViewedByUser;
 import com.odde.doughnut.entities.json.NoteViewedByUser;
 import com.odde.doughnut.entities.json.NoteViewedByUser1;
 import com.odde.doughnut.entities.json.RedirectToNoteResponse;
@@ -92,6 +94,7 @@ class RestNoteController {
   }
 
   static class NotesBulk {
+    public NoteBreadcrumbViewedByUser noteBreadcrumbViewedByUser;
     public List<NoteViewedByUser1> notes = new ArrayList<>();
     public Map<Integer, List<Integer>> parentChildren = new HashMap<>();
   }
@@ -102,6 +105,7 @@ class RestNoteController {
     user.getAuthorization().assertReadAuthorization(note);
 
     NotesBulk notesBulk = new NotesBulk();
+    notesBulk.noteBreadcrumbViewedByUser = note.jsonBreadcrumbViewedBy(user.getEntity());
 
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     notesBulk.notes.add(note.getNoteViewedByUser1(currentUTCTimestamp, user.getEntity() ));
