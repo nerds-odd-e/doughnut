@@ -91,6 +91,7 @@ in mkShell {
     vimpager
     vscodium
     powerline
+    dbeaver
   ] ++ lib.optionals stdenv.isDarwin [
     darwin.apple_sdk.libs.utmp
     darwin.apple_sdk.libs.Xplugin
