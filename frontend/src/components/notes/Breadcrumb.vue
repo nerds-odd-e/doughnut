@@ -5,7 +5,6 @@
     :notebook="notebook"
   />
   <NoteBazaarBreadcrumb v-else :ancestors="ancestors">
-    <li class="breadcrumb-item">{{ noteTitle }}</li>
   </NoteBazaarBreadcrumb>
 </template>
 
