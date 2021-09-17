@@ -1,5 +1,5 @@
 <template>
-  <NoteBreadcrumbForReview :ancestors="quizQuestion.scope" />
+  <NoteBreadcrumb :ancestors="quizQuestion.scope" />
   <div v-if="pictureQuestion">
     <ShowPicture :note="sourceNote.note" :opacity="1" />
   </div>
@@ -58,7 +58,7 @@
 </template>
 
 <script setup>
-import NoteBreadcrumbForReview from "./NoteBreadcrumbForReview.vue";
+import NoteBreadcrumb from "../notes/NoteBreadcrumb.vue";
 import ShowPicture from "../notes/ShowPicture.vue";
 import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
 import TextInput from "../form/TextInput.vue";

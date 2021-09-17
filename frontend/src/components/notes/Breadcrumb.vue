@@ -4,8 +4,7 @@
     :ancestors="ancestors"
     :notebook="notebook"
   />
-  <NoteBazaarBreadcrumb v-else :ancestors="ancestors">
-  </NoteBazaarBreadcrumb>
+  <NoteBazaarBreadcrumb v-else :ancestors="ancestors"/>
 </template>
 
 <script>

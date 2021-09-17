@@ -11,9 +11,9 @@
       </button>
     </template>
     <template #header>
-      <NoteBreadcrumbForOwnOrCircle v-bind="{ ancestors: [], circle }">
+      <NoteOwnerBreadcrumb v-bind="{ ancestors: [], notebook:{ ownership: { circle}} }">
         <li class="breadcrumb-item">(adding here)</li>
-      </NoteBreadcrumbForOwnOrCircle>
+      </NoteOwnerBreadcrumb>
     </template>
 
     <template #body>
@@ -29,7 +29,7 @@
 
 <script>
 import ModalWithButton from "../commons/ModalWithButton.vue";
-import NoteBreadcrumbForOwnOrCircle from "../notes/NoteBreadcrumbForOwnOrCircle.vue";
+import NoteOwnerBreadcrumb from "../notes/NoteOwnerBreadcrumb.vue";
 import NoteFormBody from "../notes/NoteFormBody.vue";
 import LoadingPage from "../../pages/commons/LoadingPage.vue";
 import { restPostMultiplePartForm } from "../../restful/restful";
@@ -39,7 +39,7 @@ export default {
   props: { circle: Object },
   components: {
     ModalWithButton,
-    NoteBreadcrumbForOwnOrCircle,
+    NoteOwnerBreadcrumb,
     NoteFormBody,
     LoadingPage,
   },

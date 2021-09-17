@@ -17,7 +17,6 @@
 </template>
 
 <script>
-import NoteBreadcrumbForReview from "./NoteBreadcrumbForReview.vue";
 import NoteViewedByUserWithoutChildren from "../notes/NoteViewedByUserWithoutChildren.vue";
 import LinkShow from "../links/LinkShow.vue";
 
@@ -26,7 +25,6 @@ export default {
   props: { noteViewedByUser: Object, linkViewedByUser: Object },
   emits: ["updated"],
   components: {
-    NoteBreadcrumbForReview,
     NoteViewedByUserWithoutChildren,
     LinkShow,
   },

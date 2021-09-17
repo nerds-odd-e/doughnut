@@ -30,7 +30,6 @@
 </template>
 
 <script setup>
-import NoteBreadcrumbForReview from "./NoteBreadcrumbForReview.vue";
 import NoteViewedByUserWithoutChildren from "../notes/NoteViewedByUserWithoutChildren.vue";
 import LinkShow from "../links/LinkShow.vue";
 import LinkNob from "../links/LinkNob.vue";

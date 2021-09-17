@@ -4,14 +4,9 @@
       <slot :open="() => (show = true)" />
     </template>
     <template #header>
-      <NoteBreadcrumbForOwnOrCircle
-        v-bind="{
-          circle: !!notebook ? notebook.ownership.circle : null,
-          ancestors,
-        }"
-      >
+      <NoteOwnerBreadcrumb v-bind="{ notebook, ancestors }">
         <li class="breadcrumb-item">(adding here)</li>
-      </NoteBreadcrumbForOwnOrCircle>
+      </NoteOwnerBreadcrumb>
     </template>
     <template #body>
       <form @submit.prevent="processForm">
@@ -33,7 +28,7 @@
 </template>
 
 <script>
-import NoteBreadcrumbForOwnOrCircle from "./NoteBreadcrumbForOwnOrCircle.vue";
+import NoteOwnerBreadcrumb from "./NoteOwnerBreadcrumb.vue";
 import NoteFormBody from "./NoteFormBody.vue";
 import ModalWithButton from "../commons/ModalWithButton.vue";
 import LinkTypeSelect from "../links/LinkTypeSelect.vue";
@@ -52,7 +47,7 @@ function initialState() {
 export default {
   name: "NoteNewButton",
   components: {
-    NoteBreadcrumbForOwnOrCircle,
+    NoteOwnerBreadcrumb,
     NoteFormBody,
     ModalWithButton,
     LinkTypeSelect,
