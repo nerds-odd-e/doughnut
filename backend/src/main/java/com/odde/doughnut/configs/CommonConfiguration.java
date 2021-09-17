@@ -12,7 +12,7 @@ public class CommonConfiguration {
     HttpSecurity config =  http.authorizeRequests()
         .mvcMatchers("/robots.txt")
         .permitAll()
-        .antMatchers("/", "/login", "/error", "/images/**", "/odd-e.png",
+        .antMatchers("/", "/login", "/error", "/images/**", "/odd-e.png", "/odd-e.ico",
                      "/webjars/**", "/assets/**","/bazaar", "/bazaar/**",
                      "/api/**", "/circles/join"
                 )

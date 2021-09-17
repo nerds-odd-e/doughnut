@@ -26,12 +26,15 @@ class NoteBuilder extends Builder {
     return this
   }
 
+  linkTo(note: any): NoteBuilder {
+    return this
+  }
+
   do(): any {
     const id = generateId()
 
     return merge({
       id,
-      owns: true,
       recentlyUpdated: false,
       note: {
         noteContent: {

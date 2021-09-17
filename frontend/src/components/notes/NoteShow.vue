@@ -30,6 +30,7 @@ import ShowPicture from "./ShowPicture.vue";
 import ShowDescription from "./ShowDescription.vue";
 
 const props = defineProps({
+  id: Number,
   note: { type: Object, required: true },
   links: Object,
   recentlyUpdated: Boolean,

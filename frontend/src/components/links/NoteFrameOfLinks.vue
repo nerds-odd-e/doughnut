@@ -29,18 +29,6 @@
         />
       </template>
     </li>
-    <template v-for="(linksOfType, linkType) in linksReader.tagLinks" :key="linkType">
-      <li v-if="linksOfType.direct.length > 0">
-        <LinkLink
-          class="link-multi"
-          v-for="link in linksOfType.direct"
-          :key="link.id"
-          v-bind="{ link, colors: $staticInfo.colors }"
-          :reverse="false"
-          @updated="$emit('updated')"
-        />
-      </li>
-    </template>
   </ul>
   
   <slot />
