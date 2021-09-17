@@ -88,7 +88,7 @@ When("I delete top level note {string}", (noteTitle) => {
 });
 
 When("I create a sibling note of {string}:", (noteTitle, data) => {
-  cy.findByText(noteTitle, { selector: ".h1" });
+  cy.findByText(noteTitle, { selector: "[role=title]" });
   cy.findByRole("button", { name: "Add Sibling Note" }).click();
   cy.submitNoteFormsWith(data.hashes());
 });
@@ -101,7 +101,7 @@ When(
 );
 
 Then("I should see {string} in note title", (noteTitle) => {
-  cy.findByText(noteTitle, { selector: ".h1" });
+  cy.findByText(noteTitle, { selector: "[role=title]" });
 });
 
 Then(
@@ -186,7 +186,7 @@ When("I click on the overview button", () => {
 
 Then("I should see the title {string} of the notebook", (noteTitle) => {
   cy.findByText(noteTitle, {
-    selector: ".h1",
+    selector: "[role=title]",
   }).should("be.visible");
 });
 

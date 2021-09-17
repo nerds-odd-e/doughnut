@@ -261,8 +261,8 @@ Cypress.Commands.add(
           if (additional_info) {
             const [linkType, targetNote] =
               additional_info.commonSenseSplit('; ');
-            cy.get('.h2').contains(title);
-            cy.get('.h2').contains(targetNote);
+            cy.get('[role=title]').contains(title);
+            cy.get('[role=title]').contains(targetNote);
             cy.get('.badge').contains(linkType);
           }
           break;

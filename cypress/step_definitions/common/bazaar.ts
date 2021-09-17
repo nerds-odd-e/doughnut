@@ -91,7 +91,7 @@ When("I change notebook {string} to skip review", (noteTitle) => {
 
 Then("I should see it has link to {string}", (noteTitle) => {
   cy.findByText(noteTitle, { selector: ".link-title" }).click();
-  cy.findByText(noteTitle, { selector: ".h1" }).should("be.visible");
+  cy.findByText(noteTitle, { selector: "[role=title]" }).should("be.visible");
 });
 
 Then("I unsubscribe from notebook {string}", (noteTitle) => {

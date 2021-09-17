@@ -2,7 +2,7 @@
   <NoteFrameOfLinks v-bind="{ links }" @updated="$emit('updated')">
     <div v-if="recentlyUpdated">This note has been changed recently.</div>
     <div class="note-body">
-      <h2 role="title" :class="'note-title h' + level">{{ note.noteContent.title }}</h2>
+      <h2 role="title" class="note-title">{{ note.noteContent.title }}</h2>
       <div class="row">
         <ShowDescription
           :class="`col-12 ${twoColumns ? 'col-md-6' : ''}`"
@@ -32,7 +32,6 @@ import ShowDescription from "./ShowDescription.vue";
 const props = defineProps({
   note: { type: Object, required: true },
   links: Object,
-  level: { type: Number, default: 1 },
   recentlyUpdated: Boolean,
 });
 const emits = defineEmits(["updated"]);
@@ -40,7 +39,6 @@ const emits = defineEmits(["updated"]);
 const twoColumns = computed(
   () => !!props.note.notePicture && !!props.note.noteContent.description
 );
-const marginLeft = computed(()=>`${(props.level-1) * 10}px`)
 </script>
 
 <style scoped>

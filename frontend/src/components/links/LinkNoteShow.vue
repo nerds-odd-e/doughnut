@@ -23,7 +23,6 @@
         note: noteViewedByUser.note,
         links: noteViewedByUser.links,
       }"
-      :level="2"
       :staticInfo="$staticInfo"
       @updated="$emit('updated')"
     />

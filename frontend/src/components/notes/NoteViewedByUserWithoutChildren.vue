@@ -21,7 +21,6 @@
       :note="note"
       :links="links"
       :recentlyUpdated="recentlyUpdated"
-      :level="1"
       :staticInfo="$staticInfo"
       @updated="$emit('updated')"
     />
