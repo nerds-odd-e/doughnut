@@ -51,7 +51,7 @@ backend/build/
 
 # nodes
 node_modules/
-cypress/videos/
+**/package-lock.json
 
 # git-secret
 .gitsecret/keys/random_seed
