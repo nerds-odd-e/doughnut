@@ -4,11 +4,16 @@
     :ancestors="ancestors"
     :notebook="notebook"
   />
-  <NoteBazaarBreadcrumb v-else :ancestors="ancestors"/>
+  <NoteBreadcrumb v-else :ancestors="ancestors">
+    <template #topLink>
+      <li class="breadcrumb-item"><router-link :to="{name: 'bazaar'}">Bazaar</router-link></li>
+    </template>
+  </NoteBreadcrumb>
+
 </template>
 
 <script>
-import NoteBazaarBreadcrumb from "../bazaar/NoteBazaarBreadcrumb.vue";
+import NoteBreadcrumb from "./NoteBreadcrumb.vue";
 import NoteOwnerBreadcrumb from "./NoteOwnerBreadcrumb.vue";
 
 export default {
@@ -20,7 +25,7 @@ export default {
     owns: { type: Boolean, required: true },
   },
   components: {
-    NoteBazaarBreadcrumb,
+    NoteBreadcrumb,
     NoteOwnerBreadcrumb,
   },
 };
