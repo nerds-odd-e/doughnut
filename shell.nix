@@ -126,6 +126,7 @@ in mkShell {
     google-chrome
     intellij
     psmisc
+    sequeler
     x11vnc
     xclip
     xvfb-run
