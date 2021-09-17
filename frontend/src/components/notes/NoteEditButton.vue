@@ -22,7 +22,6 @@
 </template>
 
 <script>
-import NoteBreadcrumbForOwnOrCircle from "./NoteBreadcrumbForOwnOrCircle.vue";
 import NoteFormBody from "./NoteFormBody.vue";
 import ModalWithButton from "../commons/ModalWithButton.vue";
 import SvgEdit from "../svgs/SvgEdit.vue";
@@ -31,7 +30,6 @@ import { restGet, restPostMultiplePartForm } from "../../restful/restful";
 export default {
   name: "NoteNewButton",
   components: {
-    NoteBreadcrumbForOwnOrCircle,
     NoteFormBody,
     ModalWithButton,
     SvgEdit,
