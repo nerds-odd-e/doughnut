@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.json.NoteViewedByUser;
+import com.odde.doughnut.entities.json.NoteViewedByUser1;
 import com.odde.doughnut.entities.json.RedirectToNoteResponse;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -87,12 +88,11 @@ class RestNoteController {
     final UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertReadAuthorization(note);
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-    NoteViewedByUser noteViewedByUser = note.getNoteViewedByUser(currentUTCTimestamp, user.getEntity());
-    return noteViewedByUser;
+    return note.getNoteViewedByUser(currentUTCTimestamp, user.getEntity());
   }
 
-  class NotesBulk {
-    public List<NoteViewedByUser> notes = new ArrayList<>();
+  static class NotesBulk {
+    public List<NoteViewedByUser1> notes = new ArrayList<>();
     public Map<Integer, List<Integer>> parentChildren = new HashMap<>();
   }
 
@@ -104,9 +104,9 @@ class RestNoteController {
     NotesBulk notesBulk = new NotesBulk();
 
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-    notesBulk.notes.add(note.getNoteViewedByUser(currentUTCTimestamp, user.getEntity() ));
+    notesBulk.notes.add(note.getNoteViewedByUser1(currentUTCTimestamp, user.getEntity() ));
     note.traverseBreadthFirst(n->{
-      notesBulk.notes.add(n.getNoteViewedByUser(currentUTCTimestamp, user.getEntity() ));
+      notesBulk.notes.add(n.getNoteViewedByUser1(currentUTCTimestamp, user.getEntity() ));
       List<Integer> children = notesBulk.parentChildren.computeIfAbsent(n.getParentId(), (k)->new ArrayList<>());
       Integer id = n.getId();
       children.add(id);

@@ -5,8 +5,8 @@
   />
   <NoteOverview
     v-for="child in childrenx"
-    v-bind="{ noteId: child.note.id, level: level + 1 }"
-    :key="child.note.id"
+    v-bind="{ noteId: child.id, level: level + 1 }"
+    :key="child.id"
   />
 </template>
 

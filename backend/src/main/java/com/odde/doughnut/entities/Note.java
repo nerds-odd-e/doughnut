@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.algorithms.SiblingOrder;
 import com.odde.doughnut.entities.json.LinkViewed;
 import com.odde.doughnut.entities.json.NoteViewedByUser;
+import com.odde.doughnut.entities.json.NoteViewedByUser1;
 import lombok.Getter;
 import lombok.Setter;
-import org.apache.logging.log4j.util.Strings;
 import org.hibernate.annotations.WhereJoinTable;
 import org.springframework.beans.BeanUtils;
 
@@ -131,6 +131,15 @@ public class Note {
         nvb.setAncestors(getAncestors());
         nvb.setChildren(getChildren());
         nvb.setOwns(viewer != null && viewer.owns(notebook));
+        return nvb;
+    }
+
+    @JsonIgnore
+    public NoteViewedByUser1 jsonObjectViewedBy1(User viewer) {
+        NoteViewedByUser1 nvb = new NoteViewedByUser1();
+        nvb.setId(getId());
+        nvb.setNote(this);
+        nvb.setLinks(getAllLinks(viewer));
         return nvb;
     }
 
@@ -356,9 +365,15 @@ public class Note {
 
     public NoteViewedByUser getNoteViewedByUser(Timestamp currentUTCTimestamp, User entity) {
       NoteViewedByUser noteViewedByUser = jsonObjectViewedBy(entity);
-
       noteViewedByUser.setRecentlyUpdated(isRecentlyUpdated(currentUTCTimestamp));
       return noteViewedByUser;
     }
+
+    public NoteViewedByUser1 getNoteViewedByUser1(Timestamp currentUTCTimestamp, User entity) {
+        NoteViewedByUser1 noteViewedByUser = jsonObjectViewedBy1(entity);
+        noteViewedByUser.setRecentlyUpdated(isRecentlyUpdated(currentUTCTimestamp));
+        return noteViewedByUser;
+    }
+
 }
 

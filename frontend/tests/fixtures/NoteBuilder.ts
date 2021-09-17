@@ -30,12 +30,11 @@ class NoteBuilder extends Builder {
     const id = generateId()
 
     return merge({
+      id,
       owns: true,
       recentlyUpdated: false,
       note: {
-        id,
         noteContent: {
-          id,
           title: "Note1.1.1",
           description: "Desc",
           url: null,

@@ -15,12 +15,12 @@ export default createStore({
   
   mutations: {
     addNote (state, note) {
-      state.notes[note.note.id] = note
+      state.notes[note.id] = note
     },
 
     loadNotes (state, notes) {
       notes.forEach(note => {
-        state.notes[note.note.id] = note
+        state.notes[note.id] = note
       })
     },
 
