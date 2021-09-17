@@ -151,21 +151,17 @@ Expect to find minified and uglified web bundle assets in `backend/src/main/reso
 ```bash
 ❯ pwd
 /home/csd/csd/doughnut/backend/src/main/resources/static
-❯ tree
+❯ tree -L 3
 .
 ├── assets
-│   ├── index.2cfdfd84.js
-│   ├── index.805e3910.css
-│   └── vendor.7a53bc23.js
-├── blog
-│   ├── blog_landing.html
-│   └── blog_landing.js
-├── favicon.ico
+│   ├── main.32137c85.js
+│   ├── main.b097c993.css
+│   └── vendor.8f9eb49d.js
 ├── index.html
 ├── odd-e.ico
 └── odd-e.png
 
-3 directories, 9 files
+1 directory, 6 files
 ```
 
 ### 6. Interacting with gcloud CLI for cloud infrastructure management
