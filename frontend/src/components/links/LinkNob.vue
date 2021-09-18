@@ -2,11 +2,7 @@
   <ModalWithButton v-model="show">
     <template #button>
       <span class="link-nob">
-        <a
-          role="button"
-          @click="show = true"
-          :title="link.linkTypeLabel"
-        >
+        <a role="button" @click="show = true" :title="link.linkTypeLabel">
           <SvgLinkTypeIcon
             :linkTypeId="link.typeId"
             :inverseIcon="inverseIcon"

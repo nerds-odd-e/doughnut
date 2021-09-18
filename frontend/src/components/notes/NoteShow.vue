@@ -53,5 +53,4 @@ const twoColumns = computed(
   padding-top: 10px;
   color: v-bind($staticInfo.colors[ "target" ]);
 }
-
 </style>

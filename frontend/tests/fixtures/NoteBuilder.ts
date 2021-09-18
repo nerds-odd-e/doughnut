@@ -1,65 +1,68 @@
 import { merge } from "lodash";
-import Builder from "./Builder"
-import LinkBuilder from "./LinkBuilder"
+import Builder from "./Builder";
+import LinkBuilder from "./LinkBuilder";
 
-let idCounter = 1
+let idCounter = 1;
 
 const generateId = () => {
-  return idCounter++
-}
+  return idCounter++;
+};
 
 class NoteBuilder extends Builder {
-  data: any
+  data: any;
 
   constructor(parentBuilder?: Builder) {
-    super(parentBuilder)
-    this.data = {note:{ noteContent: {}}, links: {}}
+    super(parentBuilder);
+    this.data = { note: { noteContent: {} }, links: {} };
   }
 
   title(value: string): NoteBuilder {
-    this.data.note.title = value
-    this.data.note.noteContent.title = value
-    return this
+    this.data.note.title = value;
+    this.data.note.noteContent.title = value;
+    return this;
   }
 
   recentlyUpdated(value: boolean): NoteBuilder {
-    this.data.recentlyUpdated = value
-    return this
+    this.data.recentlyUpdated = value;
+    return this;
   }
 
   linkTo(): NoteBuilder {
-    merge(this.data.links, new LinkBuilder(undefined, 'using').please())
-    return this
+    merge(this.data.links, new LinkBuilder(undefined, "using").please());
+    return this;
   }
 
   do(): any {
-    const id = generateId()
+    const id = generateId();
 
-    return merge({
-      id,
-      recentlyUpdated: false,
-      note: {
-        noteContent: {
+    return merge(
+      {
+        id,
+        recentlyUpdated: false,
+        note: {
+          noteContent: {
+            title: "Note1.1.1",
+            description: "Desc",
+            url: null,
+            urlIsVideo: false,
+            pictureUrl: null,
+            pictureMask: null,
+            useParentPicture: false,
+            skipReview: false,
+            updatedAt: "2021-08-24T08:46:44.000+00:00",
+          },
+          createdAt: "2021-08-24T08:46:44.000+00:00",
           title: "Note1.1.1",
-          description: "Desc",
-          url: null,
-          urlIsVideo: false,
-          pictureUrl: null,
-          pictureMask: null,
-          useParentPicture: false,
-          skipReview: false,
-          updatedAt: "2021-08-24T08:46:44.000+00:00",
+          notePicture: null,
+          head: false,
+          shortDescription: "Desc",
+          parentId: 4,
         },
-        createdAt: "2021-08-24T08:46:44.000+00:00",
-        title: "Note1.1.1",
-        notePicture: null,
-        head: false,
-        shortDescription: "Desc",
-        parentId: 4,
+        links: {},
       },
-      links: {},
-    }, this.data)
+      this.data
+    );
   }
 }
 
-export default NoteBuilder
+export default NoteBuilder;

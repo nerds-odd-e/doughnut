@@ -1,3 +1,6 @@
+/**
+ * @jest-environment jsdom
+ */
 import RepeatPage from "@/pages/RepeatPage.vue";
 import flushPromises from "flush-promises";
 import { reviewPointViewedByUser } from "../notes/fixtures";

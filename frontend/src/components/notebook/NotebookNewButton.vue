@@ -11,7 +11,9 @@
       </button>
     </template>
     <template #header>
-      <NoteOwnerBreadcrumb v-bind="{ ancestors: [], notebook:{ ownership: { circle}} }">
+      <NoteOwnerBreadcrumb
+        v-bind="{ ancestors: [], notebook: { ownership: { circle } } }"
+      >
         <li class="breadcrumb-item">(adding here)</li>
       </NoteOwnerBreadcrumb>
     </template>

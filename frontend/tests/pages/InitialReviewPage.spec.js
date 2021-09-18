@@ -1,3 +1,6 @@
+/**
+ * @jest-environment jsdom
+ */
 import InitialReviewPage from "@/pages/InitialReviewPage.vue";
 import flushPromises from "flush-promises";
 import _ from "lodash";

@@ -1,46 +1,49 @@
-import Builder from "./Builder"
+import Builder from "./Builder";
 
-class LinkBuilder extends Builder{
-    linkType: string
+class LinkBuilder extends Builder {
+  linkType: string;
 
-    cnt: number
+  cnt: number;
 
-    isReverse: boolean
+  isReverse: boolean;
 
-    constructor(parentBuilder: Builder | undefined, linkType: string) {
-      super(parentBuilder)
-      this.linkType = linkType
-      this.cnt = 1
-      this.isReverse = false
-    }
+  constructor(parentBuilder: Builder | undefined, linkType: string) {
+    super(parentBuilder);
+    this.linkType = linkType;
+    this.cnt = 1;
+    this.isReverse = false;
+  }
 
-    count(cnt: number): LinkBuilder {
-        this.cnt = cnt
-        return this;
-    }
+  count(cnt: number): LinkBuilder {
+    this.cnt = cnt;
+    return this;
+  }
 
-    get reverse(): LinkBuilder {
-      this.isReverse = true
-      return this
-    }
+  get reverse(): LinkBuilder {
+    this.isReverse = true;
+    return this;
+  }
 
-    do(): any {
-        return {
-            [this.linkType]: {
-              [this.isReverse ? 'reverse' : 'direct']: Array.from({ length: this.cnt }, (x, i) => ({
-                  id: 1938,
-                  targetNote: {
-                    id: 2423,
-                    title: "a tool",
-                  },
-                  typeId: 15,
-                  linkTypeLabel: "using",
-                  linkNameOfSource: "user",
-                })),
-              [this.isReverse ? 'direct' : 'reverse']: [],
+  do(): any {
+    return {
+      [this.linkType]: {
+        [this.isReverse ? "reverse" : "direct"]: Array.from(
+          { length: this.cnt },
+          (x, i) => ({
+            id: 1938,
+            targetNote: {
+              id: 2423,
+              title: "a tool",
             },
-          }
-    }
+            typeId: 15,
+            linkTypeLabel: "using",
+            linkNameOfSource: "user",
+          })
+        ),
+        [this.isReverse ? "direct" : "reverse"]: [],
+      },
+    };
+  }
 }
 
-export default LinkBuilder
+export default LinkBuilder;

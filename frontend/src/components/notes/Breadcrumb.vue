@@ -6,10 +6,11 @@
   />
   <NoteBreadcrumb v-else :ancestors="ancestors">
     <template #topLink>
-      <li class="breadcrumb-item"><router-link :to="{name: 'bazaar'}">Bazaar</router-link></li>
+      <li class="breadcrumb-item">
+        <router-link :to="{ name: 'bazaar' }">Bazaar</router-link>
+      </li>
     </template>
   </NoteBreadcrumb>
-
 </template>
 
 <script>

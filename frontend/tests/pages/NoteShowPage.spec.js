@@ -1,3 +1,6 @@
+/**
+ * @jest-environment jsdom
+ */
 import NoteShowPage from "@/pages/NoteShowPage.vue";
 import { mountWithMockRoute } from "../helpers";
 import flushPromises from "flush-promises";

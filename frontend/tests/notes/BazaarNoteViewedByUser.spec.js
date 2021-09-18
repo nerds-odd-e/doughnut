@@ -1,3 +1,6 @@
+/**
+ * @jest-environment jsdom
+ */
 import NoteViewedByUser from "@/components/notes/NoteViewedByUser.vue";
 import { noteViewedByUser } from "./fixtures";
 import _ from "lodash";

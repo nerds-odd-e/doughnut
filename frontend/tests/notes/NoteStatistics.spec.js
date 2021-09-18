@@ -1,3 +1,6 @@
+/**
+ * @jest-environment jsdom
+ */
 import NoteStatistics from "@/components/notes/NoteStatistics.vue";
 import { mount } from "@vue/test-utils";
 import flushPromises from "flush-promises";

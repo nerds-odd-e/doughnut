@@ -1,3 +1,6 @@
+/**
+ * @jest-environment jsdom
+ */
 import Repetition from "@/components/review/Repetition.vue";
 import {
   noteViewedByUser,

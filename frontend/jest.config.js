@@ -2,11 +2,11 @@ module.exports = {
   verbose: true,
   collectCoverage: false,
   globals: {
-    "vue-jest": { babelConfig: true },
+    "@vue/vue3-jest": { babelConfig: true },
   },
   moduleFileExtensions: ["js", "ts", "json", "vue"],
   transform: {
-    ".*\\.(vue)$": "vue-jest",
+    ".*\\.(vue)$": "@vue/vue3-jest",
     ".*\\.(js)$": "babel-jest",
     "^.+\\.(ts|tsx)$": "ts-jest",
   },

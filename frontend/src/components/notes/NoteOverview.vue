@@ -1,8 +1,5 @@
 <template>
-  <NoteShow
-    v-bind="{ ...noteViewedByUser }"
-    @updated="$emit('updated')"
-  />
+  <NoteShow v-bind="{ ...noteViewedByUser }" @updated="$emit('updated')" />
   <div class="note-list">
     <NoteOverview
       v-for="child in childrenx"
@@ -23,14 +20,17 @@ export default {
   emits: ["updated"],
   components: { NoteShow },
   computed: {
-    noteViewedByUser() { return this.$store.getters.getNoteById(this.noteId)},
-    childrenx() { return this.$store.getters.getChildrenOfParentId(this.noteId)}
-  }
+    noteViewedByUser() {
+      return this.$store.getters.getNoteById(this.noteId);
+    },
+    childrenx() {
+      return this.$store.getters.getChildrenOfParentId(this.noteId);
+    },
+  },
 };
 </script>
 
 <style lang="sass" scoped>
-  .note-list
-    margin-left: 10px
-
+.note-list
+  margin-left: 10px
 </style>

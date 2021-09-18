@@ -1,6 +1,9 @@
 <template>
   <ul class="parent-links">
-    <template v-for="(linksOfType, linkType) in linksReader.hierachyLinks" :key="linkType">
+    <template
+      v-for="(linksOfType, linkType) in linksReader.hierachyLinks"
+      :key="linkType"
+    >
       <li v-for="link in linksOfType.direct" :key="link.id">
         <LinkLink
           v-bind="{ link, colors: $staticInfo.colors }"
@@ -9,8 +12,13 @@
         />
       </li>
     </template>
-    <li v-if="!!linksReader.groupedLinks && linksReader.groupedLinks.length > 0">
-      <template v-for="{ direct, reverse } in linksReader.groupedLinks" :key="direct">
+    <li
+      v-if="!!linksReader.groupedLinks && linksReader.groupedLinks.length > 0"
+    >
+      <template
+        v-for="{ direct, reverse } in linksReader.groupedLinks"
+        :key="direct"
+      >
         <LinkLink
           class="link-multi"
           v-for="link in direct"
@@ -29,7 +37,10 @@
         />
       </template>
     </li>
-    <template v-for="(linksOfType, linkType) in linksReader.tagLinks" :key="linkType">
+    <template
+      v-for="(linksOfType, linkType) in linksReader.tagLinks"
+      :key="linkType"
+    >
       <li v-if="linksOfType.direct.length > 0">
         <LinkLink
           class="link-multi"
@@ -42,11 +53,14 @@
       </li>
     </template>
   </ul>
-  
+
   <slot />
 
   <ul class="children-links">
-    <template v-for="(linksOfType, linkType) in linksReader.childrenLinks" :key="linkType">
+    <template
+      v-for="(linksOfType, linkType) in linksReader.childrenLinks"
+      :key="linkType"
+    >
       <li v-if="linksOfType.reverse.length > 0">
         <span>{{ linksReader.reverseLabel(linkType) }} </span>
         <LinkLink
@@ -64,7 +78,7 @@
 
 <script>
 import LinkLink from "./LinkLink.vue";
-import LinksReader from "../../models/LinksReader"
+import LinksReader from "../../models/LinksReader";
 
 export default {
   props: { links: Object },
@@ -73,14 +87,13 @@ export default {
   computed: {
     linksReader() {
       if (!this.$staticInfo || !this.$staticInfo.linkTypeOptions) {
-        return {}
+        return {};
       }
-      if(!this.links) return {}
-      return new LinksReader(this.$staticInfo.linkTypeOptions, this.links)
-    }
-  }
-}
-
+      if (!this.links) return {};
+      return new LinksReader(this.$staticInfo.linkTypeOptions, this.links);
+    },
+  },
+};
 </script>
 
 <style scoped>

@@ -1,5 +1,5 @@
 <template>
-  <Breadcrumb v-bind="{owns, ancestors, notebook, noteTitle: note.title}"/>
+  <Breadcrumb v-bind="{ owns, ancestors, notebook, noteTitle: note.title }" />
   <div class="note-with-controls">
     <nav class="nav d-flex flex-row-reverse p-0">
       <NoteButtons

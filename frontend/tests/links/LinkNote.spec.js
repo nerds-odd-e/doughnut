@@ -1,3 +1,6 @@
+/**
+ * @jest-environment jsdom
+ */
 import LinkNoteFinalize from "@/components/links/LinkNoteFinalize.vue";
 import { mount, config } from "@vue/test-utils";
 import { noteViewedByUser } from "../notes/fixtures";

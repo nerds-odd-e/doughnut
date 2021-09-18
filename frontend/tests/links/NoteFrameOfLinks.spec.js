@@ -1,3 +1,6 @@
+/**
+ * @jest-environment jsdom
+ */
 import _ from "lodash";
 import makeMe from "../fixtures/makeMe.ts";
 import NoteFrameOfLinks from "@/components/links/NoteFrameOfLinks.vue";
@@ -22,7 +25,10 @@ describe("a link lists of a note", () => {
   });
 
   test("related, opposite, similar, confuse are grouped at top", async () => {
-    const links = makeMe.links.of('confused with').and.of('similar to').please();
+    const links = makeMe.links
+      .of("confused with")
+      .and.of("similar to")
+      .please();
     const { wrapper } = mountWithMockRoute(NoteFrameOfLinks, {
       propsData: { links },
     });
@@ -38,5 +44,4 @@ describe("a link lists of a note", () => {
     });
     expect(wrapper.findAll(".children-links li").length).toEqual(1);
   });
-
 });

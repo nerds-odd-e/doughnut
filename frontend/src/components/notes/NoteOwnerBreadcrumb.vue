@@ -26,5 +26,7 @@
 import { computed } from "@vue/reactivity";
 import NoteBreadcrumb from "./NoteBreadcrumb.vue";
 const props = defineProps({ ancestors: Array, notebook: Object });
-const circle = computed(() => !!props.notebook ? props.notebook.ownership.circle : null)
+const circle = computed(() =>
+  !!props.notebook ? props.notebook.ownership.circle : null
+);
 </script>

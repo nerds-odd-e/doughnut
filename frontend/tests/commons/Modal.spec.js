@@ -1,3 +1,6 @@
+/**
+ * @jest-environment jsdom
+ */
 import Modal from "@/components/commons/Modal.vue";
 import { mount } from "@vue/test-utils";
 
