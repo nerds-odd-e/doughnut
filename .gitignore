@@ -49,9 +49,6 @@ backend/build/
 *.iws
 .idea/
 
-# VSCode
-.settings/
-
 # nodes
 node_modules/
 **/package-lock.json
@@ -64,6 +61,7 @@ public_keys/
 **/carbon-syntax-298809-f31377ba77a9.json
 
 # VSCode
+.settings/
 **/*.code-workspace
 
 # asdf
