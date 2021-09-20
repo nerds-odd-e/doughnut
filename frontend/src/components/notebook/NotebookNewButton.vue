@@ -11,11 +11,11 @@
       </button>
     </template>
     <template #header>
-      <NoteOwnerBreadcrumb
-        v-bind="{ ancestors: [], notebook: { ownership: { circle } } }"
+      <Breadcrumb
+        v-bind="{ owns: true, ancestors: [], notebook: { ownership: { circle } } }"
       >
         <li class="breadcrumb-item">(adding here)</li>
-      </NoteOwnerBreadcrumb>
+      </Breadcrumb>
     </template>
 
     <template #body>
@@ -31,7 +31,7 @@
 
 <script>
 import ModalWithButton from "../commons/ModalWithButton.vue";
-import NoteOwnerBreadcrumb from "../notes/NoteOwnerBreadcrumb.vue";
+import Breadcrumb from "../notes/Breadcrumb.vue";
 import NoteFormBody from "../notes/NoteFormBody.vue";
 import LoadingPage from "../../pages/commons/LoadingPage.vue";
 import { restPostMultiplePartForm } from "../../restful/restful";
@@ -41,7 +41,7 @@ export default {
   props: { circle: Object },
   components: {
     ModalWithButton,
-    NoteOwnerBreadcrumb,
+    Breadcrumb,
     NoteFormBody,
     LoadingPage,
   },

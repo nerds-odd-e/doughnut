@@ -1,6 +1,7 @@
 <template>
-  <NoteOwnerBreadcrumb
+  <Breadcrumb
     v-bind="{
+      owns: true,
       ancestors: noteViewedByUser.ancestors,
       notebook: noteViewedByUser.notebook,
     }"
@@ -29,7 +30,7 @@
 </template>
 
 <script>
-import NoteOwnerBreadcrumb from "../notes/NoteOwnerBreadcrumb.vue";
+import Breadcrumb from "../notes/Breadcrumb.vue";
 import NoteShow from "../notes/NoteShow.vue";
 import Card from "../notes/Card.vue";
 
@@ -37,6 +38,6 @@ export default {
   name: "LinkNoteShow",
   props: { noteViewedByUser: Object },
   emits: ["updated"],
-  components: { NoteOwnerBreadcrumb, NoteShow, Card },
+  components: { Breadcrumb, NoteShow, Card },
 };
 </script>

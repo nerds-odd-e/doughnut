@@ -4,9 +4,9 @@
       <slot :open="() => (show = true)" />
     </template>
     <template #header>
-      <NoteOwnerBreadcrumb v-bind="{ notebook, ancestors }">
+      <Breadcrumb v-bind="{ owns: true, notebook, ancestors }">
         <li class="breadcrumb-item">(adding here)</li>
-      </NoteOwnerBreadcrumb>
+      </Breadcrumb>
     </template>
     <template #body>
       <form @submit.prevent="processForm">
@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import NoteOwnerBreadcrumb from "./NoteOwnerBreadcrumb.vue";
+import Breadcrumb from "./Breadcrumb.vue";
 import NoteFormBody from "./NoteFormBody.vue";
 import ModalWithButton from "../commons/ModalWithButton.vue";
 import LinkTypeSelect from "../links/LinkTypeSelect.vue";
@@ -47,7 +47,7 @@ function initialState() {
 export default {
   name: "NoteNewButton",
   components: {
-    NoteOwnerBreadcrumb,
+    Breadcrumb,
     NoteFormBody,
     ModalWithButton,
     LinkTypeSelect,
