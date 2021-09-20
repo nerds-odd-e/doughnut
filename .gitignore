@@ -49,6 +49,9 @@ backend/build/
 *.iws
 .idea/
 
+# VSCode
+.settings/
+
 # nodes
 node_modules/
 **/package-lock.json
