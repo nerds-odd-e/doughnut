@@ -17,4 +17,4 @@ Feature: Note overview with nested children
     Then I should see the title "Singapore" of the notebook
     And I should see the child notes "History,Geography" in order
     And I should see the child notes "History,Leaving Malaysia,Geography" in order
-    And I should see "Circles, Odd-e SG Team" in breadcrumb
+    And I should see "Top" in breadcrumb

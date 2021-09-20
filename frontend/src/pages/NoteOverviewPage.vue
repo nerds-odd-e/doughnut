@@ -1,6 +1,7 @@
 <template>
   <LoadingPage v-bind="{ loading, contentExists: !!loaded }">
     <div v-if="loaded">
+      <Breadcrumb v-bind="breadcrumb" />
       <NoteOverview v-bind="{ noteId }" />
     </div>
   </LoadingPage>
@@ -10,25 +11,26 @@
 import LoadingPage from "./commons/LoadingPage.vue";
 import { restGet } from "../restful/restful";
 import NoteOverview from "../components/notes/NoteOverview.vue";
+import Breadcrumb from "../components/notes/Breadcrumb.vue";
 
 export default {
   name: "NoteOverviewPage",
   props: { noteId: Number },
   data() {
     return {
-      ancestors: null,
+      breadcrumb: null,
       loaded: false,
       loading: false,
     };
   },
-  components: { LoadingPage, NoteOverview },
+  components: { LoadingPage, NoteOverview, Breadcrumb },
   methods: {
     fetchData() {
       restGet(
         `/api/notes/${this.noteId}/overview`,
         (r) => (this.loading = r)
       ).then((res) => {
-        this.breadcrumb = res.breadcrumb;
+        this.breadcrumb = res.noteBreadcrumbViewedByUser;
         this.$store.commit("loadNotes", res.notes);
         this.$store.commit("loadParentChildren", res.parentChildren);
         this.loaded = true;
