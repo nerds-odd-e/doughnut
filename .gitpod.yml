@@ -9,14 +9,14 @@ ports:
     onOpen: ignore
   - port: 9082
     onOpen: ignore
-  # Vite Frontend Dev Server
+# Vite Frontend Dev Server
   - port: 3000
     onOpen: open-browser
     visibility: public
-  # MySQL 8.0 DB Server
+# MySQL 8.0 DB Server
   - port: 3309
     onOpen: ignore
-  # Remote VNC
+# Remote VNC
   - port: 5900
     onOpen: ignore
     visibility: public
@@ -40,7 +40,6 @@ vscode:
     - octref.vetur
     - HansUXdev.bootstrap5-snippets
     - vscjava.vscode-java-pack
-    - vscjava.vscode-spring-initializr
     - vscjava.vscode-spring-boot-dashboard
     - Pivotal.vscode-spring-boot
     - richardwillis.vscode-gradle
@@ -48,5 +47,5 @@ vscode:
     - xyz.plsql-language
     - bajdzis.vscode-database
     - vscodevim.vim
-    - shd101wyy.markdown-preview-enhanced
     - GulajavaMinistudio.mayukaithemevsc
+    - pivotal.vscode-boot-dev-pack
