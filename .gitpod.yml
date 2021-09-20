@@ -39,9 +39,11 @@ vscode:
     - CoenraadS.bracket-pair-colorizer-2
     - octref.vetur
     - HansUXdev.bootstrap5-snippets
+    - vscjava.vscode-java-pack
     - vscjava.vscode-spring-initializr
     - vscjava.vscode-spring-boot-dashboard
     - Pivotal.vscode-spring-boot
+    - richardwillis.vscode-gradle
     - Shelex.vscode-cy-helper
     - xyz.plsql-language
     - bajdzis.vscode-database
