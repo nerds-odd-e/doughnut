@@ -34,7 +34,6 @@ export default {
   props: {
     ancestors: Array,
     notebook: Object,
-    noteTitle: String,
     owns: { type: Boolean, required: true },
   },
   components: {

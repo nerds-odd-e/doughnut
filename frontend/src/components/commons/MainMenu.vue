@@ -12,7 +12,7 @@
       >
         <span class="navbar-toggler-icon"></span>
       </button>
-      <a class="navbar-brand" href="/#">
+      <router-link class="navbar-brand" :to="{name: 'root'}">
         <img
           src="/odd-e.png"
           width="30"
@@ -21,7 +21,7 @@
           alt=""
         />
         Doughnut
-      </a>
+      </router-link>
       <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item active">
@@ -35,10 +35,10 @@
             >
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/circles">Circles</a>
+            <router-link class="nav-link" :to="{name: 'circles'}">Circles</router-link>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/bazaar">Bazaar</a>
+            <router-link class="nav-link" :to="{name: 'bazaar'}">Bazaar</router-link>
           </li>
           <li class="nav-item" v-if="user && user.isDeveloper">
             <a class="nav-link" href="/failure-report-list">Failure Reports</a>
