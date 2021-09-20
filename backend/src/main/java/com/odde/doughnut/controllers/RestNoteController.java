@@ -71,7 +71,9 @@ class RestNoteController {
     note.updateNoteContent(noteCreation.getNoteContent(), user);
     note.setParentNote(parentNote);
     note.setUser(user);
-    note.getNoteContent().setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
+    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
+    note.setCreatedAt(currentUTCTimestamp);
+    note.getNoteContent().setUpdatedAt(currentUTCTimestamp);
     modelFactoryService.noteRepository.save(note);
     if(noteCreation.getLinkTypeToParent() != null) {
       Link link = new Link();
@@ -123,6 +125,7 @@ class RestNoteController {
   public RedirectToNoteResponse updateNote(@PathVariable(name = "note") Note note, @Valid @ModelAttribute NoteContent noteContent) throws NoAccessRightException, IOException {
     final UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertAuthorization(note);
+    noteContent.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
     note.updateNoteContent(noteContent, user.getEntity());
     modelFactoryService.noteRepository.save(note);
     return new RedirectToNoteResponse(note.getId());

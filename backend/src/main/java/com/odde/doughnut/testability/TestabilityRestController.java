@@ -7,6 +7,7 @@ import com.odde.doughnut.entities.repositories.LinkRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
 import com.odde.doughnut.models.CircleModel;
+import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.services.GithubService;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -74,6 +75,7 @@ class TestabilityRestController {
         for (NoteContent content : noteContents) {
             Note note = new Note();
             note.mergeNoteContent(content);
+            note.setCreatedAt(testabilitySettings.getCurrentUTCTimestamp());
             note.getNoteContent().setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
             earlyNotes.put(content.getTitle(), note);
             noteList.add(note);
@@ -190,6 +192,18 @@ class TestabilityRestController {
         DateTimeFormatter formatter = TestabilityRestController.getDateTimeFormatter();
         LocalDateTime localDateTime = LocalDateTime.from(formatter.parse(timeTravel.travel_to));
         Timestamp timestamp = Timestamp.valueOf(localDateTime);
+        testabilitySettings.timeTravelTo(timestamp);
+        return Collections.emptyList();
+    }
+
+    static class TimeTravelRelativeToNow {
+        public Integer hours;
+    }
+
+    @PostMapping(value="/time_travel_relative_to_now")
+    public List<Object> timeTravelRelativeToNow(@RequestBody  TimeTravelRelativeToNow timeTravelRelativeToNow) {
+        DateTimeFormatter formatter = TestabilityRestController.getDateTimeFormatter();
+        Timestamp timestamp = TimestampOperations.addHoursToTimestamp(new Timestamp(System.currentTimeMillis()), timeTravelRelativeToNow.hours);
         testabilitySettings.timeTravelTo(timestamp);
         return Collections.emptyList();
     }

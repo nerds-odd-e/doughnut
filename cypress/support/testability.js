@@ -33,6 +33,16 @@ Cypress.Commands.add('timeTravelTo', (day, hour) => {
     .should('equal', 200);
 });
 
+Cypress.Commands.add('timeTravelRelativeToNow', (hours) => {
+  cy.request({
+    method: 'POST',
+    url: '/api/testability/time_travel_relative_to_now',
+    body: { hours: JSON.stringify(hours) }
+  })
+    .its('status')
+    .should('equal', 200);
+});
+
 Cypress.Commands.add('randomizerAlwaysChooseLast', (day, hour) => {
   cy.request({
     method: 'POST',

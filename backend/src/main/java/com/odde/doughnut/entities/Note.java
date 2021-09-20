@@ -48,7 +48,7 @@ public class Note {
     @Column(name = "created_at")
     @Getter
     @Setter
-    private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
+    private Timestamp createdAt;
 
     @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "master_review_setting_id", referencedColumnName = "id")

@@ -50,6 +50,15 @@ When("I update it to become:", (data) => {
   cy.submitNoteFormsWith(data.hashes());
 });
 
+When("I update note {string} with the description {string}", (noteTitle, newDescription) => {
+  cy.clickNotePageButton(noteTitle, "edit note");
+  cy.submitNoteFormsWith([{Description: newDescription}]);
+});
+
+
+
+
+
 When("I create note belonging to {string}:", (noteTitle, data) => {
   cy.jumpToNotePage(noteTitle);
   cy.clickAddChildNoteButton();

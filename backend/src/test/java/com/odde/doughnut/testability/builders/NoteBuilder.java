@@ -17,6 +17,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
         if(Strings.isEmpty(note.getTitle())) title(titleCounter.generate());
         description("descrption");
         createdAt(new Timestamp(System.currentTimeMillis()));
+        updatedAt(new Timestamp(System.currentTimeMillis()));
     }
 
     public NoteBuilder byUser(User user) {
@@ -105,6 +106,11 @@ public class NoteBuilder extends EntityBuilder<Note> {
 
     public NoteBuilder createdAt(Timestamp timestamp) {
         entity.setCreatedAt(timestamp);
+        return this;
+    }
+
+    public NoteBuilder updatedAt(Timestamp timestamp) {
+        entity.getNoteContent().setUpdatedAt(timestamp);
         return this;
     }
 

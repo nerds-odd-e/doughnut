@@ -84,7 +84,7 @@ public class NoteContent {
     @Column(name = "updated_at")
     @Getter
     @Setter
-    private Timestamp updatedAt = new Timestamp(System.currentTimeMillis());
+    private Timestamp updatedAt;
 
     @JsonIgnore
     public String getNotePicture() {
