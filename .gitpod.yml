@@ -37,6 +37,7 @@ vscode:
     - esbenp.prettier-vscode
     - dbaeumer.vscode-eslint
     - octref.vetur
+    - gabrielbb.vscode-lombok
     - HansUXdev.bootstrap5-snippets
     - richardwillis.vscode-gradle
     - Shelex.vscode-cy-helper
