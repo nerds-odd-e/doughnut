@@ -61,8 +61,8 @@ public_keys/
 **/carbon-syntax-298809-f31377ba77a9.json
 
 # VSCode
-.settings/
-.vscode/
+**/.settings/
+**/.vscode/
 **/*.code-workspace
 
 # asdf
