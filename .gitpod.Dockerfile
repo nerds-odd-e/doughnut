@@ -40,7 +40,8 @@ RUN apt-get update \
 
 # Setup Maven3 MAVEN_HOME & PATH
 RUN mv apache-maven-3.8.2 /opt/maven \
-    && rm -rf apache-maven-3.8.2-bin.tar.gz
+    && rm -rf apache-maven-3.8.2 \
+    && rm -f apache-maven-3.8.2-bin.tar.gz
 
 # Install MySQL DB
 RUN install-packages mysql-server \
