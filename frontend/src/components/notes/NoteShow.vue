@@ -1,6 +1,5 @@
 <template>
   <NoteFrameOfLinks v-bind="{ links }" @updated="$emit('updated')">
-    <div v-if="recentlyUpdated">This note has been changed recently.</div>
     <div class="note-body" :style="`background-color: ${bgColor}`">
       <h2 role="title" class="note-title">{{ note.noteContent.title }}</h2>
       <div class="row">
@@ -33,7 +32,6 @@ const props = defineProps({
   id: Number,
   note: { type: Object, required: true },
   links: Object,
-  recentlyUpdated: Boolean,
 });
 const emits = defineEmits(["updated"]);
 
@@ -43,12 +41,12 @@ const twoColumns = computed(
 
 const bgColor = computed(
   () => {
-    const colorOld = [96, 96, 96]
+    const colorOld = [150, 150, 150]
     const newColor = [208, 237, 23]
-    const ageInMillisecond = new Date() - new Date(props.note.noteContent.updatedAt)
+    const ageInMillisecond = Math.max(0, Date.now() - new Date(props.note.noteContent.updatedAt))
     const max = 15 // equals to 225 hours
     const index = Math.min(max, Math.sqrt(ageInMillisecond / 1000 / 60 / 60))
-    return `rgb(${colorOld.map((oc, i)=>(oc * index + newColor[i] * (max-index))/max).join(',')})`
+    return `rgb(${colorOld.map((oc, i)=>Math.round((oc * index + newColor[i] * (max-index))/max)).join(',')})`
   }
 );
 

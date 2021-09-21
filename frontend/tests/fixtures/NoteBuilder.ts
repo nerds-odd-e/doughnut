@@ -22,8 +22,8 @@ class NoteBuilder extends Builder {
     return this;
   }
 
-  recentlyUpdated(value: boolean): NoteBuilder {
-    this.data.recentlyUpdated = value;
+  updatedAt(value: Date): NoteBuilder {
+    this.data.note.noteContent.updatedAt = value.toJSON();
     return this;
   }
 
@@ -38,7 +38,6 @@ class NoteBuilder extends Builder {
     return merge(
       {
         id,
-        recentlyUpdated: false,
         note: {
           noteContent: {
             title: "Note1.1.1",

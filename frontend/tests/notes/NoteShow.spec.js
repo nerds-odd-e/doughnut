@@ -6,20 +6,21 @@ import NoteShow from "@/components/notes/NoteShow.vue";
 import makeMe from "../fixtures/makeMe";
 
 describe("new/updated pink banner", () => {
-  const getBannerCount = async () =>
-    screen.queryAllByText("This note has been changed recently.");
+  beforeAll(()=> {
+    Date.now = jest.fn(() => new Date(Date.UTC(2017, 1, 14)).valueOf())
+  })
 
-  test("should show pink banner if the note was updated within the last 12 hours", async () => {
-    const note = makeMe.aNote.recentlyUpdated(true).please();
+  test.each([
+    [new Date(Date.UTC(2017, 1, 15)), 'rgb(208, 237, 23)'],
+    [new Date(Date.UTC(2017, 1, 13)), 'rgb(189, 209, 64)'],
+    [new Date(Date.UTC(2017, 1, 12)), 'rgb(181, 197, 82)'],
+    [new Date(Date.UTC(2016, 1, 12)), 'rgb(150, 150, 150)'],
+
+  ])("should show fresher color if recently updated", (updatedAt, expectedColor) => {
+    const note = makeMe.aNote.updatedAt(updatedAt).please();
     render(NoteShow, { props: note });
 
-    expect(await getBannerCount()).toHaveLength(1);
-  });
+    expect(screen.getByRole("title").parentNode).toHaveStyle(`background-color: ${expectedColor};`)
+  })
 
-  test("should show 0 pink banners if the note was updated more than 12 hours ago", async () => {
-    const note = makeMe.aNote.recentlyUpdated(false).please();
-    render(NoteShow, { props: note });
-
-    expect(await getBannerCount()).toHaveLength(0);
-  });
-});
+})

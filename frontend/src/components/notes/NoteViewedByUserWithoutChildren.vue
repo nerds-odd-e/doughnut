@@ -13,7 +13,6 @@
     <NoteShow
       :note="note"
       :links="links"
-      :recentlyUpdated="recentlyUpdated"
       @updated="$emit('updated')"
     />
   </div>
@@ -32,7 +31,6 @@ export default {
     links: Object,
     ancestors: Array,
     notebook: Object,
-    recentlyUpdated: Boolean,
     owns: { type: Boolean, required: true },
   },
   emits: ["updated"],

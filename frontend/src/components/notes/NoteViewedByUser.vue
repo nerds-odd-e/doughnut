@@ -1,6 +1,6 @@
 <template>
   <NoteViewedByUserWithoutChildren
-    v-bind="{ note, links, ancestors, notebook, owns, recentlyUpdated }"
+    v-bind="{ note, links, ancestors, notebook, owns }"
     @updated="$emit('updated')"
   />
   <nav class="nav d-flex justify-content-between p-0 mb-2">
@@ -37,7 +37,6 @@ export default {
     children: Array,
     ancestors: Array,
     notebook: Object,
-    recentlyUpdated: Boolean,
     owns: { type: Boolean, required: true },
   },
   emits: ["updated"],
