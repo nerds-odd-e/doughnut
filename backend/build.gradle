@@ -4,12 +4,6 @@ plugins {
     id 'java'
 }
 
-java {
-    toolchain {
-        languageVersion = JavaLanguageVersion.of(16)
-    }
-}
-
 group = 'com.odd-e'
 version = '0.0.1-SNAPSHOT'
 
