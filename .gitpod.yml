@@ -29,12 +29,12 @@ tasks:
       cp infra/gitpod/.zshrc /home/gitpod/ &&
       [ ! -e /home/gitpod/.p10k.zsh ] && cp infra/gitpod/.p10k.zsh /home/gitpod/ &&
       git config --global init.defaultBranch main &&
+      code --install-extension infra/gitpod/loiane.java-spring-extension-pack-0.0.2.vsix &&
       sleep 3 && mysql -u root -S /var/run/mysqld/mysqld.sock < infra/gitpod/mysql/init_doughnut_db.sql
 
 vscode:
   extensions:
     - vscjava.vscode-java-pack
-    - loiane.java-spring-extension-pack	
     - esbenp.prettier-vscode
     - dbaeumer.vscode-eslint
     - octref.vetur
