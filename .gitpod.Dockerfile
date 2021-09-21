@@ -132,7 +132,7 @@ RUN echo "if [ ! -e /var/run/mysqld/gitpod-init.lock ]" >> /home/gitpod/.bashrc 
     && echo "fi" >> /home/gitpod/.bashrc \
     && echo "export JAVA_HOME=/usr/lib/jvm/zulu16" >> /home/gitpod/.bashrc \
     && echo "export MAVEN_HOME=/opt/maven" >> /home/gitpod/.bashrc \
-    && echo "export PATH=\$PATH:\$JAVA_HOME/bin:\$MAVEN_HOME/bin" >> /home/gitpod/.bashrc
+    && echo "export PATH=$PATH:$JAVA_HOME/bin:$MAVEN_HOME/bin" >> /home/gitpod/.bashrc
 
 EXPOSE 3000
 EXPOSE 3309
