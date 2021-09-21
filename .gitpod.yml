@@ -34,12 +34,15 @@ tasks:
 vscode:
   extensions:
     - bbenoist.Nix
+    - redhat.java
+    - vscjava.vscode-java-debug
+    - vscjava.vscode-java-test
+    - gabrielbb.vscode-lombok
+    - pivotal.vscode-spring-boot
     - esbenp.prettier-vscode
     - dbaeumer.vscode-eslint
     - octref.vetur
-    - gabrielbb.vscode-lombok
     - HansUXdev.bootstrap5-snippets
-    - richardwillis.vscode-gradle
     - Shelex.vscode-cy-helper
     - xyz.plsql-language
     - bajdzis.vscode-database
