@@ -102,7 +102,6 @@ export default {
   list-style: none;
   padding: 0px;
   margin: 0px;
-  background-color: #eee;
 }
 
 .parent-links {
@@ -137,4 +136,5 @@ export default {
   color: #6c757d;
   content: "|";
 }
+
 </style>

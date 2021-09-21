@@ -20,7 +20,7 @@ describe("new/updated pink banner", () => {
     const note = makeMe.aNote.updatedAt(updatedAt).please();
     render(NoteShow, { props: note });
 
-    expect(screen.getByRole("title").parentNode).toHaveStyle(`background-color: ${expectedColor};`)
+    expect(screen.getByRole("title").parentNode.parentNode).toHaveStyle(`background-color: ${expectedColor};`)
   })
 
 })

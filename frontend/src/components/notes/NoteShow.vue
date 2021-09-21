@@ -1,25 +1,27 @@
 <template>
-  <NoteFrameOfLinks v-bind="{ links }" @updated="$emit('updated')">
-    <div class="note-body" :style="`background-color: ${bgColor}`">
-      <h2 role="title" class="note-title">{{ note.noteContent.title }}</h2>
-      <div class="row">
-        <ShowDescription
-          :class="`col-12 ${twoColumns ? 'col-md-6' : ''}`"
-          :description="note.noteContent.description"
-        />
-        <ShowPicture
-          :class="`col-12 ${twoColumns ? 'col-md-6' : ''}`"
-          :note="note"
-          :opacity="0.2"
-        />
+  <div class="note-show" :style="`background-color: ${bgColor}`">
+    <NoteFrameOfLinks v-bind="{ links }" @updated="$emit('updated')">
+      <div class="note-body">
+        <h2 role="title" class="note-title">{{ note.noteContent.title }}</h2>
+        <div class="row">
+          <ShowDescription
+            :class="`col-12 ${twoColumns ? 'col-md-6' : ''}`"
+            :description="note.noteContent.description"
+          />
+          <ShowPicture
+            :class="`col-12 ${twoColumns ? 'col-md-6' : ''}`"
+            :note="note"
+            :opacity="0.2"
+          />
+        </div>
+        <div v-if="!!note.noteContent.url">
+          <label v-if="note.noteContent.urlIsVideo">Video Url:</label>
+          <label v-else>Url:</label>
+          <a :href="note.noteContent.url">{{ note.noteContent.url }}</a>
+        </div>
       </div>
-      <div v-if="!!note.noteContent.url">
-        <label v-if="note.noteContent.urlIsVideo">Video Url:</label>
-        <label v-else>Url:</label>
-        <a :href="note.noteContent.url">{{ note.noteContent.url }}</a>
-      </div>
-    </div>
-  </NoteFrameOfLinks>
+    </NoteFrameOfLinks>
+  </div>
 </template>
 
 <script setup>
@@ -53,6 +55,18 @@ const bgColor = computed(
 </script>
 
 <style scoped>
+.note-show {
+  border-radius: 10px;
+  border-top: solid 1px black;
+  border-bottom: solid 1px black;
+}
+
+.link-multi + .link-multi::before {
+  padding-right: 0.5rem;
+  color: #6c757d;
+  content: "|";
+}
+
 .note-body {
   padding-left: 10px;
   padding-right: 10px;
