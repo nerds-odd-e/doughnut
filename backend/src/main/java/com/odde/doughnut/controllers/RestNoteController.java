@@ -67,13 +67,8 @@ class RestNoteController {
     final UserModel userModel = currentUserFetcher.getUser();
     userModel.getAuthorization().assertAuthorization(parentNote);
     User user = userModel.getEntity();
-    Note note = new Note();
-    note.updateNoteContent(noteCreation.getNoteContent(), user);
+    Note note = Note.createNote(user, noteCreation.getNoteContent(), testabilitySettings.getCurrentUTCTimestamp());
     note.setParentNote(parentNote);
-    note.setUser(user);
-    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-    note.setCreatedAt(currentUTCTimestamp);
-    note.getNoteContent().setUpdatedAt(currentUTCTimestamp);
     modelFactoryService.noteRepository.save(note);
     if(noteCreation.getLinkTypeToParent() != null) {
       Link link = new Link();

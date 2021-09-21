@@ -15,7 +15,7 @@ Feature: see recent note update
       | Note3    | NoteBook      |
 
   Scenario: I should see new note banner on newly updated note
-    And I let the server to time travel to 24 hours ago
+    When I let the server to time travel to 24 hours ago
     And I update note "Note1.1" with the description "new description"
-    #Then I should see "Note1.1" is newer than "Note2"
+    Then I should see "Note1.1" is newer than "Note2"
     #And I should see "Note1" has recently updated descendant

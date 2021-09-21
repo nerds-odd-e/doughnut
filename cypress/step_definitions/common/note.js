@@ -206,5 +206,8 @@ Then("I should see the child notes {string} in order", (notesStr) => {
           expect(actual.join(",")).to.equal(notes.join(','))
       }
   )
-
 });
+
+Then("I should see {string} is newer than {string}", (newer, older) => {
+});
+

@@ -6,6 +6,7 @@ import lombok.Setter;
 
 import javax.persistence.*;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,10 +35,10 @@ public class Ownership {
         return circle.getMembers().contains(user);
     }
 
-    public Note createNotebook(User user, NoteContent noteContent) throws IOException {
-      final Note note = new Note();
-      note.updateNoteContent(noteContent, user);
-      note.buildNotebookForHeadNote(this, user);
+    public Note createNotebook(User user, NoteContent noteContent, Timestamp currentUTCTimestamp) throws IOException {
+        final Note note = Note.createNote(user, noteContent, currentUTCTimestamp);
+        note.buildNotebookForHeadNote(this, user);
       return note;
     }
+
 }

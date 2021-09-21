@@ -8,9 +8,11 @@ import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.BazaarModel;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.testability.TestabilitySettings;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.List;
@@ -20,10 +22,13 @@ import java.util.List;
 class RestNotebookController {
   private final ModelFactoryService modelFactoryService;
   private final CurrentUserFetcher currentUserFetcher;
+  @Resource(name = "testabilitySettings")
+  private final TestabilitySettings testabilitySettings;
 
-  public RestNotebookController(ModelFactoryService modelFactoryService, CurrentUserFetcher currentUserFetcher) {
+  public RestNotebookController(ModelFactoryService modelFactoryService, CurrentUserFetcher currentUserFetcher, TestabilitySettings testabilitySettings) {
     this.modelFactoryService = modelFactoryService;
     this.currentUserFetcher = currentUserFetcher;
+    this.testabilitySettings = testabilitySettings;
   }
 
   static class NotebooksViewedByUser {
@@ -46,7 +51,7 @@ class RestNotebookController {
     UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertLoggedIn();
     User userEntity = user.getEntity();
-    Note note = userEntity.getOwnership().createNotebook(userEntity, noteContent);
+    Note note = userEntity.getOwnership().createNotebook(userEntity, noteContent, testabilitySettings.getCurrentUTCTimestamp());
     modelFactoryService.noteRepository.save(note);
     return new RedirectToNoteResponse(note.getId());
   }

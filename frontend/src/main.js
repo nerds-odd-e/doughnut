@@ -12,6 +12,9 @@ const router = createRouter({
   routes,
 });
 
+// to accelerate e2e test
+window.router = router
+
 const app = createApp(DoughnutApp);
 app.config.globalProperties.$staticInfo = {
   colors,

@@ -8,6 +8,7 @@ import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.testability.TestabilitySettings;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,7 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.Resource;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
@@ -29,10 +31,13 @@ import java.util.stream.Collectors;
 class RestCircleController {
   private final ModelFactoryService modelFactoryService;
   private final CurrentUserFetcher currentUserFetcher;
+  @Resource(name = "testabilitySettings")
+  private final TestabilitySettings testabilitySettings;
 
-  public RestCircleController(ModelFactoryService modelFactoryService, CurrentUserFetcher currentUserFetcher) {
+  public RestCircleController(ModelFactoryService modelFactoryService, CurrentUserFetcher currentUserFetcher, TestabilitySettings testabilitySettings) {
     this.modelFactoryService = modelFactoryService;
     this.currentUserFetcher = currentUserFetcher;
+    this.testabilitySettings = testabilitySettings;
   }
 
   static class UserForOtherUserView {
@@ -111,7 +116,7 @@ class RestCircleController {
     UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertLoggedIn();
     currentUserFetcher.getUser().getAuthorization().assertAuthorization(circle);
-    Note note = circle.getOwnership().createNotebook(user.getEntity(), noteContent);
+    Note note = circle.getOwnership().createNotebook(user.getEntity(), noteContent, testabilitySettings.getCurrentUTCTimestamp());
     modelFactoryService.noteRepository.save(note);
     return new RedirectToNoteResponse(note.getId());
   }

@@ -103,6 +103,14 @@ public class Note {
     @Getter
     private final List<Note> children = new ArrayList<>();
 
+    public static Note createNote(User user, NoteContent noteContent, Timestamp currentUTCTimestamp) throws IOException {
+        final Note note = new Note();
+        note.updateNoteContent(noteContent, user);
+        note.setCreatedAtAndUpdatedAt(currentUTCTimestamp);
+        note.setUser(user);
+        return note;
+    }
+
     @Override
     public String toString() {
         return "Note{" + "id=" + id + ", title='" + noteContent.getTitle() + '\'' + '}';
@@ -348,7 +356,6 @@ public class Note {
         notebook.setOwnership(ownership);
         notebook.setHeadNote(this);
 
-        this.user = creator;
         this.notebook = notebook;
     }
 
@@ -385,5 +392,9 @@ public class Note {
         return noteViewedByUser;
     }
 
+    public void setCreatedAtAndUpdatedAt(Timestamp currentUTCTimestamp) {
+        this.createdAt = currentUTCTimestamp;
+        this.getNoteContent().setUpdatedAt(currentUTCTimestamp);
+    }
 }
 

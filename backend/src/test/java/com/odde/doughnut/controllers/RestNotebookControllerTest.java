@@ -1,12 +1,12 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.TestabilitySettings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -16,7 +16,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.web.servlet.view.RedirectView;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -35,12 +34,13 @@ class RestNotebookControllerTest {
     private UserModel userModel;
     private Note topNote;
     RestNotebookController controller;
+    private TestabilitySettings testabilitySettings = new TestabilitySettings();
 
     @BeforeEach
     void setup() {
         userModel = makeMe.aUser().toModelPlease();
         topNote = makeMe.aNote().byUser(userModel).please();
-        controller = new RestNotebookController(modelFactoryService, new TestCurrentUserFetcher(userModel));
+        controller = new RestNotebookController(modelFactoryService, new TestCurrentUserFetcher(userModel), testabilitySettings);
     }
 
     @Nested
@@ -48,7 +48,7 @@ class RestNotebookControllerTest {
         @Test
         void whenNotLogin() {
             userModel = modelFactoryService.toUserModel(null);
-            controller = new RestNotebookController(modelFactoryService, new TestCurrentUserFetcher(userModel));
+            controller = new RestNotebookController(modelFactoryService, new TestCurrentUserFetcher(userModel), testabilitySettings);
             assertThrows(ResponseStatusException.class, () -> controller.myNotebooks());
         }
     }

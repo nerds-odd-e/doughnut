@@ -75,8 +75,7 @@ class TestabilityRestController {
         for (NoteContent content : noteContents) {
             Note note = new Note();
             note.mergeNoteContent(content);
-            note.setCreatedAt(testabilitySettings.getCurrentUTCTimestamp());
-            note.getNoteContent().setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
+            note.setCreatedAtAndUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
             earlyNotes.put(content.getTitle(), note);
             noteList.add(note);
             final String testingParent = note.getNoteContent().getTestingParent();

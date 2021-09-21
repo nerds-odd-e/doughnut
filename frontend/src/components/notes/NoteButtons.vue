@@ -1,5 +1,5 @@
 <template>
-  <div class="btn-group btn-group-sm">
+  <div class="btn-group btn-group-sm" :key="note.id">
     <NoteNewButton :parentId="note.id">
       <template #default="{ open }">
         <button class="btn btn-small" @click="open()" :title="`Add Child Note`">
