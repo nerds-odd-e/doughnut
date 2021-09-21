@@ -22,6 +22,6 @@ Feature: Bazaar browsing
     When I open the notebook "Shape" in the Bazaar
     Then there shouldn't be any note edit button for "Rectangle"
     And I should see "Bazaar" in breadcrumb
-    And I should be able to go to the "next" note "Rectangle"
+    When I click the child note "Rectangle"
     And I should see it has link to "Square"
 

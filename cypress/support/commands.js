@@ -130,13 +130,15 @@ Cypress.Commands.add('expectNoteCards', (expectedCards) => {
   });
 });
 
+Cypress.Commands.add('navigateToChild', (noteTitle) => {
+  cy.findByText(noteTitle, { selector: '.card-title' }).click()
+});
+
 Cypress.Commands.add('navigateToNotePage', (noteTitlesDividedBySlash) => {
   cy.visitMyNotebooks();
   noteTitlesDividedBySlash
     .commonSenseSplit('/')
-    .forEach((noteTitle) =>
-      cy.findByText(noteTitle, { selector: '.card-title' }).click()
-    );
+    .forEach((noteTitle) => cy.navigateToChild(noteTitle));
 });
 
 // jumptoNotePage is faster than navigateToNotePage

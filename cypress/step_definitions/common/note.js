@@ -127,17 +127,11 @@ When("I open {string} note from top level", (noteTitles) => {
   cy.navigateToNotePage(noteTitles);
 });
 
-When(
-  "I should be able to go to the {string} note {string}",
-  (button, noteTitle) => {
-    cy.pageIsLoaded();
-    cy.findByRole("button", { name: button }).click();
+When("I click the child note {string}", (noteTitle) => {
+  cy.navigateToChild(noteTitle);
+});
 
-    cy.get(".note-with-controls").within(() =>
-      cy.findByText(noteTitle).should("exist")
-    );
-  },
-);
+
 
 When("I move note {string} left", (noteTitle) => {
   cy.jumpToNotePage(noteTitle);
