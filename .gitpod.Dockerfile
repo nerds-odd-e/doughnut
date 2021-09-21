@@ -33,15 +33,21 @@ RUN apt-get update \
     fonts-powerline \
     gnupg \
     curl \
-    maven \
     && apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 0xB1998361219BD9C9 \
     && curl -O https://cdn.azul.com/zulu/bin/zulu-repo_1.0.0-2_all.deb \
     && apt-get install -y ./zulu-repo_1.0.0-2_all.deb \
     && apt-get update -y \
     && apt-get install -y zulu16-jdk \
     && update-alternatives --set java /usr/lib/jvm/zulu16/bin/java \
+    && wget http://www-eu.apache.org/dist/maven/maven-3/3.8.2/binaries/apache-maven-3.8.2-bin.tar.gz \
+    && tar xvf apache-maven-3.8.2-bin.tar.gz \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /var/cache/apt
+
+# Setup Maven3 MAVEN_HOME & PATH
+RUN mv apache-maven-3.8.2 /opt/maven \
+    && echo "export MAVEN_HOME=/opt/maven" >> /etc/profile.d/maven.sh \
+    && echo "export PATH=$PATH:$MAVEN_HOME/bin" >> /etc/profile.d/maven.sh
 
 # Install MySQL DB
 RUN install-packages mysql-server \
