@@ -1,7 +1,7 @@
 <template>
   <NoteFrameOfLinks v-bind="{ links }" @updated="$emit('updated')">
     <div v-if="recentlyUpdated">This note has been changed recently.</div>
-    <div class="note-body">
+    <div class="note-body" :style="`background-color: ${bgColor}`">
       <h2 role="title" class="note-title">{{ note.noteContent.title }}</h2>
       <div class="row">
         <ShowDescription
@@ -40,13 +40,27 @@ const emits = defineEmits(["updated"]);
 const twoColumns = computed(
   () => !!props.note.notePicture && !!props.note.noteContent.description
 );
+
+const bgColor = computed(
+  () => {
+    const colorOld = [96, 96, 96]
+    const newColor = [208, 237, 23]
+    const ageInMillisecond = new Date() - new Date(props.note.noteContent.updatedAt)
+    const max = 15 // equals to 225 hours
+    const index = Math.min(max, Math.sqrt(ageInMillisecond / 1000 / 60 / 60))
+    return `rgb(${colorOld.map((oc, i)=>(oc * index + newColor[i] * (max-index))/max).join(',')})`
+  }
+);
+
 </script>
 
 <style scoped>
 .note-body {
-  background-color: #eee;
   padding-left: 10px;
   padding-right: 10px;
+}
+.note-body[data-age] {
+  background-color:rgb(200 * attr(data-age)/10, 200 * attr(data-age)/10, 200 * attr(data-age)/10);
 }
 .note-title {
   margin-top: 0px;
