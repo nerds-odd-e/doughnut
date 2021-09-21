@@ -88,25 +88,6 @@ class RestNoteControllerTests {
             assertThat(showOverview.parentChildren, hasKey(note.getId()));
 
         }
-
-        @Test
-        void shouldShowNoteThatIsRecentlyUpdated() throws NoAccessRightException {
-            Note note = makeMe.aNote().byUser(userModel).please();
-            makeMe.refresh(userModel.getEntity());
-            final NoteViewedByUser show = controller.show(note);
-            assertThat(show.getRecentlyUpdated(), is(true));
-        }
-
-        @Test
-        void shouldShowIfANoteIsNotRecentlyUpdated() throws NoAccessRightException {
-            testabilitySettings.timeTravelTo(new Timestamp(System.currentTimeMillis()));
-            Timestamp twelveHoursAgo = new Timestamp(testabilitySettings.getCurrentUTCTimestamp().getTime() - NoteViewedByUser.TWELVE_HOURS_MILLISECONDS);
-            Note note = makeMe.aNote().byUser(userModel).withContentUpdatedAt(twelveHoursAgo).please();
-            makeMe.refresh(userModel.getEntity());
-            final NoteViewedByUser show = controller.show(note);
-            assertThat(show.getRecentlyUpdated(), is(false));
-        }
-
     }
 
     @Nested

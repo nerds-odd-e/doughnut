@@ -21,10 +21,6 @@ public class NoteViewedByUser1 {
 
     @Getter
     @Setter
-    private Boolean recentlyUpdated;
-
-    @Getter
-    @Setter
     private Note note;
     @Getter
     @Setter

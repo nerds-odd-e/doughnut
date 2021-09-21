@@ -1,8 +1,6 @@
 
 package com.odde.doughnut.controllers;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.json.NoteBreadcrumbViewedByUser;
@@ -86,8 +84,7 @@ class RestNoteController {
   public NoteViewedByUser show(@PathVariable("note") Note note) throws NoAccessRightException {
     final UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertReadAuthorization(note);
-    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-    return note.getNoteViewedByUser(currentUTCTimestamp, user.getEntity());
+    return note.jsonObjectViewedBy(user.getEntity());
   }
 
   static class NotesBulk {
@@ -104,10 +101,9 @@ class RestNoteController {
     NotesBulk notesBulk = new NotesBulk();
     notesBulk.noteBreadcrumbViewedByUser = note.jsonBreadcrumbViewedBy(user.getEntity());
 
-    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-    notesBulk.notes.add(note.getNoteViewedByUser1(currentUTCTimestamp, user.getEntity() ));
+    notesBulk.notes.add(note.jsonObjectViewedBy1(user.getEntity()));
     note.traverseBreadthFirst(n->{
-      notesBulk.notes.add(n.getNoteViewedByUser1(currentUTCTimestamp, user.getEntity() ));
+      notesBulk.notes.add(n.jsonObjectViewedBy1(user.getEntity()));
       List<Integer> children = notesBulk.parentChildren.computeIfAbsent(n.getParentId(), (k)->new ArrayList<>());
       Integer id = n.getId();
       children.add(id);

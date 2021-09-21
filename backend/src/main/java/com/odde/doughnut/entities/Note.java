@@ -380,18 +380,6 @@ public class Note {
       return lastUpdatedAt.compareTo(twelveHoursAgo) > 0;
     }
 
-    public NoteViewedByUser getNoteViewedByUser(Timestamp currentUTCTimestamp, User entity) {
-      NoteViewedByUser noteViewedByUser = jsonObjectViewedBy(entity);
-      noteViewedByUser.setRecentlyUpdated(isRecentlyUpdated(currentUTCTimestamp));
-      return noteViewedByUser;
-    }
-
-    public NoteViewedByUser1 getNoteViewedByUser1(Timestamp currentUTCTimestamp, User entity) {
-        NoteViewedByUser1 noteViewedByUser = jsonObjectViewedBy1(entity);
-        noteViewedByUser.setRecentlyUpdated(isRecentlyUpdated(currentUTCTimestamp));
-        return noteViewedByUser;
-    }
-
     public void setCreatedAtAndUpdatedAt(Timestamp currentUTCTimestamp) {
         this.createdAt = currentUTCTimestamp;
         this.getNoteContent().setUpdatedAt(currentUTCTimestamp);
