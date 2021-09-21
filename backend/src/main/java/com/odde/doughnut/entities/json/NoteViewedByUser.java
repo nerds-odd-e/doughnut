@@ -1,24 +1,16 @@
 package com.odde.doughnut.entities.json;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.Link;
+import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.Notebook;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
 
 public class NoteViewedByUser {
-    public static final int TWELVE_HOURS_MILLISECONDS = 12 * 60 * 60 * 1000;
-
-    public static class NoteNavigation {
-        @Getter @Setter private Integer previousSiblingId;
-        @Getter @Setter private Integer previousId;
-        @Getter @Setter private Integer nextId;
-        @Getter @Setter private Integer nextSiblingId;
-    }
-
     @Getter
     @Setter
     private Note note;
@@ -29,9 +21,6 @@ public class NoteViewedByUser {
     @Getter
     @Setter
     private Map<Link.LinkType, LinkViewed> links;
-    @Getter
-    @Setter
-    private NoteNavigation navigation;
     @Getter
     @Setter
     @JsonIgnoreProperties({"noteContent"})

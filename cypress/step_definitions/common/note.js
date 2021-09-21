@@ -131,8 +131,6 @@ When("I click the child note {string}", (noteTitle) => {
   cy.navigateToChild(noteTitle);
 });
 
-
-
 When("I move note {string} left", (noteTitle) => {
   cy.jumpToNotePage(noteTitle);
   cy.findByText("Move This Note").click();
