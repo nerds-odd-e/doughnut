@@ -40,7 +40,7 @@ RUN apt-get update \
 
 # Setup Maven3 MAVEN_HOME & PATH
 RUN mv apache-maven-3.8.2 /opt/maven \
-    && rm -rf apache-maven-3.8.2
+    && rm -rf apache-maven-3.8.2-bin.tar.gz
 
 # Install MySQL DB
 RUN install-packages mysql-server \
@@ -96,7 +96,8 @@ RUN wget https://download.jetbrains.com/fonts/JetBrainsMono-2.242.zip \
     && cp fonts/ttf/JetBrainsMono-*.ttf /usr/share/fonts/ \
     && mkdir -p /home/gitpod/.local/share/fonts/ \
     && cp fonts/ttf/JetBrainsMono-*.ttf /home/gitpod/.local/share/fonts/ \
-    && rm -rf fonts
+    && rm -rf fonts \
+    && rm -f JetBrainsMono-2.242.zip
 
 # -----------------------------------------------------
 # -------------------- USER gitpod --------------------
