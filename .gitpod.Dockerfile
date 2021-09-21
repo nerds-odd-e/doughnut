@@ -33,6 +33,7 @@ RUN apt-get update \
     fonts-powerline \
     gnupg \
     curl \
+    maven \
     && apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 0xB1998361219BD9C9 \
     && curl -O https://cdn.azul.com/zulu/bin/zulu-repo_1.0.0-2_all.deb \
     && apt-get install -y ./zulu-repo_1.0.0-2_all.deb \
