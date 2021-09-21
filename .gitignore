@@ -36,8 +36,11 @@ cypress-visual-screenshots/
 hs_err_pid*
 
 # java
+.classpath
 .gradle
+.project
 backend/.classpath
+backend/.gradle
 backend/.project
 backend/.settings/
 backend/bin/
