@@ -27,7 +27,7 @@ ports:
 tasks:
   - init: >
       cp infra/gitpod/.zshrc /home/gitpod/ &&
-      cp infra/gitpod/.p10k.zsh /home/gitpod/ &&
+      if [ ! -e /home/gitpod/.p10k.zsh ] && cp infra/gitpod/.p10k.zsh /home/gitpod/ &&
       git config --global init.defaultBranch main &&
       sleep 3 && mysql -u root -S /var/run/mysqld/mysqld.sock < infra/gitpod/mysql/init_doughnut_db.sql
 
