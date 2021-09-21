@@ -33,11 +33,8 @@ tasks:
 
 vscode:
   extensions:
-    - redhat.java
-    - vscjava.vscode-java-debug
-    - vscjava.vscode-java-test
-    - gabrielbb.vscode-lombok
-    - pivotal.vscode-spring-boot
+    - vscjava.vscode-java-pack
+    - loiane.java-spring-extension-pack	
     - esbenp.prettier-vscode
     - dbaeumer.vscode-eslint
     - octref.vetur
