@@ -35,6 +35,7 @@ tasks:
 vscode:
   extensions:
     - vscjava.vscode-java-pack
+    - gabrielbb.vscode-lombok
     - esbenp.prettier-vscode
     - dbaeumer.vscode-eslint
     - octref.vetur
