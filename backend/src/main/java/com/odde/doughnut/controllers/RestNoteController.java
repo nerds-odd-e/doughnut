@@ -113,13 +113,13 @@ class RestNoteController {
 
   @PostMapping(path="/{note}")
   @Transactional
-  public RedirectToNoteResponse updateNote(@PathVariable(name = "note") Note note, @Valid @ModelAttribute NoteContent noteContent) throws NoAccessRightException, IOException {
+  public NoteViewedByUser1 updateNote(@PathVariable(name = "note") Note note, @Valid @ModelAttribute NoteContent noteContent) throws NoAccessRightException, IOException {
     final UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertAuthorization(note);
     noteContent.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
     note.updateNoteContent(noteContent, user.getEntity());
     modelFactoryService.noteRepository.save(note);
-    return new RedirectToNoteResponse(note.getId());
+    return note.jsonObjectViewedBy1(user.getEntity());
   }
 
   @GetMapping("/{note}/statistics")

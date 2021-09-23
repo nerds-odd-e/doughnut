@@ -21,6 +21,7 @@
   <div :id="`note-collapse-${noteViewedByUser.note.id}`" class="collapse">
     <NoteShow
       v-bind="{
+        id: noteViewedByUser.note.id,
         note: noteViewedByUser.note,
         links: noteViewedByUser.links,
       }"

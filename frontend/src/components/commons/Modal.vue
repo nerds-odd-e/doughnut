@@ -7,7 +7,7 @@
             <SvgClose />
           </button>
 
-          <div class="modal-header">
+          <div class="modal-header" v-if="this.$slots.header">
             <slot name="header" />
           </div>
 

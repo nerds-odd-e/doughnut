@@ -11,6 +11,7 @@
       <BazaarNoteButtons v-else :note="note" :notebook="notebook" />
     </nav>
     <NoteShow
+      :id="note.id"
       :note="note"
       :links="links"
       @updated="$emit('updated')"

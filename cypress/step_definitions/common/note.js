@@ -137,6 +137,12 @@ When("I move note {string} left", (noteTitle) => {
   cy.findByRole("button", { name: "Move Left" }).click();
 });
 
+When("I double click {string} and edit the description to {string}", (noteTitle, newDescription) => {
+  cy.findByText(noteTitle).dblclick();
+  cy.submitNoteFormsWith([{Description: newDescription}]);
+});
+
+
 When("I should see the screenshot matches", () => {
   // cy.get('.content').compareSnapshot('page-snapshot', 0.001);
 });
@@ -203,9 +209,9 @@ Then("I should see the child notes {string} in order", (notesStr) => {
 Then("I should see {string} is newer than {string}", (newer, older) => {
   let firstColor;
   cy.jumpToNotePage(newer);
-  cy.get('.note-body').invoke('css', 'background-color').then(val => firstColor = val)
+  cy.get('.note-show').invoke('css', 'background-color').then(val => firstColor = val)
   cy.jumpToNotePage(older);
-  cy.get('.note-body').invoke('css', 'background-color').then(val =>
+  cy.get('.note-show').invoke('css', 'background-color').then(val =>
     expect(parseInt(firstColor.match(/\d+/)[0])).to.greaterThan(parseInt(val.match(/\d+/)[0]))
   )
 });

@@ -8,7 +8,6 @@ const noteViewedByUser = {
       isFromCircle: false,
     },
   },
-  navigation: {},
 
   ancestors: [
     {

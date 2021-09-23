@@ -44,7 +44,6 @@ export default {
       )
         .then((res) => {
           this.$emit("done");
-          this.show = false;
         })
         .catch((res) => (this.formErrors = res));
     },

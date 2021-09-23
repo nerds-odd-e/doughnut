@@ -1,7 +1,7 @@
 <template>
   <div class="note-show" :style="`background-color: ${bgColor}`">
     <NoteFrameOfLinks v-bind="{ links }" @updated="$emit('updated')">
-      <div class="note-body">
+      <div class="note-body" @dblclick="editDialog">
         <h2 role="title" class="note-title">{{ note.noteContent.title }}</h2>
         <div class="row">
           <ShowDescription
@@ -24,33 +24,45 @@
   </div>
 </template>
 
-<script setup>
-import { computed } from "@vue/runtime-core";
+<script>
 import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
+import NoteEditDialog from "./NoteEditDialog.vue";
 import ShowPicture from "./ShowPicture.vue";
 import ShowDescription from "./ShowDescription.vue";
 
-const props = defineProps({
-  id: Number,
-  note: { type: Object, required: true },
-  links: Object,
-});
-const emits = defineEmits(["updated"]);
-
-const twoColumns = computed(
-  () => !!props.note.notePicture && !!props.note.noteContent.description
-);
-
-const bgColor = computed(
-  () => {
-    const colorOld = [150, 150, 150]
-    const newColor = [208, 237, 23]
-    const ageInMillisecond = Math.max(0, Date.now() - new Date(props.note.noteContent.updatedAt))
-    const max = 15 // equals to 225 hours
-    const index = Math.min(max, Math.sqrt(ageInMillisecond / 1000 / 60 / 60))
-    return `rgb(${colorOld.map((oc, i)=>Math.round((oc * index + newColor[i] * (max-index))/max)).join(',')})`
-  }
-);
+export default {
+  props: {
+    id: Number,
+    links: Object,
+  },
+  emits: ["updated"],
+  components: {NoteFrameOfLinks, NoteEditDialog, ShowPicture, ShowDescription},
+  computed: {
+    note() {
+      return this.$store.getters.getNoteById(this.id);
+    },
+    twoColumns() {return !!this.note.notePicture && !!this.note.noteContent.description },
+    bgColor() {
+      const colorOld = [150, 150, 150]
+      const newColor = [208, 237, 23]
+      const ageInMillisecond = Math.max(0, Date.now() - new Date(this.note.noteContent.updatedAt))
+      const max = 15 // equals to 225 hours
+      const index = Math.min(max, Math.sqrt(ageInMillisecond / 1000 / 60 / 60))
+      return `rgb(${colorOld.map((oc, i)=>Math.round((oc * index + newColor[i] * (max-index))/max)).join(',')})`
+    }
+  },
+  methods: {
+    async editDialog() {
+      if (
+        await this.$popups.dialog(NoteEditDialog, {
+          noteId: this.id,
+        })
+      ) {
+        this.$emit("updated");
+      }
+    }
+  },
+}
 
 </script>
 
