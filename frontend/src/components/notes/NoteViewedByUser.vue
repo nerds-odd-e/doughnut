@@ -10,7 +10,7 @@
   />
 
   <router-link
-    :to="{ name: 'noteOverview', params: { noteId: noteViewedByUser.id } }"
+    :to="{ name: 'noteOverview', params: { noteId: this.id } }"
     v-if="!!noteViewedByUser && !!noteViewedByUser.id"
     role="button"
     class="btn btn-sm"
@@ -26,7 +26,7 @@ import NoteOwnerViewCards from "./NoteOwnerViewCards.vue";
 export default {
   name: "NoteViewedByUser",
   props: {
-    noteId: Number,
+    id: Number,
     links: Object,
     children: Array,
     ancestors: Array,
@@ -40,7 +40,7 @@ export default {
   },
   computed: {
     noteViewedByUser() {
-      return this.$store.getters.getNoteById(this.noteId);
+      return this.$store.getters.getNoteById(this.id);
     },
   },
 };

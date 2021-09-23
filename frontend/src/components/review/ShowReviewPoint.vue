@@ -2,14 +2,7 @@
   <div>
     <div v-if="!!noteViewedByUser">
       <NoteViewedByUserWithoutChildren
-        v-bind="{
-          note: noteViewedByUser.note,
-          links: noteViewedByUser.links,
-          ancestors: noteViewedByUser.ancestors,
-          notebook: noteViewedByUser.notebook,
-          owns: noteViewedByUser.owns,
-        }"
-        @updated="$emit('updated')"
+        v-bind="noteViewedByUser" @updated="$emit('updated')"
       />
     </div>
 

@@ -28,6 +28,7 @@ import NoteButtons from "./NoteButtons.vue";
 export default {
   name: "NoteViewedByUserWithoutChildren",
   props: {
+    id: Number,
     note: Object,
     links: Object,
     ancestors: Array,
