@@ -37,17 +37,31 @@ export default {
     links: Object,
   },
   emits: ["updated"],
-  components: {NoteFrameOfLinks, NoteEditDialog, ShowPicture, ShowDescription},
+  components: {
+    NoteFrameOfLinks,
+    NoteEditDialog,
+    ShowPicture,
+    ShowDescription,
+  },
   computed: {
-    twoColumns() {return !!this.note.notePicture && !!this.note.noteContent.description },
+    twoColumns() {
+      return !!this.note.notePicture && !!this.note.noteContent.description;
+    },
     bgColor() {
-      const colorOld = [150, 150, 150]
-      const newColor = [208, 237, 23]
-      const ageInMillisecond = Math.max(0, Date.now() - new Date(this.note.noteContent.updatedAt))
-      const max = 15 // equals to 225 hours
-      const index = Math.min(max, Math.sqrt(ageInMillisecond / 1000 / 60 / 60))
-      return `rgb(${colorOld.map((oc, i)=>Math.round((oc * index + newColor[i] * (max-index))/max)).join(',')})`
-    }
+      const colorOld = [150, 150, 150];
+      const newColor = [208, 237, 23];
+      const ageInMillisecond = Math.max(
+        0,
+        Date.now() - new Date(this.note.noteContent.updatedAt)
+      );
+      const max = 15; // equals to 225 hours
+      const index = Math.min(max, Math.sqrt(ageInMillisecond / 1000 / 60 / 60));
+      return `rgb(${colorOld
+        .map((oc, i) =>
+          Math.round((oc * index + newColor[i] * (max - index)) / max)
+        )
+        .join(",")})`;
+    },
   },
   methods: {
     async editDialog() {
@@ -58,10 +72,9 @@ export default {
       ) {
         this.$emit("updated");
       }
-    }
+    },
   },
-}
-
+};
 </script>
 
 <style scoped>
@@ -82,7 +95,11 @@ export default {
   padding-right: 10px;
 }
 .note-body[data-age] {
-  background-color:rgb(200 * attr(data-age)/10, 200 * attr(data-age)/10, 200 * attr(data-age)/10);
+  background-color: rgb(
+    200 * attr(data-age) / 10,
+    200 * attr(data-age) / 10,
+    200 * attr(data-age) / 10
+  );
 }
 .note-title {
   margin-top: 0px;

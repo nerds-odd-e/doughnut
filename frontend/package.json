@@ -44,7 +44,7 @@
     "eslint-import-resolver-alias": "^1.1.2",
     "eslint-plugin-import": "^2.24.2",
     "eslint-plugin-jest-dom": "^3.9.2",
-    "eslint-plugin-testing-library": "^4.12.2",
+    "eslint-plugin-testing-library": "^4.12.4",
     "eslint-plugin-vue": "^7.9.0",
     "flush-promises": "^1.0.2",
     "jest": "^27.0.0",

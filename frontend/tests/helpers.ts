@@ -62,7 +62,7 @@ const renderWithStoreAndMockRoute = (
   currentRoute: any,
   func: (store: any) => void
 ) => {
-  if(func) func(store);
+  if (func) func(store);
   return withMockRoute(
     comp,
     merge(options, {
@@ -75,8 +75,4 @@ const renderWithStoreAndMockRoute = (
   );
 };
 
-export {
-  mountWithMockRoute,
-  renderWithMockRoute,
-  renderWithStoreAndMockRoute
-};
+export { mountWithMockRoute, renderWithMockRoute, renderWithStoreAndMockRoute };

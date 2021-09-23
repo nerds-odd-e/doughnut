@@ -1,10 +1,6 @@
 <template>
   <form @submit.prevent.once="processForm">
-    <NoteFormBody
-      v-if="!!formData"
-      v-model="formData"
-      :errors="formErrors"
-    />
+    <NoteFormBody v-if="!!formData" v-model="formData" :errors="formErrors" />
     <input type="submit" value="Submit" class="btn btn-primary" />
   </form>
 </template>
@@ -45,7 +41,7 @@ export default {
         (r) => (this.loading = r)
       )
         .then((res) => {
-          this.$store.commit('loadNotes', [res])
+          this.$store.commit("loadNotes", [res]);
           this.$emit("done");
         })
         .catch((res) => (this.formErrors = res));
@@ -53,6 +49,6 @@ export default {
   },
   mounted() {
     this.fetchData();
-  }
+  },
 };
 </script>

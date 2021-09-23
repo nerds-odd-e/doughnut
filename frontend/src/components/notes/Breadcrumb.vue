@@ -1,7 +1,9 @@
 <template>
   <NoteBreadcrumb :ancestors="ancestors">
     <template #topLink>
-      <li v-if="!owns" class="breadcrumb-item"><router-link :to="{name: 'bazaar'}">Bazaar</router-link></li>
+      <li v-if="!owns" class="breadcrumb-item">
+        <router-link :to="{ name: 'bazaar' }">Bazaar</router-link>
+      </li>
       <template v-else>
         <li class="breadcrumb-item" v-if="!circle">
           <router-link :to="{ name: 'notebooks' }">Top</router-link>
@@ -23,7 +25,6 @@
       <slot />
     </template>
   </NoteBreadcrumb>
-
 </template>
 
 <script>
@@ -40,8 +41,9 @@ export default {
     NoteBreadcrumb,
   },
   computed: {
-    circle() { return !!this.notebook ? this.notebook.ownership.circle : null }
-
-  }
+    circle() {
+      return !!this.notebook ? this.notebook.ownership.circle : null;
+    },
+  },
 };
 </script>

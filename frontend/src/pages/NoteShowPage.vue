@@ -27,8 +27,8 @@ export default {
     fetchData() {
       restGet(`/api/notes/${this.noteId}`, (r) => (this.loading = r)).then(
         (res) => {
-          this.$store.commit('loadNotes', [res])
-          this.noteViewedByUser = res
+          this.$store.commit("loadNotes", [res]);
+          this.noteViewedByUser = res;
         }
       );
     },

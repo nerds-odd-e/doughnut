@@ -14,13 +14,17 @@ const noteView = _.merge(noteViewedByUser, {
 
 describe("a note not owned by viewer", () => {
   test("", async () => {
-    const noteView = makeMe.aNote.deprecatingInBazaar().please()
-    renderWithStoreAndMockRoute(NoteViewedByUser, {
-      propsData: noteView,
-    }, null, store=> {
-      store.commit('loadNotes', [noteView])
-
-    });
+    const noteView = makeMe.aNote.deprecatingInBazaar().please();
+    renderWithStoreAndMockRoute(
+      NoteViewedByUser,
+      {
+        propsData: noteView,
+      },
+      null,
+      (store) => {
+        store.commit("loadNotes", [noteView]);
+      }
+    );
     screen.findByText("Bazaar");
     // expect(wrapper.findAll(".nav [title='Add to my learning']")).toHaveLength(
   });

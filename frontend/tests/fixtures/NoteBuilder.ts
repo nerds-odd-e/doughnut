@@ -23,7 +23,7 @@ class NoteBuilder extends Builder {
   }
 
   deprecatingFromCircle(value: string): NoteBuilder {
-    this.data.owns = true
+    this.data.owns = true;
     this.data.notebook = {
       ownership: {
         isFromCircle: true,
@@ -31,13 +31,13 @@ class NoteBuilder extends Builder {
           name: value,
         },
       },
-    }
+    };
     return this;
   }
 
   deprecatingInBazaar(): NoteBuilder {
-    this.data.owns = false
-    this.data.notebook = {}
+    this.data.owns = false;
+    this.data.notebook = {};
     return this;
   }
 

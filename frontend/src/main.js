@@ -13,7 +13,7 @@ const router = createRouter({
 });
 
 // to accelerate e2e test
-window.router = router
+window.router = router;
 
 const app = createApp(DoughnutApp);
 app.config.globalProperties.$staticInfo = {

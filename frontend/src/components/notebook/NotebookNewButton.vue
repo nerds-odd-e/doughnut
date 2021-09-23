@@ -12,7 +12,11 @@
     </template>
     <template #header>
       <Breadcrumb
-        v-bind="{ owns: true, ancestors: [], notebook: { ownership: { circle } } }"
+        v-bind="{
+          owns: true,
+          ancestors: [],
+          notebook: { ownership: { circle } },
+        }"
       >
         <li class="breadcrumb-item">(adding here)</li>
       </Breadcrumb>

@@ -2,7 +2,8 @@
   <div>
     <div v-if="!!noteViewedByUser">
       <NoteViewedByUserWithoutChildren
-        v-bind="noteViewedByUser" @updated="$emit('updated')"
+        v-bind="noteViewedByUser"
+        @updated="$emit('updated')"
       />
     </div>
 

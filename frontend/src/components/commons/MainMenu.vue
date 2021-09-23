@@ -12,7 +12,7 @@
       >
         <span class="navbar-toggler-icon"></span>
       </button>
-      <router-link class="navbar-brand" :to="{name: 'root'}">
+      <router-link class="navbar-brand" :to="{ name: 'root' }">
         <img
           src="/odd-e.png"
           width="30"
@@ -35,10 +35,14 @@
             >
           </li>
           <li class="nav-item">
-            <router-link class="nav-link" :to="{name: 'circles'}">Circles</router-link>
+            <router-link class="nav-link" :to="{ name: 'circles' }"
+              >Circles</router-link
+            >
           </li>
           <li class="nav-item">
-            <router-link class="nav-link" :to="{name: 'bazaar'}">Bazaar</router-link>
+            <router-link class="nav-link" :to="{ name: 'bazaar' }"
+              >Bazaar</router-link
+            >
           </li>
           <li class="nav-item" v-if="user && user.isDeveloper">
             <a class="nav-link" href="/failure-report-list">Failure Reports</a>

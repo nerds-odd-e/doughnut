@@ -136,5 +136,4 @@ export default {
   color: #6c757d;
   content: "|";
 }
-
 </style>

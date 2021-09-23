@@ -14,7 +14,9 @@ beforeEach(() => {
 
 describe("note show", () => {
   test("fetch API to be called ONCE", async () => {
-    const stubResponse = makeMe.aNote.deprecatingFromCircle('a circle').please()
+    const stubResponse = makeMe.aNote
+      .deprecatingFromCircle("a circle")
+      .please();
     fetch.mockResponseOnce(JSON.stringify(stubResponse));
     renderWithStoreAndMockRoute(NoteShowPage, {
       propsData: { noteId: 123 },
@@ -22,6 +24,6 @@ describe("note show", () => {
     await flushPromises();
     expect(fetch).toHaveBeenCalledTimes(1);
     expect(fetch).toHaveBeenCalledWith("/api/notes/123", {});
-    await screen.findByText('a circle')
+    await screen.findByText("a circle");
   });
 });
