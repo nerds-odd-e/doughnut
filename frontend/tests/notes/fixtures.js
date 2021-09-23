@@ -1,5 +1,6 @@
 import { basicNote } from "./fixtures-basic";
 const noteViewedByUser = {
+  id: 5,
   owns: true,
   notebook: {
     id: 5,

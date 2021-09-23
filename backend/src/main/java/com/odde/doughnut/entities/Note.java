@@ -128,6 +128,7 @@ public class Note {
     @JsonIgnore
     public NoteViewedByUser jsonObjectViewedBy(User viewer) {
         NoteViewedByUser nvb = new NoteViewedByUser();
+        nvb.setId(getId());
         nvb.setNote(this);
         nvb.setLinks(getAllLinks(viewer));
         nvb.setNotebook(notebook);

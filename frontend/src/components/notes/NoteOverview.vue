@@ -2,7 +2,7 @@
   <NoteShow v-bind="{ ...noteViewedByUser }" @updated="$emit('updated')" />
   <div class="note-list">
     <NoteOverview
-      v-for="child in childrenx"
+      v-for="child in children"
       v-bind="{ noteId: child.id }"
       :key="child.id"
     />
@@ -23,7 +23,7 @@ export default {
     noteViewedByUser() {
       return this.$store.getters.getNoteById(this.noteId);
     },
-    childrenx() {
+    children() {
       return this.$store.getters.getChildrenOfParentId(this.noteId);
     },
   },

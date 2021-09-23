@@ -4,7 +4,7 @@
 import NoteViewedByUser from "@/components/notes/NoteViewedByUser.vue";
 import { noteViewedByUser } from "./fixtures";
 import _ from "lodash";
-import { mountWithMockRoute } from "../helpers";
+import { mountWithStoreAndMockRoute } from "../helpers";
 
 const noteView = _.merge(noteViewedByUser, {
   owns: false,
@@ -12,7 +12,7 @@ const noteView = _.merge(noteViewedByUser, {
 
 describe("a note not owned by viewer", () => {
   test("", async () => {
-    const { wrapper } = mountWithMockRoute(NoteViewedByUser, {
+    const { wrapper } = mountWithStoreAndMockRoute(NoteViewedByUser, {
       propsData: noteView,
     });
     expect(wrapper.find(".breadcrumb").text()).toContain("Bazaar");

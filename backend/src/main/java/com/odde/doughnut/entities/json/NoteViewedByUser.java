@@ -13,6 +13,9 @@ import java.util.Map;
 public class NoteViewedByUser {
     @Getter
     @Setter
+    private Integer id;
+    @Getter
+    @Setter
     private Note note;
     @Getter
     @Setter
