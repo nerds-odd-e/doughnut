@@ -47,8 +47,7 @@ Feature: Nested Note CRUD
     And I update it to become:
       | Title     | Description       |
       | Odd-e CSD | Our best training |
-    Then I should see "Odd-e CSD" in the page
-    And I should see these notes belonging to the user at the top level of all my notes
+    Then I should see these notes belonging to the user at the top level of all my notes
       | title     |
       | Odd-e CSD |
 

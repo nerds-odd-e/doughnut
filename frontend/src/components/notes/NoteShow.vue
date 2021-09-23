@@ -33,14 +33,12 @@ import ShowDescription from "./ShowDescription.vue";
 export default {
   props: {
     id: Number,
+    note: { type: Object, required: true },
     links: Object,
   },
   emits: ["updated"],
   components: {NoteFrameOfLinks, NoteEditDialog, ShowPicture, ShowDescription},
   computed: {
-    note() {
-      return this.$store.getters.getNoteById(this.id);
-    },
     twoColumns() {return !!this.note.notePicture && !!this.note.noteContent.description },
     bgColor() {
       const colorOld = [150, 150, 150]
