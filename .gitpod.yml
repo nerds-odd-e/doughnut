@@ -36,6 +36,7 @@ vscode:
   extensions:
     - vscjava.vscode-java-pack
     - gabrielbb.vscode-lombok
+    - Pivotal.vscode-boot-dev-pack
     - esbenp.prettier-vscode
     - dbaeumer.vscode-eslint
     - octref.vetur
