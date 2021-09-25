@@ -15,7 +15,7 @@
     "@popperjs/core": "^2.10.1",
     "bootstrap": "^5.1.1",
     "lodash": "^4.17.21",
-    "vue": "^3.2.16",
+    "vue": "^3.2.18",
     "vue-content-loader": "^2.0.0",
     "vue-router": "4.0.10",
     "vuex": "^4.0.2"
@@ -31,7 +31,7 @@
     "@typescript-eslint/parser": "^4.31.1",
     "@vitejs/plugin-vue": "^1.6.2",
     "@vitejs/plugin-vue-jsx": "^1.1.8",
-    "@vue/compiler-sfc": "^3.2.16",
+    "@vue/compiler-sfc": "^3.2.18",
     "@vue/vue3-jest": "^27.0.0-alpha.1",
     "autoprefixer": "^9",
     "babel-core": "^7.0.0-bridge.0",

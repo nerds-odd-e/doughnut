@@ -9,14 +9,18 @@ import makeMe from "../fixtures/makeMe";
 
 describe("a note not owned by viewer", () => {
   test("", async () => {
-    const noteView = makeMe.aNote.deprecatingInBazaar().please()
-    renderWithStoreAndMockRoute(NoteViewedByUser, {
-      propsData: noteView,
-    }, null, store=> {
-      store.commit('loadNotes', [noteView])
-
-    });
+    const noteView = makeMe.aNote.deprecatingInBazaar().please();
+    renderWithStoreAndMockRoute(
+      NoteViewedByUser,
+      {
+        propsData: noteView,
+      },
+      null,
+      (store) => {
+        store.commit("loadNotes", [noteView]);
+      }
+    );
     await screen.findByText("Bazaar");
-    await screen.findByRole('button', { name: "Add to my learning" })
+    await screen.findByRole("button", { name: "Add to my learning" });
   });
 });
