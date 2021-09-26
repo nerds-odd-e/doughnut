@@ -6,13 +6,15 @@ We use nix to manage and ensure a reproducible development environment ([nixos.o
 
 #### For macOS:
 
-```
+Full details on nix installation on macOS [here](https://nixos.org/manual/nix/stable/#sect-macos-installation)
+
+```bash
  sh <(curl -L https://nixos.org/nix/install) --darwin-use-unencrypted-nix-store-volume
 ```
 
 #### For Linux:
 
-```
+```bash
 sh <(curl -L https://nixos.org/nix/install) --daemon
 ```
 
@@ -20,7 +22,8 @@ sh <(curl -L https://nixos.org/nix/install) --daemon
 
 _Install `any-nix-shell` for using `fish` or `zsh` in nix-shell_
 
-```
+```bash
+# OPTIONAL
 nix-env -i any-nix-shell -f https://github.com/NixOS/nixpkgs/archive/master.tar.gz
 ```
 
@@ -29,7 +32,8 @@ nix-env -i any-nix-shell -f https://github.com/NixOS/nixpkgs/archive/master.tar.
 Add the following to your _~/.zshrc_.
 Create it if it doesn't exist.
 
-```
+```bash
+# OPTIONAL
 any-nix-shell zsh --info-right | source /dev/stdin
 ```
 
@@ -41,6 +45,7 @@ MySQL DB server is started and initialised on entering the `nix-shell`.
 Update/refresh your installed nix state and version
 
 ```bash
+# OPTIONAL
 nix-channel --update; nix-env -iA nixpkgs.nix && nix-env -u --always
 ```
 
@@ -78,10 +83,10 @@ nohup idea-community &
 
 #### Setup IntelliJ IDEA with JDK16 SDK
 
-- Locate your `nix` installed JDK16 path location with `which java`.
-  e.g. `/nix/store/5ib97va5ngfacdqzzcvxff62rjwkxajg-zulu16.2.3-jdk16.0.1/bin/java`.
+- Locate your `nix` installed JDK16 path location with `which java` (it is printed out on entering `nix-shell`).
+  - e.g. `/nix/store/60kc2wrpr8p0jb8hginzq2hmhi9l9ws0-zulu16.30.15-ca-jdk-16.0.1`.
 - **File -> Project Structure -> Platform Settings -> SDKs -> Add JDK...**
-  - Enter the full path of above (e.g. `/nix/store/5ib97va5ngfacdqzzcvxff62rjwkxajg-zulu16.2.3-jdk16.0.1`).
+  - Enter the full path of above (e.g. `/nix/store/60kc2wrpr8p0jb8hginzq2hmhi9l9ws0-zulu16.30.15-ca-jdk-16.0.1`).
 
 #### Run a single targetted JUnit5 test in IntelliJ IDEA
 
@@ -98,6 +103,6 @@ nohup codium &
 
 #### MySQL DB UI Client - DBeaver
 
-```
+```bash
 nohup dbeaver &
 ```
