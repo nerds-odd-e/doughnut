@@ -36,14 +36,13 @@ describe("note overview", () => {
 
   it("should render note with one child", async () => {
     const noteParent = makeMe.aNote.title("parent").please();
-    const noteChild = makeMe.aNote.title("child").please();
+    const noteChild = makeMe.aNote.title("child").under(noteParent).please();
     renderWithStoreAndMockRoute(
       NoteOverview,
       { props: { noteId: noteParent.id } },
       null,
       (store) => {
         store.commit("loadNotes", [noteParent, noteChild]);
-        store.commit("loadParentChildren", { [noteParent.id]: [noteChild.id] });
       }
     );
     expect(screen.getAllByRole("title")).toHaveLength(2);
@@ -53,18 +52,14 @@ describe("note overview", () => {
 
   it("should render note with grandchild", async () => {
     const noteParent = makeMe.aNote.title("parent").please();
-    const noteChild = makeMe.aNote.title("child").please();
-    const noteGrandchild = makeMe.aNote.title("grandchild").please();
+    const noteChild = makeMe.aNote.title("child").under(noteParent).please();
+    const noteGrandchild = makeMe.aNote.title("grandchild").under(noteChild).please();
     renderWithStoreAndMockRoute(
       NoteOverview,
       { props: { noteId: noteParent.id } },
       null,
       (store) => {
         store.commit("loadNotes", [noteParent, noteChild, noteGrandchild]);
-        store.commit("loadParentChildren", {
-          [noteParent.id]: [noteChild.id],
-          [noteChild.id]: [noteGrandchild.id],
-        });
       }
     );
     await screen.findByText("parent");

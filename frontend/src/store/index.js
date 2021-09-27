@@ -4,15 +4,14 @@ import { createStore } from "vuex";
 export default createStore({
   state: () => ({
     notes: {},
-    childrens: {},
   }),
 
   getters: {
     getNoteById: (state) => (id) => state.notes[id],
-    getChildrenOfParentId: (state) => (parentId) =>
-      !state.childrens[parentId]
+    getChildrenIdsByParentId: (state) => (parentId) =>
+      !state.notes[parentId]
         ? []
-        : state.childrens[parentId].map((c) => state.notes[c]),
+        : state.notes[parentId].childrenIds
   },
 
   mutations: {
@@ -20,10 +19,6 @@ export default createStore({
       notes.forEach((note) => {
         state.notes[note.id] = note;
       });
-    },
-
-    loadParentChildren(state, parentChildren) {
-      merge(state.childrens, parentChildren);
     },
   },
 });

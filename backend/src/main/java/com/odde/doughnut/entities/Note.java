@@ -153,6 +153,7 @@ public class Note {
         nvb.setId(getId());
         nvb.setNote(this);
         nvb.setLinks(getAllLinks(viewer));
+        nvb.setChildrenIds(children.stream().map(Note::getId).collect(Collectors.toUnmodifiableList()));
         return nvb;
     }
 

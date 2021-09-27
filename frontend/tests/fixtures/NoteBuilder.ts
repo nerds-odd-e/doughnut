@@ -13,12 +13,23 @@ class NoteBuilder extends Builder {
 
   constructor(parentBuilder?: Builder) {
     super(parentBuilder);
-    this.data = { note: { noteContent: {} }, links: {} };
+    this.data = {
+      id: generateId(),
+      note: { noteContent: {} },
+      links: {},
+      childrenIds: []
+    };
   }
 
   title(value: string): NoteBuilder {
     this.data.note.title = value;
     this.data.note.noteContent.title = value;
+    return this;
+  }
+
+  under(value: any): NoteBuilder {
+    value.childrenIds.push(this.data.id)
+
     return this;
   }
 
@@ -52,11 +63,8 @@ class NoteBuilder extends Builder {
   }
 
   do(): any {
-    const id = generateId();
-
     return merge(
       {
-        id,
         note: {
           noteContent: {
             title: "Note1.1.1",

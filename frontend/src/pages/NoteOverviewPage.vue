@@ -32,7 +32,6 @@ export default {
       ).then((res) => {
         this.breadcrumb = res.noteBreadcrumbViewedByUser;
         this.$store.commit("loadNotes", res.notes);
-        this.$store.commit("loadParentChildren", res.parentChildren);
         this.loaded = true;
       });
     },

@@ -5,6 +5,7 @@ import com.odde.doughnut.entities.Note;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
 import java.util.Map;
 
 public class NoteViewedByUser1 {
@@ -15,7 +16,13 @@ public class NoteViewedByUser1 {
     @Getter
     @Setter
     private Note note;
+
     @Getter
     @Setter
     private Map<Link.LinkType, LinkViewed> links;
+
+    @Getter
+    @Setter
+    private List<Integer> childrenIds;
+
 }

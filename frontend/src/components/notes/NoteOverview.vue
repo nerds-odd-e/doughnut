@@ -2,9 +2,9 @@
   <NoteShow v-bind="{ ...noteViewedByUser }"/>
   <div class="note-list">
     <NoteOverview
-      v-for="child in children"
-      v-bind="{ noteId: child.id }"
-      :key="child.id"
+      v-for="childId in childrenIds"
+      v-bind="{ noteId: childId }"
+      :key="childId"
     />
   </div>
 </template>
@@ -17,13 +17,14 @@ export default {
   props: {
     noteId: Number,
   },
+  emits: ["updated"],
   components: { NoteShow },
   computed: {
     noteViewedByUser() {
       return this.$store.getters.getNoteById(this.noteId);
     },
-    children() {
-      return this.$store.getters.getChildrenOfParentId(this.noteId);
+    childrenIds() {
+      return this.$store.getters.getChildrenIdsByParentId(this.noteId);
     },
   },
 };

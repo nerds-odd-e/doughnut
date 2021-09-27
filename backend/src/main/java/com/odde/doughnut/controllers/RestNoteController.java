@@ -20,11 +20,8 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/notes")
@@ -90,7 +87,6 @@ class RestNoteController {
   static class NotesBulk {
     public NoteBreadcrumbViewedByUser noteBreadcrumbViewedByUser;
     public List<NoteViewedByUser1> notes = new ArrayList<>();
-    public Map<Integer, List<Integer>> parentChildren = new HashMap<>();
   }
 
   @GetMapping("/{note}/overview")
@@ -104,9 +100,6 @@ class RestNoteController {
     notesBulk.notes.add(note.jsonObjectViewedBy1(user.getEntity()));
     note.traverseBreadthFirst(n->{
       notesBulk.notes.add(n.jsonObjectViewedBy1(user.getEntity()));
-      List<Integer> children = notesBulk.parentChildren.computeIfAbsent(n.getParentId(), (k)->new ArrayList<>());
-      Integer id = n.getId();
-      children.add(id);
     });
     return notesBulk;
   }
