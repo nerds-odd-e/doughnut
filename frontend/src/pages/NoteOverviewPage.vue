@@ -9,7 +9,7 @@
 
 <script>
 import LoadingPage from "./commons/LoadingPage.vue";
-import { restGet } from "../restful/restful";
+import { storedApiGetNoteWithDescendents } from "../storedApi";
 import NoteOverview from "../components/notes/NoteOverview.vue";
 import Breadcrumb from "../components/notes/Breadcrumb.vue";
 
@@ -25,16 +25,16 @@ export default {
   },
   components: { LoadingPage, NoteOverview, Breadcrumb },
   methods: {
+
     fetchData() {
-      restGet(
-        `/api/notes/${this.noteId}/overview`,
+      storedApiGetNoteWithDescendents(this.$store, this.noteId,
         (r) => (this.loading = r)
       ).then((res) => {
         this.breadcrumb = res.noteBreadcrumbViewedByUser;
-        this.$store.commit("loadNotes", res.notes);
         this.loaded = true;
       });
     },
+
   },
   watch: {
     noteId() {
