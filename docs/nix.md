@@ -66,7 +66,8 @@ nix-shell --pure --command "zsh"
 Bootup springboot backend server with gradle (backend app started on port 9082)
 
 ```bash
-gradle wrapper --distribution-type all
+cd frontend && yarn && yarn build
+cd -
 ./gradlew bootRunDev"
 open http://localhost:9082
 ```
@@ -83,10 +84,10 @@ nohup idea-community &
 
 #### Setup IntelliJ IDEA with JDK16 SDK
 
-- Locate your `nix` installed JDK16 path location with `which java` (it is printed out on entering `nix-shell`).
-  - e.g. `/nix/store/60kc2wrpr8p0jb8hginzq2hmhi9l9ws0-zulu16.30.15-ca-jdk-16.0.1`.
+- Locate your `nix` installed JDK16 path location from the header printout on entering nix-shell ($JAVA_HOME is printed out on entering `nix-shell`).
+  - e.g. On macOS this could look like `/nix/store/60kc2wrpr8p0jb8hginzq2hmhi9l9ws0-zulu16.30.15-ca-jdk-16.0.1/zulu-16.jdk/Contents/Home`.
 - **File -> Project Structure -> Platform Settings -> SDKs -> Add JDK...**
-  - Enter the full path of above (e.g. `/nix/store/60kc2wrpr8p0jb8hginzq2hmhi9l9ws0-zulu16.30.15-ca-jdk-16.0.1`).
+  - Enter the full path of above (e.g. `/nix/store/60kc2wrpr8p0jb8hginzq2hmhi9l9ws0-zulu16.30.15-ca-jdk-16.0.1/zulu-16.jdk/COntents/Home`).
 
 #### Run a single targetted JUnit5 test in IntelliJ IDEA
 
