@@ -11,7 +11,7 @@ export default {
       externalIdentifier: null,
       showNavBar: true,
       staticInfo: null,
-      loading: null,
+      loading: true,
       popupInfo: [],
       doneResolve: null,
     };
@@ -44,12 +44,15 @@ export default {
   },
 
   mounted() {
-    restGet(`/api/static-info`, (v) => (this.loading = v)).then((res) => {
+    this.loading = true
+    restGet(`/api/static-info`).then((res) => {
       this.staticInfo = res;
       this.user = res.user;
       this.externalIdentifier = res.externalIdentifier;
       Object.assign(this.$staticInfo, res);
-    });
+    })
+    .finally(() => this.loading = false)
+    ;
 
     this.$popups.alert = (msg) => {
       this.popupInfo = { type: "alert", message: msg };

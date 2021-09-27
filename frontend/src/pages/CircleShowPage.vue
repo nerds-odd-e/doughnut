@@ -61,16 +61,20 @@ export default {
   data() {
     return {
       circle: null,
-      loading: null,
+      loading: true,
       formErrors: {},
     };
   },
 
   methods: {
     fetchData() {
-      restGet(`/api/circles/${this.circleId}`, (r) => (this.loading = r)).then(
-        (res) => (this.circle = res)
-      );
+      this.loading = true
+      restGet(`/api/circles/${this.circleId}`).then(
+        (res) => {
+          this.circle = res
+        }
+      )
+      .finally(() => this.loading = false)
     },
   },
 

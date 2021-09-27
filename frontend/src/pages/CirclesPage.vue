@@ -36,15 +36,19 @@ export default {
   components: { LoadingPage, CircleNewButton, CircleJoinForm },
   data() {
     return {
-      loading: false,
+      loading: true,
       circles: null,
     };
   },
   methods: {
     fetchData() {
-      restGet(`/api/circles`, (r) => (this.loading = r)).then(
-        (res) => (this.circles = res)
-      );
+      this.loading = true
+      restGet(`/api/circles`).then(
+        (res) => {
+          this.circles = res
+        }
+      )
+      .finally(() => this.loading = false)
     },
   },
   mounted() {

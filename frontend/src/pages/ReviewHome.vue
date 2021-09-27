@@ -19,9 +19,11 @@ export default {
   components: { ReviewWelcome, LoadingPage },
   methods: {
     fetchData() {
-      restGet(`/api/reviews/overview`, (r) => (this.loading = r)).then(
+      this.loading = true
+      restGet(`/api/reviews/overview`).then(
         (res) => (this.reviewing = res)
-      );
+      )
+      .finally(()=>this.loading = false);
     },
   },
   mounted() {

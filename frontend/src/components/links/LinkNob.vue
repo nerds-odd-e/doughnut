@@ -51,7 +51,7 @@ import SvgLinkTypeIcon from "../svgs/SvgLinkTypeIcon.vue";
 import ModalWithButton from "../commons/ModalWithButton.vue";
 import LinkTypeSelect from "./LinkTypeSelect.vue";
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue";
-import { restGet, restPost } from "../../restful/restful";
+import { restPost } from "../../restful/restful";
 
 export default {
   props: { link: Object, inverseIcon: Boolean, colors: Object },

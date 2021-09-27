@@ -22,15 +22,19 @@ export default {
   components: { LoadingPage, NotebookBazaarViewCards },
   data() {
     return {
-      loading: false,
+      loading: true,
       notebooksViewedByUser: null,
     };
   },
   methods: {
     fetchData() {
-      restGet(`/api/bazaar`, (r) => (this.loading = r)).then(
-        (res) => (this.notebooksViewedByUser = res)
-      );
+      this.loading = true
+      restGet(`/api/bazaar`).then(
+        (res) => {
+          this.notebooksViewedByUser = res
+        }
+      )
+      .finally(() => this.loading = false)
     },
   },
   mounted() {

@@ -38,9 +38,10 @@ export default {
   },
   methods: {
     fetchData() {
-      restGet(`/api/notebooks`, (r) => (this.loading = r)).then(
+      this.loading = true
+      restGet(`/api/notebooks`).then(
         (res) => (this.notebooksViewedByUser = res)
-      );
+      ).finally(()=> this.loading = false);
     },
   },
   mounted() {

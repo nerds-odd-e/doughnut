@@ -118,9 +118,11 @@ export default {
     },
 
     fetchData() {
-      restGet(`/api/reviews/initial`, (r) => (this.loading = r)).then(
-        this.loadNew
-      );
+      this.loading = true
+      restGet(`/api/reviews/initial`).then(res => {
+          this.loadNew(res)
+        })
+      .finally(() => this.loading = false)
     },
   },
   mounted() {

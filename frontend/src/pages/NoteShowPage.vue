@@ -25,12 +25,13 @@ export default {
   components: { NoteViewedByUser, NoteStatisticsButton, LoadingPage },
   methods: {
     fetchData() {
-      restGet(`/api/notes/${this.noteId}`, (r) => (this.loading = r)).then(
+      this.loading = true
+      restGet(`/api/notes/${this.noteId}`).then(
         (res) => {
           this.$store.commit("loadNotes", [res]);
           this.noteViewedByUser = res;
         }
-      );
+      ).finally(() => this.loading = false);
     },
   },
   watch: {

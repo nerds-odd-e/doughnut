@@ -27,20 +27,21 @@ export default {
   components: { LoadingPage },
   data() {
     return {
-      loading: false,
+      loading: true,
       failureReport: null,
       githubIssueUrl: null,
     };
   },
   methods: {
     fetchData() {
+      this.loading = true
       restGet(
-        `/api/failure-reports/${this.failureReportId}`,
-        (r) => (this.loading = r)
+        `/api/failure-reports/${this.failureReportId}`
       ).then((res) => {
         this.failureReport = res.failureReport;
         this.githubIssueUrl = res.githubIssueUrl;
-      });
+      })
+      .finally(() => this.loading = false)
     },
   },
   mounted() {

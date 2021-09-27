@@ -25,16 +25,18 @@ export default {
     return {
       formData: {},
       formErrors: {},
-      loading: false,
+      loading: true,
     };
   },
   methods: {
     fetchData() {
-      restGet(
-        `/api/notes/${this.noteId}/review-setting`,
-        (r) => (this.loading = r),
-        (res) => (this.formData = res)
-      );
+      this.loading = true
+      restGet(`/api/notes/${this.noteId}/review-setting`)
+      .then((res) => {
+          this.formData = res
+        }
+      )
+      .finally(() => this.loading = false)
     },
     processForm() {
       restPost(

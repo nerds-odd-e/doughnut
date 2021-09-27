@@ -48,9 +48,9 @@ export default {
   methods: {
     fetchData() {
       restGet(`/api/user`, (r) => (this.loading = r)).then((res) => {
-        this.formData = res;
-        this.loading = false;
-      });
+        this.formData = res
+      })
+      .finally(() => this.loading = false);
     },
     processForm() {
       restPatchMultiplePartForm(

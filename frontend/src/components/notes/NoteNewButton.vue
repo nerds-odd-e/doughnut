@@ -55,7 +55,7 @@ export default {
   props: { parentId: Number },
   data() {
     return {
-      loading: false,
+      loading: true,
       ancestors: null,
       notebook: null,
       show: false,
@@ -70,13 +70,15 @@ export default {
   },
   methods: {
     fetchData() {
-      restGet(`/api/notes/${this.parentId}`, (r) => (this.loading = r)).then(
+      this.loading = true
+      restGet(`/api/notes/${this.parentId}`).then(
         (res) => {
           const { ancestors, note, notebook } = res;
           this.ancestors = [...ancestors, note];
           this.notebook = notebook;
         }
-      );
+      )
+      .finally(() => this.loading = false)
     },
 
     processForm() {

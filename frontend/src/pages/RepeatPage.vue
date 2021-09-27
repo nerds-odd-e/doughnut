@@ -151,9 +151,10 @@ export default {
     },
 
     fetchData() {
-      restGet(`/api/reviews/repeat`, (r) => (this.loading = r)).then(
+      this.loading = true
+      restGet(`/api/reviews/repeat`).then(
         this.loadNew
-      );
+      ).finally(() => this.loading = false);
     },
 
     async noLongerExist() {
@@ -164,9 +165,9 @@ export default {
     },
 
     refresh() {
+      this.loading = true
       restGet(
         `/api/review-points/${this.reviewPointViewedByUser.reviewPoint.id}`,
-        (r) => (this.loading = r)
       )
         .then((res) => {
           if (!res || !!res.reviewPoint.removedFromReview) {
@@ -178,7 +179,8 @@ export default {
           if (err.statusCode === 404) {
             this.noLongerExist();
           }
-        });
+        })
+        .finally(() => this.loading = false);
     },
 
     processAnswer(answerData) {

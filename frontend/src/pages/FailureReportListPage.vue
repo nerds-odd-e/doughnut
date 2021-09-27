@@ -31,18 +31,22 @@ export default {
   components: { LoadingPage },
   data() {
     return {
-      loading: false,
+      loading: true,
       failureReports: null,
       errorMessage: null,
     };
   },
   methods: {
     fetchData() {
-      restGet(`/api/failure-reports`, (r) => (this.loading = r))
-        .then((res) => (this.failureReports = res))
+      this.loading = true
+      restGet(`/api/failure-reports`)
+        .then((res) => {
+          this.failureReports = res
+        })
         .catch(
           () => (this.errorMessage = "It seems you cannot access this page.")
-        );
+        )
+        .finally(() => this.loading = false)
     },
   },
   mounted() {

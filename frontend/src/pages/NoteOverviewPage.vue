@@ -1,6 +1,6 @@
 <template>
-  <LoadingPage v-bind="{ loading, contentExists: !!loaded }">
-    <div v-if="loaded">
+  <LoadingPage v-bind="{ loading, contentExists: !!breadcrumb }">
+    <div v-if="!loading">
       <Breadcrumb v-bind="breadcrumb" />
       <NoteOverview v-bind="{ noteId }" />
     </div>
@@ -19,20 +19,20 @@ export default {
   data() {
     return {
       breadcrumb: null,
-      loaded: false,
-      loading: false,
+      loading: true,
     };
   },
   components: { LoadingPage, NoteOverview, Breadcrumb },
   methods: {
 
     fetchData() {
-      storedApiGetNoteWithDescendents(this.$store, this.noteId,
-        (r) => (this.loading = r)
-      ).then((res) => {
+      this.loading = true;
+      storedApiGetNoteWithDescendents(this.$store, this.noteId)
+      .then((res) => {
         this.breadcrumb = res.noteBreadcrumbViewedByUser;
-        this.loaded = true;
-      });
+      })
+      .finally(() => this.loading = false)
+      ;
     },
 
   },

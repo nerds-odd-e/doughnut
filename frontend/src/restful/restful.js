@@ -61,7 +61,7 @@ const restRequest = (url, params, loadingRef) => {
   });
 };
 
-const restGet = (url, loadingRef) => restRequest(url, {}, loadingRef);
+const restGet = (url) => restRequest(url, {}, ()=>1);
 
 const restPost = (url, data, loadingRef) =>
   restRequest(

@@ -53,9 +53,10 @@ export default {
   },
   methods: {
     fetchData() {
-      restGet(`/api/links/${this.linkid}`, (r) => (this.loading = r)).then(
+      this.loading = true
+      restGet(`/api/links/${this.linkid}`).then(
         (res) => (this.linkViewedByUser = res)
-      );
+      ).finally(()=> this.loading = false);
     },
 
     updateLink() {

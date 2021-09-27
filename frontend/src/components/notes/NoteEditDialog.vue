@@ -20,18 +20,20 @@ export default {
     return {
       formData: null,
       formErrors: {},
-      loading: false,
+      loading: true,
     };
   },
 
   methods: {
     fetchData() {
-      restGet(`/api/notes/${this.noteId}`, (r) => (this.loading = r)).then(
+      this.loading = true
+      restGet(`/api/notes/${this.noteId}`).then(
         (res) => {
-          const { updatedAt, ...rest } = res.note.noteContent;
-          this.formData = rest;
+          const { updatedAt, ...rest } = res.note.noteContent
+          this.formData = rest
         }
-      );
+      )
+      .finally(() => this.loading = false)
     },
 
     processForm() {
