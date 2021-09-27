@@ -25,7 +25,6 @@
         note: noteViewedByUser.note,
         links: noteViewedByUser.links,
       }"
-      @updated="$emit('updated')"
     />
   </div>
 </template>
@@ -38,7 +37,6 @@ import Card from "../notes/Card.vue";
 export default {
   name: "LinkNoteShow",
   props: { noteViewedByUser: Object },
-  emits: ["updated"],
   components: { Breadcrumb, NoteShow, Card },
 };
 </script>

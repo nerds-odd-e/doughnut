@@ -15,17 +15,12 @@ import SvgReviewSetting from "../svgs/SvgReviewSetting.vue";
 export default {
   components: { SvgReviewSetting },
   props: { noteId: Number, oldTitle: String },
-  emits: ["updated"],
   methods: {
     async showDialog() {
-      if (
-        await this.$popups.dialog(ReviewSettingEditDialog, {
-          noteId: this.noteId,
-          title: this.oldTitle,
-        })
-      ) {
-        this.$emit("updated");
-      }
+      await this.$popups.dialog(ReviewSettingEditDialog, {
+        noteId: this.noteId,
+        title: this.oldTitle,
+      })
     },
   },
 };

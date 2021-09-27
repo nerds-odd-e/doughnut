@@ -3,7 +3,6 @@
     <div class="col-12 col-md-4 link-source">
       <LinkNoteShow
         :noteViewedByUser="sourceNoteViewedByUser"
-        @updated="$emit('updated')"
       />
     </div>
     <div class="col-12 col-md-4 text-center">
@@ -12,7 +11,6 @@
     <div class="col-12 col-md-4 link-target">
       <LinkNoteShow
         :noteViewedByUser="targetNoteViewedByUser"
-        @updated="$emit('updated')"
       />
     </div>
   </div>

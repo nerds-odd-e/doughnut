@@ -3,8 +3,6 @@
     <template v-if="owns" #headerButtons="{ note }">
       <NoteButtons
         :note="note"
-        @updated="$emit('updated')"
-        @deleted="$emit('updated')"
       />
     </template>
   </NoteCardWithHeaderAndButton>
@@ -17,7 +15,6 @@ import NoteButtons from "./NoteButtons.vue";
 export default {
   name: "NoteOwnerViewCards",
   props: { notes: Array, owns: Boolean },
-  emits: ["updated"],
   components: { NoteCardWithHeaderAndButton, NoteButtons },
 };
 </script>

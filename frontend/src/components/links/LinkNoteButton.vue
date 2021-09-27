@@ -24,7 +24,6 @@ import SvgLinkNote from "../svgs/SvgLinkNote.vue";
 export default {
   name: "LinkNoteButton",
   props: { note: Object },
-  emits: ["updated"],
   components: { ModalWithButton, LinkNote, SvgLinkNote },
   data() {
     return { show: false };
@@ -32,7 +31,6 @@ export default {
   methods: {
     done() {
       this.show = false;
-      this.$emit("updated");
     },
   },
 };

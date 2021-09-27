@@ -1,6 +1,6 @@
 <template>
   <div class="note-show" :style="`background-color: ${bgColor}`">
-    <NoteFrameOfLinks v-bind="{ links }" @updated="$emit('updated')">
+    <NoteFrameOfLinks v-bind="{ links }">
       <div class="note-body" @dblclick="editDialog">
         <h2 role="title" class="note-title">{{ note.noteContent.title }}</h2>
         <div class="row">
@@ -36,7 +36,6 @@ export default {
     note: { type: Object, required: true },
     links: Object,
   },
-  emits: ["updated"],
   components: {
     NoteFrameOfLinks,
     NoteEditDialog,
@@ -65,13 +64,9 @@ export default {
   },
   methods: {
     async editDialog() {
-      if (
-        await this.$popups.dialog(NoteEditDialog, {
-          noteId: this.id,
-        })
-      ) {
-        this.$emit("updated");
-      }
+      await this.$popups.dialog(NoteEditDialog, {
+        noteId: this.id,
+      })
     },
   },
 };

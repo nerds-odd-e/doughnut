@@ -1,7 +1,7 @@
 <template>
   <LoadingPage v-bind="{ loading, contentExists: !!noteViewedByUser }">
-    <div v-if="noteViewedByUser">
-      <NoteViewedByUser v-bind="noteViewedByUser" @updated="fetchData()" />
+    <div v-if="noteViewedByUser" :key="noteId">
+      <NoteViewedByUser v-bind="noteViewedByUser"/>
       <NoteStatisticsButton :noteId="noteId" />
     </div>
   </LoadingPage>

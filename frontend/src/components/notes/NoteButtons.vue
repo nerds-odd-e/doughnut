@@ -22,9 +22,8 @@
     <NoteEditButton
       :noteId="note.id"
       :oldTitle="note.title"
-      @updated="$emit('updated')"
     />
-    <LinkNoteButton :note="note" @updated="$emit('updated')" />
+    <LinkNoteButton :note="note"/>
     <a
       class="btn btn-light dropdown-toggle"
       data-bs-toggle="dropdown"
@@ -39,7 +38,6 @@
       <ReviewSettingEditButton
         :noteId="note.id"
         :oldTitle="note.title"
-        @updated="$emit('updated')"
       >
         Edit review settings
       </ReviewSettingEditButton>
@@ -68,7 +66,6 @@ import { restPost } from "../../restful/restful";
 export default {
   name: "NoteButtons",
   props: { note: Object, addSibling: Boolean },
-  emits: ["updated", "deleted"],
   components: {
     SvgCog,
     SvgAddChild,
@@ -93,7 +90,6 @@ export default {
             } else {
               this.$router.push({ name: "notebooks" });
             }
-            this.$emit("deleted");
           }
         );
       }

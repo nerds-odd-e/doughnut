@@ -55,7 +55,6 @@ import { restGet, restPost } from "../../restful/restful";
 
 export default {
   props: { link: Object, inverseIcon: Boolean, colors: Object },
-  emits: ["updated"],
   components: {
     SvgLinkTypeIcon,
     ModalWithButton,
@@ -79,7 +78,6 @@ export default {
         (r) => (this.loading = r)
       )
         .then((res) => {
-          this.$emit("updated");
           this.show = false;
         })
         .catch((res) => (this.formErrors = res));
@@ -94,7 +92,6 @@ export default {
         (r) => (this.loading = r)
       )
         .then((res) => {
-          this.$emit("updated");
           this.show = false;
         })
         .catch((res) => (this.formErrors = res));

@@ -8,7 +8,6 @@
         <LinkLink
           v-bind="{ link, colors: $staticInfo.colors }"
           :reverse="false"
-          @updated="$emit('updated')"
         />
       </li>
     </template>
@@ -25,7 +24,6 @@
           :key="link.id"
           v-bind="{ link, colors: $staticInfo.colors }"
           :reverse="false"
-          @updated="$emit('updated')"
         />
         <LinkLink
           class="link-multi"
@@ -33,7 +31,6 @@
           :key="link.id"
           v-bind="{ link, colors: $staticInfo.colors }"
           :reverse="true"
-          @updated="$emit('updated')"
         />
       </template>
     </li>
@@ -48,7 +45,6 @@
           :key="link.id"
           v-bind="{ link, colors: $staticInfo.colors }"
           :reverse="false"
-          @updated="$emit('updated')"
         />
       </li>
     </template>
@@ -69,7 +65,6 @@
           :key="link.id"
           v-bind="{ link, colors: $staticInfo.colors }"
           :reverse="true"
-          @updated="$emit('updated')"
         />
       </li>
     </template>
@@ -82,7 +77,6 @@ import LinksReader from "../../models/LinksReader";
 
 export default {
   props: { links: Object },
-  emits: ["updated"],
   components: { LinkLink },
   computed: {
     linksReader() {

@@ -1,12 +1,10 @@
 <template>
   <NoteViewedByUserWithoutChildren
     v-bind="{ ...noteViewedByUser, ancestors, notebook, owns }"
-    @updated="$emit('updated')"
   />
   <NoteOwnerViewCards
     :owns="owns"
     :notes="children"
-    @updated="$emit('updated')"
   />
 
   <router-link
@@ -33,7 +31,6 @@ export default {
     notebook: Object,
     owns: { type: Boolean, required: true },
   },
-  emits: ["updated"],
   components: {
     NoteViewedByUserWithoutChildren,
     NoteOwnerViewCards,

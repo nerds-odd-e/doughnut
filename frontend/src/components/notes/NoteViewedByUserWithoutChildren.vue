@@ -5,7 +5,6 @@
       <NoteButtons
         v-if="owns"
         :note="note"
-        @updated="$emit('updated')"
         :addSibling="true"
       />
       <BazaarNoteButtons v-else :note="note" :notebook="notebook" />
@@ -14,7 +13,6 @@
       :id="note.id"
       :note="note"
       :links="links"
-      @updated="$emit('updated')"
     />
   </div>
 </template>
@@ -35,7 +33,6 @@ export default {
     notebook: Object,
     owns: { type: Boolean, required: true },
   },
-  emits: ["updated"],
   components: {
     NoteShow,
     BazaarNoteButtons,

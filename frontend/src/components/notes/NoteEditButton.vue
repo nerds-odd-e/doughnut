@@ -14,16 +14,11 @@ export default {
     SvgEdit,
   },
   props: { noteId: Number },
-  emits: ["updated"],
   methods: {
     async showDialog() {
-      if (
-        await this.$popups.dialog(NoteEditDialog, {
-          noteId: this.noteId,
-        })
-      ) {
-        this.$emit("updated");
-      }
+      await this.$popups.dialog(NoteEditDialog, {
+        noteId: this.noteId,
+      })
     },
   },
 };

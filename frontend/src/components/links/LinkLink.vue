@@ -4,14 +4,12 @@
       v-bind="{ link, colors }"
       v-if="!!reverse"
       :inverseIcon="true"
-      @updated="$emit('updated')"
     />
     <NoteTitleWithLink class="link-title" v-bind="{ note }" />
     <LinkNob
       v-bind="{ link, colors }"
       v-if="!reverse"
       :inverseIcon="false"
-      @updated="$emit('updated')"
     />
   </span>
 </template>
@@ -26,7 +24,6 @@ const props = defineProps({
   reverse: Boolean,
   colors: { Object, required: true },
 });
-const emits = defineEmits(["updated"]);
 const note = computed(() =>
   !!props.reverse ? props.link.sourceNote : props.link.targetNote
 );
