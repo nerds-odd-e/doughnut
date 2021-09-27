@@ -1,0 +1,8 @@
+backend
+cypress/integration
+frontend
+gradle
+infra
+mysql
+node_modules
+secret_public_keys

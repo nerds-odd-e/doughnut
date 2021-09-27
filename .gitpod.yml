@@ -9,14 +9,14 @@ ports:
     onOpen: ignore
   - port: 9082
     onOpen: ignore
-# Vite Frontend Dev Server
+  # Vite Frontend Dev Server
   - port: 3000
     onOpen: open-browser
     visibility: public
-# MySQL 8.0 DB Server
+  # MySQL 8.0 DB Server
   - port: 3309
     onOpen: ignore
-# Remote VNC
+  # Remote VNC
   - port: 5900
     onOpen: ignore
     visibility: public

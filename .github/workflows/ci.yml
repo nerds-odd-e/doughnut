@@ -119,7 +119,8 @@ jobs:
   Package-n-Deploy:
     name: Package & GCP MIG Rolling Update Deploy
     runs-on: ubuntu-20.04
-    needs: [Backend-unit-tests, Frontend-linting, Frontend-unit-tests, E2E-tests]
+    needs:
+      [Backend-unit-tests, Frontend-linting, Frontend-unit-tests, E2E-tests]
     steps:
       - name: Code Checkout
         uses: actions/checkout@v2
@@ -155,7 +156,13 @@ jobs:
     name: Single summary slack notification for entire workflow
     runs-on: ubuntu-20.04
     needs:
-      [Backend-unit-tests, Frontend-linting, Frontend-unit-tests, E2E-tests, Package-n-Deploy]
+      [
+        Backend-unit-tests,
+        Frontend-linting,
+        Frontend-unit-tests,
+        E2E-tests,
+        Package-n-Deploy,
+      ]
     if: always()
     steps:
       - uses: technote-space/workflow-conclusion-action@v2

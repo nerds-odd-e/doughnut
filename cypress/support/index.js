@@ -16,13 +16,13 @@
 /// <reference types="cypress" />
 
 // Import commands.js using ES2015 syntax:
-import './commands';
-import './testability';
+import "./commands";
+import "./testability";
 
 String.prototype.commonSenseSplit = function (separator) {
   return this.trim()
     .split(separator)
-    .filter((s) => s !== '')
+    .filter((s) => s !== "")
     .map((s) => s.trim());
 };
 

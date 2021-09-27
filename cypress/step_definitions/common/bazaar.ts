@@ -49,14 +49,14 @@ When(
   (noteTitle, count) => {
     cy.visit("/bazaar");
     cy.subscribeToNote(noteTitle, count);
-  },
+  }
 );
 
 Then(
   "I should not see the {string} button on notebook {string}",
   (btnTitle, noteTitle) => {
     cy.findNoteCardButton(noteTitle, btnTitle).should("not.exist");
-  },
+  }
 );
 
 Then("I should see readonly notebook {string} in my notes", (noteTitle) => {
@@ -79,7 +79,7 @@ Then(
     cy.visitMyNotebooks();
     cy.findNoteCardButton(noteTitle, "Edit subscription").click();
     cy.findByRole("button", { name: "Update" }).click();
-  },
+  }
 );
 
 When("I change notebook {string} to skip review", (noteTitle) => {

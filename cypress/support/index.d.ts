@@ -11,7 +11,7 @@ declare namespace Cypress {
     failure(): void;
     findNoteCardButton(
       noteTitle: string,
-      btnTextOrTitle: string,
+      btnTextOrTitle: string
     ): Chainable<Element>;
     findNoteCardEditButton(noteTitle: string): Chainable<Element>;
     getFormControl(label: string): Chainable<Element>;
@@ -21,7 +21,7 @@ declare namespace Cypress {
     pageIsLoaded(): void;
     subscribeToNote(
       noteTitle: string,
-      dailyLearningCount: number,
+      dailyLearningCount: number
     ): Chainable<Element>;
     triggerException(): void;
     unsubscribeFromNotebook(noteTitle: string): Chainable<Element>;

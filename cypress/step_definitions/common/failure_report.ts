@@ -24,7 +24,7 @@ When("I should see a new open issue on github", () => {
   cy.request({ method: "GET", url: `/api/testability/github_issues` }).then(
     (response) => {
       expect(response.body.length).to.equal(1);
-    },
+    }
   );
 });
 
@@ -33,9 +33,9 @@ Given(
   (id) => {
     cy.request({
       method: "POST",
-      url:
-        `/api/testability/use_real_sandbox_github_and_close_all_github_issues`,
+      url: `/api/testability/use_real_sandbox_github_and_close_all_github_issues`,
     })
-      .its("body").should("contain", "OK");
-  },
+      .its("body")
+      .should("contain", "OK");
+  }
 );

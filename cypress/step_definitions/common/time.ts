@@ -12,5 +12,5 @@ import {
 } from "cypress-cucumber-preprocessor/steps";
 
 Given("I let the server to time travel to {int} hours ago", (hours) => {
-  cy.timeTravelRelativeToNow(-hours)
-})
+  cy.timeTravelRelativeToNow(-hours);
+});

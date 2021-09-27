@@ -25,7 +25,9 @@
 git config user.name "Your beautiful name"
 git config user.email "your_email@your_domain.com"
 ```
+
 ### Get your doughnut DB tables setup
+
 - From root of `doughnut` run `./gradlew bootRunE2E` to setup and migrate your base virgin `doughnut` DB tables via `flyway` migrations. Once the migrations have completed (read the `springboot` startup logs from the VSCode terminal), use `Ctrl-C` to exit `springboot` backend server application process. (this might take some time - once done, `Ctrl-C` to exit process on completion).
 
 ```bash
@@ -45,7 +47,6 @@ INFO 2142 --- [  restartedMain] o.f.core.internal.command.DbMigrate      : Succe
 ### Running java springboot unit tests
 
 - From the root of the `doughnut` codebase, run `.\gradlew test`. This assumes you have had your doughnut DB tables setup from above.
-
 
 ### Running frontend JS/TS Vue3 unit tests
 

@@ -17,7 +17,7 @@ Given(
   "there are some notes for existing user {string}",
   (externalIdentifier, data) => {
     cy.seedNotes(data.hashes(), externalIdentifier);
-  },
+  }
 );
 
 Given("there are notes from Note {int} to Note {int}", (from, to) => {
@@ -43,21 +43,20 @@ When(
     for (var field in expects) {
       cy.getFormControl(field).should("have.value", expects[field]);
     }
-  },
+  }
 );
 
 When("I update it to become:", (data) => {
   cy.submitNoteFormsWith(data.hashes());
 });
 
-When("I update note {string} with the description {string}", (noteTitle, newDescription) => {
-  cy.clickNotePageButton(noteTitle, "edit note");
-  cy.submitNoteFormsWith([{Description: newDescription}]);
-});
-
-
-
-
+When(
+  "I update note {string} with the description {string}",
+  (noteTitle, newDescription) => {
+    cy.clickNotePageButton(noteTitle, "edit note");
+    cy.submitNoteFormsWith([{ Description: newDescription }]);
+  }
+);
 
 When("I create note belonging to {string}:", (noteTitle, data) => {
   cy.jumpToNotePage(noteTitle);
@@ -84,7 +83,7 @@ Then(
   (data) => {
     cy.visitMyNotebooks();
     cy.expectNoteCards(data.hashes());
-  },
+  }
 );
 
 Then("I should see these notes as children", (data) => {
@@ -106,7 +105,7 @@ When(
   "I should see that the note creation is not successful",
   (noteTitle, data) => {
     cy.findByText("must not be empty");
-  },
+  }
 );
 
 Then("I should see {string} in note title", (noteTitle) => {
@@ -120,7 +119,7 @@ Then(
     cy.findByText("Notebooks");
     cy.pageIsLoaded();
     cy.findByText(noteTitle).should("not.exist");
-  },
+  }
 );
 
 When("I open {string} note from top level", (noteTitles) => {
@@ -137,11 +136,13 @@ When("I move note {string} left", (noteTitle) => {
   cy.findByRole("button", { name: "Move Left" }).click();
 });
 
-When("I double click {string} and edit the description to {string}", (noteTitle, newDescription) => {
-  cy.findByText(noteTitle).dblclick();
-  cy.submitNoteFormsWith([{Description: newDescription}]);
-});
-
+When(
+  "I double click {string} and edit the description to {string}",
+  (noteTitle, newDescription) => {
+    cy.findByText(noteTitle).dblclick();
+    cy.submitNoteFormsWith([{ Description: newDescription }]);
+  }
+);
 
 When("I should see the screenshot matches", () => {
   // cy.get('.content').compareSnapshot('page-snapshot', 0.001);
@@ -163,7 +164,7 @@ When(
       const texts = Array.from($els, (el) => el.innerText);
       expect(texts).to.match(matcher);
     });
-  },
+  }
 );
 
 // This step definition is for demo purpose
@@ -173,7 +174,7 @@ Then(
     cy.findByText("" + numberOfDescendants, {
       selector: ".descendant-counter",
     });
-  },
+  }
 );
 
 When(
@@ -184,7 +185,7 @@ When(
     }).then(() => {
       cy.findByText(noteTitle).click();
     });
-  },
+  }
 );
 
 When("I click on the overview button", () => {
@@ -197,22 +198,26 @@ Then("I should see the title {string} of the notebook", (noteTitle) => {
 
 Then("I should see the child notes {string} in order", (notesStr) => {
   const notes = notesStr.split(",");
-  cy.findAllByRole("title").then(elms => {
-          let actual =[]
-          elms.map((i, actualNote) => actual.push(actualNote.innerHTML))
-          actual = actual.filter(c=>notes.includes(c))
-          expect(actual.join(",")).to.equal(notes.join(','))
-      }
-  )
+  cy.findAllByRole("title").then((elms) => {
+    let actual = [];
+    elms.map((i, actualNote) => actual.push(actualNote.innerHTML));
+    actual = actual.filter((c) => notes.includes(c));
+    expect(actual.join(",")).to.equal(notes.join(","));
+  });
 });
 
 Then("I should see {string} is newer than {string}", (newer, older) => {
   let firstColor;
   cy.jumpToNotePage(newer);
-  cy.get('.note-show').invoke('css', 'background-color').then(val => firstColor = val)
+  cy.get(".note-show")
+    .invoke("css", "background-color")
+    .then((val) => (firstColor = val));
   cy.jumpToNotePage(older);
-  cy.get('.note-show').invoke('css', 'background-color').then(val =>
-    expect(parseInt(firstColor.match(/\d+/)[0])).to.greaterThan(parseInt(val.match(/\d+/)[0]))
-  )
+  cy.get(".note-show")
+    .invoke("css", "background-color")
+    .then((val) =>
+      expect(parseInt(firstColor.match(/\d+/)[0])).to.greaterThan(
+        parseInt(val.match(/\d+/)[0])
+      )
+    );
 });
-

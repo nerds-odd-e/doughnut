@@ -109,7 +109,7 @@ Then(
     cy.get("#password").type("password");
     cy.get("form.form-signin").submit();
     cy.expectNoteTitle(expectation);
-  },
+  }
 );
 
 Then("I edit user profile", () => {

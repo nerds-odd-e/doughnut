@@ -67,12 +67,15 @@ For more background info you can read:
 #### Run full backend unit tests suite
 
 - From doughnut source root directory:
+
 ```bash
 ./gradlew test
 ```
 
 #### Run full frontend unit tests suite
+
 - From doughnut/frontend source directory:
+
 ```bash
 yarn
 yarn test
