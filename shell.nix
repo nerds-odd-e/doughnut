@@ -133,7 +133,7 @@ in mkShell {
   ];
   shellHook = ''
         export NIXPKGS_ALLOW_UNFREE=1
-        export JAVA_HOME="${pkgs.jdk16}"
+        export JAVA_HOME="$(readlink -e $(type -p javac) | sed  -e 's/\/bin\/javac//g')"
         export GRADLE_HOME="${pkgs.gradle}"
 
         export MYSQL_BASEDIR=${pkgs.mysql80}
