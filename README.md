@@ -77,7 +77,7 @@ For more background info you can read:
 - From doughnut/frontend source directory:
 
 ```bash
-yarn && yarn frontend:test
+yarn && yarn test
 ```
 
 ### 4. End-to-End Test / Features / Cucumber / SbE / ATDD
@@ -88,12 +88,12 @@ We use cucumber + cypress + Javascript library to do end to end test.
 
 #### Commands
 
-| Purpose                              | Command                                                                    |
-| ------------------------------------ | -------------------------------------------------------------------------- |
-| start SUT (system under test)        | `yarn sut`                                                                 |
-| run all e2e test                     | `yarn test` (starts SUT and cypress headless)                              |
-| run all e2e test with FE in dev mode | `yarn test:dev` (starts SUT and frontend in dev mode and cypress headless) |
-| run cypress IDE                      | `yarn cy:open` (starts SUT and cypress IDE)                                |
+| Purpose                              | Command                                                                                                                       |
+| ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
+| start SUT (backend system under test)| `yarn sut`                                                                                                                    |
+| run all e2e test                     | `yarn test` (starts backend SUT and compile frontend and cypress headless)                                                    |
+| run all e2e test with FE in dev mode | `yarn test:dev` (starts backend SUT and frontend in dev mode and cypress headless)                                            |
+| run cypress IDE                      | `./gradlew bootRunE2E`, `yarn frontend:sut` and `yarn cy:open` (starts frontend SUT in dev mode, backend SUT and cypress IDE) |
 
 #### Structure
 
