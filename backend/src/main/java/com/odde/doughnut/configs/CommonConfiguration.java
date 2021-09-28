@@ -1,6 +1,5 @@
 package com.odde.doughnut.configs;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractAuthenticationFilterConfigurer;
 import org.springframework.stereotype.Component;
@@ -9,7 +8,7 @@ import org.springframework.stereotype.Component;
 public class CommonConfiguration {
 
   void commonConfig(HttpSecurity http, AbstractAuthenticationFilterConfigurer authenticationFilterConfigurer) throws Exception {
-    HttpSecurity config =  http.authorizeRequests()
+      http.authorizeRequests()
         .mvcMatchers("/robots.txt")
         .permitAll()
         .antMatchers("/", "/login", "/error", "/images/**", "/odd-e.png", "/odd-e.ico",
