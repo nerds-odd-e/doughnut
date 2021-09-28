@@ -80,6 +80,14 @@ yarn && yarn frontend:build
 open http://localhost:9081
 ```
 
+Run E2E profile with backend server & frontend in dev mode & Cypress IDE (frontend app on port 3000; backend app on port 9081)
+```bash
+# from doughnut source root dir
+yarn && yarn frontend:sut
+./gradlew bootRunE2E
+yarn cy:open
+```
+
 #### IntelliJ IDEA (Community) IDE project import
 
 ```bash

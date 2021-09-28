@@ -9,7 +9,7 @@
     "frontend:build": "cd frontend && yarn && yarn build && cd -",
     "frontend:lint": "cd frontend && yarn && yarn lint && cd -",
     "frontend:test": "cd frontend && yarn && yarn test && cd -",
-    "frontend:sut": "cd frontend && yarn dev && cd -",
+    "frontend:sut": "cd frontend && yarn && yarn dev && cd -",
     "backend:test": "./gradlew test",
     "backend:build": "backend/gradlew -p backend build -x test",
     "backend:prod_build": "backend/gradlew -p backend build -x test -Dspring.profiles.active=prod",
