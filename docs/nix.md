@@ -63,13 +63,21 @@ export NIXPKGS_ALLOW_UNFREE=1
 nix-shell --pure --command "zsh"
 ```
 
-Bootup springboot backend server with gradle (backend app started on port 9082)
+Run Dev profile springboot backend server with gradle (backend app started on port 9082)
 
 ```bash
-cd frontend && yarn && yarn build
-cd -
-./gradlew bootRunDev"
+# from doughnut source root dir
+yarn && yarn frontend:build
+./gradlew bootRunDev
 open http://localhost:9082
+```
+
+Run E2E profile springboot backend server with gradle (backend app started on port 9081)
+```bash
+# from doughnut source root dir
+yarn && yarn frontend:build
+./gradlew bootRunE2E
+open http://localhost:9081
 ```
 
 #### IntelliJ IDEA (Community) IDE project import
@@ -87,7 +95,8 @@ nohup idea-community &
 - Locate your `nix` installed JDK16 path location from the header printout on entering nix-shell ($JAVA_HOME is printed out on entering `nix-shell`).
   - e.g. On macOS this could look like `/nix/store/60kc2wrpr8p0jb8hginzq2hmhi9l9ws0-zulu16.30.15-ca-jdk-16.0.1/zulu-16.jdk/Contents/Home`.
 - **File -> Project Structure -> Platform Settings -> SDKs -> Add JDK...**
-  - Enter the full path of above (e.g. `/nix/store/60kc2wrpr8p0jb8hginzq2hmhi9l9ws0-zulu16.30.15-ca-jdk-16.0.1/zulu-16.jdk/COntents/Home`).
+  - Enter the full path of above (e.g. `/nix/store/60kc2wrpr8p0jb8hginzq2hmhi9l9ws0-zulu16.30.15-ca-jdk-16.0.1/zulu-16.jdk/Contents/Home`).
+![Sample nix-shell JAVA_HOME](./images/01_doughnut_nix-shell_JAVA_HOME.png "Sample nix-shell JAVA_HOME")
 
 #### Run a single targetted JUnit5 test in IntelliJ IDEA
 
