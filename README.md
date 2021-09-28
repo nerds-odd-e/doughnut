@@ -54,9 +54,9 @@ For more background info you can read:
 
 ## Getting started
 
-### 1. [Local development environment with nix](https://github.com/nerds-odd-e/doughnut/docs/nix.md)
+### 1. [Local development environment with nix](./docs/nix.md)
 
-### 2. [Cloud IDE development environment with Gitpod.io](https://github.com/nerds-odd-e/doughnut/docs/gitpod.md)
+### 2. [Cloud IDE development environment with Gitpod.io](./docs/gitpod.md)
 
 ### 3. Setup and run doughnut with migrations in 'test' profile (backend app started on port 8081)
 
@@ -77,8 +77,7 @@ For more background info you can read:
 - From doughnut/frontend source directory:
 
 ```bash
-yarn
-yarn test
+yarn && yarn frontend:test
 ```
 
 ### 4. End-to-End Test / Features / Cucumber / SbE / ATDD
@@ -89,11 +88,12 @@ We use cucumber + cypress + Javascript library to do end to end test.
 
 #### Commands
 
-| Purpose                       | Command                                       |
-| ----------------------------- | --------------------------------------------- |
-| start SUT (system under test) | `yarn sut`                                    |
-| run all e2e test              | `yarn test` (starts SUT and cypress headless) |
-| run cypress IDE               | `yarn cy:open` (starts SUT and cypress IDE)   |
+| Purpose                              | Command                                                                    |
+| ------------------------------------ | -------------------------------------------------------------------------- |
+| start SUT (system under test)        | `yarn sut`                                                                 |
+| run all e2e test                     | `yarn test` (starts SUT and cypress headless)                              |
+| run all e2e test with FE in dev mode | `yarn test:dev` (starts SUT and frontend in dev mode and cypress headless) |
+| run cypress IDE                      | `yarn cy:open` (starts SUT and cypress IDE)                                |
 
 #### Structure
 
@@ -136,7 +136,6 @@ yarn
 ##### Run frontend unit tests
 
 ```bash
-cd frontend
 yarn test
 ```
 
