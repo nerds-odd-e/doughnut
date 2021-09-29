@@ -34,7 +34,7 @@ const props = defineProps({
 });
 const emits = defineEmits(["updated"]);
 const breadcrumb = computed(()=>{
-  const {owns, notebook, ancestors} = props.noteViewedByUser
-  return {owns, notebook, ancestors}
+  const {noteBreadcrumbViewedByUser} = props.noteViewedByUser
+  return noteBreadcrumbViewedByUser
 })
 </script>

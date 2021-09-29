@@ -4,7 +4,6 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.json.NoteBreadcrumbViewedByUser;
-import com.odde.doughnut.entities.json.NoteViewedByUser;
 import com.odde.doughnut.entities.json.NoteViewedByUser1;
 import com.odde.doughnut.entities.json.RedirectToNoteResponse;
 import com.odde.doughnut.exceptions.NoAccessRightException;

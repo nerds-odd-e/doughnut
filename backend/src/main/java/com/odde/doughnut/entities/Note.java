@@ -131,10 +131,8 @@ public class Note {
         nvb.setId(getId());
         nvb.setNote(this);
         nvb.setLinks(getAllLinks(viewer));
-        nvb.setNotebook(notebook);
-        nvb.setAncestors(getAncestors());
+        nvb.setNoteBreadcrumbViewedByUser(jsonBreadcrumbViewedBy(viewer));
         nvb.setChildren(getChildren());
-        nvb.setOwns(viewer != null && viewer.owns(notebook));
         return nvb;
     }
 
