@@ -3,11 +3,11 @@
  */
 import Repetition from "@/components/review/Repetition.vue";
 import {
-  noteViewedByUser,
   linkViewedByUser,
   reviewPointViewedByUser,
 } from "../notes/fixtures";
 import { mountWithMockRoute } from "../helpers";
+import makeMe from "../fixtures/makeMe";
 
 describe("repetition page", () => {
   beforeEach(async () => {
@@ -16,10 +16,8 @@ describe("repetition page", () => {
   });
 
   describe("repetition page for a note", () => {
-    const reviewPointForView = {
-      ...reviewPointViewedByUser,
-      noteViewedByUser: noteViewedByUser,
-    };
+    const note = makeMe.aNote.please()
+    const reviewPointForView = makeMe.aReviewPoint.ofNote(note).please()
 
     test("for note", async () => {
       const { wrapper } = mountWithMockRoute(
@@ -32,10 +30,7 @@ describe("repetition page", () => {
   });
 
   describe("repetition page for a link", () => {
-    const reviewPointForView = {
-      ...reviewPointViewedByUser,
-      linkViewedByUser: linkViewedByUser,
-    };
+    const reviewPointForView = makeMe.aReviewPoint.ofLink(linkViewedByUser).please()
 
     test("for link", async () => {
       const { wrapper } = mountWithMockRoute(

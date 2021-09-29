@@ -2,7 +2,7 @@
   <div>
     <div v-if="!!noteViewedByUser">
       <NoteViewedByUserWithoutChildren
-        v-bind="{...noteViewedByUser, breadcrumb}"
+        v-bind="{...noteItself, breadcrumb}"
         @updated="$emit('updated')"
       />
     </div>
@@ -33,8 +33,15 @@ const props = defineProps({
   linkViewedByUser: Object,
 });
 const emits = defineEmits(["updated"]);
+
 const breadcrumb = computed(()=>{
   const {noteBreadcrumbViewedByUser} = props.noteViewedByUser
   return noteBreadcrumbViewedByUser
 })
+
+const noteItself = computed(()=>{
+  const {noteItself} = props.noteViewedByUser
+  return noteItself
+})
+
 </script>

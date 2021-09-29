@@ -6,6 +6,7 @@ import flushPromises from "flush-promises";
 import _ from "lodash";
 import { mountWithMockRoute } from "../helpers";
 import { reviewPointViewedByUser } from "../notes/fixtures";
+import makeMe from "../fixtures/makeMe";
 
 beforeEach(() => {
   fetch.resetMocks();
@@ -26,12 +27,11 @@ describe("repeat page", () => {
   });
 
   test("normal view", async () => {
-    fetch.mockResponseOnce(
-      JSON.stringify({
-        ...reviewPointViewedByUser,
-        remainingInitialReviewCountForToday: 53,
-      })
-    );
+
+    const note = makeMe.aNote.please()
+    const reviewPoint = makeMe.aReviewPoint.ofNote(note).remainingInitialReviewCountForToday(53).please()
+    fetch.mockResponseOnce(JSON.stringify(reviewPoint))
+
     const { wrapper, mockRouter } = mountWithMockRoute(
       InitialReviewPage,
       {},

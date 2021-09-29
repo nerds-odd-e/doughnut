@@ -128,11 +128,8 @@ public class Note {
     @JsonIgnore
     public NoteViewedByUser jsonObjectViewedBy(User viewer) {
         NoteViewedByUser nvb = new NoteViewedByUser();
-        nvb.setId(getId());
-        nvb.setNote(this);
-        nvb.setLinks(getAllLinks(viewer));
+        nvb.setNoteItself(jsonObjectViewedBy1(viewer));
         nvb.setNoteBreadcrumbViewedByUser(jsonBreadcrumbViewedBy(viewer));
-        nvb.setChildren(getChildren());
         return nvb;
     }
 

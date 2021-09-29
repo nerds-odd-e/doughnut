@@ -30,7 +30,7 @@ public class NoteViewedByUserTest {
             Note top = makeMe.aNote().inMemoryPlease();
             note1 = makeMe.aNote().under(top).description("note1description").inMemoryPlease();
             value = new NoteViewedByUser(){{
-                setNote(note1);
+                setNoteItself(note1.jsonObjectViewedBy1(null));
                 setNoteBreadcrumbViewedByUser(note1.jsonBreadcrumbViewedBy(null));
             }};
         }
@@ -38,7 +38,7 @@ public class NoteViewedByUserTest {
         @Test
         public void ownershipInfo() throws JsonProcessingException {
             Map<String, Object> deserialized = getJsonString(value);
-            final Object deNote = deserialized.get("note");
+            final Object deNote = deserialized.get("noteItself");
             assertThat(deNote.toString(), not(containsString("ownership")));
         }
 

@@ -39,8 +39,9 @@ public class LinkViewedByUserTest {
             note2 = makeMe.aNote().under(top).description("note2description").inMemoryPlease();
             link = makeMe.aLink().between(note1, note2).inMemoryPlease();
             value = new NoteViewedByUser(){{
-                setNote(note1);
-                setLinks(links);
+                NoteViewedByUser1 noteViewedByUser1 = note1.jsonObjectViewedBy1(null);
+                noteViewedByUser1.setLinks(links);
+                setNoteItself(noteViewedByUser1);
             }};
 
         }
@@ -49,7 +50,8 @@ public class LinkViewedByUserTest {
         public void directLink() throws JsonProcessingException {
             linkViewedByUser.setDirect(Collections.singletonList(link));
             Map<String, Object> deserialized = getJsonString(value);
-            final Object o = deserialized.get("links");
+            final Map<String, Object> noteItself = (Map<String, Object>)deserialized.get("noteItself");
+            final Object o = noteItself.get("links");
             assertThat(o.toString(), containsString(note2.getTitle()));
             assertThat(o.toString(), not(containsString("noteContent")));
             assertThat(o.toString(), containsString("targetNote"));
@@ -60,7 +62,8 @@ public class LinkViewedByUserTest {
         public void reverseLink() throws JsonProcessingException {
             linkViewedByUser.setReverse(Collections.singletonList(link));
             Map<String, Object> deserialized = getJsonString(value);
-            final Object o = deserialized.get("links");
+            final Map<String, Object> noteItself = (Map<String, Object>)deserialized.get("noteItself");
+            final Object o = noteItself.get("links");
             assertThat(o.toString(), containsString(note1.getTitle()));
             assertThat(o.toString(), not(containsString("noteContent")));
             assertThat(o.toString(), containsString("sourceNote"));
