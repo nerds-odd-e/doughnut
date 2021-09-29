@@ -33,25 +33,6 @@ class NoteBuilder extends Builder {
     return this;
   }
 
-  deprecatingFromCircle(value: string): NoteBuilder {
-    this.data.owns = true;
-    this.data.notebook = {
-      ownership: {
-        isFromCircle: true,
-        circle: {
-          name: value,
-        },
-      },
-    };
-    return this;
-  }
-
-  deprecatingInBazaar(): NoteBuilder {
-    this.data.owns = false;
-    this.data.notebook = {};
-    return this;
-  }
-
   updatedAt(value: Date): NoteBuilder {
     this.data.note.noteContent.updatedAt = value.toJSON();
     return this;

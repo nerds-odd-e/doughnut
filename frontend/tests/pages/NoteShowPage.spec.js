@@ -14,16 +14,18 @@ beforeEach(() => {
 
 describe("note show", () => {
   test("fetch API to be called ONCE", async () => {
-    const stubResponse = makeMe.aNote
-      .deprecatingFromCircle("a circle")
-      .please();
+    const note = makeMe.aNote.please()
+    const stubResponse = {
+      noteBreadcrumbViewedByUser: makeMe.aBreadcrumb.inCircle('a circle').please(),
+      notes: [ note ]
+    };
     fetch.mockResponseOnce(JSON.stringify(stubResponse));
     renderWithStoreAndMockRoute(NoteShowPage, {
-      propsData: { noteId: 123 },
+      propsData: { noteId: note.id },
     });
     await flushPromises();
     expect(fetch).toHaveBeenCalledTimes(1);
-    expect(fetch).toHaveBeenCalledWith("/api/notes/123", {});
+    expect(fetch).toHaveBeenCalledWith(`/api/notes/${note.id}`, {});
     await screen.findByText("a circle");
   });
 });

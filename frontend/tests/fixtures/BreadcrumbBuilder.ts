@@ -22,6 +22,20 @@ class BreadcrumbBuilder extends Builder {
     return this
   }
 
+  inCircle(value: string): BreadcrumbBuilder {
+    this.data.owns = true;
+    this.data.notebook = {
+      ownership: {
+        isFromCircle: true,
+        circle: {
+          name: value,
+        },
+      },
+    };
+    return this;
+  }
+
+
   do(): any {
     return this.data
   }

@@ -9,17 +9,17 @@ import makeMe from "../fixtures/makeMe";
 
 describe("a note not owned by viewer", () => {
   test("", async () => {
-    const noteView = makeMe.aNote.deprecatingInBazaar().please();
+    const note = makeMe.aNote.please();
     const breadcrumb = makeMe.aBreadcrumb.inBazaar().please();
     renderWithStoreAndMockRoute(
       NoteViewedByUser,
       {
-        propsData: { id: noteView.id, breadcrumb },
+        propsData: { id: note.id, breadcrumb },
 
       },
       null,
       (store) => {
-        store.commit("loadNotes", [noteView]);
+        store.commit("loadNotes", [note]);
       }
     );
     await screen.findByText("Bazaar");

@@ -1,6 +1,10 @@
 <template>
   <NoteViewedByUserWithoutChildren
-    v-bind="{ ...noteViewedByUser, breadcrumb }"
+    v-bind="{
+      id,
+      note: noteViewedByUser.note,
+      links: noteViewedByUser.links,
+      breadcrumb }"
   />
   <NoteOwnerViewCards
     :owns="breadcrumb.owns"
