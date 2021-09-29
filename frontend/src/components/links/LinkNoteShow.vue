@@ -6,7 +6,7 @@
       notebook: noteViewedByUser.notebook,
     }"
   />
-  <Card :note="noteViewedByUser.note">
+  <Card :note="noteViewedByUser.noteItself.note">
     <template #button="{ note }">
       <button
         class="source_btn btn btn-sm btn-secondary"
@@ -18,11 +18,11 @@
       </button>
     </template>
   </Card>
-  <div :id="`note-collapse-${noteViewedByUser.note.id}`" class="collapse">
+  <div :id="`note-collapse-${noteViewedByUser.noteItself.note.id}`" class="collapse">
     <NoteShow
       v-bind="{
-        id: noteViewedByUser.note.id,
-        note: noteViewedByUser.note,
+        id: noteViewedByUser.noteItself.note.id,
+        note: noteViewedByUser.noteItself.note,
         links: noteViewedByUser.links,
       }"
     />

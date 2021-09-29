@@ -3,6 +3,7 @@ import NoteBuilder from "./NoteBuilder";
 import BreadcrumbBuilder from "./BreadcrumbBuilder";
 import ReviewPointBuilder from "./ReviewPointBuilder"
 import LinkViewedByUserBuilder from "./LinkViewedByUserBuilder"
+import RepetitionBuilder from "./RepetitionBuilder"
 
 class MakeMe {
   get links(): LinksBuilder {
@@ -22,6 +23,10 @@ class MakeMe {
 
   get aLinkViewedByUser(): LinkViewedByUserBuilder {
     return new LinkViewedByUserBuilder();
+  }
+
+  get aRepetition(): RepetitionBuilder {
+    return new RepetitionBuilder();
   }
 
 }
