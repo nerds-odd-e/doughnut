@@ -1,16 +1,16 @@
 <template>
-  <Breadcrumb v-bind="{ owns, ancestors, notebook }" />
+  <Breadcrumb v-bind="breadcrumb" />
   <div class="note-with-controls">
     <nav class="nav d-flex flex-row-reverse p-0">
       <NoteButtons
-        v-if="owns"
+        v-if="breadcrumb.owns"
         :note="note"
         :addSibling="true"
       />
-      <BazaarNoteButtons v-else :note="note" :notebook="notebook" />
+      <BazaarNoteButtons v-else :note="note" :notebook="breadcrumb.notebook" />
     </nav>
     <NoteShow
-      :id="note.id"
+      :id="id"
       :note="note"
       :links="links"
     />
@@ -29,9 +29,7 @@ export default {
     id: Number,
     note: Object,
     links: Object,
-    ancestors: Array,
-    notebook: Object,
-    owns: { type: Boolean, required: true },
+    breadcrumb: Object,
   },
   components: {
     NoteShow,

@@ -7,6 +7,11 @@ const storedApiGetNoteWithDescendents = async (store, noteId) => {
     return res;
 }
 
-const x = 1
+const storedApiGetNoteAndItsChildren = async (store, noteId) => {
+    const res = await restGet(
+        `/api/notes/${noteId}`);
+    store.commit("loadNotes", res.notes);
+    return res;
+}
 
-export { storedApiGetNoteWithDescendents, x }
+export { storedApiGetNoteWithDescendents, storedApiGetNoteAndItsChildren }

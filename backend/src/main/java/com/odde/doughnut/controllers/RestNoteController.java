@@ -76,17 +76,24 @@ class RestNoteController {
     return new RedirectToNoteResponse(note.getId());
   }
 
-
-  @GetMapping("/{note}")
-  public NoteViewedByUser show(@PathVariable("note") Note note) throws NoAccessRightException {
-    final UserModel user = currentUserFetcher.getUser();
-    user.getAuthorization().assertReadAuthorization(note);
-    return note.jsonObjectViewedBy(user.getEntity());
-  }
-
   static class NotesBulk {
     public NoteBreadcrumbViewedByUser noteBreadcrumbViewedByUser;
     public List<NoteViewedByUser1> notes = new ArrayList<>();
+  }
+
+  @GetMapping("/{note}")
+  public NotesBulk show(@PathVariable("note") Note note) throws NoAccessRightException {
+    final UserModel user = currentUserFetcher.getUser();
+    user.getAuthorization().assertReadAuthorization(note);
+    NotesBulk notesBulk = new NotesBulk();
+
+    notesBulk.noteBreadcrumbViewedByUser = note.jsonBreadcrumbViewedBy(user.getEntity());
+    notesBulk.notes.add(note.jsonObjectViewedBy1(user.getEntity()));
+    note.getChildren().forEach(n->{
+      notesBulk.notes.add(n.jsonObjectViewedBy1(user.getEntity()));
+    });
+
+    return notesBulk;
   }
 
   @GetMapping("/{note}/overview")
@@ -96,7 +103,6 @@ class RestNoteController {
 
     NotesBulk notesBulk = new NotesBulk();
     notesBulk.noteBreadcrumbViewedByUser = note.jsonBreadcrumbViewedBy(user.getEntity());
-
     notesBulk.notes.add(note.jsonObjectViewedBy1(user.getEntity()));
     note.traverseBreadthFirst(n->{
       notesBulk.notes.add(n.jsonObjectViewedBy1(user.getEntity()));

@@ -1,14 +1,14 @@
 <template>
   <NoteViewedByUserWithoutChildren
-    v-bind="{ ...noteViewedByUser, ancestors, notebook, owns }"
+    v-bind="{ ...noteViewedByUser, breadcrumb }"
   />
   <NoteOwnerViewCards
-    :owns="owns"
+    :owns="breadcrumb.owns"
     :notes="children"
   />
 
   <router-link
-    :to="{ name: 'noteOverview', params: { noteId: this.id } }"
+    :to="{ name: 'noteOverview', params: { noteId: id } }"
     v-if="!!noteViewedByUser && !!noteViewedByUser.id"
     role="button"
     class="btn btn-sm"
@@ -25,11 +25,7 @@ export default {
   name: "NoteViewedByUser",
   props: {
     id: Number,
-    links: Object,
-    children: Array,
-    ancestors: Array,
-    notebook: Object,
-    owns: { type: Boolean, required: true },
+    breadcrumb: Object,
   },
   components: {
     NoteViewedByUserWithoutChildren,
@@ -38,6 +34,9 @@ export default {
   computed: {
     noteViewedByUser() {
       return this.$store.getters.getNoteById(this.id);
+    },
+    children() {
+      return this.$store.getters.getChildrenOfParentId(this.id);
     },
   },
 };
