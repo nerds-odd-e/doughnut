@@ -32,7 +32,8 @@ import Breadcrumb from "./Breadcrumb.vue";
 import NoteFormBody from "./NoteFormBody.vue";
 import ModalWithButton from "../commons/ModalWithButton.vue";
 import LinkTypeSelect from "../links/LinkTypeSelect.vue";
-import { restGet, restPostMultiplePartForm } from "../../restful/restful";
+import { restPostMultiplePartForm } from "../../restful/restful";
+import { storedApiGetNoteAndItsChildren } from "../../storedApi";
 
 function initialState() {
   return {
@@ -71,9 +72,10 @@ export default {
   methods: {
     fetchData() {
       this.loading = true
-      restGet(`/api/notes/${this.parentId}`).then(
-        (res) => {
-          const { ancestors, note, notebook } = res;
+      storedApiGetNoteAndItsChildren(this.$store, this.parentId)
+      .then((res) => {
+          const note = res.notes[0].note
+          const { ancestors, notebook } = res.noteBreadcrumbViewedByUser;
           this.ancestors = [...ancestors, note];
           this.notebook = notebook;
         }
@@ -89,6 +91,7 @@ export default {
       )
         .then((res) => {
           this.show = false;
+          console.table(`resolved: ${res}`)
           this.$router.push({
             name: "noteShow",
             params: { noteId: res.noteId },

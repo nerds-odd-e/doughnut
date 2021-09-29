@@ -2,7 +2,7 @@
   <div>
     <div v-if="!!noteViewedByUser">
       <NoteViewedByUserWithoutChildren
-        v-bind="noteViewedByUser"
+        v-bind="{...noteViewedByUser, breadcrumb}"
         @updated="$emit('updated')"
       />
     </div>
@@ -27,9 +27,14 @@
 import NoteViewedByUserWithoutChildren from "../notes/NoteViewedByUserWithoutChildren.vue";
 import LinkShow from "../links/LinkShow.vue";
 import LinkNob from "../links/LinkNob.vue";
+import { computed } from "@vue/reactivity";
 const props = defineProps({
   noteViewedByUser: Object,
   linkViewedByUser: Object,
 });
 const emits = defineEmits(["updated"]);
+const breadcrumb = computed(()=>{
+  const {owns, notebook, ancestors} = props.noteViewedByUser
+  return {owns, notebook, ancestors}
+})
 </script>

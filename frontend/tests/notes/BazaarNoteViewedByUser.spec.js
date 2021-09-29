@@ -10,10 +10,12 @@ import makeMe from "../fixtures/makeMe";
 describe("a note not owned by viewer", () => {
   test("", async () => {
     const noteView = makeMe.aNote.deprecatingInBazaar().please();
+    const breadcrumb = makeMe.aBreadcrumb.inBazaar().please();
     renderWithStoreAndMockRoute(
       NoteViewedByUser,
       {
-        propsData: noteView,
+        propsData: { id: noteView.id, breadcrumb },
+
       },
       null,
       (store) => {

@@ -1,5 +1,6 @@
 import LinksBuilder from "./LInksBuilder";
 import NoteBuilder from "./NoteBuilder";
+import BreadcrumbBuilder from "./BreadcrumbBuilder";
 
 class MakeMe {
   get links(): LinksBuilder {
@@ -7,6 +8,10 @@ class MakeMe {
   }
   get aNote(): NoteBuilder {
     return new NoteBuilder();
+  }
+
+  get aBreadcrumb(): BreadcrumbBuilder {
+    return new BreadcrumbBuilder();
   }
 }
 

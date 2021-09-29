@@ -1,7 +1,7 @@
 <template>
   <LoadingPage v-bind="{ loading, contentExists: !!breadcrumb }">
     <div v-if="breadcrumb" :key="noteId">
-      <NoteViewedByUser v-bind="{id: noteId, breadcrumb}"/>
+      <NoteViewedByUser v-if="!loading" v-bind="{id: noteId, breadcrumb}"/>
       <NoteStatisticsButton :noteId="noteId" />
     </div>
   </LoadingPage>
@@ -19,7 +19,7 @@ export default {
   data() {
     return {
       breadcrumb: null,
-      loading: false,
+      loading: true,
     };
   },
   components: { NoteViewedByUser, NoteStatisticsButton, LoadingPage },

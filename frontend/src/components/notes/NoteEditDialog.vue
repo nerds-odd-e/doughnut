@@ -7,7 +7,8 @@
 
 <script>
 import NoteFormBody from "./NoteFormBody.vue";
-import { restGet, restPostMultiplePartForm } from "../../restful/restful";
+import { restPostMultiplePartForm } from "../../restful/restful";
+import { storedApiGetNoteAndItsChildren } from "../../storedApi";
 
 export default {
   name: "NoteEditDialog",
@@ -27,9 +28,9 @@ export default {
   methods: {
     fetchData() {
       this.loading = true
-      restGet(`/api/notes/${this.noteId}`).then(
-        (res) => {
-          const { updatedAt, ...rest } = res.note.noteContent
+      storedApiGetNoteAndItsChildren(this.$store, this.noteId)
+      .then((res) => {
+          const { updatedAt, ...rest } = res.notes[0].note.noteContent
           this.formData = rest
         }
       )
