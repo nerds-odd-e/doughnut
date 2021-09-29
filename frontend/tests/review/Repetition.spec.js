@@ -2,10 +2,6 @@
  * @jest-environment jsdom
  */
 import Repetition from "@/components/review/Repetition.vue";
-import {
-  linkViewedByUser,
-  reviewPointViewedByUser,
-} from "../notes/fixtures";
 import { mountWithMockRoute } from "../helpers";
 import makeMe from "../fixtures/makeMe";
 
@@ -30,6 +26,7 @@ describe("repetition page", () => {
   });
 
   describe("repetition page for a link", () => {
+    const linkViewedByUser = makeMe.aLinkViewedByUser.please()
     const reviewPointForView = makeMe.aReviewPoint.ofLink(linkViewedByUser).please()
 
     test("for link", async () => {
