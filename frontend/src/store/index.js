@@ -11,9 +11,6 @@ function withState(state) {
     },
 
     getChildrenOfParentId(parentId) {
-      console.log(parentId)
-      console.log(this.getNoteById(parentId))
-      console.log(this.getChildrenIdsByParentId(parentId))
       return this.getChildrenIdsByParentId(parentId)
         .map(id=>this.getNoteById(id))
         .map(nvb=>nvb ? nvb.note : null)
