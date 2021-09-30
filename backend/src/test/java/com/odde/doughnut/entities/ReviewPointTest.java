@@ -1,18 +1,19 @@
 package com.odde.doughnut.entities;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+import java.util.Set;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+
 import com.odde.doughnut.testability.MakeMe;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
-import java.util.Set;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 @Transactional

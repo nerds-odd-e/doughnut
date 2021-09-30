@@ -2,7 +2,6 @@ package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import lombok.Getter;
 
 public class LinkModel {
     protected final Link entity;

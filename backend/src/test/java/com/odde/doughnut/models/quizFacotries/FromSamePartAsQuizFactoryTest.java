@@ -1,9 +1,26 @@
 package com.odde.doughnut.models.quizFacotries;
 
-import com.odde.doughnut.entities.*;
+import static com.odde.doughnut.entities.QuizQuestion.QuestionType.FROM_SAME_PART_AS;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.in;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import com.odde.doughnut.entities.AnswerResult;
+import com.odde.doughnut.entities.Link;
+import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.QuizQuestion;
+import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.testability.MakeMe;
+
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -12,16 +29,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static com.odde.doughnut.entities.QuizQuestion.QuestionType.FROM_SAME_PART_AS;
-import static com.odde.doughnut.entities.QuizQuestion.QuestionType.WHICH_SPEC_HAS_INSTANCE;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})

@@ -1,13 +1,14 @@
 package com.odde.doughnut.models.randomizers;
 
-import com.odde.doughnut.models.Randomizer;
-import org.hamcrest.Matchers;
-import org.junit.jupiter.api.Test;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 
 import java.util.ArrayList;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import com.odde.doughnut.models.Randomizer;
+
+import org.junit.jupiter.api.Test;
 
 class RealRandomizerTest {
     @Test

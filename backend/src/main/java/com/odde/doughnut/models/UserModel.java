@@ -1,16 +1,20 @@
 package com.odde.doughnut.models;
 
-import com.odde.doughnut.algorithms.SpacedRepetitionAlgorithm;
-import com.odde.doughnut.entities.*;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
-import lombok.Getter;
-import org.apache.logging.log4j.util.Strings;
-
 import java.sql.Timestamp;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.regex.Pattern;
+
+import com.odde.doughnut.entities.Link;
+import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.SearchTerm;
+import com.odde.doughnut.entities.User;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
+
+import org.apache.logging.log4j.util.Strings;
+
+import lombok.Getter;
 
 public class UserModel implements ReviewScope {
 

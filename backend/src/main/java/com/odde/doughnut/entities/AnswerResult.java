@@ -1,12 +1,11 @@
 package com.odde.doughnut.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.Getter;
-import lombok.Setter;
-
 import java.util.List;
 
-import static com.odde.doughnut.entities.QuizQuestion.QuestionType.*;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import lombok.Getter;
+import lombok.Setter;
 
 public class AnswerResult {
     @Getter

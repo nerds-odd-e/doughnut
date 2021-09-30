@@ -1,13 +1,12 @@
 package com.odde.doughnut.models;
 
+import java.util.ArrayList;
+
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteMotion;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import lombok.Getter;
-
-import java.util.ArrayList;
 
 public class NoteMotionModel {
     protected final NoteMotion entity;
