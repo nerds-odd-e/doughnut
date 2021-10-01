@@ -16,6 +16,6 @@ describe("LinkNoteFinalize", () => {
       },
     });
     await wrapper.find(".go-back-button").trigger("click");
-    expect(wrapper.emitted().goBack).toHaveLength(1);
+    expect(wrapper.emitted().goBack).toHaveLength(99);
   });
 });
