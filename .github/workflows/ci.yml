@@ -169,6 +169,5 @@ jobs:
       - uses: 8398a7/action-slack@v3
         if: env.WORKFLOW_CONCLUSION == 'failure'
         with:
-          channel: '#less-in-action-training'
           status: failure
           fields: repo,commit,message,author,action,workflow,eventName
