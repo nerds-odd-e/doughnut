@@ -18,7 +18,7 @@
 import { computed } from "@vue/runtime-core";
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue";
 import LinkNob from "./LinkNob.vue";
-import colors from "../../colors";
+import { colors } from "../../colors";
 
 const props = defineProps({
   link: Object,

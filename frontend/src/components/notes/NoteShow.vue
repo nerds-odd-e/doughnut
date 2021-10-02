@@ -29,7 +29,6 @@ import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
 import NoteEditDialog from "./NoteEditDialog.vue";
 import ShowPicture from "./ShowPicture.vue";
 import ShowDescription from "./ShowDescription.vue";
-import colors from "../../colors"
 
 export default {
   props: {

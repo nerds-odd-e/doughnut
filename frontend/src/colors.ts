@@ -9,6 +9,4 @@ export const colors: IColors = {
   target: '#447733',
 };
 
-const bgcolors = (role: string): string => colors[`${role}Background`];
-
-export default bgcolors;
+export const bgcolors = (role: string): string => colors[`${role}Background`];

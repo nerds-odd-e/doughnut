@@ -8,7 +8,7 @@
 
 <script setup>
 import { computed } from "@vue/runtime-core";
-import bgcolors from "../../../colors";
+import { bgcolors } from "../../../colors";
 
 const props = defineProps({ linkRole: String, x: Number, y: Number });
 const fill = computed(() => bgcolors(props.linkRole));
