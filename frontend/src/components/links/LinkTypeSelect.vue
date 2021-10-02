@@ -16,7 +16,7 @@
 <script>
 import RadioButtons from "../form/RadioButtons.vue";
 import SvgLinkTypeIcon from "../svgs/SvgLinkTypeIcon.vue";
-import linkTypeOptions from "../../models/linkTypeOptions"
+import { linkTypeOptions } from "../../models/linkTypeOptions"
 
 export default {
   name: "LinkTypeSelect",

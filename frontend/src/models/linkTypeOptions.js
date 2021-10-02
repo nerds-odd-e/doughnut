@@ -71,4 +71,19 @@ const linkTypeOptions = [
     }
   ]
 
-  export default linkTypeOptions
+  const taggingTypes = linkTypeOptions
+      .filter((t) => parseInt(t.value, 10) === 8)
+      .map((t) => t.label);
+
+  const groupedTypes = linkTypeOptions
+      .filter((t) => [1, 12, 22, 23].includes(parseInt(t.value, 10)))
+      .map((t) => t.label);
+
+  const reverseLabel = (lbl) => {
+    const linkType = linkTypeOptions.find(({ label }) => lbl === label);
+    if (linkType) return linkType.reversedLabel;
+    return "*unknown link type*";
+  }
+
+
+  export { linkTypeOptions, taggingTypes, groupedTypes, reverseLabel }

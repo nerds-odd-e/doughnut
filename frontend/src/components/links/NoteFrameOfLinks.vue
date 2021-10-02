@@ -58,7 +58,7 @@
       :key="linkType"
     >
       <li v-if="linksOfType.reverse.length > 0">
-        <span>{{ linksReader.reverseLabel(linkType) }} </span>
+        <span>{{ reverseLabel(linkType) }} </span>
         <LinkLink
           class="link-multi"
           v-for="link in linksOfType.reverse"
@@ -74,6 +74,7 @@
 <script>
 import LinkLink from "./LinkLink.vue";
 import LinksReader from "../../models/LinksReader";
+import { reverseLabel } from "../../models/linkTypeOptions"
 
 export default {
   props: { links: Object },
