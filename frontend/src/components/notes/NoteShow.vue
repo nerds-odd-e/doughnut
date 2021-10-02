@@ -29,6 +29,7 @@ import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
 import NoteEditDialog from "./NoteEditDialog.vue";
 import ShowPicture from "./ShowPicture.vue";
 import ShowDescription from "./ShowDescription.vue";
+import colors from "../../colors"
 
 export default {
   props: {
@@ -99,6 +100,6 @@ export default {
 .note-title {
   margin-top: 0px;
   padding-top: 10px;
-  color: v-bind($staticInfo.colors[ "target" ]);
+  color: black;
 }
 </style>

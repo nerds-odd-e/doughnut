@@ -10,7 +10,6 @@ export default {
       user: null,
       externalIdentifier: null,
       showNavBar: true,
-      staticInfo: null,
       loading: true,
       popupInfo: [],
       doneResolve: null,
@@ -46,10 +45,8 @@ export default {
   mounted() {
     this.loading = true
     restGet(`/api/static-info`).then((res) => {
-      this.staticInfo = res;
       this.user = res.user;
       this.externalIdentifier = res.externalIdentifier;
-      Object.assign(this.$staticInfo, res);
     })
     .finally(() => this.loading = false)
     ;
@@ -83,7 +80,7 @@ export default {
   <UserNewRegisterPage v-if="newUser" @userCreated="user = $event" />
   <template v-else>
     <MainMenu v-if="showNavBar" :user="user" />
-    <div v-if="!!staticInfo" class="container content">
+    <div v-if="!loading" class="container content">
       <router-view :user="user" @userUpdated="user = $event" />
     </div>
   </template>

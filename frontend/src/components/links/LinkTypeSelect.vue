@@ -1,6 +1,5 @@
 <template>
   <RadioButtons
-    v-if="!!$staticInfo"
     v-model="modelValue"
     @update:modelValue="$emit('update:modelValue', $event)"
     v-bind="{ scopeName, field, options, errors }"

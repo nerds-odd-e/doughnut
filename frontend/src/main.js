@@ -16,9 +16,6 @@ const router = createRouter({
 window.router = router;
 
 const app = createApp(DoughnutApp);
-app.config.globalProperties.$staticInfo = {
-  colors,
-};
 app.config.globalProperties.$popups = {};
 
 app.use(router);
