@@ -16,7 +16,7 @@ import InputWithType from "./InputWithType.vue";
 
 export default {
   props: {
-    modelValue: String,
+    modelValue: Boolean,
     scopeName: String,
     field: String,
     errors: Object,
