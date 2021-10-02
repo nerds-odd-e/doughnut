@@ -18,17 +18,17 @@
 import { computed } from "@vue/runtime-core";
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue";
 import LinkNob from "./LinkNob.vue";
+import colors from "../../colors";
 
 const props = defineProps({
   link: Object,
   reverse: Boolean,
-  colors: { Object, required: true },
 });
 const note = computed(() =>
   !!props.reverse ? props.link.sourceNote : props.link.targetNote
 );
 const fontColor = computed(() =>
-  !!props.reverse ? props.colors["target"] : props.colors["source"]
+  !!props.reverse ? colors["target"] : colors["source"]
 );
 </script>
 

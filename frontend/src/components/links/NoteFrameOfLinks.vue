@@ -6,7 +6,7 @@
     >
       <li v-for="link in linksOfType.direct" :key="link.id">
         <LinkLink
-          v-bind="{ link, colors: $staticInfo.colors }"
+          v-bind="{ link }"
           :reverse="false"
         />
       </li>
@@ -22,14 +22,14 @@
           class="link-multi"
           v-for="link in direct"
           :key="link.id"
-          v-bind="{ link, colors: $staticInfo.colors }"
+          v-bind="{ link }"
           :reverse="false"
         />
         <LinkLink
           class="link-multi"
           v-for="link in reverse"
           :key="link.id"
-          v-bind="{ link, colors: $staticInfo.colors }"
+          v-bind="{ link }"
           :reverse="true"
         />
       </template>
@@ -43,7 +43,7 @@
           class="link-multi"
           v-for="link in linksOfType.direct"
           :key="link.id"
-          v-bind="{ link, colors: $staticInfo.colors }"
+          v-bind="{ link }"
           :reverse="false"
         />
       </li>
@@ -63,7 +63,7 @@
           class="link-multi"
           v-for="link in linksOfType.reverse"
           :key="link.id"
-          v-bind="{ link, colors: $staticInfo.colors }"
+          v-bind="{ link }"
           :reverse="true"
         />
       </li>
@@ -79,6 +79,9 @@ import { reverseLabel } from "../../models/linkTypeOptions"
 export default {
   props: { links: Object },
   components: { LinkLink },
+  methods: {
+    reverseLabel(lbl) { return reverseLabel(lbl)}
+  },
   computed: {
     linksReader() {
       if (!this.links) return {};
