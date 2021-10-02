@@ -14,4 +14,12 @@ const storedApiGetNoteAndItsChildren = async (store, noteId) => {
     return res;
 }
 
-export { storedApiGetNoteWithDescendents, storedApiGetNoteAndItsChildren }
+const apiGetCurrentUserInfo = async () => {
+    return restGet(`/api/current-user-info`);
+}
+
+export {
+    storedApiGetNoteWithDescendents,
+    storedApiGetNoteAndItsChildren,
+    apiGetCurrentUserInfo,
+}

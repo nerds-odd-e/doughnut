@@ -20,24 +20,4 @@ class RestStaticInfoController {
       this.currentUserFetcher = currentUserFetcher;
   }
 
-  static class StaticInfo {
-    public List<Map<String, String>> linkTypeOptions = new ArrayList<>();
-    public User user;
-    public String externalIdentifier;
-  }
-
-  @GetMapping("/static-info")
-  public StaticInfo staticInfo() {
-      StaticInfo staticInfo = new StaticInfo();
-    staticInfo.linkTypeOptions = Arrays.stream(Link.LinkType.values())
-            .map( (linkType)->new HashMap<String, String>(){{
-                        put("value", linkType.id.toString());
-                        put("label", linkType.label);
-                        put("reversedLabel", linkType.reversedLabel);
-            }})
-            .collect(Collectors.toList());
-    staticInfo.user = currentUserFetcher.getUser().getEntity();
-    staticInfo.externalIdentifier = currentUserFetcher.getExternalIdentifier();
-    return staticInfo;
-  }
 }
