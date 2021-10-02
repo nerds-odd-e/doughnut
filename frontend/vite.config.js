@@ -22,6 +22,11 @@ export default defineConfig({
         changeOrigin: true,
         xfwd: true,
       },
+      "/images": {
+        target: "http://localhost:9081",
+        changeOrigin: true,
+        xfwd: true,
+      },
       "/login": {
         target: "http://localhost:9081",
         changeOrigin: true,

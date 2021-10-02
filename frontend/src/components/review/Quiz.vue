@@ -1,7 +1,7 @@
 <template>
   <NoteBreadcrumb :ancestors="quizQuestion.scope" />
   <div v-if="pictureQuestion">
-    <ShowPicture :note="sourceNote.note" :opacity="1" />
+    <ShowPicture :notePicture="sourceNote.notePicture" :pictureMask="sourceNote.noteContent.pictureMask" :opacity="1" />
   </div>
   <NoteFrameOfLinks v-bind="{ links: quizQuestion.hintLinks }">
     <div class="quiz-instruction">
@@ -31,7 +31,7 @@
       >
         <div v-if="!option.picture">{{ option.display }}</div>
         <div v-else>
-          <ShowPicture :note="option.note" :opacity="1" />
+          <ShowPicture :notePicture="option.note.notePicture" :pictureMask="option.note.noteContent.pictureMask" :opacity="1" />
         </div>
       </button>
     </div>
@@ -72,8 +72,8 @@ const props = defineProps({
 const emits = defineEmits(["answer"]);
 const sourceNote = computed(() => {
   if (!!props.reviewPointViewedByUser.noteViewedByUser)
-    return props.reviewPointViewedByUser.noteViewedByUser;
-  return props.reviewPointViewedByUser.linkViewedByUser.sourceNoteViewedByUser;
+    return props.reviewPointViewedByUser.noteViewedByUser.noteItself;
+  return props.reviewPointViewedByUser.linkViewedByUser.sourceNoteViewedByUser.noteItself;
 });
 const pictureQuestion = computed(() => {
   return props.quizQuestion.questionType === "PICTURE_TITLE";
