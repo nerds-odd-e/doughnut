@@ -8,10 +8,9 @@
 
     <div v-if="!!linkViewedByUser">
       <div class="jumbotron py-4 mb-2">
-        <LinkShow v-bind="linkViewedByUser" @updated="$emit('updated')">
+        <LinkShow v-bind="linkViewedByUser">
           <LinkNob
             v-bind="{ link: linkViewedByUser }"
-            @updated="$emit('updated')"
           />
           <span class="badge bg-light text-dark">
             {{ linkViewedByUser.linkTypeLabel }}</span
@@ -31,7 +30,6 @@ const props = defineProps({
   noteViewedByUser: Object,
   linkViewedByUser: Object,
 });
-const emits = defineEmits(["updated"]);
 
 const breadcrumb = computed(()=>{
   const {noteBreadcrumbViewedByUser} = props.noteViewedByUser

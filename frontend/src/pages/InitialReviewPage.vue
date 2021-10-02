@@ -26,7 +26,6 @@
         <template #fullContent>
           <ShowReviewPoint
             v-bind="reviewPointViewedByUser"
-            @updated="fetchData()"
           />
           <div>
             <div class="mb-2">

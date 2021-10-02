@@ -19,8 +19,8 @@
 
     <ShowReviewPoint
       v-bind="{ noteViewedByUser, linkViewedByUser }"
-      @updated="$emit('updated')"
     />
+
     <div class="btn-toolbar justify-content-between">
       <SelfEvaluateButtons
         v-bind="{ sadButton }"
