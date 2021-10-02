@@ -16,6 +16,7 @@
 <script>
 import RadioButtons from "../form/RadioButtons.vue";
 import SvgLinkTypeIcon from "../svgs/SvgLinkTypeIcon.vue";
+import linkTypeOptions from "../../models/linkTypeOptions"
 
 export default {
   name: "LinkTypeSelect",
@@ -34,10 +35,10 @@ export default {
       if (!!this.allowEmpty) {
         return [
           { value: "", label: "Default" },
-          ...this.$staticInfo.linkTypeOptions,
+          ...linkTypeOptions,
         ];
       }
-      return this.$staticInfo.linkTypeOptions;
+      return linkTypeOptions;
     },
   },
 };

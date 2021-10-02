@@ -80,11 +80,8 @@ export default {
   components: { LinkLink },
   computed: {
     linksReader() {
-      if (!this.$staticInfo || !this.$staticInfo.linkTypeOptions) {
-        return {};
-      }
       if (!this.links) return {};
-      return new LinksReader(this.$staticInfo.linkTypeOptions, this.links);
+      return new LinksReader(this.links);
     },
   },
 };

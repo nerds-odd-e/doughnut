@@ -1,21 +1,20 @@
-class LinksReader {
-  linkTypeOptions: Array<any>;
+import linkTypeOptions from "./linkTypeOptions"
 
+class LinksReader {
   links: any;
 
-  constructor(linkTypeOptions: Array<any>, links: any) {
-    this.linkTypeOptions = linkTypeOptions;
+  constructor(links: any) {
     this.links = links;
   }
 
   get taggingTypes() {
-    return this.linkTypeOptions
+    return linkTypeOptions
       .filter((t) => parseInt(t.value, 10) === 8)
       .map((t) => t.label);
   }
 
   get groupedTypes() {
-    return this.linkTypeOptions
+    return linkTypeOptions
       .filter((t) => [1, 12, 22, 23].includes(parseInt(t.value, 10)))
       .map((t) => t.label);
   }
@@ -52,7 +51,7 @@ class LinksReader {
   }
 
   reverseLabel(lbl: string): string {
-    const linkType = this.linkTypeOptions.find(({ label }) => lbl === label);
+    const linkType = linkTypeOptions.find(({ label }) => lbl === label);
     if (linkType) return linkType.reversedLabel;
     return "*unknown link type*";
   }

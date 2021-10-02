@@ -2,10 +2,8 @@
  * @jest-environment jsdom
  */
 import LinkNoteFinalize from "@/components/links/LinkNoteFinalize.vue";
-import { mount, config } from "@vue/test-utils";
+import { mount } from "@vue/test-utils";
 import makeMe from "../fixtures/makeMe";
-
-config.global.mocks["$staticInfo"] = { linkTypeOptions: [] };
 
 describe("LinkNoteFinalize", () => {
   test("going back", async () => {
