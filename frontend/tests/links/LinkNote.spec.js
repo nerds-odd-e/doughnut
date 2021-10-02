@@ -10,8 +10,8 @@ describe("LinkNoteFinalize", () => {
     const note = makeMe.aNote.please()
     const wrapper = mount(LinkNoteFinalize, {
       propsData: {
-        note: note.note,
-        targetNote: note.note,
+        note: note,
+        targetNote: note
       },
     });
     await wrapper.find(".go-back-button").trigger("click");

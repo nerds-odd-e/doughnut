@@ -2,8 +2,7 @@
   <NoteViewedByUserWithoutChildren
     v-bind="{
       id,
-      note: noteViewedByUser.note,
-      links: noteViewedByUser.links,
+      note,
       breadcrumb }"
   />
   <NoteOwnerViewCards
@@ -13,7 +12,7 @@
 
   <router-link
     :to="{ name: 'noteOverview', params: { noteId: id } }"
-    v-if="!!noteViewedByUser && !!noteViewedByUser.id"
+    v-if="!!note && !!note.id"
     role="button"
     class="btn btn-sm"
   >
@@ -36,7 +35,7 @@ export default {
     NoteOwnerViewCards,
   },
   computed: {
-    noteViewedByUser() {
+    note() {
       return this.$store.getters.getNoteById(this.id);
     },
     children() {

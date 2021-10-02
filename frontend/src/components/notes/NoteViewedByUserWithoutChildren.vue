@@ -9,11 +9,7 @@
       />
       <BazaarNoteButtons v-else :note="note" :notebook="breadcrumb.notebook" />
     </nav>
-    <NoteShow
-      :id="id"
-      :note="note"
-      :links="links"
-    />
+    <NoteShow v-bind="note"/>
   </div>
 </template>
 
@@ -28,9 +24,7 @@ export default {
   props: {
     id: Number,
     note: Object,
-    links: Object,
     breadcrumb: Object,
-    childrenIds: Array
   },
   components: {
     NoteShow,

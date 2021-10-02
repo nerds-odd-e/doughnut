@@ -13,7 +13,6 @@ function withState(state) {
     getChildrenOfParentId(parentId) {
       return this.getChildrenIdsByParentId(parentId)
         .map(id=>this.getNoteById(id))
-        .map(nvb=>nvb ? nvb.note : null)
         .filter(n=>n)
     }
   }

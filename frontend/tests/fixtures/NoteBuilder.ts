@@ -15,15 +15,16 @@ class NoteBuilder extends Builder {
     super(parentBuilder);
     this.data = {
       id: generateId(),
-      note: { noteContent: {} },
+      parentId: 8888,
+      noteContent: {},
       links: {},
       childrenIds: []
     };
   }
 
   title(value: string): NoteBuilder {
-    this.data.note.title = value;
-    this.data.note.noteContent.title = value;
+    this.data.title = value;
+    this.data.noteContent.title = value;
     return this;
   }
 
@@ -34,7 +35,7 @@ class NoteBuilder extends Builder {
   }
 
   updatedAt(value: Date): NoteBuilder {
-    this.data.note.noteContent.updatedAt = value.toJSON();
+    this.data.noteContent.updatedAt = value.toJSON();
     return this;
   }
 
@@ -46,25 +47,20 @@ class NoteBuilder extends Builder {
   do(): any {
     return merge(
       {
-        note: {
-          noteContent: {
-            title: "Note1.1.1",
-            description: "Desc",
-            url: null,
-            urlIsVideo: false,
-            pictureUrl: null,
-            pictureMask: null,
-            useParentPicture: false,
-            skipReview: false,
-            updatedAt: "2021-08-24T08:46:44.000+00:00",
-          },
-          createdAt: "2021-08-24T08:46:44.000+00:00",
+        noteContent: {
           title: "Note1.1.1",
-          notePicture: null,
-          head: false,
-          shortDescription: "Desc",
-          parentId: 4,
+          description: "Desc",
+          url: null,
+          urlIsVideo: false,
+          pictureUrl: null,
+          pictureMask: null,
+          useParentPicture: false,
+          skipReview: false,
+          updatedAt: "2021-08-24T08:46:44.000+00:00",
         },
+        createdAt: "2021-08-24T08:46:44.000+00:00",
+        title: "Note1.1.1",
+        notePicture: null,
         links: {},
       },
       this.data

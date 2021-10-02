@@ -30,7 +30,7 @@ export default {
       this.loading = true
       storedApiGetNoteAndItsChildren(this.$store, this.noteId)
       .then((res) => {
-          const { updatedAt, ...rest } = res.notes[0].note.noteContent
+          const { updatedAt, ...rest } = res.notes[0].noteContent
           this.formData = rest
         }
       )

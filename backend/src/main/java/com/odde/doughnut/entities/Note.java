@@ -146,7 +146,11 @@ public class Note {
     public NoteViewedByUser1 jsonObjectViewedBy1(User viewer) {
         NoteViewedByUser1 nvb = new NoteViewedByUser1();
         nvb.setId(getId());
-        nvb.setNote(this);
+        nvb.setParentId(getParentId());
+        nvb.setTitle(getTitle());
+        nvb.setNotePicture(getNotePicture());
+        nvb.setCreatedAt(getCreatedAt());
+        nvb.setNoteContent(getNoteContent());
         nvb.setLinks(getAllLinks(viewer));
         nvb.setChildrenIds(children.stream().map(Note::getId).collect(Collectors.toUnmodifiableList()));
         return nvb;

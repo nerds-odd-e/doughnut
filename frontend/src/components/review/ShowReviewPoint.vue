@@ -2,7 +2,7 @@
   <div>
     <div v-if="!!noteViewedByUser">
       <NoteViewedByUserWithoutChildren
-        v-bind="{...note, breadcrumb}"
+        v-bind="{note, breadcrumb}"
       />
     </div>
 

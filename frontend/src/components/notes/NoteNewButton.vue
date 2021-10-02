@@ -74,7 +74,7 @@ export default {
       this.loading = true
       storedApiGetNoteAndItsChildren(this.$store, this.parentId)
       .then((res) => {
-          const note = res.notes[0].note
+          const note = res.notes[0]
           const { ancestors, notebook } = res.noteBreadcrumbViewedByUser;
           this.ancestors = [...ancestors, note];
           this.notebook = notebook;

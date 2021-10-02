@@ -1,16 +1,16 @@
 <template>
   <div class="review-point-abbr">
     <span v-if="!!noteViewedByUser">
-      {{ noteViewedByUser.noteItself.note.noteContent.title }}
+      {{ noteViewedByUser.noteItself.title }}
     </span>
 
     <span v-if="!!linkViewedByUser">
       <span>
-        {{ linkViewedByUser.sourceNoteViewedByUser.note.noteContent.title }}
+        {{ linkViewedByUser.sourceNoteViewedByUser.title }}
       </span>
       <span class="badge mr-1"> {{ linkViewedByUser.linkTypeLabel }}</span>
       <span>
-        {{ linkViewedByUser.targetNoteViewedByUser.note.noteContent.title }}
+        {{ linkViewedByUser.targetNoteViewedByUser.title }}
       </span>
     </span>
   </div>

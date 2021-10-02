@@ -2,22 +2,22 @@
   <div class="note-show" :style="`background-color: ${bgColor}`">
     <NoteFrameOfLinks v-bind="{ links }">
       <div class="note-body" @dblclick="editDialog">
-        <h2 role="title" class="note-title">{{ note.noteContent.title }}</h2>
+        <h2 role="title" class="note-title">{{ title }}</h2>
         <div class="row">
           <ShowDescription
             :class="`col-12 ${twoColumns ? 'col-md-6' : ''}`"
-            :description="note.noteContent.description"
+            :description="noteContent.description"
           />
           <ShowPicture
             :class="`col-12 ${twoColumns ? 'col-md-6' : ''}`"
-            :note="note"
+            v-bind="{notePicture, pictureMask: noteContent.pictureMask}"
             :opacity="0.2"
           />
         </div>
-        <div v-if="!!note.noteContent.url">
-          <label v-if="note.noteContent.urlIsVideo">Video Url:</label>
+        <div v-if="!!noteContent.url">
+          <label v-if="noteContent.urlIsVideo">Video Url:</label>
           <label v-else>Url:</label>
-          <a :href="note.noteContent.url">{{ note.noteContent.url }}</a>
+          <a :href="noteContent.url">{{ noteContent.url }}</a>
         </div>
       </div>
     </NoteFrameOfLinks>
@@ -33,7 +33,9 @@ import ShowDescription from "./ShowDescription.vue";
 export default {
   props: {
     id: Number,
-    note: { type: Object, required: true },
+    noteContent: { type: Object, required: true },
+    title: String,
+    notePicture: String,
     links: Object,
   },
   components: {
@@ -44,14 +46,14 @@ export default {
   },
   computed: {
     twoColumns() {
-      return !!this.note.notePicture && !!this.note.noteContent.description;
+      return !!this.notePicture && !!this.noteContent.description;
     },
     bgColor() {
       const colorOld = [150, 150, 150];
       const newColor = [208, 237, 23];
       const ageInMillisecond = Math.max(
         0,
-        Date.now() - new Date(this.note.noteContent.updatedAt)
+        Date.now() - new Date(this.noteContent.updatedAt)
       );
       const max = 15; // equals to 225 hours
       const index = Math.min(max, Math.sqrt(ageInMillisecond / 1000 / 60 / 60));

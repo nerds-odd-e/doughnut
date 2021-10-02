@@ -1,9 +1,9 @@
 <template>
-  <div class="text-center" v-if="!!note.notePicture">
+  <div class="text-center" v-if="!!notePicture">
     <div style="position: relative; display: inline-block" id="note-picture">
-      <img class="img-fluid" :src="note.notePicture" />
+      <img class="img-fluid" :src="notePicture" />
       <svg
-        v-if="!!note.noteContent.pictureMask"
+        v-if="!!pictureMask"
         viewBox="0 0 100 100"
         style="
           position: absolute;
@@ -29,7 +29,11 @@
 </template>
 
 <script setup>
-const props = defineProps({ note: Object, opacity: Number });
+const props = defineProps({
+  notePicture: String,
+  pictureMask: String,
+  opacity: Number
+});
 
 const createGroups = (arr, perGroup) => {
   const numGroups = Math.ceil(arr.length / perGroup);
@@ -39,7 +43,7 @@ const createGroups = (arr, perGroup) => {
 };
 
 const getMasks = () => {
-  return createGroups(props.note.noteContent.pictureMask.split(/\s+/), 4).map(
+  return createGroups(props.pictureMask.split(/\s+/), 4).map(
     (arr, index) => {
       const [x, y, width, height] = arr;
       return { index, x, y, width, height };
