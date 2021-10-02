@@ -2,8 +2,7 @@
   <div>
     <div v-if="!!noteViewedByUser">
       <NoteViewedByUserWithoutChildren
-        v-bind="{...noteItself, breadcrumb}"
-        @updated="$emit('updated')"
+        v-bind="{...note, breadcrumb}"
       />
     </div>
 
@@ -39,7 +38,7 @@ const breadcrumb = computed(()=>{
   return noteBreadcrumbViewedByUser
 })
 
-const noteItself = computed(()=>{
+const note = computed(()=>{
   const {noteItself} = props.noteViewedByUser
   return noteItself
 })

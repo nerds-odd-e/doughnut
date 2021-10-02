@@ -45,7 +45,7 @@ class RestCircleControllerTest {
     class circleIndex {
         @Test
         void itShouldNotAllowNonMemberToSeeACircle() {
-            controller = new RestCircleController(modelFactoryService, new TestCurrentUserFetcher(null), testabilitySettings);
+            controller = new RestCircleController(modelFactoryService, new TestCurrentUserFetcher(makeMe.aNullUserModel()), testabilitySettings);
             assertThrows(NoAccessRightException.class, ()->{
                 controller.index();
             });

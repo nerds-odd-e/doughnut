@@ -23,7 +23,6 @@ import LinkShow from "../links/LinkShow.vue";
 export default {
   name: "ShowReviewPoint",
   props: { noteViewedByUser: Object, linkViewedByUser: Object },
-  emits: ["updated"],
   components: {
     NoteViewedByUserWithoutChildren,
     LinkShow,

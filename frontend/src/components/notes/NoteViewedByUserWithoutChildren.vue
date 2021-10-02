@@ -30,6 +30,7 @@ export default {
     note: Object,
     links: Object,
     breadcrumb: Object,
+    childrenIds: Array
   },
   components: {
     NoteShow,
