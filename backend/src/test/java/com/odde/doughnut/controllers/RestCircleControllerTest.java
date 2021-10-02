@@ -42,6 +42,17 @@ class RestCircleControllerTest {
     }
 
     @Nested
+    class circleIndex {
+        @Test
+        void itShouldNotAllowNonMemberToSeeACircle() {
+            controller = new RestCircleController(modelFactoryService, new TestCurrentUserFetcher(null), testabilitySettings);
+            assertThrows(NoAccessRightException.class, ()->{
+                controller.index();
+            });
+        }
+    }
+
+    @Nested
     class showNoteTest {
         @Test
         void whenTheUserIsNotAMemberOfTheCircle() {
@@ -50,6 +61,7 @@ class RestCircleControllerTest {
             assertThrows(NoAccessRightException.class, () -> controller.createNotebook(circle, noteContent));
         }
     }
+
     @Nested
     class ShowCircle {
         @Test

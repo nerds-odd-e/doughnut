@@ -78,8 +78,9 @@ class RestCircleController {
   }
 
   @GetMapping("")
-  public List<Circle> index(Model model) {
+  public List<Circle> index() {
     UserModel user = currentUserFetcher.getUser();
+    user.getAuthorization().assertLoggedIn();
     return user.getEntity().getCircles();
   }
 
