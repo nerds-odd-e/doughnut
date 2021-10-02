@@ -15,8 +15,7 @@ const storedApiGetNoteAndItsChildren = async (store, noteId) => {
 }
 
 const apiGetCurrentUserInfo = async () => {
-    const res = await restGet(`/api/current-user-info`);
-    return res;
+    return await restGet(`/api/user/current-user-info`);
 }
 
 export {
