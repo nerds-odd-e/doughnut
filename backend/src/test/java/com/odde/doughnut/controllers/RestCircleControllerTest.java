@@ -21,6 +21,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindException;
+import org.springframework.web.server.ResponseStatusException;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
@@ -46,7 +47,7 @@ class RestCircleControllerTest {
         @Test
         void itShouldNotAllowNonMemberToSeeACircle() {
             controller = new RestCircleController(modelFactoryService, new TestCurrentUserFetcher(makeMe.aNullUserModel()), testabilitySettings);
-            assertThrows(NoAccessRightException.class, ()->{
+            assertThrows(ResponseStatusException.class, ()->{
                 controller.index();
             });
         }
