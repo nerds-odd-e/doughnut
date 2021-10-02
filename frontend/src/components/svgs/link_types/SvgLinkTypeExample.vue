@@ -12,14 +12,14 @@
       :stripes="false"
       linkRole="target"
       :x="250 * ifInverse"
-      y="35"
-      size="48"
+      :y="35"
+      :size="48"
     />
     <svg
       width="400"
       height="400"
       :x="ifInverse == 1 ? 330 : -170"
-      y="-50"
+      :y="-50"
       viewBox="0 0 32 32"
       stroke-width="1%"
     >

@@ -2,72 +2,72 @@ const linkTypeOptions = [
     {
       "reversedLabel": "related to",
       "label": "related to",
-      "value": "1"
+      "value": 1
     },
     {
       "reversedLabel": "a generalization of",
       "label": "a specialization of",
-      "value": "2"
+      "value": 2
     },
     {
       "reversedLabel": "applied to",
       "label": "an application of",
-      "value": "3"
+      "value": 3
     },
     {
       "reversedLabel": "has instances",
       "label": "an instance of",
-      "value": "4"
+      "value": 4
     },
     {
       "reversedLabel": "has parts",
       "label": "a part of",
-      "value": "6"
+      "value": 6
     },
     {
       "reversedLabel": "tagging",
       "label": "tagged by",
-      "value": "8"
+      "value": 8
     },
     {
       "reversedLabel": "has attributes",
       "label": "an attribute of",
-      "value": "10"
+      "value": 10
     },
     {
       "reversedLabel": "the opposite of",
       "label": "the opposite of",
-      "value": "12"
+      "value": 12
     },
     {
       "reversedLabel": "brought by",
       "label": "author of",
-      "value": "14"
+      "value": 14
     },
     {
       "reversedLabel": "used by",
       "label": "using",
-      "value": "15"
+      "value": 15
     },
     {
       "reversedLabel": "has examples",
       "label": "an example of",
-      "value": "17"
+      "value": 17
     },
     {
       "reversedLabel": "after",
       "label": "before",
-      "value": "19"
+      "value": 19
     },
     {
       "reversedLabel": "similar to",
       "label": "similar to",
-      "value": "22"
+      "value": 22
     },
     {
       "reversedLabel": "confused with",
       "label": "confused with",
-      "value": "23"
+      "value": 23
     }
   ]
 

@@ -14,6 +14,12 @@
   </span>
 </template>
 
+<script>
+export default {
+  name: "LinkLink"
+}
+</script>
+
 <script setup>
 import { computed } from "@vue/runtime-core";
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue";

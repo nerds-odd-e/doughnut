@@ -6,12 +6,12 @@
     y="0px"
     viewBox="0 0 800 400"
   >
-    <Object1 :stripes="false" linkRole="target" :x="50 * ifInverse" size="35" />
+    <Object1 :stripes="false" linkRole="target" :x="50 * ifInverse" :size="35" />
     <Object1
       :stripes="false"
       linkRole="source"
       :x="-120 * ifInverse"
-      size="55"
+      :size="55"
     />
   </svg>
 </template>

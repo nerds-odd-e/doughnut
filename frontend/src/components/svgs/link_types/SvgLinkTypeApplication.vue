@@ -8,7 +8,7 @@
   >
     <Object1 :stripes="false" linkRole="source" :x="-250 * ifInverse" />
     <Lnk />
-    <ObjectApplication linkRole="target" :x="250 * ifInverse" y="0" />
+    <ObjectApplication linkRole="target" :x="250 * ifInverse" :y="0" />
   </svg>
 </template>
 

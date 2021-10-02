@@ -3,14 +3,14 @@
     <ObjectLeft
       linkRole="source"
       :x="ifInverse === 1 ? -330 : 175"
-      oheight="300"
-      y="50"
+      :oheight="300"
+      :y="50"
     />
     <ObjectRight
       linkRole="source"
       :x="ifInverse === 1 ? -175 : 330"
-      oheight="300"
-      y="50"
+      :oheight="300"
+      :y="50"
     />
     <Lnk />
     <ObjectRight linkRole="target" :x="ifInverse === 1 ? 275 : -200" />

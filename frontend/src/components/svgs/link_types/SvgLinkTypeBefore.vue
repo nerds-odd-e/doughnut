@@ -10,8 +10,8 @@
       :stripes="false"
       linkRole="source"
       :x="ifInverse === 1 ? -70 : 300"
-      y="105"
-      size="30"
+      :y="105"
+      :size="30"
     />
     <Object1 :stripes="false" linkRole="target" :x="250 * ifInverse" />
 

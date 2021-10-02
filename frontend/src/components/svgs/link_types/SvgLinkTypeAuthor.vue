@@ -9,7 +9,7 @@
     <Object1 linkRole="source" :x="-250 * ifInverse" />
     <Lnk />
     <Person linkRole="target" :x="250 * ifInverse" />
-    <Feather linkRole="target" :x="280 * ifInverse" y="150" />
+    <Feather linkRole="target" :x="280 * ifInverse" :y="150" />
   </svg>
 </template>
 
