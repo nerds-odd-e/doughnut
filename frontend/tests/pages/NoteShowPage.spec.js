@@ -3,6 +3,7 @@
  */
 import { screen } from "@testing-library/vue";
 import NoteShowPage from "@/pages/NoteShowPage.vue";
+import store from "../../src/store/index.js";
 import { renderWithStoreAndMockRoute } from "../helpers";
 import flushPromises from "flush-promises";
 import _ from "lodash";
@@ -20,7 +21,7 @@ describe("note show", () => {
       notes: [ note ]
     };
     fetch.mockResponseOnce(JSON.stringify(stubResponse));
-    renderWithStoreAndMockRoute(NoteShowPage, {
+    renderWithStoreAndMockRoute(store, NoteShowPage, {
       propsData: { noteId: note.id },
     });
     await flushPromises();
