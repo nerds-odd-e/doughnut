@@ -15,7 +15,7 @@ class ReviewPointBuilder extends Builder {
     super(parentBuilder);
     this.data = {
       reviewPoint: {
-        id: 3,
+        id: generateId,
       },
       noteViewedByUser: null,
       linkViewedByUser: null,

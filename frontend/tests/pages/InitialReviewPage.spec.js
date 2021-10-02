@@ -5,7 +5,6 @@ import InitialReviewPage from "@/pages/InitialReviewPage.vue";
 import flushPromises from "flush-promises";
 import _ from "lodash";
 import { mountWithMockRoute } from "../helpers";
-import { reviewPointViewedByUser } from "../notes/fixtures";
 import makeMe from "../fixtures/makeMe";
 
 beforeEach(() => {
@@ -49,7 +48,9 @@ describe("repeat page", () => {
   });
 
   test("minimized view", async () => {
-    fetch.mockResponseOnce(JSON.stringify(reviewPointViewedByUser));
+    const note = makeMe.aNote.please()
+    const reviewPoint = makeMe.aReviewPoint.ofNote(note).please()
+    fetch.mockResponseOnce(JSON.stringify(reviewPoint));
     const { wrapper, mockRouter } = mountWithMockRoute(
       InitialReviewPage,
       { propsData: { nested: true } },
@@ -58,6 +59,6 @@ describe("repeat page", () => {
     await flushPromises();
     expect(mockRouter.push).toHaveBeenCalledTimes(0);
     expect(wrapper.findAll(".initial-review-container")).toHaveLength(1);
-    expect(wrapper.find(".review-point-abbr span").text()).toContain("asdf");
+    expect(wrapper.find(".review-point-abbr span").text()).toContain(note.note.title);
   });
 });

@@ -3,8 +3,8 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.json.NoteBreadcrumbViewedByUser;
 import com.odde.doughnut.entities.json.NoteViewedByUser1;
+import com.odde.doughnut.entities.json.NotesBulk;
 import com.odde.doughnut.entities.json.RedirectToNoteResponse;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -19,7 +19,6 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -73,11 +72,6 @@ class RestNoteController {
       modelFactoryService.linkRepository.save(link);
     }
     return new RedirectToNoteResponse(note.getId());
-  }
-
-  static class NotesBulk {
-    public NoteBreadcrumbViewedByUser noteBreadcrumbViewedByUser;
-    public List<NoteViewedByUser1> notes = new ArrayList<>();
   }
 
   @GetMapping("/{note}")

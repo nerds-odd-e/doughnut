@@ -1,7 +1,7 @@
 <template>
   <div class="review-point-abbr">
     <span v-if="!!noteViewedByUser">
-      {{ noteViewedByUser.note.noteContent.title }}
+      {{ noteViewedByUser.noteItself.note.noteContent.title }}
     </span>
 
     <span v-if="!!linkViewedByUser">
