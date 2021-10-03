@@ -11,7 +11,7 @@ class TitleFragment {
     final static String internalFullMatchReplacementForSubtitle = "__f_u_l_l_s_u_b__";
     private final String content;
     private final boolean suffix;
-    private boolean subtitle;
+    private final boolean subtitle;
 
     TitleFragment(String content, boolean subtitle) {
         this.subtitle = subtitle;

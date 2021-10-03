@@ -20,11 +20,11 @@ import javax.servlet.http.HttpServletRequest;
 public class ControllerSetup
 {
     @Autowired
-    private ModelFactoryService modelFactoryService;
+    private final ModelFactoryService modelFactoryService;
     @Autowired
-    private CurrentUserFetcher currentUserFetcher;
+    private final CurrentUserFetcher currentUserFetcher;
     @Autowired
-    private TestabilitySettings testabilitySettings;
+    private final TestabilitySettings testabilitySettings;
 
     public ControllerSetup(ModelFactoryService modelFactoryService, CurrentUserFetcher currentUserFetcher, TestabilitySettings testabilitySettings) {
         this.modelFactoryService = modelFactoryService;

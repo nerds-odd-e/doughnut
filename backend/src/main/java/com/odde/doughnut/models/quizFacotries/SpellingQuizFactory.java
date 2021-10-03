@@ -23,9 +23,7 @@ public class SpellingQuizFactory extends ClozeDescriptonQuizFactory {
         Note note = reviewPoint.getNote();
         if (!Strings.isEmpty(note.getNoteContent().getDescription())) {
             ReviewSetting reviewSetting = note.getMasterReviewSetting();
-            if (reviewSetting != null && reviewSetting.getRememberSpelling()) {
-                return true;
-            }
+            return reviewSetting != null && reviewSetting.getRememberSpelling();
         }
         return false;
     }

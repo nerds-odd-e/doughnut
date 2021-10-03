@@ -34,7 +34,7 @@ public class Note {
     @Embedded
     @Valid
     @Getter
-    private NoteContent noteContent = new NoteContent();
+    private final NoteContent noteContent = new NoteContent();
 
     @Column(name = "sibling_order")
     private Long siblingOrder = SiblingOrder.getGoodEnoughOrderNumber();

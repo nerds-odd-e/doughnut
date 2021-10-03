@@ -40,7 +40,7 @@ public class FailureReportFactory {
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         exception.printStackTrace(pw);
-        failureReport.setErrorDetail(getUserInfo() + getRequestInfo() + "# Stack trace\n"+sw.toString());
+        failureReport.setErrorDetail(getUserInfo() + getRequestInfo() + "# Stack trace\n"+ sw);
         this.modelFactoryService.failureReportRepository.save(failureReport);
 
         return failureReport;

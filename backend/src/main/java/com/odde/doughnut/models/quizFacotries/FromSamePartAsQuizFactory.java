@@ -1,6 +1,8 @@
 package com.odde.doughnut.models.quizFacotries;
 
-import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.Link;
+import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.LinkViewed;
 import com.odde.doughnut.models.UserModel;
 
