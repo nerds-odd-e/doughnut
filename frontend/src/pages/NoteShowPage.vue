@@ -1,14 +1,14 @@
 <template>
   <LoadingPage v-bind="{ loading, contentExists: !!breadcrumb }">
     <div v-if="breadcrumb" :key="noteId">
-      <NoteViewedByUser v-if="!loading" v-bind="{id: noteId, breadcrumb}"/>
+      <NoteWithChildrenCards v-if="!loading" v-bind="{id: noteId, breadcrumb}"/>
       <NoteStatisticsButton :noteId="noteId" />
     </div>
   </LoadingPage>
 </template>
 
 <script>
-import NoteViewedByUser from "../components/notes/NoteViewedByUser.vue";
+import NoteWithChildrenCards from "../components/notes/NoteWithChildrenCards.vue";
 import NoteStatisticsButton from "../components/notes/NoteStatisticsButton.vue";
 import LoadingPage from "./commons/LoadingPage.vue";
 import { storedApiGetNoteAndItsChildren } from "../storedApi";
@@ -22,7 +22,7 @@ export default {
       loading: true,
     };
   },
-  components: { NoteViewedByUser, NoteStatisticsButton, LoadingPage },
+  components: { NoteWithChildrenCards, NoteStatisticsButton, LoadingPage },
   methods: {
     fetchData() {
       this.loading = true
