@@ -1,5 +1,5 @@
 <template>
-  <NoteShow v-bind="{ ...noteViewedByUser }"/>
+  <NoteWithLinks v-bind="{ ...noteViewedByUser }"/>
   <div class="note-list">
     <NoteOverview
       v-for="childId in childrenIds"
@@ -10,7 +10,7 @@
 </template>
 
 <script lang="ts">
-import NoteShow from "./NoteShow.vue";
+import NoteWithLinks from "./NoteWithLinks.vue";
 
 export default {
   name: "NoteOverview",
@@ -18,7 +18,7 @@ export default {
     noteId: Number,
   },
   emits: ["updated"],
-  components: { NoteShow },
+  components: { NoteWithLinks },
   computed: {
     noteViewedByUser() {
       return this.$store.getters.getNoteById(this.noteId);

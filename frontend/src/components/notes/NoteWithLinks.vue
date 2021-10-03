@@ -31,6 +31,7 @@ import ShowPicture from "./ShowPicture.vue";
 import ShowDescription from "./ShowDescription.vue";
 
 export default {
+  name: "NoteWithLinks",
   props: {
     id: Number,
     noteContent: { type: Object, required: true },

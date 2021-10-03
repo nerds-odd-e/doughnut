@@ -9,12 +9,12 @@
       />
       <BazaarNoteButtons v-else :note="note" :notebook="breadcrumb.notebook" />
     </nav>
-    <NoteShow v-bind="note"/>
+    <NoteWithLinks v-bind="note"/>
   </div>
 </template>
 
 <script>
-import NoteShow from "./NoteShow.vue";
+import NoteWithLinks from "./NoteWithLinks.vue";
 import Breadcrumb from "./Breadcrumb.vue";
 import BazaarNoteButtons from "../bazaar/BazaarNoteButtons.vue";
 import NoteButtons from "./NoteButtons.vue";
@@ -27,7 +27,7 @@ export default {
     breadcrumb: Object,
   },
   components: {
-    NoteShow,
+    NoteWithLinks,
     BazaarNoteButtons,
     NoteButtons,
     Breadcrumb,

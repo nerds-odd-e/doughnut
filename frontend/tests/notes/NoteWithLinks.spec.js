@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import { render, screen } from "@testing-library/vue";
-import NoteShow from "@/components/notes/NoteShow.vue";
+import NoteWithLinks from "@/components/notes/NoteWithLinks.vue";
 import makeMe from "../fixtures/makeMe";
 
 describe("new/updated pink banner", () => {
@@ -19,7 +19,7 @@ describe("new/updated pink banner", () => {
     "should show fresher color if recently updated",
     (updatedAt, expectedColor) => {
       const note = makeMe.aNote.updatedAt(updatedAt).please();
-      render(NoteShow, { props: note });
+      render(NoteWithLinks, { props: note });
 
       expect(screen.getByRole("title").parentNode.parentNode).toHaveStyle(
         `background-color: ${expectedColor};`

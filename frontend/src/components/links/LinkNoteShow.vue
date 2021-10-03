@@ -19,19 +19,19 @@
     </template>
   </Card>
   <div :id="`note-collapse-${noteViewedByUser.noteItself.id}`" class="collapse">
-    <NoteShow
+    <NoteWithLinks
       v-bind="noteViewedByUser.noteItself"/>
   </div>
 </template>
 
 <script>
 import Breadcrumb from "../notes/Breadcrumb.vue";
-import NoteShow from "../notes/NoteShow.vue";
+import NoteWithLinks from "../notes/NoteWithLinks.vue";
 import Card from "../notes/Card.vue";
 
 export default {
   name: "LinkNoteShow",
   props: { noteViewedByUser: Object },
-  components: { Breadcrumb, NoteShow, Card },
+  components: { Breadcrumb, NoteWithLinks, Card },
 };
 </script>
