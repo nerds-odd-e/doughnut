@@ -29,7 +29,7 @@ public class NoteWithPositionTest {
             Note top = makeMe.aNote().inMemoryPlease();
             note1 = makeMe.aNote().under(top).description("note1description").inMemoryPlease();
             value = new NoteWithPosition(){{
-                setNote(note1.jsonObjectViewedBy1(null));
+                setNote(note1.jsonObjectViewedBy(null));
                 setNotePosition(note1.jsonNotePosition(null));
             }};
         }

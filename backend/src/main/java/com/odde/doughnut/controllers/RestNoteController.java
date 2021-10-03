@@ -98,7 +98,7 @@ class RestNoteController {
     noteContent.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
     note.updateNoteContent(noteContent, user.getEntity());
     modelFactoryService.noteRepository.save(note);
-    return note.jsonObjectViewedBy1(user.getEntity());
+    return note.jsonObjectViewedBy(user.getEntity());
   }
 
   @GetMapping("/{note}/statistics")

@@ -24,6 +24,10 @@ public class NoteViewedByUser {
 
     @Getter
     @Setter
+    private String shortDescription;
+
+    @Getter
+    @Setter
     private String notePicture;
 
     @Getter

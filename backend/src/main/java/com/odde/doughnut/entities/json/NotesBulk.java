@@ -14,16 +14,16 @@ public class NotesBulk {
       NotesBulk notesBulk = new NotesBulk();
 
       notesBulk.notePosition = note.jsonNotePosition(user.getEntity());
-      notesBulk.notes.add(note.jsonObjectViewedBy1(user.getEntity()));
-      note.getChildren().forEach(n-> notesBulk.notes.add(n.jsonObjectViewedBy1(user.getEntity())));
+      notesBulk.notes.add(note.jsonObjectViewedBy(user.getEntity()));
+      note.getChildren().forEach(n-> notesBulk.notes.add(n.jsonObjectViewedBy(user.getEntity())));
       return notesBulk;
     }
 
     public static NotesBulk jsonNoteWitheDescendants(Note note, UserModel user) {
       NotesBulk notesBulk = new NotesBulk();
       notesBulk.notePosition = note.jsonNotePosition(user.getEntity());
-      notesBulk.notes.add(note.jsonObjectViewedBy1(user.getEntity()));
-      note.traverseBreadthFirst(n-> notesBulk.notes.add(n.jsonObjectViewedBy1(user.getEntity())));
+      notesBulk.notes.add(note.jsonObjectViewedBy(user.getEntity()));
+      note.traverseBreadthFirst(n-> notesBulk.notes.add(n.jsonObjectViewedBy(user.getEntity())));
       return notesBulk;
     }
 }

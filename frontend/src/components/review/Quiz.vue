@@ -72,8 +72,8 @@ const props = defineProps({
 const emits = defineEmits(["answer"]);
 const sourceNote = computed(() => {
   if (!!props.reviewPointViewedByUser.noteWithPosition)
-    return props.reviewPointViewedByUser.noteWithPosition.noteItself;
-  return props.reviewPointViewedByUser.linkViewedByUser.sourceNoteWithPosition.noteItself;
+    return props.reviewPointViewedByUser.noteWithPosition.note;
+  return props.reviewPointViewedByUser.linkViewedByUser.sourceNoteWithPosition.note;
 });
 const pictureQuestion = computed(() => {
   return props.quizQuestion.questionType === "PICTURE_TITLE";

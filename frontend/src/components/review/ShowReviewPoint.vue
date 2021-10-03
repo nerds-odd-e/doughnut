@@ -2,7 +2,7 @@
   <div>
     <div v-if="!!noteWithPosition">
       <NoteWithControls
-        v-bind="{note, notePosition}"
+        v-bind="noteWithPosition"
       />
     </div>
 
@@ -26,19 +26,11 @@ import NoteWithControls from "../notes/NoteWithControls.vue";
 import LinkShow from "../links/LinkShow.vue";
 import LinkNob from "../links/LinkNob.vue";
 import { computed } from "@vue/reactivity";
+
 const props = defineProps({
   noteWithPosition: Object,
   linkViewedByUser: Object,
 });
 
-const notePosition = computed(()=>{
-  const {notePosition} = props.noteWithPosition
-  return notePosition
-})
-
-const note = computed(()=>{
-  const {noteItself} = props.noteWithPosition
-  return noteItself
-})
 
 </script>

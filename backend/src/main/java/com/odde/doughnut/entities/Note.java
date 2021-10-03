@@ -126,9 +126,9 @@ public class Note {
     }
 
     @JsonIgnore
-    public NoteWithPosition jsonObjectViewedBy(User viewer) {
+    public NoteWithPosition jsonNoteWithPosition(User viewer) {
         NoteWithPosition nvb = new NoteWithPosition();
-        nvb.setNote(jsonObjectViewedBy1(viewer));
+        nvb.setNote(jsonObjectViewedBy(viewer));
         nvb.setNotePosition(jsonNotePosition(viewer));
         return nvb;
     }
@@ -145,11 +145,12 @@ public class Note {
     }
 
     @JsonIgnore
-    public NoteViewedByUser jsonObjectViewedBy1(User viewer) {
+    public NoteViewedByUser jsonObjectViewedBy(User viewer) {
         NoteViewedByUser nvb = new NoteViewedByUser();
         nvb.setId(getId());
         nvb.setParentId(getParentId());
         nvb.setTitle(getTitle());
+        nvb.setShortDescription(getShortDescription());
         nvb.setNotePicture(getNotePicture());
         nvb.setCreatedAt(getCreatedAt());
         nvb.setNoteContent(getNoteContent());

@@ -27,8 +27,8 @@ public class LinkViewedByUser {
 
     public static LinkViewedByUser from(Link link, UserModel user) {
         LinkViewedByUser linkViewedByUser = new LinkViewedByUser();
-        linkViewedByUser.setSourceNoteWithPosition(link.getSourceNote().jsonObjectViewedBy(user.getEntity()));
-        linkViewedByUser.setTargetNoteWithPosition(link.getTargetNote().jsonObjectViewedBy(user.getEntity()));
+        linkViewedByUser.setSourceNoteWithPosition(link.getSourceNote().jsonNoteWithPosition(user.getEntity()));
+        linkViewedByUser.setTargetNoteWithPosition(link.getTargetNote().jsonNoteWithPosition(user.getEntity()));
         linkViewedByUser.setLinkTypeLabel(link.getLinkTypeLabel());
         linkViewedByUser.setTypeId(link.getLinkType().id);
         linkViewedByUser.setId(link.getId());

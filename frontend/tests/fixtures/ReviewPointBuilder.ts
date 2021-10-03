@@ -29,7 +29,7 @@ class ReviewPointBuilder extends Builder {
 
   ofNote(note: any): ReviewPointBuilder {
     this.data.noteWithPosition = {
-      noteItself: note,
+      note: note,
       notePosition: new NotePositionBuilder().do()
     }
     return this

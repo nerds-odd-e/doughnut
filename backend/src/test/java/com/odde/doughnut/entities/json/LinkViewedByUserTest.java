@@ -39,7 +39,7 @@ public class LinkViewedByUserTest {
             note2 = makeMe.aNote().under(top).description("note2description").inMemoryPlease();
             link = makeMe.aLink().between(note1, note2).inMemoryPlease();
             value = new NoteWithPosition(){{
-                NoteViewedByUser noteViewedByUser = note1.jsonObjectViewedBy1(null);
+                NoteViewedByUser noteViewedByUser = note1.jsonObjectViewedBy(null);
                 noteViewedByUser.setLinks(links);
                 setNote(noteViewedByUser);
             }};

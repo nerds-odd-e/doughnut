@@ -28,7 +28,7 @@ public class ReviewPointViewedByUser {
 
         result.setReviewPoint(reviewPoint);
         if (reviewPoint.getNote() != null) {
-            result.setNoteWithPosition(reviewPoint.getNote().jsonObjectViewedBy(user.getEntity()));
+            result.setNoteWithPosition(reviewPoint.getNote().jsonNoteWithPosition(user.getEntity()));
             result.setReviewSetting(getReviewSetting(reviewPoint.getNote()));
         }
         else {

@@ -110,7 +110,7 @@ export default {
         this.reviewPointViewedByUser &&
         this.reviewPointViewedByUser.noteViewedByUser
       )
-        return this.reviewPointViewedByUser.noteViewedByUser.noteItself.id;
+        return this.reviewPointViewedByUser.noteViewedByUser.note.id;
     },
     hasLastResult() {
       return this.lastResult && !!this.lastResult.answerResult;
