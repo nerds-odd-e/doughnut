@@ -136,6 +136,8 @@ public class Note {
     @JsonIgnore
     public NotePositionViewedByUser jsonNotePosition(User viewer) {
         NotePositionViewedByUser nvb = new NotePositionViewedByUser();
+        nvb.setNoteId(getId());
+        nvb.setTitle(getTitle());
         nvb.setNotebook(notebook);
         nvb.setAncestors(getAncestors());
         nvb.setOwns(viewer != null && viewer.owns(notebook));

@@ -10,7 +10,12 @@ import lombok.Getter;
 import lombok.Setter;
 
 public class NotePositionViewedByUser {
-
+    @Getter
+    @Setter
+    private Integer noteId;
+    @Getter
+    @Setter
+    private String title;
     @Getter
     @Setter
     @JsonIgnoreProperties({"headNote"})

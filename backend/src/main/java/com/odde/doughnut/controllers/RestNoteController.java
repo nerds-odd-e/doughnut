@@ -82,9 +82,7 @@ class RestNoteController {
 
     notesBulk.notePosition = note.jsonNotePosition(user.getEntity());
     notesBulk.notes.add(note.jsonObjectViewedBy1(user.getEntity()));
-    note.getChildren().forEach(n->{
-      notesBulk.notes.add(n.jsonObjectViewedBy1(user.getEntity()));
-    });
+    note.getChildren().forEach(n-> notesBulk.notes.add(n.jsonObjectViewedBy1(user.getEntity())));
 
     return notesBulk;
   }
@@ -97,9 +95,7 @@ class RestNoteController {
     NotesBulk notesBulk = new NotesBulk();
     notesBulk.notePosition = note.jsonNotePosition(user.getEntity());
     notesBulk.notes.add(note.jsonObjectViewedBy1(user.getEntity()));
-    note.traverseBreadthFirst(n->{
-      notesBulk.notes.add(n.jsonObjectViewedBy1(user.getEntity()));
-    });
+    note.traverseBreadthFirst(n-> notesBulk.notes.add(n.jsonObjectViewedBy1(user.getEntity())));
     return notesBulk;
   }
 
