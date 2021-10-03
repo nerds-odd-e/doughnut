@@ -37,7 +37,7 @@ class RestNoteControllerTests {
     MakeMe makeMe;
     private UserModel userModel;
     RestNoteController controller;
-    private TestabilitySettings testabilitySettings = new TestabilitySettings();
+    private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
     @BeforeEach
     void setup() {
@@ -62,7 +62,7 @@ class RestNoteControllerTests {
             makeMe.refresh(userModel.getEntity());
             final NotesBulk show = controller.show(note);
             assertThat(show.notes.get(0).getTitle(), equalTo(note.getTitle()));
-            assertThat(show.noteBreadcrumbViewedByUser.getOwns(), is(false));
+            assertThat(show.notePosition.getOwns(), is(false));
         }
 
         @Test
@@ -71,7 +71,7 @@ class RestNoteControllerTests {
             makeMe.refresh(userModel.getEntity());
             final NotesBulk show = controller.show(note);
             assertThat(show.notes.get(0).getId(), equalTo(note.getId()));
-            assertThat(show.noteBreadcrumbViewedByUser.getOwns(), is(true));
+            assertThat(show.notePosition.getOwns(), is(true));
         }
 
         @Test
@@ -83,7 +83,7 @@ class RestNoteControllerTests {
             makeMe.refresh(childNote);
             final NotesBulk showOverview = controller.showOverview(note);
             assertThat(showOverview.notes, hasSize(12));
-            assertThat(showOverview.noteBreadcrumbViewedByUser.getOwns(), equalTo(true));
+            assertThat(showOverview.notePosition.getOwns(), equalTo(true));
             assertThat(showOverview.notes.get(0).getChildrenIds(), hasSize(1));
         }
     }
