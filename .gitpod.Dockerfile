@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.3-labs
 FROM gitpod/workspace-full-vnc
 # ---------------------------------------------------
 # -------------------- USER root --------------------
