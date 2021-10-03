@@ -2,7 +2,7 @@
   <div class="row">
     <div class="col-12 col-md-4 link-source">
       <LinkNoteShow
-        :noteViewedByUser="sourceNoteViewedByUser"
+        :noteViewedByUser="sourceNoteWithPosition"
       />
     </div>
     <div class="col-12 col-md-4 text-center">
@@ -10,7 +10,7 @@
     </div>
     <div class="col-12 col-md-4 link-target">
       <LinkNoteShow
-        :noteViewedByUser="targetNoteViewedByUser"
+        :noteViewedByUser="targetNoteWithPosition"
       />
     </div>
   </div>
@@ -21,8 +21,8 @@ import LinkNoteShow from "./LinkNoteShow.vue";
 
 export default {
   props: {
-    sourceNoteViewedByUser: { tyep: Object, required: true },
-    targetNoteViewedByUser: { type: Object, required: true },
+    sourceNoteWithPosition: { tyep: Object, required: true },
+    targetNoteWithPosition: { type: Object, required: true },
   },
   components: { LinkNoteShow },
 };

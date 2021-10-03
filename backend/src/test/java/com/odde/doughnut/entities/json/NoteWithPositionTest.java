@@ -15,20 +15,20 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-public class NoteViewedByUserTest {
+public class NoteWithPositionTest {
 
     MakeMe makeMe = new MakeMe();
 
     @Nested
     class JsonTest {
         Note note1;
-        NoteViewedByUser value;
+        NoteWithPosition value;
 
         @BeforeEach
         void thereAreTwoNotesWithALinkInBetween() {
             Note top = makeMe.aNote().inMemoryPlease();
             note1 = makeMe.aNote().under(top).description("note1description").inMemoryPlease();
-            value = new NoteViewedByUser(){{
+            value = new NoteWithPosition(){{
                 setNoteItself(note1.jsonObjectViewedBy1(null));
                 setNotePosition(note1.jsonNotePosition(null));
             }};
@@ -48,7 +48,7 @@ public class NoteViewedByUserTest {
             assertThat(deNotebook.toString(), not(containsString("headNote")));
         }
 
-        private Map<String, Object> getJsonString(NoteViewedByUser value) throws JsonProcessingException {
+        private Map<String, Object> getJsonString(NoteWithPosition value) throws JsonProcessingException {
             return new ObjectMapper().readerForMapOf(Object.class).readValue(new ObjectMapper().writeValueAsString(value));
         }
     }

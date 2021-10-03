@@ -17,7 +17,7 @@ class ReviewPointBuilder extends Builder {
       reviewPoint: {
         id: generateId,
       },
-      noteViewedByUser: null,
+      noteWithPosition: null,
       linkViewedByUser: null,
     };
   }
@@ -28,7 +28,7 @@ class ReviewPointBuilder extends Builder {
   }
 
   ofNote(note: any): ReviewPointBuilder {
-    this.data.noteViewedByUser = {
+    this.data.noteWithPosition = {
       noteItself: note,
       notePosition: new NotePositionBuilder().do()
     }

@@ -1,16 +1,16 @@
 <template>
   <div class="review-point-abbr">
-    <span v-if="!!noteViewedByUser">
-      {{ noteViewedByUser.noteItself.title }}
+    <span v-if="!!noteWithPosition">
+      {{ noteWithPosition.noteItself.title }}
     </span>
 
     <span v-if="!!linkViewedByUser">
       <span>
-        {{ linkViewedByUser.sourceNoteViewedByUser.title }}
+        {{ linkViewedByUser.sourceNoteWithPosition.noteItself.title }}
       </span>
       <span class="badge mr-1"> {{ linkViewedByUser.linkTypeLabel }}</span>
       <span>
-        {{ linkViewedByUser.targetNoteViewedByUser.title }}
+        {{ linkViewedByUser.targetNoteWithPosition.noteItself.title }}
       </span>
     </span>
   </div>
@@ -22,7 +22,7 @@ import LinkShow from "../links/LinkShow.vue";
 
 export default {
   name: "ShowReviewPoint",
-  props: { noteViewedByUser: Object, linkViewedByUser: Object },
+  props: { noteWithPosition: Object, linkViewedByUser: Object },
   components: {
     NoteWithControls,
     LinkShow,

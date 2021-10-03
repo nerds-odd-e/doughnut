@@ -4,8 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.algorithms.SiblingOrder;
 import com.odde.doughnut.entities.json.LinkViewed;
 import com.odde.doughnut.entities.json.NotePositionViewedByUser;
+import com.odde.doughnut.entities.json.NoteWithPosition;
 import com.odde.doughnut.entities.json.NoteViewedByUser;
-import com.odde.doughnut.entities.json.NoteViewedByUser1;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.WhereJoinTable;
@@ -126,8 +126,8 @@ public class Note {
     }
 
     @JsonIgnore
-    public NoteViewedByUser jsonObjectViewedBy(User viewer) {
-        NoteViewedByUser nvb = new NoteViewedByUser();
+    public NoteWithPosition jsonObjectViewedBy(User viewer) {
+        NoteWithPosition nvb = new NoteWithPosition();
         nvb.setNoteItself(jsonObjectViewedBy1(viewer));
         nvb.setNotePosition(jsonNotePosition(viewer));
         return nvb;
@@ -145,8 +145,8 @@ public class Note {
     }
 
     @JsonIgnore
-    public NoteViewedByUser1 jsonObjectViewedBy1(User viewer) {
-        NoteViewedByUser1 nvb = new NoteViewedByUser1();
+    public NoteViewedByUser jsonObjectViewedBy1(User viewer) {
+        NoteViewedByUser nvb = new NoteViewedByUser();
         nvb.setId(getId());
         nvb.setParentId(getParentId());
         nvb.setTitle(getTitle());

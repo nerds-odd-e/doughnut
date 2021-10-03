@@ -3,7 +3,7 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteContent;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.json.NoteViewedByUser1;
+import com.odde.doughnut.entities.json.NoteViewedByUser;
 import com.odde.doughnut.entities.json.NotesBulk;
 import com.odde.doughnut.entities.json.RedirectToNoteResponse;
 import com.odde.doughnut.exceptions.NoAccessRightException;
@@ -132,7 +132,7 @@ class RestNoteControllerTests {
 
         @Test
         void shouldBeAbleToSaveNoteWhenValid() throws NoAccessRightException, IOException {
-            NoteViewedByUser1 response = controller.updateNote(note, note.getNoteContent());
+            NoteViewedByUser response = controller.updateNote(note, note.getNoteContent());
             assertThat(response.getId(), equalTo(note.getId()));
         }
 

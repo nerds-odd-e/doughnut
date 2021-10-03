@@ -1,14 +1,45 @@
 package com.odde.doughnut.entities.json;
 
+import com.odde.doughnut.entities.Link;
+import com.odde.doughnut.entities.NoteContent;
 import lombok.Getter;
 import lombok.Setter;
 
-public class NoteViewedByUser {
-    @Setter
-    @Getter
-    private NotePositionViewedByUser notePosition;
+import java.sql.Timestamp;
+import java.util.List;
+import java.util.Map;
 
-    @Setter
+public class NoteViewedByUser {
     @Getter
-    private NoteViewedByUser1 noteItself;
+    @Setter
+    private Integer id;
+
+    @Getter
+    @Setter
+    private Integer parentId;
+
+    @Getter
+    @Setter
+    private String title;
+
+    @Getter
+    @Setter
+    private String notePicture;
+
+    @Getter
+    @Setter
+    private Timestamp createdAt;
+
+    @Getter
+    @Setter
+    private NoteContent noteContent;
+
+    @Getter
+    @Setter
+    private Map<Link.LinkType, LinkViewed> links;
+
+    @Getter
+    @Setter
+    private List<Integer> childrenIds;
+
 }

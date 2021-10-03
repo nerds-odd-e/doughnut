@@ -13,11 +13,11 @@ class LinkViewedByUserBuilder extends Builder {
     return {
       id: 8,
       linkTypeLabel: "a link",
-      sourceNoteViewedByUser:  {
+      sourceNoteWithPosition:  {
         noteItself: new NoteBuilder().do(),
         notePosition: new NotePositionBuilder().do()
       },
-      targetNoteViewedByUser: {
+      targetNoteWithPosition: {
         noteItself: new NoteBuilder().do(),
         notePosition: new NotePositionBuilder().do()
       }

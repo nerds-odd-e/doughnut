@@ -11,7 +11,7 @@ public class LinkViewedByUser {
     private Integer id;
     @Getter
     @Setter
-    private NoteViewedByUser sourceNoteViewedByUser;
+    private NoteWithPosition sourceNoteWithPosition;
     @Getter
     @Setter
     private String linkTypeLabel;
@@ -20,15 +20,15 @@ public class LinkViewedByUser {
     private Integer typeId;
     @Getter
     @Setter
-    private NoteViewedByUser targetNoteViewedByUser;
+    private NoteWithPosition targetNoteWithPosition;
     @Getter
     @Setter
     private Boolean readonly;
 
     public static LinkViewedByUser from(Link link, UserModel user) {
         LinkViewedByUser linkViewedByUser = new LinkViewedByUser();
-        linkViewedByUser.setSourceNoteViewedByUser(link.getSourceNote().jsonObjectViewedBy(user.getEntity()));
-        linkViewedByUser.setTargetNoteViewedByUser(link.getTargetNote().jsonObjectViewedBy(user.getEntity()));
+        linkViewedByUser.setSourceNoteWithPosition(link.getSourceNote().jsonObjectViewedBy(user.getEntity()));
+        linkViewedByUser.setTargetNoteWithPosition(link.getTargetNote().jsonObjectViewedBy(user.getEntity()));
         linkViewedByUser.setLinkTypeLabel(link.getLinkTypeLabel());
         linkViewedByUser.setTypeId(link.getLinkType().id);
         linkViewedByUser.setId(link.getId());

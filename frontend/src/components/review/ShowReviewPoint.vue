@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div v-if="!!noteViewedByUser">
+    <div v-if="!!noteWithPosition">
       <NoteWithControls
         v-bind="{note, notePosition}"
       />
@@ -27,17 +27,17 @@ import LinkShow from "../links/LinkShow.vue";
 import LinkNob from "../links/LinkNob.vue";
 import { computed } from "@vue/reactivity";
 const props = defineProps({
-  noteViewedByUser: Object,
+  noteWithPosition: Object,
   linkViewedByUser: Object,
 });
 
 const notePosition = computed(()=>{
-  const {notePosition} = props.noteViewedByUser
+  const {notePosition} = props.noteWithPosition
   return notePosition
 })
 
 const note = computed(()=>{
-  const {noteItself} = props.noteViewedByUser
+  const {noteItself} = props.noteWithPosition
   return noteItself
 })
 

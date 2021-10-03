@@ -11,7 +11,7 @@ public class ReviewPointViewedByUser {
     private ReviewPoint reviewPoint;
     @Getter
     @Setter
-    private NoteViewedByUser noteViewedByUser;
+    private NoteWithPosition noteWithPosition;
     @Getter
     @Setter
     private LinkViewedByUser linkViewedByUser;
@@ -28,7 +28,7 @@ public class ReviewPointViewedByUser {
 
         result.setReviewPoint(reviewPoint);
         if (reviewPoint.getNote() != null) {
-            result.setNoteViewedByUser(reviewPoint.getNote().jsonObjectViewedBy(user.getEntity()));
+            result.setNoteWithPosition(reviewPoint.getNote().jsonObjectViewedBy(user.getEntity()));
             result.setReviewSetting(getReviewSetting(reviewPoint.getNote()));
         }
         else {

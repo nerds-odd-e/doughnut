@@ -30,7 +30,7 @@ public class LinkViewedByUserTest {
         Map<Link.LinkType, LinkViewed> links = new HashMap<>(){{
             put(Link.LinkType.SPECIALIZE, linkViewedByUser);
         }};
-        NoteViewedByUser value;
+        NoteWithPosition value;
 
         @BeforeEach
         void thereAreTwoNotesWithALinkInBetween() {
@@ -38,10 +38,10 @@ public class LinkViewedByUserTest {
             note1 = makeMe.aNote().under(top).description("note1description").inMemoryPlease();
             note2 = makeMe.aNote().under(top).description("note2description").inMemoryPlease();
             link = makeMe.aLink().between(note1, note2).inMemoryPlease();
-            value = new NoteViewedByUser(){{
-                NoteViewedByUser1 noteViewedByUser1 = note1.jsonObjectViewedBy1(null);
-                noteViewedByUser1.setLinks(links);
-                setNoteItself(noteViewedByUser1);
+            value = new NoteWithPosition(){{
+                NoteViewedByUser noteViewedByUser = note1.jsonObjectViewedBy1(null);
+                noteViewedByUser.setLinks(links);
+                setNoteItself(noteViewedByUser);
             }};
 
         }
@@ -70,7 +70,7 @@ public class LinkViewedByUserTest {
             assertThat(o.toString(), not(containsString("targetNote")));
         }
 
-        private Map<String, Object> getJsonString(NoteViewedByUser value) throws JsonProcessingException {
+        private Map<String, Object> getJsonString(NoteWithPosition value) throws JsonProcessingException {
             return new ObjectMapper().readerForMapOf(Object.class).readValue(new ObjectMapper().writeValueAsString(value));
         }
     }

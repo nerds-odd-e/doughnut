@@ -3,7 +3,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.json.NoteViewedByUser1;
+import com.odde.doughnut.entities.json.NoteViewedByUser;
 import com.odde.doughnut.entities.json.NotesBulk;
 import com.odde.doughnut.entities.json.RedirectToNoteResponse;
 import com.odde.doughnut.exceptions.NoAccessRightException;
@@ -78,13 +78,8 @@ class RestNoteController {
   public NotesBulk show(@PathVariable("note") Note note) throws NoAccessRightException {
     final UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertReadAuthorization(note);
-    NotesBulk notesBulk = new NotesBulk();
 
-    notesBulk.notePosition = note.jsonNotePosition(user.getEntity());
-    notesBulk.notes.add(note.jsonObjectViewedBy1(user.getEntity()));
-    note.getChildren().forEach(n-> notesBulk.notes.add(n.jsonObjectViewedBy1(user.getEntity())));
-
-    return notesBulk;
+    return NotesBulk.jsonNoteWithChildren(note, user);
   }
 
   @GetMapping("/{note}/overview")
@@ -92,16 +87,12 @@ class RestNoteController {
     final UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertReadAuthorization(note);
 
-    NotesBulk notesBulk = new NotesBulk();
-    notesBulk.notePosition = note.jsonNotePosition(user.getEntity());
-    notesBulk.notes.add(note.jsonObjectViewedBy1(user.getEntity()));
-    note.traverseBreadthFirst(n-> notesBulk.notes.add(n.jsonObjectViewedBy1(user.getEntity())));
-    return notesBulk;
+    return NotesBulk.jsonNoteWitheDescendants(note, user);
   }
 
   @PostMapping(path="/{note}")
   @Transactional
-  public NoteViewedByUser1 updateNote(@PathVariable(name = "note") Note note, @Valid @ModelAttribute NoteContent noteContent) throws NoAccessRightException, IOException {
+  public NoteViewedByUser updateNote(@PathVariable(name = "note") Note note, @Valid @ModelAttribute NoteContent noteContent) throws NoAccessRightException, IOException {
     final UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertAuthorization(note);
     noteContent.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
