@@ -10,14 +10,14 @@ import makeMe from "../fixtures/makeMe";
 describe("note wth child cards", () => {
 
   it("should render note with one child", async () => {
-    const breadcrumb = makeMe.aBreadcrumb.please()
+    const notePosition = makeMe.aNotePosition.please()
     const noteParent = makeMe.aNote.title("parent").please();
     const noteChild = makeMe.aNote.title("child").under(noteParent).please();
     store.commit("loadNotes", [noteParent, noteChild]);
     renderWithStoreAndMockRoute(
       store,
       NoteWithChildrenCards,
-      { props: { id: noteParent.id, breadcrumb } },
+      { props: { id: noteParent.id, notePosition } },
     )
     expect(screen.getAllByRole("title")).toHaveLength(1);
     await screen.findByText("parent");
@@ -26,13 +26,13 @@ describe("note wth child cards", () => {
 
   it("view note belongs to other people in bazaar", async () => {
     const note = makeMe.aNote.please();
-    const breadcrumb = makeMe.aBreadcrumb.inBazaar().please();
+    const notePosition = makeMe.aNotePosition.inBazaar().please();
     store.commit("loadNotes", [note]);
     renderWithStoreAndMockRoute(
       store,
       NoteWithChildrenCards,
       {
-        propsData: { id: note.id, breadcrumb },
+        propsData: { id: note.id, notePosition },
 
       },
     );

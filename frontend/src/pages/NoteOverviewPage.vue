@@ -1,7 +1,7 @@
 <template>
-  <LoadingPage v-bind="{ loading, contentExists: !!breadcrumb }">
+  <LoadingPage v-bind="{ loading, contentExists: !!notePosition }">
     <div v-if="!loading">
-      <Breadcrumb v-bind="breadcrumb" />
+      <Breadcrumb v-bind="notePosition" />
       <NoteOverview v-bind="{ noteId }" />
     </div>
   </LoadingPage>
@@ -18,7 +18,7 @@ export default {
   props: { noteId: Number },
   data() {
     return {
-      breadcrumb: null,
+      notePosition: null,
       loading: true,
     };
   },
@@ -29,7 +29,7 @@ export default {
       this.loading = true;
       storedApiGetNoteWithDescendents(this.$store, this.noteId)
       .then((res) => {
-        this.breadcrumb = res.noteBreadcrumbViewedByUser;
+        this.notePosition = res.notePosition;
       })
       .finally(() => this.loading = false)
       ;

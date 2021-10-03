@@ -3,7 +3,7 @@ package com.odde.doughnut.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.algorithms.SiblingOrder;
 import com.odde.doughnut.entities.json.LinkViewed;
-import com.odde.doughnut.entities.json.NoteBreadcrumbViewedByUser;
+import com.odde.doughnut.entities.json.NotePositionViewedByUser;
 import com.odde.doughnut.entities.json.NoteViewedByUser;
 import com.odde.doughnut.entities.json.NoteViewedByUser1;
 import lombok.Getter;
@@ -129,13 +129,13 @@ public class Note {
     public NoteViewedByUser jsonObjectViewedBy(User viewer) {
         NoteViewedByUser nvb = new NoteViewedByUser();
         nvb.setNoteItself(jsonObjectViewedBy1(viewer));
-        nvb.setNoteBreadcrumbViewedByUser(jsonBreadcrumbViewedBy(viewer));
+        nvb.setNotePosition(jsonNotePosition(viewer));
         return nvb;
     }
 
     @JsonIgnore
-    public NoteBreadcrumbViewedByUser jsonBreadcrumbViewedBy(User viewer) {
-        NoteBreadcrumbViewedByUser nvb = new NoteBreadcrumbViewedByUser();
+    public NotePositionViewedByUser jsonNotePosition(User viewer) {
+        NotePositionViewedByUser nvb = new NotePositionViewedByUser();
         nvb.setNotebook(notebook);
         nvb.setAncestors(getAncestors());
         nvb.setOwns(viewer != null && viewer.owns(notebook));

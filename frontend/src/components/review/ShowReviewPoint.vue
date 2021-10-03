@@ -2,7 +2,7 @@
   <div>
     <div v-if="!!noteViewedByUser">
       <NoteWithControls
-        v-bind="{note, breadcrumb}"
+        v-bind="{note, notePosition}"
       />
     </div>
 
@@ -31,9 +31,9 @@ const props = defineProps({
   linkViewedByUser: Object,
 });
 
-const breadcrumb = computed(()=>{
-  const {noteBreadcrumbViewedByUser} = props.noteViewedByUser
-  return noteBreadcrumbViewedByUser
+const notePosition = computed(()=>{
+  const {notePosition} = props.noteViewedByUser
+  return notePosition
 })
 
 const note = computed(()=>{

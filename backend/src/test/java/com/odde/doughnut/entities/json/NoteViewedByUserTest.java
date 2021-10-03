@@ -30,7 +30,7 @@ public class NoteViewedByUserTest {
             note1 = makeMe.aNote().under(top).description("note1description").inMemoryPlease();
             value = new NoteViewedByUser(){{
                 setNoteItself(note1.jsonObjectViewedBy1(null));
-                setNoteBreadcrumbViewedByUser(note1.jsonBreadcrumbViewedBy(null));
+                setNoteBreadcrumbViewedByUser(note1.jsonNotePosition(null));
             }};
         }
 

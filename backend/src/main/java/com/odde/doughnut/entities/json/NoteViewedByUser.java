@@ -6,7 +6,7 @@ import lombok.Setter;
 public class NoteViewedByUser {
     @Setter
     @Getter
-    private NoteBreadcrumbViewedByUser noteBreadcrumbViewedByUser;
+    private NotePositionViewedByUser notePosition;
 
     @Setter
     @Getter

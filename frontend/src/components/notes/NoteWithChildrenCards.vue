@@ -3,10 +3,10 @@
     v-bind="{
       id,
       note,
-      breadcrumb }"
+      notePosition }"
   />
   <NoteOwnerViewCards
-    :owns="breadcrumb.owns"
+    :owns="notePosition.owns"
     :notes="children"
   />
 
@@ -28,7 +28,7 @@ export default {
   name: "NoteViewedByUser",
   props: {
     id: Number,
-    breadcrumb: Object,
+    notePosition: Object,
   },
   components: {
     NoteWithControls,

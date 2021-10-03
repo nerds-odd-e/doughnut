@@ -1,6 +1,6 @@
 import Builder from "./Builder"
 import NoteBuilder from "./NoteBuilder" 
-import BreadcrumbBuilder from "./BreadcrumbBuilder"
+import NotePositionBuilder from "./NotePositionBuilder"
 
 class LinkViewedByUserBuilder extends Builder {
   data: any;
@@ -15,11 +15,11 @@ class LinkViewedByUserBuilder extends Builder {
       linkTypeLabel: "a link",
       sourceNoteViewedByUser:  {
         noteItself: new NoteBuilder().do(),
-        noteBreadcrumbViewedByUser: new BreadcrumbBuilder().do()
+        notePosition: new NotePositionBuilder().do()
       },
       targetNoteViewedByUser: {
         noteItself: new NoteBuilder().do(),
-        noteBreadcrumbViewedByUser: new BreadcrumbBuilder().do()
+        notePosition: new NotePositionBuilder().do()
       }
     }
   }

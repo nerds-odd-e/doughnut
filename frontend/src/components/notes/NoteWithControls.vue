@@ -1,13 +1,13 @@
 <template>
-  <Breadcrumb v-bind="breadcrumb" />
+  <Breadcrumb v-bind="notePosition" />
   <div class="note-with-controls">
     <nav class="nav d-flex flex-row-reverse p-0">
       <NoteButtons
-        v-if="breadcrumb.owns"
+        v-if="notePosition.owns"
         :note="note"
         :addSibling="true"
       />
-      <BazaarNoteButtons v-else :note="note" :notebook="breadcrumb.notebook" />
+      <BazaarNoteButtons v-else :note="note" :notebook="notePosition.notebook" />
     </nav>
     <NoteWithLinks v-bind="note"/>
   </div>
@@ -24,7 +24,7 @@ export default {
   props: {
     id: Number,
     note: Object,
-    breadcrumb: Object,
+    notePosition: Object,
   },
   components: {
     NoteWithLinks,

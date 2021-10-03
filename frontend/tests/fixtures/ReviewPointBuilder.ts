@@ -1,6 +1,6 @@
 import { merge } from "lodash";
 import Builder from "./Builder";
-import BreadcrumbBuilder from "./BreadcrumbBuilder"
+import NotePositionBuilder from "./NotePositionBuilder"
 
 let idCounter = 1;
 
@@ -30,7 +30,7 @@ class ReviewPointBuilder extends Builder {
   ofNote(note: any): ReviewPointBuilder {
     this.data.noteViewedByUser = {
       noteItself: note,
-      noteBreadcrumbViewedByUser: new BreadcrumbBuilder().do()
+      notePosition: new NotePositionBuilder().do()
     }
     return this
   }

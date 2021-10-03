@@ -1,7 +1,7 @@
 import Builder from "./Builder";
 
 
-class BreadcrumbBuilder extends Builder {
+class NotePositionBuilder extends Builder {
   data: any;
 
   constructor(parentBuilder?: Builder) {
@@ -17,12 +17,12 @@ class BreadcrumbBuilder extends Builder {
     }
   }
 
-  inBazaar(): BreadcrumbBuilder {
+  inBazaar(): NotePositionBuilder {
     this.data.owns = false
     return this
   }
 
-  inCircle(value: string): BreadcrumbBuilder {
+  inCircle(value: string): NotePositionBuilder {
     this.data.owns = true;
     this.data.notebook = {
       ownership: {
@@ -41,4 +41,4 @@ class BreadcrumbBuilder extends Builder {
   }
 }
 
-export default BreadcrumbBuilder;
+export default NotePositionBuilder;

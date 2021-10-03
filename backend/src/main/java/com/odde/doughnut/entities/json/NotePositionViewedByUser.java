@@ -9,7 +9,7 @@ import com.odde.doughnut.entities.Notebook;
 import lombok.Getter;
 import lombok.Setter;
 
-public class NoteBreadcrumbViewedByUser {
+public class NotePositionViewedByUser {
 
     @Getter
     @Setter

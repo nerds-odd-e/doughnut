@@ -1,6 +1,6 @@
 import LinksBuilder from "./LInksBuilder";
 import NoteBuilder from "./NoteBuilder";
-import BreadcrumbBuilder from "./BreadcrumbBuilder";
+import NotePositionBuilder from "./NotePositionBuilder";
 import ReviewPointBuilder from "./ReviewPointBuilder"
 import LinkViewedByUserBuilder from "./LinkViewedByUserBuilder"
 import RepetitionBuilder from "./RepetitionBuilder"
@@ -13,8 +13,8 @@ class MakeMe {
     return new NoteBuilder();
   }
 
-  get aBreadcrumb(): BreadcrumbBuilder {
-    return new BreadcrumbBuilder();
+  get aNotePosition(): NotePositionBuilder {
+    return new NotePositionBuilder();
   }
 
   get aReviewPoint(): ReviewPointBuilder {

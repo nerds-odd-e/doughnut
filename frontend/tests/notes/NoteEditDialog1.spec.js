@@ -17,7 +17,7 @@ describe("note show", () => {
   test("fetch API to be called ONCE", async () => {
     const note = makeMe.aNote.please()
     const stubResponse = {
-      noteBreadcrumbViewedByUser: makeMe.aBreadcrumb.please(),
+      notePosition: makeMe.aNotePosition.please(),
       notes: [ note ]
     };
     fetch.mockResponseOnce(JSON.stringify(stubResponse));

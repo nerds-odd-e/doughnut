@@ -1,7 +1,7 @@
 <template>
-  <LoadingPage v-bind="{ loading, contentExists: !!breadcrumb }">
-    <div v-if="breadcrumb" :key="noteId">
-      <NoteWithChildrenCards v-if="!loading" v-bind="{id: noteId, breadcrumb}"/>
+  <LoadingPage v-bind="{ loading, contentExists: !!notePosition }">
+    <div v-if="notePosition" :key="noteId">
+      <NoteWithChildrenCards v-if="!loading" v-bind="{id: noteId, notePosition}"/>
       <NoteStatisticsButton :noteId="noteId" />
     </div>
   </LoadingPage>
@@ -18,7 +18,7 @@ export default {
   props: { noteId: Number },
   data() {
     return {
-      breadcrumb: null,
+      notePosition: null,
       loading: true,
     };
   },
@@ -28,7 +28,7 @@ export default {
       this.loading = true
       storedApiGetNoteAndItsChildren(this.$store, this.noteId)
       .then((res) => {
-        this.breadcrumb = res.noteBreadcrumbViewedByUser;
+        this.notePosition = res.notePosition;
       }).finally(() => this.loading = false);
     },
   },
