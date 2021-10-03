@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-if="!!noteViewedByUser">
-      <NoteViewedByUserWithoutChildren
+      <NoteWithControls
         v-bind="{note, breadcrumb}"
       />
     </div>
@@ -22,7 +22,7 @@
 </template>
 
 <script setup>
-import NoteViewedByUserWithoutChildren from "../notes/NoteViewedByUserWithoutChildren.vue";
+import NoteWithControls from "../notes/NoteWithControls.vue";
 import LinkShow from "../links/LinkShow.vue";
 import LinkNob from "../links/LinkNob.vue";
 import { computed } from "@vue/reactivity";

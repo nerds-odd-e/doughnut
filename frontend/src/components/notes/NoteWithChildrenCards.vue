@@ -1,5 +1,5 @@
 <template>
-  <NoteViewedByUserWithoutChildren
+  <NoteWithControls
     v-bind="{
       id,
       note,
@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import NoteViewedByUserWithoutChildren from "./NoteViewedByUserWithoutChildren.vue";
+import NoteWithControls from "./NoteWithControls.vue";
 import NoteOwnerViewCards from "./NoteOwnerViewCards.vue";
 
 export default {
@@ -31,7 +31,7 @@ export default {
     breadcrumb: Object,
   },
   components: {
-    NoteViewedByUserWithoutChildren,
+    NoteWithControls,
     NoteOwnerViewCards,
   },
   computed: {

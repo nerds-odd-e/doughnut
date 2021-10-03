@@ -17,14 +17,14 @@
 </template>
 
 <script>
-import NoteViewedByUserWithoutChildren from "../notes/NoteViewedByUserWithoutChildren.vue";
+import NoteWithControls from "../notes/NoteWithControls.vue";
 import LinkShow from "../links/LinkShow.vue";
 
 export default {
   name: "ShowReviewPoint",
   props: { noteViewedByUser: Object, linkViewedByUser: Object },
   components: {
-    NoteViewedByUserWithoutChildren,
+    NoteWithControls,
     LinkShow,
   },
 };

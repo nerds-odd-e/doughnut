@@ -20,7 +20,7 @@ import BazaarNoteButtons from "../bazaar/BazaarNoteButtons.vue";
 import NoteButtons from "./NoteButtons.vue";
 
 export default {
-  name: "NoteViewedByUserWithoutChildren",
+  name: "NoteWithControls",
   props: {
     id: Number,
     note: Object,
