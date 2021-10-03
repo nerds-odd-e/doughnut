@@ -2,7 +2,7 @@
   <div class="row">
     <div class="col-12 col-md-4 link-source">
       <LinkNoteShow
-        :noteViewedByUser="sourceNoteWithPosition"
+        v-bind="sourceNoteWithPosition"
       />
     </div>
     <div class="col-12 col-md-4 text-center">
@@ -10,7 +10,7 @@
     </div>
     <div class="col-12 col-md-4 link-target">
       <LinkNoteShow
-        :noteViewedByUser="targetNoteWithPosition"
+        v-bind="targetNoteWithPosition"
       />
     </div>
   </div>

@@ -41,7 +41,7 @@ public class LinkViewedByUserTest {
             value = new NoteWithPosition(){{
                 NoteViewedByUser noteViewedByUser = note1.jsonObjectViewedBy1(null);
                 noteViewedByUser.setLinks(links);
-                setNoteItself(noteViewedByUser);
+                setNote(noteViewedByUser);
             }};
 
         }

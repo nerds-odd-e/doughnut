@@ -128,7 +128,7 @@ public class Note {
     @JsonIgnore
     public NoteWithPosition jsonObjectViewedBy(User viewer) {
         NoteWithPosition nvb = new NoteWithPosition();
-        nvb.setNoteItself(jsonObjectViewedBy1(viewer));
+        nvb.setNote(jsonObjectViewedBy1(viewer));
         nvb.setNotePosition(jsonNotePosition(viewer));
         return nvb;
     }

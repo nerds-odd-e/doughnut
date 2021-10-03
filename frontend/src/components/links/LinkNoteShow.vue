@@ -1,12 +1,6 @@
 <template>
-  <Breadcrumb
-    v-bind="{
-      owns: true,
-      ancestors: noteViewedByUser.ancestors,
-      notebook: noteViewedByUser.notebook,
-    }"
-  />
-  <Card :note="noteViewedByUser.noteItself">
+  <Breadcrumb v-bind="notePosition" />
+  <Card :note="noteItself">
     <template #button="{ note }">
       <button
         class="source_btn btn btn-sm btn-secondary"
@@ -18,9 +12,9 @@
       </button>
     </template>
   </Card>
-  <div :id="`note-collapse-${noteViewedByUser.noteItself.id}`" class="collapse">
+  <div :id="`note-collapse-${noteItself.id}`" class="collapse">
     <NoteWithLinks
-      v-bind="noteViewedByUser.noteItself"/>
+      v-bind="noteItself"/>
   </div>
 </template>
 
@@ -31,7 +25,7 @@ import Card from "../notes/Card.vue";
 
 export default {
   name: "LinkNoteShow",
-  props: { noteViewedByUser: Object },
+  props: { noteItself: Object, notePosition: Object },
   components: { Breadcrumb, NoteWithLinks, Card },
 };
 </script>
