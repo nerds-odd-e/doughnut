@@ -76,6 +76,7 @@ When("I add a note {string} under {string}", (noteTitle, parentNoteTitle) => {
   cy.findByText(parentNoteTitle).click();
   cy.clickAddChildNoteButton();
   cy.submitNoteFormsWith([{ Title: noteTitle }]);
+  cy.findByText(noteTitle).should("be.visible");
 });
 
 When(
