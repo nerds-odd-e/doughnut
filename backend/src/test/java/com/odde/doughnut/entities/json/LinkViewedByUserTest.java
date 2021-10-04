@@ -50,7 +50,7 @@ public class LinkViewedByUserTest {
         public void directLink() throws JsonProcessingException {
             linkViewedByUser.setDirect(Collections.singletonList(link));
             Map<String, Object> deserialized = getJsonString(value);
-            final Map<String, Object> noteItself = (Map<String, Object>)deserialized.get("noteItself");
+            final Map<String, Object> noteItself = (Map<String, Object>)deserialized.get("note");
             final Object o = noteItself.get("links");
             assertThat(o.toString(), containsString(note2.getTitle()));
             assertThat(o.toString(), not(containsString("noteContent")));
@@ -62,7 +62,7 @@ public class LinkViewedByUserTest {
         public void reverseLink() throws JsonProcessingException {
             linkViewedByUser.setReverse(Collections.singletonList(link));
             Map<String, Object> deserialized = getJsonString(value);
-            final Map<String, Object> noteItself = (Map<String, Object>)deserialized.get("noteItself");
+            final Map<String, Object> noteItself = (Map<String, Object>)deserialized.get("note");
             final Object o = noteItself.get("links");
             assertThat(o.toString(), containsString(note1.getTitle()));
             assertThat(o.toString(), not(containsString("noteContent")));

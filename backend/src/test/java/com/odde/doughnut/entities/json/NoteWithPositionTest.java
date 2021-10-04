@@ -37,7 +37,7 @@ public class NoteWithPositionTest {
         @Test
         public void ownershipInfo() throws JsonProcessingException {
             Map<String, Object> deserialized = getJsonString(value);
-            final Object deNote = deserialized.get("noteItself");
+            final Object deNote = deserialized.get("note");
             assertThat(deNote.toString(), not(containsString("ownership")));
         }
 
