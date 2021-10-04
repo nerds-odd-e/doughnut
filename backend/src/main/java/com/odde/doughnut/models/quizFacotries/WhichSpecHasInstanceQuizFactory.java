@@ -4,6 +4,7 @@ import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.LinkViewed;
+import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.UserModel;
 
 import java.util.ArrayList;
@@ -99,7 +100,7 @@ public class WhichSpecHasInstanceQuizFactory implements QuizQuestionFactory {
     }
 
     private void populateCandidate(QuizQuestionServant servant, List<Link> candidates, Link.LinkType specialize) {
-        candidates.add(servant.randomizer.chooseOneRandomly(link.getSourceNote().linksOfTypeThroughDirect(List.of(specialize), reviewPoint.getUser()).collect(Collectors.toUnmodifiableList())));
+        candidates.add(servant.randomizer.chooseOneRandomly(new NoteViewer(reviewPoint.getUser(), link.getSourceNote()).linksOfTypeThroughDirect(List.of(specialize))));
     }
 
     @Override

@@ -43,7 +43,7 @@ public class QuizQuestionServant {
 
     Optional<Link> chooseOneCategoryLink(User user, Link link) {
         Link result = randomizer.chooseOneRandomly(
-                link.categoryLinksOfTarget(user).collect(Collectors.toList()));
+                link.categoryLinksOfTarget(user));
         return Optional.ofNullable(result);
     }
 }

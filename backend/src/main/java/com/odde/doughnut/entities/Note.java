@@ -2,10 +2,8 @@ package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.algorithms.SiblingOrder;
-import com.odde.doughnut.entities.json.LinkViewed;
 import com.odde.doughnut.entities.json.NotePositionViewedByUser;
 import com.odde.doughnut.entities.json.NoteWithPosition;
-import com.odde.doughnut.entities.json.NoteViewedByUser;
 import com.odde.doughnut.models.NoteViewer;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,7 +16,6 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
@@ -129,7 +126,7 @@ public class Note {
     @JsonIgnore
     public NoteWithPosition jsonNoteWithPosition(User viewer) {
         NoteWithPosition nvb = new NoteWithPosition();
-        nvb.setNote(jsonObjectViewedBy(viewer));
+        nvb.setNote(new NoteViewer(viewer, this).toJsonObject());
         nvb.setNotePosition(jsonNotePosition(viewer));
         return nvb;
     }
@@ -143,18 +140,6 @@ public class Note {
         nvb.setAncestors(getAncestors());
         nvb.setOwns(viewer != null && viewer.owns(notebook));
         return nvb;
-    }
-
-    @JsonIgnore
-    public NoteViewedByUser jsonObjectViewedBy(User viewer) {
-        NoteViewer noteViewer = new NoteViewer(viewer, this);
-        return noteViewer.toJsonObject();
-    }
-
-    public Stream<Link> linksOfTypeThroughDirect(List<Link.LinkType> linkTypes, User viewer) {
-        return this.links.stream()
-                .filter(l -> l.targetVisibleAsSourceOrTo(viewer))
-                .filter(l -> linkTypes.contains(l.getLinkType()));
     }
 
     public Stream<Link> linksOfTypeThroughReverse(Link.LinkType linkType, User viewer) {

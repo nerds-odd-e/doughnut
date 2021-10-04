@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.odde.doughnut.entities.QuizQuestion.QuestionType;
+import com.odde.doughnut.models.NoteViewer;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -145,7 +146,7 @@ public class Link {
 
     @JsonIgnore
     public List<Link> getPiblingLinksOfSameLinkType(User viewer) {
-        return sourceNote.linksOfTypeThroughDirect(List.of(getLinkType()), viewer).filter(l->!l.equals(this)).collect(Collectors.toList());
+        return new NoteViewer(viewer, sourceNote).linksOfTypeThroughDirect(List.of(getLinkType())).stream().filter(l->!l.equals(this)).collect(Collectors.toList());
     }
 
     @JsonIgnore
@@ -172,8 +173,8 @@ public class Link {
     }
 
     @JsonIgnore
-    public Stream<Link> categoryLinksOfTarget(User viewer) {
-        return getTargetNote().linksOfTypeThroughDirect(List.of(LinkType.PART, LinkType.INSTANCE, LinkType.SPECIALIZE, LinkType.APPLICATION), viewer);
+    public List<Link> categoryLinksOfTarget(User viewer) {
+        return new NoteViewer(viewer, getTargetNote()).linksOfTypeThroughDirect(List.of(LinkType.PART, LinkType.INSTANCE, LinkType.SPECIALIZE, LinkType.APPLICATION));
     }
 
     @JsonIgnore

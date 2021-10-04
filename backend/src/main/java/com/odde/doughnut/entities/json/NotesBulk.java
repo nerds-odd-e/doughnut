@@ -1,6 +1,7 @@
 package com.odde.doughnut.entities.json;
 
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.UserModel;
 
 import java.util.ArrayList;
@@ -14,16 +15,16 @@ public class NotesBulk {
       NotesBulk notesBulk = new NotesBulk();
 
       notesBulk.notePosition = note.jsonNotePosition(user.getEntity());
-      notesBulk.notes.add(note.jsonObjectViewedBy(user.getEntity()));
-      note.getChildren().forEach(n-> notesBulk.notes.add(n.jsonObjectViewedBy(user.getEntity())));
+        notesBulk.notes.add(new NoteViewer(user.getEntity(), note).toJsonObject());
+      note.getChildren().forEach(n -> notesBulk.notes.add(new NoteViewer(user.getEntity(), n).toJsonObject()));
       return notesBulk;
     }
 
     public static NotesBulk jsonNoteWitheDescendants(Note note, UserModel user) {
       NotesBulk notesBulk = new NotesBulk();
       notesBulk.notePosition = note.jsonNotePosition(user.getEntity());
-      notesBulk.notes.add(note.jsonObjectViewedBy(user.getEntity()));
-      note.traverseBreadthFirst(n-> notesBulk.notes.add(n.jsonObjectViewedBy(user.getEntity())));
+        notesBulk.notes.add(new NoteViewer(user.getEntity(), note).toJsonObject());
+      note.traverseBreadthFirst(n -> notesBulk.notes.add(new NoteViewer(user.getEntity(), n).toJsonObject()));
       return notesBulk;
     }
 }

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -39,7 +40,7 @@ public class LinkViewedByUserTest {
             note2 = makeMe.aNote().under(top).description("note2description").inMemoryPlease();
             link = makeMe.aLink().between(note1, note2).inMemoryPlease();
             value = new NoteWithPosition(){{
-                NoteViewedByUser noteViewedByUser = note1.jsonObjectViewedBy(null);
+                NoteViewedByUser noteViewedByUser = new NoteViewer(null, note1).toJsonObject();
                 noteViewedByUser.setLinks(links);
                 setNote(noteViewedByUser);
             }};

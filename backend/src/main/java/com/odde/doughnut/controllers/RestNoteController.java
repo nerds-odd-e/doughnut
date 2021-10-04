@@ -8,6 +8,7 @@ import com.odde.doughnut.entities.json.NotesBulk;
 import com.odde.doughnut.entities.json.RedirectToNoteResponse;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
 import lombok.Getter;
@@ -98,7 +99,7 @@ class RestNoteController {
     noteContent.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
     note.updateNoteContent(noteContent, user.getEntity());
     modelFactoryService.noteRepository.save(note);
-    return note.jsonObjectViewedBy(user.getEntity());
+    return new NoteViewer(user.getEntity(), note).toJsonObject();
   }
 
   @GetMapping("/{note}/statistics")

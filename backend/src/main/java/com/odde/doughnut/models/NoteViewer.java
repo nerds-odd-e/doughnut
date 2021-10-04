@@ -39,10 +39,17 @@ public class NoteViewer {
     public Map<Link.LinkType, LinkViewed> getAllLinks() {
         return Arrays.stream(Link.LinkType.values())
                 .map(type->Map.entry(type, new LinkViewed() {{
-                    setDirect(note.linksOfTypeThroughDirect(List.of(type), viewer).collect(Collectors.toUnmodifiableList()));
-                            setReverse(note.linksOfTypeThroughReverse(type, viewer).collect(Collectors.toUnmodifiableList()));
+                    setDirect(linksOfTypeThroughDirect(List.of(type)));
+                            setReverse(note.linksOfTypeThroughReverse(type, viewer).collect(Collectors.toList()));
                         }}))
                 .filter(x -> x.getValue().notEmpty())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    public List<Link> linksOfTypeThroughDirect(List<Link.LinkType> linkTypes) {
+        return note.getLinks().stream()
+                .filter(l -> l.targetVisibleAsSourceOrTo(viewer))
+                .filter(l -> linkTypes.contains(l.getLinkType()))
+                .collect(Collectors.toList());
     }
 }

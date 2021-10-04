@@ -9,6 +9,7 @@ import java.util.Map;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.testability.MakeMe;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -29,7 +30,7 @@ public class NoteWithPositionTest {
             Note top = makeMe.aNote().inMemoryPlease();
             note1 = makeMe.aNote().under(top).description("note1description").inMemoryPlease();
             value = new NoteWithPosition(){{
-                setNote(note1.jsonObjectViewedBy(null));
+                setNote(new NoteViewer(null, note1).toJsonObject());
                 setNotePosition(note1.jsonNotePosition(null));
             }};
         }
