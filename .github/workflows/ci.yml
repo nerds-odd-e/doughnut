@@ -152,22 +152,22 @@ jobs:
       - name: Perform rolling replace to GCP MIG doughnut-app-group
         run: infra/scripts/perform-rolling-replace-app-mig.sh
 
-#  Slack-Notify:
-#    name: Single summary slack notification for entire workflow
-#    runs-on: ubuntu-20.04
-#    needs:
-#      [
-#        Backend-unit-tests,
-#        Frontend-linting,
-#        Frontend-unit-tests,
-#        E2E-tests,
-#        Package-n-Deploy,
-#      ]
-#    if: always()
-#    steps:
-#      - uses: technote-space/workflow-conclusion-action@v2
-#      - uses: 8398a7/action-slack@v3
-#        if: env.WORKFLOW_CONCLUSION == 'failure'
-#        with:
-#          status: failure
-#          fields: repo,commit,message,author,action,workflow,eventName
+  Slack-Notify:
+    name: Single summary slack notification for entire workflow
+    runs-on: ubuntu-20.04
+    needs:
+      [
+        Backend-unit-tests,
+        Frontend-linting,
+        Frontend-unit-tests,
+        E2E-tests,
+        Package-n-Deploy,
+      ]
+    if: always()
+    steps:
+      - uses: technote-space/workflow-conclusion-action@v2
+      - uses: 8398a7/action-slack@v3
+        if: env.WORKFLOW_CONCLUSION == 'failure'
+        with:
+          status: failure
+          fields: repo,commit,message,author,action,workflow,eventName
