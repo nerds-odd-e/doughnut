@@ -142,12 +142,6 @@ public class Note {
         return nvb;
     }
 
-    public Stream<Link> linksOfTypeThroughReverse(Link.LinkType linkType, User viewer) {
-        return refers.stream()
-                .filter(l -> l.getLinkType().equals(linkType))
-                .filter(l -> l.sourceVisibleAsTargetOrTo(viewer));
-    }
-
     public String getNotePicture() {
         if (noteContent.getUseParentPicture() && getParentNote() != null) {
             return getParentNote().getNotePicture();

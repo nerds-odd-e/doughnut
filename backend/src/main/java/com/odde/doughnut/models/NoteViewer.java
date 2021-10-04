@@ -10,6 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class NoteViewer {
 
@@ -40,8 +41,8 @@ public class NoteViewer {
         return Arrays.stream(Link.LinkType.values())
                 .map(type->Map.entry(type, new LinkViewed() {{
                     setDirect(linksOfTypeThroughDirect(List.of(type)));
-                            setReverse(note.linksOfTypeThroughReverse(type, viewer).collect(Collectors.toList()));
-                        }}))
+                    setReverse(linksOfTypeThroughReverse(type).collect(Collectors.toList()));
+                }}))
                 .filter(x -> x.getValue().notEmpty())
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
@@ -51,5 +52,11 @@ public class NoteViewer {
                 .filter(l -> l.targetVisibleAsSourceOrTo(viewer))
                 .filter(l -> linkTypes.contains(l.getLinkType()))
                 .collect(Collectors.toList());
+    }
+
+    public Stream<Link> linksOfTypeThroughReverse(Link.LinkType linkType) {
+        return note.getRefers().stream()
+                .filter(l -> l.getLinkType().equals(linkType))
+                .filter(l -> l.sourceVisibleAsTargetOrTo(viewer));
     }
 }

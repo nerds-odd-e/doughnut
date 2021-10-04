@@ -136,7 +136,7 @@ public class Link {
 
     @JsonIgnore
     public List<Link> getCousinLinksOfSameLinkType(User viewer) {
-        return targetNote.linksOfTypeThroughReverse(getLinkType(), viewer).filter(l->!l.equals(this)).collect(Collectors.toList());
+        return new NoteViewer(viewer, targetNote).linksOfTypeThroughReverse(getLinkType()).filter(l->!l.equals(this)).collect(Collectors.toList());
     }
 
     @JsonIgnore
@@ -180,7 +180,7 @@ public class Link {
     @JsonIgnore
     public List<Link> getReverseLinksOfCousins(User user, LinkType linkType) {
         return getCousinLinksOfSameLinkType(user).stream()
-                .flatMap(p -> p.getSourceNote().linksOfTypeThroughReverse(linkType, user))
+                .flatMap(p -> new NoteViewer(user, p.getSourceNote()).linksOfTypeThroughReverse(linkType))
                 .collect(Collectors.toList());
     }
 
