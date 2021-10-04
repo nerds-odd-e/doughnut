@@ -32,8 +32,8 @@ public class NoteAsTreeNodeTest {
 
         @Test
         void topLevelNoteHaveEmptyAncestors() {
-            List<Note> ancestors = topLevel.getAncestorsIncludingMe();
-            assertThat(ancestors, contains(topLevel));
+            List<Note> ancestors = topLevel.getAncestors();
+            assertThat(ancestors, empty());
         }
 
         @Test
@@ -41,8 +41,8 @@ public class NoteAsTreeNodeTest {
             Note subject = makeMe.aNote("subject").under(topLevel).please();
             Note sibling = makeMe.aNote("sibling").under(topLevel).please();
 
-            List<Note> ancestry = subject.getAncestorsIncludingMe();
-            assertThat(ancestry, contains(topLevel, subject));
+            List<Note> ancestry = subject.getAncestors();
+            assertThat(ancestry, contains(topLevel));
             assertThat(ancestry, not(contains(sibling)));
         }
     }

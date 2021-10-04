@@ -110,9 +110,9 @@ public class NoteMotionModelTest {
         @Test
         void moveWithOwnChild() throws CyclicLinkDetectedException {
             move(firstChild, secondChild, true);
-            assertThat(firstChild.getAncestorsIncludingMe(), contains(topNote, secondChild, firstChild));
-            assertThat(thirdLevel.getAncestorsIncludingMe(), contains(topNote, secondChild, firstChild, thirdLevel));
-            assertThat(forthLevel.getAncestorsIncludingMe(), contains(topNote, secondChild, firstChild, thirdLevel, forthLevel));
+            assertThat(firstChild.getAncestors(), contains(topNote, secondChild));
+            assertThat(thirdLevel.getAncestors(), contains(topNote, secondChild, firstChild));
+            assertThat(forthLevel.getAncestors(), contains(topNote, secondChild, firstChild, thirdLevel));
         }
 
     }

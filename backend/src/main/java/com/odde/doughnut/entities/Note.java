@@ -117,20 +117,11 @@ public class Note {
         return noteContent.getShortDescription();
     }
 
-    @JsonIgnore
-    public List<Note> getTargetNotes() {
-        return links.stream().map(Link::getTargetNote).collect(toList());
-    }
-
     public String getNotePicture() {
         if (noteContent.getUseParentPicture() && getParentNote() != null) {
             return getParentNote().getNotePicture();
         }
         return noteContent.getNotePicture();
-    }
-
-    public boolean isHead() {
-        return getParentNote() == null;
     }
 
     private void addAncestors(List<Note> ancestors) {
@@ -148,16 +139,10 @@ public class Note {
     public void setParentNote(Note parentNote) {
         if (parentNote == null) return;
         notebook = parentNote.getNotebook();
-        List<Note> ancestorsIncludingMe = parentNote.getAncestorsIncludingMe();
-        Collections.reverse(ancestorsIncludingMe);
-        addAncestors(ancestorsIncludingMe);
-    }
-
-    @JsonIgnore
-    public List<Note> getAncestorsIncludingMe() {
-        List<Note> ancestors = getAncestors();
-        ancestors.add(this);
-        return ancestors;
+        List<Note> ancestors = parentNote.getAncestors();
+        ancestors.add(parentNote);
+        Collections.reverse(ancestors);
+        addAncestors(ancestors);
     }
 
     @JsonIgnore
@@ -266,7 +251,7 @@ public class Note {
     }
 
     @JsonIgnore
-    public Note getGrandAsPossilbe() {
+    public Note getGrandAsPossible() {
         Note grand = this;
         for(int i = 0; i < 2; i ++)
             if(grand.getParentNote() != null)
@@ -279,4 +264,3 @@ public class Note {
         this.getNoteContent().setUpdatedAt(currentUTCTimestamp);
     }
 }
-

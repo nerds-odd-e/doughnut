@@ -126,7 +126,7 @@ public class NoteTest {
         @Test
         void targetIsEmptyByDefault() {
             Note note = user.getNotes().get(0);
-            assertThat(note.getTargetNotes(), is(empty()));
+            assertThat(note.getLinks(), is(empty()));
         }
 
         @Test
@@ -134,7 +134,7 @@ public class NoteTest {
             Note note = user.getNotes().get(0);
             Note targetNote = user.getNotes().get(1);
             makeMe.theNote(note).linkTo(targetNote).please();
-            List<Note> targetNotes = note.getTargetNotes();
+            List<Note> targetNotes = note.getLinks().stream().map(Link::getTargetNote).collect(toList());
             assertThat(targetNotes, hasSize(equalTo(1)));
             assertThat(targetNotes, contains(targetNote));
         }

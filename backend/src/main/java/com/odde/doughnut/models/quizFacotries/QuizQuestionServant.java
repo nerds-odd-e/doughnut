@@ -30,7 +30,7 @@ public class QuizQuestionServant {
         List<Note> list = answerNote.getSiblings().stream().filter(notePredicate).collect(Collectors.toList());
         if (list.size() > 1) return list;
 
-        return answerNote.getGrandAsPossilbe().getDescendantNCs().stream().map(NotesClosure::getNote).filter(notePredicate).collect(Collectors.toList());
+        return answerNote.getGrandAsPossible().getDescendantNCs().stream().map(NotesClosure::getNote).filter(notePredicate).collect(Collectors.toList());
     }
 
     List<Note> randomlyChooseAndEnsure(List<Note> candidates, Note ensure, int maxSize) {
