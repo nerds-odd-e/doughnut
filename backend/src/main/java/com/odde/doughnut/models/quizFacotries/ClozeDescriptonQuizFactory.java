@@ -4,6 +4,7 @@ import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.LinkViewed;
+import com.odde.doughnut.models.NoteViewer;
 
 import java.util.List;
 import java.util.Map;
@@ -40,7 +41,7 @@ public abstract class ClozeDescriptonQuizFactory implements QuizQuestionFactory 
 
     @Override
     public Map<Link.LinkType, LinkViewed> generateHintLinks() {
-        return answerNote.getAllLinks(reviewPoint.getUser()).entrySet().stream()
+        return new NoteViewer(reviewPoint.getUser(), answerNote).getAllLinks().entrySet().stream()
                 .filter(x -> Link.LinkType.openTypes().anyMatch((y)->x.getKey().equals(y)))
                 .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }

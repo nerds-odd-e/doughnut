@@ -6,6 +6,7 @@ import com.odde.doughnut.entities.json.LinkViewed;
 import com.odde.doughnut.entities.json.NotePositionViewedByUser;
 import com.odde.doughnut.entities.json.NoteWithPosition;
 import com.odde.doughnut.entities.json.NoteViewedByUser;
+import com.odde.doughnut.models.NoteViewer;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.WhereJoinTable;
@@ -146,27 +147,8 @@ public class Note {
 
     @JsonIgnore
     public NoteViewedByUser jsonObjectViewedBy(User viewer) {
-        NoteViewedByUser nvb = new NoteViewedByUser();
-        nvb.setId(getId());
-        nvb.setParentId(getParentId());
-        nvb.setTitle(getTitle());
-        nvb.setShortDescription(getShortDescription());
-        nvb.setNotePicture(getNotePicture());
-        nvb.setCreatedAt(getCreatedAt());
-        nvb.setNoteContent(getNoteContent());
-        nvb.setLinks(getAllLinks(viewer));
-        nvb.setChildrenIds(children.stream().map(Note::getId).collect(Collectors.toUnmodifiableList()));
-        return nvb;
-    }
-
-    public Map<Link.LinkType, LinkViewed> getAllLinks(User viewer) {
-        return Arrays.stream(Link.LinkType.values())
-                .map(type->Map.entry(type, new LinkViewed() {{
-                    setDirect(linksOfTypeThroughDirect(List.of(type), viewer).collect(Collectors.toUnmodifiableList()));
-                            setReverse(linksOfTypeThroughReverse(type, viewer).collect(Collectors.toUnmodifiableList()));
-                        }}))
-                .filter(x -> x.getValue().notEmpty())
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+        NoteViewer noteViewer = new NoteViewer(viewer, this);
+        return noteViewer.toJsonObject();
     }
 
     public Stream<Link> linksOfTypeThroughDirect(List<Link.LinkType> linkTypes, User viewer) {
