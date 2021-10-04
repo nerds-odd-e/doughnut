@@ -4,7 +4,9 @@ import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.json.LinkViewed;
+import com.odde.doughnut.entities.json.NotePositionViewedByUser;
 import com.odde.doughnut.entities.json.NoteViewedByUser;
+import com.odde.doughnut.entities.json.NoteWithPosition;
 
 import java.util.Arrays;
 import java.util.List;
@@ -58,5 +60,22 @@ public class NoteViewer {
         return note.getRefers().stream()
                 .filter(l -> l.getLinkType().equals(linkType))
                 .filter(l -> l.sourceVisibleAsTargetOrTo(viewer));
+    }
+
+    public NotePositionViewedByUser jsonNotePosition(Note note) {
+        NotePositionViewedByUser nvb = new NotePositionViewedByUser();
+        nvb.setNoteId(note.getId());
+        nvb.setTitle(note.getTitle());
+        nvb.setNotebook(note.getNotebook());
+        nvb.setAncestors(note.getAncestors());
+        nvb.setOwns(viewer != null && viewer.owns(note.getNotebook()));
+        return nvb;
+    }
+
+    public NoteWithPosition jsonNoteWithPosition(Note note) {
+        NoteWithPosition nvb = new NoteWithPosition();
+        nvb.setNote(toJsonObject());
+        nvb.setNotePosition(jsonNotePosition(note));
+        return nvb;
     }
 }

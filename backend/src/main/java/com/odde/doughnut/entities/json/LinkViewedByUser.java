@@ -1,6 +1,8 @@
 package com.odde.doughnut.entities.json;
 
 import com.odde.doughnut.entities.Link;
+import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.UserModel;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,8 +29,10 @@ public class LinkViewedByUser {
 
     public static LinkViewedByUser from(Link link, UserModel user) {
         LinkViewedByUser linkViewedByUser = new LinkViewedByUser();
-        linkViewedByUser.setSourceNoteWithPosition(link.getSourceNote().jsonNoteWithPosition(user.getEntity()));
-        linkViewedByUser.setTargetNoteWithPosition(link.getTargetNote().jsonNoteWithPosition(user.getEntity()));
+        Note note1 = link.getSourceNote();
+        linkViewedByUser.setSourceNoteWithPosition(new NoteViewer(user.getEntity(), note1).jsonNoteWithPosition(note1));
+        Note note = link.getTargetNote();
+        linkViewedByUser.setTargetNoteWithPosition(new NoteViewer(user.getEntity(), note).jsonNoteWithPosition(note));
         linkViewedByUser.setLinkTypeLabel(link.getLinkTypeLabel());
         linkViewedByUser.setTypeId(link.getLinkType().id);
         linkViewedByUser.setId(link.getId());

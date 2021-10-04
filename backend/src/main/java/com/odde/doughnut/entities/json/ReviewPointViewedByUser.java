@@ -1,6 +1,7 @@
 package com.odde.doughnut.entities.json;
 
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.UserModel;
 import lombok.Getter;
 import lombok.Setter;
@@ -28,7 +29,8 @@ public class ReviewPointViewedByUser {
 
         result.setReviewPoint(reviewPoint);
         if (reviewPoint.getNote() != null) {
-            result.setNoteWithPosition(reviewPoint.getNote().jsonNoteWithPosition(user.getEntity()));
+            Note note = reviewPoint.getNote();
+            result.setNoteWithPosition(new NoteViewer(user.getEntity(), note).jsonNoteWithPosition(note));
             result.setReviewSetting(getReviewSetting(reviewPoint.getNote()));
         }
         else {

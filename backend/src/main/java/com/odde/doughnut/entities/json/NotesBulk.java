@@ -14,7 +14,7 @@ public class NotesBulk {
     public static NotesBulk jsonNoteWithChildren(Note note, UserModel user) {
       NotesBulk notesBulk = new NotesBulk();
 
-      notesBulk.notePosition = note.jsonNotePosition(user.getEntity());
+        notesBulk.notePosition = new NoteViewer(user.getEntity(), note).jsonNotePosition(note);
         notesBulk.notes.add(new NoteViewer(user.getEntity(), note).toJsonObject());
       note.getChildren().forEach(n -> notesBulk.notes.add(new NoteViewer(user.getEntity(), n).toJsonObject()));
       return notesBulk;
@@ -22,7 +22,7 @@ public class NotesBulk {
 
     public static NotesBulk jsonNoteWitheDescendants(Note note, UserModel user) {
       NotesBulk notesBulk = new NotesBulk();
-      notesBulk.notePosition = note.jsonNotePosition(user.getEntity());
+        notesBulk.notePosition = new NoteViewer(user.getEntity(), note).jsonNotePosition(note);
         notesBulk.notes.add(new NoteViewer(user.getEntity(), note).toJsonObject());
       note.traverseBreadthFirst(n -> notesBulk.notes.add(new NoteViewer(user.getEntity(), n).toJsonObject()));
       return notesBulk;

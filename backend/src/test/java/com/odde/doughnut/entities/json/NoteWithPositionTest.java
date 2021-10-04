@@ -31,7 +31,7 @@ public class NoteWithPositionTest {
             note1 = makeMe.aNote().under(top).description("note1description").inMemoryPlease();
             value = new NoteWithPosition(){{
                 setNote(new NoteViewer(null, note1).toJsonObject());
-                setNotePosition(note1.jsonNotePosition(null));
+                setNotePosition(new NoteViewer(null, note1).jsonNotePosition(note1));
             }};
         }
 

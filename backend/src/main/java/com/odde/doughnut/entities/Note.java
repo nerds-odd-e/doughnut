@@ -2,9 +2,6 @@ package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.algorithms.SiblingOrder;
-import com.odde.doughnut.entities.json.NotePositionViewedByUser;
-import com.odde.doughnut.entities.json.NoteWithPosition;
-import com.odde.doughnut.models.NoteViewer;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.WhereJoinTable;
@@ -14,9 +11,11 @@ import javax.persistence.*;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
-import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 
@@ -121,25 +120,6 @@ public class Note {
     @JsonIgnore
     public List<Note> getTargetNotes() {
         return links.stream().map(Link::getTargetNote).collect(toList());
-    }
-
-    @JsonIgnore
-    public NoteWithPosition jsonNoteWithPosition(User viewer) {
-        NoteWithPosition nvb = new NoteWithPosition();
-        nvb.setNote(new NoteViewer(viewer, this).toJsonObject());
-        nvb.setNotePosition(jsonNotePosition(viewer));
-        return nvb;
-    }
-
-    @JsonIgnore
-    public NotePositionViewedByUser jsonNotePosition(User viewer) {
-        NotePositionViewedByUser nvb = new NotePositionViewedByUser();
-        nvb.setNoteId(getId());
-        nvb.setTitle(getTitle());
-        nvb.setNotebook(notebook);
-        nvb.setAncestors(getAncestors());
-        nvb.setOwns(viewer != null && viewer.owns(notebook));
-        return nvb;
     }
 
     public String getNotePicture() {
