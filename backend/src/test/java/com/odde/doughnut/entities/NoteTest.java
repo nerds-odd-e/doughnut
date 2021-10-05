@@ -139,4 +139,16 @@ public class NoteTest {
             assertThat(targetNotes, contains(targetNote));
         }
     }
+
+    @Nested
+    class NoteWithVersion {
+        private final Note note = makeMe.aNote().inMemoryPlease();
+
+        @Test
+        void thereShouldBeVersions() {
+            List<NoteVersion> versions = note.getVersions();
+            assertThat(versions, hasSize(1));
+//            assertThat(versions.get(0), notNullValue());
+        }
+    }
 }
