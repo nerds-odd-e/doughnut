@@ -97,3 +97,7 @@ Given("I navigate to an existing circle {string} I belong to",
     cy.navigateToCircle(circleName);
 });
 
+Given("a notebook already exists in the circle",
+    () => {
+        cy.createNotebook("Test notebook", "Notebook description");
+    });
