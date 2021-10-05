@@ -52,3 +52,13 @@ Cypress.Commands.add("randomizerAlwaysChooseLast", (day, hour) => {
     .its("status")
     .should("equal", 200);
 });
+
+Cypress.Commands.add("seedCircle", (circle) => {
+  cy.request({
+    method: "POST",
+    url: `/api/testability/seed_circle`,
+    body: circle,
+  }).then((response) => {
+    expect(response.body).to.equal("OK");
+  });
+});
