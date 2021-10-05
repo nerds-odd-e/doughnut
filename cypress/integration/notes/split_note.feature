@@ -9,14 +9,17 @@ Feature: split note
       | 2.    |                      |
       | 3     | building.            |
       | 4.    | Any description here |
-  @Ignore
+
+  @ignore
   Scenario: Each note has as title the first line
     When I split the note
     Then we create two child notes with the first lines of each paragraph as title.
-  @Ignore
+
+  @ignore
   Scenario: Each note has as title the first line and the second line also has description
     When I split the note
-  @Ignore
+
+  @ignore
   Scenario: Each note has as title the first line and the second line also has description
     Given a note with a description like this:
       | line |.  content |
@@ -27,7 +30,8 @@ Feature: split note
       | 5.   |           |
     When I split the note
     Then we create only one child note with the first lines of the paragraph as title.
-  @Ignore
+
+  @ignore
   Scenario: Each note has as title the first line and the second line also has description
     Given a note without description
     When I split the note
