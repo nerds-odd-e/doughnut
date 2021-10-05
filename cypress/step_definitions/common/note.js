@@ -221,3 +221,54 @@ Then("I should see {string} is newer than {string}", (newer, older) => {
       )
     );
 });
+
+
+
+
+
+When("I split the note", () => {
+  //cy.findByText("Full view mode").click();
+});
+
+Then("we create two child notes with the first lines of each paragraph as title.", (noteTitle) => {
+  //cy.expectNoteTitle(noteTitle);
+});
+
+
+
+
+When("Each note has as title the first line and the second line also has description", () => {
+  //cy.findByText("Full view mode").click();
+});
+
+
+
+Given("a note with a description like this:", (data) => {
+  //cy.seedNotes(data.hashes());
+});
+
+When("I split the note", () => {
+  //cy.findByText("Full view mode").click();
+});
+
+Then("we create only one child note with the first lines of the paragraph as title.", (noteTitle) => {
+  //cy.expectNoteTitle(noteTitle);
+});
+
+
+
+
+
+Given("a note without description", (data) => {
+  //cy.seedNotes(data.hashes());
+});
+
+When("I split the note", () => {
+  //cy.findByText("Full view mode").click();
+});
+
+Then("we don't split it", (noteTitle) => {
+  //cy.expectNoteTitle(noteTitle);
+});
+
+

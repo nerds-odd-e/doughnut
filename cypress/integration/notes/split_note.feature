@@ -3,15 +3,13 @@ Feature: split note
   where a paragraph is a group of lines, separated by empty lines.
 
   Background:
-    Given a note with a description like this
-      | line  |.  content            |
-      | 1.    | animal               |
-      | 2.    |                      |
-      | 3     | building.            |
-      | 4.    | Any description here |
+    Given I've logged in as an existing user
 
   @ignore
   Scenario: Each note has as title the first line
+    When I create top level note with:
+      | Title    | Description  |
+      | PARENT NODE | Note1\nMY NOTE 1\n\nNote2\nMY NOTE 2 |
     When I split the note
     Then we create two child notes with the first lines of each paragraph as title.
 
