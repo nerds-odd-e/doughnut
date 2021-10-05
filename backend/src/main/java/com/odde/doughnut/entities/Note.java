@@ -82,6 +82,13 @@ public class Note {
     @Setter
     private List<NotesClosure> notesClosures = new ArrayList<>();
 
+//    @OneToMany(mappedBy = "note", cascade = CascadeType.ALL)
+//    @JsonIgnore
+//    @OrderBy("id DESC")
+//    @Getter
+//    @Setter
+//    private List<NoteVersion> noteVersions = new ArrayList<>();
+
     @OneToMany(mappedBy = "ancestor", cascade = CascadeType.DETACH)
     @JsonIgnore
     @OrderBy("depth")
@@ -122,6 +129,11 @@ public class Note {
             return getParentNote().getNotePicture();
         }
         return noteContent.getNotePicture();
+    }
+
+
+    public boolean isHead() {
+        return getParentNote() == null;
     }
 
     private void addAncestors(List<Note> ancestors) {
@@ -263,4 +275,11 @@ public class Note {
         this.createdAt = currentUTCTimestamp;
         this.getNoteContent().setUpdatedAt(currentUTCTimestamp);
     }
+
+    public List<NoteVersion> getVersions() {
+        List<NoteVersion> result = new ArrayList<NoteVersion>();
+        result.add(null);
+        return result;
+    }
 }
+
