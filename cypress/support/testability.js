@@ -52,3 +52,23 @@ Cypress.Commands.add("randomizerAlwaysChooseLast", (day, hour) => {
     .its("status")
     .should("equal", 200);
 });
+
+Cypress.Commands.add("seedCircle", (circle) => {
+  cy.request({
+    method: "POST",
+    url: `/api/testability/seed_circle`,
+    body: circle,
+  }).then((response) => {
+    expect(response.body).to.equal("OK");
+  });
+});
+
+Cypress.Commands.add("createNotebook", (title, description) => {
+  cy.request({
+    method: "POST",
+    url: `/api/notebooks/create?title=${title}&description=${description}`,
+  }).then((response) => {
+    expect(response.status).to.equal(200);
+    cy.wrap(response.body).as("notebookId");
+  });
+});

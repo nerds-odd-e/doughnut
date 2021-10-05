@@ -86,3 +86,18 @@ When(
     cy.subscribeToNote(noteTitle, count);
   }
 );
+
+Given("I've logged in as an existing user", () => {
+    cy.loginAs("old_learner");
+});
+
+Given("I navigate to an existing circle {string} I belong to",
+    (circleName) => {
+    cy.seedCircle({ circleName: `${circleName}`, members: "old_learner" })
+    cy.navigateToCircle(circleName);
+});
+
+Given("a notebook already exists in the circle",
+    () => {
+        cy.createNotebook("Test notebook", "Notebook description");
+    });
