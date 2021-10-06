@@ -64,6 +64,8 @@ For more background info you can read:
 ./gradlew bootRunTest
 ```
 
+- Rerun it each time you reset the database.
+
 #### Run full backend unit tests suite
 
 - From doughnut source root directory:
