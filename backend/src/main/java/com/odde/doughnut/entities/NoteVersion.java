@@ -15,5 +15,4 @@ public class NoteVersion {
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "note_id", referencedColumnName = "id")
     @Getter @Setter private Note note;
-
 }

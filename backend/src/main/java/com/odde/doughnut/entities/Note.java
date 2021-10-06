@@ -107,6 +107,15 @@ public class Note {
     @Getter
     private final List<Note> children = new ArrayList<>();
 
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinTable(name = "note_version", joinColumns = {
+            @JoinColumn(name = "note_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)},
+            inverseJoinColumns = {
+            @JoinColumn(name = "note_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
+    })
+    @Getter
+    private final List<NoteVersion> noteVersion = new ArrayList<>();
+
     public static Note createNote(User user, NoteContent noteContent, Timestamp currentUTCTimestamp) throws IOException {
         final Note note = new Note();
         note.updateNoteContent(noteContent, user);
@@ -274,12 +283,6 @@ public class Note {
     public void setCreatedAtAndUpdatedAt(Timestamp currentUTCTimestamp) {
         this.createdAt = currentUTCTimestamp;
         this.getNoteContent().setUpdatedAt(currentUTCTimestamp);
-    }
-
-    public List<NoteVersion> getVersions() {
-        List<NoteVersion> result = new ArrayList<NoteVersion>();
-        result.add(new NoteVersion());
-        return result;
     }
 }
 
