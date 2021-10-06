@@ -48,13 +48,7 @@ When(
 Given(
   "There is a circle {string} with {string} members",
   (circleName, members) => {
-    cy.request({
-      method: "POST",
-      url: `/api/testability/seed_circle`,
-      body: { circleName, members },
-    }).then((response) => {
-      expect(response.status).to.equal(200);
-    });
+    cy.seedCircle({circleName: circleName, members: members})
   }
 );
 
