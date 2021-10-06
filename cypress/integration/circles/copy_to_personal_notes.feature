@@ -2,14 +2,14 @@ Feature: Copy a circle notebook to personal notes
   As a user I want to create a copy of a notebook from the circle into my personal notes.
 
   Background:
-    Given I've logged in as an existing user
+    Given I've logged in as the existing user "old_learner"
     And I navigate to an existing circle "Odd-e SG Team" where the "old_learner" and "another_old_learner" users belong to
-    And a notebook already exists in the circle
+    And the notebook "Test notebook" already exists in the circle
 
   @ignore
   Scenario: User 1 wants to have his own notes
     Given Two users sharing a notebook
-    When one user makes a copy of the notebook
+    When the user "old_learner" makes a copy of the existing notebook "Test notebook"
     Then the user has a copy of the notebook in his private notes
 
   @ignore

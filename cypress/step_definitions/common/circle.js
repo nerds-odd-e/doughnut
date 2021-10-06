@@ -91,7 +91,12 @@ Given("I navigate to an existing circle {string} where the {string} and {string}
     cy.navigateToCircle(circleName);
   });
 
-Given("a notebook already exists in the circle",
-  () => {
-    cy.createNotebook("Test notebook", "Notebook description");
+Given("the notebook {string} already exists in the circle",
+  (notebookName) => {
+    cy.createNotebook(`${notebookName}`, "Notebook description");
+  });
+
+When("the user {string} makes a copy of the existing notebook {string}",
+  (user, notebookName) => {
+    cy.copyNotebook(user, notebookName)
   });
