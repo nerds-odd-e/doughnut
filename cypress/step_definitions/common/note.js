@@ -225,6 +225,7 @@ Then("I should see {string} is newer than {string}", (newer, older) => {
 When("I am splitting note {string}",
   (noteTitle, data) => {
     cy.clickNotePageButton(noteTitle, "split note");
+    cy.findByRole("button", { name: "OK" }).click();
   }
 );
 
