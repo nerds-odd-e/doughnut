@@ -1,16 +1,16 @@
 <template>
   <button class="btn btn-small" title="split note" @click="showDialog()">
-    <SvgEdit />
+    <SvgSplitNote />
   </button>
 </template>
 
 <script>
-import SvgEdit from "../svgs/SvgEdit.vue";
+import SvgSplitNote from "../svgs/SvgSplitNote.vue";
 
 export default {
   name: "NoteSplitButton",
   components: {
-    SvgEdit,
+    SvgSplitNote,
   },
   props: { noteId: Number },
   methods: {

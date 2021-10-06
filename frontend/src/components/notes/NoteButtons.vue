@@ -24,12 +24,12 @@
       :oldTitle="note.title"
     />
 
-    <NoteSplitButton
-      :noteId="note.id"
-      :oldTitle="note.title"
-    />
 
     <LinkNoteButton :note="note"/>
+    <NoteSplitButton
+        :noteId="note.id"
+        :oldTitle="note.title"
+    />
     <a
       class="btn btn-light dropdown-toggle"
       data-bs-toggle="dropdown"
