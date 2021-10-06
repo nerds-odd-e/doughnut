@@ -278,7 +278,7 @@ public class Note {
 
     public List<NoteVersion> getVersions() {
         List<NoteVersion> result = new ArrayList<NoteVersion>();
-        result.add(null);
+        result.add(new NoteVersion());
         return result;
     }
 }

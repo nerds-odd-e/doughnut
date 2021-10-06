@@ -148,7 +148,6 @@ public class NoteTest {
         void thereShouldBeVersions() {
             List<NoteVersion> versions = note.getVersions();
             assertThat(versions, hasSize(1));
-//            assertThat(versions.get(0), notNullValue());
         }
     }
 }
