@@ -23,6 +23,12 @@
       :noteId="note.id"
       :oldTitle="note.title"
     />
+
+    <NoteSplitButton
+      :noteId="note.id"
+      :oldTitle="note.title"
+    />
+
     <LinkNoteButton :note="note"/>
     <a
       class="btn btn-light dropdown-toggle"
@@ -61,6 +67,7 @@ import SvgRemove from "../svgs/SvgRemove.vue";
 import LinkNoteButton from "../links/LinkNoteButton.vue";
 import ReviewSettingEditButton from "../review/ReviewSettingEditButton.vue";
 import NoteEditButton from "./NoteEditButton.vue";
+import NoteSplitButton from "./NoteSplitButton.vue";
 import NoteNewButton from "./NoteNewButton.vue";
 import { restPost } from "../../restful/restful";
 export default {
@@ -74,6 +81,7 @@ export default {
     SvgRemove,
     LinkNoteButton,
     NoteEditButton,
+    NoteSplitButton,
     NoteNewButton,
   },
 

@@ -222,13 +222,11 @@ Then("I should see {string} is newer than {string}", (newer, older) => {
     );
 });
 
-
-
-
-
-When("I split the note", () => {
-  //cy.findByText("Full view mode").click();
-});
+When("I am splitting note {string}",
+  (noteTitle, data) => {
+    cy.clickNotePageButton(noteTitle, "split note");
+  }
+);
 
 Then("we create two child notes with the first lines of each paragraph as title.", (noteTitle) => {
   //cy.expectNoteTitle(noteTitle);
@@ -270,5 +268,3 @@ When("I split the note", () => {
 Then("we don't split it", (noteTitle) => {
   //cy.expectNoteTitle(noteTitle);
 });
-
-
