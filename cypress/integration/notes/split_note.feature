@@ -7,7 +7,11 @@ Feature: split note
 
   @ignore
   Scenario: Each note has as title the first line and the second line also has description
-    When I split the note
+    Given there are some notes for the current user
+      | title    | description               |
+      | Split note LeSS in Action | Note1\nMY NOTE 1\n\nNote2\nMY NOTE 2 |
+    When I am splitting note "Split note LeSS in Action"
+    Then The second line of the description is in the note description
 
   @ignore
   Scenario: Each note has as title the first line and the second line also has description
