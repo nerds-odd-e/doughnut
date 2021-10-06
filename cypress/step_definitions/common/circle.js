@@ -15,7 +15,7 @@ When(
   "I create a new circle {string} and copy the invitation code",
   (circleName) => {
     cy.visit("/circles");
-    cy.findByRole("button", { name: "Create a new circle" }).click();
+    cy.findByRole("button", {name: "Create a new circle"}).click();
     cy.getFormControl("Name").type(circleName);
     cy.get('input[value="Submit"]').click();
 
@@ -55,7 +55,7 @@ Given(
 When("I create a note {string} in circle {string}", (noteTitle, circleName) => {
   cy.navigateToCircle(circleName);
   cy.findByText("Add New Notebook In This Circle").click();
-  cy.submitNoteFormsWith([{ Title: noteTitle }]);
+  cy.submitNoteFormsWith([{Title: noteTitle}]);
 });
 
 When(
@@ -69,7 +69,7 @@ When(
 When("I add a note {string} under {string}", (noteTitle, parentNoteTitle) => {
   cy.findByText(parentNoteTitle).click();
   cy.clickAddChildNoteButton();
-  cy.submitNoteFormsWith([{ Title: noteTitle }]);
+  cy.submitNoteFormsWith([{Title: noteTitle}]);
   cy.findByText(noteTitle).should("be.visible");
 });
 
@@ -82,16 +82,16 @@ When(
 );
 
 Given("I've logged in as an existing user", () => {
-    cy.loginAs("old_learner");
+  cy.loginAs("old_learner");
 });
 
-Given("I navigate to an existing circle {string} I belong to",
-    (circleName) => {
-    cy.seedCircle({ circleName: `${circleName}`, members: "old_learner" })
+Given("I navigate to an existing circle {string} where the {string} and {string} users belong to",
+  (circleName, user1, user2) => {
+    cy.seedCircle({circleName: `${circleName}`, members: `${user1},${user2}`})
     cy.navigateToCircle(circleName);
-});
+  });
 
 Given("a notebook already exists in the circle",
-    () => {
-        cy.createNotebook("Test notebook", "Notebook description");
-    });
+  () => {
+    cy.createNotebook("Test notebook", "Notebook description");
+  });

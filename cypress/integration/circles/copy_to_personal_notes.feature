@@ -3,7 +3,7 @@ Feature: Copy a circle notebook to personal notes
 
   Background:
     Given I've logged in as an existing user
-    And I navigate to an existing circle "Odd-e SG Team" I belong to
+    And I navigate to an existing circle "Odd-e SG Team" where the "old_learner" and "another_old_learner" users belong to
     And a notebook already exists in the circle
 
   @ignore
