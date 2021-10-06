@@ -153,5 +153,4 @@ class RestNoteController {
     return new RedirectToNoteResponse(parentId);
   }
 
-
 }

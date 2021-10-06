@@ -20,6 +20,7 @@
     "open": "yarn frontend:build && run-p -clnr sut cy:open",
     "test": "yarn frontend:build && run-p -clnr sut cy:run",
     "test:dev": "yarn frontend:build && run-p -clnr sut frontend:sut cy:run:dev",
+    "test:open": "yarn frontend:build && run-p -clnr sut frontend:sut cy:open",
     "sound": "node scripts/sound-monitor.js",
     "format": "prettier . --write"
   },

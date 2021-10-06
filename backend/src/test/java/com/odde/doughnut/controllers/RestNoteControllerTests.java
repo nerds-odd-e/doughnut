@@ -201,5 +201,12 @@ class RestNoteControllerTests {
         }
     }
 
+    @Nested
+    class SplitNoteTest {
+        @Test
+        void shouldReturnSomething() {
+
+        }
+    }
 
 }
