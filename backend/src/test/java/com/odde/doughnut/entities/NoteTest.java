@@ -189,5 +189,12 @@ public class NoteTest {
             Assertions.assertThat(versionId1).isLessThan(versionId2);
 
         }
+
+        @Test
+        void deleteTheLastVersion() {
+            List<NoteVersion> versions = note.getNoteVersion();
+            versions.remove(versions.size() - 1);
+            Assertions.assertThat(note.getNoteVersion()).isEmpty();
+        }
     }
 }

@@ -82,13 +82,6 @@ public class Note {
     @Setter
     private List<NotesClosure> notesClosures = new ArrayList<>();
 
-    @OneToMany(mappedBy = "note", cascade = CascadeType.ALL)
-    @JsonIgnore
-    @OrderBy("id DESC")
-    @Getter
-    @Setter
-    private List<NoteVersion> noteVersions = new ArrayList<>();
-
     @OneToMany(mappedBy = "ancestor", cascade = CascadeType.DETACH)
     @JsonIgnore
     @OrderBy("depth")
