@@ -2,6 +2,7 @@
   <div class="btn-group btn-group-sm">
     <slot name="additional-buttons" />
     <NotebookEditButton v-bind="{ notebook }" />
+    <NotebookCopyButton v-if="featureToggle" v-bind="{ notebook }" />
     <button
       class="btn btn-sm"
       title="Share notebook to bazaar"
@@ -13,13 +14,14 @@
 </template>
 
 <script>
+import NotebookCopyButton from "./NotebookCopyButton.vue";
 import NotebookEditButton from "./NotebookEditButton.vue";
 import SvgBazaarShare from "../svgs/SvgBazaarShare.vue";
 import { restPost } from "../../restful/restful";
 
 export default {
-  props: { notebook: Object },
-  components: { NotebookEditButton, SvgBazaarShare },
+  props: { notebook: Object, featureToggle: Boolean  },
+  components: { NotebookEditButton, SvgBazaarShare, NotebookCopyButton },
   methods: {
     async shareNotebook() {
       if (await this.$popups.confirm(`Are you sure to share?`)) {

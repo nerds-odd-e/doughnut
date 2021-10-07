@@ -15,7 +15,9 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.sql.SQLOutput;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/notebooks")
@@ -75,25 +77,10 @@ class RestNotebookController {
     }
 
     @PostMapping(value = "/{notebook}/copy")
-    public Notebook copyNotebook(@PathVariable("notebook") Notebook notebook) throws NoAccessRightException {
+    public Notebook copyNotebook(@PathVariable("notebook") Integer notebookId) throws NoAccessRightException {
         UserModel user = currentUserFetcher.getUser();
-        user.getAuthorization().assertAuthorization(notebook);
-
-        Ownership ownership = notebook.getOwnership();
-        ownership.setUser(user.getEntity());
-        ownership.setCircle(null);
-
-        Notebook clonedNotebook = new Notebook();
-        clonedNotebook.setNotes(notebook.getNotes());
-        clonedNotebook.setHeadNote(notebook.getHeadNote());
-        clonedNotebook.setCreatorEntity(notebook.getCreatorEntity());
-        clonedNotebook.setOwnership(ownership);
-        clonedNotebook.setSkipReviewEntirely(notebook.getSkipReviewEntirely());
-
-        modelFactoryService.notebookRepository.save(clonedNotebook);
-
-        return clonedNotebook;
+        user.getAuthorization().assertAuthorization(user.getEntity());
+        Optional<Notebook> notebook = modelFactoryService.notebookRepository.findById(notebookId);
+        return new Notebook();
     }
-
-
 }

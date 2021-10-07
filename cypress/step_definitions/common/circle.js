@@ -89,23 +89,20 @@ Given("I navigate to an existing circle {string} where the {string} and {string}
   (circleName, user1, user2) => {
     cy.seedCircle({circleName: `${circleName}`, members: `${user1},${user2}`})
     cy.navigateToCircle(circleName);
-    cy.wait(15000)
-  });
+});
 
 Given("the notebook {string} already exists in the circle",
   (notebookName) => {
-    cy.createNotebook(`${notebookName}`, "Notebook description");
-    cy.wait(10000)
+    cy.findByText("Add New Notebook In This Circle").click()
+    cy.get("#note-title").type(notebookName)
+    cy.findByText("Submit").click()
+
+    // cy.createNotebook(`${notebookName}`, "Notebook description");
   });
-
-Given("Two users sharing a notebook", () => {
-
-    cy.reload(true)
-})
 
 When("I make a copy of the existing notebook {string}",
   (notebookName) => {
-    cy.findByText(notebookName).should("equal")
+    cy.findByRole("Copy notebook", ).should("equal")
         .then((object) => {
             object.get("href").then((href) => {
                 let array = href.split("/")
