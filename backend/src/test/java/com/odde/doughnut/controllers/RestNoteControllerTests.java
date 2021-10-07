@@ -207,9 +207,10 @@ class RestNoteControllerTests {
         void shouldReturnSomething() throws NoAccessRightException {
             Note note = makeMe.aNote().byUser(userModel).please();
 
-            String response = controller.splitNote(note);
+            RedirectToNoteResponse response = controller.splitNote(note);
+            RedirectToNoteResponse expected = new RedirectToNoteResponse(note.getId());
 
-            assertEquals("something", response);
+            assertEquals(expected.noteId, response.noteId);
 
         }
     }

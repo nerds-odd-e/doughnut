@@ -147,10 +147,10 @@ class RestNoteController {
 
   @PostMapping(value = "/{note}/split")
   @Transactional
-  public String splitNote(@PathVariable("note") Note note) throws NoAccessRightException {
+  public RedirectToNoteResponse splitNote(@PathVariable("note") Note note) throws NoAccessRightException {
     currentUserFetcher.getUser().getAuthorization().assertAuthorization(note);
     Integer parentId = note.getParentId();
-    return "something";
+    return new RedirectToNoteResponse(note.getId());
   }
 
 }
