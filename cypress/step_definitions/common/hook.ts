@@ -13,8 +13,9 @@ import {
 
 Before(() => {
   cy.cleanDBAndSeedData();
+  cy.enableFeatureToggle(false)
 });
 
 Before({ tags: "@featureToggle"}, ()=> {
-    cy.enableFeatureToggle()
+    cy.enableFeatureToggle(true)
 })

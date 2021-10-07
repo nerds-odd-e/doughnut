@@ -22,6 +22,8 @@ public class TestabilitySettings {
     Boolean useRealGithub = true;
     @Autowired
     GithubService githubService;
+    @Getter
+    private boolean featureToggleEnabled = false;
 
     public void timeTravelTo(Timestamp timestamp) {
         this.timestamp = timestamp;
@@ -56,5 +58,10 @@ public class TestabilitySettings {
             return githubService;
         }
         return new NullGithubService();
+    }
+
+    public void enableFeatureToggle(boolean enabled) {
+        this.featureToggleEnabled = enabled;
+
     }
 }

@@ -3,7 +3,7 @@ import { restGet } from "./restful/restful";
 import Popups from "./components/commons/Popups.vue";
 import MainMenu from "./components/commons/MainMenu.vue";
 import UserNewRegisterPage from "./pages/UserNewRegisterPage.vue";
-import { apiGetCurrentUserInfo } from "./storedApi"
+import { apiGetCurrentUserInfo, apiGetFeatureToggle } from "./storedApi"
 
 export default {
   data() {
@@ -46,12 +46,14 @@ export default {
 
   mounted() {
     this.loading = true
+
+    apiGetFeatureToggle().then((res) => { this.featureToggle = res})
+
     apiGetCurrentUserInfo().then((res) => {
       this.user = res.user;
       this.externalIdentifier = res.externalIdentifier;
     })
     .finally(() => this.loading = false)
-    ;
 
     this.$popups.alert = (msg) => {
       this.popupInfo = { type: "alert", message: msg };

@@ -6,8 +6,8 @@ Cypress.Commands.add("cleanDBAndSeedData", () => {
     .should("equal", "OK");
 });
 
-Cypress.Commands.add("enableFeatureToggle", () => {
-  cy.request({ method: "POST", url: "/api/testability/feature_toggle" })
+Cypress.Commands.add("enableFeatureToggle", (enabled) => {
+  cy.request({ method: "POST", url: "/api/testability/feature_toggle", body: { enabled } })
     .its("body")
     .should("equal", "OK");
 });

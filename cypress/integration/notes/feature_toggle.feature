@@ -1,6 +1,6 @@
 Feature: feature toggle
 
-  @ignore @featureToggle
+  @featureToggle
   Scenario: A scenario with feature toggle should toggle the feature
     Then The "Feature Toggle is On" alert "should exist"
 

@@ -60,8 +60,14 @@ class TestabilityRestController {
     }
 
     @PostMapping("/feature_toggle")
-    public String enableFeatureToggle() {
+    public String enableFeatureToggle(@RequestBody Map<String, String> requestBody) {
+        testabilitySettings.enableFeatureToggle(requestBody.get("enabled").equals("true"));
         return "OK";
+    }
+
+    @GetMapping("/feature_toggle")
+    public Boolean getFeatureToggle() {
+        return testabilitySettings.isFeatureToggleEnabled();
     }
 
     private void createUser(String externalIdentifier, String name) {
