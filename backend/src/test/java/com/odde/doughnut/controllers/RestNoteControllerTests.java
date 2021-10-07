@@ -204,7 +204,12 @@ class RestNoteControllerTests {
     @Nested
     class SplitNoteTest {
         @Test
-        void shouldReturnSomething() {
+        void shouldReturnSomething() throws NoAccessRightException {
+            Note note = makeMe.aNote().byUser(userModel).please();
+
+            String response = controller.splitNote(note);
+
+            assertEquals("something", response);
 
         }
     }
