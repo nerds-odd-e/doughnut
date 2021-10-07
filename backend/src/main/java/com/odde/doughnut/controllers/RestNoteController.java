@@ -20,6 +20,7 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 @RestController
@@ -147,10 +148,29 @@ class RestNoteController {
 
   @PostMapping(value = "/{note}/split")
   @Transactional
-  public RedirectToNoteResponse splitNote(@PathVariable("note") Note note) throws NoAccessRightException {
-    currentUserFetcher.getUser().getAuthorization().assertAuthorization(note);
+  public RedirectToNoteResponse splitNote(@PathVariable("note") Note note) throws NoAccessRightException, IOException {
+    final UserModel userModel = currentUserFetcher.getUser();
+    userModel.getAuthorization().assertAuthorization(note);
+    User user = userModel.getEntity();
     Integer parentId = note.getParentId();
+    List<String> items = Arrays.asList(note.getNoteContent().getDescription().split("\n\n"));
+    extractChildNotes(note, user, items);
     return new RedirectToNoteResponse(note.getId());
+  }
+
+  private void extractChildNotes(Note note, User user, List<String> items) {
+    items.stream().filter(item -> !item.isBlank()).forEach(item -> {
+      try {
+              NoteContent childNoteContent = new NoteContent();
+              childNoteContent.setTitle(item);
+              Note childNote = Note.createNote(user, childNoteContent, testabilitySettings.getCurrentUTCTimestamp());
+              childNote.setParentNote(note);
+              modelFactoryService.noteRepository.save(childNote);
+      } catch (IOException e) {
+        throw new RuntimeException(e.getLocalizedMessage());
+      }
+            }
+    );
   }
 
 }
