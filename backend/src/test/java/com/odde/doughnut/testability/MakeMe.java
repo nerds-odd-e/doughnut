@@ -30,6 +30,9 @@ public class MakeMe {
     public NoteBuilder aNote(String title) {
         return aNote().title(title);
     }
+    public NoteBuilder aNote(String title, String description) {
+        return aNote().title(title).description(description);
+    }
     public NoteBuilder theNote(Note note) {
         return new NoteBuilder(note, this);
     }

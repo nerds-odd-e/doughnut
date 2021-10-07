@@ -21,6 +21,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -204,14 +205,39 @@ class RestNoteControllerTests {
     @Nested
     class SplitNoteTest {
         @Test
-        void shouldReturnSomething() throws NoAccessRightException {
-            Note note = makeMe.aNote().byUser(userModel).please();
+        void shouldDoNothingWhenSplittingNodesWithoutDescription() throws NoAccessRightException, IOException {
+            Note note = makeMe.aNote().withNoDescription().byUser(userModel).please();
+            List<Note> childrenBefore =  note.getChildren();
+            controller.splitNote(note);
+            makeMe.refresh(note);
+            List<Note> childrenAfter =  note.getChildren();
+            assertEquals(childrenBefore.size(), childrenAfter.size());
 
-            RedirectToNoteResponse response = controller.splitNote(note);
-            RedirectToNoteResponse expected = new RedirectToNoteResponse(note.getId());
+        }
 
-            assertEquals(expected.noteId, response.noteId);
+        @Test
+        void shouldGenerateASingleNodeWhenSplittingNodesWithOnlyOneParagraphDescription() throws NoAccessRightException, IOException {
+            Note note = makeMe.aNote("noteTitle","Just one paragraph").byUser(userModel).please();
+            List<Note> childrenBefore =  note.getChildren();
+            controller.splitNote(note);
+            makeMe.refresh(note);
+            List<Note> childrenAfter =  note.getChildren();
+            assertEquals(0,childrenBefore.size());
+            assertEquals(1,childrenAfter.size());
 
+        }
+
+        @Test
+        void shouldGenerateASingleNodeWhenSplittingANodeWithAMultilineDescription() throws IOException, NoAccessRightException {
+            Note note = makeMe.aNote("noteTitle","ThisIsTheTitle\nThisIsTheDescription").byUser(userModel).please();
+            controller.splitNote(note);
+            makeMe.refresh(note);
+            List<Note> childrenAfter =  note.getChildren();
+            assertEquals(1, childrenAfter.size());
+
+            Note onlyChild = childrenAfter.get(0);
+            assertEquals("ThisIsTheTitle", onlyChild.getTitle());
+            assertEquals("ThisIsTheDescription", onlyChild.getShortDescription());
         }
     }
 
