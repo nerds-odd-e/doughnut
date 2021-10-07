@@ -82,12 +82,12 @@ public class Note {
     @Setter
     private List<NotesClosure> notesClosures = new ArrayList<>();
 
-//    @OneToMany(mappedBy = "note", cascade = CascadeType.ALL)
-//    @JsonIgnore
-//    @OrderBy("id DESC")
-//    @Getter
-//    @Setter
-//    private List<NoteVersion> noteVersions = new ArrayList<>();
+    @OneToMany(mappedBy = "note", cascade = CascadeType.ALL)
+    @JsonIgnore
+    @OrderBy("id DESC")
+    @Getter
+    @Setter
+    private List<NoteVersion> noteVersions = new ArrayList<>();
 
     @OneToMany(mappedBy = "ancestor", cascade = CascadeType.DETACH)
     @JsonIgnore
@@ -107,12 +107,7 @@ public class Note {
     @Getter
     private final List<Note> children = new ArrayList<>();
 
-    @OneToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "note_version", joinColumns = {
-            @JoinColumn(name = "note_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)},
-            inverseJoinColumns = {
-            @JoinColumn(name = "note_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
-    })
+    @OneToMany(mappedBy = "note", cascade = CascadeType.ALL)
     @Getter
     private final List<NoteVersion> noteVersion = new ArrayList<>();
 

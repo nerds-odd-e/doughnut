@@ -153,25 +153,17 @@ public class NoteTest {
         @BeforeEach
         void setup() {
             note = makeMe.aNote().please();
-            EntityTransaction trans = makeMe.modelFactoryService.entityManager.getTransaction();
-            trans.begin();
+
             version = new NoteVersion();
             version.setNote(note);
             makeMe.modelFactoryService.entityManager.persist(version);
             makeMe.refresh(note);
-            trans.commit();
-            Note newNote = makeMe.modelFactoryService.entityManager.getReference(Note.class, note.getId());
-            System.out.println(newNote);
+
         }
 
-        @Disabled
         @Test
         void thereShouldBeVersions() {
             List<NoteVersion> versions = note.getNoteVersion();
-
-            // TODO still to fix
-            System.out.println("id: " + note);
-            System.out.println("v: " + version.getId());
 
             Assertions.assertThat(versions).isNotNull()
                                            .hasSize(1)
