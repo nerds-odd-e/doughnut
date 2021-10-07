@@ -27,7 +27,6 @@
 
     <LinkNoteButton :note="note"/>
     <NoteSplitButton
-        v-if="false"
         :noteId="note.id"
         :oldTitle="note.title"
     />

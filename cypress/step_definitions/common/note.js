@@ -269,3 +269,9 @@ When("I split the note", () => {
 Then("we don't split it", (noteTitle) => {
   //cy.expectNoteTitle(noteTitle);
 });
+
+Then("I should see the {string} alert in the page", (expectedContent) => {
+    cy.visit("/")
+    cy.contains(expectedContent)
+});
+

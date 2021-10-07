@@ -34,16 +34,22 @@
               >Review</router-link
             >
           </li>
+
           <li class="nav-item">
             <router-link class="nav-link" :to="{ name: 'circles' }"
               >Circles</router-link
             >
           </li>
+
           <li class="nav-item">
             <router-link class="nav-link" :to="{ name: 'bazaar' }"
               >Bazaar</router-link
             >
           </li>
+          <li v-if="false" class="nav-item">
+            <em class="nav-link btn-danger">Feature Toggle is On </em>
+          </li>
+
           <li class="nav-item" v-if="user && user.isDeveloper">
             <a class="nav-link" href="/failure-report-list">Failure Reports</a>
           </li>
