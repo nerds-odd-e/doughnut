@@ -46,7 +46,7 @@
               >Bazaar</router-link
             >
           </li>
-          <li v-if="false" class="nav-item">
+          <li v-if="featureToggle" class="nav-item">
             <em class="nav-link btn-danger">Feature Toggle is On </em>
           </li>
 
@@ -84,6 +84,6 @@
 
 <script>
 export default {
-  props: { user: Object },
+  props: { user: Object, featureToggle: Boolean },
 };
 </script>

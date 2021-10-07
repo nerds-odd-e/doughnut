@@ -8,6 +8,7 @@ import { apiGetCurrentUserInfo } from "./storedApi"
 export default {
   data() {
     return {
+      featureToggle: false,
       user: null,
       externalIdentifier: null,
       showNavBar: true,
@@ -80,7 +81,7 @@ export default {
   <Popups :popupInfo="popupInfo" @done="done($event)" />
   <UserNewRegisterPage v-if="newUser" @userCreated="user = $event" />
   <template v-else>
-    <MainMenu v-if="showNavBar" :user="user" />
+    <MainMenu v-if="showNavBar" v-bind="{user, featureToggle}" />
     <div v-if="!loading" class="container content">
       <router-view :user="user" @userUpdated="user = $event" />
     </div>
