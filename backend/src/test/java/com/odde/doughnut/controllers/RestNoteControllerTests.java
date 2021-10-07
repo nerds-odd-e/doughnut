@@ -226,6 +226,19 @@ class RestNoteControllerTests {
             assertEquals(1,childrenAfter.size());
 
         }
+
+        @Test
+        void shouldGenerateASingleNodeWhenSplittingANodeWithAMultilineDescription() throws IOException, NoAccessRightException {
+            Note note = makeMe.aNote("noteTitle","ThisIsTheTitle\nThisIsTheDescription").byUser(userModel).please();
+            controller.splitNote(note);
+            makeMe.refresh(note);
+            List<Note> childrenAfter =  note.getChildren();
+            assertEquals(1, childrenAfter.size());
+
+            Note onlyChild = childrenAfter.get(0);
+            assertEquals("ThisIsTheTitle", onlyChild.getTitle());
+            assertEquals("ThisIsTheDescription", onlyChild.getShortDescription());
+        }
     }
 
 }
