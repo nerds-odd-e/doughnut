@@ -170,5 +170,24 @@ public class NoteTest {
                                 .extracting(NoteVersion::getNote)
                                            .isNotNull();
         }
+
+        @Test
+        void thereShouldBeMultipleVersions() {
+            NoteVersion version2 = new NoteVersion();
+            version2.setNote(note);
+            makeMe.modelFactoryService.entityManager.persist(version2);
+            makeMe.refresh(note);
+
+            List<NoteVersion> versions = note.getNoteVersion();
+
+            Assertions.assertThat(versions).isNotNull()
+                    .hasSize(2);
+
+            Integer versionId1 = versions.get(0).getId();
+            Integer versionId2 = versions.get(1).getId();
+
+            Assertions.assertThat(versionId1).isLessThan(versionId2);
+
+        }
     }
 }
