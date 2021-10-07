@@ -270,8 +270,9 @@ Then("we don't split it", (noteTitle) => {
   //cy.expectNoteTitle(noteTitle);
 });
 
-Then("I should see the {string} alert in the page", (expectedContent) => {
+
+Then("The {string} alert {string}", (expectedContent, shouldExistOrNot) => {
     cy.visit("/")
-    cy.contains(expectedContent)
+    cy.contains(expectedContent).should(shouldExistOrNot === 'should exist' ? "exist" : "not.exist")
 });
 

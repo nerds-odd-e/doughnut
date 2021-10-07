@@ -1,5 +1,9 @@
 Feature: feature toggle
 
-  @ignore @featureToggle
+  @ignore
+  @featureToggle
   Scenario: A scenario with feature toggle should toggle the feature
-    Then I should see the "Feature Toggle is On" alert in the page
+    Then The "Feature Toggle is On" alert "should exist"
+
+  Scenario: A scenario without feature toggle should toggle the feature off
+    Then The "Feature Toggle is On" alert "should not exist"
