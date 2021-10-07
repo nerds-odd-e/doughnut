@@ -239,6 +239,23 @@ class RestNoteControllerTests {
             assertEquals("ThisIsTheTitle", onlyChild.getTitle());
             assertEquals("ThisIsTheDescription", onlyChild.getShortDescription());
         }
+
+        @Test
+        void shouldGenerateMultipleNodeWhenSplittingANodeWithAMultipleParagraphs() throws IOException, NoAccessRightException {
+            Note note = makeMe.aNote("noteTitle","ThisIsTheTitle1\nThisIsTheDescription1\n\nThisIsTheTitle2\nThisIsTheDescription2\nThisIsTheDescription21").byUser(userModel).please();
+            controller.splitNote(note);
+            makeMe.refresh(note);
+            List<Note> childrenAfter =  note.getChildren();
+            assertEquals(2, childrenAfter.size());
+
+            Note child1 = childrenAfter.get(0);
+            assertEquals("ThisIsTheTitle1", child1.getTitle());
+            assertEquals("ThisIsTheDescription1", child1.getShortDescription());
+
+            Note child2 = childrenAfter.get(1);
+            assertEquals("ThisIsTheTitle2", child2.getTitle());
+            assertEquals("ThisIsTheDescription2\nThisIsTheDescription21", child2.getShortDescription());
+        }
     }
 
 }
