@@ -81,22 +81,36 @@ When(
   }
 );
 
-Given("I've logged in as an existing user", () => {
-  cy.loginAs("old_learner");
+Given("I've logged in as the existing user {string}", (user) => {
+  cy.loginAs(user);
 });
 
 Given("I navigate to an existing circle {string} where the {string} and {string} users belong to",
   (circleName, user1, user2) => {
     cy.seedCircle({circleName: `${circleName}`, members: `${user1},${user2}`})
     cy.navigateToCircle(circleName);
+    cy.wait(15000)
   });
 
 Given("the notebook {string} already exists in the circle",
   (notebookName) => {
     cy.createNotebook(`${notebookName}`, "Notebook description");
+    cy.wait(10000)
   });
 
-When("the user {string} makes a copy of the existing notebook {string}",
-  (user, notebookName) => {
-    cy.copyNotebook(user, notebookName)
+Given("Two users sharing a notebook", () => {
+
+    cy.reload(true)
+})
+
+When("I make a copy of the existing notebook {string}",
+  (notebookName) => {
+    cy.findByText(notebookName).should("equal")
+        .then((object) => {
+            object.get("href").then((href) => {
+                let array = href.split("/")
+                let id = array[array.length - 1]
+                cy.copyNotebook(id)
+            })
+    })
   });

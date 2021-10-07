@@ -75,7 +75,7 @@ class RestNotebookController {
     }
 
     @PostMapping(value = "/{notebook}/copy")
-    public Notebook copyNote(@PathVariable("notebook") Notebook notebook) throws NoAccessRightException {
+    public Notebook copyNotebook(@PathVariable("notebook") Notebook notebook) throws NoAccessRightException {
         UserModel user = currentUserFetcher.getUser();
         user.getAuthorization().assertAuthorization(notebook);
 
