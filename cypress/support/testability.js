@@ -3,7 +3,13 @@
 Cypress.Commands.add("cleanDBAndSeedData", () => {
   cy.request({ method: "POST", url: "/api/testability/clean_db_and_seed_data" })
     .its("body")
-    .should("contain", "OK");
+    .should("equal", "OK");
+});
+
+Cypress.Commands.add("enableFeatureToggle", () => {
+  cy.request({ method: "POST", url: "/api/testability/feature_toggle" })
+    .its("body")
+    .should("equal", "OK");
 });
 
 Cypress.Commands.add("seedNotes", (notes, externalIdentifier = "") => {

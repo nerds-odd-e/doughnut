@@ -59,6 +59,11 @@ class TestabilityRestController {
         return "OK";
     }
 
+    @PostMapping("/feature_toggle")
+    public String enableFeatureToggle() {
+        return "OK";
+    }
+
     private void createUser(String externalIdentifier, String name) {
         User user = new User();
         user.setExternalIdentifier(externalIdentifier);
