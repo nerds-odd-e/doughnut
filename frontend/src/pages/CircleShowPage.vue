@@ -10,7 +10,7 @@
 
       <NotebookCardsWithButtons :notebooks="circle.notebooks">
         <template #default="{ notebook }">
-          <NotebookButtons v-bind="{ notebook }" class="card-header-btn">
+          <NotebookButtons v-bind="{ notebook, featureToggle }" class="card-header-btn">
             <template #additional-buttons>
               <BazaarNotebookButtons :notebook="notebook" :user="true" />
             </template>
@@ -56,7 +56,7 @@ export default {
     BazaarNotebookButtons,
     LoadingPage,
   },
-  props: { circleId: Number },
+  props: { circleId: Number, featureToggle: Boolean },
 
   data() {
     return {

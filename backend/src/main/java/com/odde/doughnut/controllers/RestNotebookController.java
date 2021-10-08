@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.io.IOException;
-import java.sql.SQLOutput;
 import java.util.List;
 import java.util.Optional;
 
@@ -77,10 +76,14 @@ class RestNotebookController {
     }
 
     @PostMapping(value = "/{notebook}/copy")
-    public Notebook copyNotebook(@PathVariable("notebook") Integer notebookId) throws NoAccessRightException {
+    public RedirectToNoteResponse copyNotebook(@PathVariable("notebook") Notebook notebook) throws NoAccessRightException, IOException {
         UserModel user = currentUserFetcher.getUser();
-        user.getAuthorization().assertAuthorization(user.getEntity());
-        Optional<Notebook> notebook = modelFactoryService.notebookRepository.findById(notebookId);
-        return notebook.orElse(new Notebook());
+        User userEntity = user.getEntity();
+        user.getAuthorization().assertAuthorization(userEntity);
+        Note note = userEntity.getOwnership().createNotebook(userEntity, notebook.getHeadNote().getNoteContent(), testabilitySettings.getCurrentUTCTimestamp());
+        modelFactoryService.noteRepository.save(note);
+        return new RedirectToNoteResponse(note.getId());
+
+
     }
 }
