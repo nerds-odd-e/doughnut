@@ -161,6 +161,9 @@ class RestNoteController {
         Stream<Note> noteStream = note.extractChildNotes(user, testabilitySettings.getCurrentUTCTimestamp());
         noteStream.forEach(childNote -> modelFactoryService.noteRepository.save(childNote));
 
+        note.getNoteContent().setDescription("");
+        modelFactoryService.noteRepository.save(note);
+
         return new RedirectToNoteResponse(note.getId());
     }
 
