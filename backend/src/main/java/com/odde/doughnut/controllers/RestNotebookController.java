@@ -81,6 +81,6 @@ class RestNotebookController {
         UserModel user = currentUserFetcher.getUser();
         user.getAuthorization().assertAuthorization(user.getEntity());
         Optional<Notebook> notebook = modelFactoryService.notebookRepository.findById(notebookId);
-        return new Notebook();
+        return notebook.orElse(new Notebook());
     }
 }
