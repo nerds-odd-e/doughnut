@@ -85,7 +85,7 @@ export default {
   <template v-else>
     <MainMenu v-if="showNavBar" v-bind="{user, featureToggle}" />
     <div v-if="!loading" class="container content">
-      <router-view :user="user" @userUpdated="user = $event" />
+      <router-view :user="user" @userUpdated="user = $event" :featureToggle="featureToggle" />
     </div>
   </template>
 </template>

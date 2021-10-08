@@ -83,7 +83,5 @@ class RestNotebookController {
         Note note = userEntity.getOwnership().createNotebook(userEntity, notebook.getHeadNote().getNoteContent(), testabilitySettings.getCurrentUTCTimestamp());
         modelFactoryService.noteRepository.save(note);
         return new RedirectToNoteResponse(note.getId());
-
-
     }
 }
