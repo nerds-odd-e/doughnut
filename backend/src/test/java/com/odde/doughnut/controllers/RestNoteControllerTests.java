@@ -256,6 +256,35 @@ class RestNoteControllerTests {
             assertEquals("ThisIsTheTitle2", child2.getTitle());
             assertEquals("ThisIsTheDescription2\nThisIsTheDescription21", child2.getShortDescription());
         }
+
+        @Test
+        void shouldDeleteParentDescriptionWhenSplittingANoteSuccessfully() throws IOException, NoAccessRightException {
+            Note note = makeMe.aNote("noteTitle","ThisIsTheTitle1\nThisIsTheDescription1\n\nThisIsTheTitle2\nThisIsTheDescription2\nThisIsTheDescription21").byUser(userModel).please();
+            controller.splitNote(note);
+            makeMe.refresh(note);
+
+            assertEquals("", note.getShortDescription());
+        }
+
+        @Test
+        void shouldDeleteParentDescriptionWhenSplittingANoteSuccessfully() throws IOException, NoAccessRightException {
+            Note note = makeMe.aNote("noteTitle","\n\n\n\n\n").byUser(userModel).please();
+            controller.splitNote(note);
+            makeMe.refresh(note);
+
+            List<Note> childrenAfter =  note.getChildren();
+            assertEquals(0, childrenAfter.size());
+        }
+
+        @Test
+        void shouldDeleteParentDescriptionWhenSplittingANoteSuccessfully() throws IOException, NoAccessRightException {
+            Note note = makeMe.aNote("noteTitle","\n\nchopedchoped\n\n\n\nmortaldela").byUser(userModel).please();
+            controller.splitNote(note);
+            makeMe.refresh(note);
+
+            List<Note> childrenAfter =  note.getChildren();
+            assertEquals(2, childrenAfter.size());
+        }
     }
 
 }
