@@ -5,7 +5,6 @@ Feature: split note
   Background:
     Given I've logged in as an existing user
 
-  @ignore
   Scenario: Each note has as title the first line and the second line also has description
     Given there are some notes for the current user
       | title    | description               |

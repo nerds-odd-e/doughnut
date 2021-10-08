@@ -10,12 +10,13 @@ Feature: undo note version
       | title    |
       | ABC      |
     When I am editing note "ABC" the field should be pre-filled with
-      | Title          |
+      | title          |
       | ABC |
-    When I update it to become:
-      | Title          |
+    And I update it to become:
+      | title          |
       | DEFG |
-    And I click the undo button
+    Then I should see "DEFG" in the page
+    And I click the undo button for "ABC"
     Then I should see these note
       | title     |
       | ABC |
@@ -35,14 +36,6 @@ Feature: undo note version
     When a student update the note DESCRIPTION to "DESCRIPTION 2"
     And student undo this change
     Then the the note DESCRIPTION should be "DESCRIPTION 1"
-
-  @ignore
-  Scenario:
-    Given an existing note WITH DESCRIPTION "DESCRIPTION 1"
-    When a student update the note DESCRIPTION to "DESCRIPTION 2"
-    And student undo this change
-    And some connection issue happens
-    Then the note DESCRIPTION should be "DESCRIPTION 2"
 
   @ignore
   Scenario:

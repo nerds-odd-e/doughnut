@@ -229,6 +229,13 @@ When("I am splitting note {string}",
   }
 );
 
+When("I click the undo button for {string}",
+    (noteTitle, data) => {
+        cy.clickNotePageButton(noteTitle, "undo note");
+        cy.findByRole("button", { name: "OK" }).click();
+    }
+);
+
 Then("we create two child notes with the first lines of each paragraph as title.", (noteTitle) => {
   //cy.expectNoteTitle(noteTitle);
 });
