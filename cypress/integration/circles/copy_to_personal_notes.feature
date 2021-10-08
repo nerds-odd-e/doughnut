@@ -9,7 +9,7 @@ Feature: Copy a circle notebook to personal notes
   @ignore
   Scenario: User 1 wants to have his own notes
     When I make a copy of the existing notebook "Test notebook"
-    Then I have a copy of the notebook in his private notes
+    Then I have a copy of the notebook "Test notebook" in the private notes
 
   @ignore
   Scenario: New user via circle invitation

@@ -104,12 +104,11 @@ When("I make a copy of the existing notebook {string}",
     cy.findByRole("button", {name: "Copy notebook"})
         .click();
     cy.findByText("Copy").click()
+});
 
-        // .then((object) => {
-        //     object.get("href").then((href) => {
-        //         let array = href.split("/")
-        //         let id = array[array.length - 1]
-        //         cy.copyNotebook(id)
-        //     })
-    // })
-  });
+Then("I have a copy of the notebook {string} in the private notes",
+    (notebookName) => {
+    cy.log('then')
+    cy.visit('/notebooks')
+    cy.findByText(notebookName)
+});
