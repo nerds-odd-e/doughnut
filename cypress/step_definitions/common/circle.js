@@ -91,23 +91,25 @@ Given("I navigate to an existing circle {string} where the {string} and {string}
     cy.navigateToCircle(circleName);
 });
 
-Given("the notebook {string} already exists in the circle",
-  (notebookName) => {
-    cy.findByText("Add New Notebook In This Circle").click()
-    cy.get("#note-title").type(notebookName)
-    cy.findByText("Submit").click()
-
-    // cy.createNotebook(`${notebookName}`, "Notebook description");
-  });
+Given("the notebook {string} already exists in the circle {string}",
+  (notebookName, circleName) => {
+    cy.findByText("Add New Notebook In This Circle").click();
+    cy.get("#note-title").type(notebookName);
+    cy.findByText("Submit").click();
+    cy.navigateToCircle(circleName);
+ });
 
 When("I make a copy of the existing notebook {string}",
   (notebookName) => {
-    cy.findByRole("Copy notebook", ).should("equal")
-        .then((object) => {
-            object.get("href").then((href) => {
-                let array = href.split("/")
-                let id = array[array.length - 1]
-                cy.copyNotebook(id)
-            })
-    })
+    cy.findByRole("button", {name: "Copy notebook"})
+        .click();
+    cy.findByText("Copy").click()
+
+        // .then((object) => {
+        //     object.get("href").then((href) => {
+        //         let array = href.split("/")
+        //         let id = array[array.length - 1]
+        //         cy.copyNotebook(id)
+        //     })
+    // })
   });
