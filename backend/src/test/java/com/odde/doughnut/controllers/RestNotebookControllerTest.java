@@ -22,6 +22,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.IOException;
+
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
@@ -83,6 +85,17 @@ class RestNotebookControllerTest {
             assertThrows(NoAccessRightException.class, () ->
                     controller.update(note.getNotebook())
             );
+        }
+    }
+
+    @Nested
+    class copyNotebook {
+        @Test
+        void mustBeAbleToCopyNotebook() throws IOException, NoAccessRightException {
+            Note myNote = makeMe.aNote("Test note").please();
+            long oldCount = modelFactoryService.notebookRepository.count();
+            controller.copyNotebook(myNote.getNotebook());
+            assertThat ( modelFactoryService.notebookRepository.count(), equalTo(oldCount + 1));
         }
     }
 }
