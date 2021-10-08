@@ -20,9 +20,11 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/api/notes")
@@ -151,39 +153,15 @@ class RestNoteController {
 
     @PostMapping(value = "/{note}/split")
     @Transactional
-    public RedirectToNoteResponse splitNote(@PathVariable("note") Note note) throws NoAccessRightException, IOException {
+    public RedirectToNoteResponse splitNote(@PathVariable("note") Note note) throws NoAccessRightException {
         final UserModel userModel = currentUserFetcher.getUser();
         userModel.getAuthorization().assertAuthorization(note);
         User user = userModel.getEntity();
-        Integer parentId = note.getParentId();
-        List<String> items = Arrays.asList(note.getNoteContent().getDescription().split("\n\n"));
-        extractChildNotes(note, user, items);
+
+        Stream<Note> noteStream = note.extractChildNotes(user, testabilitySettings.getCurrentUTCTimestamp());
+        noteStream.forEach(childNote -> modelFactoryService.noteRepository.save(childNote));
+
         return new RedirectToNoteResponse(note.getId());
-    }
-
-    private void extractChildNotes(Note note, User user, List<String> items) {
-        items.stream().filter(item -> !item.isBlank()).forEach(paragraph -> {
-                    try {
-                        Note childNote = createNoteFromParagraph(paragraph, user);
-                        childNote.setParentNote(note);
-                        modelFactoryService.noteRepository.save(childNote);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e.getLocalizedMessage());
-                    }
-                }
-        );
-    }
-
-    private Note createNoteFromParagraph(String paragraph, User user) throws IOException {
-        LinkedList<String> linesInParagraph = new LinkedList<String>(Arrays.stream(paragraph.split("\n")).toList());
-
-        NoteContent childNoteContent = new NoteContent();
-        childNoteContent.setTitle(linesInParagraph.getFirst());
-        linesInParagraph.removeFirst();
-        childNoteContent.setDescription(String.join("\n", linesInParagraph));
-
-        Note childNote = Note.createNote(user, childNoteContent, testabilitySettings.getCurrentUTCTimestamp());
-        return childNote;
     }
 
 }

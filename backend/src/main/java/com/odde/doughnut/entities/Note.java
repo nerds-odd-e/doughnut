@@ -11,11 +11,9 @@ import javax.persistence.*;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
 
@@ -262,8 +260,8 @@ public class Note {
     @JsonIgnore
     public Note getGrandAsPossible() {
         Note grand = this;
-        for(int i = 0; i < 2; i ++)
-            if(grand.getParentNote() != null)
+        for (int i = 0; i < 2; i++)
+            if (grand.getParentNote() != null)
                 grand = grand.getParentNote();
         return grand;
     }
@@ -271,6 +269,35 @@ public class Note {
     public void setCreatedAtAndUpdatedAt(Timestamp currentUTCTimestamp) {
         this.createdAt = currentUTCTimestamp;
         this.getNoteContent().setUpdatedAt(currentUTCTimestamp);
+    }
+
+    public Stream<Note> extractChildNotes(User user, Timestamp currentUTCTimestamp) {
+        List<String> items = Arrays.asList(getNoteContent().getDescription().split("\n\n"));
+        Stream<Note> noteStream = items.stream()
+                .filter(item -> !item.isBlank())
+                .map(paragraph -> {
+                            try {
+                                Note childNote = createNoteFromParagraph(paragraph, user, currentUTCTimestamp);
+                                childNote.setParentNote(this);
+                                return childNote;
+                            } catch (IOException e) {
+                                throw new RuntimeException(e.getLocalizedMessage());
+                            }
+                        }
+                );
+        return noteStream;
+    }
+
+    private Note createNoteFromParagraph(String paragraph, User user, Timestamp currentUTCTimestamp) throws IOException {
+        LinkedList<String> linesInParagraph = new LinkedList<>(Arrays.stream(paragraph.split("\n")).toList());
+
+        NoteContent childNoteContent = new NoteContent();
+        childNoteContent.setTitle(linesInParagraph.getFirst());
+        linesInParagraph.removeFirst();
+        childNoteContent.setDescription(String.join("\n", linesInParagraph));
+
+        Note childNote = Note.createNote(user, childNoteContent, currentUTCTimestamp);
+        return childNote;
     }
 }
 
