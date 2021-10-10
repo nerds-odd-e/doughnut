@@ -74,7 +74,7 @@ jobs:
             cypress/integration/b*/**
           - |
             cypress/integration/c*/**
-            cypress/integration/f*/**
+            cypress/integration/t*/**
             cypress/integration/u*/**
           - |
             cypress/integration/n*/**

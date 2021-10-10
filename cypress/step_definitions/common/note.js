@@ -276,11 +276,3 @@ When("I split the note", () => {
 Then("we don't split it", (noteTitle) => {
   //cy.expectNoteTitle(noteTitle);
 });
-
-
-Then("The {string} alert {string}", (expectedContent, shouldExistOrNot) => {
-    cy.visit("/")
-    cy.contains("Welcome")
-    cy.contains(expectedContent).should(shouldExistOrNot === 'should exist' ? "exist" : "not.exist")
-});
-

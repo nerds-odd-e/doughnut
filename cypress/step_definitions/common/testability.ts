@@ -39,3 +39,10 @@ Given(
       .should("contain", "OK");
   }
 );
+
+Then("The {string} alert {string}", (expectedContent, shouldExistOrNot) => {
+    cy.visit("/")
+    cy.contains("Welcome")
+    cy.contains(expectedContent).should(shouldExistOrNot === 'should exist' ? "exist" : "not.exist")
+});
+
