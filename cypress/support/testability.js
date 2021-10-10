@@ -69,12 +69,3 @@ Cypress.Commands.add("seedCircle", (circle) => {
   });
 });
 
-Cypress.Commands.add("createNotebook", (title, description) => {
-  cy.request({
-    method: "POST",
-    url: `/api/notebooks/create?title=${title}&description=${description}`,
-  }).then((response) => {
-    expect(response.status).to.equal(200);
-    cy.wrap(response.body).as("notebookId");
-  });
-});
