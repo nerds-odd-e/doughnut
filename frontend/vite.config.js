@@ -16,36 +16,39 @@ export default defineConfig({
     vueJsx(),
   ],
   server: {
+    fs: {
+      strict: false,
+    },
     proxy: {
       "/api": {
         target: "http://localhost:9081",
         changeOrigin: true,
-        xfwd: true,
+        ws: true,
       },
       "/images": {
         target: "http://localhost:9081",
         changeOrigin: true,
-        xfwd: true,
+        ws: true,
       },
       "/login": {
         target: "http://localhost:9081",
         changeOrigin: true,
-        xfwd: true,
+        ws: true,
       },
       "/logout": {
         target: "http://localhost:9081",
         changeOrigin: true,
-        xfwd: true,
+        ws: true,
       },
       "/users/identify": {
         target: "http://localhost:9081",
         changeOrigin: true,
-        xfwd: true,
+        ws: true,
       },
       "/testability": {
         target: "http://localhost:9081",
         changeOrigin: true,
-        xfwd: true,
+        ws: true,
       },
     },
   },

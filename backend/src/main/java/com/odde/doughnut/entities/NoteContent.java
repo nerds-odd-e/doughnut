@@ -10,7 +10,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.web.multipart.MultipartFile;
-import org.apache.commons.lang3.StringUtils;
+import org.thymeleaf.util.StringUtils;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
