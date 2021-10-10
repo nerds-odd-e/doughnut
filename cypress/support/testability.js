@@ -1,7 +1,7 @@
 /// <reference types="cypress" />
 
 Cypress.Commands.add("cleanDBAndSeedData", () => {
-  cy.request({ method: "POST", url: "/api/testability/clean_db_and_seed_data" })
+  cy.request({ method: "POST", url: "/api/testability/clean_db_and_reset_testability_settings" })
     .its("body")
     .should("equal", "OK");
 });

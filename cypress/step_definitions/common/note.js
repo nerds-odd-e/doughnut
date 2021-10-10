@@ -229,13 +229,6 @@ When("I split note {string}",
   }
 );
 
-When("I click the undo button for {string}",
-    (noteTitle, data) => {
-        cy.clickNotePageButton(noteTitle, "undo note");
-        cy.findByRole("button", { name: "OK" }).click();
-    }
-);
-
 When("I should see the note description to be {string}",
     (expectedDescription) => {
         cy.expectCurrentNoteDescription(expectedDescription)
