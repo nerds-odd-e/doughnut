@@ -405,15 +405,6 @@ Cypress.Commands.add("failure", () => {
   throw new Error("Deliberate CYPRESS test Failure!!!");
 });
 
-Cypress.Commands.add("copyNotebook", (notebookId) => {
-  cy.request({
-    method: "POST",
-    url: `/api/notebooks/${notebookId}/copy`
-  })
-      .its("status")
-      .should("be", "200");
-});
-
 Cypress.Commands.add("expectCurrentNoteDescription", (expectedDescription) => {
   cy.findByText(expectedDescription, { selector: ".note-description" })
 });
