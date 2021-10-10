@@ -289,7 +289,7 @@ public class Note {
     }
 
     private Note createNoteFromParagraph(String paragraph, User user, Timestamp currentUTCTimestamp) throws IOException {
-        LinkedList<String> linesInParagraph = new LinkedList<>(Arrays.stream(paragraph.split("\n")).toList());
+        LinkedList<String> linesInParagraph = new LinkedList<>(Arrays.stream(paragraph.split("\n")).collect(toList()));
 
         NoteContent childNoteContent = new NoteContent();
         childNoteContent.setTitle(linesInParagraph.getFirst());

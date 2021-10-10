@@ -1,4 +1,4 @@
-import { restGet } from "../restful/restful";
+import { restGet, restPost } from "../restful/restful";
 
 const storedApiGetNoteWithDescendents = async (store, noteId) => {
     const res = await restGet(
@@ -14,6 +14,13 @@ const storedApiGetNoteAndItsChildren = async (store, noteId) => {
     return res;
 }
 
+const storedApiSplitNote = async (store, noteId) => {
+    const res = await restPost(`/api/notes/${noteId}/split`, {})
+    store.commit("loadNotes", res.notes);
+    return res;
+}
+
+
 const apiGetCurrentUserInfo = () => restGet(`/api/user/current-user-info`)
 
 const apiGetFeatureToggle = () => restGet(`/api/testability/feature_toggle`)
@@ -21,6 +28,7 @@ const apiGetFeatureToggle = () => restGet(`/api/testability/feature_toggle`)
 export {
     storedApiGetNoteWithDescendents,
     storedApiGetNoteAndItsChildren,
+    storedApiSplitNote,
     apiGetCurrentUserInfo,
     apiGetFeatureToggle,
 }

@@ -222,7 +222,7 @@ Then("I should see {string} is newer than {string}", (newer, older) => {
     );
 });
 
-When("I am splitting note {string}",
+When("I split note {string}",
   (noteTitle, data) => {
     cy.clickNotePageButton(noteTitle, "split note");
     cy.findByRole("button", { name: "OK" }).click();
@@ -235,3 +235,18 @@ When("I click the undo button for {string}",
         cy.findByRole("button", { name: "OK" }).click();
     }
 );
+
+When("I should see the note description to be {string}",
+    (expectedDescription) => {
+        cy.findByText(expectedDescription, { selector: ".note-description" })
+    }
+);
+
+When("there is a note {string} with description {string}",
+    (notePath, expectedDescription) => {
+        cy.navigateToNotePage(notePath);
+        cy.findByText(expectedDescription, { selector: ".note-description" })
+    }
+);
+
+

@@ -27,7 +27,7 @@ function toNested(data) {
 const restRequest = (url, params, loadingRef) => {
   if (loadingRef instanceof Function) {
     loadingRef(true);
-  } else {
+  } else if(!!loadingRef){
     loadingRef.value = true;
   }
 
@@ -55,7 +55,7 @@ const restRequest = (url, params, loadingRef) => {
   }).finally(() => {
     if (loadingRef instanceof Function) {
       loadingRef(false);
-    } else {
+    } else if(!!loadingRef){
       loadingRef.value = false;
     }
   });

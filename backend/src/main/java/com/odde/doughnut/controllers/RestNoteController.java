@@ -20,9 +20,6 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -153,7 +150,7 @@ class RestNoteController {
 
     @PostMapping(value = "/{note}/split")
     @Transactional
-    public RedirectToNoteResponse splitNote(@PathVariable("note") Note note) throws NoAccessRightException {
+    public NotesBulk splitNote(@PathVariable("note") Note note) throws NoAccessRightException {
         final UserModel userModel = currentUserFetcher.getUser();
         userModel.getAuthorization().assertAuthorization(note);
         User user = userModel.getEntity();
@@ -164,7 +161,7 @@ class RestNoteController {
         note.getNoteContent().setDescription("");
         modelFactoryService.noteRepository.save(note);
 
-        return new RedirectToNoteResponse(note.getId());
+        return NotesBulk.jsonNoteWithChildren(note, userModel);
     }
 
 }

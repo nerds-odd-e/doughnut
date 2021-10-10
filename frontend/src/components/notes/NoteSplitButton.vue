@@ -6,7 +6,7 @@
 
 <script>
 import SvgSplitNote from "../svgs/SvgSplitNote.vue";
-import {restPost} from "../../restful/restful";
+import { storedApiSplitNote } from "../../storedApi";
 
 export default {
   name: "NoteSplitButton",
@@ -17,7 +17,7 @@ export default {
   methods: {
     async showDialog() {
       if (await this.$popups.confirm(`Are you sure to split this note?`)) {
-        restPost(`/api/notes/${this.noteId}/split`, {}, (r) => {})
+        storedApiSplitNote(this.$store, this.noteId)
       }
     },
   },
