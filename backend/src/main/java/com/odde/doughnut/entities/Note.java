@@ -98,10 +98,6 @@ public class Note {
     @Getter
     private final List<Note> children = new ArrayList<>();
 
-    @OneToMany(mappedBy = "note", cascade = CascadeType.ALL)
-    @Getter
-    private final List<NoteVersion> noteVersion = new ArrayList<>();
-
     public static Note createNote(User user, NoteContent noteContent, Timestamp currentUTCTimestamp) {
         final Note note = new Note();
         try {

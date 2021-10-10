@@ -1,9 +1,7 @@
 package com.odde.doughnut.entities;
 
 import com.odde.doughnut.testability.MakeMe;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,7 +10,6 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityTransaction;
 import javax.validation.*;
 import java.util.List;
 import java.util.Set;
@@ -20,14 +17,14 @@ import java.util.Set;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.mockito.Mockito.mock;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
 public class NoteTest {
 
-    @Autowired MakeMe makeMe;
+    @Autowired
+    MakeMe makeMe;
     User user;
 
     @Test
@@ -103,7 +100,7 @@ public class NoteTest {
             note.getNoteContent().setUploadPictureProxy(makeMe.anUploadedPicture().toMultiplePartFilePlease());
             note.getNoteContent().setPictureUrl("http://url/img");
             assertThat(getViolations(), is(not(empty())));
-            List<String> errorFields = getViolations().stream().map(v->v.getPropertyPath().toString()).collect(toList());
+            List<String> errorFields = getViolations().stream().map(v -> v.getPropertyPath().toString()).collect(toList());
             assertThat(errorFields, containsInAnyOrder("noteContent.uploadPicture", "noteContent.pictureUrl"));
         }
 
@@ -143,58 +140,5 @@ public class NoteTest {
             assertThat(targetNotes, contains(targetNote));
         }
     }
-
-    @Nested
-    class NoteWithVersion {
-
-        private Note note;
-        private NoteVersion version;
-
-        @BeforeEach
-        void setup() {
-            note = makeMe.aNote().please();
-
-            version = new NoteVersion();
-            version.setNote(note);
-            makeMe.modelFactoryService.entityManager.persist(version);
-            makeMe.refresh(note);
-
-        }
-
-        @Test
-        void thereShouldBeVersions() {
-            List<NoteVersion> versions = note.getNoteVersion();
-
-            Assertions.assertThat(versions).isNotNull()
-                                           .hasSize(1)
-                                .extracting(NoteVersion::getNote)
-                                           .isNotNull();
-        }
-
-        @Test
-        void thereShouldBeMultipleVersions() {
-            NoteVersion version2 = new NoteVersion();
-            version2.setNote(note);
-            makeMe.modelFactoryService.entityManager.persist(version2);
-            makeMe.refresh(note);
-
-            List<NoteVersion> versions = note.getNoteVersion();
-
-            Assertions.assertThat(versions).isNotNull()
-                    .hasSize(2);
-
-            Integer versionId1 = versions.get(0).getId();
-            Integer versionId2 = versions.get(1).getId();
-
-            Assertions.assertThat(versionId1).isLessThan(versionId2);
-
-        }
-
-        @Test
-        void deleteTheLastVersion() {
-            List<NoteVersion> versions = note.getNoteVersion();
-            versions.remove(versions.size() - 1);
-            Assertions.assertThat(note.getNoteVersion()).isEmpty();
-        }
-    }
 }
+
