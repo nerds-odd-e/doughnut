@@ -260,11 +260,9 @@ class RestNoteControllerTests {
         }
 
         @Test
-        @Disabled
         void shouldDeleteParentDescriptionWhenSplittingANoteSuccessfully() throws NoAccessRightException {
             Note note = makeMe.aNote("noteTitle","ThisIsTheTitle1\nThisIsTheDescription1\n\nThisIsTheTitle2\nThisIsTheDescription2\nThisIsTheDescription21").byUser(userModel).please();
             controller.splitNote(note);
-            makeMe.refresh(note);
 
             assertEquals("", note.getShortDescription());
         }
