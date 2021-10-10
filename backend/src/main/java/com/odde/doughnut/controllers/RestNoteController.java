@@ -21,7 +21,6 @@ import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.List;
-import java.util.stream.Stream;
 
 @RestController
 @RequestMapping("/api/notes")
@@ -60,7 +59,7 @@ class RestNoteController {
 
     @PostMapping(value = "/{parentNote}/create")
     @Transactional
-    public RedirectToNoteResponse createNote(@PathVariable(name = "parentNote") Note parentNote, @Valid @ModelAttribute NoteCreation noteCreation) throws NoAccessRightException, IOException {
+    public RedirectToNoteResponse createNote(@PathVariable(name = "parentNote") Note parentNote, @Valid @ModelAttribute NoteCreation noteCreation) throws NoAccessRightException {
         final UserModel userModel = currentUserFetcher.getUser();
         userModel.getAuthorization().assertAuthorization(parentNote);
         User user = userModel.getEntity();
@@ -153,10 +152,9 @@ class RestNoteController {
     public NotesBulk splitNote(@PathVariable("note") Note note) throws NoAccessRightException {
         final UserModel userModel = currentUserFetcher.getUser();
         userModel.getAuthorization().assertAuthorization(note);
-        User user = userModel.getEntity();
 
-        Stream<Note> noteStream = note.extractChildNotes(user, testabilitySettings.getCurrentUTCTimestamp());
-        noteStream.forEach(childNote -> modelFactoryService.noteRepository.save(childNote));
+        note.extractChildNotes(userModel.getEntity(), testabilitySettings.getCurrentUTCTimestamp())
+            .forEach(childNote -> modelFactoryService.noteRepository.save(childNote));
 
         note.getNoteContent().setDescription("");
         modelFactoryService.noteRepository.save(note);

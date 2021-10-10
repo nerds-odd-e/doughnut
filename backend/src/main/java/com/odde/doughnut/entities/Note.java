@@ -102,9 +102,13 @@ public class Note {
     @Getter
     private final List<NoteVersion> noteVersion = new ArrayList<>();
 
-    public static Note createNote(User user, NoteContent noteContent, Timestamp currentUTCTimestamp) throws IOException {
+    public static Note createNote(User user, NoteContent noteContent, Timestamp currentUTCTimestamp) {
         final Note note = new Note();
-        note.updateNoteContent(noteContent, user);
+        try {
+            note.updateNoteContent(noteContent, user);
+        } catch (IOException e) {
+            throw new RuntimeException(e.getLocalizedMessage());
+        }
         note.setCreatedAtAndUpdatedAt(currentUTCTimestamp);
         note.setUser(user);
         return note;
@@ -124,11 +128,6 @@ public class Note {
             return getParentNote().getNotePicture();
         }
         return noteContent.getNotePicture();
-    }
-
-
-    public boolean isHead() {
-        return getParentNote() == null;
     }
 
     private void addAncestors(List<Note> ancestors) {
@@ -273,22 +272,17 @@ public class Note {
 
     public Stream<Note> extractChildNotes(User user, Timestamp currentUTCTimestamp) {
         List<String> items = Arrays.asList(getNoteContent().getDescription().split("\n\n"));
-        Stream<Note> noteStream = items.stream()
+        return items.stream()
                 .filter(item -> !item.isBlank())
                 .map(paragraph -> {
-                            try {
-                                Note childNote = createNoteFromParagraph(paragraph, user, currentUTCTimestamp);
-                                childNote.setParentNote(this);
-                                return childNote;
-                            } catch (IOException e) {
-                                throw new RuntimeException(e.getLocalizedMessage());
-                            }
+                            Note childNote = createNoteFromParagraph(paragraph, user, currentUTCTimestamp);
+                            childNote.setParentNote(this);
+                            return childNote;
                         }
                 );
-        return noteStream;
     }
 
-    private Note createNoteFromParagraph(String paragraph, User user, Timestamp currentUTCTimestamp) throws IOException {
+    private Note createNoteFromParagraph(String paragraph, User user, Timestamp currentUTCTimestamp) {
         LinkedList<String> linesInParagraph = new LinkedList<>(Arrays.stream(paragraph.split("\n")).collect(toList()));
 
         NoteContent childNoteContent = new NoteContent();
@@ -296,8 +290,7 @@ public class Note {
         linesInParagraph.removeFirst();
         childNoteContent.setDescription(String.join("\n", linesInParagraph));
 
-        Note childNote = Note.createNote(user, childNoteContent, currentUTCTimestamp);
-        return childNote;
+        return Note.createNote(user, childNoteContent, currentUTCTimestamp);
     }
 }
 

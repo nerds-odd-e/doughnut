@@ -35,7 +35,7 @@ public class Ownership {
         return circle.getMembers().contains(user);
     }
 
-    public Note createNotebook(User user, NoteContent noteContent, Timestamp currentUTCTimestamp) throws IOException {
+    public Note createNotebook(User user, NoteContent noteContent, Timestamp currentUTCTimestamp) {
         final Note note = Note.createNote(user, noteContent, currentUTCTimestamp);
         note.buildNotebookForHeadNote(this, user);
       return note;

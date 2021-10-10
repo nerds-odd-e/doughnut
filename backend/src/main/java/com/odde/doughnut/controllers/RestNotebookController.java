@@ -48,7 +48,7 @@ class RestNotebookController {
     }
 
     @PostMapping({"/create"})
-    public RedirectToNoteResponse createNotebook(@Valid @ModelAttribute NoteContent noteContent) throws IOException {
+    public RedirectToNoteResponse createNotebook(@Valid @ModelAttribute NoteContent noteContent) {
         UserModel user = currentUserFetcher.getUser();
         user.getAuthorization().assertLoggedIn();
         User userEntity = user.getEntity();
@@ -76,7 +76,7 @@ class RestNotebookController {
     }
 
     @PostMapping(value = "/{notebook}/copy")
-    public RedirectToNoteResponse copyNotebook(@PathVariable("notebook") Notebook notebook) throws NoAccessRightException, IOException {
+    public RedirectToNoteResponse copyNotebook(@PathVariable("notebook") Notebook notebook) throws NoAccessRightException {
         UserModel user = currentUserFetcher.getUser();
         User userEntity = user.getEntity();
         user.getAuthorization().assertAuthorization(userEntity);

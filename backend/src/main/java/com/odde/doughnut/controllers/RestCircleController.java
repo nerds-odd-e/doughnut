@@ -113,7 +113,7 @@ class RestCircleController {
   }
 
   @PostMapping({"/{circle}/notebooks"})
-  public RedirectToNoteResponse createNotebook(Circle circle, @Valid @ModelAttribute NoteContent noteContent) throws IOException, NoAccessRightException {
+  public RedirectToNoteResponse createNotebook(Circle circle, @Valid @ModelAttribute NoteContent noteContent) throws NoAccessRightException {
     UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertLoggedIn();
     currentUserFetcher.getUser().getAuthorization().assertAuthorization(circle);
