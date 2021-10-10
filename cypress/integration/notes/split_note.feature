@@ -31,7 +31,6 @@ Feature: split note
     When I split the note
     Then we don't split it
 
-  @featureToggle
   Scenario: Each note has as title the first line
     Given there are some notes for the current user
       | title   | description                                     |

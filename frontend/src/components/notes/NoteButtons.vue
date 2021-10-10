@@ -26,10 +26,7 @@
 
 
     <LinkNoteButton :note="note"/>
-    <NoteSplitButton
-        :noteId="note.id"
-        :oldTitle="note.title"
-    />
+
     <NoteUndoButton
         :noteId="note.id"
         :oldTitle="note.title"
@@ -51,6 +48,13 @@
       >
         Edit review settings
       </ReviewSettingEditButton>
+      <NoteSplitButton
+          :noteId="note.id"
+          :oldTitle="note.title"
+      >
+      Split this note
+      </NoteSplitButton>
+
       <button
         class="dropdown-item"
         title="delete note"

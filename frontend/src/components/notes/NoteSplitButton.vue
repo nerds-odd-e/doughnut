@@ -1,6 +1,7 @@
 <template>
   <button class="btn btn-small" title="split note" @click="showDialog()">
     <SvgSplitNote />
+    <slot/>
   </button>
 </template>
 

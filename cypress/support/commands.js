@@ -413,3 +413,8 @@ Cypress.Commands.add("copyNotebook", (notebookId) => {
       .its("status")
       .should("be", "200");
 });
+
+Cypress.Commands.add("expectCurrentNoteDescription", (expectedDescription) => {
+  cy.findByText(expectedDescription, { selector: ".note-description" })
+});
+
