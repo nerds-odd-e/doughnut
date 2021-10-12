@@ -133,6 +133,7 @@ in mkShell {
   ];
   shellHook = ''
         export NIXPKGS_ALLOW_UNFREE=1
+        export GPG_TTY=$(tty)
         export JAVA_HOME="$(readlink -e $(type -p javac) | sed  -e 's/\/bin\/javac//g')"
         export GRADLE_HOME="${pkgs.gradle}"
 
