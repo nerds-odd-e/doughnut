@@ -190,10 +190,11 @@ in mkShell {
 
         cleanup()
         {
+          echo -e "\nBYE!!! EXITING nix-shell."
           rm -f $MYSQL_HOME/init_doughnut_db.sql
           if [[ ! -z "$MYSQLD_PID" ]]; then
-            mysqladmin -u root --socket=$MYSQL_UNIX_SOCKET shutdown
-            wait $MYSQL_PID
+            echo -e "MySQL Server still running on Port: $MYSQL_TCP_PORT, Socket: $MYSQL_UNIX_SOCKET at PID: $MYSQLD_PID"
+            echo -e "You may choose to SHUTDOWN MySQL Server by issuing 'kill -SIGTERM $MYSQLD_PID'\n"
           fi
         }
         trap cleanup EXIT
