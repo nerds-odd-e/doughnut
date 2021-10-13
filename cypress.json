@@ -3,7 +3,7 @@
     "TAGS": "not @ignore and not @slow"
   },
   "pluginsFile": "cypress/plugins/index.js",
-  "testFiles": "**/*.{feature,features}",
+  "testFiles": "**/*.feature",
   "chromeWebSecurity": false,
   "ignoreTestFiles": [
     "**/*.{js,ts}",
