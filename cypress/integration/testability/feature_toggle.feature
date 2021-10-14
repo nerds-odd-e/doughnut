@@ -1,4 +1,6 @@
 Feature: feature toggle
+  As a developer or Product Owner, I want to toggle some feature off in production by default,
+  so that the end-user won't see the unfinished feature.
 
   @featureToggle
   Scenario: A scenario with feature toggle should toggle the feature

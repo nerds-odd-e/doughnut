@@ -50,7 +50,7 @@ public class Authorization {
         if (modelFactoryService.bazaarNotebookRepository.findByNotebook(notebook) != null) {
             return;
         }
-        modelFactoryService.toUserModel(user).getAuthorization().assertLoggedIn();
+        assertLoggedIn();
         throw new NoAccessRightException();
     }
 
@@ -62,6 +62,7 @@ public class Authorization {
     }
 
     public void assertAuthorization(Circle circle) throws NoAccessRightException {
+        assertLoggedIn();
         if (user == null || !user.inCircle(circle)) {
             throw new NoAccessRightException();
         }

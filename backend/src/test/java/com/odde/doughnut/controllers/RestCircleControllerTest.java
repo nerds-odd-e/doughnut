@@ -65,6 +65,16 @@ class RestCircleControllerTest {
 
     @Nested
     class ShowCircle {
+
+        @Test
+        void itShouldAskToLoginOfVisitorIsNotLogin() {
+            Circle circle = makeMe.aCircle().please();
+            controller = new RestCircleController(modelFactoryService, new TestCurrentUserFetcher(makeMe.aNullUserModel()), testabilitySettings);
+            assertThrows(ResponseStatusException.class, ()->{
+                controller.showCircle(circle);
+            });
+        }
+
         @Test
         void itShouldNotAllowNonMemberToSeeACircle() {
             Circle circle = makeMe.aCircle().please();
