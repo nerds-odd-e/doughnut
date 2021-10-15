@@ -1,6 +1,5 @@
 <template>
-<div class="container">
-  <LoadingPage v-bind="{ loading, contentExists: !!repetition }">
+  <ContainerPage v-bind="{ loading, contentExists: !!repetition }">
     <template v-if="!!repetition">
       <Minimizable :minimized="nested" staticHeight="75px">
         <template #minimizedContent>
@@ -60,15 +59,14 @@
         </template>
       </Minimizable>
     </template>
-  </LoadingPage>
-</div>
+  </ContainerPage>
 </template>
 
 <script>
 import Minimizable from "../components/commons/Minimizable.vue";
 import Quiz from "../components/review/Quiz.vue";
 import Repetition from "../components/review/Repetition.vue";
-import LoadingPage from "./commons/LoadingPage.vue";
+import ContainerPage from "./commons/ContainerPage.vue";
 import NoteStatisticsButton from "../components/notes/NoteStatisticsButton.vue";
 import RepeatProgressBar from "../components/review/RepeatProgressBar.vue";
 import { restGet, restPost } from "../restful/restful";
@@ -80,7 +78,7 @@ export default {
     Minimizable,
     Quiz,
     Repetition,
-    LoadingPage,
+    ContainerPage,
     NoteStatisticsButton,
     RepeatProgressBar,
   },

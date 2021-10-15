@@ -1,6 +1,4 @@
 <template>
-  <div class="container">
-    <h2></h2>
     <ContainerPage v-bind="{ loading, contentExists: true, title: 'Welcome, new user. Please create your profile' }">
       <form @submit.prevent.once="processForm">
         <TextInput
@@ -14,7 +12,6 @@
         <input type="submit" value="Submit" class="btn btn-primary" />
       </form>
     </ContainerPage>
-  </div>
 </template>
 
 <script setup>

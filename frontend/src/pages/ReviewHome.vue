@@ -1,14 +1,12 @@
 <template>
-<div class="container">
-  <LoadingPage v-bind="{ loading, contentExists: !!reviewing }">
+  <Containerpage v-bind="{ loading, contentExists: !!reviewing }">
     <ReviewWelcome v-if="!!reviewing" v-bind="{ reviewing }" />
-  </LoadingPage>
-</div>
+  </Containerpage>
 </template>
 
 <script>
 import ReviewWelcome from "../components/review/ReviewWelcome.vue";
-import LoadingPage from "./commons/LoadingPage.vue";
+import ContainerPage from "./commons/ContainerPage.vue";
 import { restGet } from "../restful/restful";
 
 export default {
@@ -18,7 +16,7 @@ export default {
       loading: null,
     };
   },
-  components: { ReviewWelcome, LoadingPage },
+  components: { ReviewWelcome, ContainerPage },
   methods: {
     fetchData() {
       this.loading = true
