@@ -1,5 +1,5 @@
 <template>
-<div class="container">
+<ContainerPage v-bind="{ loading: false, contentExists: true }">
   <h1 v-if="!!user" class="display-4">Welcome {{ user.name }}!</h1>
   <h1 v-else class="display-4">Welcome to Doughnut!!!</h1>
   <p v-if="!user">Please <a href="/login">login with Github</a>.</p>
@@ -64,9 +64,10 @@
       </div>
     </div>
   </div>
-</div>
+</ContainerPage>
 </template>
 
 <script setup>
+import ContainerPage from "./commons/ContainerPage.vue";
 const props = defineProps({ user: Object });
 </script>

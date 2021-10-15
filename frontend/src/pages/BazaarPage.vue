@@ -1,27 +1,24 @@
 <template>
-<div class="container">
-  <h2>Welcome To The Bazaar</h2>
-  <p>These are shared notes from doughnut users.</p>
-  <LoadingPage v-bind="{ loading, contentExists: !!notebooksViewedByUser }">
+  <ContainerPage v-bind="{ loading, contentExists: !!notebooksViewedByUser, title: 'Welcome To The Bazaar' }">
+    <p>These are shared notes from doughnut users.</p>
     <div v-if="!!notebooksViewedByUser">
       <NotebookBazaarViewCards
         :notebooks="notebooksViewedByUser.notebooks"
         :user="user"
       />
     </div>
-  </LoadingPage>
-</div>
+  </ContainerPage>
 </template>
 
 <script>
 import NotebookBazaarViewCards from "../components/bazaar/NotebookBazaarViewCards.vue";
-import LoadingPage from "./commons/LoadingPage.vue";
+import ContainerPage from "./commons/ContainerPage.vue";
 import { restGet } from "../restful/restful";
 
 export default {
   name: "NotebooksPage",
   props: { user: Object },
-  components: { LoadingPage, NotebookBazaarViewCards },
+  components: { ContainerPage, NotebookBazaarViewCards },
   data() {
     return {
       loading: true,

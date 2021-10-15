@@ -1,7 +1,6 @@
 <template>
-<div class="container">
   <p v-if="!!errorMessage" v-text="errorMessage"></p>
-  <LoadingPage v-bind="{ loading, contentExists: !!failureReports }">
+  <ContainerPage v-bind="{ loading, contentExists: !!failureReports }">
     <div v-if="!!failureReports">
       <h2>Failure report list</h2>
       <div
@@ -20,17 +19,16 @@
         </router-link>
       </div>
     </div>
-  </LoadingPage>
-</div>
+  </ContainerPage>
 </template>
 
 <script>
-import LoadingPage from "./commons/LoadingPage.vue";
+import ContainerPage from "./commons/ContainerPage.vue";
 import { restGet, loginOrRegister } from "../restful/restful";
 
 export default {
   props: { user: Object },
-  components: { LoadingPage },
+  components: { ContainerPage },
   data() {
     return {
       loading: true,

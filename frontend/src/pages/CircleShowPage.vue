@@ -1,6 +1,5 @@
 <template>
-<div class="container">
-  <LoadingPage v-bind="{ loading, contentExists: !!circle }">
+  <ContainerPage v-bind="{ loading, contentExists: !!circle }">
     <div v-if="circle">
       <h1 v-text="circle.name" />
       <p>
@@ -36,13 +35,12 @@
         <input id="invitation-code" :value="invitationUrl" readonly />
       </div>
     </div>
-  </LoadingPage>
-</div>
+  </ContainerPage>
 </template>
 
 <script>
 import SvgMissingAvatar from "../components/svgs/SvgMissingAvatar.vue";
-import LoadingPage from "./commons/LoadingPage.vue";
+import ContainerPage from "./commons/ContainerPage.vue";
 import NotebookCardsWithButtons from "../components/notebook/NotebookCardsWithButtons.vue";
 import NotebookNewButton from "../components/notebook/NotebookNewButton.vue";
 import NotebookButtons from "../components/notebook/NotebookButtons.vue";
@@ -56,7 +54,7 @@ export default {
     NotebookButtons,
     NotebookNewButton,
     BazaarNotebookButtons,
-    LoadingPage,
+    ContainerPage,
   },
   props: { circleId: Number, featureToggle: Boolean },
 

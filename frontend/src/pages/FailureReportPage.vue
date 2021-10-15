@@ -1,8 +1,5 @@
 <template>
-<div class="container">
-  <h2>Failure Report</h2>
-
-  <LoadingPage v-bind="{ loading, contentExists: !!failureReport }">
+  <ContainerPage v-bind="{ loading, contentExists: !!failureReport, title: 'Failure Report' }">
     <div v-if="!!failureReport">
       <div class="jumbotron py-4 mb-2">
         <h2><p v-text="failureReport.errorName" /></h2>
@@ -16,17 +13,16 @@
         />
       </div>
     </div>
-  </LoadingPage>
-</div>
+  </ContainerPage>
 </template>
 
 <script>
-import LoadingPage from "./commons/LoadingPage.vue";
+import ContainerPage from "./commons/ContainerPage.vue";
 import { restGet } from "../restful/restful";
 
 export default {
   props: { failureReportId: String },
-  components: { LoadingPage },
+  components: { ContainerPage },
   data() {
     return {
       loading: true,

@@ -1,8 +1,6 @@
 <template>
-<div class="container">
-  <h2>My Circles</h2>
-  <CircleNewButton @updated="fetchData()" />
-  <LoadingPage v-bind="{ loading, contentExists: !!circles }">
+  <ContainerPage v-bind="{ loading, contentExists: !!circles, title: 'My Circles' }">
+    <CircleNewButton @updated="fetchData()" />
     <div v-if="!!circles">
       <div class="row">
         <div
@@ -22,20 +20,18 @@
         </div>
       </div>
     </div>
-  </LoadingPage>
-
-  <CircleJoinForm />
-</div>
+    <CircleJoinForm />
+  </ContainerPage>
 </template>
 
 <script>
-import LoadingPage from "./commons/LoadingPage.vue";
+import ContainerPage from "./commons/ContainerPage.vue";
 import CircleNewButton from "../components/circles/CircleNewButton.vue";
 import CircleJoinForm from "../components/circles/CircleJoinForm.vue";
 import { restGet } from "../restful/restful";
 
 export default {
-  components: { LoadingPage, CircleNewButton, CircleJoinForm },
+  components: { ContainerPage, CircleNewButton, CircleJoinForm },
   data() {
     return {
       loading: true,
