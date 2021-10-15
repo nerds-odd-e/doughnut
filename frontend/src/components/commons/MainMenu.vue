@@ -65,11 +65,12 @@
           <div
             class="form-inline my-2 my-lg-0"
           >
-            <input
+            <button
               class="btn btn-outline-success me-2 my-sm-0"
-              value="Logout"
               v-on:click="logout"
-            />
+            >
+              Logout
+            </button>
           </div>
         </div>
         <a v-else class="btn btn-outline-primary me-2 my-sm-0" href="/login"
