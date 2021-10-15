@@ -1,8 +1,12 @@
 <template>
   <LoadingPage v-bind="{ loading, contentExists: !!notePosition }">
-    <div v-if="!loading">
-      <Breadcrumb v-bind="notePosition" />
-      <NoteOverview v-bind="{ noteId }" />
+    <div class="box" v-if="!loading">
+      <div class="header">
+        <Breadcrumb v-bind="notePosition" />
+      </div>
+      <div class="content">
+        <NoteMindmap v-bind="{ noteId }" />
+      </div>
     </div>
   </LoadingPage>
 </template>
@@ -10,7 +14,7 @@
 <script>
 import LoadingPage from "./commons/LoadingPage.vue";
 import { storedApiGetNoteWithDescendents } from "../storedApi";
-import NoteOverview from "../components/notes/NoteOverview.vue";
+import NoteMindmap from "../components/notes/NoteMindmap.vue";
 import Breadcrumb from "../components/notes/Breadcrumb.vue";
 
 export default {
@@ -22,7 +26,7 @@ export default {
       loading: true,
     };
   },
-  components: { LoadingPage, NoteOverview, Breadcrumb },
+  components: { LoadingPage, NoteMindmap, Breadcrumb },
   methods: {
 
     fetchData() {
@@ -46,3 +50,20 @@ export default {
   },
 };
 </script>
+
+<style lang="sass" scoped>
+.box
+  display: flex
+  flex-flow: column
+  height: 100%
+
+.box .header
+  flex: 0 1 auto
+
+.box .content
+  flex: 1 1 auto
+  background-color: green
+
+.box .footer
+  flex: 0 1 40px
+</style>
