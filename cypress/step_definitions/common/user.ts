@@ -121,3 +121,15 @@ Then("I change my name to {string}", (name) => {
   cy.getFormControl("Name").clear().type(name);
   cy.findByText("Submit").click();
 });
+
+Then("I logout via the UI", () => {
+  cy.visit("/")
+  cy.findByRole('button', {name: 'Logout'}).click()
+});
+
+Then("I should be on the welcome page and asked to login", () => {
+  cy.contains("Welcome")
+  cy.findByRole('link', {name: 'Login via Github'}).click()
+});
+
+

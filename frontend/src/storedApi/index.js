@@ -1,5 +1,10 @@
 import { restGet, restPost } from "../restful/restful";
 
+const apiLogout = async () => {
+    await restPost(`/logout`, {})
+}
+
+
 const storedApiGetNoteWithDescendents = async (store, noteId) => {
     const res = await restGet(
         `/api/notes/${noteId}/overview`);
@@ -26,6 +31,7 @@ const apiGetCurrentUserInfo = () => restGet(`/api/user/current-user-info`)
 const apiGetFeatureToggle = () => restGet(`/api/testability/feature_toggle`)
 
 export {
+    apiLogout,
     storedApiGetNoteWithDescendents,
     storedApiGetNoteAndItsChildren,
     storedApiSplitNote,

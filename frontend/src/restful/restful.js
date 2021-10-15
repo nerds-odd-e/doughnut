@@ -43,6 +43,10 @@ const restRequest = (url, params, loadingRef) => {
         });
       })
       .catch((error) => {
+        if (error.status === 204) {
+          resolve(null)
+          return
+        }
         if (error.status === 401) {
           loginOrRegister();
           return;

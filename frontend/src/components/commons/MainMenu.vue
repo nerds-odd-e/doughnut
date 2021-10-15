@@ -62,17 +62,15 @@
               >{{ user.name }}</router-link
             >
           </span>
-          <form
+          <div
             class="form-inline my-2 my-lg-0"
-            th:action="@{/logout}"
-            method="post"
           >
             <input
               class="btn btn-outline-success me-2 my-sm-0"
-              type="submit"
               value="Logout"
+              v-on:click="logout"
             />
-          </form>
+          </div>
         </div>
         <a v-else class="btn btn-outline-primary me-2 my-sm-0" href="/login"
           >Login via Github</a
@@ -83,7 +81,16 @@
 </template>
 
 <script>
+import { apiLogout } from '../../storedApi'
+
 export default {
   props: { user: Object, featureToggle: Boolean },
+  methods: {
+    async logout() {
+      await apiLogout()
+      window.location.href = "/bazaar"
+    }
+
+  }
 };
 </script>
