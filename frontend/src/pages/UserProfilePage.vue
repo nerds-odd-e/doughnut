@@ -1,8 +1,5 @@
 <template>
-<div class="container">
-  <h2>Edit User Setting</h2>
-
-  <LoadingPage v-bind="{ loading, contentExists: !!formData }">
+  <ContainerPage v-bind="{ loading, contentExists: !!formData, title: 'Edit User Setting' }">
     <div v-if="!!formData">
       <form @submit.prevent.once="processForm">
         <TextInput
@@ -27,18 +24,17 @@
         <input type="submit" value="Submit" class="btn btn-primary" />
       </form>
     </div>
-  </LoadingPage>
-</div>
+  </ContainerPage>
 </template>
 
 <script>
-import LoadingPage from "./commons/LoadingPage.vue";
+import ContainerPage from "./commons/ContainerPage.vue";
 import TextInput from "../components/form/TextInput.vue";
 import { restGet, restPatchMultiplePartForm } from "../restful/restful";
 
 export default {
   props: { failureReportId: String },
-  components: { LoadingPage, TextInput },
+  components: { ContainerPage, TextInput },
   emits: ["userUpdated"],
   data() {
     return {

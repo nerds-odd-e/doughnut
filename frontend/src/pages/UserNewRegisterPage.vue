@@ -1,7 +1,7 @@
 <template>
   <div class="container">
-    <h2>Welcome, new user. Please create your profile</h2>
-    <LoadingPage v-bind="{ loading, contentExists: true }">
+    <h2></h2>
+    <ContainerPage v-bind="{ loading, contentExists: true, title: 'Welcome, new user. Please create your profile' }">
       <form @submit.prevent.once="processForm">
         <TextInput
           scopeName="user"
@@ -13,12 +13,12 @@
         />
         <input type="submit" value="Submit" class="btn btn-primary" />
       </form>
-    </LoadingPage>
+    </ContainerPage>
   </div>
 </template>
 
 <script setup>
-import LoadingPage from "./commons/LoadingPage.vue";
+import ContainerPage from "./commons/ContainerPage.vue";
 import TextInput from "../components/form/TextInput.vue";
 import { restPostMultiplePartForm } from "../restful/restful";
 import { ref } from "@vue/reactivity";
