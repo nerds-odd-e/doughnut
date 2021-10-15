@@ -1,5 +1,7 @@
 <template>
+<div class="container">
   <CircleJoinForm v-bind="{ invitationCode }" />
+</div>
 </template>
 
 <script>

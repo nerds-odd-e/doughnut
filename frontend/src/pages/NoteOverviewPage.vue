@@ -1,10 +1,12 @@
 <template>
+<div class="container">
   <LoadingPage v-bind="{ loading, contentExists: !!notePosition }">
     <div v-if="!loading">
       <Breadcrumb v-bind="notePosition" />
       <NoteOverview v-bind="{ noteId }" />
     </div>
   </LoadingPage>
+</div>
 </template>
 
 <script>

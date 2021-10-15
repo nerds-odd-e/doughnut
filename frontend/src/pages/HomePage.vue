@@ -1,4 +1,5 @@
 <template>
+<div class="container">
   <h1 v-if="!!user" class="display-4">Welcome {{ user.name }}!</h1>
   <h1 v-else class="display-4">Welcome to Doughnut!!!</h1>
   <p v-if="!user">Please <a href="/login">login with Github</a>.</p>
@@ -63,6 +64,7 @@
       </div>
     </div>
   </div>
+</div>
 </template>
 
 <script setup>

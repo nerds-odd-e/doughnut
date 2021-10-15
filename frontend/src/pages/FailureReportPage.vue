@@ -1,4 +1,5 @@
 <template>
+<div class="container">
   <h2>Failure Report</h2>
 
   <LoadingPage v-bind="{ loading, contentExists: !!failureReport }">
@@ -16,6 +17,7 @@
       </div>
     </div>
   </LoadingPage>
+</div>
 </template>
 
 <script>

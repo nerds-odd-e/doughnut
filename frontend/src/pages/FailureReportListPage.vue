@@ -1,4 +1,5 @@
 <template>
+<div class="container">
   <p v-if="!!errorMessage" v-text="errorMessage"></p>
   <LoadingPage v-bind="{ loading, contentExists: !!failureReports }">
     <div v-if="!!failureReports">
@@ -20,6 +21,7 @@
       </div>
     </div>
   </LoadingPage>
+</div>
 </template>
 
 <script>

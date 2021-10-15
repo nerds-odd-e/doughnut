@@ -1,4 +1,5 @@
 <template>
+<div class="container">
   <LoadingPage v-bind="{ loading, contentExists: !!reviewPointViewedByUser }">
     <template v-if="!!reviewPoint">
       <ProgressBar
@@ -44,6 +45,7 @@
       </Minimizable>
     </template>
   </LoadingPage>
+</div>
 </template>
 
 <script>

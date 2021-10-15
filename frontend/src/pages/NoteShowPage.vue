@@ -1,10 +1,12 @@
 <template>
+<div class="container">
   <LoadingPage v-bind="{ loading, contentExists: !!notePosition }">
     <div v-if="notePosition" :key="noteId">
       <NoteWithChildrenCards v-if="!loading" v-bind="{id: noteId, notePosition}"/>
       <NoteStatisticsButton :noteId="noteId" />
     </div>
   </LoadingPage>
+</div>
 </template>
 
 <script>

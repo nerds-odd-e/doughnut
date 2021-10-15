@@ -1,4 +1,5 @@
 <template>
+<div class="container">
   <LoadingPage v-bind="{ loading, contentExists: !!circle }">
     <div v-if="circle">
       <h1 v-text="circle.name" />
@@ -36,6 +37,7 @@
       </div>
     </div>
   </LoadingPage>
+</div>
 </template>
 
 <script>

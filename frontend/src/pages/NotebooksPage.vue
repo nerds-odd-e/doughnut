@@ -1,4 +1,5 @@
 <template>
+<div class="container">
   <h2>Notebooks</h2>
   <LoadingPage v-bind="{ loading, contentExists: !!notebooksViewedByUser }">
     <div v-if="!!notebooksViewedByUser">
@@ -13,6 +14,7 @@
       />
     </div>
   </LoadingPage>
+</div>
 </template>
 
 <script>

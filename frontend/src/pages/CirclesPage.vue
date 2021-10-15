@@ -1,4 +1,5 @@
 <template>
+<div class="container">
   <h2>My Circles</h2>
   <CircleNewButton @updated="fetchData()" />
   <LoadingPage v-bind="{ loading, contentExists: !!circles }">
@@ -24,6 +25,7 @@
   </LoadingPage>
 
   <CircleJoinForm />
+</div>
 </template>
 
 <script>

@@ -1,29 +1,31 @@
 <template>
-  <LoadingPage v-bind="{ loading, contentExists: !!linkViewedByUser }">
-    <div v-if="linkViewedByUser">
-      <LinkShow v-bind="linkViewedByUser">
-        <div class="link-content">
-          <div>
-            <LinkTypeSelect
-              scopeName="link"
-              v-model="formData.typeId"
-              :errors="formErrors.typeId"
-              :inverseIcon="true"
-            />
-            <button class="btn btn-primary" v-on:click="updateLink()">
-              Update
-            </button>
-            <button class="btn btn-danger" v-on:click="deleteLink()">
-              Delete
-            </button>
-          </div>
-          <nav class="nav d-flex flex-row-reverse p-0">
-            <NoteStatisticsButton :linkid="linkViewedByUser.id" />
-          </nav>
+<div class="container">
+<LoadingPage v-bind="{ loading, contentExists: !!linkViewedByUser }">
+  <div v-if="linkViewedByUser">
+    <LinkShow v-bind="linkViewedByUser">
+      <div class="link-content">
+        <div>
+          <LinkTypeSelect
+            scopeName="link"
+            v-model="formData.typeId"
+            :errors="formErrors.typeId"
+            :inverseIcon="true"
+          />
+          <button class="btn btn-primary" v-on:click="updateLink()">
+            Update
+          </button>
+          <button class="btn btn-danger" v-on:click="deleteLink()">
+            Delete
+          </button>
         </div>
-      </LinkShow>
-    </div>
-  </LoadingPage>
+        <nav class="nav d-flex flex-row-reverse p-0">
+          <NoteStatisticsButton :linkid="linkViewedByUser.id" />
+        </nav>
+      </div>
+    </LinkShow>
+  </div>
+</LoadingPage>
+</div>
 </template>
 
 <script>

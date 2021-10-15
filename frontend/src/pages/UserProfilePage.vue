@@ -1,4 +1,5 @@
 <template>
+<div class="container">
   <h2>Edit User Setting</h2>
 
   <LoadingPage v-bind="{ loading, contentExists: !!formData }">
@@ -27,6 +28,7 @@
       </form>
     </div>
   </LoadingPage>
+</div>
 </template>
 
 <script>

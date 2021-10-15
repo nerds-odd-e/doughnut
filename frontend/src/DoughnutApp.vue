@@ -79,12 +79,33 @@ export default {
 </script>
 
 <template>
+<div class="box">
+
   <Popups :popupInfo="popupInfo" @done="done($event)" />
   <UserNewRegisterPage v-if="newUser" @userCreated="user = $event" />
   <template v-else>
-    <MainMenu v-if="showNavBar" v-bind="{user, featureToggle}" />
-    <div v-if="!loading" class="container content">
+    <div class="header">
+      <MainMenu v-if="showNavBar" v-bind="{user, featureToggle}" />
+    </div>
+    <div v-if="!loading" class="content">
       <router-view :user="user" @userUpdated="user = $event" :featureToggle="featureToggle" />
     </div>
   </template>
+</div>
 </template>
+
+<style lang="sass" scoped>
+.box
+  display: flex
+  flex-flow: column
+  height: 100vh
+
+.box .header
+  flex: 0 1 auto
+
+.box .content
+  flex: 1 1 auto
+
+.box .footer
+  flex: 0 1 40px
+</style>

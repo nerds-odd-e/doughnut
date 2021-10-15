@@ -1,4 +1,5 @@
 <template>
+<div class="container">
   <LoadingPage v-bind="{ loading, contentExists: !!repetition }">
     <template v-if="!!repetition">
       <Minimizable :minimized="nested" staticHeight="75px">
@@ -60,6 +61,7 @@
       </Minimizable>
     </template>
   </LoadingPage>
+</div>
 </template>
 
 <script>

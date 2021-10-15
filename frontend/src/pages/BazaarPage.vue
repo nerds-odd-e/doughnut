@@ -1,4 +1,5 @@
 <template>
+<div class="container">
   <h2>Welcome To The Bazaar</h2>
   <p>These are shared notes from doughnut users.</p>
   <LoadingPage v-bind="{ loading, contentExists: !!notebooksViewedByUser }">
@@ -9,6 +10,7 @@
       />
     </div>
   </LoadingPage>
+</div>
 </template>
 
 <script>
