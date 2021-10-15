@@ -1,6 +1,5 @@
 <template>
-<div class="container">
-  <LoadingPage v-bind="{ loading, contentExists: !!reviewPointViewedByUser }">
+  <ContainerPage v-bind="{ loading, contentExists: !!reviewPointViewedByUser }">
     <template v-if="!!reviewPoint">
       <ProgressBar
         v-bind="{
@@ -44,8 +43,7 @@
         </template>
       </Minimizable>
     </template>
-  </LoadingPage>
-</div>
+  </ContainerPage>
 </template>
 
 <script>
@@ -54,7 +52,7 @@ import ReviewSettingForm from "../components/review/ReviewSettingForm.vue";
 import ReviewPointAbbr from "../components/review/ReviewPointAbbr.vue";
 import InitialReviewButtons from "../components/review/InitialReviewButtons.vue";
 import ProgressBar from "../components/commons/ProgressBar.vue";
-import LoadingPage from "./commons/LoadingPage.vue";
+import ContainerPage from "./commons/ContainerPage.vue";
 import Minimizable from "../components/commons/Minimizable.vue";
 import { restGet, restPost } from "../restful/restful";
 
@@ -64,7 +62,7 @@ export default {
   components: {
     ShowReviewPoint,
     ReviewSettingForm,
-    LoadingPage,
+    ContainerPage,
     InitialReviewButtons,
     Minimizable,
     ProgressBar,

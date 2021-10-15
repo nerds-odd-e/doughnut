@@ -1,6 +1,5 @@
 <template>
-<div class="container">
-<LoadingPage v-bind="{ loading, contentExists: !!linkViewedByUser }">
+<ContainerPage v-bind="{ loading, contentExists: !!linkViewedByUser }">
   <div v-if="linkViewedByUser">
     <LinkShow v-bind="linkViewedByUser">
       <div class="link-content">
@@ -24,20 +23,19 @@
       </div>
     </LinkShow>
   </div>
-</LoadingPage>
-</div>
+</ContainerPage>
 </template>
 
 <script>
 import LinkShow from "../components/links/LinkShow.vue";
 import LinkTypeSelect from "../components/links/LinkTypeSelect.vue";
 import NoteStatisticsButton from "../components/notes/NoteStatisticsButton.vue";
-import LoadingPage from "./commons/LoadingPage.vue";
+import ContainerPage from "./commons/ContainerPage.vue";
 import { restGet, restPost } from "../restful/restful";
 
 export default {
   name: "LinkShowPage",
-  components: { LinkShow, LinkTypeSelect, NoteStatisticsButton, LoadingPage },
+  components: { LinkShow, LinkTypeSelect, NoteStatisticsButton, ContainerPage },
   props: { linkid: Number },
   data() {
     return {

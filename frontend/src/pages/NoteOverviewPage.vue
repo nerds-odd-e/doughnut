@@ -1,16 +1,14 @@
 <template>
-<div class="container">
-  <LoadingPage v-bind="{ loading, contentExists: !!notePosition }">
+  <ContainerPage v-bind="{ loading, contentExists: !!notePosition }">
     <div v-if="!loading">
       <Breadcrumb v-bind="notePosition" />
       <NoteOverview v-bind="{ noteId }" />
     </div>
-  </LoadingPage>
-</div>
+  </ContainerPage>
 </template>
 
 <script>
-import LoadingPage from "./commons/LoadingPage.vue";
+import ContainerPage from "./commons/ContainerPage.vue";
 import { storedApiGetNoteWithDescendents } from "../storedApi";
 import NoteOverview from "../components/notes/NoteOverview.vue";
 import Breadcrumb from "../components/notes/Breadcrumb.vue";
@@ -24,7 +22,7 @@ export default {
       loading: true,
     };
   },
-  components: { LoadingPage, NoteOverview, Breadcrumb },
+  components: { ContainerPage, NoteOverview, Breadcrumb },
   methods: {
 
     fetchData() {

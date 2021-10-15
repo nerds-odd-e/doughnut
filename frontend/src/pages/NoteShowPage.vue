@@ -1,18 +1,16 @@
 <template>
-<div class="container">
-  <LoadingPage v-bind="{ loading, contentExists: !!notePosition }">
+  <ContainerPage v-bind="{ loading, contentExists: !!notePosition }">
     <div v-if="notePosition" :key="noteId">
       <NoteWithChildrenCards v-if="!loading" v-bind="{id: noteId, notePosition}"/>
       <NoteStatisticsButton :noteId="noteId" />
     </div>
-  </LoadingPage>
-</div>
+  </ContainerPage>
 </template>
 
 <script>
 import NoteWithChildrenCards from "../components/notes/NoteWithChildrenCards.vue";
 import NoteStatisticsButton from "../components/notes/NoteStatisticsButton.vue";
-import LoadingPage from "./commons/LoadingPage.vue";
+import ContainerPage from "./commons/ContainerPage.vue";
 import { storedApiGetNoteAndItsChildren } from "../storedApi";
 
 export default {
@@ -24,7 +22,7 @@ export default {
       loading: true,
     };
   },
-  components: { NoteWithChildrenCards, NoteStatisticsButton, LoadingPage },
+  components: { NoteWithChildrenCards, NoteStatisticsButton, ContainerPage },
   methods: {
     fetchData() {
       this.loading = true
