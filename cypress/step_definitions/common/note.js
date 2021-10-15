@@ -192,6 +192,10 @@ When("I click on the overview button", () => {
   cy.findByText("Full view mode").click();
 });
 
+When("I click on the mindmap view button", () => {
+  cy.findByText("Mindmap mode").click();
+});
+
 Then("I should see the title {string} of the notebook", (noteTitle) => {
   cy.expectNoteTitle(noteTitle);
 });

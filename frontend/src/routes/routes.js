@@ -15,6 +15,7 @@ import FailureReportListPage from "@/pages/FailureReportListPage.vue";
 import FailureReportPage from "@/pages/FailureReportPage.vue";
 import UserProfilePage from "@/pages/UserProfilePage.vue";
 import NoteOverviewPage from "@/pages/NoteOverviewPage.vue";
+import NoteMindmapPage from "@/pages/NoteMindmapPage.vue";
 
 const NestedInitialReviewPage = NestedPage(
   InitialReviewPage,
@@ -48,6 +49,12 @@ const noteAndLinkRoutes = [
     path: "notes/:noteId/overview",
     name: "noteOverview",
     component: NoteOverviewPage,
+    props: true,
+  },
+  {
+    path: "notes/:noteId/mindmap",
+    name: "mindmap",
+    component: NoteMindmapPage,
     props: true,
   },
 ];
