@@ -2,7 +2,7 @@
   <NoteCard v-bind="{ note: noteViewedByUser, mindmapSector: mindmapSector }"/>
   <NoteMindmap
     v-for="(childId, index) in childrenIds"
-    v-bind="{ noteId: childId, mindmapSector: mindmapSector.getChildSector(index) }"
+    v-bind="{ noteId: childId, mindmapSector: mindmapSector.getChildSector(childrenIds.length, index) }"
     :key="childId"
   />
 </template>
@@ -15,7 +15,7 @@ export default {
   name: "NoteOverview",
   props: {
     noteId: Number,
-    mindmapSector: { type: MindmapSector, default: new MindmapSector(0)}
+    mindmapSector: { type: MindmapSector, default: new MindmapSector(0, 0, 0, 360)}
   },
   emits: ["updated"],
   components: { NoteCard },
