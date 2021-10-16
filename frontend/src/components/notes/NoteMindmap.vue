@@ -1,9 +1,9 @@
 <template>
 <div class="mindmap">
-  <NoteCard v-bind="{ note: noteViewedByUser }"/>
+  <NoteCard v-bind="{ note: noteViewedByUser, offset: 0 }"/>
   <NoteCard
     v-for="child in children"
-    v-bind="{ note: child }"
+    v-bind="{ note: child, offset: 20 }"
     :key="child.id"
   />
 </div>

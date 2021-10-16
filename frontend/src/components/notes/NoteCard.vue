@@ -14,10 +14,11 @@ import { computed } from "@vue/reactivity";
 import NoteTitleWithLink from "./NoteTitleWithLink.vue";
 const props = defineProps({
   note: Object,
+  offset: Number,
   linkFragment: { type: Object, default: NoteTitleWithLink },
 });
 
-const x = computed(()=>{return 45})
+const x = computed(()=>{return 45 + props.offset})
 const y = computed(()=>{return 39})
 </script>
 

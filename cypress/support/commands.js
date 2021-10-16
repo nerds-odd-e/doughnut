@@ -422,3 +422,13 @@ Cypress.Commands.add("withinMindmap", () => {
   }))
 });
 
+Cypress.Commands.add("distanceBetweenCardsGreaterThan", {prevSubject: true}, (cards, note1, note2, min) => {
+    const rect1 = cards[note1]
+    const rect2 = cards[note2]
+    const xd = (rect1.right + rect1.left) / 2 - (rect2.right + rect2.left) / 2
+    const yd = (rect1.top + rect1.bottom) / 2 - (rect2.top + rect2.bottom) / 2
+    expect(Math.sqrt(xd * xd + yd * yd)).greaterThan(min)
+
+});
+
+
