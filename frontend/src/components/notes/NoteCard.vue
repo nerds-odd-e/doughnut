@@ -12,14 +12,16 @@
 <script setup>
 import { computed } from "@vue/reactivity";
 import NoteTitleWithLink from "./NoteTitleWithLink.vue";
+import MindmapSector from "./MindmapSector";
+
 const props = defineProps({
   note: Object,
-  offset: Number,
+  mindmapSector: MindmapSector,
   linkFragment: { type: Object, default: NoteTitleWithLink },
 });
 
-const x = computed(()=>{return props.offset - 150 / 2})
-const y = computed(()=>{return 0 - 50 / 2})
+const x = computed(()=>props.mindmapSector.x)
+const y = computed(()=>props.mindmapSector.y)
 </script>
 
 <style lang="sass" scoped>

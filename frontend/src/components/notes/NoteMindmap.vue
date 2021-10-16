@@ -1,20 +1,21 @@
 <template>
-  <NoteCard v-bind="{ note: noteViewedByUser, offset: offset }"/>
+  <NoteCard v-bind="{ note: noteViewedByUser, mindmapSector: mindmapSector }"/>
   <NoteMindmap
     v-for="(childId, index) in childrenIds"
-    v-bind="{ noteId: childId, offset: 250 * (index % 2 == 0 ? 1 : -1) }"
+    v-bind="{ noteId: childId, mindmapSector: mindmapSector.getChildSector(index) }"
     :key="childId"
   />
 </template>
 
 <script lang="ts">
 import NoteCard from "./NoteCard.vue";
+import MindmapSector from "./MindmapSector";
 
 export default {
   name: "NoteOverview",
   props: {
     noteId: Number,
-    offset: { type: Number, default: 0}
+    mindmapSector: { type: MindmapSector, default: new MindmapSector(0)}
   },
   emits: ["updated"],
   components: { NoteCard },
