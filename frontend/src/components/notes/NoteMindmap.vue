@@ -1,12 +1,10 @@
 <template>
-<div class="mindmap">
-  <NoteCard v-bind="{ note: noteViewedByUser, offset: 0 }"/>
-  <NoteCard
-    v-for="(child, index) in children"
-    v-bind="{ note: child, offset: 20 * (index % 2 == 0 ? 1 : -1) }"
-    :key="child.id"
+  <NoteCard v-bind="{ note: noteViewedByUser, offset: offset }"/>
+  <NoteMindmap
+    v-for="(childId, index) in childrenIds"
+    v-bind="{ noteId: childId, offset: 250 * (index % 2 == 0 ? 1 : -1) }"
+    :key="childId"
   />
-</div>
 </template>
 
 <script lang="ts">
@@ -16,6 +14,7 @@ export default {
   name: "NoteOverview",
   props: {
     noteId: Number,
+    offset: { type: Number, default: 0}
   },
   emits: ["updated"],
   components: { NoteCard },
@@ -23,15 +22,9 @@ export default {
     noteViewedByUser() {
       return this.$store.getters.getNoteById(this.noteId);
     },
-    children() {
-      return this.$store.getters.getChildrenOfParentId(this.noteId);
+    childrenIds() {
+      return this.$store.getters.getChildrenIdsByParentId(this.noteId);
     },
   },
 };
 </script>
-
-<style lang="sass" scoped>
-.mindmap
-  position: relative
-  height: 100%
-</style>

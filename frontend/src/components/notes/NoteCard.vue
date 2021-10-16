@@ -1,5 +1,5 @@
 <template>
-  <div class="note-card" role="card" :aria-label="note.title" :style="`top:${y}vh; left:${x}vw`">
+  <div class="note-card" role="card" :aria-label="note.title" :style="`top:${y}px; left:${x}px`">
     <h5 class="note-card-title">
       <component :is="linkFragment" :note="note" class="card-title" />
     </h5>
@@ -18,8 +18,8 @@ const props = defineProps({
   linkFragment: { type: Object, default: NoteTitleWithLink },
 });
 
-const x = computed(()=>{return 45 + props.offset})
-const y = computed(()=>{return 39})
+const x = computed(()=>{return props.offset - 150 / 2})
+const y = computed(()=>{return 0 - 50 / 2})
 </script>
 
 <style lang="sass" scoped>

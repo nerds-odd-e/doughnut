@@ -202,7 +202,7 @@ When("I should see the note {string} in the center of the map", (noteTitle) => {
           const cardRect = cards[noteTitle]
           const cardCenterX = cardRect.left + cardRect.width / 2
           const cardCenterY = cardRect.bottom - cardRect.height / 2
-          expect(Math.abs(rect.right/2 - cardCenterX)).lessThan(50)
+          expect(Math.abs(rect.right/2 - cardCenterX)).lessThan(20)
           expect(Math.abs(rect.bottom/2 - cardCenterY)).lessThan(50)
   })
 });

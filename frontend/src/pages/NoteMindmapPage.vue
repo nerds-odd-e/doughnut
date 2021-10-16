@@ -5,7 +5,9 @@
         <Breadcrumb v-bind="notePosition" />
       </div>
       <div class="content">
-        <NoteMindmap v-bind="{ noteId }" />
+        <div class="mindmap">
+          <NoteMindmap v-bind="{ noteId }" />
+        </div>
       </div>
     </div>
   </LoadingPage>
@@ -66,4 +68,9 @@ export default {
 
 .box .footer
   flex: 0 1 40px
+
+.mindmap
+  position: relative
+  top: 50%
+  left: 50%
 </style>
