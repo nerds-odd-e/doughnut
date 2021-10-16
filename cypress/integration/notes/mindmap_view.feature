@@ -13,9 +13,4 @@ Feature: Mindmap view
     And I click on the mindmap view button
 
   Scenario: View the child notes of a child note in sequential order
-#    Then I should see the note "Singapore" in the center of the map
-    And I should see the child notes "History,Geography" in order
-    And I should see the child notes "History,Leaving Malaysia,Geography" in order
-    And I should see "Top" in breadcrumb
-    When I double click "Singapore" and edit the description to "Founded in 1819"
-    Then I should see "Founded in 1819" in the page
+    Then I should see the note "Singapore" in the center of the map

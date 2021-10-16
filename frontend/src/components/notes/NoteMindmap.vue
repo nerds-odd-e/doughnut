@@ -1,16 +1,11 @@
 <template>
-  <NoteWithLinks v-bind="{ ...noteViewedByUser }"/>
-  <div class="note-list">
-    <NoteOverview
-      v-for="childId in childrenIds"
-      v-bind="{ noteId: childId }"
-      :key="childId"
-    />
-  </div>
+<div class="mindmap">
+  <NoteCard v-bind="{ note: noteViewedByUser }"/>
+</div>
 </template>
 
 <script lang="ts">
-import NoteWithLinks from "./NoteWithLinks.vue";
+import NoteCard from "./NoteCard.vue";
 
 export default {
   name: "NoteOverview",
@@ -18,7 +13,7 @@ export default {
     noteId: Number,
   },
   emits: ["updated"],
-  components: { NoteWithLinks },
+  components: { NoteCard },
   computed: {
     noteViewedByUser() {
       return this.$store.getters.getNoteById(this.noteId);
@@ -31,6 +26,7 @@ export default {
 </script>
 
 <style lang="sass" scoped>
-.note-list
-  margin-left: 10px
+.mindmap
+  position: relative
+  height: 100%
 </style>

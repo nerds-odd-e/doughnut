@@ -196,6 +196,21 @@ When("I click on the mindmap view button", () => {
   cy.findByText("Mindmap mode").click();
 });
 
+When("I should see the note {string} in the center of the map", (noteTitle) => {
+  cy.get(`.mindmap`).then((mindmap)=>{
+      const rect = mindmap[0].getBoundingClientRect()
+      cy.get(`[role='card'][aria-label="${noteTitle}"]`).then((e)=>{
+          const cardRect = e[0].getBoundingClientRect()
+          const cardCenterX = cardRect.left + cardRect.width / 2
+          const cardCenterY = cardRect.bottom - cardRect.height / 2
+          expect(Math.abs(rect.right/2 - cardCenterX)).lessThan(50)
+          expect(Math.abs(rect.bottom/2 - cardCenterY)).lessThan(50)
+
+          cy.log(cardRect.width);
+      })
+  })
+});
+
 Then("I should see the title {string} of the notebook", (noteTitle) => {
   cy.expectNoteTitle(noteTitle);
 });

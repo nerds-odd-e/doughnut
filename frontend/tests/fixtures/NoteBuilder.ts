@@ -28,6 +28,11 @@ class NoteBuilder extends Builder {
     return this;
   }
 
+  shortDescription(value: string): NoteBuilder {
+    this.data.shortDescription = value;
+    return this;
+  }
+
   under(value: any): NoteBuilder {
     value.childrenIds.push(this.data.id)
 
