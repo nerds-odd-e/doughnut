@@ -197,28 +197,20 @@ When("I click on the mindmap view button", () => {
 });
 
 When("I should see the note {string} in the center of the map", (noteTitle) => {
-  cy.get(`.mindmap`).then((mindmap)=>{
-      const rect = mindmap[0].getBoundingClientRect()
-      cy.get(`[role='card'][aria-label="${noteTitle}"]`).then((e)=>{
-          const cardRect = e[0].getBoundingClientRect()
+  cy.withinMindmap().then((cards) => {
+          const rect = cards.mindmapRect
+          const cardRect = cards[noteTitle]
           const cardCenterX = cardRect.left + cardRect.width / 2
           const cardCenterY = cardRect.bottom - cardRect.height / 2
           expect(Math.abs(rect.right/2 - cardCenterX)).lessThan(50)
           expect(Math.abs(rect.bottom/2 - cardCenterY)).lessThan(50)
-      })
   })
 });
 
 When("I should see the notes {string} are around note {string} and apart from each other", (noteTitles, parentNoteTitle) => {
-  cy.get(`.mindmap`).then((mindmap)=>{
-      const rect = mindmap[0].getBoundingClientRect()
-      cy.get("[role='card']").then(($elms)=>{
-        cy.log(Cypress.$.makeArray($elms).map((el) => el.innerText))
-        const cards = Object.fromEntries(Cypress.$.makeArray($elms).map((el) => [el.innerText, el.getBoundingClientRect()]))
+  cy.withinMindmap().then((cards) => {
         noteTitles.commonSenseSplit(",").forEach((noteTitle) => {
             expect(cards).haveOwnProperty(noteTitle)
-        })
-
       })
   })
 });
