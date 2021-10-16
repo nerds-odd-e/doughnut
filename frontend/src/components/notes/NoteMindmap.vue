@@ -15,7 +15,7 @@ export default {
   name: "NoteOverview",
   props: {
     noteId: Number,
-    mindmapSector: { type: MindmapSector, default: new MindmapSector(0, 0, 0, 360)}
+    mindmapSector: { type: MindmapSector, default: new MindmapSector(0, 0, 0, Math.PI * 2)}
   },
   emits: ["updated"],
   components: { NoteCard },

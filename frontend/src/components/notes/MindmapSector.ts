@@ -1,4 +1,6 @@
 class MindmapSector {
+    readonly radius = 210
+
     nx: number
 
     ny: number
@@ -15,15 +17,19 @@ class MindmapSector {
     }
 
     get x(): number {
-        return this.nx - 150 / 2
+        return this.nx
     }
 
     get y(): number {
-        return this.ny - 50 / 2
+        return this.ny
     }
 
     getChildSector(siblingCount: number, index: number): MindmapSector {
-        return new MindmapSector(this.nx + 250 * (index % 2 === 0 ? 1 : -1), 0, 0, 360)
+        const ang = this.startAngle + this.angle / siblingCount * index + this.angle / siblingCount / 2
+        const x = this.nx + this.radius * Math.sin(ang)
+        const y = this.ny + this.radius * Math.cos(ang)
+        const start = this.startAngle + this.angle / siblingCount * index - Math.PI / 10
+        return new MindmapSector(x, y, start, this.angle / siblingCount + Math.PI / 5)
     }
 
 }

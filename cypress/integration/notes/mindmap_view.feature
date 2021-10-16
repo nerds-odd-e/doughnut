@@ -9,6 +9,7 @@ Feature: Mindmap view
       | History          | Singapore     |             |
       | Geography        | Singapore     |             |
       | Leaving Malaysia | History       | in 1965     |
+      | Terry came       | History       | in 2014     |
     And I open "Singapore" note from top level
     And I click on the mindmap view button
 

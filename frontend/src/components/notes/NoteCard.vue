@@ -20,8 +20,8 @@ const props = defineProps({
   linkFragment: { type: Object, default: NoteTitleWithLink },
 });
 
-const x = computed(()=>props.mindmapSector.x)
-const y = computed(()=>props.mindmapSector.y)
+const x = computed(()=>props.mindmapSector.x - 150 / 2)
+const y = computed(()=>props.mindmapSector.y - 50 / 2)
 </script>
 
 <style lang="sass" scoped>
