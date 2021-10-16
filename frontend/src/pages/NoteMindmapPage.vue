@@ -65,6 +65,8 @@ export default {
 .box .content
   flex: 1 1 auto
   background-color: green
+  overflow: hidden
+
 
 .box .footer
   flex: 0 1 40px
@@ -73,4 +75,6 @@ export default {
   position: relative
   top: 50%
   left: 50%
+  width: 1px
+  height: 1px
 </style>
