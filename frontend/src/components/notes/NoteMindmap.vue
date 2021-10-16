@@ -2,8 +2,8 @@
 <div class="mindmap">
   <NoteCard v-bind="{ note: noteViewedByUser, offset: 0 }"/>
   <NoteCard
-    v-for="child in children"
-    v-bind="{ note: child, offset: 20 }"
+    v-for="(child, index) in children"
+    v-bind="{ note: child, offset: 20 * (index % 2 == 0 ? 1 : -1) }"
     :key="child.id"
   />
 </div>

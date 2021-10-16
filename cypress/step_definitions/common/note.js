@@ -209,9 +209,11 @@ When("I should see the note {string} in the center of the map", (noteTitle) => {
 
 When("I should see the notes {string} are around note {string} and apart from each other", (noteTitles, parentNoteTitle) => {
   cy.withinMindmap().then((cards) => {
-    noteTitles.commonSenseSplit(",").forEach((noteTitle) => {
+    const titles = noteTitles.commonSenseSplit(",")
+    titles.forEach((noteTitle) => {
       cy.wrap(cards).distanceBetweenCardsGreaterThan(parentNoteTitle, noteTitle, 100)
     })
+    cy.wrap(cards).distanceBetweenCardsGreaterThan(titles[0], titles[1], 100)
   })
 });
 
