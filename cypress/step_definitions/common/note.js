@@ -212,8 +212,13 @@ When("I should see the note {string} in the center of the map", (noteTitle) => {
 When("I should see the notes {string} are around note {string} and apart from each other", (noteTitles, parentNoteTitle) => {
   cy.get(`.mindmap`).then((mindmap)=>{
       const rect = mindmap[0].getBoundingClientRect()
-      noteTitles.commonSenseSplit(",").forEach((noteTitle) => {
-          cy.get(`[role='card'][aria-label="${noteTitle}"]`).should('exist')
+      cy.get("[role='card']").then(($elms)=>{
+        cy.log(Cypress.$.makeArray($elms).map((el) => el.innerText))
+        const cards = Object.fromEntries(Cypress.$.makeArray($elms).map((el) => [el.innerText, el.getBoundingClientRect()]))
+        noteTitles.commonSenseSplit(",").forEach((noteTitle) => {
+            expect(cards).haveOwnProperty(noteTitle)
+        })
+
       })
   })
 });
