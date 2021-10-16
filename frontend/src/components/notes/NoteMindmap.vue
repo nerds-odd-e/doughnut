@@ -1,6 +1,11 @@
 <template>
 <div class="mindmap">
   <NoteCard v-bind="{ note: noteViewedByUser }"/>
+  <NoteCard
+    v-for="child in children"
+    v-bind="{ note: child }"
+    :key="child.id"
+  />
 </div>
 </template>
 
@@ -18,8 +23,8 @@ export default {
     noteViewedByUser() {
       return this.$store.getters.getNoteById(this.noteId);
     },
-    childrenIds() {
-      return this.$store.getters.getChildrenIdsByParentId(this.noteId);
+    children() {
+      return this.$store.getters.getChildrenOfParentId(this.noteId);
     },
   },
 };

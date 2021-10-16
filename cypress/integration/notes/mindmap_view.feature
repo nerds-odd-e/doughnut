@@ -14,3 +14,4 @@ Feature: Mindmap view
 
   Scenario: View the child notes of a child note in sequential order
     Then I should see the note "Singapore" in the center of the map
+    And I should see the notes "History,Geography" are around note "Singapore" and apart from each other

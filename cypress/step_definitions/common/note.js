@@ -205,8 +205,15 @@ When("I should see the note {string} in the center of the map", (noteTitle) => {
           const cardCenterY = cardRect.bottom - cardRect.height / 2
           expect(Math.abs(rect.right/2 - cardCenterX)).lessThan(50)
           expect(Math.abs(rect.bottom/2 - cardCenterY)).lessThan(50)
+      })
+  })
+});
 
-          cy.log(cardRect.width);
+When("I should see the notes {string} are around note {string} and apart from each other", (noteTitles, parentNoteTitle) => {
+  cy.get(`.mindmap`).then((mindmap)=>{
+      const rect = mindmap[0].getBoundingClientRect()
+      noteTitles.commonSenseSplit(",").forEach((noteTitle) => {
+          cy.get(`[role='card'][aria-label="${noteTitle}"]`).should('exist')
       })
   })
 });
