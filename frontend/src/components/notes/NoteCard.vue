@@ -16,6 +16,7 @@ import MindmapSector from "./MindmapSector";
 
 const props = defineProps({
   note: Object,
+  fromSector: MindmapSector,
   mindmapSector: MindmapSector,
   linkFragment: { type: Object, default: NoteTitleWithLink },
 });
