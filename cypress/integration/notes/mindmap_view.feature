@@ -14,5 +14,8 @@ Feature: Mindmap view
     And I click on the mindmap view button
 
   Scenario: View the child notes of a child note in sequential order
-    Then I should see the note "Singapore" in the center of the map
+    Then I should see the note "Singapore" is 0px * 0px offset the center of the map
     And I should see the notes "History,Geography" are around note "Singapore" and apart from each other
+    When I drag the map by 200px * 100px
+    Then I should see the note "Singapore" is 200px * 100px offset the center of the map
+

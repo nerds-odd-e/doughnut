@@ -39,7 +39,7 @@ describe("note mindmap", () => {
     })
 
     it("should render the two notes", async () => {
-      const container = renderAndGetContainer(notes[0].id)
+      renderAndGetContainer(notes[0].id)
       expect(screen.getAllByRole("card")).toHaveLength(2)
     });
 

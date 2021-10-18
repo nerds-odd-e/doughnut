@@ -26,6 +26,7 @@ const y = computed(()=>props.mindmapSector.y - 50 / 2)
 
 <style lang="sass" scoped>
 .note-card
+  z-index: 2000
   position: absolute
   width: 150px
   min-height: 50px

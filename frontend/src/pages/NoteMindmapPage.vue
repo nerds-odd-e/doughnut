@@ -8,6 +8,14 @@
         <div class="mindmap">
           <NoteMindmap v-bind="{ noteId }" />
         </div>
+        <div class="mindmap-event-receiver"
+         @mousedown="startDrag"
+         @touchstart="startDrag"
+         @mousemove="onDrag"
+         @touchmove="onDrag"
+         @mouseup="stopDrag"
+         @touchend="stopDrag"
+        />
       </div>
     </div>
   </LoadingPage>
@@ -26,11 +34,13 @@ export default {
     return {
       notePosition: null,
       loading: true,
+      dragging: false,
+      start: {},
+      offset: {x: 0, y: 0},
     };
   },
   components: { LoadingPage, NoteMindmap, Breadcrumb },
   methods: {
-
     fetchData() {
       this.loading = true;
       storedApiGetNoteWithDescendents(this.$store, this.noteId)
@@ -41,6 +51,31 @@ export default {
       ;
     },
 
+    startDrag(e) {
+      e = e.changedTouches ? e.changedTouches[0] : e;
+      this.dragging = true;
+      this.start.x = e.clientX;
+      this.start.y = e.clientY;
+      this.start.offset = {...this.offset}
+    },
+    onDrag(e) {
+      if (this.dragging) {
+        e = e.changedTouches ? e.changedTouches[0] : e;
+        this.offset.x = this.start.offset.x + e.clientX - this.start.x;
+        this.offset.y = this.start.offset.y + e.clientY - this.start.y;
+      }
+    },
+    stopDrag() {
+      this.dragging = false;
+    }
+  },
+  computed: {
+    centerX() {
+      return `calc(50% + ${this.offset.x}px)`
+    },
+    centerY() {
+      return `calc(50% + ${this.offset.y}px)`
+    }
   },
   watch: {
     noteId() {
@@ -73,8 +108,17 @@ export default {
 
 .mindmap
   position: relative
-  top: 50%
-  left: 50%
+  top: v-bind("centerY")
+  left: v-bind("centerX")
   width: 1px
   height: 1px
+
+.mindmap-event-receiver
+  position: relative
+  top: 0
+  left: 0
+  width: 100%
+  height: 100%
+  z-index: 1000
+
 </style>

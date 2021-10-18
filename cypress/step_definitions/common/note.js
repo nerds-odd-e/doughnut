@@ -196,16 +196,24 @@ When("I click on the mindmap view button", () => {
   cy.findByText("Mindmap mode").click();
 });
 
-When("I should see the note {string} in the center of the map", (noteTitle) => {
+When("I should see the note {string} is {int}px * {int}px offset the center of the map", (noteTitle, dx, dy) => {
   cy.withinMindmap().then((cards) => {
           const rect = cards.mindmapRect
           const cardRect = cards[noteTitle]
           const cardCenterX = cardRect.left + cardRect.width / 2
           const cardCenterY = cardRect.bottom - cardRect.height / 2
-          expect(Math.abs(rect.right/2 - cardCenterX)).lessThan(20)
-          expect(Math.abs(rect.bottom/2 - cardCenterY)).lessThan(50)
+          expect(Math.abs(rect.right/2 - cardCenterX + dx)).lessThan(20)
+          expect(Math.abs(rect.bottom/2 - cardCenterY + dy)).lessThan(50)
   })
 });
+
+When("I drag the map by {int}px * {int}px", (dx, dy) => {
+    cy.get('.mindmap-event-receiver')
+      .trigger('mousedown', "topLeft")
+      .trigger('mousemove', "topLeft", { clientX: dx, clientY: dy })
+      .trigger('mouseup', {force: true})
+});
+
 
 When("I should see the notes {string} are around note {string} and apart from each other", (noteTitles, parentNoteTitle) => {
   cy.withinMindmap().then((cards) => {
