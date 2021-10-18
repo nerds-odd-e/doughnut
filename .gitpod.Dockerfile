@@ -34,6 +34,12 @@ RUN apt-get update \
     fonts-powerline \
     gnupg \
     curl \
+    && apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 0xB1998361219BD9C9 \
+    && curl -O https://cdn.azul.com/zulu/bin/zulu-repo_1.0.0-2_all.deb \
+    && apt-get install -y ./zulu-repo_1.0.0-2_all.deb \
+    && apt-get update -y \
+    && apt-get install -y zulu16-jdk \
+    && update-alternatives --set java /usr/lib/jvm/zulu16/bin/java \
     && wget http://www-eu.apache.org/dist/maven/maven-3/3.8.2/binaries/apache-maven-3.8.2-bin.tar.gz \
     && tar xvf apache-maven-3.8.2-bin.tar.gz \
     && rm -rf /var/lib/apt/lists/* \
@@ -127,8 +133,9 @@ RUN echo "if [ ! -e /var/run/mysqld/gitpod-init.lock ]" >> /home/gitpod/.bashrc 
     && echo "  [ ! -e /var/run/mysqld/mysqld.pid ] && mysqld --daemonize" >> /home/gitpod/.bashrc \
     && echo "  rm /var/run/mysqld/gitpod-init.lock" >> /home/gitpod/.bashrc \
     && echo "fi" >> /home/gitpod/.bashrc \
+    && echo "export JAVA_HOME=/usr/lib/jvm/zulu16" >> /home/gitpod/.bashrc \
     && echo "export M2_HOME=/opt/maven" >> /home/gitpod/.bashrc \
-    && echo 'export PATH=$PATH:$M2_HOME/bin' >> /home/gitpod/.bashrc
+    && echo 'export PATH=$PATH:$JAVA_HOME/bin:$M2_HOME/bin' >> /home/gitpod/.bashrc
 
 EXPOSE 3000
 EXPOSE 3309
