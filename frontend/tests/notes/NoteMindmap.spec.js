@@ -32,11 +32,11 @@ describe("note mindmap", () => {
     );
     expect(screen.getAllByRole("card")).toHaveLength(2)
 
-    // const connection = await wrapper.container.querySelector("[role='connection']")
-    // const line = connection.querySelector("line")
-    // expect(line.getAttribute("x1")).toEqual("1000px")
-    // expect(line.getAttribute("x2")).toEqual("3000px")
-    // expect(line.getAttribute("y2")).toEqual("4000px")
+    const connection = await wrapper.container.querySelector("svg.mindmap-canvas")
+    const line = connection.querySelector("line")
+    expect(line.getAttribute("x1")).toEqual("0")
+    expect(parseFloat(line.getAttribute("x2"))).toBeCloseTo(0)
+    expect(parseFloat(line.getAttribute("y2"))).toBeCloseTo(-210)
   });
 
 })

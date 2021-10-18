@@ -1,5 +1,5 @@
 <template>
-  <NoteCard v-is="noteComponent" v-bind="{ note: noteViewedByUser, mindmapSector: mindmapSector }"/>
+  <component v-bind:is="noteComponent" v-bind="{ note: noteViewedByUser, mindmapSector: mindmapSector }"/>
   <NoteMindmapScaffold
     v-for="(childId, index) in childrenIds"
     v-bind="{ noteComponent, noteId: childId, mindmapSector: mindmapSector.getChildSector(childrenIds.length, index) }"
@@ -10,6 +10,7 @@
 <script lang="ts">
 import MindmapSector from "@/models/MindmapSector";
 import NoteCard from "./NoteCard.vue";
+import NoteConnection from "./NoteConnection.vue";
 
 export default {
   name: "NoteMindmap",
@@ -19,7 +20,7 @@ export default {
     noteComponent: String,
   },
   emits: ["updated"],
-  components: { NoteCard },
+  components: { NoteCard, NoteConnection },
   computed: {
     noteViewedByUser() {
       return this.$store.getters.getNoteById(this.noteId);

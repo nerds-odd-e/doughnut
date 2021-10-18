@@ -1,7 +1,8 @@
 <template>
-  <NoteMindmapScaffold
-    v-bind="{ noteId, mindmapSector, noteComponent: 'NoteCard'}"
-  />
+  <svg class="mindmap-canvas">
+    <NoteMindmapScaffold v-bind="{ noteId, mindmapSector, noteComponent: 'NoteConnection'}"/>
+  </svg>
+  <NoteMindmapScaffold v-bind="{ noteId, mindmapSector, noteComponent: 'NoteCard'}"/>
 </template>
 
 <script lang="ts">
@@ -22,3 +23,8 @@ export default {
   },
 };
 </script>
+
+<style lang="sass" scoped>
+.mindmap-canvas
+  overflow: visible
+</style>
