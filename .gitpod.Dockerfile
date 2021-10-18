@@ -40,15 +40,18 @@ RUN apt-get update \
     && apt-get update -y \
     && apt-get install -y zulu16-jdk \
     && update-alternatives --set java /usr/lib/jvm/zulu16/bin/java \
-    && wget http://www-eu.apache.org/dist/maven/maven-3/3.8.2/binaries/apache-maven-3.8.2-bin.tar.gz \
-    && tar xvf apache-maven-3.8.2-bin.tar.gz \
+    && wget http://www-eu.apache.org/dist/maven/maven-3/3.8.3/binaries/apache-maven-3.8.3-bin.tar.gz \
+    && tar xvf apache-maven-3.8.3-bin.tar.gz \
+    && wget https://services.gradle.org/distributions/gradle-7.2-bin.zip -P /tmp \
+    && unzip -d /opt/gradle /tmp/gradle-7.2-bin.zip \
+    && ln -s /opt/gradle/gradle-7.2 /opt/gradle/latest \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /var/cache/apt
 
 # Setup Maven3 MAVEN_HOME & PATH
-RUN mv apache-maven-3.8.2 /opt/maven \
-    && rm -rf apache-maven-3.8.2 \
-    && rm -f apache-maven-3.8.2-bin.tar.gz
+RUN mv apache-maven-3.8.3 /opt/maven \
+    && rm -rf apache-maven-3.8.3 \
+    && rm -f apache-maven-3.8.3-bin.tar.gz
 
 # Install MySQL DB
 RUN install-packages mysql-server \
@@ -135,7 +138,8 @@ RUN echo "if [ ! -e /var/run/mysqld/gitpod-init.lock ]" >> /home/gitpod/.bashrc 
     && echo "fi" >> /home/gitpod/.bashrc \
     && echo "export JAVA_HOME=/usr/lib/jvm/zulu16" >> /home/gitpod/.bashrc \
     && echo "export M2_HOME=/opt/maven" >> /home/gitpod/.bashrc \
-    && echo 'export PATH=$PATH:$JAVA_HOME/bin:$M2_HOME/bin' >> /home/gitpod/.bashrc
+    && echo "export GRADLE_HOME=/opt/gradle/latest" >> /home/gitpod/.bashrc \
+    && echo 'export PATH=$PATH:$JAVA_HOME/bin:$M2_HOME/bin:$GRADLE_HOME/bin' >> /home/gitpod/.bashrc
 
 EXPOSE 3000
 EXPOSE 3309
