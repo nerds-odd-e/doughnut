@@ -8,7 +8,7 @@
         <div class="mindmap">
           <NoteMindmap v-bind="{ noteId }" />
         </div>
-        <NoteMindmapEventReceiver class="mindmap-event-receiver" v-model="offset"/>
+        <DragListner class="mindmap-event-receiver" v-model="offset"/>
       </div>
     </div>
   </LoadingPage>
@@ -18,7 +18,7 @@
 import LoadingPage from "./commons/LoadingPage.vue";
 import { storedApiGetNoteWithDescendents } from "../storedApi";
 import NoteMindmap from "../components/notes/mindmap/NoteMindmap.vue";
-import NoteMindmapEventReceiver from "../components/notes/mindmap/NoteMindmapEventReceiver.vue";
+import DragListner from "../components/commons/DragListner.vue";
 import Breadcrumb from "../components/notes/Breadcrumb.vue";
 
 export default {
@@ -31,7 +31,7 @@ export default {
       offset: {x: 0, y: 0},
     };
   },
-  components: { LoadingPage, NoteMindmap, NoteMindmapEventReceiver, Breadcrumb },
+  components: { LoadingPage, NoteMindmap, DragListner, Breadcrumb },
   methods: {
     fetchData() {
       this.loading = true;
