@@ -20,14 +20,6 @@ class MindmapSector {
         this.angle = angle
     }
 
-    get x(): number {
-        return this.nx
-    }
-
-    get y(): number {
-        return this.ny
-    }
-
     get isHead(): boolean {
         return this.parentX === null
     }
