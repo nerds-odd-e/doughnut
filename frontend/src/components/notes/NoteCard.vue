@@ -12,11 +12,10 @@
 <script setup>
 import { computed } from "@vue/reactivity";
 import NoteTitleWithLink from "./NoteTitleWithLink.vue";
-import MindmapSector from "./MindmapSector";
+import { MindmapSector } from "../../models/Mindmap";
 
 const props = defineProps({
   note: Object,
-  fromSector: MindmapSector,
   mindmapSector: MindmapSector,
   linkFragment: { type: Object, default: NoteTitleWithLink },
 });

@@ -2,14 +2,14 @@
   <NoteCard v-bind="{ note: noteViewedByUser, mindmapSector: mindmapSector }"/>
   <NoteMindmap
     v-for="(childId, index) in childrenIds"
-    v-bind="{ fromSctor: mindmapSector, noteId: childId, mindmapSector: mindmapSector.getChildSector(childrenIds.length, index) }"
+    v-bind="{ noteId: childId, mindmapSector: mindmapSector.getChildSector(childrenIds.length, index) }"
     :key="childId"
   />
 </template>
 
 <script lang="ts">
 import NoteCard from "./NoteCard.vue";
-import MindmapSector from "./MindmapSector";
+import { MindmapSector } from "../../models/Mindmap";
 
 export default {
   name: "NoteMindmap",

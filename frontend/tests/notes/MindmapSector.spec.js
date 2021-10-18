@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-import MindmapSector from "@/components/notes/MindmapSector.ts";
+import { MindmapSector } from "@/models/Mindmap.ts";
 
 describe("MindmapSector", () => {
   const head = new MindmapSector(0, 0, 0, Math.PI * 2)
