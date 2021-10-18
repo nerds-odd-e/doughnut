@@ -16,7 +16,7 @@
 <script>
 import LoadingPage from "./commons/LoadingPage.vue";
 import { storedApiGetNoteWithDescendents } from "../storedApi";
-import NoteMindmap from "../components/notes/NoteMindmap.vue";
+import NoteMindmap from "../components/notes/mindmap/NoteMindmap.vue";
 import Breadcrumb from "../components/notes/Breadcrumb.vue";
 
 export default {

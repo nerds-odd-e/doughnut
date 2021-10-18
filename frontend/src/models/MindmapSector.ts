@@ -36,4 +36,4 @@ class MindmapSector {
 
 const x = 1
 
-export { MindmapSector, x }
+export default MindmapSector

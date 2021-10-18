@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import { screen } from "@testing-library/vue";
-import NoteMinmap from "@/components/notes/NoteMindmap.vue";
+import NoteMinmap from "@/components/notes/mindmap/NoteMindmap.vue";
 import store from "../../src/store/index.js";
 import { renderWithStoreAndMockRoute } from "../helpers";
 import makeMe from "../fixtures/makeMe";

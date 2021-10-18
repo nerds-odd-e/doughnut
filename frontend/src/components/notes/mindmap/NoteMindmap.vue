@@ -9,7 +9,7 @@
 
 <script lang="ts">
 import NoteCard from "./NoteCard.vue";
-import { MindmapSector } from "../../models/Mindmap";
+import MindmapSector from "@/models/MindmapSector";
 
 export default {
   name: "NoteMindmap",
