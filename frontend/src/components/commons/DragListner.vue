@@ -1,11 +1,12 @@
 <template>
-  <div
+  <div style="cursor: pointer;"
     @mousedown="startDrag"
     @touchstart="startDrag"
     @mousemove="onDrag"
     @touchmove="onDrag"
     @mouseup="stopDrag"
     @touchend="stopDrag"
+    @mousewheel="zoom"
   />
 </template>
 
@@ -17,6 +18,7 @@ export default {
     return {
       dragging: false,
       start: {},
+      rand: 'not yet',
     };
   },
   methods: {
@@ -37,6 +39,12 @@ export default {
     },
     stopDrag() {
       this.dragging = false;
+    },
+    zoom(e) {
+      this.modelValue.scale += e.deltaY * 0.01
+        this.modelValue.x *= this.modelValue.scale
+        this.modelValue.y *= this.modelValue.scale
+      this.$emit("update:modelValue", this.modelValue)
     }
   },
 };

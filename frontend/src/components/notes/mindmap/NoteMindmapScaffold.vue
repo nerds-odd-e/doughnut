@@ -1,8 +1,8 @@
 <template>
-  <component v-bind:is="noteComponent" v-bind="{ note: noteViewedByUser, mindmapSector: mindmapSector }"/>
+  <component v-bind:is="noteComponent" v-bind="{ note: noteViewedByUser, scale, mindmapSector: mindmapSector }"/>
   <NoteMindmapScaffold
     v-for="(childId, index) in childrenIds"
-    v-bind="{ noteComponent, noteId: childId, mindmapSector: mindmapSector.getChildSector(childrenIds.length, index) }"
+    v-bind="{ noteComponent, scale, noteId: childId, mindmapSector: mindmapSector.getChildSector(childrenIds.length, index) }"
     :key="childId"
   />
 </template>
@@ -16,6 +16,7 @@ export default {
   name: "NoteMindmap",
   props: {
     noteId: Number,
+    scale: Number,
     mindmapSector: MindmapSector,
     noteComponent: String,
   },

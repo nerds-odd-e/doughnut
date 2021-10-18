@@ -1,8 +1,8 @@
 <template>
   <svg class="mindmap-canvas">
-    <NoteMindmapScaffold v-bind="{ noteId, mindmapSector, noteComponent: 'NoteConnection'}"/>
+    <NoteMindmapScaffold v-bind="{ noteId, scale, mindmapSector, noteComponent: 'NoteConnection'}"/>
   </svg>
-  <NoteMindmapScaffold v-bind="{ noteId, mindmapSector, noteComponent: 'NoteCard'}"/>
+  <NoteMindmapScaffold v-bind="{ noteId, scale, mindmapSector, noteComponent: 'NoteCard'}"/>
 </template>
 
 <script lang="ts">
@@ -13,6 +13,7 @@ export default {
   name: "NoteMindmap",
   props: {
     noteId: Number,
+    scale: Number,
   },
   emits: ["updated"],
   components: { NoteMindmapScaffold },

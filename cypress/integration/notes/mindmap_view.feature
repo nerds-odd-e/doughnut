@@ -17,5 +17,9 @@ Feature: Mindmap view
     Then I should see the note "Singapore" is 0px * 0px offset the center of the map
     And I should see the notes "History,Geography" are around note "Singapore" and apart from each other
     When I drag the map by 200px * 100px
-    Then I should see the note "Singapore" is 200px * 100px offset the center of the map
+    Then I should see the note "Singapore" is 200px * 20px offset the center of the map
+    When I zoom in at the top left corner
+    Then I should see the note "Singapore" is 300px * 25px offset the center of the map
+    Then I should see the note "Geography" is -15px * 25px offset the center of the map
+
 

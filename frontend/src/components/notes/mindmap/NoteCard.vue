@@ -1,5 +1,5 @@
 <template>
-  <div class="note-card" role="card" :aria-label="note.title" :style="`top:${y}px; left:${x}px`">
+  <div class="note-card" role="card" :aria-label="note.title" :style="`top:${coord.y}px; left:${coord.x}px`">
     <h5 class="note-card-title">
       <component :is="linkFragment" :note="note" class="card-title" />
     </h5>
@@ -16,12 +16,12 @@ import MindmapSector from "@/models/MindmapSector";
 
 const props = defineProps({
   note: Object,
+  scale: Number,
   mindmapSector: MindmapSector,
   linkFragment: { type: Object, default: NoteTitleWithLink },
 });
 
-const x = computed(()=>props.mindmapSector.x - 150 / 2)
-const y = computed(()=>props.mindmapSector.y - 50 / 2)
+const coord = computed(()=>props.mindmapSector.coord(150, 50, props.scale))
 </script>
 
 <style lang="sass" scoped>

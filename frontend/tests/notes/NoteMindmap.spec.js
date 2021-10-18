@@ -18,7 +18,7 @@ describe("note mindmap", () => {
     const { wrapper } = renderWithStoreAndMockRoute(
       store,
       NoteMinmap,
-      { props: { noteId } },
+      { props: { noteId, scale: 1 } },
     );
     return wrapper.container
   }

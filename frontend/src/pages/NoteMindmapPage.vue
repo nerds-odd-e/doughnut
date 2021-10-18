@@ -6,7 +6,7 @@
       </div>
       <div class="content">
         <div class="mindmap">
-          <NoteMindmap v-bind="{ noteId }" />
+          <NoteMindmap v-bind="{ noteId, scale: offset.scale }" />
         </div>
         <DragListner class="mindmap-event-receiver" v-model="offset"/>
       </div>
@@ -28,7 +28,7 @@ export default {
     return {
       loading: false,
       notePosition: null,
-      offset: {x: 0, y: 0},
+      offset: {x: 0, y: 0, scale: 1.0},
     };
   },
   components: { LoadingPage, NoteMindmap, DragListner, Breadcrumb },
