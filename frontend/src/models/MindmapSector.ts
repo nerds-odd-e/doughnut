@@ -33,7 +33,7 @@ class MindmapSector {
     }
 
     connection(boxWidth: number, boxHeight: number): any {
-        return { x1: 0, y1: 0, x2: this.nx, y2: this.ny}
+        return { x1: this.parentX, y1: this.parentY, x2: this.nx, y2: this.ny}
     }
 
     getChildSector(siblingCount: number, index: number): MindmapSector {

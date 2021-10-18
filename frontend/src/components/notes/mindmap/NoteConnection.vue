@@ -1,6 +1,6 @@
 <template>
       <line v-if="!mindmapSector.isHead" v-bind="mindmapSector.connection(150, 50)"
-        style="stroke:rgb(255,0,0);stroke-width:2" />
+        style="stroke:#FF6700;stroke-width:2" />
 </template>
 
 <script setup>
