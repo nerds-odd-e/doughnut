@@ -19,7 +19,6 @@ export default {
     mindmapSector: MindmapSector,
     noteComponent: String,
   },
-  emits: ["updated"],
   components: { NoteCard, NoteConnection },
   computed: {
     noteViewedByUser() {

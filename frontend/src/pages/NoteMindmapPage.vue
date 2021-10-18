@@ -8,14 +8,7 @@
         <div class="mindmap">
           <NoteMindmap v-bind="{ noteId }" />
         </div>
-        <div class="mindmap-event-receiver"
-         @mousedown="startDrag"
-         @touchstart="startDrag"
-         @mousemove="onDrag"
-         @touchmove="onDrag"
-         @mouseup="stopDrag"
-         @touchend="stopDrag"
-        />
+        <NoteMindmapEventReceiver class="mindmap-event-receiver" v-model="offset"/>
       </div>
     </div>
   </LoadingPage>
@@ -25,6 +18,7 @@
 import LoadingPage from "./commons/LoadingPage.vue";
 import { storedApiGetNoteWithDescendents } from "../storedApi";
 import NoteMindmap from "../components/notes/mindmap/NoteMindmap.vue";
+import NoteMindmapEventReceiver from "../components/notes/mindmap/NoteMindmapEventReceiver.vue";
 import Breadcrumb from "../components/notes/Breadcrumb.vue";
 
 export default {
@@ -32,14 +26,12 @@ export default {
   props: { noteId: Number },
   data() {
     return {
+      loading: false,
       notePosition: null,
-      loading: true,
-      dragging: false,
-      start: {},
       offset: {x: 0, y: 0},
     };
   },
-  components: { LoadingPage, NoteMindmap, Breadcrumb },
+  components: { LoadingPage, NoteMindmap, NoteMindmapEventReceiver, Breadcrumb },
   methods: {
     fetchData() {
       this.loading = true;
@@ -50,24 +42,6 @@ export default {
       .finally(() => this.loading = false)
       ;
     },
-
-    startDrag(e) {
-      e = e.changedTouches ? e.changedTouches[0] : e;
-      this.dragging = true;
-      this.start.x = e.clientX;
-      this.start.y = e.clientY;
-      this.start.offset = {...this.offset}
-    },
-    onDrag(e) {
-      if (this.dragging) {
-        e = e.changedTouches ? e.changedTouches[0] : e;
-        this.offset.x = this.start.offset.x + e.clientX - this.start.x;
-        this.offset.y = this.start.offset.y + e.clientY - this.start.y;
-      }
-    },
-    stopDrag() {
-      this.dragging = false;
-    }
   },
   computed: {
     centerX() {
