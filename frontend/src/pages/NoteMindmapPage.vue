@@ -8,6 +8,10 @@
         <div class="mindmap">
           <NoteMindmap v-bind="{ noteId, scale: offset.scale }" />
         </div>
+        <div class="mindmap-info">
+          <span class="scale">{{scalePercentage}}</span>
+          <span class="offset">{{offsetMsg}}</span>
+        </div>
         <DragListner class="mindmap-event-receiver" v-model="offset"/>
       </div>
     </div>
@@ -49,6 +53,12 @@ export default {
     },
     centerY() {
       return `calc(50% + ${this.offset.y}px)`
+    },
+    scalePercentage() {
+      return `${(this.offset.scale * 100).toFixed(0)}%`
+    },
+    offsetMsg() {
+      return `offset: (${this.offset.x.toFixed(0)}, ${this.offset.y.toFixed(0)})`
     }
   },
   watch: {
@@ -94,5 +104,17 @@ export default {
   width: 100%
   height: 100%
   z-index: 1000
+
+.mindmap-info
+  position: relative
+  display: inline
+  top: calc(100% - 50px)
+  left: 10px
+  padding: 3px
+  border-radius: 5px
+  background-color: rgba(125, 125, 125, 0.5)
+  font-size: 70%
+  .offset
+    margin-left: 10px
 
 </style>

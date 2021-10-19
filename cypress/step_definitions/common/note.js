@@ -221,6 +221,10 @@ When("I zoom in at the top left corner", () => {
       .trigger('mousewheel', "topLeft", { clientX: 0, clientY: 0, deltaY: 50 })
 });
 
+When("I should see the zoom scale is {string}", (scale) => {
+    cy.get('.mindmap-info').findByText(scale)
+});
+
 When("I should see the notes {string} are around note {string} and apart from each other", (noteTitles, parentNoteTitle) => {
   cy.withinMindmap().then((cards) => {
     const titles = noteTitles.commonSenseSplit(",")

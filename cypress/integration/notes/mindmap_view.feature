@@ -20,6 +20,7 @@ Feature: Mindmap view
     Then I should see the note "Singapore" is 200px * 20px offset the center of the map
     When I zoom in at the top left corner
     Then I should see the note "Singapore" is 550px * 214px offset the center of the map
-    Then I should see the note "Geography" is 235px * 214px offset the center of the map
+    And I should see the note "Geography" is 235px * 214px offset the center of the map
+    And I should see the zoom scale is "150%"
 
 
