@@ -4,7 +4,7 @@ plugins {
     id 'java'
 }
 
-group = 'com.odd-e'
+group = 'com.odde'
 version = '0.0.1-SNAPSHOT'
 sourceCompatibility = 16
 targetCompatibility = 16
@@ -31,6 +31,7 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     runtimeOnly 'mysql:mysql-connector-java'
+    annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
 }
