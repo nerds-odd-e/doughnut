@@ -22,10 +22,12 @@ export default createStore({
   state: () => ({
     notes: {},
     currentUser: null,
+    featureToggle: false,
   }),
 
   getters: {
     getCurrentUser: (state) => () => state.currentUser,
+    getFeatureToggle: (state) => () => state.featureToggle,
     getNoteById: (state) => (id) => withState(state).getNoteById(id),
     getChildrenIdsByParentId: (state) => (parentId) => withState(state).getChildrenIdsByParentId(parentId),
     getChildrenOfParentId: (state) => (parentId) => withState(state).getChildrenOfParentId(parentId),
@@ -39,6 +41,9 @@ export default createStore({
     },
     currentUser(state, user) {
       state.currentUser = user
+    },
+    featureToggle(state, ft) {
+      state.featureToggle = ft
     },
   },
 });

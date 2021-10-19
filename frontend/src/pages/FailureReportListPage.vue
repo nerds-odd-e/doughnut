@@ -51,6 +51,9 @@ export default {
   mounted() {
     this.fetchData();
   },
+  computed: {
+    user() { return this.$store.getters.getCurrentUser()},
+  },
   beforeRouteEnter(to, from, next) {
     next((vm) => {
       if (!vm.user) {

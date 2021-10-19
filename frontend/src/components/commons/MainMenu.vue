@@ -91,7 +91,10 @@ export default {
       await apiLogout()
       window.location.href = "/bazaar"
     }
-
+  },
+  computed: {
+    user() { return this.$store.getters.getCurrentUser()},
+    featureToggle() { return this.$store.getters.getFeatureToggle()}
   }
 };
 </script>

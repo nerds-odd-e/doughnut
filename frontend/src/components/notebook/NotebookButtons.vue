@@ -20,8 +20,11 @@ import SvgBazaarShare from "../svgs/SvgBazaarShare.vue";
 import { restPost } from "../../restful/restful";
 
 export default {
-  props: { notebook: Object, featureToggle: Boolean  },
+  props: { notebook: Object },
   components: { NotebookEditButton, SvgBazaarShare, NotebookCopyButton },
+  computed: {
+    featureToggle() { return this.$store.getters.getFeatureToggle()}
+  },
   methods: {
     async shareNotebook() {
       if (await this.$popups.confirm(`Are you sure to share?`)) {

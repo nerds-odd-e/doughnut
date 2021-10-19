@@ -53,9 +53,7 @@ export default {
     processForm() {
       this.loading = true
       storedApiUpdateUser(this.$store, this.formData.id, this.formData)
-        .then(() => {
-          this.$router.push({ name: "root" });
-        })
+        .then(() =>  this.$router.push({ name: "root" }))
         .catch((res) => (this.formErrors = res))
         .finally(()=> this.loading = false)
 

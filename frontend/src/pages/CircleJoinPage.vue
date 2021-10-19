@@ -12,7 +12,9 @@ import { loginOrRegister } from "../restful/restful";
 export default {
   components: { CircleJoinForm, ContainerPage },
   props: { invitationCode: Number },
-
+  computed: {
+    user() { return this.$store.getters.getCurrentUser()},
+  },
   beforeRouteEnter(to, from, next) {
     next((vm) => {
       if (!vm.user) {

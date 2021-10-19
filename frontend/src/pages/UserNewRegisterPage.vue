@@ -14,19 +14,28 @@
     </ContainerPage>
 </template>
 
-<script setup>
+<script>
 import ContainerPage from "./commons/ContainerPage.vue";
 import TextInput from "../components/form/TextInput.vue";
-import { restPostMultiplePartForm } from "../restful/restful";
-import { ref } from "@vue/reactivity";
+import { storedApiCreateUser } from "../storedApi"
 
-const emits = defineEmits(["userCreated"]);
-const loading = ref(false);
-const formData = ref({});
-const formErrors = ref({});
-const processForm = () => {
-  restPostMultiplePartForm(`/api/user`, formData.value, loading)
-    .then((res) => emits("userCreated", res))
-    .catch((res) => (formErrors.value = res));
-};
+export default {
+  components: { ContainerPage, TextInput },
+  data() {
+    return {
+      loading: false,
+      formData: {},
+      formErrors: {},
+    }
+  },
+  methods: {
+    processForm() {
+      this.loading = true
+      storedApiCreateUser(this.$store, this.formData)
+        .catch((res) => this.formErrors.value = res)
+        .finally(()=> this.loading = false )
+
+    },
+  },
+}
 </script>

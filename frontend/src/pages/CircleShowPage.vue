@@ -56,7 +56,7 @@ export default {
     BazaarNotebookButtons,
     ContainerPage,
   },
-  props: { circleId: [String, Number], featureToggle: Boolean },
+  props: { circleId: [String, Number] },
 
   data() {
     return {
@@ -82,6 +82,7 @@ export default {
     invitationUrl() {
       return `${window.location.origin}/circles/join/${this.circle.invitationCode}`;
     },
+    featureToggle() { return this.$store.getters.getFeatureToggle()}
   },
 
   watch: {
