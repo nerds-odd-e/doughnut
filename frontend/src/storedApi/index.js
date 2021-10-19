@@ -1,4 +1,4 @@
-import { restGet, restPost } from "../restful/restful";
+import { restGet, restPost, restPatchMultiplePartForm } from "../restful/restful";
 
 const apiLogout = async () => {
     await restPost(`/logout`, {})
@@ -25,8 +25,21 @@ const storedApiSplitNote = async (store, noteId) => {
     return res;
 }
 
+const storedApiGetCurrentUserInfo = async (store) => {
+  const res = await restGet(`/api/user/current-user-info`)
+  store.commit("currentUser", res.user);
+  return res
+}
 
-const apiGetCurrentUserInfo = () => restGet(`/api/user/current-user-info`)
+const storedApiUpdateUser = async (store, userId, data) => {
+  const res = await restPatchMultiplePartForm(
+        `/api/user/${userId}`,
+        data,
+        () => {}
+      )
+  store.commit("currentUser", res)
+  return res
+}
 
 const apiGetFeatureToggle = () => restGet(`/api/testability/feature_toggle`)
 
@@ -35,6 +48,7 @@ export {
     storedApiGetNoteWithDescendents,
     storedApiGetNoteAndItsChildren,
     storedApiSplitNote,
-    apiGetCurrentUserInfo,
+    storedApiGetCurrentUserInfo,
+    storedApiUpdateUser,
     apiGetFeatureToggle,
 }

@@ -17,7 +17,6 @@ import { restGet } from "../restful/restful";
 
 export default {
   name: "NotebooksPage",
-  props: { user: Object },
   components: { ContainerPage, NotebookBazaarViewCards },
   data() {
     return {
@@ -25,6 +24,10 @@ export default {
       notebooksViewedByUser: null,
     };
   },
+  computed: {
+    user() { return this.$store.getters.getCurrentUser()}
+  },
+
   methods: {
     fetchData() {
       this.loading = true

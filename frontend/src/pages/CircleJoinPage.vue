@@ -11,7 +11,7 @@ import { loginOrRegister } from "../restful/restful";
 
 export default {
   components: { CircleJoinForm, ContainerPage },
-  props: { invitationCode: Number, user: Object },
+  props: { invitationCode: Number },
 
   beforeRouteEnter(to, from, next) {
     next((vm) => {

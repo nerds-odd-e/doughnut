@@ -21,9 +21,11 @@ function withState(state) {
 export default createStore({
   state: () => ({
     notes: {},
+    currentUser: null,
   }),
 
   getters: {
+    getCurrentUser: (state) => () => state.currentUser,
     getNoteById: (state) => (id) => withState(state).getNoteById(id),
     getChildrenIdsByParentId: (state) => (parentId) => withState(state).getChildrenIdsByParentId(parentId),
     getChildrenOfParentId: (state) => (parentId) => withState(state).getChildrenOfParentId(parentId),
@@ -34,6 +36,9 @@ export default createStore({
       notes.forEach((note) => {
         state.notes[note.id] = note;
       });
+    },
+    currentUser(state, user) {
+      state.currentUser = user
     },
   },
 });

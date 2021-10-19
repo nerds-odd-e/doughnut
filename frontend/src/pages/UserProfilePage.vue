@@ -30,10 +30,10 @@
 <script>
 import ContainerPage from "./commons/ContainerPage.vue";
 import TextInput from "../components/form/TextInput.vue";
-import { restGet, restPatchMultiplePartForm } from "../restful/restful";
+import { restGet } from "../restful/restful";
+import { storedApiUpdateUser } from "../storedApi"
 
 export default {
-  props: { failureReportId: [String, Number] },
   components: { ContainerPage, TextInput },
   emits: ["userUpdated"],
   data() {
@@ -51,16 +51,14 @@ export default {
       .finally(() => this.loading = false);
     },
     processForm() {
-      restPatchMultiplePartForm(
-        `/api/user/${this.formData.id}`,
-        this.formData,
-        (r) => (this.loading = r)
-      )
-        .then((res) => {
-          this.$emit("userUpdated", res);
+      this.loading = true
+      storedApiUpdateUser(this.$store, this.formData.id, this.formData)
+        .then(() => {
           this.$router.push({ name: "root" });
         })
-        .catch((res) => (this.formErrors = res));
+        .catch((res) => (this.formErrors = res))
+        .finally(()=> this.loading = false)
+
     },
   },
 

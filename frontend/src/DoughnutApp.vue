@@ -2,13 +2,12 @@
 import Popups from "./components/commons/Popups.vue";
 import MainMenu from "./components/commons/MainMenu.vue";
 import UserNewRegisterPage from "./pages/UserNewRegisterPage.vue";
-import { apiGetCurrentUserInfo, apiGetFeatureToggle } from "./storedApi"
+import { storedApiGetCurrentUserInfo, apiGetFeatureToggle } from "./storedApi"
 
 export default {
   data() {
     return {
       featureToggle: false,
-      user: null,
       externalIdentifier: null,
       showNavBar: true,
       loading: true,
@@ -33,6 +32,7 @@ export default {
     newUser() {
       return !this.user && !!this.externalIdentifier;
     },
+    user() { return this.$store.getters.getCurrentUser()}
   },
 
   methods: {
@@ -48,8 +48,7 @@ export default {
 
     apiGetFeatureToggle().then((res) => { this.featureToggle = res})
 
-    apiGetCurrentUserInfo().then((res) => {
-      this.user = res.user;
+    storedApiGetCurrentUserInfo(this.$store).then((res) => {
       this.externalIdentifier = res.externalIdentifier;
     })
     .finally(() => this.loading = false)
@@ -88,7 +87,7 @@ export default {
       <MainMenu v-if="showNavBar" v-bind="{user, featureToggle}" />
     </div>
     <div v-if="!loading" class="content">
-      <router-view :user="user" @userUpdated="user = $event" :featureToggle="featureToggle" />
+      <router-view :featureToggle="featureToggle" />
     </div>
   </template>
 </div>

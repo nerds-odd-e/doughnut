@@ -67,7 +67,13 @@
 </ContainerPage>
 </template>
 
-<script setup>
+<script>
 import ContainerPage from "./commons/ContainerPage.vue";
-const props = defineProps({ user: Object });
+
+export default {
+  components: { ContainerPage },
+  computed: {
+    user() { return this.$store.getters.getCurrentUser()}
+  }
+}
 </script>

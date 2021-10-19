@@ -27,7 +27,6 @@ import ContainerPage from "./commons/ContainerPage.vue";
 import { restGet, loginOrRegister } from "../restful/restful";
 
 export default {
-  props: { user: Object },
   components: { ContainerPage },
   data() {
     return {
