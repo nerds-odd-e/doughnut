@@ -27,10 +27,14 @@ ports:
 tasks:
   - init: >
       yes | sdk install java 16.0.2-zulu && sdk default java 16.0.2-zulu
-      && yes | sdk update maven gradle
+      && yes | sdk install maven 3.8.3 && sdk default maven 3.8.3
+      && yes | sdk install gradle 7.2 && sdk default gradle 7.2
       && yes | sdk install springboot
+      && sdk default maven 3.8.3
+      && sdk default gradle 7.2
       && git config --global init.defaultBranch main
       && code --install-extension /workspace/doughnut/infra/gitpod/loiane.java-spring-extension-pack-0.0.2.vsix
+      && code --install-extension /workspace/doughnut/infra/gitpod/vim-1.21.9.vsix
       && sleep 3 && mysql -u root -S /var/run/mysqld/mysqld.sock < infra/gitpod/mysql/init_doughnut_db.sql
       && cp infra/gitpod/.zshrc /home/gitpod/
       && [ ! -e /home/gitpod/.p10k.zsh ]
