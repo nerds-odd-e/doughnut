@@ -35,6 +35,9 @@ tasks:
       && cp infra/gitpod/.zshrc /home/gitpod/
       && [ ! -e /home/gitpod/.p10k.zsh ]
       && cp infra/gitpod/.p10k.zsh /home/gitpod/
+      && cp infra/gitpod/.zshrc /home/gitpod/
+      && npm i -g npm yarn
+      && yarn && cd frontend && yarn && cd -
 
 vscode:
   extensions:
