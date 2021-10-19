@@ -38,12 +38,12 @@ tasks:
       && [ ! -e /home/gitpod/.p10k.zsh ]
       && cp infra/gitpod/.p10k.zsh /home/gitpod/
       && cp infra/gitpod/.zshrc /home/gitpod/
+      && code --install-extension /workspace/doughnut/infra/gitpod/developersoapbox.vscode-springboot-developer-pack-1.0.3.vsix
       && npm i -g npm yarn
       && yarn && cd frontend && yarn && cd -
 
 vscode:
   extensions:
-    - developersoapbox.vscode-springboot-developer-pack
     - gabrielbb.vscode-lombok
     - esbenp.prettier-vscode
     - dbaeumer.vscode-eslint
