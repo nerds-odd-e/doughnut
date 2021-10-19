@@ -15,7 +15,7 @@ import { storedApiGetNoteAndItsChildren } from "../storedApi";
 
 export default {
   name: "NoteShowPage",
-  props: { noteId: Number },
+  props: { noteId: String },
   data() {
     return {
       notePosition: null,

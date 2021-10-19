@@ -21,8 +21,8 @@ import ProgressBar from "../commons/ProgressBar.vue";
 export default {
   components: { PauseRepeatButton, ViewLastResultButton, ProgressBar },
   props: {
-    noteId: Number,
-    linkId: Number,
+    noteId: String,
+    linkId: String,
     allowPause: { type: Boolean, default: true },
     finished: Number,
     toRepeatCount: Number,

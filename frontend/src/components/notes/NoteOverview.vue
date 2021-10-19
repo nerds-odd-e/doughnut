@@ -15,7 +15,7 @@ import NoteWithLinks from "./NoteWithLinks.vue";
 export default {
   name: "NoteOverview",
   props: {
-    noteId: Number,
+    noteId: String,
   },
   emits: ["updated"],
   components: { NoteWithLinks },

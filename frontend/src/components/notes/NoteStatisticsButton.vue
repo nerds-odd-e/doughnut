@@ -3,7 +3,7 @@ import NoteStatistics from "./NoteStatistics.vue";
 
 export default {
   name: "NoteStatisticsButton",
-  props: { noteId: Number, linkid: Number },
+  props: { noteId: String, linkid: String },
   components: { NoteStatistics },
   data() {
     return { statisticComponentName: null };

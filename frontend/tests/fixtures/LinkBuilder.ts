@@ -30,9 +30,9 @@ class LinkBuilder extends Builder {
         [this.isReverse ? "reverse" : "direct"]: Array.from(
           { length: this.cnt },
           (x, i) => ({
-            id: 1938,
+            id: "1938",
             targetNote: {
-              id: 2423,
+              id: "2423",
               title: "a tool",
             },
             typeId: 15,

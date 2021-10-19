@@ -5,7 +5,7 @@ import LinkBuilder from "./LinkBuilder";
 let idCounter = 1;
 
 const generateId = () => {
-  return idCounter++;
+  return (idCounter++).toString();
 };
 
 class NoteBuilder extends Builder {
@@ -15,7 +15,7 @@ class NoteBuilder extends Builder {
     super(parentBuilder);
     this.data = {
       id: generateId(),
-      parentId: 8888,
+      parentId: '8888',
       noteContent: {},
       links: {},
       childrenIds: []

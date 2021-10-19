@@ -36,7 +36,7 @@ import { restGet, restPost } from "../restful/restful";
 export default {
   name: "LinkShowPage",
   components: { LinkShow, LinkTypeSelect, NoteStatisticsButton, ContainerPage },
-  props: { linkid: Number },
+  props: { linkid: String },
   data() {
     return {
       linkViewedByUser: null,

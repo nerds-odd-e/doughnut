@@ -38,7 +38,7 @@
 <script setup>
 import { ref } from "vue";
 
-const props = defineProps({ noteId: Number, linkid: Number });
+const props = defineProps({ noteId: String, linkid: String });
 const statistics = ref(null);
 const url = () => {
   if (!!props.noteId) {

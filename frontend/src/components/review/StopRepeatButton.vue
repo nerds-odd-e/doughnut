@@ -7,7 +7,7 @@ import SvgStop from "../svgs/SvgStop.vue";
 
 export default {
   name: "StopRepeatButton",
-  props: { noteId: Number, linkId: Number },
+  props: { noteId: String, linkId: String },
   components: { SvgStop },
   methods: {
     async goHome() {

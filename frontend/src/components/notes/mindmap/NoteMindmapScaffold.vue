@@ -15,7 +15,7 @@ import NoteConnection from "./NoteConnection.vue";
 export default {
   name: "NoteMindmap",
   props: {
-    noteId: Number,
+    noteId: String,
     scale: Number,
     mindmapSector: MindmapSector,
     noteComponent: String,

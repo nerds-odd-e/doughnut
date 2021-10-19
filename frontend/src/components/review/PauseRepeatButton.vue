@@ -21,7 +21,7 @@ import SvgResume from "../svgs/SvgResume.vue";
 
 export default {
   name: "PauseRepeatButton",
-  props: { noteId: Number, linkId: Number, allowPause: Boolean, btn: String },
+  props: { noteId: String, linkId: String, allowPause: Boolean, btn: String },
   components: { SvgPause, SvgResume },
 };
 </script>

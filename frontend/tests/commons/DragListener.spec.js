@@ -29,4 +29,10 @@ describe("DragListner", () => {
     expect(wrapper.emitted()['update:modelValue'][0][0]).toEqual({x: 910, y: 1820})
   });
 
+  test("wheel", async () => {
+    const wrapper = mount(DragListner, {propsData: { modelValue: {x: 10, y: 20, scale: 1.5}}});
+    await wrapper.find("div").trigger("mousewheel", { clientX: 100, clientY: 200, deltaY: 200})
+    // expect(wrapper.emitted()['update:modelValue'][0][0]).toEqual({x: 910, y: 1820, scale: 2.5})
+  });
+
 });

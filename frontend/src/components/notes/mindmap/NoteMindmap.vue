@@ -12,7 +12,7 @@ import MindmapSector from "@/models/MindmapSector";
 export default {
   name: "NoteMindmap",
   props: {
-    noteId: Number,
+    noteId: String,
     scale: Number,
   },
   emits: ["updated"],

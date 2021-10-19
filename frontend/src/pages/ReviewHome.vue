@@ -1,7 +1,7 @@
 <template>
-  <Containerpage v-bind="{ loading, contentExists: !!reviewing }">
+  <ContainerPage v-bind="{ loading, contentExists: !!reviewing }">
     <ReviewWelcome v-if="!!reviewing" v-bind="{ reviewing }" />
-  </Containerpage>
+  </ContainerPage>
 </template>
 
 <script>
