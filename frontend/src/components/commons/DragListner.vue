@@ -41,7 +41,7 @@ export default {
       this.dragging = false;
     },
     zoom(e) {
-      // console.table(e)
+      console.table(e)
       this.modelValue.scale += e.deltaY * 0.01
       this.modelValue.x *= this.modelValue.scale
       this.modelValue.y *= this.modelValue.scale

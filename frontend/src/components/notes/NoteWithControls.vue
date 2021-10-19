@@ -22,7 +22,7 @@ import NoteButtons from "./NoteButtons.vue";
 export default {
   name: "NoteWithControls",
   props: {
-    id: String,
+    id: [String, Number],
     note: Object,
     notePosition: Object,
   },

@@ -15,7 +15,7 @@ export default {
   components: {
     NoteFormBody,
   },
-  props: { noteId: String },
+  props: { noteId: [String, Number] },
   emits: ["done"],
   data() {
     return {

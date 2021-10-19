@@ -21,7 +21,7 @@ import ContainerPage from "./commons/ContainerPage.vue";
 import { restGet } from "../restful/restful";
 
 export default {
-  props: { failureReportId: String },
+  props: { failureReportId: [String, Number] },
   components: { ContainerPage },
   data() {
     return {

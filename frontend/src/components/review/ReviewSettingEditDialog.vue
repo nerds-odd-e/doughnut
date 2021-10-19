@@ -19,7 +19,7 @@ import { restGet, restPost } from "../../restful/restful";
 
 export default {
   components: { ReviewSettingForm, SvgReviewSetting },
-  props: { noteId: String, title: String },
+  props: { noteId: [String, Number], title: String },
   emits: ["done"],
   data() {
     return {

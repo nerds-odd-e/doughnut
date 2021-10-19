@@ -13,7 +13,7 @@ export default {
   components: {
     SvgEdit,
   },
-  props: { noteId: String },
+  props: { noteId: [String, Number] },
   methods: {
     async showDialog() {
       await this.$popups.dialog(NoteEditDialog, {

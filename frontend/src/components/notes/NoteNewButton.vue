@@ -53,7 +53,7 @@ export default {
     ModalWithButton,
     LinkTypeSelect,
   },
-  props: { parentId: String },
+  props: { parentId: [String, Number] },
   data() {
     return {
       loading: true,

@@ -23,7 +23,7 @@ import Breadcrumb from "../components/notes/Breadcrumb.vue";
 
 export default {
   name: "NoteOverviewPage",
-  props: { noteId: String },
+  props: { noteId: [String, Number] },
   data() {
     return {
       loading: false,

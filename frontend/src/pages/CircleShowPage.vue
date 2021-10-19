@@ -56,7 +56,7 @@ export default {
     BazaarNotebookButtons,
     ContainerPage,
   },
-  props: { circleId: String, featureToggle: Boolean },
+  props: { circleId: [String, Number], featureToggle: Boolean },
 
   data() {
     return {

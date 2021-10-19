@@ -36,7 +36,7 @@ const debounced = _.debounce((callback) => callback(), 200);
 
 export default {
   name: "SearchNote",
-  props: { noteId: String },
+  props: { noteId: [String, Number] },
   components: { TextInput, CheckInput, Cards },
   emits: ["selected"],
   data() {

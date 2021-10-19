@@ -33,7 +33,7 @@ import TextInput from "../components/form/TextInput.vue";
 import { restGet, restPatchMultiplePartForm } from "../restful/restful";
 
 export default {
-  props: { failureReportId: String },
+  props: { failureReportId: [String, Number] },
   components: { ContainerPage, TextInput },
   emits: ["userUpdated"],
   data() {

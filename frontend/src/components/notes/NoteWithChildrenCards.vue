@@ -37,7 +37,7 @@ import NoteOwnerViewCards from "./NoteOwnerViewCards.vue";
 export default {
   name: "NoteViewedByUser",
   props: {
-    id: String,
+    id: [String, Number],
     notePosition: Object,
   },
   components: {

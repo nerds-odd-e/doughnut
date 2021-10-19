@@ -14,7 +14,7 @@ export default {
   components: {
     SvgSplitNote,
   },
-  props: { noteId: String },
+  props: { noteId: [String, Number] },
   methods: {
     async showDialog() {
       if (await this.$popups.confirm(`Are you sure to split this note?`)) {
