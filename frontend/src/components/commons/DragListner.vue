@@ -1,5 +1,5 @@
 <template>
-  <div style="cursor: pointer;"
+  <div style="cursor: pointer; overscroll-behavior: contain;"
     @mousedown="startDrag"
     @touchstart="startDrag"
     @mousemove="onDrag"
