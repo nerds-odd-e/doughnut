@@ -43,6 +43,7 @@ tasks:
 
 vscode:
   extensions:
+    - developersoapbox.vscode-springboot-developer-pack
     - gabrielbb.vscode-lombok
     - esbenp.prettier-vscode
     - dbaeumer.vscode-eslint
