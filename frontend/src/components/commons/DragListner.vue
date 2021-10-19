@@ -41,12 +41,20 @@ export default {
       this.dragging = false;
     },
     zoom(e) {
-      console.table(e)
+      const {width, height, top} = e.target.getBoundingClientRect()
+      const { clientX, clientY } = e
+      const oldScale = this.modelValue.scale
+      const newOffset = (oldOffset, center, client) => {
+        return (oldOffset + center - client) * this.modelValue.scale / oldScale - center + client
+      }
       this.modelValue.scale += e.deltaY * 0.01
-      this.modelValue.x *= this.modelValue.scale
-      this.modelValue.y *= this.modelValue.scale
+      if(this.modelValue.scale > 5) this.modelValue.scale = 5
+      if(this.modelValue.scale < 0.1) this.modelValue.scale = 0.1
+      this.modelValue.x = newOffset(this.modelValue.x, width / 2, clientX)
+      this.modelValue.y = newOffset(this.modelValue.y, height / 2, clientY - top)
       this.$emit("update:modelValue", this.modelValue)
-    }
+    },
+
   },
 };
 </script>
