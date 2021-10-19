@@ -33,8 +33,6 @@ tasks:
       && sdk default maven 3.8.3
       && sdk default gradle 7.2
       && git config --global init.defaultBranch main
-      && code --install-extension /workspace/doughnut/infra/gitpod/loiane.java-spring-extension-pack-0.0.2.vsix
-      && code --install-extension /workspace/doughnut/infra/gitpod/vim-1.21.9.vsix
       && sleep 3 && mysql -u root -S /var/run/mysqld/mysqld.sock < infra/gitpod/mysql/init_doughnut_db.sql
       && cp infra/gitpod/.zshrc /home/gitpod/
       && [ ! -e /home/gitpod/.p10k.zsh ]
@@ -45,9 +43,7 @@ tasks:
 
 vscode:
   extensions:
-    - vscjava.vscode-java-pack
     - gabrielbb.vscode-lombok
-    - Pivotal.vscode-boot-dev-pack
     - esbenp.prettier-vscode
     - dbaeumer.vscode-eslint
     - octref.vetur
@@ -56,3 +52,5 @@ vscode:
     - xyz.plsql-language
     - bajdzis.vscode-database
     - GulajavaMinistudio.mayukaithemevsc
+    - vscodevim.vim
+    - coenraads.bracket-pair-colorizer-2
