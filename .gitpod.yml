@@ -26,11 +26,15 @@ ports:
 
 tasks:
   - init: >
-      cp infra/gitpod/.zshrc /home/gitpod/ &&
-      [ ! -e /home/gitpod/.p10k.zsh ] && cp infra/gitpod/.p10k.zsh /home/gitpod/ &&
-      git config --global init.defaultBranch main &&
-      code --install-extension /workspace/doughnut/infra/gitpod/loiane.java-spring-extension-pack-0.0.2.vsix &&
-      sleep 3 && mysql -u root -S /var/run/mysqld/mysqld.sock < infra/gitpod/mysql/init_doughnut_db.sql
+      yes | sdk install java 16.0.2-zulu && sdk default java 16.0.2-zulu
+      && yes | sdk update maven gradle
+      && yes | sdk install springboot
+      && git config --global init.defaultBranch main
+      && code --install-extension /workspace/doughnut/infra/gitpod/loiane.java-spring-extension-pack-0.0.2.vsix
+      && sleep 3 && mysql -u root -S /var/run/mysqld/mysqld.sock < infra/gitpod/mysql/init_doughnut_db.sql
+      && cp infra/gitpod/.zshrc /home/gitpod/
+      && [ ! -e /home/gitpod/.p10k.zsh ]
+      && cp infra/gitpod/.p10k.zsh /home/gitpod/
 
 vscode:
   extensions:
