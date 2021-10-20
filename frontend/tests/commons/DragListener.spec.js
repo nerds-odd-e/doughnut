@@ -16,7 +16,7 @@ describe("DragListner", () => {
   test("mouse down then move", async () => {
     const wrapper = mount(DragListner, {propsData: { modelValue: {x: 10, y: 20}}});
     await wrapper.find("div").trigger("pointerdown", {clientX: 100, clientY: 200})
-    await wrapper.find("div").trigger("pointermove", {clientX: 1000, clientY: 2000, currentTarget});
+    await wrapper.find("div").trigger("pointermove", {clientX: 1000, clientY: 2000});
     expect(wrapper.emitted()['update:modelValue'][0][0]).toEqual({x: 910, y: 1820})
     await wrapper.find("div").trigger("pointerup")
     await wrapper.find("div").trigger("pointermove", {clientX: 10000, clientY: 20000, currentTarget});

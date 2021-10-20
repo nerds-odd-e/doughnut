@@ -21,6 +21,8 @@ class Gesture {
 
   startOffset: any
 
+  rect: any
+
   constructor(startOffset: Offset) {
     this.startOffset = { ... startOffset }
     this.pointers = new Map
@@ -35,7 +37,20 @@ class Gesture {
   }
 
   move(rect: any, pointerId: number, pos: Position): void {
+    this.rect = rect
     this.pointers.get(pointerId)!.current = pos
+  }
+
+  private get averagePointer(): Pointer {
+    const average = (fn: (v: Pointer) => number ) => {
+      const sum = Array.from(this.pointers.values()).map(fn).reduce((a, b) => a + b)
+      return sum / this.pointers.size
+    }
+
+    return {
+      current: {x: average(p=>p.current.x), y: average(p=>p.current.y)},
+      start: {x: average(p=>p.start.x), y: average(p=>p.start.y)},
+    }
   }
 
   get offset(): Offset {
@@ -51,29 +66,31 @@ class Gesture {
       newScale /= distance(p1.start, p2.start)
     }
 
-    const average = (fn: (v: Pointer) => number ) => {
-      const sum = Array.from(this.pointers.values()).map(fn).reduce((a, b) => a + b)
-      return sum / this.pointers.size
+    const beforeScale = {
+      x: this.startOffset.x + this.averagePointer.current.x - this.averagePointer.start.x,
+      y: this.startOffset.y + this.averagePointer.current.y - this.averagePointer.start.y,
+      scale: this.startOffset.scale,
     }
-
-    return {
-      x: this.startOffset.x + average(p=>p.current.x) - average(p=>p.start.x),
-      y: this.startOffset.y + average(p=>p.current.y) - average(p=>p.start.y),
-      scale: newScale
-    }
+    return this.scale(beforeScale, newScale)
   }
 
   zoom(rect: any, newScale: number) {
-    const pointer: Pointer = this.pointers.values().next().value
-    const {width, height, top} = rect
+    this.rect = rect
+    return this.scale(this.startOffset, newScale)
+  }
+
+  private scale(fromOffset: Offset, newScale: number) {
+    if (fromOffset.scale === newScale) return fromOffset
+    const pointer: Pointer = this.averagePointer
+    const {width, height, top} = this.rect
     const adjustedNewScale = Math.max(0.1, Math.min(5, newScale, 5))
 
-    const newOffset = (oldOffset: number, center: number, client: number) => (oldOffset + center - client) * adjustedNewScale / this.startOffset.scale - center + client
+    const newOffset = (oldOffset: number, center: number, client: number) => (oldOffset + center - client) * adjustedNewScale / fromOffset.scale - center + client
 
     return {
       scale: adjustedNewScale,
-      x: newOffset(this.startOffset.x, width / 2, pointer.start.x),
-      y: newOffset(this.startOffset.y, height / 2, pointer.start.y - top),
+      x: newOffset(fromOffset.x, width / 2, pointer.start.x),
+      y: newOffset(fromOffset.y, height / 2, pointer.start.y - top),
     }
   }
 

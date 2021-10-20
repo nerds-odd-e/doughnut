@@ -12,7 +12,7 @@ describe("Gesture", () => {
     gesture.newPointer(2, {x: frame.width/2 + 10, y: 0})
     gesture.move(frame, 2, {x:  frame.width/2 + 5, y: 0})
     expect(gesture.offset.scale).toEqual(0.5)
-    expect(gesture.offset.x).toEqual(-2.5)
+    expect(gesture.offset.x).toEqual(1.25)
   });
 });
 

@@ -56,7 +56,7 @@ export default {
           this.modelValue.scale + e.deltaY * 0.01
         )
       )
-      this.gesture.reset()
+      this.gesture = null
       this.$emit("update:modelValue", this.modelValue)
     },
 
