@@ -41,5 +41,5 @@ ports:
     onOpen: open-browser
     visibility: public
   - port: 8887
-    visibility: private
     onOpen: open-browser
+    visibility: public
