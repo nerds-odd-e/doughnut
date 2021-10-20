@@ -2,7 +2,7 @@ image:
   file: .gitpod.Dockerfile
 
 tasks:
-  - init: |
+  - init: >
       sudo docker pull registry.jetbrains.team/p/prj/containers/projector-idea-c
       && yes | sdk install java 16.0.2-zulu && sdk default java 16.0.2-zulu
       && yes | sdk install maven 3.8.3 && sdk default maven 3.8.3
@@ -14,7 +14,6 @@ tasks:
       git config --global init.defaultBranch main
       npm i -g npm yarn
       yarn && cd frontend && yarn && cd -
-    command: |
       sudo mkdir -p .jetbrains; sudo touch .jetbrains/.gitkeep; sudo chown -R 1000:1000 .jetbrains
       sudo docker run --rm --net=host -v /workspace/doughnut:/home/projector-user -it registry.jetbrains.team/p/prj/containers/projector-idea-c
 
