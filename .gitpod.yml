@@ -1,55 +1,25 @@
 image:
   file: .gitpod.Dockerfile
 
-ports:
-  # Springboot Backend Server
-  - port: 8081
-    onOpen: ignore
-  - port: 9081
-    onOpen: ignore
-  - port: 9082
-    onOpen: ignore
-  # Vite Frontend Dev Server
-  - port: 3000
-    onOpen: open-browser
-    visibility: public
-  # MySQL 8.0 DB Server
-  - port: 3309
-    onOpen: ignore
-  # Remote VNC
-  - port: 5900
-    onOpen: ignore
-    visibility: public
-  - port: 6080
-    onOpen: open-browser
-    visibility: public
-
 tasks:
-  - init: >
-      yes | sdk install java 16.0.2-zulu && sdk default java 16.0.2-zulu
-      && yes | sdk install maven 3.8.3 && sdk default maven 3.8.3
-      && yes | sdk install gradle 7.2 && sdk default gradle 7.2
-      && yes | sdk install springboot
-      && sdk default maven 3.8.3
-      && sdk default gradle 7.2
-      && git config --global init.defaultBranch main
+  - init: |
+      sudo mkdir -p .jetbrains; sudo touch .jetbrains/.gitkeep; sudo chown -R 1000:1000 .jetbrains
+    command: |
+      git config --global init.defaultBranch main
       && sleep 3 && mysql -u root -S /var/run/mysqld/mysqld.sock < infra/gitpod/mysql/init_doughnut_db.sql
-      && cp infra/gitpod/.zshrc /home/gitpod/
-      && [ ! -e /home/gitpod/.p10k.zsh ]
-      && cp infra/gitpod/.p10k.zsh /home/gitpod/
-      && cp infra/gitpod/.zshrc /home/gitpod/
-      && code --install-extension /workspace/doughnut/infra/gitpod/developersoapbox.vscode-springboot-developer-pack-1.0.3.vsix
       && npm i -g npm yarn
       && yarn && cd frontend && yarn && cd -
 
-vscode:
-  extensions:
-    - gabrielbb.vscode-lombok
-    - esbenp.prettier-vscode
-    - dbaeumer.vscode-eslint
-    - octref.vetur
-    - HansUXdev.bootstrap5-snippets
-    - Shelex.vscode-cy-helper
-    - xyz.plsql-language
-    - bajdzis.vscode-database
-    - GulajavaMinistudio.mayukaithemevsc
+ports:
+  - port: 8887
+    visibility: private
+    onOpen: open-browser
+  - port: 3000
+    onOpen: open-preview
+  - port: 8081
+    onOpen: open-preview
+  - port: 9081
+    onOpen: open-preview
+  - port: 9082
+    onOpen: open-preview
+  - port: 3309

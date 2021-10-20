@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.3-labs
-FROM gitpod/workspace-full-vnc
+FROM registry.jetbrains.team/p/prj/containers/projector-idea-c
 # ---------------------------------------------------
 # -------------------- USER root --------------------
 # ---------------------------------------------------
@@ -40,7 +40,7 @@ RUN apt-get update \
 # Install MySQL DB
 RUN install-packages mysql-server \
     && mkdir -p /var/run/mysqld /var/log/mysql \
-    && chown -R gitpod:gitpod /etc/mysql /var/run/mysqld /var/log/mysql /var/lib/mysql /var/lib/mysql-files /var/lib/mysql-keyring /var/lib/mysql-upgrade
+    && chown -R projector-user:projector-user /etc/mysql /var/run/mysqld /var/log/mysql /var/lib/mysql /var/lib/mysql-files /var/lib/mysql-keyring /var/lib/mysql-upgrade
 
 # Install our own MySQL config
 RUN rm -f /etc/mysql/mysql.conf.d/mysqld.cnf \
@@ -85,41 +85,26 @@ RUN echo "[client]" >> /etc/mysql/mysql.conf.d/client.cnf \
     && echo "password =" >> /etc/mysql/mysql.conf.d/client.cnf \
     && echo "socket   = /var/run/mysqld/mysqld.sock" >> /etc/mysql/mysql.conf.d/client.cnf
 
-# Install Jetbrains Mono font
-RUN wget https://download.jetbrains.com/fonts/JetBrainsMono-2.242.zip \
-    && unzip JetBrainsMono-2.242.zip \
-    && cp fonts/ttf/JetBrainsMono-*.ttf /usr/share/fonts/ \
-    && mkdir -p /home/gitpod/.local/share/fonts/ \
-    && cp fonts/ttf/JetBrainsMono-*.ttf /home/gitpod/.local/share/fonts/ \
-    && rm -rf fonts \
-    && rm -f JetBrainsMono-2.242.zip
-
 # -----------------------------------------------------
-# -------------------- USER gitpod --------------------
+# ---------------- USER projector-user ----------------
 # -----------------------------------------------------
 
-# Setup gitpod workspace user, zsh and zimfw
+# Setup gitpod workspace user 'projector-user'
 
 CMD /bin/bash -l
-USER gitpod
-ENV USER gitpod
-WORKDIR /home/gitpod
+USER projector-user
+ENV USER projector-user
+WORKDIR /home/projector-user
 
-RUN mkdir -p /home/gitpod/.bashrc.d
+RUN mkdir -p /home/projector-user/.bashrc.d
 
-# Make zsh default && install zimfw
-RUN curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh \
-    && echo "zmodule romkatv/powerlevel10k --use degit" >> /home/gitpod/.zimrc \
-    && zsh ~/.zim/zimfw.zsh install \
-    && echo "unset DISPLAY" >> /home/gitpod/.zshrc
-
-RUN echo "if [ ! -e /var/run/mysqld/gitpod-init.lock ]" >> /home/gitpod/.bashrc \
-    && echo "then" >> /home/gitpod/.bashrc \
-    && echo "  touch /var/run/mysqld/gitpod-init.lock" >> /home/gitpod/.bashrc \
-    && echo "  [ ! -d /workspace/mysql ] && mysqld --initialize-insecure" >> /home/gitpod/.bashrc \
-    && echo "  [ ! -e /var/run/mysqld/mysqld.pid ] && mysqld --daemonize" >> /home/gitpod/.bashrc \
-    && echo "  rm /var/run/mysqld/gitpod-init.lock" >> /home/gitpod/.bashrc \
-    && echo "fi" >> /home/gitpod/.bashrc
+RUN echo "if [ ! -e /var/run/mysqld/gitpod-init.lock ]" >> /home/projector-user/.bashrc \
+    && echo "then" >> /home/projector-user/.bashrc \
+    && echo "  touch /var/run/mysqld/gitpod-init.lock" >> /home/projector-user/.bashrc \
+    && echo "  [ ! -d /workspace/mysql ] && mysqld --initialize-insecure" >> /home/projector-user/.bashrc \
+    && echo "  [ ! -e /var/run/mysqld/mysqld.pid ] && mysqld --daemonize" >> /home/projector-user/.bashrc \
+    && echo "  rm /var/run/mysqld/gitpod-init.lock" >> /home/projector-user/.bashrc \
+    && echo "fi" >> /home/projector-user/.bashrc
 
 EXPOSE 3000
 EXPOSE 3309
@@ -128,3 +113,4 @@ EXPOSE 6080
 EXPOSE 8081
 EXPOSE 9081
 EXPOSE 9082
+EXPOSE 8887
