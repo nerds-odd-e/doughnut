@@ -8,12 +8,12 @@ tasks:
       && yes | sdk install maven 3.8.3 && sdk default maven 3.8.3
       && yes | sdk install gradle 7.2 && sdk default gradle 7.2
       && yes | sdk install springboot
-      && sdk default maven 3.8.3
-      && sdk default gradle 7.2
-      && sleep 3 && mysql -u root -S /var/run/mysqld/mysqld.sock < infra/gitpod/mysql/init_doughnut_db.sql
-      && git config --global init.defaultBranch main
-      && npm i -g npm yarn
-      && yarn && cd frontend && yarn && cd -
+      sdk default maven 3.8.3
+      sdk default gradle 7.2
+      sleep 3 && mysql -u root -S /var/run/mysqld/mysqld.sock < infra/gitpod/mysql/init_doughnut_db.sql
+      git config --global init.defaultBranch main
+      npm i -g npm yarn
+      yarn && cd frontend && yarn && cd -
     command: |
       sudo mkdir -p .jetbrains; sudo touch .jetbrains/.gitkeep; sudo chown -R 1000:1000 .jetbrains
       sudo docker run --rm --net=host -v /workspace/doughnut:/home/projector-user -it registry.jetbrains.team/p/prj/containers/projector-idea-c
