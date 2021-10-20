@@ -36,8 +36,9 @@ export default {
       if (this.dragging) {
         e = e.changedTouches ? e.changedTouches[0] : e;
         const pointer = this.pointers[e.pointerId]
-        this.modelValue.x = this.startOffset.x + e.clientX - pointer.start.x;
-        this.modelValue.y = this.startOffset.y + e.clientY - pointer.start.y;
+        pointer.current = { x: e.clientX, y: e.clientY}
+        this.modelValue.x = this.startOffset.x + pointer.current.x - pointer.start.x;
+        this.modelValue.y = this.startOffset.y + pointer.current.y - pointer.start.y;
         this.$emit("update:modelValue", this.modelValue)
       }
     },
