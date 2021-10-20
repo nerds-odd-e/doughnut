@@ -1,6 +1,3 @@
-image:
-  file: .gitpod.Dockerfile
-
 tasks:
   - init: |
       sudo docker pull registry.jetbrains.team/p/prj/containers/projector-idea-c
