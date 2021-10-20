@@ -11,42 +11,56 @@ interface Position {
   y: number
 }
 
+interface Pointer {
+  start: Position
+  current: Position
+}
+
 class Gesture {
-  pointers: any
+  pointers: Map<number, Pointer>
 
   startOffset: any
 
   constructor(startOffset: Offset) {
     this.startOffset = { ... startOffset }
-    this.pointers = {}
+    this.pointers = new Map
   }
 
   reset(): void {
-    this.pointers = {}
+    this.pointers = new Map
   }
 
   newPointer(pointerId: number, start: Position): void {
-    this.pointers[pointerId] = { start }
+    this.pointers.set(pointerId, { start, current: start })
   }
 
-  move(pointerId: number, pos: Position): void {
-    this.pointers[pointerId].current = pos
+  move(rect: any, pointerId: number, pos: Position): void {
+    this.pointers.get(pointerId)!.current = pos
   }
 
-  get isDragging(): any {
-    return Object.keys(this.pointers).length > 0
-  }
+  get offset(): Offset {
+    const pointer: Pointer = this.pointers.values().next().value
+    let newScale = this.startOffset.scale
 
-  get offset(): any {
-    const pointer = this.pointers[Object.keys(this.pointers)[0]]
+    if(this.pointers.size > 1) {
+      const iterator = this.pointers.values()
+      const p1 = iterator.next().value
+      const p2 = iterator.next().value
+      const distance = (pos1: Position, pos2: Position): number =>
+        ((pos1.x - pos2.x)**2 + (pos1.y - pos2.y)**2) ** .5
+      newScale *= distance(p1.current, p2.current)
+      newScale /= distance(p1.start, p2.start)
+    }
+
     return {
       x: this.startOffset.x + pointer.current.x - pointer.start.x,
-      y: this.startOffset.y + pointer.current.y - pointer.start.y
+      y: this.startOffset.y + pointer.current.y - pointer.start.y,
+      scale: newScale
     }
   }
 
   zoom(rect: any, newScale: number) {
-    const pointer = this.pointers[Object.keys(this.pointers)[0]]
+    const pointer: Pointer = this.pointers.values().next().value
     const {width, height, top} = rect
     const adjustedNewScale = Math.max(0.1, Math.min(5, newScale, 5))
 

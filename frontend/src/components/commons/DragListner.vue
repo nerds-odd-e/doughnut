@@ -25,25 +25,29 @@ export default {
   emits: ['update:modelValue'],
   data() {
     return {
-      gesture: new Gesture(this.modelValue),
+      gesture: null
     };
   },
   methods: {
     startDrag(e) {
+      if( this.gesture == null) {
+        this.gesture = new Gesture(this.modelValue)
+      }
       this.gesture.newPointer(e.pointerId, { x: e.clientX, y: e.clientY})
     },
     onDrag(e) {
-      if (!this.gesture.isDragging) return
+      if (!this.gesture) return
       e = e.changedTouches ? e.changedTouches[0] : e;
-      this.gesture.move(e.pointerId, {x: e.clientX, y: e.clientY})
+      this.gesture.move(e.currentTarget.getBoundingClientRect(), e.pointerId, {x: e.clientX, y: e.clientY})
       Object.assign(this.modelValue, this.gesture.offset)
       this.$emit("update:modelValue", this.modelValue)
     },
     stopDrag() {
-      this.gesture.reset()
+      this.gesture = null
     },
 
     onZoom(e) {
+      this.gesture = new Gesture(this.modelValue)
       this.gesture.newPointer(e.pointerId, { x: e.clientX, y: e.clientY})
       Object.assign(
         this.modelValue,
