@@ -30,19 +30,22 @@ RUN apt-get update \
     bash-completion \
     procps \
     gnupg \
-    curl \
-    && rm -rf /var/lib/apt/lists/* \
-    && rm -rf /var/cache/apt
+    curl
 
 # Install MySQL DB
-RUN install-packages mysql-server \
+RUN wget https://dev.mysql.com/get/mysql-apt-config_0.8.19-1_all.deb /tmp/ \
+    && dpkg -i /tmp/mysql-apt-config_0.8.19-1_all.deb \
+    && apt-get update \
+    && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    && apt-get install mysql-server libmysqlclient21 \
     && mkdir -p /var/run/mysqld /var/log/mysql \
-    && chown -R projector-user:projector-user /etc/mysql /var/run/mysqld /var/log/mysql /var/lib/mysql /var/lib/mysql-files /var/lib/mysql-keyring /var/lib/mysql-upgrade
-
-# Install our own MySQL config
-RUN rm -f /etc/mysql/mysql.conf.d/mysqld.cnf \
+    && chown -R projector-user:projector-user /etc/mysql /var/run/mysqld /var/log/mysql /var/lib/mysql /var/lib/mysql-files /var/lib/mysql-keyring /var/lib/mysql-upgrade \
+    && rm -rf /var/lib/apt/lists/* \
+    && rm -rf /var/cache/apt \
+    && rm -f /etc/mysql/mysql.conf.d/mysqld.cnf \
     && rm -f /etc/mysql/mysql.conf.d/client.cnf
 
+# Install our own MySQL config
 RUN echo "[mysqld_safe]" >> /etc/mysql/mysql.conf.d/mysqld.cnf \
     && echo "socket		= /var/run/mysqld/mysqld.sock" >> /etc/mysql/mysql.conf.d/mysqld.cnf \
     && echo "nice		= 0" >> /etc/mysql/mysql.conf.d/mysqld.cnf \
