@@ -57,7 +57,7 @@ RUN echo "[mysqld_safe]" >> /etc/mysql/mysql.conf.d/mysqld.cnf \
     && echo "tmpdir		= /tmp" >>/etc/mysql/mysql.conf.d/mysqld.cnf \
     && echo "lc-messages-dir	= /usr/share/mysql" >> /etc/mysql/mysql.conf.d/mysqld.cnf \
     && echo "skip-external-locking" >> /etc/mysql/mysql.conf.d/mysqld.cnf \
-    && echo "bind-address		= 127.0.0.1" >> /etc/mysql/mysql.conf.d/mysqld.cnf \
+    && echo "bind-address		= 0.0.0.0" >> /etc/mysql/mysql.conf.d/mysqld.cnf \
     && echo "\n" >> /etc/mysql/mysql.conf.d/mysqld.cnf \
     && echo "key_buffer_size		= 16M" >> /etc/mysql/mysql.conf.d/mysqld.cnf \
     && echo "max_allowed_packet	= 16M" >> /etc/mysql/mysql.conf.d/mysqld.cnf \
