@@ -20,7 +20,6 @@ RUN apt-get update \
     xauth \
     xvfb \
     zsh \
-    bat \
     htop \
     lsof \
     net-tools \
@@ -30,8 +29,6 @@ RUN apt-get update \
     zip \
     bash-completion \
     procps \
-    powerline \
-    fonts-powerline \
     gnupg \
     curl \
     && rm -rf /var/lib/apt/lists/* \
