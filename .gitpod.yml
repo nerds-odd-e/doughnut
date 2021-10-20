@@ -5,17 +5,16 @@ tasks:
   - init: |
       sudo docker pull registry.jetbrains.team/p/prj/containers/projector-idea-c
       yes | sdk install java 16.0.2-zulu && sdk default java 16.0.2-zulu
-      yes | sdk install maven 3.8.3 && sdk default maven 3.8.3
       yes | sdk install gradle 7.2 && sdk default gradle 7.2
       yes | sdk install springboot
-      sdk default maven 3.8.3
       sleep 3 && mysql -u root -S /var/run/mysqld/mysqld.sock < infra/gitpod/mysql/init_doughnut_db.sql
       git config --global init.defaultBranch main
       npm i -g npm yarn
       yarn && cd frontend && yarn && cd -
     command: |
       sudo mkdir -p .jetbrains; sudo touch .jetbrains/.gitkeep; sudo chown -R 1000:1000 .jetbrains
-      sudo docker run --rm -p 8887:8887 -v /workspace/doughnut/.jetbrains:/home/projector-user -v /workspace/doughnut/backend:/home/projector-user/backend -it registry.jetbrains.team/p/prj/containers/projector-idea-c
+      sudo mkdir -p backend/.gradle; sudo touch backend/.gradle/.gitkeep; sudo chown -R 1000:1000 backend/.gradle
+      sudo docker run --rm --network host -v /workspace/doughnut/.jetbrains:/home/projector-user -v /workspace/doughnut/backend:/home/projector-user/backend -it registry.jetbrains.team/p/prj/containers/projector-idea-c
 
 ports:
   # Vite Frontend Dev Server
