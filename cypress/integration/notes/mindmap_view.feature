@@ -13,7 +13,7 @@ Feature: Mindmap view
     And I open "Singapore" note from top level
     And I click on the mindmap view button
 
-  Scenario: View the child notes of a child note in sequential order
+  Scenario: view the mindmap
     Then I should see the note "Singapore" is 0px * 0px offset the center of the map
     And I should see the notes "History,Geography" are around note "Singapore" and apart from each other
     When I drag the map by 200px * 100px
@@ -22,3 +22,10 @@ Feature: Mindmap view
     Then I should see the note "Singapore" is 550px * 214px offset the center of the map
     And I should see the note "Geography" is 235px * 214px offset the center of the map
     And I should see the zoom scale is "150%"
+
+  Scenario: highlight a note
+    When I click note "History"
+    Then I should see the note "History" is "highlighted"
+    When I click note "Singapore"
+    Then I should see the note "Singapore" is "highlighted"
+    And I should see the note "History" is "not highlighted"

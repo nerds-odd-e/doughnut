@@ -20,6 +20,7 @@ function withState(state) {
 
 export default createStore({
   state: () => ({
+    highlightNoteId: null,
     notes: {},
     currentUser: null,
     featureToggle: false,
@@ -28,6 +29,7 @@ export default createStore({
   getters: {
     getCurrentUser: (state) => () => state.currentUser,
     getFeatureToggle: (state) => () => state.featureToggle,
+    getHighlightNoteId: (state) => () => state.highlightNoteId,
     getNoteById: (state) => (id) => withState(state).getNoteById(id),
     getChildrenIdsByParentId: (state) => (parentId) => withState(state).getChildrenIdsByParentId(parentId),
     getChildrenOfParentId: (state) => (parentId) => withState(state).getChildrenOfParentId(parentId),
@@ -45,5 +47,8 @@ export default createStore({
     featureToggle(state, ft) {
       state.featureToggle = ft
     },
+    highlightNoteId(state, value) {
+      state.highlightNoteId = value
+    }
   },
 });

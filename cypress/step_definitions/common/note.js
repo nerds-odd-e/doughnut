@@ -209,6 +209,15 @@ When("I should see the note {string} is {int}px * {int}px offset the center of t
   })
 });
 
+When("I click note {string}", (noteTitle) => {
+  cy.findByRole("card", {name: noteTitle}).click();
+});
+
+When("I should see the note {string} is {string}", (noteTitle, highlightedOrNot) => {
+  cy.findByRole("card", {name: noteTitle}).should(`${ highlightedOrNot === 'highlighted' ? '' : 'not.'}have.class`, 'highlighted')
+});
+
+
 When("I drag the map by {int}px * {int}px", (dx, dy) => {
     cy.get('.mindmap-event-receiver')
       .trigger('pointerdown', "topLeft")
@@ -284,5 +293,4 @@ When("there is a note {string} with description {string}",
         cy.expectCurrentNoteDescription(expectedDescription)
     }
 );
-
 
