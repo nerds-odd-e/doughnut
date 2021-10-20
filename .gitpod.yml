@@ -14,19 +14,33 @@ tasks:
       git config --global init.defaultBranch main
       npm i -g npm yarn
       yarn && cd frontend && yarn && cd -
-      sudo mkdir -p .jetbrains; sudo touch .jetbrains/.gitkeep; sudo chown -R 1000:1000 .jetbrains
-      sudo docker run --rm --net=host -v /workspace/doughnut:/home/projector-user -it registry.jetbrains.team/p/prj/containers/projector-idea-c
+      sudo mkdir -p .jetbrains; sudo touch .jetbrains/.gitkeep
+      sudo chown -R 1000:1000 /workspace/doughnut
+      sudo docker run --rm --net=host -p 8887:8887 -v /workspace/doughnut:/home/projector-user -it registry.jetbrains.team/p/prj/containers/projector-idea-c
 
 ports:
   - port: 8887
     visibility: private
     onOpen: open-browser
+  # Vite Frontend Dev Server
   - port: 3000
-    onOpen: open-preview
+    onOpen: open-browser
+    visibility: public
+  # Springboot Backend Server
   - port: 8081
-    onOpen: open-preview
+    onOpen: ignore
   - port: 9081
-    onOpen: open-preview
+    onOpen: ignore
+    visibility: public
   - port: 9082
-    onOpen: open-preview
+    onOpen: ignore
+  # MySQL 8.0 DB Server
   - port: 3309
+    onOpen: ignore
+  # Remote VNC
+  - port: 5900
+    onOpen: ignore
+    visibility: public
+  - port: 6080
+    onOpen: open-browser
+    visibility: public
