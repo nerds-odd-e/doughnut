@@ -91,12 +91,12 @@ RUN apt-get update \
 
 # Setup gitpod workspace user 'projector-user'
 
-CMD /bin/bash -l
-USER projector-user
-ENV USER projector-user
-WORKDIR /home/projector-user
+# CMD /bin/bash -l
+# USER projector-user
+# ENV USER projector-user
+# WORKDIR /home/projector-user
 
-RUN mkdir -p /home/projector-user/.bashrc.d
+# RUN mkdir -p /home/projector-user/.bashrc.d
 
 # RUN echo "if [ ! -e /var/run/mysqld/gitpod-init.lock ]" >> /home/projector-user/.bashrc \
 #     && echo "then" >> /home/projector-user/.bashrc \
