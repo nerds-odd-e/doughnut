@@ -7,7 +7,9 @@
     @mouseup="stopDrag"
     @touchend="stopDrag"
     @mousewheel="zoom"
-  />
+  >
+  <slot/>
+  </div>
 </template>
 
 <script>
@@ -41,7 +43,7 @@ export default {
       this.dragging = false;
     },
     zoom(e) {
-      const {width, height, top} = e.target.getBoundingClientRect()
+      const {width, height, top} = e.currentTarget.getBoundingClientRect()
       const { clientX, clientY } = e
       const oldScale = this.modelValue.scale
       const newOffset = (oldOffset, center, client) => {

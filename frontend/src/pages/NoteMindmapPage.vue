@@ -5,14 +5,15 @@
         <Breadcrumb v-bind="notePosition" />
       </div>
       <div class="content">
-        <div class="mindmap">
-          <NoteMindmap v-bind="{ noteId, scale: offset.scale }" />
-        </div>
+        <DragListner class="mindmap-event-receiver" v-model="offset">
+          <div class="mindmap">
+            <NoteMindmap v-bind="{ noteId, scale: offset.scale }" />
+          </div>
         <div class="mindmap-info">
           <span class="scale">{{scalePercentage}}</span>
           <span class="offset">{{offsetMsg}}</span>
         </div>
-        <DragListner class="mindmap-event-receiver" v-model="offset"/>
+        </DragListner>
       </div>
     </div>
   </LoadingPage>

@@ -216,9 +216,9 @@ When("I drag the map by {int}px * {int}px", (dx, dy) => {
       .trigger('mouseup', {force: true})
 });
 
-When("I zoom in at the top left corner", () => {
+When("I zoom in at the {string}", (position) => {
     cy.get('.mindmap-event-receiver')
-      .trigger('mousewheel', "topLeft", { clientX: 0, clientY: 0, deltaY: 50 })
+      .trigger('mousewheel', position, { clientX: 0, clientY: 0, deltaY: 50 })
 });
 
 When("I should see the zoom scale is {string}", (scale) => {
