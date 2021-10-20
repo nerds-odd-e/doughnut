@@ -211,9 +211,9 @@ When("I should see the note {string} is {int}px * {int}px offset the center of t
 
 When("I drag the map by {int}px * {int}px", (dx, dy) => {
     cy.get('.mindmap-event-receiver')
-      .trigger('mousedown', "topLeft")
-      .trigger('mousemove', "topLeft", { clientX: dx, clientY: dy })
-      .trigger('mouseup', {force: true})
+      .trigger('pointerdown', "topLeft")
+      .trigger('pointermove', "topLeft", { clientX: dx, clientY: dy })
+      .trigger('pointerup', {force: true})
 });
 
 When("I zoom in at the {string}", (position) => {
