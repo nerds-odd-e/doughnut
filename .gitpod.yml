@@ -18,6 +18,7 @@ tasks:
       sudo mkdir -p backend/.gradle; sudo touch backend/.gradle/.gitkeep; sudo chown -R 1000:1000 backend/.gradle
       sudo mkdir -p backend/bin; sudo touch backend/bin/.gitkeep; sudo chown -R 1000:1000 backend/bin
       sudo mkdir -p backend/build; sudo touch backend/build/.gitkeep; sudo chown -R 1000:1000 backend/build
+      sudo chown -R 1000:1000 /workspace/doughnut
       sudo docker run --rm -p 8887:8887 -v /workspace/.jetbrains:/home/projector-user -v /workspace/doughnut:/home/projector-user/doughnut -it registry.jetbrains.team/p/prj/containers/projector-idea-c
 
 ports:
