@@ -1,11 +1,10 @@
 <template>
-  <div style="cursor: pointer; overscroll-behavior: contain;"
-    @mousedown="startDrag"
-    @touchstart="startDrag"
-    @mousemove="onDrag"
-    @touchmove="onDrag"
-    @mouseup="stopDrag"
-    @touchend="stopDrag"
+  <div style="cursor: pointer"
+    @pointerdown="startDrag"
+    @pointermove.prevent="onDrag"
+    @touchmove.prevent="onDrag"
+    @pointerup="stopDrag"
+    @pointercancel="stopDrag"
     @mousewheel="zoom"
   >
   <slot/>
@@ -19,23 +18,26 @@ export default {
   data() {
     return {
       dragging: false,
-      start: {},
-      rand: 'not yet',
+      pointers: {},
+      startOffset: {},
     };
   },
   methods: {
     startDrag(e) {
-      e = e.changedTouches ? e.changedTouches[0] : e;
+      if (this.dragging) {
+        this.pointers[e.pointerId] = { start: { x: e.clientX, y: e.clientY} }
+        return
+      }
       this.dragging = true;
-      this.start.x = e.clientX;
-      this.start.y = e.clientY;
-      this.start.offset = {...this.modelValue}
+      this.pointers = { [e.pointerId]: { start: { x: e.clientX, y: e.clientY}} }
+      this.startOffset = {...this.modelValue}
     },
     onDrag(e) {
       if (this.dragging) {
         e = e.changedTouches ? e.changedTouches[0] : e;
-        this.modelValue.x = this.start.offset.x + e.clientX - this.start.x;
-        this.modelValue.y = this.start.offset.y + e.clientY - this.start.y;
+        const pointer = this.pointers[e.pointerId]
+        this.modelValue.x = this.startOffset.x + e.clientX - pointer.start.x;
+        this.modelValue.y = this.startOffset.y + e.clientY - pointer.start.y;
         this.$emit("update:modelValue", this.modelValue)
       }
     },

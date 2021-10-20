@@ -6,7 +6,7 @@ import { mount } from "@vue/test-utils";
 
 describe("DragListner", () => {
 
-  test("mousemove only", async () => {
+  test("mouse move only", async () => {
     const wrapper = mount(DragListner, {propsData: { modelValue: {x: 10, y: 20}}});
     await wrapper.find("div").trigger("mousemove", {clientX: 100, clientY: 200});
     expect(wrapper.emitted()).not.toHaveProperty('update:modelValue')
@@ -14,17 +14,17 @@ describe("DragListner", () => {
 
   test("mouse down then move", async () => {
     const wrapper = mount(DragListner, {propsData: { modelValue: {x: 10, y: 20}}});
-    await wrapper.find("div").trigger("mousedown", {clientX: 100, clientY: 200})
+    await wrapper.find("div").trigger("pointerdown", {clientX: 100, clientY: 200})
     await wrapper.find("div").trigger("mousemove", {clientX: 1000, clientY: 2000});
     expect(wrapper.emitted()['update:modelValue'][0][0]).toEqual({x: 910, y: 1820})
-    await wrapper.find("div").trigger("mouseup")
+    await wrapper.find("div").trigger("pointerup")
     await wrapper.find("div").trigger("mousemove", {clientX: 10000, clientY: 20000});
     expect(wrapper.emitted()['update:modelValue']).toHaveLength(1)
   });
 
   test("touch move", async () => {
     const wrapper = mount(DragListner, {propsData: { modelValue: {x: 10, y: 20}}});
-    await wrapper.find("div").trigger("touchstart", { changedTouches: [{clientX: 100, clientY: 200}]})
+    await wrapper.find("div").trigger("pointerdown", { clientX: 100, clientY: 200})
     await wrapper.find("div").trigger("touchmove", { changedTouches: [{clientX: 1000, clientY: 2000}]})
     expect(wrapper.emitted()['update:modelValue'][0][0]).toEqual({x: 910, y: 1820})
   });
@@ -45,6 +45,14 @@ describe("DragListner", () => {
     const wrapper = mount(DragListner, {propsData: { modelValue: {x: 10, y: 20, scale: 1.5}}});
     await wrapper.find("div").trigger("mousewheel", { clientX: 100, clientY: 200, deltaY: -2000})
     expect(wrapper.emitted()['update:modelValue'][0][0].scale).toEqual(0.1)
+  });
+
+  test("pinch zoom", async () => {
+    const wrapper = mount(DragListner, {propsData: { modelValue: {x: 10, y: 20}}});
+    await wrapper.find("div").trigger("pointerdown", {pointerId: 1, clientX: 100, clientY: 200})
+    await wrapper.find("div").trigger("pointerdown", {pointerId: 2, clientX: 200, clientY: 400})
+    await wrapper.find("div").trigger("mousemove", {pointerId: 2, clientX: 1000, clientY: 2000});
+    // expect(wrapper.emitted()['update:modelValue'][0][0]).toEqual({x: 910, y: 1820})
   });
 
 });
