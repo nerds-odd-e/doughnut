@@ -50,6 +50,22 @@ class Gesture {
     }
   }
 
+  zoom(rect, newScale) {
+    const pointer = this.pointers[Object.keys(this.pointers)[0]]
+    const {width, height, top} = rect
+    const newOffset = (oldOffset, center, client) => {
+      return (oldOffset + center - client) * newScale / this.startOffset.scale - center + client
+    }
+    if(newScale > 5) newScale = 5
+    if(newScale < 0.1) newScale = 0.1
+
+    return {
+      scale: newScale,
+      x: newOffset(this.startOffset.x, width / 2, pointer.start.x),
+      y: newOffset(this.startOffset.y, height / 2, pointer.start.y - top),
+    }
+  }
+
 }
 
 export default {
@@ -58,29 +74,22 @@ export default {
   data() {
     return {
       gesture: null,
-      pointers: {},
       startOffset: {},
     };
   },
   methods: {
     startDrag(e) {
       if (this.gesture) {
-        this.pointers[e.pointerId] = { start: { x: e.clientX, y: e.clientY} }
         this.gesture.newPointer(e.pointerId, { x: e.clientX, y: e.clientY})
         return
       }
       this.gesture = new Gesture(this.modelValue, e.pointerId, { x: e.clientX, y: e.clientY})
-      this.pointers = { [e.pointerId]: { start: { x: e.clientX, y: e.clientY}} }
-      this.startOffset = {...this.modelValue}
     },
     onDrag(e) {
       if (this.gesture) {
         e = e.changedTouches ? e.changedTouches[0] : e;
         this.gesture!.move(e.pointerId, {x: e.clientX, y: e.clientY})
-        const pointer = this.pointers[e.pointerId]
-        pointer.current = { x: e.clientX, y: e.clientY}
-        this.modelValue.x = this.gesture!.offset.x
-        this.modelValue.y = this.gesture!.offset.y
+        Object.assign(this.modelValue, this.gesture!.offset)
         this.$emit("update:modelValue", this.modelValue)
       }
     },
@@ -89,23 +98,13 @@ export default {
     },
 
     onZoom(e) {
-      this.zoom(e.currentTarget.getBoundingClientRect(), {x: e.clientX, y: e.clientY}, e.deltaY * 0.01)
+      this.gesture = new Gesture(this.modelValue, e.pointerId, { x: e.clientX, y: e.clientY})
+      Object.assign(this.modelValue, this.gesture.zoom(e.currentTarget.getBoundingClientRect(), this.modelValue.scale + e.deltaY * 0.01))
+      this.gesture = null
       this.$emit("update:modelValue", this.modelValue)
     },
 
-    zoom(rect, focus, newScale) {
-      const {width, height, top} = rect
-      const oldScale = this.modelValue.scale
-      const newOffset = (oldOffset, center, client) => {
-        return (oldOffset + center - client) * this.modelValue.scale / oldScale - center + client
-      }
-      this.modelValue.scale += newScale
-      if(this.modelValue.scale > 5) this.modelValue.scale = 5
-      if(this.modelValue.scale < 0.1) this.modelValue.scale = 0.1
-      this.modelValue.x = newOffset(this.modelValue.x, width / 2, focus.x)
-      this.modelValue.y = newOffset(this.modelValue.y, height / 2, focus.y - top)
-    },
-
   },
+
 };
 </script>
