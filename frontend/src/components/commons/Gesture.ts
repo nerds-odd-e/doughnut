@@ -39,7 +39,6 @@ class Gesture {
   }
 
   get offset(): Offset {
-    const pointer: Pointer = this.pointers.values().next().value
     let newScale = this.startOffset.scale
 
     if(this.pointers.size > 1) {
@@ -52,9 +51,14 @@ class Gesture {
       newScale /= distance(p1.start, p2.start)
     }
 
+    const average = (fn: (v: Pointer) => number ) => {
+      const sum = Array.from(this.pointers.values()).map(fn).reduce((a, b) => a + b)
+      return sum / this.pointers.size
+    }
+
     return {
-      x: this.startOffset.x + pointer.current.x - pointer.start.x,
-      y: this.startOffset.y + pointer.current.y - pointer.start.y,
+      x: this.startOffset.x + average(p=>p.current.x) - average(p=>p.start.x),
+      y: this.startOffset.y + average(p=>p.current.y) - average(p=>p.start.y),
       scale: newScale
     }
   }
