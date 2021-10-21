@@ -213,7 +213,6 @@ class TestabilityRestController {
 
     @PostMapping(value="/time_travel_relative_to_now")
     public List<Object> timeTravelRelativeToNow(@RequestBody  TimeTravelRelativeToNow timeTravelRelativeToNow) {
-        DateTimeFormatter formatter = TestabilityRestController.getDateTimeFormatter();
         Timestamp timestamp = TimestampOperations.addHoursToTimestamp(new Timestamp(System.currentTimeMillis()), timeTravelRelativeToNow.hours);
         testabilitySettings.timeTravelTo(timestamp);
         return Collections.emptyList();
