@@ -7,7 +7,7 @@
       <div class="content">
         <DragListner class="mindmap-event-receiver" v-model="offset">
           <div class="mindmap">
-            <NoteMindmap v-bind="{ noteId, scale: offset.scale }" />
+            <NoteMindmap v-bind="{ noteId, scale: offset.scale, ancestors: notePosition.ancestors }" />
           </div>
         <div class="mindmap-info">
           <span class="scale">{{scalePercentage}}</span>

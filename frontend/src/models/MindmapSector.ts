@@ -46,8 +46,8 @@ class MindmapSector {
 
     getChildSector(siblingCount: number, index: number): MindmapSector {
         const ang = this.startAngle + this.angle / siblingCount * index + this.angle / siblingCount / 2
-        const x = this.nx + this.radius * Math.sin(ang)
-        const y = this.ny + this.radius * Math.cos(ang)
+        const x = this.nx + this.radius * Math.cos(ang)
+        const y = this.ny + this.radius * Math.sin(ang)
         const start = this.startAngle + this.angle / siblingCount * index - Math.PI / 10
         const child = new MindmapSector(x, y, start, this.angle / siblingCount + Math.PI / 5)
         child.parentX = this.nx

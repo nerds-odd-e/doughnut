@@ -1,11 +1,11 @@
 <template>
-  <g style="stroke:#FF6700;fill:#FF6700">
-      <marker id="arrowhead" markerWidth="8" markerHeight="6" 
-      refX="8" refY="3" orient="auto">
-        <polygon points="0 0, 8 3, 0 6" style="stroke-width:0"/>
+  <g style="stroke:#000000;fill:#000000">
+      <marker id="arrowheadParent" markerWidth="8" markerHeight="6" 
+      refX="0" refY="3" orient="auto">
+        <polygon points="8 0, 0 3, 8 6" style="stroke-width:0"/>
       </marker>
       <line v-if="!mindmapSector.isHead" v-bind="connection"
-        style="stroke-width:1" marker-end="url(#arrowhead)"  />
+        style="stroke-width:2" marker-start="url(#arrowheadParent)"  />
   </g>
 </template>
 

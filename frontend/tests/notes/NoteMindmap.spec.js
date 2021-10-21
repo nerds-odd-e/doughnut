@@ -18,7 +18,7 @@ describe("note mindmap", () => {
     const { wrapper } = renderWithStoreAndMockRoute(
       store,
       NoteMinmap,
-      { props: { noteId, scale: 1 } },
+      { props: { noteId, scale: 1, ancestors: [] } },
     );
     return wrapper.container
   }
@@ -47,7 +47,7 @@ describe("note mindmap", () => {
       const connection = await container.querySelector("svg.mindmap-canvas")
       const line = connection.querySelector("line")
       expect(parseFloat(line.getAttribute("x2"))).toBeCloseTo(0)
-      expect(parseFloat(line.getAttribute("y2"))).toBeCloseTo(-185)
+      expect(parseFloat(line.getAttribute("y2"))).toBeCloseTo(185)
     });
 
     describe("with two grandchildren notes", () => {
@@ -63,8 +63,8 @@ describe("note mindmap", () => {
         const lines = connection.querySelectorAll("line")
         expect(lines).toHaveLength(3)
         expect(parseFloat(lines[2].getAttribute("x1"))).toBeCloseTo(-75)
-        expect(parseFloat(lines[2].getAttribute("y1"))).toBeCloseTo(-198.1212)
-        expect(parseFloat(lines[2].getAttribute("y2"))).toBeCloseTo(-189.0275953)
+        expect(parseFloat(lines[2].getAttribute("y1"))).toBeCloseTo(198.1212)
+        expect(parseFloat(lines[2].getAttribute("y2"))).toBeCloseTo(189.0275953)
       });
 
     })

@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import NoteTitleWithLink from "../NoteTitleWithLink.vue";
+import NoteTitleWithMindmapLink from "../NoteTitleWithMindmapLink.vue";
 import SvgDescriptionIndicator from "../../svgs/SvgDescriptionIndicator.vue";
 import MindmapSector from "@/models/MindmapSector";
 
@@ -21,9 +21,9 @@ export default {
     note: Object,
     scale: Number,
     mindmapSector: MindmapSector,
-    linkFragment: { type: Object, default: NoteTitleWithLink },
+    linkFragment: { type: Object, default: NoteTitleWithMindmapLink },
   },
-  components: { SvgDescriptionIndicator },
+  components: { SvgDescriptionIndicator, NoteTitleWithMindmapLink },
   computed: {
     coord() { return this.mindmapSector.coord(150, 50, this.scale) },
     isHighlighted() { return this.$store.getters.getHighlightNoteId() === this.note.id },
