@@ -12,14 +12,8 @@ tasks:
       npm i -g npm yarn
       yarn && cd frontend && yarn && cd -
     command: |
-      sudo mkdir -p ../.jetbrains; sudo touch ../.jetbrains/.gitkeep; sudo chown -R 1000:1000 ../.jetbrains
-      sudo mkdir -p .gradle; sudo touch .gradle/.gitkeep; sudo chown -R 1000:1000 .gradle
-      sudo mkdir -p .idea; sudo touch .idea/.gitkeep; sudo chown -R 1000:1000 .idea
-      sudo mkdir -p backend/.gradle; sudo touch backend/.gradle/.gitkeep; sudo chown -R 1000:1000 backend/.gradle
-      sudo mkdir -p backend/bin; sudo touch backend/bin/.gitkeep; sudo chown -R 1000:1000 backend/bin
-      sudo mkdir -p backend/build; sudo touch backend/build/.gitkeep; sudo chown -R 1000:1000 backend/build
-      sudo chown -R 1000:1000 /workspace/doughnut
-      sudo docker run --rm -p 8887:8887 -v /workspace/.jetbrains:/home/projector-user -v /workspace/doughnut:/home/projector-user/doughnut -it registry.jetbrains.team/p/prj/containers/projector-idea-c
+      sudo mkdir -p .jetbrains; sudo touch .jetbrains/.gitkeep; sudo chown -R 1000:1000 .jetbrains
+      sudo docker run --rm -p 8887:8887 -v /workspace/doughnut/.jetbrains:/home/projector-user -it registry.jetbrains.team/p/prj/containers/projector-idea-c
 
 ports:
   # Vite Frontend Dev Server
@@ -34,6 +28,7 @@ ports:
     visibility: public
   - port: 9082
     onOpen: ignore
+    visibility: public
   # MySQL 8.0 DB Server
   - port: 3309
     onOpen: ignore
