@@ -9,16 +9,11 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Arrays;
 import java.util.List;
 
-public class Authorization {
-    protected final User user;
-    protected final ModelFactoryService modelFactoryService;
-
-    public Authorization(User user, ModelFactoryService modelFactoryService) {
-        this.user = user;
-        this.modelFactoryService = modelFactoryService;
-    }
+public record Authorization(User user,
+                            ModelFactoryService modelFactoryService) {
 
     public void assertAuthorization(Note note) throws NoAccessRightException {
+        assertLoggedIn();
         if (!hasFullAuthority(note)) {
             throw new NoAccessRightException();
         }
@@ -29,7 +24,7 @@ public class Authorization {
     }
 
     public boolean hasFullAuthority(Notebook notebook) {
-        if(user == null) return false;
+        if (user == null) return false;
         return user.owns(notebook);
     }
 

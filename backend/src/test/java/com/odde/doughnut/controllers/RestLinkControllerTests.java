@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
@@ -104,6 +105,14 @@ class RestLinkControllerTests {
             note2 = makeMe.aNote().byUser(userModel).please();
             linkRequest.typeId = 1;
             linkRequest.moveUnder = true;
+        }
+
+        @Test
+        void userNotLoggedIn() {
+            userModel = makeMe.aNullUserModel();
+            assertThrows(ResponseStatusException.class, () ->
+                    controller().linkNoteFinalize(note1, note2, linkRequest)
+            );
         }
 
         @Test
