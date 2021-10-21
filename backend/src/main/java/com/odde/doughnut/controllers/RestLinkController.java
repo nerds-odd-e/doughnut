@@ -15,9 +15,15 @@ import com.odde.doughnut.models.UserModel;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindException;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 
 @RestController
 @RequestMapping("/api/links")
@@ -38,6 +44,7 @@ class RestLinkController {
   }
 
   static class LinkRequest {
+    @NotNull
     public Integer typeId;
     public Boolean moveUnder;
     public Boolean asFirstChild;
@@ -63,7 +70,8 @@ class RestLinkController {
 
   @PostMapping(value = "/create/{sourceNote}/{targetNote}")
   @Transactional
-  public Integer linkNoteFinalize(@PathVariable Note sourceNote, @PathVariable Note targetNote, @Valid @RequestBody  LinkRequest linkRequest) throws NoAccessRightException, CyclicLinkDetectedException {
+  public Integer linkNoteFinalize(@PathVariable Note sourceNote, @PathVariable Note targetNote, @RequestBody @Valid LinkRequest linkRequest, BindingResult bindingResult) throws NoAccessRightException, CyclicLinkDetectedException, BindException {
+    if(bindingResult.hasErrors()) throw new BindException(bindingResult);
     currentUserFetcher.getUser().getAuthorization().assertAuthorization(sourceNote);
     currentUserFetcher.getUser().getAuthorization().assertReadAuthorization(targetNote);
     if (linkRequest != null && linkRequest.moveUnder != null && linkRequest.moveUnder) {

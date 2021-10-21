@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindException;
 import org.springframework.web.server.ResponseStatusException;
 
 @ExtendWith(SpringExtension.class)
@@ -111,21 +112,28 @@ class RestLinkControllerTests {
         void userNotLoggedIn() {
             userModel = makeMe.aNullUserModel();
             assertThrows(ResponseStatusException.class, () ->
-                    controller().linkNoteFinalize(note1, note2, linkRequest)
+                    controller().linkNoteFinalize(note1, note2, linkRequest, makeMe.successfulBindingResult())
+            );
+        }
+
+        @Test
+        void linkTypeIsEmpty() {
+            assertThrows(BindException.class, () ->
+                    controller().linkNoteFinalize(note1, note2, linkRequest, makeMe.failedBindingResult())
             );
         }
 
         @Test
         void shouldNotAllowMoveOtherPeoplesNote() {
             assertThrows(NoAccessRightException.class, () ->
-                    controller().linkNoteFinalize(note1, note2, linkRequest)
+                    controller().linkNoteFinalize(note1, note2, linkRequest, makeMe.successfulBindingResult())
             );
         }
 
         @Test
         void shouldNotAllowMoveToOtherPeoplesNote() {
             assertThrows(NoAccessRightException.class, () ->
-                    controller().linkNoteFinalize(note2, note1, linkRequest)
+                    controller().linkNoteFinalize(note2, note1, linkRequest, makeMe.successfulBindingResult())
             );
         }
     }

@@ -9,7 +9,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.stream.Collectors;
 
 public record FailureReportFactory(HttpServletRequest req, Exception exception,
                                    CurrentUserFetcher currentUserFetcher,
@@ -25,7 +24,7 @@ public record FailureReportFactory(HttpServletRequest req, Exception exception,
         this.modelFactoryService.failureReportRepository.save(failureReport);
     }
 
-    private FailureReport createFailureReport() throws IOException {
+    private FailureReport createFailureReport() {
         FailureReport failureReport = new FailureReport();
         failureReport.setErrorName(exception.getClass().getName());
         StringWriter sw = new StringWriter();
@@ -37,11 +36,10 @@ public record FailureReportFactory(HttpServletRequest req, Exception exception,
         return failureReport;
     }
 
-    private String getRequestInfo() throws IOException {
+    private String getRequestInfo() {
         return "# request:\n"
                 + "  Request URI:" + req.getRequestURI() + "\n"
-                + "  Request Query:" + req.getQueryString() + "\n"
-                + "  Request data:" + req.getReader().lines().collect(Collectors.joining(System.lineSeparator())) + "\n";
+                + "  Request Query:" + req.getQueryString() + "\n";
     }
 
     private String getUserInfo() {

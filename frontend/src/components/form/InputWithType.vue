@@ -3,7 +3,7 @@
     <slot v-if="beforeLabel" />
     <label v-if="!!field" :for="controlId">{{ titlized }}</label>
     <slot v-if="!beforeLabel" />
-    <div class="invalid-feedback" v-if="!!errors">{{ errors }}</div>
+    <div class="error-msg" v-if="!!errors">{{ errors }}</div>
   </div>
 </template>
 
@@ -26,3 +26,12 @@ export default {
   },
 };
 </script>
+
+<style lang="sass" scoped>
+
+.error-msg
+    width: 100%
+    margin-top: .25rem
+    font-size: .875em
+    color: #dc3545
+</style>

@@ -74,7 +74,10 @@ export default {
         (r) => {}
       )
         .then((r) => this.$emit("success"))
-        .catch((res) => (this.formErrors = res));
+        .catch((res) => {
+          this.formErrors = res
+          console.table(res)
+        });
     },
   },
 };

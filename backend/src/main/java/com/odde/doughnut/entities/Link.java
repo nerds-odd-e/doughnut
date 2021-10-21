@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.sql.Timestamp;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -89,6 +90,7 @@ public class Link {
     @JsonIgnoreProperties("noteContent")
     @Getter @Setter private Note targetNote;
 
+    @NotNull
     @Column(name = "type_id")
     @Getter
     @Setter
