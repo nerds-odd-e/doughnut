@@ -44,7 +44,7 @@ spring:
       max-file-size: 10MB
       max-request-size: 10MB
   datasource:
-    url: jdbc:mysql://localhost:3309/doughnut_e2e_test
+    url: jdbc:mysql://127.0.0.1:3309/doughnut_e2e_test
     username: doughnut
     password: doughnut
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -77,7 +77,7 @@ spring:
       max-file-size: 10MB
       max-request-size: 10MB
   datasource:
-    url: jdbc:mysql://localhost:3309/doughnut_development
+    url: jdbc:mysql://127.0.0.1:3309/doughnut_development
     username: doughnut
     password: doughnut
     driver-class-name: com.mysql.cj.jdbc.Driver

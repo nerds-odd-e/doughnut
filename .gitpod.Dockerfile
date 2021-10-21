@@ -45,6 +45,7 @@ RUN install-packages mysql-server \
 # Install our own MySQL config
 RUN echo "[mysqld_safe]" >> /etc/mysql/mysql.conf.d/mysqld.cnf \
     && echo "socket		= /var/run/mysqld/mysqld.sock" >> /etc/mysql/mysql.conf.d/mysqld.cnf \
+    && echo "bind-address	= 0.0.0.0" >> /etc/mysql/mysql.conf.d/mysqld.cnf \
     && echo "nice		= 0" >> /etc/mysql/mysql.conf.d/mysqld.cnf \
     && echo "\n" >> /etc/mysql/mysql.conf.d/mysqld.cnf \
     && echo "[mysqld]" >> /etc/mysql/mysql.conf.d/mysqld.cnf \
@@ -57,7 +58,6 @@ RUN echo "[mysqld_safe]" >> /etc/mysql/mysql.conf.d/mysqld.cnf \
     && echo "tmpdir		= /tmp" >>/etc/mysql/mysql.conf.d/mysqld.cnf \
     && echo "lc-messages-dir	= /usr/share/mysql" >> /etc/mysql/mysql.conf.d/mysqld.cnf \
     && echo "skip-external-locking" >> /etc/mysql/mysql.conf.d/mysqld.cnf \
-    && echo "bind-address		= 0.0.0.0" >> /etc/mysql/mysql.conf.d/mysqld.cnf \
     && echo "\n" >> /etc/mysql/mysql.conf.d/mysqld.cnf \
     && echo "key_buffer_size		= 16M" >> /etc/mysql/mysql.conf.d/mysqld.cnf \
     && echo "max_allowed_packet	= 16M" >> /etc/mysql/mysql.conf.d/mysqld.cnf \
@@ -72,12 +72,12 @@ RUN echo "[mysqld_safe]" >> /etc/mysql/mysql.conf.d/mysqld.cnf \
 
 # Install default-login for MySQL clients
 RUN echo "[client]" >> /etc/mysql/mysql.conf.d/client.cnf \
-    && echo "host     = localhost" >> /etc/mysql/mysql.conf.d/client.cnf \
+    && echo "host     = 127.0.0.1" >> /etc/mysql/mysql.conf.d/client.cnf \
     && echo "user     = root" >> /etc/mysql/mysql.conf.d/client.cnf \
     && echo "password =" >> /etc/mysql/mysql.conf.d/client.cnf \
     && echo "socket   = /var/run/mysqld/mysqld.sock" >> /etc/mysql/mysql.conf.d/client.cnf \
     && echo "[mysql_upgrade]" >> /etc/mysql/mysql.conf.d/client.cnf \
-    && echo "host     = localhost" >> /etc/mysql/mysql.conf.d/client.cnf \
+    && echo "host     = 127.0.0.1" >> /etc/mysql/mysql.conf.d/client.cnf \
     && echo "user     = root" >> /etc/mysql/mysql.conf.d/client.cnf \
     && echo "password =" >> /etc/mysql/mysql.conf.d/client.cnf \
     && echo "socket   = /var/run/mysqld/mysqld.sock" >> /etc/mysql/mysql.conf.d/client.cnf
