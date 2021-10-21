@@ -42,7 +42,12 @@ export default {
   position: absolute
   width: 150px
   min-height: 50px
+  padding: 3px
   background-color: white
+  border-width: 1px
+  border-style: solid
+  border-color: rgb(0,0,0, 0.7)
+  border-radius: 10px
 .note-card-title
   font-size: 1rem
 .note-card-body

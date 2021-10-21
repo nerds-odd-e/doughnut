@@ -84,7 +84,6 @@ export default {
 
 .box .content
   flex: 1 1 auto
-  background-color: green
   overflow: hidden
 
 
