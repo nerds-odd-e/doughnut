@@ -213,6 +213,11 @@ When("I click note {string}", (noteTitle) => {
   cy.findByRole("card", {name: noteTitle}).click();
 });
 
+When("The note {string} {string} have the description indicator", (noteTitle, shouldOrNot) => {
+  cy.findByRole("card", {name: noteTitle}).within(()=>cy.get(".description-indicator").should(shouldOrNot === 'should' ? 'exist' : 'not.exist'))
+});
+
+
 When("I should see the note {string} is {string}", (noteTitle, highlightedOrNot) => {
   cy.findByRole("card", {name: noteTitle}).should(`${ highlightedOrNot === 'highlighted' ? '' : 'not.'}have.class`, 'highlighted')
 });

@@ -7,14 +7,13 @@
     <h5 class="note-card-title">
       <component :is="linkFragment" :note="note" class="card-title" />
     </h5>
-    <div class="note-card-body">
-      <p>{{ note.shortDescription }}</p>
-    </div>
+    <SvgDescriptionIndicator class="description-indicator" v-if="!!note.shortDescription"/>
   </div>
 </template>
 
 <script>
 import NoteTitleWithLink from "../NoteTitleWithLink.vue";
+import SvgDescriptionIndicator from "../../svgs/SvgDescriptionIndicator.vue";
 import MindmapSector from "@/models/MindmapSector";
 
 export default {
@@ -24,6 +23,7 @@ export default {
     mindmapSector: MindmapSector,
     linkFragment: { type: Object, default: NoteTitleWithLink },
   },
+  components: { SvgDescriptionIndicator },
   computed: {
     coord() { return this.mindmapSector.coord(150, 50, this.scale) },
     isHighlighted() { return this.$store.getters.getHighlightNoteId() === this.note.id },
@@ -50,8 +50,6 @@ export default {
   border-radius: 10px
 .note-card-title
   font-size: 1rem
-.note-card-body
-  font-size: 0.8rem
 
 .highlighted
   z-index: 4000
@@ -89,5 +87,10 @@ export default {
   transform: rotate(-1deg)
   opacity: 0.7
   border-radius: 50%
+
+.description-indicator
+  position: absolute
+  left: 5px
+  top: 25px
 
 </style>
