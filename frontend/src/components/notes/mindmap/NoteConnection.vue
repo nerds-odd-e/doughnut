@@ -4,7 +4,6 @@
 </template>
 
 <script setup>
-import { computed } from "@vue/reactivity";
 import NoteTitleWithLink from "../NoteTitleWithLink.vue";
 import MindmapSector from "@/models/MindmapSector";
 

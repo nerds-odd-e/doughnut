@@ -27,7 +27,6 @@ describe("note mindmap", () => {
     notes.push(makeMe.aNote.title("single note").shortDescription('not long').please())
     renderAndGetContainer(notes[0].id)
     expect(screen.getByRole("card")).toHaveTextContent("single note");
-    expect(screen.getByRole("card")).toHaveTextContent("not long");
   });
 
   describe("with two notes", () => {
