@@ -9,24 +9,15 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.util.stream.Collectors;
 
-public class FailureReportFactory {
-    private final HttpServletRequest req;
-    private final Exception exception;
-    private final CurrentUserFetcher currentUserFetcher;
-    private final GithubService githubService;
-    private final ModelFactoryService modelFactoryService;
-
-    public FailureReportFactory(HttpServletRequest req, Exception exception, CurrentUserFetcher currentUserFetcher, GithubService githubService, ModelFactoryService modelFactoryService) {
-        this.req = req;
-        this.exception = exception;
-        this.currentUserFetcher = currentUserFetcher;
-        this.githubService = githubService;
-        this.modelFactoryService = modelFactoryService;
-    }
+public record FailureReportFactory(HttpServletRequest req, Exception exception,
+                                   CurrentUserFetcher currentUserFetcher,
+                                   GithubService githubService,
+                                   ModelFactoryService modelFactoryService) {
 
     public void createUnlessAllowed() throws IOException, InterruptedException {
-        if(exception instanceof ResponseStatusException) return;
+        if (exception instanceof ResponseStatusException) return;
 
         FailureReport failureReport = createFailureReport();
         Integer issueNumber = githubService.createGithubIssue(failureReport);
@@ -34,22 +25,23 @@ public class FailureReportFactory {
         this.modelFactoryService.failureReportRepository.save(failureReport);
     }
 
-    private FailureReport createFailureReport() {
+    private FailureReport createFailureReport() throws IOException {
         FailureReport failureReport = new FailureReport();
         failureReport.setErrorName(exception.getClass().getName());
         StringWriter sw = new StringWriter();
         PrintWriter pw = new PrintWriter(sw);
         exception.printStackTrace(pw);
-        failureReport.setErrorDetail(getUserInfo() + getRequestInfo() + "# Stack trace\n"+ sw);
+        failureReport.setErrorDetail(getUserInfo() + getRequestInfo() + "# Stack trace\n" + sw);
         this.modelFactoryService.failureReportRepository.save(failureReport);
 
         return failureReport;
     }
 
-    private String getRequestInfo() {
+    private String getRequestInfo() throws IOException {
         return "# request:\n"
                 + "  Request URI:" + req.getRequestURI() + "\n"
-                + "  Request Query:" + req.getQueryString() + "\n";
+                + "  Request Query:" + req.getQueryString() + "\n"
+                + "  Request data:" + req.getReader().lines().collect(Collectors.joining(System.lineSeparator())) + "\n";
     }
 
     private String getUserInfo() {
