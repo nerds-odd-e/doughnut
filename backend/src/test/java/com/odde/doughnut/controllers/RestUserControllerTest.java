@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
@@ -33,6 +34,13 @@ class RestUserControllerTest {
         controller = new RestUserController(
                 makeMe.modelFactoryService,
                 new TestCurrentUserFetcher(userModel));
+    }
+
+    @Test
+    void createUserWhileSessionTimeout() {
+        assertThrows(
+                ResponseStatusException.class,
+                ()-> controller.createUser(null, userModel.getEntity()));
     }
 
     @Test

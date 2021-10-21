@@ -103,9 +103,13 @@ public class Authorization {
 
     public void assertLoggedIn() {
         if (user == null) {
-            throw new ResponseStatusException(
-                    HttpStatus.UNAUTHORIZED, "User Not Found");
+            throwUserNotFound();
         }
+    }
+
+    public static void throwUserNotFound() {
+        throw new ResponseStatusException(
+                HttpStatus.UNAUTHORIZED, "User Not Found");
     }
 
     public void assertAuthorization(ReviewPoint reviewPoint) {

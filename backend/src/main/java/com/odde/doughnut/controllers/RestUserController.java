@@ -5,29 +5,20 @@ import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import org.springframework.security.core.Authentication;
+import com.odde.doughnut.models.Authorization;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
-import java.io.IOException;
 import java.security.Principal;
 
 @RestController
 @RequestMapping("/api/user")
-class RestUserController {
-    private final ModelFactoryService modelFactoryService;
-    private final CurrentUserFetcher currentUserFetcher;
-
-  public RestUserController(ModelFactoryService modelFactoryService, CurrentUserFetcher currentUserFetcher) {
-      this.modelFactoryService = modelFactoryService;
-      this.currentUserFetcher = currentUserFetcher;
-  }
+record RestUserController(ModelFactoryService modelFactoryService,
+                          CurrentUserFetcher currentUserFetcher) {
 
     @PostMapping("")
-    public User createUser(Principal principal, User user, HttpServletRequest request, HttpServletResponse resp, Authentication auth) throws ServletException, IOException {
+    public User createUser(Principal principal, User user) {
+        if (principal == null) Authorization.throwUserNotFound();
         user.setExternalIdentifier(principal.getName());
         modelFactoryService.userRepository.save(user);
         return user;
@@ -35,11 +26,12 @@ class RestUserController {
 
     @GetMapping("")
     public User getUserProfile() {
-      return currentUserFetcher.getUser().getEntity();
+        return currentUserFetcher.getUser().getEntity();
     }
 
     @PatchMapping("/{user}")
-    public @Valid User updateUser(@Valid User user) throws NoAccessRightException {
+    public @Valid
+    User updateUser(@Valid User user) throws NoAccessRightException {
         currentUserFetcher.getUser().getAuthorization().assertAuthorization(user);
         modelFactoryService.userRepository.save(user);
         return user;
