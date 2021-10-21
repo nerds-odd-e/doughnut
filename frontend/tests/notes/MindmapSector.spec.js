@@ -32,4 +32,22 @@ describe("MindmapSector", () => {
     expect(grandchild.y).toBeCloseTo(175, -1)
   });
 
+  it("a more vertical connection", async () => {
+    const head = new MindmapSector(0, 0, Math.PI/10, 0)
+    const child = head.getChildSector(1, 0)
+    const connection = child.connection(150, 50, 1)
+    expect(connection.y1).toBeCloseTo(25, -1)
+    expect(connection.x1).toBeCloseTo(8, -1)
+  });
+
+  it("a more horizontal connection", async () => {
+    const head = new MindmapSector(0, 0, Math.PI * 0.55, 0)
+    const child = head.getChildSector(1, 0)
+    const connection = child.connection(150, 50, 1)
+    expect(connection.x1).toBeCloseTo(75, -1)
+    expect(connection.y1).toBeCloseTo(-11, -1)
+    expect(connection.x2).toBeCloseTo(132, -1)
+    expect(connection.y2).toBeCloseTo(-20, -1)
+  });
+
 })

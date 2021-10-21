@@ -25,7 +25,19 @@ class MindmapSector {
     }
 
     connection(boxWidth: number, boxHeight: number, scale: number): any {
-        return { x1: this.parentX! * scale, y1: this.parentY! * scale, x2: this.nx * scale, y2: this.ny * scale}
+        const p2p = { x1: this.parentX! * scale, y1: this.parentY! * scale, x2: this.nx * scale, y2: this.ny * scale}
+        const dx = p2p.x2 - p2p.x1
+        const dy = p2p.y2 - p2p.y1
+        let boxDx; let boxDy
+        if (Math.abs(dx * boxHeight) > Math.abs(boxWidth * dy)) {
+            boxDx = boxWidth / 2 * (dx > 0 ? 1 : -1)
+            boxDy = dy * boxDx / dx
+        }
+        else {
+            boxDy = boxHeight / 2 * (dy > 0 ? 1 : -1)
+            boxDx = dx * boxDy / dy
+        }
+        return { x1: this.parentX! * scale + boxDx, y1: p2p.y1 + boxDy, x2: p2p.x2 - boxDx, y2: p2p.y2 - boxDy}
     }
 
     coord(boxWidth: number, boxHeight: number, scale: number): any {
@@ -44,7 +56,5 @@ class MindmapSector {
     }
 
 }
-
-const x = 1
 
 export default MindmapSector
