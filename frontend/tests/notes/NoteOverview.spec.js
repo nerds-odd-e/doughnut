@@ -21,7 +21,7 @@ describe("note overview", () => {
   });
 
   it("should render one note with links", async () => {
-    const note = makeMe.aNote.title("source").linkTo().please();
+    const note = makeMe.aNote.title("source").linkToSomeNote().please();
     store.commit("loadNotes", [note]);
     renderWithStoreAndMockRoute(
       store,

@@ -7,6 +7,8 @@
       <line v-if="!mindmapSector.isHead" v-bind="connection"
         style="stroke-width:1" marker-end="url(#arrowhead)"  />
   </g>
+  <g class="notes-link" v-for="link in links" :key="link.id">
+  </g>
 </template>
 
 <script>
@@ -20,7 +22,8 @@ export default {
     mindmapSector: MindmapSector,
   },
   computed: {
-    connection() { return this.mindmapSector.connection(150, 50, this.scale)}
+    connection() { return this.mindmapSector.connection(150, 50, this.scale)},
+    links() { return this.note.links}
   }
 }
 

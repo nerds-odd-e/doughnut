@@ -44,8 +44,13 @@ class NoteBuilder extends Builder {
     return this;
   }
 
-  linkTo(): NoteBuilder {
+  linkToSomeNote(): NoteBuilder {
     merge(this.data.links, new LinkBuilder(undefined, "using").please());
+    return this;
+  }
+
+  linkTo(note: any): NoteBuilder {
+    merge(this.data.links, new LinkBuilder(undefined, "using").from(this.data).to(note).please());
     return this;
   }
 

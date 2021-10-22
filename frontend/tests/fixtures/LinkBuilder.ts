@@ -7,16 +7,38 @@ class LinkBuilder extends Builder {
 
   isReverse: boolean;
 
+  fromNote: any
+
+  toNote: any
+
   constructor(parentBuilder: Builder | undefined, linkType: string) {
     super(parentBuilder);
     this.linkType = linkType;
     this.cnt = 1;
     this.isReverse = false;
+    this.fromNote = {
+      id: "2423",
+      title: "a tool",
+    }
+    this.toNote = {
+      id: "2423",
+      title: "a tool",
+    }
   }
 
   count(cnt: number): LinkBuilder {
     this.cnt = cnt;
     return this;
+  }
+
+  from(note: any): LinkBuilder {
+    this.fromNote = note
+    return this
+  }
+
+  to(note: any): LinkBuilder {
+    this.toNote = note
+    return this
   }
 
   get reverse(): LinkBuilder {
@@ -32,8 +54,12 @@ class LinkBuilder extends Builder {
           (x, i) => ({
             id: "1938",
             targetNote: {
-              id: "2423",
-              title: "a tool",
+              id: this.toNote.id,
+              title: this.toNote.title,
+            },
+            sourceNote: {
+              id: this.fromNote.id,
+              title: this.fromNote.title,
             },
             typeId: 15,
             linkTypeLabel: "using",
