@@ -16,6 +16,10 @@ class Mindmap {
       this.noteFinder = noteFinder
     }
 
+    connectFromParent(sector: MindmapSector, boxWidth: number, BoxHeight: number): any {
+      return sector.connection(boxWidth, BoxHeight, this.scale)
+    }
+
     connection(from: MindmapSector, targetNoteId: number | string): any {
       const targetSector = this.getNoteSctor(targetNoteId)
       if (!targetSector) return undefined

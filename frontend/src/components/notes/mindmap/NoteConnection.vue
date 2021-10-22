@@ -30,7 +30,7 @@ export default {
   },
   components: { LinkConnection },
   computed: {
-    connection() { return this.mindmapSector.connection(150, 50, this.scale)},
+    connection() { return this.mindmap.connectFromParent(this.mindmapSector, 150, 50)},
     links() { return this.note.links},
     mindmap() {
       return new Mindmap(
