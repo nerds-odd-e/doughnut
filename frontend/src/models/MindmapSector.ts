@@ -40,6 +40,10 @@ class MindmapSector {
         return { x1: this.parentX! * scale + boxDx, y1: p2p.y1 + boxDy, x2: p2p.x2 - boxDx, y2: p2p.y2 - boxDy}
     }
 
+    linkTo(target: MindmapSector, scale: number): any {
+        return { x1: this.nx * scale, y1: this.ny * scale, x2: target.nx * scale, y2: target.ny * scale}
+    }
+
     coord(boxWidth: number, boxHeight: number, scale: number): any {
         return { x: this.nx * scale - boxWidth / 2, y: this.ny * scale - boxHeight / 2}
     }

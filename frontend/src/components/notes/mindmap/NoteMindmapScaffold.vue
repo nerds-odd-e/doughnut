@@ -1,8 +1,22 @@
 <template>
-  <component v-bind:is="noteComponent" v-bind="{ note: noteViewedByUser, scale, mindmapSector: mindmapSector }"/>
+  <component v-bind:is="noteComponent" v-bind="{
+    note: noteViewedByUser,
+    scale,
+    mindmapSector: mindmapSector,
+    rootNoteId: !!rootNoteId ? rootNoteId : noteId,
+    rootMindmapSector: !!rootMindmapSector ? rootMindmapSector : mindmapSector
+
+  }"/>
   <NoteMindmapScaffold
     v-for="(childId, index) in childrenIds"
-    v-bind="{ noteComponent, scale, noteId: childId, mindmapSector: mindmapSector.getChildSector(childrenIds.length, index) }"
+    v-bind="{
+      noteComponent,
+      scale,
+      noteId: childId,
+      mindmapSector: mindmapSector.getChildSector(childrenIds.length, index),
+      rootNoteId: !!rootNoteId ? rootNoteId : noteId,
+      rootMindmapSector: !!rootMindmapSector ? rootMindmapSector : mindmapSector
+    }"
     :key="childId"
   />
 </template>
@@ -19,6 +33,8 @@ export default {
     scale: Number,
     mindmapSector: MindmapSector,
     noteComponent: String,
+    rootNoteId: [Number, String],
+    rootMindmapSector: MindmapSector,
   },
   components: { NoteCard, NoteConnection },
   computed: {

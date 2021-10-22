@@ -91,7 +91,6 @@ export default {
       )
         .then((res) => {
           this.show = false;
-          console.table(`resolved: ${res}`)
           this.$router.push({
             name: "noteShow",
             params: { noteId: res.noteId },

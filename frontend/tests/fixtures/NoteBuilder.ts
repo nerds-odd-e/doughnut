@@ -15,7 +15,7 @@ class NoteBuilder extends Builder {
     super(parentBuilder);
     this.data = {
       id: generateId(),
-      parentId: '8888',
+      parentId: null,
       noteContent: {},
       links: {},
       childrenIds: []
@@ -35,6 +35,7 @@ class NoteBuilder extends Builder {
 
   under(value: any): NoteBuilder {
     value.childrenIds.push(this.data.id)
+    this.data.parentId = value.id
 
     return this;
   }

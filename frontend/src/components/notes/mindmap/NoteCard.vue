@@ -21,6 +21,8 @@ export default {
     note: Object,
     scale: Number,
     mindmapSector: MindmapSector,
+    rootNoteId: [Number, String],
+    rootMindmapSector: MindmapSector,
     linkFragment: { type: Object, default: NoteTitleWithMindmapLink },
   },
   components: { SvgDescriptionIndicator, NoteTitleWithMindmapLink },
