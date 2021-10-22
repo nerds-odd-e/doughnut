@@ -9,6 +9,7 @@ module.exports = {
   extends: [
     "eslint:recommended",
     "airbnb-base",
+    "airbnb-typescript/base",
     "plugin:import/recommended",
     "plugin:vue/vue3-strongly-recommended",
     "plugin:testing-library/vue",
@@ -16,6 +17,7 @@ module.exports = {
     "prettier",
   ],
   settings: {
+    "import/extensions": [".js", ".mjs", ".jsx", ".ts", ".tsx"],
     "import/resolver": {
       alias: {
         map: [["@", "./src"]],
@@ -25,6 +27,7 @@ module.exports = {
   parserOptions: {
     ecmaVersion: 12,
     sourceType: "module",
+    project: './tsconfig.json'
   },
   plugins: ["vue", "testing-library", "@typescript-eslint", "jest-dom"],
   overrides: [

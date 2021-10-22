@@ -9,13 +9,14 @@
   </g>
   <g class="notes-link" v-for="(directAndReverse, linkOfType) in links" :key="linkOfType">
     <LinkConnection v-for="link in directAndReverse.direct" :key="link.id"
-    v-bind="{link, scale, mindmapSector, rootNoteId, rootMindmapSector }"
+    v-bind="{link, mindmap, mindmapSector }"
     />
   </g>
 </template>
 
 <script>
 import MindmapSector from "@/models/MindmapSector";
+import Mindmap from "@/models/Mindmap";
 import LinkConnection from "./LinkConnection.vue"
 
 export default {
@@ -31,6 +32,14 @@ export default {
   computed: {
     connection() { return this.mindmapSector.connection(150, 50, this.scale)},
     links() { return this.note.links},
+    mindmap() {
+      return new Mindmap(
+        this.scale,
+        this.rootMindmapSector,
+        this.rootNoteId,
+        this.$store.getters.getNoteById
+      )},
+
   },
   methods: {
 

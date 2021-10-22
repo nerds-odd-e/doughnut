@@ -6,29 +6,13 @@
 </template>
 
 <script>
-import MindmapSector from "@/models/MindmapSector";
-import Mindmap from "@/models/Mindmap";
-
-
-
 export default {
-
   props: {
     link: Object,
-    scale: Number,
-    mindmapSector: MindmapSector,
-    rootNoteId: [Number, String],
-    rootMindmapSector: MindmapSector,
+    mindmapSector: Object,
+    mindmap: Object,
   },
   computed: {
-    mindmap() {
-      return new Mindmap(
-        this.scale,
-        this.rootMindmapSector,
-        this.rootNoteId,
-        this.$store.getters.getNoteById
-      )},
-
     connection() {
       return this.mindmap.connection(this.mindmapSector, this.link.targetNote.id)
     },

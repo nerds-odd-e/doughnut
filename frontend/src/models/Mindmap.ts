@@ -1,4 +1,4 @@
-import MindmapSector from "./MindmapSector.ts"
+import MindmapSector from "./MindmapSector"
 
 class Mindmap {
     scale: number

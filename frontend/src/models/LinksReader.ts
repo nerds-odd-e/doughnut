@@ -1,4 +1,4 @@
-import { linkTypeOptions, taggingTypes, groupedTypes } from "./linkTypeOptions"
+import { taggingTypes, groupedTypes } from "./linkTypeOptions"
 
 class LinksReader {
   links: any;
