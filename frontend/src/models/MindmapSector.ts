@@ -48,10 +48,10 @@ class MindmapSector {
         return { x: this.nx * scale - boxWidth / 2, y: this.ny * scale - boxHeight / 2}
     }
 
-    getChildSector(siblingCount: number, index: number): MindmapSector {
+    getChildSector(siblingCount: number, index: number, extraScale = 1): MindmapSector {
         const ang = this.startAngle + this.angle / siblingCount * index + this.angle / siblingCount / 2
-        const x = this.nx + this.radius * Math.cos(ang)
-        const y = this.ny + this.radius * Math.sin(ang)
+        const x = this.nx + this.radius * Math.cos(ang) * extraScale
+        const y = this.ny + this.radius * Math.sin(ang) * extraScale
         const start = this.startAngle + this.angle / siblingCount * index - Math.PI / 10
         const child = new MindmapSector(x, y, start, this.angle / siblingCount + Math.PI / 5)
         child.parentX = this.nx

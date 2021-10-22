@@ -1,8 +1,8 @@
 <template>
   <template v-if="ancestors.length > 0">
-  <component v-bind:is="noteComponent" v-bind="{ note: noteViewedByUser, scale, mindmapSector: mindmapSector.getChildSector(1, 0) }"/>
+  <component v-bind:is="noteComponent" v-bind="{ note: noteViewedByUser, mindmap, mindmapSector: mindmapSector.getChildSector(1, 0, 0.5) }"/>
   <NoteMindmapAncestorsScaffold
-    v-bind="{ noteComponent, scale, ancestors: ancestors.slice(0, ancestors.length - 1), mindmapSector: mindmapSector.getChildSector(1, 0) }"
+    v-bind="{ noteComponent, mindmap, ancestors: ancestors.slice(0, ancestors.length - 1), mindmapSector: mindmapSector.getChildSector(1, 0, 0.5) }"
   />
   </template>
 </template>
@@ -16,9 +16,9 @@ export default {
   name: "NoteMindmap",
   props: {
     ancestors: Array,
-    scale: Number,
     mindmapSector: MindmapSector,
     noteComponent: String,
+    mindmap: Object,
   },
   components: { NoteCard, NoteParentConnection },
   computed: {

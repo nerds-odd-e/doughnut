@@ -76,6 +76,8 @@ describe("note mindmap", () => {
         notes.push(child2)
         const container = renderAndGetContainer(notes[0].id)
         const connection = await container.querySelector("svg.mindmap-canvas")
+        const linkStart = connection.querySelectorAll("g.notes-link .link-start")
+        expect(linkStart).toHaveLength(1)
         const lines = connection.querySelectorAll("g.notes-link line")
         expect(lines).toHaveLength(1)
         expect(parseFloat(lines[0].getAttribute("x1"))).toBeCloseTo(-210)

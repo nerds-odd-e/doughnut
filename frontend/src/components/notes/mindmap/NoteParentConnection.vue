@@ -16,11 +16,11 @@ export default {
 
   props: {
     note: Object,
-    scale: Number,
+    mindmap: Object,
     mindmapSector: MindmapSector,
   },
   computed: {
-    connection() { return this.mindmapSector.connection(150, 50, this.scale)}
+    connection() { return this.mindmap.connectFromParent(this.mindmapSector)}
   }
 }
 

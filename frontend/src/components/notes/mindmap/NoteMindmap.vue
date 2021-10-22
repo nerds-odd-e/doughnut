@@ -1,9 +1,9 @@
 <template>
   <svg class="mindmap-canvas">
-    <NoteMindmapAncestorsScaffold v-bind="{ ancestors, scale: scale / 2, mindmapSector: mindmapAncestorSector, noteComponent: 'NoteParentConnection'}"/>
+    <NoteMindmapAncestorsScaffold v-bind="{ ancestors, mindmap, mindmapSector: mindmapAncestorSector, noteComponent: 'NoteParentConnection'}"/>
     <NoteMindmapScaffold v-bind="{ noteId, mindmap, mindmapSector, noteComponent: 'NoteConnection'}"/>
   </svg>
-  <NoteMindmapAncestorsScaffold v-bind="{ ancestors, scale: scale/2, mindmapSector: mindmapAncestorSector, noteComponent: 'NoteCard'}"/>
+  <NoteMindmapAncestorsScaffold v-bind="{ ancestors, mindmap, mindmapSector: mindmapAncestorSector, noteComponent: 'NoteCard'}"/>
   <NoteMindmapScaffold v-bind="{ noteId, mindmap, mindmapSector, noteComponent: 'NoteCard'}"/>
 </template>
 

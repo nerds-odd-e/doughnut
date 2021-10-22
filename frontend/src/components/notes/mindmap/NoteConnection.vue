@@ -7,7 +7,10 @@
       <line v-if="!mindmapSector.isHead" v-bind="connection"
         style="stroke-width:1" marker-end="url(#arrowhead)"  />
   </g>
-  <g class="notes-link" v-for="(directAndReverse, linkOfType) in links" :key="linkOfType">
+  <g class="notes-link" v-for="(directAndReverse, linkTypeName) in links" :key="linkTypeName">
+    <g class="link-start" >
+      <SvgLinkTypeIcon width="30" height="15" :linkTypeName="linkTypeName"/>
+    </g>
     <LinkConnection v-for="link in directAndReverse.direct" :key="link.id"
     v-bind="{link, mindmap, mindmapSector }"
     />
@@ -17,6 +20,7 @@
 <script>
 import MindmapSector from "@/models/MindmapSector";
 import LinkConnection from "./LinkConnection.vue"
+import SvgLinkTypeIcon from "../../svgs/SvgLinkTypeIcon.vue"
 
 export default {
 
@@ -25,7 +29,7 @@ export default {
     mindmapSector: MindmapSector,
     mindmap: Object,
   },
-  components: { LinkConnection },
+  components: { LinkConnection, SvgLinkTypeIcon },
   computed: {
     connection() { return this.mindmap.connectFromParent(this.mindmapSector)},
     links() { return this.note.links},

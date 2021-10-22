@@ -26,13 +26,17 @@ import SvgLinkTypeAttr from "./link_types/SvgLinkTypeAttr.vue";
 import SvgLinkTypeConfuse from "./link_types/SvgLinkTypeConfuse.vue";
 import SvgFolder from "./link_types/SvgFolder.vue";
 import { computed } from "@vue/runtime-core";
+import { linkTypeNameToId } from "@/models/linkTypeOptions";
 
 const props = defineProps({
   linkTypeId: Number,
+  linkTypeName: String,
   width: String,
   height: String,
   inverseIcon: Boolean,
 });
+
+const computedTypeId = computed(() => !this.linkTypeId ? linkTypeNameToId(this.linkTypeName) : this.linkTypeId)
 const iconComponent = computed(() => {
   const linkTypeId = parseInt(props.linkTypeId);
   if (linkTypeId === 1) return SvgLinkTypeRelated;

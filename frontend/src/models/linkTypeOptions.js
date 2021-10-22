@@ -85,5 +85,6 @@ const linkTypeOptions = [
     return "*unknown link type*";
   }
 
+  const linkTypeNameToId = (name) => linkTypeOptions.find(v=>v.label===name).value
 
-  export { linkTypeOptions, taggingTypes, groupedTypes, reverseLabel }
+  export { linkTypeOptions, taggingTypes, groupedTypes, reverseLabel, linkTypeNameToId }
