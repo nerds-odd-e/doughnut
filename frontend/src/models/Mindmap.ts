@@ -9,15 +9,21 @@ class Mindmap {
 
     noteFinder: (id: number | string) => any
 
-    constructor(scale: number, rootMindmapSector: MindmapSector, rootNoteId: number | string, noteFinder: (id: number | string)=>any) {
+    boxWidth: number
+
+    boxHeight: number
+
+    constructor(scale: number, rootMindmapSector: MindmapSector, rootNoteId: number | string, noteFinder: (id: number | string)=>any, boxWidth: number, boxHeight: number) {
       this.scale = scale
       this.rootMindmapSector = rootMindmapSector
       this.rootNoteId = rootNoteId
       this.noteFinder = noteFinder
+      this.boxWidth = boxWidth
+      this.boxHeight = boxHeight
     }
 
-    connectFromParent(sector: MindmapSector, boxWidth: number, BoxHeight: number): any {
-      return sector.connection(boxWidth, BoxHeight, this.scale)
+    connectFromParent(sector: MindmapSector): any {
+      return sector.connection(this.boxWidth, this.boxHeight, this.scale)
     }
 
     connection(from: MindmapSector, targetNoteId: number | string): any {
