@@ -16,31 +16,19 @@
 
 <script>
 import MindmapSector from "@/models/MindmapSector";
-import Mindmap from "@/models/Mindmap";
 import LinkConnection from "./LinkConnection.vue"
 
 export default {
 
   props: {
     note: Object,
-    scale: Number,
     mindmapSector: MindmapSector,
-    rootNoteId: [Number, String],
-    rootMindmapSector: MindmapSector,
+    mindmap: Object,
   },
   components: { LinkConnection },
   computed: {
     connection() { return this.mindmap.connectFromParent(this.mindmapSector)},
     links() { return this.note.links},
-    mindmap() {
-      return new Mindmap(
-        this.scale,
-        this.rootMindmapSector,
-        this.rootNoteId,
-        this.$store.getters.getNoteById,
-        150,
-        50
-      )},
 
   },
   methods: {

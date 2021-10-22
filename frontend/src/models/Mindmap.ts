@@ -22,6 +22,10 @@ class Mindmap {
       this.boxHeight = boxHeight
     }
 
+    coord(sector: MindmapSector): any {
+      return sector.coord(this.boxWidth, this.boxHeight, this.scale)
+    }
+
     connectFromParent(sector: MindmapSector): any {
       return sector.connection(this.boxWidth, this.boxHeight, this.scale)
     }

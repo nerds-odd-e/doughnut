@@ -1,16 +1,17 @@
 <template>
   <svg class="mindmap-canvas">
     <NoteMindmapAncestorsScaffold v-bind="{ ancestors, scale: scale / 2, mindmapSector: mindmapAncestorSector, noteComponent: 'NoteParentConnection'}"/>
-    <NoteMindmapScaffold v-bind="{ noteId, scale, mindmapSector, noteComponent: 'NoteConnection'}"/>
+    <NoteMindmapScaffold v-bind="{ noteId, mindmap, mindmapSector, noteComponent: 'NoteConnection'}"/>
   </svg>
   <NoteMindmapAncestorsScaffold v-bind="{ ancestors, scale: scale/2, mindmapSector: mindmapAncestorSector, noteComponent: 'NoteCard'}"/>
-  <NoteMindmapScaffold v-bind="{ noteId, scale, mindmapSector, noteComponent: 'NoteCard'}"/>
+  <NoteMindmapScaffold v-bind="{ noteId, mindmap, mindmapSector, noteComponent: 'NoteCard'}"/>
 </template>
 
 <script lang="ts">
 import NoteMindmapScaffold from "./NoteMindmapScaffold.vue";
 import NoteMindmapAncestorsScaffold from "./NoteMindmapAncestorsScaffold.vue";
 import MindmapSector from "@/models/MindmapSector";
+import Mindmap from "@/models/Mindmap";
 
 export default {
   name: "NoteMindmap",
@@ -30,6 +31,17 @@ export default {
       if (this.ancestors?.length > 0) d = Math.PI / 10
       return new MindmapSector(0, 0, -Math.PI / 2 + d, Math.PI * 2 - d * 2)
     },
+    mindmap() {
+      return new Mindmap(
+        this.scale,
+        this.mindmapSector,
+        this.noteId,
+        this.$store.getters.getNoteById,
+        150,
+        50
+      )
+    },
+
   },
 };
 </script>

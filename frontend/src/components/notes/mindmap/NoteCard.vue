@@ -19,15 +19,13 @@ import MindmapSector from "@/models/MindmapSector";
 export default {
   props: {
     note: Object,
-    scale: Number,
     mindmapSector: MindmapSector,
-    rootNoteId: [Number, String],
-    rootMindmapSector: MindmapSector,
+    mindmap: Object,
     linkFragment: { type: Object, default: NoteTitleWithMindmapLink },
   },
   components: { SvgDescriptionIndicator, NoteTitleWithMindmapLink },
   computed: {
-    coord() { return this.mindmapSector.coord(150, 50, this.scale) },
+    coord() { return this.mindmap.coord(this.mindmapSector) },
     isHighlighted() { return this.$store.getters.getHighlightNoteId() === this.note.id },
 
   },
