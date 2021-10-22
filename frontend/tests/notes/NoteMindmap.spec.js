@@ -69,15 +69,23 @@ describe("note mindmap", () => {
 
     })
     describe("links between notes", () => {
-
-      it("should link the two linked notes", async () => {
+      beforeEach(()=>{
         const [top, child1] = notes
         const child2 = makeMe.aNote.title('child2').under(top).linkTo(child1).please()
         notes.push(child2)
+      })
+
+      it("should link the two linked notes", async () => {
         const container = renderAndGetContainer(notes[0].id)
         const connection = await container.querySelector("svg.mindmap-canvas")
-        const linkStart = connection.querySelectorAll("g.notes-link .link-start")
+        const linkStart = connection.querySelectorAll(".link-start")
         expect(linkStart).toHaveLength(1)
+        expect(linkStart[0].getAttribute("transform")).toEqual("translate(-176, 25) rotate(36)")
+      });
+
+      it("should link the two linked notes", async () => {
+        const container = renderAndGetContainer(notes[0].id)
+        const connection = await container.querySelector("svg.mindmap-canvas")
         const lines = connection.querySelectorAll("g.notes-link line")
         expect(lines).toHaveLength(1)
         expect(parseFloat(lines[0].getAttribute("x1"))).toBeCloseTo(-210)
@@ -85,6 +93,9 @@ describe("note mindmap", () => {
         // expect(parseFloat(lines[0].getAttribute("y2"))).toBeCloseTo(189.0275953)
       });
 
+    });
+
+    describe("links between note and note outside the map", () => {
       it("link target is not on the map", async () => {
         const [top, child1] = notes
         const noteThatIsNotOnTheMap = makeMe.aNote.title('not on the map').please()

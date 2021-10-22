@@ -36,19 +36,23 @@ class Mindmap {
       return from.linkTo(targetSector, this.scale)
     }
 
+    outSlot(from: MindmapSector, connectorCount: number, connectorIndex: number): any {
+      return from.outSlot(connectorCount, connectorIndex, this.scale, this.boxWidth, this.boxHeight)
+    }
+
     getNoteSctor(noteId: number | string): MindmapSector | undefined {
       const ancestors = this.ancestorsUntilRoot(noteId)
       if(!ancestors) return undefined
       let sector = this.rootMindmapSector
       for(let i = 0; i < ancestors.length - 1; i+=1) {
-        sector = sector.getChildSector(ancestors[i].childrenIds.length, ancestors[1].childrenIds.indexOf(ancestors[i+1].id))
+        sector = sector.getChildSector(ancestors[i].childrenIds.length, ancestors[i].childrenIds.indexOf(ancestors[i+1].id))
       }
       return sector
     }
 
     ancestorsUntilRoot(noteId: number | string) : Array<any> | undefined {
       const note = this.noteFinder(noteId)
-      if(noteId === this.rootNoteId) return [note]
+      if(noteId.toString() === this.rootNoteId.toString()) return [note]
       if (!note.parentId) return undefined
       return this.ancestorsUntilRoot(note.parentId)?.concat([note])
     }

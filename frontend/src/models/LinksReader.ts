@@ -38,6 +38,13 @@ class LinksReader {
       .map((t) => t[1]);
   }
 
+  get directLinks() {
+    return Object.fromEntries(
+      Object.entries(this.links).filter((t: Array<any>) => t[1].direct.length > 0)
+
+    );
+  }
+
 }
 
 export default LinksReader;
