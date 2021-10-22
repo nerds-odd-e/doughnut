@@ -8,15 +8,15 @@
         style="stroke-width:1" marker-end="url(#arrowhead)"  />
   </g>
   <g class="notes-link" v-for="(directAndReverse, linkOfType) in links" :key="linkOfType">
-    <g style="stroke:green;fill:green" v-for="link in directAndReverse.direct" :key="link.id">
-      <line v-bind="linkNoteTo(link.targetNote.id)"
-        style="stroke-width:1" marker-end="url(#arrowhead)"  />
-    </g>
+    <LinkConnection v-for="link in directAndReverse.direct" :key="link.id"
+    v-bind="{link, scale, mindmapSector, rootNoteId, rootMindmapSector }"
+    />
   </g>
 </template>
 
 <script>
 import MindmapSector from "@/models/MindmapSector";
+import LinkConnection from "./LinkConnection.vue"
 
 export default {
 
@@ -27,29 +27,12 @@ export default {
     rootNoteId: [Number, String],
     rootMindmapSector: MindmapSector,
   },
+  components: { LinkConnection },
   computed: {
     connection() { return this.mindmapSector.connection(150, 50, this.scale)},
     links() { return this.note.links},
   },
   methods: {
-    linkNoteTo(targetNoteId) {
-       const box = this.mindmapSector.linkTo(this.locateNote(targetNoteId), this.scale)
-       return box
-    },
-    locateNote(targetNoteId) {
-      const ancestors = this.ancestorsUntilRoot(targetNoteId)
-      var sector = this.rootMindmapSector
-      for(var i = 0; i < ancestors.length - 1; i++) {
-        sector = sector.getChildSector(ancestors[i].childrenIds.length, ancestors[1].childrenIds.indexOf(ancestors[i+1].id))
-      }
-      return sector
-    },
-    ancestorsUntilRoot(targetNoteId) {
-      const note = this.$store.getters.getNoteById(targetNoteId)
-      if(targetNoteId == this.rootNoteId) return [note]
-      if (!note.parentId) return null
-      return this.ancestorsUntilRoot(note.parentId).concat([note])
-    }
 
   }
 }
