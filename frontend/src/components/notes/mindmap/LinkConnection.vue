@@ -7,6 +7,9 @@
 
 <script>
 import MindmapSector from "@/models/MindmapSector";
+import Mindmap from "@/models/Mindmap";
+
+
 
 export default {
 
@@ -18,35 +21,20 @@ export default {
     rootMindmapSector: MindmapSector,
   },
   computed: {
+    mindmap() {
+      return new Mindmap(
+        this.scale,
+        this.rootMindmapSector,
+        this.rootNoteId,
+        this.$store.getters.getNoteById
+      )},
+
     connection() {
-      if (!this.targetNoteSector) return
-
-      return this.mindmapSector.linkTo(this.targetNoteSector, this.scale)
-    },
-
-    targetNoteSector() {
-      const ancestors = this.ancestorsUntilRoot(this.link.targetNote.id)
-      if(!ancestors) return
-      var sector = this.rootMindmapSector
-      for(var i = 0; i < ancestors.length - 1; i++) {
-        sector = sector.getChildSector(ancestors[i].childrenIds.length, ancestors[1].childrenIds.indexOf(ancestors[i+1].id))
-      }
-      return sector
+      return this.mindmap.connection(this.mindmapSector, this.link.targetNote.id)
     },
 
   },
-  methods: {
-    ancestorsUntilRoot(targetNoteId) {
-      const note = this.$store.getters.getNoteById(targetNoteId)
-      if(targetNoteId == this.rootNoteId) return [note]
-      if (!note.parentId) return null
-      return this.ancestorsUntilRoot(note.parentId).concat([note])
-    }
-  }
 }
 
 
 </script>
-
-<style lang="sass" scoped>
-</style>
