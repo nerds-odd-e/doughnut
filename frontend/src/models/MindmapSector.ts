@@ -1,22 +1,6 @@
+import { Coord, StraightConnection, Vector } from "./MindmapUnits"
+
 const splitAngle =(startAngle: number, angleRange: number, siblingCount: number, index: number): number => startAngle + angleRange / siblingCount * index + angleRange / siblingCount / 2
-
-interface Vector {
-    x: number
-
-    y: number
-
-    angle: number
-}
-
-interface StraightConnection {
-    x1: number
-
-    y1: number
-
-    x2: number
-
-    y2: number
-}
 
 class MindmapSector {
     readonly radius = 210
@@ -48,10 +32,9 @@ class MindmapSector {
         return { x1: this.parentX!, y1: this.parentY!, x2: this.nx, y2: this.ny}
     }
 
-    coord(boxWidth: number, boxHeight: number, scale: number): any {
-        return { x: this.nx * scale - boxWidth / 2, y: this.ny * scale - boxHeight / 2}
+    get coord(): Coord {
+        return { x: this.nx, y: this.ny}
     }
-
 
     getChildSector(siblingCount: number, index: number, extraScale = 1): MindmapSector {
         const ang = splitAngle(this.startAngle, this.angleRange, siblingCount, index)
@@ -83,4 +66,3 @@ class MindmapSector {
 }
 
 export default MindmapSector
-export { Vector, StraightConnection, MindmapSector }
