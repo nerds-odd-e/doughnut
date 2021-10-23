@@ -95,3 +95,6 @@ frontend/app.*.map.json
 
 # local nix-shell MySQL DB instance folder/files
 mysql/
+
+# gitpod inteliij-projector
+**/.jetbrains

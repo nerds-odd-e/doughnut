@@ -7,6 +7,7 @@ tasks:
       yes | sdk install java 16.0.2-zulu && sdk default java 16.0.2-zulu
       yes | sdk install gradle 7.2 && sdk default gradle 7.2
       yes | sdk install springboot
+      code --install-extension /workspace/doughnut/infra/gitpod/loiane.java-spring-extension-pack-0.0.2.vsix
       sleep 3 && mysql -u root -S /var/run/mysqld/mysqld.sock < infra/gitpod/mysql/init_doughnut_db.sql
       git config --global init.defaultBranch main
       npm i -g npm yarn
@@ -43,3 +44,15 @@ ports:
   - port: 8887
     onOpen: open-browser
     visibility: public
+
+vscode:
+  extensions:
+    - esbenp.prettier-vscode
+    - dbaeumer.vscode-eslint
+    - octref.vetur
+    - HansUXdev.bootstrap5-snippets
+    - Shelex.vscode-cy-helper
+    - xyz.plsql-language
+    - bajdzis.vscode-database
+    - cweijan.vscode-mysql-client2
+    - GulajavaMinistudio.mayukaithemevsc
