@@ -1,6 +1,16 @@
 import { MindmapSector, Vector } from "./MindmapSector"
 import LinksReader from "./LinksReader";
 
+const borderPoint = (vector: Vector, scale: number, boxWidth: number, boxHeight: number): Vector => {
+    let dy = boxHeight / 2 * Math.sign(Math.sin(vector.angle))
+    let dx = dy / Math.tan(vector.angle)
+    if (Number.isNaN(dx) || Math.abs(dx) > boxWidth / 2) {
+        dx = boxWidth / 2 * Math.sign(Math.cos(vector.angle))
+        dy = dx * Math.tan(vector.angle)
+    }
+    return { x: Math.round(vector.x * scale + dx), y: Math.round(vector.y * scale + dy), angle: vector.angle}
+}
+
 class Mindmap {
     scale: number
 
@@ -36,12 +46,20 @@ class Mindmap {
       const targetSector = this.getNoteSctor(link.targetNote.id)
       if (!targetSector) return undefined
       const {reverseLinkTypes} = new LinksReader(note.links)
-      const inSlot = targetSector.inSlot(reverseLinkTypes.length, reverseLinkTypes.indexOf(link.linkTypeId), this.scale, this.boxWidth, this.boxHeight)
+      const inSlot = borderPoint(targetSector.inSlot(reverseLinkTypes.length, reverseLinkTypes.indexOf(link.linkTypeId)),
+        this.scale,
+        this.boxWidth,
+        this.boxHeight)
       return this.linkVectors(from, inSlot)
     }
 
     outSlot(from: MindmapSector, connectorCount: number, connectorIndex: number): Vector {
-      return from.outSlot(connectorCount, connectorIndex, this.scale, this.boxWidth, this.boxHeight)
+      return borderPoint(
+        from.outSlot(connectorCount, connectorIndex),
+        this.scale,
+        this.boxWidth,
+        this.boxHeight
+      )
     }
 
     getNoteSctor(noteId: number | string): MindmapSector | undefined {

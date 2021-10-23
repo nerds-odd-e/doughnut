@@ -8,16 +8,6 @@ interface Vector {
     angle: number
 }
 
-const borderPoint = (vector: Vector, scale: number, boxWidth: number, boxHeight: number): Vector => {
-    let dy = boxHeight / 2 * Math.sign(Math.sin(vector.angle))
-    let dx = dy / Math.tan(vector.angle)
-    if (Number.isNaN(dx) || Math.abs(dx) > boxWidth / 2) {
-        dx = boxWidth / 2 * Math.sign(Math.cos(vector.angle))
-        dy = dx * Math.tan(vector.angle)
-    }
-    return { x: Math.round(vector.x * scale + dx), y: Math.round(vector.y * scale + dy), angle: vector.angle}
-}
-
 class MindmapSector {
     readonly radius = 210
 
@@ -76,20 +66,20 @@ class MindmapSector {
         return child
     }
 
-    outSlot(connectorCount: number, connectorIndex: number, scale: number, boxWidth: number, boxHeight: number): Vector {
+    outSlot(connectorCount: number, connectorIndex: number): Vector {
         const start = this.startAngle + this.angleRange / 2 - Math.PI
-        return this.connectPoint(start, connectorCount, connectorIndex, scale, boxWidth, boxHeight)
+        return this.connectPoint(start, connectorCount, connectorIndex)
     }
 
-    inSlot(connectorCount: number, connectorIndex: number, scale: number, boxWidth: number, boxHeight: number): Vector {
+    inSlot(connectorCount: number, connectorIndex: number): Vector {
         const start = this.startAngle + this.angleRange / 2
-        return this.connectPoint(start, connectorCount, connectorIndex, scale, boxWidth, boxHeight)
+        return this.connectPoint(start, connectorCount, connectorIndex)
     }
 
-    private connectPoint(start: number, connectorCount: number, connectorIndex: number, scale: number, boxWidth: number, boxHeight: number): Vector {
+    private connectPoint(start: number, connectorCount: number, connectorIndex: number): Vector {
         const range = Math.PI - this.angleRange / 2
         const angle = splitAngle(start, range, connectorCount, connectorIndex)
-        return borderPoint({angle, x: this.nx, y: this.ny}, scale, boxWidth, boxHeight)
+        return {angle, x: this.nx, y: this.ny}
     }
 
 }
