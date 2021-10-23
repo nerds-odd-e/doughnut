@@ -86,11 +86,11 @@ describe("note mindmap", () => {
       it("should link the two linked notes", async () => {
         const container = renderAndGetContainer(notes[0].id)
         const connection = await container.querySelector("svg.mindmap-canvas")
-        const lines = connection.querySelectorAll("g.notes-link line")
+        const lines = connection.querySelectorAll("g.notes-link path")
         expect(lines).toHaveLength(1)
-        expect(parseFloat(lines[0].getAttribute("x1"))).toBeCloseTo(-176)
-        expect(parseFloat(lines[0].getAttribute("y1"))).toBeCloseTo(25)
-        expect(parseFloat(lines[0].getAttribute("y2"))).toBeCloseTo(-25)
+        const d = lines[0].getAttribute("d")
+        expect(d).toMatch(/M -176 25/)
+        expect(d).toMatch(/.*? 244 -25/)
       });
 
     });

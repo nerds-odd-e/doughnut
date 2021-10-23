@@ -1,6 +1,7 @@
 <template>
-  <g style="stroke:green;fill:green" v-if="connection">
-    <line v-bind="connection"
+  <g class="notes-link" style="stroke:green;fill:green" v-if="connection">
+    <path 
+      :d="`M ${connection.x1} ${connection.y1} ${connection.x2} ${connection.y2}`"
       style="stroke-width:1" marker-end="url(#arrowhead)"  />
   </g>
 </template>

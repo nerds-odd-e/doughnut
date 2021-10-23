@@ -1,5 +1,5 @@
 <template>
-  <g class="notes-link">
+  <g class="notes-links">
     <g class="link-start" :transform="`translate(${linkStart.x}, ${linkStart.y}) rotate(${linkStart.angle * 180 / Math.PI})`">
       <SvgLinkTypeIcon width="30" height="15" :linkTypeName="linkTypeName"/>
     </g>

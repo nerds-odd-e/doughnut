@@ -10,7 +10,6 @@ const linkVectors =(from: Vector, to: Vector): StraightConnection => ({
         y1: from.y
     })
 
-
 class Mindmap {
     rootMindmapSector: MindmapSector
 
