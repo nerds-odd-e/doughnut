@@ -1,4 +1,4 @@
-import { MindmapSector, Vector } from "./MindmapSector"
+import { MindmapSector, Vector, StraightConnection } from "./MindmapSector"
 import LinksReader from "./LinksReader";
 
 class MindmapMetrics {
@@ -14,7 +14,7 @@ class MindmapMetrics {
       this.boxHeight = boxHeight
     }
 
-    borderPoint(vector: Vector): Vector {
+    borderVector(vector: Vector): Vector {
         let dy = this.boxHeight / 2 * Math.sign(Math.sin(vector.angle))
         let dx = dy / Math.tan(vector.angle)
         if (Number.isNaN(dx) || Math.abs(dx) > this.boxWidth / 2) {
@@ -22,6 +22,22 @@ class MindmapMetrics {
             dy = dx * Math.tan(vector.angle)
         }
         return { x: Math.round(vector.x * this.scale + dx), y: Math.round(vector.y * this.scale + dy), angle: vector.angle}
+    }
+
+    straighConnection(conn: StraightConnection): StraightConnection {
+        const p2p = { x1: conn.x1 * this.scale, y1: conn.y1 * this.scale, x2: conn.x2 * this.scale, y2: conn.y2 * this.scale}
+        const dx = p2p.x2 - p2p.x1
+        const dy = p2p.y2 - p2p.y1
+        let boxDx; let boxDy
+        if (Math.abs(dx * this.boxHeight) > Math.abs(this.boxWidth * dy)) {
+            boxDx = this.boxWidth / 2 * (dx > 0 ? 1 : -1)
+            boxDy = dy * boxDx / dx
+        }
+        else {
+            boxDy = this.boxHeight / 2 * (dy > 0 ? 1 : -1)
+            boxDx = dx * boxDy / dy
+        }
+        return { x1: p2p.x1 + boxDx, y1: p2p.y1 + boxDy, x2: p2p.x2 - boxDx, y2: p2p.y2 - boxDy}
     }
 
 }
@@ -55,8 +71,8 @@ class Mindmap {
       return sector.coord(this.boxWidth, this.boxHeight, this.scale)
     }
 
-    connectFromParent(sector: MindmapSector): any {
-      return sector.connection(this.boxWidth, this.boxHeight, this.scale)
+    connectFromParent(sector: MindmapSector): StraightConnection {
+      return this.metrics.straighConnection(sector.connectionFromParent)
     }
 
     linkToTargetNote(from: any, link: any): any {
@@ -64,12 +80,12 @@ class Mindmap {
       const targetSector = this.getNoteSctor(link.targetNote.id)
       if (!targetSector) return undefined
       const {reverseLinkTypes} = new LinksReader(note.links)
-      const inSlot = this.metrics.borderPoint(targetSector.inSlot(reverseLinkTypes.length, reverseLinkTypes.indexOf(link.linkTypeId)))
+      const inSlot = this.metrics.borderVector(targetSector.inSlot(reverseLinkTypes.length, reverseLinkTypes.indexOf(link.linkTypeId)))
       return this.linkVectors(from, inSlot)
     }
 
     outSlot(from: MindmapSector, connectorCount: number, connectorIndex: number): Vector {
-      return this.metrics.borderPoint(from.outSlot(connectorCount, connectorIndex))
+      return this.metrics.borderVector(from.outSlot(connectorCount, connectorIndex))
     }
 
     getNoteSctor(noteId: number | string): MindmapSector | undefined {
