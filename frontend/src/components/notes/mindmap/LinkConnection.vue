@@ -14,7 +14,7 @@ export default {
   },
   computed: {
     connection() {
-      return this.mindmap.connection(this.linkStart, this.link.targetNote.id)
+      return this.mindmap.linkToTargetNote(this.linkStart, this.link)
     },
 
   },

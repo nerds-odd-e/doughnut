@@ -23,6 +23,7 @@ class LinkBuilder extends Builder {
     this.toNote = {
       id: "2423",
       title: "a tool",
+      links: {},
     }
   }
 
@@ -47,11 +48,23 @@ class LinkBuilder extends Builder {
   }
 
   do(): any {
+    if (!this.toNote.links[this.linkType]) this.toNote.links[this.linkType] = {}
+    if (!this.toNote.links[this.linkType].reverse) this.toNote.links[this.linkType].reverse = []
+    this.toNote.links[this.linkType].reverse.push(this.link(0))
+
     return {
       [this.linkType]: {
         [this.isReverse ? "reverse" : "direct"]: Array.from(
           { length: this.cnt },
-          (x, i) => ({
+          (x, i) => this.link(i)
+        ),
+        [this.isReverse ? "direct" : "reverse"]: [],
+      },
+    };
+  }
+
+  private link(index: number): any {
+    return {
             id: "1938",
             targetNote: {
               id: this.toNote.id,
@@ -64,12 +77,9 @@ class LinkBuilder extends Builder {
             typeId: 15,
             linkTypeLabel: "using",
             linkNameOfSource: "user",
-          })
-        ),
-        [this.isReverse ? "direct" : "reverse"]: [],
-      },
-    };
+          }
   }
+
 }
 
 export default LinkBuilder;

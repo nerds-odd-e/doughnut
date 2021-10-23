@@ -1,4 +1,5 @@
-import MindmapSector from "./MindmapSector"
+import { MindmapSector, Vector } from "./MindmapSector"
+import LinksReader from "./LinksReader";
 
 class Mindmap {
     scale: number
@@ -30,13 +31,16 @@ class Mindmap {
       return sector.connection(this.boxWidth, this.boxHeight, this.scale)
     }
 
-    connection(from: any, targetNoteId: number | string): any {
-      const targetSector = this.getNoteSctor(targetNoteId)
+    linkToTargetNote(from: any, link: any): any {
+      const note = this.noteFinder(link.targetNote.id)
+      const targetSector = this.getNoteSctor(link.targetNote.id)
       if (!targetSector) return undefined
-      return targetSector.linkFrom(from, this.scale)
+      const {reverseLinkTypes} = new LinksReader(note.links)
+      const inSlot = targetSector.inSlot(reverseLinkTypes.length, reverseLinkTypes.indexOf(link.linkTypeId), this.scale, this.boxWidth, this.boxHeight)
+      return this.linkVectors(from, inSlot)
     }
 
-    outSlot(from: MindmapSector, connectorCount: number, connectorIndex: number): any {
+    outSlot(from: MindmapSector, connectorCount: number, connectorIndex: number): Vector {
       return from.outSlot(connectorCount, connectorIndex, this.scale, this.boxWidth, this.boxHeight)
     }
 
@@ -55,6 +59,15 @@ class Mindmap {
       if(noteId.toString() === this.rootNoteId.toString()) return [note]
       if (!note.parentId) return undefined
       return this.ancestorsUntilRoot(note.parentId)?.concat([note])
+    }
+
+    private linkVectors(from: Vector, to: Vector): any {
+        return {
+           x2: to.x * this.scale,
+           y2: to.y * this.scale,
+           x1: from.x * this.scale,
+           y1: from.y * this.scale
+        }
     }
 
 
