@@ -79,8 +79,8 @@ describe("note mindmap", () => {
         const container = renderAndGetContainer(notes[0].id)
         const connection = await container.querySelector("svg.mindmap-canvas")
         const linkStart = connection.querySelectorAll(".link-start")
-        expect(linkStart).toHaveLength(1)
-        expect(linkStart[0].getAttribute("transform")).toEqual("translate(-176, 25) rotate(36)")
+        expect(linkStart).toHaveLength(2)
+        expect(linkStart[0].getAttribute("transform")).toEqual("translate(244, 25) rotate(36)")
       });
 
       it("should link the two linked notes", async () => {

@@ -7,8 +7,11 @@
       <line v-if="!mindmapSector.isHead" v-bind="connection"
         style="stroke-width:1" marker-end="url(#arrowhead)"  />
   </g>
-  <LinkType v-for="(directAndReverse, linkTypeName, index) in links" :key="linkTypeName"
-  v-bind="{linkTypeName, links: directAndReverse.direct, index, mindmapSector, mindmap}"
+  <LinkType v-for="(directAndReverse, linkTypeName, index) in directLinks" :key="linkTypeName"
+  v-bind="{linkTypeName, links: directAndReverse.direct, totalLinkTypeCount: directLinkTypeCount, index, mindmapSector, mindmap}"
+  />
+  <LinkType v-for="(directAndReverse, linkTypeName, index) in reverseLinks" :key="linkTypeName"
+  v-bind="{reverse: true, linkTypeName, links: directAndReverse.reverse, totalLinkTypeCount: reverseLinkTypeCount, index, mindmapSector, mindmap}"
   />
 </template>
 
@@ -27,7 +30,10 @@ export default {
   components: { LinkType },
   computed: {
     connection() { return this.mindmap.connectFromParent(this.mindmapSector)},
-    links() { return new LinksReader(this.note.links).directLinks },
+    directLinks() { return new LinksReader(this.note.links).directLinks },
+    reverseLinks() { return new LinksReader(this.note.links).reverseLinks },
+    directLinkTypeCount() { return Object.keys(this.directLinks).length },
+    reverseLinkTypeCount() { return Object.keys(this.reverseLinks).length },
 
   },
 }

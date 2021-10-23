@@ -1,11 +1,13 @@
 <template>
   <g class="notes-links">
-    <LinkConnection v-for="link in links" :key="link.id"
-    v-bind="{link, mindmap, linkStart }"
-    />
+    <template v-if="!reverse">
+      <LinkConnection v-for="link in links" :key="link.id"
+        v-bind="{link, mindmap, linkStart }"
+      />
+    </template>
     <g class="link-start" :transform="`translate(${linkStart.x}, ${linkStart.y}) rotate(${linkStart.angle * 180 / Math.PI})`">
     <g transform="translate(0, -10)">
-      <SvgLinkTypeIcon width="40" height="20" :linkTypeName="linkTypeName"/>
+      <SvgLinkTypeIcon width="40" height="20" :linkTypeName="linkTypeName" :inverseIcon="reverse"/>
     </g>
     </g>
   </g>
@@ -18,8 +20,10 @@ import SvgLinkTypeIcon from "../../svgs/SvgLinkTypeIcon.vue"
 export default {
 
   props: {
+    reverse: {type: Boolean, default: false},
     linkTypeName: String,
     links: Array,
+    totalLinkTypeCount: Number,
     index: Number,
     mindmapSector: Object,
     mindmap: Object,
@@ -27,7 +31,8 @@ export default {
   components: { LinkConnection, SvgLinkTypeIcon },
   computed: {
     linkStart() {
-       return this.mindmap.outSlot(this.mindmapSector, this.links.length, this.index)
+      if (this.reverse) return this.mindmap.inSlot(this.mindmapSector, this.totalLinkTypeCount, this.index)
+      return this.mindmap.outSlot(this.mindmapSector, this.totalLinkTypeCount, this.index)
      }
 
   },

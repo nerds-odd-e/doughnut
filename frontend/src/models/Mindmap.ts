@@ -40,6 +40,10 @@ class Mindmap {
       return this.metrics.borderVector(from.outSlot(connectorCount, connectorIndex))
     }
 
+    inSlot(from: MindmapSector, connectorCount: number, connectorIndex: number): Vector {
+      return this.metrics.borderVector(from.inSlot(connectorCount, connectorIndex))
+    }
+
     getNoteSctor(noteId: number | string): MindmapSector | undefined {
       const ancestors = this.ancestorsUntilRoot(noteId)
       if(!ancestors) return undefined
