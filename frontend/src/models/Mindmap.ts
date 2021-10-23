@@ -27,12 +27,12 @@ class Mindmap {
       return this.metrics.straighConnection(sector.connectionFromParent)
     }
 
-    linkToTargetNote(from: Vector, link: any): String | undefined {
+    linkToTargetNote(from: Vector, link: any): string | undefined {
       const note = this.noteFinder(link.targetNote.id)
       const targetSector = this.getNoteSctor(link.targetNote.id)
       if (!targetSector) return undefined
       const {reverseLinkTypes} = new LinksReader(note.links)
-      const inSlot = this.metrics.borderVector(targetSector.inSlot(reverseLinkTypes.length, reverseLinkTypes.indexOf(link.linkTypeId)))
+      const inSlot = this.metrics.borderVector(targetSector.inSlot(reverseLinkTypes.length, reverseLinkTypes.indexOf(link.typeId)))
       return this.metrics.linkVectors(from, inSlot)
     }
 

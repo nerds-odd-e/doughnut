@@ -89,8 +89,8 @@ describe("note mindmap", () => {
         const lines = connection.querySelectorAll("g.notes-link path")
         expect(lines).toHaveLength(1)
         const d = lines[0].getAttribute("d")
-        expect(d).toMatch(/M -176 25/)
-        expect(d).toMatch(/.*? 244 -25/)
+        expect(d).toMatch(/M -142 50/)
+        expect(d).toMatch(/.*? 278 50/)
       });
 
     });

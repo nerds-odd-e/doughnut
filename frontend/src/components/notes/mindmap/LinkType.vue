@@ -1,11 +1,13 @@
 <template>
   <g class="notes-links">
-    <g class="link-start" :transform="`translate(${linkStart.x}, ${linkStart.y}) rotate(${linkStart.angle * 180 / Math.PI})`">
-      <SvgLinkTypeIcon width="30" height="15" :linkTypeName="linkTypeName"/>
-    </g>
     <LinkConnection v-for="link in links" :key="link.id"
     v-bind="{link, mindmap, linkStart }"
     />
+    <g class="link-start" :transform="`translate(${linkStart.x}, ${linkStart.y}) rotate(${linkStart.angle * 180 / Math.PI})`">
+    <g transform="translate(0, -10)">
+      <SvgLinkTypeIcon width="40" height="20" :linkTypeName="linkTypeName"/>
+    </g>
+    </g>
   </g>
 </template>
 

@@ -36,9 +36,9 @@ const props = defineProps({
   inverseIcon: Boolean,
 });
 
-const computedTypeId = computed(() => !this.linkTypeId ? linkTypeNameToId(this.linkTypeName) : this.linkTypeId)
+const computedTypeId = computed(() => !props.linkTypeId ? linkTypeNameToId(props.linkTypeName) : props.linkTypeId)
 const iconComponent = computed(() => {
-  const linkTypeId = parseInt(props.linkTypeId);
+  const linkTypeId = parseInt(computedTypeId.value);
   if (linkTypeId === 1) return SvgLinkTypeRelated;
   if (linkTypeId === 2) return SvgLinkTypeSpecialize;
   if (linkTypeId === 3) return SvgLinkTypeApplication;

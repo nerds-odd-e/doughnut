@@ -1,3 +1,4 @@
+import { maxHeaderSize } from "http";
 import { Coord, StraightConnection, Vector } from "./MindmapUnits";
 
 class MindmapMetrics {
@@ -43,12 +44,13 @@ class MindmapMetrics {
         return { x: crd.x * this.scale - this.boxWidth / 2, y: crd.y * this.scale - this.boxHeight / 2}
     }
 
-    linkVectors(from: Vector, to: Vector): String {
-      const dist = 200 * this.scale
-      return `M ${ from.x } ${ from.y
+    linkVectors(from: Vector, to: Vector): string {
+      const icon = 42
+      const dist = 400 * this.scale
+      return `M ${ Math.round(from.x + icon * Math.cos(from.angle)) } ${ Math.round(from.y + icon * Math.sin(from.angle))
       } C ${ from.x + dist * Math.cos(from.angle)} ${ from.y + dist * Math.sin(from.angle)
-      } ${ to.x - dist * Math.cos(to.angle)} ${ to.y - dist * Math.sin(to.angle)
-      } ${ to.x } ${ to.y }`
+      } ${ to.x + dist * Math.cos(to.angle)} ${ to.y + dist * Math.sin(to.angle)
+      } ${ Math.round(to.x + icon * Math.cos(to.angle)) } ${ Math.round(to.y + icon * Math.sin(to.angle)) }`
     }
 
 
