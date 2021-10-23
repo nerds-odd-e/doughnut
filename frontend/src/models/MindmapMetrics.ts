@@ -43,6 +43,14 @@ class MindmapMetrics {
         return { x: crd.x * this.scale - this.boxWidth / 2, y: crd.y * this.scale - this.boxHeight / 2}
     }
 
+    linkVectors(from: Vector, to: Vector): String {
+      const dist = 200 * this.scale
+      return `M ${ from.x } ${ from.y
+      } C ${ from.x + dist * Math.cos(from.angle)} ${ from.y + dist * Math.sin(from.angle)
+      } ${ to.x - dist * Math.cos(to.angle)} ${ to.y - dist * Math.sin(to.angle)
+      } ${ to.x } ${ to.y }`
+    }
+
 
 }
 

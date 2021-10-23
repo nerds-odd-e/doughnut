@@ -1,7 +1,7 @@
 <template>
-  <g class="notes-link" style="stroke:green;fill:green" v-if="connection">
+  <g class="notes-link" style="stroke:green;fill:none" v-if="path">
     <path 
-      :d="`M ${connection.x1} ${connection.y1} ${connection.x2} ${connection.y2}`"
+      :d="path"
       style="stroke-width:1" marker-end="url(#arrowhead)"  />
   </g>
 </template>
@@ -14,7 +14,7 @@ export default {
     mindmap: Object,
   },
   computed: {
-    connection() {
+    path() {
       return this.mindmap.linkToTargetNote(this.linkStart, this.link)
     },
 

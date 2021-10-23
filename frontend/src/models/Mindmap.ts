@@ -3,13 +3,6 @@ import LinksReader from "./LinksReader";
 import { Coord, StraightConnection, Vector } from "./MindmapUnits";
 import MindmapMetrics from "./MindmapMetrics";
 
-const linkVectors =(from: Vector, to: Vector): StraightConnection => ({
-        x2: to.x,
-        y2: to.y,
-        x1: from.x,
-        y1: from.y
-    })
-
 class Mindmap {
     rootMindmapSector: MindmapSector
 
@@ -34,13 +27,13 @@ class Mindmap {
       return this.metrics.straighConnection(sector.connectionFromParent)
     }
 
-    linkToTargetNote(from: Vector, link: any): StraightConnection | undefined {
+    linkToTargetNote(from: Vector, link: any): String | undefined {
       const note = this.noteFinder(link.targetNote.id)
       const targetSector = this.getNoteSctor(link.targetNote.id)
       if (!targetSector) return undefined
       const {reverseLinkTypes} = new LinksReader(note.links)
       const inSlot = this.metrics.borderVector(targetSector.inSlot(reverseLinkTypes.length, reverseLinkTypes.indexOf(link.linkTypeId)))
-      return linkVectors(from, inSlot)
+      return this.metrics.linkVectors(from, inSlot)
     }
 
     outSlot(from: MindmapSector, connectorCount: number, connectorIndex: number): Vector {
