@@ -9,12 +9,12 @@
 export default {
   props: {
     link: Object,
-    mindmapSector: Object,
+    linkStart: Object,
     mindmap: Object,
   },
   computed: {
     connection() {
-      return this.mindmap.connection(this.mindmapSector, this.link.targetNote.id)
+      return this.mindmap.connection(this.linkStart, this.link.targetNote.id)
     },
 
   },

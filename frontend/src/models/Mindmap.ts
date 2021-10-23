@@ -30,10 +30,10 @@ class Mindmap {
       return sector.connection(this.boxWidth, this.boxHeight, this.scale)
     }
 
-    connection(from: MindmapSector, targetNoteId: number | string): any {
+    connection(from: any, targetNoteId: number | string): any {
       const targetSector = this.getNoteSctor(targetNoteId)
       if (!targetSector) return undefined
-      return from.linkTo(targetSector, this.scale)
+      return targetSector.linkFrom(from, this.scale)
     }
 
     outSlot(from: MindmapSector, connectorCount: number, connectorIndex: number): any {
