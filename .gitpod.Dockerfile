@@ -73,11 +73,13 @@ RUN echo "[mysqld_safe]" >> /etc/mysql/mysql.conf.d/mysqld.cnf \
 # Install default-login for MySQL clients
 RUN echo "[client]" >> /etc/mysql/mysql.conf.d/client.cnf \
     && echo "host     = 127.0.0.1" >> /etc/mysql/mysql.conf.d/client.cnf \
+    && echo "port     = 3309" >> /etc/mysql/mysql.conf.d/client.cnf \
     && echo "user     = root" >> /etc/mysql/mysql.conf.d/client.cnf \
     && echo "password =" >> /etc/mysql/mysql.conf.d/client.cnf \
     && echo "socket   = /var/run/mysqld/mysqld.sock" >> /etc/mysql/mysql.conf.d/client.cnf \
     && echo "[mysql_upgrade]" >> /etc/mysql/mysql.conf.d/client.cnf \
     && echo "host     = 127.0.0.1" >> /etc/mysql/mysql.conf.d/client.cnf \
+    && echo "port     = 3309" >> /etc/mysql/mysql.conf.d/client.cnf \
     && echo "user     = root" >> /etc/mysql/mysql.conf.d/client.cnf \
     && echo "password =" >> /etc/mysql/mysql.conf.d/client.cnf \
     && echo "socket   = /var/run/mysqld/mysqld.sock" >> /etc/mysql/mysql.conf.d/client.cnf
