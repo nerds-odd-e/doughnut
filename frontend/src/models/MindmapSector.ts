@@ -2,8 +2,20 @@ const splitAngle =(startAngle: number, angleRange: number, siblingCount: number,
 
 interface Vector {
     x: number
+
     y: number
+
     angle: number
+}
+
+const borderPoint = (vector: Vector, scale: number, boxWidth: number, boxHeight: number): Vector => {
+    let dy = boxHeight / 2 * Math.sign(Math.sin(vector.angle))
+    let dx = dy / Math.tan(vector.angle)
+    if (Number.isNaN(dx) || Math.abs(dx) > boxWidth / 2) {
+        dx = boxWidth / 2 * Math.sign(Math.cos(vector.angle))
+        dy = dx * Math.tan(vector.angle)
+    }
+    return { x: Math.round(vector.x * scale + dx), y: Math.round(vector.y * scale + dy), angle: vector.angle}
 }
 
 class MindmapSector {
@@ -77,13 +89,7 @@ class MindmapSector {
     private connectPoint(start: number, connectorCount: number, connectorIndex: number, scale: number, boxWidth: number, boxHeight: number): Vector {
         const range = Math.PI - this.angleRange / 2
         const angle = splitAngle(start, range, connectorCount, connectorIndex)
-        let dy = boxHeight / 2 * Math.sign(Math.sin(angle))
-        let dx = dy / Math.tan(angle)
-        if (Number.isNaN(dx) || Math.abs(dx) > boxWidth / 2) {
-            dx = boxWidth / 2 * Math.sign(Math.cos(angle))
-            dy = dx * Math.tan(angle)
-        }
-        return {angle, x: Math.round(this.nx * scale + dx), y: Math.round(this.ny * scale + dy)}
+        return borderPoint({angle, x: this.nx, y: this.ny}, scale, boxWidth, boxHeight)
     }
 
 }
