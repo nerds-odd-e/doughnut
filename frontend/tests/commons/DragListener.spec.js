@@ -49,12 +49,12 @@ describe("DragListner", () => {
   });
 
   test("pinch not zooming but move in parallel", async () => {
-    const wrapper = mount(DragListner, {propsData: { modelValue: {x: 10, y: 20, scale: 1}}});
+    const wrapper = mount(DragListner, {propsData: { modelValue: {x: 10, y: 20, scale: 1, rotate: 0}}});
     await wrapper.find("div").trigger("pointerdown", {pointerId: 1, clientX: 100, clientY: 200})
     await wrapper.find("div").trigger("pointerdown", {pointerId: 2, clientX: 200, clientY: 400})
     await wrapper.find("div").trigger("pointermove", {pointerId: 1, clientX: 1100, clientY: 2200, currentTarget});
     await wrapper.find("div").trigger("pointermove", {pointerId: 2, clientX: 1200, clientY: 2400, currentTarget});
-    expect(wrapper.emitted()['update:modelValue'][1][0]).toEqual({x: 1010, y: 2020, scale: 1})
+    expect(wrapper.emitted()['update:modelValue'][1][0]).toEqual({x: 1010, y: 2020, scale: 1, rotate: 0})
   });
 
 });

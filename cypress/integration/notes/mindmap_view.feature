@@ -28,7 +28,7 @@ Feature: Mindmap view
     Then I should see the note "Singapore" is 0px * 0px offset the center of the map
     When I drag the map by 200px * 100px when holding the shift button
     Then I should see the note "Singapore" is 0px * 0px offset the center of the map
-    And I should see the note "Geography" is -199px * -44px offset the center of the map
+    And I should see the note "Geography" is -145px * -44px offset the center of the map
 
   Scenario: highlight a note
     When I click note "History"

@@ -78,12 +78,10 @@ class Gesture {
   }
 
   private get virtualPointers(): Array<Pointer> {
-    const opposite = (p: Position): Position => {
-      return {
+    const opposite = (p: Position): Position => ({
         x: this.startCenter.x * 2 - p.x,
         y: this.startCenter.y * 2 - p.y,
-      }
-    }
+      })
 
     const iterator = this.pointers.values()
     const pointer1 = iterator.next().value
@@ -100,6 +98,7 @@ class Gesture {
 
   get offset(): Offset {
     let newScale = this.startOffset.scale
+    let newRotate = this.startOffset.rotate
 
     const [pointer1, pointer2] = this.virtualPointers
     if(pointer2) {
@@ -107,13 +106,18 @@ class Gesture {
         ((pos1.x - pos2.x)**2 + (pos1.y - pos2.y)**2) ** .5
       newScale *= distance(pointer1.current, pointer2.current)
       newScale /= distance(pointer1.start, pointer2.start)
+
+      const atan2 = (pos1: Position, pos2: Position): number =>
+        Math.atan2((pos1.y - pos2.y), (pos1.x - pos2.x))
+
+      newRotate += atan2(pointer1.current, pointer2.current) - atan2(pointer1.start, pointer2.start)
     }
 
     const beforeScale = {
         x: this.startOffset.x + this.averagePointer.current.x - this.averagePointer.start.x,
         y: this.startOffset.y + this.averagePointer.current.y - this.averagePointer.start.y,
         scale: this.startOffset.scale,
-        rotate: this.startOffset.rotate,
+        rotate: newRotate,
       }
     return this.scale(beforeScale, newScale)
   }
@@ -135,7 +139,7 @@ class Gesture {
       scale: adjustedNewScale,
       x: newOffset(fromOffset.x, width / 2, pointer.start.x - left),
       y: newOffset(fromOffset.y, height / 2, pointer.start.y - top),
-      rotate: fromOffset.rotate
+      rotate: fromOffset.rotate,
     }
   }
 
