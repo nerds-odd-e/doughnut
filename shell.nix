@@ -2,7 +2,7 @@
   name = "nixpkgs-unstable";
   url = "https://github.com/nixos/nixpkgs/";
   ref = "refs/heads/nixpkgs-unstable";
-  rev = "071317d543205ee5f5611d391a37582f9b282240";
+  rev = "0920efc96dc2474295f17ae9f71da5baf621246e";
 }) { } }:
 with pkgs;
 let
@@ -12,7 +12,6 @@ let
     allowUnsupportedSystem = true;
   };
   apple_sdk = darwin.apple_sdk.frameworks;
-  nodejs = nodejs-16_x;
   intellij = jetbrains.idea-community;
 in mkShell {
   name = "doughnut";
@@ -27,9 +26,9 @@ in mkShell {
     gnumake
     libgccjit
     gradle
-    nodejs
+    nodejs-16_x
     yarn
-    jdk16
+    jdk
     python3
     direnv
     nix-direnv
@@ -62,7 +61,6 @@ in mkShell {
     lesspipe
     lsof
     lzma
-    ncdu
     zoxide
     most
     ps
@@ -73,7 +71,6 @@ in mkShell {
     which
     libmysqlclient
     libpcap
-    libressl
     patchelf
     cacert
     glances
