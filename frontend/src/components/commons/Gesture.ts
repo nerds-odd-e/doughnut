@@ -4,6 +4,7 @@ interface Offset {
   x: number
   y: number
   scale: number
+  rotate: number
 }
 
 interface Position {
@@ -23,9 +24,12 @@ class Gesture {
 
   rect: any
 
+  isShiftDown: boolean
+
   constructor(startOffset: Offset) {
     this.startOffset = { ... startOffset }
     this.pointers = new Map
+    this.isShiftDown = false
   }
 
   reset(): void {
@@ -39,6 +43,10 @@ class Gesture {
   move(rect: any, pointerId: number, pos: Position): void {
     this.rect = rect
     this.pointers.get(pointerId)!.current = pos
+  }
+
+  shiftDown(value: boolean): void {
+    this.isShiftDown = value
   }
 
   private get averagePointer(): Pointer {
@@ -66,10 +74,22 @@ class Gesture {
       newScale /= distance(p1.start, p2.start)
     }
 
-    const beforeScale = {
-      x: this.startOffset.x + this.averagePointer.current.x - this.averagePointer.start.x,
-      y: this.startOffset.y + this.averagePointer.current.y - this.averagePointer.start.y,
-      scale: this.startOffset.scale,
+    let beforeScale
+    if (this.isShiftDown) {
+      beforeScale = {
+        x: this.startOffset.x,
+        y: this.startOffset.y,
+        scale: this.startOffset.scale,
+        rotate: this.startOffset.rotate + Math.PI / 10
+      }
+    }
+    else {
+      beforeScale = {
+        x: this.startOffset.x + this.averagePointer.current.x - this.averagePointer.start.x,
+        y: this.startOffset.y + this.averagePointer.current.y - this.averagePointer.start.y,
+        scale: this.startOffset.scale,
+        rotate: this.startOffset.rotate,
+      }
     }
     return this.scale(beforeScale, newScale)
   }
@@ -79,7 +99,7 @@ class Gesture {
     return this.scale(this.startOffset, newScale)
   }
 
-  private scale(fromOffset: Offset, newScale: number) {
+  private scale(fromOffset: Offset, newScale: number): Offset {
     if (fromOffset.scale === newScale) return fromOffset
     const pointer: Pointer = this.averagePointer
     const {width, height, top} = this.rect
@@ -91,6 +111,7 @@ class Gesture {
       scale: adjustedNewScale,
       x: newOffset(fromOffset.x, width / 2, pointer.start.x),
       y: newOffset(fromOffset.y, height / 2, pointer.start.y - top),
+      rotate: fromOffset.rotate
     }
   }
 

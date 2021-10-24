@@ -29,6 +29,7 @@ export default {
     noteId: [String, Number],
     ancestors: Array,
     scale: Number,
+    rotate: Number,
   },
   emits: ["updated"],
   components: { NoteMindmapScaffold, NoteMindmapAncestorsScaffold },
@@ -39,7 +40,7 @@ export default {
     mindmapSector() {
       var d = 0
       if (this.ancestors?.length > 0) d = Math.PI / 10
-      return new MindmapSector(0, 0, -Math.PI / 2 + d, Math.PI * 2 - d * 2)
+      return new MindmapSector(0, 0, this.rotate - Math.PI / 2 + d, Math.PI * 2 - d * 2)
     },
     mindmap() {
       return new Mindmap(

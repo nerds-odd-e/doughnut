@@ -39,6 +39,7 @@ export default {
       if (!this.gesture) return
       e = e.changedTouches ? e.changedTouches[0] : e;
       this.gesture.move(e.currentTarget.getBoundingClientRect(), e.pointerId, {x: e.clientX, y: e.clientY})
+      this.gesture.shiftDown(e.shiftKey)
       Object.assign(this.modelValue, this.gesture.offset)
       this.$emit("update:modelValue", this.modelValue)
     },

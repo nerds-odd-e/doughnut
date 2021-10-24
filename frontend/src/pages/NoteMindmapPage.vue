@@ -7,11 +7,12 @@
       <div class="content">
         <DragListner class="mindmap-event-receiver" v-model="offset">
           <div class="mindmap">
-            <NoteMindmap v-bind="{ noteId, scale: offset.scale, ancestors: notePosition.ancestors }" />
+            <NoteMindmap v-bind="{ noteId, scale: offset.scale, rotate: offset.rotate, ancestors: notePosition.ancestors }" />
           </div>
-        <div class="mindmap-info">
+        <div class="mindmap-info" @click.prevent="reset">
           <span class="scale">{{scalePercentage}}</span>
           <span class="offset">{{offsetMsg}}</span>
+          <span class="offset">{{rotateMsg}}&deg;</span>
         </div>
         </DragListner>
       </div>
@@ -26,6 +27,8 @@ import NoteMindmap from "../components/notes/mindmap/NoteMindmap.vue";
 import DragListner from "../components/commons/DragListner.vue";
 import Breadcrumb from "../components/notes/Breadcrumb.vue";
 
+const defaultOffset = {x: 0, y: 0, scale: 1.0, rotate: 0}
+
 export default {
   name: "NoteOverviewPage",
   props: { noteId: [String, Number] },
@@ -33,7 +36,7 @@ export default {
     return {
       loading: false,
       notePosition: null,
-      offset: {x: 0, y: 0, scale: 1.0},
+      offset: { ... defaultOffset },
     };
   },
   components: { LoadingPage, NoteMindmap, DragListner, Breadcrumb },
@@ -47,6 +50,9 @@ export default {
       .finally(() => this.loading = false)
       ;
     },
+    reset() {
+      this.offset = { ... defaultOffset }
+    }
   },
   computed: {
     centerX() {
@@ -60,6 +66,9 @@ export default {
     },
     offsetMsg() {
       return `offset: (${this.offset.x.toFixed(0)}, ${this.offset.y.toFixed(0)})`
+    },
+    rotateMsg() {
+      return `rotate: ${ (this.offset.rotate * 180 / Math.PI).toFixed(0)}`
     }
   },
   watch: {

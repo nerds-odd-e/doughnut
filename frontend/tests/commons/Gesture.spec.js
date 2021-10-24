@@ -14,5 +14,15 @@ describe("Gesture", () => {
     expect(gesture.offset.scale).toEqual(0.5)
     expect(gesture.offset.x).toEqual(1.25)
   });
+
+  test("rotate", async () => {
+    const gesture = new Gesture({x: 0, y: 0, scale: 1})
+    gesture.newPointer(1, {x: frame.width/2, y: 0})
+    gesture.move(frame, 1, {x:  frame.width/2 + 5, y: 0})
+    gesture.shiftDown(true)
+    expect(gesture.offset.scale).toEqual(1)
+    expect(gesture.offset.x).toEqual(0)
+  });
+
 });
 
