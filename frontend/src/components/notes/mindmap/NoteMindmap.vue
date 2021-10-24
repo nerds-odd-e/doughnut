@@ -1,5 +1,15 @@
 <template>
   <svg class="mindmap-canvas">
+    <marker id="arrowhead" markerWidth="8" markerHeight="6" 
+    refX="8" refY="3" orient="auto">
+      <polygon points="0 0, 8 3, 0 6" style="stroke-width:0"/>
+    </marker>
+    <marker id="treearrow" class="parent-child" markerWidth="4" markerHeight="3" 
+    refX="3" refY="1.5" orient="auto">
+      <polygon points="0 0, 4 1.5, 0 3" style="stroke-width:0"/>
+    </marker>
+
+
     <NoteMindmapAncestorsScaffold v-bind="{ ancestors, mindmap, mindmapSector: mindmapAncestorSector, noteComponent: 'NoteParentConnection'}"/>
     <NoteMindmapScaffold v-bind="{ noteId, mindmap, mindmapSector, noteComponent: 'NoteConnection'}"/>
   </svg>
@@ -46,7 +56,11 @@ export default {
 };
 </script>
 
-<style lang="sass" scoped>
+<style lang="sass">
 .mindmap-canvas
   overflow: visible
+.parent-child
+  stroke: #FFbb55
+  fill: #FFbb55
+
 </style>

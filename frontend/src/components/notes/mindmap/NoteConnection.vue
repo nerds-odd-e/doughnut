@@ -1,11 +1,8 @@
 <template>
-  <marker id="arrowhead" markerWidth="8" markerHeight="6" 
-  refX="8" refY="3" orient="auto">
-    <polygon points="0 0, 8 3, 0 6" style="stroke-width:0"/>
-  </marker>
-  <g style="stroke:#FF6700;fill:#FF6700">
+
+  <g class="parent-child">
       <line v-if="!mindmapSector.isHead" v-bind="connection"
-        style="stroke-width:1" marker-end="url(#arrowhead)"  />
+        style="stroke-width:15" marker-end="url(#treearrow)"  />
   </g>
   <LinkType v-for="(directAndReverse, linkTypeName, index) in directLinks" :key="linkTypeName"
   v-bind="{linkTypeName, links: directAndReverse.direct, totalLinkTypeCount: directLinkTypeCount, index, mindmapSector, mindmap}"
