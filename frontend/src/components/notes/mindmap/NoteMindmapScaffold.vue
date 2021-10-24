@@ -20,7 +20,8 @@
 <script>
 import MindmapSector from "@/models/MindmapSector";
 import NoteCard from "./NoteCard.vue";
-import NoteConnection from "./NoteConnection.vue";
+import NoteParentChildConnection from "./NoteParentChildConnection.vue";
+import NoteLinks from "./NoteLinks.vue";
 
 export default {
   name: "NoteMindmap",
@@ -30,7 +31,7 @@ export default {
     mindmap: Object,
     noteComponent: String,
   },
-  components: { NoteCard, NoteConnection },
+  components: { NoteCard, NoteParentChildConnection, NoteLinks },
   computed: {
     noteViewedByUser() {
       return this.$store.getters.getNoteById(this.noteId);
