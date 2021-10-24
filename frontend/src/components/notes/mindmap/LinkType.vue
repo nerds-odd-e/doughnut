@@ -7,7 +7,7 @@
     </template>
     <g class="link-start" :transform="`translate(${linkStart.x}, ${linkStart.y}) rotate(${linkStart.angle * 180 / Math.PI})`">
     <g transform="translate(0, -10)">
-      <SvgLinkTypeIcon width="40" height="20" :linkTypeName="linkTypeName" :inverseIcon="reverse"/>
+      <SvgLinkTypeIcon width="40" height="20" :linkTypeName="linkTypeName" :inverseIcon="!reverse"/>
     </g>
     </g>
   </g>

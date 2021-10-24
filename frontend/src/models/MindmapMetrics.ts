@@ -44,13 +44,24 @@ class MindmapMetrics {
         return { x: crd.x * this.scale - this.boxWidth / 2, y: crd.y * this.scale - this.boxHeight / 2}
     }
 
-    linkVectors(from: Vector, to: Vector): string {
+    linkVectors(fromO: Vector, toO: Vector): string {
       const icon = 42
-      const dist = 400 * this.scale
-      return `M ${ Math.round(from.x + icon * Math.cos(from.angle)) } ${ Math.round(from.y + icon * Math.sin(from.angle))
+      const dist = 100 * this.scale
+      const from: Vector = {
+         x: Math.round(fromO.x + icon * Math.cos(fromO.angle)),
+         y: Math.round(fromO.y + icon * Math.sin(fromO.angle)),
+         angle: fromO.angle
+      }
+      const to: Vector = {
+         x: Math.round(toO.x + icon * Math.cos(toO.angle)),
+         y: Math.round(toO.y + icon * Math.sin(toO.angle)),
+         angle: toO.angle
+      }
+      return `M ${ from. x} ${ from .y 
       } C ${ from.x + dist * Math.cos(from.angle)} ${ from.y + dist * Math.sin(from.angle)
       } ${ to.x + dist * Math.cos(to.angle)} ${ to.y + dist * Math.sin(to.angle)
-      } ${ Math.round(to.x + icon * Math.cos(to.angle)) } ${ Math.round(to.y + icon * Math.sin(to.angle)) }`
+      } ${ to.x } ${ to.y
+      }`
     }
 
 

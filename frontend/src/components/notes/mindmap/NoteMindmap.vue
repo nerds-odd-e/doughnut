@@ -60,7 +60,7 @@ export default {
 .mindmap-canvas
   overflow: visible
 .parent-child
-  stroke: #FFbb55
-  fill: #FFbb55
+  stroke: #FFccaa
+  fill: #FFccaa
 
 </style>

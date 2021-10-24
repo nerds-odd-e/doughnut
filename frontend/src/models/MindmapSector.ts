@@ -48,17 +48,18 @@ class MindmapSector {
     }
 
     outSlot(connectorCount: number, connectorIndex: number): Vector {
-        const start = this.startAngle + this.angleRange / 2 - Math.PI
-        return this.connectPoint(start, connectorCount, connectorIndex)
+        const start = this.startAngle + this.angleRange / 2 + Math.PI / 2
+        const range = Math.PI
+        return this.connectPoint(start, range, connectorCount, connectorIndex)
     }
 
     inSlot(connectorCount: number, connectorIndex: number): Vector {
-        const start = this.startAngle + this.angleRange / 2
-        return this.connectPoint(start, connectorCount, connectorIndex)
+        const start = this.startAngle + this.angleRange / 2 - Math.PI / 2
+        const range = Math.PI
+        return this.connectPoint(start, range, connectorCount, connectorIndex)
     }
 
-    private connectPoint(start: number, connectorCount: number, connectorIndex: number): Vector {
-        const range = Math.PI - this.angleRange / 2
+    private connectPoint(start: number, range: number, connectorCount: number, connectorIndex: number): Vector {
         const angle = splitAngle(start, range, connectorCount, connectorIndex)
         return {angle, x: this.nx, y: this.ny}
     }

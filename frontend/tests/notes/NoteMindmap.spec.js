@@ -80,8 +80,8 @@ describe("note mindmap", () => {
         const connection = await container.querySelector("svg.mindmap-canvas")
         const linkStart = connection.querySelectorAll(".link-start")
         expect(linkStart).toHaveLength(2)
-        expect(linkStart[0].getAttribute("transform")).toEqual("translate(244, 25) rotate(36)")
-        expect(linkStart[1].getAttribute("transform")).toEqual("translate(-176, 25) rotate(36)")
+        expect(linkStart[0].getAttribute("transform")).toEqual("translate(285, 0) rotate(0)")
+        expect(linkStart[1].getAttribute("transform")).toEqual("translate(-135, 0) rotate(360)")
       });
 
       it("should link the two linked notes", async () => {
@@ -90,8 +90,8 @@ describe("note mindmap", () => {
         const lines = connection.querySelectorAll("g.notes-link path")
         expect(lines).toHaveLength(1)
         const d = lines[0].getAttribute("d")
-        expect(d).toMatch(/M -142 50/)
-        expect(d).toMatch(/.*? 278 50/)
+        expect(d).toMatch(/M -93 0/)
+        expect(d).toMatch(/.*? 327 0/)
       });
 
     });
