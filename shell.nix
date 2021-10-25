@@ -2,7 +2,7 @@
   name = "nixpkgs-unstable";
   url = "https://github.com/nixos/nixpkgs/";
   ref = "refs/heads/nixpkgs-unstable";
-  rev = "0920efc96dc2474295f17ae9f71da5baf621246e";
+  rev = "a3f85aedb1d66266b82d9f8c0a80457b4db5850c";
 }) { } }:
 with pkgs;
 let
