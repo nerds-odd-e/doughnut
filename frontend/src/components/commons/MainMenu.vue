@@ -78,7 +78,7 @@
         >
       </div>
     </nav>
-    <nav class="navbar">
+    <nav class="navbar toolbar">
       <NoteButtons v-if="currentNote" :note="currentNote"/>
     </nav>
   </div>

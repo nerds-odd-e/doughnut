@@ -37,6 +37,5 @@ describe("note wth child cards", () => {
       },
     );
     await screen.findByText("Bazaar");
-    await screen.findByRole("button", { name: "Add to my learning" });
   });
 });

@@ -173,7 +173,7 @@ Cypress.Commands.add("creatingLinkFor", (noteTitle) => {
 
 Cypress.Commands.add("clickNotePageButton", (noteTitle, btnTextOrTitle) => {
   cy.jumpToNotePage(noteTitle);
-  cy.get(".note-with-controls")
+  cy.get(".toolbar")
     .findByRole("button", { name: btnTextOrTitle })
     .click();
 });
@@ -189,10 +189,10 @@ Cypress.Commands.add(
 Cypress.Commands.add(
   "clickNotePageMoreOptionsButtonOnCurrentPage",
   (btnTextOrTitle) => {
-    cy.get(".note-with-controls")
+    cy.get(".toolbar")
       .findByRole("button", { name: "more options" })
       .click();
-    cy.get(".note-with-controls")
+    cy.get(".toolbar")
       .findByRole("button", { name: btnTextOrTitle })
       .click();
   }

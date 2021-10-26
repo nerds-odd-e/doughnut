@@ -29,6 +29,7 @@ export default {
       storedApiGetNoteAndItsChildren(this.$store, this.noteId)
       .then((res) => {
         this.notePosition = res.notePosition;
+        this.$store.commit('highlightNoteId', this.noteId)
       }).finally(() => this.loading = false);
     },
   },
@@ -40,5 +41,8 @@ export default {
   mounted() {
     this.fetchData();
   },
+  unmounted() {
+    this.$store.commit('highlightNoteId', null)
+  }
 };
 </script>
