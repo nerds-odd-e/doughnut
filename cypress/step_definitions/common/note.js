@@ -60,6 +60,7 @@ When(
 
 When("I create note belonging to {string}:", (noteTitle, data) => {
   cy.jumpToNotePage(noteTitle);
+  cy.findByText(noteTitle)
   cy.clickAddChildNoteButton();
   cy.submitNoteFormsWith(data.hashes());
 });

@@ -26,16 +26,16 @@ describe("MindmapSector", () => {
     const child = head.getChildSector(2, 1)
     const grandchild = child.getChildSector(100, 0)
     const coord = mindmap.coord(grandchild)
-    expect(coord.x).toBeCloseTo(-275, -1)
-    expect(coord.y).toBeCloseTo(-173, -1)
+    expect(coord.x).toBeCloseTo(-4093, -1)
+    expect(coord.y).toBeCloseTo(987, -1)
   });
 
   it("head note has 2 children, 2nd child has 100 children, last grandchild", async () => {
     const child = head.getChildSector(2, 1)
     const grandchild = child.getChildSector(100, 99)
     const coord = mindmap.coord(grandchild)
-    expect(coord.x).toBeCloseTo(125, -1)
-    expect(coord.y).toBeCloseTo(-173, -1)
+    expect(coord.x).toBeCloseTo(3943, -1)
+    expect(coord.y).toBeCloseTo(987, -1)
   });
 
   it("a more vertical connection", async () => {

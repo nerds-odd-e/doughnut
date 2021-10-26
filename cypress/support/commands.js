@@ -105,6 +105,7 @@ Cypress.Commands.add("submitNoteFormWith", (noteAttributes) => {
 });
 
 Cypress.Commands.add("clickAddChildNoteButton", () => {
+  cy.pageIsLoaded()
   cy.findAllByRole("button", { name: "Add Child Note" }).first().click();
 });
 
