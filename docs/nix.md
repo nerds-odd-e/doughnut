@@ -20,23 +20,6 @@ sh <(curl -L https://nixos.org/nix/install) --daemon
 
 (NB: if the install script fails to add sourcing of `nix.sh` in `.bashrc` or `.profile`, you can do it manually `source /etc/profile.d/nix.sh`)
 
-_Install `any-nix-shell` for using `fish` or `zsh` in nix-shell_
-
-```bash
-# OPTIONAL
-nix-env -i any-nix-shell -f https://github.com/NixOS/nixpkgs/archive/master.tar.gz
-```
-
-##### `zsh`
-
-Add the following to your _~/.zshrc_.
-Create it if it doesn't exist.
-
-```bash
-# OPTIONAL
-any-nix-shell zsh --info-right | source /dev/stdin
-```
-
 ### 2. Setup and run doughnut for the first time (local development profile)
 
 The default spring profile is 'test' unless you explicitly set it to 'dev'. Tip: Add `--Dspring.profiles.active=${profile}"` to gradle task command.
@@ -60,7 +43,25 @@ Launch local nix-shell development environment (with zsh)
 ```bash
 cd doughnut
 export NIXPKGS_ALLOW_UNFREE=1
-nix-shell --pure --command "zsh"
+nix-shell --pure --show-trace
+```
+
+Run E2E profile springboot backend server with gradle (backend app started on port 9081)
+
+```bash
+# from doughnut source root dir
+yarn && yarn frontend:build
+./gradlew bootRunE2E
+open http://localhost:9081
+```
+
+Run E2E profile with backend server & frontend in dev mode & Cypress IDE (frontend app on port 3000; backend app on port 9081)
+
+```bash
+# from doughnut source root dir
+yarn && yarn frontend:sut
+./gradlew bootRunE2E
+yarn cy:open
 ```
 
 Run Dev profile springboot backend server with gradle (backend app started on port 9082)
@@ -70,22 +71,6 @@ Run Dev profile springboot backend server with gradle (backend app started on po
 yarn && yarn frontend:build
 ./gradlew bootRunDev
 open http://localhost:9082
-```
-
-Run E2E profile springboot backend server with gradle (backend app started on port 9081)
-```bash
-# from doughnut source root dir
-yarn && yarn frontend:build
-./gradlew bootRunE2E
-open http://localhost:9081
-```
-
-Run E2E profile with backend server & frontend in dev mode & Cypress IDE (frontend app on port 3000; backend app on port 9081)
-```bash
-# from doughnut source root dir
-yarn && yarn frontend:sut
-./gradlew bootRunE2E
-yarn cy:open
 ```
 
 #### IntelliJ IDEA (Community) IDE project import
@@ -104,7 +89,7 @@ nohup idea-community &
   - e.g. On macOS this could look like `/nix/store/60kc2wrpr8p0jb8hginzq2hmhi9l9ws0-zulu16.30.15-ca-jdk-16.0.1/zulu-16.jdk/Contents/Home`.
 - **File -> Project Structure -> Platform Settings -> SDKs -> Add JDK...**
   - Enter the full path of above (e.g. `/nix/store/60kc2wrpr8p0jb8hginzq2hmhi9l9ws0-zulu16.30.15-ca-jdk-16.0.1/zulu-16.jdk/Contents/Home`).
-![Sample nix-shell JAVA_HOME](./images/01_doughnut_nix-shell_JAVA_HOME.png "Sample nix-shell JAVA_HOME")
+    ![Sample nix-shell JAVA_HOME](./images/01_doughnut_nix-shell_JAVA_HOME.png "Sample nix-shell JAVA_HOME")
 
 #### Run a single targetted JUnit5 test in IntelliJ IDEA
 
