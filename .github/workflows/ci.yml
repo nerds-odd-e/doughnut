@@ -144,6 +144,15 @@ jobs:
         with:
           node-version: "16"
       - run: yarn frontend:build
+      - name: Cache local gradle repository & artifacts
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
       - name: End-to-End tests with Cypress
         uses: cypress-io/github-action@v2
         with:
@@ -184,6 +193,15 @@ jobs:
           java-version: 16
           distribution: "zulu"
           architecture: x64
+      - name: Cache local gradle repository & artifacts
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
       - name: Build application jar artifact
         run: backend/gradlew -p backend build -x test -Dspring.profiles.active=prod
       - name: Setup Google Cloud SDK with Service Account
