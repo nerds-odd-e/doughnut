@@ -1,5 +1,6 @@
 {
   "baseUrl": "http://localhost:9081",
   "environment": "ci",
+  "screenshotOnRunFailure": false,
   "nodeVersion": "system"
 }
