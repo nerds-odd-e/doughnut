@@ -1,8 +1,6 @@
 <template>
   <Breadcrumb v-bind="notePosition" />
-  <div class="note-with-controls">
-    <NoteWithLinks v-bind="note"/>
-  </div>
+  <NoteWithLinks v-bind="note"/>
 </template>
 
 <script>

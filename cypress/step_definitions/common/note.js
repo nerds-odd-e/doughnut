@@ -97,6 +97,7 @@ When("I delete top level note {string}", (noteTitle) => {
 
 When("I create a sibling note of {string}:", (noteTitle, data) => {
   cy.navigateToChild(noteTitle)
+  cy.findByText(noteTitle);
   cy.findByRole("button", { name: "Add Sibling Note" }).click();
   cy.submitNoteFormsWith(data.hashes());
 });
