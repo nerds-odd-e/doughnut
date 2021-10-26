@@ -58,10 +58,10 @@ For more background info you can read:
 
 ### 2. [Cloud IDE development environment with Gitpod.io](./docs/gitpod.md)
 
-### 3. Setup and run doughnut with migrations in 'test' profile (backend app started on port 8081)
+### 3. Setup and run doughnut with migrations in 'E2E' profile (backend app started on port 9081)
 
 ```bash
-./gradlew bootRunTest
+./gradlew bootRunE2E
 ```
 
 - Rerun it each time you reset the database.
@@ -124,14 +124,13 @@ We chose Vue3 + Vite to build our light frontend.
 #### How-to
 
 From `frontend` directory
-
 ```bash
-cd frontend
 yarn
 ```
 
 ##### Run frontend unit tests
 
+From `frontend` directory
 ```bash
 yarn test
 ```
