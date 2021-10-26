@@ -11,7 +11,6 @@ Feature: Notes in circles
     When I've logged in as "another_old_learner"
     Then I should see the note "Team agreement" in circle "Odd-e SG Team"
     When I add a note "Keep it complex" under "Team agreement"
-    Then I should see "Circles, Odd-e SG Team, Team agreement" in breadcrumb
 
   Scenario: subscribe to a note and review
     When I create a note "Team agreement" in circle "Odd-e SG Team"

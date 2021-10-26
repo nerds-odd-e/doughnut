@@ -59,7 +59,7 @@ class RestNoteController {
 
     @PostMapping(value = "/{parentNote}/create")
     @Transactional
-    public RedirectToNoteResponse createNote(@PathVariable(name = "parentNote") Note parentNote, @Valid @ModelAttribute NoteCreation noteCreation) throws NoAccessRightException {
+    public NotesBulk createNote(@PathVariable(name = "parentNote") Note parentNote, @Valid @ModelAttribute NoteCreation noteCreation) throws NoAccessRightException {
         final UserModel userModel = currentUserFetcher.getUser();
         userModel.getAuthorization().assertAuthorization(parentNote);
         User user = userModel.getEntity();
@@ -74,7 +74,7 @@ class RestNoteController {
             link.setTypeId(noteCreation.getLinkTypeToParent());
             modelFactoryService.linkRepository.save(link);
         }
-        return new RedirectToNoteResponse(note.getId());
+        return NotesBulk.jsonNoteWithChildren(parentNote, userModel);
     }
 
     @GetMapping("/{note}")

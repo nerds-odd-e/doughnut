@@ -10,7 +10,7 @@
 
     <NoteNewButton
       :parentId="note.parentId"
-      v-if="!!note.parentId && addSibling"
+      v-if="!!note.parentId"
     >
       <template #default="{ open }">
         <button class="btn btn-small" @click="open()" title="Add Sibling Note">
@@ -75,7 +75,7 @@ import NoteNewButton from "./NoteNewButton.vue";
 import { restPost } from "../../restful/restful";
 export default {
   name: "NoteButtons",
-  props: { note: Object, addSibling: Boolean },
+  props: { note: Object },
   components: {
     SvgCog,
     SvgAddChild,

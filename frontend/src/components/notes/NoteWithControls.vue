@@ -5,7 +5,6 @@
       <NoteButtons
         v-if="notePosition.owns"
         :note="note"
-        :addSibling="true"
       />
       <BazaarNoteButtons v-else :note="note" :notebook="notePosition.notebook" />
     </nav>

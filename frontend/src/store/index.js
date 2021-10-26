@@ -30,6 +30,7 @@ export default createStore({
     getCurrentUser: (state) => () => state.currentUser,
     getFeatureToggle: (state) => () => state.featureToggle,
     getHighlightNoteId: (state) => () => state.highlightNoteId,
+    getHighlightNote: (state) => () => withState(state).getNoteById(state.highlightNoteId),
     getNoteById: (state) => (id) => withState(state).getNoteById(id),
     getChildrenIdsByParentId: (state) => (parentId) => withState(state).getChildrenIdsByParentId(parentId),
     getChildrenOfParentId: (state) => (parentId) => withState(state).getChildrenOfParentId(parentId),

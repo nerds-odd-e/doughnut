@@ -120,14 +120,14 @@ class RestNoteControllerTests {
     @Nested
     class createNoteTest {
         @Test
-        void shouldBeAbleToSaveNoteWhenValid() throws NoAccessRightException, IOException {
+        void shouldBeAbleToSaveNoteWhenValid() throws NoAccessRightException {
             Note parent = makeMe.aNote().byUser(userModel).please();
             Note newNote = makeMe.aNote().inMemoryPlease();
             RestNoteController.NoteCreation noteCreation = new RestNoteController.NoteCreation();
             noteCreation.setNoteContent(newNote.getNoteContent());
 
-            RedirectToNoteResponse response = controller.createNote(parent, noteCreation);
-            assertThat(response.noteId, notNullValue());
+            NotesBulk response = controller.createNote(parent, noteCreation);
+            assertThat(response.notes.get(0).getId(), equalTo(parent.getId()));
         }
     }
 

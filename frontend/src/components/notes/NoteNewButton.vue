@@ -32,8 +32,7 @@ import Breadcrumb from "./Breadcrumb.vue";
 import NoteFormBody from "./NoteFormBody.vue";
 import ModalWithButton from "../commons/ModalWithButton.vue";
 import LinkTypeSelect from "../links/LinkTypeSelect.vue";
-import { restPostMultiplePartForm } from "../../restful/restful";
-import { storedApiGetNoteAndItsChildren } from "../../storedApi";
+import { storedApiGetNoteAndItsChildren, storedApiCreateNote } from "../../storedApi";
 
 function initialState() {
   return {
@@ -84,19 +83,14 @@ export default {
     },
 
     processForm() {
-      restPostMultiplePartForm(
-        `/api/notes/${this.parentId}/create`,
-        this.creationData,
-        (r) => (this.loading = r)
-      )
-        .then((res) => {
-          this.show = false;
-          this.$router.push({
-            name: "noteShow",
-            params: { noteId: res.noteId },
-          });
-        })
-        .catch((res) => (this.formErrors = res));
+      this.loading = true
+      storedApiCreateNote(
+        this.$store,
+        this.parentId,
+        this.creationData
+      ).then((res) => { this.show = false })
+      .catch((res) => (this.formErrors = res))
+      .finally(()=> this.loading = false )
     },
   },
 };
