@@ -23,6 +23,7 @@
 
 <script setup>
 import NoteWithControls from "../notes/NoteWithControls.vue";
+import CurrentNoteContainer from "../commons/CurrentNoteContainer.vue";
 import LinkShow from "../links/LinkShow.vue";
 import LinkNob from "../links/LinkNob.vue";
 import { computed } from "@vue/reactivity";
@@ -31,6 +32,8 @@ const props = defineProps({
   noteWithPosition: Object,
   linkViewedByUser: Object,
 });
+
+const noteId = computed(() => props.noteWithPosition ? props.noteWithPosition.id : null )
 
 
 </script>

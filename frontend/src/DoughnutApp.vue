@@ -1,6 +1,7 @@
 <script>
 import Popups from "./components/commons/Popups.vue";
 import MainMenu from "./components/commons/MainMenu.vue";
+import NoteButtons from './components/notes/NoteButtons.vue'
 import UserNewRegisterPage from "./pages/UserNewRegisterPage.vue";
 import { storedApiGetCurrentUserInfo, storedApiGetFeatureToggle } from "./storedApi"
 
@@ -15,7 +16,7 @@ export default {
     };
   },
 
-  components: { Popups, MainMenu, UserNewRegisterPage },
+  components: { Popups, MainMenu, UserNewRegisterPage, NoteButtons },
 
   watch: {
     $route(to, from) {
@@ -28,10 +29,9 @@ export default {
   },
 
   computed: {
-    newUser() {
-      return !this.user && !!this.externalIdentifier;
-    },
+    newUser() { return !this.user && !!this.externalIdentifier; },
     user() { return this.$store.getters.getCurrentUser()},
+    currentNote() { return this.$store.getters.getHighlightNote()},
   },
 
   methods: {
@@ -84,6 +84,9 @@ export default {
   <template v-else>
     <div class="header">
       <MainMenu v-if="showNavBar" />
+      <nav class="navbar toolbar">
+        <NoteButtons v-if="currentNote" :note="currentNote"/>
+      </nav>
     </div>
     <div v-if="!loading" class="content">
       <router-view/>

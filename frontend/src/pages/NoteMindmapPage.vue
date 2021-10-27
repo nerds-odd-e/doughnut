@@ -1,27 +1,30 @@
 <template>
   <LoadingPage v-bind="{ loading, contentExists: !!notePosition }">
-    <div class="box" v-if="!loading">
-      <div class="header">
-        <Breadcrumb v-bind="notePosition" />
-      </div>
-      <div class="content">
-        <DragListner class="mindmap-event-receiver" v-model="offset">
-          <div class="mindmap">
-            <NoteMindmap v-bind="{ noteId, scale: offset.scale, rotate: offset.rotate, ancestors: notePosition.ancestors }" />
-          </div>
-        <div class="mindmap-info" @click.prevent="reset">
-          <span class="scale">{{scalePercentage}}</span>
-          <span class="offset">{{offsetMsg}}</span>
-          <span class="offset">{{rotateMsg}}&deg;</span>
+    <div class="box">
+      <CurrentNoteContainer :noteId="noteId">
+        <div class="header">
+          <Breadcrumb v-bind="notePosition" />
         </div>
-        </DragListner>
-      </div>
+        <div class="content">
+          <DragListner class="mindmap-event-receiver" v-model="offset">
+            <div class="mindmap">
+              <NoteMindmap v-bind="{ noteId, scale: offset.scale, rotate: offset.rotate, ancestors: notePosition.ancestors }" />
+            </div>
+          <div class="mindmap-info" @click.prevent="reset">
+            <span class="scale">{{scalePercentage}}</span>
+            <span class="offset">{{offsetMsg}}</span>
+            <span class="offset">{{rotateMsg}}&deg;</span>
+          </div>
+          </DragListner>
+        </div>
+      </CurrentNoteContainer>
     </div>
   </LoadingPage>
 </template>
 
 <script>
 import LoadingPage from "./commons/LoadingPage.vue";
+import CurrentNoteContainer from "../components/commons/CurrentNoteContainer.vue";
 import { storedApiGetNoteWithDescendents } from "../storedApi";
 import NoteMindmap from "../components/notes/mindmap/NoteMindmap.vue";
 import DragListner from "../components/commons/DragListner.vue";
@@ -39,7 +42,7 @@ export default {
       offset: { ... defaultOffset },
     };
   },
-  components: { LoadingPage, NoteMindmap, DragListner, Breadcrumb },
+  components: { CurrentNoteContainer, LoadingPage, NoteMindmap, DragListner, Breadcrumb },
   methods: {
     fetchData() {
       this.loading = true;

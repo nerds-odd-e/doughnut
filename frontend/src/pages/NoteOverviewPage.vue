@@ -1,28 +1,29 @@
 <template>
   <ContainerPage v-bind="{ loading, contentExists: !!notePosition }">
-    <div v-if="!loading">
+    <CurrentNoteContainer :noteId="noteId">
       <Breadcrumb v-bind="notePosition" />
       <NoteOverview v-bind="{ noteId }" />
-    </div>
+    </CurrentNoteContainer>
   </ContainerPage>
 </template>
 
 <script>
 import ContainerPage from "./commons/ContainerPage.vue";
+import CurrentNoteContainer from "../components/commons/CurrentNoteContainer.vue";
 import { storedApiGetNoteWithDescendents } from "../storedApi";
 import NoteOverview from "../components/notes/NoteOverview.vue";
 import Breadcrumb from "../components/notes/Breadcrumb.vue";
 
 export default {
   name: "NoteOverviewPage",
-  props: { noteId: [String, Number] },
+  props: { noteId: String },
   data() {
     return {
       notePosition: null,
       loading: true,
     };
   },
-  components: { ContainerPage, NoteOverview, Breadcrumb },
+  components: { CurrentNoteContainer, ContainerPage, NoteOverview, Breadcrumb },
   methods: {
 
     fetchData() {

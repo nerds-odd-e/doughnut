@@ -78,18 +78,13 @@
         >
       </div>
     </nav>
-    <nav class="navbar toolbar">
-      <NoteButtons v-if="currentNote" :note="currentNote"/>
-    </nav>
   </div>
 </template>
 
 <script>
 import { apiLogout } from '../../storedApi'
-import NoteButtons from '../notes/NoteButtons.vue'
 
 export default {
-  components: { NoteButtons },
   methods: {
     async logout() {
       await apiLogout()
@@ -99,7 +94,6 @@ export default {
   computed: {
     user() { return this.$store.getters.getCurrentUser()},
     featureToggle() { return this.$store.getters.getFeatureToggle()},
-    currentNote() { return this.$store.getters.getHighlightNote()},
   }
 };
 </script>
