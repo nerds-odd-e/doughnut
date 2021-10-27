@@ -82,7 +82,7 @@ const apiProcessAnswer = async (reviewPointId, data) => {
   return res
 }
 
-const apiGetNextReviewItem = async () => await restGet(`/api/reviews/repeat`)
+const apiGetNextReviewItem = () => restGet(`/api/reviews/repeat`)
 
 export {
     apiLogout,
