@@ -411,6 +411,7 @@ Cypress.Commands.add("expectCurrentNoteDescription", (expectedDescription) => {
 });
 
 Cypress.Commands.add("withinMindmap", () => {
+  cy.pageIsLoaded()
   cy.wrap(new Promise((resolve, reject) => {
       cy.get(`.content`).then((mindmap)=>{
           const rect = mindmap[0].getBoundingClientRect()

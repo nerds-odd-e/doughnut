@@ -4,7 +4,8 @@
 import RepeatPage from "@/pages/RepeatPage.vue";
 import flushPromises from "flush-promises";
 import _ from "lodash";
-import { mountWithMockRoute } from "../helpers";
+import store from "../../src/store/index.js";
+import { mountWithStoreAndMockRoute } from "../helpers";
 import makeMe from "../fixtures/makeMe";
 
 beforeEach(() => {
@@ -17,7 +18,8 @@ describe("repeat page", () => {
 
   const mountPage = async (repetition)=>{
     fetch.mockResponseOnce(JSON.stringify(repetition))
-    const { wrapper, mockRouter }  = mountWithMockRoute(
+    const { wrapper, mockRouter }  = mountWithStoreAndMockRoute(
+      store,
       RepeatPage,
       {
         global: {

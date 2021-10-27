@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <CurrentNoteContainer v-bind="{noteId}">
     <div v-if="!!noteWithPosition">
       <NoteWithControls
         v-bind="noteWithPosition"
@@ -18,7 +18,7 @@
         </LinkShow>
       </div>
     </div>
-  </div>
+  </CurrentNoteContainer>
 </template>
 
 <script setup>

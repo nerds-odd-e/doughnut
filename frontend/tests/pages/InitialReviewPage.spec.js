@@ -4,7 +4,8 @@
 import InitialReviewPage from "@/pages/InitialReviewPage.vue";
 import flushPromises from "flush-promises";
 import _ from "lodash";
-import { mountWithMockRoute } from "../helpers";
+import store from "../../src/store/index.js";
+import { mountWithStoreAndMockRoute } from "../helpers";
 import makeMe from "../fixtures/makeMe";
 
 beforeEach(() => {
@@ -14,7 +15,8 @@ beforeEach(() => {
 describe("repeat page", () => {
   test("redirect to review page if nothing to review", async () => {
     fetch.mockResponseOnce(JSON.stringify({}));
-    const { mockRouter } = mountWithMockRoute(
+    const { mockRouter } = mountWithStoreAndMockRoute(
+      store,
       InitialReviewPage,
       {},
       { name: "initial" }
@@ -31,7 +33,8 @@ describe("repeat page", () => {
     const reviewPoint = makeMe.aReviewPoint.ofNote(note).remainingInitialReviewCountForToday(53).please()
     fetch.mockResponseOnce(JSON.stringify(reviewPoint))
 
-    const { wrapper, mockRouter } = mountWithMockRoute(
+    const { wrapper, mockRouter } = mountWithStoreAndMockRoute(
+      store,
       InitialReviewPage,
       {},
       { name: "initial" }
@@ -51,7 +54,8 @@ describe("repeat page", () => {
     const note = makeMe.aNote.please()
     const reviewPoint = makeMe.aReviewPoint.ofNote(note).please()
     fetch.mockResponseOnce(JSON.stringify(reviewPoint));
-    const { wrapper, mockRouter } = mountWithMockRoute(
+    const { wrapper, mockRouter } = mountWithStoreAndMockRoute(
+      store,
       InitialReviewPage,
       { propsData: { nested: true } },
       { name: "initial" }

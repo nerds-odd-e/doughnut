@@ -25,7 +25,8 @@
         </template>
         <template #fullContent>
           <ShowReviewPoint
-            v-bind="reviewPointViewedByUser"
+            :noteWithPosition="reviewPointViewedByUser.noteWithPosition"
+            :linkViewedByUser="reviewPointViewedByUser.linkViewedByUser"
           />
           <div>
             <div class="mb-2">

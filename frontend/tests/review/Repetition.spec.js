@@ -2,7 +2,8 @@
  * @jest-environment jsdom
  */
 import Repetition from "@/components/review/Repetition.vue";
-import { mountWithMockRoute } from "../helpers";
+import store from "../../src/store/index.js";
+import { mountWithStoreAndMockRoute } from "../helpers";
 import makeMe from "../fixtures/makeMe";
 
 describe("repetition page", () => {
@@ -16,7 +17,8 @@ describe("repetition page", () => {
     const reviewPointForView = makeMe.aReviewPoint.ofNote(note).please()
 
     test("for note", async () => {
-      const { wrapper } = mountWithMockRoute(
+      const { wrapper } = mountWithStoreAndMockRoute(
+        store,
         Repetition,
         { propsData: reviewPointForView },
         { name: "root" }
@@ -30,7 +32,8 @@ describe("repetition page", () => {
     const reviewPointForView = makeMe.aReviewPoint.ofLink(linkViewedByUser).please()
 
     test("for link", async () => {
-      const { wrapper } = mountWithMockRoute(
+      const { wrapper } = mountWithStoreAndMockRoute(
+        store,
         Repetition,
         { propsData: reviewPointForView },
         { name: "root" }
@@ -39,7 +42,8 @@ describe("repetition page", () => {
     });
 
     test("click on note when doing review", async () => {
-      const { wrapper } = mountWithMockRoute(
+      const { wrapper } = mountWithStoreAndMockRoute(
+        store,
         Repetition,
         { propsData: reviewPointForView },
         { name: "repeat" }
@@ -51,7 +55,8 @@ describe("repetition page", () => {
     });
 
     test("click on note when doing review and in a nested page", async () => {
-      const { wrapper } = mountWithMockRoute(
+      const { wrapper } = mountWithStoreAndMockRoute(
+        store,
         Repetition,
         { propsData: reviewPointForView },
         { name: "repeat-noteShow", params: { noteId: 123 } }
