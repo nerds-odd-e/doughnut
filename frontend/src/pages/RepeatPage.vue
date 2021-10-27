@@ -69,8 +69,7 @@ import Repetition from "../components/review/Repetition.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import NoteStatisticsButton from "../components/notes/NoteStatisticsButton.vue";
 import RepeatProgressBar from "../components/review/RepeatProgressBar.vue";
-import { restGet, restPost } from "../restful/restful";
-import { apiSelfEvaluate } from '../storedApi';
+import { apiSelfEvaluate, apiProcessAnswer, apiGetNextReviewItem } from '../storedApi';
 
 export default {
   name: "RepeatPage",
@@ -113,6 +112,9 @@ export default {
       )
         return this.reviewPointViewedByUser.noteViewedByUser.note.id;
     },
+    reviewPointId() {
+      return this.reviewPointViewedByUser.reviewPoint.id
+    },
     hasLastResult() {
       return this.lastResult && !!this.lastResult.answerResult;
     },
@@ -153,7 +155,7 @@ export default {
 
     fetchData() {
       this.loading = true
-      restGet(`/api/reviews/repeat`).then(
+      apiGetNextReviewItem().then(
         this.loadNew
       ).finally(() => this.loading = false);
     },
@@ -162,36 +164,35 @@ export default {
       await this.$popups.alert(
         "This review point doesn't exist any more or is being skipped now. Moving on to the next review point..."
       );
-      return this.fetchData();
+      return this.fetchData()
     },
 
     processAnswer(answerData) {
-      restPost(
-        `/api/reviews/${this.reviewPointViewedByUser.reviewPoint.id}/answer`,
-        answerData,
-        (r) => (this.loading = r)
-      ).then((res) => {
-        this.answerResult = res;
+      this.loading = true
+      apiProcessAnswer(this.reviewPointId, answerData)
+      .then((res) => {
+        this.answerResult = res
         if (res.correct) {
-          this.finished += 1;
-          this.repetition.toRepeatCount -= 1;
+          this.finished += 1
+          this.repetition.toRepeatCount -= 1
           if (this.repetition.toRepeatCount > 0) {
-            this.fetchData();
+            this.fetchData()
           }
         }
-        this.resetRoute();
-      });
+        this.resetRoute()
+      })
+      .finally(() => this.loading = false)
     },
 
     selfEvaluate(data) {
       if (data !== "again" && !this.answerResult) {
-        this.finished += 1;
-        this.repetition.toRepeatCount -= 1;
+        this.finished += 1
+        this.repetition.toRepeatCount -= 1
       }
       this.loading = true
 
       apiSelfEvaluate(
-        this.reviewPointViewedByUser.reviewPoint.id,
+        this.reviewPointId,
         { selfEvaluation: data, increaseRepeatCount: !this.answerResult },
       )
       .then(this.loadNew)

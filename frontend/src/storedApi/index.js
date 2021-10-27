@@ -70,13 +70,25 @@ const apiSelfEvaluate = async (reviewPointId, data) => {
         data,
         () => null
       )
-
   return res
 }
 
+const apiProcessAnswer = async (reviewPointId, data) => {
+  const res = await restPost(
+        `/api/reviews/${reviewPointId}/answer`,
+        data,
+        () => null
+      )
+  return res
+}
+
+const apiGetNextReviewItem = async () => await restGet(`/api/reviews/repeat`)
+
 export {
     apiLogout,
+    apiGetNextReviewItem,
     apiSelfEvaluate,
+    apiProcessAnswer,
     storedApiGetNoteWithDescendents,
     storedApiGetNoteAndItsChildren,
     storedApiCreateNote,
