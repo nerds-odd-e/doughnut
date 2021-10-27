@@ -135,60 +135,70 @@ class RestReviewsControllerTests {
 
     @Nested
     class evaluate {
+
         @Test
         void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
             userModel = makeMe.aNullUserModel();
             ReviewPoint reviewPoint = new ReviewPoint();
-            RestReviewsController.SelfEvaluation selfEvaluation = new RestReviewsController.SelfEvaluation(){{
+            RestReviewsController.SelfEvaluation selfEvaluation = new RestReviewsController.SelfEvaluation() {{
                 this.selfEvaluation = "happy";
             }};
             assertThrows(ResponseStatusException.class, () -> controller().selfEvaluate(reviewPoint, selfEvaluation));
         }
-    }
-    @Nested
-    class WhenThereIsAReviewPoint {
-        ReviewPoint rp;
-        final int expectedSatisfyingForgettingCurveIndex = 110;
-
-        @BeforeEach
-        void setup() {
-            rp = makeMe.aReviewPointFor(makeMe.aNote().please()).by(userModel).please();
-        }
-
 
         @Test
-        void repeat() {
-            evaluate("satisfying");
-            assertThat(rp.getForgettingCurveIndex(), equalTo(expectedSatisfyingForgettingCurveIndex));
-            assertThat(rp.getRepetitionCount(), equalTo(0));
-        }
-
-        private void evaluate(String evaluation) {
-            RestReviewsController.SelfEvaluation selfEvaluation = new RestReviewsController.SelfEvaluation(){{
-                this.selfEvaluation = evaluation;
+        void whenTheReviewPointDoesNotExist() {
+            RestReviewsController.SelfEvaluation selfEvaluation = new RestReviewsController.SelfEvaluation() {{
+                this.selfEvaluation = "happy";
             }};
-            controller().selfEvaluate(rp, selfEvaluation);
+            assertThrows(ResponseStatusException.class, () -> controller().selfEvaluate(null, selfEvaluation));
         }
 
-        @Test
-        void repeatSad() {
-            evaluate("sad");
-            assertThat(rp.getForgettingCurveIndex(), lessThan(expectedSatisfyingForgettingCurveIndex));
-            assertThat(rp.getRepetitionCount(), equalTo(0));
-        }
+        @Nested
+        class WhenThereIsAReviewPoint {
+            ReviewPoint rp;
+            final int expectedSatisfyingForgettingCurveIndex = 110;
 
-        @Test
-        void repeatHappy() {
-            evaluate("happy");
-            assertThat(rp.getForgettingCurveIndex(), greaterThan(expectedSatisfyingForgettingCurveIndex));
-            assertThat(rp.getRepetitionCount(), equalTo(0));
-        }
+            @BeforeEach
+            void setup() {
+                rp = makeMe.aReviewPointFor(makeMe.aNote().please()).by(userModel).please();
+            }
 
-        @Test
-        void repeatUnknown() {
-            assertThrows(ResponseStatusException.class, ()-> evaluate("unknown"));
-        }
 
+            @Test
+            void repeat() {
+                evaluate("satisfying");
+                assertThat(rp.getForgettingCurveIndex(), equalTo(expectedSatisfyingForgettingCurveIndex));
+                assertThat(rp.getRepetitionCount(), equalTo(0));
+            }
+
+            private void evaluate(String evaluation) {
+                RestReviewsController.SelfEvaluation selfEvaluation = new RestReviewsController.SelfEvaluation() {{
+                    this.selfEvaluation = evaluation;
+                }};
+                controller().selfEvaluate(rp, selfEvaluation);
+            }
+
+            @Test
+            void repeatSad() {
+                evaluate("sad");
+                assertThat(rp.getForgettingCurveIndex(), lessThan(expectedSatisfyingForgettingCurveIndex));
+                assertThat(rp.getRepetitionCount(), equalTo(0));
+            }
+
+            @Test
+            void repeatHappy() {
+                evaluate("happy");
+                assertThat(rp.getForgettingCurveIndex(), greaterThan(expectedSatisfyingForgettingCurveIndex));
+                assertThat(rp.getRepetitionCount(), equalTo(0));
+            }
+
+            @Test
+            void repeatUnknown() {
+                assertThrows(ResponseStatusException.class, () -> evaluate("unknown"));
+            }
+
+        }
     }
 
 }
