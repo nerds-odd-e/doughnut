@@ -33,7 +33,7 @@ const props = defineProps({
   linkViewedByUser: Object,
 });
 
-const noteId = computed(() => props.noteWithPosition ? props.noteWithPosition.id : null )
+const noteId = computed(() => props.noteWithPosition ? props.noteWithPosition.note.id : null )
 
 
 </script>

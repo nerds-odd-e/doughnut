@@ -1,6 +1,5 @@
 <template>
   <ContainerPage v-bind="{ loading, contentExists: !!repetition }">
-    <template v-if="!!repetition">
       <Minimizable :minimized="nested" staticHeight="75px">
         <template #minimizedContent>
           <div class="repeat-container" v-on:click="backToRepeat()">
@@ -31,6 +30,7 @@
         <template #fullContent>
           <RepeatProgressBar
             :allowPause="!quizMode"
+              v-if="noteId"
             v-bind="{
               linkId,
               noteId,
@@ -58,7 +58,6 @@
           </template>
         </template>
       </Minimizable>
-    </template>
   </ContainerPage>
 </template>
 
@@ -108,9 +107,9 @@ export default {
     noteId() {
       if (
         this.reviewPointViewedByUser &&
-        this.reviewPointViewedByUser.noteViewedByUser
+        this.reviewPointViewedByUser.noteWithPosition
       )
-        return this.reviewPointViewedByUser.noteViewedByUser.note.id;
+        return this.reviewPointViewedByUser.noteWithPosition.note.id;
     },
     reviewPointId() {
       return this.reviewPointViewedByUser.reviewPoint.id
