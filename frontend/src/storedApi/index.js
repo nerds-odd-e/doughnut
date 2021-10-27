@@ -70,7 +70,6 @@ const apiSelfEvaluate = async (data) => {
         data,
         () => null
       )
-  store.commit("currentUser", res)
   return res
 }
 
