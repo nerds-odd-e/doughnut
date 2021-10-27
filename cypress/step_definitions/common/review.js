@@ -53,11 +53,7 @@ Then("choose to remove it from reviews", () => {
   cy.findByRole("button", { name: "OK" }).click();
 });
 
-Then("it should notice the review point change and move to review page", () => {
-  cy.contains(
-    "This review point doesn't exist any more or is being skipped now. Moving on to the next review point..."
-  );
-  cy.findByRole("button", { name: "OK" }).click();
+Then("it should move to review page", () => {
   cy.url().should("eq", Cypress.config().baseUrl + "/reviews");
 });
 

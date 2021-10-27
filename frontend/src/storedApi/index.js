@@ -64,8 +64,19 @@ const storedApiCreateUser = async (store, data) => {
 const storedApiGetFeatureToggle = (store) =>
  restGet(`/api/testability/feature_toggle`).then((res) => store.commit("featureToggle", res))
 
+const apiSelfEvaluate = async (data) => {
+  const res = await restPostMultiplePartForm(
+        `/api/user`,
+        data,
+        () => null
+      )
+  store.commit("currentUser", res)
+  return res
+}
+
 export {
     apiLogout,
+    apiSelfEvaluate,
     storedApiGetNoteWithDescendents,
     storedApiGetNoteAndItsChildren,
     storedApiCreateNote,

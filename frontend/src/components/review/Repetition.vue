@@ -55,7 +55,7 @@ export default {
     linkViewedByUser: Object,
     compact: Boolean,
   },
-  emits: ["selfEvaluate", "updated"],
+  emits: ["selfEvaluate", "reviewPointRemoved"],
   components: {
     SvgCog,
     SvgNoReview,
@@ -92,7 +92,7 @@ export default {
         `/api/review-points/${this.reviewPoint.id}/remove`,
         {},
         (r) => (this.loading = r)
-      ).then((r) => this.$emit("updated"));
+      ).then((r) => this.$emit("reviewPointRemoved"));
     },
   },
 };

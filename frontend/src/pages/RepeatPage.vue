@@ -23,7 +23,7 @@
                   compact: true,
                 }"
                 @selfEvaluate="selfEvaluate($event)"
-                @updated="refresh()"
+                @reviewPointRemoved="fetchData()"
               />
             </RepeatProgressBar>
           </div>
@@ -50,7 +50,7 @@
               <Repetition
                 v-bind="{ ...reviewPointViewedByUser, answerResult }"
                 @selfEvaluate="selfEvaluate($event)"
-                @updated="refresh()"
+                @reviewPointRemoved="fetchData()"
               />
               <NoteStatisticsButton v-if="noteId" :noteId="noteId" />
               <NoteStatisticsButton v-else :link="linkId" />
@@ -164,7 +164,7 @@ export default {
       return this.fetchData();
     },
 
-    refresh() {
+    xxx() {
       this.loading = true
       restGet(
         `/api/review-points/${this.reviewPointViewedByUser.reviewPoint.id}`,
@@ -206,11 +206,14 @@ export default {
         this.finished += 1;
         this.repetition.toRepeatCount -= 1;
       }
+      this.loading = true
       restPost(
         `/api/reviews/${this.reviewPointViewedByUser.reviewPoint.id}/self-evaluate`,
         { selfEvaluation: data, increaseRepeatCount: !this.answerResult },
-        (r) => (this.loading = r)
-      ).then(this.loadNew);
+        () => null
+      )
+      .then(this.loadNew)
+      .finally(() => this.loading = false)
     },
   },
   mounted() {
