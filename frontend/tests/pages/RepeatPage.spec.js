@@ -12,11 +12,21 @@ beforeEach(() => {
 });
 
 describe("repeat page", () => {
+  const note = makeMe.aNote.please()
+  const popupMock = { alert: jest.fn() }
+
   const mountPage = async (repetition)=>{
     fetch.mockResponseOnce(JSON.stringify(repetition))
     const { wrapper, mockRouter }  = mountWithMockRoute(
       RepeatPage,
-      {},
+      {
+        global: {
+          mocks: {
+            $popups: popupMock
+          }
+        }
+
+      },
       { name: "repeat" }
     );
     await flushPromises();
@@ -31,13 +41,44 @@ describe("repeat page", () => {
   });
 
   test("replace route with repeat/quiz if there is a quiz", async () => {
-    const note = makeMe.aNote.please()
-    const repetition = makeMe.aRepetition.ofNote(note).please()
+    const repetition = makeMe.aRepetition.ofNote(note).withAQuiz().please()
     const { wrapper, mockRouter } = await mountPage(repetition)
-    expect(fetch).toHaveBeenCalledTimes(1);
-    expect(fetch).toHaveBeenCalledWith("/api/reviews/repeat", {});
     expect(mockRouter.push).toHaveBeenCalledWith({ name: "repeat-quiz" });
     expect(wrapper.findAll(".pause-repeat")).toHaveLength(1);
+  });
+
+  describe("repeat page with no quiz (or after quiz)", () => {
+    const note = makeMe.aNote.please()
+    const repetition = makeMe.aRepetition.ofNote(note).please()
+
+    test("stay at repeat page if there is no quiz", async () => {
+      const { mockRouter } = await mountPage(repetition)
+      expect(mockRouter.push).toHaveBeenCalledWith({ name: "repeat", replace: true });
+    });
+
+    test("should call the self-evaluate api", async () => {
+      const repetition = makeMe.aRepetition.ofNote(note).please()
+      const { wrapper } = await mountPage(repetition)
+      fetch.mockResponseOnce(JSON.stringify({}))
+      wrapper.find('#repeat-sad').trigger("click")
+      const reviewPointId = repetition.reviewPointViewedByUser.reviewPoint.id
+      expect(fetch).toHaveBeenCalledWith(`/api/reviews/${reviewPointId}/self-evaluate`, expect.anything());
+    });
+
+    test("reload next review point if 404", async () => {
+      const repetition = makeMe.aRepetition.ofNote(note).please()
+      const { wrapper } = await mountPage(repetition)
+
+      fetch.mockClear()
+      fetch.mockRejectOnce({status: 404})
+      fetch.mockResponseOnce(JSON.stringify({}))
+
+      wrapper.find('#repeat-sad').trigger("click")
+      await flushPromises();
+      expect(popupMock.alert).toHaveBeenCalledWith(expect.stringMatching(/review point/))
+      expect(fetch).toHaveBeenCalledWith("/api/reviews/repeat", {});
+    });
+
   });
 
 });

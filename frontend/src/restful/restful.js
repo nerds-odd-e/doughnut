@@ -51,10 +51,7 @@ const restRequest = (url, params, loadingRef) => {
           loginOrRegister();
           return;
         }
-        reject(new Error({ statusCode: error.status }));
-        if (error.status === 404) {
-          return;
-        }
+        reject(error);
       });
   }).finally(() => {
     if (loadingRef instanceof Function) {

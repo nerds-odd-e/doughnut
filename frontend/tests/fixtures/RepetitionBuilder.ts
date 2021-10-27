@@ -2,12 +2,14 @@ import Builder from "./Builder"
 import ReviewPointBuilder from "./ReviewPointBuilder";
 
 class RepetitionBuilder extends Builder {
-  data: any;
-  note: any;
+  data: any
+  note: any
+  quizQuestion: any
 
   constructor(parentBuilder?: Builder) {
     super(parentBuilder);
     this.note = null
+    this.quizQuestion = undefined
   }
 
   ofNote(note: any): RepetitionBuilder {
@@ -15,10 +17,8 @@ class RepetitionBuilder extends Builder {
     return this
   }
 
-  do(): any {
-    return {
-        reviewPointViewedByUser: new ReviewPointBuilder().ofNote(this.note).do(),
-        quizQuestion: {
+  withAQuiz(): RepetitionBuilder {
+    this.quizQuestion = {
           questionType: "CLOZE_SELECTION",
           options: [
             {
@@ -37,7 +37,15 @@ class RepetitionBuilder extends Builder {
           description: "answer",
           mainTopic: "",
           pictureQuestion: false,
-        },
+        }
+
+    return this
+  }
+
+  do(): any {
+    return {
+        reviewPointViewedByUser: new ReviewPointBuilder().ofNote(this.note).do(),
+        quizQuestion: this.quizQuestion
     }
   }
 }

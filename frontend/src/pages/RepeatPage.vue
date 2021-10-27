@@ -70,6 +70,7 @@ import ContainerPage from "./commons/ContainerPage.vue";
 import NoteStatisticsButton from "../components/notes/NoteStatisticsButton.vue";
 import RepeatProgressBar from "../components/review/RepeatProgressBar.vue";
 import { restGet, restPost } from "../restful/restful";
+import { apiSelfEvaluate } from '../storedApi';
 
 export default {
   name: "RepeatPage",
@@ -164,25 +165,6 @@ export default {
       return this.fetchData();
     },
 
-    xxx() {
-      this.loading = true
-      restGet(
-        `/api/review-points/${this.reviewPointViewedByUser.reviewPoint.id}`,
-      )
-        .then((res) => {
-          if (!res || !!res.reviewPoint.removedFromReview) {
-            this.noLongerExist();
-          }
-          this.reviewPointViewedByUser = res;
-        })
-        .catch((err) => {
-          if (err.statusCode === 404) {
-            this.noLongerExist();
-          }
-        })
-        .finally(() => this.loading = false);
-    },
-
     processAnswer(answerData) {
       restPost(
         `/api/reviews/${this.reviewPointViewedByUser.reviewPoint.id}/answer`,
@@ -207,15 +189,17 @@ export default {
         this.repetition.toRepeatCount -= 1;
       }
       this.loading = true
-      restPost(
-        `/api/reviews/${this.reviewPointViewedByUser.reviewPoint.id}/self-evaluate`,
+
+      apiSelfEvaluate(
+        this.reviewPointViewedByUser.reviewPoint.id,
         { selfEvaluation: data, increaseRepeatCount: !this.answerResult },
-        () => null
       )
       .then(this.loadNew)
+      .catch((err) => this.noLongerExist())
       .finally(() => this.loading = false)
     },
   },
+
   mounted() {
     this.fetchData();
   },
