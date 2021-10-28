@@ -32,11 +32,13 @@ class ReviewPointBuilder extends Builder {
       note: note,
       notePosition: new NotePositionBuilder().do()
     }
+    this.data.reviewPoint.noteId = note.id
     return this
   }
   
   ofLink(link: any): ReviewPointBuilder {
     this.data.linkViewedByUser = link
+    this.data.reviewPoint.linkId = link.id
     return this
   }
   

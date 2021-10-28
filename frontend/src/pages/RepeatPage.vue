@@ -93,25 +93,20 @@ export default {
     reviewPointViewedByUser() {
       return this.repetition.reviewPointViewedByUser;
     },
+    reviewPoint() {
+      return this.reviewPointViewedByUser?.reviewPoint;
+    },
     quizMode() {
       return !!this.repetition.quizQuestion && !this.answerResult;
     },
     linkId() {
-      if (
-        this.reviewPointViewedByUser &&
-        this.reviewPointViewedByUser.linkViewedByUser
-      )
-        return this.reviewPointViewedByUser.linkViewedByUser.id;
+      return this.reviewPoint?.linkId
     },
     noteId() {
-      if (
-        this.reviewPointViewedByUser &&
-        this.reviewPointViewedByUser.noteWithPosition
-      )
-        return this.reviewPointViewedByUser.noteWithPosition.note.id;
+      return this.reviewPoint?.noteId
     },
     reviewPointId() {
-      return this.reviewPointViewedByUser.reviewPoint.id
+      return this.reviewPoint?.id
     },
     hasLastResult() {
       return this.lastResult && !!this.lastResult.answerResult;
@@ -129,7 +124,7 @@ export default {
 
       this.repetition = resp;
       this.answerResult = null;
-      if (!this.repetition.reviewPoint.noteId) {
+      if (!this.reviewPoint?.noteId) {
         this.$router.push({ name: "reviews" });
         return;
       }
