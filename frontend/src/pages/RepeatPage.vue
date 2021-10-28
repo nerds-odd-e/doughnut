@@ -45,7 +45,6 @@
             @answer="processAnswer($event)"
           />
           <template v-else>
-            <template v-if="reviewPointViewedByUser">
               <Repetition
                 v-bind="{ ...reviewPointViewedByUser, answerResult }"
                 @selfEvaluate="selfEvaluate($event)"
@@ -53,7 +52,6 @@
               />
               <NoteStatisticsButton v-if="noteId" :noteId="noteId" />
               <NoteStatisticsButton v-else :link="linkId" />
-            </template>
           </template>
         </template>
       </Minimizable>
