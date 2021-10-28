@@ -30,7 +30,6 @@
         <template #fullContent>
           <RepeatProgressBar
             :allowPause="!quizMode"
-              v-if="noteId"
             v-bind="{
               linkId,
               noteId,
@@ -130,7 +129,7 @@ export default {
 
       this.repetition = resp;
       this.answerResult = null;
-      if (!this.repetition.reviewPointViewedByUser) {
+      if (!this.repetition.reviewPoint.noteId) {
         this.$router.push({ name: "reviews" });
         return;
       }
