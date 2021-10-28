@@ -1,6 +1,6 @@
 <template>
   <NoteBreadcrumb :ancestors="ancestors">
-    <template #topLink>
+    <template #topLink v-if="notebook">
       <li v-if="!owns" class="breadcrumb-item">
         <router-link :to="{ name: 'bazaar' }">Bazaar</router-link>
       </li>
