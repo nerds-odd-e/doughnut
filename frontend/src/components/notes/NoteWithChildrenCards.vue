@@ -5,6 +5,10 @@
       note,
       notePosition }"
   />
+  <NoteOwnerViewCards
+    :owns="notePosition.owns"
+    :notes="children"
+  />
 
   <router-link
     :to="{ name: 'noteOverview', params: { noteId: id } }"
@@ -29,7 +33,6 @@
 <script>
 import NoteWithControls from "./NoteWithControls.vue";
 import NoteOwnerViewCards from "./NoteOwnerViewCards.vue";
-import Breadcrumb from "./Breadcrumb.vue";
 
 export default {
   name: "NoteViewedByUser",
@@ -39,7 +42,6 @@ export default {
   },
   components: {
     NoteWithControls,
-    Breadcrumb,
     NoteOwnerViewCards,
   },
   computed: {
