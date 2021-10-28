@@ -1,5 +1,5 @@
 <template>
-  <NoteBreadcrumb :ancestors="ancestors">
+  <BasicBreadcrumb :ancestors="ancestors">
     <template #topLink v-if="notebook">
       <li v-if="!owns" class="breadcrumb-item">
         <router-link :to="{ name: 'bazaar' }">Bazaar</router-link>
@@ -24,11 +24,11 @@
     <template v-slot:additional>
       <slot />
     </template>
-  </NoteBreadcrumb>
+  </BasicBreadcrumb>
 </template>
 
 <script>
-import NoteBreadcrumb from "./NoteBreadcrumb.vue";
+import BasicBreadcrumb from "../commons/BasicBreadcrumb.vue";
 
 export default {
   name: "Breadcrumb",
@@ -38,7 +38,7 @@ export default {
     owns: { type: Boolean, required: true },
   },
   components: {
-    NoteBreadcrumb,
+    BasicBreadcrumb,
   },
   computed: {
     circle() {

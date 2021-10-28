@@ -13,9 +13,8 @@
 </template>
 
 <script setup>
-import NoteTitleWithLink from "./NoteTitleWithLink.vue";
+import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue";
 const props = defineProps({ ancestors: Array, linkFragment: Object });
-const name = "";
 </script>
 
 <style scoped></style>

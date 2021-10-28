@@ -1,5 +1,5 @@
 <template>
-  <Breadcrumb :ancestors="quizQuestion.scope" :owns="true" />
+  <BasicBreadcrumb :ancestors="quizQuestion.scope" />
   <div v-if="pictureQuestion">
     <ShowPicture :notePicture="sourceNote.notePicture" :pictureMask="sourceNote.noteContent.pictureMask" :opacity="1" />
   </div>
@@ -58,7 +58,7 @@
 </template>
 
 <script setup>
-import Breadcrumb from "../notes/Breadcrumb.vue";
+import BasicBreadcrumb from "../commons/BasicBreadcrumb.vue";
 import ShowPicture from "../notes/ShowPicture.vue";
 import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
 import TextInput from "../form/TextInput.vue";
