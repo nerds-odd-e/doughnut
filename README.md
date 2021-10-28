@@ -217,6 +217,7 @@ Login to dough GCP project account with `gcloud auth login`
 Configure gcloud CLI to project ID with `gcloud config set project carbon-syntax-298809`
 
 ```bash
+cd infra
 export GCLOUDSDK_CORE_PROJECT="$(gcloud config get-value project)"
 export GOOGLE_APPLICATION_CREDENTIALS=$(pwd)/carbon-syntax-298809-f31377ba77a9.json
 PACKER_LOG=1 packer build packer.json
