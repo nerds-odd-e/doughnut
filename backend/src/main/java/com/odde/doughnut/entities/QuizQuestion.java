@@ -32,7 +32,6 @@ public class QuizQuestion {
         }
     }
 
-    private final ReviewPoint reviewPoint;
     @Getter @Setter
     private QuestionType questionType = null;
     @Getter @Setter
@@ -50,7 +49,6 @@ public class QuizQuestion {
 
 
     public QuizQuestion(ReviewPoint reviewPoint) {
-        this.reviewPoint = reviewPoint;
     }
 
     public Answer buildAnswer() {
