@@ -122,7 +122,7 @@ export default {
 
       this.repetition = resp;
       this.answerResult = null;
-      if (!this.reviewPoint?.noteId) {
+      if (!this.reviewPoint) {
         this.$router.push({ name: "reviews" });
         return;
       }
