@@ -49,7 +49,7 @@ import { restPost } from "../../restful/restful";
 export default {
   name: "Repetition",
   props: {
-    reviewPoint: { type: Object, required: true },
+    reviewPoint: Object,
     answerResult: Object,
     noteWithPosition: Object,
     linkViewedByUser: Object,

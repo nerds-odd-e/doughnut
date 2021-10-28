@@ -1,7 +1,6 @@
 <template>
-  <ol :style="`--bs-breadcrumb-divider: url(&#34;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='8' height='8'%3E%3Cpath d='M2.5 0L1 1.5 3.5 4 1 6.5 2.5 8l4-4-4-4z' fill='currentColor'/%3E%3C/svg%3E&#34;);`"
-       class="breadcrumb bg-light bg-gradient">
-    <template v-if="notebook">
+  <NoteBreadcrumb :ancestors="ancestors">
+    <template #topLink v-if="notebook">
       <li v-if="!owns" class="breadcrumb-item">
         <router-link :to="{ name: 'bazaar' }">Bazaar</router-link>
       </li>
@@ -22,12 +21,14 @@
         </template>
       </template>
     </template>
-    <slot />
-  </ol>
+    <template v-slot:additional>
+      <slot />
+    </template>
+  </NoteBreadcrumb>
 </template>
 
 <script>
-import NoteTitleWithLink from "./NoteTitleWithLink.vue";
+import NoteBreadcrumb from "./NoteBreadcrumb.vue";
 
 export default {
   name: "Breadcrumb",
@@ -37,7 +38,7 @@ export default {
     owns: { type: Boolean, required: true },
   },
   components: {
-    NoteTitleWithLink,
+    NoteBreadcrumb,
   },
   computed: {
     circle() {

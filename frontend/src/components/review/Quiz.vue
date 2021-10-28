@@ -1,5 +1,5 @@
 <template>
-  <Breadcrumb :ancestors="quizQuestion.scope" />
+  <Breadcrumb :ancestors="quizQuestion.scope" :owns="true" />
   <div v-if="pictureQuestion">
     <ShowPicture :notePicture="sourceNote.notePicture" :pictureMask="sourceNote.noteContent.pictureMask" :opacity="1" />
   </div>
