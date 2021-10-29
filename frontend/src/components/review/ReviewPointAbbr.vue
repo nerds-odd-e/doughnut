@@ -17,16 +17,10 @@
 </template>
 
 <script>
-import NoteWithControls from "../notes/NoteWithControls.vue";
-import LinkShow from "../links/LinkShow.vue";
 
 export default {
   name: "ShowReviewPoint",
   props: { noteWithPosition: Object, linkViewedByUser: Object },
-  components: {
-    NoteWithControls,
-    LinkShow,
-  },
 };
 </script>
 

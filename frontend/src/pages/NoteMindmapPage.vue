@@ -1,7 +1,7 @@
 <template>
   <LoadingPage v-bind="{ loading, contentExists: !!notePosition }">
+    <CurrentNoteContainer :noteId="highlightNoteId"/>
     <div class="box">
-      <CurrentNoteContainer :noteId="highlightNoteId"/>
       <div class="header">
         <Breadcrumb v-bind="notePosition" />
       </div>
