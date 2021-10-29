@@ -10,7 +10,7 @@
 
 - Checked in
 - Running and passing in CI System
-- Deployed to production
+- Deployed to production within 10 minutes for every successful check in
 
 # External quality
 
