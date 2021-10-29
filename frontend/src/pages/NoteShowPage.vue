@@ -1,12 +1,14 @@
 <template>
   <ContainerPage v-bind="{ loading, contentExists: !!notePosition }">
     <CurrentNoteContainer :noteId="noteId"/>
-    <NoteWithChildrenCards v-if="!loading" v-bind="{id: noteId, notePosition}"/>
+    <Breadcrumb v-bind="notePosition" />
+    <NoteWithChildrenCards v-if="!loading" v-bind="{id: noteId, owns: notePosition.owns}"/>
     <NoteStatisticsButton :noteId="noteId" />
   </ContainerPage>
 </template>
 
 <script>
+import Breadcrumb from "../components/notes/Breadcrumb.vue";
 import NoteWithChildrenCards from "../components/notes/NoteWithChildrenCards.vue";
 import NoteStatisticsButton from "../components/notes/NoteStatisticsButton.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
@@ -22,7 +24,7 @@ export default {
       loading: true,
     };
   },
-  components: { CurrentNoteContainer, NoteWithChildrenCards, NoteStatisticsButton, ContainerPage },
+  components: { CurrentNoteContainer, Breadcrumb, NoteWithChildrenCards, NoteStatisticsButton, ContainerPage },
   methods: {
     fetchData() {
       this.loading = true

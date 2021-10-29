@@ -1,8 +1,7 @@
 <template>
-  <Breadcrumb v-bind="notePosition" />
   <NoteWithLinks v-bind="note"/>
   <NoteOwnerViewCards
-    :owns="notePosition.owns"
+    :owns="owns"
     :notes="children"
   />
 
@@ -29,16 +28,14 @@
 <script>
 import NoteOwnerViewCards from "./NoteOwnerViewCards.vue";
 import NoteWithLinks from "./NoteWithLinks.vue";
-import Breadcrumb from "./Breadcrumb.vue";
 
 export default {
   name: "NoteViewedByUser",
   props: {
     id: [String, Number],
-    notePosition: Object,
+    owns: Boolean,
   },
   components: {
-    Breadcrumb,
     NoteWithLinks,
     NoteOwnerViewCards,
   },

@@ -23,19 +23,4 @@ describe("note wth child cards", () => {
     await screen.findByText("parent");
     await screen.findByText("child");
   })
-
-  it("view note belongs to other people in bazaar", async () => {
-    const note = makeMe.aNote.please();
-    const notePosition = makeMe.aNotePosition.inBazaar().please();
-    store.commit("loadNotes", [note]);
-    renderWithStoreAndMockRoute(
-      store,
-      NoteWithChildrenCards,
-      {
-        propsData: { id: note.id, notePosition },
-
-      },
-    );
-    await screen.findByText("Bazaar");
-  });
 });
