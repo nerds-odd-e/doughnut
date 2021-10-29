@@ -1,11 +1,12 @@
 <template>
   <component v-bind:is="noteComponent" v-bind="{
-    note: noteViewedByUser,
-    mindmapSector,
-    mindmap,
-    highlighted: highlightNoteId === noteViewedByUser.id
-
-  }"/>
+      note: noteViewedByUser,
+      mindmapSector,
+      mindmap,
+      highlighted: highlightNoteId === noteId
+    }"
+    @highlight="highlight"
+  />
   <NoteMindmapScaffold
     v-for="(childId, index) in childrenIds"
     v-bind="{
@@ -13,7 +14,6 @@
       noteId: childId,
       mindmapSector: mindmapSector.getChildSector(childrenIds.length, index),
       mindmap,
-      highlighted: highlightNoteId === childId
     }"
     :key="childId"
   />
@@ -34,6 +34,9 @@ export default {
     noteComponent: String,
   },
   components: { NoteCard, NoteParentChildConnection, NoteLinks },
+  methods: {
+    highlight() {this.$store.commit('highlightNoteId', this.noteId)}
+  },
   computed: {
     noteViewedByUser() {
       return this.$store.getters.getNoteById(this.noteId);

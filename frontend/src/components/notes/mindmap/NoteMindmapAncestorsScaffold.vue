@@ -1,11 +1,13 @@
 <template>
   <template v-if="ancestors.length > 0">
   <component v-bind:is="noteComponent" v-bind="{
-     note: noteViewedByUser,
-     mindmap,
-     mindmapSector: mindmapSector.getChildSector(1, 0, 0.5),
-     highlighted: highlightNoteId === noteViewedByUser.id
-  }"/>
+      note: noteViewedByUser,
+      mindmap,
+      mindmapSector: mindmapSector.getChildSector(1, 0, 0.5),
+      highlighted: highlightNoteId === noteViewedByUser.id
+    }"
+    @highlight="highlight"
+  />
   <NoteMindmapAncestorsScaffold
     v-bind="{ noteComponent, mindmap, ancestors: ancestors.slice(0, ancestors.length - 1), mindmapSector: mindmapSector.getChildSector(1, 0, 0.5) }"
   />
@@ -24,6 +26,9 @@ export default {
     mindmapSector: MindmapSector,
     noteComponent: String,
     mindmap: Object,
+  },
+  methods: {
+    highlight() {this.$store.commit('highlightNoteId', this.noteViewedByUser.id)}
   },
   components: { NoteCard, NoteParentConnection },
   computed: {

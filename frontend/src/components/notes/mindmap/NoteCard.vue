@@ -3,7 +3,7 @@
   :class="`note-card ${highlighted ? 'highlighted' : ''}`"
   role="card" :aria-label="note.title"
   :style="`top:${coord.y}px; left:${coord.x}px`"
-  v-on:click="highlight()">
+  v-on:click="$emit('highlight')">
     <h5 class="note-card-title">
       <component :is="linkFragment" :note="note" class="card-title" />
     </h5>
@@ -24,14 +24,12 @@ export default {
     highlighted: Boolean,
     linkFragment: { type: Object, default: NoteTitleWithMindmapLink },
   },
+  emits: ['highlight'],
   components: { SvgDescriptionIndicator, NoteTitleWithMindmapLink },
   computed: {
     coord() { return this.mindmap.coord(this.mindmapSector) },
 
   },
-  methods: {
-    highlight() { this.$store.commit('highlightNoteId', this.note.id)}
-  }
 
 }
 </script>
