@@ -3,7 +3,7 @@
     <div class="box">
       <div class="header">
         <NoteControl :noteId="highlightNoteId"/>
-        <Breadcrumb v-bind="notePosition" />
+        <Breadcrumb v-bind="notePosition" :noteRouteName="`mindmap`"/>
       </div>
       <div class="content">
         <DragListner class="mindmap-event-receiver" v-model="offset">

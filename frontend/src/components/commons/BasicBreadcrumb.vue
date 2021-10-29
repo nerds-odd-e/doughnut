@@ -5,7 +5,7 @@
       <slot name="topLink" />
       <li class="breadcrumb-item" v-for="note in ancestors" :key="note.id">
         <component v-if="!!linkFragment" :is="linkFragment" :note="note" />
-        <NoteTitleWithLink v-else :note="note" />
+        <NoteTitleWithLink v-else v-bind="{note, noteRouteName}" />
       </li>
       <slot name="additional" />
     </ol>
@@ -14,7 +14,7 @@
 
 <script setup>
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue";
-const props = defineProps({ ancestors: Array, linkFragment: Object });
+const props = defineProps({ ancestors: Array, noteRouteName: {type: String, default: 'noteShow'} });
 </script>
 
 <style scoped></style>

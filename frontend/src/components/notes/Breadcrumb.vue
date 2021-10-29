@@ -1,5 +1,5 @@
 <template>
-  <BasicBreadcrumb :ancestors="ancestors">
+  <BasicBreadcrumb v-bind="{ancestors, noteRouteName}">
     <template #topLink v-if="notebook">
       <li v-if="!owns" class="breadcrumb-item">
         <router-link :to="{ name: 'bazaar' }">Bazaar</router-link>
@@ -36,6 +36,7 @@ export default {
     ancestors: Array,
     notebook: Object,
     owns: { type: Boolean, required: true },
+    noteRouteName: { type: String, default: 'noteShow'},
   },
   components: {
     BasicBreadcrumb,
