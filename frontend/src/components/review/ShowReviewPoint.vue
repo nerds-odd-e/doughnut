@@ -1,8 +1,8 @@
 <template>
     <div v-if="!!noteWithPosition">
       <CurrentNoteContainer :noteId="noteWithPosition.note.id"/>
-      <NoteWithControls
-        v-bind="noteWithPosition"
+      <Breadcrumb v-bind="notePosition" />
+      <NoteWithLinks v-bind="note"/>
       />
     </div>
 
@@ -21,7 +21,8 @@
 </template>
 
 <script setup>
-import NoteWithControls from "../notes/NoteWithControls.vue";
+import NoteWithLinks from "../notes/NoteWithLinks.vue";
+import Breadcrumb from "../notes/Breadcrumb.vue";
 import CurrentNoteContainer from "../commons/CurrentNoteContainer.vue";
 import LinkShow from "../links/LinkShow.vue";
 import LinkNob from "../links/LinkNob.vue";

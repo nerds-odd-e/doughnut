@@ -1,10 +1,6 @@
 <template>
-  <NoteWithControls
-    v-bind="{
-      id,
-      note,
-      notePosition }"
-  />
+  <Breadcrumb v-bind="notePosition" />
+  <NoteWithLinks v-bind="note"/>
   <NoteOwnerViewCards
     :owns="notePosition.owns"
     :notes="children"
@@ -31,8 +27,9 @@
 </template>
 
 <script>
-import NoteWithControls from "./NoteWithControls.vue";
 import NoteOwnerViewCards from "./NoteOwnerViewCards.vue";
+import NoteWithLinks from "./NoteWithLinks.vue";
+import Breadcrumb from "./Breadcrumb.vue";
 
 export default {
   name: "NoteViewedByUser",
@@ -41,7 +38,8 @@ export default {
     notePosition: Object,
   },
   components: {
-    NoteWithControls,
+    Breadcrumb,
+    NoteWithLinks,
     NoteOwnerViewCards,
   },
   computed: {
