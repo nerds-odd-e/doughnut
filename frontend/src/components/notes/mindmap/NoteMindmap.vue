@@ -10,17 +10,14 @@
     </marker>
 
 
-    <NoteMindmapAncestorsScaffold v-bind="{ highlightNoteId, ancestors, mindmap, mindmapSector: mindmapAncestorSector, noteComponent: 'NoteParentConnection'}"/>
     <NoteMindmapScaffold v-bind="{ highlightNoteId, noteId, mindmap, mindmapSector, noteComponent: 'NoteParentChildConnection'}"/>
     <NoteMindmapScaffold v-bind="{ highlightNoteId, noteId, mindmap, mindmapSector, noteComponent: 'NoteLinks'}"/>
   </svg>
-  <NoteMindmapAncestorsScaffold v-bind="{ highlightNoteId, ancestors, mindmap, mindmapSector: mindmapAncestorSector, noteComponent: 'NoteCard'}" @highlight="highlight"/>
   <NoteMindmapScaffold v-bind="{ highlightNoteId, noteId, mindmap, mindmapSector, noteComponent: 'NoteCard'}" @highlight="highlight"/>
 </template>
 
 <script lang="ts">
 import NoteMindmapScaffold from "./NoteMindmapScaffold.vue";
-import NoteMindmapAncestorsScaffold from "./NoteMindmapAncestorsScaffold.vue";
 import MindmapSector from "@/models/MindmapSector";
 import Mindmap from "@/models/Mindmap";
 
@@ -34,14 +31,11 @@ export default {
     rotate: Number,
   },
   emits: ['highlight'],
-  components: { NoteMindmapScaffold, NoteMindmapAncestorsScaffold },
+  components: { NoteMindmapScaffold },
   methods: {
     highlight(id) {this.$emit('highlight', id)}
   },
   computed: {
-    mindmapAncestorSector() {
-      return new MindmapSector(0, 0, -Math.PI/2, 0)
-    },
     mindmapSector() {
       var d = 0
       if (this.ancestors?.length > 0) d = Math.PI / 10

@@ -1,6 +1,7 @@
 <template>
-  <div 
+  <NoteShell 
   :class="`note-card ${highlighted ? 'highlighted' : ''}`"
+  v-bind="{id: note.id, updatedAt: note.noteContent.updatedAt}"
   role="card" :aria-label="note.title"
   :style="`top:${coord.y}px; left:${coord.x}px`"
   v-on:click="$emit('highlight')">
@@ -8,12 +9,13 @@
       <component :is="linkFragment" :note="note" class="card-title" />
     </h5>
     <SvgDescriptionIndicator class="description-indicator" v-if="!!note.shortDescription"/>
-  </div>
+  </NoteShell>
 </template>
 
 <script>
 import NoteTitleWithMindmapLink from "../NoteTitleWithMindmapLink.vue";
 import SvgDescriptionIndicator from "../../svgs/SvgDescriptionIndicator.vue";
+import NoteShell from "../NoteShell.vue";
 import MindmapSector from "@/models/MindmapSector";
 
 export default {
@@ -25,7 +27,7 @@ export default {
     linkFragment: { type: Object, default: NoteTitleWithMindmapLink },
   },
   emits: ['highlight'],
-  components: { SvgDescriptionIndicator, NoteTitleWithMindmapLink },
+  components: { NoteShell, SvgDescriptionIndicator, NoteTitleWithMindmapLink },
   computed: {
     coord() { return this.mindmap.coord(this.mindmapSector) },
 

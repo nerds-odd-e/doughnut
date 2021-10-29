@@ -285,7 +285,7 @@ Then("I should see the child notes {string} in order", (notesStr) => {
 Then("I should see {string} is newer than {string}", (newer, older) => {
   let firstColor;
   cy.jumpToNotePage(newer);
-  cy.get(".note-show")
+  cy.get(".note-show div")
     .invoke("css", "background-color")
     .then((val) => (firstColor = val));
   cy.jumpToNotePage(older);
