@@ -27,18 +27,18 @@ import Mindmap from "@/models/Mindmap";
 export default {
   name: "NoteMindmap",
   props: {
+    highlightNoteId: [String, Number],
     noteId: [String, Number],
     ancestors: Array,
     scale: Number,
     rotate: Number,
   },
+  emits: ['highlight'],
   components: { NoteMindmapScaffold, NoteMindmapAncestorsScaffold },
   methods: {
-    highlight(id) {this.$store.commit('highlightNoteId', id)}
+    highlight(id) {this.$emit('highlight', id)}
   },
   computed: {
-    highlightNoteId() { return this.$store.getters.getHighlightNoteId() },
-
     mindmapAncestorSector() {
       return new MindmapSector(0, 0, -Math.PI/2, 0)
     },

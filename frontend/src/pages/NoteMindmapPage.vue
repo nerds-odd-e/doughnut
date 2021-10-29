@@ -8,7 +8,14 @@
         <div class="content">
           <DragListner class="mindmap-event-receiver" v-model="offset">
             <div class="mindmap">
-              <NoteMindmap v-bind="{ noteId, scale: offset.scale, rotate: offset.rotate, ancestors: notePosition.ancestors }" />
+              <NoteMindmap v-bind="{
+                 highlightNoteId,
+                 noteId,
+                 scale: offset.scale,
+                 rotate: offset.rotate,
+                 ancestors: notePosition.ancestors }"
+                 @highlight="highlight"
+              />
             </div>
           <div class="mindmap-info" @click.prevent="reset">
             <span class="scale">{{scalePercentage}}</span>
@@ -40,10 +47,12 @@ export default {
       loading: false,
       notePosition: null,
       offset: { ... defaultOffset },
+      highlightNoteId: null,
     };
   },
   components: { CurrentNoteContainer, LoadingPage, NoteMindmap, DragListner, Breadcrumb },
   methods: {
+    highlight(id) { this.highlightNoteId = id},
     fetchData() {
       this.loading = true;
       storedApiGetNoteWithDescendents(this.$store, this.noteId)
@@ -76,10 +85,12 @@ export default {
   },
   watch: {
     noteId() {
+      this.highlightNoteId = this.noteId
       this.fetchData();
     },
   },
   mounted() {
+    this.highlightNoteId = this.noteId
     this.fetchData();
   },
 };
