@@ -1,7 +1,7 @@
 <template>
     <div v-if="!!noteWithPosition">
       <CurrentNoteContainer :noteId="noteWithPosition.note.id"/>
-      <Breadcrumb v-bind="notePosition" />
+      <Breadcrumb v-bind="noteWithPosition.notePosition" />
       <NoteWithLinks v-bind="noteWithPosition.note"/>
       />
     </div>
