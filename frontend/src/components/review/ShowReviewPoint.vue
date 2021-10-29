@@ -1,6 +1,6 @@
 <template>
     <div v-if="!!noteWithPosition">
-      <NoteControl :notePosition="notePosition"/>
+      <NoteControl :noteId="noteId"/>
       <Breadcrumb v-bind="noteWithPosition.notePosition" />
       <NoteWithLinks v-bind="note" v-if="note"/>
     </div>
@@ -33,8 +33,11 @@ export default {
   },
   components: {NoteControl, NoteWithLinks, Breadcrumb, LinkShow, LinkNob},
   computed: {
+    noteId() {
+      return this.noteWithPosition.notePosition.noteId
+    },
     note() {
-      return this.$store.getters.getNoteById(this.noteWithPosition.notePosition.noteId);
+      return this.$store.getters.getNoteById(this.noteId)
     },
   }
 }
