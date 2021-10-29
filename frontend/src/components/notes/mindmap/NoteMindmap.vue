@@ -10,12 +10,12 @@
     </marker>
 
 
-    <NoteMindmapAncestorsScaffold v-bind="{ ancestors, mindmap, mindmapSector: mindmapAncestorSector, noteComponent: 'NoteParentConnection'}"/>
-    <NoteMindmapScaffold v-bind="{ noteId, mindmap, mindmapSector, noteComponent: 'NoteParentChildConnection'}"/>
-    <NoteMindmapScaffold v-bind="{ noteId, mindmap, mindmapSector, noteComponent: 'NoteLinks'}"/>
+    <NoteMindmapAncestorsScaffold v-bind="{ highlightNoteId, ancestors, mindmap, mindmapSector: mindmapAncestorSector, noteComponent: 'NoteParentConnection'}"/>
+    <NoteMindmapScaffold v-bind="{ highlightNoteId, noteId, mindmap, mindmapSector, noteComponent: 'NoteParentChildConnection'}"/>
+    <NoteMindmapScaffold v-bind="{ highlightNoteId, noteId, mindmap, mindmapSector, noteComponent: 'NoteLinks'}"/>
   </svg>
-  <NoteMindmapAncestorsScaffold v-bind="{ ancestors, mindmap, mindmapSector: mindmapAncestorSector, noteComponent: 'NoteCard'}"/>
-  <NoteMindmapScaffold v-bind="{ noteId, mindmap, mindmapSector, noteComponent: 'NoteCard'}"/>
+  <NoteMindmapAncestorsScaffold v-bind="{ highlightNoteId, ancestors, mindmap, mindmapSector: mindmapAncestorSector, noteComponent: 'NoteCard'}" @highlight="highlight"/>
+  <NoteMindmapScaffold v-bind="{ highlightNoteId, noteId, mindmap, mindmapSector, noteComponent: 'NoteCard'}" @highlight="highlight"/>
 </template>
 
 <script lang="ts">
@@ -32,9 +32,13 @@ export default {
     scale: Number,
     rotate: Number,
   },
-  emits: ["updated"],
   components: { NoteMindmapScaffold, NoteMindmapAncestorsScaffold },
+  methods: {
+    highlight(id) {this.$store.commit('highlightNoteId', id)}
+  },
   computed: {
+    highlightNoteId() { return this.$store.getters.getHighlightNoteId() },
+
     mindmapAncestorSector() {
       return new MindmapSector(0, 0, -Math.PI/2, 0)
     },

@@ -6,10 +6,11 @@
       mindmapSector: mindmapSector.getChildSector(1, 0, 0.5),
       highlighted: highlightNoteId === noteViewedByUser.id
     }"
-    @highlight="highlight"
+    @highlight="$emit('highlight', noteViewedByUser.id)"
   />
   <NoteMindmapAncestorsScaffold
-    v-bind="{ noteComponent, mindmap, ancestors: ancestors.slice(0, ancestors.length - 1), mindmapSector: mindmapSector.getChildSector(1, 0, 0.5) }"
+    v-bind="{ highlightNoteId, noteComponent, mindmap, ancestors: ancestors.slice(0, ancestors.length - 1), mindmapSector: mindmapSector.getChildSector(1, 0, 0.5) }"
+    @highlight="$emit('highlight', $event)"
   />
   </template>
 </template>
@@ -26,16 +27,14 @@ export default {
     mindmapSector: MindmapSector,
     noteComponent: String,
     mindmap: Object,
+    highlightNoteId: [String, Number]
   },
-  methods: {
-    highlight() {this.$store.commit('highlightNoteId', this.noteViewedByUser.id)}
-  },
+  emits: ['highlight'],
   components: { NoteCard, NoteParentConnection },
   computed: {
     noteViewedByUser() {
       return this.ancestors[this.ancestors.length - 1]
     },
-    highlightNoteId() { return this.$store.getters.getHighlightNoteId() },
   },
 };
 </script>

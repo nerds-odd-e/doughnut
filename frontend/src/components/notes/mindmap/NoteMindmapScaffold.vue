@@ -5,17 +5,19 @@
       mindmap,
       highlighted: highlightNoteId === noteId
     }"
-    @highlight="highlight"
+    @highlight="$emit('highlight', noteId)"
   />
   <NoteMindmapScaffold
     v-for="(childId, index) in childrenIds"
     v-bind="{
+      highlightNoteId,
       noteComponent,
       noteId: childId,
       mindmapSector: mindmapSector.getChildSector(childrenIds.length, index),
       mindmap,
     }"
     :key="childId"
+    @highlight="$emit('highlight', $event)"
   />
 </template>
 
@@ -32,11 +34,10 @@ export default {
     mindmapSector: MindmapSector,
     mindmap: Object,
     noteComponent: String,
+    highlightNoteId: [String, Number]
   },
+  emits: ['highlight'],
   components: { NoteCard, NoteParentChildConnection, NoteLinks },
-  methods: {
-    highlight() {this.$store.commit('highlightNoteId', this.noteId)}
-  },
   computed: {
     noteViewedByUser() {
       return this.$store.getters.getNoteById(this.noteId);
@@ -44,8 +45,6 @@ export default {
     childrenIds() {
       return this.$store.getters.getChildrenIdsByParentId(this.noteId);
     },
-    highlightNoteId() { return this.$store.getters.getHighlightNoteId() },
-
   },
 };
 </script>
