@@ -1,6 +1,6 @@
 <template>
   <div 
-  :class="`note-card ${isHighlighted ? 'highlighted' : ''}`"
+  :class="`note-card ${highlighted ? 'highlighted' : ''}`"
   role="card" :aria-label="note.title"
   :style="`top:${coord.y}px; left:${coord.x}px`"
   v-on:click="highlight()">
@@ -21,12 +21,12 @@ export default {
     note: Object,
     mindmapSector: MindmapSector,
     mindmap: Object,
+    highlighted: Boolean,
     linkFragment: { type: Object, default: NoteTitleWithMindmapLink },
   },
   components: { SvgDescriptionIndicator, NoteTitleWithMindmapLink },
   computed: {
     coord() { return this.mindmap.coord(this.mindmapSector) },
-    isHighlighted() { return this.$store.getters.getHighlightNoteId() === this.note.id },
 
   },
   methods: {

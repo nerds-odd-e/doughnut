@@ -1,6 +1,11 @@
 <template>
   <template v-if="ancestors.length > 0">
-  <component v-bind:is="noteComponent" v-bind="{ note: noteViewedByUser, mindmap, mindmapSector: mindmapSector.getChildSector(1, 0, 0.5) }"/>
+  <component v-bind:is="noteComponent" v-bind="{
+     note: noteViewedByUser,
+     mindmap,
+     mindmapSector: mindmapSector.getChildSector(1, 0, 0.5),
+     highlighted: highlightNoteId === noteViewedByUser.id
+  }"/>
   <NoteMindmapAncestorsScaffold
     v-bind="{ noteComponent, mindmap, ancestors: ancestors.slice(0, ancestors.length - 1), mindmapSector: mindmapSector.getChildSector(1, 0, 0.5) }"
   />
@@ -25,6 +30,7 @@ export default {
     noteViewedByUser() {
       return this.ancestors[this.ancestors.length - 1]
     },
+    highlightNoteId() { return this.$store.getters.getHighlightNoteId() },
   },
 };
 </script>

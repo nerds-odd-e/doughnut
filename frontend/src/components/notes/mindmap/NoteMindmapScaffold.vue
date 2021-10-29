@@ -3,6 +3,7 @@
     note: noteViewedByUser,
     mindmapSector,
     mindmap,
+    highlighted: highlightNoteId === noteViewedByUser.id
 
   }"/>
   <NoteMindmapScaffold
@@ -12,6 +13,7 @@
       noteId: childId,
       mindmapSector: mindmapSector.getChildSector(childrenIds.length, index),
       mindmap,
+      highlighted: highlightNoteId === childId
     }"
     :key="childId"
   />
@@ -39,6 +41,7 @@ export default {
     childrenIds() {
       return this.$store.getters.getChildrenIdsByParentId(this.noteId);
     },
+    highlightNoteId() { return this.$store.getters.getHighlightNoteId() },
 
   },
 };
