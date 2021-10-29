@@ -1,30 +1,29 @@
 <template>
   <LoadingPage v-bind="{ loading, contentExists: !!notePosition }">
     <div class="box">
-      <CurrentNoteContainer :noteId="noteId">
-        <div class="header">
-          <Breadcrumb v-bind="notePosition" />
-        </div>
-        <div class="content">
-          <DragListner class="mindmap-event-receiver" v-model="offset">
-            <div class="mindmap">
-              <NoteMindmap v-bind="{
-                 highlightNoteId,
-                 noteId,
-                 scale: offset.scale,
-                 rotate: offset.rotate,
-                 ancestors: notePosition.ancestors }"
-                 @highlight="highlight"
-              />
-            </div>
-          <div class="mindmap-info" @click.prevent="reset">
-            <span class="scale">{{scalePercentage}}</span>
-            <span class="offset">{{offsetMsg}}</span>
-            <span class="offset">{{rotateMsg}}&deg;</span>
+      <CurrentNoteContainer :noteId="highlightNoteId"/>
+      <div class="header">
+        <Breadcrumb v-bind="notePosition" />
+      </div>
+      <div class="content">
+        <DragListner class="mindmap-event-receiver" v-model="offset">
+          <div class="mindmap">
+            <NoteMindmap v-bind="{
+                highlightNoteId,
+                noteId,
+                scale: offset.scale,
+                rotate: offset.rotate,
+                ancestors: notePosition.ancestors }"
+                @highlight="highlight"
+            />
           </div>
-          </DragListner>
+        <div class="mindmap-info" @click.prevent="reset">
+          <span class="scale">{{scalePercentage}}</span>
+          <span class="offset">{{offsetMsg}}</span>
+          <span class="offset">{{rotateMsg}}&deg;</span>
         </div>
-      </CurrentNoteContainer>
+        </DragListner>
+      </div>
     </div>
   </LoadingPage>
 </template>
