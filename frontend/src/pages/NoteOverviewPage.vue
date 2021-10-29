@@ -1,6 +1,6 @@
 <template>
   <ContainerPage v-bind="{ loading, contentExists: !!notePosition }">
-    <CurrentNoteContainer :noteId="noteId" />
+    <NoteControl :noteId="noteId" />
     <Breadcrumb v-bind="notePosition" />
     <NoteOverview v-bind="{ noteId }" />
   </ContainerPage>
@@ -8,7 +8,7 @@
 
 <script>
 import ContainerPage from "./commons/ContainerPage.vue";
-import CurrentNoteContainer from "../components/commons/CurrentNoteContainer.vue";
+import NoteControl from "../components/commons/NoteControl.vue";
 import { storedApiGetNoteWithDescendents } from "../storedApi";
 import NoteOverview from "../components/notes/NoteOverview.vue";
 import Breadcrumb from "../components/notes/Breadcrumb.vue";
@@ -22,7 +22,7 @@ export default {
       loading: true,
     };
   },
-  components: { CurrentNoteContainer, ContainerPage, NoteOverview, Breadcrumb },
+  components: { NoteControl, ContainerPage, NoteOverview, Breadcrumb },
   methods: {
 
     fetchData() {

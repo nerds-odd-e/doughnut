@@ -1,6 +1,6 @@
 <template>
     <div v-if="!!noteWithPosition">
-      <CurrentNoteContainer :noteId="noteWithPosition.notePosition.noteId"/>
+      <NoteControl :notePosition="notePosition"/>
       <Breadcrumb v-bind="noteWithPosition.notePosition" />
       <NoteWithLinks v-bind="note" v-if="note"/>
     </div>
@@ -22,7 +22,7 @@
 <script>
 import NoteWithLinks from "../notes/NoteWithLinks.vue";
 import Breadcrumb from "../notes/Breadcrumb.vue";
-import CurrentNoteContainer from "../commons/CurrentNoteContainer.vue";
+import NoteControl from "../commons/NoteControl.vue";
 import LinkShow from "../links/LinkShow.vue";
 import LinkNob from "../links/LinkNob.vue";
 
@@ -31,7 +31,7 @@ export default {
     noteWithPosition: Object,
     linkViewedByUser: Object,
   },
-  components: {CurrentNoteContainer, NoteWithLinks, Breadcrumb, LinkShow, LinkNob},
+  components: {NoteControl, NoteWithLinks, Breadcrumb, LinkShow, LinkNob},
   computed: {
     note() {
       return this.$store.getters.getNoteById(this.noteWithPosition.notePosition.noteId);

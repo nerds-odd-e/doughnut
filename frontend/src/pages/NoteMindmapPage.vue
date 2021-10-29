@@ -2,7 +2,7 @@
   <LoadingPage v-bind="{ loading, contentExists: !!notePosition }">
     <div class="box">
       <div class="header">
-        <CurrentNoteContainer :noteId="highlightNoteId"/>
+        <NoteControl :noteId="highlightNoteId"/>
         <Breadcrumb v-bind="notePosition" />
       </div>
       <div class="content">
@@ -30,7 +30,7 @@
 
 <script>
 import LoadingPage from "./commons/LoadingPage.vue";
-import CurrentNoteContainer from "../components/commons/CurrentNoteContainer.vue";
+import NoteControl from "../components/commons/NoteControl.vue";
 import { storedApiGetNoteWithDescendents } from "../storedApi";
 import NoteMindmap from "../components/notes/mindmap/NoteMindmap.vue";
 import DragListner from "../components/commons/DragListner.vue";
@@ -49,7 +49,7 @@ export default {
       highlightNoteId: null,
     };
   },
-  components: { CurrentNoteContainer, LoadingPage, NoteMindmap, DragListner, Breadcrumb },
+  components: { NoteControl, LoadingPage, NoteMindmap, DragListner, Breadcrumb },
   methods: {
     highlight(id) { this.highlightNoteId = id},
     fetchData() {

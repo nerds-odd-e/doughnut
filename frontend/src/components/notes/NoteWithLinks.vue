@@ -1,7 +1,7 @@
 <template>
-  <div class="note-show" :style="`background-color: ${bgColor}`">
+  <div class="note-show">
     <NoteFrameOfLinks v-bind="{ links }">
-      <div class="note-body" @dblclick="editDialog">
+      <NoteShell class="note-body" v-bind="{id, updatedAt: noteContent.updatedAt}">
         <h2 role="title" class="note-title">{{ title }}</h2>
         <div class="row">
           <ShowDescription
@@ -19,14 +19,14 @@
           <label v-else>Url:</label>
           <a :href="noteContent.url">{{ noteContent.url }}</a>
         </div>
-      </div>
+      </NoteShell>
     </NoteFrameOfLinks>
   </div>
 </template>
 
 <script>
 import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
-import NoteEditDialog from "./NoteEditDialog.vue";
+import NoteShell from "./NoteShell.vue";
 import ShowPicture from "./ShowPicture.vue";
 import ShowDescription from "./ShowDescription.vue";
 
@@ -41,35 +41,13 @@ export default {
   },
   components: {
     NoteFrameOfLinks,
-    NoteEditDialog,
+    NoteShell,
     ShowPicture,
     ShowDescription,
   },
   computed: {
     twoColumns() {
       return !!this.notePicture && !!this.noteContent.description;
-    },
-    bgColor() {
-      const colorOld = [150, 150, 150];
-      const newColor = [208, 237, 23];
-      const ageInMillisecond = Math.max(
-        0,
-        Date.now() - new Date(this.noteContent.updatedAt)
-      );
-      const max = 15; // equals to 225 hours
-      const index = Math.min(max, Math.sqrt(ageInMillisecond / 1000 / 60 / 60));
-      return `rgb(${colorOld
-        .map((oc, i) =>
-          Math.round((oc * index + newColor[i] * (max - index)) / max)
-        )
-        .join(",")})`;
-    },
-  },
-  methods: {
-    async editDialog() {
-      await this.$popups.dialog(NoteEditDialog, {
-        noteId: this.id,
-      })
     },
   },
 };
