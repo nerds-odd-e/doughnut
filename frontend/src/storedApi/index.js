@@ -1,3 +1,4 @@
+import LinkViewedByUserBuilder from "../../tests/fixtures/LinkViewedByUserBuilder";
 import { restGet, restPost, restPatchMultiplePartForm, restPostMultiplePartForm } from "../restful/restful";
 
 const apiLogout = async () => {
@@ -16,6 +17,36 @@ const storedApiGetNoteAndItsChildren = async (store, noteId) => {
     const res = await restGet(
         `/api/notes/${noteId}`);
     store.commit("loadNotes", res.notes);
+    return res;
+}
+
+function loadReviewPointViewedByUser(store, data) {
+    if(!data) return
+    const { noteWithPosition, linkViewedbyUser } = data
+    if (noteWithPosition) {
+       store.commit("loadNotes", [noteWithPosition.note]);
+    }
+    if(linkViewedbyUser){
+      loadReviewPointViewedByUser(store, {noteWithPosition: linkViewedbyUser.sourceNoteWithPosition})
+      loadReviewPointViewedByUser(store, {noteWithPosition: linkViewedbyUser.targetNoteWithPosition})
+    }
+}
+
+const storedApiGetOneInitialReview = async (store) => {
+    const res = await restGet(
+        `/api/reviews/initial`);
+    loadReviewPointViewedByUser(store, res)
+
+    return res;
+}
+
+const storedApiDoInitialReview = async (store, data) => {
+    const res = await restPost(
+        `/api/reviews`,
+        data,
+        () => null
+    )
+    loadReviewPointViewedByUser(store, res)
     return res;
 }
 
@@ -64,12 +95,13 @@ const storedApiCreateUser = async (store, data) => {
 const storedApiGetFeatureToggle = (store) =>
  restGet(`/api/testability/feature_toggle`).then((res) => store.commit("featureToggle", res))
 
-const apiSelfEvaluate = async (reviewPointId, data) => {
+const storedApiSelfEvaluate = async (store, reviewPointId, data) => {
   const res = await restPost(
         `/api/reviews/${reviewPointId}/self-evaluate`,
         data,
         () => null
       )
+  loadReviewPointViewedByUser(store, res.reviewPointViewedByUser)
   return res
 }
 
@@ -82,12 +114,16 @@ const apiProcessAnswer = async (reviewPointId, data) => {
   return res
 }
 
-const apiGetNextReviewItem = () => restGet(`/api/reviews/repeat`)
+const storedApiGetNextReviewItem = async (store) => {
+    const res = await restGet(`/api/reviews/repeat`)
+    loadReviewPointViewedByUser(store, res.reviewPointViewedByUser)
+    return res
+}
 
 export {
     apiLogout,
-    apiGetNextReviewItem,
-    apiSelfEvaluate,
+    storedApiGetNextReviewItem,
+    storedApiSelfEvaluate,
     apiProcessAnswer,
     storedApiGetNoteWithDescendents,
     storedApiGetNoteAndItsChildren,
@@ -96,5 +132,7 @@ export {
     storedApiGetCurrentUserInfo,
     storedApiUpdateUser,
     storedApiCreateUser,
+    storedApiGetOneInitialReview,
+    storedApiDoInitialReview,
     storedApiGetFeatureToggle,
 }

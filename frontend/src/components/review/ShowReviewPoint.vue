@@ -1,9 +1,8 @@
 <template>
     <div v-if="!!noteWithPosition">
-      <CurrentNoteContainer :noteId="noteWithPosition.note.id"/>
+      <CurrentNoteContainer :noteId="noteWithPosition.notePosition.noteId"/>
       <Breadcrumb v-bind="noteWithPosition.notePosition" />
-      <NoteWithLinks v-bind="noteWithPosition.note"/>
-      />
+      <NoteWithLinks v-bind="note"/>
     </div>
 
     <div v-if="!!linkViewedByUser">
@@ -20,17 +19,24 @@
     </div>
 </template>
 
-<script setup>
+<script>
 import NoteWithLinks from "../notes/NoteWithLinks.vue";
 import Breadcrumb from "../notes/Breadcrumb.vue";
 import CurrentNoteContainer from "../commons/CurrentNoteContainer.vue";
 import LinkShow from "../links/LinkShow.vue";
 import LinkNob from "../links/LinkNob.vue";
-import { computed } from "@vue/reactivity";
 
-const props = defineProps({
-  noteWithPosition: Object,
-  linkViewedByUser: Object,
-});
+export default {
+  props: {
+    noteWithPosition: Object,
+    linkViewedByUser: Object,
+  },
+  components: {CurrentNoteContainer, NoteWithLinks, Breadcrumb, LinkShow, LinkNob},
+  computed: {
+    note() {
+      return this.$store.getters.getNoteById(this.noteWithPosition.notePosition.noteId);
+    },
+  }
+}
 
 </script>

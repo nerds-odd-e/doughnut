@@ -1,5 +1,5 @@
 <template>
-  <ContainerPage v-bind="{ loading, contentExists: !!repetition }">
+  <ContainerPage v-bind="{ loading, contentExists: !!reviewPoint }">
       <Minimizable :minimized="nested" staticHeight="75px">
         <template #minimizedContent>
           <div class="repeat-container" v-on:click="backToRepeat()">
@@ -65,7 +65,7 @@ import Repetition from "../components/review/Repetition.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import NoteStatisticsButton from "../components/notes/NoteStatisticsButton.vue";
 import RepeatProgressBar from "../components/review/RepeatProgressBar.vue";
-import { apiSelfEvaluate, apiProcessAnswer, apiGetNextReviewItem } from '../storedApi';
+import { storedApiSelfEvaluate, apiProcessAnswer, storedApiGetNextReviewItem } from '../storedApi';
 
 export default {
   name: "RepeatPage",
@@ -89,7 +89,7 @@ export default {
   },
   computed: {
     reviewPointViewedByUser() {
-      return this.repetition.reviewPointViewedByUser;
+      return this.repetition?.reviewPointViewedByUser;
     },
     reviewPoint() {
       return this.reviewPointViewedByUser?.reviewPoint;
@@ -146,7 +146,7 @@ export default {
 
     fetchData() {
       this.loading = true
-      apiGetNextReviewItem().then(
+      storedApiGetNextReviewItem(this.$store).then(
         this.loadNew
       ).finally(() => this.loading = false);
     },
@@ -182,7 +182,8 @@ export default {
       }
       this.loading = true
 
-      apiSelfEvaluate(
+      storedApiSelfEvaluate(
+        this.$store,
         this.reviewPointId,
         { selfEvaluation: data, increaseRepeatCount: !this.answerResult },
       )

@@ -55,7 +55,7 @@ import InitialReviewButtons from "../components/review/InitialReviewButtons.vue"
 import ProgressBar from "../components/commons/ProgressBar.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import Minimizable from "../components/commons/Minimizable.vue";
-import { restGet, restPost } from "../restful/restful";
+import { storedApiGetOneInitialReview, storedApiDoInitialReview } from "../storedApi";
 
 export default {
   name: "InitialReviewPage",
@@ -110,18 +110,16 @@ export default {
           return;
       }
       this.reviewPoint.removedFromReview = skipReview;
-      restPost(
-        `/api/reviews`,
+      storedApiDoInitialReview(this.$store,
         { reviewPoint: this.reviewPoint, reviewSetting: this.reviewSetting },
-        (r) => (this.loading = r)
-      ).then(this.loadNew);
+      ).then(this.loadNew)
+      .finally(()=>this.loading=false)
     },
 
     fetchData() {
       this.loading = true
-      restGet(`/api/reviews/initial`).then(res => {
-          this.loadNew(res)
-        })
+      storedApiGetOneInitialReview(this.$store)
+      .then(this.loadNew)
       .finally(() => this.loading = false)
     },
   },
