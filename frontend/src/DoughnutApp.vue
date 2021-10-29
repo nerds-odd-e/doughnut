@@ -30,7 +30,6 @@ export default {
   computed: {
     newUser() { return !this.user && !!this.externalIdentifier; },
     user() { return this.$store.getters.getCurrentUser()},
-    currentNote() { return this.$store.getters.getHighlightNote()},
   },
 
   methods: {

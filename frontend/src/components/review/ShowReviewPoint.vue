@@ -1,6 +1,6 @@
 <template>
-  <CurrentNoteContainer v-bind="{noteId}">
     <div v-if="!!noteWithPosition">
+      <CurrentNoteContainer :noteId="noteWithPosition.note.id"/>
       <NoteWithControls
         v-bind="noteWithPosition"
       />
@@ -18,7 +18,6 @@
         </LinkShow>
       </div>
     </div>
-  </CurrentNoteContainer>
 </template>
 
 <script setup>
@@ -32,8 +31,5 @@ const props = defineProps({
   noteWithPosition: Object,
   linkViewedByUser: Object,
 });
-
-const noteId = computed(() => props.noteWithPosition ? props.noteWithPosition.note.id : null )
-
 
 </script>

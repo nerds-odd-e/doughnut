@@ -1,9 +1,8 @@
 <template>
   <ContainerPage v-bind="{ loading, contentExists: !!notePosition }">
-    <CurrentNoteContainer :noteId="noteId" v-if="notePosition" :key="noteId">
-      <NoteWithChildrenCards v-if="!loading" v-bind="{id: noteId, notePosition}"/>
-      <NoteStatisticsButton :noteId="noteId" />
-    </CurrentNoteContainer>
+    <CurrentNoteContainer :noteId="noteId"/>
+    <NoteWithChildrenCards v-if="!loading" v-bind="{id: noteId, notePosition}"/>
+    <NoteStatisticsButton :noteId="noteId" />
   </ContainerPage>
 </template>
 
