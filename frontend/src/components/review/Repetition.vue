@@ -30,7 +30,7 @@
       <button
         class="btn"
         title="remove this note from review"
-        @click="removeFromReview()"
+        @click="$emit('removeFromReview')"
       >
         <SvgNoReview />
       </button>
@@ -44,7 +44,6 @@ import SvgNoReview from "../svgs/SvgNoReview.vue";
 import ShowReviewPoint from "./ShowReviewPoint.vue";
 import SelfEvaluateButtons from "./SelfEvaluateButtons.vue";
 import ReviewPointAbbr from "./ReviewPointAbbr.vue";
-import { restPost } from "../../restful/restful";
 
 export default {
   name: "Repetition",
@@ -55,7 +54,7 @@ export default {
     linkViewedByUser: Object,
     compact: Boolean,
   },
-  emits: ["selfEvaluate", "reviewPointRemoved"],
+  emits: ["selfEvaluate", "removeFromReview"],
   components: {
     SvgCog,
     SvgNoReview,
@@ -65,7 +64,6 @@ export default {
   },
   data() {
     return {
-      loading: false,
       buttonKey: 1,
     };
   },
@@ -83,20 +81,6 @@ export default {
       this.$emit("selfEvaluate", event);
     },
 
-    async removeFromReview() {
-      if (
-        !(await this.$popups.confirm(
-          `Are you sure to hide this from reviewing in the future?`
-        ))
-      ) {
-        return;
-      }
-      restPost(
-        `/api/review-points/${this.reviewPoint.id}/remove`,
-        {},
-        (r) => (this.loading = r)
-      ).then((r) => this.$emit("reviewPointRemoved"));
-    },
   },
 };
 </script>

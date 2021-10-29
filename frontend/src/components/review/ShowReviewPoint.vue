@@ -2,7 +2,7 @@
     <div v-if="!!noteWithPosition">
       <CurrentNoteContainer :noteId="noteWithPosition.notePosition.noteId"/>
       <Breadcrumb v-bind="noteWithPosition.notePosition" />
-      <NoteWithLinks v-bind="note"/>
+      <NoteWithLinks v-bind="note" v-if="note"/>
     </div>
 
     <div v-if="!!linkViewedByUser">

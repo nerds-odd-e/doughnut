@@ -114,6 +114,15 @@ const apiProcessAnswer = async (reviewPointId, data) => {
   return res
 }
 
+const apiRemoveFromReview = async (reviewPointId) => {
+  const res = await restPost(
+        `/api/review-points/${reviewPointId}/remove`,
+        {},
+        () => null
+      )
+  return res
+}
+
 const storedApiGetNextReviewItem = async (store) => {
     const res = await restGet(`/api/reviews/repeat`)
     loadReviewPointViewedByUser(store, res.reviewPointViewedByUser)
@@ -125,6 +134,7 @@ export {
     storedApiGetNextReviewItem,
     storedApiSelfEvaluate,
     apiProcessAnswer,
+    apiRemoveFromReview,
     storedApiGetNoteWithDescendents,
     storedApiGetNoteAndItsChildren,
     storedApiCreateNote,

@@ -22,7 +22,7 @@
                   compact: true,
                 }"
                 @selfEvaluate="selfEvaluate($event)"
-                @reviewPointRemoved="fetchData()"
+                @removeFromReview="removeFromReview"
               />
             </RepeatProgressBar>
           </div>
@@ -48,7 +48,7 @@
               <Repetition
                 v-bind="{ ...reviewPointViewedByUser, answerResult }"
                 @selfEvaluate="selfEvaluate($event)"
-                @reviewPointRemoved="fetchData()"
+                @removeFromReview="removeFromReview"
               />
               <NoteStatisticsButton v-if="noteId" :noteId="noteId" />
               <NoteStatisticsButton v-else :link="linkId" />
@@ -65,7 +65,7 @@ import Repetition from "../components/review/Repetition.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import NoteStatisticsButton from "../components/notes/NoteStatisticsButton.vue";
 import RepeatProgressBar from "../components/review/RepeatProgressBar.vue";
-import { storedApiSelfEvaluate, apiProcessAnswer, storedApiGetNextReviewItem } from '../storedApi';
+import { apiRemoveFromReview, storedApiSelfEvaluate, apiProcessAnswer, storedApiGetNextReviewItem } from '../storedApi';
 
 export default {
   name: "RepeatPage",
@@ -191,6 +191,19 @@ export default {
       .catch((err) => this.noLongerExist())
       .finally(() => this.loading = false)
     },
+    async removeFromReview() {
+      if (!(await this.$popups.confirm(
+          `Are you sure to hide this from reviewing in the future?`
+        ))
+      ) {
+        return;
+      }
+      this.loading = true
+      apiRemoveFromReview(this.reviewPointId)
+      .then((r) => this.fetchData())
+      .finally(() => this.loading = false)
+    },
+
   },
 
   mounted() {
