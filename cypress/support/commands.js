@@ -413,7 +413,7 @@ Cypress.Commands.add("expectCurrentNoteDescription", (expectedDescription) => {
 Cypress.Commands.add("withinMindmap", () => {
   cy.pageIsLoaded()
   cy.wrap(new Promise((resolve, reject) => {
-      cy.get(`.content`).then((mindmap)=>{
+      cy.get(`.box .content .box .content`).then((mindmap)=>{
           const rect = mindmap[0].getBoundingClientRect()
           cy.get("[role='card']").then(($elms)=>{
             const cards = Object.fromEntries(Cypress.$.makeArray($elms).map((el) => [el.innerText, el.getBoundingClientRect()]))
