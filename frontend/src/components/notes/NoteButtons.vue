@@ -72,7 +72,7 @@ import ReviewSettingEditButton from "../review/ReviewSettingEditButton.vue";
 import NoteEditButton from "./NoteEditButton.vue";
 import NoteSplitButton from "./NoteSplitButton.vue";
 import NoteNewButton from "./NoteNewButton.vue";
-import { restPost } from "../../restful/restful";
+import { storedApiDeleteNote } from "../../storedApi";
 export default {
   name: "NoteButtons",
   props: { note: Object },
@@ -91,18 +91,15 @@ export default {
   methods: {
     async deleteNote() {
       if (await this.$popups.confirm(`Are you sure to delete this note?`)) {
-        restPost(`/api/notes/${this.note.id}/delete`, {}, (r) => {}).then(
-          (r) => {
-            if (!!r.noteId) {
-              this.$router.push({
-                name: "noteShow",
-                params: { noteId: r.noteId },
-              });
-            } else {
-              this.$router.push({ name: "notebooks" });
-            }
-          }
-        );
+        const r = await storedApiDeleteNote(this.$store, this.note.id)
+        if(!!r.noteId) {
+          this.$router.push({
+            name: "noteShow",
+            params: { noteId: r.noteId },
+          });
+        } else {
+          this.$router.push({ name: "notebooks" });
+        }
       }
     },
   },

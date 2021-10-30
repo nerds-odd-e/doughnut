@@ -60,6 +60,16 @@ const storedApiCreateNote = async (store, parentId, data) => {
     return res;
 }
 
+const storedApiDeleteNote = async (store, noteId) => {
+    const res = await restPost(
+        `/api/notes/${noteId}/delete`,
+        {},
+        () => null
+    )
+    // store.commit("loadNotes", res.notes);
+    return res;
+}
+
 const storedApiSplitNote = async (store, noteId) => {
     const res = await restPost(`/api/notes/${noteId}/split`, {})
     store.commit("loadNotes", res.notes);
@@ -138,6 +148,7 @@ export {
     storedApiGetNoteWithDescendents,
     storedApiGetNoteAndItsChildren,
     storedApiCreateNote,
+    storedApiDeleteNote,
     storedApiSplitNote,
     storedApiGetCurrentUserInfo,
     storedApiUpdateUser,
