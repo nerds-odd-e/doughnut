@@ -53,7 +53,7 @@
       <button
         class="dropdown-item"
         title="delete note"
-        v-on:click="deleteNote()"
+        v-on:click="deleteNote"
       >
         <SvgRemove />
         Delete

@@ -125,7 +125,7 @@ export default {
   left: 0
   width: 100%
   height: 100%
-  z-index: 1000
+  z-index: 999
 
 .mindmap-info
   position: relative

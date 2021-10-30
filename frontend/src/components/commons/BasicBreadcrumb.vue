@@ -4,8 +4,7 @@
        class="breadcrumb bg-light bg-gradient">
       <slot name="topLink" />
       <li class="breadcrumb-item" v-for="note in ancestors" :key="note.id">
-        <component v-if="!!linkFragment" :is="linkFragment" :note="note" />
-        <NoteTitleWithLink v-else v-bind="{note, noteRouteName}" />
+        <NoteTitleWithLink v-bind="{note, noteRouteName}" />
       </li>
       <slot name="additional" />
     </ol>
