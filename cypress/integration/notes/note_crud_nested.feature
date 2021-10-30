@@ -5,8 +5,10 @@ Feature: Nested Note CRUD
   Background:
     Given I've logged in as an existing user
     And there are some notes for the current user
-      | title          | description         |
-      | LeSS in Action | An awesome training |
+      | title          | testingParent  | description         |
+      | LeSS in Action |                | An awesome training |
+      | team           | LeSS in Action |                     |
+      | tech           | LeSS in Action |                     |
 
   Scenario: Create a new note belonging to another node
     When I create note belonging to "LeSS in Action":
@@ -31,7 +33,7 @@ Feature: Nested Note CRUD
       | Title        | Description                        |
       | Re-quirement | Re-think the way we do requirement |
     When I create a sibling note of "Re-quirement":
-      | Title     | Description                   | Link Type To Parent    |
+      | Title     | Description                   | Link Type To Parent |
       | Re-Design | Re-think the way we do design | a specialization of |
     When I open "LeSS in Action" note from top level
     And I should see these notes as children

@@ -121,7 +121,9 @@ class RestNoteController {
     }
 
     @PostMapping(value = "/{note}/delete")
-    @Transactional
+    // @Transactional   // for some reason we don't understand yet, the @Transactional seems try to trigger
+                        // note to delete the NoteClosures via note.children.
+                        // But NoteClosure is managed by note.descendantNCs.
     public RedirectToNoteResponse deleteNote(@PathVariable("note") Note note) throws NoAccessRightException {
         currentUserFetcher.getUser().getAuthorization().assertAuthorization(note);
         Integer parentId = note.getParentId();
