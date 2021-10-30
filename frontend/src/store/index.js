@@ -42,6 +42,9 @@ export default createStore({
         state.notes[note.id] = note;
       });
     },
+    deleteNote(state, noteId) {
+      delete state.notes[noteId]
+    },
     currentUser(state, user) {
       state.currentUser = user
     },

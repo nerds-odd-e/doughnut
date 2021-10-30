@@ -66,7 +66,7 @@ const storedApiDeleteNote = async (store, noteId) => {
         {},
         () => null
     )
-    // store.commit("loadNotes", res.notes);
+    store.commit("deleteNote", noteId)
     return res;
 }
 
