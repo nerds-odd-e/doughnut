@@ -177,8 +177,8 @@ class RestNoteControllerTests {
         void shouldDeleteTheNoteButNotTheUser() throws NoAccessRightException {
             Note note = makeMe.aNote().byUser(userModel).please();
             Integer noteId = note.getId();
-            RedirectToNoteResponse response = controller.deleteNote(note);
-            assertEquals(null, response.noteId);
+            Integer response = controller.deleteNote(note);
+            assertEquals(noteId, response);
             assertFalse(modelFactoryService.findNoteById(noteId).isPresent());
             assertTrue(modelFactoryService.findUserById(userModel.getEntity().getId()).isPresent());
         }

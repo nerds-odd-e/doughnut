@@ -1,27 +1,29 @@
 <template>
-  <NoteWithLinks v-bind="note"/>
-  <NoteOwnerViewCards
-    :owns="owns"
-    :notes="children"
-  />
+  <template v-if="note">
+    <NoteWithLinks v-bind="note"/>
+    <NoteOwnerViewCards
+      :owns="owns"
+      :notes="children"
+    />
 
-  <router-link
-    :to="{ name: 'noteOverview', params: { noteId: id } }"
-    v-if="!!note && !!note.id"
-    role="button"
-    class="btn btn-sm"
-  >
-    Full view mode
-  </router-link>
+    <router-link
+      :to="{ name: 'noteOverview', params: { noteId: id } }"
+      v-if="!!note && !!note.id"
+      role="button"
+      class="btn btn-sm"
+    >
+      Full view mode
+    </router-link>
 
-  <router-link
-    :to="{ name: 'mindmap', params: { noteId: id } }"
-    v-if="!!note && !!note.id"
-    role="button"
-    class="btn btn-sm"
-  >
-    Mindmap mode
-  </router-link>
+    <router-link
+      :to="{ name: 'mindmap', params: { noteId: id } }"
+      v-if="!!note && !!note.id"
+      role="button"
+      class="btn btn-sm"
+    >
+      Mindmap mode
+    </router-link>
+  </template>
 
 </template>
 

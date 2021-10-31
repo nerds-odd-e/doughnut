@@ -14,8 +14,7 @@ Feature: Nested Note CRUD
     When I create note belonging to "LeSS in Action":
       | Title        | Description                        |
       | Re-quirement | Re-think the way we do requirement |
-    Then I should not see note "Re-quirement" at the top level of all my notes
-    When I open "LeSS in Action" note from top level
+    And I open "LeSS in Action" note from top level
     Then I should see "LeSS in Action" in note title
     And I should see these notes as children
       | note-title   |

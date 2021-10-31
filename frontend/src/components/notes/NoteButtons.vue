@@ -91,11 +91,13 @@ export default {
   methods: {
     async deleteNote() {
       if (await this.$popups.confirm(`Are you sure to delete this note?`)) {
-        const r = await storedApiDeleteNote(this.$store, this.note.id)
-        if(!!r.noteId) {
+        const parentId = this.note.parentId
+        await storedApiDeleteNote(this.$store, this.note.id)
+        this.$emit('ensureVisible', parentId)
+        if(parentId) {
           this.$router.push({
             name: "noteShow",
-            params: { noteId: r.noteId },
+            params: { noteId: parentId },
           });
         } else {
           this.$router.push({ name: "notebooks" });
