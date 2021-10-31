@@ -26,7 +26,6 @@ export default {
   props: {
     highlightNoteId: [String, Number],
     noteId: [String, Number],
-    ancestors: Array,
     scale: Number,
     rotate: Number,
   },
@@ -37,9 +36,7 @@ export default {
   },
   computed: {
     mindmapSector() {
-      var d = 0
-      if (this.ancestors?.length > 0) d = Math.PI / 10
-      return new MindmapSector(0, 0, this.rotate - Math.PI / 2 + d, Math.PI * 2 - d * 2)
+      return new MindmapSector(0, 0, this.rotate - Math.PI / 2, Math.PI * 2)
     },
     mindmap() {
       return new Mindmap(
