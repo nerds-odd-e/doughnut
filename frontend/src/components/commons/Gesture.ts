@@ -1,5 +1,3 @@
-import { PropType } from 'vue';
-
 interface Offset {
   x: number
   y: number

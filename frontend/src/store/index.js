@@ -14,6 +14,12 @@ function withState(state) {
       return this.getChildrenIdsByParentId(parentId)
         .map(id=>this.getNoteById(id))
         .filter(n=>n)
+    },
+
+    deleteNote(id) {
+      this.getChildrenIdsByParentId(id).forEach(cid=>
+        this.deleteNote(cid))
+      delete state.notes[id]
     }
   }
 }
@@ -43,7 +49,7 @@ export default createStore({
       });
     },
     deleteNote(state, noteId) {
-      delete state.notes[noteId]
+      withState(state).deleteNote(noteId)
     },
     currentUser(state, user) {
       state.currentUser = user

@@ -25,9 +25,16 @@ describe("storedApi", () => {
       expect(fetch).toHaveBeenCalledWith(`/api/notes/${note.id}/delete`, expect.anything());
     });
 
-    test("should call the api", async () => {
+    test("should change the store", async () => {
       await storedApiDeleteNote(store, note.id)
       expect(store.getters.getNoteById(note.id)).toBeUndefined()
+    });
+
+    test("should remove children notes", async () => {
+      const child = makeMe.aNote.under(note).please()
+      store.commit("loadNotes", [child]);
+      await storedApiDeleteNote(store, note.id)
+      expect(store.getters.getNoteById(child.id)).toBeUndefined()
     });
 
   });

@@ -1,4 +1,3 @@
-import LinkViewedByUserBuilder from "../../tests/fixtures/LinkViewedByUserBuilder";
 import { restGet, restPost, restPatchMultiplePartForm, restPostMultiplePartForm } from "../restful/restful";
 
 const apiLogout = async () => {
