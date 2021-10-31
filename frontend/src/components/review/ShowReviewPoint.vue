@@ -1,6 +1,6 @@
 <template>
     <div v-if="!!noteWithPosition">
-      <NoteControl :noteId="noteId"/>
+      <NoteControl :noteId="noteId" :deleteRedirect="true"/>
       <Breadcrumb v-bind="noteWithPosition.notePosition" />
       <NoteWithLinks v-bind="note" v-if="note"/>
     </div>

@@ -20,7 +20,20 @@ function withState(state) {
       this.getChildrenIdsByParentId(id).forEach(cid=>
         this.deleteNote(cid))
       delete state.notes[id]
-    }
+    },
+
+    deleteNoteFromParentChildrenList(id) {
+      const children = this.getNoteById(
+        this.getNoteById(id)?.parentId
+      )?.childrenIds
+      if (children) {
+        const index = children.indexOf(id)
+        if (index > -1) {
+          children.splice(index, 1);
+        }
+      }
+    },
+
   }
 }
 
@@ -49,6 +62,7 @@ export default createStore({
       });
     },
     deleteNote(state, noteId) {
+      withState(state).deleteNoteFromParentChildrenList(noteId)
       withState(state).deleteNote(noteId)
     },
     currentUser(state, user) {

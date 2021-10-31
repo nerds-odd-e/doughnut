@@ -75,7 +75,10 @@ import NoteNewButton from "./NoteNewButton.vue";
 import { storedApiDeleteNote } from "../../storedApi";
 export default {
   name: "NoteButtons",
-  props: { note: Object },
+  props: {
+    note: Object,
+    deleteRedirect: { type: Boolean, required: true},
+  },
   components: {
     SvgCog,
     SvgAddChild,
@@ -95,10 +98,12 @@ export default {
         await storedApiDeleteNote(this.$store, this.note.id)
         this.$emit('ensureVisible', parentId)
         if(parentId) {
-          this.$router.push({
-            name: "noteShow",
-            params: { noteId: parentId },
-          });
+          if(this.deleteRedirect) {
+            this.$router.push({
+              name: "noteShow",
+              params: { noteId: parentId },
+            });
+          }
         } else {
           this.$router.push({ name: "notebooks" });
         }

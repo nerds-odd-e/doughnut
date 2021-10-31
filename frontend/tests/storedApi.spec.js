@@ -37,6 +37,14 @@ describe("storedApi", () => {
       expect(store.getters.getNoteById(child.id)).toBeUndefined()
     });
 
+    test("should remove child from list", async () => {
+      const child = makeMe.aNote.under(note).please()
+      store.commit("loadNotes", [child]);
+      const childrenCount = store.getters.getChildrenIdsByParentId(note.id).length
+      await storedApiDeleteNote(store, child.id)
+      expect(store.getters.getChildrenIdsByParentId(note.id)).toHaveLength(childrenCount - 1)
+    });
+
   });
 });
 

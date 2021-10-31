@@ -3,6 +3,7 @@
     <template v-if="owns" #headerButtons="{ note }">
       <NoteButtons
         :note="note"
+        :deleteRedirect="true"
       />
     </template>
   </NoteCardWithHeaderAndButton>

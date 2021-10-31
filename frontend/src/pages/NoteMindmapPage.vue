@@ -2,7 +2,7 @@
   <LoadingPage v-bind="{ loading, contentExists: !!notePosition }">
     <div class="box">
       <div class="header">
-        <NoteControl :noteId="highlightNoteId"/>
+        <NoteControl :noteId="highlightNoteId" :deleteRedirect="false"/>
         <Breadcrumb v-bind="notePosition" :noteRouteName="`mindmap`"/>
       </div>
       <div class="content">

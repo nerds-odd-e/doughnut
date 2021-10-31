@@ -1,6 +1,6 @@
 <template>
   <ContainerPage v-bind="{ loading, contentExists: !!notePosition }">
-    <NoteControl :noteId="noteId"/>
+    <NoteControl :noteId="noteId" :deleteRedirect="true"/>
     <Breadcrumb v-bind="notePosition" />
     <NoteWithChildrenCards v-if="!loading" v-bind="{id: noteId, owns: notePosition.owns}"/>
     <NoteStatisticsButton :noteId="noteId" />

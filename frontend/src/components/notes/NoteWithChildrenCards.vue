@@ -8,7 +8,6 @@
 
     <router-link
       :to="{ name: 'noteOverview', params: { noteId: id } }"
-      v-if="!!note && !!note.id"
       role="button"
       class="btn btn-sm"
     >
@@ -17,7 +16,6 @@
 
     <router-link
       :to="{ name: 'mindmap', params: { noteId: id } }"
-      v-if="!!note && !!note.id"
       role="button"
       class="btn btn-sm"
     >

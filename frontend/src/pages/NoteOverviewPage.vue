@@ -1,6 +1,6 @@
 <template>
   <ContainerPage v-bind="{ loading, contentExists: !!notePosition }">
-    <NoteControl :noteId="noteId" />
+    <NoteControl :noteId="noteId" :deleteRedirect="false"/>
     <Breadcrumb v-bind="notePosition" />
     <NoteOverview v-bind="{ noteId }" />
   </ContainerPage>
