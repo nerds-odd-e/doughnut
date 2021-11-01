@@ -1,8 +1,8 @@
 <template>
     <div class="box">
       <div class="header">
-        <NoteControl :noteId="highlightNoteId" :deleteRedirect="false"/>
-        <Breadcrumb v-bind="notePosition" :noteRouteName="`mindmap`"/>
+        <NoteControl :noteId="highlightNoteId" :deleteRedirect="deleteRedirect"/>
+        <Breadcrumb v-bind="notePosition" :noteRouteName="noteRouteName"/>
       </div>
       <div class="content">
         <component :is="noteComponent" 
@@ -16,6 +16,7 @@
 <script>
 import NoteControl from "../commons/NoteControl.vue";
 import NoteMindmapWithListner from "./NoteMindmapWithListner.vue";
+import NoteWithChildrenCards from "./NoteWithChildrenCards.vue";
 import Breadcrumb from "./Breadcrumb.vue";
 
 export default {
@@ -23,13 +24,15 @@ export default {
      noteId: [String, Number],
      notePosition: Object,
      noteComponent: String,
+     deleteRedirect: Boolean,
+     noteRouteName: String
   },
   data() {
     return {
       highlightNoteId: null,
     };
   },
-  components: { NoteControl, NoteMindmapWithListner, Breadcrumb },
+  components: { NoteControl, NoteMindmapWithListner, Breadcrumb, NoteWithChildrenCards },
   methods: {
     highlight(id) { this.highlightNoteId = id},
   },

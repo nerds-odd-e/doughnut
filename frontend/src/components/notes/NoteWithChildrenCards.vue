@@ -2,9 +2,8 @@
   <template v-if="note">
     <NoteWithLinks v-bind="note"/>
     <Cards :notes="children"/>
-
     <router-link
-      :to="{ name: 'noteOverview', params: { noteId: id } }"
+      :to="{ name: 'noteOverview', params: { noteId: noteId } }"
       role="button"
       class="btn btn-sm"
     >
@@ -12,7 +11,7 @@
     </router-link>
 
     <router-link
-      :to="{ name: 'mindmap', params: { noteId: id } }"
+      :to="{ name: 'mindmap', params: { noteId: noteId } }"
       role="button"
       class="btn btn-sm"
     >
@@ -29,18 +28,20 @@ import Cards from "./Cards.vue";
 export default {
   name: "NoteViewedByUser",
   props: {
-    id: [String, Number],
+    noteId: [String, Number],
+    highlightNoteId: [String, Number],
   },
+  emits: ['highlight'],
   components: {
     NoteWithLinks,
     Cards,
   },
   computed: {
     note() {
-      return this.$store.getters.getNoteById(this.id);
+      return this.$store.getters.getNoteById(this.noteId);
     },
     children() {
-      return this.$store.getters.getChildrenOfParentId(this.id);
+      return this.$store.getters.getChildrenOfParentId(this.noteId);
     },
   },
 };

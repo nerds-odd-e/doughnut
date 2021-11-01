@@ -1,7 +1,12 @@
 <template>
   <LoadingPage v-bind="{ loading, contentExists: !!notePosition }">
     <NotePageFrame
-      v-bind="{noteId, notePosition, noteComponent: 'NoteMindmapWithListner'}"/>
+      v-bind="{
+        noteId,
+        notePosition,
+        deleteRedirect: false,
+        noteRouteName: 'mindmap',
+        noteComponent: 'NoteMindmapWithListner'}"/>
   </LoadingPage>
 </template>
 

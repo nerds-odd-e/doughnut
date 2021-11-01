@@ -1,25 +1,20 @@
 <template>
   <LoadingPage v-bind="{ loading, contentExists: !!notePosition, inContainer: true }">
-    <div class="box">
-      <div class="header">
-    <NoteControl :noteId="noteId" :deleteRedirect="true"/>
-    <Breadcrumb v-bind="notePosition" />
-      </div>
-      <div class="content">
-    <NoteWithChildrenCards v-if="!loading" v-bind="{id: noteId}"/>
-      </div>
-    </div>
+    <NotePageFrame
+      v-bind="{
+        noteId,
+        notePosition,
+        deleteRedirect: true,
+        noteRouteName: 'noteShow',
+        noteComponent: 'NoteWithChildrenCards'}"/>
     <NoteStatisticsButton :noteId="noteId" />
   </LoadingPage>
 </template>
 
 <script>
 import LoadingPage from "./commons/LoadingPage.vue";
-import Breadcrumb from "../components/notes/Breadcrumb.vue";
-import NoteWithChildrenCards from "../components/notes/NoteWithChildrenCards.vue";
+import NotePageFrame from '../components/notes/NotePageFrame.vue';
 import NoteStatisticsButton from "../components/notes/NoteStatisticsButton.vue";
-import ContainerPage from "./commons/ContainerPage.vue";
-import NoteControl from "../components/commons/NoteControl.vue";
 import { storedApiGetNoteAndItsChildren } from "../storedApi";
 
 export default {
@@ -31,7 +26,7 @@ export default {
       loading: true,
     };
   },
-  components: { LoadingPage, NoteControl, Breadcrumb, NoteWithChildrenCards, NoteStatisticsButton, ContainerPage },
+  components: { LoadingPage, NotePageFrame, NoteStatisticsButton },
   methods: {
     fetchData() {
       this.loading = true
@@ -51,20 +46,3 @@ export default {
   },
 };
 </script>
-
-<style lang="sass" scoped>
-.box
-  display: flex
-  flex-flow: column
-  height: 100%
-
-.box .header
-  flex: 0 1 auto
-
-.box .content
-  flex: 1 1 auto
-  overflow: hidden
-
-.box .footer
-  flex: 0 1 40px
-</style>
