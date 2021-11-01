@@ -7,7 +7,7 @@
         deleteRedirect: true,
         expandChildren: true,
         noteRouteName: 'noteShow',
-        noteComponent: 'NoteWithChildrenCards'}"/>
+        noteComponent}"/>
 
     <router-link
       :to="{ name: 'noteOverview', params: { noteId: noteId } }"
@@ -33,7 +33,7 @@
 import LoadingPage from "./commons/LoadingPage.vue";
 import NotePageFrame from '../components/notes/NotePageFrame.vue';
 import NoteStatisticsButton from "../components/notes/NoteStatisticsButton.vue";
-import { storedApiGetNoteAndItsChildren } from "../storedApi";
+import { storedApiGetNoteAndItsChildren, storedApiGetNoteWithDescendents } from "../storedApi";
 
 export default {
   name: "NoteShowPage",
@@ -45,10 +45,22 @@ export default {
     };
   },
   components: { LoadingPage, NotePageFrame, NoteStatisticsButton },
+  computed: {
+    noteComponent() {
+      if(this.viewType === 'article') return 'NoteOverview'
+      return 'NoteWithChildrenCards'
+    },
+    storedApiCall() {
+      if(this.viewType === 'article') return storedApiGetNoteWithDescendents
+      return storedApiGetNoteAndItsChildren
+
+    }
+
+  },
   methods: {
     fetchData() {
       this.loading = true
-      storedApiGetNoteAndItsChildren(this.$store, this.noteId)
+      this.storedApiCall(this.$store, this.noteId)
       .then((res) => {
         this.notePosition = res.notePosition;
       }).finally(() => this.loading = false);

@@ -48,8 +48,8 @@ const noteAndLinkRoutes = [
   {
     path: "notes/:noteId/overview",
     name: "noteOverview",
-    component: NoteOverviewPage,
-    props: true,
+    component: NoteShowPage,
+    props: (route)=>({noteId: route.params.noteId, viewType: 'article'}),
   },
   {
     path: "notes/:noteId/mindmap",
