@@ -7,6 +7,23 @@
         deleteRedirect: true,
         noteRouteName: 'noteShow',
         noteComponent: 'NoteWithChildrenCards'}"/>
+
+    <router-link
+      :to="{ name: 'noteOverview', params: { noteId: noteId } }"
+      role="button"
+      class="btn btn-sm"
+    >
+      Full view mode
+    </router-link>
+
+    <router-link
+      :to="{ name: 'mindmap', params: { noteId: noteId } }"
+      role="button"
+      class="btn btn-sm"
+    >
+      Mindmap mode
+    </router-link>
+
     <NoteStatisticsButton :noteId="noteId" />
   </LoadingPage>
 </template>

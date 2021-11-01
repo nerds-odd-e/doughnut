@@ -2,21 +2,7 @@
   <template v-if="note">
     <NoteWithLinks v-bind="note"/>
     <Cards :notes="children"/>
-    <router-link
-      :to="{ name: 'noteOverview', params: { noteId: noteId } }"
-      role="button"
-      class="btn btn-sm"
-    >
-      Full view mode
-    </router-link>
 
-    <router-link
-      :to="{ name: 'mindmap', params: { noteId: noteId } }"
-      role="button"
-      class="btn btn-sm"
-    >
-      Mindmap mode
-    </router-link>
   </template>
 
 </template>
