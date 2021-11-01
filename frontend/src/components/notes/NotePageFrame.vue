@@ -6,7 +6,7 @@
       </div>
       <div class="content">
         <component :is="noteComponent" 
-          v-bind="{noteId, highlightNoteId}"
+          v-bind="{noteId, highlightNoteId, expandChildren}"
           @highlight="highlight"
         />
       </div>
@@ -26,7 +26,8 @@ export default {
      notePosition: Object,
      noteComponent: String,
      deleteRedirect: Boolean,
-     noteRouteName: String
+     noteRouteName: String,
+     expandChildren: { type: Boolean, required: true },
   },
   data() {
     return {

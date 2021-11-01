@@ -4,6 +4,7 @@
       <NoteMindmap v-bind="{
           highlightNoteId,
           noteId,
+          expandChildren,
           scale: offset.scale,
           rotate: offset.rotate,
           }"
@@ -28,6 +29,7 @@ export default {
   props: {
     noteId: [String, Number],
     highlightNoteId: [String, Number],
+    expandChildren: { type: Boolean, required: true },
   },
   emits: ['highlight'],
   data() {

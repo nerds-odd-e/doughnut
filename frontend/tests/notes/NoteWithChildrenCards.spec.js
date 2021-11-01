@@ -17,7 +17,7 @@ describe("note wth child cards", () => {
     renderWithStoreAndMockRoute(
       store,
       NoteWithChildrenCards,
-      { props: { noteId: noteParent.id, notePosition } },
+      { props: { noteId: noteParent.id, notePosition, expandChildren: true } },
     )
     expect(screen.getAllByRole("title")).toHaveLength(1);
     await screen.findByText("parent");
