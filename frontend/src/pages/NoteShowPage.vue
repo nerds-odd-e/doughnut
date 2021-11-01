@@ -6,7 +6,7 @@
     <Breadcrumb v-bind="notePosition" />
       </div>
       <div class="content">
-    <NoteWithChildrenCards v-if="!loading" v-bind="{id: noteId, owns: notePosition.owns}"/>
+    <NoteWithChildrenCards v-if="!loading" v-bind="{id: noteId}"/>
       </div>
     </div>
     <NoteStatisticsButton :noteId="noteId" />

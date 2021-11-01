@@ -1,10 +1,7 @@
 <template>
   <template v-if="note">
     <NoteWithLinks v-bind="note"/>
-    <NoteOwnerViewCards
-      :owns="owns"
-      :notes="children"
-    />
+    <Cards :notes="children"/>
 
     <router-link
       :to="{ name: 'noteOverview', params: { noteId: id } }"
@@ -26,18 +23,17 @@
 </template>
 
 <script>
-import NoteOwnerViewCards from "./NoteOwnerViewCards.vue";
 import NoteWithLinks from "./NoteWithLinks.vue";
+import Cards from "./Cards.vue";
 
 export default {
   name: "NoteViewedByUser",
   props: {
     id: [String, Number],
-    owns: Boolean,
   },
   components: {
     NoteWithLinks,
-    NoteOwnerViewCards,
+    Cards,
   },
   computed: {
     note() {
