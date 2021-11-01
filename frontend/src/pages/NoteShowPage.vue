@@ -7,9 +7,9 @@
       </div>
       <div class="content">
     <NoteWithChildrenCards v-if="!loading" v-bind="{id: noteId, owns: notePosition.owns}"/>
-    <NoteStatisticsButton :noteId="noteId" />
       </div>
     </div>
+    <NoteStatisticsButton :noteId="noteId" />
   </ContainerPage>
 </template>
 
