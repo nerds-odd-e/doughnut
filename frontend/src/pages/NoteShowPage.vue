@@ -5,7 +5,7 @@
         noteId,
         notePosition,
         deleteRedirect: true,
-        expendChildren: true,
+        expandChildren: true,
         noteRouteName: 'noteShow',
         noteComponent: 'NoteWithChildrenCards'}"/>
 
@@ -37,7 +37,7 @@ import { storedApiGetNoteAndItsChildren } from "../storedApi";
 
 export default {
   name: "NoteShowPage",
-  props: { noteId: [String, Number] },
+  props: { noteId: [String, Number], viewType: String },
   data() {
     return {
       notePosition: null,
