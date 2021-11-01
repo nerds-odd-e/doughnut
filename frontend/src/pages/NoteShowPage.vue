@@ -5,6 +5,7 @@
         noteId,
         notePosition,
         deleteRedirect: true,
+        expendChildren: true,
         noteRouteName: 'noteShow',
         noteComponent: 'NoteWithChildrenCards'}"/>
 

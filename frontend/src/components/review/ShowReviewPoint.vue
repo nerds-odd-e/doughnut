@@ -1,14 +1,13 @@
 <template>
     <div v-if="!!noteWithPosition">
-    <div class="box">
-      <div class="header">
-      <NoteControl :noteId="noteId" :deleteRedirect="true"/>
-      <Breadcrumb v-bind="noteWithPosition.notePosition" />
-      </div>
-      <div class="content">
-      <NoteWithChildrenCards v-bind="{noteId, highlightNoteId: noteId, expendChildren: false}"/>
-      </div>
-    </div>
+      <NotePageFrame
+      v-bind="{
+        noteId,
+        notePosition,
+        deleteRedirect: true,
+        expendChildren: false,
+        noteRouteName: 'noteShow',
+        noteComponent: 'NoteWithChildrenCards'}"/>
     </div>
 
     <div v-if="!!linkViewedByUser">
@@ -26,9 +25,7 @@
 </template>
 
 <script>
-import NoteWithChildrenCards from "../notes/NoteWithChildrenCards.vue";
-import Breadcrumb from "../notes/Breadcrumb.vue";
-import NoteControl from "../commons/NoteControl.vue";
+import NotePageFrame from "../notes/NotePageFrame.vue";
 import LinkShow from "../links/LinkShow.vue";
 import LinkNob from "../links/LinkNob.vue";
 
@@ -37,7 +34,7 @@ export default {
     noteWithPosition: Object,
     linkViewedByUser: Object,
   },
-  components: {NoteControl, NoteWithChildrenCards, Breadcrumb, LinkShow, LinkNob},
+  components: {NotePageFrame, LinkShow, LinkNob},
   computed: {
     noteId() {
       return this.noteWithPosition.notePosition.noteId

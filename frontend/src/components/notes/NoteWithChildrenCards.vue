@@ -1,7 +1,7 @@
 <template>
   <template v-if="note">
     <NoteWithLinks v-bind="note"/>
-    <Cards v-if="expandChildrenCards" :notes="children"/>
+    <Cards v-if="expandChildren" :notes="children"/>
   </template>
 
 </template>
@@ -15,7 +15,7 @@ export default {
   props: {
     noteId: [String, Number],
     highlightNoteId: [String, Number],
-    expandChildrenCards: { type: Boolean, default: true },
+    expandChildren: { type: Boolean, required: true },
   },
   emits: ['highlight'],
   components: {

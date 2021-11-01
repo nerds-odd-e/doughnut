@@ -5,6 +5,7 @@
         noteId,
         notePosition,
         deleteRedirect: false,
+        expendChildren: true,
         noteRouteName: 'mindmap',
         noteComponent: 'NoteMindmapWithListner'}"/>
   </LoadingPage>
