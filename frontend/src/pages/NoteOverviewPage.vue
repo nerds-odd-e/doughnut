@@ -1,23 +1,19 @@
 <template>
-  <ContainerPage v-bind="{ loading, contentExists: !!notePosition }">
-    <div class="box">
-      <div class="header">
-    <NoteControl :noteId="noteId" :deleteRedirect="false"/>
-    <Breadcrumb v-bind="notePosition" />
-      </div>
-      <div class="content">
-    <NoteOverview v-bind="{ noteId }" />
-      </div>
-    </div>
-  </ContainerPage>
+  <LoadingPage v-bind="{ loading, contentExists: !!notePosition, inContainer: true }">
+    <NotePageFrame
+      v-bind="{
+        noteId,
+        notePosition,
+        deleteRedirect: false,
+        noteRouteName: 'noteOverview',
+        noteComponent: 'NoteOverview'}"/>
+  </LoadingPage>
 </template>
 
 <script>
-import ContainerPage from "./commons/ContainerPage.vue";
-import NoteControl from "../components/commons/NoteControl.vue";
+import LoadingPage from "./commons/LoadingPage.vue";
+import NotePageFrame from '../components/notes/NotePageFrame.vue';
 import { storedApiGetNoteWithDescendents } from "../storedApi";
-import NoteOverview from "../components/notes/NoteOverview.vue";
-import Breadcrumb from "../components/notes/Breadcrumb.vue";
 
 export default {
   name: "NoteOverviewPage",
@@ -28,7 +24,7 @@ export default {
       loading: true,
     };
   },
-  components: { NoteControl, ContainerPage, NoteOverview, Breadcrumb },
+  components: { LoadingPage, NotePageFrame },
   methods: {
 
     fetchData() {
@@ -52,20 +48,3 @@ export default {
   },
 };
 </script>
-
-<style lang="sass" scoped>
-.box
-  display: flex
-  flex-flow: column
-  height: 100%
-
-.box .header
-  flex: 0 1 auto
-
-.box .content
-  flex: 1 1 auto
-  overflow: hidden
-
-.box .footer
-  flex: 0 1 40px
-</style>
