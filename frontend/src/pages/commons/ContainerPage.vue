@@ -1,10 +1,8 @@
 <template>
-  <div class="container">
+  <LoadingPage v-bind="{ loading, contentExists, inContainer: true }">
     <h2 v-if="!!title">{{title}}</h2>
-    <LoadingPage v-bind="{ loading, contentExists }">
-      <slot/>
-    </LoadingPage>
-  </div>
+    <slot/>
+  </LoadingPage>
 </template>
 
 <script setup>

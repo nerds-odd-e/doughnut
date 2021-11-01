@@ -1,5 +1,5 @@
 <template>
-  <ContainerPage v-bind="{ loading, contentExists: !!notePosition }">
+  <LoadingPage v-bind="{ loading, contentExists: !!notePosition, inContainer: true }">
     <div class="box">
       <div class="header">
     <NoteControl :noteId="noteId" :deleteRedirect="true"/>
@@ -10,10 +10,11 @@
       </div>
     </div>
     <NoteStatisticsButton :noteId="noteId" />
-  </ContainerPage>
+  </LoadingPage>
 </template>
 
 <script>
+import LoadingPage from "./commons/LoadingPage.vue";
 import Breadcrumb from "../components/notes/Breadcrumb.vue";
 import NoteWithChildrenCards from "../components/notes/NoteWithChildrenCards.vue";
 import NoteStatisticsButton from "../components/notes/NoteStatisticsButton.vue";
@@ -30,7 +31,7 @@ export default {
       loading: true,
     };
   },
-  components: { NoteControl, Breadcrumb, NoteWithChildrenCards, NoteStatisticsButton, ContainerPage },
+  components: { LoadingPage, NoteControl, Breadcrumb, NoteWithChildrenCards, NoteStatisticsButton, ContainerPage },
   methods: {
     fetchData() {
       this.loading = true
