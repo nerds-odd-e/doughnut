@@ -71,8 +71,6 @@ export default {
   flex: 1 1 auto
   overflow: hidden
 
-
 .box .footer
   flex: 0 1 40px
-
 </style>

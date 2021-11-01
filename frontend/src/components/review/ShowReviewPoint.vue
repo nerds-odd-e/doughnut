@@ -1,8 +1,14 @@
 <template>
     <div v-if="!!noteWithPosition">
+    <div class="box">
+      <div class="header">
       <NoteControl :noteId="noteId" :deleteRedirect="true"/>
       <Breadcrumb v-bind="noteWithPosition.notePosition" />
+      </div>
+      <div class="content">
       <NoteWithLinks v-bind="note" v-if="note"/>
+      </div>
+    </div>
     </div>
 
     <div v-if="!!linkViewedByUser">
@@ -43,3 +49,20 @@ export default {
 }
 
 </script>
+
+<style lang="sass" scoped>
+.box
+  display: flex
+  flex-flow: column
+  height: 100%
+
+.box .header
+  flex: 0 1 auto
+
+.box .content
+  flex: 1 1 auto
+  overflow: hidden
+
+.box .footer
+  flex: 0 1 40px
+</style>
