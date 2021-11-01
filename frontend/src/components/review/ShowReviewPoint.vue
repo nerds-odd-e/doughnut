@@ -6,7 +6,7 @@
       <Breadcrumb v-bind="noteWithPosition.notePosition" />
       </div>
       <div class="content">
-      <NoteWithLinks v-bind="note" v-if="note"/>
+      <NoteWithChildrenCards v-bind="{noteId, highlightNoteId: noteId, expendChildren: false}"/>
       </div>
     </div>
     </div>
@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import NoteWithLinks from "../notes/NoteWithLinks.vue";
+import NoteWithChildrenCards from "../notes/NoteWithChildrenCards.vue";
 import Breadcrumb from "../notes/Breadcrumb.vue";
 import NoteControl from "../commons/NoteControl.vue";
 import LinkShow from "../links/LinkShow.vue";
@@ -37,13 +37,10 @@ export default {
     noteWithPosition: Object,
     linkViewedByUser: Object,
   },
-  components: {NoteControl, NoteWithLinks, Breadcrumb, LinkShow, LinkNob},
+  components: {NoteControl, NoteWithChildrenCards, Breadcrumb, LinkShow, LinkNob},
   computed: {
     noteId() {
       return this.noteWithPosition.notePosition.noteId
-    },
-    note() {
-      return this.$store.getters.getNoteById(this.noteId)
     },
   }
 }
