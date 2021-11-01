@@ -18,11 +18,5 @@ export default {
   computed: {
     currentNote() { return this.$store.getters.getNoteById(this.noteId)},
   },
-  mounted() {
-    this.$store.commit('highlightNoteId', this.noteId)
-  },
-  unmounted() {
-    this.$store.commit('highlightNoteId', null)
-  }
 };
 </script>
