@@ -273,6 +273,7 @@ Then("I should see the title {string} of the notebook", (noteTitle) => {
 
 Then("I should see the child notes {string} in order", (notesStr) => {
   const notes = notesStr.split(",");
+  cy.findByText(notes[notes.length - 1])
   cy.findAllByRole("title").then((elms) => {
     let actual = [];
     elms.map((i, actualNote) => actual.push(actualNote.innerHTML));
