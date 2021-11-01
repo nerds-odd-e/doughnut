@@ -1,10 +1,10 @@
 <template>
-  <LoadingPage v-bind="{ loading, contentExists: !!notePosition, inContainer: true }">
+  <LoadingPage v-bind="{ loading, contentExists: !!notePosition, inContainer }">
     <NotePageFrame
       v-bind="{
         noteId,
         notePosition,
-        deleteRedirect: true,
+        deleteRedirect,
         expandChildren: true,
         noteRouteName: 'noteShow',
         noteComponent}"/>
@@ -48,13 +48,26 @@ export default {
   computed: {
     noteComponent() {
       if(this.viewType === 'article') return 'NoteOverview'
+      if(this.viewType === 'mindmap') return 'NoteMindmapWithListner'
       return 'NoteWithChildrenCards'
     },
+
     storedApiCall() {
       if(this.viewType === 'article') return storedApiGetNoteWithDescendents
+      if(this.viewType === 'mindmap') return storedApiGetNoteWithDescendents
       return storedApiGetNoteAndItsChildren
+    },
 
-    }
+    deleteRedirect() {
+      if(this.viewType === 'article') return false
+      if(this.viewType === 'mindmap') return false
+      return true
+    },
+
+    deleteRedirect() {
+      if(this.viewType === 'mindmap') return false
+      return true
+    },
 
   },
   methods: {
@@ -68,6 +81,9 @@ export default {
   },
   watch: {
     noteId() {
+      this.fetchData();
+    },
+    viewType() {
       this.fetchData();
     },
   },

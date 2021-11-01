@@ -14,8 +14,6 @@ import CircleJoinPage from "@/pages/CircleJoinPage.vue";
 import FailureReportListPage from "@/pages/FailureReportListPage.vue";
 import FailureReportPage from "@/pages/FailureReportPage.vue";
 import UserProfilePage from "@/pages/UserProfilePage.vue";
-import NoteOverviewPage from "@/pages/NoteOverviewPage.vue";
-import NoteMindmapPage from "@/pages/NoteMindmapPage.vue";
 
 const NestedInitialReviewPage = NestedPage(
   InitialReviewPage,
@@ -54,8 +52,8 @@ const noteAndLinkRoutes = [
   {
     path: "notes/:noteId/mindmap",
     name: "mindmap",
-    component: NoteMindmapPage,
-    props: true,
+    component: NoteShowPage,
+    props: (route)=>({noteId: route.params.noteId, viewType: 'mindmap'}),
   },
 ];
 

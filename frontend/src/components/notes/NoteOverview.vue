@@ -1,5 +1,5 @@
 <template>
-  <NoteWithLinks v-bind="{ ...noteViewedByUser }"/>
+  <NoteWithLinks v-bind="{ ...note }" v-if="note"/>
   <div class="note-list">
     <NoteOverview
       v-for="childId in childrenIds"
@@ -23,7 +23,7 @@ export default {
   emits: ["highlight"],
   components: { NoteWithLinks },
   computed: {
-    noteViewedByUser() {
+    note() {
       return this.$store.getters.getNoteById(this.noteId);
     },
     childrenIds() {
