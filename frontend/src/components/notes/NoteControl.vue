@@ -7,7 +7,7 @@
 
 <script>
 
-import NoteButtons from '../notes/NoteButtons.vue'
+import NoteButtons from './NoteButtons.vue'
 
 export default {
   props: {
