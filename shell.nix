@@ -120,7 +120,7 @@ in mkShell {
     cypress
     firefox
     geckodriver
-    google-chrome
+    chromium
     intellij
     psmisc
     sequeler
