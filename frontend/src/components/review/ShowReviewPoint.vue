@@ -3,7 +3,7 @@
       <NotePageFrame
       v-bind="{
         noteId,
-        notePosition,
+        notePosition: noteWithPosition.notePosition,
         deleteRedirect: true,
         expendChildren: false,
         noteRouteName: 'noteShow',
