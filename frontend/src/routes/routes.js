@@ -35,7 +35,7 @@ const noteAndLinkRoutes = [
     path: "notes/:noteId",
     name: "noteShow",
     component: NoteShowPage,
-    props: (route)=>({noteId: route.params.noteId, viewType: 'one-note'}),
+    props: (route)=>({noteId: route.params.noteId, viewType: 'cards'}),
   },
   {
     path: "links/:linkid",

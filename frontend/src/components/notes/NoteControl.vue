@@ -1,6 +1,10 @@
 <template>
   <nav class="navbar toolbar">
-    <NoteButtons v-if="currentNote" :note="currentNote" :deleteRedirect="deleteRedirect"/>
+    <NoteButtons v-if="currentNote"
+    :note="currentNote"
+    :deleteRedirect="deleteRedirect"
+    :viewType="viewType"
+    />
   </nav>
   <slot />
 </template>
@@ -12,7 +16,8 @@ import NoteButtons from './NoteButtons.vue'
 export default {
   props: {
     noteId: [String, Number],
-    deleteRedirect: {type: Boolean, required: true}
+    deleteRedirect: {type: Boolean, required: true},
+    viewType: String,
   },
   components: { NoteButtons },
   computed: {

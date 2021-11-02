@@ -10,8 +10,7 @@ Feature: Note overview with nested children
       | History          | Singapore     |             |
       | Geography        | Singapore     |             |
       | Leaving Malaysia | History       | in 1965     |
-    And I open "Singapore" note from top level
-    And I click on the overview button
+    And I click on the overview button of note "Singapore"
 
   Scenario: View the child notes of a child note in sequential order
     Then I should see the title "Singapore" of the notebook

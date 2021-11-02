@@ -5,25 +5,10 @@
         noteId,
         notePosition,
         deleteRedirect,
+        viewType,
         expandChildren: true,
         noteRouteName: 'noteShow',
         noteComponent}"/>
-
-    <router-link
-      :to="{ name: 'noteOverview', params: { noteId: noteId } }"
-      role="button"
-      class="btn btn-sm"
-    >
-      Full view mode
-    </router-link>
-
-    <router-link
-      :to="{ name: 'mindmap', params: { noteId: noteId } }"
-      role="button"
-      class="btn btn-sm"
-    >
-      Mindmap mode
-    </router-link>
 
     <NoteStatisticsButton :noteId="noteId" />
   </LoadingPage>
@@ -64,7 +49,7 @@ export default {
       return true
     },
 
-    deleteRedirect() {
+    inContainer() {
       if(this.viewType === 'mindmap') return false
       return true
     },

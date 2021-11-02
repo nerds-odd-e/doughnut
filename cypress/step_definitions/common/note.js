@@ -189,12 +189,12 @@ When(
   }
 );
 
-When("I click on the overview button", () => {
-  cy.findByText("Full view mode").click();
+When("I click on the overview button of note {string}", (noteTitle) => {
+    cy.clickNotePageButton(noteTitle, "article view");
 });
 
-When("I click on the mindmap view button", () => {
-  cy.findByText("Mindmap mode").click();
+When("I click on the mindmap view button of note {string}", (noteTitle) => {
+    cy.clickNotePageButton(noteTitle, "mindmap view");
 });
 
 When("I should see the note {string} is {int}px * {int}px offset the center of the map", (noteTitle, dx, dy) => {

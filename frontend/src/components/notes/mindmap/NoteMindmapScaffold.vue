@@ -1,24 +1,26 @@
 <template>
-  <component v-bind:is="noteComponent" v-bind="{
-      note: noteViewedByUser,
-      mindmapSector,
-      mindmap,
-      highlighted: highlightNoteId === noteId
-    }"
-    @highlight="$emit('highlight', noteId)"
-  />
-  <NoteMindmapScaffold
-    v-for="(childId, index) in childrenIds"
-    v-bind="{
-      highlightNoteId,
-      noteComponent,
-      noteId: childId,
-      mindmapSector: mindmapSector.getChildSector(childrenIds.length, index),
-      mindmap,
-    }"
-    :key="childId"
-    @highlight="$emit('highlight', $event)"
-  />
+  <template v-if="note">
+    <component v-bind:is="noteComponent" v-bind="{
+        note,
+        mindmapSector,
+        mindmap,
+        highlighted: highlightNoteId === noteId
+      }"
+      @highlight="$emit('highlight', noteId)"
+    />
+    <NoteMindmapScaffold
+      v-for="(childId, index) in childrenIds"
+      v-bind="{
+        highlightNoteId,
+        noteComponent,
+        noteId: childId,
+        mindmapSector: mindmapSector.getChildSector(childrenIds.length, index),
+        mindmap,
+      }"
+      :key="childId"
+      @highlight="$emit('highlight', $event)"
+    />
+  </template>
 </template>
 
 <script>
@@ -39,7 +41,7 @@ export default {
   emits: ['highlight'],
   components: { NoteCard, NoteParentChildConnection, NoteLinks },
   computed: {
-    noteViewedByUser() {
+    note() {
       return this.$store.getters.getNoteById(this.noteId);
     },
     childrenIds() {

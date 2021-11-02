@@ -6,6 +6,7 @@
         notePosition: noteWithPosition.notePosition,
         deleteRedirect: true,
         expendChildren: false,
+        viewType: 'cards',
         noteRouteName: 'noteShow',
         noteComponent: 'NoteWithChildrenCards'}"/>
     </div>

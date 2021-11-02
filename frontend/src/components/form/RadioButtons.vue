@@ -2,25 +2,25 @@
   <InputWithType v-bind="{ scopeName, field, errors }">
     <output
       :id="`${scopeName}-${field}`"
-      role="radiogroup"
-      class="filter-switch"
+      class="btn-group filter-switch"
     >
-      <span
+      <template
         v-for="option in options"
         :key="option.value"
         class="filter-switch-item"
       >
         <input
+          class="btn-check"
           type="radio"
           :value="option.value"
           :id="`${scopeName}-${option.value}`"
           v-model="modelValue"
         />
-        <label :for="`${scopeName}-${option.value}`">
+        <label role="button" :title ="option.title" class="btn btn-outline-primary text-nowrap" :for="`${scopeName}-${option.value}`">
           <slot name="labelAddition" :value="option.value" />
           {{ option.label }}
         </label>
-      </span>
+      </template>
     </output>
   </InputWithType>
 </template>
@@ -46,26 +46,12 @@ export default {
 </script>
 
 <style scoped>
-.filter-switch label {
+.btn-group {
+  flex-wrap: wrap;
+}
+
+label {
   font-size: small;
-  cursor: pointer;
-  margin-right: 5px;
-  border-radius: 5px;
-  padding: 2px;
-  border: solid 1px #32612d;
 }
 
-.filter-switch .filter-switch-item input {
-  display: none;
-}
-
-.filter-switch .filter-switch-item input:checked + label {
-  color: white;
-  background-color: #03ac13;
-}
-
-.filter-switch .filter-switch-item input:not(:checked) + label {
-  --bg-opacity: 0;
-  box-shadow: none;
-}
 </style>
