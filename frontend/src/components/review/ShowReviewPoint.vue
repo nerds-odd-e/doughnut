@@ -7,7 +7,7 @@
         deleteRedirect: true,
         expendChildren: false,
         viewType: 'cards',
-        noteComponent: 'NoteWithChildrenCards'}"/>
+        noteComponent: 'NoteCardsView'}"/>
     </div>
 
     <div v-if="!!linkViewedByUser">
@@ -25,7 +25,7 @@
 </template>
 
 <script>
-import NotePageFrame from "../notes/NotePageFrame.vue";
+import NotePageFrame from "../notes/views/NotePageFrame.vue";
 import LinkShow from "../links/LinkShow.vue";
 import LinkNob from "../links/LinkNob.vue";
 

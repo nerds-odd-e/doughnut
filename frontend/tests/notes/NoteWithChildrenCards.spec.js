@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import { screen } from "@testing-library/vue";
-import NoteWithChildrenCards from "@/components/notes/NoteWithChildrenCards.vue";
+import NoteCardsView from "@/components/notes/views/NoteCardsView.vue";
 import store from "../../src/store/index.js";
 import { renderWithStoreAndMockRoute } from "../helpers";
 import makeMe from "../fixtures/makeMe";
@@ -16,7 +16,7 @@ describe("note wth child cards", () => {
     store.commit("loadNotes", [noteParent, noteChild]);
     renderWithStoreAndMockRoute(
       store,
-      NoteWithChildrenCards,
+      NoteCardsView,
       { props: { noteId: noteParent.id, notePosition, expandChildren: true } },
     )
     expect(screen.getAllByRole("title")).toHaveLength(1);

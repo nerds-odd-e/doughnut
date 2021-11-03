@@ -14,11 +14,11 @@
 </template>
 
 <script>
-import NoteControl from "../toolbars/NoteControl.vue";
-import NoteMindmapWithListner from "./NoteMindmapWithListner.vue";
-import NoteWithChildrenCards from "./NoteWithChildrenCards.vue";
-import NoteArticleView from "./views/NoteArticleView.vue";
-import Breadcrumb from "./Breadcrumb.vue";
+import NoteControl from "../../toolbars/NoteControl.vue";
+import NoteMindmapView from "./NoteMindmapView.vue";
+import NoteCardsView from "./NoteCardsView.vue";
+import NoteArticleView from "./NoteArticleView.vue";
+import Breadcrumb from "../Breadcrumb.vue";
 
 export default {
   props: {
@@ -34,7 +34,7 @@ export default {
       highlightNoteId: null,
     };
   },
-  components: { NoteControl, NoteMindmapWithListner, Breadcrumb, NoteWithChildrenCards, NoteArticleView },
+  components: { NoteControl, NoteMindmapView, Breadcrumb, NoteCardsView, NoteArticleView },
   methods: {
     highlight(id) { this.highlightNoteId = id},
   },

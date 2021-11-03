@@ -7,11 +7,10 @@
 </template>
 
 <script>
-import NoteWithLinks from "./NoteWithLinks.vue";
-import Cards from "./Cards.vue";
+import NoteWithLinks from "../NoteWithLinks.vue";
+import Cards from "../Cards.vue";
 
 export default {
-  name: "NoteViewedByUser",
   props: {
     noteId: [String, Number],
     highlightNoteId: [String, Number],

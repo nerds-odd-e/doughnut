@@ -15,7 +15,7 @@
 
 <script>
 import LoadingPage from "./commons/LoadingPage.vue";
-import NotePageFrame from '../components/notes/NotePageFrame.vue';
+import NotePageFrame from '../components/notes/views/NotePageFrame.vue';
 import NoteStatisticsButton from "../components/notes/NoteStatisticsButton.vue";
 import { storedApiGetNoteAndItsChildren, storedApiGetNoteWithDescendents } from "../storedApi";
 
@@ -32,8 +32,8 @@ export default {
   computed: {
     noteComponent() {
       if(this.viewType === 'article') return 'NoteArticleView'
-      if(this.viewType === 'mindmap') return 'NoteMindmapWithListner'
-      return 'NoteWithChildrenCards'
+      if(this.viewType === 'mindmap') return 'NoteMindmapView'
+      return 'NoteCardsView'
     },
 
     storedApiCall() {
