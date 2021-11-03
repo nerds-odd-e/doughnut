@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import NoteControl from "./NoteControl.vue";
+import NoteControl from "../toolbars/NoteControl.vue";
 import NoteMindmapWithListner from "./NoteMindmapWithListner.vue";
 import NoteWithChildrenCards from "./NoteWithChildrenCards.vue";
 import NoteOverview from "./NoteOverview.vue";

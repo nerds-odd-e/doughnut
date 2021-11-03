@@ -6,7 +6,7 @@
 
 <script>
 import SvgEdit from "../svgs/SvgEdit.vue";
-import NoteEditDialog from "./NoteEditDialog.vue";
+import NoteEditDialog from "../notes/NoteEditDialog.vue";
 
 export default {
   name: "NoteNewButton",

@@ -28,8 +28,8 @@
 </template>
 
 <script>
-import Breadcrumb from "./Breadcrumb.vue";
-import NoteFormBody from "./NoteFormBody.vue";
+import Breadcrumb from "../notes/Breadcrumb.vue";
+import NoteFormBody from "../notes/NoteFormBody.vue";
 import ModalWithButton from "../commons/ModalWithButton.vue";
 import LinkTypeSelect from "../links/LinkTypeSelect.vue";
 import { storedApiGetNoteAndItsChildren, storedApiCreateNote } from "../../storedApi";
