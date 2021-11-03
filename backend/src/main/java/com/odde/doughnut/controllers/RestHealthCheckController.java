@@ -29,8 +29,10 @@ class RestHealthCheckController {
     @GetMapping("/data_upgrade")
     @Transactional
     public List dataUpgrade() {
-        modelFactoryService.entityManager.createNativeQuery("delete from review_point where note_id is null").executeUpdate();
-        List resultList = modelFactoryService.entityManager.createNativeQuery("select user_id, note_id, count(1) as cnt from review_point rp group by note_id, user_id having note_id is null").getResultList();
+        modelFactoryService.entityManager.createNativeQuery("delete from review_point where note_id=1806").executeUpdate();
+        modelFactoryService.entityManager.createNativeQuery("delete from review_point where note_id=2411").executeUpdate();
+        modelFactoryService.entityManager.createNativeQuery("delete from review_point where note_id=2446").executeUpdate();
+        List resultList = modelFactoryService.entityManager.createNativeQuery("select user_id, note_id, link_id, count(1) as cnt from review_point rp group by note_id, user_id, link_id having cnt > 1").getResultList();
         return resultList;
     }
 
