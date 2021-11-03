@@ -1,6 +1,7 @@
 
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -28,7 +29,7 @@ class RestHealthCheckController {
     @GetMapping("/data_upgrade")
     @Transactional
     public List dataUpgrade() {
-        List resultList = modelFactoryService.entityManager.createQuery("select user_id, note_id, count(1) from review_point rp group by note_id, user_id").getResultList();
+        List resultList = modelFactoryService.entityManager.createNativeQuery("select user_id, note_id, count(1) from review_point rp group by note_id, user_id").getResultList();
         return resultList;
     }
 

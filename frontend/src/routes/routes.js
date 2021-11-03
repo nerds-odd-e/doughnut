@@ -29,26 +29,22 @@ const NestedRepeatPage = NestedPage(
   "Please answer the question first before you explore the notes."
 );
 
+const viewTypes = [
+  {name: 'cards', path: 'cards', routeName: 'noteCards', title: 'cards view'},
+  {name: 'article', path: 'article', routeName: 'noteArticle', title: 'article view'},
+  {name: 'mindmap', path: 'mindmap', routeName: 'noteMindmap', title: 'mindmap view'},
+]
+
+const noteShowRoutes = viewTypes.map(({name, path, routeName})=>({
+    path: `notes/:noteId/${path}`,
+    name: routeName,
+    component: NoteShowPage,
+    props: (route)=>({noteId: route.params.noteId, viewType: name}),
+}))
+
 const noteAndLinkRoutes = [
   { path: "notebooks", name: "notebooks", component: NotebooksPage },
-  {
-    path: "notes/:noteId",
-    name: "noteCards",
-    component: NoteShowPage,
-    props: (route)=>({noteId: route.params.noteId, viewType: 'cards'}),
-  },
-  {
-    path: "notes/:noteId/overview",
-    name: "noteArticle",
-    component: NoteShowPage,
-    props: (route)=>({noteId: route.params.noteId, viewType: 'article'}),
-  },
-  {
-    path: "notes/:noteId/mindmap",
-    name: "noteMindmap",
-    component: NoteShowPage,
-    props: (route)=>({noteId: route.params.noteId, viewType: 'mindmap'}),
-  },
+  ...noteShowRoutes,
   {
     path: "links/:linkid",
     name: "linkShow",
