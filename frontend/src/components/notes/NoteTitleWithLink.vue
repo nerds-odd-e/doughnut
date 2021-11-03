@@ -1,7 +1,7 @@
 <template>
   <template v-if="!!note">
     <router-link
-      :to="{ name: 'noteShow', params: { noteId: note.id, viewType: $route.params.viewType} }"
+      :to="{ name: 'noteShow', params: { noteId: note.id, viewType} }"
       class="text-decoration-none"
     >
       {{ note.title }}
@@ -17,10 +17,10 @@ export default {
   },
   computed: {
     viewType() {
-      if(noteRouteName === 'noteCards') return 'cards'
-      if(noteRouteName === 'noteMindmap') return 'mindmap'
-      if(noteRouteName === 'noteArticle') return 'article'
-      return this.$route.params.viewType
+      if(this.noteRouteName === 'noteCards') return 'cards'
+      if(this.noteRouteName === 'noteMindmap') return 'mindmap'
+      if(this.noteRouteName === 'noteArticle') return 'article'
+      return this.$route.params?.viewType
     }
   }
 
