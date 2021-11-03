@@ -1,7 +1,7 @@
 <template>
     <div class="box">
       <div class="header">
-        <NoteControl :noteId="highlightNoteId" :deleteRedirect="deleteRedirect" :viewType="viewType"/>
+        <NoteControl :noteId="highlightNoteId" :viewType="viewType"/>
         <Breadcrumb v-bind="notePosition"/>
       </div>
       <div class="content">
@@ -26,7 +26,6 @@ export default {
      notePosition: Object,
      noteComponent: String,
      viewType: String,
-     deleteRedirect: Boolean,
      expandChildren: { type: Boolean, required: true },
   },
   data() {

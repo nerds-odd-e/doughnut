@@ -4,7 +4,6 @@
       v-bind="{
         noteId,
         notePosition: noteWithPosition.notePosition,
-        deleteRedirect: true,
         expendChildren: false,
         viewType: 'cards',
         noteComponent: 'NoteCardsView'}"/>

@@ -4,7 +4,6 @@
       v-bind="{
         noteId,
         notePosition,
-        deleteRedirect,
         viewType,
         expandChildren: true,
         noteComponent}"/>
@@ -40,12 +39,6 @@ export default {
       if(this.viewType === 'article') return storedApiGetNoteWithDescendents
       if(this.viewType === 'mindmap') return storedApiGetNoteWithDescendents
       return storedApiGetNoteAndItsChildren
-    },
-
-    deleteRedirect() {
-      if(this.viewType === 'article') return false
-      if(this.viewType === 'mindmap') return false
-      return true
     },
 
   },

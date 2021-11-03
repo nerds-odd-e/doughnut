@@ -80,11 +80,11 @@ import NoteSplitButton from "./NoteSplitButton.vue";
 import NoteNewButton from "./NoteNewButton.vue";
 import ViewTypeButtons from "./ViewTypeButtons.vue";
 import { storedApiDeleteNote } from "../../storedApi";
+import { viewType } from "../../models/viewTypes";
 export default {
   name: "NoteButtons",
   props: {
     note: Object,
-    deleteRedirect: { type: Boolean, required: true},
     viewType: String,
   },
   components: {
@@ -108,7 +108,7 @@ export default {
         await storedApiDeleteNote(this.$store, this.note.id)
         this.$emit('ensureVisible', parentId)
         if(parentId) {
-          if(this.deleteRedirect) {
+          if(viewType(this.viewType).redirectAfterDelete) {
             this.$router.push({
               name: "noteCards",
               params: { noteId: parentId },
