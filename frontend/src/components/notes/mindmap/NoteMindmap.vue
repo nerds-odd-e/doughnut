@@ -26,6 +26,7 @@ export default {
   props: {
     highlightNoteId: [String, Number],
     noteId: [String, Number],
+    expandChildren: Boolean,
     scale: Number,
     rotate: Number,
   },

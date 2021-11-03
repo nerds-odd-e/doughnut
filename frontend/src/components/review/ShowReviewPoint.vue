@@ -4,7 +4,7 @@
       v-bind="{
         noteId,
         notePosition: noteWithPosition.notePosition,
-        expendChildren: false,
+        expandChildren: false,
         viewType: 'cards',
         noteComponent: 'NoteCardsView'}"/>
     </div>

@@ -14,7 +14,7 @@ describe("note overview", () => {
     renderWithStoreAndMockRoute(
       store,
       NoteOverview,
-      { props: { noteId: note.id } },
+      { props: { noteId: note.id, expandChildren: true } },
     );
     expect(screen.getByRole("title")).toHaveTextContent("single note");
     expect(screen.getAllByRole("title")).toHaveLength(1);
@@ -26,7 +26,7 @@ describe("note overview", () => {
     renderWithStoreAndMockRoute(
       store,
       NoteOverview,
-      { props: { noteId: note.id } },
+      { props: { noteId: note.id, expandChildren: true } },
     );
     await screen.findByText("a tool");
   });
@@ -38,7 +38,7 @@ describe("note overview", () => {
     renderWithStoreAndMockRoute(
       store,
       NoteOverview,
-      { props: { noteId: noteParent.id } },
+      { props: { noteId: noteParent.id, expandChildren: true } },
     );
     expect(screen.getAllByRole("title")).toHaveLength(2);
     await screen.findByText("parent");
@@ -53,7 +53,7 @@ describe("note overview", () => {
     renderWithStoreAndMockRoute(
       store,
       NoteOverview,
-      { props: { noteId: noteParent.id } },
+      { props: { noteId: noteParent.id, expandChildren: true } },
     );
     await screen.findByText("parent");
     await screen.findByText("child");
