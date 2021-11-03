@@ -67,7 +67,7 @@ export default {
       )
         .then((res) =>
           this.$router.push({
-            name: "noteCards",
+            name: "noteShow",
             params: { noteId: res.noteId },
           })
         )
@@ -83,7 +83,7 @@ export default {
         (r) => (this.loading = r)
       ).then((res) =>
         this.$router.push({
-          name: "noteCards",
+          name: "noteShow",
           replace: true,
           params: { noteId: res.noteId },
         })

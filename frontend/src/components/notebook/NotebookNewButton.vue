@@ -72,7 +72,7 @@ export default {
       )
         .then((res) =>
           this.$router.push({
-            name: "noteCards",
+            name: "noteShow",
             params: { noteId: res.noteId },
           })
         )
