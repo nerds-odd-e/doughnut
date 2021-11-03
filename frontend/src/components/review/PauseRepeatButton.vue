@@ -6,7 +6,7 @@
       :to="
         !!linkId
           ? { name: 'linkShow', params: { linkid: linkId } }
-          : { name: 'noteShow', params: { noteId } }
+          : { name: 'noteCards', params: { noteId } }
       "
       ><SvgPause
     /></router-link>

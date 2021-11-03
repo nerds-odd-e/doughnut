@@ -13,7 +13,7 @@
 
 <script setup>
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue";
-const props = defineProps({ ancestors: Array, noteRouteName: {type: String, default: 'noteShow'} });
+const props = defineProps({ ancestors: Array, noteRouteName: {type: String, default: 'noteCards'} });
 </script>
 
 <style scoped></style>

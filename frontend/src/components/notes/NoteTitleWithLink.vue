@@ -12,6 +12,6 @@
 <script setup>
 const props = defineProps({
   note: Object, 
-  noteRouteName: { type: String, default: 'noteShow'},
+  noteRouteName: { type: String, default: 'noteCards'},
  });
 </script>

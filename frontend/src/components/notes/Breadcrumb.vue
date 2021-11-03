@@ -36,7 +36,7 @@ export default {
     ancestors: Array,
     notebook: Object,
     owns: { type: Boolean, required: true },
-    noteRouteName: { type: String, default: 'noteShow'},
+    noteRouteName: { type: String, default: 'noteCards'},
   },
   components: {
     BasicBreadcrumb,

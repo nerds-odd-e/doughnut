@@ -126,7 +126,7 @@ export default {
     },
 
     viewTypeToRouteName(newType) {
-      if (newType === 'cards') return 'noteShow'
+      if (newType === 'cards') return 'noteCards'
       if (newType === 'mindmap') return 'mindmap'
       return 'noteOverview'
     },
@@ -139,7 +139,7 @@ export default {
         if(parentId) {
           if(this.deleteRedirect) {
             this.$router.push({
-              name: "noteShow",
+              name: "noteCards",
               params: { noteId: parentId },
             });
           }

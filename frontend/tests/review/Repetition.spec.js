@@ -59,7 +59,7 @@ describe("repetition page", () => {
         store,
         Repetition,
         { propsData: reviewPointForView },
-        { name: "repeat-noteShow", params: { noteId: 123 } }
+        { name: "repeat-noteCards", params: { noteId: 123 } }
       );
       expect(
         JSON.parse(wrapper.find(".link-source .router-link").attributes().to)

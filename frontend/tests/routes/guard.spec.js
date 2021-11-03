@@ -10,21 +10,21 @@ describe("router guards", () => {
     guard = routerScopeGuard("repeat", ["repeat-quiz"], async () => alert());
     next = jest.fn();
   });
-  test("when in repeat, go to nested noteShow", async () => {
+  test("when in repeat, go to nested noteCards", async () => {
     await guard(
-      { name: "noteShow", params: { noteId: 3 } },
+      { name: "noteCards", params: { noteId: 3 } },
       { name: "repeat" },
       next
     );
     expect(next).toHaveBeenCalledWith({
-      name: "repeat-noteShow",
+      name: "repeat-noteCards",
       params: { noteId: 3 },
     });
   });
 
   test("when in repeat, and going to already nested route", async () => {
     await guard(
-      { name: "repeat-noteShow", params: { noteId: 3 } },
+      { name: "repeat-noteCards", params: { noteId: 3 } },
       { name: "repeat" },
       next
     );
@@ -42,7 +42,7 @@ describe("router guards", () => {
 
   test("when in repeat-quiz, and going to a note route", async () => {
     await guard(
-      { name: "noteShow", params: { noteId: 2 } },
+      { name: "noteCards", params: { noteId: 2 } },
       { name: "repeat-quiz" },
       next
     );
