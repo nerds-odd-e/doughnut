@@ -40,10 +40,10 @@ const noteShowRoutes = viewTypes.map(({value, path, routeName})=>({
 const noteAndLinkRoutes = [
   { path: "notebooks", name: "notebooks", component: NotebooksPage },
   {
-      path: `notes/:noteId`,
-      name: 'noteShowDefault',
+      path: `notes/:noteId/:viewType?`,
+      name: 'noteShow',
       component: NoteShowPage,
-      props: (route)=>({noteId: route.params.noteId, viewType: 'cards'}),
+      props: true,
   },
   ...noteShowRoutes,
   {

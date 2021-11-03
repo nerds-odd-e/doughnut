@@ -6,14 +6,14 @@
   :style="`top:${coord.y}px; left:${coord.x}px`"
   v-on:click="$emit('highlight')">
     <h5 class="note-card-title">
-      <component :is="linkFragment" :note="note" class="card-title" />
+      <NoteTitleWithLink :noteRouteName="noteMindmap" :note="note" class="card-title" />
     </h5>
     <SvgDescriptionIndicator class="description-indicator" v-if="!!note.shortDescription"/>
   </NoteShell>
 </template>
 
 <script>
-import NoteTitleWithMindmapLink from "../NoteTitleWithMindmapLink.vue";
+import NoteTitleWithLink from "../NoteTitleWithLink.vue";
 import SvgDescriptionIndicator from "../../svgs/SvgDescriptionIndicator.vue";
 import NoteShell from "../NoteShell.vue";
 import MindmapSector from "@/models/MindmapSector";
@@ -24,10 +24,9 @@ export default {
     mindmapSector: MindmapSector,
     mindmap: Object,
     highlighted: Boolean,
-    linkFragment: { type: Object, default: NoteTitleWithMindmapLink },
   },
   emits: ['highlight'],
-  components: { NoteShell, SvgDescriptionIndicator, NoteTitleWithMindmapLink },
+  components: { NoteShell, SvgDescriptionIndicator, NoteTitleWithLink },
   computed: {
     coord() { return this.mindmap.coord(this.mindmapSector) },
 
