@@ -2,10 +2,7 @@
   <RadioButtons
     v-model="viewType"
     @update:modelValue="viewTypeChange"
-    v-bind="{ options: [
-      {value: 'cards', title: 'cards view'},
-      {value: 'mindmap', title: 'mindmap view'},
-      {value: 'article', title: 'article view'}] }"
+    v-bind="{ options }"
   >
     <template #labelAddition="{ value }">
       <SvgMindmap v-if="value==='mindmap'"/>
@@ -20,6 +17,7 @@ import RadioButtons from "../form/RadioButtons.vue";
 import SvgArticle from "../svgs/SvgArticle.vue";
 import SvgMindmap from "../svgs/SvgMindmap.vue";
 import SvgCards from "../svgs/SvgCards.vue";
+import {viewTypes, viewType} from "../../models/viewTypes";
 export default {
   props: {
     noteId: [String, Number],
@@ -32,16 +30,14 @@ export default {
     SvgArticle,
   },
 
+  computed: {
+    options() {return viewTypes},
+  },
   methods: {
     viewTypeChange(newType) {
-      this.$router.push({name: this.viewTypeToRouteName(newType), params:{ noteId }})
-    },
-
-    viewTypeToRouteName(newType) {
-      if (newType === 'cards') return 'noteCards'
-      if (newType === 'mindmap') return 'noteMindmap'
-      return 'noteArticle'
+      this.$router.push({name: viewType(newType).routeName, params:{ noteId }})
     },
   },
+
 };
 </script>

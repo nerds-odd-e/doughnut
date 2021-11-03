@@ -88,7 +88,6 @@ export default {
     viewType: String,
   },
   components: {
-    RadioButtons,
     SvgCog,
     SvgAddChild,
     SvgAddSibling,

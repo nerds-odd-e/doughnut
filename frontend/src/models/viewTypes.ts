@@ -11,4 +11,7 @@ const viewTypes: Array<ViewType> = [
   {value: 'mindmap', path: 'mindmap', routeName: 'noteMindmap', title: 'mindmap view'},
 ]
 
-export default viewTypes
+const viewType = (value:String): ViewType | undefined => {
+  return viewTypes.find((vt=> vt.value === value))
+}
+export { viewTypes, viewType }
