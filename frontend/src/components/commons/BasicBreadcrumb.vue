@@ -4,7 +4,7 @@
        class="breadcrumb bg-light bg-gradient">
       <slot name="topLink" />
       <li class="breadcrumb-item" v-for="note in ancestors" :key="note.id">
-        <NoteTitleWithLink v-bind="{note, noteRouteName}" />
+        <NoteTitleWithLink v-bind="{note}" />
       </li>
       <slot name="additional" />
     </ol>
@@ -13,7 +13,7 @@
 
 <script setup>
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue";
-const props = defineProps({ ancestors: Array, noteRouteName: {type: String, default: 'noteCards'} });
+const props = defineProps({ ancestors: Array });
 </script>
 
 <style scoped></style>

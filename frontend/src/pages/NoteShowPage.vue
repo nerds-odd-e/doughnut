@@ -7,7 +7,6 @@
         deleteRedirect,
         viewType,
         expandChildren: true,
-        noteRouteName: 'noteCards',
         noteComponent}"/>
 
     <NoteStatisticsButton :noteId="noteId" />

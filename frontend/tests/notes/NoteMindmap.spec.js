@@ -98,7 +98,7 @@ describe("note mindmap", () => {
 
     describe("links between note and note outside the map", () => {
       it("link target is not on the map", async () => {
-        const [top, child1] = notes
+        const [top] = notes
         const noteThatIsNotOnTheMap = makeMe.aNote.title('not on the map').please()
         const child2 = makeMe.aNote.title('child2').under(top).linkTo(noteThatIsNotOnTheMap).please()
         notes.push(noteThatIsNotOnTheMap)

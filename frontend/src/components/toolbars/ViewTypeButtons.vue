@@ -17,7 +17,7 @@ import RadioButtons from "../form/RadioButtons.vue";
 import SvgArticle from "../svgs/SvgArticle.vue";
 import SvgMindmap from "../svgs/SvgMindmap.vue";
 import SvgCards from "../svgs/SvgCards.vue";
-import {viewTypes, viewType} from "../../models/viewTypes";
+import {viewTypes} from "../../models/viewTypes";
 export default {
   props: {
     noteId: [String, Number],

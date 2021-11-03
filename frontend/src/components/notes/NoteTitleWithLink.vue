@@ -1,26 +1,22 @@
 <template>
-  <template v-if="!!note">
-    <router-link
-      :to="{ name: 'noteShow', params: { noteId: note.id, viewType} }"
-      class="text-decoration-none"
-    >
-      {{ note.title }}
-    </router-link>
-  </template>
+  <router-link
+    :to="{ name: 'noteShow', params: { noteId: note.id, viewType: computedViewType } }"
+    class="text-decoration-none"
+  >
+    {{ note.title }}
+  </router-link>
 </template>
 
 <script>
 export default {
   props: {
-    note: Object, 
-    noteRouteName: { type: String, default: 'noteCards'},
+    note: { type: Object, required: true }, 
+    viewType: String,
   },
   computed: {
-    viewType() {
-      if(this.noteRouteName === 'noteCards') return 'cards'
-      if(this.noteRouteName === 'noteMindmap') return 'mindmap'
-      if(this.noteRouteName === 'noteArticle') return 'article'
-      return this.$route.params?.viewType
+    computedViewType() {
+      if(this.viewType) return this.viewType
+      return this.$route?.params?.viewType
     }
   }
 

@@ -6,7 +6,7 @@
   :style="`top:${coord.y}px; left:${coord.x}px`"
   v-on:click="$emit('highlight')">
     <h5 class="note-card-title">
-      <NoteTitleWithLink :noteRouteName="`noteMindmap`" :note="note" class="card-title" />
+      <NoteTitleWithLink :note="note" class="card-title" />
     </h5>
     <SvgDescriptionIndicator class="description-indicator" v-if="!!note.shortDescription"/>
   </NoteShell>

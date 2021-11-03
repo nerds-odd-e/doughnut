@@ -7,7 +7,6 @@
         deleteRedirect: true,
         expendChildren: false,
         viewType: 'cards',
-        noteRouteName: 'noteCards',
         noteComponent: 'NoteWithChildrenCards'}"/>
     </div>
 
