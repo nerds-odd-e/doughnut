@@ -6,7 +6,7 @@
         notePosition,
         viewType,
         expandChildren: true,
-        noteComponent}"/>
+        noteComponent: viewTypeObj.noteComponent}"/>
 
     <NoteStatisticsButton :noteId="noteId" />
   </LoadingPage>
@@ -17,6 +17,7 @@ import LoadingPage from "./commons/LoadingPage.vue";
 import NotePageFrame from '../components/notes/views/NotePageFrame.vue';
 import NoteStatisticsButton from "../components/notes/NoteStatisticsButton.vue";
 import { storedApiGetNoteAndItsChildren, storedApiGetNoteWithDescendents } from "../storedApi";
+import { viewType } from "../models/viewTypes";
 
 export default {
   name: "NoteShowPage",
@@ -29,23 +30,18 @@ export default {
   },
   components: { LoadingPage, NotePageFrame, NoteStatisticsButton },
   computed: {
-    noteComponent() {
-      if(this.viewType === 'article') return 'NoteArticleView'
-      if(this.viewType === 'mindmap') return 'NoteMindmapView'
-      return 'NoteCardsView'
-    },
-
-    storedApiCall() {
-      if(this.viewType === 'article') return storedApiGetNoteWithDescendents
-      if(this.viewType === 'mindmap') return storedApiGetNoteWithDescendents
-      return storedApiGetNoteAndItsChildren
-    },
-
+    viewTypeObj() {
+      return viewType(this.viewType)
+    }
   },
   methods: {
     fetchData() {
       this.loading = true
-      this.storedApiCall(this.$store, this.noteId)
+      const storedApiCall = this.viewTypeObj.fetchAll ?
+                              storedApiGetNoteWithDescendents :
+                              storedApiGetNoteAndItsChildren
+
+      storedApiCall(this.$store, this.noteId)
       .then((res) => {
         this.notePosition = res.notePosition;
       }).finally(() => this.loading = false);

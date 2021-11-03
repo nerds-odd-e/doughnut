@@ -101,7 +101,6 @@ export default {
   },
 
   methods: {
-
     async deleteNote() {
       if (await this.$popups.confirm(`Are you sure to delete this note?`)) {
         const parentId = this.note.parentId

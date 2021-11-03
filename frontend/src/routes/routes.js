@@ -14,7 +14,6 @@ import CircleJoinPage from "@/pages/CircleJoinPage.vue";
 import FailureReportListPage from "@/pages/FailureReportListPage.vue";
 import FailureReportPage from "@/pages/FailureReportPage.vue";
 import UserProfilePage from "@/pages/UserProfilePage.vue";
-import { viewTypes } from "@/models/viewTypes.ts";
 
 const NestedInitialReviewPage = NestedPage(
   InitialReviewPage,
