@@ -31,7 +31,7 @@ export default {
   components: { LoadingPage, NotePageFrame, NoteStatisticsButton },
   computed: {
     noteComponent() {
-      if(this.viewType === 'article') return 'NoteOverview'
+      if(this.viewType === 'article') return 'NoteArticleView'
       if(this.viewType === 'mindmap') return 'NoteMindmapWithListner'
       return 'NoteWithChildrenCards'
     },

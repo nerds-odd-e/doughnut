@@ -17,7 +17,7 @@
 import NoteControl from "../toolbars/NoteControl.vue";
 import NoteMindmapWithListner from "./NoteMindmapWithListner.vue";
 import NoteWithChildrenCards from "./NoteWithChildrenCards.vue";
-import NoteOverview from "./NoteOverview.vue";
+import NoteArticleView from "./views/NoteArticleView.vue";
 import Breadcrumb from "./Breadcrumb.vue";
 
 export default {
@@ -34,7 +34,7 @@ export default {
       highlightNoteId: null,
     };
   },
-  components: { NoteControl, NoteMindmapWithListner, Breadcrumb, NoteWithChildrenCards, NoteOverview },
+  components: { NoteControl, NoteMindmapWithListner, Breadcrumb, NoteWithChildrenCards, NoteArticleView },
   methods: {
     highlight(id) { this.highlightNoteId = id},
   },
