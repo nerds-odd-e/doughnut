@@ -1,9 +1,6 @@
 <template>
   <h1>Joining a Circle</h1>
   <form @submit.prevent.once="processForm">
-    <div
-      th:replace="_fragments/forms :: textInput('circle', 'invitationCode', 'Invitation code you got from other people', false)"
-    />
     <TextInput
       scopeName="join-circle"
       field="invitationCode"

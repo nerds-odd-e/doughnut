@@ -1,6 +1,5 @@
 <template>
   <svg
-    th:fragment="forward"
     width="20px"
     height="20px"
     version="1.1"

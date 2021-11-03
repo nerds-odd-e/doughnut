@@ -1,6 +1,5 @@
 <template>
   <svg
-    th:fragment="editNotebook"
     width="25px"
     height="25px"
     x="0px"

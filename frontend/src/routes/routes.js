@@ -14,6 +14,7 @@ import CircleJoinPage from "@/pages/CircleJoinPage.vue";
 import FailureReportListPage from "@/pages/FailureReportListPage.vue";
 import FailureReportPage from "@/pages/FailureReportPage.vue";
 import UserProfilePage from "@/pages/UserProfilePage.vue";
+import viewTypes from "@/models/viewTypes.ts";
 
 const NestedInitialReviewPage = NestedPage(
   InitialReviewPage,
@@ -29,21 +30,21 @@ const NestedRepeatPage = NestedPage(
   "Please answer the question first before you explore the notes."
 );
 
-const viewTypes = [
-  {name: 'cards', path: 'cards', routeName: 'noteCards', title: 'cards view'},
-  {name: 'article', path: 'article', routeName: 'noteArticle', title: 'article view'},
-  {name: 'mindmap', path: 'mindmap', routeName: 'noteMindmap', title: 'mindmap view'},
-]
-
-const noteShowRoutes = viewTypes.map(({name, path, routeName})=>({
+const noteShowRoutes = viewTypes.map(({value, path, routeName})=>({
     path: `notes/:noteId/${path}`,
     name: routeName,
     component: NoteShowPage,
-    props: (route)=>({noteId: route.params.noteId, viewType: name}),
+    props: (route)=>({noteId: route.params.noteId, viewType: value}),
 }))
 
 const noteAndLinkRoutes = [
   { path: "notebooks", name: "notebooks", component: NotebooksPage },
+  {
+      path: `notes/:noteId`,
+      name: 'noteShowDefault',
+      component: NoteShowPage,
+      props: (route)=>({noteId: route.params.noteId, viewType: 'cards'}),
+  },
   ...noteShowRoutes,
   {
     path: "links/:linkid",

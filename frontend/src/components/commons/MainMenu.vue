@@ -1,5 +1,4 @@
 <template>
-  <div th:fragment="header">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
       <button
         class="navbar-toggler"
@@ -78,7 +77,6 @@
         >
       </div>
     </nav>
-  </div>
 </template>
 
 <script>

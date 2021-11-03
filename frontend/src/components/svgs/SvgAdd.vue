@@ -1,6 +1,5 @@
 <template>
   <svg
-    th:fragment="add"
     width="25px"
     height="25px"
     xmlns="http://www.w3.org/2000/svg"

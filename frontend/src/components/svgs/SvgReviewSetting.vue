@@ -1,6 +1,5 @@
 <template>
   <svg
-    th:fragment="reviewSetting"
     width="25px"
     height="25px"
     id="Layer_1"

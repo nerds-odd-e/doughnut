@@ -1,6 +1,5 @@
 <template>
   <svg
-    th:fragment="cog"
     width="25px"
     height="25px"
     id="Layer_1"

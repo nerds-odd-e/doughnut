@@ -1,6 +1,5 @@
 <template>
   <svg
-    th:fragment="bazaarShare"
     width="20px"
     height="20px"
     version="1.1"

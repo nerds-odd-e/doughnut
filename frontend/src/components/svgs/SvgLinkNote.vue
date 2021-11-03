@@ -1,6 +1,5 @@
 <template>
   <svg
-    th:fragment="linkNote"
     width="20px"
     height="20px"
     version="1.1"

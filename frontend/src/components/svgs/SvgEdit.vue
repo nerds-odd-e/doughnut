@@ -1,6 +1,5 @@
 <template>
   <svg
-    th:fragment="edit"
     width="20px"
     height="20px"
     ersion="1.1"
