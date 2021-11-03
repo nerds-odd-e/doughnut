@@ -127,8 +127,8 @@ export default {
 
     viewTypeToRouteName(newType) {
       if (newType === 'cards') return 'noteCards'
-      if (newType === 'mindmap') return 'mindmap'
-      return 'noteOverview'
+      if (newType === 'mindmap') return 'noteMindmap'
+      return 'noteArticle'
     },
 
     async deleteNote() {

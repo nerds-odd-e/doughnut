@@ -1,7 +1,7 @@
 <template>
   <template v-if="!!note">
     <router-link
-      :to="{ name: 'mindmap', params: { noteId: note.id } }"
+      :to="{ name: 'noteMindmap', params: { noteId: note.id } }"
       class="text-decoration-none"
     >
       {{ note.title }}
