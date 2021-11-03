@@ -1,5 +1,5 @@
 <template>
-  <LoadingPage v-bind="{ loading, contentExists: !!notePosition, inContainer }">
+  <LoadingPage v-bind="{ loading, contentExists: !!notePosition }">
     <NotePageFrame
       v-bind="{
         noteId,
@@ -44,11 +44,6 @@ export default {
 
     deleteRedirect() {
       if(this.viewType === 'article') return false
-      if(this.viewType === 'mindmap') return false
-      return true
-    },
-
-    inContainer() {
       if(this.viewType === 'mindmap') return false
       return true
     },

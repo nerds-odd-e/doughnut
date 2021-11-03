@@ -1,8 +1,8 @@
 <template>
-  <template v-if="note">
+  <div class="container" v-if="note">
     <NoteWithLinks v-bind="note"/>
     <Cards v-if="expandChildren" :notes="children"/>
-  </template>
+  </div>
 
 </template>
 
