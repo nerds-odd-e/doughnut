@@ -30,13 +30,6 @@ const NestedRepeatPage = NestedPage(
   "Please answer the question first before you explore the notes."
 );
 
-const noteShowRoutes = viewTypes.map(({value, path, routeName})=>({
-    path: `notes/:noteId/${path}`,
-    name: routeName,
-    component: NoteShowPage,
-    props: (route)=>({noteId: route.params.noteId, viewType: value}),
-}))
-
 const noteAndLinkRoutes = [
   { path: "notebooks", name: "notebooks", component: NotebooksPage },
   {
@@ -45,7 +38,6 @@ const noteAndLinkRoutes = [
       component: NoteShowPage,
       props: true,
   },
-  ...noteShowRoutes,
   {
     path: "links/:linkid",
     name: "linkShow",
