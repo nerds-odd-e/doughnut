@@ -105,3 +105,20 @@ export default {
 .box .footer
   flex: 0 1 40px
 </style>
+
+<style lang="sass">
+.inner-box
+  display: flex
+  flex-flow: column
+  height: 100%
+
+.inner-box .header
+  flex: 0 1 auto
+
+.inner-box .content
+  flex: 1 1 auto
+  overflow: hidden
+
+.inner-box .footer
+  flex: 0 1 40px
+</style>

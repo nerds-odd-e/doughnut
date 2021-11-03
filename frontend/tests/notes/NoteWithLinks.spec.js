@@ -11,10 +11,10 @@ describe("new/updated pink banner", () => {
   });
 
   test.each([
-    [new Date(Date.UTC(2017, 1, 15)), "rgb(208, 237, 23)"],
-    [new Date(Date.UTC(2017, 1, 13)), "rgb(189, 209, 64)"],
-    [new Date(Date.UTC(2017, 1, 12)), "rgb(181, 197, 82)"],
-    [new Date(Date.UTC(2016, 1, 12)), "rgb(150, 150, 150)"],
+    [new Date(Date.UTC(2017, 1, 15)), "rgb(208,237,23)"],
+    [new Date(Date.UTC(2017, 1, 13)), "rgb(189,209,64)"],
+    [new Date(Date.UTC(2017, 1, 12)), "rgb(181,197,82)"],
+    [new Date(Date.UTC(2016, 1, 12)), "rgb(150,150,150)"],
   ])(
     "should show fresher color if recently updated",
     (updatedAt, expectedColor) => {
@@ -22,7 +22,7 @@ describe("new/updated pink banner", () => {
       render(NoteWithLinks, { props: note });
 
       expect(screen.getByRole("title").parentNode).toHaveStyle(
-        `background-color: ${expectedColor};`
+        `border-color: ${expectedColor};`
       );
     }
   );
