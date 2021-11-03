@@ -23,3 +23,11 @@ export default {
   },
 };
 </script>
+
+<style lang="sass" scoped>
+
+::v-deep .note-body
+  border-width: 0px
+  border-left-width: 3px
+
+</style>

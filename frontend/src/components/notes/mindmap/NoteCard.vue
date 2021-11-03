@@ -43,7 +43,7 @@ export default {
   min-height: 50px
   padding: 3px
   background-color: white
-  border-width: 1px
+  border-width: 3px
   border-style: solid
   border-color: rgb(0,0,0, 0.7)
   border-radius: 10px

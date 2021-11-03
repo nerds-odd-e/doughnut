@@ -285,12 +285,12 @@ Then("I should see the child notes {string} in order", (notesStr) => {
 Then("I should see {string} is newer than {string}", (newer, older) => {
   let firstColor;
   cy.jumpToNotePage(newer);
-  cy.get(".note-show div")
-    .invoke("css", "background-color")
+  cy.get(".note-body")
+    .invoke("css", "border-color")
     .then((val) => (firstColor = val));
   cy.jumpToNotePage(older);
-  cy.get(".note-show")
-    .invoke("css", "background-color")
+  cy.get(".note-body")
+    .invoke("css", "border-color")
     .then((val) =>
       expect(parseInt(firstColor.match(/\d+/)[0])).to.greaterThan(
         parseInt(val.match(/\d+/)[0])

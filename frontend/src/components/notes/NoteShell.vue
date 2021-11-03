@@ -1,5 +1,5 @@
 <template>
-      <div class="note-body" @dblclick="editDialog" :style="`background-color: ${bgColor}`">
+      <div class="note-body" @dblclick="editDialog" :style="`border-color: ${bgColor}`">
         <slot/>
       </div>
 </template>
