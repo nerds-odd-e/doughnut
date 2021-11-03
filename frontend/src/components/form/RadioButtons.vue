@@ -2,6 +2,7 @@
   <InputWithType v-bind="{ scopeName, field, errors }">
     <output
       :id="`${scopeName}-${field}`"
+      role="radiogroup"
       class="btn-group filter-switch"
     >
       <template

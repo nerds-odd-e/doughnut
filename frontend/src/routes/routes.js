@@ -38,12 +38,6 @@ const noteAndLinkRoutes = [
     props: (route)=>({noteId: route.params.noteId, viewType: 'cards'}),
   },
   {
-    path: "links/:linkid",
-    name: "linkShow",
-    component: LinkShowPage,
-    props: true,
-  },
-  {
     path: "notes/:noteId/overview",
     name: "noteOverview",
     component: NoteShowPage,
@@ -55,6 +49,13 @@ const noteAndLinkRoutes = [
     component: NoteShowPage,
     props: (route)=>({noteId: route.params.noteId, viewType: 'mindmap'}),
   },
+  {
+    path: "links/:linkid",
+    name: "linkShow",
+    component: LinkShowPage,
+    props: true,
+  },
+
 ];
 
 const nestedNoteAndLinkRoutes = (prefix) =>
