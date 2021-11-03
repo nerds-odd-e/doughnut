@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api")
 class RestHealthCheckController {
@@ -25,8 +27,9 @@ class RestHealthCheckController {
 
     @GetMapping("/data_upgrade")
     @Transactional
-    public String dataUpgrade() {
-        return "OK. Active Profile: " + String.join(", ", environment.getActiveProfiles());
+    public List dataUpgrade() {
+        List resultList = modelFactoryService.entityManager.createQuery("select user_id, note_id, count(1) from review_point rp group by note_id, user_id").getResultList();
+        return resultList;
     }
 
 }
