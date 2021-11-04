@@ -29,7 +29,7 @@ public class LinkSourceQuizFactory implements QuizQuestionFactory {
 
     @Override
     public String generateInstruction() {
-        return "Which one <em>is " + link.getLinkTypeLabel() + "</em>:";
+        return "Which one <em>is immediately " + link.getLinkTypeLabel() + "</em>:";
     }
 
     @Override
