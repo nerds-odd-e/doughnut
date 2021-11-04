@@ -305,12 +305,6 @@ When("I split note {string}",
   }
 );
 
-When("I should see the note description to be {string}",
-    (expectedDescription) => {
-        cy.expectCurrentNoteDescription(expectedDescription)
-    }
-);
-
 When("there is a note {string} with description {string}",
     (notePath, expectedDescription) => {
         cy.navigateToNotePage(notePath);
