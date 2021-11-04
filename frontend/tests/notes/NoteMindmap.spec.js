@@ -116,7 +116,7 @@ describe("note mindmap", () => {
 
   describe("size", () => {
     beforeEach(()=>{
-      notes.push(makeMe.aNote.title("single note").shortDescription('not long').please())
+      notes.push(makeMe.aNote.title("single note").picture('a.jpg').shortDescription('not long').please())
     })
 
     it("small size by default", async () => {
@@ -125,6 +125,10 @@ describe("note mindmap", () => {
       expect(descriptionIndicators).toHaveLength(1)
       const description = await container.querySelectorAll(".note-description")
       expect(description).toHaveLength(0)
+      const pictureIndicators = await container.querySelectorAll(".picture-indicator")
+      expect(pictureIndicators).toHaveLength(1)
+      const pictures = await container.querySelectorAll(".note-picture")
+      expect(pictures).toHaveLength(0)
     })
 
     it("medium", async () => {
