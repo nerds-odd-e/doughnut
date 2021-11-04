@@ -9,7 +9,8 @@ import { PropType } from 'vue'
     @touchmove.prevent="onDrag"
     @pointerup="stopDrag"
     @pointercancel="stopDrag"
-    @mousewheel="onZoom"
+    @wheel.prevent="onZoom"
+    @mousewheel.prevent="onZoom"
   >
   <slot/>
   </div>
