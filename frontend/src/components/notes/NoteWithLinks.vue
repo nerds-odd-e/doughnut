@@ -1,8 +1,8 @@
 <template>
-    <NoteShell class="note-body" v-bind="{id, updatedAt: noteContent.updatedAt}">
-      <NoteFrameOfLinks v-bind="{ links }">
-        <h2 role="title" class="note-title">{{ title }}</h2>
-        <NoteBody v-bind="{notePicture, noteContent}"/>
+    <NoteShell class="note-body" v-bind="{id: note.id, updatedAt: note.noteContent?.updatedAt}">
+      <NoteFrameOfLinks v-bind="{ links: note.links }">
+        <h2 role="title" class="note-title">{{ note.title }}</h2>
+        <NoteContent v-bind="{note}"/>
       </NoteFrameOfLinks>
     </NoteShell>
 </template>
@@ -10,21 +10,17 @@
 <script>
 import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
 import NoteShell from "./NoteShell.vue";
-import NoteBody from "./NoteBody.vue";
+import NoteContent from "./NoteContent.vue";
 
 export default {
   name: "NoteWithLinks",
   props: {
-    id: [String, Number],
-    noteContent: { type: Object, required: true },
-    title: String,
-    notePicture: String,
-    links: Object,
+    note: Object,
   },
   components: {
     NoteFrameOfLinks,
     NoteShell,
-    NoteBody,
+    NoteContent,
   },
 };
 </script>

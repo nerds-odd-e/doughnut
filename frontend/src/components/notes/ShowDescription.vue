@@ -7,10 +7,3 @@
 <script setup>
 const props = defineProps({ description: String });
 </script>
-
-<style scoped>
-.note-body {
-  padding-left: 10px;
-  padding-right: 10px;
-}
-</style>

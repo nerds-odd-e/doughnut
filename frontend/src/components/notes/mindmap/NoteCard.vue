@@ -1,21 +1,21 @@
 <template>
   <NoteShell 
   :class="`note-card ${highlighted ? 'highlighted' : ''}`"
-  v-bind="{id: note.id, updatedAt: note.noteContent.updatedAt}"
+  v-bind="{id: note.id, updatedAt: note.noteContent?.updatedAt}"
   role="card" :aria-label="note.title"
   :style="`top:${coord.y}px; left:${coord.x}px`"
   v-on:click="$emit('highlight')">
     <h5 class="note-card-title">
       <NoteTitleWithLink :note="note" class="card-title" />
     </h5>
-    <SvgDescriptionIndicator class="description-indicator" v-if="!!note.shortDescription"/>
+    <NoteContent v-bind="{note, size}"/>
   </NoteShell>
 </template>
 
 <script>
 import NoteTitleWithLink from "../NoteTitleWithLink.vue";
-import SvgDescriptionIndicator from "../../svgs/SvgDescriptionIndicator.vue";
 import NoteShell from "../NoteShell.vue";
+import NoteContent from "../NoteContent.vue";
 import MindmapSector from "@/models/MindmapSector";
 
 export default {
@@ -26,10 +26,13 @@ export default {
     highlighted: Boolean,
   },
   emits: ['highlight'],
-  components: { NoteShell, SvgDescriptionIndicator, NoteTitleWithLink },
+  components: {
+     NoteShell,
+     NoteContent,
+     NoteTitleWithLink },
   computed: {
     coord() { return this.mindmap.coord(this.mindmapSector) },
-
+    size() { return this.mindmap.size() },
   },
 
 }
@@ -86,10 +89,5 @@ export default {
   transform: rotate(-1deg)
   opacity: 0.7
   border-radius: 50%
-
-.description-indicator
-  position: absolute
-  left: 5px
-  top: 25px
 
 </style>

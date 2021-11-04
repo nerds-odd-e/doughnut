@@ -13,12 +13,12 @@ describe("note mindmap", () => {
     notes.length = 0
   })
 
-  const renderAndGetContainer = (noteId) => {
+  const renderAndGetContainer = (noteId, props={}) => {
     store.commit("loadNotes", notes);
     const { wrapper } = renderWithStoreAndMockRoute(
       store,
       NoteMinmap,
-      { props: { noteId, scale: 1, rotate: 0 } },
+      { props: { noteId, scale: 1, rotate: 0, ...props } },
     );
     return wrapper.container
   }
@@ -114,4 +114,36 @@ describe("note mindmap", () => {
 
   });
 
+  describe("size", () => {
+    beforeEach(()=>{
+      notes.push(makeMe.aNote.title("single note").shortDescription('not long').please())
+    })
+
+    it("small size by default", async () => {
+      const container = renderAndGetContainer(notes[0].id, {scale: 1})
+      const descriptionIndicators = await container.querySelectorAll(".description-indicator")
+      expect(descriptionIndicators).toHaveLength(1)
+      const description = await container.querySelectorAll(".note-description")
+      expect(description).toHaveLength(0)
+    })
+
+    it("medium", async () => {
+      const container = renderAndGetContainer(notes[0].id, {scale: 1.5})
+      const descriptionIndicators = await container.querySelectorAll(".description-indicator")
+      expect(descriptionIndicators).toHaveLength(0)
+      const description = await container.querySelectorAll(".note-description")
+      expect(description).toHaveLength(0)
+      const shortDescription = await container.querySelectorAll(".note-short-description")
+      expect(shortDescription).toHaveLength(1)
+    })
+
+    it("large", async () => {
+      const container = renderAndGetContainer(notes[0].id, {scale: 2.1})
+      const descriptionIndicators = await container.querySelectorAll(".description-indicator")
+      expect(descriptionIndicators).toHaveLength(0)
+      const description = await container.querySelectorAll(".note-description")
+      expect(description).toHaveLength(1)
+    })
+
+  })
 })

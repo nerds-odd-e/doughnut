@@ -14,7 +14,7 @@
   </Card>
   <div :id="`note-collapse-${note.id}`" class="collapse">
     <NoteWithLinks
-      v-bind="note"/>
+      v-bind="{note}"/>
   </div>
 </template>
 

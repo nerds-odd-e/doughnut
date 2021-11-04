@@ -1,5 +1,5 @@
 <template>
-  <NoteWithLinks v-bind="{ ...note }" v-if="note"/>
+  <NoteWithLinks v-bind="{ note }" v-if="note"/>
   <div class="note-list">
     <NoteOverview
       v-for="childId in childrenIds"
