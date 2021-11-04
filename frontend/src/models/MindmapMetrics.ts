@@ -4,14 +4,8 @@ import { Coord, StraightConnection, Vector } from "./MindmapUnits";
 class MindmapMetrics {
     scale: number
 
-    _boxWidth: number
-
-    _boxHeight: number
-
     constructor(scale: number, boxWidth: number, boxHeight: number) {
       this.scale = scale
-      this._boxWidth = boxWidth
-      this._boxHeight = boxHeight
     }
 
     get boxWidth(): number {
