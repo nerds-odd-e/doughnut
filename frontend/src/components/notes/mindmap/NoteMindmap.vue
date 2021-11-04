@@ -1,5 +1,13 @@
 <template>
   <svg class="mindmap-canvas">
+    <defs>
+      <radialGradient id="myGradient">
+        <stop offset="10%" stop-color="white" />
+        <stop offset="30%" stop-color="#87CEEB" />
+        <stop offset="100%" stop-color="azure" />
+      </radialGradient>
+    </defs>
+    <circle cx="0" cy="0" :r="3000 * scale" fill="url('#myGradient')" />
     <marker id="arrowhead" markerWidth="8" markerHeight="6" 
     refX="8" refY="3" orient="auto">
       <polygon points="0 0, 8 3, 0 6" style="stroke-width:0"/>
