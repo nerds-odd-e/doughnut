@@ -1,6 +1,6 @@
 <template>
   <NoteShell 
-  :class="`note-card ${highlighted ? 'highlighted' : ''}`"
+  :class="`note-card ${size} ${highlighted ? 'highlighted' : ''}`"
   v-bind="{id: note.id, updatedAt: note.noteContent?.updatedAt}"
   role="card" :aria-label="note.title"
   :style="`top:${coord.y}px; left:${coord.x}px`"
@@ -50,6 +50,12 @@ export default {
   border-style: solid
   border-color: rgb(0,0,0, 0.7)
   border-radius: 10px
+  &.medium
+    width: 200px
+    min-height: 100px
+  &.large
+    width: 300px
+    min-height: 200px
 .note-card-title
   font-size: 1rem
 
