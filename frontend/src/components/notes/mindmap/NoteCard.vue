@@ -1,14 +1,14 @@
 <template>
   <NoteShell 
-  :class="`note-card ${size} ${highlighted ? 'highlighted' : ''}`"
+  :class="`inner-box note-card ${size} ${highlighted ? 'highlighted' : ''}`"
   v-bind="{id: note.id, updatedAt: note.noteContent?.updatedAt}"
   role="card" :aria-label="note.title"
   :style="`top:${coord.y}px; left:${coord.x}px`"
   v-on:click="$emit('highlight')">
-    <h5 class="note-card-title">
+    <h5 class="header note-card-title">
       <NoteTitleWithLink :note="note" class="card-title" />
     </h5>
-    <NoteContent v-bind="{note, size}"/>
+    <NoteContent class="content" v-bind="{note, size}"/>
   </NoteShell>
 </template>
 
@@ -43,7 +43,7 @@ export default {
   z-index: 2000
   position: absolute
   width: 150px
-  min-height: 50px
+  height: 50px
   padding: 3px
   background-color: white
   border-width: 3px
@@ -52,10 +52,10 @@ export default {
   border-radius: 10px
   &.medium
     width: 200px
-    min-height: 100px
+    height: 100px
   &.large
     width: 300px
-    min-height: 200px
+    height: 200px
 .note-card-title
   font-size: 1rem
 
@@ -96,4 +96,6 @@ export default {
   opacity: 0.7
   border-radius: 50%
 
+::v-deep .note-description
+  height: 100%
 </style>
