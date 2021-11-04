@@ -5,7 +5,6 @@
         v-bind="{ hasLastResult }"
         @viewLastResult="$emit('viewLastResult')"
       />
-      <PauseRepeatButton v-bind="{ noteId, linkId, allowPause, btn }" />
     </template>
     <template #default v-if="$slots.default">
       <slot />
@@ -14,12 +13,11 @@
 </template>
 
 <script>
-import PauseRepeatButton from "./PauseRepeatButton.vue";
 import ViewLastResultButton from "./ViewLastResultButton.vue";
 import ProgressBar from "../commons/ProgressBar.vue";
 
 export default {
-  components: { PauseRepeatButton, ViewLastResultButton, ProgressBar },
+  components: { ViewLastResultButton, ProgressBar },
   props: {
     noteId: [String, Number],
     linkId: [String, Number],
