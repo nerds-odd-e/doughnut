@@ -18,14 +18,50 @@
     </marker>
 
 
-    <NoteMindmapScaffold v-bind="{ highlightNoteId, noteId, mindmap, mindmapSector, noteComponent: 'NoteParentChildConnection'}"/>
-    <NoteMindmapScaffold v-bind="{ highlightNoteId, noteId, mindmap, mindmapSector, noteComponent: 'NoteLinks'}"/>
+    <NoteMindmapScaffold v-bind="{ highlightNoteId, noteId, mindmap, mindmapSector, noteComponent: 'NoteParentChildConnection'}">
+      <template #default="{note, mindmapSector, mindmap}">
+        <NoteParentChildConnection v-bind="{
+            note,
+            mindmapSector,
+            mindmap,
+            highlighted: highlightNoteId === note.id
+          }"
+          @highlight="$emit('highlight', noteId)"
+        />
+      </template>
+    </NoteMindmapScaffold>
+    <NoteMindmapScaffold v-bind="{ highlightNoteId, noteId, mindmap, mindmapSector, noteComponent: 'NoteLinks'}">
+      <template #default="{note, mindmapSector, mindmap}">
+        <NoteLinks v-bind="{
+            note,
+            mindmapSector,
+            mindmap,
+            highlighted: highlightNoteId === note.id
+          }"
+          @highlight="$emit('highlight', noteId)"
+        />
+      </template>
+    </NoteMindmapScaffold>
   </svg>
-  <NoteMindmapScaffold v-bind="{ highlightNoteId, noteId, mindmap, mindmapSector, noteComponent: 'NoteCard'}" @highlight="highlight"/>
+  <NoteMindmapScaffold v-bind="{ highlightNoteId, noteId, mindmap, mindmapSector, noteComponent: 'NoteCard'}" @highlight="highlight">
+    <template #default="{note, mindmapSector, mindmap}">
+      <NoteCard v-bind="{
+          note,
+          mindmapSector,
+          mindmap,
+          highlighted: highlightNoteId === note.id
+        }"
+        @highlight="$emit('highlight', noteId)"
+      />
+    </template>
+  </NoteMindmapScaffold>
 </template>
 
 <script lang="ts">
 import NoteMindmapScaffold from "./NoteMindmapScaffold.vue";
+import NoteCard from "./NoteCard.vue";
+import NoteParentChildConnection from "./NoteParentChildConnection.vue";
+import NoteLinks from "./NoteLinks.vue";
 import MindmapSector from "@/models/MindmapSector";
 import Mindmap from "@/models/Mindmap";
 
@@ -38,7 +74,12 @@ export default {
     offset: Object,
   },
   emits: ['highlight'],
-  components: { NoteMindmapScaffold },
+  components: {
+    NoteMindmapScaffold,
+    NoteCard,
+    NoteParentChildConnection,
+    NoteLinks,
+  },
   methods: {
     highlight(id) {this.$emit('highlight', id)}
   },

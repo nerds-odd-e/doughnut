@@ -1,13 +1,10 @@
 <template>
   <template v-if="note">
-    <component v-bind:is="noteComponent" v-bind="{
+    <slot v-bind="{
         note,
         mindmapSector,
         mindmap,
-        highlighted: highlightNoteId === noteId
-      }"
-      @highlight="$emit('highlight', noteId)"
-    />
+      }"/>
     <NoteMindmapScaffold
       v-for="(childId, index) in childrenIds"
       v-bind="{
@@ -19,15 +16,19 @@
       }"
       :key="childId"
       @highlight="$emit('highlight', $event)"
-    />
+    >
+      <template #default="{note, mindmapSector, mindmap}">
+        <slot v-bind="{
+          note,
+          mindmapSector,
+          mindmap,}"/>
+      </template>
+    </NoteMindmapScaffold>
   </template>
 </template>
 
 <script>
 import MindmapSector from "@/models/MindmapSector";
-import NoteCard from "./NoteCard.vue";
-import NoteParentChildConnection from "./NoteParentChildConnection.vue";
-import NoteLinks from "./NoteLinks.vue";
 
 export default {
   name: "NoteMindmap",
@@ -39,7 +40,6 @@ export default {
     highlightNoteId: [String, Number]
   },
   emits: ['highlight'],
-  components: { NoteCard, NoteParentChildConnection, NoteLinks },
   computed: {
     note() {
       return this.$store.getters.getNoteById(this.noteId);
