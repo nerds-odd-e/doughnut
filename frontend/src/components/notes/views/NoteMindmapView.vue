@@ -5,8 +5,7 @@
           highlightNoteId,
           noteId,
           expandChildren,
-          scale: offset.scale,
-          rotate: offset.rotate,
+          offset,
           }"
           @highlight="$emit('highlight', $event)"
       />

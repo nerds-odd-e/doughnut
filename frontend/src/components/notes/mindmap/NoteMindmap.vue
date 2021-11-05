@@ -7,7 +7,7 @@
         <stop offset="100%" stop-color="azure" />
       </radialGradient>
     </defs>
-    <circle cx="0" cy="0" :r="3000 * scale" fill="url('#myGradient')" />
+    <circle :cx="-offset.x/8" :cy="-offset.y/8" :r="3000 * offset.scale" fill="url('#myGradient')" />
     <marker id="arrowhead" markerWidth="8" markerHeight="6" 
     refX="8" refY="3" orient="auto">
       <polygon points="0 0, 8 3, 0 6" style="stroke-width:0"/>
@@ -35,8 +35,7 @@ export default {
     highlightNoteId: [String, Number],
     noteId: [String, Number],
     expandChildren: Boolean,
-    scale: Number,
-    rotate: Number,
+    offset: Object,
   },
   emits: ['highlight'],
   components: { NoteMindmapScaffold },
@@ -45,11 +44,11 @@ export default {
   },
   computed: {
     mindmapSector() {
-      return new MindmapSector(0, 0, this.rotate - Math.PI / 2, Math.PI * 2)
+      return new MindmapSector(0, 0, this.offset.rotate - Math.PI / 2, Math.PI * 2)
     },
     mindmap() {
       return new Mindmap(
-        this.scale,
+        this.offset.scale,
         this.mindmapSector,
         this.noteId,
         this.$store.getters.getNoteById,
