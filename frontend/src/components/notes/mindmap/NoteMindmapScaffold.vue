@@ -3,7 +3,6 @@
     <slot v-bind="{
         note,
         mindmapSector,
-        mindmap,
       }"/>
     <NoteMindmapScaffold
       v-for="(childId, index) in childrenIds"
@@ -11,15 +10,14 @@
         highlightNoteId,
         noteId: childId,
         mindmapSector: mindmapSector.getChildSector(childrenIds.length, index),
-        mindmap,
       }"
       :key="childId"
     >
-      <template #default="{note, mindmapSector, mindmap}">
+      <template #default="{note, mindmapSector}">
         <slot v-bind="{
           note,
           mindmapSector,
-          mindmap,}"/>
+        }"/>
       </template>
     </NoteMindmapScaffold>
   </template>
@@ -33,7 +31,6 @@ export default {
   props: {
     noteId: [String, Number],
     mindmapSector: MindmapSector,
-    mindmap: Object,
     highlightNoteId: [String, Number]
   },
   computed: {

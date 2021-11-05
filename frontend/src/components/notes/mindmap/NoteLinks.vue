@@ -17,10 +17,8 @@ export default {
     note: Object,
     mindmapSector: Object,
     mindmap: Object,
-    highlighted: Boolean,
   },
   components: { LinkType },
-  emits: ['highlight'],
   computed: {
     directLinks() { return new LinksReader(this.note.links).directLinks },
     reverseLinks() { return new LinksReader(this.note.links).reverseLinks },
