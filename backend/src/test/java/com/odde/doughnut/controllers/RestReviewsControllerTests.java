@@ -61,6 +61,21 @@ class RestReviewsControllerTests {
             ReviewPointViewedByUser reviewPointViewedByUser = controller().initialReview();
             assertThat(reviewPointViewedByUser.getRemainingInitialReviewCountForToday(), equalTo(1));
         }
+        @Test
+        void notLoggedIn() {
+            userModel = makeMe.aNullUserModel();
+            assertThrows(ResponseStatusException.class, ()->controller().initialReview());
+        }
+    }
+
+    @Nested
+    class createInitialReviewPoiint {
+        @Test
+        void create() {
+            userModel = makeMe.aNullUserModel();
+            RestReviewsController.InitialInfo info = new RestReviewsController.InitialInfo();
+            assertThrows(ResponseStatusException.class, ()->controller().create(info));
+        }
     }
 
     @Nested
