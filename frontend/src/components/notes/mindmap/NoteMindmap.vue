@@ -18,7 +18,7 @@
     </marker>
 
 
-    <NoteMindmapScaffold v-bind="{ highlightNoteId, noteId, mindmap, mindmapSector, noteComponent: 'NoteParentChildConnection'}">
+    <NoteMindmapScaffold v-bind="{ highlightNoteId, noteId, mindmap, mindmapSector}">
       <template #default="{note, mindmapSector, mindmap}">
         <NoteParentChildConnection v-bind="{
             note,
@@ -26,11 +26,11 @@
             mindmap,
             highlighted: highlightNoteId === note.id
           }"
-          @highlight="$emit('highlight', noteId)"
+          @highlight="highlight"
         />
       </template>
     </NoteMindmapScaffold>
-    <NoteMindmapScaffold v-bind="{ highlightNoteId, noteId, mindmap, mindmapSector, noteComponent: 'NoteLinks'}">
+    <NoteMindmapScaffold v-bind="{ highlightNoteId, noteId, mindmap, mindmapSector}">
       <template #default="{note, mindmapSector, mindmap}">
         <NoteLinks v-bind="{
             note,
@@ -38,12 +38,12 @@
             mindmap,
             highlighted: highlightNoteId === note.id
           }"
-          @highlight="$emit('highlight', noteId)"
+          @highlight="highlight"
         />
       </template>
     </NoteMindmapScaffold>
   </svg>
-  <NoteMindmapScaffold v-bind="{ highlightNoteId, noteId, mindmap, mindmapSector, noteComponent: 'NoteCard'}" @highlight="highlight">
+  <NoteMindmapScaffold v-bind="{ highlightNoteId, noteId, mindmap, mindmapSector}" @highlight="highlight">
     <template #default="{note, mindmapSector, mindmap}">
       <NoteCard v-bind="{
           note,
@@ -51,7 +51,7 @@
           mindmap,
           highlighted: highlightNoteId === note.id
         }"
-        @highlight="$emit('highlight', noteId)"
+        @highlight="highlight(note.id)"
       />
     </template>
   </NoteMindmapScaffold>
