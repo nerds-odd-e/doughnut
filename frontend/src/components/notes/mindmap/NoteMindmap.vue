@@ -18,7 +18,7 @@
     </marker>
 
 
-    <NoteMindmapScaffold v-bind="{ highlightNoteId, noteId, mindmapSector}">
+    <NoteMindmapScaffold v-bind="{ noteId, mindmapSector}">
       <template #default="{note, mindmapSector}">
         <NoteParentChildConnection v-bind="{
             note,
@@ -28,7 +28,7 @@
         />
       </template>
     </NoteMindmapScaffold>
-    <NoteMindmapScaffold v-bind="{ highlightNoteId, noteId, mindmapSector}">
+    <NoteMindmapScaffold v-bind="{ noteId, mindmapSector}">
       <template #default="{note, mindmapSector}">
         <NoteLinks v-bind="{
             note,
@@ -39,13 +39,13 @@
       </template>
     </NoteMindmapScaffold>
   </svg>
-  <NoteMindmapScaffold v-bind="{ highlightNoteId, noteId, mindmapSector}">
+  <NoteMindmapScaffold v-bind="{ noteId, mindmapSector}">
     <template #default="{note, mindmapSector}">
       <NoteCard v-bind="{
           note,
           mindmapSector,
           mindmap,
-          highlighted: highlightNoteId === note.id
+          highlightNoteId,
         }"
         @highlight="highlight(note.id)"
       />

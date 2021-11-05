@@ -1,6 +1,6 @@
 <template>
   <NoteShell 
-  :class="`inner-box note-card ${size} ${highlighted ? 'highlighted' : ''}`"
+  :class="`inner-box note-card ${size} ${highlightClass}`"
   v-bind="{id: note.id, updatedAt: note.noteContent?.updatedAt}"
   role="card" :aria-label="note.title"
   :style="`top:${coord.y}px; left:${coord.x}px`"
@@ -23,7 +23,7 @@ export default {
     note: Object,
     mindmapSector: MindmapSector,
     mindmap: Object,
-    highlighted: Boolean,
+    highlightNoteId: [String, Number],
   },
   emits: ['highlight'],
   components: {
@@ -31,6 +31,9 @@ export default {
      NoteContent,
      NoteTitleWithLink },
   computed: {
+    highlightClass() {
+      console.log(this.highlightNoteId, this.note.id)
+       return this.highlightNoteId?.toString() === this.note.id.toString() ? 'highlighted' : '' },
     coord() { return this.mindmap.coord(this.mindmapSector) },
     size() { return this.mindmap.size() },
   },
