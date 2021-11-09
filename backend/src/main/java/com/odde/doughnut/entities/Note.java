@@ -177,6 +177,10 @@ public class Note {
         return noteContent.getTitle();
     }
 
+    public String getTitleId() {
+        return noteContent.getTitleId();
+    }
+
     public void mergeMasterReviewSetting(ReviewSetting reviewSetting) {
         ReviewSetting current = getMasterReviewSetting();
         if (current == null) {
