@@ -19,7 +19,7 @@ spring:
   flyway:
     clean-on-validation-error: true
   jpa:
-    generate-ddl: false
+    generate-ddl: true
     show-sql: false
     properties.hibernate:
       enable_lazy_load_no_trans: true
