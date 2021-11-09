@@ -23,6 +23,12 @@ class Mindmap {
       return this.metrics.coord(sector.coord)
     }
 
+    size(): string {
+      if(this.metrics.scale <= 1) return 'small'
+      if(this.metrics.scale <= 2) return 'medium'
+      return 'large'
+    }
+
     connectFromParent(sector: MindmapSector): StraightConnection {
       return this.metrics.straighConnection(sector.connectionFromParent)
     }

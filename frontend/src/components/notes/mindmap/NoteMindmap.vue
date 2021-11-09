@@ -1,5 +1,13 @@
 <template>
   <svg class="mindmap-canvas">
+    <defs>
+      <radialGradient id="myGradient">
+        <stop offset="10%" stop-color="white" />
+        <stop offset="30%" stop-color="#87CEEB" />
+        <stop offset="100%" stop-color="azure" />
+      </radialGradient>
+    </defs>
+    <circle :cx="-offset.x/8" :cy="-offset.y/8" :r="3000 * offset.scale" fill="url('#myGradient')" />
     <marker id="arrowhead" markerWidth="8" markerHeight="6" 
     refX="8" refY="3" orient="auto">
       <polygon points="0 0, 8 3, 0 6" style="stroke-width:0"/>
@@ -10,14 +18,46 @@
     </marker>
 
 
-    <NoteMindmapScaffold v-bind="{ highlightNoteId, noteId, mindmap, mindmapSector, noteComponent: 'NoteParentChildConnection'}"/>
-    <NoteMindmapScaffold v-bind="{ highlightNoteId, noteId, mindmap, mindmapSector, noteComponent: 'NoteLinks'}"/>
+    <NoteMindmapScaffold v-bind="{ noteId, mindmapSector}">
+      <template #default="{note, mindmapSector}">
+        <NoteParentChildConnection v-bind="{
+            note,
+            mindmap,
+            mindmapSector,
+          }"
+        />
+      </template>
+    </NoteMindmapScaffold>
+    <NoteMindmapScaffold v-bind="{ noteId, mindmapSector}">
+      <template #default="{note, mindmapSector}">
+        <NoteLinks v-bind="{
+            note,
+            mindmap,
+            mindmapSector,
+          }"
+        />
+      </template>
+    </NoteMindmapScaffold>
   </svg>
-  <NoteMindmapScaffold v-bind="{ highlightNoteId, noteId, mindmap, mindmapSector, noteComponent: 'NoteCard'}" @highlight="highlight"/>
+  <NoteMindmapScaffold v-bind="{ noteId, mindmapSector}">
+    <template #default="{note, mindmapSector}">
+      <NoteCard v-bind="{
+          note,
+          mindmapSector,
+          mindmap,
+          highlightNoteId,
+        }"
+        @highlight="highlight(note.id)"
+      />
+    </template>
+  </NoteMindmapScaffold>
 </template>
 
 <script lang="ts">
 import NoteMindmapScaffold from "./NoteMindmapScaffold.vue";
+import NoteCard from "./NoteCard.vue";
+import NoteParentChildConnection from "./NoteParentChildConnection.vue";
+import NoteLinks from "./NoteLinks.vue";
 import MindmapSector from "@/models/MindmapSector";
 import Mindmap from "@/models/Mindmap";
 
@@ -27,21 +67,25 @@ export default {
     highlightNoteId: [String, Number],
     noteId: [String, Number],
     expandChildren: Boolean,
-    scale: Number,
-    rotate: Number,
+    offset: Object,
   },
   emits: ['highlight'],
-  components: { NoteMindmapScaffold },
+  components: {
+    NoteMindmapScaffold,
+    NoteCard,
+    NoteParentChildConnection,
+    NoteLinks,
+  },
   methods: {
     highlight(id) {this.$emit('highlight', id)}
   },
   computed: {
     mindmapSector() {
-      return new MindmapSector(0, 0, this.rotate - Math.PI / 2, Math.PI * 2)
+      return new MindmapSector(0, 0, this.offset.rotate - Math.PI / 2, Math.PI * 2)
     },
     mindmap() {
       return new Mindmap(
-        this.scale,
+        this.offset.scale,
         this.mindmapSector,
         this.noteId,
         this.$store.getters.getNoteById,

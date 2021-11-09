@@ -45,9 +45,8 @@ describe("repeat page", () => {
 
   test("replace route with repeat/quiz if there is a quiz", async () => {
     const repetition = makeMe.aRepetition.ofNote(note).withAQuiz().please()
-    const { wrapper, mockRouter } = await mountPage(repetition)
+    const { mockRouter } = await mountPage(repetition)
     expect(mockRouter.push).toHaveBeenCalledWith({ name: "repeat-quiz" });
-    expect(wrapper.findAll(".pause-repeat")).toHaveLength(1);
   });
 
   describe("repeat page with no quiz (or after quiz)", () => {

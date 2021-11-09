@@ -5,8 +5,7 @@
           highlightNoteId,
           noteId,
           expandChildren,
-          scale: offset.scale,
-          rotate: offset.rotate,
+          offset,
           }"
           @highlight="$emit('highlight', $event)"
       />
@@ -74,6 +73,7 @@ export default {
 
 .mindmap-event-receiver
   position: relative
+  background-color: azure
   top: 0
   left: 0
   width: 100%

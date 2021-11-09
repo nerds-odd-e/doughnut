@@ -3,7 +3,6 @@ import BazaarPage from "@/pages/BazaarPage.vue";
 import CirclesPage from "@/pages/CirclesPage.vue";
 import NotebooksPage from "@/pages/NotebooksPage.vue";
 import NoteShowPage from "@/pages/NoteShowPage.vue";
-import LinkShowPage from "@/pages/LinkShowPage.vue";
 import ReviewHome from "@/pages/ReviewHome.vue";
 import RepeatPage from "@/pages/RepeatPage.vue";
 import DoingQuiz from "@/pages/DoingQuiz.vue";
@@ -37,13 +36,6 @@ const noteAndLinkRoutes = [
       component: NoteShowPage,
       props: true,
   },
-  {
-    path: "links/:linkid",
-    name: "linkShow",
-    component: LinkShowPage,
-    props: true,
-  },
-
 ];
 
 const nestedNoteAndLinkRoutes = (prefix) =>

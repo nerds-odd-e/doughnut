@@ -4,14 +4,20 @@ import { Coord, StraightConnection, Vector } from "./MindmapUnits";
 class MindmapMetrics {
     scale: number
 
-    boxWidth: number
-
-    boxHeight: number
-
     constructor(scale: number, boxWidth: number, boxHeight: number) {
       this.scale = scale
-      this.boxWidth = boxWidth
-      this.boxHeight = boxHeight
+    }
+
+    get boxWidth(): number {
+        if (this.scale <=1) return 150
+        if (this.scale <=2) return 200
+        return 300
+    }
+
+    get boxHeight(): number {
+        if (this.scale <=1) return 50
+        if (this.scale <=2) return 100
+        return 200
     }
 
     borderVector(vector: Vector): Vector {

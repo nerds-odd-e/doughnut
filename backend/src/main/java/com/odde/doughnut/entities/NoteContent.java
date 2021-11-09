@@ -42,6 +42,16 @@ public class NoteContent {
 
     @Getter
     @Setter
+    @Column(name = "title_id", nullable = true)
+    private String titleId;
+
+    @Getter
+    @Setter
+    @Column(name = "description_id", nullable = true)
+    private String descriptionId;
+
+    @Getter
+    @Setter
     private String url;
 
     @Column(name = "url_is_video")

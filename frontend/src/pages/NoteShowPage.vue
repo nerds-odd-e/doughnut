@@ -8,14 +8,12 @@
         expandChildren: true,
         noteComponent: viewTypeObj.noteComponent}"/>
 
-    <NoteStatisticsButton :noteId="noteId" />
   </LoadingPage>
 </template>
 
 <script>
 import LoadingPage from "./commons/LoadingPage.vue";
 import NotePageFrame from '../components/notes/views/NotePageFrame.vue';
-import NoteStatisticsButton from "../components/notes/NoteStatisticsButton.vue";
 import { storedApiGetNoteAndItsChildren, storedApiGetNoteWithDescendents } from "../storedApi";
 import { viewType } from "../models/viewTypes";
 
@@ -28,7 +26,7 @@ export default {
       loading: true,
     };
   },
-  components: { LoadingPage, NotePageFrame, NoteStatisticsButton },
+  components: { LoadingPage, NotePageFrame },
   computed: {
     viewTypeObj() {
       return viewType(this.viewType)

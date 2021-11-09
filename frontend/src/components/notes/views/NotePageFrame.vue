@@ -1,5 +1,5 @@
 <template>
-    <div class="box">
+    <div class="inner-box">
       <div class="header">
         <NoteControl :noteId="highlightNoteId" :viewType="viewType"/>
         <Breadcrumb v-bind="notePosition"/>
@@ -47,20 +47,3 @@ export default {
   },
 };
 </script>
-
-<style lang="sass" scoped>
-.box
-  display: flex
-  flex-flow: column
-  height: 100%
-
-.box .header
-  flex: 0 1 auto
-
-.box .content
-  flex: 1 1 auto
-  overflow: hidden
-
-.box .footer
-  flex: 0 1 40px
-</style>

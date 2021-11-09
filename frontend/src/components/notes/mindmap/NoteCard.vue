@@ -1,21 +1,21 @@
 <template>
   <NoteShell 
-  :class="`note-card ${highlighted ? 'highlighted' : ''}`"
-  v-bind="{id: note.id, updatedAt: note.noteContent.updatedAt}"
+  :class="`inner-box note-card ${size} ${highlightClass}`"
+  v-bind="{id: note.id, updatedAt: note.noteContent?.updatedAt}"
   role="card" :aria-label="note.title"
   :style="`top:${coord.y}px; left:${coord.x}px`"
   v-on:click="$emit('highlight')">
-    <h5 class="note-card-title">
+    <h5 class="header note-card-title">
       <NoteTitleWithLink :note="note" class="card-title" />
     </h5>
-    <SvgDescriptionIndicator class="description-indicator" v-if="!!note.shortDescription"/>
+    <NoteContent class="content" v-bind="{note, size}"/>
   </NoteShell>
 </template>
 
 <script>
 import NoteTitleWithLink from "../NoteTitleWithLink.vue";
-import SvgDescriptionIndicator from "../../svgs/SvgDescriptionIndicator.vue";
 import NoteShell from "../NoteShell.vue";
+import NoteContent from "../NoteContent.vue";
 import MindmapSector from "@/models/MindmapSector";
 
 export default {
@@ -23,13 +23,18 @@ export default {
     note: Object,
     mindmapSector: MindmapSector,
     mindmap: Object,
-    highlighted: Boolean,
+    highlightNoteId: [String, Number],
   },
   emits: ['highlight'],
-  components: { NoteShell, SvgDescriptionIndicator, NoteTitleWithLink },
+  components: {
+     NoteShell,
+     NoteContent,
+     NoteTitleWithLink },
   computed: {
+    highlightClass() {
+      return this.highlightNoteId?.toString() === this.note.id.toString() ? 'highlighted' : '' },
     coord() { return this.mindmap.coord(this.mindmapSector) },
-
+    size() { return this.mindmap.size() },
   },
 
 }
@@ -40,13 +45,19 @@ export default {
   z-index: 2000
   position: absolute
   width: 150px
-  min-height: 50px
+  height: 50px
   padding: 3px
   background-color: white
-  border-width: 1px
+  border-width: 3px
   border-style: solid
   border-color: rgb(0,0,0, 0.7)
   border-radius: 10px
+  &.medium
+    width: 200px
+    height: 100px
+  &.large
+    width: 300px
+    height: 200px
 .note-card-title
   font-size: 1rem
 
@@ -87,9 +98,6 @@ export default {
   opacity: 0.7
   border-radius: 50%
 
-.description-indicator
-  position: absolute
-  left: 5px
-  top: 25px
-
+::v-deep .note-description
+  height: 100%
 </style>

@@ -44,6 +44,7 @@ class RestReviewsController {
     @GetMapping("/initial")
     public ReviewPointViewedByUser initialReview() {
         UserModel user = currentUserFetcher.getUser();
+        user.getAuthorization().assertLoggedIn();
         Reviewing reviewing = user.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
         ReviewPoint reviewPoint = reviewing.getOneInitialReviewPoint();
         ReviewPointViewedByUser from = ReviewPointViewedByUser.from(reviewPoint, user);
@@ -62,6 +63,7 @@ class RestReviewsController {
     @Transactional
     public ReviewPointViewedByUser create(@RequestBody InitialInfo initialInfo) {
         UserModel userModel = currentUserFetcher.getUser();
+        userModel.getAuthorization().assertLoggedIn();
         if (initialInfo.reviewPoint.getNoteId() != null) {
             initialInfo.reviewPoint.setNote(modelFactoryService.noteRepository.findById(initialInfo.reviewPoint.getNoteId()).orElse(null));
         }

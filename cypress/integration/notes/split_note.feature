@@ -10,6 +10,5 @@ Feature: split note
       | title   | description                                     |
       | animals | canine\nDogs, wolves, etc\n\nHomo\nWe are homos |
     When I split note "animals"
-    Then I should see the note description to be ""
-    And there is a note "animals/canine" with description "Dogs, wolves, etc"
+    Then there is a note "animals/canine" with description "Dogs, wolves, etc"
     And there is a note "animals/Homo" with description "We are homos"

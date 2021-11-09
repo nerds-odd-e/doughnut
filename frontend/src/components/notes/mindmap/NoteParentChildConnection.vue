@@ -14,7 +14,6 @@ export default {
     mindmapSector: Object,
     mindmap: Object,
   },
-  emits: ['highlight'],
   computed: {
     connection() { return this.mindmap.connectFromParent(this.mindmapSector)},
   },

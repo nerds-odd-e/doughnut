@@ -28,8 +28,16 @@ class NoteBuilder extends Builder {
     return this;
   }
 
+  picture(value: string): NoteBuilder {
+    this.data.notePicture = value;
+    return this;
+  }
+
   shortDescription(value: string): NoteBuilder {
     this.data.shortDescription = value;
+    if(!this.data.noteContent.description) {
+      this.data.noteContent.description = value;
+    }
     return this;
   }
 

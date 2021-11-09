@@ -1,6 +1,7 @@
 <template>
   <div class="container" v-if="note">
-    <NoteWithLinks v-bind="note"/>
+    <NoteWithLinks v-bind="{note}"/>
+    <NoteStatisticsButton :noteId="noteId" />
     <Cards v-if="expandChildren" :notes="children"/>
   </div>
 
@@ -8,6 +9,7 @@
 
 <script>
 import NoteWithLinks from "../NoteWithLinks.vue";
+import NoteStatisticsButton from "../NoteStatisticsButton.vue";
 import Cards from "../Cards.vue";
 
 export default {
@@ -20,6 +22,7 @@ export default {
   components: {
     NoteWithLinks,
     Cards,
+    NoteStatisticsButton,
   },
   computed: {
     note() {

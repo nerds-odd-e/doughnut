@@ -2,7 +2,7 @@
   name = "nixpkgs-unstable";
   url = "https://github.com/nixos/nixpkgs/";
   ref = "refs/heads/nixpkgs-unstable";
-  rev = "7053541084bf5ce2921ef307e5585d39d7ba8b3f";
+  rev = "550dab224a26ec25e20e82c0c8bfc764e01b772e";
 }) { } }:
 with pkgs;
 let
@@ -72,6 +72,7 @@ in mkShell {
     libmysqlclient
     libpcap
     patchelf
+    pinentry
     cacert
     glances
     httpie

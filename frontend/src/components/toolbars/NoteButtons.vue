@@ -109,8 +109,8 @@ export default {
         if(parentId) {
           if(viewType(this.viewType).redirectAfterDelete) {
             this.$router.push({
-              name: "noteCards",
-              params: { noteId: parentId },
+              name: "noteShow",
+              params: { noteId: parentId, viewType: this.viewType },
             });
           }
         } else {

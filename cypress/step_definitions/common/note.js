@@ -245,7 +245,7 @@ When("I drag the map by {int}px * {int}px when holding the shift button", (dx, d
 
 When("I zoom in at the {string}", (position) => {
     cy.get('.mindmap-event-receiver')
-      .trigger('mousewheel', position, { clientX: 0, clientY: 0, deltaY: 50 })
+      .trigger('wheel', position, { clientX: 0, clientY: 0, deltaY: 50 })
 });
 
 When("I should see the zoom scale is {string}", (scale) => {
@@ -285,12 +285,12 @@ Then("I should see the child notes {string} in order", (notesStr) => {
 Then("I should see {string} is newer than {string}", (newer, older) => {
   let firstColor;
   cy.jumpToNotePage(newer);
-  cy.get(".note-show div")
-    .invoke("css", "background-color")
+  cy.get(".note-body")
+    .invoke("css", "border-color")
     .then((val) => (firstColor = val));
   cy.jumpToNotePage(older);
-  cy.get(".note-show")
-    .invoke("css", "background-color")
+  cy.get(".note-body")
+    .invoke("css", "border-color")
     .then((val) =>
       expect(parseInt(firstColor.match(/\d+/)[0])).to.greaterThan(
         parseInt(val.match(/\d+/)[0])
@@ -303,12 +303,6 @@ When("I split note {string}",
     cy.clickNotePageMoreOptionsButton(noteTitle, "split note");
     cy.findByRole("button", { name: "OK" }).click();
   }
-);
-
-When("I should see the note description to be {string}",
-    (expectedDescription) => {
-        cy.expectCurrentNoteDescription(expectedDescription)
-    }
 );
 
 When("there is a note {string} with description {string}",
