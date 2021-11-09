@@ -43,12 +43,12 @@ public class NoteContent {
     @Getter
     @Setter
     @Column(name = "title_id", nullable = true)
-    private String titleId;
+    private String titleID;
 
     @Getter
     @Setter
     @Column(name = "description_id", nullable = true)
-    private String descriptionId;
+    private String descriptionID;
 
     @Getter
     @Setter

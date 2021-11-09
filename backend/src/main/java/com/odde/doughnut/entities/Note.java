@@ -177,8 +177,8 @@ public class Note {
         return noteContent.getTitle();
     }
 
-    public String getTitleId() {
-        return noteContent.getTitleId();
+    public String getTitleID() {
+        return noteContent.getTitleID();
     }
 
     public void mergeMasterReviewSetting(ReviewSetting reviewSetting) {
