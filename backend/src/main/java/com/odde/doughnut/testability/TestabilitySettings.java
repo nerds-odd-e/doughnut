@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import org.springframework.util.Assert;
 import org.springframework.web.context.annotation.SessionScope;
 
 import java.sql.Timestamp;
@@ -67,6 +68,9 @@ public class TestabilitySettings {
     }
 
     public boolean isDateBefore(Date dateToCheck, Date dateExists) {
+        if (dateToCheck == null || dateExists == null) {
+            return false;
+        }
         if (dateToCheck.before(dateExists)) {
             return true;
         }

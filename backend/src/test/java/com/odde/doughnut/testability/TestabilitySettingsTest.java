@@ -42,4 +42,18 @@ public class TestabilitySettingsTest {
 
         assertThat(response, equalTo(false));
     }
+
+    @Test
+    void shouldResponseFalseIfDateToCheckIsNull_isDateBefore() {
+        Date date = new Date();
+        boolean response = testabilitySettings.isDateBefore(null, date);
+        assertThat(response, equalTo(false));
+    }
+
+    @Test
+    void shouldResponseFalseIfDateExistsIsNull_isDateBefore() {
+        Date date = new Date();
+        boolean response = testabilitySettings.isDateBefore(date, null);
+        assertThat(response, equalTo(false));
+    }
 }
