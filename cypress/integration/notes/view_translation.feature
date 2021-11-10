@@ -8,6 +8,7 @@ Feature: View Translate on Notes
         | English        |               | English Language     |
         And I click on the overview button of note "English"
 
+    @featureToggle
     Scenario: Should show default title and translation button
         Then Note title will be shown "English" version
         And I should see button "ID"
