@@ -105,7 +105,7 @@ Cypress.Commands.add("submitNoteFormWith", (noteAttributes) => {
 });
 
 Cypress.Commands.add("clickAddChildNoteButton", () => {
-  cy.pageIsLoaded()
+  cy.pageIsLoaded();
   cy.findAllByRole("button", { name: "Add Child Note" }).first().click();
 });
 
@@ -174,9 +174,7 @@ Cypress.Commands.add("creatingLinkFor", (noteTitle) => {
 
 Cypress.Commands.add("clickNotePageButton", (noteTitle, btnTextOrTitle) => {
   cy.jumpToNotePage(noteTitle);
-  cy.get(".toolbar")
-    .findByRole("button", { name: btnTextOrTitle })
-    .click();
+  cy.get(".toolbar").findByRole("button", { name: btnTextOrTitle }).click();
 });
 
 Cypress.Commands.add(
@@ -190,12 +188,8 @@ Cypress.Commands.add(
 Cypress.Commands.add(
   "clickNotePageMoreOptionsButtonOnCurrentPage",
   (btnTextOrTitle) => {
-    cy.get(".toolbar")
-      .findByRole("button", { name: "more options" })
-      .click();
-    cy.get(".toolbar")
-      .findByRole("button", { name: btnTextOrTitle })
-      .click();
+    cy.get(".toolbar").findByRole("button", { name: "more options" }).click();
+    cy.get(".toolbar").findByRole("button", { name: btnTextOrTitle }).click();
   }
 );
 
@@ -407,38 +401,51 @@ Cypress.Commands.add("failure", () => {
 });
 
 Cypress.Commands.add("expectCurrentNoteDescription", (expectedDescription) => {
-  cy.findByText(expectedDescription, { selector: ".note-description" })
+  cy.findByText(expectedDescription, { selector: ".note-description" });
 });
 
 Cypress.Commands.add("withinMindmap", () => {
-  cy.pageIsLoaded()
-  cy.wrap(new Promise((resolve, reject) => {
-      cy.get(`.box .content .inner-box .content`).then((mindmap)=>{
-          const rect = mindmap[0].getBoundingClientRect()
-          cy.get("[role='card']").then(($elms)=>{
-            const cards = Object.fromEntries(Cypress.$.makeArray($elms).map((el) => [el.innerText, el.getBoundingClientRect()]))
-            cards.mindmapRect = rect
-            resolve(cards)
-          })
-      })
-  }))
-});
-
-Cypress.Commands.add("distanceBetweenCardsGreaterThan", {prevSubject: true}, (cards, note1, note2, min) => {
-    const rect1 = cards[note1]
-    const rect2 = cards[note2]
-    const xd = (rect1.right + rect1.left) / 2 - (rect2.right + rect2.left) / 2
-    const yd = (rect1.top + rect1.bottom) / 2 - (rect2.top + rect2.bottom) / 2
-    expect(Math.sqrt(xd * xd + yd * yd)).greaterThan(min)
-
+  cy.pageIsLoaded();
+  cy.wrap(
+    new Promise((resolve, reject) => {
+      cy.get(`.box .content .inner-box .content`).then((mindmap) => {
+        const rect = mindmap[0].getBoundingClientRect();
+        cy.get("[role='card']").then(($elms) => {
+          const cards = Object.fromEntries(
+            Cypress.$.makeArray($elms).map((el) => [
+              el.innerText,
+              el.getBoundingClientRect(),
+            ])
+          );
+          cards.mindmapRect = rect;
+          resolve(cards);
+        });
+      });
+    })
+  );
 });
 
 Cypress.Commands.add(
-  "expectTranslationButtonLang",
-  (lang) => {
-   const buttonText = `Translate to ${lang}`
-    cy.findByRole('button', {name: buttonText })
+  "distanceBetweenCardsGreaterThan",
+  { prevSubject: true },
+  (cards, note1, note2, min) => {
+    const rect1 = cards[note1];
+    const rect2 = cards[note2];
+    const xd = (rect1.right + rect1.left) / 2 - (rect2.right + rect2.left) / 2;
+    const yd = (rect1.top + rect1.bottom) / 2 - (rect2.top + rect2.bottom) / 2;
+    expect(Math.sqrt(xd * xd + yd * yd)).greaterThan(min);
   }
 );
 
+Cypress.Commands.add("expectTranslationButtonLang", (lang) => {
+  const buttonText = `Translate to ${lang}`;
+  cy.findByRole("button", { name: buttonText });
+});
 
+Cypress.Commands.add("expectButtonWithTextOrTitle", (btnTextOrTitle) => {
+  cy.findByRole("button", { name: btnTextOrTitle });
+});
+
+Cypress.Commands.add("clickButtonWithTextOrTitle", (btnTextOrTitle) => {
+  cy.findByRole("button", { name: btnTextOrTitle }).click();
+});

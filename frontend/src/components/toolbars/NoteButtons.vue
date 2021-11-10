@@ -42,7 +42,12 @@
         <SvgCog />
       </a>
       <div class="dropdown-menu dropdown-menu-right">
-        <NoteTranslationEditButton :noteId="note.id" :oldTitle="note.title">
+        <NoteTranslationEditButton
+          v-if="featureToggle"
+          :noteId="note.id"
+          :oldTitle="note.title"
+          :oldDesc="note.description"
+        >
           Edit translations
         </NoteTranslationEditButton>
         <ReviewSettingEditButton :noteId="note.id" :oldTitle="note.title">
@@ -60,7 +65,7 @@
           Delete
         </button>
       </div>
-      <NoteTranslationButton v-if="featureToggle"/>
+      <NoteTranslationButton v-if="featureToggle" />
     </div>
   </div>
 </template>
@@ -101,9 +106,9 @@ export default {
     ViewTypeButtons,
   },
   computed: {
-    featureToggle() { 
-      return this.$store.getters.getFeatureToggle()
-    }
+    featureToggle() {
+      return this.$store.getters.getFeatureToggle();
+    },
   },
   methods: {
     async deleteNote() {

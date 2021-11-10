@@ -17,7 +17,7 @@ import NoteTranslationEditForm from "./NoteTranslationEditForm.vue";
 
 export default {
   components: { NoteTranslationEditForm },
-  props: { noteId: [String, Number], title: String },
+  props: { noteId: [String, Number], title: String, description: String },
   emits: ["done"],
   data() {
     return {

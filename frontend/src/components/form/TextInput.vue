@@ -1,5 +1,5 @@
 <template>
-  <InputWithType v-bind="{ scopeName, field, errors }">
+  <InputWithType v-bind="{ scopeName, field, title, errors }">
     <input
       :class="`text-input-control form-control ${!!errors ? 'is-invalid' : ''}`"
       :id="`${scopeName}-${field}`"
@@ -20,6 +20,7 @@ const props = defineProps({
   modelValue: String,
   scopeName: String,
   field: String,
+  title: String,
   placeholder: { type: String, default: null },
   autofocus: { type: Boolean, default: false },
   errors: Object,

@@ -14,12 +14,13 @@ import SvgTranslationEdit from "../svgs/SvgTranslationEdit.vue";
 
 export default {
   components: { SvgTranslationEdit },
-  props: { noteId: [String, Number], oldTitle: String },
+  props: { noteId: [String, Number], oldTitle: String, oldDescription: String },
   methods: {
     async showDialog() {
       await this.$popups.dialog(NoteTranslationEditDialog, {
         noteId: this.noteId,
         title: this.oldTitle,
+        description: this.oldDescription,
       });
     },
   },
