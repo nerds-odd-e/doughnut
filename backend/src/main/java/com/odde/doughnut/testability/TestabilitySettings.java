@@ -76,4 +76,8 @@ public class TestabilitySettings {
         }
         return false;
     }
+
+    public boolean isDateNotBefore(Date dateToCheck, Date dateExists) {
+        return !isDateBefore(dateToCheck, dateExists);
+    }
 }

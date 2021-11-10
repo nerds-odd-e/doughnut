@@ -56,4 +56,17 @@ public class TestabilitySettingsTest {
         boolean response = testabilitySettings.isDateBefore(date, null);
         assertThat(response, equalTo(false));
     }
+
+    @Test
+    void shouldResponseFalseIfDateIsNotBefore_isNotBefore() {
+        Date date1 = new Date();
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date1);
+        calendar.add(Calendar.SECOND, -1);
+
+        boolean response = testabilitySettings.isDateNotBefore(calendar.getTime(), new Date());
+
+        assertThat(response, equalTo(false));
+    }
 }
