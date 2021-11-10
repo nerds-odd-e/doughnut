@@ -8,8 +8,6 @@ Cypress.Commands.add("cleanDBAndSeedData", () => {
 
 Cypress.Commands.add("enableFeatureToggle", (enabled) => {
   cy.request({ method: "POST", url: "/api/testability/feature_toggle", body: { enabled } })
-    .its("body")
-    .should("equal", "OK");
 });
 
 Cypress.Commands.add("seedNotes", (notes, externalIdentifier = "") => {
@@ -68,4 +66,3 @@ Cypress.Commands.add("seedCircle", (circle) => {
     expect(response.body).to.equal("OK");
   });
 });
-

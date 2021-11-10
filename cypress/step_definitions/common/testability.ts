@@ -46,3 +46,8 @@ Then("The {string} alert {string}", (expectedContent, shouldExistOrNot) => {
     cy.contains(expectedContent).should(shouldExistOrNot === 'should exist' ? "exist" : "not.exist")
 });
 
+Then("I go to the testability page to turn on the feature toggle", () => {
+    cy.findByText("Testability").click()
+    cy.getFormControl('Feature Toggle').click()
+});
+

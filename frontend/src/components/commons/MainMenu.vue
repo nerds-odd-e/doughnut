@@ -25,26 +25,28 @@
         <ul class="navbar-nav me-auto mb-2 mb-lg-0">
           <li class="nav-item active">
             <router-link class="nav-link" :to="{ name: 'notebooks' }"
-              >My Notes</router-link
-            >
+              >My Notes</router-link>
           </li>
           <li class="nav-item">
             <router-link class="nav-link" :to="{ name: 'reviews' }"
-              >Review</router-link
-            >
+              >Review</router-link>
           </li>
 
           <li class="nav-item">
             <router-link class="nav-link" :to="{ name: 'circles' }"
-              >Circles</router-link
-            >
+              >Circles</router-link>
           </li>
 
           <li class="nav-item">
             <router-link class="nav-link" :to="{ name: 'bazaar' }"
-              >Bazaar</router-link
-            >
+              >Bazaar</router-link>
           </li>
+
+          <li v-if="environment=='testing'" class="nav-item">
+            <router-link class="nav-link" :to="{ name: 'testability' }"
+              >Testability</router-link>
+          </li>
+
           <li v-if="featureToggle" class="nav-item">
             <em class="nav-link btn-danger">Feature Toggle is On </em>
           </li>
@@ -92,6 +94,7 @@ export default {
   computed: {
     user() { return this.$store.getters.getCurrentUser()},
     featureToggle() { return this.$store.getters.getFeatureToggle()},
+    environment() { return this.$store.getters.getEnvironment()},
   }
 };
 </script>

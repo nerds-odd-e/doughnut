@@ -13,6 +13,7 @@ import CircleJoinPage from "@/pages/CircleJoinPage.vue";
 import FailureReportListPage from "@/pages/FailureReportListPage.vue";
 import FailureReportPage from "@/pages/FailureReportPage.vue";
 import UserProfilePage from "@/pages/UserProfilePage.vue";
+import TestabilityPage from "@/pages/TestabilityPage.vue";
 
 const NestedInitialReviewPage = NestedPage(
   InitialReviewPage,
@@ -84,6 +85,11 @@ const routes = [
     path: "/failure-report-list",
     name: "failureReportList",
     component: FailureReportListPage,
+  },
+  {
+    path: "/testability",
+    name: "testability",
+    component: TestabilityPage,
   },
   {
     path: "/failure-report-list/show/:failureReportId",

@@ -61,9 +61,9 @@ class TestabilityRestController {
     }
 
     @PostMapping("/feature_toggle")
-    public String enableFeatureToggle(@RequestBody Map<String, String> requestBody) {
+    public List enableFeatureToggle(@RequestBody Map<String, String> requestBody) {
         testabilitySettings.enableFeatureToggle(requestBody.get("enabled").equals("true"));
-        return "OK";
+        return new ArrayList();
     }
 
     @GetMapping("/feature_toggle")

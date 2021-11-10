@@ -42,10 +42,12 @@ export default createStore({
     notes: {},
     currentUser: null,
     featureToggle: false,
+    environment: 'production',
   }),
 
   getters: {
     getCurrentUser: (state) => () => state.currentUser,
+    getEnvironment: (state) => () => state.environment,
     getFeatureToggle: (state) => () => state.featureToggle,
     getNoteById: (state) => (id) => withState(state).getNoteById(id),
     getChildrenIdsByParentId: (state) => (parentId) => withState(state).getChildrenIdsByParentId(parentId),
@@ -66,6 +68,7 @@ export default createStore({
       state.currentUser = user
     },
     featureToggle(state, ft) {
+      state.environment = "testing"
       state.featureToggle = ft
     },
   },

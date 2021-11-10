@@ -8,3 +8,5 @@ Feature: feature toggle
 
   Scenario: A scenario without feature toggle should toggle the feature off
     Then The "Feature Toggle is On" alert "should not exist"
+    When I go to the testability page to turn on the feature toggle
+    Then The "Feature Toggle is On" alert "should exist"
