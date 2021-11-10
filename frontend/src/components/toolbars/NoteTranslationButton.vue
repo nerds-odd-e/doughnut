@@ -12,7 +12,7 @@
 <script>
 import SvgFlagID from "../svgs/flags/SvgFlagID.vue";
 import SvgFlagEN from "../svgs/flags/SvgFlagEN.vue";
-import { Languages } from "../../constants/lang";
+import Languages from "../../constants/lang";
 
 export default {
     name: "NoteTranslationButton",
