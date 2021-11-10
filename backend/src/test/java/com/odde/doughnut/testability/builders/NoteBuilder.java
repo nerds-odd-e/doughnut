@@ -1,13 +1,19 @@
 package com.odde.doughnut.testability.builders;
 
-import com.odde.doughnut.entities.*;
+import java.sql.Timestamp;
+
+import com.odde.doughnut.entities.Circle;
+import com.odde.doughnut.entities.Link;
+import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.Ownership;
+import com.odde.doughnut.entities.ReviewSetting;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
-import org.apache.logging.log4j.util.Strings;
 
-import java.sql.Timestamp;
+import org.apache.logging.log4j.util.Strings;
 
 public class NoteBuilder extends EntityBuilder<Note> {
     static final TestObjectCounter titleCounter = new TestObjectCounter(n->"title" + n);
@@ -15,9 +21,9 @@ public class NoteBuilder extends EntityBuilder<Note> {
     public NoteBuilder(Note note, MakeMe makeMe){
         super(makeMe, note);
         if(Strings.isEmpty(note.getTitle())) title(titleCounter.generate());
-        if(Strings.isEmpty(note.getTitleID())) titleID(titleCounter.generate());
+        if(Strings.isEmpty(note.getTitleIDN())) titleID(titleCounter.generate());
         description("descrption");
-        getDescriptionID("description_ID");
+        getDescriptionIDN("description_idn");
         createdAt(new Timestamp(System.currentTimeMillis()));
         updatedAt(new Timestamp(System.currentTimeMillis()));
     }
@@ -87,7 +93,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
     }
 
     public NoteBuilder titleID(String text) {
-        entity.getNoteContent().setTitleID(text);
+        entity.getNoteContent().setTitleIDN(text);
         return this;
     }
 
@@ -96,8 +102,8 @@ public class NoteBuilder extends EntityBuilder<Note> {
         return this;
     }
 
-    public NoteBuilder getDescriptionID(String text) {
-        entity.getNoteContent().setDescriptionID(text);
+    public NoteBuilder getDescriptionIDN(String text) {
+        entity.getNoteContent().setDescriptionIDN(text);
         return this;
     }
 

@@ -1,27 +1,35 @@
 package com.odde.doughnut.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.odde.doughnut.algorithms.ClozeDescription;
-import com.odde.doughnut.algorithms.NoteTitle;
-import com.odde.doughnut.entities.validators.ValidateNotePicture;
-import com.odde.doughnut.models.ImageBuilder;
-import lombok.Getter;
-import lombok.Setter;
-import org.apache.logging.log4j.util.Strings;
-import org.springframework.web.multipart.MultipartFile;
-import org.thymeleaf.util.StringUtils;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Embeddable;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Transient;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.odde.doughnut.algorithms.ClozeDescription;
+import com.odde.doughnut.algorithms.NoteTitle;
+import com.odde.doughnut.entities.validators.ValidateNotePicture;
+import com.odde.doughnut.models.ImageBuilder;
+
+import org.apache.logging.log4j.util.Strings;
+import org.springframework.web.multipart.MultipartFile;
+import org.thymeleaf.util.StringUtils;
+
+import lombok.Getter;
+import lombok.Setter;
 
 @Embeddable
 @ValidateNotePicture
@@ -42,13 +50,13 @@ public class NoteContent {
 
     @Getter
     @Setter
-    @Column(name = "title_id", nullable = true)
-    private String titleID;
+    @Column(name = "title_idn", nullable = true)
+    private String titleIDN;
 
     @Getter
     @Setter
-    @Column(name = "description_id", nullable = true)
-    private String descriptionID;
+    @Column(name = "description_idn", nullable = true)
+    private String descriptionIDN;
 
     @Getter
     @Setter
