@@ -2,7 +2,9 @@ interface ILanguages {
     [property: string]: string
 }
 
-export const Languages: ILanguages = {
+const Languages: ILanguages = {
     ID: "ID",
     EN: "EN"
 };
+
+export default Languages;
