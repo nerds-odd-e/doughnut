@@ -433,4 +433,12 @@ Cypress.Commands.add("distanceBetweenCardsGreaterThan", {prevSubject: true}, (ca
 
 });
 
+Cypress.Commands.add(
+  "expectTranslationButtonLang",
+  (lang) => {
+   const buttonText = `Translate to ${lang}`
+    cy.findByRole('button', {name: buttonText })
+  }
+);
+
 
