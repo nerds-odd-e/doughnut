@@ -63,6 +63,7 @@
           Delete
         </button>
       </div>
+      <NoteTranslationButton />
     </div>
 
   </div>
@@ -77,6 +78,7 @@ import LinkNoteButton from "../links/LinkNoteButton.vue";
 import ReviewSettingEditButton from "../review/ReviewSettingEditButton.vue";
 import NoteEditButton from "./NoteEditButton.vue";
 import NoteSplitButton from "./NoteSplitButton.vue";
+import NoteTranslationButton from "./NoteTranslationButton.vue";
 import NoteNewButton from "./NoteNewButton.vue";
 import ViewTypeButtons from "./ViewTypeButtons.vue";
 import { storedApiDeleteNote } from "../../storedApi";
@@ -96,6 +98,7 @@ export default {
     LinkNoteButton,
     NoteEditButton,
     NoteSplitButton,
+    NoteTranslationButton,
     NoteNewButton,
     ViewTypeButtons,
   },
