@@ -13,9 +13,10 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -106,7 +107,10 @@ class RestNoteController {
         Long oldVersion = noteOld.get().getNoteContent().getVersion();
 
         if (noteOld.isPresent() && noteContent.getVersion() != null) {
-            Assert.isTrue((oldVersion == null) || (noteContent.getVersion() >= oldVersion), "Failed!. Conflicting edit have been made to the same note");
+            boolean isSucceed = (oldVersion == null) || (noteContent.getVersion() >= oldVersion);
+            if (!isSucceed) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Failed!. Conflicting edit have been made to the same note");
+            }
         }
 
         noteContent.setVersion(oldVersion + 1);
