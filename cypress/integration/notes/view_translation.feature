@@ -4,8 +4,8 @@ Feature: View Translate on Notes
     Background:
         Given I've logged in as an existing user
         And there are some notes for the current user
-        | title            | testingParent | description |
-        | English        |               | English Language     |
+        | title   |  titleIDN       | testingParent | description |
+        | English  |  Indonesia    |               | English Language     |
         And I click on the overview button of note "English"
 
     @featureToggle
@@ -14,8 +14,11 @@ Feature: View Translate on Notes
         And I should see button "ID"
 
 
-        @ignore
-    Scenario: Should translate note's content
-        Given I am on Notes Detail
-        When I click on ID/ENG button and ID/ENG translation is available
-        Then Title and Description for Notes and its children will be translated to ID/ENG
+    @featureToggle
+    Scenario: Should show translation title and translation button changes
+        When I click on the translation button "ID"
+        Then Note title will be shown "Indonesia" version
+        And I should see button "EN"
+        When I click on the translation button "EN"
+        Then Note title will be shown "English" version
+        And I should see button "ID"
