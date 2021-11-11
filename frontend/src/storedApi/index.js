@@ -1,4 +1,4 @@
-import { restGet, restPost, restPatchMultiplePartForm, restPostMultiplePartForm } from "../restful/restful";
+import { restGet, restPatchMultiplePartForm, restPost, restPostMultiplePartForm } from "../restful/restful";
 
 const apiLogout = async () => {
     await restPost(`/logout`, {})
@@ -148,6 +148,8 @@ const storedApiGetNextReviewItem = async (store) => {
     return res
 }
 
+const changeNotesLanguage = async (store, id, language) => store.commit("changeNotesLanguage", { id, language });
+
 export {
     apiLogout,
     storedApiGetNextReviewItem,
@@ -166,4 +168,5 @@ export {
     storedApiDoInitialReview,
     storedApiGetFeatureToggle,
     storedApiSetFeatureToggle,
+    changeNotesLanguage,
 }

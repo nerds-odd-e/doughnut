@@ -36,4 +36,22 @@ describe("Note Translation Button", () => {
         expect(buttonTranslation.attributes().lang).toBe("EN");
         expect(buttonTranslation.find(".flag").attributes().class).toContain("ID");
     });
+
+    it("should show EN translation button when ID translation button is clicked", async () => {
+        expect(buttonTranslation.find(".flag").attributes().class).toContain("ID");
+        
+        await wrapper.find(".btn-translation").trigger("click");
+        
+        expect(wrapper.find(".btn-translation").attributes().lang).toBe("ID");
+        expect(wrapper.find(".btn-translation .flag").attributes().class).toContain("EN");
+    });
+
+    it("should show ID translation button when EN translation button is clicked", async () => {
+        expect(buttonTranslation.find(".flag").attributes().class).toContain("EN");
+
+        await wrapper.find(".btn-translation").trigger("click");
+        
+        expect(wrapper.find(".btn-translation").attributes().lang).toBe("EN");
+        expect(wrapper.find(".btn-translation .flag").attributes().class).toContain("ID");
+    });
  });

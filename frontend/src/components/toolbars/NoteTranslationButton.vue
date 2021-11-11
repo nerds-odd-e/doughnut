@@ -13,6 +13,7 @@
 import SvgFlagID from "../svgs/flags/SvgFlagID.vue";
 import SvgFlagEN from "../svgs/flags/SvgFlagEN.vue";
 import Languages from "../../constants/lang";
+import { changeNotesLanguage } from "../../storedApi";
 
 export default {
     name: "NoteTranslationButton",
@@ -37,11 +38,11 @@ export default {
         toggleLanguage(){
             if (this.currentLang === Languages.EN) {
                 this.changeLanguage(Languages.ID, Languages.EN);
-                this.$store.commit("changeNotesLanguage", { id: this.noteId, language: Languages.ID });
+                changeNotesLanguage(this.$store, this.noteId, Languages.ID);
             } else {
                 this.changeLanguage(Languages.EN, Languages.ID);
-                this.$store.commit("changeNotesLanguage", { id: this.noteId, language: Languages.EN });
-            }            
+                changeNotesLanguage(this.$store, this.noteId, Languages.EN);
+            }
         }
     }
 }
