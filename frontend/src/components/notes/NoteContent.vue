@@ -1,10 +1,10 @@
 <template>
   <div class="note-content">
-    <template v-if="!!note.noteContent.description">
+    <template v-if="!!translatedDescription">
       <ShowDescription
         v-if="size==='large'"
         class="col"
-        :description="note.noteContent.description"
+        :description="translatedDescription"
       />
       <NoteShortDescription class="col" v-if="size==='medium'" :shortDescription="note.shortDescription"/>
       <SvgDescriptionIndicator v-if="size==='small'" class="description-indicator"/>
@@ -38,6 +38,7 @@ import ShowDescription from "./ShowDescription.vue";
 import SvgDescriptionIndicator from "../svgs/SvgDescriptionIndicator.vue";
 import SvgPictureIndicator from "../svgs/SvgPictureIndicator.vue";
 import SvgUrlIndicator from "../svgs/SvgUrlIndicator.vue";
+import Languages from "../../constants/lang";
 
 export default {
   props: {
@@ -56,6 +57,9 @@ export default {
     twoColumns() {
       return !!this.notePicture && !!this.note.noteContent.description;
     },
+    translatedDescription(){
+      return this.note.language === Languages.ID && this.note.noteContent && this.note.noteContent.descriptionIDN ? this.note.noteContent.descriptionIDN : this.note.noteContent.description;
+    }
   },
 };
 </script>

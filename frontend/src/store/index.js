@@ -71,5 +71,15 @@ export default createStore({
       state.environment = "testing"
       state.featureToggle = ft
     },
+    changeNotesLanguage(state, param) {
+      const notes = [];
+      notes.push(withState(state).getNoteById(param.id));
+      notes.push(...withState(state).getChildrenOfParentId(param.id));
+
+      notes.forEach(note => {
+        note.language = param.language;
+        state.notes[note.id] = note;
+      });
+    }
   },
 });

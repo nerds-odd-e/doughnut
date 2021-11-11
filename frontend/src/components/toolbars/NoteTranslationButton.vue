@@ -20,6 +20,9 @@ export default {
         SvgFlagID,
         SvgFlagEN,
     },
+    props: {
+        noteId: Number,
+    },
     data(){
         return {
             currentLang: Languages.EN,
@@ -32,10 +35,13 @@ export default {
             this.translationLang = translationLang;
         },
         toggleLanguage(){
-            if (this.currentLang === Languages.EN)
+            if (this.currentLang === Languages.EN) {
                 this.changeLanguage(Languages.ID, Languages.EN);
-            else
+                this.$store.commit("changeNotesLanguage", { id: this.noteId, language: Languages.ID });
+            } else {
                 this.changeLanguage(Languages.EN, Languages.ID);
+                this.$store.commit("changeNotesLanguage", { id: this.noteId, language: Languages.EN });
+            }            
         }
     }
 }

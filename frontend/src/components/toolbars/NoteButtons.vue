@@ -65,7 +65,7 @@
           Delete
         </button>
       </div>
-      <NoteTranslationButton v-if="featureToggle" />
+      <NoteTranslationButton v-if="featureToggle" :noteId="note.id" />
     </div>
   </div>
 </template>
