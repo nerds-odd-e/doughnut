@@ -459,3 +459,7 @@ Cypress.Commands.add(
   (text) => cy.findByText(text) //.should("be.visible")
   // Add should be visible back when the link view page is remade.
 );
+
+Cypress.Commands.add("clickNoteTab", (noteTab) => {
+  cy.findByRole("button", { name: noteTab }).click();
+});

@@ -40,3 +40,7 @@ And("Note description will be shown {string}", (description) => {
 And("I should see translation button with language code {string}", (lang) => {
   cy.expectTranslationButtonLang(lang);
 });
+
+Given("I jump to {string} tab", (noteTab) => {
+  cy.clickNoteTab(noteTab);
+});

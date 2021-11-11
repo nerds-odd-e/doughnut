@@ -29,3 +29,18 @@ Feature: View Translate on Notes
         Then Note title will be shown "English"
         And Note description will be shown "English Language"
         And I should see translation button with language code "ID"
+
+    @featureToggle
+    Scenario: View translation on article view in English
+        Given I jump to "article view" tab
+        Then Note title will be shown "English"
+        And Note description will be shown "English Language"
+        And I should see translation button with language code "ID"
+
+    @featureToggle
+    Scenario: Switch to Indonesia on article view
+        Given I jump to "article view" tab
+        When I switch language to "ID"
+        Then Note title will be shown "Indonesia"
+        And Note description will be shown "Bahasa Indonesia"
+        And I should see translation button with language code "EN"
