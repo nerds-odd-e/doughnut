@@ -86,9 +86,9 @@ nohup idea-community &
 #### Setup IntelliJ IDEA with JDK16 SDK
 
 - Locate your `nix` installed JDK16 path location from the header printout on entering nix-shell ($JAVA_HOME is printed out on entering `nix-shell`).
-  - e.g. On macOS this could look like `/nix/store/60kc2wrpr8p0jb8hginzq2hmhi9l9ws0-zulu16.30.15-ca-jdk-16.0.1/zulu-16.jdk/Contents/Home`.
+  - e.g. On macOS this could look like `/nix/store/cj3vbr57and7wywlvac6dkz62kzf0awh-zulu16.30.15-ca-jdk-16.0.1/zulu-16.jdk/Contents/Home`.
 - **File -> Project Structure -> Platform Settings -> SDKs -> Add JDK...**
-  - Enter the full path of above (e.g. `/nix/store/60kc2wrpr8p0jb8hginzq2hmhi9l9ws0-zulu16.30.15-ca-jdk-16.0.1/zulu-16.jdk/Contents/Home`).
+  - Enter the full path of above (e.g. `/nix/store/cj3vbr57and7wywlvac6dkz62kzf0awh-zulu16.30.15-ca-jdk-16.0.1/zulu-16.jdk/Contents/Home`).
     ![Sample nix-shell JAVA_HOME](./images/01_doughnut_nix-shell_JAVA_HOME.png "Sample nix-shell JAVA_HOME")
 
 #### Run a single targetted JUnit5 test in IntelliJ IDEA
