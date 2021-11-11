@@ -14,16 +14,13 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
-import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/notes")
@@ -98,15 +95,9 @@ class RestNoteController {
 
     @PostMapping(path = "/{note}")
     @Transactional
-    public NoteViewedByUser updateNote(@PathVariable(name = "note") Note note, @Valid @ModelAttribute NoteContent noteContent) throws NoAccessRightException, IOException, IllegalArgumentException {
+    public NoteViewedByUser updateNote(@PathVariable(name = "note") Note note, @Valid @ModelAttribute NoteContent noteContent) throws NoAccessRightException, IOException {
         final UserModel user = currentUserFetcher.getUser();
         user.getAuthorization().assertAuthorization(note);
-
-        Optional<Note> noteOld = modelFactoryService.noteRepository.findById(note.getId());
-        if (noteOld.isPresent())  {
-            Assert.isTrue(testabilitySettings.isDateNotBefore(noteContent.getUpdatedAt(), noteOld.get().getNoteContent().getUpdatedAt()), "Failed!. Conflicting edit have been made to the same note");
-        }
-
         noteContent.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
         note.updateNoteContent(noteContent, user.getEntity());
         modelFactoryService.noteRepository.save(note);
