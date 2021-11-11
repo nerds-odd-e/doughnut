@@ -104,6 +104,11 @@ public class NoteContent {
     @Setter
     private Timestamp updatedAt;
 
+    @Transient
+    @Getter
+    @Setter
+    private Integer version;
+
     @JsonIgnore
     public String getNotePicture() {
         if (uploadPicture != null) {
