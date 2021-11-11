@@ -19,7 +19,6 @@ import com.odde.doughnut.entities.NoteContent;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.json.NoteViewedByUser;
 import com.odde.doughnut.entities.json.NotesBulk;
-import com.odde.doughnut.entities.json.RedirectToNoteResponse;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;

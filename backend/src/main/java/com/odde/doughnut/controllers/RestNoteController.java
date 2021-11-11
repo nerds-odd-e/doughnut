@@ -103,11 +103,13 @@ class RestNoteController {
 
         Optional<Note> noteOld = modelFactoryService.findNoteById(note.getId());
 
+        Long oldVersion = noteOld.get().getNoteContent().getVersion();
+
         if (noteOld.isPresent() && noteContent.getVersion() != null) {
-            Integer oldVersion = noteOld.get().getNoteContent().getVersion();
             Assert.isTrue((oldVersion == null) || (noteContent.getVersion() >= oldVersion), "Failed!. Conflicting edit have been made to the same note");
         }
 
+        noteContent.setVersion(oldVersion + 1);
         noteContent.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
         note.updateNoteContent(noteContent, user.getEntity());
         modelFactoryService.noteRepository.save(note);

@@ -7,12 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Embeddable;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Transient;
+import javax.persistence.*;
 import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
@@ -104,10 +99,17 @@ public class NoteContent {
     @Setter
     private Timestamp updatedAt;
 
-    @Transient
-    @Getter
-    @Setter
-    private Integer version;
+    @Column(name = "version")
+    @JsonProperty
+    private Long version;
+
+    public Long getVersion() {
+        return version == null ? 1 : version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
+    }
 
     @JsonIgnore
     public String getNotePicture() {
