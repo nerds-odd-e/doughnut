@@ -31,6 +31,7 @@ public class NoteViewer {
         nvb.setParentId(note.getParentId());
         nvb.setTitle(note.getTitle());
         nvb.setShortDescription(note.getShortDescription());
+        nvb.setShortDescriptionIDN(note.getShortDescriptionIDN());
         nvb.setNotePicture(note.getNotePicture());
         nvb.setCreatedAt(note.getCreatedAt());
         nvb.setNoteContent(note.getNoteContent());

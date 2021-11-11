@@ -140,6 +140,10 @@ public class Note {
         return noteContent.getShortDescription();
     }
 
+    public String getShortDescriptionIDN() {
+        return noteContent.getShortDescriptionIDN();
+    }
+
     public String getNotePicture() {
         if (noteContent.getUseParentPicture() && getParentNote() != null) {
             return getParentNote().getNotePicture();

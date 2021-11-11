@@ -28,6 +28,10 @@ public class NoteViewedByUser {
 
     @Getter
     @Setter
+    private String shortDescriptionIDN;
+
+    @Getter
+    @Setter
     private String notePicture;
 
     @Getter

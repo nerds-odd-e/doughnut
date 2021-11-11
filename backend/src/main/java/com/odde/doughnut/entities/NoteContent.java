@@ -153,4 +153,9 @@ public class NoteContent {
     public String getShortDescription() {
         return StringUtils.abbreviate(description, 50);
     }
+
+    @JsonIgnore
+    public String getShortDescriptionIDN() {
+        return StringUtils.abbreviate(descriptionIDN, 50);
+    }
 }
