@@ -9,13 +9,13 @@ We use nix to manage and ensure a reproducible development environment ([nixos.o
 Full details on nix installation on macOS [here](https://nixos.org/manual/nix/stable/#sect-macos-installation)
 
 ```bash
- sh <(curl -L https://nixos.org/nix/install) --darwin-use-unencrypted-nix-store-volume
+ sh <(curl -k -L https://nixos.org/nix/install) --darwin-use-unencrypted-nix-store-volume
 ```
 
 #### For Linux:
 
 ```bash
-sh <(curl -L https://nixos.org/nix/install) --daemon
+sh <(curl -k -L https://nixos.org/nix/install) --daemon
 ```
 
 (NB: if the install script fails to add sourcing of `nix.sh` in `.bashrc` or `.profile`, you can do it manually `source /etc/profile.d/nix.sh`)
@@ -43,7 +43,7 @@ Launch local nix-shell development environment (with zsh)
 ```bash
 cd doughnut
 export NIXPKGS_ALLOW_UNFREE=1
-nix-shell --pure --show-trace
+nix-shell --pure
 ```
 
 Run E2E profile springboot backend server with gradle (backend app started on port 9081)
