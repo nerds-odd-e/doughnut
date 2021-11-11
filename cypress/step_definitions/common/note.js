@@ -60,7 +60,7 @@ When(
 
 When("I create note belonging to {string}:", (noteTitle, data) => {
   cy.jumpToNotePage(noteTitle);
-  cy.findByText(noteTitle)
+  cy.findByText(noteTitle);
   cy.clickAddChildNoteButton();
   cy.submitNoteFormsWith(data.hashes());
 });
@@ -97,7 +97,7 @@ When("I delete top level note {string}", (noteTitle) => {
 });
 
 When("I create a sibling note of {string}:", (noteTitle, data) => {
-  cy.navigateToChild(noteTitle)
+  cy.navigateToChild(noteTitle);
   cy.findByText(noteTitle);
   cy.findByRole("button", { name: "Add Sibling Note" }).click();
   cy.submitNoteFormsWith(data.hashes());
@@ -190,82 +190,111 @@ When(
 );
 
 When("I click on the overview button of note {string}", (noteTitle) => {
-    cy.clickNotePageButton(noteTitle, "article view");
+  cy.clickNotePageButton(noteTitle, "article view");
 });
 
 When("I click on the mindmap view button of note {string}", (noteTitle) => {
-    cy.clickNotePageButton(noteTitle, "mindmap view");
+  cy.clickNotePageButton(noteTitle, "mindmap view");
 });
 
-When("I should see the note {string} is {int}px * {int}px offset the center of the map", (noteTitle, dx, dy) => {
-  cy.withinMindmap().then((cards) => {
-          const rect = cards.mindmapRect
-          const frameCenterX = rect.left + rect.width / 2
-          const frameCenterY = rect.top + rect.height / 2
-          const cardRect = cards[noteTitle]
-          const cardCenterX = cardRect.left + cardRect.width / 2
-          const cardCenterY = cardRect.top + cardRect.height / 2
-          expect(cardCenterX - frameCenterX).to.closeTo(dx, 10)
-          expect(cardCenterY - frameCenterY).to.closeTo(dy, 30)
-  })
-});
+When(
+  "I should see the note {string} is {int}px * {int}px offset the center of the map",
+  (noteTitle, dx, dy) => {
+    cy.withinMindmap().then((cards) => {
+      const rect = cards.mindmapRect;
+      const frameCenterX = rect.left + rect.width / 2;
+      const frameCenterY = rect.top + rect.height / 2;
+      const cardRect = cards[noteTitle];
+      const cardCenterX = cardRect.left + cardRect.width / 2;
+      const cardCenterY = cardRect.top + cardRect.height / 2;
+      expect(cardCenterX - frameCenterX).to.closeTo(dx, 10);
+      expect(cardCenterY - frameCenterY).to.closeTo(dy, 30);
+    });
+  }
+);
 
 When("I click note {string}", (noteTitle) => {
-  cy.findByRole("card", {name: noteTitle}).click();
+  cy.findByRole("card", { name: noteTitle }).click();
 });
 
 When("I click note title {string}", (noteTitle) => {
-  cy.findByText(noteTitle).click()
+  cy.findByText(noteTitle).click();
 });
 
-When("The note {string} {string} have the description indicator", (noteTitle, shouldOrNot) => {
-  cy.findByRole("card", {name: noteTitle}).within(()=>cy.get(".description-indicator").should(shouldOrNot === 'should' ? 'exist' : 'not.exist'))
-});
+When(
+  "The note {string} {string} have the description indicator",
+  (noteTitle, shouldOrNot) => {
+    cy.findByRole("card", { name: noteTitle }).within(() =>
+      cy
+        .get(".description-indicator")
+        .should(shouldOrNot === "should" ? "exist" : "not.exist")
+    );
+  }
+);
 
-
-When("I should see the note {string} is {string}", (noteTitle, highlightedOrNot) => {
-  cy.findByRole("card", {name: noteTitle}).should(`${ highlightedOrNot === 'highlighted' ? '' : 'not.'}have.class`, 'highlighted')
-});
-
+When(
+  "I should see the note {string} is {string}",
+  (noteTitle, highlightedOrNot) => {
+    cy.findByRole("card", { name: noteTitle }).should(
+      `${highlightedOrNot === "highlighted" ? "" : "not."}have.class`,
+      "highlighted"
+    );
+  }
+);
 
 When("I drag the map by {int}px * {int}px", (dx, dy) => {
-    cy.get('.mindmap-event-receiver')
-      .trigger('pointerdown', "topLeft")
-      .trigger('pointermove', "topLeft", { clientX: dx, clientY: dy })
-      .trigger('pointerup', {force: true})
+  cy.get(".mindmap-event-receiver")
+    .trigger("pointerdown", "topLeft")
+    .trigger("pointermove", "topLeft", { clientX: dx, clientY: dy })
+    .trigger("pointerup", { force: true });
 });
 
-When("I drag the map by {int}px * {int}px when holding the shift button", (dx, dy) => {
-    cy.get('.mindmap-event-receiver')
-      .trigger('pointerdown', "topLeft")
-      .trigger('pointermove', "topLeft", { shiftKey: true, clientX: dx, clientY: dy })
-      .trigger('pointerup', {force: true})
-});
-
+When(
+  "I drag the map by {int}px * {int}px when holding the shift button",
+  (dx, dy) => {
+    cy.get(".mindmap-event-receiver")
+      .trigger("pointerdown", "topLeft")
+      .trigger("pointermove", "topLeft", {
+        shiftKey: true,
+        clientX: dx,
+        clientY: dy,
+      })
+      .trigger("pointerup", { force: true });
+  }
+);
 
 When("I zoom in at the {string}", (position) => {
-    cy.get('.mindmap-event-receiver')
-      .trigger('wheel', position, { clientX: 0, clientY: 0, deltaY: 50 })
+  cy.get(".mindmap-event-receiver").trigger("wheel", position, {
+    clientX: 0,
+    clientY: 0,
+    deltaY: 50,
+  });
 });
 
 When("I should see the zoom scale is {string}", (scale) => {
-    cy.get('.mindmap-info').findByText(scale)
+  cy.get(".mindmap-info").findByText(scale);
 });
 
 When("I click the zoom indicator", (scale) => {
-    cy.get('.mindmap-info').click()
+  cy.get(".mindmap-info").click();
 });
 
-
-When("I should see the notes {string} are around note {string} and apart from each other", (noteTitles, parentNoteTitle) => {
-  cy.withinMindmap().then((cards) => {
-    const titles = noteTitles.commonSenseSplit(",")
-    titles.forEach((noteTitle) => {
-      cy.wrap(cards).distanceBetweenCardsGreaterThan(parentNoteTitle, noteTitle, 100)
-    })
-    cy.wrap(cards).distanceBetweenCardsGreaterThan(titles[0], titles[1], 100)
-  })
-});
+When(
+  "I should see the notes {string} are around note {string} and apart from each other",
+  (noteTitles, parentNoteTitle) => {
+    cy.withinMindmap().then((cards) => {
+      const titles = noteTitles.commonSenseSplit(",");
+      titles.forEach((noteTitle) => {
+        cy.wrap(cards).distanceBetweenCardsGreaterThan(
+          parentNoteTitle,
+          noteTitle,
+          100
+        );
+      });
+      cy.wrap(cards).distanceBetweenCardsGreaterThan(titles[0], titles[1], 100);
+    });
+  }
+);
 
 Then("I should see the title {string} of the notebook", (noteTitle) => {
   cy.expectNoteTitle(noteTitle);
@@ -273,7 +302,7 @@ Then("I should see the title {string} of the notebook", (noteTitle) => {
 
 Then("I should see the child notes {string} in order", (notesStr) => {
   const notes = notesStr.split(",");
-  notes.forEach(n=> cy.findByText(n))
+  notes.forEach((n) => cy.findByText(n));
   cy.findAllByRole("title").then((elms) => {
     let actual = [];
     elms.map((i, actualNote) => actual.push(actualNote.innerHTML));
@@ -298,17 +327,26 @@ Then("I should see {string} is newer than {string}", (newer, older) => {
     );
 });
 
-When("I split note {string}",
-  (noteTitle, data) => {
-    cy.clickNotePageMoreOptionsButton(noteTitle, "split note");
-    cy.findByRole("button", { name: "OK" }).click();
+When("I split note {string}", (noteTitle, data) => {
+  cy.clickNotePageMoreOptionsButton(noteTitle, "split note");
+  cy.findByRole("button", { name: "OK" }).click();
+});
+
+When(
+  "there is a note {string} with description {string}",
+  (notePath, expectedDescription) => {
+    cy.navigateToNotePage(notePath);
+    cy.expectCurrentNoteDescription(expectedDescription);
   }
 );
 
-When("there is a note {string} with description {string}",
-    (notePath, expectedDescription) => {
-        cy.navigateToNotePage(notePath);
-        cy.expectCurrentNoteDescription(expectedDescription)
-    }
-);
+When("I edit note translation to become", (data) => {
+  cy.findByRole("button", { name: "more options" }).click();
+  cy.findByRole("button", { name: "edit note translation" }).click();
+  cy.submitNoteTranslationFormsWith(data.hashes());
+});
 
+Then("I should see confirmation title {string}", (title) => {
+  cy.findByText(title);
+  cy.findByRole("button", { name: "OK" }).click();
+});

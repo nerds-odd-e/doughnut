@@ -1,6 +1,6 @@
 <template>
   <h3>
-    Edit translation for <em>{{ title }}</em>
+    {{ EDIT_TRANSLATION_LABEL }} <em>{{ title }}</em>
   </h3>
   <form @submit.prevent="processForm">
     <NoteTranslationEditForm
@@ -14,10 +14,15 @@
 
 <script>
 import NoteTranslationEditForm from "./NoteTranslationEditForm.vue";
+import StringConstants from "../../constants/labels";
 
 export default {
   components: { NoteTranslationEditForm },
-  props: { noteId: [String, Number], title: String, description: String },
+  props: {
+    noteId: [String, Number],
+    title: String,
+    description: String
+  },
   emits: ["done"],
   data() {
     return {
@@ -28,10 +33,15 @@ export default {
   },
   methods: {
     fetchData() {},
-    processForm() {},
+    processForm() {
+      this.$popups.alert(StringConstants.TRANSACTION_SUCCESS_TITLE);
+    },
   },
   mounted() {
     this.fetchData();
+  },
+  created() {
+    this.EDIT_TRANSLATION_LABEL = StringConstants.EDIT_TRANSLATION_LABEL;
   },
 };
 </script>

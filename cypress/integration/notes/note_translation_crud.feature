@@ -4,7 +4,7 @@ Feature: Note Translation Crud
     Background:
         Given I've logged in as an existing user
         And there are some notes for the current user
-        | title            | testingParent | description |
+        | title          | testingParent | description          |
         | English        |               | English Language     |
         And I click on the overview button of note "English"
 
@@ -13,13 +13,9 @@ Feature: Note Translation Crud
         When I click on button with text or title as "more options"
         Then I should see button with text or title as "edit note translation"
 
-    @ignore
     @featureToggle
-    Scenario: Should show translation edit popup
-        When I click on button with text or title as "more options"
-        And I should see button with text or title as "edit note translation"
-        And I submit title translation as "Indonesia"
-        Then I should see snackbar with title "Translation successfully saved"
-        And I should see there are some notes for the current user with
-        | title            | testingParent | description          |
-        | English          |               | English Language     |
+    Scenario: Should able to edit note translation
+        When I edit note translation to become
+      | Title in Indonesian     | Description in Indonesian       |
+      | Indonesia               | Bahasa Indonesia                |
+        Then I should see confirmation title "Translation successfully saved"

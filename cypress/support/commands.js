@@ -463,3 +463,32 @@ Cypress.Commands.add(
 Cypress.Commands.add("clickNoteTab", (noteTab) => {
   cy.findByRole("button", { name: noteTab }).click();
 });
+Cypress.Commands.add("submitNoteTranslationFormsWith", (notes) => {
+  notes.forEach((noteAttributes) =>
+    cy.submitNoteTranslationFormWith(noteAttributes)
+  );
+});
+
+Cypress.Commands.add("submitNoteTranslationFormWith", (noteAttributes) => {
+  for (var propName in noteAttributes) {
+    const value = noteAttributes[propName];
+    if (value) {
+      cy.getFormControl(propName).then(($input) => {
+        if ($input.attr("type") === "file") {
+          cy.fixture(value).then((img) => {
+            cy.wrap($input).attachFile({
+              fileContent: Cypress.Blob.base64StringToBlob(img),
+              fileName: value,
+              mimeType: "image/png",
+            });
+          });
+        } else if ($input.attr("role") === "radiogroup") {
+          cy.clickRadioByLabel(value);
+        } else {
+          cy.wrap($input).clear().type(value);
+        }
+      });
+    }
+  }
+  cy.get('input[value="Update"]').click();
+});
