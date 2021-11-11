@@ -443,10 +443,8 @@ Cypress.Commands.add("expectTranslationButtonLang", (lang) => {
 });
 
 Cypress.Commands.add("clickTranslationButton", (buttonText) => {
-  cy.findByRole("button", { name: buttonText })
-    .click();
+  cy.findByRole("button", { name: buttonText }).click();
 });
-
 
 Cypress.Commands.add("expectButtonWithTextOrTitle", (btnTextOrTitle) => {
   cy.findByRole("button", { name: btnTextOrTitle });

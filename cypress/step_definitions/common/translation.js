@@ -9,7 +9,6 @@ import {
   When,
 } from "cypress-cucumber-preprocessor/steps";
 
-
 Then("I should see button with text or title as {string}", (btnTextOrTitle) => {
   cy.expectButtonWithTextOrTitle(btnTextOrTitle);
 });
@@ -29,7 +28,7 @@ Then("I should see button {string}", (lang) => {
 });
 
 When("I click on the translation button {string}", (lang) => {
-  const buttonText = `Translate to ${lang}`
+  const buttonText = `Translate to ${lang}`;
   cy.clickTranslationButton(buttonText);
 });
 
@@ -42,7 +41,7 @@ Then("I should see button {string}", (lang) => {
 });
 
 When("I click on the translation button {string}", (lang) => {
-  const buttonText = `Translate to ${lang}`
+  const buttonText = `Translate to ${lang}`;
   cy.clickTranslationButton(buttonText);
 });
 
