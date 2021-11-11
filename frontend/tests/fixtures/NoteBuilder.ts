@@ -28,6 +28,11 @@ class NoteBuilder extends Builder {
     return this;
   }
 
+  titleIDN(value: string): NoteBuilder {
+    this.data.noteContent.titleIDN = value;
+    return this;
+  }
+
   picture(value: string): NoteBuilder {
     this.data.notePicture = value;
     return this;

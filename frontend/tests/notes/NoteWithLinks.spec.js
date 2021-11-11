@@ -4,6 +4,8 @@
 import { render, screen } from "@testing-library/vue";
 import NoteWithLinks from "@/components/notes/NoteWithLinks.vue";
 import makeMe from "../fixtures/makeMe";
+import { renderWithStoreAndMockRoute } from '../helpers';
+import store from '../../src/store';
 
 describe("new/updated pink banner", () => {
   beforeAll(() => {
@@ -26,4 +28,32 @@ describe("new/updated pink banner", () => {
       );
     }
   );
+});
+
+describe("fallback translation", () => {
+  it("should display 'No translation available' text below the title when no title translation available", async () => {
+    const noteParent = makeMe.aNote.title("Dummy Title").please();
+    store.commit("loadNotes", [noteParent]);
+
+    renderWithStoreAndMockRoute(
+      store,
+      NoteWithLinks,
+      { props: { note: noteParent } },
+    )
+
+    expect(screen.getByRole("title-fallback")).toHaveTextContent("No translation available");
+  });
+
+  it("should not display 'No translation available' text below the title when title translation available", async () => {
+    const noteParent = makeMe.aNote.title("Dummy Title").titleIDN("Judul Palsu").please();
+    store.commit("loadNotes", [noteParent]);
+
+    renderWithStoreAndMockRoute(
+      store,
+      NoteWithLinks,
+      { props: { note: noteParent } },
+    )
+
+    expect(screen.queryByRole("title-fallback")).not.toBeInTheDocument();
+  });
 });
