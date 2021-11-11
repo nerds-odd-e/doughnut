@@ -23,6 +23,7 @@ export default {
     },
     props: {
         noteId: Number,
+        note: Object,
     },
     data(){
         return {
@@ -30,18 +31,27 @@ export default {
             translationLang: Languages.ID,
         }
     },
+    mounted(){
+        let currentLanguage = this.$store?.getters.getCurrentLanguage();
+        if (currentLanguage === Languages.ID) {
+            this.currentLang = Languages.ID;
+            this.translationLang = Languages.EN;
+        }
+
+        this.changeButtonTranslation(this.currentLang, this.translationLang);
+    },
     methods: {
-        changeLanguage(targetLanguage, translationLang){
+        changeButtonTranslation(targetLanguage, translationLang){
             this.currentLang = targetLanguage;
             this.translationLang = translationLang;
         },
         toggleLanguage(){
             if (this.currentLang === Languages.EN) {
-                this.changeLanguage(Languages.ID, Languages.EN);
-                changeNotesLanguage(this.$store, this.noteId, Languages.ID);
+                this.changeButtonTranslation(Languages.ID, Languages.EN);
+                changeNotesLanguage(this.$store, Languages.ID);
             } else {
-                this.changeLanguage(Languages.EN, Languages.ID);
-                changeNotesLanguage(this.$store, this.noteId, Languages.EN);
+                this.changeButtonTranslation(Languages.EN, Languages.ID);
+                changeNotesLanguage(this.$store, Languages.EN);
             }
         }
     }

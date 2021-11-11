@@ -1,6 +1,6 @@
-import { merge } from "lodash";
 import Builder from "./Builder";
 import LinkBuilder from "./LinkBuilder";
+import { merge } from "lodash";
 
 let idCounter = 1;
 
@@ -30,6 +30,17 @@ class NoteBuilder extends Builder {
 
   titleIDN(value: string): NoteBuilder {
     this.data.noteContent.titleIDN = value;
+    return this;
+  }
+
+  description(value: string): NoteBuilder {
+    this.data.description = value;
+    this.data.noteContent.description = value;
+    return this;
+  }
+
+  descriptionIDN(value: string): NoteBuilder {
+    this.data.noteContent.descriptionIDN = value;
     return this;
   }
 

@@ -5,17 +5,29 @@
       <h5 class="card-title">
         <component :is="linkFragment" :note="note" class="card-title" />
       </h5>
-      <NoteShortDescription :shortDescription="note.shortDescription"/>
+      <NoteShortDescription :shortDescription="translatedShortDescription"/>
       <slot name="button" :note="note" />
     </div>
   </div>
 </template>
 
-<script setup>
+<script>
 import NoteTitleWithLink from "./NoteTitleWithLink.vue";
 import NoteShortDescription from "./NoteShortDescription.vue";
-const props = defineProps({
-  note: Object,
-  linkFragment: { type: Object, default: NoteTitleWithLink },
-});
+import Languages from "../../constants/lang";
+
+export default {
+  props: {
+    note: Object,
+    linkFragment: { type: Object, default: NoteTitleWithLink },
+  },
+  components: {
+    NoteShortDescription,
+  },
+  computed: {
+    translatedShortDescription(){
+      return this.$store?.getters.getCurrentLanguage() === Languages.ID && this.note && this.note.shortDescriptionIDN ? this.note.shortDescriptionIDN : this.note.shortDescription;
+    }
+  }
+}
 </script>

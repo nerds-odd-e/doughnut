@@ -1,11 +1,12 @@
 /**
  * @jest-environment jsdom
  */
-import { screen } from "@testing-library/vue";
+
 import NoteOverview from "@/components/notes/NoteOverview.vue";
-import store from "../../src/store/index.js";
-import { renderWithStoreAndMockRoute } from "../helpers";
 import makeMe from "../fixtures/makeMe";
+import { renderWithStoreAndMockRoute } from "../helpers";
+import { screen } from "@testing-library/vue";
+import store from "../../src/store/index.js";
 
 describe("note overview", () => {
   it("should render one note", async () => {
@@ -58,5 +59,36 @@ describe("note overview", () => {
     await screen.findByText("parent");
     await screen.findByText("child");
     await screen.findByText("grandchild");
+  });
+
+  it("should render note with translated content", async () => {
+    const noteParent = makeMe.aNote.title("Title1").titleIDN("Judul1").description("Description1").descriptionIDN("Deskripsi1").please();
+    const noteChild = makeMe.aNote.title("Title1.1").titleIDN("Judul1.1").description("Description1.1").descriptionIDN("Deskripsi1.1").under(noteParent).please();
+    const noteGrandchild = makeMe.aNote.title("Title1.1.1").titleIDN("Judul1.1.1").description("Description1.1.1").descriptionIDN("Deskripsi1.1.1").under(noteChild).please();
+    
+    store.commit("loadNotes", [noteParent, noteChild, noteGrandchild]);
+    renderWithStoreAndMockRoute(
+      store,
+      NoteOverview,
+      { props: { noteId: noteParent.id, expandChildren: true } },
+    );
+
+    store.commit("changeNotesLanguage", "ID");
+
+    await screen.findByText("Judul1");
+    await screen.findByText("Judul1.1");
+    await screen.findByText("Judul1.1.1");
+    await screen.findByText("Deskripsi1");
+    await screen.findByText("Deskripsi1.1");
+    await screen.findByText("Deskripsi1.1.1");
+
+    store.commit("changeNotesLanguage", "EN");
+
+    await screen.findByText("Title1");
+    await screen.findByText("Title1.1");
+    await screen.findByText("Title1.1.1");
+    await screen.findByText("Description1");
+    await screen.findByText("Description1.1");
+    await screen.findByText("Description1.1.1");
   });
 });

@@ -28,8 +28,8 @@ export default {
     translatedTitle(){
       if (!this.note.noteContent)
         return this.note.title;
-      
-      return this.note.language === Languages.ID && this.note.noteContent.titleIDN ? this.note.noteContent.titleIDN : this.note.noteContent.title;
+
+      return this.$store?.getters.getCurrentLanguage() === Languages.ID && this.note.noteContent.titleIDN ? this.note.noteContent.titleIDN : this.note.noteContent.title;
     }
   },
 };

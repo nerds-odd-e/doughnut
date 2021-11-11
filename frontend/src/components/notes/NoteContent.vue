@@ -6,7 +6,7 @@
         class="col"
         :description="translatedDescription"
       />
-      <NoteShortDescription class="col" v-if="size==='medium'" :shortDescription="note.shortDescription"/>
+      <NoteShortDescription class="col" v-if="size==='medium'" :shortDescription="translatedShortDescription"/>
       <SvgDescriptionIndicator v-if="size==='small'" class="description-indicator"/>
     </template>
     <template v-if="!!note.notePicture">
@@ -58,7 +58,10 @@ export default {
       return !!this.notePicture && !!this.note.noteContent.description;
     },
     translatedDescription(){
-      return this.note.language === Languages.ID && this.note.noteContent && this.note.noteContent.descriptionIDN ? this.note.noteContent.descriptionIDN : this.note.noteContent.description;
+      return this.$store?.getters.getCurrentLanguage() === Languages.ID && this.note.noteContent && this.note.noteContent.descriptionIDN ? this.note.noteContent.descriptionIDN : this.note.noteContent.description;
+    },
+    translatedShortDescription(){
+      return this.$store?.getters.getCurrentLanguage() === Languages.ID && this.note.shortDescriptionIDN ? this.note.shortDescriptionIDN : this.note.shortDescription;
     }
   },
 };

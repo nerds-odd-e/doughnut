@@ -148,7 +148,7 @@ const storedApiGetNextReviewItem = async (store) => {
     return res
 }
 
-const changeNotesLanguage = (store, id, language) => store && store.commit("changeNotesLanguage", { id, language });
+const changeNotesLanguage = (store, language) => store && store.commit("changeNotesLanguage", language);
 
 export {
     apiLogout,
