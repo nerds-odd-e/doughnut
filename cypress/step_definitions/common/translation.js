@@ -19,36 +19,24 @@ When("I click on button with text or title as {string}", (btnTextOrTitle) => {
 
 // View Translation
 
-Then("Note title will be shown {string} version", (title) => {
-  cy.expectNoteTitle(title);
-});
-
-Then("I should see button {string}", (lang) => {
-  cy.expectTranslationButtonLang(lang);
-});
-
-When("I click on the translation button {string}", (lang) => {
+Given("I switch language to {string}", (lang) => {
   const buttonText = `Translate to ${lang}`;
   cy.clickTranslationButton(buttonText);
 });
 
-Then("Note title will be shown {string} version", (title) => {
-  cy.expectNoteTitle(title);
-});
-
-Then("I should see button {string}", (lang) => {
-  cy.expectTranslationButtonLang(lang);
-});
-
-When("I click on the translation button {string}", (lang) => {
+When("I switch language to {string}", (lang) => {
   const buttonText = `Translate to ${lang}`;
   cy.clickTranslationButton(buttonText);
 });
 
-Then("Note title will be shown {string} version", (title) => {
+Then("Note title will be shown {string}", (title) => {
   cy.expectNoteTitle(title);
 });
 
-Then("I should see button {string}", (lang) => {
+And("Note description will be shown {string}", (description) => {
+  cy.expectText(description);
+});
+
+And("I should see translation button with language code {string}", (lang) => {
   cy.expectTranslationButtonLang(lang);
 });

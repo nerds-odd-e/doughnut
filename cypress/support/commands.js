@@ -453,3 +453,9 @@ Cypress.Commands.add("expectButtonWithTextOrTitle", (btnTextOrTitle) => {
 Cypress.Commands.add("clickButtonWithTextOrTitle", (btnTextOrTitle) => {
   cy.findByRole("button", { name: btnTextOrTitle }).click();
 });
+
+Cypress.Commands.add(
+  "expectText",
+  (text) => cy.findByText(text) //.should("be.visible")
+  // Add should be visible back when the link view page is remade.
+);
