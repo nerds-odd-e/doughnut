@@ -15,7 +15,8 @@
 <script>
 import NoteTranslationEditForm from "./NoteTranslationEditForm.vue";
 import StringConstants from "../../constants/labels";
-import { restPostMultiplePartForm } from "../../restful/restful"; 
+import { restPostMultiplePartForm } from "../../restful/restful";
+import { storedApiGetNoteAndItsChildren } from "../../storedApi";
 
 export default {
   components: { NoteTranslationEditForm },
@@ -33,7 +34,16 @@ export default {
     };
   },
   methods: {
-    fetchData() {},
+    fetchData() {
+      this.loading = true
+      storedApiGetNoteAndItsChildren(this.$store, this.noteId)
+      .then((res) => {
+          const { updatedAt, ...rest } = res.notes[0].noteContent
+          this.formData = rest
+        }
+      )
+      .finally(() => this.loading = false)
+    },
     processForm() {
       const note = this.$store.getters.getNoteById(this.noteId)
       const noteContent = {...note.noteContent}
