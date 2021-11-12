@@ -1,9 +1,4 @@
-{ pkgs ? import (builtins.fetchGit {
-  name = "nixpkgs-unstable";
-  url = "https://github.com/nixos/nixpkgs/";
-  ref = "refs/heads/nixpkgs-unstable";
-  rev = "550dab224a26ec25e20e82c0c8bfc764e01b772e";
-}) { } }:
+{ pkgs ? import <nixpkgs> { } }: 
 with pkgs;
 let
   inherit (pkgs) stdenv;
@@ -30,13 +25,11 @@ in mkShell {
     yarn
     jdk
     python3
-    direnv
-    nix-direnv
     any-nix-shell
     bash_5
+    libiconv
     zsh
     zsh-powerlevel10k
-    git
     git-extras
     git-secret
     gitAndTools.delta
@@ -64,7 +57,6 @@ in mkShell {
     zoxide
     most
     ps
-    ripgrep
     tree
     vgrep
     unixtools.whereis
@@ -92,33 +84,14 @@ in mkShell {
     dbeaver
   ] ++ lib.optionals stdenv.isDarwin [
     darwin.apple_sdk.libs.utmp
-    darwin.apple_sdk.libs.Xplugin
-    apple_sdk.AppKit
-    apple_sdk.AGL
     apple_sdk.ApplicationServices
-    apple_sdk.AudioToolbox
-    apple_sdk.AudioUnit
-    apple_sdk.AVFoundation
-    apple_sdk.Carbon
-    apple_sdk.CoreAudio
-    apple_sdk.CoreGraphics
-    apple_sdk.CoreMedia
-    apple_sdk.CoreVideo
-    apple_sdk.Cocoa
     apple_sdk.CoreServices
-    apple_sdk.CoreText
-    apple_sdk.Foundation
-    apple_sdk.ImageIO
-    apple_sdk.IOKit
-    apple_sdk.Kernel
-    apple_sdk.MediaToolbox
     apple_sdk.OpenGL
     apple_sdk.QTKit
     apple_sdk.Security
     apple_sdk.SystemConfiguration
     xcodebuild
   ] ++ lib.optionals (!stdenv.isDarwin) [
-    cypress
     firefox
     geckodriver
     chromium
