@@ -44,3 +44,7 @@ And("I should see translation button with language code {string}", (lang) => {
 Given("I jump to {string} tab", (noteTab) => {
   cy.clickNoteTab(noteTab);
 });
+
+When("I jump to {string} tab", (noteTab) => {
+  cy.clickNoteTab(noteTab);
+});
