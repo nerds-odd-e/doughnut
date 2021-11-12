@@ -2,7 +2,7 @@
     <NoteShell class="note-body" v-bind="{id: note.id, updatedAt: note.noteContent?.updatedAt}">
       <NoteFrameOfLinks v-bind="{ links: note.links }">
         <h2 role="title" class="note-title">{{ translatedTitle }}</h2>
-        <p role="title-fallback" v-if="!note.noteContent.titleIDN">No translation available</p>
+        <p style="color: red" role="title-fallback" v-if="!note.noteContent.titleIDN">No translation available</p>
         <NoteContent v-bind="{note}"/>
       </NoteFrameOfLinks>
     </NoteShell>
