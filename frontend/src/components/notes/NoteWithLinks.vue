@@ -1,11 +1,20 @@
 <template>
-    <NoteShell class="note-body" v-bind="{id: note.id, updatedAt: note.noteContent?.updatedAt}">
-      <NoteFrameOfLinks v-bind="{ links: note.links }">
-        <h2 role="title" class="note-title">{{ translatedTitle }}</h2>
-        <p style="color: red" role="title-fallback" v-if="!note.noteContent.titleIDN">No translation available</p>
-        <NoteContent v-bind="{note}"/>
-      </NoteFrameOfLinks>
-    </NoteShell>
+  <NoteShell
+    class="note-body"
+    v-bind="{ id: note.id, updatedAt: note.noteContent?.updatedAt }"
+  >
+    <NoteFrameOfLinks v-bind="{ links: note.links }">
+      <h2 role="title" class="note-title">{{ translatedTitle }}</h2>
+      <p
+        style="color: red"
+        role="title-fallback"
+        v-if="currentLanguage === Languages.ID && !note.noteContent.titleIDN"
+      >
+        No translation available
+      </p>
+      <NoteContent v-bind="{ note }" />
+    </NoteFrameOfLinks>
+  </NoteShell>
 </template>
 
 <script>
@@ -25,18 +34,25 @@ export default {
     NoteContent,
   },
   computed: {
-    translatedTitle(){
-      if (!this.note.noteContent)
-        return this.note.title;
+    translatedTitle() {
+      if (!this.note.noteContent) return this.note.title;
 
-      return this.$store?.getters.getCurrentLanguage() === Languages.ID && this.note.noteContent.titleIDN ? this.note.noteContent.titleIDN : this.note.noteContent.title;
-    }
+      return this.$store?.getters.getCurrentLanguage() === Languages.ID &&
+        this.note.noteContent.titleIDN
+        ? this.note.noteContent.titleIDN
+        : this.note.noteContent.title;
+    },
+    currentLanguage() {
+      return this.$store?.getters.getCurrentLanguage();
+    },
+    Languages() {
+      return Languages;
+    },
   },
 };
 </script>
 
 <style scoped>
-
 .note-body {
   padding-left: 10px;
   padding-right: 10px;
