@@ -15,6 +15,7 @@
 <script>
 import NoteTranslationEditForm from "./NoteTranslationEditForm.vue";
 import StringConstants from "../../constants/labels";
+import { restPostMultiplePartForm } from "../../restful/restful"; 
 
 export default {
   components: { NoteTranslationEditForm },
@@ -34,14 +35,30 @@ export default {
   methods: {
     fetchData() {},
     processForm() {
-      this.$popups.alert(StringConstants.TRANSACTION_SUCCESS_TITLE);
+      const note = this.$store.getters.getNoteById(this.noteId)
+      const noteContent = {...note.noteContent}
+      delete noteContent.updatedAt
+
+      restPostMultiplePartForm(
+        `/api/notes/${this.noteId}`,
+        {...noteContent, ...this.formData},
+        (result) => (this.loading = result)
+      ).then((res) => {
+          this.$store.commit("loadNotes", [res])
+          this.$emit("done")
+          this.$popups.alert(StringConstants.TRANSACTION_SUCCESS_TITLE)
+        })
+        .catch((res) => {
+            this.formErrors = res.message
+            alert(res.message)
+        });
     },
   },
   mounted() {
-    this.fetchData();
+    this.fetchData()
   },
   created() {
-    this.EDIT_TRANSLATION_LABEL = StringConstants.EDIT_TRANSLATION_LABEL;
+    this.EDIT_TRANSLATION_LABEL = StringConstants.EDIT_TRANSLATION_LABEL
   },
 };
 </script>

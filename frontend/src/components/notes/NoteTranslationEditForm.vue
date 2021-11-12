@@ -1,17 +1,17 @@
 <template>
   <TextInput
     scopeName="note"
-    field="title"
+    field="titleIDN"
     title="Title in Indonesian"
-    v-model="modelValue.title"
+    v-model="modelValue.titleIDN"
     :errors="errors.title"
   />
   <br />
   <TextArea
     scopeName="note"
-    field="description"
+    field="descriptionIDN"
     title="Description in Indonesian"
-    v-model="modelValue.description"
+    v-model="modelValue.descriptionIDN"
     :errors="errors.description"
   />
   <br />

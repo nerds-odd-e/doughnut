@@ -19,3 +19,7 @@ Feature: Note Translation Crud
       | Title in Indonesian     | Description in Indonesian       |
       | Indonesia               | Bahasa Indonesia                |
         Then I should see confirmation title "Translation successfully saved"
+        And I switch language to "ID"
+        And Note title will be shown "Indonesia"
+        And Note description will be shown "Bahasa Indonesia"
+        And I should see translation button with language code "EN"
