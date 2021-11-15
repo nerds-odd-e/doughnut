@@ -25,11 +25,9 @@ in mkShell {
     yarn
     jdk17
     python3
-    any-nix-shell
     bash_5
     libiconv
     zsh
-    zsh-powerlevel10k
     git-extras
     git-secret
     gitAndTools.delta
@@ -43,7 +41,6 @@ in mkShell {
     pkg-config
     rsync
     autojump
-    bat
     fasd
     fzf
     gnupg
@@ -54,7 +51,6 @@ in mkShell {
     lsof
     lzma
     zoxide
-    most
     ps
     tree
     vgrep
@@ -65,7 +61,6 @@ in mkShell {
     patchelf
     pinentry
     cacert
-    glances
     httpie
     mysql80
     mysql-client
@@ -88,8 +83,6 @@ in mkShell {
     apple_sdk.SystemConfiguration
     xcodebuild
   ] ++ lib.optionals (!stdenv.isDarwin) [
-    firefox
-    geckodriver
     chromium
     intellij
     psmisc
