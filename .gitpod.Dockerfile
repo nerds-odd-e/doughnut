@@ -32,6 +32,8 @@ RUN apt-get update \
     procps \
     gnupg \
     curl \
+    gawk \
+    dirmngr \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /var/cache/apt
 
@@ -95,7 +97,11 @@ USER gitpod
 ENV USER gitpod
 WORKDIR /home/gitpod
 
+RUN git clone https://github.com/asdf-vm/asdf.git /home/gitpod/.asdf --branch v0.8.1
+
 RUN mkdir -p /home/gitpod/.bashrc.d \
+    && echo "source /home/gitpod/.asdf/asdf.sh" >> /home/gitpod/.bashrc \
+    && echo "source /home/gitpod/.asdf/completions/asdf.bash" >> /home/gitpod/.bashrc \ 
     && echo "if [ ! -e /var/run/mysqld/gitpod-init.lock ]" >> /home/gitpod/.bashrc \
     && echo "then" >> /home/gitpod/.bashrc \
     && echo "  touch /var/run/mysqld/gitpod-init.lock" >> /home/gitpod/.bashrc \

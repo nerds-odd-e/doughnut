@@ -38,7 +38,7 @@ Clone full all-in-one doughnut codebase from Github
 git clone https://github.com/nerds-odd-e/doughnut
 ```
 
-Launch local nix-shell development environment (with zsh)
+Launch local nix-shell development environment
 
 ```bash
 cd doughnut
