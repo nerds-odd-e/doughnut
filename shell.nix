@@ -23,7 +23,7 @@ in mkShell {
     gradle
     nodejs-16_x
     yarn
-    jdk
+    jdk17_headless
     python3
     any-nix-shell
     bash_5
