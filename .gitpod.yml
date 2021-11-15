@@ -8,11 +8,13 @@ tasks:
       asdf plugin-add java https://github.com/halcyon/asdf-java.git
       asdf plugin add nodejs https://github.com/asdf-vm/asdf-nodejs.git
       asdf install java zulu-17.30.15
-      asdf install nodejs 17.1.0
       asdf global java zulu-17.30.15
+      asdf install nodejs 17.1.0
       asdf global nodejs 17.1.0
       npm i -g npm yarn
       yarn && cd frontend && yarn && cd -
+      asdf local java zulu-17.30.15
+      asdf local nodejs 17.1.0
 
 ports:
   # Vite Frontend Dev Server

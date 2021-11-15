@@ -15,11 +15,8 @@ in mkShell {
   buildInputs = [
     autoconf
     automake
-    cmake
     coreutils-full
-    gcc10
     gnumake
-    libgccjit
     gradle
     nodejs-16_x
     yarn
@@ -40,7 +37,6 @@ in mkShell {
     openssh
     pkg-config
     rsync
-    autojump
     fasd
     fzf
     gnupg
@@ -61,7 +57,6 @@ in mkShell {
     patchelf
     pinentry
     cacert
-    httpie
     mysql80
     mysql-client
     mysql_jdbc
