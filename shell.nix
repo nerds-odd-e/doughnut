@@ -23,7 +23,7 @@ in mkShell {
     gradle
     nodejs-16_x
     yarn
-    jdk17_headless
+    jdk17
     python3
     any-nix-shell
     bash_5
@@ -40,7 +40,6 @@ in mkShell {
     hostname
     inetutils
     openssh
-    ssh-tools
     pkg-config
     rsync
     autojump
@@ -75,12 +74,9 @@ in mkShell {
     chromedriver
     google-cloud-sdk
     packer
-    tmux
-    tmuxPlugins.tmux-fzf
     vim
     vimpager
     vscodium
-    powerline
     dbeaver
   ] ++ lib.optionals stdenv.isDarwin [
     darwin.apple_sdk.libs.utmp
