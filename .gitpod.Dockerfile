@@ -97,7 +97,12 @@ USER gitpod
 ENV USER gitpod
 WORKDIR /home/gitpod
 
-RUN git clone https://github.com/asdf-vm/asdf.git /home/gitpod/.asdf --branch v0.8.1
+RUN git clone https://github.com/asdf-vm/asdf.git /home/gitpod/.asdf --branch v0.8.1 \
+    && rm -rf /home/gitpod/.sdkman \
+    && sed -i '/sdkman/d' /home/gitpod/.bashrc \
+    && sed -i '/sdkman/d' /home/gitpod/.bash_profile \
+    && sed -i '/sdkman/d' /home/gitpod/.profile \
+    && sed -i '/sdkman/d' /home/gitpod/.zshrc
 
 RUN mkdir -p /home/gitpod/.bashrc.d \
     && echo "source /home/gitpod/.asdf/asdf.sh" >> /home/gitpod/.bashrc \
