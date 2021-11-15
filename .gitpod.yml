@@ -5,11 +5,7 @@ tasks:
   - init: |
       sleep 3 && mysql -u root -S /var/run/mysqld/mysqld.sock < infra/gitpod/mysql/init_doughnut_db.sql
       git config --global init.defaultBranch main
-      asdf plugin-add java https://github.com/halcyon/asdf-java.git
-      asdf plugin add nodejs https://github.com/asdf-vm/asdf-nodejs.git
-      asdf install java zulu-17.30.15
       asdf global java zulu-17.30.15
-      asdf install nodejs 17.1.0
       asdf global nodejs 17.1.0
       npm i -g npm yarn
       yarn && cd frontend && yarn && cd -

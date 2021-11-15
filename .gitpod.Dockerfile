@@ -116,7 +116,16 @@ RUN mkdir -p /home/gitpod/.bashrc.d \
     && echo "  [ ! -d /workspace/mysql ] && mysqld --initialize-insecure" >> /home/gitpod/.bashrc \
     && echo "  [ ! -e /var/run/mysqld/mysqld.pid ] && mysqld --daemonize" >> /home/gitpod/.bashrc \
     && echo "  rm /var/run/mysqld/gitpod-init.lock" >> /home/gitpod/.bashrc \
-    && echo "fi" >> /home/gitpod/.bashrc
+    && echo "fi" >> /home/gitpod/.bashrc \
+    && source /home/gitpod/.asdf/asdf.sh \
+    && source /home/gitpod/.asdf/completions/asdf.bash
+
+RUN asdf plugin-add java https://github.com/halcyon/asdf-java.git \
+    && asdf plugin add nodejs https://github.com/a/asdf-nodejs.git \
+    && asdf install java zulu-17.30.15 \
+    && asdf global java zulu-17.30.15 \
+    && asdf install nodejs 17.1.0 \
+    && asdf global nodejs 17.1.0
 
 EXPOSE 3000
 EXPOSE 3309
