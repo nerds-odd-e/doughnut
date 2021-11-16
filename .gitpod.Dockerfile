@@ -117,7 +117,8 @@ RUN mkdir -p /home/gitpod/.bashrc.d \
     && echo "  [ ! -e /var/run/mysqld/mysqld.pid ] && mysqld --daemonize" >> /home/gitpod/.bashrc \
     && echo "  rm /var/run/mysqld/gitpod-init.lock" >> /home/gitpod/.bashrc \
     && echo "fi" >> /home/gitpod/.bashrc \
-    && . /home/gitpod/.asdf/asdf.sh \
+
+RUN . /home/gitpod/.asdf/asdf.sh \
     && . /home/gitpod/.asdf/completions/asdf.bash
 
 RUN asdf plugin-add java https://github.com/halcyon/asdf-java.git \
