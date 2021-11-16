@@ -116,7 +116,7 @@ RUN mkdir -p /home/gitpod/.bashrc.d \
     && echo "  [ ! -d /workspace/mysql ] && mysqld --initialize-insecure" >> /home/gitpod/.bashrc \
     && echo "  [ ! -e /var/run/mysqld/mysqld.pid ] && mysqld --daemonize" >> /home/gitpod/.bashrc \
     && echo "  rm /var/run/mysqld/gitpod-init.lock" >> /home/gitpod/.bashrc \
-    && echo "fi" >> /home/gitpod/.bashrc \
+    && echo "fi" >> /home/gitpod/.bashrc
 
 RUN . /home/gitpod/.asdf/asdf.sh \
     && . /home/gitpod/.asdf/completions/asdf.bash
