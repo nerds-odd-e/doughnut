@@ -44,7 +44,7 @@ RUN apt-key adv \
 RUN curl -O https://cdn.azul.com/zulu/bin/zulu-repo_1.0.0-3_all.deb \
     && apt-get install -yq ./zulu-repo_1.0.0-3_all.deb \
     && apt-get update -y \
-    && apt-get install zulu16-ca-jdk
+    && apt-get install -yq zulu16-ca-jdk
 
 # Install MySQL DB
 RUN install-packages mysql-server \
