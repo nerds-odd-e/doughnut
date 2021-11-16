@@ -37,6 +37,13 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /var/cache/apt
 
+# OpenJDK-17
+RUN wget https://download.oracle.com/java/17/latest/jdk-17_linux-x64_bin.deb \
+    && apt install -y ./jdk-17_linux-x64_bin.deb \
+    && echo "export JAVA_HOME=/usr/lib/jvm/jdk-17" >> /etc/profile.d/jdk.sh \
+    && echo "export PATH=$PATH:$JAVA_HOME/bin" >> /etc/profile.d/jdk.sh \
+    && . /etc/profile.d/jdk.sh
+
 # Install MySQL DB
 RUN install-packages mysql-server \
     && mkdir -p /var/run/mysqld /var/log/mysql \
@@ -86,9 +93,6 @@ RUN echo "[client]" >> /etc/mysql/mysql.conf.d/client.cnf \
     && echo "password =" >> /etc/mysql/mysql.conf.d/client.cnf \
     && echo "socket   = /var/run/mysqld/mysqld.sock" >> /etc/mysql/mysql.conf.d/client.cnf
 
-# asdf-vm
-RUN echo ". /home/gitpod/.asdf/asdf.sh" >> /etc/bash.bashrc \
-    && echo ". /home/gitpod/.asdf/completions/asdf.bash" >> /etc/bash.bashrc
 
 # -----------------------------------------------------
 # -------------------- USER gitpod --------------------
@@ -109,11 +113,10 @@ RUN git clone https://github.com/asdf-vm/asdf.git /home/gitpod/.asdf --branch v0
     && sed -i '/sdkman/d' /home/gitpod/.zshrc
 
 RUN mkdir -p /home/gitpod/.bashrc.d \
-    && echo ". /home/gitpod/.asdf/asdf.sh" >> /home/gitpod/.bashrc \
-    && echo ". /home/gitpod/.asdf/completions/asdf.bash" >> /home/gitpod/.bashrc \
-    && echo ". /home/gitpod/.asdf/asdf.sh" >> /home/gitpod/.zshrc \
-    && echo "fpath=(${ASDF_DIR}/completions $fpath)" >> /home/gitpod/.zshrc \
-    && echo "autoload -Uz compinit && compinit" >> /home/gitpod/.zshrc \
+    && echo "export JAVA_HOME=/usr/lib/jvm/jdk-17" >> /home/gitpod/.bashrc \
+    && echo "export PATH=$PATH:$JAVA_HOME/bin" >> /home/gitpod/.bashrc \
+    && echo "export JAVA_HOME=/usr/lib/jvm/jdk-17" >> /home/gitpod/.zshrc \
+    && echo "export PATH=$PATH:$JAVA_HOME/bin" >> /home/gitpod/.zshrc \
     && echo "if [ ! -e /var/run/mysqld/gitpod-init.lock ]" >> /home/gitpod/.bashrc \
     && echo "then" >> /home/gitpod/.bashrc \
     && echo "  touch /var/run/mysqld/gitpod-init.lock" >> /home/gitpod/.bashrc \

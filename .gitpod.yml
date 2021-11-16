@@ -7,11 +7,6 @@ tasks:
       sleep 3 && mysql -u root -S /var/run/mysqld/mysqld.sock < infra/gitpod/mysql/init_doughnut_db.sql
       npm i -g npm yarn
       yarn && cd frontend && yarn && cd -
-      . /home/gitpod/.asdf/asdf.sh &&
-      . /home/gitpod/.asdf/completions/asdf.bash &&
-      asdf plugin-add java https://github.com/halcyon/asdf-java.git &&
-      asdf install java zulu-17.30.15 &&
-      asdf global java zulu-17.30.15
 
 ports:
   # Vite Frontend Dev Server
