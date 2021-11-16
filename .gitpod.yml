@@ -3,18 +3,18 @@ image:
 
 tasks:
   - init: |
+      git config --global init.defaultBranch main
+      sleep 3 && mysql -u root -S /var/run/mysqld/mysqld.sock < infra/gitpod/mysql/init_doughnut_db.sql
       . /home/gitpod/.asdf/asdf.sh
       . /home/gitpod/.asdf/completions/asdf.bash
-      sleep 3 && mysql -u root -S /var/run/mysqld/mysqld.sock < infra/gitpod/mysql/init_doughnut_db.sql
-      asdf plugin-add java https://github.com/halcyon/asdf-java.git
-      asdf plugin add nodejs https://github.com/a/asdf-nodejs.git
-      asdf install java zulu-17.30.15
-      asdf global java zulu-17.30.15
-      asdf install nodejs 17.1.0
-      asdf global nodejs 17.1.0
-      git config --global init.defaultBranch main
       npm i -g npm yarn
       yarn && cd frontend && yarn && cd -
+      asdf plugin-add java https://github.com/halcyon/asdf-java.git
+      asdf plugin-add nodejs https://github.com/a/asdf-nodejs.git
+      asdf install java zulu-17.30.15
+      asdf install nodejs 17.1.0
+      asdf global java zulu-17.30.15
+      asdf global nodejs 17.1.0
 
 ports:
   # Vite Frontend Dev Server
