@@ -81,7 +81,6 @@ in mkShell {
     chromium
     intellij
     psmisc
-    sequeler
     x11vnc
     xclip
     xvfb-run
