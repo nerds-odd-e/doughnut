@@ -37,9 +37,14 @@ RUN apt-get update \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /var/cache/apt
 
-# OpenJDK-17
-RUN wget https://cdn.azul.com/zulu/bin/zulu17.30.15-ca-jdk17.0.1-linux_amd64.deb \
-    && apt-get install -y ./zulu17.30.15-ca-jdk17.0.1-linux_amd64.deb
+# Azul Zulu jdk16
+RUN apt-key adv \
+    --keyserver hkp://keyserver.ubuntu.com:80 \
+    --recv-keys 0xB1998361219BD9C9
+RUN curl -O https://cdn.azul.com/zulu/bin/zulu-repo_1.0.0-3_all.deb \
+    && apt-get install -yq ./zulu-repo_1.0.0-3_all.deb \
+    && apt-get update -y \
+    && apt-get install zulu16-ca-jdk
 
 # Install MySQL DB
 RUN install-packages mysql-server \
