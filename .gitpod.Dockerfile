@@ -38,11 +38,11 @@ RUN apt-get update \
     && rm -rf /var/cache/apt
 
 # OpenJDK-17
-RUN wget https://download.oracle.com/java/17/latest/jdk-17_linux-x64_bin.deb \
-    && apt install -y ./jdk-17_linux-x64_bin.deb \
-    && echo "export JAVA_HOME=/usr/lib/jvm/jdk-17" >> /etc/profile.d/jdk.sh \
-    && echo "export PATH=$PATH:$JAVA_HOME/bin" >> /etc/profile.d/jdk.sh \
-    && . /etc/profile.d/jdk.sh
+RUN apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 0xB1998361219BD9C9 \
+    && curl -O https://cdn.azul.com/zulu/bin/zulu-repo_1.0.0-3_all.deb \
+    && apt-get install -y ./zulu-repo_1.0.0-3_all.deb \
+    && apt-get update -y \
+    && apt-get install zulu17-ca-jdk
 
 # Install MySQL DB
 RUN install-packages mysql-server \
@@ -113,10 +113,6 @@ RUN git clone https://github.com/asdf-vm/asdf.git /home/gitpod/.asdf --branch v0
     && sed -i '/sdkman/d' /home/gitpod/.zshrc
 
 RUN mkdir -p /home/gitpod/.bashrc.d \
-    && echo "export JAVA_HOME=/usr/lib/jvm/jdk-17" >> /home/gitpod/.bashrc \
-    && echo "export PATH=$PATH:$JAVA_HOME/bin" >> /home/gitpod/.bashrc \
-    && echo "export JAVA_HOME=/usr/lib/jvm/jdk-17" >> /home/gitpod/.zshrc \
-    && echo "export PATH=$PATH:$JAVA_HOME/bin" >> /home/gitpod/.zshrc \
     && echo "if [ ! -e /var/run/mysqld/gitpod-init.lock ]" >> /home/gitpod/.bashrc \
     && echo "then" >> /home/gitpod/.bashrc \
     && echo "  touch /var/run/mysqld/gitpod-init.lock" >> /home/gitpod/.bashrc \
