@@ -86,6 +86,10 @@ RUN echo "[client]" >> /etc/mysql/mysql.conf.d/client.cnf \
     && echo "password =" >> /etc/mysql/mysql.conf.d/client.cnf \
     && echo "socket   = /var/run/mysqld/mysqld.sock" >> /etc/mysql/mysql.conf.d/client.cnf
 
+# asdf-vm
+RUN echo ". /home/gitpod/.asdf/asdf.sh" >> /etc/bash.bashrc \
+    && echo ". /home/gitpod/.asdf/completions/asdf.bash" >> /etc/bash.bashrc
+
 # -----------------------------------------------------
 # -------------------- USER gitpod --------------------
 # -----------------------------------------------------
@@ -105,8 +109,6 @@ RUN git clone https://github.com/asdf-vm/asdf.git /home/gitpod/.asdf --branch v0
     && sed -i '/sdkman/d' /home/gitpod/.zshrc
 
 RUN mkdir -p /home/gitpod/.bashrc.d \
-    && echo ". /home/gitpod/.asdf/asdf.sh" >> /etc/bash.bashrc \
-    && echo ". /home/gitpod/.asdf/completions/asdf.bash" >> /etc/bash.bashrc \
     && echo ". /home/gitpod/.asdf/asdf.sh" >> /home/gitpod/.bashrc \
     && echo ". /home/gitpod/.asdf/completions/asdf.bash" >> /home/gitpod/.bashrc \
     && echo ". /home/gitpod/.asdf/asdf.sh" >> /home/gitpod/.zshrc \
