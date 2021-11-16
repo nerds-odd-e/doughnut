@@ -105,9 +105,11 @@ RUN git clone https://github.com/asdf-vm/asdf.git /home/gitpod/.asdf --branch v0
     && sed -i '/sdkman/d' /home/gitpod/.zshrc
 
 RUN mkdir -p /home/gitpod/.bashrc.d \
-    && echo "source /home/gitpod/.asdf/asdf.sh" >> /home/gitpod/.bashrc \
-    && echo "source /home/gitpod/.asdf/completions/asdf.bash" >> /home/gitpod/.bashrc \ 
-    && echo "source /home/gitpod/.asdf/asdf.sh" >> /home/gitpod/.zshrc \
+    && echo ". /home/gitpod/.asdf/asdf.sh" >> /echo/bash.bashrc \
+    && echo ". /home/gitpod/.asdf/completions/asdf.bash" >> /echo/bash.bashrc \
+    && echo ". /home/gitpod/.asdf/asdf.sh" >> /home/gitpod/.bashrc \
+    && echo ". /home/gitpod/.asdf/completions/asdf.bash" >> /home/gitpod/.bashrc \
+    && echo ". /home/gitpod/.asdf/asdf.sh" >> /home/gitpod/.zshrc \
     && echo "fpath=(${ASDF_DIR}/completions $fpath)" >> /home/gitpod/.zshrc \
     && echo "autoload -Uz compinit && compinit" >> /home/gitpod/.zshrc \
     && echo "if [ ! -e /var/run/mysqld/gitpod-init.lock ]" >> /home/gitpod/.bashrc \
@@ -117,16 +119,6 @@ RUN mkdir -p /home/gitpod/.bashrc.d \
     && echo "  [ ! -e /var/run/mysqld/mysqld.pid ] && mysqld --daemonize" >> /home/gitpod/.bashrc \
     && echo "  rm /var/run/mysqld/gitpod-init.lock" >> /home/gitpod/.bashrc \
     && echo "fi" >> /home/gitpod/.bashrc
-
-RUN . /home/gitpod/.asdf/asdf.sh \
-    && . /home/gitpod/.asdf/completions/asdf.bash
-
-RUN asdf plugin-add java https://github.com/halcyon/asdf-java.git \
-    && asdf plugin add nodejs https://github.com/a/asdf-nodejs.git \
-    && asdf install java zulu-17.30.15 \
-    && asdf global java zulu-17.30.15 \
-    && asdf install nodejs 17.1.0 \
-    && asdf global nodejs 17.1.0
 
 EXPOSE 3000
 EXPOSE 3309
