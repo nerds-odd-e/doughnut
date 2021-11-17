@@ -4,7 +4,7 @@ image:
 tasks:
   - init: |
       git config --global init.defaultBranch main
-      sleep 2 && mysql -u root -S /var/run/mysqld/mysqld.sock < infra/gitpod/mysql/init_doughnut_db.sql
+      sleep 4 && mysql -u root -S /var/run/mysqld/mysqld.sock < infra/gitpod/mysql/init_doughnut_db.sql
       npm i -g npm yarn
       yarn && cd frontend && yarn && cd -
 
@@ -33,9 +33,7 @@ ports:
   - port: 6080
     onOpen: open-browser
     visibility: public
-  # - port: 8887
-  #   onOpen: open-browser
-  #   visibility: public
+
 
 vscode:
   extensions:
