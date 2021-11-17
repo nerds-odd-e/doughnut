@@ -49,7 +49,6 @@ in mkShell {
     lzma
     zoxide
     ps
-    tree
     vgrep
     unixtools.whereis
     which
