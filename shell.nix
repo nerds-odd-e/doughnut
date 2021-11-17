@@ -25,6 +25,7 @@ in mkShell {
     bash_5
     libiconv
     zsh
+    git
     git-extras
     git-secret
     gitAndTools.delta
@@ -90,6 +91,7 @@ in mkShell {
         export GPG_TTY=$(tty)
         export JAVA_HOME="$(readlink -e $(type -p javac) | sed  -e 's/\/bin\/javac//g')"
         export GRADLE_HOME="${pkgs.gradle}"
+        export NODE_HOME="${pkgs.nodejs-16_x}"
 
         export MYSQL_BASEDIR=${pkgs.mysql80}
         export MYSQL_HOME="''${MYSQL_HOME:-$PWD/mysql}"
@@ -100,13 +102,14 @@ in mkShell {
         export MYSQL_TCP_PORT=3309
         export MYSQLX_TCP_PORT=33090
 
-        export PATH=$PATH:$JAVA_HOME/bin:$GRADLE_HOME/bin
+        export PATH=$PATH:$JAVA_HOME/bin:$GRADLE_HOME/bin:$NODE_HOME/bin
 
         echo "##############################################################################################################"
         echo "                                                                                "
         echo "##    !! DOUGHNUT NIX-SHELL !!      "
         echo "##    JAVA_HOME: $JAVA_HOME         "
         echo "##    GRADLE_HOME: $GRADLE_HOME     "
+        echo "##    NODE_HOME: $NODE_HOME         "
         echo "##    MYSQL_HOME: $MYSQL_HOME       "
         echo "##    MYSQL_DATADIR: $MYSQL_DATADIR "
         echo "                                                                                "
