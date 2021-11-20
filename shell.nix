@@ -2,12 +2,7 @@
 with pkgs;
 let
   inherit (pkgs) stdenv;
-  allowConfig = config.nixpkgs.config {
-    allowUnfree = true;
-    allowUnsupportedSystem = true;
-  };
   apple_sdk = darwin.apple_sdk.frameworks;
-  intellij = jetbrains.idea-community;
 in mkShell {
   name = "doughnut";
   MYSQL_HOME = builtins.getEnv "MYSQL_HOME";
@@ -20,7 +15,7 @@ in mkShell {
     gradle
     nodejs-16_x
     yarn
-    jdk17
+    jdk
     python3
     bash_5
     libiconv
@@ -31,7 +26,6 @@ in mkShell {
     gitAndTools.delta
     locale
     lsd
-    platinum-searcher
     binutils-unwrapped
     hostname
     inetutils
@@ -60,13 +54,11 @@ in mkShell {
     mysql80
     mysql-client
     mysql_jdbc
-    python39Packages.pip
     chromedriver
     google-cloud-sdk
     packer
     vim
     vimpager
-    vscodium
     dbeaver
   ] ++ lib.optionals stdenv.isDarwin [
     darwin.apple_sdk.libs.utmp
@@ -79,7 +71,6 @@ in mkShell {
     xcodebuild
   ] ++ lib.optionals (!stdenv.isDarwin) [
     chromium
-    intellij
     psmisc
     x11vnc
     xclip
