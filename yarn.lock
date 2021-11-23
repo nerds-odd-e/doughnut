@@ -1364,7 +1364,7 @@ blob-util@^2.0.2:
   resolved "https://registry.yarnpkg.com/blob-util/-/blob-util-2.0.2.tgz#3b4e3c281111bb7f11128518006cdc60b403a1eb"
   integrity sha512-T7JQa+zsXXEa6/8ZhHcQEW1UFfVM49Ts65uBkFL6fz2QmrElqmbajIDJvuA0tEhRe5eIjpV9ZF+0RfZR9voJFQ==
 
-bluebird@^3.4.1, bluebird@^3.7.2:
+bluebird@3.7.2, bluebird@^3.4.1, bluebird@^3.7.2:
   version "3.7.2"
   resolved "https://registry.yarnpkg.com/bluebird/-/bluebird-3.7.2.tgz#9f229c15be272454ffa973ace0dbee79a1b0c36f"
   integrity sha512-XpNj6GDQzdfW+r2Wnn7xiSAd7TM3jzkxGXBGTtWKuSXv1xUV+azxAm8jdWZN06QTQk+2N2XB9jRDkvbmQmcRtg==
@@ -1759,11 +1759,6 @@ cli-truncate@^2.1.0:
     slice-ansi "^3.0.0"
     string-width "^4.2.0"
 
-clone@^2.1.2:
-  version "2.1.2"
-  resolved "https://registry.yarnpkg.com/clone/-/clone-2.1.2.tgz#1b7f4b9f591f1e8f83670401600345a02887435f"
-  integrity sha1-G39Ln1kfHo+DZwQBYANFoCiHQ18=
-
 coffeeify@^3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/coffeeify/-/coffeeify-3.0.1.tgz#5e2753000c50bd24c693115f33864248dd11136c"
@@ -2064,10 +2059,10 @@ cypress-file-upload@5.0.8:
   resolved "https://registry.yarnpkg.com/cypress-file-upload/-/cypress-file-upload-5.0.8.tgz#d8824cbeaab798e44be8009769f9a6c9daa1b4a1"
   integrity sha512-+8VzNabRk3zG6x8f8BWArF/xA/W0VK4IZNx3MV0jFWrJS/qKn8eHfa5nU73P9fOQAgwHFJx7zjg4lwOnljMO8g==
 
-cypress@9.0.0:
-  version "9.0.0"
-  resolved "https://registry.yarnpkg.com/cypress/-/cypress-9.0.0.tgz#8c496f7f350e611604cc2f77b663fb81d0c235d2"
-  integrity sha512-/93SWBZTw7BjFZ+I9S8SqkFYZx7VhedDjTtRBmXO0VzTeDbmxgK/snMJm/VFjrqk/caWbI+XY4Qr80myDMQvYg==
+cypress@9.1.0:
+  version "9.1.0"
+  resolved "https://registry.yarnpkg.com/cypress/-/cypress-9.1.0.tgz#5d23c1b363b7d4853009c74a422a083a8ad2601c"
+  integrity sha512-fyXcCN51vixkPrz/vO/Qy6WL3hKYJzCQFeWofOpGOFewVVXrGfmfSOGFntXpzWBXsIwPn3wzW0HOFw51jZajNQ==
   dependencies:
     "@cypress/request" "^2.88.7"
     "@cypress/xvfb" "^1.2.4"
@@ -2076,7 +2071,7 @@ cypress@9.0.0:
     "@types/sizzle" "^2.3.2"
     arch "^2.2.0"
     blob-util "^2.0.2"
-    bluebird "^3.7.2"
+    bluebird "3.7.2"
     cachedir "^2.3.0"
     chalk "^4.1.0"
     check-more-types "^2.24.0"
@@ -2254,9 +2249,9 @@ ecc-jsbn@~0.1.1:
     safer-buffer "^2.1.0"
 
 electron-to-chromium@^1.3.896:
-  version "1.3.904"
-  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.904.tgz#52a353994faeb0f2a9fab3606b4e0614d1af7b58"
-  integrity sha512-x5uZWXcVNYkTh4JubD7KSC1VMKz0vZwJUqVwY3ihsW0bst1BXDe494Uqbg3Y0fDGVjJqA8vEeGuvO5foyH2+qw==
+  version "1.3.906"
+  resolved "https://registry.yarnpkg.com/electron-to-chromium/-/electron-to-chromium-1.3.906.tgz#144e212691e35fa8c294431e2ecb51e4b03f7577"
+  integrity sha512-UjoECdcOYIVzWmrbtNnYpPrDuu+RtiO5W08Vdbid9ydGQMSdnqtJUtvOqQEAVQqpoXN9kSW9YnQufvzLQMYQOw==
 
 elliptic@^6.5.3:
   version "6.5.4"
@@ -3153,15 +3148,15 @@ lazy-ass@^1.6.0:
   integrity sha1-eZllXoZGwX8In90YfRUNMyTVRRM=
 
 listr2@^3.8.3:
-  version "3.13.4"
-  resolved "https://registry.yarnpkg.com/listr2/-/listr2-3.13.4.tgz#34101fc0184545597e00d1e7915ccfbfb17332e6"
-  integrity sha512-lZ1Rut1DSIRwbxQbI8qaUBfOWJ1jEYRgltIM97j6kKOCI2pHVWMyxZvkU/JKmRBWcIYgDS2PK+yDgVqm7u3crw==
+  version "3.13.5"
+  resolved "https://registry.yarnpkg.com/listr2/-/listr2-3.13.5.tgz#105a813f2eb2329c4aae27373a281d610ee4985f"
+  integrity sha512-3n8heFQDSk+NcwBn3CgxEibZGaRzx+pC64n3YjpMD1qguV4nWus3Al+Oo3KooqFKTQEJ1v7MmnbnyyNspgx3NA==
   dependencies:
     cli-truncate "^2.1.0"
-    clone "^2.1.2"
     colorette "^2.0.16"
     log-update "^4.0.0"
     p-map "^4.0.0"
+    rfdc "^1.3.0"
     rxjs "^7.4.0"
     through "^2.3.8"
     wrap-ansi "^7.0.0"
@@ -3876,6 +3871,11 @@ restore-cursor@^3.1.0:
   dependencies:
     onetime "^5.1.0"
     signal-exit "^3.0.2"
+
+rfdc@^1.3.0:
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/rfdc/-/rfdc-1.3.0.tgz#d0b7c441ab2720d05dc4cf26e01c89631d9da08b"
+  integrity sha512-V2hovdzFbOi77/WajaSMXk2OLm+xNIeQdMMuB7icj7bk6zi2F8GGAxigcnDFpJHbNyNcgyJDiP+8nOrY5cZGrA==
 
 rimraf@^3.0.0:
   version "3.0.2"
