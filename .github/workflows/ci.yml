@@ -114,6 +114,10 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: List all simulators
+      - uses: actions/checkout@v1
+      - uses: ./.github/mobile_actions
+        with:
+          flutter-version: '2.5.3'
         run: xcrun instruments -s
       # get UUID  simulator and boot a simulator on mac from  command line
       - name: Start Simulator
@@ -126,15 +130,6 @@ jobs:
               '$1 == device { print $2 }'
           )
           xcrun simctl boot "${UDID:?No Simulator with this name found}"
-      - uses: actions/checkout@v1
-      - uses: ./.github/mobile_actions
-        with:
-          flutter-version: '2.5.3'
-      - uses: subosito/flutter-action@v1.5.3
-        with:
-          flutter-version: '2.5.3'
-      - run: flutter pub get
-        working-directory: ./doughnut_mobile
       - run: dart test_driver/app_test.dart
         working-directory: ./doughnut_mobile
 
@@ -147,11 +142,9 @@ jobs:
         api-level: [29]
     steps:
       - uses: actions/checkout@v1
-      - uses: subosito/flutter-action@v1.5.3
+      - uses: ./.github/mobile_actions
         with:
           flutter-version: '2.5.3'
-      - run: flutter pub get
-        working-directory: ./doughnut_mobile
       - name: Run Flutter Driver tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
