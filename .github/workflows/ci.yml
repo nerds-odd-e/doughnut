@@ -130,7 +130,9 @@ jobs:
       - uses: subosito/flutter-action@v1.5.3
         with:
           flutter-version: '2.5.3'
-      - run: flutter drive --target=test_driver/app.dart
+      - run: flutter pub get
+        working-directory: ./doughnut_mobile
+      - run: dart test_driver/app_test.dart
         working-directory: ./doughnut_mobile
 
   drive_android:
@@ -150,7 +152,7 @@ jobs:
         with:
           api-level: ${{ matrix.api-level }}
           script: |
-            cd ./doughnut_mobile && flutter drive --target=test_driver/app.dart
+            cd ./doughnut_mobile && flutter pub get && dart test_driver/app_test.dart
   E2E-tests:
     name: End-to-End tests with Database
     runs-on: ubuntu-20.04
