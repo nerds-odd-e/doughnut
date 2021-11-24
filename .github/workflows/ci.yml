@@ -127,6 +127,9 @@ jobs:
           )
           xcrun simctl boot "${UDID:?No Simulator with this name found}"
       - uses: actions/checkout@v1
+      - uses: ./.github/actions/mobile_action.yml@main
+        with:
+          flutter-version: '2.5.3'
       - uses: subosito/flutter-action@v1.5.3
         with:
           flutter-version: '2.5.3'
@@ -147,12 +150,15 @@ jobs:
       - uses: subosito/flutter-action@v1.5.3
         with:
           flutter-version: '2.5.3'
+      - run: flutter pub get
+        working-directory: ./doughnut_mobile
       - name: Run Flutter Driver tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
           script: |
-            cd ./doughnut_mobile && flutter pub get && dart test_driver/app_test.dart
+            cd ./doughnut_mobile && dart test_driver/app_test.dart
+
   E2E-tests:
     name: End-to-End tests with Database
     runs-on: ubuntu-20.04
