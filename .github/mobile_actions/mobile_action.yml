@@ -9,4 +9,10 @@ inputs:
     required: false
     default: 'stable'
 runs:
-  main: 'ls'
+  - uses: actions/checkout@v1
+  - uses: subosito/flutter-action@v1.5.3
+    with:
+      flutter-version: ${{ inputs.flutter-version }}
+      channel: ${{ inputs.channel }}
+  - run: flutter pub get
+    working-directory: ./doughnut_mobile
