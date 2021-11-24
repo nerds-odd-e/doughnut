@@ -113,11 +113,11 @@ jobs:
       fail-fast: false
     runs-on: macos-latest
     steps:
-      - name: List all simulators
       - uses: actions/checkout@v1
       - uses: ./.github/mobile_actions
         with:
           flutter-version: '2.5.3'
+      - name: List all simulators
         run: xcrun instruments -s
       # get UUID  simulator and boot a simulator on mac from  command line
       - name: Start Simulator
