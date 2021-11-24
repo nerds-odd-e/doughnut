@@ -1,4 +1,4 @@
-import 'package:influ/main.dart';
+import 'package:doughnut_mobile/main.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_driver/driver_extension.dart';
 

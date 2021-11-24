@@ -93,7 +93,7 @@ jobs:
           node-version: "16"
       - run: yarn frontend:test
 
-  mobile_unit_test:
+  mobile-unit-test:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -239,6 +239,7 @@ jobs:
         Backend-unit-tests,
         Frontend-linting,
         Frontend-unit-tests,
+        mobile-unit-test,
         E2E-tests,
         Package-n-Deploy,
       ]
