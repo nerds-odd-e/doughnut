@@ -12,7 +12,7 @@ spring:
       max-file-size: 10MB
       max-request-size: 10MB
   datasource:
-    url: ${db.url}
+    url: ${db.url:#{'jdbc:mysql://127.0.0.1:3309/doughnut_test'}}
     username: ${db.user}
     password: ${db.password}
     driver-class-name: com.mysql.cj.jdbc.Driver
