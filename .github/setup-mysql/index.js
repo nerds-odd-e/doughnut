@@ -53,8 +53,8 @@ if (process.platform == 'darwin') {
 
   // start
   bin = `/usr/local/opt/mysql@${mysqlVersion}/bin`;
-  const myconf = `/usr/local/Cellar/mysql/${mysqlVersion}/my.cnf`;
-  run(`sudo echo "port		= ${port}" >> ${myconf}`)`
+  const myconf = `/usr/local/etc/my.cnf`;
+  run(`sudo echo "port		= ${port}" >> ${myconf}`);
   run(`${bin}/mysql.server start`);
 
   // add user
