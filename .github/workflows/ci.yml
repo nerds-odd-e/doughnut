@@ -188,6 +188,8 @@ jobs:
           mysql password: ${{ secrets.DBPASSWORD }}
           host port: 3309
           container port: 3309
+      - name: Start backend service
+        run: yarn sut
       - name: Cache yarn directory path
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn cache dir)"
@@ -219,7 +221,6 @@ jobs:
           headless: true
           config: pageLoadTimeout=100000,video=false
           install-command: yarn
-          start: yarn sut
           wait-on: "http://localhost:9081"
           spec: ${{ matrix.spec }}
 
