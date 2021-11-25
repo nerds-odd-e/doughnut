@@ -96,10 +96,11 @@ if (process.platform == 'darwin') {
   run(`"${bin}\\mysql" -u root -e "FLUSH PRIVILEGES"`);
 } else {
   run(`sudo cat /etc/mysql/mysql.conf.d/mysqld.cnf`)
-  run(`sudo sed -i 's/3306/3309/g' /etc/mysql/mysql.conf.d/mysqld.cnf`)
+  run(`sudo sed -i 's/# port\\s+= 3306/port=3309/g' /etc/mysql/mysql.conf.d/mysqld.cnf`)
+  run(`sudo cat /etc/mysql/mysql.conf.d/mysqld.cnf`)
 
   // start
-  run(`sudo mysqld &`);
+  run('sudo systemctl start mysql');
 
   // remove root password
   run(`sudo mysqladmin -proot password ''`);
