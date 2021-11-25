@@ -95,27 +95,8 @@ if (process.platform == 'darwin') {
   run(`"${bin}\\mysql" -u root -e "GRANT ALL PRIVILEGES ON *.* TO 'ODBC'@'localhost'"`);
   run(`"${bin}\\mysql" -u root -e "FLUSH PRIVILEGES"`);
 } else {
-  if (image == 'ubuntu20') {
-    if (mysqlVersion != '8.0') {
-      // install
-      run(`sudo apt-get install mysql-server-${mysqlVersion}`);
-    }
-  } else {
-    if (mysqlVersion != '5.7') {
-      if (mysqlVersion == '5.6') {
-        throw `MySQL version not supported yet: ${mysqlVersion}`;
-      }
-
-      // install
-      useTmpDir();
-      run(`wget -q -O mysql-apt-config.deb https://dev.mysql.com/get/mysql-apt-config_0.8.16-1_all.deb`);
-      run(`echo mysql-apt-config mysql-apt-config/select-server select mysql-${mysqlVersion} | sudo debconf-set-selections`);
-      run(`sudo dpkg -i mysql-apt-config.deb`);
-      // TODO only update single list
-      run(`sudo apt-get update`);
-      run(`sudo apt-get install mysql-server`);
-    }
-  }
+  run(`mysqld -v`);
+  run(`sudo apt-get install mysql-server-${mysqlVersion}`);
 
   run(`sudo ls -al /etc/mysql/`)
   run(`sudo ls -al /etc/mysql/mysql.conf.d/`)
