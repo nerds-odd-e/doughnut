@@ -115,6 +115,9 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - uses: ./.github/starting_backend_actions
+        with:
+          dbuser: ${{ secrets.DBUSER }}
+          dbpassword: ${{ secrets.DBPASSWORD }}
       - uses: ./.github/mobile_actions
         with:
           flutter-version: '2.5.3'
@@ -144,6 +147,9 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - uses: ./.github/starting_backend_actions
+        with:
+          dbuser: ${{ secrets.DBUSER }}
+          dbpassword: ${{ secrets.DBPASSWORD }}
       - uses: ./.github/mobile_actions
         with:
           flutter-version: '2.5.3'
@@ -174,6 +180,9 @@ jobs:
       - name: Code Checkout
         uses: actions/checkout@v2
       - uses: ./.github/starting_backend_actions
+        with:
+          dbuser: ${{ secrets.DBUSER }}
+          dbpassword: ${{ secrets.DBPASSWORD }}
       - name: Cache yarn directory path
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn cache dir)"
