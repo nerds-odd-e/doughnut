@@ -189,7 +189,7 @@ jobs:
           host port: 3309
           container port: 3309
       - name: Start backend service
-        run: yarn sut
+        run: yarn sut&
       - name: Cache yarn directory path
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn cache dir)"
