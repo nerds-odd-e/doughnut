@@ -83,9 +83,6 @@ tasks.register("bootRunE2E") {
     doFirst {
       tasks.bootRun.configure {
         systemProperty("spring.profiles.active", "e2e")
-        systemProperty("spring.datasource.url", "jdbc:mysql://127.0.0.1:3309/doughnut_e2e_test")
-        systemProperty("spring.datasource.username", "doughnut")
-        systemProperty("spring.datasource.username", "doughnut")
       }
     }
     finalizedBy("bootRun")

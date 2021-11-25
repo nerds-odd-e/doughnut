@@ -72,6 +72,8 @@ in mkShell {
     x11vnc
     xclip
     xvfb-run
+    dart
+    flutter
   ];
   shellHook = ''
         export NIXPKGS_ALLOW_UNFREE=1
