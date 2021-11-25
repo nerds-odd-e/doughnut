@@ -95,22 +95,18 @@ if (process.platform == 'darwin') {
   run(`"${bin}\\mysql" -u root -e "GRANT ALL PRIVILEGES ON *.* TO 'ODBC'@'localhost'"`);
   run(`"${bin}\\mysql" -u root -e "FLUSH PRIVILEGES"`);
 } else {
-  run(`mysqld -v`);
-  run(`sudo apt-get install mysql-server-${mysqlVersion}`);
-
   run(`sudo ls -al /etc/mysql/`)
   run(`sudo ls -al /etc/mysql/mysql.conf.d/`)
-  run(`sudo echo "port		= ${port}" >> /etc/mysql/mysql.conf.d/mysqld.cnf`)
   // start
-  run(`sudo systemctl start mysql`);
+  run(`sudo mysqld --port=${port}`);
 
   // remove root password
-  run(`sudo mysqladmin -proot password ''`);
+  run(`sudo mysqladmin --port=${port} -proot password ''`);
 
   // add user
-  run(`sudo mysql -e "CREATE USER '$USER'@'localhost' IDENTIFIED BY ''"`);
-  run(`sudo mysql -e "GRANT ALL PRIVILEGES ON *.* TO '$USER'@'localhost'"`);
-  run(`sudo mysql -e "FLUSH PRIVILEGES"`);
+  run(`sudo mysql  --port=${port} -e "CREATE USER '$USER'@'localhost' IDENTIFIED BY ''"`);
+  run(`sudo mysql --port=${port} -e "GRANT ALL PRIVILEGES ON *.* TO '$USER'@'localhost'"`);
+  run(`sudo mysql --port=${port} -e "FLUSH PRIVILEGES"`);
 
   bin = `/usr/bin`;
 }
