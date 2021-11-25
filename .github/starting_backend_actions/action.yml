@@ -22,9 +22,9 @@ runs:
         mysql-version: 8.0
         database: "doughnut_e2e_test"
     - run: |
-      mysql -e "CREATE USER '${{ inputs.dbuser}}'@'localhost' IDENTIFIED BY '${{inputs.dbpassword}}'"`);
-      mysql -e "GRANT ALL PRIVILEGES ON *.* TO '${{iputs.dbuser}}'@'localhost'"`);
-      mysql -e "FLUSH PRIVILEGES"`);
+        mysql -e "CREATE USER '${{ inputs.dbuser}}'@'localhost' IDENTIFIED BY '${{inputs.dbpassword}}'"`);
+        mysql -e "GRANT ALL PRIVILEGES ON *.* TO '${{iputs.dbuser}}'@'localhost'"`);
+        mysql -e "FLUSH PRIVILEGES"`);
       shell: bash
     - run: yarn sut&
       shell: bash
