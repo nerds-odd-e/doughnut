@@ -48,8 +48,7 @@ function useTmpDir() {
 }
 
 if (process.platform == 'darwin') {
-  run(`which mysqld`);
-  run(`mysqld`);
+  run(`mysqld --daemon`);
 
   // add user
   run(`${bin}/mysql -e "CREATE USER '$USER'@'localhost' IDENTIFIED BY ''"`);
