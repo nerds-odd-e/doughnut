@@ -114,6 +114,7 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v1
+      - uses: ./.github/starting_backend_actions
       - uses: ./.github/mobile_actions
         with:
           flutter-version: '2.5.3'
@@ -142,6 +143,7 @@ jobs:
         api-level: [29]
     steps:
       - uses: actions/checkout@v1
+      - uses: ./.github/starting_backend_actions
       - uses: ./.github/mobile_actions
         with:
           flutter-version: '2.5.3'
@@ -171,25 +173,7 @@ jobs:
     steps:
       - name: Code Checkout
         uses: actions/checkout@v2
-      - name: Set up JDK 16
-        uses: actions/setup-java@v2
-        with:
-          java-version: 16
-          distribution: "zulu"
-          architecture: x64
-      - name: Setup MySQL DB Server 8.0
-        uses: mirromutth/mysql-action@v1.1
-        with:
-          mysql version: "8.0"
-          character set server: "utf8mb4"
-          collation server: "utf8mb4_unicode_ci"
-          mysql database: "doughnut_e2e_test"
-          mysql user: ${{ secrets.DBUSER }}
-          mysql password: ${{ secrets.DBPASSWORD }}
-          host port: 3309
-          container port: 3309
-      - name: Start backend service
-        run: yarn sut&
+      - uses: ./.github/starting_backend_actions
       - name: Cache yarn directory path
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn cache dir)"

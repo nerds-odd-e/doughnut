@@ -1,0 +1,25 @@
+name: 'Starting backend action'
+description: 'Starting backend service'
+runs:
+  using: "composite"
+  steps:
+    - name: Set up JDK 16
+      uses: actions/setup-java@v2
+      with:
+        java-version: 16
+        distribution: "zulu"
+        architecture: x64
+    - name: Setup MySQL DB Server 8.0
+      uses: mirromutth/mysql-action@v1.1
+      with:
+        mysql version: "8.0"
+        character set server: "utf8mb4"
+        collation server: "utf8mb4_unicode_ci"
+        mysql database: "doughnut_e2e_test"
+        mysql user: ${{ secrets.DBUSER }}
+        mysql password: ${{ secrets.DBPASSWORD }}
+        host port: 3309
+        container port: 3309
+    - run: yarn sut&
+      shell: bash
+
