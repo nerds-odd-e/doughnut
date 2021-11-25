@@ -117,7 +117,7 @@ if (process.platform == 'darwin') {
     }
   }
 
-  run(`sudo echo "port		= ${port}" >> /etc/mysql/mysql.conf.d/mysqld.cnf`)`
+  run(`sudo echo "port		= ${port}" >> /etc/mysql/mysql.conf.d/mysqld.cnf`)
   // start
   run(`sudo systemctl start mysql`);
 
