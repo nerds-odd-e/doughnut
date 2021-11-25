@@ -53,7 +53,9 @@ if (process.platform == 'darwin') {
 
   // start
   bin = `/usr/local/opt/mysql@${mysqlVersion}/bin`;
-  run(`${bin}/mysql.server start --port ${port}`);
+  const myconf = `/usr/local/Cellar/mysql/${mysqlVersion}/my.cnf`;
+  run(`sudo echo "port		= ${port}" >> ${myconf}`)`
+  run(`${bin}/mysql.server start`);
 
   // add user
   run(`${bin}/mysql -e "CREATE USER '$USER'@'localhost' IDENTIFIED BY ''"`);
@@ -115,8 +117,9 @@ if (process.platform == 'darwin') {
     }
   }
 
+  run(`sudo echo "port		= ${port}" >> /etc/mysql/mysql.conf.d/mysqld.cnf`)`
   // start
-  run(`sudo systemctl start mysql --port ${port}`);
+  run(`sudo systemctl start mysql`);
 
   // remove root password
   run(`sudo mysqladmin -proot password ''`);
