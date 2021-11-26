@@ -13,10 +13,10 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Set up JDK 16
+    - name: Set up JDK 18
       uses: actions/setup-java@v2
       with:
-        java-version: 16
+        java-version: 18
         distribution: "zulu"
         architecture: x64
     - name: Setup MySQL DB Server 8.0
