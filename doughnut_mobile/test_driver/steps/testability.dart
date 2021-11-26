@@ -6,16 +6,12 @@ import 'package:flutter_gherkin/flutter_gherkin.dart';
 import 'package:gherkin/gherkin.dart';
 
 class Testability {
+  static final contentTypeUtf8 = {'Content-Type': 'application/json; charset=UTF-8'};
   StepContext<FlutterWorld> context;
   Testability(this.context);
 
   static Future<void> cleanDbAndResetTestabilitySettings() async {
-    final response = await http.post(Uri.parse('http://localhost:9081/api/testability/clean_db_and_reset_testability_settings'),
-        headers: {
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode([]));
-
+    final response = await http.post(Uri.parse('http://localhost:9081/api/testability/clean_db_and_reset_testability_settings'), headers: contentTypeUtf8);
     ExpectMimic().expect(response.statusCode, 200);
   }
 
@@ -35,13 +31,8 @@ class Testability {
     context.expect(response1.body, 'OK');
   }
 
-  Future<http.Response> httpPost(
-      String uri, Object object) async {
-    final response = await http.post(Uri.parse(uri),
-        headers: {
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(object));
+  Future<http.Response> httpPost(String uri, Object object) async {
+    final response = await http.post(Uri.parse(uri), headers: contentTypeUtf8, body: jsonEncode(object));
     context.expect(response.statusCode, 200);
     return response;
   }
