@@ -138,11 +138,11 @@ jobs:
         api-level: [29]
     steps:
       - uses: actions/checkout@v1
-      - uses: ./.github/starting_backend_actions
-        with:
-          dbuser: ${{ secrets.DBUSER }}
-          dbpassword: ${{ secrets.DBPASSWORD }}
-          db_url: ${{ secrets.CI_E2E_DB_URL }}
+#      - uses: ./.github/starting_backend_actions
+#        with:
+#          dbuser: ${{ secrets.DBUSER }}
+#          dbpassword: ${{ secrets.DBPASSWORD }}
+#          db_url: ${{ secrets.CI_E2E_DB_URL }}
       - uses: ./.github/mobile_actions
         with:
           flutter-version: '2.5.3'
