@@ -30,5 +30,7 @@ runs:
         mysql -uroot -e "FLUSH PRIVILEGES"
       shell: bash
     - run: yarn sut
+      env:
+        INPUT_DB_URL: ${{ inputs.db_url }}
       shell: bash
 
