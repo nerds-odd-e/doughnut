@@ -15,10 +15,6 @@ runs:
       with:
         flutter-version: ${{ inputs.flutter-version }}
         channel: ${{ inputs.channel }}
-    - uses: actions/cache@v2
-      with:
-        path: ${{ env.FLUTTER_ROOT }}
-        key: macos-flutter-${{ env.FLUTTER_ROOT }}
     - run: flutter pub get
       shell: bash
       working-directory: ./doughnut_mobile
