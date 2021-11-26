@@ -9,6 +9,6 @@ class CucumberHook extends Hook {
       String scenario,
       Iterable<Tag> tags,
       ) async {
-    await Testability.cleanDbAndResetTestabilitySettings();
+    await TestabilityContextless().cleanDbAndResetTestabilitySettings();
   }
 }
