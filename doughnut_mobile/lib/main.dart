@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'bazaar_widget.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -36,7 +38,6 @@ class _MyHomePageState extends State<MyHomePage> {
   void _incrementCounter() {
     setState(() {
       _counter++;
-      futureTitle = abc();
     });
   }
 
@@ -60,19 +61,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            FutureBuilder<String>(
-              future: futureTitle,
-              builder: (context, snapshot) {
-                  if (snapshot.hasData) {
-                    return Text(snapshot.data!);
-                  } else if (snapshot.hasError) {
-                    return Text('${snapshot.error}');
-                  }
-
-                  // By default, show a loading spinner.
-                  return const CircularProgressIndicator();
-              },
-            ),
+            BazaarWidget(futureTitle),
             Text(
               '$_counter',
               style: Theme.of(context).textTheme.headline4,
@@ -88,5 +77,6 @@ class _MyHomePageState extends State<MyHomePage> {
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
   }
+
 }
 
