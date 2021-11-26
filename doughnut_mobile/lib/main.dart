@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'bazaar_widget.dart';
+import 'rest_api.dart';
 
 void main() {
   runApp(const MyApp());
@@ -33,6 +34,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  final RestApi restApi = RestApi();
   late Future<String> futureTitle;
 
   void _incrementCounter() {
@@ -44,11 +46,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    futureTitle = abc();
-  }
-
-  Future<String> abc() async {
-    return 'Shape';
+    futureTitle = restApi.getBazaarNotebooks();
   }
 
   @override
