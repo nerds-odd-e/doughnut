@@ -109,7 +109,7 @@ jobs:
     strategy:
       matrix:
         device:
-          - "iPhone 11 Pro (14.4)"
+          - "iPhone 11"
       fail-fast: false
     runs-on: macos-latest
     steps:
@@ -124,6 +124,7 @@ jobs:
           flutter-version: '2.5.3'
       - name: Start Simulator
         run: |
+          xcrun xctrace list devices
           xcrun simctl boot "${{ matrix.device }}"
       - run: dart test_driver/app_test.dart
         working-directory: ./doughnut_mobile
