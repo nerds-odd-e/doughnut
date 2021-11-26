@@ -1,4 +1,5 @@
 import 'package:flutter_gherkin/flutter_gherkin.dart';
+import 'package:flutter_driver/flutter_driver.dart';
 import 'package:gherkin/gherkin.dart';
 import './testability.dart';
 
@@ -16,7 +17,13 @@ List<StepDefinitionGeneric> bazaarSteps() {
     ),
     then1<String, FlutterWorld>(
       "I should see {string} is shared in the Bazaar",
-      (notebookName, context) async {},
+      (notebookName, context) async {
+        final isPresent = await FlutterDriverUtils.isPresent(
+          context.world.driver,
+          find.text(notebookName),
+        );
+        context.expect(isPresent, true);
+      },
     ),
   ];
 }
