@@ -7,14 +7,15 @@ import 'package:gherkin/gherkin.dart';
 
 class Testability extends TestabilityBase {
   StepContext<FlutterWorld> context;
+
   Testability(this.context);
 
   @override
   void expect(
-      actual,
-      matcher, {
-        String? reason,
-      }) {
+    actual,
+    matcher, {
+    String? reason,
+  }) {
     context.expect(actual, matcher, reason: reason);
   }
 }
@@ -22,10 +23,10 @@ class Testability extends TestabilityBase {
 class TestabilityContextless extends TestabilityBase {
   @override
   void expect(
-      actual,
-      matcher, {
-        String? reason,
-      }) {
+    actual,
+    matcher, {
+    String? reason,
+  }) {
     ExpectMimic().expect(actual, matcher, reason: reason);
   }
 }
@@ -39,7 +40,8 @@ abstract class TestabilityBase {
   }
 
   Future<void> seedNotebookInBazaar(String notebookName) async {
-    http.Response response = await testabilityPost('seed_notes?external_identifier=old_learner',
+    http.Response response = await testabilityPost(
+        'seed_notes?external_identifier=old_learner',
         bodyObject: [
           {'title': notebookName}
         ]);
@@ -47,17 +49,21 @@ abstract class TestabilityBase {
     expect((jsonDecode(response.body) as List).length, 1);
 
     http.Response response1 = await testabilityPost('share_to_bazaar',
-        bodyObject: {'noteTitle': notebookName}
-    );
+        bodyObject: {'noteTitle': notebookName});
     expect(response1.body, 'OK');
   }
 
-  Future<http.Response> testabilityPost(String uri, { Object? bodyObject }) async {
-    final response = await http.post(Uri.parse(testabilityBaseUrl + uri), headers: contentTypeUtf8, body: jsonEncode(bodyObject));
+  Future<http.Response> testabilityPost(String uri,
+      {Object? bodyObject}) async {
+    final response = await http.post(Uri.parse(testabilityBaseUrl + uri),
+        headers: contentTypeUtf8, body: jsonEncode(bodyObject));
     expect(response.statusCode, 200);
     return response;
   }
 
-   void expect(actual, matcher, { String? reason, });
+  void expect(
+    actual,
+    matcher, {
+    String? reason,
+  });
 }
-
