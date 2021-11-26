@@ -9,13 +9,9 @@ class Testability {
   StepContext<FlutterWorld> context;
   Testability(this.context);
 
-  // 'http://localhost:9081/api/testability/clean_db_and_reset_testability_settings',
   seedNotebookInBazaar(String notebookName) async {
     await httpPost(
-      'http://localhost:9081/api/testability/clean_db_and_reset_testability_settings',
-        [
-
-        ]);
+      'http://localhost:9081/api/testability/clean_db_and_reset_testability_settings', []);
 
     http.Response response = await httpPost(
         'http://localhost:9081/api/testability/seed_notes?external_identifier=old_learner',
