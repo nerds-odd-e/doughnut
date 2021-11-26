@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter_gherkin/flutter_gherkin.dart';
 import 'package:gherkin/gherkin.dart';
-// import 'hooks/hook_example.dart';
+import 'hooks/cucumber_hook.dart';
 import 'steps/my_steps.dart';
 import 'steps/bazaar_steps.dart';
 
@@ -13,7 +13,7 @@ Future<void> main() {
       TestRunSummaryReporter(),
       JsonReporter(path: './report.json')
     ] // you can include the "StdoutReporter()" without the message level parameter for verbose log information
-  // ..hooks = [HookExample()]
+  ..hooks = [CucumberHook()]
     ..stepDefinitions = [MySteps(), ...bazaarSteps()]
     ..flutterBuildTimeout = const Duration(seconds: 400)
     ..restartAppBetweenScenarios = true
@@ -21,3 +21,5 @@ Future<void> main() {
   // ..tagExpression = "@smoke" // uncomment to see an example of running scenarios based on tag expressions
   return GherkinRunner().execute(config);
 }
+
+

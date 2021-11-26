@@ -9,7 +9,7 @@ class Testability {
   StepContext<FlutterWorld> context;
   Testability(this.context);
 
-  Future<void> cleanDbAndResetTestabilitySettings() async {
+  static Future<void> cleanDbAndResetTestabilitySettings() async {
     final response = await http.post(Uri.parse('http://localhost:9081/api/testability/clean_db_and_reset_testability_settings'),
         headers: {
           'Content-Type': 'application/json; charset=UTF-8',
@@ -20,8 +20,6 @@ class Testability {
   }
 
   Future<void> seedNotebookInBazaar(String notebookName) async {
-    await cleanDbAndResetTestabilitySettings();
-
     http.Response response = await httpPost(
         'http://localhost:9081/api/testability/seed_notes?external_identifier=old_learner',
         [
