@@ -69,6 +69,9 @@ tasks.register("bootRunTest") {
     doFirst {
       tasks.bootRun.configure {
         systemProperty("spring.profiles.active", "test")
+        systemProperty("spring.datasource.url", "jdbc:mysql://127.0.0.1:3309/doughnut_test")
+        systemProperty("spring.datasource.username", "doughnut")
+        systemProperty("spring.datasource.username", "doughnut")
       }
     }
     finalizedBy("bootRun")

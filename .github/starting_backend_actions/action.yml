@@ -7,6 +7,9 @@ inputs:
   dbpassword:
     description: 'dbpassword'
     required: true
+  db_url:
+    description: 'db url for mysql'
+    required: true
 runs:
   using: "composite"
   steps:

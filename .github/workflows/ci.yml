@@ -118,6 +118,7 @@ jobs:
         with:
           dbuser: ${{ secrets.DBUSER }}
           dbpassword: ${{ secrets.DBPASSWORD }}
+          db_url: ${{ secrets.CI_E2E_DB_URL }}
       - uses: ./.github/mobile_actions
         with:
           flutter-version: '2.5.3'
@@ -150,6 +151,7 @@ jobs:
         with:
           dbuser: ${{ secrets.DBUSER }}
           dbpassword: ${{ secrets.DBPASSWORD }}
+          db_url: ${{ secrets.CI_E2E_DB_URL }}
       - uses: ./.github/mobile_actions
         with:
           flutter-version: '2.5.3'
@@ -183,6 +185,7 @@ jobs:
         with:
           dbuser: ${{ secrets.DBUSER }}
           dbpassword: ${{ secrets.DBPASSWORD }}
+          db_url: ${{ secrets.CI_E2E_DB_URL }}
       - name: Cache yarn directory path
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn cache dir)"
