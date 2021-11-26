@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:gherkin/src/expect/expect_mimic.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_gherkin/flutter_gherkin.dart';
 import 'package:gherkin/gherkin.dart';
@@ -9,8 +10,13 @@ class Testability {
   Testability(this.context);
 
   Future<void> cleanDbAndResetTestabilitySettings() async {
-    await httpPost(
-        'http://localhost:9081/api/testability/clean_db_and_reset_testability_settings', []);
+    final response = await http.post(Uri.parse('http://localhost:9081/api/testability/clean_db_and_reset_testability_settings'),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode([]));
+
+    ExpectMimic().expect(response.statusCode, 200);
   }
 
   Future<void> seedNotebookInBazaar(String notebookName) async {
