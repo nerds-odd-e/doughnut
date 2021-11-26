@@ -122,19 +122,9 @@ jobs:
       - uses: ./.github/mobile_actions
         with:
           flutter-version: '2.5.3'
-      - name: List all simulators
-        run: xcrun instruments -s
-      # get UUID  simulator and boot a simulator on mac from  command line
       - name: Start Simulator
         run: |
-          UDID=$(
-            xcrun instruments -s |
-            awk \
-              -F ' *[][]' \
-              -v 'device=${{ matrix.device }}' \
-              '$1 == device { print $2 }'
-          )
-          xcrun simctl boot "${UDID:?No Simulator with this name found}"
+          xcrun simctl boot "${{ matrix.device }}"
       - run: dart test_driver/app_test.dart
         working-directory: ./doughnut_mobile
 
