@@ -113,6 +113,10 @@ jobs:
       fail-fast: false
     runs-on: macos-latest
     steps:
+      - name: List Simulators
+        run: xcrun xctrace list devices
+      - name: Start Simulator
+        run: xcrun simctl boot "${{ matrix.device }}"
       - uses: actions/checkout@v1
       - uses: ./.github/starting_backend_actions
         with:
@@ -122,10 +126,6 @@ jobs:
       - uses: ./.github/mobile_actions
         with:
           flutter-version: '2.5.3'
-      - name: Start Simulator
-        run: |
-          xcrun xctrace list devices
-          xcrun simctl boot "${{ matrix.device }}"
       - run: dart test_driver/app_test.dart
         working-directory: ./doughnut_mobile
 
