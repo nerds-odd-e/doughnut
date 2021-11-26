@@ -29,7 +29,7 @@ runs:
         mysql -uroot -e "GRANT ALL PRIVILEGES ON *.* TO '${{inputs.dbuser}}'@'localhost'"
         mysql -uroot -e "FLUSH PRIVILEGES"
       shell: bash
-    - run: yarn sut
+    - run: yarn sut &
       env:
         INPUT_DB_URL: ${{ inputs.db_url }}
       shell: bash
