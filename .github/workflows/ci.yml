@@ -161,13 +161,14 @@ jobs:
         spec:
           - |
             cypress/integration/b*/**
-          - |
             cypress/integration/c*/**
+          - |
             cypress/integration/t*/**
             cypress/integration/u*/**
           - |
             cypress/integration/n*/**
           - |
+            cypress/integration/p*/**
             cypress/integration/r*/**
     steps:
       - name: Code Checkout
