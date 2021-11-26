@@ -9,14 +9,6 @@ import {
   When,
 } from "cypress-cucumber-preprocessor/steps";
 
-Then("I should see button with text or title as {string}", (btnTextOrTitle) => {
-  cy.expectButtonWithTextOrTitle(btnTextOrTitle);
-});
-
-When("I click on button with text or title as {string}", (btnTextOrTitle) => {
-  cy.clickButtonWithTextOrTitle(btnTextOrTitle);
-});
-
 // View Translation
 
 Given("I switch language to {string}", (lang) => {

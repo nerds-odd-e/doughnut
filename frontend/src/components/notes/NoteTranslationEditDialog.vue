@@ -56,7 +56,6 @@ export default {
       ).then((res) => {
           this.$store.commit("loadNotes", [res])
           this.$emit("done")
-          this.$popups.alert(StringConstants.TRANSACTION_SUCCESS_TITLE)
         })
         .catch((res) => {
             this.formErrors = res.message

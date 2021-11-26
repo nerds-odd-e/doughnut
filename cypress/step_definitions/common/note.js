@@ -346,7 +346,3 @@ When("I edit note translation to become", (data) => {
   cy.submitNoteTranslationFormsWith(data.hashes());
 });
 
-Then("I should see confirmation title {string}", (title) => {
-  cy.findByText(title);
-  cy.findByRole("button", { name: "OK" }).click();
-});

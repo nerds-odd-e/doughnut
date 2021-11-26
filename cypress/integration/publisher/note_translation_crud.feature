@@ -9,16 +9,10 @@ Feature: Note Translation Crud
         And I click on the overview button of note "English"
 
     @featureToggle
-    Scenario: Should show translation button
-        When I click on button with text or title as "more options"
-        Then I should see button with text or title as "edit note translation"
-
-    @featureToggle
     Scenario: Should able to edit note translation
         When I edit note translation to become
       | Title in Indonesian     | Description in Indonesian       |
       | Indonesia               | Bahasa Indonesia                |
-        Then I should see confirmation title "Translation successfully saved"
         And I switch language to "ID"
         And Note title will be shown "Indonesia"
         And Note description will be shown "Bahasa Indonesia"
