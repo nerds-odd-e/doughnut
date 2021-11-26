@@ -4,14 +4,17 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_gherkin/flutter_gherkin.dart';
 import 'package:gherkin/gherkin.dart';
 
-
 class Testability {
   StepContext<FlutterWorld> context;
   Testability(this.context);
 
-  seedNotebookInBazaar(String notebookName) async {
+  Future<void> cleanDbAndResetTestabilitySettings() async {
     await httpPost(
-      'http://localhost:9081/api/testability/clean_db_and_reset_testability_settings', []);
+        'http://localhost:9081/api/testability/clean_db_and_reset_testability_settings', []);
+  }
+
+  Future<void> seedNotebookInBazaar(String notebookName) async {
+    await cleanDbAndResetTestabilitySettings();
 
     http.Response response = await httpPost(
         'http://localhost:9081/api/testability/seed_notes?external_identifier=old_learner',
