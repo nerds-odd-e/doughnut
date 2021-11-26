@@ -48,7 +48,15 @@ function useTmpDir() {
 }
 
 if (process.platform == 'darwin') {
-  run(`mysqld --daemon`);
+  // install
+  run(`brew install mysql@${mysqlVersion}`);
+
+  // start
+  bin = `/usr/local/opt/mysql@${mysqlVersion}/bin`;
+  const myconf = `/usr/local/etc/my.cnf`;
+  run(`sudo echo "port		= ${port}" >> ${myconf}`);
+  run(`sudo cat ${myconf}`);
+  run(`${bin}/mysql.server start`);
 
   // add user
   run(`${bin}/mysql -e "CREATE USER '$USER'@'localhost' IDENTIFIED BY ''"`);
