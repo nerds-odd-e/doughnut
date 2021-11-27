@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart';
 
 import 'bazaar_widget.dart';
 import 'rest_api.dart';
@@ -34,7 +35,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
-  final RestApi restApi = RestApi();
+  final RestApi restApi = RestApi(Client());
   late Future<String> futureTitle;
 
   void _incrementCounter() {
