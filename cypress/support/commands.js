@@ -174,7 +174,7 @@ Cypress.Commands.add("creatingLinkFor", (noteTitle) => {
 
 Cypress.Commands.add("clickNotePageButton", (noteTitle, btnTextOrTitle) => {
   cy.jumpToNotePage(noteTitle);
-  cy.get(".toolbar").findByRole("button", { name: btnTextOrTitle }).click();
+  cy.clickNoteToolbarButton(btnTextOrTitle);
 });
 
 Cypress.Commands.add(
@@ -460,8 +460,8 @@ Cypress.Commands.add(
   // Add should be visible back when the link view page is remade.
 );
 
-Cypress.Commands.add("clickNoteTab", (noteTab) => {
-  cy.findByRole("button", { name: noteTab }).click();
+Cypress.Commands.add("clickNoteToolbarButton", (btnTextOrTitle) => {
+  cy.get(".toolbar").findByRole("button", { name: btnTextOrTitle }).click();
 });
 Cypress.Commands.add("submitNoteTranslationFormsWith", (notes) => {
   notes.forEach((noteAttributes) =>

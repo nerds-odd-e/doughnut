@@ -19,7 +19,7 @@ Feature: View Translate on Notes
   @featureToggle
   Scenario Outline: Cards and Article view have language same with parent
     Given I switch language to "ID"
-    When I jump to "<View>" tab
+    When I switch to "<View>" view
     Then Note title on the page should be "<Title>"
     And Note description on the page should be "<Description>"
 

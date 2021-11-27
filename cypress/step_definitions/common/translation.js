@@ -29,6 +29,6 @@ And("Note description on the page should be {string}", (description) => {
   cy.expectText(description);
 });
 
-Given("I jump to {string} tab", (noteTab) => {
-  cy.clickNoteTab(noteTab);
+Given("I switch to {string} view", (noteTab) => {
+  cy.clickNoteToolbarButton(noteTab);
 });
