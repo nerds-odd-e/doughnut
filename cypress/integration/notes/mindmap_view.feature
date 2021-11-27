@@ -10,7 +10,7 @@ Feature: Mindmap view
       | Geography        | Singapore     |             |
       | Leaving Malaysia | History       | in 1965     |
       | Terry came       | History       | in 2014     |
-    And I click on the mindmap view button of note "Singapore"
+    And I open the "mindmap" view of note "Singapore"
 
   Scenario: view the mindmap
     Then I should see the note "Singapore" is 0px * 0px offset the center of the map

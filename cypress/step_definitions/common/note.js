@@ -189,12 +189,8 @@ When(
   }
 );
 
-When("I click on the overview button of note {string}", (noteTitle) => {
-  cy.clickNotePageButton(noteTitle, "article view");
-});
-
-When("I click on the mindmap view button of note {string}", (noteTitle) => {
-  cy.clickNotePageButton(noteTitle, "mindmap view");
+When("I open the {string} view of note {string}", (viewType, noteTitle) => {
+  cy.clickNotePageButton(noteTitle, `${viewType} view`);
 });
 
 When(

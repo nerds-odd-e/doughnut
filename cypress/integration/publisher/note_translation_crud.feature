@@ -6,7 +6,7 @@ Feature: Note Translation Crud
         And there are some notes for the current user
         | title          | testingParent | description          |
         | English        |               | English Language     |
-        And I click on the overview button of note "English"
+        And I open the "article" view of note "English"
 
     @featureToggle
     Scenario: Should able to edit note translation
@@ -14,6 +14,5 @@ Feature: Note Translation Crud
       | Title in Indonesian     | Description in Indonesian       |
       | Indonesia               | Bahasa Indonesia                |
         And I switch language to "ID"
-        And Note title will be shown "Indonesia"
-        And Note description will be shown "Bahasa Indonesia"
-        And I should see translation button with language code "EN"
+        And Note title on the page should be "Indonesia"
+        And Note description on the page should be "Bahasa Indonesia"
