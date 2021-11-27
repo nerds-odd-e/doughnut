@@ -188,8 +188,8 @@ Cypress.Commands.add(
 Cypress.Commands.add(
   "clickNotePageMoreOptionsButtonOnCurrentPage",
   (btnTextOrTitle) => {
-    cy.get(".toolbar").findByRole("button", { name: "more options" }).click();
-    cy.get(".toolbar").findByRole("button", { name: btnTextOrTitle }).click();
+    cy.clickNoteToolbarButton('more options');
+    cy.clickNoteToolbarButton(btnTextOrTitle);
   }
 );
 
@@ -446,14 +446,6 @@ Cypress.Commands.add("clickTranslationButton", (buttonText) => {
   cy.findByRole("button", { name: buttonText }).click();
 });
 
-Cypress.Commands.add("expectButtonWithTextOrTitle", (btnTextOrTitle) => {
-  cy.findByRole("button", { name: btnTextOrTitle });
-});
-
-Cypress.Commands.add("clickButtonWithTextOrTitle", (btnTextOrTitle) => {
-  cy.findByRole("button", { name: btnTextOrTitle }).click();
-});
-
 Cypress.Commands.add(
   "expectText",
   (text) => cy.findByText(text) //.should("be.visible")
@@ -463,6 +455,7 @@ Cypress.Commands.add(
 Cypress.Commands.add("clickNoteToolbarButton", (btnTextOrTitle) => {
   cy.get(".toolbar").findByRole("button", { name: btnTextOrTitle }).click();
 });
+
 Cypress.Commands.add("submitNoteTranslationFormsWith", (notes) => {
   notes.forEach((noteAttributes) =>
     cy.submitNoteTranslationFormWith(noteAttributes)
