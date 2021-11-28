@@ -5,7 +5,7 @@
       <h5 class="card-title">
         <component :is="linkFragment" :note="note" class="card-title" />
       </h5>
-      <NoteShortDescription :shortDescription="translatedShortDescription"/>
+      <NoteShortDescription :shortDescription="note.shortDescription"/>
       <slot name="button" :note="note" />
     </div>
   </div>
@@ -14,7 +14,6 @@
 <script>
 import NoteTitleWithLink from "./NoteTitleWithLink.vue";
 import NoteShortDescription from "./NoteShortDescription.vue";
-import Languages from "../../constants/lang";
 
 export default {
   props: {
@@ -24,10 +23,5 @@ export default {
   components: {
     NoteShortDescription,
   },
-  computed: {
-    translatedShortDescription(){
-      return this.$store?.getters.getCurrentLanguage() === Languages.ID && this.note && this.note.shortDescriptionIDN ? this.note.shortDescriptionIDN : this.note.shortDescription;
-    }
-  }
 }
 </script>
