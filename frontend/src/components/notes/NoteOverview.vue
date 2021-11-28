@@ -1,5 +1,5 @@
 <template>
-  <NoteWithLinks v-bind="{ note }" v-if="note"/>
+  <NoteWithLinks v-bind="{ note, language }" v-if="note"/>
   <div class="note-list">
     <NoteOverview
       v-for="childId in childrenIds"
@@ -29,6 +29,9 @@ export default {
     childrenIds() {
       return this.$store.getters.getChildrenIdsByParentId(this.noteId);
     },
+    language() {
+      return this.$store?.getters.getCurrentLanguage();
+     },
   },
 };
 </script>

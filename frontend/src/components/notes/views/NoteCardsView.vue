@@ -1,6 +1,6 @@
 <template>
   <div class="container" v-if="note">
-    <NoteWithLinks v-bind="{note}"/>
+    <NoteWithLinks v-bind="{note, language}"/>
     <NoteStatisticsButton :noteId="noteId" />
     <Cards v-if="expandChildren" :notes="children"/>
   </div>
@@ -31,6 +31,10 @@ export default {
     children() {
       return this.$store.getters.getChildrenOfParentId(this.noteId);
     },
+    language() {
+      return this.$store?.getters.getCurrentLanguage();
+    }
+
   },
 };
 </script>

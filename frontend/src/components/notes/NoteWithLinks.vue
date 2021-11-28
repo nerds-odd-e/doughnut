@@ -27,6 +27,7 @@ export default {
   name: "NoteWithLinks",
   props: {
     note: Object,
+    language: String,
   },
   components: {
     NoteFrameOfLinks,
@@ -37,9 +38,6 @@ export default {
     translatedNote(){
       return new TranslatedNoteWrapper(this.note, this.language);
     },
-    language() {
-      return this.$store?.getters.getCurrentLanguage();
-     },
   },
 };
 </script>
