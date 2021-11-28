@@ -73,8 +73,6 @@ describe("note overview", () => {
       { props: { noteId: noteParent.id, expandChildren: true, language: 'ID' } },
     );
 
-    store.commit("changeNotesLanguage", "ID");
-
     await screen.findByText("Judul1");
     await screen.findByText("Judul1.1");
     await screen.findByText("Judul1.1.1");

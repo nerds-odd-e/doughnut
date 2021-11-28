@@ -52,7 +52,6 @@ export default createStore({
     getNoteById: (state) => (id) => withState(state).getNoteById(id),
     getChildrenIdsByParentId: (state) => (parentId) => withState(state).getChildrenIdsByParentId(parentId),
     getChildrenOfParentId: (state) => (parentId) => withState(state).getChildrenOfParentId(parentId),
-    getCurrentLanguage: (state) => () => state.currentLanguage,
   },
 
   mutations: {
@@ -72,8 +71,5 @@ export default createStore({
       state.environment = "testing"
       state.featureToggle = ft
     },
-    changeNotesLanguage(state, language) {
-      state.currentLanguage = language;
-    }
   },
 });

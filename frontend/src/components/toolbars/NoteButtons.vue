@@ -65,7 +65,9 @@
           Delete
         </button>
       </div>
-      <NoteTranslationButton v-if="featureToggle" :noteId="note.id" :note="note"/>
+      <NoteTranslationButton v-if="featureToggle" :noteId="note.id" :note="note"
+        @updateLanguage="$emit('updateLanguage', $event)"
+      />
     </div>
   </div>
 </template>
@@ -105,6 +107,7 @@ export default {
     NoteNewButton,
     ViewTypeButtons,
   },
+  emits: ['updateLanguage'],
   computed: {
     featureToggle() {
       return this.$store.getters.getFeatureToggle();

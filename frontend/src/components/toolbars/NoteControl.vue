@@ -3,6 +3,7 @@
     <NoteButtons v-if="currentNote"
     :note="currentNote"
     :viewType="viewType"
+    @updateLanguage="$emit('updateLanguage', $event)"
     />
   </nav>
   <slot />
@@ -17,6 +18,7 @@ export default {
     noteId: [String, Number],
     viewType: String,
   },
+  emits: ['updateLanguage'],
   components: { NoteButtons },
   computed: {
     currentNote() { return this.$store.getters.getNoteById(this.noteId)},

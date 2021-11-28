@@ -24,33 +24,24 @@ export default {
         noteId: Number,
         note: Object,
     },
+    emits: ['updateLanguage'],
     data(){
         return {
             currentLang: Languages.EN,
             translationLang: Languages.ID,
         }
     },
-    mounted(){
-        let currentLanguage = this.$store?.getters.getCurrentLanguage();
-        if (currentLanguage === Languages.ID) {
-            this.currentLang = Languages.ID;
-            this.translationLang = Languages.EN;
-        }
-
-        this.changeButtonTranslation(this.currentLang, this.translationLang);
-    },
     methods: {
         changeButtonTranslation(targetLanguage, translationLang){
             this.currentLang = targetLanguage;
             this.translationLang = translationLang;
+            this.$emit("updateLanguage", targetLanguage);
         },
         toggleLanguage(){
             if (this.currentLang === Languages.EN) {
                 this.changeButtonTranslation(Languages.ID, Languages.EN);
-                this.$store?.commit('changeNotesLanguage', Languages.ID);
             } else {
                 this.changeButtonTranslation(Languages.EN, Languages.ID);
-                this.$store?.commit('changeNotesLanguage', Languages.EN);
             }
         }
     }

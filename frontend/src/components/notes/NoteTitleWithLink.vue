@@ -3,12 +3,11 @@
     :to="{ name: 'noteShow', params: { noteId: note.id, viewType: computedViewType } }"
     class="text-decoration-none"
   >
-    {{ translatedTitle }}
+    {{ note.title }}
   </router-link>
 </template>
 
 <script>
-import Languages from "../../constants/lang";
 
 export default {
   props: {
@@ -20,12 +19,6 @@ export default {
       if(this.viewType) return this.viewType
       return this.$route?.params?.viewType
     },
-    translatedTitle(){
-      if (!this.note.noteContent)
-        return this.note.title;
-
-      return this.$store?.getters.getCurrentLanguage() === Languages.ID && this.note.noteContent.titleIDN ? this.note.noteContent.titleIDN : this.note.noteContent.title;
-    }
   }
 
 }
