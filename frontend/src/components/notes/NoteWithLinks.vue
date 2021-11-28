@@ -12,7 +12,7 @@
       >
         No translation available
       </p>
-      <NoteContent v-bind="{ note }" :language="currentLanguage" />
+      <NoteContent v-bind="{ note, language }" />
     </NoteFrameOfLinks>
   </NoteShell>
 </template>
@@ -35,12 +35,11 @@ export default {
   },
   computed: {
     translatedNote(){
-      return new TranslatedNoteWrapper(this.note, this.currentLanguage);
+      return new TranslatedNoteWrapper(this.note, this.language);
     },
-
-    currentLanguage() {
+    language() {
       return this.$store?.getters.getCurrentLanguage();
-    },
+     },
   },
 };
 </script>
