@@ -44,6 +44,7 @@ export default {
   props: {
     note: Object,
     size: { type: String, default: 'large'},
+    language: String,
   },
   components: {
     NoteShortDescription,
@@ -58,10 +59,10 @@ export default {
       return !!this.notePicture && !!this.note.noteContent.description;
     },
     translatedDescription(){
-      return this.$store?.getters.getCurrentLanguage() === Languages.ID && this.note.noteContent && this.note.noteContent.descriptionIDN ? this.note.noteContent.descriptionIDN : this.note.noteContent.description;
+      return this.language === Languages.ID && this.note.noteContent && this.note.noteContent.descriptionIDN ? this.note.noteContent.descriptionIDN : this.note.noteContent.description;
     },
     translatedShortDescription(){
-      return this.$store?.getters.getCurrentLanguage() === Languages.ID && this.note.shortDescriptionIDN ? this.note.shortDescriptionIDN : this.note.shortDescription;
+      return this.language === Languages.ID && this.note.shortDescriptionIDN ? this.note.shortDescriptionIDN : this.note.shortDescription;
     }
   },
 };

@@ -12,7 +12,7 @@
       >
         No translation available
       </p>
-      <NoteContent v-bind="{ note }" />
+      <NoteContent v-bind="{ note }" :language="$store?.getters.getCurrentLanguage()" />
     </NoteFrameOfLinks>
   </NoteShell>
 </template>
