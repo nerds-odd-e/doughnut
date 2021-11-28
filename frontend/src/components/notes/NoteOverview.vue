@@ -3,7 +3,7 @@
   <div class="note-list">
     <NoteOverview
       v-for="childId in childrenIds"
-      v-bind="{ noteId: childId, highlightNoteId, expandChildren }"
+      v-bind="{ noteId: childId, highlightNoteId, expandChildren, language }"
       :key="childId"
       @highlight="$emit('highlight', $event)"
     />
@@ -19,6 +19,7 @@ export default {
     noteId: [String, Number],
     highlightNoteId: [String, Number],
     expandChildren: { type: Boolean, required: true },
+    language: String,
   },
   emits: ["highlight"],
   components: { NoteWithLinks },
@@ -29,9 +30,6 @@ export default {
     childrenIds() {
       return this.$store.getters.getChildrenIdsByParentId(this.noteId);
     },
-    language() {
-      return this.$store?.getters.getCurrentLanguage();
-     },
   },
 };
 </script>

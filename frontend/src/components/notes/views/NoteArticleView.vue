@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <NoteOverview
-      v-bind="{ noteId, highlightNoteId, expandChildren }"
+      v-bind="{ noteId, highlightNoteId, expandChildren, language }"
       :key="noteId"
       @highlight="$emit('highlight', $event)"
     />
@@ -20,6 +20,9 @@ export default {
   emits: ['highlight'],
   components: { NoteOverview },
   computed: {
+    language() {
+      return this.$store?.getters.getCurrentLanguage();
+    }
   },
 };
 </script>
