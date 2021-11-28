@@ -7,7 +7,7 @@
       v-for="note in notes"
       :key="note.id"
     >
-      <Card :note="note" :linkFragment="linkFragment">
+      <Card :note="note">
         <template #cardHeader>
           <slot name="cardHeader" :note="note" />
         </template>
@@ -26,7 +26,6 @@ import NoteTitleWithLink from "./NoteTitleWithLink.vue";
 export default {
   props: {
     notes: Array,
-    linkFragment: { type: Object, default: NoteTitleWithLink },
     columns: { type: Number, default: 4 },
   },
   components: { Card, NoteTitleWithLink },
