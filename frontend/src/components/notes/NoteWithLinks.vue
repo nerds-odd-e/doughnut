@@ -4,11 +4,11 @@
     v-bind="{ id: note.id, updatedAt: note.noteContent?.updatedAt }"
   >
     <NoteFrameOfLinks v-bind="{ links: note.links }">
-      <h2 role="title" class="note-title">{{ translatedTitle }}</h2>
+      <h2 role="title" class="note-title">{{ translatedNote.title }}</h2>
       <p
         style="color: red"
         role="title-fallback"
-        v-if="translationNoteAvailable"
+        v-if="translatedNote.translationNoteAvailable"
       >
         No translation available
       </p>
@@ -21,7 +21,7 @@
 import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
 import NoteShell from "./NoteShell.vue";
 import NoteContent from "./NoteContent.vue";
-import Languages from "../../constants/lang";
+import { TranslatedNoteWrapper } from "../../constants/lang";
 
 export default {
   name: "NoteWithLinks",
@@ -34,17 +34,10 @@ export default {
     NoteContent,
   },
   computed: {
-    translationNoteAvailable() {
-      return this.currentLanguage === Languages.ID && !this.note.noteContent.titleIDN
+    translatedNote(){
+      return new TranslatedNoteWrapper(this.note, this.currentLanguage);
     },
-    translatedTitle() {
-      if (!this.note.noteContent) return this.note.title;
 
-      return this.currentLanguage === Languages.ID &&
-        this.note.noteContent.titleIDN
-        ? this.note.noteContent.titleIDN
-        : this.note.noteContent.title;
-    },
     currentLanguage() {
       return this.$store?.getters.getCurrentLanguage();
     },
