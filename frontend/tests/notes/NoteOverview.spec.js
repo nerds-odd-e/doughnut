@@ -70,7 +70,7 @@ describe("note overview", () => {
     renderWithStoreAndMockRoute(
       store,
       NoteOverview,
-      { props: { noteId: noteParent.id, expandChildren: true } },
+      { props: { noteId: noteParent.id, expandChildren: true, language: 'ID' } },
     );
 
     store.commit("changeNotesLanguage", "ID");
@@ -81,14 +81,5 @@ describe("note overview", () => {
     await screen.findByText("Deskripsi1");
     await screen.findByText("Deskripsi1.1");
     await screen.findByText("Deskripsi1.1.1");
-
-    store.commit("changeNotesLanguage", "EN");
-
-    await screen.findByText("Title1");
-    await screen.findByText("Title1.1");
-    await screen.findByText("Title1.1.1");
-    await screen.findByText("Description1");
-    await screen.findByText("Description1.1");
-    await screen.findByText("Description1.1.1");
   });
 });

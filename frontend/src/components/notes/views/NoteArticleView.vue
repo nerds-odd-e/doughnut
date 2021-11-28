@@ -16,13 +16,11 @@ export default {
     highlightNoteId: [String, Number],
     noteId: [String, Number],
     expandChildren: { type: Boolean, required: true },
+    language: String,
   },
   emits: ['highlight'],
   components: { NoteOverview },
   computed: {
-    language() {
-      return this.$store?.getters.getCurrentLanguage();
-    }
   },
 };
 </script>

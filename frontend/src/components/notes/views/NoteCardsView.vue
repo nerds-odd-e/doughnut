@@ -17,6 +17,7 @@ export default {
     noteId: [String, Number],
     highlightNoteId: [String, Number],
     expandChildren: { type: Boolean, required: true },
+    language: String,
   },
   emits: ['highlight'],
   components: {
@@ -31,10 +32,6 @@ export default {
     children() {
       return this.$store.getters.getChildrenOfParentId(this.noteId);
     },
-    language() {
-      return this.$store?.getters.getCurrentLanguage();
-    }
-
   },
 };
 </script>

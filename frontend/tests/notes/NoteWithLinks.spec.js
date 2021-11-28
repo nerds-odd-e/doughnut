@@ -35,12 +35,11 @@ describe("fallback translation", () => {
   it("should display 'No translation available' text below the title when no title translation available", async () => {
     const noteParent = makeMe.aNote.title("Dummy Title").please();
     store.commit("loadNotes", [noteParent]);
-    store.commit("changeNotesLanguage", Languages.ID);
 
     renderWithStoreAndMockRoute(
       store,
       NoteWithLinks,
-      { props: { note: noteParent } },
+      { props: { note: noteParent, language: Languages.ID } },
     )
 
     expect(screen.getByRole("title-fallback")).toHaveTextContent("No translation available");
