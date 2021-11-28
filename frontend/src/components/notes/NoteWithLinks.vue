@@ -8,11 +8,11 @@
       <p
         style="color: red"
         role="title-fallback"
-        v-if="currentLanguage === Languages.ID && !note.noteContent.titleIDN"
+        v-if="translationNoteAvailable"
       >
         No translation available
       </p>
-      <NoteContent v-bind="{ note }" :language="$store?.getters.getCurrentLanguage()" />
+      <NoteContent v-bind="{ note }" :language="currentLanguage" />
     </NoteFrameOfLinks>
   </NoteShell>
 </template>
@@ -34,19 +34,19 @@ export default {
     NoteContent,
   },
   computed: {
+    translationNoteAvailable() {
+      return this.currentLanguage === Languages.ID && !this.note.noteContent.titleIDN
+    },
     translatedTitle() {
       if (!this.note.noteContent) return this.note.title;
 
-      return this.$store?.getters.getCurrentLanguage() === Languages.ID &&
+      return this.currentLanguage === Languages.ID &&
         this.note.noteContent.titleIDN
         ? this.note.noteContent.titleIDN
         : this.note.noteContent.title;
     },
     currentLanguage() {
       return this.$store?.getters.getCurrentLanguage();
-    },
-    Languages() {
-      return Languages;
     },
   },
 };
