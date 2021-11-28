@@ -38,7 +38,7 @@ import ShowDescription from "./ShowDescription.vue";
 import SvgDescriptionIndicator from "../svgs/SvgDescriptionIndicator.vue";
 import SvgPictureIndicator from "../svgs/SvgPictureIndicator.vue";
 import SvgUrlIndicator from "../svgs/SvgUrlIndicator.vue";
-import Languages from "../../constants/lang";
+import { NoteWrapper } from "../../constants/lang";
 
 export default {
   props: {
@@ -59,10 +59,10 @@ export default {
       return !!this.notePicture && !!this.note.noteContent.description;
     },
     translatedDescription(){
-      return this.language === Languages.ID && this.note.noteContent && this.note.noteContent.descriptionIDN ? this.note.noteContent.descriptionIDN : this.note.noteContent.description;
+      return new NoteWrapper(this.note).translatedDescription(this.language);
     },
     translatedShortDescription(){
-      return this.language === Languages.ID && this.note.shortDescriptionIDN ? this.note.shortDescriptionIDN : this.note.shortDescription;
+      return new NoteWrapper(this.note).translatedShortDescription(this.language);
     }
   },
 };
