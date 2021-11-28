@@ -7,19 +7,24 @@ const Languages: ILanguages = {
     EN: "EN"
 };
 
-class NoteWrapper {
+class TranslatedNoteWrapper {
   note: any
 
-  constructor(note: any) {
+  language: string
+
+  constructor(note: any, language: string) {
     this.note = note;
+    this.language = language
   }
 
-  translatedDescription(language: string){
-    return language === Languages.ID && this.note.noteContent && this.note.noteContent.descriptionIDN ? this.note.noteContent.descriptionIDN : this.note.noteContent.description;
+  get description(){
+    return this.language === Languages.ID && this.note.noteContent && this.note.noteContent.descriptionIDN ? this.note.noteContent.descriptionIDN : this.note.noteContent.description;
   }
 
-  translatedShortDescription =(language: string) => language === Languages.ID && this.note.shortDescriptionIDN ? this.note.shortDescriptionIDN : this.note.shortDescription
+  get shortDescription (){
+    return this.language === Languages.ID && this.note.shortDescriptionIDN ? this.note.shortDescriptionIDN : this.note.shortDescription
+  }
 }
 
 export default Languages;
-export { NoteWrapper }
+export { TranslatedNoteWrapper }

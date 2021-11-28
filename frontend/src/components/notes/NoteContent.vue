@@ -1,12 +1,12 @@
 <template>
   <div class="note-content">
-    <template v-if="!!translatedDescription">
+    <template v-if="!!translatedNote.description">
       <ShowDescription
         v-if="size==='large'"
         class="col"
-        :description="translatedDescription"
+        :description="translatedNote.description"
       />
-      <NoteShortDescription class="col" v-if="size==='medium'" :shortDescription="translatedShortDescription"/>
+      <NoteShortDescription class="col" v-if="size==='medium'" :shortDescription="translatedNote.shortDescription"/>
       <SvgDescriptionIndicator v-if="size==='small'" class="description-indicator"/>
     </template>
     <template v-if="!!note.notePicture">
@@ -38,7 +38,7 @@ import ShowDescription from "./ShowDescription.vue";
 import SvgDescriptionIndicator from "../svgs/SvgDescriptionIndicator.vue";
 import SvgPictureIndicator from "../svgs/SvgPictureIndicator.vue";
 import SvgUrlIndicator from "../svgs/SvgUrlIndicator.vue";
-import { NoteWrapper } from "../../constants/lang";
+import { TranslatedNoteWrapper } from "../../constants/lang";
 
 export default {
   props: {
@@ -58,12 +58,9 @@ export default {
     twoColumns() {
       return !!this.notePicture && !!this.note.noteContent.description;
     },
-    translatedDescription(){
-      return new NoteWrapper(this.note).translatedDescription(this.language);
+    translatedNote(){
+      return new TranslatedNoteWrapper(this.note, this.language);
     },
-    translatedShortDescription(){
-      return new NoteWrapper(this.note).translatedShortDescription(this.language);
-    }
   },
 };
 </script>
