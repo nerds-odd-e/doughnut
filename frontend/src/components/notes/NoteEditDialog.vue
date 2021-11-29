@@ -47,10 +47,7 @@ export default {
           this.$store.commit("loadNotes", [res]);
           this.$emit("done");
         })
-        .catch((res) => {
-            this.formErrors = res.message;
-            alert(res.message);
-        });
+        .catch((res) => (this.formErrors = res));
     },
   },
   mounted() {
