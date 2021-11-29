@@ -21,7 +21,7 @@
 import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
 import NoteShell from "./NoteShell.vue";
 import NoteContent from "./NoteContent.vue";
-import { TranslatedNoteWrapper } from "../../constants/lang";
+import { TranslatedNoteWrapper } from "../../models/languages";
 
 export default {
   name: "NoteWithLinks",

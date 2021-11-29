@@ -6,7 +6,7 @@ import NoteWithLinks from "@/components/notes/NoteWithLinks.vue";
 import makeMe from "../fixtures/makeMe";
 import { renderWithStoreAndMockRoute } from '../helpers';
 import store from '../../src/store';
-import Languages from "../../src/constants/lang";
+import Languages from "../../src/models/languages";
 
 describe("new/updated pink banner", () => {
   beforeAll(() => {

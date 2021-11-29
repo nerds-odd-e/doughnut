@@ -1,6 +1,6 @@
 <template>
   <h3>
-    {{ EDIT_TRANSLATION_LABEL }} <em>{{ title }}</em>
+     Edit translation for <em>{{ title }}</em>
   </h3>
   <form @submit.prevent="processForm">
     <NoteTranslationEditForm
@@ -14,7 +14,6 @@
 
 <script>
 import NoteTranslationEditForm from "./NoteTranslationEditForm.vue";
-import StringConstants from "../../constants/labels";
 import { restPostMultiplePartForm } from "../../restful/restful";
 import { storedApiGetNoteAndItsChildren } from "../../storedApi";
 
@@ -65,9 +64,6 @@ export default {
   },
   mounted() {
     this.fetchData()
-  },
-  created() {
-    this.EDIT_TRANSLATION_LABEL = StringConstants.EDIT_TRANSLATION_LABEL
   },
 };
 </script>

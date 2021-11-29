@@ -38,7 +38,7 @@ import ShowDescription from "./ShowDescription.vue";
 import SvgDescriptionIndicator from "../svgs/SvgDescriptionIndicator.vue";
 import SvgPictureIndicator from "../svgs/SvgPictureIndicator.vue";
 import SvgUrlIndicator from "../svgs/SvgUrlIndicator.vue";
-import { TranslatedNoteWrapper } from "../../constants/lang";
+import { TranslatedNoteWrapper } from "../../models/languages";
 
 export default {
   props: {
