@@ -1,6 +1,6 @@
 <template>
   <h3>
-     Edit translation for <em>{{ title }}</em>
+     Edit translation for <em>{{ formData?.title }}</em>
   </h3>
   <form @submit.prevent="processForm">
     <NoteTranslationEditForm
@@ -21,8 +21,6 @@ export default {
   components: { NoteTranslationEditForm },
   props: {
     noteId: [String, Number],
-    title: String,
-    description: String
   },
   emits: ["done"],
   data() {

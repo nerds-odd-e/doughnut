@@ -45,8 +45,6 @@
         <NoteTranslationEditButton
           v-if="featureToggle"
           :noteId="note.id"
-          :oldTitle="note.title"
-          :oldDesc="note.description"
         >
           Edit translations
         </NoteTranslationEditButton>
