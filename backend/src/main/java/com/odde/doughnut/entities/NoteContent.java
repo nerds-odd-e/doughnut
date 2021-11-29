@@ -99,18 +99,6 @@ public class NoteContent {
     @Setter
     private Timestamp updatedAt;
 
-    @Column(name = "version")
-    @JsonProperty
-    private Long version;
-
-    public Long getVersion() {
-        return version == null ? 1 : version;
-    }
-
-    public void setVersion(Long version) {
-        this.version = version;
-    }
-
     @JsonIgnore
     public String getNotePicture() {
         if (uploadPicture != null) {

@@ -21,9 +21,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
     public NoteBuilder(Note note, MakeMe makeMe){
         super(makeMe, note);
         if(Strings.isEmpty(note.getTitle())) title(titleCounter.generate());
-        if(Strings.isEmpty(note.getTitleIDN())) titleID(titleCounter.generate());
         description("descrption");
-        getDescriptionIDN("description_idn");
         createdAt(new Timestamp(System.currentTimeMillis()));
         updatedAt(new Timestamp(System.currentTimeMillis()));
     }
@@ -92,18 +90,8 @@ public class NoteBuilder extends EntityBuilder<Note> {
         return this;
     }
 
-    public NoteBuilder titleID(String text) {
-        entity.getNoteContent().setTitleIDN(text);
-        return this;
-    }
-
     public NoteBuilder description(String text) {
         entity.getNoteContent().setDescription(text);
-        return this;
-    }
-
-    public NoteBuilder getDescriptionIDN(String text) {
-        entity.getNoteContent().setDescriptionIDN(text);
         return this;
     }
 
