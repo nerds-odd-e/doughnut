@@ -34,13 +34,12 @@ const restRequest = (url, params, loadingRef) => {
   return new Promise((resolve, reject) => {
     fetch(url, params)
       .then((res) => {
-        if (res.status !== 200 && res.status !== 400 && res.status !== 409) {
+        if (res.status !== 200 && res.status !== 400) {
           throw new HttpResponseError(res.status);
         }
         return res.json().then((resp) => {
           if (res.status === 200) resolve(resp);
           if (res.status === 400) reject(toNested(resp.errors));
-          if (res.status === 409) reject(toNested(resp));
         });
       })
       .catch((error) => {
