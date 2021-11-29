@@ -27,7 +27,7 @@
         </template>
       </NoteNewButton>
 
-      <NoteEditButton :noteId="note.id" :oldTitle="note.title" />
+      <NoteEditButton :noteId="note.id" :oldTitle="note.title" :language="language" />
 
       <LinkNoteButton :note="note" />
 
@@ -42,12 +42,6 @@
         <SvgCog />
       </a>
       <div class="dropdown-menu dropdown-menu-right">
-        <NoteTranslationEditButton
-          v-if="featureToggle"
-          :noteId="note.id"
-        >
-          Edit translations
-        </NoteTranslationEditButton>
         <ReviewSettingEditButton :noteId="note.id" :oldTitle="note.title">
           Edit review settings
         </ReviewSettingEditButton>
@@ -64,7 +58,7 @@
         </button>
       </div>
       <NoteTranslationButton v-if="featureToggle" :noteId="note.id" :note="note"
-        @updateLanguage="$emit('updateLanguage', $event)"
+        @updateLanguage="updateLanguage"
       />
     </div>
   </div>
@@ -80,7 +74,6 @@ import ReviewSettingEditButton from "../review/ReviewSettingEditButton.vue";
 import NoteEditButton from "./NoteEditButton.vue";
 import NoteSplitButton from "./NoteSplitButton.vue";
 import NoteTranslationButton from "./NoteTranslationButton.vue";
-import NoteTranslationEditButton from "./NoteTranslationEditButton.vue";
 import NoteNewButton from "./NoteNewButton.vue";
 import ViewTypeButtons from "./ViewTypeButtons.vue";
 import { storedApiDeleteNote } from "../../storedApi";
@@ -90,6 +83,12 @@ export default {
   props: {
     note: Object,
     viewType: String,
+  },
+  data() {
+    return {
+      language: null
+    }
+
   },
   components: {
     SvgCog,
@@ -101,7 +100,6 @@ export default {
     NoteEditButton,
     NoteSplitButton,
     NoteTranslationButton,
-    NoteTranslationEditButton,
     NoteNewButton,
     ViewTypeButtons,
   },
@@ -112,6 +110,10 @@ export default {
     },
   },
   methods: {
+    updateLanguage(lan) {
+      this.language = lan
+      this.$emit('updateLanguage', lan)
+    },
     async deleteNote() {
       if (await this.$popups.confirm(`Are you sure to delete this note?`)) {
         const parentId = this.note.parentId;

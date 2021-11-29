@@ -13,6 +13,5 @@ Feature: Note Translation Crud
         When I edit note translation to become
       | Title in Indonesian     | Description in Indonesian       |
       | Indonesia               | Bahasa Indonesia                |
-        And I switch language to "ID"
         And Note title on the page should be "Indonesia"
         And Note description on the page should be "Bahasa Indonesia"

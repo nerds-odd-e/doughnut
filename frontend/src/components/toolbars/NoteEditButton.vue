@@ -6,7 +6,6 @@
 
 <script>
 import SvgEdit from "../svgs/SvgEdit.vue";
-import NoteEditDialog from "../dialogs/NoteEditDialog.vue";
 import { editNote } from "../dialogs";
 
 export default {
@@ -14,10 +13,10 @@ export default {
   components: {
     SvgEdit,
   },
-  props: { noteId: [String, Number] },
+  props: { noteId: [String, Number], language: String },
   methods: {
     async showDialog() {
-      await editNote(this.$popups, this.noteId);
+      await editNote(this.$popups, this.noteId, this.language);
     },
   },
 };

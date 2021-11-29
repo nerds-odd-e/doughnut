@@ -337,8 +337,8 @@ When(
 );
 
 When("I edit note translation to become", (data) => {
-  cy.findByRole("button", { name: "more options" }).click();
-  cy.findByRole("button", { name: "edit note translation" }).click();
+  cy.clickTranslationButton("ID");
+  cy.clickNoteToolbarButton("edit note");
   cy.submitNoteTranslationFormsWith(data.hashes());
 });
 

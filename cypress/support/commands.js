@@ -442,8 +442,8 @@ Cypress.Commands.add("expectTranslationButtonLang", (lang) => {
   cy.findByRole("button", { name: buttonText });
 });
 
-Cypress.Commands.add("clickTranslationButton", (buttonText) => {
-  cy.findByRole("button", { name: buttonText }).click();
+Cypress.Commands.add("clickTranslationButton", (lang) => {
+  cy.findByRole("button", { name: (`Translate to ${lang}`) }).click();
 });
 
 Cypress.Commands.add(

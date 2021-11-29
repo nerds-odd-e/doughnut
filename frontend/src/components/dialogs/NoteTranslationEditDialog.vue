@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import NoteTranslationEditForm from "./NoteTranslationEditForm.vue";
+import NoteTranslationEditForm from "../notes/NoteTranslationEditForm.vue";
 import { restPostMultiplePartForm } from "../../restful/restful";
 import { storedApiGetNoteAndItsChildren } from "../../storedApi";
 

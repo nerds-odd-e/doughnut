@@ -12,13 +12,7 @@ import {
 // View Translation
 
 Given("I switch language to {string}", (lang) => {
-  const buttonText = `Translate to ${lang}`;
-  cy.clickTranslationButton(buttonText);
-});
-
-When("I switch language to {string}", (lang) => {
-  const buttonText = `Translate to ${lang}`;
-  cy.clickTranslationButton(buttonText);
+  cy.clickTranslationButton(lang);
 });
 
 Then("Note title on the page should be {string}", (title) => {
