@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import NoteFormBody from "./NoteFormBody.vue";
+import NoteFormBody from "../notes/NoteFormBody.vue";
 import { restPostMultiplePartForm } from "../../restful/restful";
 import { storedApiGetNoteAndItsChildren } from "../../storedApi";
 

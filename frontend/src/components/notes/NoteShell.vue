@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import NoteEditDialog from "./NoteEditDialog.vue";
+import { editNote } from "../dialogs";
 
 export default {
   props: {
@@ -13,7 +13,6 @@ export default {
     updatedAt: String,
   },
   components: {
-    NoteEditDialog,
   },
   computed: {
     bgColor() {
@@ -34,9 +33,7 @@ export default {
   },
   methods: {
     async editDialog() {
-      await this.$popups.dialog(NoteEditDialog, {
-        noteId: this.id,
-      })
+      await editNote(this.$popups, this.id);
     },
   },
 };
