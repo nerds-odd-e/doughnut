@@ -22,14 +22,12 @@ sh <(curl -k -L https://nixos.org/nix/install) --daemon
 
 ### 2. Setup and run doughnut for the first time (local development profile)
 
-The default spring profile is 'test' unless you explicitly set it to 'dev'. Tip: Add `--Dspring.profiles.active=${profile}"` to gradle task command.
-MySQL DB server is started and initialised on entering the `nix-shell`.
-
-Update/refresh your installed nix state and version
+Launch a new terminal in your favourite shell (I highly recommend zsh).
 
 ```bash
-# OPTIONAL
-nix-channel --update; nix-env -iA nixpkgs.nix && nix-env -u --always
+mkdir -p ~/.config/nix
+echo 'experimental-features = nix-command flakes' >> ~/.config/nix/nix.conf
+nix-channel --update; nix-env -iA nixpkgs.nix; nix-env -f '<nixpkgs>' -iA nixUnstable
 ```
 
 Clone full all-in-one doughnut codebase from Github
@@ -38,12 +36,13 @@ Clone full all-in-one doughnut codebase from Github
 git clone https://github.com/nerds-odd-e/doughnut
 ```
 
-Launch local nix-shell development environment
+Boot up your doughnut development environment.
+MySQL DB server is started and initialised on entering the `nix develop`.
 
 ```bash
 cd doughnut
 export NIXPKGS_ALLOW_UNFREE=1
-nix-shell --pure
+nix develop
 ```
 
 Run E2E profile springboot backend server with gradle (backend app started on port 9081)
@@ -85,11 +84,11 @@ nohup idea-community &
 
 #### Setup IntelliJ IDEA with JDK16 SDK
 
-- Locate your `nix` installed JDK16 path location from the header printout on entering nix-shell ($JAVA_HOME is printed out on entering `nix-shell`).
+- Locate your `nix develop` installed JDK path location from the header printout on entering ` nix develop`` ($JAVA_HOME is printed out on entering  `nix develop`).
   - e.g. On macOS this could look like `/nix/store/cj3vbr57and7wywlvac6dkz62kzf0awh-zulu16.30.15-ca-jdk-16.0.1/zulu-16.jdk/Contents/Home`.
 - **File -> Project Structure -> Platform Settings -> SDKs -> Add JDK...**
   - Enter the full path of above (e.g. `/nix/store/cj3vbr57and7wywlvac6dkz62kzf0awh-zulu16.30.15-ca-jdk-16.0.1/zulu-16.jdk/Contents/Home`).
-    ![Sample nix-shell JAVA_HOME](./images/01_doughnut_nix-shell_JAVA_HOME.png "Sample nix-shell JAVA_HOME")
+    ![Sample `nix develop` JAVA_HOME](./images/01_doughnut_nix-shell_JAVA_HOME.png "Sample nix-shell JAVA_HOME")
 
 #### Run a single targetted JUnit5 test in IntelliJ IDEA
 

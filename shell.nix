@@ -1,4 +1,4 @@
-{ pkgs ? import <nixpkgs> { } }: 
+{ pkgs ? import <nixpkgs> { } }:
 with pkgs;
 let
   inherit (pkgs) stdenv;
@@ -95,12 +95,12 @@ in mkShell {
 
         echo "##############################################################################################################"
         echo "                                                                                "
-        echo "##    !! DOUGHNUT NIX-SHELL !!      "
-        echo "##    JAVA_HOME: $JAVA_HOME         "
-        echo "##    GRADLE_HOME: $GRADLE_HOME     "
-        echo "##    NODE_HOME: $NODE_HOME         "
-        echo "##    MYSQL_HOME: $MYSQL_HOME       "
-        echo "##    MYSQL_DATADIR: $MYSQL_DATADIR "
+        echo "##    !! DOUGHNUT NIX DEVELOPMENT ENVIRONMENT ;) !!  "
+        echo "##    JAVA_HOME: $JAVA_HOME                          "
+        echo "##    GRADLE_HOME: $GRADLE_HOME                      "
+        echo "##    NODE_HOME: $NODE_HOME                          "
+        echo "##    MYSQL_HOME: $MYSQL_HOME                        "
+        echo "##    MYSQL_DATADIR: $MYSQL_DATADIR                  "
         echo "                                                                                "
         echo "##############################################################################################################"
         mkdir -p $MYSQL_HOME
@@ -140,7 +140,7 @@ in mkShell {
 
         cleanup()
         {
-          echo -e "\nBYE!!! EXITING nix-shell."
+          echo -e "\nBYE!!! EXITING doughnut NIX DEVELOPMENT ENVIRONMENT."
           rm -f $MYSQL_HOME/init_doughnut_db.sql
           if [[ ! -z "$MYSQLD_PID" ]]; then
             echo -e "MySQL Server still running on Port: $MYSQL_TCP_PORT, Socket: $MYSQL_UNIX_SOCKET at PID: $MYSQLD_PID"
