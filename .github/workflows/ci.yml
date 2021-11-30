@@ -188,24 +188,16 @@ jobs:
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
-      - name: Cache local gradle repository & artifacts
-        uses: actions/cache@v2
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
       - name: End-to-End tests with Cypress
         uses: cypress-io/github-action@v2
         with:
           install-command: yarn
           build: yarn frontend:build
           browser: chrome
+          headless: true
           config: pageLoadTimeout=100000,video=false,watchForFileChanges=false
-          wait-on: "http://localhost:9081/, http://localhost:9081/api/healthcheck"
-          wait-on-timeout: 120
+          wait-on: 'http://127.0.0.1:9081/api/healthcheck'
+          wait-on-timeout: 150
           spec: ${{ matrix.spec }}
 
   Package-n-Deploy:
