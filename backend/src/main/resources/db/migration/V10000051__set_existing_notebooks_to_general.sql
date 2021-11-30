@@ -1,1 +1,0 @@
-UPDATE notebook SET notebook_type = 'GENERAL' WHERE notebook_type IS NULL;

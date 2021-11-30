@@ -1,4 +1,0 @@
-ALTER TABLE link
-    DROP COLUMN type;
-ALTER TABLE link
-    MODIFY type_id INT NOT NULL;

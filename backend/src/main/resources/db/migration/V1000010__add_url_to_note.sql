@@ -1,5 +1,0 @@
-ALTER TABLE note
-ADD COLUMN (
-    url VARCHAR(1024),
-    url_is_video BOOLEAN NOT NULL DEFAULT 0
-);

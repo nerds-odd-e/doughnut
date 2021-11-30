@@ -1,8 +1,0 @@
-CREATE TABLE bazaar_note (
-    id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-    note_id INT UNSIGNED NOT NULL,
-    PRIMARY KEY (id),
-    CONSTRAINT `fk_bazaar_note_note`
-        FOREIGN KEY (note_id) REFERENCES note (id)
-        ON DELETE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 AUTO_INCREMENT=1;

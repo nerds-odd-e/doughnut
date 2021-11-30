@@ -1,2 +1,0 @@
-ALTER TABLE review_point
-    ADD COLUMN initial_reviewed_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP;
