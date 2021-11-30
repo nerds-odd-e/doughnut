@@ -25,8 +25,8 @@ runs:
         mysql-version: 8.0
         database: "doughnut_e2e_test"
     - run: |
-        mysql -uroot -e "CREATE USER '${{ inputs.dbuser}}'@'localhost' IDENTIFIED BY '${{inputs.dbpassword}}'"
-        mysql -uroot -e "GRANT ALL PRIVILEGES ON *.* TO '${{inputs.dbuser}}'@'localhost'"
+        mysql -uroot -e "CREATE USER '${{ inputs.dbuser }}'@'localhost' IDENTIFIED BY '${{ inputs.dbpassword }}'"
+        mysql -uroot -e "GRANT ALL PRIVILEGES ON *.* TO '${{ inputs.dbuser }}'@'localhost'"
         mysql -uroot -e "FLUSH PRIVILEGES"
       shell: bash
     - run: yarn sut &
