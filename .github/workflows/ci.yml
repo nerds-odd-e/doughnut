@@ -204,7 +204,8 @@ jobs:
           build: yarn frontend:build
           browser: chrome
           config: pageLoadTimeout=100000,video=false,watchForFileChanges=false
-          wait-on: "http://localhost:9081/api/healthcheck"
+          wait-on: "http://localhost:9081/, http://localhost:9081/api/healthcheck"
+          wait-on-timeout: 120
           spec: ${{ matrix.spec }}
 
   Package-n-Deploy:
