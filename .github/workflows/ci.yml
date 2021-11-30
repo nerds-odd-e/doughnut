@@ -173,11 +173,6 @@ jobs:
     steps:
       - name: Code Checkout
         uses: actions/checkout@v2
-      - uses: ./.github/starting_backend_actions
-        with:
-          dbuser: ${{ secrets.DBUSER }}
-          dbpassword: ${{ secrets.DBPASSWORD }}
-          db_url: ${{ secrets.CI_E2E_DB_URL }}
       - name: Cache yarn directory path
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn cache dir)"
@@ -196,8 +191,9 @@ jobs:
           browser: chrome
           headless: true
           config: pageLoadTimeout=100000,video=false,watchForFileChanges=false
+          start: yarn sut
           wait-on: 'http://127.0.0.1:9081/api/healthcheck'
-          wait-on-timeout: 180
+          wait-on-timeout: 120
           spec: ${{ matrix.spec }}
 
   Package-n-Deploy:
