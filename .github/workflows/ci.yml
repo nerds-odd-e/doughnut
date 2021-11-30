@@ -203,7 +203,7 @@ jobs:
           node-version: "16"
           config: pageLoadTimeout=100000,video=false
           spec: ${{ matrix.spec }}
-      - run: yarn test
+      - run: yanr && yarn test
 
   Package-n-Deploy:
     name: Package & GCP MIG Rolling Update Deploy
