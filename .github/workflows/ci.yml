@@ -198,12 +198,14 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: End-to-End tests with Cypress
-        uses: actions/setup-node@v2
+        uses: cypress-io/github-action@v2
         with:
-          node-version: "16"
-          config: pageLoadTimeout=100000,video=false
+          install-command: yarn
+          build: yarn frontend:build
+          browser: chrome
+          config: pageLoadTimeout=100000,video=false,watchForFileChanges=false
+          wait-on: "http://localhost:9081/api/healthcheck"
           spec: ${{ matrix.spec }}
-      - run: yarn && yarn test
 
   Package-n-Deploy:
     name: Package & GCP MIG Rolling Update Deploy
