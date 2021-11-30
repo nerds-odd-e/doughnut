@@ -197,7 +197,7 @@ jobs:
           headless: true
           config: pageLoadTimeout=100000,video=false,watchForFileChanges=false
           wait-on: 'http://127.0.0.1:9081/api/healthcheck'
-          wait-on-timeout: 150
+          wait-on-timeout: 180
           spec: ${{ matrix.spec }}
 
   Package-n-Deploy:
