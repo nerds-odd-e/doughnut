@@ -18,7 +18,7 @@
     "cy:run": "cypress run --env configFile=ci",
     "sut": "./gradlew bootRunE2E",
     "open": "yarn frontend:build && run-p -clnr sut cy:open",
-    "test": "yarn frontend:build && run-p -clnr sut cy:run",
+    "test": "yarn frontend:build && start-server-and-test sut http://localhost:9081 cy:run",
     "test:dev": "yarn frontend:build && run-p -clnr sut frontend:sut cy:run:dev",
     "test:open": "yarn frontend:build && run-p -clnr sut frontend:sut cy:open",
     "sound": "node scripts/sound-monitor.js",
@@ -36,6 +36,7 @@
     "cypress-file-upload": "5.0.8",
     "npm-run-all": "4.1.5",
     "prettier": "^2.5.0",
+    "start-server-and-test": "^1.14.0",
     "tsify": "5.0.4",
     "typescript": "^3.9"
   },

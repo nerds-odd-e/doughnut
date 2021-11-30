@@ -188,11 +188,6 @@ jobs:
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
-      - name: Build frontend
-        uses: actions/setup-node@v2
-        with:
-          node-version: "16"
-      - run: yarn frontend:build
       - name: Cache local gradle repository & artifacts
         uses: actions/cache@v2
         with:
@@ -203,14 +198,12 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: End-to-End tests with Cypress
-        uses: cypress-io/github-action@v2
+        uses: actions/setup-node@v2
         with:
-          browser: chrome
-          headless: true
+          node-version: "16"
           config: pageLoadTimeout=100000,video=false
-          install-command: yarn
-          wait-on: "http://localhost:9081"
           spec: ${{ matrix.spec }}
+      - run: yarn test
 
   Package-n-Deploy:
     name: Package & GCP MIG Rolling Update Deploy
