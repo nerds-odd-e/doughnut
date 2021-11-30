@@ -208,6 +208,7 @@ jobs:
           config: pageLoadTimeout=100000,video=false,watchForFileChanges=false
           install-command: yarn
           build: yarn frontend:build
+          start: yarn sut
           wait-on: "http://127.0.0.1:9081/api/healthcheck"
           wait-on-timeout: 120
           spec: ${{ matrix.spec }}
