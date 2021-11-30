@@ -27,7 +27,7 @@ runs:
     - run: |
         mysql -u root < infra/gitpod/mysql/init_doughnut_db.sql
       shell: bash
-    - run: yarn && yarn run-p -clnr sut
+    - run: ./gradlew bootRunE2E &
       env:
         INPUT_DB_URL: ${{ inputs.db_url }}
       shell: bash
