@@ -82,19 +82,25 @@ We use cucumber + cypress + Javascript library to do end to end test.
 
 #### Commands
 
-| Purpose                              | Command                                                                                                                       |
+| Purpose                              | Command (run from `doughnut` source root directory                                                                            |
 | ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
+| Install needed e2e tooling           | `yarn`                                                                                                                        |
 | Start SUT (backend system under test)| `yarn sut`                                                                                                                    |
 | Run all e2e test                     | `yarn test` (starts backend SUT and compile frontend and cypress headless)                                                    |
 | Run all e2e test with FE in dev mode | `yarn test:dev` (starts backend SUT and frontend in dev mode and cypress headless)                                            |
-| Run cypress IDE                      | `./gradlew bootRunE2E`, `yarn frontend:sut` and `yarn cy:open` (starts frontend SUT in dev mode, backend SUT and cypress IDE) |
+| Run cypress IDE                      | `yarn sut`, `yarn frontend:sut` and `yarn cy:open` (starts frontend SUT in dev mode, backend SUT and cypress IDE) |
 
 #### Structure
 
-| Purpose          | Location                           |
-| ---------------- | ---------------------------------- |
-| feature files    | `cypress/integration/**`          |
-| step definitions | `cypress/step_definitions/common` |
+| Purpose          | Location                                     |
+| ---------------- | -------------------------------------------- |
+| feature files    | `cypress/integration/*.feature`              |
+| step definitions | `cypress/step_definitions/common/*.{js,ts}`  |
+| custom DSL       | `cypress/support/*.js`                       |
+| cucumber hooks   | `cypress/step_definitions/common/hook.ts`    |
+| test fixtures    | `cypress/fixtures/*.*`                       |
+| cypress config   | `cypress/config/*.json`                      |
+| cypress plugins  | `cypress/plugins/index.js`                   |
 
 #### How-to
 
@@ -102,12 +108,6 @@ The Cypress+Cucumber tests are written in JavaScript.
 
 [cypress](https://docs.cypress.io/guides/getting-started/writing-your-first-test#Add-a-test-file) + [cypress-cucumber-preprocessor](https://github.com/TheBrainFamily/cypress-cucumber-preprocessor)
 
-
-##### Run doughnut E2E tests in 'e2e' profile headless (backend app started on port 9081)
-
-```bash
-yarn test
-```
 
 ### 5. [Vue3 web-app frontend](https://flutter.dev/docs/get-started/web)
 
