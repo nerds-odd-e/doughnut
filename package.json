@@ -19,7 +19,7 @@
     "sut": "./gradlew bootRunE2E --build-cache --parallel",
     "open": "yarn frontend:build && run-p -clnr sut cy:open",
     "test": "yarn frontend:build && run-p -clnr sut cy:run",
-    "ci": "yarn wait_on_sut && cypress run --env configFile=ci --browser chrome --spec ${{ matrix.spec }}",
+    "ci": "sleep 5 && cypress run --env configFile=ci --browser chrome --spec ${{ matrix.spec }}",
     "test:dev": "yarn frontend:build && run-p -clnr sut frontend:sut cy:run:dev",
     "test:open": "yarn frontend:build && run-p -clnr sut frontend:sut cy:open",
     "wait_on_sut": "yarn wait-on http://127.0.0.1:9081",
