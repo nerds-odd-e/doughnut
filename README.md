@@ -74,14 +74,6 @@ For more background info you can read:
 ./gradlew test
 ```
 
-#### Run full frontend unit tests suite
-
-- From doughnut/frontend source directory:
-
-```bash
-yarn frontend:test
-```
-
 ### 4. End-to-End Test / Features / Cucumber / SbE / ATDD
 
 We use cucumber + cypress + Javascript library to do end to end test.
@@ -125,7 +117,7 @@ We chose Vue3 + Vite to build our light frontend.
 
 ##### Run frontend unit tests
 
-From `frontend` directory
+From `doughnut` source root directory
 ```bash
 yarn frontend:test
 ```
