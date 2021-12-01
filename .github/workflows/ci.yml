@@ -45,9 +45,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: DB Migration unit test
-        run: ./gradlew testDBMigrate -Dspring.profiles.active=test
+        run: ./gradlew testDBMigrate -Dspring.profiles.active=test --build-cache --parallel
       - name: Unit tests with Gradle
-        run: ./gradlew test -Dspring.profiles.active=test
+        run: ./gradlew test -Dspring.profiles.active=test --build-cache --parallel
 
   Frontend-linting:
     name: Frontend Lint
@@ -252,7 +252,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: Build application jar artifact
-        run: backend/gradlew -p backend build -x test -Dspring.profiles.active=prod
+        run: backend/gradlew -p backend build -x test -Dspring.profiles.active=prod --build-cache --parallel
       - name: Setup Google Cloud SDK with Service Account
         uses: google-github-actions/setup-gcloud@master
         with:
