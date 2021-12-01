@@ -169,6 +169,7 @@ jobs:
             cypress/integration/n*/**
           - |
             cypress/integration/p*/**
+          - |
             cypress/integration/r*/**
     steps:
       - name: Code Checkout
