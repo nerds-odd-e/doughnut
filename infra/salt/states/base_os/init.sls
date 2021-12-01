@@ -16,8 +16,8 @@
 mysql-deb-apt-repo:
   pkgrepo.managed:
     - humanname: MySQL
-    - name: deb http://repo.mysql.com/apt/debian/ Buster mysql-8.0
-    - dist: buster
+    - name: deb http://repo.mysql.com/apt/debian/ Bullseye mysql-8.0
+    - dist: bullseye
     - file: /etc/apt/sources.list.d/mysql.list
     - keyid: 5072E1F5
     - keyserver: keyserver.ubuntu.com
@@ -45,11 +45,10 @@ doughnut-app-deps:
         - cmd: os-dist-upgrade
         - cmd: doughnut-jre
         - file: /etc/profile.d/doughnut_env.sh
-
-zulu16.32.15-ca-jre16.0.2-linux_amd64.deb:
+zulu17.28.13-ca-jre17.0.0-linux_amd64.deb:
   file.managed:
-    - name: /tmp/zulu16.32.15-ca-jre16.0.2-linux_amd64.deb
-    - source: https://cdn.azul.com/zulu/bin/zulu16.32.15-ca-jre16.0.2-linux_amd64.deb
+    - name: /tmp/zulu17.28.13-ca-jre17.0.0-linux_amd64.deb
+    - source: https://cdn.azul.com/zulu/bin/zulu17.28.13-ca-jre17.0.0-linux_amd64.deb
     - skip_verify: True
     - require_in:
         - cmd: install-jre
@@ -57,13 +56,13 @@ zulu16.32.15-ca-jre16.0.2-linux_amd64.deb:
 
 install-jre:
   cmd.run:
-    - name: apt install -y /tmp/zulu16.32.15-ca-jre16.0.2-linux_amd64.deb
+    - name: apt install -y /tmp/zulu17.28.13-ca-jre17.0.0-linux_amd64.deb
     - require_in:
         - cmd: doughnut-jre
 
 doughnut-jre:
   cmd.run:
-    - name: update-alternatives --set java /usr/lib/jvm/zre-16-amd64/bin/java
+    - name: update-alternatives --set java /usr/lib/jvm/zre-17-amd64/bin/java
 
 os-dist-upgrade:
   cmd.run:
