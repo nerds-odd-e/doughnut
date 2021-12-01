@@ -16,12 +16,11 @@
     "cy:open": "cypress open --env configFile=development",
     "cy:run:dev": "cypress run --env configFile=development",
     "cy:run": "cypress run --env configFile=ci",
-    "sut": "./gradlew bootRunE2E --build-cache --parallel",
+    "sut": "./gradlew bootRunE2E --build-cache",
     "open": "yarn frontend:build && run-p -clnr sut cy:open",
     "test": "yarn frontend:build && run-p -clnr sut cy:run",
     "test:dev": "yarn frontend:build && run-p -clnr sut frontend:sut cy:run:dev",
-    "test:open": "yarn frontend:build && run-p -clnr sut frontend:sut cy:open",
-    "wait_on_sut": "yarn wait-on http://127.0.0.1:9081",
+    "test:open": "yarn run-p -clnr sut frontend:sut cy:open",
     "sound": "node scripts/sound-monitor.js",
     "format": "prettier . --write"
   },
@@ -38,8 +37,7 @@
     "npm-run-all": "4.1.5",
     "prettier": "^2.5.0",
     "tsify": "5.0.4",
-    "typescript": "^3.9",
-    "wait-on": "^6.0.0"
+    "typescript": "^3.9"
   },
   "dependencies": {
     "@types/node": "^16.7.12",
