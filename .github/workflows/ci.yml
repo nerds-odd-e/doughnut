@@ -192,11 +192,11 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: "16"
-      - run: |
-          yarn
-          yarn frontend:build
-          yarn wait_on_sut
-          cypress run --env configFile=ci --config pageLoadTimeout=100000,watchForFileChanges=false,video=false --browser chrome --spec ${{ matrix.spec }}
+      - run: >
+          yarn &&
+          yarn frontend:build &&
+          yarn wait_on_sut &&
+          cypress run --env configFile=ci --browser chrome --spec ${{ matrix.spec }}
 
   Package-n-Deploy:
     name: Package & GCP MIG Rolling Update Deploy

@@ -1,5 +1,8 @@
 {
   "baseUrl": "http://127.0.0.1:9081",
   "environment": "ci",
-  "screenshotOnRunFailure": false
+  "screenshotOnRunFailure": false,
+  "pageLoadTimeout": 100000,
+  "watchForFileChanges": false,
+  "video": false
 }
