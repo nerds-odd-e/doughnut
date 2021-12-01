@@ -82,7 +82,7 @@ We use cucumber + cypress + Javascript library to do end to end test.
 
 #### Commands
 
-| Purpose                              | Command (run from `doughnut` source root directory                                                                            |
+| Purpose                              | Command (run from `doughnut` source root directory)                                                                           |
 | ------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
 | Install needed e2e tooling           | `yarn`                                                                                                                        |
 | Start SUT (backend system under test)| `yarn sut`                                                                                                                    |
