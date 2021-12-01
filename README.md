@@ -79,7 +79,7 @@ For more background info you can read:
 - From doughnut/frontend source directory:
 
 ```bash
-yarn && yarn test
+yarn frontend:test
 ```
 
 ### 4. End-to-End Test / Features / Cucumber / SbE / ATDD
