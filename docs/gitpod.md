@@ -28,7 +28,7 @@ git config user.email "your_email@your_domain.com"
 
 ### Get your doughnut DB tables setup
 
-- From root of `doughnut` run `./gradlew bootRunE2E` to setup and migrate your base virgin `doughnut` DB tables via `flyway` migrations. Once the migrations have completed (read the `springboot` startup logs from the VSCode terminal), use `Ctrl-C` to exit `springboot` backend server application process. (this might take some time - once done, `Ctrl-C` to exit process on completion).
+- From root of `doughnut` run `yarn sut` to setup and migrate your base virgin `doughnut` DB tables via `flyway` migrations. Once the migrations have completed (read the `springboot` startup logs from the VSCode terminal), use `Ctrl-C` to exit `springboot` backend server application process. (this might take some time - once done, `Ctrl-C` to exit process on completion).
 
 ```bash
 ### You should see in the springboot terminal log output a line similar to the below ###
@@ -41,7 +41,6 @@ INFO 2142 --- [  restartedMain] o.f.core.internal.command.DbMigrate      : Succe
 ### Preparation steps to run doughnut backend unit tests & cypress End-to-End tests
 
 - From the root of the `doughnut` codebase (this should be on path `/workspace/doughnut`), run `yarn` to get End-to-End testing tooling setup.
-- From `doughnut/frontend` path, also run `yarn` followed by `yarn build` to prepare for frontend Vue3 development tool packages setup.
 - From root of `doughnut` source path, execute `yarn test:dev` to execute the full headless cypress End-to-End test suite.
 
 ### Running java springboot unit tests
@@ -50,4 +49,4 @@ INFO 2142 --- [  restartedMain] o.f.core.internal.command.DbMigrate      : Succe
 
 ### Running frontend JS/TS Vue3 unit tests
 
-- Navigate to `doughnut/frontend`. Execute `yarn` to install the frontend packages. Now execute `yarn test` to run the full frontend `jest` unit tests.
+- Navigate to `doughnut` source root directory. Execute `yarn frontend:test` to run the full frontend `jest` unit tests.

@@ -50,7 +50,7 @@ Run E2E profile springboot backend server with gradle (backend app started on po
 ```bash
 # from doughnut source root dir
 yarn && yarn frontend:build
-./gradlew bootRunE2E
+yarn sut
 open http://localhost:9081
 ```
 
@@ -59,7 +59,7 @@ Run E2E profile with backend server & frontend in dev mode & Cypress IDE (fronte
 ```bash
 # from doughnut source root dir
 yarn && yarn frontend:sut
-./gradlew bootRunE2E
+yarn sut
 yarn cy:open
 ```
 

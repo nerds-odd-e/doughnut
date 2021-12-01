@@ -123,24 +123,17 @@ We chose Vue3 + Vite to build our light frontend.
 
 #### How-to
 
-From `frontend` directory
-```bash
-yarn
-```
-
 ##### Run frontend unit tests
 
 From `frontend` directory
 ```bash
-yarn test
+yarn frontend:test
 ```
 
 ##### Build & Bundle Vue3 frontend web-app assets and startup backend app (backend app started on port 8081)
 
 ```bash
-cd frontend
-yarn build
-cd ..
+yarn frontend:build
 ./gradlew bootRun
 ```
 
@@ -148,7 +141,7 @@ Expect to find minified and uglified web bundle assets in `backend/src/main/reso
 
 ```bash
 ❯ pwd
-/home/csd/csd/doughnut/backend/src/main/resources/static
+/home/lia/doughnut/backend/src/main/resources/static
 ❯ tree -L 3
 .
 ├── assets
