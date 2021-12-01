@@ -1,6 +1,7 @@
 --
 -- Table structure for table `bazaar_notebook`
 --
+SET foreign_key_checks = 0;
 
 CREATE TABLE `bazaar_notebook` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
@@ -49,25 +50,6 @@ CREATE TABLE `failure_report` (
   `issue_number` decimal(10,0) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
---
--- Table structure for table `flyway_schema_history`
---
-
-CREATE TABLE `flyway_schema_history` (
-  `installed_rank` int NOT NULL,
-  `version` varchar(50) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `description` varchar(200) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `type` varchar(20) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `script` varchar(1000) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `checksum` int DEFAULT NULL,
-  `installed_by` varchar(100) COLLATE utf8mb4_unicode_ci NOT NULL,
-  `installed_on` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `execution_time` int NOT NULL,
-  `success` tinyint(1) NOT NULL,
-  PRIMARY KEY (`installed_rank`),
-  KEY `flyway_schema_history_s_idx` (`success`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Table structure for table `image`
@@ -297,3 +279,5 @@ CREATE TABLE `user` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_external_identifier` (`external_identifier`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1763 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+SET foreign_key_checks = 1;
