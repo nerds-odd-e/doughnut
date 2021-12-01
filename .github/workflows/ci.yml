@@ -194,7 +194,7 @@ jobs:
           node-version: "16"
       - run: yarn
       - run: yarn frontend:build
-      - run: yarn ci
+      - run: sleep 5 && cypress run --env configFile=ci --browser chrome --spec ${{ matrix.spec }}
 
   Package-n-Deploy:
     name: Package & GCP MIG Rolling Update Deploy
