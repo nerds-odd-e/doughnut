@@ -51,7 +51,6 @@ in mkShell {
     mysql80
     mysql-client
     mysql_jdbc
-    chromedriver
     google-cloud-sdk
     packer
     vim
