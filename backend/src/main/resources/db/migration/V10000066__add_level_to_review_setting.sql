@@ -3,4 +3,4 @@ UPDATE review_setting SET level=0;
 ALTER TABLE review_setting MODIFY level TINYINT NOT NULL DEFAULT 0;
 ALTER TABLE review_setting ADD INDEX review_setting_level_idx(level);
 
-ALTER TABLE doughnut_test.note DROP COLUMN `level`;
+ALTER TABLE note DROP COLUMN `level`;
