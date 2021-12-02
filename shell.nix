@@ -52,10 +52,8 @@ in mkShell {
     mysql-client
     mysql_jdbc
     google-cloud-sdk
-    packer
     vim
     vimpager
-    dbeaver
   ] ++ lib.optionals stdenv.isDarwin [
     darwin.apple_sdk.libs.utmp
     apple_sdk.ApplicationServices
@@ -71,6 +69,8 @@ in mkShell {
     x11vnc
     xclip
     xvfb-run
+    dbeaver
+    packer
     dart
     flutter
   ];
