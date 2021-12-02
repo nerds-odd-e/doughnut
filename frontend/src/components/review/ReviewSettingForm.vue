@@ -1,11 +1,11 @@
 <template>
-  <CheckInput
+  <TextInput
     scopeName="review_setting"
     field="level"
     v-model="modelValue.level"
     :errors="errors.level"
   />
-  <TextInput
+  <CheckInput
     scopeName="review_setting"
     field="rememberSpelling"
     v-model="modelValue.rememberSpelling"
