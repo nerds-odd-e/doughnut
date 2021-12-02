@@ -81,6 +81,11 @@ public class NoteBuilder extends EntityBuilder<Note> {
         return this;
     }
 
+
+    public NoteBuilder cancelSkipReview() {
+        entity.getNoteContent().setSkipReview(false);
+        return this;
+    }
     public NoteBuilder withNoDescription() {
         return description("");
     }

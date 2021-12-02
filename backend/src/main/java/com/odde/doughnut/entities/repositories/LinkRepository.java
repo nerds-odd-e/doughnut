@@ -16,9 +16,20 @@ public interface LinkRepository extends CrudRepository<Link, Integer> {
     @Query( value = "SELECT link.* from link " + byAncestorWhereThereIsNoReviewPoint, nativeQuery = true)
     List<Link> findByAncestorWhereThereIsNoReviewPoint(@Param("user") User user, @Param("ancestor") Note ancestor);
 
+    String noteReviewedOrSkipped = "   SELECT note.id, note.skip_review, nrp.id as nrp_id FROM note"
+            + "     LEFT JOIN review_point nrp"
+            + "     ON note.id = nrp.note_id "
+            + "        AND nrp.user_id = :user"
+            + "   WHERE note.skip_review IS TRUE"
+            + "         OR nrp.id IS NOT NULL ";
+
     String whereThereIsNoReviewPoint = " LEFT JOIN review_point rp"
             + " ON link.id = rp.link_id "
             + "   AND rp.user_id = :user"
+            + " INNER JOIN ("+ noteReviewedOrSkipped +") n1 "
+            + "   ON link.target_id = n1.id"
+            + " INNER JOIN ("+ noteReviewedOrSkipped +") n2 "
+            + "   ON link.source_id = n2.id"
             + " WHERE "
             + "   rp.id IS NULL "
             + " ORDER BY link.created_at";

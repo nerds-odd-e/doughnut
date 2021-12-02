@@ -25,12 +25,14 @@ public class ReviewingInitialReviewTest {
     UserModel userModel;
     UserModel anotherUser;
     Timestamp day1;
+    Timestamp day0;
 
     @BeforeEach
     void setup() {
         userModel = makeMe.aUser().toModelPlease();
         anotherUser = makeMe.aUser().toModelPlease();
         day1 = makeMe.aTimestamp().of(1, 8).forWhereTheUserIs(userModel).please();
+        day0 = makeMe.aTimestamp().of(0, 8).forWhereTheUserIs(userModel).please();
     }
 
     private ReviewPoint getOneInitialReviewPoint(Timestamp timestamp) {
@@ -88,6 +90,25 @@ public class ReviewingInitialReviewTest {
             void shouldReturnReviewPointForLink() {
                 assertThat(getOneInitialReviewPoint(day1).getLink().getSourceNote(), equalTo(note1));
                 assertThat(getOneInitialReviewPoint(day1).getNote(), is(nullValue()));
+            }
+
+            @Test
+            void shouldNotReturnReviewPointForLinkWhenTheNoteIsNotSkipped() {
+                makeMe.theNote(note2).cancelSkipReview().createdAt(new Timestamp(System.currentTimeMillis() + 10000)).please();
+                assertThat(getOneInitialReviewPoint(day1).getNote(), equalTo(note2));
+            }
+
+            @Test
+            void shouldNotReturnReviewPointForLinkWhenTheSourceNoteIsNotSkipped() {
+                makeMe.theNote(note1).cancelSkipReview().createdAt(new Timestamp(System.currentTimeMillis() + 10000)).please();
+                assertThat(getOneInitialReviewPoint(day1).getNote(), equalTo(note1));
+            }
+
+            @Test
+            void shouldNotReturnReviewPointForLinkWhenTheNoteIsNotReviewed() {
+                makeMe.theNote(note2).cancelSkipReview().please();
+                makeMe.aReviewPointFor(note2).by(userModel).initiallyReviewedOn(day0).please();
+                assertThat(getOneInitialReviewPoint(day1).getLink(), is(notNullValue()));
             }
 
             @Test
