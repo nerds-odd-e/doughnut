@@ -65,8 +65,9 @@ public class ReviewingInitialReviewTest {
 
         @Test
         void shouldReturnTheSecondNoteIfItsLevelIsLower() {
-//            makeMe.theNote(note2).level(-1).please();
-//            assertThat(getOneInitialReviewPoint(day1).getNote(), equalTo(note2));
+            makeMe.aReviewSettingFor(note1).level(2).please();
+            makeMe.aReviewSettingFor(note2).level(1).please();
+            assertThat(getOneInitialReviewPoint(day1).getNote(), equalTo(note2));
         }
 
         @Test

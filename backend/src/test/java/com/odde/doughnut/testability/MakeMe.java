@@ -106,4 +106,8 @@ public class MakeMe {
     public UserModel aNullUserModel() {
         return modelFactoryService.toUserModel(null);
     }
+
+    public ReviewSettingBuilder aReviewSettingFor(Note note) {
+        return new ReviewSettingBuilder(this, note);
+    }
 }

@@ -10,7 +10,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface NoteRepository extends CrudRepository<Note, Integer> {
-    @Query( value = "SELECT note.* from note " + byOwnershipWhereThereIsNoReviewPoint, nativeQuery = true)
+    @Query( value = "SELECT note.*,rs.level as level from note " + byOwnershipWhereThereIsNoReviewPoint, nativeQuery = true)
     List<Note> findByOwnershipWhereThereIsNoReviewPoint(@Param("user") User user);
 
     @Query( value = "SELECT count(1) as count from note " + byOwnershipWhereThereIsNoReviewPoint, nativeQuery = true)
@@ -29,11 +29,13 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
     int countByAncestorAndInTheList(@Param("ancestor") Note ancestor, @Param("noteIds") List<Integer> noteIds);
 
     String whereThereIsNoReviewPointAndOrderByTime = " LEFT JOIN review_point rp"
-            + " ON note.id = rp.note_id "
-            + "   AND rp.user_id = :#{#user.id} "
+            + "   ON note.id = rp.note_id "
+            + "     AND rp.user_id = :#{#user.id} "
+            + " LEFT JOIN review_setting rs "
+            + "   ON note.master_review_setting_id = rs.id "
             + " WHERE note.skip_review IS FALSE "
             + "   AND rp.id IS NULL "
-            + "ORDER BY note.created_at ";
+            + "ORDER BY level, note.created_at ";
 
     String byOwnershipWhereThereIsNoReviewPoint = "JOIN notebook ON notebook.id = note.notebook_id "
             + " AND notebook.ownership_id = :#{#user.ownership.id} "

@@ -16,4 +16,7 @@ public class ReviewSetting {
     @Getter
     @Setter
     private Boolean rememberSpelling = false;
+    @Getter
+    @Setter
+    private Integer level = 0;
 }

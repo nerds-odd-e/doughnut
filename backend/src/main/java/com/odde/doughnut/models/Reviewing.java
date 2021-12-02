@@ -36,7 +36,7 @@ public class Reviewing {
         if (count == 0) {
             return null;
         }
-        List<Integer> initialReviewedNotesOfToday = getNewReviewPointsOfToday().stream().map(rp -> rp.getSourceNote().getId()).collect(Collectors.toUnmodifiableList());
+        List<Integer> initialReviewedNotesOfToday = getNewReviewPointsOfToday().stream().map(rp -> rp.getSourceNote().getId()).toList();
         return getSubscriptionModelStream()
                 .filter(sub-> sub.needToLearnMoreToday(initialReviewedNotesOfToday))
                 .map(this::getOneNewReviewPoint)
@@ -119,7 +119,7 @@ public class Reviewing {
 
     private List<ReviewPoint> getNewReviewPointsOfToday_() {
         Timestamp oneDayAgo = TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, -24);
-        return userModel.getRecentReviewPoints(oneDayAgo).stream().filter(p -> userModel.isInitialReviewOnSameDay(p, currentUTCTimestamp)).collect(Collectors.toUnmodifiableList());
+        return userModel.getRecentReviewPoints(oneDayAgo).stream().filter(p -> userModel.isInitialReviewOnSameDay(p, currentUTCTimestamp)).toList();
     }
 
     public ReviewPointModel getOneReviewPointNeedToRepeat(Randomizer randomizer) {
