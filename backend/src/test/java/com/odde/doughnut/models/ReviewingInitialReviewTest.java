@@ -64,6 +64,12 @@ public class ReviewingInitialReviewTest {
         }
 
         @Test
+        void shouldReturnTheSecondNoteIfItsLevelIsLower() {
+//            makeMe.theNote(note2).level(-1).please();
+//            assertThat(getOneInitialReviewPoint(day1).getNote(), equalTo(note2));
+        }
+
+        @Test
         void shouldNotIncludeNoteThatIsSkippedForReview() {
             makeMe.theNote(note1).skipReview().linkTo(note2).please();
             assertThat(getOneInitialReviewPoint(day1).getNote(), equalTo(note2));
