@@ -86,8 +86,9 @@ Then("I am learning new note on day {int}", (day) => {
   cy.visit("/reviews/initial");
 });
 
-Then("I have selected the option {string} in review setting", (option) => {
+Then("I have selected the option {string} in review setting and set the level to be {int}", (option, level) => {
   cy.getFormControl(option).check();
+  cy.getFormControl('Level').clear().type(level);
   cy.findByRole("button", { name: "Update" }).click();
 });
 

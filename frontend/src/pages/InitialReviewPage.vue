@@ -33,6 +33,7 @@
               <ReviewSettingForm
                 v-if="!!reviewPointViewedByUser.reviewSetting"
                 v-model="reviewSetting"
+                :showLevel="false"
                 :errors="{}"
               />
             </div>

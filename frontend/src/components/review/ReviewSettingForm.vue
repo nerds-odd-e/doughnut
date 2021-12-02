@@ -1,5 +1,6 @@
 <template>
   <TextInput
+    v-if="showLevel"
     scopeName="review_setting"
     field="level"
     v-model="modelValue.level"
@@ -17,7 +18,7 @@
 import CheckInput from "../form/CheckInput.vue";
 import TextInput from "../form/TextInput.vue";
 export default {
-  props: { modelValue: Object, errors: Object },
+  props: { modelValue: Object, errors: Object, showLevel: Boolean },
   components: { CheckInput, TextInput },
 };
 </script>

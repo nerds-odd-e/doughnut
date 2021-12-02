@@ -4,6 +4,7 @@
   </h3>
   <form @submit.prevent="processForm">
     <ReviewSettingForm
+      :showLevel="true"
       scopeName="review-setting"
       v-model="formData"
       :errors="formErrors"
