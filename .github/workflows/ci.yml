@@ -207,7 +207,7 @@ jobs:
           browser: chrome
           headless: true
           config: pageLoadTimeout=100000,video=false,watchForFileChanges=false
-          install-command: yarn --frozen-lockfile --silent
+          install-command: yarn --silent
           build: yarn frontend:build
           start: yarn sut
           wait-on: "http://127.0.0.1:9081/api/healthcheck"
