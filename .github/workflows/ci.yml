@@ -93,65 +93,65 @@ jobs:
           node-version: "16"
       - run: yarn frontend:test
 
-  mobile-unit-test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: subosito/flutter-action@v1
-        with:
-          flutter-version: "2.5.3"
-      - run: flutter pub get
-        working-directory: ./doughnut_mobile
-      - run: flutter test
-        working-directory: ./doughnut_mobile
+  # mobile-unit-test:
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: subosito/flutter-action@v1
+  #       with:
+  #         flutter-version: "2.5.3"
+  #     - run: flutter pub get
+  #       working-directory: ./doughnut_mobile
+  #     - run: flutter test
+  #       working-directory: ./doughnut_mobile
 
-  drive_ios:
-    strategy:
-      matrix:
-        device:
-          - "iPhone 11"
-      fail-fast: false
-    runs-on: macos-latest
-    steps:
-      - name: List Simulators
-        run: xcrun xctrace list devices
-      - name: Start Simulator
-        run: xcrun simctl boot "${{ matrix.device }}"
-      - uses: actions/checkout@v1
-      - uses: ./.github/starting_backend_actions
-        with:
-          dbuser: ${{ secrets.DBUSER }}
-          dbpassword: ${{ secrets.DBPASSWORD }}
-          db_url: ${{ secrets.CI_E2E_DB_URL }}
-      - uses: ./.github/mobile_actions
-        with:
-          flutter-version: "2.5.3"
-      - run: dart test_driver/app_test.dart
-        working-directory: ./doughnut_mobile
+  # drive_ios:
+  #   strategy:
+  #     matrix:
+  #       device:
+  #         - "iPhone 11"
+  #     fail-fast: false
+  #   runs-on: macos-latest
+  #   steps:
+  #     - name: List Simulators
+  #       run: xcrun xctrace list devices
+  #     - name: Start Simulator
+  #       run: xcrun simctl boot "${{ matrix.device }}"
+  #     - uses: actions/checkout@v1
+  #     - uses: ./.github/starting_backend_actions
+  #       with:
+  #         dbuser: ${{ secrets.DBUSER }}
+  #         dbpassword: ${{ secrets.DBPASSWORD }}
+  #         db_url: ${{ secrets.CI_E2E_DB_URL }}
+  #     - uses: ./.github/mobile_actions
+  #       with:
+  #         flutter-version: "2.5.3"
+  #     - run: dart test_driver/app_test.dart
+  #       working-directory: ./doughnut_mobile
 
-  drive_android:
-    runs-on: macos-latest
-    #creates a build matrix for your jobs
-    strategy:
-      #set of different configurations of the virtual environment.
-      matrix:
-        api-level: [29]
-    steps:
-      - uses: actions/checkout@v1
-      - uses: ./.github/starting_backend_actions
-        with:
-          dbuser: ${{ secrets.DBUSER }}
-          dbpassword: ${{ secrets.DBPASSWORD }}
-          db_url: ${{ secrets.CI_E2E_DB_URL }}
-      - uses: ./.github/mobile_actions
-        with:
-          flutter-version: "2.5.3"
-      - name: Run Flutter Driver tests
-        uses: reactivecircus/android-emulator-runner@v2.21.0
-        with:
-          api-level: ${{ matrix.api-level }}
-          script: |
-            cd ./doughnut_mobile && dart test_driver/app_test.dart
+  # drive_android:
+  #   runs-on: macos-latest
+  #   #creates a build matrix for your jobs
+  #   strategy:
+  #     #set of different configurations of the virtual environment.
+  #     matrix:
+  #       api-level: [29]
+  #   steps:
+  #     - uses: actions/checkout@v1
+  #     - uses: ./.github/starting_backend_actions
+  #       with:
+  #         dbuser: ${{ secrets.DBUSER }}
+  #         dbpassword: ${{ secrets.DBPASSWORD }}
+  #         db_url: ${{ secrets.CI_E2E_DB_URL }}
+  #     - uses: ./.github/mobile_actions
+  #       with:
+  #         flutter-version: "2.5.3"
+  #     - name: Run Flutter Driver tests
+  #       uses: reactivecircus/android-emulator-runner@v2.21.0
+  #       with:
+  #         api-level: ${{ matrix.api-level }}
+  #         script: |
+  #           cd ./doughnut_mobile && dart test_driver/app_test.dart
 
   E2E-tests:
     name: End-to-End tests with Database
@@ -207,7 +207,7 @@ jobs:
           browser: chrome
           headless: true
           config: pageLoadTimeout=100000,video=false,watchForFileChanges=false
-          install-command: yarn --silent
+          install-command: yarn --frozen-lockfile --silent
           build: yarn frontend:build
           start: yarn sut
           wait-on: "http://127.0.0.1:9081/api/healthcheck"
