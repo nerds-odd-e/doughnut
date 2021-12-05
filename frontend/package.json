@@ -51,7 +51,7 @@
     "jest": "^27.4",
     "jest-fetch-mock": "^3.0.3",
     "postcss": "^8.4.1",
-    "prettier": "^2.5.0",
+    "prettier": "^2.5.1",
     "sass": "^1.38.2",
     "sass-loader": "^12.3.0",
     "style-loader": "^3.3.1",
