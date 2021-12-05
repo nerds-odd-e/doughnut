@@ -277,7 +277,6 @@ jobs:
         Backend-unit-tests,
         Frontend-linting,
         Frontend-unit-tests,
-        mobile-unit-test,
         E2E-tests,
         Package-n-Deploy,
       ]
