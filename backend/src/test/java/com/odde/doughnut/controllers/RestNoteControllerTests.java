@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
@@ -341,6 +342,20 @@ class RestNoteControllerTests {
             assertNotNull(note);
             assertEquals(note.getNoteContent().getDescriptionIDN(), patchNoteContent.getDescriptionIDN());
             assertNotEquals(currentTimeStamp, note.getNoteContent().getUpdatedAt());
+        }
+
+        @Test
+        void shouldNotBeAbleUpdateInvalidNoteId() {
+            assertThrows(ResponseStatusException.class, () -> controller.patchNote(note.getId().toString()+"01",
+                    new RestNoteController.PatchNoteContent()));
+        }
+
+        @Test
+        void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
+            User otherUser = makeMe.aUser().please();
+            note = makeMe.aNote().byUser(otherUser).please();
+            assertThrows(NoAccessRightException.class, () -> controller.patchNote(note.getId().toString(),
+                    new RestNoteController.PatchNoteContent()));
         }
 
     }
