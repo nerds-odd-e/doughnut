@@ -32,6 +32,7 @@ import javax.validation.Valid;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.algorithms.SiblingOrder;
 
+import com.odde.doughnut.controllers.RestNoteController;
 import org.hibernate.annotations.WhereJoinTable;
 import org.springframework.beans.BeanUtils;
 
@@ -316,6 +317,11 @@ public class Note {
         childNoteContent.setDescription(String.join("\n", linesInParagraph));
 
         return Note.createNote(user, childNoteContent, currentUTCTimestamp);
+    }
+
+    public Note patchNoteContentInformation(Note note, RestNoteController.PatchNoteContent patchNoteContent) {
+
+        return note;
     }
 }
 
