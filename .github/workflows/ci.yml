@@ -6,6 +6,7 @@ name: doughnut CI
 on: push
 env:
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+  DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   ARTIFACT: "doughnut"
   VERSION: "0.0.1-SNAPSHOT"
@@ -288,3 +289,19 @@ jobs:
         with:
           status: failure
           fields: repo,commit,message,author,action,workflow,eventName
+
+  Discord-Notify:
+    name: Discord notification
+    runs-on: ubuntu-20.04
+    needs:
+      - Backend-unit-tests
+      - Frontend-linting
+      - Frontend-unit-tests
+      - E2E-tests
+      - Package-n-Deploy
+    if: ${{ always() }}
+    steps:
+      - uses: nobrayner/discord-webhook@v1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          discord-webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
