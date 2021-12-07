@@ -6,7 +6,6 @@
 
 <script>
 import SvgDownload from "../svgs/SvgDownload.vue";
-import { saveAs } from 'file-saver';
 
 export default {
   name: "DownloadButton",
