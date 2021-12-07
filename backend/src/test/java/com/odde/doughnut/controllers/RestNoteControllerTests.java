@@ -286,14 +286,12 @@ class RestNoteControllerTests {
     @Nested
     class PatchNoteTest {
         Note note;
-        Timestamp currentTimeStamp;
 
         @BeforeEach
         void setup() throws IOException {
             note = makeMe.aNote().byUser(userModel).please();
             NoteContent noteContent = makeMe.aNote().inMemoryPlease().getNoteContent();
             note.updateNoteContent(noteContent, userModel.getEntity());
-            currentTimeStamp = noteContent.getUpdatedAt();
         }
 
         @Test
@@ -305,7 +303,6 @@ class RestNoteControllerTests {
 
             assertNotNull(note);
             assertEquals(note.getNoteContent().getTitle(), patchNoteContent.getTitle());
-            assertNotEquals(currentTimeStamp, note.getNoteContent().getUpdatedAt());
         }
 
         @Test
@@ -317,7 +314,6 @@ class RestNoteControllerTests {
 
             assertNotNull(note);
             assertEquals(note.getNoteContent().getDescription(), patchNoteContent.getDescription());
-            assertNotEquals(currentTimeStamp, note.getNoteContent().getUpdatedAt());
         }
 
         @Test
@@ -329,7 +325,6 @@ class RestNoteControllerTests {
 
             assertNotNull(note);
             assertEquals(note.getNoteContent().getTitleIDN(), patchNoteContent.getTitleIDN());
-            assertNotEquals(currentTimeStamp, note.getNoteContent().getUpdatedAt());
         }
 
         @Test
@@ -341,7 +336,6 @@ class RestNoteControllerTests {
 
             assertNotNull(note);
             assertEquals(note.getNoteContent().getDescriptionIDN(), patchNoteContent.getDescriptionIDN());
-            assertNotEquals(currentTimeStamp, note.getNoteContent().getUpdatedAt());
         }
 
         @Test
@@ -353,8 +347,8 @@ class RestNoteControllerTests {
         @Test
         void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
             User otherUser = makeMe.aUser().please();
-            note = makeMe.aNote().byUser(otherUser).please();
-            assertThrows(NoAccessRightException.class, () -> controller.patchNote(note.getId().toString(),
+            Note unAuthorizeNote = makeMe.aNote().byUser(otherUser).please();
+            assertThrows(NoAccessRightException.class, () -> controller.patchNote(unAuthorizeNote.getId().toString(),
                     new RestNoteController.PatchNoteContent()));
         }
 
