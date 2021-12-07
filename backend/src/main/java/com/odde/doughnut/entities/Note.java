@@ -319,8 +319,22 @@ public class Note {
         return Note.createNote(user, childNoteContent, currentUTCTimestamp);
     }
 
-    public Note patchNoteContentInformation(Note note, RestNoteController.PatchNoteContent patchNoteContent) {
+    public Note patchNoteContentInformation(Note note, RestNoteController.PatchNoteContent patchNoteContent, Timestamp currentUTCTimestamp) {
+        if ( patchNoteContent.getTitle() != null && !patchNoteContent.getTitle().isEmpty() ) {
+            note.getNoteContent().setTitle(patchNoteContent.getTitle());
+        }
+        if ( patchNoteContent.getDescription() != null && !patchNoteContent.getDescription().isEmpty() ) {
+            note.getNoteContent().setDescription(patchNoteContent.getDescription());
+        }
+        if ( patchNoteContent.getTitleIDN() != null && !patchNoteContent.getTitleIDN().isEmpty() ) {
+            note.getNoteContent().setTitleIDN(patchNoteContent.getTitleIDN());
+        }
+        if ( patchNoteContent.getDescriptionIDN() != null && !patchNoteContent.getDescriptionIDN().isEmpty() ) {
+            note.getNoteContent().setDescriptionIDN(patchNoteContent.getDescriptionIDN());
+        }
 
+        note.getNoteContent().setUpdatedAt(currentUTCTimestamp);
+        note.setCreatedAtAndUpdatedAt(currentUTCTimestamp);
         return note;
     }
 }

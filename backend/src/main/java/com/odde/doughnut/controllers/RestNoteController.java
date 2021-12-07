@@ -13,8 +13,10 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.annotation.Resource;
 import javax.persistence.Column;
@@ -190,16 +192,17 @@ class RestNoteController {
     @Transactional
     public NoteContent patchNote(@PathVariable("noteId") String noteId, @Valid @RequestBody PatchNoteContent patchNoteContent) throws Exception {
         final UserModel user = currentUserFetcher.getUser();
-        Optional<Note> noteObject = modelFactoryService.noteRepository.findById(Integer.parseInt(noteId));
+        Optional<Note> noteObject = modelFactoryService.findNoteById(Integer.parseInt(noteId));
         if (noteObject.isEmpty()) {
-            throw new Exception("Invalid Note Id");
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "Note Not Found");
         }
         Note note = noteObject.get();
         user.getAuthorization().assertAuthorization(note);
 
-
+        note.patchNoteContentInformation(note, patchNoteContent, testabilitySettings.getCurrentUTCTimestamp());
         modelFactoryService.noteRepository.save(note);
 
-        return new NoteContent();
+        return note.getNoteContent();
     }
 }
