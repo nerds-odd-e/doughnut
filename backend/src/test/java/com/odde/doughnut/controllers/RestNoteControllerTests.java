@@ -6,12 +6,10 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.List;
 
 import com.odde.doughnut.entities.Note;
@@ -280,6 +278,46 @@ class RestNoteControllerTests {
 
             List<Note> childrenAfter =  note.getChildren();
             assertEquals(0, childrenAfter.size());
+        }
+
+    }
+
+    @Nested
+    class PatchNoteTest {
+        @Test
+        void shouldUpdateEnglishTitleSuccessfully() throws Exception {
+            Note note = makeMe.aNote().byUser(userModel).please();
+            NoteContent noteContent = makeMe.aNote().inMemoryPlease().getNoteContent();
+            note.updateNoteContent(noteContent, userModel.getEntity());
+
+            Timestamp currentTimeStamp = noteContent.getUpdatedAt();
+
+            RestNoteController.PatchNoteContent patchNoteContent = new RestNoteController.PatchNoteContent();
+            patchNoteContent.setTitle(note.getNoteContent().getTitle()+ "_new_title");
+
+            controller.patchNote(note.getId().toString(), patchNoteContent);
+
+            assertNotNull(note);
+            assertEquals(note.getNoteContent().getTitle(), patchNoteContent.getTitle());
+            assertNotEquals(currentTimeStamp, note.getNoteContent().getUpdatedAt());
+        }
+
+        @Test
+        void shouldUpdateEnglishDescriptionSuccessfully() throws Exception {
+            Note note = makeMe.aNote().byUser(userModel).please();
+            NoteContent noteContent = makeMe.aNote().inMemoryPlease().getNoteContent();
+            note.updateNoteContent(noteContent, userModel.getEntity());
+
+            Timestamp currentTimeStamp = noteContent.getUpdatedAt();
+
+            RestNoteController.PatchNoteContent patchNoteContent = new RestNoteController.PatchNoteContent();
+            patchNoteContent.setDescription(note.getNoteContent().getDescription()+ "_new_description");
+
+            controller.patchNote(note.getId().toString(), patchNoteContent);
+
+            assertNotNull(note);
+            assertEquals(note.getNoteContent().getDescription(), patchNoteContent.getDescription());
+            assertNotEquals(currentTimeStamp, note.getNoteContent().getUpdatedAt());
         }
 
     }
