@@ -60,6 +60,7 @@
       <NoteTranslationButton v-if="featureToggle" :noteId="note.id" :note="note"
         @updateLanguage="updateLanguage"
       />
+      <NoteDownloadButton v-if="featureToggle" />
     </div>
   </div>
 </template>
@@ -74,6 +75,7 @@ import ReviewSettingEditButton from "../review/ReviewSettingEditButton.vue";
 import NoteEditButton from "./NoteEditButton.vue";
 import NoteSplitButton from "./NoteSplitButton.vue";
 import NoteTranslationButton from "./NoteTranslationButton.vue";
+import NoteDownloadButton from "./NoteDownloadButton.vue"
 import NoteNewButton from "./NoteNewButton.vue";
 import ViewTypeButtons from "./ViewTypeButtons.vue";
 import { storedApiDeleteNote } from "../../storedApi";
@@ -102,6 +104,7 @@ export default {
     NoteTranslationButton,
     NoteNewButton,
     ViewTypeButtons,
+    NoteDownloadButton
   },
   emits: ['updateLanguage'],
   computed: {
@@ -113,6 +116,9 @@ export default {
     updateLanguage(lan) {
       this.language = lan
       this.$emit('updateLanguage', lan)
+    },
+    async downloadMD(){
+
     },
     async deleteNote() {
       if (await this.$popups.confirm(`Are you sure to delete this note?`)) {
