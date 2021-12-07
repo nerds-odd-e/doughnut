@@ -13,11 +13,13 @@ export default {
   components: {
     SvgDownload,
   },
-  props: { noteId: [String, Number], language: String },
+  props: { note:Object },
   methods: {
     async saveAsMD(){
-        const blob = new Blob(["Hello, world!"], {type: "text/plain;charset=utf-8"});
-        await saveAs(blob, "Singapore.md");
+        const title = this.note.title
+        const description =  this.note.description
+        const blob = new Blob([description], {type: "text/plain;charset=utf-8"});
+        await saveAs(blob, `${title}.md`);
 
     }
   },
