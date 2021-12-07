@@ -284,14 +284,19 @@ class RestNoteControllerTests {
 
     @Nested
     class PatchNoteTest {
-        @Test
-        void shouldUpdateEnglishTitleSuccessfully() throws Exception {
-            Note note = makeMe.aNote().byUser(userModel).please();
+        Note note;
+        Timestamp currentTimeStamp;
+
+        @BeforeEach
+        void setup() throws IOException {
+            note = makeMe.aNote().byUser(userModel).please();
             NoteContent noteContent = makeMe.aNote().inMemoryPlease().getNoteContent();
             note.updateNoteContent(noteContent, userModel.getEntity());
+            currentTimeStamp = noteContent.getUpdatedAt();
+        }
 
-            Timestamp currentTimeStamp = noteContent.getUpdatedAt();
-
+        @Test
+        void shouldUpdateEnglishTitleSuccessfully() throws Exception {
             RestNoteController.PatchNoteContent patchNoteContent = new RestNoteController.PatchNoteContent();
             patchNoteContent.setTitle(note.getNoteContent().getTitle()+ "_new_title");
 
@@ -304,12 +309,6 @@ class RestNoteControllerTests {
 
         @Test
         void shouldUpdateEnglishDescriptionSuccessfully() throws Exception {
-            Note note = makeMe.aNote().byUser(userModel).please();
-            NoteContent noteContent = makeMe.aNote().inMemoryPlease().getNoteContent();
-            note.updateNoteContent(noteContent, userModel.getEntity());
-
-            Timestamp currentTimeStamp = noteContent.getUpdatedAt();
-
             RestNoteController.PatchNoteContent patchNoteContent = new RestNoteController.PatchNoteContent();
             patchNoteContent.setDescription(note.getNoteContent().getDescription()+ "_new_description");
 
@@ -317,6 +316,30 @@ class RestNoteControllerTests {
 
             assertNotNull(note);
             assertEquals(note.getNoteContent().getDescription(), patchNoteContent.getDescription());
+            assertNotEquals(currentTimeStamp, note.getNoteContent().getUpdatedAt());
+        }
+
+        @Test
+        void shouldUpdateIndonesiaTitleSuccessfully() throws Exception {
+            RestNoteController.PatchNoteContent patchNoteContent = new RestNoteController.PatchNoteContent();
+            patchNoteContent.setTitleIDN(note.getNoteContent().getTitleIDN()+ "_new_title_indonesia");
+
+            controller.patchNote(note.getId().toString(), patchNoteContent);
+
+            assertNotNull(note);
+            assertEquals(note.getNoteContent().getTitleIDN(), patchNoteContent.getTitleIDN());
+            assertNotEquals(currentTimeStamp, note.getNoteContent().getUpdatedAt());
+        }
+
+        @Test
+        void shouldUpdateIndonesiaDescriptionSuccessfully() throws Exception {
+            RestNoteController.PatchNoteContent patchNoteContent = new RestNoteController.PatchNoteContent();
+            patchNoteContent.setDescriptionIDN(note.getNoteContent().getDescriptionIDN()+ "_new_description_indonesia");
+
+            controller.patchNote(note.getId().toString(), patchNoteContent);
+
+            assertNotNull(note);
+            assertEquals(note.getNoteContent().getDescriptionIDN(), patchNoteContent.getDescriptionIDN());
             assertNotEquals(currentTimeStamp, note.getNoteContent().getUpdatedAt());
         }
 
