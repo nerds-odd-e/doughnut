@@ -10,6 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 
 import com.odde.doughnut.entities.Note;
@@ -155,6 +156,30 @@ class RestNoteControllerTests {
             NoteContent newContent = makeMe.aNote().inMemoryPlease().getNoteContent();
             controller.updateNote(note, newContent);
             assertThat(note.getNoteContent().getUploadPicture(), is(not(nullValue())));
+        }
+
+        @Test
+        void shouldNotBeAbleToSaveNoteWhenConflict() throws NoAccessRightException, IOException {
+            //simulate another user create
+            Note newNote = makeMe.aNote().byUser(userModel).please();
+
+            //simulate i made update
+            Integer newNoteId = newNote.getId();
+            modelFactoryService.findNoteById(newNoteId).ifPresent(modifiedNote->{
+                NoteContent modifiedContent = modifiedNote.getNoteContent();
+                modifiedContent.setTitle("modified Title");
+                modifiedContent.setDescription("modified Description");
+                try{
+                    controller.updateNote(modifiedNote, modifiedContent);
+                }
+                catch(Exception e){}
+            });
+            //simulate another users trying to update with new content
+            NoteContent newContent = makeMe.aNote().inMemoryPlease().getNoteContent();
+            newContent.setTitle("Avengers");
+            NoteViewedByUser response = controller.updateNote(newNote, newContent);
+            assertThat(newNote.getNoteContent().getTitle(), equalTo("modified Title"));
+            assertThat(response.isConflicting(), equalTo(true));
         }
     }
     @Nested

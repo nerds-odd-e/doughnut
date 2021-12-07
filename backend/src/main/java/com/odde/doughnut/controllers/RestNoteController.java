@@ -123,10 +123,18 @@ class RestNoteController {
     public NoteViewedByUser updateNote(@PathVariable(name = "note") Note note, @Valid @ModelAttribute NoteContent noteContent) throws NoAccessRightException, IOException {
         final UserModel user = currentUserFetcher.getUser();
         user.getAuthorization().assertAuthorization(note);
+        //detect updatedAt conflicting
+        Note currentNote = modelFactoryService.noteRepository.findById(note.getId()).orElseThrow();
+        if(!currentNote.getNoteContent().getUpdatedAt().equals(noteContent.getUpdatedAt())){
+            //conflict
+            return new NoteViewer(user.getEntity(), note, currentNote).toJsonObject();
+        }
+
         noteContent.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
         note.updateNoteContent(noteContent, user.getEntity());
         modelFactoryService.noteRepository.save(note);
         return new NoteViewer(user.getEntity(), note).toJsonObject();
+
     }
 
     @GetMapping("/{note}/statistics")

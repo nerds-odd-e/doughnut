@@ -18,11 +18,19 @@ public class NoteViewer {
 
     private User viewer;
     private Note note;
+    private Note conflictingNote;
 
     public NoteViewer(User viewer, Note note) {
 
         this.viewer = viewer;
         this.note = note;
+    }
+
+    public NoteViewer(User viewer, Note note, Note conflictingNote) {
+
+        this.viewer = viewer;
+        this.note = note;
+        this.conflictingNote = conflictingNote;
     }
 
     public NoteViewedByUser toJsonObject() {
@@ -37,6 +45,10 @@ public class NoteViewer {
         nvb.setNoteContent(note.getNoteContent());
         nvb.setLinks(getAllLinks());
         nvb.setChildrenIds(note.getChildren().stream().map(Note::getId).collect(Collectors.toUnmodifiableList()));
+        if(conflictingNote!=null){
+            nvb.setConflicting(true);
+        }
+
         return nvb;
     }
 
