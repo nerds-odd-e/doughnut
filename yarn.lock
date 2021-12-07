@@ -1054,9 +1054,9 @@
     "@types/istanbul-lib-report" "*"
 
 "@types/node@*", "@types/node@^16.7.12":
-  version "16.11.11"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-16.11.11.tgz#6ea7342dfb379ea1210835bada87b3c512120234"
-  integrity sha512-KB0sixD67CeecHC33MYn+eYARkqTheIRNuu97y2XMjR7Wu3XibO1vaY6VBV6O/a89SPI81cEUIYT87UqUWlZNw==
+  version "16.11.12"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-16.11.12.tgz#ac7fb693ac587ee182c3780c26eb65546a1a3c10"
+  integrity sha512-+2Iggwg7PxoO5Kyhvsq9VarmPbIelXP070HMImEpbtGCoyWNINQj4wzjbQCXzdHTRXnqufutJb5KAURZANNBAw==
 
 "@types/node@^14.14.31":
   version "14.18.0"
@@ -2031,6 +2031,11 @@ cucumber@^4.2.1:
     title-case "^2.1.1"
     util-arity "^1.0.2"
     verror "^1.9.0"
+
+cy-verify-downloads@^0.0.5:
+  version "0.0.5"
+  resolved "https://registry.yarnpkg.com/cy-verify-downloads/-/cy-verify-downloads-0.0.5.tgz#2f9c7da0f5fda125ecef2f19ca2b83b1890d3037"
+  integrity sha512-aRK7VvKG5rmDJK4hjZ27KM2oOOz0cMO7z/j4zX8qCc4ffXZS1XRJkofUY0w5u6MCB/wUsNMs03VuvkeR2tNPoQ==
 
 cypress-cucumber-preprocessor@4.3.1:
   version "4.3.1"

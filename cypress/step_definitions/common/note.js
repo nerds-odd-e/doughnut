@@ -8,6 +8,9 @@ import {
   Then,
   When,
 } from "cypress-cucumber-preprocessor/steps";
+const path = require("path");
+
+
 
 Given("there are some notes for the current user", (data) => {
   cy.seedNotes(data.hashes());
@@ -342,3 +345,12 @@ When("I edit note translation to become", (data) => {
   cy.submitNoteTranslationFormsWith(data.hashes());
 });
 
+
+When("I open my note the download button is there", () => {
+  cy.get('#note-download-button');
+});
+
+Then("I click download button for {string} note", (title) => {
+  cy.get('#note-download-button').click();
+  cy.verifyDownload(`${title}.md`);
+});

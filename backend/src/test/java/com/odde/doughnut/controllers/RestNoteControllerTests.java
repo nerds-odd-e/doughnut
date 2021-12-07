@@ -32,6 +32,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
@@ -309,14 +310,17 @@ class RestNoteControllerTests {
 
     @Nested
     class PatchNoteTest {
-        @Test
-        void shouldUpdateEnglishTitleSuccessfully() throws Exception {
-            Note note = makeMe.aNote().byUser(userModel).please();
+        Note note;
+
+        @BeforeEach
+        void setup() throws IOException {
+            note = makeMe.aNote().byUser(userModel).please();
             NoteContent noteContent = makeMe.aNote().inMemoryPlease().getNoteContent();
             note.updateNoteContent(noteContent, userModel.getEntity());
+        }
 
-            Timestamp currentTimeStamp = noteContent.getUpdatedAt();
-
+        @Test
+        void shouldUpdateEnglishTitleSuccessfully() throws Exception {
             RestNoteController.PatchNoteContent patchNoteContent = new RestNoteController.PatchNoteContent();
             patchNoteContent.setTitle(note.getNoteContent().getTitle()+ "_new_title");
 
@@ -324,17 +328,10 @@ class RestNoteControllerTests {
 
             assertNotNull(note);
             assertEquals(note.getNoteContent().getTitle(), patchNoteContent.getTitle());
-            assertNotEquals(currentTimeStamp, note.getNoteContent().getUpdatedAt());
         }
 
         @Test
         void shouldUpdateEnglishDescriptionSuccessfully() throws Exception {
-            Note note = makeMe.aNote().byUser(userModel).please();
-            NoteContent noteContent = makeMe.aNote().inMemoryPlease().getNoteContent();
-            note.updateNoteContent(noteContent, userModel.getEntity());
-
-            Timestamp currentTimeStamp = noteContent.getUpdatedAt();
-
             RestNoteController.PatchNoteContent patchNoteContent = new RestNoteController.PatchNoteContent();
             patchNoteContent.setDescription(note.getNoteContent().getDescription()+ "_new_description");
 
@@ -342,7 +339,42 @@ class RestNoteControllerTests {
 
             assertNotNull(note);
             assertEquals(note.getNoteContent().getDescription(), patchNoteContent.getDescription());
-            assertNotEquals(currentTimeStamp, note.getNoteContent().getUpdatedAt());
+        }
+
+        @Test
+        void shouldUpdateIndonesiaTitleSuccessfully() throws Exception {
+            RestNoteController.PatchNoteContent patchNoteContent = new RestNoteController.PatchNoteContent();
+            patchNoteContent.setTitleIDN(note.getNoteContent().getTitleIDN()+ "_new_title_indonesia");
+
+            controller.patchNote(note.getId().toString(), patchNoteContent);
+
+            assertNotNull(note);
+            assertEquals(note.getNoteContent().getTitleIDN(), patchNoteContent.getTitleIDN());
+        }
+
+        @Test
+        void shouldUpdateIndonesiaDescriptionSuccessfully() throws Exception {
+            RestNoteController.PatchNoteContent patchNoteContent = new RestNoteController.PatchNoteContent();
+            patchNoteContent.setDescriptionIDN(note.getNoteContent().getDescriptionIDN()+ "_new_description_indonesia");
+
+            controller.patchNote(note.getId().toString(), patchNoteContent);
+
+            assertNotNull(note);
+            assertEquals(note.getNoteContent().getDescriptionIDN(), patchNoteContent.getDescriptionIDN());
+        }
+
+        @Test
+        void shouldNotBeAbleUpdateInvalidNoteId() {
+            assertThrows(ResponseStatusException.class, () -> controller.patchNote(note.getId().toString()+"01",
+                    new RestNoteController.PatchNoteContent()));
+        }
+
+        @Test
+        void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
+            User otherUser = makeMe.aUser().please();
+            Note unAuthorizeNote = makeMe.aNote().byUser(otherUser).please();
+            assertThrows(NoAccessRightException.class, () -> controller.patchNote(unAuthorizeNote.getId().toString(),
+                    new RestNoteController.PatchNoteContent()));
         }
 
     }

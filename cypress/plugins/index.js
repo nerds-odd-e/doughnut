@@ -15,6 +15,8 @@
 
 const cucumber = require("cypress-cucumber-preprocessor").default;
 const browserify = require("@cypress/browserify-preprocessor");
+const { isFileExist } = require('cy-verify-downloads');
+
 // const getCompareSnapshotsPlugin = require('cypress-image-diff-js/dist/plugin');
 const fs = require("fs-extra");
 const path = require("path");
@@ -29,6 +31,8 @@ module.exports = (on, config) => {
   options.browserifyOptions.plugin.unshift(["tsify"]);
   on("file:preprocessor", cucumber(options));
 
+  on('task', { isFileExist })
+  
   const file = config.env.configFile || "ci";
   console.table(`<<<<<< CYPRESS RUN ENV: ${file} >>>>>>`);
   return getConfigurationByFile(file);
