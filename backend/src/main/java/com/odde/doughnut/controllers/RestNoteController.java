@@ -17,13 +17,17 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.persistence.Column;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Null;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/notes")
+public
 class RestNoteController {
     private final ModelFactoryService modelFactoryService;
     private final CurrentUserFetcher currentUserFetcher;
@@ -55,6 +59,25 @@ class RestNoteController {
         @Valid
         @NotNull
         private NoteContent noteContent = new NoteContent();
+    }
+
+    public static class PatchNoteContent {
+        @Getter
+        @Setter
+        @Null
+        private String title;
+        @Getter
+        @Setter
+        @Null
+        private String description;
+        @Getter
+        @Setter
+        @Null
+        private String titleIDN;
+        @Getter
+        @Setter
+        @Null
+        private String descriptionIDN;
     }
 
     @PostMapping(value = "/{parentNote}/create")
@@ -163,4 +186,20 @@ class RestNoteController {
         return NotesBulk.jsonNoteWithChildren(note, userModel);
     }
 
+    @PatchMapping(value = "/{noteId}")
+    @Transactional
+    public NoteContent patchNote(@PathVariable("noteId") String noteId, @Valid @RequestBody PatchNoteContent patchNoteContent) throws Exception {
+        final UserModel user = currentUserFetcher.getUser();
+        Optional<Note> noteObject = modelFactoryService.noteRepository.findById(Integer.parseInt(noteId));
+        if (noteObject.isEmpty()) {
+            throw new Exception("Invalid Note Id");
+        }
+        Note note = noteObject.get();
+        user.getAuthorization().assertAuthorization(note);
+
+
+        modelFactoryService.noteRepository.save(note);
+
+        return new NoteContent();
+    }
 }
