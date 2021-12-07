@@ -19,3 +19,4 @@ Feature: Note overview with nested children
     And I should see "Top" in breadcrumb
     When I double click "Singapore" and edit the description to "Founded in 1819"
     Then I should see "Founded in 1819" in the page
+    When I open my note the download button is there

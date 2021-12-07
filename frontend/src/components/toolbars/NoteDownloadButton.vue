@@ -1,5 +1,5 @@
 <template>
-  <button class="btn btn-small" title="Download as MD" >
+  <button class="btn btn-small" title="Download as MD" id="note-download-button" >
     <SvgDownload />
   </button>
 </template>

@@ -342,3 +342,7 @@ When("I edit note translation to become", (data) => {
   cy.submitNoteTranslationFormsWith(data.hashes());
 });
 
+
+When("I open my note the download button is there", () => {
+  cy.get('#note-download-button');
+});
