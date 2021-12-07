@@ -66,19 +66,15 @@ class RestNoteController {
     public static class PatchNoteContent {
         @Getter
         @Setter
-        @Null
         private String title;
         @Getter
         @Setter
-        @Null
         private String description;
         @Getter
         @Setter
-        @Null
         private String titleIDN;
         @Getter
         @Setter
-        @Null
         private String descriptionIDN;
     }
 
