@@ -26,6 +26,7 @@
 
 import "@testing-library/cypress/add-commands";
 import "cypress-file-upload";
+require('cy-verify-downloads').addCustomCommand();
 
 // const compareSnapshotCommand = require('cypress-image-diff-js/dist/command');
 // compareSnapshotCommand();
@@ -33,6 +34,7 @@ import "cypress-file-upload";
 Cypress.Commands.add("pageIsLoaded", () => {
   cy.get(".loading-bar").should("not.exist");
 });
+
 
 Cypress.Commands.add("loginAs", (username) => {
   const password = "password";
