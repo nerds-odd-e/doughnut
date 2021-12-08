@@ -8,8 +8,7 @@ Feature: Synchronize Translation
       | English | Indonesia | English Language | Bahasa Indonesia |
     And I open the "article" view of note "English"
 
-  @ignore
-  @featureToggle
+  @ignore @featureToggle
   Scenario: Should display outdated tag on Indonesian translation
     When I edit english note translation to become
       | Title   |
