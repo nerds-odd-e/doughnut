@@ -60,7 +60,7 @@
       <NoteTranslationButton v-if="featureToggle" :noteId="note.id" :note="note"
         @updateLanguage="updateLanguage"
       />
-      <NoteDownloadButton :note="note" />
+      <NoteDownloadButton :note="note" v-if="featureToggle" />
     </div>
   </div>
 </template>

@@ -346,16 +346,12 @@ When("I edit note translation to become", (data) => {
 });
 
 
-When("I open my note the download button is there", () => {
-  cy.get('#note-download-button');
+
+Then("I download note", () => {
+  cy.get('#note-download-button').click();
 });
 
-Then("I click download button for {string} note", (title) => {
-  cy.get('#note-download-button').click();
-  cy.verifyDownload(`${title}.md`);
-});
-  
-When("I edit english note translation to become", (data) => {
-  cy.clickNoteToolbarButton("edit note");
-  cy.submitNoteFormsWith(data.hashes());
+Then("There is a {string} file downloaded", (fileName) => {
+  cy.verifyDownload(fileName);
+  cy.cleanDownloadFolder();
 });

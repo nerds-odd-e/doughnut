@@ -36,6 +36,12 @@ Cypress.Commands.add("pageIsLoaded", () => {
 });
 
 
+Cypress.Commands.add("cleanDownloadFolder", () => {
+  const downloadsFolder = Cypress.config("downloadsFolder");
+  cy.exec(`rm -rf ${downloadsFolder}/*`)
+});
+
+
 Cypress.Commands.add("loginAs", (username) => {
   const password = "password";
   cy.request({
