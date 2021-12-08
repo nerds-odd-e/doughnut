@@ -1,13 +1,18 @@
 <template>
   <div class="note-content">
     <template v-if="!!translatedNote.description">
-      <ShowDescription
-        v-if="size==='large'"
-        class="col"
-        :description="translatedNote.description"
-      />
-      <NoteShortDescription class="col" v-if="size==='medium'" :shortDescription="translatedNote.shortDescription"/>
-      <SvgDescriptionIndicator v-if="size==='small'" class="description-indicator"/>
+      <div class="note-content" @click="inPlaceButton" v-if="!isEditingDescription">
+        <ShowDescription
+          v-if="size==='large'"
+          class="col"
+          :description="translatedNote.description"
+        />
+        <NoteShortDescription class="col" v-if="size==='medium'" :shortDescription="translatedNote.shortDescription"/>
+        <SvgDescriptionIndicator v-if="size==='small'" class="description-indicator"/>
+      </div>
+      <div class="note-content-description" @click="inPlaceButton" v-if="isEditingDescription">
+        <TextArea scopeName="note" v-model="translatedNote.description" :autofocus="true"/>
+      </div>
     </template>
     <template v-if="!!note.notePicture">
       <ShowPicture
@@ -39,12 +44,15 @@ import SvgDescriptionIndicator from "../svgs/SvgDescriptionIndicator.vue";
 import SvgPictureIndicator from "../svgs/SvgPictureIndicator.vue";
 import SvgUrlIndicator from "../svgs/SvgUrlIndicator.vue";
 import { TranslatedNoteWrapper } from "../../models/languages";
+import TextArea from "../form/TextArea.vue";
 
 export default {
   props: {
     note: Object,
     size: { type: String, default: 'large'},
     language: String,
+    isEditingTitle: Boolean,
+    isEditingDescription: Boolean,
   },
   components: {
     NoteShortDescription,
@@ -53,6 +61,12 @@ export default {
     SvgDescriptionIndicator,
     SvgPictureIndicator,
     SvgUrlIndicator,
+    TextArea
+  },
+  data() {
+    return {
+      isEditingDescription: false,
+    };
   },
   computed: {
     twoColumns() {
@@ -62,6 +76,17 @@ export default {
       return new TranslatedNoteWrapper(this.note, this.language);
     },
   },
+  methods: {
+    inPlaceButton() {
+        if (this.isEditingDescription) {
+          this.isEditingDescription = false;
+        } else{
+          this.isEditingDescription = true;
+          this.$refs.email.$el.focus()
+        }
+      
+    },
+  },
 };
 </script>
 
@@ -69,10 +94,14 @@ export default {
 .note-content
   display: flex
   flex-wrap: wrap
+.note-content-description
+  width: 100%
+  display: inline
 
   .col
     flex: 1 1 auto
     width: 50%
+
 
 
 </style>

@@ -4,7 +4,12 @@
     v-bind="{ id: note.id, updatedAt: note.noteContent?.updatedAt, language }"
   >
     <NoteFrameOfLinks v-bind="{ links: note.links }">
-      <h2 role="title" class="note-title">{{ translatedNote.title }}</h2>
+      <div @click="inPlaceButton" v-if="!isEditingTitle">
+        <h2 role="title" class="note-title">{{ translatedNote.title }}</h2>
+      </div>
+      <div @click="inPlaceButton" v-if="isEditingTitle">
+        <TextInput scopeName="note" v-model="translatedNote.title" :autofocus="true"/>
+      </div>
       <p
         style="color: red"
         role="title-fallback"
@@ -12,12 +17,13 @@
       >
         No translation available
       </p>
-      <NoteContent v-bind="{ note, language }" />
+      <NoteContent v-bind="{ note, language, isEditingTitle}" />
     </NoteFrameOfLinks>
   </NoteShell>
 </template>
 
 <script>
+import TextInput from "../form/TextInput.vue";
 import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
 import NoteShell from "./NoteShell.vue";
 import NoteContent from "./NoteContent.vue";
@@ -28,15 +34,31 @@ export default {
   props: {
     note: Object,
     language: String,
+    isEditingTitle: Boolean
   },
   components: {
     NoteFrameOfLinks,
     NoteShell,
     NoteContent,
+    TextInput
+  },
+  data() {
+    return {
+      isEditingTitle: false,
+    };
   },
   computed: {
     translatedNote(){
-      return new TranslatedNoteWrapper(this.note, this.language);
+      return new TranslatedNoteWrapper(this.note, this.language, this.isEditingTitle);
+    },
+  },
+  methods: {
+    inPlaceButton() {
+      if (this.isEditingTitle) {
+        this.isEditingTitle = false;
+      } else{
+        this.isEditingTitle = true;
+      }
     },
   },
 };
