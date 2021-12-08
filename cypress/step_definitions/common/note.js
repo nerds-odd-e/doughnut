@@ -346,7 +346,6 @@ When("I edit note translation to become", (data) => {
 });
 
 
-
 Then("I download note", () => {
   cy.get('#note-download-button').click();
 });
@@ -354,4 +353,9 @@ Then("I download note", () => {
 Then("There is a {string} file downloaded", (fileName) => {
   cy.verifyDownload(fileName);
   cy.cleanDownloadFolder();
+});
+
+When("I edit english note translation to become", (data) => {
+  cy.clickNoteToolbarButton("edit note");
+  cy.submitNoteFormsWith(data.hashes());
 });
