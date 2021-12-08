@@ -2,6 +2,7 @@ package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.NoteContent;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.json.LinkViewed;
 import com.odde.doughnut.entities.json.NotePositionViewedByUser;
@@ -18,7 +19,7 @@ public class NoteViewer {
 
     private User viewer;
     private Note note;
-    private Note conflictingNote;
+    private NoteContent conflictingNote;
 
     public NoteViewer(User viewer, Note note) {
 
@@ -26,7 +27,7 @@ public class NoteViewer {
         this.note = note;
     }
 
-    public NoteViewer(User viewer, Note note, Note conflictingNote) {
+    public NoteViewer(User viewer, Note note, NoteContent conflictingNote) {
 
         this.viewer = viewer;
         this.note = note;
@@ -47,6 +48,7 @@ public class NoteViewer {
         nvb.setChildrenIds(note.getChildren().stream().map(Note::getId).collect(Collectors.toUnmodifiableList()));
         if(conflictingNote!=null){
             nvb.setConflicting(true);
+            nvb.setConflictingNoteContent(conflictingNote);
         }
 
         return nvb;

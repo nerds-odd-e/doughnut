@@ -54,4 +54,8 @@ public class NoteViewedByUser {
     @Setter
     private boolean conflicting;
 
+    @Getter
+    @Setter
+    private NoteContent conflictingNoteContent;
+
 }

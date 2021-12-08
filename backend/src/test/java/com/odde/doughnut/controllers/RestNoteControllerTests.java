@@ -165,17 +165,12 @@ class RestNoteControllerTests {
             Note newNote = makeMe.aNote().byUser(userModel).please();
 
             //simulate i made update
-            Integer newNoteId = newNote.getId();
-            modelFactoryService.findNoteById(newNoteId).ifPresent(modifiedNote->{
-                NoteContent modifiedContent = modifiedNote.getNoteContent();
-                modifiedContent.setTitle("modified Title");
-                modifiedContent.setDescription("modified Description");
-                try{
-                    controller.updateNote(modifiedNote, modifiedContent);
-                }
-                catch(Exception e){}
-            });
-            //simulate another users trying to update with new content
+            NoteContent modifiedContent = newNote.getNoteContent();
+            modifiedContent.setTitle("modified Title");
+            modifiedContent.setDescription("modified Description");
+            controller.updateNote(newNote, modifiedContent);
+
+            //simulate another users trying to update with new title
             NoteContent newContent = makeMe.aNote().inMemoryPlease().getNoteContent();
             newContent.setTitle("Avengers");
             NoteViewedByUser response = controller.updateNote(newNote, newContent);
