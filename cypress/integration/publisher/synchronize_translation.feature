@@ -20,15 +20,15 @@ Feature: Synchronize Translation
   @ignore @featureToggle
   Scenario: Should not display outdated tag on Indonesian translation
     When I edit note translation to become
-      | Title in Indonesian   |
-      | Bahasa indonesia |
+      | Title in Indonesian |
+      | Bahasa indonesia    |
     And Note title on the page should be "Bahasa indonesia"
     Then I should not see outdated tag
 
   @ignore @featureToggle
   Scenario: Should remove outdated tag
     When I edit outdated indonesian translation to become
-      | Title in Indonesian   |
-      | Bahasa indonesia |
+      | Title in Indonesian |
+      | Bahasa indonesia    |
     And Note title on the page should be "Bahasa indonesia"
     Then I should not see outdated tag
