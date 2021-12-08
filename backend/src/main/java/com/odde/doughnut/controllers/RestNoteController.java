@@ -100,13 +100,11 @@ class RestNoteController {
         final UserModel user = currentUserFetcher.getUser();
         user.getAuthorization().assertAuthorization(note);
 
-        noteContent.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
-        //detect updatedAt conflicting
         if(noteContent.getUpdatedAt()!=null && !note.getNoteContent().getUpdatedAt().equals(noteContent.getUpdatedAt())){
-            //conflict
             return new NoteViewer(user.getEntity(), note, noteContent).toJsonObject();
         }
 
+        noteContent.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
         note.updateNoteContent(noteContent, user.getEntity());
         modelFactoryService.noteRepository.save(note);
         return new NoteViewer(user.getEntity(), note).toJsonObject();
