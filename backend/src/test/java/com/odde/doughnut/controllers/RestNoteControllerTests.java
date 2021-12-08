@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
 import java.util.List;
@@ -157,22 +158,22 @@ class RestNoteControllerTests {
         }
 
         @Test
-        void shouldNotBeAbleToSaveNoteWhenConflict() throws NoAccessRightException, IOException {
-            //simulate another user create
+        void shouldNotBeAbleToSaveNoteWhenConflictAndReturnConflictNote() throws NoAccessRightException, IOException {
             Note newNote = makeMe.aNote().byUser(userModel).please();
 
-            //simulate i made update
             NoteContent modifiedContent = newNote.getNoteContent();
             modifiedContent.setTitle("modified Title");
             modifiedContent.setDescription("modified Description");
             controller.updateNote(newNote, modifiedContent);
 
-            //simulate another users trying to update with new title
             NoteContent newContent = makeMe.aNote().inMemoryPlease().getNoteContent();
             newContent.setTitle("Avengers");
             NoteViewedByUser response = controller.updateNote(newNote, newContent);
-            assertThat(newNote.getNoteContent().getTitle(), equalTo("modified Title"));
+
+            assertThat(newNote.getNoteContent().getTitle(), equalTo(modifiedContent.getTitle()));
             assertThat(response.isConflicting(), equalTo(true));
+            assertThat(response.getConflictingNoteContent().getTitle(), equalTo(newContent.getTitle()));
+            assertThat(response.getConflictingNoteContent().getDescription(), equalTo(newContent.getDescription()));
         }
 
         @Test
