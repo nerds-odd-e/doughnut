@@ -13,19 +13,14 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import javax.annotation.Resource;
-import javax.persistence.Column;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Null;
 import java.io.IOException;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/notes")
@@ -61,21 +56,6 @@ class RestNoteController {
         @Valid
         @NotNull
         private NoteContent noteContent = new NoteContent();
-    }
-
-    public static class PatchNoteContent {
-        @Getter
-        @Setter
-        private String title;
-        @Getter
-        @Setter
-        private String description;
-        @Getter
-        @Setter
-        private String titleIDN;
-        @Getter
-        @Setter
-        private String descriptionIDN;
     }
 
     @PostMapping(value = "/{parentNote}/create")
@@ -114,11 +94,13 @@ class RestNoteController {
         return NotesBulk.jsonNoteWitheDescendants(note, user);
     }
 
-    @PostMapping(path = "/{note}")
+    @PatchMapping(path = "/{note}")
     @Transactional
     public NoteViewedByUser updateNote(@PathVariable(name = "note") Note note, @Valid @ModelAttribute NoteContent noteContent) throws NoAccessRightException, IOException {
         final UserModel user = currentUserFetcher.getUser();
         user.getAuthorization().assertAuthorization(note);
+
+        noteContent.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
         //detect updatedAt conflicting
         Note currentNote = modelFactoryService.noteRepository.findById(note.getId()).orElseThrow();
         if(!currentNote.getNoteContent().getUpdatedAt().equals(noteContent.getUpdatedAt())){
@@ -126,7 +108,6 @@ class RestNoteController {
             return new NoteViewer(user.getEntity(), note, currentNote).toJsonObject();
         }
 
-        noteContent.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
         note.updateNoteContent(noteContent, user.getEntity());
         modelFactoryService.noteRepository.save(note);
         return new NoteViewer(user.getEntity(), note).toJsonObject();
@@ -190,23 +171,5 @@ class RestNoteController {
         modelFactoryService.noteRepository.save(note);
 
         return NotesBulk.jsonNoteWithChildren(note, userModel);
-    }
-
-    @PatchMapping(value = "/{noteId}")
-    @Transactional
-    public NoteContent patchNote(@PathVariable("noteId") String noteId, @Valid @RequestBody PatchNoteContent patchNoteContent) throws Exception {
-        final UserModel user = currentUserFetcher.getUser();
-        Optional<Note> noteObject = modelFactoryService.findNoteById(Integer.parseInt(noteId));
-        if (noteObject.isEmpty()) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, "Note Not Found");
-        }
-        Note note = noteObject.get();
-        user.getAuthorization().assertAuthorization(note);
-
-        note.patchNoteContentInformation(note, patchNoteContent, testabilitySettings.getCurrentUTCTimestamp());
-        modelFactoryService.noteRepository.save(note);
-
-        return note.getNoteContent();
     }
 }

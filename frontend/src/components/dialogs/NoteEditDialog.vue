@@ -7,7 +7,7 @@
 
 <script>
 import NoteFormBody from "../notes/NoteFormBody.vue";
-import { restPostMultiplePartForm } from "../../restful/restful";
+import { restPatchMultiplePartForm } from "../../restful/restful";
 import { storedApiGetNoteAndItsChildren } from "../../storedApi";
 
 export default {
@@ -38,7 +38,7 @@ export default {
     },
 
     processForm() {
-      restPostMultiplePartForm(
+      restPatchMultiplePartForm(
         `/api/notes/${this.noteId}`,
         this.formData,
         (r) => (this.loading = r)
