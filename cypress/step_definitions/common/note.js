@@ -365,3 +365,24 @@ When("I edit note title to become {string}", (data) => {
   cy.clickNoteToolbarButton("edit note");
   cy.submitNoteTranslationFormsWith(data.hashes());
 });
+
+When("Another user updates note {string} with:", (noteTitle, data) => {
+  cy.loginAs("another_old_learner");
+  let fields = data.hashes()[0];
+  cy.request({
+    method: "PATCH",
+    url: "/api/notes/1",
+    form: true,
+    body: { 
+      title: fields['Title'],
+      description: fields['Description']
+    },
+  }).then((response) => {
+    expect(response.status).to.equal(200);
+    cy.loginAs("old_learner");
+  });
+});
+
+Then("I should see {string} message", (messageContent) => {
+  cy.contains(messageContent).should('exist');
+});
