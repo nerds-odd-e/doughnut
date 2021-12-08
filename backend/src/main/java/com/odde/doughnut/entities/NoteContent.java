@@ -99,6 +99,11 @@ public class NoteContent {
     @Setter
     private Timestamp updatedAt;
 
+    @Column(name = "is_outdated_translation_idn")
+    @Getter
+    @Setter
+    private Boolean isTranslationOutdatedIDN;
+
     @JsonIgnore
     public String getNotePicture() {
         if (uploadPicture != null) {

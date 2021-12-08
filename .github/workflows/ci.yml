@@ -289,19 +289,8 @@ jobs:
         with:
           status: failure
           fields: repo,commit,message,author,action,workflow,eventName
-
-  Discord-Notify:
-    name: Discord notification
-    runs-on: ubuntu-20.04
-    needs:
-      - Backend-unit-tests
-      - Frontend-linting
-      - Frontend-unit-tests
-      - E2E-tests
-      - Package-n-Deploy
-    if: ${{ always() }}
-    steps:
       - uses: nobrayner/discord-webhook@v1
+        if: env.WORKFLOW_CONCLUSION == 'failure'
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           discord-webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}

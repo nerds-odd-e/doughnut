@@ -14,7 +14,7 @@
 
 <script>
 import NoteTranslationEditForm from "../notes/NoteTranslationEditForm.vue";
-import { restPostMultiplePartForm } from "../../restful/restful";
+import { restPatchMultiplePartForm } from "../../restful/restful";
 import { storedApiGetNoteAndItsChildren } from "../../storedApi";
 
 export default {
@@ -46,7 +46,7 @@ export default {
       const noteContent = {...note.noteContent}
       delete noteContent.updatedAt
 
-      restPostMultiplePartForm(
+      restPatchMultiplePartForm(
         `/api/notes/${this.noteId}`,
         {...noteContent, ...this.formData},
         (result) => (this.loading = result)
