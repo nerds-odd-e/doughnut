@@ -359,3 +359,9 @@ When("I edit english note translation to become", (data) => {
   cy.clickNoteToolbarButton("edit note");
   cy.submitNoteFormsWith(data.hashes());
 });
+
+When("I edit note title to become {string}", (data) => {
+  cy.clickTranslationButton("title");
+  cy.clickNoteToolbarButton("edit note");
+  cy.submitNoteTranslationFormsWith(data.hashes());
+});
