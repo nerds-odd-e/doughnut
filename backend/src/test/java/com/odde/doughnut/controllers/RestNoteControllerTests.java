@@ -177,6 +177,7 @@ class RestNoteControllerTests {
 
         @Test
         void shouldSetTranslationOutdatedTagWhenUpdatingEnglishNoteAndIndonesianTranslationIsAvailable() throws NoAccessRightException, IOException {
+            note.getNoteContent().setTitleIDN("indonesian");
             NoteViewedByUser response = controller.updateNote(note, note.getNoteContent());
 
             assertEquals(true, response.getNoteContent().getIsTranslationOutdatedIDN());
@@ -189,7 +190,18 @@ class RestNoteControllerTests {
 
             NoteViewedByUser response = controller.updateNote(note, newContent);
 
-            assertEquals(false, response.getNoteContent().getIsTranslationOutdatedIDN());
+            assertEquals(note.getNoteContent().getIsTranslationOutdatedIDN(), response.getNoteContent().getIsTranslationOutdatedIDN());
+        }
+
+        @Test
+        void shouldNotSetTranslationOutdatedTagWhenUpdatingIndonesianTranslation() throws NoAccessRightException, IOException {
+            note.getNoteContent().setTitleIDN("indonesia");
+            NoteContent newContent = makeMe.aNote().inMemoryPlease().getNoteContent();
+            newContent.setTitleIDN("bahasa");
+
+            NoteViewedByUser response = controller.updateNote(note, newContent);
+
+            assertEquals(note.getNoteContent().getIsTranslationOutdatedIDN(), response.getNoteContent().getIsTranslationOutdatedIDN());
         }
     }
     @Nested
