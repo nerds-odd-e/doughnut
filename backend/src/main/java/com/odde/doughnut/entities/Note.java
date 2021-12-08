@@ -217,6 +217,15 @@ public class Note {
 
     public void updateNoteContent(NoteContent noteContent, User user) throws IOException {
         noteContent.fetchUploadedPicture(user);
+
+        if (getNoteContent().getTitleIDN() == null) {
+            noteContent.setIsTranslationOutdatedIDN(false);
+        }
+
+        if (getNoteContent().getTitleIDN() != null) {
+            noteContent.setIsTranslationOutdatedIDN(true);
+        }
+
         mergeNoteContent(noteContent);
     }
 
