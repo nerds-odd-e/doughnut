@@ -41,7 +41,6 @@ Cypress.Commands.add("cleanDownloadFolder", () => {
   cy.exec(`rm -rf ${downloadsFolder}/*`)
 });
 
-
 Cypress.Commands.add("loginAs", (username) => {
   const password = "password";
   cy.request({
