@@ -181,7 +181,7 @@ class RestNoteControllerTests {
             note.getNoteContent().setTitleIDN("indonesian");
             NoteViewedByUser response = controller.updateNote(note, note.getNoteContent());
 
-            assertEquals(true, response.getNoteContent().getIsTranslationOutdatedIDN());
+            assertTrue(response.getNoteContent().getIsTranslationOutdatedIDN());
         }
 
         @Test
@@ -210,7 +210,7 @@ class RestNoteControllerTests {
             note.getNoteContent().setDescriptionIDN("bahasa indonesia");
             NoteViewedByUser response = controller.updateNote(note, note.getNoteContent());
 
-            assertEquals(true, response.getNoteContent().getIsTranslationOutdatedIDN());
+            assertTrue(response.getNoteContent().getIsTranslationOutdatedIDN());
         }
     }
     @Nested
