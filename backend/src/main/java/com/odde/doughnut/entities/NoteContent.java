@@ -166,4 +166,19 @@ public class NoteContent {
         }
         return false;
     }
+
+    @JsonIgnore
+    private boolean isEnglishTranslationUpdated(NoteContent updatedNoteContent) {
+        return !this.title.equals(updatedNoteContent.title) || !this.description.equals(updatedNoteContent.description);
+    }
+
+    @JsonIgnore
+    private boolean isIndonesianTranslationAvailable() {
+        return (this.titleIDN != null) || (this.descriptionIDN != null);
+    }
+
+    @JsonIgnore
+    public boolean isTranslationOutdated(NoteContent updatedNoteContent) {
+        return this.isEnglishTranslationUpdated(updatedNoteContent) && this.isIndonesianTranslationAvailable();
+    }
 }
