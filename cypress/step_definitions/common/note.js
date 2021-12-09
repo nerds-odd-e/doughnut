@@ -349,7 +349,7 @@ Then("I download note", () => {
 
 Then("There is a {string} file downloaded", (fileName) => {
   cy.verifyDownload(fileName);
-  cy.cleanDownloadFolder();
+  // cy.cleanDownloadFolder();
 });
 
 When("I edit english note translation to become", (data) => {
@@ -379,5 +379,10 @@ When("Another user updates note {string} with:", (noteTitle, data) => {
 });
 
 Then("I should see {string} message", (messageContent) => {
-  cy.contains(messageContent).should("exist");
+  cy.contains(messageContent).should('exist');
 });
+
+And("the file {string} content is",(fileName, mdContent) => {
+  const downloadsFolder = Cypress.config("downloadsFolder");
+  cy.readFile(`${downloadsFolder}/${fileName}`).should("eq", mdContent);
+})

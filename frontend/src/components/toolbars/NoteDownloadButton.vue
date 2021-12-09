@@ -9,14 +9,20 @@ import SvgDownload from "../svgs/SvgDownload.vue";
 import { saveAs } from 'file-saver';
 
 const generateMD = ({title, description, image, url}) => {
-    return `# ${title}
-    
-    ${description}
-
-    ![alt text](${image})
-
-    [${url}](${url})
-    `
+    let mdString = ""
+    if(title){
+      mdString += "# " + title  + "\n"
+    }
+    if(description){
+      mdString += description + "\n"
+    }
+    if(image){
+        mdString += `!(image)[${window.location.origin + image}]` + "\n"
+    }
+    if(url){
+        mdString += `(url)[${url}]` + "\n"
+    }
+    return mdString
 }
 
 export default {
@@ -27,8 +33,9 @@ export default {
   props: { note:Object },
   methods: {
     async saveAsMD(){
+        console.log(this.note)
         const title = this.note.title
-        const mdString = generateMD({...this.note})
+        const mdString = generateMD({...this.note.noteContent, image: this.note.notePicture})
         const blob = new Blob([mdString], {type: "text/plain;charset=utf-8"});
         await saveAs(blob, `${title}.md`);
 
