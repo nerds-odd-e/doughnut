@@ -16,6 +16,6 @@ Feature: Download Note to .md file
     """md
     # Singapore
     Singapore is great
-    !(image)[https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1255573980l/1713426.jpg]
-    (url)[http://localhost:3000/]
+    ![image](https://i.gr-assets.com/images/S/compressed.photo.goodreads.com/books/1255573980l/1713426.jpg)
+    [url](http://localhost:3000/)
     """

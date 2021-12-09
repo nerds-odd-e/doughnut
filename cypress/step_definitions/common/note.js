@@ -349,7 +349,7 @@ Then("I download note", () => {
 
 Then("There is a {string} file downloaded", (fileName) => {
   cy.verifyDownload(fileName);
-  // cy.cleanDownloadFolder();
+//   cy.cleanDownloadFolder();
 });
 
 When("I edit english note translation to become", (data) => {
