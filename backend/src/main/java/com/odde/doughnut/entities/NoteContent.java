@@ -169,7 +169,7 @@ public class NoteContent {
 
     @JsonIgnore
     private boolean isEnglishTranslationUpdated(NoteContent updatedNoteContent) {
-        return !this.title.equals(updatedNoteContent.title) || !this.description.equals(updatedNoteContent.description);
+        return !(updatedNoteContent.title.equals(this.title)) || !(updatedNoteContent.description.equals(this.description));
     }
 
     @JsonIgnore

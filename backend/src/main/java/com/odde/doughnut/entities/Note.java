@@ -218,12 +218,7 @@ public class Note {
     public void updateNoteContent(NoteContent noteContent, User user) throws IOException {
         noteContent.fetchUploadedPicture(user);
 
-        boolean isEnglishTranslationUpdated = !noteContent.getTitle().equals(getNoteContent().getTitle())
-                || !noteContent.getDescription().equals(getNoteContent().getDescription());
-        boolean isTranslationOutdated = (getNoteContent().getTitleIDN() != null)
-                || (getNoteContent().getDescriptionIDN() != null);
-
-        noteContent.setIsTranslationOutdatedIDN(isEnglishTranslationUpdated && isTranslationOutdated);
+        noteContent.setIsTranslationOutdatedIDN(getNoteContent().isTranslationOutdated(noteContent));
 
         mergeNoteContent(noteContent);
     }
