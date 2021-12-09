@@ -100,7 +100,7 @@ class RestNoteController {
         final UserModel user = currentUserFetcher.getUser();
         user.getAuthorization().assertAuthorization(note);
 
-        if(noteContent.getUpdatedAt()!=null && !note.getNoteContent().getUpdatedAt().equals(noteContent.getUpdatedAt())){
+        if(note.getNoteContent().isConflictingWith(noteContent)){
             return new NoteViewer(user.getEntity(), note, noteContent).toJsonObject();
         }
 

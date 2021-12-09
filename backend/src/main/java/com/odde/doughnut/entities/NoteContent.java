@@ -158,4 +158,12 @@ public class NoteContent {
     public String getShortDescriptionIDN() {
         return StringUtils.abbreviate(descriptionIDN, 50);
     }
+
+    @JsonIgnore
+    public boolean isConflictingWith(NoteContent conflictNoteContent){
+        if(conflictNoteContent.getUpdatedAt()!=null && !this.getUpdatedAt().equals(conflictNoteContent.getUpdatedAt())){
+            return true;
+        }
+        return false;
+    }
 }
