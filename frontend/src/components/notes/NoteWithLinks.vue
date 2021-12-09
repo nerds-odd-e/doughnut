@@ -1,7 +1,7 @@
 <template>
   <NoteShell
     class="note-body"
-    v-bind="{ id: note.id, updatedAt: note.noteContent?.updatedAt, language }"
+    v-bind="{ id: note.id, updatedAt: note.noteContent?.updatedAt, language, isEditingTitle }"
   >
     <NoteFrameOfLinks v-bind="{ links: note.links }">
       <h2 role="title" class="note-title" style="display: inline-block;" @click="onTitleClick" v-if="!isEditingTitle">{{ translatedNote.title }}</h2>
@@ -20,7 +20,7 @@
       >
         No translation available
       </p>
-      <NoteContent v-bind="{ note, language, isInPlaceEditEnabled }"/>
+      <NoteContent v-bind="{ note, language, isInPlaceEditEnabled, isEditingTitle }"/>
     </NoteFrameOfLinks>
   </NoteShell>
 </template>
@@ -31,6 +31,7 @@ import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
 import NoteShell from "./NoteShell.vue";
 import NoteContent from "./NoteContent.vue";
 import { TranslatedNoteWrapper } from "../../models/languages";
+import { restPatchMultiplePartForm } from "../../restful/restful";
 
 export default {
   name: "NoteWithLinks",
@@ -64,7 +65,19 @@ export default {
     },
     onBlurTextField(input) {
       this.note.title = input.target.value;
+      this.note.description = this.note.noteContent.description;
+      this.note.noteContent.title = input.target.value;
       this.isEditingTitle = false;
+      restPatchMultiplePartForm(
+        `/api/notes/${this.note.id}`,
+        this.note,
+        (r) => (this.loading = r)
+      )
+        .then((res) => {
+          this.$store.commit("loadNotes", [res]);
+          this.$emit("done");
+        })
+        .catch((res) => (this.formErrors = res));
     }
   },
 };

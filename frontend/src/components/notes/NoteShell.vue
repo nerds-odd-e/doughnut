@@ -12,6 +12,7 @@ export default {
     id: [String, Number],
     updatedAt: String,
     language: String,
+    isEditingTitle: Boolean,
   },
   components: {
   },
@@ -34,7 +35,9 @@ export default {
   },
   methods: {
     async editDialog() {
-      await editNote(this.$popups, this.id, this.language);
+      if (!this.isEditingTitle) {
+        await editNote(this.$popups, this.id, this.language);
+      }
     },
   },
 };

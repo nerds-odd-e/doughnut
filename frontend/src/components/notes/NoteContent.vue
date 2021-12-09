@@ -45,6 +45,7 @@ import SvgPictureIndicator from "../svgs/SvgPictureIndicator.vue";
 import SvgUrlIndicator from "../svgs/SvgUrlIndicator.vue";
 import { TranslatedNoteWrapper } from "../../models/languages";
 import TextArea from "../form/TextArea.vue";
+import { restPatchMultiplePartForm } from "../../restful/restful";
 
 export default {
   props: {
@@ -52,6 +53,7 @@ export default {
     size: { type: String, default: 'large'},
     language: String,
     isInPlaceEditEnabled: Boolean,
+    isEditingTitle: Boolean,
     isEditingDescription: Boolean,
   },
   components: {
@@ -78,13 +80,24 @@ export default {
   },
   methods: {
     onDescriptionClick() {
-      if (this.isInPlaceEditEnabled) {
+      if (this.isInPlaceEditEnabled && !this.isEditingTitle) {
         this.isEditingDescription = true;
       }
     },
     onBlurTextField(input) {
-      this.note.description = input.target.value;
       this.isEditingDescription = false;
+      this.note.description = input.target.value;
+      this.note.noteContent.description = input.target.value;
+      restPatchMultiplePartForm(
+        `/api/notes/${this.note.id}`,
+        this.note,
+        (r) => (this.loading = r)
+      )
+        .then((res) => {
+          this.$store.commit("loadNotes", [res]);
+          this.$emit("done");
+        })
+        .catch((res) => (this.formErrors = res));
     }
   }
 };
