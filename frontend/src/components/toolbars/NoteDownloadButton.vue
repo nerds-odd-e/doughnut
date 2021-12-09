@@ -17,10 +17,10 @@ const generateMD = ({title, description, image, url}) => {
       mdString += description + "\n"
     }
     if(image){
-        mdString += `!(image)[${window.location.origin + image}]` + "\n"
+        mdString += `!(image)[${image}]` + "\n"
     }
     if(url){
-        mdString += `(url)[${url}]` + "\n"
+        mdString += `(url)[${url}]`
     }
     return mdString
 }
