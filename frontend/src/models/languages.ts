@@ -39,7 +39,7 @@ class TranslatedNoteWrapper {
     }
 
   get isTranslationOutdatedIDN() {
-      return this.note.noteContent.isTranslationOutdatedIDN;
+      return this.language === Languages.ID && this.note.noteContent.isTranslationOutdatedIDN;
     }
 
 }

@@ -67,7 +67,7 @@ describe("fallback translation", () => {
       { props: { note: noteParent } },
     )
 
-    expect(screen.queryByRole("title-fallback")).not.toBeInTheDocument();    
+    expect(screen.queryByRole("title-fallback")).not.toBeInTheDocument();
   });
 });
 
@@ -82,7 +82,7 @@ describe("outdated translations", () => {
       { props: { note: noteParent } },
     )
 
-    expect(screen.queryByRole("outdated-tag")).not.toBeInTheDocument();    
+    expect(screen.queryByRole("outdated-tag")).not.toBeInTheDocument();
   });
 
   it("should display outdated translation tag on indonesian translation beside title text when translation is outdated", async () => {
@@ -92,9 +92,22 @@ describe("outdated translations", () => {
     renderWithStoreAndMockRoute(
       store,
       NoteWithLinks,
+      { props: { note: noteParent, language: Languages.ID } },
+    )
+
+    expect(screen.queryByRole("outdated-tag")).toBeInTheDocument();
+  });
+
+  it("should not display outdated tag when translation is outdated and language is English", async () => {
+    const noteParent = makeMe.aNote.title("Dummy Title").isTranslationOutdatedIDN(true).please();
+    store.commit("loadNotes", [noteParent]);
+
+    renderWithStoreAndMockRoute(
+      store,
+      NoteWithLinks,
       { props: { note: noteParent } },
     )
 
-    expect(screen.queryByRole("outdated-tag")).toBeInTheDocument();    
+    expect(screen.queryByRole("outdated-tag")).not.toBeInTheDocument();
   });
 });
