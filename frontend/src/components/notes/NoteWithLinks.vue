@@ -13,7 +13,7 @@
       >
         No translation available
       </p>
-      <NoteContent v-bind="{ note, language }"/>
+      <NoteContent v-bind="{ note, language, isInPlaceEditEnabled }"/>
     </NoteFrameOfLinks>
   </NoteShell>
 </template>

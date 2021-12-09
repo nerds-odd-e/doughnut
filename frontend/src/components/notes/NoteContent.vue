@@ -11,7 +11,7 @@
         <SvgDescriptionIndicator v-if="size==='small'" class="description-indicator"/>
       </div>
       <div class="note-content-description" v-if="isEditingDescription">
-        <TextArea scopeName="note" v-model="translatedNote.description" :autofocus="true"/>
+        <TextArea scopeName="note" v-model="translatedNote.description" :autofocus="true" @blur="onBlurTextField"/>
       </div>
     </template>
     <template v-if="!!note.notePicture">
@@ -51,6 +51,7 @@ export default {
     note: Object,
     size: { type: String, default: 'large'},
     language: String,
+    isInPlaceEditEnabled: Boolean,
     isEditingDescription: Boolean,
   },
   components: {
@@ -77,8 +78,14 @@ export default {
   },
   methods: {
     onDescriptionClick() {
+      if (this.isInPlaceEditEnabled) {
         this.isEditingDescription = true;
+      }
     },
+    onBlurTextField(input) {
+      this.note.description = input.target.value;
+      this.isEditingDescription = false;
+    }
   }
 };
 </script>

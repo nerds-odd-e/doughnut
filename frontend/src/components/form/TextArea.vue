@@ -11,6 +11,7 @@
       autocomplete="off"
       autocapitalize="off"
       rows="8"
+      @blur="onBlur"
     />
   </InputWithType>
 </template>
@@ -25,6 +26,7 @@ export default {
     placeholder: { type: String, default: null },
     autofocus: { type: Boolean, default: false },
     errors: Object,
+    onBlur: {type: Function},
   },
   emits: ["update:modelValue"],
   components: { InputWithType },
