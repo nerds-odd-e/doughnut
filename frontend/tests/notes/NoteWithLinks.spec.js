@@ -4,9 +4,10 @@
 import { render, screen } from "@testing-library/vue";
 import NoteWithLinks from "@/components/notes/NoteWithLinks.vue";
 import makeMe from "../fixtures/makeMe";
-import { renderWithStoreAndMockRoute } from '../helpers';
+import { renderWithStoreAndMockRoute, mountWithStoreAndMockRoute } from '../helpers';
 import store from '../../src/store';
 import Languages from "../../src/models/languages";
+import { mount } from "@vue/test-utils";
 
 describe("new/updated pink banner", () => {
   beforeAll(() => {
@@ -111,3 +112,47 @@ describe("outdated translations", () => {
     expect(screen.queryByRole("outdated-tag")).not.toBeInTheDocument();
   });
 });
+
+describe("in place edit on title", () => {
+
+  it("should display text field when one single click on title", async () => {
+    const noteParent = makeMe.aNote.title("Dummy Title").please();
+    store.commit("loadNotes", [noteParent]);
+
+    const { wrapper } = mountWithStoreAndMockRoute(
+      store,
+      NoteWithLinks,
+      { 
+        props: { 
+          note: noteParent ,
+          isInPlaceEditEnabled: true 
+        } 
+      },
+    )
+
+    await wrapper.find('#title-id').trigger('click');
+
+    expect(wrapper.findAll('#title-form-id')).toHaveLength(1);
+  });
+
+  it("should not display text field when one single click on title", async () => {
+    const noteParent = makeMe.aNote.title("Dummy Title").please();
+    store.commit("loadNotes", [noteParent]);
+
+    const { wrapper } = mountWithStoreAndMockRoute(
+      store,
+      NoteWithLinks,
+      { 
+        props: { 
+          note: noteParent ,
+          isInPlaceEditEnabled: false 
+        } 
+      },
+    )
+
+    await wrapper.find('#title-id').trigger('click');
+
+    expect(wrapper.findAll('#title-form-id')).toHaveLength(0);
+  });
+});
+
