@@ -10,6 +10,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 
 import com.odde.doughnut.entities.Note;
@@ -157,23 +159,38 @@ class RestNoteControllerTests {
             assertThat(note.getNoteContent().getUploadPicture(), is(not(nullValue())));
         }
 
-        @Test
-        void shouldNotBeAbleToSaveNoteWhenConflictAndReturnConflictNote() throws NoAccessRightException, IOException {
-            Note newNote = makeMe.aNote().byUser(userModel).please();
 
-            NoteContent modifiedContent = newNote.getNoteContent();
-            modifiedContent.setTitle("modified Title");
-            modifiedContent.setDescription("modified Description");
-            controller.updateNote(newNote, modifiedContent);
+        @Nested
+        class Conflicting{
+            Note oldNote;
+            NoteContent modifiedContentByMe;
+            @BeforeEach
+            void setup(){
+                Instant today = Instant.now();
+                oldNote = makeMe.aNote().byUser(userModel).updatedAt(Timestamp.from(today.minusSeconds(10)))
+                        .title("old title").please();
 
-            NoteContent newContent = makeMe.aNote().inMemoryPlease().getNoteContent();
-            newContent.setTitle("Avengers");
-            NoteViewedByUser response = controller.updateNote(newNote, newContent);
-
-            assertThat(newNote.getNoteContent().getTitle(), equalTo(modifiedContent.getTitle()));
-            assertThat(response.isConflicting(), equalTo(true));
-            assertThat(response.getConflictingNoteContent().getTitle(), equalTo(newContent.getTitle()));
-            assertThat(response.getConflictingNoteContent().getDescription(), equalTo(newContent.getDescription()));
+                modifiedContentByMe = makeMe.aNote().byUser(userModel).title("modified Title").description("modified Description")
+                        .updatedAt(Timestamp.from(today))
+                        .inMemoryPlease().getNoteContent();
+            }
+            @Test
+            void shouldDetectConflict() throws NoAccessRightException, IOException {
+                NoteViewedByUser response = controller.updateNote(oldNote, modifiedContentByMe);
+                assertThat(response.isConflicting(), equalTo(true));
+            }
+            @Test
+            void shouldNotBeAbleToSaveNoteWhenConflict() throws NoAccessRightException, IOException {
+                controller.updateNote(oldNote, modifiedContentByMe);
+                makeMe.refresh(oldNote);
+                assertThat(oldNote.getTitle(), equalTo("old title"));
+            }
+            @Test
+            void shouldReturnConflictingNote() throws NoAccessRightException, IOException {
+                NoteViewedByUser response = controller.updateNote(oldNote, modifiedContentByMe);
+                NoteContent conflictingNoteContent = response.getConflictingNoteContent();
+                assertThat(conflictingNoteContent.getTitle(), equalTo("modified Title"));
+            }
         }
 
         @Test
