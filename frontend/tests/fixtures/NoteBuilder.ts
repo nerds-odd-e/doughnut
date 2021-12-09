@@ -79,6 +79,11 @@ class NoteBuilder extends Builder {
     return this;
   }
 
+  isTranslationOutdatedIDN(value: boolean): NoteBuilder {
+    this.data.noteContent.isTranslationOutdatedIDN = value;
+    return this;
+  }
+
   do(): any {
     return merge(
       {
@@ -92,6 +97,7 @@ class NoteBuilder extends Builder {
           useParentPicture: false,
           skipReview: false,
           updatedAt: "2021-08-24T08:46:44.000+00:00",
+          isTranslationOutdatedIDN: null,
         },
         createdAt: "2021-08-24T08:46:44.000+00:00",
         title: "Note1.1.1",

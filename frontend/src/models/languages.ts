@@ -38,6 +38,10 @@ class TranslatedNoteWrapper {
         : this.note.noteContent.title;
     }
 
+  get isTranslationOutdatedIDN() {
+      return this.note.noteContent.isTranslationOutdatedIDN;
+    }
+
 }
 
 export default Languages;

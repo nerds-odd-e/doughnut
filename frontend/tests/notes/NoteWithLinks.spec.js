@@ -70,3 +70,31 @@ describe("fallback translation", () => {
     expect(screen.queryByRole("title-fallback")).not.toBeInTheDocument();    
   });
 });
+
+describe("outdated translations", () => {
+  it("should not display outdated translation tag on indonesian translation beside title text when translation is not outdated", async () => {
+    const noteParent = makeMe.aNote.title("Dummy Title").isTranslationOutdatedIDN(false).please();
+    store.commit("loadNotes", [noteParent]);
+
+    renderWithStoreAndMockRoute(
+      store,
+      NoteWithLinks,
+      { props: { note: noteParent } },
+    )
+
+    expect(screen.queryByRole("outdated-tag")).not.toBeInTheDocument();    
+  });
+
+  it("should display outdated translation tag on indonesian translation beside title text when translation is outdated", async () => {
+    const noteParent = makeMe.aNote.title("Dummy Title").isTranslationOutdatedIDN(true).please();
+    store.commit("loadNotes", [noteParent]);
+
+    renderWithStoreAndMockRoute(
+      store,
+      NoteWithLinks,
+      { props: { note: noteParent } },
+    )
+
+    expect(screen.queryByRole("outdated-tag")).toBeInTheDocument();    
+  });
+});

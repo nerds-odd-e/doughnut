@@ -4,7 +4,14 @@
     v-bind="{ id: note.id, updatedAt: note.noteContent?.updatedAt, language }"
   >
     <NoteFrameOfLinks v-bind="{ links: note.links }">
-      <h2 role="title" class="note-title" @click="onTitleClick" v-if="!isEditingTitle">{{ translatedNote.title }}</h2>
+      <h2 role="title" class="note-title" style="display: inline-block;" @click="onTitleClick" v-if="!isEditingTitle">{{ translatedNote.title }}</h2>
+      <span 
+        role="outdated-tag" 
+        class="outdated-label" 
+        v-if="translatedNote.isTranslationOutdatedIDN"
+        >
+          Outdated translation
+      </span>
       <TextInput scopeName="note" v-model="translatedNote.title" :autofocus="true" @blur="onBlurTextField" v-if="isEditingTitle"/>
       <p
         style="color: red"
@@ -79,5 +86,14 @@ export default {
   margin-top: 0px;
   padding-top: 10px;
   color: black;
+}
+
+.outdated-label {
+  display: inline-block;
+  height: 100%;
+  vertical-align: middle;
+  margin-left: 20px;
+  padding-bottom: 10px;
+  color: red;
 }
 </style>
