@@ -10,8 +10,6 @@ import {
 } from "cypress-cucumber-preprocessor/steps";
 const path = require("path");
 
-
-
 Given("there are some notes for the current user", (data) => {
   cy.seedNotes(data.hashes());
 });
@@ -345,9 +343,8 @@ When("I edit note translation to become", (data) => {
   cy.submitNoteTranslationFormsWith(data.hashes());
 });
 
-
 Then("I download note", () => {
-  cy.get('#note-download-button').click();
+  cy.get("#note-download-button").click();
 });
 
 Then("There is a {string} file downloaded", (fileName) => {
@@ -360,10 +357,8 @@ When("I edit english note translation to become", (data) => {
   cy.submitNoteFormsWith(data.hashes());
 });
 
-When("I edit note title to become {string}", (data) => {
-  cy.clickTranslationButton("title");
-  cy.clickNoteToolbarButton("edit note");
-  cy.submitNoteTranslationFormsWith(data.hashes());
+When("I change the title to {string} in-place-edit mode", (noteTitle) => {
+  cy.findByRole("title", { name: noteTitle }).click();
 });
 
 When("Another user updates note {string} with:", (noteTitle, data) => {
@@ -373,9 +368,9 @@ When("Another user updates note {string} with:", (noteTitle, data) => {
     method: "PATCH",
     url: "/api/notes/1",
     form: true,
-    body: { 
-      title: fields['Title'],
-      description: fields['Description']
+    body: {
+      title: fields["Title"],
+      description: fields["Description"],
     },
   }).then((response) => {
     expect(response.status).to.equal(200);
@@ -384,5 +379,5 @@ When("Another user updates note {string} with:", (noteTitle, data) => {
 });
 
 Then("I should see {string} message", (messageContent) => {
-  cy.contains(messageContent).should('exist');
+  cy.contains(messageContent).should("exist");
 });
