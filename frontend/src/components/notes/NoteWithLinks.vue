@@ -4,12 +4,8 @@
     v-bind="{ id: note.id, updatedAt: note.noteContent?.updatedAt, language }"
   >
     <NoteFrameOfLinks v-bind="{ links: note.links }">
-      <div @click="onTitleClick" v-if="!isEditingTitle">
-        <h2 role="title" class="note-title">{{ translatedNote.title }}</h2>
-      </div>
-      <div v-if="isEditingTitle">
-        <TextInput scopeName="note" v-model="translatedNote.title" :autofocus="true" @blur="onBlurTextField"/>
-      </div>
+      <h2 role="title" class="note-title" @click="onTitleClick" v-if="!isEditingTitle">{{ translatedNote.title }}</h2>
+      <TextInput scopeName="note" v-model="translatedNote.title" :autofocus="true" @blur="onBlurTextField" v-if="isEditingTitle"/>
       <p
         style="color: red"
         role="title-fallback"
@@ -50,7 +46,7 @@ export default {
   },
   computed: {
     translatedNote(){
-      return new TranslatedNoteWrapper(this.note, this.language, this.isEditingTitle);
+      return new TranslatedNoteWrapper(this.note, this.language);
     },
   },
   methods: {
@@ -59,8 +55,8 @@ export default {
         this.isEditingTitle = true;
       }
     },
-    onBlurTextField(e) {
-      this.note.title = e.target.value;
+    onBlurTextField(input) {
+      this.note.title = input.target.value;
       this.isEditingTitle = false;
     }
   },
