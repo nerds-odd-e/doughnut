@@ -17,7 +17,7 @@ Feature: Synchronize Translation
     And I switch language to "ID"
     Then I should see outdated tag
 
-  @ignore @featureToggle
+  @featureToggle
   Scenario: Should not display outdated tag
     When I edit note translation to become
       | Title in Indonesian |
