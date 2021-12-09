@@ -4,11 +4,11 @@
     v-bind="{ id: note.id, updatedAt: note.noteContent?.updatedAt, language }"
   >
     <NoteFrameOfLinks v-bind="{ links: note.links }">
-      <div @click="inPlaceButton" v-if="!isEditingTitle">
+      <div @click="onTitleClick" v-if="!isEditingTitle">
         <h2 role="title" class="note-title">{{ translatedNote.title }}</h2>
       </div>
-      <div @click="inPlaceButton" v-if="isEditingTitle">
-        <TextInput scopeName="note" v-model="translatedNote.title" :autofocus="true"/>
+      <div v-if="isEditingTitle">
+        <TextInput scopeName="note" v-model="translatedNote.title" :autofocus="true" @blur="onBlurTextField"/>
       </div>
       <p
         style="color: red"
@@ -17,7 +17,7 @@
       >
         No translation available
       </p>
-      <NoteContent v-bind="{ note, language, isEditingTitle}" />
+      <NoteContent v-bind="{ note, language }"/>
     </NoteFrameOfLinks>
   </NoteShell>
 </template>
@@ -34,6 +34,7 @@ export default {
   props: {
     note: Object,
     language: String,
+    isInPlaceEditEnabled: Boolean,
     isEditingTitle: Boolean
   },
   components: {
@@ -53,13 +54,15 @@ export default {
     },
   },
   methods: {
-    inPlaceButton() {
-      if (this.isEditingTitle) {
-        this.isEditingTitle = false;
-      } else{
+    onTitleClick() {
+      if (this.isInPlaceEditEnabled) {
         this.isEditingTitle = true;
       }
     },
+    onBlurTextField(e) {
+      this.note.title = e.target.value;
+      this.isEditingTitle = false;
+    }
   },
 };
 </script>

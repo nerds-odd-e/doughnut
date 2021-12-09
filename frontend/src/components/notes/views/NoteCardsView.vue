@@ -1,6 +1,6 @@
 <template>
   <div class="container" v-if="note">
-    <NoteWithLinks v-bind="{note, language}"/>
+    <NoteWithLinks v-bind="{note, language, isInPlaceEditEnabled}"/>
     <NoteStatisticsButton :noteId="noteId" />
     <Cards v-if="expandChildren" :notes="children"/>
   </div>
@@ -18,6 +18,12 @@ export default {
     highlightNoteId: [String, Number],
     expandChildren: { type: Boolean, required: true },
     language: String,
+    isInPlaceEditEnabled: Boolean,
+  },
+  data() {
+    return {
+      isInPlaceEditEnabled: false
+    }
   },
   emits: ['highlight'],
   components: {

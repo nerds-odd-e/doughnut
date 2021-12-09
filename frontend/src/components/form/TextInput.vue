@@ -10,20 +10,27 @@
       :autofocus="autofocus"
       autocomplete="off"
       autocapitalize="off"
+      @blur="onBlur"
     />
   </InputWithType>
 </template>
 
-<script setup>
+<script>
 import InputWithType from "./InputWithType.vue";
-const props = defineProps({
-  modelValue: String,
-  scopeName: String,
-  field: String,
-  title: String,
-  placeholder: { type: String, default: null },
-  autofocus: { type: Boolean, default: false },
-  errors: Object,
-});
-const emit = defineEmits(["update:modelValue"]);
+export default {
+  props: {
+    modelValue: String,
+    scopeName: String,
+    field: String,
+    title: String,
+    placeholder: { type: String, default: null },
+    autofocus: { type: Boolean, default: false },
+    errors: Object,
+    onBlur: {type: Function},
+  },
+  components: {
+    InputWithType
+  },
+  emits: ["update:modelValue"],
+}
 </script>

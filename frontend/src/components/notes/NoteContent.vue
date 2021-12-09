@@ -1,7 +1,7 @@
 <template>
   <div class="note-content">
     <template v-if="!!translatedNote.description">
-      <div class="note-content" @click="inPlaceButton" v-if="!isEditingDescription">
+      <div class="note-content" @click="onDescriptionClick" v-if="!isEditingDescription">
         <ShowDescription
           v-if="size==='large'"
           class="col"
@@ -10,7 +10,7 @@
         <NoteShortDescription class="col" v-if="size==='medium'" :shortDescription="translatedNote.shortDescription"/>
         <SvgDescriptionIndicator v-if="size==='small'" class="description-indicator"/>
       </div>
-      <div class="note-content-description" @click="inPlaceButton" v-if="isEditingDescription">
+      <div class="note-content-description" v-if="isEditingDescription">
         <TextArea scopeName="note" v-model="translatedNote.description" :autofocus="true"/>
       </div>
     </template>
@@ -51,7 +51,6 @@ export default {
     note: Object,
     size: { type: String, default: 'large'},
     language: String,
-    isEditingTitle: Boolean,
     isEditingDescription: Boolean,
   },
   components: {
@@ -77,16 +76,10 @@ export default {
     },
   },
   methods: {
-    inPlaceButton() {
-        if (this.isEditingDescription) {
-          this.isEditingDescription = false;
-        } else{
-          this.isEditingDescription = true;
-          this.$refs.email.$el.focus()
-        }
-      
+    onDescriptionClick() {
+        this.isEditingDescription = true;
     },
-  },
+  }
 };
 </script>
 
