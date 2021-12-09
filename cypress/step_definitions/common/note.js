@@ -382,6 +382,10 @@ Then("I should see {string} message", (messageContent) => {
   cy.contains(messageContent).should('exist');
 });
 
+Then("I should see outdated tag", (messageContent) => {
+    cy.expectText("Outdated translation");
+});
+
 And("the file {string} content is",(fileName, mdContent) => {
   const downloadsFolder = Cypress.config("downloadsFolder");
   cy.readFile(`${downloadsFolder}/${fileName}`).should("eq", mdContent);
