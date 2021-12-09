@@ -6,6 +6,7 @@
 import {
   And,
   Before,
+  After,
   Given,
   Then,
   When,
@@ -17,4 +18,8 @@ Before(() => {
 
 Before({ tags: "@featureToggle"}, ()=> {
     cy.enableFeatureToggle(true)
+})
+
+After({ tags: "@cleanDownloadFolder"}, ()=> {
+  cy.cleanDownloadFolder()
 })

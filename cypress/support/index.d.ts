@@ -8,6 +8,7 @@ declare namespace Cypress {
   interface Chainable {
     cleanDBAndSeedData(): void;
     enableFeatureToggle(enabled: boolean): void;
+    cleanDownloadFolder(): void;
     timeTravelRelativeToNow(hours: number): void;
     failure(): void;
     findNoteCardButton(
