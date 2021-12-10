@@ -217,6 +217,9 @@ When("I click note {string}", (noteTitle) => {
 When("I click note title {string}", (noteTitle) => {
   cy.findByText(noteTitle).click();
 });
+When("I click note description {string}", (noteDescription) => {
+  cy.findByText(noteDescription).click();
+});
 
 When(
   "The note {string} {string} have the description indicator",
@@ -360,6 +363,10 @@ When("I change the title to {string} in-place-edit mode", (noteTitle) => {
  cy.get("#title-form-id input").clear().type(noteTitle).blur();
 });
 
+When("I change the description to {string} in-place-edit mode", (noteDescription) => {
+ cy.get("#description-form-id textarea").clear().type(noteDescription).blur();
+});
+
 When("Another user updates note {string} with:", (noteTitle, data) => {
   cy.loginAs("another_old_learner");
   let fields = data.hashes()[0];
@@ -382,6 +389,9 @@ Then("I should see {string} message", (messageContent) => {
 });
 
 Then("The title should change to {string}", (messageContent) => {
+  cy.contains(messageContent).should('exist');
+});
+Then("The description should change to {string}", (messageContent) => {
   cy.contains(messageContent).should('exist');
 });
 

@@ -1,6 +1,6 @@
 <template>
   <div class="note-content">
-    <template v-if="!!translatedNote.description">
+        <template v-if="!!translatedNote.description || isEditingDescription">
       <div id="description-id" class="note-content" @click="onDescriptionClick" v-if="!isEditingDescription">
         <ShowDescription
           v-if="size==='large'"

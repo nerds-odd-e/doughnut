@@ -7,14 +7,12 @@ Feature: In-place Edit
       | title   | titleIDN  | description      | descriptionIDN   |
       | Storm   | Indonesia | Heavy Rain       | Bahasa Indonesia |
 
-
   Scenario: Note title should be updated when edited in-place
     When I open the "article" view of note "Storm"
     And I click note title "Storm"
     When I change the title to "Thunderstorm" in-place-edit mode
     Then The title should change to "Thunderstorm"
 
-  @ignore
   Scenario: Note description should be updated when edited in-place
     When I open the "article" view of note "Storm"
     And I click note description "Heavy Rain"
