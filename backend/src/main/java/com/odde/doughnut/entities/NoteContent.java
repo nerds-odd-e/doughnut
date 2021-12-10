@@ -178,7 +178,15 @@ public class NoteContent {
     }
 
     @JsonIgnore
+    private boolean isIndonesianTranslationUpdated(NoteContent updatedNoteContent) {
+        boolean isTitleIDNChanged = updatedNoteContent.titleIDN != null && !(updatedNoteContent.titleIDN.equals(this.titleIDN));
+        boolean isDescriptionIDNChanged = updatedNoteContent.descriptionIDN != null && !(updatedNoteContent.descriptionIDN.equals(this.descriptionIDN));
+
+        return isTitleIDNChanged || isDescriptionIDNChanged;
+    }
+
+    @JsonIgnore
     public boolean isTranslationOutdated(NoteContent updatedNoteContent) {
-        return this.isEnglishTranslationUpdated(updatedNoteContent) && this.isIndonesianTranslationAvailable();
+        return (this.isEnglishTranslationUpdated(updatedNoteContent) && this.isIndonesianTranslationAvailable()) || (this.isTranslationOutdatedIDN != null && this.isTranslationOutdatedIDN && !isIndonesianTranslationUpdated(updatedNoteContent));
     }
 }
