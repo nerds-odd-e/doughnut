@@ -42,6 +42,14 @@ class TranslatedNoteWrapper {
       return this.language === Languages.ID && this.note.noteContent.isTranslationOutdatedIDN;
     }
 
+  set title(title: string) {
+
+    if (this.language === Languages.ID) {
+      this.note.noteContent.titleIDN = title;
+    } else {
+      this.note.noteContent.title = title;
+    }
+  }
 }
 
 export default Languages;

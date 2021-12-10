@@ -30,7 +30,7 @@ import TextInput from "../form/TextInput.vue";
 import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
 import NoteShell from "./NoteShell.vue";
 import NoteContent from "./NoteContent.vue";
-import { TranslatedNoteWrapper } from "../../models/languages";
+import Languages, { TranslatedNoteWrapper } from "../../models/languages";
 import { restPatchMultiplePartForm } from "../../restful/restful";
 
 export default {
@@ -64,9 +64,23 @@ export default {
       }
     },
     onBlurTextField(input) {
-      this.note.title = input.target.value;
+      const resolvedLanguage = this.language ?? Languages.EN;
+
+      if (resolvedLanguage === Languages.EN) {
+        this.note.title = input.target.value;
+        this.note.titleIDN = this.note.noteContent.titleIDN;
+        this.note.noteContent.title = input.target.value;
+
+      } else if (resolvedLanguage === Languages.ID) {
+        this.note.title = this.note.noteContent.title;
+        this.note.titleIDN = input.target.value;
+        this.note.noteContent.titleIDN = input.target.value;
+      }
+
+      // Need to update description to make sure we're calling API with correct value.
       this.note.description = this.note.noteContent.description;
-      this.note.noteContent.title = input.target.value;
+      this.note.descriptionIDN = this.note.noteContent.descriptionIDN;
+
       this.isEditingTitle = false;
       restPatchMultiplePartForm(
         `/api/notes/${this.note.id}`,

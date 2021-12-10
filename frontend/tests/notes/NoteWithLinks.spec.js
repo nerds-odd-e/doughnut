@@ -123,7 +123,7 @@ describe("in place edit on title", () => {
       NoteWithLinks,
       { 
         props: { 
-          note: noteParent ,
+          note: noteParent,
           isInPlaceEditEnabled: true 
         } 
       },
@@ -172,6 +172,30 @@ describe("in place edit on title", () => {
 
     expect(wrapper.findAll("#title-form-id")).toHaveLength(0);
     expect(wrapper.findAll("#title-id")).toHaveLength(1);
+  });
+
+  it("should update Indonesian title on blur when language is Indonesian", async () => {
+    let noteParent = makeMe.aNote.title("Dummy Title IDN").please();
+    store.commit("loadNotes", [noteParent]);
+
+    const { wrapper } = mountWithStoreAndMockRoute(
+      store,
+      NoteWithLinks,
+      { 
+        props: { 
+          note: noteParent,
+          language: Languages.ID,
+          isInPlaceEditEnabled: true 
+        } 
+      },
+    );
+
+    await wrapper.find('#title-id').trigger('click');
+    await wrapper.find('#title-form-id input').setValue('Dummy Title Updated');
+    await wrapper.find('#title-form-id input').trigger('input');
+    await wrapper.find('#note-undefined').trigger("blur");
+
+    expect(wrapper.find("#title-id").text()).toContain('Dummy Title Updated');
   });
 });
 
