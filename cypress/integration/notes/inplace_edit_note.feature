@@ -7,7 +7,7 @@ Feature: In-place Edit
       | title   | titleIDN  | description      | descriptionIDN   |
       | Storm   | Indonesia | Heavy Rain       | Bahasa Indonesia |
 
-  @ignore
+
   Scenario: Note title should be updated when edited in-place
     When I open the "article" view of note "Storm"
     And I click note title "Storm"

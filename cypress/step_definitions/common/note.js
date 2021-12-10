@@ -357,7 +357,7 @@ When("I edit english note translation to become", (data) => {
 });
 
 When("I change the title to {string} in-place-edit mode", (noteTitle) => {
-  cy.findByRole("title", { name: noteTitle }).click();
+ cy.get("#title-form-id input").clear().type(noteTitle).blur();
 });
 
 When("Another user updates note {string} with:", (noteTitle, data) => {
@@ -378,6 +378,10 @@ When("Another user updates note {string} with:", (noteTitle, data) => {
 });
 
 Then("I should see {string} message", (messageContent) => {
+  cy.contains(messageContent).should('exist');
+});
+
+Then("The title should change to {string}", (messageContent) => {
   cy.contains(messageContent).should('exist');
 });
 
