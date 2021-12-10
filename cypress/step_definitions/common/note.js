@@ -360,11 +360,11 @@ When("I edit english note translation to become", (data) => {
 });
 
 When("I change the title to {string} in-place-edit mode", (noteTitle) => {
- cy.get("#title-form-id input").clear().type(noteTitle).blur();
+ cy.get("#title-form-id input").clear().type(noteTitle).type('{enter}');
 });
 
 When("I change the description to {string} in-place-edit mode", (noteDescription) => {
- cy.get("#description-form-id textarea").clear().type(noteDescription).blur();
+ cy.get("#description-form-id textarea").clear().type(noteDescription).type('{shift}{enter}');
 });
 
 When("Another user updates note {string} with:", (noteTitle, data) => {
