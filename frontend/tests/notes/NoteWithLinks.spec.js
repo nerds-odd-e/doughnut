@@ -170,12 +170,13 @@ describe("in place edit on title", () => {
     await wrapper.find("#title-id").trigger("click");
     await wrapper.find("#note-undefined").trigger("blur");
 
+    expect(fetch).toHaveBeenCalledWith(`/api/notes/${noteParent.id}`, expect.objectContaining({method: 'PATCH'}));
     expect(wrapper.findAll("#title-form-id")).toHaveLength(0);
     expect(wrapper.findAll("#title-id")).toHaveLength(1);
   });
 
   it("should update Indonesian title on blur when language is Indonesian", async () => {
-    let noteParent = makeMe.aNote.title("Dummy Title IDN").please();
+    const noteParent = makeMe.aNote.title("Dummy Title IDN").please();
     store.commit("loadNotes", [noteParent]);
 
     const { wrapper } = mountWithStoreAndMockRoute(
@@ -194,6 +195,8 @@ describe("in place edit on title", () => {
     await wrapper.find('#title-form-id input').setValue('Dummy Title Updated');
     await wrapper.find('#title-form-id input').trigger('input');
     await wrapper.find('#note-undefined').trigger("blur");
+
+    expect(fetch).toHaveBeenCalledWith(`/api/notes/${noteParent.id}`, expect.objectContaining({method: 'PATCH'}));
 
     expect(wrapper.find("#title-id").text()).toContain('Dummy Title Updated');
   });

@@ -65,6 +65,7 @@ describe("in place edit on description", () => {
     await wrapper.find('#description-id').trigger('click');
     await wrapper.find("#note-undefined").trigger("blur");
 
+    expect(fetch).toHaveBeenCalledWith(`/api/notes/${noteParent.id}`, expect.objectContaining({method: 'PATCH'}));
     expect(wrapper.findAll('#description-form-id')).toHaveLength(0);
     expect(wrapper.findAll("#description-id")).toHaveLength(1);
   });
@@ -90,6 +91,7 @@ describe("in place edit on description", () => {
     await wrapper.find('#description-form-id textarea').trigger('textarea');
     await wrapper.find('#note-undefined').trigger("blur");
 
+    expect(fetch).toHaveBeenCalledWith(`/api/notes/${noteParent.id}`, expect.objectContaining({method: 'PATCH'}));
     expect(wrapper.find("#description-id").text()).toContain('Dummy Description Updated');
   });
 });
