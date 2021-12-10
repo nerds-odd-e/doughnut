@@ -10,6 +10,7 @@
 .svn/
 
 # cypress screenshots & videos
+cypress/downloads/
 cypress/screenshots/
 cypress/videos/
 cypress-visual-report/
@@ -94,7 +95,8 @@ frontend/app.*.symbols
 # Obfuscation related
 frontend/app.*.map.json
 
-# local nix-shell MySQL DB instance folder/files
+# local nix env related e.g. MySQL DB instance folder/files
+.envrc
 mysql/
 
 # gitpod inteliij-projector
