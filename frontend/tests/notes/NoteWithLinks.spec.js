@@ -7,7 +7,6 @@ import makeMe from "../fixtures/makeMe";
 import { renderWithStoreAndMockRoute, mountWithStoreAndMockRoute } from '../helpers';
 import store from '../../src/store';
 import Languages from "../../src/models/languages";
-import { mount } from "@vue/test-utils";
 
 describe("new/updated pink banner", () => {
   beforeAll(() => {
@@ -133,6 +132,7 @@ describe("in place edit on title", () => {
     await wrapper.find('#title-id').trigger('click');
 
     expect(wrapper.findAll('#title-form-id')).toHaveLength(1);
+    expect(wrapper.findAll("#title-id")).toHaveLength(0);
   });
 
   it("should not display text field when one single click on title", async () => {
@@ -153,6 +153,25 @@ describe("in place edit on title", () => {
     await wrapper.find('#title-id').trigger('click');
 
     expect(wrapper.findAll('#title-form-id')).toHaveLength(0);
+    expect(wrapper.findAll("#title-id")).toHaveLength(1);
+  });
+
+  it("should back to label when blur text field title", async () => {
+    const noteParent = makeMe.aNote.title("Dummy Title").please();
+    store.commit("loadNotes", [noteParent]);
+
+    const { wrapper } = mountWithStoreAndMockRoute(store, NoteWithLinks, {
+      props: {
+        note: noteParent,
+        isInPlaceEditEnabled: true,
+      },
+    });
+
+    await wrapper.find("#title-id").trigger("click");
+    await wrapper.find("#note-undefined").trigger("blur");
+
+    expect(wrapper.findAll("#title-form-id")).toHaveLength(0);
+    expect(wrapper.findAll("#title-id")).toHaveLength(1);
   });
 });
 
