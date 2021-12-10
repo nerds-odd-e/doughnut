@@ -8,7 +8,7 @@
       <span 
         role="outdated-tag" 
         class="outdated-label" 
-        v-if="translatedNote.isTranslationOutdatedIDN"
+        v-if="translatedNote.isTranslationOutdatedIDN && !isEditingTitle"
         >
           Outdated translation
       </span>

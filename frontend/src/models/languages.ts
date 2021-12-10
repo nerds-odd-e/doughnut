@@ -50,6 +50,14 @@ class TranslatedNoteWrapper {
       this.note.noteContent.title = title;
     }
   }
+
+  set description(description: string) {
+    if (this.language === Languages.ID) {
+      this.note.noteContent.descriptionIDN = description;
+    } else {
+      this.note.noteContent.description = description;
+    }
+  }
 }
 
 export default Languages;

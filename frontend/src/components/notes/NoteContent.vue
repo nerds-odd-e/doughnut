@@ -1,7 +1,7 @@
 <template>
   <div class="note-content">
     <template v-if="!!translatedNote.description">
-      <div class="note-content" @click="onDescriptionClick" v-if="!isEditingDescription">
+      <div id="description-id" class="note-content" @click="onDescriptionClick" v-if="!isEditingDescription">
         <ShowDescription
           v-if="size==='large'"
           class="col"
@@ -10,9 +10,7 @@
         <NoteShortDescription class="col" v-if="size==='medium'" :shortDescription="translatedNote.shortDescription"/>
         <SvgDescriptionIndicator v-if="size==='small'" class="description-indicator"/>
       </div>
-      <div class="note-content-description" v-if="isEditingDescription">
-        <TextArea scopeName="note" v-model="translatedNote.description" :autofocus="true" @blur="onBlurTextField"/>
-      </div>
+      <TextArea class="note-content-description" id="description-form-id" scopeName="note" v-model="translatedNote.description" :autofocus="true" @blur="onBlurTextField" v-if="isEditingDescription"/>
     </template>
     <template v-if="!!note.notePicture">
       <ShowPicture
@@ -43,7 +41,7 @@ import ShowDescription from "./ShowDescription.vue";
 import SvgDescriptionIndicator from "../svgs/SvgDescriptionIndicator.vue";
 import SvgPictureIndicator from "../svgs/SvgPictureIndicator.vue";
 import SvgUrlIndicator from "../svgs/SvgUrlIndicator.vue";
-import { TranslatedNoteWrapper } from "../../models/languages";
+import Languages, { TranslatedNoteWrapper } from "../../models/languages";
 import TextArea from "../form/TextArea.vue";
 import { restPatchMultiplePartForm } from "../../restful/restful";
 
@@ -86,8 +84,19 @@ export default {
     },
     onBlurTextField(input) {
       this.isEditingDescription = false;
-      this.note.description = input.target.value;
-      this.note.noteContent.description = input.target.value;
+
+      const resolvedLanguage = this.language ?? Languages.EN;
+
+      if (resolvedLanguage === Languages.EN) {
+        this.note.description = input.target.value;
+        this.note.noteContent.description = input.target.value;
+        this.note.descriptionIDN = this.note.noteContent.descriptionIDN;
+      } else if (resolvedLanguage === Languages.ID) {
+        this.note.descriptionIDN = input.target.value;
+        this.note.noteContent.descriptionIDN = input.target.value;
+        this.note.description = this.note.noteContent.description;
+      }
+
       restPatchMultiplePartForm(
         `/api/notes/${this.note.id}`,
         this.note,

@@ -4,7 +4,7 @@
       :class="`area-control form-control ${!!errors ? 'is-invalid' : ''}`"
       :id="`${scopeName}-${field}`"
       :name="field"
-      v-model="modelValue"
+      :value="modelValue"
       @input="$emit('update:modelValue', $event.target.value)"
       :placeholder="placeholder"
       :autofocus="autofocus"
