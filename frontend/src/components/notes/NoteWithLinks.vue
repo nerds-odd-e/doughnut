@@ -12,7 +12,7 @@
         >
           Outdated translation
       </span>
-      <TextInput id="title-form-id" role="title-input" scopeName="note" v-model="translatedNote.title" :autofocus="true" @blur="onBlurTextField" v-if="isEditingTitle"/>
+      <TextInput id="title-form-id" role="title-input" scopeName="note" v-model="translatedNote.title" :autofocus="true" @blur="onBlurTextField" v-if="isEditingTitle" v-on:keyup.enter="$event.target.blur()"/>
       <p
         style="color: red"
         role="title-fallback"

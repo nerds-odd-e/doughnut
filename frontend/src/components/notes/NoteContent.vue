@@ -10,7 +10,8 @@
         <NoteShortDescription class="col" v-if="size==='medium'" :shortDescription="translatedNote.shortDescription"/>
         <SvgDescriptionIndicator v-if="size==='small'" class="description-indicator"/>
       </div>
-      <TextArea class="note-content-description" id="description-form-id" scopeName="note" v-model="translatedNote.description" :autofocus="true" @blur="onBlurTextField" v-if="isEditingDescription"/>
+      <TextArea class="note-content-description" id="description-form-id" scopeName="note" v-model="translatedNote.description" :autofocus="true" 
+        @blur="onBlurTextField" v-if="isEditingDescription" v-on:keydown.enter.shift="$event.target.blur()"/>
     </template>
     <template v-if="!!note.notePicture">
       <ShowPicture
@@ -80,6 +81,12 @@ export default {
     onDescriptionClick() {
       if (this.isInPlaceEditEnabled && !this.isEditingTitle) {
         this.isEditingDescription = true;
+      }
+    },
+    inputHandler(e) {
+      if (e.keyCode === 13 && !e.shiftKey) {
+        e.preventDefault();
+        this.onBlurTextField();
       }
     },
     onBlurTextField(input) {
