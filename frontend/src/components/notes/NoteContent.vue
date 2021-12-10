@@ -97,6 +97,10 @@ export default {
         this.note.description = this.note.noteContent.description;
       }
 
+      // Need to update title to make sure we're calling API with correct value.
+      this.note.title = this.note.noteContent.title;
+      this.note.titleIDN = this.note.noteContent.titleIDN;
+
       restPatchMultiplePartForm(
         `/api/notes/${this.note.id}`,
         this.note,
