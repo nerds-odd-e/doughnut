@@ -4,5 +4,6 @@
   "screenshotOnRunFailure": false,
   "pageLoadTimeout": 100000,
   "watchForFileChanges": false,
+  "trashAssetsBeforeRuns": true,
   "video": false
 }

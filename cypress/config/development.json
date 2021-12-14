@@ -1,6 +1,9 @@
 {
   "baseUrl": "http://127.0.0.1:3000",
   "environment": "development",
+  "screenshotOnRunFailure": false,
+  "pageLoadTimeout": 100000,
+  "trashAssetsBeforeRuns": true,
   "viewportWidth": 1000,
   "viewportHeight": 660
 }

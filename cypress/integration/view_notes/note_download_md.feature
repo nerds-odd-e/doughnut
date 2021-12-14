@@ -8,7 +8,7 @@ Feature: Download Note to .md file
       | Singapore | Singapore is great | https://www.gstatic.com/webp/gallery/1.jpg  | http://localhost:3000/ |
     And I open the "article" view of note "Singapore"
 
-  @featureToggle  @cleanDownloadFolder
+  @featureToggle @cleanDownloadFolder
   Scenario: User download current note
     Then I download note
     Then There is a "Singapore.md" file downloaded

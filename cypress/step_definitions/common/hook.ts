@@ -16,10 +16,10 @@ Before(() => {
   cy.cleanDBAndSeedData();
 });
 
-Before({ tags: "@featureToggle"}, ()=> {
-    cy.enableFeatureToggle(true)
+Before({ tags: "@featureToggle" }, () => {
+  cy.enableFeatureToggle(true)
 })
 
-After({ tags: "@cleanDownloadFolder"}, ()=> {
+Before({ tags: "@cleanDownloadFolder" }, () => {
   cy.cleanDownloadFolder()
 })
