@@ -3,7 +3,9 @@
   "environment": "ci",
   "screenshotOnRunFailure": false,
   "pageLoadTimeout": 100000,
+  "defaultCommandTimeout": 6000,
   "watchForFileChanges": false,
   "trashAssetsBeforeRuns": true,
+  "nodeVersion": "system",
   "video": false
 }
