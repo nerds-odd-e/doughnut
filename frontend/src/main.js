@@ -1,10 +1,10 @@
-import { createApp } from "vue";
-import { createRouter, createWebHistory } from "vue-router";
-import DoughnutApp from "./DoughnutApp.vue";
-import store from "./store";
-import routes from "./routes/routes";
-import "bootstrap/dist/css/bootstrap.min.css";
-import "bootstrap";
+import { createApp } from 'vue';
+import { createRouter, createWebHistory } from 'vue-router';
+import DoughnutApp from './DoughnutApp.vue';
+import store from './store';
+import routes from './routes/routes';
+import 'bootstrap/scss/bootstrap.scss';
+import 'bootstrap';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -20,4 +20,4 @@ app.config.globalProperties.$popups = {};
 app.use(router);
 app.use(store);
 
-app.mount("#app");
+app.mount('#app');
