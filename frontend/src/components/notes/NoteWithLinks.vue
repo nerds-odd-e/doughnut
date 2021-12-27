@@ -38,8 +38,7 @@ export default {
   props: {
     note: Object,
     language: String,
-    isInPlaceEditEnabled: Boolean,
-    isEditingTitle: Boolean
+    isInPlaceEditEnabled: Boolean
   },
   components: {
     NoteFrameOfLinks,

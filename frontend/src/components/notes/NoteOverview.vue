@@ -20,7 +20,6 @@ export default {
     highlightNoteId: [String, Number],
     expandChildren: { type: Boolean, required: true },
     language: String,
-    isInPlaceEditEnabled: Boolean,
   },
   data() {
     return {

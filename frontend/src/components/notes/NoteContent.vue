@@ -53,7 +53,6 @@ export default {
     language: String,
     isInPlaceEditEnabled: Boolean,
     isEditingTitle: Boolean,
-    isEditingDescription: Boolean,
   },
   components: {
     NoteShortDescription,
