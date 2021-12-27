@@ -27,7 +27,7 @@ export default {
 
 <style lang="sass" scoped>
 
-::v-deep .note-body
+:deep(.note-body)
   border-width: 0px
   border-left-width: 3px
 

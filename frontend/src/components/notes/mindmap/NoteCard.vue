@@ -98,6 +98,6 @@ export default {
   opacity: 0.7
   border-radius: 50%
 
-::v-deep .note-description
+:deep(.note-description)
   height: 100%
 </style>
