@@ -42,9 +42,10 @@ MySQL DB server is started and initialised on entering the `nix develop`.
 ```bash
 cd doughnut
 export NIXPKGS_ALLOW_UNFREE=1
-nix develop
+nix develop -c $SHELL
 ```
 
+All development tool commands henceforth should be run within `nix develop -c $SHELL`
 Run E2E profile springboot backend server with gradle (backend app started on port 9081)
 
 ```bash
