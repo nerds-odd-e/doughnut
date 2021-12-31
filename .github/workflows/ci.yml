@@ -46,9 +46,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
       - name: DB Migration unit test
-        run: ./gradlew testDBMigrate -Dspring.profiles.active=test --build-cache --parallel
+        run: ./gradlew testDBMigrate -Dspring.profiles.active=test
       - name: Unit tests with Gradle
-        run: ./gradlew test -Dspring.profiles.active=test --build-cache --parallel
+        run: ./gradlew test -Dspring.profiles.active=test --parallel
 
   Frontend-linting:
     name: Frontend Lint
