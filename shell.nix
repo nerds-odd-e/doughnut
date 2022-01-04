@@ -46,7 +46,6 @@ in mkShell {
     libmysqlclient
     libpcap
     patchelf
-    pinentry
     cacert
     mysql80
     mysql-client
