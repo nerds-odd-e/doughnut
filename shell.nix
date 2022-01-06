@@ -63,7 +63,7 @@ in mkShell {
     apple_sdk.SystemConfiguration
     xcodebuild
   ] ++ lib.optionals (!stdenv.isDarwin) [
-    chromium
+    ungoogled-chromium
     psmisc
     x11vnc
     xclip
