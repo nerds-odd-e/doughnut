@@ -80,6 +80,12 @@ public class Note {
     @Setter
     private User user;
 
+    @OneToMany(mappedBy = "note", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore
+    @Getter
+    @Setter
+    private List<ReviewPoint> reviewPoints = new ArrayList<>();
+
     @OneToMany(mappedBy = "sourceNote", cascade = CascadeType.ALL,
             orphanRemoval = true)
     @JsonIgnore
