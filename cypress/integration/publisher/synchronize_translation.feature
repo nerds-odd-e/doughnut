@@ -4,37 +4,28 @@ Feature: Synchronize Translation
   Background:
     Given I've logged in as an existing user
     And there are some notes for the current user
-      | title   | titleIDN  | description      | descriptionIDN   |
-      | English | Indonesia | English Language | Bahasa Indonesia |
-    And I open the "article" view of note "English"
-
-  @featureToggle
-  Scenario: Should inform me if translation is outdated
-    When I edit english note translation to become
-      | Title   |
-      | Inggris |
-    And Note title on the page should be "Inggris"
-    And I switch language to "ID"
-    Then I should see outdated tag
+      | title   | titleIDN | description      | descriptionIDN |
+      | Pandava | Pandawa  | The five heroes. | Lima pahlawan  |
+    And I open the "article" view of note "Pandava"
 
   @featureToggle
   Scenario: Should not change anything if translation is still up to date
     When I edit note translation to become
       | Title in Indonesian |
-      | Bahasa Indonesia    |
-    And Note title on the page should be "Bahasa Indonesia"
-    Then I should not see outdated tag
+      | putra Pandu         |
+    And Note title on the page should be "putra Pandu"
+    Then I should not see translation outdated tag
 
   @featureToggle
   Scenario: Should inform me if outdated translation already updated
-    When I edit english note translation to become
-      | Title   |
-      | Inggris |
+    When I edit original note translation to become
+      | Title         |
+      | sons of Pandu |
     And I switch language to "ID"
-    Then I should see outdated tag
+    Then I should see translation outdated tag
     And I switch language to "EN"
     When I edit note translation to become
       | Title in Indonesian |
-      | Bahasa Indonesia    |
-    And Note title on the page should be "Bahasa Indonesia"
-    Then I should not see outdated tag
+      | putra Pandu         |
+    And Note title on the page should be "putra Pandu"
+    Then I should not see translation outdated tag

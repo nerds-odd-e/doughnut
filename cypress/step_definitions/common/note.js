@@ -354,7 +354,7 @@ Then("There is a {string} file downloaded", (fileName) => {
   cy.verifyDownload(fileName);
 });
 
-When("I edit english note translation to become", (data) => {
+When("I edit original note translation to become", (data) => {
   cy.clickNoteToolbarButton("edit note");
   cy.submitNoteFormsWith(data.hashes());
 });
@@ -374,11 +374,11 @@ Then("The description should change to {string}", (messageContent) => {
   cy.contains(messageContent).should('exist');
 });
 
-Then("I should see outdated tag", (messageContent) => {
+Then("I should see translation outdated tag", (messageContent) => {
     cy.expectText("Outdated translation");
 });
 
-Then("I should not see outdated tag", (messageContent) => {
+Then("I should not see translation outdated tag", (messageContent) => {
     cy.expectText("Outdated translation").should("not.exist");
 });
 
