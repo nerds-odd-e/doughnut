@@ -367,27 +367,6 @@ When("I change the description to {string} in-place-edit mode", (noteDescription
  cy.get("#description-form-id textarea").clear().type(noteDescription).type('{shift}{enter}');
 });
 
-When("Another user updates note {string} with:", (noteTitle, data) => {
-  cy.loginAs("another_old_learner");
-  let fields = data.hashes()[0];
-  cy.request({
-    method: "PATCH",
-    url: "/api/notes/1",
-    form: true,
-    body: {
-      title: fields["Title"],
-      description: fields["Description"],
-    },
-  }).then((response) => {
-    expect(response.status).to.equal(200);
-    cy.loginAs("old_learner");
-  });
-});
-
-Then("I should see {string} message", (messageContent) => {
-  cy.contains(messageContent).should('exist');
-});
-
 Then("The title should change to {string}", (messageContent) => {
   cy.contains(messageContent).should('exist');
 });
