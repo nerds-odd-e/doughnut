@@ -11,7 +11,7 @@
       autocomplete="off"
       autocapitalize="off"
       rows="8"
-      @blur="onBlur"
+      @blur="$emit('blur', $event)"
     />
   </InputWithType>
 </template>
@@ -26,9 +26,8 @@ export default {
     placeholder: { type: String, default: null },
     autofocus: { type: Boolean, default: false },
     errors: Object,
-    onBlur: {type: Function},
   },
-  emits: ["update:modelValue"],
+  emits: ["update:modelValue", "blur"],
   components: { InputWithType },
 };
 </script>
