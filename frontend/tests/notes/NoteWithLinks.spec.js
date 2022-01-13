@@ -172,8 +172,6 @@ describe("in place edit on title", () => {
     await wrapper.find('[role="title"] input').trigger("blur");
 
     expect(fetch).toHaveBeenCalledWith(`/api/notes/${noteParent.id}`, expect.objectContaining({method: 'PATCH'}));
-
-    expect(wrapper.find('[role="title"] h2').text()).toContain('Dummy Title Updated');
   });
 });
 
