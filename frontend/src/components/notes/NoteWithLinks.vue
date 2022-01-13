@@ -4,10 +4,9 @@
     v-bind="{ id: note.id, updatedAt: note.noteContent?.updatedAt, language }"
   >
     <NoteFrameOfLinks v-bind="{ links: note.links }">
-      <div role="title" class="note-title">
-        <h2 style="display: inline-block;" @click="onTitleClick" v-if="!isEditingTitle">{{ translatedNote.title }}</h2>
-        <TextInput scopeName="note" v-model="translatedNote.title" :autofocus="true" @blur="onBlurTextField" v-if="isEditingTitle" v-on:keyup.enter="$event.target.blur()"/>
-      </div>
+      <EditableLine role="title" class="note-title"
+        scopeName="note" v-model="translatedNote.title" @blur="onBlurTextField"
+      />
       <span 
         role="outdated-tag" 
         class="outdated-label" 
@@ -28,7 +27,7 @@
 </template>
 
 <script>
-import TextInput from "../form/TextInput.vue";
+import EditableLine from "../form/EditableLine.vue";
 import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
 import NoteShell from "./NoteShell.vue";
 import NoteContent from "./NoteContent.vue";
@@ -45,11 +44,10 @@ export default {
     NoteFrameOfLinks,
     NoteShell,
     NoteContent,
-    TextInput
+    EditableLine,
   },
   data() {
     return {
-      isEditingTitle: false,
       formErrors: {},
     };
   },
@@ -59,11 +57,7 @@ export default {
     },
   },
   methods: {
-    onTitleClick() {
-      this.isEditingTitle = true;
-    },
     onBlurTextField() {
-      this.isEditingTitle = false;
       this.loading = true
       storedApiUpdateNote(this.$store, this.note.id, this.note.noteContent)
       .then((res) => {
