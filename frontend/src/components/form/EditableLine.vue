@@ -3,7 +3,7 @@
     <h2 style="display: inline-block;" @click="onClickText" v-if="!isEditing">{{ modelValue }}</h2>
     <TextInput
      v-bind="$attrs"
-     v-model="modelValue"
+     :modelValue="modelValue"
      @update:modelValue="$emit('update:modelValue', $event)"
      @blur="onBlurTextField"
      v-if="isEditing"
