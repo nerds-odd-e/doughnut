@@ -7,8 +7,7 @@
 
 <script>
 import NoteFormBody from "../notes/NoteFormBody.vue";
-import { restPatchMultiplePartForm } from "../../restful/restful";
-import { storedApiGetNoteAndItsChildren } from "../../storedApi";
+import { storedApiGetNoteAndItsChildren, storedApiUpdateNote } from "../../storedApi";
 
 export default {
   name: "NoteEditDialog",
@@ -38,16 +37,13 @@ export default {
     },
 
     processForm() {
-      restPatchMultiplePartForm(
-        `/api/notes/${this.noteId}`,
-        this.formData,
-        (r) => (this.loading = r)
-      )
-        .then((res) => {
-          this.$store.commit("loadNotes", [res]);
-          this.$emit("done");
-        })
-        .catch((res) => (this.formErrors = res));
+      this.loading = true
+      storedApiUpdateNote(this.$store, this.noteId, this.formData)
+      .then(() => {
+        this.$emit("done");
+      })
+      .catch((res) => (this.formErrors = res))
+      .finally(() => this.loading = false)
     },
   },
   mounted() {

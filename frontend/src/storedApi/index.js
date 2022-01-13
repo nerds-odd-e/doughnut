@@ -59,6 +59,18 @@ const storedApiCreateNote = async (store, parentId, data) => {
     return res;
 }
 
+const storedApiUpdateNote = async (store, noteId, noteContentData) => {
+
+    const { updatedAt, ...data } = noteContentData
+    const res = await restPatchMultiplePartForm(
+        `/api/notes/${noteId}`,
+        data,
+        () => null
+    )
+    store.commit("loadNotes", [res]);
+    return res;
+}
+
 const storedApiDeleteNote = async (store, noteId) => {
     const res = await restPost(
         `/api/notes/${noteId}/delete`,
@@ -157,6 +169,7 @@ export {
     storedApiGetNoteWithDescendents,
     storedApiGetNoteAndItsChildren,
     storedApiCreateNote,
+    storedApiUpdateNote,
     storedApiDeleteNote,
     storedApiSplitNote,
     storedApiGetCurrentUserInfo,
