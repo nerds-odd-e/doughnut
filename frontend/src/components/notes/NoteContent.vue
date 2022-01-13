@@ -51,7 +51,6 @@ export default {
     note: Object,
     size: { type: String, default: 'large'},
     language: String,
-    isInPlaceEditEnabled: Boolean,
   },
   components: {
     NoteShortDescription,
@@ -77,9 +76,7 @@ export default {
   },
   methods: {
     onDescriptionClick() {
-      if (this.isInPlaceEditEnabled) {
-        this.isEditingDescription = true;
-      }
+      this.isEditingDescription = true;
     },
     inputHandler(e) {
       if (e.keyCode === 13 && !e.shiftKey) {

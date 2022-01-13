@@ -1,5 +1,5 @@
 <template>
-  <NoteWithLinks v-bind="{ note, language, isInPlaceEditEnabled }" v-if="note"/>
+  <NoteWithLinks v-bind="{ note, language }" v-if="note"/>
   <div class="note-list">
     <NoteOverview
       v-for="childId in childrenIds"
@@ -20,11 +20,6 @@ export default {
     highlightNoteId: [String, Number],
     expandChildren: { type: Boolean, required: true },
     language: String,
-  },
-  data() {
-    return {
-      isInPlaceEditEnabled: true
-    }
   },
   emits: ["highlight"],
   components: { NoteWithLinks },

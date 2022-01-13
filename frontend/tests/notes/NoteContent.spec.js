@@ -19,7 +19,6 @@ describe("in place edit on description", () => {
       { 
         props: { 
           note: noteParent,
-          isInPlaceEditEnabled: true 
         } 
       },
     )
@@ -30,27 +29,6 @@ describe("in place edit on description", () => {
     expect(wrapper.findAll("#description-id")).toHaveLength(0);
   });
 
-  it("should not display text field when one single click on description", async () => {
-    const noteParent = makeMe.aNote.title("Dummy Title").description("Dummy Description").please();
-    store.commit("loadNotes", [noteParent]);
-
-    const { wrapper } = mountWithStoreAndMockRoute(
-      store,
-      NoteContent,
-      { 
-        props: { 
-          note: noteParent,
-          isInPlaceEditEnabled: false 
-        } 
-      },
-    )
-
-    await wrapper.find('#description-id').trigger('click');
-
-    expect(wrapper.findAll('#description-form-id')).toHaveLength(0);
-    expect(wrapper.findAll("#description-id")).toHaveLength(1);
-  });
-
   it("should back to label when blur text field description", async () => {
     const noteParent = makeMe.aNote.title("Dummy Title").description("Dummy Description").please();
     store.commit("loadNotes", [noteParent]);
@@ -58,7 +36,6 @@ describe("in place edit on description", () => {
     const { wrapper } = mountWithStoreAndMockRoute(store, NoteContent, {
       props: {
         note: noteParent,
-        isInPlaceEditEnabled: true,
       },
     });
 
@@ -81,7 +58,6 @@ describe("in place edit on description", () => {
         props: { 
           note: noteParent,
           language: Languages.ID,
-          isInPlaceEditEnabled: true 
         } 
       },
     );

@@ -22,7 +22,7 @@
       >
         No translation available
       </p>
-      <NoteContent v-bind="{ note, language, isInPlaceEditEnabled, isEditingTitle }"/>
+      <NoteContent v-bind="{ note, language }"/>
     </NoteFrameOfLinks>
   </NoteShell>
 </template>
@@ -40,7 +40,6 @@ export default {
   props: {
     note: Object,
     language: String,
-    isInPlaceEditEnabled: Boolean
   },
   components: {
     NoteFrameOfLinks,
@@ -60,9 +59,7 @@ export default {
   },
   methods: {
     onTitleClick() {
-      if (this.isInPlaceEditEnabled) {
-        this.isEditingTitle = true;
-      }
+      this.isEditingTitle = true;
     },
     onBlurTextField(input) {
       const resolvedLanguage = this.language ?? Languages.EN;
