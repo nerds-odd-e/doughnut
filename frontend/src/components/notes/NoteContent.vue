@@ -1,17 +1,17 @@
 <template>
   <div class="note-content">
-        <template v-if="!!translatedNote.description || isEditingDescription">
-      <div id="description-id" class="note-content" @click="onDescriptionClick" v-if="!isEditingDescription">
+    <template v-if="!!translatedNote.description || isEditingDescription">
+      <div
+        v-if="size==='large'"
+        class="col">
         <ShowDescription
-          v-if="size==='large'"
-          class="col"
-          :description="translatedNote.description"
+          :description="translatedNote.description" @click="onDescriptionClick" v-if="!isEditingDescription"
         />
-        <NoteShortDescription class="col" v-if="size==='medium'" :shortDescription="translatedNote.shortDescription"/>
-        <SvgDescriptionIndicator v-if="size==='small'" class="description-indicator"/>
+        <TextArea class="note-content-description" id="description-form-id" scopeName="note" v-model="translatedNote.description" :autofocus="true" 
+          @blur="onBlurTextField" v-if="isEditingDescription" v-on:keydown.enter.shift="$event.target.blur()"/>
       </div>
-      <TextArea class="note-content-description" id="description-form-id" scopeName="note" v-model="translatedNote.description" :autofocus="true" 
-        @blur="onBlurTextField" v-if="isEditingDescription" v-on:keydown.enter.shift="$event.target.blur()"/>
+      <NoteShortDescription class="col" v-if="size==='medium'" :shortDescription="translatedNote.shortDescription"/>
+      <SvgDescriptionIndicator v-if="size==='small'" class="description-indicator"/>
     </template>
     <template v-if="!!note.notePicture">
       <ShowPicture
@@ -98,6 +98,5 @@ export default {
 
 .note-content-description
   width: 100%
-  display: inline
 
 </style>
