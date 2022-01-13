@@ -6,7 +6,7 @@
     <NoteFrameOfLinks v-bind="{ links: note.links }">
       <div role="title">
         <h2 class="note-title" style="display: inline-block;" @click="onTitleClick" v-if="!isEditingTitle">{{ translatedNote.title }}</h2>
-        <TextInput id="title-form-id" scopeName="note" v-model="translatedNote.title" :autofocus="true" @blur="onBlurTextField" v-if="isEditingTitle" v-on:keyup.enter="$event.target.blur()"/>
+        <TextInput scopeName="note" v-model="translatedNote.title" :autofocus="true" @blur="onBlurTextField" v-if="isEditingTitle" v-on:keyup.enter="$event.target.blur()"/>
       </div>
       <span 
         role="outdated-tag" 

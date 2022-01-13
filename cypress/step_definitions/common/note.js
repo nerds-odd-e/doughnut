@@ -360,7 +360,7 @@ When("I edit original note translation to become", (data) => {
 });
 
 When("I change the title to {string} in-place-edit mode", (noteTitle) => {
- cy.get("#title-form-id input").clear().type(noteTitle).type('{enter}');
+ cy.get("[role=title] input").clear().type(noteTitle).type('{enter}');
 });
 
 When("I change the description to {string} in-place-edit mode", (noteDescription) => {
