@@ -52,7 +52,6 @@ export default {
     size: { type: String, default: 'large'},
     language: String,
     isInPlaceEditEnabled: Boolean,
-    isEditingTitle: Boolean,
   },
   components: {
     NoteShortDescription,
@@ -78,7 +77,7 @@ export default {
   },
   methods: {
     onDescriptionClick() {
-      if (this.isInPlaceEditEnabled && !this.isEditingTitle) {
+      if (this.isInPlaceEditEnabled) {
         this.isEditingDescription = true;
       }
     },

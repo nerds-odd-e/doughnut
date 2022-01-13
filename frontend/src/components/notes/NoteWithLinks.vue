@@ -1,7 +1,7 @@
 <template>
   <NoteShell
     class="note-body"
-    v-bind="{ id: note.id, updatedAt: note.noteContent?.updatedAt, language, isEditingTitle }"
+    v-bind="{ id: note.id, updatedAt: note.noteContent?.updatedAt, language }"
   >
     <NoteFrameOfLinks v-bind="{ links: note.links }">
       <div role="title">
@@ -11,7 +11,7 @@
       <span 
         role="outdated-tag" 
         class="outdated-label" 
-        v-if="translatedNote.isTranslationOutdatedIDN && !isEditingTitle"
+        v-if="translatedNote.isTranslationOutdatedIDN"
         >
           Outdated translation
       </span>
