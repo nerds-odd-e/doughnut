@@ -210,6 +210,7 @@ Cypress.Commands.add('findNoteCardButton', (noteTitle, btnTextOrTitle) => {
     .parent()
     .parent()
     .parent()
+    .parent()
     .findByRole('button', { name: btnTextOrTitle });
 });
 
@@ -289,8 +290,7 @@ Cypress.Commands.add(
 
 Cypress.Commands.add(
   'expectNoteTitle',
-  (title) => cy.findByText(title, { selector: '[role=title]' }) //.should("be.visible")
-  // Add should be visible back when the link view page is remade.
+  (title) => cy.findByText(title, { selector: '[role=title] *' })
 );
 
 Cypress.Commands.add(

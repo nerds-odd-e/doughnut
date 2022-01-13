@@ -305,7 +305,7 @@ Then("I should see the child notes {string} in order", (notesStr) => {
   notes.forEach((n) => cy.findByText(n));
   cy.findAllByRole("title").then((elms) => {
     let actual = [];
-    elms.map((i, actualNote) => actual.push(actualNote.innerHTML));
+    elms.map((i, actualNote) => actual.push(actualNote.innerText));
     actual = actual.filter((c) => notes.includes(c));
     expect(actual.join(",")).to.equal(notes.join(","));
   });

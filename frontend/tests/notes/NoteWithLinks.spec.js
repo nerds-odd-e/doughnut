@@ -129,10 +129,11 @@ describe("in place edit on title", () => {
       },
     )
 
-    await wrapper.find('#title-id').trigger('click');
+    expect(wrapper.findAll('[role="title"] input')).toHaveLength(0);
+    await wrapper.find('[role="title"] h2').trigger('click');
 
-    expect(wrapper.findAll('#title-form-id')).toHaveLength(1);
-    expect(wrapper.findAll("#title-id")).toHaveLength(0);
+    expect(wrapper.findAll('[role="title"] input')).toHaveLength(1);
+    expect(wrapper.findAll('[role="title"] h2')).toHaveLength(0);
   });
 
   it("should not display text field when one single click on title", async () => {
@@ -150,10 +151,10 @@ describe("in place edit on title", () => {
       },
     )
 
-    await wrapper.find('#title-id').trigger('click');
+    await wrapper.find('[role="title"] h2').trigger('click');
 
-    expect(wrapper.findAll('#title-form-id')).toHaveLength(0);
-    expect(wrapper.findAll("#title-id")).toHaveLength(1);
+    expect(wrapper.findAll('[role="title"] input')).toHaveLength(0);
+    expect(wrapper.findAll('[role="title"] h2')).toHaveLength(1);
   });
 
   it("should back to label when blur text field title", async () => {
@@ -167,12 +168,10 @@ describe("in place edit on title", () => {
       },
     });
 
-    await wrapper.find("#title-id").trigger("click");
-    await wrapper.find("#note-undefined").trigger("blur");
+    await wrapper.find('[role="title"] h2').trigger('click');
+    await wrapper.find('[role="title"] input').trigger("blur");
 
     expect(fetch).toHaveBeenCalledWith(`/api/notes/${noteParent.id}`, expect.objectContaining({method: 'PATCH'}));
-    expect(wrapper.findAll("#title-form-id")).toHaveLength(0);
-    expect(wrapper.findAll("#title-id")).toHaveLength(1);
   });
 
   it("should update Indonesian title on blur when language is Indonesian", async () => {
@@ -191,14 +190,14 @@ describe("in place edit on title", () => {
       },
     );
 
-    await wrapper.find('#title-id').trigger('click');
-    await wrapper.find('#title-form-id input').setValue('Dummy Title Updated');
-    await wrapper.find('#title-form-id input').trigger('input');
-    await wrapper.find('#note-undefined').trigger("blur");
+    await wrapper.find('[role="title"] h2').trigger('click');
+    await wrapper.find('[role="title"] input').setValue('Dummy Title Updated');
+    await wrapper.find('[role="title"] input').trigger('input');
+    await wrapper.find('[role="title"] input').trigger("blur");
 
     expect(fetch).toHaveBeenCalledWith(`/api/notes/${noteParent.id}`, expect.objectContaining({method: 'PATCH'}));
 
-    expect(wrapper.find("#title-id").text()).toContain('Dummy Title Updated');
+    expect(wrapper.find('[role="title"] h2').text()).toContain('Dummy Title Updated');
   });
 });
 
