@@ -5,7 +5,7 @@
   >
     <NoteFrameOfLinks v-bind="{ links: note.links }">
       <EditableLine role="title" class="note-title"
-        scopeName="note" v-model="translatedNote.title" @blur="onBlurTextField"
+        scopeName="note" v-model="translatedNote.title" @blur="submitChange"
       />
       <span 
         role="outdated-tag" 
@@ -21,7 +21,7 @@
       >
         No translation available
       </p>
-      <NoteContent v-bind="{ note, language }"/>
+      <NoteContent v-bind="{ note, language }" @blur="submitChange"/>
     </NoteFrameOfLinks>
   </NoteShell>
 </template>
@@ -57,7 +57,7 @@ export default {
     },
   },
   methods: {
-    onBlurTextField() {
+    submitChange() {
       this.loading = true
       storedApiUpdateNote(this.$store, this.note.id, this.note.noteContent)
       .then((res) => {
