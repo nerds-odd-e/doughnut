@@ -1,7 +1,7 @@
 <template>
   <div class="note-content">
-        <template v-if="!!note.noteContent.description || isEditingDescription">
-      <div id="description-id" class="note-content" @click="onDescriptionClick" v-if="!isEditingDescription">
+    <template v-if="!!note.noteContent.description">
+      <div id="description-id" class="note-content" @click="onDescriptionClick">
         <ShowDescription
           v-if="size==='large'"
           class="col"
@@ -44,7 +44,7 @@ import SvgUrlIndicator from "../svgs/SvgUrlIndicator.vue";
 export default {
   props: {
     note: Object,
-    size: { type: String, default: 'large'},
+    size: String,
   },
   components: {
     NoteShortDescription,
@@ -53,11 +53,6 @@ export default {
     SvgDescriptionIndicator,
     SvgPictureIndicator,
     SvgUrlIndicator,
-  },
-  data() {
-    return {
-      isEditingDescription: false,
-    };
   },
   computed: {
     twoColumns() {
