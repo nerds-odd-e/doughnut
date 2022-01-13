@@ -8,14 +8,14 @@
     <h5 class="header note-card-title">
       <NoteTitleWithLink :note="note" class="card-title" />
     </h5>
-    <NoteCardContent class="content" v-bind="{note, size}"/>
+    <NoteContent class="content" v-bind="{note, size}"/>
   </NoteShell>
 </template>
 
 <script>
 import NoteTitleWithLink from "../NoteTitleWithLink.vue";
 import NoteShell from "../NoteShell.vue";
-import NoteCardContent from "../NoteCardContent.vue";
+import NoteContent from "../NoteContent.vue";
 import MindmapSector from "@/models/MindmapSector";
 
 export default {
@@ -28,7 +28,7 @@ export default {
   emits: ['highlight'],
   components: {
      NoteShell,
-     NoteCardContent,
+     NoteContent,
      NoteTitleWithLink },
   computed: {
     highlightClass() {
