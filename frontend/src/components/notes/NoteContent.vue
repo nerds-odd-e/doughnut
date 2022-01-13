@@ -23,7 +23,7 @@
       <SvgPictureIndicator v-else class="picture-indicator"/>
     </template>
     <template v-if="!!note.noteContent.url">
-      <div class="col" v-if="size!='small'">
+      <div v-if="size!='small'">
         <label v-if="note.noteContent.urlIsVideo">Video Url:</label>
         <label v-else>Url:</label>
         <a :href="note.noteContent.url" target="_blank">{{ note.noteContent.url }}</a>
@@ -42,9 +42,8 @@ import ShowDescription from "./ShowDescription.vue";
 import SvgDescriptionIndicator from "../svgs/SvgDescriptionIndicator.vue";
 import SvgPictureIndicator from "../svgs/SvgPictureIndicator.vue";
 import SvgUrlIndicator from "../svgs/SvgUrlIndicator.vue";
-import Languages, { TranslatedNoteWrapper } from "../../models/languages";
+import { TranslatedNoteWrapper } from "../../models/languages";
 import TextArea from "../form/TextArea.vue";
-import { restPatchMultiplePartForm } from "../../restful/restful";
 
 export default {
   props: {
@@ -79,12 +78,6 @@ export default {
     onDescriptionClick() {
       this.isEditingDescription = true;
     },
-    inputHandler(e) {
-      if (e.keyCode === 13 && !e.shiftKey) {
-        e.preventDefault();
-        this.onBlurTextField();
-      }
-    },
     onBlurTextField() {
       this.isEditingDescription = false;
       this.$emit("blur", {description: this.note.noteContent.description});
@@ -97,14 +90,14 @@ export default {
 .note-content
   display: flex
   flex-wrap: wrap
-.note-content-description
-  width: 100%
-  display: inline
-
   .col
     flex: 1 1 auto
     width: 50%
 
 
+
+.note-content-description
+  width: 100%
+  display: inline
 
 </style>
