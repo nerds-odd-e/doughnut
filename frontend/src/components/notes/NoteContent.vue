@@ -52,6 +52,7 @@ export default {
     size: { type: String, default: 'large'},
     language: String,
   },
+  emits: ['blur'],
   components: {
     NoteShortDescription,
     ShowPicture,
@@ -84,35 +85,9 @@ export default {
         this.onBlurTextField();
       }
     },
-    onBlurTextField(input) {
+    onBlurTextField() {
       this.isEditingDescription = false;
-
-      const resolvedLanguage = this.language ?? Languages.EN;
-
-      if (resolvedLanguage === Languages.EN) {
-        this.note.description = input.target.value;
-        this.note.noteContent.description = input.target.value;
-        this.note.descriptionIDN = this.note.noteContent.descriptionIDN;
-      } else if (resolvedLanguage === Languages.ID) {
-        this.note.descriptionIDN = input.target.value;
-        this.note.noteContent.descriptionIDN = input.target.value;
-        this.note.description = this.note.noteContent.description;
-      }
-
-      // Need to update title to make sure we're calling API with correct value.
-      this.note.title = this.note.noteContent.title;
-      this.note.titleIDN = this.note.noteContent.titleIDN;
-
-      restPatchMultiplePartForm(
-        `/api/notes/${this.note.id}`,
-        this.note,
-        (r) => (this.loading = r)
-      )
-        .then((res) => {
-          this.$store.commit("loadNotes", [res]);
-          this.$emit("done");
-        })
-        .catch((res) => (this.formErrors = res));
+      this.$emit("blur", {description: this.note.noteContent.description});
     }
   }
 };
