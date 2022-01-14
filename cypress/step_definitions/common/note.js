@@ -360,11 +360,11 @@ When("I edit original note translation to become", (data) => {
 });
 
 When("I change the title to {string} in-place-edit mode", (noteTitle) => {
- cy.get("[role=title] input").clear().type(noteTitle).type('{enter}');
+ cy.focused().clear().type(noteTitle).type('{enter}');
 });
 
 When("I change the description to {string} in-place-edit mode", (noteDescription) => {
- cy.get("[role=description] textarea").clear().type(noteDescription).type('{shift}{enter}');
+ cy.focused().clear().type(noteDescription).type('{shift}{enter}');
 });
 
 Then("The title should change to {string}", (messageContent) => {

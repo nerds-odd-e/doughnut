@@ -19,5 +19,10 @@ app.config.globalProperties.$popups = {};
 
 app.use(router);
 app.use(store);
+app.directive('focus', {
+  mounted(el) {
+    el.querySelector('input, textarea').focus()
+  }
+})
 
 app.mount('#app');

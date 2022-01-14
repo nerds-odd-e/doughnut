@@ -3,6 +3,7 @@
     <component v-bind:is="displayComponent"
         @click="onClickText" v-if="!isEditing" v-text="modelValue"/>
     <component v-bind:is="editingComponent"
+     v-focus
      class="editor" 
      :modelValue="modelValue"
      :scopeName="scopeName"
