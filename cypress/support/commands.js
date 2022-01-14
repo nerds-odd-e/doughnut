@@ -402,7 +402,7 @@ Cypress.Commands.add('failure', () => {
 });
 
 Cypress.Commands.add('expectCurrentNoteDescription', (expectedDescription) => {
-  cy.findByText(expectedDescription, { selector: '.note-description' });
+  cy.findByText(expectedDescription, { selector: '.note-description *' });
 });
 
 Cypress.Commands.add('withinMindmap', () => {
