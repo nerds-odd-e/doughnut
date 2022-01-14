@@ -19,6 +19,9 @@ const withMockRoute = (
     comp,
     merge(options, {
       global: {
+        directives: {
+          focus() {}
+        },
         mocks: {
           $route: currentRoute,
           $router: mockRouter,

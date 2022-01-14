@@ -17,7 +17,7 @@
           v-model="creationData.linkTypeToParent"
           :errors="formErrors.linkTypeToParent"
         />
-        <NoteFormBody
+        <NoteFormTitleOnly
           v-model="creationData.noteContent"
           :errors="formErrors.noteContent"
         />
@@ -29,7 +29,7 @@
 
 <script>
 import Breadcrumb from "../notes/Breadcrumb.vue";
-import NoteFormBody from "../notes/NoteFormBody.vue";
+import NoteFormTitleOnly from "../notes/NoteFormTitleOnly.vue";
 import ModalWithButton from "../commons/ModalWithButton.vue";
 import LinkTypeSelect from "../links/LinkTypeSelect.vue";
 import { storedApiGetNoteAndItsChildren, storedApiCreateNote } from "../../storedApi";
@@ -48,7 +48,7 @@ export default {
   name: "NoteNewButton",
   components: {
     Breadcrumb,
-    NoteFormBody,
+    NoteFormTitleOnly,
     ModalWithButton,
     LinkTypeSelect,
   },
@@ -88,7 +88,14 @@ export default {
         this.$store,
         this.parentId,
         this.creationData
-      ).then((res) => { this.show = false })
+      ).then((res) => {
+        this.show = false
+        console.log(res)
+        this.$router.push({
+          name: "noteShow",
+          params: { noteId: res.notePosition.noteId },
+        })
+      })
       .catch((res) => (this.formErrors = res))
       .finally(()=> this.loading = false )
     },

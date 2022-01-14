@@ -23,8 +23,8 @@ Feature: Nested Note CRUD
 
   Scenario: Create a new note with wrong info
     When I create note belonging to "LeSS in Action":
-      | Title | Description |
-      |       |             |
+      | Title |
+      |       |
     Then I should see that the note creation is not successful
 
   Scenario: Create a new sibling note

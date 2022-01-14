@@ -33,7 +33,7 @@ Given("there are notes from Note {int} to Note {int}", (from, to) => {
 When("I create top level note with:", (data) => {
   cy.visitMyNotebooks();
   cy.findByText("Add New Notebook").click();
-  cy.submitNoteFormsWith(data.hashes());
+  cy.submitNoteCreationFormsWith(data.hashes());
 });
 
 When(
@@ -63,7 +63,7 @@ When("I create note belonging to {string}:", (noteTitle, data) => {
   cy.jumpToNotePage(noteTitle);
   cy.findByText(noteTitle);
   cy.clickAddChildNoteButton();
-  cy.submitNoteFormsWith(data.hashes());
+  cy.submitNoteCreationFormsWith(data.hashes());
 });
 
 When("I am creating note under {string}", (noteTitles) => {
@@ -98,10 +98,9 @@ When("I delete top level note {string}", (noteTitle) => {
 });
 
 When("I create a sibling note of {string}:", (noteTitle, data) => {
-  cy.navigateToChild(noteTitle);
   cy.findByText(noteTitle);
   cy.findByRole("button", { name: "Add Sibling Note" }).click();
-  cy.submitNoteFormsWith(data.hashes());
+  cy.submitNoteCreationFormsWith(data.hashes());
 });
 
 When(

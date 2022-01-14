@@ -21,7 +21,7 @@ Feature: Note CRUD
 
   Scenario: Create a new note with invalid information
     When I create top level note with:
-      | Title | Description  |
-      |       | Put to sleep |
+      | Title |
+      |       |
     Then I should see that the note creation is not successful
 

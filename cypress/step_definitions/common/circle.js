@@ -55,7 +55,7 @@ Given(
 When("I create a note {string} in circle {string}", (noteTitle, circleName) => {
   cy.navigateToCircle(circleName);
   cy.findByText("Add New Notebook In This Circle").click();
-  cy.submitNoteFormsWith([{Title: noteTitle}]);
+  cy.submitNoteCreationFormsWith([{Title: noteTitle}]);
 });
 
 When(
@@ -69,7 +69,7 @@ When(
 When("I add a note {string} under {string}", (noteTitle, parentNoteTitle) => {
   cy.findByText(parentNoteTitle).click();
   cy.clickAddChildNoteButton();
-  cy.submitNoteFormsWith([{Title: noteTitle}]);
+  cy.submitNoteCreationFormsWith([{Title: noteTitle}]);
   cy.findByText(noteTitle).should("be.visible");
 });
 

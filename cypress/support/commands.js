@@ -81,6 +81,20 @@ Cypress.Commands.add('triggerException', () => {
   });
 });
 
+Cypress.Commands.add('submitNoteCreationFormWith', (noteAttributes) => {
+    const linkTypeToParent = noteAttributes['Link Type To Parent']
+    delete noteAttributes['Link Type To Parent']
+    const { Title, ...remainingAttrs } = noteAttributes
+
+    cy.submitNoteFormWith({Title, 'Link Type To Parent': linkTypeToParent})
+    if(Object.keys(remainingAttrs).length > 0) {
+        cy.findByText(Title)
+        cy.clickNoteToolbarButton("edit note");
+        cy.submitNoteFormWith(remainingAttrs)
+    }
+
+});
+
 Cypress.Commands.add('submitNoteFormWith', (noteAttributes) => {
   for (var propName in noteAttributes) {
     const value = noteAttributes[propName];
@@ -112,6 +126,10 @@ Cypress.Commands.add('clickAddChildNoteButton', () => {
 
 Cypress.Commands.add('clickRadioByLabel', (labelText) => {
   cy.findByText(labelText, { selector: 'label' }).click({ force: true });
+});
+
+Cypress.Commands.add('submitNoteCreationFormsWith', (notes) => {
+  notes.forEach((noteAttributes) => cy.submitNoteCreationFormWith(noteAttributes));
 });
 
 Cypress.Commands.add('submitNoteFormsWith', (notes) => {

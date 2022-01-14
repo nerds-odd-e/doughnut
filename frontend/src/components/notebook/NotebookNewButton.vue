@@ -25,7 +25,7 @@
     <template #body>
       <LoadingPage v-bind="{ loading, contentExists: true }">
         <form @submit.prevent.once="processForm">
-          <NoteFormBody v-model="noteFormData" :errors="noteFormErrors" />
+          <NoteFormTitleOnly v-model="noteFormData" :errors="noteFormErrors" />
           <input type="submit" value="Submit" class="btn btn-primary" />
         </form>
       </LoadingPage>
@@ -36,7 +36,7 @@
 <script>
 import ModalWithButton from "../commons/ModalWithButton.vue";
 import Breadcrumb from "../notes/Breadcrumb.vue";
-import NoteFormBody from "../notes/NoteFormBody.vue";
+import NoteFormTitleOnly from "../notes/NoteFormTitleOnly.vue";
 import LoadingPage from "../../pages/commons/LoadingPage.vue";
 import { restPostMultiplePartForm } from "../../restful/restful";
 
@@ -46,7 +46,7 @@ export default {
   components: {
     ModalWithButton,
     Breadcrumb,
-    NoteFormBody,
+    NoteFormTitleOnly,
     LoadingPage,
   },
   data() {

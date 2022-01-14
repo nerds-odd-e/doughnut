@@ -75,7 +75,7 @@ class RestNoteController {
             link.setTypeId(noteCreation.getLinkTypeToParent());
             modelFactoryService.linkRepository.save(link);
         }
-        return NotesBulk.jsonNoteWithChildren(parentNote, userModel);
+        return NotesBulk.jsonNoteWithParent(note, userModel);
     }
 
     @GetMapping("/{note}")
