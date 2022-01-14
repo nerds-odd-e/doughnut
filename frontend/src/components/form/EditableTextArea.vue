@@ -1,11 +1,15 @@
 <template>
   <div>
-    <pre :class="`note-description`" style="white-space: pre-wrap"
+    <pre style="white-space: pre-wrap"
         @click="onClickText" v-if="!isEditing">{{
           modelValue
     }}</pre>
     <TextArea class="editor" 
-      v-bind="$props"
+      :modelValue="modelValue"
+      :scopeName="scopeName"
+      :field="field"
+      :title="title"
+      :errors="errors"
       @update:modelValue="$emit('update:modelValue', $event)"
       @blur="onBlurTextField"
       v-if="isEditing"

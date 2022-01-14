@@ -3,7 +3,7 @@
       <EditableTextArea
           role="description"
           v-if="size==='large'"
-          class="col"
+          class="col note-description"
           scopeName="note"
           v-model="translatedNote.description"
           @blur="onBlurTextField"/>
