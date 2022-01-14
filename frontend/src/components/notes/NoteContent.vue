@@ -1,6 +1,7 @@
 <template>
   <div class="note-content">
-      <EditableTextArea
+      <EditableText
+          :multipleLine="true"
           role="description"
           v-if="size==='large'"
           class="col note-description"
@@ -38,7 +39,7 @@ import SvgDescriptionIndicator from "../svgs/SvgDescriptionIndicator.vue";
 import SvgPictureIndicator from "../svgs/SvgPictureIndicator.vue";
 import SvgUrlIndicator from "../svgs/SvgUrlIndicator.vue";
 import { TranslatedNoteWrapper } from "../../models/languages";
-import EditableTextArea from "../form/EditableTextArea.vue";
+import EditableText from "../form/EditableText.vue";
 
 export default {
   props: {
@@ -53,7 +54,7 @@ export default {
     SvgDescriptionIndicator,
     SvgPictureIndicator,
     SvgUrlIndicator,
-    EditableTextArea
+    EditableText
   },
   computed: {
     twoColumns() {
@@ -64,8 +65,8 @@ export default {
     },
   },
   methods: {
-    onBlurTextField(data) {
-      this.$emit("blur", data);
+    onBlurTextField() {
+      this.$emit("blur");
     }
   }
 };

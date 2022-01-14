@@ -4,7 +4,8 @@
     v-bind="{ id: note.id, updatedAt: note.noteContent?.updatedAt, language }"
   >
     <NoteFrameOfLinks v-bind="{ links: note.links }">
-      <EditableLine role="title" class="note-title"
+      <EditableText role="title" class="note-title"
+        :multipleLine="false"
         scopeName="note" v-model="translatedNote.title" @blur="submitChange"
       />
       <span 
@@ -27,7 +28,7 @@
 </template>
 
 <script>
-import EditableLine from "../form/EditableLine.vue";
+import EditableText from "../form/EditableText.vue";
 import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
 import NoteShell from "./NoteShell.vue";
 import NoteContent from "./NoteContent.vue";
@@ -44,7 +45,7 @@ export default {
     NoteFrameOfLinks,
     NoteShell,
     NoteContent,
-    EditableLine,
+    EditableText,
   },
   data() {
     return {
