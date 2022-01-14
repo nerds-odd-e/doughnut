@@ -4,9 +4,10 @@
       <div
         v-if="size==='large'"
         class="col">
-        <ShowDescription
-          :description="translatedNote.description" @click="onDescriptionClick" v-if="!isEditingDescription"
-        />
+        <pre :class="`note-description`" style="white-space: pre-wrap"
+           @click="onDescriptionClick" v-if="!isEditingDescription">{{
+          translatedNote.description
+        }}</pre>
         <TextArea class="note-content-description" id="description-form-id" scopeName="note" v-model="translatedNote.description" :autofocus="true" 
           @blur="onBlurTextField" v-if="isEditingDescription" v-on:keydown.enter.shift="$event.target.blur()"/>
       </div>
@@ -38,7 +39,6 @@
 <script>
 import NoteShortDescription from "./NoteShortDescription.vue";
 import ShowPicture from "./ShowPicture.vue";
-import ShowDescription from "./ShowDescription.vue";
 import SvgDescriptionIndicator from "../svgs/SvgDescriptionIndicator.vue";
 import SvgPictureIndicator from "../svgs/SvgPictureIndicator.vue";
 import SvgUrlIndicator from "../svgs/SvgUrlIndicator.vue";
@@ -55,7 +55,6 @@ export default {
   components: {
     NoteShortDescription,
     ShowPicture,
-    ShowDescription,
     SvgDescriptionIndicator,
     SvgPictureIndicator,
     SvgUrlIndicator,
