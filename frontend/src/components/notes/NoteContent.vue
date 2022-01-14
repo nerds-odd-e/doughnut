@@ -1,19 +1,14 @@
 <template>
   <div class="note-content">
-    <template v-if="!!translatedNote.description || isEditingDescription">
-      <div
-        v-if="size==='large'"
-        class="col">
-        <pre :class="`note-description`" style="white-space: pre-wrap"
-           @click="onDescriptionClick" v-if="!isEditingDescription">{{
-          translatedNote.description
-        }}</pre>
-        <TextArea class="note-content-description" id="description-form-id" scopeName="note" v-model="translatedNote.description" :autofocus="true" 
-          @blur="onBlurTextField" v-if="isEditingDescription" v-on:keydown.enter.shift="$event.target.blur()"/>
-      </div>
+      <EditableTextArea
+          role="description"
+          v-if="size==='large'"
+          class="col"
+          scopeName="note"
+          v-model="translatedNote.description"
+          @blur="onBlurTextField"/>
       <NoteShortDescription class="col" v-if="size==='medium'" :shortDescription="translatedNote.shortDescription"/>
-      <SvgDescriptionIndicator v-if="size==='small'" class="description-indicator"/>
-    </template>
+      <SvgDescriptionIndicator v-if="size==='small' && !!translatedNote.description" class="description-indicator"/>
     <template v-if="!!note.notePicture">
       <ShowPicture
         v-if="size!=='small'"
@@ -43,7 +38,7 @@ import SvgDescriptionIndicator from "../svgs/SvgDescriptionIndicator.vue";
 import SvgPictureIndicator from "../svgs/SvgPictureIndicator.vue";
 import SvgUrlIndicator from "../svgs/SvgUrlIndicator.vue";
 import { TranslatedNoteWrapper } from "../../models/languages";
-import TextArea from "../form/TextArea.vue";
+import EditableTextArea from "../form/EditableTextArea.vue";
 
 export default {
   props: {
@@ -58,12 +53,7 @@ export default {
     SvgDescriptionIndicator,
     SvgPictureIndicator,
     SvgUrlIndicator,
-    TextArea
-  },
-  data() {
-    return {
-      isEditingDescription: false,
-    };
+    EditableTextArea
   },
   computed: {
     twoColumns() {
@@ -74,12 +64,8 @@ export default {
     },
   },
   methods: {
-    onDescriptionClick() {
-      this.isEditingDescription = true;
-    },
-    onBlurTextField() {
-      this.isEditingDescription = false;
-      this.$emit("blur", {description: this.note.noteContent.description});
+    onBlurTextField(data) {
+      this.$emit("blur", data);
     }
   }
 };
@@ -92,10 +78,5 @@ export default {
   .col
     flex: 1 1 auto
     width: 50%
-
-
-
-.note-content-description
-  width: 100%
 
 </style>

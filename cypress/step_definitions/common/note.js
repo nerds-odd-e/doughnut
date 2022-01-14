@@ -364,7 +364,7 @@ When("I change the title to {string} in-place-edit mode", (noteTitle) => {
 });
 
 When("I change the description to {string} in-place-edit mode", (noteDescription) => {
- cy.get("#description-form-id textarea").clear().type(noteDescription).type('{shift}{enter}');
+ cy.get("[role=description] textarea").clear().type(noteDescription).type('{shift}{enter}');
 });
 
 Then("The title should change to {string}", (messageContent) => {
