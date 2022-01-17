@@ -15,7 +15,7 @@ Feature: Logged in status
     And I open "Shape" note from top level
     When my session is logged out
     Then I should be asked to log in again when I click the link "Triangle"
-    And when I login as "old_learner" I should see "Triangle"
+    When I login as "old_learner" I should see "Triangle"
 
   Scenario: Session timeout out when post
     Given I added and learned one note "Fungible" on day 1
@@ -23,4 +23,4 @@ Feature: Logged in status
     And I should see the happy option
     And my session is logged out
     When I choose the happy option
-    And when I login as "old_learner" I should see "Fungible"
+    When I login as "old_learner" I should see "Fungible"

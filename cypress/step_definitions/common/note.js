@@ -181,11 +181,8 @@ Then(
 When(
   "I should be asked to log in again when I click the link {string}",
   (noteTitle) => {
-    cy.on("window:alert", (str) => {
-      expect(str).to.equal(`Your login session has expired, let's refresh.`);
-    }).then(() => {
-      cy.findByText(noteTitle).click();
-    });
+    cy.findByText(noteTitle).click();
+    cy.get("#username").should('exist')
   }
 );
 

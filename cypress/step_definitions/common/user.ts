@@ -100,10 +100,8 @@ Then("The {string} page is displayed", (pageName) => {
   }
 });
 
-Then("I should be asked to log in again.", () => {});
-
 Then(
-  "when I login as {string} I should see {string}",
+  "I login as {string} I should see {string}",
   (username, expectation) => {
     cy.get("#username").type(username);
     cy.get("#password").type("password");
@@ -129,7 +127,7 @@ Then("I logout via the UI", () => {
 
 Then("I should be on the welcome page and asked to login", () => {
   cy.contains("Welcome")
-  cy.findByRole('link', {name: 'Login via Github'}).click()
+  cy.findByRole('button', {name: 'Login via Github'}).click()
 });
 
 

@@ -74,14 +74,15 @@
             </button>
           </div>
         </div>
-        <a v-else class="btn btn-outline-primary me-2 my-sm-0" href="/login"
-          >Login via Github</a
-        >
+        <button v-else class="btn btn-outline-primary me-2 my-sm-0" @click="login"
+          >Login via Github
+        </button>
       </div>
     </nav>
 </template>
 
 <script>
+import { loginOrRegister } from '../../restful/restful';
 import { apiLogout } from '../../storedApi'
 
 export default {
@@ -89,6 +90,9 @@ export default {
     async logout() {
       await apiLogout()
       window.location.href = "/bazaar"
+    },
+    login() {
+      loginOrRegister()
     }
   },
   computed: {
