@@ -1,11 +1,11 @@
 <template>
-  <div>
+  <div @click="onClickText">
     <template v-if="!isEditing">
       <component v-bind:is="displayComponent"
         v-if="!!modelValue"
         v-text="modelValue"
-        @click="onClickText"/>
-      <SvgEditText v-else @click="onClickText"/>
+        />
+      <SvgEditText v-else/>
     </template>
     <component v-bind:is="editingComponent"
      v-else

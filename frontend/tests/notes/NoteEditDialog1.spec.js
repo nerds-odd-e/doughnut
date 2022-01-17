@@ -1,7 +1,6 @@
 /**
  * @jest-environment jsdom
  */
-import { screen } from "@testing-library/vue";
 import NoteEditDialog from "@/components/dialogs/NoteEditDialog.vue";
 import store from "../../src/store/index.js";
 import { renderWithStoreAndMockRoute } from "../helpers";
@@ -27,6 +26,5 @@ describe("note show", () => {
     await flushPromises();
     expect(fetch).toHaveBeenCalledTimes(1);
     expect(fetch).toHaveBeenCalledWith(`/api/notes/${note.id}`, {});
-    await screen.findByDisplayValue(note.title);
   });
 });

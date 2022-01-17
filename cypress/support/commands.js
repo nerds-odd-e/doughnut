@@ -84,9 +84,15 @@ Cypress.Commands.add('triggerException', () => {
 Cypress.Commands.add('submitNoteCreationFormWith', (noteAttributes) => {
     const linkTypeToParent = noteAttributes['Link Type To Parent']
     delete noteAttributes['Link Type To Parent']
-    const { Title, ...remainingAttrs } = noteAttributes
+    const { Title, Description, ...remainingAttrs } = noteAttributes
 
     cy.submitNoteFormWith({Title, 'Link Type To Parent': linkTypeToParent})
+
+    if(!!Description) {
+      cy.findByRole("description").click()
+      cy.focused().clear().type(Description).type('{shift}{enter}');
+    }
+
     if(Object.keys(remainingAttrs).length > 0) {
         cy.findByText(Title)
         cy.clickNoteToolbarButton("edit note");
