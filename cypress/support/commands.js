@@ -89,8 +89,7 @@ Cypress.Commands.add('submitNoteCreationFormWith', (noteAttributes) => {
     cy.submitNoteFormWith({Title, 'Link Type To Parent': linkTypeToParent})
 
     if(!!Description) {
-      cy.findByRole("description").click()
-      cy.focused().clear().type(Description).type('{shift}{enter}');
+        cy.inPlaceEdit({Description})
     }
 
     if(Object.keys(remainingAttrs).length > 0) {
@@ -100,6 +99,16 @@ Cypress.Commands.add('submitNoteCreationFormWith', (noteAttributes) => {
     }
 
 });
+
+Cypress.Commands.add('inPlaceEdit', (noteAttributes) => {
+  for (var propName in noteAttributes) {
+    const value = noteAttributes[propName];
+    if (value) {
+      cy.findByRole(propName.toLowerCase()).click()
+      cy.focused().clear().type(value).type('{shift}{enter}');
+    }
+  }
+})
 
 Cypress.Commands.add('submitNoteFormWith', (noteAttributes) => {
   for (var propName in noteAttributes) {

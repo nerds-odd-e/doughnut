@@ -42,16 +42,13 @@ Feature: Nested Note CRUD
     And On the current page, I should see "LeSS in Action" has link "a specialization of" "Re-Design"
 
   Scenario: Edit a note
-    When I am editing note "LeSS in Action" the field should be pre-filled with
-      | Title          | Description         |
-      | LeSS in Action | An awesome training |
-    And I update it to become:
+    And I update note "LeSS in Action" to become:
       | Title     | Description       |
       | Odd-e CSD | Our best training |
     Then I should see "Odd-e CSD" in the page
     And I should see these notes belonging to the user at the top level of all my notes
-      | title     |
-      | Odd-e CSD |
+      | title     | description       |
+      | Odd-e CSD | Our best training |
 
   Scenario: Delete a note
     Given I initial review "LeSS in Action"

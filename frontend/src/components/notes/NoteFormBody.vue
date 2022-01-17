@@ -1,16 +1,4 @@
 <template>
-  <TextInput
-    scopeName="note"
-    field="title"
-    v-model="modelValue.title"
-    :errors="errors.title"
-  />
-  <TextArea
-    scopeName="note"
-    field="description"
-    v-model="modelValue.description"
-    :errors="errors.description"
-  />
   <ImageInput
     scopeName="note"
     field="uploadPicture"
@@ -60,7 +48,6 @@
 <script setup>
 import TextInput from "../form/TextInput.vue";
 import CheckInput from "../form/CheckInput.vue";
-import TextArea from "../form/TextArea.vue";
 import ImageInput from "../form/ImageInput.vue";
 
 const props = defineProps({

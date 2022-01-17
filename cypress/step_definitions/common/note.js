@@ -36,19 +36,9 @@ When("I create top level note with:", (data) => {
   cy.submitNoteCreationFormsWith(data.hashes());
 });
 
-When(
-  "I am editing note {string} the field should be pre-filled with",
-  (noteTitle, data) => {
-    cy.clickNotePageButton(noteTitle, "edit note");
-    const expects = data.hashes()[0];
-    for (var field in expects) {
-      cy.getFormControl(field).should("have.value", expects[field]);
-    }
-  }
-);
-
-When("I update it to become:", (data) => {
-  cy.submitNoteFormsWith(data.hashes());
+When("I update note {string} to become:", (noteTitle, data) => {
+  cy.jumpToNotePage(noteTitle);
+  cy.inPlaceEdit(data.hashes()[0]);
 });
 
 When(
@@ -213,9 +203,6 @@ When("I click note {string}", (noteTitle) => {
 When("I click note title {string}", (noteTitle) => {
   cy.findByText(noteTitle).click();
 });
-When("I click note description {string}", (noteDescription) => {
-  cy.findByText(noteDescription).click();
-});
 
 When(
   "The note {string} {string} have the description indicator",
@@ -353,21 +340,6 @@ Then("There is a {string} file downloaded", (fileName) => {
 When("I edit original note translation to become", (data) => {
   cy.clickNoteToolbarButton("edit note");
   cy.submitNoteFormsWith(data.hashes());
-});
-
-When("I change the title to {string} in-place-edit mode", (noteTitle) => {
- cy.focused().clear().type(noteTitle).type('{enter}');
-});
-
-When("I change the description to {string} in-place-edit mode", (noteDescription) => {
- cy.focused().clear().type(noteDescription).type('{shift}{enter}');
-});
-
-Then("The title should change to {string}", (messageContent) => {
-  cy.contains(messageContent).should('exist');
-});
-Then("The description should change to {string}", (messageContent) => {
-  cy.contains(messageContent).should('exist');
 });
 
 Then("I should see translation outdated tag", (messageContent) => {
