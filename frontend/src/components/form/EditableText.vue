@@ -1,5 +1,5 @@
 <template>
-  <div @click="onClickText">
+  <div class="text" @click="onClickText">
     <template v-if="!isEditing">
       <component v-bind:is="displayComponent"
         v-if="!!modelValue"
@@ -76,6 +76,9 @@ export default {
 <style lang="sass" scoped>
 .editor
   width: 100%
+
+.text
+  cursor: text
 
 pre
  white-space: pre-wrap
