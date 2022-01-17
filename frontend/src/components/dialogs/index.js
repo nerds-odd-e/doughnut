@@ -1,13 +1,7 @@
 import NoteEditDialog from "./NoteEditDialog.vue";
-import NoteTranslationEditDialog from "./NoteTranslationEditDialog.vue";
-import Languages from "../../models/languages"
 
-const editNote = (popups, noteId, language) => {
-    if(language === Languages.ID) {
-      return popups.dialog(NoteTranslationEditDialog, { noteId });
-    }
+const editNote = (popups, noteId) => popups.dialog(NoteEditDialog, { noteId })
 
-      return popups.dialog(NoteEditDialog, { noteId });
-    }
+const version = 0
 
-export { editNote, Languages }
+export { editNote, version }

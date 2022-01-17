@@ -11,7 +11,6 @@ export default {
   props: {
     id: [String, Number],
     updatedAt: String,
-    language: String,
   },
   components: {
   },
@@ -34,7 +33,7 @@ export default {
   },
   methods: {
     async editDialog() {
-      await editNote(this.$popups, this.id, this.language);
+      await editNote(this.$popups, this.id);
     },
   },
 };

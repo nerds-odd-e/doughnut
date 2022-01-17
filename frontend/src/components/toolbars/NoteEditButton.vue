@@ -16,7 +16,7 @@ export default {
   props: { noteId: [String, Number], language: String },
   methods: {
     async showDialog() {
-      await editNote(this.$popups, this.noteId, this.language);
+      await editNote(this.$popups, this.noteId);
     },
   },
 };
