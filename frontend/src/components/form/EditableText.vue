@@ -1,8 +1,14 @@
 <template>
   <div>
-    <component v-bind:is="displayComponent"
-        @click="onClickText" v-if="!isEditing" v-text="modelValue"/>
+    <template v-if="!isEditing">
+      <component v-bind:is="displayComponent"
+        v-if="!!modelValue"
+        v-text="modelValue"
+        @click="onClickText"/>
+      <SvgEditText v-else @click="onClickText"/>
+    </template>
     <component v-bind:is="editingComponent"
+     v-else
      v-focus
      class="editor" 
      :modelValue="modelValue"
@@ -12,7 +18,6 @@
      :errors="errors"
      @update:modelValue="$emit('update:modelValue', $event)"
      @blur="onBlurTextField"
-     v-if="isEditing"
      v-on:keydown.enter="onEnterKey($event)"/>
   </div>
 </template>
@@ -20,6 +25,7 @@
 <script>
 import TextArea from "./TextArea.vue";
 import TextInput from "./TextInput.vue";
+import SvgEditText from "../svgs/SvgEditText.vue";
 
 export default {
   name: "EditableLine",
@@ -34,7 +40,8 @@ export default {
   emits: ["update:modelValue", "blur"],
   components: {
     TextArea,
-    TextInput
+    TextInput,
+    SvgEditText,
   },
   data() {
     return {
