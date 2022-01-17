@@ -338,8 +338,7 @@ Then("There is a {string} file downloaded", (fileName) => {
 });
 
 When("I edit original note translation to become", (data) => {
-  cy.clickNoteToolbarButton("edit note");
-  cy.submitNoteFormsWith(data.hashes());
+  cy.inPlaceEdit(data.hashes()[0]);
 });
 
 Then("I should see translation outdated tag", (messageContent) => {
