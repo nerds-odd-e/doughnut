@@ -18,7 +18,7 @@ class TranslatedNoteWrapper {
   }
 
   get description(){
-    return this.language === Languages.ID && this.note.noteContent && this.note.noteContent.descriptionIDN ? this.note.noteContent.descriptionIDN : this.note.noteContent.description;
+    return this.language === Languages.ID ? this.note.noteContent.descriptionIDN : this.note.noteContent.description;
   }
 
   set description(description: string) {
@@ -40,8 +40,7 @@ class TranslatedNoteWrapper {
   get  title() {
       if (!this.note.noteContent) return this.note.title;
 
-      return this.language === Languages.ID &&
-        this.note.noteContent.titleIDN
+      return this.language === Languages.ID
         ? this.note.noteContent.titleIDN
         : this.note.noteContent.title;
     }

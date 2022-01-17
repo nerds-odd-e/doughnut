@@ -325,8 +325,7 @@ When(
 
 When("I edit note translation to become", (data) => {
   cy.clickTranslationButton("ID");
-  cy.clickNoteToolbarButton("edit note");
-  cy.submitNoteTranslationFormsWith(data.hashes());
+  cy.inPlaceEdit(data.hashes()[0]);
 });
 
 Then("I download note", () => {

@@ -11,8 +11,8 @@ Feature: Synchronize Translation
   @featureToggle
   Scenario: Should not change anything if translation is still up to date
     When I edit note translation to become
-      | Title in Indonesian |
-      | putra Pandu         |
+      | Title       |
+      | putra Pandu |
     And Note title on the page should be "putra Pandu"
     Then I should not see translation outdated tag
 
@@ -25,7 +25,7 @@ Feature: Synchronize Translation
     Then I should see translation outdated tag
     And I switch language to "EN"
     When I edit note translation to become
-      | Title in Indonesian |
-      | putra Pandu         |
+      | Title       |
+      | putra Pandu |
     And Note title on the page should be "putra Pandu"
     Then I should not see translation outdated tag
