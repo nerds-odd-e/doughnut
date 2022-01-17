@@ -88,12 +88,15 @@ Cypress.Commands.add('submitNoteCreationFormWith', (noteAttributes) => {
 
     cy.submitNoteFormWith({Title, 'Link Type To Parent': linkTypeToParent})
 
+    if(!!Title) {
+      cy.findByText(Title)
+    }
+
     if(!!Description) {
         cy.inPlaceEdit({Description})
     }
 
     if(Object.keys(remainingAttrs).length > 0) {
-        cy.findByText(Title)
         cy.clickNoteToolbarButton("edit note");
         cy.submitNoteFormWith(remainingAttrs)
     }
