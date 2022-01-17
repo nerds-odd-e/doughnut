@@ -44,8 +44,8 @@ When("I update note {string} to become:", (noteTitle, data) => {
 When(
   "I update note {string} with the description {string}",
   (noteTitle, newDescription) => {
-    cy.clickNotePageButton(noteTitle, "edit note");
-    cy.submitNoteFormsWith([{ Description: newDescription }]);
+    cy.jumpToNotePage(noteTitle);
+    cy.inPlaceEdit({ Description: newDescription });
   }
 );
 
@@ -130,8 +130,8 @@ When("I move note {string} left", (noteTitle) => {
 When(
   "I double click {string} and edit the description to {string}",
   (noteTitle, newDescription) => {
-    cy.findByText(noteTitle).dblclick();
-    cy.submitNoteFormsWith([{ Description: newDescription }]);
+    cy.findByText(noteTitle).click();
+    cy.replaceFocusedText(newDescription)
   }
 );
 

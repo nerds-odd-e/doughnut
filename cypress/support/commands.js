@@ -100,12 +100,16 @@ Cypress.Commands.add('submitNoteCreationFormWith', (noteAttributes) => {
 
 });
 
+Cypress.Commands.add('replaceFocusedText', (text) => {
+  cy.focused().clear().type(text).type('{shift}{enter}');
+})
+
 Cypress.Commands.add('inPlaceEdit', (noteAttributes) => {
   for (var propName in noteAttributes) {
     const value = noteAttributes[propName];
     if (value) {
       cy.findByRole(propName.toLowerCase()).click()
-      cy.focused().clear().type(value).type('{shift}{enter}');
+      cy.replaceFocusedText(value)
     }
   }
 })
