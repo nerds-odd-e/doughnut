@@ -294,13 +294,13 @@ Then("I should see the child notes {string} in order", (notesStr) => {
   });
 });
 
-Then("I should see {string} is newer than {string}", (newer, older) => {
+Then("I should see {string} is {string} than {string}", (left, aging, right) => {
   let firstColor;
-  cy.jumpToNotePage(newer);
+  cy.jumpToNotePage(left);
   cy.get(".note-body")
     .invoke("css", "border-color")
     .then((val) => (firstColor = val));
-  cy.jumpToNotePage(older);
+  cy.jumpToNotePage(right);
   cy.get(".note-body")
     .invoke("css", "border-color")
     .then((val) =>

@@ -187,16 +187,18 @@ Cypress.Commands.add('navigateToNotePage', (noteTitlesDividedBySlash) => {
 //    it uses the note id memorized when creating them with testability api
 Cypress.Commands.add('jumpToNotePage', (noteTitle) => {
   cy.get('@seededNoteIdMap').then(
-    (seededNoteIdMap) => cy.visit(`/notes/${seededNoteIdMap[noteTitle]}`)
-    //        cy.window().then(win=> {
-    //          if(!!win.router) {
-    //                const noteId = seededNoteIdMap[noteTitle]
-    //                win.router.push({name: "noteShow", params: {noteId}})
-    //                return
-    //          }
-    //          return cy.visit(`/notes/${seededNoteIdMap[noteTitle]}`)
-    //        })
+    (seededNoteIdMap) =>
+     cy.visit(`/notes/${seededNoteIdMap[noteTitle]}`)
+//            cy.window().then(win=> {
+//              if(!!win.router) {
+//                    const noteId = seededNoteIdMap[noteTitle]
+//                    win.router.push({name: "noteShow", params: {noteId}})
+//                    return
+//              }
+//              return cy.visit(`/notes/${seededNoteIdMap[noteTitle]}`)
+//            })
   );
+  cy.findByText(noteTitle)
 });
 
 Cypress.Commands.add('clickButtonOnCardBody', (noteTitle, buttonTitle) => {

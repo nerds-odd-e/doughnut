@@ -52,7 +52,6 @@
 <script>
 import Modal from "./Modal.vue";
 export default {
-  name: "ModalWithButton",
   props: { popupInfo: Object },
   emits: ["done"],
   components: { Modal },

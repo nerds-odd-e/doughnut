@@ -1,4 +1,7 @@
 <template>
+  <h3>
+    Link <strong>{{ note.title }}</strong> to
+  </h3>
   <SearchNote
     v-if="!targetNote"
     v-bind="{ noteId: note.id }"

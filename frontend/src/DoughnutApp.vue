@@ -10,7 +10,7 @@ export default {
       externalIdentifier: null,
       showNavBar: true,
       loading: true,
-      popupInfo: [],
+      popupInfo: null,
       doneResolve: null,
     };
   },
@@ -19,6 +19,7 @@ export default {
 
   watch: {
     $route(to, from) {
+      this.popupInfo = null
       if (to.name) {
         this.showNavBar = !["repeat", "initial"].includes(
           to.name.split("-").shift()
@@ -76,7 +77,6 @@ export default {
 
 <template>
 <div class="box">
-
   <Popups :popupInfo="popupInfo" @done="done($event)" />
   <UserNewRegisterPage v-if="newUser"/>
   <template v-else>
