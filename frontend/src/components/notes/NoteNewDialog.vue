@@ -1,0 +1,87 @@
+<template>
+  <Breadcrumb v-bind="{ owns: true, notebook, ancestors }">
+    <li class="breadcrumb-item">(adding here)</li>
+  </Breadcrumb>
+  <form @submit.prevent="processForm">
+    <LinkTypeSelect
+      scopeName="note"
+      field="linkTypeToParent"
+      :allowEmpty="true"
+      v-model="creationData.linkTypeToParent"
+      :errors="formErrors.linkTypeToParent"
+    />
+    <NoteFormTitleOnly
+      v-model="creationData.noteContent"
+      :errors="formErrors.noteContent"
+    />
+    <input type="submit" value="Submit" class="btn btn-primary" />
+  </form>
+</template>
+
+<script>
+import Breadcrumb from "./Breadcrumb.vue";
+import NoteFormTitleOnly from "./NoteFormTitleOnly.vue";
+import LinkTypeSelect from "../links/LinkTypeSelect.vue";
+import { storedApiGetNoteAndItsChildren, storedApiCreateNote } from "../../storedApi";
+
+function initialState() {
+  return {
+    creationData: {
+      linkTypeToParent: "",
+      noteContent: {},
+    },
+    formErrors: {},
+  };
+}
+
+export default {
+  components: {
+    Breadcrumb,
+    NoteFormTitleOnly,
+    LinkTypeSelect,
+  },
+  props: { parentId: [String, Number] },
+  data() {
+    return {
+      loading: true,
+      ancestors: null,
+      notebook: null,
+      ...initialState(),
+    };
+  },
+  mounted() {
+    this.fetchData()
+  },
+  methods: {
+    fetchData() {
+      this.loading = true
+      storedApiGetNoteAndItsChildren(this.$store, this.parentId)
+      .then((res) => {
+          const note = res.notes[0]
+          const { ancestors, notebook } = res.notePosition;
+          this.ancestors = [...ancestors, note];
+          this.notebook = notebook;
+        }
+      )
+      .finally(() => this.loading = false)
+    },
+
+    processForm() {
+      this.loading = true
+      storedApiCreateNote(
+        this.$store,
+        this.parentId,
+        this.creationData
+      ).then((res) => {
+        console.log(res)
+        this.$router.push({
+          name: "noteShow",
+          params: { noteId: res.notePosition.noteId },
+        })
+      })
+      .catch((res) => (this.formErrors = res))
+      .finally(()=> this.loading = false )
+    },
+  },
+};
+</script>
