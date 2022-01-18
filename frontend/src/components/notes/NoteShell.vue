@@ -1,11 +1,10 @@
 <template>
-      <div class="note-body" @dblclick="editDialog" :style="`border-color: ${bgColor}`">
-        <slot/>
-      </div>
+  <div class="note-body" :style="`border-color: ${bgColor}`">
+    <slot/>
+  </div>
 </template>
 
 <script>
-import { editNote } from "../dialogs";
 
 export default {
   props: {
@@ -29,11 +28,6 @@ export default {
           Math.round((oc * index + newColor[i] * (max - index)) / max)
         )
         .join(",")})`;
-    },
-  },
-  methods: {
-    async editDialog() {
-      await editNote(this.$popups, this.id);
     },
   },
 };
