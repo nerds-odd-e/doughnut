@@ -6,7 +6,7 @@
 </template>
 
 <script>
-import NoteFormBody from "../notes/NoteFormBody.vue";
+import NoteFormBody from "./NoteFormBody.vue";
 import { storedApiGetNoteAndItsChildren, storedApiUpdateNote } from "../../storedApi";
 
 export default {

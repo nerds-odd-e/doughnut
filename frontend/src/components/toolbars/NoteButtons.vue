@@ -17,7 +17,7 @@
           <SvgAddSibling />
       </NoteNewButton>
 
-      <NoteEditButton :noteId="note.id" :oldTitle="note.title" :language="language" />
+      <NoteEditButton :noteId="note.id" :oldTitle="note.title" />
 
       <LinkNoteButton :note="note" />
 
@@ -76,12 +76,6 @@ export default {
     note: Object,
     viewType: String,
   },
-  data() {
-    return {
-      language: null
-    }
-
-  },
   components: {
     SvgCog,
     SvgAddChild,
@@ -104,7 +98,6 @@ export default {
   },
   methods: {
     updateLanguage(lan) {
-      this.language = lan
       this.$emit('updateLanguage', lan)
     },
     async downloadMD(){
