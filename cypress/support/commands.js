@@ -496,7 +496,7 @@ Cypress.Commands.add(
 );
 
 Cypress.Commands.add('clickNoteToolbarButton', (btnTextOrTitle) => {
-  cy.get('.toolbar').findByRole('button', { name: btnTextOrTitle }).click({waitForAnimations: false});
+  cy.get('.toolbar').findByRole('button', { name: btnTextOrTitle }).click();
 });
 
 Cypress.Commands.add('submitNoteTranslationFormsWith', (notes) => {
