@@ -15,7 +15,7 @@ export default {
   },
   props: { noteId: [String, Number] },
   methods: {
-    async showDialog() {
+    showDialog() {
       this.$popups.dialog(NoteEditDialog, { noteId: this.noteId })
     },
   },
