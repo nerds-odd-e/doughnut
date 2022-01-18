@@ -3,28 +3,18 @@
     <ViewTypeButtons v-bind="{ viewType, noteId: note.id }" />
 
     <div class="btn-group btn-group-sm">
-      <NoteNewButton :parentId="note.id">
-        <template #default="{ open }">
-          <button
-            class="btn btn-small"
-            @click="open()"
-            :title="`Add Child Note`"
-          >
-            <SvgAddChild />
-          </button>
-        </template>
+      <NoteNewButton
+        :parentId="note.id"
+        buttonTitle="Add Child Note"
+       >
+        <SvgAddChild />
       </NoteNewButton>
 
-      <NoteNewButton :parentId="note.parentId" v-if="!!note.parentId">
-        <template #default="{ open }">
-          <button
-            class="btn btn-small"
-            @click="open()"
-            title="Add Sibling Note"
-          >
-            <SvgAddSibling />
-          </button>
-        </template>
+      <NoteNewButton
+        :parentId="note.parentId"
+        buttonTitle="Add Sibling Note"
+        v-if="!!note.parentId">
+          <SvgAddSibling />
       </NoteNewButton>
 
       <NoteEditButton :noteId="note.id" :oldTitle="note.title" :language="language" />

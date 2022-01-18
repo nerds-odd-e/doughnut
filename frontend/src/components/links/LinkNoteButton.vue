@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import LinkNote from "./LinkNote.vue";
+import LinkNoteDialog from "./LinkNoteDialog.vue";
 import SvgLinkNote from "../svgs/SvgLinkNote.vue";
 
 export default {
@@ -14,7 +14,7 @@ export default {
   components: { SvgLinkNote },
   methods: {
     showLinkNoteDialog() {
-      this.$popups.dialog(LinkNote, { note: this.note })
+      this.$popups.dialog(LinkNoteDialog, { note: this.note })
     },
   },
 };

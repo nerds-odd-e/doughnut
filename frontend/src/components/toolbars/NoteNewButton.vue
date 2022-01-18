@@ -1,103 +1,20 @@
 <template>
-  <ModalWithButton v-model="show">
-    <template #button>
-      <slot :open="() => (show = true)" />
-    </template>
-    <template #header>
-      <Breadcrumb v-bind="{ owns: true, notebook, ancestors }">
-        <li class="breadcrumb-item">(adding here)</li>
-      </Breadcrumb>
-    </template>
-    <template #body>
-      <form @submit.prevent="processForm">
-        <LinkTypeSelect
-          scopeName="note"
-          field="linkTypeToParent"
-          :allowEmpty="true"
-          v-model="creationData.linkTypeToParent"
-          :errors="formErrors.linkTypeToParent"
-        />
-        <NoteFormTitleOnly
-          v-model="creationData.noteContent"
-          :errors="formErrors.noteContent"
-        />
-        <input type="submit" value="Submit" class="btn btn-primary" />
-      </form>
-    </template>
-  </ModalWithButton>
+  <button class="btn btn-small" :title="buttonTitle" @click="showDialog">
+    <slot />
+  </button>
 </template>
 
 <script>
-import Breadcrumb from "../notes/Breadcrumb.vue";
-import NoteFormTitleOnly from "../notes/NoteFormTitleOnly.vue";
-import ModalWithButton from "../commons/ModalWithButton.vue";
-import LinkTypeSelect from "../links/LinkTypeSelect.vue";
-import { storedApiGetNoteAndItsChildren, storedApiCreateNote } from "../../storedApi";
-
-function initialState() {
-  return {
-    creationData: {
-      linkTypeToParent: "",
-      noteContent: {},
-    },
-    formErrors: {},
-  };
-}
+import NoteNewDialog from "../notes/NoteNewDialog.vue";
 
 export default {
-  name: "NoteNewButton",
-  components: {
-    Breadcrumb,
-    NoteFormTitleOnly,
-    ModalWithButton,
-    LinkTypeSelect,
-  },
-  props: { parentId: [String, Number] },
-  data() {
-    return {
-      loading: true,
-      ancestors: null,
-      notebook: null,
-      show: false,
-      ...initialState(),
-    };
-  },
-  watch: {
-    show() {
-      Object.assign(this.$data, initialState());
-      if (this.show) this.fetchData();
-    },
+  props: {
+    parentId: [String, Number],
+    buttonTitle: String,
   },
   methods: {
-    fetchData() {
-      this.loading = true
-      storedApiGetNoteAndItsChildren(this.$store, this.parentId)
-      .then((res) => {
-          const note = res.notes[0]
-          const { ancestors, notebook } = res.notePosition;
-          this.ancestors = [...ancestors, note];
-          this.notebook = notebook;
-        }
-      )
-      .finally(() => this.loading = false)
-    },
-
-    processForm() {
-      this.loading = true
-      storedApiCreateNote(
-        this.$store,
-        this.parentId,
-        this.creationData
-      ).then((res) => {
-        this.show = false
-        console.log(res)
-        this.$router.push({
-          name: "noteShow",
-          params: { noteId: res.notePosition.noteId },
-        })
-      })
-      .catch((res) => (this.formErrors = res))
-      .finally(()=> this.loading = false )
+    showDialog() {
+      this.$popups.dialog(NoteNewDialog, {parentId: this.parentId})
     },
   },
 };
