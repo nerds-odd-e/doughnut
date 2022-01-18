@@ -1,107 +1,25 @@
 <template>
-  <ModalWithButton v-model="show">
-    <template #button>
       <span class="link-nob">
-        <a role="button" @click="show = true" :title="link.linkTypeLabel">
+        <a role="button" @click="showDialog" :title="link.linkTypeLabel">
           <SvgLinkTypeIcon
             :linkTypeId="link.typeId"
             :inverseIcon="inverseIcon"
           />
         </a>
       </span>
-    </template>
-    <template #header>
-      <h3>Link</h3>
-    </template>
-    <template #body>
-      <div v-if="!!inverseIcon">
-        Source:
-        <strong>
-          <NoteTitleWithLink
-            class="link-title"
-            v-bind="{ note: link.sourceNote }"
-          />
-        </strong>
-      </div>
-      <LinkTypeSelect
-        field="linkType"
-        scopeName="link"
-        v-model="formData.typeId"
-        :errors="formErrors.typeId"
-        :inverseIcon="true"
-      />
-      <div v-if="!inverseIcon">
-        Target:
-        <strong>
-          <NoteTitleWithLink
-            class="link-title"
-            v-bind="{ note: link.targetNote }"
-          />
-        </strong>
-      </div>
-
-      <button class="btn btn-primary" v-on:click="updateLink()">Update</button>
-      <button class="btn btn-danger" v-on:click="deleteLink()">Delete</button>
-    </template>
-  </ModalWithButton>
 </template>
 
 <script>
 import SvgLinkTypeIcon from "../svgs/SvgLinkTypeIcon.vue";
-import ModalWithButton from "../commons/ModalWithButton.vue";
-import LinkTypeSelect from "./LinkTypeSelect.vue";
-import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue";
-import { restPost } from "../../restful/restful";
+import LinkNobDialog from "./LinkNobDialog.vue";
 
 export default {
   props: { link: Object, inverseIcon: Boolean, colors: Object },
-  components: {
-    SvgLinkTypeIcon,
-    ModalWithButton,
-    LinkTypeSelect,
-    NoteTitleWithLink,
-  },
-  data() {
-    return {
-      show: false,
-      loading: false,
-      formData: { typeId: this.link.typeId },
-      formErrors: {},
-    };
-  },
-
+  components: { SvgLinkTypeIcon },
   methods: {
-    updateLink() {
-      restPost(
-        `/api/links/${this.link.id}`,
-        this.formData,
-        (r) => (this.loading = r)
-      )
-        .then((res) => {
-          this.show = false;
-        })
-        .catch((res) => (this.formErrors = res));
-    },
-
-    async deleteLink() {
-      if (!(await this.$popups.confirm("Are you sure to delete this link?")))
-        return;
-      restPost(
-        `/api/links/${this.link.id}/delete`,
-        null,
-        (r) => (this.loading = r)
-      )
-        .then((res) => {
-          this.show = false;
-        })
-        .catch((res) => (this.formErrors = res));
+    showDialog() {
+      this.$popups.dialog(LinkNobDialog, this.$props)
     },
   },
 };
 </script>
-
-<style scoped>
-.link-nob {
-  padding: 3px;
-}
-</style>
