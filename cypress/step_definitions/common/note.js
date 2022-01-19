@@ -296,19 +296,24 @@ Then("I should see the child notes {string} in order", (notesStr) => {
 });
 
 Then("I should see {string} is {string} than {string}", (left, aging, right) => {
-  let firstColor;
+  let leftColor;
   cy.jumpToNotePage(left);
   cy.get(".note-body")
     .invoke("css", "border-color")
-    .then((val) => (firstColor = val));
+    .then((val) => (leftColor = val));
   cy.jumpToNotePage(right);
   cy.get(".note-body")
     .invoke("css", "border-color")
-    .then((val) =>
-      expect(parseInt(firstColor.match(/\d+/)[0])).to.greaterThan(
-        parseInt(val.match(/\d+/)[0])
-      )
-    );
+    .then((val) => {
+      const leftColorIndex = parseInt(leftColor.match(/\d+/)[0])
+      const rightColorIndex = parseInt(val.match(/\d+/)[0])
+      if (aging === 'newer') {
+          expect(leftColorIndex).to.greaterThan(rightColorIndex)
+      }
+      else {
+          expect(leftColorIndex).to.equal(rightColorIndex)
+      }
+    });
 });
 
 When("I split note {string}", (noteTitle, data) => {

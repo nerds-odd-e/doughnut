@@ -22,7 +22,7 @@
       >
         No translation available
       </p>
-      <NoteContent v-bind="{ note, language }" @blur="submitChangeWithDescription"/>
+      <NoteContent v-bind="{ note, language }" @blur="submitChange"/>
     </NoteFrameOfLinks>
   </NoteShell>
 </template>
@@ -58,10 +58,6 @@ export default {
     },
   },
   methods: {
-    submitChangeWithDescription(data) {
-      this.note.Content = {...this.note.Content, ...data}
-      this.submitChange();
-    },
     submitChange() {
       this.loading = true
       storedApiUpdateNote(this.$store, this.note.id, this.note.noteContent)

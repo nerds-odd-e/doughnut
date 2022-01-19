@@ -1,5 +1,5 @@
 <template>
-  <div class="text" @click="onClickText">
+  <div class="text" @click="startEditing">
     <template v-if="!isEditing">
       <component v-bind:is="displayComponent"
         v-if="!!modelValue"
@@ -45,6 +45,7 @@ export default {
   },
   data() {
     return {
+      initialValue: null,
       isEditing: false,
     };
   },
@@ -57,7 +58,9 @@ export default {
     },
   },
   methods: {
-    onClickText() {
+    startEditing() {
+      if(this.isEditing) return
+      this.initialValue = this.modelValue
       this.isEditing = true;
     },
     onEnterKey(event) {
@@ -67,7 +70,9 @@ export default {
     },
     onBlurTextField() {
       this.isEditing = false;
-      this.$emit("blur");
+      if (this.initialValue !== this.modelValue) {
+        this.$emit("blur");
+      }
     }
   },
 };
