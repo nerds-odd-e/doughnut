@@ -185,12 +185,12 @@ Cypress.Commands.add('navigateToNotePage', (noteTitlesDividedBySlash) => {
 
 // jumptoNotePage is faster than navigateToNotePage
 //    it uses the note id memorized when creating them with testability api
-Cypress.Commands.add('jumpToNotePage', (noteTitle) => {
+Cypress.Commands.add('jumpToNotePage', (noteTitle, forceLoadPage) => {
   cy.get('@firstVisited').then(firstVisited => {
       cy.get('@seededNoteIdMap').then(
         (seededNoteIdMap) =>
             cy.window().then(win=> {
-              if(!!win.router && !firstVisited) {
+              if(!!win.router && !forceLoadPage && !firstVisited) {
                     const noteId = seededNoteIdMap[noteTitle]
                     const r = win.router.push({name: "noteShow", params: {noteId}, query: {time: Date.now()}})
                     cy.get(".modal-body").should("not.exist")
@@ -218,8 +218,8 @@ Cypress.Commands.add('creatingLinkFor', (noteTitle) => {
   cy.clickNotePageButton(noteTitle, 'link note');
 });
 
-Cypress.Commands.add('clickNotePageButton', (noteTitle, btnTextOrTitle) => {
-  cy.jumpToNotePage(noteTitle);
+Cypress.Commands.add('clickNotePageButton', (noteTitle, btnTextOrTitle, forceLoadPage) => {
+  cy.jumpToNotePage(noteTitle, forceLoadPage);
   cy.clickNoteToolbarButton(btnTextOrTitle);
 });
 

@@ -177,7 +177,7 @@ When(
 );
 
 When("I open the {string} view of note {string}", (viewType, noteTitle) => {
-  cy.clickNotePageButton(noteTitle, `${viewType} view`);
+  cy.clickNotePageButton(noteTitle, `${viewType} view`, true);
 });
 
 When(
