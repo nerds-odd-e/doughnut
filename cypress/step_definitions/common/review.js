@@ -178,7 +178,6 @@ Then("I should see the satisfied button: {string}", (yesNo) => {
 });
 
 Then("I am changing note {string}'s review setting", (noteTitle) => {
-  cy.visit("/")
   cy.clickNotePageMoreOptionsButton(noteTitle, "edit review setting");
 });
 

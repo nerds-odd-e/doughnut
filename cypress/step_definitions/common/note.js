@@ -83,7 +83,6 @@ Then("I should see these notes as children", (data) => {
 });
 
 When("I delete top level note {string}", (noteTitle) => {
-  cy.visit("/")
   cy.clickNotePageMoreOptionsButton(noteTitle, "delete note");
   cy.findByRole("button", { name: "OK" }).click();
 });
@@ -178,7 +177,7 @@ When(
 );
 
 When("I open the {string} view of note {string}", (viewType, noteTitle) => {
-  cy.clickNotePageButton(noteTitle, `${viewType} view`, true);
+  cy.clickNotePageButton(noteTitle, `${viewType} view`);
 });
 
 When(
