@@ -159,22 +159,8 @@ public class NoteContent {
         return StringUtils.abbreviate(descriptionIDN, 50);
     }
 
-    @JsonIgnore
-    public boolean isConflictingWith(NoteContent conflictNoteContent){
-        if(conflictNoteContent.getUpdatedAt()!=null && !this.getUpdatedAt().equals(conflictNoteContent.getUpdatedAt())){
-            return true;
-        }
-        return false;
-    }
-
-    @JsonIgnore
     private boolean isEnglishTranslationUpdated(NoteContent updatedNoteContent) {
         return !(updatedNoteContent.title.equals(this.title)) || !(updatedNoteContent.description.equals(this.description));
-    }
-
-    @JsonIgnore
-    private boolean isIndonesianTranslationAvailable() {
-        return (this.titleIDN != null) || (this.descriptionIDN != null);
     }
 
     @JsonIgnore
@@ -187,6 +173,6 @@ public class NoteContent {
 
     @JsonIgnore
     public boolean isTranslationOutdated(NoteContent updatedNoteContent) {
-        return (this.isEnglishTranslationUpdated(updatedNoteContent) && this.isIndonesianTranslationAvailable()) || (this.isTranslationOutdatedIDN != null && this.isTranslationOutdatedIDN && !isIndonesianTranslationUpdated(updatedNoteContent));
+        return (this.isEnglishTranslationUpdated(updatedNoteContent)) || (this.isTranslationOutdatedIDN != null && this.isTranslationOutdatedIDN && !isIndonesianTranslationUpdated(updatedNoteContent));
     }
 }

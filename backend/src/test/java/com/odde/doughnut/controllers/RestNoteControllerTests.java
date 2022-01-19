@@ -159,40 +159,6 @@ class RestNoteControllerTests {
             assertThat(note.getNoteContent().getUploadPicture(), is(not(nullValue())));
         }
 
-
-        @Nested
-        class Conflicting{
-            Note oldNote;
-            NoteContent modifiedContentByMe;
-            @BeforeEach
-            void setup(){
-                Instant today = Instant.now();
-                oldNote = makeMe.aNote().byUser(userModel).updatedAt(Timestamp.from(today.minusSeconds(10)))
-                        .title("old title").please();
-
-                modifiedContentByMe = makeMe.aNote().byUser(userModel).title("modified Title").description("modified Description")
-                        .updatedAt(Timestamp.from(today))
-                        .inMemoryPlease().getNoteContent();
-            }
-            @Test
-            void shouldDetectConflict() throws NoAccessRightException, IOException {
-                NoteViewedByUser response = controller.updateNote(oldNote, modifiedContentByMe);
-                assertThat(response.isConflicting(), equalTo(true));
-            }
-            @Test
-            void shouldNotBeAbleToSaveNoteWhenConflict() throws NoAccessRightException, IOException {
-                controller.updateNote(oldNote, modifiedContentByMe);
-                makeMe.refresh(oldNote);
-                assertThat(oldNote.getTitle(), equalTo("old title"));
-            }
-            @Test
-            void shouldReturnConflictingNote() throws NoAccessRightException, IOException {
-                NoteViewedByUser response = controller.updateNote(oldNote, modifiedContentByMe);
-                NoteContent conflictingNoteContent = response.getConflictingNoteContent();
-                assertThat(conflictingNoteContent.getTitle(), equalTo("modified Title"));
-            }
-        }
-
         @Test
         void shouldSetTranslationOutdatedTagWhenUpdatingEnglishNoteAndIndonesianTranslationIsAvailable() throws NoAccessRightException, IOException {
             note.getNoteContent().setTitleIDN("indonesian");

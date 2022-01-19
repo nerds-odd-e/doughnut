@@ -50,12 +50,4 @@ public class NoteViewedByUser {
     @Setter
     private List<Integer> childrenIds;
 
-    @Getter
-    @Setter
-    private boolean conflicting;
-
-    @Getter
-    @Setter
-    private NoteContent conflictingNoteContent;
-
 }
