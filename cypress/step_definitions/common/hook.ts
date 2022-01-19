@@ -14,6 +14,7 @@ import {
 
 Before(() => {
   cy.cleanDBAndSeedData();
+  cy.wrap(false).as('firstVisited')
 });
 
 Before({ tags: "@featureToggle" }, () => {
