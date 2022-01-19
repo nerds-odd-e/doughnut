@@ -50,7 +50,6 @@
     </Modal>
   </template>
 </template>
-</template>
 
 <script>
 import Modal from "./Modal.vue";

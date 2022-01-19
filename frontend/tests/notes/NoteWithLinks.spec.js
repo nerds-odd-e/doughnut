@@ -1,10 +1,10 @@
 /**
  * @jest-environment jsdom
  */
-import { render, screen } from "@testing-library/vue";
+import { screen } from "@testing-library/vue";
 import NoteWithLinks from "@/components/notes/NoteWithLinks.vue";
 import makeMe from "../fixtures/makeMe";
-import { renderWithStoreAndMockRoute, mountWithStoreAndMockRoute } from '../helpers';
+import { renderWithMockRoute, renderWithStoreAndMockRoute, mountWithStoreAndMockRoute } from '../helpers';
 import store from '../../src/store';
 import Languages from "../../src/models/languages";
 
@@ -22,7 +22,7 @@ describe("new/updated pink banner", () => {
     "should show fresher color if recently updated",
     (updatedAt, expectedColor) => {
       const note = makeMe.aNote.updatedAt(updatedAt).please();
-      render(NoteWithLinks, { props: { note } });
+      renderWithMockRoute(NoteWithLinks, { props: { note } });
 
       expect(screen.getByRole("title").parentNode).toHaveStyle(
         `border-color: ${expectedColor};`
