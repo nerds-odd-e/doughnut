@@ -41,7 +41,54 @@ Feature: Nested Note CRUD
       | Re-Design    |
     And On the current page, I should see "LeSS in Action" has link "a specialization of" "Re-Design"
 
-  Scenario: Edit a note
+  Scenario: Edit a note1
+    And I update note "LeSS in Action" to become:
+      | Title     | Description       |
+      | Odd-e CSD | Our best training |
+
+  Scenario: Edit a note2
+    And I update note "LeSS in Action" to become:
+      | Title     | Description       |
+      | Odd-e CSD | Our best training |
+    Then I should see "Odd-e CSD" in the page
+
+  Scenario: Edit a note3
+    And I update note "LeSS in Action" to become:
+      | Title     | Description       |
+      | Odd-e CSD | Our best training |
+    Then I should see "Odd-e CSD" in the page
+    And I should see these notes belonging to the user at the top level of all my notes
+      | title     | description       |
+      | Odd-e CSD | Our best training |
+
+  Scenario: Edit a note4
+    And I update note "LeSS in Action" to become:
+      | Title     | Description       |
+      | Odd-e CSD | Our best training |
+    Then I should see "Odd-e CSD" in the page
+    And I should see these notes belonging to the user at the top level of all my notes
+      | title     | description       |
+      | Odd-e CSD | Our best training |
+
+  Scenario: Edit a note5
+    And I update note "LeSS in Action" to become:
+      | Title     | Description       |
+      | Odd-e CSD | Our best training |
+    Then I should see "Odd-e CSD" in the page
+    And I should see these notes belonging to the user at the top level of all my notes
+      | title     | description       |
+      | Odd-e CSD | Our best training |
+
+  Scenario: Edit a note6
+    And I update note "LeSS in Action" to become:
+      | Title     | Description       |
+      | Odd-e CSD | Our best training |
+    Then I should see "Odd-e CSD" in the page
+    And I should see these notes belonging to the user at the top level of all my notes
+      | title     | description       |
+      | Odd-e CSD | Our best training |
+
+  Scenario: Edit a note7
     And I update note "LeSS in Action" to become:
       | Title     | Description       |
       | Odd-e CSD | Our best training |
