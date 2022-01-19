@@ -100,9 +100,6 @@ export default {
     updateLanguage(lan) {
       this.$emit('updateLanguage', lan)
     },
-    async downloadMD(){
-
-    },
     async deleteNote() {
       if (await this.$popups.confirm(`Are you sure to delete this note?`)) {
         const parentId = this.note.parentId;

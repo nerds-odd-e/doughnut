@@ -24,7 +24,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/notes")
-public
 class RestNoteController {
     private final ModelFactoryService modelFactoryService;
     private final CurrentUserFetcher currentUserFetcher;
@@ -37,7 +36,7 @@ class RestNoteController {
         this.testabilitySettings = testabilitySettings;
     }
 
-    class NoteStatistics {
+    static class NoteStatistics {
         @Getter
         @Setter
         private ReviewPoint reviewPoint;
