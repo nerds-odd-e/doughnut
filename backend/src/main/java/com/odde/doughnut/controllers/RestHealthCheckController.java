@@ -32,6 +32,7 @@ class RestHealthCheckController {
     @GetMapping("/data_upgrade")
     @Transactional(timeout=200)
     public List dataUpgrade() {
+        modelFactoryService.entityManager.createNativeQuery("delete from text_content where id not in (select text_content_id from note)").executeUpdate();
         long count = modelFactoryService.textContentRepository.count();
 //        modelFactoryService.noteRepository.findAll().forEach(n->{
 //            NoteContent noteContent = n.getNoteContent();
