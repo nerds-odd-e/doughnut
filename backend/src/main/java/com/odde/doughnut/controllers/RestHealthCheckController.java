@@ -1,7 +1,9 @@
 
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.entities.NoteContent;
 import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.TextContent;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -30,6 +32,14 @@ class RestHealthCheckController {
     @GetMapping("/data_upgrade")
     @Transactional
     public List dataUpgrade() {
+        modelFactoryService.noteRepository.findAll().forEach(n->{
+            NoteContent noteContent = n.getNoteContent();
+            noteContent.setTextContent(new TextContent());
+            noteContent.getTextContent().setDescription(noteContent.getDescription());
+            noteContent.getTextContent().setTitle(noteContent.getTitle());
+            modelFactoryService.noteRepository.save(n);
+        });
+
         return new ArrayList();
     }
 
