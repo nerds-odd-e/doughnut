@@ -13,6 +13,7 @@ import java.util.Optional;
 
 @Service
 public class ModelFactoryService {
+    @Autowired public TextContentRepository textContentRepository;
     @Autowired public NoteRepository noteRepository;
     @Autowired public UserRepository userRepository;
     @Autowired public BazaarNotebookRepository bazaarNotebookRepository;

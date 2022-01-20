@@ -32,16 +32,17 @@ class RestHealthCheckController {
     @GetMapping("/data_upgrade")
     @Transactional(timeout=200)
     public List dataUpgrade() {
-        modelFactoryService.noteRepository.findAll().forEach(n->{
-            NoteContent noteContent = n.getNoteContent();
-            noteContent.setTextContent(new TextContent());
-            noteContent.getTextContent().setDescription(noteContent.getDescription());
-            noteContent.getTextContent().setTitle(noteContent.getTitle());
-            noteContent.getTextContent().setUpdatedAt(noteContent.getUpdatedAt());
-            modelFactoryService.noteRepository.save(n);
-        });
+        long count = modelFactoryService.textContentRepository.count();
+//        modelFactoryService.noteRepository.findAll().forEach(n->{
+//            NoteContent noteContent = n.getNoteContent();
+//            noteContent.setTextContent(new TextContent());
+//            noteContent.getTextContent().setDescription(noteContent.getDescription());
+//            noteContent.getTextContent().setTitle(noteContent.getTitle());
+//            noteContent.getTextContent().setUpdatedAt(noteContent.getUpdatedAt());
+//            modelFactoryService.noteRepository.save(n);
+//        });
 
-        return new ArrayList();
+        return List.of(count);
     }
 
 }

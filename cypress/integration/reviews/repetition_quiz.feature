@@ -12,7 +12,7 @@ Feature: Repetition Quiz
 
   Scenario: Auto generate cloze deletion
     Given I learned one note "sedition" on day 1
-    And I link note "sedition" as "tagged by" note "medical"
+    And there is "tagged by" link between note "sedition" and "medical"
     When I am repeat-reviewing my old note on day 2
     Then I should be asked cloze deletion question "[...] means incite violence" with options "sedition, sedation"
     And On the current page, I should see "Sedition" has link "tagged by" "medical"

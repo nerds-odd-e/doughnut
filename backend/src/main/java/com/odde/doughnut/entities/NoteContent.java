@@ -100,8 +100,12 @@ public class NoteContent {
 
     @Column(name = "updated_at")
     @Getter
-    @Setter
     private Timestamp updatedAt;
+
+    public void setUpdatedAt(Timestamp value) {
+        this.updatedAt = value;
+        this.textContent.setUpdatedAt(value);
+    }
 
     @Column(name = "is_outdated_translation_idn")
     @Getter
