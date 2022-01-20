@@ -37,6 +37,7 @@ class RestHealthCheckController {
             noteContent.setTextContent(new TextContent());
             noteContent.getTextContent().setDescription(noteContent.getDescription());
             noteContent.getTextContent().setTitle(noteContent.getTitle());
+            noteContent.getTextContent().setUpdatedAt(noteContent.getUpdatedAt());
             modelFactoryService.noteRepository.save(n);
         });
 
