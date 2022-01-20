@@ -36,12 +36,20 @@ public class NoteContent {
     @NotEmpty
     @Size(min = 1, max = 100)
     @Getter
-    @Setter
     private String title;
 
+    public void setTitle(String title) {
+        this.title = title;
+        this.textContent.setTitle(title);
+    }
+
     @Getter
-    @Setter
     private String description;
+
+    public void setDescription(String description) {
+        this.description = description;
+        this.textContent.setDescription(description);
+    }
 
     @Getter
     @Setter
@@ -123,7 +131,7 @@ public class NoteContent {
         if(Strings.isEmpty(pictureMask)) {
             return "";
         }
-        List<String> list = Arrays.stream(pictureMask.split("\\s+")).collect(Collectors.toUnmodifiableList());
+        List<String> list = Arrays.stream(pictureMask.split("\\s+")).toList();
         List<String> results = new ArrayList<>();
         for (int i = 0; i < list.size(); i+=4) {
             results.add(String.format("<rect x=\"%s\" y=\"%s\" width=\"%s\" height=\"%s\" style=\"fill:blue;stroke:pink;stroke-width:1;fill-opacity:%s;stroke-opacity:0.8\" />", list.get(i), list.get(i+1), list.get(i+2), list.get(i+3), opacity));
