@@ -40,14 +40,6 @@ public class NoteContent {
     }
 
     @Getter
-    private String description;
-
-    public void setDescription(String description) {
-        this.description = description;
-        this.textContent.setDescription(description);
-    }
-
-    @Getter
     @Setter
     @Column(name = "title_idn", nullable = true)
     private String titleIDN;
@@ -98,15 +90,6 @@ public class NoteContent {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Transient @Getter @Setter private String testingParent;
 
-    @Column(name = "updated_at")
-    @Getter
-    private Timestamp updatedAt;
-
-    public void setUpdatedAt(Timestamp value) {
-        this.updatedAt = value;
-        this.textContent.setUpdatedAt(value);
-    }
-
     @Column(name = "is_outdated_translation_idn")
     @Getter
     @Setter
@@ -118,6 +101,22 @@ public class NoteContent {
     @Getter
     @Setter
     private TextContent textContent = new TextContent();
+
+    public Timestamp getUpdatedAt() {
+        return this.textContent.getUpdatedAt();
+    }
+
+    public void setUpdatedAt(Timestamp value) {
+        this.textContent.setUpdatedAt(value);
+    }
+
+    public String getDescription() {
+        return this.textContent.getDescription();
+    }
+
+    public void setDescription(String description) {
+        this.textContent.setDescription(description);
+    }
 
     @JsonIgnore
     public String getNotePicture() {

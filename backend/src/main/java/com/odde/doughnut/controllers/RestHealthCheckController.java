@@ -34,16 +34,9 @@ class RestHealthCheckController {
     public List dataUpgrade() {
         modelFactoryService.entityManager.createNativeQuery("delete from text_content where id not in (select text_content_id from note)").executeUpdate();
         long count = modelFactoryService.textContentRepository.count();
-//        modelFactoryService.noteRepository.findAll().forEach(n->{
-//            NoteContent noteContent = n.getNoteContent();
-//            noteContent.setTextContent(new TextContent());
-//            noteContent.getTextContent().setDescription(noteContent.getDescription());
-//            noteContent.getTextContent().setTitle(noteContent.getTitle());
-//            noteContent.getTextContent().setUpdatedAt(noteContent.getUpdatedAt());
-//            modelFactoryService.noteRepository.save(n);
-//        });
+        long countNotes = modelFactoryService.noteRepository.count();
 
-        return List.of(count);
+        return List.of(count, countNotes);
     }
 
 }
