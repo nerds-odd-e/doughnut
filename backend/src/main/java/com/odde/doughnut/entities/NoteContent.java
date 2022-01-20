@@ -104,6 +104,13 @@ public class NoteContent {
     @Setter
     private Boolean isTranslationOutdatedIDN;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "text_content_id", referencedColumnName = "id")
+    @JsonIgnore
+    @Getter
+    @Setter
+    private TextContent textContent = new TextContent();
+
     @JsonIgnore
     public String getNotePicture() {
         if (uploadPicture != null) {
@@ -139,9 +146,9 @@ public class NoteContent {
 
     @JsonIgnore
     public String getClozeDescription() {
-        if(Strings.isEmpty(description)) return "";
+        if(Strings.isEmpty(getDescription())) return "";
 
-        return ClozeDescription.htmlClosedDescription().getClozeDescription(getNoteTitle(), description);
+        return ClozeDescription.htmlClosedDescription().getClozeDescription(getNoteTitle(), getDescription());
     }
 
     @JsonIgnore
@@ -151,7 +158,7 @@ public class NoteContent {
 
     @JsonIgnore
     public String getShortDescription() {
-        return StringUtils.abbreviate(description, 50);
+        return StringUtils.abbreviate(getDescription(), 50);
     }
 
     @JsonIgnore
@@ -160,7 +167,7 @@ public class NoteContent {
     }
 
     private boolean isEnglishTranslationUpdated(NoteContent updatedNoteContent) {
-        return !(updatedNoteContent.title.equals(this.title)) || !(updatedNoteContent.description.equals(this.description));
+        return !(updatedNoteContent.title.equals(this.title)) || !(updatedNoteContent.getDescription().equals(this.getDescription()));
     }
 
     @JsonIgnore
