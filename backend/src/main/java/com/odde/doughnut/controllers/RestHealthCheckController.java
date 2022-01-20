@@ -30,7 +30,7 @@ class RestHealthCheckController {
     }
 
     @GetMapping("/data_upgrade")
-    @Transactional
+    @Transactional(timeout=200)
     public List dataUpgrade() {
         modelFactoryService.noteRepository.findAll().forEach(n->{
             NoteContent noteContent = n.getNoteContent();

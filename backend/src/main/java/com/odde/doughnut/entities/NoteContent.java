@@ -1,30 +1,26 @@
 package com.odde.doughnut.entities;
 
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.odde.doughnut.algorithms.ClozeDescription;
 import com.odde.doughnut.algorithms.NoteTitle;
 import com.odde.doughnut.entities.validators.ValidateNotePicture;
 import com.odde.doughnut.models.ImageBuilder;
-
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.web.multipart.MultipartFile;
 import org.thymeleaf.util.StringUtils;
 
-import lombok.Getter;
-import lombok.Setter;
+import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Pattern;
+import javax.validation.constraints.Size;
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Embeddable
 @ValidateNotePicture
@@ -161,7 +157,7 @@ public class NoteContent {
 
     @JsonIgnore
     public NoteTitle getNoteTitle() {
-        return new NoteTitle(title);
+        return new NoteTitle(getTitle());
     }
 
     @JsonIgnore
@@ -175,7 +171,7 @@ public class NoteContent {
     }
 
     private boolean isEnglishTranslationUpdated(NoteContent updatedNoteContent) {
-        return !(updatedNoteContent.title.equals(this.title)) || !(updatedNoteContent.getDescription().equals(this.getDescription()));
+        return !(updatedNoteContent.getTitle().equals(this.getTitle())) || !(updatedNoteContent.getDescription().equals(this.getDescription()));
     }
 
     @JsonIgnore
