@@ -37,7 +37,7 @@ class RestTextContentController {
         user.getAuthorization().assertAuthorization(note);
 
         TextContent target =
-                textContent.getLanguage().equals("idn") ?
+                textContent.getLanguage() != null && textContent.getLanguage().equals("idn") ?
                         note.getTranslationTextContent() : note.getTextContent();
 
         target.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());

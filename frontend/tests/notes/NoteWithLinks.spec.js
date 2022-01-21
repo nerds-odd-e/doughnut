@@ -149,7 +149,7 @@ describe("in place edit on title", () => {
     await wrapper.find('[role="title"] input').setValue('updated');
     await wrapper.find('[role="title"] input').trigger("blur");
 
-    expect(fetch).toHaveBeenCalledWith(`/api/notes/${noteParent.id}`, expect.objectContaining({method: 'PATCH'}));
+    expect(fetch).toHaveBeenCalledWith(`/api/text_content/${noteParent.id}`, expect.objectContaining({method: 'PATCH'}));
   });
 
   it("should update Indonesian title on blur when language is Indonesian", async () => {
@@ -172,7 +172,7 @@ describe("in place edit on title", () => {
     await wrapper.find('[role="title"] input').trigger('input');
     await wrapper.find('[role="title"] input').trigger("blur");
 
-    expect(fetch).toHaveBeenCalledWith(`/api/notes/${noteParent.id}`, expect.objectContaining({method: 'PATCH'}));
+    expect(fetch).toHaveBeenCalledWith(`/api/text_content/${noteParent.id}`, expect.objectContaining({method: 'PATCH'}));
   });
 });
 

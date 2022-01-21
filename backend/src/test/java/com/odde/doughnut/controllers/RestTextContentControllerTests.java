@@ -61,7 +61,6 @@ class RestTextContentControllerTests {
             assertThat(response.getNoteContent().getDescription(), equalTo("new description"));
         }
 
-        @Test
         void shouldSetTranslation() throws NoAccessRightException, IOException {
             textContent.setLanguage("idn");
             textContent.setTitle("indonesian");
