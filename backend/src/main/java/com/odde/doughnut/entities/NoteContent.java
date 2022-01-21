@@ -31,16 +31,6 @@ public class NoteContent {
 
     @Getter
     @Setter
-    @Column(name = "title_idn", nullable = true)
-    private String titleIDN;
-
-    @Getter
-    @Setter
-    @Column(name = "description_idn", nullable = true)
-    private String descriptionIDN;
-
-    @Getter
-    @Setter
     private String url;
 
     @Column(name = "url_is_video")
@@ -91,6 +81,43 @@ public class NoteContent {
     @Getter
     @Setter
     private TextContent textContent = new TextContent();
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "translation_text_content_id", referencedColumnName = "id")
+    @JsonIgnore
+    @Getter
+    @Setter
+    private TextContent translationTextContent;
+
+    public String getTitleIDN() {
+        if (translationTextContent == null) {
+            return null;
+        }
+        return translationTextContent.getTitle();
+    }
+
+    public void setTitleIDN(String title) {
+        if (title == null) {return;}
+        if (translationTextContent == null) {
+            translationTextContent = new TextContent();
+        }
+        this.translationTextContent.setTitle(title);
+    }
+
+    public String getDescriptionIDN() {
+        if (translationTextContent == null) {
+            return null;
+        }
+        return translationTextContent.getDescription();
+    }
+
+    public void setDescriptionIDN(String desc) {
+        if (desc == null) {return;}
+        if (translationTextContent == null) {
+            translationTextContent = new TextContent();
+        }
+        this.translationTextContent.setDescription(desc);
+    }
 
     @NotEmpty
     @Size(min = 1, max = 100)
@@ -170,7 +197,7 @@ public class NoteContent {
 
     @JsonIgnore
     public String getShortDescriptionIDN() {
-        return StringUtils.abbreviate(descriptionIDN, 50);
+        return StringUtils.abbreviate(getDescriptionIDN(), 50);
     }
 
     private boolean isEnglishTranslationUpdated(NoteContent updatedNoteContent) {
@@ -180,8 +207,8 @@ public class NoteContent {
 
     @JsonIgnore
     private boolean isIndonesianTranslationUpdated(NoteContent updatedNoteContent) {
-        boolean isTitleIDNChanged = updatedNoteContent.titleIDN != null && !(updatedNoteContent.titleIDN.equals(this.titleIDN));
-        boolean isDescriptionIDNChanged = updatedNoteContent.descriptionIDN != null && !(updatedNoteContent.descriptionIDN.equals(this.descriptionIDN));
+        boolean isTitleIDNChanged = updatedNoteContent.getTitleIDN() != null && !(updatedNoteContent.getTitleIDN().equals(this.getTitleIDN()));
+        boolean isDescriptionIDNChanged = updatedNoteContent.getDescriptionIDN() != null && !(updatedNoteContent.getDescriptionIDN().equals(this.getDescriptionIDN()));
 
         return isTitleIDNChanged || isDescriptionIDNChanged;
     }
