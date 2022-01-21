@@ -17,6 +17,7 @@ class NoteBuilder extends Builder {
       id: generateId(),
       parentId: null,
       noteContent: {},
+      textContent: {},
       links: {},
       childrenIds: []
     };
@@ -24,7 +25,7 @@ class NoteBuilder extends Builder {
 
   title(value: string): NoteBuilder {
     this.data.title = value;
-    this.data.noteContent.title = value;
+    this.data.textContent.title = value;
     return this;
   }
 
@@ -34,8 +35,7 @@ class NoteBuilder extends Builder {
   }
 
   description(value: string): NoteBuilder {
-    this.data.description = value;
-    this.data.noteContent.description = value;
+    this.data.textContent.description = value;
     return this;
   }
 
@@ -95,8 +95,6 @@ class NoteBuilder extends Builder {
     return merge(
       {
         noteContent: {
-          title: "Note1.1.1",
-          description: "Desc",
           url: null,
           urlIsVideo: false,
           pictureUrl: null,
@@ -106,9 +104,8 @@ class NoteBuilder extends Builder {
           updatedAt: "2021-08-24T08:46:44.000+00:00",
         },
         textContent: {
-          updatedAt: "2021-08-24T08:46:44.000+00:00",
-        },
-        translationTextContent: {
+          title: "Note1.1.1",
+          description: "Desc",
           updatedAt: "2021-08-24T08:46:44.000+00:00",
         },
         createdAt: "2021-08-24T08:46:44.000+00:00",
