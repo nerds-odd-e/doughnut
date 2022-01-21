@@ -70,8 +70,9 @@ const storedApiUpdateNote = async (store, noteId, noteContentData) => {
     return res;
 }
 
-const storedApiUpdateTextContent = async (store, noteId, data) => {
-    const res = await restPatch(
+const storedApiUpdateTextContent = async (store, noteId, noteContentData) => {
+    const { updatedAt, ...data } = noteContentData
+    const res = await restPatchMultiplePartForm(
         `/api/text_content/${noteId}`,
         data,
         () => null

@@ -33,7 +33,7 @@ import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
 import NoteShell from "./NoteShell.vue";
 import NoteContent from "./NoteContent.vue";
 import { TranslatedNoteWrapper } from "../../models/languages";
-import { storedApiUpdateNote } from "../../storedApi";
+import { storedApiUpdateTextContent } from "../../storedApi";
 
 export default {
   name: "NoteWithLinks",
@@ -60,7 +60,7 @@ export default {
   methods: {
     submitChange() {
       this.loading = true
-      storedApiUpdateNote(this.$store, this.note.id, this.note.noteContent)
+      storedApiUpdateTextContent(this.$store, this.note.id, this.note.textContent)
       .then((res) => {
         this.$emit("done");
       })

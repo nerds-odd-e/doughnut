@@ -97,7 +97,7 @@ When("I create a sibling note of {string}:", (noteTitle, data) => {
 When(
   "I should see that the note creation is not successful",
   (noteTitle, data) => {
-    cy.findByText("must not be empty");
+    cy.findByText("size must be between 1 and 100");
   }
 );
 

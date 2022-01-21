@@ -30,7 +30,11 @@ class NoteBuilder extends Builder {
   }
 
   titleIDN(value: string): NoteBuilder {
-    this.data.noteContent.titleIDN = value;
+    merge(this.data, {
+      translationTextContent: {
+        title: value
+      }
+    })
     return this;
   }
 
@@ -40,7 +44,11 @@ class NoteBuilder extends Builder {
   }
 
   descriptionIDN(value: string): NoteBuilder {
-    this.data.noteContent.descriptionIDN = value;
+    merge(this.data, {
+      translationTextContent: {
+        description: value
+      }
+    })
     return this;
   }
 

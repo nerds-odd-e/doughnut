@@ -129,7 +129,6 @@ public class NoteContent {
         this.translationTextContent.setUpdatedAt(value);
     }
 
-    @NotEmpty
     @Size(min = 1, max = 100)
     public String getTitle() {
         return textContent.getTitle();
