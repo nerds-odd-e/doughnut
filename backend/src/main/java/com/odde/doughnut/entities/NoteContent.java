@@ -29,16 +29,6 @@ public class NoteContent {
     @Getter
     private Integer id;
 
-    @NotEmpty
-    @Size(min = 1, max = 100)
-    public String getTitle() {
-        return textContent.getTitle();
-    }
-
-    public void setTitle(String title) {
-        this.textContent.setTitle(title);
-    }
-
     @Getter
     @Setter
     @Column(name = "title_idn", nullable = true)
@@ -101,6 +91,16 @@ public class NoteContent {
     @Getter
     @Setter
     private TextContent textContent = new TextContent();
+
+    @NotEmpty
+    @Size(min = 1, max = 100)
+    public String getTitle() {
+        return textContent.getTitle();
+    }
+
+    public void setTitle(String title) {
+        this.textContent.setTitle(title);
+    }
 
     public Timestamp getUpdatedAt() {
         return this.textContent.getUpdatedAt();

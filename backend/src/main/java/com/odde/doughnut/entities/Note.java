@@ -52,6 +52,11 @@ public class Note {
     @Getter
     private final NoteContent noteContent = new NoteContent();
 
+    @JsonIgnore
+    public TextContent getTextContent() {
+        return noteContent.getTextContent();
+    }
+
     @Column(name = "sibling_order")
     private Long siblingOrder = SiblingOrder.getGoodEnoughOrderNumber();
 

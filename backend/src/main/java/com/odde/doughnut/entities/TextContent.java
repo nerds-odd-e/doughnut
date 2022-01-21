@@ -23,6 +23,10 @@ public class TextContent {
     @Setter
     private String description;
 
+    @Getter
+    @Setter
+    private String language;
+
     @Column(name = "updated_at")
     @Getter
     @Setter
