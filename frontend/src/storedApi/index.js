@@ -1,4 +1,4 @@
-import { restGet, restPatchMultiplePartForm, restPost, restPostMultiplePartForm } from "../restful/restful";
+import { restGet, restPatchMultiplePartForm, restPost, restPatch, restPostMultiplePartForm } from "../restful/restful";
 
 const apiLogout = async () => {
     await restPost(`/logout`, {})
@@ -60,10 +60,19 @@ const storedApiCreateNote = async (store, parentId, data) => {
 }
 
 const storedApiUpdateNote = async (store, noteId, noteContentData) => {
-
     const { updatedAt, ...data } = noteContentData
     const res = await restPatchMultiplePartForm(
         `/api/notes/${noteId}`,
+        data,
+        () => null
+    )
+    store.commit("loadNotes", [res]);
+    return res;
+}
+
+const storedApiUpdateTextContent = async (store, noteId, data) => {
+    const res = await restPatch(
+        `/api/text_content/${noteId}`,
         data,
         () => null
     )
@@ -170,6 +179,7 @@ export {
     storedApiGetNoteAndItsChildren,
     storedApiCreateNote,
     storedApiUpdateNote,
+    storedApiUpdateTextContent,
     storedApiDeleteNote,
     storedApiSplitNote,
     storedApiGetCurrentUserInfo,

@@ -78,6 +78,20 @@ const restPost = (url, data, loadingRef) =>
     loadingRef
   );
 
+const restPatch = (url, data, loadingRef) =>
+  restRequest(
+    url,
+    {
+      method: "PATCH",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(data),
+    },
+    loadingRef
+  );
+
 function objectToFormData(data) {
   const formData = new FormData();
   Object.keys(data).forEach((key) => {
@@ -126,6 +140,7 @@ const restPatchMultiplePartForm = (url, data, loadingRef) =>
 export {
   restGet,
   restPost,
+  restPatch,
   restPostMultiplePartForm,
   restPatchMultiplePartForm,
   loginOrRegister,
