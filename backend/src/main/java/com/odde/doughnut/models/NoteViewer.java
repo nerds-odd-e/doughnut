@@ -38,6 +38,8 @@ public class NoteViewer {
         nvb.setLinks(getAllLinks());
         nvb.setChildrenIds(note.getChildren().stream().map(Note::getId).toList());
         nvb.setIsTranslationOutdatedIDN(note.getIsTranslationOutdatedIDN());
+        nvb.setTextContent(note.getTextContent());
+        nvb.setTranslationTextContent(note.getTranslationTextContent());
 
         return nvb;
     }

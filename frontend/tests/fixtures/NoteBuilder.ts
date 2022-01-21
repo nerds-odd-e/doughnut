@@ -80,7 +80,14 @@ class NoteBuilder extends Builder {
   }
 
   isTranslationOutdatedIDN(value: boolean): NoteBuilder {
-    this.data.isTranslationOutdatedIDN = value;
+    merge(this.data, {
+      textContent: {
+        updatedAt: "2021-08-24T08:46:44.000+00:00",
+      },
+      translationTextContent: {
+        updatedAt: value ? "2021-08-23T08:46:44.000+00:00" : "2021-08-25T08:46:44.000+00:00"
+      }
+    });
     return this;
   }
 
@@ -98,7 +105,12 @@ class NoteBuilder extends Builder {
           skipReview: false,
           updatedAt: "2021-08-24T08:46:44.000+00:00",
         },
-        isTranslationOutdatedIDN: null,
+        textContent: {
+          updatedAt: "2021-08-24T08:46:44.000+00:00",
+        },
+        translationTextContent: {
+          updatedAt: "2021-08-24T08:46:44.000+00:00",
+        },
         createdAt: "2021-08-24T08:46:44.000+00:00",
         title: "Note1.1.1",
         notePicture: null,

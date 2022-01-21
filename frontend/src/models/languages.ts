@@ -55,7 +55,13 @@ class TranslatedNoteWrapper {
     }
 
   get isTranslationOutdatedIDN() {
-      return this.language === Languages.ID && this.note.isTranslationOutdatedIDN;
+      if (this.language !== Languages.ID) {
+        return false;
+      } 
+      if (!this.note.translationTextContent?.updatedAt) {
+        return true;
+      } 
+      return new Date(this.note.textContent.updatedAt) > new Date(this.note.translationTextContent.updatedAt);
     }
 }
 
