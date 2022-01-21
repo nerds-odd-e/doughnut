@@ -17,7 +17,7 @@ public class TextContent {
 
     @Getter
     @Setter
-    private String title = "111";
+    private String title;
 
     @Getter
     @Setter

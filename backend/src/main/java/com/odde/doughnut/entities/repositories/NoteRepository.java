@@ -16,7 +16,7 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
     @Query( value = "SELECT count(1) as count from note " + byOwnershipWhereThereIsNoReviewPoint, nativeQuery = true)
     int countByOwnershipWhereThereIsNoReviewPoint(@Param("user") User user);
 
-    @Query( value = "SELECT note.* from note where title = :noteTitle limit 1", nativeQuery = true)
+    @Query( value = selectFromNoteJoinTextContent + " where text_content.title = :noteTitle limit 1", nativeQuery = true)
     Note findFirstByTitle(@Param("noteTitle") String noteTitle);
 
     @Query( value = "SELECT note.* from note " + byAncestorWhereThereIsNoReviewPoint, nativeQuery = true)
@@ -27,6 +27,9 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
 
     @Query( value = "SELECT count(1) as count from note " + joinClosure + " WHERE note.id in :noteIds", nativeQuery = true)
     int countByAncestorAndInTheList(@Param("ancestor") Note ancestor, @Param("noteIds") List<Integer> noteIds);
+
+    String selectFromNoteJoinTextContent = "SELECT note.*  from note JOIN text_content"
+            + "   ON note.text_content_id = text_content.id ";
 
     String whereThereIsNoReviewPointAndOrderByTime = " LEFT JOIN review_point rp"
             + "   ON note.id = rp.note_id "
@@ -50,10 +53,10 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
     @Query( value = notesVisibleToAUser + searchForLinkTarget , nativeQuery = true)
     List<Note> searchForUserInVisibleScope(@Param("user") User user, @Param("noteToAvoid") Note noteToAvoid, @Param("pattern") String pattern);
 
-    @Query( value = "SELECT note.* from note WHERE note.notebook_id = :notebook " + searchForLinkTarget , nativeQuery = true)
+    @Query( value = selectFromNoteJoinTextContent +" WHERE note.notebook_id = :notebook " + searchForLinkTarget , nativeQuery = true)
     List<Note> searchInNotebook(@Param("notebook") Notebook notebook, @Param("noteToAvoid") Note noteToAvoid, @Param("pattern") String pattern);
 
-    String notesVisibleToAUser = "SELECT note.* from note"
+    String notesVisibleToAUser = selectFromNoteJoinTextContent
             + "  JOIN ("
             + "          SELECT notebook.id FROM notebook "
             + "             LEFT JOIN circle_user ON circle_user.user_id = :user "
@@ -67,5 +70,5 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
             + "  WHERE 1=1 ";
 
     String searchForLinkTarget = "  AND note.id != :noteToAvoid "
-                    + "      AND REGEXP_LIKE(note.title, :pattern) ";
+                    + "      AND REGEXP_LIKE(text_content.title, :pattern) ";
 }

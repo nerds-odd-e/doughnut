@@ -31,11 +31,11 @@ public class NoteContent {
 
     @NotEmpty
     @Size(min = 1, max = 100)
-    @Getter
-    private String title;
+    public String getTitle() {
+        return textContent.getTitle();
+    }
 
     public void setTitle(String title) {
-        this.title = title;
         this.textContent.setTitle(title);
     }
 
@@ -174,7 +174,8 @@ public class NoteContent {
     }
 
     private boolean isEnglishTranslationUpdated(NoteContent updatedNoteContent) {
-        return !(updatedNoteContent.getTitle().equals(this.getTitle())) || !(updatedNoteContent.getDescription().equals(this.getDescription()));
+        boolean isDescriptionChanged = updatedNoteContent.getDescription() != null && !(updatedNoteContent.getDescription().equals(this.getDescription()));
+        return !(updatedNoteContent.getTitle().equals(this.getTitle())) || isDescriptionChanged;
     }
 
     @JsonIgnore
