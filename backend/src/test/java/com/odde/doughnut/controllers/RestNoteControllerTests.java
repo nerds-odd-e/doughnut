@@ -153,18 +153,6 @@ class RestNoteControllerTests {
         }
 
         @Test
-        void shouldSetTranslationOutdatedTagWhenUpdatingEnglishNoteAndIndonesianTranslationIsAvailable() throws NoAccessRightException, IOException {
-            note.getNoteContent().setTitleIDN("indonesian");
-            NoteContent newContent = makeMe.aNote().inMemoryPlease().getNoteContent();
-            newContent.setTitle("fulan");
-            newContent.setUpdatedAt(null);
-
-            NoteViewedByUser response = controller.updateNote(note, newContent);
-
-            assertTrue(response.getNoteContent().getIsTranslationOutdatedIDN());
-        }
-
-        @Test
         void shouldNotSetTranslationOutdatedTagWhenUpdatingEnglishNoteAndIndonesianTranslationIsNotAvailable() throws NoAccessRightException, IOException {
             note.getNoteContent().setTitleIDN(null);
             NoteContent newContent = note.getNoteContent();
@@ -176,41 +164,27 @@ class RestNoteControllerTests {
 
         @Test
         void shouldNotSetTranslationOutdatedTagWhenUpdatingIndonesianTranslation() throws NoAccessRightException, IOException {
-            note.getNoteContent().setTitleIDN("indonesia");
             NoteContent newContent = makeMe.aNote().inMemoryPlease().getNoteContent();
             newContent.setTitleIDN("bahasa");
 
             NoteViewedByUser response = controller.updateNote(note, newContent);
 
-            assertEquals(note.getNoteContent().getIsTranslationOutdatedIDN(), response.getNoteContent().getIsTranslationOutdatedIDN());
-        }
-
-        @Test
-        void shouldSetTranslationOutdatedTagWhenUpdatingEnglishDescriptionAndIndonesianTranslationIsAvailable() throws NoAccessRightException, IOException {
-            note.getNoteContent().setDescriptionIDN("bahasa indonesia");
-            NoteContent newContent = makeMe.aNote().inMemoryPlease().getNoteContent();
-            newContent.setTitle(note.getNoteContent().getTitle());
-            newContent.setDescription("deskripsi");
-            newContent.setUpdatedAt(null);
-
-            NoteViewedByUser response = controller.updateNote(note, newContent);
-
-            assertTrue(response.getNoteContent().getIsTranslationOutdatedIDN());
+            assertFalse(response.getNoteContent().getIsTranslationOutdatedIDN());
         }
 
         @Test
         void shouldNotSetTranslationOutdatedTagWhenThereIsNoTitleChangeOnEnglishTranslation() throws NoAccessRightException, IOException {
-            note.getNoteContent().setTitleIDN("indonesia");
+            note.getNoteContent().setTitle("title changed");
             NoteViewedByUser response = controller.updateNote(note, note.getNoteContent());
 
-            assertFalse(response.getNoteContent().getIsTranslationOutdatedIDN());
+            assertTrue(response.getNoteContent().getIsTranslationOutdatedIDN());
         }
 
         @Test
         void shouldNotChangeTranslationOutdatedTagWhenThereIsNoTitleChangeOnIndonesianTranslation() throws NoAccessRightException, IOException {
             note.getNoteContent().setTitleIDN("indonesia");
             note.getNoteContent().setTitle("inggris");
-            note.getNoteContent().setIsTranslationOutdatedIDN(true);
+            note.getNoteContent().setUpdatedAtIDN(null);
 
             NoteContent newContent = makeMe.aNote("inggris", "descrption").inMemoryPlease().getNoteContent();
             newContent.setTitleIDN(note.getNoteContent().getTitleIDN());

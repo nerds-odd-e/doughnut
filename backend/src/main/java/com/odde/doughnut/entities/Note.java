@@ -229,8 +229,6 @@ public class Note {
     public void updateNoteContent(NoteContent noteContent, User user) throws IOException {
         noteContent.fetchUploadedPicture(user);
 
-        noteContent.setIsTranslationOutdatedIDN(getNoteContent().isTranslationOutdated(noteContent));
-
         mergeNoteContent(noteContent);
     }
 

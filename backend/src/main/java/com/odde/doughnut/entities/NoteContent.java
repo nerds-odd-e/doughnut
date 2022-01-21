@@ -70,11 +70,6 @@ public class NoteContent {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @Transient @Getter @Setter private String testingParent;
 
-    @Column(name = "is_outdated_translation_idn")
-    @Getter
-    @Setter
-    private Boolean isTranslationOutdatedIDN;
-
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "text_content_id", referencedColumnName = "id")
     @JsonIgnore
@@ -117,6 +112,21 @@ public class NoteContent {
             translationTextContent = new TextContent();
         }
         this.translationTextContent.setDescription(desc);
+    }
+
+    @JsonIgnore
+    public Timestamp getUpdatedAtIDN() {
+        if (translationTextContent == null) {
+            return null;
+        }
+        return translationTextContent.getUpdatedAt();
+    }
+
+    public void setUpdatedAtIDN(Timestamp value) {
+        if (translationTextContent == null) {
+            translationTextContent = new TextContent();
+        }
+        this.translationTextContent.setUpdatedAt(value);
     }
 
     @NotEmpty
@@ -200,21 +210,10 @@ public class NoteContent {
         return StringUtils.abbreviate(getDescriptionIDN(), 50);
     }
 
-    private boolean isEnglishTranslationUpdated(NoteContent updatedNoteContent) {
-        boolean isDescriptionChanged = updatedNoteContent.getDescription() != null && !(updatedNoteContent.getDescription().equals(this.getDescription()));
-        return !(updatedNoteContent.getTitle().equals(this.getTitle())) || isDescriptionChanged;
+    public Boolean getIsTranslationOutdatedIDN() {
+        Timestamp updatedAtIDN = getUpdatedAtIDN();
+        if (updatedAtIDN == null) return true;
+        return updatedAtIDN.before(getUpdatedAt());
     }
 
-    @JsonIgnore
-    private boolean isIndonesianTranslationUpdated(NoteContent updatedNoteContent) {
-        boolean isTitleIDNChanged = updatedNoteContent.getTitleIDN() != null && !(updatedNoteContent.getTitleIDN().equals(this.getTitleIDN()));
-        boolean isDescriptionIDNChanged = updatedNoteContent.getDescriptionIDN() != null && !(updatedNoteContent.getDescriptionIDN().equals(this.getDescriptionIDN()));
-
-        return isTitleIDNChanged || isDescriptionIDNChanged;
-    }
-
-    @JsonIgnore
-    public boolean isTranslationOutdated(NoteContent updatedNoteContent) {
-        return (this.isEnglishTranslationUpdated(updatedNoteContent)) || (this.isTranslationOutdatedIDN != null && this.isTranslationOutdatedIDN && !isIndonesianTranslationUpdated(updatedNoteContent));
-    }
 }

@@ -99,7 +99,11 @@ class RestNoteController {
         final UserModel user = currentUserFetcher.getUser();
         user.getAuthorization().assertAuthorization(note);
 
+        if (noteContent.getTitleIDN() != note.getNoteContent().getTitleIDN()) {
+            noteContent.setUpdatedAtIDN(testabilitySettings.getCurrentUTCTimestamp());
+        }
         noteContent.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
+
         note.updateNoteContent(noteContent, user.getEntity());
         modelFactoryService.noteRepository.save(note);
         return new NoteViewer(user.getEntity(), note).toJsonObject();
