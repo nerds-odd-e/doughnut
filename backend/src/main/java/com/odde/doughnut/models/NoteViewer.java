@@ -2,7 +2,6 @@ package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.NoteContent;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.json.LinkViewed;
 import com.odde.doughnut.entities.json.NotePositionViewedByUser;
@@ -38,6 +37,7 @@ public class NoteViewer {
         nvb.setNoteContent(note.getNoteContent());
         nvb.setLinks(getAllLinks());
         nvb.setChildrenIds(note.getChildren().stream().map(Note::getId).toList());
+        nvb.setIsTranslationOutdatedIDN(note.getIsTranslationOutdatedIDN());
 
         return nvb;
     }

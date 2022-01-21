@@ -50,4 +50,8 @@ public class NoteViewedByUser {
     @Setter
     private List<Integer> childrenIds;
 
+    @Getter
+    @Setter
+    private Boolean isTranslationOutdatedIDN;
+
 }

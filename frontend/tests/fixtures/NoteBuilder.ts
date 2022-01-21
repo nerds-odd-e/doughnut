@@ -80,7 +80,7 @@ class NoteBuilder extends Builder {
   }
 
   isTranslationOutdatedIDN(value: boolean): NoteBuilder {
-    this.data.noteContent.isTranslationOutdatedIDN = value;
+    this.data.isTranslationOutdatedIDN = value;
     return this;
   }
 
@@ -97,8 +97,8 @@ class NoteBuilder extends Builder {
           useParentPicture: false,
           skipReview: false,
           updatedAt: "2021-08-24T08:46:44.000+00:00",
-          isTranslationOutdatedIDN: null,
         },
+        isTranslationOutdatedIDN: null,
         createdAt: "2021-08-24T08:46:44.000+00:00",
         title: "Note1.1.1",
         notePicture: null,

@@ -57,6 +57,16 @@ public class Note {
         return noteContent.getTextContent();
     }
 
+    public TextContent getTranslationTextContent() {
+        return noteContent.getTranslationTextContent();
+    }
+
+    public Boolean getIsTranslationOutdatedIDN() {
+        Timestamp updatedAtIDN = getNoteContent().getUpdatedAtIDN();
+        if (updatedAtIDN == null) return true;
+        return updatedAtIDN.before(getNoteContent().getUpdatedAt());
+    }
+
     @Column(name = "sibling_order")
     private Long siblingOrder = SiblingOrder.getGoodEnoughOrderNumber();
 

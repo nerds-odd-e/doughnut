@@ -210,10 +210,4 @@ public class NoteContent {
         return StringUtils.abbreviate(getDescriptionIDN(), 50);
     }
 
-    public Boolean getIsTranslationOutdatedIDN() {
-        Timestamp updatedAtIDN = getUpdatedAtIDN();
-        if (updatedAtIDN == null) return true;
-        return updatedAtIDN.before(getUpdatedAt());
-    }
-
 }

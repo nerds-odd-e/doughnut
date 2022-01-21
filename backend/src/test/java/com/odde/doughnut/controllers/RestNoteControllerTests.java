@@ -159,7 +159,7 @@ class RestNoteControllerTests {
 
             NoteViewedByUser response = controller.updateNote(note, newContent);
 
-            assertEquals(note.getNoteContent().getIsTranslationOutdatedIDN(), response.getNoteContent().getIsTranslationOutdatedIDN());
+            assertEquals(note.getIsTranslationOutdatedIDN(), response.getIsTranslationOutdatedIDN());
         }
 
         @Test
@@ -169,7 +169,7 @@ class RestNoteControllerTests {
 
             NoteViewedByUser response = controller.updateNote(note, newContent);
 
-            assertFalse(response.getNoteContent().getIsTranslationOutdatedIDN());
+            assertFalse(response.getIsTranslationOutdatedIDN());
         }
 
         @Test
@@ -177,7 +177,7 @@ class RestNoteControllerTests {
             note.getNoteContent().setTitle("title changed");
             NoteViewedByUser response = controller.updateNote(note, note.getNoteContent());
 
-            assertTrue(response.getNoteContent().getIsTranslationOutdatedIDN());
+            assertTrue(response.getIsTranslationOutdatedIDN());
         }
 
         @Test
@@ -192,7 +192,7 @@ class RestNoteControllerTests {
 
             NoteViewedByUser response = controller.updateNote(note, newContent);
 
-            assertEquals(note.getNoteContent().getIsTranslationOutdatedIDN(), response.getNoteContent().getIsTranslationOutdatedIDN());
+            assertEquals(note.getIsTranslationOutdatedIDN(), response.getIsTranslationOutdatedIDN());
         }
     }
 
