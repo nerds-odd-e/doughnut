@@ -32,27 +32,18 @@ class RestTextContentController {
 
     @PatchMapping(path = "/{note}")
     @Transactional
-    public NoteViewedByUser updateNote(@PathVariable(name = "note") Note note, @Valid @ModelAttribute TextContent textContent) throws NoAccessRightException, IOException
-    {
+    public NoteViewedByUser updateNote(@PathVariable(name = "note") Note note, @Valid @ModelAttribute TextContent textContent) throws NoAccessRightException, IOException {
         final UserModel user = currentUserFetcher.getUser();
         user.getAuthorization().assertAuthorization(note);
 
-        if (textContent.getLanguage() == "idn") {
-            NoteContent noteContent = note.getNoteContent();
-            noteContent.setDescriptionIDN(textContent.getDescription());
-            noteContent.setTitleIDN(textContent.getTitle());
-            noteContent.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
-            note.updateNoteContent(noteContent, user.getEntity());
-            modelFactoryService.noteRepository.save(note);
-        }
-        else {
-            TextContent target = note.getTextContent();
+        TextContent target =
+                textContent.getLanguage().equals("idn") ?
+                        note.getTranslationTextContent() : note.getTextContent();
 
-            target.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
-            target.setTitle(textContent.getTitle());
-            target.setDescription(textContent.getDescription());
-            modelFactoryService.textContentRepository.save(target);
-        }
+        target.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
+        target.setTitle(textContent.getTitle());
+        target.setDescription(textContent.getDescription());
+        modelFactoryService.textContentRepository.save(target);
         return new NoteViewer(user.getEntity(), note).toJsonObject();
     }
 }

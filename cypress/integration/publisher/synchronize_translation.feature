@@ -16,7 +16,6 @@ Feature: Synchronize Translation
     And Note title on the page should be "putra Pandu"
     Then I should not see translation outdated tag
 
-    @ignore
   @featureToggle
   Scenario: Should inform me if outdated translation already updated
     When I edit original note translation to become

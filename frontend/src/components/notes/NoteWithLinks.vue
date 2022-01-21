@@ -32,7 +32,7 @@ import EditableText from "../form/EditableText.vue";
 import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
 import NoteShell from "./NoteShell.vue";
 import NoteContent from "./NoteContent.vue";
-import { TranslatedNoteWrapper } from "../../models/languages";
+import Languages, { TranslatedNoteWrapper } from "../../models/languages";
 import { storedApiUpdateTextContent } from "../../storedApi";
 
 export default {
@@ -60,7 +60,13 @@ export default {
   methods: {
     submitChange() {
       this.loading = true
-      storedApiUpdateTextContent(this.$store, this.note.id, this.note.textContent)
+      const textContent = (()=>{
+        if (this.language == Languages.ID) {
+          return {...this.note.translationTextContent, language: 'idn', };
+        }
+        return this.note.textContent;
+      })();
+      storedApiUpdateTextContent(this.$store, this.note.id, textContent)
       .then((res) => {
         this.$emit("done");
       })
