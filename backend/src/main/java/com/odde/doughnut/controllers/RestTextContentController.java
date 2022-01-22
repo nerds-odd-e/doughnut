@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.sql.Timestamp;
 
 @RestController
 @RequestMapping("/api/text_content")
@@ -40,10 +41,11 @@ class RestTextContentController {
                 textContent.getLanguage() != null && textContent.getLanguage().equals("idn") ?
                         note.getOrBuildTranslationTextContent() : note.getTextContent();
 
-        target.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
-        target.setTitle(textContent.getTitle());
-        target.setDescription(textContent.getDescription());
+        Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
+        target.updateTextContent(textContent, currentUTCTimestamp);
+
         modelFactoryService.noteRepository.save(note);
         return new NoteViewer(user.getEntity(), note).toJsonObject();
     }
+
 }

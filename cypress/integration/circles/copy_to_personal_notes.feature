@@ -4,8 +4,6 @@ Feature: Copy a circle notebook to personal notes
 
   Background:
     Given I've logged in as the existing user "old_learner"
-    And I navigate to an existing circle "Odd-e SG Team" where the "old_learner" and "another_old_learner" users belong to
-    And the notebook "Test notebook" already exists in the circle "Odd-e SG Team"
 
   @featureToggle
   Scenario: User 1 wants to have his own notes

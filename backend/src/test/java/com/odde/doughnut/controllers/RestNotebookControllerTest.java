@@ -88,14 +88,4 @@ class RestNotebookControllerTest {
         }
     }
 
-    @Nested
-    class copyNotebook {
-        @Test
-        void mustBeAbleToCopyNotebook() throws IOException, NoAccessRightException {
-            Note myNote = makeMe.aNote("Test note").please();
-            long oldCount = modelFactoryService.notebookRepository.count();
-            controller.copyNotebook(myNote.getNotebook());
-            assertThat ( modelFactoryService.notebookRepository.count(), equalTo(oldCount + 1));
-        }
-    }
 }

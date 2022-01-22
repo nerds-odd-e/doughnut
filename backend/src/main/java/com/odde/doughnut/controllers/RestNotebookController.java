@@ -84,13 +84,4 @@ class RestNotebookController {
         return notebook;
     }
 
-    @PostMapping(value = "/{notebook}/copy")
-    public RedirectToNoteResponse copyNotebook(@PathVariable("notebook") Notebook notebook) throws NoAccessRightException {
-        UserModel user = currentUserFetcher.getUser();
-        User userEntity = user.getEntity();
-        user.getAuthorization().assertAuthorization(userEntity);
-        Note note = userEntity.getOwnership().createNotebook(userEntity, notebook.getHeadNote().getNoteContent(), testabilitySettings.getCurrentUTCTimestamp());
-        modelFactoryService.noteRepository.save(note);
-        return new RedirectToNoteResponse(note.getId());
-    }
 }

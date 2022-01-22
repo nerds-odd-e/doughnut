@@ -158,7 +158,6 @@ class RestNoteController {
         note.extractChildNotes(userModel.getEntity(), testabilitySettings.getCurrentUTCTimestamp())
             .forEach(childNote -> modelFactoryService.noteRepository.save(childNote));
 
-        note.getNoteContent().setDescription("");
         modelFactoryService.noteRepository.save(note);
 
         return NotesBulk.jsonNoteWithChildren(note, userModel);

@@ -32,5 +32,11 @@ public class TextContent {
     @Getter
     @Setter
     private Timestamp updatedAt;
+
+    public void updateTextContent(TextContent textContent, Timestamp currentUTCTimestamp) {
+        setUpdatedAt(currentUTCTimestamp);
+        setTitle(textContent.getTitle());
+        setDescription(textContent.getDescription());
+    }
 }
 

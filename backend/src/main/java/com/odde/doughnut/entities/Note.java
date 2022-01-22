@@ -145,12 +145,13 @@ public class Note {
     private final List<Note> children = new ArrayList<>();
 
     public static Note createNote(User user, NoteContent noteContent, Timestamp currentUTCTimestamp) {
+        TextContent textContent = noteContent.getTextContent();
+        return createNote(user, currentUTCTimestamp, textContent);
+    }
+
+    private static Note createNote(User user, Timestamp currentUTCTimestamp, TextContent textContent) {
         final Note note = new Note();
-        try {
-            note.updateNoteContent(noteContent, user);
-        } catch (IOException e) {
-            throw new RuntimeException(e.getLocalizedMessage());
-        }
+        note.getTextContent().updateTextContent(textContent, currentUTCTimestamp);
         note.setCreatedAtAndUpdatedAt(currentUTCTimestamp);
         note.setUser(user);
         return note;
@@ -311,7 +312,6 @@ public class Note {
     public void setCreatedAtAndUpdatedAt(Timestamp currentUTCTimestamp) {
         this.createdAt = currentUTCTimestamp;
         this.getNoteContent().setUpdatedAt(currentUTCTimestamp);
-        this.getTextContent().setUpdatedAt(currentUTCTimestamp);
     }
 
     public Stream<Note> extractChildNotes(User user, Timestamp currentUTCTimestamp) {
@@ -329,12 +329,12 @@ public class Note {
     private Note createNoteFromParagraph(String paragraph, User user, Timestamp currentUTCTimestamp) {
         LinkedList<String> linesInParagraph = new LinkedList<>(Arrays.stream(paragraph.split("\n")).collect(toList()));
 
-        NoteContent childNoteContent = new NoteContent();
-        childNoteContent.setTitle(linesInParagraph.getFirst());
+        TextContent childTextConent = new TextContent();
+        childTextConent.setTitle(linesInParagraph.getFirst());
         linesInParagraph.removeFirst();
-        childNoteContent.setDescription(String.join("\n", linesInParagraph));
+        childTextConent.setDescription(String.join("\n", linesInParagraph));
 
-        return Note.createNote(user, childNoteContent, currentUTCTimestamp);
+        return createNote(user, currentUTCTimestamp, childTextConent);
     }
 
 }

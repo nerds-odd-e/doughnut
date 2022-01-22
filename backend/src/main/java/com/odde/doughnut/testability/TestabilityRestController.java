@@ -95,25 +95,27 @@ class TestabilityRestController {
         final User user = getUserModelByExternalIdentifierOrCurrentUser(externalIdentifier).getEntity();
         HashMap<String, Note> earlyNotes = new HashMap<>();
         List<Note> noteList = new ArrayList<>();
+        Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
 
         for (SeedNote seedNote : seedNotes) {
+            Note note = new Note();
             NoteContent content = new NoteContent();
 
-            content.setTitle(seedNote.title);
-            content.setDescription(seedNote.description);
+            note.getTextContent().setTitle(seedNote.title);
+            note.getTextContent().setDescription(seedNote.description);
+            note.getTextContent().setUpdatedAt(currentUTCTimestamp);
             if(seedNote.skipReview != null) { content.setSkipReview(seedNote.skipReview); }
             content.setUrl(seedNote.url);
             content.setPictureMask(seedNote.pictureMask);
             content.setPictureUrl(seedNote.pictureUrl);
 
-            Note note = new Note();
             if(seedNote.titleIDN != null || seedNote.descriptionIDN != null) {
                 note.getOrBuildTranslationTextContent().setTitle(seedNote.titleIDN);
                 note.getOrBuildTranslationTextContent().setDescription(seedNote.descriptionIDN);
             }
 
             note.mergeNoteContent(content);
-            note.setCreatedAtAndUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
+            note.setCreatedAtAndUpdatedAt(currentUTCTimestamp);
             earlyNotes.put(content.getTitle(), note);
             noteList.add(note);
             if (Strings.isBlank(seedNote.testingParent)) {

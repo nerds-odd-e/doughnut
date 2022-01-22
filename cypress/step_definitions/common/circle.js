@@ -80,35 +80,3 @@ When(
     cy.subscribeToNote(noteTitle, count);
   }
 );
-
-Given("I've logged in as the existing user {string}", (user) => {
-  cy.loginAs(user);
-});
-
-Given("I navigate to an existing circle {string} where the {string} and {string} users belong to",
-  (circleName, user1, user2) => {
-    cy.seedCircle({circleName: `${circleName}`, members: `${user1},${user2}`})
-    cy.navigateToCircle(circleName);
-});
-
-Given("the notebook {string} already exists in the circle {string}",
-  (notebookName, circleName) => {
-    cy.findByText("Add New Notebook In This Circle").click();
-    cy.get("#note-title").type(notebookName);
-    cy.findByText("Submit").click();
-    cy.navigateToCircle(circleName);
- });
-
-When("I make a copy of the existing notebook {string}",
-  (notebookName) => {
-    cy.findByRole("button", {name: "Copy notebook"})
-        .click();
-    cy.findByText("Copy").click()
-});
-
-Then("I have a copy of the notebook {string} in the private notes",
-    (notebookName) => {
-    cy.log('then')
-    cy.visit('/notebooks')
-    cy.findByText(notebookName)
-});
