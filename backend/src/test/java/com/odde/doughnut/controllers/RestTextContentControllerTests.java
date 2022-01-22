@@ -69,7 +69,7 @@ class RestTextContentControllerTests {
 
             NoteViewedByUser response = controller.updateNote(note, textContent);
 
-            assertThat(response.getNoteContent().getTitleIDN(), equalTo("indonesian"));
+            assertThat(response.getTranslationTextContent().getTitle(), equalTo("indonesian"));
             assertThat(response.getTranslationTextContent().getDescription(), equalTo("xxx"));
         }
 

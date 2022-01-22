@@ -87,16 +87,6 @@ public class NoteContent {
         }
         return translationTextContent;
     }
-    public String getTitleIDN() {
-        if (translationTextContent == null) {
-            return null;
-        }
-        return translationTextContent.getTitle();
-    }
-
-    public void setUpdatedAtIDN(Timestamp value) {
-        this.getOrBuildTranslationTextContent().setUpdatedAt(value);
-    }
 
     @Size(min = 1, max = 100)
     public String getTitle() {

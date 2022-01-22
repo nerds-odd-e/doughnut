@@ -219,10 +219,6 @@ public class Note {
         return noteContent.getTitle();
     }
 
-    public String getTitleIDN() {
-        return noteContent.getTitleIDN();
-    }
-
     public void mergeMasterReviewSetting(ReviewSetting reviewSetting) {
         ReviewSetting current = getMasterReviewSetting();
         if (current == null) {
