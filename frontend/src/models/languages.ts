@@ -35,12 +35,11 @@ class TranslatedNoteWrapper {
   }
 
   get shortDescription (){
-    const str = this.description
     const num = 50
-    if (str.length > num) {
-      return str.slice(0, num) + "...";
+    if (this.description.length > num) {
+      return `${this.description.slice(0, num)  }...`;
     }
-    return str;
+    return this.description;
   }
 
   get  translationNoteAvailable() {
