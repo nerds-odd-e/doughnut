@@ -111,6 +111,10 @@ public class NoteContent {
         this.textContent.setUpdatedAt(value);
     }
 
+    public Timestamp getUpdatedAt() {
+        return this.textContent.getUpdatedAt();
+    }
+
     public String getDescription() {
         return this.textContent.getDescription();
     }
