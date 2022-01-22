@@ -83,9 +83,10 @@ public class NoteContent {
         this.textContent.setTitle(title);
     }
 
-    public void setUpdatedAt(Timestamp value) {
-        this.textContent.setUpdatedAt(value);
-    }
+    @Column(name = "updated_at")
+    @Getter
+    @Setter
+    private Timestamp updatedAt;
 
     public String getDescription() {
         return this.textContent.getDescription();
