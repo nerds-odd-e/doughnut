@@ -72,8 +72,8 @@ class NoteBuilder extends Builder {
     return this;
   }
 
-  updatedAt(value: Date): NoteBuilder {
-    this.data.noteContent.updatedAt = value.toJSON();
+  textContentUpdatedAt(value: Date): NoteBuilder {
+    this.data.textContent.updatedAt = value.toJSON();
     return this;
   }
 

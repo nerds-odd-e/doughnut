@@ -311,6 +311,7 @@ public class Note {
     public void setCreatedAtAndUpdatedAt(Timestamp currentUTCTimestamp) {
         this.createdAt = currentUTCTimestamp;
         this.getNoteContent().setUpdatedAt(currentUTCTimestamp);
+        this.getTextContent().setUpdatedAt(currentUTCTimestamp);
     }
 
     public Stream<Note> extractChildNotes(User user, Timestamp currentUTCTimestamp) {
