@@ -32,6 +32,5 @@ public class TextContent {
     @Getter
     @Setter
     private Timestamp updatedAt;
-
 }
 

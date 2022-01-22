@@ -84,6 +84,12 @@ public class NoteContent {
     @Setter
     private TextContent translationTextContent;
 
+    public TextContent getOrBuildTranslationTextContent() {
+        if (translationTextContent == null) {
+            translationTextContent = new TextContent();
+        }
+        return translationTextContent;
+    }
     public String getTitleIDN() {
         if (translationTextContent == null) {
             return null;
@@ -93,10 +99,7 @@ public class NoteContent {
 
     public void setTitleIDN(String title) {
         if (title == null) {return;}
-        if (translationTextContent == null) {
-            translationTextContent = new TextContent();
-        }
-        this.translationTextContent.setTitle(title);
+        this.getOrBuildTranslationTextContent().setTitle(title);
     }
 
     public String getDescriptionIDN() {
@@ -104,14 +107,6 @@ public class NoteContent {
             return null;
         }
         return translationTextContent.getDescription();
-    }
-
-    public void setDescriptionIDN(String desc) {
-        if (desc == null) {return;}
-        if (translationTextContent == null) {
-            translationTextContent = new TextContent();
-        }
-        this.translationTextContent.setDescription(desc);
     }
 
     @JsonIgnore
@@ -123,10 +118,7 @@ public class NoteContent {
     }
 
     public void setUpdatedAtIDN(Timestamp value) {
-        if (translationTextContent == null) {
-            translationTextContent = new TextContent();
-        }
-        this.translationTextContent.setUpdatedAt(value);
+        this.getOrBuildTranslationTextContent().setUpdatedAt(value);
     }
 
     @Size(min = 1, max = 100)

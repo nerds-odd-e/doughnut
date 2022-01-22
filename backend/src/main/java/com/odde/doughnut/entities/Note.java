@@ -57,6 +57,12 @@ public class Note {
         return noteContent.getTextContent();
     }
 
+    @JsonIgnore
+    public TextContent getOrBuildTranslationTextContent() {
+        return noteContent.getOrBuildTranslationTextContent();
+    }
+
+    @JsonIgnore
     public TextContent getTranslationTextContent() {
         return noteContent.getTranslationTextContent();
     }
@@ -339,5 +345,6 @@ public class Note {
 
         return Note.createNote(user, childNoteContent, currentUTCTimestamp);
     }
+
 }
 

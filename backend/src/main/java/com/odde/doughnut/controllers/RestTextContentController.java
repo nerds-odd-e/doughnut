@@ -38,12 +38,12 @@ class RestTextContentController {
 
         TextContent target =
                 textContent.getLanguage() != null && textContent.getLanguage().equals("idn") ?
-                        note.getTranslationTextContent() : note.getTextContent();
+                        note.getOrBuildTranslationTextContent() : note.getTextContent();
 
         target.setUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
         target.setTitle(textContent.getTitle());
         target.setDescription(textContent.getDescription());
-        modelFactoryService.textContentRepository.save(target);
+        modelFactoryService.noteRepository.save(note);
         return new NoteViewer(user.getEntity(), note).toJsonObject();
     }
 }
