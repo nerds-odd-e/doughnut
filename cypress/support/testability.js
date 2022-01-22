@@ -26,11 +26,9 @@ Cypress.Commands.add('seedNotes', (notes, externalIdentifier = '') => {
   }).then((response) => {
     expect(response.body.length).to.equal(notes.length);
     const titles = notes.map((n) => n['title']);
-    const titlesIdn = notes.map((n) => n['titleIDN']);
     const noteMap = Object.assign(
       {},
       ...titles.map((t, index) => ({ [t]: response.body[index] })),
-      ...titlesIdn.map((t, index) => ({ [t]: response.body[index] }))
     );
     cy.wrap(noteMap).as('seededNoteIdMap');
   });

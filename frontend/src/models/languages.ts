@@ -35,7 +35,13 @@ class TranslatedNoteWrapper {
   }
 
   get shortDescription (){
-    return this.language === Languages.ID && this.note.shortDescriptionIDN ? this.note.shortDescriptionIDN : this.note.shortDescription
+    const str = this.description
+    const num = 50
+    if (str.length > num) {
+      return str.slice(0, num) + "...";
+    } else {
+      return str;
+    }
   }
 
   get  translationNoteAvailable() {

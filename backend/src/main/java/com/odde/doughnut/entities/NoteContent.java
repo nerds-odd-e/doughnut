@@ -67,9 +67,6 @@ public class NoteContent {
     @JsonIgnore
     @Transient @Getter @Setter private MultipartFile uploadPictureProxy;
 
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    @Transient @Getter @Setter private String testingParent;
-
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "text_content_id", referencedColumnName = "id")
     @JsonIgnore
@@ -95,11 +92,6 @@ public class NoteContent {
             return null;
         }
         return translationTextContent.getTitle();
-    }
-
-    public void setTitleIDN(String title) {
-        if (title == null) {return;}
-        this.getOrBuildTranslationTextContent().setTitle(title);
     }
 
     public String getDescriptionIDN() {

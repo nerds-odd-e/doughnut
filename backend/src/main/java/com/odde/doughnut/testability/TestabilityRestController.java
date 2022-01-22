@@ -78,24 +78,48 @@ class TestabilityRestController {
         userRepository.save(user);
     }
 
+    static class SeedNote {
+        public String title;
+        public String description;
+        public String titleIDN;
+        public String descriptionIDN;
+        public String testingParent;
+        public Boolean skipReview;
+        public String url;
+        public String pictureUrl;
+        public String pictureMask;
+    }
+
     @PostMapping("/seed_notes")
-    public List<Integer> seedNote(@RequestBody List<NoteContent> noteContents, @RequestParam(name = "external_identifier") String externalIdentifier) throws Exception {
+    public List<Integer> seedNote(@RequestBody List<SeedNote> seedNotes, @RequestParam(name = "external_identifier") String externalIdentifier) throws Exception {
         final User user = getUserModelByExternalIdentifierOrCurrentUser(externalIdentifier).getEntity();
         HashMap<String, Note> earlyNotes = new HashMap<>();
         List<Note> noteList = new ArrayList<>();
 
-        for (NoteContent content : noteContents) {
+        for (SeedNote seedNote : seedNotes) {
+            NoteContent content = new NoteContent();
+
+            content.setTitle(seedNote.title);
+            content.setDescription(seedNote.description);
+            content.setSkipReview(seedNote.skipReview);
+            content.setUrl(seedNote.url);
+            content.setPictureMask(seedNote.pictureMask);
+            content.setPictureUrl(seedNote.pictureUrl);
+            if(seedNote.titleIDN != null || seedNote.descriptionIDN != null) {
+                content.getOrBuildTranslationTextContent().setTitle(seedNote.titleIDN);
+                content.getOrBuildTranslationTextContent().setDescription(seedNote.descriptionIDN);
+            }
+
             Note note = new Note();
             note.mergeNoteContent(content);
             note.setCreatedAtAndUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
             earlyNotes.put(content.getTitle(), note);
             noteList.add(note);
-            final String testingParent = note.getNoteContent().getTestingParent();
-            if (Strings.isBlank(testingParent)) {
+            if (Strings.isBlank(seedNote.testingParent)) {
                 note.buildNotebookForHeadNote(user.getOwnership(), user);
             }
             else {
-                note.setParentNote(earlyNotes.get(testingParent));
+                note.setParentNote(earlyNotes.get(seedNote.testingParent));
             }
             note.setUser(user);
         }
