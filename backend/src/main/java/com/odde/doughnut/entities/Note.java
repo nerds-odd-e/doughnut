@@ -57,14 +57,18 @@ public class Note {
         return noteContent.getTextContent();
     }
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "translation_text_content_id", referencedColumnName = "id")
     @JsonIgnore
-    public TextContent getOrBuildTranslationTextContent() {
-        return noteContent.getOrBuildTranslationTextContent();
-    }
+    @Getter
+    @Setter
+    private TextContent translationTextContent;
 
-    @JsonIgnore
-    public TextContent getTranslationTextContent() {
-        return noteContent.getTranslationTextContent();
+    public TextContent getOrBuildTranslationTextContent() {
+        if (translationTextContent == null) {
+            translationTextContent = new TextContent();
+        }
+        return translationTextContent;
     }
 
     @Column(name = "sibling_order")

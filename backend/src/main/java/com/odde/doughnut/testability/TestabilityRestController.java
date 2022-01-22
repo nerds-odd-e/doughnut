@@ -105,12 +105,13 @@ class TestabilityRestController {
             content.setUrl(seedNote.url);
             content.setPictureMask(seedNote.pictureMask);
             content.setPictureUrl(seedNote.pictureUrl);
-            if(seedNote.titleIDN != null || seedNote.descriptionIDN != null) {
-                content.getOrBuildTranslationTextContent().setTitle(seedNote.titleIDN);
-                content.getOrBuildTranslationTextContent().setDescription(seedNote.descriptionIDN);
-            }
 
             Note note = new Note();
+            if(seedNote.titleIDN != null || seedNote.descriptionIDN != null) {
+                note.getOrBuildTranslationTextContent().setTitle(seedNote.titleIDN);
+                note.getOrBuildTranslationTextContent().setDescription(seedNote.descriptionIDN);
+            }
+
             note.mergeNoteContent(content);
             note.setCreatedAtAndUpdatedAt(testabilitySettings.getCurrentUTCTimestamp());
             earlyNotes.put(content.getTitle(), note);

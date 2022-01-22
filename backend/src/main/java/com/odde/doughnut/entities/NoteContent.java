@@ -74,20 +74,6 @@ public class NoteContent {
     @Setter
     private TextContent textContent = new TextContent();
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "translation_text_content_id", referencedColumnName = "id")
-    @JsonIgnore
-    @Getter
-    @Setter
-    private TextContent translationTextContent;
-
-    public TextContent getOrBuildTranslationTextContent() {
-        if (translationTextContent == null) {
-            translationTextContent = new TextContent();
-        }
-        return translationTextContent;
-    }
-
     @Size(min = 1, max = 100)
     public String getTitle() {
         return textContent.getTitle();
