@@ -94,13 +94,6 @@ public class NoteContent {
         return translationTextContent.getTitle();
     }
 
-    public String getDescriptionIDN() {
-        if (translationTextContent == null) {
-            return null;
-        }
-        return translationTextContent.getDescription();
-    }
-
     public void setUpdatedAtIDN(Timestamp value) {
         this.getOrBuildTranslationTextContent().setUpdatedAt(value);
     }
@@ -174,11 +167,6 @@ public class NoteContent {
     @JsonIgnore
     public String getShortDescription() {
         return StringUtils.abbreviate(getDescription(), 50);
-    }
-
-    @JsonIgnore
-    public String getShortDescriptionIDN() {
-        return StringUtils.abbreviate(getDescriptionIDN(), 50);
     }
 
 }
