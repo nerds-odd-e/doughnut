@@ -152,48 +152,6 @@ class RestNoteControllerTests {
             assertThat(note.getNoteContent().getUploadPicture(), is(not(nullValue())));
         }
 
-        @Test
-        void shouldNotSetTranslationOutdatedTagWhenUpdatingEnglishNoteAndIndonesianTranslationIsNotAvailable() throws NoAccessRightException, IOException {
-            note.getNoteContent().setTitleIDN(null);
-            NoteContent newContent = note.getNoteContent();
-
-            NoteViewedByUser response = controller.updateNote(note, newContent);
-
-            assertEquals(note.getIsTranslationOutdatedIDN(), response.getIsTranslationOutdatedIDN());
-        }
-
-        @Test
-        void shouldNotSetTranslationOutdatedTagWhenUpdatingIndonesianTranslation() throws NoAccessRightException, IOException {
-            NoteContent newContent = makeMe.aNote().inMemoryPlease().getNoteContent();
-            newContent.setTitleIDN("bahasa");
-
-            NoteViewedByUser response = controller.updateNote(note, newContent);
-
-            assertFalse(response.getIsTranslationOutdatedIDN());
-        }
-
-        @Test
-        void shouldNotSetTranslationOutdatedTagWhenThereIsNoTitleChangeOnEnglishTranslation() throws NoAccessRightException, IOException {
-            note.getNoteContent().setTitle("title changed");
-            NoteViewedByUser response = controller.updateNote(note, note.getNoteContent());
-
-            assertTrue(response.getIsTranslationOutdatedIDN());
-        }
-
-        @Test
-        void shouldNotChangeTranslationOutdatedTagWhenThereIsNoTitleChangeOnIndonesianTranslation() throws NoAccessRightException, IOException {
-            note.getNoteContent().setTitleIDN("indonesia");
-            note.getNoteContent().setTitle("inggris");
-            note.getNoteContent().setUpdatedAtIDN(null);
-
-            NoteContent newContent = makeMe.aNote("inggris", "descrption").inMemoryPlease().getNoteContent();
-            newContent.setTitleIDN(note.getNoteContent().getTitleIDN());
-            newContent.setUpdatedAt(null);
-
-            NoteViewedByUser response = controller.updateNote(note, newContent);
-
-            assertEquals(note.getIsTranslationOutdatedIDN(), response.getIsTranslationOutdatedIDN());
-        }
     }
 
     @Nested

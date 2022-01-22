@@ -53,10 +53,6 @@ public class NoteViewedByUser {
 
     @Getter
     @Setter
-    private Boolean isTranslationOutdatedIDN;
-
-    @Getter
-    @Setter
     private TextContent textContent;
 
     @Getter

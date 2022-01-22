@@ -109,14 +109,6 @@ public class NoteContent {
         return translationTextContent.getDescription();
     }
 
-    @JsonIgnore
-    public Timestamp getUpdatedAtIDN() {
-        if (translationTextContent == null) {
-            return null;
-        }
-        return translationTextContent.getUpdatedAt();
-    }
-
     public void setUpdatedAtIDN(Timestamp value) {
         this.getOrBuildTranslationTextContent().setUpdatedAt(value);
     }
@@ -128,10 +120,6 @@ public class NoteContent {
 
     public void setTitle(String title) {
         this.textContent.setTitle(title);
-    }
-
-    public Timestamp getUpdatedAt() {
-        return this.textContent.getUpdatedAt();
     }
 
     public void setUpdatedAt(Timestamp value) {
