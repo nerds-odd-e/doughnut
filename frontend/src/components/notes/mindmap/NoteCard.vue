@@ -1,7 +1,7 @@
 <template>
   <NoteShell 
   :class="`inner-box note-card ${size} ${highlightClass}`"
-  v-bind="{id: note.id, updatedAt: note.noteContent?.updatedAt}"
+  v-bind="{id: note.id, updatedAt: note.textContent?.updatedAt}"
   role="card" :aria-label="note.title"
   :style="`top:${coord.y}px; left:${coord.x}px`"
   v-on:click="$emit('highlight')">

@@ -1,7 +1,7 @@
 <template>
   <NoteShell
     class="note-body"
-    v-bind="{ id: note.id, updatedAt: note.noteContent?.updatedAt }"
+    v-bind="{ id: note.id, updatedAt: note.textContent?.updatedAt }"
   >
     <NoteFrameOfLinks v-bind="{ links: note.links }">
       <EditableText role="title" class="note-title"
