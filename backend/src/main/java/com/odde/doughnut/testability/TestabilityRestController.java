@@ -101,7 +101,7 @@ class TestabilityRestController {
 
             content.setTitle(seedNote.title);
             content.setDescription(seedNote.description);
-            content.setSkipReview(seedNote.skipReview);
+            if(seedNote.skipReview != null) { content.setSkipReview(seedNote.skipReview); }
             content.setUrl(seedNote.url);
             content.setPictureMask(seedNote.pictureMask);
             content.setPictureUrl(seedNote.pictureUrl);

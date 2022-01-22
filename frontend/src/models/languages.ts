@@ -39,9 +39,8 @@ class TranslatedNoteWrapper {
     const num = 50
     if (str.length > num) {
       return str.slice(0, num) + "...";
-    } else {
-      return str;
     }
+    return str;
   }
 
   get  translationNoteAvailable() {
