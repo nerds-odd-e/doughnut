@@ -56,10 +56,12 @@ public class Note {
     @Getter
     private final NoteContent noteContent = new NoteContent();
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "text_content_id", referencedColumnName = "id")
     @JsonIgnore
-    public TextContent getTextContent() {
-        return noteContent.getTextContent();
-    }
+    @Getter
+    @Setter
+    private TextContent textContent = new TextContent();
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "translation_text_content_id", referencedColumnName = "id")
@@ -158,7 +160,7 @@ public class Note {
 
     @Override
     public String toString() {
-        return "Note{" + "id=" + id + ", title='" + noteContent.getTitle() + '\'' + '}';
+        return "Note{" + "id=" + id + ", title='" + getTextContent().getTitle() + '\'' + '}';
     }
 
     public String getShortDescription() {
@@ -220,7 +222,7 @@ public class Note {
     }
 
     public String getTitle() {
-        return noteContent.getTitle();
+        return getTextContent().getTitle();
     }
 
     public void mergeMasterReviewSetting(ReviewSetting reviewSetting) {

@@ -67,17 +67,6 @@ public class NoteContent {
     @JsonIgnore
     @Transient @Getter @Setter private MultipartFile uploadPictureProxy;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "text_content_id", referencedColumnName = "id")
-    @JsonIgnore
-    @Getter
-    @Setter
-    private TextContent textContent = new TextContent();
-
-    public String getTitle() {
-        return textContent.getTitle();
-    }
-
     @Column(name = "updated_at")
     @Getter
     @Setter
