@@ -1,7 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.NoteContent;
+import com.odde.doughnut.entities.NoteAccessories;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.json.NoteViewedByUser;
 import com.odde.doughnut.entities.json.NotesBulk;
@@ -134,23 +134,23 @@ class RestNoteControllerTests {
 
         @Test
         void shouldBeAbleToSaveNoteWhenValid() throws NoAccessRightException, IOException {
-            NoteViewedByUser response = controller.updateNote(note, note.getNoteContent());
+            NoteViewedByUser response = controller.updateNote(note, note.getNoteAccessories());
             assertThat(response.getId(), equalTo(note.getId()));
         }
 
         @Test
         void shouldAddUploadedPicture() throws NoAccessRightException, IOException {
             makeMe.theNote(note).withNewlyUploadedPicture();
-            controller.updateNote(note, note.getNoteContent());
-            assertThat(note.getNoteContent().getUploadPicture(), is(not(nullValue())));
+            controller.updateNote(note, note.getNoteAccessories());
+            assertThat(note.getNoteAccessories().getUploadPicture(), is(not(nullValue())));
         }
 
         @Test
         void shouldNotRemoveThePictureIfNoNewPictureInTheUpdate() throws NoAccessRightException, IOException {
             makeMe.theNote(note).withUploadedPicture();
-            NoteContent newContent = makeMe.aNote().inMemoryPlease().getNoteContent();
+            NoteAccessories newContent = makeMe.aNote().inMemoryPlease().getNoteAccessories();
             controller.updateNote(note, newContent);
-            assertThat(note.getNoteContent().getUploadPicture(), is(not(nullValue())));
+            assertThat(note.getNoteAccessories().getUploadPicture(), is(not(nullValue())));
         }
 
     }

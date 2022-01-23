@@ -43,7 +43,7 @@ public class NoteTest {
         void useParentPicture() {
             Note parent = makeMe.aNote().pictureUrl("https://img.com/xxx.jpg").inMemoryPlease();
             Note child = makeMe.aNote().under(parent).useParentPicture().inMemoryPlease();
-            assertThat(child.getNotePicture(), equalTo(parent.getNoteContent().getPictureUrl()));
+            assertThat(child.getNotePicture(), equalTo(parent.getNoteAccessories().getPictureUrl()));
         }
     }
 
@@ -65,31 +65,31 @@ public class NoteTest {
 
         @Test
         public void goodMask() {
-            note.getNoteContent().setPictureMask("1 -2.3 3 -4");
+            note.getNoteAccessories().setPictureMask("1 -2.3 3 -4");
             assertThat(getViolations(), is(empty()));
         }
 
         @Test
         public void goodMaskWith2Rect() {
-            note.getNoteContent().setPictureMask("-1 2 3 4 11 22 33 44");
+            note.getNoteAccessories().setPictureMask("-1 2 3 4 11 22 33 44");
             assertThat(getViolations(), is(empty()));
         }
 
         @Test
         public void masksNeedToBeFourNumbers() {
-            note.getNoteContent().setPictureMask("1 2 3 4 5 6 7");
+            note.getNoteAccessories().setPictureMask("1 2 3 4 5 6 7");
             assertThat(getViolations(), is(not(empty())));
             Path propertyPath = getViolations().stream().findFirst().get().getPropertyPath();
-            assertThat(propertyPath.toString(), equalTo("noteContent.pictureMask"));
+            assertThat(propertyPath.toString(), equalTo("noteAccessories.pictureMask"));
         }
 
         @Test
         public void withBothUploadPictureProxyAndPicture() {
-            note.getNoteContent().setUploadPictureProxy(makeMe.anUploadedPicture().toMultiplePartFilePlease());
-            note.getNoteContent().setPictureUrl("http://url/img");
+            note.getNoteAccessories().setUploadPictureProxy(makeMe.anUploadedPicture().toMultiplePartFilePlease());
+            note.getNoteAccessories().setPictureUrl("http://url/img");
             assertThat(getViolations(), is(not(empty())));
             List<String> errorFields = getViolations().stream().map(v -> v.getPropertyPath().toString()).collect(toList());
-            assertThat(errorFields, containsInAnyOrder("noteContent.uploadPicture", "noteContent.pictureUrl"));
+            assertThat(errorFields, containsInAnyOrder("noteAccessories.uploadPicture", "noteAccessories.pictureUrl"));
         }
 
         private Set<ConstraintViolation<Note>> getViolations() {

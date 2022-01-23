@@ -1,6 +1,6 @@
 package com.odde.doughnut.entities.validators;
 
-import com.odde.doughnut.entities.NoteContent;
+import com.odde.doughnut.entities.NoteAccessories;
 import org.apache.logging.log4j.util.Strings;
 
 import javax.validation.ConstraintValidator;
@@ -12,15 +12,15 @@ public class ValidateNotePictureValidator implements ConstraintValidator<Validat
 
     @Override
     public boolean isValid(Object value, ConstraintValidatorContext context) {
-        final NoteContent noteContent = (NoteContent) value;
+        final NoteAccessories noteAccessories = (NoteAccessories) value;
         List<String> fieldsWithValue = new ArrayList<>();
-        if (noteContent.getUploadPictureProxy() != null && !noteContent.getUploadPictureProxy().isEmpty()) {
+        if (noteAccessories.getUploadPictureProxy() != null && !noteAccessories.getUploadPictureProxy().isEmpty()) {
             fieldsWithValue.add("uploadPicture");
         }
-        if (!Strings.isEmpty(noteContent.getPictureUrl())) {
+        if (!Strings.isEmpty(noteAccessories.getPictureUrl())) {
             fieldsWithValue.add("pictureUrl");
         }
-        if (noteContent.getUseParentPicture()) {
+        if (noteAccessories.getUseParentPicture()) {
             fieldsWithValue.add("useParentPicture");
         }
 

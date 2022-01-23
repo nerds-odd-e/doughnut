@@ -33,8 +33,8 @@ public class Subscription {
         return notebook.getHeadNote().getShortDescription();
     }
 
-    public NoteContent getNoteContent() {
-        return notebook.getHeadNote().getNoteContent();
+    public NoteAccessories getNoteContent() {
+        return notebook.getHeadNote().getNoteAccessories();
     }
 
     public Note getHeadNote() {

@@ -24,7 +24,7 @@ import java.util.List;
 
 @Embeddable
 @ValidateNotePicture
-public class NoteContent {
+public class NoteAccessories {
     @Column(name = "id", insertable = false, updatable = false)
     @Getter
     private Integer id;

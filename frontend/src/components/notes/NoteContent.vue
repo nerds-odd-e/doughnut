@@ -14,18 +14,18 @@
       <ShowPicture
         v-if="size!=='small'"
         class="col text-center"
-        v-bind="{notePicture: note.notePicture, pictureMask: note.noteContent.pictureMask}"
+        v-bind="{notePicture: note.notePicture, pictureMask: note.noteAccessories.pictureMask}"
         :opacity="0.2"
       />
       <SvgPictureIndicator v-else class="picture-indicator"/>
     </template>
-    <template v-if="!!note.noteContent.url">
+    <template v-if="!!note.noteAccessories.url">
       <div v-if="size!='small'">
-        <label v-if="note.noteContent.urlIsVideo">Video Url:</label>
+        <label v-if="note.noteAccessories.urlIsVideo">Video Url:</label>
         <label v-else>Url:</label>
-        <a :href="note.noteContent.url" target="_blank">{{ note.noteContent.url }}</a>
+        <a :href="note.noteAccessories.url" target="_blank">{{ note.noteAccessories.url }}</a>
       </div>
-      <a v-else :href="note.noteContent.url" target="_blank">
+      <a v-else :href="note.noteAccessories.url" target="_blank">
         <SvgUrlIndicator/>
       </a>
     </template>
@@ -58,7 +58,7 @@ export default {
   },
   computed: {
     twoColumns() {
-      return !!this.notePicture && !!this.note.noteContent.description;
+      return !!this.notePicture && !!this.note.noteAccessories.description;
     },
     translatedNote(){
       return new TranslatedNoteWrapper(this.note, this.language);

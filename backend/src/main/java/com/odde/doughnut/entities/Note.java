@@ -55,7 +55,7 @@ public class Note {
     @Valid
     @Getter
     @JsonIgnore
-    private final NoteContent noteContent = new NoteContent();
+    private final NoteAccessories noteAccessories = new NoteAccessories();
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "text_content_id", referencedColumnName = "id")
@@ -169,10 +169,10 @@ public class Note {
     }
 
     public String getNotePicture() {
-        if (noteContent.getUseParentPicture() && getParentNote() != null) {
+        if (noteAccessories.getUseParentPicture() && getParentNote() != null) {
             return getParentNote().getNotePicture();
         }
-        return noteContent.getNotePicture();
+        return noteAccessories.getNotePicture();
     }
 
     private void addAncestors(List<Note> ancestors) {
@@ -235,13 +235,13 @@ public class Note {
         }
     }
 
-    public void updateNoteContent(NoteContent noteContent, User user) throws IOException {
-        noteContent.fetchUploadedPicture(user);
+    public void updateNoteContent(NoteAccessories noteAccessories, User user) throws IOException {
+        noteAccessories.fetchUploadedPicture(user);
 
-        if (noteContent.getUploadPicture() == null) {
-            noteContent.setUploadPicture(getNoteContent().getUploadPicture());
+        if (noteAccessories.getUploadPicture() == null) {
+            noteAccessories.setUploadPicture(getNoteAccessories().getUploadPicture());
         }
-        BeanUtils.copyProperties(noteContent, getNoteContent());
+        BeanUtils.copyProperties(noteAccessories, getNoteAccessories());
     }
 
     @JsonIgnore
@@ -309,7 +309,7 @@ public class Note {
 
     public void setCreatedAtAndUpdatedAt(Timestamp currentUTCTimestamp) {
         this.createdAt = currentUTCTimestamp;
-        this.getNoteContent().setUpdatedAt(currentUTCTimestamp);
+        this.getNoteAccessories().setUpdatedAt(currentUTCTimestamp);
     }
 
     public Stream<Note> extractChildNotes(User user, Timestamp currentUTCTimestamp) {

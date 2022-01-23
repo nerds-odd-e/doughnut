@@ -1,9 +1,6 @@
 
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.entities.NoteContent;
-import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.TextContent;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -12,7 +9,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @RestController

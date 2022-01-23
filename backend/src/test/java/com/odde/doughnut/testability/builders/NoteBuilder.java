@@ -79,13 +79,13 @@ public class NoteBuilder extends EntityBuilder<Note> {
     }
 
     public NoteBuilder skipReview() {
-        entity.getNoteContent().setSkipReview(true);
+        entity.getNoteAccessories().setSkipReview(true);
         return this;
     }
 
 
     public NoteBuilder cancelSkipReview() {
-        entity.getNoteContent().setSkipReview(false);
+        entity.getNoteAccessories().setSkipReview(false);
         return this;
     }
     public NoteBuilder withNoDescription() {
@@ -123,7 +123,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
     }
 
     public NoteBuilder updatedAt(Timestamp timestamp) {
-        entity.getNoteContent().setUpdatedAt(timestamp);
+        entity.getNoteAccessories().setUpdatedAt(timestamp);
         return this;
     }
 
@@ -133,22 +133,22 @@ public class NoteBuilder extends EntityBuilder<Note> {
     }
 
     public NoteBuilder pictureUrl(String picture) {
-        entity.getNoteContent().setPictureUrl(picture);
+        entity.getNoteAccessories().setPictureUrl(picture);
         return this;
     }
 
     public NoteBuilder useParentPicture() {
-        entity.getNoteContent().setUseParentPicture(true);
+        entity.getNoteAccessories().setUseParentPicture(true);
         return this;
     }
 
     public NoteBuilder withNewlyUploadedPicture() {
-        entity.getNoteContent().setUploadPictureProxy(makeMe.anUploadedPicture().toMultiplePartFilePlease());
+        entity.getNoteAccessories().setUploadPictureProxy(makeMe.anUploadedPicture().toMultiplePartFilePlease());
         return this;
     }
 
     public void withUploadedPicture() {
-        entity.getNoteContent().setUploadPicture(makeMe.anImage().please());
+        entity.getNoteAccessories().setUploadPicture(makeMe.anImage().please());
     }
 
     private void buildNotebookUnlessExist() {

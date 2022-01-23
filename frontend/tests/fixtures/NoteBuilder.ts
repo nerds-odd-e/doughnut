@@ -16,7 +16,7 @@ class NoteBuilder extends Builder {
     this.data = {
       id: generateId(),
       parentId: null,
-      noteContent: {},
+      noteAccessories: {},
       textContent: {},
       links: {},
       childrenIds: []
@@ -59,8 +59,8 @@ class NoteBuilder extends Builder {
 
   shortDescription(value: string): NoteBuilder {
     this.data.shortDescription = value;
-    if(!this.data.noteContent.description) {
-      this.data.noteContent.description = value;
+    if(!this.data.noteAccessories.description) {
+      this.data.noteAccessories.description = value;
     }
     return this;
   }
@@ -102,7 +102,7 @@ class NoteBuilder extends Builder {
   do(): any {
     return merge(
       {
-        noteContent: {
+        noteAccessories: {
           url: null,
           urlIsVideo: false,
           pictureUrl: null,

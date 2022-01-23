@@ -1,7 +1,7 @@
 <template>
   <BasicBreadcrumb :ancestors="quizQuestion.scope" />
   <div v-if="pictureQuestion">
-    <ShowPicture :notePicture="sourceNote.notePicture" :pictureMask="sourceNote.noteContent.pictureMask" :opacity="1" />
+    <ShowPicture :notePicture="sourceNote.notePicture" :pictureMask="sourceNote.noteAccessories.pictureMask" :opacity="1" />
   </div>
   <NoteFrameOfLinks v-bind="{ links: quizQuestion.hintLinks }">
     <div class="quiz-instruction">
@@ -31,7 +31,7 @@
       >
         <div v-if="!option.picture">{{ option.display }}</div>
         <div v-else>
-          <ShowPicture :notePicture="option.note.notePicture" :pictureMask="option.note.noteContent.pictureMask" :opacity="1" />
+          <ShowPicture :notePicture="option.note.notePicture" :pictureMask="option.note.noteAccessories.pictureMask" :opacity="1" />
         </div>
       </button>
     </div>

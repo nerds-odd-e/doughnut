@@ -1,7 +1,7 @@
 package com.odde.doughnut.entities.json;
 
 import com.odde.doughnut.entities.Link;
-import com.odde.doughnut.entities.NoteContent;
+import com.odde.doughnut.entities.NoteAccessories;
 import com.odde.doughnut.entities.TextContent;
 import lombok.Getter;
 import lombok.Setter;
@@ -37,7 +37,7 @@ public class NoteViewedByUser {
 
     @Getter
     @Setter
-    private NoteContent noteContent;
+    private NoteAccessories noteAccessories;
 
     @Getter
     @Setter
