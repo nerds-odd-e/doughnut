@@ -54,6 +54,7 @@ public class Note {
     @Embedded
     @Valid
     @Getter
+    @JsonIgnore
     private final NoteContent noteContent = new NoteContent();
 
     @OneToOne(cascade = CascadeType.ALL)

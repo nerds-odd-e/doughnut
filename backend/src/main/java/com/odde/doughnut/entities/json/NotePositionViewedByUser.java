@@ -22,7 +22,6 @@ public class NotePositionViewedByUser {
     private Notebook notebook;
     @Getter
     @Setter
-    @JsonIgnoreProperties({"noteContent"})
     private List<Note> ancestors;
     @Getter
     @Setter
