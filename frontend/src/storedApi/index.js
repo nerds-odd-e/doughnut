@@ -49,6 +49,22 @@ const storedApiDoInitialReview = async (store, data) => {
     return res;
 }
 
+const storedApiCreateNotebook = async (store, circle, data) => {
+    const url = (() =>{
+        if (circle) {
+            return `/api/circles/${circle.id}/notebooks`;
+        }
+        return `/api/notebooks/create`;
+        })();
+
+    const res = await restPostMultiplePartForm(
+        url,
+        data,
+        () => null
+    )
+    return res;
+}
+
 const storedApiCreateNote = async (store, parentId, data) => {
     const res = await restPostMultiplePartForm(
         `/api/notes/${parentId}/create`,
@@ -176,6 +192,7 @@ export {
     storedApiSelfEvaluate,
     apiProcessAnswer,
     apiRemoveFromReview,
+    storedApiCreateNotebook,
     storedApiGetNoteWithDescendents,
     storedApiGetNoteAndItsChildren,
     storedApiCreateNote,
