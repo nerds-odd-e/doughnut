@@ -10,11 +10,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
-import com.odde.doughnut.entities.Circle;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.NoteContent;
-import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.json.RedirectToNoteResponse;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -123,11 +119,11 @@ class RestCircleController {
   }
 
   @PostMapping({"/{circle}/notebooks"})
-  public RedirectToNoteResponse createNotebook(Circle circle, @Valid @ModelAttribute NoteContent noteContent) throws NoAccessRightException {
+  public RedirectToNoteResponse createNotebook(Circle circle, @Valid @ModelAttribute TextContent textContent) throws NoAccessRightException {
     UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertLoggedIn();
     currentUserFetcher.getUser().getAuthorization().assertAuthorization(circle);
-    Note note = circle.getOwnership().createNotebook(user.getEntity(), noteContent, testabilitySettings.getCurrentUTCTimestamp());
+    Note note = circle.getOwnership().createNotebook(user.getEntity(), textContent, testabilitySettings.getCurrentUTCTimestamp());
     modelFactoryService.noteRepository.save(note);
     return new RedirectToNoteResponse(note.getId());
   }

@@ -11,8 +11,8 @@
       :errors="formErrors.linkTypeToParent"
     />
     <NoteFormTitleOnly
-      v-model="creationData.noteContent"
-      :errors="formErrors.noteContent"
+      v-model="creationData.textContent"
+      :errors="formErrors.textContent"
     />
     <input type="submit" value="Submit" class="btn btn-primary" />
   </form>
@@ -28,7 +28,7 @@ function initialState() {
   return {
     creationData: {
       linkTypeToParent: "",
-      noteContent: {},
+      textContent: {},
     },
     formErrors: {},
   };

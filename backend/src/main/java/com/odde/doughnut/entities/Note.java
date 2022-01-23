@@ -144,12 +144,7 @@ public class Note {
     @Getter
     private final List<Note> children = new ArrayList<>();
 
-    public static Note createNote(User user, NoteContent noteContent, Timestamp currentUTCTimestamp) {
-        TextContent textContent = noteContent.getTextContent();
-        return createNote(user, currentUTCTimestamp, textContent);
-    }
-
-    private static Note createNote(User user, Timestamp currentUTCTimestamp, TextContent textContent) {
+    public static Note createNote(User user, Timestamp currentUTCTimestamp, TextContent textContent) {
         final Note note = new Note();
         note.getTextContent().updateTextContent(textContent, currentUTCTimestamp);
         note.setCreatedAtAndUpdatedAt(currentUTCTimestamp);
@@ -236,10 +231,6 @@ public class Note {
     public void updateNoteContent(NoteContent noteContent, User user) throws IOException {
         noteContent.fetchUploadedPicture(user);
 
-        mergeNoteContent(noteContent);
-    }
-
-    public void mergeNoteContent(NoteContent noteContent) {
         if (noteContent.getUploadPicture() == null) {
             noteContent.setUploadPicture(getNoteContent().getUploadPicture());
         }
@@ -315,7 +306,8 @@ public class Note {
     }
 
     public Stream<Note> extractChildNotes(User user, Timestamp currentUTCTimestamp) {
-        List<String> items = Arrays.asList(getNoteContent().getDescription().split("\n\n"));
+        List<String> items = Arrays.asList(getTextContent().getDescription().split("\n\n"));
+        getTextContent().setDescription("");
         return items.stream()
                 .filter(item -> !item.isBlank())
                 .map(paragraph -> {

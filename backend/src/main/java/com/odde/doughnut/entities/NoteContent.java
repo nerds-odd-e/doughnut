@@ -74,7 +74,6 @@ public class NoteContent {
     @Setter
     private TextContent textContent = new TextContent();
 
-    @Size(min = 1, max = 100)
     public String getTitle() {
         return textContent.getTitle();
     }

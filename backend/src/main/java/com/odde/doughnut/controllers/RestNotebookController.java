@@ -7,11 +7,7 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.NoteContent;
-import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.entities.Subscription;
-import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.json.RedirectToNoteResponse;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -57,11 +53,11 @@ class RestNotebookController {
     }
 
     @PostMapping({"/create"})
-    public RedirectToNoteResponse createNotebook(@Valid @ModelAttribute NoteContent noteContent) {
+    public RedirectToNoteResponse createNotebook(@Valid @ModelAttribute TextContent textContent) {
         UserModel user = currentUserFetcher.getUser();
         user.getAuthorization().assertLoggedIn();
         User userEntity = user.getEntity();
-        Note note = userEntity.getOwnership().createNotebook(userEntity, noteContent, testabilitySettings.getCurrentUTCTimestamp());
+        Note note = userEntity.getOwnership().createNotebook(userEntity, textContent, testabilitySettings.getCurrentUTCTimestamp());
         modelFactoryService.noteRepository.save(note);
         return new RedirectToNoteResponse(note.getId());
     }

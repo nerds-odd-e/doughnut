@@ -64,18 +64,6 @@ public class NoteTest {
         }
 
         @Test
-        public void titleIsNotOptional() {
-            makeMe.theNote(note).title("");
-            assertThat(getViolations(), is(not(empty())));
-        }
-
-        @Test
-        public void titleCannotBeTooLong() {
-            makeMe.theNote(note).title(makeMe.aStringOfLength(101));
-            assertThat(getViolations(), is(not(empty())));
-        }
-
-        @Test
         public void goodMask() {
             note.getNoteContent().setPictureMask("1 -2.3 3 -4");
             assertThat(getViolations(), is(empty()));

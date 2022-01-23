@@ -43,8 +43,8 @@ public class Ownership {
         return circle.getMembers().contains(user);
     }
 
-    public Note createNotebook(User user, NoteContent noteContent, Timestamp currentUTCTimestamp) {
-        final Note note = Note.createNote(user, noteContent, currentUTCTimestamp);
+    public Note createNotebook(User user, TextContent textContent, Timestamp currentUTCTimestamp) {
+        final Note note = Note.createNote(user, currentUTCTimestamp, textContent);
         note.buildNotebookForHeadNote(this, user);
       return note;
     }

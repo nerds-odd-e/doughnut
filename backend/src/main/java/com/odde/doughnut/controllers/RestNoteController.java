@@ -54,7 +54,7 @@ class RestNoteController {
         @Setter
         @Valid
         @NotNull
-        private NoteContent noteContent = new NoteContent();
+        private TextContent textContent = new TextContent();
     }
 
     @PostMapping(value = "/{parentNote}/create")
@@ -63,7 +63,7 @@ class RestNoteController {
         final UserModel userModel = currentUserFetcher.getUser();
         userModel.getAuthorization().assertAuthorization(parentNote);
         User user = userModel.getEntity();
-        Note note = Note.createNote(user, noteCreation.getNoteContent(), testabilitySettings.getCurrentUTCTimestamp());
+        Note note = Note.createNote(user, testabilitySettings.getCurrentUTCTimestamp(), noteCreation.textContent);
         note.setParentNote(parentNote);
         modelFactoryService.noteRepository.save(note);
         if (noteCreation.getLinkTypeToParent() != null) {

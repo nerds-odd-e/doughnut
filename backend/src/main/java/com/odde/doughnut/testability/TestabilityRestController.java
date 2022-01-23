@@ -99,7 +99,7 @@ class TestabilityRestController {
 
         for (SeedNote seedNote : seedNotes) {
             Note note = new Note();
-            NoteContent content = new NoteContent();
+            NoteContent content = note.getNoteContent();
 
             note.getTextContent().setTitle(seedNote.title);
             note.getTextContent().setDescription(seedNote.description);
@@ -114,9 +114,8 @@ class TestabilityRestController {
                 note.getOrBuildTranslationTextContent().setDescription(seedNote.descriptionIDN);
             }
 
-            note.mergeNoteContent(content);
             note.setCreatedAtAndUpdatedAt(currentUTCTimestamp);
-            earlyNotes.put(content.getTitle(), note);
+            earlyNotes.put(seedNote.title, note);
             noteList.add(note);
             if (Strings.isBlank(seedNote.testingParent)) {
                 note.buildNotebookForHeadNote(user.getOwnership(), user);
