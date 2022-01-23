@@ -125,18 +125,6 @@ public class NoteContent {
     }
 
     @JsonIgnore
-    public String getClozeDescription() {
-        if(Strings.isEmpty(getDescription())) return "";
-
-        return ClozeDescription.htmlClosedDescription().getClozeDescription(getNoteTitle(), getDescription());
-    }
-
-    @JsonIgnore
-    public NoteTitle getNoteTitle() {
-        return new NoteTitle(getTitle());
-    }
-
-    @JsonIgnore
     public String getShortDescription() {
         return StringUtils.abbreviate(getDescription(), 50);
     }

@@ -30,8 +30,11 @@ import javax.persistence.Table;
 import javax.validation.Valid;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.odde.doughnut.algorithms.ClozeDescription;
+import com.odde.doughnut.algorithms.NoteTitle;
 import com.odde.doughnut.algorithms.SiblingOrder;
 
+import org.apache.logging.log4j.util.Strings;
 import org.hibernate.annotations.WhereJoinTable;
 import org.springframework.beans.BeanUtils;
 
@@ -327,6 +330,19 @@ public class Note {
         childTextConent.setDescription(String.join("\n", linesInParagraph));
 
         return createNote(user, currentUTCTimestamp, childTextConent);
+    }
+
+    @JsonIgnore
+    public String getClozeDescription() {
+        String description = getTextContent().getDescription();
+        if(Strings.isEmpty(description)) return "";
+
+        return ClozeDescription.htmlClosedDescription().getClozeDescription(getNoteTitle(), description);
+    }
+
+    @JsonIgnore
+    public NoteTitle getNoteTitle() {
+        return new NoteTitle(getTextContent().getTitle());
     }
 
 }

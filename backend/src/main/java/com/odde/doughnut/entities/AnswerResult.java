@@ -46,7 +46,7 @@ public class AnswerResult {
             return correctAnswerNote.equals(answerNote);
         }
 
-        return correctAnswerNote.getNoteContent().getNoteTitle().matches(answer);
+        return correctAnswerNote.getNoteTitle().matches(answer);
     }
 
 }
