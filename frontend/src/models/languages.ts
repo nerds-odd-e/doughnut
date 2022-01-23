@@ -23,13 +23,11 @@ class TranslatedNoteWrapper {
 
   set description(description: string) {
     if (this.language === Languages.ID) {
-      this.note.noteAccessories.descriptionIDN = description;
       if(!this.note.translationTextContent) {
         this.note.translationTextContent = {}
       }
       this.note.translationTextContent.description = description;
     } else {
-      this.note.noteAccessories.description = description;
       this.note.textContent.description = description;
     }
   }
@@ -43,7 +41,7 @@ class TranslatedNoteWrapper {
   }
 
   get  translationNoteAvailable() {
-      return this.language === Languages.ID && !this.note.noteAccessories.titleIDN;
+      return this.language === Languages.ID && !this.note.translationTextContent?.title;
     }
 
   get  title() {
