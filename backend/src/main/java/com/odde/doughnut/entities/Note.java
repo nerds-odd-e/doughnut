@@ -40,6 +40,7 @@ import org.springframework.beans.BeanUtils;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.thymeleaf.util.StringUtils;
 
 @Entity
 @Table(name = "note")
@@ -161,7 +162,7 @@ public class Note {
     }
 
     public String getShortDescription() {
-        return noteContent.getShortDescription();
+        return StringUtils.abbreviate(getTextContent().getDescription(), 50);
     }
 
     public String getNotePicture() {

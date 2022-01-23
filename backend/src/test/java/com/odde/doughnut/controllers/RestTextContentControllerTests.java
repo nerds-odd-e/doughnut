@@ -58,7 +58,7 @@ class RestTextContentControllerTests {
         void shouldBeAbleToSaveNoteWhenValid() throws NoAccessRightException, IOException {
             NoteViewedByUser response = controller.updateNote(note, textContent);
             assertThat(response.getId(), equalTo(note.getId()));
-            assertThat(response.getNoteContent().getDescription(), equalTo("new description"));
+            assertThat(response.getTextContent().getDescription(), equalTo("new description"));
         }
 
         @Test

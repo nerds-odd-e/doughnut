@@ -18,6 +18,6 @@ public class ClozeTitleSelectionQuizFactory extends ClozeDescriptonQuizFactory {
 
     @Override
     public boolean isValidQuestion() {
-        return !Strings.isEmpty(reviewPoint.getNote().getNoteContent().getDescription());
+        return !Strings.isEmpty(reviewPoint.getNote().getTextContent().getDescription());
     }
 }

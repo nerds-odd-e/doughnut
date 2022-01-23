@@ -21,7 +21,7 @@ public class SpellingQuizFactory extends ClozeDescriptonQuizFactory {
     @Override
     public boolean isValidQuestion() {
         Note note = reviewPoint.getNote();
-        if (!Strings.isEmpty(note.getNoteContent().getDescription())) {
+        if (!Strings.isEmpty(note.getTextContent().getDescription())) {
             ReviewSetting reviewSetting = note.getMasterReviewSetting();
             return reviewSetting != null && reviewSetting.getRememberSpelling();
         }

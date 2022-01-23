@@ -78,18 +78,10 @@ public class NoteContent {
         return textContent.getTitle();
     }
 
-    public void setTitle(String title) {
-        this.textContent.setTitle(title);
-    }
-
     @Column(name = "updated_at")
     @Getter
     @Setter
     private Timestamp updatedAt;
-
-    public String getDescription() {
-        return this.textContent.getDescription();
-    }
 
     @JsonIgnore
     public String getNotePicture() {
@@ -122,11 +114,6 @@ public class NoteContent {
             Image image = new ImageBuilder().buildImageFromUploadedPicture(user, file);
             setUploadPicture(image);
         }
-    }
-
-    @JsonIgnore
-    public String getShortDescription() {
-        return StringUtils.abbreviate(getDescription(), 50);
     }
 
 }
