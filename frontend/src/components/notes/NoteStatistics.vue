@@ -22,7 +22,7 @@
       }}</span>
       <label>Last Content Updated:</label>
       <span class="statistics-value">{{
-        new Date(statistics.note.noteContent.updatedAt).toLocaleString()
+        new Date(statistics.note.textContent.updatedAt).toLocaleString()
       }}</span>
     </div>
 

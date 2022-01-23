@@ -42,7 +42,7 @@ class RestNoteController {
         private ReviewPoint reviewPoint;
         @Getter
         @Setter
-        private Note note;
+        private NoteViewedByUser note;
 
     }
 
@@ -113,7 +113,7 @@ class RestNoteController {
         user.getAuthorization().assertReadAuthorization(note);
         NoteStatistics statistics = new NoteStatistics();
         statistics.setReviewPoint(user.getReviewPointFor(note));
-        statistics.setNote(note);
+        statistics.note = new NoteViewer(user.getEntity(), note).toJsonObject();
         return statistics;
     }
 

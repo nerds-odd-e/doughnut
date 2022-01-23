@@ -105,7 +105,7 @@ class RestNoteControllerTests {
             Note note = makeMe.aNote().byUser(otherUser).please();
             makeMe.aSubscription().forUser(userModel.getEntity()).forNotebook(note.getNotebook()).please();
             makeMe.refresh(userModel.getEntity());
-            assertThat(controller.statistics(note).getNote(), equalTo(note));
+            assertThat(controller.statistics(note).getNote().getId(), equalTo(note.getId()));
         }
     }
 
