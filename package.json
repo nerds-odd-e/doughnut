@@ -32,8 +32,8 @@
     "@testing-library/cypress": "8.0.2",
     "@types/node": "^17.0.2",
     "browserify": "^17.0.0",
-    "cy-verify-downloads": "^0.0.5",
-    "cypress": "9.2.1",
+    "cy-verify-downloads": "0.0.6",
+    "cypress": "9.3.1",
     "cypress-cucumber-preprocessor": "4.3.1",
     "cypress-file-upload": "5.0.8",
     "file-saver": "^2.0.5",
@@ -44,6 +44,6 @@
     "typescript": "^3.9"
   },
   "resolutions": {
-    "resolve": "1.20.0"
+    "@cucumber/cucumber": "7.3.2"
   }
 }
