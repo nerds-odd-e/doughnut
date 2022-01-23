@@ -91,10 +91,6 @@ public class NoteContent {
         return this.textContent.getDescription();
     }
 
-    public void setDescription(String description) {
-        this.textContent.setDescription(description);
-    }
-
     @JsonIgnore
     public String getNotePicture() {
         if (uploadPicture != null) {
