@@ -45,8 +45,6 @@ class TranslatedNoteWrapper {
     }
 
   get  title() {
-      if (!this.note.noteAccessories) return this.note.title;
-
       return this.language === Languages.ID
         ? this.note.translationTextContent?.title
         : this.note.textContent.title;
@@ -55,13 +53,11 @@ class TranslatedNoteWrapper {
   set title(title: string) {
 
       if (this.language === Languages.ID) {
-        this.note.noteAccessories.titleIDN = title;
         if(!this.note.translationTextContent) {
           this.note.translationTextContent = {}
         }
         this.note.translationTextContent.title = title;
       } else {
-        this.note.noteAccessories.title = title;
         this.note.textContent.title = title;
       }
     }
