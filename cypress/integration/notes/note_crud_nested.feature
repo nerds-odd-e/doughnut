@@ -45,7 +45,7 @@ Feature: Nested Note CRUD
     And I update note "LeSS in Action" to become:
       | Title     | Description       |
       | Odd-e CSD | Our best training |
-#    Then I should see "Odd-e CSD" in the page
+    Then I should see "Odd-e CSD" in the page
     And I should see these notes belonging to the user at the top level of all my notes
       | title     | description       |
       | Odd-e CSD | Our best training |

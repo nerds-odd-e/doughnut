@@ -104,7 +104,7 @@ Cypress.Commands.add('submitNoteCreationFormWith', (noteAttributes) => {
 });
 
 Cypress.Commands.add('replaceFocusedText', (text) => {
-  cy.focused().clear().type(text).type('{shift}{enter}');
+  cy.focused().clear().clear().type(text).type('{shift}{enter}');
 })
 
 Cypress.Commands.add('inPlaceEdit', (noteAttributes) => {
