@@ -27,7 +27,6 @@ Launch a new terminal in your favourite shell (I highly recommend zsh).
 ```bash
 mkdir -p ~/.config/nix
 echo 'experimental-features = nix-command flakes' >> ~/.config/nix/nix.conf
-nix-channel --update; nix-env -iA nixpkgs.nix && nix-env -u --always
 ```
 
 Clone full all-in-one doughnut codebase from Github
