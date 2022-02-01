@@ -69,7 +69,7 @@ jobs:
       - name: eslint
         uses: actions/setup-node@v2
         with:
-          node-version: "16"
+          node-version: "17"
       - run: yarn frontend:lint
 
   Frontend-unit-tests:
@@ -91,7 +91,7 @@ jobs:
       - name: Unit tests with jest & vue-jest
         uses: actions/setup-node@v2
         with:
-          node-version: "16"
+          node-version: "17"
       - run: yarn frontend:test
 
   # mobile-unit-test:
@@ -238,7 +238,7 @@ jobs:
       - name: Build frontend
         uses: actions/setup-node@v2
         with:
-          node-version: "16"
+          node-version: "17"
       - run: yarn frontend:build
       - name: Set up JDK 17
         uses: actions/setup-java@v2

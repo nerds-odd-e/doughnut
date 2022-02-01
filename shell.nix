@@ -10,7 +10,7 @@ in mkShell {
   buildInputs = [
     coreutils-full
     gradle
-    nodejs-16_x
+    nodejs-17_x
     yarn
     jdk
     python3
@@ -74,11 +74,12 @@ in mkShell {
     flutter
   ];
   shellHook = ''
+        set -e
         export NIXPKGS_ALLOW_UNFREE=1
         export GPG_TTY=$(tty)
         export JAVA_HOME="$(readlink -e $(type -p javac) | sed  -e 's/\/bin\/javac//g')"
         export GRADLE_HOME="${pkgs.gradle}"
-        export NODE_HOME="${pkgs.nodejs-16_x}"
+        export NODE_HOME="${pkgs.nodejs-17_x}"
 
         export MYSQL_BASEDIR=${pkgs.mysql80}
         export MYSQL_HOME="''${MYSQL_HOME:-$PWD/mysql}"
