@@ -257,15 +257,14 @@ jobs:
             ${{ runner.os }}-gradle-
       - name: Build application jar artifact
         run: backend/gradlew -p backend build -x test -Dspring.profiles.active=prod --build-cache --parallel
-      - name: Setup Google Cloud SDK with Service Account
-        uses: google-github-actions/setup-gcloud@v0
+      - name: GCP Auth with Service Account
+        uses: google-github-actions/auth@v0
         with:
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
-          service_account_email: ${{ secrets.GCP_SA_EMAIL }}
-          service_account_key: ${{ secrets.GCP_SA_KEY }}
-          export_default_credentials: true
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+      - name: Set up GCP SDK
+        uses: google-github-actions/setup-gcloud@v0
       - name: Upload production application jar to Google Cloud Storage
-        uses: google-github-actions/upload-cloud-storage@main
+        uses: google-github-actions/upload-cloud-storage@v0
         with:
           path: backend/build/libs/doughnut-0.0.1-SNAPSHOT.jar
           destination: dough-01/backend_app_jar
