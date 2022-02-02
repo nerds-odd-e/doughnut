@@ -10,7 +10,7 @@
     "frontend:lint": "cd frontend && yarn --frozen-lockfile --silent && yarn lint && cd -",
     "frontend:test": "cd frontend && yarn --frozen-lockfile --silent && yarn test && cd -",
     "frontend:sut": "cd frontend && yarn --frozen-lockfile --silent && yarn dev && cd -",
-    "backend:test": "./gradlew test --build-cache --parallel",
+    "backend:test": "./gradlew testDBMigrate && ./gradlew test --build-cache --parallel",
     "backend:build": "backend/gradlew -p backend build -x test --build-cache --parallel",
     "backend:prod_build": "backend/gradlew -p backend build -x test -Dspring.profiles.active=prod --build-cache --parallel",
     "cy:open": "cypress open --env configFile=development",
