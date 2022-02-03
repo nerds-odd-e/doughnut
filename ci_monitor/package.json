@@ -4,7 +4,31 @@
   "description": "ci monitor for Github action",
   "main": "sound-monitor.js",
   "license": "MIT",
+  "scripts": {
+    "test": "jest"
+  },
+  "jest": {
+    "verbose": true,
+    "collectCoverage": true,
+    "rootDir": "./",
+    "testRegex": "__tests__/.+\\.spec\\.js",
+    "transform": {
+      "^.+\\.(js|jsx|ts|tsx)$": "babel-jest"
+    },
+    "moduleFileExtensions": [
+      "js"
+    ],
+    "moduleDirectories": [
+      "node_modules"
+    ]
+  },
   "devDependencies": {
-    "jest": "^26.6.3"
+    "@babel/core": "^7.17.0",
+    "@babel/preset-env": "^7.16.11",
+    "babel-jest": "^27.4.6",
+    "jest": "^27.4.7"
+  },
+  "dependencies": {
+    "request": "^2.88.2"
   }
 }
