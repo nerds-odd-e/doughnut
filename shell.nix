@@ -9,6 +9,7 @@ in mkShell {
   MYSQL_DATADIR = builtins.getEnv "MYSQL_DATADIR";
   buildInputs = [
     coreutils-full
+    dart
     gradle
     nodejs-17_x
     yarn
