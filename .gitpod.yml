@@ -4,9 +4,13 @@ image:
 tasks:
   - init: |
       git config --global init.defaultBranch main
-      sleep 4 && mysql -u root -S /var/run/mysqld/mysqld.sock < infra/gitpod/mysql/init_doughnut_db.sql
-      npm i -g npm yarn
-      yarn && cd frontend && yarn && cd -
+      mkdir -p /home/gitpod/.config/nix && touch /home/gitpod/.config/nix/nix.conf
+      echo 'experimental-features = nix-command flakes' >> /home/gitpod/.config/nix/nix.conf
+      nix-env -iA nixpkgs.zoxide
+      chsh -s $(which zsh)
+      curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh
+      echo 'eval "$(zoxide init bash)"' >> /home/gitpod/.bashrc
+      echo 'eval "$(zoxide init bash)"' >> /home/gitpod/.zshrc
 
 ports:
   # Vite Frontend Dev Server
@@ -33,7 +37,6 @@ ports:
   - port: 6080
     onOpen: open-browser
     visibility: public
-
 
 vscode:
   extensions:
