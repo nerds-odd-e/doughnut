@@ -71,7 +71,6 @@ in mkShell {
     xvfb-run
     dbeaver
     packer
-    dart
     flutter
   ];
   shellHook = ''
