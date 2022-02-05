@@ -4,10 +4,6 @@ image:
 tasks:
   - init: |
       git config --global init.defaultBranch main
-      sh <(curl -L https://nixos.org/nix/install) --no-daemon
-      mkdir -p /home/gitpod/.config/nix && touch /home/gitpod/.config/nix/nix.conf
-      echo 'experimental-features = nix-command flakes' >> /home/gitpod/.config/nix/nix.conf
-      . /home/gitpod/.nix-profile/etc/profile.d/nix.sh
       rm -rf /home/gitpod/.sdkman
       sed -i '/sdkman/d' /home/gitpod/.bashrc
       sed -i '/sdkman/d' /home/gitpod/.bash_profile

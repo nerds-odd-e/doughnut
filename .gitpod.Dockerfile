@@ -44,6 +44,7 @@ RUN apt-get -y update \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /var/cache/apt \
     && chsh -s $(which zsh) \
+    && chsh -s $(which zsh) gitpod \
     && curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh
 
 
@@ -60,7 +61,10 @@ WORKDIR /home/gitpod
 
 RUN mkdir -p /home/gitpod/.config/nix \
     && touch /home/gitpod/.config/nix/nix.conf \
-    && echo "experimental-features = nix-command flakes" >> /home/gitpod/.config/nix/nix.conf
+    && echo "experimental-features = nix-command flakes" >> /home/gitpod/.config/nix/nix.conf \
+    && sh <(curl -L https://nixos.org/nix/install) --no-daemon \
+    && . /home/gitpod/.nix-profile/etc/profile.d/nix.sh \
+    && curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh
 
 EXPOSE 3000
 EXPOSE 3309
