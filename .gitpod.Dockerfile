@@ -39,7 +39,6 @@ RUN apt-get -y update \
     xclip \
     fasd \
     fzf \
-    && apt-get -y upgrade \
     && apt-get autoremove \
     && rm -rf /var/lib/apt/lists/* \
     && rm -rf /var/cache/apt \
@@ -59,12 +58,11 @@ USER gitpod
 ENV USER gitpod
 WORKDIR /home/gitpod
 
+RUN curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh
+RUN curl -L https://nixos.org/nix/install --no-daemon | sh
 RUN mkdir -p /home/gitpod/.config/nix \
     && touch /home/gitpod/.config/nix/nix.conf \
-    && curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh \
-    && curl -L https://nixos.org/nix/install --no-daemon | sh \
-    && echo "experimental-features = nix-command flakes" >> /home/gitpod/.config/nix/nix.conf \
-    && . /home/gitpod/.nix-profile/etc/profile.d/nix.sh
+    && echo "experimental-features = nix-command flakes" >> /home/gitpod/.config/nix/nix.conf
 
 EXPOSE 3000
 EXPOSE 3309
