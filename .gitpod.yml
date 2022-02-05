@@ -8,7 +8,7 @@ tasks:
       sed -i '/sdkman/d' /home/gitpod/.bashrc
       sed -i '/sdkman/d' /home/gitpod/.bash_profile
       sed -i '/sdkman/d' /home/gitpod/.profile
-      curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh
+      . /home/gitpod/.nix-profile/etc/profile.d/nix.sh
       nix develop
 
 ports:
