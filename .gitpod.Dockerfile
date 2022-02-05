@@ -61,10 +61,10 @@ WORKDIR /home/gitpod
 
 RUN mkdir -p /home/gitpod/.config/nix \
     && touch /home/gitpod/.config/nix/nix.conf \
-    && curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh
+    && curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh \
     && curl -L https://nixos.org/nix/install --no-daemon | sh \
     && echo "experimental-features = nix-command flakes" >> /home/gitpod/.config/nix/nix.conf \
-    && . /home/gitpod/.nix-profile/etc/profile.d/nix.sh \
+    && . /home/gitpod/.nix-profile/etc/profile.d/nix.sh
 
 EXPOSE 3000
 EXPOSE 3309
