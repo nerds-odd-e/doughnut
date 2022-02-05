@@ -63,7 +63,7 @@ RUN mkdir -p /home/gitpod/.config/nix \
     && touch /home/gitpod/.config/nix/nix.conf \
     && echo "experimental-features = nix-command flakes" >> /home/gitpod/.config/nix/nix.conf
 
-RUN sh < (curl -L https://nixos.org/nix/install) --no-daemon
+RUN curl -L https://nixos.org/nix/install --no-daemon | sh
 
 EXPOSE 3000
 EXPOSE 3309
