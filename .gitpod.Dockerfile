@@ -63,9 +63,9 @@ RUN rm -rf /home/gitpod/.sdkman \
     && sed -i '/sdkman/d' /home/gitpod/.bash_profile \
     && sed -i '/sdkman/d' /home/gitpod/.profile \
     && sed -i '/sdkman/d' /home/gitpod/.zshrc \
-    && mkdir -p ~/.config/nix \
-    && touch ~/.config/nix/nix.conf \
-    && echo 'experimental-features = nix-command flakes' >> ~/.config/nix/nix.conf
+    && mkdir -p /home/gitpod/.config/nix \
+    && touch /home/gitpod/.config/nix/nix.conf \
+    && echo 'experimental-features = nix-command flakes' >> /home/gitpod/.config/nix/nix.conf
 
 EXPOSE 3000
 EXPOSE 3309
