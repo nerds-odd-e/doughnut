@@ -4,13 +4,12 @@ image:
 tasks:
   - init: |
       git config --global init.defaultBranch main
+      sh <(curl -L https://nixos.org/nix/install) --no-daemon
       mkdir -p /home/gitpod/.config/nix && touch /home/gitpod/.config/nix/nix.conf
       echo 'experimental-features = nix-command flakes' >> /home/gitpod/.config/nix/nix.conf
-      nix-env -iA nixpkgs.zoxide
+      source /home/gitpod/.nix-profile/etc/profile.d/nix.sh
       chsh -s $(which zsh)
       curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh
-      echo 'eval "$(zoxide init bash)"' >> /home/gitpod/.bashrc
-      echo 'eval "$(zoxide init bash)"' >> /home/gitpod/.zshrc
 
 ports:
   # Vite Frontend Dev Server
