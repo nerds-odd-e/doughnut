@@ -9,6 +9,7 @@ tasks:
       sed -i '/sdkman/d' /home/gitpod/.bash_profile
       sed -i '/sdkman/d' /home/gitpod/.profile
       . /home/gitpod/.nix-profile/etc/profile.d/nix.sh
+      nix-collect-garbage -d
       nix-channel --update
       nix-env -iA nixpkgs.nix && nix-env -u --always
       nix develop
