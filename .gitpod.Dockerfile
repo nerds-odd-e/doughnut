@@ -41,7 +41,12 @@ RUN apt-get -y update \
     fzf \
     && apt-get autoremove \
     && rm -rf /var/lib/apt/lists/* \
-    && rm -rf /var/cache/apt
+    && rm -rf /var/cache/apt \
+    && rm -rf /nix \
+    && rm -rf /home/gitpod/.nix-channels \
+    && rm -rf /home/gitpod/.nix-defexpr \
+    && rm -rf /home/gitpod/.nix-profile \
+    && rm -rf /home/gitpod/.config/nixpkgs
 
 
 # -----------------------------------------------------
@@ -55,7 +60,7 @@ USER gitpod
 ENV USER gitpod
 WORKDIR /home/gitpod
 
-RUN curl -L https://nixos.org/nix/install --no-daemon | sh
+RUN curl -L https://nixos.org/nix/install | sh
 RUN mkdir -p /home/gitpod/.config/nix \
     && touch /home/gitpod/.config/nix/nix.conf \
     && echo "experimental-features = nix-command flakes" >> /home/gitpod/.config/nix/nix.conf
