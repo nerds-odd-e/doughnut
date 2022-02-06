@@ -9,13 +9,13 @@ We use nix to manage and ensure a reproducible development environment ([nixos.o
 Full details on nix installation on macOS [here](https://nixos.org/manual/nix/stable/#sect-macos-installation)
 
 ```bash
- sh <(curl -k -L https://nixos.org/nix/install) --darwin-use-unencrypted-nix-store-volume
+ sh < (curl -k -L https://nixos.org/nix/install) --darwin-use-unencrypted-nix-store-volume
 ```
 
 #### For Linux:
 
 ```bash
-sh <(curl -k -L https://nixos.org/nix/install) --daemon
+sh < (curl -k -L https://nixos.org/nix/install) --no-daemon
 ```
 
 (NB: if the install script fails to add sourcing of `nix.sh` in `.bashrc` or `.profile`, you can do it manually `source /etc/profile.d/nix.sh`)
@@ -27,6 +27,7 @@ Launch a new terminal in your favourite shell (I highly recommend zsh).
 ```bash
 mkdir -p ~/.config/nix
 echo 'experimental-features = nix-command flakes' >> ~/.config/nix/nix.conf
+. ~/.nix-profile/etc/profile.d/nix.sh
 ```
 
 Clone full all-in-one doughnut codebase from Github
