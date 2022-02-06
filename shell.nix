@@ -9,7 +9,6 @@ in mkShell {
   MYSQL_DATADIR = builtins.getEnv "MYSQL_DATADIR";
   buildInputs = [
     coreutils-full
-    dart
     gradle
     nodejs-17_x
     yarn
@@ -71,7 +70,6 @@ in mkShell {
     xvfb-run
     dbeaver
     packer
-    flutter
   ];
   shellHook = ''
         export NIXPKGS_ALLOW_UNFREE=1
