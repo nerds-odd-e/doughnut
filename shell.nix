@@ -13,8 +13,6 @@ in mkShell {
     nodejs-17_x
     yarn
     jdk
-    python3
-    bash_5
     libiconv
     zsh
     git
@@ -22,7 +20,6 @@ in mkShell {
     git-secret
     gitAndTools.delta
     locale
-    lsd
     binutils-unwrapped
     hostname
     inetutils
@@ -38,7 +35,6 @@ in mkShell {
     lesspipe
     lsof
     lzma
-    zoxide
     ps
     vgrep
     unixtools.whereis
