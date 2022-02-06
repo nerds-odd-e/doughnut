@@ -12,8 +12,6 @@ tasks:
       nix-collect-garbage -d
       nix-channel --update
       nix-env -iA nixpkgs.nix && nix-env -u --always
-      curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | sh
-      zsh
 
 ports:
   # Vite Frontend Dev Server
