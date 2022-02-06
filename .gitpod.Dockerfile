@@ -58,8 +58,7 @@ WORKDIR /home/gitpod
 RUN curl -L https://nixos.org/nix/install --no-daemon | sh
 RUN mkdir -p /home/gitpod/.config/nix \
     && touch /home/gitpod/.config/nix/nix.conf \
-    && echo "experimental-features = nix-command flakes" >> /home/gitpod/.config/nix/nix.conf \
-    && nix-channel --update; nix-env -iA nixpkgs.nix && nix-env -u --always
+    && echo "experimental-features = nix-command flakes" >> /home/gitpod/.config/nix/nix.conf
 
 EXPOSE 3000
 EXPOSE 3309
