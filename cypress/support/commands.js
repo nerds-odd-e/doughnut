@@ -104,6 +104,9 @@ Cypress.Commands.add('submitNoteCreationFormWith', (noteAttributes) => {
 });
 
 Cypress.Commands.add('replaceFocusedText', (text) => {
+  // cy.clear for now is an alias of cy.type('{selectall}{backspace}')
+  // it doesn't clear the text sometimes.
+  // Invoking it twice seems to solve the problem.
   cy.focused().clear().clear().type(text).type('{shift}{enter}');
 })
 
