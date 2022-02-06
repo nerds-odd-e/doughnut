@@ -41,10 +41,7 @@ RUN apt-get -y update \
     fzf \
     && apt-get autoremove \
     && rm -rf /var/lib/apt/lists/* \
-    && rm -rf /var/cache/apt \
-    && chsh -s $(which zsh) \
-    && chsh -s $(which zsh) gitpod \
-    && curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh
+    && rm -rf /var/cache/apt
 
 
 # -----------------------------------------------------
@@ -58,7 +55,6 @@ USER gitpod
 ENV USER gitpod
 WORKDIR /home/gitpod
 
-RUN curl -fsSL https://raw.githubusercontent.com/zimfw/install/master/install.zsh | zsh
 RUN curl -L https://nixos.org/nix/install --no-daemon | sh
 RUN mkdir -p /home/gitpod/.config/nix \
     && touch /home/gitpod/.config/nix/nix.conf \
