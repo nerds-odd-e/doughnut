@@ -41,6 +41,7 @@ in mkShell {
     mysql_jdbc
     uutils-coreutils
     jetbrains-mono
+    dbeaver
   ] ++ lib.optionals stdenv.isDarwin [
     darwin.apple_sdk.libs.utmp
     apple_sdk.ApplicationServices
@@ -56,7 +57,6 @@ in mkShell {
     x11vnc
     xclip
     xvfb-run
-    dbeaver
   ];
   shellHook = ''
         export NIXPKGS_ALLOW_UNFREE=1
