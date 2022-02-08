@@ -19,8 +19,15 @@ class NotePositionBuilder extends Builder {
 
   inBazaar(): NotePositionBuilder {
     this.data.owns = false
+    this.data.headNote = {}
     return this
   }
+
+  shortDescription(value: string): NotePositionBuilder {
+    this.data.headNote.shortDescription = value;
+    return this;
+  }
+
 
   inCircle(value: string): NotePositionBuilder {
     this.data.owns = true;

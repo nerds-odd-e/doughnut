@@ -4,9 +4,12 @@ image:
 tasks:
   - init: |
       git config --global init.defaultBranch main
-      sleep 4 && mysql -u root -S /var/run/mysqld/mysqld.sock < infra/gitpod/mysql/init_doughnut_db.sql
-      npm i -g npm yarn
-      yarn && cd frontend && yarn && cd -
+      rm -rf /home/gitpod/.sdkman
+      sed -i '/sdkman/d' /home/gitpod/.bashrc
+      sed -i '/sdkman/d' /home/gitpod/.bash_profile
+      sed -i '/sdkman/d' /home/gitpod/.profile
+      . /home/gitpod/.bashrc
+      . /home/gitpod/.nix-profile/etc/profile.d/nix.sh
 
 ports:
   # Vite Frontend Dev Server
@@ -33,7 +36,6 @@ ports:
   - port: 6080
     onOpen: open-browser
     visibility: public
-
 
 vscode:
   extensions:

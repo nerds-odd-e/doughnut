@@ -8,21 +8,13 @@ in mkShell {
   MYSQL_HOME = builtins.getEnv "MYSQL_HOME";
   MYSQL_DATADIR = builtins.getEnv "MYSQL_DATADIR";
   buildInputs = [
-    coreutils-full
-    gradle
     nodejs-17_x
     yarn
     jdk
-    python3
-    bash_5
     libiconv
-    zsh
     git
-    git-extras
     git-secret
     gitAndTools.delta
-    locale
-    lsd
     binutils-unwrapped
     hostname
     inetutils
@@ -32,17 +24,14 @@ in mkShell {
     fasd
     fzf
     gnupg
-    htop
     jq
     less
     lesspipe
     lsof
     lzma
-    zoxide
     ps
     vgrep
     unixtools.whereis
-    which
     libmysqlclient
     libpcap
     patchelf
@@ -50,9 +39,9 @@ in mkShell {
     mysql80
     mysql-client
     mysql_jdbc
-    google-cloud-sdk
-    vim
-    vimpager
+    uutils-coreutils
+    jetbrains-mono
+    dbeaver
   ] ++ lib.optionals stdenv.isDarwin [
     darwin.apple_sdk.libs.utmp
     apple_sdk.ApplicationServices
@@ -68,17 +57,11 @@ in mkShell {
     x11vnc
     xclip
     xvfb-run
-    dbeaver
-    packer
-    dart
-    flutter
   ];
   shellHook = ''
-        set -e
         export NIXPKGS_ALLOW_UNFREE=1
         export GPG_TTY=$(tty)
         export JAVA_HOME="$(readlink -e $(type -p javac) | sed  -e 's/\/bin\/javac//g')"
-        export GRADLE_HOME="${pkgs.gradle}"
         export NODE_HOME="${pkgs.nodejs-17_x}"
 
         export MYSQL_BASEDIR=${pkgs.mysql80}
@@ -90,13 +73,12 @@ in mkShell {
         export MYSQL_TCP_PORT=3309
         export MYSQLX_TCP_PORT=33090
 
-        export PATH=$PATH:$JAVA_HOME/bin:$GRADLE_HOME/bin:$NODE_HOME/bin
+        export PATH=$PATH:$JAVA_HOME/bin:$NODE_HOME/bin
 
         echo "##############################################################################################################"
         echo "                                                                                "
         echo "##    !! DOUGHNUT NIX DEVELOPMENT ENVIRONMENT ;) !!  "
         echo "##    JAVA_HOME: $JAVA_HOME                          "
-        echo "##    GRADLE_HOME: $GRADLE_HOME                      "
         echo "##    NODE_HOME: $NODE_HOME                          "
         echo "##    MYSQL_HOME: $MYSQL_HOME                        "
         echo "##    MYSQL_DATADIR: $MYSQL_DATADIR                  "

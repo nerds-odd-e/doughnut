@@ -3,6 +3,7 @@ const {
   buildState,
   BuildState,
   englishDictionary,
+  timer
 } = require("../sound-monitor");
 
 jest.mock("request");
@@ -12,6 +13,11 @@ const html = `
         <div title="This workflow run completed successfully." class="d-flex flex-items-center flex-justify-center">
         <a class="Link--primary css-truncate css-truncate-target" aria-label="Run 976 of dough CI CD" href="/nerds-odd-e/doughnut/actions/runs/737396864">move code</a>
   `;
+
+afterAll((done) => {
+  clearInterval(timer);
+  done();
+});
 
 test("get content from github action", () => {
   request.mockImplementation((url, cb) => cb(null, null, html));

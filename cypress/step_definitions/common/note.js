@@ -36,9 +36,17 @@ When("I create top level note with:", (data) => {
   cy.submitNoteCreationFormsWith(data.hashes());
 });
 
+When("I open note {string}", (noteTitle) => {
+    cy.jumpToNotePage(noteTitle);
+});
+
 When("I update note {string} to become:", (noteTitle, data) => {
   cy.jumpToNotePage(noteTitle);
   cy.inPlaceEdit(data.hashes()[0]);
+});
+
+When("Other update note {string} to become:", (noteTitle, data) => {
+    // TODO create testability endpoint to update note title/description
 });
 
 When(

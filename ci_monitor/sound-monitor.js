@@ -134,7 +134,7 @@ const japaneseDictionary = {
   },
 };
 
-setInterval(() => {
+const timer = setInterval(() => {
   buildState("https://github.com/nerds-odd-e/doughnut/actions").then(
     (newState) => {
       say(
@@ -151,4 +151,5 @@ module.exports = {
   BuildState,
   say,
   englishDictionary,
+  timer
 };
