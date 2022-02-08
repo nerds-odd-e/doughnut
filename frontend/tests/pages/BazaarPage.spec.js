@@ -34,7 +34,7 @@ describe("bazaar page", () => {
     const stubResponse = {
       notebooks: [bazaarNote],
     };
-    fetch.mockResponseOnce(JSON.stringify(stubResponse));
+    fetch.mockResponse(JSON.stringify(stubResponse));
 
     renderWithStoreAndMockRoute(store, BazaarPage);
 
