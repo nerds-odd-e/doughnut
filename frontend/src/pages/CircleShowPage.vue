@@ -63,12 +63,13 @@ export default {
       circle: null,
       loading: true,
       formErrors: {},
+      polling: null
     };
   },
 
   methods: {
-    fetchData() {
-      this.loading = true
+    fetchData(loading) {
+      this.loading = loading ?? true;
       restGet(`/api/circles/${this.circleId}`).then(
         (res) => {
           this.circle = res
@@ -76,6 +77,11 @@ export default {
       )
       .finally(() => this.loading = false)
     },
+    pollData() {
+      this.polling = setInterval(() => {
+        this.fetchData(false);
+      }, 1000)
+    }
   },
 
   computed: {
@@ -87,12 +93,16 @@ export default {
 
   watch: {
     circleId() {
-      this.fetchData();
+      this.fetchData(this.loading);
     },
   },
 
   mounted() {
-    this.fetchData();
+    this.pollData();
+  },
+
+  unmounted () {
+	  clearInterval(this.polling)
   },
 };
 </script>
