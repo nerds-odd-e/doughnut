@@ -22,6 +22,7 @@ export default {
     return {
       loading: true,
       notebooksViewedByUser: null,
+      polling: null,
     };
   },
   computed: {
@@ -36,11 +37,22 @@ export default {
           this.notebooksViewedByUser = res
         }
       )
-      .finally(() => this.loading = false)
+      .finally(() => { 
+        this.loading = false;
+      })
+    },
+     pollData() {
+      this.polling = setInterval(() => {
+         this.fetchData();
+        }, 5000);
     },
   },
   mounted() {
     this.fetchData();
+    this.pollData();
+  },
+  unmounted() {
+    clearInterval(this.polling);
   },
 };
 </script>
