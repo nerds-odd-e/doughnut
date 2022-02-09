@@ -20,7 +20,12 @@ public class BazaarModel {
     public List<Notebook> getAllNotebooks() {
         Iterable<BazaarNotebook> all = bazaarNotebookRepository.findAll();
         List<Notebook> notes = new ArrayList<>();
-        all.forEach(bn->notes.add(bn.getNotebook()));
+        all.forEach(bn-> {
+            Notebook notebook = bn.getNotebook();
+            if(notebook.getDeletedAt() == null) {
+                notes.add(notebook);
+            }
+        });
         return notes;
     }
 
