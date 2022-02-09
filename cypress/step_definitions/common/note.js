@@ -386,5 +386,13 @@ And("I edit note {string} to become:",(noteTitle, mdContent) => {
 })
 
 Then("I should see alert {string} in the page", (alertText) => {
-  cy.log(alertText);
+   cy.get(".modal-body").should('equals', alertText);
+})
+
+Then("I dismissed the alert",() => {
+  // TODO: should dismiss the modal
+})
+
+And("I edit note title {string} to become {string}", (oldTitle, newTitle) => {
+  cy.inPlaceEdit({title: newTitle});
 })

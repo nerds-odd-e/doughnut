@@ -39,9 +39,7 @@ Cypress.Commands.add('editTextContent', (noteId, textContent) => {
     method: 'PATCH',
     url: `/api/testability/textContent/${noteId}`,
     body: textContent,
-  }).then((response) => {
-    expect(response.statusCode).to.equal(200);
-  });
+  }).its('status').should('equal', 200);
 });
 
 Cypress.Commands.add('timeTravelTo', (day, hour) => {

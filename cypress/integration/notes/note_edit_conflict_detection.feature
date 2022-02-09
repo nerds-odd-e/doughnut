@@ -15,10 +15,9 @@ Feature: Note edit conflict detection
     When Other update note "LeSS in Action" to become:
       | title             | description       |
       | LeSS Training     | An awesome training |
-    And I edit note "LeSS in Action" to become:
-      | Title     | Description       |
-      | Odd-e CSD | Our best training |
+    And I edit note title "LeSS in Action" to become "Odd-e CSD"
     Then I should see alert "Conflict detected, change cannot be saved" in the page
+    Then I dismissed the alert
     And I should see these notes belonging to the user at the top level of all my notes
       | title     | description       |
       | LeSS in Action | Our best training |

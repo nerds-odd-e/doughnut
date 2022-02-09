@@ -1,4 +1,3 @@
-
 package com.odde.doughnut.testability;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcherFromRequest;
@@ -14,6 +13,7 @@ import com.odde.doughnut.services.GithubService;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -129,6 +129,21 @@ class TestabilityRestController {
         noteRepository.saveAll(noteList);
 
         return noteList.stream().map(Note::getId).collect(Collectors.toList());
+    }
+
+    @PatchMapping("/textContent/{noteId}")
+    @Transactional
+    public ResponseEntity textContent(@RequestBody TextContent textContent, @PathVariable("noteId") Integer noteId) {
+        final Optional<Note> noteById = noteRepository.findById(noteId);
+        if (noteById.isPresent()) {
+            Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
+            final Note currentNote = noteById.get();
+            final TextContent currentTextContent = currentNote.getTextContent();
+            currentTextContent.updateTextContent(textContent, currentUTCTimestamp);
+            noteRepository.save(currentNote);
+            return ResponseEntity.ok(null);
+        }
+        return ResponseEntity.notFound().build();
     }
 
     @PostMapping("/link_notes")
