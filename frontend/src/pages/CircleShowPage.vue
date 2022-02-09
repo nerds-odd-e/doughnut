@@ -12,7 +12,7 @@
         <template #default="{ notebook }">
           <NotebookButtons v-bind="{ notebook, featureToggle }" class="card-header-btn">
             <template #additional-buttons>
-              <BazaarNotebookButtons :notebook="notebook" :user="user" />
+              <BazaarNotebookButtons :notebook="notebook" :user="true" />
             </template>
           </NotebookButtons>
         </template>
@@ -63,30 +63,18 @@ export default {
       circle: null,
       loading: true,
       formErrors: {},
-      polling: null,
-      user: null,
     };
-  },
-  computed: {
-    user() { return this.$store.getters.getCurrentUser()}
   },
 
   methods: {
-    fetchData(loading) {
-      this.loading = loading ?? true;
+    fetchData() {
+      this.loading = true
       restGet(`/api/circles/${this.circleId}`).then(
         (res) => {
           this.circle = res
         }
       )
       .finally(() => this.loading = false)
-    },
-     pollData() {
-      // this.polling = setInterval(() => {
-      //    this.fetchData();
-      //   }, 5000);
-
-        this.fetchData();
     },
   },
 
@@ -99,17 +87,13 @@ export default {
 
   watch: {
     circleId() {
-      this.fetchData(this.loading);
+      this.fetchData();
     },
   },
 
   mounted() {
     this.fetchData();
-    // this.pollData();
   },
-  unmounted() {
-    clearInterval(this.polling);
-  }
 };
 </script>
 

@@ -24,7 +24,6 @@ export default {
     return {
       notePosition: null,
       loading: true,
-      polling: null, 
     };
   },
   components: { LoadingPage, NotePageFrame },
@@ -34,8 +33,8 @@ export default {
     }
   },
   methods: {
-    fetchData(loading) {
-      this.loading = loading ?? true;
+    fetchData() {
+      this.loading = true
       const storedApiCall = this.viewTypeObj.fetchAll ?
                               storedApiGetNoteWithDescendents :
                               storedApiGetNoteAndItsChildren
@@ -45,31 +44,17 @@ export default {
         this.notePosition = res.notePosition;
       }).finally(() => this.loading = false);
     },
-    pollData() {
-       this.fetchData(false);
-      //TODO: refactor this
-      // if(!this.viewTypeObj.fetchAll) {
-      //   this.polling = setInterval(() => {
-      //     this.fetchData(false);
-      //   }, 1000)
-      // } else {
-      //   this.fetchData(false);
-      // }      
-    }
   },
   watch: {
     noteId() {
-      this.fetchData(this.loading);
+      this.fetchData();
     },
     viewType() {
-      this.fetchData(this.loading);
+      this.fetchData();
     },
   },
   mounted() {
-    this.pollData();
+    this.fetchData();
   },
-  unmounted() {
-    clearInterval(this.polling);
-  }
 };
 </script>
