@@ -43,8 +43,10 @@ export default {
     },
      pollData() {
       this.polling = setInterval(() => {
-         this.fetchData();
-        }, 5000);
+        restGet(`/api/bazaar`).then((res) => {
+          this.notebooksViewedByUser = res
+        })
+      }, 5000);
     },
   },
   mounted() {

@@ -63,6 +63,7 @@ export default {
       circle: null,
       loading: true,
       formErrors: {},
+      polling: null,
     };
   },
 
@@ -75,6 +76,13 @@ export default {
         }
       )
       .finally(() => this.loading = false)
+    },
+     pollData() {
+      this.polling = setInterval(() => {
+         restGet(`/api/circles/${this.circleId}`).then((res) => {
+          this.circle = res
+        })
+      }, 5000);
     },
   },
 
@@ -93,6 +101,7 @@ export default {
 
   mounted() {
     this.fetchData();
+    this.pollData();
   },
 };
 </script>
