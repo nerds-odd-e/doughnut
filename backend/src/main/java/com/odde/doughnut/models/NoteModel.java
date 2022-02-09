@@ -1,5 +1,7 @@
 package com.odde.doughnut.models;
 
+import java.sql.Timestamp;
+
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 
@@ -13,14 +15,17 @@ public class NoteModel {
     }
 
     public void destroy() {
-        entity.traverseBreadthFirst(child ->
-                modelFactoryService.toNoteModel(child).destroy());
-        modelFactoryService.reviewPointRepository.deleteAllByNote(entity);
+        entity.traverseBreadthFirst(child -> modelFactoryService.toNoteModel(child).destroy());
+
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+        
         if (entity.getNotebook() != null) {
-            if (entity.getNotebook().getHeadNote() == entity) {
-                modelFactoryService.notebookRepository.delete(entity.getNotebook());
+            if (entity.getNotebook().getHeadNote() == entity) {        
+                entity.getNotebook().setDeletedAt(now);
+                modelFactoryService.notebookRepository.save(entity.getNotebook());
             }
         }
-        modelFactoryService.noteRepository.delete(entity);
+        entity.setDeletedAt(now);
+        modelFactoryService.noteRepository.save(entity);
     }
 }

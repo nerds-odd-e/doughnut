@@ -174,7 +174,7 @@ class RestNoteControllerTests {
             Integer noteId = note.getId();
             Integer response = controller.deleteNote(note);
             assertEquals(noteId, response);
-            assertFalse(modelFactoryService.findNoteById(noteId).isPresent());
+            assertNotNull(modelFactoryService.findNoteById(noteId).get().getDeletedAt());
             assertTrue(modelFactoryService.findUserById(userModel.getEntity().getId()).isPresent());
         }
 
@@ -189,19 +189,7 @@ class RestNoteControllerTests {
             controller.deleteNote(subject);
 
             assertTrue(modelFactoryService.findNoteById(sibling.getId()).isPresent());
-            assertFalse(modelFactoryService.findNoteById(child.getId()).isPresent());
-        }
-
-        @Test
-        void shouldDeleteTheReviewPoints() throws NoAccessRightException {
-            Note subject = makeMe.aNote().byUser(userModel).please();
-            Note child = makeMe.aNote().byUser(userModel).under(subject).please();
-            makeMe.aReviewPointFor(child).by(userModel).please();
-            long oldCount = makeMe.modelFactoryService.reviewPointRepository.count();
-            makeMe.refresh(subject);
-            controller.deleteNote(subject);
-
-            assertThat(makeMe.modelFactoryService.reviewPointRepository.count(), equalTo(oldCount - 1));
+            assertNotNull(modelFactoryService.findNoteById(child.getId()).get().getDeletedAt());
         }
     }
 

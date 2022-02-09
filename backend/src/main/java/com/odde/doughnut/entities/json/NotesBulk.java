@@ -15,8 +15,14 @@ public class NotesBulk {
         NotesBulk notesBulk = new NotesBulk();
 
         notesBulk.notePosition = new NoteViewer(user.getEntity(), note).jsonNotePosition(note);
-        notesBulk.notes.add(new NoteViewer(user.getEntity(), note).toJsonObject());
-        note.getChildren().forEach(n -> notesBulk.notes.add(new NoteViewer(user.getEntity(), n).toJsonObject()));
+        if(note.getDeletedAt() == null) {
+            notesBulk.notes.add(new NoteViewer(user.getEntity(), note).toJsonObject());
+        }
+        note.getChildren().forEach(n -> {
+            if(n.getDeletedAt() == null) {
+                notesBulk.notes.add(new NoteViewer(user.getEntity(), n).toJsonObject());
+            }
+        });
         return notesBulk;
     }
 
