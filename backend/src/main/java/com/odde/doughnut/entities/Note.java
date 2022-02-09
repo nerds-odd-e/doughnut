@@ -91,7 +91,12 @@ public class Note {
     @Getter
     @Setter
     private Timestamp createdAt;
-
+    
+    @Column(name = "deleted_at")
+    @Getter
+    @Setter
+    private Timestamp deletedAt;
+    
     @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "master_review_setting_id", referencedColumnName = "id")
     @JsonIgnore
