@@ -4,6 +4,9 @@ import NotePositionBuilder from "./NotePositionBuilder";
 import ReviewPointBuilder from "./ReviewPointBuilder"
 import LinkViewedByUserBuilder from "./LinkViewedByUserBuilder"
 import RepetitionBuilder from "./RepetitionBuilder"
+import NotebookBuilder from "./NotebookBuilder";
+import CircleNoteBuilder from "./CircleNoteBuilder";
+import BazaarNoteBuilder from "./BazaarNoteBuilder";
 
 class MakeMe {
   get links(): LinksBuilder {
@@ -29,6 +32,17 @@ class MakeMe {
     return new RepetitionBuilder();
   }
 
+  get aCircleNote(): CircleNoteBuilder {
+    return new CircleNoteBuilder();
+  }
+
+  get aNotebook(): NotebookBuilder {
+    return new NotebookBuilder();
+  }
+
+  get aBazaarNote(): BazaarNoteBuilder {
+    return new BazaarNoteBuilder();
+  }
 }
 
 const makeMe = new MakeMe();

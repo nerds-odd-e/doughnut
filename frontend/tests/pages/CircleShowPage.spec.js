@@ -1,9 +1,8 @@
 /**
  * @jest-environment jsdom
  */
- import BazaarPage from "@/pages/BazaarPage.vue";
+ import CircleShowPage from "@/pages/CircleShowPage.vue";
  import flushPromises from "flush-promises";
- import _ from "lodash";
  import { renderWithStoreAndMockRoute } from "../helpers";
  import store from "../../src/store/index.js";
  import makeMe from "../fixtures/makeMe";
@@ -14,29 +13,33 @@
    fetch.resetMocks();
  });
 
-describe("bazaar page", () => {
+describe("circle show page", () => {
   test("fetch API to be called ONCE on mount", async () => {
     const notebook = makeMe.aNotebook.please();
-    const bazaarNote = makeMe.aBazaarNote.notebooks(notebook).please();
-    fetch.mockResponseOnce(JSON.stringify(bazaarNote));
+    const circleNote = makeMe.aCircleNote.notebooks(notebook).please();
+    fetch.mockResponseOnce(JSON.stringify(circleNote));
 
-    renderWithStoreAndMockRoute(store, BazaarPage);
+    renderWithStoreAndMockRoute(store, CircleShowPage, {
+      propsData: { circleId: circleNote.id }
+    });
     
     await flushPromises();
     expect(fetch).toHaveBeenCalledTimes(1);
-    expect(fetch).toHaveBeenCalledWith("/api/bazaar", {});
+    expect(fetch).toHaveBeenCalledWith(`/api/circles/${circleNote.id}`, {});
   });
 
   test('fetch API to be called every 5 seconds', async () => {
     const notebook = makeMe.aNotebook.please();
-    const bazaarNote = makeMe.aBazaarNote.notebooks(notebook).please();
-    fetch.mockResponse(JSON.stringify(bazaarNote));
+    const circleNote = makeMe.aCircleNote.notebooks(notebook).please();
+    fetch.mockResponse(JSON.stringify(circleNote));
 
-    renderWithStoreAndMockRoute(store, BazaarPage);
+    renderWithStoreAndMockRoute(store, CircleShowPage, {
+        propsData: { circleId: circleNote.id }
+    });
 
     await flushPromises();
     jest.advanceTimersByTime(6000);
     expect(fetch).toHaveBeenCalledTimes(2);
-    expect(fetch).toHaveBeenCalledWith("/api/bazaar", {});
+    expect(fetch).toHaveBeenCalledWith(`/api/circles/${circleNote.id}`, {});
   });
 });

@@ -12,7 +12,7 @@
         <template #default="{ notebook }">
           <NotebookButtons v-bind="{ notebook, featureToggle }" class="card-header-btn">
             <template #additional-buttons>
-              <BazaarNotebookButtons :notebook="notebook" :user="true" />
+              <BazaarNotebookButtons :notebook="notebook" :user="user" />
             </template>
           </NotebookButtons>
         </template>
@@ -63,8 +63,12 @@ export default {
       circle: null,
       loading: true,
       formErrors: {},
-      polling: null
+      polling: null,
+      user: null,
     };
+  },
+  computed: {
+    user() { return this.$store.getters.getCurrentUser()}
   },
 
   methods: {
@@ -77,11 +81,11 @@ export default {
       )
       .finally(() => this.loading = false)
     },
-    pollData() {
+     pollData() {
       this.polling = setInterval(() => {
-        this.fetchData(false);
-      }, 1000)
-    }
+         this.fetchData();
+        }, 5000);
+    },
   },
 
   computed: {
@@ -98,12 +102,12 @@ export default {
   },
 
   mounted() {
+    this.fetchData();
     this.pollData();
   },
-
-  unmounted () {
-	  clearInterval(this.polling)
-  },
+  unmounted() {
+    clearInterval(this.polling);
+  }
 };
 </script>
 
