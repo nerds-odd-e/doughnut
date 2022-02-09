@@ -12,7 +12,7 @@ Feature: Note edit conflict detection
   @ignore
   Scenario: Edit a note title
     And I open note "LeSS in Action"
-    And Other update note "LeSS in Action" to become
+    When Other update note "LeSS in Action" to become
       | old_title      | title             | description       |
       | LeSS in Action | LeSS Training     | Our best training |
     And I edit note "LeSS in Action" to become:
@@ -26,12 +26,12 @@ Feature: Note edit conflict detection
   @ignore
   Scenario: Edit a note description
     And I open note "Odd-e CSD"
-    And Other update note "Odd-e CSD" to become
-      | old_title      | title             | description       |
+    When Other update note "Odd-e CSD" to become
+      | old_title      | title             | description           |
       | Odd-e CSD      | Odd-e CSD         | Our best training new |
     And I update note "Odd-e CSD" with the description "New description"
     Then I should see alert "Conflict detected, change cannot be saved" in the page
     And I should see these notes belonging to the user at the top level of all my notes
-      | title         | description       |
+      | title         | description           |
       | Odd-e CSD     | Our best training new |
 
