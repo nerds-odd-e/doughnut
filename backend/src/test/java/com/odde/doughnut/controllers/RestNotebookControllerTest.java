@@ -2,9 +2,11 @@ package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -23,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.util.List;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
@@ -52,6 +55,15 @@ class RestNotebookControllerTest {
             userModel = modelFactoryService.toUserModel(null);
             controller = new RestNotebookController(modelFactoryService, new TestCurrentUserFetcher(userModel), testabilitySettings);
             assertThrows(ResponseStatusException.class, () -> controller.myNotebooks());
+        }
+        
+        @Test
+        void whenLoggedIn() {
+            User user = new User();
+            userModel = modelFactoryService.toUserModel(user);
+            List<Notebook> notebooks = userModel.getEntity().getOwnership().getNotebooks();
+            controller = new RestNotebookController(modelFactoryService, new TestCurrentUserFetcher(userModel), testabilitySettings);
+            assertEquals(notebooks, controller.myNotebooks().notebooks);
         }
     }
 
