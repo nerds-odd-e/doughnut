@@ -45,6 +45,12 @@ When("I update note {string} to become:", (noteTitle, data) => {
   cy.inPlaceEdit(data.hashes()[0]);
 });
 
+Given("I update note title {string} to become {string}", (noteTitle, newNoteTitle) => {
+    cy.jumpToNotePage(noteTitle);
+    cy.findByText(noteTitle).click();
+    cy.replaceFocusedText(newNoteTitle);
+});
+
 When("Other update note {string} to become:", (noteTitle, data) => {
     // TODO create testability endpoint to update note title/description
 });
