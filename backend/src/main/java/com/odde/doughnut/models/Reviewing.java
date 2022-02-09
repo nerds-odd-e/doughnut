@@ -57,6 +57,9 @@ public class Reviewing {
                 link = null;
             }
         }
+        if (note != null && note.getDeletedAt() != null) {
+            return null;
+        }
 
         ReviewPoint reviewPoint = new ReviewPoint();
         reviewPoint.setNote(note);

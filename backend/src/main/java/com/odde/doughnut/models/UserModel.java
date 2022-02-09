@@ -83,11 +83,13 @@ public class UserModel implements ReviewScope {
     public List<ReviewPoint> getReviewPointsNeedToRepeat(Timestamp currentUTCTimestamp) {
         final ZoneId timeZone = getTimeZone();
         final Timestamp timestamp = TimestampOperations.alignByHalfADay(currentUTCTimestamp, timeZone);
-        return modelFactoryService.reviewPointRepository
-                .findAllByUserAndNextReviewAtLessThanEqualOrderByNextReviewAt(
-                        getEntity(),
-                        timestamp
-                );
+        List<ReviewPoint> points = modelFactoryService.reviewPointRepository
+        .findAllByUserAndNextReviewAtLessThanEqualOrderByNextReviewAt(
+            getEntity(),
+            timestamp
+        );
+        points.removeIf(point -> point.getNote().getDeletedAt() != null);
+        return points;
     }
 
     int learntCount() {
