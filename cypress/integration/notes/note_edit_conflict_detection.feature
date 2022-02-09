@@ -12,9 +12,9 @@ Feature: Note edit conflict detection
   @ignore
   Scenario: Edit a note title
     And I open note "LeSS in Action"
-    When Other update note "LeSS in Action" to become
-      | old_title      | title             | description       |
-      | LeSS in Action | LeSS Training     | Our best training |
+    When Other update note "LeSS in Action" to become:
+      | title             | description       |
+      | LeSS Training     | An awesome training |
     And I edit note "LeSS in Action" to become:
       | Title     | Description       |
       | Odd-e CSD | Our best training |

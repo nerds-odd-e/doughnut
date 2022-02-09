@@ -34,6 +34,16 @@ Cypress.Commands.add('seedNotes', (notes, externalIdentifier = '') => {
   });
 });
 
+Cypress.Commands.add('editTextContent', (noteId, textContent) => {
+  cy.request({
+    method: 'PATCH',
+    url: `/api/testability/textContent/${noteId}`,
+    body: textContent,
+  }).then((response) => {
+    expect(response.statusCode).to.equal(200);
+  });
+});
+
 Cypress.Commands.add('timeTravelTo', (day, hour) => {
   const travelTo = new Date(1976, 5, 1, hour).addDays(day);
   cy.request({

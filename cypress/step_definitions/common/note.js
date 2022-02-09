@@ -51,8 +51,10 @@ Given("I update note title {string} to become {string}", (noteTitle, newNoteTitl
     cy.replaceFocusedText(newNoteTitle);
 });
 
-When("Other update note {string} to become:", (noteTitle, data) => {
-    // TODO create testability endpoint to update note title/description
+When("Other update note {string} to become:", (noteTitle, textContain) => {
+    cy.get('@seededNoteIdMap').then((noteId) => {
+        cy.editTextContent(noteId[noteTitle], textContain.hashes()[0]);
+    })
 });
 
 When(
@@ -385,8 +387,4 @@ And("I edit note {string} to become:",(noteTitle, mdContent) => {
 
 Then("I should see alert {string} in the page", (alertText) => {
   cy.log(alertText);
-})
-
-When("I do undo", () => {
-  cy.findByTitle("undo note").click();
 })
