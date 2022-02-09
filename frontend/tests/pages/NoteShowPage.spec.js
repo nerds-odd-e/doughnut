@@ -16,7 +16,7 @@ beforeEach(() => {
 });
 
 describe("note show", () => {
-  test("fetch API to be called ONCE", async () => {
+  test("fetch API to be called SIXTH time after 6 seconds", async () => {
     const note = makeMe.aNote.please()
     const stubResponse = {
       notePosition: makeMe.aNotePosition.inCircle('a circle').please(),

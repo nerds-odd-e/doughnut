@@ -46,10 +46,14 @@ export default {
       }).finally(() => this.loading = false);
     },
     pollData() {
-      this.polling = setInterval(() => {
+
+      if(!this.viewTypeObj.fetchAll) {
+        this.polling = setInterval(() => {
+          this.fetchData(false);
+        }, 1000)
+      } else {
         this.fetchData(false);
-      }, 1000)
-      
+      }      
     }
   },
   watch: {
