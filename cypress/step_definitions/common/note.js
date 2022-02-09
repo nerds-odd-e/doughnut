@@ -386,3 +386,7 @@ And("I edit note {string} to become:",(noteTitle, mdContent) => {
 Then("I should see alert {string} in the page", (alertText) => {
   cy.log(alertText);
 })
+
+When("I do undo", () => {
+  cy.findByTitle("undo note").click();
+})

@@ -19,6 +19,8 @@
 
       <NoteEditButton :noteId="note.id" :oldTitle="note.title" />
 
+      <NoteUndoButton />
+
       <LinkNoteButton :note="note" />
 
       <a
@@ -63,6 +65,7 @@ import SvgRemove from "../svgs/SvgRemove.vue";
 import LinkNoteButton from "../links/LinkNoteButton.vue";
 import ReviewSettingEditButton from "../review/ReviewSettingEditButton.vue";
 import NoteEditButton from "./NoteEditButton.vue";
+import NoteUndoButton from "./NoteUndoButton.vue";
 import NoteSplitButton from "./NoteSplitButton.vue";
 import NoteTranslationButton from "./NoteTranslationButton.vue";
 import NoteDownloadButton from "./NoteDownloadButton.vue"
@@ -84,6 +87,7 @@ export default {
     SvgRemove,
     LinkNoteButton,
     NoteEditButton,
+    NoteUndoButton,
     NoteSplitButton,
     NoteTranslationButton,
     NoteNewButton,
