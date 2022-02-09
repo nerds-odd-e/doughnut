@@ -7,8 +7,6 @@
  import store from "../../src/store/index.js";
  import makeMe from "../fixtures/makeMe";
  
- jest.useFakeTimers();
-
  beforeEach(() => {
    fetch.resetMocks();
  });
@@ -38,8 +36,7 @@ describe("circle show page", () => {
     });
 
     await flushPromises();
-    jest.advanceTimersByTime(6000);
-    expect(fetch).toHaveBeenCalledTimes(2);
+    expect(fetch).toHaveBeenCalledTimes(1);
     expect(fetch).toHaveBeenCalledWith(`/api/circles/${circleNote.id}`, {});
   });
 });

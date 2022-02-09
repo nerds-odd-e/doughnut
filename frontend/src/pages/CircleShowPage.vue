@@ -82,9 +82,11 @@ export default {
       .finally(() => this.loading = false)
     },
      pollData() {
-      this.polling = setInterval(() => {
-         this.fetchData();
-        }, 5000);
+      // this.polling = setInterval(() => {
+      //    this.fetchData();
+      //   }, 5000);
+
+        this.fetchData();
     },
   },
 
@@ -103,7 +105,7 @@ export default {
 
   mounted() {
     this.fetchData();
-    this.pollData();
+    // this.pollData();
   },
   unmounted() {
     clearInterval(this.polling);

@@ -9,8 +9,6 @@ import flushPromises from "flush-promises";
 import _ from "lodash";
 import makeMe from "../fixtures/makeMe";
 
-jest.useFakeTimers();
-
 beforeEach(() => {
   fetch.resetMocks();
 });
@@ -27,8 +25,7 @@ describe("note show", () => {
       propsData: { noteId: note.id },
     });
     await flushPromises();
-    jest.advanceTimersByTime(6000);
-    expect(fetch).toHaveBeenCalledTimes(6);
+    expect(fetch).toHaveBeenCalledTimes(1);
     expect(fetch).toHaveBeenCalledWith(`/api/notes/${note.id}`, {});
     await screen.findByText("a circle");
   });
