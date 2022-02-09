@@ -366,3 +366,17 @@ And("the file {string} content is",(fileName, mdContent) => {
   const downloadsFolder = Cypress.config("downloadsFolder");
   cy.readFile(`${downloadsFolder}/${fileName}`).should("eq", mdContent);
 })
+
+And("Other update note {string} to become",(noteTitle, mdContent) => {
+  cy.log(noteTitle);
+  cy.log(mdContent.hashes()[0]);
+})
+
+And("I edit note {string} to become:",(noteTitle, mdContent) => {
+  cy.log(noteTitle);
+  cy.log(mdContent.hashes()[0]);
+})
+
+Then("I should see alert {string} in the page", (alertText) => {
+  cy.log(alertText);
+})
