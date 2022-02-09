@@ -78,7 +78,11 @@ class RestCircleController {
     circleForUserView.setId(circle.getId());
     circleForUserView.setName(circle.getName());
     circleForUserView.setInvitationCode(circle.getInvitationCode());
-    circleForUserView.setNotebooks(circle.getOwnership().getNotebooks());
+
+    List<Notebook> notebooks = circle.getOwnership().getNotebooks();
+    notebooks.removeIf(notebook -> notebook.getDeletedAt() != null);
+    
+    circleForUserView.setNotebooks(notebooks);
     circleForUserView.setMembers(UserForOtherUserView.fromList(circle.getMembers()));
     return circleForUserView;
   }

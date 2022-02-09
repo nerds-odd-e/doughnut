@@ -1,9 +1,11 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.controllers.RestCircleController.CircleForUserView;
 import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.entities.TextContent;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -20,6 +22,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @ExtendWith(SpringExtension.class)
@@ -64,6 +67,28 @@ class RestCircleControllerTest {
 
     @Nested
     class ShowCircle {
+        @Test
+        void itShouldCircleForUserViewIfAuthorized() throws NoAccessRightException {
+            UserModel user = makeMe.aUser().toModelPlease();
+            controller = new RestCircleController(modelFactoryService, new TestCurrentUserFetcher(user), testabilitySettings);
+            
+            Circle circle = makeMe.aCircle().please();
+            circle.setName("Some circle");
+            
+            CircleModel circleModel = modelFactoryService.toCircleModel(circle);
+            circleModel.joinAndSave(user);
+            
+            CircleForUserView expected = new CircleForUserView();
+            expected.setId(circle.getId());
+            expected.setName(circle.getName());
+            expected.setInvitationCode(circle.getInvitationCode());
+
+            CircleForUserView actual = controller.showCircle(circle);
+            
+            assertEquals(expected.getId(), actual.getId());
+            assertEquals(expected.getName(), actual.getName());
+            assertEquals(expected.getInvitationCode(), actual.getInvitationCode());
+        }
 
         @Test
         void itShouldAskToLoginOfVisitorIsNotLogin() {
