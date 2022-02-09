@@ -40,6 +40,7 @@ function withState(state) {
 export default createStore({
   state: () => ({
     notes: {},
+    noteUndoHistories: [],
     currentUser: null,
     featureToggle: false,
     environment: 'production',
@@ -52,12 +53,21 @@ export default createStore({
     getNoteById: (state) => (id) => withState(state).getNoteById(id),
     getChildrenIdsByParentId: (state) => (parentId) => withState(state).getChildrenIdsByParentId(parentId),
     getChildrenOfParentId: (state) => (parentId) => withState(state).getChildrenOfParentId(parentId),
+    addHistory: (state) => (note) => {
+      state.noteUndoHistories.push({...note});
+    },
   },
 
   mutations: {
+    initHistory(state, notes) {
+      notes.forEach((note) => {
+        state.noteUndoHistories = []
+        state.noteUndoHistories.push({...note.textContent});
+      });
+    },
     loadNotes(state, notes) {
       notes.forEach((note) => {
-        state.notes[note.id] = note;
+       state.notes[note.id] = note;
       });
     },
     deleteNote(state, noteId) {

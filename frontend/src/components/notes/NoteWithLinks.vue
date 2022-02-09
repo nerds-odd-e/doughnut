@@ -61,11 +61,12 @@ export default {
     submitChange() {
       this.loading = true
       const textContent = (()=>{
-        if (this.language == Languages.ID) {
+        if (this.language === Languages.ID) {
           return {...this.note.translationTextContent, language: 'idn', };
         }
         return this.note.textContent;
       })();
+      this.$store.getters.addHistory(textContent);
       storedApiUpdateTextContent(this.$store, this.note.id, textContent)
       .then((res) => {
         this.$emit("done");
