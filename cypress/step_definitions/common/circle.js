@@ -80,3 +80,28 @@ When(
     cy.subscribeToNote(noteTitle, count);
   }
 );
+
+And("From circle {string} I create a note {string}", (circleName, noteTitle) => {
+    cy.navigateToCircle(circleName);
+    cy.findByText("Add New Notebook In This Circle").click();
+    cy.submitNoteCreationFormsWith([{Title: noteTitle}]);
+})
+
+When("I am on {string} circle page", (circleName) => {
+    cy.navigateToCircle(circleName);
+})
+
+And("A member {string} of my circle delete the {string}", (member, noteTitle) => {
+    let pathToNoteId = '';
+    cy.get('a.text-decoration-none.card-title')
+        .invoke('attr', 'href')
+        .then(($attr) => {
+            pathToNoteId = $attr;
+            cy.deleteCircleNote(pathToNoteId);
+        })
+})
+
+Then("I should not see {string} in the circle page within 5 seconds after deletion",
+    (noteTitle) => {
+        cy.findByText(noteTitle).should('not.exist');
+    })

@@ -534,3 +534,12 @@ Cypress.Commands.add('submitNoteTranslationFormWith', (noteAttributes) => {
   }
   cy.get('input[value="Update"]').click();
 });
+
+Cypress.Commands.add('deleteCircleNote', (pathToNoteId) => {
+  cy.request({
+    method: 'POST',
+    url: `/api${pathToNoteId.toString()}/delete`,
+  }).then((response) => {
+    expect(response.status).to.equal(200);
+  });
+})
