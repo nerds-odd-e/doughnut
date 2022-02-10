@@ -18,6 +18,8 @@ export default {
   methods: {
     performUndo() {
       this.$store.commit("popUndoHistory", this.noteId);
+      const note = this.$store.getters.getNoteById(this.noteId);
+      console.log(JSON.stringify(note, null, 1));
     }
   }
 };

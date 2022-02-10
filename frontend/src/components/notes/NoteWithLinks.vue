@@ -34,6 +34,7 @@ import NoteShell from "./NoteShell.vue";
 import NoteContent from "./NoteContent.vue";
 import Languages, { TranslatedNoteWrapper } from "../../models/languages";
 import { storedApiUpdateTextContent } from "../../storedApi";
+import storeUndoCommand from "../../storeUndoCommand";
 
 export default {
   name: "NoteWithLinks",
@@ -78,7 +79,7 @@ export default {
         }
         return this.note.textContent;
       })();
-      this.$store.commit("addUndoHistory", {id: this.note.id, textContent});
+      storeUndoCommand.addUndoHistory(this.$store,  {id: this.note.id, textContent: textContent});
       storedApiUpdateTextContent(this.$store, this.note.id, textContent)
       .then((res) => {
         this.$emit("done");
@@ -91,7 +92,7 @@ export default {
     }
   },
   mounted() {
-    this.$store.commit("initUndoHistory", [this.note]);
+    storeUndoCommand.initUndoHistory( this.$store,[this.note]);
   }
 };
 </script>

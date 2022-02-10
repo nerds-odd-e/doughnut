@@ -66,6 +66,9 @@ export default createStore({
     },
     popUndoHistory(state, id) {
       if (state.noteUndoHistories[id].length > 1) state.noteUndoHistories[id].pop();
+      const note = state.notes[id];
+      const histories = state.noteUndoHistories[id];
+      note.textContent = histories[histories.length - 1];
     },
     loadNotes(state, notes) {
       notes.forEach((note) => {
