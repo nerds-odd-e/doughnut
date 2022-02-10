@@ -390,3 +390,7 @@ And("I edit note title {string} to become {string}", (oldTitle, newTitle) => {
 When("I perform undo", () => {
   cy.findByTitle("undo note").click();
 })
+
+And("I should see a toast at the top of my screen", () => {
+  cy.get('.snackbar').should('exist');
+})

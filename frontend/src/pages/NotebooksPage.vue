@@ -20,6 +20,7 @@ import NotebookNewButton from "../components/notebook/NotebookNewButton.vue";
 import NotebookSubscriptionCards from "../components/subscriptions/NotebookSubscriptionCards.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import { restGet } from "../restful/restful";
+import { useSnackbarPlugin } from "snackbar-vue";
 
 export default {
   name: "NotebooksPage",
@@ -42,9 +43,22 @@ export default {
         (res) => (this.notebooksViewedByUser = res)
       ).finally(()=> this.loading = false);
     },
+    showUndoSnackbar() {
+      const snack = useSnackbarPlugin();
+      if(this.$route.query.deletedNoteId) {
+        snack.show({
+          position: 'bottom',
+          text: `Note successfully deleted`,
+          button: 'Undo',
+          action: () => {},
+          time: 5000
+        });
+      }
+    }
   },
   mounted() {
     this.fetchData();
+    this.showUndoSnackbar();
   },
 };
 </script>
