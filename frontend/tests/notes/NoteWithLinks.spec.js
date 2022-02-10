@@ -22,7 +22,12 @@ describe("new/updated pink banner", () => {
     "should show fresher color if recently updated",
     (updatedAt, expectedColor) => {
       const note = makeMe.aNote.textContentUpdatedAt(updatedAt).please();
-      renderWithMockRoute(NoteWithLinks, { props: { note } });
+
+      renderWithStoreAndMockRoute(
+        store,
+        NoteWithLinks,
+        { props: { note } }
+      )
 
       expect(screen.getByRole("title").parentNode).toHaveStyle(
         `border-color: ${expectedColor};`
