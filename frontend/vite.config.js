@@ -22,40 +22,13 @@ export default defineConfig({
     vueJsx(),
   ],
   server: {
-    fs: {
-      strict: false,
-    },
     proxy: {
-      "/api": {
-        target: "http://localhost:9081",
-        changeOrigin: true,
-        ws: true,
-      },
-      "/images": {
-        target: "http://localhost:9081",
-        changeOrigin: true,
-        ws: true,
-      },
-      "/login": {
-        target: "http://localhost:9081",
-        changeOrigin: true,
-        ws: true,
-      },
-      "/logout": {
-        target: "http://localhost:9081",
-        changeOrigin: true,
-        ws: true,
-      },
-      "/users/identify": {
-        target: "http://localhost:9081",
-        changeOrigin: true,
-        ws: true,
-      },
-      "/testability": {
-        target: "http://localhost:9081",
-        changeOrigin: true,
-        ws: true,
-      },
+      "/api": "http://localhost:9081",
+      "/images": "http://localhost:9081",
+      "/login": "http://localhost:9081",
+      "/logout": "http://localhost:9081",
+      "/users/identify": "http://localhost:9081",
+      "/testability": "http://localhost:9081",
     },
   },
   resolve: {
