@@ -40,6 +40,9 @@ export default {
   methods: {
     reset() {
       this.offset = { ... defaultOffset }
+    },
+    onEditing(){
+      this.$emit("on-editing", "onEditing");
     }
   },
   computed: {
@@ -59,6 +62,9 @@ export default {
       return `rotate: ${ (this.offset.rotate * 180 / Math.PI).toFixed(0)}`
     }
   },
+  mounted() {
+    this.onEditing();
+  } 
 };
 </script>
 

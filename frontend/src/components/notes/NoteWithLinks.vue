@@ -64,6 +64,7 @@ export default {
         this.$listeners,
         {
           input: function (event) {
+           
             vm.$emit("on-editing", "onEditing");
           }
         }

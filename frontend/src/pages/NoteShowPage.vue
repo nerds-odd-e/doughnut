@@ -48,15 +48,15 @@ export default {
       }).finally(() => this.loading = false);
     },
     pollData() {
-        if(!this.viewTypeObj.fetchAll) {
+        if(this.viewTypeObj.fetchAll) {
+          this.fetchData(false);
+        } else {
           if (this.pauseFetching){
             if (this.polling)
               this.pausePolling();
           } else {
             this.startPolling();
           }
-        } else {
-          this.fetchData(false);
         }      
       },
     onEditing(value){

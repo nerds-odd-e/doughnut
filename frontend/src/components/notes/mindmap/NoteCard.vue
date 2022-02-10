@@ -32,7 +32,8 @@ export default {
      NoteTitleWithLink },
   computed: {
     highlightClass() {
-      return this.highlightNoteId?.toString() === this.note.id.toString() ? 'highlighted' : '' },
+       return this.highlightNoteId?.toString() === this.note.id.toString() ? 'highlighted' : '' 
+      },
     coord() { return this.mindmap.coord(this.mindmapSector) },
     size() { return this.mindmap.size() },
   },

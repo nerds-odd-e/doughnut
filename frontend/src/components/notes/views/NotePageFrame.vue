@@ -37,7 +37,12 @@ export default {
   },
   components: { NoteControl, NoteMindmapView, Breadcrumb, NoteCardsView, NoteArticleView },
   methods: {
-    highlight(id) { this.highlightNoteId = id},
+    highlight(id) { 
+      this.highlightNoteId = id
+    },
+    onEditing(value){
+      this.$emit("on-editing", value);
+    }
   },
   watch: {
     noteId() {
@@ -46,11 +51,6 @@ export default {
   },
   mounted() {
     this.highlightNoteId = this.noteId
-  },
-  methods:{
-    onEditing(value){
-      this.$emit("on-editing", value);
-    }
   }
 };
 </script>
