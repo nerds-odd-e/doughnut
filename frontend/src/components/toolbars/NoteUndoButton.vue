@@ -1,11 +1,12 @@
 <template>
   <button class="btn btn-small" title="undo note" @click="performUndo()">
-    <SvgUndo />
+    <SvgUndo/>
   </button>
 </template>
 
 <script>
 import SvgUndo from "../svgs/SvgUndo.vue";
+import storeUndoCommand from "../../storeUndoCommand";
 
 export default {
   name: "NoteUndoButton",
@@ -17,9 +18,8 @@ export default {
   },
   methods: {
     performUndo() {
-      this.$store.commit("popUndoHistory", this.noteId);
+      storeUndoCommand.popUndoHistory(this.$store, this.noteId);
       const note = this.$store.getters.getNoteById(this.noteId);
-      console.log(JSON.stringify(note, null, 1));
     }
   }
 };
