@@ -8,6 +8,8 @@
  import flushPromises from "flush-promises";
  import _ from "lodash";
  import makeMe from "../fixtures/makeMe";
+
+ jest.useFakeTimers();
  
  beforeEach(() => {
    fetch.resetMocks();
@@ -20,12 +22,13 @@
        notePosition: makeMe.aNotePosition.inCircle('a circle').please(),
        notes: [ note ]
      };
-     fetch.mockResponseOnce(JSON.stringify(stubResponse));
+     fetch.mockResponse(JSON.stringify(stubResponse));
      renderWithStoreAndMockRoute(store, NoteShowPage, {
        propsData: { noteId: note.id },
      });
      await flushPromises();
-     expect(fetch).toHaveBeenCalledTimes(1);
+     jest.advanceTimersByTime(5000);
+     expect(fetch).toHaveBeenCalledTimes(2);
      expect(fetch).toHaveBeenCalledWith(`/api/notes/${note.id}`, {});
      await screen.findByText("a circle");
    });
