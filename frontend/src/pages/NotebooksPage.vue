@@ -43,14 +43,20 @@ export default {
         (res) => (this.notebooksViewedByUser = res)
       ).finally(()=> this.loading = false);
     },
+    handleUndoDelete(id) {
+      restPatch(`/api/notes/${id}/undo-delete`).then(
+        (res) => this.fetchData()
+      );
+    },
     showUndoSnackbar() {
       const snack = useSnackbarPlugin();
-      if(this.$route.query.deletedNoteId) {
+      const { deletedNoteId } = this.$route.query;
+      if(deletedNoteId) {
         snack.show({
           position: 'bottom',
           text: `Note successfully deleted`,
           button: 'Undo',
-          action: () => {},
+          action: () => this.handleUndoDelete(deletedNoteId),
           time: 5000
         });
       }

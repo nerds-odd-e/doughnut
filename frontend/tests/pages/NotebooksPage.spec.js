@@ -39,4 +39,28 @@ describe("Notebooks Page", () => {
             await screen.findByText("Note successfully deleted");
         }, 500);
     });
+
+    test("call /undo-delete when snackbar button is pressed", async () => {
+        const notebook = makeMe.aNotebook.please()
+        const stubResponse = {
+            notebooks: [notebook],
+            subscriptions: []
+        };
+        const deletedNoteId = '1';
+
+        fetch.mockResponses([
+            JSON.stringify(stubResponse),
+            JSON.stringify({ deletedNoteId })
+        ]);
+        const { wrapper } = renderWithStoreAndMockRoute(store, NotebooksPage, {}, { query: { deletedNoteId } });
+
+        await flushPromises();
+
+        setTimeout(async () => {
+            wrapper.find('.snackbar__action').trigger("click")
+            expect(fetch).toHaveBeenCalledWith('/api/notebooks', {});
+            expect(fetch).toHaveBeenCalledWith(`/api/notes/${deletedNoteId}/undo-delete`);
+        }, 500);
+
+    })
 });

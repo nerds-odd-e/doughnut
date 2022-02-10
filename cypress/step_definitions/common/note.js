@@ -391,6 +391,18 @@ When("I perform undo", () => {
   cy.findByTitle("undo note").click();
 })
 
-And("I should see a toast at the top of my screen", () => {
+And("I should see a toast at the bottom of my screen", () => {
   cy.get('.snackbar').should('exist');
+})
+
+Given("I successfully delete a note", () => {
+  cy.get('.snackbar').should('exist');
+})
+
+When("When I click undo delete on snackbar", () => {
+  cy.get('.snackbar__action').click();
+})
+
+Then("Then the deleted note with title {string} will be restored", (title) => {
+  cy.findByText(title).should('exist');
 })
