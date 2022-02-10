@@ -40,7 +40,7 @@ function withState(state) {
 export default createStore({
   state: () => ({
     notes: {},
-    noteUndoHistories: [],
+    noteUndoHistories: {},
     currentUser: null,
     featureToggle: false,
     environment: 'production',
@@ -53,17 +53,19 @@ export default createStore({
     getNoteById: (state) => (id) => withState(state).getNoteById(id),
     getChildrenIdsByParentId: (state) => (parentId) => withState(state).getChildrenIdsByParentId(parentId),
     getChildrenOfParentId: (state) => (parentId) => withState(state).getChildrenOfParentId(parentId),
-    addHistory: (state) => (note) => {
-      state.noteUndoHistories.push({...note});
-    },
   },
 
   mutations: {
-    initHistory(state, notes) {
+    initUndoHistory(state, notes) {
       notes.forEach((note) => {
-        state.noteUndoHistories = []
-        state.noteUndoHistories.push({...note.textContent});
+        state.noteUndoHistories[note.id] = [{...note.textContent}];
       });
+    },
+    addUndoHistory(state, params) {
+      state.noteUndoHistories[params.id].push({...params.textContent});
+    },
+    popUndoHistory(state, id) {
+      if (state.noteUndoHistories[id].length > 1) state.noteUndoHistories[id].pop();
     },
     loadNotes(state, notes) {
       notes.forEach((note) => {

@@ -12,10 +12,12 @@ export default {
   components: {
     SvgUndo,
   },
-  props: {},
+  props: {
+    noteId: [String, Number]
+  },
   methods: {
     performUndo() {
-        alert('Undo');
+      this.$store.commit("popUndoHistory", this.noteId);
     }
   }
 };

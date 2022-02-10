@@ -396,3 +396,7 @@ Then("I dismissed the alert",() => {
 And("I edit note title {string} to become {string}", (oldTitle, newTitle) => {
   cy.inPlaceEdit({title: newTitle});
 })
+
+When("I perform undo", () => {
+  cy.findByTitle("undo note").click();
+})

@@ -19,7 +19,7 @@
 
       <NoteEditButton :noteId="note.id" :oldTitle="note.title" />
 
-      <NoteUndoButton />
+      <NoteUndoButton :noteId="note.id"/>
 
       <LinkNoteButton :note="note" />
 

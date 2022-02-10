@@ -78,7 +78,7 @@ export default {
         }
         return this.note.textContent;
       })();
-      this.$store.getters.addHistory(textContent);
+      this.$store.commit("addUndoHistory", {id: this.note.id, textContent});
       storedApiUpdateTextContent(this.$store, this.note.id, textContent)
       .then((res) => {
         this.$emit("done");
@@ -90,6 +90,9 @@ export default {
       })
     }
   },
+  mounted() {
+    this.$store.commit("initUndoHistory", [this.note]);
+  }
 };
 </script>
 

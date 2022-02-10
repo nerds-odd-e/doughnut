@@ -12,14 +12,14 @@ Feature: Undo Note Edit
   Scenario: Edit a note title
     And I update note title "LeSS in Action" to become "Odd-e CSD"
     And I should see "Odd-e CSD" in the page
-    When I do undo
+    When I perform undo
     Then I should see "LeSS in Action" in the page
 
   @ignore
   Scenario: Edit a note description
     And I update note description "An awesome training" to become "An superb awesome training"
     And I should see "An superb awesome training" in the page
-    When I do undo
+    When I perform undo
     Then I should see "An awesome training" in the page
 
   @ignore
@@ -28,8 +28,8 @@ Feature: Undo Note Edit
     And I should see "Odd-e CSD" in the page
     And I update note description "An awesome training" to become "An superb awesome training"
     And I should see "An superb awesome training" in the page
-    When I do undo
+    When I perform undo
     Then I should see "An awesome training" in the page
-    When I do undo
+    When I perform undo
     Then I should see "LeSS in Action" in the page
 
