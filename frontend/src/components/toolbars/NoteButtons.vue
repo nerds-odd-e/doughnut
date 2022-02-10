@@ -19,7 +19,7 @@
 
       <NoteEditButton :noteId="note.id" :oldTitle="note.title" />
 
-      <NoteUndoButton :noteId="note.id"/>
+      <NoteUndoButton :noteId="note.id" v-if="featureToggle"/>
 
       <LinkNoteButton :note="note" />
 
