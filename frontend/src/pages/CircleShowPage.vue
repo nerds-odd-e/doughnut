@@ -68,21 +68,21 @@ export default {
   },
 
   methods: {
+    getCircleDataById(circleId) {
+      restGet(`/api/circles/${circleId}`).then((res) => {
+        this.circle = res
+      });
+    },
     fetchData() {
-      this.loading = true
-      restGet(`/api/circles/${this.circleId}`).then(
-        (res) => {
-          this.circle = res
-        }
-      )
-      .finally(() => this.loading = false)
+      this.loading = true;
+      this.getCircleDataById(this.circleId)
+      this.loading = false;
     },
      pollData() {
+      const intervalTime = 5000;
       this.polling = setInterval(() => {
-         restGet(`/api/circles/${this.circleId}`).then((res) => {
-          this.circle = res
-        })
-      }, 5000);
+        this.getCircleDataById(this.circleId)
+      }, intervalTime);
     },
   },
 
@@ -104,7 +104,7 @@ export default {
   },
   unmounted() {
     clearInterval(this.polling);
-  }
+  },
 };
 </script>
 

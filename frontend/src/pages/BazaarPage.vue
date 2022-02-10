@@ -30,23 +30,23 @@ export default {
   },
 
   methods: {
-    fetchData() {
-      this.loading = true
+    getBazaarData() {
       restGet(`/api/bazaar`).then(
         (res) => {
           this.notebooksViewedByUser = res
         }
       )
-      .finally(() => { 
-        this.loading = false;
-      })
+    },
+    fetchData() {
+      this.loading = true
+      this.getBazaarData();
+      this.loading = false;
     },
      pollData() {
+      const intervalTime = 5000;
       this.polling = setInterval(() => {
-        restGet(`/api/bazaar`).then((res) => {
-          this.notebooksViewedByUser = res
-        })
-      }, 5000);
+        this.getBazaarData();
+      }, intervalTime);
     },
   },
   mounted() {
