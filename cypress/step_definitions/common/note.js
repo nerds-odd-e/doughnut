@@ -51,9 +51,9 @@ Given("I update note title {string} to become {string}", (noteTitle, newNoteTitl
     cy.replaceFocusedText(newNoteTitle);
 });
 
-When("Other update note {string} to become:", (noteTitle, textContain) => {
+And("Other person update note {string} to become:", (noteTitle, textContain) => {
     cy.get('@seededNoteIdMap').then((noteId) => {
-        cy.editTextContent(noteId[noteTitle], textContain.hashes()[0]);
+        cy.updateTextContent(noteId[noteTitle], textContain.hashes()[0]);
     })
 });
 
@@ -373,16 +373,6 @@ Then("I should not see translation outdated tag", (messageContent) => {
 And("the file {string} content is",(fileName, mdContent) => {
   const downloadsFolder = Cypress.config("downloadsFolder");
   cy.readFile(`${downloadsFolder}/${fileName}`).should("eq", mdContent);
-})
-
-And("Other update note {string} to become",(noteTitle, mdContent) => {
-  cy.log(noteTitle);
-  cy.log(mdContent.hashes()[0]);
-})
-
-And("I edit note {string} to become:",(noteTitle, mdContent) => {
-  cy.log(noteTitle);
-  cy.log(mdContent.hashes()[0]);
 })
 
 Then("I should see alert {string} in the page", (alertText) => {

@@ -34,7 +34,7 @@ Cypress.Commands.add('seedNotes', (notes, externalIdentifier = '') => {
   });
 });
 
-Cypress.Commands.add('editTextContent', (noteId, textContent) => {
+Cypress.Commands.add('updateTextContent', (noteId, textContent) => {
   cy.request({
     method: 'PATCH',
     url: `/api/testability/textContent/${noteId}`,
