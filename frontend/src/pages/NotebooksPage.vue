@@ -19,7 +19,7 @@ import NotebookViewCards from "../components/notebook/NotebookViewCards.vue";
 import NotebookNewButton from "../components/notebook/NotebookNewButton.vue";
 import NotebookSubscriptionCards from "../components/subscriptions/NotebookSubscriptionCards.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
-import { restGet } from "../restful/restful";
+import { restGet, restPatch } from "../restful/restful";
 import { useSnackbarPlugin } from "snackbar-vue";
 
 export default {
