@@ -98,11 +98,13 @@ export default {
       this.fetchData();
     },
   },
-
   mounted() {
     this.fetchData();
     this.pollData();
   },
+  unmounted() {
+    clearInterval(this.polling);
+  }
 };
 </script>
 

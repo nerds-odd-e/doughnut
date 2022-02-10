@@ -1,6 +1,6 @@
 <template>
   <div class="container" v-if="note">
-    <NoteWithLinks v-bind="{ note, language }"/>
+    <NoteWithLinks v-bind="{ note, language }" @on-editing="onEditing"/>
     <NoteStatisticsButton :noteId="noteId" />
     <Cards v-if="expandChildren" :notes="children"/>
   </div>
@@ -33,5 +33,10 @@ export default {
       return this.$store.getters.getChildrenOfParentId(this.noteId);
     },
   },
+  methods:{
+    onEditing(value){
+      this.$emit("on-editing", value);
+    }
+  }
 };
 </script>

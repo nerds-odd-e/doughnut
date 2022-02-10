@@ -6,7 +6,8 @@
         notePosition,
         viewType,
         expandChildren: true,
-        noteComponent: viewTypeObj.noteComponent}"/>
+        noteComponent: viewTypeObj.noteComponent}"
+      @on-editing="onEditing" />
 
   </LoadingPage>
 </template>
@@ -24,6 +25,8 @@ export default {
     return {
       notePosition: null,
       loading: true,
+      pauseFetching: false,
+      polling: null
     };
   },
   components: { LoadingPage, NotePageFrame },
@@ -33,8 +36,8 @@ export default {
     }
   },
   methods: {
-    fetchData() {
-      this.loading = true
+    fetchData(loading) {
+      this.loading = loading ?? true;
       const storedApiCall = this.viewTypeObj.fetchAll ?
                               storedApiGetNoteWithDescendents :
                               storedApiGetNoteAndItsChildren
@@ -44,17 +47,52 @@ export default {
         this.notePosition = res.notePosition;
       }).finally(() => this.loading = false);
     },
+    pollData() {
+        if(!this.viewTypeObj.fetchAll) {
+          if (this.pauseFetching){
+            if (this.polling)
+              this.pausePolling();
+          } else {
+            this.startPolling();
+          }
+        } else {
+          this.fetchData(false);
+        }      
+      },
+    onEditing(value){
+      if (value==="onEditing"){
+        this.pauseFetching = true;
+        this.pausePolling();
+      }
+      else{
+        this.pauseFetching = false;
+        this.startPolling();
+      }
+      
+    },
+    startPolling() {
+      this.polling=setInterval(() => {
+        this.fetchData(false);
+      }, 2000);
+    },
+    pausePolling() {
+      clearInterval(this.polling);
+    }
   },
   watch: {
     noteId() {
-      this.fetchData();
+      this.fetchData(this.loading);
     },
     viewType() {
-      this.fetchData();
+      this.fetchData(this.loading);
     },
   },
   mounted() {
-    this.fetchData();
+    this.pollData();
   },
+  unmounted() {
+    clearInterval(this.polling);
+  }
 };
+
 </script>

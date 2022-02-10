@@ -8,6 +8,7 @@
         <component :is="noteComponent" 
           v-bind="{noteId, highlightNoteId, expandChildren, language}"
           @highlight="highlight"
+          @on-editing="onEditing"
         />
       </div>
     </div>
@@ -46,5 +47,10 @@ export default {
   mounted() {
     this.highlightNoteId = this.noteId
   },
+  methods:{
+    onEditing(value){
+      this.$emit("on-editing", value);
+    }
+  }
 };
 </script>

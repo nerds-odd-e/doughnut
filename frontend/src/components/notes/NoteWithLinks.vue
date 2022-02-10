@@ -6,7 +6,7 @@
     <NoteFrameOfLinks v-bind="{ links: note.links }">
       <EditableText role="title" class="note-title"
         :multipleLine="false"
-        scopeName="note" v-model="translatedNote.title" @blur="submitChange"
+        scopeName="note" v-model="translatedNote.title"  v-on="inputListeners"   @blur="submitChange"
       />
       <span 
         role="outdated-tag" 
@@ -22,7 +22,7 @@
       >
         No translation available
       </p>
-      <NoteContent v-bind="{ note, language }" @blur="submitChange"/>
+      <NoteContent v-bind="{ note, language }" v-on="inputListeners"  @blur="submitChange" />
     </NoteFrameOfLinks>
   </NoteShell>
 </template>
@@ -52,10 +52,22 @@ export default {
       formErrors: {},
     };
   },
+  emits:['on-editing'],
   computed: {
     translatedNote(){
       return new TranslatedNoteWrapper(this.note, this.language);
     },
+    inputListeners: function () {
+      var vm = this;
+      return Object.assign({},
+        this.$listeners,
+        {
+          input: function (event) {
+            vm.$emit("on-editing", "onEditing");
+          }
+        }
+      )
+    }
   },
   methods: {
     submitChange() {
@@ -72,7 +84,10 @@ export default {
         this.$emit("done");
       })
       .catch((res) => (this.formErrors = res))
-      .finally(() => this.loading = false)
+      .finally(() => { 
+        this.loading = false;
+        this.$emit("on-editing", "onNotEditing");
+      })
     }
   },
 };
