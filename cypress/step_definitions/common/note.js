@@ -399,10 +399,10 @@ Given("I successfully delete a note", () => {
   cy.get('.snackbar').should('exist');
 })
 
-When("When I click undo delete on snackbar", () => {
+When("I click undo delete on snackbar", () => {
   cy.get('.snackbar__action').click();
 })
 
-Then("Then the deleted note with title {string} will be restored", (title) => {
+Then("the deleted note with title {string} will be restored", (title) => {
   cy.findByText(title).should('exist');
 })

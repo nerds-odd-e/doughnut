@@ -88,7 +88,7 @@ public class UserModel implements ReviewScope {
             getEntity(),
             timestamp
         );
-        points.removeIf(point -> point.getNote().getDeletedAt() != null);
+        points.removeIf(point -> point.getNote() != null && point.getNote().getDeletedAt() != null);
         return points;
     }
 

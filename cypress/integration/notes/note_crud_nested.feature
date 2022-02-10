@@ -59,4 +59,4 @@ Feature: Nested Note CRUD
   Scenario: Undo delete a note
     Given I successfully delete a note
     When I click undo delete on snackbar
-    Then the notebook list will refresh
+    Then the deleted note with title "LeSS in Action" will be restored
