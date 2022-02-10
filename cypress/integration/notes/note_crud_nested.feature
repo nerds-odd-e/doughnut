@@ -50,14 +50,12 @@ Feature: Nested Note CRUD
       | title     | description       |
       | Odd-e CSD | Our best training |
 
-  @featureToggle
   Scenario: Delete a note
     Given I initial review "LeSS in Action"
     When I delete top level note "LeSS in Action"
     Then I should not see note "LeSS in Action" at the top level of all my notes
     And I should see a toast at the bottom of my screen
 
-  @ignore
   Scenario: Undo delete a note
     Given I successfully delete a note
     When I click undo delete on snackbar

@@ -194,6 +194,21 @@ class RestNoteControllerTests {
     }
 
     @Nested
+    class UndoDeleteNoteTest {
+        @Test
+        void shouldUndoDeleteTheNote() throws NoAccessRightException {
+            Note note = makeMe.aNote().byUser(userModel).please();
+            makeMe.refresh(note);
+
+            controller.deleteNote(note);
+            Integer response = controller.undoDeleteNote(note);
+
+            assertEquals(note.getId(), response);
+            assertNull(modelFactoryService.findNoteById(note.getId()).get().getDeletedAt());
+        }
+    }
+
+    @Nested
     class SplitNoteTest {
         @Test
         void shouldDoNothingWhenSplittingNodesWithoutDescription() throws NoAccessRightException {

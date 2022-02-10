@@ -14,18 +14,26 @@ public class NoteModel {
         this.modelFactoryService = modelFactoryService;
     }
 
-    public void destroy() {
-        entity.traverseBreadthFirst(child -> modelFactoryService.toNoteModel(child).destroy());
-
-        Timestamp now = new Timestamp(System.currentTimeMillis());
-        
+    private void updateDeletedAt(Timestamp time) {
         if (entity.getNotebook() != null) {
             if (entity.getNotebook().getHeadNote() == entity) {        
-                entity.getNotebook().setDeletedAt(now);
+                entity.getNotebook().setDeletedAt(time);
                 modelFactoryService.notebookRepository.save(entity.getNotebook());
             }
         }
-        entity.setDeletedAt(now);
+        entity.setDeletedAt(time);
         modelFactoryService.noteRepository.save(entity);
+    }
+    
+    public void destroy() {
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+
+        entity.traverseBreadthFirst(child -> modelFactoryService.toNoteModel(child).destroy());
+        updateDeletedAt(now);
+    }
+    
+    public void restore() {
+        entity.traverseBreadthFirst(child -> modelFactoryService.toNoteModel(child).restore());
+        updateDeletedAt(null);
     }
 }

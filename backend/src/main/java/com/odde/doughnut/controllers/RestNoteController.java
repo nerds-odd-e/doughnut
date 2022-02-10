@@ -131,6 +131,14 @@ class RestNoteController {
         return note.getId();
     }
 
+    @PatchMapping(value = "/{note}/undo-delete")
+    @Transactional
+    public Integer undoDeleteNote(@PathVariable("note") Note note) throws NoAccessRightException {
+        currentUserFetcher.getUser().getAuthorization().assertAuthorization(note);
+        modelFactoryService.toNoteModel(note).restore();
+        return note.getId();
+    }
+
     @GetMapping("/{note}/review-setting")
     public ReviewSetting editReviewSetting(Note note) {
         ReviewSetting reviewSetting = note.getMasterReviewSetting();

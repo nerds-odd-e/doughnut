@@ -30,11 +30,6 @@ export default {
     NotebookSubscriptionCards,
     NotebookNewButton,
   },
-  computed: {
-    featureToggle() {
-      return this.$store.getters.getFeatureToggle();
-    },
-  },
   data() {
     return {
       loading: false,
@@ -69,9 +64,7 @@ export default {
   },
   mounted() {
     this.fetchData();
-    if(this.featureToggle) {
-      this.showUndoSnackbar();
-    }
+    this.showUndoSnackbar();
   },
 };
 </script>
