@@ -25,7 +25,6 @@ export default {
     return {
       notePosition: null,
       loading: true,
-      pauseFetching: false,
       polling: null
     };
   },
@@ -36,9 +35,9 @@ export default {
     }
   },
   methods: {
-    fetchData(loading) {
+    fetchData(loading, fetchAll) {
       this.loading = loading ?? true;
-      const storedApiCall = this.viewTypeObj.fetchAll ?
+      const storedApiCall = fetchAll ?
                               storedApiGetNoteWithDescendents :
                               storedApiGetNoteAndItsChildren
 
@@ -47,32 +46,24 @@ export default {
         this.notePosition = res.notePosition;
       }).finally(() => this.loading = false);
     },
-    pollData() {
-        if(this.viewTypeObj.fetchAll) {
-          this.fetchData(false);
-        } else {
-          if (this.pauseFetching){
-            if (this.polling)
-              this.pausePolling();
-          } else {
-            this.startPolling();
-          }
-        }      
+    pollData(fetchAll) {
+        if(fetchAll) {
+          this.fetchData(false,fetchAll);
+          return;
+        }  
+        this.startPolling();                    
       },
     onEditing(value){
       if (value==="onEditing"){
-        this.pauseFetching = true;
         this.pausePolling();
       }
       else{
-        this.pauseFetching = false;
         this.startPolling();
       }
-      
     },
     startPolling() {
       this.polling=setInterval(() => {
-        this.fetchData(false);
+        this.fetchData(false,this.viewTypeObj.fetchAll);
       }, 2000);
     },
     pausePolling() {
@@ -81,14 +72,14 @@ export default {
   },
   watch: {
     noteId() {
-      this.fetchData(this.loading);
+      this.fetchData(this.loading,this.viewTypeObj.fetchAll);
     },
     viewType() {
-      this.fetchData(this.loading);
+      this.fetchData(this.loading,this.viewTypeObj.fetchAll);
     },
   },
   mounted() {
-    this.pollData();
+    this.pollData(this.viewTypeObj.fetchAll);
   },
   unmounted() {
     clearInterval(this.polling);
