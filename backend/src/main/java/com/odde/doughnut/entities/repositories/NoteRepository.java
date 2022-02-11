@@ -38,6 +38,7 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
             + "   ON note.master_review_setting_id = rs.id "
             + " WHERE note.skip_review IS FALSE "
             + "   AND rp.id IS NULL "
+            + "   AND note.deleted_at IS NULL "
             + "ORDER BY level, note.created_at ";
 
     String byOwnershipWhereThereIsNoReviewPoint = "JOIN notebook ON notebook.id = note.notebook_id "

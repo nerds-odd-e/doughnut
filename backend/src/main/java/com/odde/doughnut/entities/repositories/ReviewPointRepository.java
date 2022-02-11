@@ -14,7 +14,7 @@ import java.util.List;
 public interface ReviewPointRepository extends CrudRepository<ReviewPoint, Integer> {
     List<ReviewPoint> findAllByUserAndInitialReviewedAtGreaterThan(User user, Timestamp since);
 
-    @Query( value = "SELECT count(*) " + byUser, nativeQuery = true)
+    @Query( value = "SELECT count(*) " + byUserAndNotDeleted, nativeQuery = true)
     int countByUserNotRemoved(@Param("user") User user);
 
     @Query( value = "SELECT * " + byUser + " AND rp.next_review_at <= :nextReviewAt ORDER BY rp.next_review_at", nativeQuery = true)
@@ -30,6 +30,12 @@ public interface ReviewPointRepository extends CrudRepository<ReviewPoint, Integ
 
     String byUser = " FROM review_point rp "
             + " WHERE rp.user_id = :user "
+            + "   AND rp.removed_from_review IS FALSE ";
+    
+    String byUserAndNotDeleted = " FROM review_point rp "
+            + " JOIN note ON rp.note_id = note.id"
+            + " WHERE rp.user_id = :user "
+            + " AND note.deleted_at IS NULL "
             + "   AND rp.removed_from_review IS FALSE ";
 
 }
