@@ -1,11 +1,11 @@
 import { createApp } from 'vue';
 import { createRouter, createWebHistory } from 'vue-router';
+import { SnackbarPlugin } from 'snackbar-vue';
 import DoughnutApp from './DoughnutApp.vue';
 import store from './store';
 import routes from './routes/routes';
 import 'bootstrap/scss/bootstrap.scss';
 import 'bootstrap';
-import { SnackbarPlugin } from 'snackbar-vue';
 import "snackbar-vue/dist/snackbar-vue.common.css";
 
 const router = createRouter({
