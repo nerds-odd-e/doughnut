@@ -51,7 +51,13 @@ Given("I update note title {string} to become {string}", (noteTitle, newNoteTitl
     cy.replaceFocusedText(newNoteTitle);
 });
 
-And("Other person update note {string} to become:", (noteTitle, textContain) => {
+Given("I update note {string} description from {string} to become {string}",
+    (noteTitle, noteDescription, newNoteDescription) => {
+      cy.findByText(noteDescription).click({force: true});
+      cy.replaceFocusedText(newNoteDescription);
+    });
+
+When("Other person update note {string} to become:", (noteTitle, textContain) => {
     cy.get('@seededNoteIdMap').then((noteId) => {
         cy.updateTextContent(noteId[noteTitle], textContain.hashes()[0]);
     })

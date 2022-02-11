@@ -5,8 +5,8 @@ Feature: Undo Note Edit
   Background:
     Given I've logged in as an existing user
     And there are some notes for the current user
-      | title          | testingParent  | description         |
-      | LeSS in Action |                | An awesome training |
+      | title          | testingParent | description         |
+      | LeSS in Action |               | An awesome training |
 
   @ignore
   Scenario: Edit a note title
@@ -17,8 +17,8 @@ Feature: Undo Note Edit
 
   @ignore
   Scenario: Edit a note description
-    And I update note description "An awesome training" to become "An superb awesome training"
-    And I should see "An superb awesome training" in the page
+    And I update note "LeSS in Action" description from "An awesome training" to become "A super awesome training"
+    And I should see "A super awesome training" in the page
     When I perform undo
     Then I should see "An awesome training" in the page
 
@@ -26,10 +26,9 @@ Feature: Undo Note Edit
   Scenario: Edit a note title and edit description
     And I update note title "LeSS in Action" to become "Odd-e CSD"
     And I should see "Odd-e CSD" in the page
-    And I update note description "An awesome training" to become "An superb awesome training"
-    And I should see "An superb awesome training" in the page
+    And I update note "Odd-e CSD" description from "An awesome training" to become "A super awesome training"
+    And I should see "A super awesome training" in the page
     When I perform undo
     Then I should see "An awesome training" in the page
     When I perform undo
     Then I should see "LeSS in Action" in the page
-

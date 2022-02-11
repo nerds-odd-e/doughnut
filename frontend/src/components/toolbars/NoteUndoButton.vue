@@ -7,6 +7,7 @@
 <script>
 import SvgUndo from "../svgs/SvgUndo.vue";
 import storeUndoCommand from "../../storeUndoCommand";
+import {storedApiUpdateTextContent} from "../../storedApi";
 
 export default {
   name: "NoteUndoButton",
@@ -20,6 +21,10 @@ export default {
     performUndo() {
       storeUndoCommand.popUndoHistory(this.$store, this.noteId);
       const note = this.$store.getters.getNoteById(this.noteId);
+      storedApiUpdateTextContent(this.$store, this.noteId, note.textContent)
+      .then((res) => {
+        this.$emit("done");
+      })
     }
   }
 };
