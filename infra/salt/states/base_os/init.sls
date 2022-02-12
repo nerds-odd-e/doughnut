@@ -45,10 +45,10 @@ doughnut-app-deps:
         - cmd: os-dist-upgrade
         - cmd: doughnut-jre
         - file: /etc/profile.d/doughnut_env.sh
-zulu17.32.13-ca-jre17.0.2-linux_amd64.deb:
+zulu{{ pillar['doughnut_app']['jre_version'] }}-linux_amd64.deb:
   file.managed:
-    - name: /tmp/zulu17.32.13-ca-jre17.0.2-linux_amd64.deb
-    - source: https://cdn.azul.com/zulu/bin/zulu17.32.13-ca-jre17.0.2-linux_amd64.deb
+    - name: /tmp/zulu{{ pillar['doughnut_app']['jre_version'] }}-linux_amd64.deb
+    - source: https://cdn.azul.com/zulu/bin/zulu{{ pillar['doughnut_app']['jre_version'] }}-linux_amd64.deb
     - skip_verify: True
     - require_in:
         - cmd: install-jre
@@ -56,13 +56,13 @@ zulu17.32.13-ca-jre17.0.2-linux_amd64.deb:
 
 install-jre:
   cmd.run:
-    - name: apt-get install -y /tmp/zulu17.32.13-ca-jre17.0.2-linux_amd64.deb
+    - name: apt-get install -y /tmp/zulu{{ pillar['doughnut_app']['jre_version'] }}-linux_amd64.deb
     - require_in:
         - cmd: doughnut-jre
 
 doughnut-jre:
   cmd.run:
-    - name: update-alternatives --set java /usr/lib/jvm/zre-17-amd64/bin/java
+    - name: update-alternatives --set java {{ pillar['doughnut_app']['java_home'] }}/bin/java
 
 os-dist-upgrade:
   cmd.run:
