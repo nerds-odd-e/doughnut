@@ -47,12 +47,12 @@ git secret killperson <user_to_be_removed_email>@odd-e.com
 
 - `git secret list`
 
-#### Remove a git-secret file from git-secret management (make sure you reveal/decrypt it before doing this!!!)
+### 8. Remove a git-secret file from git-secret management (make sure you reveal/decrypt it before doing this!!!)
 
 - Just remove file from git-secret management but leaves it on the filesystem: `git secret remove <your__no_longer_secret_file>`
 - Remove an encrypted file from git-secret management and permanently delete it from filesystem (make sure you have revealed/decrypted the file): `git secret remove -c <your_no_longer_secret_file>`
 
-### 8. Reveal all git-secret managed encrypted files
+### 9. Reveal all git-secret managed encrypted files
 
 - Upon hitting `enter/return` for each decrypt command below, enter secret passphrase you used when you generated your GnuPG key-pair.
 - Decrypt secrets to local filesystem: `git secret reveal`

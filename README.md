@@ -71,7 +71,7 @@ To manually walk-thru the install process - see Step 2 below.
 ### 4. Setup and run doughnut with migrations in 'E2E' profile (backend app started on port 9081)
 
 ```bash
-./gradlew bootRunE2E
+yarn sut
 ```
 
 - Rerun it each time you reset the database.
@@ -81,7 +81,7 @@ To manually walk-thru the install process - see Step 2 below.
 - From doughnut source root directory:
 
 ```bash
-yarn && yarn backend:test
+yarn backend:test
 ```
 
 ### 5. End-to-End Test / Features / Cucumber / SbE / ATDD
@@ -114,13 +114,13 @@ We use cucumber + cypress + Javascript library to do end to end test.
 
 #### How-to
 
-The Cypress+Cucumber tests are written in JavaScript.
+The Cypress+Cucumber tests are in JavaScript/TypeScript.
 
 [cypress](https://docs.cypress.io/guides/getting-started/writing-your-first-test#Add-a-test-file) + [cypress-cucumber-preprocessor](https://github.com/TheBrainFamily/cypress-cucumber-preprocessor)
 
 ### 6. [Vue3 web-app frontend](https://flutter.dev/docs/get-started/web)
 
-We chose Vue3 + Vite to build our light frontend.
+We chose Vue3 + Vite to build our frontend.
 
 #### How-to
 
@@ -132,11 +132,11 @@ From `doughnut` source root directory
 yarn frontend:test
 ```
 
-##### Build & Bundle Vue3 frontend web-app assets and startup backend app (backend app started on port 8081)
+##### Build & Bundle Vue3 frontend web-app assets and startup backend app (doughnut webapp will launch on port 9081).
 
 ```bash
 yarn frontend:build
-./gradlew bootRun
+yarn sut
 ```
 
 Expect to find minified and uglified web bundle assets in `backend/src/main/resources/static` directory:
