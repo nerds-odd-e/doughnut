@@ -29,7 +29,7 @@ For more background info you can read:
 ## Technology Stack
 
 - [Nix](https://nixos.org/)
-- [Zulu OpenJDK 17](https://docs.azul.com/core/zulu-openjdk/release-notes/october-2021)
+- [Zulu OpenJDK 17](https://docs.azul.com/core/zulu-openjdk/release-notes/january-2022)
 - [Spring Boot](https://spring.io/projects/spring-boot)
 - [Flyway](https://flywaydb.org)
 - [Gradle](https://gradle.org/)
