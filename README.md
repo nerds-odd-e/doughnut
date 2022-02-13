@@ -62,13 +62,9 @@ From the root of doughnut directory:
 ./setup-doughnut-dev.sh
 ```
 
-To manually walk-thru the install process - see Step 2 below.
+If you hit problems with the above quick-start setup, you should manually walk-through the [local development environment nix setup](./docs/nix.md).
 
-### 2. [Local development environment with nix](./docs/nix.md)
-
-### 3. [Cloud IDE development environment with Gitpod.io](./docs/gitpod.md)
-
-### 4. Setup and run doughnut with migrations in 'E2E' profile (backend app started on port 9081)
+### 2. Setup and run doughnut with migrations in 'E2E' profile (backend app started on port 9081)
 
 ```bash
 yarn sut
@@ -84,7 +80,7 @@ yarn sut
 yarn backend:test
 ```
 
-### 5. End-to-End Test / Features / Cucumber / SbE / ATDD
+### 3. End-to-End Test / Features / Cucumber / SbE / ATDD
 
 We use cucumber [Gherkin](https://cucumber.io/docs/gherkin/) + cypress (test driver) Javascript/Typescript framework to drive the end to end test suite.
 
@@ -116,7 +112,7 @@ The Cypress+Cucumber tests are in JavaScript/TypeScript.
 | cypress config   | `cypress/config/*.json`                     |
 | cypress plugins  | `cypress/plugins/index.js`                  |
 
-### 6. [Vue3 web-app frontend](https://flutter.dev/docs/get-started/web)
+### 4. [Vue3 web-app frontend](https://flutter.dev/docs/get-started/web)
 
 We chose Vue3 + Vite to build our frontend.
 
@@ -155,6 +151,6 @@ Expect to find minified and uglified web bundle assets in `backend/src/main/reso
 1 directory, 6 files
 ```
 
-### 7. [Production environment](./docs/prod_env.md)
+### 5. [Production environment](./docs/prod_env.md)
 
-### 8. [Doughnut source code secrets management](./docs/secrets_management.md)
+### 6. [Doughnut source code secrets management](./docs/secrets_management.md)
