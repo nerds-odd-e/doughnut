@@ -86,9 +86,13 @@ yarn backend:test
 
 ### 5. End-to-End Test / Features / Cucumber / SbE / ATDD
 
-We use cucumber + cypress + Javascript library to do end to end test.
+We use cucumber [Gherkin](https://cucumber.io/docs/gherkin/) + cypress (test driver) Javascript/Typescript framework to drive the end to end test suite.
 
 - [Cucumber](https://cucumber.io/)
+
+The Cypress+Cucumber tests are in JavaScript/TypeScript.
+
+[cypress](https://docs.cypress.io/guides/getting-started/writing-your-first-test#Add-a-test-file) + [cypress-cucumber-preprocessor](https://github.com/TheBrainFamily/cypress-cucumber-preprocessor)
 
 #### Commands
 
@@ -111,12 +115,6 @@ We use cucumber + cypress + Javascript library to do end to end test.
 | test fixtures    | `cypress/fixtures/*.*`                      |
 | cypress config   | `cypress/config/*.json`                     |
 | cypress plugins  | `cypress/plugins/index.js`                  |
-
-#### How-to
-
-The Cypress+Cucumber tests are in JavaScript/TypeScript.
-
-[cypress](https://docs.cypress.io/guides/getting-started/writing-your-first-test#Add-a-test-file) + [cypress-cucumber-preprocessor](https://github.com/TheBrainFamily/cypress-cucumber-preprocessor)
 
 ### 6. [Vue3 web-app frontend](https://flutter.dev/docs/get-started/web)
 
