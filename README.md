@@ -54,11 +54,21 @@ For more background info you can read:
 
 ## Getting started
 
-### 1. [Local development environment with nix](./docs/nix.md)
+### 1. Quick Start - doughnut development environment setup
 
-### 2. [Cloud IDE development environment with Gitpod.io](./docs/gitpod.md)
+From the root of doughnut directory:
 
-### 3. Setup and run doughnut with migrations in 'E2E' profile (backend app started on port 9081)
+```bash
+./setup-doughnut-dev.sh
+```
+
+To manually walk-thru the install process - see Step 2 below.
+
+### 2. [Local development environment with nix](./docs/nix.md)
+
+### 3. [Cloud IDE development environment with Gitpod.io](./docs/gitpod.md)
+
+### 4. Setup and run doughnut with migrations in 'E2E' profile (backend app started on port 9081)
 
 ```bash
 ./gradlew bootRunE2E
@@ -74,7 +84,7 @@ For more background info you can read:
 yarn && yarn backend:test
 ```
 
-### 4. End-to-End Test / Features / Cucumber / SbE / ATDD
+### 5. End-to-End Test / Features / Cucumber / SbE / ATDD
 
 We use cucumber + cypress + Javascript library to do end to end test.
 
@@ -108,7 +118,7 @@ The Cypress+Cucumber tests are written in JavaScript.
 
 [cypress](https://docs.cypress.io/guides/getting-started/writing-your-first-test#Add-a-test-file) + [cypress-cucumber-preprocessor](https://github.com/TheBrainFamily/cypress-cucumber-preprocessor)
 
-### 5. [Vue3 web-app frontend](https://flutter.dev/docs/get-started/web)
+### 6. [Vue3 web-app frontend](https://flutter.dev/docs/get-started/web)
 
 We chose Vue3 + Vite to build our light frontend.
 
@@ -147,126 +157,6 @@ Expect to find minified and uglified web bundle assets in `backend/src/main/reso
 1 directory, 6 files
 ```
 
-### 6. Interacting with gcloud CLI for cloud infrastructure management
+### 7. [Production environment](./docs/prod_env.md)
 
-- [Install `Google Cloud SDK`](https://cloud.google.com/sdk/docs/install)
-- [Create App Server in GCloud Compute](infra/scripts/create-gcloud-app-compute.sh)
-- Login to gcloud sdk: `gcloud auth login`
-- Check your login: `gcloud auth list`
-- Set/Point to gcloud dough project: `gcloud config set project carbon-syntax-298809`
-- Check you can see the project as login user: `gcloud config list`
-
-### 7. View/tail GCP VM instance logs
-
-```bash
-gcloud auth login
-gcloud config set project carbon-syntax-298809
-# Query GCP MIG instance/s health state and grep instance id of each GCP VM in MIG
-infra/scripts/check-mig-doughnut-app-service-health.sh
-# Expected output
-# ❯ ./check-mig-doughnut-app-service-health.sh
-# ---
-# backend: https://www.googleapis.com/compute/v1/projects/carbon-syntax-298809/zones/us-east1-b/instanceGroups/doughnut-app-group
-# status:
-#  healthStatus:
-#  - healthState: HEALTHY
-#    instance: https://www.googleapis.com/compute/v1/projects/carbon-syntax-298809/zones/us-east1-b/instances/doughnut-app-group-0c2b
-#    ipAddress: 10.142.0.7
-#    port: 8081
-#  - healthState: HEALTHY
-#    instance: https://www.googleapis.com/compute/v1/projects/carbon-syntax-298809/zones/us-east1-b/instances/doughnut-app-group-2j9f
-#    ipAddress: 10.142.0.8
-#    port: 8081
-#  kind: compute#backendServiceGroupHealth
-
-# View instance logs - Take/use one of the above healthcheck report instance id for next command (e.g. doughnut-app-group-2j9f)
-infra/scripts/view-mig-doughnut-app-instance-logs.sh doughnut-app-group-2j9f
-
-# Tail instance logs - Take/use one of the above healthcheck report instance id for next command (e.g. doughnut-app-group-2j9f)
-infra/scripts/tail-mig-doughnut-app-instance-logs.sh doughnut-app-group-2j9f
-```
-
-### 8. Building/refreshing doughnut-app MIG VM instance/s base image with Packer + GoogleCompute builder
-
-We use packer + googlecompute builder + shell provisioner to construct and materialise base VM image to speed up deployment and control our OS patches and dependent packages and libraries upgrades
-
-- [Packer](https://www.packer.io)
-- [packer googlecompute builder](https://www.packer.io/docs/builders/googlecompute)
-- [SaltStack](https://docs.saltproject.io/en/latest/)
-
-#### How-to
-
-From `infra` directory, run the following:
-
-Login to dough GCP project account with `gcloud auth login`
-Configure gcloud CLI to project ID with `gcloud config set project carbon-syntax-298809`
-
-```bash
-cd infra
-export GCLOUDSDK_CORE_PROJECT="$(gcloud config get-value project)"
-export GOOGLE_APPLICATION_CREDENTIALS=$(pwd)/carbon-syntax-298809-f31377ba77a9.json
-PACKER_LOG=1 packer build packer.json
-```
-
-Expect to see following log line towards end of Packer build stdout log:
-`--> googlecompute: A disk image was created: doughnut-debian10-mysql80-base-saltstack`
-
-### 9. Secrets via [git-secret](https://git-secret.io) and [GnuPG](https://www.devdungeon.com/content/gpg-tutorial)
-
-#### Generate your local GnuPG key
-
-- Generate your GnuPG key 4096 bits key using your odd-e.com email address with no-expiry (option 0 in dialog):
-
-```
-gpg --full-generate-key
-```
-
-- Export your GnuPG public key:
-
-```
-gpg --export --armor <your_email>@odd-e.com > <your_email>_public_gpg_key.gpg
-```
-
-- Email your GnuPG public key file <your_email>\_public_gpg_key.gpg from above step and private message an existing git-secret collaborator
-
-#### Add a new user's GnuPG public key to local dev machine key-ring for git-secret for team secrets collaboration
-
-- Add public key to local GnuPG key-ring: `gpg --import <your_email>_public_gpg_key.gpg`
-- Add user to git-secret managed list of users: `git secret tell <your_email>@odd-e.com`
-- Re-encrypt all managed secret files: `git secret hide -d`
-
-#### List who are list of users managed by git-secret and allowed to encrypt/decrypt those files
-
-- Short list of user emails of managed users: `git secret whoknows`
-- List of user emails with expiration info of managed users: `git secret whoknows -l`
-
-#### Removes a user from list of git-secret managed users (e.g. user should no longer be allowed access to list of secrets)
-
-```
-git secret killperson <user_to_be_removed_email>@odd-e.com
-```
-
-#### Add a new file for git-secret to manage
-
-- Remove sensitive file from git: `git rm --cached <the_secret_file>`
-- Tell git-secret to manage the file (auto add to .gitignore and update stuff in .gitsecret dir): `git secret add <the_secret_file>`
-- Encrypt the file (need to reveal and hide for changes in list of users in dough/secrets*public_keys dir*): `git secret hide`
-
-#### View diff of git-secret managed files
-
-- `git secret changes -p <your__gpg_passphrase>`
-
-#### List all git-secret managed files
-
-- `git secret list`
-
-#### Remove a git-secret file from git-secret management (make sure you reveal/decrypt it before doing this!!!)
-
-- Just remove file from git-secret management but leaves it on the filesystem: `git secret remove <your__no_longer_secret_file>`
-- Remove an encrypted file from git-secret management and permanently delete it from filesystem (make sure you have revealed/decrypted the file): `git secret remove -c <your_no_longer_secret_file>`
-
-#### Reveal all git-secret managed encrypted files
-
-- Upon hitting `enter/return` for each decrypt command below, enter secret passphrase you used when you generated your GnuPG key-pair.
-- Decrypt secrets to local filesystem: `git secret reveal`
-- Decrypt secrets to stdout: `git secret cat`
+### 8. [Doughnut source code secrets management](./docs/secrets_management.md)
