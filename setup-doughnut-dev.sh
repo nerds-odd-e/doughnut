@@ -22,8 +22,15 @@ if [[ $nix_installed_path == *"not found"* ]]; then
         echo "Unsupported OS Platform for Nix development enviroment. Exiting!!!"
         exit 1
     fi
+fi
+
+if [[ ! -f ~/.config/nix/nix/nix.conf ]]; then
     mkdir -p ~/.config/nix
-    echo 'experimental-features = nix-command flakes' >>~/.config/nix/nix.conf
+    touch ~/.config/nix/nix.conf
+fi
+
+if ! grep -Fxq "experimental-features = nix-command flakes" ~/.config/nix/nix.conf ; then
+    echo 'experimental-features = nix-command flakes' >> ~/.config/nix/nix.conf
 fi
 
 . ~/.nix-profile/etc/profile.d/nix.sh
