@@ -6,7 +6,7 @@ Feature: Notes in circles
     And I've logged in as "old_learner"
     And  I create a notebook "Shared info" in circle "Odd-e SG Team"
 
-
+  @stopTime
   Scenario: Realtime view when note is deleted in circle page
     Given I am on "Odd-e SG Team" circle page
     When someone of my circle deletes the "Shared info" notebook

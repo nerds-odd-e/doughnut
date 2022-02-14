@@ -47,10 +47,7 @@ export default {
       }).finally(() => this.loading = false);
     },
     pollData(fetchAll) {
-        if(fetchAll) {
-          this.fetchData(false,fetchAll);
-          return;
-        }  
+        this.fetchData(false,fetchAll);
         this.startPolling();                    
       },
     onEditing(value){

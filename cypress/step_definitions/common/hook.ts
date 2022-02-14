@@ -24,3 +24,7 @@ Before({ tags: "@featureToggle" }, () => {
 Before({ tags: "@cleanDownloadFolder" }, () => {
   cy.cleanDownloadFolder()
 })
+
+Before({ tags: "@stopTime" }, () => {
+  cy.clock()
+})

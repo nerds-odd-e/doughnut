@@ -91,5 +91,6 @@ And("someone of my circle deletes the {string} notebook", (noteTitle) => {
 
 Then("I should not see {string} in the circle page within 5 seconds after deletion",
     (noteTitle) => {
+        cy.tick(5000);
         cy.findByText(noteTitle).should('not.exist');
     })
