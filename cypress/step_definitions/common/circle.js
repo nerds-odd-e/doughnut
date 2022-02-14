@@ -59,7 +59,7 @@ When("I create a notebook {string} in circle {string}", (noteTitle, circleName) 
 });
 
 When(
-  "I should see the note {string} in circle {string}",
+  "I should see the notebook {string} in circle {string}",
   (noteTitle, circleName) => {
     cy.navigateToCircle(circleName);
     cy.findByText(noteTitle).should("be.visible");
@@ -74,7 +74,7 @@ When("I add a note {string} under {string}", (noteTitle, parentNoteTitle) => {
 });
 
 When(
-  "I subscribe to note {string} in the circle {string}, with target of learning {int} notes per day",
+  "I subscribe to notebook {string} in the circle {string}, with target of learning {int} notes per day",
   (noteTitle, circleName, count) => {
     cy.navigateToCircle(circleName);
     cy.subscribeToNote(noteTitle, count);
@@ -93,13 +93,13 @@ And("someone of my circle deletes the {string} notebook", (noteTitle) => {
     cy.noteByTitle(noteTitle).deleteNoteViaAPI();
 })
 
-Then("I should see {string} in the circle page within {int} seconds after deletion",
+Then("I should see {string} in the circle page within {int} seconds",
     (noteTitle, seconds) => {
         cy.tick(seconds * 1000);
         cy.findByText(noteTitle);
 })
 
-Then("I should not see {string} in the circle page within {int} seconds after deletion",
+Then("I should not see {string} in the circle page within {int} seconds",
     (noteTitle, seconds) => {
         cy.tick(seconds * 1000);
         cy.findByText(noteTitle).should('not.exist');

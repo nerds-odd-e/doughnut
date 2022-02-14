@@ -8,11 +8,11 @@ Feature: real time note
 
   @ignore
   Scenario: Creating note that belongs to the circle
-    When I create a notebook "Team agreement" in circle "Odd-e SG Team"
+    When someone seed a notebook "Team agreement" in circle "Odd-e SG Team"
     When I've logged in as "another_old_learner"
-    Then I should see the note "Team agreement" in circle "Odd-e SG Team"
+    Then I should see the notebook "Team agreement" in circle "Odd-e SG Team"
     When I add a note "Keep it complex" under "Team agreement" 
     When I've logged in as "old_learner"
     Then I update note title "Team agreement" to become "New team agreement"
     When I've logged in as "another_old_learner"
-    Then I should see the note "New team agreement" in circle "Odd-e SG Team"
+    Then I should see the notebook "New team agreement" in circle "Odd-e SG Team"

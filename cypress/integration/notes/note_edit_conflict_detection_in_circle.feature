@@ -5,7 +5,7 @@ Feature: Note edit conflict detection
   Background:
     Given There is a circle "Odd-e SG Team" with "old_learner, another_old_learner" members
     And I've logged in as "old_learner"
-    And I create a notebook "Team agreement" in circle "Odd-e SG Team"
+    And someone seed a notebook "Team agreement" in circle "Odd-e SG Team"
     And I add a note "Keep it complex" under "Team agreement"
 
   @ignore
