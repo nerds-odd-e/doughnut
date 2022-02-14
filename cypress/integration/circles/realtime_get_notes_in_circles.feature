@@ -10,4 +10,4 @@ Feature: Notes in circles
   Scenario: Realtime view when note is deleted in circle page
     Given I am on "Odd-e SG Team" circle page
     When someone of my circle deletes the "Shared info" notebook
-    Then I should not see "Butter Deleted Note" in the circle page within 5 seconds after deletion
+    Then I should not see "Shared info" in the circle page within 5 seconds after deletion

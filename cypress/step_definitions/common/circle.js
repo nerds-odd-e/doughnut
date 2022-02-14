@@ -86,13 +86,7 @@ When("I am on {string} circle page", (circleName) => {
 })
 
 And("someone of my circle deletes the {string} notebook", (noteTitle) => {
-    let pathToNoteId = '';
-    cy.get('a.card-title')
-        .invoke('attr', 'href')
-        .then(($attr) => {
-            pathToNoteId = $attr;
-            cy.deleteCircleNote(pathToNoteId);
-        })
+    cy.noteByTitle(noteTitle).deleteNoteViaAPI();
 })
 
 Then("I should not see {string} in the circle page within 5 seconds after deletion",
