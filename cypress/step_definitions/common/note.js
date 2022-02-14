@@ -104,7 +104,7 @@ Then("I should see these notes as children", (data) => {
   cy.expectNoteCards(data.hashes());
 });
 
-When("I delete top level note {string}", (noteTitle) => {
+When("I delete notebook {string}", (noteTitle) => {
   cy.visit("/")
   cy.clickNotePageMoreOptionsButton(noteTitle, "delete note");
   cy.findByRole("button", { name: "OK" }).click();
@@ -397,14 +397,10 @@ When("I perform undo", () => {
   cy.findByTitle("undo note").click();
 })
 
-Given("I successfully delete a note", () => {
-  cy.get('.snackbar').should('exist');
-})
-
 When("I click undo delete on snackbar", () => {
   cy.get('.snackbar__action').click();
 })
 
-Then("the deleted note with title {string} will be restored", (title) => {
+Then("the deleted notebook with title {string} should be restored", (title) => {
   cy.findByText(title).should('exist');
 })

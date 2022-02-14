@@ -50,12 +50,9 @@ Feature: Nested Note CRUD
       | title     | description       |
       | Odd-e CSD | Our best training |
 
-  Scenario: Delete a note
+  Scenario: Delete a notebook and undo
     Given I initial review "LeSS in Action"
-    When I delete top level note "LeSS in Action"
+    When I delete notebook "LeSS in Action"
     Then I should not see note "LeSS in Action" at the top level of all my notes
-
-  Scenario: Undo delete a note
-    Given I successfully delete a note
     When I click undo delete on snackbar
-    Then the deleted note with title "LeSS in Action" will be restored
+    Then the deleted notebook with title "LeSS in Action" should be restored
