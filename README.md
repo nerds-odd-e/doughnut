@@ -68,7 +68,10 @@ The Cypress+Cucumber tests are in JavaScript/TypeScript.
 
 #### Commands
 
-For MS Windows users, you need to ensure your WSL2 Linux has `xvfb` installed manually. This is not managed by Nix!
+For MS Windows WSL2 users:
+
+1. you need to ensure your WSL2 Linux has `xvfb` installed manually before you can run cypress. This is not managed by Nix!
+2. `export NODE_OPTIONS="--max-old-space-size=4096"` before running any cypress related commands (e.g. `cy:open` or `cy:run`).
 
 | Purpose                               | Command (run from `doughnut` source root directory)                                                               |
 | ------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
