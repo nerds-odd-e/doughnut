@@ -90,14 +90,24 @@ class TestabilityRestController {
         public String pictureMask;
     }
 
+    static class SeedInfo {
+        public List<SeedNote> seedNotes;
+        public String externalIdentifier;
+        public String circleName; // optional
+    }
+
+    //
+    //  Testability API to seed notebooks and notes
+    //
     @PostMapping("/seed_notes")
-    public List<Integer> seedNote(@RequestBody List<SeedNote> seedNotes, @RequestParam(name = "external_identifier") String externalIdentifier) throws Exception {
-        final User user = getUserModelByExternalIdentifierOrCurrentUser(externalIdentifier).getEntity();
+    public List<Integer> seedNote(@RequestBody SeedInfo seedInfo) {
+        final User user = getUserModelByExternalIdentifierOrCurrentUser(seedInfo.externalIdentifier).getEntity();
+        Ownership ownership = getOwnership(seedInfo, user);
         HashMap<String, Note> earlyNotes = new HashMap<>();
         List<Note> noteList = new ArrayList<>();
         Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
 
-        for (SeedNote seedNote : seedNotes) {
+        for (SeedNote seedNote : seedInfo.seedNotes) {
             Note note = new Note();
             NoteAccessories content = note.getNoteAccessories();
 
@@ -118,7 +128,7 @@ class TestabilityRestController {
             earlyNotes.put(seedNote.title, note);
             noteList.add(note);
             if (Strings.isBlank(seedNote.testingParent)) {
-                note.buildNotebookForHeadNote(user.getOwnership(), user);
+                note.buildNotebookForHeadNote(ownership, user);
             }
             else {
                 note.setParentNote(earlyNotes.get(seedNote.testingParent));
@@ -129,6 +139,14 @@ class TestabilityRestController {
         noteRepository.saveAll(noteList);
 
         return noteList.stream().map(Note::getId).collect(Collectors.toList());
+    }
+
+    private Ownership getOwnership(SeedInfo seedInfo, User user) {
+        if(seedInfo.circleName != null) {
+            Circle circle = modelFactoryService.circleRepository.findByName(seedInfo.circleName);
+            return circle.getOwnership();
+        }
+        return user.getOwnership();
     }
 
     @PatchMapping("/textContent/{noteId}")

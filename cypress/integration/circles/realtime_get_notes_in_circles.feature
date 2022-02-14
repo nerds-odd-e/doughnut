@@ -4,7 +4,7 @@ Feature: Notes in circles
   Background:
     Given There is a circle "Odd-e SG Team" with "old_learner, another_old_learner" members
     And I've logged in as "old_learner"
-    And  I create a notebook "Shared info" in circle "Odd-e SG Team"
+    And  Someone seed a notebook "Shared info" in circle "Odd-e SG Team"
 
   @stopTime
   Scenario: Realtime view when note is deleted in circle page

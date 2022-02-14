@@ -41,10 +41,12 @@ abstract class TestabilityBase {
 
   Future<void> seedNotebookInBazaar(String notebookName) async {
     http.Response response = await testabilityPost(
-        'seed_notes?external_identifier=old_learner',
-        bodyObject: [
+        'seed_notes',
+        bodyObject: {
+          external_identifier: 'old_learner',
+          seedNotes: [
           {'title': notebookName}
-        ]);
+        ]});
 
     expect((jsonDecode(response.body) as List).length, 1);
 

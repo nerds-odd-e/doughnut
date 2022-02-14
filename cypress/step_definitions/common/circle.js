@@ -85,12 +85,18 @@ When("I am on {string} circle page", (circleName) => {
     cy.navigateToCircle(circleName);
 })
 
+When("Someone seed a notebook {string} in circle {string}", (noteTitle, circleName) => {
+  cy.navigateToCircle(circleName);
+  cy.findByText("Add New Notebook In This Circle").click();
+  cy.submitNoteCreationFormsWith([{Title: noteTitle}]);
+});
+
 And("someone of my circle deletes the {string} notebook", (noteTitle) => {
     cy.noteByTitle(noteTitle).deleteNoteViaAPI();
 })
 
-Then("I should not see {string} in the circle page within 5 seconds after deletion",
-    (noteTitle) => {
-        cy.tick(5000);
+Then("I should not see {string} in the circle page within {int} seconds after deletion",
+    (noteTitle, seconds) => {
+        cy.tick(seconds * 1000);
         cy.findByText(noteTitle).should('not.exist');
     })

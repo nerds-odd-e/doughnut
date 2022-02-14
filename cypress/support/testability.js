@@ -21,8 +21,11 @@ Cypress.Commands.add('enableFeatureToggle', (enabled) => {
 Cypress.Commands.add('seedNotes', (notes, externalIdentifier = '') => {
   cy.request({
     method: 'POST',
-    url: `/api/testability/seed_notes?external_identifier=${externalIdentifier}`,
-    body: notes,
+    url: `/api/testability/seed_notes`,
+    body: {
+              externalIdentifier,
+              seedNotes: notes
+          },
   }).then((response) => {
     expect(response.body.length).to.equal(notes.length);
     const titles = notes.map((n) => n['title']);
