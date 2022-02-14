@@ -26,31 +26,7 @@ For more background info you can read:
   - Please keep the PR small and on only one topic
   - The code need to come with tests
 
-## Technology Stack
-
-- [Nix](https://nixos.org/)
-- [Zulu OpenJDK 17](https://docs.azul.com/core/zulu-openjdk/release-notes/january-2022)
-- [Spring Boot](https://spring.io/projects/spring-boot)
-- [Flyway](https://flywaydb.org)
-- [Gradle](https://gradle.org/)
-- [Junit5](https://junit.org/junit5/)
-- [Cypress](https://www.cypress.io/)
-- [Cucumber](https://cucumber.io/docs/guides/)
-- [cypress-cucumber-preprocessor](https://github.com/TheBrainFamily/cypress-cucumber-preprocessor#cypress-configuration)
-- [Vue3](https://v3.vuejs.org/guide/introduction.html)
-- [Vite](https://vitejs.dev)
-- [Jest](https://jestjs.io/)
-- [Vue Testing Library](https://testing-library.com/docs/vue-testing-library/intro/)
-- [Bootstrap 5](https://getbootstrap.com/docs/5.0/getting-started/introduction/)
-- [MySQL 8.0](https://dev.mysql.com/doc/refman/8.0/en/)
-- [Github Actions](https://docs.github.com/en/actions)
-- [git-secret](https://git-secret.io)
-- [SaltStack](https://docs.saltproject.io/en/latest/)
-- [packer](https://www.packer.io)
-- [packer googlecompute builder](https://www.packer.io/docs/builders/googlecompute)
-- [Google Cloud](https://cloud.google.com/gcp/getting-started)
-- [Google Cloud Managed Instance Group](https://cloud.google.com/compute/docs/instance-groups/)
-- [Google Cloud SQL](https://cloud.google.com/sql/docs/mysql/introduction)
+## [Doughnut Technology Stack](./docs/tech_stack.md)
 
 ## Getting started
 

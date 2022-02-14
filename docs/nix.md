@@ -30,10 +30,10 @@ echo 'experimental-features = nix-command flakes' >> ~/.config/nix/nix.conf
 . ~/.nix-profile/etc/profile.d/nix.sh
 ```
 
-Clone full all-in-one doughnut codebase from Github
+Clone full all-in-one doughnut codebase from Github (Microsoft Windows OS users, please clone the repo to a non-Windows mount directory)
 
 ```bash
-git clone https://github.com/nerds-odd-e/doughnut
+git clone git@github.com:nerds-odd-e/doughnut.git
 ```
 
 Boot up your doughnut development environment.
