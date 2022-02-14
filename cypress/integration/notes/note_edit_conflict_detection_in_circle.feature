@@ -5,9 +5,8 @@ Feature: Note edit conflict detection
   Background:
     Given There is a circle "Odd-e SG Team" with "old_learner, another_old_learner" members
     And I've logged in as "old_learner"
-    When I create a note "Team agreement" in circle "Odd-e SG Team"
-    Then I should see "Circles, Odd-e SG Team" in breadcrumb
-    When I add a note "Keep it complex" under "Team agreement"
+    And I create a notebook "Team agreement" in circle "Odd-e SG Team"
+    And I add a note "Keep it complex" under "Team agreement"
 
   @ignore
   Scenario: Edit a note title

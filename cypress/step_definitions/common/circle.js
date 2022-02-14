@@ -52,7 +52,7 @@ Given(
   }
 );
 
-When("I create a note {string} in circle {string}", (noteTitle, circleName) => {
+When("I create a notebook {string} in circle {string}", (noteTitle, circleName) => {
   cy.navigateToCircle(circleName);
   cy.findByText("Add New Notebook In This Circle").click();
   cy.submitNoteCreationFormsWith([{Title: noteTitle}]);
@@ -80,12 +80,6 @@ When(
     cy.subscribeToNote(noteTitle, count);
   }
 );
-
-And("From circle {string} I create a note {string}", (circleName, noteTitle) => {
-    cy.navigateToCircle(circleName);
-    cy.findByText("Add New Notebook In This Circle").click();
-    cy.submitNoteCreationFormsWith([{Title: noteTitle}]);
-})
 
 When("I am on {string} circle page", (circleName) => {
     cy.navigateToCircle(circleName);
