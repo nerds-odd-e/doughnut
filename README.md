@@ -68,6 +68,8 @@ The Cypress+Cucumber tests are in JavaScript/TypeScript.
 
 #### Commands
 
+For MS Windows users, you need to ensure your WSL2 Linux has `xvfb` installed manually. This is not managed by Nix!
+
 | Purpose                               | Command (run from `doughnut` source root directory)                                                               |
 | ------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
 | Install needed e2e tooling            | `yarn`                                                                                                            |

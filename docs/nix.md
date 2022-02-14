@@ -56,6 +56,7 @@ open http://localhost:9081
 ```
 
 Run E2E profile with backend server & frontend in dev mode & Cypress IDE (frontend app on port 3000; backend app on port 9081)
+For MS Windows users, you need to ensure your WSL2 Linux has `xvfb` installed. This is not managed by Nix!
 
 ```bash
 # from doughnut source root dir
