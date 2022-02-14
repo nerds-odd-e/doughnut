@@ -18,12 +18,13 @@ Cypress.Commands.add('enableFeatureToggle', (enabled) => {
   });
 });
 
-Cypress.Commands.add('seedNotes', (notes, externalIdentifier = '') => {
+Cypress.Commands.add('seedNotes', (notes, externalIdentifier = '', circleName = null) => {
   cy.request({
     method: 'POST',
     url: `/api/testability/seed_notes`,
     body: {
               externalIdentifier,
+              circleName,
               seedNotes: notes
           },
   }).then((response) => {
