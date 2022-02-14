@@ -397,10 +397,6 @@ When("I perform undo", () => {
   cy.findByTitle("undo note").click();
 })
 
-And("I should see a toast at the bottom of my screen", () => {
-  cy.get('.snackbar').should('exist');
-})
-
 Given("I successfully delete a note", () => {
   cy.get('.snackbar').should('exist');
 })
