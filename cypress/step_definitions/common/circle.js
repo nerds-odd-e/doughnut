@@ -85,9 +85,9 @@ When("I am on {string} circle page", (circleName) => {
     cy.navigateToCircle(circleName);
 })
 
-And("A member {string} of my circle delete the {string}", (member, noteTitle) => {
+And("someone of my circle deletes the {string} notebook", (noteTitle) => {
     let pathToNoteId = '';
-    cy.get('a.text-decoration-none.card-title')
+    cy.get('a.card-title')
         .invoke('attr', 'href')
         .then(($attr) => {
             pathToNoteId = $attr;

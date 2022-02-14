@@ -4,10 +4,10 @@ Feature: Notes in circles
   Background:
     Given There is a circle "Odd-e SG Team" with "old_learner, another_old_learner" members
     And I've logged in as "old_learner"
-    And  I create a notebook "Butter Deleted Note" in circle "Odd-e SG Team"
+    And  I create a notebook "Shared info" in circle "Odd-e SG Team"
 
 
   Scenario: Realtime view when note is deleted in circle page
-    When I am on "Odd-e SG Team" circle page
-    And A member "another_old_learner" of my circle delete the "Butter Deleted Note"
+    Given I am on "Odd-e SG Team" circle page
+    When someone of my circle deletes the "Shared info" notebook
     Then I should not see "Butter Deleted Note" in the circle page within 5 seconds after deletion
