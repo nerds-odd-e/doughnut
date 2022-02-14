@@ -50,7 +50,7 @@ export default {
     },
     showUndoSnackbar() {
       const snack = useSnackbarPlugin();
-      const { deletedNoteId } = this.$route.query;
+      const deletedNoteId = this.$store.getters.getLastDeletedNoteId()
       if(deletedNoteId) {
         snack.show({
           position: 'bottom',

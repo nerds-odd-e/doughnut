@@ -41,6 +41,7 @@ export default createStore({
   state: () => ({
     notes: {},
     noteUndoHistories: {},
+    lastDeletedNoteId: null,
     currentUser: null,
     featureToggle: false,
     environment: 'production',
@@ -53,6 +54,7 @@ export default createStore({
     getNoteById: (state) => (id) => withState(state).getNoteById(id),
     getChildrenIdsByParentId: (state) => (parentId) => withState(state).getChildrenIdsByParentId(parentId),
     getChildrenOfParentId: (state) => (parentId) => withState(state).getChildrenOfParentId(parentId),
+    getLastDeletedNoteId: (state) => () => state.lastDeletedNoteId,
   },
 
   mutations: {
@@ -78,6 +80,7 @@ export default createStore({
     deleteNote(state, noteId) {
       withState(state).deleteNoteFromParentChildrenList(noteId)
       withState(state).deleteNote(noteId)
+      state.lastDeletedNoteId = noteId
     },
     currentUser(state, user) {
       state.currentUser = user
