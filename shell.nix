@@ -43,8 +43,8 @@ in mkShell {
     jetbrains-mono
     dbeaver
     google-cloud-sdk
-    packer
     yamllint
+    nix-direnv
   ] ++ lib.optionals stdenv.isDarwin [
     darwin.apple_sdk.libs.utmp
     apple_sdk.ApplicationServices
