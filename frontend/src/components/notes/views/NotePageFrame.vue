@@ -7,7 +7,6 @@
       <div class="content">
         <component :is="noteComponent" 
           v-bind="{noteId, expandChildren, language}"
-          @highlight="highlight"
           @on-editing="onEditing"
         />
       </div>

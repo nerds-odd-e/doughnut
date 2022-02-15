@@ -18,7 +18,6 @@ export default {
     expandChildren: { type: Boolean, required: true },
     language: String,
   },
-  emits: ['highlight'],
   components: {
     NoteWithLinks,
     Cards,

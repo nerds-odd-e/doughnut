@@ -3,7 +3,6 @@
     <NoteOverview
       v-bind="{ noteId, expandChildren, language }"
       :key="noteId"
-      @highlight="$emit('highlight', $event)"
     />
   </div>
 </template>
@@ -17,7 +16,6 @@ export default {
     expandChildren: { type: Boolean, required: true },
     language: String,
   },
-  emits: ['highlight'],
   components: { NoteOverview },
   computed: {
   },

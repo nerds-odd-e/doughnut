@@ -7,7 +7,6 @@
           expandChildren,
           offset,
           }"
-          @highlight="$emit('highlight', $event)"
       />
     </div>
   <div class="mindmap-info" @click.prevent="reset">
@@ -29,7 +28,6 @@ export default {
     noteId: [String, Number],
     expandChildren: { type: Boolean, required: true },
   },
-  emits: ['highlight'],
   data() {
     return {
       offset: { ... defaultOffset },

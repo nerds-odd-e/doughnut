@@ -47,7 +47,6 @@
           mindmap,
           highlightNoteId,
         }"
-        @highlight="highlight(note.id)"
       />
     </template>
   </NoteMindmapScaffold>
@@ -69,15 +68,11 @@ export default {
     expandChildren: Boolean,
     offset: Object,
   },
-  emits: ['highlight'],
   components: {
     NoteMindmapScaffold,
     NoteCard,
     NoteParentChildConnection,
     NoteLinks,
-  },
-  methods: {
-    highlight(id) {this.$emit('highlight', id)}
   },
   computed: {
     mindmapSector() {

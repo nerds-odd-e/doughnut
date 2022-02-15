@@ -5,7 +5,6 @@
       v-for="childId in childrenIds"
       v-bind="{ noteId: childId, expandChildren, language }"
       :key="childId"
-      @highlight="$emit('highlight', $event)"
     />
   </div>
 </template>
@@ -20,7 +19,6 @@ export default {
     expandChildren: { type: Boolean, required: true },
     language: String,
   },
-  emits: ["highlight"],
   components: { NoteWithLinks },
   computed: {
     note() {
