@@ -29,26 +29,8 @@ class NoteBuilder extends Builder {
     return this;
   }
 
-  titleIDN(value: string): NoteBuilder {
-    merge(this.data, {
-      translationTextContent: {
-        title: value
-      }
-    })
-    return this;
-  }
-
   description(value: string): NoteBuilder {
     this.data.textContent.description = value;
-    return this;
-  }
-
-  descriptionIDN(value: string): NoteBuilder {
-    merge(this.data, {
-      translationTextContent: {
-        description: value
-      }
-    })
     return this;
   }
 
@@ -84,18 +66,6 @@ class NoteBuilder extends Builder {
 
   linkTo(note: any): NoteBuilder {
     merge(this.data.links, new LinkBuilder(undefined, "using").from(this.data).to(note).please());
-    return this;
-  }
-
-  isTranslationOutdatedIDN(value: boolean): NoteBuilder {
-    merge(this.data, {
-      textContent: {
-        updatedAt: "2021-08-24T08:46:44.000+00:00",
-      },
-      translationTextContent: {
-        updatedAt: value ? "2021-08-23T08:46:44.000+00:00" : "2021-08-25T08:46:44.000+00:00"
-      }
-    });
     return this;
   }
 
