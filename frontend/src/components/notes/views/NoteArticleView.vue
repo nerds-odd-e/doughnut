@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <NoteOverview
-      v-bind="{ noteId, expandChildren, language }"
+      v-bind="{ noteId, expandChildren }"
       :key="noteId"
     />
   </div>
@@ -14,7 +14,6 @@ export default {
   props: {
     noteId: [String, Number],
     expandChildren: { type: Boolean, required: true },
-    language: String,
   },
   components: { NoteOverview },
   computed: {

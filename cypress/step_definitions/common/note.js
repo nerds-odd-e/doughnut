@@ -351,29 +351,12 @@ When(
   }
 );
 
-When("I edit note translation to become", (data) => {
-  cy.clickTranslationButton("ID");
-  cy.inPlaceEdit(data.hashes()[0]);
-});
-
 Then("I download note", () => {
   cy.get("#note-download-button").click();
 });
 
 Then("There is a {string} file downloaded", (fileName) => {
   cy.verifyDownload(fileName);
-});
-
-When("I edit original note translation to become", (data) => {
-  cy.inPlaceEdit(data.hashes()[0]);
-});
-
-Then("I should see translation outdated tag", (messageContent) => {
-    cy.expectText("Outdated translation");
-});
-
-Then("I should not see translation outdated tag", (messageContent) => {
-    cy.expectText("Outdated translation").should("not.exist");
 });
 
 And("the file {string} content is",(fileName, mdContent) => {

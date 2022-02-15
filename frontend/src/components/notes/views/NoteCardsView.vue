@@ -1,6 +1,6 @@
 <template>
   <div class="container" v-if="note">
-    <NoteWithLinks v-bind="{ note, language }" @on-editing="onEditing"/>
+    <NoteWithLinks v-bind="{ note }" @on-editing="onEditing"/>
     <NoteStatisticsButton :noteId="noteId" />
     <Cards v-if="expandChildren" :notes="children"/>
   </div>
@@ -16,7 +16,6 @@ export default {
   props: {
     noteId: [String, Number],
     expandChildren: { type: Boolean, required: true },
-    language: String,
   },
   components: {
     NoteWithLinks,

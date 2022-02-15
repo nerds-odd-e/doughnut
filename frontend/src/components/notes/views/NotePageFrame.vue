@@ -1,12 +1,12 @@
 <template>
     <div class="inner-box">
       <div class="header">
-        <NoteControl @updateLanguage="language=$event"/>
+        <NoteControl/>
         <Breadcrumb v-bind="notePosition"/>
       </div>
       <div class="content">
         <component :is="noteComponent" 
-          v-bind="{noteId, expandChildren, language}"
+          v-bind="{noteId, expandChildren}"
           @on-editing="onEditing"
         />
       </div>
@@ -26,11 +26,6 @@ export default {
      notePosition: Object,
      noteComponent: String,
      expandChildren: { type: Boolean, required: true },
-  },
-  data() {
-    return {
-      language: null,
-    };
   },
   components: { NoteControl, NoteMindmapView, Breadcrumb, NoteCardsView, NoteArticleView },
   methods: {

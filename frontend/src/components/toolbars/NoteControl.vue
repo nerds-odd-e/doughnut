@@ -3,7 +3,6 @@
     <NoteButtons v-if="currentNote"
     :note="currentNote"
     :viewType="viewType"
-    @updateLanguage="$emit('updateLanguage', $event)"
     />
   </nav>
   <slot />
@@ -14,7 +13,6 @@
 import NoteButtons from './NoteButtons.vue'
 
 export default {
-  emits: ['updateLanguage'],
   components: { NoteButtons },
   computed: {
     currentNote() { return this.$store.getters.getHighlightNote()},

@@ -1,9 +1,9 @@
 <template>
-  <NoteWithLinks v-bind="{ note, language }" v-if="note"/>
+  <NoteWithLinks v-bind="{ note }" v-if="note"/>
   <div class="note-list">
     <NoteOverview
       v-for="childId in childrenIds"
-      v-bind="{ noteId: childId, expandChildren, language }"
+      v-bind="{ noteId: childId, expandChildren }"
       :key="childId"
     />
   </div>
@@ -17,7 +17,6 @@ export default {
   props: {
     noteId: [String, Number],
     expandChildren: { type: Boolean, required: true },
-    language: String,
   },
   components: { NoteWithLinks },
   computed: {

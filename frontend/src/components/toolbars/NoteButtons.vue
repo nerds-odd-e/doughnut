@@ -49,9 +49,6 @@
           Delete
         </button>
       </div>
-      <NoteTranslationButton v-if="featureToggle" :noteId="note.id" :note="note"
-        @updateLanguage="updateLanguage"
-      />
       <NoteDownloadButton :note="note" v-if="featureToggle" />
     </div>
   </div>
@@ -67,7 +64,6 @@ import ReviewSettingEditButton from "../review/ReviewSettingEditButton.vue";
 import NoteEditButton from "./NoteEditButton.vue";
 import NoteUndoButton from "./NoteUndoButton.vue";
 import NoteSplitButton from "./NoteSplitButton.vue";
-import NoteTranslationButton from "./NoteTranslationButton.vue";
 import NoteDownloadButton from "./NoteDownloadButton.vue"
 import NoteNewButton from "./NoteNewButton.vue";
 import ViewTypeButtons from "./ViewTypeButtons.vue";
@@ -89,21 +85,16 @@ export default {
     NoteEditButton,
     NoteUndoButton,
     NoteSplitButton,
-    NoteTranslationButton,
     NoteNewButton,
     ViewTypeButtons,
     NoteDownloadButton
   },
-  emits: ['updateLanguage'],
   computed: {
     featureToggle() {
       return this.$store.getters.getFeatureToggle();
     },
   },
   methods: {
-    updateLanguage(lan) {
-      this.$emit('updateLanguage', lan)
-    },
     async deleteNote() {
       if (await this.$popups.confirm(`Are you sure to delete this note?`)) {
         const parentId = this.note.parentId;

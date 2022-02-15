@@ -45,7 +45,6 @@ export default {
   props: {
     note: Object,
     size: { type: String, default: 'large'},
-    language: String,
   },
   emits: ['blur'],
   components: {
@@ -61,7 +60,7 @@ export default {
       return !!this.notePicture && !!this.note.noteAccessories.description;
     },
     translatedNote(){
-      return new TranslatedNoteWrapper(this.note, this.language);
+      return new TranslatedNoteWrapper(this.note, null);
     },
   },
   methods: {

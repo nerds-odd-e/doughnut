@@ -486,15 +486,6 @@ Cypress.Commands.add(
   }
 );
 
-Cypress.Commands.add('expectTranslationButtonLang', (lang) => {
-  const buttonText = `Translate to ${lang}`;
-  cy.findByRole('button', { name: buttonText });
-});
-
-Cypress.Commands.add('clickTranslationButton', (lang) => {
-  cy.findByRole('button', { name: `Translate to ${lang}` }).click();
-});
-
 Cypress.Commands.add(
   'expectText',
   (text) => cy.findByText(text) //.should("be.visible")
@@ -503,36 +494,6 @@ Cypress.Commands.add(
 
 Cypress.Commands.add('clickNoteToolbarButton', (btnTextOrTitle) => {
   cy.get('.toolbar').findByRole('button', { name: btnTextOrTitle }).click();
-});
-
-Cypress.Commands.add('submitNoteTranslationFormsWith', (notes) => {
-  notes.forEach((noteAttributes) =>
-    cy.submitNoteTranslationFormWith(noteAttributes)
-  );
-});
-
-Cypress.Commands.add('submitNoteTranslationFormWith', (noteAttributes) => {
-  for (var propName in noteAttributes) {
-    const value = noteAttributes[propName];
-    if (value) {
-      cy.getFormControl(propName).then(($input) => {
-        if ($input.attr('type') === 'file') {
-          cy.fixture(value).then((img) => {
-            cy.wrap($input).attachFile({
-              fileContent: Cypress.Blob.base64StringToBlob(img),
-              fileName: value,
-              mimeType: 'image/png',
-            });
-          });
-        } else if ($input.attr('role') === 'radiogroup') {
-          cy.clickRadioByLabel(value);
-        } else {
-          cy.wrap($input).clear().type(value);
-        }
-      });
-    }
-  }
-  cy.get('input[value="Update"]').click();
 });
 
 Cypress.Commands.add('deleteNoteViaAPI', {prevSubject: true}, (subject) => {

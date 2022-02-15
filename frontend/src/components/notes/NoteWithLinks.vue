@@ -22,7 +22,7 @@
       >
         No translation available
       </p>
-      <NoteContent v-bind="{ note, language }" v-on="inputListeners"  @blur="submitChange" />
+      <NoteContent v-bind="{ note }" v-on="inputListeners"  @blur="submitChange" />
     </NoteFrameOfLinks>
   </NoteShell>
 </template>
@@ -40,7 +40,6 @@ export default {
   name: "NoteWithLinks",
   props: {
     note: Object,
-    language: String,
   },
   components: {
     NoteFrameOfLinks,
@@ -56,7 +55,7 @@ export default {
   emits:['on-editing'],
   computed: {
     translatedNote(){
-      return new TranslatedNoteWrapper(this.note, this.language);
+      return new TranslatedNoteWrapper(this.note, null);
     },
     inputListeners: function () {
       var vm = this;
@@ -73,12 +72,7 @@ export default {
   methods: {
     submitChange() {
       this.loading = true
-      const textContent = (()=>{
-        if (this.language === Languages.ID) {
-          return {...this.note.translationTextContent, language: 'idn', };
-        }
-        return this.note.textContent;
-      })();
+      const textContent = this.note.textContent;
       storeUndoCommand.addUndoHistory(this.$store,  {id: this.note.id, textContent: textContent});
       storedApiUpdateTextContent(this.$store, this.note.id, textContent)
       .then((res) => {
