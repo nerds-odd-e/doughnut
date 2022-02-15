@@ -37,6 +37,7 @@ describe("Notebooks Page", () => {
 
         expect(fetch).toHaveBeenCalledTimes(1);
         expect(fetch).toHaveBeenCalledWith('/api/notebooks', {});
+        expect(await screen.findByTitle("undo")).toBeDisabled();
     });
 
    test("show undo when there is something to undo", async () => {
@@ -46,22 +47,6 @@ describe("Notebooks Page", () => {
 
         renderWithStoreAndMockRoute(store, NotebooksPage, {});
 
-        await screen.findByTitle("undo");
+        expect(await screen.findByTitle("undo")).not.toBeDisabled();
     });
-
-    xtest("call /undo-delete when snackbar button is pressed", async () => {
-        const notebook = makeMe.aNotebook.please()
-        const stubResponse = {
-            notebooks: [notebook],
-            subscriptions: []
-        };
-        const deletedNoteId = '1';
-
-        const { wrapper } = renderWithStoreAndMockRoute(store, NotebooksPage, {});
-
-        wrapper.find('.snackbar__action').trigger("click")
-        expect(fetch).toHaveBeenCalledWith('/api/notebooks', {});
-        expect(fetch).toHaveBeenCalledWith(`/api/notes/${deletedNoteId}/undo-delete`);
-
-    })
 });

@@ -59,6 +59,7 @@ export default createStore({
     getChildrenIdsByParentId: (state) => (parentId) => withState(state).getChildrenIdsByParentId(parentId),
     getChildrenOfParentId: (state) => (parentId) => withState(state).getChildrenOfParentId(parentId),
     getLastDeletedNoteId: (state) => () => state.lastDeletedNoteId,
+    peekUndo1: (state) => () => state.lastDeletedNoteId,
     peekUndo: (state) => () => {
       if(state.noteUndoHistories.length === 0) return null
       return state.noteUndoHistories[state.noteUndoHistories.length - 1]

@@ -2,7 +2,7 @@
   <button class="btn btn-small" title="undo note" @click="performUndo()">
     <SvgUndo/>
   </button>
-  <button class="btn btn-small" title="undo" @click="performUndo()">
+  <button class="btn btn-small" title="undo" @click="performUndo()" :disabled="!hasHistory">
     <SvgUndo/>
   </button>
 </template>
@@ -19,6 +19,11 @@ export default {
   },
   props: {
     noteId: [String, Number]
+  },
+  computed: {
+    hasHistory() {
+      return (this.$store.getters.peekUndo1() != null)
+    }
   },
   methods: {
     performUndo() {
