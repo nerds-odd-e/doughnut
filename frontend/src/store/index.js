@@ -17,7 +17,7 @@ function withState(state) {
     },
 
     deleteNote(id) {
-      this.getChildrenIdsByParentId(id)?.forEach(this.deleteNote)
+      this.getChildrenIdsByParentId(id)?.forEach(cid=>this.deleteNote(cid))
       delete state.notes[id]
     },
 
@@ -39,6 +39,7 @@ function withState(state) {
 export default createStore({
   state: () => ({
     notes: {},
+    highlightNoteId: null,
     noteUndoHistories: {},
     lastDeletedNoteId: null,
     currentUser: null,
@@ -48,6 +49,7 @@ export default createStore({
 
   getters: {
     getCurrentUser: (state) => () => state.currentUser,
+    getHighlightNoteId: (state) => () => state.highlightNoteId,
     getEnvironment: (state) => () => state.environment,
     getFeatureToggle: (state) => () => state.featureToggle,
     getNoteById: (state) => (id) => withState(state).getNoteById(id),
@@ -80,6 +82,9 @@ export default createStore({
       withState(state).deleteNoteFromParentChildrenList(noteId)
       withState(state).deleteNote(noteId)
       state.lastDeletedNoteId = noteId
+    },
+    highlightNoteId(state, noteId) {
+      state.highlightNoteId = noteId
     },
     currentUser(state, user) {
       state.currentUser = user

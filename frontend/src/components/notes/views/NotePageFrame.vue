@@ -36,9 +36,13 @@ export default {
     };
   },
   components: { NoteControl, NoteMindmapView, Breadcrumb, NoteCardsView, NoteArticleView },
+  computed: {
+    highlightNoteId() {return this.$store.getters.getHighlightNoteId()},
+
+  },
   methods: {
     highlight(id) { 
-      this.highlightNoteId = id
+      this.$store.commit("highlightNoteId", id)
     },
     onEditing(value){
       this.$emit("on-editing", value);
@@ -46,11 +50,11 @@ export default {
   },
   watch: {
     noteId() {
-      this.highlightNoteId = this.noteId
+      this.highlight(this.noteId)
     },
   },
   mounted() {
-    this.highlightNoteId = this.noteId
+    this.highlight(this.noteId)
   }
 };
 </script>
