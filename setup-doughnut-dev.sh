@@ -29,9 +29,11 @@ if [[ ! -f ~/.config/nix/nix/nix.conf ]]; then
     touch ~/.config/nix/nix.conf
 fi
 
-if ! grep -Fxq "experimental-features = nix-command flakes" ~/.config/nix/nix.conf ; then
-    echo 'experimental-features = nix-command flakes' >> ~/.config/nix/nix.conf
+if ! grep -Fxq "experimental-features = nix-command flakes" ~/.config/nix/nix.conf; then
+    echo 'experimental-features = nix-command flakes' >>~/.config/nix/nix.conf
 fi
 
+nix-channel --update
+nix-env -iA nixpkgs.nix && nix-env -u --always
 . ~/.nix-profile/etc/profile.d/nix.sh
 nix develop -c $SHELL
