@@ -7,7 +7,6 @@
       <div class="content">
         <component :is="noteComponent" 
           v-bind="{noteId, expandChildren}"
-          @on-editing="onEditing"
         />
       </div>
     </div>
@@ -32,9 +31,6 @@ export default {
     highlight(id) { 
       this.$store.commit("highlightNoteId", id)
     },
-    onEditing(value){
-      this.$emit("on-editing", value);
-    }
   },
   watch: {
     noteId() {

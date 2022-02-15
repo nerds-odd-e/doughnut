@@ -4,7 +4,7 @@
     v-bind="{ id: note.id, updatedAt: note.textContent?.updatedAt }"
   >
     <NoteFrameOfLinks v-bind="{ links: note.links }">
-      <NoteContent v-bind="{ note }" v-on="inputListeners"/>
+      <NoteContent v-bind="{ note }"/>
     </NoteFrameOfLinks>
   </NoteShell>
 </template>
@@ -25,20 +25,6 @@ export default {
     NoteShell,
     NoteContent,
     EditableText,
-  },
-  emits:['on-editing'],
-  computed: {
-    inputListeners: function () {
-      var vm = this;
-      return Object.assign({},
-        this.$listeners,
-        {
-          input: function (event) {
-            vm.$emit("on-editing", "onEditing");
-          }
-        }
-      )
-    }
   },
 };
 </script>

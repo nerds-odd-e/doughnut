@@ -38,9 +38,6 @@ export default {
     reset() {
       this.offset = { ... defaultOffset }
     },
-    onEditing(){
-      this.$emit("on-editing", "onEditing");
-    }
   },
   computed: {
     highlightNoteId() { return this.$store.getters.getHighlightNoteId() },
@@ -60,9 +57,6 @@ export default {
       return `rotate: ${ (this.offset.rotate * 180 / Math.PI).toFixed(0)}`
     }
   },
-  mounted() {
-    this.onEditing();
-  } 
 };
 </script>
 

@@ -6,7 +6,7 @@
         notePosition,
         expandChildren: true,
         noteComponent: viewTypeObj.noteComponent}"
-      @on-editing="onEditing" />
+      />
 
   </LoadingPage>
 </template>
@@ -52,14 +52,6 @@ export default {
         this.fetchData(false,fetchAll);
         this.startPolling();                    
       },
-    onEditing(value){
-      if (value==="onEditing"){
-        this.pausePolling();
-      }
-      else{
-        this.startPolling();
-      }
-    },
     startPolling() {
       this.polling=setInterval(() => {
         this.fetchData(false,this.viewTypeObj.fetchAll);
