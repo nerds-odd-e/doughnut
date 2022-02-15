@@ -6,22 +6,8 @@
     <NoteFrameOfLinks v-bind="{ links: note.links }">
       <EditableText role="title" class="note-title"
         :multipleLine="false"
-        scopeName="note" v-model="translatedNote.title"  v-on="inputListeners"   @blur="submitChange"
+        scopeName="note" v-model="note.textContent.title"  v-on="inputListeners"   @blur="submitChange"
       />
-      <span 
-        role="outdated-tag" 
-        class="outdated-label" 
-        v-if="translatedNote.isTranslationOutdatedIDN"
-        >
-          Outdated translation
-      </span>
-      <p
-        style="color: red"
-        role="title-fallback"
-        v-if="translatedNote.translationNoteAvailable"
-      >
-        No translation available
-      </p>
       <NoteContent v-bind="{ note }" v-on="inputListeners"  @blur="submitChange" />
     </NoteFrameOfLinks>
   </NoteShell>
@@ -32,7 +18,6 @@ import EditableText from "../form/EditableText.vue";
 import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
 import NoteShell from "./NoteShell.vue";
 import NoteContent from "./NoteContent.vue";
-import Languages, { TranslatedNoteWrapper } from "../../models/languages";
 import { storedApiUpdateTextContent } from "../../storedApi";
 import storeUndoCommand from "../../storeUndoCommand";
 
@@ -54,9 +39,6 @@ export default {
   },
   emits:['on-editing'],
   computed: {
-    translatedNote(){
-      return new TranslatedNoteWrapper(this.note, null);
-    },
     inputListeners: function () {
       var vm = this;
       return Object.assign({},

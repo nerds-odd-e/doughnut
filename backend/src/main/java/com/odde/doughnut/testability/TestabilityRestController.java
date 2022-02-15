@@ -81,8 +81,6 @@ class TestabilityRestController {
     static class SeedNote {
         public String title;
         public String description;
-        public String titleIDN;
-        public String descriptionIDN;
         public String testingParent;
         public Boolean skipReview;
         public String url;
@@ -118,11 +116,6 @@ class TestabilityRestController {
             content.setUrl(seedNote.url);
             content.setPictureMask(seedNote.pictureMask);
             content.setPictureUrl(seedNote.pictureUrl);
-
-            if(seedNote.titleIDN != null || seedNote.descriptionIDN != null) {
-                note.getOrBuildTranslationTextContent().setTitle(seedNote.titleIDN);
-                note.getOrBuildTranslationTextContent().setDescription(seedNote.descriptionIDN);
-            }
 
             note.setCreatedAtAndUpdatedAt(currentUTCTimestamp);
             earlyNotes.put(seedNote.title, note);

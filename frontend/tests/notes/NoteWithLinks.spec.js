@@ -9,7 +9,6 @@ import {
   mountWithStoreAndMockRoute,
 } from "../helpers";
 import store from "../../src/store";
-import Languages from "../../src/models/languages";
 import storeUndoCommand from "../../src/storeUndoCommand";
 
 jest.mock("../../src/storeUndoCommand");

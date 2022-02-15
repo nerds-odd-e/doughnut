@@ -6,10 +6,10 @@
           v-if="size==='large'"
           class="col note-description"
           scopeName="note"
-          v-model="translatedNote.description"
+          v-model="textContent.description"
           @blur="onBlurTextField"/>
-      <NoteShortDescription class="col" v-if="size==='medium'" :shortDescription="translatedNote.shortDescription"/>
-      <SvgDescriptionIndicator v-if="size==='small' && !!translatedNote.description" class="description-indicator"/>
+      <NoteShortDescription class="col" v-if="size==='medium'" :shortDescription="note.shortDescription"/>
+      <SvgDescriptionIndicator v-if="size==='small' && !!textContent.description" class="description-indicator"/>
     <template v-if="!!note.notePicture">
       <ShowPicture
         v-if="size!=='small'"
@@ -38,7 +38,6 @@ import ShowPicture from "./ShowPicture.vue";
 import SvgDescriptionIndicator from "../svgs/SvgDescriptionIndicator.vue";
 import SvgPictureIndicator from "../svgs/SvgPictureIndicator.vue";
 import SvgUrlIndicator from "../svgs/SvgUrlIndicator.vue";
-import { TranslatedNoteWrapper } from "../../models/languages";
 import EditableText from "../form/EditableText.vue";
 
 export default {
@@ -59,8 +58,8 @@ export default {
     twoColumns() {
       return !!this.notePicture && !!this.note.noteAccessories.description;
     },
-    translatedNote(){
-      return new TranslatedNoteWrapper(this.note, null);
+    textContent(){
+      return this.note.textContent;
     },
   },
   methods: {
