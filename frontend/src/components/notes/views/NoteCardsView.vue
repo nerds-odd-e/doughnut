@@ -15,7 +15,6 @@ import Cards from "../Cards.vue";
 export default {
   props: {
     noteId: [String, Number],
-    highlightNoteId: [String, Number],
     expandChildren: { type: Boolean, required: true },
     language: String,
   },

@@ -3,7 +3,7 @@
   <div class="note-list">
     <NoteOverview
       v-for="childId in childrenIds"
-      v-bind="{ noteId: childId, highlightNoteId, expandChildren, language }"
+      v-bind="{ noteId: childId, expandChildren, language }"
       :key="childId"
       @highlight="$emit('highlight', $event)"
     />
@@ -17,7 +17,6 @@ export default {
   name: "NoteOverview",
   props: {
     noteId: [String, Number],
-    highlightNoteId: [String, Number],
     expandChildren: { type: Boolean, required: true },
     language: String,
   },

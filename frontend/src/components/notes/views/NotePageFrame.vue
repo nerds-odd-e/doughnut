@@ -6,7 +6,7 @@
       </div>
       <div class="content">
         <component :is="noteComponent" 
-          v-bind="{noteId, highlightNoteId, expandChildren, language}"
+          v-bind="{noteId, expandChildren, language}"
           @highlight="highlight"
           @on-editing="onEditing"
         />
@@ -31,14 +31,10 @@ export default {
   },
   data() {
     return {
-      highlightNoteId: null,
       language: null,
     };
   },
   components: { NoteControl, NoteMindmapView, Breadcrumb, NoteCardsView, NoteArticleView },
-  computed: {
-    highlightNoteId() {return this.$store.getters.getHighlightNoteId()},
-  },
   methods: {
     highlight(id) { 
       this.$store.commit("highlightNoteId", id)

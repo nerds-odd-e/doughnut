@@ -27,7 +27,6 @@ const defaultOffset = {x: 0, y: 0, scale: 1.0, rotate: 0}
 export default {
   props: {
     noteId: [String, Number],
-    highlightNoteId: [String, Number],
     expandChildren: { type: Boolean, required: true },
   },
   emits: ['highlight'],
@@ -46,6 +45,7 @@ export default {
     }
   },
   computed: {
+    highlightNoteId() { return this.$store.getters.getHighlightNoteId() },
     centerX() {
       return `calc(50% + ${this.offset.x}px)`
     },

@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <NoteOverview
-      v-bind="{ noteId, highlightNoteId, expandChildren, language }"
+      v-bind="{ noteId, expandChildren, language }"
       :key="noteId"
       @highlight="$emit('highlight', $event)"
     />
@@ -13,7 +13,6 @@ import NoteOverview from "../NoteOverview.vue";
 
 export default {
   props: {
-    highlightNoteId: [String, Number],
     noteId: [String, Number],
     expandChildren: { type: Boolean, required: true },
     language: String,
