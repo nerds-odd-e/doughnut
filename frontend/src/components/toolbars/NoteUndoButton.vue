@@ -2,6 +2,9 @@
   <button class="btn btn-small" title="undo note" @click="performUndo()">
     <SvgUndo/>
   </button>
+  <button class="btn btn-small" title="undo" @click="performUndo()">
+    <SvgUndo/>
+  </button>
 </template>
 
 <script>

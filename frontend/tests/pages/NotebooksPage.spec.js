@@ -5,7 +5,6 @@ import { screen } from "@testing-library/vue";
 import NotebooksPage from "@/pages/NotebooksPage.vue";
 import store from "../../src/store/index.js";
 import { renderWithStoreAndMockRoute } from "../helpers";
-import flushPromises from "flush-promises";
 import _ from "lodash";
 import makeMe from "../fixtures/makeMe";
  
@@ -17,13 +16,17 @@ jest.mock("snackbar-vue", () => ({
 
 beforeEach(() => {
    fetch.resetMocks();
+   fetch.mockResponse(JSON.stringify({
+            notebooks: [],
+            subscriptions: []
+
+   }));
 });
  
 describe("Notebooks Page", () => {
-   xtest("fetch API to be called ONCE", async () => {
+
+   test("fetch API to be called ONCE", async () => {
         const notebook = makeMe.aNotebook.please()
-        store.commit('loadNotes', [notebook.headNote])
-        store.commit('deleteNote', notebook.headNote.id)
         const stubResponse = {
             notebooks: [notebook],
             subscriptions: []
@@ -32,12 +35,18 @@ describe("Notebooks Page", () => {
         fetch.mockResponse(JSON.stringify(stubResponse));
         renderWithStoreAndMockRoute(store, NotebooksPage, {});
 
-        await flushPromises();
-
         expect(fetch).toHaveBeenCalledTimes(1);
         expect(fetch).toHaveBeenCalledWith('/api/notebooks', {});
-        
-        await screen.findByText("Note successfully deleted");
+    });
+
+   test("show undo when there is something to undo", async () => {
+        const notebook = makeMe.aNotebook.please()
+        store.commit('loadNotes', [notebook.headNote])
+        store.commit('deleteNote', notebook.headNote.id)
+
+        renderWithStoreAndMockRoute(store, NotebooksPage, {});
+
+        await screen.findByTitle("undo");
     });
 
     xtest("call /undo-delete when snackbar button is pressed", async () => {
@@ -48,13 +57,7 @@ describe("Notebooks Page", () => {
         };
         const deletedNoteId = '1';
 
-        fetch.mockResponses([
-            JSON.stringify(stubResponse),
-            JSON.stringify({ deletedNoteId })
-        ]);
         const { wrapper } = renderWithStoreAndMockRoute(store, NotebooksPage, {});
-
-        await flushPromises();
 
         wrapper.find('.snackbar__action').trigger("click")
         expect(fetch).toHaveBeenCalledWith('/api/notebooks', {});

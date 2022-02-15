@@ -1,4 +1,5 @@
 <template>
+  <NoteControl/>
   <ContainerPage v-bind="{ loading, contentExists: !!notebooksViewedByUser, title: 'Notebooks' }">
     <div v-if="!!notebooksViewedByUser">
       <p>
@@ -17,6 +18,7 @@
 <script>
 import NotebookViewCards from "../components/notebook/NotebookViewCards.vue";
 import NotebookNewButton from "../components/notebook/NotebookNewButton.vue";
+import NoteControl from "../components/toolbars/NoteControl.vue";
 import NotebookSubscriptionCards from "../components/subscriptions/NotebookSubscriptionCards.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import { restGet, restPatch } from "../restful/restful";
@@ -26,6 +28,7 @@ export default {
   name: "NotebooksPage",
   components: {
     ContainerPage,
+    NoteControl,
     NotebookViewCards,
     NotebookSubscriptionCards,
     NotebookNewButton,
