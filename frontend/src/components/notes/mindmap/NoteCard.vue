@@ -5,15 +5,11 @@
   role="card" :aria-label="note.title"
   :style="`top:${coord.y}px; left:${coord.x}px`"
   v-on:click="highlight">
-    <h5 class="header note-card-title">
-      <NoteTitleWithLink :note="note" class="card-title" />
-    </h5>
-    <NoteContent class="content" v-bind="{note, size}"/>
+    <NoteContent class="content" v-bind="{note, size}" :titleAsLink="true"/>
   </NoteShell>
 </template>
 
 <script>
-import NoteTitleWithLink from "../NoteTitleWithLink.vue";
 import NoteShell from "../NoteShell.vue";
 import NoteContent from "../NoteContent.vue";
 import MindmapSector from "@/models/MindmapSector";
@@ -28,7 +24,7 @@ export default {
   components: {
      NoteShell,
      NoteContent,
-     NoteTitleWithLink },
+  },
   computed: {
     highlightClass() {
        return this.highlightNoteId?.toString() === this.note.id.toString() ? 'highlighted' : '' 

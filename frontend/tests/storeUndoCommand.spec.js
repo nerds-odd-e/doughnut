@@ -16,41 +16,30 @@ describe("storeUndoCommand", () => {
     test("should push textContent into store state noteUndoHistories ",
         () => {
           storeUndoCommand.addUndoHistory(store,
-              {
-                id: note.id,
-                textContent: {
-                  description: "Desc",
-                  title: 'updatedTitle',
-                  updatedAt: "2021-08-24T08:46:44.000+00:00"
-                }
-              });
+              { noteId: note.id, });
 
           expect(store.state.noteUndoHistories.length).toEqual(1);
         });
   });
 
   describe('popUndoHistory', () => {
-    const mockUpdatedNote = {
-      id: note.id,
-      textContent: {
-        description: "Desc",
-        title: 'updatedTitle',
-        updatedAt: "2021-08-24T08:46:44.000+00:00"
-      }
-    };
+    const mockUpdatedNote = { noteId: note.id };
+    let initialUndoCount;
 
     beforeEach(() => {
       store.commit('loadNotes', [note]);
       storeUndoCommand.addUndoHistory(store, mockUpdatedNote);
+      initialUndoCount = store.state.noteUndoHistories.length;
     });
 
     it('should undo to last history', () => {
       storeUndoCommand.popUndoHistory(store);
 
-      expect(store.state.noteUndoHistories.length).toEqual(1);
+      expect(store.state.noteUndoHistories.length).toEqual(initialUndoCount - 1);
     });
 
     it('should not undo to last history if there is no more history', () => {
+      storeUndoCommand.popUndoHistory(store);
       storeUndoCommand.popUndoHistory(store);
       storeUndoCommand.popUndoHistory(store);
 

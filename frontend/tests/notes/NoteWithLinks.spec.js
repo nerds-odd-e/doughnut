@@ -95,10 +95,6 @@ describe("undo editing", () => {
     await wrapper.find('[role="title"] input').trigger("blur");
 
     expect(storeUndoCommand.addUndoHistory).toBeCalledWith(store,
-        {id: noteParent.id, textContent: {
-            description: "Desc",
-            title: updatedTitle,
-            updatedAt: "2021-08-24T08:46:44.000+00:00"
-        }})
+        {noteId: noteParent.id})
   });
 });

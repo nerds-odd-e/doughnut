@@ -4,11 +4,7 @@
     v-bind="{ id: note.id, updatedAt: note.textContent?.updatedAt }"
   >
     <NoteFrameOfLinks v-bind="{ links: note.links }">
-      <EditableText role="title" class="note-title"
-        :multipleLine="false"
-        scopeName="note" v-model="note.textContent.title"  v-on="inputListeners"   @blur="submitChange"
-      />
-      <NoteContent v-bind="{ note }" v-on="inputListeners"  @blur="submitChange" />
+      <NoteContent v-bind="{ note }" v-on="inputListeners"/>
     </NoteFrameOfLinks>
   </NoteShell>
 </template>
@@ -18,8 +14,6 @@ import EditableText from "../form/EditableText.vue";
 import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
 import NoteShell from "./NoteShell.vue";
 import NoteContent from "./NoteContent.vue";
-import { storedApiUpdateTextContent } from "../../storedApi";
-import storeUndoCommand from "../../storeUndoCommand";
 
 export default {
   name: "NoteWithLinks",
@@ -31,11 +25,6 @@ export default {
     NoteShell,
     NoteContent,
     EditableText,
-  },
-  data() {
-    return {
-      formErrors: {},
-    };
   },
   emits:['on-editing'],
   computed: {
@@ -49,21 +38,6 @@ export default {
           }
         }
       )
-    }
-  },
-  methods: {
-    submitChange() {
-      this.loading = true
-      storeUndoCommand.addUndoHistory(this.$store,  {noteId: this.note.id});
-      storedApiUpdateTextContent(this.$store, this.note.id, this.note.textContent)
-      .then((res) => {
-        this.$emit("done");
-      })
-      .catch((res) => (this.formErrors = res))
-      .finally(() => { 
-        this.loading = false;
-        this.$emit("on-editing", "onNotEditing");
-      })
     }
   },
 };

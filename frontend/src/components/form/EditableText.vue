@@ -11,12 +11,11 @@
      v-else
      v-focus
      class="editor" 
-     :modelValue="modelValue"
+     v-model="localValue"
      :scopeName="scopeName"
      :field="field"
      :title="title"
      :errors="errors"
-     @update:modelValue="$emit('update:modelValue', $event)"
      @blur="onBlurTextField"
      v-on:keydown.enter="onEnterKey($event)"/>
   </div>
@@ -46,6 +45,7 @@ export default {
   data() {
     return {
       initialValue: null,
+      localValue: null,
       isEditing: false,
     };
   },
@@ -61,6 +61,7 @@ export default {
     startEditing() {
       if(this.isEditing) return
       this.initialValue = this.modelValue
+      this.localValue = this.modelValue
       this.isEditing = true;
     },
     onEnterKey(event) {
@@ -70,7 +71,8 @@ export default {
     },
     onBlurTextField() {
       this.isEditing = false;
-      if (this.initialValue !== this.modelValue) {
+      if (this.initialValue !== this.localValue) {
+        this.$emit('update:modelValue', this.localValue)
         this.$emit("blur");
       }
     }

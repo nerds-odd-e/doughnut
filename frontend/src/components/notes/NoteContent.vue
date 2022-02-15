@@ -1,15 +1,22 @@
 <template>
+  <h5 v-if="titleAsLink" class="header note-card-title">
+    <NoteTitleWithLink :note="note" class="card-title" />
+  </h5>
+  <EditableText v-else role="title" class="note-title"
+    :multipleLine="false"
+    scopeName="note" v-model="textContent.title"  @blur="onBlurTextField"
+  />
   <div class="note-content">
-      <EditableText
-          :multipleLine="true"
-          role="description"
-          v-if="size==='large'"
-          class="col note-description"
-          scopeName="note"
-          v-model="textContent.description"
-          @blur="onBlurTextField"/>
-      <NoteShortDescription class="col" v-if="size==='medium'" :shortDescription="note.shortDescription"/>
-      <SvgDescriptionIndicator v-if="size==='small' && !!textContent.description" class="description-indicator"/>
+    <EditableText
+        :multipleLine="true"
+        role="description"
+        v-if="size==='large'"
+        class="col note-description"
+        scopeName="note"
+        v-model="textContent.description"
+        @blur="onBlurTextField"/>
+    <NoteShortDescription class="col" v-if="size==='medium'" :shortDescription="note.shortDescription"/>
+    <SvgDescriptionIndicator v-if="size==='small' && !!textContent.description" class="description-indicator"/>
     <template v-if="!!note.notePicture">
       <ShowPicture
         v-if="size!=='small'"
@@ -33,38 +40,58 @@
 </template>
 
 <script>
+import NoteTitleWithLink from "./NoteTitleWithLink.vue";
 import NoteShortDescription from "./NoteShortDescription.vue";
 import ShowPicture from "./ShowPicture.vue";
 import SvgDescriptionIndicator from "../svgs/SvgDescriptionIndicator.vue";
 import SvgPictureIndicator from "../svgs/SvgPictureIndicator.vue";
 import SvgUrlIndicator from "../svgs/SvgUrlIndicator.vue";
 import EditableText from "../form/EditableText.vue";
+import { storedApiUpdateTextContent } from "../../storedApi";
+import storeUndoCommand from "../../storeUndoCommand";
 
 export default {
   props: {
     note: Object,
     size: { type: String, default: 'large'},
+    titleAsLink: Boolean,
   },
-  emits: ['blur'],
   components: {
     NoteShortDescription,
     ShowPicture,
     SvgDescriptionIndicator,
     SvgPictureIndicator,
     SvgUrlIndicator,
-    EditableText
+    EditableText,
+    NoteTitleWithLink,
+  },
+  data() {
+    return {
+      loading: false,
+      formErrors: {},
+    };
   },
   computed: {
     twoColumns() {
       return !!this.notePicture && !!this.note.noteAccessories.description;
     },
     textContent(){
-      return this.note.textContent;
+      return {...this.note.textContent};
     },
   },
   methods: {
     onBlurTextField() {
-      this.$emit("blur");
+      this.loading = true
+      storeUndoCommand.addUndoHistory(this.$store,  {noteId: this.note.id});
+      storedApiUpdateTextContent(this.$store, this.note.id, this.textContent)
+      .then((res) => {
+        this.$emit("done");
+      })
+      .catch((res) => (this.formErrors = res))
+      .finally(() => { 
+        this.loading = false;
+      })
+
     }
   }
 };

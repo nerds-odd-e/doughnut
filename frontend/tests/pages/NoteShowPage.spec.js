@@ -80,9 +80,6 @@
     await wrapper.find('[role="title"] input').trigger("input");
     
 
-    expect(wrapper.emitted()["on-editing"]).toHaveLength(1);
-    expect(wrapper.emitted()["on-editing"][0][0]).toBe("onEditing");
-
     await flushPromises();
     jest.advanceTimersByTime(5000);
     expect(fetch).not.toHaveBeenCalledWith(
