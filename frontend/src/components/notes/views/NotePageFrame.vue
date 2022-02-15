@@ -1,6 +1,7 @@
 <template>
     <div class="inner-box">
       <div class="header">
+        <NoteControl/>
         <Breadcrumb v-bind="notePosition"/>
       </div>
       <div class="content">
@@ -13,6 +14,7 @@
 </template>
 
 <script>
+import NoteControl from "../../toolbars/NoteControl.vue";
 import NoteMindmapView from "./NoteMindmapView.vue";
 import NoteCardsView from "./NoteCardsView.vue";
 import NoteArticleView from "./NoteArticleView.vue";
@@ -25,7 +27,7 @@ export default {
      noteComponent: String,
      expandChildren: { type: Boolean, required: true },
   },
-  components: { NoteMindmapView, Breadcrumb, NoteCardsView, NoteArticleView },
+  components: { NoteControl, NoteMindmapView, Breadcrumb, NoteCardsView, NoteArticleView },
   methods: {
     highlight(id) { 
       this.$store.commit("highlightNoteId", id)

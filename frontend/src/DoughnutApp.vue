@@ -1,7 +1,6 @@
 <script>
 import Popups from "./components/commons/Popups.vue";
 import MainMenu from "./components/commons/MainMenu.vue";
-import NoteControl from "./components/toolbars/NoteControl.vue";
 import UserNewRegisterPage from "./pages/UserNewRegisterPage.vue";
 import { storedApiGetCurrentUserInfo, storedApiGetFeatureToggle } from "./storedApi"
 
@@ -16,7 +15,7 @@ export default {
     };
   },
 
-  components: { Popups, MainMenu, NoteControl, UserNewRegisterPage },
+  components: { Popups, MainMenu, UserNewRegisterPage },
 
   watch: {
     $route(to, from) {
@@ -83,7 +82,6 @@ export default {
   <template v-else>
     <div class="header">
       <MainMenu v-if="showNavBar" />
-      <NoteControl/>
     </div>
     <div v-if="!loading" class="content">
       <router-view/>
