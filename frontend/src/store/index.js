@@ -50,6 +50,7 @@ export default createStore({
   getters: {
     getCurrentUser: (state) => () => state.currentUser,
     getHighlightNoteId: (state) => () => state.highlightNoteId,
+    getHighlightNote: (state) => () => withState(state).getNoteById(state.highlightNoteId),
     getEnvironment: (state) => () => state.environment,
     getFeatureToggle: (state) => () => state.featureToggle,
     getNoteById: (state) => (id) => withState(state).getNoteById(id),

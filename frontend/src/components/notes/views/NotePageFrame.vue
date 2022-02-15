@@ -1,7 +1,7 @@
 <template>
     <div class="inner-box">
       <div class="header">
-        <NoteControl :noteId="highlightNoteId" :viewType="viewType" @updateLanguage="language=$event"/>
+        <NoteControl :viewType="viewType" @updateLanguage="language=$event"/>
         <Breadcrumb v-bind="notePosition"/>
       </div>
       <div class="content">
@@ -38,7 +38,6 @@ export default {
   components: { NoteControl, NoteMindmapView, Breadcrumb, NoteCardsView, NoteArticleView },
   computed: {
     highlightNoteId() {return this.$store.getters.getHighlightNoteId()},
-
   },
   methods: {
     highlight(id) { 
