@@ -54,9 +54,8 @@ export default {
   methods: {
     submitChange() {
       this.loading = true
-      const textContent = this.note.textContent;
-      storeUndoCommand.addUndoHistory(this.$store,  {id: this.note.id, textContent: textContent});
-      storedApiUpdateTextContent(this.$store, this.note.id, textContent)
+      storeUndoCommand.addUndoHistory(this.$store,  {noteId: this.note.id});
+      storedApiUpdateTextContent(this.$store, this.note.id, this.note.textContent)
       .then((res) => {
         this.$emit("done");
       })
@@ -67,9 +66,6 @@ export default {
       })
     }
   },
-  mounted() {
-    storeUndoCommand.initUndoHistory( this.$store,[this.note]);
-  }
 };
 </script>
 

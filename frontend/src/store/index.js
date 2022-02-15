@@ -41,7 +41,7 @@ export default createStore({
     notes: {},
     highlightNoteId: null,
     viewType: null,
-    noteUndoHistories: {},
+    noteUndoHistories: [],
     lastDeletedNoteId: null,
     currentUser: null,
     featureToggle: false,
@@ -59,22 +59,23 @@ export default createStore({
     getChildrenIdsByParentId: (state) => (parentId) => withState(state).getChildrenIdsByParentId(parentId),
     getChildrenOfParentId: (state) => (parentId) => withState(state).getChildrenOfParentId(parentId),
     getLastDeletedNoteId: (state) => () => state.lastDeletedNoteId,
+    peekUndo: (state) => () => {
+      if(state.noteUndoHistories.length === 0) return
+      return state.noteUndoHistories[state.noteUndoHistories.length - 1]
+    },
   },
 
   mutations: {
-    initUndoHistory(state, notes) {
-      notes.forEach((note) => {
-        state.noteUndoHistories[note.id] = [{...note.textContent}];
-      });
+    addUndoHistory(state, {noteId}) {
+      state.noteUndoHistories.push({noteId, textContent: {...withState(state).getNoteById(noteId).textContent}});
     },
-    addUndoHistory(state, params) {
-      state.noteUndoHistories[params.id].push({...params.textContent});
-    },
-    popUndoHistory(state, id) {
-      if (state.noteUndoHistories[id].length > 1) state.noteUndoHistories[id].pop();
-      const note = state.notes[id];
-      const histories = state.noteUndoHistories[id];
-      note.textContent = histories[histories.length - 1];
+    popUndoHistory(state) {
+      if (state.noteUndoHistories.length === 0) {
+        return
+      }
+      const history = state.noteUndoHistories.pop();
+      const note = withState(state).getNoteById(history.noteId);
+      note.textContent = history.textContent;
     },
     loadNotes(state, notes) {
       notes.forEach((note) => {

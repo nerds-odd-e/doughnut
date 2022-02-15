@@ -22,9 +22,10 @@ export default {
   },
   methods: {
     performUndo() {
-      storeUndoCommand.popUndoHistory(this.$store, this.noteId);
-      const note = this.$store.getters.getNoteById(this.noteId);
-      storedApiUpdateTextContent(this.$store, this.noteId, note.textContent)
+      const noteId = this.$store.getters.peekUndo().noteId;
+      storeUndoCommand.popUndoHistory(this.$store);
+      const note = this.$store.getters.getNoteById(noteId);
+      storedApiUpdateTextContent(this.$store, noteId, note.textContent)
       .then((res) => {
         this.$emit("done");
       })

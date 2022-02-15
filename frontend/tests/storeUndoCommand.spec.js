@@ -8,22 +8,9 @@ import makeMe from "./fixtures/makeMe";
 describe("storeUndoCommand", () => {
   const note = makeMe.aNote.title("Dummy Title").please()
 
-  describe("initUndoHistory", () => {
-    beforeEach(() => {
-      store.commit("loadNotes", [note]);
-      storeUndoCommand.initUndoHistory(store, [note])
-    });
-
-    test("should init store state noteUndoHistories ", () => {
-      expect(store.state.noteUndoHistories[note.id]).toEqual(
-          [note.textContent]);
-    });
-  });
-
   describe("addUndoHistory", () => {
     beforeEach(() => {
       store.commit("loadNotes", [note]);
-      storeUndoCommand.initUndoHistory(store, [note])
     });
 
     test("should push textContent into store state noteUndoHistories ",
@@ -38,7 +25,7 @@ describe("storeUndoCommand", () => {
                 }
               });
 
-          expect(store.state.noteUndoHistories[note.id].length).toEqual(2);
+          expect(store.state.noteUndoHistories.length).toEqual(1);
         });
   });
 
@@ -54,21 +41,20 @@ describe("storeUndoCommand", () => {
 
     beforeEach(() => {
       store.commit('loadNotes', [note]);
-      storeUndoCommand.initUndoHistory(store, [note]);
       storeUndoCommand.addUndoHistory(store, mockUpdatedNote);
     });
 
     it('should undo to last history', () => {
-      storeUndoCommand.popUndoHistory(store, note.id);
+      storeUndoCommand.popUndoHistory(store);
 
-      expect(store.state.noteUndoHistories[note.id].length).toEqual(1);
+      expect(store.state.noteUndoHistories.length).toEqual(1);
     });
 
     it('should not undo to last history if there is no more history', () => {
-      storeUndoCommand.popUndoHistory(store, note.id);
-      storeUndoCommand.popUndoHistory(store, note.id);
+      storeUndoCommand.popUndoHistory(store);
+      storeUndoCommand.popUndoHistory(store);
 
-      expect(store.state.noteUndoHistories[note.id].length).toEqual(1);
+      expect(store.state.noteUndoHistories.length).toEqual(0);
     });
   })
 });

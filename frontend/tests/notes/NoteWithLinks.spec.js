@@ -78,20 +78,6 @@ describe("in place edit on title", () => {
 });
 
 describe("undo editing", () => {
-  it("should call initUndoHistory on mounted", async () => {
-    const noteParent = makeMe.aNote.title("Dummy Title").please();
-    store.commit("loadNotes", [noteParent]);
-
-    mountWithStoreAndMockRoute(store, NoteWithLinks, {
-      props: {
-        note: noteParent,
-      },
-    });
-
-    expect(storeUndoCommand.initUndoHistory).toBeCalledWith(store, [
-      noteParent,
-    ]);
-  });
 
   it("should call addUndoHistory on submitChange", async () => {
     const noteParent = makeMe.aNote.title("Dummy Title").please();
