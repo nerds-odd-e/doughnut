@@ -22,7 +22,7 @@ For more background info you can read:
   - [GitHub Discussions](https://github.com/nerds-odd-e/doughnut/discussions) for product ideas/features,
   - [GitHub Issues](https://github.com/nerds-odd-e/doughnut/issues) for reporting issues or bugs, OR
   - [doughnut gitter.im](https://gitter.im/Odd-e-doughnut/community)
-- FOSS style; Fork and submit Github PR.
+- FOSS style; Fork and submit GitHub PR.
   - Please keep the PR small and on only one topic
   - The code need to come with tests
 
@@ -38,7 +38,7 @@ From the root of doughnut directory:
 ./setup-doughnut-dev.sh
 ```
 
-If you hit problems with the above quick-start setup, you should manually walk-through the [local development environment nix setup](./docs/nix.md).
+If you hit problems with the above quick-start setup, you should manually walk through the [local development environment nix setup](./docs/nix.md).
 
 ### 2. Setup and run doughnut with migrations in 'E2E' profile (backend app started on port 9081)
 
@@ -58,7 +58,7 @@ yarn backend:test
 
 ### 3. End-to-End Test / Features / Cucumber / SbE / ATDD
 
-We use cucumber [Gherkin](https://cucumber.io/docs/gherkin/) + cypress (test driver) Javascript/Typescript framework to drive the end to end test suite.
+We use cucumber [Gherkin](https://cucumber.io/docs/gherkin/) + cypress (test driver) Javascript/Typescript framework to drive the end-to-end test suite.
 
 - [Cucumber](https://cucumber.io/)
 
@@ -74,7 +74,7 @@ For MS Windows WSL2 users:
 2. `export NODE_OPTIONS="--max-old-space-size=4096"` before running any cypress related commands (e.g. `cy:open` or `cy:run`).
 
 | Purpose                               | Command (run from `doughnut` source root directory)                                                               |
-| ------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+|---------------------------------------|-------------------------------------------------------------------------------------------------------------------|
 | Install needed e2e tooling            | `yarn`                                                                                                            |
 | Start SUT (backend system under test) | `yarn sut`                                                                                                        |
 | Run all e2e test                      | `yarn test` (starts backend SUT and compile frontend and cypress headless)                                        |
@@ -84,7 +84,7 @@ For MS Windows WSL2 users:
 #### Structure
 
 | Purpose          | Location                                    |
-| ---------------- | ------------------------------------------- |
+|------------------|---------------------------------------------|
 | feature files    | `cypress/integration/*.feature`             |
 | step definitions | `cypress/step_definitions/common/*.{js,ts}` |
 | custom DSL       | `cypress/support/*.js`                      |
