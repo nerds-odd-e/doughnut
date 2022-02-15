@@ -4,7 +4,6 @@
       v-bind="{
         noteId,
         notePosition,
-        viewType,
         expandChildren: true,
         noteComponent: viewTypeObj.noteComponent}"
       @on-editing="onEditing" />
@@ -35,6 +34,9 @@ export default {
     }
   },
   methods: {
+    updateStoreViewType() {
+      this.$store.commit('viewType', this.viewType);
+    },
     fetchData(loading, fetchAll) {
       this.loading = loading ?? true;
       const storedApiCall = fetchAll ?
@@ -72,10 +74,12 @@ export default {
       this.fetchData(this.loading,this.viewTypeObj.fetchAll);
     },
     viewType() {
+      this.updateStoreViewType();
       this.fetchData(this.loading,this.viewTypeObj.fetchAll);
     },
   },
   mounted() {
+    this.updateStoreViewType();
     this.pollData(this.viewTypeObj.fetchAll);
   },
   unmounted() {

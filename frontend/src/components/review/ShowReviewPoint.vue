@@ -5,7 +5,6 @@
         noteId,
         notePosition: noteWithPosition.notePosition,
         expandChildren: false,
-        viewType: 'cards',
         noteComponent: 'NoteCardsView'}"/>
     </div>
 

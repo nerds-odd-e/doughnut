@@ -40,6 +40,7 @@ export default createStore({
   state: () => ({
     notes: {},
     highlightNoteId: null,
+    viewType: null,
     noteUndoHistories: {},
     lastDeletedNoteId: null,
     currentUser: null,
@@ -50,6 +51,7 @@ export default createStore({
   getters: {
     getCurrentUser: (state) => () => state.currentUser,
     getHighlightNoteId: (state) => () => state.highlightNoteId,
+    getViewType: (state) => () => state.viewType,
     getHighlightNote: (state) => () => withState(state).getNoteById(state.highlightNoteId),
     getEnvironment: (state) => () => state.environment,
     getFeatureToggle: (state) => () => state.featureToggle,
@@ -86,6 +88,9 @@ export default createStore({
     },
     highlightNoteId(state, noteId) {
       state.highlightNoteId = noteId
+    },
+    viewType(state, viewType) {
+      state.viewType = viewType
     },
     currentUser(state, user) {
       state.currentUser = user

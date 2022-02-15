@@ -14,13 +14,11 @@
 import NoteButtons from './NoteButtons.vue'
 
 export default {
-  props: {
-    viewType: String,
-  },
   emits: ['updateLanguage'],
   components: { NoteButtons },
   computed: {
     currentNote() { return this.$store.getters.getHighlightNote()},
+    viewType() { return this.$store.getters.getViewType()},
   },
 };
 </script>

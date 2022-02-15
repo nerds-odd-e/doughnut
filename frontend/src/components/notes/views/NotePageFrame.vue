@@ -1,7 +1,7 @@
 <template>
     <div class="inner-box">
       <div class="header">
-        <NoteControl :viewType="viewType" @updateLanguage="language=$event"/>
+        <NoteControl @updateLanguage="language=$event"/>
         <Breadcrumb v-bind="notePosition"/>
       </div>
       <div class="content">
@@ -25,7 +25,6 @@ export default {
      noteId: [String, Number],
      notePosition: Object,
      noteComponent: String,
-     viewType: String,
      expandChildren: { type: Boolean, required: true },
   },
   data() {
