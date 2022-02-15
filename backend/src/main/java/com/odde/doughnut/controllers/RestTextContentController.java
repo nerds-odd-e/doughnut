@@ -33,16 +33,12 @@ class RestTextContentController {
 
     @PatchMapping(path = "/{note}")
     @Transactional
-    public NoteViewedByUser updateNote(@PathVariable(name = "note") Note note, @Valid @ModelAttribute TextContent textContent) throws NoAccessRightException, IOException {
+    public NoteViewedByUser updateNote(@PathVariable(name = "note") Note note, @Valid @ModelAttribute TextContent textContent) throws NoAccessRightException {
         final UserModel user = currentUserFetcher.getUser();
         user.getAuthorization().assertAuthorization(note);
 
-        TextContent target =
-                textContent.getLanguage() != null && textContent.getLanguage().equals("idn") ?
-                        note.getOrBuildTranslationTextContent() : note.getTextContent();
-
         Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-        target.updateTextContent(textContent, currentUTCTimestamp);
+        note.getTextContent().updateTextContent(textContent, currentUTCTimestamp);
 
         modelFactoryService.noteRepository.save(note);
         return new NoteViewer(user.getEntity(), note).toJsonObject();

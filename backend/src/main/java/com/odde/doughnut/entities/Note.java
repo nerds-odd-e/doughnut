@@ -64,21 +64,6 @@ public class Note {
     @Setter
     private TextContent textContent = new TextContent();
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "translation_text_content_id", referencedColumnName = "id")
-    @JsonIgnore
-    @Getter
-    @Setter
-    private TextContent translationTextContent;
-
-    @JsonIgnore
-    public TextContent getOrBuildTranslationTextContent() {
-        if (translationTextContent == null) {
-            translationTextContent = new TextContent();
-        }
-        return translationTextContent;
-    }
-
     @Column(name = "sibling_order")
     private Long siblingOrder = SiblingOrder.getGoodEnoughOrderNumber();
 

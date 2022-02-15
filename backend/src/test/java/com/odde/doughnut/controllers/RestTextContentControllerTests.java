@@ -62,18 +62,6 @@ class RestTextContentControllerTests {
         }
 
         @Test
-        void shouldSetTranslation() throws NoAccessRightException, IOException {
-            textContent.setLanguage("idn");
-            textContent.setTitle("indonesian");
-            textContent.setDescription("xxx");
-
-            NoteViewedByUser response = controller.updateNote(note, textContent);
-
-            assertThat(response.getTranslationTextContent().getTitle(), equalTo("indonesian"));
-            assertThat(response.getTranslationTextContent().getDescription(), equalTo("xxx"));
-        }
-
-        @Test
         void shouldNotAllowOthersToChange() {
             note = makeMe.aNote("another").byUser(makeMe.aUser().please()).please();
             assertThrows(NoAccessRightException.class, () ->

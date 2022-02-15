@@ -51,8 +51,4 @@ public class NoteViewedByUser {
     @Setter
     private TextContent textContent;
 
-    @Getter
-    @Setter
-    private TextContent translationTextContent;
-
 }

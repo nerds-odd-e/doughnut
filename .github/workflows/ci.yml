@@ -169,8 +169,6 @@ jobs:
           - |
             cypress/integration/n*/**
           - |
-            cypress/integration/p*/**
-          - |
             cypress/integration/r*/**
           - |
             cypress/integration/v*/**
