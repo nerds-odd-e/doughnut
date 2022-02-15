@@ -71,6 +71,7 @@ public class Note {
     @Setter
     private TextContent translationTextContent;
 
+    @JsonIgnore
     public TextContent getOrBuildTranslationTextContent() {
         if (translationTextContent == null) {
             translationTextContent = new TextContent();

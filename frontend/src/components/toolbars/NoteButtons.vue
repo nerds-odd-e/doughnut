@@ -117,7 +117,7 @@ export default {
             });
           }
         } else {
-          this.$router.push({ name: "notebooks", query: { deletedNoteId: this.note.id } });
+          this.$router.push({ name: "notebooks" });
         }
       }
     },

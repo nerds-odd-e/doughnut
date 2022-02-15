@@ -18,9 +18,6 @@ class NotebookBuilder extends Builder {
         id: generateId(),
         shortDescription: '',
         parentId: null,
-        orBuildTranslationTextContent: {
-          title: ''
-        },
         title: ''
       },
       skipReviewEntirely: false

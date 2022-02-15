@@ -17,8 +17,7 @@ function withState(state) {
     },
 
     deleteNote(id) {
-      this.getChildrenIdsByParentId(id).forEach(cid=>
-        this.deleteNote(cid))
+      this.getChildrenIdsByParentId(id)?.forEach(this.deleteNote)
       delete state.notes[id]
     },
 
