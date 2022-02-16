@@ -29,8 +29,6 @@ configure_nix_flakes() {
     if ! grep -Fxq "experimental-features = nix-command flakes" ~/.config/nix/nix.conf; then
         echo 'experimental-features = nix-command flakes' >>~/.config/nix/nix.conf
     fi
-    nix-channel --update
-    nix-env -iA nixpkgs.nix && nix-env -u --always
 }
 
 install_nixpkg_manager() {
@@ -53,4 +51,6 @@ install_nixpkg_manager() {
 install_nixpkg_manager
 
 . ~/.nix-profile/etc/profile.d/nix.sh
+nix-channel --update
+nix-env -iA nixpkgs.nix && nix-env -u --always
 nix develop -c $SHELL
