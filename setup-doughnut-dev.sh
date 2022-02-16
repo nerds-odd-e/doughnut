@@ -4,7 +4,7 @@ set -eo pipefail
 
 export NIXPKGS_ALLOW_UNFREE=1
 export unameOut="$(uname -s)"
-export os_type=Linux
+export os_type=Unsupported
 
 get_os_type() {
     case "${unameOut}" in
@@ -12,13 +12,12 @@ get_os_type() {
         Darwin*) os_type=Mac ;;
         *) os_type="UNKNOWN:${unameOut}" ;;
     esac
-    export os_type=$os_type
 }
 
 download_nixpkg_manager_install_script() {
     rm -f install-nix
     curl -o install-nix https://releases.nixos.org/nix/nix-2.6.0/install
-    chmod +x install-nix
+    chmod +x ./install-nix
 }
 
 configure_nix_flakes() {
@@ -36,8 +35,7 @@ configure_nix_flakes() {
 
 install_nixpkg_manager() {
     get_os_type
-    nix_installed_path=$(which nix 2>/dev/null)
-    if [[ $nix_installed_path == *"not found"* ]]; then
+    if ! command -v nix &>/dev/null; then
         download_nixpkg_manager_install_script
         if [ "${os_type}" = "Mac" ]; then
             ./install-nix --darwin-use-unencrypted-nix-store-volume
