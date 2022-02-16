@@ -142,21 +142,6 @@ class TestabilityRestController {
         return user.getOwnership();
     }
 
-    @PatchMapping("/textContent/{noteId}")
-    @Transactional
-    public ResponseEntity textContent(@RequestBody TextContent textContent, @PathVariable("noteId") Integer noteId) {
-        final Optional<Note> noteById = noteRepository.findById(noteId);
-        if (noteById.isPresent()) {
-            Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-            final Note currentNote = noteById.get();
-            final TextContent currentTextContent = currentNote.getTextContent();
-            currentTextContent.updateTextContent(textContent, currentUTCTimestamp);
-            noteRepository.save(currentNote);
-            return ResponseEntity.ok(null);
-        }
-        return ResponseEntity.notFound().build();
-    }
-
     @PostMapping("/link_notes")
     @Transactional
     public String linkNotes(@RequestBody HashMap<String, String> linkInfo) {
