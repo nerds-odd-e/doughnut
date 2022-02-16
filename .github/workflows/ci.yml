@@ -216,7 +216,7 @@ jobs:
         if: failure()
         with:
           name: cypress-screenshots
-          path: cypress/screenshots-${{ github.run_id }}-${{ matrix.spec }}
+          path: cypress/screenshots
 
   Package-n-Deploy:
     name: Package & GCP MIG Rolling Update Deploy
