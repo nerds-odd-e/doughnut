@@ -45,6 +45,7 @@ install_nixpkg_manager() {
             echo "Unsupported OS Platform for Nix development enviroment. Exiting!!!"
             exit 1
         fi
+        rm -f ./install-nix
     fi
     configure_nix_flakes
 }
