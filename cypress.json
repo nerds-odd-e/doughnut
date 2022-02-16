@@ -9,9 +9,5 @@
     "**/*.{js,ts}",
     "**/__snapshots__/*",
     "**/__image_snapshots__/*"
-  ],
-  "pageLoadTimeout": 100000,
-  "video": false,
-  "viewportWidth": 1000,
-  "viewportHeight": 660
+  ]
 }

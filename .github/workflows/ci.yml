@@ -216,6 +216,18 @@ jobs:
           wait-on: "http://127.0.0.1:9081/api/healthcheck"
           wait-on-timeout: 120
           spec: ${{ matrix.spec }}
+      - name: Upload screenshots & videos
+      - name: GCP Auth with Service Account
+        uses: google-github-actions/auth@v0
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+      - name: Set up GCP SDK
+        uses: google-github-actions/setup-gcloud@v0
+      - name: Upload production application jar to Google Cloud Storage
+        uses: google-github-actions/upload-cloud-storage@v0
+        with:
+          path: cypress/screenshots
+          destination: doughnut-e2e/${{ github.run_id }}/${{ matrix.spec }}/screenshots
 
   Package-n-Deploy:
     name: Package & GCP MIG Rolling Update Deploy
