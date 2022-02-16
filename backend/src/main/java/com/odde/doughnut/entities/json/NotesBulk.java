@@ -37,7 +37,9 @@ public class NotesBulk {
     public static NotesBulk jsonNoteWithParent(Note note, UserModel user) {
         NotesBulk notesBulk = new NotesBulk();
         notesBulk.notePosition = new NoteViewer(user.getEntity(), note).jsonNotePosition(note);
-        notesBulk.notes.add(new NoteViewer(user.getEntity(), note.getParentNote()).toJsonObject());
+        if(note.getParentNote() != null) {
+            notesBulk.notes.add(new NoteViewer(user.getEntity(), note.getParentNote()).toJsonObject());
+        }
         return notesBulk;
     }
 }

@@ -49,6 +49,12 @@ const storedApiDoInitialReview = async (store, data) => {
     return res;
 }
 
+const storedApiGetNotebooks = async (store) => {
+  const res = await restGet(`/api/notebooks`)
+  store.commit("notebooks", res.notebooks)
+  return res
+}
+
 const storedApiCreateNotebook = async (store, circle, data) => {
     const url = (() =>{
         if (circle) {
@@ -104,6 +110,19 @@ const storedApiDeleteNote = async (store, noteId) => {
         () => null
     )
     store.commit("deleteNote", noteId)
+    return res;
+}
+
+const storedApiUndoDeleteNote = async (store) => {
+    const deletedNoteId = store.getters.getLastDeletedNoteId()
+    const res = await restPatch(
+        `/api/notes/${deletedNoteId}/undo-delete`,
+        {},
+    )
+    store.commit("loadNotes", res.notes)
+    if(res.notes[0].parentId === null) {
+        storedApiGetNotebooks(store)
+    }
     return res;
 }
 
@@ -188,10 +207,12 @@ const storedApiGetNextReviewItem = async (store) => {
 
 export {
     apiLogout,
-    storedApiGetNextReviewItem,
-    storedApiSelfEvaluate,
     apiProcessAnswer,
     apiRemoveFromReview,
+
+    storedApiGetNextReviewItem,
+    storedApiSelfEvaluate,
+    storedApiGetNotebooks,
     storedApiCreateNotebook,
     storedApiGetNoteWithDescendents,
     storedApiGetNoteAndItsChildren,
@@ -199,6 +220,7 @@ export {
     storedApiUpdateNote,
     storedApiUpdateTextContent,
     storedApiDeleteNote,
+    storedApiUndoDeleteNote,
     storedApiSplitNote,
     storedApiGetCurrentUserInfo,
     storedApiUpdateUser,

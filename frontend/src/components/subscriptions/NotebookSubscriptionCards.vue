@@ -1,5 +1,5 @@
 <template>
-  <NotebookCardsWithButtons :notebooks="subscriptions.map((s) => s.notebook)">
+  <NotebookCardsWithButtons :notebooks="subscriptions?.map((s) => s.notebook)">
     <template #default="{ notebook }">
       <SubscriptionNoteButtons
         :subscription="subscriptions.find((s) => s.notebook === notebook)"

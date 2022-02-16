@@ -34,6 +34,9 @@ export default {
       .then((res) => {
         this.$emit("done");
       })
+    },
+    undoDelete() {
+
     }
   }
 };
