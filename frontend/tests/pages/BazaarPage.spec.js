@@ -26,17 +26,4 @@ describe("bazaar page", () => {
     expect(fetch).toHaveBeenCalledTimes(1);
     expect(fetch).toHaveBeenCalledWith("/api/bazaar", {});
   });
-
-  test('fetch API to be called every 5 seconds', async () => {
-    const notebook = makeMe.aNotebook.please();
-    const bazaarNote = makeMe.aBazaarNote.notebooks(notebook).please();
-    fetch.mockResponse(JSON.stringify(bazaarNote));
-
-    renderWithStoreAndMockRoute(store, BazaarPage);
-
-    await flushPromises();
-    jest.advanceTimersByTime(6000);
-    expect(fetch).toHaveBeenCalledTimes(2);
-    expect(fetch).toHaveBeenCalledWith("/api/bazaar", {});
-  });
 });

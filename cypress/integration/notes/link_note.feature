@@ -11,12 +11,14 @@ Feature: link note
       | Sedation | Put to sleep    |
       | Sedative | Sleep medicine  |
 
+    @stopTime
   Scenario: View all linkable notes for a note when no link exists
     When I am creating link for note "Sedition"
     Then I should see the source note as "Sedition"
     And I should see "Sedation, Sedative" as targets only when searching " se "
     And I should see note cannot be found when searching "Sedition"
 
+  @stopTime
   Scenario Outline: Search note for linking with partial input
     Given I am creating link for note "Sedition"
     And I should see "<targets>" as targets only when searching "<search key>"
@@ -25,6 +27,7 @@ Feature: link note
       | Sed        | Sedation, Sedative |
       | Sedatio    | Sedation           |
 
+  @stopTime
   Scenario: links should show in the view
     When I link note "Sedition" as "similar to" note "Sedation"
     And I link note "Sedition" as "similar to" note "Sedative"
@@ -36,6 +39,7 @@ Feature: link note
 #    Then I should be able to delete the link
 #    And I should see "Sedition" has no link of type "a specialization of"
 
+  @stopTime
   Scenario: link and move
     Given I link note "Sedition" as "similar to" note "Sedation" and move under it
     When I open "Sedation/Sedition" note from top level

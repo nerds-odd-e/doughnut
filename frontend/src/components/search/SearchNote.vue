@@ -32,7 +32,7 @@ import Cards from "../notes/Cards.vue";
 import { restPost } from "../../restful/restful";
 import _ from "lodash";
 
-const debounced = _.debounce((callback) => callback(), 200);
+const debounced = _.debounce((callback) => callback(), 500);
 
 export default {
   name: "SearchNote",

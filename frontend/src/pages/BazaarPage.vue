@@ -22,7 +22,6 @@ export default {
     return {
       loading: true,
       notebooksViewedByUser: null,
-      polling: null,
     };
   },
   computed: {
@@ -30,31 +29,18 @@ export default {
   },
 
   methods: {
-    getBazaarData() {
+    fetchData() {
+      this.loading = true
       restGet(`/api/bazaar`).then(
         (res) => {
           this.notebooksViewedByUser = res
         }
       )
-    },
-    fetchData() {
-      this.loading = true
-      this.getBazaarData();
-      this.loading = false;
-    },
-     pollData() {
-      const intervalTime = 5000;
-      this.polling = setInterval(() => {
-        this.getBazaarData();
-      }, intervalTime);
+      .finally(()=> this.loading = false)
     },
   },
   mounted() {
     this.fetchData();
-    this.pollData();
-  },
-  unmounted() {
-    clearInterval(this.polling);
   },
 };
 </script>

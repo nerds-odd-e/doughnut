@@ -28,3 +28,4 @@ Before({ tags: "@cleanDownloadFolder" }, () => {
 Before({ tags: "@stopTime" }, () => {
   cy.clock()
 })
+
