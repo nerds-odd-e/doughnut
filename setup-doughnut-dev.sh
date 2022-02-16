@@ -36,8 +36,6 @@ nixpkg_script_activate() {
     mkdir -p ~/.nix-profile/etc/profile.d
     cp infra/nix/nix.sh ~/.nix-profile/etc/profile.d/nix.sh
     . ~/.nix-profile/etc/profile.d/nix.sh
-    nix-channel --update
-    nix-env -iA nixpkgs.nix && nix-env -u --always
 }
 
 install_nixpkg_manager() {
@@ -58,5 +56,3 @@ install_nixpkg_manager() {
 }
 
 install_nixpkg_manager
-
-nix develop -c $SHELL
