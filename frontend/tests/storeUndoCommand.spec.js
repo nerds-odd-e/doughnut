@@ -1,7 +1,6 @@
 /**
  * @jest-environment jsdom
  */
-import storeUndoCommand from "../src/storeUndoCommand";
 import store from "../src/store/index";
 import makeMe from "./fixtures/makeMe";
 
@@ -15,8 +14,7 @@ describe("storeUndoCommand", () => {
 
     test("should push textContent into store state noteUndoHistories ",
         () => {
-          storeUndoCommand.addEditingToUndoHistory(store,
-              { noteId: note.id, });
+          store.commit('addEditingToUndoHistory', { noteId: note.id, });
 
           expect(store.state.noteUndoHistories.length).toEqual(1);
         });
@@ -28,7 +26,7 @@ describe("storeUndoCommand", () => {
 
     beforeEach(() => {
       store.commit('loadNotes', [note]);
-      storeUndoCommand.addEditingToUndoHistory(store, mockUpdatedNote);
+      store.commit('addEditingToUndoHistory', mockUpdatedNote);
       initialUndoCount = store.state.noteUndoHistories.length;
     });
 

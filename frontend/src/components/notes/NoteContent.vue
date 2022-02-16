@@ -48,7 +48,6 @@ import SvgPictureIndicator from "../svgs/SvgPictureIndicator.vue";
 import SvgUrlIndicator from "../svgs/SvgUrlIndicator.vue";
 import EditableText from "../form/EditableText.vue";
 import { storedApi } from "../../storedApi";
-import storeUndoCommand from "../../storeUndoCommand";
 
 export default {
   props: {
@@ -82,7 +81,6 @@ export default {
   methods: {
     onBlurTextField() {
       this.loading = true
-      storeUndoCommand.addEditingToUndoHistory(this.$store,  {noteId: this.note.id});
       storedApi(this.$store).updateTextContent(this.note.id, this.textContent)
       .then((res) => {
         this.$emit("done");

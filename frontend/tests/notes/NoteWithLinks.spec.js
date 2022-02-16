@@ -9,9 +9,6 @@ import {
   mountWithStoreAndMockRoute,
 } from "../helpers";
 import store from "../../src/store";
-import storeUndoCommand from "../../src/storeUndoCommand";
-
-jest.mock("../../src/storeUndoCommand");
 
 describe("new/updated pink banner", () => {
   beforeAll(() => {
@@ -80,13 +77,13 @@ describe("in place edit on title", () => {
 describe("undo editing", () => {
 
   it("should call addEditingToUndoHistory on submitChange", async () => {
-    const noteParent = makeMe.aNote.title("Dummy Title").please();
-    store.commit("loadNotes", [noteParent]);
+    const note = makeMe.aNote.title("Dummy Title").please();
+    store.commit("loadNotes", [note]);
 
     const updatedTitle = "updated";
     const { wrapper } = mountWithStoreAndMockRoute(store, NoteWithLinks, {
       props: {
-        note: noteParent,
+        note: note,
       },
     });
 
@@ -94,7 +91,6 @@ describe("undo editing", () => {
     await wrapper.find('[role="title"] input').setValue(updatedTitle);
     await wrapper.find('[role="title"] input').trigger("blur");
 
-    expect(storeUndoCommand.addEditingToUndoHistory).toBeCalledWith(store,
-        {noteId: noteParent.id})
+    expect(store.getters.peekUndo()).toMatchObject({type: 'editing'})
   });
 });

@@ -117,6 +117,7 @@ const storedApi = (store) => {
         },
 
         async updateTextContent(noteId, noteContentData)  {
+            store.commit('addEditingToUndoHistory',  { noteId });
             return this.updateTextContentWithoutUndo(noteId, noteContentData)
         },
 
