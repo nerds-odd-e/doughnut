@@ -19,8 +19,7 @@ import NotebookNewButton from "../components/notebook/NotebookNewButton.vue";
 import NoteControl from "../components/toolbars/NoteControl.vue";
 import NotebookSubscriptionCards from "../components/subscriptions/NotebookSubscriptionCards.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
-import { storedApiGetNotebooks, storedApiUndoDeleteNote } from "../storedApi";
-import { useSnackbarPlugin } from "snackbar-vue";
+import { storedApiGetNotebooks } from "../storedApi";
 
 export default {
   name: "NotebooksPage",
@@ -49,24 +48,9 @@ export default {
         (res) => (this.subscriptions = res.subscriptions)
       ).finally(()=> this.loading = false);
     },
-    showUndoSnackbar() {
-      const snack = useSnackbarPlugin();
-      const deletedNoteId = this.$store.getters.getLastDeletedNoteId()
-      if(!deletedNoteId) return
-      snack.show({
-        position: 'bottom',
-        text: `Note successfully deleted`,
-        button: 'Undo',
-        action: () => {
-          storedApiUndoDeleteNote(this.$store);
-        },
-        time: 5000
-      });
-    }
   },
   mounted() {
     this.fetchData();
-    this.showUndoSnackbar();
   },
 };
 </script>

@@ -201,9 +201,9 @@ class RestNoteControllerTests {
             makeMe.refresh(note);
 
             controller.deleteNote(note);
-            Integer response = controller.undoDeleteNote(note);
+            NotesBulk response = controller.undoDeleteNote(note);
 
-            assertEquals(note.getId(), response);
+            assertEquals(note.getId(), response.notes.get(0).getId());
             assertNull(modelFactoryService.findNoteById(note.getId()).get().getDeletedAt());
         }
     }

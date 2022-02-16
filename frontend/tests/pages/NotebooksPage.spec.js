@@ -7,12 +7,6 @@ import store from "../../src/store/index.js";
 import { renderWithStoreAndMockRoute } from "../helpers";
 import _ from "lodash";
 import makeMe from "../fixtures/makeMe";
- 
-jest.mock("snackbar-vue", () => ({
-    useSnackbarPlugin: () => ({
-        show: jest.fn(0)
-    })
-}));
 
 beforeEach(() => {
    fetch.resetMocks();
@@ -47,6 +41,6 @@ describe("Notebooks Page", () => {
 
         renderWithStoreAndMockRoute(store, NotebooksPage, {});
 
-        expect(await screen.findByTitle("undo")).not.toBeDisabled();
+        expect(await screen.findByTitle("undo delete note")).not.toBeDisabled();
     });
 });

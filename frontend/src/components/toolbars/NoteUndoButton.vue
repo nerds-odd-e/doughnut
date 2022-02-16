@@ -2,7 +2,7 @@
   <button class="btn btn-small" title="undo note" @click="performUndo()">
     <SvgUndo/>
   </button>
-  <button class="btn btn-small" title="undo" @click="performUndo()" :disabled="!hasHistory">
+  <button class="btn btn-small" :title="undoTitle" @click="undoDelete()" :disabled="!hasHistory">
     <SvgUndo/>
   </button>
 </template>
@@ -10,7 +10,7 @@
 <script>
 import SvgUndo from "../svgs/SvgUndo.vue";
 import storeUndoCommand from "../../storeUndoCommand";
-import {storedApiUpdateTextContent} from "../../storedApi";
+import {storedApiUpdateTextContent, storedApiUndoDeleteNote } from "../../storedApi";
 
 export default {
   name: "NoteUndoButton",
@@ -23,6 +23,12 @@ export default {
   computed: {
     hasHistory() {
       return (this.$store.getters.peekUndo1() != null)
+    },
+    undoTitle() {
+      if(this.hasHistory) {
+        return 'undo delete note'
+      }
+      return 'undo'
     }
   },
   methods: {
@@ -36,7 +42,7 @@ export default {
       })
     },
     undoDelete() {
-
+      storedApiUndoDeleteNote(this.$store)
     }
   }
 };

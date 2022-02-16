@@ -220,8 +220,8 @@ When(
 );
 
 When("I click note {string}", (noteTitle) => {
-  //cy.findByRole("card", { name: noteTitle }).click('bottomRight', {force: true});
-  cy.findByRole("card", { name: noteTitle }).click();
+  cy.findByRole("card", { name: noteTitle }).click('bottomRight', {force: true});
+  //cy.findByRole("card", { name: noteTitle }).click();
 });
 
 When("I click note title {string}", (noteTitle) => {
@@ -381,8 +381,8 @@ When("I perform undo", () => {
   cy.findByTitle("undo note").click();
 })
 
-When("I click undo delete on snackbar", () => {
-  cy.get('.snackbar__action').click();
+When("I undo {string}", (undoType) => {
+  cy.findByTitle(`undo ${undoType}`).click();
 })
 
 Then("the deleted notebook with title {string} should be restored", (title) => {

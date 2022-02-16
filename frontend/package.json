@@ -16,7 +16,6 @@
     "bootstrap": "^5.1.3",
     "file-saver": "^2.0.5",
     "lodash": "^4.17.21",
-    "snackbar-vue": "^1.0.3",
     "vue": "^3.2.31",
     "vue-content-loader": "^2.0.1",
     "vue-router": "^4.0.12",
