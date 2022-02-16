@@ -115,6 +115,7 @@ const storedApiDeleteNote = async (store, noteId) => {
 
 const storedApiUndoDeleteNote = async (store) => {
     const deletedNoteId = store.getters.getLastDeletedNoteId()
+    store.commit('popUndoHistory1')
     const res = await restPatch(
         `/api/notes/${deletedNoteId}/undo-delete`,
         {},

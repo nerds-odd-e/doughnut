@@ -14,3 +14,4 @@ Feature: Notebook deletion
     Then I should not see note "LeSS in Action" at the top level of all my notes
     When I undo "delete note"
     Then the deleted notebook with title "LeSS in Action" should be restored
+    And there should be no more undo to do

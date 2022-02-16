@@ -388,3 +388,7 @@ When("I undo {string}", (undoType) => {
 Then("the deleted notebook with title {string} should be restored", (title) => {
   cy.findByText(title).should('exist');
 })
+
+Then("there should be no more undo to do", () => {
+  cy.get('.btn[title="undo"]').should('be.disabled');
+})

@@ -83,6 +83,9 @@ export default createStore({
       const note = withState(state).getNoteById(history.noteId);
       note.textContent = history.textContent;
     },
+    popUndoHistory1(state) {
+      state.lastDeletedNoteId = null
+    },
     loadNotes(state, notes) {
       notes.forEach((note) => {
        state.notes[note.id] = note;
