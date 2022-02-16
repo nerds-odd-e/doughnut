@@ -36,7 +36,6 @@ const storedApi = (store) => {
                 const res = await restPost(
                     `/api/reviews`,
                     data,
-                    () => null
                 )
                 loadReviewPointViewedByUser(res)
                 return res;
@@ -46,7 +45,6 @@ const storedApi = (store) => {
                 const res = await restPost(
                         `/api/reviews/${reviewPointId}/self-evaluate`,
                         data,
-                        () => null
                     )
                 loadReviewPointViewedByUser(res.reviewPointViewedByUser)
                 return res
@@ -90,7 +88,6 @@ const storedApi = (store) => {
             const res = await restPostMultiplePartForm(
                 url,
                 data,
-                () => null
             )
             return res;
         },
@@ -99,7 +96,6 @@ const storedApi = (store) => {
             const res = await restPostMultiplePartForm(
                 `/api/notes/${parentId}/create`,
                 data,
-                () => null
             )
             store.commit("loadNotes", res.notes);
             return res;
@@ -109,7 +105,6 @@ const storedApi = (store) => {
             const res = await restPost(
                 `/api/links/create/${sourceId}/${targetId}`,
                 data,
-                () => null
             )
             store.commit("loadNotes", res.notes);
             return res;
@@ -119,7 +114,6 @@ const storedApi = (store) => {
             const res = await restPost(
                 `/api/links/${linkId}`,
                 data,
-                () => null
             )
             store.commit("loadNotes", res.notes);
             return res;
@@ -128,8 +122,7 @@ const storedApi = (store) => {
         async deleteLink(linkId)  {
             const res = await restPost(
                 `/api/links/${linkId}/delete`,
-                data,
-                () => null
+                {},
             )
             store.commit("loadNotes", res.notes);
             return res;
@@ -140,7 +133,6 @@ const storedApi = (store) => {
             const res = await restPatchMultiplePartForm(
                 `/api/notes/${noteId}`,
                 data,
-                () => null
             )
             store.commit("loadNotes", [res]);
             return res;
@@ -194,7 +186,6 @@ const storedApi = (store) => {
         const res = await restPatchMultiplePartForm(
                 `/api/user/${userId}`,
                 data,
-                () => null
             )
         store.commit("currentUser", res)
         return res
@@ -204,7 +195,6 @@ const storedApi = (store) => {
         const res = await restPostMultiplePartForm(
                 `/api/user`,
                 data,
-                () => null
             )
         store.commit("currentUser", res)
         return res
@@ -218,7 +208,6 @@ const storedApi = (store) => {
             const res = await restPost(
                     `/api/testability/feature_toggle`,
                     {enabled: data},
-                    () => null
                 )
             this.getFeatureToggle(store)
             return res
@@ -236,7 +225,6 @@ const apiProcessAnswer = async (reviewPointId, data) => {
   const res = await restPost(
         `/api/reviews/${reviewPointId}/answer`,
         data,
-        () => null
       )
   return res
 }
@@ -245,7 +233,6 @@ const apiRemoveFromReview = async (reviewPointId) => {
   const res = await restPost(
         `/api/review-points/${reviewPointId}/remove`,
         {},
-        () => null
       )
   return res
 }
