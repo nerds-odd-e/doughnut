@@ -82,6 +82,10 @@ Then("I should see {string} in breadcrumb", (noteTitles) => {
   );
 });
 
+When("I visit all my notebooks", () => {
+    cy.visitMyNotebooks();
+});
+
 Then(
   "I should see these notes belonging to the user at the top level of all my notes",
   (data) => {
@@ -120,7 +124,6 @@ Then("I should see {string} in note title", (noteTitle) => {
 Then(
   "I should not see note {string} at the top level of all my notes",
   (noteTitle) => {
-    cy.visitMyNotebooks();
     cy.pageIsLoaded();
     cy.findByText("Notebooks");
     cy.findByText(noteTitle).should("not.exist");
