@@ -9,5 +9,12 @@
     "**/*.{js,ts}",
     "**/__snapshots__/*",
     "**/__image_snapshots__/*"
-  ]
+  ],
+  "nodeVersion": "system",
+  "screenshotOnRunFailure": true,
+  "pageLoadTimeout": 100000,
+  "defaultCommandTimeout": 6000,
+  "trashAssetsBeforeRuns": true,
+  "viewportWidth": 1000,
+  "viewportHeight": 660
 }

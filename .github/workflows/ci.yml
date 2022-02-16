@@ -205,6 +205,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
       - name: End-to-End tests with Cypress
+        id: cypress_e2e
         uses: cypress-io/github-action@v2
         with:
           browser: chrome
@@ -217,12 +218,15 @@ jobs:
           wait-on-timeout: 120
           spec: ${{ matrix.spec }}
       - name: GCP Auth with Service Account
+        if: steps.cypress_e2e.conclusion == 'failure'
         uses: google-github-actions/auth@v0
         with:
           credentials_json: ${{ secrets.GCP_CREDENTIALS }}
       - name: Set up GCP SDK
+        if: steps.cypress_e2e.conclusion == 'failure'
         uses: google-github-actions/setup-gcloud@v0
       - name: Upload screenshots & videos to GCP Storage at doughnut-e2e bucket
+        if: steps.cypress_e2e.conclusion == 'failure'
         uses: google-github-actions/upload-cloud-storage@v0
         with:
           path: cypress/screenshots
