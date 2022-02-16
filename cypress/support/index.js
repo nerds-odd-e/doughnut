@@ -19,16 +19,6 @@
 import "./commands";
 import "./testability";
 
-//
-// When the active polling features are added, the browser page is still polling when the next test started.
-// but the session is already reset, so this cause exception. This is to suppress the exceptions temporarily
-//
-// Remove this before: 12 Feb 2022
-//
-Cypress.on('uncaught:exception', (err, runnable) => {
-  return false
-})
-
 String.prototype.commonSenseSplit = function (separator) {
   return this.trim()
     .split(separator)
