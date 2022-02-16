@@ -22,7 +22,7 @@
 import Breadcrumb from "./Breadcrumb.vue";
 import NoteFormTitleOnly from "./NoteFormTitleOnly.vue";
 import LinkTypeSelect from "../links/LinkTypeSelect.vue";
-import { storedApiGetNoteAndItsChildren, storedApiCreateNote } from "../../storedApi";
+import { storedApi } from "../../storedApi";
 
 function initialState() {
   return {
@@ -55,7 +55,7 @@ export default {
   methods: {
     fetchData() {
       this.loading = true
-      storedApiGetNoteAndItsChildren(this.$store, this.parentId)
+      storedApi(this.$store).getNoteAndItsChildren(this.parentId)
       .then((res) => {
           const note = res.notes[0]
           const { ancestors, notebook } = res.notePosition;
@@ -68,9 +68,7 @@ export default {
 
     processForm() {
       this.loading = true
-      storedApiCreateNote(
-        this.$store,
-        this.parentId,
+      storedApi(this.$store).createNote(this.parentId,
         this.creationData
       ).then((res) => {
         console.log(res)

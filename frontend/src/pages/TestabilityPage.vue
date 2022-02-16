@@ -11,7 +11,7 @@
 
 <script>
 import CheckInput from "../components/form/CheckInput.vue";
-import { storedApiSetFeatureToggle } from '../storedApi';
+import { storedApi } from '../storedApi';
 
 export default {
   data() {
@@ -23,7 +23,7 @@ export default {
   components: { CheckInput },
   watch: {
     featureToggle() {
-      storedApiSetFeatureToggle(this.$store, this.featureToggle)
+      storedApi(this.$store).setFeatureToggle(this.featureToggle)
     }
 
   }

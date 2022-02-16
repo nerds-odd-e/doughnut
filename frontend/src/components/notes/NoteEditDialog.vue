@@ -7,7 +7,7 @@
 
 <script>
 import NoteFormBody from "./NoteFormBody.vue";
-import { storedApiGetNoteAndItsChildren, storedApiUpdateNote } from "../../storedApi";
+import { storedApi } from "../../storedApi";
 
 export default {
   name: "NoteEditDialog",
@@ -27,7 +27,7 @@ export default {
   methods: {
     fetchData() {
       this.loading = true
-      storedApiGetNoteAndItsChildren(this.$store, this.noteId)
+      storedApi(this.$store).getNoteAndItsChildren(this.noteId)
       .then((res) => {
           const { updatedAt, ...rest } = res.notes[0].noteAccessories
           this.formData = rest
@@ -38,7 +38,7 @@ export default {
 
     processForm() {
       this.loading = true
-      storedApiUpdateNote(this.$store, this.noteId, this.formData)
+      storedApi(this.$store).updateNote(this.noteId, this.formData)
       .then(() => {
         this.$emit("done");
       })

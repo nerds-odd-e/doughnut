@@ -19,7 +19,7 @@ import NotebookNewButton from "../components/notebook/NotebookNewButton.vue";
 import NoteControl from "../components/toolbars/NoteControl.vue";
 import NotebookSubscriptionCards from "../components/subscriptions/NotebookSubscriptionCards.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
-import { storedApiGetNotebooks } from "../storedApi";
+import { storedApi } from "../storedApi";
 
 export default {
   name: "NotebooksPage",
@@ -44,7 +44,7 @@ export default {
   methods: {
     fetchData() {
       this.loading = true
-      storedApiGetNotebooks(this.$store).then(
+      storedApi(this.$store).getNotebooks().then(
         (res) => (this.subscriptions = res.subscriptions)
       ).finally(()=> this.loading = false);
     },

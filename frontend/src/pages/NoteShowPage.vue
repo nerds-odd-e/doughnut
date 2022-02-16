@@ -14,7 +14,7 @@
 <script>
 import LoadingPage from "./commons/LoadingPage.vue";
 import NotePageFrame from '../components/notes/views/NotePageFrame.vue';
-import { storedApiGetNoteAndItsChildren, storedApiGetNoteWithDescendents } from "../storedApi";
+import { storedApi } from "../storedApi";
 import { viewType } from "../models/viewTypes";
 
 export default {
@@ -40,10 +40,10 @@ export default {
     fetchData(loading, fetchAll) {
       this.loading = loading ?? true;
       const storedApiCall = fetchAll ?
-                              storedApiGetNoteWithDescendents :
-                              storedApiGetNoteAndItsChildren
+                              storedApi(this.$store).getNoteWithDescendents :
+                              storedApi(this.$store).getNoteAndItsChildren
 
-      storedApiCall(this.$store, this.noteId)
+      storedApiCall(this.noteId)
       .then((res) => {
         this.notePosition = res.notePosition;
       }).finally(() => this.loading = false);

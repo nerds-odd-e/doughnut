@@ -65,7 +65,7 @@ import Repetition from "../components/review/Repetition.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import NoteStatisticsButton from "../components/notes/NoteStatisticsButton.vue";
 import RepeatProgressBar from "../components/review/RepeatProgressBar.vue";
-import { apiRemoveFromReview, storedApiSelfEvaluate, apiProcessAnswer, storedApiGetNextReviewItem } from '../storedApi';
+import { apiRemoveFromReview, storedApi, apiProcessAnswer } from '../storedApi';
 
 export default {
   name: "RepeatPage",
@@ -146,7 +146,7 @@ export default {
 
     fetchData() {
       this.loading = true
-      storedApiGetNextReviewItem(this.$store).then(
+      storedApi(this.$store).reviewMethods.getNextReviewItem().then(
         this.loadNew
       ).finally(() => this.loading = false);
     },
@@ -182,9 +182,7 @@ export default {
       }
       this.loading = true
 
-      storedApiSelfEvaluate(
-        this.$store,
-        this.reviewPointId,
+      storedApi(this.$store).reviewMethods.selfEvaluate(this.reviewPointId,
         { selfEvaluation: data, increaseRepeatCount: !this.answerResult },
       )
       .then(this.loadNew)

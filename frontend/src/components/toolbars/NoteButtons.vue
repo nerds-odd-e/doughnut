@@ -64,7 +64,7 @@ import NoteSplitButton from "./NoteSplitButton.vue";
 import NoteDownloadButton from "./NoteDownloadButton.vue"
 import NoteNewButton from "./NoteNewButton.vue";
 import ViewTypeButtons from "./ViewTypeButtons.vue";
-import { storedApiDeleteNote } from "../../storedApi";
+import { storedApi } from "../../storedApi";
 import { viewType } from "../../models/viewTypes";
 export default {
   name: "NoteButtons",
@@ -94,7 +94,7 @@ export default {
     async deleteNote() {
       if (await this.$popups.confirm(`Are you sure to delete this note?`)) {
         const parentId = this.note.parentId;
-        await storedApiDeleteNote(this.$store, this.note.id);
+        await storedApi(this.$store).deleteNote(this.note.id);
         this.$emit("ensureVisible", parentId);
         if (parentId) {
           if (viewType(this.viewType).redirectAfterDelete) {

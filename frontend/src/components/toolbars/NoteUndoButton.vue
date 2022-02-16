@@ -10,7 +10,7 @@
 <script>
 import SvgUndo from "../svgs/SvgUndo.vue";
 import storeUndoCommand from "../../storeUndoCommand";
-import {storedApiUpdateTextContent, storedApiUndoDeleteNote } from "../../storedApi";
+import { storedApi } from "../../storedApi";
 
 export default {
   name: "NoteUndoButton",
@@ -36,13 +36,13 @@ export default {
       const noteId = this.$store.getters.peekUndo().noteId;
       storeUndoCommand.popUndoHistory(this.$store);
       const note = this.$store.getters.getNoteById(noteId);
-      storedApiUpdateTextContent(this.$store, noteId, note.textContent)
+      storedApi(this.$store).updateTextContent(noteId, note.textContent)
       .then((res) => {
         this.$emit("done");
       })
     },
     undoDelete() {
-      storedApiUndoDeleteNote(this.$store)
+      storedApi(this.$store).undoDeleteNote()
     }
   }
 };

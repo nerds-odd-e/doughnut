@@ -7,7 +7,7 @@
 
 <script>
 import SvgSplitNote from "../svgs/SvgSplitNote.vue";
-import { storedApiSplitNote } from "../../storedApi";
+import { storedApi } from "../../storedApi";
 
 export default {
   name: "NoteSplitButton",
@@ -18,7 +18,7 @@ export default {
   methods: {
     async showDialog() {
       if (await this.$popups.confirm(`Are you sure to split this note?`)) {
-        storedApiSplitNote(this.$store, this.noteId)
+        storedApi(this.$store).splitNote(this.noteId)
       }
     },
   },

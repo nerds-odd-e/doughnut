@@ -31,7 +31,7 @@
 import ContainerPage from "./commons/ContainerPage.vue";
 import TextInput from "../components/form/TextInput.vue";
 import { restGet } from "../restful/restful";
-import { storedApiUpdateUser } from "../storedApi"
+import { storedApi } from "../storedApi"
 
 export default {
   components: { ContainerPage, TextInput },
@@ -52,7 +52,7 @@ export default {
     },
     processForm() {
       this.loading = true
-      storedApiUpdateUser(this.$store, this.formData.id, this.formData)
+      storedApi(this.$store).updateUser(this.formData.id, this.formData)
         .then(() =>  this.$router.push({ name: "root" }))
         .catch((res) => (this.formErrors = res))
         .finally(()=> this.loading = false)

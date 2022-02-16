@@ -2,7 +2,7 @@
 import Popups from "./components/commons/Popups.vue";
 import MainMenu from "./components/commons/MainMenu.vue";
 import UserNewRegisterPage from "./pages/UserNewRegisterPage.vue";
-import { storedApiGetCurrentUserInfo, storedApiGetFeatureToggle } from "./storedApi"
+import { storedApi } from "./storedApi"
 
 export default {
   data() {
@@ -44,9 +44,9 @@ export default {
   mounted() {
     this.loading = true
 
-    storedApiGetFeatureToggle(this.$store)
+    storedApi(this.$store).getFeatureToggle()
 
-    storedApiGetCurrentUserInfo(this.$store).then((res) => {
+    storedApi(this.$store).getCurrentUserInfo().then((res) => {
       this.externalIdentifier = res.externalIdentifier;
     })
     .finally(() => this.loading = false)

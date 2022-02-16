@@ -56,7 +56,7 @@ import InitialReviewButtons from "../components/review/InitialReviewButtons.vue"
 import ProgressBar from "../components/commons/ProgressBar.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import Minimizable from "../components/commons/Minimizable.vue";
-import { storedApiGetOneInitialReview, storedApiDoInitialReview } from "../storedApi";
+import { storedApi } from "../storedApi";
 
 export default {
   name: "InitialReviewPage",
@@ -111,7 +111,7 @@ export default {
           return;
       }
       this.reviewPoint.removedFromReview = skipReview;
-      storedApiDoInitialReview(this.$store,
+      storedApi(this.$store).reviewMethods.doInitialReview(
         { reviewPoint: this.reviewPoint, reviewSetting: this.reviewSetting },
       ).then(this.loadNew)
       .finally(()=>this.loading=false)
@@ -119,7 +119,7 @@ export default {
 
     fetchData() {
       this.loading = true
-      storedApiGetOneInitialReview(this.$store)
+      storedApi(this.$store).reviewMethods.getOneInitialReview()
       .then(this.loadNew)
       .finally(() => this.loading = false)
     },

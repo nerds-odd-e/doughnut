@@ -17,7 +17,7 @@
 <script>
 import ContainerPage from "./commons/ContainerPage.vue";
 import TextInput from "../components/form/TextInput.vue";
-import { storedApiCreateUser } from "../storedApi"
+import { storedApi } from "../storedApi"
 
 export default {
   components: { ContainerPage, TextInput },
@@ -31,7 +31,7 @@ export default {
   methods: {
     processForm() {
       this.loading = true
-      storedApiCreateUser(this.$store, this.formData)
+      storedApi(this.$store).createUser(this.formData)
         .catch((res) => this.formErrors.value = res)
         .finally(()=> this.loading = false )
 
