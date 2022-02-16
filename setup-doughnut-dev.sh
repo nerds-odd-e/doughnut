@@ -29,11 +29,20 @@ configure_nix_flakes() {
     if ! grep -Fxq "experimental-features = nix-command flakes" ~/.config/nix/nix.conf; then
         echo 'experimental-features = nix-command flakes' >>~/.config/nix/nix.conf
     fi
+    nixpkg_script_activate
+}
+
+nixpkg_script_activate() {
+    mkdir -p ~/.nix-profile/etc/profile.d
+    cp infra/nix/nix.sh ~/.nix-profile/etc/profile.d/nix.sh
+    . ~/.nix-profile/etc/profile.d/nix.sh
+    nix-channel --update
+    nix-env -iA nixpkgs.nix && nix-env -u --always
 }
 
 install_nixpkg_manager() {
     get_os_type
-    if ! command -v nix &>/dev/null; then
+    if ! command -v nix >/dev/null 2>&1; then
         download_nixpkg_manager_install_script
         if [ "${os_type}" = "Mac" ]; then
             ./install-nix --darwin-use-unencrypted-nix-store-volume
@@ -50,7 +59,4 @@ install_nixpkg_manager() {
 
 install_nixpkg_manager
 
-. ~/.nix-profile/etc/profile.d/nix.sh
-nix-channel --update
-nix-env -iA nixpkgs.nix && nix-env -u --always
 nix develop -c $SHELL
