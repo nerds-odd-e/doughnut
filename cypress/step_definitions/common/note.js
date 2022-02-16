@@ -36,10 +36,6 @@ When("I create a notebook with:", (data) => {
   cy.submitNoteCreationFormsWith(data.hashes());
 });
 
-When("I open note {string}", (noteTitle) => {
-    cy.jumpToNotePage(noteTitle);
-});
-
 When("I update note {string} to become:", (noteTitle, data) => {
   cy.jumpToNotePage(noteTitle);
   cy.inPlaceEdit(data.hashes()[0]);
@@ -56,12 +52,6 @@ Given("I update note {string} description from {string} to become {string}",
       cy.findByText(noteDescription).click({force: true});
       cy.replaceFocusedText(newNoteDescription);
     });
-
-When("Other person update note {string} to become:", (noteTitle, textContain) => {
-    cy.get('@seededNoteIdMap').then((noteId) => {
-        cy.updateTextContent(noteId[noteTitle], textContain.hashes()[0]);
-    })
-});
 
 When(
   "I update note {string} with the description {string}",
@@ -363,18 +353,6 @@ Then("There is a {string} file downloaded", (fileName) => {
 And("the file {string} content is",(fileName, mdContent) => {
   const downloadsFolder = Cypress.config("downloadsFolder");
   cy.readFile(`${downloadsFolder}/${fileName}`).should("eq", mdContent);
-})
-
-Then("I should see alert {string} in the page", (alertText) => {
-   cy.get(".modal-body").should('equals', alertText);
-})
-
-Then("I dismissed the alert",() => {
-  // TODO: should dismiss the modal
-})
-
-And("I edit note title {string} to become {string}", (oldTitle, newTitle) => {
-  cy.inPlaceEdit({title: newTitle});
 })
 
 When("I perform undo", () => {
