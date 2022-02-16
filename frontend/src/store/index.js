@@ -43,7 +43,6 @@ export default createStore({
     highlightNoteId: null,
     viewType: null,
     noteUndoHistories: [],
-    lastDeletedNoteId: null,
     currentUser: null,
     featureToggle: false,
     environment: 'production',
@@ -60,8 +59,6 @@ export default createStore({
     getNoteById: (state) => (id) => withState(state).getNoteById(id),
     getChildrenIdsByParentId: (state) => (parentId) => withState(state).getChildrenIdsByParentId(parentId),
     getChildrenOfParentId: (state) => (parentId) => withState(state).getChildrenOfParentId(parentId),
-    getLastDeletedNoteId: (state) => () => state.lastDeletedNoteId,
-    peekUndo1: (state) => () => state.lastDeletedNoteId,
     peekUndo: (state) => () => {
       if(state.noteUndoHistories.length === 0) return null
       return state.noteUndoHistories[state.noteUndoHistories.length - 1]
@@ -72,19 +69,14 @@ export default createStore({
     notebooks(state, notebooks) {
       state.notebooks = notebooks
     },
-    addUndoHistory(state, {noteId}) {
-      state.noteUndoHistories.push({noteId, textContent: {...withState(state).getNoteById(noteId).textContent}});
+    addEditingToUndoHistory(state, {noteId}) {
+      state.noteUndoHistories.push({type: 'editing', noteId, textContent: {...withState(state).getNoteById(noteId).textContent}});
     },
     popUndoHistory(state) {
       if (state.noteUndoHistories.length === 0) {
         return
       }
       const history = state.noteUndoHistories.pop();
-      const note = withState(state).getNoteById(history.noteId);
-      note.textContent = history.textContent;
-    },
-    popUndoHistory1(state) {
-      state.lastDeletedNoteId = null
     },
     loadNotes(state, notes) {
       notes.forEach((note) => {
@@ -94,7 +86,7 @@ export default createStore({
     deleteNote(state, noteId) {
       withState(state).deleteNoteFromParentChildrenList(noteId)
       withState(state).deleteNote(noteId)
-      state.lastDeletedNoteId = noteId
+      state.noteUndoHistories.push({type: 'delete note', noteId});
     },
     highlightNoteId(state, noteId) {
       state.highlightNoteId = noteId

@@ -355,10 +355,6 @@ And("the file {string} content is",(fileName, mdContent) => {
   cy.readFile(`${downloadsFolder}/${fileName}`).should("eq", mdContent);
 })
 
-When("I perform undo", () => {
-  cy.findByTitle("undo note").click();
-})
-
 When("I undo {string}", (undoType) => {
   cy.findByTitle(`undo ${undoType}`).click();
 })

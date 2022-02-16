@@ -79,7 +79,7 @@ describe("in place edit on title", () => {
 
 describe("undo editing", () => {
 
-  it("should call addUndoHistory on submitChange", async () => {
+  it("should call addEditingToUndoHistory on submitChange", async () => {
     const noteParent = makeMe.aNote.title("Dummy Title").please();
     store.commit("loadNotes", [noteParent]);
 
@@ -94,7 +94,7 @@ describe("undo editing", () => {
     await wrapper.find('[role="title"] input').setValue(updatedTitle);
     await wrapper.find('[role="title"] input').trigger("blur");
 
-    expect(storeUndoCommand.addUndoHistory).toBeCalledWith(store,
+    expect(storeUndoCommand.addEditingToUndoHistory).toBeCalledWith(store,
         {noteId: noteParent.id})
   });
 });

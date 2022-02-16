@@ -1,15 +1,11 @@
 <template>
-  <button class="btn btn-small" title="undo note" @click="performUndo()">
-    <SvgUndo/>
-  </button>
-  <button class="btn btn-small" :title="undoTitle" @click="undoDelete()" :disabled="!hasHistory">
+  <button class="btn btn-small" :title="undoTitle" @click="undoDelete()" :disabled="!history">
     <SvgUndo/>
   </button>
 </template>
 
 <script>
 import SvgUndo from "../svgs/SvgUndo.vue";
-import storeUndoCommand from "../../storeUndoCommand";
 import { storedApi } from "../../storedApi";
 
 export default {
@@ -21,28 +17,19 @@ export default {
     noteId: [String, Number]
   },
   computed: {
-    hasHistory() {
-      return (this.$store.getters.peekUndo1() != null)
+    history() {
+      return this.$store.getters.peekUndo()
     },
     undoTitle() {
-      if(this.hasHistory) {
-        return 'undo delete note'
+      if(this.history) {
+        return `undo ${this.history.type}`
       }
       return 'undo'
     }
   },
   methods: {
-    performUndo() {
-      const noteId = this.$store.getters.peekUndo().noteId;
-      storeUndoCommand.popUndoHistory(this.$store);
-      const note = this.$store.getters.getNoteById(noteId);
-      storedApi(this.$store).updateTextContent(noteId, note.textContent)
-      .then((res) => {
-        this.$emit("done");
-      })
-    },
     undoDelete() {
-      storedApi(this.$store).undoDeleteNote()
+      storedApi(this.$store).undo()
     }
   }
 };

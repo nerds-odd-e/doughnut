@@ -105,7 +105,7 @@ const storedApi = (store) => {
             return res;
         },
 
-        async updateTextContent(noteId, noteContentData)  {
+        async updateTextContentWithoutUndo(noteId, noteContentData)  {
             const { updatedAt, ...data } = noteContentData
             const res = await restPatchMultiplePartForm(
                 `/api/text_content/${noteId}`,
@@ -114,6 +114,19 @@ const storedApi = (store) => {
             )
             store.commit("loadNotes", [res]);
             return res;
+        },
+
+        async updateTextContent(noteId, noteContentData)  {
+            return this.updateTextContentWithoutUndo(noteId, noteContentData)
+        },
+
+        async undo()  {
+            const history = store.getters.peekUndo()
+            store.commit('popUndoHistory')
+            if(history.type==='editing') {
+                return this.updateTextContentWithoutUndo(history.noteId, history.textContent)
+            }
+            return this._undoDeleteNote(history.noteId)
         },
 
         async deleteNote(noteId)  {
@@ -126,9 +139,7 @@ const storedApi = (store) => {
             return res;
         },
 
-        async undoDeleteNote()  {
-            const deletedNoteId = store.getters.getLastDeletedNoteId()
-            store.commit('popUndoHistory1')
+        async _undoDeleteNote(deletedNoteId)  {
             const res = await restPatch(
                 `/api/notes/${deletedNoteId}/undo-delete`,
                 {},

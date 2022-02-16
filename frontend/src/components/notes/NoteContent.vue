@@ -82,7 +82,7 @@ export default {
   methods: {
     onBlurTextField() {
       this.loading = true
-      storeUndoCommand.addUndoHistory(this.$store,  {noteId: this.note.id});
+      storeUndoCommand.addEditingToUndoHistory(this.$store,  {noteId: this.note.id});
       storedApi(this.$store).updateTextContent(this.note.id, this.textContent)
       .then((res) => {
         this.$emit("done");

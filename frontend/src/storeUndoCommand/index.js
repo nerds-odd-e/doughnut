@@ -1,12 +1,7 @@
-const addUndoHistory = (store, note) => {
-  store.commit("addUndoHistory", note);
-}
-
-const popUndoHistory = (store) => {
-  store.commit('popUndoHistory');
+const addEditingToUndoHistory = (store, note) => {
+  store.commit("addEditingToUndoHistory", note);
 }
 
 export default {
-  addUndoHistory,
-  popUndoHistory
+  addEditingToUndoHistory,
 }
