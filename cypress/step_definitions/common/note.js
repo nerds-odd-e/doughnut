@@ -220,7 +220,8 @@ When(
 );
 
 When("I click note {string}", (noteTitle) => {
-  cy.findByRole("card", { name: noteTitle }).click('bottomRight', {force: true});
+  //cy.findByRole("card", { name: noteTitle }).click('bottomRight', {force: true});
+  cy.findByRole("card", { name: noteTitle }).click();
 });
 
 When("I click note title {string}", (noteTitle) => {
