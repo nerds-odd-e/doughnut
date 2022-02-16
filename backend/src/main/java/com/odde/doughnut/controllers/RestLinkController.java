@@ -6,7 +6,7 @@ import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.LinkViewedByUser;
-import com.odde.doughnut.entities.json.RedirectToNoteResponse;
+import com.odde.doughnut.entities.json.NotesBulk;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -49,25 +49,25 @@ class RestLinkController {
 
   @PostMapping(value = "/{link}")
   @Transactional
-  public RedirectToNoteResponse updateLink(Link link, @RequestBody LinkRequest linkRequest) throws NoAccessRightException {
+  public NotesBulk updateLink(Link link, @RequestBody LinkRequest linkRequest) throws NoAccessRightException {
     currentUserFetcher.getUser().getAuthorization().assertAuthorization(link.getSourceNote());
     link.setTypeId(linkRequest.typeId);
     modelFactoryService.linkRepository.save(link);
-    return new RedirectToNoteResponse(link.getSourceNote().getId());
+    return NotesBulk.jsonNoteWithChildren(link.getSourceNote(), currentUserFetcher.getUser());
   }
 
   @PostMapping(value = "/{link}/delete")
   @Transactional
-  public RedirectToNoteResponse deleteLink(Link link) throws NoAccessRightException {
+  public NotesBulk deleteLink(Link link) throws NoAccessRightException {
     currentUserFetcher.getUser().getAuthorization().assertAuthorization(link.getSourceNote());
     LinkModel linkModel = modelFactoryService.toLinkModel(link);
     linkModel.destroy();
-    return new RedirectToNoteResponse(link.getSourceNote().getId());
+    return NotesBulk.jsonNoteWithChildren(link.getSourceNote(), currentUserFetcher.getUser());
   }
 
   @PostMapping(value = "/create/{sourceNote}/{targetNote}")
   @Transactional
-  public Integer linkNoteFinalize(@PathVariable Note sourceNote, @PathVariable Note targetNote, @RequestBody @Valid LinkRequest linkRequest, BindingResult bindingResult) throws NoAccessRightException, CyclicLinkDetectedException, BindException {
+  public NotesBulk linkNoteFinalize(@PathVariable Note sourceNote, @PathVariable Note targetNote, @RequestBody @Valid LinkRequest linkRequest, BindingResult bindingResult) throws NoAccessRightException, CyclicLinkDetectedException, BindException {
     if(bindingResult.hasErrors()) throw new BindException(bindingResult);
     currentUserFetcher.getUser().getAuthorization().assertAuthorization(sourceNote);
     currentUserFetcher.getUser().getAuthorization().assertReadAuthorization(targetNote);
@@ -81,7 +81,7 @@ class RestLinkController {
     link.setTypeId(linkRequest.typeId);
     link.setUser(currentUserFetcher.getUser().getEntity());
     modelFactoryService.linkRepository.save(link);
-    return link.getId();
+    return NotesBulk.jsonNoteWithChildren(link.getSourceNote(), currentUserFetcher.getUser());
   }
 
   class LinkStatistics {

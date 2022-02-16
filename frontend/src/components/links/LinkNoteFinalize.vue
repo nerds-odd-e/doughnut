@@ -44,7 +44,7 @@ import LinkTypeSelect from "./LinkTypeSelect.vue";
 import CheckInput from "../form/CheckInput.vue";
 import RadioButtons from "../form/RadioButtons.vue";
 import SvgGoBack from "../svgs/SvgGoBack.vue";
-import { restPost } from "../../restful/restful";
+import { storedApi } from "../../storedApi";
 
 export default {
   name: "LinkNoteFinalize",
@@ -68,15 +68,10 @@ export default {
           return;
         }
       }
-      restPost(
-        `/api/links/create/${this.note.id}/${this.targetNote.id}`,
-        this.formData,
-        (r) => {}
-      )
+      storedApi(this.$store).createLink(this.note.id, this.targetNote.id, this.formData)
         .then((r) => this.$emit("success"))
         .catch((res) => {
           this.formErrors = res
-          console.table(res)
         });
     },
   },

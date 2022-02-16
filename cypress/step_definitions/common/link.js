@@ -93,6 +93,7 @@ When("I open link {string}", (linkTitle) => {
 
 Then("I should be able to change the link to {string}", (linkType) => {
   cy.clickRadioByLabel(linkType);
+  cy.pageIsLoaded();
   cy.findByRole("button", { name: "Update" }).click();
   cy.findAllByRole("button", { name: linkType }).should("be.visible");
 });

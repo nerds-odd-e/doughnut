@@ -1,5 +1,6 @@
 package com.odde.doughnut.entities.json;
 
+import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.UserModel;
@@ -42,4 +43,5 @@ public class NotesBulk {
         }
         return notesBulk;
     }
+
 }

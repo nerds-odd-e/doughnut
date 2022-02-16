@@ -120,6 +120,7 @@ Then("I should see {string} in note title", (noteTitle) => {
 Then(
   "I should not see note {string} at the top level of all my notes",
   (noteTitle) => {
+    cy.visitMyNotebooks();
     cy.pageIsLoaded();
     cy.findByText("Notebooks");
     cy.findByText(noteTitle).should("not.exist");

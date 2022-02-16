@@ -105,6 +105,36 @@ const storedApi = (store) => {
             return res;
         },
 
+        async createLink(sourceId, targetId, data)  {
+            const res = await restPost(
+                `/api/links/create/${sourceId}/${targetId}`,
+                data,
+                () => null
+            )
+            store.commit("loadNotes", res.notes);
+            return res;
+        },
+
+        async updateLink(linkId, data)  {
+            const res = await restPost(
+                `/api/links/${linkId}`,
+                data,
+                () => null
+            )
+            store.commit("loadNotes", res.notes);
+            return res;
+        },
+
+        async deleteLink(linkId)  {
+            const res = await restPost(
+                `/api/links/${linkId}/delete`,
+                data,
+                () => null
+            )
+            store.commit("loadNotes", res.notes);
+            return res;
+        },
+
         async updateNote(noteId, noteContentData)  {
             const { updatedAt, ...data } = noteContentData
             const res = await restPatchMultiplePartForm(

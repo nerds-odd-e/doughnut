@@ -33,7 +33,7 @@
 <script>
 import LinkTypeSelect from "./LinkTypeSelect.vue";
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue";
-import { restPost } from "../../restful/restful";
+import { storedApi } from "../../storedApi";
 
 export default {
   props: { link: Object, inverseIcon: Boolean, colors: Object },
@@ -52,29 +52,21 @@ export default {
 
   methods: {
     updateLink() {
-      restPost(
-        `/api/links/${this.link.id}`,
-        this.formData,
-        (r) => (this.loading = r)
-      )
-        .then((res) => {
-          this.$emit('done')
-        })
-        .catch((res) => (this.formErrors = res));
+      this.loading = true
+      storedApi(this.$store).updateLink(this.link.id, this.formData)
+        .then((res) => this.$emit('done'))
+        .catch((res) => (this.formErrors = res))
+        .finally(()=> this.loading = false)
     },
 
     async deleteLink() {
       if (!(await this.$popups.confirm("Are you sure to delete this link?")))
         return;
-      restPost(
-        `/api/links/${this.link.id}/delete`,
-        null,
-        (r) => (this.loading = r)
-      )
-        .then((res) => {
-          this.$emit('done')
-        })
-        .catch((res) => (this.formErrors = res));
+      this.loading = true
+      storedApi(this.$store).deleteLink(this.link.id)
+        .then((res) => { this.$emit('done') })
+        .catch((res) => (this.formErrors = res))
+        .finally(()=> this.loading = false)
     },
   },
 };
