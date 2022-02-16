@@ -16,9 +16,9 @@ get_os_type() {
 }
 
 download_nixpkg_manager_install_script() {
-    rm -f ./install-nix
-    curl -k -o install-nix https://releases.nixos.org/nix/nix-2.6.0/install
-    chmod +x ./install-nix
+    rm -f install-nix
+    curl -o install-nix https://releases.nixos.org/nix/nix-2.6.0/install
+    chmod +x install-nix
 }
 
 configure_nix_flakes() {
