@@ -167,7 +167,9 @@ jobs:
             cypress/integration/t*/**
             cypress/integration/u*/**
           - |
-            cypress/integration/n*/**
+            cypress/integration/notes*/**
+          - |
+            cypress/integration/notebooks*/**
           - |
             cypress/integration/r*/**
           - |

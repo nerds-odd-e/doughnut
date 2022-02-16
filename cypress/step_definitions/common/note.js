@@ -30,7 +30,7 @@ Given("there are notes from Note {int} to Note {int}", (from, to) => {
   cy.seedNotes(notes);
 });
 
-When("I create top level note with:", (data) => {
+When("I create a notebook with:", (data) => {
   cy.visitMyNotebooks();
   cy.findByText("Add New Notebook").click();
   cy.submitNoteCreationFormsWith(data.hashes());
@@ -220,7 +220,7 @@ When(
 );
 
 When("I click note {string}", (noteTitle) => {
-  cy.findByRole("card", { name: noteTitle }).click();
+  cy.findByRole("card", { name: noteTitle }).click('bottomRight', {force: true});
 });
 
 When("I click note title {string}", (noteTitle) => {
