@@ -13,6 +13,29 @@ const storedApi = (store) => {
         }
     }
 
+    async function undoDeleteNote(deletedNoteId) {
+        const res = await restPatch(
+            `/api/notes/${deletedNoteId}/undo-delete`,
+            {},
+        )
+        store.commit("loadNotes", res.notes)
+        if(res.notes[0].parentId === null) {
+            this.getNotebooks(store)
+        }
+        return res;
+    }
+
+    async function updateTextContentWithoutUndo(noteId, noteContentData)  {
+        const { updatedAt, ...data } = noteContentData
+        const res = await restPatchMultiplePartForm(
+            `/api/text_content/${noteId}`,
+            data,
+            () => null
+        )
+        store.commit("loadNotes", [res]);
+        return res;
+    }
+
     return {
         reviewMethods: {
             async getOneInitialReview()  {
@@ -105,29 +128,18 @@ const storedApi = (store) => {
             return res;
         },
 
-        async updateTextContentWithoutUndo(noteId, noteContentData)  {
-            const { updatedAt, ...data } = noteContentData
-            const res = await restPatchMultiplePartForm(
-                `/api/text_content/${noteId}`,
-                data,
-                () => null
-            )
-            store.commit("loadNotes", [res]);
-            return res;
-        },
-
         async updateTextContent(noteId, noteContentData)  {
             store.commit('addEditingToUndoHistory',  { noteId });
-            return this.updateTextContentWithoutUndo(noteId, noteContentData)
+            return updateTextContentWithoutUndo(noteId, noteContentData)
         },
 
         async undo()  {
             const history = store.getters.peekUndo()
             store.commit('popUndoHistory')
             if(history.type==='editing') {
-                return this.updateTextContentWithoutUndo(history.noteId, history.textContent)
+                return updateTextContentWithoutUndo(history.noteId, history.textContent)
             }
-            return this._undoDeleteNote(history.noteId)
+            return undoDeleteNote(history.noteId)
         },
 
         async deleteNote(noteId)  {
@@ -137,18 +149,6 @@ const storedApi = (store) => {
                 () => null
             )
             store.commit("deleteNote", noteId)
-            return res;
-        },
-
-        async _undoDeleteNote(deletedNoteId)  {
-            const res = await restPatch(
-                `/api/notes/${deletedNoteId}/undo-delete`,
-                {},
-            )
-            store.commit("loadNotes", res.notes)
-            if(res.notes[0].parentId === null) {
-                this.getNotebooks(store)
-            }
             return res;
         },
 
