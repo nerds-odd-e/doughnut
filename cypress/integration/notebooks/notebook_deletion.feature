@@ -15,3 +15,4 @@ Feature: Notebook deletion
     When I undo "delete note"
     Then the deleted notebook with title "LeSS in Action" should be restored
     And there should be no more undo to do
+    #And On day 100 I should have "2/2" note for initial review and "0/0" for repeat

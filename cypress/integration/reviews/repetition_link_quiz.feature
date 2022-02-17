@@ -32,3 +32,4 @@ Feature: Repetition Link Quiz
       | link        | Moon  |
     When I open "Space/Moon" note from top level
     Then I should be able to delete the link to note "Earth"
+    And On day 100 I should have "0/0" note for initial review and "0/0" for repeat
