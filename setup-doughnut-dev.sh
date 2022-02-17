@@ -33,8 +33,10 @@ configure_nix_flakes() {
 }
 
 nixpkg_script_activate() {
-    mkdir -p ~/.nix-profile/etc/profile.d
-    cp infra/nix/nix.sh ~/.nix-profile/etc/profile.d/nix.sh
+	if [[ ! -f ~/.nix-profile/etc/profile.d/nix.sh ]]; then
+		mkdir -p ~/.nix-profile/etc/profile.d
+		cp infra/nix/nix.sh ~/.nix-profile/etc/profile.d/nix.sh
+	fi
     . ~/.nix-profile/etc/profile.d/nix.sh
 }
 
@@ -56,3 +58,7 @@ install_nixpkg_manager() {
 }
 
 install_nixpkg_manager
+
+nixpkg_script_activate
+
+nix develop -c $SHELL
