@@ -5,7 +5,7 @@
   role="card" :aria-label="note.title"
   :style="`top:${coord.y}px; left:${coord.x}px`"
   v-on:click="highlight">
-    <NoteContent class="content" v-bind="{note, size}" :titleAsLink="true"/>
+    <NoteContent v-bind="{note, size}" :titleAsLink="true"/>
   </NoteShell>
 </template>
 

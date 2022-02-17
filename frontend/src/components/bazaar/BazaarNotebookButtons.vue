@@ -9,5 +9,5 @@
 
 <script setup>
 import SubscribeButton from "./SubscribeButton.vue";
-const props = defineProps({ notebook: Object, user: Object });
+const props = defineProps({ notebook: Object, user: Boolean });
 </script>

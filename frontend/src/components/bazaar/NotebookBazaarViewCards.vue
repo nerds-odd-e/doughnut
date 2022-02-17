@@ -10,5 +10,5 @@
 import NotebookCardsWithButtons from "../notebook/NotebookCardsWithButtons.vue";
 import BazaarNotebookButtons from "./BazaarNotebookButtons.vue";
 
-const props = defineProps({ notebooks: Array, user: Object });
+const props = defineProps({ notebooks: Array, user: Boolean });
 </script>
