@@ -1,19 +1,16 @@
 import Builder from "./Builder";
+import NotebookBuilder from "./NotebookBuilder";
 
 
 class NotePositionBuilder extends Builder {
   data: any;
+  notebookBuilder = new NotebookBuilder();
 
   constructor(parentBuilder?: Builder) {
     super(parentBuilder);
     this.data = {
       owns: true,
       ancestors: [],
-      notebook: {
-        ownership: {
-          isFromCircle: false,
-        }
-      }
     }
   }
 
@@ -31,19 +28,13 @@ class NotePositionBuilder extends Builder {
 
   inCircle(value: string): NotePositionBuilder {
     this.data.owns = true;
-    this.data.notebook = {
-      ownership: {
-        isFromCircle: true,
-        circle: {
-          name: value,
-        },
-      },
-    };
+    this.notebookBuilder.inCircle(value);
     return this;
   }
 
 
   do(): any {
+    this.data.notebook = this.notebookBuilder.do();
     return this.data
   }
 }

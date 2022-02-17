@@ -12,17 +12,28 @@ class NotebookBuilder extends Builder {
 
   constructor(parentBuilder?: Builder) {
     super(parentBuilder);
+    this.data = {
+      id: generateId(),
+      ownership: {
+        isFromCircle: false,
+      },
+      headNote: new NoteBuilder().do(),
+      skipReviewEntirely: false
+    }
+  }
 
+  inCircle(value: string): NotebookBuilder {
+    this.data.ownership = {
+      isFromCircle: true,
+      circle: {
+        name: value,
+      },
+    };
+    return this;
   }
 
   do(): any {
-    return {
-      id: generateId(),
-      ownership: {},
-      headNote: new NoteBuilder().do(),
-      skipReviewEntirely: false
-    };
-
+    return this.data;
   }
 }
 
