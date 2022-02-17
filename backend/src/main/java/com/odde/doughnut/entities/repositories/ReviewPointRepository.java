@@ -17,7 +17,7 @@ public interface ReviewPointRepository extends CrudRepository<ReviewPoint, Integ
     @Query( value = "SELECT count(*) " + byUserAndNotDeleted, nativeQuery = true)
     int countByUserNotRemoved(@Param("user") User user);
 
-    @Query( value = "SELECT * " + byUser + " AND rp.next_review_at <= :nextReviewAt ORDER BY rp.next_review_at", nativeQuery = true)
+    @Query( value = "SELECT * " + byUserAndNotDeleted + " AND rp.next_review_at <= :nextReviewAt ORDER BY rp.next_review_at", nativeQuery = true)
     List<ReviewPoint> findAllByUserAndNextReviewAtLessThanEqualOrderByNextReviewAt(@Param("user") User user, @Param("nextReviewAt") Timestamp nextReviewAt);
 
     @Query( value = "SELECT * " + byUser + "AND rp.note_id =:#{#note.id}", nativeQuery = true)
@@ -25,8 +25,6 @@ public interface ReviewPointRepository extends CrudRepository<ReviewPoint, Integ
 
     @Query( value = "SELECT * " + byUser + "AND rp.link_id =:#{#link.id}", nativeQuery = true)
     ReviewPoint findByUserAndLink(User user, Link link);
-
-    void deleteAllByNote(Note note);
 
     String byUser = " FROM review_point rp "
             + " WHERE rp.user_id = :user "
