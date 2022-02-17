@@ -35,6 +35,7 @@ import com.odde.doughnut.algorithms.NoteTitle;
 import com.odde.doughnut.algorithms.SiblingOrder;
 
 import org.apache.logging.log4j.util.Strings;
+import org.hibernate.annotations.Where;
 import org.hibernate.annotations.WhereJoinTable;
 import org.springframework.beans.BeanUtils;
 
@@ -82,7 +83,7 @@ public class Note {
     @Getter
     @Setter
     private Timestamp deletedAt;
-    
+
     @OneToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "master_review_setting_id", referencedColumnName = "id")
     @JsonIgnore
@@ -138,6 +139,7 @@ public class Note {
     @OneToMany(cascade = CascadeType.DETACH)
     @JsonIgnore
     @WhereJoinTable(clause = "depth = 1")
+    @Where(clause = "deleted_at is null")
     @OrderBy("sibling_order")
     @Getter
     private final List<Note> children = new ArrayList<>();
