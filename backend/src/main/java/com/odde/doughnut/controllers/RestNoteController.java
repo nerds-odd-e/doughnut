@@ -127,7 +127,7 @@ class RestNoteController {
     @Transactional
     public Integer deleteNote(@PathVariable("note") Note note) throws NoAccessRightException {
         currentUserFetcher.getUser().getAuthorization().assertAuthorization(note);
-        modelFactoryService.toNoteModel(note).destroy();
+        modelFactoryService.toNoteModel(note).destroy(testabilitySettings.getCurrentUTCTimestamp());
         return note.getId();
     }
 

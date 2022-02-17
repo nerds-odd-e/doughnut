@@ -25,11 +25,9 @@ public class NoteModel {
         modelFactoryService.noteRepository.save(entity);
     }
     
-    public void destroy() {
-        Timestamp now = new Timestamp(System.currentTimeMillis());
-
-        entity.traverseBreadthFirst(child -> modelFactoryService.toNoteModel(child).destroy());
-        updateDeletedAt(now);
+    public void destroy(Timestamp currentUTCTimestamp) {
+        entity.traverseBreadthFirst(child -> modelFactoryService.toNoteModel(child).destroy(currentUTCTimestamp));
+        updateDeletedAt(currentUTCTimestamp);
     }
     
     public void restore() {
