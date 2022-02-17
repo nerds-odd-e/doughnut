@@ -17,6 +17,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.Where;
 
 @Entity
 @Table(name = "ownership")
@@ -33,6 +34,7 @@ public class Ownership {
     @Getter @Setter private Circle circle;
 
     @OneToMany(mappedBy = "ownership")
+    @Where(clause = "notebook.deleted_at is null")
     @JsonIgnore
     @Getter @Setter private List<Notebook> notebooks = new ArrayList<>();
 
