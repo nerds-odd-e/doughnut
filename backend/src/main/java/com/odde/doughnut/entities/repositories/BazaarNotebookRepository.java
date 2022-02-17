@@ -10,6 +10,6 @@ import java.util.List;
 
 public interface BazaarNotebookRepository extends CrudRepository<BazaarNotebook, Integer> {
     BazaarNotebook findByNotebook(Notebook notebook);
-    @Query( value = "SELECT * from bazaar_notebook JOIN notebook on notebook.id == bazaar_notebook.notebook_id WHERE notebook.deleted_at IS NULL ", nativeQuery = true)
+    @Query( value = "SELECT * from bazaar_notebook JOIN notebook on notebook.id = bazaar_notebook.notebook_id WHERE notebook.deleted_at IS NULL ", nativeQuery = true)
     List<BazaarNotebook> findAllNonDeleted();
 }
