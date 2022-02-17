@@ -37,9 +37,9 @@ export default {
     updateStoreViewType() {
       this.$store.commit('viewType', this.viewType);
     },
-    fetchData(loading, fetchAll) {
-      this.loading = loading ?? true;
-      const storedApiCall = fetchAll ?
+    fetchData() {
+      this.loading = true;
+      const storedApiCall = this.viewTypeObj.fetchAll ?
                               storedApi(this.$store).getNoteWithDescendents :
                               storedApi(this.$store).getNoteAndItsChildren
 
@@ -48,22 +48,18 @@ export default {
         this.notePosition = res.notePosition;
       }).finally(() => this.loading = false);
     },
-    pollData(fetchAll) {
-        this.fetchData(false,fetchAll);
-    },
   },
   watch: {
     noteId() {
-      this.fetchData(this.loading,this.viewTypeObj.fetchAll);
+      this.fetchData();
     },
     viewType() {
       this.updateStoreViewType();
-      this.fetchData(this.loading,this.viewTypeObj.fetchAll);
     },
   },
   mounted() {
     this.updateStoreViewType();
-    this.pollData(this.viewTypeObj.fetchAll);
+    this.fetchData();
   },
 };
 
