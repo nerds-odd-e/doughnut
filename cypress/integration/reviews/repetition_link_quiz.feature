@@ -26,7 +26,6 @@ Feature: Repetition Link Quiz
       | Mars   | "Mars" is wrong |
       | Earth  | is correct      |
 
-    @ignore
   Scenario: Delete link with review record
     Given I do these initial reviews in sequence:
       | review_type | title |

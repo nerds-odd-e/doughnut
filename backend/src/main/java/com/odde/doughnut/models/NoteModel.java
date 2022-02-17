@@ -29,7 +29,8 @@ public class NoteModel {
         entity.traverseBreadthFirst(child -> modelFactoryService.toNoteModel(child).destroy(currentUTCTimestamp));
         updateDeletedAt(currentUTCTimestamp);
     }
-    
+
+    // this is a bug
     public void restore() {
         entity.traverseBreadthFirst(child -> modelFactoryService.toNoteModel(child).restore());
         updateDeletedAt(null);

@@ -107,6 +107,7 @@ Then("I should be able to delete the link to note {string}", (noteTitle) => {
   cy.findByText(noteTitle).siblings(".link-nob").click();
   cy.findByRole("button", { name: "Delete" }).click();
   cy.findByRole("button", { name: "Cancel" }).click();
+  cy.findByText(noteTitle).siblings(".link-nob").click();
   cy.findByRole("button", { name: "Delete" }).click();
   cy.findByRole("button", { name: "OK" }).click();
   cy.contains(noteTitle).should("not.exist");
