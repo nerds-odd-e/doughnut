@@ -68,7 +68,7 @@ And(
 Then(
   "On the current page, I should see {string} has link {string} {string}",
   (noteTitle, linkType, targetNoteTitles) => {
-    cy.findByText(targetNoteTitles.commonSenseSplit(",").pop());
+    cy.findByText(targetNoteTitles.commonSenseSplit(",").pop(), {selector: '.link-title'});
     cy.findAllByRole("button", { name: linkType })
       .parent()
       .parent()
