@@ -18,14 +18,9 @@ public class BazaarModel {
     }
 
     public List<Notebook> getAllNotebooks() {
-        Iterable<BazaarNotebook> all = bazaarNotebookRepository.findAll();
+        Iterable<BazaarNotebook> all = bazaarNotebookRepository.findAllNonDeleted();
         List<Notebook> notes = new ArrayList<>();
-        all.forEach(bn-> {
-            Notebook notebook = bn.getNotebook();
-            if(notebook.getDeletedAt() == null) {
-                notes.add(notebook);
-            }
-        });
+        all.forEach(bn-> notes.add(bn.getNotebook()));
         return notes;
     }
 
@@ -33,11 +28,5 @@ public class BazaarModel {
         BazaarNotebook bazaarNotebook = new BazaarNotebook();
         bazaarNotebook.setNotebook(notebook);
         bazaarNotebookRepository.save(bazaarNotebook);
-    }
-
-    public void assertAuthentication(Note note) throws NoAccessRightException {
-        if(bazaarNotebookRepository.findByNotebook(note.getNotebook()) == null) {
-            throw new NoAccessRightException();
-        }
     }
 }
