@@ -46,12 +46,9 @@ class RestNotebookController {
     public NotebooksViewedByUser myNotebooks() {
         UserModel user = currentUserFetcher.getUser();
         user.getAuthorization().assertLoggedIn();
-        
-        List<Notebook> notebooks = user.getEntity().getOwnership().getNotebooks();
-        notebooks.removeIf(notebook -> notebook.getDeletedAt() != null);
-        
+
         NotebooksViewedByUser notebooksViewedByUser = new NotebooksViewedByUser();
-        notebooksViewedByUser.notebooks = notebooks;
+        notebooksViewedByUser.notebooks = user.getEntity().getOwnership().getNotebooks();
         notebooksViewedByUser.subscriptions = user.getEntity().getSubscriptions();
         return notebooksViewedByUser;
     }
