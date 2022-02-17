@@ -46,6 +46,7 @@ import NotebookNewButton from "../components/notebook/NotebookNewButton.vue";
 import NotebookButtons from "../components/notebook/NotebookButtons.vue";
 import BazaarNotebookButtons from "../components/bazaar/BazaarNotebookButtons.vue";
 import { restGet } from "../restful/restful";
+import { storedApi } from "../storedApi";
 
 export default {
   components: {
@@ -68,16 +69,15 @@ export default {
   },
 
   methods: {
-    getCircleDataById(circleId) {
-      restGet(`/api/circles/${circleId}`).then((res) => {
-        this.circle = res
-      });
+    getCircle() {
+      storedApi(this.$store).getCircle(this.circleId)
+      .then((res) =>  this.circle = res )
+      .finally(() => this.loading = false )
       this.lastQueryTimeToken += 1
     },
     fetchData() {
       this.loading = true;
-      this.getCircleDataById(this.circleId)
-      this.loading = false;
+      this.getCircle()
     },
   },
 
@@ -91,7 +91,7 @@ export default {
   watch: {
     lastQueryTimeToken() {
       setTimeout(() => {
-        this.getCircleDataById(this.circleId)
+        this.getCircle()
       }, 5000);
 
     },
