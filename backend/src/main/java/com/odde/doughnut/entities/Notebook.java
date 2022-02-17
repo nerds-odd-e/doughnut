@@ -40,7 +40,6 @@ public class Notebook {
     @Getter @Setter Boolean skipReviewEntirely = false;
 
     @Column(name = "deleted_at")
-    @Getter
     @Setter
     private Timestamp deletedAt;
 }
