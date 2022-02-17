@@ -1,4 +1,5 @@
 import Builder from "./Builder";
+import NoteBuilder from "./NoteBuilder";
 
 let idCounter = 1;
 
@@ -11,21 +12,17 @@ class NotebookBuilder extends Builder {
 
   constructor(parentBuilder?: Builder) {
     super(parentBuilder);
-    this.data = {
-      id: generateId(),
-      ownership: {},
-      headNote: {
-        id: generateId(),
-        shortDescription: '',
-        parentId: null,
-        title: ''
-      },
-      skipReviewEntirely: false
-    };
+
   }
 
   do(): any {
-    return this.data
+    return {
+      id: generateId(),
+      ownership: {},
+      headNote: new NoteBuilder().do(),
+      skipReviewEntirely: false
+    };
+
   }
 }
 
