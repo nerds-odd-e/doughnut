@@ -15,8 +15,6 @@
  jest.useFakeTimers();
  describe("all in note show page", () => {
  describe("note show", () => {
- 
- 
     const note = makeMe.aNote.please()
     const stubResponse = {
       notePosition: makeMe.aNotePosition.inCircle('a circle').please(),

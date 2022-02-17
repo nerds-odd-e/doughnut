@@ -213,8 +213,8 @@ const storedApi = (store) => {
             return res
         },
 
-        async getCircle(circleId)  {
-            return await restGet(`/api/circles/${circleId}`);
+        getCircle(circleId)  {
+            return restGet(`/api/circles/${circleId}`);
         },
 
     }
