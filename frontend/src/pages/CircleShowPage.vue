@@ -45,7 +45,7 @@ import NotebookCardsWithButtons from "../components/notebook/NotebookCardsWithBu
 import NotebookNewButton from "../components/notebook/NotebookNewButton.vue";
 import NotebookButtons from "../components/notebook/NotebookButtons.vue";
 import BazaarNotebookButtons from "../components/bazaar/BazaarNotebookButtons.vue";
-import { restGet, restPost } from "../restful/restful";
+import { restGet } from "../restful/restful";
 
 export default {
   components: {
@@ -60,10 +60,10 @@ export default {
 
   data() {
     return {
+      lastQueryTimeToken: 0,
       circle: null,
       loading: true,
       formErrors: {},
-      polling: null,
     };
   },
 
@@ -72,17 +72,12 @@ export default {
       restGet(`/api/circles/${circleId}`).then((res) => {
         this.circle = res
       });
+      this.lastQueryTimeToken += 1
     },
     fetchData() {
       this.loading = true;
       this.getCircleDataById(this.circleId)
       this.loading = false;
-    },
-     pollData() {
-      const intervalTime = 5000;
-      this.polling = setInterval(() => {
-        this.getCircleDataById(this.circleId)
-      }, intervalTime);
     },
   },
 
@@ -94,16 +89,15 @@ export default {
   },
 
   watch: {
-    circleId() {
-      this.fetchData();
+    lastQueryTimeToken() {
+      setTimeout(() => {
+        this.getCircleDataById(this.circleId)
+      }, 5000);
+
     },
   },
   mounted() {
     this.fetchData();
-    this.pollData();
-  },
-  unmounted() {
-    clearInterval(this.polling);
   },
 };
 </script>
@@ -112,3 +106,4 @@ export default {
 #invitation-code
   width: 100%
 </style>
+
