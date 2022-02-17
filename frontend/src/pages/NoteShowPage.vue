@@ -50,16 +50,7 @@ export default {
     },
     pollData(fetchAll) {
         this.fetchData(false,fetchAll);
-        this.startPolling();                    
-      },
-    startPolling() {
-      this.polling=setInterval(() => {
-        this.fetchData(false,this.viewTypeObj.fetchAll);
-      }, 2000);
     },
-    pausePolling() {
-      clearInterval(this.polling);
-    }
   },
   watch: {
     noteId() {
@@ -74,9 +65,6 @@ export default {
     this.updateStoreViewType();
     this.pollData(this.viewTypeObj.fetchAll);
   },
-  unmounted() {
-    clearInterval(this.polling);
-  }
 };
 
 </script>

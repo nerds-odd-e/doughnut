@@ -45,7 +45,6 @@ import NotebookCardsWithButtons from "../components/notebook/NotebookCardsWithBu
 import NotebookNewButton from "../components/notebook/NotebookNewButton.vue";
 import NotebookButtons from "../components/notebook/NotebookButtons.vue";
 import BazaarNotebookButtons from "../components/bazaar/BazaarNotebookButtons.vue";
-import { restGet } from "../restful/restful";
 import { storedApi } from "../storedApi";
 
 export default {
@@ -61,7 +60,7 @@ export default {
 
   data() {
     return {
-      lastQueryTimeToken: 0,
+      queryCounter: 0,
       circle: null,
       loading: true,
       formErrors: {},
@@ -73,7 +72,7 @@ export default {
       storedApi(this.$store).getCircle(this.circleId)
       .then((res) =>  this.circle = res )
       .finally(() => this.loading = false )
-      this.lastQueryTimeToken += 1
+      this.queryCounter += 1
     },
     fetchData() {
       this.loading = true;
@@ -89,7 +88,7 @@ export default {
   },
 
   watch: {
-    lastQueryTimeToken() {
+    queryCounter() {
       setTimeout(() => {
         this.getCircle()
       }, 5000);
