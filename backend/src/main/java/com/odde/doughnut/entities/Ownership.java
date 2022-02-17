@@ -34,7 +34,7 @@ public class Ownership {
     @Getter @Setter private Circle circle;
 
     @OneToMany(mappedBy = "ownership")
-    @Where(clause = "notebook.deleted_at is null")
+    @Where(clause = "deleted_at is null")
     @JsonIgnore
     @Getter @Setter private List<Notebook> notebooks = new ArrayList<>();
 
