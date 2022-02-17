@@ -55,6 +55,7 @@ export default {
     },
     viewType() {
       this.updateStoreViewType();
+      this.fetchData();
     },
   },
   mounted() {

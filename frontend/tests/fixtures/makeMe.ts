@@ -6,7 +6,7 @@ import LinkViewedByUserBuilder from "./LinkViewedByUserBuilder"
 import RepetitionBuilder from "./RepetitionBuilder"
 import NotebookBuilder from "./NotebookBuilder";
 import CircleNoteBuilder from "./CircleNoteBuilder";
-import BazaarNoteBuilder from "./BazaarNoteBuilder";
+import BazaarNoteBuilder from "./BazaarNotebooksBuilder";
 
 class MakeMe {
   get links(): LinksBuilder {
@@ -40,7 +40,7 @@ class MakeMe {
     return new NotebookBuilder();
   }
 
-  get aBazaarNote(): BazaarNoteBuilder {
+  get bazaarNotebooks(): BazaarNoteBuilder {
     return new BazaarNoteBuilder();
   }
 }
