@@ -44,7 +44,7 @@ export default {
   mounted() {
     this.loading = true
 
-    process.env.NODE_ENV !== 'production' && storedApi(this.$store).getFeatureToggle()
+    storedApi(this.$store).getFeatureToggle()
 
     storedApi(this.$store).getCurrentUserInfo().then((res) => {
       this.externalIdentifier = res.externalIdentifier;
