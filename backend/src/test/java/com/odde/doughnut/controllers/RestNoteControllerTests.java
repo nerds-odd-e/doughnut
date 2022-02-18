@@ -157,6 +157,15 @@ class RestNoteControllerTests {
 
     @Nested
     class DeleteNoteTest {
+        Note subject;
+        Note parent;
+
+        @BeforeEach
+        void setup() {
+            parent = makeMe.aNote().byUser(userModel).please();
+            subject = makeMe.aNote().under(parent).byUser(userModel).please();
+        }
+
         @Test
         void shouldNotBeAbleToDeleteNoteThatBelongsToOtherUser() {
             User anotherUser = makeMe.aUser().please();
@@ -180,8 +189,6 @@ class RestNoteControllerTests {
 
         @Test
         void shouldDeleteTheChildNoteButNotSiblingOrParent() throws NoAccessRightException {
-            Note parent = makeMe.aNote().byUser(userModel).please();
-            Note subject = makeMe.aNote().under(parent).byUser(userModel).please();
             Note sibling = makeMe.aNote().under(parent).byUser(userModel).please();
             Note child = makeMe.aNote().under(subject).byUser(userModel).please();
             makeMe.refresh(subject);
@@ -207,80 +214,4 @@ class RestNoteControllerTests {
             assertNull(modelFactoryService.findNoteById(note.getId()).get().getDeletedAt());
         }
     }
-
-    @Nested
-    class SplitNoteTest {
-        @Test
-        void shouldDoNothingWhenSplittingNodesWithoutDescription() throws NoAccessRightException {
-            Note note = makeMe.aNote().withNoDescription().byUser(userModel).please();
-            List<Note> childrenBefore =  note.getChildren();
-            controller.splitNote(note);
-            makeMe.refresh(note);
-            List<Note> childrenAfter =  note.getChildren();
-            assertEquals(childrenBefore.size(), childrenAfter.size());
-
-        }
-
-        @Test
-        void shouldGenerateASingleNodeWhenSplittingNodesWithOnlyOneParagraphDescription() throws NoAccessRightException {
-            Note note = makeMe.aNote("noteTitle","Just one paragraph").byUser(userModel).please();
-            List<Note> childrenBefore =  note.getChildren();
-            controller.splitNote(note);
-            makeMe.refresh(note);
-            List<Note> childrenAfter =  note.getChildren();
-            assertEquals(0,childrenBefore.size());
-            assertEquals(1,childrenAfter.size());
-
-        }
-
-        @Test
-        void shouldGenerateASingleNodeWhenSplittingANodeWithAMultilineDescription() throws NoAccessRightException {
-            Note note = makeMe.aNote("noteTitle","ThisIsTheTitle\nThisIsTheDescription").byUser(userModel).please();
-            controller.splitNote(note);
-            makeMe.refresh(note);
-            List<Note> childrenAfter =  note.getChildren();
-            assertEquals(1, childrenAfter.size());
-
-            Note onlyChild = childrenAfter.get(0);
-            assertEquals("ThisIsTheTitle", onlyChild.getTitle());
-            assertEquals("ThisIsTheDescription", onlyChild.getShortDescription());
-        }
-
-        @Test
-        void shouldGenerateMultipleNodeWhenSplittingANodeWithAMultipleParagraphs() throws NoAccessRightException {
-            Note note = makeMe.aNote("noteTitle","ThisIsTheTitle1\nThisIsTheDescription1\n\nThisIsTheTitle2\nThisIsTheDescription2\nThisIsTheDescription21").byUser(userModel).please();
-            controller.splitNote(note);
-            makeMe.refresh(note);
-            List<Note> childrenAfter =  note.getChildren();
-            assertEquals(2, childrenAfter.size());
-
-            Note child1 = childrenAfter.get(0);
-            assertEquals("ThisIsTheTitle1", child1.getTitle());
-            assertEquals("ThisIsTheDescription1", child1.getShortDescription());
-
-            Note child2 = childrenAfter.get(1);
-            assertEquals("ThisIsTheTitle2", child2.getTitle());
-            assertEquals("ThisIsTheDescription2\nThisIsTheDescription21", child2.getShortDescription());
-        }
-
-        @Test
-        void shouldDeleteParentDescriptionWhenSplittingANoteSuccessfully() throws NoAccessRightException {
-            Note note = makeMe.aNote("noteTitle","ThisIsTheTitle1\nThisIsTheDescription1\n\nThisIsTheTitle2\nThisIsTheDescription2\nThisIsTheDescription21").byUser(userModel).please();
-            controller.splitNote(note);
-
-            assertTrue(Strings.isBlank(note.getShortDescription()));
-        }
-
-        @Test
-        void shouldDoNothingWhenDescriptionIsEmptyLines() throws NoAccessRightException {
-            Note note = makeMe.aNote("noteTitle","\n\n\n\n\n").byUser(userModel).please();
-            controller.splitNote(note);
-            makeMe.refresh(note);
-
-            List<Note> childrenAfter =  note.getChildren();
-            assertEquals(0, childrenAfter.size());
-        }
-
-    }
-
 }

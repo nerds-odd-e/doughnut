@@ -156,18 +156,4 @@ class RestNoteController {
         modelFactoryService.noteRepository.save(note);
         return new RedirectToNoteResponse(note.getId());
     }
-
-    @PostMapping(value = "/{note}/split")
-    @Transactional
-    public NotesBulk splitNote(@PathVariable("note") Note note) throws NoAccessRightException {
-        final UserModel userModel = currentUserFetcher.getUser();
-        userModel.getAuthorization().assertAuthorization(note);
-
-        note.extractChildNotes(userModel.getEntity(), testabilitySettings.getCurrentUTCTimestamp())
-            .forEach(childNote -> modelFactoryService.noteRepository.save(childNote));
-
-        modelFactoryService.noteRepository.save(note);
-
-        return NotesBulk.jsonNoteWithChildren(note, userModel);
-    }
 }

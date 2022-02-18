@@ -170,12 +170,6 @@ const storedApi = (store) => {
             return res;
         },
 
-        async splitNote(noteId)  {
-            const res = await restPost(`/api/notes/${noteId}/split`, {})
-            store.commit("loadNotes", res.notes);
-            return res;
-        },
-
         async getCurrentUserInfo()  {
         const res = await restGet(`/api/user/current-user-info`)
         store.commit("currentUser", res.user);

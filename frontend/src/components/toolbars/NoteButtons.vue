@@ -35,9 +35,6 @@
         <ReviewSettingEditButton :noteId="note.id" :oldTitle="note.title">
           Edit review settings
         </ReviewSettingEditButton>
-        <NoteSplitButton :noteId="note.id" :oldTitle="note.title">
-          Split this note
-        </NoteSplitButton>
         <button
           class="dropdown-item"
           title="delete note"
@@ -60,7 +57,6 @@ import SvgRemove from "../svgs/SvgRemove.vue";
 import LinkNoteButton from "../links/LinkNoteButton.vue";
 import ReviewSettingEditButton from "../review/ReviewSettingEditButton.vue";
 import NoteEditButton from "./NoteEditButton.vue";
-import NoteSplitButton from "./NoteSplitButton.vue";
 import NoteDownloadButton from "./NoteDownloadButton.vue"
 import NoteNewButton from "./NoteNewButton.vue";
 import ViewTypeButtons from "./ViewTypeButtons.vue";
@@ -80,7 +76,6 @@ export default {
     SvgRemove,
     LinkNoteButton,
     NoteEditButton,
-    NoteSplitButton,
     NoteNewButton,
     ViewTypeButtons,
     NoteDownloadButton

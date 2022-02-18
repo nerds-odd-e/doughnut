@@ -333,19 +333,6 @@ Then("I should see {string} is {string} than {string}", (left, aging, right) => 
     });
 });
 
-When("I split note {string}", (noteTitle, data) => {
-  cy.clickNotePageMoreOptionsButton(noteTitle, "split note");
-  cy.findByRole("button", { name: "OK" }).click();
-});
-
-When(
-  "there is a note {string} with description {string}",
-  (notePath, expectedDescription) => {
-    cy.navigateToNotePage(notePath);
-    cy.expectCurrentNoteDescription(expectedDescription);
-  }
-);
-
 Then("I download note", () => {
   cy.get("#note-download-button").click();
 });

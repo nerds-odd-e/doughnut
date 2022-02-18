@@ -1,47 +1,28 @@
 package com.odde.doughnut.entities;
 
-import static java.util.stream.Collectors.toList;
-
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.stream.Stream;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Embedded;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
-import javax.persistence.OrderBy;
-import javax.persistence.Table;
-import javax.validation.Valid;
-
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.algorithms.ClozeDescription;
 import com.odde.doughnut.algorithms.NoteTitle;
 import com.odde.doughnut.algorithms.SiblingOrder;
-
+import lombok.Getter;
+import lombok.Setter;
 import org.apache.logging.log4j.util.Strings;
 import org.hibernate.annotations.Where;
 import org.hibernate.annotations.WhereJoinTable;
 import org.springframework.beans.BeanUtils;
-
-import lombok.Getter;
-import lombok.Setter;
 import org.thymeleaf.util.StringUtils;
+
+import javax.persistence.*;
+import javax.validation.Valid;
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Consumer;
+
+import static java.util.stream.Collectors.toList;
 
 @Entity
 @Table(name = "note")
@@ -303,30 +284,6 @@ public class Note {
     public void setCreatedAtAndUpdatedAt(Timestamp currentUTCTimestamp) {
         this.createdAt = currentUTCTimestamp;
         this.getNoteAccessories().setUpdatedAt(currentUTCTimestamp);
-    }
-
-    public Stream<Note> extractChildNotes(User user, Timestamp currentUTCTimestamp) {
-        List<String> items = Arrays.asList(getTextContent().getDescription().split("\n\n"));
-        getTextContent().setDescription("");
-        return items.stream()
-                .filter(item -> !item.isBlank())
-                .map(paragraph -> {
-                            Note childNote = createNoteFromParagraph(paragraph, user, currentUTCTimestamp);
-                            childNote.setParentNote(this);
-                            return childNote;
-                        }
-                );
-    }
-
-    private Note createNoteFromParagraph(String paragraph, User user, Timestamp currentUTCTimestamp) {
-        LinkedList<String> linesInParagraph = new LinkedList<>(Arrays.stream(paragraph.split("\n")).collect(toList()));
-
-        TextContent childTextConent = new TextContent();
-        childTextConent.setTitle(linesInParagraph.getFirst());
-        linesInParagraph.removeFirst();
-        childTextConent.setDescription(String.join("\n", linesInParagraph));
-
-        return createNote(user, currentUTCTimestamp, childTextConent);
     }
 
     @JsonIgnore
