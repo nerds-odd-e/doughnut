@@ -111,10 +111,11 @@ public class Note {
             @JoinColumn(name = "note_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
     })
     @OneToMany(cascade = CascadeType.DETACH)
-    @JsonIgnore
+    @Where(clause = "deleted_at is null")
     @OrderBy("`notes_closure`.depth, sibling_order")
+    @JsonIgnore
     @Getter
-    private List<Note> descendants = new ArrayList<>();
+    private List<Note> descendantsInBreathFirstOrder = new ArrayList<>();
 
     @JoinTable(name = "notes_closure", joinColumns = {
             @JoinColumn(name = "ancestor_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)}, inverseJoinColumns = {
@@ -176,10 +177,6 @@ public class Note {
     @JsonIgnore
     public List<Note> getAncestors() {
         return getNotesClosures().stream().map(NotesClosure::getAncestor).collect(toList());
-    }
-
-    public void traverseBreadthFirst(Consumer<Note> noteConsumer) {
-        descendants.forEach(noteConsumer);
     }
 
     @JsonIgnore

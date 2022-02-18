@@ -22,7 +22,7 @@ public class NoteMotionModel {
         entity.moveHeadNoteOnly();
         updateAncestors(entity.getSubject(), entity.getNewParent());
         modelFactoryService.noteRepository.save(entity.getSubject());
-        entity.getSubject().traverseBreadthFirst(desc-> {
+        entity.getSubject().getDescendantsInBreathFirstOrder().forEach(desc-> {
             updateAncestors(desc, desc.getParentNote());
             modelFactoryService.noteRepository.save(desc);
         });

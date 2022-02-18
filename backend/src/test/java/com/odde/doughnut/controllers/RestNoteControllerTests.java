@@ -192,6 +192,7 @@ class RestNoteControllerTests {
             controller.deleteNote(subject);
             makeMe.refresh(parent);
             assertThat(parent.getChildren(), hasSize(1));
+            assertThat(parent.getDescendantsInBreathFirstOrder(), hasSize(1));
         }
     }
 

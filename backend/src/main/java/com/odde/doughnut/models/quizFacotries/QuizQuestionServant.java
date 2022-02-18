@@ -2,7 +2,6 @@ package com.odde.doughnut.models.quizFacotries;
 
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.NotesClosure;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.Randomizer;
@@ -31,12 +30,7 @@ public class QuizQuestionServant {
         List<Note> list = answerNote.getSiblings().stream().filter(notePredicate).collect(Collectors.toList());
         if (list.size() > 1) return list;
 
-        List<Note> result = new ArrayList<>();
-
-        answerNote.getGrandAsPossible().traverseBreadthFirst(note -> {
-            if(notePredicate.test(note)) result.add(note);
-        });
-        return result;
+        return answerNote.getGrandAsPossible().getDescendantsInBreathFirstOrder().stream().filter(notePredicate).collect(Collectors.toList());
     }
 
     List<Note> randomlyChooseAndEnsure(List<Note> candidates, Note ensure, int maxSize) {

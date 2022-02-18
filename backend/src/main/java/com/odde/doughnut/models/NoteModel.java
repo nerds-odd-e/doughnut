@@ -26,13 +26,13 @@ public class NoteModel {
     }
     
     public void destroy(Timestamp currentUTCTimestamp) {
-        entity.traverseBreadthFirst(child -> modelFactoryService.toNoteModel(child).destroy(currentUTCTimestamp));
+        entity.getDescendantsInBreathFirstOrder().forEach(child -> modelFactoryService.toNoteModel(child).destroy(currentUTCTimestamp));
         updateDeletedAt(currentUTCTimestamp);
     }
 
     // this is a bug
     public void restore() {
-        entity.traverseBreadthFirst(child -> modelFactoryService.toNoteModel(child).restore());
+        entity.getDescendantsInBreathFirstOrder().forEach(child -> modelFactoryService.toNoteModel(child).restore());
         updateDeletedAt(null);
     }
 }
