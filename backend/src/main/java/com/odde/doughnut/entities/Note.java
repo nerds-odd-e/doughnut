@@ -106,11 +106,15 @@ public class Note {
     @Setter
     private List<NotesClosure> notesClosures = new ArrayList<>();
 
-    @OneToMany(mappedBy = "ancestor", cascade = CascadeType.DETACH)
+    @JoinTable(name = "notes_closure", joinColumns = {
+            @JoinColumn(name = "ancestor_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)}, inverseJoinColumns = {
+            @JoinColumn(name = "note_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
+    })
+    @OneToMany(cascade = CascadeType.DETACH)
     @JsonIgnore
-    @OrderBy("depth")
+    @OrderBy("`notes_closure`.depth, sibling_order")
     @Getter
-    private List<NotesClosure> descendantNCs = new ArrayList<>();
+    private List<Note> descendants = new ArrayList<>();
 
     @JoinTable(name = "notes_closure", joinColumns = {
             @JoinColumn(name = "ancestor_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)}, inverseJoinColumns = {
@@ -175,7 +179,7 @@ public class Note {
     }
 
     public void traverseBreadthFirst(Consumer<Note> noteConsumer) {
-        descendantNCs.stream().map(NotesClosure::getNote).forEach(noteConsumer);
+        descendants.forEach(noteConsumer);
     }
 
     @JsonIgnore
