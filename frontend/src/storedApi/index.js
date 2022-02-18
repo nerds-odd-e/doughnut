@@ -195,7 +195,7 @@ const storedApi = (store) => {
         },
 
         getFeatureToggle() {
-            return (! window.location.href.includes('odd-e.com)) && restGet(`/api/testability/feature_toggle`).then((res) => store.commit("featureToggle", res))
+            return (! window.location.href.includes('odd-e.com')) && restGet(`/api/testability/feature_toggle`).then((res) => store.commit("featureToggle", res))
         },
 
         async setFeatureToggle(data)  {
