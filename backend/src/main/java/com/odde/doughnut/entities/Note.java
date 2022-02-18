@@ -110,7 +110,6 @@ public class Note {
     @JsonIgnore
     @OrderBy("depth")
     @Getter
-    @Setter
     private List<NotesClosure> descendantNCs = new ArrayList<>();
 
     @JoinTable(name = "notes_closure", joinColumns = {

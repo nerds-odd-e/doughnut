@@ -170,33 +170,28 @@ class RestNoteControllerTests {
         void shouldNotBeAbleToDeleteNoteThatBelongsToOtherUser() {
             User anotherUser = makeMe.aUser().please();
             Note note = makeMe.aNote().byUser(anotherUser).please();
-            Integer noteId = note.getId();
             assertThrows(NoAccessRightException.class, () ->
                     controller.deleteNote(note)
             );
-            assertTrue(modelFactoryService.findNoteById(noteId).isPresent());
         }
 
         @Test
         void shouldDeleteTheNoteButNotTheUser() throws NoAccessRightException {
-            Note note = makeMe.aNote().byUser(userModel).please();
-            Integer noteId = note.getId();
-            Integer response = controller.deleteNote(note);
-            assertEquals(noteId, response);
-            assertNotNull(modelFactoryService.findNoteById(noteId).get().getDeletedAt());
+            controller.deleteNote(subject);
+            makeMe.refresh(parent);
+            assertThat(parent.getChildren(), hasSize(0));
             assertTrue(modelFactoryService.findUserById(userModel.getEntity().getId()).isPresent());
         }
 
         @Test
-        void shouldDeleteTheChildNoteButNotSiblingOrParent() throws NoAccessRightException {
-            Note sibling = makeMe.aNote().under(parent).byUser(userModel).please();
-            Note child = makeMe.aNote().under(subject).byUser(userModel).please();
+        void shouldDeleteTheChildNoteButNotSibling() throws NoAccessRightException {
+            makeMe.aNote("silbling").under(parent).byUser(userModel).please();
+            makeMe.aNote("child").under(subject).byUser(userModel).please();
             makeMe.refresh(subject);
 
             controller.deleteNote(subject);
-
-            assertTrue(modelFactoryService.findNoteById(sibling.getId()).isPresent());
-            assertNotNull(modelFactoryService.findNoteById(child.getId()).get().getDeletedAt());
+            makeMe.refresh(parent);
+            assertThat(parent.getChildren(), hasSize(1));
         }
     }
 

@@ -7,6 +7,7 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.Randomizer;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -30,7 +31,12 @@ public class QuizQuestionServant {
         List<Note> list = answerNote.getSiblings().stream().filter(notePredicate).collect(Collectors.toList());
         if (list.size() > 1) return list;
 
-        return answerNote.getGrandAsPossible().getDescendantNCs().stream().map(NotesClosure::getNote).filter(notePredicate).collect(Collectors.toList());
+        List<Note> result = new ArrayList<>();
+
+        answerNote.getGrandAsPossible().traverseBreadthFirst(note -> {
+            if(notePredicate.test(note)) result.add(note);
+        });
+        return result;
     }
 
     List<Note> randomlyChooseAndEnsure(List<Note> candidates, Note ensure, int maxSize) {
