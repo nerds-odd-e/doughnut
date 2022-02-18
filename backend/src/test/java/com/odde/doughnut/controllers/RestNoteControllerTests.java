@@ -7,6 +7,7 @@ import com.odde.doughnut.entities.json.NoteViewedByUser;
 import com.odde.doughnut.entities.json.NotesBulk;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -21,6 +22,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -209,10 +211,16 @@ class RestNoteControllerTests {
 
             @Test
             void shouldUndoOnlylastChange() throws NoAccessRightException {
+                Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+                testabilitySettings.timeTravelTo(timestamp);
                 controller.deleteNote(child);
                 makeMe.refresh(subject);
+
+                timestamp = TimestampOperations.addHoursToTimestamp(timestamp, 1);
+                testabilitySettings.timeTravelTo(timestamp);
                 controller.deleteNote(subject);
                 makeMe.refresh(subject);
+
                 controller.undoDeleteNote(subject);
                 makeMe.refresh(parent);
                 assertThat(parent.getDescendantsInBreathFirstOrder(), hasSize(1));
