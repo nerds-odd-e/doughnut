@@ -159,11 +159,14 @@ class RestNoteControllerTests {
     class DeleteNoteTest {
         Note subject;
         Note parent;
+        Note child;
 
         @BeforeEach
         void setup() {
             parent = makeMe.aNote().byUser(userModel).please();
             subject = makeMe.aNote().under(parent).byUser(userModel).please();
+            child = makeMe.aNote("child").under(subject).byUser(userModel).please();
+            makeMe.refresh(subject);
         }
 
         @Test
@@ -186,28 +189,35 @@ class RestNoteControllerTests {
         @Test
         void shouldDeleteTheChildNoteButNotSibling() throws NoAccessRightException {
             makeMe.aNote("silbling").under(parent).byUser(userModel).please();
-            makeMe.aNote("child").under(subject).byUser(userModel).please();
-            makeMe.refresh(subject);
-
             controller.deleteNote(subject);
             makeMe.refresh(parent);
             assertThat(parent.getChildren(), hasSize(1));
             assertThat(parent.getDescendantsInBreathFirstOrder(), hasSize(1));
         }
-    }
 
-    @Nested
-    class UndoDeleteNoteTest {
-        @Test
-        void shouldUndoDeleteTheNote() throws NoAccessRightException {
-            Note note = makeMe.aNote().byUser(userModel).please();
-            makeMe.refresh(note);
+        @Nested
+        class UndoDeleteNoteTest {
+            @Test
+            void shouldUndoDeleteTheNote() throws NoAccessRightException {
+                controller.deleteNote(subject);
+                makeMe.refresh(subject);
+                controller.undoDeleteNote(subject);
+                makeMe.refresh(parent);
+                assertThat(parent.getChildren(), hasSize(1));
+                assertThat(parent.getDescendantsInBreathFirstOrder(), hasSize(2));
+            }
 
-            controller.deleteNote(note);
-            NotesBulk response = controller.undoDeleteNote(note);
-
-            assertEquals(note.getId(), response.notes.get(0).getId());
-            assertNull(modelFactoryService.findNoteById(note.getId()).get().getDeletedAt());
+            @Test
+            void shouldUndoOnlylastChange() throws NoAccessRightException {
+                controller.deleteNote(child);
+                makeMe.refresh(subject);
+                controller.deleteNote(subject);
+                makeMe.refresh(subject);
+                controller.undoDeleteNote(subject);
+                makeMe.refresh(parent);
+                assertThat(parent.getDescendantsInBreathFirstOrder(), hasSize(1));
+            }
         }
+
     }
 }

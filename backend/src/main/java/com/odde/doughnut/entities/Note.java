@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 
 import static java.util.stream.Collectors.toList;
 
@@ -61,8 +60,8 @@ public class Note {
     private Timestamp createdAt;
     
     @Column(name = "deleted_at")
-    @Getter
     @Setter
+    @Getter
     private Timestamp deletedAt;
 
     @OneToOne(cascade = CascadeType.PERSIST)
@@ -104,7 +103,7 @@ public class Note {
     @OrderBy("depth DESC")
     @Getter
     @Setter
-    private List<NotesClosure> notesClosures = new ArrayList<>();
+    private List<NotesClosure> ancestorNotesClosures = new ArrayList<>();
 
     @JoinTable(name = "notes_closure", joinColumns = {
             @JoinColumn(name = "ancestor_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)}, inverseJoinColumns = {
@@ -160,7 +159,7 @@ public class Note {
             notesClosure.setNote(this);
             notesClosure.setAncestor(anc);
             notesClosure.setDepth(counter[0]);
-            getNotesClosures().add(0, notesClosure);
+            getAncestorNotesClosures().add(0, notesClosure);
             counter[0] += 1;
         });
     }
@@ -176,7 +175,7 @@ public class Note {
 
     @JsonIgnore
     public List<Note> getAncestors() {
-        return getNotesClosures().stream().map(NotesClosure::getAncestor).collect(toList());
+        return getAncestorNotesClosures().stream().map(NotesClosure::getAncestor).collect(toList());
     }
 
     @JsonIgnore

@@ -32,8 +32,8 @@ public class NoteMotionModel {
     }
 
     private void updateAncestors(Note note, Note parent) {
-        note.getNotesClosures().forEach(modelFactoryService.notesClosureRepository::delete);
-        note.setNotesClosures(new ArrayList<>());
+        note.getAncestorNotesClosures().forEach(modelFactoryService.notesClosureRepository::delete);
+        note.setAncestorNotesClosures(new ArrayList<>());
         modelFactoryService.entityManager.flush();
         note.setParentNote(parent);
     }

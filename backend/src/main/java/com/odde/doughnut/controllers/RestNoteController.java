@@ -137,6 +137,7 @@ class RestNoteController {
     public NotesBulk undoDeleteNote(@PathVariable("note") Note note) throws NoAccessRightException {
         currentUserFetcher.getUser().getAuthorization().assertAuthorization(note);
         modelFactoryService.toNoteModel(note).restore();
+        modelFactoryService.entityManager.flush();
         return NotesBulk.jsonNoteWithChildren(note, currentUserFetcher.getUser());
     }
 

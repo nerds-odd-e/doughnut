@@ -14,25 +14,28 @@ public class NoteModel {
         this.modelFactoryService = modelFactoryService;
     }
 
-    private void updateDeletedAt(Timestamp time) {
+    public void destroy(Timestamp currentUTCTimestamp) {
         if (entity.getNotebook() != null) {
-            if (entity.getNotebook().getHeadNote() == entity) {        
-                entity.getNotebook().setDeletedAt(time);
+            if (entity.getNotebook().getHeadNote() == entity) {
+                entity.getNotebook().setDeletedAt(currentUTCTimestamp);
                 modelFactoryService.notebookRepository.save(entity.getNotebook());
             }
         }
-        entity.setDeletedAt(time);
+
+        entity.setDeletedAt(currentUTCTimestamp);
         modelFactoryService.noteRepository.save(entity);
-    }
-    
-    public void destroy(Timestamp currentUTCTimestamp) {
-        entity.getDescendantsInBreathFirstOrder().forEach(child -> modelFactoryService.toNoteModel(child).destroy(currentUTCTimestamp));
-        updateDeletedAt(currentUTCTimestamp);
+        modelFactoryService.noteRepository.softDeleteDescendants(entity, currentUTCTimestamp);
     }
 
-    // this is a bug
     public void restore() {
-        entity.getDescendantsInBreathFirstOrder().forEach(child -> modelFactoryService.toNoteModel(child).restore());
-        updateDeletedAt(null);
+        if (entity.getNotebook() != null) {
+            if (entity.getNotebook().getHeadNote() == entity) {
+                entity.getNotebook().setDeletedAt(null);
+                modelFactoryService.notebookRepository.save(entity.getNotebook());
+            }
+        }
+        modelFactoryService.noteRepository.undoDeleteDescendants(entity, entity.getDeletedAt());
+        entity.setDeletedAt(null);
+        modelFactoryService.noteRepository.save(entity);
     }
 }
