@@ -1,5 +1,4 @@
 #!/bin/bash
-set -x
 
 export expected_healthy_services_count=2
 export healthy_services_counter=0
@@ -19,9 +18,9 @@ do
 		unhealthy_mig_state_count=0
 	fi
 
-	sleep 60
+	sleep 90
 
 	if [ $unhealthy_mig_state_count -gt $unhealthy_mig_state_count_threshold ]; then
-		say "doughnut Production is DOWN!!!"
+		say "doughnut Production is DOWN!"
 	fi
 done
