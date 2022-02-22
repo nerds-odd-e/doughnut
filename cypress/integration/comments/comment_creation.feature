@@ -1,7 +1,7 @@
 Feature: Add a new comment to a note
   As a user, I want to add a new comment to an existing note
 
- 
+  @ignore
   Scenario: Add a new comment to my note
     Given I've logged in as an existing user
     And there are some notes for the current user
@@ -16,7 +16,7 @@ Feature: Add a new comment to a note
     Then I should see comment added to note
 
 
-
+  @ignore
   Scenario: Add a new comment to another person's note
     Given There is a circle "Odd-e SG Team" with "old_learner, another_old_learner" members
     And I've logged in as "old_learner"
