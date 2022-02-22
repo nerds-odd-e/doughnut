@@ -1,31 +1,33 @@
 Feature: Add a new comment to a note
   As a user, I want to add a new comment to an existing note
 
-  Background:
+ 
+  Scenario: Add a new comment to my note
     Given I've logged in as an existing user
     And there are some notes for the current user
-      | title          | testingParent  | description         | author |
-      | LeSS in Action |                | An awesome training | a      |
-      | team           | LeSS in Action |                     | b      |
-      | tech           | LeSS in Action |                     | c      |
+      | title           | testingParent  | description        |
+      | My note         |                | My individual note |                 
 
-  @ignore
-  Scenario: Add a new comment to my note
-    
-    When I select my note with title 'LeSS in Action'
+    When I select a note with title 'My note'
     And I click the add comment button
     Then I should see a new comment input box displayed
-    And I input 'some comment' in the comment input box 
+    And I input 'A comment to my note' in the comment input box 
     And I click outside the input box
     Then I should see comment added to note
 
 
-  @ignore
+
   Scenario: Add a new comment to another person's note
-    
-    When I select user 'a' note with title 'team'
+    Given There is a circle "Odd-e SG Team" with "old_learner, another_old_learner" members
+    And I've logged in as "old_learner"
+    And Someone seed a notebook "My circle - Old learner's Notebook" in circle "Odd-e SG Team"
+    And there are some notes for existing user 'another_old_learner'
+      | title                         | testingParent  | description         | 
+      | My circle - Another user note |                | An awesome training |
+
+    When I select a note with title 'My circle - Another user note'
     And I click the add comment button
     Then I should see a new comment input box displayed
-    And I input 'some comment' in the comment input box 
+    And I input 'A comment to another user\'s note (same circle)' in the comment input box 
     And I click outside the input box
     Then I should see comment added to note
