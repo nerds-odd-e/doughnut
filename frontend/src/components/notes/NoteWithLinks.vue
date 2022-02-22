@@ -4,9 +4,10 @@
     v-bind="{ id: note.id, updatedAt: note.textContent?.updatedAt }"
   >
     <NoteFrameOfLinks v-bind="{ links: note.links }">
-      <NoteContent v-bind="{ note }"/>
+      <NoteContent v-bind="{ note }" />
     </NoteFrameOfLinks>
   </NoteShell>
+  <Comment content="comment1"/>
 </template>
 
 <script>
@@ -14,6 +15,7 @@ import EditableText from "../form/EditableText.vue";
 import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
 import NoteShell from "./NoteShell.vue";
 import NoteContent from "./NoteContent.vue";
+import Comment from "../comment/Comment.vue";
 
 export default {
   name: "NoteWithLinks",
@@ -25,6 +27,7 @@ export default {
     NoteShell,
     NoteContent,
     EditableText,
+    Comment,
   },
 };
 </script>
