@@ -31,6 +31,10 @@ public class MakeMe {
         return new CommentBuilder(new Comment(), this).note(note).user(user);
     }
 
+    public CommentBuilder aComment(Note note, User user, String content) {
+        return aComment(note, user).content(content);
+    }
+
     public NoteBuilder aNote(String title) {
         return aNote().title(title);
     }

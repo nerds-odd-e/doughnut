@@ -1,6 +1,7 @@
 package com.odde.doughnut.entities;
 
 import com.odde.doughnut.testability.MakeMe;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,15 +18,29 @@ import static org.hamcrest.Matchers.*;
 public class CommentTest {
     @Autowired
     MakeMe makeMe;
+    User user;
+    Note note;
+
+    @BeforeEach
+    void setup() {
+        user = makeMe.aUser().please();
+        note = makeMe.aNote().please();
+    }
 
     @Test
-    void hasComment() {
-        User user = makeMe.aUser().please();
-        Note note = makeMe.aNote().please();
+    void shouldCreateComment() {
         Comment comment = makeMe.aComment(note, user).please();
 
         assertThat(comment.getId(), is(notNullValue()));
         assertThat(comment.getUser().getId(), equalTo(user.getId()));
         assertThat(comment.getNote().getId(), equalTo(note.getId()));
+    }
+
+    @Test
+    void shouldCreateCommentWithContent() {
+        String content = "My comment";
+        Comment comment = makeMe.aComment(note, user, content).please();
+
+        assertThat(comment.getContent(), equalTo(content));
     }
 }

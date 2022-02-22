@@ -43,4 +43,8 @@ public class CommentBuilder extends EntityBuilder<Comment>  {
         return this;
     }
 
+    public CommentBuilder content(String content) {
+        entity.setContent(content);
+        return this;
+    }
 }
