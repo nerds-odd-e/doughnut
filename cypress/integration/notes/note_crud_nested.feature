@@ -3,7 +3,7 @@ Feature: Nested Note CRUD
   notes, so that I can review them in the future.
 
   Background:
-    Given I've logged in as an existing useras
+    Given I've logged in as an existing user
     And there are some notes for the current user
       | title          | testingParent  | description         |
       | LeSS in Action |                | An awesome training |
