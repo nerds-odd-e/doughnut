@@ -1,5 +1,5 @@
 <script>
-import NoteStatistics from "./NoteCommentForm.vue";
+import NoteCommentForm from "./NoteCommentForm.vue";
 
 export default {
   name: "NoteAddCommentButton",
@@ -35,10 +35,10 @@ export default {
     role="button"
     title="statistics"
   >
-    Comment
+    Add Comment
   </a>
-  <div>toggleStatistics
-    <component
+  <div>
+    <component 
       :is="noteAddCommentComponentName"
       :noteId="noteId"
       :linkid="linkid"

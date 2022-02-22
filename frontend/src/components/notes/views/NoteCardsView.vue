@@ -31,7 +31,7 @@ export default {
     },
     children() {
       return this.$store.getters.getChildrenOfParentId(this.noteId);
-    },
+    }
   },
 };
 </script>

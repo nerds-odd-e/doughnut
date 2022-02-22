@@ -1,5 +1,5 @@
 <template>
-  <div v-if="noteCommentForm">
+  <div>
     This is a future comment form
   </div>
 </template>
@@ -28,5 +28,5 @@ const fetchData = async () => {
     });
 };
 
-fetchData(); */S
+fetchData(); */
 </script>
