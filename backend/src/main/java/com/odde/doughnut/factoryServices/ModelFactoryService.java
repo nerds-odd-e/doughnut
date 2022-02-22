@@ -13,17 +13,30 @@ import java.util.Optional;
 
 @Service
 public class ModelFactoryService {
-    @Autowired public TextContentRepository textContentRepository;
-    @Autowired public NoteRepository noteRepository;
-    @Autowired public UserRepository userRepository;
-    @Autowired public BazaarNotebookRepository bazaarNotebookRepository;
-    @Autowired public ReviewPointRepository reviewPointRepository;
-    @Autowired public CircleRepository circleRepository;
-    @Autowired public LinkRepository linkRepository;
-    @Autowired public NotesClosureRepository notesClosureRepository;
-    @Autowired public NotebookRepository notebookRepository;
-    @Autowired public EntityManager entityManager;
-    @Autowired public FailureReportRepository failureReportRepository;
+    @Autowired
+    public TextContentRepository textContentRepository;
+    @Autowired
+    public NoteRepository noteRepository;
+    @Autowired
+    public UserRepository userRepository;
+    @Autowired
+    public BazaarNotebookRepository bazaarNotebookRepository;
+    @Autowired
+    public ReviewPointRepository reviewPointRepository;
+    @Autowired
+    public CircleRepository circleRepository;
+    @Autowired
+    public LinkRepository linkRepository;
+    @Autowired
+    public NotesClosureRepository notesClosureRepository;
+    @Autowired
+    public NotebookRepository notebookRepository;
+    @Autowired
+    public EntityManager entityManager;
+    @Autowired
+    public FailureReportRepository failureReportRepository;
+    @Autowired
+    public CommentReadStatusRepository commentReadStatusRepository;
 
     public NoteModel toNoteModel(Note note) {
         return new NoteModel(note, this);
@@ -35,9 +48,9 @@ public class ModelFactoryService {
     }
 
     public NoteMotionModel toNoteMotionModel(Note sourceNote, Note targetNote, Boolean asFirstChild) {
-        if(!asFirstChild) {
+        if (!asFirstChild) {
             List<Note> children = targetNote.getChildren();
-            if (children.size()> 0) {
+            if (children.size() > 0) {
                 return toNoteMotionModel(new NoteMotion(children.get(children.size() - 1), false), sourceNote);
             }
         }

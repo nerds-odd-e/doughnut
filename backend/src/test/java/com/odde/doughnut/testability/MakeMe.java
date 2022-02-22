@@ -13,7 +13,8 @@ import java.nio.CharBuffer;
 
 @Component
 public class MakeMe {
-    @Autowired public ModelFactoryService modelFactoryService;
+    @Autowired
+    public ModelFactoryService modelFactoryService;
 
     public UserBuilder aUser() {
         return new UserBuilder(this);
@@ -38,12 +39,19 @@ public class MakeMe {
     public NoteBuilder aNote(String title) {
         return aNote().title(title);
     }
+
     public NoteBuilder aNote(String title, String description) {
         return aNote().title(title).description(description);
     }
+
     public NoteBuilder theNote(Note note) {
         return new NoteBuilder(note, this);
     }
+
+    public CommentReadStatusBuilder aCommentReadStatus(Comment comment, User user) {
+        return new CommentReadStatusBuilder(new CommentReadStatus(), this).comment(comment).user(user);
+    }
+
     public BazaarNotebookBuilder aBazaarNodebook(Notebook notebook) {
         return new BazaarNotebookBuilder(this, notebook);
     }
