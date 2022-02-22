@@ -8,7 +8,7 @@ Feature: Add a new comment to a note
       | title           | testingParent  | description        |
       | My note         |                | My individual note |                 
 
-    When I select a note with title 'My note'
+    When I open "My note" note from top level
     And I click the add comment button
     Then I should see a new comment input box displayed
     And I input 'A comment to my note' in the comment input box 
