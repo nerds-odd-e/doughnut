@@ -27,6 +27,10 @@ public class MakeMe {
         return new NoteBuilder(new Note(), this);
     }
 
+    public CommentBuilder aComment(Note note, User user) {
+        return new CommentBuilder(new Comment(), this).note(note).user(user);
+    }
+
     public NoteBuilder aNote(String title) {
         return aNote().title(title);
     }
