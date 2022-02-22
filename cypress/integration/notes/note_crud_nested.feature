@@ -3,14 +3,14 @@ Feature: Nested Note CRUD
   notes, so that I can review them in the future.
 
   Background:
-    Given I've logged in as an existing user
+    Given I've logged in as an existing useras
     And there are some notes for the current user
       | title          | testingParent  | description         |
       | LeSS in Action |                | An awesome training |
       | team           | LeSS in Action |                     |
       | tech           | LeSS in Action |                     |
 
-  Scenario: Create a new note belonging to another node
+  Scenario: Create a new note belonging to another note
     When I create note belonging to "LeSS in Action":
       | Title        | Description                        |
       | Re-quirement | Re-think the way we do requirement |
