@@ -23,6 +23,10 @@ And('{string} adds a comment with description {string}',(user, commentDescriptio
       expect(response.status).to.equal(200);
     });
   });
-  
-  
+
+And('I should see a comment with description {string}', (commentDescription) => {
+  cy.findByText("Show Comment").click();
+  cy.findByText(commentDescription);
+});
+
 })
