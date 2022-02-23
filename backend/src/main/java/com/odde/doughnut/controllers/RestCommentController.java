@@ -31,12 +31,8 @@ public class RestCommentController {
 
     @GetMapping("/{note}")
     public List<Comment> noteComments(@PathVariable("note") Note note) {
-        List<Comment> comments = new ArrayList<>();
-        final UserModel userModel = currentUserFetcher.getUser();
-        User user = userModel.getEntity();
-        comments.add(createComment(note, user, true));
-        comments.add(createComment(note, user, false));
-        return comments;
+
+        return modelFactoryService.commentRepository.getCommentsByNote(note);
     }
 
     private Comment createComment(Note note, User user, boolean isRead) {

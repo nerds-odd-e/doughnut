@@ -47,11 +47,10 @@ class RestCommentControllerTests {
     class NoteCommentsTest {
         @Test
         void shouldBeAbleToSeeNoteComments() {
-            makeMe.refresh(userModel.getEntity());
+            makeMe.aComment(note, userModel.getEntity()).please(true);
+            makeMe.aComment(note, userModel.getEntity()).please(true);
             final List<Comment> comments = controller.noteComments(note);
             assertThat(comments.size(), equalTo(2));
-            assertThat(comments.get(0).isRead(), equalTo(true));
-            assertThat(comments.get(1).isRead(), equalTo(false));
         }
 
     }
