@@ -18,7 +18,7 @@ beforeEach(() => {
 });
  
 describe("Notebooks Page", () => {
-    const findUndoButton = () => screen.findByTitle("undo").then(res => res.closest("button"))
+    const findUndoButton = async () => screen.findByTitle("undo").then(res => res.closest("button"))
 
    test("fetch API to be called ONCE", async () => {
         const notebook = makeMe.aNotebook.please()
