@@ -7,7 +7,7 @@
       <NoteContent v-bind="{ note }" />
     </NoteFrameOfLinks>
   </NoteShell>
-  <Comment content="comment1"/>
+  <Comment v-if="featureToggle" content="comment1"/>
 </template>
 
 <script>
@@ -29,6 +29,9 @@ export default {
     EditableText,
     Comment,
   },
+  computed: {
+    featureToggle() { return this.$store.getters.getFeatureToggle()}
+  }
 };
 </script>
 
