@@ -24,7 +24,7 @@ export default {
     linkid() {
       this.noteAddCommentComStatisticsponentName = null;
     },
-  },
+  }
 };
 </script>
 

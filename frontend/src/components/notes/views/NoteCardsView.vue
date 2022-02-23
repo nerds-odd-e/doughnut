@@ -2,7 +2,7 @@
   <div class="container" v-if="note">
     <NoteWithLinks v-bind="{ note }"/>
     <NoteStatisticsButton :noteId="noteId" />
-    <NoteAddCommentButton :noteId="noteId" />
+    <NoteAddCommentButton v-if="featureToggle" :noteId="noteId" />
     <Cards v-if="expandChildren" :notes="children"/>
   </div>
 
@@ -31,7 +31,8 @@ export default {
     },
     children() {
       return this.$store.getters.getChildrenOfParentId(this.noteId);
-    }
-  },
+    },
+    featureToggle() { return this.$store.getters.getFeatureToggle()}
+  }
 };
 </script>

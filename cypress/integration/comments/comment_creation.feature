@@ -1,7 +1,8 @@
 Feature: Add a new comment to a note
   As a user, I want to add a new comment to an existing note
 
-  @ignore
+
+  @ignore 
   Scenario: Add a new comment to my note
     Given I've logged in as an existing user
     And there are some notes for the current user
