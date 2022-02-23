@@ -7,7 +7,7 @@
       <NoteContent v-bind="{ note }" />
     </NoteFrameOfLinks>
   </NoteShell>
-  <Comment v-if="featureToggle" content="comment1"/>
+  <NoteShowCommentButton v-if="featureToggle" />
 </template>
 
 <script>
@@ -15,7 +15,7 @@ import EditableText from "../form/EditableText.vue";
 import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
 import NoteShell from "./NoteShell.vue";
 import NoteContent from "./NoteContent.vue";
-import Comment from "../comment/Comment.vue";
+import NoteShowCommentButton from "./NoteShowCommentButton.vue";
 
 export default {
   name: "NoteWithLinks",
@@ -27,7 +27,7 @@ export default {
     NoteShell,
     NoteContent,
     EditableText,
-    Comment,
+    NoteShowCommentButton
   },
   computed: {
     featureToggle() { return this.$store.getters.getFeatureToggle()}

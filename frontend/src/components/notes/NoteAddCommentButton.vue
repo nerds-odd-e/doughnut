@@ -33,7 +33,6 @@ export default {
     @click="toggleCommentForm()"
     class="btn btn-sm"
     role="button"
-    title="Add Comment"
   >
     Add Comment
   </a>
