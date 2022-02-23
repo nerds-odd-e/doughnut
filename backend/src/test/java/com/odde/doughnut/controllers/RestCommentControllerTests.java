@@ -64,9 +64,27 @@ class RestCommentControllerTests {
             String content = "My comment";
             Comment comment = makeMe.aComment(note, userModel.getEntity(), content).please();
 
-            controller.deleteComment(comment);
+            Integer commentId = controller.deleteComment(comment);
             makeMe.refresh(comment);
             assertThat(comment.getDeletedAt(), notNullValue());
+            assertThat(commentId, equalTo(comment.getId()));
+        }
+
+    }
+
+    @Nested
+    class EditCommentTest {
+
+        @Test
+        void shouldBeAbleToEditAComment() throws NoAccessRightException {
+            String content = "My comment";
+            Comment comment = makeMe.aComment(note, userModel.getEntity(), content).please();
+            comment.setContent("edited");
+            String response = controller.editComment(comment);
+
+            makeMe.refresh(comment);
+            assertThat(comment.getContent(), equalTo("edited"));
+            assertThat(response, equalTo(comment.getContent()));
         }
 
     }

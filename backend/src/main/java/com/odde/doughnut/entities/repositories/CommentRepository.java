@@ -14,4 +14,8 @@ public interface CommentRepository extends CrudRepository<Comment, Integer> {
     @Query( value = " UPDATE comment SET deleted_at = :currentUTCTimestamp WHERE id = :#{#comment.id}", nativeQuery = true)
     void softDelete(@Param("comment")Comment comment, @Param("currentUTCTimestamp") Timestamp currentUTCTimestamp);
 
+    @Modifying
+    @Query( value = " UPDATE comment SET content = :#{#comment.content} WHERE id = :#{#comment.id}", nativeQuery = true)
+    void edit(@Param("comment")Comment comment);
+
 }

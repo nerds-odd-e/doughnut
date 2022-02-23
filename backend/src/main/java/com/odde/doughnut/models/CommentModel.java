@@ -17,4 +17,8 @@ public class CommentModel {
     public void destroy(Timestamp currentUTCTimestamp) {
         modelFactoryService.commentRepository.softDelete(entity, currentUTCTimestamp);
     }
+
+    public void edit() {
+        modelFactoryService.commentRepository.edit(entity);
+    }
 }

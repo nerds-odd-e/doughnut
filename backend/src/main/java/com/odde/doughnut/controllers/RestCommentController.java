@@ -57,4 +57,12 @@ public class RestCommentController {
         return comment.getId();
     }
 
+    @PostMapping(value = "/{comment}")
+    @Transactional
+    public String editComment(@PathVariable("comment") Comment comment) throws NoAccessRightException {
+        currentUserFetcher.getUser().getAuthorization().assertAuthorization(comment);
+        modelFactoryService.toCommentModel(comment).edit();
+        modelFactoryService.entityManager.flush();
+        return comment.getContent();
+    }
 }
