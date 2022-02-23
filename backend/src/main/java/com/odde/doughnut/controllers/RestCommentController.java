@@ -12,6 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,11 +36,8 @@ public class RestCommentController {
         return modelFactoryService.commentRepository.getCommentsByNote(note);
     }
 
-    private Comment createComment(Note note, User user, boolean isRead) {
-        Comment comment = new Comment();
-        comment.setNote(note);
-        comment.setUser(user);
-        comment.setContent("Comment 1");
+    private Comment createComment(Note note, User user, String commentDescription, boolean isRead) {
+        Comment comment = Comment.createComment(user, note, testabilitySettings.getCurrentUTCTimestamp(), commentDescription);
         comment.setRead(isRead);
         return comment;
     }
@@ -64,10 +62,11 @@ public class RestCommentController {
     
     @PostMapping(value = "/{note}/add")
     @Transactional
-    public Comment addComment(@PathVariable("note") Note note) throws NoAccessRightException {
+    public Comment addComment(@PathVariable("note") Note note, @Valid @RequestBody String commentDescription) throws NoAccessRightException {
         final UserModel userModel = currentUserFetcher.getUser();
         User user = userModel.getEntity();
-        Comment comment = createComment(note, user, true);
+        Comment comment = createComment(note, user, commentDescription, true);
+        modelFactoryService.commentRepository.save(comment);
         return comment;
     }
 }

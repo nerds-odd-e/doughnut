@@ -55,6 +55,16 @@ public class Comment {
     @Getter
     private boolean isRead;
 
+    public static Comment createComment(User user, Note note, Timestamp currentUTCTimestamp, String commentDescription) {
+        final Comment comment = new Comment();
+        comment.setContent(commentDescription);
+        comment.setCreatedAt(currentUTCTimestamp);
+        comment.setUpdatedAt(currentUTCTimestamp);
+        comment.setUser(user);
+        comment.setNote(note);
+        return comment;
+    }
+
     @Override
     public String toString() {
         return "Comment{" + "id=" + id + ", content='" + getContent() + '\'' + '}';

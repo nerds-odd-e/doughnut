@@ -56,6 +56,25 @@ class RestCommentControllerTests {
     }
 
     @Nested
+    class AddCommentTest {
+
+        @Test
+        void shouldBeAbleToAddAComment() throws NoAccessRightException {
+            String content = "My comment";
+
+            Comment comment = controller.addComment(note, content);
+
+            assertThat(comment.getContent(), equalTo(content));
+            assertThat(comment.getId(), notNullValue());
+            assertThat(comment.getNote(), equalTo(note));
+            assertThat(comment.getUser(), equalTo(userModel.getEntity()));
+            assertThat(comment.getCreatedAt(), notNullValue());
+            assertThat(comment.getUpdatedAt(), notNullValue());
+        }
+
+    }
+
+    @Nested
     class DeleteCommentTest {
 
         @Test
