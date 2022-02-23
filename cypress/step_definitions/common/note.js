@@ -346,8 +346,8 @@ And("the file {string} content is",(fileName, mdContent) => {
   cy.readFile(`${downloadsFolder}/${fileName}`).should("eq", mdContent);
 })
 
-When("I undo {string}", (undoType) => {
-  cy.findByTitle(`undo ${undoType}`).click();
+When("I undo", () => {
+  cy.get('#undo').click();
 })
 
 Then("the deleted notebook with title {string} should be restored", (title) => {
