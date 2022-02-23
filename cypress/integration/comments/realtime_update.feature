@@ -8,12 +8,11 @@ Feature: Retrieve Realtime Updates for Comments
 
   @ignore
   Scenario: New comment is added by another user
-    Given that I open the "card" view of note "Triangle"
-    When "another_old_learner" adds a comment for note "Triangle" with description "Needs a description"
+    When "another_old_learner" adds a comment with description "Needs a description"
     Then I should see a comment with content "Needs a description"
 
   @ignore
   Scenario: Existing comment is edited by another user
-    Given "another_old_user" adds a comment for note "Triangle" with description "Needs a description"
-    When "another_old_user" edits the comment with description "Please add description for triangle"
+    Given "another_old_learner" adds a comment for note "Triangle" with description "Needs a description"
+    When "another_old_learner" edits the comment with description "Please add description for triangle"
     Then I should see a comment with content "Please add description for triangle"
