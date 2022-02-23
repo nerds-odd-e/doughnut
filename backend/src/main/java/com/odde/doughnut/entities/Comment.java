@@ -50,6 +50,11 @@ public class Comment {
     @Getter
     private Timestamp deletedAt;
 
+    @Transient
+    @Setter
+    @Getter
+    private boolean isRead;
+
     @Override
     public String toString() {
         return "Comment{" + "id=" + id + ", content='" + getContent() + '\'' + '}';

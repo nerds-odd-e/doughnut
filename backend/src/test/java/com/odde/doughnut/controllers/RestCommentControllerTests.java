@@ -2,7 +2,6 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.Comment;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.json.NotesBulk;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
@@ -16,6 +15,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -43,15 +44,16 @@ class RestCommentControllerTests {
     }
 
     @Nested
-    class createCommentTest {
-        void shouldBeAbleToSaveCommentWhenValid() throws NoAccessRightException {
-            Note note = null;
-            Comment newComment = null;
-            controller.create(note, newComment);
-
-            makeMe.refresh(newComment);
-            assertThat(newComment.getId(), notNullValue());
+    class NoteCommentsTest {
+        @Test
+        void shouldBeAbleToSeeNoteComments() {
+            makeMe.refresh(userModel.getEntity());
+            final List<Comment> comments = controller.noteComments(note);
+            assertThat(comments.size(), equalTo(2));
+            assertThat(comments.get(0).isRead(), equalTo(true));
+            assertThat(comments.get(1).isRead(), equalTo(false));
         }
+
     }
 
     @Nested

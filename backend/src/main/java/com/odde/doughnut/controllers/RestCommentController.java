@@ -3,15 +3,20 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.Comment;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
 
+@RestController
+@RequestMapping("/api/comments")
 public class RestCommentController {
     private final ModelFactoryService modelFactoryService;
     private final CurrentUserFetcher currentUserFetcher;
@@ -24,8 +29,23 @@ public class RestCommentController {
         this.testabilitySettings = testabilitySettings;
     }
 
-    public void create(Note note, Comment newComment) {
+    @GetMapping("/{note}")
+    public List<Comment> noteComments(@PathVariable("note") Note note) {
+        List<Comment> comments = new ArrayList<>();
+        final UserModel userModel = currentUserFetcher.getUser();
+        User user = userModel.getEntity();
+        comments.add(createComment(note, user, true));
+        comments.add(createComment(note, user, false));
+        return comments;
+    }
 
+    private Comment createComment(Note note, User user, boolean isRead) {
+        Comment comment = new Comment();
+        comment.setNote(note);
+        comment.setUser(user);
+        comment.setContent("Comment 1");
+        comment.setRead(isRead);
+        return comment;
     }
 
     @PostMapping(value = "/{comment}/delete")
