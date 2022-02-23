@@ -355,7 +355,7 @@ Then("the deleted notebook with title {string} should be restored", (title) => {
 })
 
 Then("there should be no more undo to do", () => {
-  cy.get('.btn[title="undo"]').should('be.disabled');
+  cy.get('#undo').should('be.disabled');
 })
 
 Then("I should see 1 comment", () => {
