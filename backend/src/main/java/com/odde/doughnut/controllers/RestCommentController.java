@@ -64,12 +64,10 @@ public class RestCommentController {
     
     @PostMapping(value = "/{note}/add")
     @Transactional
-    public Comment addComment(@PathVariable("note") String noteId) throws NoAccessRightException {
-        // final UserModel userModel = currentUserFetcher.getUser();
-        // NoteModel noteModel = userModel.getAuthorization().assertAuthorization(note);
-
-        // User user = userModel.getEntity();
-        // comments.add(createComment(note, user, true));
-        // return comments;
+    public Comment addComment(@PathVariable("note") Note note) throws NoAccessRightException {
+        final UserModel userModel = currentUserFetcher.getUser();
+        User user = userModel.getEntity();
+        Comment comment = createComment(note, user, true);
+        return comment;
     }
 }
