@@ -1,5 +1,5 @@
 <script>
-import NoteCommentForm from "./NoteCommentForm.vue";
+import NoteCommentForm from "../comment/NoteCommentForm.vue";
 
 export default {
   name: "NoteAddCommentButton",
