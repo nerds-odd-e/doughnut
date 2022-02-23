@@ -8,6 +8,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,8 +31,16 @@ class RestCommentControllerTests {
     @Autowired
     MakeMe makeMe;
     private UserModel userModel;
-    RestCommentController controller = new RestCommentController();
     private final TestabilitySettings testabilitySettings = new TestabilitySettings();
+    private Note note;
+    RestCommentController controller;
+
+    @BeforeEach
+    void setup() {
+        userModel = makeMe.aUser().toModelPlease();
+        controller = new RestCommentController(modelFactoryService, new TestCurrentUserFetcher(userModel), testabilitySettings);
+        note = makeMe.aNote().byUser(userModel).please();
+    }
 
     @Nested
     class createCommentTest {
@@ -43,5 +52,20 @@ class RestCommentControllerTests {
             makeMe.refresh(newComment);
             assertThat(newComment.getId(), notNullValue());
         }
+    }
+
+    @Nested
+    class DeleteCommentTest {
+
+        @Test
+        void shouldBeAbleToDeleteAComment() throws NoAccessRightException {
+            String content = "My comment";
+            Comment comment = makeMe.aComment(note, userModel.getEntity(), content).please();
+
+            controller.deleteComment(comment);
+            makeMe.refresh(comment);
+            assertThat(comment.getDeletedAt(), notNullValue());
+        }
+
     }
 }

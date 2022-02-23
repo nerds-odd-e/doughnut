@@ -36,7 +36,7 @@ public class ModelFactoryService {
     @Autowired
     public FailureReportRepository failureReportRepository;
     @Autowired
-    public CommentReadStatusRepository commentReadStatusRepository;
+    public CommentRepository commentRepository;
 
     public NoteModel toNoteModel(Note note) {
         return new NoteModel(note, this);
@@ -63,10 +63,6 @@ public class ModelFactoryService {
 
     public Optional<User> findUserById(Integer id) {
         return userRepository.findById(id);
-    }
-
-    public Optional<Note> findNoteById(Integer noteId) {
-        return noteRepository.findById(noteId);
     }
 
     public UserModel toUserModel(User user) {
@@ -100,5 +96,7 @@ public class ModelFactoryService {
     public Authorization toAuthorization(User entity) {
         return new Authorization(entity, this);
     }
+
+    public CommentModel toCommentModel(Comment comment) { return new CommentModel(comment, this); }
 
 }
