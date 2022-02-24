@@ -6,7 +6,7 @@ Feature: read unread comment
       | title    | description     |
       | Sedition | Incite violence |
 
-  @featureToggle
+  @ignore
   Scenario: Note with one read comment
     Given I open "Sedition" note from top level
     When I add a comment with description "comment1"
