@@ -64,7 +64,7 @@ Cypress.Commands.add('createLink', (type, fromNoteTitle, toNoteTitle) => {
         url: '/api/testability/link_notes',
         body: {
           type,
-          source_id: seededNoteIdMap[fromNoteTitle],featureToggle,
+          source_id: seededNoteIdMap[fromNoteTitle],
           target_id: seededNoteIdMap[toNoteTitle],
         },
       })
