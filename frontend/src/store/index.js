@@ -15,7 +15,7 @@ function withState(state) {
         .map(id=>this.getNoteById(id))
         .filter(n=>n)
     },
-
+   
     deleteNote(id) {
       this.getChildrenIdsByParentId(id)?.forEach(cid=>this.deleteNote(cid))
       delete state.notes[id]
@@ -40,6 +40,7 @@ export default createStore({
   state: () => ({
     notebooks: [],
     notes: {},
+    comments: {},
     highlightNoteId: null,
     viewType: null,
     noteUndoHistories: [],
@@ -81,6 +82,11 @@ export default createStore({
     loadNotes(state, notes) {
       notes.forEach((note) => {
        state.notes[note.id] = note;
+      });
+    },
+    loadComments(state, comments) {
+      comments.forEach((comment) => {
+       state.comments[comment.id] = comment;
       });
     },
     deleteNote(state, noteId) {

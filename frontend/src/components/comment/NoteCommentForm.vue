@@ -6,16 +6,19 @@
         class="note-title"
         scopeName="note"
         :showInputBox="true"
-        v-model="textContent.title"
+        v-model="textContent.description"
         @blur="onBlurTextField"/>
   </div>
 </template>
 
 <script>
 import EditableText from "../form/EditableText.vue";
+import { storedApi } from "../../storedApi";
+
 
 export default {
   props:{
+    noteId: String,
     comment: Object,
   },
   components:{
@@ -36,6 +39,15 @@ export default {
   },
   methods: {
     onBlurTextField(){
+      this.loading = true
+      storedApi(this.$store).addCommentToNote(this.noteId, this.textContent)
+      .then((res) => {
+        this.$emit("done");
+      })
+      .catch((res) => (this.formErrors = res))
+      .finally(() => { 
+        this.loading = false;
+      })
     }
   }
 

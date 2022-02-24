@@ -56,7 +56,7 @@ const storedApi = (store) => {
                 return res
             },
         },
-
+    
         async getNoteWithDescendents(noteId) {
             const res = await restGet(
                 `/api/notes/${noteId}/overview`);
@@ -141,6 +141,17 @@ const storedApi = (store) => {
         async updateTextContent(noteId, noteContentData)  {
             store.commit('addEditingToUndoHistory',  { noteId });
             return updateTextContentWithoutUndo(noteId, noteContentData)
+        },
+
+        async addCommentToNote(noteId, commentContentData)  {
+            const { updatedAt, ...data } = commentContentData
+            const res = await restPost(
+                `/api/comments/${noteId}/add`,
+                data,
+                () => null
+        )
+        store.commit("loadComments", [res]);
+        return res;
         },
 
         async undo()  {
