@@ -12,7 +12,7 @@ And('I click the add comment button', () => {
   cy.findByText("Add Comment").click();
 })
 
-And('{string} adds a comment with description {string}',(user, commentDescription) => {
+And('{string} has a comment with description {string}', (user, commentDescription) => {
   cy.url().then(url => {
     const noteId = url.split("/").slice(-1)[0];
     cy.request({
@@ -23,10 +23,9 @@ And('{string} adds a comment with description {string}',(user, commentDescriptio
       expect(response.status).to.equal(200);
     });
   });
+})
 
 And('I should see a comment with description {string}', (commentDescription) => {
   cy.findByText("Show Comment").click();
   cy.findByText(commentDescription);
 });
-
-})

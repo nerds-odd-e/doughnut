@@ -8,7 +8,7 @@ Feature: Retrieve Realtime Updates for Comments
 
   @featureToggle
   Scenario: New comment is added by another user
-    When "another_old_learner" adds a comment with description "comment1"
+    When "another_old_learner" has a comment with description "comment1"
     Then I should see a comment with description "comment1"
 
   @ignore
