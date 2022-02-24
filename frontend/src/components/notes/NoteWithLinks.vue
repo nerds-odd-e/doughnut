@@ -7,7 +7,7 @@
       <NoteContent v-bind="{ note }" />
     </NoteFrameOfLinks>
   </NoteShell>
-  <NoteShowCommentButton v-if="featureToggle" :comments='[{content:"comment1"}]'/>
+  <NoteShowCommentButton v-if="featureToggle" :comments='[{user: {id: 1763}, content:"comment1"}]'/>
 </template>
 
 <script>

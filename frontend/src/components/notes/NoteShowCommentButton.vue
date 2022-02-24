@@ -1,7 +1,7 @@
 <template>
   <a class="btn btn-sm" id="show-comment">Show Comment</a>
   <template :key="index" v-for="(comment,index) in comments">
-    <Comment :content="comment.content"></Comment>
+    <Comment :comment="comment"></Comment>
   </template>
 </template>
 

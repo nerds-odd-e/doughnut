@@ -1,14 +1,37 @@
 <template>
   <div class="card">
-  <span>{{ content }}</span>
+  <span>{{ comment.content }}</span>
+  <button
+    v-if="shouldShowDelete"
+    class="btn btn-sm"
+    title="delete comment"
+    v-on:click="deleteComment"
+  >
+    <SvgRemove />
+    Delete
+  </button>
   </div>
 </template>
 
 <script>
+import SvgRemove from "../svgs/SvgRemove.vue";
 
 export default {
-  props: {
-    content: { type: String, required: true }, 
+  components: {
+    SvgRemove
   },
+  props: {
+    comment: { type: Object, required: true }
+  },
+  computed: {
+    user() { return this.$store.getters.getCurrentUser()},
+    shouldShowDelete() {
+      return this.user.id === this.comment.user.id || true
+    }
+  },
+  methods: {
+    deleteComment(){
+    }
+  }
 }
 </script>
