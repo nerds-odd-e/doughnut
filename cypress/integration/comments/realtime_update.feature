@@ -8,11 +8,11 @@ Feature: Retrieve Realtime Updates for Comments
 
   @ignore @featureToggle
   Scenario: New comment is added by another user
-    When "another_old_learner" adds a comment for note "Triangle" with description "comment1"
+    When "another_old_learner" adds a comment for note with description "comment1"
     Then I should see a comment with description "comment1"
 
-  @ignore
+  @ignore @featureToggle
   Scenario: Existing comment is edited by another user
-    Given "another_old_learner" adds a comment for note "Triangle" with description "Needs a description"
+    Given "another_old_learner" adds a comment for note with description "Needs a description"
     When "another_old_learner" edits the comment with description "Please add description for triangle"
     Then I should see a comment with content "Please add description for triangle"
