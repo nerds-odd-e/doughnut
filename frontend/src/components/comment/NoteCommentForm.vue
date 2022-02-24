@@ -2,7 +2,7 @@
   <div>
     <EditableText
         :multipleLine="false"
-        role="title"
+        role="comment-form"
         class="note-title"
         scopeName="note"
         :showInputBox="true"
@@ -36,7 +36,6 @@ export default {
   },
   methods: {
     onBlurTextField(){
-      console.log('test')
     }
   }
 
