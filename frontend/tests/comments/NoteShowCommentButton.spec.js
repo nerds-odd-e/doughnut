@@ -10,5 +10,12 @@ describe('List of comment cards', () => {
       render(NoteShowCommentButton, { props: { comments: [{content:"this is a comment"}] } });
       expect(screen.getByText('this is a comment'));
     })
-  })   
+
+    it('Display 2 comments', () => {
+      render(NoteShowCommentButton, { props: { comments: [{content:"this is a comment"}, {content:"this is another one"}] } });
+      expect(screen.getByText('this is a comment'));
+      expect(screen.getByText('this is another one'));
+    })
+    
+  })
 })

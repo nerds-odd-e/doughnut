@@ -13,7 +13,7 @@ Feature: read unread comment
     Then I should see no comments
     And I should see "show comment"
 
-  @ignore
+  @featureToggle
   Scenario: Note with one read and one unread comment
     Given there is "1" read comment for note "Sedition"
     And there is "1" unread comment for note "Sedition"
