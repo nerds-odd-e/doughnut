@@ -1,6 +1,5 @@
 Feature: read unread comment
 
-
   Background:
     Given I've logged in as an existing user
     And there are some notes for the current user
@@ -9,9 +8,8 @@ Feature: read unread comment
 
   @featureToggle
   Scenario: Note with one read comment
-   Given there is "0" unread comment for note "Sedition"
-    And there is "1" read comment for note "Sedition"
-    When I open "Sedition" note from top level
+    Given I open "Sedition" note from top level
+    When I add a comment with description "comment1"
     Then I should see no comments
     And I should see "show comment"
 
@@ -19,7 +17,7 @@ Feature: read unread comment
   Scenario: Note with one read and one unread comment
     Given there is "1" read comment for note "Sedition"
     And there is "1" unread comment for note "Sedition"
-    When I open note "Sedition"
+    When I open "Sedition" note from top level
     Then I should see 1 comment
     And I should see "show comment"
 
@@ -27,7 +25,7 @@ Feature: read unread comment
   Scenario: Note with one unread comment
     Given there is "1" unread comment for note "Sedition"
     And there is "0" read comment for note "Sedition"
-    When I open note "Sedition"
+    When I open "Sedition" note from top level
     Then I should see 1 comment
     And I should NOT see "show comment"
 

@@ -366,7 +366,7 @@ Then('I should see "show comment"', () => {
   cy.get('#show-comment').should('exist')
 })
 
-Given('there is "0" unread comment for note "Sedition"', () => {
+Given('there is "1" unread comment for note "Sedition"', () => {
 })
 
 Given('there is "1" read comment for note "Sedition"', () => {
