@@ -9,16 +9,10 @@ Feature: Edit an existing comment from a note
       | team           | LeSS in Action |                     | b      |
       | tech           | LeSS in Action |                     | c      |
 
-  @ignore
-  Scenario: Remove a comment from a note
+  @ignore @featureToggle
+  Scenario: Edit a comment from a note
 
-    When I select my note with title 'LeSS in Action'
-    And I click the add comment button
-    Then I should see a new comment input box displayed
-    And I input 'comment to be edited' in the comment input box
-    And I click outside the input box
-    Then I should see comment added to note
-    And I click the edit comment button on the comment with value "comment to be edited"
-    And I input ' testing edit' in the comment input box
-    And I click outside the input box
-    Then I should see comment with value "comment to be edited testing edit"
+    When I open "LeSS in Action" note from top level
+    And I add a comment with description "edit"
+    And I edit the "edit" comment with description "comment to be edited"
+    Then I should see comment with value "comment to be edited"
