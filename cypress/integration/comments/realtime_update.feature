@@ -6,9 +6,9 @@ Feature: Retrieve Realtime Updates for Comments
     And I create a notebook "Shapes" in circle "Odd-e SG Team"
     And I add a note "Triangle" under "Shapes"
 
-  @featureToggle
+  @ignore @featureToggle
   Scenario: New comment is added by another user
-    When "another_old_learner" has a comment with description "comment1"
+    When "another_old_learner" adds a comment for note "Triangle" with description "comment1"
     Then I should see a comment with description "comment1"
 
   @ignore
