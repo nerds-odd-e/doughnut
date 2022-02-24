@@ -1,4 +1,4 @@
-F// ***********************************************
+// ***********************************************
 // custom commands and overwrite existing commands.
 //
 // For more comprehensive examples of custom
@@ -64,7 +64,7 @@ Cypress.Commands.add('createLink', (type, fromNoteTitle, toNoteTitle) => {
         url: '/api/testability/link_notes',
         body: {
           type,
-          source_id: seededNoteIdMap[fromNoteTitle],
+          source_id: seededNoteIdMap[fromNoteTitle],featureToggle,
           target_id: seededNoteIdMap[toNoteTitle],
         },
       })
