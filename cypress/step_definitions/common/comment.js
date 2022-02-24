@@ -29,3 +29,8 @@ And('I should see a comment with description {string}', (commentDescription) => 
   cy.findByText("Show Comment").click();
   cy.findByText(commentDescription);
 });
+
+And('I should be able to add a comment with description {string}', (comment) => {
+  cy.focused().type(comment).blur();
+  cy.findByText(comment);
+})
