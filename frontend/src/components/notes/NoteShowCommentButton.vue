@@ -1,25 +1,18 @@
 
 <template>
-  <a class="btn btn-sm" @click="toggleComment" id="show-comment">Show Comment</a>
-  <Comment v-if="showComment" content="comment1"/>
+  <a class="btn btn-sm" id="show-comment">Show Comment</a>
+  <Comment :content="comments[0].content"/>
 </template>
 
 <script>
 import Comment from "../comment/Comment.vue"
   export default {
     name: "NoteShowCommentButton",
-    data() {
-      return {
-        showComment: false 
-      }
+    props: {
+      comments: Array
     },
     components: {
       Comment
-    },
-    methods: {
-      toggleComment() {
-        this.showComment = !this.showComment
-      }
     }
   }
 </script>
