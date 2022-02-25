@@ -7,7 +7,7 @@
       <NoteContent v-bind="{ note }" />
     </NoteFrameOfLinks>
   </NoteShell>
-  <NoteShowCommentButton v-if="featureToggle" :comments='[{user: {id: 1763}, content:"comment1"}]'/>
+  <NoteShowCommentButton v-if="featureToggle" :comments='comments'/>
 </template>
 
 <script>
@@ -20,6 +20,9 @@ import { restGet } from "../../restful/restful";
 
 export default {
   name: "NoteWithLinks",
+  data() {
+    return { comments: [] }
+  },
   props: {
     note: Object,
   },
@@ -28,11 +31,11 @@ export default {
   },
   methods: {
     fetchData() {
-      this.loading = true;
       restGet(`/api/comments/${this.note.id}`)
-        .then(() => {})
-        .catch(() => {})
-        .finally(() => (this.loading = false));
+        .then((res) => {
+          this.comments = [{user: {id: 1763}, content:"comment1"}]
+        })
+        .catch(() => {});
     },
   },
   components: {
