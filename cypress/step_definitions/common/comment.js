@@ -18,7 +18,7 @@ And('I add a comment with description {string}',(commentDescription) => {
     cy.request({
       method: "POST",
       url: `/api/comments/${noteId}/add`,
-      body: { commentDescription },
+      body: commentDescription,
     }).then((response) => {
       expect(response.status).to.equal(200);
     });

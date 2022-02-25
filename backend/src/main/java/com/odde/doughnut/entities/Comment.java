@@ -19,7 +19,6 @@ public class Comment {
 
     @ManyToOne(cascade = CascadeType.PERSIST)
     @JoinColumn(name = "user_id", referencedColumnName = "id")
-    @JsonIgnore
     @Getter
     @Setter
     private User user;

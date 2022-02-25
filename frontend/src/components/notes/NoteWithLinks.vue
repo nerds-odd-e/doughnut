@@ -28,14 +28,14 @@ export default {
   props: {
     note: Object,
   },
-  created() {
+  mounted() {
     this.fetchData();
   },
   methods: {
     fetchData() {
       restGet(`/api/comments/${this.note.id}`)
         .then((res) => {
-          this.comments = [{user: {id: 1763}, content:"comment1"}]
+          this.comments = res
         })
         .catch(() => {});
     },
