@@ -7,6 +7,7 @@ import RepetitionBuilder from "./RepetitionBuilder"
 import NotebookBuilder from "./NotebookBuilder";
 import CircleNoteBuilder from "./CircleNoteBuilder";
 import BazaarNoteBuilder from "./BazaarNotebooksBuilder";
+import CommentBuilder from "./CommentBuilder";
 
 class MakeMe {
   get links(): LinksBuilder {
@@ -42,6 +43,10 @@ class MakeMe {
 
   get bazaarNotebooks(): BazaarNoteBuilder {
     return new BazaarNoteBuilder();
+  }
+
+  get aComment(): CommentBuilder {
+    return new CommentBuilder();
   }
 }
 
