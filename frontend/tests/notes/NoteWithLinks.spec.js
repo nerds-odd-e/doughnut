@@ -10,6 +10,10 @@ import {
 } from "../helpers";
 import store from "../../src/store";
 
+afterEach(() => {
+  fetch.resetMocks();
+})
+
 describe("new/updated pink banner", () => {
   beforeAll(() => {
     Date.now = jest.fn(() => new Date(Date.UTC(2017, 1, 14)).valueOf());
@@ -83,7 +87,7 @@ describe("undo editing", () => {
     const updatedTitle = "updated";
     const { wrapper } = mountWithStoreAndMockRoute(store, NoteWithLinks, {
       props: {
-        note: note,
+        note,
       },
     });
 
@@ -94,3 +98,22 @@ describe("undo editing", () => {
     expect(store.getters.peekUndo()).toMatchObject({type: 'editing'})
   });
 });
+
+describe("fetch comments", () => {
+  it("fetch comment api is called", () => {
+    const comments = [{content:"comment1"}]
+    fetch.mockResponseOnce(JSON.stringify(comments))
+
+    const noteParent = makeMe.aNote.title("Dummy Title").please();
+    store.commit("loadNotes", [noteParent]);
+
+    mountWithStoreAndMockRoute(store, NoteWithLinks, {
+      props: {
+        note: noteParent,
+      },
+    });
+
+    expect(fetch).toHaveBeenCalledWith(`/api/comments/${noteParent.id}`,{});
+    expect(fetch).toHaveBeenCalledTimes(1)
+    })
+})

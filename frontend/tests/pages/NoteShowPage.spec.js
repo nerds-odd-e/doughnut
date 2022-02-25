@@ -4,11 +4,11 @@
  import { screen } from "@testing-library/vue";
  import NoteShowPage from "@/pages/NoteShowPage.vue";
  import NoteWithLinks from "@/components/notes/NoteWithLinks.vue";
+ import flushPromises from "flush-promises";
+ import _ from "lodash";
  import store from "../../src/store/index.js";
  import { renderWithStoreAndMockRoute, 
   mountWithStoreAndMockRoute } from "../helpers";
- import flushPromises from "flush-promises";
- import _ from "lodash";
  import makeMe from "../fixtures/makeMe";
  import { viewType } from "../../src/models/viewTypes";
 
@@ -34,7 +34,7 @@
      });
      await flushPromises();
      jest.advanceTimersByTime(5000);
-     expect(fetch).toHaveBeenCalledTimes(1);
+     expect(fetch).toHaveBeenCalledTimes(2);
      expect(fetch).toHaveBeenCalledWith(`/api/notes/${note.id}`, {});
      await screen.findByText("a circle");
    });
@@ -65,7 +65,7 @@
 
     const { wrapper } = mountWithStoreAndMockRoute(store, NoteWithLinks, {
       props: {
-        note: note
+        note
       },
     });
 

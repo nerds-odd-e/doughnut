@@ -16,22 +16,37 @@ import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
 import NoteShell from "./NoteShell.vue";
 import NoteContent from "./NoteContent.vue";
 import NoteShowCommentButton from "./NoteShowCommentButton.vue";
+import { restGet } from "../../restful/restful";
 
 export default {
   name: "NoteWithLinks",
   props: {
     note: Object,
   },
+  created() {
+    this.fetchData();
+  },
+  methods: {
+    fetchData() {
+      this.loading = true;
+      restGet(`/api/comments/${this.note.id}`)
+        .then(() => {})
+        .catch(() => {})
+        .finally(() => (this.loading = false));
+    },
+  },
   components: {
     NoteFrameOfLinks,
     NoteShell,
     NoteContent,
     EditableText,
-    NoteShowCommentButton
+    NoteShowCommentButton,
   },
   computed: {
-    featureToggle() { return this.$store.getters.getFeatureToggle()}
-  }
+    featureToggle() {
+      return this.$store.getters.getFeatureToggle();
+    },
+  },
 };
 </script>
 
