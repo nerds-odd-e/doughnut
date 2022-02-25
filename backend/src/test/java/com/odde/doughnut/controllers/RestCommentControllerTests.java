@@ -53,6 +53,17 @@ class RestCommentControllerTests {
             assertThat(comments.size(), equalTo(2));
         }
 
+        @Test
+        void verifyComment() {
+            String content = "hello comment";
+            makeMe.aComment(note, userModel.getEntity()).content(content).please(true);
+            final List<Comment> comments = controller.noteComments(note);
+            Comment comment = comments.get(0);
+            assertThat(comment.getContent(), equalTo(content));
+            assertThat(comment.getUser(), equalTo(userModel.getEntity()));
+            assertThat(comment.getNote(), equalTo(note));
+        }
+
     }
 
     @Nested
