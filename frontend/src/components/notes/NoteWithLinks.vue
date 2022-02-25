@@ -30,15 +30,7 @@ export default {
   },
   mounted() {
     this.fetchData();
-  },
-  methods: {
-    fetchData() {
-      restGet(`/api/comments/${this.note.id}`)
-        .then((res) => {
-          this.comments = res
-        })
-        .catch(() => {});
-    },
+    this.connect();
   },
   components: {
     NoteFrameOfLinks,
@@ -72,15 +64,19 @@ export default {
         this.stompClient.disconnect();
       }
       this.connected = false;
+    },
+    fetchData() {
+      restGet(`/api/comments/${this.note.id}`)
+        .then((res) => {
+          this.comments = res
+        })
+        .catch(() => {});
     }
   },
   computed: {
     featureToggle() {
       return this.$store.getters.getFeatureToggle();
     }
-  },
-  mounted() {
-    this.connect()
   }
 };
 </script>
