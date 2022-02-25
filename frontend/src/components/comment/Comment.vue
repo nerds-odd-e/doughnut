@@ -1,6 +1,6 @@
 <template>
   <div class="card">
-  <span>{{ comment.textContent.title }}</span>
+  <span>{{ comment.content }}</span>
   <button
     v-if="shouldShowDelete"
     class="btn btn-sm"

@@ -30,7 +30,6 @@ export default {
   },
   mounted() {
     this.fetchData();
-    this.connect();
   },
   components: {
     NoteFrameOfLinks,
