@@ -44,6 +44,7 @@ And('I should see a comment with description {string}', (commentDescription) => 
 });
 
 And('I should be able to add a comment with description {string}', (comment) => {
+  cy.findByText(comment).should("not.exist")
   cy.focused().type(comment).blur();
   cy.findByText(comment);
 })

@@ -9,6 +9,9 @@
         v-model="textContent.description"
         @blur="onBlurTextField"/>
   </div>
+  <div>
+    <span>{{commentx}}</span>
+  </div>
 </template>
 
 <script>
@@ -28,6 +31,7 @@ export default {
   data() {
     return {
       comment:{textContent: 'Add a comment'} ,
+      commentx: null,
       loading: false,
       formErrors: {},
     };
@@ -38,11 +42,15 @@ export default {
     },
   },
   methods: {
+    fetchComments() {
+      this.commentx = 'please elaborate'
+
+    },
     onBlurTextField(){
       this.loading = true
       storedApi(this.$store).addCommentToNote(this.noteId, this.textContent)
       .then((res) => {
-        this.$emit("done");
+        this.fetchComments();
       })
       .catch((res) => (this.formErrors = res))
       .finally(() => { 

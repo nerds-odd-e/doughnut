@@ -2,7 +2,7 @@ Feature: Add a new comment to a note
   As a user, I want to add a new comment to an existing note
 
 
-  @ignore
+  @featureToggle
   Scenario: Add a new comment to my note
     Given I've logged in as an existing user
     And there are some notes for the current user
@@ -11,7 +11,7 @@ Feature: Add a new comment to a note
 
     When I open "My note" note from top level
     And I click the add comment button
-    Then I should be able to add a comment with description "My comment"
+    Then I should be able to add a comment with description "please elaborate"
 
   @ignore
   Scenario: Add a new comment to another person's note
