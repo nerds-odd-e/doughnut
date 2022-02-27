@@ -70,7 +70,7 @@ const restPost = (url, data, loadingRef) =>
     {
       method: "POST",
       headers: {
-        Accept: "application/json",
+        "Accept": "application/json",
         "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
@@ -84,7 +84,7 @@ const restPatch = (url, data, loadingRef) =>
     {
       method: "PATCH",
       headers: {
-        Accept: "application/json",
+        "Accept": "application/json",
         "Content-Type": "application/json",
       },
       body: JSON.stringify(data),
@@ -117,7 +117,7 @@ const restPostMultiplePartForm = (url, data, loadingRef) =>
     {
       method: "POST",
       headers: {
-        Accept: "application/json",
+        "Accept": "application/json",
       },
       body: objectToFormData(data),
     },
@@ -130,7 +130,7 @@ const restPatchMultiplePartForm = (url, data, loadingRef) =>
     {
       method: "PATCH",
       headers: {
-        Accept: "application/json",
+        "Accept": "application/json",
       },
       body: objectToFormData(data),
     },

@@ -226,7 +226,7 @@ const storedApi = (store) => {
 }
 
 const apiLogout = async () => {
-    await restPost(`/logout`, {})
+    await restPost(`/logout`, {},)
 }
 
 
