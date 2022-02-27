@@ -43,6 +43,7 @@ export default defineConfig({
   base: "/",
   build: {
     outDir: "../backend/src/main/resources/static",
+    sourcemap: true,
     rollupOptions: {
       input: {
         main: path.resolve(__dirname, "index.html"),
