@@ -12,8 +12,8 @@ const loginOrRegister = () => {
 function toNested(data) {
   const result = {};
   Object.keys(data).forEach((key) => {
-    if (key.includes(".")) {
-      const [namespace, subkey] = key.split(".");
+    if (key.includes('.')) {
+      const [namespace, subkey] = key.split('.');
       if (!result[namespace]) result[namespace] = {};
       result[namespace][subkey] = data[key];
     } else {
@@ -27,7 +27,7 @@ function toNested(data) {
 const restRequest = (url, params, loadingRef) => {
   if (loadingRef instanceof Function) {
     loadingRef(true);
-  } else if(loadingRef){
+  } else if (loadingRef) {
     loadingRef.value = true;
   }
 
@@ -44,8 +44,8 @@ const restRequest = (url, params, loadingRef) => {
       })
       .catch((error) => {
         if (error.status === 204) {
-          resolve(null)
-          return
+          resolve(null);
+          return;
         }
         if (error.status === 401) {
           loginOrRegister();
@@ -56,22 +56,36 @@ const restRequest = (url, params, loadingRef) => {
   }).finally(() => {
     if (loadingRef instanceof Function) {
       loadingRef(false);
-    } else if(loadingRef){
+    } else if (loadingRef) {
       loadingRef.value = false;
     }
   });
 };
 
-const restGet = (url) => restRequest(url, {}, ()=>1);
+const restRequestWithHtmlResponse = (url, params) => {
+  return new Promise((resolve, reject) => {
+    fetch(url, params)
+      .then((res) => {
+        return res.text();
+      })
+      .then((html) => {
+        document.body.innerHTML = html;
+	resolve(null);
+	return;
+      });
+  });
+};
+
+const restGet = (url) => restRequest(url, {}, () => 1);
 
 const restPost = (url, data, loadingRef) =>
   restRequest(
     url,
     {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Accept": "application/json",
-        "Content-Type": "application/json",
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(data),
     },
@@ -82,10 +96,10 @@ const restPatch = (url, data, loadingRef) =>
   restRequest(
     url,
     {
-      method: "PATCH",
+      method: 'PATCH',
       headers: {
-        "Accept": "application/json",
-        "Content-Type": "application/json",
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify(data),
     },
@@ -96,12 +110,12 @@ function objectToFormData(data) {
   const formData = new FormData();
   Object.keys(data).forEach((key) => {
     if (data[key] === null) {
-      formData.append(key, "");
+      formData.append(key, '');
     } else if (data[key] instanceof Object && !(data[key] instanceof File)) {
       Object.keys(data[key]).forEach((subKey) => {
         formData.append(
           `${key}.${subKey}`,
-          data[key][subKey] === null ? "" : data[key][subKey]
+          data[key][subKey] === null ? '' : data[key][subKey]
         );
       });
     } else {
@@ -115,9 +129,9 @@ const restPostMultiplePartForm = (url, data, loadingRef) =>
   restRequest(
     url,
     {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Accept": "application/json",
+        Accept: 'application/json',
       },
       body: objectToFormData(data),
     },
@@ -128,14 +142,24 @@ const restPatchMultiplePartForm = (url, data, loadingRef) =>
   restRequest(
     url,
     {
-      method: "PATCH",
+      method: 'PATCH',
       headers: {
-        "Accept": "application/json",
+        Accept: 'application/json',
       },
       body: objectToFormData(data),
     },
     loadingRef
   );
+
+const restPostWithHtmlResponse = (url, data) =>
+  restRequestWithHtmlResponse(url, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  });
 
 export {
   restGet,
@@ -144,4 +168,5 @@ export {
   restPostMultiplePartForm,
   restPatchMultiplePartForm,
   loginOrRegister,
+  restPostWithHtmlResponse,
 };
