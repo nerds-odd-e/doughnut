@@ -16,7 +16,7 @@ get_os_type() {
 
 download_nixpkg_manager_install_script() {
     rm -f install-nix
-    curl -o install-nix https://releases.nixos.org/nix/nix-2.6.0/install
+    curl -o install-nix https://releases.nixos.org/nix/nix-2.6.1/install
     chmod +x ./install-nix
 }
 
@@ -34,10 +34,10 @@ configure_nix_flakes() {
 
 nixpkg_script_activate() {
 	if [[ ! -f ~/.nix-profile/etc/profile.d/nix.sh ]]; then
-		mkdir -p ~/.nix-profile/etc/profile.d
-		cp infra/nix/nix.sh ~/.nix-profile/etc/profile.d/nix.sh
+    user=$(whoami)
+    ln -sf /nix/var/nix/profiles/per-user/${user}/profile ${HOME}/.nix-profile
 	fi
-    . ~/.nix-profile/etc/profile.d/nix.sh
+  . ~/.nix-profile/etc/profile.d/nix.sh
 }
 
 install_nixpkg_manager() {
@@ -61,4 +61,7 @@ install_nixpkg_manager
 
 nixpkg_script_activate
 
-nix develop -c $SHELL
+echo "------------------------------------------ CONGRATS !!! ----------------------------------------------------"
+echo "  doughnut basic nix development environment tooling setup complete."
+echo "  Please exit this shell terminal and start a new one in doughnut root directory then execute 'nix develop'."
+echo "------------------------------------------    END       ----------------------------------------------------"

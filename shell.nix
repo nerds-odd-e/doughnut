@@ -79,16 +79,16 @@ in mkShell {
 
         export PATH=$PATH:$JAVA_HOME/bin:$NODE_HOME/bin:$MYSQL_BASEDIR/bin
 
-        echo "##############################################################################################################"
+        echo "###################################################################################################################"
         echo "                                                                                "
-        echo "##    !! DOUGHNUT NIX DEVELOPMENT ENVIRONMENT ;) !!  "
-        echo "##    JAVA_HOME: $JAVA_HOME                          "
-        echo "##    NODE_HOME: $NODE_HOME                          "
-        echo "##    MYSQL_BASEDIR: $MYSQL_BASEDIR                  "
-        echo "##    MYSQL_HOME: $MYSQL_HOME                        "
-        echo "##    MYSQL_DATADIR: $MYSQL_DATADIR                  "
+        echo "##   !! DOUGHNUT NIX DEVELOPMENT ENVIRONMENT ;) !!  "
+        echo "##   JAVA_HOME: $JAVA_HOME                          "
+        echo "##   NODE_HOME: $NODE_HOME                          "
+        echo "##   MYSQL_BASEDIR: $MYSQL_BASEDIR                  "
+        echo "##   MYSQL_HOME: $MYSQL_HOME                        "
+        echo "##   MYSQL_DATADIR: $MYSQL_DATADIR                  "
         echo "                                                                                "
-        echo "##############################################################################################################"
+        echo "###################################################################################################################"
         mkdir -p $MYSQL_HOME
         mkdir -p $MYSQL_DATADIR
 
