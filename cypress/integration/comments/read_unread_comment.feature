@@ -16,9 +16,9 @@ Feature: read unread comment
   @featureToggle
   Scenario: Note with one read and one unread comment
     Given I open "Sedition" note from top level
-    And I add a comment with description "comment1"
+    And I click the add comment button
     And there is "1" unread comment for note "Sedition"
-    Then I should see 1 comment
+    Then I should be able to add a comment with description "please elaborate"
     And I should see "show comment"
 
   @ignore
