@@ -62,19 +62,30 @@ const restRequest = (url, params, loadingRef) => {
   });
 };
 
-const restRequestWithHtmlResponse = (url, params) => {
-  return new Promise((resolve, reject) => {
+const restRequestWithHtmlResponse = (url, params) =>
+  new Promise((resolve, reject) => {
     fetch(url, params)
       .then((res) => {
-        return res.text();
+        if (res.status !== 200 && res.status !== 400) {
+          throw new HttpResponseError(res.status);
+        }
+        return res.text().then((html) => {
+          if (res.status === 200) resolve(html);
+          if (res.status === 400) reject(html);
+        });
       })
-      .then((html) => {
-        document.body.innerHTML = html;
-	resolve(null);
-	return;
+      .catch((error) => {
+        if (error.status === 204) {
+          resolve(null);
+          return;
+        }
+        if (error.status === 401) {
+          loginOrRegister();
+          return;
+        }
+        reject(error);
       });
   });
-};
 
 const restGet = (url) => restRequest(url, {}, () => 1);
 

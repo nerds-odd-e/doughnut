@@ -22,9 +22,6 @@ import SockJS from "sockjs-client/dist/sockjs.min.js";
 
 export default {
   name: "NoteWithLinks",
-  data() {
-    return { comments: [] }
-  },
   props: {
     note: Object,
   },
