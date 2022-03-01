@@ -10,7 +10,6 @@
     "**/__snapshots__/*",
     "**/__image_snapshots__/*"
   ],
-  "nodeVersion": "system",
   "screenshotOnRunFailure": true,
   "pageLoadTimeout": 100000,
   "defaultCommandTimeout": 6000,
