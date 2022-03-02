@@ -18,7 +18,6 @@ beforeEach(() => {
 });
  
 describe("Notebooks Page", () => {
-    const findUndoButton = async () => screen.findByTitle("undo").then(res => res.closest("button"))
 
    test("fetch API to be called ONCE", async () => {
         const notebook = makeMe.aNotebook.please()
@@ -32,8 +31,7 @@ describe("Notebooks Page", () => {
 
         expect(fetch).toHaveBeenCalledTimes(1);
         expect(fetch).toHaveBeenCalledWith('/api/notebooks', {});
-
-        expect(await findUndoButton()).toBeDisabled();
+        expect(await screen.findByTitle("undo")).toBeDisabled();
     });
 
    test("show undo when there is something to undo", async () => {
@@ -43,6 +41,6 @@ describe("Notebooks Page", () => {
 
         renderWithStoreAndMockRoute(store, NotebooksPage, {});
 
-        expect(await findUndoButton()).not.toBeDisabled();
+        expect(await screen.findByTitle("undo delete note")).not.toBeDisabled();
     });
 });

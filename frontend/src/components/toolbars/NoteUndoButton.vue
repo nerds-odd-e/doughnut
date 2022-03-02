@@ -1,5 +1,5 @@
 <template>
-  <button class="btn btn-small" id="undo" @click="undoDelete()" :disabled="!history">
+  <button class="btn btn-small" :title="undoTitle" @click="undoDelete()" :disabled="!history">
     <SvgUndo/>
   </button>
 </template>
@@ -19,6 +19,12 @@ export default {
   computed: {
     history() {
       return this.$store.getters.peekUndo()
+    },
+    undoTitle() {
+      if(this.history) {
+        return `undo ${this.history.type}`
+      }
+      return 'undo'
     }
   },
   methods: {

@@ -346,8 +346,8 @@ And("the file {string} content is",(fileName, mdContent) => {
   cy.readFile(`${downloadsFolder}/${fileName}`).should("eq", mdContent);
 })
 
-When("I undo", () => {
-  cy.get('#undo').click();
+When("I undo {string}", (undoType) => {
+  cy.findByTitle(`undo ${undoType}`).click();
 })
 
 Then("the deleted notebook with title {string} should be restored", (title) => {
@@ -355,7 +355,7 @@ Then("the deleted notebook with title {string} should be restored", (title) => {
 })
 
 Then("there should be no more undo to do", () => {
-  cy.get('#undo').should('be.disabled');
+  cy.get('.btn[title="undo"]').should('be.disabled');
 })
 
 Then("I should see 1 comment", () => {
