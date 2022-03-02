@@ -24,13 +24,7 @@ function toNested(data) {
   return result;
 }
 
-const restRequest = (url, params, loadingRef) => {
-  if (loadingRef instanceof Function) {
-    loadingRef(true);
-  } else if (loadingRef) {
-    loadingRef.value = true;
-  }
-
+const restRequest = (url, params) => {
   return new Promise((resolve, reject) => {
     fetch(url, params)
       .then((res) => {
@@ -53,12 +47,6 @@ const restRequest = (url, params, loadingRef) => {
         }
         reject(error);
       });
-  }).finally(() => {
-    if (loadingRef instanceof Function) {
-      loadingRef(false);
-    } else if (loadingRef) {
-      loadingRef.value = false;
-    }
   });
 };
 
@@ -100,10 +88,9 @@ const restPost = (url, data) =>
       },
       body: JSON.stringify(data),
     },
-    ()=>1
   );
 
-const restPatch = (url, data, loadingRef) =>
+const restPatch = (url, data) =>
   restRequest(
     url,
     {
@@ -114,7 +101,6 @@ const restPatch = (url, data, loadingRef) =>
       },
       body: JSON.stringify(data),
     },
-    loadingRef
   );
 
 function objectToFormData(data) {
@@ -148,7 +134,7 @@ const restPostMultiplePartForm = (url, data) =>
     },
   );
 
-const restPatchMultiplePartForm = (url, data, loadingRef) =>
+const restPatchMultiplePartForm = (url, data) =>
   restRequest(
     url,
     {
@@ -158,7 +144,6 @@ const restPatchMultiplePartForm = (url, data, loadingRef) =>
       },
       body: objectToFormData(data),
     },
-    loadingRef
   );
 
 const restPostWithHtmlResponse = (url, data) =>

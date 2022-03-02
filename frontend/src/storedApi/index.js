@@ -29,7 +29,6 @@ const storedApi = (store) => {
     const res = await restPatchMultiplePartForm(
       `/api/text_content/${noteId}`,
       data,
-      () => null
     );
     store.commit('loadNotes', [res]);
     return res;
