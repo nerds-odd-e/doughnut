@@ -357,21 +357,3 @@ Then("the deleted notebook with title {string} should be restored", (title) => {
 Then("there should be no more undo to do", () => {
   cy.get('.btn[title="undo"]').should('be.disabled');
 })
-
-Then("I should see 1 comment", () => {
-  cy.findByText('comment1').should('exist');
-})
-
-Then('I should see "show comment"', () => {
-  cy.get('#show-comment').should('exist')
-})
-
-Given('there is "1" unread comment for note "Sedition"', () => {
-})
-
-Given('there is "1" read comment for note "Sedition"', () => {
-})
-
-Then("I should see no comments", () => {
-
-})
