@@ -24,8 +24,7 @@ function toNested(data) {
   return result;
 }
 
-const restRequest = (url, params) =>
-  new Promise((resolve, reject) => {
+const restRequest = (url, params) => new Promise((resolve, reject) => {
     fetch(url, params)
       .then((res) => {
         if (res.status !== 200 && res.status !== 400) {
@@ -74,7 +73,7 @@ const restRequestWithHtmlResponse = (url, params) =>
       });
   });
 
-const restGet = (url) => restRequest(url, {}, () => 1);
+const restGet = (url) => restRequest(url, {});
 
 const restPost = (url, data) =>
   restRequest(
