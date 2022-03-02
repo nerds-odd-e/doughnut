@@ -89,7 +89,7 @@ const restRequestWithHtmlResponse = (url, params) =>
 
 const restGet = (url) => restRequest(url, {}, () => 1);
 
-const restPost = (url, data, loadingRef) =>
+const restPost = (url, data) =>
   restRequest(
     url,
     {
@@ -100,7 +100,7 @@ const restPost = (url, data, loadingRef) =>
       },
       body: JSON.stringify(data),
     },
-    loadingRef
+    ()=>1
   );
 
 const restPatch = (url, data, loadingRef) =>
@@ -136,7 +136,7 @@ function objectToFormData(data) {
   return formData;
 }
 
-const restPostMultiplePartForm = (url, data, loadingRef) =>
+const restPostMultiplePartForm = (url, data) =>
   restRequest(
     url,
     {
@@ -146,7 +146,6 @@ const restPostMultiplePartForm = (url, data, loadingRef) =>
       },
       body: objectToFormData(data),
     },
-    loadingRef
   );
 
 const restPatchMultiplePartForm = (url, data, loadingRef) =>

@@ -26,7 +26,6 @@ export default {
         restPost(
           `/api/subscriptions/${this.subscription.id}/delete`,
           {},
-          (r) => {}
         ).then((r) => {
           this.$emit("updated");
         });

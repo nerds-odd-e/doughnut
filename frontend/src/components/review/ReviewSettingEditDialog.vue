@@ -40,15 +40,16 @@ export default {
       .finally(() => this.loading = false)
     },
     processForm() {
+      this.loading = true
       restPost(
         `/api/notes/${this.noteId}/review-setting`,
         this.formData,
-        (r) => (this.loading = r)
-      )
+        (r) => (this.loading = r)      )
         .then((res) => {
           this.$emit("done");
         })
-        .catch((res) => (this.formErrors = res));
+        .catch((res) => (this.formErrors = res))
+        .finally(() => this.loading = false)
     },
   },
   mounted() {

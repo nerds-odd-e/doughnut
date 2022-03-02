@@ -83,7 +83,6 @@ export default {
         restPost(
           `/api/notes/${this.noteId}/search`,
           { searchGlobally, searchKey: trimedSearchKey },
-          (r) => {}
         ).then((r) => {
           this.cache[searchGlobally][trimedSearchKey] = r;
           this.recentResult = r;

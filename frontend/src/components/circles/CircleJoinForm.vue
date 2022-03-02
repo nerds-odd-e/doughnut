@@ -31,10 +31,10 @@ export default {
 
   methods: {
     processForm() {
+      this.loading = true;
       restPostMultiplePartForm(
         `/api/circles/join`,
         this.formData,
-        (r) => (this.loading = r)
       )
         .then((res) => {
           this.show = false;
@@ -43,7 +43,8 @@ export default {
             params: { circleId: res.id },
           });
         })
-        .catch((res) => (this.formErrors = res));
+        .catch((res) => (this.formErrors = res))
+        .finally(()=>this.loading = false);
     },
   },
 };

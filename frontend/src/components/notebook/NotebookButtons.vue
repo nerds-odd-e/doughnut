@@ -26,7 +26,6 @@ export default {
         restPost(
           `/api/notebooks/${this.notebook.id}/share`,
           {},
-          (r) => {}
         ).then((r) => this.$router.push({ name: "notebooks" }));
       }
     },

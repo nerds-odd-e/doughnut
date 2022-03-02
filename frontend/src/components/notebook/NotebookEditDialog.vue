@@ -28,15 +28,16 @@ export default {
 
   methods: {
     processForm() {
+      this.loading = true
       restPostMultiplePartForm(
         `/api/notebooks/${this.notebook.id}`,
         this.formData,
-        (r) => (this.loading = r)
       )
         .then((res) => {
           this.$router.push({ name: "notebooks" });
         })
-        .catch((res) => (this.formErrors = res));
+        .catch((res) => (this.formErrors = res))
+        .finally(()=>this.loading = false);
     },
   },
 };
