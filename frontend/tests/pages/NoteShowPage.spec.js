@@ -34,7 +34,7 @@
      });
      await flushPromises();
      jest.advanceTimersByTime(5000);
-     expect(fetch).toHaveBeenCalledTimes(2);
+     expect(fetch).toHaveBeenCalledTimes(1);
      expect(fetch).toHaveBeenCalledWith(`/api/notes/${note.id}`, {});
      await screen.findByText("a circle");
    });

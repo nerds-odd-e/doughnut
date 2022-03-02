@@ -1,6 +1,6 @@
 <template>
   <div class="text" @click="startEditing">
-    <template v-if="!showEditing">
+    <template v-if="!isEditing">
       <component v-bind:is="displayComponent"
         v-if="!!modelValue"
         v-text="modelValue"
@@ -35,7 +35,6 @@ export default {
     field: String,
     title: String,
     errors: Object,
-    showInputBox: {type: Boolean, default: false},
   },
   emits: ["update:modelValue", "blur"],
   components: {
@@ -57,9 +56,6 @@ export default {
     editingComponent() {
       return this.multipleLine ? 'TextArea' : 'TextInput'
     },
-    showEditing(){
-      return this.showInputBox || this.isEditing
-    }
   },
   methods: {
     startEditing() {

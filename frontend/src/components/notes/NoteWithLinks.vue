@@ -7,7 +7,6 @@
       <NoteContent v-bind="{ note }" />
     </NoteFrameOfLinks>
   </NoteShell>
-  <NoteShowCommentButton v-if="featureToggle" :comments='comments'/>
 </template>
 
 <script>
@@ -15,65 +14,18 @@ import EditableText from "../form/EditableText.vue";
 import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
 import NoteShell from "./NoteShell.vue";
 import NoteContent from "./NoteContent.vue";
-import NoteShowCommentButton from "./NoteShowCommentButton.vue";
-import { restGet } from "../../restful/restful";
-import Stomp from "webstomp-client";
-import SockJS from "sockjs-client/dist/sockjs.min.js";
 
 export default {
   name: "NoteWithLinks",
   props: {
     note: Object,
   },
-  mounted() {
-    this.fetchData();
-  },
   components: {
     NoteFrameOfLinks,
     NoteShell,
     NoteContent,
     EditableText,
-    NoteShowCommentButton,
   },
-  methods: {
-    connect() {
-      this.socket = new SockJS("http://localhost:3000/websocket");
-      this.stompClient = Stomp.over(this.socket);
-      this.stompClient.connect(
-        {},
-        frame => {
-          this.connected = true;
-          console.log(frame);
-          this.stompClient.subscribe("/topic/greetings", tick => {
-            console.log(tick);
-            this.received_messages.push(JSON.parse(tick.body).content);
-          });
-        },
-        error => {
-          console.log(error);
-          this.connected = false;
-        }
-      );
-    },
-    disconnect() {
-      if (this.stompClient) {
-        this.stompClient.disconnect();
-      }
-      this.connected = false;
-    },
-    fetchData() {
-      restGet(`/api/comments/${this.note.id}`)
-        .then((res) => {
-          this.comments = res
-        })
-        .catch(() => {});
-    }
-  },
-  computed: {
-    featureToggle() {
-      return this.$store.getters.getFeatureToggle();
-    }
-  }
 };
 </script>
 
