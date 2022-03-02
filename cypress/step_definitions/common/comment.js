@@ -8,10 +8,6 @@ import {
   When,
 } from "cypress-cucumber-preprocessor/steps";
 
-And('I click the add comment button', () => {
-  cy.findByText("Add Comment").click();
-})
-
 And('I add a comment with description {string}',(commentDescription) => {
   cy.url().then(url => {
     const noteId = url.split("/").slice(-1)[0];
@@ -42,9 +38,3 @@ And('I should see a comment with description {string}', (commentDescription) => 
   cy.findByText("Show Comment").click();
   cy.findByText(commentDescription);
 });
-
-And('I should be able to add a comment with description {string}', (comment) => {
-  cy.findByText(comment).should("not.exist")
-  cy.focused().type(comment).blur();
-  cy.findByText(comment);
-})

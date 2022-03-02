@@ -13,7 +13,7 @@ Feature: read unread comment
     Then I should see no comments
     And I should see "show comment"
 
-  @featureToggle
+  @ignore @featureToggle
   Scenario: Note with one read and one unread comment
     Given I open "Sedition" note from top level
     And I click the add comment button

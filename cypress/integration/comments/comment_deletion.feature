@@ -13,10 +13,6 @@ Feature: Delete a comment from a note
   Scenario: Remove a comment from a note
 
     When I select my note with title 'LeSS in Action'
-    And I click the add comment button
-    Then I should see a new comment input box displayed
-    And I input 'comment to be deleted' in the comment input box
-    And I click outside the input box
     Then I should see comment added to note
     And I click the delete comment button
     Then I should not see comment with value "comment to be deleted"
