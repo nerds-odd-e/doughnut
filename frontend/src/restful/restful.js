@@ -6,23 +6,17 @@ const loginOrRegister = () => {
 };
 
 const request = async (url, params) => {
-  try {
-    const res = await fetch(url, params)
-    if (res.status === 200 || res.status === 400) {
-      return res;
-    }
-    throw new HttpResponseError(res.status);
+  const res = await fetch(url, params)
+  if (res.status === 200 || res.status === 400) {
+    return res;
   }
-  catch(error) {
-    if (error.status === 204) {
-      return null;
-    }
-    if (error.status === 401) {
-      loginOrRegister();
-      return null;
-    }
-    throw error
+  if (res.status === 204) {
+    return {json: ()=>null, text: ()=>null};
   }
+  if (res.status === 401) {
+    loginOrRegister();
+  }
+  throw new HttpResponseError(res.status);
 }
 
 const restRequest = async (url, params) => {

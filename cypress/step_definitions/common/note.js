@@ -188,6 +188,9 @@ Then(
 When(
   "I should be asked to log in again when I click the link {string}",
   (noteTitle) => {
+    cy.on('uncaught:exception', (err, runnable) => {
+      return false;
+    });
     cy.findByText(noteTitle).click();
     cy.get("#username").should('exist')
   }
