@@ -34,25 +34,10 @@ const request = async (url, params) => {
 const restRequest = (url, params) => request(url, params).then(jsonResponseHelper)
 
 const restRequestWithHtmlResponse = async (url, params) => {
-  try {
-    const res = await fetch(url, params);
-    if (res.status === 200 || res.status === 400) {
-      const html = await res.text();
-      if (res.status === 400) throw Error("BadRequest", html);
-      return html;
-    }
-    throw new HttpResponseError(res.status);
-  }
-  catch(error) {
-    if (error.status === 204) {
-      return null;
-    }
-    if (error.status === 401) {
-      loginOrRegister();
-      return null;
-    }
-    throw error
-  }
+  const response = request(url, params)
+  const html = await response.text();
+  if (response.status === 400) throw Error("BadRequest", html);
+  return html;
 }
 
 const restGet = (url) => restRequest(url, {});
