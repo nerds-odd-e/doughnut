@@ -14,7 +14,7 @@
 
 <script>
 import TextInput from "../form/TextInput.vue";
-import { restPostMultiplePartForm } from "../../restful/restful";
+import { api } from "../../storedApi";
 
 export default {
   components: { TextInput },
@@ -32,10 +32,7 @@ export default {
   methods: {
     processForm() {
       this.loading = true;
-      restPostMultiplePartForm(
-        `/api/circles/join`,
-        this.formData,
-      )
+      api().circleMethods.joinCircle(this.formData)
         .then((res) => {
           this.show = false;
           this.$router.push({

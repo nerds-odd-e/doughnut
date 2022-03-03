@@ -220,7 +220,7 @@ const api = () => ({
         return restPostWithHtmlResponse(`/logout`, {});
       },
 
-      currenUser() {
+      currentUser() {
           return restGet(`/api/user`);
       },
     },
@@ -245,17 +245,30 @@ const api = () => ({
           return restPost(`/api/notes/${noteId}/review-setting`, data);
       }
     },
+    circleMethods: {
+        createCircle(data) {
+            return restPostMultiplePartForm(data);
+        },
+        joinCircle(data) {
+            return restPostMultiplePartForm( `/api/circles/join`, data)
+        },
+        getCirclesOfCurrentUser() {
+            return restGet("/api/circles");
+        },
+    },
     getBazaar() {
         return restGet("/api/bazaar");
-    },
-    getCirclesOfCurrentUser() {
-        return restGet("/api/circles");
     },
     getFailureReports() {
         return restGet("/api/failure-reports");
     },
     getFailureReport(failureReportId) {
         return restGet(`/api/failure-reports/${failureReportId}`);
+    },
+    subscribe(notebookId, data) {
+      return restPostMultiplePartForm(
+        `/api/subscriptions/notebooks/${notebookId}/subscribe`, data
+      )
     },
   })
 

@@ -41,7 +41,7 @@ export default {
   methods: {
     fetchData() {
       this.loading = true
-      api().getCirclesOfCurrentUser().then(
+      api().circleMethods.getCirclesOfCurrentUser().then(
         (res) => {
           this.circles = res
         }
