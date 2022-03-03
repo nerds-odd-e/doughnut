@@ -5,6 +5,25 @@ const loginOrRegister = () => {
   window.location = `/users/identify?from=${window.location.href}`;
 };
 
+function objectToFormData(data) {
+  const formData = new FormData();
+  Object.keys(data).forEach((key) => {
+    if (data[key] === null) {
+      formData.append(key, '');
+    } else if (data[key] instanceof Object && !(data[key] instanceof File)) {
+      Object.keys(data[key]).forEach((subKey) => {
+        formData.append(
+          `${key}.${subKey}`,
+          data[key][subKey] === null ? '' : data[key][subKey]
+        );
+      });
+    } else {
+      formData.append(key, data[key]);
+    }
+  });
+  return formData;
+}
+
 const request = async (url, data, {method="GET", contentType='json'}) => {
   const headers = {Accept: 'application/json' };
   let body;
@@ -47,36 +66,10 @@ const restRequestWithHtmlResponse = async (url, data, params) => {
 const restGet = (url) => restRequest(url, {}, {});
 
 const restPost = (url, data) =>
-  restRequest(
-    url,
-    data,
-    {
-      method: 'POST',
-    },
-  );
+  restRequest( url, data, { method: 'POST' });
 
 const restPatch = (url, data) =>
-  restRequest( url, data, { method: 'PATCH' },
-  );
-
-function objectToFormData(data) {
-  const formData = new FormData();
-  Object.keys(data).forEach((key) => {
-    if (data[key] === null) {
-      formData.append(key, '');
-    } else if (data[key] instanceof Object && !(data[key] instanceof File)) {
-      Object.keys(data[key]).forEach((subKey) => {
-        formData.append(
-          `${key}.${subKey}`,
-          data[key][subKey] === null ? '' : data[key][subKey]
-        );
-      });
-    } else {
-      formData.append(key, data[key]);
-    }
-  });
-  return formData;
-}
+  restRequest( url, data, { method: 'PATCH' });
 
 const restPostMultiplePartForm = (url, data) =>
   restRequest( url, data, { method: 'POST', contentType: "MultiplePartForm" });
