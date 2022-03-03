@@ -6,14 +6,34 @@ import {
 } from '../restful/restful';
 
 class ManagedApi {
-  restGet(url) { return restGet(url); }
-  restPost(url, data) { return restPost(url, data);}
-  restPostMultiplePartForm(url, data) {return restPostMultiplePartForm(url, data)}
-  restPostWithHtmlResponse(url, data) {return restPostWithHtmlResponse(url, data)}
+  constructor(component) {
+    this.component = component;
+  }
+
+  around(promise) {
+    if(this.component != null && this.component != undefined) {
+      this.component.loading = true
+    }
+    return promise.finally(()=>{
+      if(this.component != null && this.component != undefined) {
+        this.component.loading = false
+      }
+    })
+
+  }
+
+  restGet(url) { return this.around(restGet(url)); }
+
+  restPost(url, data) { return this.around(restPost(url, data));}
+
+  restPostMultiplePartForm(url, data) {return this.around(restPostMultiplePartForm(url, data));}
+
+  restPostWithHtmlResponse(url, data) {return this.around(restPostWithHtmlResponse(url, data));}
 }
 
-const api = () => {
-  const managedApi = new ManagedApi();
+
+const api = (component) => {
+  const managedApi = new ManagedApi(component);
   return {
     userMethods: {
       logout() {
