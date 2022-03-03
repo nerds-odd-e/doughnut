@@ -24,7 +24,7 @@
 
 <script>
 import ContainerPage from "./commons/ContainerPage.vue";
-import { restGet, loginOrRegister } from "../restful/restful";
+import { restGet } from "../restful/restful";
 
 export default {
   components: { ContainerPage },
@@ -53,15 +53,6 @@ export default {
   },
   computed: {
     user() { return this.$store.getters.getCurrentUser()},
-  },
-  beforeRouteEnter(to, from, next) {
-    next((vm) => {
-      if (!vm.user) {
-        loginOrRegister();
-        next(false);
-      }
-      next();
-    });
   },
 };
 </script>
