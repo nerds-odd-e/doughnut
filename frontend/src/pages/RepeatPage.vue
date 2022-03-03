@@ -65,7 +65,8 @@ import Repetition from "../components/review/Repetition.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import NoteStatisticsButton from "../components/notes/NoteStatisticsButton.vue";
 import RepeatProgressBar from "../components/review/RepeatProgressBar.vue";
-import { api, storedApi } from '../storedApi';
+import api from "../managedApi/api"
+import storedApi from "../managedApi/storedApi"
 
 export default {
   name: "RepeatPage",

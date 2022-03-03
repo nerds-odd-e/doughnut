@@ -24,7 +24,7 @@
 
 <script>
 import ContainerPage from "./commons/ContainerPage.vue";
-import { api } from "../storedApi";
+import api from  "../managedApi/api";
 
 export default {
   components: { ContainerPage },

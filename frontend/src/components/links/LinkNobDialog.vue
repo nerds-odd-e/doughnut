@@ -33,7 +33,7 @@
 <script>
 import LinkTypeSelect from "./LinkTypeSelect.vue";
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue";
-import { storedApi } from "../../storedApi";
+import storedApi from  "../../managedApi/storedApi";
 
 export default {
   props: { link: Object, inverseIcon: Boolean, colors: Object },

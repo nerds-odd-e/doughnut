@@ -30,7 +30,8 @@
 <script>
 import ContainerPage from "./commons/ContainerPage.vue";
 import TextInput from "../components/form/TextInput.vue";
-import { api, storedApi } from "../storedApi"
+import api from "../managedApi/api"
+import storedApi from "../managedApi/storedApi"
 
 export default {
   components: { ContainerPage, TextInput },

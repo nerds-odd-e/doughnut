@@ -83,7 +83,7 @@
 
 <script>
 import { loginOrRegister } from '../../restful/restful';
-import { api } from '../../storedApi'
+import api from  '../../managedApi/api'
 
 export default {
   methods: {

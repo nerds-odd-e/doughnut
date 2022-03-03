@@ -6,7 +6,7 @@
 
 <script>
 import SvgUndo from "../svgs/SvgUndo.vue";
-import { storedApi } from "../../storedApi";
+import storedApi from  "../../managedApi/storedApi";
 
 export default {
   name: "NoteUndoButton",

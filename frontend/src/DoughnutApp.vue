@@ -2,7 +2,7 @@
 import Popups from "./components/commons/Popups.vue";
 import MainMenu from "./components/commons/MainMenu.vue";
 import UserNewRegisterPage from "./pages/UserNewRegisterPage.vue";
-import { storedApi } from "./storedApi"
+import storedApi from  "./managedApi/storedApi"
 
 export default {
   data() {

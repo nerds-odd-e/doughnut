@@ -14,7 +14,7 @@
 
 <script>
 import TextInput from "../form/TextInput.vue";
-import { api } from "../../storedApi";
+import api from  "../../managedApi/api";
 
 export default {
   props: { notebook: Object, user: Object },

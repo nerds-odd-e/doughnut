@@ -17,7 +17,7 @@
 <script>
 import ContainerPage from "./commons/ContainerPage.vue";
 import TextInput from "../components/form/TextInput.vue";
-import { storedApi } from "../storedApi"
+import storedApi from  "../managedApi/storedApi"
 
 export default {
   components: { ContainerPage, TextInput },

@@ -19,7 +19,7 @@ import NotebookNewButton from "../components/notebook/NotebookNewButton.vue";
 import NoteControl from "../components/toolbars/NoteControl.vue";
 import NotebookSubscriptionCards from "../components/subscriptions/NotebookSubscriptionCards.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
-import { storedApi } from "../storedApi";
+import storedApi from  "../managedApi/storedApi";
 
 export default {
   name: "NotebooksPage",

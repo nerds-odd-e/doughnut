@@ -28,7 +28,7 @@
 import ContainerPage from "./commons/ContainerPage.vue";
 import CircleNewButton from "../components/circles/CircleNewButton.vue";
 import CircleJoinForm from "../components/circles/CircleJoinForm.vue";
-import { api } from "../storedApi";
+import api from  "../managedApi/api";
 
 export default {
   components: { ContainerPage, CircleNewButton, CircleJoinForm },

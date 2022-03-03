@@ -16,7 +16,7 @@
 <script>
 import ReviewSettingForm from "./ReviewSettingForm.vue";
 import SvgReviewSetting from "../svgs/SvgReviewSetting.vue";
-import { api } from "../../storedApi";
+import api from  "../../managedApi/api";
 
 export default {
   components: { ReviewSettingForm, SvgReviewSetting },

@@ -13,7 +13,7 @@
 
 <script>
 import CheckInput from "../form/CheckInput.vue";
-import { api } from "../../storedApi";
+import api from  "../../managedApi/api";
 
 export default {
   props: { notebook: Object },

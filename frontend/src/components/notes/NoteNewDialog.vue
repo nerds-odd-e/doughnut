@@ -22,7 +22,7 @@
 import Breadcrumb from "./Breadcrumb.vue";
 import NoteFormTitleOnly from "./NoteFormTitleOnly.vue";
 import LinkTypeSelect from "../links/LinkTypeSelect.vue";
-import { storedApi } from "../../storedApi";
+import storedApi from  "../../managedApi/storedApi";
 
 function initialState() {
   return {

@@ -47,7 +47,7 @@ import SvgDescriptionIndicator from "../svgs/SvgDescriptionIndicator.vue";
 import SvgPictureIndicator from "../svgs/SvgPictureIndicator.vue";
 import SvgUrlIndicator from "../svgs/SvgUrlIndicator.vue";
 import EditableText from "../form/EditableText.vue";
-import { storedApi } from "../../storedApi";
+import storedApi from  "../../managedApi/storedApi";
 
 export default {
   props: {

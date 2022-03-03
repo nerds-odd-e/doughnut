@@ -56,7 +56,7 @@ import InitialReviewButtons from "../components/review/InitialReviewButtons.vue"
 import ProgressBar from "../components/commons/ProgressBar.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import Minimizable from "../components/commons/Minimizable.vue";
-import { storedApi } from "../storedApi";
+import storedApi from  "../managedApi/storedApi";
 
 export default {
   name: "InitialReviewPage",

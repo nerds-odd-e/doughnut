@@ -10,7 +10,7 @@
 <script>
 import SubscriptionEditButton from "./SubscriptionEditButton.vue";
 import SvgUnsubscribe from "../svgs/SvgUnsubscribe.vue";
-import { api } from "../../storedApi";
+import api from  "../../managedApi/api";
 
 export default {
   props: { subscription: Object },

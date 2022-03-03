@@ -44,7 +44,7 @@ import LinkTypeSelect from "./LinkTypeSelect.vue";
 import CheckInput from "../form/CheckInput.vue";
 import RadioButtons from "../form/RadioButtons.vue";
 import SvgGoBack from "../svgs/SvgGoBack.vue";
-import { storedApi } from "../../storedApi";
+import storedApi from  "../../managedApi/storedApi";
 
 export default {
   name: "LinkNoteFinalize",

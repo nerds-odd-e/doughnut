@@ -14,7 +14,7 @@
 <script>
 import LoadingPage from "./commons/LoadingPage.vue";
 import NotePageFrame from '../components/notes/views/NotePageFrame.vue';
-import { storedApi } from "../storedApi";
+import storedApi from  "../managedApi/storedApi";
 import { viewType } from "../models/viewTypes";
 
 export default {

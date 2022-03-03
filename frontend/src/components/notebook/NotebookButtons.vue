@@ -15,7 +15,7 @@
 <script>
 import NotebookEditButton from "./NotebookEditButton.vue";
 import SvgBazaarShare from "../svgs/SvgBazaarShare.vue";
-import { api } from "../../storedApi";
+import api from  "../../managedApi/api";
 
 export default {
   props: { notebook: Object },

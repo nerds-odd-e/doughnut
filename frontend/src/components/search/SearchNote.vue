@@ -29,7 +29,7 @@
 import TextInput from "../form/TextInput.vue";
 import CheckInput from "../form/CheckInput.vue";
 import Cards from "../notes/Cards.vue";
-import { api } from "../../storedApi";
+import api from  "../../managedApi/api";
 import _ from "lodash";
 
 const debounced = _.debounce((callback) => callback(), 500);

@@ -60,7 +60,7 @@ import NoteEditButton from "./NoteEditButton.vue";
 import NoteDownloadButton from "./NoteDownloadButton.vue"
 import NoteNewButton from "./NoteNewButton.vue";
 import ViewTypeButtons from "./ViewTypeButtons.vue";
-import { storedApi } from "../../storedApi";
+import storedApi from  "../../managedApi/storedApi";
 import { viewType } from "../../models/viewTypes";
 export default {
   name: "NoteButtons",

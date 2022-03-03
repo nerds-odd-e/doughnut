@@ -21,7 +21,7 @@
 import Breadcrumb from "../notes/Breadcrumb.vue";
 import NoteFormTitleOnly from "../notes/NoteFormTitleOnly.vue";
 import LoadingPage from "../../pages/commons/LoadingPage.vue";
-import { storedApi } from "../../storedApi";
+import storedApi from  "../../managedApi/storedApi";
 
 export default {
   props: { circle: Object },

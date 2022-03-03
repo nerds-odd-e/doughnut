@@ -11,7 +11,7 @@
 
 <script>
 import CheckInput from "../components/form/CheckInput.vue";
-import { storedApi } from '../storedApi';
+import storedApi from  '../managedApi/storedApi';
 
 export default {
   data() {

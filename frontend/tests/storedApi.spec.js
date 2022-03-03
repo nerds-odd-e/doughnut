@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-import { storedApi } from "../src/storedApi";
+import storedApi from "../src/managedApi/storedApi";
 import store from "../src/store/index.js";
 import makeMe from "./fixtures/makeMe";
 

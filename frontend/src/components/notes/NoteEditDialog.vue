@@ -7,7 +7,7 @@
 
 <script>
 import NoteFormBody from "./NoteFormBody.vue";
-import { storedApi } from "../../storedApi";
+import storedApi from  "../../managedApi/storedApi";
 
 export default {
   name: "NoteEditDialog",
