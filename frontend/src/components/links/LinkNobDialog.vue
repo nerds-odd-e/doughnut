@@ -53,7 +53,7 @@ export default {
   methods: {
     updateLink() {
       this.loading = true
-      storedApi(this.$store).updateLink(this.link.id, this.formData)
+      storedApi(this).updateLink(this.link.id, this.formData)
         .then((res) => this.$emit('done'))
         .catch((res) => (this.formErrors = res))
         .finally(()=> this.loading = false)
@@ -63,7 +63,7 @@ export default {
       if (!(await this.$popups.confirm("Are you sure to delete this link?")))
         return;
       this.loading = true
-      storedApi(this.$store).deleteLink(this.link.id)
+      storedApi(this).deleteLink(this.link.id)
         .then((res) => { this.$emit('done') })
         .catch((res) => (this.formErrors = res))
         .finally(()=> this.loading = false)

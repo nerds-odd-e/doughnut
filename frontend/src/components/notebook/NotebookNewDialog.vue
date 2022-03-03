@@ -41,7 +41,7 @@ export default {
 
     processForm() {
       this.loading = true;
-      storedApi(this.$store).createNotebook(this.circle,
+      storedApi(this).createNotebook(this.circle,
         this.noteFormData,
       )
         .then((res) =>

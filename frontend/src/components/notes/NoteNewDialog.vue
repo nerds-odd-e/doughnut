@@ -55,7 +55,7 @@ export default {
   methods: {
     fetchData() {
       this.loading = true
-      storedApi(this.$store).getNoteAndItsChildren(this.parentId)
+      storedApi(this).getNoteAndItsChildren(this.parentId)
       .then((res) => {
           const note = res.notes[0]
           const { ancestors, notebook } = res.notePosition;
@@ -68,7 +68,7 @@ export default {
 
     processForm() {
       this.loading = true
-      storedApi(this.$store).createNote(this.parentId,
+      storedApi(this).createNote(this.parentId,
         this.creationData
       ).then((res) => {
         console.log(res)

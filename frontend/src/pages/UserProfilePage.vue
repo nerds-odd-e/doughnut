@@ -52,7 +52,7 @@ export default {
     },
     processForm() {
       this.loading = true
-      storedApi(this.$store).updateUser(this.formData.id, this.formData)
+      storedApi(this).updateUser(this.formData.id, this.formData)
         .then(() =>  this.$router.push({ name: "root" }))
         .catch((res) => (this.formErrors = res))
         .finally(()=> this.loading = false)

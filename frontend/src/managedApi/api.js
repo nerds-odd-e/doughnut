@@ -1,36 +1,4 @@
-import {
-  restGet,
-  restPost,
-  restPostMultiplePartForm,
-  restPostWithHtmlResponse,
-} from '../restful/restful';
-
-class ManagedApi {
-  constructor(component) {
-    this.component = component;
-  }
-
-  around(promise) {
-    if(this.component !== null && this.component !== undefined) {
-      this.component.loading = true
-    }
-    return promise.finally(()=>{
-      if(this.component !== null && this.component !== undefined) {
-        this.component.loading = false
-      }
-    })
-
-  }
-
-  restGet(url) { return this.around(restGet(url)); }
-
-  restPost(url, data) { return this.around(restPost(url, data));}
-
-  restPostMultiplePartForm(url, data) {return this.around(restPostMultiplePartForm(url, data));}
-
-  restPostWithHtmlResponse(url, data) {return this.around(restPostWithHtmlResponse(url, data));}
-}
-
+import ManagedApi from "./ManagedApi";
 
 const api = (component) => {
   const managedApi = new ManagedApi(component);

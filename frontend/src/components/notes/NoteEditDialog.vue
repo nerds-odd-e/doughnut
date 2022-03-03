@@ -27,7 +27,7 @@ export default {
   methods: {
     fetchData() {
       this.loading = true
-      storedApi(this.$store).getNoteAndItsChildren(this.noteId)
+      storedApi(this).getNoteAndItsChildren(this.noteId)
       .then((res) => {
           const { updatedAt, ...rest } = res.notes[0].noteAccessories
           this.formData = rest
@@ -38,7 +38,7 @@ export default {
 
     processForm() {
       this.loading = true
-      storedApi(this.$store).updateNote(this.noteId, this.formData)
+      storedApi(this).updateNote(this.noteId, this.formData)
       .then(() => {
         this.$emit("done");
       })

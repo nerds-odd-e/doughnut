@@ -44,7 +44,7 @@ export default {
   methods: {
     fetchData() {
       this.loading = true
-      storedApi(this.$store).getNotebooks().then(
+      storedApi(this).getNotebooks().then(
         (res) => (this.subscriptions = res.subscriptions)
       ).finally(()=> this.loading = false);
     },

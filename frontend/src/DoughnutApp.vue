@@ -44,9 +44,9 @@ export default {
   mounted() {
     this.loading = true
 
-    storedApi(this.$store).getFeatureToggle()
+    storedApi(this).getFeatureToggle()
 
-    storedApi(this.$store).getCurrentUserInfo().then((res) => {
+    storedApi(this).getCurrentUserInfo().then((res) => {
       this.externalIdentifier = res.externalIdentifier;
     })
     .finally(() => this.loading = false)

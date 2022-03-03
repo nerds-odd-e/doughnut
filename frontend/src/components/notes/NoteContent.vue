@@ -81,7 +81,7 @@ export default {
   methods: {
     onBlurTextField() {
       this.loading = true
-      storedApi(this.$store).updateTextContent(this.note.id, this.textContent)
+      storedApi(this).updateTextContent(this.note.id, this.textContent)
       .then((res) => {
         this.$emit("done");
       })

@@ -29,7 +29,7 @@ export default {
   },
   methods: {
     undoDelete() {
-      storedApi(this.$store).undo()
+      storedApi(this).undo()
     }
   }
 };

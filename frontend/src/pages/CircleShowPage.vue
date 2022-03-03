@@ -69,7 +69,7 @@ export default {
 
   methods: {
     getCircle() {
-      storedApi(this.$store).getCircle(this.circleId)
+      storedApi(this).getCircle(this.circleId)
       .then((res) =>  this.circle = res )
       .finally(() => this.loading = false )
       this.queryCounter += 1

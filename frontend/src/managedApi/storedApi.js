@@ -1,12 +1,9 @@
-import {
-  restGet,
-  restPatchMultiplePartForm,
-  restPost,
-  restPatch,
-  restPostMultiplePartForm,
-} from '../restful/restful';
+import ManagedApi from './ManagedApi';
 
-const storedApi = (store) => {
+const storedApi = (component) => {
+  const managedApi = new ManagedApi(component);
+  const store = component.$store
+
   function loadReviewPointViewedByUser(data) {
     if (!data) return;
     const { noteWithPosition, linkViewedbyUser } = data;
@@ -25,7 +22,7 @@ const storedApi = (store) => {
 
   async function updateTextContentWithoutUndo(noteId, noteContentData) {
     const { updatedAt, ...data } = noteContentData;
-    const res = await restPatchMultiplePartForm(
+    const res = await managedApi.restPatchMultiplePartForm(
       `/api/text_content/${noteId}`,
       data,
     );
@@ -36,19 +33,19 @@ const storedApi = (store) => {
   return {
     reviewMethods: {
       async getOneInitialReview() {
-        const res = await restGet(`/api/reviews/initial`);
+        const res = await managedApi.restGet(`/api/reviews/initial`);
         loadReviewPointViewedByUser(res);
         return res;
       },
 
       async doInitialReview(data) {
-        const res = await restPost(`/api/reviews`, data);
+        const res = await managedApi.restPost(`/api/reviews`, data);
         loadReviewPointViewedByUser(res);
         return res;
       },
 
       async selfEvaluate(reviewPointId, data) {
-        const res = await restPost(
+        const res = await managedApi.restPost(
           `/api/reviews/${reviewPointId}/self-evaluate`,
           data
         );
@@ -57,26 +54,26 @@ const storedApi = (store) => {
       },
 
       async getNextReviewItem() {
-        const res = await restGet(`/api/reviews/repeat`);
+        const res = await managedApi.restGet(`/api/reviews/repeat`);
         loadReviewPointViewedByUser(res.reviewPointViewedByUser);
         return res;
       },
     },
 
     async getNoteWithDescendents(noteId) {
-      const res = await restGet(`/api/notes/${noteId}/overview`);
+      const res = await managedApi.restGet(`/api/notes/${noteId}/overview`);
       store.commit('loadNotes', res.notes);
       return res;
     },
 
     async getNoteAndItsChildren(noteId) {
-      const res = await restGet(`/api/notes/${noteId}`);
+      const res = await managedApi.restGet(`/api/notes/${noteId}`);
       store.commit('loadNotes', res.notes);
       return res;
     },
 
     async getNotebooks() {
-      const res = await restGet(`/api/notebooks`);
+      const res = await managedApi.restGet(`/api/notebooks`);
       store.commit('notebooks', res.notebooks);
       return res;
     },
@@ -89,12 +86,12 @@ const storedApi = (store) => {
         return `/api/notebooks/create`;
       })();
 
-      const res = await restPostMultiplePartForm(url, data);
+      const res = await managedApi.restPostMultiplePartForm(url, data);
       return res;
     },
 
     async createNote(parentId, data) {
-      const res = await restPostMultiplePartForm(
+      const res = await managedApi.restPostMultiplePartForm(
         `/api/notes/${parentId}/create`,
         data
       );
@@ -103,7 +100,7 @@ const storedApi = (store) => {
     },
 
     async createLink(sourceId, targetId, data) {
-      const res = await restPost(
+      const res = await managedApi.restPost(
         `/api/links/create/${sourceId}/${targetId}`,
         data
       );
@@ -112,20 +109,20 @@ const storedApi = (store) => {
     },
 
     async updateLink(linkId, data) {
-      const res = await restPost(`/api/links/${linkId}`, data);
+      const res = await managedApi.restPost(`/api/links/${linkId}`, data);
       store.commit('loadNotes', res.notes);
       return res;
     },
 
     async deleteLink(linkId) {
-      const res = await restPost(`/api/links/${linkId}/delete`, {});
+      const res = await managedApi.restPost(`/api/links/${linkId}/delete`, {});
       store.commit('loadNotes', res.notes);
       return res;
     },
 
     async updateNote(noteId, noteContentData) {
       const { updatedAt, ...data } = noteContentData;
-      const res = await restPatchMultiplePartForm(`/api/notes/${noteId}`, data);
+      const res = await managedApi.restPatchMultiplePartForm(`/api/notes/${noteId}`, data);
       store.commit('loadNotes', [res]);
       return res;
     },
@@ -137,7 +134,7 @@ const storedApi = (store) => {
 
     async addCommentToNote(noteId, commentContentData) {
       const { updatedAt, ...data } = commentContentData;
-      const res = await restPost(
+      const res = await managedApi.restPost(
         `/api/comments/${noteId}/add`,
         data,
         () => null
@@ -155,7 +152,7 @@ const storedApi = (store) => {
           history.textContent
         );
       }
-      const res = await restPatch(
+      const res = await managedApi.restPatch(
         `/api/notes/${history.noteId}/undo-delete`,
         {}
       );
@@ -167,25 +164,25 @@ const storedApi = (store) => {
     },
 
     async deleteNote(noteId) {
-      const res = await restPost(`/api/notes/${noteId}/delete`, {}, () => null);
+      const res = await managedApi.restPost(`/api/notes/${noteId}/delete`, {}, () => null);
       store.commit('deleteNote', noteId);
       return res;
     },
 
     async getCurrentUserInfo() {
-      const res = await restGet(`/api/user/current-user-info`);
+      const res = await managedApi.restGet(`/api/user/current-user-info`);
       store.commit('currentUser', res.user);
       return res;
     },
 
     async updateUser(userId, data) {
-      const res = await restPatchMultiplePartForm(`/api/user/${userId}`, data);
+      const res = await managedApi.restPatchMultiplePartForm(`/api/user/${userId}`, data);
       store.commit('currentUser', res);
       return res;
     },
 
     async createUser(data) {
-      const res = await restPostMultiplePartForm(`/api/user`, data);
+      const res = await managedApi.restPostMultiplePartForm(`/api/user`, data);
       store.commit('currentUser', res);
       return res;
     },
@@ -193,14 +190,14 @@ const storedApi = (store) => {
     getFeatureToggle() {
       return (
         !window.location.href.includes('odd-e.com') &&
-        restGet(`/api/testability/feature_toggle`).then((res) =>
+        managedApi.restGet(`/api/testability/feature_toggle`).then((res) =>
           store.commit('featureToggle', res)
         )
       );
     },
 
     async setFeatureToggle(data) {
-      const res = await restPost(`/api/testability/feature_toggle`, {
+      const res = await managedApi.restPost(`/api/testability/feature_toggle`, {
         enabled: data,
       });
       this.getFeatureToggle(store);
@@ -208,7 +205,7 @@ const storedApi = (store) => {
     },
 
     getCircle(circleId) {
-      return restGet(`/api/circles/${circleId}`);
+      return managedApi.restGet(`/api/circles/${circleId}`);
     },
   };
 };

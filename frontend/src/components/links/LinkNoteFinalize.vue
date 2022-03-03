@@ -68,7 +68,7 @@ export default {
           return;
         }
       }
-      storedApi(this.$store).createLink(this.note.id, this.targetNote.id, this.formData)
+      storedApi(this).createLink(this.note.id, this.targetNote.id, this.formData)
         .then((r) => this.$emit("success"))
         .catch((res) => {
           this.formErrors = res

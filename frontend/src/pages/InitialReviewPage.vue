@@ -111,7 +111,7 @@ export default {
           return;
       }
       this.reviewPoint.removedFromReview = skipReview;
-      storedApi(this.$store).reviewMethods.doInitialReview(
+      storedApi(this).reviewMethods.doInitialReview(
         { reviewPoint: this.reviewPoint, reviewSetting: this.reviewSetting },
       ).then(this.loadNew)
       .finally(()=>this.loading=false)
@@ -119,7 +119,7 @@ export default {
 
     fetchData() {
       this.loading = true
-      storedApi(this.$store).reviewMethods.getOneInitialReview()
+      storedApi(this).reviewMethods.getOneInitialReview()
       .then(this.loadNew)
       .finally(() => this.loading = false)
     },
