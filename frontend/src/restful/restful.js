@@ -5,12 +5,6 @@ const loginOrRegister = () => {
   window.location = `/users/identify?from=${window.location.href}`;
 };
 
-const jsonResponseHelper = async (response) => {
-  const jsonResponse = await response.json()
-  if (response.status === 400) throw new BadRequestError(jsonResponse.errors);
-  return jsonResponse;
-}
-
 const request = async (url, params) => {
   try {
     const res = await fetch(url, params)
@@ -31,10 +25,15 @@ const request = async (url, params) => {
   }
 }
 
-const restRequest = (url, params) => request(url, params).then(jsonResponseHelper)
+const restRequest = async (url, params) => {
+  const response = await request(url, params);
+  const jsonResponse = await response.json()
+  if (response.status === 400) throw new BadRequestError(jsonResponse.errors);
+  return jsonResponse;
+}
 
 const restRequestWithHtmlResponse = async (url, params) => {
-  const response = request(url, params)
+  const response = await request(url, params)
   const html = await response.text();
   if (response.status === 400) throw Error("BadRequest", html);
   return html;
