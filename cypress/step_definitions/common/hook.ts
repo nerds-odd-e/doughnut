@@ -12,6 +12,10 @@ import {
   When,
 } from "cypress-cucumber-preprocessor/steps";
 
+Before({ tags: "@stopTime" }, () => {
+  cy.clock()
+})
+
 Before(() => {
   cy.cleanDBAndSeedData();
   cy.wrap(false).as('firstVisited')
@@ -23,9 +27,5 @@ Before({ tags: "@featureToggle" }, () => {
 
 Before({ tags: "@cleanDownloadFolder" }, () => {
   cy.cleanDownloadFolder()
-})
-
-Before({ tags: "@stopTime" }, () => {
-  cy.clock()
 })
 
