@@ -5,7 +5,7 @@ const loginOrRegister = () => {
   window.location = `/users/identify?from=${window.location.href}`;
 };
 
-const restRequest = async (url, params) => {
+const request = async (url, params) => {
   try {
     const res = await fetch(url, params)
     if (res.status === 200 || res.status === 400) {
@@ -26,6 +26,8 @@ const restRequest = async (url, params) => {
     throw error
   }
 }
+
+const restRequest = async (url, params) => request(url, params)
 
 const restRequestWithHtmlResponse = async (url, params) => {
   try {
