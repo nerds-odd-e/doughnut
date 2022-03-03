@@ -5,92 +5,102 @@ import {
   restPostWithHtmlResponse,
 } from '../restful/restful';
 
-const api = () => ({
+class ManagedApi {
+  restGet(url) { return restGet(url); }
+  restPost(url, data) { return restPost(url, data);}
+  restPostMultiplePartForm(url, data) {return restPostMultiplePartForm(url, data)}
+  restPostWithHtmlResponse(url, data) {return restPostWithHtmlResponse(url, data)}
+}
+
+const api = () => {
+  const managedApi = new ManagedApi();
+  return {
     userMethods: {
       logout() {
-        return restPostWithHtmlResponse(`/logout`, {});
+        return managedApi.restPostWithHtmlResponse(`/logout`, {});
       },
 
       currentUser() {
-          return restGet(`/api/user`);
+          return managedApi.restGet(`/api/user`);
       },
     },
     reviewMethods: {
       processAnswer(reviewPointId, data) {
-        return restPost(`/api/reviews/${reviewPointId}/answer`, data);
+        return managedApi.restPost(`/api/reviews/${reviewPointId}/answer`, data);
       },
 
       removeFromReview(reviewPointId) {
-        return restPost(`/api/review-points/${reviewPointId}/remove`, {});
+        return managedApi.restPost(`/api/review-points/${reviewPointId}/remove`, {});
       },
 
       overview() {
-          return restGet(`/api/reviews/overview`);
+          return managedApi.restGet(`/api/reviews/overview`);
       },
 
       getReviewSetting(noteId) {
-          return restGet(`/api/notes/${noteId}/review-setting`);
+          return managedApi.restGet(`/api/notes/${noteId}/review-setting`);
       },
 
       updateReviewSetting(noteId, data) {
-          return restPost(`/api/notes/${noteId}/review-setting`, data);
+          return managedApi.restPost(`/api/notes/${noteId}/review-setting`, data);
       }
     },
     circleMethods: {
         createCircle(data) {
-            return restPostMultiplePartForm("/api/circles", data);
+            return managedApi.restPostMultiplePartForm("/api/circles", data);
         },
         joinCircle(data) {
-            return restPostMultiplePartForm( `/api/circles/join`, data)
+            return managedApi.restPostMultiplePartForm( `/api/circles/join`, data)
         },
         getCirclesOfCurrentUser() {
-            return restGet("/api/circles");
+            return managedApi.restGet("/api/circles");
         },
     },
 
     relativeSearch(noteId, {searchGlobally, searchKey}) {
-        return restPost(
+        return managedApi.restPost(
           `/api/notes/${noteId}/search`,
           { searchGlobally, searchKey })
     },
 
     updateNotebookSettings(notebookId, data) {
-      return restPostMultiplePartForm(
+      return managedApi.restPostMultiplePartForm(
         `/api/notebooks/${notebookId}`, data
       )
     },
 
     getBazaar() {
-        return restGet("/api/bazaar");
+        return managedApi.restGet("/api/bazaar");
     },
     shareToBazaar(notebookId) {
-        return restPost( `/api/notebooks/${notebookId}/share`, {})
+        return managedApi.restPost( `/api/notebooks/${notebookId}/share`, {})
     },
 
     getFailureReports() {
-        return restGet("/api/failure-reports");
+        return managedApi.restGet("/api/failure-reports");
     },
     getFailureReport(failureReportId) {
-        return restGet(`/api/failure-reports/${failureReportId}`);
+        return managedApi.restGet(`/api/failure-reports/${failureReportId}`);
     },
     subscriptionMethods: {
         subscribe(notebookId, data) {
-        return restPostMultiplePartForm(
+        return managedApi.restPostMultiplePartForm(
             `/api/subscriptions/notebooks/${notebookId}/subscribe`, data
         )
         },
         updateSubscription(subscriptionId, data) {
-        return restPostMultiplePartForm(
+        return managedApi.restPostMultiplePartForm(
             `/api/subscriptions/${subscriptionId}`, data
         )
         },
         deleteSubscription(subscriptionId) {
-            return restPost(
+            return managedApi.restPost(
             `/api/subscriptions/${subscriptionId}/delete`,
             {},
             )
         },
     },
-  })
+  };
+}
 
 export default api;
