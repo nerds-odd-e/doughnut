@@ -18,7 +18,7 @@
 
 <script>
 import ContainerPage from "./commons/ContainerPage.vue";
-import { restGet } from "../restful/restful";
+import { api } from "../storedApi";
 
 export default {
   props: { failureReportId: [String, Number] },
@@ -33,9 +33,7 @@ export default {
   methods: {
     fetchData() {
       this.loading = true
-      restGet(
-        `/api/failure-reports/${this.failureReportId}`
-      ).then((res) => {
+      api().getFailureReport(this.failureReportId).then((res) => {
         this.failureReport = res.failureReport;
         this.githubIssueUrl = res.githubIssueUrl;
       })

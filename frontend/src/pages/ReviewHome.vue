@@ -7,7 +7,7 @@
 <script>
 import ReviewWelcome from "../components/review/ReviewWelcome.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
-import { restGet } from "../restful/restful";
+import { api } from "../storedApi";
 
 export default {
   data() {
@@ -20,7 +20,7 @@ export default {
   methods: {
     fetchData() {
       this.loading = true
-      restGet(`/api/reviews/overview`).then(
+      api().reviewMethods.overview().then(
         (res) => (this.reviewing = res)
       )
       .finally(()=>this.loading = false);

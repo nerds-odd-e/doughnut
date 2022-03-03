@@ -30,8 +30,7 @@
 <script>
 import ContainerPage from "./commons/ContainerPage.vue";
 import TextInput from "../components/form/TextInput.vue";
-import { restGet } from "../restful/restful";
-import { storedApi } from "../storedApi"
+import { api, storedApi } from "../storedApi"
 
 export default {
   components: { ContainerPage, TextInput },
@@ -45,7 +44,7 @@ export default {
   },
   methods: {
     fetchData() {
-      restGet(`/api/user`, (r) => (this.loading = r)).then((res) => {
+      api().userMethods.currentUser().then((res) => {
         this.formData = res
       })
       .finally(() => this.loading = false);

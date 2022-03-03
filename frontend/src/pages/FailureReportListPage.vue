@@ -24,7 +24,7 @@
 
 <script>
 import ContainerPage from "./commons/ContainerPage.vue";
-import { restGet } from "../restful/restful";
+import { api } from "../storedApi";
 
 export default {
   components: { ContainerPage },
@@ -38,7 +38,7 @@ export default {
   methods: {
     fetchData() {
       this.loading = true
-      restGet(`/api/failure-reports`)
+      api().getFailureReports()
         .then((res) => {
           this.failureReports = res
         })

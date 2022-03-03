@@ -219,6 +219,10 @@ const api = () => ({
       logout() {
         return restPostWithHtmlResponse(`/logout`, {});
       },
+
+      currenUser() {
+          return restGet(`/api/user`);
+      },
     },
     reviewMethods: {
       processAnswer(reviewPointId, data) {
@@ -227,6 +231,10 @@ const api = () => ({
 
       removeFromReview(reviewPointId) {
         return restPost(`/api/review-points/${reviewPointId}/remove`, {});
+      },
+
+      overview() {
+          return restGet(`/api/reviews/overview`);
       },
 
       getReviewSetting(noteId) {
@@ -242,6 +250,12 @@ const api = () => ({
     },
     getCirclesOfCurrentUser() {
         return restGet("/api/circles");
+    },
+    getFailureReports() {
+        return restGet("/api/failure-reports");
+    },
+    getFailureReport(failureReportId) {
+        return restGet(`/api/failure-reports/${failureReportId}`);
     },
   })
 
