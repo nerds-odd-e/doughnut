@@ -5,8 +5,12 @@ const loginOrRegister = () => {
   window.location = `/users/identify?from=${window.location.href}`;
 };
 
-const request = async (url, {method, headers, body}) => {
-  const res = await fetch(url, {method, headers: {Accept: 'application/json', ...headers}, body})
+const request = async (url, {method, contentType='json', body}) => {
+  const headers = {Accept: 'application/json' };
+  if (contentType === 'json') {
+    headers["Content-Type"] = 'application/json';
+  }
+  const res = await fetch(url, {method, headers, body})
   if (res.status === 200 || res.status === 400) {
     return res;
   }
@@ -40,9 +44,6 @@ const restPost = (url, data) =>
     url,
     {
       method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
       body: JSON.stringify(data),
     },
   );
@@ -52,9 +53,6 @@ const restPatch = (url, data) =>
     url,
     {
       method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
       body: JSON.stringify(data),
     },
   );
@@ -83,8 +81,7 @@ const restPostMultiplePartForm = (url, data) =>
     url,
     {
       method: 'POST',
-      headers: {
-      },
+      contentType: "MultiplePartForm",
       body: objectToFormData(data),
     },
   );
@@ -94,8 +91,7 @@ const restPatchMultiplePartForm = (url, data) =>
     url,
     {
       method: 'PATCH',
-      headers: {
-      },
+      contentType: "MultiplePartForm",
       body: objectToFormData(data),
     },
   );
@@ -103,9 +99,6 @@ const restPatchMultiplePartForm = (url, data) =>
 const restPostWithHtmlResponse = (url, data) =>
   restRequestWithHtmlResponse(url, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
     body: JSON.stringify(data),
   });
 
