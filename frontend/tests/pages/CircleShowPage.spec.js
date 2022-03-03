@@ -23,7 +23,7 @@ describe("circle show page", () => {
     
     await flushPromises();
     expect(fetch).toHaveBeenCalledTimes(1);
-    expect(fetch).toHaveBeenCalledWith(`/api/circles/${circleNote.id}`, {});
+    expect(fetch).toHaveBeenCalledWith(`/api/circles/${circleNote.id}`, expect.anything());
   });
 
   test('fetch API to be called every 5 seconds', async () => {
@@ -37,6 +37,6 @@ describe("circle show page", () => {
 
     await flushPromises();
     expect(fetch).toHaveBeenCalledTimes(1);
-    expect(fetch).toHaveBeenCalledWith(`/api/circles/${circleNote.id}`, {});
+    expect(fetch).toHaveBeenCalledWith(`/api/circles/${circleNote.id}`, expect.anything());
   });
 });

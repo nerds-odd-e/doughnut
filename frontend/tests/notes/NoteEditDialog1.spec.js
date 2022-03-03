@@ -25,6 +25,6 @@ describe("note show", () => {
     });
     await flushPromises();
     expect(fetch).toHaveBeenCalledTimes(1);
-    expect(fetch).toHaveBeenCalledWith(`/api/notes/${note.id}`, {});
+    expect(fetch).toHaveBeenCalledWith(`/api/notes/${note.id}`, expect.anything());
   });
 });

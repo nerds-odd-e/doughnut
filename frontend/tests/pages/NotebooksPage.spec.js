@@ -30,7 +30,7 @@ describe("Notebooks Page", () => {
         renderWithStoreAndMockRoute(store, NotebooksPage, {});
 
         expect(fetch).toHaveBeenCalledTimes(1);
-        expect(fetch).toHaveBeenCalledWith('/api/notebooks', {});
+        expect(fetch).toHaveBeenCalledWith('/api/notebooks', expect.anything());
         expect(await screen.findByTitle("undo")).toBeDisabled();
     });
 

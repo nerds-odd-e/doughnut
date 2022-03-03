@@ -39,7 +39,7 @@ describe("repeat page", () => {
   test("redirect to review page if nothing to repeat", async () => {
     const { mockRouter } = await mountPage({})
     expect(fetch).toHaveBeenCalledTimes(1);
-    expect(fetch).toHaveBeenCalledWith("/api/reviews/repeat", {});
+    expect(fetch).toHaveBeenCalledWith("/api/reviews/repeat", expect.anything());
     expect(mockRouter.push).toHaveBeenCalledWith({ name: "reviews" });
   });
 
@@ -79,7 +79,7 @@ describe("repeat page", () => {
       wrapper.find('#repeat-sad').trigger("click")
       await flushPromises();
       expect(popupMock.alert).toHaveBeenCalledWith(expect.stringMatching(/review point/))
-      expect(fetch).toHaveBeenCalledWith("/api/reviews/repeat", {});
+      expect(fetch).toHaveBeenCalledWith("/api/reviews/repeat", expect.anything());
     });
 
   });

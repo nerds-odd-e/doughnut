@@ -35,7 +35,7 @@
      await flushPromises();
      jest.advanceTimersByTime(5000);
      expect(fetch).toHaveBeenCalledTimes(1);
-     expect(fetch).toHaveBeenCalledWith(`/api/notes/${note.id}`, {});
+     expect(fetch).toHaveBeenCalledWith(`/api/notes/${note.id}`, expect.anything());
      await screen.findByText("a circle");
    });
 
@@ -47,7 +47,7 @@
     await flushPromises();
     expect(viewType(viewTypeValue).fetchAll).toBe(true);
     expect(fetch).toHaveBeenCalledTimes(1);
-    expect(fetch).toHaveBeenCalledWith(`/api/notes/${note.id}/overview`, {});
+    expect(fetch).toHaveBeenCalledWith(`/api/notes/${note.id}/overview`, expect.anything());
     await screen.findByText("a circle");
   
   });

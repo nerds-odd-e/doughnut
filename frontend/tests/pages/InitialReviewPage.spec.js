@@ -23,7 +23,7 @@ describe("repeat page", () => {
     );
     await flushPromises();
     expect(fetch).toHaveBeenCalledTimes(1);
-    expect(fetch).toHaveBeenCalledWith("/api/reviews/initial", {});
+    expect(fetch).toHaveBeenCalledWith("/api/reviews/initial", expect.anything());
     expect(mockRouter.push).toHaveBeenCalledWith({ name: "reviews" });
   });
 
@@ -41,7 +41,7 @@ describe("repeat page", () => {
     );
     await flushPromises();
     expect(fetch).toHaveBeenCalledTimes(1);
-    expect(fetch).toHaveBeenCalledWith("/api/reviews/initial", {});
+    expect(fetch).toHaveBeenCalledWith("/api/reviews/initial", expect.anything());
     expect(mockRouter.push).toHaveBeenCalledTimes(0);
     expect(wrapper.findAll(".initial-review-container")).toHaveLength(0);
     expect(wrapper.findAll(".pause-stop")).toHaveLength(1);

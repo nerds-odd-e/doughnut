@@ -24,6 +24,6 @@ describe("bazaar page", () => {
     
     await flushPromises();
     expect(fetch).toHaveBeenCalledTimes(1);
-    expect(fetch).toHaveBeenCalledWith("/api/bazaar", {});
+    expect(fetch).toHaveBeenCalledWith("/api/bazaar", expect.anything());
   });
 });
