@@ -27,6 +27,30 @@ const restRequest = async (url, params) => {
   }
 }
 
+
+const restRequest = async (url, params) => {
+  try {
+    const res = await fetch(url, params)
+    if (res.status === 200 || res.status === 400) {
+      const jsonResponse = await res.json()
+      if (res.status === 400) throw toNested(jsonResponse.errors);
+      return jsonResponse;
+    }
+    throw new HttpResponseError(res.status);
+  }
+  catch(error) {
+    if (error.status === 204) {
+      return null;
+    }
+    if (error.status === 401) {
+      loginOrRegister();
+      return null;
+    }
+    throw error
+  }
+}
+
+
 const restRequestWithHtmlResponse = async (url, params) => {
   try {
     const res = await fetch(url, params);
