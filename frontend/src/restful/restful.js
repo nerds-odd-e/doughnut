@@ -30,12 +30,12 @@ const restRequest = async (url, params) => {
 const restRequestWithHtmlResponse = async (url, params) => {
   try {
     const res = await fetch(url, params);
-    if (res.status !== 200 && res.status !== 400) {
-      throw new HttpResponseError(res.status);
+    if (res.status === 200 || res.status === 400) {
+      const html = await res.text();
+      if (res.status === 400) throw Error("BadRequest", html);
+      return html;
     }
-    const html = await res.text();
-    if (res.status === 200) return html;
-    if (res.status === 400) throw Error("BadRequest", html);
+    throw new HttpResponseError(res.status);
   }
   catch(error) {
     if (error.status === 204) {
