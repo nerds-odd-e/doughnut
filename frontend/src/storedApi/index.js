@@ -214,23 +214,29 @@ const storedApi = (store) => {
   };
 };
 
-const api = () => {
-  return {
+const api = () => ({
     userMethods: {
-      async logout() {
-        await restPostWithHtmlResponse(`/logout`, {});
+      logout() {
+        return restPostWithHtmlResponse(`/logout`, {});
       },
     },
-    async processAnswer(reviewPointId, data) {
-    const res = await restPost(`/api/reviews/${reviewPointId}/answer`, data);
-    return res;
-    },
+    reviewMethods: {
+      processAnswer(reviewPointId, data) {
+        return restPost(`/api/reviews/${reviewPointId}/answer`, data);
+      },
 
-    async removeFromReview(reviewPointId) {
-    const res = await restPost(`/api/review-points/${reviewPointId}/remove`, {});
-    return res;
+      removeFromReview(reviewPointId) {
+        return restPost(`/api/review-points/${reviewPointId}/remove`, {});
+      },
+
+      getReviewSetting(noteId) {
+          return restGet(`/api/notes/${noteId}/review-setting`);
+      },
+
+      updateReviewSetting(noteId, data) {
+          return restPost(`/api/notes/${noteId}/review-setting`, data);
+      }
     }
-  };
-}
+  })
 
 export { api, storedApi };

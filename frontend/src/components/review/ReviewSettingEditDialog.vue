@@ -16,7 +16,7 @@
 <script>
 import ReviewSettingForm from "./ReviewSettingForm.vue";
 import SvgReviewSetting from "../svgs/SvgReviewSetting.vue";
-import { restGet, restPost } from "../../restful/restful";
+import { api } from "../../storedApi";
 
 export default {
   components: { ReviewSettingForm, SvgReviewSetting },
@@ -32,19 +32,13 @@ export default {
   methods: {
     fetchData() {
       this.loading = true
-      restGet(`/api/notes/${this.noteId}/review-setting`)
-      .then((res) => {
-          this.formData = res
-        }
-      )
+      api().reviewMethods.getReviewSetting(this.noteId)
+      .then((res) => { this.formData = res })
       .finally(() => this.loading = false)
     },
     processForm() {
       this.loading = true
-      restPost(
-        `/api/notes/${this.noteId}/review-setting`,
-        this.formData,
-        (r) => (this.loading = r)      )
+      api().reviewMethods.updateReviewSetting(this.noteId, this.formData)
         .then((res) => {
           this.$emit("done");
         })
