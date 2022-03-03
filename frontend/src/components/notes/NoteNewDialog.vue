@@ -54,7 +54,6 @@ export default {
   },
   methods: {
     fetchData() {
-      this.loading = true
       storedApi(this).getNoteAndItsChildren(this.parentId)
       .then((res) => {
           const note = res.notes[0]
@@ -63,11 +62,9 @@ export default {
           this.notebook = notebook;
         }
       )
-      .finally(() => this.loading = false)
     },
 
     processForm() {
-      this.loading = true
       storedApi(this).createNote(this.parentId,
         this.creationData
       ).then((res) => {
@@ -78,7 +75,6 @@ export default {
         })
       })
       .catch((res) => (this.formErrors = res))
-      .finally(()=> this.loading = false )
     },
   },
 };

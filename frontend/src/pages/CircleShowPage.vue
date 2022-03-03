@@ -71,11 +71,9 @@ export default {
     getCircle() {
       storedApi(this).getCircle(this.circleId)
       .then((res) =>  this.circle = res )
-      .finally(() => this.loading = false )
       this.queryCounter += 1
     },
     fetchData() {
-      this.loading = true;
       this.getCircle()
     },
   },

@@ -42,14 +42,11 @@ export default {
   },
 
   mounted() {
-    this.loading = true
-
     storedApi(this).getFeatureToggle()
 
     storedApi(this).getCurrentUserInfo().then((res) => {
       this.externalIdentifier = res.externalIdentifier;
     })
-    .finally(() => this.loading = false)
 
     this.$popups.alert = (msg) => {
       this.popupInfo = { type: "alert", message: msg };

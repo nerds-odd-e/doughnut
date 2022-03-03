@@ -146,10 +146,9 @@ export default {
     },
 
     fetchData() {
-      this.loading = true
       storedApi(this).reviewMethods.getNextReviewItem().then(
         this.loadNew
-      ).finally(() => this.loading = false);
+      );
     },
 
     async noLongerExist() {
@@ -181,14 +180,12 @@ export default {
         this.finished += 1
         this.repetition.toRepeatCount -= 1
       }
-      this.loading = true
 
       storedApi(this).reviewMethods.selfEvaluate(this.reviewPointId,
         { selfEvaluation: data, increaseRepeatCount: !this.answerResult },
       )
       .then(this.loadNew)
       .catch((err) => this.noLongerExist())
-      .finally(() => this.loading = false)
     },
     async removeFromReview() {
       if (!(await this.$popups.confirm(
@@ -197,10 +194,8 @@ export default {
       ) {
         return;
       }
-      this.loading = true
       api(this).reviewMethods.removeFromReview(this.reviewPointId)
       .then((r) => this.fetchData())
-      .finally(() => this.loading = false)
     },
 
   },

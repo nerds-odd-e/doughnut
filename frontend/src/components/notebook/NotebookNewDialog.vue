@@ -11,7 +11,7 @@
 
   <LoadingPage v-bind="{ loading, contentExists: true }">
     <form @submit.prevent.once="processForm">
-      <NoteFormTitleOnly v-model="noteFormData" :errors="noteFormErrors" />
+      <NoteFormTitleOnly v-model="noteFormData" :errors="formErrors" />
       <input type="submit" value="Submit" class="btn btn-primary" />
     </form>
   </LoadingPage>
@@ -34,13 +34,12 @@ export default {
     return {
       loading: false,
       noteFormData: {},
-      noteFormErrors: {},
+      formErrors: {},
     };
   },
   methods: {
 
     processForm() {
-      this.loading = true;
       storedApi(this).createNotebook(this.circle,
         this.noteFormData,
       )
@@ -50,8 +49,7 @@ export default {
             params: { noteId: res.noteId },
           })
         )
-        .catch((res) => (this.noteFormErrors = res))
-        .finally(() => this.loading = false);
+        .catch((res) => (this.formErrors = res))
     },
   },
 };

@@ -80,16 +80,11 @@ export default {
   },
   methods: {
     onBlurTextField() {
-      this.loading = true
       storedApi(this).updateTextContent(this.note.id, this.textContent)
       .then((res) => {
         this.$emit("done");
       })
       .catch((res) => (this.formErrors = res))
-      .finally(() => { 
-        this.loading = false;
-      })
-
     }
   }
 };

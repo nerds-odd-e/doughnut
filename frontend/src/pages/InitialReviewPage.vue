@@ -114,14 +114,11 @@ export default {
       storedApi(this).reviewMethods.doInitialReview(
         { reviewPoint: this.reviewPoint, reviewSetting: this.reviewSetting },
       ).then(this.loadNew)
-      .finally(()=>this.loading=false)
     },
 
     fetchData() {
-      this.loading = true
       storedApi(this).reviewMethods.getOneInitialReview()
       .then(this.loadNew)
-      .finally(() => this.loading = false)
     },
   },
   mounted() {

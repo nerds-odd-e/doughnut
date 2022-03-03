@@ -26,24 +26,20 @@ export default {
 
   methods: {
     fetchData() {
-      this.loading = true
       storedApi(this).getNoteAndItsChildren(this.noteId)
       .then((res) => {
           const { updatedAt, ...rest } = res.notes[0].noteAccessories
           this.formData = rest
         }
       )
-      .finally(() => this.loading = false)
     },
 
     processForm() {
-      this.loading = true
       storedApi(this).updateNote(this.noteId, this.formData)
       .then(() => {
         this.$emit("done");
       })
       .catch((res) => (this.formErrors = res))
-      .finally(() => this.loading = false)
     },
   },
   mounted() {

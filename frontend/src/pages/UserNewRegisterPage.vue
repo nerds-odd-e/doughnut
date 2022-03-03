@@ -30,11 +30,8 @@ export default {
   },
   methods: {
     processForm() {
-      this.loading = true
       storedApi(this).createUser(this.formData)
         .catch((res) => this.formErrors.value = res)
-        .finally(()=> this.loading = false )
-
     },
   },
 }

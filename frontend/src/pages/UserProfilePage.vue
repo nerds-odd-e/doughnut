@@ -51,11 +51,9 @@ export default {
       .finally(() => this.loading = false);
     },
     processForm() {
-      this.loading = true
       storedApi(this).updateUser(this.formData.id, this.formData)
         .then(() =>  this.$router.push({ name: "root" }))
         .catch((res) => (this.formErrors = res))
-        .finally(()=> this.loading = false)
 
     },
   },

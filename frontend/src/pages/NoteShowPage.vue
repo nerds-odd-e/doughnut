@@ -38,7 +38,6 @@ export default {
       this.$store.commit('viewType', this.viewType);
     },
     fetchData() {
-      this.loading = true;
       const storedApiCall = this.viewTypeObj.fetchAll ?
                               storedApi(this).getNoteWithDescendents :
                               storedApi(this).getNoteAndItsChildren
@@ -46,7 +45,7 @@ export default {
       storedApiCall(this.noteId)
       .then((res) => {
         this.notePosition = res.notePosition;
-      }).finally(() => this.loading = false);
+      })
     },
   },
   watch: {
