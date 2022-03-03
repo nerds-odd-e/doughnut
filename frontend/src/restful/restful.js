@@ -5,10 +5,17 @@ const loginOrRegister = () => {
   window.location = `/users/identify?from=${window.location.href}`;
 };
 
-const request = async (url, {method, contentType='json', body}) => {
+const request = async (url, data, {method="GET", contentType='json'}) => {
   const headers = {Accept: 'application/json' };
-  if (contentType === 'json') {
-    headers["Content-Type"] = 'application/json';
+  let body;
+  if (method !== "GET") {
+    if (contentType === 'json') {
+      headers["Content-Type"] = 'application/json';
+      body = JSON.stringify(data)
+    }
+    else {
+      body = objectToFormData(data)
+    }
   }
   const res = await fetch(url, {method, headers, body})
   if (res.status === 200 || res.status === 400) {
@@ -23,38 +30,33 @@ const request = async (url, {method, contentType='json', body}) => {
   throw new HttpResponseError(res.status);
 }
 
-const restRequest = async (url, params) => {
-  const response = await request(url, params);
+const restRequest = async (url, data, params) => {
+  const response = await request(url, data, params);
   const jsonResponse = await response.json()
   if (response.status === 400) throw new BadRequestError(jsonResponse.errors);
   return jsonResponse;
 }
 
-const restRequestWithHtmlResponse = async (url, params) => {
-  const response = await request(url, params)
+const restRequestWithHtmlResponse = async (url, data, params) => {
+  const response = await request(url, data, params)
   const html = await response.text();
   if (response.status === 400) throw Error("BadRequest", html);
   return html;
 }
 
-const restGet = (url) => restRequest(url, {});
+const restGet = (url) => restRequest(url, {}, {});
 
 const restPost = (url, data) =>
   restRequest(
     url,
+    data,
     {
       method: 'POST',
-      body: JSON.stringify(data),
     },
   );
 
 const restPatch = (url, data) =>
-  restRequest(
-    url,
-    {
-      method: 'PATCH',
-      body: JSON.stringify(data),
-    },
+  restRequest( url, data, { method: 'PATCH' },
   );
 
 function objectToFormData(data) {
@@ -77,30 +79,13 @@ function objectToFormData(data) {
 }
 
 const restPostMultiplePartForm = (url, data) =>
-  restRequest(
-    url,
-    {
-      method: 'POST',
-      contentType: "MultiplePartForm",
-      body: objectToFormData(data),
-    },
-  );
+  restRequest( url, data, { method: 'POST', contentType: "MultiplePartForm" });
 
 const restPatchMultiplePartForm = (url, data) =>
-  restRequest(
-    url,
-    {
-      method: 'PATCH',
-      contentType: "MultiplePartForm",
-      body: objectToFormData(data),
-    },
-  );
+  restRequest( url, data, { method: 'PATCH', contentType: "MultiplePartForm" });
 
 const restPostWithHtmlResponse = (url, data) =>
-  restRequestWithHtmlResponse(url, {
-    method: 'POST',
-    body: JSON.stringify(data),
-  });
+  restRequestWithHtmlResponse(url, data, { method: 'POST'});
 
 export {
   restGet,
