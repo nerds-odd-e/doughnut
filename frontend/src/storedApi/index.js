@@ -236,7 +236,13 @@ const api = () => ({
       updateReviewSetting(noteId, data) {
           return restPost(`/api/notes/${noteId}/review-setting`, data);
       }
-    }
+    },
+    getBazaar() {
+        return restGet("/api/bazaar");
+    },
+    getCirclesOfCurrentUser() {
+        return restGet("/api/circles");
+    },
   })
 
 export { api, storedApi };

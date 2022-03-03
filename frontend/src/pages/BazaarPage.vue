@@ -13,7 +13,7 @@
 <script>
 import NotebookBazaarViewCards from "../components/bazaar/NotebookBazaarViewCards.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
-import { restGet } from "../restful/restful";
+import { api } from "../storedApi";
 
 export default {
   name: "NotebooksPage",
@@ -31,7 +31,7 @@ export default {
   methods: {
     fetchData() {
       this.loading = true
-      restGet(`/api/bazaar`).then(
+      api().getBazaar().then(
         (res) => {
           this.notebooksViewedByUser = res
         }

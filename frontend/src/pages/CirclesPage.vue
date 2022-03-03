@@ -28,7 +28,7 @@
 import ContainerPage from "./commons/ContainerPage.vue";
 import CircleNewButton from "../components/circles/CircleNewButton.vue";
 import CircleJoinForm from "../components/circles/CircleJoinForm.vue";
-import { restGet } from "../restful/restful";
+import { api } from "../storedApi";
 
 export default {
   components: { ContainerPage, CircleNewButton, CircleJoinForm },
@@ -41,7 +41,7 @@ export default {
   methods: {
     fetchData() {
       this.loading = true
-      restGet(`/api/circles`).then(
+      api().getCirclesOfCurrentUser().then(
         (res) => {
           this.circles = res
         }
