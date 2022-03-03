@@ -5,8 +5,8 @@ const loginOrRegister = () => {
   window.location = `/users/identify?from=${window.location.href}`;
 };
 
-const request = async (url, params) => {
-  const res = await fetch(url, params)
+const request = async (url, {method, headers, body}) => {
+  const res = await fetch(url, {method, headers: {Accept: 'application/json', ...headers}, body})
   if (res.status === 200 || res.status === 400) {
     return res;
   }
@@ -41,7 +41,6 @@ const restPost = (url, data) =>
     {
       method: 'POST',
       headers: {
-        Accept: 'application/json',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(data),
@@ -54,7 +53,6 @@ const restPatch = (url, data) =>
     {
       method: 'PATCH',
       headers: {
-        Accept: 'application/json',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(data),
@@ -86,7 +84,6 @@ const restPostMultiplePartForm = (url, data) =>
     {
       method: 'POST',
       headers: {
-        Accept: 'application/json',
       },
       body: objectToFormData(data),
     },
@@ -98,7 +95,6 @@ const restPatchMultiplePartForm = (url, data) =>
     {
       method: 'PATCH',
       headers: {
-        Accept: 'application/json',
       },
       body: objectToFormData(data),
     },
@@ -108,7 +104,6 @@ const restPostWithHtmlResponse = (url, data) =>
   restRequestWithHtmlResponse(url, {
     method: 'POST',
     headers: {
-      Accept: 'application/json',
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(data),
