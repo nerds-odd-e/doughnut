@@ -8,32 +8,9 @@ const loginOrRegister = () => {
 const restRequest = async (url, params) => {
   try {
     const res = await fetch(url, params)
-    if (res.status !== 200 && res.status !== 400) {
-      throw new HttpResponseError(res.status);
-    }
-    const resp = await res.json()
-    if (res.status === 200) return resp;
-    if (res.status === 400) throw new BadRequestError(resp.errors);
-  }
-  catch(error) {
-    if (error.status === 204) {
-      return null;
-    }
-    if (error.status === 401) {
-      loginOrRegister();
-      return null;
-    }
-    throw error
-  }
-}
-
-
-const restRequest = async (url, params) => {
-  try {
-    const res = await fetch(url, params)
     if (res.status === 200 || res.status === 400) {
       const jsonResponse = await res.json()
-      if (res.status === 400) throw toNested(jsonResponse.errors);
+      if (res.status === 400) throw new BadRequestError(jsonResponse.errors);
       return jsonResponse;
     }
     throw new HttpResponseError(res.status);
@@ -49,7 +26,6 @@ const restRequest = async (url, params) => {
     throw error
   }
 }
-
 
 const restRequestWithHtmlResponse = async (url, params) => {
   try {
