@@ -15,7 +15,7 @@
 <script>
 import NotebookEditButton from "./NotebookEditButton.vue";
 import SvgBazaarShare from "../svgs/SvgBazaarShare.vue";
-import { restPost } from "../../restful/restful";
+import { api } from "../../storedApi";
 
 export default {
   props: { notebook: Object },
@@ -23,10 +23,8 @@ export default {
   methods: {
     async shareNotebook() {
       if (await this.$popups.confirm(`Are you sure to share?`)) {
-        restPost(
-          `/api/notebooks/${this.notebook.id}/share`,
-          {},
-        ).then((r) => this.$router.push({ name: "notebooks" }));
+        api().shareToBazaar(this.notebook.id)
+        .then((r) => this.$router.push({ name: "notebooks" }));
       }
     },
   },

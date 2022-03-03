@@ -247,7 +247,7 @@ const api = () => ({
     },
     circleMethods: {
         createCircle(data) {
-            return restPostMultiplePartForm(data);
+            return restPostMultiplePartForm("/api/circles", data);
         },
         joinCircle(data) {
             return restPostMultiplePartForm( `/api/circles/join`, data)
@@ -256,19 +256,49 @@ const api = () => ({
             return restGet("/api/circles");
         },
     },
+
+    relativeSearch(noteId, {searchGlobally, searchKey}) {
+        return restPost(
+          `/api/notes/${noteId}/search`,
+          { searchGlobally, searchKey })
+    },
+
+    updateNotebookSettings(notebookId, data) {
+      return restPostMultiplePartForm(
+        `/api/notebooks/${notebookId}`, data
+      )
+    },
+
     getBazaar() {
         return restGet("/api/bazaar");
     },
+    shareToBazaar(notebookId) {
+        return restPost( `/api/notebooks/${notebookId}/share`, {})
+    },
+
     getFailureReports() {
         return restGet("/api/failure-reports");
     },
     getFailureReport(failureReportId) {
         return restGet(`/api/failure-reports/${failureReportId}`);
     },
-    subscribe(notebookId, data) {
-      return restPostMultiplePartForm(
-        `/api/subscriptions/notebooks/${notebookId}/subscribe`, data
-      )
+    subscriptionMethods: {
+        subscribe(notebookId, data) {
+        return restPostMultiplePartForm(
+            `/api/subscriptions/notebooks/${notebookId}/subscribe`, data
+        )
+        },
+        updateSubscription(subscriptionId, data) {
+        return restPostMultiplePartForm(
+            `/api/subscriptions/${subscriptionId}`, data
+        )
+        },
+        deleteSubscription(subscriptionId) {
+            return restPost(
+            `/api/subscriptions/${subscriptionId}/delete`,
+            {},
+            )
+        },
     },
   })
 

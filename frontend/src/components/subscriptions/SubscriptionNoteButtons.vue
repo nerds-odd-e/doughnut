@@ -10,7 +10,7 @@
 <script>
 import SubscriptionEditButton from "./SubscriptionEditButton.vue";
 import SvgUnsubscribe from "../svgs/SvgUnsubscribe.vue";
-import { restPost } from "../../restful/restful";
+import { api } from "../../storedApi";
 
 export default {
   props: { subscription: Object },
@@ -23,9 +23,7 @@ export default {
           `Are yyou sure to unsubscribe from this notebook??`
         )
       ) {
-        restPost(
-          `/api/subscriptions/${this.subscription.id}/delete`,
-          {},
+        api().subscriptionMethods.deleteSubscription(this.subscription.id
         ).then((r) => {
           this.$emit("updated");
         });

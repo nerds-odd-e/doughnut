@@ -29,7 +29,7 @@
 import TextInput from "../form/TextInput.vue";
 import CheckInput from "../form/CheckInput.vue";
 import Cards from "../notes/Cards.vue";
-import { restPost } from "../../restful/restful";
+import { api } from "../../storedApi";
 import _ from "lodash";
 
 const debounced = _.debounce((callback) => callback(), 500);
@@ -80,8 +80,7 @@ export default {
       }
 
       debounced(() => {
-        restPost(
-          `/api/notes/${this.noteId}/search`,
+        api().relativeSearch(this.noteId,
           { searchGlobally, searchKey: trimedSearchKey },
         ).then((r) => {
           this.cache[searchGlobally][trimedSearchKey] = r;

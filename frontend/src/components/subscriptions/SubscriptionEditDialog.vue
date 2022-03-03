@@ -13,7 +13,7 @@
 
 <script>
 import TextInput from "../form/TextInput.vue";
-import { restPostMultiplePartForm } from "../../restful/restful";
+import { api } from "../../storedApi";
 
 export default {
   props: { subscription: Object },
@@ -29,10 +29,7 @@ export default {
   methods: {
     processForm() {
       this.loading = true
-      restPostMultiplePartForm(
-        `/api/subscriptions/${this.subscription.id}`,
-        this.formData,
-      )
+      api().subscriptionMethods.updateSubscription(this.subscription.id, this.formData)
         .then((res) => {
           this.$router.push({ name: "notebooks" });
         })

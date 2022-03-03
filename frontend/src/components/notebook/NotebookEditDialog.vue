@@ -13,7 +13,7 @@
 
 <script>
 import CheckInput from "../form/CheckInput.vue";
-import { restPostMultiplePartForm } from "../../restful/restful";
+import { api } from "../../storedApi";
 
 export default {
   props: { notebook: Object },
@@ -29,10 +29,7 @@ export default {
   methods: {
     processForm() {
       this.loading = true
-      restPostMultiplePartForm(
-        `/api/notebooks/${this.notebook.id}`,
-        this.formData,
-      )
+      api().updateNotebookSettings(this.notebook.id, this.formData)
         .then((res) => {
           this.$router.push({ name: "notebooks" });
         })

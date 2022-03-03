@@ -29,7 +29,7 @@ export default {
   methods: {
     processForm() {
       this.loading = true
-      api().subscribe(this.notebook.id, this.formData)
+      api().subscriptionMethods.subscribe(this.notebook.id, this.formData)
         .then((res) => {
           this.$router.push({ name: "notebooks" });
         })
