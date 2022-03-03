@@ -27,20 +27,20 @@ function toNested(data) {
 const restRequest = async (url, params) => {
   try {
     const res = await fetch(url, params)
-    if (res.status === 200 || res.status === 400) {
-      const jsonResponse = await res.json()
-      if (res.status === 400) throw toNested(jsonResponse.errors);
-      return jsonResponse;
+    if (res.status !== 200 && res.status !== 400) {
+      throw new HttpResponseError(res.status);
     }
-    throw new HttpResponseError(res.status);
+    const resp = res.json()
+    if (res.status === 200) return resp;
+    if (res.status === 400) throw toNested(resp.errors);
   }
   catch(error) {
     if (error.status === 204) {
-      return null;
+      return;
     }
     if (error.status === 401) {
       loginOrRegister();
-      return null;
+      return;
     }
     throw error
   }
@@ -52,17 +52,17 @@ const restRequestWithHtmlResponse = async (url, params) => {
     if (res.status !== 200 && res.status !== 400) {
       throw new HttpResponseError(res.status);
     }
-    const html = await res.text();
+    const html = res.text();
     if (res.status === 200) return html;
     if (res.status === 400) throw html;
   }
   catch(error) {
     if (error.status === 204) {
-      return null;
+      return;
     }
     if (error.status === 401) {
       loginOrRegister();
-      return null;
+      return;
     }
     throw error
   }
