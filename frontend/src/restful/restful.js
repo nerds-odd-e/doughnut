@@ -1,28 +1,9 @@
-class HttpResponseError extends Error {
-  constructor(status) {
-    super(`got ${status}`);
-    this.status = status;
-  }
-}
+import HttpResponseError from "./HttpResponseError";
+import BadRequestError from "./BadRequestError";
 
 const loginOrRegister = () => {
   window.location = `/users/identify?from=${window.location.href}`;
 };
-
-function toNested(data) {
-  const result = {};
-  Object.keys(data).forEach((key) => {
-    if (key.includes('.')) {
-      const [namespace, subkey] = key.split('.');
-      if (!result[namespace]) result[namespace] = {};
-      result[namespace][subkey] = data[key];
-    } else {
-      result[key] = data[key];
-    }
-  });
-
-  return result;
-}
 
 const restRequest = async (url, params) => {
   try {
@@ -30,17 +11,17 @@ const restRequest = async (url, params) => {
     if (res.status !== 200 && res.status !== 400) {
       throw new HttpResponseError(res.status);
     }
-    const resp = res.json()
+    const resp = await res.json()
     if (res.status === 200) return resp;
-    if (res.status === 400) throw toNested(resp.errors);
+    if (res.status === 400) throw new BadRequestError(resp.errors);
   }
   catch(error) {
     if (error.status === 204) {
-      return;
+      return null;
     }
     if (error.status === 401) {
       loginOrRegister();
-      return;
+      return null;
     }
     throw error
   }
@@ -52,17 +33,17 @@ const restRequestWithHtmlResponse = async (url, params) => {
     if (res.status !== 200 && res.status !== 400) {
       throw new HttpResponseError(res.status);
     }
-    const html = res.text();
+    const html = await res.text();
     if (res.status === 200) return html;
-    if (res.status === 400) throw html;
+    if (res.status === 400) throw Error("BadRequest", html);
   }
   catch(error) {
     if (error.status === 204) {
-      return;
+      return null;
     }
     if (error.status === 401) {
       loginOrRegister();
-      return;
+      return null;
     }
     throw error
   }
