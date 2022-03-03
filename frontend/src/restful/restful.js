@@ -24,54 +24,49 @@ function toNested(data) {
   return result;
 }
 
-const restRequest = (url, params) => new Promise((resolve, reject) => {
-    fetch(url, params)
-      .then((res) => {
-        if (res.status !== 200 && res.status !== 400) {
-          throw new HttpResponseError(res.status);
-        }
-        return res.json().then((resp) => {
-          if (res.status === 200) resolve(resp);
-          if (res.status === 400) reject(toNested(resp.errors));
-        });
-      })
-      .catch((error) => {
-        if (error.status === 204) {
-          resolve(null);
-          return;
-        }
-        if (error.status === 401) {
-          loginOrRegister();
-          return;
-        }
-        reject(error);
-      });
-  });
+const restRequest = async (url, params) => {
+  try {
+    const res = await fetch(url, params)
+    if (res.status !== 200 && res.status !== 400) {
+      throw new HttpResponseError(res.status);
+    }
+    const resp = res.json()
+    if (res.status === 200) return resp;
+    if (res.status === 400) throw toNested(resp.errors);
+  }
+  catch(error) {
+    if (error.status === 204) {
+      return;
+    }
+    if (error.status === 401) {
+      loginOrRegister();
+      return;
+    }
+    throw error
+  }
+}
 
-const restRequestWithHtmlResponse = (url, params) =>
-  new Promise((resolve, reject) => {
-    fetch(url, params)
-      .then((res) => {
-        if (res.status !== 200 && res.status !== 400) {
-          throw new HttpResponseError(res.status);
-        }
-        return res.text().then((html) => {
-          if (res.status === 200) resolve(html);
-          if (res.status === 400) reject(html);
-        });
-      })
-      .catch((error) => {
-        if (error.status === 204) {
-          resolve(null);
-          return;
-        }
-        if (error.status === 401) {
-          loginOrRegister();
-          return;
-        }
-        reject(error);
-      });
-  });
+const restRequestWithHtmlResponse = async (url, params) => {
+  try {
+    const res = await fetch(url, params);
+    if (res.status !== 200 && res.status !== 400) {
+      throw new HttpResponseError(res.status);
+    }
+    const html = res.text();
+    if (res.status === 200) return html;
+    if (res.status === 400) throw html;
+  }
+  catch(error) {
+    if (error.status === 204) {
+      return;
+    }
+    if (error.status === 401) {
+      loginOrRegister();
+      return;
+    }
+    throw error
+  }
+}
 
 const restGet = (url) => restRequest(url, {});
 
