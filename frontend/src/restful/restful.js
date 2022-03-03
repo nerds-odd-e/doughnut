@@ -15,7 +15,7 @@ const request = async (url, params) => {
   try {
     const res = await fetch(url, params)
     if (res.status === 200 || res.status === 400) {
-      return await jsonResponseHelper(res);
+      return res;
     }
     throw new HttpResponseError(res.status);
   }
@@ -31,7 +31,7 @@ const request = async (url, params) => {
   }
 }
 
-const restRequest = async (url, params) => request(url, params)
+const restRequest = (url, params) => request(url, params).then(jsonResponseHelper)
 
 const restRequestWithHtmlResponse = async (url, params) => {
   try {
