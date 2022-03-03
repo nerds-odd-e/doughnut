@@ -5,13 +5,17 @@ const loginOrRegister = () => {
   window.location = `/users/identify?from=${window.location.href}`;
 };
 
+const jsonResponseHelper = async (response) => {
+  const jsonResponse = await response.json()
+  if (response.status === 400) throw new BadRequestError(jsonResponse.errors);
+  return jsonResponse;
+}
+
 const request = async (url, params) => {
   try {
     const res = await fetch(url, params)
     if (res.status === 200 || res.status === 400) {
-      const jsonResponse = await res.json()
-      if (res.status === 400) throw new BadRequestError(jsonResponse.errors);
-      return jsonResponse;
+      return await jsonResponseHelper(res);
     }
     throw new HttpResponseError(res.status);
   }
