@@ -83,12 +83,12 @@
 
 <script>
 import { loginOrRegister } from '../../restful/restful';
-import { apiLogout } from '../../storedApi'
+import { api } from '../../storedApi'
 
 export default {
   methods: {
     async logout() {
-      await apiLogout()
+      await api().userMethods.logout()
       window.location.href = "/bazaar"
     },
     login() {

@@ -214,10 +214,6 @@ const storedApi = (store) => {
   };
 };
 
-const apiLogout = async () => {
-  await restPostWithHtmlResponse(`/logout`, {});
-};
-
 const apiProcessAnswer = async (reviewPointId, data) => {
   const res = await restPost(`/api/reviews/${reviewPointId}/answer`, data);
   return res;
@@ -228,4 +224,15 @@ const apiRemoveFromReview = async (reviewPointId) => {
   return res;
 };
 
-export { apiLogout, apiProcessAnswer, apiRemoveFromReview, storedApi };
+
+const api = () => {
+  return {
+    userMethods: {
+      async logout() {
+        await restPostWithHtmlResponse(`/logout`, {});
+      },
+    }
+  };
+}
+
+export { api, apiProcessAnswer, apiRemoveFromReview, storedApi };
