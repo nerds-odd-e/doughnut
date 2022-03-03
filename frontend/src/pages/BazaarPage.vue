@@ -31,7 +31,7 @@ export default {
   methods: {
     fetchData() {
       this.loading = true
-      api().getBazaar().then(
+      api(this).getBazaar().then(
         (res) => {
           this.notebooksViewedByUser = res
         }

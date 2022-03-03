@@ -32,13 +32,13 @@ export default {
   methods: {
     fetchData() {
       this.loading = true
-      api().reviewMethods.getReviewSetting(this.noteId)
+      api(this).reviewMethods.getReviewSetting(this.noteId)
       .then((res) => { this.formData = res })
       .finally(() => this.loading = false)
     },
     processForm() {
       this.loading = true
-      api().reviewMethods.updateReviewSetting(this.noteId, this.formData)
+      api(this).reviewMethods.updateReviewSetting(this.noteId, this.formData)
         .then((res) => {
           this.$emit("done");
         })

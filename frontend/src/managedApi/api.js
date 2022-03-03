@@ -11,11 +11,11 @@ class ManagedApi {
   }
 
   around(promise) {
-    if(this.component != null && this.component != undefined) {
+    if(this.component !== null && this.component !== undefined) {
       this.component.loading = true
     }
     return promise.finally(()=>{
-      if(this.component != null && this.component != undefined) {
+      if(this.component !== null && this.component !== undefined) {
         this.component.loading = false
       }
     })

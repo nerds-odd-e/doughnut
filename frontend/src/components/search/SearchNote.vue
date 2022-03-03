@@ -80,7 +80,7 @@ export default {
       }
 
       debounced(() => {
-        api().relativeSearch(this.noteId,
+        api(this).relativeSearch(this.noteId,
           { searchGlobally, searchKey: trimedSearchKey },
         ).then((r) => {
           this.cache[searchGlobally][trimedSearchKey] = r;

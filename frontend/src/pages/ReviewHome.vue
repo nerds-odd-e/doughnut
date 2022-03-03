@@ -20,7 +20,7 @@ export default {
   methods: {
     fetchData() {
       this.loading = true
-      api().reviewMethods.overview().then(
+      api(this).reviewMethods.overview().then(
         (res) => (this.reviewing = res)
       )
       .finally(()=>this.loading = false);

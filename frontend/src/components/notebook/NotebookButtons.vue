@@ -23,7 +23,7 @@ export default {
   methods: {
     async shareNotebook() {
       if (await this.$popups.confirm(`Are you sure to share?`)) {
-        api().shareToBazaar(this.notebook.id)
+        api(this).shareToBazaar(this.notebook.id)
         .then((r) => this.$router.push({ name: "notebooks" }));
       }
     },

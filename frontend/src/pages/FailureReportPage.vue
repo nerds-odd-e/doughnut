@@ -33,7 +33,7 @@ export default {
   methods: {
     fetchData() {
       this.loading = true
-      api().getFailureReport(this.failureReportId).then((res) => {
+      api(this).getFailureReport(this.failureReportId).then((res) => {
         this.failureReport = res.failureReport;
         this.githubIssueUrl = res.githubIssueUrl;
       })

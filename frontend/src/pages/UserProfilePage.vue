@@ -45,7 +45,7 @@ export default {
   },
   methods: {
     fetchData() {
-      api().userMethods.currentUser().then((res) => {
+      api(this).userMethods.currentUser().then((res) => {
         this.formData = res
       })
       .finally(() => this.loading = false);

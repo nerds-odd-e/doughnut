@@ -88,7 +88,7 @@ import api from  '../../managedApi/api'
 export default {
   methods: {
     async logout() {
-      await api().userMethods.logout()
+      await api(this).userMethods.logout()
       window.location.href = "/bazaar"
     },
     login() {

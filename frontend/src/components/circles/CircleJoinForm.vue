@@ -32,7 +32,7 @@ export default {
   methods: {
     processForm() {
       this.loading = true;
-      api().circleMethods.joinCircle(this.formData)
+      api(this).circleMethods.joinCircle(this.formData)
         .then((res) => {
           this.show = false;
           this.$router.push({

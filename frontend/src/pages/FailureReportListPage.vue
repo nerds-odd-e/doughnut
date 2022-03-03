@@ -38,7 +38,7 @@ export default {
   methods: {
     fetchData() {
       this.loading = true
-      api().getFailureReports()
+      api(this).getFailureReports()
         .then((res) => {
           this.failureReports = res
         })

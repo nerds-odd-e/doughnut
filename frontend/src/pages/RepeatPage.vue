@@ -161,7 +161,7 @@ export default {
 
     processAnswer(answerData) {
       this.loading = true
-      api().reviewMethods.processAnswer(this.reviewPointId, answerData)
+      api(this).reviewMethods.processAnswer(this.reviewPointId, answerData)
       .then((res) => {
         this.answerResult = res
         if (res.correct) {
@@ -198,7 +198,7 @@ export default {
         return;
       }
       this.loading = true
-      api().reviewMethods.removeFromReview(this.reviewPointId)
+      api(this).reviewMethods.removeFromReview(this.reviewPointId)
       .then((r) => this.fetchData())
       .finally(() => this.loading = false)
     },

@@ -23,7 +23,7 @@ export default {
           `Are yyou sure to unsubscribe from this notebook??`
         )
       ) {
-        api().subscriptionMethods.deleteSubscription(this.subscription.id
+        api(this).subscriptionMethods.deleteSubscription(this.subscription.id
         ).then((r) => {
           this.$emit("updated");
         });
