@@ -40,13 +40,11 @@ export default {
   },
   methods: {
     fetchData() {
-      this.loading = true
       api(this).circleMethods.getCirclesOfCurrentUser().then(
         (res) => {
           this.circles = res
         }
       )
-      .finally(() => this.loading = false)
     },
   },
   mounted() {

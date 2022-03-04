@@ -30,13 +30,11 @@ export default {
 
   methods: {
     fetchData() {
-      this.loading = true
       api(this).getBazaar().then(
         (res) => {
           this.notebooksViewedByUser = res
         }
       )
-      .finally(()=> this.loading = false)
     },
   },
   mounted() {

@@ -19,11 +19,9 @@ export default {
   components: { ReviewWelcome, ContainerPage },
   methods: {
     fetchData() {
-      this.loading = true
       api(this).reviewMethods.overview().then(
         (res) => (this.reviewing = res)
       )
-      .finally(()=>this.loading = false);
     },
   },
   mounted() {

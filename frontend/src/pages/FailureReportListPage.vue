@@ -37,7 +37,6 @@ export default {
   },
   methods: {
     fetchData() {
-      this.loading = true
       api(this).getFailureReports()
         .then((res) => {
           this.failureReports = res
@@ -45,7 +44,6 @@ export default {
         .catch(
           () => (this.errorMessage = "It seems you cannot access this page.")
         )
-        .finally(() => this.loading = false)
     },
   },
   mounted() {

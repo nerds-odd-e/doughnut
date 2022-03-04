@@ -27,7 +27,6 @@ export default {
 
   methods: {
     processForm() {
-      this.loading = true
       api(this).circleMethods.createCircle(this.formData)
         .then((res) => {
           this.$router.push({
@@ -36,7 +35,6 @@ export default {
           });
         })
         .catch((res) => (this.formErrors = res))
-        .finally(()=>this.loading = false);
     },
   },
 };

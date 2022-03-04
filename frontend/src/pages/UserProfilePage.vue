@@ -48,7 +48,6 @@ export default {
       api(this).userMethods.currentUser().then((res) => {
         this.formData = res
       })
-      .finally(() => this.loading = false);
     },
     processForm() {
       storedApi(this).updateUser(this.formData.id, this.formData)

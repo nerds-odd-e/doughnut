@@ -31,19 +31,15 @@ export default {
   },
   methods: {
     fetchData() {
-      this.loading = true
       api(this).reviewMethods.getReviewSetting(this.noteId)
       .then((res) => { this.formData = res })
-      .finally(() => this.loading = false)
     },
     processForm() {
-      this.loading = true
       api(this).reviewMethods.updateReviewSetting(this.noteId, this.formData)
         .then((res) => {
           this.$emit("done");
         })
         .catch((res) => (this.formErrors = res))
-        .finally(() => this.loading = false)
     },
   },
   mounted() {

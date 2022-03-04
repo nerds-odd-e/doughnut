@@ -31,7 +31,6 @@ export default {
 
   methods: {
     processForm() {
-      this.loading = true;
       api(this).circleMethods.joinCircle(this.formData)
         .then((res) => {
           this.show = false;
@@ -41,7 +40,6 @@ export default {
           });
         })
         .catch((res) => (this.formErrors = res))
-        .finally(()=>this.loading = false);
     },
   },
 };

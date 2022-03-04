@@ -159,7 +159,6 @@ export default {
     },
 
     processAnswer(answerData) {
-      this.loading = true
       api(this).reviewMethods.processAnswer(this.reviewPointId, answerData)
       .then((res) => {
         this.answerResult = res
@@ -172,7 +171,6 @@ export default {
         }
         this.resetRoute()
       })
-      .finally(() => this.loading = false)
     },
 
     selfEvaluate(data) {

@@ -32,12 +32,10 @@ export default {
   },
   methods: {
     fetchData() {
-      this.loading = true
       api(this).getFailureReport(this.failureReportId).then((res) => {
         this.failureReport = res.failureReport;
         this.githubIssueUrl = res.githubIssueUrl;
       })
-      .finally(() => this.loading = false)
     },
   },
   mounted() {

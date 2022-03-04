@@ -28,13 +28,11 @@ export default {
 
   methods: {
     processForm() {
-      this.loading = true
       api(this).subscriptionMethods.subscribe(this.notebook.id, this.formData)
         .then((res) => {
           this.$router.push({ name: "notebooks" });
         })
         .catch((res) => (this.formErrors = res))
-        .finally(()=>this.loading = false);
     },
   },
 };
