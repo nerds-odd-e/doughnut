@@ -80,6 +80,7 @@ For MS Windows WSL2 users:
 | Run all e2e test                      | `yarn test` (starts backend SUT and compile frontend and cypress headless)                                        |
 | Run all e2e test with FE in dev mode  | `yarn test:dev` (starts backend SUT and frontend in dev mode and cypress headless)                                |
 | Run cypress IDE                       | `yarn sut`, `yarn frontend:sut` and `yarn cy:open` (starts frontend SUT in dev mode, backend SUT and cypress IDE) |
+| Generate TypeScript Interfaces        | `yarn generateTypeScript` (Generate TypeScript Interfaces from backend JSON classes. Should run manually every time backend JSON class changes)|
 
 #### Structure
 

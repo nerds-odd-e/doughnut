@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-03-04 18:29:58.
+// Generated using typescript-generator version 2.35.1025 on 2022-03-04 18:36:49.
 
 declare namespace Generated {
 

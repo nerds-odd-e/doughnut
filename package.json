@@ -13,6 +13,7 @@
     "backend:test": "./gradlew testDBMigrate && ./gradlew test --build-cache --parallel",
     "backend:build": "backend/gradlew -p backend build -x test --build-cache --parallel",
     "backend:prod_build": "backend/gradlew -p backend build -x test -Dspring.profiles.active=prod --build-cache --parallel",
+    "generateTypeScript": "backend/gradlew -p backend generateTypeScript",
     "cy:open": "cypress open --env configFile=development",
     "cy:run:dev": "cypress run --env configFile=development",
     "cy:run": "cypress run --env configFile=ci",
