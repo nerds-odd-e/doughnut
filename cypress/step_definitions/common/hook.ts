@@ -12,14 +12,14 @@ import {
   When,
 } from "cypress-cucumber-preprocessor/steps";
 
-Before({ tags: "@stopTime" }, () => {
-  cy.clock()
-})
-
 Before(() => {
   cy.cleanDBAndSeedData();
   cy.wrap(false).as('firstVisited')
 });
+
+Before({ tags: "@stopTime" }, () => {
+  cy.clock()
+})
 
 Before({ tags: "@featureToggle" }, () => {
   cy.enableFeatureToggle(true)
