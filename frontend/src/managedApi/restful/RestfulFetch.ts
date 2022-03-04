@@ -2,7 +2,7 @@ import HttpResponseError from "./HttpResponseError";
 import BadRequestError from "./BadRequestError";
 import loginOrRegister from "./loginOrRegister";
 
-function objectToFormData(data) {
+function objectToFormData(data: any) {
   const formData = new FormData();
   Object.keys(data).forEach((key) => {
     if (data[key] === null) {
@@ -21,12 +21,13 @@ function objectToFormData(data) {
   return formData;
 }
 
-const request = async (url, data, {method="GET", contentType='json'}) => {
-  const headers = {Accept: 'application/json' };
-  let body;
+const request = async (url: string, data: any, {method="GET", contentType='json'}) => {
+  const headers = new Headers();
+  headers.set('Accept', 'application/json');
+  let body: any;
   if (method !== "GET") {
     if (contentType === 'json') {
-      headers["Content-Type"] = 'application/json';
+      headers.set("Content-Type", 'application/json');
       body = JSON.stringify(data)
     }
     else {
@@ -38,7 +39,7 @@ const request = async (url, data, {method="GET", contentType='json'}) => {
     return res;
   }
   if (res.status === 204) {
-    return {json: ()=>null, text: ()=>null};
+    return {status: 204, json: ()=>null, text: ()=>null};
   }
   if (res.status === 401) {
     loginOrRegister();
@@ -47,26 +48,27 @@ const request = async (url, data, {method="GET", contentType='json'}) => {
 }
 
 class RestfulFetch {
-  constructor(base_url) {
+  base_url: string
+  constructor(base_url: string) {
     this.base_url = base_url
-    this.expanUrl = (url) => {
-      if(url.startsWith("/")) return url;
-      return this.base_url + url;
-    }
   }
 
-  async restRequest(url, data, params) {
-    const response = await request(this.expanUrl(url), data, params);
+  private expandUrl(url: string): string {
+    if(url.startsWith("/")) return url;
+    return this.base_url + url;
+  }
+
+  async restRequest(url: string, data: any, params: any) {
+    const response = await request(this.expandUrl(url), data, params);
     const jsonResponse = await response.json()
     if (response.status === 400) throw new BadRequestError(jsonResponse.errors);
     return jsonResponse;
   }
 
-  async restRequestWithHtmlResponse(url, data, params) {
-    const response = await request(this.expanUrl(url), data, params)
-    const html = await response.text();
-    if (response.status === 400) throw Error("BadRequest", html);
-    return html;
+  async restRequestWithHtmlResponse(url: string, data: any, params: any) {
+    const response = await request(this.expandUrl(url), data, params)
+    if (response.status === 400) throw Error("BadRequest");
+    return await response.text();
   }
 }
 
