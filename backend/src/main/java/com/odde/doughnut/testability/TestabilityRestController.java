@@ -264,20 +264,5 @@ class TestabilityRestController {
         testabilitySettings.setAlwaysChoose(randomization.choose);
         return Collections.emptyList();
     }
-
-    static class AddCommentByUser {
-        public String externalIdentifier;
-        public String note;
-        public String commentDescription;
-    }
-
-    @PostMapping(value = "/add_comment_by_user")
-    @Transactional
-    public Integer addComment(@RequestBody AddCommentByUser addCommentByUser ) {
-        final UserModel userModel = getUserModelByExternalIdentifier(addCommentByUser.externalIdentifier);
-        User user = userModel.getEntity(); 
-
-        return 1;
-    }
-
 }
+

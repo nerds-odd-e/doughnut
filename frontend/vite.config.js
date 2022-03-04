@@ -29,7 +29,6 @@ export default defineConfig({
       "/logout": "http://localhost:9081",
       "/users/identify": "http://localhost:9081",
       "/testability": "http://localhost:9081",
-      "/websocket": "http://localhost:9081"
     },
   },
   resolve: {

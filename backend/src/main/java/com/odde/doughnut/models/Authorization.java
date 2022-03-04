@@ -82,12 +82,6 @@ public record Authorization(User user,
         }
     }
 
-    public void assertAuthorization(Comment comment) throws NoAccessRightException {
-        if (comment.getUser().getId() != user.getId()) {
-            throw new NoAccessRightException();
-        }
-    }
-
     public void assertDeveloperAuthorization() throws NoAccessRightException {
         if (!isDeveloper()) {
             throw new NoAccessRightException();

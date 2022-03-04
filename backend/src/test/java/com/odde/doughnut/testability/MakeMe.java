@@ -28,14 +28,6 @@ public class MakeMe {
         return new NoteBuilder(new Note(), this);
     }
 
-    public CommentBuilder aComment(Note note, User user) {
-        return new CommentBuilder(new Comment(), this).note(note).user(user);
-    }
-
-    public CommentBuilder aComment(Note note, User user, String content) {
-        return aComment(note, user).content(content);
-    }
-
     public NoteBuilder aNote(String title) {
         return aNote().title(title);
     }
@@ -46,10 +38,6 @@ public class MakeMe {
 
     public NoteBuilder theNote(Note note) {
         return new NoteBuilder(note, this);
-    }
-
-    public CommentReadStatusBuilder aCommentReadStatus(Comment comment, User user) {
-        return new CommentReadStatusBuilder(new CommentReadStatus(), this).comment(comment).user(user);
     }
 
     public BazaarNotebookBuilder aBazaarNodebook(Notebook notebook) {

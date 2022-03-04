@@ -35,8 +35,6 @@ public class ModelFactoryService {
     public EntityManager entityManager;
     @Autowired
     public FailureReportRepository failureReportRepository;
-    @Autowired
-    public CommentRepository commentRepository;
 
     public NoteModel toNoteModel(Note note) {
         return new NoteModel(note, this);
@@ -96,7 +94,4 @@ public class ModelFactoryService {
     public Authorization toAuthorization(User entity) {
         return new Authorization(entity, this);
     }
-
-    public CommentModel toCommentModel(Comment comment) { return new CommentModel(comment, this); }
-
 }
