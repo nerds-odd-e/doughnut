@@ -1,8 +1,18 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'cz.habarta.typescript-generator:typescript-generator-gradle-plugin:2.35.1025'
+    }
+}
+
 plugins {
     id 'org.springframework.boot' version '2.6.3'
     id 'io.spring.dependency-management' version '1.0.11.RELEASE'
     id 'java'
 }
+apply plugin: 'cz.habarta.typescript-generator'
 
 group = 'com.odde'
 version = '0.0.1-SNAPSHOT'
@@ -93,4 +103,11 @@ tasks.register("bootRunE2E") {
       }
     }
     finalizedBy("bootRun")
+}
+generateTypeScript {
+    jsonLibrary = 'jackson2'
+    classes = [ 'com.odde.doughnut.entities.json.NoteViewedByUser']
+    outputFile = '../frontend/generated/rest.d.ts'
+    outputKind = 'global'
+    namespace = 'Generated';
 }
