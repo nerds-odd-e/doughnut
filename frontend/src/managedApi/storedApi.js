@@ -1,7 +1,7 @@
 import ManagedApi from './ManagedApi';
 
-const storedApi = (component) => {
-  const managedApi = new ManagedApi(component);
+const storedApi = (component, options={}) => {
+  const managedApi = new ManagedApi(component, options);
   const store = component.$store
 
   function loadReviewPointViewedByUser(data) {

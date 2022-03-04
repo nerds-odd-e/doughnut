@@ -8,20 +8,23 @@ import {
 } from '../restful/restful';
 
 class ManagedApi {
-  constructor(component) {
+  constructor(component, options={}) {
     this.component = component;
+    this.skipLoading = options.skipLoading;
   }
 
   around(promise) {
-    if(this.component !== null && this.component !== undefined) {
-      this.component.loading = true
-    }
-    return promise.finally(()=>{
+    const assignLoading = (value) => {
+      if (this.skipLoading) return;
       if(this.component !== null && this.component !== undefined) {
-        this.component.loading = false
+        this.component.loading = value
       }
-    })
+    }
 
+    assignLoading(true);
+    return new Promise((resolve, reject) => {
+      promise.then(resolve).catch(reject).finally(()=>assignLoading(false))
+    });
   }
 
   restGet(url) { return this.around(restGet(url)); }
