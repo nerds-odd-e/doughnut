@@ -11,6 +11,7 @@ class ManagedApi {
   constructor(component, options={}) {
     this.component = component;
     this.skipLoading = options.skipLoading;
+    this.base_url = ''
   }
 
   around(promise) {
@@ -27,17 +28,17 @@ class ManagedApi {
     });
   }
 
-  restGet(url) { return this.around(restGet(url)); }
+  restGet(url) { return this.around(restGet(this.base_url + url)); }
 
-  restPost(url, data) { return this.around(restPost(url, data));}
+  restPost(url, data) { return this.around(restPost(this.base_url + url, data));}
 
-  restPatch(url, data) { return this.around(restPatch(url, data));}
+  restPatch(url, data) { return this.around(restPatch(this.base_url + url, data));}
 
-  restPostMultiplePartForm(url, data) {return this.around(restPostMultiplePartForm(url, data));}
+  restPostMultiplePartForm(url, data) {return this.around(restPostMultiplePartForm(this.base_url + url, data));}
 
-  restPatchMultiplePartForm(url, data) {return this.around(restPatchMultiplePartForm(url, data));}
+  restPatchMultiplePartForm(url, data) {return this.around(restPatchMultiplePartForm(this.base_url + url, data));}
 
-  restPostWithHtmlResponse(url, data) {return this.around(restPostWithHtmlResponse(url, data));}
+  restPostWithHtmlResponse(url, data) {return this.around(restPostWithHtmlResponse(this.base_url + url, data));}
 }
 
 export default ManagedApi;

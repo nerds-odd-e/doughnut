@@ -88,6 +88,9 @@ const api = (component) => {
             )
         },
     },
+    getStatistics(noteId, linkId) {
+        return managedApi.restGet(`/api/${noteId ? `notes/${noteId}`: `links/${linkId}`}/statistics`);
+    }
   };
 }
 

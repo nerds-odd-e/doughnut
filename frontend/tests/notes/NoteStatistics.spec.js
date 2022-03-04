@@ -26,7 +26,7 @@ describe("note statistics", () => {
     const wrapper = mount(NoteStatistics, { propsData: { noteId: "123" } });
     await flushPromises();
     expect(fetch).toHaveBeenCalledTimes(1);
-    expect(fetch).toHaveBeenCalledWith("/api/notes/123/statistics");
+    expect(fetch).toHaveBeenCalledWith("/api/notes/123/statistics", expect.anything());
     expect(wrapper.findAll(".statistics-value")).toHaveLength(0);
   });
 
@@ -41,7 +41,7 @@ describe("note statistics", () => {
     fetch.mockResponseOnce(JSON.stringify(stubLinkResponse));
     const wrapper = mount(NoteStatistics, { propsData: { linkid: "123" } });
     await flushPromises();
-    expect(fetch).toHaveBeenCalledWith("/api/links/123/statistics");
+    expect(fetch).toHaveBeenCalledWith("/api/links/123/statistics", expect.anything());
     expect(wrapper.findAll(".statistics-value")).toHaveLength(4);
   });
 });
