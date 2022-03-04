@@ -49,58 +49,46 @@ const request = async (url, data, {method="GET", contentType='json'}) => {
   throw new HttpResponseError(res.status);
 }
 
-const restRequest = async (url, data, params) => {
-  const response = await request(url, data, params);
-  const jsonResponse = await response.json()
-  if (response.status === 400) throw new BadRequestError(jsonResponse.errors);
-  return jsonResponse;
-}
-
-const restRequestWithHtmlResponse = async (url, data, params) => {
-  const response = await request(url, data, params)
-  const html = await response.text();
-  if (response.status === 400) throw Error("BadRequest", html);
-  return html;
-}
-
-const restGet = (url) => restRequest(url, {}, {});
-
-const restPost = (url, data) =>
-  restRequest( url, data, { method: 'POST' });
-
-const restPatch = (url, data) =>
-  restRequest( url, data, { method: 'PATCH' });
-
-const restPostMultiplePartForm = (url, data) =>
-  restRequest( url, data, { method: 'POST', contentType: "MultiplePartForm" });
-
-const restPatchMultiplePartForm = (url, data) =>
-  restRequest( url, data, { method: 'PATCH', contentType: "MultiplePartForm" });
-
-const restPostWithHtmlResponse = (url, data) =>
-  restRequestWithHtmlResponse(url, data, { method: 'POST'});
-
 class Api {
   constructor(base_url) {
     this.base_url = base_url
+    const expanUrl = (url) => {
+      if(url.startsWith("/")) return url;
+      return this.base_url + url;
+    }
+
+    this.restRequest = async (url, data, params) => {
+      const response = await request(expanUrl(url), data, params);
+      const jsonResponse = await response.json()
+      if (response.status === 400) throw new BadRequestError(jsonResponse.errors);
+      return jsonResponse;
+    }
+
+    this.restRequestWithHtmlResponse = async (url, data, params) => {
+      const response = await request(expanUrl(url), data, params)
+      const html = await response.text();
+      if (response.status === 400) throw Error("BadRequest", html);
+      return html;
+    }
   }
 
-  url(url) {
-    if(url.startsWith("/")) return url;
-    return this.base_url + url;
+  restGet(url) { return this.restRequest(url, {}, {}); }
+
+  restPost(url, data) { return this.restRequest( url, data, { method: 'POST' }); }
+
+  restPatch(url, data) { return this.restRequest( url, data, { method: 'PATCH' }); }
+
+  restPostMultiplePartForm(url, data) {
+     return this.restRequest( url, data, { method: 'POST', contentType: "MultiplePartForm" });
   }
 
-  restGet(url) { return restGet(this.url(url)); }
+  restPatchMultiplePartForm(url, data) {
+    return this.restRequest( url, data, { method: 'PATCH', contentType: "MultiplePartForm" });
+  }
 
-  restPost(url, data) { return restPost(this.url(url), data);}
-
-  restPatch(url, data) { return restPatch(this.url(url), data);}
-
-  restPostMultiplePartForm(url, data) {return restPostMultiplePartForm(this.url(url), data);}
-
-  restPatchMultiplePartForm(url, data) {return restPatchMultiplePartForm(this.url(url), data);}
-
-  restPostWithHtmlResponse(url, data) {return restPostWithHtmlResponse(this.url(url), data);}
+  restPostWithHtmlResponse(url, data) {
+    return this.restRequestWithHtmlResponse(url, data, { method: 'POST'});
+  }
 }
 
 export {
