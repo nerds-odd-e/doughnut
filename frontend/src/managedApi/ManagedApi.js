@@ -1,6 +1,6 @@
 import {
   Api,
-} from '../restful/restful';
+} from './restful/restful';
 
 class ManagedApi {
   constructor(component, options={}) {
