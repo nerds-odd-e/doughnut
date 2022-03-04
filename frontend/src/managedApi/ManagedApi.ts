@@ -11,7 +11,7 @@ class ManagedApi {
 
   skipLoading: boolean;
 
-  constructor(component: ManaagedComponent, options: {skipLoading: boolean}) {
+  constructor(component: ManaagedComponent, options: {skipLoading: boolean}={skipLoading: false}) {
     this.api = new Api('/api/')
     this.component = component;
     this.skipLoading = options.skipLoading;
