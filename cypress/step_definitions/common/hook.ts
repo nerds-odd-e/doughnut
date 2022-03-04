@@ -27,7 +27,9 @@ Before({ tags: "@stopTime" }, () => {
 // the next test resets the DB while the current page refreshes
 // itself. So, here it visits the blank page at the end of each test.
 After({ tags: "@stopTime" }, () => {
-  cy.visit('about:blank')
+  cy.window().then((win) => {
+    win.location.href = 'about:blank'
+  })
 })
 
 Before({ tags: "@featureToggle" }, () => {
