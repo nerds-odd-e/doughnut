@@ -82,8 +82,8 @@
 </template>
 
 <script>
-import { loginOrRegister } from '../../restful/restful';
 import api from  '../../managedApi/api'
+import loginOrRegister from '../../managedApi/restful/loginOrRegister';
 
 export default {
   methods: {

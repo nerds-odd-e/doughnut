@@ -1,9 +1,6 @@
 import HttpResponseError from "./HttpResponseError";
 import BadRequestError from "./BadRequestError";
-
-const loginOrRegister = () => {
-  window.location = `/users/identify?from=${window.location.href}`;
-};
+import loginOrRegister from "./loginOrRegister";
 
 function objectToFormData(data) {
   const formData = new FormData();
@@ -49,7 +46,7 @@ const request = async (url, data, {method="GET", contentType='json'}) => {
   throw new HttpResponseError(res.status);
 }
 
-class Fetch {
+class RestfulFetch {
   constructor(base_url) {
     this.base_url = base_url
     this.expanUrl = (url) => {
@@ -73,7 +70,4 @@ class Fetch {
   }
 }
 
-export {
-  Fetch,
-  loginOrRegister,
-};
+export default RestfulFetch;
