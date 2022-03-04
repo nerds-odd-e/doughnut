@@ -1,6 +1,4 @@
-import {
-  Api,
-} from './restful/restful';
+import Api from "./restful/Api";
 
 class ManagedApi {
   constructor(component, options={}) {

@@ -49,49 +49,31 @@ const request = async (url, data, {method="GET", contentType='json'}) => {
   throw new HttpResponseError(res.status);
 }
 
-class Api {
+class Fetch {
   constructor(base_url) {
     this.base_url = base_url
-    const expanUrl = (url) => {
+    this.expanUrl = (url) => {
       if(url.startsWith("/")) return url;
       return this.base_url + url;
     }
-
-    this.restRequest = async (url, data, params) => {
-      const response = await request(expanUrl(url), data, params);
-      const jsonResponse = await response.json()
-      if (response.status === 400) throw new BadRequestError(jsonResponse.errors);
-      return jsonResponse;
-    }
-
-    this.restRequestWithHtmlResponse = async (url, data, params) => {
-      const response = await request(expanUrl(url), data, params)
-      const html = await response.text();
-      if (response.status === 400) throw Error("BadRequest", html);
-      return html;
-    }
   }
 
-  restGet(url) { return this.restRequest(url, {}, {}); }
-
-  restPost(url, data) { return this.restRequest( url, data, { method: 'POST' }); }
-
-  restPatch(url, data) { return this.restRequest( url, data, { method: 'PATCH' }); }
-
-  restPostMultiplePartForm(url, data) {
-     return this.restRequest( url, data, { method: 'POST', contentType: "MultiplePartForm" });
+  async restRequest(url, data, params) {
+    const response = await request(this.expanUrl(url), data, params);
+    const jsonResponse = await response.json()
+    if (response.status === 400) throw new BadRequestError(jsonResponse.errors);
+    return jsonResponse;
   }
 
-  restPatchMultiplePartForm(url, data) {
-    return this.restRequest( url, data, { method: 'PATCH', contentType: "MultiplePartForm" });
-  }
-
-  restPostWithHtmlResponse(url, data) {
-    return this.restRequestWithHtmlResponse(url, data, { method: 'POST'});
+  async restRequestWithHtmlResponse(url, data, params) {
+    const response = await request(this.expanUrl(url), data, params)
+    const html = await response.text();
+    if (response.status === 400) throw Error("BadRequest", html);
+    return html;
   }
 }
 
 export {
-  Api,
+  Fetch,
   loginOrRegister,
 };
