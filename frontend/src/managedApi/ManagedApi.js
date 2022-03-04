@@ -1,17 +1,12 @@
 import {
-  restGet,
-  restPost,
-  restPatch,
-  restPostMultiplePartForm,
-  restPatchMultiplePartForm,
-  restPostWithHtmlResponse,
+  Api,
 } from '../restful/restful';
 
 class ManagedApi {
   constructor(component, options={}) {
+    this.api = new Api('/api/')
     this.component = component;
     this.skipLoading = options.skipLoading;
-    this.base_url = '/api/'
   }
 
   around(promise) {
@@ -28,17 +23,17 @@ class ManagedApi {
     });
   }
 
-  restGet(url) { return this.around(restGet(this.base_url + url)); }
+  restGet(url) { return this.around(this.api.restGet(url)); }
 
-  restPost(url, data) { return this.around(restPost(this.base_url + url, data));}
+  restPost(url, data) { return this.around(this.api.restPost(url, data));}
 
-  restPatch(url, data) { return this.around(restPatch(this.base_url + url, data));}
+  restPatch(url, data) { return this.around(this.api.restPatch(url, data));}
 
-  restPostMultiplePartForm(url, data) {return this.around(restPostMultiplePartForm(this.base_url + url, data));}
+  restPostMultiplePartForm(url, data) {return this.around(this.api.restPostMultiplePartForm(url, data));}
 
-  restPatchMultiplePartForm(url, data) {return this.around(restPatchMultiplePartForm(this.base_url + url, data));}
+  restPatchMultiplePartForm(url, data) {return this.around(this.api.restPatchMultiplePartForm(url, data));}
 
-  restPostWithHtmlResponse(url, data) {return this.around(restPostWithHtmlResponse(this.base_url + url, data));}
+  restPostWithHtmlResponse(url, data) {return this.around(this.api.restPostWithHtmlResponse(url, data));}
 }
 
 export default ManagedApi;

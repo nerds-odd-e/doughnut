@@ -80,12 +80,30 @@ const restPatchMultiplePartForm = (url, data) =>
 const restPostWithHtmlResponse = (url, data) =>
   restRequestWithHtmlResponse(url, data, { method: 'POST'});
 
+class Api {
+  constructor(base_url) {
+    this.base_url = base_url
+  }
+
+  url(url) {
+    if(url.startsWith("/")) return url;
+    return this.base_url + url;
+  }
+
+  restGet(url) { return restGet(this.url(url)); }
+
+  restPost(url, data) { return restPost(this.url(url), data);}
+
+  restPatch(url, data) { return restPatch(this.url(url), data);}
+
+  restPostMultiplePartForm(url, data) {return restPostMultiplePartForm(this.url(url), data);}
+
+  restPatchMultiplePartForm(url, data) {return restPatchMultiplePartForm(this.url(url), data);}
+
+  restPostWithHtmlResponse(url, data) {return restPostWithHtmlResponse(this.url(url), data);}
+}
+
 export {
-  restGet,
-  restPost,
-  restPatch,
-  restPostMultiplePartForm,
-  restPatchMultiplePartForm,
+  Api,
   loginOrRegister,
-  restPostWithHtmlResponse,
 };
