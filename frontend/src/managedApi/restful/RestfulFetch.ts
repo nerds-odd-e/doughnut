@@ -49,6 +49,7 @@ const request = async (url: string, data: any, {method="GET", contentType='json'
 
 class RestfulFetch {
   base_url: string
+
   constructor(base_url: string) {
     this.base_url = base_url
   }
@@ -68,7 +69,7 @@ class RestfulFetch {
   async restRequestWithHtmlResponse(url: string, data: any, params: any) {
     const response = await request(this.expandUrl(url), data, params)
     if (response.status === 400) throw Error("BadRequest");
-    return await response.text();
+    return response.text();
   }
 }
 
