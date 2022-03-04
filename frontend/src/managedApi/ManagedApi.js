@@ -11,7 +11,7 @@ class ManagedApi {
   constructor(component, options={}) {
     this.component = component;
     this.skipLoading = options.skipLoading;
-    this.base_url = ''
+    this.base_url = '/api/'
   }
 
   around(promise) {

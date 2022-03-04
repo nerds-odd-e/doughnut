@@ -9,87 +9,87 @@ const api = (component) => {
       },
 
       currentUser() {
-          return managedApi.restGet(`/api/user`);
+          return managedApi.restGet(`user`);
       },
     },
     reviewMethods: {
       processAnswer(reviewPointId, data) {
-        return managedApi.restPost(`/api/reviews/${reviewPointId}/answer`, data);
+        return managedApi.restPost(`reviews/${reviewPointId}/answer`, data);
       },
 
       removeFromReview(reviewPointId) {
-        return managedApi.restPost(`/api/review-points/${reviewPointId}/remove`, {});
+        return managedApi.restPost(`review-points/${reviewPointId}/remove`, {});
       },
 
       overview() {
-          return managedApi.restGet(`/api/reviews/overview`);
+          return managedApi.restGet(`reviews/overview`);
       },
 
       getReviewSetting(noteId) {
-          return managedApi.restGet(`/api/notes/${noteId}/review-setting`);
+          return managedApi.restGet(`notes/${noteId}/review-setting`);
       },
 
       updateReviewSetting(noteId, data) {
-          return managedApi.restPost(`/api/notes/${noteId}/review-setting`, data);
+          return managedApi.restPost(`notes/${noteId}/review-setting`, data);
       }
     },
     circleMethods: {
         createCircle(data) {
-            return managedApi.restPostMultiplePartForm("/api/circles", data);
+            return managedApi.restPostMultiplePartForm("circles", data);
         },
         joinCircle(data) {
-            return managedApi.restPostMultiplePartForm( `/api/circles/join`, data)
+            return managedApi.restPostMultiplePartForm( `circles/join`, data)
         },
         getCirclesOfCurrentUser() {
-            return managedApi.restGet("/api/circles");
+            return managedApi.restGet("circles");
         },
     },
 
     relativeSearch(noteId, {searchGlobally, searchKey}) {
         return managedApi.restPost(
-          `/api/notes/${noteId}/search`,
+          `notes/${noteId}/search`,
           { searchGlobally, searchKey })
     },
 
     updateNotebookSettings(notebookId, data) {
       return managedApi.restPostMultiplePartForm(
-        `/api/notebooks/${notebookId}`, data
+        `notebooks/${notebookId}`, data
       )
     },
 
     getBazaar() {
-        return managedApi.restGet("/api/bazaar");
+        return managedApi.restGet("bazaar");
     },
     shareToBazaar(notebookId) {
-        return managedApi.restPost( `/api/notebooks/${notebookId}/share`, {})
+        return managedApi.restPost( `notebooks/${notebookId}/share`, {})
     },
 
     getFailureReports() {
-        return managedApi.restGet("/api/failure-reports");
+        return managedApi.restGet("failure-reports");
     },
     getFailureReport(failureReportId) {
-        return managedApi.restGet(`/api/failure-reports/${failureReportId}`);
+        return managedApi.restGet(`failure-reports/${failureReportId}`);
     },
     subscriptionMethods: {
         subscribe(notebookId, data) {
         return managedApi.restPostMultiplePartForm(
-            `/api/subscriptions/notebooks/${notebookId}/subscribe`, data
+            `subscriptions/notebooks/${notebookId}/subscribe`, data
         )
         },
         updateSubscription(subscriptionId, data) {
         return managedApi.restPostMultiplePartForm(
-            `/api/subscriptions/${subscriptionId}`, data
+            `subscriptions/${subscriptionId}`, data
         )
         },
         deleteSubscription(subscriptionId) {
             return managedApi.restPost(
-            `/api/subscriptions/${subscriptionId}/delete`,
+            `subscriptions/${subscriptionId}/delete`,
             {},
             )
         },
     },
     getStatistics(noteId, linkId) {
-        return managedApi.restGet(`/api/${noteId ? `notes/${noteId}`: `links/${linkId}`}/statistics`);
+        return managedApi.restGet(`${noteId ? `notes/${noteId}`: `links/${linkId}`}/statistics`);
     }
   };
 }
