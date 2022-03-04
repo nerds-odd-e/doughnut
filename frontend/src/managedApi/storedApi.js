@@ -132,17 +132,6 @@ const storedApi = (component, options={}) => {
       return updateTextContentWithoutUndo(noteId, noteContentData);
     },
 
-    async addCommentToNote(noteId, commentContentData) {
-      const { updatedAt, ...data } = commentContentData;
-      const res = await managedApi.restPost(
-        `comments/${noteId}/add`,
-        data,
-        () => null
-      );
-      store.commit('loadComments', [res]);
-      return res;
-    },
-
     async undo() {
       const history = store.getters.peekUndo();
       store.commit('popUndoHistory');

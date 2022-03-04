@@ -40,7 +40,6 @@ export default createStore({
   state: () => ({
     notebooks: [],
     notes: {},
-    comments: {},
     highlightNoteId: null,
     viewType: null,
     noteUndoHistories: [],
@@ -82,11 +81,6 @@ export default createStore({
     loadNotes(state, notes) {
       notes.forEach((note) => {
        state.notes[note.id] = note;
-      });
-    },
-    loadComments(state, comments) {
-      comments.forEach((comment) => {
-       state.comments[comment.id] = comment;
       });
     },
     deleteNote(state, noteId) {
