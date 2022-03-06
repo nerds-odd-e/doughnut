@@ -25,7 +25,7 @@ describe("storeUndoCommand", () => {
     let initialUndoCount;
 
     beforeEach(() => {
-      store.commit('loadNotes', [note]);
+      store.getters.ps().loadNotes([note]);
       store.commit('addEditingToUndoHistory', mockUpdatedNote);
       initialUndoCount = store.state.piniaStore.noteUndoHistories.length;
     });

@@ -17,7 +17,7 @@ describe("repeat page", () => {
   const popupMock = { alert: jest.fn() }
 
   const mountPage = async (repetition)=>{
-    store.commit('loadNotes', [note])
+    store.getters.ps().loadNotes([note])
     fetch.mockResponseOnce(JSON.stringify(repetition))
     const { wrapper, mockRouter }  = mountWithStoreAndMockRoute(
       store,
@@ -51,7 +51,7 @@ describe("repeat page", () => {
 
   describe("repeat page with no quiz (or after quiz)", () => {
     const note = makeMe.aNote.please()
-    store.commit('loadNotes', [note])
+    store.getters.ps().loadNotes([note])
     const repetition = makeMe.aRepetition.ofNote(note).please()
 
     test("stay at repeat page if there is no quiz", async () => {
