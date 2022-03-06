@@ -14,8 +14,13 @@
 import NotebookBazaarViewCards from "../components/bazaar/NotebookBazaarViewCards.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import api from  "../managedApi/api";
+import { useStore } from "@/store";
 
 export default {
+  setup() {
+    const store = useStore()
+    return { store }
+  },
   name: "NotebooksPage",
   components: { ContainerPage, NotebookBazaarViewCards },
   data() {
@@ -25,7 +30,7 @@ export default {
     };
   },
   computed: {
-    user() { return this.$store.getters.getCurrentUser()}
+    user() { return this.store.getCurrentUser()}
   },
 
   methods: {

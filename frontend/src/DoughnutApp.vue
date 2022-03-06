@@ -3,8 +3,13 @@ import Popups from "./components/commons/Popups.vue";
 import MainMenu from "./components/commons/MainMenu.vue";
 import UserNewRegisterPage from "./pages/UserNewRegisterPage.vue";
 import storedApi from  "./managedApi/storedApi"
+import { useStore } from "@/store";
 
 export default {
+  setup() {
+    const store = useStore()
+    return { store }
+  },
   data() {
     return {
       externalIdentifier: null,
@@ -30,7 +35,7 @@ export default {
 
   computed: {
     newUser() { return !this.user && !!this.externalIdentifier; },
-    user() { return this.$store.getters.getCurrentUser()},
+    user() { return this.store.getCurrentUser()},
   },
 
   methods: {

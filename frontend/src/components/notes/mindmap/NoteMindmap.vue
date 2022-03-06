@@ -59,11 +59,16 @@ import NoteParentChildConnection from "./NoteParentChildConnection.vue";
 import NoteLinks from "./NoteLinks.vue";
 import MindmapSector from "@/models/MindmapSector";
 import Mindmap from "@/models/Mindmap";
+import { useStore } from "@/store";
 
 export default {
+  setup() {
+    const store = useStore()
+    return { store }
+  },
   name: "NoteMindmap",
   props: {
-    highlightNoteId: [String, Number],
+    highlightNoteId: [String, Number, Function],
     noteId: [String, Number],
     expandChildren: Boolean,
     offset: Object,
@@ -83,7 +88,7 @@ export default {
         this.offset.scale,
         this.mindmapSector,
         this.noteId,
-        this.$store.getters.getNoteById,
+        this.store.getNoteById(),
         150,
         50
       )

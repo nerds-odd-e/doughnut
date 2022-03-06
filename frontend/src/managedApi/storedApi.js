@@ -1,14 +1,16 @@
-import ManagedApi from './ManagedApi';
+import ManagedApi from "./ManagedApi";
+import { useStore } from "@/store";
 
 const storedApi = (component, options={}) => {
   const managedApi = new ManagedApi(component, options);
-  const store = component.$store
+  //const store = component.$store
+  const store = useStore();
 
   function loadReviewPointViewedByUser(data) {
     if (!data) return;
     const { noteWithPosition, linkViewedbyUser } = data;
     if (noteWithPosition) {
-      store.commit('loadNotes', [noteWithPosition.note]);
+      store.loadNotes([noteWithPosition.note]);
     }
     if (linkViewedbyUser) {
       loadReviewPointViewedByUser({
@@ -26,7 +28,7 @@ const storedApi = (component, options={}) => {
       `text_content/${noteId}`,
       data,
     );
-    store.commit('loadNotes', [res]);
+    store.loadNotes([res]);
     return res;
   }
 
@@ -62,19 +64,19 @@ const storedApi = (component, options={}) => {
 
     async getNoteWithDescendents(noteId) {
       const res = await managedApi.restGet(`notes/${noteId}/overview`);
-      store.commit('loadNotes', res.notes);
+      store.loadNotes(res.notes);
       return res;
     },
 
     async getNoteAndItsChildren(noteId) {
       const res = await managedApi.restGet(`notes/${noteId}`);
-      store.commit('loadNotes', res.notes);
+      store.loadNotes(res.notes);
       return res;
     },
 
     async getNotebooks() {
       const res = await managedApi.restGet(`notebooks`);
-      store.commit('notebooks', res.notebooks);
+      store.notebooks(res.notebooks);
       return res;
     },
 
@@ -95,7 +97,7 @@ const storedApi = (component, options={}) => {
         `notes/${parentId}/create`,
         data
       );
-      store.commit('loadNotes', res.notes);
+      store.loadNotes(res.notes);
       return res;
     },
 
@@ -104,37 +106,39 @@ const storedApi = (component, options={}) => {
         `links/create/${sourceId}/${targetId}`,
         data
       );
-      store.commit('loadNotes', res.notes);
+      store.loadNotes(res.notes);
       return res;
     },
 
     async updateLink(linkId, data) {
       const res = await managedApi.restPost(`links/${linkId}`, data);
-      store.commit('loadNotes', res.notes);
+      store.loadNotes(res.notes);
       return res;
     },
 
     async deleteLink(linkId) {
       const res = await managedApi.restPost(`links/${linkId}/delete`, {});
-      store.commit('loadNotes', res.notes);
+      store.loadNotes(res.notes);
       return res;
     },
 
     async updateNote(noteId, noteContentData) {
       const { updatedAt, ...data } = noteContentData;
       const res = await managedApi.restPatchMultiplePartForm(`notes/${noteId}`, data);
-      store.commit('loadNotes', [res]);
+      store.loadNotes([res]);
       return res;
     },
 
     async updateTextContent(noteId, noteContentData) {
-      store.commit('addEditingToUndoHistory', { noteId });
-      return updateTextContentWithoutUndo(noteId, noteContentData);
+      console.log(`>>>>> updateTextContent BEFORE store.addEditingToUndoHistory called ${noteId} ${JSON.stringify(noteContentData)}`);
+      store.addEditingToUndoHistory({ noteId });
+      console.log(`>>>>> updateTextContent AFTER store.addEditingUndoHistory ${store.noteUndoHistories}`);
+      return await updateTextContentWithoutUndo(noteId, noteContentData);
     },
 
     async undo() {
-      const history = store.getters.peekUndo();
-      store.commit('popUndoHistory');
+      const history = store.peekUndo();
+      store.popUndoHistory();
       if (history.type === 'editing') {
         return updateTextContentWithoutUndo(
           history.noteId,
@@ -145,7 +149,7 @@ const storedApi = (component, options={}) => {
         `notes/${history.noteId}/undo-delete`,
         {}
       );
-      store.commit('loadNotes', res.notes);
+      store.loadNotes(res.notes);
       if (res.notes[0].parentId === null) {
         this.getNotebooks(store);
       }
@@ -154,25 +158,25 @@ const storedApi = (component, options={}) => {
 
     async deleteNote(noteId) {
       const res = await managedApi.restPost(`notes/${noteId}/delete`, {}, () => null);
-      store.commit('deleteNote', noteId);
+      store.deleteNote(noteId);
       return res;
     },
 
     async getCurrentUserInfo() {
       const res = await managedApi.restGet(`user/current-user-info`);
-      store.commit('currentUser', res.user);
+      store.currentUser(res.user);
       return res;
     },
 
     async updateUser(userId, data) {
       const res = await managedApi.restPatchMultiplePartForm(`user/${userId}`, data);
-      store.commit('currentUser', res);
+      store.currentUser(res);
       return res;
     },
 
     async createUser(data) {
       const res = await managedApi.restPostMultiplePartForm(`user`, data);
-      store.commit('currentUser', res);
+      store.currentUser(res);
       return res;
     },
 
@@ -180,7 +184,7 @@ const storedApi = (component, options={}) => {
       return (
         !window.location.href.includes('odd-e.com') &&
         managedApi.restGet(`testability/feature_toggle`).then((res) =>
-          store.commit('featureToggle', res)
+          store.featureToggle(res)
         )
       );
     },

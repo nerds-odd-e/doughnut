@@ -11,8 +11,13 @@
 
 <script lang="ts">
 import NoteWithLinks from "./NoteWithLinks.vue";
+import { useStore } from "@/store/index.js";
 
 export default {
+  setup() {
+    const store = useStore()
+    return { store }
+  },
   name: "NoteOverview",
   props: {
     noteId: [String, Number],
@@ -21,10 +26,10 @@ export default {
   components: { NoteWithLinks },
   computed: {
     note() {
-      return this.$store.getters.getNoteById(this.noteId);
+      return this.store.getNoteById(this.noteId);
     },
     childrenIds() {
-      return this.$store.getters.getChildrenIdsByParentId(this.noteId);
+      return this.store.getChildrenIdsByParentId(this.noteId);
     },
   },
 };

@@ -13,8 +13,13 @@
 import NoteShell from "../NoteShell.vue";
 import NoteContent from "../NoteContent.vue";
 import MindmapSector from "@/models/MindmapSector";
+import { useStore } from "@/store";
 
 export default {
+  setup() {
+    const store = useStore()
+    return { store }
+  },
   props: {
     note: Object,
     mindmapSector: MindmapSector,
@@ -34,7 +39,8 @@ export default {
   },
   methods: {
     highlight() {
-      this.$store.commit('highlightNoteId', this.note.id)
+      //const store = useStore(this.$pinia)
+      this.store.highlightNoteId(this.note.id)
     }
   }
 

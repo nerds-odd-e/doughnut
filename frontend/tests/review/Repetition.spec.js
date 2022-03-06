@@ -2,11 +2,13 @@
  * @jest-environment jsdom
  */
 import Repetition from "@/components/review/Repetition.vue";
-import store from "../../src/store/index.js";
+import { useStore } from "@/store";
 import { mountWithStoreAndMockRoute } from "../helpers";
 import makeMe from "../fixtures/makeMe";
+import { createTestingPinia } from "@pinia/testing";
 
 describe("repetition page", () => {
+  const pinia = createTestingPinia();
   beforeEach(async () => {
     fetch.resetMocks();
     fetch.mockResponseOnce(JSON.stringify({}));
@@ -16,9 +18,9 @@ describe("repetition page", () => {
     const note = makeMe.aNote.please()
     const reviewPointForView = makeMe.aReviewPoint.ofNote(note).please()
 
-    test("for note", async () => {
+    it("for note", async () => {
       const { wrapper } = mountWithStoreAndMockRoute(
-        store,
+        useStore(pinia),
         Repetition,
         { propsData: reviewPointForView },
         { name: "root" }
@@ -31,9 +33,9 @@ describe("repetition page", () => {
     const linkViewedByUser = makeMe.aLinkViewedByUser.please()
     const reviewPointForView = makeMe.aReviewPoint.ofLink(linkViewedByUser).please()
 
-    test("for link", async () => {
+    it("for link", async () => {
       const { wrapper } = mountWithStoreAndMockRoute(
-        store,
+        useStore(pinia),
         Repetition,
         { propsData: reviewPointForView },
         { name: "root" }
@@ -41,9 +43,9 @@ describe("repetition page", () => {
       expect(wrapper.findAll(".btn-toolbar")).toHaveLength(1);
     });
 
-    test("click on note when doing review", async () => {
+    it("click on note when doing review", async () => {
       const { wrapper } = mountWithStoreAndMockRoute(
-        store,
+        useStore(pinia),
         Repetition,
         { propsData: reviewPointForView },
         { name: "repeat" }
@@ -54,9 +56,9 @@ describe("repetition page", () => {
       ).toEqual("notebooks");
     });
 
-    test("click on note when doing review and in a nested page", async () => {
+    it("click on note when doing review and in a nested page", async () => {
       const { wrapper } = mountWithStoreAndMockRoute(
-        store,
+        useStore(pinia),
         Repetition,
         { propsData: reviewPointForView },
         { name: "repeat-noteShow", params: { noteId: 123 } }

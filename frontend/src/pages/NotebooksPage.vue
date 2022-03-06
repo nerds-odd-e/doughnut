@@ -14,14 +14,19 @@
 </template>
 
 <script>
-import NotebookViewCards from "../components/notebook/NotebookViewCards.vue";
-import NotebookNewButton from "../components/notebook/NotebookNewButton.vue";
-import NoteControl from "../components/toolbars/NoteControl.vue";
-import NotebookSubscriptionCards from "../components/subscriptions/NotebookSubscriptionCards.vue";
+import NotebookViewCards from "@/components/notebook/NotebookViewCards.vue";
+import NotebookNewButton from "@/components/notebook/NotebookNewButton.vue";
+import NoteControl from "@/components/toolbars/NoteControl.vue";
+import NotebookSubscriptionCards from "@/components/subscriptions/NotebookSubscriptionCards.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
-import storedApi from  "../managedApi/storedApi";
+import storedApi from  "@/managedApi/storedApi";
+import { useStore } from "@/store";
 
 export default {
+  setup() {
+    const store = useStore()
+    return { store }
+  },
   name: "NotebooksPage",
   components: {
     ContainerPage,
@@ -38,8 +43,8 @@ export default {
   },
   computed: {
     notebooks() {
-      return this.$store.getters.getNotebooks()
-    }
+      return this.store.getNotebooks()
+    },
   },
   methods: {
     fetchData() {

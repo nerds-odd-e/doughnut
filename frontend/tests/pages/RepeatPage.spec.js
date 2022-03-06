@@ -4,20 +4,23 @@
 import RepeatPage from "@/pages/RepeatPage.vue";
 import flushPromises from "flush-promises";
 import _ from "lodash";
-import store from "../../src/store/index.js";
+import { useStore } from "@/store";
 import { mountWithStoreAndMockRoute } from "../helpers";
 import makeMe from "../fixtures/makeMe";
+import { createTestingPinia } from "@pinia/testing";
 
 beforeEach(() => {
   fetch.resetMocks();
 });
 
 describe("repeat page", () => {
+  const pinia = createTestingPinia();
   const note = makeMe.aNote.please()
   const popupMock = { alert: jest.fn() }
 
   const mountPage = async (repetition)=>{
-    store.commit('loadNotes', [note])
+    const store = useStore(pinia);
+    store.loadNotes([note])
     fetch.mockResponseOnce(JSON.stringify(repetition))
     const { wrapper, mockRouter }  = mountWithStoreAndMockRoute(
       store,
@@ -36,14 +39,14 @@ describe("repeat page", () => {
     return { wrapper, mockRouter }
   }
 
-  test("redirect to review page if nothing to repeat", async () => {
+  it("redirect to review page if nothing to repeat", async () => {
     const { mockRouter } = await mountPage({})
     expect(fetch).toHaveBeenCalledTimes(1);
     expect(fetch).toHaveBeenCalledWith("/api/reviews/repeat", expect.anything());
     expect(mockRouter.push).toHaveBeenCalledWith({ name: "reviews" });
   });
 
-  test("replace route with repeat/quiz if there is a quiz", async () => {
+  it("replace route with repeat/quiz if there is a quiz", async () => {
     const repetition = makeMe.aRepetition.ofNote(note).withAQuiz().please()
     const { mockRouter } = await mountPage(repetition)
     expect(mockRouter.push).toHaveBeenCalledWith({ name: "repeat-quiz" });
@@ -51,15 +54,14 @@ describe("repeat page", () => {
 
   describe("repeat page with no quiz (or after quiz)", () => {
     const note = makeMe.aNote.please()
-    store.commit('loadNotes', [note])
     const repetition = makeMe.aRepetition.ofNote(note).please()
 
-    test("stay at repeat page if there is no quiz", async () => {
+    it("stay at repeat page if there is no quiz", async () => {
       const { mockRouter } = await mountPage(repetition)
       expect(mockRouter.push).toHaveBeenCalledWith({ name: "repeat", replace: true });
     });
 
-    test("should call the self-evaluate api", async () => {
+    it("should call the self-evaluate api", async () => {
       const repetition = makeMe.aRepetition.ofNote(note).please()
       const { wrapper } = await mountPage(repetition)
       fetch.mockResponseOnce(JSON.stringify({}))
@@ -68,7 +70,7 @@ describe("repeat page", () => {
       expect(fetch).toHaveBeenCalledWith(`/api/reviews/${reviewPointId}/self-evaluate`, expect.anything());
     });
 
-    test("reload next review point if 404", async () => {
+    it("reload next review point if 404", async () => {
       const repetition = makeMe.aRepetition.ofNote(note).please()
       const { wrapper } = await mountPage(repetition)
 

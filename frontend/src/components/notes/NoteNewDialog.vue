@@ -68,7 +68,6 @@ export default {
       storedApi(this).createNote(this.parentId,
         this.creationData
       ).then((res) => {
-        console.log(res)
         this.$router.push({
           name: "noteShow",
           params: { noteId: res.notePosition.noteId },

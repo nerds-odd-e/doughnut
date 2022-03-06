@@ -1,20 +1,23 @@
 /**
  * @jest-environment jsdom
  */
-import { screen } from "@testing-library/vue";
 import Breadcrumb from "@/components/notes/Breadcrumb.vue";
-import store from "../../src/store/index.js";
+import { useStore } from "@/store";
+import { screen } from "@testing-library/vue";
 import { renderWithStoreAndMockRoute } from "../helpers";
 import makeMe from "../fixtures/makeMe";
+import { createTestingPinia } from "@pinia/testing";
 
 describe("note wth child cards", () => {
+  const pinia = createTestingPinia();
+  const store = useStore(pinia);
 
   it("view note belongs to other people in bazaar", async () => {
     const note = makeMe.aNote.please();
     const notePosition = makeMe.aNotePosition.inBazaar().please();
-    store.commit("loadNotes", [note]);
+    store.loadNotes([note]);
     renderWithStoreAndMockRoute(
-      store,
+      pinia,
       Breadcrumb,
       {
         propsData: notePosition,

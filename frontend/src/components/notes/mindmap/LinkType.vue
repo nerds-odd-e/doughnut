@@ -2,7 +2,7 @@
   <g class="notes-links">
     <template v-if="!reverse">
       <LinkConnection v-for="link in links" :key="link.id"
-        v-bind="{link, mindmap, linkStart }"
+        v-bind="{ link, mindmap, linkStart }"
       />
     </template>
     <g class="link-start" :transform="`translate(${linkStart.x}, ${linkStart.y}) rotate(${linkStart.angle * 180 / Math.PI})`">
@@ -15,7 +15,7 @@
 
 <script>
 import LinkConnection from "./LinkConnection.vue"
-import SvgLinkTypeIcon from "../../svgs/SvgLinkTypeIcon.vue"
+import SvgLinkTypeIcon from "@/components/svgs/SvgLinkTypeIcon.vue"
 
 export default {
 
@@ -35,8 +35,6 @@ export default {
       return this.mindmap.outSlot(this.mindmapSector, this.totalLinkTypeCount, this.index)
      }
 
-  },
-  methods: {
   }
 }
 

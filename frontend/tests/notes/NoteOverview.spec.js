@@ -3,17 +3,21 @@
  */
 
 import NoteOverview from "@/components/notes/NoteOverview.vue";
+import { useStore } from "@/store";
 import makeMe from "../fixtures/makeMe";
 import { renderWithStoreAndMockRoute } from "../helpers";
 import { screen } from "@testing-library/vue";
-import store from "../../src/store/index.js";
+import { createTestingPinia } from "@pinia/testing";
 
 describe("note overview", () => {
+  const pinia = createTestingPinia();
+  const store = useStore(pinia);
+
   it("should render one note", async () => {
     const note = makeMe.aNote.title("single note").please();
-    store.commit("loadNotes", [note]);
+    store.loadNotes([note]);
     renderWithStoreAndMockRoute(
-      store,
+      pinia,
       NoteOverview,
       { props: { noteId: note.id, expandChildren: true } },
     );
@@ -23,9 +27,9 @@ describe("note overview", () => {
 
   it("should render one note with links", async () => {
     const note = makeMe.aNote.title("source").linkToSomeNote().please();
-    store.commit("loadNotes", [note]);
+    store.loadNotes([note]);
     renderWithStoreAndMockRoute(
-      store,
+      pinia,
       NoteOverview,
       { props: { noteId: note.id, expandChildren: true } },
     );
@@ -35,9 +39,9 @@ describe("note overview", () => {
   it("should render note with one child", async () => {
     const noteParent = makeMe.aNote.title("parent").please();
     const noteChild = makeMe.aNote.title("child").under(noteParent).please();
-    store.commit("loadNotes", [noteParent, noteChild]);
+    store.loadNotes([noteParent, noteChild]);
     renderWithStoreAndMockRoute(
-      store,
+      pinia,
       NoteOverview,
       { props: { noteId: noteParent.id, expandChildren: true } },
     );
@@ -50,9 +54,9 @@ describe("note overview", () => {
     const noteParent = makeMe.aNote.title("parent").please();
     const noteChild = makeMe.aNote.title("child").under(noteParent).please();
     const noteGrandchild = makeMe.aNote.title("grandchild").under(noteChild).please();
-    store.commit("loadNotes", [noteParent, noteChild, noteGrandchild]);
+    store.loadNotes([noteParent, noteChild, noteGrandchild]);
     renderWithStoreAndMockRoute(
-      store,
+      pinia,
       NoteOverview,
       { props: { noteId: noteParent.id, expandChildren: true } },
     );

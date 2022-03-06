@@ -1,23 +1,27 @@
 /**
  * @jest-environment jsdom
  */
+import NoteMindmap from "@/components/notes/mindmap/NoteMindmap.vue";
+import { useStore } from "@/store";
 import { screen } from "@testing-library/vue";
-import NoteMinmap from "@/components/notes/mindmap/NoteMindmap.vue";
-import store from "../../src/store/index.js";
 import { renderWithStoreAndMockRoute } from "../helpers";
 import makeMe from "../fixtures/makeMe";
+import { createTestingPinia } from "@pinia/testing";
 
 describe("note mindmap", () => {
+  const pinia = createTestingPinia();
+  const store = useStore(pinia);
   const notes = []
+
   beforeEach(()=>{
     notes.length = 0
   })
 
   const renderAndGetContainer = (noteId, props={}) => {
-    store.commit("loadNotes", notes);
+    store.loadNotes(notes);
     const { wrapper } = renderWithStoreAndMockRoute(
       store,
-      NoteMinmap,
+      NoteMindmap,
       { props: { noteId, offset: {scale: 1, rotate: 0}, ...props } },
     );
     return wrapper.container
@@ -68,6 +72,7 @@ describe("note mindmap", () => {
       });
 
     })
+
     describe("links between notes", () => {
       beforeEach(()=>{
         const [top, child1] = notes

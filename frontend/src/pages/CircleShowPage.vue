@@ -46,8 +46,13 @@ import NotebookNewButton from "../components/notebook/NotebookNewButton.vue";
 import NotebookButtons from "../components/notebook/NotebookButtons.vue";
 import BazaarNotebookButtons from "../components/bazaar/BazaarNotebookButtons.vue";
 import storedApi from  "../managedApi/storedApi";
+import { useStore } from "@/store";
 
 export default {
+  setup() {
+    const store = useStore()
+    return { store }
+  },
   components: {
     SvgMissingAvatar,
     NotebookCardsWithButtons,
@@ -82,7 +87,7 @@ export default {
     invitationUrl() {
       return `${window.location.origin}/circles/join/${this.circle.invitationCode}`;
     },
-    featureToggle() { return this.$store.getters.getFeatureToggle()}
+    featureToggle() { return this.store.getFeatureToggle()}
   },
 
   watch: {

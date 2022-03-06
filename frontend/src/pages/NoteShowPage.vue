@@ -16,8 +16,13 @@ import LoadingPage from "./commons/LoadingPage.vue";
 import NotePageFrame from '../components/notes/views/NotePageFrame.vue';
 import storedApi from  "../managedApi/storedApi";
 import { viewType } from "../models/viewTypes";
+import { useStore } from "@/store/index.js";
 
 export default {
+  setup() {
+    const store = useStore()
+    return { store }
+  },
   name: "NoteShowPage",
   props: { noteId: [String, Number], viewType: String },
   data() {
@@ -35,7 +40,7 @@ export default {
   },
   methods: {
     updateStoreViewType() {
-      this.$store.commit('viewType', this.viewType);
+      this.store.viewType(this.viewType);
     },
     fetchData() {
       const storedApiCall = this.viewTypeObj.fetchAll ?

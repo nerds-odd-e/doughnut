@@ -11,8 +11,13 @@
 import NoteWithLinks from "../NoteWithLinks.vue";
 import NoteStatisticsButton from "../NoteStatisticsButton.vue";
 import Cards from "../Cards.vue";
+import { useStore } from "@/store";
 
 export default {
+  setup() {
+    const store = useStore()
+    return { store }
+  },
   props: {
     noteId: [String, Number],
     expandChildren: { type: Boolean, required: true },
@@ -24,10 +29,10 @@ export default {
   },
   computed: {
     note() {
-      return this.$store.getters.getNoteById(this.noteId);
+      return this.store.getNoteById(this.noteId);
     },
     children() {
-      return this.$store.getters.getChildrenOfParentId(this.noteId);
+      return this.store.getChildrenOfParentId(this.noteId);
     },
   }
 };

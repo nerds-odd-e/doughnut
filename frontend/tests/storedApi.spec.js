@@ -1,49 +1,51 @@
 /**
  * @jest-environment jsdom
  */
-import storedApi from "../src/managedApi/storedApi";
-import store from "../src/store/index.js";
+import storedApi from "@/managedApi/storedApi";
+import { useStore } from "@/store";
 import makeMe from "./fixtures/makeMe";
+import { setActivePinia, createPinia } from "pinia";
 
 beforeEach(() => {
   fetch.resetMocks();
 });
 
 describe("storedApi", () => {
+  setActivePinia(createPinia());
+  const store = useStore();
   const note = makeMe.aNote.please()
   const sa = storedApi({$store: store})
 
   describe("delete note", () => {
-
     beforeEach(() => {
       fetch.mockResponseOnce(JSON.stringify({}));
-      store.commit("loadNotes", [note]);
+      store.loadNotes([note]);
     });
 
-    test("should call the api", async () => {
+    it("should call the api", async () => {
       await sa.deleteNote(note.id)
       expect(fetch).toHaveBeenCalledTimes(1);
       expect(fetch).toHaveBeenCalledWith(`/api/notes/${note.id}/delete`, expect.anything());
     });
 
-    test("should change the store", async () => {
+    it("should change the store", async () => {
       await sa.deleteNote(note.id)
-      expect(store.getters.getNoteById(note.id)).toBeUndefined()
+      expect(store.getNoteById(note.id)).toBeUndefined()
     });
 
-    test("should remove children notes", async () => {
+    it("should remove children notes", async () => {
       const child = makeMe.aNote.under(note).please()
-      store.commit("loadNotes", [child]);
+      store.loadNotes([child]);
       await sa.deleteNote(note.id)
-      expect(store.getters.getNoteById(child.id)).toBeUndefined()
+      expect(store.getNoteById(child.id)).toBeUndefined()
     });
 
-    test("should remove child from list", async () => {
+    it("should remove child from list", async () => {
       const child = makeMe.aNote.under(note).please()
-      store.commit("loadNotes", [child]);
-      const childrenCount = store.getters.getChildrenIdsByParentId(note.id).length
+      store.loadNotes([child]);
+      const childrenCount = store.getChildrenIdsByParentId(note.id).length
       await sa.deleteNote(child.id)
-      expect(store.getters.getChildrenIdsByParentId(note.id)).toHaveLength(childrenCount - 1)
+      expect(store.getChildrenIdsByParentId(note.id)).toHaveLength(childrenCount - 1)
     });
 
   });

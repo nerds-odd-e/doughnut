@@ -7,8 +7,13 @@
 <script>
 import SvgUndo from "../svgs/SvgUndo.vue";
 import storedApi from  "../../managedApi/storedApi";
+import { useStore } from "@/store/index.js";
 
 export default {
+  setup() {
+    const store = useStore()
+    return { store }
+  },
   name: "NoteUndoButton",
   components: {
     SvgUndo,
@@ -18,7 +23,7 @@ export default {
   },
   computed: {
     history() {
-      return this.$store.getters.peekUndo()
+      return this.store.peekUndo()
     },
     undoTitle() {
       if(this.history) {

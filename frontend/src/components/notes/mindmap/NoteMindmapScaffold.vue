@@ -18,8 +18,13 @@
 
 <script>
 import MindmapSector from "@/models/MindmapSector";
+import { useStore } from "@/store";
 
 export default {
+  setup() {
+    const store = useStore()
+    return { store }
+  },
   name: "NoteMindmap",
   props: {
     noteId: [String, Number],
@@ -27,10 +32,10 @@ export default {
   },
   computed: {
     note() {
-      return this.$store.getters.getNoteById(this.noteId);
+      return this.store.getNoteById(this.noteId);
     },
     childrenIds() {
-      return this.$store.getters.getChildrenIdsByParentId(this.noteId);
+      return this.store.getChildrenIdsByParentId(this.noteId);
     },
   },
 };

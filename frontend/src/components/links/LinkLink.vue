@@ -15,28 +15,35 @@
 </template>
 
 <script>
-export default {
-  name: "LinkLink"
-}
-</script>
-
-<script setup>
 import { computed } from "@vue/runtime-core";
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue";
 import LinkNob from "./LinkNob.vue";
 import { colors } from "../../colors";
 
-const props = defineProps({
-  link: Object,
-  reverse: Boolean,
-});
-const note = computed(() =>
-  !!props.reverse ? props.link.sourceNote : props.link.targetNote
-);
-const fontColor = computed(() =>
-  !!props.reverse ? colors["target"] : colors["source"]
-);
+export default {
+  name: "LinkLink",
+  props: {
+    link: Object,
+    reverse: Boolean,
+    colors: String
+  },
+  components: {
+    NoteTitleWithLink,
+    LinkNob,
+  },
+  computed: {
+    note() {
+      return !!this.reverse ? this.link.sourceNote : this.link.targetNote;
+    },
+    fontColor() {
+      return !!this.reverse ? this.colors["target"] : this.colors["source"];
+    },
+  },
+
+}
 </script>
+
+
 
 <style scoped>
 .link-link {

@@ -20,10 +20,15 @@
 <script>
 import NoteMindmap from "../mindmap/NoteMindmap.vue";
 import DragListner from "../../commons/DragListner.vue";
+import { useStore } from "@/store";
 
 const defaultOffset = {x: 0, y: 0, scale: 1.0, rotate: 0}
 
 export default {
+  setup() {
+    const store = useStore()
+    return { store }
+  },
   props: {
     noteId: [String, Number],
     expandChildren: { type: Boolean, required: true },
@@ -40,7 +45,10 @@ export default {
     },
   },
   computed: {
-    highlightNoteId() { return this.$store.getters.getHighlightNoteId() },
+    highlightNoteId() {
+        const store = useStore(this.$pinia)
+        return store.getHighlightNoteId()
+    },
     centerX() {
       return `calc(50% + ${this.offset.x}px)`
     },

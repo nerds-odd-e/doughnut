@@ -62,7 +62,13 @@ import NoteNewButton from "./NoteNewButton.vue";
 import ViewTypeButtons from "./ViewTypeButtons.vue";
 import storedApi from  "../../managedApi/storedApi";
 import { viewType } from "../../models/viewTypes";
+import { useStore } from "@/store/index.js";
+
 export default {
+  setup() {
+    const store = useStore()
+    return { store }
+  },
   name: "NoteButtons",
   props: {
     note: Object,
@@ -82,7 +88,7 @@ export default {
   },
   computed: {
     featureToggle() {
-      return this.$store.getters.getFeatureToggle();
+      return this.store.getFeatureToggle();
     },
   },
   methods: {

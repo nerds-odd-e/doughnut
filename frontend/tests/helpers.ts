@@ -2,6 +2,7 @@ import { merge } from "lodash";
 import { Component } from "vue";
 import { mount } from "@vue/test-utils";
 import { render } from "@testing-library/vue";
+import { createTestingPinia } from "@pinia/testing";
 
 type Options = {};
 
@@ -57,7 +58,7 @@ const renderWithMockRoute = (
 };
 
 const withStoreAndMockRoute = (
-  store: any,
+  store: Function,
   comp: Component,
   options: Options = {},
   currentRoute: any,
@@ -74,8 +75,9 @@ const withStoreAndMockRoute = (
     func
   );
 };
+
 const renderWithStoreAndMockRoute = (
-  store: any,
+  store: Function,
   comp: Component,
   options: Options = {},
   currentRoute: any,
@@ -93,9 +95,8 @@ const renderWithStoreAndMockRoute = (
   );
 };
 
-
 const mountWithStoreAndMockRoute = (
-  store: any,
+  store: Function,
   comp: Component,
   options: Options = {},
   currentRoute: any,
@@ -105,7 +106,7 @@ const mountWithStoreAndMockRoute = (
     comp,
     merge(options, {
       global: {
-        plugins: [store],
+        plugins: [createTestingPinia()],
       },
     }),
     currentRoute,

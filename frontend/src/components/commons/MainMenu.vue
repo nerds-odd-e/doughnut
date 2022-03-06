@@ -84,8 +84,13 @@
 <script>
 import api from  '../../managedApi/api'
 import loginOrRegister from '../../managedApi/restful/loginOrRegister';
+import { useStore } from "@/store";
 
 export default {
+  setup() {
+    const store = useStore()
+    return { store }
+  },
   methods: {
     async logout() {
       await api(this).userMethods.logout()
@@ -96,9 +101,9 @@ export default {
     }
   },
   computed: {
-    user() { return this.$store.getters.getCurrentUser()},
-    featureToggle() { return this.$store.getters.getFeatureToggle()},
-    environment() { return this.$store.getters.getEnvironment()},
+    user() { return this.store.getCurrentUser()},
+    featureToggle() { return this.store.getFeatureToggle()},
+    environment() { return this.store.getEnvironment()},
   }
 };
 </script>

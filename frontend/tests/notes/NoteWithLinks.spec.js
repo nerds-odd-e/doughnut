@@ -1,25 +1,28 @@
 /**
  * @jest-environment jsdom
  */
-import { screen } from "@testing-library/vue";
 import NoteWithLinks from "@/components/notes/NoteWithLinks.vue";
+import { useStore } from "@/store";
 import makeMe from "../fixtures/makeMe";
+import { screen } from "@testing-library/vue";
 import {
   renderWithStoreAndMockRoute,
   mountWithStoreAndMockRoute,
 } from "../helpers";
-import store from "../../src/store";
+import { createTestingPinia } from "@pinia/testing";
 
 afterEach(() => {
   fetch.resetMocks();
 })
 
 describe("new/updated pink banner", () => {
+  const pinia = createTestingPinia();
+  const store = useStore(pinia);
   beforeAll(() => {
     Date.now = jest.fn(() => new Date(Date.UTC(2017, 1, 14)).valueOf());
   });
 
-  test.each([
+  it.each([
     [new Date(Date.UTC(2017, 1, 15)), "rgb(208,237,23)"],
     [new Date(Date.UTC(2017, 1, 13)), "rgb(189,209,64)"],
     [new Date(Date.UTC(2017, 1, 12)), "rgb(181,197,82)"],
@@ -29,7 +32,7 @@ describe("new/updated pink banner", () => {
     (updatedAt, expectedColor) => {
       const note = makeMe.aNote.textContentUpdatedAt(updatedAt).please();
 
-      renderWithStoreAndMockRoute(store, NoteWithLinks, { props: { note } });
+      renderWithStoreAndMockRoute(pinia, NoteWithLinks, { props: { note } });
 
       expect(screen.getByRole("title").parentNode).toHaveStyle(
         `border-color: ${expectedColor};`
@@ -39,9 +42,11 @@ describe("new/updated pink banner", () => {
 });
 
 describe("in place edit on title", () => {
+  const pinia = createTestingPinia();
+  const store = useStore(pinia);
   it("should display text field when one single click on title", async () => {
     const noteParent = makeMe.aNote.title("Dummy Title").please();
-    store.commit("loadNotes", [noteParent]);
+    store.loadNotes([noteParent]);
 
     const { wrapper } = mountWithStoreAndMockRoute(store, NoteWithLinks, {
       props: {
@@ -58,7 +63,7 @@ describe("in place edit on title", () => {
 
   it("should back to label when blur text field title", async () => {
     const noteParent = makeMe.aNote.title("Dummy Title").please();
-    store.commit("loadNotes", [noteParent]);
+    store.loadNotes([noteParent]);
 
     const { wrapper } = mountWithStoreAndMockRoute(store, NoteWithLinks, {
       props: {
@@ -79,10 +84,11 @@ describe("in place edit on title", () => {
 });
 
 describe("undo editing", () => {
-
+  const pinia = createTestingPinia();
+  const store = useStore(pinia);
   it("should call addEditingToUndoHistory on submitChange", async () => {
     const note = makeMe.aNote.title("Dummy Title").please();
-    store.commit("loadNotes", [note]);
+    store.loadNotes([note]);
 
     const updatedTitle = "updated";
     const { wrapper } = mountWithStoreAndMockRoute(store, NoteWithLinks, {
@@ -95,6 +101,6 @@ describe("undo editing", () => {
     await wrapper.find('[role="title"] input').setValue(updatedTitle);
     await wrapper.find('[role="title"] input').trigger("blur");
 
-    expect(store.getters.peekUndo()).toMatchObject({type: 'editing'})
+    expect(store.peekUndo()).toMatchObject({type: "editing"})
   });
 });

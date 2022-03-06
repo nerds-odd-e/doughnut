@@ -1,4 +1,4 @@
-import { createStore } from "vuex";
+import { defineStore } from "pinia";
 
 function withState(state) {
   return {
@@ -36,70 +36,71 @@ function withState(state) {
   }
 }
 
-export default createStore({
-  state: () => ({
-    notebooks: [],
-    notes: {},
-    highlightNoteId: null,
-    viewType: null,
-    noteUndoHistories: [],
-    currentUser: null,
-    featureToggle: false,
-    environment: 'production',
-  }),
+export const useStore = defineStore('main', {
+    state: () => ({
+        notebooks: [],
+        notes: {},
+        highlightNoteId: null,
+        viewType: null,
+        noteUndoHistories: [],
+        currentUser: null,
+        featureToggle: false,
+        environment: 'production',
+    }),
 
-  getters: {
-    getNotebooks: (state) => () => state.notebooks,
-    getCurrentUser: (state) => () => state.currentUser,
-    getHighlightNoteId: (state) => () => state.highlightNoteId,
-    getViewType: (state) => () => state.viewType,
-    getHighlightNote: (state) => () => withState(state).getNoteById(state.highlightNoteId),
-    getEnvironment: (state) => () => state.environment,
-    getFeatureToggle: (state) => () => state.featureToggle,
-    getNoteById: (state) => (id) => withState(state).getNoteById(id),
-    getChildrenIdsByParentId: (state) => (parentId) => withState(state).getChildrenIdsByParentId(parentId),
-    getChildrenOfParentId: (state) => (parentId) => withState(state).getChildrenOfParentId(parentId),
-    peekUndo: (state) => () => {
-      if(state.noteUndoHistories.length === 0) return null
-      return state.noteUndoHistories[state.noteUndoHistories.length - 1]
+    getters: {
+        getNotebooks: (state)       => state.notebooks,
+        getCurrentUser: (state)     => state.currentUser,
+        getHighlightNoteId: (state) => () => state.highlightNoteId,
+        getViewType: (state) => ()  => state.viewType,
+        getHighlightNote: (state)   => () => withState(state).getNoteById(state.highlightNoteId),
+        getEnvironment: (state)     => () => state.environment,
+        getFeatureToggle: (state)   => () => state.featureToggle,
+        getNoteById: (state)        => (id) => withState(state).getNoteById(id),
+        peekUndo: (state)           => () => {
+          if(state.noteUndoHistories.length === 0) return null
+          return state.noteUndoHistories[state.noteUndoHistories.length - 1]
+        },
+        getChildrenIdsByParentId: (state) => (parentId) => withState(state).getChildrenIdsByParentId(parentId),
+        getChildrenOfParentId: (state)    => (parentId) => withState(state).getChildrenOfParentId(parentId),
     },
-  },
 
-  mutations: {
-    notebooks(state, notebooks) {
-      state.notebooks = notebooks
-    },
-    addEditingToUndoHistory(state, {noteId}) {
-      state.noteUndoHistories.push({type: 'editing', noteId, textContent: {...withState(state).getNoteById(noteId).textContent}});
-    },
-    popUndoHistory(state) {
-      if (state.noteUndoHistories.length === 0) {
-        return
-      }
-      state.noteUndoHistories.pop();
-    },
-    loadNotes(state, notes) {
-      notes.forEach((note) => {
-       state.notes[note.id] = note;
-      });
-    },
-    deleteNote(state, noteId) {
-      withState(state).deleteNoteFromParentChildrenList(noteId)
-      withState(state).deleteNote(noteId)
-      state.noteUndoHistories.push({type: 'delete note', noteId});
-    },
-    highlightNoteId(state, noteId) {
-      state.highlightNoteId = noteId
-    },
-    viewType(state, viewType) {
-      state.viewType = viewType
-    },
-    currentUser(state, user) {
-      state.currentUser = user
-    },
-    featureToggle(state, ft) {
-      state.environment = "testing"
-      state.featureToggle = ft
-    },
-  },
-});
+    actions: {
+        notebooks(notebooks) {
+          this.notebooks = notebooks
+        },
+        addEditingToUndoHistory({noteId}) {
+          console.log(`in store.addEditingToUndoHistory ${noteId}`)
+          this.noteUndoHistories.push({type: 'editing', noteId, textContent: {...withState(this).getNoteById(noteId).textContent}});
+        },
+        popUndoHistory() {
+          if (this.noteUndoHistories.length === 0) {
+            return
+          }
+          this.noteUndoHistories.pop();
+        },
+        loadNotes(notes) {
+          notes.forEach((note) => {
+            this.notes[note.id] = note;
+          });
+        },
+        deleteNote(noteId) {
+          withState(this).deleteNoteFromParentChildrenList(noteId)
+          withState(this).deleteNote(noteId)
+          this.noteUndoHistories.push({type: 'delete note', noteId});
+        },
+        highlightNoteId(noteId) {
+          this.highlightNoteId = noteId
+        },
+        viewType(viewType) {
+          this.viewType = viewType
+        },
+        currentUser(user) {
+          this.currentUser = user
+        },
+        featureToggle(ft) {
+          this.environment = "testing"
+          this.featureToggle = ft
+        },
+      },
+    });

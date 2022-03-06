@@ -18,8 +18,13 @@ import NoteMindmapView from "./NoteMindmapView.vue";
 import NoteCardsView from "./NoteCardsView.vue";
 import NoteArticleView from "./NoteArticleView.vue";
 import Breadcrumb from "../Breadcrumb.vue";
+import { useStore } from "@/store";
 
 export default {
+  setup() {
+    const store = useStore()
+    return { store }
+  },
   props: {
      noteId: [String, Number],
      notePosition: Object,
@@ -29,7 +34,7 @@ export default {
   components: { NoteControl, NoteMindmapView, Breadcrumb, NoteCardsView, NoteArticleView },
   methods: {
     highlight(id) { 
-      this.$store.commit("highlightNoteId", id)
+      this.store.highlightNoteId(id)
     },
   },
   watch: {

@@ -25,8 +25,13 @@
 <script>
 import ContainerPage from "./commons/ContainerPage.vue";
 import api from  "../managedApi/api";
+import { useStore } from "@/store";
 
 export default {
+  setup() {
+    const store = useStore()
+    return { store }
+  },
   components: { ContainerPage },
   data() {
     return {
@@ -50,7 +55,7 @@ export default {
     this.fetchData();
   },
   computed: {
-    user() { return this.$store.getters.getCurrentUser()},
+    user() { return this.store.getCurrentUser()},
   },
 };
 </script>

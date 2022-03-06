@@ -1,22 +1,25 @@
 /**
  * @jest-environment jsdom
  */
-import store from "../src/store/index";
+import { useStore } from "@/store";
 import makeMe from "./fixtures/makeMe";
+import { setActivePinia, createPinia } from "pinia";
 
 describe("storeUndoCommand", () => {
+  setActivePinia(createPinia());
+  const store = useStore();
   const note = makeMe.aNote.title("Dummy Title").please()
 
   describe("addEditingToUndoHistory", () => {
     beforeEach(() => {
-      store.commit("loadNotes", [note]);
+      store.loadNotes([note]);
     });
 
     test("should push textContent into store state noteUndoHistories ",
         () => {
-          store.commit('addEditingToUndoHistory', { noteId: note.id, });
+          store.addEditingToUndoHistory({ noteId: note.id, });
 
-          expect(store.state.noteUndoHistories.length).toEqual(1);
+          expect(store.noteUndoHistories.length).toEqual(1);
         });
   });
 
@@ -25,23 +28,23 @@ describe("storeUndoCommand", () => {
     let initialUndoCount;
 
     beforeEach(() => {
-      store.commit('loadNotes', [note]);
-      store.commit('addEditingToUndoHistory', mockUpdatedNote);
-      initialUndoCount = store.state.noteUndoHistories.length;
+      store.loadNotes([note]);
+      store.addEditingToUndoHistory(mockUpdatedNote);
+      initialUndoCount = store.noteUndoHistories.length;
     });
 
     it('should undo to last history', () => {
-      store.commit('popUndoHistory');
+      store.popUndoHistory();
 
-      expect(store.state.noteUndoHistories.length).toEqual(initialUndoCount - 1);
+      expect(store.noteUndoHistories.length).toEqual(initialUndoCount - 1);
     });
 
     it('should not undo to last history if there is no more history', () => {
-      store.commit('popUndoHistory');
-      store.commit('popUndoHistory');
-      store.commit('popUndoHistory');
+      store.popUndoHistory();
+      store.popUndoHistory();
+      store.popUndoHistory();
 
-      expect(store.state.noteUndoHistories.length).toEqual(0);
+      expect(store.noteUndoHistories.length).toEqual(0);
     });
   })
 });
