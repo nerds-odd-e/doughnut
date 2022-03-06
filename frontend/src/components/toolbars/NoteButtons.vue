@@ -19,8 +19,6 @@
 
       <NoteEditButton :noteId="note.id" :oldTitle="note.title" />
 
-      <LinkNoteButton :note="note" />
-
       <a
         class="btn btn-light dropdown-toggle"
         data-bs-toggle="dropdown"
@@ -54,7 +52,6 @@ import SvgAddChild from "../svgs/SvgAddChild.vue";
 import SvgAddSibling from "../svgs/SvgAddSibling.vue";
 import SvgCog from "../svgs/SvgCog.vue";
 import SvgRemove from "../svgs/SvgRemove.vue";
-import LinkNoteButton from "../links/LinkNoteButton.vue";
 import ReviewSettingEditButton from "../review/ReviewSettingEditButton.vue";
 import NoteEditButton from "./NoteEditButton.vue";
 import NoteDownloadButton from "./NoteDownloadButton.vue"
@@ -74,7 +71,6 @@ export default {
     SvgAddSibling,
     ReviewSettingEditButton,
     SvgRemove,
-    LinkNoteButton,
     NoteEditButton,
     NoteNewButton,
     ViewTypeButtons,
