@@ -47,7 +47,6 @@ export default ()=>createStore({
     currentUser: null,
     featureToggle: false,
     environment: 'production',
-    piniaStore: useStore(),
   }),
 
   getters: {

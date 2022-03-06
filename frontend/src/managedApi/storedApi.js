@@ -3,6 +3,7 @@ import ManagedApi from './ManagedApi';
 const storedApi = (component, options={}) => {
   const managedApi = new ManagedApi(component, options);
   const store = component.$store
+  const piniaStore = component.piniaStore
 
   function loadReviewPointViewedByUser(data) {
     if (!data) return;
@@ -74,7 +75,8 @@ const storedApi = (component, options={}) => {
 
     async getNotebooks() {
       const res = await managedApi.restGet(`notebooks`);
-      store.commit('notebooks', res.notebooks);
+      console.table(piniaStore)
+      piniaStore.setNotebooks(res.notebooks);
       return res;
     },
 
@@ -147,7 +149,7 @@ const storedApi = (component, options={}) => {
       );
       store.commit('loadNotes', res.notes);
       if (res.notes[0].parentId === null) {
-        this.getNotebooks(store);
+        this.getNotebooks();
       }
       return res;
     },

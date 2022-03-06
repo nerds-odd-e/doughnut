@@ -66,7 +66,7 @@ export default defineStore('main', {
     },
 
     actions: {
-        notebooks(notebooks) {
+        setNotebooks(notebooks) {
           this.notebooks = notebooks
         },
         addEditingToUndoHistory({noteId}) {

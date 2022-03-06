@@ -20,8 +20,13 @@ import NoteControl from "../components/toolbars/NoteControl.vue";
 import NotebookSubscriptionCards from "../components/subscriptions/NotebookSubscriptionCards.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import storedApi from  "../managedApi/storedApi";
+import useStore from '../store/pinia_store';
 
 export default {
+  setup() {
+    const piniaStore = useStore()
+    return { piniaStore }
+  },
   name: "NotebooksPage",
   components: {
     ContainerPage,
@@ -38,7 +43,7 @@ export default {
   },
   computed: {
     notebooks() {
-      return this.$store.getters.getNotebooks()
+      return this.piniaStore.notebooks
     }
   },
   methods: {
