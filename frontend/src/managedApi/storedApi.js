@@ -9,7 +9,7 @@ const storedApi = (component, options={}) => {
     if (!data) return;
     const { noteWithPosition, linkViewedbyUser } = data;
     if (noteWithPosition) {
-      store.commit('loadNotes', [noteWithPosition.note]);
+      piniaStore.loadNotes([noteWithPosition.note]);
     }
     if (linkViewedbyUser) {
       loadReviewPointViewedByUser({
@@ -27,7 +27,7 @@ const storedApi = (component, options={}) => {
       `text_content/${noteId}`,
       data,
     );
-    store.commit('loadNotes', [res]);
+    piniaStore.loadNotes([res]);
     return res;
   }
 
@@ -63,13 +63,13 @@ const storedApi = (component, options={}) => {
 
     async getNoteWithDescendents(noteId) {
       const res = await managedApi.restGet(`notes/${noteId}/overview`);
-      store.commit('loadNotes', res.notes);
+      piniaStore.loadNotes(res.notes);
       return res;
     },
 
     async getNoteAndItsChildren(noteId) {
       const res = await managedApi.restGet(`notes/${noteId}`);
-      store.commit('loadNotes', res.notes);
+      piniaStore.loadNotes(res.notes);
       return res;
     },
 
@@ -96,7 +96,7 @@ const storedApi = (component, options={}) => {
         `notes/${parentId}/create`,
         data
       );
-      store.commit('loadNotes', res.notes);
+      piniaStore.loadNotes(res.notes);
       return res;
     },
 
@@ -105,26 +105,26 @@ const storedApi = (component, options={}) => {
         `links/create/${sourceId}/${targetId}`,
         data
       );
-      store.commit('loadNotes', res.notes);
+      piniaStore.loadNotes(res.notes);
       return res;
     },
 
     async updateLink(linkId, data) {
       const res = await managedApi.restPost(`links/${linkId}`, data);
-      store.commit('loadNotes', res.notes);
+      piniaStore.loadNotes(res.notes);
       return res;
     },
 
     async deleteLink(linkId) {
       const res = await managedApi.restPost(`links/${linkId}/delete`, {});
-      store.commit('loadNotes', res.notes);
+      piniaStore.loadNotes(res.notes);
       return res;
     },
 
     async updateNote(noteId, noteContentData) {
       const { updatedAt, ...data } = noteContentData;
       const res = await managedApi.restPatchMultiplePartForm(`notes/${noteId}`, data);
-      store.commit('loadNotes', [res]);
+      piniaStore.loadNotes([res]);
       return res;
     },
 
@@ -146,7 +146,7 @@ const storedApi = (component, options={}) => {
         `notes/${history.noteId}/undo-delete`,
         {}
       );
-      store.commit('loadNotes', res.notes);
+      piniaStore.loadNotes(res.notes);
       if (res.notes[0].parentId === null) {
         this.getNotebooks();
       }

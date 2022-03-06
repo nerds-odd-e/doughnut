@@ -16,8 +16,9 @@ import LoadingPage from "./commons/LoadingPage.vue";
 import NotePageFrame from '../components/notes/views/NotePageFrame.vue';
 import storedApi from  "../managedApi/storedApi";
 import { viewType } from "../models/viewTypes";
+import storedComponent from "../store/storedComponent";
 
-export default {
+export default storedComponent({
   name: "NoteShowPage",
   props: { noteId: [String, Number], viewType: String },
   data() {
@@ -61,6 +62,6 @@ export default {
     this.updateStoreViewType();
     this.fetchData();
   },
-};
+});
 
 </script>

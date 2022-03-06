@@ -8,8 +8,9 @@
 <script>
 import NoteFormBody from "./NoteFormBody.vue";
 import storedApi from  "../../managedApi/storedApi";
+import storedComponent from "../../store/storedComponent";
 
-export default {
+export default storedComponent({
   name: "NoteEditDialog",
   components: {
     NoteFormBody,
@@ -45,5 +46,5 @@ export default {
   mounted() {
     this.fetchData();
   },
-};
+});
 </script>

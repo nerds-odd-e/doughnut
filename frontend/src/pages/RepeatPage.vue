@@ -67,8 +67,9 @@ import NoteStatisticsButton from "../components/notes/NoteStatisticsButton.vue";
 import RepeatProgressBar from "../components/review/RepeatProgressBar.vue";
 import api from "../managedApi/api"
 import storedApi from "../managedApi/storedApi"
+import storedComponent from "../store/storedComponent";
 
-export default {
+export default storedComponent({
   name: "RepeatPage",
   props: { nested: Boolean },
   components: {
@@ -201,7 +202,7 @@ export default {
   mounted() {
     this.fetchData();
   },
-};
+});
 </script>
 
 <style>

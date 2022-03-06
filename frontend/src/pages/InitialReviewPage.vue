@@ -57,8 +57,9 @@ import ProgressBar from "../components/commons/ProgressBar.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import Minimizable from "../components/commons/Minimizable.vue";
 import storedApi from  "../managedApi/storedApi";
+import storedComponent from "../store/storedComponent";
 
-export default {
+export default storedComponent({
   name: "InitialReviewPage",
   props: { nested: Boolean },
   components: {
@@ -124,7 +125,7 @@ export default {
   mounted() {
     this.fetchData();
   },
-};
+});
 </script>
 
 <style>
