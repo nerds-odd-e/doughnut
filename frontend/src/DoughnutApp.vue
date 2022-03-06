@@ -2,7 +2,6 @@
 import Popups from "./components/commons/Popups.vue";
 import MainMenu from "./components/commons/MainMenu.vue";
 import UserNewRegisterPage from "./pages/UserNewRegisterPage.vue";
-import storedApi from  "./managedApi/storedApi"
 import storedComponent from './store/storedComponent';
 
 export default storedComponent({
@@ -43,9 +42,9 @@ export default storedComponent({
   },
 
   mounted() {
-    storedApi(this, {skipLoading: true}).getFeatureToggle()
+    this.storedApiExp({skipLoading: true}).getFeatureToggle()
 
-    storedApi(this ).getCurrentUserInfo().then((res) => {
+    this.storedApiExp().getCurrentUserInfo().then((res) => {
       this.externalIdentifier = res.externalIdentifier;
     })
 

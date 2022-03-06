@@ -7,7 +7,7 @@ export default function(component) {
       const piniaStore = useStore()
       return {
         piniaStore,
-        storedApiExp() { return storedApi(this) }
+        storedApiExp(options={}) { return storedApi(this, options) }
       }
     },
     ...component,
