@@ -11,7 +11,7 @@ beforeEach(() => {
 
 describe("storedApi", () => {
   const note = makeMe.aNote.please()
-  const sa = storedApi({$store: store})
+  const sa = storedApi({piniaStore: store.getters.ps()})
 
   describe("delete note", () => {
 

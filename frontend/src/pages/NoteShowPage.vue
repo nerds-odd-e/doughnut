@@ -36,7 +36,7 @@ export default storedComponent({
   },
   methods: {
     updateStoreViewType() {
-      this.$store.commit('viewType', this.viewType);
+      this.piniaStore.setViewType( this.viewType);
     },
     fetchData() {
       const storedApiCall = this.viewTypeObj.fetchAll ?

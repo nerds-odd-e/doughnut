@@ -129,13 +129,13 @@ const storedApi = (component, options={}) => {
     },
 
     async updateTextContent(noteId, noteContentData) {
-      store.commit('addEditingToUndoHistory', { noteId });
+      piniaStore.addEditingToUndoHistory( { noteId });
       return updateTextContentWithoutUndo(noteId, noteContentData);
     },
 
     async undo() {
       const history = piniaStore.peekUndo();
-      store.commit('popUndoHistory');
+      piniaStore.popUndoHistory();
       if (history.type === 'editing') {
         return updateTextContentWithoutUndo(
           history.noteId,
@@ -155,25 +155,25 @@ const storedApi = (component, options={}) => {
 
     async deleteNote(noteId) {
       const res = await managedApi.restPost(`notes/${noteId}/delete`, {}, () => null);
-      store.commit('deleteNote', noteId);
+      piniaStore.deleteNote( noteId);
       return res;
     },
 
     async getCurrentUserInfo() {
       const res = await managedApi.restGet(`user/current-user-info`);
-      store.commit('currentUser', res.user);
+      piniaStore.currentUser( res.user);
       return res;
     },
 
     async updateUser(userId, data) {
       const res = await managedApi.restPatchMultiplePartForm(`user/${userId}`, data);
-      store.commit('currentUser', res);
+      piniaStore.currentUser( res);
       return res;
     },
 
     async createUser(data) {
       const res = await managedApi.restPostMultiplePartForm(`user`, data);
-      store.commit('currentUser', res);
+      piniaStore.currentUser( res);
       return res;
     },
 
@@ -181,7 +181,7 @@ const storedApi = (component, options={}) => {
       return (
         !window.location.href.includes('odd-e.com') &&
         managedApi.restGet(`testability/feature_toggle`).then((res) =>
-          store.commit('featureToggle', res)
+          piniaStore.featureToggle( res)
         )
       );
     },
