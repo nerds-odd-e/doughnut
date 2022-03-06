@@ -14,7 +14,7 @@ describe("storeUndoCommand", () => {
 
     test("should push textContent into store state noteUndoHistories ",
         () => {
-          store.commit('addEditingToUndoHistory', { noteId: note.id, });
+          store.getters.ps().addEditingToUndoHistory( { noteId: note.id, });
 
           expect(store.state.piniaStore.noteUndoHistories.length).toEqual(1);
         });
@@ -26,20 +26,20 @@ describe("storeUndoCommand", () => {
 
     beforeEach(() => {
       store.getters.ps().loadNotes([note]);
-      store.commit('addEditingToUndoHistory', mockUpdatedNote);
+      store.getters.ps().addEditingToUndoHistory( mockUpdatedNote);
       initialUndoCount = store.state.piniaStore.noteUndoHistories.length;
     });
 
     it('should undo to last history', () => {
-      store.commit('popUndoHistory');
+      store.getters.ps().popUndoHistory();
 
       expect(store.state.piniaStore.noteUndoHistories.length).toEqual(initialUndoCount - 1);
     });
 
     it('should not undo to last history if there is no more history', () => {
-      store.commit('popUndoHistory');
-      store.commit('popUndoHistory');
-      store.commit('popUndoHistory');
+      store.getters.ps().popUndoHistory();
+      store.getters.ps().popUndoHistory();
+      store.getters.ps().popUndoHistory();
 
       expect(store.state.piniaStore.noteUndoHistories.length).toEqual(0);
     });
