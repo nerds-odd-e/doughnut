@@ -8,10 +8,6 @@ export default ()=>createStore({
 
   getters: {
     ps: (state) => () => state.piniaStore,
-    getNoteById: (state) => (id) => state.piniaStore.getNoteById(id),
-    getChildrenIdsByParentId: (state) => (parentId) => state.piniaStore.getChildrenIdsByParentId(parentId),
-    getChildrenOfParentId: (state) => (parentId) => state.piniaStore.getChildrenOfParentId(parentId),
-    peekUndo: (state) => () => state.piniaStore.peekUndo(),
   },
 
   mutations: {

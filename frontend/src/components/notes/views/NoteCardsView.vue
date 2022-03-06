@@ -11,8 +11,9 @@
 import NoteWithLinks from "../NoteWithLinks.vue";
 import NoteStatisticsButton from "../NoteStatisticsButton.vue";
 import Cards from "../Cards.vue";
+import storedComponent from "../../../store/storedComponent";
 
-export default {
+export default storedComponent({
   props: {
     noteId: [String, Number],
     expandChildren: { type: Boolean, required: true },
@@ -24,11 +25,11 @@ export default {
   },
   computed: {
     note() {
-      return this.$store.getters.getNoteById(this.noteId);
+      return this.piniaStore.getNoteById(this.noteId);
     },
     children() {
-      return this.$store.getters.getChildrenOfParentId(this.noteId);
+      return this.piniaStore.getChildrenOfParentId(this.noteId);
     },
   }
-};
+});
 </script>

@@ -19,7 +19,7 @@ export default storedComponent({
   },
   computed: {
     history() {
-      return this.$store.getters.peekUndo()
+      return this.piniaStore.peekUndo()
     },
     undoTitle() {
       if(this.history) {

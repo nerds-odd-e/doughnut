@@ -95,6 +95,6 @@ describe("undo editing", () => {
     await wrapper.find('[role="title"] input').setValue(updatedTitle);
     await wrapper.find('[role="title"] input').trigger("blur");
 
-    expect(store.getters.peekUndo()).toMatchObject({type: 'editing'})
+    expect(store.getters.ps().peekUndo()).toMatchObject({type: 'editing'})
   });
 });

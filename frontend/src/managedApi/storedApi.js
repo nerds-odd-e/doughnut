@@ -134,7 +134,7 @@ const storedApi = (component, options={}) => {
     },
 
     async undo() {
-      const history = store.getters.peekUndo();
+      const history = piniaStore.peekUndo();
       store.commit('popUndoHistory');
       if (history.type === 'editing') {
         return updateTextContentWithoutUndo(
