@@ -8,12 +8,13 @@
 import CircleJoinForm from "../components/circles/CircleJoinForm.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import loginOrRegister from '../managedApi/restful/loginOrRegister';
+import storedComponent from "../store/storedComponent";
 
-export default {
+export default storedComponent({
   components: { CircleJoinForm, ContainerPage },
   props: { invitationCode: Number },
   computed: {
-    user() { return this.$store.getters.getCurrentUser()},
+    user() { return this.pinaStore.currentUser },
   },
   beforeRouteEnter(to, from, next) {
     next((vm) => {
@@ -24,5 +25,5 @@ export default {
       next();
     });
   },
-};
+});
 </script>

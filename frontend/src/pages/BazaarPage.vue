@@ -14,8 +14,9 @@
 import NotebookBazaarViewCards from "../components/bazaar/NotebookBazaarViewCards.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import api from  "../managedApi/api";
+import storedComponent from "../store/storedComponent";
 
-export default {
+export default storedComponent({
   name: "NotebooksPage",
   components: { ContainerPage, NotebookBazaarViewCards },
   data() {
@@ -25,7 +26,7 @@ export default {
     };
   },
   computed: {
-    user() { return this.$store.getters.getCurrentUser()}
+    user() { return this.piniaStore.currentUser }
   },
 
   methods: {
@@ -40,5 +41,5 @@ export default {
   mounted() {
     this.fetchData();
   },
-};
+});
 </script>

@@ -1,4 +1,4 @@
-import useStore from '../store/pinia_store';
+import useStore from "./pinia_store";
 
 export default function(component) {
   return {

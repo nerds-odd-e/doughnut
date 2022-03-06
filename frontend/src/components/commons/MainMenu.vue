@@ -84,8 +84,9 @@
 <script>
 import api from  '../../managedApi/api'
 import loginOrRegister from '../../managedApi/restful/loginOrRegister';
+import storedComponent from '../../store/storedComponent';
 
-export default {
+export default storedComponent({
   methods: {
     async logout() {
       await api(this).userMethods.logout()
@@ -96,9 +97,9 @@ export default {
     }
   },
   computed: {
-    user() { return this.$store.getters.getCurrentUser()},
-    featureToggle() { return this.$store.getters.getFeatureToggle()},
-    environment() { return this.$store.getters.getEnvironment()},
+    user() { return this.piniaStore.currentUser },
+    featureToggle() { return this.piniaStore.featureToggle },
+    environment() { return this.piniaStore.environment },
   }
-};
+});
 </script>
