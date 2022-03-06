@@ -49,7 +49,6 @@ export default defineStore('main', {
     }),
 
     getters: {
-        getCurrentUser: (state)     => state.currentUser,
         getHighlightNoteId: (state) => () => state.highlightNoteId,
         getViewType: (state) => ()  => state.viewType,
         getHighlightNote: (state)   => () => withState(state).getNoteById(state.highlightNoteId),
@@ -94,7 +93,7 @@ export default defineStore('main', {
         viewType(viewType) {
           this.viewType = viewType
         },
-        currentUser(user) {
+        setCurrentUser(user) {
           this.currentUser = user
         },
         featureToggle(ft) {

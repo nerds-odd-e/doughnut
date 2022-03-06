@@ -46,10 +46,11 @@ export default ()=>createStore({
     currentUser: null,
     featureToggle: false,
     environment: 'production',
+    piniaStore: useStore(),
   }),
 
   getters: {
-    getCurrentUser: (state) => () => state.currentUser,
+    getCurrentUser: (state) => () => state.piniaStore.currentUser,
     getHighlightNoteId: (state) => () => state.highlightNoteId,
     getViewType: (state) => () => state.viewType,
     getHighlightNote: (state) => () => withState(state).getNoteById(state.highlightNoteId),
@@ -91,7 +92,7 @@ export default ()=>createStore({
       state.viewType = viewType
     },
     currentUser(state, user) {
-      state.currentUser = user
+      state.piniaStore.setCurrentUser(user)
     },
     featureToggle(state, ft) {
       state.environment = "testing"
