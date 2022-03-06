@@ -46,8 +46,9 @@ import NotebookNewButton from "../components/notebook/NotebookNewButton.vue";
 import NotebookButtons from "../components/notebook/NotebookButtons.vue";
 import BazaarNotebookButtons from "../components/bazaar/BazaarNotebookButtons.vue";
 import storedApi from  "../managedApi/storedApi";
+import storedComponent from "../store/storedComponent";
 
-export default {
+export default storedComponent({
   components: {
     SvgMissingAvatar,
     NotebookCardsWithButtons,
@@ -82,7 +83,7 @@ export default {
     invitationUrl() {
       return `${window.location.origin}/circles/join/${this.circle.invitationCode}`;
     },
-    featureToggle() { return this.$store.getters.getFeatureToggle()}
+    featureToggle() { return this.piniaStore.featureToggle }
   },
 
   watch: {
@@ -96,7 +97,7 @@ export default {
   mounted() {
     this.fetchData();
   },
-};
+});
 </script>
 
 <style lang="sass" scoped>

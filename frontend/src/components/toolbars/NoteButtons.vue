@@ -64,6 +64,7 @@ export default {
   props: {
     note: Object,
     viewType: String,
+    featureToggle: Boolean,
   },
   components: {
     SvgCog,
@@ -75,11 +76,6 @@ export default {
     NoteNewButton,
     ViewTypeButtons,
     NoteDownloadButton
-  },
-  computed: {
-    featureToggle() {
-      return this.$store.getters.getFeatureToggle();
-    },
   },
   methods: {
     async deleteNote() {

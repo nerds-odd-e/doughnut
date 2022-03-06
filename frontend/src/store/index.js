@@ -7,9 +7,6 @@ export default ()=>createStore({
   }),
 
   getters: {
-    getHighlightNote: (state) => () => state.piniaStore.getHighlightNote(),
-    getEnvironment: (state) => () => state.piniaStore.environment,
-    getFeatureToggle: (state) => () => state.piniaStore.featureToggle,
     getNoteById: (state) => (id) => state.piniaStore.getNoteById(id),
     getChildrenIdsByParentId: (state) => (parentId) => state.piniaStore.getChildrenIdsByParentId(parentId),
     getChildrenOfParentId: (state) => (parentId) => state.piniaStore.getChildrenOfParentId(parentId),

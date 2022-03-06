@@ -49,7 +49,6 @@ export default defineStore('main', {
 
     getters: {
         getHighlightNote: (state)   => () => withState(state).getNoteById(state.highlightNoteId),
-        getEnvironment: (state)     => () => state.environment,
         getNoteById: (state)        => (id) => withState(state).getNoteById(id),
         peekUndo: (state)           => () => {
           if(state.noteUndoHistories.length === 0) return null

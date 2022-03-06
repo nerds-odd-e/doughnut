@@ -3,6 +3,7 @@
     <NoteButtons v-if="currentNote"
     :note="currentNote"
     :viewType="viewType"
+    :featureToggle="featureToggle"
     />
     <div class="btn-group btn-group-sm">
       <LinkNoteButton :note="currentNote" />
@@ -28,6 +29,7 @@ export default storedComponent({
   computed: {
     currentNote() { return this.piniaStore.getHighlightNote() },
     viewType() { return this.piniaStore.viewType },
+    featureToggle() { return this.piniaStore.featureToggle },
   },
 });
 </script>
