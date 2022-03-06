@@ -6,7 +6,6 @@
 
 <script>
 import SvgUndo from "../svgs/SvgUndo.vue";
-import storedApi from  "../../managedApi/storedApi";
 import storedComponent from '../../store/storedComponent';
 
 export default storedComponent({

@@ -1,5 +1,5 @@
 import useStore from "./pinia_store";
-import storedApi from  "../managedApi/storedApi";
+import createStoredApi from  "../managedApi/createStoredApi";
 
 export default function(component) {
   return {
@@ -7,7 +7,7 @@ export default function(component) {
       const piniaStore = useStore()
       return {
         piniaStore,
-        storedApiExp(options={}) { return storedApi(this, options) }
+        storedApiExp(options={}) { return createStoredApi(this, options) }
       }
     },
     ...component,

@@ -1,6 +1,6 @@
 import ManagedApi from './ManagedApi';
 
-const storedApi = (component, options={}) => {
+const createStoredApi = (component, options={}) => {
   const managedApi = new ManagedApi(component, options);
   const store = component.$store
   const {piniaStore} = component
@@ -200,5 +200,5 @@ const storedApi = (component, options={}) => {
   };
 };
 
-export default storedApi;
+export default createStoredApi;
 

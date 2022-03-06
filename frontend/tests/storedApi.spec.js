@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-import storedApi from "../src/managedApi/storedApi";
+import createStoredApi from "../src/managedApi/createStoredApi";
 import store from "./fixtures/testingStore.js";
 import makeMe from "./fixtures/makeMe";
 
@@ -9,9 +9,9 @@ beforeEach(() => {
   fetch.resetMocks();
 });
 
-describe("storedApi", () => {
+describe("createStoredApi", () => {
   const note = makeMe.aNote.please()
-  const sa = storedApi({piniaStore: store})
+  const sa = createStoredApi({piniaStore: store})
 
   describe("delete note", () => {
 

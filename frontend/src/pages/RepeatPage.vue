@@ -66,7 +66,6 @@ import ContainerPage from "./commons/ContainerPage.vue";
 import NoteStatisticsButton from "../components/notes/NoteStatisticsButton.vue";
 import RepeatProgressBar from "../components/review/RepeatProgressBar.vue";
 import api from "../managedApi/api"
-import storedApi from "../managedApi/storedApi"
 import storedComponent from "../store/storedComponent";
 
 export default storedComponent({

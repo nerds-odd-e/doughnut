@@ -45,7 +45,6 @@ import NotebookCardsWithButtons from "../components/notebook/NotebookCardsWithBu
 import NotebookNewButton from "../components/notebook/NotebookNewButton.vue";
 import NotebookButtons from "../components/notebook/NotebookButtons.vue";
 import BazaarNotebookButtons from "../components/bazaar/BazaarNotebookButtons.vue";
-import storedApi from  "../managedApi/storedApi";
 import storedComponent from "../store/storedComponent";
 
 export default storedComponent({

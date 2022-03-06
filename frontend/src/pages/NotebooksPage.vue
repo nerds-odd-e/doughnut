@@ -19,7 +19,6 @@ import NotebookNewButton from "../components/notebook/NotebookNewButton.vue";
 import NoteControl from "../components/toolbars/NoteControl.vue";
 import NotebookSubscriptionCards from "../components/subscriptions/NotebookSubscriptionCards.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
-import storedApi from  "../managedApi/storedApi";
 import storedComponent from '../store/storedComponent';
 
 export default storedComponent({
