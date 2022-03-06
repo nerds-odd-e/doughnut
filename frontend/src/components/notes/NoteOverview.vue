@@ -10,9 +10,10 @@
 </template>
 
 <script lang="ts">
+import storedComponent from "../../store/storedComponent";
 import NoteWithLinks from "./NoteWithLinks.vue";
 
-export default {
+export default storedComponent({
   name: "NoteOverview",
   props: {
     noteId: [String, Number],
@@ -21,13 +22,13 @@ export default {
   components: { NoteWithLinks },
   computed: {
     note() {
-      return this.$store.getters.getNoteById(this.noteId);
+      return this.piniaStore.getNoteById(this.noteId);
     },
     childrenIds() {
-      return this.$store.getters.getChildrenIdsByParentId(this.noteId);
+      return this.piniaStore.getChildrenIdsByParentId(this.noteId);
     },
   },
-};
+});
 </script>
 
 <style lang="sass" scoped>
