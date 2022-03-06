@@ -42,9 +42,9 @@ export default storedComponent({
   },
 
   mounted() {
-    this.storedApiExp({skipLoading: true}).getFeatureToggle()
+    this.storedApi({skipLoading: true}).getFeatureToggle()
 
-    this.storedApiExp().getCurrentUserInfo().then((res) => {
+    this.storedApi().getCurrentUserInfo().then((res) => {
       this.externalIdentifier = res.externalIdentifier;
     })
 

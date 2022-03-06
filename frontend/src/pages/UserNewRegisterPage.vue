@@ -30,7 +30,7 @@ export default storedComponent({
   },
   methods: {
     processForm() {
-      this.storedApiExp().createUser(this.formData)
+      this.storedApi().createUser(this.formData)
         .catch((res) => this.formErrors.value = res)
     },
   },

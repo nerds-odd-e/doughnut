@@ -80,7 +80,7 @@ export default storedComponent({
   },
   methods: {
     onBlurTextField() {
-      this.storedApiExp().updateTextContent(this.note.id, this.textContent)
+      this.storedApi().updateTextContent(this.note.id, this.textContent)
       .then((res) => {
         this.$emit("done");
       })

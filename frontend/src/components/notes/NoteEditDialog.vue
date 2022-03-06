@@ -26,7 +26,7 @@ export default storedComponent({
 
   methods: {
     fetchData() {
-      this.storedApiExp().getNoteAndItsChildren(this.noteId)
+      this.storedApi().getNoteAndItsChildren(this.noteId)
       .then((res) => {
           const { updatedAt, ...rest } = res.notes[0].noteAccessories
           this.formData = rest
@@ -35,7 +35,7 @@ export default storedComponent({
     },
 
     processForm() {
-      this.storedApiExp().updateNote(this.noteId, this.formData)
+      this.storedApi().updateNote(this.noteId, this.formData)
       .then(() => {
         this.$emit("done");
       })

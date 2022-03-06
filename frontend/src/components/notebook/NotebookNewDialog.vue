@@ -40,7 +40,7 @@ export default storedComponent({
   methods: {
 
     processForm() {
-      this.storedApiExp().createNotebook(this.circle,
+      this.storedApi().createNotebook(this.circle,
         this.noteFormData,
       )
         .then((res) =>

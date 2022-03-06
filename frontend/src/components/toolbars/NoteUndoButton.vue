@@ -29,7 +29,7 @@ export default storedComponent({
   },
   methods: {
     undoDelete() {
-      this.storedApiExp().undo()
+      this.storedApi().undo()
     }
   }
 });

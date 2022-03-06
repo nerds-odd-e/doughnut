@@ -111,13 +111,13 @@ export default storedComponent({
           return;
       }
       this.reviewPoint.removedFromReview = skipReview;
-      this.storedApiExp().reviewMethods.doInitialReview(
+      this.storedApi().reviewMethods.doInitialReview(
         { reviewPoint: this.reviewPoint, reviewSetting: this.reviewSetting },
       ).then(this.loadNew)
     },
 
     fetchData() {
-      this.storedApiExp().reviewMethods.getOneInitialReview()
+      this.storedApi().reviewMethods.getOneInitialReview()
       .then(this.loadNew)
     },
   },

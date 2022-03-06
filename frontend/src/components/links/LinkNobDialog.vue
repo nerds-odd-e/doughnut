@@ -52,7 +52,7 @@ export default storedComponent({
 
   methods: {
     updateLink() {
-      this.storedApiExp().updateLink(this.link.id, this.formData)
+      this.storedApi().updateLink(this.link.id, this.formData)
         .then((res) => this.$emit('done'))
         .catch((res) => (this.formErrors = res))
     },
@@ -60,7 +60,7 @@ export default storedComponent({
     async deleteLink() {
       if (!(await this.$popups.confirm("Are you sure to delete this link?")))
         return;
-      this.storedApiExp().deleteLink(this.link.id)
+      this.storedApi().deleteLink(this.link.id)
         .then((res) => { this.$emit('done') })
         .catch((res) => (this.formErrors = res))
     },

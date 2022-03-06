@@ -43,7 +43,7 @@ export default storedComponent({
   },
   methods: {
     fetchData() {
-      this.storedApiExp().getNotebooks().then(
+      this.storedApi().getNotebooks().then(
         (res) => (this.subscriptions = res.subscriptions))
     },
   },

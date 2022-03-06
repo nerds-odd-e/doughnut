@@ -23,7 +23,7 @@ export default storedComponent({
   components: { CheckInput },
   watch: {
     featureToggle() {
-      this.storedApiExp().setFeatureToggle(this.featureToggle)
+      this.storedApi().setFeatureToggle(this.featureToggle)
     }
 
   }
