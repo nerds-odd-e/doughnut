@@ -1,4 +1,5 @@
 import { createStore } from "vuex";
+import useStore from "./pinia_store";
 
 function withState(state) {
   return {
@@ -46,6 +47,7 @@ export default createStore({
     currentUser: null,
     featureToggle: false,
     environment: 'production',
+    piniaStore: useStore(),
   }),
 
   getters: {
