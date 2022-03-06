@@ -18,8 +18,9 @@
 
 <script>
 import MindmapSector from "@/models/MindmapSector";
+import storedComponent from "../../../store/storedComponent";
 
-export default {
+export default storedComponent({
   name: "NoteMindmap",
   props: {
     noteId: [String, Number],
@@ -27,11 +28,11 @@ export default {
   },
   computed: {
     note() {
-      return this.$store.getters.getNoteById(this.noteId);
+      return this.piniaStore.getNoteById(this.noteId);
     },
     childrenIds() {
-      return this.$store.getters.getChildrenIdsByParentId(this.noteId);
+      return this.piniaStore.getChildrenIdsByParentId(this.noteId);
     },
   },
-};
+});
 </script>

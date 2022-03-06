@@ -28,22 +28,22 @@ describe("storedApi", () => {
 
     test("should change the store", async () => {
       await sa.deleteNote(note.id)
-      expect(store.getters.getNoteById(note.id)).toBeUndefined()
+      expect(store.getters.ps().getNoteById(note.id)).toBeUndefined()
     });
 
     test("should remove children notes", async () => {
       const child = makeMe.aNote.under(note).please()
       store.commit("loadNotes", [child]);
       await sa.deleteNote(note.id)
-      expect(store.getters.getNoteById(child.id)).toBeUndefined()
+      expect(store.getters.ps().getNoteById(child.id)).toBeUndefined()
     });
 
     test("should remove child from list", async () => {
       const child = makeMe.aNote.under(note).please()
       store.commit("loadNotes", [child]);
-      const childrenCount = store.getters.getChildrenIdsByParentId(note.id).length
+      const childrenCount = store.getters.ps().getChildrenIdsByParentId(note.id).length
       await sa.deleteNote(child.id)
-      expect(store.getters.getChildrenIdsByParentId(note.id)).toHaveLength(childrenCount - 1)
+      expect(store.getters.ps().getChildrenIdsByParentId(note.id)).toHaveLength(childrenCount - 1)
     });
 
   });

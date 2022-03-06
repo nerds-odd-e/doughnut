@@ -59,8 +59,9 @@ import NoteParentChildConnection from "./NoteParentChildConnection.vue";
 import NoteLinks from "./NoteLinks.vue";
 import MindmapSector from "@/models/MindmapSector";
 import Mindmap from "@/models/Mindmap";
+import storedComponent from "../../../store/storedComponent";
 
-export default {
+export default storedComponent({
   name: "NoteMindmap",
   props: {
     highlightNoteId: [String, Number],
@@ -83,14 +84,14 @@ export default {
         this.offset.scale,
         this.mindmapSector,
         this.noteId,
-        this.$store.getters.getNoteById,
+        this.piniaStore.getNoteById,
         150,
         50
       )
     },
 
   },
-};
+});
 </script>
 
 <style lang="sass">
