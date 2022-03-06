@@ -7,12 +7,19 @@ import {
   Background,
 } from "cypress-cucumber-preprocessor/steps";
 
+
+When("I start searching", () => {
+  cy.startSearching();
+});
+
 When("I am creating link for note {string}", (noteTitle) => {
-  cy.creatingLinkFor(noteTitle);
+  cy.jumpToNotePage(noteTitle);
+  cy.startSearching();
 });
 
 function makingLink(cy, fromNoteTitle, linkType, toNoteTitle) {
-  cy.creatingLinkFor(fromNoteTitle);
+  cy.jumpToNotePage(fromNoteTitle);
+  cy.startSearching();
   cy.searchNote(toNoteTitle);
   cy.clickButtonOnCardBody(toNoteTitle, "Select");
   cy.clickRadioByLabel(linkType);

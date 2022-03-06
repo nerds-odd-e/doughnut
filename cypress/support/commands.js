@@ -217,8 +217,8 @@ Cypress.Commands.add('visitMyNotebooks', (noteTitle) => {
   cy.visit('/notebooks');
 });
 
-Cypress.Commands.add('creatingLinkFor', (noteTitle) => {
-  cy.clickNotePageButton(noteTitle, 'link note');
+Cypress.Commands.add('startSearching', (noteTitle) => {
+  cy.clickNoteToolbarButton('link note');
 });
 
 Cypress.Commands.add('clickNotePageButton', (noteTitle, btnTextOrTitle, forceLoadPage) => {
