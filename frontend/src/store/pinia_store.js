@@ -41,7 +41,6 @@ export default defineStore('main', {
         notebooks: [],
         notes: {},
         highlightNoteId: null,
-        viewType: null,
         noteUndoHistories: [],
         currentUser: null,
         featureToggle: false,
@@ -49,7 +48,6 @@ export default defineStore('main', {
     }),
 
     getters: {
-        getViewType: (state) => ()  => state.viewType,
         getHighlightNote: (state)   => () => withState(state).getNoteById(state.highlightNoteId),
         getEnvironment: (state)     => () => state.environment,
         getNoteById: (state)        => (id) => withState(state).getNoteById(id),
@@ -88,7 +86,7 @@ export default defineStore('main', {
         setHighlightNoteId(noteId) {
           this.highlightNoteId = noteId
         },
-        viewType(viewType) {
+        setViewType(viewType) {
           this.viewType = viewType
         },
         setCurrentUser(user) {

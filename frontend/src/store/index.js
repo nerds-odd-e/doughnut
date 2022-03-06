@@ -40,7 +40,6 @@ function withState(state) {
 export default ()=>createStore({
   state: () => ({
     notes: {},
-    viewType: null,
     noteUndoHistories: [],
     featureToggle: false,
     piniaStore: useStore(),
@@ -49,7 +48,7 @@ export default ()=>createStore({
   getters: {
     getCurrentUser: (state) => () => state.piniaStore.currentUser,
     getHighlightNoteId: (state) => () => state.piniaStore.highlightNoteId,
-    getViewType: (state) => () => state.viewType,
+    getViewType: (state) => () => state.piniaStore.viewType,
     getHighlightNote: (state) => () => withState(state).getNoteById(state.piniaStore.highlightNoteId),
     getEnvironment: (state) => () => state.piniaStore.environment,
     getFeatureToggle: (state) => () => state.piniaStore.featureToggle,
@@ -86,7 +85,7 @@ export default ()=>createStore({
       state.piniaStore.setHighlightNoteId(noteId)
     },
     viewType(state, viewType) {
-      state.viewType = viewType
+      state.piniaStore.setViewType(viewType)
     },
     currentUser(state, user) {
       state.piniaStore.setCurrentUser(user)
