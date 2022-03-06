@@ -20,13 +20,9 @@ import NoteControl from "../components/toolbars/NoteControl.vue";
 import NotebookSubscriptionCards from "../components/subscriptions/NotebookSubscriptionCards.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import storedApi from  "../managedApi/storedApi";
-import useStore from '../store/pinia_store';
+import storedComponent from '../store/storedComponent';
 
-export default {
-  setup() {
-    const piniaStore = useStore()
-    return { piniaStore }
-  },
+export default storedComponent({
   name: "NotebooksPage",
   components: {
     ContainerPage,
@@ -55,5 +51,5 @@ export default {
   mounted() {
     this.fetchData();
   },
-};
+});
 </script>
