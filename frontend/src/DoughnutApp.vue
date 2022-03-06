@@ -3,8 +3,9 @@ import Popups from "./components/commons/Popups.vue";
 import MainMenu from "./components/commons/MainMenu.vue";
 import UserNewRegisterPage from "./pages/UserNewRegisterPage.vue";
 import storedApi from  "./managedApi/storedApi"
+import storedComponent from './store/storedComponent';
 
-export default {
+export default storedComponent({
   data() {
     return {
       externalIdentifier: null,
@@ -30,7 +31,7 @@ export default {
 
   computed: {
     newUser() { return !this.user && !!this.externalIdentifier; },
-    user() { return this.$store.getters.getCurrentUser()},
+    user() { return this.piniaStore.currentUser },
   },
 
   methods: {
@@ -69,7 +70,7 @@ export default {
       });
     };
   },
-};
+});
 </script>
 
 <template>
