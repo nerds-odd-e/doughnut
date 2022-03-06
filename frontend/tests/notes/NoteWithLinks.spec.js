@@ -41,7 +41,7 @@ describe("new/updated pink banner", () => {
 describe("in place edit on title", () => {
   it("should display text field when one single click on title", async () => {
     const noteParent = makeMe.aNote.title("Dummy Title").please();
-    store.getters.ps().loadNotes([noteParent]);
+    store.loadNotes([noteParent]);
 
     const { wrapper } = mountWithStoreAndMockRoute(store, NoteWithLinks, {
       props: {
@@ -58,7 +58,7 @@ describe("in place edit on title", () => {
 
   it("should back to label when blur text field title", async () => {
     const noteParent = makeMe.aNote.title("Dummy Title").please();
-    store.getters.ps().loadNotes([noteParent]);
+    store.loadNotes([noteParent]);
 
     const { wrapper } = mountWithStoreAndMockRoute(store, NoteWithLinks, {
       props: {
@@ -82,7 +82,7 @@ describe("undo editing", () => {
 
   it("should call addEditingToUndoHistory on submitChange", async () => {
     const note = makeMe.aNote.title("Dummy Title").please();
-    store.getters.ps().loadNotes([note]);
+    store.loadNotes([note]);
 
     const updatedTitle = "updated";
     const { wrapper } = mountWithStoreAndMockRoute(store, NoteWithLinks, {
@@ -95,6 +95,6 @@ describe("undo editing", () => {
     await wrapper.find('[role="title"] input').setValue(updatedTitle);
     await wrapper.find('[role="title"] input').trigger("blur");
 
-    expect(store.getters.ps().peekUndo()).toMatchObject({type: 'editing'})
+    expect(store.peekUndo()).toMatchObject({type: 'editing'})
   });
 });

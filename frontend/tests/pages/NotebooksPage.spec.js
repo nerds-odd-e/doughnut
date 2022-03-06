@@ -36,8 +36,8 @@ describe("Notebooks Page", () => {
 
    test("show undo when there is something to undo", async () => {
         const notebook = makeMe.aNotebook.please()
-        store.getters.ps().loadNotes([notebook.headNote])
-        store.getters.ps().deleteNote( notebook.headNote.id)
+        store.loadNotes([notebook.headNote])
+        store.deleteNote( notebook.headNote.id)
 
         renderWithStoreAndMockRoute(store, NotebooksPage, {});
 

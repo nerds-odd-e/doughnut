@@ -1,6 +1,6 @@
 import { createTestingPinia } from "@pinia/testing";
-import creatingLegacyStore from "../../src/store";
+import createPiniaStore from "../../src/store/pinia_store";
 
 const pinia = createTestingPinia();
 
-export default creatingLegacyStore();
+export default createPiniaStore(pinia);

@@ -11,13 +11,13 @@ beforeEach(() => {
 
 describe("storedApi", () => {
   const note = makeMe.aNote.please()
-  const sa = storedApi({piniaStore: store.getters.ps()})
+  const sa = storedApi({piniaStore: store})
 
   describe("delete note", () => {
 
     beforeEach(() => {
       fetch.mockResponseOnce(JSON.stringify({}));
-      store.getters.ps().loadNotes([note]);
+      store.loadNotes([note]);
     });
 
     test("should call the api", async () => {
@@ -28,22 +28,22 @@ describe("storedApi", () => {
 
     test("should change the store", async () => {
       await sa.deleteNote(note.id)
-      expect(store.getters.ps().getNoteById(note.id)).toBeUndefined()
+      expect(store.getNoteById(note.id)).toBeUndefined()
     });
 
     test("should remove children notes", async () => {
       const child = makeMe.aNote.under(note).please()
-      store.getters.ps().loadNotes([child]);
+      store.loadNotes([child]);
       await sa.deleteNote(note.id)
-      expect(store.getters.ps().getNoteById(child.id)).toBeUndefined()
+      expect(store.getNoteById(child.id)).toBeUndefined()
     });
 
     test("should remove child from list", async () => {
       const child = makeMe.aNote.under(note).please()
-      store.getters.ps().loadNotes([child]);
-      const childrenCount = store.getters.ps().getChildrenIdsByParentId(note.id).length
+      store.loadNotes([child]);
+      const childrenCount = store.getChildrenIdsByParentId(note.id).length
       await sa.deleteNote(child.id)
-      expect(store.getters.ps().getChildrenIdsByParentId(note.id)).toHaveLength(childrenCount - 1)
+      expect(store.getChildrenIdsByParentId(note.id)).toHaveLength(childrenCount - 1)
     });
 
   });

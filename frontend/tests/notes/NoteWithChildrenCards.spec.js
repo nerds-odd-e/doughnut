@@ -13,7 +13,7 @@ describe("note wth child cards", () => {
     const notePosition = makeMe.aNotePosition.please()
     const noteParent = makeMe.aNote.title("parent").please();
     const noteChild = makeMe.aNote.title("child").under(noteParent).please();
-    store.getters.ps().loadNotes([noteParent, noteChild]);
+    store.loadNotes([noteParent, noteChild]);
     renderWithStoreAndMockRoute(
       store,
       NoteCardsView,

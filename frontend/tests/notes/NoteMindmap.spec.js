@@ -14,7 +14,7 @@ describe("note mindmap", () => {
   })
 
   const renderAndGetContainer = (noteId, props={}) => {
-    store.getters.ps().loadNotes(notes);
+    store.loadNotes(notes);
     const { wrapper } = renderWithStoreAndMockRoute(
       store,
       NoteMinmap,

@@ -12,7 +12,7 @@ describe("note wth child cards", () => {
   it("view note belongs to other people in bazaar", async () => {
     const note = makeMe.aNote.please();
     const notePosition = makeMe.aNotePosition.inBazaar().please();
-    store.getters.ps().loadNotes([note]);
+    store.loadNotes([note]);
     renderWithStoreAndMockRoute(
       store,
       Breadcrumb,

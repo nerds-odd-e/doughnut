@@ -9,14 +9,14 @@ describe("storeUndoCommand", () => {
 
   describe("addEditingToUndoHistory", () => {
     beforeEach(() => {
-      store.getters.ps().loadNotes([note]);
+      store.loadNotes([note]);
     });
 
     test("should push textContent into store state noteUndoHistories ",
         () => {
-          store.getters.ps().addEditingToUndoHistory( { noteId: note.id, });
+          store.addEditingToUndoHistory( { noteId: note.id, });
 
-          expect(store.state.piniaStore.noteUndoHistories.length).toEqual(1);
+          expect(store.noteUndoHistories.length).toEqual(1);
         });
   });
 
@@ -25,23 +25,23 @@ describe("storeUndoCommand", () => {
     let initialUndoCount;
 
     beforeEach(() => {
-      store.getters.ps().loadNotes([note]);
-      store.getters.ps().addEditingToUndoHistory( mockUpdatedNote);
-      initialUndoCount = store.state.piniaStore.noteUndoHistories.length;
+      store.loadNotes([note]);
+      store.addEditingToUndoHistory( mockUpdatedNote);
+      initialUndoCount = store.noteUndoHistories.length;
     });
 
     it('should undo to last history', () => {
-      store.getters.ps().popUndoHistory();
+      store.popUndoHistory();
 
-      expect(store.state.piniaStore.noteUndoHistories.length).toEqual(initialUndoCount - 1);
+      expect(store.noteUndoHistories.length).toEqual(initialUndoCount - 1);
     });
 
     it('should not undo to last history if there is no more history', () => {
-      store.getters.ps().popUndoHistory();
-      store.getters.ps().popUndoHistory();
-      store.getters.ps().popUndoHistory();
+      store.popUndoHistory();
+      store.popUndoHistory();
+      store.popUndoHistory();
 
-      expect(store.state.piniaStore.noteUndoHistories.length).toEqual(0);
+      expect(store.noteUndoHistories.length).toEqual(0);
     });
   })
 });

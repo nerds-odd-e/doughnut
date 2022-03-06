@@ -7,6 +7,6 @@ export default ()=>createStore({
   }),
 
   getters: {
-    ps: (state) => () => state.piniaStore,
+    ps1: (state) => () => state.piniaStore,
   },
 });
