@@ -47,6 +47,7 @@
           mindmap,
           highlightNoteId,
         }"
+        @highlight="$store.commit('highlightNoteId', $event)"
       />
     </template>
   </NoteMindmapScaffold>

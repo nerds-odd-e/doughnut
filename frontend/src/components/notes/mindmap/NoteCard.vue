@@ -4,7 +4,7 @@
   v-bind="{id: note.id, updatedAt: note.textContent?.updatedAt}"
   role="card" :aria-label="note.title"
   :style="`top:${coord.y}px; left:${coord.x}px`"
-  v-on:click="highlight">
+  v-on:click="$emit('highlight', note.id)">
     <NoteContent v-bind="{note, size}" :titleAsLink="true"/>
   </NoteShell>
 </template>
@@ -21,6 +21,7 @@ export default {
     mindmap: Object,
     highlightNoteId: [String, Number],
   },
+  emits: ['highlight'],
   components: {
      NoteShell,
      NoteContent,
@@ -32,12 +33,6 @@ export default {
     coord() { return this.mindmap.coord(this.mindmapSector) },
     size() { return this.mindmap.size() },
   },
-  methods: {
-    highlight() {
-      this.$store.commit('highlightNoteId', this.note.id)
-    }
-  }
-
 }
 </script>
 
