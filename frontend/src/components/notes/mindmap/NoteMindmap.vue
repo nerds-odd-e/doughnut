@@ -47,7 +47,7 @@
           mindmap,
           highlightNoteId,
         }"
-        @highlight="$store.commit('highlightNoteId', $event)"
+        @highlight="piniaStore.setHighlightNoteId($event)"
       />
     </template>
   </NoteMindmapScaffold>

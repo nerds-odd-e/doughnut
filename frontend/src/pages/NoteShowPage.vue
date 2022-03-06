@@ -1,6 +1,7 @@
 <template>
   <LoadingPage v-bind="{ loading, contentExists: !!notePosition }">
     <NotePageFrame
+      @highlight="piniaStore.setHighlightNoteId($event)"
       v-bind="{
         noteId,
         notePosition,
@@ -14,7 +15,6 @@
 <script>
 import LoadingPage from "./commons/LoadingPage.vue";
 import NotePageFrame from '../components/notes/views/NotePageFrame.vue';
-import storedApi from  "../managedApi/storedApi";
 import { viewType } from "../models/viewTypes";
 import storedComponent from "../store/storedComponent";
 

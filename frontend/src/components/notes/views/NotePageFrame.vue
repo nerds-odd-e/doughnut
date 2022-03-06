@@ -27,9 +27,10 @@ export default {
      expandChildren: { type: Boolean, required: true },
   },
   components: { NoteControl, NoteMindmapView, Breadcrumb, NoteCardsView, NoteArticleView },
+  emits: ['highlight'],
   methods: {
     highlight(id) { 
-      this.$store.commit("highlightNoteId", id)
+      this.$emit('highlight')
     },
   },
   watch: {
