@@ -39,7 +39,6 @@ function withState(state) {
 
 export default ()=>createStore({
   state: () => ({
-    notebooks: [],
     notes: {},
     highlightNoteId: null,
     viewType: null,
@@ -50,7 +49,6 @@ export default ()=>createStore({
   }),
 
   getters: {
-    getNotebooks: (state) => () => state.notebooks,
     getCurrentUser: (state) => () => state.currentUser,
     getHighlightNoteId: (state) => () => state.highlightNoteId,
     getViewType: (state) => () => state.viewType,
@@ -67,9 +65,6 @@ export default ()=>createStore({
   },
 
   mutations: {
-    notebooks(state, notebooks) {
-      state.notebooks = notebooks
-    },
     addEditingToUndoHistory(state, {noteId}) {
       state.noteUndoHistories.push({type: 'editing', noteId, textContent: {...withState(state).getNoteById(noteId).textContent}});
     },

@@ -75,7 +75,6 @@ const storedApi = (component, options={}) => {
 
     async getNotebooks() {
       const res = await managedApi.restGet(`notebooks`);
-      console.table(piniaStore)
       piniaStore.setNotebooks(res.notebooks);
       return res;
     },

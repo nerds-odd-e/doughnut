@@ -49,7 +49,6 @@ export default defineStore('main', {
     }),
 
     getters: {
-        getNotebooks: (state)       => state.notebooks,
         getCurrentUser: (state)     => state.currentUser,
         getHighlightNoteId: (state) => () => state.highlightNoteId,
         getViewType: (state) => ()  => state.viewType,
