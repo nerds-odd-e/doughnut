@@ -3,7 +3,7 @@ import ManagedApi from './ManagedApi';
 const storedApi = (component, options={}) => {
   const managedApi = new ManagedApi(component, options);
   const store = component.$store
-  const piniaStore = component.piniaStore
+  const {piniaStore} = component
 
   function loadReviewPointViewedByUser(data) {
     if (!data) return;

@@ -49,11 +49,9 @@ export default defineStore('main', {
     }),
 
     getters: {
-        getHighlightNoteId: (state) => () => state.highlightNoteId,
         getViewType: (state) => ()  => state.viewType,
         getHighlightNote: (state)   => () => withState(state).getNoteById(state.highlightNoteId),
         getEnvironment: (state)     => () => state.environment,
-        getFeatureToggle: (state)   => () => state.featureToggle,
         getNoteById: (state)        => (id) => withState(state).getNoteById(id),
         peekUndo: (state)           => () => {
           if(state.noteUndoHistories.length === 0) return null
@@ -87,7 +85,7 @@ export default defineStore('main', {
           withState(this).deleteNote(noteId)
           this.noteUndoHistories.push({type: 'delete note', noteId});
         },
-        highlightNoteId(noteId) {
+        setHighlightNoteId(noteId) {
           this.highlightNoteId = noteId
         },
         viewType(viewType) {
@@ -96,7 +94,7 @@ export default defineStore('main', {
         setCurrentUser(user) {
           this.currentUser = user
         },
-        featureToggle(ft) {
+        setFeatureToggle(ft) {
           this.environment = "testing"
           this.featureToggle = ft
         },

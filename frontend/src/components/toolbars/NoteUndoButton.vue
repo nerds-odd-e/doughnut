@@ -7,8 +7,13 @@
 <script>
 import SvgUndo from "../svgs/SvgUndo.vue";
 import storedApi from  "../../managedApi/storedApi";
+import useStore from '../../store/pinia_store';
 
 export default {
+  setup() {
+    const piniaStore = useStore()
+    return { piniaStore }
+  },
   name: "NoteUndoButton",
   components: {
     SvgUndo,

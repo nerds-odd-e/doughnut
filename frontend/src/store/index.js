@@ -40,22 +40,19 @@ function withState(state) {
 export default ()=>createStore({
   state: () => ({
     notes: {},
-    highlightNoteId: null,
     viewType: null,
     noteUndoHistories: [],
-    currentUser: null,
     featureToggle: false,
-    environment: 'production',
     piniaStore: useStore(),
   }),
 
   getters: {
     getCurrentUser: (state) => () => state.piniaStore.currentUser,
-    getHighlightNoteId: (state) => () => state.highlightNoteId,
+    getHighlightNoteId: (state) => () => state.piniaStore.highlightNoteId,
     getViewType: (state) => () => state.viewType,
-    getHighlightNote: (state) => () => withState(state).getNoteById(state.highlightNoteId),
-    getEnvironment: (state) => () => state.environment,
-    getFeatureToggle: (state) => () => state.featureToggle,
+    getHighlightNote: (state) => () => withState(state).getNoteById(state.piniaStore.highlightNoteId),
+    getEnvironment: (state) => () => state.piniaStore.environment,
+    getFeatureToggle: (state) => () => state.piniaStore.featureToggle,
     getNoteById: (state) => (id) => withState(state).getNoteById(id),
     getChildrenIdsByParentId: (state) => (parentId) => withState(state).getChildrenIdsByParentId(parentId),
     getChildrenOfParentId: (state) => (parentId) => withState(state).getChildrenOfParentId(parentId),
@@ -86,7 +83,7 @@ export default ()=>createStore({
       state.noteUndoHistories.push({type: 'delete note', noteId});
     },
     highlightNoteId(state, noteId) {
-      state.highlightNoteId = noteId
+      state.piniaStore.setHighlightNoteId(noteId)
     },
     viewType(state, viewType) {
       state.viewType = viewType
@@ -96,7 +93,7 @@ export default ()=>createStore({
     },
     featureToggle(state, ft) {
       state.environment = "testing"
-      state.featureToggle = ft
+      state.piniaStore.setFeatureToggle(ft)
     },
   },
 });
