@@ -22,7 +22,7 @@
 import Breadcrumb from "./Breadcrumb.vue";
 import NoteFormTitleOnly from "./NoteFormTitleOnly.vue";
 import LinkTypeSelect from "../links/LinkTypeSelect.vue";
-import storedApi from  "../../managedApi/storedApi";
+import storedComponent from "../../store/storedComponent";
 
 function initialState() {
   return {
@@ -34,7 +34,7 @@ function initialState() {
   };
 }
 
-export default {
+export default storedComponent({
   components: {
     Breadcrumb,
     NoteFormTitleOnly,
@@ -54,7 +54,7 @@ export default {
   },
   methods: {
     fetchData() {
-      storedApi(this).getNoteAndItsChildren(this.parentId)
+      this.storedApiExp().getNoteAndItsChildren(this.parentId)
       .then((res) => {
           const note = res.notes[0]
           const { ancestors, notebook } = res.notePosition;
@@ -65,7 +65,7 @@ export default {
     },
 
     processForm() {
-      storedApi(this).createNote(this.parentId,
+      this.storedApiExp().createNote(this.parentId,
         this.creationData
       ).then((res) => {
         this.$router.push({
@@ -76,5 +76,5 @@ export default {
       .catch((res) => (this.formErrors = res))
     },
   },
-};
+});
 </script>

@@ -7,7 +7,6 @@
 
 <script>
 import NoteFormBody from "./NoteFormBody.vue";
-import storedApi from  "../../managedApi/storedApi";
 import storedComponent from "../../store/storedComponent";
 
 export default storedComponent({
@@ -36,7 +35,7 @@ export default storedComponent({
     },
 
     processForm() {
-      storedApi(this).updateNote(this.noteId, this.formData)
+      this.storedApiExp().updateNote(this.noteId, this.formData)
       .then(() => {
         this.$emit("done");
       })
