@@ -44,9 +44,9 @@ import LinkTypeSelect from "./LinkTypeSelect.vue";
 import CheckInput from "../form/CheckInput.vue";
 import RadioButtons from "../form/RadioButtons.vue";
 import SvgGoBack from "../svgs/SvgGoBack.vue";
-import storedApi from  "../../managedApi/storedApi";
+import storedComponent from "../../store/storedComponent";
 
-export default {
+export default storedComponent({
   name: "LinkNoteFinalize",
   props: { note: Object, targetNote: { type: Object, required: true } },
   components: { LinkTypeSelect, SvgGoBack, CheckInput, RadioButtons },
@@ -68,12 +68,12 @@ export default {
           return;
         }
       }
-      storedApi(this).createLink(this.note.id, this.targetNote.id, this.formData)
+      this.storedApiExp().createLink(this.note.id, this.targetNote.id, this.formData)
         .then((r) => this.$emit("success"))
         .catch((res) => {
           this.formErrors = res
         });
     },
   },
-};
+});
 </script>

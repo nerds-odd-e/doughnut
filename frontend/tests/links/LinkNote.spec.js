@@ -4,8 +4,11 @@
 import LinkNoteFinalize from "@/components/links/LinkNoteFinalize.vue";
 import { mount } from "@vue/test-utils";
 import makeMe from "../fixtures/makeMe";
+import { createTestingPinia } from "@pinia/testing";
 
 describe("LinkNoteFinalize", () => {
+  createTestingPinia();
+
   test("going back", async () => {
     const note = makeMe.aNote.please()
     const wrapper = mount(LinkNoteFinalize, {

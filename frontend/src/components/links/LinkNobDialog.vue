@@ -33,9 +33,9 @@
 <script>
 import LinkTypeSelect from "./LinkTypeSelect.vue";
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue";
-import storedApi from  "../../managedApi/storedApi";
+import storedComponent from "../../store/storedComponent";
 
-export default {
+export default storedComponent({
   props: { link: Object, inverseIcon: Boolean, colors: Object },
   emits: ["done"],
   components: {
@@ -52,7 +52,7 @@ export default {
 
   methods: {
     updateLink() {
-      storedApi(this).updateLink(this.link.id, this.formData)
+      this.storedApiExp().updateLink(this.link.id, this.formData)
         .then((res) => this.$emit('done'))
         .catch((res) => (this.formErrors = res))
     },
@@ -60,12 +60,12 @@ export default {
     async deleteLink() {
       if (!(await this.$popups.confirm("Are you sure to delete this link?")))
         return;
-      storedApi(this).deleteLink(this.link.id)
+      this.storedApiExp().deleteLink(this.link.id)
         .then((res) => { this.$emit('done') })
         .catch((res) => (this.formErrors = res))
     },
   },
-};
+});
 </script>
 
 <style scoped>
