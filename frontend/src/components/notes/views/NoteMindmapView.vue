@@ -20,10 +20,11 @@
 <script>
 import NoteMindmap from "../mindmap/NoteMindmap.vue";
 import DragListner from "../../commons/DragListner.vue";
+import storedComponent from "../../../store/storedComponent";
 
 const defaultOffset = {x: 0, y: 0, scale: 1.0, rotate: 0}
 
-export default {
+export default storedComponent({
   props: {
     noteId: [String, Number],
     expandChildren: { type: Boolean, required: true },
@@ -40,7 +41,7 @@ export default {
     },
   },
   computed: {
-    highlightNoteId() { return this.$store.getters.getHighlightNoteId() },
+    highlightNoteId() { return this.piniaStore.highlightNoteId },
     centerX() {
       return `calc(50% + ${this.offset.x}px)`
     },
@@ -57,7 +58,7 @@ export default {
       return `rotate: ${ (this.offset.rotate * 180 / Math.PI).toFixed(0)}`
     }
   },
-};
+});
 </script>
 
 <style lang="sass" scoped>
