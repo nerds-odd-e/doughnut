@@ -161,19 +161,19 @@ const storedApi = (component, options={}) => {
 
     async getCurrentUserInfo() {
       const res = await managedApi.restGet(`user/current-user-info`);
-      piniaStore.currentUser( res.user);
+      piniaStore.setCurrentUser( res.user);
       return res;
     },
 
     async updateUser(userId, data) {
       const res = await managedApi.restPatchMultiplePartForm(`user/${userId}`, data);
-      piniaStore.currentUser( res);
+      piniaStore.setCurrentUser( res);
       return res;
     },
 
     async createUser(data) {
       const res = await managedApi.restPostMultiplePartForm(`user`, data);
-      piniaStore.currentUser( res);
+      piniaStore.setCurrentUser( res);
       return res;
     },
 
@@ -181,7 +181,7 @@ const storedApi = (component, options={}) => {
       return (
         !window.location.href.includes('odd-e.com') &&
         managedApi.restGet(`testability/feature_toggle`).then((res) =>
-          piniaStore.featureToggle( res)
+          piniaStore.setFeatureToggle( res)
         )
       );
     },

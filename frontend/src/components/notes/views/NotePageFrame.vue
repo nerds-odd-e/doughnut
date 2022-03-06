@@ -30,7 +30,7 @@ export default {
   emits: ['highlight'],
   methods: {
     highlight(id) { 
-      this.$emit('highlight')
+      this.$emit('highlight', id)
     },
   },
   watch: {
