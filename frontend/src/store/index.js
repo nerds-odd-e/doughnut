@@ -3,8 +3,6 @@ import useStore from "./pinia_store";
 
 export default ()=>createStore({
   state: () => ({
-    notes: {},
-    noteUndoHistories: [],
     piniaStore: useStore(),
   }),
 
@@ -18,29 +16,21 @@ export default ()=>createStore({
     getNoteById: (state) => (id) => state.piniaStore.getNoteById(id),
     getChildrenIdsByParentId: (state) => (parentId) => state.piniaStore.getChildrenIdsByParentId(parentId),
     getChildrenOfParentId: (state) => (parentId) => state.piniaStore.getChildrenOfParentId(parentId),
-    peekUndo: (state) => () => {
-      if(state.noteUndoHistories.length === 0) return null
-      return state.noteUndoHistories[state.noteUndoHistories.length - 1]
-    },
+    peekUndo: (state) => () => state.piniaStore.peekUndo(),
   },
 
   mutations: {
     addEditingToUndoHistory(state, {noteId}) {
-      state.noteUndoHistories.push({type: 'editing', noteId, textContent: {
-        ...state.piniaStore.getNoteById(noteId).textContent}});
+      state.piniaStore.addEditingToUndoHistory({noteId})
     },
     popUndoHistory(state) {
-      if (state.noteUndoHistories.length === 0) {
-        return
-      }
-      state.noteUndoHistories.pop();
+      state.piniaStore.popUndoHistory()
     },
     loadNotes(state, notes) {
       state.piniaStore.loadNotes(notes)
     },
     deleteNote(state, noteId) {
       state.piniaStore.deleteNote(noteId);
-      state.noteUndoHistories.push({type: 'delete note', noteId});
     },
     highlightNoteId(state, noteId) {
       state.piniaStore.setHighlightNoteId(noteId)
@@ -52,7 +42,6 @@ export default ()=>createStore({
       state.piniaStore.setCurrentUser(user)
     },
     featureToggle(state, ft) {
-      state.environment = "testing"
       state.piniaStore.setFeatureToggle(ft)
     },
   },

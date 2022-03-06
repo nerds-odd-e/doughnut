@@ -16,7 +16,7 @@ describe("storeUndoCommand", () => {
         () => {
           store.commit('addEditingToUndoHistory', { noteId: note.id, });
 
-          expect(store.state.noteUndoHistories.length).toEqual(1);
+          expect(store.state.piniaStore.noteUndoHistories.length).toEqual(1);
         });
   });
 
@@ -27,13 +27,13 @@ describe("storeUndoCommand", () => {
     beforeEach(() => {
       store.commit('loadNotes', [note]);
       store.commit('addEditingToUndoHistory', mockUpdatedNote);
-      initialUndoCount = store.state.noteUndoHistories.length;
+      initialUndoCount = store.state.piniaStore.noteUndoHistories.length;
     });
 
     it('should undo to last history', () => {
       store.commit('popUndoHistory');
 
-      expect(store.state.noteUndoHistories.length).toEqual(initialUndoCount - 1);
+      expect(store.state.piniaStore.noteUndoHistories.length).toEqual(initialUndoCount - 1);
     });
 
     it('should not undo to last history if there is no more history', () => {
@@ -41,7 +41,7 @@ describe("storeUndoCommand", () => {
       store.commit('popUndoHistory');
       store.commit('popUndoHistory');
 
-      expect(store.state.noteUndoHistories.length).toEqual(0);
+      expect(store.state.piniaStore.noteUndoHistories.length).toEqual(0);
     });
   })
 });
