@@ -7,7 +7,6 @@ export default ()=>createStore({
   }),
 
   getters: {
-    getViewType: (state) => () => state.piniaStore.viewType,
     getHighlightNote: (state) => () => state.piniaStore.getHighlightNote(),
     getEnvironment: (state) => () => state.piniaStore.environment,
     getFeatureToggle: (state) => () => state.piniaStore.featureToggle,

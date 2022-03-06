@@ -17,16 +17,17 @@
 import NoteButtons from './NoteButtons.vue'
 import NoteUndoButton from "./NoteUndoButton.vue";
 import LinkNoteButton from "../links/LinkNoteButton.vue";
+import storedComponent from '../../store/storedComponent';
 
-export default {
+export default storedComponent({
   components: {
     NoteButtons,
     NoteUndoButton,
     LinkNoteButton,
   },
   computed: {
-    currentNote() { return this.$store.getters.getHighlightNote()},
-    viewType() { return this.$store.getters.getViewType()},
+    currentNote() { return this.piniaStore.getHighlightNote() },
+    viewType() { return this.piniaStore.viewType },
   },
-};
+});
 </script>
