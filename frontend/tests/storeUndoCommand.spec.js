@@ -9,7 +9,7 @@ describe("storeUndoCommand", () => {
 
   describe("addEditingToUndoHistory", () => {
     beforeEach(() => {
-      store.commit("loadNotes", [note]);
+      store.getters.ps().loadNotes([note]);
     });
 
     test("should push textContent into store state noteUndoHistories ",

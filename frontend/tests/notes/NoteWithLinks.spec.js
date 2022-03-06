@@ -41,7 +41,7 @@ describe("new/updated pink banner", () => {
 describe("in place edit on title", () => {
   it("should display text field when one single click on title", async () => {
     const noteParent = makeMe.aNote.title("Dummy Title").please();
-    store.commit("loadNotes", [noteParent]);
+    store.getters.ps().loadNotes([noteParent]);
 
     const { wrapper } = mountWithStoreAndMockRoute(store, NoteWithLinks, {
       props: {
@@ -58,7 +58,7 @@ describe("in place edit on title", () => {
 
   it("should back to label when blur text field title", async () => {
     const noteParent = makeMe.aNote.title("Dummy Title").please();
-    store.commit("loadNotes", [noteParent]);
+    store.getters.ps().loadNotes([noteParent]);
 
     const { wrapper } = mountWithStoreAndMockRoute(store, NoteWithLinks, {
       props: {
@@ -82,7 +82,7 @@ describe("undo editing", () => {
 
   it("should call addEditingToUndoHistory on submitChange", async () => {
     const note = makeMe.aNote.title("Dummy Title").please();
-    store.commit("loadNotes", [note]);
+    store.getters.ps().loadNotes([note]);
 
     const updatedTitle = "updated";
     const { wrapper } = mountWithStoreAndMockRoute(store, NoteWithLinks, {

@@ -11,7 +11,7 @@ import store from "../fixtures/testingStore.js";
 describe("note overview", () => {
   it("should render one note", async () => {
     const note = makeMe.aNote.title("single note").please();
-    store.commit("loadNotes", [note]);
+    store.getters.ps().loadNotes([note]);
     renderWithStoreAndMockRoute(
       store,
       NoteOverview,
@@ -23,7 +23,7 @@ describe("note overview", () => {
 
   it("should render one note with links", async () => {
     const note = makeMe.aNote.title("source").linkToSomeNote().please();
-    store.commit("loadNotes", [note]);
+    store.getters.ps().loadNotes([note]);
     renderWithStoreAndMockRoute(
       store,
       NoteOverview,
@@ -35,7 +35,7 @@ describe("note overview", () => {
   it("should render note with one child", async () => {
     const noteParent = makeMe.aNote.title("parent").please();
     const noteChild = makeMe.aNote.title("child").under(noteParent).please();
-    store.commit("loadNotes", [noteParent, noteChild]);
+    store.getters.ps().loadNotes([noteParent, noteChild]);
     renderWithStoreAndMockRoute(
       store,
       NoteOverview,
@@ -50,7 +50,7 @@ describe("note overview", () => {
     const noteParent = makeMe.aNote.title("parent").please();
     const noteChild = makeMe.aNote.title("child").under(noteParent).please();
     const noteGrandchild = makeMe.aNote.title("grandchild").under(noteChild).please();
-    store.commit("loadNotes", [noteParent, noteChild, noteGrandchild]);
+    store.getters.ps().loadNotes([noteParent, noteChild, noteGrandchild]);
     renderWithStoreAndMockRoute(
       store,
       NoteOverview,

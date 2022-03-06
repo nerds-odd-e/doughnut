@@ -61,7 +61,7 @@
  describe("polling data", () => {
   it("should not call fetch API when inputing text ", async () => {
     const note = makeMe.aNote.title("Dummy Title").please();
-    store.commit("loadNotes", [note]);
+    store.getters.ps().loadNotes([note]);
 
     const { wrapper } = mountWithStoreAndMockRoute(store, NoteWithLinks, {
       props: {
