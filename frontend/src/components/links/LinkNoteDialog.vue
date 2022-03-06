@@ -1,10 +1,11 @@
 <template>
-  <h3>
+  <h3 v-if="note">
     Link <strong>{{ note.title }}</strong> to
   </h3>
+  <h3 v-else>Searching</h3>
   <SearchNote
     v-if="!targetNote"
-    v-bind="{ noteId: note.id }"
+    v-bind="{ noteId: note?.id }"
     @selected="targetNote = $event"
   />
   <LinkNoteFinalize
