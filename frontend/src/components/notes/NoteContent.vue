@@ -47,9 +47,9 @@ import SvgDescriptionIndicator from "../svgs/SvgDescriptionIndicator.vue";
 import SvgPictureIndicator from "../svgs/SvgPictureIndicator.vue";
 import SvgUrlIndicator from "../svgs/SvgUrlIndicator.vue";
 import EditableText from "../form/EditableText.vue";
-import storedApi from  "../../managedApi/storedApi";
+import storedComponent from "../../store/storedComponent";
 
-export default {
+export default storedComponent({
   props: {
     note: Object,
     size: { type: String, default: 'large'},
@@ -80,14 +80,14 @@ export default {
   },
   methods: {
     onBlurTextField() {
-      storedApi(this).updateTextContent(this.note.id, this.textContent)
+      this.storedApiExp().updateTextContent(this.note.id, this.textContent)
       .then((res) => {
         this.$emit("done");
       })
       .catch((res) => (this.formErrors = res))
     }
   }
-};
+});
 </script>
 
 <style lang="sass" scoped>

@@ -40,8 +40,8 @@ export default storedComponent({
     },
     fetchData() {
       const storedApiCall = this.viewTypeObj.fetchAll ?
-                              storedApi(this).getNoteWithDescendents :
-                              storedApi(this).getNoteAndItsChildren
+                              this.storedApiExp().getNoteWithDescendents :
+                              this.storedApiExp().getNoteAndItsChildren
 
       storedApiCall(this.noteId)
       .then((res) => {

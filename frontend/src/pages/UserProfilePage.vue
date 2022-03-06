@@ -31,9 +31,9 @@
 import ContainerPage from "./commons/ContainerPage.vue";
 import TextInput from "../components/form/TextInput.vue";
 import api from "../managedApi/api"
-import storedApi from "../managedApi/storedApi"
+import storedComponent from "../store/storedComponent";
 
-export default {
+export default storedComponent({
   components: { ContainerPage, TextInput },
   emits: ["userUpdated"],
   data() {
@@ -50,7 +50,7 @@ export default {
       })
     },
     processForm() {
-      storedApi(this).updateUser(this.formData.id, this.formData)
+      this.storedApiExp().updateUser(this.formData.id, this.formData)
         .then(() =>  this.$router.push({ name: "root" }))
         .catch((res) => (this.formErrors = res))
 
@@ -60,5 +60,5 @@ export default {
   mounted() {
     this.fetchData();
   },
-};
+});
 </script>

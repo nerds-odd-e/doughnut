@@ -21,9 +21,9 @@
 import Breadcrumb from "../notes/Breadcrumb.vue";
 import NoteFormTitleOnly from "../notes/NoteFormTitleOnly.vue";
 import LoadingPage from "../../pages/commons/LoadingPage.vue";
-import storedApi from  "../../managedApi/storedApi";
+import storedComponent from "../../store/storedComponent";
 
-export default {
+export default storedComponent({
   props: { circle: Object },
   components: {
     Breadcrumb,
@@ -40,7 +40,7 @@ export default {
   methods: {
 
     processForm() {
-      storedApi(this).createNotebook(this.circle,
+      this.storedApiExp().createNotebook(this.circle,
         this.noteFormData,
       )
         .then((res) =>
@@ -52,5 +52,5 @@ export default {
         .catch((res) => (this.formErrors = res))
     },
   },
-};
+});
 </script>

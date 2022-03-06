@@ -147,7 +147,7 @@ export default storedComponent({
     },
 
     fetchData() {
-      storedApi(this).reviewMethods.getNextReviewItem().then(
+      this.storedApiExp().reviewMethods.getNextReviewItem().then(
         this.loadNew
       );
     },
@@ -180,7 +180,7 @@ export default storedComponent({
         this.repetition.toRepeatCount -= 1
       }
 
-      storedApi(this).reviewMethods.selfEvaluate(this.reviewPointId,
+      this.storedApiExp().reviewMethods.selfEvaluate(this.reviewPointId,
         { selfEvaluation: data, increaseRepeatCount: !this.answerResult },
       )
       .then(this.loadNew)

@@ -17,9 +17,9 @@
 <script>
 import ContainerPage from "./commons/ContainerPage.vue";
 import TextInput from "../components/form/TextInput.vue";
-import storedApi from  "../managedApi/storedApi"
+import storedComponent from "../store/storedComponent";
 
-export default {
+export default storedComponent({
   components: { ContainerPage, TextInput },
   data() {
     return {
@@ -30,9 +30,9 @@ export default {
   },
   methods: {
     processForm() {
-      storedApi(this).createUser(this.formData)
+      this.storedApiExp().createUser(this.formData)
         .catch((res) => this.formErrors.value = res)
     },
   },
-}
+})
 </script>

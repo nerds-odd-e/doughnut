@@ -57,9 +57,9 @@ import NoteEditButton from "./NoteEditButton.vue";
 import NoteDownloadButton from "./NoteDownloadButton.vue"
 import NoteNewButton from "./NoteNewButton.vue";
 import ViewTypeButtons from "./ViewTypeButtons.vue";
-import storedApi from  "../../managedApi/storedApi";
 import { viewType } from "../../models/viewTypes";
-export default {
+import storedComponent from "../../store/storedComponent";
+export default storedComponent({
   name: "NoteButtons",
   props: {
     note: Object,
@@ -81,7 +81,7 @@ export default {
     async deleteNote() {
       if (await this.$popups.confirm(`Are you sure to delete this note?`)) {
         const parentId = this.note.parentId;
-        await storedApi(this).deleteNote(this.note.id);
+        await this.storedApiExp().deleteNote(this.note.id);
         this.$emit("ensureVisible", parentId);
         if (parentId) {
           if (viewType(this.viewType).redirectAfterDelete) {
@@ -96,5 +96,5 @@ export default {
       }
     },
   },
-};
+});
 </script>
