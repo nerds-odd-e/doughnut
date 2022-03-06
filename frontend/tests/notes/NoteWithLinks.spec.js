@@ -8,7 +8,7 @@ import {
   renderWithStoreAndMockRoute,
   mountWithStoreAndMockRoute,
 } from "../helpers";
-import store from "../../src/store";
+import store from "../fixtures/testingStore.js";
 
 afterEach(() => {
   fetch.resetMocks();

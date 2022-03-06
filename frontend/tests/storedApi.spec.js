@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import storedApi from "../src/managedApi/storedApi";
-import store from "../src/store/index.js";
+import store from "./fixtures/testingStore.js";
 import makeMe from "./fixtures/makeMe";
 
 beforeEach(() => {

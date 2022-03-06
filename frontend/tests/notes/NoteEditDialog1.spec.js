@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import NoteEditDialog from "@/components/notes/NoteEditDialog.vue";
-import store from "../../src/store/index.js";
+import store from "../fixtures/testingStore.js";
 import { renderWithStoreAndMockRoute } from "../helpers";
 import flushPromises from "flush-promises";
 import _ from "lodash";

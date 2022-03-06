@@ -3,7 +3,7 @@
  */
 import { screen } from "@testing-library/vue";
 import NotebooksPage from "@/pages/NotebooksPage.vue";
-import store from "../../src/store/index.js";
+import store from "../fixtures/testingStore.js";
 import { renderWithStoreAndMockRoute } from "../helpers";
 import _ from "lodash";
 import makeMe from "../fixtures/makeMe";

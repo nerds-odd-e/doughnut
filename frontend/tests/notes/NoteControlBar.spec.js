@@ -3,7 +3,7 @@
  */
 import { screen } from "@testing-library/vue";
 import Breadcrumb from "@/components/notes/Breadcrumb.vue";
-import store from "../../src/store/index.js";
+import store from "../fixtures/testingStore.js";
 import { renderWithStoreAndMockRoute } from "../helpers";
 import makeMe from "../fixtures/makeMe";
 

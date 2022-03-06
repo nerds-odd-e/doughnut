@@ -4,7 +4,7 @@
 import InitialReviewPage from "@/pages/InitialReviewPage.vue";
 import flushPromises from "flush-promises";
 import _ from "lodash";
-import store from "../../src/store/index.js";
+import store from "../fixtures/testingStore.js";
 import { mountWithStoreAndMockRoute } from "../helpers";
 import makeMe from "../fixtures/makeMe";
 

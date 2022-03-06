@@ -6,7 +6,7 @@
  import NoteWithLinks from "@/components/notes/NoteWithLinks.vue";
  import flushPromises from "flush-promises";
  import _ from "lodash";
- import store from "../../src/store/index.js";
+ import store from "../fixtures/testingStore.js";
  import { renderWithStoreAndMockRoute, 
   mountWithStoreAndMockRoute } from "../helpers";
  import makeMe from "../fixtures/makeMe";

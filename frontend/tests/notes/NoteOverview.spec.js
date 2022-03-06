@@ -6,7 +6,7 @@ import NoteOverview from "@/components/notes/NoteOverview.vue";
 import makeMe from "../fixtures/makeMe";
 import { renderWithStoreAndMockRoute } from "../helpers";
 import { screen } from "@testing-library/vue";
-import store from "../../src/store/index.js";
+import store from "../fixtures/testingStore.js";
 
 describe("note overview", () => {
   it("should render one note", async () => {

@@ -37,7 +37,7 @@ function withState(state) {
   }
 }
 
-export default createStore({
+export default ()=>createStore({
   state: () => ({
     notebooks: [],
     notes: {},
