@@ -2,7 +2,7 @@ import { isRef } from "vue";
 import Api from "./restful/Api";
 
 interface ManaagedComponent {
-  formError: unknown;
+  formErrors: unknown;
   loading: boolean
 }
 
@@ -30,10 +30,11 @@ class ManagedApi {
     assignLoading(true);
     return new Promise((resolve, reject) => {
       promise.then(resolve).catch(error=>{
-        if(this.component != null && isRef(this.component.formError)) {
-          this.component.formError = error
+        if(this.component != null && this.component.formErrors !== undefined) {
+          this.component.formErrors = error
+          return;
         }
-        return reject(error);
+        reject(error);
       }).finally(()=>assignLoading(false))
     });
   }
