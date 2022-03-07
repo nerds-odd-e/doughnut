@@ -12,10 +12,13 @@
 </template>
 
 <script>
+import useLoadingApi from '../../managedApi/useLoadingApi';
 import TextInput from "../form/TextInput.vue";
-import api from  "../../managedApi/api";
 
 export default {
+  setup() {
+    return {...useLoadingApi({hasFormError: true}) };
+  },
   props: { notebook: Object, user: Object },
   components: { TextInput },
   data() {
@@ -27,14 +30,13 @@ export default {
 
   methods: {
     processForm() {
-      api(this).circleMethods.createCircle(this.formData)
+      this.apiExp().circleMethods.createCircle(this.formData)
         .then((res) => {
           this.$router.push({
             name: "circleShow",
             params: { circleId: res.id },
           });
         })
-        .catch((res) => (this.formErrors = res))
     },
   },
 };
