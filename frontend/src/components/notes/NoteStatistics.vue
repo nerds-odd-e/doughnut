@@ -37,12 +37,13 @@
 
 <script setup>
 import { ref } from "vue";
-import api from  "../../managedApi/api";
+import useLoadingApi from "../../managedApi/useLoadingApi";
 
 const props = defineProps({ noteId: [String, Number], linkid: [String, Number] });
 const statistics = ref(null);
+const { apiExp } = useLoadingApi();
 const fetchData = () => {
-  api(this).getStatistics(props.noteId, props.linkid)
+  apiExp().getStatistics(props.noteId, props.linkid)
     .then((articles) => {
       statistics.value = articles;
     })
