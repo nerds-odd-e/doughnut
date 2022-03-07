@@ -10,9 +10,12 @@
 <script>
 import SubscriptionEditButton from "./SubscriptionEditButton.vue";
 import SvgUnsubscribe from "../svgs/SvgUnsubscribe.vue";
-import api from  "../../managedApi/api";
+import useLoadingApi from '../../managedApi/useLoadingApi';
 
 export default {
+  setup() {
+    return useLoadingApi();
+  },
   props: { subscription: Object },
   emits: ["updated"],
   components: { SubscriptionEditButton, SvgUnsubscribe },
@@ -23,7 +26,7 @@ export default {
           `Are yyou sure to unsubscribe from this notebook??`
         )
       ) {
-        api(this).subscriptionMethods.deleteSubscription(this.subscription.id
+        this.apiExp().subscriptionMethods.deleteSubscription(this.subscription.id
         ).then((r) => {
           this.$emit("updated");
         });

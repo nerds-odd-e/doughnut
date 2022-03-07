@@ -13,15 +13,17 @@
 <script>
 import NotebookBazaarViewCards from "../components/bazaar/NotebookBazaarViewCards.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
-import api from  "../managedApi/api";
 import storedComponent from "../store/storedComponent";
+import useLoadingApi from "../managedApi/useLoadingApi";
 
 export default storedComponent({
+  setup() {
+    return useLoadingApi({initalLoading: true});
+  },
   name: "NotebooksPage",
   components: { ContainerPage, NotebookBazaarViewCards },
   data() {
     return {
-      loading: true,
       notebooksViewedByUser: null,
     };
   },
@@ -31,7 +33,7 @@ export default storedComponent({
 
   methods: {
     fetchData() {
-      api(this).getBazaar().then(
+      this.apiExp().getBazaar().then(
         (res) => {
           this.notebooksViewedByUser = res
         }

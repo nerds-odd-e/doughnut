@@ -17,22 +17,24 @@
 </template>
 
 <script>
+import useLoadingApi from '../managedApi/useLoadingApi';
 import ContainerPage from "./commons/ContainerPage.vue";
-import api from  "../managedApi/api";
 
 export default {
+  setup() {
+    return useLoadingApi({initalLoading: true});
+  },
   props: { failureReportId: [String, Number] },
   components: { ContainerPage },
   data() {
     return {
-      loading: true,
       failureReport: null,
       githubIssueUrl: null,
     };
   },
   methods: {
     fetchData() {
-      api(this).getFailureReport(this.failureReportId).then((res) => {
+      this.apiExp().getFailureReport(this.failureReportId).then((res) => {
         this.failureReport = res.failureReport;
         this.githubIssueUrl = res.githubIssueUrl;
       })

@@ -23,21 +23,23 @@
 </template>
 
 <script>
+import useLoadingApi from '../managedApi/useLoadingApi';
 import ContainerPage from "./commons/ContainerPage.vue";
-import api from  "../managedApi/api";
 
 export default {
+  setup() {
+    return useLoadingApi();
+  },
   components: { ContainerPage },
   data() {
     return {
-      loading: true,
       failureReports: null,
       errorMessage: null,
     };
   },
   methods: {
     fetchData() {
-      api(this).getFailureReports()
+      this.apiExp().getFailureReports()
         .then((res) => {
           this.failureReports = res
         })

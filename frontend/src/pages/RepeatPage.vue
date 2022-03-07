@@ -65,10 +65,13 @@ import Repetition from "../components/review/Repetition.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import NoteStatisticsButton from "../components/notes/NoteStatisticsButton.vue";
 import RepeatProgressBar from "../components/review/RepeatProgressBar.vue";
-import api from "../managedApi/api"
 import storedComponent from "../store/storedComponent";
+import useLoadingApi from "../managedApi/useLoadingApi";
 
 export default storedComponent({
+  setup() {
+    return useLoadingApi();
+  },
   name: "RepeatPage",
   props: { nested: Boolean },
   components: {
@@ -84,7 +87,6 @@ export default storedComponent({
       repetition: null,
       answerResult: null,
       lastResult: null,
-      loading: false,
       finished: 0,
     };
   },
@@ -159,7 +161,7 @@ export default storedComponent({
     },
 
     processAnswer(answerData) {
-      api(this).reviewMethods.processAnswer(this.reviewPointId, answerData)
+      this.apiExp().reviewMethods.processAnswer(this.reviewPointId, answerData)
       .then((res) => {
         this.answerResult = res
         if (res.correct) {
@@ -192,7 +194,7 @@ export default storedComponent({
       ) {
         return;
       }
-      api(this).reviewMethods.removeFromReview(this.reviewPointId)
+      this.apiExp().reviewMethods.removeFromReview(this.reviewPointId)
       .then((r) => this.fetchData())
     },
 

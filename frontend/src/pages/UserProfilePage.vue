@@ -32,27 +32,28 @@ import ContainerPage from "./commons/ContainerPage.vue";
 import TextInput from "../components/form/TextInput.vue";
 import api from "../managedApi/api"
 import storedComponent from "../store/storedComponent";
+import useLoadingApi from "../managedApi/useLoadingApi";
 
 export default storedComponent({
+  setup() {
+    return useLoadingApi({initalLoading: true, hasFormError: true})
+  },
   components: { ContainerPage, TextInput },
   emits: ["userUpdated"],
   data() {
     return {
-      loading: true,
       formData: null,
-      formErrors: {},
     };
   },
   methods: {
     fetchData() {
-      api(this).userMethods.currentUser().then((res) => {
+      this.apiExp().userMethods.currentUser().then((res) => {
         this.formData = res
       })
     },
     processForm() {
       this.storedApi().updateUser(this.formData.id, this.formData)
         .then(() =>  this.$router.push({ name: "root" }))
-        .catch((res) => (this.formErrors = res))
 
     },
   },

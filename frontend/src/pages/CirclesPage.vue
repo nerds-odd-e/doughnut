@@ -28,19 +28,21 @@
 import ContainerPage from "./commons/ContainerPage.vue";
 import CircleNewButton from "../components/circles/CircleNewButton.vue";
 import CircleJoinForm from "../components/circles/CircleJoinForm.vue";
-import api from  "../managedApi/api";
+import useLoadingApi from '../managedApi/useLoadingApi';
 
 export default {
+  setup() {
+    return useLoadingApi();
+  },
   components: { ContainerPage, CircleNewButton, CircleJoinForm },
   data() {
     return {
-      loading: true,
       circles: null,
     };
   },
   methods: {
     fetchData() {
-      api(this).circleMethods.getCirclesOfCurrentUser().then(
+      this.apiExp().circleMethods.getCirclesOfCurrentUser().then(
         (res) => {
           this.circles = res
         }
