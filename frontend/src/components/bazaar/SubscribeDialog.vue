@@ -18,7 +18,7 @@ import useLoadingApi from '../../managedApi/useLoadingApi';
 
 export default {
   setup() {
-    return { ...useLoadingApi() }
+    return { ...useLoadingApi({hasFormError: true}) }
 
   },
   props: { notebook: Object, user: Object },
@@ -26,7 +26,6 @@ export default {
   data() {
     return {
       formData: { dailyTargetOfNewNotes: 5 },
-      formErrors: {},
     };
   },
 
