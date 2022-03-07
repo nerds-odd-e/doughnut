@@ -8,18 +8,18 @@
 import ReviewWelcome from "../components/review/ReviewWelcome.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import api from  "../managedApi/api";
+import loadingComponent from  "../store/loadingComponent";
 
-export default {
+export default loadingComponent({
   data() {
     return {
       reviewing: null,
-      loading: null,
     };
   },
   components: { ReviewWelcome, ContainerPage },
   methods: {
     fetchData() {
-      api(this).reviewMethods.overview().then(
+      this.api(this).reviewMethods.overview().then(
         (res) => (this.reviewing = res)
       )
     },
@@ -27,5 +27,5 @@ export default {
   mounted() {
     this.fetchData();
   },
-};
+});
 </script>
