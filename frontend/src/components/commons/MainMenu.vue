@@ -88,8 +88,7 @@ import storedComponent from '../../store/storedComponent';
 
 export default storedComponent({
   setup() {
-    return {...useLoadingApi() }
-
+    return useLoadingApi();
   },
   methods: {
     async logout() {

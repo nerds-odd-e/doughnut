@@ -17,7 +17,7 @@ import TextInput from "../form/TextInput.vue";
 
 export default {
   setup() {
-    return {...useLoadingApi({hasFormError: true}) };
+    return useLoadingApi({hasFormError: true});
   },
   props: { notebook: Object, user: Object },
   components: { TextInput },

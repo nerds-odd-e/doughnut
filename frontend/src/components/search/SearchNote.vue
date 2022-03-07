@@ -29,12 +29,15 @@
 import TextInput from "../form/TextInput.vue";
 import CheckInput from "../form/CheckInput.vue";
 import Cards from "../notes/Cards.vue";
-import api from  "../../managedApi/api";
 import _ from "lodash";
+import useLoadingApi from '../../managedApi/useLoadingApi';
 
 const debounced = _.debounce((callback) => callback(), 500);
 
 export default {
+  setup() {
+    return useLoadingApi();
+  },
   name: "SearchNote",
   props: { noteId: [String, Number] },
   components: { TextInput, CheckInput, Cards },
@@ -80,7 +83,7 @@ export default {
       }
 
       debounced(() => {
-        api(this).relativeSearch(this.noteId,
+        this.apiExp().relativeSearch(this.noteId,
           { searchGlobally, searchKey: trimedSearchKey },
         ).then((r) => {
           this.cache[searchGlobally][trimedSearchKey] = r;

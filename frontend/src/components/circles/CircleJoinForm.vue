@@ -18,7 +18,7 @@ import useLoadingApi from '../../managedApi/useLoadingApi';
 
 export default {
   setup() {
-    return { ... useLoadingApi({hasFormError: true}) };
+    return useLoadingApi({hasFormError: true});
   },
   components: { TextInput },
   props: { invitationCode: Number },

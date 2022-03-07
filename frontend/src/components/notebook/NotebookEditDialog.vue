@@ -17,7 +17,7 @@ import CheckInput from "../form/CheckInput.vue";
 
 export default {
   setup() {
-    return { ...useLoadingApi({hasFormError: true}) };
+    return useLoadingApi({hasFormError: true});
   },
   props: { notebook: Object },
   components: { CheckInput },

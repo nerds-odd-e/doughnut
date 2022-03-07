@@ -19,7 +19,7 @@ import useLoadingApi from '../../managedApi/useLoadingApi';
 
 export default {
   setup() {
-    return {...useLoadingApi() }
+    return useLoadingApi();
   },
   props: { notebook: Object },
   components: { NotebookEditButton, SvgBazaarShare },

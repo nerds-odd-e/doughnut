@@ -12,27 +12,28 @@
 </template>
 
 <script>
+import useLoadingApi from '../../managedApi/useLoadingApi';
 import TextInput from "../form/TextInput.vue";
-import api from  "../../managedApi/api";
 
 export default {
+  setup() {
+    return useLoadingApi({hasFormError: true})
+  },
   props: { subscription: Object },
   components: { TextInput },
   data() {
     const { dailyTargetOfNewNotes } = this.subscription;
     return {
       formData: { dailyTargetOfNewNotes },
-      formErrors: {},
     };
   },
 
   methods: {
     processForm() {
-      api(this).subscriptionMethods.updateSubscription(this.subscription.id, this.formData)
+      this.apiExp().subscriptionMethods.updateSubscription(this.subscription.id, this.formData)
         .then((res) => {
           this.$router.push({ name: "notebooks" });
         })
-        .catch((res) => (this.formErrors = res))
     },
   },
 };

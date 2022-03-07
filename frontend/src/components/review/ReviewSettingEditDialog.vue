@@ -16,30 +16,28 @@
 <script>
 import ReviewSettingForm from "./ReviewSettingForm.vue";
 import SvgReviewSetting from "../svgs/SvgReviewSetting.vue";
-import api from  "../../managedApi/api";
+import useLoadingApi from '../../managedApi/useLoadingApi';
 
 export default {
+  setup() {
+    return useLoadingApi({initalLoading: true, hasFormError: true});
+  },
   components: { ReviewSettingForm, SvgReviewSetting },
   props: { noteId: [String, Number], title: String },
   emits: ["done"],
   data() {
     return {
       formData: {},
-      formErrors: {},
-      loading: true,
     };
   },
   methods: {
     fetchData() {
-      api(this).reviewMethods.getReviewSetting(this.noteId)
+      this.apiExp().reviewMethods.getReviewSetting(this.noteId)
       .then((res) => { this.formData = res })
     },
     processForm() {
-      api(this).reviewMethods.updateReviewSetting(this.noteId, this.formData)
-        .then((res) => {
-          this.$emit("done");
-        })
-        .catch((res) => (this.formErrors = res))
+      this.apiExp().reviewMethods.updateReviewSetting(this.noteId, this.formData)
+        .then((res) => this.$emit("done"))
     },
   },
   mounted() {
