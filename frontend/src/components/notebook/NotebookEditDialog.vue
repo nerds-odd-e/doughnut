@@ -12,27 +12,28 @@
 </template>
 
 <script>
+import useLoadingApi from '../../managedApi/useLoadingApi';
 import CheckInput from "../form/CheckInput.vue";
-import api from  "../../managedApi/api";
 
 export default {
+  setup() {
+    return { ...useLoadingApi({hasFormError: true}) };
+  },
   props: { notebook: Object },
   components: { CheckInput },
   data() {
     const { skipReviewEntirely } = this.notebook;
     return {
       formData: { skipReviewEntirely },
-      formErrors: {},
     };
   },
 
   methods: {
     processForm() {
-      api(this).updateNotebookSettings(this.notebook.id, this.formData)
+      this.apiExp().updateNotebookSettings(this.notebook.id, this.formData)
         .then((res) => {
           this.$router.push({ name: "notebooks" });
         })
-        .catch((res) => (this.formErrors = res))
     },
   },
 };

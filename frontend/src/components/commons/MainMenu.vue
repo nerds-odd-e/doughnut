@@ -82,14 +82,18 @@
 </template>
 
 <script>
-import api from  '../../managedApi/api'
 import loginOrRegister from '../../managedApi/restful/loginOrRegister';
+import useLoadingApi from '../../managedApi/useLoadingApi';
 import storedComponent from '../../store/storedComponent';
 
 export default storedComponent({
+  setup() {
+    return {...useLoadingApi() }
+
+  },
   methods: {
     async logout() {
-      await api(this).userMethods.logout()
+      await this.apiExp().userMethods.logout()
       window.location.href = "/bazaar"
     },
     login() {

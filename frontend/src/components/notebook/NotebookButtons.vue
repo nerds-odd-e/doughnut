@@ -15,15 +15,18 @@
 <script>
 import NotebookEditButton from "./NotebookEditButton.vue";
 import SvgBazaarShare from "../svgs/SvgBazaarShare.vue";
-import api from  "../../managedApi/api";
+import useLoadingApi from '../../managedApi/useLoadingApi';
 
 export default {
+  setup() {
+    return {...useLoadingApi() }
+  },
   props: { notebook: Object },
   components: { NotebookEditButton, SvgBazaarShare },
   methods: {
     async shareNotebook() {
       if (await this.$popups.confirm(`Are you sure to share?`)) {
-        api(this).shareToBazaar(this.notebook.id)
+        this.apiExp().shareToBazaar(this.notebook.id)
         .then((r) => this.$router.push({ name: "notebooks" }));
       }
     },
