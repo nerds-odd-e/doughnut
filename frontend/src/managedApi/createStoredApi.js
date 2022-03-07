@@ -2,7 +2,6 @@ import ManagedApi from './ManagedApi';
 
 const createStoredApi = (component, options={}) => {
   const managedApi = new ManagedApi(component, options);
-  const store = component.$store
   const {piniaStore} = component
 
   function loadReviewPointViewedByUser(data) {
@@ -190,7 +189,7 @@ const createStoredApi = (component, options={}) => {
       const res = await managedApi.restPost(`testability/feature_toggle`, {
         enabled: data,
       });
-      this.getFeatureToggle(store);
+      this.getFeatureToggle();
       return res;
     },
 
