@@ -2,14 +2,16 @@
 import Popups from "./components/commons/Popups.vue";
 import MainMenu from "./components/commons/MainMenu.vue";
 import UserNewRegisterPage from "./pages/UserNewRegisterPage.vue";
-import storedComponent from './store/storedComponent';
+import useStoredLoadingApi from "./managedApi/useStoredLoadingApi";
 
-export default storedComponent({
+export default {
+  setup() {
+    return useStoredLoadingApi({initalLoading: true})
+  },
   data() {
     return {
       externalIdentifier: null,
       showNavBar: true,
-      loading: true,
       popupInfo: null,
       doneResolve: null,
     };
@@ -69,7 +71,7 @@ export default storedComponent({
       });
     };
   },
-});
+};
 </script>
 
 <template>

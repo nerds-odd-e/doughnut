@@ -30,7 +30,6 @@
 <script>
 import ContainerPage from "./commons/ContainerPage.vue";
 import TextInput from "../components/form/TextInput.vue";
-import api from "../managedApi/api"
 import storedComponent from "../store/storedComponent";
 import useLoadingApi from "../managedApi/useLoadingApi";
 
