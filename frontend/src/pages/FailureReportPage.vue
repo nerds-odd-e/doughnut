@@ -34,7 +34,7 @@ export default {
   },
   methods: {
     fetchData() {
-      this.apiExp().getFailureReport(this.failureReportId).then((res) => {
+      this.api.getFailureReport(this.failureReportId).then((res) => {
         this.failureReport = res.failureReport;
         this.githubIssueUrl = res.githubIssueUrl;
       })

@@ -41,9 +41,9 @@ import useLoadingApi from "../../managedApi/useLoadingApi";
 
 const props = defineProps({ noteId: [String, Number], linkid: [String, Number] });
 const statistics = ref(null);
-const { apiExp } = useLoadingApi();
+const { api } = useLoadingApi();
 const fetchData = () => {
-  apiExp().getStatistics(props.noteId, props.linkid)
+  api.getStatistics(props.noteId, props.linkid)
     .then((articles) => {
       statistics.value = articles;
     })

@@ -42,7 +42,7 @@ export default {
   },
   methods: {
     fetchData() {
-      this.apiExp().circleMethods.getCirclesOfCurrentUser().then(
+      this.api.circleMethods.getCirclesOfCurrentUser().then(
         (res) => {
           this.circles = res
         }

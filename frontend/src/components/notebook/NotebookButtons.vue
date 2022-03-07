@@ -26,7 +26,7 @@ export default {
   methods: {
     async shareNotebook() {
       if (await this.$popups.confirm(`Are you sure to share?`)) {
-        this.apiExp().shareToBazaar(this.notebook.id)
+        this.api.shareToBazaar(this.notebook.id)
         .then((r) => this.$router.push({ name: "notebooks" }));
       }
     },

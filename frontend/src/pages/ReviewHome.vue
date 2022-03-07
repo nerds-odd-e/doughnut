@@ -21,7 +21,7 @@ export default {
   components: { ReviewWelcome, ContainerPage },
   methods: {
     fetchData() {
-      this.apiExp().reviewMethods.overview().then(
+      this.api.reviewMethods.overview().then(
         (res) => (this.reviewing = res)
       )
     },

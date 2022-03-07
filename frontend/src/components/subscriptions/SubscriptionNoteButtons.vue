@@ -26,7 +26,7 @@ export default {
           `Are yyou sure to unsubscribe from this notebook??`
         )
       ) {
-        this.apiExp().subscriptionMethods.deleteSubscription(this.subscription.id
+        this.api.subscriptionMethods.deleteSubscription(this.subscription.id
         ).then((r) => {
           this.$emit("updated");
         });

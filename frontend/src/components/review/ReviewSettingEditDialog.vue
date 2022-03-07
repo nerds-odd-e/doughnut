@@ -32,11 +32,11 @@ export default {
   },
   methods: {
     fetchData() {
-      this.apiExp().reviewMethods.getReviewSetting(this.noteId)
+      this.api.reviewMethods.getReviewSetting(this.noteId)
       .then((res) => { this.formData = res })
     },
     processForm() {
-      this.apiExp().reviewMethods.updateReviewSetting(this.noteId, this.formData)
+      this.api.reviewMethods.updateReviewSetting(this.noteId, this.formData)
         .then((res) => this.$emit("done"))
     },
   },

@@ -160,7 +160,7 @@ export default ({
     },
 
     processAnswer(answerData) {
-      this.apiExp().reviewMethods.processAnswer(this.reviewPointId, answerData)
+      this.api.reviewMethods.processAnswer(this.reviewPointId, answerData)
       .then((res) => {
         this.answerResult = res
         if (res.correct) {
@@ -193,7 +193,7 @@ export default ({
       ) {
         return;
       }
-      this.apiExp().reviewMethods.removeFromReview(this.reviewPointId)
+      this.api.reviewMethods.removeFromReview(this.reviewPointId)
       .then((r) => this.fetchData())
     },
 

@@ -39,7 +39,7 @@ export default {
   },
   methods: {
     fetchData() {
-      this.apiExp().getFailureReports()
+      this.api.getFailureReports()
         .then((res) => {
           this.failureReports = res
         })

@@ -32,7 +32,7 @@ export default ({
 
   methods: {
     fetchData() {
-      this.apiExp().getBazaar().then(
+      this.api.getBazaar().then(
         (res) => {
           this.notebooksViewedByUser = res
         }

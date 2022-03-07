@@ -30,7 +30,7 @@ export default {
 
   methods: {
     processForm() {
-      this.apiExp().subscriptionMethods.updateSubscription(this.subscription.id, this.formData)
+      this.api.subscriptionMethods.updateSubscription(this.subscription.id, this.formData)
         .then((res) => {
           this.$router.push({ name: "notebooks" });
         })

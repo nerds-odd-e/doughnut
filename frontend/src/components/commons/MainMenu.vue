@@ -91,7 +91,7 @@ export default ({
   },
   methods: {
     async logout() {
-      await this.apiExp().userMethods.logout()
+      await this.api.userMethods.logout()
       window.location.href = "/bazaar"
     },
     login() {

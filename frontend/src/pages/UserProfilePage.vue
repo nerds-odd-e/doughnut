@@ -45,7 +45,7 @@ export default ({
   },
   methods: {
     fetchData() {
-      this.apiExp().userMethods.currentUser().then((res) => {
+      this.api.userMethods.currentUser().then((res) => {
         this.formData = res
       })
     },

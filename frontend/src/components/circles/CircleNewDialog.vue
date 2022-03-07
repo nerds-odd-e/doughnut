@@ -30,7 +30,7 @@ export default {
 
   methods: {
     processForm() {
-      this.apiExp().circleMethods.createCircle(this.formData)
+      this.api.circleMethods.createCircle(this.formData)
         .then((res) => {
           this.$router.push({
             name: "circleShow",

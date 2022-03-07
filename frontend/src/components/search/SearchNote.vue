@@ -83,7 +83,7 @@ export default {
       }
 
       debounced(() => {
-        this.apiExp().relativeSearch(this.noteId,
+        this.api.relativeSearch(this.noteId,
           { searchGlobally, searchKey: trimedSearchKey },
         ).then((r) => {
           this.cache[searchGlobally][trimedSearchKey] = r;
