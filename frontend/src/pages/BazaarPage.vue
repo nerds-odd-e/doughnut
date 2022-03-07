@@ -13,12 +13,11 @@
 <script>
 import NotebookBazaarViewCards from "../components/bazaar/NotebookBazaarViewCards.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
-import storedComponent from "../store/storedComponent";
-import useLoadingApi from "../managedApi/useLoadingApi";
+import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
 
-export default storedComponent({
+export default ({
   setup() {
-    return useLoadingApi({initalLoading: true});
+    return useStoredLoadingApi({initalLoading: true});
   },
   name: "NotebooksPage",
   components: { ContainerPage, NotebookBazaarViewCards },

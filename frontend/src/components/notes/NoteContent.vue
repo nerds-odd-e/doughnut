@@ -47,9 +47,12 @@ import SvgDescriptionIndicator from "../svgs/SvgDescriptionIndicator.vue";
 import SvgPictureIndicator from "../svgs/SvgPictureIndicator.vue";
 import SvgUrlIndicator from "../svgs/SvgUrlIndicator.vue";
 import EditableText from "../form/EditableText.vue";
-import storedComponent from "../../store/storedComponent";
+import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 
-export default storedComponent({
+export default ({
+  setup() {
+    return useStoredLoadingApi({hasFormError: true});
+  },
   props: {
     note: Object,
     size: { type: String, default: 'large'},
@@ -63,12 +66,6 @@ export default storedComponent({
     SvgUrlIndicator,
     EditableText,
     NoteTitleWithLink,
-  },
-  data() {
-    return {
-      loading: false,
-      formErrors: {},
-    };
   },
   computed: {
     twoColumns() {

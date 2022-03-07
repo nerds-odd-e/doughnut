@@ -21,9 +21,12 @@
 import Breadcrumb from "../notes/Breadcrumb.vue";
 import NoteFormTitleOnly from "../notes/NoteFormTitleOnly.vue";
 import LoadingPage from "../../pages/commons/LoadingPage.vue";
-import storedComponent from "../../store/storedComponent";
+import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 
-export default storedComponent({
+export default ({
+  setup() {
+    return useStoredLoadingApi({hasFormError: true});
+  },
   props: { circle: Object },
   components: {
     Breadcrumb,
@@ -32,9 +35,7 @@ export default storedComponent({
   },
   data() {
     return {
-      loading: false,
       noteFormData: {},
-      formErrors: {},
     };
   },
   methods: {
@@ -49,7 +50,6 @@ export default storedComponent({
             params: { noteId: res.noteId },
           })
         )
-        .catch((res) => (this.formErrors = res))
     },
   },
 });

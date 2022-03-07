@@ -67,10 +67,13 @@
 </template>
 
 <script>
-import storedComponent from "../store/storedComponent";
+import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
 import ContainerPage from "./commons/ContainerPage.vue";
 
-export default storedComponent({
+export default ({
+  setup() {
+    return useStoredLoadingApi();
+  },
   components: { ContainerPage },
   computed: {
     user() { return this.piniaStore.currentUser }

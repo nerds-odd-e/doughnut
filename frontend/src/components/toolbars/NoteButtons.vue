@@ -58,8 +58,12 @@ import NoteDownloadButton from "./NoteDownloadButton.vue"
 import NoteNewButton from "./NoteNewButton.vue";
 import ViewTypeButtons from "./ViewTypeButtons.vue";
 import { viewType } from "../../models/viewTypes";
-import storedComponent from "../../store/storedComponent";
-export default storedComponent({
+import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
+
+export default ({
+  setup() {
+    return useStoredLoadingApi();
+  },
   name: "NoteButtons",
   props: {
     note: Object,

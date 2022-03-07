@@ -11,9 +11,12 @@
 import NoteWithLinks from "../NoteWithLinks.vue";
 import NoteStatisticsButton from "../NoteStatisticsButton.vue";
 import Cards from "../Cards.vue";
-import storedComponent from "../../../store/storedComponent";
+import useStoredLoadingApi from "../../../managedApi/useStoredLoadingApi";
 
-export default storedComponent({
+export default ({
+  setup() {
+    return useStoredLoadingApi();
+  },
   props: {
     noteId: [String, Number],
     expandChildren: { type: Boolean, required: true },

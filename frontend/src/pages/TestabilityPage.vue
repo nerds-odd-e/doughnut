@@ -11,9 +11,12 @@
 
 <script>
 import CheckInput from "../components/form/CheckInput.vue";
-import storedComponent from "../store/storedComponent";
+import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
 
-export default storedComponent({
+export default ({
+  setup() {
+    return useStoredLoadingApi();
+  },
   data() {
     return {
       featureToggle: null

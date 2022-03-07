@@ -18,9 +18,12 @@
 import NoteButtons from './NoteButtons.vue'
 import NoteUndoButton from "./NoteUndoButton.vue";
 import LinkNoteButton from "../links/LinkNoteButton.vue";
-import storedComponent from '../../store/storedComponent';
+import useStoredLoadingApi from '../../managedApi/useStoredLoadingApi';
 
-export default storedComponent({
+export default ({
+  setup() {
+    return useStoredLoadingApi();
+  },
   components: {
     NoteButtons,
     NoteUndoButton,

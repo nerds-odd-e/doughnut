@@ -20,11 +20,14 @@
 <script>
 import NoteMindmap from "../mindmap/NoteMindmap.vue";
 import DragListner from "../../commons/DragListner.vue";
-import storedComponent from "../../../store/storedComponent";
+import useStoredLoadingApi from "../../../managedApi/useStoredLoadingApi";
 
 const defaultOffset = {x: 0, y: 0, scale: 1.0, rotate: 0}
 
-export default storedComponent({
+export default ({
+  setup() {
+    return useStoredLoadingApi();
+  },
   props: {
     noteId: [String, Number],
     expandChildren: { type: Boolean, required: true },

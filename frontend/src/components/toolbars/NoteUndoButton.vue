@@ -5,10 +5,13 @@
 </template>
 
 <script>
+import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 import SvgUndo from "../svgs/SvgUndo.vue";
-import storedComponent from '../../store/storedComponent';
 
-export default storedComponent({
+export default ({
+  setup() {
+    return useStoredLoadingApi();
+  },
   name: "NoteUndoButton",
   components: {
     SvgUndo,

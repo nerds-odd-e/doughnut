@@ -83,12 +83,11 @@
 
 <script>
 import loginOrRegister from '../../managedApi/restful/loginOrRegister';
-import useLoadingApi from '../../managedApi/useLoadingApi';
-import storedComponent from '../../store/storedComponent';
+import useStoredLoadingApi from '../../managedApi/useStoredLoadingApi';
 
-export default storedComponent({
+export default ({
   setup() {
-    return useLoadingApi();
+    return useStoredLoadingApi();
   },
   methods: {
     async logout() {

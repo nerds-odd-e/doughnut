@@ -30,12 +30,11 @@
 <script>
 import ContainerPage from "./commons/ContainerPage.vue";
 import TextInput from "../components/form/TextInput.vue";
-import storedComponent from "../store/storedComponent";
-import useLoadingApi from "../managedApi/useLoadingApi";
+import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
 
-export default storedComponent({
+export default ({
   setup() {
-    return useLoadingApi({initalLoading: true, hasFormError: true})
+    return useStoredLoadingApi({initalLoading: true, hasFormError: true})
   },
   components: { ContainerPage, TextInput },
   emits: ["userUpdated"],

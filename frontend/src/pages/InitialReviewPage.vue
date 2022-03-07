@@ -56,9 +56,12 @@ import InitialReviewButtons from "../components/review/InitialReviewButtons.vue"
 import ProgressBar from "../components/commons/ProgressBar.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import Minimizable from "../components/commons/Minimizable.vue";
-import storedComponent from "../store/storedComponent";
+import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
 
-export default storedComponent({
+export default ({
+  setup() {
+    return useStoredLoadingApi();
+  },
   name: "InitialReviewPage",
   props: { nested: Boolean },
   components: {
@@ -74,7 +77,6 @@ export default storedComponent({
     return {
       finished: 0,
       reviewPointViewedByUser: null,
-      loading: null,
     };
   },
   computed: {

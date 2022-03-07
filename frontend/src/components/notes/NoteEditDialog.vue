@@ -6,10 +6,13 @@
 </template>
 
 <script>
+import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 import NoteFormBody from "./NoteFormBody.vue";
-import storedComponent from "../../store/storedComponent";
 
-export default storedComponent({
+export default ({
+  setup() {
+    return useStoredLoadingApi({initalLoading: true, hasFormError: true});
+  },
   name: "NoteEditDialog",
   components: {
     NoteFormBody,
@@ -19,8 +22,6 @@ export default storedComponent({
   data() {
     return {
       formData: null,
-      formErrors: {},
-      loading: true,
     };
   },
 
@@ -39,7 +40,6 @@ export default storedComponent({
       .then(() => {
         this.$emit("done");
       })
-      .catch((res) => (this.formErrors = res))
     },
   },
   mounted() {

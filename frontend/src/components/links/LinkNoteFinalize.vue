@@ -44,9 +44,12 @@ import LinkTypeSelect from "./LinkTypeSelect.vue";
 import CheckInput from "../form/CheckInput.vue";
 import RadioButtons from "../form/RadioButtons.vue";
 import SvgGoBack from "../svgs/SvgGoBack.vue";
-import storedComponent from "../../store/storedComponent";
+import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 
-export default storedComponent({
+export default ({
+  setup() {
+    return useStoredLoadingApi({hasFormError: true});
+  },
   name: "LinkNoteFinalize",
   props: { note: Object, targetNote: { type: Object, required: true } },
   components: { LinkTypeSelect, SvgGoBack, CheckInput, RadioButtons },
@@ -54,7 +57,6 @@ export default storedComponent({
   data() {
     return {
       formData: { asFirstChild: false },
-      formErrors: {},
     };
   },
   methods: {

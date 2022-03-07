@@ -16,15 +16,17 @@
 import LoadingPage from "./commons/LoadingPage.vue";
 import NotePageFrame from '../components/notes/views/NotePageFrame.vue';
 import { viewType } from "../models/viewTypes";
-import storedComponent from "../store/storedComponent";
+import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
 
-export default storedComponent({
+export default ({
+  setup() {
+    return useStoredLoadingApi({initalLoading: true});
+  },
   name: "NoteShowPage",
   props: { noteId: [String, Number], viewType: String },
   data() {
     return {
       notePosition: null,
-      loading: true,
       polling: null
     };
   },

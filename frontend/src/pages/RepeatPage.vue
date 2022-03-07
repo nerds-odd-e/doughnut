@@ -65,12 +65,11 @@ import Repetition from "../components/review/Repetition.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import NoteStatisticsButton from "../components/notes/NoteStatisticsButton.vue";
 import RepeatProgressBar from "../components/review/RepeatProgressBar.vue";
-import storedComponent from "../store/storedComponent";
-import useLoadingApi from "../managedApi/useLoadingApi";
+import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
 
-export default storedComponent({
+export default ({
   setup() {
-    return useLoadingApi();
+    return useStoredLoadingApi();
   },
   name: "RepeatPage",
   props: { nested: Boolean },

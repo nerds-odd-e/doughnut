@@ -10,10 +10,13 @@
 </template>
 
 <script lang="ts">
-import storedComponent from "../../store/storedComponent";
+import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 import NoteWithLinks from "./NoteWithLinks.vue";
 
-export default storedComponent({
+export default ({
+  setup() {
+    return useStoredLoadingApi();
+  },
   name: "NoteOverview",
   props: {
     noteId: [String, Number],

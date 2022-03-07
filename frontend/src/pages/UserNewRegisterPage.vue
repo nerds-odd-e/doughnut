@@ -17,21 +17,21 @@
 <script>
 import ContainerPage from "./commons/ContainerPage.vue";
 import TextInput from "../components/form/TextInput.vue";
-import storedComponent from "../store/storedComponent";
+import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
 
-export default storedComponent({
+export default ({
+  setup() {
+    return useStoredLoadingApi({hasFormError: true});
+  },
   components: { ContainerPage, TextInput },
   data() {
     return {
-      loading: false,
       formData: {},
-      formErrors: {},
     }
   },
   methods: {
     processForm() {
       this.storedApi().createUser(this.formData)
-        .catch((res) => this.formErrors.value = res)
     },
   },
 })

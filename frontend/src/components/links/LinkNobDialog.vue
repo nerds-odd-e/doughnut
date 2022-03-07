@@ -33,9 +33,12 @@
 <script>
 import LinkTypeSelect from "./LinkTypeSelect.vue";
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue";
-import storedComponent from "../../store/storedComponent";
+import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 
-export default storedComponent({
+export default ({
+  setup() {
+    return useStoredLoadingApi({hasFormError: true});
+  },
   props: { link: Object, inverseIcon: Boolean, colors: Object },
   emits: ["done"],
   components: {
@@ -44,9 +47,7 @@ export default storedComponent({
   },
   data() {
     return {
-      loading: false,
       formData: { typeId: this.link.typeId },
-      formErrors: {},
     };
   },
 
@@ -54,7 +55,6 @@ export default storedComponent({
     updateLink() {
       this.storedApi().updateLink(this.link.id, this.formData)
         .then((res) => this.$emit('done'))
-        .catch((res) => (this.formErrors = res))
     },
 
     async deleteLink() {
@@ -62,7 +62,6 @@ export default storedComponent({
         return;
       this.storedApi().deleteLink(this.link.id)
         .then((res) => { this.$emit('done') })
-        .catch((res) => (this.formErrors = res))
     },
   },
 });

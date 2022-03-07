@@ -18,9 +18,12 @@
 
 <script>
 import MindmapSector from "@/models/MindmapSector";
-import storedComponent from "../../../store/storedComponent";
+import useStoredLoadingApi from "../../../managedApi/useStoredLoadingApi";
 
-export default storedComponent({
+export default ({
+  setup() {
+    return useStoredLoadingApi();
+  },
   name: "NoteMindmap",
   props: {
     noteId: [String, Number],

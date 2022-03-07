@@ -60,9 +60,12 @@ import NoteParentChildConnection from "./NoteParentChildConnection.vue";
 import NoteLinks from "./NoteLinks.vue";
 import MindmapSector from "@/models/MindmapSector";
 import Mindmap from "@/models/Mindmap";
-import storedComponent from "../../../store/storedComponent";
+import useStoredLoadingApi from "../../../managedApi/useStoredLoadingApi";
 
-export default storedComponent({
+export default ({
+  setup() {
+    return useStoredLoadingApi();
+  },
   name: "NoteMindmap",
   props: {
     highlightNoteId: [String, Number],

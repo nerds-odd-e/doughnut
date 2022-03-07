@@ -45,9 +45,12 @@ import NotebookCardsWithButtons from "../components/notebook/NotebookCardsWithBu
 import NotebookNewButton from "../components/notebook/NotebookNewButton.vue";
 import NotebookButtons from "../components/notebook/NotebookButtons.vue";
 import BazaarNotebookButtons from "../components/bazaar/BazaarNotebookButtons.vue";
-import storedComponent from "../store/storedComponent";
+import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
 
-export default storedComponent({
+export default ({
+  setup() {
+    return useStoredLoadingApi({initalLoading: true, hasFormError: true});
+  },
   components: {
     SvgMissingAvatar,
     NotebookCardsWithButtons,
@@ -62,8 +65,6 @@ export default storedComponent({
     return {
       queryCounter: 0,
       circle: null,
-      loading: true,
-      formErrors: {},
     };
   },
 

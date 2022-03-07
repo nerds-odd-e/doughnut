@@ -22,7 +22,7 @@
 import Breadcrumb from "./Breadcrumb.vue";
 import NoteFormTitleOnly from "./NoteFormTitleOnly.vue";
 import LinkTypeSelect from "../links/LinkTypeSelect.vue";
-import storedComponent from "../../store/storedComponent";
+import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 
 function initialState() {
   return {
@@ -30,11 +30,13 @@ function initialState() {
       linkTypeToParent: "",
       textContent: {},
     },
-    formErrors: {},
   };
 }
 
-export default storedComponent({
+export default ({
+  setup() {
+    return useStoredLoadingApi({initalLoading: true, hasFormError: true});
+  },
   components: {
     Breadcrumb,
     NoteFormTitleOnly,
@@ -43,7 +45,6 @@ export default storedComponent({
   props: { parentId: [String, Number] },
   data() {
     return {
-      loading: true,
       ancestors: null,
       notebook: null,
       ...initialState(),
