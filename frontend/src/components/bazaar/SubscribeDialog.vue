@@ -14,9 +14,13 @@
 
 <script>
 import TextInput from "../form/TextInput.vue";
-import api from  "../../managedApi/api";
+import useLoadingApi from '../../managedApi/useLoadingApi';
 
 export default {
+  setup() {
+    return { ...useLoadingApi() }
+
+  },
   props: { notebook: Object, user: Object },
   components: { TextInput },
   data() {
@@ -28,7 +32,7 @@ export default {
 
   methods: {
     processForm() {
-      api(this).subscriptionMethods.subscribe(this.notebook.id, this.formData)
+      this.apiExp().subscriptionMethods.subscribe(this.notebook.id, this.formData)
         .then((res) => {
           this.$router.push({ name: "notebooks" });
         })
