@@ -1,7 +1,6 @@
 <template>
   <LoadingPage v-bind="{ loading, contentExists: !!notePosition }">
     <NotePageFrame
-      @highlight="piniaStore.setHighlightNoteId($event)"
       v-bind="{
         noteId,
         notePosition,

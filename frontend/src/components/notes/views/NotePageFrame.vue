@@ -18,8 +18,12 @@ import NoteMindmapView from "./NoteMindmapView.vue";
 import NoteCardsView from "./NoteCardsView.vue";
 import NoteArticleView from "./NoteArticleView.vue";
 import Breadcrumb from "../Breadcrumb.vue";
+import useStoredLoadingApi from '../../../managedApi/useStoredLoadingApi';
 
 export default {
+  setup() {
+    return useStoredLoadingApi();
+  },
   props: {
      noteId: [String, Number],
      notePosition: Object,
@@ -27,10 +31,9 @@ export default {
      expandChildren: { type: Boolean, required: true },
   },
   components: { NoteControl, NoteMindmapView, Breadcrumb, NoteCardsView, NoteArticleView },
-  emits: ['highlight'],
   methods: {
     highlight(id) { 
-      this.$emit('highlight', id)
+      this.piniaStore.setHighlightNoteId(id)
     },
   },
   watch: {
