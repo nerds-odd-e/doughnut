@@ -2,14 +2,14 @@
  * @jest-environment jsdom
  */
 
-import NoteOverview from "@/components/notes/NoteOverview.vue";
+import NoteOverview from "../../src/components/notes/NoteOverview.vue";
 import makeMe from "../fixtures/makeMe";
 import { renderWithStoreAndMockRoute, StoredComponentTestHelper } from "../helpers";
 import { screen } from "@testing-library/vue";
 
 describe("note overview", () => {
-  let pinia;
-  let store;
+  let pinia: any;
+  let store: any;
   let helper;
   beforeEach(()=>{
     helper = new StoredComponentTestHelper();
