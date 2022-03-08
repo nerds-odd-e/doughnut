@@ -36,17 +36,18 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 
-const props = defineProps({ noteId: [String, Number], linkid: [String, Number] });
-const statistics = ref(null);
+const props = defineProps({
+  noteId: [String, Number],
+  linkid: [String, Number],
+});
+const statistics = $ref(null);
 const { api } = useLoadingApi();
 const fetchData = () => {
-  api.getStatistics(props.noteId, props.linkid)
-    .then((articles) => {
-      statistics.value = articles;
-    })
+  api.getStatistics(props.noteId, props.linkid).then((articles) => {
+    statistics = articles;
+  });
 };
 
 fetchData();
