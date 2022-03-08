@@ -6,14 +6,22 @@ import NoteOverview from "@/components/notes/NoteOverview.vue";
 import makeMe from "../fixtures/makeMe";
 import { renderWithStoreAndMockRoute } from "../helpers";
 import { screen } from "@testing-library/vue";
-import store from "../fixtures/testingStore.js";
+import { createTestingPinia } from "@pinia/testing";
+import createPiniaStore from '@/store/pinia_store';
 
 describe("note overview", () => {
+  let pinia;
+  let store;
+  beforeEach(()=>{
+    pinia = createTestingPinia();
+    store = createPiniaStore(pinia);
+  });
+
   it("should render one note", async () => {
     const note = makeMe.aNote.title("single note").please();
     store.loadNotes([note]);
     renderWithStoreAndMockRoute(
-      store,
+      pinia,
       NoteOverview,
       { props: { noteId: note.id, expandChildren: true } },
     );
@@ -25,7 +33,7 @@ describe("note overview", () => {
     const note = makeMe.aNote.title("source").linkToSomeNote().please();
     store.loadNotes([note]);
     renderWithStoreAndMockRoute(
-      store,
+      pinia,
       NoteOverview,
       { props: { noteId: note.id, expandChildren: true } },
     );
@@ -37,7 +45,7 @@ describe("note overview", () => {
     const noteChild = makeMe.aNote.title("child").under(noteParent).please();
     store.loadNotes([noteParent, noteChild]);
     renderWithStoreAndMockRoute(
-      store,
+      pinia,
       NoteOverview,
       { props: { noteId: noteParent.id, expandChildren: true } },
     );
@@ -52,7 +60,7 @@ describe("note overview", () => {
     const noteGrandchild = makeMe.aNote.title("grandchild").under(noteChild).please();
     store.loadNotes([noteParent, noteChild, noteGrandchild]);
     renderWithStoreAndMockRoute(
-      store,
+      pinia,
       NoteOverview,
       { props: { noteId: noteParent.id, expandChildren: true } },
     );
