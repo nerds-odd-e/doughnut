@@ -265,10 +265,10 @@ public class Note {
         this.notebook = notebook;
     }
 
-    public Integer getParentId() {
+    public Optional<Integer> getParentId() {
         Note parent = getParentNote();
-        if (parent == null) return null;
-        return parent.id;
+        if (parent == null) return Optional.empty();
+        return Optional.ofNullable(parent.id);
     }
 
     @JsonIgnore

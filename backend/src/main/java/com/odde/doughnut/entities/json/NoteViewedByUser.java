@@ -9,6 +9,7 @@ import lombok.Setter;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class NoteViewedByUser {
     @Getter
@@ -17,7 +18,7 @@ public class NoteViewedByUser {
 
     @Getter
     @Setter
-    private Integer parentId;
+    private Optional<Integer> parentId;
 
     @Getter
     @Setter
@@ -29,7 +30,7 @@ public class NoteViewedByUser {
 
     @Getter
     @Setter
-    private String notePicture;
+    private Optional<String> notePicture;
 
     @Getter
     @Setter

@@ -1,21 +1,15 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.odde.doughnut.algorithms.ClozeDescription;
-import com.odde.doughnut.algorithms.NoteTitle;
 import com.odde.doughnut.entities.validators.ValidateNotePicture;
 import com.odde.doughnut.models.ImageBuilder;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.web.multipart.MultipartFile;
-import org.thymeleaf.util.StringUtils;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.Pattern;
-import javax.validation.constraints.Size;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.util.ArrayList;

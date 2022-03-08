@@ -107,7 +107,7 @@ class StoredComponentTestHelper {
     return this.piniaInstance;
   }
 
-  get store() {
+  get store(): PiniaStore {
     if(this.piniaStore === undefined) {
       this.piniaStore = createPiniaStore(this.pinia);
     }

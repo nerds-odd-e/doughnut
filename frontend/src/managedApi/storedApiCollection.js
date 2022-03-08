@@ -66,6 +66,7 @@ const storedApiCollection = (managedApi, piniaStore) => {
 
     async getNoteAndItsChildren(noteId) {
       const res = await managedApi.restGet(`notes/${noteId}`);
+      console.table(typeof res.notes[0].createdAt)
       piniaStore.loadNotes(res.notes);
       return res;
     },

@@ -1,4 +1,4 @@
-abstract class Builder {
+abstract class Builder<T=any> {
   protected parentBuilder: Builder | undefined;
 
   protected childrenBuilders: Array<Builder>;
@@ -15,14 +15,14 @@ abstract class Builder {
     return this.parentBuilder;
   }
 
-  please(): any {
+  please(): T {
     if (this.parentBuilder !== undefined) {
       return this.parentBuilder.please();
     }
     return this.do();
   }
 
-  abstract do(): any;
+  abstract do(): T;
 }
 
 export default Builder;

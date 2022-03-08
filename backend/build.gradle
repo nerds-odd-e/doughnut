@@ -106,6 +106,9 @@ generateTypeScript {
           'com.odde.doughnut.entities.json.NoteViewedByUser',
           'com.odde.doughnut.entities.json.NotebooksViewedByUser',
   ]
+  customTypeMappings = [
+          'java.sql.Timestamp:string'
+  ]
   outputFile = '../frontend/src/generated/rest.d.ts'
   outputKind = 'global'
   namespace = 'Generated';

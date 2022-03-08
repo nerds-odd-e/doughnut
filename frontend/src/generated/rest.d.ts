@@ -1,16 +1,16 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-03-08 16:56:40.
+// Generated using typescript-generator version 2.35.1025 on 2022-03-08 18:49:40.
 
 declare namespace Generated {
 
     interface NoteViewedByUser {
         id: number;
-        parentId: number;
+        parentId?: number;
         title: string;
         shortDescription: string;
-        notePicture: string;
-        createdAt: Date;
+        notePicture?: string;
+        createdAt: string;
         noteAccessories: NoteAccessories;
         links: { [P in LinkType]?: LinkViewed };
         childrenIds: number[];
@@ -30,7 +30,7 @@ declare namespace Generated {
         pictureMask: string;
         useParentPicture: boolean;
         skipReview: boolean;
-        updatedAt: Date;
+        updatedAt: string;
     }
 
     interface LinkViewed {
@@ -42,7 +42,7 @@ declare namespace Generated {
         title: string;
         description: string;
         language: string;
-        updatedAt: Date;
+        updatedAt: string;
     }
 
     interface Notebook {
@@ -50,7 +50,7 @@ declare namespace Generated {
         ownership: Ownership;
         headNote: Note;
         skipReviewEntirely: boolean;
-        deletedAt: Date;
+        deletedAt: string;
     }
 
     interface Subscription {
@@ -58,9 +58,9 @@ declare namespace Generated {
         dailyTargetOfNewNotes: number;
         user: User;
         notebook: Notebook;
-        title: string;
         headNote: Note;
         noteContent: NoteAccessories;
+        title: string;
         shortDescription: string;
     }
 
@@ -69,7 +69,7 @@ declare namespace Generated {
         sourceNote: Note;
         targetNote: Note;
         typeId: number;
-        createdAt: Date;
+        createdAt: string;
         linkTypeLabel: string;
         linkNameOfSource: string;
     }
@@ -81,13 +81,13 @@ declare namespace Generated {
 
     interface Note {
         id: number;
-        createdAt: Date;
-        deletedAt: Date;
-        title: string;
+        createdAt: string;
+        deletedAt: string;
         notePicture: string;
-        parentId: number;
+        title: string;
         shortDescription: string;
-        createdAtAndUpdatedAt: Date;
+        parentId?: number;
+        createdAtAndUpdatedAt: string;
     }
 
     interface User {

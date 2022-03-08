@@ -7,10 +7,12 @@ import com.odde.doughnut.entities.json.LinkViewed;
 import com.odde.doughnut.entities.json.NotePositionViewedByUser;
 import com.odde.doughnut.entities.json.NoteViewedByUser;
 import com.odde.doughnut.entities.json.NoteWithPosition;
+import org.apache.logging.log4j.util.Strings;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -31,7 +33,7 @@ public class NoteViewer {
         nvb.setParentId(note.getParentId());
         nvb.setTitle(note.getTitle());
         nvb.setShortDescription(note.getShortDescription());
-        nvb.setNotePicture(note.getNotePicture());
+        nvb.setNotePicture(Strings.isEmpty(note.getNotePicture()) ? Optional.empty() : Optional.of(note.getNotePicture()));
         nvb.setCreatedAt(note.getCreatedAt());
         nvb.setNoteAccessories(note.getNoteAccessories());
         nvb.setLinks(getAllLinks());

@@ -5,19 +5,36 @@ import { merge } from "lodash";
 let idCounter = 1;
 
 const generateId = () => {
-  return (idCounter++).toString();
+  return (idCounter++);
 };
 
-class NoteBuilder extends Builder {
-  data: any;
+class NoteBuilder extends Builder<Generated.NoteViewedByUser> {
+  data: Generated.NoteViewedByUser;
 
   constructor(parentBuilder?: Builder) {
     super(parentBuilder);
     this.data = {
       id: generateId(),
-      parentId: null,
-      noteAccessories: {},
-      textContent: {},
+      title: '',
+      shortDescription: '',
+      createdAt: '',
+      noteAccessories: {
+        id: 0,
+        url: '',
+        urlIsVideo: false,
+        pictureUrl: '',
+        pictureMask: '',
+        useParentPicture: false,
+        skipReview: false,
+        updatedAt: '',
+      },
+      textContent: {
+        title: '',
+        description: '',
+        language: '',
+        updatedAt: '',
+
+      },
       links: {},
       childrenIds: []
     };
@@ -41,8 +58,8 @@ class NoteBuilder extends Builder {
 
   shortDescription(value: string): NoteBuilder {
     this.data.shortDescription = value;
-    if(!this.data.noteAccessories.description) {
-      this.data.noteAccessories.description = value;
+    if(!this.data.textContent.description) {
+      this.data.textContent.description = value;
     }
     return this;
   }
@@ -69,7 +86,7 @@ class NoteBuilder extends Builder {
     return this;
   }
 
-  do(): any {
+  do(): Generated.NoteViewedByUser {
     return merge(
       {
         noteAccessories: {
