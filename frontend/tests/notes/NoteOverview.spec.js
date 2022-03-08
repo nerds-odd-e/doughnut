@@ -4,17 +4,19 @@
 
 import NoteOverview from "@/components/notes/NoteOverview.vue";
 import makeMe from "../fixtures/makeMe";
-import { renderWithStoreAndMockRoute } from "../helpers";
+import { renderWithStoreAndMockRoute, StoredComponentTestHelper } from "../helpers";
 import { screen } from "@testing-library/vue";
 import { createTestingPinia } from "@pinia/testing";
-import createPiniaStore from '@/store/pinia_store';
+import createPiniaStore from '@/store/createPiniaStore';
 
 describe("note overview", () => {
   let pinia;
   let store;
+  let helper;
   beforeEach(()=>{
-    pinia = createTestingPinia();
-    store = createPiniaStore(pinia);
+    helper = new StoredComponentTestHelper();
+    pinia = helper.pinia
+    store = helper.store
   });
 
   it("should render one note", async () => {

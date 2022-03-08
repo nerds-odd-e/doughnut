@@ -1,4 +1,4 @@
-import useStore from "../store/pinia_store";
+import useStore from "../store/createPiniaStore";
 import storedApiCollection from  "./storedApiCollection";
 import useLoadingApi from "./useLoadingApi";
 

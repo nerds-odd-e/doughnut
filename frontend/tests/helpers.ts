@@ -2,6 +2,8 @@ import { merge } from "lodash";
 import { Component } from "vue";
 import { mount } from "@vue/test-utils";
 import { render } from "@testing-library/vue";
+import { createTestingPinia, TestingPinia } from "@pinia/testing";
+import createPiniaStore from '../src/store/createPiniaStore.js';
 
 type Options = {};
 
@@ -93,4 +95,24 @@ const mountWithStoreAndMockRoute = (
   );
 };
 
-export { mountWithMockRoute, renderWithMockRoute, renderWithStoreAndMockRoute, mountWithStoreAndMockRoute };
+class StoredComponentTestHelper {
+  piniaInstance: TestingPinia | undefined;
+  piniaStore: any | undefined;
+
+  get pinia() {
+    if(this.piniaInstance === undefined) {
+      this.piniaInstance = createTestingPinia();
+    }
+    return this.piniaInstance;
+  }
+
+  get store() {
+    if(this.piniaStore === undefined) {
+      this.piniaStore = createPiniaStore(this.pinia);
+    }
+    return this.piniaStore;
+  }
+
+}
+
+export { StoredComponentTestHelper, mountWithMockRoute, renderWithMockRoute, renderWithStoreAndMockRoute, mountWithStoreAndMockRoute };
