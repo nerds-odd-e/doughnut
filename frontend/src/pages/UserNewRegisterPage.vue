@@ -31,7 +31,7 @@ export default ({
   },
   methods: {
     processForm() {
-      this.storedApi().createUser(this.formData)
+      this.storedApi.createUser(this.formData)
     },
   },
 })

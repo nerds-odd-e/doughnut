@@ -85,7 +85,7 @@ export default ({
     async deleteNote() {
       if (await this.$popups.confirm(`Are you sure to delete this note?`)) {
         const parentId = this.note.parentId;
-        await this.storedApi().deleteNote(this.note.id);
+        await this.storedApi.deleteNote(this.note.id);
         this.$emit("ensureVisible", parentId);
         if (parentId) {
           if (viewType(this.viewType).redirectAfterDelete) {

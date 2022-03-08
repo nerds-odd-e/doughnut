@@ -7,7 +7,7 @@ export default function(loadingOptions={initalLoading: false, hasFormError: fals
     return {
       ...useLoadingApi(loadingOptions),
       piniaStore,
-      storedApi() {
+      get storedApi(): any {
          return storedApiCollection(this.managedApi, piniaStore)
       }
     }

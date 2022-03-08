@@ -53,14 +53,14 @@ export default ({
 
   methods: {
     updateLink() {
-      this.storedApi().updateLink(this.link.id, this.formData)
+      this.storedApi.updateLink(this.link.id, this.formData)
         .then((res) => this.$emit('done'))
     },
 
     async deleteLink() {
       if (!(await this.$popups.confirm("Are you sure to delete this link?")))
         return;
-      this.storedApi().deleteLink(this.link.id)
+      this.storedApi.deleteLink(this.link.id)
         .then((res) => { this.$emit('done') })
     },
   },

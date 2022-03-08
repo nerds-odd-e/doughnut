@@ -50,7 +50,7 @@ export default ({
       })
     },
     processForm() {
-      this.storedApi().updateUser(this.formData.id, this.formData)
+      this.storedApi.updateUser(this.formData.id, this.formData)
         .then(() =>  this.$router.push({ name: "root" }))
 
     },

@@ -70,7 +70,7 @@ export default ({
           return;
         }
       }
-      this.storedApi().createLink(this.note.id, this.targetNote.id, this.formData)
+      this.storedApi.createLink(this.note.id, this.targetNote.id, this.formData)
         .then((r) => this.$emit("success"))
         .catch((res) => {
           this.formErrors = res

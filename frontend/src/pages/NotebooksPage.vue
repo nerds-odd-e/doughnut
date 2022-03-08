@@ -45,7 +45,7 @@ export default ({
   },
   methods: {
     fetchData() {
-      this.storedApi().getNotebooks().then(
+      this.storedApi.getNotebooks().then(
         (res) => (this.subscriptions = res.subscriptions))
     },
   },

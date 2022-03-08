@@ -32,7 +32,7 @@ export default ({
   },
   methods: {
     undoDelete() {
-      this.storedApi().undo()
+      this.storedApi.undo()
     }
   }
 });

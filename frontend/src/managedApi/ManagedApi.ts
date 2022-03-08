@@ -2,7 +2,7 @@ import { isRef, Ref } from "vue";
 import Api from "./restful/Api";
 
 interface ManagedComponent {
-  formErrors: Ref<any>;
+  formErrors: Ref<any> | undefined;
   loading: Ref<boolean>;
 }
 

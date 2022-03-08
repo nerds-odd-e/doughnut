@@ -11,7 +11,7 @@ beforeEach(() => {
 
 describe("storedApiCollection", () => {
   const note = makeMe.aNote.please()
-  const sa = useStoredLoadingApi().storedApi();
+  const sa = useStoredLoadingApi().storedApi;
 
   describe("delete note", () => {
 

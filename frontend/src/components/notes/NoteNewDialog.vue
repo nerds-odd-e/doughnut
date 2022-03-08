@@ -55,7 +55,7 @@ export default ({
   },
   methods: {
     fetchData() {
-      this.storedApi().getNoteAndItsChildren(this.parentId)
+      this.storedApi.getNoteAndItsChildren(this.parentId)
       .then((res) => {
           const note = res.notes[0]
           const { ancestors, notebook } = res.notePosition;
@@ -66,7 +66,7 @@ export default ({
     },
 
     processForm() {
-      this.storedApi().createNote(this.parentId,
+      this.storedApi.createNote(this.parentId,
         this.creationData
       ).then((res) => {
         this.$router.push({

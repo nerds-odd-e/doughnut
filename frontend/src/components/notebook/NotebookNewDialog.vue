@@ -41,7 +41,7 @@ export default ({
   methods: {
 
     processForm() {
-      this.storedApi().createNotebook(this.circle,
+      this.storedApi.createNotebook(this.circle,
         this.noteFormData,
       )
         .then((res) =>
