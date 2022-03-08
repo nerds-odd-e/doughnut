@@ -100,7 +100,7 @@ Then("I should see these notes as children", (data) => {
 
 When("I delete notebook {string}", (noteTitle) => {
   cy.visit("/")
-  cy.clickNotePageMoreOptionsButton(noteTitle, "delete note");
+  cy.clickNotePageMoreOptionsButton(noteTitle, "Delete note");
   cy.findByRole("button", { name: "OK" }).click();
 });
 

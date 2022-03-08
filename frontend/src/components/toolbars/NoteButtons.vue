@@ -35,11 +35,11 @@
         </ReviewSettingEditButton>
         <button
           class="dropdown-item"
-          title="delete note"
+          title="Delete note"
           v-on:click="deleteNote"
         >
           <SvgRemove />
-          Delete
+          Delete note
         </button>
       </div>
       <NoteDownloadButton :note="note" v-if="featureToggle" />
