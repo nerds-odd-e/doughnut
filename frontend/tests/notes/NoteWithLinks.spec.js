@@ -19,7 +19,7 @@ describe("new/updated pink banner", () => {
     Date.now = jest.fn(() => new Date(Date.UTC(2017, 1, 14)).valueOf());
   });
 
-  test.each([
+  it.each([
     [new Date(Date.UTC(2017, 1, 15)), "rgb(208,237,23)"],
     [new Date(Date.UTC(2017, 1, 13)), "rgb(189,209,64)"],
     [new Date(Date.UTC(2017, 1, 12)), "rgb(181,197,82)"],
@@ -79,7 +79,6 @@ describe("in place edit on title", () => {
 });
 
 describe("undo editing", () => {
-
   it("should call addEditingToUndoHistory on submitChange", async () => {
     const note = makeMe.aNote.title("Dummy Title").please();
     store.loadNotes([note]);
