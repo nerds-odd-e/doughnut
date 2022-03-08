@@ -56,32 +56,13 @@ const renderWithMockRoute = (
   return withMockRoute(comp, options, currentRoute, render);
 };
 
-const withStoreAndMockRoute = (
-  store: any,
-  comp: Component,
-  options: Options = {},
-  currentRoute: any,
-  func: (comp: Component, options: Options) => any
-) => {
-  return withMockRoute(
-    comp,
-    merge(options, {
-      global: {
-        plugins: [store],
-      },
-    }),
-    currentRoute,
-    func
-  );
-};
 const renderWithStoreAndMockRoute = (
   store: any,
   comp: Component,
   options: Options = {},
   currentRoute: any,
 ) => {
-  return withStoreAndMockRoute(
-    store,
+  return withMockRoute(
     comp,
     merge(options, {
       global: {
@@ -100,8 +81,7 @@ const mountWithStoreAndMockRoute = (
   options: Options = {},
   currentRoute: any,
 ) => {
-  return withStoreAndMockRoute(
-    store,
+  return withMockRoute(
     comp,
     merge(options, {
       global: {
