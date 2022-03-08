@@ -6,8 +6,6 @@ import NoteOverview from "@/components/notes/NoteOverview.vue";
 import makeMe from "../fixtures/makeMe";
 import { renderWithStoreAndMockRoute, StoredComponentTestHelper } from "../helpers";
 import { screen } from "@testing-library/vue";
-import { createTestingPinia } from "@pinia/testing";
-import createPiniaStore from '@/store/createPiniaStore';
 
 describe("note overview", () => {
   let pinia;

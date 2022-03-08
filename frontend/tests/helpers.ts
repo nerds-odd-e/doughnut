@@ -3,7 +3,7 @@ import { Component } from "vue";
 import { mount } from "@vue/test-utils";
 import { render } from "@testing-library/vue";
 import { createTestingPinia, TestingPinia } from "@pinia/testing";
-import createPiniaStore from '../src/store/createPiniaStore.js';
+import createPiniaStore from '../src/store/createPiniaStore';
 
 type Options = {};
 

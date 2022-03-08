@@ -1,6 +1,7 @@
 
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.entities.json.NotebooksViewedByUser;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.BazaarModel;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,9 +18,9 @@ class RestBazaarController {
   }
 
   @GetMapping("")
-  public RestNotebookController.NotebooksViewedByUser bazaar() {
+  public NotebooksViewedByUser bazaar() {
     BazaarModel bazaar = modelFactoryService.toBazaarModel();
-    RestNotebookController.NotebooksViewedByUser notebooksViewedByUser = new RestNotebookController.NotebooksViewedByUser();
+    NotebooksViewedByUser notebooksViewedByUser = new NotebooksViewedByUser();
     notebooksViewedByUser.notebooks = bazaar.getAllNotebooks();
     return notebooksViewedByUser;
   }

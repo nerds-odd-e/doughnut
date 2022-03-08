@@ -4,6 +4,7 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.Subscription;
+import com.odde.doughnut.entities.json.NotebooksViewedByUser;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.BazaarModel;
@@ -26,9 +27,9 @@ class RestSubscriptionController {
   }
 
   @GetMapping("")
-  public RestNotebookController.NotebooksViewedByUser bazaar() {
+  public NotebooksViewedByUser bazaar() {
     BazaarModel bazaar = modelFactoryService.toBazaarModel();
-    RestNotebookController.NotebooksViewedByUser notebooksViewedByUser = new RestNotebookController.NotebooksViewedByUser();
+    NotebooksViewedByUser notebooksViewedByUser = new NotebooksViewedByUser();
     notebooksViewedByUser.notebooks = bazaar.getAllNotebooks();
     return notebooksViewedByUser;
   }

@@ -1,13 +1,12 @@
 
 package com.odde.doughnut.controllers;
 
-import java.util.List;
-
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.json.NotebooksViewedByUser;
 import com.odde.doughnut.entities.json.RedirectToNoteResponse;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -35,11 +34,6 @@ class RestNotebookController {
         this.modelFactoryService = modelFactoryService;
         this.currentUserFetcher = currentUserFetcher;
         this.testabilitySettings = testabilitySettings;
-    }
-
-    static class NotebooksViewedByUser {
-        public List<Notebook> notebooks;
-        public List<Subscription> subscriptions;
     }
 
     @GetMapping("")

@@ -102,8 +102,11 @@ tasks.register("bootRunE2E") {
 
 generateTypeScript {
   jsonLibrary = 'jackson2'
-  classes = [ 'com.odde.doughnut.entities.json.NoteViewedByUser']
-  outputFile = '../frontend/generated/rest.d.ts'
+  classes = [
+          'com.odde.doughnut.entities.json.NoteViewedByUser',
+          'com.odde.doughnut.entities.json.NotebooksViewedByUser',
+  ]
+  outputFile = '../frontend/src/generated/rest.d.ts'
   outputKind = 'global'
   namespace = 'Generated';
 }
