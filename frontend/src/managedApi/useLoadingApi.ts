@@ -1,12 +1,14 @@
-import { ref } from "vue";
-import api from "./api";
+import { Ref, ref } from "vue";
+import apiCollection from "./apiCollection";
+import ManagedApi from "./ManagedApi";
 
-export default function (options={initalLoading: false, hasFormError: false}) {
-  const loading = ref(options.initalLoading)
+export default function (options={initalLoading: false, hasFormError: false, skipLoading: false}) {
+  const loading: Ref<boolean> = ref(options.initalLoading)
   const formErrors = options.hasFormError ? ref({}) : undefined
   const loadingData = { loading, formErrors }
   return {
-    get api() { return api(loadingData) },
+    get managedApi() { return new ManagedApi(loadingData, {skipLoading: options.skipLoading}) },
+    get api(): any { return apiCollection(this.managedApi) },
     ...loadingData
   };
 }

@@ -1,8 +1,6 @@
 import ManagedApi from "./ManagedApi";
 
-const api = (component) => {
-  const managedApi = new ManagedApi(component);
-  return {
+const apiCollection = (managedApi) => ({
     userMethods: {
       logout() {
         return managedApi.restPostWithHtmlResponse(`/logout`, {});
@@ -91,7 +89,6 @@ const api = (component) => {
     getStatistics(noteId, linkId) {
         return managedApi.restGet(`${noteId ? `notes/${noteId}`: `links/${linkId}`}/statistics`);
     }
-  };
-}
+  })
 
-export default api;
+export default apiCollection;

@@ -6,7 +6,7 @@ import useStoredLoadingApi from "./managedApi/useStoredLoadingApi";
 
 export default {
   setup() {
-    return useStoredLoadingApi({initalLoading: true})
+    return useStoredLoadingApi({initalLoading: true, skipLoading: true})
   },
   data() {
     return {
@@ -44,11 +44,12 @@ export default {
   },
 
   mounted() {
-    this.storedApi({skipLoading: true}).getFeatureToggle()
+    this.storedApi().getFeatureToggle()
 
     this.storedApi().getCurrentUserInfo().then((res) => {
       this.externalIdentifier = res.externalIdentifier;
     })
+    .finally(()=> this.loading = false )
 
     this.$popups.alert = (msg) => {
       this.popupInfo = { type: "alert", message: msg };

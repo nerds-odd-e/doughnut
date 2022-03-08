@@ -1,9 +1,9 @@
-import { isRef } from "vue";
+import { isRef, Ref } from "vue";
 import Api from "./restful/Api";
 
-interface ManaagedComponent {
-  formErrors: unknown;
-  loading: boolean
+interface ManagedComponent {
+  formErrors: Ref<any>;
+  loading: Ref<boolean>;
 }
 
 class ManagedApi {
@@ -13,7 +13,7 @@ class ManagedApi {
 
   skipLoading: boolean;
 
-  constructor(component: ManaagedComponent, options: {skipLoading: boolean}={skipLoading: false}) {
+  constructor(component: ManagedComponent, options: {skipLoading: boolean}={skipLoading: false}) {
     this.api = new Api('/api/')
     this.component = component;
     this.skipLoading = options.skipLoading;
@@ -23,7 +23,7 @@ class ManagedApi {
     const assignLoading = (value: boolean) => {
       if (this.skipLoading) return;
       if(this.component !== null && this.component !== undefined) {
-        this.component.loading = value
+        this.component.loading.value = value
       }
     }
 
@@ -31,7 +31,7 @@ class ManagedApi {
     return new Promise((resolve, reject) => {
       promise.then(resolve).catch(error=>{
         if(this.component != null && this.component.formErrors !== undefined) {
-          this.component.formErrors = error
+          this.component.formErrors.value = error
           return;
         }
         reject(error);

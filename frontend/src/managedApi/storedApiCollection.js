@@ -1,8 +1,6 @@
 import ManagedApi from './ManagedApi';
 
-const createStoredApi = (component, options={}) => {
-  const managedApi = new ManagedApi(component, options);
-  const {piniaStore} = component
+const storedApiCollection = (managedApi, piniaStore) => {
 
   function loadReviewPointViewedByUser(data) {
     if (!data) return;
@@ -199,5 +197,5 @@ const createStoredApi = (component, options={}) => {
   };
 };
 
-export default createStoredApi;
+export default storedApiCollection;
 
