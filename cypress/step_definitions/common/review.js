@@ -179,7 +179,7 @@ Then("I should see the satisfied button: {string}", (yesNo) => {
 
 Then("I am changing note {string}'s review setting", (noteTitle) => {
   cy.visit("/")
-  cy.clickNotePageMoreOptionsButton(noteTitle, "edit review setting");
+  cy.clickNotePageMoreOptionsButton(noteTitle, "Edit review settings");
 });
 
 Then("The randomizer always choose the last", (yesNo) => {
@@ -188,7 +188,7 @@ Then("The randomizer always choose the last", (yesNo) => {
 
 Then("I should see the statistics of note {string}", (noteTitle, data) => {
   cy.jumpToNotePage(noteTitle);
-  cy.findByRole("button", { name: "statistics" }).click();
+  cy.findByRole("button", { name: "Statistics" }).click();
   const attrs = data.hashes()[0];
   for (var k in attrs) {
     cy.findByText(attrs[k]).should("be.visible");

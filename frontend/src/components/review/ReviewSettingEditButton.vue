@@ -1,7 +1,7 @@
 <template>
   <button
     class="dropdown-item"
-    title="edit review setting"
+    title="Edit review settings"
     @click="showDialog()"
   >
     <SvgReviewSetting />

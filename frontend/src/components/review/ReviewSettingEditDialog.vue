@@ -1,6 +1,6 @@
 <template>
   <h3>
-    Edit review setting for <em>{{ title }}</em>
+    Edit review settings for <em>{{ title }}</em>
   </h3>
   <form @submit.prevent="processForm">
     <ReviewSettingForm
