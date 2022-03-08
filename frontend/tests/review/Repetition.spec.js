@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import Repetition from '@/components/review/Repetition.vue';
-import store from '../fixtures/testingStore.js';
+import store from '../fixtures/testingStore';
 import { mountWithStoreAndMockRoute } from '../helpers';
 import makeMe from '../fixtures/makeMe';
 

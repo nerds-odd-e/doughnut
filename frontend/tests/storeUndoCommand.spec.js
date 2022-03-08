@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-import store from './fixtures/testingStore.js';
+import store from './fixtures/testingStore';
 import makeMe from './fixtures/makeMe';
 
 describe('storeUndoCommand', () => {
