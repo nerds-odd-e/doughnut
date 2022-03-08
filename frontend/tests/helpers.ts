@@ -94,9 +94,11 @@ const mountWithStoreAndMockRoute = (
   );
 };
 
+type PiniaStore = ReturnType<typeof createPiniaStore>
+
 class StoredComponentTestHelper {
   piniaInstance: TestingPinia | undefined;
-  piniaStore: ReturnType<typeof createPiniaStore> | undefined;
+  piniaStore: PiniaStore | undefined;
 
   get pinia() {
     if(this.piniaInstance === undefined) {
@@ -110,6 +112,14 @@ class StoredComponentTestHelper {
       this.piniaStore = createPiniaStore(this.pinia);
     }
     return this.piniaStore;
+  }
+
+  render(
+    comp: any,
+    options: Options = {},
+    currentRoute: any = undefined,
+  ) {
+    return renderWithStoreAndMockRoute(this.pinia, comp, options, currentRoute);
   }
 
 }

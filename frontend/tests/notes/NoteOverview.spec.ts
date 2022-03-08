@@ -10,7 +10,8 @@ import { screen } from "@testing-library/vue";
 describe("note overview", () => {
   let pinia: any;
   let store: any;
-  let helper;
+  let helper: StoredComponentTestHelper;
+
   beforeEach(()=>{
     helper = new StoredComponentTestHelper();
     pinia = helper.pinia
@@ -19,9 +20,8 @@ describe("note overview", () => {
 
   it("should render one note", async () => {
     const note = makeMe.aNote.title("single note").please();
-    store.loadNotes([note]);
-    renderWithStoreAndMockRoute(
-      pinia,
+    helper.store.loadNotes([note]);
+    helper.render(
       NoteOverview,
       { props: { noteId: note.id, expandChildren: true } },
     );
