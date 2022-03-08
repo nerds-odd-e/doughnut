@@ -1,23 +1,22 @@
 /**
  * @jest-environment jsdom
  */
-import store from "./fixtures/testingStore.js";
-import makeMe from "./fixtures/makeMe";
+import store from './fixtures/testingStore.js';
+import makeMe from './fixtures/makeMe';
 
-describe("storeUndoCommand", () => {
-  const note = makeMe.aNote.title("Dummy Title").please()
+describe('storeUndoCommand', () => {
+  const note = makeMe.aNote.title('Dummy Title').please();
 
-  describe("addEditingToUndoHistory", () => {
+  describe('addEditingToUndoHistory', () => {
     beforeEach(() => {
       store.loadNotes([note]);
     });
 
-    test("should push textContent into store state noteUndoHistories ",
-        () => {
-          store.addEditingToUndoHistory( { noteId: note.id, });
+    it('should push textContent into store state noteUndoHistories ', () => {
+      store.addEditingToUndoHistory({ noteId: note.id });
 
-          expect(store.noteUndoHistories.length).toEqual(1);
-        });
+      expect(store.noteUndoHistories.length).toEqual(1);
+    });
   });
 
   describe('popUndoHistory', () => {
@@ -26,7 +25,7 @@ describe("storeUndoCommand", () => {
 
     beforeEach(() => {
       store.loadNotes([note]);
-      store.addEditingToUndoHistory( mockUpdatedNote);
+      store.addEditingToUndoHistory(mockUpdatedNote);
       initialUndoCount = store.noteUndoHistories.length;
     });
 
@@ -43,6 +42,5 @@ describe("storeUndoCommand", () => {
 
       expect(store.noteUndoHistories.length).toEqual(0);
     });
-  })
+  });
 });
-

@@ -63,7 +63,6 @@ export default defineStore('main', {
           this.notebooks = notebooks
         },
         addEditingToUndoHistory({noteId}) {
-          console.log(`in store.addEditingToUndoHistory ${noteId}`)
           this.noteUndoHistories.push({type: 'editing', noteId, textContent: {...withState(this).getNoteById(noteId).textContent}});
         },
         popUndoHistory() {
