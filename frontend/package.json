@@ -7,8 +7,8 @@
     "build": "vite build --emptyOutDir",
     "serve": "vite preview",
     "test": "jest",
-    "lint": "eslint src",
-    "lint:fix": "eslint src --fix",
+    "lint": "eslint src tests",
+    "lint:fix": "eslint src tests --fix",
     "format": "prettier .  --write"
   },
   "dependencies": {
