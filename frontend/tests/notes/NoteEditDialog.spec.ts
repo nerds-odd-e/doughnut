@@ -1,15 +1,18 @@
 /**
  * @jest-environment jsdom
  */
+import fetchMock from "jest-fetch-mock";
 import NoteEditDialog from '@/components/notes/NoteEditDialog.vue';
 import flushPromises from 'flush-promises';
 import _ from 'lodash';
-import store from '../fixtures/testingStore';
-import { renderWithStoreAndMockRoute } from '../helpers';
+import { StoredComponentTestHelper } from '../helpers';
 import makeMe from '../fixtures/makeMe';
 
+let helper: StoredComponentTestHelper
+
 beforeEach(() => {
-  fetch.resetMocks();
+  fetchMock.resetMocks();
+  helper = new StoredComponentTestHelper()
 });
 
 describe('note show', () => {
@@ -19,13 +22,11 @@ describe('note show', () => {
       notePosition: makeMe.aNotePosition.please(),
       notes: [note],
     };
-    fetch.mockResponseOnce(JSON.stringify(stubResponse));
-    renderWithStoreAndMockRoute(store, NoteEditDialog, {
-      propsData: { noteId: note.id },
-    });
+    fetchMock.mockResponseOnce(JSON.stringify(stubResponse));
+    helper.component(NoteEditDialog).withProps({ noteId: note.id }).render()
     await flushPromises();
-    expect(fetch).toHaveBeenCalledTimes(1);
-    expect(fetch).toHaveBeenCalledWith(
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock).toHaveBeenCalledWith(
       `/api/notes/${note.id}`,
       expect.anything()
     );
