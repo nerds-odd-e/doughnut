@@ -1,17 +1,17 @@
 /**
  * @jest-environment jsdom
  */
+import fetchMock from "jest-fetch-mock";
 import { screen } from '@testing-library/vue';
 import NoteWithLinks from '@/components/notes/NoteWithLinks.vue';
 import makeMe from '../fixtures/makeMe';
-import {
-  renderWithStoreAndMockRoute,
-  mountWithStoreAndMockRoute,
-} from '../helpers';
-import store from '../fixtures/testingStore';
+import { StoredComponentTestHelper } from '../helpers';
 
-afterEach(() => {
-  fetch.resetMocks();
+let helper: StoredComponentTestHelper
+
+beforeEach(() => {
+  fetchMock.resetMocks();
+  helper = new StoredComponentTestHelper()
 });
 
 describe('new/updated pink banner', () => {
@@ -29,7 +29,7 @@ describe('new/updated pink banner', () => {
     (updatedAt, expectedColor) => {
       const note = makeMe.aNote.textContentUpdatedAt(updatedAt).please();
 
-      renderWithStoreAndMockRoute(store, NoteWithLinks, { props: { note } });
+      helper.component(NoteWithLinks).withProps({note}).render()
 
       expect(screen.getByRole('title').parentNode).toHaveStyle(
         `border-color: ${expectedColor};`
@@ -41,13 +41,9 @@ describe('new/updated pink banner', () => {
 describe('in place edit on title', () => {
   it('should display text field when one single click on title', async () => {
     const noteParent = makeMe.aNote.title('Dummy Title').please();
-    store.loadNotes([noteParent]);
+    helper.store.loadNotes([noteParent]);
 
-    const { wrapper } = mountWithStoreAndMockRoute(store, NoteWithLinks, {
-      props: {
-        note: noteParent,
-      },
-    });
+    const { wrapper } = helper.component(NoteWithLinks).withProps({note: noteParent}).mount()
 
     expect(wrapper.findAll('[role="title"] input')).toHaveLength(0);
     await wrapper.find('[role="title"] h2').trigger('click');
@@ -58,19 +54,15 @@ describe('in place edit on title', () => {
 
   it('should back to label when blur text field title', async () => {
     const noteParent = makeMe.aNote.title('Dummy Title').please();
-    store.loadNotes([noteParent]);
+    helper.store.loadNotes([noteParent]);
 
-    const { wrapper } = mountWithStoreAndMockRoute(store, NoteWithLinks, {
-      props: {
-        note: noteParent,
-      },
-    });
+    const { wrapper } = helper.component(NoteWithLinks).withProps({note: noteParent}).mount()
 
     await wrapper.find('[role="title"]').trigger('click');
     await wrapper.find('[role="title"] input').setValue('updated');
     await wrapper.find('[role="title"] input').trigger('blur');
 
-    expect(fetch).toHaveBeenCalledWith(
+    expect(fetchMock).toHaveBeenCalledWith(
       `/api/text_content/${noteParent.id}`,
       expect.objectContaining({ method: 'PATCH' })
     );
@@ -80,19 +72,15 @@ describe('in place edit on title', () => {
 describe('undo editing', () => {
   it('should call addEditingToUndoHistory on submitChange', async () => {
     const note = makeMe.aNote.title('Dummy Title').please();
-    store.loadNotes([note]);
+    helper.store.loadNotes([note]);
 
     const updatedTitle = 'updated';
-    const { wrapper } = mountWithStoreAndMockRoute(store, NoteWithLinks, {
-      props: {
-        note,
-      },
-    });
+    const { wrapper } = helper.component(NoteWithLinks).withProps({note}).mount()
 
     await wrapper.find('[role="title"]').trigger('click');
     await wrapper.find('[role="title"] input').setValue(updatedTitle);
     await wrapper.find('[role="title"] input').trigger('blur');
 
-    expect(store.peekUndo()).toMatchObject({ type: 'editing' });
+    expect(helper.store.peekUndo()).toMatchObject({ type: 'editing' });
   });
 });
