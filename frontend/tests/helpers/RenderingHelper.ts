@@ -12,8 +12,6 @@ class RenderingHelper {
 
   private route = {}
 
-  private mockRouter
-
   private global = {
     directives: {
       focus() { }
@@ -29,14 +27,17 @@ class RenderingHelper {
 
   constructor(comp: DefineComponent) {
     this.comp = comp
-    this.mockRouter = {
-      push: jest.fn(),
-    };
-
   }
 
   withProps(props: Options) {
     this.props = props
+    return this
+  }
+
+  withMockRouterPush(push: jest.Mock) {
+    this.withGlobal({
+      mocks: { $router: {push} }
+    })
     return this
   }
 
@@ -53,14 +54,12 @@ class RenderingHelper {
   render() {
     return {
       wrapper: render( this.comp, this.options),
-      mockRouter: this.mockRouter
     };
   }
 
   mount() {
     return {
       wrapper: mount(this.comp, this.options),
-      mockRouter: this.mockRouter
     }
   }
 
@@ -72,7 +71,6 @@ class RenderingHelper {
           {
             mocks: {
               $route: this.route,
-              $router: this.mockRouter,
             },
           })
       }

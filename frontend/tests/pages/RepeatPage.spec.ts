@@ -6,12 +6,17 @@ import RepeatPage from '@/pages/RepeatPage.vue';
 import flushPromises from 'flush-promises';
 import { StoredComponentTestHelper } from '../helpers';
 import makeMe from '../fixtures/makeMe';
+import RenderingHelper from "../helpers/RenderingHelper";
 
 let helper: StoredComponentTestHelper
+let renderer: RenderingHelper
+let mockRouterPush = jest.fn();
 
 beforeEach(() => {
   fetchMock.resetMocks();
+  mockRouterPush = jest.fn();
   helper = new StoredComponentTestHelper()
+  renderer = helper.component(RepeatPage).withMockRouterPush(mockRouterPush);
 });
 
 describe('repeat page', () => {
@@ -21,30 +26,30 @@ describe('repeat page', () => {
   const mountPage = async (repetition: any) => {
     helper.store.loadNotes([note]);
     fetchMock.mockResponseOnce(JSON.stringify(repetition));
-    const { wrapper, mockRouter } = helper.component(RepeatPage).withGlobal(
+    const { wrapper } = renderer.withGlobal(
         {
           mocks: {
             $popups: popupMock,
           },
         }).currentRoute({ name: 'repeat' }).mount()
     await flushPromises();
-    return { wrapper, mockRouter };
+    return wrapper;
   };
 
   it('redirect to review page if nothing to repeat', async () => {
-    const { mockRouter } = await mountPage({});
+    await mountPage({});
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(fetchMock).toHaveBeenCalledWith(
       '/api/reviews/repeat',
       expect.anything()
     );
-    expect(mockRouter.push).toHaveBeenCalledWith({ name: 'reviews' });
+    expect(mockRouterPush).toHaveBeenCalledWith({ name: 'reviews' });
   });
 
   it('replace route with repeat/quiz if there is a quiz', async () => {
     const repetition = makeMe.aRepetition.ofNote(note).withAQuiz().please();
-    const { mockRouter } = await mountPage(repetition);
-    expect(mockRouter.push).toHaveBeenCalledWith({ name: 'repeat-quiz' });
+    await mountPage(repetition);
+    expect(mockRouterPush).toHaveBeenCalledWith({ name: 'repeat-quiz' });
   });
 
   describe('repeat page with no quiz (or after quiz)', () => {
@@ -57,8 +62,8 @@ describe('repeat page', () => {
     })
 
     it('stay at repeat page if there is no quiz', async () => {
-      const { mockRouter } = await mountPage(repetition);
-      expect(mockRouter.push).toHaveBeenCalledWith({
+      await mountPage(repetition);
+      expect(mockRouterPush).toHaveBeenCalledWith({
         name: 'repeat',
         replace: true,
       });
@@ -66,7 +71,7 @@ describe('repeat page', () => {
 
     it('should call the self-evaluate api', async () => {
       repetition = makeMe.aRepetition.ofNote(note).please();
-      const { wrapper } = await mountPage(repetition);
+      const wrapper = await mountPage(repetition);
       fetchMock.mockResponseOnce(JSON.stringify({}));
       wrapper.find('#repeat-sad').trigger('click');
       const reviewPointId = repetition.reviewPointViewedByUser.reviewPoint.id;
@@ -78,7 +83,7 @@ describe('repeat page', () => {
 
     it('reload next review point if 404', async () => {
       repetition = makeMe.aRepetition.ofNote(note).please();
-      const { wrapper } = await mountPage(repetition);
+      const wrapper = await mountPage(repetition);
 
       fetchMock.mockClear();
       fetchMock.mockResponseOnce('', {status: 404});
