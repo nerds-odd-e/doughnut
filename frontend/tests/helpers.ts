@@ -109,14 +109,31 @@ class StoredComponentTestHelper {
     return this.piniaStore || (this.piniaStore = createPiniaStore(this.pinia))
   }
 
-  render(
-    comp: DefineComponent,
-    options: Options = {},
-    currentRoute: any = undefined,
-  ) {
-    return renderWithStoreAndMockRoute(this.pinia, comp, options, currentRoute);
+  component( comp: DefineComponent) {
+    return new RenderingHelper(this, comp)
   }
 
 }
+
+class RenderingHelper {
+  private helper
+  private comp
+  private props = {}
+
+  constructor(helper: StoredComponentTestHelper, comp: DefineComponent) {
+    this.helper = helper
+    this.comp = comp
+  }
+
+  withProps(props: Options) {
+    this.props = props
+    return this
+  }
+
+  render() {
+    return renderWithStoreAndMockRoute(this.helper.pinia, this.comp, {props: this.props}, {});
+  }
+}
+
 
 export { StoredComponentTestHelper, mountWithMockRoute, renderWithMockRoute, renderWithStoreAndMockRoute, mountWithStoreAndMockRoute };

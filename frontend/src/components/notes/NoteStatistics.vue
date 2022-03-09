@@ -46,7 +46,7 @@ let statistics = $ref(null);
 const { api } = useLoadingApi();
 const fetchData = () => {
   api.getStatistics(props.noteId, props.linkid).then((articles) => {
-    statistics = articles;
+    statistics.value = articles;
   });
 };
 
