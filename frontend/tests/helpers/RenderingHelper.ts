@@ -42,35 +42,6 @@ const withMockRoute = <T>(
   return { wrapper, mockRouter };
 };
 
-const mountWithMockRoute = (
-  comp: any,
-  options: Options = {},
-  currentRoute: any
-) => withMockRoute(comp, options, currentRoute, mount);
-
-const renderWithMockRoute = (
-  comp: any,
-  options: Options = {},
-  currentRoute: any
-) => withMockRoute(comp, options, currentRoute, render);
-
-const renderWithStoreAndMockRoute = <T>(
-  store: any,
-  comp: T,
-  options: Options = {},
-  currentRoute: any = undefined,
-) => withMockRoute(
-  comp,
-  merge(options, {
-    global: {
-      plugins: [store],
-    },
-  }),
-  currentRoute,
-  render
-);
-
-
 const mountWithStoreAndMockRoute = (
   store: any,
   comp: any,
@@ -119,7 +90,19 @@ class RenderingHelper {
   }
 
   render() {
-    return renderWithStoreAndMockRoute(this.helper.pinia, this.comp, { propsData: this.props }, this.route);
+    return withMockRoute(
+      this.comp,
+      {
+        propsData: this.props,
+        global: {
+          plugins: [this.helper.pinia],
+        },
+      },
+      this.currentRoute,
+      render
+    );
+
+
   }
 
   mount() {
