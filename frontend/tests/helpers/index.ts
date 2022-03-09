@@ -55,23 +55,6 @@ const renderWithMockRoute = (
   currentRoute: any
 ) => withMockRoute(comp, options, currentRoute, render);
 
-const renderWithStoreAndMockRoute = <T>(
-  store: any,
-  comp: T,
-  options: Options = {},
-  currentRoute: any = undefined,
-) => withMockRoute(
-  comp,
-  merge(options, {
-    global: {
-      plugins: [store],
-    },
-  }),
-  currentRoute,
-  render
-);
-
-
 const mountWithStoreAndMockRoute = (
   store: any,
   comp: any,
@@ -107,4 +90,4 @@ class StoredComponentTestHelper {
 
 }
 
-export { StoredComponentTestHelper, mountWithMockRoute, renderWithMockRoute, renderWithStoreAndMockRoute, mountWithStoreAndMockRoute };
+export { StoredComponentTestHelper, mountWithMockRoute, renderWithMockRoute, mountWithStoreAndMockRoute };
