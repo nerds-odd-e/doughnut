@@ -30,7 +30,6 @@ class NoteBuilder extends Builder<Generated.NoteViewedByUser> {
       textContent: {
         title: '',
         description: '',
-        language: '',
         updatedAt: '',
 
       },

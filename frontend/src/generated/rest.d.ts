@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-03-09 09:37:52.
+// Generated using typescript-generator version 2.35.1025 on 2022-03-09 09:49:17.
 
 declare namespace Generated {
 
@@ -40,7 +40,6 @@ declare namespace Generated {
     interface TextContent {
         title: string;
         description: string;
-        language: string;
         updatedAt: string;
     }
 
