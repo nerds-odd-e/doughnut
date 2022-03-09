@@ -5,7 +5,7 @@ import { render } from "@testing-library/vue";
 import { DefineComponent } from "vue";
 import createPiniaStore from '../../src/store/createPiniaStore';
 
-type Options = {};
+type Options = Record<string, unknown>;
 
 const withMockRoute = <T>(
   comp: T,

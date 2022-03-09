@@ -6,7 +6,7 @@ import { DefineComponent } from "vue";
 import createPiniaStore from '../../src/store/createPiniaStore';
 import RenderingHelper, { PiniaStore } from "./RenderingHelper";
 
-type Options = {};
+type Options = Record<string, unknown>;
 
 const withMockRoute = <T>(
   comp: T,
@@ -23,7 +23,7 @@ const withMockRoute = <T>(
     merge(options, {
       global: {
         directives: {
-          focus() {}
+          focus() { }
         },
         mocks: {
           $route: currentRoute,
@@ -61,15 +61,15 @@ const renderWithStoreAndMockRoute = <T>(
   options: Options = {},
   currentRoute: any = undefined,
 ) => withMockRoute(
-    comp,
-    merge(options, {
-      global: {
-        plugins: [store],
-      },
-    }),
-    currentRoute,
-    render
-  );
+  comp,
+  merge(options, {
+    global: {
+      plugins: [store],
+    },
+  }),
+  currentRoute,
+  render
+);
 
 
 const mountWithStoreAndMockRoute = (
@@ -78,15 +78,15 @@ const mountWithStoreAndMockRoute = (
   options: Options = {},
   currentRoute: any,
 ) => withMockRoute(
-    comp,
-    merge(options, {
-      global: {
-        plugins: [store],
-      },
-    }),
-    currentRoute,
-    mount
-  );
+  comp,
+  merge(options, {
+    global: {
+      plugins: [store],
+    },
+  }),
+  currentRoute,
+  mount
+);
 
 class StoredComponentTestHelper {
   private piniaInstance?: TestingPinia
@@ -101,7 +101,7 @@ class StoredComponentTestHelper {
     return this.piniaStore || (this.piniaStore = createPiniaStore(this.pinia))
   }
 
-  component( comp: DefineComponent) {
+  component(comp: DefineComponent) {
     return new RenderingHelper(this, comp)
   }
 
