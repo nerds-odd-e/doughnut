@@ -8,14 +8,10 @@ import { renderWithStoreAndMockRoute, StoredComponentTestHelper } from "../helpe
 import { screen } from "@testing-library/vue";
 
 describe("note overview", () => {
-  let pinia: any;
-  let store: any;
   let helper: StoredComponentTestHelper;
 
   beforeEach(()=>{
     helper = new StoredComponentTestHelper();
-    pinia = helper.pinia
-    store = helper.store
   });
 
   it("should render one note", async () => {
@@ -31,9 +27,8 @@ describe("note overview", () => {
 
   it("should render one note with links", async () => {
     const note = makeMe.aNote.title("source").linkToSomeNote().please();
-    store.loadNotes([note]);
-    renderWithStoreAndMockRoute(
-      pinia,
+    helper.store.loadNotes([note]);
+    helper.render(
       NoteOverview,
       { props: { noteId: note.id, expandChildren: true } },
     );
@@ -43,9 +38,8 @@ describe("note overview", () => {
   it("should render note with one child", async () => {
     const noteParent = makeMe.aNote.title("parent").please();
     const noteChild = makeMe.aNote.title("child").under(noteParent).please();
-    store.loadNotes([noteParent, noteChild]);
-    renderWithStoreAndMockRoute(
-      pinia,
+    helper.store.loadNotes([noteParent, noteChild]);
+    helper.render(
       NoteOverview,
       { props: { noteId: noteParent.id, expandChildren: true } },
     );
@@ -58,9 +52,8 @@ describe("note overview", () => {
     const noteParent = makeMe.aNote.title("parent").please();
     const noteChild = makeMe.aNote.title("child").under(noteParent).please();
     const noteGrandchild = makeMe.aNote.title("grandchild").under(noteChild).please();
-    store.loadNotes([noteParent, noteChild, noteGrandchild]);
-    renderWithStoreAndMockRoute(
-      pinia,
+    helper.store.loadNotes([noteParent, noteChild, noteGrandchild]);
+    helper.render(
       NoteOverview,
       { props: { noteId: noteParent.id, expandChildren: true } },
     );
