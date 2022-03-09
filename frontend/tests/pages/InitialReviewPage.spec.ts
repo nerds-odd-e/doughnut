@@ -1,28 +1,26 @@
 /**
  * @jest-environment jsdom
  */
+import fetchMock from "jest-fetch-mock";
 import InitialReviewPage from '@/pages/InitialReviewPage.vue';
 import flushPromises from 'flush-promises';
-import store from '../fixtures/testingStore';
-import { mountWithStoreAndMockRoute } from '../helpers';
+import { StoredComponentTestHelper } from '../helpers';
 import makeMe from '../fixtures/makeMe';
 
+let helper: StoredComponentTestHelper
+
 beforeEach(() => {
-  fetch.resetMocks();
+  fetchMock.resetMocks();
+  helper = new StoredComponentTestHelper()
 });
 
 describe('repeat page', () => {
   it('redirect to review page if nothing to review', async () => {
-    fetch.mockResponseOnce(JSON.stringify({}));
-    const { mockRouter } = mountWithStoreAndMockRoute(
-      store,
-      InitialReviewPage,
-      {},
-      { name: 'initial' }
-    );
+    fetchMock.mockResponseOnce(JSON.stringify({}));
+    const { mockRouter } = helper.component(InitialReviewPage).currentRoute({ name: 'initial' }).mount()
     await flushPromises();
-    expect(fetch).toHaveBeenCalledTimes(1);
-    expect(fetch).toHaveBeenCalledWith(
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock).toHaveBeenCalledWith(
       '/api/reviews/initial',
       expect.anything()
     );
@@ -35,17 +33,12 @@ describe('repeat page', () => {
       .ofNote(note)
       .remainingInitialReviewCountForToday(53)
       .please();
-    fetch.mockResponseOnce(JSON.stringify(reviewPoint));
+    fetchMock.mockResponseOnce(JSON.stringify(reviewPoint));
 
-    const { wrapper, mockRouter } = mountWithStoreAndMockRoute(
-      store,
-      InitialReviewPage,
-      {},
-      { name: 'initial' }
-    );
+    const { wrapper, mockRouter } = helper.component(InitialReviewPage).currentRoute({ name: 'initial' }).mount()
     await flushPromises();
-    expect(fetch).toHaveBeenCalledTimes(1);
-    expect(fetch).toHaveBeenCalledWith(
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock).toHaveBeenCalledWith(
       '/api/reviews/initial',
       expect.anything()
     );
@@ -60,13 +53,8 @@ describe('repeat page', () => {
   it('minimized view', async () => {
     const note = makeMe.aNote.please();
     const reviewPoint = makeMe.aReviewPoint.ofNote(note).please();
-    fetch.mockResponseOnce(JSON.stringify(reviewPoint));
-    const { wrapper, mockRouter } = mountWithStoreAndMockRoute(
-      store,
-      InitialReviewPage,
-      { propsData: { nested: true } },
-      { name: 'initial' }
-    );
+    fetchMock.mockResponseOnce(JSON.stringify(reviewPoint));
+    const { wrapper, mockRouter } = helper.component(InitialReviewPage).withProps({nested: true}).currentRoute({ name: 'initial' }).mount()
     await flushPromises();
     expect(mockRouter.push).toHaveBeenCalledTimes(0);
     expect(wrapper.findAll('.initial-review-container')).toHaveLength(1);
