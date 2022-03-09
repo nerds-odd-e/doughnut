@@ -2,9 +2,9 @@
  * @jest-environment jsdom
  */
 
-import NoteOverview from "../../src/components/notes/NoteOverview.vue";
+import NoteOverview from "@/components/notes/NoteOverview.vue";
 import makeMe from "../fixtures/makeMe";
-import { renderWithStoreAndMockRoute, StoredComponentTestHelper } from "../helpers";
+import { StoredComponentTestHelper } from "../helpers";
 import { screen } from "@testing-library/vue";
 
 describe("note overview", () => {

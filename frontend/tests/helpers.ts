@@ -1,13 +1,14 @@
 import { merge } from "lodash";
 import { mount } from "@vue/test-utils";
-import { render } from "@testing-library/vue";
 import { createTestingPinia, TestingPinia } from "@pinia/testing";
 import createPiniaStore from '../src/store/createPiniaStore';
+import { render } from "@testing-library/vue";
+import { DefineComponent } from "vue";
 
 type Options = {};
 
-const withMockRoute = (
-  comp: any,
+const withMockRoute = <T>(
+  comp: T,
   options: Options = {},
   currentRoute: any,
   func: (comp: any, options: Options) => any
@@ -57,9 +58,9 @@ const renderWithMockRoute = (
   return withMockRoute(comp, options, currentRoute, render);
 };
 
-const renderWithStoreAndMockRoute = (
+const renderWithStoreAndMockRoute = <T>(
   store: any,
-  comp: any,
+  comp: T,
   options: Options = {},
   currentRoute: any = undefined,
 ) => {
@@ -109,7 +110,7 @@ class StoredComponentTestHelper {
   }
 
   render(
-    comp: any,
+    comp: DefineComponent,
     options: Options = {},
     currentRoute: any = undefined,
   ) {
