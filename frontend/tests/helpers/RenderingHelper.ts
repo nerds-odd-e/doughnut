@@ -42,22 +42,6 @@ const withMockRoute = <T>(
   return { wrapper, mockRouter };
 };
 
-const mountWithStoreAndMockRoute = (
-  store: any,
-  comp: any,
-  options: Options = {},
-  currentRoute: any,
-) => withMockRoute(
-  comp,
-  merge(options, {
-    global: {
-      plugins: [store],
-    },
-  }),
-  currentRoute,
-  mount
-);
-
 type PiniaStore = ReturnType<typeof createPiniaStore>
 
 interface StoreHelper {
@@ -74,6 +58,8 @@ class RenderingHelper {
 
   private route = {}
 
+  private global = {}
+
   constructor(helper: StoreHelper, comp: DefineComponent) {
     this.helper = helper
     this.comp = comp
@@ -81,6 +67,11 @@ class RenderingHelper {
 
   withProps(props: Options) {
     this.props = props
+    return this
+  }
+
+  withGlobal(global: Options) {
+    this.global = global
     return this
   }
 
@@ -110,9 +101,9 @@ class RenderingHelper {
   private get options() {
     return {
         propsData: this.props,
-        global: {
+        global: merge(this.global, {
           plugins: [this.helper.pinia],
-        },
+        }),
       }
   }
 
