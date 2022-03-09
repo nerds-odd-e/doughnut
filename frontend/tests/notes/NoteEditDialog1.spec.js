@@ -2,10 +2,10 @@
  * @jest-environment jsdom
  */
 import NoteEditDialog from '@/components/notes/NoteEditDialog.vue';
-import store from '../fixtures/testingStore';
-import { renderWithStoreAndMockRoute } from '../helpers';
 import flushPromises from 'flush-promises';
 import _ from 'lodash';
+import store from '../fixtures/testingStore';
+import { renderWithStoreAndMockRoute } from '../helpers';
 import makeMe from '../fixtures/makeMe';
 
 beforeEach(() => {

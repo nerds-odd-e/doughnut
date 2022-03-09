@@ -4,9 +4,7 @@ import NotePositionBuilder from "./NotePositionBuilder"
 
 let idCounter = 1;
 
-const generateId = () => {
-  return idCounter++;
-};
+const generateId = () => idCounter++;
 
 class ReviewPointBuilder extends Builder {
   data: any;
@@ -29,7 +27,7 @@ class ReviewPointBuilder extends Builder {
 
   ofNote(note: any): ReviewPointBuilder {
     this.data.noteWithPosition = {
-      note: note,
+      note,
       notePosition: new NotePositionBuilder().do()
     }
     this.data.reviewPoint.noteId = note.id

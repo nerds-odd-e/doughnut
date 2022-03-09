@@ -3,9 +3,7 @@ import NotebookBuilder from "./NotebookBuilder";
 
 let idCounter = 1;
 
-const generateId = () => {
-  return (idCounter++).toString();
-};
+const generateId = () => (idCounter++).toString();
 
 class CircleNoteBuilder extends Builder {
   data: any;

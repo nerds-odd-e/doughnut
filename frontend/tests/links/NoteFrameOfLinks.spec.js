@@ -2,8 +2,8 @@
  * @jest-environment jsdom
  */
 import _ from 'lodash';
-import makeMe from '../fixtures/makeMe.ts';
 import NoteFrameOfLinks from '@/components/links/NoteFrameOfLinks.vue';
+import makeMe from '../fixtures/makeMe.ts';
 import { mountWithMockRoute } from '../helpers';
 
 describe('a link lists of a note', () => {

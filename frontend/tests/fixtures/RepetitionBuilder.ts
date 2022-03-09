@@ -3,7 +3,9 @@ import ReviewPointBuilder from "./ReviewPointBuilder";
 
 class RepetitionBuilder extends Builder {
   data: any
+
   note: any
+
   quizQuestion: any
 
   constructor(parentBuilder?: Builder) {

@@ -1,12 +1,10 @@
+import { merge } from "lodash";
 import Builder from "./Builder";
 import LinkBuilder from "./LinkBuilder";
-import { merge } from "lodash";
 
 let idCounter = 1;
 
-const generateId = () => {
-  return (idCounter++);
-};
+const generateId = () => (idCounter++);
 
 class NoteBuilder extends Builder<Generated.NoteViewedByUser> {
   data: Generated.NoteViewedByUser;

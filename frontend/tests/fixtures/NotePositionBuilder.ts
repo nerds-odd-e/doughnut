@@ -4,6 +4,7 @@ import NotebookBuilder from "./NotebookBuilder";
 
 class NotePositionBuilder extends Builder {
   data: any;
+
   notebookBuilder = new NotebookBuilder();
 
   constructor(parentBuilder?: Builder) {

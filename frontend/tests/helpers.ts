@@ -1,9 +1,9 @@
 import { merge } from "lodash";
 import { mount } from "@vue/test-utils";
 import { createTestingPinia, TestingPinia } from "@pinia/testing";
-import createPiniaStore from '../src/store/createPiniaStore';
 import { render } from "@testing-library/vue";
 import { DefineComponent } from "vue";
+import createPiniaStore from '../src/store/createPiniaStore';
 
 type Options = {};
 
@@ -46,25 +46,20 @@ const mountWithMockRoute = (
   comp: any,
   options: Options = {},
   currentRoute: any
-) => {
-  return withMockRoute(comp, options, currentRoute, mount);
-};
+) => withMockRoute(comp, options, currentRoute, mount);
 
 const renderWithMockRoute = (
   comp: any,
   options: Options = {},
   currentRoute: any
-) => {
-  return withMockRoute(comp, options, currentRoute, render);
-};
+) => withMockRoute(comp, options, currentRoute, render);
 
 const renderWithStoreAndMockRoute = <T>(
   store: any,
   comp: T,
   options: Options = {},
   currentRoute: any = undefined,
-) => {
-  return withMockRoute(
+) => withMockRoute(
     comp,
     merge(options, {
       global: {
@@ -74,7 +69,6 @@ const renderWithStoreAndMockRoute = <T>(
     currentRoute,
     render
   );
-};
 
 
 const mountWithStoreAndMockRoute = (
@@ -82,8 +76,7 @@ const mountWithStoreAndMockRoute = (
   comp: any,
   options: Options = {},
   currentRoute: any,
-) => {
-  return withMockRoute(
+) => withMockRoute(
     comp,
     merge(options, {
       global: {
@@ -93,12 +86,12 @@ const mountWithStoreAndMockRoute = (
     currentRoute,
     mount
   );
-};
 
 type PiniaStore = ReturnType<typeof createPiniaStore>
 
 class StoredComponentTestHelper {
   private piniaInstance?: TestingPinia
+
   private piniaStore?: PiniaStore
 
   get pinia() {
@@ -117,7 +110,9 @@ class StoredComponentTestHelper {
 
 class RenderingHelper {
   private helper
+
   private comp
+
   private props = {}
 
   constructor(helper: StoredComponentTestHelper, comp: DefineComponent) {

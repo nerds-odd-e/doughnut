@@ -3,9 +3,9 @@
  */
 import { screen } from '@testing-library/vue';
 import NotebooksPage from '@/pages/NotebooksPage.vue';
+import _ from 'lodash';
 import store from '../fixtures/testingStore';
 import { renderWithStoreAndMockRoute } from '../helpers';
-import _ from 'lodash';
 import makeMe from '../fixtures/makeMe';
 
 beforeEach(() => {

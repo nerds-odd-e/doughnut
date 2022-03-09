@@ -3,9 +3,9 @@
  */
 
 import NoteOverview from "@/components/notes/NoteOverview.vue";
+import { screen } from "@testing-library/vue";
 import makeMe from "../fixtures/makeMe";
 import { StoredComponentTestHelper } from "../helpers";
-import { screen } from "@testing-library/vue";
 
 describe("note overview", () => {
   let helper: StoredComponentTestHelper;

@@ -6,7 +6,7 @@ const createTestRouter = async (currentRoute) => {
     history: createMemoryHistory(),
     routes,
   });
-  if (!!currentRoute) {
+  if (currentRoute) {
     route.replace(currentRoute);
     await route.isReady();
   }
