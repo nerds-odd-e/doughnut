@@ -19,20 +19,11 @@ const withMockRoute = <T>(
     comp,
     merge(options, {
       global: {
-        directives: {
-          focus() { }
-        },
         mocks: {
           $route: currentRoute,
           $router: mockRouter,
         },
-        stubs: {
-          "router-view": true,
-          "router-link": {
-            props: ["to"],
-            template: `<a class="router-link" :to='JSON.stringify(to)'><slot/></a>`,
-          },
-        },
+
       },
     })
   );
@@ -47,7 +38,18 @@ class RenderingHelper {
 
   private route = {}
 
-  private global = {}
+  private global = {
+    directives: {
+      focus() { }
+    },
+    stubs: {
+      "router-view": true,
+      "router-link": {
+        props: ["to"],
+        template: `<a class="router-link" :to='JSON.stringify(to)'><slot/></a>`,
+      },
+    },
+  }
 
   constructor(comp: DefineComponent) {
     this.comp = comp
