@@ -2,16 +2,15 @@
  * @jest-environment jsdom
  */
 import LinkNoteDialog from '@/components/links/LinkNoteDialog.vue';
-import { screen } from '@testing-library/vue';
-import { mount } from '@vue/test-utils';
+import { render, screen } from '@testing-library/vue';
 
 describe('LinkNoteDialog', () => {
   it('Search at the top level with no note', async () => {
-    mount(LinkNoteDialog, {
+    render(LinkNoteDialog, {
       propsData: {
         note: null,
       },
     });
-    await screen.findByTitle('Searching1');
+    await screen.findByText('Searching');
   });
 });
