@@ -13,7 +13,7 @@ beforeEach(() => {
 });
 
 describe('repeat page', () => {
-  const note = makeMe.aNote.please();
+  let note = makeMe.aNote.please();
   const popupMock = { alert: jest.fn() };
 
   const mountPage = async (repetition) => {
@@ -52,9 +52,9 @@ describe('repeat page', () => {
   });
 
   describe('repeat page with no quiz (or after quiz)', () => {
-    const note = makeMe.aNote.please();
+    note = makeMe.aNote.please();
     store.loadNotes([note]);
-    const repetition = makeMe.aRepetition.ofNote(note).please();
+    let repetition = makeMe.aRepetition.ofNote(note).please();
 
     it('stay at repeat page if there is no quiz', async () => {
       const { mockRouter } = await mountPage(repetition);
@@ -65,7 +65,7 @@ describe('repeat page', () => {
     });
 
     it('should call the self-evaluate api', async () => {
-      const repetition = makeMe.aRepetition.ofNote(note).please();
+      repetition = makeMe.aRepetition.ofNote(note).please();
       const { wrapper } = await mountPage(repetition);
       fetch.mockResponseOnce(JSON.stringify({}));
       wrapper.find('#repeat-sad').trigger('click');
@@ -77,7 +77,7 @@ describe('repeat page', () => {
     });
 
     it('reload next review point if 404', async () => {
-      const repetition = makeMe.aRepetition.ofNote(note).please();
+      repetition = makeMe.aRepetition.ofNote(note).please();
       const { wrapper } = await mountPage(repetition);
 
       fetch.mockClear();
