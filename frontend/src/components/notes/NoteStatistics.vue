@@ -42,7 +42,7 @@ const props = defineProps({
   noteId: [String, Number],
   linkid: [String, Number],
 });
-let statistics = $ref(null);
+const statistics = $ref(null);
 const { api } = useLoadingApi();
 const fetchData = () => {
   api.getStatistics(props.noteId, props.linkid).then((articles) => {
