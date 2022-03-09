@@ -3,8 +3,6 @@
  */
 import fetchMock from "jest-fetch-mock";
 import NoteEditDialog from '@/components/notes/NoteEditDialog.vue';
-import flushPromises from 'flush-promises';
-import _ from 'lodash';
 import { StoredComponentTestHelper } from '../helpers';
 import makeMe from '../fixtures/makeMe';
 
@@ -24,7 +22,6 @@ describe('note show', () => {
     };
     fetchMock.mockResponseOnce(JSON.stringify(stubResponse));
     helper.component(NoteEditDialog).withProps({ noteId: note.id }).render()
-    await flushPromises();
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(fetchMock).toHaveBeenCalledWith(
       `/api/notes/${note.id}`,

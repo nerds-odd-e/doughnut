@@ -3,21 +3,20 @@
  */
 import { screen } from '@testing-library/vue';
 import NoteMinmap from '@/components/notes/mindmap/NoteMindmap.vue';
-import store from '../fixtures/testingStore';
-import { renderWithStoreAndMockRoute } from '../helpers';
+import { StoredComponentTestHelper } from '../helpers';
 import makeMe from '../fixtures/makeMe';
 
 describe('note mindmap', () => {
-  const notes = [];
+  let helper: StoredComponentTestHelper;
+  const notes: Generated.NoteViewedByUser[] = [];
   beforeEach(() => {
     notes.length = 0;
+    helper = new StoredComponentTestHelper();
   });
 
-  const renderAndGetContainer = (noteId, props = {}) => {
-    store.loadNotes(notes);
-    const { wrapper } = renderWithStoreAndMockRoute(store, NoteMinmap, {
-      props: { noteId, offset: { scale: 1, rotate: 0 }, ...props },
-    });
+  const renderAndGetContainer = (noteId: number, props = {}) => {
+    helper.store.loadNotes(notes);
+    const { wrapper } = helper.component(NoteMinmap).withProps({ noteId, offset: { scale: 1, rotate: 0 }, ...props }).render()
     return wrapper.container;
   };
 
