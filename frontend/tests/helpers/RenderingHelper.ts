@@ -92,22 +92,30 @@ class RenderingHelper {
   render() {
     return withMockRoute(
       this.comp,
-      {
+      this.options,
+      this.route,
+      render
+    );
+  }
+
+  mount() {
+    return withMockRoute(
+      this.comp,
+      this.options,
+      this.route,
+      mount
+    );
+  }
+
+  private get options() {
+    return {
         propsData: this.props,
         global: {
           plugins: [this.helper.pinia],
         },
-      },
-      this.currentRoute,
-      render
-    );
-
-
+      }
   }
 
-  mount() {
-    return mountWithStoreAndMockRoute(this.helper.pinia, this.comp, { propsData: this.props }, this.route);
-  }
 }
 
 
