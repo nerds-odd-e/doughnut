@@ -44,10 +44,10 @@ describe('note mindmap', () => {
 
     it('should connect the two notes', async () => {
       const container = renderAndGetContainer(notes[0].id);
-      const connection = await container.querySelector('svg.mindmap-canvas');
-      const line = connection.querySelector('line');
-      expect(parseFloat(line.getAttribute('x2'))).toBeCloseTo(0);
-      expect(parseFloat(line.getAttribute('y2'))).toBeCloseTo(185);
+      const connection = await container.querySelector('svg.mindmap-canvas') || fail();
+      const line = connection.querySelector('line') || fail();
+      expect(parseFloat(line.getAttribute('x2') || fail())).toBeCloseTo(0);
+      expect(parseFloat(line.getAttribute('y2') || fail())).toBeCloseTo(185);
     });
 
     describe('with two grandchildren notes', () => {
@@ -59,12 +59,13 @@ describe('note mindmap', () => {
 
       it('should connect the two notes', async () => {
         const container = renderAndGetContainer(notes[0].id);
-        const connection = await container.querySelector('svg.mindmap-canvas');
+        const connection = await container.querySelector('svg.mindmap-canvas') || fail();
         const lines = connection.querySelectorAll('line');
         expect(lines).toHaveLength(3);
-        expect(parseFloat(lines[2].getAttribute('x1'))).toBeCloseTo(-75);
-        expect(parseFloat(lines[2].getAttribute('y1'))).toBeCloseTo(198.1212);
-        expect(parseFloat(lines[2].getAttribute('y2'))).toBeCloseTo(
+        const lastLine = lines[2];
+        expect(parseFloat(lastLine.getAttribute('x1') || fail())).toBeCloseTo(-75);
+        expect(parseFloat(lastLine.getAttribute('y1') || fail())).toBeCloseTo(198.1212);
+        expect(parseFloat(lastLine.getAttribute('y2') || fail())).toBeCloseTo(
           189.0275953
         );
       });
@@ -82,7 +83,7 @@ describe('note mindmap', () => {
 
       it('should link the two linked notes', async () => {
         const container = renderAndGetContainer(notes[0].id);
-        const connection = await container.querySelector('svg.mindmap-canvas');
+        const connection = await container.querySelector('svg.mindmap-canvas') || fail();
         const linkStart = connection.querySelectorAll('.link-start');
         expect(linkStart).toHaveLength(2);
         expect(linkStart[0].getAttribute('transform')).toEqual(
@@ -95,7 +96,7 @@ describe('note mindmap', () => {
 
       it('should link the two linked notes', async () => {
         const container = renderAndGetContainer(notes[0].id);
-        const connection = await container.querySelector('svg.mindmap-canvas');
+        const connection = await container.querySelector('svg.mindmap-canvas') || fail();
         const lines = connection.querySelectorAll('g.notes-link path');
         expect(lines).toHaveLength(1);
         const d = lines[0].getAttribute('d');
@@ -118,7 +119,7 @@ describe('note mindmap', () => {
         notes.push(noteThatIsNotOnTheMap);
         notes.push(child2);
         const container = renderAndGetContainer(notes[0].id);
-        const connection = await container.querySelector('svg.mindmap-canvas');
+        const connection = await container.querySelector('svg.mindmap-canvas') || fail();
         const lines = connection.querySelectorAll('g.notes-link line');
         expect(lines).toHaveLength(0);
       });

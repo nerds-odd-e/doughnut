@@ -5,38 +5,14 @@ import { DefineComponent } from "vue";
 
 type Options = Record<string, unknown>;
 
-const withMockRoute = <T>(
-  comp: T,
-  options: Options = {},
-  currentRoute: any,
-  func: (comp: any, options: Options) => any
-) => {
-  const mockRouter = {
-    push: jest.fn(),
-  };
-
-  const wrapper = func(
-    comp,
-    merge(options, {
-      global: {
-        mocks: {
-          $route: currentRoute,
-          $router: mockRouter,
-        },
-
-      },
-    })
-  );
-
-  return { wrapper, mockRouter };
-};
-
 class RenderingHelper {
   private comp
 
   private props = {}
 
   private route = {}
+
+  private mockRouter
 
   private global = {
     directives: {
@@ -53,6 +29,10 @@ class RenderingHelper {
 
   constructor(comp: DefineComponent) {
     this.comp = comp
+    this.mockRouter = {
+      push: jest.fn(),
+    };
+
   }
 
   withProps(props: Options) {
@@ -71,31 +51,32 @@ class RenderingHelper {
   }
 
   render() {
-    return withMockRoute(
-      this.comp,
-      this.options,
-      this.route,
-      render
-    );
+    return {
+      wrapper: render( this.comp, this.options),
+      mockRouter: this.mockRouter
+    };
   }
 
   mount() {
-    return withMockRoute(
-      this.comp,
-      this.options,
-      this.route,
-      mount
-    );
+    return {
+      wrapper: mount(this.comp, this.options),
+      mockRouter: this.mockRouter
+    }
   }
 
   private get options() {
     return {
         propsData: this.props,
-        global: this.global
+        global: merge(
+          this.global,
+          {
+            mocks: {
+              $route: this.route,
+              $router: this.mockRouter,
+            },
+          })
       }
   }
-
 }
-
 
 export default RenderingHelper
