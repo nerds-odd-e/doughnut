@@ -20,6 +20,7 @@ describe('note show', () => {
       notePosition: makeMe.aNotePosition.please(),
       notes: [note],
     };
+
     fetchMock.mockResponseOnce(JSON.stringify(stubResponse));
     helper.component(NoteEditDialog).withProps({ noteId: note.id }).render()
     expect(fetchMock).toHaveBeenCalledTimes(1);
