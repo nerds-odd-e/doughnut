@@ -4,7 +4,7 @@ import LinkBuilder from "./LinkBuilder";
 
 let idCounter = 1;
 
-const generateId = () => (idCounter++);
+const generateId = () => { idCounter += 1 };
 
 class NoteBuilder extends Builder<Generated.NoteViewedByUser> {
   data: Generated.NoteViewedByUser;

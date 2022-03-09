@@ -4,7 +4,7 @@ import NotePositionBuilder from "./NotePositionBuilder"
 
 let idCounter = 1;
 
-const generateId = () => idCounter++;
+const generateId = () => { idCounter += 1 };
 
 class ReviewPointBuilder extends Builder {
   data: any;
@@ -33,13 +33,13 @@ class ReviewPointBuilder extends Builder {
     this.data.reviewPoint.noteId = note.id
     return this
   }
-  
+
   ofLink(link: any): ReviewPointBuilder {
     this.data.linkViewedByUser = link
     this.data.reviewPoint.linkId = link.id
     return this
   }
-  
+
   do(): any {
     return merge(
       {}, this.data

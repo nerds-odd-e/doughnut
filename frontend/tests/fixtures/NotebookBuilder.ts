@@ -3,7 +3,10 @@ import NoteBuilder from "./NoteBuilder";
 
 let idCounter = 1;
 
-const generateId = () => (idCounter++).toString();
+const generateId = () => {
+	idCounter += 1;
+	return idCounter.toString();
+}
 
 class NotebookBuilder extends Builder {
   data: any;
