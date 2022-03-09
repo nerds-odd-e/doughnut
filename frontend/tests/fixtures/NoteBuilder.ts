@@ -19,7 +19,6 @@ class NoteBuilder extends Builder<Generated.NoteViewedByUser> {
       shortDescription: '',
       createdAt: '',
       noteAccessories: {
-        id: 0,
         url: '',
         urlIsVideo: false,
         pictureUrl: '',

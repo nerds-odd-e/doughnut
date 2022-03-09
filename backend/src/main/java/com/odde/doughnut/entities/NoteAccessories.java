@@ -19,10 +19,6 @@ import java.util.List;
 @Embeddable
 @ValidateNotePicture
 public class NoteAccessories {
-    @Column(name = "id", insertable = false, updatable = false)
-    @Getter
-    private Integer id;
-
     @Getter
     @Setter
     private String url;

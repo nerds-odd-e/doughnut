@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-03-08 18:49:40.
+// Generated using typescript-generator version 2.35.1025 on 2022-03-09 09:37:52.
 
 declare namespace Generated {
 
@@ -23,7 +23,6 @@ declare namespace Generated {
     }
 
     interface NoteAccessories {
-        id: number;
         url: string;
         urlIsVideo: boolean;
         pictureUrl: string;
