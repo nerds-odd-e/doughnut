@@ -12,6 +12,6 @@ describe('LinkNoteDialog', () => {
         note: null,
       },
     });
-    screen.findByTitle('Searching1');
+    await screen.findByTitle('Searching1');
   });
 });
