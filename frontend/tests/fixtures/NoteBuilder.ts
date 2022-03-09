@@ -4,7 +4,7 @@ import LinkBuilder from "./LinkBuilder";
 
 let idCounter = 1;
 
-const generateId = () => { idCounter += 1 };
+const generateId = () => idCounter += 1;
 
 class NoteBuilder extends Builder<Generated.NoteViewedByUser> {
   data: Generated.NoteViewedByUser;
@@ -54,7 +54,7 @@ class NoteBuilder extends Builder<Generated.NoteViewedByUser> {
 
   shortDescription(value: string): NoteBuilder {
     this.data.shortDescription = value;
-    if(!this.data.textContent.description) {
+    if (!this.data.textContent.description) {
       this.data.textContent.description = value;
     }
     return this;

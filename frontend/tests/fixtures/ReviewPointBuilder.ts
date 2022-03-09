@@ -4,7 +4,7 @@ import NotePositionBuilder from "./NotePositionBuilder"
 
 let idCounter = 1;
 
-const generateId = () => { idCounter += 1 };
+const generateId = () => idCounter += 1;
 
 class ReviewPointBuilder extends Builder {
   data: any;
