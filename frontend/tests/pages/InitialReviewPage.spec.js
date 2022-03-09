@@ -3,7 +3,6 @@
  */
 import InitialReviewPage from '@/pages/InitialReviewPage.vue';
 import flushPromises from 'flush-promises';
-import _ from 'lodash';
 import store from '../fixtures/testingStore';
 import { mountWithStoreAndMockRoute } from '../helpers';
 import makeMe from '../fixtures/makeMe';

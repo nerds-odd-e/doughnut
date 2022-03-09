@@ -5,7 +5,6 @@ import { screen } from '@testing-library/vue';
 import NoteShowPage from '@/pages/NoteShowPage.vue';
 import NoteWithLinks from '@/components/notes/NoteWithLinks.vue';
 import flushPromises from 'flush-promises';
-import _ from 'lodash';
 import store from '../fixtures/testingStore';
 import {
   renderWithStoreAndMockRoute,
