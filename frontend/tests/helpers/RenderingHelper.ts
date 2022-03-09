@@ -1,9 +1,7 @@
 import { merge } from "lodash";
 import { mount } from "@vue/test-utils";
-import { TestingPinia } from "@pinia/testing";
 import { render } from "@testing-library/vue";
 import { DefineComponent } from "vue";
-import createPiniaStore from '../../src/store/createPiniaStore';
 
 type Options = Record<string, unknown>;
 
@@ -42,16 +40,7 @@ const withMockRoute = <T>(
   return { wrapper, mockRouter };
 };
 
-type PiniaStore = ReturnType<typeof createPiniaStore>
-
-interface StoreHelper {
-  pinia: TestingPinia
-  store: PiniaStore
-}
-
 class RenderingHelper {
-  private helper
-
   private comp
 
   private props = {}
@@ -60,8 +49,7 @@ class RenderingHelper {
 
   private global = {}
 
-  constructor(helper: StoreHelper, comp: DefineComponent) {
-    this.helper = helper
+  constructor(comp: DefineComponent) {
     this.comp = comp
   }
 
@@ -71,7 +59,7 @@ class RenderingHelper {
   }
 
   withGlobal(global: Options) {
-    this.global = global
+    this.global = merge(this.global, global)
     return this
   }
 
@@ -101,9 +89,7 @@ class RenderingHelper {
   private get options() {
     return {
         propsData: this.props,
-        global: merge(this.global, {
-          plugins: [this.helper.pinia],
-        }),
+        global: this.global
       }
   }
 
@@ -111,4 +97,3 @@ class RenderingHelper {
 
 
 export default RenderingHelper
-export { PiniaStore }

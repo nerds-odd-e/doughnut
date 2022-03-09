@@ -1,10 +1,9 @@
 import { merge } from "lodash";
 import { mount } from "@vue/test-utils";
 import { createTestingPinia, TestingPinia } from "@pinia/testing";
-import { render } from "@testing-library/vue";
 import { DefineComponent } from "vue";
 import createPiniaStore from '../../src/store/createPiniaStore';
-import RenderingHelper, { PiniaStore } from "./RenderingHelper";
+import RenderingHelper  from "./RenderingHelper";
 
 type Options = Record<string, unknown>;
 
@@ -49,34 +48,14 @@ const mountWithMockRoute = (
   currentRoute: any
 ) => withMockRoute(comp, options, currentRoute, mount);
 
-const renderWithMockRoute = (
-  comp: any,
-  options: Options = {},
-  currentRoute: any
-) => withMockRoute(comp, options, currentRoute, render);
-
-const mountWithStoreAndMockRoute = (
-  store: any,
-  comp: any,
-  options: Options = {},
-  currentRoute: any,
-) => withMockRoute(
-  comp,
-  merge(options, {
-    global: {
-      plugins: [store],
-    },
-  }),
-  currentRoute,
-  mount
-);
+type PiniaStore = ReturnType<typeof createPiniaStore>
 
 class StoredComponentTestHelper {
   private piniaInstance?: TestingPinia
 
   private piniaStore?: PiniaStore
 
-  get pinia() {
+  private get pinia() {
     return this.piniaInstance || (this.piniaInstance = createTestingPinia())
   }
 
@@ -85,9 +64,9 @@ class StoredComponentTestHelper {
   }
 
   component(comp: DefineComponent) {
-    return new RenderingHelper(this, comp)
+    return new RenderingHelper(comp).withGlobal({plugins: [this.pinia]})
   }
 
 }
 
-export { StoredComponentTestHelper, mountWithMockRoute, renderWithMockRoute, mountWithStoreAndMockRoute };
+export { StoredComponentTestHelper, mountWithMockRoute };
