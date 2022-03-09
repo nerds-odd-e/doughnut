@@ -43,7 +43,7 @@ describe('in place edit on title', () => {
     const noteParent = makeMe.aNote.title('Dummy Title').please();
     helper.store.loadNotes([noteParent]);
 
-    const { wrapper } = helper.component(NoteWithLinks).withProps({note: noteParent}).mount()
+    const wrapper = helper.component(NoteWithLinks).withProps({note: noteParent}).mount()
 
     expect(wrapper.findAll('[role="title"] input')).toHaveLength(0);
     await wrapper.find('[role="title"] h2').trigger('click');
@@ -56,7 +56,7 @@ describe('in place edit on title', () => {
     const noteParent = makeMe.aNote.title('Dummy Title').please();
     helper.store.loadNotes([noteParent]);
 
-    const { wrapper } = helper.component(NoteWithLinks).withProps({note: noteParent}).mount()
+    const wrapper = helper.component(NoteWithLinks).withProps({note: noteParent}).mount()
 
     await wrapper.find('[role="title"]').trigger('click');
     await wrapper.find('[role="title"] input').setValue('updated');
@@ -75,7 +75,7 @@ describe('undo editing', () => {
     helper.store.loadNotes([note]);
 
     const updatedTitle = 'updated';
-    const { wrapper } = helper.component(NoteWithLinks).withProps({note}).mount()
+    const wrapper = helper.component(NoteWithLinks).withProps({note}).mount()
 
     await wrapper.find('[role="title"]').trigger('click');
     await wrapper.find('[role="title"] input').setValue(updatedTitle);

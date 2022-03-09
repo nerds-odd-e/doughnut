@@ -26,7 +26,7 @@ describe('repeat page', () => {
   const mountPage = async (repetition: any) => {
     helper.store.loadNotes([note]);
     fetchMock.mockResponseOnce(JSON.stringify(repetition));
-    const { wrapper } = renderer.withGlobal(
+    const wrapper = renderer.withGlobal(
         {
           mocks: {
             $popups: popupMock,

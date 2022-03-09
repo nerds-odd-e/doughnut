@@ -58,7 +58,7 @@ describe('all in note show page', () => {
       const note = makeMe.aNote.title('Dummy Title').please();
       helper.store.loadNotes([note]);
 
-      const { wrapper } = helper.component(NoteWithLinks).withProps( { note }).mount()
+      const wrapper = helper.component(NoteWithLinks).withProps( { note }).mount()
 
       await wrapper.find('[role="title"]').trigger('click');
       await wrapper.find('[role="title"] input').trigger('input');

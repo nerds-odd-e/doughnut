@@ -14,7 +14,7 @@ describe('LinkNoteFinalize', () => {
 
   it('going back', async () => {
     const note = makeMe.aNote.please();
-    const { wrapper } = helper.component(LinkNoteFinalize).withProps({
+    const wrapper = helper.component(LinkNoteFinalize).withProps({
         note,
         targetNote: note,
       }).mount()

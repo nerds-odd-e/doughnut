@@ -40,7 +40,7 @@ describe('repeat page', () => {
       .please();
     fetchMock.mockResponseOnce(JSON.stringify(reviewPoint));
 
-    const { wrapper } = renderer.currentRoute({ name: 'initial' }).mount()
+    const wrapper = renderer.currentRoute({ name: 'initial' }).mount()
     await flushPromises();
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(fetchMock).toHaveBeenCalledWith(
@@ -59,7 +59,7 @@ describe('repeat page', () => {
     const note = makeMe.aNote.please();
     const reviewPoint = makeMe.aReviewPoint.ofNote(note).please();
     fetchMock.mockResponseOnce(JSON.stringify(reviewPoint));
-    const { wrapper } = renderer.withProps({nested: true}).currentRoute({ name: 'initial' }).mount()
+    const wrapper = renderer.withProps({nested: true}).currentRoute({ name: 'initial' }).mount()
     await flushPromises();
     expect(mockRouterPush).toHaveBeenCalledTimes(0);
     expect(wrapper.findAll('.initial-review-container')).toHaveLength(1);

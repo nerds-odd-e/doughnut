@@ -58,9 +58,7 @@ class RenderingHelper {
   }
 
   mount() {
-    return {
-      wrapper: mount(this.comp, this.options),
-    }
+    return mount(this.comp, this.options)
   }
 
   private get options() {

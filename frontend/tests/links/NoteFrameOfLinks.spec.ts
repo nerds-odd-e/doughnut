@@ -14,14 +14,14 @@ describe('a link lists of a note', () => {
 
   it('link to upper level', async () => {
     const links = makeMe.links.of('using').count(2).please();
-    const { wrapper } = renderer.withProps({ links }).mount();
+    const wrapper = renderer.withProps({ links }).mount();
     expect(wrapper.find('.parent-links').text()).toContain('a tool');
     expect(wrapper.findAll('.parent-links li').length).toEqual(2);
   });
 
   it('tags are grouped', async () => {
     const links = makeMe.links.of('tagged by').count(2).please();
-    const { wrapper } = renderer.withProps({ links }).mount();
+    const wrapper = renderer.withProps({ links }).mount();
     expect(wrapper.findAll('.parent-links li').length).toEqual(1);
   });
 
@@ -30,7 +30,7 @@ describe('a link lists of a note', () => {
       .of('confused with')
       .and.of('similar to')
       .please();
-    const { wrapper } = renderer.withProps({ links }).mount();
+    const wrapper = renderer.withProps({ links }).mount();
     expect(wrapper.findAll('.parent-links li').length).toEqual(1);
     expect(wrapper.findAll('.parent-links li .link-multi').length).toEqual(2);
     expect(wrapper.findAll('.children-links li').length).toEqual(0);
@@ -38,7 +38,7 @@ describe('a link lists of a note', () => {
 
   it('taggings (reverse of tagged by) are grouped', async () => {
     const links = makeMe.links.of('tagged by').reverse.count(2).please();
-    const { wrapper } = renderer.withProps({ links }).mount();
+    const wrapper = renderer.withProps({ links }).mount();
     expect(wrapper.findAll('.children-links li').length).toEqual(1);
   });
 });
