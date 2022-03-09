@@ -1,6 +1,7 @@
 import Builder from "./Builder";
+import LinksBuilder from "./LInksBuilder";
 
-class LinkBuilder extends Builder {
+class LinkBuilder extends Builder<any, LinksBuilder> {
   linkType: string;
 
   cnt: number;
@@ -11,7 +12,7 @@ class LinkBuilder extends Builder {
 
   toNote: any
 
-  constructor(parentBuilder: Builder | undefined, linkType: string) {
+  constructor(parentBuilder: LinksBuilder | undefined, linkType: string) {
     super(parentBuilder);
     this.linkType = linkType;
     this.cnt = 1;

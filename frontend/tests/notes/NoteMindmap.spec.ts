@@ -9,6 +9,7 @@ import makeMe from '../fixtures/makeMe';
 describe('note mindmap', () => {
   let helper: StoredComponentTestHelper;
   const notes: Generated.NoteViewedByUser[] = [];
+
   beforeEach(() => {
     notes.length = 0;
     helper = new StoredComponentTestHelper();

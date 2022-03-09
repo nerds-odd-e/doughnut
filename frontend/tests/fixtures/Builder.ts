@@ -1,15 +1,15 @@
-abstract class Builder<T=any> {
-  protected parentBuilder: Builder | undefined;
+abstract class Builder<T=any, PB extends Builder | undefined=any> {
+  protected parentBuilder: PB | undefined;
 
-  protected childrenBuilders: Array<Builder>;
+  protected childrenBuilders: Builder[];
 
-  constructor(parentBuilder?: Builder) {
+  constructor(parentBuilder?: PB) {
     this.parentBuilder = parentBuilder;
     this.childrenBuilders = [];
   }
 
-  get and(): Builder {
-    if (this.parentBuilder == null) {
+  get and(): PB {
+    if (!this.parentBuilder) {
       throw new Error("There is no parent builder");
     }
     return this.parentBuilder;
