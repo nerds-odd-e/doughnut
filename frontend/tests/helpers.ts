@@ -126,7 +126,7 @@ class RenderingHelper {
   }
 
   render() {
-    return renderWithStoreAndMockRoute(this.helper.pinia, this.comp, {props: this.props}, {});
+    return renderWithStoreAndMockRoute(this.helper.pinia, this.comp, {propsData: this.props}, {});
   }
 }
 
