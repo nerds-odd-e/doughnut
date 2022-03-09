@@ -1,4 +1,4 @@
-import path from "path";
+import { fileURLToPath, URL } from "url";
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import vueJsx from "@vitejs/plugin-vue-jsx";
@@ -42,12 +42,9 @@ export default defineConfig({
     },
   },
   resolve: {
-    alias: [
-      {
-        find: "@",
-        replacement: path.resolve(__dirname, "src"),
-      },
-    ],
+    alias: {
+      "@": fileURLToPath(new URL("./src", import.meta.url))
+    },
   },
   base: "/",
   build: {
@@ -55,7 +52,7 @@ export default defineConfig({
     sourcemap: true,
     rollupOptions: {
       input: {
-        main: path.resolve(__dirname, "index.html"),
+        main: fileURLToPath(new URL("index.html", import.meta.url))
       },
     },
   },
