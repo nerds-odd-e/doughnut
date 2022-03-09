@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-import Gesture from '@/components/commons/Gesture';
+import Gesture from '@/components/commons/Gesture.ts';
 
 describe('Gesture', () => {
   const top = 10;
