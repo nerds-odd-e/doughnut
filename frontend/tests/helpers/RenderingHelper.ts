@@ -101,6 +101,8 @@ class RenderingHelper {
 
   private props = {}
 
+  private route = {}
+
   constructor(helper: StoreHelper, comp: DefineComponent) {
     this.helper = helper
     this.comp = comp
@@ -111,12 +113,17 @@ class RenderingHelper {
     return this
   }
 
+  currentRoute(route: any) {
+    this.route = route
+    return this
+  }
+
   render() {
-    return renderWithStoreAndMockRoute(this.helper.pinia, this.comp, { propsData: this.props }, {});
+    return renderWithStoreAndMockRoute(this.helper.pinia, this.comp, { propsData: this.props }, this.route);
   }
 
   mount() {
-    return mountWithStoreAndMockRoute(this.helper.pinia, this.comp, { propsData: this.props }, {});
+    return mountWithStoreAndMockRoute(this.helper.pinia, this.comp, { propsData: this.props }, this.route);
   }
 }
 

@@ -1,15 +1,18 @@
 /**
  * @jest-environment jsdom
  */
+import fetchMock from "jest-fetch-mock";
 import Repetition from '@/components/review/Repetition.vue';
-import store from '../fixtures/testingStore';
-import { mountWithStoreAndMockRoute } from '../helpers';
+import { StoredComponentTestHelper } from '../helpers';
 import makeMe from '../fixtures/makeMe';
 
 describe('repetition page', () => {
+  let helper: StoredComponentTestHelper
+
   beforeEach(async () => {
-    fetch.resetMocks();
-    fetch.mockResponseOnce(JSON.stringify({}));
+    helper = new StoredComponentTestHelper()
+    fetchMock.resetMocks();
+    fetchMock.mockResponseOnce(JSON.stringify({}));
   });
 
   describe('repetition page for a note', () => {
@@ -17,12 +20,7 @@ describe('repetition page', () => {
     const reviewPointForView = makeMe.aReviewPoint.ofNote(note).please();
 
     it('for note', async () => {
-      const { wrapper } = mountWithStoreAndMockRoute(
-        store,
-        Repetition,
-        { propsData: reviewPointForView },
-        { name: 'root' }
-      );
+      const { wrapper } = helper.component(Repetition).withProps(reviewPointForView).currentRoute({ name: 'root' }).mount()
       expect(wrapper.findAll('.btn-toolbar')).toHaveLength(1);
     });
   });
@@ -34,22 +32,12 @@ describe('repetition page', () => {
       .please();
 
     it('for link', async () => {
-      const { wrapper } = mountWithStoreAndMockRoute(
-        store,
-        Repetition,
-        { propsData: reviewPointForView },
-        { name: 'root' }
-      );
+      const { wrapper } = helper.component(Repetition).withProps(reviewPointForView).currentRoute({ name: 'root' }).mount()
       expect(wrapper.findAll('.btn-toolbar')).toHaveLength(1);
     });
 
     it('click on note when doing review', async () => {
-      const { wrapper } = mountWithStoreAndMockRoute(
-        store,
-        Repetition,
-        { propsData: reviewPointForView },
-        { name: 'repeat' }
-      );
+      const { wrapper } = helper.component(Repetition).withProps(reviewPointForView).currentRoute({ name: 'repeat' }).mount()
       expect(
         JSON.parse(wrapper.find('.link-source .router-link').attributes().to)
           .name
@@ -57,12 +45,7 @@ describe('repetition page', () => {
     });
 
     it('click on note when doing review and in a nested page', async () => {
-      const { wrapper } = mountWithStoreAndMockRoute(
-        store,
-        Repetition,
-        { propsData: reviewPointForView },
-        { name: 'repeat-noteShow', params: { noteId: 123 } }
-      );
+      const { wrapper } = helper.component(Repetition).withProps(reviewPointForView).currentRoute({ name: 'repeat-noteShow', params: { noteId: 123 } }).mount()
       expect(
         JSON.parse(wrapper.find('.link-source .router-link').attributes().to)
       ).toEqual({ name: 'notebooks' });
