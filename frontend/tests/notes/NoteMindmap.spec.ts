@@ -3,16 +3,15 @@
  */
 import { screen } from '@testing-library/vue';
 import NoteMinmap from '@/components/notes/mindmap/NoteMindmap.vue';
-import { StoredComponentTestHelper } from '../helpers';
+import helper from '../helpers';
 import makeMe from '../fixtures/makeMe';
 
 describe('note mindmap', () => {
-  let helper: StoredComponentTestHelper;
   const notes: Generated.NoteViewedByUser[] = [];
 
   beforeEach(() => {
     notes.length = 0;
-    helper = new StoredComponentTestHelper();
+    helper.reset();
   });
 
   const renderAndGetContainer = (noteId: number, props = {}) => {

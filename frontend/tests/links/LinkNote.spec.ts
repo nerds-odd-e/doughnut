@@ -3,13 +3,11 @@
  */
 import LinkNoteFinalize from '@/components/links/LinkNoteFinalize.vue';
 import makeMe from '../fixtures/makeMe';
-import { StoredComponentTestHelper } from '../helpers';
+import helper from '../helpers';
 
 describe('LinkNoteFinalize', () => {
-  let helper: StoredComponentTestHelper;
-
   beforeEach(() => {
-    helper = new StoredComponentTestHelper();
+    helper.reset();
   });
 
   it('going back', async () => {

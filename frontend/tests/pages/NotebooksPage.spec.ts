@@ -4,13 +4,11 @@
 import fetchMock from "jest-fetch-mock";
 import { screen } from '@testing-library/vue';
 import NotebooksPage from '@/pages/NotebooksPage.vue';
-import { StoredComponentTestHelper } from '../helpers';
+import helper from '../helpers';
 import makeMe from '../fixtures/makeMe';
 
-let helper: StoredComponentTestHelper
-
 beforeEach(() => {
-  helper = new StoredComponentTestHelper()
+  helper.reset()
   fetchMock.resetMocks();
   fetchMock.mockResponse(
     JSON.stringify({

@@ -3,14 +3,12 @@
  */
 import fetchMock from "jest-fetch-mock";
 import CircleShowPage from '@/pages/CircleShowPage.vue';
-import { StoredComponentTestHelper } from '../helpers';
+import helper from '../helpers';
 import makeMe from '../fixtures/makeMe';
-
-let helper: StoredComponentTestHelper
 
 beforeEach(() => {
   fetchMock.resetMocks();
-  helper = new StoredComponentTestHelper()
+  helper.reset()
 });
 
 describe('circle show page', () => {

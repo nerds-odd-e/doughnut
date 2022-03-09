@@ -5,13 +5,12 @@
 import NoteOverview from "@/components/notes/NoteOverview.vue";
 import { screen } from "@testing-library/vue";
 import makeMe from "../fixtures/makeMe";
-import { StoredComponentTestHelper } from "../helpers";
+import helper from "../helpers";
 
 describe("note overview", () => {
-  let helper: StoredComponentTestHelper;
 
   beforeEach(()=>{
-    helper = new StoredComponentTestHelper();
+    helper.reset();
   });
 
   it("should render one note", async () => {

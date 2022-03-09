@@ -3,12 +3,12 @@
  */
 import { screen } from '@testing-library/vue';
 import NoteCardsView from '@/components/notes/views/NoteCardsView.vue';
-import { StoredComponentTestHelper } from '../helpers';
+import helper from '../helpers';
 import makeMe from '../fixtures/makeMe';
 
 describe('note wth child cards', () => {
   it('should render note with one child', async () => {
-    const helper = new StoredComponentTestHelper()
+    helper.reset()
     const notePosition = makeMe.aNotePosition.please();
     const noteParent = makeMe.aNote.title('parent').please();
     const noteChild = makeMe.aNote.title('child').under(noteParent).please();

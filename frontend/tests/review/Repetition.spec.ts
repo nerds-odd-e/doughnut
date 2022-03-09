@@ -3,14 +3,13 @@
  */
 import fetchMock from "jest-fetch-mock";
 import Repetition from '@/components/review/Repetition.vue';
-import { StoredComponentTestHelper } from '../helpers';
+import helper from '../helpers';
 import makeMe from '../fixtures/makeMe';
 
 describe('repetition page', () => {
-  let helper: StoredComponentTestHelper
 
   beforeEach(async () => {
-    helper = new StoredComponentTestHelper()
+    helper.reset()
     fetchMock.resetMocks();
     fetchMock.mockResponseOnce(JSON.stringify({}));
   });

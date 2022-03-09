@@ -5,16 +5,15 @@ import fetchMock from "jest-fetch-mock";
 import { screen } from '@testing-library/vue';
 import NoteShowPage from '@/pages/NoteShowPage.vue';
 import NoteWithLinks from '@/components/notes/NoteWithLinks.vue';
-import { StoredComponentTestHelper } from '../helpers';
+import helper from '../helpers';
 import makeMe from '../fixtures/makeMe';
 import { viewType } from '../../src/models/viewTypes';
 
 jest.useFakeTimers();
-let helper: StoredComponentTestHelper
 
 beforeEach(() => {
   fetchMock.resetMocks();
-  helper = new StoredComponentTestHelper()
+  helper.reset()
 });
 
 describe('all in note show page', () => {

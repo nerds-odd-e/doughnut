@@ -4,18 +4,17 @@
 import fetchMock from "jest-fetch-mock";
 import InitialReviewPage from '@/pages/InitialReviewPage.vue';
 import flushPromises from 'flush-promises';
-import { StoredComponentTestHelper } from '../helpers';
+import helper from '../helpers';
 import makeMe from '../fixtures/makeMe';
 import RenderingHelper from "../helpers/RenderingHelper";
 
-let helper: StoredComponentTestHelper
 let renderer: RenderingHelper
 let mockRouterPush = jest.fn();
 
 beforeEach(() => {
   fetchMock.resetMocks();
   mockRouterPush = jest.fn();
-  helper = new StoredComponentTestHelper()
+  helper.reset()
   renderer = helper.component(InitialReviewPage).withMockRouterPush(mockRouterPush);
 });
 

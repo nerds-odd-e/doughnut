@@ -3,14 +3,12 @@
  */
 import { screen } from '@testing-library/vue';
 import Breadcrumb from '@/components/notes/Breadcrumb.vue';
-import { StoredComponentTestHelper } from '../helpers';
+import helper from '../helpers';
 import makeMe from '../fixtures/makeMe';
 
 describe('note wth child cards', () => {
-  let helper: StoredComponentTestHelper
-
   beforeEach(()=>{
-    helper = new StoredComponentTestHelper()
+    helper.reset()
   })
 
   it('view note belongs to other people in bazaar', async () => {

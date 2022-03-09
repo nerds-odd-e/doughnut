@@ -18,10 +18,15 @@ class StoredComponentTestHelper {
     return this.piniaStore || (this.piniaStore = createPiniaStore(this.pinia))
   }
 
+  reset() {
+    this.piniaInstance = undefined
+    this.piniaStore = undefined
+  }
+
   component(comp: DefineComponent) {
     return new RenderingHelper(comp).withGlobal({plugins: [this.pinia]})
   }
 
 }
 
-export { StoredComponentTestHelper };
+export default new StoredComponentTestHelper();

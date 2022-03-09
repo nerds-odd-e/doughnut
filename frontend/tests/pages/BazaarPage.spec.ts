@@ -3,16 +3,14 @@
  */
 import fetchMock from "jest-fetch-mock";
 import BazaarPage from '@/pages/BazaarPage.vue';
-import { StoredComponentTestHelper } from '../helpers';
+import helper from '../helpers';
 import makeMe from '../fixtures/makeMe';
 
 jest.useFakeTimers();
 
-let helper: StoredComponentTestHelper
-
 beforeEach(() => {
   fetchMock.resetMocks();
-  helper = new StoredComponentTestHelper()
+  helper.reset()
 });
 
 describe('bazaar page', () => {

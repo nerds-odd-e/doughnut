@@ -5,13 +5,11 @@ import fetchMock from "jest-fetch-mock";
 import { screen } from '@testing-library/vue';
 import NoteWithLinks from '@/components/notes/NoteWithLinks.vue';
 import makeMe from '../fixtures/makeMe';
-import { StoredComponentTestHelper } from '../helpers';
-
-let helper: StoredComponentTestHelper
+import helper from '../helpers';
 
 beforeEach(() => {
   fetchMock.resetMocks();
-  helper = new StoredComponentTestHelper()
+  helper.reset()
 });
 
 describe('new/updated pink banner', () => {
