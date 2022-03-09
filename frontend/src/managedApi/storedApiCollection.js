@@ -1,7 +1,4 @@
-import ManagedApi from './ManagedApi';
-
 const storedApiCollection = (managedApi, piniaStore) => {
-
   function loadReviewPointViewedByUser(data) {
     if (!data) return;
     const { noteWithPosition, linkViewedbyUser } = data;
@@ -22,7 +19,7 @@ const storedApiCollection = (managedApi, piniaStore) => {
     const { updatedAt, ...data } = noteContentData;
     const res = await managedApi.restPatchMultiplePartForm(
       `text_content/${noteId}`,
-      data,
+      data
     );
     piniaStore.loadNotes([res]);
     return res;
@@ -66,7 +63,6 @@ const storedApiCollection = (managedApi, piniaStore) => {
 
     async getNoteAndItsChildren(noteId) {
       const res = await managedApi.restGet(`notes/${noteId}`);
-      console.table(typeof res.notes[0].createdAt)
       piniaStore.loadNotes(res.notes);
       return res;
     },
@@ -121,13 +117,16 @@ const storedApiCollection = (managedApi, piniaStore) => {
 
     async updateNote(noteId, noteContentData) {
       const { updatedAt, ...data } = noteContentData;
-      const res = await managedApi.restPatchMultiplePartForm(`notes/${noteId}`, data);
+      const res = await managedApi.restPatchMultiplePartForm(
+        `notes/${noteId}`,
+        data
+      );
       piniaStore.loadNotes([res]);
       return res;
     },
 
     async updateTextContent(noteId, noteContentData) {
-      piniaStore.addEditingToUndoHistory( { noteId });
+      piniaStore.addEditingToUndoHistory({ noteId });
       return updateTextContentWithoutUndo(noteId, noteContentData);
     },
 
@@ -152,35 +151,42 @@ const storedApiCollection = (managedApi, piniaStore) => {
     },
 
     async deleteNote(noteId) {
-      const res = await managedApi.restPost(`notes/${noteId}/delete`, {}, () => null);
-      piniaStore.deleteNote( noteId);
+      const res = await managedApi.restPost(
+        `notes/${noteId}/delete`,
+        {},
+        () => null
+      );
+      piniaStore.deleteNote(noteId);
       return res;
     },
 
     async getCurrentUserInfo() {
       const res = await managedApi.restGet(`user/current-user-info`);
-      piniaStore.setCurrentUser( res.user);
+      piniaStore.setCurrentUser(res.user);
       return res;
     },
 
     async updateUser(userId, data) {
-      const res = await managedApi.restPatchMultiplePartForm(`user/${userId}`, data);
-      piniaStore.setCurrentUser( res);
+      const res = await managedApi.restPatchMultiplePartForm(
+        `user/${userId}`,
+        data
+      );
+      piniaStore.setCurrentUser(res);
       return res;
     },
 
     async createUser(data) {
       const res = await managedApi.restPostMultiplePartForm(`user`, data);
-      piniaStore.setCurrentUser( res);
+      piniaStore.setCurrentUser(res);
       return res;
     },
 
     getFeatureToggle() {
       return (
         !window.location.href.includes('odd-e.com') &&
-        managedApi.restGet(`testability/feature_toggle`).then((res) =>
-          piniaStore.setFeatureToggle( res)
-        )
+        managedApi
+          .restGet(`testability/feature_toggle`)
+          .then((res) => piniaStore.setFeatureToggle(res))
       );
     },
 
@@ -199,4 +205,3 @@ const storedApiCollection = (managedApi, piniaStore) => {
 };
 
 export default storedApiCollection;
-
