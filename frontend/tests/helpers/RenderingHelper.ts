@@ -3,7 +3,7 @@ import { mount } from "@vue/test-utils";
 import { createTestingPinia, TestingPinia } from "@pinia/testing";
 import { render } from "@testing-library/vue";
 import { DefineComponent } from "vue";
-import createPiniaStore from '../src/store/createPiniaStore';
+import createPiniaStore from '../../src/store/createPiniaStore';
 
 type Options = {};
 
@@ -89,23 +89,9 @@ const mountWithStoreAndMockRoute = (
 
 type PiniaStore = ReturnType<typeof createPiniaStore>
 
-class StoredComponentTestHelper {
-  private piniaInstance?: TestingPinia
-
-  private piniaStore?: PiniaStore
-
-  get pinia() {
-    return this.piniaInstance || (this.piniaInstance = createTestingPinia())
-  }
-
-  get store(): PiniaStore {
-    return this.piniaStore || (this.piniaStore = createPiniaStore(this.pinia))
-  }
-
-  component( comp: DefineComponent) {
-    return new RenderingHelper(this, comp)
-  }
-
+interface StoreHelper {
+  pinia: TestingPinia
+  store: PiniaStore
 }
 
 class RenderingHelper {
@@ -115,7 +101,7 @@ class RenderingHelper {
 
   private props = {}
 
-  constructor(helper: StoredComponentTestHelper, comp: DefineComponent) {
+  constructor(helper: StoreHelper, comp: DefineComponent) {
     this.helper = helper
     this.comp = comp
   }
@@ -131,4 +117,5 @@ class RenderingHelper {
 }
 
 
-export { StoredComponentTestHelper, mountWithMockRoute, renderWithMockRoute, renderWithStoreAndMockRoute, mountWithStoreAndMockRoute };
+export default RenderingHelper
+export { PiniaStore }
