@@ -9,13 +9,7 @@ import { viewType } from '../../src/models/viewTypes';
 
 jest.useFakeTimers();
 
-beforeEach(() => {
-  helper.reset()
-});
-
-afterEach(() => {
-  helper.apiMock.noUnexpectedCalls()
-});
+helper.resetWithApiMock(beforeEach, afterEach)
 
 describe('all in note show page', () => {
   describe('note show', () => {

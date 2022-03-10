@@ -10,14 +10,11 @@ import RenderingHelper from "../helpers/RenderingHelper";
 let renderer: RenderingHelper
 let mockRouterPush = jest.fn();
 
+helper.resetWithApiMock(beforeEach, afterEach)
+
 beforeEach(() => {
   mockRouterPush = jest.fn();
-  helper.reset()
   renderer = helper.component(RepeatPage).withMockRouterPush(mockRouterPush);
-});
-
-afterEach(() => {
-  helper.apiMock.noUnexpectedCalls()
 });
 
 describe('repeat page', () => {

@@ -1,12 +1,12 @@
-import { FetchMock, MockParams } from "jest-fetch-mock";
+import fetchMock from "jest-fetch-mock";
+import { MockParams } from "jest-fetch-mock";
 
 class ApiMock {
-  fetchMock
+  fetchMock = fetchMock
   private unexpectedApiCalls: string[] = []
   private expected: {url: string, value: any, response?: MockParams, called: boolean}[] = []
 
-  constructor(fetchMock: FetchMock) {
-    this.fetchMock = fetchMock
+  init() {
     this.fetchMock.doMock(async (request: Request)=>{
       const match = this.expected.filter(exp=>exp.url === request.url).pop()
       if(match) {
@@ -17,6 +17,7 @@ class ApiMock {
       this.unexpectedApiCalls.push(request.url)
       return JSON.stringify({})
     })
+    return this
   }
 
   noUnexpectedCalls() {

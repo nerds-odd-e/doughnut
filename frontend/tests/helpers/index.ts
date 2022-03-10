@@ -1,4 +1,3 @@
-import fetchMock from "jest-fetch-mock";
 import { createTestingPinia, TestingPinia } from "@pinia/testing";
 import { DefineComponent } from "vue";
 import createPiniaStore from '../../src/store/createPiniaStore';
@@ -14,6 +13,8 @@ class StoredComponentTestHelper {
 
   private mockedApi?: ApiMock
 
+  private mockedApiTeardown?: Function
+
   private get pinia() {
     return this.piniaInstance || (this.piniaInstance = createTestingPinia())
   }
@@ -23,16 +24,26 @@ class StoredComponentTestHelper {
   }
 
   get apiMock(): ApiMock {
-    return this.mockedApi || (this.mockedApi = (()=>{
-      fetchMock.resetMocks();
-      return new ApiMock(fetchMock);
-    })())
+    if(!this.mockedApi) throw(new Error("please call resetWithApiMock first."))
+    return this.mockedApi
   }
 
   reset() {
     this.piniaInstance = undefined
     this.piniaStore = undefined
     this.mockedApi = undefined
+    return this
+  }
+
+  resetWithApiMock(beforeEach: jest.Lifecycle, afterEach: jest.Lifecycle) {
+    beforeEach(()=>{
+      this.reset()
+      this.mockedApi = new ApiMock().init()
+      this.mockedApiTeardown = ()=> this.apiMock.noUnexpectedCalls()
+    })
+    afterEach(()=>{
+      if(this.mockedApiTeardown) this.mockedApiTeardown()
+    })
     return this
   }
 
