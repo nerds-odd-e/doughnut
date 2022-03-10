@@ -25,7 +25,7 @@ describe('all in note show page', () => {
     it(' should fetch API to be called TWICE when viewType is not included ', async () => {
       helper.apiMock.expecting(`/api/notes/${note.id}`, stubResponse);
       helper.component(NoteShowPage).withProps({ noteId: note.id }).render();
-      helper.apiMock.expectCall(`/api/notes/${note.id}`);
+      helper.apiMock.verifyCall(`/api/notes/${note.id}`);
       await screen.findByText('a circle');
     });
 
@@ -34,7 +34,7 @@ describe('all in note show page', () => {
       helper.apiMock.expecting(`/api/notes/${note.id}/overview`, stubResponse);
       helper.component(NoteShowPage).withProps({ noteId: note.id, viewType: viewTypeValue }).render()
       expect(viewType(viewTypeValue)?.fetchAll).toBe(true);
-      helper.apiMock.expectCall(`/api/notes/${note.id}/overview`);
+      helper.apiMock.verifyCall(`/api/notes/${note.id}/overview`);
       await screen.findByText('a circle');
     });
   });

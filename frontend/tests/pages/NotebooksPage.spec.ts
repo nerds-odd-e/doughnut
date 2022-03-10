@@ -18,7 +18,7 @@ describe('Notebooks Page', () => {
       })
     helper.component(NotebooksPage).render();
 
-    helper.apiMock.expectCall('/api/notebooks');
+    helper.apiMock.verifyCall('/api/notebooks');
     expect(await screen.findByTitle('undo')).toBeDisabled();
   });
 

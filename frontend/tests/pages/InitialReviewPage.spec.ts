@@ -21,7 +21,7 @@ describe('repeat page', () => {
   it('redirect to review page if nothing to review', async () => {
     renderer.currentRoute({ name: 'initial' }).mount()
     await flushPromises();
-    helper.apiMock.expectCall('/api/reviews/initial')
+    helper.apiMock.verifyCall('/api/reviews/initial')
     expect(mockRouterPush).toHaveBeenCalledWith({ name: 'reviews' });
   });
 

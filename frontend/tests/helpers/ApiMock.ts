@@ -1,7 +1,7 @@
 import fetchMock from "jest-fetch-mock";
 import { MockParams } from "jest-fetch-mock";
 
-class ApiMock {
+class ApiMockImpl {
   fetchMock = fetchMock
   private unexpectedApiCalls: string[] = []
   private expected: {url: string, value: any, response?: MockParams, called: boolean}[] = []
@@ -33,11 +33,11 @@ class ApiMock {
     this.expected.push({ url, value, called: false })
   }
 
-  mockResponse(url: string, response: MockParams) {
+  expectingResponse(url: string, response: MockParams) {
     this.expected.push({ url, value: {}, response, called: false })
   }
 
-  expectCall(url: string) {
+  verifyCall(url: string) {
     const unexpectedIndex = this.unexpectedApiCalls.indexOf(url)
     unexpectedIndex >=0 && this.unexpectedApiCalls.splice(unexpectedIndex, 1)
 
@@ -47,5 +47,19 @@ class ApiMock {
     )
   }
 }
+
+interface ApiMock {
+  expecting(url: string) : void
+  expecting(url: string, value: any) : void
+  expectingResponse(url: string, response: MockParams) : void
+  verifyCall(url: string) : void
+}
+
+const  setupApiMock = () => {
+  const mockedApi = new ApiMockImpl().init()
+  return {mockedApi: mockedApi as ApiMock, teardown: ()=> mockedApi.noUnexpectedCalls()}
+}
+
+export { setupApiMock }
 
 export default ApiMock

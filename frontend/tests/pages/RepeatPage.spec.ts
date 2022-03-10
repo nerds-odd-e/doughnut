@@ -33,7 +33,7 @@ describe('repeat page', () => {
 
   it('redirect to review page if nothing to repeat', async () => {
     await mountPage({});
-    helper.apiMock.expectCall('/api/reviews/repeat')
+    helper.apiMock.verifyCall('/api/reviews/repeat')
     expect(mockRouterPush).toHaveBeenCalledWith({ name: 'reviews' });
   });
 
@@ -73,14 +73,14 @@ describe('repeat page', () => {
       const reviewPointId = repetition.reviewPointViewedByUser.reviewPoint.id;
       const wrapper = await mountPage(repetition);
 
-      helper.apiMock.mockResponse(`/api/reviews/${reviewPointId}/self-evaluate`, {status: 404})
+      helper.apiMock.expectingResponse(`/api/reviews/${reviewPointId}/self-evaluate`, {status: 404})
 
       wrapper.find('#repeat-sad').trigger('click');
       await flushPromises();
       expect(popupMock.alert).toHaveBeenCalledWith(
         expect.stringMatching(/review point/)
       );
-      helper.apiMock.expectCall(`/api/reviews/repeat`)
+      helper.apiMock.verifyCall(`/api/reviews/repeat`)
     });
   });
 });
