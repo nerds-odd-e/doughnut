@@ -9,7 +9,6 @@ describe('repetition page', () => {
 
   beforeEach(async () => {
     helper.reset()
-    helper.apiMock.mockResponseOnce('xx', {})
   });
 
   describe('repetition page for a note', () => {

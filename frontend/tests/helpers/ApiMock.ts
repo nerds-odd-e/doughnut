@@ -8,7 +8,7 @@ class ApiMock {
   }
 
   mockResponseOnce(url: string, value: any) {
-    this.fetchMock.mockResponseOnce(JSON.stringify(value))
+    this.fetchMock.mockOnceIf(url, JSON.stringify(value))
   }
 
   expectOnce(url: string) {

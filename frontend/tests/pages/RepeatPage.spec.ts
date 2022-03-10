@@ -12,7 +12,6 @@ let renderer: RenderingHelper
 let mockRouterPush = jest.fn();
 
 beforeEach(() => {
-  fetchMock.resetMocks();
   mockRouterPush = jest.fn();
   helper.reset()
   renderer = helper.component(RepeatPage).withMockRouterPush(mockRouterPush);
@@ -24,7 +23,7 @@ describe('repeat page', () => {
 
   const mountPage = async (repetition: any) => {
     helper.store.loadNotes([note]);
-    fetchMock.mockResponseOnce(JSON.stringify(repetition));
+    helper.apiMock.mockResponseOnce('/api/reviews/repeat', repetition);
     const wrapper = renderer.withGlobal(
         {
           mocks: {
