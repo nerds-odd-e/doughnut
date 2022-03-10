@@ -1,7 +1,6 @@
 /**
  * @jest-environment jsdom
  */
-import fetchMock from "jest-fetch-mock";
 import Repetition from '@/components/review/Repetition.vue';
 import helper from '../helpers';
 import makeMe from '../fixtures/makeMe';
@@ -9,9 +8,7 @@ import makeMe from '../fixtures/makeMe';
 describe('repetition page', () => {
 
   beforeEach(async () => {
-    helper.reset()
-    fetchMock.resetMocks();
-    fetchMock.mockResponseOnce(JSON.stringify({}));
+    helper.reset().useFetchMock({})
   });
 
   describe('repetition page for a note', () => {

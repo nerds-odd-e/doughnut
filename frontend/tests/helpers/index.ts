@@ -1,3 +1,4 @@
+import fetchMock from "jest-fetch-mock";
 import { createTestingPinia, TestingPinia } from "@pinia/testing";
 import { DefineComponent } from "vue";
 import createPiniaStore from '../../src/store/createPiniaStore';
@@ -21,6 +22,12 @@ class StoredComponentTestHelper {
   reset() {
     this.piniaInstance = undefined
     this.piniaStore = undefined
+    return this
+  }
+
+  useFetchMock(onceDefault: any | undefined = undefined) {
+    fetchMock.resetMocks();
+    onceDefault && fetchMock.mockResponseOnce(JSON.stringify(onceDefault));
   }
 
   component(comp: DefineComponent) {
