@@ -17,6 +17,10 @@ beforeEach(() => {
   renderer = helper.component(RepeatPage).withMockRouterPush(mockRouterPush);
 });
 
+afterEach(() => {
+  helper.apiMock.noUnexpectedCalls()
+});
+
 describe('repeat page', () => {
   let note = makeMe.aNote.please();
   const popupMock = { alert: jest.fn() };
@@ -24,23 +28,16 @@ describe('repeat page', () => {
   const mountPage = async (repetition: any) => {
     helper.store.loadNotes([note]);
     helper.apiMock.mockResponseOnce('/api/reviews/repeat', repetition);
-    const wrapper = renderer.withGlobal(
-        {
-          mocks: {
-            $popups: popupMock,
-          },
-        }).currentRoute({ name: 'repeat' }).mount()
+    const wrapper = renderer.withGlobalMock( {
+      $popups: popupMock
+    }).currentRoute({ name: 'repeat' }).mount()
     await flushPromises();
     return wrapper;
   };
 
   it('redirect to review page if nothing to repeat', async () => {
     await mountPage({});
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-    expect(fetchMock).toHaveBeenCalledWith(
-      '/api/reviews/repeat',
-      expect.anything()
-    );
+    helper.apiMock.expectOnce('/api/reviews/repeat')
     expect(mockRouterPush).toHaveBeenCalledWith({ name: 'reviews' });
   });
 
@@ -70,13 +67,11 @@ describe('repeat page', () => {
     it('should call the self-evaluate api', async () => {
       repetition = makeMe.aRepetition.ofNote(note).please();
       const wrapper = await mountPage(repetition);
-      fetchMock.mockResponseOnce(JSON.stringify({}));
+      helper.apiMock.mockResponseOnce('/api/reviews/*/self-evalute')
+      helper.apiMock.mockResponseOnce('/api/reviews/repeat')
       wrapper.find('#repeat-sad').trigger('click');
       const reviewPointId = repetition.reviewPointViewedByUser.reviewPoint.id;
-      expect(fetchMock).toHaveBeenCalledWith(
-        `/api/reviews/${reviewPointId}/self-evaluate`,
-        expect.anything()
-      );
+      helper.apiMock.expectTimes(2, `/api/reviews/${reviewPointId}/self-evaluate`)
     });
 
     it('reload next review point if 404', async () => {

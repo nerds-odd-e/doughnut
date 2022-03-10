@@ -37,7 +37,7 @@ class StoredComponentTestHelper {
   }
 
   component(comp: DefineComponent) {
-    return new RenderingHelper(comp).withGlobal({plugins: [this.pinia]})
+    return new RenderingHelper(comp).withGlobalPlugin(this.pinia)
   }
 }
 

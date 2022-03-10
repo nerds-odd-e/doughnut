@@ -35,14 +35,17 @@ class RenderingHelper {
   }
 
   withMockRouterPush(push: jest.Mock) {
-    this.withGlobal({
-      mocks: { $router: {push} }
-    })
+    this.withGlobalMock({ $router: {push} })
     return this
   }
 
-  withGlobal(global: Options) {
-    this.global = merge(this.global, global)
+  withGlobalPlugin(plugin: any) {
+    this.global = merge(this.global, {plugins: [plugin]})
+    return this
+  }
+
+  withGlobalMock(mocks: Options) {
+    this.global = merge(this.global, {mocks})
     return this
   }
 
