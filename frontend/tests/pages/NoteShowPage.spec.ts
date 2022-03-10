@@ -14,7 +14,7 @@ beforeEach(() => {
 });
 
 afterEach(() => {
-  // helper.apiMock.noUnexpectedCalls()
+  helper.apiMock.noUnexpectedCalls()
 });
 
 describe('all in note show page', () => {
