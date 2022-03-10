@@ -12,8 +12,9 @@ let renderer: RenderingHelper
 let mockRouterPush = jest.fn();
 
 beforeEach(() => {
+  fetchMock.resetMocks();
   mockRouterPush = jest.fn();
-  helper.reset().useFetchMock();
+  helper.reset()
   renderer = helper.component(RepeatPage).withMockRouterPush(mockRouterPush);
 });
 

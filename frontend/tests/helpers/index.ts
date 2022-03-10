@@ -3,6 +3,7 @@ import { createTestingPinia, TestingPinia } from "@pinia/testing";
 import { DefineComponent } from "vue";
 import createPiniaStore from '../../src/store/createPiniaStore';
 import RenderingHelper  from "./RenderingHelper";
+import ApiMock  from "./ApiMock";
 
 type PiniaStore = ReturnType<typeof createPiniaStore>
 
@@ -10,6 +11,8 @@ class StoredComponentTestHelper {
   private piniaInstance?: TestingPinia
 
   private piniaStore?: PiniaStore
+
+  private mockedApi?: ApiMock
 
   private get pinia() {
     return this.piniaInstance || (this.piniaInstance = createTestingPinia())
@@ -19,21 +22,23 @@ class StoredComponentTestHelper {
     return this.piniaStore || (this.piniaStore = createPiniaStore(this.pinia))
   }
 
+  get apiMock(): ApiMock {
+    return this.mockedApi || (this.mockedApi = (()=>{
+      fetchMock.resetMocks();
+      return new ApiMock(fetchMock);
+    })())
+  }
+
   reset() {
     this.piniaInstance = undefined
     this.piniaStore = undefined
+    this.mockedApi = undefined
     return this
-  }
-
-  useFetchMock(onceDefault: any | undefined = undefined) {
-    fetchMock.resetMocks();
-    onceDefault && fetchMock.mockResponseOnce(JSON.stringify(onceDefault));
   }
 
   component(comp: DefineComponent) {
     return new RenderingHelper(comp).withGlobal({plugins: [this.pinia]})
   }
-
 }
 
 export default new StoredComponentTestHelper();
