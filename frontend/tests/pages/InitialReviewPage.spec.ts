@@ -14,20 +14,19 @@ let mockRouterPush = jest.fn();
 beforeEach(() => {
   fetchMock.resetMocks();
   mockRouterPush = jest.fn();
-  helper.reset()
+  helper.reset().apiMock
   renderer = helper.component(InitialReviewPage).withMockRouterPush(mockRouterPush);
+});
+
+afterEach(() => {
+  helper.apiMock.noUnexpectedCalls()
 });
 
 describe('repeat page', () => {
   it('redirect to review page if nothing to review', async () => {
-    fetchMock.mockResponseOnce(JSON.stringify({}));
     renderer.currentRoute({ name: 'initial' }).mount()
     await flushPromises();
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-    expect(fetchMock).toHaveBeenCalledWith(
-      '/api/reviews/initial',
-      expect.anything()
-    );
+    helper.apiMock.expectCall('/api/reviews/initial')
     expect(mockRouterPush).toHaveBeenCalledWith({ name: 'reviews' });
   });
 

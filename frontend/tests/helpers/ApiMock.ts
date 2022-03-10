@@ -37,6 +37,9 @@ class ApiMock {
   }
 
   expectCall(url: string) {
+    const unexpectedIndex = this.unexpectedApiCalls.indexOf(url)
+    unexpectedIndex >=0 && this.unexpectedApiCalls.splice(unexpectedIndex, 1)
+
     expect(this.fetchMock).toHaveBeenCalledWith(
       url,
       expect.anything()
