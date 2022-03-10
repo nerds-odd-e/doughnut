@@ -28,7 +28,7 @@ class ApiMock {
     return this.expected.filter(exp => !exp.called).map(exp => exp.url);
   }
 
-  mockJson(url: string, value: any={}) {
+  expecting(url: string, value: any={}) {
     this.expected.push({ url, value, called: false })
   }
 

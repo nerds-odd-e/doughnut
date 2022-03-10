@@ -1,7 +1,6 @@
 /**
  * @jest-environment jsdom
  */
-import fetchMock from "jest-fetch-mock";
 import InitialReviewPage from '@/pages/InitialReviewPage.vue';
 import flushPromises from 'flush-promises';
 import helper from '../helpers';
@@ -12,7 +11,6 @@ let renderer: RenderingHelper
 let mockRouterPush = jest.fn();
 
 beforeEach(() => {
-  fetchMock.resetMocks();
   mockRouterPush = jest.fn();
   helper.reset().apiMock
   renderer = helper.component(InitialReviewPage).withMockRouterPush(mockRouterPush);
@@ -36,15 +34,10 @@ describe('repeat page', () => {
       .ofNote(note)
       .remainingInitialReviewCountForToday(53)
       .please();
-    fetchMock.mockResponseOnce(JSON.stringify(reviewPoint));
+    helper.apiMock.expecting('/api/reviews/initial', reviewPoint)
 
     const wrapper = renderer.currentRoute({ name: 'initial' }).mount()
     await flushPromises();
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-    expect(fetchMock).toHaveBeenCalledWith(
-      '/api/reviews/initial',
-      expect.anything()
-    );
     expect(mockRouterPush).toHaveBeenCalledTimes(0);
     expect(wrapper.findAll('.initial-review-container')).toHaveLength(0);
     expect(wrapper.findAll('.pause-stop')).toHaveLength(1);
@@ -56,7 +49,7 @@ describe('repeat page', () => {
   it('minimized view', async () => {
     const note = makeMe.aNote.please();
     const reviewPoint = makeMe.aReviewPoint.ofNote(note).please();
-    fetchMock.mockResponseOnce(JSON.stringify(reviewPoint));
+    helper.apiMock.expecting('/api/reviews/initial', reviewPoint)
     const wrapper = renderer.withProps({nested: true}).currentRoute({ name: 'initial' }).mount()
     await flushPromises();
     expect(mockRouterPush).toHaveBeenCalledTimes(0);

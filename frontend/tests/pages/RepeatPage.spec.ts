@@ -26,7 +26,7 @@ describe('repeat page', () => {
 
   const mountPage = async (repetition: any) => {
     helper.store.loadNotes([note]);
-    helper.apiMock.mockJson('/api/reviews/repeat', repetition);
+    helper.apiMock.expecting('/api/reviews/repeat', repetition);
     const wrapper = renderer.withGlobalMock( {
       $popups: popupMock
     }).currentRoute({ name: 'repeat' }).mount()
@@ -67,7 +67,7 @@ describe('repeat page', () => {
       repetition = makeMe.aRepetition.ofNote(note).please();
       const reviewPointId = repetition.reviewPointViewedByUser.reviewPoint.id;
       const wrapper = await mountPage(repetition);
-      helper.apiMock.mockJson(`/api/reviews/${reviewPointId}/self-evaluate`)
+      helper.apiMock.expecting(`/api/reviews/${reviewPointId}/self-evaluate`)
       await wrapper.find('#repeat-sad').trigger('click');
     });
 

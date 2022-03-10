@@ -18,7 +18,7 @@ describe('Notebooks Page', () => {
   it('fetch API to be called ONCE', async () => {
     const notebook = makeMe.aNotebook.please();
 
-    helper.apiMock.mockJson('/api/notebooks', {
+    helper.apiMock.expecting('/api/notebooks', {
         notebooks: [notebook],
         subscriptions: [],
       })
@@ -32,7 +32,7 @@ describe('Notebooks Page', () => {
     const notebook = makeMe.aNotebook.please();
     helper.store.loadNotes([notebook.headNote]);
     helper.store.deleteNote(notebook.headNote.id);
-    helper.apiMock.mockJson('/api/notebooks', {
+    helper.apiMock.expecting('/api/notebooks', {
         notebooks: [],
         subscriptions: [],
       })
