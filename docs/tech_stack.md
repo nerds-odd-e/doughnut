@@ -1,6 +1,7 @@
 # Technology Stack
 
 - [Nix](https://nixos.org/)
+- [nix flakes](https://nixos.wiki/wiki/Flakes)
 - [Zulu OpenJDK 17](https://docs.azul.com/core/zulu-openjdk/release-notes/january-2022)
 - [Spring Boot](https://spring.io/projects/spring-boot)
 - [Flyway](https://flywaydb.org)
@@ -9,7 +10,10 @@
 - [Cypress](https://www.cypress.io/)
 - [Cucumber](https://cucumber.io/docs/guides/)
 - [cypress-cucumber-preprocessor](https://github.com/TheBrainFamily/cypress-cucumber-preprocessor#cypress-configuration)
+- [Cypress Testing Library](https://testing-library.com/docs/cypress-testing-library/intro/)
 - [Vue3](https://v3.vuejs.org/guide/introduction.html)
+- [vue-router 4.x](https://router.vuejs.org/)
+- [pinia](https://pinia.vuejs.org/)
 - [Vite](https://vitejs.dev)
 - [Jest](https://jestjs.io/)
 - [Vue Testing Library](https://testing-library.com/docs/vue-testing-library/intro/)
