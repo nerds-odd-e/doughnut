@@ -1,7 +1,6 @@
 /**
  * @jest-environment jsdom
  */
-import fetchMock from "jest-fetch-mock";
 import RepeatPage from '@/pages/RepeatPage.vue';
 import flushPromises from 'flush-promises';
 import helper from '../helpers';
@@ -68,15 +67,16 @@ describe('repeat page', () => {
       repetition = makeMe.aRepetition.ofNote(note).please();
       const reviewPointId = repetition.reviewPointViewedByUser.reviewPoint.id;
       const wrapper = await mountPage(repetition);
+      helper.apiMock.mockJson(`/api/reviews/${reviewPointId}/self-evaluate`)
       await wrapper.find('#repeat-sad').trigger('click');
-      helper.apiMock.expectCall(`/api/reviews/${reviewPointId}/self-evaluate`)
     });
 
-    it.only('reload next review point if 404', async () => {
+    it('reload next review point if 404', async () => {
       repetition = makeMe.aRepetition.ofNote(note).please();
+      const reviewPointId = repetition.reviewPointViewedByUser.reviewPoint.id;
       const wrapper = await mountPage(repetition);
 
-      helper.apiMock.mockResponse('*', {status: 404});
+      helper.apiMock.mockResponse(`/api/reviews/${reviewPointId}/self-evaluate`, {status: 404})
 
       wrapper.find('#repeat-sad').trigger('click');
       await flushPromises();

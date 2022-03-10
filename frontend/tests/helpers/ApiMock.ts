@@ -1,17 +1,20 @@
 import { FetchMock, MockParams } from "jest-fetch-mock";
 
 class ApiMock {
-  private fetchMock
+  fetchMock
   private unexpectedApiCalls: string[] = []
-  private expected: {url: string, called: boolean}[] = []
+  private expected: {url: string, value: any, response?: MockParams, called: boolean}[] = []
 
   constructor(fetchMock: FetchMock) {
     this.fetchMock = fetchMock
     this.fetchMock.doMock(async (request: Request)=>{
+      const match = this.expected.filter(exp=>exp.url === request.url).pop()
+      if(match) {
+        match.called = true
+        return match.response || JSON.stringify(match.value)
+      }
+
       this.unexpectedApiCalls.push(request.url)
-      // use empty json as default return value,
-      // hopefully, the execution will be back to the
-      // main thread and the exception makes more sense.
       return JSON.stringify({})
     })
   }
@@ -26,16 +29,11 @@ class ApiMock {
   }
 
   mockJson(url: string, value: any={}) {
-    const val = { url, called: false }
-    this.expected.push(val)
-    this.fetchMock.mockIf(url, async (request: Request)=>{
-      val.called = true
-      return JSON.stringify(value)
-    })
+    this.expected.push({ url, value, called: false })
   }
 
   mockResponse(url: string, response: MockParams) {
-    this.fetchMock.mockOnceIf(url, '', response)
+    this.expected.push({ url, value: {}, response, called: false })
   }
 
   expectCall(url: string) {
