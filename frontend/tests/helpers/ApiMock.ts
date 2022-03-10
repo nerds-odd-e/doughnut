@@ -1,4 +1,4 @@
-import { FetchMock } from "jest-fetch-mock";
+import { FetchMock, MockParams } from "jest-fetch-mock";
 
 class ApiMock {
   private fetchMock
@@ -32,6 +32,10 @@ class ApiMock {
       val.called = true
       return JSON.stringify(value)
     })
+  }
+
+  mockResponse(url: string, response: MockParams) {
+    this.fetchMock.mockOnceIf(url, '', response)
   }
 
   expectCall(url: string) {

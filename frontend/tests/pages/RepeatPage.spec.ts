@@ -69,26 +69,21 @@ describe('repeat page', () => {
       const reviewPointId = repetition.reviewPointViewedByUser.reviewPoint.id;
       const wrapper = await mountPage(repetition);
       await wrapper.find('#repeat-sad').trigger('click');
-      await flushPromises();
       helper.apiMock.expectCall(`/api/reviews/${reviewPointId}/self-evaluate`)
     });
 
-    it('reload next review point if 404', async () => {
+    it.only('reload next review point if 404', async () => {
       repetition = makeMe.aRepetition.ofNote(note).please();
       const wrapper = await mountPage(repetition);
 
-      fetchMock.mockOnceIf('*', '', {status: 404});
-      helper.apiMock.mockJson('/api/reviews/repeat')
+      helper.apiMock.mockResponse('*', {status: 404});
 
       wrapper.find('#repeat-sad').trigger('click');
       await flushPromises();
       expect(popupMock.alert).toHaveBeenCalledWith(
         expect.stringMatching(/review point/)
       );
-      expect(fetchMock).toHaveBeenCalledWith(
-        '/api/reviews/repeat',
-        expect.anything()
-      );
+      helper.apiMock.expectCall(`/api/reviews/repeat`)
     });
   });
 });
