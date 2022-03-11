@@ -16,7 +16,7 @@ describe('note mindmap', () => {
 
   const renderAndGetContainer = (noteId: number, props = {}) => {
     helper.store.loadNotes(notes);
-    const { wrapper } = helper.component(NoteMinmap).withProps({ noteId, offset: { scale: 1, rotate: 0 }, ...props }).render()
+    const wrapper = helper.component(NoteMinmap).withProps({ noteId, offset: { scale: 1, rotate: 0 }, ...props }).render()
     return wrapper.container;
   };
 

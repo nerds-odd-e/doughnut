@@ -21,7 +21,7 @@ describe('repeat page', () => {
   let note = makeMe.aNote.please();
   const popupMock = { alert: jest.fn() };
 
-  const mountPage = async (repetition: Generated.RepetitionForUser | {}) => {
+  const mountPage = async (repetition: Generated.RepetitionForUser | Record<string, never>) => {
     helper.store.loadNotes([note]);
     helper.apiMock.expecting('/api/reviews/repeat', repetition);
     const wrapper = renderer.withGlobalMock( {

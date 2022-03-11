@@ -55,9 +55,7 @@ class RenderingHelper {
   }
 
   render() {
-    return {
-      wrapper: render( this.comp, this.options),
-    };
+    return render(this.comp, this.options)
   }
 
   mount() {
