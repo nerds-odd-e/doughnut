@@ -9,8 +9,8 @@ const generateId = () => {
   return idCounter;
 }
 
-class NoteBuilder extends Builder<Generated.NoteViewedByUser> {
-  data: Generated.NoteViewedByUser;
+class NoteBuilder extends Builder<Generated.NoteSphere> {
+  data: Generated.NoteSphere;
 
   constructor(parentBuilder?: Builder) {
     super(parentBuilder);
@@ -85,7 +85,7 @@ class NoteBuilder extends Builder<Generated.NoteViewedByUser> {
     return this;
   }
 
-  do(): Generated.NoteViewedByUser {
+  do(): Generated.NoteSphere {
     return merge(
       {
         noteAccessories: {

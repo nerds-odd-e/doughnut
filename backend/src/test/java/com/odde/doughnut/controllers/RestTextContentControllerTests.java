@@ -2,7 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.TextContent;
-import com.odde.doughnut.entities.json.NoteViewedByUser;
+import com.odde.doughnut.entities.json.NoteSphere;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
@@ -56,7 +56,7 @@ class RestTextContentControllerTests {
 
         @Test
         void shouldBeAbleToSaveNoteWhenValid() throws NoAccessRightException, IOException {
-            NoteViewedByUser response = controller.updateNote(note, textContent);
+            NoteSphere response = controller.updateNote(note, textContent);
             assertThat(response.getId(), equalTo(note.getId()));
             assertThat(response.getTextContent().getDescription(), equalTo("new description"));
         }

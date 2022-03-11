@@ -3,7 +3,7 @@ import { defineStore } from "pinia";
 
 interface State {
   notebooks: Generated.Notebook[]
-  notes: {[id: number]: Generated.NoteViewedByUser }
+  notes: {[id: number]: Generated.NoteSphere }
   links: {[id: number]: { [P in Generated.LinkType]?: Generated.LinkViewed } }
   parentChildrenIds: {[id: number]: number[] }
   highlightNoteId: number | undefined
@@ -93,7 +93,7 @@ export default defineStore('main', {
           }
           this.noteUndoHistories.pop();
         },
-        loadNotes(notes: Generated.NoteViewedByUser[]) {
+        loadNotes(notes: Generated.NoteSphere[]) {
           notes.forEach((note) => {
             this.notes[note.id] = note;
             this.links[note.id] = note.links;

@@ -3,7 +3,7 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteAccessories;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.json.NoteViewedByUser;
+import com.odde.doughnut.entities.json.NoteSphere;
 import com.odde.doughnut.entities.json.NotesBulk;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -11,7 +11,6 @@ import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
-import org.apache.logging.log4j.util.Strings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -23,7 +22,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.List;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
@@ -136,7 +134,7 @@ class RestNoteControllerTests {
 
         @Test
         void shouldBeAbleToSaveNoteWhenValid() throws NoAccessRightException, IOException {
-            NoteViewedByUser response = controller.updateNote(note, note.getNoteAccessories());
+            NoteSphere response = controller.updateNote(note, note.getNoteAccessories());
             assertThat(response.getId(), equalTo(note.getId()));
         }
 

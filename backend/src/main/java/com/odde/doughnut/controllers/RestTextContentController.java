@@ -3,7 +3,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.json.NoteViewedByUser;
+import com.odde.doughnut.entities.json.NoteSphere;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.NoteViewer;
@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.io.IOException;
 import java.sql.Timestamp;
 
 @RestController
@@ -33,7 +32,7 @@ class RestTextContentController {
 
     @PatchMapping(path = "/{note}")
     @Transactional
-    public NoteViewedByUser updateNote(@PathVariable(name = "note") Note note, @Valid @ModelAttribute TextContent textContent) throws NoAccessRightException {
+    public NoteSphere updateNote(@PathVariable(name = "note") Note note, @Valid @ModelAttribute TextContent textContent) throws NoAccessRightException {
         final UserModel user = currentUserFetcher.getUser();
         user.getAuthorization().assertAuthorization(note);
 

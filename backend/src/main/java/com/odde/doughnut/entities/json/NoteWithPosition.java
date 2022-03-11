@@ -10,5 +10,5 @@ public class NoteWithPosition {
 
     @Setter
     @Getter
-    private NoteViewedByUser note;
+    private NoteSphere note;
 }

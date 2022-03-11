@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-03-11 16:45:33.
+// Generated using typescript-generator version 2.35.1025 on 2022-03-11 19:03:10.
 
 declare namespace Generated {
 
@@ -26,7 +26,7 @@ declare namespace Generated {
         owns: boolean;
     }
 
-    interface NoteViewedByUser {
+    interface NoteSphere {
         id: number;
         parentId?: number;
         title: string;
@@ -41,7 +41,7 @@ declare namespace Generated {
 
     interface NoteWithPosition {
         notePosition: NotePositionViewedByUser;
-        note: NoteViewedByUser;
+        note: NoteSphere;
     }
 
     interface NotebooksViewedByUser {
@@ -51,7 +51,7 @@ declare namespace Generated {
 
     interface NotesBulk {
         notePosition: NotePositionViewedByUser;
-        notes: NoteViewedByUser[];
+        notes: NoteSphere[];
     }
 
     interface RedirectToNoteResponse {
@@ -177,7 +177,7 @@ declare namespace Generated {
     }
 
     interface Option {
-        note: NoteViewedByUser;
+        note: NoteSphere;
         picture: boolean;
         display: string;
     }

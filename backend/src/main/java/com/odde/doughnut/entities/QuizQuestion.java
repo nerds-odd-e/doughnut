@@ -1,7 +1,7 @@
 package com.odde.doughnut.entities;
 
 import com.odde.doughnut.entities.json.LinkViewed;
-import com.odde.doughnut.entities.json.NoteViewedByUser;
+import com.odde.doughnut.entities.json.NoteSphere;
 import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.quizFacotries.*;
 import lombok.Getter;
@@ -63,7 +63,7 @@ public class QuizQuestion {
     }
 
     public static class Option {
-        @Getter private NoteViewedByUser note;
+        @Getter private NoteSphere note;
         @Getter private boolean isPicture = false;
 
         private Option() { }

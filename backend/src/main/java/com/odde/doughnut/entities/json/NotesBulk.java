@@ -1,6 +1,5 @@
 package com.odde.doughnut.entities.json;
 
-import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.UserModel;
@@ -10,7 +9,7 @@ import java.util.List;
 
 public class NotesBulk {
     public NotePositionViewedByUser notePosition;
-    public List<NoteViewedByUser> notes = new ArrayList<>();
+    public List<NoteSphere> notes = new ArrayList<>();
 
     public static NotesBulk jsonNoteWithChildren(Note note, UserModel user) {
         NotesBulk notesBulk = new NotesBulk();

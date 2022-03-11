@@ -5,14 +5,12 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.json.LinkViewed;
 import com.odde.doughnut.entities.json.NotePositionViewedByUser;
-import com.odde.doughnut.entities.json.NoteViewedByUser;
+import com.odde.doughnut.entities.json.NoteSphere;
 import com.odde.doughnut.entities.json.NoteWithPosition;
-import org.apache.logging.log4j.util.Strings;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -27,8 +25,8 @@ public class NoteViewer {
         this.note = note;
     }
 
-    public NoteViewedByUser toJsonObject() {
-        NoteViewedByUser nvb = new NoteViewedByUser();
+    public NoteSphere toJsonObject() {
+        NoteSphere nvb = new NoteSphere();
         nvb.setId(note.getId());
         nvb.setParentId(note.getParentId());
         nvb.setTitle(note.getTitle());

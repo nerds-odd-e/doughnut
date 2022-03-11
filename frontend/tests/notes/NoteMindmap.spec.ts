@@ -6,7 +6,7 @@ import helper from '../helpers';
 import makeMe from '../fixtures/makeMe';
 
 describe('note mindmap', () => {
-  const notes: Generated.NoteViewedByUser[] = [];
+  const notes: Generated.NoteSphere[] = [];
 
   beforeEach(() => {
     notes.length = 0;
