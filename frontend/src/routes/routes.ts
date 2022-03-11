@@ -1,3 +1,4 @@
+import NestedPage from '../pages/commons/NestedPage.js';
 import HomePage from "@/pages/HomePage.vue";
 import BazaarPage from "@/pages/BazaarPage.vue";
 import CirclesPage from "@/pages/CirclesPage.vue";
@@ -7,7 +8,6 @@ import ReviewHome from "@/pages/ReviewHome.vue";
 import RepeatPage from "@/pages/RepeatPage.vue";
 import DoingQuiz from "@/pages/DoingQuiz.vue";
 import InitialReviewPage from "@/pages/InitialReviewPage.vue";
-import NestedPage from "@/pages/commons/NestedPage";
 import CircleShowPage from "@/pages/CircleShowPage.vue";
 import CircleJoinPage from "@/pages/CircleJoinPage.vue";
 import FailureReportListPage from "@/pages/FailureReportListPage.vue";
@@ -39,7 +39,7 @@ const noteAndLinkRoutes = [
   },
 ];
 
-const nestedNoteAndLinkRoutes = (prefix) =>
+const nestedNoteAndLinkRoutes = (prefix: string) =>
   noteAndLinkRoutes.map((route) => ({ ...route, name: prefix + route.name }));
 
 const routes = [

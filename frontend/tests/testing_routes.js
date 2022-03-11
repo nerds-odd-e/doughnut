@@ -1,4 +1,4 @@
-import { routes } from '@/routes/routes';
+import routes from '@/routes/routes';
 import { createMemoryHistory, createRouter } from 'vue-router';
 
 const createTestRouter = async (currentRoute) => {
