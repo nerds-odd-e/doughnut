@@ -1,4 +1,3 @@
-import NestedPage from '../pages/commons/NestedPage';
 import HomePage from "@/pages/HomePage.vue";
 import BazaarPage from "@/pages/BazaarPage.vue";
 import CirclesPage from "@/pages/CirclesPage.vue";
@@ -14,6 +13,7 @@ import FailureReportListPage from "@/pages/FailureReportListPage.vue";
 import FailureReportPage from "@/pages/FailureReportPage.vue";
 import UserProfilePage from "@/pages/UserProfilePage.vue";
 import TestabilityPage from "@/pages/TestabilityPage.vue";
+import NestedPage from '../pages/commons/NestedPage';
 
 const NestedInitialReviewPage = NestedPage(
   InitialReviewPage,
