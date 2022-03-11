@@ -1,7 +1,6 @@
 /**
  * @jest-environment jsdom
  */
-import { screen } from '@testing-library/vue';
 import NoteMinmap from '@/components/notes/mindmap/NoteMindmap.vue';
 import helper from '../helpers';
 import makeMe from '../fixtures/makeMe';
@@ -14,12 +13,6 @@ describe('note mindmap', () => {
     helper.reset();
   });
 
-  const getRendereedElement = (noteId: number, props = {}) => {
-    helper.store.loadNotes(notes);
-    const view = helper.component(NoteMinmap).withProps({ noteId, offset: { scale: 1, rotate: 0 }, ...props }).render()
-    return view.container
-  };
-
   const getMountedElement = (noteId: number, props = {}) => {
     helper.store.loadNotes(notes);
     return helper.component(NoteMinmap).withProps({ noteId, offset: { scale: 1, rotate: 0 }, ...props }).mount()
@@ -29,8 +22,8 @@ describe('note mindmap', () => {
     notes.push(
       makeMe.aNote.title('single note').shortDescription('not long').please()
     );
-    getRendereedElement(notes[0].id);
-    expect(screen.getByRole('card')).toHaveTextContent('single note');
+    const wrapper = getMountedElement(notes[0].id);
+    expect(wrapper.find("[role='card']").text()).toContain('single note');
   });
 
   describe('with two notes', () => {
@@ -42,13 +35,13 @@ describe('note mindmap', () => {
     });
 
     it('should render the two notes', async () => {
-      getRendereedElement(notes[0].id);
-      expect(screen.getAllByRole('card')).toHaveLength(2);
+      const wrapper = getMountedElement(notes[0].id);
+      expect(wrapper.findAll("[role='card']")).toHaveLength(2);
     });
 
     it('should connect the two notes', async () => {
       const wrapper = getMountedElement(notes[0].id);
-      const connection = await wrapper.find('svg.mindmap-canvas')
+      const connection = wrapper.find('svg.mindmap-canvas')
       const line = connection.find('line');
       expect(parseFloat(line.attributes('x2'))).toBeCloseTo(0);
       expect(parseFloat(line.attributes('y2'))).toBeCloseTo(185);
@@ -62,14 +55,14 @@ describe('note mindmap', () => {
       });
 
       it('should connect the two notes', async () => {
-        const view = getRendereedElement(notes[0].id);
-        const connection = await view.querySelector('svg.mindmap-canvas') || fail();
-        const lines = connection.querySelectorAll('line');
+        const wrapper = getMountedElement(notes[0].id);
+        const connection = await wrapper.find('svg.mindmap-canvas');
+        const lines = connection.findAll('line');
         expect(lines).toHaveLength(3);
         const lastLine = lines[2];
-        expect(parseFloat(lastLine.getAttribute('x1') || fail())).toBeCloseTo(-75);
-        expect(parseFloat(lastLine.getAttribute('y1') || fail())).toBeCloseTo(198.1212);
-        expect(parseFloat(lastLine.getAttribute('y2') || fail())).toBeCloseTo(
+        expect(parseFloat(lastLine.attributes('x1'))).toBeCloseTo(-75);
+        expect(parseFloat(lastLine.attributes('y1'))).toBeCloseTo(198.1212);
+        expect(parseFloat(lastLine.attributes('y2'))).toBeCloseTo(
           189.0275953
         );
       });
@@ -86,24 +79,24 @@ describe('note mindmap', () => {
       });
 
       it('should link the two linked notes', async () => {
-        const view = getRendereedElement(notes[0].id);
-        const connection = await view.querySelector('svg.mindmap-canvas') || fail();
-        const linkStart = connection.querySelectorAll('.link-start');
+        const wrapper = getMountedElement(notes[0].id);
+        const connection = wrapper.find('svg.mindmap-canvas');
+        const linkStart = connection.findAll('.link-start');
         expect(linkStart).toHaveLength(2);
-        expect(linkStart[0].getAttribute('transform')).toEqual(
+        expect(linkStart[0].attributes('transform')).toEqual(
           'translate(285, 0) rotate(0)'
         );
-        expect(linkStart[1].getAttribute('transform')).toEqual(
+        expect(linkStart[1].attributes('transform')).toEqual(
           'translate(-135, 0) rotate(360)'
         );
       });
 
       it('should link the two linked notes', async () => {
-        const view = getRendereedElement(notes[0].id);
-        const connection = await view.querySelector('svg.mindmap-canvas') || fail();
-        const lines = connection.querySelectorAll('g.notes-link path');
+        const wrapper = getMountedElement(notes[0].id);
+        const connection = wrapper.find('svg.mindmap-canvas');
+        const lines = connection.findAll('g.notes-link path');
         expect(lines).toHaveLength(1);
-        const d = lines[0].getAttribute('d');
+        const d = lines[0].attributes('d');
         expect(d).toMatch(/M -93 0/);
         expect(d).toMatch(/.*? 327 0/);
       });
@@ -122,9 +115,9 @@ describe('note mindmap', () => {
           .please();
         notes.push(noteThatIsNotOnTheMap);
         notes.push(child2);
-        const view = getRendereedElement(notes[0].id);
-        const connection = await view.querySelector('svg.mindmap-canvas') || fail();
-        const lines = connection.querySelectorAll('g.notes-link line');
+        const wrapper = getMountedElement(notes[0].id);
+        const connection = wrapper.find('svg.mindmap-canvas');
+        const lines = connection.findAll('g.notes-link line');
         expect(lines).toHaveLength(0);
       });
     });
@@ -142,48 +135,46 @@ describe('note mindmap', () => {
     });
 
     it('small size by default', async () => {
-      const container = getRendereedElement(notes[0].id, {
+      const wrapper = getMountedElement(notes[0].id, {
         offset: { scale: 1, rotate: 0 },
       });
-      const descriptionIndicators = await container.querySelectorAll(
+      const descriptionIndicators = wrapper.findAll(
         '.description-indicator'
       );
       expect(descriptionIndicators).toHaveLength(1);
-      const description = await container.querySelectorAll('.note-description');
+      const description = wrapper.findAll('.note-description');
       expect(description).toHaveLength(0);
-      const pictureIndicators = await container.querySelectorAll(
+      const pictureIndicators = wrapper.findAll(
         '.picture-indicator'
       );
       expect(pictureIndicators).toHaveLength(1);
-      const pictures = await container.querySelectorAll('.note-picture');
+      const pictures = wrapper.findAll('.note-picture');
       expect(pictures).toHaveLength(0);
     });
 
     it('medium', async () => {
-      const container = getRendereedElement(notes[0].id, {
+      const wrapper = getMountedElement(notes[0].id, {
         offset: { scale: 1.5, rotat: 0 },
       });
-      const descriptionIndicators = await container.querySelectorAll(
+      const descriptionIndicators = wrapper.findAll(
         '.description-indicator'
       );
       expect(descriptionIndicators).toHaveLength(0);
-      const description = await container.querySelectorAll('.note-description');
+      const description = wrapper.findAll('.note-description');
       expect(description).toHaveLength(0);
-      const shortDescription = await container.querySelectorAll(
+      const shortDescription = wrapper.findAll(
         '.note-short-description'
       );
       expect(shortDescription).toHaveLength(1);
     });
 
     it('large', async () => {
-      const container = getRendereedElement(notes[0].id, {
+      const wrapper = getMountedElement(notes[0].id, {
         offset: { scale: 2.1, rotate: 0 },
       });
-      const descriptionIndicators = await container.querySelectorAll(
-        '.description-indicator'
-      );
+      const descriptionIndicators = wrapper.findAll('.description-indicator');
       expect(descriptionIndicators).toHaveLength(0);
-      const description = await container.querySelectorAll('.note-description');
+      const description = wrapper.findAll('.note-description');
       expect(description).toHaveLength(1);
     });
   });
