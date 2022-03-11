@@ -316,8 +316,8 @@ Cypress.Commands.add(
           if (additional_info) {
             const [linkType, targetNote] =
               additional_info.commonSenseSplit('; ');
-            cy.expectNoteTitle(title);
-            cy.expectNoteTitle(targetNote);
+            cy.findByText(title);
+            cy.findByText(targetNote);
             cy.get('.badge').contains(linkType);
           }
           break;

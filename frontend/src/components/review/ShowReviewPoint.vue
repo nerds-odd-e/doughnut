@@ -1,5 +1,5 @@
 <template>
-    <div v-if="!!noteWithPosition">
+    <div v-if="noteWithPosition">
       <NotePageFrame
       v-if="noteId"
       v-bind="{
@@ -9,7 +9,7 @@
         noteComponent: 'NoteCardsView'}"/>
     </div>
 
-    <div v-if="!!linkViewedByUser">
+    <div v-if="linkViewedByUser">
       <div class="jumbotron py-4 mb-2">
         <LinkShow v-bind="linkViewedByUser">
           <LinkNob
