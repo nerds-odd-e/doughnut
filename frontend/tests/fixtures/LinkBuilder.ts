@@ -50,20 +50,20 @@ class LinkBuilder<PB extends Builder> extends Builder<any, PB> {
   do(): any {
     if (!this.toNote.links[this.linkType]) this.toNote.links[this.linkType] = {}
     if (!this.toNote.links[this.linkType].reverse) this.toNote.links[this.linkType].reverse = []
-    this.toNote.links[this.linkType].reverse.push(this.link(0))
+    this.toNote.links[this.linkType].reverse.push(this.link())
 
     return {
       [this.linkType]: {
         [this.isReverse ? "reverse" : "direct"]: Array.from(
           { length: this.cnt },
-          (x, i) => this.link(i)
+          () => this.link()
         ),
         [this.isReverse ? "direct" : "reverse"]: [],
       },
     };
   }
 
-  private link(index: number): any {
+  private link(): any {
     return {
             id: "1938",
             targetNote: {

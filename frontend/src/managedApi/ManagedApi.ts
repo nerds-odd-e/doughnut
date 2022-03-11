@@ -19,7 +19,7 @@ class ManagedApi {
     this.skipLoading = options.skipLoading;
   }
 
-  around(promise: Promise<any>) {
+  private around<T>(promise: Promise<T>) {
     const assignLoading = (value: boolean) => {
       if (this.skipLoading) return;
       if (this.component !== null && this.component !== undefined) {

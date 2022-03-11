@@ -1,12 +1,7 @@
 import Builder from "./Builder";
 import NotebookBuilder from "./NotebookBuilder";
 
-let idCounter = 1;
-
-const generateId = () => {
-	idCounter += 1;
-	idCounter.toString();
-}
+const idCounter = 1;
 
 class BazaarNotebooksBuilder extends Builder {
   data: any;

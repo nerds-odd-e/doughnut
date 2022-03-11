@@ -32,7 +32,8 @@ class RenderingHelper {
     this.comp = comp
   }
 
-  withProps(props: Record<string, unknown>) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  withProps(props: any) {
     this.props = props
     return this
   }
