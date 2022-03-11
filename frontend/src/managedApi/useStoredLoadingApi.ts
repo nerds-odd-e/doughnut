@@ -2,12 +2,12 @@ import useStore from "../store/createPiniaStore";
 import storedApiCollection from  "./storedApiCollection";
 import useLoadingApi from "./useLoadingApi";
 
-export default function(loadingOptions={initalLoading: false, hasFormError: false, skipLoading: false}) {
+export default function useStoredLoadingApi({initalLoading = false, hasFormError = false, skipLoading = false}={}) {
     const piniaStore = useStore();
     return {
-      ...useLoadingApi(loadingOptions),
+      ...useLoadingApi({initalLoading, hasFormError, skipLoading}),
       piniaStore,
-      get storedApi(): any {
+      get storedApi(): ReturnType<typeof storedApiCollection> {
          return storedApiCollection(this.managedApi, piniaStore)
       }
     }
