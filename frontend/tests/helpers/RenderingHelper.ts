@@ -4,8 +4,6 @@ import { render } from "@testing-library/vue";
 import { App, DefineComponent } from "vue";
 import { RouteLocationRaw } from "vue-router";
 
-type Options = Record<string, unknown>;
-
 interface VuePlugin {
     install: (app: App) => void;
 }
@@ -34,7 +32,7 @@ class RenderingHelper {
     this.comp = comp
   }
 
-  withProps(props: Options) {
+  withProps(props: any) {
     this.props = props
     return this
   }
@@ -49,7 +47,7 @@ class RenderingHelper {
     return this
   }
 
-  withGlobalMock(mocks: Options) {
+  withGlobalMock(mocks: Record<string, unknown>) {
     this.global = merge(this.global, {mocks})
     return this
   }

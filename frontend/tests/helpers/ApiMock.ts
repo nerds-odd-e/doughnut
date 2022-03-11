@@ -1,6 +1,16 @@
 import fetchMock, { MockParams } from "jest-fetch-mock";
 
-class ApiMockImpl {
+interface ApiMock {
+  expecting(url: string) : void
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  expecting(url: string, value: any) : void
+  expectingResponse(url: string, response: MockParams) : void
+  verifyCall(url: string) : void
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  verifyCall(url: string, matcher: any) : void
+}
+
+class ApiMockImpl implements ApiMock {
   fetchMock = fetchMock
 
   private unexpectedApiCalls: string[] = []
@@ -50,16 +60,6 @@ class ApiMockImpl {
       matcher
     )
   }
-}
-
-interface ApiMock {
-  expecting(url: string) : void
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  expecting(url: string, value: any) : void
-  expectingResponse(url: string, response: MockParams) : void
-  verifyCall(url: string) : void
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  verifyCall(url: string, matcher: any) : void
 }
 
 const  setupApiMock = () => {

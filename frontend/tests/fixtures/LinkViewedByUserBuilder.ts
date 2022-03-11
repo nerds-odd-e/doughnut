@@ -1,12 +1,13 @@
+import { merge } from 'lodash';
 import Builder from "./Builder"
 import NoteBuilder from "./NoteBuilder"
 import NotePositionBuilder from "./NotePositionBuilder"
 
 class LinkViewedByUserBuilder extends Builder {
-  data: any;
+  data: any = {};
 
   do(): any {
-    return {
+    return merge(this.data, {
       id: 8,
       linkTypeLabel: "a link",
       sourceNoteWithPosition: {
@@ -17,7 +18,7 @@ class LinkViewedByUserBuilder extends Builder {
         note: new NoteBuilder().do(),
         notePosition: new NotePositionBuilder().do()
       }
-    }
+    });
   }
 }
 

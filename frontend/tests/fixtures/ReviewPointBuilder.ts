@@ -4,19 +4,28 @@ import NotePositionBuilder from "./NotePositionBuilder"
 
 let idCounter = 1;
 
-const generateId = () => idCounter += 1;
+const generateId = () => {
+  idCounter += 1;
+  return idCounter;
+}
 
-class ReviewPointBuilder extends Builder {
-  data: any;
+class ReviewPointBuilder extends Builder<Generated.ReviewPointViewedByUser> {
+  data: any
 
   constructor(parentBuilder?: Builder) {
     super(parentBuilder);
     this.data = {
       reviewPoint: {
         id: generateId(),
+        lastReviewedAt: '',
+        nextReviewAt: '',
+        initialReviewedAt: '',
+        repetitionCount: 0,
+        forgettingCurveIndex: 0,
+        removedFromReview: false,
+        noteId: 0,
+        linkId: 0
       },
-      noteWithPosition: null,
-      linkViewedByUser: null,
     };
   }
 

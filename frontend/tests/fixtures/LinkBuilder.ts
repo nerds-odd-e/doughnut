@@ -1,7 +1,6 @@
 import Builder from "./Builder";
-import LinksBuilder from "./LInksBuilder";
 
-class LinkBuilder extends Builder<any, LinksBuilder> {
+class LinkBuilder<PB extends Builder> extends Builder<any, PB> {
   linkType: string;
 
   cnt: number;
@@ -12,7 +11,7 @@ class LinkBuilder extends Builder<any, LinksBuilder> {
 
   toNote: any
 
-  constructor(parentBuilder: LinksBuilder | undefined, linkType: string) {
+  constructor(parentBuilder: PB | undefined, linkType: string) {
     super(parentBuilder);
     this.linkType = linkType;
     this.cnt = 1;
@@ -28,22 +27,22 @@ class LinkBuilder extends Builder<any, LinksBuilder> {
     }
   }
 
-  count(cnt: number): LinkBuilder {
+  count(cnt: number) {
     this.cnt = cnt;
     return this;
   }
 
-  from(note: any): LinkBuilder {
+  from(note: any) {
     this.fromNote = note
     return this
   }
 
-  to(note: any): LinkBuilder {
+  to(note: any) {
     this.toNote = note
     return this
   }
 
-  get reverse(): LinkBuilder {
+  get reverse() {
     this.isReverse = true;
     return this;
   }
