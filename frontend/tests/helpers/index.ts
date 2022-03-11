@@ -13,14 +13,16 @@ class StoredComponentTestHelper {
 
   private mockedApi?: ApiMockImpl
 
-  private mockedApiTeardown?: Function
+  private mockedApiTeardown?: ()=>void
 
   private get pinia() {
-    return this.piniaInstance || (this.piniaInstance = createTestingPinia())
+    if(!this.piniaInstance) this.piniaInstance = createTestingPinia()
+    return this.piniaInstance
   }
 
   get store(): PiniaStore {
-    return this.piniaStore || (this.piniaStore = createPiniaStore(this.pinia))
+    if(!this.piniaStore) (this.piniaStore = createPiniaStore(this.pinia))
+    return this.piniaStore
   }
 
   get apiMock(): ApiMockImpl {
