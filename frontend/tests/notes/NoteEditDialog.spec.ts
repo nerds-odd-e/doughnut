@@ -1,15 +1,11 @@
 /**
  * @jest-environment jsdom
  */
-import fetchMock from "jest-fetch-mock";
 import NoteEditDialog from '@/components/notes/NoteEditDialog.vue';
 import helper from '../helpers';
 import makeMe from '../fixtures/makeMe';
 
-beforeEach(() => {
-  fetchMock.resetMocks();
-  helper.reset()
-});
+helper.resetWithApiMock(beforeEach, afterEach)
 
 describe('note show', () => {
   it('fetch API to be called ONCE', async () => {
@@ -19,12 +15,7 @@ describe('note show', () => {
       notes: [note],
     };
 
-    fetchMock.mockResponseOnce(JSON.stringify(stubResponse));
+    helper.apiMock.expecting(`/api/notes/${note.id}`, stubResponse);
     helper.component(NoteEditDialog).withProps({ noteId: note.id }).render()
-    expect(fetchMock).toHaveBeenCalledTimes(1);
-    expect(fetchMock).toHaveBeenCalledWith(
-      `/api/notes/${note.id}`,
-      expect.anything()
-    );
   });
 });
