@@ -43,7 +43,7 @@ public class NoteTest {
         void useParentPicture() {
             Note parent = makeMe.aNote().pictureUrl("https://img.com/xxx.jpg").inMemoryPlease();
             Note child = makeMe.aNote().under(parent).useParentPicture().inMemoryPlease();
-            assertThat(child.getNotePicture(), equalTo(parent.getNoteAccessories().getPictureUrl()));
+            assertThat(child.getNotePicture().get(), equalTo(parent.getNoteAccessories().getPictureUrl()));
         }
     }
 

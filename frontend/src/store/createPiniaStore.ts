@@ -4,6 +4,7 @@ import { defineStore } from "pinia";
 interface State {
   notebooks: Generated.Notebook[]
   notes: {[id: number]: Generated.NoteViewedByUser }
+  links: {[id: number]: { [P in Generated.LinkType]?: Generated.LinkViewed } }
   highlightNoteId: number | undefined
   noteUndoHistories: any[]
   currentUser: Generated.User | null
@@ -54,6 +55,7 @@ export default defineStore('main', {
     state: () => ({
         notebooks: [],
         notes: {},
+        links: {},
         highlightNoteId: undefined,
         noteUndoHistories: [],
         currentUser: null,
@@ -89,6 +91,7 @@ export default defineStore('main', {
         loadNotes(notes: Generated.NoteViewedByUser[]) {
           notes.forEach((note) => {
             this.notes[note.id] = note;
+            this.links[note.id] = note.links;
           });
         },
         deleteNote(noteId: number) {
