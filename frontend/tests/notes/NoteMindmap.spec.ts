@@ -14,17 +14,22 @@ describe('note mindmap', () => {
     helper.reset();
   });
 
-  const renderAndGetContainer = (noteId: number, props = {}) => {
+  const getRendereedElement = (noteId: number, props = {}) => {
     helper.store.loadNotes(notes);
-    const wrapper = helper.component(NoteMinmap).withProps({ noteId, offset: { scale: 1, rotate: 0 }, ...props }).render()
-    return wrapper.container;
+    const view = helper.component(NoteMinmap).withProps({ noteId, offset: { scale: 1, rotate: 0 }, ...props }).render()
+    return view.container
+  };
+
+  const getMountedElement = (noteId: number, props = {}) => {
+    helper.store.loadNotes(notes);
+    return helper.component(NoteMinmap).withProps({ noteId, offset: { scale: 1, rotate: 0 }, ...props }).mount()
   };
 
   it('should render one note', async () => {
     notes.push(
       makeMe.aNote.title('single note').shortDescription('not long').please()
     );
-    renderAndGetContainer(notes[0].id);
+    getRendereedElement(notes[0].id);
     expect(screen.getByRole('card')).toHaveTextContent('single note');
   });
 
@@ -37,16 +42,16 @@ describe('note mindmap', () => {
     });
 
     it('should render the two notes', async () => {
-      renderAndGetContainer(notes[0].id);
+      getRendereedElement(notes[0].id);
       expect(screen.getAllByRole('card')).toHaveLength(2);
     });
 
     it('should connect the two notes', async () => {
-      const container = renderAndGetContainer(notes[0].id);
-      const connection = await container.querySelector('svg.mindmap-canvas') || fail();
-      const line = connection.querySelector('line') || fail();
-      expect(parseFloat(line.getAttribute('x2') || fail())).toBeCloseTo(0);
-      expect(parseFloat(line.getAttribute('y2') || fail())).toBeCloseTo(185);
+      const wrapper = getMountedElement(notes[0].id);
+      const connection = await wrapper.find('svg.mindmap-canvas')
+      const line = connection.find('line');
+      expect(parseFloat(line.attributes('x2'))).toBeCloseTo(0);
+      expect(parseFloat(line.attributes('y2'))).toBeCloseTo(185);
     });
 
     describe('with two grandchildren notes', () => {
@@ -57,8 +62,8 @@ describe('note mindmap', () => {
       });
 
       it('should connect the two notes', async () => {
-        const container = renderAndGetContainer(notes[0].id);
-        const connection = await container.querySelector('svg.mindmap-canvas') || fail();
+        const view = getRendereedElement(notes[0].id);
+        const connection = await view.querySelector('svg.mindmap-canvas') || fail();
         const lines = connection.querySelectorAll('line');
         expect(lines).toHaveLength(3);
         const lastLine = lines[2];
@@ -81,8 +86,8 @@ describe('note mindmap', () => {
       });
 
       it('should link the two linked notes', async () => {
-        const container = renderAndGetContainer(notes[0].id);
-        const connection = await container.querySelector('svg.mindmap-canvas') || fail();
+        const view = getRendereedElement(notes[0].id);
+        const connection = await view.querySelector('svg.mindmap-canvas') || fail();
         const linkStart = connection.querySelectorAll('.link-start');
         expect(linkStart).toHaveLength(2);
         expect(linkStart[0].getAttribute('transform')).toEqual(
@@ -94,8 +99,8 @@ describe('note mindmap', () => {
       });
 
       it('should link the two linked notes', async () => {
-        const container = renderAndGetContainer(notes[0].id);
-        const connection = await container.querySelector('svg.mindmap-canvas') || fail();
+        const view = getRendereedElement(notes[0].id);
+        const connection = await view.querySelector('svg.mindmap-canvas') || fail();
         const lines = connection.querySelectorAll('g.notes-link path');
         expect(lines).toHaveLength(1);
         const d = lines[0].getAttribute('d');
@@ -117,8 +122,8 @@ describe('note mindmap', () => {
           .please();
         notes.push(noteThatIsNotOnTheMap);
         notes.push(child2);
-        const container = renderAndGetContainer(notes[0].id);
-        const connection = await container.querySelector('svg.mindmap-canvas') || fail();
+        const view = getRendereedElement(notes[0].id);
+        const connection = await view.querySelector('svg.mindmap-canvas') || fail();
         const lines = connection.querySelectorAll('g.notes-link line');
         expect(lines).toHaveLength(0);
       });
@@ -137,7 +142,7 @@ describe('note mindmap', () => {
     });
 
     it('small size by default', async () => {
-      const container = renderAndGetContainer(notes[0].id, {
+      const container = getRendereedElement(notes[0].id, {
         offset: { scale: 1, rotate: 0 },
       });
       const descriptionIndicators = await container.querySelectorAll(
@@ -155,7 +160,7 @@ describe('note mindmap', () => {
     });
 
     it('medium', async () => {
-      const container = renderAndGetContainer(notes[0].id, {
+      const container = getRendereedElement(notes[0].id, {
         offset: { scale: 1.5, rotat: 0 },
       });
       const descriptionIndicators = await container.querySelectorAll(
@@ -171,7 +176,7 @@ describe('note mindmap', () => {
     });
 
     it('large', async () => {
-      const container = renderAndGetContainer(notes[0].id, {
+      const container = getRendereedElement(notes[0].id, {
         offset: { scale: 2.1, rotate: 0 },
       });
       const descriptionIndicators = await container.querySelectorAll(
