@@ -4,12 +4,15 @@
   <div v-else><ContentLoader /></div>
 </template>
 
-<script setup>
+<script lang="ts">
 import ContentLoader from "../../components/commons/ContentLoader.vue";
 import LoadingThinBar from "../../components/commons/LoadingThinBar.vue";
 
-const props = defineProps({
+export default {
+  props: {
    loading: Boolean,
    contentExists: Boolean,
-  });
+  },
+  components: { ContentLoader, LoadingThinBar }
+}
 </script>
