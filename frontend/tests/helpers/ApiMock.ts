@@ -5,6 +5,7 @@ class ApiMockImpl {
 
   private unexpectedApiCalls: string[] = []
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private expected: {url: string, value: any, response?: MockParams, called: boolean}[] = []
 
   init() {
@@ -30,6 +31,7 @@ class ApiMockImpl {
     return this.expected.filter(exp => !exp.called).map(exp => exp.url);
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   expecting(url: string, value: any={}) {
     this.expected.push({ url, value, called: false })
   }
@@ -38,9 +40,10 @@ class ApiMockImpl {
     this.expected.push({ url, value: {}, response, called: false })
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   verifyCall(url: string, matcher: any=expect.anything()) {
     const unexpectedIndex = this.unexpectedApiCalls.indexOf(url)
-    unexpectedIndex >=0 && this.unexpectedApiCalls.splice(unexpectedIndex, 1)
+    if(unexpectedIndex >=0) this.unexpectedApiCalls.splice(unexpectedIndex, 1)
 
     expect(this.fetchMock).toHaveBeenCalledWith(
       url,
@@ -51,9 +54,11 @@ class ApiMockImpl {
 
 interface ApiMock {
   expecting(url: string) : void
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   expecting(url: string, value: any) : void
   expectingResponse(url: string, response: MockParams) : void
   verifyCall(url: string) : void
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   verifyCall(url: string, matcher: any) : void
 }
 
