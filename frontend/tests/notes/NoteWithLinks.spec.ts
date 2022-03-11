@@ -1,16 +1,12 @@
 /**
  * @jest-environment jsdom
  */
-import fetchMock from "jest-fetch-mock";
 import { screen } from '@testing-library/vue';
 import NoteWithLinks from '@/components/notes/NoteWithLinks.vue';
 import makeMe from '../fixtures/makeMe';
 import helper from '../helpers';
 
-beforeEach(() => {
-  fetchMock.resetMocks();
-  helper.reset()
-});
+helper.resetWithApiMock(beforeEach, afterEach)
 
 describe('new/updated pink banner', () => {
   beforeAll(() => {
@@ -60,9 +56,7 @@ describe('in place edit on title', () => {
     await wrapper.find('[role="title"] input').setValue('updated');
     await wrapper.find('[role="title"] input').trigger('blur');
 
-    expect(fetchMock).toHaveBeenCalledWith(
-      `/api/text_content/${noteParent.id}`,
-      expect.objectContaining({ method: 'PATCH' })
+    helper.apiMock.verifyCall(`/api/text_content/${noteParent.id}`, expect.objectContaining({ method: 'PATCH' })
     );
   });
 });
@@ -80,5 +74,6 @@ describe('undo editing', () => {
     await wrapper.find('[role="title"] input').trigger('blur');
 
     expect(helper.store.peekUndo()).toMatchObject({ type: 'editing' });
+    helper.apiMock.verifyCall(`/api/text_content/${note.id}`)
   });
 });

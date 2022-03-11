@@ -37,13 +37,13 @@ class ApiMockImpl {
     this.expected.push({ url, value: {}, response, called: false })
   }
 
-  verifyCall(url: string) {
+  verifyCall(url: string, matcher: any=expect.anything()) {
     const unexpectedIndex = this.unexpectedApiCalls.indexOf(url)
     unexpectedIndex >=0 && this.unexpectedApiCalls.splice(unexpectedIndex, 1)
 
     expect(this.fetchMock).toHaveBeenCalledWith(
       url,
-      expect.anything()
+      matcher
     )
   }
 }
@@ -53,6 +53,7 @@ interface ApiMock {
   expecting(url: string, value: any) : void
   expectingResponse(url: string, response: MockParams) : void
   verifyCall(url: string) : void
+  verifyCall(url: string, matcher: any) : void
 }
 
 const  setupApiMock = () => {
