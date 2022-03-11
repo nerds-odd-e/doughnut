@@ -12,10 +12,6 @@
       </button>
     </template>
   </Card>
-  <div :id="`note-collapse-${note.id}`" class="collapse">
-    <NoteWithLinks
-      v-bind="{note}"/>
-  </div>
 </template>
 
 <script>

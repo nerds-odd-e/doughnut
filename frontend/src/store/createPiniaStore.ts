@@ -19,6 +19,10 @@ function withState(state: State) {
       if(id === undefined) return undefined;
       return state.notes[id]
     },
+    getLinksById(id: number | undefined) {
+      if(id === undefined) return undefined;
+      return state.links[id]
+    },
 
     getChildrenIdsByParentId(parentId: number) {
       return !state.notes[parentId]
@@ -67,6 +71,7 @@ export default defineStore('main', {
     getters: {
         getHighlightNote: (state: State)   => () => withState(state).getNoteById(state.highlightNoteId),
         getNoteById: (state)        => (id: number) => withState(state).getNoteById(id),
+        getLinksById: (state)        => (id: number) => withState(state).getLinksById(id),
         peekUndo: (state)           => () => {
           if(state.noteUndoHistories.length === 0) return null
           return state.noteUndoHistories[state.noteUndoHistories.length - 1]
