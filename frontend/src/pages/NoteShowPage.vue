@@ -11,13 +11,13 @@
   </LoadingPage>
 </template>
 
-<script>
+<script lang="ts">
 import LoadingPage from "./commons/LoadingPage.vue";
 import NotePageFrame from '../components/notes/views/NotePageFrame.vue';
-import { viewType } from "../models/viewTypes";
+import { ViewType, viewType } from "../models/viewTypes";
 import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
 
-export default ({
+export default defineComponent({
   setup() {
     return useStoredLoadingApi({initalLoading: true});
   },
@@ -31,13 +31,14 @@ export default ({
   },
   components: { LoadingPage, NotePageFrame },
   computed: {
-    viewTypeObj() {
+    viewTypeObj() : ViewType {
       return viewType(this.viewType)
     }
   },
   methods: {
     updateStoreViewType() {
-      this.piniaStore.setViewType( this.viewType);
+      if(!this.viewType) return;
+      this.piniaStore.setViewType(this.viewType);
     },
     fetchData() {
       const storedApiCall = this.viewTypeObj.fetchAll ?

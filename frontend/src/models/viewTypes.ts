@@ -13,9 +13,9 @@ const viewTypes: Array<ViewType> = [
   {value: 'mindmap', path: 'mindmap', title: 'mindmap view', noteComponent: 'NoteMindmapView', fetchAll: true},
 ]
 
-const viewType = (value:string): ViewType | undefined => {
+const viewType = (value:string|undefined): ViewType => {
   const result = viewTypes.find((vt=> vt.value === value))
   if (result) return result
   return viewTypes[0]
 }
-export { viewTypes, viewType }
+export { viewTypes, viewType, ViewType}
