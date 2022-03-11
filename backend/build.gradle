@@ -102,9 +102,8 @@ tasks.register("bootRunE2E") {
 
 generateTypeScript {
   jsonLibrary = 'jackson2'
-  classes = [
-          'com.odde.doughnut.entities.json.NoteViewedByUser',
-          'com.odde.doughnut.entities.json.NotebooksViewedByUser',
+  classPatterns = [
+          'com.odde.doughnut.entities.json.*',
   ]
   customTypeMappings = [
           'java.sql.Timestamp:string'

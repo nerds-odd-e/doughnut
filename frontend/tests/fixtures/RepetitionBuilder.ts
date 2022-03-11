@@ -1,7 +1,7 @@
 import Builder from "./Builder"
 import ReviewPointBuilder from "./ReviewPointBuilder";
 
-class RepetitionBuilder extends Builder {
+class RepetitionBuilder extends Builder<Generated.RepetitionForUser> {
   data: any
 
   note: any

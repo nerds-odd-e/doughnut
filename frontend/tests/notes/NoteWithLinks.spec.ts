@@ -1,7 +1,6 @@
 /**
  * @jest-environment jsdom
  */
-import { screen } from '@testing-library/vue';
 import NoteWithLinks from '@/components/notes/NoteWithLinks.vue';
 import makeMe from '../fixtures/makeMe';
 import helper from '../helpers';
@@ -23,9 +22,9 @@ describe('new/updated pink banner', () => {
     (updatedAt, expectedColor) => {
       const note = makeMe.aNote.textContentUpdatedAt(updatedAt).please();
 
-      helper.component(NoteWithLinks).withProps({note}).render()
+      const wrapper = helper.component(NoteWithLinks).withProps({note}).mount()
 
-      expect(screen.getByRole('title').parentNode).toHaveStyle(
+      expect(wrapper.find('.note-body').element).toHaveStyle(
         `border-color: ${expectedColor};`
       );
     }

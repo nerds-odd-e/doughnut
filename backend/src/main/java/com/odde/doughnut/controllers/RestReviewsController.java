@@ -3,14 +3,13 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.json.RepetitionForUser;
 import com.odde.doughnut.entities.json.ReviewPointViewedByUser;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.ReviewPointModel;
 import com.odde.doughnut.models.Reviewing;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -73,21 +72,6 @@ class RestReviewsController {
         ReviewPointModel reviewPointModel = modelFactoryService.toReviewPointModel(initialInfo.reviewPoint);
         reviewPointModel.initialReview(userModel, initialInfo.reviewSetting, testabilitySettings.getCurrentUTCTimestamp());
         return initialReview();
-    }
-
-    static class RepetitionForUser {
-        @Getter
-        @Setter
-        private ReviewPointViewedByUser reviewPointViewedByUser;
-        @Getter
-        @Setter
-        private QuizQuestion quizQuestion;
-        @Getter
-        @Setter
-        private Answer emptyAnswer;
-        @Getter
-        @Setter
-        private Integer toRepeatCount;
     }
 
     @GetMapping("/repeat")

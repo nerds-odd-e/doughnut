@@ -1,8 +1,30 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-03-09 09:49:17.
+// Generated using typescript-generator version 2.35.1025 on 2022-03-11 13:21:42.
 
 declare namespace Generated {
+
+    interface LinkViewed {
+        direct: Link[];
+        reverse: Link[];
+    }
+
+    interface LinkViewedByUser {
+        id: number;
+        sourceNoteWithPosition: NoteWithPosition;
+        linkTypeLabel: string;
+        typeId: number;
+        targetNoteWithPosition: NoteWithPosition;
+        readonly: boolean;
+    }
+
+    interface NotePositionViewedByUser {
+        noteId: number;
+        title: string;
+        notebook: Notebook;
+        ancestors: Note[];
+        owns: boolean;
+    }
 
     interface NoteViewedByUser {
         id: number;
@@ -17,49 +39,38 @@ declare namespace Generated {
         textContent: TextContent;
     }
 
+    interface NoteWithPosition {
+        notePosition: NotePositionViewedByUser;
+        note: NoteViewedByUser;
+    }
+
     interface NotebooksViewedByUser {
         notebooks: Notebook[];
         subscriptions: Subscription[];
     }
 
-    interface NoteAccessories {
-        url: string;
-        urlIsVideo: boolean;
-        pictureUrl: string;
-        pictureMask: string;
-        useParentPicture: boolean;
-        skipReview: boolean;
-        updatedAt: string;
+    interface NotesBulk {
+        notePosition: NotePositionViewedByUser;
+        notes: NoteViewedByUser[];
     }
 
-    interface LinkViewed {
-        direct: Link[];
-        reverse: Link[];
+    interface RedirectToNoteResponse {
+        noteId: number;
     }
 
-    interface TextContent {
-        title: string;
-        description: string;
-        updatedAt: string;
+    interface RepetitionForUser {
+        reviewPointViewedByUser: ReviewPointViewedByUser;
+        quizQuestion: QuizQuestion;
+        emptyAnswer: Answer;
+        toRepeatCount: number;
     }
 
-    interface Notebook {
-        id: number;
-        ownership: Ownership;
-        headNote: Note;
-        skipReviewEntirely: boolean;
-        deletedAt: string;
-    }
-
-    interface Subscription {
-        id: number;
-        dailyTargetOfNewNotes: number;
-        user: User;
-        notebook: Notebook;
-        headNote: Note;
-        noteContent: NoteAccessories;
-        title: string;
-        shortDescription: string;
+    interface ReviewPointViewedByUser {
+        reviewPoint: ReviewPoint;
+        noteWithPosition: NoteWithPosition;
+        linkViewedByUser: LinkViewedByUser;
+        reviewSetting: ReviewSetting;
+        remainingInitialReviewCountForToday: number;
     }
 
     interface Link {
@@ -72,20 +83,90 @@ declare namespace Generated {
         linkNameOfSource: string;
     }
 
-    interface Ownership {
+    interface Notebook {
         id: number;
-        circle: Circle;
+        ownership: Ownership;
+        headNote: Note;
+        skipReviewEntirely: boolean;
+        deletedAt: string;
     }
 
     interface Note {
         id: number;
         createdAt: string;
         deletedAt: string;
-        notePicture: string;
         title: string;
-        shortDescription: string;
         parentId?: number;
+        notePicture: string;
+        shortDescription: string;
         createdAtAndUpdatedAt: string;
+    }
+
+    interface NoteAccessories {
+        url: string;
+        urlIsVideo: boolean;
+        pictureUrl: string;
+        pictureMask: string;
+        useParentPicture: boolean;
+        skipReview: boolean;
+        updatedAt: string;
+    }
+
+    interface TextContent {
+        title: string;
+        description: string;
+        updatedAt: string;
+    }
+
+    interface Subscription {
+        id: number;
+        dailyTargetOfNewNotes: number;
+        user: User;
+        notebook: Notebook;
+        title: string;
+        noteContent: NoteAccessories;
+        headNote: Note;
+        shortDescription: string;
+    }
+
+    interface QuizQuestion {
+        questionType: QuestionType;
+        options: Option[];
+        description: string;
+        mainTopic: string;
+        hintLinks: { [P in LinkType]?: LinkViewed };
+        viceReviewPointIds: number[];
+        scope: Note[];
+    }
+
+    interface Answer {
+        answer: string;
+        answerNoteId: number;
+        questionType: QuestionType;
+        viceReviewPointIds: number[];
+    }
+
+    interface ReviewPoint {
+        id: number;
+        lastReviewedAt: string;
+        nextReviewAt: string;
+        initialReviewedAt: string;
+        repetitionCount: number;
+        forgettingCurveIndex: number;
+        removedFromReview: boolean;
+        noteId: number;
+        linkId: number;
+    }
+
+    interface ReviewSetting {
+        id: number;
+        rememberSpelling: boolean;
+        level: number;
+    }
+
+    interface Ownership {
+        id: number;
+        circle: Circle;
     }
 
     interface User {
@@ -97,11 +178,19 @@ declare namespace Generated {
         spaceIntervals: string;
     }
 
+    interface Option {
+        note: NoteViewedByUser;
+        picture: boolean;
+        display: string;
+    }
+
     interface Circle {
         id: number;
         name: string;
     }
 
     type LinkType = "related to" | "a specialization of" | "an application of" | "an instance of" | "a part of" | "tagged by" | "an attribute of" | "the opposite of" | "author of" | "using" | "an example of" | "before" | "similar to" | "confused with";
+
+    type QuestionType = "CLOZE_SELECTION" | "SPELLING" | "PICTURE_TITLE" | "PICTURE_SELECTION" | "LINK_TARGET" | "LINK_SOURCE" | "CLOZE_LINK_TARGET" | "DESCRIPTION_LINK_TARGET" | "WHICH_SPEC_HAS_INSTANCE" | "FROM_SAME_PART_AS" | "FROM_DIFFERENT_PART_AS" | "LINK_SOURCE_EXCLUSIVE";
 
 }
