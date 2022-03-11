@@ -2,6 +2,7 @@ import { merge } from "lodash";
 import { mount } from "@vue/test-utils";
 import { render } from "@testing-library/vue";
 import { App, DefineComponent } from "vue";
+import { RouteLocationRaw } from "vue-router";
 
 type Options = Record<string, unknown>;
 
@@ -53,7 +54,7 @@ class RenderingHelper {
     return this
   }
 
-  currentRoute(route: Record<string, string>) {
+  currentRoute(route: RouteLocationRaw) {
     this.route = route
     return this
   }
