@@ -1,5 +1,5 @@
 <template>
-  <NoteWithLinks v-bind="{ note }" v-if="note"/>
+  <NoteWithLinks v-bind="{ noteId }"/>
   <div class="note-list">
     <NoteOverview
       v-for="childId in childrenIds"
@@ -25,9 +25,6 @@ export default defineComponent({
   },
   components: { NoteWithLinks },
   computed: {
-    note() {
-      return this.piniaStore.getNoteById(this.noteId);
-    },
     childrenIds() {
       return this.piniaStore.getChildrenIdsByParentId(this.noteId);
     },

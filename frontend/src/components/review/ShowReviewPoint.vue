@@ -1,6 +1,7 @@
 <template>
     <div v-if="!!noteWithPosition">
       <NotePageFrame
+      v-if="noteId"
       v-bind="{
         noteId,
         notePosition: noteWithPosition.notePosition,

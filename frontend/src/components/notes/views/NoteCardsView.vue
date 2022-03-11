@@ -1,24 +1,25 @@
 <template>
-  <div class="container" v-if="note">
-    <NoteWithLinks v-bind="{ note }"/>
+  <div class="container">
+    <NoteWithLinks v-bind="{ noteId }"/>
     <NoteStatisticsButton :noteId="noteId" />
     <Cards v-if="expandChildren" :notes="children"/>
   </div>
 
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
 import NoteWithLinks from "../NoteWithLinks.vue";
 import NoteStatisticsButton from "../NoteStatisticsButton.vue";
 import Cards from "../Cards.vue";
 import useStoredLoadingApi from "../../../managedApi/useStoredLoadingApi";
 
-export default ({
+export default defineComponent({
   setup() {
     return useStoredLoadingApi();
   },
   props: {
-    noteId: [String, Number],
+    noteId: { type: Number, required: true },
     expandChildren: { type: Boolean, required: true },
   },
   components: {
@@ -27,9 +28,6 @@ export default ({
     NoteStatisticsButton,
   },
   computed: {
-    note() {
-      return this.piniaStore.getNoteById(this.noteId);
-    },
     children() {
       return this.piniaStore.getChildrenOfParentId(this.noteId);
     },

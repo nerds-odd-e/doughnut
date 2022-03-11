@@ -12,7 +12,8 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
 import NoteControl from "../../toolbars/NoteControl.vue";
 import NoteMindmapView from "./NoteMindmapView.vue";
 import NoteCardsView from "./NoteCardsView.vue";
@@ -20,19 +21,19 @@ import NoteArticleView from "./NoteArticleView.vue";
 import Breadcrumb from "../Breadcrumb.vue";
 import useStoredLoadingApi from '../../../managedApi/useStoredLoadingApi';
 
-export default {
+export default defineComponent({
   setup() {
     return useStoredLoadingApi();
   },
   props: {
-     noteId: [String, Number],
+     noteId: { type: Number, required: true },
      notePosition: Object,
      noteComponent: String,
      expandChildren: { type: Boolean, required: true },
   },
   components: { NoteControl, NoteMindmapView, Breadcrumb, NoteCardsView, NoteArticleView },
   methods: {
-    highlight(id) { 
+    highlight(id: number) { 
       this.piniaStore.setHighlightNoteId(id)
     },
   },
@@ -44,5 +45,5 @@ export default {
   mounted() {
     this.highlight(this.noteId)
   }
-};
+});
 </script>

@@ -1,5 +1,6 @@
 <template>
   <NoteShell
+    v-if="note"
     class="note-body"
     v-bind="{ id: note.id, updatedAt: note.textContent?.updatedAt }"
   >
@@ -9,16 +10,21 @@
   </NoteShell>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from 'vue'
 import EditableText from "../form/EditableText.vue";
 import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
 import NoteShell from "./NoteShell.vue";
 import NoteContent from "./NoteContent.vue";
+import useStoredLoadingApi from '../../managedApi/useStoredLoadingApi';
 
-export default {
+export default defineComponent({
+  setup() {
+    return useStoredLoadingApi();
+  },
   name: "NoteWithLinks",
   props: {
-    note: Object,
+    noteId: { type: Number, required: true },
   },
   components: {
     NoteFrameOfLinks,
@@ -26,7 +32,12 @@ export default {
     NoteContent,
     EditableText,
   },
-};
+  computed: {
+    note() {
+      return this.piniaStore.getNoteById(this.noteId);
+    },
+  }
+});
 </script>
 
 <style scoped>
