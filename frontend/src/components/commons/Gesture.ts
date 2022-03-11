@@ -48,7 +48,10 @@ class Gesture {
 
   move(rect: BoundaryRect, pointerId: number, pos: Position): void {
     this.rect = rect
-    this.pointers.get(pointerId)!.current = pos
+    const pointer = this.pointers.get(pointerId)
+    if(pointer) {
+      pointer.current = pos
+    }
   }
 
   shiftDown(value: boolean): void {
@@ -120,7 +123,7 @@ class Gesture {
     return this.scale(beforeScale, newScale)
   }
 
-  zoom(rect: any, newScale: number) {
+  zoom(rect: BoundaryRect, newScale: number) {
     this.rect = rect
     return this.scale(this.startOffset, newScale)
   }

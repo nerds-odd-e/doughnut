@@ -32,7 +32,7 @@ class RenderingHelper {
     this.comp = comp
   }
 
-  withProps(props: any) {
+  withProps(props: Record<string, unknown>) {
     this.props = props
     return this
   }
