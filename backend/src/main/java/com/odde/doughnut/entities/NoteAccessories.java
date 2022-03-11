@@ -19,6 +19,7 @@ import java.util.List;
 @Embeddable
 @ValidateNotePicture
 public class NoteAccessories {
+
     @Getter
     @Setter
     private String url;

@@ -280,6 +280,7 @@ public class Note {
         return grand;
     }
 
+    @JsonIgnore
     public void setCreatedAtAndUpdatedAt(Timestamp currentUTCTimestamp) {
         this.createdAt = currentUTCTimestamp;
         this.getNoteAccessories().setUpdatedAt(currentUTCTimestamp);
