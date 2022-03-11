@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-03-11 13:21:42.
+// Generated using typescript-generator version 2.35.1025 on 2022-03-11 16:45:33.
 
 declare namespace Generated {
 
@@ -93,13 +93,12 @@ declare namespace Generated {
 
     interface Note {
         id: number;
+        noteAccessories: NoteAccessories;
         createdAt: string;
-        deletedAt: string;
         title: string;
-        parentId?: number;
-        notePicture: string;
+        notePicture?: string;
         shortDescription: string;
-        createdAtAndUpdatedAt: string;
+        parentId?: number;
     }
 
     interface NoteAccessories {
@@ -124,7 +123,6 @@ declare namespace Generated {
         user: User;
         notebook: Notebook;
         title: string;
-        noteContent: NoteAccessories;
         headNote: Note;
         shortDescription: string;
     }

@@ -15,6 +15,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 @Embeddable
 @ValidateNotePicture
@@ -64,11 +65,11 @@ public class NoteAccessories {
     private Timestamp updatedAt;
 
     @JsonIgnore
-    public String getNotePicture() {
+    public Optional<String> getNotePicture() {
         if (uploadPicture != null) {
-            return "/images/" + uploadPicture.getId() + "/" + uploadPicture.getName();
+            return Optional.of("/images/" + uploadPicture.getId() + "/" + uploadPicture.getName());
         }
-        return pictureUrl;
+        return Optional.ofNullable(pictureUrl);
     }
 
     public String getPictureMaskSvg(String opacity) {

@@ -49,7 +49,7 @@ public class PictureSelectionQuizFactory implements QuizQuestionFactory {
 
     @Override
     public boolean isValidQuestion() {
-        return !Strings.isEmpty(answerNote.getNotePicture());
+        return !Strings.isEmpty(answerNote.getNotePicture().orElse(null));
     }
 
     @Override

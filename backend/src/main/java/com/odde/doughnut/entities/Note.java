@@ -35,7 +35,6 @@ public class Note {
     @Embedded
     @Valid
     @Getter
-    @JsonIgnore
     private final NoteAccessories noteAccessories = new NoteAccessories();
 
     @OneToOne(cascade = CascadeType.ALL)
@@ -62,6 +61,7 @@ public class Note {
     @Column(name = "deleted_at")
     @Setter
     @Getter
+    @JsonIgnore
     private Timestamp deletedAt;
 
     @OneToOne(cascade = CascadeType.PERSIST)
@@ -145,7 +145,7 @@ public class Note {
         return StringUtils.abbreviate(getTextContent().getDescription(), 50);
     }
 
-    public String getNotePicture() {
+    public Optional<String> getNotePicture() {
         if (noteAccessories.getUseParentPicture() && getParentNote() != null) {
             return getParentNote().getNotePicture();
         }
