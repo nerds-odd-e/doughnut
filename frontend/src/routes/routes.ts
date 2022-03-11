@@ -1,4 +1,4 @@
-import NestedPage from '../pages/commons/NestedPage.js';
+import NestedPage from '../pages/commons/NestedPage';
 import HomePage from "@/pages/HomePage.vue";
 import BazaarPage from "@/pages/BazaarPage.vue";
 import CirclesPage from "@/pages/CirclesPage.vue";

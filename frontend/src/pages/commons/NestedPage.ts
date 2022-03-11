@@ -1,20 +1,27 @@
-import { h } from "vue";
+import { DefineComponent, defineComponent, h } from "vue";
 import { RouterView } from "vue-router";
 import routerScopeGuard from "../../routes/relative_routes";
 
+declare module "@vue/runtime-core" {
+  interface ComponentCustomProperties {
+    $popups: any;
+    alert: any
+  }
+}
+
 function NestedPage(
-  WrappedComponent,
-  scopeName,
-  exceptRoutes,
-  notAllowedMessage
+  WrappedComponent: DefineComponent,
+  scopeName: string,
+  exceptRoutes: string[],
+  notAllowedMessage: string
 ) {
-  return {
+  return defineComponent({
     name: "NestedPage",
     computed: {
       isNested() {
         if (this.$route) {
-          const routeParts = this.$route.name.split("-");
-          return routeParts.length > 1 && routeParts[1] !== "quiz";
+          const routeParts = this.$route?.name?.toString().split("-");
+          return routeParts && routeParts.length > 1 && routeParts[1] !== "quiz";
         }
         return true;
       },
@@ -41,7 +48,7 @@ function NestedPage(
         h(RouterView, {}),
       ]);
     },
-  };
+  });
 }
 
 export default NestedPage;
