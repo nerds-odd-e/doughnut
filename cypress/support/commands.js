@@ -290,7 +290,7 @@ Cypress.Commands.add(
         'be.visible'
       );
     } else {
-      cy.findByText(title, { selector: '.card-title' });
+      cy.findByText(title);
       switch (review_type) {
         case 'single note': {
           if (additional_info) {

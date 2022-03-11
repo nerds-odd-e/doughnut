@@ -5,6 +5,7 @@ interface State {
   notebooks: Generated.Notebook[]
   notes: {[id: number]: Generated.NoteViewedByUser }
   links: {[id: number]: { [P in Generated.LinkType]?: Generated.LinkViewed } }
+  parentChildrenIds: {[id: number]: number[] }
   highlightNoteId: number | undefined
   noteUndoHistories: any[]
   currentUser: Generated.User | null
@@ -25,9 +26,7 @@ function withState(state: State) {
     },
 
     getChildrenIdsByParentId(parentId: number) {
-      return !state.notes[parentId]
-        ? []
-        : state.notes[parentId].childrenIds
+      return state.parentChildrenIds[parentId] || []
     },
 
     getChildrenOfParentId(parentId: number) {
@@ -42,9 +41,9 @@ function withState(state: State) {
     },
 
     deleteNoteFromParentChildrenList(id: number) {
-      const children = this.getNoteById(
-        this.getNoteById(id)?.parentId
-      )?.childrenIds
+      const parent = this.getNoteById(id)?.parentId
+      if(!parent) return
+      const children = this.getChildrenIdsByParentId(parent)
       if (children) {
         const index = children.indexOf(id)
         if (index > -1) {
@@ -60,6 +59,7 @@ export default defineStore('main', {
         notebooks: [],
         notes: {},
         links: {},
+        parentChildrenIds: {},
         highlightNoteId: undefined,
         noteUndoHistories: [],
         currentUser: null,
@@ -97,6 +97,7 @@ export default defineStore('main', {
           notes.forEach((note) => {
             this.notes[note.id] = note;
             this.links[note.id] = note.links;
+            this.parentChildrenIds[note.id] = note.childrenIds;
           });
         },
         deleteNote(noteId: number) {
