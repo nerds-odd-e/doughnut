@@ -37,7 +37,7 @@ export default {
 
   methods: {
     done(result) {
-      this.doneResolve(result);
+      if(this.doneResolve) this.doneResolve(result);
       this.popupInfo = null;
       this.doneResolve = null;
     },
