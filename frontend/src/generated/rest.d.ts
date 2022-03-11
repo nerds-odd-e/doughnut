@@ -1,8 +1,13 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-03-11 19:03:10.
+// Generated using typescript-generator version 2.35.1025 on 2022-03-11 19:26:12.
 
 declare namespace Generated {
+
+    interface CurrentUserInfo {
+        user: User;
+        externalIdentifier: string;
+    }
 
     interface LinkViewed {
         direct: Link[];
@@ -67,10 +72,19 @@ declare namespace Generated {
 
     interface ReviewPointViewedByUser {
         reviewPoint: ReviewPoint;
-        noteWithPosition: NoteWithPosition;
-        linkViewedByUser: LinkViewedByUser;
+        noteWithPosition?: NoteWithPosition;
+        linkViewedByUser?: LinkViewedByUser;
         reviewSetting: ReviewSetting;
         remainingInitialReviewCountForToday: number;
+    }
+
+    interface User {
+        id: number;
+        name: string;
+        externalIdentifier: string;
+        ownership: Ownership;
+        dailyNewNotesCount: number;
+        spaceIntervals: string;
     }
 
     interface Link {
@@ -79,8 +93,8 @@ declare namespace Generated {
         targetNote: Note;
         typeId: number;
         createdAt: string;
-        linkTypeLabel: string;
         linkNameOfSource: string;
+        linkTypeLabel: string;
     }
 
     interface Notebook {
@@ -165,15 +179,6 @@ declare namespace Generated {
     interface Ownership {
         id: number;
         circle: Circle;
-    }
-
-    interface User {
-        id: number;
-        name: string;
-        externalIdentifier: string;
-        ownership: Ownership;
-        dailyNewNotesCount: number;
-        spaceIntervals: string;
     }
 
     interface Option {

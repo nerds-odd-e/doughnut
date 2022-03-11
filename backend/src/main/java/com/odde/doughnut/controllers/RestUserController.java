@@ -3,6 +3,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.json.CurrentUserInfo;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.Authorization;
@@ -35,11 +36,6 @@ record RestUserController(ModelFactoryService modelFactoryService,
         currentUserFetcher.getUser().getAuthorization().assertAuthorization(user);
         modelFactoryService.userRepository.save(user);
         return user;
-    }
-
-    static class CurrentUserInfo {
-        public User user;
-        public String externalIdentifier;
     }
 
     @GetMapping("/current-user-info")
