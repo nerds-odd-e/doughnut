@@ -9,43 +9,41 @@ import CircleNoteBuilder from "./CircleNoteBuilder";
 import BazaarNoteBuilder from "./BazaarNotebooksBuilder";
 
 class MakeMe {
-  get links(): LinksBuilder {
+  static get links(): LinksBuilder {
     return new LinksBuilder();
   }
 
-  get aNote(): NoteBuilder {
+  static get aNote(): NoteBuilder {
     return new NoteBuilder();
   }
 
-  get aNotePosition(): NotePositionBuilder {
+  static get aNotePosition(): NotePositionBuilder {
     return new NotePositionBuilder();
   }
 
-  get aReviewPoint(): ReviewPointBuilder {
+  static get aReviewPoint(): ReviewPointBuilder {
     return new ReviewPointBuilder();
   }
 
-  get aLinkViewedByUser(): LinkViewedByUserBuilder {
+  static get aLinkViewedByUser(): LinkViewedByUserBuilder {
     return new LinkViewedByUserBuilder();
   }
 
-  get aRepetition(): RepetitionBuilder {
+  static get aRepetition(): RepetitionBuilder {
     return new RepetitionBuilder();
   }
 
-  get aCircleNote(): CircleNoteBuilder {
+  static get aCircleNote(): CircleNoteBuilder {
     return new CircleNoteBuilder();
   }
 
-  get aNotebook(): NotebookBuilder {
+  static get aNotebook(): NotebookBuilder {
     return new NotebookBuilder();
   }
 
-  get bazaarNotebooks(): BazaarNoteBuilder {
+  static get bazaarNotebooks(): BazaarNoteBuilder {
     return new BazaarNoteBuilder();
   }
 }
 
-const makeMe = new MakeMe();
-
-export default makeMe;
+export default MakeMe;
