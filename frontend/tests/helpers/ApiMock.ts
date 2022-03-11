@@ -1,9 +1,10 @@
-import fetchMock from "jest-fetch-mock";
-import { MockParams } from "jest-fetch-mock";
+import fetchMock, { MockParams } from "jest-fetch-mock";
 
 class ApiMockImpl {
   fetchMock = fetchMock
+
   private unexpectedApiCalls: string[] = []
+
   private expected: {url: string, value: any, response?: MockParams, called: boolean}[] = []
 
   init() {
