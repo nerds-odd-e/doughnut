@@ -1,9 +1,13 @@
 import { merge } from "lodash";
 import { mount } from "@vue/test-utils";
 import { render } from "@testing-library/vue";
-import { DefineComponent } from "vue";
+import { App, DefineComponent } from "vue";
 
 type Options = Record<string, unknown>;
+
+interface VuePlugin {
+    install: (app: App) => void;
+}
 
 class RenderingHelper {
   private comp
@@ -39,7 +43,7 @@ class RenderingHelper {
     return this
   }
 
-  withGlobalPlugin(plugin: any) {
+  withGlobalPlugin(plugin: VuePlugin) {
     this.global = merge(this.global, {plugins: [plugin]})
     return this
   }
@@ -49,7 +53,7 @@ class RenderingHelper {
     return this
   }
 
-  currentRoute(route: any) {
+  currentRoute(route: Record<string, string>) {
     this.route = route
     return this
   }
