@@ -195,7 +195,7 @@ Cypress.Commands.add('jumpToNotePage', (noteTitle, forceLoadPage) => {
             cy.window().then(win=> {
               if(!!win.router && !forceLoadPage && !firstVisited) {
                     const noteId = seededNoteIdMap[noteTitle]
-                    const r = win.router.push({name: "noteShow", params: {noteId}, query: {time: Date.now()}})
+                    const r = win.router.push({name: "noteShow", params: {rawNoteId: noteId}, query: {time: Date.now()}})
                     cy.get(".modal-body").should("not.exist")
                     return
               }
