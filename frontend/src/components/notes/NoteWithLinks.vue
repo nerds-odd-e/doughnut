@@ -4,7 +4,7 @@
     class="note-body"
     v-bind="{ id: note.id, updatedAt: note.textContent?.updatedAt }"
   >
-    <NoteFrameOfLinks v-bind="{ links: note.links }">
+    <NoteFrameOfLinks v-bind="{ links }">
       <NoteContent v-bind="{ note }" />
     </NoteFrameOfLinks>
   </NoteShell>
@@ -35,6 +35,9 @@ export default defineComponent({
   computed: {
     note() {
       return this.piniaStore.getNoteById(this.noteId);
+    },
+    links() {
+      return this.piniaStore.getLinksById(this.noteId);
     },
   }
 });
