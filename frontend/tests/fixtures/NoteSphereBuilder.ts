@@ -1,13 +1,7 @@
 import { merge } from "lodash";
 import Builder from "./Builder";
+import generateId from "./generateId";
 import LinkBuilder from "./LinkBuilder";
-
-let idCounter = 1;
-
-const generateId = () => {
-  idCounter += 1;
-  return idCounter;
-}
 
 class NoteSphereBuilder extends Builder<Generated.NoteSphere> {
   data: Generated.NoteSphere;

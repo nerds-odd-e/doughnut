@@ -1,12 +1,6 @@
 import Builder from "./Builder";
+import generateId from "./generateId";
 import NotebookBuilder from "./NotebookBuilder";
-
-let idCounter = 1;
-
-const generateId = () => {
-	idCounter += 1;
-	return idCounter.toString();
-}
 
 class CircleNoteBuilder extends Builder {
   data: any;

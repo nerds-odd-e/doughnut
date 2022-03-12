@@ -1,13 +1,7 @@
 import { merge } from "lodash";
 import Builder from "./Builder";
+import generateId from "./generateId";
 import NotePositionBuilder from "./NotePositionBuilder"
-
-let idCounter = 1;
-
-const generateId = () => {
-  idCounter += 1;
-  return idCounter;
-}
 
 class ReviewPointBuilder extends Builder<Generated.ReviewPointViewedByUser> {
   data: any

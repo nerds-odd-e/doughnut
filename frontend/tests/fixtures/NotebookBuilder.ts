@@ -1,12 +1,6 @@
 import Builder from "./Builder";
+import generateId from "./generateId";
 import NoteSphereBuilder from "./NoteSphereBuilder";
-
-let idCounter = 1;
-
-const generateId = () => {
-	idCounter += 1;
-	return idCounter.toString();
-}
 
 class NotebookBuilder extends Builder {
   data: any;

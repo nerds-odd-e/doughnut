@@ -31,7 +31,7 @@
       >
         <div v-if="!option.picture">{{ option.display }}</div>
         <div v-else>
-          <ShowPicture :notePicture="option.note.notePicture" :pictureMask="option.note.noteAccessories.pictureMask" :opacity="1" />
+          <ShowPicture :notePicture="option.note.note.notePicture" :pictureMask="option.note.note.noteAccessories.pictureMask" :opacity="1" />
         </div>
       </button>
     </div>
@@ -57,28 +57,38 @@
   </div>
 </template>
 
-<script setup>
+<script lang="ts">
+import { defineComponent, PropType } from "vue";
 import BasicBreadcrumb from "../commons/BasicBreadcrumb.vue";
 import ShowPicture from "../notes/ShowPicture.vue";
 import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
 import TextInput from "../form/TextInput.vue";
 import { computed } from "@vue/runtime-core";
 
-const props = defineProps({
-  reviewPointViewedByUser: Object,
-  quizQuestion: Object,
-  emptyAnswer: Object,
-});
-const emits = defineEmits(["answer"]);
-const sourceNote = computed(() => {
-  if (!!props.reviewPointViewedByUser.noteWithPosition)
-    return props.reviewPointViewedByUser.noteWithPosition.note;
-  return props.reviewPointViewedByUser.linkViewedByUser.sourceNoteWithPosition.note;
-});
-const pictureQuestion = computed(() => {
-  return props.quizQuestion.questionType === "PICTURE_TITLE";
-});
-const processForm = () => {
-  emits("answer", props.emptyAnswer);
-};
+export default defineComponent({
+  props:{
+    reviewPointViewedByUser: { type: Object as PropType<Generated.ReviewPointViewedByUser>, required: true},
+    quizQuestion: { type: Object as PropType<Generated.QuizQuestion>, required: true},
+    emptyAnswer: Object,
+  },
+  components: {
+    BasicBreadcrumb, ShowPicture, NoteFrameOfLinks, TextInput
+  },
+  emits: ["answer"],
+  computed: {
+    sourceNote(): Generated.Note {
+      if (!!this.reviewPointViewedByUser.noteWithPosition)
+        return this.reviewPointViewedByUser.noteWithPosition.note.note;
+      return this.reviewPointViewedByUser.linkViewedByUser!.sourceNoteWithPosition.note.note;
+    },
+    pictureQuestion() {
+      return this.quizQuestion.questionType === "PICTURE_TITLE";
+    },
+  },
+  methods: {
+    processForm() {
+      this.$emit("answer", this.emptyAnswer);
+    }
+  }
+})
 </script>
