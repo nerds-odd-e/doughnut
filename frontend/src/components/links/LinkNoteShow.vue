@@ -1,6 +1,6 @@
 <template>
   <Breadcrumb v-bind="notePosition" />
-  <Card :note="note">
+  <Card :note="note.note">
     <template #button="{ note }">
       <button
         class="source_btn btn btn-sm btn-secondary"
@@ -14,14 +14,18 @@
   </Card>
 </template>
 
-<script>
+<script lang="ts">
 import Breadcrumb from "../notes/Breadcrumb.vue";
 import NoteWithLinks from "../notes/NoteWithLinks.vue";
 import Card from "../notes/Card.vue";
+import { defineComponent, PropType } from "vue";
 
-export default {
+export default defineComponent({
   name: "LinkNoteShow",
-  props: { note: Object, notePosition: Object },
+  props: {
+    note: Object as PropType<Generated.NoteSphere>,
+    notePosition: Object as PropType<Generated.NotePositionViewedByUser>
+  },
   components: { Breadcrumb, NoteWithLinks, Card },
-};
+});
 </script>

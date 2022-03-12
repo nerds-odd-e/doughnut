@@ -16,14 +16,15 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, PropType } from "vue";
 import LinkNoteShow from "./LinkNoteShow.vue";
 
-export default {
+export default defineComponent({
   props: {
-    sourceNoteWithPosition: { tyep: Object, required: true },
-    targetNoteWithPosition: { type: Object, required: true },
+    sourceNoteWithPosition: { tyep: Object as PropType<Generated.NoteWithPosition>, required: true },
+    targetNoteWithPosition: { type: Object as PropType<Generated.NoteWithPosition>, required: true },
   },
   components: { LinkNoteShow },
-};
+});
 </script>
