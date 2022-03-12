@@ -62,7 +62,7 @@ class RestNoteControllerTests {
             makeMe.aBazaarNodebook(note.getNotebook()).please();
             makeMe.refresh(userModel.getEntity());
             final NotesBulk show = controller.show(note);
-            assertThat(show.notes.get(0).getTitle(), equalTo(note.getTitle()));
+            assertThat(show.notes.get(0).getNote().getTitle(), equalTo(note.getTitle()));
             assertThat(show.notePosition.getOwns(), is(false));
         }
 

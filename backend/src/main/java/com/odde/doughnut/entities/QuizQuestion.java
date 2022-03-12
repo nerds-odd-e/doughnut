@@ -82,7 +82,7 @@ public class QuizQuestion {
         }
 
         public String getDisplay() {
-            return note.getTitle();
+            return note.getNote().getTitle();
         }
     }
 

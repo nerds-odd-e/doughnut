@@ -28,15 +28,8 @@ public class NoteViewer {
     public NoteSphere toJsonObject() {
         NoteSphere nvb = new NoteSphere();
         nvb.setId(note.getId());
-        nvb.setParentId(note.getParentId());
-        nvb.setTitle(note.getTitle());
-        nvb.setShortDescription(note.getShortDescription());
-        nvb.setNotePicture(note.getNotePicture());
-        nvb.setCreatedAt(note.getCreatedAt());
-        nvb.setNoteAccessories(note.getNoteAccessories());
         nvb.setLinks(getAllLinks());
         nvb.setChildrenIds(note.getChildren().stream().map(Note::getId).toList());
-        nvb.setTextContent(note.getTextContent());
         nvb.setNote(note);
 
         return nvb;
