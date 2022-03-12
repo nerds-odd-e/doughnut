@@ -14,14 +14,14 @@ import LinkType from "./LinkType.vue"
 export default {
 
   props: {
-    note: Object,
+    links: Object,
     mindmapSector: Object,
     mindmap: Object,
   },
   components: { LinkType },
   computed: {
-    directLinks() { return new LinksReader(this.note.links).directLinks },
-    reverseLinks() { return new LinksReader(this.note.links).reverseLinks },
+    directLinks() { return new LinksReader(this.links).directLinks },
+    reverseLinks() { return new LinksReader(this.links).reverseLinks },
     directLinkTypeCount() { return Object.keys(this.directLinks).length },
     reverseLinkTypeCount() { return Object.keys(this.reverseLinks).length },
 

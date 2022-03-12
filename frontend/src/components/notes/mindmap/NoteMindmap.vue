@@ -29,9 +29,9 @@
       </template>
     </NoteMindmapScaffold>
     <NoteMindmapScaffold v-bind="{ noteId, mindmapSector}">
-      <template #default="{note, mindmapSector}">
+      <template #default="{links, mindmapSector}">
         <NoteLinks v-bind="{
-            note,
+            links,
             mindmap,
             mindmapSector,
           }"

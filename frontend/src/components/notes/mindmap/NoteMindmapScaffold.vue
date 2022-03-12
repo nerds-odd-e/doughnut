@@ -1,6 +1,6 @@
 <template>
   <template v-if="note">
-    <slot v-bind="{ note, mindmapSector }"/>
+    <slot v-bind="{ note, links, mindmapSector }"/>
     <NoteMindmapScaffold
       v-for="(childId, index) in childrenIds"
       v-bind="{
@@ -9,8 +9,8 @@
       }"
       :key="childId"
     >
-      <template #default="{note, mindmapSector}">
-        <slot v-bind="{ note, mindmapSector }"/>
+      <template #default="{note, links, mindmapSector}">
+        <slot v-bind="{ note, links, mindmapSector }"/>
       </template>
     </NoteMindmapScaffold>
   </template>
@@ -32,6 +32,9 @@ export default ({
   computed: {
     note() {
       return this.piniaStore.getNoteById(this.noteId);
+    },
+    links() {
+      return this.piniaStore.getLinksById(this.noteId);
     },
     childrenIds() {
       return this.piniaStore.getChildrenIdsByParentId(this.noteId);
