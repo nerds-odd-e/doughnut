@@ -44,15 +44,15 @@ describe('repeat page', () => {
   });
 
   it('minimized view', async () => {
-    const note = makeMe.aNote.please();
-    const reviewPoint = makeMe.aReviewPoint.ofNote(note).please();
+    const noteSphere = makeMe.aNote.please();
+    const reviewPoint = makeMe.aReviewPoint.ofNote(noteSphere).please();
     helper.apiMock.expecting('/api/reviews/initial', reviewPoint)
     const wrapper = renderer.withProps({nested: true}).currentRoute({ name: 'initial' }).mount()
     await flushPromises();
     expect(mockRouterPush).toHaveBeenCalledTimes(0);
     expect(wrapper.findAll('.initial-review-container')).toHaveLength(1);
     expect(wrapper.find('.review-point-abbr span').text()).toContain(
-      note.title
+      noteSphere.title
     );
   });
 });

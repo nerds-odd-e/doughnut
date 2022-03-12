@@ -2,17 +2,19 @@ import MindmapSector from "./MindmapSector"
 import LinksReader from "./LinksReader";
 import { Coord, StraightConnection, Vector } from "./MindmapUnits";
 import MindmapMetrics from "./MindmapMetrics";
+import LegacyNote from "../store/LegacyNote";
 
+type NoteFinder = (id: number) => LegacyNote | undefined
 class Mindmap {
     rootMindmapSector: MindmapSector
 
-    rootNoteId: number | string
+    rootNoteId: number
 
-    noteFinder: (id: number | string) => any
+    noteFinder
 
     metrics: MindmapMetrics
 
-    constructor(scale: number, rootMindmapSector: MindmapSector, rootNoteId: number | string, noteFinder: (id: number | string)=>any, boxWidth: number, boxHeight: number) {
+    constructor(scale: number, rootMindmapSector: MindmapSector, rootNoteId: number, noteFinder: NoteFinder, boxWidth: number, boxHeight: number) {
       this.rootMindmapSector = rootMindmapSector
       this.rootNoteId = rootNoteId
       this.noteFinder = noteFinder
@@ -33,11 +35,11 @@ class Mindmap {
       return this.metrics.straighConnection(sector.connectionFromParent)
     }
 
-    linkToTargetNote(from: Vector, link: any): string | undefined {
-      const note = this.noteFinder(link.targetNote.id)
+    linkToTargetNote(from: Vector, link: Generated.Link): string | undefined {
+      const noteLegacy = this.noteFinder(link.targetNote.id)
       const targetSector = this.getNoteSctor(link.targetNote.id)
       if (!targetSector) return undefined
-      const {reverseLinkTypes} = new LinksReader(note.links)
+      const {reverseLinkTypes} = new LinksReader(noteLegacy!.links)
       const inSlot = this.metrics.borderVector(targetSector.inSlot(reverseLinkTypes.length, reverseLinkTypes.indexOf(link.typeId)))
       return this.metrics.linkVectors(from, inSlot)
     }
@@ -50,7 +52,7 @@ class Mindmap {
       return this.metrics.borderVector(from.inSlot(connectorCount, connectorIndex))
     }
 
-    getNoteSctor(noteId: number | string): MindmapSector | undefined {
+    getNoteSctor(noteId: number): MindmapSector | undefined {
       const ancestors = this.ancestorsUntilRoot(noteId)
       if(!ancestors) return undefined
       let sector = this.rootMindmapSector
@@ -60,11 +62,12 @@ class Mindmap {
       return sector
     }
 
-    ancestorsUntilRoot(noteId: number | string) : Array<any> | undefined {
+    ancestorsUntilRoot(noteId: number) : Array<LegacyNote> | undefined {
       const note = this.noteFinder(noteId)
+      if (!note) return undefined
       if(noteId.toString() === this.rootNoteId.toString()) return [note]
       if (!note.parentId) return undefined
-      return this.ancestorsUntilRoot(note.parentId)?.concat([note])
+      return this.ancestorsUntilRoot(note!.parentId)?.concat([note])
     }
 
 }

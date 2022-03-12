@@ -54,24 +54,26 @@
 </template>
 
 <script lang="ts">
+import { defineComponent, PropType } from "vue";
 import NoteMindmapScaffold from "./NoteMindmapScaffold.vue";
 import NoteCard from "./NoteCard.vue";
 import NoteParentChildConnection from "./NoteParentChildConnection.vue";
 import NoteLinks from "./NoteLinks.vue";
-import MindmapSector from "@/models/MindmapSector";
-import Mindmap from "@/models/Mindmap";
 import useStoredLoadingApi from "../../../managedApi/useStoredLoadingApi";
+import MindmapSector from "../../../models/MindmapSector";
+import Mindmap from "../../../models/Mindmap";
+import MindmapOffset from "../../../models/MindmapOffset";
 
-export default ({
+export default defineComponent({
   setup() {
     return useStoredLoadingApi();
   },
   name: "NoteMindmap",
   props: {
     highlightNoteId: [String, Number],
-    noteId: [String, Number],
+    noteId: {type: Number, required: true},
     expandChildren: Boolean,
-    offset: Object,
+    offset: {type: Object as PropType<MindmapOffset>, required: true}
   },
   components: {
     NoteMindmapScaffold,
@@ -88,7 +90,7 @@ export default ({
         this.offset.scale,
         this.mindmapSector,
         this.noteId,
-        this.piniaStore.getNoteById,
+        this.piniaStore.getNoteByIdLegacy,
         150,
         50
       )

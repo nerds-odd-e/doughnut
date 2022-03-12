@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-03-11 19:26:12.
+// Generated using typescript-generator version 2.35.1025 on 2022-03-12 14:36:04.
 
 declare namespace Generated {
 
@@ -108,6 +108,7 @@ declare namespace Generated {
     interface Note {
         id: number;
         noteAccessories: NoteAccessories;
+        textContent: TextContent;
         createdAt: string;
         title: string;
         notePicture?: string;

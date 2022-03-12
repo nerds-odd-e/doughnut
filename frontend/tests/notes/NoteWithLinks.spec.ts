@@ -47,33 +47,33 @@ describe('in place edit on title', () => {
   });
 
   it('should back to label when blur text field title', async () => {
-    const noteParent = makeMe.aNote.title('Dummy Title').please();
-    helper.store.loadNotes([noteParent]);
+    const noteParentSphere = makeMe.aNote.title('Dummy Title').please();
+    helper.store.loadNotes([noteParentSphere]);
 
-    const wrapper = helper.component(NoteWithLinks).withProps({noteId: noteParent.id}).mount()
+    const wrapper = helper.component(NoteWithLinks).withProps({noteId: noteParentSphere.id}).mount()
 
     await wrapper.find('[role="title"]').trigger('click');
     await wrapper.find('[role="title"] input').setValue('updated');
     await wrapper.find('[role="title"] input').trigger('blur');
 
-    helper.apiMock.verifyCall(`/api/text_content/${noteParent.id}`, expect.objectContaining({ method: 'PATCH' })
+    helper.apiMock.verifyCall(`/api/text_content/${noteParentSphere.id}`, expect.objectContaining({ method: 'PATCH' })
     );
   });
 });
 
 describe('undo editing', () => {
   it('should call addEditingToUndoHistory on submitChange', async () => {
-    const note = makeMe.aNote.title('Dummy Title').please();
-    helper.store.loadNotes([note]);
+    const noteSphere = makeMe.aNote.title('Dummy Title').please();
+    helper.store.loadNotes([noteSphere]);
 
     const updatedTitle = 'updated';
-    const wrapper = helper.component(NoteWithLinks).withProps({noteId: note.id}).mount()
+    const wrapper = helper.component(NoteWithLinks).withProps({noteId: noteSphere.id}).mount()
 
     await wrapper.find('[role="title"]').trigger('click');
     await wrapper.find('[role="title"] input').setValue(updatedTitle);
     await wrapper.find('[role="title"] input').trigger('blur');
 
     expect(helper.store.peekUndo()).toMatchObject({ type: 'editing' });
-    helper.apiMock.verifyCall(`/api/text_content/${note.id}`)
+    helper.apiMock.verifyCall(`/api/text_content/${noteSphere.id}`)
   });
 });

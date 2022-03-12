@@ -5,11 +5,12 @@
   </form>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 import NoteFormBody from "./NoteFormBody.vue";
 
-export default ({
+export default defineComponent({
   setup() {
     return useStoredLoadingApi({initalLoading: true, hasFormError: true});
   },
@@ -17,11 +18,13 @@ export default ({
   components: {
     NoteFormBody,
   },
-  props: { noteId: [String, Number] },
+  props: { noteId: {type: Number, required: true}},
   emits: ["done"],
   data() {
     return {
       formData: null,
+    } as {
+      formData: any
     };
   },
 
@@ -29,7 +32,7 @@ export default ({
     fetchData() {
       this.storedApi.getNoteAndItsChildren(this.noteId)
       .then((res) => {
-          const { updatedAt, ...rest } = res.notes[0].noteAccessories
+          const { updatedAt, ...rest } = res.notes[0]!.noteAccessories
           this.formData = rest
         }
       )

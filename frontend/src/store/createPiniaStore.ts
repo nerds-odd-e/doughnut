@@ -1,10 +1,11 @@
 import { defineStore } from "pinia";
-
+import LegacyNote from "./LegacyNote";
+import Links from "./Links";
 
 interface State {
   notebooks: Generated.Notebook[]
   notes: {[id: number]: Generated.NoteSphere }
-  links: {[id: number]: { [P in Generated.LinkType]?: Generated.LinkViewed } }
+  links: {[id: number]: Links }
   parentChildrenIds: {[id: number]: number[] }
   highlightNoteId: number | undefined
   noteUndoHistories: any[]
@@ -71,6 +72,13 @@ export default defineStore('main', {
     getters: {
         getHighlightNote: (state: State)   => () => withState(state).getNoteById(state.highlightNoteId),
         getNoteById: (state)        => (id: number) => withState(state).getNoteById(id),
+        getNoteByIdLegacy: (state)        => (id: number): LegacyNote | undefined => {
+          const note = withState(state).getNoteById(id)
+          if(!note) return undefined
+          // const {parentId} = note
+          // const links = withState(state).getLinksById(id)
+          return note // { parentId, links }
+        },
         getLinksById: (state)        => (id: number) => withState(state).getLinksById(id),
         peekUndo: (state)           => () => {
           if(state.noteUndoHistories.length === 0) return null
@@ -93,11 +101,13 @@ export default defineStore('main', {
           }
           this.noteUndoHistories.pop();
         },
-        loadNotes(notes: Generated.NoteSphere[]) {
-          notes.forEach((note) => {
-            this.notes[note.id] = note;
-            this.links[note.id] = note.links;
-            this.parentChildrenIds[note.id] = note.childrenIds;
+        loadNotes(noteSpheres: Generated.NoteSphere[]) {
+
+          noteSpheres.forEach((noteSphere) => {
+            const {id} = noteSphere;
+            this.notes[id] = noteSphere;
+            this.links[id] = noteSphere.links;
+            this.parentChildrenIds[id] = noteSphere.childrenIds;
           });
         },
         deleteNote(noteId: number) {

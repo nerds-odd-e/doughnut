@@ -45,13 +45,17 @@
   />
 </template>
 
-<script setup>
+<script lang="ts">
+import { defineComponent } from "vue";
 import TextInput from "../form/TextInput.vue";
 import CheckInput from "../form/CheckInput.vue";
 import ImageInput from "../form/ImageInput.vue";
 
-const props = defineProps({
-  modelValue: { type: Object, required: true },
-  errors: { type: Object, default: {} },
+export default defineComponent({
+  props: {
+    modelValue: { type: Object, required: true },
+    errors: { type: Object, default: {} },
+  },
+  components: { TextInput, CheckInput, ImageInput }
 });
 </script>

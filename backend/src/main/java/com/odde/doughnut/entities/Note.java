@@ -39,7 +39,6 @@ public class Note {
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "text_content_id", referencedColumnName = "id")
-    @JsonIgnore
     @Getter
     @Setter
     private TextContent textContent = new TextContent();
