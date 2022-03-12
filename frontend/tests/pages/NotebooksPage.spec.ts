@@ -24,7 +24,7 @@ describe('Notebooks Page', () => {
 
   it('show undo when there is something to undo', async () => {
     const notebook = makeMe.aNotebook.please();
-    helper.store.loadNotes([notebook.headNote]);
+    helper.store.loadNoteSpheres([notebook.headNote]);
     helper.store.deleteNote(notebook.headNote.id);
     helper.apiMock.expecting('/api/notebooks', {
         notebooks: [],

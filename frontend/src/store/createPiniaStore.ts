@@ -102,7 +102,7 @@ export default defineStore('main', {
           }
           this.noteUndoHistories.pop();
         },
-        loadNotes(noteSpheres: Generated.NoteSphere[]) {
+        loadNoteSpheres(noteSpheres: Generated.NoteSphere[]) {
 
           noteSpheres.forEach((noteSphere) => {
             const {id} = noteSphere.note;

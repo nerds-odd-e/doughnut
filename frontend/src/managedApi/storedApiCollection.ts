@@ -6,11 +6,11 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
     if (!data) return;
     const { noteWithPosition, linkViewedByUser } = data;
     if (noteWithPosition) {
-      piniaStore.loadNotes([noteWithPosition.note]);
+      piniaStore.loadNoteSpheres([noteWithPosition.note]);
     }
     if (linkViewedByUser) {
-      piniaStore.loadNotes([linkViewedByUser.sourceNoteWithPosition.note])
-      piniaStore.loadNotes([linkViewedByUser.targetNoteWithPosition.note])
+      piniaStore.loadNoteSpheres([linkViewedByUser.sourceNoteWithPosition.note])
+      piniaStore.loadNoteSpheres([linkViewedByUser.targetNoteWithPosition.note])
     }
   }
 
@@ -20,7 +20,7 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
       `text_content/${noteId}`,
       data
     ) as Generated.NoteSphere;
-    piniaStore.loadNotes([res]);
+    piniaStore.loadNoteSpheres([res]);
     return res;
   }
 
@@ -56,13 +56,13 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
 
     async getNoteWithDescendents(noteId: number) {
       const res = await managedApi.restGet(`notes/${noteId}/overview`) as Generated.NotesBulk;
-      piniaStore.loadNotes(res.notes);
+      piniaStore.loadNoteSpheres(res.notes);
       return res;
     },
 
     async getNoteAndItsChildren(noteId: number) {
       const res = await managedApi.restGet(`notes/${noteId}`) as Generated.NotesBulk;
-      piniaStore.loadNotes(res.notes);
+      piniaStore.loadNoteSpheres(res.notes);
       return res;
     },
 
@@ -89,7 +89,7 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
         `notes/${parentId}/create`,
         data
       ) as Generated.NotesBulk;
-      piniaStore.loadNotes(res.notes);
+      piniaStore.loadNoteSpheres(res.notes);
       return res;
     },
 
@@ -98,19 +98,19 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
         `links/create/${sourceId}/${targetId}`,
         data
       ) as Generated.NotesBulk;
-      piniaStore.loadNotes(res.notes);
+      piniaStore.loadNoteSpheres(res.notes);
       return res;
     },
 
     async updateLink(linkId: number, data: any) {
       const res = await managedApi.restPost(`links/${linkId}`, data) as Generated.NotesBulk;
-      piniaStore.loadNotes(res.notes);
+      piniaStore.loadNoteSpheres(res.notes);
       return res;
     },
 
     async deleteLink(linkId: number) {
       const res = await managedApi.restPost(`links/${linkId}/delete`, {}) as Generated.NotesBulk;
-      piniaStore.loadNotes(res.notes);
+      piniaStore.loadNoteSpheres(res.notes);
       return res;
     },
 
@@ -120,7 +120,7 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
         `notes/${noteId}`,
         data
       ) as Generated.NoteSphere;
-      piniaStore.loadNotes([res]);
+      piniaStore.loadNoteSpheres([res]);
       return res;
     },
 
@@ -142,7 +142,7 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
         `notes/${history.noteId}/undo-delete`,
         {}
       ) as Generated.NotesBulk;
-      piniaStore.loadNotes(res.notes);
+      piniaStore.loadNoteSpheres(res.notes);
       if (res.notes[0].note.parentId === null) {
         this.getNotebooks();
       }

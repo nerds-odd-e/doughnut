@@ -16,7 +16,7 @@ describe('storedApiCollection', () => {
   describe('delete note', () => {
     beforeEach(() => {
       fetch.mockResponseOnce(JSON.stringify({}));
-      store.loadNotes([note]);
+      store.loadNoteSpheres([note]);
     });
 
     it('should call the api', async () => {
@@ -35,14 +35,14 @@ describe('storedApiCollection', () => {
 
     it('should remove children notes', async () => {
       const child = makeMe.aNote.under(note).please();
-      store.loadNotes([child]);
+      store.loadNoteSpheres([child]);
       await sa.deleteNote(note.id);
       expect(store.getNoteById(child.id)).toBeUndefined();
     });
 
     it('should remove child from list', async () => {
       const child = makeMe.aNote.under(note).please();
-      store.loadNotes([child]);
+      store.loadNoteSpheres([child]);
       const childrenCount = store.getChildrenIdsByParentId(note.id).length;
       await sa.deleteNote(child.id);
       expect(store.getChildrenIdsByParentId(note.id)).toHaveLength(

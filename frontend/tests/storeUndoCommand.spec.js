@@ -9,7 +9,7 @@ describe('storeUndoCommand', () => {
 
   describe('addEditingToUndoHistory', () => {
     beforeEach(() => {
-      store.loadNotes([note]);
+      store.loadNoteSpheres([note]);
     });
 
     it('should push textContent into store state noteUndoHistories ', () => {
@@ -24,7 +24,7 @@ describe('storeUndoCommand', () => {
     let initialUndoCount;
 
     beforeEach(() => {
-      store.loadNotes([note]);
+      store.loadNoteSpheres([note]);
       store.addEditingToUndoHistory(mockUpdatedNote);
       initialUndoCount = store.noteUndoHistories.length;
     });

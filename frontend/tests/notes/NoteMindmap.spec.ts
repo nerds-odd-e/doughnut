@@ -14,7 +14,7 @@ describe('note mindmap', () => {
   });
 
   const getMountedElement = (noteId: number, props = {}) => {
-    helper.store.loadNotes(notes);
+    helper.store.loadNoteSpheres(notes);
     return helper.component(NoteMinmap).withProps({ noteId, offset: { scale: 1, rotate: 0 }, ...props }).mount()
   };
 
