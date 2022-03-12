@@ -37,6 +37,7 @@ public class NoteViewer {
         nvb.setLinks(getAllLinks());
         nvb.setChildrenIds(note.getChildren().stream().map(Note::getId).toList());
         nvb.setTextContent(note.getTextContent());
+        nvb.setNote(note);
 
         return nvb;
     }

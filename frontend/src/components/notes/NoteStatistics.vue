@@ -18,11 +18,11 @@
     <div v-if="statistics.note">
       <label>Created:</label>
       <span class="statistics-value">{{
-        new Date(statistics.note.createdAt).toLocaleString()
+        new Date(statistics.note.note.createdAt).toLocaleString()
       }}</span>
       <label>Last Content Updated:</label>
       <span class="statistics-value">{{
-        new Date(statistics.note.textContent.updatedAt).toLocaleString()
+        new Date(statistics.note.note.textContent.updatedAt).toLocaleString()
       }}</span>
     </div>
 

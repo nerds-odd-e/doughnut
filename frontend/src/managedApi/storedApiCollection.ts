@@ -143,7 +143,7 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
         {}
       ) as Generated.NotesBulk;
       piniaStore.loadNotes(res.notes);
-      if (res.notes[0].parentId === null) {
+      if (res.notes[0].note.parentId === null) {
         this.getNotebooks();
       }
       return res;

@@ -4,7 +4,7 @@ import Links from "./Links";
 
 interface State {
   notebooks: Generated.Notebook[]
-  notes: {[id: number]: Generated.NoteSphere }
+  notes: {[id: number]: Generated.Note }
   links: {[id: number]: Links }
   parentChildrenIds: {[id: number]: number[] }
   highlightNoteId: number | undefined
@@ -75,9 +75,10 @@ export default defineStore('main', {
         getNoteByIdLegacy: (state)        => (id: number): LegacyNote | undefined => {
           const note = withState(state).getNoteById(id)
           if(!note) return undefined
-          // const {parentId} = note
-          // const links = withState(state).getLinksById(id)
-          return note // { parentId, links }
+          const {parentId} = note
+          const links = withState(state).getLinksById(id)
+          const childrenIds = withState(state).getChildrenIdsByParentId(id)
+          return {id, parentId, links, childrenIds }
         },
         getLinksById: (state)        => (id: number) => withState(state).getLinksById(id),
         peekUndo: (state)           => () => {
@@ -104,8 +105,8 @@ export default defineStore('main', {
         loadNotes(noteSpheres: Generated.NoteSphere[]) {
 
           noteSpheres.forEach((noteSphere) => {
-            const {id} = noteSphere;
-            this.notes[id] = noteSphere;
+            const {id} = noteSphere.note;
+            this.notes[id] = noteSphere.note;
             this.links[id] = noteSphere.links;
             this.parentChildrenIds[id] = noteSphere.childrenIds;
           });

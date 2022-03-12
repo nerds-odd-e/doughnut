@@ -52,7 +52,7 @@ describe('repeat page', () => {
     expect(mockRouterPush).toHaveBeenCalledTimes(0);
     expect(wrapper.findAll('.initial-review-container')).toHaveLength(1);
     expect(wrapper.find('.review-point-abbr span').text()).toContain(
-      noteSphere.title
+      noteSphere.note.title
     );
   });
 });

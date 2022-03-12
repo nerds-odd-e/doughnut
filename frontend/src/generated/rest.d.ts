@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-03-12 14:36:04.
+// Generated using typescript-generator version 2.35.1025 on 2022-03-12 15:09:45.
 
 declare namespace Generated {
 
@@ -33,15 +33,9 @@ declare namespace Generated {
 
     interface NoteSphere {
         id: number;
-        parentId?: number;
-        title: string;
-        shortDescription: string;
-        notePicture?: string;
-        createdAt: string;
-        noteAccessories: NoteAccessories;
         links: { [P in LinkType]?: LinkViewed };
         childrenIds: number[];
-        textContent: TextContent;
+        note: Note;
     }
 
     interface NoteWithPosition {
@@ -116,22 +110,6 @@ declare namespace Generated {
         parentId?: number;
     }
 
-    interface NoteAccessories {
-        url: string;
-        urlIsVideo: boolean;
-        pictureUrl: string;
-        pictureMask: string;
-        useParentPicture: boolean;
-        skipReview: boolean;
-        updatedAt: string;
-    }
-
-    interface TextContent {
-        title: string;
-        description: string;
-        updatedAt: string;
-    }
-
     interface Subscription {
         id: number;
         dailyTargetOfNewNotes: number;
@@ -180,6 +158,22 @@ declare namespace Generated {
     interface Ownership {
         id: number;
         circle: Circle;
+    }
+
+    interface NoteAccessories {
+        url: string;
+        urlIsVideo: boolean;
+        pictureUrl: string;
+        pictureMask: string;
+        useParentPicture: boolean;
+        skipReview: boolean;
+        updatedAt: string;
+    }
+
+    interface TextContent {
+        title: string;
+        description: string;
+        updatedAt: string;
     }
 
     interface Option {

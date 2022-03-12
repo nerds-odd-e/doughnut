@@ -1,6 +1,8 @@
 package com.odde.doughnut.entities.json;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.entities.Link;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteAccessories;
 import com.odde.doughnut.entities.TextContent;
 import lombok.Getter;
@@ -18,26 +20,32 @@ public class NoteSphere {
 
     @Getter
     @Setter
+    @JsonIgnore
     private Optional<Integer> parentId;
 
     @Getter
     @Setter
+    @JsonIgnore
     private String title;
 
     @Getter
     @Setter
+    @JsonIgnore
     private String shortDescription;
 
     @Getter
     @Setter
+    @JsonIgnore
     private Optional<String> notePicture;
 
     @Getter
     @Setter
+    @JsonIgnore
     private Timestamp createdAt;
 
     @Getter
     @Setter
+    @JsonIgnore
     private NoteAccessories noteAccessories;
 
     @Getter
@@ -50,6 +58,11 @@ public class NoteSphere {
 
     @Getter
     @Setter
+    @JsonIgnore
     private TextContent textContent;
+
+    @Getter
+    @Setter
+    private Note note;
 
 }
