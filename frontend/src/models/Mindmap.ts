@@ -2,9 +2,9 @@ import MindmapSector from "./MindmapSector"
 import LinksReader from "./LinksReader";
 import { Coord, StraightConnection, Vector } from "./MindmapUnits";
 import MindmapMetrics from "./MindmapMetrics";
-import LegacyNote from "../store/LegacyNote";
+import MinimumNoteSphere from "../store/MinimumNoteSphere";
 
-type NoteFinder = (id: number) => LegacyNote | undefined
+type NoteFinder = (id: number) => MinimumNoteSphere | undefined
 class Mindmap {
     rootMindmapSector: MindmapSector
 
@@ -62,7 +62,7 @@ class Mindmap {
       return sector
     }
 
-    ancestorsUntilRoot(noteId: number) : Array<LegacyNote> | undefined {
+    ancestorsUntilRoot(noteId: number) : Array<MinimumNoteSphere> | undefined {
       const note = this.noteFinder(noteId)
       if (!note) return undefined
       if(noteId.toString() === this.rootNoteId.toString()) return [note]

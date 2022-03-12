@@ -1,10 +1,10 @@
 import Links from "./Links";
 
-interface LegacyNote {
+interface MinimumNoteSphere {
   id: number,
   parentId: number | undefined
   links: Links | undefined
   childrenIds: number[]
 }
 
-export default LegacyNote
+export default MinimumNoteSphere

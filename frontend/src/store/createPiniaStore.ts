@@ -1,5 +1,5 @@
 import { defineStore } from "pinia";
-import LegacyNote from "./LegacyNote";
+import MinimumNoteSphere from "./MinimumNoteSphere";
 import Links from "./Links";
 
 interface State {
@@ -72,7 +72,7 @@ export default defineStore('main', {
     getters: {
         getHighlightNote: (state: State)   => () => withState(state).getNoteById(state.highlightNoteId),
         getNoteById: (state)        => (id: number) => withState(state).getNoteById(id),
-        getNoteByIdLegacy: (state)        => (id: number): LegacyNote | undefined => {
+        getNoteByIdLegacy: (state)        => (id: number): MinimumNoteSphere | undefined => {
           const note = withState(state).getNoteById(id)
           if(!note) return undefined
           const {parentId} = note
