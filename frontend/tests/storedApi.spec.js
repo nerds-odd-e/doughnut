@@ -10,7 +10,7 @@ beforeEach(() => {
 });
 
 describe('storedApiCollection', () => {
-  const note = makeMe.aNote.please();
+  const note = makeMe.aNoteSphere.please();
   const sa = useStoredLoadingApi().storedApi;
 
   describe('delete note', () => {
@@ -34,14 +34,14 @@ describe('storedApiCollection', () => {
     });
 
     it('should remove children notes', async () => {
-      const child = makeMe.aNote.under(note).please();
+      const child = makeMe.aNoteSphere.under(note).please();
       store.loadNoteSpheres([child]);
       await sa.deleteNote(note.id);
       expect(store.getNoteById(child.id)).toBeUndefined();
     });
 
     it('should remove child from list', async () => {
-      const child = makeMe.aNote.under(note).please();
+      const child = makeMe.aNoteSphere.under(note).please();
       store.loadNoteSpheres([child]);
       const childrenCount = store.getChildrenIdsByParentId(note.id).length;
       await sa.deleteNote(child.id);

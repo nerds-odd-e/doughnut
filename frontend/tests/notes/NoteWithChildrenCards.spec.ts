@@ -10,8 +10,8 @@ describe('note wth child cards', () => {
   it('should render note with one child', async () => {
     helper.reset()
     const notePosition = makeMe.aNotePosition.please();
-    const noteParent = makeMe.aNote.title('parent').please();
-    const noteChild = makeMe.aNote.title('child').under(noteParent).please();
+    const noteParent = makeMe.aNoteSphere.title('parent').please();
+    const noteChild = makeMe.aNoteSphere.title('child').under(noteParent).please();
     helper.store.loadNoteSpheres([noteParent, noteChild]);
     helper.component(NoteCardsView).withProps({ noteId: noteParent.id, notePosition, expandChildren: true }).render()
     expect(screen.getAllByRole('title')).toHaveLength(1);

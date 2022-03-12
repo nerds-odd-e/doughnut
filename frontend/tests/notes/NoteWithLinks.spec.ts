@@ -20,7 +20,7 @@ describe('new/updated pink banner', () => {
   ])(
     'should show fresher color if recently updated',
     (updatedAt, expectedColor) => {
-      const note = makeMe.aNote.textContentUpdatedAt(updatedAt).please();
+      const note = makeMe.aNoteSphere.textContentUpdatedAt(updatedAt).please();
       helper.store.loadNoteSpheres([note]);
 
       const wrapper = helper.component(NoteWithLinks).withProps({noteId: note.id}).mount()
@@ -34,7 +34,7 @@ describe('new/updated pink banner', () => {
 
 describe('in place edit on title', () => {
   it('should display text field when one single click on title', async () => {
-    const noteParent = makeMe.aNote.title('Dummy Title').please();
+    const noteParent = makeMe.aNoteSphere.title('Dummy Title').please();
     helper.store.loadNoteSpheres([noteParent]);
 
     const wrapper = helper.component(NoteWithLinks).withProps({noteId: noteParent.id}).mount()
@@ -47,7 +47,7 @@ describe('in place edit on title', () => {
   });
 
   it('should back to label when blur text field title', async () => {
-    const noteParentSphere = makeMe.aNote.title('Dummy Title').please();
+    const noteParentSphere = makeMe.aNoteSphere.title('Dummy Title').please();
     helper.store.loadNoteSpheres([noteParentSphere]);
 
     const wrapper = helper.component(NoteWithLinks).withProps({noteId: noteParentSphere.id}).mount()
@@ -63,7 +63,7 @@ describe('in place edit on title', () => {
 
 describe('undo editing', () => {
   it('should call addEditingToUndoHistory on submitChange', async () => {
-    const noteSphere = makeMe.aNote.title('Dummy Title').please();
+    const noteSphere = makeMe.aNoteSphere.title('Dummy Title').please();
     helper.store.loadNoteSpheres([noteSphere]);
 
     const updatedTitle = 'updated';

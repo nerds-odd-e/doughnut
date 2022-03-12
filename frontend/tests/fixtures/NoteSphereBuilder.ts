@@ -9,7 +9,7 @@ const generateId = () => {
   return idCounter;
 }
 
-class NoteBuilder extends Builder<Generated.NoteSphere> {
+class NoteSphereBuilder extends Builder<Generated.NoteSphere> {
   data: Generated.NoteSphere;
 
   constructor(parentBuilder?: Builder) {
@@ -44,23 +44,23 @@ class NoteBuilder extends Builder<Generated.NoteSphere> {
     };
   }
 
-  title(value: string): NoteBuilder {
+  title(value: string): NoteSphereBuilder {
     this.data.note.title = value;
     this.data.note.textContent.title = value;
     return this;
   }
 
-  description(value: string): NoteBuilder {
+  description(value: string): NoteSphereBuilder {
     this.data.note.textContent.description = value;
     return this;
   }
 
-  picture(value: string): NoteBuilder {
+  picture(value: string): NoteSphereBuilder {
     this.data.note.notePicture = value;
     return this;
   }
 
-  shortDescription(value: string): NoteBuilder {
+  shortDescription(value: string): NoteSphereBuilder {
     this.data.note.shortDescription = value;
     if (!this.data.note.textContent.description) {
       this.data.note.textContent.description = value;
@@ -68,24 +68,24 @@ class NoteBuilder extends Builder<Generated.NoteSphere> {
     return this;
   }
 
-  under(value: any): NoteBuilder {
+  under(value: any): NoteSphereBuilder {
     value.childrenIds.push(this.data.note.id)
     this.data.note.parentId = value.id
 
     return this;
   }
 
-  textContentUpdatedAt(value: Date): NoteBuilder {
+  textContentUpdatedAt(value: Date): NoteSphereBuilder {
     this.data.note.textContent.updatedAt = value.toJSON();
     return this;
   }
 
-  linkToSomeNote(): NoteBuilder {
+  linkToSomeNote(): NoteSphereBuilder {
     merge(this.data.links, new LinkBuilder(undefined, "using").please());
     return this;
   }
 
-  linkTo(note: any): NoteBuilder {
+  linkTo(note: any): NoteSphereBuilder {
     merge(this.data.links, new LinkBuilder(undefined, "using").from(this.data).to(note).please());
     return this;
   }
@@ -95,4 +95,4 @@ class NoteBuilder extends Builder<Generated.NoteSphere> {
   }
 }
 
-export default NoteBuilder;
+export default NoteSphereBuilder;

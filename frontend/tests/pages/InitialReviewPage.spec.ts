@@ -26,7 +26,7 @@ describe('repeat page', () => {
   });
 
   it('normal view', async () => {
-    const note = makeMe.aNote.please();
+    const note = makeMe.aNoteSphere.please();
     const reviewPoint = makeMe.aReviewPoint
       .ofNote(note)
       .remainingInitialReviewCountForToday(53)
@@ -44,7 +44,7 @@ describe('repeat page', () => {
   });
 
   it('minimized view', async () => {
-    const noteSphere = makeMe.aNote.please();
+    const noteSphere = makeMe.aNoteSphere.please();
     const reviewPoint = makeMe.aReviewPoint.ofNote(noteSphere).please();
     helper.apiMock.expecting('/api/reviews/initial', reviewPoint)
     const wrapper = renderer.withProps({nested: true}).currentRoute({ name: 'initial' }).mount()

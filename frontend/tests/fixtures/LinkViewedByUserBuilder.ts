@@ -1,6 +1,6 @@
 import { merge } from 'lodash';
 import Builder from "./Builder"
-import NoteBuilder from "./NoteBuilder"
+import NoteSphereBuilder from "./NoteSphereBuilder"
 import NotePositionBuilder from "./NotePositionBuilder"
 
 class LinkViewedByUserBuilder extends Builder {
@@ -11,11 +11,11 @@ class LinkViewedByUserBuilder extends Builder {
       id: 8,
       linkTypeLabel: "a link",
       sourceNoteWithPosition: {
-        note: new NoteBuilder().do(),
+        note: new NoteSphereBuilder().do(),
         notePosition: new NotePositionBuilder().do()
       },
       targetNoteWithPosition: {
-        note: new NoteBuilder().do(),
+        note: new NoteSphereBuilder().do(),
         notePosition: new NotePositionBuilder().do()
       }
     });

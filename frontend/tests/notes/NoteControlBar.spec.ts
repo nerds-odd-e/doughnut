@@ -12,7 +12,7 @@ describe('note wth child cards', () => {
   })
 
   it('view note belongs to other people in bazaar', async () => {
-    const note = makeMe.aNote.please();
+    const note = makeMe.aNoteSphere.please();
     const notePosition = makeMe.aNotePosition.inBazaar().please();
     helper.store.loadNoteSpheres([note]);
     helper.component(Breadcrumb).withProps(notePosition).render()

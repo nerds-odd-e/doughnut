@@ -12,7 +12,7 @@ beforeEach(() => {
 
 const stubResponse = {
   reviewPoint: makeMe.aReviewPoint.please(),
-  note: makeMe.aNote.please(),
+  note: makeMe.aNoteSphere.please(),
 };
 
 const stubLinkResponse = {

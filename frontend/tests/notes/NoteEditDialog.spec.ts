@@ -9,7 +9,7 @@ helper.resetWithApiMock(beforeEach, afterEach)
 
 describe('note show', () => {
   it('fetch API to be called ONCE', async () => {
-    const noteSphere = makeMe.aNote.please();
+    const noteSphere = makeMe.aNoteSphere.please();
     const stubResponse = {
       notePosition: makeMe.aNotePosition.please(),
       notes: [noteSphere],

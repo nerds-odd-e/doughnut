@@ -12,7 +12,7 @@ describe('repetition page', () => {
   });
 
   describe('repetition page for a note', () => {
-    const note = makeMe.aNote.please();
+    const note = makeMe.aNoteSphere.please();
     const reviewPointForView = makeMe.aReviewPoint.ofNote(note).please();
 
     it('for note', async () => {

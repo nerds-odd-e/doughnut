@@ -5,7 +5,7 @@ import store from './fixtures/testingStore';
 import makeMe from './fixtures/makeMe';
 
 describe('storeUndoCommand', () => {
-  const note = makeMe.aNote.title('Dummy Title').please();
+  const note = makeMe.aNoteSphere.title('Dummy Title').please();
 
   describe('addEditingToUndoHistory', () => {
     beforeEach(() => {

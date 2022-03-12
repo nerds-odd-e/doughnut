@@ -18,7 +18,7 @@ beforeEach(() => {
 });
 
 describe('repeat page', () => {
-  let note = makeMe.aNote.please();
+  let note = makeMe.aNoteSphere.please();
   const popupMock = { alert: jest.fn() };
 
   const mountPage = async (repetition: Generated.RepetitionForUser | Record<string, never>) => {
@@ -47,7 +47,7 @@ describe('repeat page', () => {
     let repetition: Generated.RepetitionForUser;
 
     beforeEach(()=>{
-      note = makeMe.aNote.please();
+      note = makeMe.aNoteSphere.please();
       helper.store.loadNoteSpheres([note]);
       repetition = makeMe.aRepetition.ofNote(note).please();
     })

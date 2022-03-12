@@ -1,5 +1,5 @@
 import Builder from "./Builder";
-import NoteBuilder from "./NoteBuilder";
+import NoteSphereBuilder from "./NoteSphereBuilder";
 
 let idCounter = 1;
 
@@ -18,7 +18,7 @@ class NotebookBuilder extends Builder {
       ownership: {
         isFromCircle: false,
       },
-      headNote: new NoteBuilder().do(),
+      headNote: new NoteSphereBuilder().do(),
       skipReviewEntirely: false
     }
   }

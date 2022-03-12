@@ -1,5 +1,5 @@
 import LinksBuilder from "./LInksBuilder";
-import NoteBuilder from "./NoteBuilder";
+import NoteSphereBuilder from "./NoteSphereBuilder";
 import NotePositionBuilder from "./NotePositionBuilder";
 import ReviewPointBuilder from "./ReviewPointBuilder"
 import LinkViewedByUserBuilder from "./LinkViewedByUserBuilder"
@@ -13,8 +13,8 @@ class MakeMe {
     return new LinksBuilder();
   }
 
-  static get aNote(): NoteBuilder {
-    return new NoteBuilder();
+  static get aNoteSphere(): NoteSphereBuilder {
+    return new NoteSphereBuilder();
   }
 
   static get aNotePosition(): NotePositionBuilder {

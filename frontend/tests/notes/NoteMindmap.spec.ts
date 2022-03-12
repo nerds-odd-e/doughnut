@@ -20,7 +20,7 @@ describe('note mindmap', () => {
 
   it('should render one note', async () => {
     notes.push(
-      makeMe.aNote.title('single note').shortDescription('not long').please()
+      makeMe.aNoteSphere.title('single note').shortDescription('not long').please()
     );
     const wrapper = getMountedElement(notes[0].id);
     expect(wrapper.find("[role='card']").text()).toContain('single note');
@@ -28,8 +28,8 @@ describe('note mindmap', () => {
 
   describe('with two notes', () => {
     beforeEach(() => {
-      const note = makeMe.aNote.title('note1').please();
-      const childNote = makeMe.aNote.title('note2').under(note).please();
+      const note = makeMe.aNoteSphere.title('note1').please();
+      const childNote = makeMe.aNoteSphere.title('note2').under(note).please();
       notes.push(note);
       notes.push(childNote);
     });
@@ -50,8 +50,8 @@ describe('note mindmap', () => {
     describe('with two grandchildren notes', () => {
       beforeEach(() => {
         const childNote = notes[1];
-        notes.push(makeMe.aNote.title('grand1').under(childNote).please());
-        notes.push(makeMe.aNote.title('grand2').under(childNote).please());
+        notes.push(makeMe.aNoteSphere.title('grand1').under(childNote).please());
+        notes.push(makeMe.aNoteSphere.title('grand2').under(childNote).please());
       });
 
       it('should connect the two notes', async () => {
@@ -70,7 +70,7 @@ describe('note mindmap', () => {
     describe('links between notes', () => {
       beforeEach(() => {
         const [top, child1] = notes;
-        const child2 = makeMe.aNote
+        const child2 = makeMe.aNoteSphere
           .title('child2')
           .under(top)
           .linkTo(child1)
@@ -105,10 +105,10 @@ describe('note mindmap', () => {
     describe('links between note and note outside the map', () => {
       it('link target is not on the map', async () => {
         const [top] = notes;
-        const noteThatIsNotOnTheMap = makeMe.aNote
+        const noteThatIsNotOnTheMap = makeMe.aNoteSphere
           .title('not on the map')
           .please();
-        const child2 = makeMe.aNote
+        const child2 = makeMe.aNoteSphere
           .title('child2')
           .under(top)
           .linkTo(noteThatIsNotOnTheMap)
@@ -126,7 +126,7 @@ describe('note mindmap', () => {
   describe('size', () => {
     beforeEach(() => {
       notes.push(
-        makeMe.aNote
+        makeMe.aNoteSphere
           .title('single note')
           .picture('a.jpg')
           .shortDescription('not long')
