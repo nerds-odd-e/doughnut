@@ -41,7 +41,7 @@ describe('repetition page', () => {
     });
 
     it('click on note when doing review and in a nested page', async () => {
-      const wrapper = helper.component(Repetition).withProps(reviewPointForView).currentRoute({ name: 'repeat-noteShow', params: { noteId: 123 } }).mount()
+      const wrapper = helper.component(Repetition).withProps(reviewPointForView).currentRoute({ name: 'repeat-noteShow', params: { rawNoteId: 123 } }).mount()
       expect(
         JSON.parse(wrapper.find('.link-source .router-link').attributes().to)
       ).toEqual({ name: 'notebooks' });

@@ -71,7 +71,7 @@ export default ({
       ).then((res) => {
         this.$router.push({
           name: "noteShow",
-          params: { noteId: res.notePosition.noteId },
+          params: { rawNoteId: res.notePosition.noteId },
         })
       })
       .catch((res) => (this.formErrors = res))

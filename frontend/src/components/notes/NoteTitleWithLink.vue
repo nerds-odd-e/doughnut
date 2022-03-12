@@ -1,6 +1,6 @@
 <template>
   <router-link
-    :to="{ name: 'noteShow', params: { noteId: note.id, viewType: computedViewType } }"
+    :to="{ name: 'noteShow', params: { rawNoteId: note.id, viewType: computedViewType } }"
     class="text-decoration-none"
   >
     {{ note.title }}

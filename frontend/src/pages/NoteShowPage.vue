@@ -23,7 +23,7 @@ export default defineComponent({
     return useStoredLoadingApi({initalLoading: true});
   },
   name: "NoteShowPage",
-  props: { noteId: [String, Number], viewType: String },
+  props: { rawNoteId: String, viewType: String },
   data() {
     return {
       notePosition: null,
@@ -32,6 +32,10 @@ export default defineComponent({
   },
   components: { LoadingPage, NotePageFrame },
   computed: {
+    noteId() {
+      if(!this.rawNoteId) return Number.NaN;
+      return Number.parseInt(this.rawNoteId)
+    },
     viewTypeObj() : ViewType {
       return viewType(this.viewType)
     }

@@ -35,7 +35,7 @@ export default {
   },
   methods: {
     viewTypeChange(newType) {
-      this.$router.push({name: 'noteShow', params:{ noteId: this.noteId, viewType: newType }})
+      this.$router.push({name: 'noteShow', params:{ rawNoteId: this.noteId, viewType: newType }})
     },
   },
 

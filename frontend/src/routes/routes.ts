@@ -32,7 +32,7 @@ const NestedRepeatPage = NestedPage(
 const noteAndLinkRoutes = [
   { path: "notebooks", name: "notebooks", component: NotebooksPage },
   {
-      path: `notes/:noteId/:viewType?`,
+      path: `notes/:rawNoteId/:viewType?`,
       name: 'noteShow',
       component: NoteShowPage,
       props: true,
@@ -60,7 +60,7 @@ const routes = [
     props: true,
   },
   {
-    path: "/bazaar/notes/:noteId",
+    path: "/bazaar/notes/:rawNoteId",
     name: "bnoteShow",
     component: NoteShowPage,
     props: true,
