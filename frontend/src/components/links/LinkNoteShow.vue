@@ -1,5 +1,5 @@
 <template>
-  <Breadcrumb v-bind="notePosition" />
+  <Breadcrumb v-bind="notePosition" :noteId="note.id" />
   <Card :note="note.note">
     <template #button="{ note }">
       <button

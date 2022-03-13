@@ -33,6 +33,7 @@ import BasicBreadcrumb from "../commons/BasicBreadcrumb.vue";
 export default {
   name: "Breadcrumb",
   props: {
+    noteId: {type: Number, required: true},
     ancestors: Array,
     notebook: Object,
     owns: { type: Boolean, required: true },

@@ -2,7 +2,7 @@
     <div class="inner-box">
       <div class="header">
         <NoteControl/>
-        <Breadcrumb v-bind="notePosition"/>
+        <Breadcrumb v-bind="notePosition" :noteId="noteId"/>
       </div>
       <div class="content">
         <component :is="noteComponent" 

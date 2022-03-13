@@ -23,22 +23,24 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, PropType } from "vue";
 import NotePageFrame from "../notes/views/NotePageFrame.vue";
 import LinkShow from "../links/LinkShow.vue";
 import LinkNob from "../links/LinkNob.vue";
+import LinkViewedByUserBuilder from "../../../tests/fixtures/LinkViewedByUserBuilder";
 
-export default {
+export default defineComponent({
   props: {
-    noteWithPosition: Object,
-    linkViewedByUser: Object,
+    noteWithPosition: Object as PropType<Generated.NoteWithPosition>,
+    linkViewedByUser: Object as PropType<LinkViewedByUserBuilder>,
   },
   components: {NotePageFrame, LinkShow, LinkNob},
   computed: {
     noteId() {
-      return this.noteWithPosition.notePosition.noteId
+      return this.noteWithPosition?.note.id
     },
   }
-}
+})
 
 </script>
