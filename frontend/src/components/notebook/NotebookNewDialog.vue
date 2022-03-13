@@ -8,7 +8,6 @@
 </template>
 
 <script>
-import Breadcrumb from "../notes/Breadcrumb.vue";
 import NoteFormTitleOnly from "../notes/NoteFormTitleOnly.vue";
 import LoadingPage from "../../pages/commons/LoadingPage.vue";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
@@ -19,7 +18,6 @@ export default ({
   },
   props: { circle: Object },
   components: {
-    Breadcrumb,
     NoteFormTitleOnly,
     LoadingPage,
   },

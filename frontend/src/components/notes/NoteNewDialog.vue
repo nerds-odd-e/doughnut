@@ -1,7 +1,4 @@
 <template>
-  <Breadcrumb v-bind="{ owns: true, notebook, ancestors }">
-    <li class="breadcrumb-item">(adding here)</li>
-  </Breadcrumb>
   <form @submit.prevent="processForm">
     <LinkTypeSelect
       scopeName="note"
@@ -18,8 +15,8 @@
   </form>
 </template>
 
-<script>
-import Breadcrumb from "./Breadcrumb.vue";
+<script lang="ts">
+import { defineComponent } from "vue";
 import NoteFormTitleOnly from "./NoteFormTitleOnly.vue";
 import LinkTypeSelect from "../links/LinkTypeSelect.vue";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
@@ -33,20 +30,17 @@ function initialState() {
   };
 }
 
-export default ({
+export default defineComponent({
   setup() {
     return useStoredLoadingApi({initalLoading: true, hasFormError: true});
   },
   components: {
-    Breadcrumb,
     NoteFormTitleOnly,
     LinkTypeSelect,
   },
   props: { parentId: Number },
   data() {
     return {
-      ancestors: null,
-      notebook: null,
       ...initialState(),
     };
   },
@@ -56,13 +50,6 @@ export default ({
   methods: {
     fetchData() {
       this.storedApi.getNoteAndItsChildren(this.parentId)
-      .then((res) => {
-          const note = res.notes[0]
-          const { ancestors, notebook } = res.notePosition;
-          this.ancestors = [...ancestors, note];
-          this.notebook = notebook;
-        }
-      )
     },
 
     processForm() {
@@ -71,7 +58,7 @@ export default ({
       ).then((res) => {
         this.$router.push({
           name: "noteShow",
-          params: { rawNoteId: res.notePosition.noteId },
+          params: { rawNoteId: res.notes[0].id },
         })
       })
       .catch((res) => (this.formErrors = res))
