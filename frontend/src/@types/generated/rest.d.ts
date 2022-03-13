@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-03-12 15:29:55.
+// Generated using typescript-generator version 2.35.1025 on 2022-03-13 11:25:43.
 
 declare namespace Generated {
 
@@ -106,8 +106,8 @@ declare namespace Generated {
         createdAt: string;
         title: string;
         notePicture?: string;
-        parentId?: number;
         shortDescription: string;
+        parentId?: number;
     }
 
     interface Subscription {

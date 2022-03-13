@@ -108,7 +108,7 @@ generateTypeScript {
   customTypeMappings = [
           'java.sql.Timestamp:string'
   ]
-  outputFile = '../frontend/src/generated/rest.d.ts'
+  outputFile = '../frontend/src/@types/generated/rest.d.ts'
   outputKind = 'global'
   namespace = 'Generated';
 }
