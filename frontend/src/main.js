@@ -1,10 +1,11 @@
 import { createApp } from 'vue';
 import { createRouter, createWebHistory } from 'vue-router';
 import { createPinia } from "pinia";
-import DoughnutApp from './DoughnutApp.vue';
+
 import routes from './routes/routes';
 import 'bootstrap/scss/bootstrap.scss';
 import 'bootstrap';
+import DoughnutAppVue from './DoughnutApp.vue';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -14,7 +15,7 @@ const router = createRouter({
 // to accelerate e2e test
 window.router = router;
 
-const app = createApp(DoughnutApp);
+const app = createApp(DoughnutAppVue);
 app.config.globalProperties.$popups = {};
 
 app.use(router);

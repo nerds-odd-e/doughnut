@@ -32,6 +32,7 @@ import Cards from "../notes/Cards.vue";
 import _ from "lodash";
 import useLoadingApi from '../../managedApi/useLoadingApi';
 
+
 const debounced = _.debounce((callback) => callback(), 500);
 
 export default {
@@ -39,7 +40,7 @@ export default {
     return useLoadingApi();
   },
   name: "SearchNote",
-  props: { noteId: [String, Number] },
+  props: { noteId: Number },
   components: { TextInput, CheckInput, Cards },
   emits: ["selected"],
   data() {

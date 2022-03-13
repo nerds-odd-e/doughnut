@@ -14,12 +14,13 @@ import NoteShell from "../NoteShell.vue";
 import NoteContent from "../NoteContent.vue";
 import MindmapSector from "@/models/MindmapSector";
 
+
 export default {
   props: {
     note: Object,
     mindmapSector: MindmapSector,
     mindmap: Object,
-    highlightNoteId: [String, Number],
+    highlightNoteId: Number,
   },
   emits: ['highlight'],
   components: {

@@ -8,12 +8,13 @@
 import SvgEdit from "../svgs/SvgEdit.vue";
 import NoteEditDialog from "../notes/NoteEditDialog.vue";
 
+
 export default {
   name: "NoteNewButton",
   components: {
     SvgEdit,
   },
-  props: { noteId: [String, Number] },
+  props: { noteId: Number },
   methods: {
     showDialog() {
       this.$popups.dialog(NoteEditDialog, { noteId: this.noteId })

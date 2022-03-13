@@ -5,6 +5,7 @@
 </template>
 
 <script>
+
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 import SvgUndo from "../svgs/SvgUndo.vue";
 
@@ -17,7 +18,7 @@ export default ({
     SvgUndo,
   },
   props: {
-    noteId: [String, Number]
+    noteId: Number
   },
   computed: {
     history() {

@@ -22,6 +22,7 @@ import NoteMindmap from "../mindmap/NoteMindmap.vue";
 import DragListner from "../../commons/DragListner.vue";
 import useStoredLoadingApi from "../../../managedApi/useStoredLoadingApi";
 
+
 const defaultOffset = {x: 0, y: 0, scale: 1.0, rotate: 0}
 
 export default ({
@@ -29,7 +30,7 @@ export default ({
     return useStoredLoadingApi();
   },
   props: {
-    noteId: [String, Number],
+    noteId: Number,
     expandChildren: { type: Boolean, required: true },
   },
   data() {

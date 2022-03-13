@@ -4,7 +4,7 @@
 import NoteMinmap from '@/components/notes/mindmap/NoteMindmap.vue';
 import helper from '../helpers';
 import makeMe from '../fixtures/makeMe';
-import Doughnut from '../../src/@types/Doughnut';
+
 
 describe('note mindmap', () => {
   const notes: Generated.NoteSphere[] = [];

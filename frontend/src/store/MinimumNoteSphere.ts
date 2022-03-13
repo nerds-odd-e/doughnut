@@ -1,4 +1,4 @@
-import Doughnut from "../@types/Doughnut";
+
 import Links from "./Links";
 
 interface MinimumNoteSphere {

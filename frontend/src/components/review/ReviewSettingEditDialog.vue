@@ -13,17 +13,18 @@
   </form>
 </template>
 
-<script>
+<script lang="ts">
 import ReviewSettingForm from "./ReviewSettingForm.vue";
 import SvgReviewSetting from "../svgs/SvgReviewSetting.vue";
 import useLoadingApi from '../../managedApi/useLoadingApi';
+
 
 export default {
   setup() {
     return useLoadingApi({initalLoading: true, hasFormError: true});
   },
   components: { ReviewSettingForm, SvgReviewSetting },
-  props: { noteId: [String, Number], title: String },
+  props: { noteId: Number, title: String },
   emits: ["done"],
   data() {
     return {

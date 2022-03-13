@@ -21,6 +21,7 @@ import NoteArticleView from "./NoteArticleView.vue";
 import Breadcrumb from "../Breadcrumb.vue";
 import useStoredLoadingApi from '../../../managedApi/useStoredLoadingApi';
 
+
 export default defineComponent({
   setup() {
     return useStoredLoadingApi();

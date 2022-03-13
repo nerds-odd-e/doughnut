@@ -5,11 +5,12 @@
 </template>
 
 <script>
+
 import NoteNewDialog from "../notes/NoteNewDialog.vue";
 
 export default {
   props: {
-    parentId: [String, Number],
+    parentId: Number,
     buttonTitle: String,
   },
   methods: {

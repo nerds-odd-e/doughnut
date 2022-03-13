@@ -18,9 +18,10 @@ import SvgArticle from "../svgs/SvgArticle.vue";
 import SvgMindmap from "../svgs/SvgMindmap.vue";
 import SvgCards from "../svgs/SvgCards.vue";
 import {viewTypes} from "../../models/viewTypes";
+
 export default {
   props: {
-    noteId: [String, Number],
+    noteId: Number,
     viewType: String,
   },
   components: {

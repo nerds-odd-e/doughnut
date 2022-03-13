@@ -14,6 +14,7 @@ import NoteStatisticsButton from "../NoteStatisticsButton.vue";
 import Cards from "../Cards.vue";
 import useStoredLoadingApi from "../../../managedApi/useStoredLoadingApi";
 
+
 export default defineComponent({
   setup() {
     return useStoredLoadingApi();

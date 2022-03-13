@@ -16,17 +16,19 @@
   </template>
 </template>
 
-<script>
-import MindmapSector from "@/models/MindmapSector";
+<script lang="ts">
+import { defineComponent } from "vue";
+import MindmapSector from "../../../models/MindmapSector";
+
 import useStoredLoadingApi from "../../../managedApi/useStoredLoadingApi";
 
-export default ({
+export default defineComponent({
   setup() {
     return useStoredLoadingApi();
   },
   name: "NoteMindmap",
   props: {
-    noteId: [String, Number],
+    noteId: { type: Number, required: true},
     mindmapSector: MindmapSector,
   },
   computed: {

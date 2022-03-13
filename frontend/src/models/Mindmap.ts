@@ -3,7 +3,7 @@ import LinksReader from "./LinksReader";
 import { Coord, StraightConnection, Vector } from "./MindmapUnits";
 import MindmapMetrics from "./MindmapMetrics";
 import MinimumNoteSphere from "../store/MinimumNoteSphere";
-import Doughnut from "../@types/Doughnut";
+
 
 type NoteFinder = (id: Doughnut.ID) => MinimumNoteSphere | undefined
 class Mindmap {

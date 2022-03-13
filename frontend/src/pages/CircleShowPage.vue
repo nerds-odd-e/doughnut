@@ -47,6 +47,7 @@ import NotebookButtons from "../components/notebook/NotebookButtons.vue";
 import BazaarNotebookButtons from "../components/bazaar/BazaarNotebookButtons.vue";
 import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
 
+
 export default ({
   setup() {
     return useStoredLoadingApi({initalLoading: true, hasFormError: true});
@@ -59,7 +60,7 @@ export default ({
     BazaarNotebookButtons,
     ContainerPage,
   },
-  props: { circleId: [String, Number] },
+  props: { circleId: Number },
 
   data() {
     return {

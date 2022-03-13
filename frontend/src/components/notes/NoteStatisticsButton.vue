@@ -1,9 +1,10 @@
 <script>
+
 import NoteStatistics from "./NoteStatistics.vue";
 
 export default {
   name: "NoteStatisticsButton",
-  props: { noteId: [String, Number], linkid: [String, Number] },
+  props: { noteId: Number, linkid: Number },
   components: { NoteStatistics },
   data() {
     return { statisticComponentName: null };

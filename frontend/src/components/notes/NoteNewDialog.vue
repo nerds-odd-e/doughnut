@@ -42,7 +42,7 @@ export default ({
     NoteFormTitleOnly,
     LinkTypeSelect,
   },
-  props: { parentId: [String, Number] },
+  props: { parentId: Number },
   data() {
     return {
       ancestors: null,

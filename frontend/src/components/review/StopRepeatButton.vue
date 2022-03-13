@@ -3,11 +3,12 @@
 </template>
 
 <script>
+
 import SvgStop from "../svgs/SvgStop.vue";
 
 export default {
   name: "StopRepeatButton",
-  props: { noteId: [String, Number], linkId: [String, Number] },
+  props: { noteId: Number, linkId: Number },
   components: { SvgStop },
   methods: {
     async goHome() {

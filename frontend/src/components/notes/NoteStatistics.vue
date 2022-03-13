@@ -39,9 +39,10 @@
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import { ref } from "vue";
 
+
 const props = defineProps({
-  noteId: [String, Number],
-  linkid: [String, Number],
+  noteId: Number,
+  linkid: Number,
 });
 const statistics = ref(null);
 const { api } = useLoadingApi();

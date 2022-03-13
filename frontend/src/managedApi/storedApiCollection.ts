@@ -1,6 +1,6 @@
 import ManagedApi from "./ManagedApi";
 import createPiniaStore from "../store/createPiniaStore";
-import Doughnut from "../@types/Doughnut";
+
 
 const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<typeof createPiniaStore>) => {
   function loadReviewPointViewedByUser(data: Generated.ReviewPointViewedByUser) {

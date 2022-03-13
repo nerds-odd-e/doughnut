@@ -64,13 +64,14 @@ import MindmapSector from "../../../models/MindmapSector";
 import Mindmap from "../../../models/Mindmap";
 import MindmapOffset from "../../../models/MindmapOffset";
 
+
 export default defineComponent({
   setup() {
     return useStoredLoadingApi();
   },
   name: "NoteMindmap",
   props: {
-    highlightNoteId: [String, Number],
+    highlightNoteId: Number,
     noteId: {type: Number, required: true},
     expandChildren: Boolean,
     offset: {type: Object as PropType<MindmapOffset>, required: true}

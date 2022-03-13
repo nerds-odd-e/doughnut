@@ -8,11 +8,12 @@
 </template>
 
 <script lang="ts">
+
 import NoteOverview from "../NoteOverview.vue";
 
 export default {
   props: {
-    noteId: [String, Number],
+    noteId: Number,
     expandChildren: { type: Boolean, required: true },
   },
   components: { NoteOverview },
