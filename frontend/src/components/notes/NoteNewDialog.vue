@@ -58,7 +58,7 @@ export default defineComponent({
       ).then((res) => {
         this.$router.push({
           name: "noteShow",
-          params: { rawNoteId: res.notes[0].id },
+          params: { rawNoteId: res.notePosition.noteId },
         })
       })
       .catch((res) => (this.formErrors = res))
