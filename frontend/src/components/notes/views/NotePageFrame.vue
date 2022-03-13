@@ -13,7 +13,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, PropType } from 'vue'
 import NoteControl from "../../toolbars/NoteControl.vue";
 import NoteMindmapView from "./NoteMindmapView.vue";
 import NoteCardsView from "./NoteCardsView.vue";
@@ -28,7 +28,7 @@ export default defineComponent({
   },
   props: {
      noteId: { type: Number, required: true },
-     notePosition: Object,
+     notePosition: Object as PropType<Generated.NotePositionViewedByUser>,
      noteComponent: String,
      expandChildren: { type: Boolean, required: true },
   },

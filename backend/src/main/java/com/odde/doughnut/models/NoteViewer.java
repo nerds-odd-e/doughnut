@@ -60,8 +60,6 @@ public class NoteViewer {
 
     public NotePositionViewedByUser jsonNotePosition(Note note) {
         NotePositionViewedByUser nvb = new NotePositionViewedByUser();
-        nvb.setNoteId(note.getId());
-        nvb.setTitle(note.getTitle());
         nvb.setNotebook(note.getNotebook());
         nvb.setAncestors(note.getAncestors());
         nvb.setOwns(viewer != null && viewer.owns(note.getNotebook()));

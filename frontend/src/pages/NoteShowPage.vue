@@ -27,7 +27,8 @@ export default defineComponent({
   data() {
     return {
       notePosition: null,
-      polling: null
+    } as {
+      notePosition: Generated.NotePositionViewedByUser | null
     };
   },
   components: { LoadingPage, NotePageFrame },
