@@ -6,6 +6,7 @@
 </template>
 
 <script lang="ts">
+import Doughnut from "../../@types/Doughnut/index.d"
 import { defineComponent } from "vue";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 import NoteFormBody from "./NoteFormBody.vue";
@@ -18,7 +19,7 @@ export default defineComponent({
   components: {
     NoteFormBody,
   },
-  props: { noteId: {type: Number, required: true}},
+  props: { noteId: {type: Doughnut.IDPropType, required: true}},
   emits: ["done"],
   data() {
     return {

@@ -1,4 +1,8 @@
 declare namespace Doughnut {
-    export type ID = number
-    export type IDPropType = number;
+    const IDPropType = Number
+    type ID = number
+    export {ID, IDPropType}
 }
+
+
+export default Doughnut

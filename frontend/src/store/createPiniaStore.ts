@@ -1,6 +1,7 @@
 import { defineStore } from "pinia";
 import MinimumNoteSphere from "./MinimumNoteSphere";
 import Links from "./Links";
+import Doughnut from "../@types/Doughnut";
 
 interface State {
   notebooks: Generated.Notebook[]
