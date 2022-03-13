@@ -4,6 +4,7 @@
 import NoteMinmap from '@/components/notes/mindmap/NoteMindmap.vue';
 import helper from '../helpers';
 import makeMe from '../fixtures/makeMe';
+import Doughnut from '../../src/@types/Doughnut';
 
 describe('note mindmap', () => {
   const notes: Generated.NoteSphere[] = [];
@@ -13,7 +14,7 @@ describe('note mindmap', () => {
     helper.reset();
   });
 
-  const getMountedElement = (noteId: number, props = {}) => {
+  const getMountedElement = (noteId: Doughnut.ID, props = {}) => {
     helper.store.loadNoteSpheres(notes);
     return helper.component(NoteMinmap).withProps({ noteId, offset: { scale: 1, rotate: 0 }, ...props }).mount()
   };

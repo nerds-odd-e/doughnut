@@ -1,5 +1,6 @@
 import ManagedApi from "./ManagedApi";
 import createPiniaStore from "../store/createPiniaStore";
+import Doughnut from "../@types/Doughnut";
 
 const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<typeof createPiniaStore>) => {
   function loadReviewPointViewedByUser(data: Generated.ReviewPointViewedByUser) {
@@ -14,7 +15,7 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
     }
   }
 
-  async function updateTextContentWithoutUndo(noteId: number, noteContentData: any) {
+  async function updateTextContentWithoutUndo(noteId: Doughnut.ID, noteContentData: any) {
     const { updatedAt, ...data } = noteContentData;
     const res = await managedApi.restPatchMultiplePartForm(
       `text_content/${noteId}`,
@@ -38,7 +39,7 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
         return res;
       },
 
-      async selfEvaluate(reviewPointId: number, data: any) {
+      async selfEvaluate(reviewPointId: Doughnut.ID, data: any) {
         const res = await managedApi.restPost(
           `reviews/${reviewPointId}/self-evaluate`,
           data
@@ -54,13 +55,13 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
       },
     },
 
-    async getNoteWithDescendents(noteId: number) {
+    async getNoteWithDescendents(noteId: Doughnut.ID) {
       const res = await managedApi.restGet(`notes/${noteId}/overview`) as Generated.NotesBulk;
       piniaStore.loadNoteSpheres(res.notes);
       return res;
     },
 
-    async getNoteAndItsChildren(noteId: number) {
+    async getNoteAndItsChildren(noteId: Doughnut.ID) {
       const res = await managedApi.restGet(`notes/${noteId}`) as Generated.NotesBulk;
       piniaStore.loadNoteSpheres(res.notes);
       return res;
@@ -84,7 +85,7 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
       return res;
     },
 
-    async createNote(parentId: number, data: any) {
+    async createNote(parentId: Doughnut.ID, data: any) {
       const res = await managedApi.restPostMultiplePartForm(
         `notes/${parentId}/create`,
         data
@@ -93,7 +94,7 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
       return res;
     },
 
-    async createLink(sourceId: number, targetId: number, data: any) {
+    async createLink(sourceId: Doughnut.ID, targetId: Doughnut.ID, data: any) {
       const res = await managedApi.restPost(
         `links/create/${sourceId}/${targetId}`,
         data
@@ -102,19 +103,19 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
       return res;
     },
 
-    async updateLink(linkId: number, data: any) {
+    async updateLink(linkId: Doughnut.ID, data: any) {
       const res = await managedApi.restPost(`links/${linkId}`, data) as Generated.NotesBulk;
       piniaStore.loadNoteSpheres(res.notes);
       return res;
     },
 
-    async deleteLink(linkId: number) {
+    async deleteLink(linkId: Doughnut.ID) {
       const res = await managedApi.restPost(`links/${linkId}/delete`, {}) as Generated.NotesBulk;
       piniaStore.loadNoteSpheres(res.notes);
       return res;
     },
 
-    async updateNote(noteId: number, noteContentData: any) {
+    async updateNote(noteId: Doughnut.ID, noteContentData: any) {
       const { updatedAt, ...data } = noteContentData;
       const res = await managedApi.restPatchMultiplePartForm(
         `notes/${noteId}`,
@@ -124,7 +125,7 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
       return res;
     },
 
-    async updateTextContent(noteId: number, noteContentData: Generated.TextContent) {
+    async updateTextContent(noteId: Doughnut.ID, noteContentData: Generated.TextContent) {
       piniaStore.addEditingToUndoHistory({ noteId });
       return updateTextContentWithoutUndo(noteId, noteContentData);
     },
@@ -149,7 +150,7 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
       return res;
     },
 
-    async deleteNote(noteId: number) {
+    async deleteNote(noteId: Doughnut.ID) {
       const res = await managedApi.restPost(
         `notes/${noteId}/delete`,
         {},
@@ -164,7 +165,7 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
       return res;
     },
 
-    async updateUser(userId: number, data: any) {
+    async updateUser(userId: Doughnut.ID, data: any) {
       const res = await managedApi.restPatchMultiplePartForm(
         `user/${userId}`,
         data
@@ -196,7 +197,7 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
       return res;
     },
 
-    getCircle(circleId: number) {
+    getCircle(circleId: Doughnut.ID) {
       return managedApi.restGet(`circles/${circleId}`);
     },
   };

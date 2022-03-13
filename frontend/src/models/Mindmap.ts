@@ -3,18 +3,19 @@ import LinksReader from "./LinksReader";
 import { Coord, StraightConnection, Vector } from "./MindmapUnits";
 import MindmapMetrics from "./MindmapMetrics";
 import MinimumNoteSphere from "../store/MinimumNoteSphere";
+import Doughnut from "../@types/Doughnut";
 
-type NoteFinder = (id: number) => MinimumNoteSphere | undefined
+type NoteFinder = (id: Doughnut.ID) => MinimumNoteSphere | undefined
 class Mindmap {
     rootMindmapSector: MindmapSector
 
-    rootNoteId: number
+    rootNoteId: Doughnut.ID
 
     noteFinder
 
     metrics: MindmapMetrics
 
-    constructor(scale: number, rootMindmapSector: MindmapSector, rootNoteId: number, noteFinder: NoteFinder, boxWidth: number, boxHeight: number) {
+    constructor(scale: number, rootMindmapSector: MindmapSector, rootNoteId: Doughnut.ID, noteFinder: NoteFinder, boxWidth: number, boxHeight: number) {
       this.rootMindmapSector = rootMindmapSector
       this.rootNoteId = rootNoteId
       this.noteFinder = noteFinder
@@ -52,7 +53,7 @@ class Mindmap {
       return this.metrics.borderVector(from.inSlot(connectorCount, connectorIndex))
     }
 
-    getNoteSctor(noteId: number): MindmapSector | undefined {
+    getNoteSctor(noteId: Doughnut.ID): MindmapSector | undefined {
       const ancestors = this.ancestorsUntilRoot(noteId)
       if(!ancestors) return undefined
       let sector = this.rootMindmapSector
@@ -62,7 +63,7 @@ class Mindmap {
       return sector
     }
 
-    ancestorsUntilRoot(noteId: number) : Array<MinimumNoteSphere> | undefined {
+    ancestorsUntilRoot(noteId: Doughnut.ID) : Array<MinimumNoteSphere> | undefined {
       const note = this.noteFinder(noteId)
       if (!note) return undefined
       if(noteId.toString() === this.rootNoteId.toString()) return [note]
