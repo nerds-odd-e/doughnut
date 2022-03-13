@@ -1,14 +1,4 @@
 <template>
-  <Breadcrumb
-    v-bind="{
-      owns: true,
-      ancestors: [],
-      notebook: { ownership: { circle } },
-    }"
-  >
-    <li class="breadcrumb-item">(adding here)</li>
-  </Breadcrumb>
-
   <LoadingPage v-bind="{ loading, contentExists: true }">
     <form @submit.prevent.once="processForm">
       <NoteFormTitleOnly v-model="noteFormData" :errors="formErrors" />
