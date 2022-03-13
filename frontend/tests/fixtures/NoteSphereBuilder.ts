@@ -1,64 +1,42 @@
 import { merge } from "lodash";
 import Builder from "./Builder";
-import generateId from "./generateId";
 import LinkBuilder from "./LinkBuilder";
+import NoteBuilder from "./NoteBuilder";
 
 class NoteSphereBuilder extends Builder<Generated.NoteSphere> {
   data: Generated.NoteSphere;
 
+  noteBuilder
+
   constructor(parentBuilder?: Builder) {
     super(parentBuilder);
-    const id = generateId()
+    this.noteBuilder = new NoteBuilder()
+    const noteData = this.noteBuilder.data
     this.data = {
-      id,
-      note: {
-        id,
-        title: "Note1.1.1",
-        shortDescription: '',
-        createdAt: "2021-08-24T08:46:44.000+00:00",
-        noteAccessories: {
-          url: '',
-          urlIsVideo: false,
-          pictureUrl: '',
-          pictureMask: '',
-          useParentPicture: false,
-          skipReview: false,
-          updatedAt: '',
-        },
-        textContent: {
-          title: "Note1.1.1",
-          description: "Desc",
-          updatedAt: "2021-08-24T08:46:44.000+00:00",
-
-        },
-
-      },
+      id: noteData.id,
+      note: noteData,
       links: {},
       childrenIds: []
     };
   }
 
   title(value: string): NoteSphereBuilder {
-    this.data.note.title = value;
-    this.data.note.textContent.title = value;
+    this.noteBuilder.title(value);
     return this;
   }
 
   description(value: string): NoteSphereBuilder {
-    this.data.note.textContent.description = value;
+    this.noteBuilder.description(value);
     return this;
   }
 
   picture(value: string): NoteSphereBuilder {
-    this.data.note.notePicture = value;
+    this.noteBuilder.picture(value);
     return this;
   }
 
   shortDescription(value: string): NoteSphereBuilder {
-    this.data.note.shortDescription = value;
-    if (!this.data.note.textContent.description) {
-      this.data.note.textContent.description = value;
-    }
+    this.noteBuilder.shortDescription(value);
     return this;
   }
 
@@ -70,7 +48,7 @@ class NoteSphereBuilder extends Builder<Generated.NoteSphere> {
   }
 
   textContentUpdatedAt(value: Date): NoteSphereBuilder {
-    this.data.note.textContent.updatedAt = value.toJSON();
+    this.noteBuilder.textContentUpdatedAt(value);
     return this;
   }
 
@@ -79,12 +57,13 @@ class NoteSphereBuilder extends Builder<Generated.NoteSphere> {
     return this;
   }
 
-  linkTo(note: any): NoteSphereBuilder {
+  linkTo(note: Generated.NoteSphere): NoteSphereBuilder {
     merge(this.data.links, new LinkBuilder(undefined, "using").from(this.data).to(note).please());
     return this;
   }
 
   do(): Generated.NoteSphere {
+    this.data.note = this.noteBuilder.do()
     return this.data
   }
 }
