@@ -4,10 +4,10 @@ import Links from "./Links";
 
 interface State {
   notebooks: Generated.Notebook[]
-  notes: {[id: number]: Generated.Note }
-  links: {[id: number]: Links }
-  parentChildrenIds: {[id: number]: number[] }
-  highlightNoteId: number | undefined
+  notes: {[id: Doughnut.ID]: Generated.Note }
+  links: {[id: Doughnut.ID]: Links }
+  parentChildrenIds: {[id: Doughnut.ID]: Doughnut.ID[] }
+  highlightNoteId: Doughnut.ID | undefined
   noteUndoHistories: any[]
   currentUser: Generated.User | null
   featureToggle: boolean
@@ -17,31 +17,31 @@ interface State {
 
 function withState(state: State) {
   return {
-    getNoteById(id: number | undefined) {
+    getNoteById(id: Doughnut.ID | undefined) {
       if(id === undefined) return undefined;
       return state.notes[id]
     },
-    getLinksById(id: number | undefined) {
+    getLinksById(id: Doughnut.ID | undefined) {
       if(id === undefined) return undefined;
       return state.links[id]
     },
 
-    getChildrenIdsByParentId(parentId: number) {
+    getChildrenIdsByParentId(parentId: Doughnut.ID) {
       return state.parentChildrenIds[parentId] || []
     },
 
-    getChildrenOfParentId(parentId: number) {
+    getChildrenOfParentId(parentId: Doughnut.ID) {
       return this.getChildrenIdsByParentId(parentId)
-        .map((id: number)=>this.getNoteById(id))
+        .map((id: Doughnut.ID)=>this.getNoteById(id))
         .filter((n: any)=>n)
     },
    
-    deleteNote(id: number) {
-      this.getChildrenIdsByParentId(id)?.forEach((cid: number)=>this.deleteNote(cid))
+    deleteNote(id: Doughnut.ID) {
+      this.getChildrenIdsByParentId(id)?.forEach((cid: Doughnut.ID)=>this.deleteNote(cid))
       delete state.notes[id]
     },
 
-    deleteNoteFromParentChildrenList(id: number) {
+    deleteNoteFromParentChildrenList(id: Doughnut.ID) {
       const parent = this.getNoteById(id)?.parentId
       if(!parent) return
       const children = this.getChildrenIdsByParentId(parent)
@@ -71,8 +71,8 @@ export default defineStore('main', {
 
     getters: {
         getHighlightNote: (state: State)   => () => withState(state).getNoteById(state.highlightNoteId),
-        getNoteById: (state)        => (id: number) => withState(state).getNoteById(id),
-        getNoteByIdLegacy: (state)        => (id: number): MinimumNoteSphere | undefined => {
+        getNoteById: (state)        => (id: Doughnut.ID) => withState(state).getNoteById(id),
+        getNoteByIdLegacy: (state)        => (id: Doughnut.ID): MinimumNoteSphere | undefined => {
           const note = withState(state).getNoteById(id)
           if(!note) return undefined
           const {parentId} = note
@@ -80,20 +80,20 @@ export default defineStore('main', {
           const childrenIds = withState(state).getChildrenIdsByParentId(id)
           return {id, parentId, links, childrenIds }
         },
-        getLinksById: (state)        => (id: number) => withState(state).getLinksById(id),
+        getLinksById: (state)        => (id: Doughnut.ID) => withState(state).getLinksById(id),
         peekUndo: (state)           => () => {
           if(state.noteUndoHistories.length === 0) return null
           return state.noteUndoHistories[state.noteUndoHistories.length - 1]
         },
-        getChildrenIdsByParentId: (state) => (parentId: number) => withState(state).getChildrenIdsByParentId(parentId),
-        getChildrenOfParentId: (state)    => (parentId: number) => withState(state).getChildrenOfParentId(parentId),
+        getChildrenIdsByParentId: (state) => (parentId: Doughnut.ID) => withState(state).getChildrenIdsByParentId(parentId),
+        getChildrenOfParentId: (state)    => (parentId: Doughnut.ID) => withState(state).getChildrenOfParentId(parentId),
     },
 
     actions: {
         setNotebooks(notebooks: Generated.Notebook[]) {
           this.notebooks = notebooks
         },
-        addEditingToUndoHistory({noteId}: {noteId: number}) {
+        addEditingToUndoHistory({noteId}: {noteId: Doughnut.ID}) {
           this.noteUndoHistories.push({type: 'editing', noteId, textContent: {...withState(this).getNoteById(noteId)?.textContent}});
         },
         popUndoHistory() {
@@ -111,12 +111,12 @@ export default defineStore('main', {
             this.parentChildrenIds[id] = noteSphere.childrenIds;
           });
         },
-        deleteNote(noteId: number) {
+        deleteNote(noteId: Doughnut.ID) {
           withState(this).deleteNoteFromParentChildrenList(noteId)
           withState(this).deleteNote(noteId)
           this.noteUndoHistories.push({type: 'delete note', noteId});
         },
-        setHighlightNoteId(noteId: number) {
+        setHighlightNoteId(noteId: Doughnut.ID) {
           this.highlightNoteId = noteId
         },
         setViewType(viewType: string) {

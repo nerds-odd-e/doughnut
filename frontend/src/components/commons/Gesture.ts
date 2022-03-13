@@ -23,7 +23,7 @@ interface BoundaryRect {
 }
 
 class Gesture {
-  pointers: Map<number, Pointer>
+  pointers: Map<Doughnut.ID, Pointer>
 
   startOffset: Offset
 
@@ -42,11 +42,11 @@ class Gesture {
     this.pointers = new Map
   }
 
-  newPointer(pointerId: number, start: Position): void {
+  newPointer(pointerId: Doughnut.ID, start: Position): void {
     this.pointers.set(pointerId, { start, current: start })
   }
 
-  move(rect: BoundaryRect, pointerId: number, pos: Position): void {
+  move(rect: BoundaryRect, pointerId: Doughnut.ID, pos: Position): void {
     this.rect = rect
     const pointer = this.pointers.get(pointerId)
     if(pointer) {

@@ -33,7 +33,7 @@ export default defineComponent({
   },
   components: { NoteControl, NoteMindmapView, Breadcrumb, NoteCardsView, NoteArticleView },
   methods: {
-    highlight(id: number) { 
+    highlight(id: Doughnut.ID) { 
       this.piniaStore.setHighlightNoteId(id)
     },
   },
