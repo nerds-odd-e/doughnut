@@ -16,11 +16,11 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, PropType } from "vue";
 import Card from "../notes/Card.vue";
-export default {
-  name: "NotebookCardsWithButtons",
-  props: { notebooks: Array },
+export default defineComponent({
+  props: { notebooks: Array as PropType<Array<Generated.NotebookViewedByUser>> },
   components: { Card },
-};
+});
 </script>

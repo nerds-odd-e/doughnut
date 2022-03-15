@@ -4,7 +4,7 @@ import Links from "./Links";
 
 
 interface State {
-  notebooks: Generated.Notebook[]
+  notebooks: Generated.NotebookViewedByUser[]
   notes: {[id: Doughnut.ID]: Generated.Note }
   links: {[id: Doughnut.ID]: Links }
   parentChildrenIds: {[id: Doughnut.ID]: Doughnut.ID[] }
@@ -91,7 +91,7 @@ export default defineStore('main', {
     },
 
     actions: {
-        setNotebooks(notebooks: Generated.Notebook[]) {
+        setNotebooks(notebooks: Generated.NotebookViewedByUser[]) {
           this.notebooks = notebooks
         },
         addEditingToUndoHistory({noteId}: {noteId: Doughnut.ID}) {

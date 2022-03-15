@@ -42,13 +42,6 @@ public class NoteWithPositionTest {
             assertThat(deNote.toString(), not(containsString("ownership")));
         }
 
-        @Test
-        public void notebookInfo() throws JsonProcessingException {
-            Map<String, Object> deserialized = getJsonString(value);
-            final Object deNotebook = deserialized.get("notePosition");
-            assertThat(deNotebook.toString(), not(containsString("headNote")));
-        }
-
         private Map<String, Object> getJsonString(NoteWithPosition value) throws JsonProcessingException {
             return new ObjectMapper().readerForMapOf(Object.class).readValue(new ObjectMapper().writeValueAsString(value));
         }

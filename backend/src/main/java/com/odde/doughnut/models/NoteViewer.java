@@ -2,11 +2,9 @@ package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.json.LinkViewed;
-import com.odde.doughnut.entities.json.NotePositionViewedByUser;
-import com.odde.doughnut.entities.json.NoteSphere;
-import com.odde.doughnut.entities.json.NoteWithPosition;
+import com.odde.doughnut.entities.json.*;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,11 +16,12 @@ public class NoteViewer {
 
     private User viewer;
     private Note note;
+    private JsonViewer jsonViewer;
 
     public NoteViewer(User viewer, Note note) {
-
         this.viewer = viewer;
         this.note = note;
+        this.jsonViewer = new JsonViewer(viewer);
     }
 
     public NoteSphere toJsonObject() {
@@ -61,7 +60,7 @@ public class NoteViewer {
     public NotePositionViewedByUser jsonNotePosition(Note note) {
         NotePositionViewedByUser nvb = new NotePositionViewedByUser();
         nvb.setNoteId(note.getId());
-        nvb.setNotebook(note.getNotebook());
+        nvb.setNotebook(jsonViewer.jsonNotebookViewedByUser(note.getNotebook()));
         nvb.setAncestors(note.getAncestors());
         nvb.setOwns(viewer != null && viewer.owns(note.getNotebook()));
         return nvb;

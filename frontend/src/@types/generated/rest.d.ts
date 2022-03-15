@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-03-13 14:54:39.
+// Generated using typescript-generator version 2.35.1025 on 2022-03-15 15:05:49.
 
 declare namespace Generated {
 
@@ -25,7 +25,7 @@ declare namespace Generated {
 
     interface NotePositionViewedByUser {
         noteId: number;
-        notebook: Notebook;
+        notebook: NotebookViewedByUser;
         ancestors: Note[];
         owns: boolean;
     }
@@ -42,8 +42,16 @@ declare namespace Generated {
         note: NoteSphere;
     }
 
+    interface NotebookViewedByUser {
+        id: number;
+        headNoteId: number;
+        headNote: Note;
+        fromBazaar: boolean;
+        ownership: Ownership;
+    }
+
     interface NotebooksViewedByUser {
-        notebooks: Notebook[];
+        notebooks: NotebookViewedByUser[];
         subscriptions: Subscription[];
     }
 
@@ -86,16 +94,8 @@ declare namespace Generated {
         targetNote: Note;
         typeId: number;
         createdAt: string;
-        linkNameOfSource: string;
         linkTypeLabel: string;
-    }
-
-    interface Notebook {
-        id: number;
-        ownership: Ownership;
-        headNote: Note;
-        skipReviewEntirely: boolean;
-        deletedAt: string;
+        linkNameOfSource: string;
     }
 
     interface Note {
@@ -105,8 +105,13 @@ declare namespace Generated {
         createdAt: string;
         title: string;
         notePicture?: string;
-        shortDescription: string;
         parentId?: number;
+        shortDescription: string;
+    }
+
+    interface Ownership {
+        id: number;
+        circle: Circle;
     }
 
     interface Subscription {
@@ -154,11 +159,6 @@ declare namespace Generated {
         level: number;
     }
 
-    interface Ownership {
-        id: number;
-        circle: Circle;
-    }
-
     interface NoteAccessories {
         url: string;
         urlIsVideo: boolean;
@@ -175,15 +175,23 @@ declare namespace Generated {
         updatedAt: string;
     }
 
+    interface Circle {
+        id: number;
+        name: string;
+    }
+
+    interface Notebook {
+        id: number;
+        ownership: Ownership;
+        headNote: Note;
+        skipReviewEntirely: boolean;
+        deletedAt: string;
+    }
+
     interface Option {
         note: NoteSphere;
         picture: boolean;
         display: string;
-    }
-
-    interface Circle {
-        id: number;
-        name: string;
     }
 
     type LinkType = "related to" | "a specialization of" | "an application of" | "an instance of" | "a part of" | "tagged by" | "an attribute of" | "the opposite of" | "author of" | "using" | "an example of" | "before" | "similar to" | "confused with";

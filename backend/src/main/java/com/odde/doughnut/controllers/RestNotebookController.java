@@ -11,6 +11,7 @@ import com.odde.doughnut.entities.json.RedirectToNoteResponse;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.BazaarModel;
+import com.odde.doughnut.models.JsonViewer;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
 
@@ -41,8 +42,7 @@ class RestNotebookController {
         UserModel user = currentUserFetcher.getUser();
         user.getAuthorization().assertLoggedIn();
 
-        NotebooksViewedByUser notebooksViewedByUser = new NotebooksViewedByUser();
-        notebooksViewedByUser.notebooks = user.getEntity().getOwnership().getNotebooks();
+        NotebooksViewedByUser notebooksViewedByUser = new JsonViewer(user.getEntity()).jsonNotebooksViewedByUser(user.getEntity().getOwnership().getNotebooks());
         notebooksViewedByUser.subscriptions = user.getEntity().getSubscriptions();
         return notebooksViewedByUser;
     }

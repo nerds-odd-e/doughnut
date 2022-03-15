@@ -26,14 +26,6 @@ class RestSubscriptionController {
     this.currentUserFetcher = currentUserFetcher;
   }
 
-  @GetMapping("")
-  public NotebooksViewedByUser bazaar() {
-    BazaarModel bazaar = modelFactoryService.toBazaarModel();
-    NotebooksViewedByUser notebooksViewedByUser = new NotebooksViewedByUser();
-    notebooksViewedByUser.notebooks = bazaar.getAllNotebooks();
-    return notebooksViewedByUser;
-  }
-
   @PostMapping("/notebooks/{notebook}/subscribe")
   @Transactional
   public @Valid Subscription createSubscription(@PathVariable(name = "notebook") Notebook notebook, @Valid Subscription subscription) throws NoAccessRightException {

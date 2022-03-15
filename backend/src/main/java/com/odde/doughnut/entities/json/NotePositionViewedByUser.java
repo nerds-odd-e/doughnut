@@ -16,7 +16,7 @@ public class NotePositionViewedByUser {
     @Getter
     @Setter
     @JsonIgnoreProperties({"headNote"})
-    private Notebook notebook;
+    private NotebookViewedByUser notebook;
     @Getter
     @Setter
     private List<Note> ancestors;
