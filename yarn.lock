@@ -1197,7 +1197,7 @@
   dependencies:
     "@types/node" "*"
 
-"@types/node@*", "@types/node@^17.0.2":
+"@types/node@*", "@types/node@^17.0.21":
   version "17.0.21"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.21.tgz#864b987c0c68d07b4345845c3e63b75edd143644"
   integrity sha512-DBZCJbhII3r90XbQxI8Y9IjjiiOGlZ0Hr32omXIZvwwZ7p4DMMXGrKXVyPfuoBOri9XNtL0UK69jYIBIsRX3QQ==
@@ -2247,10 +2247,10 @@ cucumber@^4.2.1:
     util-arity "^1.0.2"
     verror "^1.9.0"
 
-cy-verify-downloads@0.0.6:
-  version "0.0.6"
-  resolved "https://registry.yarnpkg.com/cy-verify-downloads/-/cy-verify-downloads-0.0.6.tgz#39428cb7681de2ab660d0c25bc0ca3cc3c6ea267"
-  integrity sha512-tFfTDMigyNtj/dGlUE2HOvD9h9pFDl6olB5F52HQ7oGsYLWhTJ0/L6cz+972hGBiOB4nHd/Xxrx30vULB3Bu4Q==
+cy-verify-downloads@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/cy-verify-downloads/-/cy-verify-downloads-0.1.1.tgz#2a1deaab229fce87ac88d72c8a821093330daf31"
+  integrity sha512-Szm1ZCaYzFUMhbUXQMP8qA5ryclrQEZHX60jl2+oPr0MCDk0Wbi9WICanfnA5ks0flYlaT9fmI8nKv71Kc9HNw==
 
 cypress-cucumber-preprocessor@4.3.1:
   version "4.3.1"
@@ -2272,7 +2272,7 @@ cypress-cucumber-preprocessor@4.3.1:
     minimist "^1.2.5"
     through "^2.3.8"
 
-cypress-file-upload@5.0.8:
+cypress-file-upload@^5.0.8:
   version "5.0.8"
   resolved "https://registry.yarnpkg.com/cypress-file-upload/-/cypress-file-upload-5.0.8.tgz#d8824cbeaab798e44be8009769f9a6c9daa1b4a1"
   integrity sha512-+8VzNabRk3zG6x8f8BWArF/xA/W0VK4IZNx3MV0jFWrJS/qKn8eHfa5nU73P9fOQAgwHFJx7zjg4lwOnljMO8g==
@@ -3926,7 +3926,7 @@ pify@^3.0.0:
   resolved "https://registry.yarnpkg.com/pify/-/pify-3.0.0.tgz#e5a4acd2c101fdf3d9a4d07f0dbc4db49dd28176"
   integrity sha1-5aSs0sEB/fPZpNB/DbxNtJ3SgXY=
 
-prettier@^2.5.0:
+prettier@^2.5.1:
   version "2.5.1"
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.5.1.tgz#fff75fa9d519c54cf0fce328c1017d94546bc56a"
   integrity sha512-vBZcPRUR5MZJwoyi3ZoyQlc1rXeEck8KgeC9AwwOn+exuxLxq5toTRDTSaVrXHxelDMHy9zlicw8u66yxoSUFg==
