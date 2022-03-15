@@ -57,13 +57,13 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
 
     async getNoteWithDescendents(noteId: Doughnut.ID) {
       const res = await managedApi.restGet(`notes/${noteId}/overview`) as Generated.NotesBulk;
-      piniaStore.loadNoteSpheres(res.notes);
+      piniaStore.loadNotesBulk(res);
       return res;
     },
 
     async getNoteAndItsChildren(noteId: Doughnut.ID) {
       const res = await managedApi.restGet(`notes/${noteId}`) as Generated.NotesBulk;
-      piniaStore.loadNoteSpheres(res.notes);
+      piniaStore.loadNotesBulk(res);
       return res;
     },
 
@@ -90,7 +90,7 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
         `notes/${parentId}/create`,
         data
       ) as Generated.NotesBulk;
-      piniaStore.loadNoteSpheres(res.notes);
+      piniaStore.loadNotesBulk(res);
       return res;
     },
 
@@ -99,19 +99,19 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
         `links/create/${sourceId}/${targetId}`,
         data
       ) as Generated.NotesBulk;
-      piniaStore.loadNoteSpheres(res.notes);
+      piniaStore.loadNotesBulk(res);
       return res;
     },
 
     async updateLink(linkId: Doughnut.ID, data: any) {
       const res = await managedApi.restPost(`links/${linkId}`, data) as Generated.NotesBulk;
-      piniaStore.loadNoteSpheres(res.notes);
+      piniaStore.loadNotesBulk(res);
       return res;
     },
 
     async deleteLink(linkId: Doughnut.ID) {
       const res = await managedApi.restPost(`links/${linkId}/delete`, {}) as Generated.NotesBulk;
-      piniaStore.loadNoteSpheres(res.notes);
+      piniaStore.loadNotesBulk(res);
       return res;
     },
 
@@ -143,7 +143,7 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
         `notes/${history.noteId}/undo-delete`,
         {}
       ) as Generated.NotesBulk;
-      piniaStore.loadNoteSpheres(res.notes);
+      piniaStore.loadNotesBulk(res);
       if (res.notes[0].note.parentId === null) {
         this.getNotebooks();
       }

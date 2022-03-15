@@ -103,6 +103,7 @@ export default defineStore('main', {
           }
           this.noteUndoHistories.pop();
         },
+
         loadNoteSpheres(noteSpheres: Generated.NoteSphere[]) {
           noteSpheres.forEach((noteSphere) => {
             const {id} = noteSphere.note;
@@ -111,6 +112,11 @@ export default defineStore('main', {
             this.parentChildrenIds[id] = noteSphere.childrenIds;
           });
         },
+
+        loadNotesBulk(noteBulk: Generated.NotesBulk) {
+          this.loadNoteSpheres(noteBulk.notes);
+        },
+
         deleteNote(noteId: Doughnut.ID) {
           withState(this).deleteNoteFromParentChildrenList(noteId)
           withState(this).deleteNote(noteId)
