@@ -10,17 +10,19 @@
       <NoteUndoButton/>
     </div>
   </nav>
-  <slot />
+  <Breadcrumb v-bind="notePosition"/>
 </template>
 
-<script>
+<script lang="ts">
 
+import { defineComponent } from 'vue'
 import NoteButtons from './NoteButtons.vue'
 import NoteUndoButton from "./NoteUndoButton.vue";
 import LinkNoteButton from "../links/LinkNoteButton.vue";
 import useStoredLoadingApi from '../../managedApi/useStoredLoadingApi';
+import Breadcrumb from "./Breadcrumb.vue";
 
-export default ({
+export default defineComponent({
   setup() {
     return useStoredLoadingApi();
   },
@@ -28,11 +30,15 @@ export default ({
     NoteButtons,
     NoteUndoButton,
     LinkNoteButton,
+    Breadcrumb
   },
   computed: {
     currentNote() { return this.piniaStore.getHighlightNote() },
     viewType() { return this.piniaStore.viewType },
     featureToggle() { return this.piniaStore.featureToggle },
+    notePosition(): Generated.NotePositionViewedByUser | undefined {
+      return this.piniaStore.getHighlightNotePosition()
+    },
   },
 });
 </script>

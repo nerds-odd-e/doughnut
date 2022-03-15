@@ -4,7 +4,6 @@
       v-if="noteId"
       v-bind="{
         noteId,
-        notePosition: noteWithPosition.notePosition,
         expandChildren: false,
         noteComponent: 'NoteCardsView'}"/>
     </div>

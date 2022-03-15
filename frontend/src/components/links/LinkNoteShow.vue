@@ -1,5 +1,5 @@
 <template>
-  <Breadcrumb v-bind="notePosition" :noteId="note.id" />
+  <Breadcrumb v-bind="notePosition"/>
   <Card :note="note.note">
     <template #button="{ note }">
       <button
@@ -15,7 +15,7 @@
 </template>
 
 <script lang="ts">
-import Breadcrumb from "../notes/Breadcrumb.vue";
+import Breadcrumb from "../toolbars/Breadcrumb.vue";
 import NoteWithLinks from "../notes/NoteWithLinks.vue";
 import Card from "../notes/Card.vue";
 import { defineComponent, PropType } from "vue";

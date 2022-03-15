@@ -28,7 +28,8 @@ function withState(state: State) {
       return state.links[id]
     },
 
-    getNotePosition(id: Doughnut.ID) {
+    getNotePosition(id: Doughnut.ID | undefined) {
+      if(!id) return undefined
       const ancestors: Generated.Note[] = []
       let cursor = this.getNoteById(id)
       while(cursor && cursor.parentId) {
@@ -88,7 +89,7 @@ export default defineStore('main', {
     getters: {
         getHighlightNote: (state: State)   => () => withState(state).getNoteById(state.highlightNoteId),
         getNoteById: (state)        => (id: Doughnut.ID) => withState(state).getNoteById(id),
-        getNotePosition: (state)        => (id: Doughnut.ID) => withState(state).getNotePosition(id),
+        getHighlightNotePosition: (state)        => () => withState(state).getNotePosition(state.highlightNoteId),
         getNoteByIdLegacy: (state)        => (id: Doughnut.ID): MinimumNoteSphere | undefined => {
           const note = withState(state).getNoteById(id)
           if(!note) return undefined

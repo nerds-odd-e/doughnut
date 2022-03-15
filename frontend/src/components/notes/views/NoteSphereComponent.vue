@@ -2,7 +2,6 @@
     <div class="inner-box">
       <div class="header">
         <NoteControl/>
-        <Breadcrumb v-bind="notePosition" :noteId="noteId"/>
       </div>
       <div class="content">
         <component :is="noteComponent" 
@@ -18,7 +17,6 @@ import NoteControl from "../../toolbars/NoteControl.vue";
 import NoteMindmapView from "./NoteMindmapView.vue";
 import NoteCardsView from "./NoteCardsView.vue";
 import NoteArticleView from "./NoteArticleView.vue";
-import Breadcrumb from "../Breadcrumb.vue";
 import useStoredLoadingApi from '../../../managedApi/useStoredLoadingApi';
 
 
@@ -28,11 +26,10 @@ export default defineComponent({
   },
   props: {
      noteId: { type: Number, required: true },
-     notePosition: Object as PropType<Generated.NotePositionViewedByUser>,
      noteComponent: String,
      expandChildren: { type: Boolean, required: true },
   },
-  components: { NoteControl, NoteMindmapView, Breadcrumb, NoteCardsView, NoteArticleView },
+  components: { NoteControl, NoteMindmapView, NoteCardsView, NoteArticleView },
   methods: {
     highlight(id: Doughnut.ID) { 
       this.piniaStore.setHighlightNoteId(id)

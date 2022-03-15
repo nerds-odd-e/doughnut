@@ -1,9 +1,8 @@
 <template>
-  <LoadingPage v-bind="{ loading, contentExists: !!notePosition }">
+  <LoadingPage v-bind="{ loading, contentExists: !!true }">
     <NoteSphereComponent
       v-bind="{
         noteId,
-        notePosition,
         expandChildren: true,
         noteComponent: viewTypeObj.noteComponent}"
       />
@@ -29,9 +28,6 @@ export default defineComponent({
     noteId(): number {
       if(!this.rawNoteId) return Number.NaN;
       return Number.parseInt(this.rawNoteId)
-    },
-    notePosition(): Generated.NotePositionViewedByUser | undefined {
-      return this.piniaStore.getNotePosition(this.noteId)
     },
     viewTypeObj() : ViewType {
       return viewType(this.viewType)

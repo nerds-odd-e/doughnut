@@ -34,7 +34,6 @@ import BasicBreadcrumb from "../commons/BasicBreadcrumb.vue";
 export default defineComponent({
   name: "Breadcrumb",
   props: {
-    noteId: {type: Number, required: true},
     ancestors: Array,
     notebook: Object as PropType<Generated.NotebookViewedByUser>,
   },

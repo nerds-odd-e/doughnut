@@ -29,7 +29,7 @@ describe('all in note show page', () => {
       helper.apiMock.expecting(`/api/notes/${note.id}`, stubResponse);
       helper.component(NoteShowPage).withProps({ rawNoteId: `${note.id}` }).render();
       helper.apiMock.verifyCall(`/api/notes/${note.id}`);
-      await screen.findByText('a circle');
+      await screen.findByText(note.note.title);
     });
 
     it(' should fetch API to be called when viewType is mindmap ', async () => {
@@ -38,7 +38,7 @@ describe('all in note show page', () => {
       helper.component(NoteShowPage).withProps({ rawNoteId: `${note.id}`, viewType: viewTypeValue }).render()
       expect(viewType(viewTypeValue)?.fetchAll).toBe(true);
       helper.apiMock.verifyCall(`/api/notes/${note.id}/overview`);
-      await screen.findByText('a circle');
+      await screen.findByText(note.note.title);
     });
   });
 });
