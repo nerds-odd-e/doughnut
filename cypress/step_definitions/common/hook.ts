@@ -3,19 +3,12 @@
 /// <reference types="../../support" />
 // @ts-check
 
-import {
-  And,
-  Before,
-  After,
-  Given,
-  Then,
-  When,
-} from "cypress-cucumber-preprocessor/steps";
+import { And, Before, After, Given, Then, When } from "cypress-cucumber-preprocessor/steps"
 
 Before(() => {
-  cy.cleanDBAndSeedData();
-  cy.wrap(false).as('firstVisited')
-});
+  cy.cleanDBAndSeedData()
+  cy.wrap(false).as("firstVisited")
+})
 
 Before({ tags: "@stopTime" }, () => {
   cy.clock()
@@ -28,7 +21,7 @@ Before({ tags: "@stopTime" }, () => {
 // itself. So, here it visits the blank page at the end of each test.
 After({ tags: "@stopTime" }, () => {
   cy.window().then((win) => {
-    win.location.href = 'about:blank'
+    win.location.href = "about:blank"
   })
 })
 
@@ -39,4 +32,3 @@ Before({ tags: "@featureToggle" }, () => {
 Before({ tags: "@cleanDownloadFolder" }, () => {
   cy.cleanDownloadFolder()
 })
-
