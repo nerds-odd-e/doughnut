@@ -15,11 +15,14 @@ describe('all in note show page', () => {
   describe('note show', () => {
     const note = makeMe.aNoteSphere.please();
     const stubResponse = {
-      notePosition: makeMe.aNotePosition.inCircle('a circle').please(),
+      notePosition: makeMe.aNotePosition.for(note.note).inCircle('a circle').please(),
       notes: [note],
     };
 
     beforeEach(() => {
+      // this shouldn't be needed
+      // however, the computed notePosition doesn't seem to re-compute after the store value changes.
+      helper.store.loadNotesBulk(stubResponse)
     });
 
     it(' should fetch API to be called TWICE when viewType is not included ', async () => {

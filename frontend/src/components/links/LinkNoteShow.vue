@@ -23,7 +23,7 @@ import { defineComponent, PropType } from "vue";
 export default defineComponent({
   name: "LinkNoteShow",
   props: {
-    note: Object as PropType<Generated.NoteSphere>,
+    note: { type: Object as PropType<Generated.NoteSphere>, required: true },
     notePosition: Object as PropType<Generated.NotePositionViewedByUser>
   },
   components: { Breadcrumb, NoteWithLinks, Card },

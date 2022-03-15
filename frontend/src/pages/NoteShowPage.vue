@@ -24,18 +24,14 @@ export default defineComponent({
   },
   name: "NoteShowPage",
   props: { rawNoteId: String, viewType: String },
-  data() {
-    return {
-      notePosition: null,
-    } as {
-      notePosition: Generated.NotePositionViewedByUser | null
-    };
-  },
   components: { LoadingPage, NoteSphereComponent },
   computed: {
-    noteId() {
+    noteId(): number {
       if(!this.rawNoteId) return Number.NaN;
       return Number.parseInt(this.rawNoteId)
+    },
+    notePosition(): Generated.NotePositionViewedByUser | undefined {
+      return this.piniaStore.getNotePosition(this.noteId)
     },
     viewTypeObj() : ViewType {
       return viewType(this.viewType)
@@ -52,9 +48,6 @@ export default defineComponent({
                               this.storedApi.getNoteAndItsChildren
 
       storedApiCall(this.noteId)
-      .then((res) => {
-        this.notePosition = res.notePosition;
-      })
     },
   },
   watch: {

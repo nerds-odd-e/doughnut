@@ -69,7 +69,7 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
 
     async getNotebooks() {
       const res = await managedApi.restGet(`notebooks`) as Generated.NotebooksViewedByUser
-      piniaStore.setNotebooks(res.notebooks);
+      piniaStore.loadNotebooks(res.notebooks);
       return res;
     },
 

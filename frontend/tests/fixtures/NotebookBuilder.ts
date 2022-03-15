@@ -21,6 +21,11 @@ class NotebookBuilder extends Builder<Generated.NotebookViewedByUser> {
     }
   }
 
+  headNote(headNote: Generated.Note | undefined) {
+    this.notebuilder.for(headNote)
+    return this
+  }
+
   shortDescription(value: string): NotebookBuilder {
     this.notebuilder.shortDescription(value)
     return this
@@ -41,6 +46,7 @@ class NotebookBuilder extends Builder<Generated.NotebookViewedByUser> {
 
   do(): Generated.NotebookViewedByUser {
     this.data.headNote = this.notebuilder.do()
+    this.data.headNoteId = this.data.headNote.id
     return this.data;
   }
 }

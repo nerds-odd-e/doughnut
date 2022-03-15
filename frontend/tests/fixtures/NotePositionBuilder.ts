@@ -5,6 +5,13 @@ import NotebookBuilder from "./NotebookBuilder";
 class NotePositionBuilder extends Builder<Generated.NotePositionViewedByUser> {
   notebookBuilder = new NotebookBuilder();
 
+  headNote?: Generated.Note
+
+  for(note: Generated.Note) {
+    this.headNote = note
+    return this
+  }
+
   inBazaar(): NotePositionBuilder {
     this.notebookBuilder.fromBazzar()
     return this
@@ -23,11 +30,11 @@ class NotePositionBuilder extends Builder<Generated.NotePositionViewedByUser> {
 
 
   do(): Generated.NotePositionViewedByUser {
+    const notebook = this.notebookBuilder.headNote(this.headNote).do()
     return {
-      noteId: 0,
-      notebook: this.notebookBuilder.do(),
+      noteId: notebook.headNoteId,
+      notebook,
       ancestors:[]
-
     }
   }
 }

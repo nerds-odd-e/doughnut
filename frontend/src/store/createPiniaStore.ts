@@ -5,6 +5,7 @@ import Links from "./Links";
 
 interface State {
   notebooks: Generated.NotebookViewedByUser[]
+  notebooksMapByHeadNoteId: {[id: Doughnut.ID]: Generated.NotebookViewedByUser}
   notes: {[id: Doughnut.ID]: Generated.Note }
   links: {[id: Doughnut.ID]: Links }
   parentChildrenIds: {[id: Doughnut.ID]: Doughnut.ID[] }
@@ -22,9 +23,22 @@ function withState(state: State) {
       if(id === undefined) return undefined;
       return state.notes[id]
     },
-    getLinksById(id: Doughnut.ID | undefined) {
-      if(id === undefined) return undefined;
+
+    getLinksById(id: Doughnut.ID) {
       return state.links[id]
+    },
+
+    getNotePosition(id: Doughnut.ID) {
+      const ancestors: Generated.Note[] = []
+      let cursor = this.getNoteById(id)
+      while(cursor && cursor.parentId) {
+        cursor = this.getNoteById(cursor.parentId)
+        if(!cursor) return undefined
+        ancestors.unshift(cursor)
+      }
+      if(!cursor) return undefined
+      const notebook = state.notebooksMapByHeadNoteId[cursor.id]
+      return { noteId: id, ancestors, notebook } as Generated.NotePositionViewedByUser
     },
 
     getChildrenIdsByParentId(parentId: Doughnut.ID) {
@@ -59,6 +73,7 @@ function withState(state: State) {
 export default defineStore('main', {
     state: () => ({
         notebooks: [],
+        notebooksMapByHeadNoteId: {},
         notes: {},
         links: {},
         parentChildrenIds: {},
@@ -73,6 +88,7 @@ export default defineStore('main', {
     getters: {
         getHighlightNote: (state: State)   => () => withState(state).getNoteById(state.highlightNoteId),
         getNoteById: (state)        => (id: Doughnut.ID) => withState(state).getNoteById(id),
+        getNotePosition: (state)        => (id: Doughnut.ID) => withState(state).getNotePosition(id),
         getNoteByIdLegacy: (state)        => (id: Doughnut.ID): MinimumNoteSphere | undefined => {
           const note = withState(state).getNoteById(id)
           if(!note) return undefined
@@ -91,9 +107,16 @@ export default defineStore('main', {
     },
 
     actions: {
-        setNotebooks(notebooks: Generated.NotebookViewedByUser[]) {
+
+        loadNotebooks(notebooks: Generated.NotebookViewedByUser[]) {
           this.notebooks = notebooks
+          notebooks.forEach(nb=>{ this.loadNotebook(nb) })
         },
+
+        loadNotebook(notebook: Generated.NotebookViewedByUser) {
+          this.notebooksMapByHeadNoteId[notebook.headNoteId] = notebook
+        },
+
         addEditingToUndoHistory({noteId}: {noteId: Doughnut.ID}) {
           this.noteUndoHistories.push({type: 'editing', noteId, textContent: {...withState(this).getNoteById(noteId)?.textContent}});
         },
@@ -118,7 +141,7 @@ export default defineStore('main', {
             const {id} = note;
             this.notes[id] = note;
           });
-          this.notebooks[notePosition.notebook.id] = notePosition.notebook
+          this.loadNotebook(notePosition.notebook)
         },
 
         loadNotesBulk(noteBulk: Generated.NotesBulk) {

@@ -30,6 +30,13 @@ class NoteBuilder extends Builder<Generated.Note> {
       }
   }
 
+  for(note: Generated.Note | undefined) {
+    if(note) {
+      this.data = note
+    }
+    return this
+  }
+
   title(value: string): NoteBuilder {
     this.data.title = value;
     this.data.textContent.title = value;
