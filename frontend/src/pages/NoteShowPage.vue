@@ -1,6 +1,6 @@
 <template>
   <LoadingPage v-bind="{ loading, contentExists: !!notePosition }">
-    <NotePageFrame
+    <NoteSphereComponent
       v-bind="{
         noteId,
         notePosition,
@@ -14,7 +14,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import LoadingPage from "./commons/LoadingPage.vue";
-import NotePageFrame from '../components/notes/views/NotePageFrame.vue';
+import NoteSphereComponent from '../components/notes/views/NoteSphereComponent.vue';
 import { ViewType, viewType } from "../models/viewTypes";
 import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
 
@@ -31,7 +31,7 @@ export default defineComponent({
       notePosition: Generated.NotePositionViewedByUser | null
     };
   },
-  components: { LoadingPage, NotePageFrame },
+  components: { LoadingPage, NoteSphereComponent },
   computed: {
     noteId() {
       if(!this.rawNoteId) return Number.NaN;

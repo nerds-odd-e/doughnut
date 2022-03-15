@@ -1,6 +1,6 @@
 <template>
     <div v-if="noteWithPosition">
-      <NotePageFrame
+      <NoteSphereComponent
       v-if="noteId"
       v-bind="{
         noteId,
@@ -25,7 +25,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import NotePageFrame from "../notes/views/NotePageFrame.vue";
+import NoteSphereComponent from "../notes/views/NoteSphereComponent.vue";
 import LinkShow from "../links/LinkShow.vue";
 import LinkNob from "../links/LinkNob.vue";
 import LinkViewedByUserBuilder from "../../../tests/fixtures/LinkViewedByUserBuilder";
@@ -35,7 +35,7 @@ export default defineComponent({
     noteWithPosition: Object as PropType<Generated.NoteWithPosition>,
     linkViewedByUser: Object as PropType<LinkViewedByUserBuilder>,
   },
-  components: {NotePageFrame, LinkShow, LinkNob},
+  components: {NoteSphereComponent, LinkShow, LinkNob},
   computed: {
     noteId() {
       return this.noteWithPosition?.note.id
