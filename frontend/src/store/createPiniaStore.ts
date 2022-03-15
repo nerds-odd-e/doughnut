@@ -117,6 +117,10 @@ export default defineStore('main', {
           this.loadNoteSpheres(noteBulk.notes);
         },
 
+        loadNoteWithPosition(noteWithPosition: Generated.NoteWithPosition) {
+          this.loadNoteSpheres([noteWithPosition.note]);
+        },
+
         deleteNote(noteId: Doughnut.ID) {
           withState(this).deleteNoteFromParentChildrenList(noteId)
           withState(this).deleteNote(noteId)

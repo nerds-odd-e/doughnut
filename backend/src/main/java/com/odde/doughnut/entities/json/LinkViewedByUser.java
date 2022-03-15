@@ -8,9 +8,6 @@ import com.odde.doughnut.models.UserModel;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class LinkViewedByUser {
     @Getter
     @Setter
