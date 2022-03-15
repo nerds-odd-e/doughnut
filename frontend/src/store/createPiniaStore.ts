@@ -113,12 +113,22 @@ export default defineStore('main', {
           });
         },
 
+        loadNotePosition(notePosition: Generated.NotePositionViewedByUser) {
+          notePosition.ancestors.forEach((note) => {
+            const {id} = note;
+            this.notes[id] = note;
+          });
+          this.notebooks[notePosition.notebook.id] = notePosition.notebook
+        },
+
         loadNotesBulk(noteBulk: Generated.NotesBulk) {
           this.loadNoteSpheres(noteBulk.notes);
+          this.loadNotePosition(noteBulk.notePosition);
         },
 
         loadNoteWithPosition(noteWithPosition: Generated.NoteWithPosition) {
           this.loadNoteSpheres([noteWithPosition.note]);
+          this.loadNotePosition(noteWithPosition.notePosition);
         },
 
         deleteNote(noteId: Doughnut.ID) {

@@ -7,7 +7,7 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
     if (!data) return;
     const { noteWithPosition, linkViewedByUser } = data;
     if (noteWithPosition) {
-      piniaStore.loadNoteWithPosition(noteWithPosition]);
+      piniaStore.loadNoteWithPosition(noteWithPosition);
     }
     if (linkViewedByUser) {
       piniaStore.loadNoteWithPosition(linkViewedByUser.sourceNoteWithPosition)
