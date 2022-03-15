@@ -1,28 +1,30 @@
 import Builder from "./Builder";
 import generateId from "./generateId";
-import NotebookBuilder from "./NotebookBuilder";
+import NotebooksBuilder from "./NotebooksBuilder";
 
-class CircleNoteBuilder extends Builder {
-  data: any;
+class CircleNoteBuilder extends Builder<Generated.CircleForUserView> {
+  notebooksBuilder: NotebooksBuilder
 
   constructor(parentBuilder?: Builder) {
     super(parentBuilder);
-    this.data = {
-      id: generateId(),
-      name: '',
-      invitationCode: '',
-      notebooks: [],
-      members: []
-    };
+    this.notebooksBuilder = new NotebooksBuilder()
+
   }
 
-  notebooks(notebook: NotebookBuilder) {
-    this.data.notebooks = [ ...this.data.notebooks, notebook];
+  notebooks(notebook: Generated.NotebookViewedByUser) {
+    this.notebooksBuilder.notebooks(notebook)
     return this;
   }
 
-  do(): any {
-    return this.data
+  do(): Generated.CircleForUserView {
+    return {
+      id: generateId(),
+      name: '',
+      invitationCode: '',
+      notebooks: this.notebooksBuilder.do(),
+      members: []
+    };
+
   }
 }
 

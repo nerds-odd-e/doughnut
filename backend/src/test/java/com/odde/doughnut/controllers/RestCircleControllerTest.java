@@ -1,6 +1,6 @@
 package com.odde.doughnut.controllers;
 
-import com.odde.doughnut.controllers.RestCircleController.CircleForUserView;
+import com.odde.doughnut.entities.json.CircleForUserView;
 import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.entities.TextContent;
 import com.odde.doughnut.exceptions.NoAccessRightException;

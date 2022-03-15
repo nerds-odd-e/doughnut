@@ -1,8 +1,16 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-03-15 15:24:55.
+// Generated using typescript-generator version 2.35.1025 on 2022-03-15 16:14:45.
 
 declare namespace Generated {
+
+    interface CircleForUserView {
+        id: number;
+        name: string;
+        invitationCode: string;
+        notebooks: NotebooksViewedByUser;
+        members: UserForOtherUserView[];
+    }
 
     interface CurrentUserInfo {
         user: User;
@@ -79,6 +87,10 @@ declare namespace Generated {
         remainingInitialReviewCountForToday: number;
     }
 
+    interface UserForOtherUserView {
+        name: string;
+    }
+
     interface User {
         id: number;
         name: string;
@@ -94,8 +106,8 @@ declare namespace Generated {
         targetNote: Note;
         typeId: number;
         createdAt: string;
-        linkNameOfSource: string;
         linkTypeLabel: string;
+        linkNameOfSource: string;
     }
 
     interface Note {
@@ -111,7 +123,7 @@ declare namespace Generated {
 
     interface Ownership {
         id: number;
-        circle: Circle;
+        circle?: Circle;
     }
 
     interface Subscription {

@@ -3,6 +3,7 @@ package com.odde.doughnut.entities;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -31,18 +32,21 @@ public class Ownership {
 
     @OneToOne
     @JoinColumn(name = "circle_id")
-    @Getter @Setter private Circle circle;
+    @Setter private Circle circle;
 
     @OneToMany(mappedBy = "ownership")
     @Where(clause = "deleted_at is null")
     @JsonIgnore
     @Getter @Setter private List<Notebook> notebooks = new ArrayList<>();
 
+    public Optional<Circle> getCircle() {
+        return Optional.ofNullable(circle);
+    }
     public boolean ownsBy(User user) {
         if(this.user != null) {
             return this.user.equals(user);
         }
-        return circle.getMembers().contains(user);
+        return getCircle().map((circle)->circle.getMembers().contains(user)).orElse(false);
     }
 
     public Note createNotebook(User user, TextContent textContent, Timestamp currentUTCTimestamp) {

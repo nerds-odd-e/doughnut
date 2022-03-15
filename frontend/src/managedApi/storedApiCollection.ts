@@ -197,8 +197,8 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
       return res;
     },
 
-    getCircle(circleId: Doughnut.ID) {
-      return managedApi.restGet(`circles/${circleId}`);
+    async getCircle(circleId: Doughnut.ID) {
+      return await managedApi.restGet(`circles/${circleId}`) as Generated.CircleForUserView;
     },
   };
 };

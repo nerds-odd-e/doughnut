@@ -2,7 +2,6 @@
 package com.odde.doughnut.controllers;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -11,10 +10,12 @@ import javax.validation.constraints.Size;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.json.CircleForUserView;
 import com.odde.doughnut.entities.json.RedirectToNoteResponse;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.CircleModel;
+import com.odde.doughnut.models.JsonViewer;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
 
@@ -46,41 +47,11 @@ class RestCircleController {
     this.testabilitySettings = testabilitySettings;
   }
 
-  static class UserForOtherUserView {
-    @Setter @Getter String name;
-
-    public static List<UserForOtherUserView> fromList(List<User> users) {
-      return users.stream().map(u->{
-        UserForOtherUserView ufv = new UserForOtherUserView();
-        ufv.setName(u.getName());
-        return ufv;
-      }).collect(Collectors.toUnmodifiableList());
-    }
-  }
-
-  static class CircleForUserView {
-    @Setter @Getter
-    Integer id;
-    @Setter @Getter
-    String name;
-    @Setter @Getter
-    String invitationCode;
-    @Setter @Getter
-    List<Notebook> notebooks;
-    @Setter @Getter
-    List<UserForOtherUserView> members;
-  }
-
   @GetMapping("/{circle}")
   public CircleForUserView showCircle(@PathVariable("circle") Circle circle) throws NoAccessRightException {
     currentUserFetcher.getUser().getAuthorization().assertAuthorization(circle);
-    CircleForUserView circleForUserView = new CircleForUserView();
-    circleForUserView.setId(circle.getId());
-    circleForUserView.setName(circle.getName());
-    circleForUserView.setInvitationCode(circle.getInvitationCode());
-    circleForUserView.setNotebooks(circle.getOwnership().getNotebooks());
-    circleForUserView.setMembers(UserForOtherUserView.fromList(circle.getMembers()));
-    return circleForUserView;
+    JsonViewer jsonViewer = new JsonViewer(currentUserFetcher.getUser().getEntity());
+    return jsonViewer.jsonCircleForUserView(circle);
   }
 
   @GetMapping("")

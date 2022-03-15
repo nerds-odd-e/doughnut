@@ -1,33 +1,46 @@
 import Builder from "./Builder";
 import generateId from "./generateId";
-import NoteSphereBuilder from "./NoteSphereBuilder";
+import NoteBuilder from "./NoteBuilder";
 
-class NotebookBuilder extends Builder {
-  data: any;
+class NotebookBuilder extends Builder<Generated.NotebookViewedByUser> {
+  data: Generated.NotebookViewedByUser
+
+  notebuilder = new NoteBuilder()
 
   constructor(parentBuilder?: Builder) {
     super(parentBuilder);
     this.data = {
       id: generateId(),
       ownership: {
-        isFromCircle: false,
+        id: generateId(),
       },
-      headNote: new NoteSphereBuilder().do(),
+      headNote: this.notebuilder.data,
+      headNoteId: this.notebuilder.data.id,
+      fromBazaar: false,
       skipReviewEntirely: false
     }
   }
 
+  shortDescription(value: string): NotebookBuilder {
+    this.notebuilder.shortDescription(value)
+    return this
+  }
+
+  fromBazzar(): NotebookBuilder {
+    this.data.fromBazaar = true
+    return this;
+  }
+
   inCircle(value: string): NotebookBuilder {
-    this.data.ownership = {
-      isFromCircle: true,
-      circle: {
-        name: value,
-      },
+    this.data.ownership.circle = {
+      id: generateId(),
+      name: value,
     };
     return this;
   }
 
-  do(): any {
+  do(): Generated.NotebookViewedByUser {
+    this.data.headNote = this.notebuilder.do()
     return this.data;
   }
 }

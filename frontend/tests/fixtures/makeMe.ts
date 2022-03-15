@@ -6,7 +6,7 @@ import LinkViewedByUserBuilder from "./LinkViewedByUserBuilder"
 import RepetitionBuilder from "./RepetitionBuilder"
 import NotebookBuilder from "./NotebookBuilder";
 import CircleNoteBuilder from "./CircleNoteBuilder";
-import BazaarNoteBuilder from "./BazaarNotebooksBuilder";
+import BazaarNoteBuilder from "./NotebooksBuilder";
 
 class MakeMe {
   static get links(): LinksBuilder {

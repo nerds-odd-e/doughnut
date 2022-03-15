@@ -8,7 +8,7 @@
         </NotebookNewButton>
       </p>
 
-      <NotebookCardsWithButtons :notebooks="circle.notebooks">
+      <NotebookCardsWithButtons :notebooks="circle.notebooks.notebooks">
         <template #default="{ notebook }">
           <NotebookButtons v-bind="{ notebook, featureToggle }" class="card-header-btn">
             <template #additional-buttons>
@@ -38,7 +38,8 @@
   </ContainerPage>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue";
 import SvgMissingAvatar from "../components/svgs/SvgMissingAvatar.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import NotebookCardsWithButtons from "../components/notebook/NotebookCardsWithButtons.vue";
@@ -48,7 +49,7 @@ import BazaarNotebookButtons from "../components/bazaar/BazaarNotebookButtons.vu
 import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
 
 
-export default ({
+export default defineComponent({
   setup() {
     return useStoredLoadingApi({initalLoading: true, hasFormError: true});
   },
@@ -60,12 +61,15 @@ export default ({
     BazaarNotebookButtons,
     ContainerPage,
   },
-  props: { circleId: Number },
+  props: { circleId: { type: Number, required: true } },
 
   data() {
     return {
       queryCounter: 0,
       circle: null,
+    } as {
+      queryCounter: number
+      circle: Generated.CircleForUserView | null
     };
   },
 
@@ -82,7 +86,7 @@ export default ({
 
   computed: {
     invitationUrl() {
-      return `${window.location.origin}/circles/join/${this.circle.invitationCode}`;
+      return `${window.location.origin}/circles/join/${this.circle!.invitationCode}`;
     },
     featureToggle() { return this.piniaStore.featureToggle }
   },

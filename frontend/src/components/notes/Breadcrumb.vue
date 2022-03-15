@@ -1,7 +1,7 @@
 <template>
   <BasicBreadcrumb v-bind="{ancestors}">
     <template #topLink v-if="notebook">
-      <li v-if="!owns" class="breadcrumb-item">
+      <li v-if="fromBazaar" class="breadcrumb-item">
         <router-link :to="{ name: 'bazaar' }">Bazaar</router-link>
       </li>
       <template v-else>
@@ -27,24 +27,27 @@
   </BasicBreadcrumb>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, PropType } from "vue";
 import BasicBreadcrumb from "../commons/BasicBreadcrumb.vue";
 
-export default {
+export default defineComponent({
   name: "Breadcrumb",
   props: {
     noteId: {type: Number, required: true},
     ancestors: Array,
-    notebook: Object,
-    owns: { type: Boolean, required: true },
+    notebook: Object as PropType<Generated.NotebookViewedByUser>,
   },
   components: {
     BasicBreadcrumb,
   },
   computed: {
+    fromBazaar() {
+      return this.notebook?.fromBazaar;
+    },
     circle() {
-      return !!this.notebook ? this.notebook.ownership.circle : null;
+      return this.notebook ? this.notebook.ownership.circle : null;
     },
   },
-};
+});
 </script>

@@ -2,41 +2,33 @@ import Builder from "./Builder";
 import NotebookBuilder from "./NotebookBuilder";
 
 
-class NotePositionBuilder extends Builder {
-  data: any;
-
+class NotePositionBuilder extends Builder<Generated.NotePositionViewedByUser> {
   notebookBuilder = new NotebookBuilder();
 
-  constructor(parentBuilder?: Builder) {
-    super(parentBuilder);
-    this.data = {
-      owns: true,
-      ancestors: [],
-    }
-  }
-
   inBazaar(): NotePositionBuilder {
-    this.data.owns = false
-    this.data.headNote = {}
+    this.notebookBuilder.fromBazzar()
     return this
   }
 
   shortDescription(value: string): NotePositionBuilder {
-    this.data.headNote.shortDescription = value;
+    this.notebookBuilder.shortDescription(value)
     return this;
   }
 
 
   inCircle(value: string): NotePositionBuilder {
-    this.data.owns = true;
     this.notebookBuilder.inCircle(value);
     return this;
   }
 
 
-  do(): any {
-    this.data.notebook = this.notebookBuilder.do();
-    return this.data
+  do(): Generated.NotePositionViewedByUser {
+    return {
+      noteId: 0,
+      notebook: this.notebookBuilder.do(),
+      ancestors:[]
+
+    }
   }
 }
 

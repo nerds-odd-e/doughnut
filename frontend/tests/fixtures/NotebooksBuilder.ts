@@ -1,10 +1,7 @@
 import Builder from "./Builder";
-import NotebookBuilder from "./NotebookBuilder";
 
-const idCounter = 1;
-
-class BazaarNotebooksBuilder extends Builder {
-  data: any;
+class NotebooksBuilder extends Builder<Generated.NotebooksViewedByUser> {
+  data: Generated.NotebooksViewedByUser;
 
   constructor(parentBuilder?: Builder) {
     super(parentBuilder);
@@ -14,14 +11,14 @@ class BazaarNotebooksBuilder extends Builder {
     };
   }
 
-  notebooks(notebook: NotebookBuilder) {
+  notebooks(notebook: Generated.NotebookViewedByUser) {
     this.data.notebooks = [ ...this.data.notebooks, notebook];
     return this;
   }
 
-  do(): any {
+  do(): Generated.NotebooksViewedByUser {
     return this.data
   }
 }
 
-export default BazaarNotebooksBuilder;
+export default NotebooksBuilder;
