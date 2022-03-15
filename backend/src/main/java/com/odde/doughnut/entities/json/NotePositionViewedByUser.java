@@ -20,7 +20,4 @@ public class NotePositionViewedByUser {
     @Getter
     @Setter
     private List<Note> ancestors;
-    @Getter
-    @Setter
-    private Boolean owns;
 }

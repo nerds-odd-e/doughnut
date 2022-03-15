@@ -62,7 +62,6 @@ public class NoteViewer {
         nvb.setNoteId(note.getId());
         nvb.setNotebook(jsonViewer.jsonNotebookViewedByUser(note.getNotebook()));
         nvb.setAncestors(note.getAncestors());
-        nvb.setOwns(viewer != null && viewer.owns(note.getNotebook()));
         return nvb;
     }
 

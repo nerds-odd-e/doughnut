@@ -63,7 +63,7 @@ class RestNoteControllerTests {
             makeMe.refresh(userModel.getEntity());
             final NotesBulk show = controller.show(note);
             assertThat(show.notes.get(0).getNote().getTitle(), equalTo(note.getTitle()));
-            assertThat(show.notePosition.getOwns(), is(false));
+            assertThat(show.notePosition.getNotebook().getFromBazaar(), is(true));
         }
 
         @Test
@@ -72,7 +72,7 @@ class RestNoteControllerTests {
             makeMe.refresh(userModel.getEntity());
             final NotesBulk show = controller.show(note);
             assertThat(show.notes.get(0).getId(), equalTo(note.getId()));
-            assertThat(show.notePosition.getOwns(), is(true));
+            assertThat(show.notePosition.getNotebook().getFromBazaar(), is(false));
         }
 
         @Test
@@ -84,7 +84,7 @@ class RestNoteControllerTests {
             makeMe.refresh(childNote);
             final NotesBulk showOverview = controller.showOverview(note);
             assertThat(showOverview.notes, hasSize(12));
-            assertThat(showOverview.notePosition.getOwns(), equalTo(true));
+            assertThat(showOverview.notePosition.getNotebook().getFromBazaar(), equalTo(false));
             assertThat(showOverview.notes.get(0).getChildrenIds(), hasSize(1));
         }
 
