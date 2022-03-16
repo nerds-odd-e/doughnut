@@ -1,21 +1,21 @@
 <template>
   <nav class="navbar toolbar">
-    <NoteButtons v-if="currentNote"
-    :note="currentNote"
+    <NoteButtons v-if="selectedNote"
+    :note="selectedNote"
     :viewType="viewType"
     :featureToggle="featureToggle"
     />
     <div class="btn-group btn-group-sm">
-      <LinkNoteButton :note="currentNote" />
+      <LinkNoteButton :note="selectedNote" />
       <NoteUndoButton/>
     </div>
   </nav>
-  <Breadcrumb v-bind="notePosition"/>
+  <Breadcrumb v-bind="selectedNotePosition"/>
 </template>
 
 <script lang="ts">
 
-import { defineComponent } from 'vue'
+import { defineComponent, PropType } from 'vue'
 import Breadcrumb from "./Breadcrumb.vue";
 import NoteButtons from './NoteButtons.vue'
 import NoteUndoButton from "./NoteUndoButton.vue";
@@ -26,7 +26,10 @@ export default defineComponent({
   setup() {
     return useStoredLoadingApi();
   },
-  props: { selectedNoteId: Number},
+  props: {
+    selectedNote: Object as PropType<Generated.Note>,
+    selectedNotePosition: Object as PropType<Generated.NotePositionViewedByUser>,
+  },
   components: {
     NoteButtons,
     NoteUndoButton,
@@ -34,12 +37,8 @@ export default defineComponent({
     Breadcrumb,
   },
   computed: {
-    currentNote() { return this.piniaStore.getNoteById(this.selectedNoteId) },
     viewType() { return this.piniaStore.viewType },
     featureToggle() { return this.piniaStore.featureToggle },
-    notePosition(): Generated.NotePositionViewedByUser | undefined {
-      return this.piniaStore.getNotePosition(this.selectedNoteId)
-    },
   },
 });
 </script>

@@ -7,6 +7,7 @@
           expandChildren,
           offset,
           }"
+          @selectNote="$emit('selectNote', $event)"
       />
     </div>
   <div class="mindmap-info" @click.prevent="reset">
@@ -31,8 +32,10 @@ export default ({
   },
   props: {
     noteId: Number,
+    highlightNoteId: Number,
     expandChildren: { type: Boolean, required: true },
   },
+  emits: ['selectNote'],
   data() {
     return {
       offset: { ... defaultOffset },
@@ -45,7 +48,6 @@ export default ({
     },
   },
   computed: {
-    highlightNoteId() { return this.piniaStore.highlightNoteId },
     centerX() {
       return `calc(50% + ${this.offset.x}px)`
     },

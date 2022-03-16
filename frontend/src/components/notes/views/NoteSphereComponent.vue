@@ -1,11 +1,12 @@
 <template>
     <div class="inner-box">
       <div class="header">
-        <NoteControl v-bind="{selectedNoteId}"/>
+        <NoteControl v-bind="{selectedNote, selectedNotePosition}"/>
       </div>
       <div class="content">
         <component :is="noteComponent" 
           v-bind="{noteId, expandChildren}"
+          :highlightNoteId="selectedNoteId"
           @selectNote="highlight($event)"
         />
       </div>
@@ -41,6 +42,16 @@ export default defineComponent({
   methods: {
     highlight(id: Doughnut.ID) { 
       this.selectedNoteId = id
+    },
+  },
+  computed: {
+    selectedNotePosition(): Generated.NotePositionViewedByUser | undefined {
+      if(!this.selectedNoteId) return
+      return this.piniaStore.getNotePosition(this.selectedNoteId)
+    },
+    selectedNote() {
+      if(!this.selectedNoteId) return
+      return this.piniaStore.getNoteById(this.selectedNoteId)
     },
   },
   mounted() {

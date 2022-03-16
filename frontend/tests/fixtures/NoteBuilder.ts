@@ -62,6 +62,7 @@ class NoteBuilder extends Builder<Generated.Note> {
   }
 
   under(value: Generated.NoteSphere): NoteBuilder {
+    value.childrenIds ||= []
     value.childrenIds.push(this.data.id)
     this.data.parentId = value.id
 
