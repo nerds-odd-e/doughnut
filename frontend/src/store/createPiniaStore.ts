@@ -1,13 +1,10 @@
 import { defineStore } from "pinia";
-import MinimumNoteSphere from "./MinimumNoteSphere";
-import Links from "./Links";
 
 
 interface State {
   notebooks: Generated.NotebookViewedByUser[]
   notebooksMapByHeadNoteId: {[id: Doughnut.ID]: Generated.NotebookViewedByUser}
   noteSpheres: {[id: Doughnut.ID]: Generated.NoteSphere }
-  parentChildrenIds: {[id: Doughnut.ID]: Doughnut.ID[] }
   highlightNoteId: Doughnut.ID | undefined
   noteUndoHistories: any[]
   currentUser: Generated.User | null
@@ -46,12 +43,12 @@ function withState(state: State) {
     },
 
     getChildrenIdsByParentId(parentId: Doughnut.ID) {
-      return state.parentChildrenIds[parentId] || []
+      return this.getNoteSphereById(parentId)?.childrenIds
     },
 
     getChildrenOfParentId(parentId: Doughnut.ID) {
       return this.getChildrenIdsByParentId(parentId)
-        .map((id: Doughnut.ID)=>this.getNoteById(id))
+        ?.map((id: Doughnut.ID)=>this.getNoteById(id))
         .filter((n: any)=>n)
     },
    
@@ -79,7 +76,6 @@ export default defineStore('main', {
         notebooks: [],
         notebooksMapByHeadNoteId: {},
         noteSpheres: {},
-        parentChildrenIds: {},
         highlightNoteId: undefined,
         noteUndoHistories: [],
         currentUser: null,
@@ -91,15 +87,8 @@ export default defineStore('main', {
     getters: {
         getHighlightNote: (state: State)   => () => withState(state).getNoteById(state.highlightNoteId),
         getNoteById: (state)        => (id: Doughnut.ID) => withState(state).getNoteById(id),
+        getNoteSphereById: (state)        => (id: Doughnut.ID) => withState(state).getNoteSphereById(id),
         getHighlightNotePosition: (state)        => () => withState(state).getNotePosition(state.highlightNoteId),
-        getNoteByIdLegacy: (state)        => (id: Doughnut.ID): MinimumNoteSphere | undefined => {
-          const note = withState(state).getNoteById(id)
-          if(!note) return undefined
-          const {parentId} = note
-          const links = withState(state).getLinksById(id)
-          const childrenIds = withState(state).getChildrenIdsByParentId(id)
-          return {id, parentId, links, childrenIds }
-        },
         getLinksById: (state)        => (id: Doughnut.ID) => withState(state).getLinksById(id),
         peekUndo: (state)           => () => {
           if(state.noteUndoHistories.length === 0) return null
@@ -132,9 +121,7 @@ export default defineStore('main', {
 
         loadNoteSpheres(noteSpheres: Generated.NoteSphere[]) {
           noteSpheres.forEach((noteSphere) => {
-            const {id} = noteSphere.note;
-            this.noteSpheres[id] = noteSphere;
-            if(noteSphere.childrenIds !== undefined) this.parentChildrenIds[id] = noteSphere.childrenIds;
+            this.noteSpheres[noteSphere.id] = noteSphere;
           });
         },
 

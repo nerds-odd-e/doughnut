@@ -2,10 +2,9 @@ import MindmapSector from "./MindmapSector"
 import LinksReader from "./LinksReader";
 import { Coord, StraightConnection, Vector } from "./MindmapUnits";
 import MindmapMetrics from "./MindmapMetrics";
-import MinimumNoteSphere from "../store/MinimumNoteSphere";
 
 
-type NoteFinder = (id: Doughnut.ID) => MinimumNoteSphere | undefined
+type NoteFinder = (id: Doughnut.ID) => Generated.NoteSphere | undefined
 class Mindmap {
     rootMindmapSector: MindmapSector
 
@@ -58,17 +57,20 @@ class Mindmap {
       if(!ancestors) return undefined
       let sector = this.rootMindmapSector
       for(let i = 0; i < ancestors.length - 1; i+=1) {
-        sector = sector.getChildSector(ancestors[i].childrenIds.length, ancestors[i].childrenIds.indexOf(ancestors[i+1].id))
+        const ancestorChildrenIds = ancestors[i].childrenIds;
+        if(ancestorChildrenIds !== undefined) {
+          sector = sector.getChildSector(ancestorChildrenIds.length, ancestorChildrenIds.indexOf(ancestors[i+1].id))
+        }
       }
       return sector
     }
 
-    ancestorsUntilRoot(noteId: Doughnut.ID) : Array<MinimumNoteSphere> | undefined {
-      const note = this.noteFinder(noteId)
-      if (!note) return undefined
-      if(noteId.toString() === this.rootNoteId.toString()) return [note]
-      if (!note.parentId) return undefined
-      return this.ancestorsUntilRoot(note!.parentId)?.concat([note])
+    ancestorsUntilRoot(noteId: Doughnut.ID) : Array<Generated.NoteSphere> | undefined {
+      const noteSphere = this.noteFinder(noteId)
+      if (!noteSphere) return undefined
+      if(noteId.toString() === this.rootNoteId.toString()) return [noteSphere]
+      if (!noteSphere.note.parentId) return undefined
+      return this.ancestorsUntilRoot(noteSphere.note.parentId)?.concat([noteSphere])
     }
 
 }

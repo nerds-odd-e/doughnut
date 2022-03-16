@@ -8,6 +8,7 @@ import java.util.Map;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.testability.MakeMe;
@@ -43,7 +44,9 @@ public class NoteWithPositionTest {
         }
 
         private Map<String, Object> getJsonString(NoteWithPosition value) throws JsonProcessingException {
-            return new ObjectMapper().readerForMapOf(Object.class).readValue(new ObjectMapper().writeValueAsString(value));
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.registerModule(new Jdk8Module());
+            return objectMapper.readerForMapOf(Object.class).readValue(objectMapper.writeValueAsString(value));
         }
     }
 
