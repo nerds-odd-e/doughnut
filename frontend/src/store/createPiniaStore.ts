@@ -29,11 +29,11 @@ function withState(state: State) {
     getNotePosition(id: Doughnut.ID | undefined) {
       if(!id) return undefined
       const ancestors: Generated.Note[] = []
-      let cursor = this.getNoteById(id)
-      while(cursor && cursor.parentId) {
-        cursor = this.getNoteById(cursor.parentId)
+      let cursor = this.getNoteSphereById(id)
+      while(cursor && cursor.note.parentId) {
+        cursor = this.getNoteSphereById(cursor.note.parentId)
         if(!cursor) return undefined
-        ancestors.unshift(cursor)
+        ancestors.unshift(cursor.note)
       }
       if(!cursor) return undefined
       const notebook = state.notebooksMapByHeadNoteId[cursor.id]
@@ -44,12 +44,6 @@ function withState(state: State) {
       return this.getNoteSphereById(parentId)?.childrenIds
     },
 
-    getChildrenOfParentId(parentId: Doughnut.ID) {
-      return this.getChildrenIdsByParentId(parentId)
-        ?.map((id: Doughnut.ID)=>this.getNoteById(id))
-        .filter((n: any)=>n)
-    },
-   
     deleteNote(id: Doughnut.ID) {
       this.getChildrenIdsByParentId(id)?.forEach((cid: Doughnut.ID)=>this.deleteNote(cid))
       delete state.noteSpheres[id]
@@ -89,8 +83,6 @@ export default defineStore('main', {
           if(state.noteUndoHistories.length === 0) return null
           return state.noteUndoHistories[state.noteUndoHistories.length - 1]
         },
-        getChildrenIdsByParentId: (state) => (parentId: Doughnut.ID) => withState(state).getChildrenIdsByParentId(parentId),
-        getChildrenOfParentId: (state)    => (parentId: Doughnut.ID) => withState(state).getChildrenOfParentId(parentId),
     },
 
     actions: {

@@ -12,7 +12,7 @@
         <NoteArticleView v-if="viewType==='article'" 
           v-bind="{noteId, expandChildren}"
         />
-        <NoteCardsView v-if="!viewType || viewType==='card'" 
+        <NoteCardsView v-if="!viewType || viewType==='cards'" 
           v-bind="{noteId, expandChildren}"
         />
       </div>
@@ -57,7 +57,7 @@ export default defineComponent({
     },
     selectedNote() {
       if(!this.selectedNoteId) return
-      return this.piniaStore.getNoteById(this.selectedNoteId)
+      return this.piniaStore.getNoteSphereById(this.selectedNoteId)?.note
     },
   },
   mounted() {

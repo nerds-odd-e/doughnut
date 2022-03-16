@@ -43,9 +43,9 @@ describe('storedApiCollection', () => {
     it('should remove child from list', async () => {
       const child = makeMe.aNoteSphere.under(note).please();
       store.loadNoteSpheres([child]);
-      const childrenCount = store.getChildrenIdsByParentId(note.id).length;
+      const childrenCount = store.getNoteSphereById(note.id).childrenIds.length;
       await sa.deleteNote(child.id);
-      expect(store.getChildrenIdsByParentId(note.id)).toHaveLength(
+      expect(store.getNoteSphereById(note.id).childrenIds).toHaveLength(
         childrenCount - 1
       );
     });

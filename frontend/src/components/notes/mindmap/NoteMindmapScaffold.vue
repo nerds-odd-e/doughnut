@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, PropType } from "vue";
 import MindmapSector from "../../../models/MindmapSector";
 
 import useStoredLoadingApi from "../../../managedApi/useStoredLoadingApi";
@@ -29,17 +29,20 @@ export default defineComponent({
   name: "NoteMindmap",
   props: {
     noteId: { type: Number, required: true},
-    mindmapSector: MindmapSector,
+    mindmapSector: Object as PropType<MindmapSector>,
   },
   computed: {
+    noteSphere() {
+      return this.piniaStore.getNoteSphereById(this.noteId);
+    },
     note() {
-      return this.piniaStore.getNoteById(this.noteId);
+      return this.noteSphere?.note
     },
     links() {
-      return this.piniaStore.getLinksById(this.noteId);
+      return this.noteSphere?.links
     },
     childrenIds() {
-      return this.piniaStore.getChildrenIdsByParentId(this.noteId);
+      return this.noteSphere?.childrenIds
     },
   },
 });

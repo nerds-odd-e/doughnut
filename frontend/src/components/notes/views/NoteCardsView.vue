@@ -33,7 +33,9 @@ export default defineComponent({
       return this.piniaStore.getNoteSphereById(this.noteId);
     },
     children() {
-      return this.piniaStore.getChildrenOfParentId(this.noteId);
+      return this.noteSphere?.childrenIds
+        ?.map((id: Doughnut.ID)=>this.piniaStore.getNoteSphereById(id)?.note)
+        .filter((n)=>n)
     },
   }
 });
