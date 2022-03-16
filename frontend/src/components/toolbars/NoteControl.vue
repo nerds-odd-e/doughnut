@@ -26,6 +26,7 @@ export default defineComponent({
   setup() {
     return useStoredLoadingApi();
   },
+  props: { selectedNoteId: Number},
   components: {
     NoteButtons,
     NoteUndoButton,
@@ -33,11 +34,11 @@ export default defineComponent({
     Breadcrumb,
   },
   computed: {
-    currentNote() { return this.piniaStore.getHighlightNote() },
+    currentNote() { return this.piniaStore.getNoteById(this.selectedNoteId) },
     viewType() { return this.piniaStore.viewType },
     featureToggle() { return this.piniaStore.featureToggle },
     notePosition(): Generated.NotePositionViewedByUser | undefined {
-      return this.piniaStore.getHighlightNotePosition()
+      return this.piniaStore.getNotePosition(this.selectedNoteId)
     },
   },
 });

@@ -5,7 +5,6 @@ interface State {
   notebooks: Generated.NotebookViewedByUser[]
   notebooksMapByHeadNoteId: {[id: Doughnut.ID]: Generated.NotebookViewedByUser}
   noteSpheres: {[id: Doughnut.ID]: Generated.NoteSphere }
-  highlightNoteId: Doughnut.ID | undefined
   noteUndoHistories: any[]
   currentUser: Generated.User | null
   featureToggle: boolean
@@ -76,7 +75,6 @@ export default defineStore('main', {
         notebooks: [],
         notebooksMapByHeadNoteId: {},
         noteSpheres: {},
-        highlightNoteId: undefined,
         noteUndoHistories: [],
         currentUser: null,
         featureToggle: false,
@@ -85,10 +83,9 @@ export default defineStore('main', {
     } as State),
 
     getters: {
-        getHighlightNote: (state: State)   => () => withState(state).getNoteById(state.highlightNoteId),
         getNoteById: (state)        => (id: Doughnut.ID) => withState(state).getNoteById(id),
         getNoteSphereById: (state)        => (id: Doughnut.ID) => withState(state).getNoteSphereById(id),
-        getHighlightNotePosition: (state)        => () => withState(state).getNotePosition(state.highlightNoteId),
+        getNotePosition: (state)        => (id: Doughnut.ID) => withState(state).getNotePosition(id),
         getLinksById: (state)        => (id: Doughnut.ID) => withState(state).getLinksById(id),
         peekUndo: (state)           => () => {
           if(state.noteUndoHistories.length === 0) return null
@@ -157,9 +154,6 @@ export default defineStore('main', {
           withState(this).deleteNoteFromParentChildrenList(noteId)
           withState(this).deleteNote(noteId)
           this.noteUndoHistories.push({type: 'delete note', noteId});
-        },
-        setHighlightNoteId(noteId: Doughnut.ID) {
-          this.highlightNoteId = noteId
         },
         setViewType(viewType: string) {
           this.viewType = viewType

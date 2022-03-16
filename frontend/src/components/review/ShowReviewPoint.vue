@@ -5,7 +5,9 @@
       v-bind="{
         noteId,
         expandChildren: false,
-        noteComponent: 'NoteCardsView'}"/>
+        noteComponent: 'NoteCardsView'}"
+      :key="noteId"
+      />
     </div>
 
     <div v-if="linkViewedByUser">

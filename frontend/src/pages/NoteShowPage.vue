@@ -5,6 +5,7 @@
         noteId,
         expandChildren: true,
         noteComponent: viewTypeObj.noteComponent}"
+      :key="noteId"
       />
 
   </LoadingPage>

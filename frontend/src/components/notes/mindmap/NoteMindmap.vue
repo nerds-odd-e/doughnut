@@ -47,7 +47,7 @@
           mindmap,
           highlightNoteId,
         }"
-        @highlight="piniaStore.setHighlightNoteId($event)"
+        @highlight="$emit('selectNote', $event)"
       />
     </template>
   </NoteMindmapScaffold>
@@ -82,6 +82,7 @@ export default defineComponent({
     NoteParentChildConnection,
     NoteLinks,
   },
+  emits: ['selectNote'],
   computed: {
     mindmapSector() {
       return new MindmapSector(0, 0, this.offset.rotate - Math.PI / 2, Math.PI * 2)
