@@ -4,7 +4,7 @@ import generateId from "./generateId";
 import NotePositionBuilder from "./NotePositionBuilder"
 
 class ReviewPointBuilder extends Builder<Generated.ReviewPointViewedByUser> {
-  data: any
+  data: Generated.ReviewPointViewedByUser
 
   constructor(parentBuilder?: Builder) {
     super(parentBuilder);
@@ -18,8 +18,14 @@ class ReviewPointBuilder extends Builder<Generated.ReviewPointViewedByUser> {
         forgettingCurveIndex: 0,
         removedFromReview: false,
         noteId: 0,
-        linkId: 0
+        linkId: 0,
       },
+      reviewSetting: {
+        id: 0,
+        rememberSpelling: false,
+        level: 0
+      },
+      remainingInitialReviewCountForToday: 0
     };
   }
 
@@ -28,7 +34,7 @@ class ReviewPointBuilder extends Builder<Generated.ReviewPointViewedByUser> {
     return this;
   }
 
-  ofNote(note: any): ReviewPointBuilder {
+  ofNote(note: Generated.NoteSphere): ReviewPointBuilder {
     this.data.noteWithPosition = {
       note,
       notePosition: new NotePositionBuilder().do()
@@ -37,16 +43,14 @@ class ReviewPointBuilder extends Builder<Generated.ReviewPointViewedByUser> {
     return this
   }
 
-  ofLink(link: any): ReviewPointBuilder {
+  ofLink(link: Generated.LinkViewedByUser): ReviewPointBuilder {
     this.data.linkViewedByUser = link
     this.data.reviewPoint.linkId = link.id
     return this
   }
 
-  do(): any {
-    return merge(
-      {}, this.data
-    );
+  do(): Generated.ReviewPointViewedByUser {
+    return this.data
   }
 }
 

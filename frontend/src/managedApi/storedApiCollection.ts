@@ -132,6 +132,7 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
 
     async undo() {
       const history = piniaStore.peekUndo();
+      if(!history) throw new Error('undo history is empty')
       piniaStore.popUndoHistory();
       if (history.type === 'editing') {
         return updateTextContentWithoutUndo(
