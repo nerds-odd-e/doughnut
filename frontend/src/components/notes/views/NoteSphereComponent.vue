@@ -29,6 +29,7 @@ export default defineComponent({
   props: {
      noteId: { type: Number, required: true },
      noteComponent: String,
+     viewType: String,
      expandChildren: { type: Boolean, required: true },
   },
   data() {
@@ -45,7 +46,6 @@ export default defineComponent({
     },
   },
   computed: {
-    viewType() { return this.piniaStore.viewType },
     selectedNotePosition(): Generated.NotePositionViewedByUser | undefined {
       if(!this.selectedNoteId) return
       return this.piniaStore.getNotePosition(this.selectedNoteId)

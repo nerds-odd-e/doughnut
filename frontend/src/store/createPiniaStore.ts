@@ -8,7 +8,6 @@ interface State {
   noteUndoHistories: any[]
   currentUser: Generated.User | null
   featureToggle: boolean
-  viewType: string
   environment: 'production' | 'testing'
 }
 
@@ -78,7 +77,6 @@ export default defineStore('main', {
         noteUndoHistories: [],
         currentUser: null,
         featureToggle: false,
-        viewType: 'card',
         environment: 'production',
     } as State),
 
@@ -154,9 +152,6 @@ export default defineStore('main', {
           withState(this).deleteNoteFromParentChildrenList(noteId)
           withState(this).deleteNote(noteId)
           this.noteUndoHistories.push({type: 'delete note', noteId});
-        },
-        setViewType(viewType: string) {
-          this.viewType = viewType
         },
         setCurrentUser(user: Generated.User) {
           this.currentUser = user

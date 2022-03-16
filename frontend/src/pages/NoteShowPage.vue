@@ -3,6 +3,7 @@
     <NoteSphereComponent
       v-bind="{
         noteId,
+        viewType,
         expandChildren: true,
         noteComponent: viewTypeObj.noteComponent}"
       :key="noteId"
@@ -35,10 +36,6 @@ export default defineComponent({
     }
   },
   methods: {
-    updateStoreViewType() {
-      if(!this.viewType) return;
-      this.piniaStore.setViewType(this.viewType);
-    },
     fetchData() {
       const storedApiCall = this.viewTypeObj.fetchAll ?
                               this.storedApi.getNoteWithDescendents :
@@ -52,12 +49,10 @@ export default defineComponent({
       this.fetchData();
     },
     viewType() {
-      this.updateStoreViewType();
       this.fetchData();
     },
   },
   mounted() {
-    this.updateStoreViewType();
     this.fetchData();
   },
 });
