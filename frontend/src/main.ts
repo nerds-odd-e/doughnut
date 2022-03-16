@@ -1,3 +1,4 @@
+import { App } from 'vue';
 import { createApp } from 'vue';
 import { createRouter, createWebHistory } from 'vue-router';
 import { createPinia } from "pinia";
@@ -18,7 +19,18 @@ Object.assign(window, {router});
 const app = createApp(DoughnutAppVue);
 app.config.globalProperties.$popups = {};
 
+class Popup {
+  install(app: App) {
+
+  }
+
+}
+
+function createPopup() {
+  return new Popup()
+}
 app.use(router);
+app.use(createPopup());
 app.use(createPinia());
 
 app.directive('focus', {
