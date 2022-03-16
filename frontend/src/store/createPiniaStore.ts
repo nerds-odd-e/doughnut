@@ -1,22 +1,21 @@
 import { defineStore } from "pinia";
 
 
-interface State {
+interface NoteCacheState {
   notebooks: Generated.NotebookViewedByUser[]
   notebooksMapByHeadNoteId: {[id: Doughnut.ID]: Generated.NotebookViewedByUser}
   noteSpheres: {[id: Doughnut.ID]: Generated.NoteSphere }
+}
+
+interface State extends NoteCacheState {
   noteUndoHistories: any[]
   currentUser: Generated.User | null
   featureToggle: boolean
   environment: 'production' | 'testing'
 }
 
-function withState(state: State) {
+function withState(state: NoteCacheState) {
   return {
-    getNoteById(id: Doughnut.ID | undefined) {
-      return this.getNoteSphereById(id)?.note
-    },
-
     getNoteSphereById(id: Doughnut.ID | undefined) {
       if(id === undefined) return undefined;
       return state.noteSpheres[id]
@@ -50,7 +49,7 @@ function withState(state: State) {
     },
 
     deleteNoteFromParentChildrenList(id: Doughnut.ID) {
-      const parent = this.getNoteById(id)?.parentId
+      const parent = this.getNoteSphereById(id)?.note.parentId
       if(!parent) return
       const children = this.getChildrenIdsByParentId(parent)
       if (children) {
@@ -75,7 +74,6 @@ export default defineStore('main', {
     } as State),
 
     getters: {
-        getNoteById: (state)        => (id: Doughnut.ID) => withState(state).getNoteById(id),
         getNoteSphereById: (state)        => (id: Doughnut.ID) => withState(state).getNoteSphereById(id),
         getNotePosition: (state)        => (id: Doughnut.ID) => withState(state).getNotePosition(id),
         getLinksById: (state)        => (id: Doughnut.ID) => withState(state).getLinksById(id),
@@ -97,7 +95,7 @@ export default defineStore('main', {
         },
 
         addEditingToUndoHistory({noteId}: {noteId: Doughnut.ID}) {
-          this.noteUndoHistories.push({type: 'editing', noteId, textContent: {...withState(this).getNoteById(noteId)?.textContent}});
+          this.noteUndoHistories.push({type: 'editing', noteId, textContent: {...withState(this).getNoteSphereById(noteId)?.note.textContent}});
         },
         popUndoHistory() {
           if (this.noteUndoHistories.length === 0) {

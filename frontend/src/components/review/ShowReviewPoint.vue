@@ -5,7 +5,7 @@
       v-bind="{
         noteId,
         expandChildren: false,
-        viewType: 'card',
+        viewType: 'cards',
       }"
       :key="noteId"
       />

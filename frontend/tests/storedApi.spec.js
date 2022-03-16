@@ -30,14 +30,14 @@ describe('storedApiCollection', () => {
 
     it('should change the store', async () => {
       await sa.deleteNote(note.id);
-      expect(store.getNoteById(note.id)).toBeUndefined();
+      expect(store.getNoteSphereById(note.id)).toBeUndefined();
     });
 
     it('should remove children notes', async () => {
       const child = makeMe.aNoteSphere.under(note).please();
       store.loadNoteSpheres([child]);
       await sa.deleteNote(note.id);
-      expect(store.getNoteById(child.id)).toBeUndefined();
+      expect(store.getNoteSphereById(child.id)).toBeUndefined();
     });
 
     it('should remove child from list', async () => {
