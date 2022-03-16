@@ -34,10 +34,11 @@
 import LinkTypeSelect from "./LinkTypeSelect.vue";
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
+import usePopups from "../commons/usePopup";
 
 export default ({
   setup() {
-    return useStoredLoadingApi({hasFormError: true});
+    return {...useStoredLoadingApi({hasFormError: true}), ...usePopups()};
   },
   props: { link: Object, inverseIcon: Boolean, colors: Object },
   emits: ["done"],
@@ -58,7 +59,7 @@ export default ({
     },
 
     async deleteLink() {
-      if (!(await this.$popups.confirm("Are you sure to delete this link?")))
+      if (!(await this.popups.confirm("Are you sure to delete this link?")))
         return;
       this.storedApi.deleteLink(this.link.id)
         .then((res) => { this.$emit('done') })

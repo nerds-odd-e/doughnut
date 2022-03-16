@@ -19,14 +19,11 @@ beforeEach(() => {
 
 describe('repeat page', () => {
   let note = makeMe.aNoteSphere.please();
-  const popupMock = { alert: jest.fn() };
 
   const mountPage = async (repetition: Generated.RepetitionForUser | Record<string, never>) => {
     helper.store.loadNoteSpheres([note]);
     helper.apiMock.expecting('/api/reviews/repeat', repetition);
-    const wrapper = renderer.withGlobalMock( {
-      $popups: popupMock
-    }).currentRoute({ name: 'repeat' }).mount()
+    const wrapper = renderer.currentRoute({ name: 'repeat' }).mount()
     await flushPromises();
     return wrapper;
   };
@@ -77,9 +74,7 @@ describe('repeat page', () => {
 
       wrapper.find('#repeat-sad').trigger('click');
       await flushPromises();
-      expect(popupMock.alert).toHaveBeenCalledWith(
-        expect.stringMatching(/review point/)
-      );
+      expect(helper.store.popupInfo?.message).toMatch(/review point/)
       helper.apiMock.verifyCall(`/api/reviews/repeat`)
     });
   });

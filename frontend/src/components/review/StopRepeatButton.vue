@@ -2,22 +2,27 @@
   <a class="pause-stop" href="/" @click.prevent="goHome()"><SvgStop /></a>
 </template>
 
-<script>
+<script lang="ts">
 
+import { defineComponent } from "vue";
+import usePopups from "../commons/usePopup";
 import SvgStop from "../svgs/SvgStop.vue";
 
-export default {
+export default defineComponent({
   name: "StopRepeatButton",
+  setup() {
+    return usePopups();
+  },
   props: { noteId: Number, linkId: Number },
   components: { SvgStop },
   methods: {
     async goHome() {
-      if (await this.$popups.confirm("Are you sure to leave the reviewing?")) {
+      if (await this.popups.confirm("Are you sure to leave the reviewing?")) {
         window.location = "/";
       }
     },
   },
-};
+});
 </script>
 
 <style lang="scss" scoped>

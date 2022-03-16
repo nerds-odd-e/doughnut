@@ -4,21 +4,26 @@
   </button>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue";
 import SvgEdit from "../svgs/SvgEdit.vue";
 import NoteEditDialog from "../notes/NoteEditDialog.vue";
+import usePopups from "../commons/usePopup";
 
 
-export default {
+export default defineComponent({
   name: "NoteNewButton",
+  setup() {
+    return usePopups();
+  },
   components: {
     SvgEdit,
   },
   props: { noteId: Number },
   methods: {
     showDialog() {
-      this.$popups.dialog(NoteEditDialog, { noteId: this.noteId })
+      this.popups.dialog(NoteEditDialog, { noteId: this.noteId })
     },
   },
-};
+});
 </script>

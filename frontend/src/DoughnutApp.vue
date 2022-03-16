@@ -12,8 +12,6 @@ export default {
     return {
       externalIdentifier: null,
       showNavBar: true,
-      popupInfo: null,
-      doneResolve: null,
     };
   },
 
@@ -21,7 +19,7 @@ export default {
 
   watch: {
     $route(to, from) {
-      this.popupInfo = null
+      this.piniaStore.popupInfo = undefined
       if (to.name) {
         this.showNavBar = !["repeat", "initial"].includes(
           to.name.split("-").shift()
@@ -33,13 +31,13 @@ export default {
   computed: {
     newUser() { return !this.user && !!this.externalIdentifier; },
     user() { return this.piniaStore.currentUser },
+    popupInfo() { return this.piniaStore.popupInfo },
   },
 
   methods: {
     done(result) {
-      if(this.doneResolve) this.doneResolve(result);
-      this.popupInfo = null;
-      this.doneResolve = null;
+      if(this.piniaStore.popupInfo.doneResolve) this.piniaStore.popupInfo.doneResolve(result);
+      this.piniaStore.popupInfo = undefined;
     },
   },
 
@@ -51,26 +49,6 @@ export default {
     })
     .finally(()=> this.loading = false )
 
-    this.$popups.alert = (msg) => {
-      this.popupInfo = { type: "alert", message: msg };
-      return new Promise((resolve, reject) => {
-        this.doneResolve = resolve;
-      });
-    };
-
-    this.$popups.confirm = (msg) => {
-      this.popupInfo = { type: "confirm", message: msg };
-      return new Promise((resolve, reject) => {
-        this.doneResolve = resolve;
-      });
-    };
-
-    this.$popups.dialog = (component, attrs) => {
-      this.popupInfo = { type: "dialog", component, attrs };
-      return new Promise((resolve, reject) => {
-        this.doneResolve = resolve;
-      });
-    };
   },
 };
 </script>

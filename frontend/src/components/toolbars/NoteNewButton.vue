@@ -4,19 +4,24 @@
   </button>
 </template>
 
-<script>
+<script lang="ts">
 
+import { defineComponent } from "vue";
+import usePopups from "../commons/usePopup";
 import NoteNewDialog from "../notes/NoteNewDialog.vue";
 
-export default {
+export default defineComponent({
+  setup() {
+    return usePopups();
+  },
   props: {
     parentId: Number,
     buttonTitle: String,
   },
   methods: {
     showDialog() {
-      this.$popups.dialog(NoteNewDialog, {parentId: this.parentId})
+      this.popups.dialog(NoteNewDialog, {parentId: this.parentId})
     },
   },
-};
+});
 </script>

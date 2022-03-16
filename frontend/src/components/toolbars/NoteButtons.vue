@@ -59,10 +59,11 @@ import NoteNewButton from "./NoteNewButton.vue";
 import ViewTypeButtons from "./ViewTypeButtons.vue";
 import { viewType } from "../../models/viewTypes";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
+import usePopups from "../commons/usePopup";
 
 export default ({
   setup() {
-    return useStoredLoadingApi();
+    return {...useStoredLoadingApi(), ...usePopups()};
   },
   name: "NoteButtons",
   props: {
@@ -83,7 +84,7 @@ export default ({
   },
   methods: {
     async deleteNote() {
-      if (await this.$popups.confirm(`Are you sure to delete this note?`)) {
+      if (await this.popups.confirm(`Are you sure to delete this note?`)) {
         const parentId = this.note.parentId;
         await this.storedApi.deleteNote(this.note.id);
         this.$emit("ensureVisible", parentId);

@@ -9,15 +9,20 @@
   </button>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue";
+import usePopups from "../commons/usePopup";
 import NotebookNewDialog from "./NotebookNewDialog.vue";
 
-export default {
+export default defineComponent({
+  setup() {
+    return usePopups();
+  },
   props: { circle: Object },
   methods: {
     showDialog() {
-      this.$popups.dialog(NotebookNewDialog, { circle: this.circle })
+      this.popups.dialog(NotebookNewDialog, { circle: this.circle })
     }
   },
-};
+});
 </script>

@@ -1,10 +1,10 @@
 import { DefineComponent, defineComponent, h } from "vue";
 import { RouterView } from "vue-router";
+import usePopups from "../../components/commons/usePopup";
 import routerScopeGuard from "../../routes/relative_routes";
 
 declare module "@vue/runtime-core" {
   interface ComponentCustomProperties {
-    $popups: any;
     alert: any
   }
 }
@@ -17,6 +17,9 @@ function NestedPage(
 ) {
   return defineComponent({
     name: "NestedPage",
+    setup() {
+      return usePopups();
+    },
     computed: {
       isNested() {
         if (this.$route) {
@@ -28,7 +31,7 @@ function NestedPage(
     },
     methods: {
       async alert() {
-        return this.$popups.alert(notAllowedMessage);
+        return this.popups.alert(notAllowedMessage);
       },
     },
     beforeRouteEnter(to, from, next) {

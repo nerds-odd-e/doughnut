@@ -6,7 +6,6 @@ import routes from './routes/routes';
 import 'bootstrap/scss/bootstrap.scss';
 import 'bootstrap';
 import DoughnutAppVue from './DoughnutApp.vue';
-import createPopup from './components/commons/createPopup';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -19,7 +18,6 @@ Object.assign(window, {router});
 const app = createApp(DoughnutAppVue);
 
 app.use(router);
-app.use(createPopup());
 app.use(createPinia());
 
 app.directive('focus', {

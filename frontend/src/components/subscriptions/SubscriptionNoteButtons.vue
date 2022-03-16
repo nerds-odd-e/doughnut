@@ -11,10 +11,11 @@
 import SubscriptionEditButton from "./SubscriptionEditButton.vue";
 import SvgUnsubscribe from "../svgs/SvgUnsubscribe.vue";
 import useLoadingApi from '../../managedApi/useLoadingApi';
+import usePopups from "../commons/usePopup";
 
 export default {
   setup() {
-    return useLoadingApi();
+    return {...useLoadingApi(), ...usePopups()};
   },
   props: { subscription: Object },
   emits: ["updated"],
@@ -22,7 +23,7 @@ export default {
   methods: {
     async processForm() {
       if (
-        await this.$popups.confirm(
+        await this.popups.confirm(
           `Are yyou sure to unsubscribe from this notebook??`
         )
       ) {

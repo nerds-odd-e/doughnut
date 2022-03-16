@@ -4,12 +4,14 @@
 import NoteFrameOfLinks from '@/components/links/NoteFrameOfLinks.vue';
 import makeMe from '../fixtures/makeMe';
 import RenderingHelper from '../helpers/RenderingHelper';
+import helper from '../helpers';
 
 describe('a link lists of a note', () => {
   let renderer: RenderingHelper;
 
   beforeEach(() => {
-    renderer = new RenderingHelper(NoteFrameOfLinks);
+    helper.reset()
+    renderer = helper.component(NoteFrameOfLinks);
   });
 
   it('link to upper level', async () => {

@@ -45,10 +45,11 @@ import CheckInput from "../form/CheckInput.vue";
 import RadioButtons from "../form/RadioButtons.vue";
 import SvgGoBack from "../svgs/SvgGoBack.vue";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
+import usePopups from "../commons/usePopup";
 
 export default ({
   setup() {
-    return useStoredLoadingApi({hasFormError: true});
+    return {...useStoredLoadingApi({hasFormError: true}), ...usePopups()};
   },
   name: "LinkNoteFinalize",
   props: { note: Object, targetNote: { type: Object, required: true } },
@@ -63,7 +64,7 @@ export default ({
     async createLink() {
       if (this.formData.moveUnder && this.note.parentId === null) {
         if (
-          !(await this.$popups.confirm(
+          !(await this.popups.confirm(
             `"${this.note.title}" is a top level notebook, do you want to move it under other notebook?`
           ))
         ) {

@@ -2,8 +2,16 @@ import { defineStore } from "pinia";
 import history, { HistoryState } from "./history";
 import noteCache, { NoteCacheState } from "./noteCache";
 
+interface PopupInfo {
+  type: 'alert' | 'confirm' | 'dialog'
+  message?: string
+  doneResolve: (value: unknown)=>void
+  component?: string
+  attrs?: unknown
+}
 
 interface State extends NoteCacheState, HistoryState {
+  popupInfo?: PopupInfo,
   currentUser: Generated.User | null
   featureToggle: boolean
   environment: 'production' | 'testing'
@@ -15,6 +23,7 @@ export default defineStore('main', {
     notebooksMapByHeadNoteId: {},
     noteSpheres: {},
     noteUndoHistories: [],
+    popupInfo: undefined,
     currentUser: null,
     featureToggle: false,
     environment: 'production',

@@ -9,18 +9,23 @@
       </button>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue";
+import usePopups from "../commons/usePopup";
 import SvgEditNotebook from "../svgs/SvgEditNotebook.vue";
 import NotebookEditDialog from "./NotebookEditDialog.vue";
 
-export default {
+export default defineComponent({
+  setup() {
+    return usePopups();
+  },
   props: { notebook: Object },
   components: { SvgEditNotebook },
 
   methods: {
     showDialog() {
-      this.$popups.dialog(NotebookEditDialog, this.$props)
+      this.popups.dialog(NotebookEditDialog, this.$props)
     },
   },
-};
+});
 </script>

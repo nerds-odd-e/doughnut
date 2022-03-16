@@ -77,10 +77,11 @@ import ContainerPage from "./commons/ContainerPage.vue";
 import NoteStatisticsButton from "../components/notes/NoteStatisticsButton.vue";
 import RepeatProgressBar from "../components/review/RepeatProgressBar.vue";
 import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
+import usePopups from "../components/commons/usePopup";
 
 export default ({
   setup() {
-    return useStoredLoadingApi();
+    return {...useStoredLoadingApi(), ...usePopups()};
   },
   name: "RepeatPage",
   props: { nested: Boolean },
@@ -164,7 +165,7 @@ export default ({
     },
 
     async noLongerExist() {
-      await this.$popups.alert(
+      await this.popups.alert(
         "This review point doesn't exist any more or is being skipped now. Moving on to the next review point..."
       );
       return this.fetchData()
@@ -198,7 +199,7 @@ export default ({
       .catch((err) => this.noLongerExist())
     },
     async removeFromReview() {
-      if (!(await this.$popups.confirm(
+      if (!(await this.popups.confirm(
           `Are you sure to hide this from reviewing in the future?`
         ))
       ) {

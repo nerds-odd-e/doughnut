@@ -16,12 +16,8 @@ import EditableText from "../form/EditableText.vue";
 import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
 import NoteShell from "./NoteShell.vue";
 import NoteContent from "./NoteContent.vue";
-import useStoredLoadingApi from '../../managedApi/useStoredLoadingApi';
 
 export default defineComponent({
-  setup() {
-    return useStoredLoadingApi();
-  },
   name: "NoteWithLinks",
   props: {
     note: { type: Object as PropType<Generated.Note>, required: true },

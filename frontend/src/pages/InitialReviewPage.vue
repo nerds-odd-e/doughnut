@@ -57,10 +57,11 @@ import ProgressBar from "../components/commons/ProgressBar.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import Minimizable from "../components/commons/Minimizable.vue";
 import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
+import usePopups from "../components/commons/usePopup";
 
 export default ({
   setup() {
-    return useStoredLoadingApi();
+    return {...useStoredLoadingApi(), ...usePopups()};
   },
   name: "InitialReviewPage",
   props: { nested: Boolean },
@@ -106,7 +107,7 @@ export default ({
       this.reviewPointViewedByUser.remainingInitialReviewCountForToday -= 1;
       if (skipReview) {
         if (
-          !(await this.$popups.confirm(
+          !(await this.popups.confirm(
             "Are you sure to hide this note from reviewing in the future?"
           ))
         )

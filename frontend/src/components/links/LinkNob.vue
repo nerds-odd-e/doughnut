@@ -9,17 +9,22 @@
       </span>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue";
+import usePopups from "../commons/usePopup";
 import SvgLinkTypeIcon from "../svgs/SvgLinkTypeIcon.vue";
 import LinkNobDialog from "./LinkNobDialog.vue";
 
-export default {
+export default defineComponent({
+  setup() {
+    return usePopups();
+  },
   props: { link: Object, inverseIcon: Boolean, colors: Object },
   components: { SvgLinkTypeIcon },
   methods: {
     showDialog() {
-      this.$popups.dialog(LinkNobDialog, this.$props)
+      this.popups.dialog(LinkNobDialog, this.$props)
     },
   },
-};
+});
 </script>
