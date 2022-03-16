@@ -1,4 +1,3 @@
-import { App } from 'vue';
 import { createApp } from 'vue';
 import { createRouter, createWebHistory } from 'vue-router';
 import { createPinia } from "pinia";
@@ -7,6 +6,7 @@ import routes from './routes/routes';
 import 'bootstrap/scss/bootstrap.scss';
 import 'bootstrap';
 import DoughnutAppVue from './DoughnutApp.vue';
+import createPopup from './components/commons/createPopup';
 
 const router = createRouter({
   history: createWebHistory(),
@@ -17,18 +17,7 @@ const router = createRouter({
 Object.assign(window, {router});
 
 const app = createApp(DoughnutAppVue);
-app.config.globalProperties.$popups = {};
 
-class Popup {
-  install(app: App) {
-
-  }
-
-}
-
-function createPopup() {
-  return new Popup()
-}
 app.use(router);
 app.use(createPopup());
 app.use(createPinia());
