@@ -1,7 +1,7 @@
 <template>
-    <div class="inner-box">
+    <div class="inner-box" v-if="selectedNote">
       <div class="header">
-        <NoteControl v-bind="{selectedNote, selectedNotePosition}"/>
+        <NoteControl v-bind="{selectedNote, selectedNotePosition, viewType}"/>
       </div>
       <div class="content">
         <component :is="noteComponent" 
@@ -45,6 +45,7 @@ export default defineComponent({
     },
   },
   computed: {
+    viewType() { return this.piniaStore.viewType },
     selectedNotePosition(): Generated.NotePositionViewedByUser | undefined {
       if(!this.selectedNoteId) return
       return this.piniaStore.getNotePosition(this.selectedNoteId)

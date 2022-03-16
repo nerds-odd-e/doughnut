@@ -29,6 +29,7 @@ export default defineComponent({
   props: {
     selectedNote: Object as PropType<Generated.Note>,
     selectedNotePosition: Object as PropType<Generated.NotePositionViewedByUser>,
+    viewType: String,
   },
   components: {
     NoteButtons,
@@ -37,7 +38,6 @@ export default defineComponent({
     Breadcrumb,
   },
   computed: {
-    viewType() { return this.piniaStore.viewType },
     featureToggle() { return this.piniaStore.featureToggle },
   },
 });
