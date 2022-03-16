@@ -7,8 +7,6 @@ interface State {
   notebooks: Generated.NotebookViewedByUser[]
   notebooksMapByHeadNoteId: {[id: Doughnut.ID]: Generated.NotebookViewedByUser}
   noteSpheres: {[id: Doughnut.ID]: Generated.NoteSphere }
-  notes: {[id: Doughnut.ID]: Generated.Note }
-  links: {[id: Doughnut.ID]: Links }
   parentChildrenIds: {[id: Doughnut.ID]: Doughnut.ID[] }
   highlightNoteId: Doughnut.ID | undefined
   noteUndoHistories: any[]
@@ -21,12 +19,16 @@ interface State {
 function withState(state: State) {
   return {
     getNoteById(id: Doughnut.ID | undefined) {
+      return this.getNoteSphereById(id)?.note
+    },
+
+    getNoteSphereById(id: Doughnut.ID | undefined) {
       if(id === undefined) return undefined;
-      return state.noteSpheres[id]?.note
+      return state.noteSpheres[id]
     },
 
     getLinksById(id: Doughnut.ID) {
-      return state.links[id]
+      return this.getNoteSphereById(id)?.links
     },
 
     getNotePosition(id: Doughnut.ID | undefined) {
@@ -77,8 +79,6 @@ export default defineStore('main', {
         notebooks: [],
         notebooksMapByHeadNoteId: {},
         noteSpheres: {},
-        notes: {},
-        links: {},
         parentChildrenIds: {},
         highlightNoteId: undefined,
         noteUndoHistories: [],
@@ -134,7 +134,6 @@ export default defineStore('main', {
           noteSpheres.forEach((noteSphere) => {
             const {id} = noteSphere.note;
             this.noteSpheres[id] = noteSphere;
-            if(noteSphere.links !== undefined) this.links[id] = noteSphere.links;
             if(noteSphere.childrenIds !== undefined) this.parentChildrenIds[id] = noteSphere.childrenIds;
           });
         },
