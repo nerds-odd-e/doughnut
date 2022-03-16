@@ -40,8 +40,8 @@ class NoteSphereBuilder extends Builder<Generated.NoteSphere> {
     return this;
   }
 
-  under(value: any): NoteSphereBuilder {
-    value.childrenIds.push(this.data.note.id)
+  under(value: Generated.NoteSphere): NoteSphereBuilder {
+    value?.childrenIds?.push(this.data.note.id)
     this.data.note.parentId = value.id
 
     return this;
