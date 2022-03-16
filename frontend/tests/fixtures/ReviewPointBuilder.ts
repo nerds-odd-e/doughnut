@@ -1,4 +1,3 @@
-import { merge } from "lodash";
 import Builder from "./Builder";
 import generateId from "./generateId";
 import NotePositionBuilder from "./NotePositionBuilder"

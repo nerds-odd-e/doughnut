@@ -17,6 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/reviews")
@@ -87,7 +88,7 @@ class RestReviewsController {
             repetitionForUser.setReviewPointViewedByUser(ReviewPointViewedByUser.from(reviewPointModel.getEntity(), user));
             QuizQuestion quizQuestion = reviewPointModel.generateAQuizQuestion(testabilitySettings.getRandomizer());
             if (quizQuestion != null) {
-                repetitionForUser.setQuizQuestion(quizQuestion);
+                repetitionForUser.setQuizQuestion(Optional.of(quizQuestion));
                 repetitionForUser.setEmptyAnswer(quizQuestion.buildAnswer());
             }
         }

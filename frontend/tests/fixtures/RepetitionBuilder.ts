@@ -1,20 +1,13 @@
 import Builder from "./Builder"
+import NoteSphereBuilder from "./NoteSphereBuilder";
 import ReviewPointBuilder from "./ReviewPointBuilder";
 
 class RepetitionBuilder extends Builder<Generated.RepetitionForUser> {
-  data: any
+  note?: Generated.NoteSphere
 
-  note: any
+  quizQuestion?: Generated.QuizQuestion
 
-  quizQuestion: any
-
-  constructor(parentBuilder?: Builder) {
-    super(parentBuilder);
-    this.note = null
-    this.quizQuestion = undefined
-  }
-
-  ofNote(note: any): RepetitionBuilder {
+  ofNote(note: Generated.NoteSphere): RepetitionBuilder {
     this.note = note
     return this
   }
@@ -24,30 +17,34 @@ class RepetitionBuilder extends Builder<Generated.RepetitionForUser> {
           questionType: "CLOZE_SELECTION",
           options: [
             {
-              note: {
-                id: 1,
-                notePicture: null,
-                head: true,
-                noteTypeDisplay: "Child Note",
-                title: "question",
-                shortDescription: "answer",
-              },
+              note: new NoteSphereBuilder().do(),
               picture: false,
               display: "question",
             },
           ],
           description: "answer",
           mainTopic: "",
-          pictureQuestion: false,
+          hintLinks: {},
+          viceReviewPointIds: [],
+          scope: []
         }
 
     return this
   }
 
-  do(): any {
+  do(): Generated.RepetitionForUser {
+    const reviewPointBuilder = new ReviewPointBuilder()
+    if(this.note) reviewPointBuilder.ofNote(this.note)
     return {
-        reviewPointViewedByUser: new ReviewPointBuilder().ofNote(this.note).do(),
-        quizQuestion: this.quizQuestion
+        reviewPointViewedByUser: reviewPointBuilder.do(),
+        quizQuestion: this.quizQuestion,
+        emptyAnswer: {
+          answer: '',
+          answerNoteId: 0,
+          questionType: 'CLOZE_SELECTION',
+          viceReviewPointIds: []
+        },
+        toRepeatCount: 0,
     }
   }
 }

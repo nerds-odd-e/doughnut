@@ -63,7 +63,6 @@ import BasicBreadcrumb from "../commons/BasicBreadcrumb.vue";
 import ShowPicture from "../notes/ShowPicture.vue";
 import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
 import TextInput from "../form/TextInput.vue";
-import { computed } from "@vue/runtime-core";
 
 export default defineComponent({
   props:{

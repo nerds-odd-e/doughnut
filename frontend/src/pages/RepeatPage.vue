@@ -43,7 +43,11 @@
           />
           <Quiz
             v-if="quizMode"
-            v-bind="repetition"
+            v-bind="{
+              reviewPointViewedByUser: repetition.reviewPointViewedByUser,
+              quizQuestion: repetition.quizQuestion,
+              emptyAnswer: repetition.emptyAnswer,
+            }"
             @answer="processAnswer($event)"
           />
           <template v-else>
