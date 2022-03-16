@@ -1,12 +1,14 @@
 <template>
-  <NoteWithLinks v-bind="{ noteId }"/>
+<template v-if="noteSphere">
+  <NoteWithLinks v-bind="{ note: noteSphere?.note, links: noteSphere.links }"/>
   <div class="note-list">
     <NoteOverview
-      v-for="childId in childrenIds"
+      v-for="childId in noteSphere.childrenIds"
       v-bind="{ noteId: childId, expandChildren }"
       :key="childId"
     />
   </div>
+</template>
 </template>
 
 <script lang="ts">
@@ -25,8 +27,8 @@ export default defineComponent({
   },
   components: { NoteWithLinks },
   computed: {
-    childrenIds() {
-      return this.piniaStore.getChildrenIdsByParentId(this.noteId);
+    noteSphere() {
+      return this.piniaStore.getNoteSphereById(this.noteId);
     },
   },
 });

@@ -23,7 +23,7 @@ describe('new/updated pink banner', () => {
       const note = makeMe.aNoteSphere.textContentUpdatedAt(updatedAt).please();
       helper.store.loadNoteSpheres([note]);
 
-      const wrapper = helper.component(NoteWithLinks).withProps({noteId: note.id}).mount()
+      const wrapper = helper.component(NoteWithLinks).withProps(note).mount()
 
       expect(wrapper.find('.note-body').element).toHaveStyle(
         `border-color: ${expectedColor};`
@@ -37,7 +37,7 @@ describe('in place edit on title', () => {
     const noteParent = makeMe.aNoteSphere.title('Dummy Title').please();
     helper.store.loadNoteSpheres([noteParent]);
 
-    const wrapper = helper.component(NoteWithLinks).withProps({noteId: noteParent.id}).mount()
+    const wrapper = helper.component(NoteWithLinks).withProps(noteParent).mount()
 
     expect(wrapper.findAll('[role="title"] input')).toHaveLength(0);
     await wrapper.find('[role="title"] h2').trigger('click');
@@ -50,7 +50,7 @@ describe('in place edit on title', () => {
     const noteParentSphere = makeMe.aNoteSphere.title('Dummy Title').please();
     helper.store.loadNoteSpheres([noteParentSphere]);
 
-    const wrapper = helper.component(NoteWithLinks).withProps({noteId: noteParentSphere.id}).mount()
+    const wrapper = helper.component(NoteWithLinks).withProps(noteParentSphere).mount()
 
     await wrapper.find('[role="title"]').trigger('click');
     await wrapper.find('[role="title"] input').setValue('updated');
@@ -67,7 +67,7 @@ describe('undo editing', () => {
     helper.store.loadNoteSpheres([noteSphere]);
 
     const updatedTitle = 'updated';
-    const wrapper = helper.component(NoteWithLinks).withProps({noteId: noteSphere.id}).mount()
+    const wrapper = helper.component(NoteWithLinks).withProps(noteSphere).mount()
 
     await wrapper.find('[role="title"]').trigger('click');
     await wrapper.find('[role="title"] input').setValue(updatedTitle);

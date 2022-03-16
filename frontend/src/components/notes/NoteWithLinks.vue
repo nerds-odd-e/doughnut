@@ -11,7 +11,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent, PropType } from 'vue'
 import EditableText from "../form/EditableText.vue";
 import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
 import NoteShell from "./NoteShell.vue";
@@ -24,7 +24,8 @@ export default defineComponent({
   },
   name: "NoteWithLinks",
   props: {
-    noteId: { type: Number, required: true },
+    note: { type: Object as PropType<Generated.Note>, required: true },
+    links: { type: Object as PropType<{ [P in Generated.LinkType]?: Generated.LinkViewed }> },
   },
   components: {
     NoteFrameOfLinks,
@@ -32,14 +33,6 @@ export default defineComponent({
     NoteContent,
     EditableText,
   },
-  computed: {
-    note() {
-      return this.piniaStore.getNoteById(this.noteId);
-    },
-    links() {
-      return this.piniaStore.getLinksById(this.noteId);
-    },
-  }
 });
 </script>
 
