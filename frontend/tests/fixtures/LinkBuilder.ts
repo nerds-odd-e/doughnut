@@ -1,30 +1,31 @@
 import Builder from "./Builder";
+import generateId from "./generateId";
 
-class LinkBuilder<PB extends Builder> extends Builder<any, PB> {
-  linkType: string;
+type LinksMap = { [P in Generated.LinkType]?: Generated.LinkViewed }
+
+class LinkBuilder<PB extends Builder> extends Builder<LinksMap, PB> {
+  linkType: Generated.LinkType;
 
   cnt: number;
 
   isReverse: boolean;
 
-  fromNote: any
+  fromNote: Generated.NoteSphere
 
-  toNote: any
+  toNote: Generated.NoteSphere
 
-  constructor(parentBuilder: PB | undefined, linkType: string) {
+  constructor(
+    parentBuilder: PB | undefined,
+    linkType: Generated.LinkType,
+    from: Generated.NoteSphere,
+    to: Generated.NoteSphere
+  ) {
     super(parentBuilder);
     this.linkType = linkType;
     this.cnt = 1;
     this.isReverse = false;
-    this.fromNote = {
-      id: "2423",
-      title: "a tool",
-    }
-    this.toNote = {
-      id: "2423",
-      title: "a tool",
-      links: {},
-    }
+    this.fromNote = from;
+    this.toNote = to;
   }
 
   count(cnt: number) {
@@ -32,25 +33,17 @@ class LinkBuilder<PB extends Builder> extends Builder<any, PB> {
     return this;
   }
 
-  from(note: any) {
-    this.fromNote = note
-    return this
-  }
-
-  to(note: any) {
-    this.toNote = note
-    return this
-  }
-
   get reverse() {
     this.isReverse = true;
     return this;
   }
 
-  do(): any {
-    if (!this.toNote.links[this.linkType]) this.toNote.links[this.linkType] = {}
-    if (!this.toNote.links[this.linkType].reverse) this.toNote.links[this.linkType].reverse = []
-    this.toNote.links[this.linkType].reverse.push(this.link())
+  do(): LinksMap {
+    if (!this.fromNote.links || !this.toNote.links) throw new Error('note does not have links');
+    if (!this.toNote.links[this.linkType]) this.toNote.links[this.linkType] = { direct: [], reverse: []}
+    const linksOfType = this.toNote.links[this.linkType]
+    if (linksOfType && !linksOfType.reverse) linksOfType.reverse = []
+    linksOfType?.reverse.push(this.link())
 
     return {
       [this.linkType]: {
@@ -63,20 +56,15 @@ class LinkBuilder<PB extends Builder> extends Builder<any, PB> {
     };
   }
 
-  private link(): any {
+  private link(): Generated.Link {
     return {
-            id: "1938",
-            targetNote: {
-              id: this.toNote.id,
-              title: this.toNote.title,
-            },
-            sourceNote: {
-              id: this.fromNote.id,
-              title: this.fromNote.title,
-            },
+            id: generateId(),
+            targetNote: this.toNote.note,
+            sourceNote: this.fromNote.note,
             typeId: 15,
             linkTypeLabel: "using",
             linkNameOfSource: "user",
+            createdAt: '',
           }
   }
 

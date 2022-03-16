@@ -15,7 +15,7 @@ describe('a link lists of a note', () => {
   it('link to upper level', async () => {
     const links = makeMe.links.of('using').count(2).please();
     const wrapper = renderer.withProps({ links }).mount();
-    expect(wrapper.find('.parent-links').text()).toContain('a tool');
+    expect(wrapper.find('.parent-links').text()).toContain('target note');
     expect(wrapper.findAll('.parent-links li').length).toEqual(2);
   });
 

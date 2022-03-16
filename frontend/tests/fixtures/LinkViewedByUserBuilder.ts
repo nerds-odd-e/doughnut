@@ -3,6 +3,8 @@ import NoteSphereBuilder from "./NoteSphereBuilder"
 import NotePositionBuilder from "./NotePositionBuilder"
 
 class LinkViewedByUserBuilder extends Builder<Generated.LinkViewedByUser> {
+  sourceNoteBuilder = new NoteSphereBuilder()
+
   do(): Generated.LinkViewedByUser {
     return {
       id: 8,
@@ -10,7 +12,7 @@ class LinkViewedByUserBuilder extends Builder<Generated.LinkViewedByUser> {
       typeId: 1,
       readonly: false,
       sourceNoteWithPosition: {
-        note: new NoteSphereBuilder().do(),
+        note: this.sourceNoteBuilder.do(),
         notePosition: new NotePositionBuilder().do()
       },
       targetNoteWithPosition: {

@@ -52,13 +52,12 @@ class NoteSphereBuilder extends Builder<Generated.NoteSphere> {
     return this;
   }
 
-  linkToSomeNote(): NoteSphereBuilder {
-    merge(this.data.links, new LinkBuilder(undefined, "using").please());
-    return this;
+  linkToSomeNote(title: string): NoteSphereBuilder {
+    return this.linkTo(new NoteSphereBuilder().title(title).do());
   }
 
   linkTo(note: Generated.NoteSphere): NoteSphereBuilder {
-    merge(this.data.links, new LinkBuilder(undefined, "using").from(this.data).to(note).please());
+    merge(this.data.links, new LinkBuilder(undefined, "using", this.data, note).please());
     return this;
   }
 

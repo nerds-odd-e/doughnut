@@ -22,10 +22,10 @@ describe("note overview", () => {
   });
 
   it("should render one note with links", async () => {
-    const note = makeMe.aNoteSphere.title("source").linkToSomeNote().please();
+    const note = makeMe.aNoteSphere.title("source").linkToSomeNote('target note').please();
     helper.store.loadNoteSpheres([note]);
     helper.component(NoteOverview).withProps({ noteId: note.id, expandChildren: true }).render();
-    await screen.findByText("a tool");
+    await screen.findByText("target note");
   });
 
   it("should render note with one child", async () => {
