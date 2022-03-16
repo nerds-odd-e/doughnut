@@ -6,6 +6,7 @@ import Links from "./Links";
 interface State {
   notebooks: Generated.NotebookViewedByUser[]
   notebooksMapByHeadNoteId: {[id: Doughnut.ID]: Generated.NotebookViewedByUser}
+  noteSpheres: {[id: Doughnut.ID]: Generated.NoteSphere }
   notes: {[id: Doughnut.ID]: Generated.Note }
   links: {[id: Doughnut.ID]: Links }
   parentChildrenIds: {[id: Doughnut.ID]: Doughnut.ID[] }
@@ -21,7 +22,7 @@ function withState(state: State) {
   return {
     getNoteById(id: Doughnut.ID | undefined) {
       if(id === undefined) return undefined;
-      return state.notes[id]
+      return state.noteSpheres[id]?.note
     },
 
     getLinksById(id: Doughnut.ID) {
@@ -54,7 +55,7 @@ function withState(state: State) {
    
     deleteNote(id: Doughnut.ID) {
       this.getChildrenIdsByParentId(id)?.forEach((cid: Doughnut.ID)=>this.deleteNote(cid))
-      delete state.notes[id]
+      delete state.noteSpheres[id]
     },
 
     deleteNoteFromParentChildrenList(id: Doughnut.ID) {
@@ -75,6 +76,7 @@ export default defineStore('main', {
     state: () => ({
         notebooks: [],
         notebooksMapByHeadNoteId: {},
+        noteSpheres: {},
         notes: {},
         links: {},
         parentChildrenIds: {},
@@ -131,16 +133,26 @@ export default defineStore('main', {
         loadNoteSpheres(noteSpheres: Generated.NoteSphere[]) {
           noteSpheres.forEach((noteSphere) => {
             const {id} = noteSphere.note;
-            this.notes[id] = noteSphere.note;
-            this.links[id] = noteSphere.links;
-            this.parentChildrenIds[id] = noteSphere.childrenIds;
+            this.noteSpheres[id] = noteSphere;
+            if(noteSphere.links !== undefined) this.links[id] = noteSphere.links;
+            if(noteSphere.childrenIds !== undefined) this.parentChildrenIds[id] = noteSphere.childrenIds;
           });
         },
+
+        loadNote(id: Doughnut.ID, note: Generated.Note) {
+          const noteSphere = this.noteSpheres[id];
+          if (!noteSphere) {
+            this.noteSpheres[id] = {id, note }
+            return
+          }
+          noteSphere.note = note
+        },
+
 
         loadNotePosition(notePosition: Generated.NotePositionViewedByUser) {
           notePosition.ancestors.forEach((note) => {
             const {id} = note;
-            this.notes[id] = note;
+            this.loadNote(id, note)
           });
           this.loadNotebook(notePosition.notebook)
         },

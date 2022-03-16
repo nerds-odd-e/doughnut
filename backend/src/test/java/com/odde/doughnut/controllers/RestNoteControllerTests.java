@@ -85,7 +85,7 @@ class RestNoteControllerTests {
             final NotesBulk showOverview = controller.showOverview(note);
             assertThat(showOverview.notes, hasSize(12));
             assertThat(showOverview.notePosition.getNotebook().getFromBazaar(), equalTo(false));
-            assertThat(showOverview.notes.get(0).getChildrenIds(), hasSize(1));
+            assertThat(showOverview.notes.get(0).getChildrenIds().get(), hasSize(1));
         }
 
     }

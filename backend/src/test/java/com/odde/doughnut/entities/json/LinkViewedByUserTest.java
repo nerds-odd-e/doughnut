@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
@@ -41,7 +42,7 @@ public class LinkViewedByUserTest {
             link = makeMe.aLink().between(note1, note2).inMemoryPlease();
             value = new NoteWithPosition(){{
                 NoteSphere noteSphere = new NoteViewer(null, note1).toJsonObject();
-                noteSphere.setLinks(links);
+                noteSphere.setLinks(Optional.of(links));
                 setNote(noteSphere);
             }};
 

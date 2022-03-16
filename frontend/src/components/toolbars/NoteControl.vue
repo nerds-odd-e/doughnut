@@ -16,11 +16,11 @@
 <script lang="ts">
 
 import { defineComponent } from 'vue'
+import Breadcrumb from "./Breadcrumb.vue";
 import NoteButtons from './NoteButtons.vue'
 import NoteUndoButton from "./NoteUndoButton.vue";
 import LinkNoteButton from "../links/LinkNoteButton.vue";
 import useStoredLoadingApi from '../../managedApi/useStoredLoadingApi';
-import Breadcrumb from "./Breadcrumb.vue";
 
 export default defineComponent({
   setup() {
@@ -30,7 +30,7 @@ export default defineComponent({
     NoteButtons,
     NoteUndoButton,
     LinkNoteButton,
-    Breadcrumb
+    Breadcrumb,
   },
   computed: {
     currentNote() { return this.piniaStore.getHighlightNote() },

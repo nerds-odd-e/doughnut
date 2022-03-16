@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public class NoteSphere {
     @Getter
@@ -15,11 +16,11 @@ public class NoteSphere {
 
     @Getter
     @Setter
-    private Map<Link.LinkType, LinkViewed> links;
+    private Optional<Map<Link.LinkType, LinkViewed>> links;
 
     @Getter
     @Setter
-    private List<Integer> childrenIds;
+    private Optional<List<Integer>> childrenIds;
 
     @Getter
     @Setter
