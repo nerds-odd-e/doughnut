@@ -13,7 +13,7 @@ const router = createRouter({
 });
 
 // to accelerate e2e test
-window.router = router;
+Object.assign(window, {router});
 
 const app = createApp(DoughnutAppVue);
 app.config.globalProperties.$popups = {};

@@ -16,7 +16,7 @@ class LinksBuilder extends Builder<LinksMap> {
     return child;
   }
 
-  do(): any {
+  do(): LinksMap {
     return this.childrenBuilders.reduce(
       (prev, curr) => ({ ...prev, ...curr.do() }),
       {}
