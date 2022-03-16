@@ -2,15 +2,14 @@ interface ViewType {
   value: string
   path: string
   title: string
-  noteComponent: string
   redirectAfterDelete?: boolean
   fetchAll?: boolean
 }
 
 const viewTypes: Array<ViewType> = [
-  {value: 'cards', path: 'cards', title: 'cards view', noteComponent: 'NoteCardsView', redirectAfterDelete: true},
-  {value: 'article', path: 'article', title: 'article view', noteComponent: 'NoteArticleView', fetchAll: true},
-  {value: 'mindmap', path: 'mindmap', title: 'mindmap view', noteComponent: 'NoteMindmapView', fetchAll: true},
+  {value: 'cards', path: 'cards', title: 'cards view', redirectAfterDelete: true},
+  {value: 'article', path: 'article', title: 'article view', fetchAll: true},
+  {value: 'mindmap', path: 'mindmap', title: 'mindmap view', fetchAll: true},
 ]
 
 const viewType = (value:string|undefined): ViewType => {

@@ -4,9 +4,10 @@
       v-bind="{
         noteId,
         viewType,
-        expandChildren: true,
-        noteComponent: viewTypeObj.noteComponent}"
+        expandChildren: true
+      }"
       :key="noteId"
+
       />
 
   </LoadingPage>

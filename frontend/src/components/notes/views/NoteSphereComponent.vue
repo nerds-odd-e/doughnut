@@ -4,10 +4,16 @@
         <NoteControl v-bind="{selectedNote, selectedNotePosition, viewType}"/>
       </div>
       <div class="content">
-        <component :is="noteComponent" 
+        <NoteMindmapView v-if="viewType==='mindmap'" 
           v-bind="{noteId, expandChildren}"
           :highlightNoteId="selectedNoteId"
           @selectNote="highlight($event)"
+        />
+        <NoteArticleView v-if="viewType==='article'" 
+          v-bind="{noteId, expandChildren}"
+        />
+        <NoteCardsView v-if="!viewType || viewType==='card'" 
+          v-bind="{noteId, expandChildren}"
         />
       </div>
     </div>
@@ -28,7 +34,6 @@ export default defineComponent({
   },
   props: {
      noteId: { type: Number, required: true },
-     noteComponent: String,
      viewType: String,
      expandChildren: { type: Boolean, required: true },
   },
