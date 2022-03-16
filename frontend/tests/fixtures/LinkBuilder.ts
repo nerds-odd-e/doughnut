@@ -3,7 +3,7 @@ import generateId from "./generateId";
 
 type LinksMap = { [P in Generated.LinkType]?: Generated.LinkViewed }
 
-class LinkBuilder<PB extends Builder> extends Builder<LinksMap, PB> {
+class LinkBuilder extends Builder<LinksMap> {
   linkType: Generated.LinkType;
 
   cnt: number;
@@ -15,12 +15,11 @@ class LinkBuilder<PB extends Builder> extends Builder<LinksMap, PB> {
   toNote: Generated.NoteSphere
 
   constructor(
-    parentBuilder: PB | undefined,
     linkType: Generated.LinkType,
     from: Generated.NoteSphere,
     to: Generated.NoteSphere
   ) {
-    super(parentBuilder);
+    super();
     this.linkType = linkType;
     this.cnt = 1;
     this.isReverse = false;
@@ -40,7 +39,7 @@ class LinkBuilder<PB extends Builder> extends Builder<LinksMap, PB> {
 
   do(): LinksMap {
     if (!this.fromNote.links || !this.toNote.links) throw new Error('note does not have links');
-    if (!this.toNote.links[this.linkType]) this.toNote.links[this.linkType] = { direct: [], reverse: []}
+    if (!this.toNote.links[this.linkType]) this.toNote.links[this.linkType] = { direct: [], reverse: [] }
     const linksOfType = this.toNote.links[this.linkType]
     if (linksOfType && !linksOfType.reverse) linksOfType.reverse = []
     linksOfType?.reverse.push(this.link())
@@ -58,16 +57,17 @@ class LinkBuilder<PB extends Builder> extends Builder<LinksMap, PB> {
 
   private link(): Generated.Link {
     return {
-            id: generateId(),
-            targetNote: this.toNote.note,
-            sourceNote: this.fromNote.note,
-            typeId: 15,
-            linkTypeLabel: "using",
-            linkNameOfSource: "user",
-            createdAt: '',
-          }
+      id: generateId(),
+      targetNote: this.toNote.note,
+      sourceNote: this.fromNote.note,
+      typeId: 15,
+      linkTypeLabel: "using",
+      linkNameOfSource: "user",
+      createdAt: '',
+    }
   }
 
 }
 
 export default LinkBuilder;
+export { LinksMap }

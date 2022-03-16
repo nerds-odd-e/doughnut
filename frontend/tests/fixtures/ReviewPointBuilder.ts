@@ -5,8 +5,8 @@ import NotePositionBuilder from "./NotePositionBuilder"
 class ReviewPointBuilder extends Builder<Generated.ReviewPointViewedByUser> {
   data: Generated.ReviewPointViewedByUser
 
-  constructor(parentBuilder?: Builder) {
-    super(parentBuilder);
+  constructor() {
+    super();
     this.data = {
       reviewPoint: {
         id: generateId(),

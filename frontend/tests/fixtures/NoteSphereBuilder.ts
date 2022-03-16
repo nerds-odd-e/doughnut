@@ -8,8 +8,8 @@ class NoteSphereBuilder extends Builder<Generated.NoteSphere> {
 
   noteBuilder
 
-  constructor(parentBuilder?: Builder) {
-    super(parentBuilder);
+  constructor() {
+    super();
     this.noteBuilder = new NoteBuilder()
     const noteData = this.noteBuilder.data
     this.data = {
@@ -57,7 +57,7 @@ class NoteSphereBuilder extends Builder<Generated.NoteSphere> {
   }
 
   linkTo(note: Generated.NoteSphere): NoteSphereBuilder {
-    merge(this.data.links, new LinkBuilder(undefined, "using", this.data, note).please());
+    merge(this.data.links, new LinkBuilder("using", this.data, note).please());
     return this;
   }
 

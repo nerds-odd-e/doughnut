@@ -3,13 +3,7 @@ import generateId from "./generateId";
 import NotebooksBuilder from "./NotebooksBuilder";
 
 class CircleNoteBuilder extends Builder<Generated.CircleForUserView> {
-  notebooksBuilder: NotebooksBuilder
-
-  constructor(parentBuilder?: Builder) {
-    super(parentBuilder);
-    this.notebooksBuilder = new NotebooksBuilder()
-
-  }
+  notebooksBuilder: NotebooksBuilder = new NotebooksBuilder()
 
   notebooks(notebook: Generated.NotebookViewedByUser) {
     this.notebooksBuilder.notebooks(notebook)

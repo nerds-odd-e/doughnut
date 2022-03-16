@@ -7,8 +7,8 @@ class NotebookBuilder extends Builder<Generated.NotebookViewedByUser> {
 
   notebuilder = new NoteBuilder()
 
-  constructor(parentBuilder?: Builder) {
-    super(parentBuilder);
+  constructor() {
+    super();
     this.data = {
       id: generateId(),
       ownership: {

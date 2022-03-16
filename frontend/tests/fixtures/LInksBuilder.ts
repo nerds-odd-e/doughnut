@@ -1,15 +1,17 @@
 import Builder from "./Builder";
 import generateId from "./generateId";
-import LinkBuilder from "./LinkBuilder";
+import LinkBuilder, { LinksMap } from "./LinkBuilder";
 import NoteSphereBuilder from "./NoteSphereBuilder";
 
-class LinksBuilder extends Builder {
+class LinksBuilder extends Builder<LinksMap> {
   from = new NoteSphereBuilder().title('source note').do()
 
-  of(linkType: Generated.LinkType): LinkBuilder<LinksBuilder> {
+  protected childrenBuilders: Omit<LinkBuilder, "please">[] = [];
+
+  of(linkType: Generated.LinkType) {
     const child = new LinkBuilder(
-      this, linkType, this.from, new NoteSphereBuilder().title(`target note ${generateId()}`).do()
-    );
+      linkType, this.from, new NoteSphereBuilder().title(`target note ${generateId()}`).do()
+    ).parent(this);
     this.childrenBuilders.push(child);
     return child;
   }

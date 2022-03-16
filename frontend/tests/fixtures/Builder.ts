@@ -1,24 +1,17 @@
-abstract class Builder<T=any, PB extends Builder | undefined=any> {
-  protected parentBuilder: PB | undefined;
+abstract class Builder<T> {
 
-  protected childrenBuilders: Builder[];
-
-  constructor(parentBuilder?: PB) {
-    this.parentBuilder = parentBuilder;
-    this.childrenBuilders = [];
-  }
-
-  get and(): PB {
-    if (!this.parentBuilder) {
-      throw new Error("There is no parent builder");
+  parent<P extends Builder<S>, S>(parentBuilder: P)  {
+    const that = this as Omit<typeof this, "please">;
+    const those = that as typeof that & {
+      please: () => S,
+      and: P
     }
-    return this.parentBuilder;
+    those.and = parentBuilder;
+    those.please = () => parentBuilder.please();
+    return those
   }
 
   please(): T {
-    if (this.parentBuilder !== undefined) {
-      return this.parentBuilder.please();
-    }
     return this.do();
   }
 

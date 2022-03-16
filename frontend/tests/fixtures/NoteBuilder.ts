@@ -4,8 +4,8 @@ import generateId from "./generateId";
 class NoteBuilder extends Builder<Generated.Note> {
   data: Generated.Note;
 
-  constructor(parentBuilder?: Builder) {
-    super(parentBuilder);
+  constructor() {
+    super();
     this.data = {
         id: generateId(),
         title: "Note1.1.1",

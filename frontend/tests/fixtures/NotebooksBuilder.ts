@@ -3,8 +3,8 @@ import Builder from "./Builder";
 class NotebooksBuilder extends Builder<Generated.NotebooksViewedByUser> {
   data: Generated.NotebooksViewedByUser;
 
-  constructor(parentBuilder?: Builder) {
-    super(parentBuilder);
+  constructor() {
+    super();
     this.data = {
       notebooks: [],
       subscriptions: []
