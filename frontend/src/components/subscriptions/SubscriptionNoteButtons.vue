@@ -1,6 +1,13 @@
 <template>
   <div class="btn-group btn-group-sm">
-    <SubscriptionEditButton :subscription="subscription" />
+    <PopupButton title="Edit subscription">
+      <template v-slot:face>
+        <SvgEdit />
+      </template>
+      <template #default="{ doneHandler }">
+        <SubscriptionEditDialog :subscription="subscription" @done="doneHandler($event)" />
+      </template>
+    </PopupButton>
     <button class="btn btn-sm" title="Unsubscribe" @click="processForm()">
       <SvgUnsubscribe />
     </button>
@@ -8,18 +15,20 @@
 </template>
 
 <script>
-import SubscriptionEditButton from "./SubscriptionEditButton.vue";
 import SvgUnsubscribe from "../svgs/SvgUnsubscribe.vue";
 import useLoadingApi from '../../managedApi/useLoadingApi';
 import usePopups from "../commons/Popups/usePopup";
+import PopupButton from "../commons/Popups/PopupButton.vue";
+import SvgEdit from "../svgs/SvgEdit.vue";
+import SubscriptionEditDialog from "./SubscriptionEditDialog.vue";
 
 export default {
   setup() {
-    return {...useLoadingApi(), ...usePopups()};
+    return { ...useLoadingApi(), ...usePopups() };
   },
   props: { subscription: Object },
   emits: ["updated"],
-  components: { SubscriptionEditButton, SvgUnsubscribe },
+  components: { SvgUnsubscribe, PopupButton, SvgEdit, SubscriptionEditDialog },
   methods: {
     async processForm() {
       if (

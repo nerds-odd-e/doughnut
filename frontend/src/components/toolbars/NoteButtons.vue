@@ -15,7 +15,14 @@
         <SvgAddSibling />
       </NoteNewButton>
 
-      <NoteEditButton :noteId="note.id" :oldTitle="note.title" />
+      <PopupButton title="edit note">
+        <template v-slot:face>
+          <SvgEdit/>
+        </template>
+        <template #default="{doneHandler}">
+          <NoteEditDialog :noteId="note.id" @done="doneHandler($event)"/>
+        </template>
+      </PopupButton>
 
       <a
         class="btn btn-light dropdown-toggle"
@@ -54,7 +61,6 @@ import SvgAddChild from "../svgs/SvgAddChild.vue";
 import SvgAddSibling from "../svgs/SvgAddSibling.vue";
 import SvgCog from "../svgs/SvgCog.vue";
 import SvgRemove from "../svgs/SvgRemove.vue";
-import NoteEditButton from "./NoteEditButton.vue";
 import NoteDownloadButton from "./NoteDownloadButton.vue"
 import NoteNewButton from "./NoteNewButton.vue";
 import ViewTypeButtons from "./ViewTypeButtons.vue";
@@ -64,6 +70,8 @@ import usePopups from "../commons/Popups/usePopup";
 import PopupButton from "../commons/Popups/PopupButton.vue";
 import SvgReviewSetting from "../svgs/SvgReviewSetting.vue";
 import ReviewSettingEditDialog from "../review/ReviewSettingEditDialog.vue";
+import SvgEdit from "../svgs/SvgEdit.vue";
+import NoteEditDialog from "../notes/NoteEditDialog.vue";
 
 export default ({
   setup() {
@@ -80,13 +88,14 @@ export default ({
     SvgAddChild,
     SvgAddSibling,
     SvgRemove,
-    NoteEditButton,
     NoteNewButton,
     ViewTypeButtons,
     NoteDownloadButton,
     PopupButton,
     SvgReviewSetting,
     ReviewSettingEditDialog,
+    SvgEdit,
+    NoteEditDialog
   },
   methods: {
     async deleteNote() {
