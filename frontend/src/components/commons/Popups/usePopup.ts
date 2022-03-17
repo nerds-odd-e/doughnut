@@ -4,9 +4,7 @@ interface PopupInfo {
   type: 'alert' | 'confirm' | 'dialog'
   message?: string
   doneResolve: ((value: unknown) => void) | ((value: boolean) => void)
-  component?: string
   slot?: Slot
-  attrs?: unknown
 }
 
 class Popup {
@@ -37,13 +35,7 @@ function usePopups() {
         });
       },
 
-      dialog(component: any, attrs: unknown) {
-        return new Promise((resolve) => {
-          setPopupInfo({ type: "dialog", component, attrs, doneResolve: resolve });
-        });
-      },
-
-      dialog1(slot?: Slot) {
+      dialog(slot?: Slot) {
         return new Promise((resolve) => {
           setPopupInfo({ type: "dialog", slot, doneResolve: resolve });
         });
