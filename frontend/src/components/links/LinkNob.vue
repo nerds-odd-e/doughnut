@@ -1,30 +1,27 @@
 <template>
       <span class="link-nob">
-        <a role="button" @click="showDialog" :title="link.linkTypeLabel">
-          <SvgLinkTypeIcon
-            :linkTypeId="link.typeId"
-            :inverseIcon="inverseIcon"
-          />
-        </a>
+        <PopupButton
+          :title="link.linkTypeLabel"
+        >
+          <template v-slot:face>
+            <SvgLinkTypeIcon
+              :linkTypeId="link.typeId"
+              :inverseIcon="inverseIcon"
+            />
+          </template>
+          <LinkNobDialog v-bind="{link, inverseIcon, colors}"/>
+        </PopupButton>
       </span>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import usePopups from "../commons/Popups/usePopup";
 import SvgLinkTypeIcon from "../svgs/SvgLinkTypeIcon.vue";
+import PopupButton from "../commons/Popups/PopupButton.vue";
 import LinkNobDialog from "./LinkNobDialog.vue";
 
 export default defineComponent({
-  setup() {
-    return usePopups();
-  },
   props: { link: Object, inverseIcon: Boolean, colors: Object },
-  components: { SvgLinkTypeIcon },
-  methods: {
-    showDialog() {
-      this.popups.dialog(LinkNobDialog, this.$props)
-    },
-  },
+  components: { SvgLinkTypeIcon, PopupButton, LinkNobDialog },
 });
 </script>

@@ -3,7 +3,6 @@
     <PopupButton
       v-if="!notebook.skipReviewEntirely"
       title="Add to my learning"
-      :icon="SvgAdd"
     >
     <template v-slot:face>
       <SvgAdd/>

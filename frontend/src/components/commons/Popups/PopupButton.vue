@@ -5,7 +5,6 @@
         @click="showDialog"
         :title="title"
       >
-      {{icon}}
       <slot name="face"/>
       <template v-if="!$slots.face">
         {{ title }}
@@ -22,7 +21,7 @@ export default defineComponent({
   setup() {
     return usePopups();
   },
-  props: { title: String, icon: Object },
+  props: { title: String },
   methods: {
     showDialog() {
       this.popups.dialog1(this.$slots.default)
