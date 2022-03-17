@@ -3,6 +3,7 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteAccessories;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.json.NoteCreation;
 import com.odde.doughnut.entities.json.NoteSphere;
 import com.odde.doughnut.entities.json.NotesBulk;
 import com.odde.doughnut.exceptions.NoAccessRightException;
@@ -115,7 +116,7 @@ class RestNoteControllerTests {
         void shouldBeAbleToSaveNoteWhenValid() throws NoAccessRightException {
             Note parent = makeMe.aNote().byUser(userModel).please();
             Note newNote = makeMe.aNote().inMemoryPlease();
-            RestNoteController.NoteCreation noteCreation = new RestNoteController.NoteCreation();
+            NoteCreation noteCreation = new NoteCreation();
             noteCreation.setTextContent(newNote.getTextContent());
 
             NotesBulk response = controller.createNote(parent, noteCreation);

@@ -85,7 +85,7 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
       return res;
     },
 
-    async createNote(parentId: Doughnut.ID, data: any) {
+    async createNote(parentId: Doughnut.ID, data: Generated.NoteCreation) {
       const res = await managedApi.restPostMultiplePartForm(
         `notes/${parentId}/create`,
         data
@@ -94,7 +94,7 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
       return res;
     },
 
-    async createLink(sourceId: Doughnut.ID, targetId: Doughnut.ID, data: any) {
+    async createLink(sourceId: Doughnut.ID, targetId: Doughnut.ID, data: Generated.LinkRequest) {
       const res = await managedApi.restPost(
         `links/create/${sourceId}/${targetId}`,
         data
@@ -103,7 +103,7 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
       return res;
     },
 
-    async updateLink(linkId: Doughnut.ID, data: any) {
+    async updateLink(linkId: Doughnut.ID, data: Generated.LinkRequest) {
       const res = await managedApi.restPost(`links/${linkId}`, data) as Generated.NotesBulk;
       piniaStore.loadNotesBulk(res);
       return res;
@@ -115,7 +115,7 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
       return res;
     },
 
-    async updateNote(noteId: Doughnut.ID, noteContentData: any) {
+    async updateNote(noteId: Doughnut.ID, noteContentData: Generated.NoteAccessories) {
       const { updatedAt, ...data } = noteContentData;
       const res = await managedApi.restPatchMultiplePartForm(
         `notes/${noteId}`,

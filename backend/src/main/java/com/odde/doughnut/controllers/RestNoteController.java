@@ -3,6 +3,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.json.NoteCreation;
 import com.odde.doughnut.entities.json.NoteSphere;
 import com.odde.doughnut.entities.json.NotesBulk;
 import com.odde.doughnut.entities.json.RedirectToNoteResponse;
@@ -18,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 import java.io.IOException;
 import java.util.List;
 
@@ -44,17 +44,6 @@ class RestNoteController {
         @Setter
         private NoteSphere note;
 
-    }
-
-    static class NoteCreation {
-        @Getter
-        @Setter
-        private Integer linkTypeToParent;
-        @Getter
-        @Setter
-        @Valid
-        @NotNull
-        private TextContent textContent = new TextContent();
     }
 
     @PostMapping(value = "/{parentNote}/create")

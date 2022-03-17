@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-03-17 18:54:52.
+// Generated using typescript-generator version 2.35.1025 on 2022-03-17 18:59:57.
 
 declare namespace Generated {
 
@@ -22,6 +22,12 @@ declare namespace Generated {
         reviewSetting: ReviewSetting;
     }
 
+    interface LinkRequest {
+        typeId: number;
+        moveUnder: boolean;
+        asFirstChild: boolean;
+    }
+
     interface LinkViewed {
         direct: Link[];
         reverse: Link[];
@@ -34,6 +40,11 @@ declare namespace Generated {
         typeId: number;
         targetNoteWithPosition: NoteWithPosition;
         readonly: boolean;
+    }
+
+    interface NoteCreation {
+        linkTypeToParent: number;
+        textContent: TextContent;
     }
 
     interface NotePositionViewedByUser {
@@ -138,6 +149,12 @@ declare namespace Generated {
         linkNameOfSource: string;
     }
 
+    interface TextContent {
+        title: string;
+        description: string;
+        updatedAt: string;
+    }
+
     interface Note {
         id: number;
         noteAccessories: NoteAccessories;
@@ -188,12 +205,6 @@ declare namespace Generated {
         pictureMask: string;
         useParentPicture: boolean;
         skipReview: boolean;
-        updatedAt: string;
-    }
-
-    interface TextContent {
-        title: string;
-        description: string;
         updatedAt: string;
     }
 

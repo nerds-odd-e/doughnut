@@ -5,6 +5,7 @@ import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.json.LinkRequest;
 import com.odde.doughnut.entities.json.LinkViewedByUser;
 import com.odde.doughnut.entities.json.NotesBulk;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
@@ -20,7 +21,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 
 @RestController
 @RequestMapping("/api/links")
@@ -38,13 +38,6 @@ class RestLinkController {
     UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertReadAuthorization(link.getSourceNote());
     return LinkViewedByUser.from(link, user);
-  }
-
-  static class LinkRequest {
-    @NotNull
-    public Integer typeId;
-    public Boolean moveUnder;
-    public Boolean asFirstChild;
   }
 
   @PostMapping(value = "/{link}")
