@@ -1,7 +1,9 @@
 <template>
   <ContainerPage v-bind="{ loading, contentExists: !!circles, title: 'My Circles' }">
     <PopupButton title="Create a new circle">
-      <CircleNewDialog/>
+      <template #default="{doneHandler}">
+        <CircleNewDialog @done="doneHandler($event)"/>
+      </template>
     </PopupButton>
     <div v-if="!!circles">
       <div class="row">

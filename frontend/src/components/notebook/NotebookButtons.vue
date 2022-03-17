@@ -5,7 +5,9 @@
       <template v-slot:face>
         <SvgEditNotebook/>
       </template>
-      <NotebookEditDialog v-bind="{ notebook }" />
+      <template #default="{doneHandler}">
+      <NotebookEditDialog v-bind="{ notebook }" @done="doneHandler($event)"/>
+      </template>
     </PopupButton>
     <button
       class="btn btn-sm"

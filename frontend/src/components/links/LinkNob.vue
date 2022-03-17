@@ -9,7 +9,9 @@
               :inverseIcon="inverseIcon"
             />
           </template>
-          <LinkNobDialog v-bind="{link, inverseIcon, colors}"/>
+          <template #default="{doneHandler}">
+            <LinkNobDialog v-bind="{link, inverseIcon, colors}" @done="doneHandler($event)"/>
+          </template>
         </PopupButton>
       </span>
 </template>

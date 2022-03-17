@@ -3,7 +3,9 @@
     <template v-slot:face>
       <slot />
     </template>
-    <NotebookNewDialog :circle="circle"/>
+    <template #default="{doneHandler}">
+      <NotebookNewDialog :circle="circle" @done="doneHandler($event)"/>
+    </template>
   </PopupButton>
 </template>
 
