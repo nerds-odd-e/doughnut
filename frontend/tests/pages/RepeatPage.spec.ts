@@ -6,6 +6,7 @@ import flushPromises from 'flush-promises';
 import helper from '../helpers';
 import makeMe from '../fixtures/makeMe';
 import RenderingHelper from "../helpers/RenderingHelper";
+import usePopups, { PopupInfo } from '../../src/components/commons/usePopup';
 
 let renderer: RenderingHelper
 let mockRouterPush = jest.fn();
@@ -66,6 +67,9 @@ describe('repeat page', () => {
     });
 
     it('reload next review point if 404', async () => {
+      const {popups} = usePopups()
+      const popupData = {} as { popupInfo?: PopupInfo}
+      popups.register(popupData)
       repetition = makeMe.aRepetition.ofNote(note).please();
       const reviewPointId = repetition.reviewPointViewedByUser.reviewPoint.id;
       const wrapper = await mountPage(repetition);
@@ -74,7 +78,7 @@ describe('repeat page', () => {
 
       wrapper.find('#repeat-sad').trigger('click');
       await flushPromises();
-      expect(helper.store.popupInfo?.message).toMatch(/review point/)
+      expect(popupData.popupInfo?.message).toMatch(/review point/)
       helper.apiMock.verifyCall(`/api/reviews/repeat`)
     });
   });

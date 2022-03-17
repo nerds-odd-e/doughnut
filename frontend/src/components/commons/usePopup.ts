@@ -1,8 +1,11 @@
+import { Slot } from "vue"
+
 interface PopupInfo {
   type: 'alert' | 'confirm' | 'dialog'
   message?: string
   doneResolve: ((value: unknown) => void) | ((value: boolean) => void)
   component?: string
+  slot?: Slot
   attrs?: unknown
 }
 
@@ -18,25 +21,31 @@ function usePopups() {
   }
   return {
     popups: {
-      register(data: any) {
+      register(data: {popupInfo?: PopupInfo}) {
         Popup.popupDataWrap.popupData = data
       },
 
       alert(msg: string) {
-        return new Promise<boolean>((resolve, reject) => {
+        return new Promise<boolean>((resolve) => {
           setPopupInfo({ type: "alert", message: msg, doneResolve: resolve });
         });
       },
 
       confirm(msg: string) {
-        return new Promise<boolean>((resolve, reject) => {
+        return new Promise<boolean>((resolve) => {
           setPopupInfo({ type: "confirm", message: msg, doneResolve: resolve });
         });
       },
 
       dialog(component: any, attrs: unknown) {
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
           setPopupInfo({ type: "dialog", component, attrs, doneResolve: resolve });
+        });
+      },
+
+      dialog1(slot?: Slot) {
+        return new Promise((resolve) => {
+          setPopupInfo({ type: "dialog", slot, doneResolve: resolve });
         });
       },
 

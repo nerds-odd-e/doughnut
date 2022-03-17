@@ -1,6 +1,8 @@
 <template>
   <ContainerPage v-bind="{ loading, contentExists: !!circles, title: 'My Circles' }">
-    <CircleNewButton @updated="fetchData()" />
+    <CircleNewButton>
+      <CircleNewDialog/>
+    </CircleNewButton>
     <div v-if="!!circles">
       <div class="row">
         <div
@@ -29,12 +31,13 @@ import ContainerPage from "./commons/ContainerPage.vue";
 import CircleNewButton from "../components/circles/CircleNewButton.vue";
 import CircleJoinForm from "../components/circles/CircleJoinForm.vue";
 import useLoadingApi from '../managedApi/useLoadingApi';
+import CircleNewDialog from "../components/circles/CircleNewDialog.vue";
 
 export default {
   setup() {
     return useLoadingApi();
   },
-  components: { ContainerPage, CircleNewButton, CircleJoinForm },
+  components: { ContainerPage, CircleNewButton, CircleJoinForm, CircleNewDialog },
   data() {
     return {
       circles: null,

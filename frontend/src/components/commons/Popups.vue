@@ -41,7 +41,9 @@
       @close_request="resolve(null)"
     >
       <template v-slot:body>
+        <component v-if="popupInfo.slot" :is="popupInfo.slot"/>
         <component
+        v-else
           :is="popupInfo.component"
           v-bind="popupInfo.attrs"
           @done="resolve($event)"
@@ -52,7 +54,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, } from "vue";
 import Modal from "./Modal.vue";
 import usePopups, {PopupInfo} from "./usePopup";
 
