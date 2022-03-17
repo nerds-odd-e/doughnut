@@ -3,8 +3,10 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.json.InitialInfo;
 import com.odde.doughnut.entities.json.RepetitionForUser;
 import com.odde.doughnut.entities.json.ReviewPointViewedByUser;
+import com.odde.doughnut.entities.json.SelfEvaluation;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.ReviewPointModel;
 import com.odde.doughnut.models.Reviewing;
@@ -50,13 +52,6 @@ class RestReviewsController {
         ReviewPointViewedByUser from = ReviewPointViewedByUser.from(reviewPoint, user);
         from.setRemainingInitialReviewCountForToday(reviewing.toInitialReviewCount());
         return from;
-    }
-
-    static class InitialInfo {
-        @Valid
-        public ReviewPoint reviewPoint;
-        @Valid
-        public ReviewSetting reviewSetting;
     }
 
     @PostMapping(path = "")
@@ -123,11 +118,6 @@ class RestReviewsController {
         if (answerResult.isCorrect()) {
             modelFactoryService.toReviewPointModel(reviewPoint).repeated(testabilitySettings.getCurrentUTCTimestamp());
         }
-    }
-
-    static class SelfEvaluation {
-        public String selfEvaluation;
-        public Boolean increaseRepeatCount;
     }
 
     @PostMapping(path = "/{reviewPoint}/self-evaluate")

@@ -15,7 +15,7 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
     }
   }
 
-  async function updateTextContentWithoutUndo(noteId: Doughnut.ID, noteContentData: any) {
+  async function updateTextContentWithoutUndo(noteId: Doughnut.ID, noteContentData: Generated.TextContent) {
     const { updatedAt, ...data } = noteContentData;
     const res = await managedApi.restPatchMultiplePartForm(
       `text_content/${noteId}`,
@@ -33,13 +33,13 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
         return res;
       },
 
-      async doInitialReview(data: any) {
+      async doInitialReview(data: Generated.InitialInfo) {
         const res = await managedApi.restPost(`reviews`, data) as Generated.ReviewPointViewedByUser;
         loadReviewPointViewedByUser(res);
         return res;
       },
 
-      async selfEvaluate(reviewPointId: Doughnut.ID, data: any) {
+      async selfEvaluate(reviewPointId: Doughnut.ID, data: Generated.SelfEvaluation) {
         const res = await managedApi.restPost(
           `reviews/${reviewPointId}/self-evaluate`,
           data
@@ -73,7 +73,7 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
       return res;
     },
 
-    async createNotebook(circle: any, data: any) {
+    async createNotebook(circle: Generated.Circle | undefined, data: Generated.Notebook) {
       const url = (() => {
         if (circle) {
           return `circles/${circle.id}/notebooks`;
@@ -134,7 +134,7 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
       const history = piniaStore.peekUndo();
       if(!history) throw new Error('undo history is empty')
       piniaStore.popUndoHistory();
-      if (history.type === 'editing') {
+      if (history.type === 'editing' && history.textContent) {
         return updateTextContentWithoutUndo(
           history.noteId,
           history.textContent
@@ -166,7 +166,7 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
       return res;
     },
 
-    async updateUser(userId: Doughnut.ID, data: any) {
+    async updateUser(userId: Doughnut.ID, data: Generated.User) {
       const res = await managedApi.restPatchMultiplePartForm(
         `user/${userId}`,
         data
@@ -175,7 +175,7 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
       return res;
     },
 
-    async createUser(data: any) {
+    async createUser(data: Generated.User) {
       const res = await managedApi.restPostMultiplePartForm(`user`, data) as Generated.User;
       piniaStore.setCurrentUser(res);
       return res;

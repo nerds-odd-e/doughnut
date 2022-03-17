@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-03-16 15:17:51.
+// Generated using typescript-generator version 2.35.1025 on 2022-03-17 18:54:52.
 
 declare namespace Generated {
 
@@ -15,6 +15,11 @@ declare namespace Generated {
     interface CurrentUserInfo {
         user: User;
         externalIdentifier: string;
+    }
+
+    interface InitialInfo {
+        reviewPoint: ReviewPoint;
+        reviewSetting: ReviewSetting;
     }
 
     interface LinkViewed {
@@ -87,6 +92,11 @@ declare namespace Generated {
         remainingInitialReviewCountForToday: number;
     }
 
+    interface SelfEvaluation {
+        selfEvaluation: string;
+        increaseRepeatCount: boolean;
+    }
+
     interface UserForOtherUserView {
         name: string;
     }
@@ -98,59 +108,6 @@ declare namespace Generated {
         ownership: Ownership;
         dailyNewNotesCount: number;
         spaceIntervals: string;
-    }
-
-    interface Link {
-        id: number;
-        sourceNote: Note;
-        targetNote: Note;
-        typeId: number;
-        createdAt: string;
-        linkTypeLabel: string;
-        linkNameOfSource: string;
-    }
-
-    interface Note {
-        id: number;
-        noteAccessories: NoteAccessories;
-        textContent: TextContent;
-        createdAt: string;
-        title: string;
-        notePicture?: string;
-        shortDescription: string;
-        parentId?: number;
-    }
-
-    interface Ownership {
-        id: number;
-        circle?: Circle;
-    }
-
-    interface Subscription {
-        id: number;
-        dailyTargetOfNewNotes: number;
-        user: User;
-        notebook: Notebook;
-        title: string;
-        headNote: Note;
-        shortDescription: string;
-    }
-
-    interface QuizQuestion {
-        questionType: QuestionType;
-        options: Option[];
-        description: string;
-        mainTopic: string;
-        hintLinks: { [P in LinkType]?: LinkViewed };
-        viceReviewPointIds: number[];
-        scope: Note[];
-    }
-
-    interface Answer {
-        answer: string;
-        answerNoteId: number;
-        questionType: QuestionType;
-        viceReviewPointIds: number[];
     }
 
     interface ReviewPoint {
@@ -169,6 +126,59 @@ declare namespace Generated {
         id: number;
         rememberSpelling: boolean;
         level: number;
+    }
+
+    interface Link {
+        id: number;
+        sourceNote: Note;
+        targetNote: Note;
+        typeId: number;
+        createdAt: string;
+        linkTypeLabel: string;
+        linkNameOfSource: string;
+    }
+
+    interface Note {
+        id: number;
+        noteAccessories: NoteAccessories;
+        textContent: TextContent;
+        createdAt: string;
+        notePicture?: string;
+        title: string;
+        shortDescription: string;
+        parentId?: number;
+    }
+
+    interface Ownership {
+        id: number;
+        circle?: Circle;
+    }
+
+    interface Subscription {
+        id: number;
+        dailyTargetOfNewNotes: number;
+        user: User;
+        notebook: Notebook;
+        headNote: Note;
+        title: string;
+        shortDescription: string;
+    }
+
+    interface QuizQuestion {
+        questionType: QuestionType;
+        options: Option[];
+        description: string;
+        mainTopic: string;
+        hintLinks: { [P in LinkType]?: LinkViewed };
+        viceReviewPointIds: number[];
+        scope: Note[];
+    }
+
+    interface Answer {
+        answer: string;
+        answerNoteId: number;
+        questionType: QuestionType;
+        viceReviewPointIds: number[];
     }
 
     interface NoteAccessories {

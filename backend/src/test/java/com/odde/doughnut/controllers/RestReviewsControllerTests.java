@@ -1,7 +1,9 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.json.InitialInfo;
 import com.odde.doughnut.entities.json.ReviewPointViewedByUser;
+import com.odde.doughnut.entities.json.SelfEvaluation;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
@@ -73,7 +75,7 @@ class RestReviewsControllerTests {
         @Test
         void create() {
             userModel = makeMe.aNullUserModel();
-            RestReviewsController.InitialInfo info = new RestReviewsController.InitialInfo();
+            InitialInfo info = new InitialInfo();
             assertThrows(ResponseStatusException.class, ()->controller().create(info));
         }
     }
@@ -155,7 +157,7 @@ class RestReviewsControllerTests {
         void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
             userModel = makeMe.aNullUserModel();
             ReviewPoint reviewPoint = new ReviewPoint();
-            RestReviewsController.SelfEvaluation selfEvaluation = new RestReviewsController.SelfEvaluation() {{
+            SelfEvaluation selfEvaluation = new SelfEvaluation() {{
                 this.selfEvaluation = "happy";
             }};
             assertThrows(ResponseStatusException.class, () -> controller().selfEvaluate(reviewPoint, selfEvaluation));
@@ -163,7 +165,7 @@ class RestReviewsControllerTests {
 
         @Test
         void whenTheReviewPointDoesNotExist() {
-            RestReviewsController.SelfEvaluation selfEvaluation = new RestReviewsController.SelfEvaluation() {{
+            SelfEvaluation selfEvaluation = new SelfEvaluation() {{
                 this.selfEvaluation = "happy";
             }};
             assertThrows(ResponseStatusException.class, () -> controller().selfEvaluate(null, selfEvaluation));
@@ -188,7 +190,7 @@ class RestReviewsControllerTests {
             }
 
             private void evaluate(String evaluation) {
-                RestReviewsController.SelfEvaluation selfEvaluation = new RestReviewsController.SelfEvaluation() {{
+                SelfEvaluation selfEvaluation = new SelfEvaluation() {{
                     this.selfEvaluation = evaluation;
                 }};
                 controller().selfEvaluate(rp, selfEvaluation);
