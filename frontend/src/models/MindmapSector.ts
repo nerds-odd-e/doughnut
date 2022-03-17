@@ -28,8 +28,9 @@ class MindmapSector {
         return this.parentX === null
     }
 
-    get connectionFromParent(): StraightConnection {
-        return { x1: this.parentX!, y1: this.parentY!, x2: this.nx, y2: this.ny}
+    get connectionFromParent(): StraightConnection | undefined {
+        if(!this.parentX || !this.parentY) return undefined
+        return { x1: this.parentX, y1: this.parentY, x2: this.nx, y2: this.ny}
     }
 
     get coord(): Coord {
