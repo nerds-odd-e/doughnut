@@ -11,7 +11,7 @@
 import SubscriptionEditButton from "./SubscriptionEditButton.vue";
 import SvgUnsubscribe from "../svgs/SvgUnsubscribe.vue";
 import useLoadingApi from '../../managedApi/useLoadingApi';
-import usePopups from "../commons/usePopup";
+import usePopups from "../commons/Popups/usePopup";
 
 export default {
   setup() {

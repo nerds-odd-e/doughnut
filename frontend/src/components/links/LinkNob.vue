@@ -11,7 +11,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import usePopups from "../commons/usePopup";
+import usePopups from "../commons/Popups/usePopup";
 import SvgLinkTypeIcon from "../svgs/SvgLinkTypeIcon.vue";
 import LinkNobDialog from "./LinkNobDialog.vue";
 

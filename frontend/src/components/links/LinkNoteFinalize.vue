@@ -45,7 +45,7 @@ import CheckInput from "../form/CheckInput.vue";
 import RadioButtons from "../form/RadioButtons.vue";
 import SvgGoBack from "../svgs/SvgGoBack.vue";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
-import usePopups from "../commons/usePopup";
+import usePopups from "../commons/Popups/usePopup";
 
 export default ({
   setup() {

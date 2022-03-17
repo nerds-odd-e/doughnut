@@ -7,7 +7,7 @@
 <script lang="ts">
 
 import { defineComponent } from "vue";
-import usePopups from "../commons/usePopup";
+import usePopups from "../commons/Popups/usePopup";
 import NoteNewDialog from "../notes/NoteNewDialog.vue";
 
 export default defineComponent({

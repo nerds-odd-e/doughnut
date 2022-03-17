@@ -77,7 +77,7 @@ import ContainerPage from "./commons/ContainerPage.vue";
 import NoteStatisticsButton from "../components/notes/NoteStatisticsButton.vue";
 import RepeatProgressBar from "../components/review/RepeatProgressBar.vue";
 import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
-import usePopups from "../components/commons/usePopup";
+import usePopups from "../components/commons/Popups/usePopup";
 
 export default ({
   setup() {

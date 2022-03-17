@@ -1,6 +1,6 @@
 import { DefineComponent, defineComponent, h } from "vue";
 import { RouterView } from "vue-router";
-import usePopups from "../../components/commons/usePopup";
+import usePopups from "../../components/commons/Popups/usePopup";
 import routerScopeGuard from "../../routes/relative_routes";
 
 declare module "@vue/runtime-core" {

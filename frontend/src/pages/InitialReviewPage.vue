@@ -57,7 +57,7 @@ import ProgressBar from "../components/commons/ProgressBar.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import Minimizable from "../components/commons/Minimizable.vue";
 import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
-import usePopups from "../components/commons/usePopup";
+import usePopups from "../components/commons/Popups/usePopup";
 
 export default ({
   setup() {

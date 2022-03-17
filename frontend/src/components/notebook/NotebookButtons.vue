@@ -17,7 +17,7 @@ import { defineComponent } from "vue";
 import NotebookEditButton from "./NotebookEditButton.vue";
 import SvgBazaarShare from "../svgs/SvgBazaarShare.vue";
 import useLoadingApi from '../../managedApi/useLoadingApi';
-import usePopups from "../commons/usePopup";
+import usePopups from "../commons/Popups/usePopup";
 
 export default defineComponent({
   setup() {

@@ -1,9 +1,9 @@
 <script>
-import Popups from "./components/commons/Popups.vue";
+import Popups from "./components/commons/Popups/Popups.vue";
 import MainMenu from "./components/commons/MainMenu.vue";
 import UserNewRegisterPage from "./pages/UserNewRegisterPage.vue";
 import useStoredLoadingApi from "./managedApi/useStoredLoadingApi";
-import usePopups from "./components/commons/usePopup";
+import usePopups from "./components/commons/Popups/usePopup";
 
 export default {
   setup() {

@@ -8,7 +8,7 @@
 import { defineComponent } from "vue";
 import LinkNoteDialog from "./LinkNoteDialog.vue";
 import SvgSearch from "../svgs/SvgSearch.vue";
-import usePopups from "../commons/usePopup";
+import usePopups from "../commons/Popups/usePopup";
 
 export default defineComponent({
   setup() {

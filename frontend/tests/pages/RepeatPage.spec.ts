@@ -6,7 +6,7 @@ import flushPromises from 'flush-promises';
 import helper from '../helpers';
 import makeMe from '../fixtures/makeMe';
 import RenderingHelper from "../helpers/RenderingHelper";
-import usePopups, { PopupInfo } from '../../src/components/commons/usePopup';
+import usePopups, { PopupInfo } from '../../src/components/commons/Popups/usePopup';
 
 let renderer: RenderingHelper
 let mockRouterPush = jest.fn();

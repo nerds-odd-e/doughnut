@@ -8,7 +8,7 @@
 import { defineComponent } from "vue";
 import SvgEdit from "../svgs/SvgEdit.vue";
 import NoteEditDialog from "../notes/NoteEditDialog.vue";
-import usePopups from "../commons/usePopup";
+import usePopups from "../commons/Popups/usePopup";
 
 
 export default defineComponent({

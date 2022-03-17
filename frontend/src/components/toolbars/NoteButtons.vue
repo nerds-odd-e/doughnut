@@ -59,7 +59,7 @@ import NoteNewButton from "./NoteNewButton.vue";
 import ViewTypeButtons from "./ViewTypeButtons.vue";
 import { viewType } from "../../models/viewTypes";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
-import usePopups from "../commons/usePopup";
+import usePopups from "../commons/Popups/usePopup";
 
 export default ({
   setup() {

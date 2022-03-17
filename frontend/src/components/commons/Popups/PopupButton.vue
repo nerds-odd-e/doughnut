@@ -3,22 +3,22 @@
         class="btn btn-sm"
         role="button"
         @click="showDialog"
-        title="Create a new circle"
+        :title="title"
       >
-        Create a new circle
+        {{ title }}
       </button>
 
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import usePopups from "../commons/usePopup";
+import usePopups from "./usePopup";
 
 export default defineComponent({
   setup() {
     return usePopups();
   },
-  props: { notebook: Object, user: Object },
+  props: { title: String },
   methods: {
     showDialog() {
       this.popups.dialog1(this.$slots.default)

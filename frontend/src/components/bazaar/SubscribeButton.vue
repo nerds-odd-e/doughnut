@@ -11,7 +11,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import usePopups from "../commons/usePopup";
+import usePopups from "../commons/Popups/usePopup";
 import SvgAdd from "../svgs/SvgAdd.vue";
 import SubscribeDialog from "./SubscribeDialog.vue";
 

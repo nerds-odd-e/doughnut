@@ -12,7 +12,7 @@
 import { defineComponent } from "vue";
 import ReviewSettingEditDialog from "./ReviewSettingEditDialog.vue";
 import SvgReviewSetting from "../svgs/SvgReviewSetting.vue";
-import usePopups from "../commons/usePopup";
+import usePopups from "../commons/Popups/usePopup";
 
 
 export default defineComponent({
