@@ -6,7 +6,12 @@
     :featureToggle="featureToggle"
     />
     <div class="btn-group btn-group-sm">
-      <LinkNoteButton :note="selectedNote" />
+      <PopupButton title="link note">
+        <template v-slot:face>
+          <SvgSearch />
+        </template>
+        <LinkNoteDialog :note="selectedNote"/>
+      </PopupButton>
       <NoteUndoButton/>
     </div>
   </nav>
@@ -19,8 +24,10 @@ import { defineComponent, PropType } from 'vue'
 import Breadcrumb from "./Breadcrumb.vue";
 import NoteButtons from './NoteButtons.vue'
 import NoteUndoButton from "./NoteUndoButton.vue";
-import LinkNoteButton from "../links/LinkNoteButton.vue";
 import useStoredLoadingApi from '../../managedApi/useStoredLoadingApi';
+import PopupButton from '../commons/Popups/PopupButton.vue';
+import SvgSearch from '../svgs/SvgSearch.vue';
+import LinkNoteDialog from '../links/LinkNoteDialog.vue';
 
 export default defineComponent({
   setup() {
@@ -34,9 +41,11 @@ export default defineComponent({
   components: {
     NoteButtons,
     NoteUndoButton,
-    LinkNoteButton,
     Breadcrumb,
-  },
+    PopupButton,
+    SvgSearch,
+    LinkNoteDialog
+},
   computed: {
     featureToggle() { return this.piniaStore.featureToggle },
   },

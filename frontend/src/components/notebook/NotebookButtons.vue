@@ -1,7 +1,12 @@
 <template>
   <div class="btn-group btn-group-sm">
     <slot name="additional-buttons" />
-    <NotebookEditButton v-bind="{ notebook }" />
+    <PopupButton title="Edit notebook settings">
+      <template v-slot:face>
+        <SvgEditNotebook/>
+      </template>
+      <NotebookEditDialog v-bind="{ notebook }" />
+    </PopupButton>
     <button
       class="btn btn-sm"
       title="Share notebook to bazaar"
@@ -14,17 +19,19 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import NotebookEditButton from "./NotebookEditButton.vue";
 import SvgBazaarShare from "../svgs/SvgBazaarShare.vue";
 import useLoadingApi from '../../managedApi/useLoadingApi';
 import usePopups from "../commons/Popups/usePopup";
+import PopupButton from "../commons/Popups/PopupButton.vue";
+import NotebookEditDialog from "./NotebookEditDialog.vue";
+import SvgEditNotebook from "../svgs/SvgEditNotebook.vue";
 
 export default defineComponent({
   setup() {
     return {...useLoadingApi(), ...usePopups()}
   },
   props: { notebook: Object },
-  components: { NotebookEditButton, SvgBazaarShare },
+  components: { SvgBazaarShare, PopupButton, NotebookEditDialog, SvgEditNotebook },
   methods: {
     async shareNotebook() {
       if (await this.popups.confirm(`Are you sure to share?`)) {
