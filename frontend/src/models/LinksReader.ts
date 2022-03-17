@@ -1,9 +1,10 @@
+import LinksMap from "./LinksMap";
 import { taggingTypes, groupedTypes, linkTypeNameToId } from "./linkTypeOptions"
 
 class LinksReader {
-  links: any;
+  links
 
-  constructor(links: any) {
+  constructor(links: LinksMap) {
     this.links = links;
   }
 

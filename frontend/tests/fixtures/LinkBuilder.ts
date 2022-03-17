@@ -1,7 +1,6 @@
+import LinksMap from "../../src/models/LinksMap";
 import Builder from "./Builder";
 import generateId from "./generateId";
-
-type LinksMap = { [P in Generated.LinkType]?: Generated.LinkViewed }
 
 class LinkBuilder extends Builder<LinksMap> {
   linkType: Generated.LinkType;
