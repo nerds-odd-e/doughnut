@@ -41,17 +41,17 @@ class LinksReader {
 
   get directLinks() {
     return Object.fromEntries(
-      Object.entries(this.links).filter((t: Array<any>) => t[1].direct && t[1].direct.length > 0)
+      Object.entries(this.links).filter((t) => t[1].direct && t[1].direct.length > 0)
     );
   }
 
   get reverseLinks() {
     return Object.fromEntries(
-      Object.entries(this.links).filter((t: Array<any>) => t[1].reverse && t[1].reverse.length > 0)
+      Object.entries(this.links).filter((t) => t[1].reverse && t[1].reverse.length > 0)
     );
   }
 
-  get reverseLinkTypes(): Array<number> {
+  get reverseLinkTypes() {
     return Object.keys(this.reverseLinks).map(ln=>linkTypeNameToId(ln))
   }
 

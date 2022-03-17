@@ -5,9 +5,9 @@ const splitAngle =(startAngle: number, angleRange: number, siblingCount: number,
 class MindmapSector {
     readonly radius = 210
 
-    parentX: number | null = null
+    parentX?: number
 
-    parentY: number | null = null
+    parentY?: number
 
     nx: number
 
@@ -25,7 +25,7 @@ class MindmapSector {
     }
 
     get isHead(): boolean {
-        return this.parentX === null
+        return this.parentX === undefined
     }
 
     get connectionFromParent(): StraightConnection {
