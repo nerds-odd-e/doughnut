@@ -51,18 +51,26 @@
   </template>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue";
 import Modal from "./Modal.vue";
-export default {
-  props: { popupInfo: Object },
+import usePopups from "./usePopup";
+
+export default defineComponent({
+  setup() {
+    return usePopups();
+  },
   emits: ["done"],
   components: { Modal },
   methods: {
-    resolve(result) {
-      this.$emit("done", result);
+    resolve(result: unknown) {
+      this.popups.done(result)
     },
   },
-};
+  computed: {
+    popupInfo() { return this.piniaStore.popupInfo },
+  }
+});
 </script>
 
 <style lang="scss" scoped>

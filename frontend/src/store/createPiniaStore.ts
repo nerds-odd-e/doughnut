@@ -5,7 +5,7 @@ import noteCache, { NoteCacheState } from "./noteCache";
 interface PopupInfo {
   type: 'alert' | 'confirm' | 'dialog'
   message?: string
-  doneResolve: (value: unknown)=>void
+  doneResolve: ((value: unknown)=>void) | ((value: boolean)=>void)
   component?: string
   attrs?: unknown
 }

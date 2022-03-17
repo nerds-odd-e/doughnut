@@ -31,14 +31,6 @@ export default {
   computed: {
     newUser() { return !this.user && !!this.externalIdentifier; },
     user() { return this.piniaStore.currentUser },
-    popupInfo() { return this.piniaStore.popupInfo },
-  },
-
-  methods: {
-    done(result) {
-      if(this.piniaStore.popupInfo.doneResolve) this.piniaStore.popupInfo.doneResolve(result);
-      this.piniaStore.popupInfo = undefined;
-    },
   },
 
   mounted() {
@@ -55,7 +47,7 @@ export default {
 
 <template>
 <div class="box">
-  <Popups :popupInfo="popupInfo" @done="done($event)" />
+  <Popups />
   <UserNewRegisterPage v-if="newUser"/>
   <template v-else>
     <div class="header">
