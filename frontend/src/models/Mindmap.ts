@@ -14,11 +14,11 @@ class Mindmap {
 
     metrics: MindmapMetrics
 
-    constructor(scale: number, rootMindmapSector: MindmapSector, rootNoteId: Doughnut.ID, noteFinder: NoteFinder) {
+    constructor(scale: number, rootMindmapSector: MindmapSector, rootNoteId: Doughnut.ID, noteFinder: NoteFinder, boxWidth: number, boxHeight: number) {
       this.rootMindmapSector = rootMindmapSector
       this.rootNoteId = rootNoteId
       this.noteFinder = noteFinder
-      this.metrics = new MindmapMetrics(scale)
+      this.metrics = new MindmapMetrics(scale, boxWidth, boxHeight)
     }
 
     coord(sector: MindmapSector): Coord {
@@ -31,17 +31,15 @@ class Mindmap {
       return 'large'
     }
 
-    connectFromParent(sector: MindmapSector): StraightConnection | undefined {
-      const fromParent = sector.connectionFromParent;
-      if(!fromParent) return undefined
-      return this.metrics.straighConnection(fromParent)
+    connectFromParent(sector: MindmapSector): StraightConnection {
+      return this.metrics.straighConnection(sector.connectionFromParent)
     }
 
     linkToTargetNote(from: Vector, link: Generated.Link): string | undefined {
-      const noteSphere = this.noteFinder(link.targetNote.id)
+      const noteLegacy = this.noteFinder(link.targetNote.id)
       const targetSector = this.getNoteSctor(link.targetNote.id)
-      if (!targetSector || !noteSphere) return undefined
-      const {reverseLinkTypes} = new LinksReader(noteSphere.links)
+      if (!targetSector) return undefined
+      const {reverseLinkTypes} = new LinksReader(noteLegacy!.links)
       const inSlot = this.metrics.borderVector(targetSector.inSlot(reverseLinkTypes.length, reverseLinkTypes.indexOf(link.typeId)))
       return this.metrics.linkVectors(from, inSlot)
     }

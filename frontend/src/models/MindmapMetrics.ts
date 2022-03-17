@@ -3,7 +3,7 @@ import { Coord, StraightConnection, Vector } from "./MindmapUnits";
 class MindmapMetrics {
     scale: number
 
-    constructor(scale: number) {
+    constructor(scale: number, boxWidth?: number, boxHeight?: number) {
       this.scale = scale
     }
 

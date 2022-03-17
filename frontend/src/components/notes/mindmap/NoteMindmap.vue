@@ -93,6 +93,8 @@ export default defineComponent({
         this.mindmapSector,
         this.noteId,
         this.piniaStore.getNoteSphereById,
+        150,
+        50
       )
     },
 
