@@ -2,16 +2,7 @@ import { defineStore } from "pinia";
 import history, { HistoryState } from "./history";
 import noteCache, { NoteCacheState } from "./noteCache";
 
-interface PopupInfo {
-  type: 'alert' | 'confirm' | 'dialog'
-  message?: string
-  doneResolve: ((value: unknown)=>void) | ((value: boolean)=>void)
-  component?: string
-  attrs?: unknown
-}
-
 interface State extends NoteCacheState, HistoryState {
-  popupInfo?: PopupInfo,
   currentUser: Generated.User | null
   featureToggle: boolean
   environment: 'production' | 'testing'

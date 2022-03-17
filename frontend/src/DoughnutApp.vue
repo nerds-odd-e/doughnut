@@ -3,10 +3,14 @@ import Popups from "./components/commons/Popups.vue";
 import MainMenu from "./components/commons/MainMenu.vue";
 import UserNewRegisterPage from "./pages/UserNewRegisterPage.vue";
 import useStoredLoadingApi from "./managedApi/useStoredLoadingApi";
+import usePopups from "./components/commons/usePopup";
 
 export default {
   setup() {
-    return useStoredLoadingApi({initalLoading: true, skipLoading: true})
+    return {
+      ...useStoredLoadingApi({initalLoading: true, skipLoading: true}),
+      ...usePopups()
+    }
   },
   data() {
     return {
@@ -19,7 +23,7 @@ export default {
 
   watch: {
     $route(to, from) {
-      this.piniaStore.popupInfo = undefined
+      this.popups.done(false)
       if (to.name) {
         this.showNavBar = !["repeat", "initial"].includes(
           to.name.split("-").shift()

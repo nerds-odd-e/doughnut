@@ -5,7 +5,7 @@ import routerScopeGuard from "../../routes/relative_routes";
 
 declare module "@vue/runtime-core" {
   interface ComponentCustomProperties {
-    alert: Promise<unknown>
+    alert: Promise<boolean>
   }
 }
 

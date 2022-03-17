@@ -54,7 +54,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import Modal from "./Modal.vue";
-import usePopups from "./usePopup";
+import usePopups, {PopupInfo} from "./usePopup";
 
 export default defineComponent({
   setup() {
@@ -67,8 +67,23 @@ export default defineComponent({
       this.popups.done(result)
     },
   },
+  data() {
+    return {
+      popupData: {
+        popupInfo: undefined
+      }
+    } as {
+      popupData: {
+        popupInfo?: PopupInfo
+      }
+    };
+  },
   computed: {
-    popupInfo() { return this.piniaStore.popupInfo },
+    popupInfo() { return this.popupData.popupInfo }
+  },
+  mounted() {
+    this.popups.register(this.popupData);
+
   }
 });
 </script>
