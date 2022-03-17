@@ -3,18 +3,16 @@
     <ViewTypeButtons v-bind="{ viewType, noteId: note.id }" />
 
     <div class="btn-group btn-group-sm">
-      <NoteNewButton
-        :parentId="note.id"
-        buttonTitle="Add Child Note"
-       >
+      <NoteNewButton :parentId="note.id" buttonTitle="Add Child Note">
         <SvgAddChild />
       </NoteNewButton>
 
       <NoteNewButton
         :parentId="note.parentId"
         buttonTitle="Add Sibling Note"
-        v-if="!!note.parentId">
-          <SvgAddSibling />
+        v-if="!!note.parentId"
+      >
+        <SvgAddSibling />
       </NoteNewButton>
 
       <NoteEditButton :noteId="note.id" :oldTitle="note.title" />
@@ -30,16 +28,20 @@
         <SvgCog />
       </a>
       <div class="dropdown-menu dropdown-menu-right">
-        <ReviewSettingEditButton :noteId="note.id" :oldTitle="note.title">
-          Edit review settings
-        </ReviewSettingEditButton>
-        <button
-          class="dropdown-item"
-          title="Delete note"
-          v-on:click="deleteNote"
-        >
-          <SvgRemove />
-          Delete note
+        <PopupButton title="Edit review settings">
+          <template v-slot:face>
+            <SvgReviewSetting />Edit review settings
+          </template>
+          <template #default="{ doneHandler }">
+            <ReviewSettingEditDialog
+              :noteId="note.id"
+              :title="note.title"
+              @done="doneHandler($event)"
+            />
+          </template>
+        </PopupButton>
+        <button class="dropdown-item" title="Delete note" v-on:click="deleteNote">
+          <SvgRemove />Delete note
         </button>
       </div>
       <NoteDownloadButton :note="note" v-if="featureToggle" />
@@ -52,7 +54,6 @@ import SvgAddChild from "../svgs/SvgAddChild.vue";
 import SvgAddSibling from "../svgs/SvgAddSibling.vue";
 import SvgCog from "../svgs/SvgCog.vue";
 import SvgRemove from "../svgs/SvgRemove.vue";
-import ReviewSettingEditButton from "../review/ReviewSettingEditButton.vue";
 import NoteEditButton from "./NoteEditButton.vue";
 import NoteDownloadButton from "./NoteDownloadButton.vue"
 import NoteNewButton from "./NoteNewButton.vue";
@@ -60,10 +61,13 @@ import ViewTypeButtons from "./ViewTypeButtons.vue";
 import { viewType } from "../../models/viewTypes";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 import usePopups from "../commons/Popups/usePopup";
+import PopupButton from "../commons/Popups/PopupButton.vue";
+import SvgReviewSetting from "../svgs/SvgReviewSetting.vue";
+import ReviewSettingEditDialog from "../review/ReviewSettingEditDialog.vue";
 
 export default ({
   setup() {
-    return {...useStoredLoadingApi(), ...usePopups()};
+    return { ...useStoredLoadingApi(), ...usePopups() };
   },
   name: "NoteButtons",
   props: {
@@ -75,12 +79,14 @@ export default ({
     SvgCog,
     SvgAddChild,
     SvgAddSibling,
-    ReviewSettingEditButton,
     SvgRemove,
     NoteEditButton,
     NoteNewButton,
     ViewTypeButtons,
-    NoteDownloadButton
+    NoteDownloadButton,
+    PopupButton,
+    SvgReviewSetting,
+    ReviewSettingEditDialog,
   },
   methods: {
     async deleteNote() {
