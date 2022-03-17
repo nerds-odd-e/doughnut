@@ -6,7 +6,7 @@ import MindmapSector from '../../src/models/MindmapSector';
 
 describe('MindmapSector', () => {
   let head = new MindmapSector(0, 0, 0, Math.PI * 2);
-  const mindmap = new Mindmap(1, head, 0, null, 150, 50);
+  const mindmap = new Mindmap(1, head, 0, null);
 
   it('head note has 1 child', async () => {
     const child = head.getChildSector(1, 0);

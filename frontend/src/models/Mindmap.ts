@@ -14,11 +14,11 @@ class Mindmap {
 
   metrics: MindmapMetrics
 
-  constructor(scale: number, rootMindmapSector: MindmapSector, rootNoteId: Doughnut.ID, noteFinder: NoteFinder, boxWidth: number, boxHeight: number) {
+  constructor(scale: number, rootMindmapSector: MindmapSector, rootNoteId: Doughnut.ID, noteFinder: NoteFinder) {
     this.rootMindmapSector = rootMindmapSector
     this.rootNoteId = rootNoteId
     this.noteFinder = noteFinder
-    this.metrics = new MindmapMetrics(scale, boxWidth, boxHeight)
+    this.metrics = new MindmapMetrics(scale)
   }
 
   coord(sector: MindmapSector): Coord {
