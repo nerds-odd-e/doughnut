@@ -41,7 +41,9 @@
       @close_request="resolve(null)"
     >
       <template v-slot:body>
-        <component v-if="popupInfo.slot" :is="popupInfo.slot"/>
+        <component v-if="popupInfo.slot" :is="popupInfo.slot"
+        :doneHandler="resolve"
+         />
         <component
         v-else
           :is="popupInfo.component"

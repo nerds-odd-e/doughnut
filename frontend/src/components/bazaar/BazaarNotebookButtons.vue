@@ -4,10 +4,12 @@
       v-if="!notebook.skipReviewEntirely"
       title="Add to my learning"
     >
-    <template v-slot:face>
-      <SvgAdd/>
-    </template>
-      <SubscribeDialog v-bind="{notebook, user}"/>
+      <template v-slot:face>
+        <SvgAdd/>
+      </template>
+      <template #default="{doneHandler}">
+        <SubscribeDialog v-bind="{notebook, user}" @done="doneHandler($event)"/>
+      </template>
     </PopupButton>
   </div>
 </template>

@@ -1,33 +1,35 @@
 <template>
   <nav class="navbar toolbar">
-    <NoteButtons v-if="selectedNote"
-    :note="selectedNote"
-    :viewType="viewType"
-    :featureToggle="featureToggle"
+    <NoteButtons
+      v-if="selectedNote"
+      :note="selectedNote"
+      :viewType="viewType"
+      :featureToggle="featureToggle"
     />
     <div class="btn-group btn-group-sm">
       <PopupButton title="link note">
-        <template v-slot:face>
+        <template #face>
           <SvgSearch />
         </template>
-        <LinkNoteDialog :note="selectedNote"/>
+        <template #default="{doneHandler}">
+          <LinkNoteDialog :note="selectedNote" @done="doneHandler($event)" />
+        </template>
       </PopupButton>
-      <NoteUndoButton/>
+      <NoteUndoButton />
     </div>
   </nav>
-  <Breadcrumb v-bind="selectedNotePosition"/>
+  <Breadcrumb v-bind="selectedNotePosition" />
 </template>
 
 <script lang="ts">
-
-import { defineComponent, PropType } from 'vue'
+import { defineComponent, PropType } from "vue";
 import Breadcrumb from "./Breadcrumb.vue";
-import NoteButtons from './NoteButtons.vue'
+import NoteButtons from "./NoteButtons.vue";
 import NoteUndoButton from "./NoteUndoButton.vue";
-import useStoredLoadingApi from '../../managedApi/useStoredLoadingApi';
-import PopupButton from '../commons/Popups/PopupButton.vue';
-import SvgSearch from '../svgs/SvgSearch.vue';
-import LinkNoteDialog from '../links/LinkNoteDialog.vue';
+import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
+import PopupButton from "../commons/Popups/PopupButton.vue";
+import SvgSearch from "../svgs/SvgSearch.vue";
+import LinkNoteDialog from "../links/LinkNoteDialog.vue";
 
 export default defineComponent({
   setup() {
@@ -44,10 +46,12 @@ export default defineComponent({
     Breadcrumb,
     PopupButton,
     SvgSearch,
-    LinkNoteDialog
-},
+    LinkNoteDialog,
+  },
   computed: {
-    featureToggle() { return this.piniaStore.featureToggle },
+    featureToggle() {
+      return this.piniaStore.featureToggle;
+    },
   },
 });
 </script>
