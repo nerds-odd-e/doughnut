@@ -2,26 +2,31 @@ import HttpResponseError from "./HttpResponseError";
 import BadRequestError from "./BadRequestError";
 import loginOrRegister from "./loginOrRegister";
 
-function objectToFormData(data: any) {
+function objectToFormData(data: Record<string, Record<string, unknown> | unknown>) {
   const formData = new FormData();
   Object.keys(data).forEach((key) => {
-    if (data[key] === null) {
+    const field = data[key]
+    if (field) {
       formData.append(key, '');
-    } else if (data[key] instanceof Object && !(data[key] instanceof File)) {
-      Object.keys(data[key]).forEach((subKey) => {
+    } else if (field instanceof File) {
+      formData.append(key, field);
+    } else if (field instanceof Object) {
+      const fieldRecords = field as Record<string, string | Blob>
+      Object.keys(fieldRecords).forEach((subKey) => {
+        const subValue = fieldRecords[subKey]
         formData.append(
           `${key}.${subKey}`,
-          data[key][subKey] === null ? '' : data[key][subKey]
+          subValue
         );
       });
     } else {
-      formData.append(key, data[key]);
+      formData.append(key, field as string);
     }
   });
   return formData;
 }
 
-const request = async (url: string, data: any, {method="GET", contentType='json'}) => {
+const request = async (url: string, data: any, { method = "GET", contentType = 'json' }) => {
   const headers = new Headers();
   headers.set('Accept', 'application/json');
   let body: any;
@@ -34,12 +39,12 @@ const request = async (url: string, data: any, {method="GET", contentType='json'
       body = objectToFormData(data)
     }
   }
-  const res = await fetch(url, {method, headers, body})
+  const res = await fetch(url, { method, headers, body })
   if (res.status === 200 || res.status === 400) {
     return res;
   }
   if (res.status === 204) {
-    return {status: 204, json: ()=>null, text: ()=>null};
+    return { status: 204, json: () => null, text: () => null };
   }
   if (res.status === 401) {
     loginOrRegister();
@@ -55,7 +60,7 @@ class RestfulFetch {
   }
 
   private expandUrl(url: string): string {
-    if(url.startsWith("/")) return url;
+    if (url.startsWith("/")) return url;
     return this.base_url + url;
   }
 
