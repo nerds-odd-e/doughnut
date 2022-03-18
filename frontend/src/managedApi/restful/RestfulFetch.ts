@@ -2,7 +2,9 @@ import HttpResponseError from "./HttpResponseError";
 import BadRequestError from "./BadRequestError";
 import loginOrRegister from "./loginOrRegister";
 
-function objectToFormData(data: Record<string, Record<string, unknown> | unknown>) {
+type JsonData = Record<string, Record<string, unknown> | unknown>
+
+function objectToFormData(data: JsonData) {
   const formData = new FormData();
   Object.keys(data).forEach((key) => {
     const field = data[key]
@@ -14,10 +16,7 @@ function objectToFormData(data: Record<string, Record<string, unknown> | unknown
       const fieldRecords = field as Record<string, string | Blob>
       Object.keys(fieldRecords).forEach((subKey) => {
         const subValue = fieldRecords[subKey]
-        formData.append(
-          `${key}.${subKey}`,
-          subValue
-        );
+        formData.append(`${key}.${subKey}`, subValue || '');
       });
     } else {
       formData.append(key, field as string);
@@ -26,11 +25,11 @@ function objectToFormData(data: Record<string, Record<string, unknown> | unknown
   return formData;
 }
 
-const request = async (url: string, data: any, { method = "GET", contentType = 'json' }) => {
+const request = async (url: string, data: JsonData | undefined, { method = "GET", contentType = 'json' }) => {
   const headers = new Headers();
   headers.set('Accept', 'application/json');
-  let body: any;
-  if (method !== "GET") {
+  let body: string | FormData | undefined;
+  if (method !== "GET" && data) {
     if (contentType === 'json') {
       headers.set("Content-Type", 'application/json');
       body = JSON.stringify(data)
