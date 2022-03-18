@@ -24,6 +24,11 @@ function objectToFormData(data: JsonData) {
   return formData;
 }
 
+interface RequestOptions{
+  method: "GET" | "POST" | "PUT" | "PATCH"
+  contentType?: 'json' | 'MultiplePartForm'
+}
+
 const request = async (url: string, data: JsonData | undefined, { method, contentType = 'json' }: RequestOptions) => {
   const headers = new Headers();
   headers.set('Accept', 'application/json');
