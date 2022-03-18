@@ -1,4 +1,4 @@
-import RestfullFetch from "./RestfulFetch";
+import RestfullFetch, { JsonData } from "./RestfulFetch";
 
 class Api {
   fetch;
@@ -7,21 +7,21 @@ class Api {
     this.fetch = new RestfullFetch(base_url)
   }
 
-  restGet(url: string) { return this.fetch.restRequest(url, {}, {}); }
+  restGet(url: string) { return this.fetch.restRequest(url, {}, {method: "GET"}); }
 
-  restPost(url: string, data: any) { return this.fetch.restRequest( url, data, { method: 'POST' }); }
+  restPost(url: string, data: JsonData) { return this.fetch.restRequest( url, data, { method: 'POST' }); }
 
-  restPatch(url: string, data: any) { return this.fetch.restRequest( url, data, { method: 'PATCH' }); }
+  restPatch(url: string, data: JsonData) { return this.fetch.restRequest( url, data, { method: 'PATCH' }); }
 
-  restPostMultiplePartForm(url: string, data: any) {
+  restPostMultiplePartForm(url: string, data: JsonData) {
      return this.fetch.restRequest( url, data, { method: 'POST', contentType: "MultiplePartForm" });
   }
 
-  restPatchMultiplePartForm(url: string, data: any) {
+  restPatchMultiplePartForm(url: string, data: JsonData) {
     return this.fetch.restRequest( url, data, { method: 'PATCH', contentType: "MultiplePartForm" });
   }
 
-  restPostWithHtmlResponse(url: string, data: any) {
+  restPostWithHtmlResponse(url: string, data: JsonData) {
     return this.fetch.restRequestWithHtmlResponse(url, data, { method: 'POST'});
   }
 }

@@ -27,10 +27,11 @@ function objectToFormData(data: JsonData) {
   return formData;
 }
 interface RequestOptions{
-  method: "GET" | "POST" | "PUT"
-  contentType?: 'json'
+  method: "GET" | "POST" | "PUT" | "PATCH"
+  contentType?: 'json' | 'MultiplePartForm'
 }
-const request = async (url: string, data: JsonData | undefined, { method = "GET", contentType = 'json' }: RequestOptions) => {
+
+const request = async (url: string, data: JsonData | undefined, { method, contentType }: RequestOptions) => {
   const headers = new Headers();
   headers.set('Accept', 'application/json');
   let body: string | FormData | undefined;
@@ -83,3 +84,4 @@ class RestfulFetch {
 }
 
 export default RestfulFetch;
+export { JsonData }
