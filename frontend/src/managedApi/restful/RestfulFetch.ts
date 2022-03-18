@@ -8,15 +8,17 @@ function objectToFormData(data: JsonData) {
   const formData = new FormData();
   Object.keys(data).forEach((key) => {
     const field = data[key]
-    if (field) {
+    if (!field) {
       formData.append(key, '');
     } else if (field instanceof File) {
       formData.append(key, field);
     } else if (field instanceof Object) {
-      const fieldRecords = field as Record<string, string | Blob>
-      Object.keys(fieldRecords).forEach((subKey) => {
-        const subValue = fieldRecords[subKey]
-        formData.append(`${key}.${subKey}`, subValue || '');
+      const castField = field as Record<string, string | null>
+      Object.keys(castField).forEach((subKey) => {
+        formData.append(
+          `${key}.${subKey}`,
+          castField[subKey] || ''
+        );
       });
     } else {
       formData.append(key, field as string);
@@ -41,12 +43,12 @@ const request = async (url: string, data: JsonData | undefined, { method = "GET"
       body = objectToFormData(data)
     }
   }
-  const res = await fetch(url, { method, headers, body })
+  const res = await fetch(url, {method, headers, body})
   if (res.status === 200 || res.status === 400) {
     return res;
   }
   if (res.status === 204) {
-    return { status: 204, json: () => null, text: () => null };
+    return {status: 204, json: ()=>null, text: ()=>null};
   }
   if (res.status === 401) {
     loginOrRegister();
@@ -62,7 +64,7 @@ class RestfulFetch {
   }
 
   private expandUrl(url: string): string {
-    if (url.startsWith("/")) return url;
+    if(url.startsWith("/")) return url;
     return this.base_url + url;
   }
 
