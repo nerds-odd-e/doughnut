@@ -24,8 +24,11 @@ function objectToFormData(data: JsonData) {
   });
   return formData;
 }
-
-const request = async (url: string, data: JsonData | undefined, { method = "GET", contentType = 'json' }) => {
+interface RequestOptions{
+  method: "GET" | "POST" | "PUT"
+  contentType?: 'json'
+}
+const request = async (url: string, data: JsonData | undefined, { method = "GET", contentType = 'json' }: RequestOptions) => {
   const headers = new Headers();
   headers.set('Accept', 'application/json');
   let body: string | FormData | undefined;
@@ -63,14 +66,14 @@ class RestfulFetch {
     return this.base_url + url;
   }
 
-  async restRequest(url: string, data: any, params: any) {
+  async restRequest(url: string, data: JsonData, params: RequestOptions) {
     const response = await request(this.expandUrl(url), data, params);
     const jsonResponse = await response.json()
     if (response.status === 400) throw new BadRequestError(jsonResponse.errors);
     return jsonResponse;
   }
 
-  async restRequestWithHtmlResponse(url: string, data: any, params: any) {
+  async restRequestWithHtmlResponse(url: string, data: JsonData, params: RequestOptions) {
     const response = await request(this.expandUrl(url), data, params)
     if (response.status === 400) throw Error("BadRequest");
     return response.text();
