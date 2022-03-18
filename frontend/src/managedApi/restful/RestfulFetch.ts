@@ -2,7 +2,8 @@ import HttpResponseError from "./HttpResponseError";
 import BadRequestError from "./BadRequestError";
 import loginOrRegister from "./loginOrRegister";
 
-type JsonData = Record<string, Record<string, unknown> | unknown>
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type JsonData = any
 
 function objectToFormData(data: JsonData) {
   const formData = new FormData();
