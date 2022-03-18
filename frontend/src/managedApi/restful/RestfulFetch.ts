@@ -8,28 +8,20 @@ type JsonData = any
 function objectToFormData(data: JsonData) {
   const formData = new FormData();
   Object.keys(data).forEach((key) => {
-    const field = data[key]
-    if (!field) {
+    if (data[key] === null) {
       formData.append(key, '');
-    } else if (field instanceof File) {
-      formData.append(key, field);
-    } else if (field instanceof Object) {
-      const castField = field as Record<string, string | null>
-      Object.keys(castField).forEach((subKey) => {
+    } else if (data[key] instanceof Object && !(data[key] instanceof File)) {
+      Object.keys(data[key]).forEach((subKey) => {
         formData.append(
           `${key}.${subKey}`,
-          castField[subKey] || ''
+          data[key][subKey] === null ? '' : data[key][subKey]
         );
       });
     } else {
-      formData.append(key, field as string);
+      formData.append(key, data[key]);
     }
   });
   return formData;
-}
-interface RequestOptions{
-  method: "GET" | "POST" | "PUT" | "PATCH"
-  contentType?: 'json' | 'MultiplePartForm'
 }
 
 const request = async (url: string, data: JsonData | undefined, { method, contentType = 'json' }: RequestOptions) => {
