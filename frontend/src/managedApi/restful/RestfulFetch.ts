@@ -32,7 +32,7 @@ interface RequestOptions{
   contentType?: 'json' | 'MultiplePartForm'
 }
 
-const request = async (url: string, data: JsonData | undefined, { method, contentType }: RequestOptions) => {
+const request = async (url: string, data: JsonData | undefined, { method, contentType = 'json' }: RequestOptions) => {
   const headers = new Headers();
   headers.set('Accept', 'application/json');
   let body: string | FormData | undefined;
