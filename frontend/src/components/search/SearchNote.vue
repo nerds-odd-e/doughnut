@@ -60,22 +60,22 @@ export default defineComponent({
       handler(newSearchTerm) {
         if (newSearchTerm.searchKey.trim() === "") {
         } else {
-          this.search(
-            newSearchTerm.searchGlobally,
-            newSearchTerm.searchKey.trim()
-          );
+          this.search();
         }
       },
       deep: true,
     },
   },
   computed: {
+    trimmedSearchKey() {
+      return this.searchTerm.searchKey.trim()
+    },
     cachedSearches() {
       return this.searchTerm.searchGlobally ? this.cache.global : this.cache.local
     },
     cachedResult() {
       return this.cachedSearches[
-        this.searchTerm.searchKey.trim()
+        this.trimmedSearchKey
       ];
     },
     searchResult() {
@@ -83,16 +83,15 @@ export default defineComponent({
     },
   },
   methods: {
-    search(searchGlobally, trimedSearchKey) {
-      if (this.cachedSearches.hasOwnProperty(trimedSearchKey)) {
+    search() {
+      if (this.cachedSearches.hasOwnProperty(this.trimmedSearchKey)) {
         return;
       }
 
       debounced(() => {
-        this.api.relativeSearch(this.noteId,
-          { searchGlobally, searchKey: trimedSearchKey },
-        ).then((r) => {
-          this.cachedSearches[trimedSearchKey] = r;
+        this.api.relativeSearch(this.noteId, this.searchTerm)
+        .then((r) => {
+          this.cachedSearches[this.trimmedSearchKey] = r;
           this.recentResult = r;
         });
       });

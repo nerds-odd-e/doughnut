@@ -41,11 +41,8 @@ const apiCollection = (managedApi) => ({
     },
   },
 
-  relativeSearch(noteId, { searchGlobally, searchKey }) {
-    return managedApi.restPost(`notes/${noteId}/search`, {
-      searchGlobally,
-      searchKey,
-    });
+  relativeSearch(noteId, searchTerm) {
+    return managedApi.restPost(`notes/${noteId}/search`, searchTerm);
   },
 
   updateNotebookSettings(notebookId, data) {

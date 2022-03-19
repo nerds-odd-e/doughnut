@@ -50,10 +50,10 @@ public class UserModel implements ReviewScope {
     }
 
     public List<Note> getLinkableNotes(Note note, SearchTerm searchTerm) {
-        if (Strings.isBlank(searchTerm.getSearchKey())) {
+        if (Strings.isBlank(searchTerm.getTrimmedSearchKey())) {
             return null;
         }
-        final String pattern = Pattern.quote(searchTerm.getSearchKey());
+        final String pattern = Pattern.quote(searchTerm.getTrimmedSearchKey());
         if (searchTerm.getSearchGlobally()) {
             return  modelFactoryService.noteRepository.searchForUserInVisibleScope(entity, note, pattern);
         }
