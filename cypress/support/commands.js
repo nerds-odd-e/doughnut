@@ -237,10 +237,7 @@ Cypress.Commands.add("clickNotePageMoreOptionsButtonOnCurrentPage", (btnTextOrTi
 })
 
 Cypress.Commands.add("expectExactLinkTargets", (targets) => {
-  targets.forEach((elem) => {
-    cy.findByText(elem, { selector: ".card-title a" }).should("be.visible")
-  })
-  cy.findAllByText(/.*/, { selector: ".card-title a" }).should("have.length", targets.length)
+  cy.get(".search-result .card-title a").then(elms=>Cypress._.map(elms, 'innerText')).should('deep.equal', targets)
 })
 
 Cypress.Commands.add("findNoteCardButton", (noteTitle, btnTextOrTitle) => {
