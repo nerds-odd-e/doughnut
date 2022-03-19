@@ -7,11 +7,8 @@ import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import com.odde.doughnut.entities.Link;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.json.SearchTerm;
-import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 
 import org.apache.logging.log4j.util.Strings;
@@ -55,17 +52,20 @@ public class UserModel implements ReviewScope {
         if (Strings.isBlank(searchTerm.getTrimmedSearchKey())) {
             return null;
         }
-        Integer avoidNoteId = searchTerm.note.map(Note::getId).orElse(null);
-        final String pattern = Pattern.quote(searchTerm.getTrimmedSearchKey());
-        return searchTerm.note.map((note)-> {
-            if (searchTerm.getSearchGlobally()) {
-                return  modelFactoryService.noteRepository.searchForUserInVisibleScope(entity, pattern);
-            }
-            return  modelFactoryService.noteRepository.searchInNotebook(note.getNotebook(), pattern);
-        }).orElseGet(()->{
-            return List.of();
-        }).stream().filter(n-> !n.getId().equals(avoidNoteId)).collect(Collectors.toList());
+        List<Note> result = search(searchTerm);
 
+        Integer avoidNoteId = searchTerm.note.map(Note::getId).orElse(null);
+        return result.stream().filter(n -> !n.getId().equals(avoidNoteId)).collect(Collectors.toList());
+
+    }
+
+    private List<Note> search(SearchTerm searchTerm) {
+        final String pattern = Pattern.quote(searchTerm.getTrimmedSearchKey());
+        if (searchTerm.getSearchGlobally()) {
+            return modelFactoryService.noteRepository.searchForUserInVisibleScope(entity, pattern);
+        }
+        Notebook notebook = searchTerm.note.map(Note::getNotebook).orElse(null);
+        return modelFactoryService.noteRepository.searchInNotebook(notebook, pattern);
     }
 
     @Override
@@ -91,10 +91,10 @@ public class UserModel implements ReviewScope {
         final ZoneId timeZone = getTimeZone();
         final Timestamp timestamp = TimestampOperations.alignByHalfADay(currentUTCTimestamp, timeZone);
         return modelFactoryService.reviewPointRepository
-        .findAllByUserAndNextReviewAtLessThanEqualOrderByNextReviewAt(
-            getEntity(),
-            timestamp
-        );
+                .findAllByUserAndNextReviewAtLessThanEqualOrderByNextReviewAt(
+                        getEntity(),
+                        timestamp
+                );
     }
 
     int learntCount() {

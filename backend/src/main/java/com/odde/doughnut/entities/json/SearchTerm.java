@@ -25,7 +25,7 @@ public class SearchTerm {
             scope = Note.class,
             property = "id")
     @JsonIdentityReference(alwaysAsId = true)
-    public Optional<Note> note;
+    public Optional<Note> note = Optional.empty();
 
     @JsonIgnore
     public String getTrimmedSearchKey() {
