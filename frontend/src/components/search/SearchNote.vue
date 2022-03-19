@@ -52,7 +52,7 @@ export default defineComponent({
         global: Record<string, Generated.Note[]>,
         local: Record<string, Generated.Note[]>,
       },
-      recentResult: null,
+      recentResult: undefined as Generated.Note[] | undefined,
     };
   },
   watch: {
@@ -88,12 +88,10 @@ export default defineComponent({
         return;
       }
 
-      debounced(() => {
-        this.api.relativeSearch(this.noteId, this.searchTerm)
-        .then((r) => {
-          this.cachedSearches[this.trimmedSearchKey] = r;
-          this.recentResult = r;
-        });
+      debounced(async () => {
+        const result = await this.api.relativeSearch(this.noteId, {...this.searchTerm, note: this.noteId})
+        this.recentResult = result
+        this.cachedSearches[this.trimmedSearchKey] = result
       });
     },
   },
