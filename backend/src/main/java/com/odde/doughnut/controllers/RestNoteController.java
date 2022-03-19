@@ -106,7 +106,7 @@ class RestNoteController {
     @PostMapping("/{note}/search")
     @Transactional
     public List<Note> searchForLinkTarget(@PathVariable("note") Note note, @Valid @RequestBody SearchTerm searchTerm) {
-        return currentUserFetcher.getUser().getLinkableNotes(note, searchTerm);
+        return currentUserFetcher.getUser().getLinkableNotes(searchTerm);
     }
 
     @PostMapping(value = "/{note}/delete")

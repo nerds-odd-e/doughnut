@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.services.EntityIdResolver;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -18,7 +19,11 @@ public class SearchTerm {
     @Setter
     private Boolean searchGlobally = false;
 
-    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityInfo(
+            generator = ObjectIdGenerators.PropertyGenerator.class,
+            resolver = EntityIdResolver.class,
+            scope = Note.class,
+            property = "id")
     @JsonIdentityReference(alwaysAsId = true)
     public Optional<Note> note;
 

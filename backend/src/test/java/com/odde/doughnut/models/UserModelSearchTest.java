@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.entities.Note;
@@ -38,10 +39,11 @@ public class UserModelSearchTest {
         userModel = makeMe.aUser().toModelPlease();
         anotherUser = makeMe.aUser().toModelPlease();
         note = makeMe.aNote().byUser(userModel).please();
+        searchTerm.note = Optional.of(note);
     }
 
     private List<Note> search() {
-        return userModel.getLinkableNotes(note, searchTerm);
+        return userModel.getLinkableNotes(searchTerm);
     }
 
     @Test

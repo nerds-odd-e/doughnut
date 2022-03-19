@@ -56,8 +56,8 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
     @Query( value = notesVisibleToAUser + searchForLinkTarget , nativeQuery = true)
     List<Note> searchForUserInVisibleScope(@Param("user") User user, @Param("noteToAvoid") Note noteToAvoid, @Param("pattern") String pattern);
 
-    @Query( value = selectFromNoteJoinTextContent +" WHERE note.notebook_id = :notebook " + searchForLinkTarget , nativeQuery = true)
-    List<Note> searchInNotebook(@Param("notebook") Notebook notebook, @Param("noteToAvoid") Note noteToAvoid, @Param("pattern") String pattern);
+    @Query( value = selectFromNoteJoinTextContent +" WHERE note.notebook_id = :#{#noteToAvoid.notebook} " + searchForLinkTarget , nativeQuery = true)
+    List<Note> searchInNotebook(@Param("noteToAvoid") Note noteToAvoid, @Param("pattern") String pattern);
 
     String notesVisibleToAUser = selectFromNoteJoinTextContent
             + "  JOIN ("

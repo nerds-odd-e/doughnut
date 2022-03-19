@@ -49,15 +49,15 @@ public class UserModel implements ReviewScope {
         save();
     }
 
-    public List<Note> getLinkableNotes(Note note, SearchTerm searchTerm) {
+    public List<Note> getLinkableNotes(SearchTerm searchTerm) {
         if (Strings.isBlank(searchTerm.getTrimmedSearchKey())) {
             return null;
         }
         final String pattern = Pattern.quote(searchTerm.getTrimmedSearchKey());
         if (searchTerm.getSearchGlobally()) {
-            return  modelFactoryService.noteRepository.searchForUserInVisibleScope(entity, note, pattern);
+            return  modelFactoryService.noteRepository.searchForUserInVisibleScope(entity, searchTerm.note.orElse(null), pattern);
         }
-        return  modelFactoryService.noteRepository.searchInNotebook(note.getNotebook(), note, pattern);
+        return  modelFactoryService.noteRepository.searchInNotebook(searchTerm.note.orElse(null), pattern);
 
     }
 
