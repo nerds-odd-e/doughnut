@@ -54,10 +54,10 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
             + whereThereIsNoReviewPointAndOrderByTime;
 
     @Query( value = notesVisibleToAUser + searchForLinkTarget , nativeQuery = true)
-    List<Note> searchForUserInVisibleScope(@Param("user") User user, @Param("noteToAvoid") Note noteToAvoid, @Param("pattern") String pattern);
+    List<Note> searchForUserInVisibleScope(@Param("user") User user, @Param("pattern") String pattern);
 
-    @Query( value = selectFromNoteJoinTextContent +" WHERE note.notebook_id = :#{#noteToAvoid.notebook} " + searchForLinkTarget , nativeQuery = true)
-    List<Note> searchInNotebook(@Param("noteToAvoid") Note noteToAvoid, @Param("pattern") String pattern);
+    @Query( value = selectFromNoteJoinTextContent +" WHERE note.notebook_id = :notebook " + searchForLinkTarget , nativeQuery = true)
+    List<Note> searchInNotebook(@Param("notebook") Notebook notebook, @Param("pattern") String pattern);
 
     String notesVisibleToAUser = selectFromNoteJoinTextContent
             + "  JOIN ("
@@ -72,8 +72,7 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
             + "       ) nb ON nb.id = note.notebook_id "
             + "  WHERE 1=1 ";
 
-    String searchForLinkTarget = "  AND note.id != :noteToAvoid "
-                    + "      AND REGEXP_LIKE(text_content.title, :pattern) ";
+    String searchForLinkTarget = " AND REGEXP_LIKE(text_content.title, :pattern) ";
 
     @Modifying
     @Query( value = " UPDATE note JOIN notes_closure ON notes_closure.note_id = note.id AND notes_closure.ancestor_id = :#{#note.id} SET deleted_at = :currentUTCTimestamp WHERE deleted_at IS NULL", nativeQuery = true)

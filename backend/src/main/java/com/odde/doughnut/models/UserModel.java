@@ -2,8 +2,10 @@ package com.odde.doughnut.models;
 
 import java.sql.Timestamp;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
@@ -49,15 +51,20 @@ public class UserModel implements ReviewScope {
         save();
     }
 
-    public List<Note> getLinkableNotes(SearchTerm searchTerm) {
+    public List<Note> searchForNotes(SearchTerm searchTerm) {
         if (Strings.isBlank(searchTerm.getTrimmedSearchKey())) {
             return null;
         }
+        Integer avoidNoteId = searchTerm.note.map(Note::getId).orElse(null);
         final String pattern = Pattern.quote(searchTerm.getTrimmedSearchKey());
-        if (searchTerm.getSearchGlobally()) {
-            return  modelFactoryService.noteRepository.searchForUserInVisibleScope(entity, searchTerm.note.orElse(null), pattern);
-        }
-        return  modelFactoryService.noteRepository.searchInNotebook(searchTerm.note.orElse(null), pattern);
+        return searchTerm.note.map((note)-> {
+            if (searchTerm.getSearchGlobally()) {
+                return  modelFactoryService.noteRepository.searchForUserInVisibleScope(entity, pattern);
+            }
+            return  modelFactoryService.noteRepository.searchInNotebook(note.getNotebook(), pattern);
+        }).orElseGet(()->{
+            return List.of();
+        }).stream().filter(n-> !n.getId().equals(avoidNoteId)).collect(Collectors.toList());
 
     }
 

@@ -43,7 +43,7 @@ public class UserModelSearchTest {
     }
 
     private List<Note> search() {
-        return userModel.getLinkableNotes(searchTerm);
+        return userModel.searchForNotes(searchTerm);
     }
 
     @Test

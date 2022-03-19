@@ -11,7 +11,7 @@ Feature: search note
       | Sedation | Put to sleep    |
       | Sedative | Sleep medicine  |
 
-  @stopTime @ignore
+  @stopTime
   Scenario Outline: Search at the top level
     Given I visit all my notebooks
     Then I start searching
