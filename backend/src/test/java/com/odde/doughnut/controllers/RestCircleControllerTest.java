@@ -3,6 +3,7 @@ package com.odde.doughnut.controllers;
 import com.odde.doughnut.entities.json.CircleForUserView;
 import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.entities.TextContent;
+import com.odde.doughnut.entities.json.CircleJoiningByInvitation;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.CircleModel;
@@ -112,7 +113,7 @@ class RestCircleControllerTest {
     class JoinCircle {
         @Test
         void validationFailed() {
-            RestCircleController.CircleJoiningByInvitation entity = new RestCircleController.CircleJoiningByInvitation();
+            CircleJoiningByInvitation entity = new CircleJoiningByInvitation();
             entity.setInvitationCode("short");
             BindException exception = assertThrows(BindException.class, ()->controller.joinCircle(entity));
             assertThat(exception.getErrorCount(), equalTo(1));
@@ -121,7 +122,7 @@ class RestCircleControllerTest {
         @Test
         void userAlreadyInCircle() {
             Circle circle = makeMe.aCircle().hasMember(userModel).please();
-            RestCircleController.CircleJoiningByInvitation entity = new RestCircleController.CircleJoiningByInvitation();
+            CircleJoiningByInvitation entity = new CircleJoiningByInvitation();
             entity.setInvitationCode(circle.getInvitationCode());
             BindException exception = assertThrows(BindException.class, ()->controller.joinCircle(entity));
             assertThat(exception.getErrorCount(), equalTo(1));

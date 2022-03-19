@@ -5,12 +5,11 @@ import java.util.List;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.json.CircleForUserView;
+import com.odde.doughnut.entities.json.CircleJoiningByInvitation;
 import com.odde.doughnut.entities.json.RedirectToNoteResponse;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -29,9 +28,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import lombok.Getter;
-import lombok.Setter;
 
 @RestController
 @RequestMapping("/api/circles")
@@ -71,7 +67,7 @@ class RestCircleController {
 
   @PostMapping("/join")
   @Transactional
-  public Circle joinCircle(@Valid RestCircleController.CircleJoiningByInvitation circleJoiningByInvitation) throws BindException {
+  public Circle joinCircle(@Valid CircleJoiningByInvitation circleJoiningByInvitation) throws BindException {
     CircleModel circleModel = modelFactoryService.findCircleByInvitationCode(circleJoiningByInvitation.getInvitationCode());
     if (circleModel == null) {
       BindingResult bindingResult = new BeanPropertyBindingResult(circleJoiningByInvitation, "circle");
@@ -99,11 +95,4 @@ class RestCircleController {
     return new RedirectToNoteResponse(note.getId());
   }
 
-  public static class CircleJoiningByInvitation {
-      @NotNull
-      @Size(min = 10, max = 20)
-      @Getter
-      @Setter
-      String invitationCode;
-  }
 }

@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-03-19 12:45:07.
+// Generated using typescript-generator version 2.35.1025 on 2022-03-19 14:10:58.
 
 declare namespace Generated {
 
@@ -10,6 +10,10 @@ declare namespace Generated {
         invitationCode: string;
         notebooks: NotebooksViewedByUser;
         members: UserForOtherUserView[];
+    }
+
+    interface CircleJoiningByInvitation {
+        invitationCode: string;
     }
 
     interface CurrentUserInfo {
@@ -104,9 +108,9 @@ declare namespace Generated {
     }
 
     interface SearchTerm {
-        searchKey: string;
         searchGlobally: boolean;
         note?: number;
+        searchKey: string;
     }
 
     interface SelfEvaluation {
@@ -168,8 +172,8 @@ declare namespace Generated {
         createdAt: string;
         title: string;
         notePicture?: string;
-        parentId?: number;
         shortDescription: string;
+        parentId?: number;
     }
 
     interface Ownership {
