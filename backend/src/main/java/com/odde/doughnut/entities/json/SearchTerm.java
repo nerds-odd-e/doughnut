@@ -1,0 +1,24 @@
+package com.odde.doughnut.entities.json;
+
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+import com.odde.doughnut.entities.Note;
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.Optional;
+
+public class SearchTerm {
+    @Getter
+    @Setter
+    private String searchKey = "";
+
+    @Getter
+    @Setter
+    private Boolean searchGlobally = false;
+
+    @JsonIdentityInfo(generator = ObjectIdGenerators.PropertyGenerator.class, property = "id")
+    @JsonIdentityReference(alwaysAsId = true)
+    public Optional<Note> note;
+}

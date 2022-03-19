@@ -8,7 +8,7 @@ import java.util.regex.Pattern;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.SearchTerm;
+import com.odde.doughnut.entities.json.SearchTerm;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 

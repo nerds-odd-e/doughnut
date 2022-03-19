@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-03-17 18:59:57.
+// Generated using typescript-generator version 2.35.1025 on 2022-03-19 12:45:07.
 
 declare namespace Generated {
 
@@ -103,6 +103,12 @@ declare namespace Generated {
         remainingInitialReviewCountForToday: number;
     }
 
+    interface SearchTerm {
+        searchKey: string;
+        searchGlobally: boolean;
+        note?: number;
+    }
+
     interface SelfEvaluation {
         selfEvaluation: string;
         increaseRepeatCount: boolean;
@@ -160,10 +166,10 @@ declare namespace Generated {
         noteAccessories: NoteAccessories;
         textContent: TextContent;
         createdAt: string;
-        notePicture?: string;
         title: string;
-        shortDescription: string;
+        notePicture?: string;
         parentId?: number;
+        shortDescription: string;
     }
 
     interface Ownership {
@@ -176,8 +182,8 @@ declare namespace Generated {
         dailyTargetOfNewNotes: number;
         user: User;
         notebook: Notebook;
-        headNote: Note;
         title: string;
+        headNote: Note;
         shortDescription: string;
     }
 

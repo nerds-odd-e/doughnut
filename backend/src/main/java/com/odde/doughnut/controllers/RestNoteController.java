@@ -3,10 +3,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.json.NoteCreation;
-import com.odde.doughnut.entities.json.NoteSphere;
-import com.odde.doughnut.entities.json.NotesBulk;
-import com.odde.doughnut.entities.json.RedirectToNoteResponse;
+import com.odde.doughnut.entities.json.*;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.NoteViewer;

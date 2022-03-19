@@ -6,11 +6,7 @@
       v-model="searchTerm.searchKey"
       placeholder="Search"
     />
-    <CheckInput
-      scopeName="searchTerm"
-      field="searchGlobally"
-      v-model="searchTerm.searchGlobally"
-    />
+    <CheckInput scopeName="searchTerm" field="searchGlobally" v-model="searchTerm.searchGlobally" />
   </div>
 
   <div v-if="!searchResult || searchResult.length === 0">
@@ -18,14 +14,13 @@
   </div>
   <Cards v-else class="search-result" :notes="searchResult" columns="3">
     <template #button="{ note }">
-      <button class="btn btn-primary" v-on:click="$emit('selected', note)">
-        Select
-      </button>
+      <button class="btn btn-primary" v-on:click="$emit('selected', note)">Select</button>
     </template>
   </Cards>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue";
 import TextInput from "../form/TextInput.vue";
 import CheckInput from "../form/CheckInput.vue";
 import Cards from "../notes/Cards.vue";
@@ -35,7 +30,7 @@ import useLoadingApi from '../../managedApi/useLoadingApi';
 
 const debounced = _.debounce((callback) => callback(), 500);
 
-export default {
+export default defineComponent({
   setup() {
     return useLoadingApi();
   },
@@ -48,8 +43,15 @@ export default {
       searchTerm: {
         searchKey: "",
         searchGlobally: false,
+      } as Generated.SearchTerm,
+      cache: {
+        global: {},
+        local: {}
+
+      } as {
+        global: Record<string, Generated.Note[]>,
+        local: Record<string, Generated.Note[]>,
       },
-      cache: { true: {}, false: {} },
       recentResult: null,
     };
   },
@@ -68,8 +70,11 @@ export default {
     },
   },
   computed: {
+    cachedSearches() {
+      return this.searchTerm.searchGlobally ? this.cache.global : this.cache.local
+    },
     cachedResult() {
-      return this.cache[this.searchTerm.searchGlobally][
+      return this.cachedSearches[
         this.searchTerm.searchKey.trim()
       ];
     },
@@ -79,7 +84,7 @@ export default {
   },
   methods: {
     search(searchGlobally, trimedSearchKey) {
-      if (this.cache[searchGlobally].hasOwnProperty(trimedSearchKey)) {
+      if (this.cachedSearches.hasOwnProperty(trimedSearchKey)) {
         return;
       }
 
@@ -87,13 +92,13 @@ export default {
         this.api.relativeSearch(this.noteId,
           { searchGlobally, searchKey: trimedSearchKey },
         ).then((r) => {
-          this.cache[searchGlobally][trimedSearchKey] = r;
+          this.cachedSearches[trimedSearchKey] = r;
           this.recentResult = r;
         });
       });
     },
   },
-};
+});
 </script>
 
 <style scoped>

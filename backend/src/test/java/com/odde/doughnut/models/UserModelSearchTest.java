@@ -10,7 +10,7 @@ import java.util.List;
 
 import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.SearchTerm;
+import com.odde.doughnut.entities.json.SearchTerm;
 import com.odde.doughnut.testability.MakeMe;
 
 import org.junit.jupiter.api.BeforeEach;
