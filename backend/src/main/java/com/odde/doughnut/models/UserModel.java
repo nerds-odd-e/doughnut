@@ -2,7 +2,6 @@ package com.odde.doughnut.models;
 
 import java.sql.Timestamp;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
@@ -61,7 +60,7 @@ public class UserModel implements ReviewScope {
 
     private List<Note> search(SearchTerm searchTerm) {
         final String pattern = Pattern.quote(searchTerm.getTrimmedSearchKey());
-        if (searchTerm.getSearchGlobally()) {
+        if (searchTerm.getAllMyNotebooksAndSubscriptions()) {
             return modelFactoryService.noteRepository.searchForUserInVisibleScope(entity, pattern);
         }
         Notebook notebook = searchTerm.note.map(Note::getNotebook).orElse(null);

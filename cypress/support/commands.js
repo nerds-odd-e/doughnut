@@ -397,8 +397,8 @@ Cypress.Commands.add("unsubscribeFromNotebook", (noteTitle) => {
   cy.findNoteCardButton(noteTitle, "Unsubscribe").click()
 })
 
-Cypress.Commands.add("searchNote", (searchKey) => {
-  cy.getFormControl("Search Globally").check()
+Cypress.Commands.add("searchNote", (searchKey, options) => {
+  options.forEach(option=> cy.getFormControl(option).check())
   cy.findByPlaceholderText("Search").clear().type(searchKey)
   cy.tick(500)
 })

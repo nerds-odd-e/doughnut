@@ -79,7 +79,7 @@ public class UserModelSearchTest {
     void theSearchShouldIncludeNoteFromOtherNotebookIfGlobally() {
         Note anotherNote = makeMe.aNote("Some Note").byUser(userModel).please();
         searchTerm.setSearchKey(anotherNote.getTitle());
-        searchTerm.setSearchGlobally(true);
+        searchTerm.setAllMyNotebooksAndSubscriptions(true);
         final List<Note> notes = search();
         assertThat(notes, contains(anotherNote));
     }
@@ -97,7 +97,7 @@ public class UserModelSearchTest {
         @Test
         void theSearchShouldNotIncludeNoteInBazaar() {
             searchTerm.setSearchKey(bazaarNote.getTitle());
-            searchTerm.setSearchGlobally(true);
+            searchTerm.setAllMyNotebooksAndSubscriptions(true);
             final List<Note> notes = search();
             assertTrue(notes.isEmpty());
         }
@@ -106,7 +106,7 @@ public class UserModelSearchTest {
         void theSearchShouldIncludeNoteISubscribed() {
             makeMe.aSubscription().forNotebook(bazaarNote.getNotebook()).forUser(userModel.getEntity()).please();
             searchTerm.setSearchKey(bazaarNote.getTitle());
-            searchTerm.setSearchGlobally(true);
+            searchTerm.setAllMyNotebooksAndSubscriptions(true);
             final List<Note> notes = search();
             assertThat(notes, contains(bazaarNote));
         }
@@ -126,7 +126,7 @@ public class UserModelSearchTest {
         @Test
         void theSearchShouldIncludeNote() {
             searchTerm.setSearchKey(circleNote.getTitle());
-            searchTerm.setSearchGlobally(true);
+            searchTerm.setAllMyNotebooksAndSubscriptions(true);
             final List<Note> notes = search();
             assertThat(notes, contains(circleNote));
         }

@@ -17,7 +17,11 @@ public class SearchTerm {
 
     @Getter
     @Setter
-    private Boolean searchGlobally = false;
+    private Boolean allMyNotebooksAndSubscriptions = false;
+
+    @Getter
+    @Setter
+    private Boolean allMyCircles = false;
 
     @JsonIdentityInfo(
             generator = ObjectIdGenerators.PropertyGenerator.class,

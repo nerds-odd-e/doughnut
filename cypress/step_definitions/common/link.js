@@ -46,7 +46,15 @@ And("I should see the source note as {string}", (noteTitle) => {
 And(
   "I should see {string} as targets only when searching {string}",
   (noteTitlesAsString, searchKey) => {
-    cy.searchNote(searchKey)
+    cy.searchNote(searchKey, [])
+    cy.expectExactLinkTargets(noteTitlesAsString.commonSenseSplit(",").map((i) => i.trim()))
+  },
+)
+
+And(
+  "I should see {string} as targets only when searching in all my notes {string}",
+  (noteTitlesAsString, searchKey) => {
+    cy.searchNote(searchKey, ['All My Notebooks And Subscriptions'])
     cy.expectExactLinkTargets(noteTitlesAsString.commonSenseSplit(",").map((i) => i.trim()))
   },
 )

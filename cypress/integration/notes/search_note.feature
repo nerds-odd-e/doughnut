@@ -14,7 +14,7 @@ Feature: search note
   Scenario Outline: Search at the top level
     Given I visit all my notebooks
     Then I start searching
-    Then I should see "<targets>" as targets only when searching "<search key>"
+    Then I should see "<targets>" as targets only when searching in all my notes "<search key>"
     Examples:
       | search key | targets            |
       | Sed        | Sedation, Sedative |

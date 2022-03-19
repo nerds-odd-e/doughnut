@@ -6,7 +6,8 @@
       v-model="searchTerm.searchKey"
       placeholder="Search"
     />
-    <CheckInput scopeName="searchTerm" field="searchGlobally" v-model="searchTerm.searchGlobally" />
+    <CheckInput scopeName="searchTerm" field="allMyNotebooksAndSubscriptions" v-model="searchTerm.allMyNotebooksAndSubscriptions" />
+    <CheckInput scopeName="searchTerm" field="allMyCircles" v-model="searchTerm.allMyCircles" />
   </div>
 
   <div v-if="!searchResult || searchResult.length === 0">
@@ -42,7 +43,8 @@ export default defineComponent({
     return {
       searchTerm: {
         searchKey: "",
-        searchGlobally: false,
+        allMyNotebooksAndSubscriptions: false,
+        allMyCircles: false,
       } as Generated.SearchTerm,
       cache: {
         global: {},
@@ -71,7 +73,7 @@ export default defineComponent({
       return this.searchTerm.searchKey.trim()
     },
     cachedSearches() {
-      return this.searchTerm.searchGlobally ? this.cache.global : this.cache.local
+      return this.searchTerm.allMyNotebooksAndSubscriptions ? this.cache.global : this.cache.local
     },
     cachedResult() {
       return this.cachedSearches[
