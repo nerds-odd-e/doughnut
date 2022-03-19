@@ -6,6 +6,7 @@
       :id="`${scopeName}-${field}`"
       :name="field"
       :checked="modelValue"
+      :disabled="disabled"
       @change="$emit('update:modelValue', $event.target.checked)"
     />
   </InputWithType>
@@ -20,6 +21,7 @@ export default {
     scopeName: String,
     field: String,
     errors: Object,
+    disabled: Boolean
   },
   emits: ["update:modelValue"],
   components: { InputWithType },

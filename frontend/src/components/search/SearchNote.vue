@@ -6,7 +6,9 @@
       v-model="searchTerm.searchKey"
       placeholder="Search"
     />
-    <CheckInput scopeName="searchTerm" field="allMyNotebooksAndSubscriptions" v-model="searchTerm.allMyNotebooksAndSubscriptions" />
+    <CheckInput scopeName="searchTerm" field="allMyNotebooksAndSubscriptions" v-model="searchTerm.allMyNotebooksAndSubscriptions"
+      :disabled="!noteId"
+     />
     <CheckInput scopeName="searchTerm" field="allMyCircles" v-model="searchTerm.allMyCircles" />
   </div>
 
@@ -97,6 +99,11 @@ export default defineComponent({
       });
     },
   },
+  mounted() {
+    if (!this.noteId) {
+      this.searchTerm.allMyNotebooksAndSubscriptions = true
+    }
+  }
 });
 </script>
 
