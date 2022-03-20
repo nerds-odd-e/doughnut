@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,7 +14,6 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.json.SearchTerm;
 import com.odde.doughnut.testability.MakeMe;
 
-import org.hamcrest.Matcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -68,75 +68,54 @@ public class UserModelSearchTest {
         assertThat(search(), contains(anotherNote));
     }
 
-    @Test
-    void theSearchShouldNotIncludeNoteFromOtherNotebook() {
-        Note anotherNote = makeMe.aNote("Some Note").byUser(user).please();
-        searchTerm.setSearchKey(anotherNote.getTitle());
-        assertTrue(search().isEmpty());
-    }
-
-    @Test
-    void theSearchShouldIncludeNoteFromOtherNotebookIfGlobally() {
-        Note anotherNote = makeMe.aNote("Some Note").byUser(user).please();
-        searchTerm.setSearchKey(anotherNote.getTitle());
-        searchTerm.setAllMyNotebooksAndSubscriptions(true);
-        assertThat(search(), contains(anotherNote));
-    }
-
-    @Nested
-    class ThereIsANoteBookInBazaar {
-        Note bazaarNote;
-
-        @BeforeEach
-        void setup() {
-            bazaarNote = makeMe.aNote().byUser(anotherUser).please();
-            makeMe.aBazaarNodebook(bazaarNote.getNotebook()).please();
-        }
-
-        @Test
-        void theSearchShouldNotIncludeNoteInBazaar() {
-            searchTerm.setSearchKey(bazaarNote.getTitle());
-            searchTerm.setAllMyNotebooksAndSubscriptions(true);
-            assertTrue(search().isEmpty());
-        }
-
-        @Test
-        void theSearchShouldIncludeNoteISubscribed() {
-            makeMe.aSubscription().forNotebook(bazaarNote.getNotebook()).forUser(user).please();
-            searchTerm.setSearchKey(bazaarNote.getTitle());
-            searchTerm.setAllMyNotebooksAndSubscriptions(true);
-            assertThat(search(), contains(bazaarNote));
-        }
-
-    }
-
     @Nested
     class ThereIsANoteBookInMyCircle {
+        Note noteInTheSameNotebook;
+        Note noteFromMyOtherNotebook;
         Note circleNote;
+        Note bazaarNote;
+        Note subscribedBazaarNote;
+        final String commonPhrase = "viva la";
+
+        @BeforeEach
+        void setupBazaarNotes() {
+            bazaarNote = makeMe.aNote(commonPhrase + " bazaar").byUser(anotherUser).please();
+            makeMe.aBazaarNodebook(bazaarNote.getNotebook()).please();
+            subscribedBazaarNote = makeMe.aNote(commonPhrase + " subscription").byUser(anotherUser).please();
+            makeMe.aBazaarNodebook(subscribedBazaarNote.getNotebook()).please();
+            makeMe.aSubscription().forNotebook(subscribedBazaarNote.getNotebook()).forUser(user).please();
+        }
 
         @BeforeEach
         void setup() {
+            noteInTheSameNotebook = makeMe.aNote(commonPhrase + " same notebook").under(note).byUser(user).please();
+            noteFromMyOtherNotebook = makeMe.aNote(commonPhrase + " same notebook").byUser(user).please();
             Circle circle = makeMe.aCircle().hasMember(user).hasMember(anotherUser).please();
-            circleNote = makeMe.aNote().byUser(anotherUser).inCircle(circle).please();
-        }
-
-        static class SearchTest {
-
+            circleNote = makeMe.aNote(commonPhrase + " circle").byUser(anotherUser).inCircle(circle).please();
         }
 
         @ParameterizedTest
         @CsvSource({
-                "false,            false",
-                "true,             true",
+                "false, false, false, false, false",
+                "true,  false, true,  true,  false",
+                "true,  true,  true,  true,  true",
         })
-        void testSearch(boolean inAllMyCircle, boolean expectCircleNote) {
-            searchTerm.setSearchKey(circleNote.getTitle());
-            searchTerm.setAllMyNotebooksAndSubscriptions(true);
-            searchTerm.setAllMyCircles(inAllMyCircle);
-            Matcher<Iterable<? extends Note>> matcher = contains(circleNote);
-            if(!expectCircleNote) matcher = not(matcher);
-            assertThat(search(), matcher);
+        void testSearch(boolean allMyNotebooksAndSubscriptions, boolean allMyCircle, boolean expectOtherNotebooks, boolean expectSubscription, boolean expectCircleNote) {
+            searchTerm.setSearchKey(commonPhrase);
+            searchTerm.setAllMyNotebooksAndSubscriptions(allMyNotebooksAndSubscriptions);
+            searchTerm.setAllMyCircles(allMyCircle);
+            assertThat(search(), containsInAnyOrder(expectedNotes(expectOtherNotebooks, expectSubscription, expectCircleNote)));
         }
+
+        Object[] expectedNotes(boolean expectOtherNotebooks, boolean expectSubscription, boolean expectCircleNote) {
+            List<Note> result = new ArrayList<>();
+            result.add(noteInTheSameNotebook);
+            if(expectOtherNotebooks) result.add(noteFromMyOtherNotebook);
+            if(expectSubscription) result.add(subscribedBazaarNote);
+            if(expectCircleNote) result.add(circleNote);
+            return result.toArray();
+        }
+
     }
 }
 
