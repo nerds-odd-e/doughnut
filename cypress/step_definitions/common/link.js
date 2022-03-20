@@ -110,3 +110,7 @@ Then("I should be able to delete the link to note {string}", (noteTitle) => {
   cy.findByRole("button", { name: "OK" }).click()
   cy.contains(noteTitle).should("not.exist")
 })
+
+Then("I should see the note {string} {string}", (linkType, linkTarget) => {
+})
+

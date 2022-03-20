@@ -4,6 +4,10 @@
 import { And, Before, Given, Then, When } from "cypress-cucumber-preprocessor/steps"
 const path = require("path")
 
+Given("I visit note {string}", (noteTitle) => {
+  cy.jumpToNotePage(noteTitle);
+})
+
 Given("there are some notes for the current user", (data) => {
   cy.seedNotes(data.hashes())
 })
