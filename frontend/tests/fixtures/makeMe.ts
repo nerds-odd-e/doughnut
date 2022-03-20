@@ -7,10 +7,15 @@ import RepetitionBuilder from "./RepetitionBuilder"
 import NotebookBuilder from "./NotebookBuilder";
 import CircleNoteBuilder from "./CircleNoteBuilder";
 import BazaarNoteBuilder from "./NotebooksBuilder";
+import NoteBuilder from "./NoteBuilder";
 
 class MakeMe {
   static get links(): LinksBuilder {
     return new LinksBuilder();
+  }
+
+  static get aNote(): NoteBuilder {
+    return new NoteBuilder();
   }
 
   static get aNoteSphere(): NoteSphereBuilder {

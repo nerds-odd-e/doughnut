@@ -48,6 +48,11 @@ export default defineComponent({
         allMyNotebooksAndSubscriptions: false,
         allMyCircles: false,
       } as Generated.SearchTerm,
+      oldSearchTerm: {
+        searchKey: "",
+        allMyNotebooksAndSubscriptions: false,
+        allMyCircles: false,
+      } as Generated.SearchTerm,
       cache: {
         global: {},
         local: {}
@@ -61,11 +66,18 @@ export default defineComponent({
   },
   watch: {
     searchTerm: {
-      handler(newSearchTerm) {
-        if (newSearchTerm.searchKey.trim() === "") {
+      handler() {
+        if (this.searchTerm.allMyCircles && !this.oldSearchTerm.allMyNotebooksAndSubscriptions) {
+          this.searchTerm.allMyNotebooksAndSubscriptions = true
+        }
+        else if (!this.searchTerm.allMyNotebooksAndSubscriptions && this.oldSearchTerm.allMyCircles) {
+          this.searchTerm.allMyCircles = false
+        }
+        if (this.searchTerm.searchKey.trim() === "") {
         } else {
           this.search();
         }
+        this.oldSearchTerm = { ... this.searchTerm}
       },
       deep: true,
     },

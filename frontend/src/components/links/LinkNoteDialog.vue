@@ -12,23 +12,26 @@
     v-else
     v-bind="{ targetNote, note }"
     @success="$emit('done')"
-    @goBack="targetNote = null"
+    @goBack="targetNote = undefined"
   />
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, PropType } from "vue";
 import LinkNoteFinalize from "./LinkNoteFinalize.vue";
 import SearchNote from "../search/SearchNote.vue";
 
-export default {
-  name: "LinkNote",
-  props: { note: Object },
+export default defineComponent({
+  props: { note: Object as PropType<Generated.Note> },
   components: { LinkNoteFinalize, SearchNote },
   emits: ["done"],
   data() {
     return {
-      targetNote: null,
-    };
+      targetNote: undefined,
+    } as {
+      targetNote: Generated.Note | undefined
+    }
+    ;
   },
-};
+});
 </script>
