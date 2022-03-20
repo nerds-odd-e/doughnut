@@ -45,8 +45,10 @@ public class Link {
         public String reversedLabel;
         @Getter
         private final QuestionType[] questionTypes;
+        private DoughPredicate doughPredicate;
 
         LinkType(Integer id, String nameOfSource, String label, String reversedLabel, QuestionType[] questionTypes) {
+            this.doughPredicate = new DoughPredicate(this);
             this.nameOfSource = nameOfSource;
             this.label = label;
             this.id = id;
