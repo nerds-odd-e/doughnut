@@ -7,6 +7,7 @@ import com.odde.doughnut.entities.json.*;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.NoteViewer;
+import com.odde.doughnut.models.SearchTermModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
 import lombok.Getter;
@@ -106,7 +107,8 @@ class RestNoteController {
     @PostMapping("/search")
     @Transactional
     public List<Note> searchForLinkTarget(@Valid @RequestBody SearchTerm searchTerm) {
-        return currentUserFetcher.getUser().searchForNotes(searchTerm);
+        SearchTermModel searchTermModel = modelFactoryService.toSearchTermModel(currentUserFetcher.getUser().getEntity(), searchTerm);
+        return searchTermModel.searchForNotes();
     }
 
     @PostMapping(value = "/{note}/delete")

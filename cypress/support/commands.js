@@ -398,7 +398,7 @@ Cypress.Commands.add("unsubscribeFromNotebook", (noteTitle) => {
 })
 
 Cypress.Commands.add("searchNote", (searchKey, options) => {
-  options.forEach(option=> cy.getFormControl(option).check())
+  options?.forEach(option=> cy.getFormControl(option).check())
   cy.findByPlaceholderText("Search").clear().type(searchKey)
   cy.tick(500)
 })

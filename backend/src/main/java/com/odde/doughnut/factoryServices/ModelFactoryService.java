@@ -1,6 +1,7 @@
 package com.odde.doughnut.factoryServices;
 
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.json.SearchTerm;
 import com.odde.doughnut.entities.repositories.*;
 import com.odde.doughnut.models.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,5 +94,9 @@ public class ModelFactoryService {
 
     public Authorization toAuthorization(User entity) {
         return new Authorization(entity, this);
+    }
+
+    public SearchTermModel toSearchTermModel(User entity, SearchTerm searchTerm) {
+        return new SearchTermModel(entity, this, searchTerm);
     }
 }

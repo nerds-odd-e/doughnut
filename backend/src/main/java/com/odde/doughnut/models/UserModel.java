@@ -3,14 +3,10 @@ package com.odde.doughnut.models;
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.util.List;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.json.SearchTerm;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-
-import org.apache.logging.log4j.util.Strings;
 
 import lombok.Getter;
 
@@ -45,26 +41,6 @@ public class UserModel implements ReviewScope {
     public void setAndSaveSpaceIntervals(String spaceIntervals) {
         entity.setSpaceIntervals(spaceIntervals);
         save();
-    }
-
-    public List<Note> searchForNotes(SearchTerm searchTerm) {
-        if (Strings.isBlank(searchTerm.getTrimmedSearchKey())) {
-            return null;
-        }
-        List<Note> result = search(searchTerm);
-
-        Integer avoidNoteId = searchTerm.note.map(Note::getId).orElse(null);
-        return result.stream().filter(n -> !n.getId().equals(avoidNoteId)).collect(Collectors.toList());
-
-    }
-
-    private List<Note> search(SearchTerm searchTerm) {
-        final String pattern = Pattern.quote(searchTerm.getTrimmedSearchKey());
-        if (searchTerm.getAllMyNotebooksAndSubscriptions()) {
-            return modelFactoryService.noteRepository.searchForUserInVisibleScope(entity, pattern);
-        }
-        Notebook notebook = searchTerm.note.map(Note::getNotebook).orElse(null);
-        return modelFactoryService.noteRepository.searchInNotebook(notebook, pattern);
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.Circle;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.EntityBuilder;
@@ -20,7 +21,11 @@ public class CircleBuilder extends EntityBuilder<Circle> {
     }
 
     public CircleBuilder hasMember(UserModel userModel) {
-        entity.getMembers().add(userModel.getEntity());
+        return hasMember(userModel.getEntity());
+    }
+
+    public CircleBuilder hasMember(User user) {
+        entity.getMembers().add(user);
         return this;
     }
 

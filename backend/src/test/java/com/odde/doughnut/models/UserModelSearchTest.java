@@ -11,6 +11,7 @@ import java.util.Optional;
 
 import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.json.SearchTerm;
 import com.odde.doughnut.testability.MakeMe;
 
@@ -29,21 +30,23 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserModelSearchTest {
     @Autowired
     MakeMe makeMe;
-    UserModel userModel;
+    SearchTermModel searchTermModel;
+    User user;
     UserModel anotherUser;
     Note note;
     final SearchTerm searchTerm = new SearchTerm();
 
     @BeforeEach
     void setup() {
-        userModel = makeMe.aUser().toModelPlease();
-        anotherUser = makeMe.aUser().toModelPlease();
-        note = makeMe.aNote().byUser(userModel).please();
+        user  = makeMe.aUser().please();
+        note = makeMe.aNote().byUser(user).please();
         searchTerm.note = Optional.of(note);
+        searchTermModel = new SearchTermModel(user, makeMe.modelFactoryService, searchTerm);
+        anotherUser = makeMe.aUser().toModelPlease();
     }
 
     private List<Note> search() {
-        return userModel.searchForNotes(searchTerm);
+        return searchTermModel.searchForNotes();
     }
 
     @Test
@@ -69,7 +72,7 @@ public class UserModelSearchTest {
 
     @Test
     void theSearchShouldNotIncludeNoteFromOtherNotebook() {
-        Note anotherNote = makeMe.aNote("Some Note").byUser(userModel).please();
+        Note anotherNote = makeMe.aNote("Some Note").byUser(user).please();
         searchTerm.setSearchKey(anotherNote.getTitle());
         final List<Note> notes = search();
         assertTrue(notes.isEmpty());
@@ -77,7 +80,7 @@ public class UserModelSearchTest {
 
     @Test
     void theSearchShouldIncludeNoteFromOtherNotebookIfGlobally() {
-        Note anotherNote = makeMe.aNote("Some Note").byUser(userModel).please();
+        Note anotherNote = makeMe.aNote("Some Note").byUser(user).please();
         searchTerm.setSearchKey(anotherNote.getTitle());
         searchTerm.setAllMyNotebooksAndSubscriptions(true);
         final List<Note> notes = search();
@@ -104,7 +107,7 @@ public class UserModelSearchTest {
 
         @Test
         void theSearchShouldIncludeNoteISubscribed() {
-            makeMe.aSubscription().forNotebook(bazaarNote.getNotebook()).forUser(userModel.getEntity()).please();
+            makeMe.aSubscription().forNotebook(bazaarNote.getNotebook()).forUser(user).please();
             searchTerm.setSearchKey(bazaarNote.getTitle());
             searchTerm.setAllMyNotebooksAndSubscriptions(true);
             final List<Note> notes = search();
@@ -119,7 +122,7 @@ public class UserModelSearchTest {
 
         @BeforeEach
         void setup() {
-            Circle circle = makeMe.aCircle().hasMember(userModel).hasMember(anotherUser).please();
+            Circle circle = makeMe.aCircle().hasMember(user).hasMember(anotherUser).please();
             circleNote = makeMe.aNote().byUser(anotherUser).inCircle(circle).please();
         }
 

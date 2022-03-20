@@ -12,7 +12,7 @@ When("I am creating link for note {string}", (noteTitle) => {
 function makingLink(cy, fromNoteTitle, linkType, toNoteTitle) {
   cy.jumpToNotePage(fromNoteTitle)
   cy.startSearching()
-  cy.searchNote(toNoteTitle)
+  cy.searchNote(toNoteTitle, ['All My Notebooks And Subscriptions'])
   cy.clickButtonOnCardBody(toNoteTitle, "Select")
   cy.clickRadioByLabel(linkType)
 }
@@ -52,15 +52,15 @@ And(
 )
 
 And(
-  "I should see {string} as targets only when searching in all my notes {string}",
+  "I should see {string} as targets only when searching in all my notebooks {string}",
   (noteTitlesAsString, searchKey) => {
     cy.searchNote(searchKey, ['All My Notebooks And Subscriptions'])
     cy.expectExactLinkTargets(noteTitlesAsString.commonSenseSplit(",").map((i) => i.trim()))
   },
 )
 
-And("I should see note cannot be found when searching {string}", (searchKey) => {
-  cy.searchNote(searchKey)
+And("I should see note cannot be found when searching in all my notebooks {string}", (searchKey) => {
+  cy.searchNote(searchKey, ['All My Notebooks And Subscriptions'])
   cy.findByText("No linkable notes found.").should("be.visible")
 })
 
