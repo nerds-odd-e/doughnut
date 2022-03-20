@@ -1,6 +1,6 @@
 <template>
   <template v-if="compact">
-    <ReviewPointAbbr v-bind="{ noteWithPosition, linkViewedByUser }" />
+    <ReviewPointAbbr v-bind="{ reviewPointViewedByUser }" />
     <SelfEvaluateButtons
       v-bind="{ sadButton }"
       :key="buttonKey"
@@ -18,7 +18,7 @@
     </div>
 
     <ShowReviewPoint
-      v-bind="{ noteWithPosition, linkViewedByUser }"
+      v-bind="{ reviewPointViewedByUser }"
     />
 
     <div class="btn-toolbar justify-content-between">
@@ -70,12 +70,6 @@ export default defineComponent({
     sadButton() {
       return this.answerResult && !this.answerResult.correct;
     },
-    noteWithPosition() {
-      return this.reviewPointViewedByUser?.noteWithPosition;
-    },
-    linkViewedByUser() {
-      return this.reviewPointViewedByUser?.linkViewedByUser;
-    }
   },
   methods: {
     selfEvaluate(event: string) {

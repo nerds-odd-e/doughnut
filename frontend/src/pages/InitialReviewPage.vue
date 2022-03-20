@@ -16,7 +16,7 @@
             class="initial-review-container"
             v-on:click="$router.push({ name: 'initial' })"
           >
-            <ReviewPointAbbr v-bind="reviewPointViewedByUser" />
+            <ReviewPointAbbr v-bind="{reviewPointViewedByUser}" />
             <InitialReviewButtons
               :key="buttonKey"
               @doInitialReview="processForm($event)"
@@ -25,8 +25,7 @@
         </template>
         <template #fullContent>
           <ShowReviewPoint
-            :noteWithPosition="reviewPointViewedByUser.noteWithPosition"
-            :linkViewedByUser="reviewPointViewedByUser.linkViewedByUser"
+            v-bind="{reviewPointViewedByUser}"
           />
           <div>
             <div class="mb-2">

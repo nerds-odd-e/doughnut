@@ -30,18 +30,22 @@ import { defineComponent, PropType } from "vue";
 import NoteSphereComponent from "../notes/views/NoteSphereComponent.vue";
 import LinkShow from "../links/LinkShow.vue";
 import LinkNob from "../links/LinkNob.vue";
-import LinkViewedByUserBuilder from "../../../tests/fixtures/LinkViewedByUserBuilder";
 
 export default defineComponent({
   props: {
-    noteWithPosition: Object as PropType<Generated.NoteWithPosition>,
-    linkViewedByUser: Object as PropType<LinkViewedByUserBuilder>,
+    reviewPointViewedByUser: { type: Object as PropType<Generated.ReviewPointViewedByUser>, required: true },
   },
   components: {NoteSphereComponent, LinkShow, LinkNob},
   computed: {
     noteId() {
       return this.noteWithPosition?.note.id
     },
+    noteWithPosition() {
+      return this.reviewPointViewedByUser?.noteWithPosition;
+    },
+    linkViewedByUser() {
+      return this.reviewPointViewedByUser?.linkViewedByUser;
+    }
   }
 })
 

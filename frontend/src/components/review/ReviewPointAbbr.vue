@@ -18,15 +18,19 @@
 </template>
 
 <script lang="ts">
-import { PropType } from 'vue-demi';
+import { defineComponent, PropType } from "vue";
 
-export default {
-  name: "ShowReviewPoint",
+export default defineComponent({
   props: {
-    noteWithPosition: Object as PropType<Generated.NoteWithPosition>,
-    linkViewedByUser: Object as PropType<Generated.LinkViewedByUser>
+    reviewPointViewedByUser: { type: Object as PropType<Generated.ReviewPointViewedByUser>, required: true },
   },
   computed: {
+    noteWithPosition() {
+      return this.reviewPointViewedByUser?.noteWithPosition;
+    },
+    linkViewedByUser() {
+      return this.reviewPointViewedByUser?.linkViewedByUser;
+    },
     noteTitle() {
       return this.noteWithPosition?.note.note.title
     },
@@ -38,7 +42,7 @@ export default {
     }
 
   }
-};
+});
 </script>
 
 <style lang="sass" scoped>
