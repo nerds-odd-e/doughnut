@@ -55,4 +55,21 @@ describe('repeat page', () => {
       noteSphere.note.title
     );
   });
+
+  it('minimized view for link', async () => {
+    const link = makeMe.aLinkViewedByUser.please()
+    const reviewPoint = makeMe.aReviewPoint.ofLink(link).please();
+    helper.apiMock.expecting('/api/reviews/initial', reviewPoint)
+    const wrapper = renderer.withProps({nested: true}).currentRoute({ name: 'initial' }).mount()
+    await flushPromises();
+    expect(mockRouterPush).toHaveBeenCalledTimes(0);
+    expect(wrapper.findAll('.initial-review-container')).toHaveLength(1);
+    expect(wrapper.find('.review-point-abbr span').text()).toContain(
+      link.sourceNoteWithPosition.note.note.title
+    );
+    expect(wrapper.find('.review-point-abbr span').text()).toContain(
+      link.targetNoteWithPosition.note.note.title
+    );
+  });
+
 });
