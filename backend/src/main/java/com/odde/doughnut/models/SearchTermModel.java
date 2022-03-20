@@ -12,9 +12,9 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class SearchTermModel {
-    private User user;
-    private ModelFactoryService modelFactoryService;
-    private SearchTerm searchTerm;
+    private final User user;
+    private final ModelFactoryService modelFactoryService;
+    private final SearchTerm searchTerm;
 
     public SearchTermModel(User entity, ModelFactoryService modelFactoryService, SearchTerm searchTerm) {
         this.user = entity;
@@ -24,8 +24,11 @@ public class SearchTermModel {
 
     private List<Note> search() {
         final String pattern = Pattern.quote(searchTerm.getTrimmedSearchKey());
+        if (searchTerm.getAllMyCircles()) {
+            return this.modelFactoryService.noteRepository.searchForUserInAllMyNotebooksSubscriptionsAndCircle(user, pattern);
+        }
         if (searchTerm.getAllMyNotebooksAndSubscriptions()) {
-            return this.modelFactoryService.noteRepository.searchForUserInVisibleScope(user, pattern);
+            return this.modelFactoryService.noteRepository.searchForUserInAllMyNotebooksAndSubscriptions(user, pattern);
         }
         Notebook notebook = searchTerm.note.map(Note::getNotebook).orElse(null);
         return this.modelFactoryService.noteRepository.searchInNotebook(notebook, pattern);

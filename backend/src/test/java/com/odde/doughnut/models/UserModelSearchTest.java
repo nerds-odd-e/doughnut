@@ -1,9 +1,7 @@
 package com.odde.doughnut.models;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
@@ -51,31 +49,27 @@ public class UserModelSearchTest {
 
     @Test
     void returnNullWhenNoteKeyIsGiven() {
-        final List<Note> notes = search();
-        assertThat(notes, is(nullValue()));
+        assertThat(search(), is(nullValue()));
     }
 
     @Test
     void theNoteItselfIsNotIncludedInTheResult() {
         searchTerm.setSearchKey(note.getTitle());
-        final List<Note> notes = search();
-        assertTrue(notes.isEmpty());
+        assertTrue(search().isEmpty());
     }
 
     @Test
     void theSearchIsCaseInsensitive() {
         Note anotherNote = makeMe.aNote("Some Note").under(note).please();
         searchTerm.setSearchKey("not");
-        final List<Note> notes = search();
-        assertThat(notes, contains(anotherNote));
+        assertThat(search(), contains(anotherNote));
     }
 
     @Test
     void theSearchShouldNotIncludeNoteFromOtherNotebook() {
         Note anotherNote = makeMe.aNote("Some Note").byUser(user).please();
         searchTerm.setSearchKey(anotherNote.getTitle());
-        final List<Note> notes = search();
-        assertTrue(notes.isEmpty());
+        assertTrue(search().isEmpty());
     }
 
     @Test
@@ -83,8 +77,7 @@ public class UserModelSearchTest {
         Note anotherNote = makeMe.aNote("Some Note").byUser(user).please();
         searchTerm.setSearchKey(anotherNote.getTitle());
         searchTerm.setAllMyNotebooksAndSubscriptions(true);
-        final List<Note> notes = search();
-        assertThat(notes, contains(anotherNote));
+        assertThat(search(), contains(anotherNote));
     }
 
     @Nested
@@ -101,8 +94,7 @@ public class UserModelSearchTest {
         void theSearchShouldNotIncludeNoteInBazaar() {
             searchTerm.setSearchKey(bazaarNote.getTitle());
             searchTerm.setAllMyNotebooksAndSubscriptions(true);
-            final List<Note> notes = search();
-            assertTrue(notes.isEmpty());
+            assertTrue(search().isEmpty());
         }
 
         @Test
@@ -110,8 +102,7 @@ public class UserModelSearchTest {
             makeMe.aSubscription().forNotebook(bazaarNote.getNotebook()).forUser(user).please();
             searchTerm.setSearchKey(bazaarNote.getTitle());
             searchTerm.setAllMyNotebooksAndSubscriptions(true);
-            final List<Note> notes = search();
-            assertThat(notes, contains(bazaarNote));
+            assertThat(search(), contains(bazaarNote));
         }
 
     }
@@ -127,11 +118,18 @@ public class UserModelSearchTest {
         }
 
         @Test
-        void theSearchShouldIncludeNote() {
+        void theSearchShouldNotIncludeNoteIfNotSearchingInCircle() {
             searchTerm.setSearchKey(circleNote.getTitle());
             searchTerm.setAllMyNotebooksAndSubscriptions(true);
-            final List<Note> notes = search();
-            assertThat(notes, contains(circleNote));
+            assertThat(search(), not(contains(circleNote)));
+        }
+
+        @Test
+        void theSearchShouldIncludeNote() {
+            searchTerm.setAllMyCircles(true);
+            searchTerm.setSearchKey(circleNote.getTitle());
+            searchTerm.setAllMyNotebooksAndSubscriptions(true);
+            assertThat(search(), contains(circleNote));
         }
 
     }
