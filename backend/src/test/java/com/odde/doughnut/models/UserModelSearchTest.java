@@ -13,10 +13,13 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.json.SearchTerm;
 import com.odde.doughnut.testability.MakeMe;
 
+import org.hamcrest.Matcher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -39,7 +42,7 @@ public class UserModelSearchTest {
         user  = makeMe.aUser().please();
         note = makeMe.aNote().byUser(user).please();
         searchTerm.note = Optional.of(note);
-        searchTermModel = new SearchTermModel(user, makeMe.modelFactoryService, searchTerm);
+        searchTermModel = new SearchTermModel(user, makeMe.modelFactoryService.noteRepository, searchTerm);
         anotherUser = makeMe.aUser().toModelPlease();
     }
 
@@ -117,21 +120,23 @@ public class UserModelSearchTest {
             circleNote = makeMe.aNote().byUser(anotherUser).inCircle(circle).please();
         }
 
-        @Test
-        void theSearchShouldNotIncludeNoteIfNotSearchingInCircle() {
-            searchTerm.setSearchKey(circleNote.getTitle());
-            searchTerm.setAllMyNotebooksAndSubscriptions(true);
-            assertThat(search(), not(contains(circleNote)));
+        static class SearchTest {
+
         }
 
-        @Test
-        void theSearchShouldIncludeNote() {
-            searchTerm.setAllMyCircles(true);
+        @ParameterizedTest
+        @CsvSource({
+                "false,            false",
+                "true,             true",
+        })
+        void testSearch(boolean inAllMyCircle, boolean expectCircleNote) {
             searchTerm.setSearchKey(circleNote.getTitle());
             searchTerm.setAllMyNotebooksAndSubscriptions(true);
-            assertThat(search(), contains(circleNote));
+            searchTerm.setAllMyCircles(inAllMyCircle);
+            Matcher<Iterable<? extends Note>> matcher = contains(circleNote);
+            if(!expectCircleNote) matcher = not(matcher);
+            assertThat(search(), matcher);
         }
-
     }
 }
 

@@ -4,7 +4,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.json.SearchTerm;
-import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.entities.repositories.NoteRepository;
 import org.apache.logging.log4j.util.Strings;
 
 import java.util.List;
@@ -13,25 +13,28 @@ import java.util.stream.Collectors;
 
 public class SearchTermModel {
     private final User user;
-    private final ModelFactoryService modelFactoryService;
     private final SearchTerm searchTerm;
+    NoteRepository noteRepository;
 
-    public SearchTermModel(User entity, ModelFactoryService modelFactoryService, SearchTerm searchTerm) {
+    public SearchTermModel(User entity, NoteRepository noteRepository, SearchTerm searchTerm) {
         this.user = entity;
-        this.modelFactoryService = modelFactoryService;
         this.searchTerm = searchTerm;
+        this.noteRepository = noteRepository;
     }
 
     private List<Note> search() {
-        final String pattern = Pattern.quote(searchTerm.getTrimmedSearchKey());
         if (searchTerm.getAllMyCircles()) {
-            return this.modelFactoryService.noteRepository.searchForUserInAllMyNotebooksSubscriptionsAndCircle(user, pattern);
+            return noteRepository.searchForUserInAllMyNotebooksSubscriptionsAndCircle(user, getPattern());
         }
         if (searchTerm.getAllMyNotebooksAndSubscriptions()) {
-            return this.modelFactoryService.noteRepository.searchForUserInAllMyNotebooksAndSubscriptions(user, pattern);
+            return noteRepository.searchForUserInAllMyNotebooksAndSubscriptions(user, getPattern());
         }
         Notebook notebook = searchTerm.note.map(Note::getNotebook).orElse(null);
-        return this.modelFactoryService.noteRepository.searchInNotebook(notebook, pattern);
+        return noteRepository.searchInNotebook(notebook, getPattern());
+    }
+
+    private String getPattern() {
+        return Pattern.quote(searchTerm.getTrimmedSearchKey());
     }
 
     public List<Note> searchForNotes() {
