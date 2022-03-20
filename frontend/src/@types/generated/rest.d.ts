@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-03-19 15:31:11.
+// Generated using typescript-generator version 2.35.1025 on 2022-03-20 15:05:44.
 
 declare namespace Generated {
 
@@ -19,6 +19,10 @@ declare namespace Generated {
     interface CurrentUserInfo {
         user: User;
         externalIdentifier: string;
+    }
+
+    interface DummyForGeneratingTypes {
+        answerResult: AnswerResult;
     }
 
     interface InitialInfo {
@@ -132,6 +136,14 @@ declare namespace Generated {
         spaceIntervals: string;
     }
 
+    interface AnswerResult {
+        answer: string;
+        answerNote: Note;
+        questionType: QuestionType;
+        answerDisplay: string;
+        correct: boolean;
+    }
+
     interface ReviewPoint {
         id: number;
         lastReviewedAt: string;
@@ -156,8 +168,8 @@ declare namespace Generated {
         targetNote: Note;
         typeId: number;
         createdAt: string;
-        linkNameOfSource: string;
         linkTypeLabel: string;
+        linkNameOfSource: string;
     }
 
     interface TextContent {

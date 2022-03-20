@@ -11,34 +11,29 @@ describe('repetition page', () => {
     helper.reset()
   });
 
-  const propHelper = (reviewPointForView: Generated.ReviewPointViewedByUser) => {
-    const { reviewPoint, noteWithPosition, linkViewedByUser} = reviewPointForView
-    return { reviewPoint, noteWithPosition, linkViewedByUser }
-  }
-
   describe('repetition page for a note', () => {
     const note = makeMe.aNoteSphere.please();
-    const reviewPointForView = makeMe.aReviewPoint.ofNote(note).please();
+    const reviewPointViewedByUser = makeMe.aReviewPoint.ofNote(note).please();
 
     it('for note', async () => {
-      const wrapper = helper.component(Repetition).withProps(propHelper(reviewPointForView)).currentRoute({ name: 'root' }).mount()
+      const wrapper = helper.component(Repetition).withProps({ reviewPointViewedByUser }).currentRoute({ name: 'root' }).mount()
       expect(wrapper.findAll('.btn-toolbar')).toHaveLength(1);
     });
   });
 
   describe('repetition page for a link', () => {
     const linkViewedByUser = makeMe.aLinkViewedByUser.please();
-    const reviewPointForView = makeMe.aReviewPoint
+    const reviewPointViewedByUser = makeMe.aReviewPoint
       .ofLink(linkViewedByUser)
       .please();
 
     it('for link', async () => {
-      const wrapper = helper.component(Repetition).withProps(propHelper(reviewPointForView)).currentRoute({ name: 'root' }).mount()
+      const wrapper = helper.component(Repetition).withProps({ reviewPointViewedByUser }).currentRoute({ name: 'root' }).mount()
       expect(wrapper.findAll('.btn-toolbar')).toHaveLength(1);
     });
 
     it('click on note when doing review', async () => {
-      const wrapper = helper.component(Repetition).withProps(propHelper(reviewPointForView)).currentRoute({ name: 'repeat' }).mount()
+      const wrapper = helper.component(Repetition).withProps({ reviewPointViewedByUser }).currentRoute({ name: 'repeat' }).mount()
       expect(
         JSON.parse(wrapper.find('.link-source .router-link').attributes().to)
           .name
@@ -46,7 +41,7 @@ describe('repetition page', () => {
     });
 
     it('click on note when doing review and in a nested page', async () => {
-      const wrapper = helper.component(Repetition).withProps(propHelper(reviewPointForView)).currentRoute({ name: 'repeat-noteShow', params: { rawNoteId: 123 } }).mount()
+      const wrapper = helper.component(Repetition).withProps({ reviewPointViewedByUser }).currentRoute({ name: 'repeat-noteShow', params: { rawNoteId: 123 } }).mount()
       expect(
         JSON.parse(wrapper.find('.link-source .router-link').attributes().to)
       ).toEqual({ name: 'notebooks' });

@@ -17,9 +17,7 @@
             >
               <Repetition
                 v-bind="{
-                  reviewPoint: reviewPointViewedByUser.reviewPoint,
-                  noteWithPosition: reviewPointViewedByUser.noteWithPosition,
-                  linkViewedByUser: reviewPointViewedByUser.linkViewedByUser,
+                  reviewPointViewedByUser,
                   answerResult,
                   compact: true,
                 }"
@@ -53,9 +51,7 @@
           <template v-else>
               <Repetition
                 v-bind="{ 
-                  reviewPoint: reviewPointViewedByUser.reviewPoint,
-                  noteWithPosition: reviewPointViewedByUser.noteWithPosition,
-                  linkViewedByUser: reviewPointViewedByUser.linkViewedByUser,
+                  reviewPointViewedByUser,
                   answerResult
                 }"
                 @selfEvaluate="selfEvaluate($event)"

@@ -1,6 +1,6 @@
 <template>
   <template v-if="compact">
-    <ReviewPointAbbr v-bind="{ noteWithPosition: note, linkViewedByUser }" />
+    <ReviewPointAbbr v-bind="{ noteWithPosition, linkViewedByUser }" />
     <SelfEvaluateButtons
       v-bind="{ sadButton }"
       :key="buttonKey"
@@ -18,7 +18,7 @@
     </div>
 
     <ShowReviewPoint
-      v-bind="{ noteWithPosition: note, linkViewedByUser }"
+      v-bind="{ noteWithPosition, linkViewedByUser }"
     />
 
     <div class="btn-toolbar justify-content-between">
@@ -38,20 +38,19 @@
   </template>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, PropType } from "vue";
 import SvgCog from "../svgs/SvgCog.vue";
 import SvgNoReview from "../svgs/SvgNoReview.vue";
 import ShowReviewPoint from "./ShowReviewPoint.vue";
 import SelfEvaluateButtons from "./SelfEvaluateButtons.vue";
 import ReviewPointAbbr from "./ReviewPointAbbr.vue";
 
-export default {
+export default defineComponent({
   name: "Repetition",
   props: {
-    reviewPoint: Object,
-    answerResult: Object,
-    noteWithPosition: Object,
-    linkViewedByUser: Object,
+    reviewPointViewedByUser: { type: Object as PropType<Generated.ReviewPointViewedByUser>, required: true },
+    answerResult: Object as PropType<Generated.AnswerResult>,
     compact: Boolean,
   },
   emits: ["selfEvaluate", "removeFromReview"],
@@ -69,18 +68,21 @@ export default {
   },
   computed: {
     sadButton() {
-      return !!this.answerResult && !this.answerResult.correct;
+      return this.answerResult && !this.answerResult.correct;
     },
-    note() {
-      return this.noteWithPosition
+    noteWithPosition() {
+      return this.reviewPointViewedByUser?.noteWithPosition;
+    },
+    linkViewedByUser() {
+      return this.reviewPointViewedByUser?.linkViewedByUser;
     }
   },
   methods: {
-    selfEvaluate(event) {
+    selfEvaluate(event: string) {
       this.buttonKey += 1;
       this.$emit("selfEvaluate", event);
     },
 
   },
-};
+});
 </script>

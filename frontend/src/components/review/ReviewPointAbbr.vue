@@ -10,9 +10,10 @@
       </span>
       <span class="badge mr-1"> {{ linkViewedByUser.linkTypeLabel }}</span>
       <span>
-        {{ sourceNoteTitle }}
+        {{ targetNoteTitle }}
       </span>
     </span>
+
   </div>
 </template>
 
