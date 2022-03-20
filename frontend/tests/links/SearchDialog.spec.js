@@ -12,5 +12,6 @@ describe('LinkNoteDialog', () => {
       },
     });
     await screen.findByText('Searching');
+    expect(await screen.findByLabelText("All My Notebooks And Subscriptions")).toBeDisabled();
   });
 });
