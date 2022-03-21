@@ -10,7 +10,6 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE,
@@ -19,7 +18,6 @@ public class Reviewing {
     private final UserModel userModel;
     private final Timestamp currentUTCTimestamp;
     private final ModelFactoryService modelFactoryService;
-    private final Memoizer memoizer = new Memoizer();
 
     public Reviewing(UserModel user, Timestamp currentUTCTimestamp, ModelFactoryService modelFactoryService) {
         userModel = user;
@@ -28,10 +26,6 @@ public class Reviewing {
     }
 
     public ReviewPoint getOneInitialReviewPoint() {
-        return memoizer.call("getOneInitialReviewPoint", this::getOneInitialReviewPoint_);
-    }
-
-    private ReviewPoint getOneInitialReviewPoint_() {
         int count = remainingDailyNewNotesCount();
         if (count == 0) {
             return null;
@@ -66,28 +60,16 @@ public class Reviewing {
 
     @JsonProperty
     public int toRepeatCount() {
-        return memoizer.call("toRepeatCount", this::getToRepeatCount_);
-    }
-
-    private Integer getToRepeatCount_() {
         return userModel.getReviewPointsNeedToRepeat(currentUTCTimestamp).size();
     }
 
     @JsonProperty
     public int learntCount() {
-        return memoizer.call("learntCount", this::getLearntCount_);
-    }
-
-    public int getLearntCount_() {
         return userModel.learntCount();
     }
 
     @JsonProperty
     public int notLearntCount() {
-        return memoizer.call("notLearntCount", this::getNotLearntCount_);
-    }
-
-    public int getNotLearntCount_() {
         Integer subscribedCount = getSubscriptionModelStream()
                 .map(SubscriptionModel::getNotesHaveNotBeenReviewedAtAllCount)
                 .reduce(Integer::sum).orElse(0);
@@ -105,10 +87,6 @@ public class Reviewing {
     }
 
     private List<ReviewPoint> getNewReviewPointsOfToday() {
-        return memoizer.call("getNewReviewPointsOfToday", this::getNewReviewPointsOfToday_);
-    }
-
-    private List<ReviewPoint> getNewReviewPointsOfToday_() {
         Timestamp oneDayAgo = TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, -24);
         return userModel.getRecentReviewPoints(oneDayAgo).stream().filter(p -> userModel.isInitialReviewOnSameDay(p, currentUTCTimestamp)).toList();
     }
