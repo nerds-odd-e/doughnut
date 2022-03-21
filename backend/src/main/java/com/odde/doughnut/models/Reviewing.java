@@ -30,9 +30,9 @@ public class Reviewing {
         if (count == 0) {
             return null;
         }
-        List<Integer> initialReviewedNotesOfToday = getNewReviewPointsOfToday().stream().map(rp -> rp.getSourceNote().getId()).toList();
+        List<Integer> alreadyInitialReviewed = getNewReviewPointsOfToday().stream().map(rp -> rp.getSourceNote().getId()).toList();
         return getSubscriptionModelStream()
-                .filter(sub-> sub.needToLearnMoreToday(initialReviewedNotesOfToday))
+                .filter(sub-> sub.needToLearnMoreToday(alreadyInitialReviewed))
                 .map(this::getOneNewReviewPoint)
                 .filter(Objects::nonNull).findFirst().orElseGet(()-> getOneNewReviewPoint(userModel));
     }
@@ -71,9 +71,16 @@ public class Reviewing {
     @JsonProperty
     public int notLearntCount() {
         Integer subscribedCount = getSubscriptionModelStream()
-                .map(SubscriptionModel::getNotesHaveNotBeenReviewedAtAllCount)
+                .map(this::getPendingNewReviewPointCount)
                 .reduce(Integer::sum).orElse(0);
-        return subscribedCount + userModel.getNotesHaveNotBeenReviewedAtAllCount();
+        return subscribedCount + getPendingNewReviewPointCount(userModel);
+    }
+
+    private int getPendingNewReviewPointCount(ReviewScope reviewScope) {
+        int noteCount = reviewScope.getNotesHaveNotBeenReviewedAtAllCount();
+        int linkCount = reviewScope.getLinksHaveNotBeenReviewedAtAllCount();
+
+        return noteCount + linkCount;
     }
 
     public int toInitialReviewCount() {

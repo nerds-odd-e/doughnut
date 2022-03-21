@@ -13,8 +13,14 @@ public interface LinkRepository extends CrudRepository<Link, Integer> {
     @Query( value = "SELECT link.* from link " + byOwnershipWhereThereIsNoReviewPoint, nativeQuery = true)
     List<Link> findByOwnershipWhereThereIsNoReviewPoint(@Param("user") User user);
 
+    @Query( value = "SELECT count(1) from link " + byOwnershipWhereThereIsNoReviewPoint, nativeQuery = true)
+    int countByOwnershipWhereThereIsNoReviewPoint(@Param("user") User user);
+
     @Query( value = "SELECT link.* from link " + byAncestorWhereThereIsNoReviewPoint, nativeQuery = true)
     List<Link> findByAncestorWhereThereIsNoReviewPoint(@Param("user") User user, @Param("ancestor") Note ancestor);
+
+    @Query( value = "SELECT count(1) from link " + byAncestorWhereThereIsNoReviewPoint, nativeQuery = true)
+    int countByAncestorWhereThereIsNoReviewPoint(@Param("user") User user, @Param("ancestor") Note ancestor);
 
     String noteReviewedOrSkipped = "   SELECT note.id, note.skip_review, nrp.id as nrp_id FROM note"
             + "     LEFT JOIN review_point nrp"
@@ -42,4 +48,5 @@ public interface LinkRepository extends CrudRepository<Link, Integer> {
     String byAncestorWhereThereIsNoReviewPoint = "JOIN notes_closure ON notes_closure.note_id = source_id "
             + "   AND notes_closure.ancestor_id = :ancestor "
             + whereThereIsNoReviewPoint;
+
 }

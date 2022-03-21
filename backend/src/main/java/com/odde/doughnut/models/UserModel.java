@@ -58,6 +58,11 @@ public class UserModel implements ReviewScope {
         return modelFactoryService.linkRepository.findByOwnershipWhereThereIsNoReviewPoint(entity);
     }
 
+    @Override
+    public int getLinksHaveNotBeenReviewedAtAllCount() {
+        return modelFactoryService.linkRepository.countByOwnershipWhereThereIsNoReviewPoint(entity);
+    }
+
     public List<ReviewPoint> getRecentReviewPoints(Timestamp since) {
         return modelFactoryService.reviewPointRepository.findAllByUserAndInitialReviewedAtGreaterThan(entity, since);
     }

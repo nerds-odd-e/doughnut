@@ -11,4 +11,6 @@ public interface ReviewScope {
     int getNotesHaveNotBeenReviewedAtAllCount();
 
     List<Link> getLinksHaveNotBeenReviewedAtAll();
+
+    int getLinksHaveNotBeenReviewedAtAllCount();
 }

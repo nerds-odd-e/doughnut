@@ -58,8 +58,10 @@ public class ReviewingInitialReviewTest {
 
         @Test
         void shouldReturnTheFirstNoteAndThenTheSecondWhenThereAreTwo() {
+            assertThat(reviewingOnDay1.toInitialReviewCount(), equalTo(2));
             assertThat(reviewingOnDay1.getOneInitialReviewPoint().getNote(), equalTo(note1));
             makeMe.aReviewPointFor(note1).by(userModel).initiallyReviewedOn(day1).please();
+            assertThat(reviewingOnDay1.toInitialReviewCount(), equalTo(1));
             assertThat(reviewingOnDay1.getOneInitialReviewPoint().getNote(), equalTo(note2));
         }
 
@@ -82,6 +84,12 @@ public class ReviewingInitialReviewTest {
             void Note1And2SkippedReview_AndThereIsALink() {
                 makeMe.theNote(note2).skipReview().please();
                 makeMe.theNote(note1).skipReview().linkTo(note2).please();
+            }
+
+            @Test
+            void shouldGetInitalReviewCountForTheLink() {
+                assertThat(reviewingOnDay1.remainingDailyNewNotesCount(), equalTo(userModel.getEntity().getDailyNewNotesCount()));
+                assertThat(reviewingOnDay1.notLearntCount(), equalTo(1));
             }
 
             @Test

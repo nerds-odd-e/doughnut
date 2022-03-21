@@ -31,6 +31,11 @@ public class SubscriptionModel implements ReviewScope {
         return modelFactoryService.linkRepository.findByAncestorWhereThereIsNoReviewPoint(entity.getUser(), entity.getHeadNote());
     }
 
+    @Override
+    public int getLinksHaveNotBeenReviewedAtAllCount() {
+        return modelFactoryService.linkRepository.countByAncestorWhereThereIsNoReviewPoint(entity.getUser(), entity.getHeadNote());
+    }
+
     public boolean needToLearnMoreToday(List<Integer> noteIds) {
         int count = modelFactoryService.noteRepository.countByAncestorAndInTheList(entity.getHeadNote(), noteIds);
         return count < entity.getDailyTargetOfNewNotes();
