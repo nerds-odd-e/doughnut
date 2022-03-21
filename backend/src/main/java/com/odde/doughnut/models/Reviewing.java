@@ -94,16 +94,7 @@ public class Reviewing {
         return subscribedCount + userModel.getNotesHaveNotBeenReviewedAtAllCount();
     }
 
-    @JsonProperty
     public int toInitialReviewCount() {
-        return memoizer.call("toInitialReviewCount", this::getToInitialReviewCount_);
-    }
-
-    public int getToInitialReviewCount_() {
-        ReviewPoint oneInitialReviewPoint = getOneInitialReviewPoint();
-        if (oneInitialReviewPoint == null) {
-            return 0;
-        }
         return Math.min(remainingDailyNewNotesCount(), notLearntCount());
     }
 

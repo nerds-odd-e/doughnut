@@ -7,7 +7,7 @@
           Learn New Notes
           <span class="badge bg-secondary number-of-initial-reviews">
             {{
-              `${reviewing.toInitialReviewCount}/${reviewing.notLearntCount}`
+              `${toInitialReviewCount}/${reviewing.notLearntCount}`
             }}
           </span>
         </div>
@@ -17,7 +17,7 @@
             for the first time. Or, you can mark some as no repetition needed.
           </p>
           <router-link
-            v-if="reviewing.toInitialReviewCount > 0"
+            v-if="toInitialReviewCount > 0"
             role="button"
             class="btn btn-light"
             :to="{ name: 'initial' }"
@@ -59,6 +59,18 @@
   </div>
 </template>
 
-<script setup>
-const props = defineProps({ reviewing: Object });
+<script lang="ts">
+import { defineComponent, PropType } from "vue";
+
+export default defineComponent({
+  props: {
+    reviewing: { type: Object as PropType<Generated.Reviewing>, required: true },
+  },
+  computed: {
+    toInitialReviewCount() {
+      return Math.min(this.reviewing.remainingDailyNewNotesCount, this.reviewing.notLearntCount)
+    }
+  }
+
+})
 </script>

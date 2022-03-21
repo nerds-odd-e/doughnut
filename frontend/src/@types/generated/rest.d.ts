@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-03-20 15:05:44.
+// Generated using typescript-generator version 2.35.1025 on 2022-03-21 17:17:29.
 
 declare namespace Generated {
 
@@ -23,6 +23,7 @@ declare namespace Generated {
 
     interface DummyForGeneratingTypes {
         answerResult: AnswerResult;
+        reviewing: Reviewing;
     }
 
     interface InitialInfo {
@@ -144,6 +145,13 @@ declare namespace Generated {
         correct: boolean;
     }
 
+    interface Reviewing {
+        toRepeatCount: number;
+        remainingDailyNewNotesCount: number;
+        learntCount: number;
+        notLearntCount: number;
+    }
+
     interface ReviewPoint {
         id: number;
         lastReviewedAt: string;
@@ -183,10 +191,10 @@ declare namespace Generated {
         noteAccessories: NoteAccessories;
         textContent: TextContent;
         createdAt: string;
-        title: string;
         notePicture?: string;
-        shortDescription: string;
         parentId?: number;
+        shortDescription: string;
+        title: string;
     }
 
     interface Ownership {
@@ -199,9 +207,9 @@ declare namespace Generated {
         dailyTargetOfNewNotes: number;
         user: User;
         notebook: Notebook;
-        title: string;
         headNote: Note;
         shortDescription: string;
+        title: string;
     }
 
     interface QuizQuestion {
