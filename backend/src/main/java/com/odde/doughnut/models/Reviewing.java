@@ -70,6 +70,10 @@ public class Reviewing {
 
     @JsonProperty
     public int notLearntCount() {
+        ReviewPoint oneInitialReviewPoint = getOneInitialReviewPoint();
+        if (oneInitialReviewPoint == null) {
+            return 0;
+        }
         Integer subscribedCount = getSubscriptionModelStream()
                 .map(this::getPendingNewReviewPointCount)
                 .reduce(Integer::sum).orElse(0);
