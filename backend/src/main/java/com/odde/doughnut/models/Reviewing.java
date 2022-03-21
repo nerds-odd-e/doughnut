@@ -70,10 +70,6 @@ public class Reviewing {
 
     @JsonProperty
     public int notLearntCount() {
-        ReviewPoint oneInitialReviewPoint = getOneInitialReviewPoint();
-        if (oneInitialReviewPoint == null) {
-            return 0;
-        }
         Integer subscribedCount = getSubscriptionModelStream()
                 .map(this::getPendingNewReviewPointCount)
                 .reduce(Integer::sum).orElse(0);
@@ -87,7 +83,12 @@ public class Reviewing {
         return noteCount + linkCount;
     }
 
+    @JsonProperty
     public int toInitialReviewCount() {
+        ReviewPoint oneInitialReviewPoint = getOneInitialReviewPoint();
+        if (oneInitialReviewPoint == null) {
+            return 0;
+        }
         return Math.min(remainingDailyNewNotesCount(), notLearntCount());
     }
 
