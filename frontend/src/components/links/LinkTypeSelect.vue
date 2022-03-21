@@ -35,7 +35,7 @@ export default {
     options() {
       if (!!this.allowEmpty) {
         return [
-          { value: "", label: "Default" },
+          { value: 0, label: "Default" },
           ...linkTypeOptions,
         ];
       }
