@@ -7,6 +7,7 @@ import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.quizFacotries.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.apache.logging.log4j.util.Strings;
 
 import javax.persistence.*;
 import java.util.Arrays;
@@ -119,11 +120,10 @@ public class QuizQuestion {
         return getPresenter().hintLinks();
     }
 
-    public List<Integer> getViceReviewPointIds1() {
-        return Arrays.stream(viceReviewPointIds.split(",")).map(Integer::getInteger).collect(Collectors.toList());
+    public List<Integer> getViceReviewPointIdList() {
+        if(Strings.isBlank(viceReviewPointIds)) return null;
+        return Arrays.stream(viceReviewPointIds.split(",")).map(Integer::valueOf).collect(Collectors.toList());
     }
-
-
 
     public List<Note> getScope() {
         return List.of(reviewPoint.getSourceNote().getNotebook().getHeadNote());
@@ -137,7 +137,7 @@ public class QuizQuestion {
     public Answer buildAnswer() {
         Answer answer = new Answer();
         answer.setQuestionType(getQuestionType());
-        answer.setViceReviewPointIds(getViceReviewPointIds1());
+        answer.setViceReviewPointIds(getViceReviewPointIdList());
         return answer;
     }
 

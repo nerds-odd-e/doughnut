@@ -2,10 +2,7 @@ package com.odde.doughnut.models.quizFacotries;
 
 import static com.odde.doughnut.entities.QuizQuestion.QuestionType.FROM_DIFFERENT_PART_AS;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.in;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -125,6 +122,8 @@ class FromDifferentPartAsQuizFactoryTest {
                     QuizQuestion quizQuestion = buildQuestion();
                     String viceReviewPointIds = quizQuestion.getViceReviewPointIds();
                     assertThat(viceReviewPointIds, containsString(additionalReviewPoint.getId().toString()));
+                    assertThat(quizQuestion.getViceReviewPointIdList(), contains(additionalReviewPoint.getId()));
+
                 }
 
             }
