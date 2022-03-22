@@ -1,4 +1,5 @@
 import Builder from "./Builder"
+import generateId from "./generateId";
 import NoteSphereBuilder from "./NoteSphereBuilder";
 import ReviewPointBuilder from "./ReviewPointBuilder";
 
@@ -14,6 +15,7 @@ class RepetitionBuilder extends Builder<Generated.RepetitionForUser> {
 
   withAQuiz(): RepetitionBuilder {
     this.quizQuestion = {
+          id: generateId(),
           questionType: "CLOZE_SELECTION",
           options: [
             {
@@ -22,6 +24,7 @@ class RepetitionBuilder extends Builder<Generated.RepetitionForUser> {
               display: "question",
             },
           ],
+          viceReviewPointIdList: [],
           description: "answer",
           mainTopic: "",
           hintLinks: {},

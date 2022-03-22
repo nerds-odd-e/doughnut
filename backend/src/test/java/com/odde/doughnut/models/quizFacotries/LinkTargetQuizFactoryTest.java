@@ -54,8 +54,7 @@ class LinkTargetQuizFactoryTest {
         makeMe.aLink().between(source, anotherTarget).please();
         makeMe.refresh(top);
 
-        QuizQuestion quizQuestion = buildLinkTargetQuizQuestion();
-        assertThat(quizQuestion, is(nullValue()));
+        assertThat( buildLinkTargetQuizQuestion(), is(nullValue()));
     }
 
     @Nested
@@ -68,7 +67,7 @@ class LinkTargetQuizFactoryTest {
 
         @Test
         void shouldIncludeRightAnswers() {
-            QuizQuestion quizQuestion = buildLinkTargetQuizQuestion();
+            QuizQuestionViewedByUser quizQuestion = buildLinkTargetQuizQuestion();
             assertThat(quizQuestion.getDescription(), equalTo("<mark>source</mark> is a specialization of:"));
             assertThat(quizQuestion.getMainTopic(), equalTo(""));
             List<String> options = toOptionStrings(quizQuestion);
@@ -77,13 +76,13 @@ class LinkTargetQuizFactoryTest {
         }
     }
 
-    private QuizQuestion buildLinkTargetQuizQuestion() {
+    private QuizQuestionViewedByUser buildLinkTargetQuizQuestion() {
         QuizQuestionDirector builder = new QuizQuestionDirector(LINK_TARGET, randomizer, reviewPoint, makeMe.modelFactoryService);
-        return builder.buildQuizQuestion();
+        return QuizQuestionViewedByUser.from(builder.buildQuizQuestion(), makeMe.modelFactoryService.noteRepository).orElse(null);
     }
 
-    private List<String> toOptionStrings(QuizQuestion quizQuestion) {
-        return quizQuestion.getOptions().stream().map(QuizQuestionViewedByUser.Option::getDisplay).collect(Collectors.toUnmodifiableList());
+    private List<String> toOptionStrings(QuizQuestionViewedByUser quizQuestion) {
+        return quizQuestion.getOptions().stream().map(QuizQuestionViewedByUser.Option::getDisplay).toList();
     }
 }
 

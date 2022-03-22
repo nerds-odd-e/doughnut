@@ -5,6 +5,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.models.NoteViewer;
+import com.odde.doughnut.models.quizFacotries.QuizQuestionPresenter;
 import lombok.Getter;
 
 import java.util.List;
@@ -15,26 +16,33 @@ public class QuizQuestionViewedByUser {
 
     public Integer id;
 
+    @Getter
     public QuizQuestion.QuestionType questionType;
 
+    @Getter
     public String description;
 
+    @Getter
     public String mainTopic;
 
+    @Getter
     public Map<Link.LinkType, LinkViewed> hintLinks;
 
+    @Getter
     public List<Integer> viceReviewPointIdList;
 
     public List<Note> scope;
 
+    @Getter
     public List<Option> options;
 
     public static Optional<QuizQuestionViewedByUser> from(QuizQuestion quizQuestion, NoteRepository noteRepository) {
         if(quizQuestion == null) return Optional.empty();
+        QuizQuestionPresenter presenter = quizQuestion.getQuestionType().presenter.apply(quizQuestion);
         QuizQuestionViewedByUser question = new QuizQuestionViewedByUser();
         question.id = quizQuestion.getId();
         question.questionType = quizQuestion.getQuestionType();
-        question.description = quizQuestion.getDescription();
+        question.description = presenter.instruction();
         question.mainTopic = quizQuestion.getMainTopic();
         question.hintLinks = quizQuestion.getHintLinks();
         question.viceReviewPointIdList = quizQuestion.getViceReviewPointIdList();

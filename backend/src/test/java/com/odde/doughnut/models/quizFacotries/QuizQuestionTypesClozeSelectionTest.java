@@ -61,7 +61,7 @@ class QuizQuestionTypesClozeSelectionTest {
         @Test
         void shouldIncludeRightAnswers() {
             makeMe.refresh(top);
-            QuizQuestion quizQuestion = buildClozeQuizQuestion();
+            QuizQuestionViewedByUser quizQuestion = buildClozeQuizQuestion();
             assertThat(quizQuestion.getDescription(), equalTo("descrption"));
             assertThat(quizQuestion.getMainTopic(), equalTo(""));
             List<String> options = toOptionStrings(quizQuestion);
@@ -74,19 +74,19 @@ class QuizQuestionTypesClozeSelectionTest {
             makeMe.theNote(note1).linkTo(note2, Link.LinkType.TAGGED_BY).please();
             makeMe.theNote(note1).linkTo(note2, Link.LinkType.SPECIALIZE).please();
             makeMe.refresh(top);
-            QuizQuestion quizQuestion = buildClozeQuizQuestion();
+            QuizQuestionViewedByUser quizQuestion = buildClozeQuizQuestion();
             Map<Link.LinkType, LinkViewed> hintLinks = quizQuestion.getHintLinks();
             assertThat(Link.LinkType.TAGGED_BY, in(hintLinks.keySet()));
             assertThat(Link.LinkType.SPECIALIZE, not(in(hintLinks.keySet())));
         }
 
-        private QuizQuestion buildClozeQuizQuestion() {
+        private QuizQuestionViewedByUser buildClozeQuizQuestion() {
             QuizQuestionDirector builder = new QuizQuestionDirector(CLOZE_SELECTION, randomizer, reviewPoint, makeMe.modelFactoryService);
-            return builder.buildQuizQuestion();
+            return QuizQuestionViewedByUser.from(builder.buildQuizQuestion(), makeMe.modelFactoryService.noteRepository).orElse(null);
         }
 
-        private List<String> toOptionStrings(QuizQuestion quizQuestion) {
-            return quizQuestion.getOptions().stream().map(QuizQuestionViewedByUser.Option::getDisplay).collect(Collectors.toUnmodifiableList());
+        private List<String> toOptionStrings(QuizQuestionViewedByUser quizQuestion) {
+            return quizQuestion.getOptions().stream().map(QuizQuestionViewedByUser.Option::getDisplay).toList();
         }
     }
 }

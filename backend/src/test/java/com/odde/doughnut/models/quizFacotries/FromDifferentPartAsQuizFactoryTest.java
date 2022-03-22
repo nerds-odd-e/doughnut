@@ -68,8 +68,7 @@ class FromDifferentPartAsQuizFactoryTest {
 
     @Test
     void shouldBeInvalidWhenNoCousin() {
-        QuizQuestion quizQuestion = buildQuestion();
-        assertThat(quizQuestion, nullValue());
+        assertThat( buildQuestion(), nullValue());
     }
 
     @Nested
@@ -84,8 +83,7 @@ class FromDifferentPartAsQuizFactoryTest {
 
         @Test
         void shouldBeInvalidWhenNoFillingOptions() {
-            QuizQuestion quizQuestion = buildQuestion();
-            assertThat(quizQuestion, nullValue());
+            assertThat( buildQuestion(), nullValue());
         }
 
         @Nested
@@ -99,7 +97,7 @@ class FromDifferentPartAsQuizFactoryTest {
 
             @Test
             void shouldIncludeRightAnswersAndFillingOptions() {
-                QuizQuestion quizQuestion = buildQuestion();
+                QuizQuestionViewedByUser quizQuestion = buildQuestion();
                 assertThat(quizQuestion.getDescription(), containsString("<p>Which one <mark>is tagged by</mark> a <em>DIFFERENT</em> part <mark>perspective</mark> than:"));
                 assertThat(quizQuestion.getMainTopic(), containsString(ugly.getTitle()));
                 List<String> strings = toOptionStrings(quizQuestion);
@@ -120,9 +118,7 @@ class FromDifferentPartAsQuizFactoryTest {
 
                 @Test
                 void shouldInclude2ViceReviewPoints() {
-                    QuizQuestion quizQuestion = buildQuestion();
-                    String viceReviewPointIds = quizQuestion.getViceReviewPointIds();
-                    assertThat(viceReviewPointIds, containsString(additionalReviewPoint.getId().toString()));
+                    QuizQuestionViewedByUser quizQuestion = buildQuestion();
                     assertThat(quizQuestion.getViceReviewPointIdList(), contains(additionalReviewPoint.getId()));
 
                 }
@@ -163,12 +159,12 @@ class FromDifferentPartAsQuizFactoryTest {
 
     }
 
-    private QuizQuestion buildQuestion() {
+    private QuizQuestionViewedByUser buildQuestion() {
         QuizQuestionDirector builder = new QuizQuestionDirector(FROM_DIFFERENT_PART_AS, randomizer, uglySubjectiveRp, makeMe.modelFactoryService);
-        return builder.buildQuizQuestion();
+        return QuizQuestionViewedByUser.from(builder.buildQuizQuestion(), makeMe.modelFactoryService.noteRepository).orElse(null);
     }
 
-    private List<String> toOptionStrings(QuizQuestion quizQuestion) {
+    private List<String> toOptionStrings(QuizQuestionViewedByUser quizQuestion) {
         List<QuizQuestionViewedByUser.Option> options = quizQuestion.getOptions();
         return options.stream().map(QuizQuestionViewedByUser.Option::getDisplay).toList();
     }

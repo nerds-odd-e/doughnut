@@ -11,6 +11,7 @@ import com.odde.doughnut.entities.AnswerResult;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.testability.MakeMe;
@@ -60,15 +61,13 @@ class DescriptionLinkTargetQuizFactoryTest {
 
         @Test
         void shouldBeInvalid() {
-            QuizQuestion quizQuestion = buildQuestion();
-            assertThat(quizQuestion, nullValue());
+            assertThat( buildQuestion(), nullValue());
         }
     }
 
     @Test
     void shouldIncludeRightAnswers() {
-        QuizQuestion quizQuestion = buildQuestion();
-        assertThat(quizQuestion.getDescription(), containsString("<p>The following descriptions is a specialization of:</p><pre style='white-space: pre-wrap;'><mark title='Hidden text that is matching the answer'>[...]</mark> is not built in a day</pre>"));
+        assertThat(( buildQuestion()).getDescription(), containsString("<p>The following descriptions is a specialization of:</p><pre style='white-space: pre-wrap;'><mark title='Hidden text that is matching the answer'>[...]</mark> is not built in a day</pre>"));
     }
 
     @Nested
@@ -82,8 +81,7 @@ class DescriptionLinkTargetQuizFactoryTest {
 
         @Test
         void shouldIncludeRightAnswers() {
-            QuizQuestion quizQuestion = buildQuestion();
-            assertThat(quizQuestion.getViceReviewPointIds(), containsString(sourceReviewPoint.getId().toString()));
+            assertThat( buildQuestion().getViceReviewPointIdList(), contains(sourceReviewPoint.getId()));
         }
 
     }
@@ -102,9 +100,9 @@ class DescriptionLinkTargetQuizFactoryTest {
 
 
 
-    private QuizQuestion buildQuestion() {
+    private QuizQuestionViewedByUser buildQuestion() {
         QuizQuestionDirector builder = new QuizQuestionDirector(DESCRIPTION_LINK_TARGET, randomizer, reviewPoint, makeMe.modelFactoryService);
-        return builder.buildQuizQuestion();
+        return QuizQuestionViewedByUser.from(builder.buildQuizQuestion(), makeMe.modelFactoryService.noteRepository).orElse(null);
     }
 
 }

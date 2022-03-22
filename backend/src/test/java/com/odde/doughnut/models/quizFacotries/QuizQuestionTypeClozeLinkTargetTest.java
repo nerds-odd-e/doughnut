@@ -7,6 +7,7 @@ import static org.hamcrest.Matchers.equalTo;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.testability.MakeMe;
@@ -50,14 +51,13 @@ class ClozeLinkTargetQuizFactoryTest {
     class WhenThereAreMoreThanOneOptions {
         @Test
         void shouldIncludeRightAnswers() {
-            QuizQuestion quizQuestion = buildQuestion();
-            assertThat(quizQuestion.getDescription(), equalTo("<mark><mark title='Hidden text that is matching the answer'>[...]</mark> is not built in a day</mark> is a specialization of:"));
+            assertThat(( buildQuestion()).getDescription(), equalTo("<mark><mark title='Hidden text that is matching the answer'>[...]</mark> is not built in a day</mark> is a specialization of:"));
         }
     }
 
-    private QuizQuestion buildQuestion() {
+    private QuizQuestionViewedByUser buildQuestion() {
         QuizQuestionDirector builder = new QuizQuestionDirector(CLOZE_LINK_TARGET, randomizer, reviewPoint, makeMe.modelFactoryService);
-        return builder.buildQuizQuestion();
+        return QuizQuestionViewedByUser.from(builder.buildQuizQuestion(), makeMe.modelFactoryService.noteRepository).get();
     }
 
 }

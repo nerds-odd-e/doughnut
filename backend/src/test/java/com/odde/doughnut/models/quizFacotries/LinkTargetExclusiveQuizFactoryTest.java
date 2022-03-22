@@ -1,23 +1,11 @@
 package com.odde.doughnut.models.quizFacotries;
 
-import static com.odde.doughnut.entities.QuizQuestion.QuestionType.LINK_SOURCE_EXCLUSIVE;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.in;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.testability.MakeMe;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -26,6 +14,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+import static com.odde.doughnut.entities.QuizQuestion.QuestionType.LINK_SOURCE_EXCLUSIVE;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
@@ -59,8 +53,7 @@ class LinkTargetExclusiveQuizFactoryTest {
 
         @Test
         void shouldReturnNullIfCannotFindCandidateAnswer() {
-            QuizQuestion quizQuestion = buildLinSourceExclusiveQuizQuestion();
-            assertThat(quizQuestion, is(nullValue()));
+            assertThat( buildLinSourceExclusiveQuizQuestion(), is(nullValue()));
         }
 
         @Nested
@@ -74,8 +67,7 @@ class LinkTargetExclusiveQuizFactoryTest {
 
             @Test
             void shouldReturnNullIfNoEnoughOptions() {
-                QuizQuestion quizQuestion = buildLinSourceExclusiveQuizQuestion();
-                assertThat(quizQuestion, is(nullValue()));
+                assertThat( buildLinSourceExclusiveQuizQuestion(), is(nullValue()));
             }
 
             @Nested
@@ -89,7 +81,7 @@ class LinkTargetExclusiveQuizFactoryTest {
                 @Test
                 void shouldIncludeRightAnswers() {
                     makeMe.refresh(top);
-                    QuizQuestion quizQuestion = buildLinSourceExclusiveQuizQuestion();
+                    QuizQuestionViewedByUser quizQuestion = buildLinSourceExclusiveQuizQuestion();
                     assertThat(quizQuestion.getDescription(), equalTo("Which of the following is <em>NOT</em> a specialization of"));
                     assertThat(quizQuestion.getMainTopic(), equalTo(target.getTitle()));
                     List<String> options = toOptionStrings(quizQuestion);
@@ -108,7 +100,7 @@ class LinkTargetExclusiveQuizFactoryTest {
                     source = makeMe.aNote("anotherSource6").under(top).byUser(userModel.getEntity()).linkTo(target).please();
                     makeMe.refresh(top);
                     reviewPoint = makeMe.aReviewPointFor(source.getLinks().get(0)).inMemoryPlease();
-                    QuizQuestion quizQuestion = buildLinSourceExclusiveQuizQuestion();
+                    QuizQuestionViewedByUser quizQuestion = buildLinSourceExclusiveQuizQuestion();
                     List<String> options = toOptionStrings(quizQuestion);
                     assertThat(notRelated.getTitle(), in(options));
                     assertThat(source.getTitle(), in(options));
@@ -116,14 +108,14 @@ class LinkTargetExclusiveQuizFactoryTest {
             }
         }
 
-        private QuizQuestion buildLinSourceExclusiveQuizQuestion() {
+        private QuizQuestionViewedByUser buildLinSourceExclusiveQuizQuestion() {
             QuizQuestionDirector builder = new QuizQuestionDirector(LINK_SOURCE_EXCLUSIVE, randomizer, reviewPoint, makeMe.modelFactoryService);
-            return builder.buildQuizQuestion();
+            return QuizQuestionViewedByUser.from(builder.buildQuizQuestion(), makeMe.modelFactoryService.noteRepository).orElse(null);
         }
     }
 
-    private List<String> toOptionStrings(QuizQuestion quizQuestion) {
-        return quizQuestion.getOptions().stream().map(QuizQuestionViewedByUser.Option::getDisplay).collect(Collectors.toUnmodifiableList());
+    private List<String> toOptionStrings(QuizQuestionViewedByUser quizQuestion) {
+        return quizQuestion.getOptions().stream().map(QuizQuestionViewedByUser.Option::getDisplay).toList();
     }
 }
 

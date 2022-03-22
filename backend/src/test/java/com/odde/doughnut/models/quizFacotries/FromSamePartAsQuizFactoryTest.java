@@ -7,7 +7,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.odde.doughnut.entities.AnswerResult;
 import com.odde.doughnut.entities.Link;
@@ -66,8 +65,7 @@ class FromSamePartAsQuizFactoryTest {
 
     @Test
     void shouldBeInvalidWhenNoCousin() {
-        QuizQuestion quizQuestion = buildQuestion();
-        assertThat(quizQuestion, nullValue());
+        assertThat( buildQuestion(), nullValue());
     }
 
     @Nested
@@ -82,8 +80,7 @@ class FromSamePartAsQuizFactoryTest {
 
         @Test
         void shouldBeInvalidWhenNoFillingOptions() {
-            QuizQuestion quizQuestion = buildQuestion();
-            assertThat(quizQuestion, nullValue());
+            assertThat( buildQuestion(), nullValue());
         }
 
         @Nested
@@ -97,8 +94,7 @@ class FromSamePartAsQuizFactoryTest {
 
             @Test
             void shouldBeInvalidWhenNoViceReviewPoint() {
-                QuizQuestion quizQuestion = buildQuestion();
-                assertThat(quizQuestion, nullValue());
+                assertThat( buildQuestion(), nullValue());
             }
 
             @Nested
@@ -111,7 +107,7 @@ class FromSamePartAsQuizFactoryTest {
 
                 @Test
                 void shouldIncludeRightAnswersAndFillingOptions() {
-                    QuizQuestion quizQuestion = buildQuestion();
+                    QuizQuestionViewedByUser quizQuestion = buildQuestion();
                     assertThat(quizQuestion.getDescription(), containsString("<p>Which one <mark>is tagged by</mark> the same part of <mark>perspective</mark> as:"));
                     assertThat(quizQuestion.getMainTopic(), containsString(ugly.getTitle()));
                     List<String> strings = toOptionStrings(quizQuestion);
@@ -130,9 +126,10 @@ class FromSamePartAsQuizFactoryTest {
 
                     @Test
                     void shouldInclude2ViceReviewPoints() {
-                        QuizQuestion quizQuestion = buildQuestion();
-                        String viceReviewPointIds = quizQuestion.getViceReviewPointIds();
-                        assertThat(viceReviewPointIds, containsString(additionalReviewPoint.getId().toString()));
+                        QuizQuestionViewedByUser quizQuestion = buildQuestion();
+                        List<Integer> viceReviewPointIds = quizQuestion.getViceReviewPointIdList();
+                        assertThat(viceReviewPointIds, hasSize(2));
+                        assertThat(additionalReviewPoint.getId(), in(viceReviewPointIds));
                     }
 
                 }
@@ -161,14 +158,14 @@ class FromSamePartAsQuizFactoryTest {
         }
     }
 
-    private QuizQuestion buildQuestion() {
+    private QuizQuestionViewedByUser buildQuestion() {
         QuizQuestionDirector builder = new QuizQuestionDirector(FROM_SAME_PART_AS, randomizer, reviewPoint, makeMe.modelFactoryService);
-        return builder.buildQuizQuestion();
+        return QuizQuestionViewedByUser.from(builder.buildQuizQuestion(), makeMe.modelFactoryService.noteRepository).orElse(null);
     }
 
-    private List<String> toOptionStrings(QuizQuestion quizQuestion) {
+    private List<String> toOptionStrings(QuizQuestionViewedByUser quizQuestion) {
         List<QuizQuestionViewedByUser.Option> options = quizQuestion.getOptions();
-        return options.stream().map(QuizQuestionViewedByUser.Option::getDisplay).collect(Collectors.toUnmodifiableList());
+        return options.stream().map(QuizQuestionViewedByUser.Option::getDisplay).toList();
     }
 }
 

@@ -9,7 +9,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.odde.doughnut.entities.AnswerResult;
 import com.odde.doughnut.entities.Link;
@@ -58,8 +57,7 @@ class WhichSpecHasInstanceQuizFactoryTest {
 
     @Test
     void shouldBeInvalidWhenNoInsatnceOfLink() {
-        QuizQuestion quizQuestion = buildQuestion();
-        assertThat(quizQuestion, nullValue());
+        assertThat( buildQuestion(), nullValue());
     }
 
     @Nested
@@ -71,8 +69,7 @@ class WhichSpecHasInstanceQuizFactoryTest {
 
         @Test
         void shouldBeInvalidWhenNoInsatnceOfLink() {
-            QuizQuestion quizQuestion = buildQuestion();
-            assertThat(quizQuestion, nullValue());
+            assertThat( buildQuestion(), nullValue());
         }
 
         @Nested
@@ -86,8 +83,7 @@ class WhichSpecHasInstanceQuizFactoryTest {
 
             @Test
             void shouldBeInvalidWhenNoViceReviewPoint() {
-                QuizQuestion quizQuestion = buildQuestion();
-                assertThat(quizQuestion, nullValue());
+                assertThat( buildQuestion(), nullValue());
             }
 
             @Nested
@@ -101,7 +97,7 @@ class WhichSpecHasInstanceQuizFactoryTest {
 
                 @Test
                 void shouldIncludeRightAnswers() {
-                    QuizQuestion quizQuestion = buildQuestion();
+                    QuizQuestionViewedByUser quizQuestion = buildQuestion();
                     assertThat(quizQuestion.getDescription(), containsString("<p>Which one is a specialization of <mark>element</mark> <em>and</em> is an instance of <mark>non-official name</mark>:"));
                     List<String> strings = toOptionStrings(quizQuestion);
                     assertThat("metal", in(strings));
@@ -139,8 +135,7 @@ class WhichSpecHasInstanceQuizFactoryTest {
 
                     @Test
                     void shouldBeInvalid() {
-                        QuizQuestion quizQuestion = buildQuestion();
-                        assertThat(quizQuestion, nullValue());
+                        assertThat( buildQuestion(), nullValue());
                     }
                 }
 
@@ -155,8 +150,7 @@ class WhichSpecHasInstanceQuizFactoryTest {
 
                     @Test
                     void options() {
-                        QuizQuestion quizQuestion = buildQuestion();
-                        List<String> strings = toOptionStrings(quizQuestion);
+                        List<String> strings = toOptionStrings( buildQuestion());
                         assertThat("something else", in(strings));
                     }
                 }
@@ -166,14 +160,14 @@ class WhichSpecHasInstanceQuizFactoryTest {
 
     }
 
-    private QuizQuestion buildQuestion() {
+    private QuizQuestionViewedByUser buildQuestion() {
         QuizQuestionDirector builder = new QuizQuestionDirector(WHICH_SPEC_HAS_INSTANCE, randomizer, reviewPoint, makeMe.modelFactoryService);
-        return builder.buildQuizQuestion();
+        return QuizQuestionViewedByUser.from(builder.buildQuizQuestion(), makeMe.modelFactoryService.noteRepository).orElse(null);
     }
 
-    private List<String> toOptionStrings(QuizQuestion quizQuestion) {
+    private List<String> toOptionStrings(QuizQuestionViewedByUser quizQuestion) {
         List<QuizQuestionViewedByUser.Option> options = quizQuestion.getOptions();
-        return options.stream().map(QuizQuestionViewedByUser.Option::getDisplay).collect(Collectors.toUnmodifiableList());
+        return options.stream().map(QuizQuestionViewedByUser.Option::getDisplay).toList();
     }
 }
 

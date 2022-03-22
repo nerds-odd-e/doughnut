@@ -57,8 +57,7 @@ class PictureSelectionQuizFactoryTest {
 
     @Test
     void shouldReturnNullIfCannotFindPicture() {
-        QuizQuestion quizQuestion = buildLinkTargetQuizQuestion();
-        assertThat(quizQuestion, is(nullValue()));
+        assertThat( buildLinkTargetQuizQuestion(), is(nullValue()));
     }
 
     @Nested
@@ -70,8 +69,7 @@ class PictureSelectionQuizFactoryTest {
 
         @Test
         void shouldReturnNullIfCannotFindPicture() {
-            QuizQuestion quizQuestion = buildLinkTargetQuizQuestion();
-            assertThat(quizQuestion, is(nullValue()));
+            assertThat( buildLinkTargetQuizQuestion(), is(nullValue()));
         }
 
         @Nested
@@ -83,7 +81,7 @@ class PictureSelectionQuizFactoryTest {
 
             @Test
             void shouldIncludeRightAnswers() {
-                QuizQuestion quizQuestion = buildLinkTargetQuizQuestion();
+                QuizQuestionViewedByUser quizQuestion = buildLinkTargetQuizQuestion();
                 assertThat(quizQuestion.getDescription(), equalTo(""));
                 assertThat(quizQuestion.getMainTopic(), equalTo("source"));
                 List<String> options = toOptionStrings(quizQuestion);
@@ -100,7 +98,7 @@ class PictureSelectionQuizFactoryTest {
 
             @Test
             void shouldIncludeUncle() {
-                QuizQuestion quizQuestion = buildLinkTargetQuizQuestion();
+                QuizQuestionViewedByUser quizQuestion = buildLinkTargetQuizQuestion();
                 List<String> options = toOptionStrings(quizQuestion);
                 assertThat(uncle.getTitle(), in(options));
             }
@@ -122,13 +120,13 @@ class PictureSelectionQuizFactoryTest {
 
     }
 
-    private QuizQuestion buildLinkTargetQuizQuestion() {
+    private QuizQuestionViewedByUser buildLinkTargetQuizQuestion() {
         QuizQuestionDirector builder = new QuizQuestionDirector(PICTURE_SELECTION, randomizer, reviewPoint, makeMe.modelFactoryService);
-        return builder.buildQuizQuestion();
+        return QuizQuestionViewedByUser.from(builder.buildQuizQuestion(), makeMe.modelFactoryService.noteRepository).orElse(null);
     }
 
-    private List<String> toOptionStrings(QuizQuestion quizQuestion) {
-        return quizQuestion.getOptions().stream().map(QuizQuestionViewedByUser.Option::getDisplay).collect(Collectors.toUnmodifiableList());
+    private List<String> toOptionStrings(QuizQuestionViewedByUser quizQuestion) {
+        return quizQuestion.getOptions().stream().map(QuizQuestionViewedByUser.Option::getDisplay).toList();
     }
 }
 

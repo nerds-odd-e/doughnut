@@ -113,10 +113,6 @@ public class QuizQuestion {
         return this.getQuestionType().presenter.apply(this);
     }
 
-    public String getDescription() {
-        return getPresenter().instruction();
-    }
-
     public String getMainTopic() {
        return getPresenter().mainTopic();
     }

@@ -46,23 +46,21 @@ class QuizQuestionTest {
     @Test
     void aNoteWithNoDescriptionHasNoQuiz() {
         Note note = makeMe.aNote().withNoDescription().byUser(userModel).please();
-        QuizQuestion quizQuestion = getQuizQuestion(note);
-        assertThat(quizQuestion, is(nullValue()));
+        assertThat( getQuizQuestion(note), is(nullValue()));
     }
 
     @Test
     void useClozeDescription() {
         Note note = makeMe.aNote().title("abc").description("abc has 3 letters").please();
-        QuizQuestion quizQuestion = getQuizQuestion(note);
+        QuizQuestionViewedByUser quizQuestion = getQuizQuestion(note);
         assertThat(quizQuestion.getDescription(), equalTo("<mark title='Hidden text that is matching the answer'>[...]</mark> has 3 letters"));
     }
 
     @Nested
     class ClozeSelectionQuiz {
         private List<String> getOptions(Note note) {
-            QuizQuestion quizQuestion = getQuizQuestion(note);
-            List<String> options = quizQuestion.getOptions().stream().map(QuizQuestionViewedByUser.Option::getDisplay).toList();
-            return options;
+            QuizQuestionViewedByUser quizQuestion = getQuizQuestion(note);
+            return quizQuestion.getOptions().stream().map(QuizQuestionViewedByUser.Option::getDisplay).toList();
         }
 
         @Test
@@ -132,8 +130,8 @@ class QuizQuestionTest {
 
     }
 
-    private QuizQuestion getQuizQuestion(Note note) {
-        return getReviewPointModel(note).generateAQuizQuestion(randomizer);
+    private QuizQuestionViewedByUser getQuizQuestion(Note note) {
+        return QuizQuestionViewedByUser.from(getReviewPointModel(note).generateAQuizQuestion(randomizer), makeMe.modelFactoryService.noteRepository).orElse(null);
     }
 
     private ReviewPointModel getReviewPointModel(Note note) {
