@@ -55,13 +55,10 @@ public class QuizQuestionDirector {
         quizQuestion.setOptions(generateOptions(fillingOptions, answerNote));
         quizQuestion.setMainTopic(quizQuestionFactory.generateMainTopic());
         quizQuestion.setHintLinks(quizQuestionFactory.generateHintLinks());
-        quizQuestion.setScope(getScope());
         return quizQuestion;
     }
 
     private List<Note> getScope() {
-        List<Note> scope = quizQuestionFactory.generateScope();
-        if (scope != null) return scope;
         return List.of(reviewPoint.getSourceNote().getNotebook().getHeadNote());
     }
 

@@ -83,10 +83,9 @@ public class QuizQuestion {
     @Setter
     private List<ReviewPoint> viceReviewPoints;
 
-    @Getter
-    @Setter
-    private List<Note> scope;
-
+    public List<Note> getScope() {
+        return List.of(reviewPoint.getSourceNote().getNotebook().getHeadNote());
+    }
 
     public Answer buildAnswer() {
         Answer answer = new Answer();

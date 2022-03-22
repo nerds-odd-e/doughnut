@@ -41,10 +41,6 @@ public interface QuizQuestionFactory {
         return null;
     }
 
-    default List<Note> generateScope() {
-        return null;
-    }
-
     default List<Note> knownRightAnswers() {
         return null;
     }
