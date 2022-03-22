@@ -35,13 +35,13 @@ public class QuizQuestion {
     }
 
     @Getter @Setter
-    private QuestionType questionType = null;
+    private QuestionType questionType;
     @Getter @Setter
-    public List<Option> options;
+    private List<Option> options;
     @Getter @Setter
-    public String description;
+    private String description;
     @Getter @Setter
-    public String mainTopic;
+    private String mainTopic;
     @Getter @Setter
     private Map<Link.LinkType, LinkViewed> hintLinks;
     @Getter @Setter
