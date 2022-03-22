@@ -1,17 +1,31 @@
 package com.odde.doughnut.models.quizFacotries;
 
+import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.QuizQuestion;
+import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.json.LinkViewed;
+import com.odde.doughnut.models.NoteViewer;
+
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public abstract class ClozeDescriptonQuizPresenter implements QuizQuestionPresenter {
-    private QuizQuestion quizQuestion;
+    private final ReviewPoint reviewPoint;
 
     public ClozeDescriptonQuizPresenter(QuizQuestion quizQuestion) {
-        this.quizQuestion = quizQuestion;
+        this.reviewPoint = quizQuestion.getReviewPoint();
     }
 
     @Override
     public String generateInstruction() {
-        return quizQuestion.getReviewPoint().getNote().getClozeDescription();
+        return reviewPoint.getNote().getClozeDescription();
+    }
+
+    @Override
+    public Map<Link.LinkType, LinkViewed> hintLinks() {
+        return new NoteViewer(reviewPoint.getUser(), reviewPoint.getNote()).getAllLinks().entrySet().stream()
+                .filter(x -> Link.LinkType.openTypes().anyMatch((y)->x.getKey().equals(y)))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
     }
 
 }

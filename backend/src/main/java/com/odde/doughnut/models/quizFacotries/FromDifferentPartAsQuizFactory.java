@@ -72,8 +72,4 @@ public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory {
         return categoryLink.map(userModel::getReviewPointFor).map(List::of).orElse(Collections.emptyList());
     }
 
-    @Override
-    public Map<Link.LinkType, LinkViewed> generateHintLinks() {
-        return null;
-    }
 }

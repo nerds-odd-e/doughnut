@@ -38,11 +38,6 @@ public class PictureSelectionQuizFactory implements QuizQuestionFactory {
     }
 
     @Override
-    public Map<Link.LinkType, LinkViewed> generateHintLinks() {
-        return null;
-    }
-
-    @Override
     public QuizQuestion.OptionCreator optionCreator() {
         return new QuizQuestion.PictureOptionCreator();
     }

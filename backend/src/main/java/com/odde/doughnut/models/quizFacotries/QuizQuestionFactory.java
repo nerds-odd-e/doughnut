@@ -19,8 +19,6 @@ public interface QuizQuestionFactory {
 
     Note generateAnswerNote(QuizQuestionServant servant);
 
-    Map<Link.LinkType, LinkViewed> generateHintLinks();
-
     default QuizQuestion.OptionCreator optionCreator() {
         return new QuizQuestion.TitleOptionCreator();
     }

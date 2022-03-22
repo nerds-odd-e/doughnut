@@ -70,9 +70,10 @@ public class QuizQuestion {
     @Getter
     @Setter
     private String mainTopic;
-    @Getter
-    @Setter
-    private Map<Link.LinkType, LinkViewed> hintLinks;
+
+    public Map<Link.LinkType, LinkViewed> getHintLinks() {
+        return getPresenter().hintLinks();
+    }
 
     @Getter
     @Setter

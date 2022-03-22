@@ -43,11 +43,6 @@ public class LinkTargetQuizFactory implements QuizQuestionFactory {
     }
 
     @Override
-    public Map<Link.LinkType, LinkViewed> generateHintLinks() {
-        return null;
-    }
-
-    @Override
     public int minimumFillingOptionCount() {
         return 1;
     }

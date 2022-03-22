@@ -54,7 +54,6 @@ public class QuizQuestionDirector {
         quizQuestion.setCategoryLink(quizQuestionFactory.getCategoryLink());
         quizQuestion.setOptions(generateOptions(fillingOptions, answerNote));
         quizQuestion.setMainTopic(quizQuestionFactory.generateMainTopic());
-        quizQuestion.setHintLinks(quizQuestionFactory.generateHintLinks());
         return quizQuestion;
     }
 

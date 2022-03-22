@@ -39,13 +39,6 @@ public abstract class ClozeDescriptonQuizFactory implements QuizQuestionFactory 
         return List.of(answerNote);
     }
 
-    @Override
-    public Map<Link.LinkType, LinkViewed> generateHintLinks() {
-        return new NoteViewer(reviewPoint.getUser(), answerNote).getAllLinks().entrySet().stream()
-                .filter(x -> Link.LinkType.openTypes().anyMatch((y)->x.getKey().equals(y)))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
-    }
-
     private Note getAnswerNote() {
         return reviewPoint.getNote();
     }

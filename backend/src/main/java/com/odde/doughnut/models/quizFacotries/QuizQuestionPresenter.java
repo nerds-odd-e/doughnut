@@ -12,4 +12,9 @@ import java.util.Map;
 
 public interface QuizQuestionPresenter {
     String generateInstruction();
+
+    default Map<Link.LinkType, LinkViewed> hintLinks() {
+        return null;
+    }
+
 }
