@@ -21,7 +21,7 @@ public class QuizQuestion {
 
     public enum QuestionType {
         CLOZE_SELECTION(ClozeTitleSelectionQuizFactory::new, ClozeTitleSelectionQuizPresenter::new),
-        SPELLING(SpellingQuizFactory::new, null),
+        SPELLING(SpellingQuizFactory::new, SpellingQuizPresenter::new),
         PICTURE_TITLE(PictureTitleSelectionQuizFactory::new, null),
         PICTURE_SELECTION(PictureSelectionQuizFactory::new, null),
         LINK_TARGET(LinkTargetQuizFactory::new, null),
