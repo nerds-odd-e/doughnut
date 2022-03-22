@@ -8,7 +8,6 @@ import com.odde.doughnut.models.quizFacotries.*;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -72,9 +71,13 @@ public class QuizQuestion {
         return getPresenter().hintLinks();
     }
 
-    @Getter
-    @Setter
-    private List<Integer> viceReviewPointIds;
+    public List<Integer> getViceReviewPointIds() {
+        if (viceReviewPoints != null) {
+            return viceReviewPoints.stream().map(ReviewPoint::getId).toList();
+        }
+        return null;
+    }
+
 
     @JsonIgnore
     @Getter
@@ -97,7 +100,7 @@ public class QuizQuestion {
     public Answer buildAnswer() {
         Answer answer = new Answer();
         answer.setQuestionType(questionType);
-        answer.setViceReviewPointIds(viceReviewPointIds);
+        answer.setViceReviewPointIds(getViceReviewPointIds());
         return answer;
     }
 

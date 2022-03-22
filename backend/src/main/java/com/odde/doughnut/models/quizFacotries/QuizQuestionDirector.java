@@ -46,12 +46,7 @@ public class QuizQuestionDirector {
         QuizQuestion quizQuestion = new QuizQuestion(reviewPoint);
         quizQuestion.setQuestionType(questionType);
         quizQuestion.setViceReviewPoints( viceReviewPoints );
-        List<Integer> viceReviewPoinIds = null;
-        if (viceReviewPoints != null) {
-            viceReviewPoinIds = viceReviewPoints.stream().map(ReviewPoint::getId).toList();
-        }
 
-        quizQuestion.setViceReviewPointIds(viceReviewPoinIds);
         quizQuestion.setCategoryLink(quizQuestionFactory.getCategoryLink());
         List<Note> allOptions = mixAndShuffle(fillingOptions, answerNote);
         quizQuestion.setOptionNotes(allOptions);
