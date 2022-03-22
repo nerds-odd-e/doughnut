@@ -46,47 +46,45 @@ public class QuizQuestion {
     @Getter
     private ReviewPoint reviewPoint;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private QuestionType questionType;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private List<Option> options;
 
     @JsonIgnore
-    @Getter @Setter
+    @Getter
+    @Setter
     private Link categoryLink;
 
-    private String description;
-
     private QuizQuestionPresenter getPresenter() {
-        if(this.questionType.presenter != null)
-            return this.questionType.presenter.apply(this);
-        return null;
+        return this.questionType.presenter.apply(this);
     }
 
     public String getDescription() {
-        QuizQuestionPresenter presenter = getPresenter();
-        if(presenter != null) return presenter.generateInstruction();
-        return this.description;
+        return getPresenter().generateInstruction();
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    @Getter @Setter
+    @Getter
+    @Setter
     private String mainTopic;
-    @Getter @Setter
+    @Getter
+    @Setter
     private Map<Link.LinkType, LinkViewed> hintLinks;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private List<Integer> viceReviewPointIds;
 
     @JsonIgnore
-    @Getter @Setter
+    @Getter
+    @Setter
     private List<ReviewPoint> viceReviewPoints;
 
-    @Getter @Setter
+    @Getter
+    @Setter
     private List<Note> scope;
 
 
@@ -98,10 +96,13 @@ public class QuizQuestion {
     }
 
     public static class Option {
-        @Getter private NoteSphere note;
-        @Getter private boolean isPicture = false;
+        @Getter
+        private NoteSphere note;
+        @Getter
+        private boolean isPicture = false;
 
-        private Option() { }
+        private Option() {
+        }
 
         public static Option createTitleOption(Note note) {
             Option option = new Option();

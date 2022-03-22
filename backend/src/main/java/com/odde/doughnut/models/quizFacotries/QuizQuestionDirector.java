@@ -56,7 +56,6 @@ public class QuizQuestionDirector {
         quizQuestion.setMainTopic(quizQuestionFactory.generateMainTopic());
         quizQuestion.setHintLinks(quizQuestionFactory.generateHintLinks());
         quizQuestion.setScope(getScope());
-        quizQuestion.setDescription(quizQuestionFactory.generateInstruction());
         return quizQuestion;
     }
 
