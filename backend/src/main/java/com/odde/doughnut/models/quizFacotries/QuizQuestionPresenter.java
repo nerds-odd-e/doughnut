@@ -18,4 +18,8 @@ public interface QuizQuestionPresenter {
         return null;
     }
 
+    default QuizQuestion.OptionCreator optionCreator() {
+        return new QuizQuestion.TitleOptionCreator();
+    }
+
 }

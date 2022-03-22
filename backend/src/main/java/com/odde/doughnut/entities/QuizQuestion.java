@@ -8,6 +8,7 @@ import com.odde.doughnut.models.quizFacotries.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -50,10 +51,6 @@ public class QuizQuestion {
     @Setter
     private QuestionType questionType;
 
-    @Getter
-    @Setter
-    private List<Option> options;
-
     @JsonIgnore
     @Getter
     @Setter
@@ -87,6 +84,15 @@ public class QuizQuestion {
     public List<Note> getScope() {
         return List.of(reviewPoint.getSourceNote().getNotebook().getHeadNote());
     }
+
+    public List<Option> getOptions() {
+        QuizQuestion.OptionCreator optionCreator = getPresenter().optionCreator();
+        return optionNotes.stream().map(optionCreator::optionFromNote).toList();
+    }
+
+    @JsonIgnore
+    @Getter @Setter
+    private List<Note> optionNotes;
 
     public Answer buildAnswer() {
         Answer answer = new Answer();

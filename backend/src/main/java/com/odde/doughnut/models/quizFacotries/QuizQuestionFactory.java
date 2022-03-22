@@ -17,10 +17,6 @@ public interface QuizQuestionFactory {
 
     Note generateAnswerNote(QuizQuestionServant servant);
 
-    default QuizQuestion.OptionCreator optionCreator() {
-        return new QuizQuestion.TitleOptionCreator();
-    }
-
     default boolean isValidQuestion() {
         return true;
     }

@@ -21,4 +21,9 @@ public class PictureSelectionQuizPresenter implements QuizQuestionPresenter {
         return "";
     }
 
+    @Override
+    public QuizQuestion.OptionCreator optionCreator() {
+        return new QuizQuestion.PictureOptionCreator();
+    }
+
 }

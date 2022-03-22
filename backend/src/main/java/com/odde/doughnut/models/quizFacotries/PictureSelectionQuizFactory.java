@@ -30,11 +30,6 @@ public class PictureSelectionQuizFactory implements QuizQuestionFactory {
     }
 
     @Override
-    public QuizQuestion.OptionCreator optionCreator() {
-        return new QuizQuestion.PictureOptionCreator();
-    }
-
-    @Override
     public boolean isValidQuestion() {
         return !Strings.isEmpty(answerNote.getNotePicture().orElse(null));
     }

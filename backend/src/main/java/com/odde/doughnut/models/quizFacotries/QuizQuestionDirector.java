@@ -6,6 +6,7 @@ import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class QuizQuestionDirector {
@@ -52,18 +53,15 @@ public class QuizQuestionDirector {
 
         quizQuestion.setViceReviewPointIds(viceReviewPoinIds);
         quizQuestion.setCategoryLink(quizQuestionFactory.getCategoryLink());
-        quizQuestion.setOptions(generateOptions(fillingOptions, answerNote));
+        List<Note> allOptions = mixAndShuffle(fillingOptions, answerNote);
+        quizQuestion.setOptionNotes(allOptions);
         return quizQuestion;
     }
 
-    private List<Note> getScope() {
-        return List.of(reviewPoint.getSourceNote().getNotebook().getHeadNote());
-    }
-
-    private List<QuizQuestion.Option> generateOptions(List<Note> fillingOptions, Note answerNote) {
-        fillingOptions.add(answerNote);
-        randomizer.shuffle(fillingOptions);
-        QuizQuestion.OptionCreator optionCreator = quizQuestionFactory.optionCreator();
-        return fillingOptions.stream().map(optionCreator::optionFromNote).toList();
+    private List<Note> mixAndShuffle(List<Note> fillingOptions, Note answerNote) {
+        List<Note> result = new ArrayList<>(fillingOptions);
+        result.add(answerNote);
+        randomizer.shuffle(result);
+        return result;
     }
 }
