@@ -9,7 +9,7 @@ public class WhichSpecHasInstanceQuizPresenter implements QuizQuestionPresenter 
 
     public WhichSpecHasInstanceQuizPresenter(QuizQuestion quizQuestion) {
         this.link = quizQuestion.getReviewPoint().getLink();
-        this.instanceLink = quizQuestion.getViceReviewPoints().get(0).getLink();
+        this.instanceLink = quizQuestion.getCategoryLink();
     }
 
     @Override

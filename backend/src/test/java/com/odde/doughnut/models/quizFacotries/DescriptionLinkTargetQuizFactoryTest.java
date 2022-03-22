@@ -83,7 +83,7 @@ class DescriptionLinkTargetQuizFactoryTest {
         @Test
         void shouldIncludeRightAnswers() {
             QuizQuestion quizQuestion = buildQuestion();
-            assertThat(quizQuestion.getViceReviewPointIds(), contains(sourceReviewPoint.getId()));
+            assertThat(quizQuestion.getViceReviewPointIds(), containsString(sourceReviewPoint.getId().toString()));
         }
 
     }

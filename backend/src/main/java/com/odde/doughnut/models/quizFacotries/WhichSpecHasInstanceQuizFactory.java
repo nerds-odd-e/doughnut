@@ -92,6 +92,9 @@ public class WhichSpecHasInstanceQuizFactory implements QuizQuestionFactory {
     }
 
     @Override
+    public Link getCategoryLink() { return cachedInstanceLink; }
+
+    @Override
     public List<Note> knownRightAnswers() {
         return List.of(link.getSourceNote());
     }

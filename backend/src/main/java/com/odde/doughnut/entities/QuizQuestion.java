@@ -79,14 +79,16 @@ public class QuizQuestion {
 
     @JsonIgnore
     @Column(name = "vice_review_point_ids")
-    @Getter @Setter
-    private String vice_review_point_ids = "";
-
-    @JsonIgnore
-    @Transient
     @Getter
-    @Setter
-    private List<ReviewPoint> viceReviewPoints;
+    private String viceReviewPointIds = "";
+
+    public void setViceReviewPoints(List<ReviewPoint> reviewPoints) {
+        if(reviewPoints == null) {
+            viceReviewPointIds = "";
+            return;
+        }
+        viceReviewPointIds = reviewPoints.stream().map(ReviewPoint::getId).map(Object::toString).collect(Collectors.joining(","));
+    }
 
     @JsonIgnore
     @Transient
@@ -117,12 +119,10 @@ public class QuizQuestion {
         return getPresenter().hintLinks();
     }
 
-    public List<Integer> getViceReviewPointIds() {
-        if (viceReviewPoints != null) {
-            return viceReviewPoints.stream().map(ReviewPoint::getId).toList();
-        }
-        return null;
+    public List<Integer> getViceReviewPointIds1() {
+        return Arrays.stream(viceReviewPointIds.split(",")).map(Integer::getInteger).collect(Collectors.toList());
     }
+
 
 
     public List<Note> getScope() {
@@ -137,7 +137,7 @@ public class QuizQuestion {
     public Answer buildAnswer() {
         Answer answer = new Answer();
         answer.setQuestionType(getQuestionType());
-        answer.setViceReviewPointIds(getViceReviewPointIds());
+        answer.setViceReviewPointIds(getViceReviewPointIds1());
         return answer;
     }
 

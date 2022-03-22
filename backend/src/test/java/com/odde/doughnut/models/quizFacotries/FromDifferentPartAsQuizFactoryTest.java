@@ -123,8 +123,8 @@ class FromDifferentPartAsQuizFactoryTest {
                 @Test
                 void shouldInclude2ViceReviewPoints() {
                     QuizQuestion quizQuestion = buildQuestion();
-                    List<Integer> viceReviewPointIds = quizQuestion.getViceReviewPointIds();
-                    assertThat(additionalReviewPoint.getId(), in(viceReviewPointIds));
+                    String viceReviewPointIds = quizQuestion.getViceReviewPointIds();
+                    assertThat(viceReviewPointIds, containsString(additionalReviewPoint.getId().toString()));
                 }
 
             }
