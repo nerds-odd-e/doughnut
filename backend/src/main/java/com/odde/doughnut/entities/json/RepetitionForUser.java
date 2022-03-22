@@ -13,7 +13,7 @@ public class RepetitionForUser {
     private ReviewPointViewedByUser reviewPointViewedByUser;
     @Getter
     @Setter
-    private Optional<QuizQuestion> quizQuestion;
+    private Optional<QuizQuestionViewedByUser> quizQuestion;
     @Getter
     @Setter
     private Answer emptyAnswer;

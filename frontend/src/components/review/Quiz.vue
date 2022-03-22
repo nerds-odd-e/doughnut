@@ -67,7 +67,7 @@ import TextInput from "../form/TextInput.vue";
 export default defineComponent({
   props:{
     reviewPointViewedByUser: { type: Object as PropType<Generated.ReviewPointViewedByUser>, required: true},
-    quizQuestion: { type: Object as PropType<Generated.QuizQuestion>, required: true},
+    quizQuestion: { type: Object as PropType<Generated.QuizQuestionViewedByUser>, required: true},
     emptyAnswer: Object,
   },
   components: {

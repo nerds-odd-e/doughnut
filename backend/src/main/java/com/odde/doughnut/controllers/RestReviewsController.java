@@ -3,10 +3,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.json.InitialInfo;
-import com.odde.doughnut.entities.json.RepetitionForUser;
-import com.odde.doughnut.entities.json.ReviewPointViewedByUser;
-import com.odde.doughnut.entities.json.SelfEvaluation;
+import com.odde.doughnut.entities.json.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.ReviewPointModel;
 import com.odde.doughnut.models.Reviewing;
@@ -85,7 +82,8 @@ class RestReviewsController {
             QuizQuestion quizQuestion = reviewPointModel.generateAQuizQuestion(testabilitySettings.getRandomizer());
             if (quizQuestion != null) {
                 modelFactoryService.quizQuestionRepository.save(quizQuestion);
-                repetitionForUser.setQuizQuestion(Optional.of(quizQuestion));
+                repetitionForUser.setQuizQuestion(
+                        QuizQuestionViewedByUser.from(quizQuestion, modelFactoryService.noteRepository));
                 repetitionForUser.setEmptyAnswer(quizQuestion.buildAnswer());
             }
         }

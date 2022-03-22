@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import com.odde.doughnut.models.ReviewPointModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
@@ -60,7 +61,7 @@ class QuizQuestionTest {
     class ClozeSelectionQuiz {
         private List<String> getOptions(Note note) {
             QuizQuestion quizQuestion = getQuizQuestion(note);
-            List<String> options = quizQuestion.getOptions().stream().map(QuizQuestion.Option::getDisplay).collect(Collectors.toUnmodifiableList());
+            List<String> options = quizQuestion.getOptions().stream().map(QuizQuestionViewedByUser.Option::getDisplay).toList();
             return options;
         }
 

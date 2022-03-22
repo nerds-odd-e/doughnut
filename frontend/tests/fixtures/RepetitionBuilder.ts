@@ -5,7 +5,7 @@ import ReviewPointBuilder from "./ReviewPointBuilder";
 class RepetitionBuilder extends Builder<Generated.RepetitionForUser> {
   note?: Generated.NoteSphere
 
-  quizQuestion?: Generated.QuizQuestion
+  quizQuestion?: Generated.QuizQuestionViewedByUser
 
   ofNote(note: Generated.NoteSphere): RepetitionBuilder {
     this.note = note
@@ -25,7 +25,6 @@ class RepetitionBuilder extends Builder<Generated.RepetitionForUser> {
           description: "answer",
           mainTopic: "",
           hintLinks: {},
-          viceReviewPointIds: [],
           scope: []
         }
 

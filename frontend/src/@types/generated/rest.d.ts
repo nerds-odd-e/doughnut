@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-03-22 14:17:18.
+// Generated using typescript-generator version 2.35.1025 on 2022-03-22 19:24:25.
 
 declare namespace Generated {
 
@@ -93,13 +93,24 @@ declare namespace Generated {
         notes: NoteSphere[];
     }
 
+    interface QuizQuestionViewedByUser {
+        id: number;
+        questionType: QuestionType;
+        description: string;
+        mainTopic: string;
+        hintLinks: { [P in LinkType]?: LinkViewed };
+        viceReviewPointIdList: number[];
+        scope: Note[];
+        options: Option[];
+    }
+
     interface RedirectToNoteResponse {
         noteId: number;
     }
 
     interface RepetitionForUser {
         reviewPointViewedByUser: ReviewPointViewedByUser;
-        quizQuestion?: QuizQuestion;
+        quizQuestion?: QuizQuestionViewedByUser;
         emptyAnswer: Answer;
         toRepeatCount: number;
     }
@@ -141,16 +152,16 @@ declare namespace Generated {
         answer: string;
         answerNote: Note;
         questionType: QuestionType;
-        correct: boolean;
         answerDisplay: string;
+        correct: boolean;
     }
 
     interface Reviewing {
         toRepeatCount: number;
         remainingDailyNewNotesCount: number;
+        learntCount: number;
         notLearntCount: number;
         toInitialReviewCount: number;
-        learntCount: number;
     }
 
     interface ReviewPoint {
@@ -177,8 +188,8 @@ declare namespace Generated {
         targetNote: Note;
         typeId: number;
         createdAt: string;
-        linkNameOfSource: string;
         linkTypeLabel: string;
+        linkNameOfSource: string;
     }
 
     interface TextContent {
@@ -213,14 +224,10 @@ declare namespace Generated {
         shortDescription: string;
     }
 
-    interface QuizQuestion {
-        questionType: QuestionType;
-        options: Option[];
-        description: string;
-        mainTopic: string;
-        hintLinks: { [P in LinkType]?: LinkViewed };
-        viceReviewPointIds: number[];
-        scope: Note[];
+    interface Option {
+        note: NoteSphere;
+        picture: boolean;
+        display: string;
     }
 
     interface Answer {
@@ -251,12 +258,6 @@ declare namespace Generated {
         headNote: Note;
         skipReviewEntirely: boolean;
         deletedAt: string;
-    }
-
-    interface Option {
-        note: NoteSphere;
-        picture: boolean;
-        display: string;
     }
 
     type LinkType = "related to" | "a specialization of" | "an application of" | "an instance of" | "a part of" | "tagged by" | "an attribute of" | "the opposite of" | "author of" | "using" | "an example of" | "before" | "similar to" | "confused with";

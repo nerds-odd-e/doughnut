@@ -5,6 +5,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.LinkViewed;
+import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import com.odde.doughnut.models.UserModel;
 
 import java.util.List;
@@ -18,8 +19,8 @@ public interface QuizQuestionPresenter {
         return null;
     }
 
-    default QuizQuestion.OptionCreator optionCreator() {
-        return new QuizQuestion.TitleOptionCreator();
+    default QuizQuestionViewedByUser.OptionCreator optionCreator() {
+        return new QuizQuestionViewedByUser.TitleOptionCreator();
     }
 
 }

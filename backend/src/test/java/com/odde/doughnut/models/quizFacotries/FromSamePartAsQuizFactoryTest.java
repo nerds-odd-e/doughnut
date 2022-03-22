@@ -14,6 +14,7 @@ import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.testability.MakeMe;
@@ -166,8 +167,8 @@ class FromSamePartAsQuizFactoryTest {
     }
 
     private List<String> toOptionStrings(QuizQuestion quizQuestion) {
-        List<QuizQuestion.Option> options = quizQuestion.getOptions();
-        return options.stream().map(QuizQuestion.Option::getDisplay).collect(Collectors.toUnmodifiableList());
+        List<QuizQuestionViewedByUser.Option> options = quizQuestion.getOptions();
+        return options.stream().map(QuizQuestionViewedByUser.Option::getDisplay).collect(Collectors.toUnmodifiableList());
     }
 }
 

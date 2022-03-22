@@ -3,6 +3,7 @@ package com.odde.doughnut.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.entities.json.LinkViewed;
 import com.odde.doughnut.entities.json.NoteSphere;
+import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.quizFacotries.*;
 import lombok.Getter;
@@ -133,8 +134,8 @@ public class QuizQuestion {
         return List.of(reviewPoint.getSourceNote().getNotebook().getHeadNote());
     }
 
-    public List<Option> getOptions() {
-        QuizQuestion.OptionCreator optionCreator = getPresenter().optionCreator();
+    public List<QuizQuestionViewedByUser.Option> getOptions() {
+        QuizQuestionViewedByUser.OptionCreator optionCreator = getPresenter().optionCreator();
         return optionNotes.stream().map(optionCreator::optionFromNote).toList();
     }
 
@@ -145,48 +146,4 @@ public class QuizQuestion {
         return answer;
     }
 
-    public static class Option {
-        @Getter
-        private NoteSphere note;
-        @Getter
-        private boolean isPicture = false;
-
-        private Option() {
-        }
-
-        public static Option createTitleOption(Note note) {
-            Option option = new Option();
-            option.note = new NoteViewer(null, note).toJsonObject();
-            return option;
-        }
-
-        public static Option createPictureOption(Note note) {
-            Option option = new Option();
-            option.note = new NoteViewer(null, note).toJsonObject();
-            option.isPicture = true;
-            return option;
-        }
-
-        public String getDisplay() {
-            return note.getNote().getTitle();
-        }
-    }
-
-    public interface OptionCreator {
-        Option optionFromNote(Note note);
-    }
-
-    public static class TitleOptionCreator implements OptionCreator {
-        @Override
-        public Option optionFromNote(Note note) {
-            return Option.createTitleOption(note);
-        }
-    }
-
-    public static class PictureOptionCreator implements OptionCreator {
-        @Override
-        public Option optionFromNote(Note note) {
-            return Option.createPictureOption(note);
-        }
-    }
 }

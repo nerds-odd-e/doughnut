@@ -2,6 +2,7 @@ package com.odde.doughnut.models.quizFacotries;
 
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 
 public class PictureSelectionQuizPresenter implements QuizQuestionPresenter {
 
@@ -22,8 +23,8 @@ public class PictureSelectionQuizPresenter implements QuizQuestionPresenter {
     }
 
     @Override
-    public QuizQuestion.OptionCreator optionCreator() {
-        return new QuizQuestion.PictureOptionCreator();
+    public QuizQuestionViewedByUser.OptionCreator optionCreator() {
+        return new QuizQuestionViewedByUser.PictureOptionCreator();
     }
 
 }
