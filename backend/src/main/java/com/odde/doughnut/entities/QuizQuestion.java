@@ -1,7 +1,6 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.odde.doughnut.entities.annotations.JsonUseIdInsteadOfReviewPoint;
 import com.odde.doughnut.entities.json.LinkViewed;
 import com.odde.doughnut.entities.json.NoteSphere;
 import com.odde.doughnut.models.NoteViewer;
@@ -14,6 +13,11 @@ import java.util.Map;
 import java.util.function.Function;
 
 public class QuizQuestion {
+
+    public QuizQuestion(ReviewPoint reviewPoint) {
+
+        this.reviewPoint = reviewPoint;
+    }
 
     public enum QuestionType {
         CLOZE_SELECTION(ClozeTitleSelectionQuizFactory::new),

@@ -42,7 +42,7 @@ public class QuizQuestionDirector {
         if(quizQuestionFactory.minimumViceReviewPointCount() > 0 && viceReviewPoinIds.size() < quizQuestionFactory.minimumViceReviewPointCount()) {
             return null;
         }
-        QuizQuestion quizQuestion = new QuizQuestion();
+        QuizQuestion quizQuestion = new QuizQuestion(reviewPoint);
         quizQuestion.setQuestionType(questionType);
         quizQuestion.setViceReviewPointIds(viceReviewPoinIds);
         quizQuestion.setOptions(generateOptions(fillingOptions, answerNote));
@@ -62,7 +62,7 @@ public class QuizQuestionDirector {
     private List<Integer> getViceReviewPoinIds() {
         List<ReviewPoint> viceReviewPoints = quizQuestionFactory.getViceReviewPoints(modelFactoryService.toUserModel(reviewPoint.getUser()));
         if (viceReviewPoints == null) return null;
-        return viceReviewPoints.stream().map(ReviewPoint::getId).collect(Collectors.toUnmodifiableList());
+        return viceReviewPoints.stream().map(ReviewPoint::getId).toList();
     }
 
     private List<QuizQuestion.Option> generateOptions(List<Note> fillingOptions, Note answerNote) {
