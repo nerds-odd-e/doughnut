@@ -7,7 +7,6 @@ import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class QuizQuestionDirector {
     private final QuizQuestion.QuestionType questionType;
@@ -38,16 +37,21 @@ public class QuizQuestionDirector {
         if(quizQuestionFactory.minimumFillingOptionCount() > 0 && fillingOptions.size() < quizQuestionFactory.minimumFillingOptionCount()) {
             return null;
         }
-        List<Integer> viceReviewPoinIds = getViceReviewPoinIds();
-        if(quizQuestionFactory.minimumViceReviewPointCount() > 0 && viceReviewPoinIds.size() < quizQuestionFactory.minimumViceReviewPointCount()) {
+        List<ReviewPoint> viceReviewPoints = quizQuestionFactory.getViceReviewPoints(modelFactoryService.toUserModel(reviewPoint.getUser()));
+
+        if(quizQuestionFactory.minimumViceReviewPointCount() > 0 && viceReviewPoints.size() < quizQuestionFactory.minimumViceReviewPointCount()) {
             return null;
         }
         QuizQuestion quizQuestion = new QuizQuestion(reviewPoint);
         quizQuestion.setQuestionType(questionType);
-        quizQuestion.setViceReviewPoints(
-                quizQuestionFactory.getViceReviewPoints(modelFactoryService.toUserModel(reviewPoint.getUser()))
-        );
+        quizQuestion.setViceReviewPoints( viceReviewPoints );
+        List<Integer> viceReviewPoinIds = null;
+        if (viceReviewPoints != null) {
+            viceReviewPoinIds = viceReviewPoints.stream().map(ReviewPoint::getId).toList();
+        }
+
         quizQuestion.setViceReviewPointIds(viceReviewPoinIds);
+        quizQuestion.setCategoryLink(quizQuestionFactory.getCategoryLink());
         quizQuestion.setOptions(generateOptions(fillingOptions, answerNote));
         quizQuestion.setMainTopic(quizQuestionFactory.generateMainTopic());
         quizQuestion.setHintLinks(quizQuestionFactory.generateHintLinks());
@@ -60,12 +64,6 @@ public class QuizQuestionDirector {
         List<Note> scope = quizQuestionFactory.generateScope();
         if (scope != null) return scope;
         return List.of(reviewPoint.getSourceNote().getNotebook().getHeadNote());
-    }
-
-    private List<Integer> getViceReviewPoinIds() {
-        List<ReviewPoint> viceReviewPoints = quizQuestionFactory.getViceReviewPoints(modelFactoryService.toUserModel(reviewPoint.getUser()));
-        if (viceReviewPoints == null) return null;
-        return viceReviewPoints.stream().map(ReviewPoint::getId).toList();
     }
 
     private List<QuizQuestion.Option> generateOptions(List<Note> fillingOptions, Note answerNote) {

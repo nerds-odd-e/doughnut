@@ -29,7 +29,7 @@ public class QuizQuestion {
         CLOZE_LINK_TARGET(ClozeLinkTargetQuizFactory::new, ClozeLinkTargetQuizPresenter::new),
         DESCRIPTION_LINK_TARGET(DescriptionLinkTargetQuizFactory::new, DescriptionLinkTargetQuizPresenter::new),
         WHICH_SPEC_HAS_INSTANCE(WhichSpecHasInstanceQuizFactory::new, WhichSpecHasInstanceQuizPresenter::new),
-        FROM_SAME_PART_AS(FromSamePartAsQuizFactory::new, null),
+        FROM_SAME_PART_AS(FromSamePartAsQuizFactory::new, FromSamePartAsQuizPresenter::new),
         FROM_DIFFERENT_PART_AS(FromDifferentPartAsQuizFactory::new, null),
         LINK_SOURCE_EXCLUSIVE(LinkTargetExclusiveQuizFactory::new, null);
 
@@ -48,8 +48,13 @@ public class QuizQuestion {
 
     @Getter @Setter
     private QuestionType questionType;
+
     @Getter @Setter
     private List<Option> options;
+
+    @JsonIgnore
+    @Getter @Setter
+    private Link categoryLink;
 
     private String description;
 

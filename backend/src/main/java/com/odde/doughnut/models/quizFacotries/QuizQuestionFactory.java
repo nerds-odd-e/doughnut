@@ -52,4 +52,6 @@ public interface QuizQuestionFactory {
     default List<Note> knownWrongAnswers() {
         return null;
     }
+
+    default Link getCategoryLink() { return null; }
 }
