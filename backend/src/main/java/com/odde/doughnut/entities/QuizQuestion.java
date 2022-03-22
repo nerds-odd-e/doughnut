@@ -76,7 +76,7 @@ public class QuizQuestion {
     @JsonIgnore
     @Column(name = "option_notes")
     @Getter @Setter
-    private String option_note_ids = "";
+    private String optionNoteIds = "";
 
     @JsonIgnore
     @Column(name = "vice_review_point_ids")
@@ -93,8 +93,12 @@ public class QuizQuestion {
 
     @JsonIgnore
     @Transient
-    @Getter @Setter
     private List<Note> optionNotes;
+
+    public void setOptionNotes(List<Note> notes) {
+        optionNotes = notes;
+        optionNoteIds = notes.stream().map(Note::getId).map(Object::toString).collect(Collectors.joining(","));
+    }
 
     public void setQuestionType(QuestionType questionType) {
         this.questionTypeId = questionType.id;
