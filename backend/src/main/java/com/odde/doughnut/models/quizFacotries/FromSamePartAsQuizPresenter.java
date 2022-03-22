@@ -13,7 +13,12 @@ public class FromSamePartAsQuizPresenter implements QuizQuestionPresenter {
     }
 
     @Override
-    public String generateInstruction() {
+    public String mainTopic() {
+        return link.getSourceNote().getTitle();
+    }
+
+    @Override
+    public String instruction() {
         return "<p>Which one <mark>is " +link.getLinkTypeLabel() +"</mark> the same "+categoryLink.getLinkType().nameOfSource+" of <mark>" + categoryLink.getTargetNote().getTitle() + "</mark> as:";
     }
 

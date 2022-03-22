@@ -10,7 +10,7 @@ public class DescriptionLinkTargetQuizPresenter extends LinkTargetQuizPresenter 
     }
 
     @Override
-    public String generateInstruction() {
+    public String instruction() {
         String clozeDescription = ClozeDescription.htmlClosedDescription().getClozeDescription(answerNote.getNoteTitle(), getSourceDescription());
         return "<p>The following descriptions is " + link.getLinkTypeLabel() + ":</p>" + "<pre style='white-space: pre-wrap;'>" + clozeDescription + "</pre> " ;
     }

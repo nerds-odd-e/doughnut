@@ -15,8 +15,6 @@ public interface QuizQuestionFactory {
 
     String generateInstruction();
 
-    String generateMainTopic();
-
     Note generateAnswerNote(QuizQuestionServant servant);
 
     default QuizQuestion.OptionCreator optionCreator() {

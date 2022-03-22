@@ -11,7 +11,12 @@ public class LinkTargetExclusiveQuizPresenter implements QuizQuestionPresenter {
     }
 
     @Override
-    public String generateInstruction() {
+    public String mainTopic() {
+        return link.getTargetNote().getTitle();
+    }
+
+    @Override
+    public String instruction() {
         return String.format("Which of the following is <em>NOT</em> %s", link.getLinkType().label);
     }
 

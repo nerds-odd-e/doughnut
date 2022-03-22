@@ -17,7 +17,12 @@ public abstract class ClozeDescriptonQuizPresenter implements QuizQuestionPresen
     }
 
     @Override
-    public String generateInstruction() {
+    public String mainTopic() {
+        return "";
+    }
+
+    @Override
+    public String instruction() {
         return reviewPoint.getNote().getClozeDescription();
     }
 

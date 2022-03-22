@@ -64,12 +64,12 @@ public class QuizQuestion {
     }
 
     public String getDescription() {
-        return getPresenter().generateInstruction();
+        return getPresenter().instruction();
     }
 
-    @Getter
-    @Setter
-    private String mainTopic;
+    public String getMainTopic() {
+       return getPresenter().mainTopic();
+    }
 
     public Map<Link.LinkType, LinkViewed> getHintLinks() {
         return getPresenter().hintLinks();

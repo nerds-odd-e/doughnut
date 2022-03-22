@@ -1,10 +1,8 @@
 package com.odde.doughnut.models.quizFacotries;
 
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.json.LinkViewed;
 
 import java.util.List;
-import java.util.Map;
 
 public class LinkSourceQuizFactory implements QuizQuestionFactory {
     protected final Link link;
@@ -30,11 +28,6 @@ public class LinkSourceQuizFactory implements QuizQuestionFactory {
     @Override
     public String generateInstruction() {
         return "Which one <em>is immediately " + link.getLinkTypeLabel() + "</em>:";
-    }
-
-    @Override
-    public String generateMainTopic() {
-        return link.getTargetNote().getTitle();
     }
 
     @Override

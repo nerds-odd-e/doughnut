@@ -3,7 +3,6 @@ package com.odde.doughnut.models.quizFacotries;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.json.LinkViewed;
 import com.odde.doughnut.models.UserModel;
 
 import java.util.*;
@@ -45,11 +44,6 @@ public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory {
     @Override
     public String generateInstruction() {
         return "<p>Which one <mark>is " + link.getLinkTypeLabel() + "</mark> a <em>DIFFERENT</em> "+categoryLink.map(lk->lk.getLinkType().nameOfSource).orElse("")+" <mark>" + categoryLink.map(lk->lk.getTargetNote().getTitle()).orElse("") + "</mark> than:";
-    }
-
-    @Override
-    public String generateMainTopic() {
-        return link.getSourceNote().getTitle();
     }
 
     @Override

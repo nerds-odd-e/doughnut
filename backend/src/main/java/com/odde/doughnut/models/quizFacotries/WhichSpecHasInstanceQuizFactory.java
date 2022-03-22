@@ -3,14 +3,12 @@ package com.odde.doughnut.models.quizFacotries;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.json.LinkViewed;
 import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.UserModel;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -41,11 +39,6 @@ public class WhichSpecHasInstanceQuizFactory implements QuizQuestionFactory {
     @Override
     public String generateInstruction() {
         return "<p>Which one is " + link.getLinkTypeLabel() + " <mark>"+link.getTargetNote().getTitle()+"</mark> <em>and</em> is " + cachedInstanceLink.getLinkTypeLabel() + " <mark>" + cachedInstanceLink.getTargetNote().getTitle() + "</mark>:" ;
-    }
-
-    @Override
-    public String generateMainTopic() {
-        return null;
     }
 
     @Override

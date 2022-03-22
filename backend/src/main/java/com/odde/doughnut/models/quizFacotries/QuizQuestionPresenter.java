@@ -11,7 +11,8 @@ import java.util.List;
 import java.util.Map;
 
 public interface QuizQuestionPresenter {
-    String generateInstruction();
+    String instruction();
+    String mainTopic();
 
     default Map<Link.LinkType, LinkViewed> hintLinks() {
         return null;

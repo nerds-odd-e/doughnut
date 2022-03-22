@@ -13,7 +13,12 @@ public class WhichSpecHasInstanceQuizPresenter implements QuizQuestionPresenter 
     }
 
     @Override
-    public String generateInstruction() {
+    public String mainTopic() {
+        return null;
+    }
+
+    @Override
+    public String instruction() {
         return "<p>Which one is " + link.getLinkTypeLabel() + " <mark>"+link.getTargetNote().getTitle()+"</mark> <em>and</em> is " + instanceLink.getLinkTypeLabel() + " <mark>" + instanceLink.getTargetNote().getTitle() + "</mark>:" ;
     }
 

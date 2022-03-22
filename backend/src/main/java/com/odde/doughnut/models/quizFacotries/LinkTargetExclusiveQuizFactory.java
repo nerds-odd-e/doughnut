@@ -3,10 +3,8 @@ package com.odde.doughnut.models.quizFacotries;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.json.LinkViewed;
 
 import java.util.List;
-import java.util.Map;
 
 public class LinkTargetExclusiveQuizFactory implements QuizQuestionFactory {
     private final Link link;
@@ -32,11 +30,6 @@ public class LinkTargetExclusiveQuizFactory implements QuizQuestionFactory {
     @Override
     public String generateInstruction() {
         return String.format("Which of the following is <em>NOT</em> %s", link.getLinkType().label);
-    }
-
-    @Override
-    public String generateMainTopic() {
-        return link.getTargetNote().getTitle();
     }
 
     @Override

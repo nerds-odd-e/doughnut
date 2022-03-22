@@ -1,17 +1,23 @@
 package com.odde.doughnut.models.quizFacotries;
 
 import com.odde.doughnut.entities.QuizQuestion;
+import com.odde.doughnut.entities.ReviewPoint;
 
 public class PictureSelectionQuizPresenter implements QuizQuestionPresenter {
 
-    private QuizQuestion quizQuestion;
+    private ReviewPoint reviewPoint;
 
     public PictureSelectionQuizPresenter(QuizQuestion quizQuestion) {
-        this.quizQuestion = quizQuestion;
+        this.reviewPoint = quizQuestion.getReviewPoint();
     }
 
     @Override
-    public String generateInstruction() {
+    public String mainTopic() {
+        return reviewPoint.getNote().getTitle();
+    }
+
+    @Override
+    public String instruction() {
         return "";
     }
 

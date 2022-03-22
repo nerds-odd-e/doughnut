@@ -53,7 +53,6 @@ public class QuizQuestionDirector {
         quizQuestion.setViceReviewPointIds(viceReviewPoinIds);
         quizQuestion.setCategoryLink(quizQuestionFactory.getCategoryLink());
         quizQuestion.setOptions(generateOptions(fillingOptions, answerNote));
-        quizQuestion.setMainTopic(quizQuestionFactory.generateMainTopic());
         return quizQuestion;
     }
 

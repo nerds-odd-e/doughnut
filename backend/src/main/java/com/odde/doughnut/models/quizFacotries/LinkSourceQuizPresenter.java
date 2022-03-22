@@ -11,7 +11,12 @@ public class LinkSourceQuizPresenter implements QuizQuestionPresenter {
     }
 
     @Override
-    public String generateInstruction() {
+    public String mainTopic() {
+        return link.getTargetNote().getTitle();
+    }
+
+    @Override
+    public String instruction() {
         return "Which one <em>is immediately " + link.getLinkTypeLabel() + "</em>:";
     }
 }

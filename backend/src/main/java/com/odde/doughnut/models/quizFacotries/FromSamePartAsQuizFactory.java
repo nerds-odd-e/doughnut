@@ -3,7 +3,6 @@ package com.odde.doughnut.models.quizFacotries;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.json.LinkViewed;
 import com.odde.doughnut.models.UserModel;
 
 import java.util.*;
@@ -37,11 +36,6 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory {
     @Override
     public String generateInstruction() {
         return "<p>Which one <mark>is " +link.getLinkTypeLabel() +"</mark> the same "+categoryLink.map(lk->lk.getLinkType().nameOfSource).orElse("")+" of <mark>" + categoryLink.map(lk->lk.getTargetNote().getTitle()).orElse("") + "</mark> as:";
-    }
-
-    @Override
-    public String generateMainTopic() {
-        return link.getSourceNote().getTitle();
     }
 
     @Override

@@ -1,14 +1,11 @@
 package com.odde.doughnut.models.quizFacotries;
 
-import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.QuizQuestion;
-import com.odde.doughnut.entities.json.LinkViewed;
 import org.apache.logging.log4j.util.Strings;
 
 import java.util.List;
-import java.util.Map;
 
 public class PictureSelectionQuizFactory implements QuizQuestionFactory {
     private final Note answerNote;
@@ -25,11 +22,6 @@ public class PictureSelectionQuizFactory implements QuizQuestionFactory {
     @Override
     public String generateInstruction() {
         return "";
-    }
-
-    @Override
-    public String generateMainTopic() {
-        return answerNote.getTitle();
     }
 
     @Override

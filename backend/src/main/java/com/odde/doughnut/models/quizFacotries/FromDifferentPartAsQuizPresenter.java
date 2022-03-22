@@ -20,7 +20,13 @@ public class FromDifferentPartAsQuizPresenter implements QuizQuestionPresenter {
     }
 
     @Override
-    public String generateInstruction() {
+    public String instruction() {
         return "<p>Which one <mark>is " + link.getLinkTypeLabel() + "</mark> a <em>DIFFERENT</em> "+categoryLink.getLinkType().nameOfSource+" <mark>" + categoryLink.getTargetNote().getTitle() + "</mark> than:";
     }
+
+    @Override
+    public String mainTopic() {
+        return link.getSourceNote().getTitle();
+    }
+
 }
