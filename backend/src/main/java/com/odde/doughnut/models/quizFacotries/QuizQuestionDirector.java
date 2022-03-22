@@ -44,6 +44,9 @@ public class QuizQuestionDirector {
         }
         QuizQuestion quizQuestion = new QuizQuestion(reviewPoint);
         quizQuestion.setQuestionType(questionType);
+        quizQuestion.setViceReviewPoints(
+                quizQuestionFactory.getViceReviewPoints(modelFactoryService.toUserModel(reviewPoint.getUser()))
+        );
         quizQuestion.setViceReviewPointIds(viceReviewPoinIds);
         quizQuestion.setOptions(generateOptions(fillingOptions, answerNote));
         quizQuestion.setMainTopic(quizQuestionFactory.generateMainTopic());
@@ -69,6 +72,6 @@ public class QuizQuestionDirector {
         fillingOptions.add(answerNote);
         randomizer.shuffle(fillingOptions);
         QuizQuestion.OptionCreator optionCreator = quizQuestionFactory.optionCreator();
-        return fillingOptions.stream().map(optionCreator::optionFromNote).collect(Collectors.toUnmodifiableList());
+        return fillingOptions.stream().map(optionCreator::optionFromNote).toList();
     }
 }

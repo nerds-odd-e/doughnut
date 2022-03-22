@@ -27,8 +27,8 @@ public class QuizQuestion {
         LINK_TARGET(LinkTargetQuizFactory::new, LinkTargetQuizPresenter::new),
         LINK_SOURCE(LinkSourceQuizFactory::new, LinkSourceQuizPresenter::new),
         CLOZE_LINK_TARGET(ClozeLinkTargetQuizFactory::new, ClozeLinkTargetQuizPresenter::new),
-        DESCRIPTION_LINK_TARGET(DescriptionLinkTargetQuizFactory::new, null),
-        WHICH_SPEC_HAS_INSTANCE(WhichSpecHasInstanceQuizFactory::new, null),
+        DESCRIPTION_LINK_TARGET(DescriptionLinkTargetQuizFactory::new, DescriptionLinkTargetQuizPresenter::new),
+        WHICH_SPEC_HAS_INSTANCE(WhichSpecHasInstanceQuizFactory::new, WhichSpecHasInstanceQuizPresenter::new),
         FROM_SAME_PART_AS(FromSamePartAsQuizFactory::new, null),
         FROM_DIFFERENT_PART_AS(FromDifferentPartAsQuizFactory::new, null),
         LINK_SOURCE_EXCLUSIVE(LinkTargetExclusiveQuizFactory::new, null);
@@ -73,8 +73,14 @@ public class QuizQuestion {
     private String mainTopic;
     @Getter @Setter
     private Map<Link.LinkType, LinkViewed> hintLinks;
+
     @Getter @Setter
     private List<Integer> viceReviewPointIds;
+
+    @JsonIgnore
+    @Getter @Setter
+    private List<ReviewPoint> viceReviewPoints;
+
     @Getter @Setter
     private List<Note> scope;
 
