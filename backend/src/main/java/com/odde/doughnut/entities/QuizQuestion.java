@@ -20,35 +20,50 @@ public class QuizQuestion {
     }
 
     public enum QuestionType {
-        CLOZE_SELECTION(ClozeTitleSelectionQuizFactory::new),
-        SPELLING(SpellingQuizFactory::new),
-        PICTURE_TITLE(PictureTitleSelectionQuizFactory::new),
-        PICTURE_SELECTION(PictureSelectionQuizFactory::new),
-        LINK_TARGET(LinkTargetQuizFactory::new),
-        LINK_SOURCE(LinkSourceQuizFactory::new),
-        CLOZE_LINK_TARGET(ClozeLinkTargetQuizFactory::new),
-        DESCRIPTION_LINK_TARGET(DescriptionLinkTargetQuizFactory::new),
-        WHICH_SPEC_HAS_INSTANCE(WhichSpecHasInstanceQuizFactory::new),
-        FROM_SAME_PART_AS(FromSamePartAsQuizFactory::new),
-        FROM_DIFFERENT_PART_AS(FromDifferentPartAsQuizFactory::new),
-        LINK_SOURCE_EXCLUSIVE(LinkTargetExclusiveQuizFactory::new);
+        CLOZE_SELECTION(ClozeTitleSelectionQuizFactory::new, ClozeTitleSelectionQuizPresenter::new),
+        SPELLING(SpellingQuizFactory::new, null),
+        PICTURE_TITLE(PictureTitleSelectionQuizFactory::new, null),
+        PICTURE_SELECTION(PictureSelectionQuizFactory::new, null),
+        LINK_TARGET(LinkTargetQuizFactory::new, null),
+        LINK_SOURCE(LinkSourceQuizFactory::new, null),
+        CLOZE_LINK_TARGET(ClozeLinkTargetQuizFactory::new, null),
+        DESCRIPTION_LINK_TARGET(DescriptionLinkTargetQuizFactory::new, null),
+        WHICH_SPEC_HAS_INSTANCE(WhichSpecHasInstanceQuizFactory::new, null),
+        FROM_SAME_PART_AS(FromSamePartAsQuizFactory::new, null),
+        FROM_DIFFERENT_PART_AS(FromDifferentPartAsQuizFactory::new, null),
+        LINK_SOURCE_EXCLUSIVE(LinkTargetExclusiveQuizFactory::new, null);
 
         public final Function<ReviewPoint, QuizQuestionFactory> factory;
+        public final Function<QuizQuestion, QuizQuestionPresenter> presenter;
 
-        QuestionType(Function<ReviewPoint, QuizQuestionFactory> factory) {
+        QuestionType(Function<ReviewPoint, QuizQuestionFactory> factory, Function<QuizQuestion, QuizQuestionPresenter> presenter) {
             this.factory = factory;
+            this.presenter = presenter;
         }
     }
 
     @JsonIgnore
+    @Getter
     private ReviewPoint reviewPoint;
 
     @Getter @Setter
     private QuestionType questionType;
     @Getter @Setter
     private List<Option> options;
-    @Getter
+
     private String description;
+
+    private QuizQuestionPresenter getPresenter() {
+        if(this.questionType.presenter != null)
+            return this.questionType.presenter.apply(this);
+        return null;
+    }
+
+    public String getDescription() {
+        QuizQuestionPresenter presenter = getPresenter();
+        if(presenter != null) return presenter.generateInstruction();
+        return this.description;
+    }
 
     public void setDescription(String description) {
         this.description = description;
