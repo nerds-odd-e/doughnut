@@ -29,6 +29,8 @@ public class ModelFactoryService {
     @Autowired
     public LinkRepository linkRepository;
     @Autowired
+    public QuizQuestionRepository quizQuestionRepository;
+    @Autowired
     public NotesClosureRepository notesClosureRepository;
     @Autowired
     public NotebookRepository notebookRepository;

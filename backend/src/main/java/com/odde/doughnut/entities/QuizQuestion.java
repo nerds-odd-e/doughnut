@@ -75,12 +75,12 @@ public class QuizQuestion {
     @JsonIgnore
     @Column(name = "option_notes")
     @Getter @Setter
-    private String option_note_ids;
+    private String option_note_ids = "";
 
     @JsonIgnore
     @Column(name = "vice_review_point_ids")
     @Getter @Setter
-    private String vice_review_point_ids;
+    private String vice_review_point_ids = "";
 
     @JsonIgnore
     @Transient

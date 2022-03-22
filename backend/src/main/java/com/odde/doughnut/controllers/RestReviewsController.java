@@ -71,6 +71,7 @@ class RestReviewsController {
     }
 
     @GetMapping("/repeat")
+    @Transactional
     public RepetitionForUser repeatReview() {
         UserModel user = currentUserFetcher.getUser();
         user.getAuthorization().assertLoggedIn();
@@ -83,6 +84,7 @@ class RestReviewsController {
             repetitionForUser.setReviewPointViewedByUser(ReviewPointViewedByUser.from(reviewPointModel.getEntity(), user));
             QuizQuestion quizQuestion = reviewPointModel.generateAQuizQuestion(testabilitySettings.getRandomizer());
             if (quizQuestion != null) {
+                modelFactoryService.quizQuestionRepository.save(quizQuestion);
                 repetitionForUser.setQuizQuestion(Optional.of(quizQuestion));
                 repetitionForUser.setEmptyAnswer(quizQuestion.buildAnswer());
             }
