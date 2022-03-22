@@ -26,6 +26,10 @@ public class EntityIdResolver
 
     @Override
     public Object resolveId(final ObjectIdGenerator.IdKey id) {
+        System.out.println("id.type" +id.type);
+        System.out.println("id.type" +id.type.descriptorString());
+        System.out.println("id.type" +id.type.getAnnotatedInterfaces()[0]);
+        System.out.println("id.toString" +id.toString());
 
         return this.entityManager.find(id.scope, id.key);
     }

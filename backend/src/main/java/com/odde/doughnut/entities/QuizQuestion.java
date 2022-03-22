@@ -1,5 +1,7 @@
 package com.odde.doughnut.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.odde.doughnut.entities.annotations.JsonUseIdInsteadOfReviewPoint;
 import com.odde.doughnut.entities.json.LinkViewed;
 import com.odde.doughnut.entities.json.NoteSphere;
 import com.odde.doughnut.models.NoteViewer;
@@ -34,12 +36,20 @@ public class QuizQuestion {
         }
     }
 
+    @JsonIgnore
+    private ReviewPoint reviewPoint;
+
     @Getter @Setter
     private QuestionType questionType;
     @Getter @Setter
     private List<Option> options;
-    @Getter @Setter
+    @Getter
     private String description;
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     @Getter @Setter
     private String mainTopic;
     @Getter @Setter

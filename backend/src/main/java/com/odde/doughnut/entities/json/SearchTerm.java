@@ -1,11 +1,8 @@
 package com.odde.doughnut.entities.json;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.services.EntityIdResolver;
+import com.odde.doughnut.entities.annotations.JsonUseIdInsteadOfNote;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,12 +20,7 @@ public class SearchTerm {
     @Setter
     private Boolean allMyCircles = false;
 
-    @JsonIdentityInfo(
-            generator = ObjectIdGenerators.PropertyGenerator.class,
-            resolver = EntityIdResolver.class,
-            scope = Note.class,
-            property = "id")
-    @JsonIdentityReference(alwaysAsId = true)
+    @JsonUseIdInsteadOfNote
     public Optional<Note> note = Optional.empty();
 
     @JsonIgnore
