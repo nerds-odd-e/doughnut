@@ -113,8 +113,8 @@ public class ReviewingWithSpacedRepetitionAlgorithmTest {
                         .by(userModel)
                         .nthStrictRepetitionOn(ntimes)
                         .toModelPlease();
-                reviewPoint.repeated(TimestampOperations.addHoursToTimestamp(reviewPoint.entity.getNextReviewAt(), daysDelay * 24));
-                assertThat(reviewPoint.entity.getForgettingCurveIndex(), equalTo(expectedForgettingCurveIndex));
+                reviewPoint.repeated(TimestampOperations.addHoursToTimestamp(reviewPoint.getEntity().getNextReviewAt(), daysDelay * 24));
+                assertThat(reviewPoint.getEntity().getForgettingCurveIndex(), equalTo(expectedForgettingCurveIndex));
             }
         }
 

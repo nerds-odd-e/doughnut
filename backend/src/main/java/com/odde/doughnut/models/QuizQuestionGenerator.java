@@ -9,21 +9,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class QuizQuestionGenerator {
-    private final ReviewPoint reviewPoint;
-    private final Randomizer randomizer;
-
-    public QuizQuestionGenerator(ReviewPoint reviewPoint, Randomizer randomizer) {
-        this.reviewPoint = reviewPoint;
-        this.randomizer = randomizer;
-    }
+public record QuizQuestionGenerator(ReviewPoint reviewPoint,
+                                    Randomizer randomizer) {
 
     List<QuizQuestion.QuestionType> availableQuestionTypes() {
         List<QuizQuestion.QuestionType> questionTypes = new ArrayList<>();
         if (reviewPoint.getLink() != null) {
             Collections.addAll(questionTypes, reviewPoint.getLink().getLinkType().getQuestionTypes());
-        }
-        else {
+        } else {
             questionTypes.add(QuizQuestion.QuestionType.SPELLING);
             questionTypes.add(QuizQuestion.QuestionType.CLOZE_SELECTION);
             questionTypes.add(QuizQuestion.QuestionType.PICTURE_TITLE);
@@ -35,12 +28,11 @@ public class QuizQuestionGenerator {
     QuizQuestion generateQuestion(ModelFactoryService modelFactoryService) {
         List<QuizQuestion.QuestionType> questionTypes = availableQuestionTypes();
         randomizer.shuffle(questionTypes);
-        for(QuizQuestion.QuestionType type: questionTypes) {
+        for (QuizQuestion.QuestionType type : questionTypes) {
             QuizQuestionDirector quizQuestionDirector = new QuizQuestionDirector(type, randomizer, reviewPoint, modelFactoryService);
             QuizQuestion quizQuestion = quizQuestionDirector.buildQuizQuestion();
             if (quizQuestion != null) return quizQuestion;
         }
         return null;
     }
-
 }

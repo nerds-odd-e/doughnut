@@ -5,18 +5,13 @@ import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.ReviewSetting;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import lombok.Getter;
 
 import java.sql.Timestamp;
 
-public class ReviewPointModel {
-    @Getter
-    protected final ReviewPoint entity;
-    protected final ModelFactoryService modelFactoryService;
-
-    public ReviewPointModel(ReviewPoint entity, ModelFactoryService modelFactoryService) {
-        this.entity = entity;
-        this.modelFactoryService = modelFactoryService;
+public record ReviewPointModel(ReviewPoint entity,
+                               ModelFactoryService modelFactoryService) {
+    public ReviewPoint getEntity() {
+        return entity;
     }
 
     public void initialReview(UserModel userModel, ReviewSetting reviewSetting, Timestamp currentUTCTimestamp) {
