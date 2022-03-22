@@ -34,7 +34,6 @@ public class QuizQuestion {
         }
     }
 
-    private final ReviewPoint reviewPoint;
     @Getter @Setter
     private QuestionType questionType = null;
     @Getter @Setter
@@ -50,10 +49,6 @@ public class QuizQuestion {
     @Getter @Setter
     private List<Note> scope;
 
-
-    public QuizQuestion(ReviewPoint reviewPoint) {
-        this.reviewPoint = reviewPoint;
-    }
 
     public Answer buildAnswer() {
         Answer answer = new Answer();

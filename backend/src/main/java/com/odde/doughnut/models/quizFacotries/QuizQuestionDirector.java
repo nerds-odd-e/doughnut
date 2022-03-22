@@ -42,7 +42,7 @@ public class QuizQuestionDirector {
         if(quizQuestionFactory.minimumViceReviewPointCount() > 0 && viceReviewPoinIds.size() < quizQuestionFactory.minimumViceReviewPointCount()) {
             return null;
         }
-        QuizQuestion quizQuestion = new QuizQuestion(reviewPoint);
+        QuizQuestion quizQuestion = new QuizQuestion();
         quizQuestion.setQuestionType(questionType);
         quizQuestion.setViceReviewPointIds(viceReviewPoinIds);
         quizQuestion.setOptions(generateOptions(fillingOptions, answerNote));

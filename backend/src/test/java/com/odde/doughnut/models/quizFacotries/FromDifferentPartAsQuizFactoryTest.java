@@ -10,7 +10,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import com.odde.doughnut.entities.AnswerResult;
 import com.odde.doughnut.entities.Link;
@@ -47,7 +46,7 @@ class FromDifferentPartAsQuizFactoryTest {
     Note tall;
     Note kind;
     Link subjectivePerspective;
-    ReviewPoint reviewPoint;
+    ReviewPoint uglySubjectiveRp;
 
 
     @BeforeEach
@@ -65,7 +64,7 @@ class FromDifferentPartAsQuizFactoryTest {
         makeMe.aLink().between(objective, perspective, Link.LinkType.PART).please();
         makeMe.aLink().between(kind, subjective, Link.LinkType.TAGGED_BY).please();
         Link uglySubjective = makeMe.aLink().between(ugly, subjective, Link.LinkType.TAGGED_BY).please();
-        reviewPoint = makeMe.aReviewPointFor(uglySubjective).by(userModel).inMemoryPlease();
+        uglySubjectiveRp = makeMe.aReviewPointFor(uglySubjective).by(userModel).inMemoryPlease();
         makeMe.refresh(top);
     }
 
@@ -132,9 +131,19 @@ class FromDifferentPartAsQuizFactoryTest {
 
             @Nested
             class Answer {
+
                 @Test
                 void correct() {
-                    AnswerResult answerResult = makeMe.anAnswerFor(reviewPoint)
+                    AnswerResult answerResult = makeMe.anAnswerFor(uglySubjectiveRp)
+                            .type(FROM_DIFFERENT_PART_AS)
+                            .answer(tall.getTitle())
+                            .inMemoryPlease();
+                    assertTrue(answerResult.isCorrect());
+                }
+
+                @Test
+                void wrongWhenChooseCousin() {
+                    AnswerResult answerResult = makeMe.anAnswerFor(uglySubjectiveRp)
                             .type(FROM_DIFFERENT_PART_AS)
                             .answer(pretty.getTitle())
                             .inMemoryPlease();
@@ -142,8 +151,8 @@ class FromDifferentPartAsQuizFactoryTest {
                 }
 
                 @Test
-                void wrong() {
-                    AnswerResult answerResult = makeMe.anAnswerFor(reviewPoint)
+                void wrongWhenRandomAnswer() {
+                    AnswerResult answerResult = makeMe.anAnswerFor(uglySubjectiveRp)
                             .type(FROM_DIFFERENT_PART_AS)
                             .answer("metal")
                             .inMemoryPlease();
@@ -155,13 +164,13 @@ class FromDifferentPartAsQuizFactoryTest {
     }
 
     private QuizQuestion buildQuestion() {
-        QuizQuestionDirector builder = new QuizQuestionDirector(FROM_DIFFERENT_PART_AS, randomizer, reviewPoint, makeMe.modelFactoryService);
+        QuizQuestionDirector builder = new QuizQuestionDirector(FROM_DIFFERENT_PART_AS, randomizer, uglySubjectiveRp, makeMe.modelFactoryService);
         return builder.buildQuizQuestion();
     }
 
     private List<String> toOptionStrings(QuizQuestion quizQuestion) {
         List<QuizQuestion.Option> options = quizQuestion.getOptions();
-        return options.stream().map(QuizQuestion.Option::getDisplay).collect(Collectors.toUnmodifiableList());
+        return options.stream().map(QuizQuestion.Option::getDisplay).toList();
     }
 }
 
