@@ -14,11 +14,6 @@ import java.util.function.Function;
 
 public class QuizQuestion {
 
-    public QuizQuestion(ReviewPoint reviewPoint) {
-
-        this.reviewPoint = reviewPoint;
-    }
-
     public enum QuestionType {
         CLOZE_SELECTION(ClozeTitleSelectionQuizFactory::new, ClozeTitleSelectionQuizPresenter::new),
         SPELLING(SpellingQuizFactory::new, SpellingQuizPresenter::new),
@@ -43,7 +38,7 @@ public class QuizQuestion {
     }
 
     @JsonIgnore
-    @Getter
+    @Getter @Setter
     private ReviewPoint reviewPoint;
 
     @Getter

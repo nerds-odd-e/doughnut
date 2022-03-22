@@ -43,10 +43,11 @@ public class QuizQuestionDirector {
         if(quizQuestionFactory.minimumViceReviewPointCount() > 0 && viceReviewPoints.size() < quizQuestionFactory.minimumViceReviewPointCount()) {
             return null;
         }
-        QuizQuestion quizQuestion = new QuizQuestion(reviewPoint);
+
+        QuizQuestion quizQuestion = new QuizQuestion();
+        quizQuestion.setReviewPoint(reviewPoint);
         quizQuestion.setQuestionType(questionType);
         quizQuestion.setViceReviewPoints( viceReviewPoints );
-
         quizQuestion.setCategoryLink(quizQuestionFactory.getCategoryLink());
         List<Note> allOptions = mixAndShuffle(fillingOptions, answerNote);
         quizQuestion.setOptionNotes(allOptions);
