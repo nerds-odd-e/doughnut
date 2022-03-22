@@ -33,7 +33,7 @@ public class AnswerResult {
     }
 
     public boolean isCorrect() {
-        List<Note> wrongAnswers = questionType.factory.apply(reviewPoint).knownWrongAnswers();
+        List<Note> wrongAnswers = questionType.factory.apply(reviewPoint).allWrongAnswers();
         if (wrongAnswers != null) {
             return wrongAnswers.stream().noneMatch(this::matchAnswer);
         }

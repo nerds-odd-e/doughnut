@@ -37,7 +37,7 @@ public interface QuizQuestionFactory {
         return null;
     }
 
-    default List<Note> knownWrongAnswers() {
+    default List<Note> allWrongAnswers() {
         return null;
     }
 

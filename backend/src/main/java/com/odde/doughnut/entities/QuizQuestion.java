@@ -8,50 +8,101 @@ import com.odde.doughnut.models.quizFacotries.*;
 import lombok.Getter;
 import lombok.Setter;
 
+import javax.persistence.*;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
+@Entity
+@Table(name = "quiz_question")
 public class QuizQuestion {
 
     public enum QuestionType {
-        CLOZE_SELECTION(ClozeTitleSelectionQuizFactory::new, ClozeTitleSelectionQuizPresenter::new),
-        SPELLING(SpellingQuizFactory::new, SpellingQuizPresenter::new),
-        PICTURE_TITLE(PictureTitleSelectionQuizFactory::new, PictureTitleSelectionQuizPresenter::new),
-        PICTURE_SELECTION(PictureSelectionQuizFactory::new, PictureSelectionQuizPresenter::new),
-        LINK_TARGET(LinkTargetQuizFactory::new, LinkTargetQuizPresenter::new),
-        LINK_SOURCE(LinkSourceQuizFactory::new, LinkSourceQuizPresenter::new),
-        CLOZE_LINK_TARGET(ClozeLinkTargetQuizFactory::new, ClozeLinkTargetQuizPresenter::new),
-        DESCRIPTION_LINK_TARGET(DescriptionLinkTargetQuizFactory::new, DescriptionLinkTargetQuizPresenter::new),
-        WHICH_SPEC_HAS_INSTANCE(WhichSpecHasInstanceQuizFactory::new, WhichSpecHasInstanceQuizPresenter::new),
-        FROM_SAME_PART_AS(FromSamePartAsQuizFactory::new, FromSamePartAsQuizPresenter::new),
-        FROM_DIFFERENT_PART_AS(FromDifferentPartAsQuizFactory::new, FromDifferentPartAsQuizPresenter::new),
-        LINK_SOURCE_EXCLUSIVE(LinkTargetExclusiveQuizFactory::new, LinkTargetExclusiveQuizPresenter::new);
+        CLOZE_SELECTION(1, ClozeTitleSelectionQuizFactory::new, ClozeTitleSelectionQuizPresenter::new),
+        SPELLING(2, SpellingQuizFactory::new, SpellingQuizPresenter::new),
+        PICTURE_TITLE(3, PictureTitleSelectionQuizFactory::new, PictureTitleSelectionQuizPresenter::new),
+        PICTURE_SELECTION(4, PictureSelectionQuizFactory::new, PictureSelectionQuizPresenter::new),
+        LINK_TARGET(5, LinkTargetQuizFactory::new, LinkTargetQuizPresenter::new),
+        LINK_SOURCE(6, LinkSourceQuizFactory::new, LinkSourceQuizPresenter::new),
+        CLOZE_LINK_TARGET(7, ClozeLinkTargetQuizFactory::new, ClozeLinkTargetQuizPresenter::new),
+        DESCRIPTION_LINK_TARGET(8, DescriptionLinkTargetQuizFactory::new, DescriptionLinkTargetQuizPresenter::new),
+        WHICH_SPEC_HAS_INSTANCE(9, WhichSpecHasInstanceQuizFactory::new, WhichSpecHasInstanceQuizPresenter::new),
+        FROM_SAME_PART_AS(10, FromSamePartAsQuizFactory::new, FromSamePartAsQuizPresenter::new),
+        FROM_DIFFERENT_PART_AS(11, FromDifferentPartAsQuizFactory::new, FromDifferentPartAsQuizPresenter::new),
+        LINK_SOURCE_EXCLUSIVE(12, LinkTargetExclusiveQuizFactory::new, LinkTargetExclusiveQuizPresenter::new);
 
+        public final Integer id;
         public final Function<ReviewPoint, QuizQuestionFactory> factory;
         public final Function<QuizQuestion, QuizQuestionPresenter> presenter;
 
-        QuestionType(Function<ReviewPoint, QuizQuestionFactory> factory, Function<QuizQuestion, QuizQuestionPresenter> presenter) {
+        QuestionType(Integer id, Function<ReviewPoint, QuizQuestionFactory> factory, Function<QuizQuestion, QuizQuestionPresenter> presenter) {
+            this.id = id;
             this.factory = factory;
             this.presenter = presenter;
         }
+
+        private static final Map<Integer, QuestionType> idMap = Collections.unmodifiableMap(Arrays.stream(values()).collect(Collectors.toMap(x->x.id, x->x)));
+
+        public static QuestionType fromId(Integer id) {
+            return idMap.getOrDefault(id, null);
+        }
     }
 
+    @Id
+    @Getter
+    @GeneratedValue(strategy = GenerationType.IDENTITY) private Integer id;
+
     @JsonIgnore
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "review_point_id", referencedColumnName = "id")
     @Getter @Setter
     private ReviewPoint reviewPoint;
 
-    @Getter
-    @Setter
-    private QuestionType questionType;
+    @Column(name = "question_type")
+    @Getter @Setter
+    private Integer questionTypeId;
 
     @JsonIgnore
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "category_link_id", referencedColumnName = "id")
     @Getter
     @Setter
     private Link categoryLink;
 
+    @JsonIgnore
+    @Column(name = "option_notes")
+    @Getter @Setter
+    private String option_note_ids;
+
+    @JsonIgnore
+    @Column(name = "vice_review_point_ids")
+    @Getter @Setter
+    private String vice_review_point_ids;
+
+    @JsonIgnore
+    @Transient
+    @Getter
+    @Setter
+    private List<ReviewPoint> viceReviewPoints;
+
+    @JsonIgnore
+    @Transient
+    @Getter @Setter
+    private List<Note> optionNotes;
+
+    public void setQuestionType(QuestionType questionType) {
+        this.questionTypeId = questionType.id;
+    }
+
+    public QuestionType getQuestionType() {
+        return QuestionType.fromId(questionTypeId);
+    }
+
     private QuizQuestionPresenter getPresenter() {
-        return this.questionType.presenter.apply(this);
+        return this.getQuestionType().presenter.apply(this);
     }
 
     public String getDescription() {
@@ -74,11 +125,6 @@ public class QuizQuestion {
     }
 
 
-    @JsonIgnore
-    @Getter
-    @Setter
-    private List<ReviewPoint> viceReviewPoints;
-
     public List<Note> getScope() {
         return List.of(reviewPoint.getSourceNote().getNotebook().getHeadNote());
     }
@@ -88,13 +134,9 @@ public class QuizQuestion {
         return optionNotes.stream().map(optionCreator::optionFromNote).toList();
     }
 
-    @JsonIgnore
-    @Getter @Setter
-    private List<Note> optionNotes;
-
     public Answer buildAnswer() {
         Answer answer = new Answer();
-        answer.setQuestionType(questionType);
+        answer.setQuestionType(getQuestionType());
         answer.setViceReviewPointIds(getViceReviewPointIds());
         return answer;
     }
