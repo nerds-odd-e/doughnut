@@ -153,7 +153,7 @@ public class ReviewingInitialReviewTest {
             }
 
             @Test
-            void shouldReturnOneIfUsersDailySettignIsOne() {
+            void shouldReturnOneIfUsersDailySettingIsOne() {
                 assertThat(reviewingOnDay1.getOneInitialReviewPoint().getNote(), equalTo(note1));
             }
 

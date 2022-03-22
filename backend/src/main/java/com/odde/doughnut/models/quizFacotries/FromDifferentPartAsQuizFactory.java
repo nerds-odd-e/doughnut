@@ -57,7 +57,7 @@ public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory {
         categoryLink = servant.chooseOneCategoryLink(reviewPoint.getUser(), link);
         return categoryLink
                 .map(lk -> lk.getReverseLinksOfCousins(reviewPoint.getUser(), link.getLinkType()))
-                .map(remoteCousins -> servant.randomizer.chooseOneRandomly(remoteCousins))
+                .map(servant.randomizer::chooseOneRandomly)
                 .map(Link::getSourceNote)
                 .orElse(null);
     }

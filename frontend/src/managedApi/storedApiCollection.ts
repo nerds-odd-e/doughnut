@@ -55,6 +55,33 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
       },
     },
 
+    testability: {
+      getFeatureToggle() {
+        return (
+          !window.location.href.includes('odd-e.com') &&
+          managedApi
+            .restGet(`testability/feature_toggle`)
+            .then((res) => piniaStore.setFeatureToggle(res as boolean))
+        );
+      },
+
+      async setFeatureToggle(data: boolean) {
+        const res = await managedApi.restPost(`testability/feature_toggle`, {
+          enabled: data,
+        });
+        this.getFeatureToggle();
+        return res;
+      },
+
+      async setRandomizer(data: string) {
+        const res = await managedApi.restPost(`testability/randomizer`, {
+          choose: data,
+        });
+        return res;
+      },
+
+    },
+
     async getNoteWithDescendents(noteId: Doughnut.ID) {
       const res = await managedApi.restGet(`notes/${noteId}/overview`) as Generated.NotesBulk;
       piniaStore.loadNotesBulk(res);
@@ -178,23 +205,6 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
     async createUser(data: Generated.User) {
       const res = await managedApi.restPostMultiplePartForm(`user`, data) as Generated.User;
       piniaStore.setCurrentUser(res);
-      return res;
-    },
-
-    getFeatureToggle() {
-      return (
-        !window.location.href.includes('odd-e.com') &&
-        managedApi
-          .restGet(`testability/feature_toggle`)
-          .then((res) => piniaStore.setFeatureToggle(res as boolean))
-      );
-    },
-
-    async setFeatureToggle(data: boolean) {
-      const res = await managedApi.restPost(`testability/feature_toggle`, {
-        enabled: data,
-      });
-      this.getFeatureToggle();
       return res;
     },
 

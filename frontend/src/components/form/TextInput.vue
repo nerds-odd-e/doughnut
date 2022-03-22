@@ -1,5 +1,5 @@
 <template>
-  <InputWithType v-bind="{ scopeName, field, title, errors }">
+  <InputWithType v-bind="{ scopeName, field, title, errors, hint }">
     <input
       :class="`text-input-control form-control ${!!errors ? 'is-invalid' : ''}`"
       :id="`${scopeName}-${field}`"
@@ -23,6 +23,7 @@ export default {
     scopeName: String,
     field: String,
     title: String,
+    hint: String,
     placeholder: { type: String, default: null },
     autofocus: { type: Boolean, default: false },
     errors: Object,
