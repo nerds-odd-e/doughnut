@@ -30,8 +30,8 @@ public class QuizQuestion {
         DESCRIPTION_LINK_TARGET(DescriptionLinkTargetQuizFactory::new, DescriptionLinkTargetQuizPresenter::new),
         WHICH_SPEC_HAS_INSTANCE(WhichSpecHasInstanceQuizFactory::new, WhichSpecHasInstanceQuizPresenter::new),
         FROM_SAME_PART_AS(FromSamePartAsQuizFactory::new, FromSamePartAsQuizPresenter::new),
-        FROM_DIFFERENT_PART_AS(FromDifferentPartAsQuizFactory::new, null),
-        LINK_SOURCE_EXCLUSIVE(LinkTargetExclusiveQuizFactory::new, null);
+        FROM_DIFFERENT_PART_AS(FromDifferentPartAsQuizFactory::new, FromDifferentPartAsQuizPresenter::new),
+        LINK_SOURCE_EXCLUSIVE(LinkTargetExclusiveQuizFactory::new, LinkTargetExclusiveQuizPresenter::new);
 
         public final Function<ReviewPoint, QuizQuestionFactory> factory;
         public final Function<QuizQuestion, QuizQuestionPresenter> presenter;
