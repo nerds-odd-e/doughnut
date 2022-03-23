@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-03-23 10:55:26.
+// Generated using typescript-generator version 2.35.1025 on 2022-03-23 11:01:45.
 
 declare namespace Generated {
 
@@ -246,6 +246,7 @@ declare namespace Generated {
         answer: string;
         answerNoteId: number;
         questionType: QuestionType;
+        question: QuizQuestion;
         viceReviewPointIds: number[];
     }
 

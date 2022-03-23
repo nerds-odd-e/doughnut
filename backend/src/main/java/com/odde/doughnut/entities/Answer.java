@@ -18,6 +18,10 @@ public class Answer {
     @Setter
     QuizQuestion.QuestionType questionType;
 
+    @Getter
+    @Setter
+    QuizQuestion question;
+
     @Getter @Setter
     private List<Integer> viceReviewPointIds;
 }
