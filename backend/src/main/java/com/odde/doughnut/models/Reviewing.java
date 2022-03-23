@@ -9,6 +9,7 @@ import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import com.odde.doughnut.entities.json.RepetitionForUser;
 import com.odde.doughnut.entities.json.ReviewPointViewedByUser;
+import com.odde.doughnut.entities.json.ReviewStatus;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 
 import java.sql.Timestamp;
@@ -96,7 +97,6 @@ public class Reviewing {
         return Math.min(remainingDailyNewNotesCount(), notLearntCount());
     }
 
-    @JsonProperty
     public int remainingDailyNewNotesCount() {
         long sameDayCount = getNewReviewPointsOfToday().size();
         return (int) (userModel.entity.getDailyNewNotesCount() - sameDayCount);
@@ -132,5 +132,16 @@ public class Reviewing {
         }
         repetitionForUser.setToRepeatCount(toRepeatCount());
         return repetitionForUser;
+    }
+
+    public ReviewStatus getReviewStatus() {
+        ReviewStatus reviewStatus = new ReviewStatus();
+        reviewStatus.toRepeatCount = toRepeatCount();
+        reviewStatus.learntCount = learntCount();
+        reviewStatus.notLearntCount = notLearntCount();
+        reviewStatus.toInitialReviewCount = toInitialReviewCount();
+        reviewStatus.remainingDailyNewNotesCount = remainingDailyNewNotesCount();
+
+        return reviewStatus;
     }
 }

@@ -34,10 +34,10 @@ class RestReviewsController {
     }
 
     @GetMapping("/overview")
-    public Reviewing overview() {
+    public ReviewStatus overview() {
         UserModel user = currentUserFetcher.getUser();
         user.getAuthorization().assertLoggedIn();
-        return user.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
+        return user.createReviewing(testabilitySettings.getCurrentUTCTimestamp()).getReviewStatus();
     }
 
     @GetMapping("/initial")
