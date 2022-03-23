@@ -68,7 +68,6 @@ export default defineComponent({
   props:{
     reviewPointViewedByUser: { type: Object as PropType<Generated.ReviewPointViewedByUser>, required: true},
     quizQuestion: { type: Object as PropType<Generated.QuizQuestionViewedByUser>, required: true},
-    emptyAnswer: { type: Object as PropType<Generated.Answer>, required: true },
   },
   components: {
     BasicBreadcrumb, ShowPicture, NoteFrameOfLinks, TextInput

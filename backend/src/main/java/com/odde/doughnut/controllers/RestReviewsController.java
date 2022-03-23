@@ -83,7 +83,6 @@ class RestReviewsController {
         UserModel user = currentUserFetcher.getUser();
         user.getAuthorization().assertLoggedIn();
         AnswerModel answerModel = modelFactoryService.toAnswerModel(answer);
-
         answerModel.updateReviewPoints(testabilitySettings.getCurrentUTCTimestamp());
         return answerModel.getAnswerResult();
     }
