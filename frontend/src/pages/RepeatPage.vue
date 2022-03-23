@@ -44,7 +44,6 @@
             v-bind="{
               reviewPointViewedByUser: repetition.reviewPointViewedByUser,
               quizQuestion: repetition.quizQuestion,
-              emptyAnswer: repetition.emptyAnswer,
             }"
             @answer="processAnswer($event)"
           />

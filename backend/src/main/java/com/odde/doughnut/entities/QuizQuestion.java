@@ -104,19 +104,14 @@ public class QuizQuestion {
         this.questionTypeId = questionType.id;
     }
 
+    @JsonIgnore
     public QuestionType getQuestionType() {
         return QuestionType.fromId(questionTypeId);
     }
 
+    @JsonIgnore
     public List<Integer> getViceReviewPointIdList() {
-        if(Strings.isBlank(viceReviewPointIds)) return null;
+        if(Strings.isBlank(viceReviewPointIds)) return List.of();
         return Arrays.stream(viceReviewPointIds.split(",")).map(Integer::valueOf).collect(Collectors.toList());
-    }
-
-    public Answer buildAnswer() {
-        Answer answer = new Answer();
-        answer.setQuestionType(getQuestionType());
-        answer.setViceReviewPointIds(getViceReviewPointIdList());
-        return answer;
     }
 }

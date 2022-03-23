@@ -35,7 +35,7 @@ class RestReviewsControllerTests {
     @Autowired
     MakeMe makeMe;
     private UserModel userModel;
-    private TestabilitySettings testabilitySettings = new TestabilitySettings();
+    private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
     @BeforeEach
     void setup() {
@@ -99,7 +99,8 @@ class RestReviewsControllerTests {
         void setup() {
             note1 = makeMe.aNote().please();
             reviewPoint = makeMe.aReviewPointFor(note1).by(userModel).please();
-            answer.setQuestionType(QuizQuestion.QuestionType.CLOZE_SELECTION);
+            QuizQuestion quizQuestion = makeMe.aQuestion().of(QuizQuestion.QuestionType.CLOZE_SELECTION, reviewPoint).inMemoryPlease();
+            answer.setQuestion(quizQuestion);
             answer.setAnswerNoteId(note1.getId());
         }
 
@@ -115,7 +116,8 @@ class RestReviewsControllerTests {
 
         @Test
         void shouldValidateTheWrongAnswer() {
-            answer.setQuestionType(QuizQuestion.QuestionType.SPELLING);
+            QuizQuestion quizQuestion = makeMe.aQuestion().of(QuizQuestion.QuestionType.SPELLING, reviewPoint).inMemoryPlease();
+            answer.setQuestion(quizQuestion);
             answer.setAnswerNoteId(null);
             answer.setAnswer("wrong");
             Integer oldForgettingCurveIndex = reviewPoint.getForgettingCurveIndex();
@@ -130,7 +132,7 @@ class RestReviewsControllerTests {
         void shouldIncreaseTheViceReviewPointToo() {
             Note note2 = makeMe.aNote().please();
             ReviewPoint anotherReviewPoint = makeMe.aReviewPointFor(note2).by(userModel).please();
-            answer.setViceReviewPointIds(List.of(anotherReviewPoint.getId()));
+            answer.getQuestion().setViceReviewPoints(List.of(anotherReviewPoint));
             makeMe.refresh(anotherReviewPoint);
 
             Integer oldForgettingCurveIndex = anotherReviewPoint.getForgettingCurveIndex();

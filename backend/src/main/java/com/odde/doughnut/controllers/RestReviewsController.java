@@ -83,7 +83,6 @@ class RestReviewsController {
             if (quizQuestion != null) {
                 repetitionForUser.setQuizQuestion(
                         QuizQuestionViewedByUser.from(quizQuestion, modelFactoryService.noteRepository));
-                repetitionForUser.setEmptyAnswer(quizQuestion.buildAnswer());
             }
         }
         repetitionForUser.setToRepeatCount(reviewing.toRepeatCount());
@@ -97,17 +96,15 @@ class RestReviewsController {
         user.getAuthorization().assertLoggedIn();
         AnswerResult answerResult = new AnswerResult();
         answerResult.setReviewPoint(reviewPoint);
-        answerResult.setQuestionType(answer.getQuestionType());
+        answerResult.setQuestionType(answer.getQuestion().getQuestionType());
         answerResult.setAnswer(answer.getAnswer());
         if (answer.getAnswerNoteId() != null) {
             answerResult.setAnswerNote(modelFactoryService.noteRepository.findById(answer.getAnswerNoteId()).orElse(null));
         }
-        if (answer.getViceReviewPointIds() != null) {
-            answer.getViceReviewPointIds().forEach(rPid ->
-                    modelFactoryService.reviewPointRepository
-                            .findById(rPid).ifPresent(vice -> updateReviewPoint(vice, answerResult))
-            );
-        }
+        answer.getQuestion().getViceReviewPointIdList().forEach(rPid ->
+                modelFactoryService.reviewPointRepository
+                        .findById(rPid).ifPresent(vice -> updateReviewPoint(vice, answerResult))
+        );
         updateReviewPoint(reviewPoint, answerResult);
         return answerResult;
     }

@@ -118,8 +118,12 @@ public class MakeMe {
         return new ReviewSettingBuilder(this, note);
     }
 
-    public QuizQuestionViewedByUser buildAQuestion(QuizQuestion.QuestionType questionType, ReviewPoint reviewPoint) {
-        QuizQuestionDirector builder = new QuizQuestionDirector(questionType, new NonRandomizer(), reviewPoint, modelFactoryService);
-        return QuizQuestionViewedByUser.from(builder.buildQuizQuestion(), modelFactoryService.noteRepository).orElse(null);
+    public QuizQuestionBuilder aQuestion() {
+        return new QuizQuestionBuilder(this);
     }
+
+    public QuizQuestionViewedByUser buildAQuestion(QuizQuestion.QuestionType questionType, ReviewPoint reviewPoint) {
+        return aQuestion().buildValid(questionType, reviewPoint).ViewedByUserPlease();
+    }
+
 }

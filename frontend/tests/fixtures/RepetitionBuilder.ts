@@ -15,7 +15,15 @@ class RepetitionBuilder extends Builder<Generated.RepetitionForUser> {
 
   withAQuiz(): RepetitionBuilder {
     this.quizQuestion = {
-          id: generateId(),
+          quizQuestion: {
+            id: generateId(),
+            reviewPoint: 0,
+            questionTypeId: 0,
+            categoryLink: 0,
+            optionNoteIds: "",
+            viceReviewPointIds: "",
+            createdAt: "",
+          },
           questionType: "CLOZE_SELECTION",
           options: [
             {
@@ -40,12 +48,6 @@ class RepetitionBuilder extends Builder<Generated.RepetitionForUser> {
     return {
         reviewPointViewedByUser: reviewPointBuilder.do(),
         quizQuestion: this.quizQuestion,
-        emptyAnswer: {
-          answer: '',
-          answerNoteId: 0,
-          questionType: 'CLOZE_SELECTION',
-          viceReviewPointIds: []
-        },
         toRepeatCount: 0,
     }
   }

@@ -86,10 +86,7 @@ export default defineComponent({
       return {
         answer: this.answer,
         answerNoteId: this.answerNoteId,
-        questionType: this.emptyAnswer.questionType,
         question: this.quizQuestion.quizQuestion,
-        viceReviewPointIds: this.emptyAnswer.viceReviewPointIds
-
       }
 
     },

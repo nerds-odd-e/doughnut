@@ -2,7 +2,7 @@ package com.odde.doughnut.testability;
 
 public abstract class EntityBuilder<T> {
     protected final MakeMe makeMe;
-    protected final T entity;
+    protected T entity;
 
     public EntityBuilder(MakeMe makeMe, T entity) {
         this.makeMe = makeMe;

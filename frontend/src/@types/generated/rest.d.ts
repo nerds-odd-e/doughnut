@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-03-23 11:01:45.
+// Generated using typescript-generator version 2.35.1025 on 2022-03-23 11:48:05.
 
 declare namespace Generated {
 
@@ -23,6 +23,7 @@ declare namespace Generated {
 
     interface DummyForGeneratingTypes {
         answerResult: AnswerResult;
+        answer: Answer;
         reviewing: Reviewing;
     }
 
@@ -111,7 +112,6 @@ declare namespace Generated {
     interface RepetitionForUser {
         reviewPointViewedByUser: ReviewPointViewedByUser;
         quizQuestion?: QuizQuestionViewedByUser;
-        emptyAnswer: Answer;
         toRepeatCount: number;
     }
 
@@ -156,12 +156,18 @@ declare namespace Generated {
         correct: boolean;
     }
 
+    interface Answer {
+        answer: string;
+        answerNoteId: number;
+        question: QuizQuestion;
+    }
+
     interface Reviewing {
         toRepeatCount: number;
-        toInitialReviewCount: number;
         remainingDailyNewNotesCount: number;
         learntCount: number;
         notLearntCount: number;
+        toInitialReviewCount: number;
     }
 
     interface ReviewPoint {
@@ -188,8 +194,8 @@ declare namespace Generated {
         targetNote: Note;
         typeId: number;
         createdAt: string;
-        linkNameOfSource: string;
         linkTypeLabel: string;
+        linkNameOfSource: string;
     }
 
     interface TextContent {
@@ -205,8 +211,8 @@ declare namespace Generated {
         createdAt: string;
         title: string;
         notePicture?: string;
-        shortDescription: string;
         parentId?: number;
+        shortDescription: string;
     }
 
     interface Ownership {
@@ -232,22 +238,12 @@ declare namespace Generated {
         optionNoteIds: string;
         viceReviewPointIds: string;
         createdAt: string;
-        questionType: QuestionType;
-        viceReviewPointIdList: number[];
     }
 
     interface Option {
         note: NoteSphere;
         picture: boolean;
         display: string;
-    }
-
-    interface Answer {
-        answer: string;
-        answerNoteId: number;
-        questionType: QuestionType;
-        question: QuizQuestion;
-        viceReviewPointIds: number[];
     }
 
     interface NoteAccessories {

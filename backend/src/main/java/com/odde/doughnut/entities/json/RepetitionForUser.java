@@ -16,8 +16,5 @@ public class RepetitionForUser {
     private Optional<QuizQuestionViewedByUser> quizQuestion;
     @Getter
     @Setter
-    private Answer emptyAnswer;
-    @Getter
-    @Setter
     private Integer toRepeatCount;
 }
