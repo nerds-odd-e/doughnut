@@ -31,15 +31,17 @@ public class AnswerModel {
 
     public AnswerResult getAnswerResult() {
         AnswerResult answerResult = new AnswerResult();
-        answerResult.setReviewPoint(answer.getQuestion().getReviewPoint());
-        answerResult.setQuestionType(answer.getQuestion().getQuestionType());
-        answerResult.setAnswer(answer.getAnswer());
-        if (answer.getAnswerNoteId() != null) {
-            answerResult.setAnswerNote(this.modelFactoryService.noteRepository.findById(answer.getAnswerNoteId()).orElse(null));
-        }
         answerResult.correct = isCorrect();
+        answerResult.answerDisplay = getAnswerDisplay();
 
         return answerResult;
+    }
+
+    private String getAnswerDisplay() {
+        if (getAnswerNote() != null) {
+            return getAnswerNote().getTitle();
+        }
+        return answer.getAnswer();
     }
 
     private boolean isCorrect() {
