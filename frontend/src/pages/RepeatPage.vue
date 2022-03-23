@@ -64,7 +64,8 @@
   </ContainerPage>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue";
 import Minimizable from "../components/commons/Minimizable.vue";
 import Quiz from "../components/review/Quiz.vue";
 import Repetition from "../components/review/Repetition.vue";
@@ -74,7 +75,7 @@ import RepeatProgressBar from "../components/review/RepeatProgressBar.vue";
 import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
 import usePopups from "../components/commons/Popups/usePopup";
 
-export default ({
+export default defineComponent({
   setup() {
     return {...useStoredLoadingApi(), ...usePopups()};
   },
@@ -90,8 +91,8 @@ export default ({
   },
   data() {
     return {
-      repetition: null,
-      answerResult: null,
+      repetition: undefined as Generated.RepetitionForUser | undefined,
+      answerResult: undefined as Generated.AnswerResult | undefined,
       lastResult: null,
       finished: 0,
     };
@@ -104,7 +105,7 @@ export default ({
       return this.reviewPointViewedByUser?.reviewPoint;
     },
     quizMode() {
-      return !!this.repetition.quizQuestion && !this.answerResult;
+      return this.repetition?.quizQuestion && !this.answerResult;
     },
     linkId() {
       return this.reviewPoint?.linkId
@@ -116,7 +117,7 @@ export default ({
       return this.reviewPoint?.id
     },
     hasLastResult() {
-      return this.lastResult && !!this.lastResult.answerResult;
+      return this.lastResult?.answerResult;
     },
   },
   methods: {
@@ -135,7 +136,7 @@ export default ({
         this.$router.push({ name: "reviews" });
         return;
       }
-      if (!!this.repetition.quizQuestion) {
+      if (this.repetition?.quizQuestion) {
         this.$router.push({ name: "repeat-quiz" });
         return;
       }
@@ -166,9 +167,9 @@ export default ({
       return this.fetchData()
     },
 
-    processAnswer(answerData) {
-      this.api.reviewMethods.processAnswer(this.reviewPointId, answerData)
-      .then((res) => {
+    processAnswer(answerData: Generated.Answer) {
+      this.api.reviewMethods.processAnswer(answerData)
+      .then((res: Generated.AnswerResult) => {
         this.answerResult = res
         if (res.correct) {
           this.finished += 1

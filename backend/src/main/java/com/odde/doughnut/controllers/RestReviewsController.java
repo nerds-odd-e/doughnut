@@ -89,13 +89,13 @@ class RestReviewsController {
         return repetitionForUser;
     }
 
-    @PostMapping("/{reviewPoint}/answer")
+    @PostMapping("/answer")
     @Transactional
-    public AnswerResult answerQuiz(ReviewPoint reviewPoint, @Valid @RequestBody Answer answer) {
+    public AnswerResult answerQuiz(@Valid @RequestBody Answer answer) {
         UserModel user = currentUserFetcher.getUser();
         user.getAuthorization().assertLoggedIn();
         AnswerResult answerResult = new AnswerResult();
-        answerResult.setReviewPoint(reviewPoint);
+        answerResult.setReviewPoint(answer.getQuestion().getReviewPoint());
         answerResult.setQuestionType(answer.getQuestion().getQuestionType());
         answerResult.setAnswer(answer.getAnswer());
         if (answer.getAnswerNoteId() != null) {
@@ -105,7 +105,7 @@ class RestReviewsController {
                 modelFactoryService.reviewPointRepository
                         .findById(rPid).ifPresent(vice -> updateReviewPoint(vice, answerResult))
         );
-        updateReviewPoint(reviewPoint, answerResult);
+        updateReviewPoint(answer.getQuestion().getReviewPoint(), answerResult);
         return answerResult;
     }
 
