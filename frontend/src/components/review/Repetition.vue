@@ -8,14 +8,7 @@
     />
   </template>
   <template v-else>
-    <div v-if="answerResult">
-      <div class="alert alert-success" v-if="answerResult.correct">
-        Correct!
-      </div>
-      <div class="alert alert-danger" v-else>
-        {{ "Your answer `" + answerResult.answerDisplay + "` is wrong." }}
-      </div>
-    </div>
+    <AnswerResult v-if="answerResult" v-bind="{answerResult}"/>
 
     <ShowReviewPoint
       v-bind="{ reviewPointViewedByUser }"
@@ -45,6 +38,7 @@ import SvgNoReview from "../svgs/SvgNoReview.vue";
 import ShowReviewPoint from "./ShowReviewPoint.vue";
 import SelfEvaluateButtons from "./SelfEvaluateButtons.vue";
 import ReviewPointAbbr from "./ReviewPointAbbr.vue";
+import AnswerResult from "./AnswerResult.vue";
 
 export default defineComponent({
   name: "Repetition",
@@ -60,6 +54,7 @@ export default defineComponent({
     ShowReviewPoint,
     SelfEvaluateButtons,
     ReviewPointAbbr,
+    AnswerResult,
   },
   data() {
     return {

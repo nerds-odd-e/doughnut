@@ -8,7 +8,7 @@ export default function useLoadingApi({ initalLoading = false, hasFormError = fa
   const loadingData = { loading, formErrors }
   return {
     get managedApi() { return new ManagedApi(loadingData, { skipLoading }) },
-    get api(): ReturnType<typeof apiCollection>  { return apiCollection(this.managedApi) },
+  get api(): ReturnType<typeof apiCollection>  { return apiCollection(this.managedApi) },
     ...loadingData
   };
 }

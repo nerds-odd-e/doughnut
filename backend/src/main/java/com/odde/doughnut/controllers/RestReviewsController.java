@@ -93,6 +93,16 @@ class RestReviewsController {
         return answerResult;
     }
 
+    @GetMapping(path = "/answers/{answer}")
+    public AnswerResult getAnswer(Answer answer) {
+        UserModel user = currentUserFetcher.getUser();
+        user.getAuthorization().assertAuthorization(answer.getQuestion().getReviewPoint());
+        AnswerModel answerModel = modelFactoryService.toAnswerModel(answer);
+        AnswerResult answerResult = answerModel.getAnswerResult();
+        answerResult.reviewPoint = Optional.of(ReviewPointViewedByUser.from(answer.getQuestion().getReviewPoint(), user));
+        return answerResult;
+    }
+
     @PostMapping(path = "/{reviewPoint}/self-evaluate")
     public RepetitionForUser selfEvaluate(ReviewPoint reviewPoint, @RequestBody SelfEvaluation selfEvaluation) {
         if (reviewPoint == null || reviewPoint.getId() == null) {

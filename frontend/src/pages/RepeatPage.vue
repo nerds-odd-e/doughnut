@@ -144,10 +144,9 @@ export default defineComponent({
     },
 
     viewLastResult() {
-      this.answerResult = this.lastResult.answerResult;
-      this.repetition = this.lastResult.repetition;
+      const last = this.lastResult.answerResult;
       this.lastResult = null;
-      this.$router.push({ name: "repeat-answer", params: {answerId: this.answerResult.answerId} });
+      this.$router.push({ name: "repeat-answer", params: {answerId: last.answerId} });
     },
 
     resetRoute() {

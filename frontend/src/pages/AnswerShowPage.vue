@@ -1,6 +1,10 @@
 <template>
-  <LoadingPage v-bind="{ loading, contentExists: !!true }">
-    this is your answer
+  <LoadingPage v-bind="{ loading, contentExists: answerResult }">
+    <AnswerResult v-if="answerResult" v-bind="{answerResult}"/>
+    <ShowReviewPoint
+      v-bind="{ reviewPointViewedByUser }"
+    />
+
   </LoadingPage>
 </template>
 
@@ -9,6 +13,8 @@ import { defineComponent } from 'vue'
 import LoadingPage from "./commons/LoadingPage.vue";
 import NoteSphereComponent from '../components/notes/views/NoteSphereComponent.vue';
 import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
+import AnswerResult from "../components/review/AnswerResult.vue";
+import ShowReviewPoint from '../components/review/ShowReviewPoint.vue';
 
 export default defineComponent({
   setup() {
@@ -16,16 +22,20 @@ export default defineComponent({
   },
   name: "NoteShowPage",
   props: { answerId: Number },
-  components: { LoadingPage, NoteSphereComponent },
+  components: { LoadingPage, NoteSphereComponent, AnswerResult, ShowReviewPoint },
+  data() {
+    return {
+      answerResult: undefined as Generated.AnswerResult | undefined
+    }
+  },
   computed: {
+    reviewPointViewedByUser() {
+      return this.answerResult?.reviewPoint;
+    }
   },
   methods: {
-    fetchData() {
-      // const storedApiCall = this.viewTypeObj.fetchAll ?
-      //                         this.storedApi.getNoteWithDescendents :
-      //                         this.storedApi.getNoteAndItsChildren
-
-      // storedApiCall(this.noteId)
+    async fetchData() {
+      this.answerResult = await this.api.reviewMethods.getAnswer(this.answerId);
     },
   },
   watch: {
