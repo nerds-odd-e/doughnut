@@ -147,7 +147,7 @@ export default defineComponent({
       this.answerResult = this.lastResult.answerResult;
       this.repetition = this.lastResult.repetition;
       this.lastResult = null;
-      this.resetRoute();
+      this.$router.push({ name: "repeat-answer", params: {answerId: this.answerResult.answerId} });
     },
 
     resetRoute() {

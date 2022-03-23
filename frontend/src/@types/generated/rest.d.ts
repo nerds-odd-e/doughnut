@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-03-23 16:23:57.
+// Generated using typescript-generator version 2.35.1025 on 2022-03-23 17:30:06.
 
 declare namespace Generated {
 
@@ -155,6 +155,7 @@ declare namespace Generated {
     }
 
     interface AnswerResult {
+        answerId: number;
         answerDisplay: string;
         correct: boolean;
         nextRepetition?: RepetitionForUser;

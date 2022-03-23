@@ -13,6 +13,7 @@ import FailureReportListPage from "@/pages/FailureReportListPage.vue";
 import FailureReportPage from "@/pages/FailureReportPage.vue";
 import UserProfilePage from "@/pages/UserProfilePage.vue";
 import TestabilityPage from "@/pages/TestabilityPage.vue";
+import AnswerShowPage from "@/pages/AnswerShowPage.vue";
 import NestedPage from '../pages/commons/NestedPage';
 
 const NestedInitialReviewPage = NestedPage(
@@ -35,6 +36,12 @@ const noteAndLinkRoutes = [
       path: `notes/:rawNoteId/:viewType?`,
       name: 'noteShow',
       component: NoteShowPage,
+      props: true,
+  },
+  {
+      path: `answers/:answerId`,
+      name: 'answer',
+      component: AnswerShowPage,
       props: true,
   },
 ];

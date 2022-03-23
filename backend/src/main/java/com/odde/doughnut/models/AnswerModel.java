@@ -31,6 +31,7 @@ public class AnswerModel {
 
     public AnswerResult getAnswerResult() {
         AnswerResult answerResult = new AnswerResult();
+        answerResult.answerId = answer.getId();
         answerResult.correct = isCorrect();
         answerResult.answerDisplay = getAnswerDisplay();
 
