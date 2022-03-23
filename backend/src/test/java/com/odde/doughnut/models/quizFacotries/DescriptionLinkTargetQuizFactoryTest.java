@@ -9,7 +9,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.odde.doughnut.entities.AnswerResult;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import com.odde.doughnut.models.UserModel;
@@ -33,7 +32,6 @@ class DescriptionLinkTargetQuizFactoryTest {
     @Autowired
     MakeMe makeMe;
     UserModel userModel;
-    NonRandomizer randomizer = new NonRandomizer();
     Note top;
     Note target;
     Note source;
@@ -101,8 +99,7 @@ class DescriptionLinkTargetQuizFactoryTest {
 
 
     private QuizQuestionViewedByUser buildQuestion() {
-        QuizQuestionDirector builder = new QuizQuestionDirector(DESCRIPTION_LINK_TARGET, randomizer, reviewPoint, makeMe.modelFactoryService);
-        return QuizQuestionViewedByUser.from(builder.buildQuizQuestion(), makeMe.modelFactoryService.noteRepository).orElse(null);
+        return makeMe.buildAQuestion(DESCRIPTION_LINK_TARGET, reviewPoint);
     }
 
 }

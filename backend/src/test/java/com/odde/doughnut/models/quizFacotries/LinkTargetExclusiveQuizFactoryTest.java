@@ -28,7 +28,6 @@ class LinkTargetExclusiveQuizFactoryTest {
     @Autowired
     MakeMe makeMe;
     UserModel userModel;
-    NonRandomizer randomizer = new NonRandomizer();
 
     @BeforeEach
     void setup() {
@@ -109,8 +108,7 @@ class LinkTargetExclusiveQuizFactoryTest {
         }
 
         private QuizQuestionViewedByUser buildLinSourceExclusiveQuizQuestion() {
-            QuizQuestionDirector builder = new QuizQuestionDirector(LINK_SOURCE_EXCLUSIVE, randomizer, reviewPoint, makeMe.modelFactoryService);
-            return QuizQuestionViewedByUser.from(builder.buildQuizQuestion(), makeMe.modelFactoryService.noteRepository).orElse(null);
+            return makeMe.buildAQuestion(LINK_SOURCE_EXCLUSIVE, reviewPoint);
         }
     }
 

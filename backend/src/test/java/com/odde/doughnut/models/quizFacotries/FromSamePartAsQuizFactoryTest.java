@@ -11,7 +11,6 @@ import java.util.List;
 import com.odde.doughnut.entities.AnswerResult;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import com.odde.doughnut.models.UserModel;
@@ -34,7 +33,6 @@ class FromSamePartAsQuizFactoryTest {
     @Autowired
     MakeMe makeMe;
     UserModel userModel;
-    NonRandomizer randomizer = new NonRandomizer();
     Note top;
     Note perspective;
     Note subjective;
@@ -159,8 +157,7 @@ class FromSamePartAsQuizFactoryTest {
     }
 
     private QuizQuestionViewedByUser buildQuestion() {
-        QuizQuestionDirector builder = new QuizQuestionDirector(FROM_SAME_PART_AS, randomizer, reviewPoint, makeMe.modelFactoryService);
-        return QuizQuestionViewedByUser.from(builder.buildQuizQuestion(), makeMe.modelFactoryService.noteRepository).orElse(null);
+        return makeMe.buildAQuestion(FROM_SAME_PART_AS, reviewPoint);
     }
 
     private List<String> toOptionStrings(QuizQuestionViewedByUser quizQuestion) {

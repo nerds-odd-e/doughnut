@@ -5,7 +5,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import com.odde.doughnut.models.UserModel;
@@ -28,7 +27,6 @@ class ClozeLinkTargetQuizFactoryTest {
     @Autowired
     MakeMe makeMe;
     UserModel userModel;
-    NonRandomizer randomizer = new NonRandomizer();
     Note top;
     Note target;
     Note source;
@@ -56,8 +54,7 @@ class ClozeLinkTargetQuizFactoryTest {
     }
 
     private QuizQuestionViewedByUser buildQuestion() {
-        QuizQuestionDirector builder = new QuizQuestionDirector(CLOZE_LINK_TARGET, randomizer, reviewPoint, makeMe.modelFactoryService);
-        return QuizQuestionViewedByUser.from(builder.buildQuizQuestion(), makeMe.modelFactoryService.noteRepository).get();
+        return makeMe.buildAQuestion(CLOZE_LINK_TARGET, reviewPoint);
     }
 
 }

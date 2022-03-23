@@ -10,14 +10,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
-import com.odde.doughnut.entities.AnswerResult;
-import com.odde.doughnut.entities.Link;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestion;
-import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.testability.MakeMe;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -36,7 +31,6 @@ class WhichSpecHasInstanceQuizFactoryTest {
     @Autowired
     MakeMe makeMe;
     UserModel userModel;
-    NonRandomizer randomizer = new NonRandomizer();
     Note top;
     Note target;
     Note source;
@@ -161,8 +155,7 @@ class WhichSpecHasInstanceQuizFactoryTest {
     }
 
     private QuizQuestionViewedByUser buildQuestion() {
-        QuizQuestionDirector builder = new QuizQuestionDirector(WHICH_SPEC_HAS_INSTANCE, randomizer, reviewPoint, makeMe.modelFactoryService);
-        return QuizQuestionViewedByUser.from(builder.buildQuizQuestion(), makeMe.modelFactoryService.noteRepository).orElse(null);
+        return makeMe.buildAQuestion(WHICH_SPEC_HAS_INSTANCE, this.reviewPoint);
     }
 
     private List<String> toOptionStrings(QuizQuestionViewedByUser quizQuestion) {

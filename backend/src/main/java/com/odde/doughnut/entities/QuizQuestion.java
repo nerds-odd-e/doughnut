@@ -1,8 +1,6 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.odde.doughnut.entities.json.LinkViewed;
-import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import com.odde.doughnut.models.quizFacotries.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -96,12 +94,7 @@ public class QuizQuestion {
         viceReviewPointIds = reviewPoints.stream().map(ReviewPoint::getId).map(Object::toString).collect(Collectors.joining(","));
     }
 
-    @JsonIgnore
-    @Transient
-    private List<Note> optionNotes;
-
     public void setOptionNotes(List<Note> notes) {
-        optionNotes = notes;
         optionNoteIds = notes.stream().map(Note::getId).map(Object::toString).collect(Collectors.joining(","));
     }
 
@@ -113,18 +106,6 @@ public class QuizQuestion {
         return QuestionType.fromId(questionTypeId);
     }
 
-    private QuizQuestionPresenter getPresenter() {
-        return this.getQuestionType().presenter.apply(this);
-    }
-
-    public String getMainTopic() {
-       return getPresenter().mainTopic();
-    }
-
-    public Map<Link.LinkType, LinkViewed> getHintLinks() {
-        return getPresenter().hintLinks();
-    }
-
     public List<Integer> getViceReviewPointIdList() {
         if(Strings.isBlank(viceReviewPointIds)) return null;
         return Arrays.stream(viceReviewPointIds.split(",")).map(Integer::valueOf).collect(Collectors.toList());
@@ -134,16 +115,10 @@ public class QuizQuestion {
         return List.of(reviewPoint.getSourceNote().getNotebook().getHeadNote());
     }
 
-    public List<QuizQuestionViewedByUser.Option> getOptions() {
-        QuizQuestionViewedByUser.OptionCreator optionCreator = getPresenter().optionCreator();
-        return optionNotes.stream().map(optionCreator::optionFromNote).toList();
-    }
-
     public Answer buildAnswer() {
         Answer answer = new Answer();
         answer.setQuestionType(getQuestionType());
         answer.setViceReviewPointIds(getViceReviewPointIdList());
         return answer;
     }
-
 }

@@ -22,5 +22,5 @@ public class NotesClosure {
 
     @Getter
     @Setter
-    private Integer depth;
+    private Integer depth = 0;
 }

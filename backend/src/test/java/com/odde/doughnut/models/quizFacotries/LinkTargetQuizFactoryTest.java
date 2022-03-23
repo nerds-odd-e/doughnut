@@ -1,7 +1,6 @@
 package com.odde.doughnut.models.quizFacotries;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import com.odde.doughnut.models.UserModel;
@@ -17,7 +16,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.odde.doughnut.entities.QuizQuestion.QuestionType.LINK_TARGET;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -30,7 +28,6 @@ class LinkTargetQuizFactoryTest {
     @Autowired
     MakeMe makeMe;
     UserModel userModel;
-    NonRandomizer randomizer = new NonRandomizer();
     Note top;
     Note target;
     Note source;
@@ -77,8 +74,7 @@ class LinkTargetQuizFactoryTest {
     }
 
     private QuizQuestionViewedByUser buildLinkTargetQuizQuestion() {
-        QuizQuestionDirector builder = new QuizQuestionDirector(LINK_TARGET, randomizer, reviewPoint, makeMe.modelFactoryService);
-        return QuizQuestionViewedByUser.from(builder.buildQuizQuestion(), makeMe.modelFactoryService.noteRepository).orElse(null);
+        return makeMe.buildAQuestion(LINK_TARGET, reviewPoint);
     }
 
     private List<String> toOptionStrings(QuizQuestionViewedByUser quizQuestion) {

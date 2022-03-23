@@ -8,9 +8,12 @@ import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionPresenter;
 import lombok.Getter;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public class QuizQuestionViewedByUser {
 
@@ -43,11 +46,14 @@ public class QuizQuestionViewedByUser {
         question.id = quizQuestion.getId();
         question.questionType = quizQuestion.getQuestionType();
         question.description = presenter.instruction();
-        question.mainTopic = quizQuestion.getMainTopic();
-        question.hintLinks = quizQuestion.getHintLinks();
+        question.mainTopic = presenter.mainTopic();
+        question.hintLinks = presenter.hintLinks();
         question.viceReviewPointIdList = quizQuestion.getViceReviewPointIdList();
         question.scope = quizQuestion.getScope();
-        question.options = quizQuestion.getOptions();
+        QuizQuestionViewedByUser.OptionCreator optionCreator = presenter.optionCreator();
+        Stream<Integer> ids = Arrays.stream(quizQuestion.getOptionNoteIds().split(",")).map(Integer::valueOf);
+        Stream<Note> noteStream = ids.map(noteRepository::findById).filter(Optional::isPresent).map(Optional::get);
+        question.options = noteStream.map(optionCreator::optionFromNote).toList();
         return Optional.of(question);
     }
 

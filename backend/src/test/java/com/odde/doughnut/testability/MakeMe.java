@@ -1,9 +1,12 @@
 package com.odde.doughnut.testability;
 
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.models.quizFacotries.QuizQuestionDirector;
+import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.testability.builders.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -113,5 +116,10 @@ public class MakeMe {
 
     public ReviewSettingBuilder aReviewSettingFor(Note note) {
         return new ReviewSettingBuilder(this, note);
+    }
+
+    public QuizQuestionViewedByUser buildAQuestion(QuizQuestion.QuestionType questionType, ReviewPoint reviewPoint) {
+        QuizQuestionDirector builder = new QuizQuestionDirector(questionType, new NonRandomizer(), reviewPoint, modelFactoryService);
+        return QuizQuestionViewedByUser.from(builder.buildQuizQuestion(), modelFactoryService.noteRepository).orElse(null);
     }
 }

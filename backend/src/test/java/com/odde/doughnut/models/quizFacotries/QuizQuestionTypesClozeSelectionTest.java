@@ -8,11 +8,9 @@ import static org.hamcrest.Matchers.not;
 
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.LinkViewed;
 import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
@@ -36,7 +34,6 @@ class QuizQuestionTypesClozeSelectionTest {
     @Autowired
     MakeMe makeMe;
     UserModel userModel;
-    NonRandomizer randomizer = new NonRandomizer();
 
     @BeforeEach
     void setup() {
@@ -81,8 +78,7 @@ class QuizQuestionTypesClozeSelectionTest {
         }
 
         private QuizQuestionViewedByUser buildClozeQuizQuestion() {
-            QuizQuestionDirector builder = new QuizQuestionDirector(CLOZE_SELECTION, randomizer, reviewPoint, makeMe.modelFactoryService);
-            return QuizQuestionViewedByUser.from(builder.buildQuizQuestion(), makeMe.modelFactoryService.noteRepository).orElse(null);
+            return makeMe.buildAQuestion(CLOZE_SELECTION, reviewPoint);
         }
 
         private List<String> toOptionStrings(QuizQuestionViewedByUser quizQuestion) {
