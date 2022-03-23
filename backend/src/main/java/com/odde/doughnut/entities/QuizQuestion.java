@@ -2,15 +2,14 @@ package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.entities.json.LinkViewed;
-import com.odde.doughnut.entities.json.NoteSphere;
 import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
-import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.quizFacotries.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.util.Strings;
 
 import javax.persistence.*;
+import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -58,7 +57,7 @@ public class QuizQuestion {
     @GeneratedValue(strategy = GenerationType.IDENTITY) private Integer id;
 
     @JsonIgnore
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "review_point_id", referencedColumnName = "id")
     @Getter @Setter
     private ReviewPoint reviewPoint;
@@ -68,7 +67,7 @@ public class QuizQuestion {
     private Integer questionTypeId;
 
     @JsonIgnore
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "category_link_id", referencedColumnName = "id")
     @Getter
     @Setter
@@ -83,6 +82,11 @@ public class QuizQuestion {
     @Column(name = "vice_review_point_ids")
     @Getter
     private String viceReviewPointIds = "";
+
+    @Column(name = "created_at")
+    @Getter
+    @Setter
+    private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
     public void setViceReviewPoints(List<ReviewPoint> reviewPoints) {
         if(reviewPoints == null) {
