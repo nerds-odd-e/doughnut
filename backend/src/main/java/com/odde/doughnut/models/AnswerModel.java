@@ -37,6 +37,10 @@ public class AnswerModel {
         return answerResult;
     }
 
+    public void save() {
+        modelFactoryService.answerRepository.save(answer);
+    }
+
     private String getAnswerDisplay() {
         if (getAnswerNote() != null) {
             return getAnswerNote().getTitle();

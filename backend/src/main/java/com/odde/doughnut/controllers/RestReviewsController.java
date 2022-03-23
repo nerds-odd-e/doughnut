@@ -84,6 +84,7 @@ class RestReviewsController {
         user.getAuthorization().assertLoggedIn();
         AnswerModel answerModel = modelFactoryService.toAnswerModel(answer);
         answerModel.updateReviewPoints(testabilitySettings.getCurrentUTCTimestamp());
+        answerModel.save();
         AnswerResult answerResult = answerModel.getAnswerResult();
         if(answerResult.correct) {
             Reviewing reviewing = user.createReviewing(testabilitySettings.getCurrentUTCTimestamp());

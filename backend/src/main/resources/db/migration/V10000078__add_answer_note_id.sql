@@ -1,0 +1,1 @@
+ALTER TABLE quiz_answer ADD `answer_note_id` int unsigned DEFAULT NULL;

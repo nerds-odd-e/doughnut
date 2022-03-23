@@ -31,6 +31,8 @@ public class ModelFactoryService {
     @Autowired
     public QuizQuestionRepository quizQuestionRepository;
     @Autowired
+    public AnswerRepository answerRepository;
+    @Autowired
     public NotesClosureRepository notesClosureRepository;
     @Autowired
     public NotebookRepository notebookRepository;
