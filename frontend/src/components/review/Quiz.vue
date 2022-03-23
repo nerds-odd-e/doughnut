@@ -25,7 +25,7 @@
       <button
         class="btn btn-secondary btn-lg"
         v-on:click.once="
-          emptyAnswer.answerNoteId = option.note.id;
+          answerNoteId = option.note.id;
           processForm();
         "
       >
@@ -43,7 +43,7 @@
         <TextInput
           scopeName="review_point"
           field="answer"
-          v-model="emptyAnswer.answer"
+          v-model="answer"
           placeholder="put your answer here"
           :autofocus="true"
         />
@@ -68,13 +68,31 @@ export default defineComponent({
   props:{
     reviewPointViewedByUser: { type: Object as PropType<Generated.ReviewPointViewedByUser>, required: true},
     quizQuestion: { type: Object as PropType<Generated.QuizQuestionViewedByUser>, required: true},
-    emptyAnswer: Object,
+    emptyAnswer: { type: Object as PropType<Generated.Answer>, required: true },
   },
   components: {
     BasicBreadcrumb, ShowPicture, NoteFrameOfLinks, TextInput
   },
   emits: ["answer"],
+  data() {
+    return {
+      answer: '' as string,
+      answerNoteId: 0 as Doughnut.ID,
+    }
+
+  },
   computed: {
+    answerToQuestion(): Generated.Answer {
+      return {
+        answer: this.answer,
+        answerNoteId: this.answerNoteId,
+        questionType: this.emptyAnswer.questionType,
+        question: this.quizQuestion.quizQuestion,
+        viceReviewPointIds: this.emptyAnswer.viceReviewPointIds
+
+      }
+
+    },
     sourceNote(): Generated.Note {
       if (!!this.reviewPointViewedByUser.noteWithPosition)
         return this.reviewPointViewedByUser.noteWithPosition.note.note;
@@ -86,7 +104,7 @@ export default defineComponent({
   },
   methods: {
     processForm() {
-      this.$emit("answer", this.emptyAnswer);
+      this.$emit("answer", this.answerToQuestion);
     }
   }
 })
