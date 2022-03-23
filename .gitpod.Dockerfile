@@ -60,7 +60,9 @@ USER gitpod
 ENV USER gitpod
 WORKDIR /home/gitpod
 
-RUN curl -L https://nixos.org/nix/install | sh
+RUN curl -o install-nix https://releases.nixos.org/nix/nix-2.7.0/install \
+    && chmod +x ./install-nix \
+    && ./install-nix --no-daemon
 RUN mkdir -p /home/gitpod/.config/nix \
     && touch /home/gitpod/.config/nix/nix.conf \
     && echo "experimental-features = nix-command flakes" >> /home/gitpod/.config/nix/nix.conf
