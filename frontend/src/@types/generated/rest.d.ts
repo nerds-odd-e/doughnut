@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-03-22 19:24:25.
+// Generated using typescript-generator version 2.35.1025 on 2022-03-23 10:55:26.
 
 declare namespace Generated {
 
@@ -94,7 +94,7 @@ declare namespace Generated {
     }
 
     interface QuizQuestionViewedByUser {
-        id: number;
+        quizQuestion: QuizQuestion;
         questionType: QuestionType;
         description: string;
         mainTopic: string;
@@ -158,10 +158,10 @@ declare namespace Generated {
 
     interface Reviewing {
         toRepeatCount: number;
+        toInitialReviewCount: number;
         remainingDailyNewNotesCount: number;
         learntCount: number;
         notLearntCount: number;
-        toInitialReviewCount: number;
     }
 
     interface ReviewPoint {
@@ -188,8 +188,8 @@ declare namespace Generated {
         targetNote: Note;
         typeId: number;
         createdAt: string;
-        linkTypeLabel: string;
         linkNameOfSource: string;
+        linkTypeLabel: string;
     }
 
     interface TextContent {
@@ -222,6 +222,18 @@ declare namespace Generated {
         title: string;
         headNote: Note;
         shortDescription: string;
+    }
+
+    interface QuizQuestion {
+        id: number;
+        reviewPoint: number;
+        questionTypeId: number;
+        categoryLink: number;
+        optionNoteIds: string;
+        viceReviewPointIds: string;
+        createdAt: string;
+        questionType: QuestionType;
+        viceReviewPointIdList: number[];
     }
 
     interface Option {

@@ -1,6 +1,8 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.odde.doughnut.entities.annotations.JsonUseIdInsteadOfLink;
+import com.odde.doughnut.entities.annotations.JsonUseIdInsteadOfReviewPoint;
 import com.odde.doughnut.models.quizFacotries.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -54,7 +56,7 @@ public class QuizQuestion {
     @Getter
     @GeneratedValue(strategy = GenerationType.IDENTITY) private Integer id;
 
-    @JsonIgnore
+    @JsonUseIdInsteadOfReviewPoint
     @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "review_point_id", referencedColumnName = "id")
     @Getter @Setter
@@ -64,19 +66,17 @@ public class QuizQuestion {
     @Getter @Setter
     private Integer questionTypeId;
 
-    @JsonIgnore
+    @JsonUseIdInsteadOfLink
     @ManyToOne(cascade = CascadeType.DETACH)
     @JoinColumn(name = "category_link_id", referencedColumnName = "id")
     @Getter
     @Setter
     private Link categoryLink;
 
-    @JsonIgnore
     @Column(name = "option_notes")
     @Getter @Setter
     private String optionNoteIds = "";
 
-    @JsonIgnore
     @Column(name = "vice_review_point_ids")
     @Getter
     private String viceReviewPointIds = "";
@@ -86,6 +86,7 @@ public class QuizQuestion {
     @Setter
     private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
+    @JsonIgnore
     public void setViceReviewPoints(List<ReviewPoint> reviewPoints) {
         if(reviewPoints == null) {
             viceReviewPointIds = "";
@@ -94,6 +95,7 @@ public class QuizQuestion {
         viceReviewPointIds = reviewPoints.stream().map(ReviewPoint::getId).map(Object::toString).collect(Collectors.joining(","));
     }
 
+    @JsonIgnore
     public void setOptionNotes(List<Note> notes) {
         optionNoteIds = notes.stream().map(Note::getId).map(Object::toString).collect(Collectors.joining(","));
     }
@@ -109,10 +111,6 @@ public class QuizQuestion {
     public List<Integer> getViceReviewPointIdList() {
         if(Strings.isBlank(viceReviewPointIds)) return null;
         return Arrays.stream(viceReviewPointIds.split(",")).map(Integer::valueOf).collect(Collectors.toList());
-    }
-
-    public List<Note> getScope() {
-        return List.of(reviewPoint.getSourceNote().getNotebook().getHeadNote());
     }
 
     public Answer buildAnswer() {

@@ -13,11 +13,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
 public class QuizQuestionViewedByUser {
 
-    public Integer id;
+    public QuizQuestion quizQuestion;
 
     @Getter
     public QuizQuestion.QuestionType questionType;
@@ -43,13 +42,13 @@ public class QuizQuestionViewedByUser {
         if(quizQuestion == null) return Optional.empty();
         QuizQuestionPresenter presenter = quizQuestion.getQuestionType().presenter.apply(quizQuestion);
         QuizQuestionViewedByUser question = new QuizQuestionViewedByUser();
-        question.id = quizQuestion.getId();
+        question.quizQuestion = quizQuestion;
         question.questionType = quizQuestion.getQuestionType();
         question.description = presenter.instruction();
         question.mainTopic = presenter.mainTopic();
         question.hintLinks = presenter.hintLinks();
         question.viceReviewPointIdList = quizQuestion.getViceReviewPointIdList();
-        question.scope = quizQuestion.getScope();
+        question.scope = List.of(quizQuestion.getReviewPoint().getSourceNote().getNotebook().getHeadNote());
         QuizQuestionViewedByUser.OptionCreator optionCreator = presenter.optionCreator();
         Stream<Integer> ids = Arrays.stream(quizQuestion.getOptionNoteIds().split(",")).map(Integer::valueOf);
         Stream<Note> noteStream = ids.map(noteRepository::findById).filter(Optional::isPresent).map(Optional::get);

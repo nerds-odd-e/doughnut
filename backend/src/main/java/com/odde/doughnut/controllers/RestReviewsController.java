@@ -81,7 +81,6 @@ class RestReviewsController {
             repetitionForUser.setReviewPointViewedByUser(ReviewPointViewedByUser.from(reviewPointModel.getEntity(), user));
             QuizQuestion quizQuestion = reviewPointModel.generateAQuizQuestion(testabilitySettings.getRandomizer());
             if (quizQuestion != null) {
-                modelFactoryService.quizQuestionRepository.save(quizQuestion);
                 repetitionForUser.setQuizQuestion(
                         QuizQuestionViewedByUser.from(quizQuestion, modelFactoryService.noteRepository));
                 repetitionForUser.setEmptyAnswer(quizQuestion.buildAnswer());
