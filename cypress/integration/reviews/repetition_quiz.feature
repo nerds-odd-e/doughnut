@@ -29,19 +29,6 @@ Feature: Repetition Quiz
       | sedation | "sedation" is wrong | no                         |
       | sedition | is correct          | yes                        |
 
-  Scenario: View last result when the quiz answer was correct
-    Given I learned one note "sedition" on day 1
-    And I learned one note "sedation" on day 1
-    When I am repeat-reviewing my old note on day 2
-    And I choose answer "sedition"
-    Then I view the last result
-    And I should see that my answer is correct
-    Then I should see "sedition" in note title
-    And I should see the statistics of note "sedition"
-      | RepetitionCount |
-      | 1               |
-
-
   Scenario Outline: Spelling quiz
     Given I am learning new note on day 1
     And I have selected the option "Remember Spelling"

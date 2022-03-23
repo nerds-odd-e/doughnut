@@ -17,7 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.sql.Timestamp;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/reviews")
@@ -84,7 +84,12 @@ class RestReviewsController {
         user.getAuthorization().assertLoggedIn();
         AnswerModel answerModel = modelFactoryService.toAnswerModel(answer);
         answerModel.updateReviewPoints(testabilitySettings.getCurrentUTCTimestamp());
-        return answerModel.getAnswerResult();
+        AnswerResult answerResult = answerModel.getAnswerResult();
+        if(answerResult.correct) {
+            Reviewing reviewing = user.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
+            answerResult.nextRepetition = Optional.ofNullable(reviewing.getOneRepetitionForUser(user, testabilitySettings.getRandomizer()));
+        }
+        return answerResult;
     }
 
     @PostMapping(path = "/{reviewPoint}/self-evaluate")

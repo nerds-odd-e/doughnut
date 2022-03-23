@@ -124,7 +124,7 @@ export default defineComponent({
     backToRepeat() {
       this.$router.push({ name: "repeat" });
     },
-    loadNew(resp) {
+    loadNew(resp: Generated.RepetitionForUser) {
       this.lastResult = {
         answerResult: this.answerResult,
         repetition: this.repetition,
@@ -174,8 +174,8 @@ export default defineComponent({
         if (res.correct) {
           this.finished += 1
           this.repetition.toRepeatCount -= 1
-          if (this.repetition.toRepeatCount > 0) {
-            this.fetchData()
+          if (res.nextRepetition?.reviewPointViewedByUser) {
+            this.loadNew(res.nextRepetition)
           }
         }
         this.resetRoute()
