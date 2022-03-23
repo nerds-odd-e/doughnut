@@ -4,7 +4,11 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
+import com.odde.doughnut.entities.json.RepetitionForUser;
+import com.odde.doughnut.entities.json.ReviewPointViewedByUser;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 
 import java.sql.Timestamp;
@@ -116,4 +120,17 @@ public class Reviewing {
         return userModel.entity.getSubscriptions().stream().map(modelFactoryService::toSubscriptionModel);
     }
 
+    public RepetitionForUser getOneRepetitionForUser(UserModel user, Randomizer randomizer) {
+        ReviewPointModel reviewPointModel = getOneReviewPointNeedToRepeat(randomizer);
+
+        RepetitionForUser repetitionForUser = new RepetitionForUser();
+
+        if (reviewPointModel != null) {
+            repetitionForUser.setReviewPointViewedByUser(ReviewPointViewedByUser.from(reviewPointModel.getEntity(), user));
+            QuizQuestion quizQuestion = reviewPointModel.generateAQuizQuestion(randomizer);
+            repetitionForUser.setQuizQuestion(QuizQuestionViewedByUser.from(quizQuestion, this.modelFactoryService.noteRepository));
+        }
+        repetitionForUser.setToRepeatCount(toRepeatCount());
+        return repetitionForUser;
+    }
 }

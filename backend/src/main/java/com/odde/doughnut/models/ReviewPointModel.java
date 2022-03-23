@@ -52,4 +52,10 @@ public record ReviewPointModel(ReviewPoint entity,
         return new QuizQuestionGenerator(entity, randomizer).generateQuestion(modelFactoryService);
     }
 
+    public void updateReviewPoint(boolean correct, Timestamp currentUTCTimestamp) {
+        increaseRepetitionCountAndSave();
+        if (correct) {
+            repeated(currentUTCTimestamp);
+        }
+    }
 }

@@ -16,7 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.Optional;
+import java.sql.Timestamp;
 
 @RestController
 @RequestMapping("/api/reviews")
@@ -73,20 +73,7 @@ class RestReviewsController {
         UserModel user = currentUserFetcher.getUser();
         user.getAuthorization().assertLoggedIn();
         Reviewing reviewing = user.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
-        ReviewPointModel reviewPointModel = reviewing.getOneReviewPointNeedToRepeat(testabilitySettings.getRandomizer());
-
-        RepetitionForUser repetitionForUser = new RepetitionForUser();
-
-        if (reviewPointModel != null) {
-            repetitionForUser.setReviewPointViewedByUser(ReviewPointViewedByUser.from(reviewPointModel.getEntity(), user));
-            QuizQuestion quizQuestion = reviewPointModel.generateAQuizQuestion(testabilitySettings.getRandomizer());
-            if (quizQuestion != null) {
-                repetitionForUser.setQuizQuestion(
-                        QuizQuestionViewedByUser.from(quizQuestion, modelFactoryService.noteRepository));
-            }
-        }
-        repetitionForUser.setToRepeatCount(reviewing.toRepeatCount());
-        return repetitionForUser;
+        return reviewing.getOneRepetitionForUser(user, testabilitySettings.getRandomizer());
     }
 
     @PostMapping("/answer")
@@ -101,19 +88,13 @@ class RestReviewsController {
         if (answer.getAnswerNoteId() != null) {
             answerResult.setAnswerNote(modelFactoryService.noteRepository.findById(answer.getAnswerNoteId()).orElse(null));
         }
+        Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
         answer.getQuestion().getViceReviewPointIdList().forEach(rPid ->
                 modelFactoryService.reviewPointRepository
-                        .findById(rPid).ifPresent(vice -> updateReviewPoint(vice, answerResult))
+                        .findById(rPid).ifPresent(vice -> modelFactoryService.toReviewPointModel(vice).updateReviewPoint(answerResult.isCorrect(), currentUTCTimestamp))
         );
-        updateReviewPoint(answer.getQuestion().getReviewPoint(), answerResult);
+        modelFactoryService.toReviewPointModel(answer.getQuestion().getReviewPoint()).updateReviewPoint(answerResult.isCorrect(), currentUTCTimestamp);
         return answerResult;
-    }
-
-    private void updateReviewPoint(ReviewPoint reviewPoint, final AnswerResult answerResult) {
-        modelFactoryService.toReviewPointModel(reviewPoint).increaseRepetitionCountAndSave();
-        if (answerResult.isCorrect()) {
-            modelFactoryService.toReviewPointModel(reviewPoint).repeated(testabilitySettings.getCurrentUTCTimestamp());
-        }
     }
 
     @PostMapping(path = "/{reviewPoint}/self-evaluate")
