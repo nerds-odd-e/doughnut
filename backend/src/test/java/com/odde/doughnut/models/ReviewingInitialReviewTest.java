@@ -41,7 +41,7 @@ public class ReviewingInitialReviewTest {
     void whenThereIsNoNotesForUser() {
         makeMe.aNote().byUser(anotherUser).please();
         assertThat(reviewingOnDay1.getOneInitialReviewPoint(), is(nullValue()));
-        assertThat(reviewingOnDay1.toInitialReviewCount(), equalTo(0));
+        assertThat(reviewingOnDay1.getReviewStatus().toInitialReviewCount, equalTo(0));
     }
 
     @Nested
@@ -58,10 +58,10 @@ public class ReviewingInitialReviewTest {
 
         @Test
         void shouldReturnTheFirstNoteAndThenTheSecondWhenThereAreTwo() {
-            assertThat(reviewingOnDay1.toInitialReviewCount(), equalTo(2));
+            assertThat(reviewingOnDay1.getReviewStatus().toInitialReviewCount, equalTo(2));
             assertThat(reviewingOnDay1.getOneInitialReviewPoint().getNote(), equalTo(note1));
             makeMe.aReviewPointFor(note1).by(userModel).initiallyReviewedOn(day1).please();
-            assertThat(reviewingOnDay1.toInitialReviewCount(), equalTo(1));
+            assertThat(reviewingOnDay1.getReviewStatus().toInitialReviewCount, equalTo(1));
             assertThat(reviewingOnDay1.getOneInitialReviewPoint().getNote(), equalTo(note2));
         }
 

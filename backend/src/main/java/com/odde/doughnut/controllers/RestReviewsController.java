@@ -89,11 +89,9 @@ class RestReviewsController {
             answerResult.setAnswerNote(modelFactoryService.noteRepository.findById(answer.getAnswerNoteId()).orElse(null));
         }
         Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-        answer.getQuestion().getViceReviewPointIdList().forEach(rPid ->
-                modelFactoryService.reviewPointRepository
-                        .findById(rPid).ifPresent(vice -> modelFactoryService.toReviewPointModel(vice).updateReviewPoint(answerResult.isCorrect(), currentUTCTimestamp))
-        );
-        modelFactoryService.toReviewPointModel(answer.getQuestion().getReviewPoint()).updateReviewPoint(answerResult.isCorrect(), currentUTCTimestamp);
+        boolean correct = answerResult.isCorrect();
+
+        modelFactoryService.toAnswerModel(answer).updateReviewPoints(currentUTCTimestamp, correct);
         return answerResult;
     }
 

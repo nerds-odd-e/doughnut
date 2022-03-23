@@ -1,7 +1,5 @@
 package com.odde.doughnut.models;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestion;
@@ -17,8 +15,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-@JsonAutoDetect(getterVisibility = JsonAutoDetect.Visibility.NONE,
-        isGetterVisibility = JsonAutoDetect.Visibility.NONE)
 public class Reviewing {
     private final UserModel userModel;
     private final Timestamp currentUTCTimestamp;
@@ -63,18 +59,11 @@ public class Reviewing {
         return reviewPoint;
     }
 
-    @JsonProperty
-    public int toRepeatCount() {
+    private int toRepeatCount() {
         return userModel.getReviewPointsNeedToRepeat(currentUTCTimestamp).size();
     }
 
-    @JsonProperty
-    public int learntCount() {
-        return userModel.learntCount();
-    }
-
-    @JsonProperty
-    public int notLearntCount() {
+    private int notLearntCount() {
         Integer subscribedCount = getSubscriptionModelStream()
                 .map(this::getPendingNewReviewPointCount)
                 .reduce(Integer::sum).orElse(0);
@@ -88,7 +77,6 @@ public class Reviewing {
         return noteCount + linkCount;
     }
 
-    @JsonProperty
     public int toInitialReviewCount() {
         ReviewPoint oneInitialReviewPoint = getOneInitialReviewPoint();
         if (oneInitialReviewPoint == null) {
@@ -137,7 +125,7 @@ public class Reviewing {
     public ReviewStatus getReviewStatus() {
         ReviewStatus reviewStatus = new ReviewStatus();
         reviewStatus.toRepeatCount = toRepeatCount();
-        reviewStatus.learntCount = learntCount();
+        reviewStatus.learntCount = userModel.learntCount();
         reviewStatus.notLearntCount = notLearntCount();
         reviewStatus.toInitialReviewCount = toInitialReviewCount();
 

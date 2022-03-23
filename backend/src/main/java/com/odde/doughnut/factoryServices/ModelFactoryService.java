@@ -101,4 +101,8 @@ public class ModelFactoryService {
     public SearchTermModel toSearchTermModel(User entity, SearchTerm searchTerm) {
         return new SearchTermModel(entity, noteRepository, searchTerm);
     }
+
+    public AnswerModel toAnswerModel(Answer answer) {
+        return new AnswerModel(answer, this);
+    }
 }
