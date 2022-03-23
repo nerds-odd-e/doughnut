@@ -87,12 +87,6 @@ public class ReviewingInitialReviewTest {
             }
 
             @Test
-            void shouldGetInitalReviewCountForTheLink() {
-                assertThat(reviewingOnDay1.remainingDailyNewNotesCount(), equalTo(userModel.getEntity().getDailyNewNotesCount()));
-                assertThat(reviewingOnDay1.notLearntCount(), equalTo(1));
-            }
-
-            @Test
             void shouldReturnReviewPointForLink() {
                 assertThat(reviewingOnDay1.getOneInitialReviewPoint().getLink().getSourceNote(), equalTo(note1));
                 assertThat(reviewingOnDay1.getOneInitialReviewPoint().getNote(), is(nullValue()));

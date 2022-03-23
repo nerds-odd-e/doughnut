@@ -9,6 +9,4 @@ public class ReviewStatus {
     public int notLearntCount;
 
     public int toInitialReviewCount;
-
-    public int remainingDailyNewNotesCount;
 }

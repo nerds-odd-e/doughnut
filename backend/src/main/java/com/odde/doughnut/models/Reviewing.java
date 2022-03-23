@@ -97,7 +97,7 @@ public class Reviewing {
         return Math.min(remainingDailyNewNotesCount(), notLearntCount());
     }
 
-    public int remainingDailyNewNotesCount() {
+    private int remainingDailyNewNotesCount() {
         long sameDayCount = getNewReviewPointsOfToday().size();
         return (int) (userModel.entity.getDailyNewNotesCount() - sameDayCount);
     }
@@ -140,7 +140,6 @@ public class Reviewing {
         reviewStatus.learntCount = learntCount();
         reviewStatus.notLearntCount = notLearntCount();
         reviewStatus.toInitialReviewCount = toInitialReviewCount();
-        reviewStatus.remainingDailyNewNotesCount = remainingDailyNewNotesCount();
 
         return reviewStatus;
     }
