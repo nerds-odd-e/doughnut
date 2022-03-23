@@ -92,7 +92,7 @@ class DescriptionLinkTargetQuizFactoryTest {
                     .type(DESCRIPTION_LINK_TARGET)
                     .answer(target.getTitle())
                     .inMemoryPlease();
-            assertTrue(answerResult.isCorrect());
+            assertTrue(answerResult.correct);
         }
     }
 

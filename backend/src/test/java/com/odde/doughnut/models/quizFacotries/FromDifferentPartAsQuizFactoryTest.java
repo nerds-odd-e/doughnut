@@ -132,7 +132,7 @@ class FromDifferentPartAsQuizFactoryTest {
                             .type(FROM_DIFFERENT_PART_AS)
                             .answer(tall.getTitle())
                             .inMemoryPlease();
-                    assertTrue(answerResult.isCorrect());
+                    assertTrue(answerResult.correct);
                 }
 
                 @Test
@@ -141,7 +141,7 @@ class FromDifferentPartAsQuizFactoryTest {
                             .type(FROM_DIFFERENT_PART_AS)
                             .answer(pretty.getTitle())
                             .inMemoryPlease();
-                    assertFalse(answerResult.isCorrect());
+                    assertFalse(answerResult.correct);
                 }
 
                 @Test
@@ -150,7 +150,7 @@ class FromDifferentPartAsQuizFactoryTest {
                             .type(FROM_DIFFERENT_PART_AS)
                             .answer("metal")
                             .inMemoryPlease();
-                    assertTrue(answerResult.isCorrect());
+                    assertTrue(answerResult.correct);
                 }
             }
         }

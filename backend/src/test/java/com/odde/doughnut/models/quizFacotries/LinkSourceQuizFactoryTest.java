@@ -81,7 +81,7 @@ class LinkSourceQuizFactoryTest {
                         .type(LINK_SOURCE)
                         .answer(source.getTitle())
                         .inMemoryPlease();
-                assertTrue(answerResult.isCorrect());
+                assertTrue(answerResult.correct);
             }
         }
 

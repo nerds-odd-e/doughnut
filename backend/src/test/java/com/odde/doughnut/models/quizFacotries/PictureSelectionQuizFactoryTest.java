@@ -109,7 +109,7 @@ class PictureSelectionQuizFactoryTest {
                         .type(PICTURE_SELECTION)
                         .answer(source.getTitle())
                         .inMemoryPlease();
-                assertTrue(answerResult.isCorrect());
+                assertTrue(answerResult.correct);
             }
         }
 

@@ -5,6 +5,7 @@ import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.json.*;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.models.AnswerModel;
 import com.odde.doughnut.models.ReviewPointModel;
 import com.odde.doughnut.models.Reviewing;
 import com.odde.doughnut.models.UserModel;
@@ -81,18 +82,10 @@ class RestReviewsController {
     public AnswerResult answerQuiz(@Valid @RequestBody Answer answer) {
         UserModel user = currentUserFetcher.getUser();
         user.getAuthorization().assertLoggedIn();
-        AnswerResult answerResult = new AnswerResult();
-        answerResult.setReviewPoint(answer.getQuestion().getReviewPoint());
-        answerResult.setQuestionType(answer.getQuestion().getQuestionType());
-        answerResult.setAnswer(answer.getAnswer());
-        if (answer.getAnswerNoteId() != null) {
-            answerResult.setAnswerNote(modelFactoryService.noteRepository.findById(answer.getAnswerNoteId()).orElse(null));
-        }
-        Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-        boolean correct = answerResult.isCorrect();
+        AnswerModel answerModel = modelFactoryService.toAnswerModel(answer);
 
-        modelFactoryService.toAnswerModel(answer).updateReviewPoints(currentUTCTimestamp, correct);
-        return answerResult;
+        answerModel.updateReviewPoints(testabilitySettings.getCurrentUTCTimestamp());
+        return answerModel.getAnswerResult();
     }
 
     @PostMapping(path = "/{reviewPoint}/self-evaluate")

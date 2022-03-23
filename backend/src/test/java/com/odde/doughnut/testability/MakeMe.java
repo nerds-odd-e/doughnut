@@ -99,7 +99,7 @@ public class MakeMe {
     }
 
     public AnswerBuilder anAnswerFor(ReviewPoint reviewPoint) {
-        return new AnswerBuilder(new AnswerResult(), this).forReviewPoint(reviewPoint);
+        return new AnswerBuilder(this).forReviewPoint(reviewPoint);
     }
 
     public SubscriptionBuilder aSubscription() {

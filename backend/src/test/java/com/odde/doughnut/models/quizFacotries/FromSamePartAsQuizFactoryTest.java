@@ -139,7 +139,7 @@ class FromSamePartAsQuizFactoryTest {
                                 .type(FROM_SAME_PART_AS)
                                 .answer(pretty.getTitle())
                                 .inMemoryPlease();
-                        assertTrue(answerResult.isCorrect());
+                        assertTrue(answerResult.correct);
                     }
 
                     @Test
@@ -148,7 +148,7 @@ class FromSamePartAsQuizFactoryTest {
                                 .type(FROM_SAME_PART_AS)
                                 .answer("metal")
                                 .inMemoryPlease();
-                        assertFalse(answerResult.isCorrect());
+                        assertFalse(answerResult.correct);
                     }
                 }
             }

@@ -4,14 +4,23 @@ import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.transaction.annotation.Transactional;
 
 import static com.odde.doughnut.entities.QuizQuestion.QuestionType.CLOZE_SELECTION;
 import static com.odde.doughnut.entities.QuizQuestion.QuestionType.LINK_SOURCE_EXCLUSIVE;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+@ExtendWith(SpringExtension.class)
+@ContextConfiguration(locations = {"classpath:repository.xml"})
+@Transactional
 class AnswerResultTest {
-    MakeMe makeMe = new MakeMe();
+    @Autowired
+    MakeMe makeMe;
 
     @Nested
     class ClozeSelectionQuestion {
@@ -30,7 +39,7 @@ class AnswerResultTest {
                     .type(CLOZE_SELECTION)
                     .answer("this")
                     .inMemoryPlease();
-            assertTrue(answer.isCorrect());
+            assertTrue(answer.correct);
         }
 
         @Test
@@ -39,7 +48,7 @@ class AnswerResultTest {
                     .type(CLOZE_SELECTION)
                     .answer("this / that")
                     .inMemoryPlease();
-            assertTrue(answerResult.isCorrect());
+            assertTrue(answerResult.correct);
         }
 
     }
@@ -64,7 +73,7 @@ class AnswerResultTest {
                     .type(LINK_SOURCE_EXCLUSIVE)
                     .answer("blah")
                     .inMemoryPlease();
-            assertTrue(answerResult.isCorrect());
+            assertTrue(answerResult.correct);
         }
 
         @Test
@@ -73,7 +82,7 @@ class AnswerResultTest {
                     .type(LINK_SOURCE_EXCLUSIVE)
                     .answer(source.getTitle())
                     .inMemoryPlease();
-            assertFalse(answerResult.isCorrect());
+            assertFalse(answerResult.correct);
         }
     }
 

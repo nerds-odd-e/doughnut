@@ -106,7 +106,7 @@ class WhichSpecHasInstanceQuizFactoryTest {
                                 .type(WHICH_SPEC_HAS_INSTANCE)
                                 .answer(source.getTitle())
                                 .inMemoryPlease();
-                        assertTrue(answerResult.isCorrect());
+                        assertTrue(answerResult.correct);
                     }
 
                     @Test
@@ -115,7 +115,7 @@ class WhichSpecHasInstanceQuizFactoryTest {
                                 .type(WHICH_SPEC_HAS_INSTANCE)
                                 .answer("metal")
                                 .inMemoryPlease();
-                        assertFalse(answerResult.isCorrect());
+                        assertFalse(answerResult.correct);
                     }
                 }
 
