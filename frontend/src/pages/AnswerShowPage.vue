@@ -4,8 +4,6 @@
     <Repetition
       v-bind="{ reviewPointViewedByUser, answerResult }"
     />
-    <NoteStatisticsButton v-if="noteId" :noteId="noteId" />
-    <NoteStatisticsButton v-else :link="linkId" />
 
   </LoadingPage>
 </template>
