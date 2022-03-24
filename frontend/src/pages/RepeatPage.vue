@@ -15,15 +15,6 @@
               }"
               @viewLastResult="viewLastResult()"
             >
-              <Repetition
-                v-bind="{
-                  reviewPointViewedByUser,
-                  answerResult,
-                  compact: true,
-                }"
-                @selfEvaluate="selfEvaluate($event)"
-                @removeFromReview="removeFromReview"
-              />
             </RepeatProgressBar>
           </div>
         </template>
@@ -39,6 +30,9 @@
             }"
             @viewLastResult="viewLastResult()"
           />
+          <div class="alert alert-success" v-if="lastAnswerCorrrect">
+            Correct!
+          </div>
           <Quiz
             v-if="quizMode"
             v-bind="{
@@ -57,8 +51,6 @@
                 @selfEvaluate="selfEvaluate($event)"
                 @removeFromReview="removeFromReview"
               />
-              <NoteStatisticsButton v-if="noteId" :noteId="noteId" />
-              <NoteStatisticsButton v-else :link="linkId" />
           </template>
         </template>
       </Minimizable>
@@ -71,7 +63,6 @@ import Minimizable from "../components/commons/Minimizable.vue";
 import Quiz from "../components/review/Quiz.vue";
 import Repetition from "../components/review/Repetition.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
-import NoteStatisticsButton from "../components/notes/NoteStatisticsButton.vue";
 import RepeatProgressBar from "../components/review/RepeatProgressBar.vue";
 import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
 import usePopups from "../components/commons/Popups/usePopup";
@@ -87,14 +78,13 @@ export default defineComponent({
     Quiz,
     Repetition,
     ContainerPage,
-    NoteStatisticsButton,
     RepeatProgressBar,
   },
   data() {
     return {
       repetition: undefined as Generated.RepetitionForUser | undefined,
       answerResult: undefined as Generated.AnswerResult | undefined,
-      lastResult: null,
+      lastResult: undefined,
       finished: 0,
     };
   },
@@ -120,6 +110,9 @@ export default defineComponent({
     hasLastResult() {
       return this.lastResult?.answerResult;
     },
+    lastAnswerCorrrect() {
+      return this.answerResult?.correct;
+    }
   },
   methods: {
     backToRepeat() {

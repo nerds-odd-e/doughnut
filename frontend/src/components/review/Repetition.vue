@@ -1,14 +1,4 @@
 <template>
-  <template v-if="compact">
-    <ReviewPointAbbr v-bind="{ reviewPointViewedByUser }" />
-    <SelfEvaluateButtons
-      v-bind="{ sadButton }"
-      :key="buttonKey"
-      @selfEvaluate="selfEvaluate($event)"
-    />
-  </template>
-  <template v-else>
-    <AnswerResult v-if="answerResult" v-bind="{answerResult}"/>
     <ShowReviewPoint
       v-bind="{ reviewPointViewedByUser }"
     />
@@ -27,7 +17,6 @@
         <SvgNoReview />
       </button>
     </div>
-  </template>
 </template>
 
 <script lang="ts">
@@ -37,14 +26,12 @@ import SvgNoReview from "../svgs/SvgNoReview.vue";
 import ShowReviewPoint from "./ShowReviewPoint.vue";
 import SelfEvaluateButtons from "./SelfEvaluateButtons.vue";
 import ReviewPointAbbr from "./ReviewPointAbbr.vue";
-import AnswerResult from "./AnswerResult.vue";
 
 export default defineComponent({
   name: "Repetition",
   props: {
     reviewPointViewedByUser: { type: Object as PropType<Generated.ReviewPointViewedByUser>, required: true },
     answerResult: Object as PropType<Generated.AnswerResult>,
-    compact: Boolean,
   },
   emits: ["selfEvaluate", "removeFromReview"],
   components: {
@@ -53,7 +40,6 @@ export default defineComponent({
     ShowReviewPoint,
     SelfEvaluateButtons,
     ReviewPointAbbr,
-    AnswerResult,
   },
   data() {
     return {

@@ -1,9 +1,11 @@
 <template>
   <LoadingPage v-bind="{ loading, contentExists: answerResult }">
     <AnswerResult v-if="answerResult" v-bind="{answerResult}"/>
-    <ShowReviewPoint
-      v-bind="{ reviewPointViewedByUser }"
+    <Repetition
+      v-bind="{ reviewPointViewedByUser, answerResult }"
     />
+    <NoteStatisticsButton v-if="noteId" :noteId="noteId" />
+    <NoteStatisticsButton v-else :link="linkId" />
 
   </LoadingPage>
 </template>
@@ -14,7 +16,8 @@ import LoadingPage from "./commons/LoadingPage.vue";
 import NoteSphereComponent from '../components/notes/views/NoteSphereComponent.vue';
 import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
 import AnswerResult from "../components/review/AnswerResult.vue";
-import ShowReviewPoint from '../components/review/ShowReviewPoint.vue';
+import Repetition from '../components/review/Repetition.vue';
+import NoteStatisticsButton from '../components/notes/NoteStatisticsButton.vue';
 
 export default defineComponent({
   setup() {
@@ -22,7 +25,7 @@ export default defineComponent({
   },
   name: "NoteShowPage",
   props: { answerId: Number },
-  components: { LoadingPage, NoteSphereComponent, AnswerResult, ShowReviewPoint },
+  components: { LoadingPage, NoteSphereComponent, AnswerResult, Repetition, NoteStatisticsButton },
   data() {
     return {
       answerResult: undefined as Generated.AnswerViewedByUser | undefined
@@ -31,7 +34,16 @@ export default defineComponent({
   computed: {
     reviewPointViewedByUser() {
       return this.answerResult?.reviewPoint;
-    }
+    },
+    reviewPoint() {
+      return this.reviewPointViewedByUser?.reviewPoint;
+    },
+    noteId() {
+      return this.reviewPoint?.noteId
+    },
+    linkId() {
+      return this.reviewPoint?.linkId
+    },
   },
   methods: {
     async fetchData() {
