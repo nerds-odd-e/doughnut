@@ -177,8 +177,10 @@ export default defineComponent({
           if (res.nextRepetition?.reviewPointViewedByUser) {
             this.loadNew(res.nextRepetition)
           }
+          this.resetRoute()
+          return
         }
-        this.resetRoute()
+        this.$router.push({ name: "repeat-answer", params: {answerId: res.answerId} });
       })
     },
 
