@@ -47,7 +47,7 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
       },
 
       async getAnswer(answerId: Doughnut.ID) {
-        const res = await managedApi.restGet(`reviews/answers/${answerId}`) as Generated.AnswerResult;
+        const res = await managedApi.restGet(`reviews/answers/${answerId}`) as Generated.AnswerViewedByUser;
         const reviewPointViewedByUser = res.reviewPoint;
         if(reviewPointViewedByUser) loadReviewPointViewedByUser(reviewPointViewedByUser);
         return res

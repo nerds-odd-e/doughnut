@@ -18,7 +18,7 @@ public class Answer {
     @Getter
     @Setter
     @Column(name="answer")
-    String answer;
+    String spellingAnswer;
 
     @Getter
     @Setter

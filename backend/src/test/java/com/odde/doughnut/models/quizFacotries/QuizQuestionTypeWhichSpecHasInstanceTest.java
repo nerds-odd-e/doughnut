@@ -102,7 +102,7 @@ class WhichSpecHasInstanceQuizFactoryTest {
                 class Answer {
                     @Test
                     void correct() {
-                        AnswerResult answerResult = makeMe.anAnswerFor(reviewPoint)
+                        AnswerViewedByUser answerResult = makeMe.anAnswerFor(reviewPoint)
                                 .type(WHICH_SPEC_HAS_INSTANCE)
                                 .answer(source.getTitle())
                                 .inMemoryPlease();
@@ -111,7 +111,7 @@ class WhichSpecHasInstanceQuizFactoryTest {
 
                     @Test
                     void wrong() {
-                        AnswerResult answerResult = makeMe.anAnswerFor(reviewPoint)
+                        AnswerViewedByUser answerResult = makeMe.anAnswerFor(reviewPoint)
                                 .type(WHICH_SPEC_HAS_INSTANCE)
                                 .answer("metal")
                                 .inMemoryPlease();

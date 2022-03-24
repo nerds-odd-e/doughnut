@@ -1,11 +1,10 @@
 package com.odde.doughnut.models.quizFacotries;
 
-import com.odde.doughnut.entities.AnswerResult;
+import com.odde.doughnut.entities.AnswerViewedByUser;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -77,7 +76,7 @@ class LinkSourceQuizFactoryTest {
         class Answer {
             @Test
             void correct() {
-                AnswerResult answerResult = makeMe.anAnswerFor(reviewPoint)
+                AnswerViewedByUser answerResult = makeMe.anAnswerFor(reviewPoint)
                         .type(LINK_SOURCE)
                         .answer(source.getTitle())
                         .inMemoryPlease();

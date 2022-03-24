@@ -8,13 +8,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
-import com.odde.doughnut.entities.AnswerResult;
+import com.odde.doughnut.entities.AnswerViewedByUser;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.testability.MakeMe;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -135,7 +134,7 @@ class FromSamePartAsQuizFactoryTest {
                 class Answer {
                     @Test
                     void correct() {
-                        AnswerResult answerResult = makeMe.anAnswerFor(reviewPoint)
+                        AnswerViewedByUser answerResult = makeMe.anAnswerFor(reviewPoint)
                                 .type(FROM_SAME_PART_AS)
                                 .answer(pretty.getTitle())
                                 .inMemoryPlease();
@@ -144,7 +143,7 @@ class FromSamePartAsQuizFactoryTest {
 
                     @Test
                     void wrong() {
-                        AnswerResult answerResult = makeMe.anAnswerFor(reviewPoint)
+                        AnswerViewedByUser answerResult = makeMe.anAnswerFor(reviewPoint)
                                 .type(FROM_SAME_PART_AS)
                                 .answer("metal")
                                 .inMemoryPlease();

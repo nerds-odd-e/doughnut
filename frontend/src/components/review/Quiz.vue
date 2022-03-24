@@ -76,14 +76,14 @@ export default defineComponent({
   data() {
     return {
       answer: '' as string,
-      answerNoteId: 0 as Doughnut.ID,
+      answerNoteId: null as Doughnut.ID | null,
     }
 
   },
   computed: {
     answerToQuestion(): Generated.Answer {
       return {
-        answer: this.answer,
+        spellingAnswer: this.answer,
         answerNoteId: this.answerNoteId,
         question: this.quizQuestion.quizQuestion,
       }

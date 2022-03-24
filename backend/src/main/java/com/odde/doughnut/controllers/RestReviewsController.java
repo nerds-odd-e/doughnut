@@ -94,16 +94,17 @@ class RestReviewsController {
     }
 
     @GetMapping(path = "/answers/{answer}")
-    public AnswerResult getAnswer(Answer answer) {
+    public AnswerViewedByUser getAnswer(Answer answer) {
         UserModel user = currentUserFetcher.getUser();
         user.getAuthorization().assertAuthorization(answer.getQuestion().getReviewPoint());
         AnswerModel answerModel = modelFactoryService.toAnswerModel(answer);
-        AnswerResult answerResult = answerModel.getAnswerResult();
+        AnswerViewedByUser answerResult = answerModel.getAnswerViewedByUser();
         answerResult.reviewPoint = Optional.of(ReviewPointViewedByUser.from(answer.getQuestion().getReviewPoint(), user));
         return answerResult;
     }
 
     @PostMapping(path = "/{reviewPoint}/self-evaluate")
+    @Transactional
     public RepetitionForUser selfEvaluate(ReviewPoint reviewPoint, @RequestBody SelfEvaluation selfEvaluation) {
         if (reviewPoint == null || reviewPoint.getId() == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The review point does not exist.");

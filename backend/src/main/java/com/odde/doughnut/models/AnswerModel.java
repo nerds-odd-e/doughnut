@@ -29,12 +29,18 @@ public class AnswerModel {
         this.modelFactoryService.toReviewPointModel(answer.getQuestion().getReviewPoint()).updateReviewPoint(correct, currentUTCTimestamp);
     }
 
+    public AnswerViewedByUser getAnswerViewedByUser() {
+        AnswerViewedByUser answerResult = new AnswerViewedByUser();
+        answerResult.answerId = answer.getId();
+        answerResult.correct = isCorrect();
+        answerResult.answerDisplay = getAnswerDisplay();
+        return answerResult;
+    }
+
     public AnswerResult getAnswerResult() {
         AnswerResult answerResult = new AnswerResult();
         answerResult.answerId = answer.getId();
         answerResult.correct = isCorrect();
-        answerResult.answerDisplay = getAnswerDisplay();
-
         return answerResult;
     }
 
@@ -46,11 +52,11 @@ public class AnswerModel {
         if (getAnswerNote() != null) {
             return getAnswerNote().getTitle();
         }
-        return answer.getAnswer();
+        return answer.getSpellingAnswer();
     }
 
     private boolean isCorrect() {
-        if(cachedResult != null) return cachedResult;
+        if (cachedResult != null) return cachedResult;
         List<Note> wrongAnswers = questionType.factory.apply(reviewPoint).allWrongAnswers();
         if (wrongAnswers != null) {
             return wrongAnswers.stream().noneMatch(this::matchAnswer);
@@ -62,7 +68,7 @@ public class AnswerModel {
 
     private Note getAnswerNote() {
         if (answer.getAnswerNoteId() == null) return null;
-         return this.modelFactoryService.noteRepository.findById(answer.getAnswerNoteId()).orElse(null);
+        return this.modelFactoryService.noteRepository.findById(answer.getAnswerNoteId()).orElse(null);
     }
 
     private boolean matchAnswer(Note correctAnswerNote) {
@@ -70,7 +76,7 @@ public class AnswerModel {
             return correctAnswerNote.equals(getAnswerNote());
         }
 
-        return correctAnswerNote.getNoteTitle().matches(answer.getAnswer());
+        return correctAnswerNote.getNoteTitle().matches(answer.getSpellingAnswer());
     }
-
 }
+

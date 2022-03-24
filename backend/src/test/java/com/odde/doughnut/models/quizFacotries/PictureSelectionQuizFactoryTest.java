@@ -1,11 +1,10 @@
 package com.odde.doughnut.models.quizFacotries;
 
-import com.odde.doughnut.entities.AnswerResult;
+import com.odde.doughnut.entities.AnswerViewedByUser;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -105,7 +104,7 @@ class PictureSelectionQuizFactoryTest {
         class Answer {
             @Test
             void correct() {
-                AnswerResult answerResult = makeMe.anAnswerFor(reviewPoint)
+                AnswerViewedByUser answerResult = makeMe.anAnswerFor(reviewPoint)
                         .type(PICTURE_SELECTION)
                         .answer(source.getTitle())
                         .inMemoryPlease();

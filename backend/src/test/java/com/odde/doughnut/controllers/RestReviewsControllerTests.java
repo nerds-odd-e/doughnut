@@ -119,7 +119,7 @@ class RestReviewsControllerTests {
             QuizQuestion quizQuestion = makeMe.aQuestion().of(QuizQuestion.QuestionType.SPELLING, reviewPoint).inMemoryPlease();
             answer.setQuestion(quizQuestion);
             answer.setAnswerNoteId(null);
-            answer.setAnswer("wrong");
+            answer.setSpellingAnswer("wrong");
             Integer oldForgettingCurveIndex = reviewPoint.getForgettingCurveIndex();
             Integer oldRepetitionCount = reviewPoint.getRepetitionCount();
             AnswerResult answerResult = controller().answerQuiz(answer);

@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
-class AnswerResultTest {
+class AnswerViewedByUserTest {
     @Autowired
     MakeMe makeMe;
 
@@ -35,7 +35,7 @@ class AnswerResultTest {
 
         @Test
         void correct() {
-            AnswerResult answer = makeMe.anAnswerFor(reviewPoint)
+            AnswerViewedByUser answer = makeMe.anAnswerFor(reviewPoint)
                     .type(CLOZE_SELECTION)
                     .answer("this")
                     .inMemoryPlease();
@@ -44,7 +44,7 @@ class AnswerResultTest {
 
         @Test
         void literalAnswer() {
-            AnswerResult answerResult = makeMe.anAnswerFor(reviewPoint)
+            AnswerViewedByUser answerResult = makeMe.anAnswerFor(reviewPoint)
                     .type(CLOZE_SELECTION)
                     .answer("this / that")
                     .inMemoryPlease();
@@ -69,7 +69,7 @@ class AnswerResultTest {
 
         @Test
         void correct () {
-            AnswerResult answerResult = makeMe.anAnswerFor(reviewPoint)
+            AnswerViewedByUser answerResult = makeMe.anAnswerFor(reviewPoint)
                     .type(LINK_SOURCE_EXCLUSIVE)
                     .answer("blah")
                     .inMemoryPlease();
@@ -78,7 +78,7 @@ class AnswerResultTest {
 
         @Test
         void wrong () {
-            AnswerResult answerResult = makeMe.anAnswerFor(reviewPoint)
+            AnswerViewedByUser answerResult = makeMe.anAnswerFor(reviewPoint)
                     .type(LINK_SOURCE_EXCLUSIVE)
                     .answer(source.getTitle())
                     .inMemoryPlease();

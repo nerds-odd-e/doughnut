@@ -25,7 +25,7 @@ export default defineComponent({
   components: { LoadingPage, NoteSphereComponent, AnswerResult, ShowReviewPoint },
   data() {
     return {
-      answerResult: undefined as Generated.AnswerResult | undefined
+      answerResult: undefined as Generated.AnswerViewedByUser | undefined
     }
   },
   computed: {
