@@ -54,7 +54,7 @@ class AnswerResultTest {
     }
 
     @Nested
-    class LinkTargetExclusiveQuestion {
+    class LinkSourceExclusiveQuestion {
         Note target;
         Note source;
         ReviewPoint reviewPoint;

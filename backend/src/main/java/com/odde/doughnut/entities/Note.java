@@ -193,7 +193,7 @@ public class Note {
         if (getParentNote() == null) {
             return new ArrayList<>();
         }
-        return getParentNote().getChildren();
+        return Collections.unmodifiableList(getParentNote().getChildren());
     }
 
     public String getTitle() {

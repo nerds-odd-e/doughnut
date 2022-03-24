@@ -4,15 +4,16 @@ import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class LinkTargetExclusiveQuizFactory implements QuizQuestionFactory {
+public class LinkSourceExclusiveQuizFactory implements QuizQuestionFactory {
     private final Link link;
     private final ReviewPoint reviewPoint;
     private List<Note> cachedFillingOptions = null;
     private Note answerNote = null;
 
-    public LinkTargetExclusiveQuizFactory(ReviewPoint reviewPoint) {
+    public LinkSourceExclusiveQuizFactory(ReviewPoint reviewPoint) {
         this.reviewPoint = reviewPoint;
         this.link = reviewPoint.getLink();
     }
@@ -36,7 +37,7 @@ public class LinkTargetExclusiveQuizFactory implements QuizQuestionFactory {
     public Note generateAnswerNote(QuizQuestionServant servant) {
         if (answerNote == null) {
             Note note = link.getSourceNote();
-            List<Note> siblings = note.getSiblings();
+            List<Note> siblings = new ArrayList<>(note.getSiblings());
             siblings.removeAll(link.getCousinOfSameLinkType(reviewPoint.getUser()));
             siblings.remove(link.getTargetNote());
             siblings.remove(link.getSourceNote());

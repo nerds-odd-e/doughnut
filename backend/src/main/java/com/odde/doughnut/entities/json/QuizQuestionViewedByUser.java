@@ -49,10 +49,8 @@ public class QuizQuestionViewedByUser {
         question.hintLinks = presenter.hintLinks();
         question.viceReviewPointIdList = quizQuestion.getViceReviewPointIdList();
         question.scope = List.of(quizQuestion.getReviewPoint().getSourceNote().getNotebook().getHeadNote());
-        QuizQuestionViewedByUser.OptionCreator optionCreator = presenter.optionCreator();
-        Stream<Integer> ids = Arrays.stream(quizQuestion.getOptionNoteIds().split(",")).map(Integer::valueOf);
-        Stream<Note> noteStream = ids.map(noteRepository::findById).filter(Optional::isPresent).map(Optional::get);
-        question.options = noteStream.map(optionCreator::optionFromNote).toList();
+        Stream<Note> noteStream = noteRepository.findAllByIds(quizQuestion.getOptionNoteIds().split(","));
+        question.options = noteStream.map(presenter.optionCreator()::optionFromNote).toList();
         return Optional.of(question);
     }
 

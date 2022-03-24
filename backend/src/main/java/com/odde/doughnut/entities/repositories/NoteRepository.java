@@ -10,6 +10,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.stream.Stream;
 
 public interface NoteRepository extends CrudRepository<Note, Integer> {
     @Query(value = "SELECT note.*,rs.level as level from note " + byOwnershipWhereThereIsNoReviewPoint, nativeQuery = true)
@@ -96,4 +97,6 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
     @Query(value = " UPDATE note JOIN notes_closure ON notes_closure.note_id = note.id AND notes_closure.ancestor_id = :#{#note.id} SET deleted_at = NULL WHERE deleted_at = :currentUTCTimestamp", nativeQuery = true)
     void undoDeleteDescendants(@Param("note") Note note, @Param("currentUTCTimestamp") Timestamp currentUTCTimestamp);
 
+    @Query(value = "SELECT note.* FROM note where id in (:ids)", nativeQuery = true)
+    Stream<Note> findAllByIds(String[] ids);
 }

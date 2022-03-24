@@ -4,7 +4,6 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -24,7 +23,7 @@ import static org.hamcrest.Matchers.*;
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
-class LinkTargetExclusiveQuizFactoryTest {
+class LinkSourceExclusiveQuizFactoryTest {
     @Autowired
     MakeMe makeMe;
     UserModel userModel;
