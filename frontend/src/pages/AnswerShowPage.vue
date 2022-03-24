@@ -35,7 +35,7 @@ export default defineComponent({
   },
   methods: {
     async fetchData() {
-      this.answerResult = await this.api.reviewMethods.getAnswer(this.answerId);
+      this.answerResult = await this.storedApi.reviewMethods.getAnswer(this.answerId);
     },
   },
   watch: {
