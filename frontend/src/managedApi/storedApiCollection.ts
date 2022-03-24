@@ -39,6 +39,20 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
         return res;
       },
 
+      async processAnswer(data: Generated.Answer) {
+        const res = await managedApi.restPost(`reviews/answer`, data) as Generated.AnswerResult
+        const reviewPointViewedByUser = res.nextRepetition?.reviewPointViewedByUser;
+        if(reviewPointViewedByUser) loadReviewPointViewedByUser(reviewPointViewedByUser);
+        return res
+      },
+
+      async getAnswer(answerId: Doughnut.ID) {
+        const res = await managedApi.restGet(`reviews/answers/${answerId}`) as Generated.AnswerResult;
+        const reviewPointViewedByUser = res.reviewPoint;
+        if(reviewPointViewedByUser) loadReviewPointViewedByUser(reviewPointViewedByUser);
+        return res
+      },
+
       async selfEvaluate(reviewPointId: Doughnut.ID, data: Generated.SelfEvaluation) {
         const res = await managedApi.restPost(
           `reviews/${reviewPointId}/self-evaluate`,

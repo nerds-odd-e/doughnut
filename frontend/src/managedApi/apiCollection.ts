@@ -11,13 +11,6 @@ const apiCollection = (managedApi: ManagedApi) => ({
     },
   },
   reviewMethods: {
-    async processAnswer(data: Generated.Answer) {
-      return await managedApi.restPost(`reviews/answer`, data) as Generated.AnswerResult
-    },
-
-    async getAnswer(answerId: Doughnut.ID) {
-      return await managedApi.restGet(`reviews/answers/${answerId}`) as Generated.AnswerResult;
-    },
 
     removeFromReview(reviewPointId: Doughnut.ID) {
       return managedApi.restPost(`review-points/${reviewPointId}/remove`, {});

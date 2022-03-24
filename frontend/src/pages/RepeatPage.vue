@@ -167,7 +167,7 @@ export default defineComponent({
     },
 
     processAnswer(answerData: Generated.Answer) {
-      this.api.reviewMethods.processAnswer(answerData)
+      this.storedApi.reviewMethods.processAnswer(answerData)
       .then((res: Generated.AnswerResult) => {
         this.answerResult = res
         if (res.correct) {

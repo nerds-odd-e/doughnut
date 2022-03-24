@@ -9,7 +9,6 @@
   </template>
   <template v-else>
     <AnswerResult v-if="answerResult" v-bind="{answerResult}"/>
-
     <ShowReviewPoint
       v-bind="{ reviewPointViewedByUser }"
     />
