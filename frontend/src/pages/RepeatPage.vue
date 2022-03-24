@@ -46,6 +46,7 @@
               quizQuestion: repetition.quizQuestion,
             }"
             @answer="processAnswer($event)"
+            :key="reviewPoint.id"
           />
           <template v-else>
               <Repetition
