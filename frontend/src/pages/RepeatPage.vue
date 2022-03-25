@@ -23,7 +23,7 @@
           }"
           @viewLastResult="viewLastResult()"
         />
-        <div class="alert alert-success" v-if="lastAnswerCorrrect">Correct!</div>
+        <div class="alert alert-success" v-if="latestAnswerCorrrect">Correct!</div>
         <QuizQuestion
           v-if="repetition?.quizQuestion"
           v-bind="{
@@ -34,7 +34,7 @@
           :key="reviewPointId"
         />
         <template v-else>
-          <div class="alert alert-success" v-if="lastAnswerCorrrect">
+          <div class="alert alert-success">
             You have finished all repetitions for this half a day!
           </div>
         </template>
@@ -67,8 +67,8 @@ export default defineComponent({
   data() {
     return {
       repetition: undefined as Generated.RepetitionForUser | undefined,
-      answerResult: undefined as Generated.AnswerResult | undefined,
-      lastResult: undefined,
+      previousResults: [] as Generated.AnswerResult[],
+      previousResultCursor: undefined as number | undefined,
       finished: 0,
       toRepeatCount: 0,
     };
@@ -77,38 +77,36 @@ export default defineComponent({
     reviewPointId() {
       return this.repetition?.quizQuestion?.quizQuestion?.reviewPoint;
     },
-    quizMode() {
-      return !this.answerResult;
-    },
     hasLastResult() {
-      return this.lastResult?.answerResult;
+      return this.previousResultCursor !== undefined
     },
-    lastAnswerCorrrect() {
-      return this.answerResult?.correct;
+    latestAnswerCorrrect() {
+      return this.previousResults.length > 0 && this.previousResults[this.previousResults.length - 1].correct
     },
   },
   methods: {
     backToRepeat() {
+      this.previousResultCursor = this.previousResults.length - 1
       this.$router.push({ name: "repeat" });
     },
     loadNew(resp?: Generated.RepetitionForUser) {
-      this.lastResult = {
-        answerResult: this.answerResult,
-        repetition: this.repetition,
-      };
-
       this.repetition = resp;
       if (resp) {
         this.toRepeatCount = resp.toRepeatCount;
-        this.answerResult = undefined;
         this.$router.push({ name: "repeat-quiz" });
       }
     },
 
     viewLastResult() {
-      const last = this.lastResult.answerResult;
-      this.lastResult = null;
-      this.$router.push({ name: "repeat-answer", params: { answerId: last.answerId } });
+      if(this.previousResultCursor === undefined) return;
+      const answerId = this.previousResults[this.previousResultCursor].answerId
+      if(this.previousResultCursor > 0){
+         this.previousResultCursor -= 1
+      }
+      else {
+        this.previousResultCursor = undefined
+      }
+      this.$router.push({ name: "repeat-answer", params: { answerId } });
     },
 
     fetchData() {
@@ -131,7 +129,8 @@ export default defineComponent({
       this.storedApi.reviewMethods
         .processAnswer(answerData)
         .then((res: Generated.AnswerResult) => {
-          this.answerResult = res;
+          this.previousResults.push(res)
+          this.previousResultCursor = this.previousResults.length - 1
           if (res.correct) {
             this.finished += 1;
             this.toRepeatCount -= 1;
@@ -146,19 +145,6 @@ export default defineComponent({
         .catch((err) => this.noLongerExist());
     },
 
-    selfEvaluate(data) {
-      if (data !== "again" && !this.answerResult) {
-        this.finished += 1;
-        this.toRepeatCount -= 1;
-      }
-
-      this.storedApi.reviewMethods
-        .selfEvaluate(this.reviewPointId, {
-          selfEvaluation: data,
-          increaseRepeatCount: !this.answerResult,
-        })
-        .then(() => this.fetchData());
-    },
     async removeFromReview() {
       if (
         !(await this.popups.confirm(

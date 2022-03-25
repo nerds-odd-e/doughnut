@@ -17,7 +17,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -97,25 +96,27 @@ class RestReviewsController {
     }
 
     @GetMapping(path = "/answers/{answer}")
+    @Transactional
     public AnswerViewedByUser getAnswer(Answer answer) {
         UserModel user = currentUserFetcher.getUser();
         user.getAuthorization().assertAuthorization(answer.getQuestion().getReviewPoint());
         AnswerModel answerModel = modelFactoryService.toAnswerModel(answer);
         AnswerViewedByUser answerResult = answerModel.getAnswerViewedByUser();
         answerResult.reviewPoint = ReviewPointViewedByUser.from(answer.getQuestion().getReviewPoint(), user);
+        answerResult.quizQuestion = QuizQuestionViewedByUser.from(answer.getQuestion(), modelFactoryService.noteRepository);
         return answerResult;
     }
 
     @PostMapping(path = "/{reviewPoint}/self-evaluate")
     @Transactional
-    public List<Integer> selfEvaluate(ReviewPoint reviewPoint, @RequestBody SelfEvaluation selfEvaluation) {
+    public ReviewPoint selfEvaluate(ReviewPoint reviewPoint, @RequestBody SelfEvaluation selfEvaluation) {
         if (reviewPoint == null || reviewPoint.getId() == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The review point does not exist.");
         }
         UserModel user = currentUserFetcher.getUser();
         user.getAuthorization().assertLoggedIn();
         modelFactoryService.toReviewPointModel(reviewPoint).evaluate(testabilitySettings.getCurrentUTCTimestamp(), selfEvaluation.selfEvaluation, selfEvaluation.increaseRepeatCount);
-        return List.of();
+        return reviewPoint;
     }
 
 }

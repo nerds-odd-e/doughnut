@@ -21,3 +21,4 @@ Feature: Repetition Quiz
     And I should see the statistics of note "sedition"
       | RepetitionCount |
       | 1               |
+    When I choose the happy option

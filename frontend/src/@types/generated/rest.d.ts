@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-03-25 17:22:15.
+// Generated using typescript-generator version 2.35.1025 on 2022-03-25 20:19:27.
 
 declare namespace Generated {
 
@@ -161,6 +161,7 @@ declare namespace Generated {
         answerDisplay: string;
         correct: boolean;
         reviewPoint: ReviewPointViewedByUser;
+        quizQuestion: QuizQuestionViewedByUser;
     }
 
     interface AnswerResult {

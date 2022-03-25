@@ -55,7 +55,7 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
         const res = await managedApi.restPost(
           `reviews/${reviewPointId}/self-evaluate`,
           data
-        ) as Generated.RepetitionForUser;
+        ) as Generated.ReviewPoint;
         return res;
       },
 
