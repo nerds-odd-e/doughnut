@@ -16,7 +16,7 @@
         </button>
       </template>
     </div>
-    <QuizQuestion :quizQuestion="answerResult.quizQuestion"/>
+    <QuizQuestion v-if="answerResult.quizQuestion" :quizQuestion="answerResult.quizQuestion"/>
   </LoadingPage>
 </template>
 
