@@ -41,8 +41,6 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
 
       async processAnswer(data: Generated.Answer) {
         const res = await managedApi.restPost(`reviews/answer`, data) as Generated.AnswerResult
-        const reviewPointViewedByUser = res.nextRepetition?.reviewPointViewedByUser;
-        if(reviewPointViewedByUser) loadReviewPointViewedByUser(reviewPointViewedByUser);
         return res
       },
 
@@ -58,13 +56,11 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
           `reviews/${reviewPointId}/self-evaluate`,
           data
         ) as Generated.RepetitionForUser;
-        loadReviewPointViewedByUser(res.reviewPointViewedByUser);
         return res;
       },
 
       async getNextReviewItem() {
         const res = await managedApi.restGet(`reviews/repeat`) as Generated.RepetitionForUser
-        loadReviewPointViewedByUser(res.reviewPointViewedByUser);
         return res;
       },
     },

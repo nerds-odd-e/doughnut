@@ -1,6 +1,6 @@
 <template>
   <template v-if="quizQuestion.questionType === 'JUST_REVIEW'">
-    <NoteSphereComponent
+    <NoteSphereAsync
       v-bind="{
         noteId: quizQuestion.revealedNoteId,
         expandChildren: false,
@@ -85,9 +85,9 @@ import BasicBreadcrumb from "../commons/BasicBreadcrumb.vue";
 import ShowPicture from "../notes/ShowPicture.vue";
 import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
 import TextInput from "../form/TextInput.vue";
-import NoteSphereComponent from "../notes/views/NoteSphereComponent.vue";
 import SelfEvaluateButtons from "./SelfEvaluateButtons.vue";
 import SvgNoReview from "../svgs/SvgNoReview.vue";
+import NoteSphereAsync from "../notes/NoteSphereAsync.vue";
 
 export default defineComponent({
   props: {
@@ -101,9 +101,9 @@ export default defineComponent({
     ShowPicture,
     NoteFrameOfLinks,
     TextInput,
-    NoteSphereComponent,
     SelfEvaluateButtons,
-    SvgNoReview
+    SvgNoReview,
+    NoteSphereAsync
 },
   emits: ["answer", "selfEvaluate", "removeFromReview"],
   data() {
