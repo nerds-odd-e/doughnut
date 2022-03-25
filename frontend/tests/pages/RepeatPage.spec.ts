@@ -36,30 +36,28 @@ describe('repeat page', () => {
   });
 
   it('replace route with repeat/quiz if there is a quiz', async () => {
-    const repetition = makeMe.aRepetition.ofNote(note).withAQuiz().please();
+    const repetition = makeMe.aRepetition.ofNote(note).please();
     await mountPage(repetition);
     expect(mockRouterPush).toHaveBeenCalledWith({ name: 'repeat-quiz' });
   });
 
-  describe('repeat page with no quiz (or after quiz)', () => {
+  describe('repeat page with "just review" quiz', () => {
     let repetition: Generated.RepetitionForUser;
 
     beforeEach(()=>{
       note = makeMe.aNoteSphere.please();
       helper.store.loadNoteSpheres([note]);
-      repetition = makeMe.aRepetition.ofNote(note).please();
+      repetition = makeMe.aRepetition.ofNote(note).quizType("JUST_REVIEW").please();
     })
 
     it('stay at repeat page if there is no quiz', async () => {
       await mountPage(repetition);
       expect(mockRouterPush).toHaveBeenCalledWith({
-        name: 'repeat',
-        replace: true,
+        name: 'repeat-quiz',
       });
     });
 
     it('should call the self-evaluate api', async () => {
-      repetition = makeMe.aRepetition.ofNote(note).please();
       const reviewPointId = repetition.reviewPointViewedByUser.reviewPoint.id;
       const wrapper = await mountPage(repetition);
       helper.apiMock.expecting(`/api/reviews/${reviewPointId}/self-evaluate`)
@@ -70,7 +68,6 @@ describe('repeat page', () => {
       const {popups} = usePopups()
       const popupData = {} as { popupInfo?: PopupInfo}
       popups.register(popupData)
-      repetition = makeMe.aRepetition.ofNote(note).please();
       const reviewPointId = repetition.reviewPointViewedByUser.reviewPoint.id;
       const wrapper = await mountPage(repetition);
 

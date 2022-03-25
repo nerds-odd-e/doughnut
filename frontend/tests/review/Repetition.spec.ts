@@ -11,26 +11,11 @@ describe('repetition page', () => {
     helper.reset()
   });
 
-  describe('repetition page for a note', () => {
-    const note = makeMe.aNoteSphere.please();
-    const reviewPointViewedByUser = makeMe.aReviewPoint.ofNote(note).please();
-
-    it('for note', async () => {
-      const wrapper = helper.component(Repetition).withProps({ reviewPointViewedByUser }).currentRoute({ name: 'root' }).mount()
-      expect(wrapper.findAll('.btn-toolbar')).toHaveLength(1);
-    });
-  });
-
   describe('repetition page for a link', () => {
     const linkViewedByUser = makeMe.aLinkViewedByUser.please();
     const reviewPointViewedByUser = makeMe.aReviewPoint
       .ofLink(linkViewedByUser)
       .please();
-
-    it('for link', async () => {
-      const wrapper = helper.component(Repetition).withProps({ reviewPointViewedByUser }).currentRoute({ name: 'root' }).mount()
-      expect(wrapper.findAll('.btn-toolbar')).toHaveLength(1);
-    });
 
     it('click on note when doing review', async () => {
       const wrapper = helper.component(Repetition).withProps({ reviewPointViewedByUser }).currentRoute({ name: 'repeat' }).mount()

@@ -1,9 +1,30 @@
 package com.odde.doughnut.models.quizFacotries;
 
 import com.odde.doughnut.entities.QuizQuestion;
+import com.odde.doughnut.entities.ReviewPoint;
 
-public class JustReviewQuizPresenter extends ClozeDescriptonQuizPresenter {
+import java.util.Optional;
+
+public class JustReviewQuizPresenter implements QuizQuestionPresenter {
+    private final ReviewPoint reviewPoint;
+
     public JustReviewQuizPresenter(QuizQuestion quizQuestion) {
-        super(quizQuestion);
+        this.reviewPoint = quizQuestion.getReviewPoint();
     }
+
+    @Override
+    public Optional<Integer> revealedNoteId() {
+        return Optional.of(reviewPoint.getNoteId());
+    }
+
+    @Override
+    public String mainTopic() {
+        return "";
+    }
+
+    @Override
+    public String instruction() {
+        return "";
+    }
+
 }

@@ -29,11 +29,6 @@ public class LinkSourceExclusiveQuizFactory implements QuizQuestionFactory {
     }
 
     @Override
-    public String generateInstruction() {
-        return String.format("Which of the following is <em>NOT</em> %s", link.getLinkType().label);
-    }
-
-    @Override
     public Note generateAnswerNote(QuizQuestionServant servant) {
         if (answerNote == null) {
             Note note = link.getSourceNote();

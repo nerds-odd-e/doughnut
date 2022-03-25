@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-03-25 11:43:27.
+// Generated using typescript-generator version 2.35.1025 on 2022-03-25 13:37:12.
 
 declare namespace Generated {
 
@@ -104,6 +104,7 @@ declare namespace Generated {
         scope: Note[];
         options: Option[];
         pictureWithMask?: PictureWithMask;
+        revealedNoteId?: number;
     }
 
     interface RedirectToNoteResponse {
@@ -112,7 +113,7 @@ declare namespace Generated {
 
     interface RepetitionForUser {
         reviewPointViewedByUser: ReviewPointViewedByUser;
-        quizQuestion?: QuizQuestionViewedByUser;
+        quizQuestion: QuizQuestionViewedByUser;
         toRepeatCount: number;
     }
 
@@ -200,8 +201,8 @@ declare namespace Generated {
         targetNote: Note;
         typeId: number;
         createdAt: string;
-        linkTypeLabel: string;
         linkNameOfSource: string;
+        linkTypeLabel: string;
     }
 
     interface TextContent {
@@ -215,8 +216,8 @@ declare namespace Generated {
         noteAccessories: NoteAccessories;
         textContent: TextContent;
         createdAt: string;
-        pictureWithMask?: PictureWithMask;
         title: string;
+        pictureWithMask?: PictureWithMask;
         parentId?: number;
         shortDescription: string;
     }

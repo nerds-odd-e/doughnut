@@ -2,8 +2,6 @@ package com.odde.doughnut.models.quizFacotries;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.QuizQuestion;
-import org.apache.logging.log4j.util.Strings;
 
 import java.util.List;
 
@@ -17,11 +15,6 @@ public class PictureSelectionQuizFactory implements QuizQuestionFactory {
     @Override
     public List<Note> generateFillingOptions(QuizQuestionServant servant) {
         return servant.choose5FromCohort(answerNote, n -> n.getNoteAccessories().hasPicture() && !n.equals(answerNote));
-    }
-
-    @Override
-    public String generateInstruction() {
-        return "";
     }
 
     @Override

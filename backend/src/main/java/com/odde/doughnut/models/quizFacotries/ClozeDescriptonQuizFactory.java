@@ -15,11 +15,6 @@ public abstract class ClozeDescriptonQuizFactory implements QuizQuestionFactory 
     }
 
     @Override
-    public String generateInstruction() {
-        return answerNote.getClozeDescription();
-    }
-
-    @Override
     public Note generateAnswerNote(QuizQuestionServant servant) {
         return answerNote;
     }

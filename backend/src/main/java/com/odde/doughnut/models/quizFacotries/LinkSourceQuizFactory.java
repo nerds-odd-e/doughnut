@@ -26,11 +26,6 @@ public class LinkSourceQuizFactory implements QuizQuestionFactory {
     }
 
     @Override
-    public String generateInstruction() {
-        return "Which one <em>is immediately " + link.getLinkTypeLabel() + "</em>:";
-    }
-
-    @Override
     public Note generateAnswerNote(QuizQuestionServant servant) {
         return answerNote;
     }

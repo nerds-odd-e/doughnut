@@ -6,14 +6,10 @@ import ReviewPointBuilder from "./ReviewPointBuilder";
 class RepetitionBuilder extends Builder<Generated.RepetitionForUser> {
   note?: Generated.NoteSphere
 
-  quizQuestion?: Generated.QuizQuestionViewedByUser
+  quizQuestion: Generated.QuizQuestionViewedByUser
 
-  ofNote(note: Generated.NoteSphere): RepetitionBuilder {
-    this.note = note
-    return this
-  }
-
-  withAQuiz(): RepetitionBuilder {
+  constructor() {
+    super();
     this.quizQuestion = {
           quizQuestion: {
             id: generateId(),
@@ -39,7 +35,17 @@ class RepetitionBuilder extends Builder<Generated.RepetitionForUser> {
           scope: []
         }
 
+  }
+
+  ofNote(note: Generated.NoteSphere): RepetitionBuilder {
+    this.note = note
     return this
+  }
+
+  quizType(value: Generated.QuestionType): RepetitionBuilder {
+    this.quizQuestion.questionType = value;
+    this.quizQuestion.revealedNoteId = this.note?.id;
+    return this;
   }
 
   do(): Generated.RepetitionForUser {

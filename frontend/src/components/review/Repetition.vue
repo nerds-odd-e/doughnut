@@ -3,20 +3,6 @@
       v-bind="{ reviewPointViewedByUser }"
     />
 
-    <div class="btn-toolbar justify-content-between">
-      <SelfEvaluateButtons
-        v-bind="{ sadButton }"
-        :key="buttonKey"
-        @selfEvaluate="selfEvaluate($event)"
-      />
-      <button
-        class="btn"
-        title="remove this note from review"
-        @click="$emit('removeFromReview')"
-      >
-        <SvgNoReview />
-      </button>
-    </div>
 </template>
 
 <script lang="ts">

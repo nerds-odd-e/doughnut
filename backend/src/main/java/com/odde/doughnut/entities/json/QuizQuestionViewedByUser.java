@@ -9,7 +9,6 @@ import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionPresenter;
 import lombok.Getter;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -41,8 +40,9 @@ public class QuizQuestionViewedByUser {
 
     public Optional<PictureWithMask> pictureWithMask;
 
-    public static Optional<QuizQuestionViewedByUser> from(QuizQuestion quizQuestion, NoteRepository noteRepository) {
-        if(quizQuestion == null) return Optional.empty();
+    public Optional<Integer> revealedNoteId;
+
+    public static QuizQuestionViewedByUser from(QuizQuestion quizQuestion, NoteRepository noteRepository) {
         QuizQuestionPresenter presenter = quizQuestion.getQuestionType().presenter.apply(quizQuestion);
         QuizQuestionViewedByUser question = new QuizQuestionViewedByUser();
         question.quizQuestion = quizQuestion;
@@ -51,11 +51,12 @@ public class QuizQuestionViewedByUser {
         question.mainTopic = presenter.mainTopic();
         question.hintLinks = presenter.hintLinks();
         question.pictureWithMask = presenter.pictureWithMask();
+        question.revealedNoteId = presenter.revealedNoteId();
         question.viceReviewPointIdList = quizQuestion.getViceReviewPointIdList();
         question.scope = List.of(quizQuestion.getReviewPoint().getSourceNote().getNotebook().getHeadNote());
         Stream<Note> noteStream = noteRepository.findAllByIds(quizQuestion.getOptionNoteIds().split(","));
         question.options = noteStream.map(presenter.optionCreator()::optionFromNote).toList();
-        return Optional.of(question);
+        return question;
     }
 
     public static class Option {

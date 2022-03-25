@@ -39,6 +39,8 @@
               quizQuestion: repetition.quizQuestion,
             }"
             @answer="processAnswer($event)"
+            @selfEvaluate="selfEvaluate($event)"
+            @removeFromReview="removeFromReview"
             :key="reviewPoint.id"
           />
           <template v-else>
@@ -95,7 +97,7 @@ export default defineComponent({
       return this.reviewPointViewedByUser?.reviewPoint;
     },
     quizMode() {
-      return !(this.repetition?.quizQuestion?.questionType === 'JUST_REVIEW') && !this.answerResult;
+      return !this.answerResult;
     },
     linkId() {
       return this.reviewPoint?.linkId

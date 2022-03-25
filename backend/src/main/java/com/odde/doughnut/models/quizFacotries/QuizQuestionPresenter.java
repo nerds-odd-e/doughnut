@@ -3,9 +3,7 @@ package com.odde.doughnut.models.quizFacotries;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.json.LinkViewed;
 import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
-import com.odde.doughnut.models.UserModel;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -22,6 +20,10 @@ public interface QuizQuestionPresenter {
     }
 
     default Optional<PictureWithMask> pictureWithMask() {
+        return Optional.empty();
+    }
+
+    default Optional<Integer> revealedNoteId() {
         return Optional.empty();
     }
 }

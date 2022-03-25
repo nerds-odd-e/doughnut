@@ -2,20 +2,18 @@ package com.odde.doughnut.models.quizFacotries;
 
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.json.LinkViewed;
 import com.odde.doughnut.models.UserModel;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 public interface QuizQuestionFactory {
-    List<Note> generateFillingOptions(QuizQuestionServant servant);
-
-    String generateInstruction();
-
     Note generateAnswerNote(QuizQuestionServant servant);
+
+    default List<Note> generateFillingOptions(QuizQuestionServant servant) {
+        return new ArrayList<>();
+    }
 
     default boolean isValidQuestion() {
         return true;

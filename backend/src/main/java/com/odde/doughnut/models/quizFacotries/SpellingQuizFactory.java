@@ -14,11 +14,6 @@ public class SpellingQuizFactory extends ClozeDescriptonQuizFactory {
     }
 
     @Override
-    public List<Note> generateFillingOptions(QuizQuestionServant servant) {
-        return new ArrayList<>();
-    }
-
-    @Override
     public boolean isValidQuestion() {
         Note note = reviewPoint.getNote();
         if (!Strings.isEmpty(note.getTextContent().getDescription())) {

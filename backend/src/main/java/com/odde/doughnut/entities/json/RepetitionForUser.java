@@ -11,7 +11,7 @@ public class RepetitionForUser {
     private ReviewPointViewedByUser reviewPointViewedByUser;
     @Getter
     @Setter
-    private Optional<QuizQuestionViewedByUser> quizQuestion;
+    private QuizQuestionViewedByUser quizQuestion;
     @Getter
     @Setter
     private Integer toRepeatCount;
