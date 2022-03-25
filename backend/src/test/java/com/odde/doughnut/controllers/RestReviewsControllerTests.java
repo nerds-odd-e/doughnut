@@ -208,7 +208,7 @@ class RestReviewsControllerTests {
 
             @Test
             void repeatHappy() {
-                assertThrows(ResponseStatusException.class, ()->evaluate("happy"));
+                evaluate("happy");
                 assertThat(rp.getForgettingCurveIndex(), greaterThan(expectedSatisfyingForgettingCurveIndex));
                 assertThat(rp.getRepetitionCount(), equalTo(0));
             }

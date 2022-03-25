@@ -17,6 +17,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -101,20 +102,20 @@ class RestReviewsController {
         user.getAuthorization().assertAuthorization(answer.getQuestion().getReviewPoint());
         AnswerModel answerModel = modelFactoryService.toAnswerModel(answer);
         AnswerViewedByUser answerResult = answerModel.getAnswerViewedByUser();
-        answerResult.reviewPoint = Optional.of(ReviewPointViewedByUser.from(answer.getQuestion().getReviewPoint(), user));
+        answerResult.reviewPoint = ReviewPointViewedByUser.from(answer.getQuestion().getReviewPoint(), user);
         return answerResult;
     }
 
     @PostMapping(path = "/{reviewPoint}/self-evaluate")
     @Transactional
-    public RepetitionForUser selfEvaluate(ReviewPoint reviewPoint, @RequestBody SelfEvaluation selfEvaluation) {
+    public List<Integer> selfEvaluate(ReviewPoint reviewPoint, @RequestBody SelfEvaluation selfEvaluation) {
         if (reviewPoint == null || reviewPoint.getId() == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The review point does not exist.");
         }
         UserModel user = currentUserFetcher.getUser();
         user.getAuthorization().assertLoggedIn();
         evaluate(reviewPoint, selfEvaluation);
-        return repeatReview();
+        return List.of();
     }
 
     private void evaluate(ReviewPoint reviewPoint, SelfEvaluation selfEvaluation) {

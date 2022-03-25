@@ -166,7 +166,7 @@ export default defineComponent({
       this.storedApi.reviewMethods.selfEvaluate(this.reviewPoint.id,
         { selfEvaluation: data, increaseRepeatCount: !this.answerResult },
       )
-      .then(this.loadNew)
+      .then(()=>this.fetchData())
       .catch((err) => this.noLongerExist())
     },
     async removeFromReview() {

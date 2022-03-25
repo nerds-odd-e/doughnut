@@ -2,9 +2,9 @@
  * @jest-environment jsdom
  */
 import AnswerShowPage from '@/pages/AnswerShowPage.vue';
+import { flushPromises } from '@vue/test-utils';
 import helper from '../helpers';
 import makeMe from '../fixtures/makeMe';
-import { flushPromises } from '@vue/test-utils';
 
 helper.resetWithApiMock(beforeEach, afterEach)
 
