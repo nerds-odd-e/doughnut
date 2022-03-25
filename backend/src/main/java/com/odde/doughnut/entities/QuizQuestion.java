@@ -33,7 +33,8 @@ public class QuizQuestion {
         WHICH_SPEC_HAS_INSTANCE(9, WhichSpecHasInstanceQuizFactory::new, WhichSpecHasInstanceQuizPresenter::new),
         FROM_SAME_PART_AS(10, FromSamePartAsQuizFactory::new, FromSamePartAsQuizPresenter::new),
         FROM_DIFFERENT_PART_AS(11, FromDifferentPartAsQuizFactory::new, FromDifferentPartAsQuizPresenter::new),
-        LINK_SOURCE_EXCLUSIVE(12, LinkSourceExclusiveQuizFactory::new, LinkSourceExclusiveQuizPresenter::new);
+        LINK_SOURCE_EXCLUSIVE(12, LinkSourceExclusiveQuizFactory::new, LinkSourceExclusiveQuizPresenter::new),
+        JUST_REVIEW(13, JustReviewQuizFactory::new, JustReviewQuizPresenter::new);
 
         public final Integer id;
         public final Function<ReviewPoint, QuizQuestionFactory> factory;

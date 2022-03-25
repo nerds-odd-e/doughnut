@@ -5,34 +5,23 @@ import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionDirector;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public record QuizQuestionGenerator(ReviewPoint reviewPoint,
-                                    Randomizer randomizer) {
+                                    Randomizer randomizer, ModelFactoryService modelFactoryService) {
 
-    List<QuizQuestion.QuestionType> availableQuestionTypes() {
-        List<QuizQuestion.QuestionType> questionTypes = new ArrayList<>();
-        if (reviewPoint.getLink() != null) {
-            Collections.addAll(questionTypes, reviewPoint.getLink().getLinkType().getQuestionTypes());
-        } else {
-            questionTypes.add(QuizQuestion.QuestionType.SPELLING);
-            questionTypes.add(QuizQuestion.QuestionType.CLOZE_SELECTION);
-            questionTypes.add(QuizQuestion.QuestionType.PICTURE_TITLE);
-            questionTypes.add(QuizQuestion.QuestionType.PICTURE_SELECTION);
-        }
-        return questionTypes;
-    }
-
-    QuizQuestion generateQuestion(ModelFactoryService modelFactoryService) {
-        List<QuizQuestion.QuestionType> questionTypes = availableQuestionTypes();
+    QuizQuestion generateQuestion() {
+        List<QuizQuestion.QuestionType> questionTypes = reviewPoint.availableQuestionTypes();
         randomizer.shuffle(questionTypes);
         for (QuizQuestion.QuestionType type : questionTypes) {
-            QuizQuestionDirector quizQuestionDirector = new QuizQuestionDirector(type, randomizer, reviewPoint, modelFactoryService);
-            QuizQuestion quizQuestion = quizQuestionDirector.buildQuizQuestion();
+            QuizQuestion quizQuestion = buildQuestionOfType(type);
             if (quizQuestion != null) return quizQuestion;
         }
-        return null;
+        return buildQuestionOfType(QuizQuestion.QuestionType.JUST_REVIEW);
+    }
+
+    private QuizQuestion buildQuestionOfType(QuizQuestion.QuestionType type) {
+        QuizQuestionDirector quizQuestionDirector = new QuizQuestionDirector(type, randomizer, reviewPoint, modelFactoryService);
+        return quizQuestionDirector.buildQuizQuestion();
     }
 }

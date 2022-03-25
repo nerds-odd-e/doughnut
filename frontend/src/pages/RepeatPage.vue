@@ -95,7 +95,7 @@ export default defineComponent({
       return this.reviewPointViewedByUser?.reviewPoint;
     },
     quizMode() {
-      return this.repetition?.quizQuestion && !this.answerResult;
+      return !(this.repetition?.quizQuestion?.questionType === 'JUST_REVIEW') && !this.answerResult;
     },
     linkId() {
       return this.reviewPoint?.linkId

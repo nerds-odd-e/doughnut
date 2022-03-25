@@ -49,7 +49,7 @@ public record ReviewPointModel(ReviewPoint entity,
     }
 
     public QuizQuestion generateAQuizQuestion(Randomizer randomizer) {
-        return new QuizQuestionGenerator(entity, randomizer).generateQuestion(modelFactoryService);
+        return new QuizQuestionGenerator(entity, randomizer, modelFactoryService).generateQuestion();
     }
 
     public void updateReviewPoint(boolean correct, Timestamp currentUTCTimestamp) {

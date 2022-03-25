@@ -18,7 +18,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class QuizQuestionGeneratorTest {
     MakeMe makeMe = new MakeMe();
-    private Randomizer randomizer = new NonRandomizer();
     Note note = makeMe.aNote().inMemoryPlease();
 
     @Test
@@ -46,8 +45,7 @@ class QuizQuestionGeneratorTest {
     }
 
     private List<QuizQuestion.QuestionType> getQuestionTypes(ReviewPoint reviewPoint) {
-        QuizQuestionGenerator generator = new QuizQuestionGenerator(reviewPoint, randomizer);
-        return generator.availableQuestionTypes();
+        return reviewPoint.availableQuestionTypes();
     }
 
 }

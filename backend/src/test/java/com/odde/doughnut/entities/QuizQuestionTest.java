@@ -46,7 +46,7 @@ class QuizQuestionTest {
     @Test
     void aNoteWithNoDescriptionHasNoQuiz() {
         Note note = makeMe.aNote().withNoDescription().byUser(userModel).please();
-        assertThat( getQuizQuestion(note), is(nullValue()));
+        assertThat( getQuizQuestion(note).getQuestionType(), equalTo(QuizQuestion.QuestionType.JUST_REVIEW));
     }
 
     @Test

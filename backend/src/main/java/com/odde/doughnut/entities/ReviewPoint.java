@@ -2,6 +2,9 @@ package com.odde.doughnut.entities;
 
 import java.sql.Timestamp;
 import java.time.ZoneId;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -150,4 +153,17 @@ public class ReviewPoint {
       final int nextRepeatInHours = spacedRepetitionAlgorithm.getRepeatInHours(nextForgettingCurveIndex);
       updateMemoryState(currentUTCTimestamp, nextRepeatInHours, nextForgettingCurveIndex);
   }
+
+    public List<QuizQuestion.QuestionType> availableQuestionTypes() {
+        List<QuizQuestion.QuestionType> questionTypes = new ArrayList<>();
+        if (getLink() != null) {
+            Collections.addAll(questionTypes, getLink().getLinkType().getQuestionTypes());
+        } else {
+            questionTypes.add(QuizQuestion.QuestionType.SPELLING);
+            questionTypes.add(QuizQuestion.QuestionType.CLOZE_SELECTION);
+            questionTypes.add(QuizQuestion.QuestionType.PICTURE_TITLE);
+            questionTypes.add(QuizQuestion.QuestionType.PICTURE_SELECTION);
+        }
+        return questionTypes;
+    }
 }
