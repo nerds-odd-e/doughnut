@@ -20,7 +20,6 @@ RUN apt-get -y update \
     xauth \
     xvfb \
     zsh \
-    bat \
     htop \
     lsof \
     net-tools \
@@ -31,6 +30,7 @@ RUN apt-get -y update \
     wget \
     zip \
     bash-completion \
+    zsh-completion \
     procps \
     gnupg \
     curl \
