@@ -76,9 +76,6 @@ export default defineComponent({
     };
   },
   computed: {
-    reviewPointViewedByUser() {
-      return this.repetition?.reviewPointViewedByUser;
-    },
     reviewPointId() {
       return this.repetition?.quizQuestion?.quizQuestion?.reviewPoint;
     },
@@ -143,7 +140,7 @@ export default defineComponent({
         if (res.correct) {
           this.finished += 1
           this.repetition.toRepeatCount -= 1
-          if (res.nextRepetition?.reviewPointViewedByUser) {
+          if (res.nextRepetition) {
             this.loadNew(res.nextRepetition)
           }
           this.resetRoute()

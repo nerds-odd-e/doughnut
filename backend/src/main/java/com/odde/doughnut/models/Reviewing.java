@@ -108,12 +108,11 @@ public class Reviewing {
         return userModel.entity.getSubscriptions().stream().map(modelFactoryService::toSubscriptionModel);
     }
 
-    public RepetitionForUser getOneRepetitionForUser(UserModel user, Randomizer randomizer) {
+    public RepetitionForUser getOneRepetitionForUser(Randomizer randomizer) {
         ReviewPointModel reviewPointModel = getOneReviewPointNeedToRepeat(randomizer);
         RepetitionForUser repetitionForUser = new RepetitionForUser();
         if (reviewPointModel == null) return null;
 
-        repetitionForUser.setReviewPointViewedByUser(ReviewPointViewedByUser.from(reviewPointModel.getEntity(), user));
         QuizQuestion quizQuestion = reviewPointModel.generateAQuizQuestion(randomizer);
         repetitionForUser.setQuizQuestion(QuizQuestionViewedByUser.from(quizQuestion, this.modelFactoryService.noteRepository));
         repetitionForUser.setToRepeatCount(toRepeatCount());

@@ -19,10 +19,8 @@ beforeEach(() => {
 });
 
 describe('repeat page', () => {
-  let note = makeMe.aNoteSphere.please();
 
   const mountPage = async (repetition: Generated.RepetitionForUser | Record<string, never>) => {
-    helper.store.loadNoteSpheres([note]);
     helper.apiMock.expecting('/api/reviews/repeat', repetition);
     const wrapper = renderer.currentRoute({ name: 'repeat' }).mount()
     await flushPromises();
@@ -30,13 +28,14 @@ describe('repeat page', () => {
   };
 
   it('redirect to review page if nothing to repeat', async () => {
-    await mountPage({});
-    helper.apiMock.verifyCall('/api/reviews/repeat')
+    helper.apiMock.expectingResponse('/api/reviews/repeat', {status: 404});
+    renderer.currentRoute({ name: 'repeat' }).mount()
+    await flushPromises();
     expect(mockRouterPush).toHaveBeenCalledWith({ name: 'reviews' });
   });
 
   it('replace route with repeat/quiz if there is a quiz', async () => {
-    const repetition = makeMe.aRepetition.ofNote(note).please();
+    const repetition = makeMe.aRepetition.please();
     await mountPage(repetition);
     expect(mockRouterPush).toHaveBeenCalledWith({ name: 'repeat-quiz' });
   });
@@ -45,9 +44,7 @@ describe('repeat page', () => {
     let repetition: Generated.RepetitionForUser;
 
     beforeEach(()=>{
-      note = makeMe.aNoteSphere.please();
-      helper.store.loadNoteSpheres([note]);
-      repetition = makeMe.aRepetition.ofNote(note).quizType("JUST_REVIEW").please();
+      repetition = makeMe.aRepetition.quizType("JUST_REVIEW").please();
     })
 
     it('stay at repeat page if there is no quiz', async () => {
@@ -58,7 +55,7 @@ describe('repeat page', () => {
     });
 
     it('should call the self-evaluate api', async () => {
-      const reviewPointId = repetition.reviewPointViewedByUser.reviewPoint.id;
+      const reviewPointId = repetition.quizQuestion.quizQuestion.reviewPoint;
       const wrapper = await mountPage(repetition);
       helper.apiMock.expecting(`/api/reviews/${reviewPointId}/self-evaluate`)
       await wrapper.find('#repeat-sad').trigger('click');
@@ -68,7 +65,7 @@ describe('repeat page', () => {
       const {popups} = usePopups()
       const popupData = {} as { popupInfo?: PopupInfo}
       popups.register(popupData)
-      const reviewPointId = repetition.reviewPointViewedByUser.reviewPoint.id;
+      const reviewPointId = repetition.quizQuestion.quizQuestion.reviewPoint;
       const wrapper = await mountPage(repetition);
 
       helper.apiMock.expectingResponse(`/api/reviews/${reviewPointId}/self-evaluate`, {status: 404})

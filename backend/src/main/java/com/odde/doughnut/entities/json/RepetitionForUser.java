@@ -6,9 +6,6 @@ import lombok.Setter;
 public class RepetitionForUser {
     @Getter
     @Setter
-    private ReviewPointViewedByUser reviewPointViewedByUser;
-    @Getter
-    @Setter
     private QuizQuestionViewedByUser quizQuestion;
     @Getter
     @Setter
