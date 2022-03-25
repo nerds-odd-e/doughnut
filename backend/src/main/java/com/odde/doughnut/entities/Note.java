@@ -144,13 +144,6 @@ public class Note {
         return StringUtils.abbreviate(getTextContent().getDescription(), 50);
     }
 
-    public Optional<String> getNotePicture() {
-        if (noteAccessories.getUseParentPicture() && getParentNote() != null) {
-            return getParentNote().getNotePicture();
-        }
-        return noteAccessories.getNotePicture();
-    }
-
     private void addAncestors(List<Note> ancestors) {
         int[] counter = {1};
         ancestors.forEach(anc -> {
@@ -298,7 +291,6 @@ public class Note {
         return new NoteTitle(getTextContent().getTitle());
     }
 
-    @JsonIgnore
     public Optional<PictureWithMask> getPictureWithMask() {
         return getNotePicture().map((pic)->{
             PictureWithMask pictureWithMask = new PictureWithMask();
@@ -307,5 +299,13 @@ public class Note {
             return pictureWithMask;
         });
     }
+
+    private Optional<String> getNotePicture() {
+        if (noteAccessories.getUseParentPicture() && getParentNote() != null) {
+            return getParentNote().getNotePicture();
+        }
+        return noteAccessories.getNotePicture();
+    }
+
 }
 

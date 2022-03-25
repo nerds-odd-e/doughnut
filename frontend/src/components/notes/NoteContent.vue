@@ -17,11 +17,11 @@
         @blur="onBlurTextField"/>
     <NoteShortDescription class="col" v-if="size==='medium'" :shortDescription="note.shortDescription"/>
     <SvgDescriptionIndicator v-if="size==='small' && !!textContent.description" class="description-indicator"/>
-    <template v-if="!!note.notePicture">
+    <template v-if="note.pictureWithMask">
       <ShowPicture
         v-if="size!=='small'"
         class="col text-center"
-        v-bind="{notePicture: note.notePicture, pictureMask: note.noteAccessories.pictureMask}"
+        v-bind="note.pictureWithMask"
         :opacity="0.2"
       />
       <SvgPictureIndicator v-else class="picture-indicator"/>
@@ -39,7 +39,8 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, PropType } from "vue";
 import NoteTitleWithLink from "./NoteTitleWithLink.vue";
 import NoteShortDescription from "./NoteShortDescription.vue";
 import ShowPicture from "./ShowPicture.vue";
@@ -49,12 +50,12 @@ import SvgUrlIndicator from "../svgs/SvgUrlIndicator.vue";
 import EditableText from "../form/EditableText.vue";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 
-export default ({
+export default defineComponent({
   setup() {
     return useStoredLoadingApi({hasFormError: true});
   },
   props: {
-    note: Object,
+    note: {type: Object as PropType<Generated.Note>, required: true },
     size: { type: String, default: 'large'},
     titleAsLink: Boolean,
   },
@@ -68,9 +69,6 @@ export default ({
     NoteTitleWithLink,
   },
   computed: {
-    twoColumns() {
-      return !!this.notePicture && !!this.note.noteAccessories.description;
-    },
     textContent(){
       return {...this.note.textContent};
     },

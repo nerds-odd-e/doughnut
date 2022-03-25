@@ -33,7 +33,7 @@ export default {
   props: { note:Object },
   methods: {
     async saveAsMD(){
-        const mdString = generateMD({...this.note.textContent, ...this.note.noteAccessories, image: this.note.notePicture})
+        const mdString = generateMD({...this.note.textContent, ...this.note.noteAccessories, image: this.note.pictureWithMask?.notePicture})
         const blob = new Blob([mdString], {type: "text/plain;charset=utf-8"});
         await saveAs(blob, `${this.note.title}.md`);
 

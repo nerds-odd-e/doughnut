@@ -29,7 +29,7 @@
       >
         <div v-if="!option.picture">{{ option.display }}</div>
         <div v-else>
-          <ShowPicture :notePicture="option.note.note.notePicture" :pictureMask="option.note.note.noteAccessories.pictureMask" :opacity="1" />
+          <ShowPicture v-bind="option.note.note.pictureWithMask" :opacity="1" />
         </div>
       </button>
     </div>

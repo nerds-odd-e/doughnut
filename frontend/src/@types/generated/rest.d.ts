@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-03-25 10:05:55.
+// Generated using typescript-generator version 2.35.1025 on 2022-03-25 10:17:36.
 
 declare namespace Generated {
 
@@ -218,7 +218,7 @@ declare namespace Generated {
         title: string;
         parentId?: number;
         shortDescription: string;
-        notePicture?: string;
+        pictureWithMask?: PictureWithMask;
     }
 
     interface Ownership {

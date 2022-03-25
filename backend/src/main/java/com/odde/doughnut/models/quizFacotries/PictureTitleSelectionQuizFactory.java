@@ -10,7 +10,7 @@ public class PictureTitleSelectionQuizFactory extends ClozeTitleSelectionQuizFac
 
     @Override
     public boolean isValidQuestion() {
-        return !Strings.isEmpty(reviewPoint.getNote().getNotePicture().orElse(null));
+        return reviewPoint.getNote().getPictureWithMask().isPresent();
     }
 
 }

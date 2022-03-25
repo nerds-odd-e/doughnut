@@ -49,7 +49,10 @@ class NoteBuilder extends Builder<Generated.Note> {
   }
 
   picture(value: string): NoteBuilder {
-    this.data.notePicture = value;
+    this.data.pictureWithMask = {
+      notePicture: value,
+      pictureMask: '',
+    };
     return this;
   }
 
