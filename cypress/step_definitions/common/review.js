@@ -167,8 +167,8 @@ Then("I should see that my answer {string} is wrong", (answer) => {
   cy.findByText(`Your answer \`${answer}\` is wrong.`)
 })
 
-Then("I should see the satisfied button: {string}", (yesNo) => {
-  cy.get("#repeat-satisfied").should(yesNo === "yes" ? "exist" : "not.exist")
+Then("I should see the repetition is finished: {string}", (yesNo) => {
+  cy.findByText("You have finished all repetitions for this half a day!").should(yesNo === "yes" ? "exist" : "not.exist")
 })
 
 Then("I am changing note {string}'s review setting", (noteTitle) => {

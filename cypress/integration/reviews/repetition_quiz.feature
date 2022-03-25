@@ -22,12 +22,12 @@ Feature: Repetition Quiz
     When I am repeat-reviewing my old note on day 2
     When I choose answer "<answer>"
     Then I should see that my answer <result>
-    And I should see the satisfied button: "<should see the next button>"
+    And I should see the repetition is finished: "<should see finish>"
 
     Examples:
-      | answer   | result              | should see the next button |
-      | sedation | "sedation" is wrong | no                         |
-      | sedition | is correct          | yes                        |
+      | answer   | result              | should see finish |
+      | sedation | "sedation" is wrong | no                |
+      | sedition | is correct          | yes               |
 
   Scenario Outline: Spelling quiz
     Given I am learning new note on day 1

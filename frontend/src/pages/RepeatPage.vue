@@ -37,14 +37,9 @@
             :key="reviewPoint.id"
           />
           <template v-else>
-              <Repetition
-                v-bind="{ 
-                  reviewPointViewedByUser,
-                  answerResult
-                }"
-                @selfEvaluate="selfEvaluate($event)"
-                @removeFromReview="removeFromReview"
-              />
+            <div class="alert alert-success" v-if="lastAnswerCorrrect">
+              You have finished all repetitions for this half a day!
+            </div>
           </template>
         </template>
       </Minimizable>
@@ -55,7 +50,6 @@
 import { defineComponent } from "vue";
 import Minimizable from "../components/commons/Minimizable.vue";
 import QuizQuestion from "../components/review/QuizQuestion.vue";
-import Repetition from "../components/review/Repetition.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import RepeatProgressBar from "../components/review/RepeatProgressBar.vue";
 import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
@@ -70,7 +64,6 @@ export default defineComponent({
   components: {
     Minimizable,
     QuizQuestion,
-    Repetition,
     ContainerPage,
     RepeatProgressBar,
   },

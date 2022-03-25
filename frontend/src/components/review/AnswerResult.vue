@@ -11,7 +11,6 @@
 import { defineComponent, PropType } from "vue";
 
 export default defineComponent({
-  name: "Repetition",
   props: {
     answerResult: {type: Object as PropType<Generated.AnswerResult>, required: true},
   },
