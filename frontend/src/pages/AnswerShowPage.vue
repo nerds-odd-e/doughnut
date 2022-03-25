@@ -1,8 +1,8 @@
 <template>
-  <LoadingPage v-bind="{ loading, contentExists: answerResult }">
+  <LoadingPage v-bind="{ loading, contentExists: !!answerResult }">
     <AnswerResult v-if="answerResult" v-bind="{answerResult}"/>
-    <Repetition
-      v-bind="{ reviewPointViewedByUser, answerResult }"
+    <ShowReviewPoint
+      v-bind="{ reviewPointViewedByUser }"
     />
 
   </LoadingPage>
@@ -14,8 +14,8 @@ import LoadingPage from "./commons/LoadingPage.vue";
 import NoteSphereComponent from '../components/notes/views/NoteSphereComponent.vue';
 import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
 import AnswerResult from "../components/review/AnswerResult.vue";
-import Repetition from '../components/review/Repetition.vue';
 import NoteStatisticsButton from '../components/notes/NoteStatisticsButton.vue';
+import ShowReviewPoint from '../components/review/ShowReviewPoint.vue';
 
 export default defineComponent({
   setup() {
@@ -23,7 +23,7 @@ export default defineComponent({
   },
   name: "NoteShowPage",
   props: { answerId: Number },
-  components: { LoadingPage, NoteSphereComponent, AnswerResult, Repetition, NoteStatisticsButton },
+  components: { LoadingPage, NoteSphereComponent, AnswerResult, NoteStatisticsButton, ShowReviewPoint },
   data() {
     return {
       answerResult: undefined as Generated.AnswerViewedByUser | undefined

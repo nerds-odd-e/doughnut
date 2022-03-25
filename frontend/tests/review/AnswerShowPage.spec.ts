@@ -1,15 +1,14 @@
 /**
  * @jest-environment jsdom
  */
-import Repetition from '@/components/review/Repetition.vue';
+import AnswerShowPage from '@/pages/AnswerShowPage.vue';
 import helper from '../helpers';
 import makeMe from '../fixtures/makeMe';
+import { flushPromises } from '@vue/test-utils';
+
+helper.resetWithApiMock(beforeEach, afterEach)
 
 describe('repetition page', () => {
-
-  beforeEach(async () => {
-    helper.reset()
-  });
 
   describe('repetition page for a link', () => {
     const linkViewedByUser = makeMe.aLinkViewedByUser.please();
@@ -17,8 +16,18 @@ describe('repetition page', () => {
       .ofLink(linkViewedByUser)
       .please();
 
+    beforeEach(async () => {
+      helper.apiMock.expecting('/api/reviews/answers/1', {
+        answerId: 1,
+        answerDisplay: '',
+        correct: true,
+        reviewPoint: reviewPointViewedByUser
+      });
+    });
+
     it('click on note when doing review', async () => {
-      const wrapper = helper.component(Repetition).withProps({ reviewPointViewedByUser }).currentRoute({ name: 'repeat' }).mount()
+      const wrapper = helper.component(AnswerShowPage).withProps({ answerId: 1 }).currentRoute({ name: 'repeat' }).mount()
+      await flushPromises();
       expect(
         JSON.parse(wrapper.find('.link-source .router-link').attributes().to)
           .name
@@ -26,7 +35,8 @@ describe('repetition page', () => {
     });
 
     it('click on note when doing review and in a nested page', async () => {
-      const wrapper = helper.component(Repetition).withProps({ reviewPointViewedByUser }).currentRoute({ name: 'repeat-noteShow', params: { rawNoteId: 123 } }).mount()
+      const wrapper = helper.component(AnswerShowPage).withProps({ answerId: 1 }).currentRoute({ name: 'repeat-noteShow', params: { rawNoteId: 123 } }).mount()
+      await flushPromises();
       expect(
         JSON.parse(wrapper.find('.link-source .router-link').attributes().to)
       ).toEqual({ name: 'notebooks' });
