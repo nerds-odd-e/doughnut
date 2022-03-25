@@ -33,10 +33,9 @@
           <div class="alert alert-success" v-if="lastAnswerCorrrect">
             Correct!
           </div>
-          <Quiz
+          <QuizQuestion
             v-if="quizMode"
             v-bind="{
-              reviewPointViewedByUser: repetition.reviewPointViewedByUser,
               quizQuestion: repetition.quizQuestion,
             }"
             @answer="processAnswer($event)"
@@ -60,7 +59,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import Minimizable from "../components/commons/Minimizable.vue";
-import Quiz from "../components/review/Quiz.vue";
+import QuizQuestion from "../components/review/QuizQuestion.vue";
 import Repetition from "../components/review/Repetition.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import RepeatProgressBar from "../components/review/RepeatProgressBar.vue";
@@ -75,7 +74,7 @@ export default defineComponent({
   props: { nested: Boolean },
   components: {
     Minimizable,
-    Quiz,
+    QuizQuestion,
     Repetition,
     ContainerPage,
     RepeatProgressBar,

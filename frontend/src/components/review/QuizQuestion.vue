@@ -64,7 +64,6 @@ import TextInput from "../form/TextInput.vue";
 
 export default defineComponent({
   props:{
-    reviewPointViewedByUser: { type: Object as PropType<Generated.ReviewPointViewedByUser>, required: true},
     quizQuestion: { type: Object as PropType<Generated.QuizQuestionViewedByUser>, required: true},
   },
   components: {
@@ -86,11 +85,6 @@ export default defineComponent({
         question: this.quizQuestion.quizQuestion,
       }
 
-    },
-    sourceNote(): Generated.Note {
-      if (!!this.reviewPointViewedByUser.noteWithPosition)
-        return this.reviewPointViewedByUser.noteWithPosition.note.note;
-      return this.reviewPointViewedByUser.linkViewedByUser!.sourceNoteWithPosition.note.note;
     },
     pictureQuestion() {
       return this.quizQuestion.questionType === "PICTURE_TITLE";
