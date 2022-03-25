@@ -114,7 +114,7 @@ class RestReviewsController {
         }
         UserModel user = currentUserFetcher.getUser();
         user.getAuthorization().assertLoggedIn();
-        modelFactoryService.toReviewPointModel(reviewPoint).evaluate(selfEvaluation, testabilitySettings.getCurrentUTCTimestamp());
+        modelFactoryService.toReviewPointModel(reviewPoint).evaluate(testabilitySettings.getCurrentUTCTimestamp(), selfEvaluation.selfEvaluation, selfEvaluation.increaseRepeatCount);
         return List.of();
     }
 

@@ -4,7 +4,6 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.ReviewSetting;
-import com.odde.doughnut.entities.json.SelfEvaluation;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
@@ -62,22 +61,22 @@ public record ReviewPointModel(ReviewPoint entity,
         }
     }
 
-    public void evaluate(SelfEvaluation selfEvaluation, Timestamp currentUTCTimestamp) {
-        if (selfEvaluation.increaseRepeatCount != null && selfEvaluation.increaseRepeatCount) {
+    public void evaluate(Timestamp currentUTCTimestamp, String selfEvaluation, Boolean increaseRepeatCount) {
+        if (increaseRepeatCount != null && increaseRepeatCount) {
             increaseRepetitionCountAndSave();
         }
-        if ("again".equals(selfEvaluation.selfEvaluation)) {
+        if ("again".equals(selfEvaluation)) {
             return;
         }
-        if ("satisfying".equals(selfEvaluation.selfEvaluation)) {
+        if ("satisfying".equals(selfEvaluation)) {
             repeated(currentUTCTimestamp);
             return;
         }
-        if ("sad".equals(selfEvaluation.selfEvaluation)) {
+        if ("sad".equals(selfEvaluation)) {
             repeatedSad(currentUTCTimestamp);
             return;
         }
-        if ("happy".equals(selfEvaluation.selfEvaluation)) {
+        if ("happy".equals(selfEvaluation)) {
             repeatedHappy(currentUTCTimestamp);
             return;
         }

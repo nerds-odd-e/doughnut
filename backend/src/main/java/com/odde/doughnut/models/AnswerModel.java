@@ -1,6 +1,7 @@
 package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.json.SelfEvaluation;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 
 import java.sql.Timestamp;
@@ -26,7 +27,12 @@ public class AnswerModel {
                 this.modelFactoryService.reviewPointRepository
                         .findById(rPid).ifPresent(vice -> this.modelFactoryService.toReviewPointModel(vice).updateReviewPoint(correct, currentUTCTimestamp))
         );
-        this.modelFactoryService.toReviewPointModel(answer.getQuestion().getReviewPoint()).updateReviewPoint(correct, currentUTCTimestamp);
+        ReviewPointModel reviewPointModel = this.modelFactoryService.toReviewPointModel(answer.getQuestion().getReviewPoint());
+        if(answer.getQuestion().getQuestionType() == QuizQuestion.QuestionType.JUST_REVIEW) {
+            reviewPointModel.evaluate(currentUTCTimestamp, answer.getSpellingAnswer(), true);
+            return;
+        }
+        reviewPointModel.updateReviewPoint(correct, currentUTCTimestamp);
     }
 
     public AnswerViewedByUser getAnswerViewedByUser() {

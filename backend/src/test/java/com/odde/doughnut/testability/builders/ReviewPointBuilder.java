@@ -54,4 +54,13 @@ public class ReviewPointBuilder extends EntityBuilder<ReviewPoint> {
 
     }
 
+    public ReviewPointBuilder forgettiveCurveIndex(int value) {
+        entity.setForgettingCurveIndex(value);
+        return this;
+    }
+
+    public ReviewPointBuilder repetitionCount(int value) {
+        entity.setRepetitionCount(value);
+        return this;
+    }
 }

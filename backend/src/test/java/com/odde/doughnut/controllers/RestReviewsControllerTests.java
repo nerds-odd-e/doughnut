@@ -99,7 +99,7 @@ class RestReviewsControllerTests {
         @BeforeEach
         void setup() {
             note1 = makeMe.aNote().please();
-            reviewPoint = makeMe.aReviewPointFor(note1).by(userModel).please();
+            reviewPoint = makeMe.aReviewPointFor(note1).by(userModel).repetitionCount(5).forgettiveCurveIndex(200).please();
             QuizQuestion quizQuestion = makeMe.aQuestion().of(QuizQuestion.QuestionType.CLOZE_SELECTION, reviewPoint).inMemoryPlease();
             answer.setQuestion(quizQuestion);
             answer.setAnswerNoteId(note1.getId());
@@ -149,6 +149,20 @@ class RestReviewsControllerTests {
             userModel = makeMe.aNullUserModel();
             Answer answer = new Answer();
             assertThrows(ResponseStatusException.class, () -> controller().answerQuiz(answer));
+        }
+
+        @Test
+        void shouldUpdateSelfEvaluateIfJustReview() {
+            QuizQuestion quizQuestion = makeMe.aQuestion().of(QuizQuestion.QuestionType.JUST_REVIEW, reviewPoint).inMemoryPlease();
+            answer.setQuestion(quizQuestion);
+            answer.setAnswerNoteId(null);
+            answer.setSpellingAnswer("sad");
+            Integer oldForgettingCurveIndex = reviewPoint.getForgettingCurveIndex();
+            Integer oldRepetitionCount = reviewPoint.getRepetitionCount();
+            AnswerResult answerResult = controller().answerQuiz(answer);
+            assertTrue(answerResult.correct);
+            assertThat(reviewPoint.getRepetitionCount(), greaterThan(oldRepetitionCount));
+            assertThat(reviewPoint.getForgettingCurveIndex(), lessThanOrEqualTo(oldForgettingCurveIndex));
         }
 
     }
