@@ -21,7 +21,7 @@
       </button>
     </div>
   </template>
-  <template>
+  <template v-else>
     <BasicBreadcrumb :ancestors="quizQuestion.scope" />
     <ShowPicture
       v-if="quizQuestion.pictureWithMask"

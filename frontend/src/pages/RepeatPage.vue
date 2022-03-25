@@ -92,9 +92,6 @@ export default defineComponent({
     quizMode() {
       return !this.answerResult;
     },
-    reviewPointId() {
-      return this.reviewPoint?.id
-    },
     hasLastResult() {
       return this.lastResult?.answerResult;
     },
@@ -171,7 +168,7 @@ export default defineComponent({
         this.repetition.toRepeatCount -= 1
       }
 
-      this.storedApi.reviewMethods.selfEvaluate(this.reviewPointId,
+      this.storedApi.reviewMethods.selfEvaluate(this.reviewPoint.id,
         { selfEvaluation: data, increaseRepeatCount: !this.answerResult },
       )
       .then(this.loadNew)
@@ -184,7 +181,7 @@ export default defineComponent({
       ) {
         return;
       }
-      this.api.reviewMethods.removeFromReview(this.reviewPointId)
+      this.api.reviewMethods.removeFromReview(this.reviewPoint.id)
       .then((r) => this.fetchData())
     },
 
