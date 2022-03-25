@@ -17,6 +17,7 @@ import java.util.Set;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
@@ -45,6 +46,14 @@ public class NoteTest {
             Note child = makeMe.aNote().under(parent).useParentPicture().inMemoryPlease();
             assertThat(child.getPictureWithMask().get().notePicture, equalTo(parent.getNoteAccessories().getPictureUrl()));
         }
+
+        @Test
+        void useParentPictureWhenTheUrlIsEmptyString() {
+            Note parent = makeMe.aNote().pictureUrl("").inMemoryPlease();
+            Note child = makeMe.aNote().under(parent).useParentPicture().inMemoryPlease();
+            assertTrue(child.getPictureWithMask().isEmpty());
+        }
+
     }
 
     @Nested

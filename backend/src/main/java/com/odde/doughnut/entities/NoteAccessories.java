@@ -69,7 +69,8 @@ public class NoteAccessories {
         if (uploadPicture != null) {
             return Optional.of("/images/" + uploadPicture.getId() + "/" + uploadPicture.getName());
         }
-        return Optional.ofNullable(pictureUrl);
+        if(Strings.isBlank(pictureUrl)) return Optional.empty();
+        return Optional.of(pictureUrl);
     }
 
     public boolean hasPicture() {
