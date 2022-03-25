@@ -128,7 +128,9 @@ export default defineComponent({
     fetchData() {
       this.storedApi.reviewMethods.getNextReviewItem().then(
         this.loadNew
-      );
+      ).catch((e) =>{
+        this.$router.push({ name: "reviews" });
+      });
     },
 
     async noLongerExist() {

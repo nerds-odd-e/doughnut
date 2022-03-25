@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
@@ -207,7 +208,7 @@ class RestReviewsControllerTests {
 
             @Test
             void repeatHappy() {
-                evaluate("happy");
+                assertThrows(ResponseStatusException.class, ()->evaluate("happy"));
                 assertThat(rp.getForgettingCurveIndex(), greaterThan(expectedSatisfyingForgettingCurveIndex));
                 assertThat(rp.getRepetitionCount(), equalTo(0));
             }

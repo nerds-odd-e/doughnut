@@ -110,14 +110,12 @@ public class Reviewing {
 
     public RepetitionForUser getOneRepetitionForUser(UserModel user, Randomizer randomizer) {
         ReviewPointModel reviewPointModel = getOneReviewPointNeedToRepeat(randomizer);
-
         RepetitionForUser repetitionForUser = new RepetitionForUser();
+        if (reviewPointModel == null) return null;
 
-        if (reviewPointModel != null) {
-            repetitionForUser.setReviewPointViewedByUser(ReviewPointViewedByUser.from(reviewPointModel.getEntity(), user));
-            QuizQuestion quizQuestion = reviewPointModel.generateAQuizQuestion(randomizer);
-            repetitionForUser.setQuizQuestion(QuizQuestionViewedByUser.from(quizQuestion, this.modelFactoryService.noteRepository));
-        }
+        repetitionForUser.setReviewPointViewedByUser(ReviewPointViewedByUser.from(reviewPointModel.getEntity(), user));
+        QuizQuestion quizQuestion = reviewPointModel.generateAQuizQuestion(randomizer);
+        repetitionForUser.setQuizQuestion(QuizQuestionViewedByUser.from(quizQuestion, this.modelFactoryService.noteRepository));
         repetitionForUser.setToRepeatCount(toRepeatCount());
         return repetitionForUser;
     }

@@ -74,7 +74,9 @@ class RestReviewsController {
         UserModel user = currentUserFetcher.getUser();
         user.getAuthorization().assertLoggedIn();
         Reviewing reviewing = user.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
-        return reviewing.getOneRepetitionForUser(user, testabilitySettings.getRandomizer());
+        RepetitionForUser oneRepetitionForUser = reviewing.getOneRepetitionForUser(user, testabilitySettings.getRandomizer());
+        if(oneRepetitionForUser == null) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "no more repetition for today");
+        return oneRepetitionForUser;
     }
 
     @PostMapping("/answer")
