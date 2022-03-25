@@ -114,32 +114,8 @@ class RestReviewsController {
         }
         UserModel user = currentUserFetcher.getUser();
         user.getAuthorization().assertLoggedIn();
-        evaluate(reviewPoint, selfEvaluation);
+        modelFactoryService.toReviewPointModel(reviewPoint).evaluate(selfEvaluation, testabilitySettings.getCurrentUTCTimestamp());
         return List.of();
-    }
-
-    private void evaluate(ReviewPoint reviewPoint, SelfEvaluation selfEvaluation) {
-        ReviewPointModel reviewPointModel = modelFactoryService.toReviewPointModel(reviewPoint);
-        if (selfEvaluation.increaseRepeatCount != null && selfEvaluation.increaseRepeatCount) {
-            reviewPointModel.increaseRepetitionCountAndSave();
-        }
-        if ("again".equals(selfEvaluation.selfEvaluation)) {
-            return;
-        }
-        if ("satisfying".equals(selfEvaluation.selfEvaluation)) {
-            reviewPointModel.repeated(testabilitySettings.getCurrentUTCTimestamp());
-            return;
-        }
-        if ("sad".equals(selfEvaluation.selfEvaluation)) {
-            reviewPointModel.repeatedSad(testabilitySettings.getCurrentUTCTimestamp());
-            return;
-        }
-        if ("happy".equals(selfEvaluation.selfEvaluation)) {
-            reviewPointModel.repeatedHappy(testabilitySettings.getCurrentUTCTimestamp());
-            return;
-        }
-
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
     }
 
 }

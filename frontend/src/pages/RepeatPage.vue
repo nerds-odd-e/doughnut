@@ -148,6 +148,7 @@ export default defineComponent({
         }
         this.$router.push({ name: "repeat-answer", params: {answerId: res.answerId} });
       })
+      .catch((err) => this.noLongerExist())
     },
 
     selfEvaluate(data) {
@@ -160,7 +161,6 @@ export default defineComponent({
         { selfEvaluation: data, increaseRepeatCount: !this.answerResult },
       )
       .then(()=>this.fetchData())
-      .catch((err) => this.noLongerExist())
     },
     async removeFromReview() {
       if (!(await this.popups.confirm(

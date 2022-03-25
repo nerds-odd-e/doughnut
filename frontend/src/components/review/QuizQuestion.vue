@@ -10,7 +10,7 @@
     />
     <div class="btn-toolbar justify-content-between">
       <SelfEvaluateButtons
-        @selfEvaluate="$emit('selfEvaluate', $event)"
+        @selfEvaluate="onSelfEvaluate"
       />
       <button
         class="btn"
@@ -125,6 +125,10 @@ export default defineComponent({
     },
   },
   methods: {
+    onSelfEvaluate(choice: string) {
+      this.answer = choice
+      this.processForm()
+    },
     processForm() {
       this.$emit("answer", this.answerToQuestion);
     },

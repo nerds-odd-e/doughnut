@@ -326,7 +326,7 @@ Cypress.Commands.add("expectNoteTitle", (title) =>
 
 Cypress.Commands.add("repeatReviewOneNoteIfThereIs", ({ review_type, title, additional_info }) => {
   if (review_type == "repeat done") {
-    cy.findByText("You have reviewed all the old notes for today.").should("be.visible")
+    cy.findByText("You have finished all repetitions for this half a day!").should("be.visible")
   } else {
     cy.findByText(title, { selector: "h2" })
     switch (review_type) {

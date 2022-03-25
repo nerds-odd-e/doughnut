@@ -27,7 +27,7 @@ Feature: Bazaar subscription
     And my daily new notes to review is set to 2
     When I subscribe to notebook "Shape" in the bazaar, with target of learning 1 notes per day
     Then On day 1 I should have "2/4" note for initial review and "0/0" for repeat
-    And  On day 1 I repeat old "end                  " and initial review new "Square, My memo, end"
+    And  On day 1 I repeat old "                     " and initial review new "Square, My memo, end"
     And  On day 2 I repeat old "Square, My memo, end " and initial review new "Triangle, end       "
     And  I should be able to edit the subscription to notebook "Shape"
 

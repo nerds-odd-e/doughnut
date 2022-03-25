@@ -18,7 +18,7 @@ public record JustReviewQuizFactory(ReviewPoint reviewPoint) implements QuizQues
     }
 
     @Override
-    public List<Note> knownRightAnswers() {
+    public List<Note> allWrongAnswers() {
         return List.of();
     }
 }
