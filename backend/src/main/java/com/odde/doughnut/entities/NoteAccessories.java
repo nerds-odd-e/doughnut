@@ -73,10 +73,6 @@ public class NoteAccessories {
         return Optional.of(pictureUrl);
     }
 
-    public boolean hasPicture() {
-        return Strings.isNotBlank(pictureUrl) || uploadPicture != null || useParentPicture;
-    }
-
     public void fetchUploadedPicture(User user) throws IOException {
         MultipartFile file = getUploadPictureProxy();
         if (file != null && !file.isEmpty()) {
