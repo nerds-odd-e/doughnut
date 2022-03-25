@@ -4,11 +4,7 @@
         <template #minimizedContent>
           <div class="repeat-container" v-on:click="backToRepeat()">
             <RepeatProgressBar
-              :allowPause="!quizMode"
-              :btn="`play`"
               v-bind="{
-                linkId,
-                noteId,
                 finished,
                 toRepeatCount: repetition.toRepeatCount,
                 hasLastResult,
@@ -20,10 +16,7 @@
         </template>
         <template #fullContent>
           <RepeatProgressBar
-            :allowPause="!quizMode"
             v-bind="{
-              linkId,
-              noteId,
               finished,
               toRepeatCount: repetition.toRepeatCount,
               hasLastResult,
@@ -98,12 +91,6 @@ export default defineComponent({
     },
     quizMode() {
       return !this.answerResult;
-    },
-    linkId() {
-      return this.reviewPoint?.linkId
-    },
-    noteId() {
-      return this.reviewPoint?.noteId
     },
     reviewPointId() {
       return this.reviewPoint?.id

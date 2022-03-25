@@ -20,12 +20,8 @@ import ProgressBar from "../commons/ProgressBar.vue";
 export default {
   components: { ViewLastResultButton, ProgressBar },
   props: {
-    noteId: Number,
-    linkId: Number,
-    allowPause: { type: Boolean, default: true },
     finished: Number,
     toRepeatCount: Number,
-    btn: { type: String, default: "pause" },
     hasLastResult: Boolean,
   },
   emits: ["viewLastResult"],
