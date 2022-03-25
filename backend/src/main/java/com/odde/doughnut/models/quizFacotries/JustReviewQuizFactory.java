@@ -14,7 +14,7 @@ public record JustReviewQuizFactory(ReviewPoint reviewPoint) implements QuizQues
 
     @Override
     public Note generateAnswerNote(QuizQuestionServant servant) {
-        return reviewPoint.getNote();
+        return reviewPoint.getSourceNote();
     }
 
     @Override
