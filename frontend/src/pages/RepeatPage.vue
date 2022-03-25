@@ -1,5 +1,5 @@
 <template>
-  <ContainerPage v-bind="{ loading, contentExists: !!reviewPoint }">
+  <ContainerPage v-bind="{ loading, contentExists: !!repetition }">
       <Minimizable :minimized="nested" staticHeight="75px">
         <template #minimizedContent>
           <div class="repeat-container" v-on:click="backToRepeat()">
@@ -34,7 +34,7 @@
             @answer="processAnswer($event)"
             @selfEvaluate="selfEvaluate($event)"
             @removeFromReview="removeFromReview"
-            :key="reviewPoint.id"
+            :key="reviewPointId"
           />
           <template v-else>
             <div class="alert alert-success" v-if="lastAnswerCorrrect">
@@ -79,8 +79,8 @@ export default defineComponent({
     reviewPointViewedByUser() {
       return this.repetition?.reviewPointViewedByUser;
     },
-    reviewPoint() {
-      return this.reviewPointViewedByUser?.reviewPoint;
+    reviewPointId() {
+      return this.repetition?.quizQuestion?.quizQuestion?.reviewPoint;
     },
     quizMode() {
       return !this.answerResult;
@@ -103,11 +103,7 @@ export default defineComponent({
       };
 
       this.repetition = resp;
-      this.answerResult = null;
-      if (!this.reviewPoint) {
-        this.$router.push({ name: "reviews" });
-        return;
-      }
+      this.answerResult = undefined;
       if (this.repetition?.quizQuestion) {
         this.$router.push({ name: "repeat-quiz" });
         return;
@@ -163,7 +159,7 @@ export default defineComponent({
         this.repetition.toRepeatCount -= 1
       }
 
-      this.storedApi.reviewMethods.selfEvaluate(this.reviewPoint.id,
+      this.storedApi.reviewMethods.selfEvaluate(this.reviewPointId,
         { selfEvaluation: data, increaseRepeatCount: !this.answerResult },
       )
       .then(()=>this.fetchData())
@@ -176,7 +172,7 @@ export default defineComponent({
       ) {
         return;
       }
-      this.api.reviewMethods.removeFromReview(this.reviewPoint.id)
+      this.api.reviewMethods.removeFromReview(this.reviewPointId)
       .then((r) => this.fetchData())
     },
 
