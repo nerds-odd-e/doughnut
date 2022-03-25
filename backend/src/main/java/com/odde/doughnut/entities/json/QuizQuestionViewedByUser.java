@@ -2,6 +2,7 @@ package com.odde.doughnut.entities.json;
 
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.PictureWithMask;
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.models.NoteViewer;
@@ -38,6 +39,8 @@ public class QuizQuestionViewedByUser {
     @Getter
     public List<Option> options;
 
+    public Optional<PictureWithMask> pictureWithMask;
+
     public static Optional<QuizQuestionViewedByUser> from(QuizQuestion quizQuestion, NoteRepository noteRepository) {
         if(quizQuestion == null) return Optional.empty();
         QuizQuestionPresenter presenter = quizQuestion.getQuestionType().presenter.apply(quizQuestion);
@@ -47,6 +50,7 @@ public class QuizQuestionViewedByUser {
         question.description = presenter.instruction();
         question.mainTopic = presenter.mainTopic();
         question.hintLinks = presenter.hintLinks();
+        question.pictureWithMask = presenter.pictureWithMask();
         question.viceReviewPointIdList = quizQuestion.getViceReviewPointIdList();
         question.scope = List.of(quizQuestion.getReviewPoint().getSourceNote().getNotebook().getHeadNote());
         Stream<Note> noteStream = noteRepository.findAllByIds(quizQuestion.getOptionNoteIds().split(","));
