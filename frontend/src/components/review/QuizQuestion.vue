@@ -105,7 +105,7 @@ export default defineComponent({
     SvgNoReview,
     NoteSphereAsync
 },
-  emits: ["answer", "selfEvaluate", "removeFromReview"],
+  emits: ["answer", "removeFromReview"],
   data() {
     return {
       answer: "" as string,
