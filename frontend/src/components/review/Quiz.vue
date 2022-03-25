@@ -1,8 +1,6 @@
 <template>
   <BasicBreadcrumb :ancestors="quizQuestion.scope" />
-  <div v-if="pictureQuestion">
-    <ShowPicture :notePicture="sourceNote.notePicture" :pictureMask="sourceNote.noteAccessories.pictureMask" :opacity="1" />
-  </div>
+  <ShowPicture v-if="quizQuestion.pictureWithMask" v-bind="quizQuestion.pictureWithMask" :opacity="1" />
   <NoteFrameOfLinks v-bind="{ links: quizQuestion.hintLinks }">
     <div class="quiz-instruction">
       <pre
