@@ -30,7 +30,6 @@ RUN apt-get -y update \
     wget \
     zip \
     bash-completion \
-    zsh-completion \
     procps \
     gnupg \
     curl \
