@@ -32,7 +32,7 @@ export default defineComponent({
   },
   methods: {
     async fetchData() {
-      this.reviewPointViewedByUser = this.storedApi.reviewMethods.getReviewPoint(this.reviewPointId)
+      this.reviewPointViewedByUser = await this.storedApi.reviewMethods.getReviewPoint(this.reviewPointId)
     },
   },
   watch: {

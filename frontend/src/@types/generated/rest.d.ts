@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-03-26 15:27:55.
+// Generated using typescript-generator version 2.35.1025 on 2022-03-26 15:33:24.
 
 declare namespace Generated {
 
@@ -139,7 +139,6 @@ declare namespace Generated {
 
     interface SelfEvaluation {
         selfEvaluation: string;
-        increaseRepeatCount: boolean;
     }
 
     interface UserForOtherUserView {

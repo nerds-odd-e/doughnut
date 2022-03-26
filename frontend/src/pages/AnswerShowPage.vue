@@ -76,7 +76,6 @@ export default defineComponent({
       this.storedApi.reviewMethods
         .selfEvaluate(this.reviewPoint.id, {
           selfEvaluation: data,
-          increaseRepeatCount: false,
         })
         .then((res) => {
           this.nextReviewAt = res.nextReviewAt;

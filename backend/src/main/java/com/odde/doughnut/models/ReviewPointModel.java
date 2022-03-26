@@ -61,10 +61,7 @@ public record ReviewPointModel(ReviewPoint entity,
         }
     }
 
-    public void evaluate(Timestamp currentUTCTimestamp, String selfEvaluation, Boolean increaseRepeatCount) {
-        if (increaseRepeatCount != null && increaseRepeatCount) {
-            increaseRepetitionCountAndSave();
-        }
+    public void evaluate(Timestamp currentUTCTimestamp, String selfEvaluation) {
         if ("again".equals(selfEvaluation)) {
             return;
         }
