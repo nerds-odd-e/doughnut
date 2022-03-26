@@ -27,11 +27,11 @@ public class QuizQuestionDirector {
     }
 
     public QuizQuestion buildQuizQuestion() {
-        Note answerNote = quizQuestionFactory.generateAnswerNote(servant);
-        if (answerNote == null) {
+        if (!quizQuestionFactory.isValidQuestion()) {
             return null;
         }
-        if (!quizQuestionFactory.isValidQuestion()) {
+        Note answerNote = quizQuestionFactory.generateAnswerNote(servant);
+        if (answerNote == null) {
             return null;
         }
         List<Note> fillingOptions = quizQuestionFactory.generateFillingOptions(servant);
