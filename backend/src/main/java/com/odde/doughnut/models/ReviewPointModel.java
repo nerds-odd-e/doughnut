@@ -24,19 +24,7 @@ public record ReviewPointModel(ReviewPoint entity,
         }
         entity.setUser(userModel.getEntity());
         entity.setInitialReviewedAt(currentUTCTimestamp);
-        repeated(currentUTCTimestamp);
-    }
-
-    public void repeated(Timestamp currentUTCTimestamp) {
-        updateNextRepetitionWithAdjustment(currentUTCTimestamp, 0);
-    }
-
-    public void repeatedSad(Timestamp currentUTCTimestamp) {
-        updateNextRepetitionWithAdjustment(currentUTCTimestamp, -1);
-    }
-
-    public void repeatedHappy(Timestamp currentUTCTimestamp) {
-        updateNextRepetitionWithAdjustment(currentUTCTimestamp, 1);
+        evaluate(currentUTCTimestamp, "satisfying");
     }
 
     private void updateNextRepetitionWithAdjustment(Timestamp currentUTCTimestamp, int adjustment) {
@@ -57,28 +45,32 @@ public record ReviewPointModel(ReviewPoint entity,
     public void updateReviewPoint(boolean correct, Timestamp currentUTCTimestamp) {
         increaseRepetitionCountAndSave();
         if (correct) {
-            repeated(currentUTCTimestamp);
+            evaluate(currentUTCTimestamp, "satisfying");
+        }
+        else {
+            evaluate(currentUTCTimestamp, "sad");
         }
     }
 
     public void evaluate(Timestamp currentUTCTimestamp, String selfEvaluation) {
+        updateNextRepetitionWithAdjustment(currentUTCTimestamp, getAdjustment(selfEvaluation));
+    }
+
+    private int getAdjustment(String selfEvaluation) {
         if ("reset".equals(selfEvaluation)) {
-            updateNextRepetitionWithAdjustment(currentUTCTimestamp, -2);
-            return;
+            return -2;
         }
         if ("satisfying".equals(selfEvaluation)) {
-            repeated(currentUTCTimestamp);
-            return;
+            return 0;
         }
         if ("sad".equals(selfEvaluation)) {
-            repeatedSad(currentUTCTimestamp);
-            return;
+            return -1;
         }
         if ("happy".equals(selfEvaluation)) {
-            repeatedHappy(currentUTCTimestamp);
-            return;
+            return 1;
         }
-
         throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+
     }
+
 }
