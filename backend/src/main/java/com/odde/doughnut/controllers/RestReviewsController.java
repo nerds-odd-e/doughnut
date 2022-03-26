@@ -88,10 +88,8 @@ class RestReviewsController {
         answerModel.updateReviewPoints(testabilitySettings.getCurrentUTCTimestamp());
         answerModel.save();
         AnswerResult answerResult = answerModel.getAnswerResult();
-        if(answerResult.correct) {
-            Reviewing reviewing = user.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
-            answerResult.nextRepetition = Optional.ofNullable(reviewing.getOneRepetitionForUser(testabilitySettings.getRandomizer()));
-        }
+        Reviewing reviewing = user.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
+        answerResult.nextRepetition = Optional.ofNullable(reviewing.getOneRepetitionForUser(testabilitySettings.getRandomizer()));
         return answerResult;
     }
 
