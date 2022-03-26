@@ -11,10 +11,11 @@ public class NonRandomizer implements Randomizer {
     public String alwaysChoose = "first";
 
     @Override
-    public <T> void shuffle(List<T> list) {
+    public <T> List<T> shuffle(List<T> list) {
         if (alwaysChoose.equals("last")) {
             Collections.reverse(list);
         }
+        return list;
     }
 
     @Override

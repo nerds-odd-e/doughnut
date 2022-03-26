@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public interface Randomizer {
-    <T> void shuffle(List<T> list);
+    <T> List<T> shuffle(List<T> list);
     <T> T chooseOneRandomly(List<T> list);
 
     default <T> List<T> randomlyChoose(int maxSize, List<T> list) {

@@ -31,13 +31,10 @@ public class QuizQuestionDirector {
         }
         QuizQuestion quizQuestion = new QuizQuestion();
         List<Note> options = quizQuestionFactory.generateOptions(servant);
-        if(quizQuestionFactory.minimumOptionCount() > 0){
-            if( options.size() < quizQuestionFactory.minimumOptionCount()) {
-                return null;
-            }
-            randomizer.shuffle(options);
-            quizQuestion.setOptionNotes(options);
+        if(quizQuestionFactory.minimumOptionCount() > options.size()) {
+            return null;
         }
+        quizQuestion.setOptionNotes(randomizer.shuffle(options));
         List<ReviewPoint> viceReviewPoints = quizQuestionFactory.getViceReviewPoints(modelFactoryService.toUserModel(reviewPoint.getUser()));
 
         if(quizQuestionFactory.minimumViceReviewPointCount() > 0 && viceReviewPoints.size() < quizQuestionFactory.minimumViceReviewPointCount()) {

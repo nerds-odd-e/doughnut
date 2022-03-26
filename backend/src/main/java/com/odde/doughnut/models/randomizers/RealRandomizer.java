@@ -8,8 +8,9 @@ import java.util.Random;
 
 public class RealRandomizer implements Randomizer {
     @Override
-    public <T> void shuffle(List<T> list) {
+    public <T> List<T> shuffle(List<T> list) {
         Collections.shuffle(list);
+        return list;
     }
 
     @Override
