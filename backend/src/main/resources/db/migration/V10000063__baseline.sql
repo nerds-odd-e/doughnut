@@ -112,15 +112,15 @@ CREATE TABLE `note` (
   `updated_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   `picture_url` varchar(1024) DEFAULT NULL,
   `url` varchar(1024) DEFAULT NULL,
-  `url_is_video` tinyint(1) NOT NULL DEFAULT '0',
+  `url_is_video` tinyint NOT NULL DEFAULT '0',
   `sibling_order` bigint NOT NULL DEFAULT '1',
-  `skip_review` tinyint(1) NOT NULL DEFAULT '0',
+  `skip_review` tinyint NOT NULL DEFAULT '0',
   `master_review_setting_id` int unsigned DEFAULT NULL,
   `image_id` int unsigned DEFAULT NULL,
-  `use_parent_picture` tinyint(1) NOT NULL DEFAULT '0',
+  `use_parent_picture` tinyint NOT NULL DEFAULT '0',
   `picture_mask` varchar(1024) DEFAULT NULL,
-  `hide_title_in_article` tinyint(1) NOT NULL DEFAULT '0',
-  `show_as_bullet_in_article` tinyint(1) NOT NULL DEFAULT '0',
+  `hide_title_in_article` tinyint NOT NULL DEFAULT '0',
+  `show_as_bullet_in_article` tinyint NOT NULL DEFAULT '0',
   `notebook_id` int unsigned DEFAULT NULL,
   `title_idn` varchar(100) DEFAULT NULL,
   `description_idn` text,
@@ -145,7 +145,7 @@ CREATE TABLE `notebook` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `ownership_id` int unsigned NOT NULL,
   `creator_id` int unsigned NOT NULL,
-  `skip_review_entirely` tinyint(1) NOT NULL DEFAULT '0',
+  `skip_review_entirely` tinyint NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `fk_notes_book_creator_id` (`creator_id`),
   KEY `fk_notes_book_ownership_id` (`ownership_id`),
@@ -213,7 +213,7 @@ CREATE TABLE `review_point` (
   `last_reviewed_at` timestamp NOT NULL,
   `initial_reviewed_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `next_review_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `removed_from_review` tinyint(1) NOT NULL DEFAULT '0',
+  `removed_from_review` tinyint NOT NULL DEFAULT '0',
   `link_id` int unsigned DEFAULT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `user_id` (`user_id`,`note_id`,`link_id`),
@@ -231,7 +231,7 @@ CREATE TABLE `review_point` (
 
 CREATE TABLE `review_setting` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `remember_spelling` tinyint(1) NOT NULL DEFAULT '0',
+  `remember_spelling` tinyint NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=19 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
