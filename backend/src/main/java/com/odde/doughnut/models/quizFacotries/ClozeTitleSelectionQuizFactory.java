@@ -6,9 +6,14 @@ import org.apache.logging.log4j.util.Strings;
 
 import java.util.List;
 
-public class ClozeTitleSelectionQuizFactory extends ClozeDescriptonQuizFactory {
+public class ClozeTitleSelectionQuizFactory extends ClozeDescriptonQuizFactory implements QuestionOptionsFactory {
     public ClozeTitleSelectionQuizFactory(ReviewPoint reviewPoint) {
         super(reviewPoint);
+    }
+
+    @Override
+    public Note generateAnswerNote(QuizQuestionServant servant) {
+        return answerNote;
     }
 
     @Override

@@ -7,7 +7,7 @@ import com.odde.doughnut.entities.ReviewPoint;
 import java.util.ArrayList;
 import java.util.List;
 
-public class LinkSourceExclusiveQuizFactory implements QuizQuestionFactory {
+public class LinkSourceExclusiveQuizFactory implements QuizQuestionFactory, QuestionOptionsFactory {
     private final Link link;
     private final ReviewPoint reviewPoint;
     private List<Note> cachedFillingOptions = null;

@@ -5,7 +5,7 @@ import com.odde.doughnut.entities.ReviewPoint;
 
 import java.util.List;
 
-public class PictureSelectionQuizFactory implements QuizQuestionFactory {
+public class PictureSelectionQuizFactory implements QuizQuestionFactory, QuestionOptionsFactory {
     private final Note answerNote;
 
     public PictureSelectionQuizFactory(ReviewPoint reviewPoint) {

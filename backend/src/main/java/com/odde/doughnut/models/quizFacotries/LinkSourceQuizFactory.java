@@ -4,7 +4,7 @@ import com.odde.doughnut.entities.*;
 
 import java.util.List;
 
-public class LinkSourceQuizFactory implements QuizQuestionFactory {
+public class LinkSourceQuizFactory implements QuizQuestionFactory, QuestionOptionsFactory {
     protected final Link link;
     protected final Note answerNote;
     private final User user;
@@ -16,7 +16,7 @@ public class LinkSourceQuizFactory implements QuizQuestionFactory {
         this.user = reviewPoint.getUser();
     }
 
-    @Override
+    @ Override
     public List<Note> generateFillingOptions(QuizQuestionServant servant) {
         if(cachedFillingOptions == null) {
             List<Note> cousinOfSameLinkType = link.getCousinOfSameLinkType(user);

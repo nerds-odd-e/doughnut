@@ -5,16 +5,9 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.models.UserModel;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public interface QuizQuestionFactory {
-    Note generateAnswerNote(QuizQuestionServant servant);
-
-    default List<Note> generateFillingOptions(QuizQuestionServant servant) {
-        return new ArrayList<>();
-    }
-
     default boolean isValidQuestion() {
         return true;
     }
@@ -39,13 +32,8 @@ public interface QuizQuestionFactory {
         return null;
     }
 
-    default Link getCategoryLink() { return null; }
-
-    default List<Note> generateOptions(QuizQuestionServant servant) {
-        Note answerNote = generateAnswerNote(servant);
-        if(answerNote == null) return List.of();
-        List<Note> fillingOptions = generateFillingOptions(servant);
-        fillingOptions.add(answerNote);
-        return fillingOptions;
+    default Link getCategoryLink() {
+        return null;
     }
+
 }

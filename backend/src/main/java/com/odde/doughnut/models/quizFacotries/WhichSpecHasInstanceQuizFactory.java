@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class WhichSpecHasInstanceQuizFactory implements QuizQuestionFactory {
+public class WhichSpecHasInstanceQuizFactory implements QuizQuestionFactory, QuestionOptionsFactory {
     private Link cachedInstanceLink = null;
     private List<Note> cachedFillingOptions = null;
     private final ReviewPoint reviewPoint;

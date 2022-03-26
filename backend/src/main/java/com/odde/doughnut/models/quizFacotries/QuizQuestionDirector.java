@@ -26,16 +26,12 @@ public class QuizQuestionDirector {
     }
 
     public QuizQuestion buildQuizQuestion() {
-        if (!quizQuestionFactory.isValidQuestion()) {
-            return null;
-        }
+        if (!quizQuestionFactory.isValidQuestion()) return null;
         QuizQuestion quizQuestion = new QuizQuestion();
         quizQuestion.setReviewPoint(reviewPoint);
         quizQuestion.setQuestionType(questionType);
-        List<Note> options = quizQuestionFactory.generateOptions(servant);
-        if (quizQuestionFactory.minimumOptionCount() > options.size()) {
-            return null;
-        }
+        List<Note> options = getOptions();
+        if (options == null) return null;
         quizQuestion.setOptionNotes(randomizer.shuffle(options));
         List<ReviewPoint> viceReviewPoints = quizQuestionFactory.getViceReviewPoints(modelFactoryService.toUserModel(reviewPoint.getUser()));
 
@@ -45,6 +41,20 @@ public class QuizQuestionDirector {
         quizQuestion.setViceReviewPoints(viceReviewPoints);
         quizQuestion.setCategoryLink(quizQuestionFactory.getCategoryLink());
         return quizQuestion;
+    }
+
+    private List<Note> getOptions() {
+        if (quizQuestionFactory instanceof QuestionOptionsFactory optionsFactory) {
+            Note answerNote = optionsFactory.generateAnswerNote(servant);
+            if (answerNote == null) return null;
+            List<Note> fillingOptions = optionsFactory.generateFillingOptions(servant);
+            if (quizQuestionFactory.minimumOptionCount() > fillingOptions.size() + 1) {
+                return null;
+            }
+            fillingOptions.add(answerNote);
+            return fillingOptions;
+        }
+        return List.of();
     }
 
 }

@@ -11,21 +11,12 @@ public abstract class ClozeDescriptonQuizFactory implements QuizQuestionFactory 
 
     public ClozeDescriptonQuizFactory(ReviewPoint reviewPoint) {
         this.reviewPoint = reviewPoint;
-        this.answerNote = getAnswerNote();
-    }
-
-    @Override
-    public Note generateAnswerNote(QuizQuestionServant servant) {
-        return answerNote;
+        this.answerNote = this.reviewPoint.getNote();
     }
 
     @Override
     public List<Note> knownRightAnswers() {
         return List.of(answerNote);
-    }
-
-    private Note getAnswerNote() {
-        return reviewPoint.getNote();
     }
 
 }

@@ -13,11 +13,6 @@ public record JustReviewQuizFactory(ReviewPoint reviewPoint) implements QuizQues
     }
 
     @Override
-    public Note generateAnswerNote(QuizQuestionServant servant) {
-        return reviewPoint.getSourceNote();
-    }
-
-    @Override
     public List<Note> allWrongAnswers() {
         return List.of();
     }

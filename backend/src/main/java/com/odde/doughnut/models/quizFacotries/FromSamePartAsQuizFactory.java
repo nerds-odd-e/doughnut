@@ -8,7 +8,7 @@ import com.odde.doughnut.models.UserModel;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class FromSamePartAsQuizFactory implements QuizQuestionFactory {
+public class FromSamePartAsQuizFactory implements QuizQuestionFactory, QuestionOptionsFactory {
     private Link cachedAnswerLink = null;
     private List<Note> cachedFillingOptions = null;
     protected final ReviewPoint reviewPoint;

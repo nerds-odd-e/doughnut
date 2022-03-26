@@ -4,7 +4,7 @@ import com.odde.doughnut.entities.*;
 
 import java.util.List;
 
-public class LinkTargetQuizFactory implements QuizQuestionFactory {
+public class LinkTargetQuizFactory implements QuizQuestionFactory, QuestionOptionsFactory {
     protected final Link link;
     protected final Note answerNote;
     private final User user;
