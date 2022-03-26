@@ -5,7 +5,6 @@ import AnswerShowPage from '@/pages/AnswerShowPage.vue';
 import { flushPromises } from '@vue/test-utils';
 import helper from '../helpers';
 import makeMe from '../fixtures/makeMe';
-import QuizQuestionVue from '../../src/components/review/QuizQuestion.vue';
 
 helper.resetWithApiMock(beforeEach, afterEach)
 

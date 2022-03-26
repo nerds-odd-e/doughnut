@@ -34,9 +34,11 @@
           :key="reviewPointId"
         />
         <template v-else>
-          <div class="alert alert-success">
-            You have finished all repetitions for this half a day!
-          </div>
+          <template v-if="hasLastResult">
+            <div class="alert alert-success">
+              You have finished all repetitions for this half a day!
+            </div>
+          </template>
         </template>
       </template>
     </Minimizable>
@@ -78,15 +80,18 @@ export default defineComponent({
       return this.repetition?.quizQuestion?.quizQuestion?.reviewPoint;
     },
     hasLastResult() {
-      return this.previousResultCursor !== undefined
+      return this.previousResultCursor !== undefined;
     },
     latestAnswerCorrrect() {
-      return this.previousResults.length > 0 && this.previousResults[this.previousResults.length - 1].correct
+      return (
+        this.previousResults.length > 0 &&
+        this.previousResults[this.previousResults.length - 1].correct
+      );
     },
   },
   methods: {
     backToRepeat() {
-      this.previousResultCursor = this.previousResults.length - 1
+      this.previousResultCursor = this.previousResults.length - 1;
       this.$router.push({ name: "repeat" });
     },
     loadNew(resp?: Generated.RepetitionForUser) {
@@ -98,13 +103,12 @@ export default defineComponent({
     },
 
     viewLastResult() {
-      if(this.previousResultCursor === undefined) return;
-      const answerId = this.previousResults[this.previousResultCursor].answerId
-      if(this.previousResultCursor > 0){
-         this.previousResultCursor -= 1
-      }
-      else {
-        this.previousResultCursor = undefined
+      if (this.previousResultCursor === undefined) return;
+      const answerId = this.previousResults[this.previousResultCursor].answerId;
+      if (this.previousResultCursor > 0) {
+        this.previousResultCursor -= 1;
+      } else {
+        this.previousResultCursor = undefined;
       }
       this.$router.push({ name: "repeat-answer", params: { answerId } });
     },
@@ -129,12 +133,11 @@ export default defineComponent({
       this.storedApi.reviewMethods
         .processAnswer(answerData)
         .then((res: Generated.AnswerResult) => {
-          this.previousResults.push(res)
-          this.previousResultCursor = this.previousResults.length - 1
+          this.previousResults.push(res);
+          this.previousResultCursor = this.previousResults.length - 1;
+          this.loadNew(res.nextRepetition);
+          this.finished += 1;
           if (res.correct) {
-            this.finished += 1;
-            this.toRepeatCount -= 1;
-            this.loadNew(res.nextRepetition);
             return;
           }
           this.$router.push({
