@@ -103,7 +103,7 @@ class RestReviewsController {
         AnswerModel answerModel = modelFactoryService.toAnswerModel(answer);
         AnswerViewedByUser answerResult = answerModel.getAnswerViewedByUser();
         answerResult.reviewPoint = ReviewPointViewedByUser.from(answer.getQuestion().getReviewPoint(), user);
-        answerResult.quizQuestion = Optional.of(QuizQuestionViewedByUser.from(answer.getQuestion(), modelFactoryService.noteRepository));
+        answerResult.quizQuestion = QuizQuestionViewedByUser.from(answer.getQuestion(), modelFactoryService.noteRepository);
         return answerResult;
     }
 

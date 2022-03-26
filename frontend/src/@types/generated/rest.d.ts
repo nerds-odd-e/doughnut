@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-03-25 20:28:47.
+// Generated using typescript-generator version 2.35.1025 on 2022-03-26 13:21:45.
 
 declare namespace Generated {
 
@@ -161,7 +161,7 @@ declare namespace Generated {
         answerDisplay: string;
         correct: boolean;
         reviewPoint: ReviewPointViewedByUser;
-        quizQuestion?: QuizQuestionViewedByUser;
+        quizQuestion: QuizQuestionViewedByUser;
     }
 
     interface AnswerResult {
@@ -215,10 +215,10 @@ declare namespace Generated {
         noteAccessories: NoteAccessories;
         textContent: TextContent;
         createdAt: string;
-        title: string;
         pictureWithMask?: PictureWithMask;
-        parentId?: number;
         shortDescription: string;
+        title: string;
+        parentId?: number;
     }
 
     interface Ownership {
@@ -231,9 +231,9 @@ declare namespace Generated {
         dailyTargetOfNewNotes: number;
         user: User;
         notebook: Notebook;
-        title: string;
         headNote: Note;
         shortDescription: string;
+        title: string;
     }
 
     interface QuizQuestion {
