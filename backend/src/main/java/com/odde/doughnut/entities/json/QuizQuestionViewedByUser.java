@@ -40,8 +40,6 @@ public class QuizQuestionViewedByUser {
 
     public Optional<PictureWithMask> pictureWithMask;
 
-    public Optional<Integer> revealedNoteId;
-
     public static QuizQuestionViewedByUser from(QuizQuestion quizQuestion, NoteRepository noteRepository) {
         QuizQuestionPresenter presenter = quizQuestion.getQuestionType().presenter.apply(quizQuestion);
         QuizQuestionViewedByUser question = new QuizQuestionViewedByUser();
@@ -51,7 +49,6 @@ public class QuizQuestionViewedByUser {
         question.mainTopic = presenter.mainTopic();
         question.hintLinks = presenter.hintLinks();
         question.pictureWithMask = presenter.pictureWithMask();
-        question.revealedNoteId = presenter.revealedNoteId();
         question.viceReviewPointIdList = quizQuestion.getViceReviewPointIdList();
         question.scope = List.of(quizQuestion.getReviewPoint().getSourceNote().getNotebook().getHeadNote());
         Stream<Note> noteStream = noteRepository.findAllByIds(quizQuestion.getOptionNoteIds().split(","));

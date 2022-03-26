@@ -1,12 +1,9 @@
 <template>
   <template v-if="quizQuestion.questionType === 'JUST_REVIEW'">
-    <NoteSphereAsync
+    <ReviewPointAsync
       v-bind="{
-        noteId: quizQuestion.revealedNoteId,
-        expandChildren: false,
-        viewType: 'cards',
+        reviewPointId: quizQuestion.quizQuestion.reviewPoint
       }"
-      :key="quizQuestion.revealedNoteId"
     />
     <div class="btn-toolbar justify-content-between">
       <SelfEvaluateButtons
@@ -87,7 +84,7 @@ import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
 import TextInput from "../form/TextInput.vue";
 import SelfEvaluateButtons from "./SelfEvaluateButtons.vue";
 import SvgNoReview from "../svgs/SvgNoReview.vue";
-import NoteSphereAsync from "../notes/NoteSphereAsync.vue";
+import ReviewPointAsync from "./ReviewPointAsync.vue";
 
 export default defineComponent({
   props: {
@@ -103,7 +100,7 @@ export default defineComponent({
     TextInput,
     SelfEvaluateButtons,
     SvgNoReview,
-    NoteSphereAsync
+    ReviewPointAsync
 },
   emits: ["answer", "removeFromReview"],
   data() {

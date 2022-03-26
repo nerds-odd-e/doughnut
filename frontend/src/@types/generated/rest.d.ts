@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-03-26 13:21:45.
+// Generated using typescript-generator version 2.35.1025 on 2022-03-26 15:27:55.
 
 declare namespace Generated {
 
@@ -104,7 +104,6 @@ declare namespace Generated {
         scope: Note[];
         options: Option[];
         pictureWithMask?: PictureWithMask;
-        revealedNoteId?: number;
     }
 
     interface RedirectToNoteResponse {

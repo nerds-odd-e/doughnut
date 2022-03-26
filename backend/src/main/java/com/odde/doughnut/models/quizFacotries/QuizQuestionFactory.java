@@ -12,10 +12,6 @@ public interface QuizQuestionFactory {
         return true;
     }
 
-    default int minimumOptionCount() {
-        return 0;
-    }
-
     default int minimumViceReviewPointCount() {
         return 0;
     }

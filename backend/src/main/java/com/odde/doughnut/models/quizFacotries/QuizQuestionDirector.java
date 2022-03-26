@@ -13,7 +13,7 @@ public class QuizQuestionDirector {
     private final Randomizer randomizer;
     private final ReviewPoint reviewPoint;
     private final QuizQuestionServant servant;
-    final ModelFactoryService modelFactoryService;
+    private final ModelFactoryService modelFactoryService;
     private final QuizQuestionFactory quizQuestionFactory;
 
     public QuizQuestionDirector(QuizQuestion.QuestionType questionType, Randomizer randomizer, ReviewPoint reviewPoint, ModelFactoryService modelFactoryService) {
@@ -45,14 +45,7 @@ public class QuizQuestionDirector {
 
     private List<Note> getOptions() {
         if (quizQuestionFactory instanceof QuestionOptionsFactory optionsFactory) {
-            Note answerNote = optionsFactory.generateAnswerNote(servant);
-            if (answerNote == null) return null;
-            List<Note> fillingOptions = optionsFactory.generateFillingOptions(servant);
-            if (quizQuestionFactory.minimumOptionCount() > fillingOptions.size() + 1) {
-                return null;
-            }
-            fillingOptions.add(answerNote);
-            return fillingOptions;
+            return optionsFactory.generateOptions(servant);
         }
         return List.of();
     }

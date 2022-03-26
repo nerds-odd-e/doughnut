@@ -41,12 +41,12 @@ describe('repeat page', () => {
   });
 
   describe('repeat page with "just review" quiz', () => {
-    const note = makeMe.aNoteSphere.please();
     let repetition: Generated.RepetitionForUser;
 
     beforeEach(()=>{
-      helper.apiMock.expecting(`/api/notes/${note.id}`, note);
-      repetition = makeMe.aRepetition.quizType("JUST_REVIEW").forNoteId(note.id).please();
+      const reviewPoint = makeMe.aReviewPoint.please();
+      repetition = makeMe.aRepetition.reviewPoint(reviewPoint.reviewPoint).quizType("JUST_REVIEW").please();
+      helper.apiMock.expecting(`/api/review-points/${reviewPoint.reviewPoint.id}`, reviewPoint);
     })
 
     it('stay at repeat page if there is no quiz', async () => {

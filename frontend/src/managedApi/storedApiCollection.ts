@@ -27,6 +27,12 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
 
   return {
     reviewMethods: {
+      async getReviewPoint(reviewPointId: Doughnut.ID) {
+        const res = await managedApi.restGet(`review-points/${reviewPointId}`) as Generated.ReviewPointViewedByUser;
+        loadReviewPointViewedByUser(res);
+        return res;
+      },
+
       async getOneInitialReview() {
         const res = await managedApi.restGet(`reviews/initial`) as Generated.ReviewPointViewedByUser;
         loadReviewPointViewedByUser(res);

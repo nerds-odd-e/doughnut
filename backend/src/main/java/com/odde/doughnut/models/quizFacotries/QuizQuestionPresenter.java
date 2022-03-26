@@ -22,8 +22,4 @@ public interface QuizQuestionPresenter {
     default Optional<PictureWithMask> pictureWithMask() {
         return Optional.empty();
     }
-
-    default Optional<Integer> revealedNoteId() {
-        return Optional.empty();
-    }
 }
