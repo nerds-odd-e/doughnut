@@ -30,20 +30,19 @@ public class QuizQuestionDirector {
             return null;
         }
         QuizQuestion quizQuestion = new QuizQuestion();
+        quizQuestion.setReviewPoint(reviewPoint);
+        quizQuestion.setQuestionType(questionType);
         List<Note> options = quizQuestionFactory.generateOptions(servant);
-        if(quizQuestionFactory.minimumOptionCount() > options.size()) {
+        if (quizQuestionFactory.minimumOptionCount() > options.size()) {
             return null;
         }
         quizQuestion.setOptionNotes(randomizer.shuffle(options));
         List<ReviewPoint> viceReviewPoints = quizQuestionFactory.getViceReviewPoints(modelFactoryService.toUserModel(reviewPoint.getUser()));
 
-        if(quizQuestionFactory.minimumViceReviewPointCount() > 0 && viceReviewPoints.size() < quizQuestionFactory.minimumViceReviewPointCount()) {
+        if (quizQuestionFactory.minimumViceReviewPointCount() > viceReviewPoints.size()) {
             return null;
         }
-
-        quizQuestion.setReviewPoint(reviewPoint);
-        quizQuestion.setQuestionType(questionType);
-        quizQuestion.setViceReviewPoints( viceReviewPoints );
+        quizQuestion.setViceReviewPoints(viceReviewPoints);
         quizQuestion.setCategoryLink(quizQuestionFactory.getCategoryLink());
         return quizQuestion;
     }

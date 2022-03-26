@@ -28,7 +28,7 @@ public interface QuizQuestionFactory {
     }
 
     default List<ReviewPoint> getViceReviewPoints(UserModel userModel) {
-        return null;
+        return List.of();
     }
 
     default List<Note> knownRightAnswers() {
