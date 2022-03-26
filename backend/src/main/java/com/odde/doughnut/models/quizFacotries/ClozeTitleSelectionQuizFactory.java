@@ -20,4 +20,9 @@ public class ClozeTitleSelectionQuizFactory extends ClozeDescriptonQuizFactory {
     public boolean isValidQuestion() {
         return !Strings.isEmpty(reviewPoint.getNote().getTextContent().getDescription());
     }
+
+    @Override
+    public int minimumOptionCount() {
+        return 1;
+    }
 }
