@@ -19,7 +19,7 @@ public interface QuizQuestionFactory {
         return true;
     }
 
-    default int minimumFillingOptionCount() {
+    default int minimumOptionCount() {
         return 0;
     }
 
@@ -40,4 +40,12 @@ public interface QuizQuestionFactory {
     }
 
     default Link getCategoryLink() { return null; }
+
+    default List<Note> generateOptions(QuizQuestionServant servant) {
+        Note answerNote = generateAnswerNote(servant);
+        if(answerNote == null) return List.of();
+        List<Note> fillingOptions = generateFillingOptions(servant);
+        fillingOptions.add(answerNote);
+        return fillingOptions;
+    }
 }

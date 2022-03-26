@@ -20,8 +20,8 @@ public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory {
     }
 
     @Override
-    public int minimumFillingOptionCount() {
-        return 1;
+    public int minimumOptionCount() {
+        return 2;
     }
 
     @Override
@@ -48,12 +48,14 @@ public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory {
 
     @Override
     public Note generateAnswerNote(QuizQuestionServant servant) {
+
         categoryLink = servant.chooseOneCategoryLink(reviewPoint.getUser(), link);
         return categoryLink
                 .map(lk -> lk.getReverseLinksOfCousins(reviewPoint.getUser(), link.getLinkType()))
                 .map(servant.randomizer::chooseOneRandomly)
                 .map(Link::getSourceNote)
                 .orElse(null);
+
     }
 
     @Override

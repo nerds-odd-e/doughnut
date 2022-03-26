@@ -44,8 +44,8 @@ public class WhichSpecHasInstanceQuizFactory implements QuizQuestionFactory {
     }
 
     @Override
-    public int minimumFillingOptionCount() {
-        return 1;
+    public int minimumOptionCount() {
+        return 2;
     }
 
     @Override
