@@ -42,14 +42,9 @@ public record ReviewPointModel(ReviewPoint entity,
         return new QuizQuestionGenerator(entity, randomizer, modelFactoryService).generateQuestion();
     }
 
-    public void updateReviewPoint(boolean correct, Timestamp currentUTCTimestamp) {
+    public void updateReviewPoint(Timestamp currentUTCTimestamp, String selfEvaluate) {
         increaseRepetitionCountAndSave();
-        if (correct) {
-            evaluate(currentUTCTimestamp, "satisfying");
-        }
-        else {
-            evaluate(currentUTCTimestamp, "sad");
-        }
+        evaluate(currentUTCTimestamp, selfEvaluate);
     }
 
     public void evaluate(Timestamp currentUTCTimestamp, String selfEvaluation) {

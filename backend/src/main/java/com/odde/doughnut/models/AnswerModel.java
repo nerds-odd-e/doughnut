@@ -21,18 +21,21 @@ public class AnswerModel {
     }
 
     public void updateReviewPoints(Timestamp currentUTCTimestamp) {
-        boolean correct = isCorrect();
+        String selfEvaluate = getSelfEvaluate();
         answer.getQuestion().getViceReviewPointIdList().forEach(rPid ->
                 this.modelFactoryService.reviewPointRepository
-                        .findById(rPid).ifPresent(vice -> this.modelFactoryService.toReviewPointModel(vice).updateReviewPoint(correct, currentUTCTimestamp))
+                        .findById(rPid).ifPresent(vice -> this.modelFactoryService.toReviewPointModel(vice).updateReviewPoint(currentUTCTimestamp, selfEvaluate))
         );
         ReviewPointModel reviewPointModel = this.modelFactoryService.toReviewPointModel(answer.getQuestion().getReviewPoint());
+        reviewPointModel.updateReviewPoint(currentUTCTimestamp, selfEvaluate);
+    }
+
+    private String getSelfEvaluate() {
+        String selfEvaluate = isCorrect() ? "satisfying" : "sad";
         if(answer.getQuestion().getQuestionType() == QuizQuestion.QuestionType.JUST_REVIEW) {
-            reviewPointModel.increaseRepetitionCountAndSave();
-            reviewPointModel.evaluate(currentUTCTimestamp, answer.getSpellingAnswer());
-            return;
+            return answer.getSpellingAnswer();
         }
-        reviewPointModel.updateReviewPoint(correct, currentUTCTimestamp);
+        return selfEvaluate;
     }
 
     public AnswerViewedByUser getAnswerViewedByUser() {
