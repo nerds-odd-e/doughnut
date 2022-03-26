@@ -6,7 +6,6 @@ import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.models.Randomizer;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class QuizQuestionDirector {
@@ -35,7 +34,8 @@ public class QuizQuestionDirector {
             return null;
         }
         List<Note> fillingOptions = quizQuestionFactory.generateFillingOptions(servant);
-        if(quizQuestionFactory.minimumFillingOptionCount() > 0 && fillingOptions.size() < quizQuestionFactory.minimumFillingOptionCount()) {
+        fillingOptions.add(answerNote);
+        if(quizQuestionFactory.minimumFillingOptionCount() > 0 && fillingOptions.size() - 1 < quizQuestionFactory.minimumFillingOptionCount()) {
             return null;
         }
         List<ReviewPoint> viceReviewPoints = quizQuestionFactory.getViceReviewPoints(modelFactoryService.toUserModel(reviewPoint.getUser()));
@@ -49,15 +49,9 @@ public class QuizQuestionDirector {
         quizQuestion.setQuestionType(questionType);
         quizQuestion.setViceReviewPoints( viceReviewPoints );
         quizQuestion.setCategoryLink(quizQuestionFactory.getCategoryLink());
-        List<Note> allOptions = mixAndShuffle(fillingOptions, answerNote);
-        quizQuestion.setOptionNotes(allOptions);
+        randomizer.shuffle(fillingOptions);
+        quizQuestion.setOptionNotes(fillingOptions);
         return quizQuestion;
     }
 
-    private List<Note> mixAndShuffle(List<Note> fillingOptions, Note answerNote) {
-        List<Note> result = new ArrayList<>(fillingOptions);
-        result.add(answerNote);
-        randomizer.shuffle(result);
-        return result;
-    }
 }
