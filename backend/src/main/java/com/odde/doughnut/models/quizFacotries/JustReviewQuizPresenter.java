@@ -14,7 +14,7 @@ public class JustReviewQuizPresenter implements QuizQuestionPresenter {
 
     @Override
     public Optional<Integer> revealedNoteId() {
-        return Optional.of(reviewPoint.getNoteId());
+        return Optional.of(reviewPoint.getSourceNote().getId());
     }
 
     @Override
