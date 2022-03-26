@@ -62,7 +62,8 @@ public record ReviewPointModel(ReviewPoint entity,
     }
 
     public void evaluate(Timestamp currentUTCTimestamp, String selfEvaluation) {
-        if ("again".equals(selfEvaluation)) {
+        if ("reset".equals(selfEvaluation)) {
+            updateNextRepetitionWithAdjustment(currentUTCTimestamp, -2);
             return;
         }
         if ("satisfying".equals(selfEvaluation)) {
