@@ -1,32 +1,35 @@
 <template>
   <ContainerPage v-bind="{ loading, contentExists: !!reviewPointViewedByUser }">
     <template v-if="!!reviewPoint">
-      <ProgressBar
-        v-bind="{
-          title: `Initial Review: `,
-          finished,
-          toRepeatCount:
-            reviewPointViewedByUser.remainingInitialReviewCountForToday,
-        }"
-      >
-      </ProgressBar>
       <Minimizable :minimized="nested">
         <template #minimizedContent>
-          <div
-            class="initial-review-container"
-            v-on:click="$router.push({ name: 'initial' })"
+          <ProgressBar
+            :class="nested ? 'initial-review-paused' : ''"
+            v-bind="{
+              title: `Initial Review: `,
+              finished,
+              toRepeatCount: reviewPointViewedByUser.remainingInitialReviewCountForToday,
+            }"
           >
-            <ReviewPointAbbr v-bind="{reviewPointViewedByUser}" />
-            <InitialReviewButtons
-              :key="buttonKey"
-              @doInitialReview="processForm($event)"
-            />
-          </div>
+            <template #default v-if="nested">
+              <div style="display: flex;"
+                @click="resume"
+              >
+              <a
+                title="Go back to review"
+              >
+                <SvgResume width="30" height="30"/>
+              </a>
+
+              <ReviewPointAbbr
+                v-bind="{ reviewPointViewedByUser }"
+              />
+              </div>
+            </template>
+          </ProgressBar>
         </template>
         <template #fullContent>
-          <ShowReviewPoint
-            v-bind="{reviewPointViewedByUser}"
-          />
+          <ShowReviewPoint v-bind="{ reviewPointViewedByUser }" />
           <div>
             <div class="mb-2">
               <ReviewSettingForm
@@ -57,10 +60,11 @@ import ContainerPage from "./commons/ContainerPage.vue";
 import Minimizable from "../components/commons/Minimizable.vue";
 import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
 import usePopups from "../components/commons/Popups/usePopup";
+import SvgResume from "../components/svgs/SvgResume.vue";
 
-export default ({
+export default {
   setup() {
-    return {...useStoredLoadingApi(), ...usePopups()};
+    return { ...useStoredLoadingApi(), ...usePopups() };
   },
   name: "InitialReviewPage",
   props: { nested: Boolean },
@@ -72,6 +76,7 @@ export default ({
     Minimizable,
     ProgressBar,
     ReviewPointAbbr,
+    SvgResume,
   },
   data() {
     return {
@@ -94,6 +99,9 @@ export default ({
   },
 
   methods: {
+    resume() {
+      this.$router.push({ name: 'initial' })
+    },
     loadNew(resp) {
       this.reviewPointViewedByUser = resp;
       if (!this.reviewPointViewedByUser.reviewPoint) {
@@ -113,26 +121,29 @@ export default ({
           return;
       }
       this.reviewPoint.removedFromReview = skipReview;
-      this.storedApi.reviewMethods.doInitialReview(
-        { reviewPoint: this.reviewPoint, reviewSetting: this.reviewSetting },
-      ).then(this.loadNew)
+      this.storedApi.reviewMethods
+        .doInitialReview({
+          reviewPoint: this.reviewPoint,
+          reviewSetting: this.reviewSetting,
+        })
+        .then(this.loadNew);
     },
 
     fetchData() {
-      this.storedApi.reviewMethods.getOneInitialReview()
-      .then(this.loadNew)
+      this.storedApi.reviewMethods.getOneInitialReview().then(this.loadNew);
     },
   },
   mounted() {
     this.fetchData();
   },
-});
+};
 </script>
 
 <style>
-.initial-review-container {
+.initial-review-paused {
   background-color: rgba(50, 50, 150, 0.8);
   padding: 5px;
   border-radius: 10px;
 }
+
 </style>

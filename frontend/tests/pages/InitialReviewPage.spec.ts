@@ -36,7 +36,7 @@ describe('repeat page', () => {
     const wrapper = renderer.currentRoute({ name: 'initial' }).mount()
     await flushPromises();
     expect(mockRouterPush).toHaveBeenCalledTimes(0);
-    expect(wrapper.findAll('.initial-review-container')).toHaveLength(0);
+    expect(wrapper.findAll('.initial-review-paused')).toHaveLength(0);
     expect(wrapper.findAll('.pause-stop')).toHaveLength(1);
     expect(wrapper.find('.progress-text').text()).toContain(
       'Initial Review: 0/53'
@@ -50,7 +50,7 @@ describe('repeat page', () => {
     const wrapper = renderer.withProps({nested: true}).currentRoute({ name: 'initial' }).mount()
     await flushPromises();
     expect(mockRouterPush).toHaveBeenCalledTimes(0);
-    expect(wrapper.findAll('.initial-review-container')).toHaveLength(1);
+    expect(wrapper.findAll('.initial-review-paused')).toHaveLength(1);
     expect(wrapper.find('.review-point-abbr span').text()).toContain(
       noteSphere.note.title
     );
@@ -63,7 +63,7 @@ describe('repeat page', () => {
     const wrapper = renderer.withProps({nested: true}).currentRoute({ name: 'initial' }).mount()
     await flushPromises();
     expect(mockRouterPush).toHaveBeenCalledTimes(0);
-    expect(wrapper.findAll('.initial-review-container')).toHaveLength(1);
+    expect(wrapper.findAll('.initial-review-paused')).toHaveLength(1);
     expect(wrapper.find('.review-point-abbr span').text()).toContain(
       link.sourceNoteWithPosition.note.note.title
     );

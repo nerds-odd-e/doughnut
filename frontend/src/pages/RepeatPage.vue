@@ -1,28 +1,20 @@
 <template>
   <ContainerPage v-bind="{ loading, contentExists: true }">
-    <Minimizable :minimized="nested" staticHeight="75px">
+    <Minimizable :minimized="nested">
       <template #minimizedContent>
-        <div class="repeat-container" v-on:click="backToRepeat()">
+        <div :class="pausing ? 'repeat-paused' : ''">
           <RepeatProgressBar
             v-bind="{
               finished,
               toRepeatCount,
-              hasLastResult,
+              previousResultCursor,
             }"
-            @viewLastResult="viewLastResult()"
+            @viewLastResult="viewLastResult($event)"
           >
           </RepeatProgressBar>
         </div>
       </template>
       <template #fullContent>
-        <RepeatProgressBar
-          v-bind="{
-            finished,
-            toRepeatCount,
-            hasLastResult,
-          }"
-          @viewLastResult="viewLastResult()"
-        />
         <div class="alert alert-success" v-if="latestAnswerCorrrect">Correct!</div>
         <QuizQuestion
           v-if="repetition?.quizQuestion"
@@ -34,7 +26,7 @@
           :key="reviewPointId"
         />
         <template v-else>
-          <template v-if="hasLastResult">
+          <template v-if="finished > 0">
             <div class="alert alert-success">
               You have finished all repetitions for this half a day!
             </div>
@@ -71,29 +63,28 @@ export default defineComponent({
       repetition: undefined as Generated.RepetitionForUser | undefined,
       previousResults: [] as Generated.AnswerResult[],
       previousResultCursor: undefined as number | undefined,
-      finished: 0,
       toRepeatCount: 0,
     };
   },
   computed: {
+    pausing() {
+      return this.previousResultCursor !== undefined
+    },
+    finished() {
+      return this.previousResults.length
+    },
     reviewPointId() {
       return this.repetition?.quizQuestion?.quizQuestion?.reviewPoint;
     },
-    hasLastResult() {
-      return this.previousResultCursor !== undefined;
+    latestAnswer() {
+      if(this.previousResults.length === 0) return
+      return this.previousResults[this.previousResults.length - 1]
     },
     latestAnswerCorrrect() {
-      return (
-        this.previousResults.length > 0 &&
-        this.previousResults[this.previousResults.length - 1].correct
-      );
+      return this.latestAnswer?.correct
     },
   },
   methods: {
-    backToRepeat() {
-      this.previousResultCursor = this.previousResults.length - 1;
-      this.$router.push({ name: "repeat" });
-    },
     loadNew(resp?: Generated.RepetitionForUser) {
       this.repetition = resp;
       if (resp) {
@@ -102,15 +93,14 @@ export default defineComponent({
       }
     },
 
-    viewLastResult() {
-      if (this.previousResultCursor === undefined) return;
-      const answerId = this.previousResults[this.previousResultCursor].answerId;
-      if (this.previousResultCursor > 0) {
-        this.previousResultCursor -= 1;
-      } else {
-        this.previousResultCursor = undefined;
+    viewLastResult(cursor: number | undefined) {
+      this.previousResultCursor = cursor
+      if(this.pausing) {
+        const answerId = this.previousResults[this.previousResultCursor].answerId;
+        this.$router.push({ name: "repeat-answer", params: { answerId } });
+        return
       }
-      this.$router.push({ name: "repeat-answer", params: { answerId } });
+      this.$router.push({ name: "repeat" });
     },
 
     fetchData() {
@@ -134,9 +124,7 @@ export default defineComponent({
         .processAnswer(answerData)
         .then((res: Generated.AnswerResult) => {
           this.previousResults.push(res);
-          this.previousResultCursor = this.previousResults.length - 1;
           this.loadNew(res.nextRepetition);
-          this.finished += 1;
           if (res.correct) {
             return;
           }
@@ -169,7 +157,7 @@ export default defineComponent({
 </script>
 
 <style>
-.repeat-container {
+.repeat-paused {
   background-color: rgba(50, 150, 50, 0.8);
   padding: 5px;
   border-radius: 10px;

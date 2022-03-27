@@ -1,12 +1,5 @@
 <template>
-  <div class="stick-top-bar">
-    <transition name="mini">
-      <div v-if="minimized" class="container">
-        <slot name="minimizedContent" />
-      </div>
-    </transition>
-  </div>
-  <div v-if="minimized" :style="`height: ${staticHeight};`"></div>
+  <slot name="minimizedContent" />
   <transition name="max">
     <div v-if="!minimized">
       <slot v-if="!minimized" name="fullContent" />
@@ -19,7 +12,6 @@ export default {
   name: "Minimizable",
   props: {
     minimized: Boolean,
-    staticHeight: { type: String, default: "40px" },
   },
 };
 </script>
@@ -47,12 +39,4 @@ export default {
   opacity: 0.8;
 }
 
-.stick-top-bar {
-  overflow: visible;
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  z-index: 1000;
-}
 </style>

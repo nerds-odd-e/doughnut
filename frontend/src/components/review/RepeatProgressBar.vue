@@ -1,28 +1,77 @@
 <template>
   <ProgressBar v-bind="{ title: `Repetation: `, finished, toRepeatCount }">
     <template #buttons>
-      <ViewLastResultButton
-        v-bind="{ hasLastResult }"
-        @viewLastResult="$emit('viewLastResult')"
-      />
-    </template>
-    <template #default v-if="$slots.default">
-      <slot />
+      <div class="btn-group">
+        <template v-if="previousResultCursor !== undefined">
+          <button
+            class="btn large-btn"
+            title="view previous result"
+            :disabled="finished === 0 || previousResultCursor === 0"
+            @click="
+              $emit(
+                'viewLastResult',
+                previousResultCursor === undefind
+                  ? finished - 1
+                  : previousResultCursor - 1
+              )
+            "
+          >
+            <SvgBackward />
+          </button>
+
+          <button
+            class="btn large-btn"
+            title="view next result"
+            :disabled="previousResultCursor >= finished - 1"
+            @click="$emit('viewLastResult', previousResultCursor + 1)"
+          >
+            <SvgForward />
+          </button>
+
+          <button
+            class="btn large-btn"
+            title="Go back to review"
+            @click="$emit('viewLastResult', undefined)"
+          >
+            <SvgResume />
+          </button>
+
+        </template>
+        <button
+          v-else
+          class="btn large-btn"
+          title="view last result"
+          :disabled="finished === 0"
+          @click="$emit('viewLastResult', finished - 1)"
+        >
+          <SvgPause />
+        </button>
+      </div>
     </template>
   </ProgressBar>
 </template>
 
 <script>
-import ViewLastResultButton from "./ViewLastResultButton.vue";
 import ProgressBar from "../commons/ProgressBar.vue";
-
+import SvgLastResult from "../svgs/SvgLastResult.vue";
+import SvgResume from "../svgs/SvgResume.vue";
+import SvgPause from "../svgs/SvgPause.vue";
+import SvgBackward from "../svgs/SvgBackward.vue";
+import SvgForward from "../svgs/SvgForward.vue";
 
 export default {
-  components: { ViewLastResultButton, ProgressBar },
+  components: {
+    ProgressBar,
+    SvgLastResult,
+    SvgResume,
+    SvgPause,
+    SvgBackward,
+    SvgForward,
+  },
   props: {
     finished: Number,
     toRepeatCount: Number,
-    hasLastResult: Boolean,
+    previousResultCursor: Number,
   },
   emits: ["viewLastResult"],
   methods: {},
@@ -66,4 +115,15 @@ export default {
   transform: translate(-50%, -50%);
   color: white;
 }
+
+.large-btn {
+  svg {
+    width: 30px;
+    height: 30px;
+  }
+  &:disabled {
+    opacity: 0.5;
+  }
+}
+
 </style>
