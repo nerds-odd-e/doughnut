@@ -2,21 +2,11 @@
   <template v-if="quizQuestion.questionType === 'JUST_REVIEW'">
     <ReviewPointAsync
       v-bind="{
-        reviewPointId: quizQuestion.quizQuestion.reviewPoint
+        reviewPointId: quizQuestion.quizQuestion.reviewPoint,
+        showSelfEvaluate: false,
       }"
     />
-    <div class="btn-toolbar justify-content-between">
-      <SelfEvaluateButtons
-        @selfEvaluate="onSelfEvaluate"
-      />
-      <button
-        class="btn"
-        title="remove this note from review"
-        @click="$emit('removeFromReview')"
-      >
-        <SvgNoReview />
-      </button>
-    </div>
+    <SelfEvaluateButtons @selfEvaluate="onSelfEvaluate" />
   </template>
   <template v-else>
     <BasicBreadcrumb :ancestors="quizQuestion.scope" />
@@ -100,8 +90,8 @@ export default defineComponent({
     TextInput,
     SelfEvaluateButtons,
     SvgNoReview,
-    ReviewPointAsync
-},
+    ReviewPointAsync,
+  },
   emits: ["answer", "removeFromReview"],
   data() {
     return {
@@ -123,8 +113,8 @@ export default defineComponent({
   },
   methods: {
     onSelfEvaluate(choice: string) {
-      this.answer = choice
-      this.processForm()
+      this.answer = choice;
+      this.processForm();
     },
     processForm() {
       this.$emit("answer", this.answerToQuestion);

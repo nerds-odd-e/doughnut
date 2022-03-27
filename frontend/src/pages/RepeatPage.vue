@@ -19,7 +19,6 @@
             quizQuestion: repetition?.quizQuestion,
           }"
           @answer="processAnswer($event)"
-          @removeFromReview="removeFromReview"
           :key="reviewPointId"
         />
         <template v-else>
@@ -130,18 +129,6 @@ export default defineComponent({
         .catch((err) => this.noLongerExist());
     },
 
-    async removeFromReview() {
-      if (
-        !(await this.popups.confirm(
-          `Are you sure to hide this from reviewing in the future?`
-        ))
-      ) {
-        return;
-      }
-      this.api.reviewMethods
-        .removeFromReview(this.reviewPointId)
-        .then((r) => this.fetchData());
-    },
   },
 
   mounted() {
