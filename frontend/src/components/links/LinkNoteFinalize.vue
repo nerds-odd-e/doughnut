@@ -16,6 +16,7 @@
       :errors="formErrors.moveUnder"
       field="alsoMoveToUnderTargetNote"
     />
+
     <RadioButtons
       v-if="!!formData.moveUnder"
       scopeName="link"
