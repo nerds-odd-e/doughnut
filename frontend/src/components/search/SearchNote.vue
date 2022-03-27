@@ -105,9 +105,10 @@ export default defineComponent({
       }
 
       debounced(async () => {
+        const originalTrimmedKey = this.trimmedSearchKey
         const result = await this.api.relativeSearch({...this.searchTerm, note: this.noteId})
         this.recentResult = result
-        this.cachedSearches[this.trimmedSearchKey] = result
+        this.cachedSearches[originalTrimmedKey] = result
       });
     },
   },
