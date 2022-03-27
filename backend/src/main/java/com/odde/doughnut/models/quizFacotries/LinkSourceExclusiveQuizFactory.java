@@ -23,7 +23,7 @@ public class LinkSourceExclusiveQuizFactory implements QuizQuestionFactory, Ques
         if(cachedFillingOptions == null) {
             Note sourceNote = link.getSourceNote();
             List<Note> backwardPeers = link.getCousinOfSameLinkType(reviewPoint.getUser());
-            cachedFillingOptions = servant.randomlyChooseAndEnsure(backwardPeers, sourceNote, 5);
+            cachedFillingOptions = servant.randomlyChooseAndEnsure(backwardPeers, sourceNote);
         }
         return cachedFillingOptions;
     }

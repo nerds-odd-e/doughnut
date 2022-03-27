@@ -6,11 +6,11 @@
       <RadioButtons
         v-model="showQuiz"
         :options="[
-          { value: false, label: 'Review Point' },
-          { value: true, label: 'Quiz' },
+          { value: 'review point', label: 'Review Point' },
+          { value: 'quiz', label: 'Quiz' },
         ]"
       />
-      <QuizQuestion v-if="showQuiz" :quizQuestion="answerResult.quizQuestion" />
+      <QuizQuestion v-if="showQuiz === 'quiz'" :quizQuestion="answerResult.quizQuestion" />
       <div v-else>
         <ReviewPointAsync v-bind="{ reviewPointId: reviewPointViewedByUser?.reviewPoint.id }" />
 
@@ -44,7 +44,7 @@ export default defineComponent({
   data() {
     return {
       answerResult: undefined as Generated.AnswerViewedByUser | undefined,
-      showQuiz: false,
+      showQuiz: "review point",
     };
   },
   computed: {

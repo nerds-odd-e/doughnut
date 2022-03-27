@@ -6,7 +6,6 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.Randomizer;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -15,15 +14,16 @@ import java.util.stream.Collectors;
 public class QuizQuestionServant {
     final Randomizer randomizer;
     final ModelFactoryService modelFactoryService;
+    final int maxFillingOptionCount = 3;
 
     public QuizQuestionServant(Randomizer randomizer, ModelFactoryService modelFactoryService) {
         this.randomizer = randomizer;
         this.modelFactoryService = modelFactoryService;
     }
 
-    List<Note> choose5FromCohort(Note answerNote, Predicate<Note> notePredicate) {
+    List<Note> chooseFromCohort(Note answerNote, Predicate<Note> notePredicate) {
         List<Note> list = getCohort(answerNote, notePredicate);
-        return randomizer.randomlyChoose(5, list);
+        return randomizer.randomlyChoose(maxFillingOptionCount, list);
     }
 
     private List<Note> getCohort(Note answerNote, Predicate<Note> notePredicate) {
@@ -33,10 +33,10 @@ public class QuizQuestionServant {
         return answerNote.getGrandAsPossible().getDescendantsInBreathFirstOrder().stream().filter(notePredicate).collect(Collectors.toList());
     }
 
-    List<Note> randomlyChooseAndEnsure(List<Note> candidates, Note ensure, int maxSize) {
+    List<Note> randomlyChooseAndEnsure(List<Note> candidates, Note ensure) {
         List<Note> list = candidates.stream()
                 .filter(n -> !n.equals(ensure)).collect(Collectors.toList());
-        List<Note> selectedList = this.randomizer.randomlyChoose(maxSize - 1, list);
+        List<Note> selectedList = this.randomizer.randomlyChoose(maxFillingOptionCount - 1, list);
         selectedList.add(ensure);
         return selectedList;
     }

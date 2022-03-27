@@ -23,6 +23,7 @@ describe('repetition page', () => {
         correct: true,
         reviewPoint: reviewPointViewedByUser,
       });
+      helper.apiMock.expecting(`/api/review-points/${reviewPointViewedByUser.reviewPoint.id}`, reviewPointViewedByUser)
     });
 
     it('click on note when doing review', async () => {
