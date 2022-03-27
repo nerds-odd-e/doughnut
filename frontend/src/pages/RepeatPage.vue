@@ -1,7 +1,5 @@
 <template>
   <ContainerPage v-bind="{ loading, contentExists: true }">
-    <Minimizable :minimized="nested">
-      <template #minimizedContent>
         <div :class="pausing ? 'repeat-paused' : ''">
           <RepeatProgressBar
             v-bind="{
@@ -13,8 +11,7 @@
           >
           </RepeatProgressBar>
         </div>
-      </template>
-      <template #fullContent>
+      <template v-if="!nested">
         <div class="alert alert-success" v-if="latestAnswerCorrrect">Correct!</div>
         <QuizQuestion
           v-if="repetition?.quizQuestion"
@@ -33,13 +30,11 @@
           </template>
         </template>
       </template>
-    </Minimizable>
   </ContainerPage>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import Minimizable from "../components/commons/Minimizable.vue";
 import QuizQuestion from "../components/review/QuizQuestion.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import RepeatProgressBar from "../components/review/RepeatProgressBar.vue";
@@ -53,7 +48,6 @@ export default defineComponent({
   name: "RepeatPage",
   props: { nested: Boolean },
   components: {
-    Minimizable,
     QuizQuestion,
     ContainerPage,
     RepeatProgressBar,
