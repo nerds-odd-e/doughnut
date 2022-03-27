@@ -1,4 +1,5 @@
 <template>
+    <div class="alert alert-danger" v-if="reviewPoint.removedFromReview">This review point has been removed from reviewing.</div>
     <div v-if="noteWithPosition">
       <NoteSphereComponent
       v-if="noteId"
@@ -39,6 +40,9 @@ export default defineComponent({
   computed: {
     noteId() {
       return this.noteWithPosition?.note.id
+    },
+    reviewPoint() {
+      return this.reviewPointViewedByUser.reviewPoint;
     },
     noteWithPosition() {
       return this.reviewPointViewedByUser?.noteWithPosition;

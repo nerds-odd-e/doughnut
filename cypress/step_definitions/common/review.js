@@ -192,3 +192,9 @@ Then("I should see the statistics of note {string}", (noteTitle, data) => {
 Then("I view the last result", () => {
   cy.findByRole("button", { name: "view last result" }).click()
 })
+
+
+Then("I should see the review point is removed from review", () => {
+  cy.findByText("This review point has been removed from reviewing.")
+})
+

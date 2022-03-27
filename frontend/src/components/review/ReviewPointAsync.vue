@@ -29,10 +29,11 @@ import LoadingPage from "../../pages/commons/LoadingPage.vue";
 import ShowReviewPoint from "./ShowReviewPoint.vue";
 import SelfEvaluateButtons from "./SelfEvaluateButtons.vue";
 import SvgNoReview from "../svgs/SvgNoReview.vue";
+import usePopups from "../commons/Popups/usePopup";
 
 export default defineComponent({
   setup() {
-    return useStoredLoadingApi({ initalLoading: true });
+    return {...useStoredLoadingApi({ initalLoading: true }), ...usePopups()}
   },
   props: {
     reviewPointId: { type: Number, required: true },
