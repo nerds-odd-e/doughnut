@@ -44,6 +44,13 @@ And("I should see the source note as {string}", (noteTitle) => {
 })
 
 And(
+  "I should see {string} as the possible duplicate",
+  (noteTitlesAsString) => {
+//    cy.expectExactLinkTargets(noteTitlesAsString.commonSenseSplit(",").map((i) => i.trim()))
+  },
+)
+
+And(
   "I should see {string} as targets only when searching {string}",
   (noteTitlesAsString, searchKey) => {
     cy.searchNote(searchKey, [])

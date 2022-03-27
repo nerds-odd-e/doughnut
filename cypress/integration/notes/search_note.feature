@@ -6,9 +6,11 @@ Feature: search note
   Background:
     Given I've logged in as an existing user
     And there are some notes for the current user
-      | title    | description     |
-      | Sedation | Put to sleep    |
-      | Sedative | Sleep medicine  |
+      | title    | description    | testingParent |
+      | Sedation | Put to sleep   |               |
+      | Sedative | Sleep medicine |               |
+      | Physical |                | Sedation      |
+      | Magical  |                | Sedation      |
 
   @stopTime
   Scenario Outline: Search at the top level
@@ -19,3 +21,9 @@ Feature: search note
       | search key | targets            |
       | Sed        | Sedation, Sedative |
       | Sedatio    | Sedation           |
+
+  @stopTime
+  Scenario: Search when adding new note
+    Given I am creating note under "Sedation"
+    When I type "ph" in the title
+    Then I should see "Physical" as the possible duplicate

@@ -4,6 +4,7 @@
     field="title"
     v-model="modelValue.title"
     :errors="errors.title"
+    v-focus
   />
 </template>
 
