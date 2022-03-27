@@ -12,6 +12,7 @@
       :errors="formErrors.textContent"
     />
     <input type="submit" value="Submit" class="btn btn-primary" />
+    <SearchResults v-bind="{noteId: parentId, inputSearchKey: creationData.textContent.title}"/>
   </form>
 </template>
 
@@ -20,12 +21,13 @@ import { defineComponent } from "vue";
 import NoteFormTitleOnly from "./NoteFormTitleOnly.vue";
 import LinkTypeSelect from "../links/LinkTypeSelect.vue";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
+import SearchResults from "../search/SearchResults.vue";
 
 function initialState() {
   return {
     creationData: {
       linkTypeToParent: "",
-      textContent: {},
+      textContent: {title: ""},
     },
   };
 }
@@ -37,7 +39,8 @@ export default defineComponent({
   components: {
     NoteFormTitleOnly,
     LinkTypeSelect,
-  },
+    SearchResults
+},
   props: { parentId: Number },
   data() {
     return {
