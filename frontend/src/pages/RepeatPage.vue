@@ -121,10 +121,7 @@ export default defineComponent({
           if (res.correct) {
             return;
           }
-          this.$router.push({
-            name: "repeat-answer",
-            params: { answerId: res.answerId },
-          });
+          this.viewLastResult(this.previousResults.length - 1)
         })
         .catch((err) => this.noLongerExist());
     },
