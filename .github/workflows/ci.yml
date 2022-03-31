@@ -210,7 +210,7 @@ jobs:
           build: yarn frontend:build
           start: yarn sut
           wait-on: "http://127.0.0.1:9081/api/healthcheck"
-          wait-on-timeout: 120
+          wait-on-timeout: 150
           spec: ${{ matrix.spec }}
       - uses: actions/upload-artifact@v2
         if: failure()
