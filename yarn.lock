@@ -2417,10 +2417,10 @@ cucumber@^4.2.1:
     util-arity "^1.0.2"
     verror "^1.9.0"
 
-cy-verify-downloads@^0.1.2:
-  version "0.1.2"
-  resolved "https://registry.yarnpkg.com/cy-verify-downloads/-/cy-verify-downloads-0.1.2.tgz#f188f35e8c74a8408460b32cac2596c7777d29eb"
-  integrity sha512-F4LL52GvFVQgJFTjiHdEioiQoI3QLbdfEcGn22MxR1hE2JeN1gWri/Xgd+EqC6pIVebnYRkMJJ2dnoF8tImCzg==
+cy-verify-downloads@^0.1.3:
+  version "0.1.3"
+  resolved "https://registry.yarnpkg.com/cy-verify-downloads/-/cy-verify-downloads-0.1.3.tgz#cf397a039ab710816f47172cef43476bd1a4024a"
+  integrity sha512-PNbIzGUyw+zKXWUs2vy5IfcIg7O5iHKSEtUoeJnIuK/HQY3k6lwqQPeRY5/Nm8QhVB2BIqiaLlhC/XnLqXQvvw==
 
 cypress-cucumber-preprocessor@4.3.1:
   version "4.3.1"
@@ -4435,10 +4435,10 @@ prettier-linter-helpers@^1.0.0:
   dependencies:
     fast-diff "^1.1.2"
 
-prettier@^2.6.1:
-  version "2.6.1"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.6.1.tgz#d472797e0d7461605c1609808e27b80c0f9cfe17"
-  integrity sha512-8UVbTBYGwN37Bs9LERmxCPjdvPxlEowx2urIL6urHzdb3SDq4B/Z6xLFCblrSnE4iKWcS6ziJ3aOYrc1kz/E2A==
+prettier@^2.6.2:
+  version "2.6.2"
+  resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.6.2.tgz#e26d71a18a74c3d0f0597f55f01fb6c06c206032"
+  integrity sha512-PkUpF+qoXTqhOeWL9fu7As8LXsIUZ1WYaJiY/a7McAQzxjk82OF0tibkFXVCDImZtWxbvojFjerkiLb0/q8mew==
 
 pretty-bytes@^5.6.0:
   version "5.6.0"
