@@ -59,7 +59,7 @@ export default ({
     },
 
     async deleteLink() {
-      if (!(await this.popups.confirm("Are you sure to delete this link?")))
+      if (!(await this.popups.confirm("Confirm to delete this link?")))
         return;
       this.storedApi.deleteLink(this.link.id)
         .then((res) => { this.$emit('done') })

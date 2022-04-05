@@ -33,7 +33,7 @@ export default {
     async processForm() {
       if (
         await this.popups.confirm(
-          `Are yyou sure to unsubscribe from this notebook??`
+          `Confirm to unsubscribe from this notebook??`
         )
       ) {
         this.api.subscriptionMethods.deleteSubscription(this.subscription.id

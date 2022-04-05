@@ -17,7 +17,7 @@ export default defineComponent({
   components: { SvgStop },
   methods: {
     async goHome() {
-      if (await this.popups.confirm("Are you sure to leave the reviewing?")) {
+      if (await this.popups.confirm("Confirm to leave the reviewing?")) {
         window.location = "/";
       }
     },

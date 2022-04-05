@@ -66,7 +66,7 @@ export default ({
       if (this.formData.moveUnder && this.note.parentId === null) {
         if (
           !(await this.popups.confirm(
-            `"${this.note.title}" is a top level notebook, do you want to move it under other notebook?`
+            `"${this.note.title}" is a top level notebook. Do you want to move it under other notebook?`
           ))
         ) {
           return;

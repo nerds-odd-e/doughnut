@@ -60,7 +60,7 @@ export default defineComponent({
     async removeFromReview() {
       if (
         !(await this.popups.confirm(
-          `Are you sure to hide this from reviewing in the future?`
+          `Confirm to hide this from reviewing in the future?`
         ))
       ) {
         return;

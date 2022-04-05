@@ -99,7 +99,7 @@ export default {
       if (skipReview) {
         if (
           !(await this.popups.confirm(
-            "Are you sure to hide this note from reviewing in the future?"
+            "Confirm to hide this note from reviewing in the future?"
           ))
         )
           return;

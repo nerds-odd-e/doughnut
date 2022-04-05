@@ -36,7 +36,7 @@ export default defineComponent({
   components: { SvgBazaarShare, PopupButton, NotebookEditDialog, SvgEditNotebook },
   methods: {
     async shareNotebook() {
-      if (await this.popups.confirm(`Are you sure to share?`)) {
+      if (await this.popups.confirm(`Confirm to share?`)) {
         this.api.shareToBazaar(this.notebook.id)
         .then((r) => this.$router.push({ name: "notebooks" }));
       }
