@@ -21,23 +21,23 @@ download_nixpkg_manager_install_script() {
 }
 
 configure_nix_flakes() {
-    if [[ ! -f ~/.config/nix/nix/nix.conf ]]; then
-      mkdir -p ~/.config/nix
-      touch ~/.config/nix/nix.conf
+    if [[ ! -f ${HOME}/.config/nix/nix/nix.conf ]]; then
+      mkdir -p ${HOME}/.config/nix
+      touch ${HOME}/.config/nix/nix.conf
     fi
 
-    if ! grep -Fxq "experimental-features = nix-command flakes" ~/.config/nix/nix.conf; then
-      echo 'experimental-features = nix-command flakes' >>~/.config/nix/nix.conf
+    if ! grep -Fxq "experimental-features = nix-command flakes" ${HOME}/.config/nix/nix.conf; then
+      echo 'experimental-features = nix-command flakes' >> ${HOME}/.config/nix/nix.conf
     fi
     nixpkg_script_activate
 }
 
 nixpkg_script_activate() {
-    if [[ ! -f ~/.nix-profile/etc/profile.d/nix.sh ]]; then
+    if [[ ! -f ${HOME}/.nix-profile/etc/profile.d/nix.sh ]]; then
       user=$(whoami)
       ln -sf /nix/var/nix/profiles/per-user/${user}/profile ${HOME}/.nix-profile
     fi
-    . ~/.nix-profile/etc/profile.d/nix.sh
+    . ${HOME}/nix-profile/etc/profile.d/nix.sh
 }
 
 install_nixpkg_manager() {
