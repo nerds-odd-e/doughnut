@@ -44,8 +44,8 @@ describe('note mindmap', () => {
       const wrapper = getMountedElement(notes[0].id);
       const connection = wrapper.find('svg.mindmap-canvas')
       const line = connection.find('line');
-      expect(parseFloat(line.attributes('x2'))).toBeCloseTo(0);
-      expect(parseFloat(line.attributes('y2'))).toBeCloseTo(185);
+      expect(parseFloat(line.attributes('x2') as string)).toBeCloseTo(0);
+      expect(parseFloat(line.attributes('y2') as string)).toBeCloseTo(185);
     });
 
     describe('with two grandchildren notes', () => {
@@ -61,9 +61,9 @@ describe('note mindmap', () => {
         const lines = connection.findAll('line');
         expect(lines).toHaveLength(3);
         const lastLine = lines[2];
-        expect(parseFloat(lastLine.attributes('x1'))).toBeCloseTo(-75);
-        expect(parseFloat(lastLine.attributes('y1'))).toBeCloseTo(198.1212);
-        expect(parseFloat(lastLine.attributes('y2'))).toBeCloseTo(
+        expect(parseFloat(lastLine.attributes('x1') as string)).toBeCloseTo(-75);
+        expect(parseFloat(lastLine.attributes('y1') as string)).toBeCloseTo(198.1212);
+        expect(parseFloat(lastLine.attributes('y2') as string)).toBeCloseTo(
           189.0275953
         );
       });
