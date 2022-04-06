@@ -52,6 +52,6 @@
     "typescript": "^4.6"
   },
   "resolutions": {
-    "@cucumber/cucumber": "7.3.2"
+    "@cucumber/cucumber": "8.0"
   }
 }
