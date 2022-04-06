@@ -8,9 +8,9 @@ export os_type=Unsupported
 
 get_os_type() {
     case "${unameOut}" in
-        Linux*) os_type=Linux ;;
-        Darwin*) os_type=Mac ;;
-        *) os_type="UNKNOWN:${unameOut}" ;;
+      Linux*) os_type=Linux ;;
+      Darwin*) os_type=Mac ;;
+      *) os_type="UNKNOWN:${unameOut}" ;;
     esac
 }
 
@@ -22,37 +22,37 @@ download_nixpkg_manager_install_script() {
 
 configure_nix_flakes() {
     if [[ ! -f ~/.config/nix/nix/nix.conf ]]; then
-        mkdir -p ~/.config/nix
-        touch ~/.config/nix/nix.conf
+      mkdir -p ~/.config/nix
+      touch ~/.config/nix/nix.conf
     fi
 
     if ! grep -Fxq "experimental-features = nix-command flakes" ~/.config/nix/nix.conf; then
-        echo 'experimental-features = nix-command flakes' >>~/.config/nix/nix.conf
+      echo 'experimental-features = nix-command flakes' >>~/.config/nix/nix.conf
     fi
     nixpkg_script_activate
 }
 
 nixpkg_script_activate() {
-	if [[ ! -f ~/.nix-profile/etc/profile.d/nix.sh ]]; then
-    user=$(whoami)
-    ln -sf /nix/var/nix/profiles/per-user/${user}/profile ${HOME}/.nix-profile
-	fi
-  . ~/.nix-profile/etc/profile.d/nix.sh
+    if [[ ! -f ~/.nix-profile/etc/profile.d/nix.sh ]]; then
+      user=$(whoami)
+      ln -sf /nix/var/nix/profiles/per-user/${user}/profile ${HOME}/.nix-profile
+    fi
+    . ~/.nix-profile/etc/profile.d/nix.sh
 }
 
 install_nixpkg_manager() {
     get_os_type
     if ! command -v nix >/dev/null 2>&1; then
-        download_nixpkg_manager_install_script
-        if [ "${os_type}" = "Mac" ]; then
-            ./install-nix --darwin-use-unencrypted-nix-store-volume
-        elif [ "${os_type}" = "Linux" ]; then
-            ./install-nix --no-daemon
-        else
-            echo "Unsupported OS Platform for Nix development enviroment. Exiting!!!"
-            exit 1
-        fi
-        rm -f ./install-nix
+      download_nixpkg_manager_install_script
+      if [ "${os_type}" = "Mac" ]; then
+        ./install-nix --darwin-use-unencrypted-nix-store-volume
+      elif [ "${os_type}" = "Linux" ]; then
+        ./install-nix --no-daemon
+      else
+        echo "Unsupported OS Platform for Nix development enviroment. Exiting!!!"
+        exit 1
+      fi
+      rm -f ./install-nix
     fi
     configure_nix_flakes
 }
