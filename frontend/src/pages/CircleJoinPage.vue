@@ -17,7 +17,7 @@ export default ({
   components: { CircleJoinForm, ContainerPage },
   props: { invitationCode: Number },
   computed: {
-    user() { return this.pinaStore.currentUser },
+    user() { return this.piniaStore.currentUser },
   },
   beforeRouteEnter(to, from, next) {
     next((vm) => {
