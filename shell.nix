@@ -41,7 +41,6 @@ in mkShell {
     mysql_jdbc
     uutils-coreutils
     jetbrains-mono
-    dbeaver
     google-cloud-sdk
     yamllint
     nix-direnv
@@ -55,6 +54,7 @@ in mkShell {
     apple_sdk.SystemConfiguration
     xcodebuild
   ] ++ lib.optionals (!stdenv.isDarwin) [
+    dbeaver
     ungoogled-chromium
     psmisc
     x11vnc
