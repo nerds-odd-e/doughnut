@@ -166,4 +166,10 @@ public class NoteBuilder extends EntityBuilder<Note> {
         entity.getNotebook().setOwnership(user.getOwnership());
         return this;
     }
+
+    public NoteBuilder softDeleted() {
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+        entity.setDeletedAt(timestamp);
+        return this;
+    }
 }

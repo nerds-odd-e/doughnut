@@ -68,6 +68,13 @@ public class UserModelSearchTest {
         assertThat(search(), contains(anotherNote));
     }
 
+    @Test
+    void theSearchResultShouldNotIncludeSoftDeletedNote() {
+        makeMe.aNote("Some Note").under(note).softDeleted().please();
+        searchTerm.setSearchKey("not");
+        assertTrue(search().isEmpty());
+    }
+
     @Nested
     class ThereIsANoteBookInMyCircle {
         Note noteInTheSameNotebook;

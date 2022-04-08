@@ -87,7 +87,7 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
             + "             WHERE notebook.ownership_id = ownership.id "
             + joinNotebooksEnd;
 
-    String searchForLinkTarget = " AND REGEXP_LIKE(text_content.title, :pattern) ";
+    String searchForLinkTarget = " AND REGEXP_LIKE(text_content.title, :pattern) AND note.deleted_at IS NULL ";
 
     @Modifying
     @Query(value = " UPDATE note JOIN notes_closure ON notes_closure.note_id = note.id AND notes_closure.ancestor_id = :#{#note.id} SET deleted_at = :currentUTCTimestamp WHERE deleted_at IS NULL", nativeQuery = true)
