@@ -20,11 +20,12 @@
 import { defineComponent } from "vue";
 import CheckInput from "../form/CheckInput.vue";
 import Cards from "../notes/Cards.vue";
-import _ from "lodash";
+import _, { DebouncedFunc } from "lodash";
 import useLoadingApi from '../../managedApi/useLoadingApi';
 
 
 const debounced = _.debounce((callback) => callback(), 500);
+let debouncedSearch: DebouncedFunc<any> | undefined
 
 export default defineComponent({
   setup() {
@@ -100,7 +101,8 @@ export default defineComponent({
         return;
       }
 
-      debounced(async () => {
+      if(debouncedSearch) debouncedSearch.cancel();
+      debouncedSearch = debounced(async () => {
         const originalTrimmedKey = this.trimmedSearchKey
         const result = await this.api.relativeSearch({...this.searchTerm, note: this.noteId})
         this.recentResult = result
@@ -113,6 +115,9 @@ export default defineComponent({
       this.searchTerm.allMyNotebooksAndSubscriptions = true
     }
     this.searchTerm.searchKey = this.inputSearchKey
+  },
+  beforeUnmount() {
+    if(debouncedSearch) debouncedSearch.cancel();
   }
 });
 </script>
