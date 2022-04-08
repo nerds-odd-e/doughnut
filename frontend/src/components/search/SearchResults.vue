@@ -25,7 +25,6 @@ import useLoadingApi from '../../managedApi/useLoadingApi';
 
 
 const debounced = _.debounce((callback) => callback(), 500);
-let debouncedSearch: DebouncedFunc<any> | undefined
 
 export default defineComponent({
   setup() {
@@ -101,8 +100,8 @@ export default defineComponent({
         return;
       }
 
-      if(debouncedSearch) debouncedSearch.cancel();
-      debouncedSearch = debounced(async () => {
+      debounced.cancel();
+      debounced(async () => {
         const originalTrimmedKey = this.trimmedSearchKey
         const result = await this.api.relativeSearch({...this.searchTerm, note: this.noteId})
         this.recentResult = result
@@ -117,7 +116,7 @@ export default defineComponent({
     this.searchTerm.searchKey = this.inputSearchKey
   },
   beforeUnmount() {
-    if(debouncedSearch) debouncedSearch.cancel();
+    debounced.cancel();
   }
 });
 </script>
