@@ -52,7 +52,7 @@ public class UserModelSearchTest {
 
     @Test
     void returnNullWhenNoteKeyIsGiven() {
-        assertThat(search(), is(nullValue()));
+        assertTrue(search().isEmpty());
     }
 
     @Test

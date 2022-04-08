@@ -39,7 +39,7 @@ public class SearchTermModel {
 
     public List<Note> searchForNotes() {
         if (Strings.isBlank(searchTerm.getTrimmedSearchKey())) {
-            return null;
+            return List.of();
         }
 
         Integer avoidNoteId = searchTerm.note.map(Note::getId).orElse(null);
