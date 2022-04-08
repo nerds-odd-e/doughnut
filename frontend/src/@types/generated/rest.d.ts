@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-03-26 15:33:24.
+// Generated using typescript-generator version 2.35.1025 on 2022-04-08 15:25:55.
 
 declare namespace Generated {
 
@@ -63,7 +63,7 @@ declare namespace Generated {
         ancestors: Note[];
     }
 
-    interface NoteSphere {
+    interface NoteRealm {
         id: number;
         links?: { [P in LinkType]?: LinkViewed };
         childrenIds?: number[];
@@ -72,7 +72,7 @@ declare namespace Generated {
 
     interface NoteWithPosition {
         notePosition: NotePositionViewedByUser;
-        note: NoteSphere;
+        note: NoteRealm;
     }
 
     interface NotebookViewedByUser {
@@ -91,7 +91,7 @@ declare namespace Generated {
 
     interface NotesBulk {
         notePosition: NotePositionViewedByUser;
-        notes: NoteSphere[];
+        notes: NoteRealm[];
     }
 
     interface QuizQuestionViewedByUser {
@@ -214,8 +214,8 @@ declare namespace Generated {
         textContent: TextContent;
         createdAt: string;
         pictureWithMask?: PictureWithMask;
-        shortDescription: string;
         title: string;
+        shortDescription: string;
         parentId?: number;
     }
 
@@ -230,8 +230,8 @@ declare namespace Generated {
         user: User;
         notebook: Notebook;
         headNote: Note;
-        shortDescription: string;
         title: string;
+        shortDescription: string;
     }
 
     interface QuizQuestion {
@@ -245,7 +245,7 @@ declare namespace Generated {
     }
 
     interface Option {
-        note: NoteSphere;
+        note: NoteRealm;
         picture: boolean;
         display: string;
     }

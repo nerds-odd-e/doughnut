@@ -9,14 +9,14 @@ class LinkBuilder extends Builder<LinksMap> {
 
   isReverse: boolean;
 
-  fromNote: Generated.NoteSphere
+  fromNote: Generated.NoteRealm
 
-  toNote: Generated.NoteSphere
+  toNote: Generated.NoteRealm
 
   constructor(
     linkType: Generated.LinkType,
-    from: Generated.NoteSphere,
-    to: Generated.NoteSphere
+    from: Generated.NoteRealm,
+    to: Generated.NoteRealm
   ) {
     super();
     this.linkType = linkType;

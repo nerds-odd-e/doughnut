@@ -5,11 +5,11 @@ import store from './fixtures/testingStore';
 import makeMe from './fixtures/makeMe';
 
 describe('storeUndoCommand', () => {
-  const note = makeMe.aNoteSphere.title('Dummy Title').please();
+  const note = makeMe.aNoteRealm.title('Dummy Title').please();
 
   describe('addEditingToUndoHistory', () => {
     beforeEach(() => {
-      store.loadNoteSpheres([note]);
+      store.loadNoteRealms([note]);
     });
 
     it('should push textContent into store state noteUndoHistories ', () => {
@@ -24,7 +24,7 @@ describe('storeUndoCommand', () => {
     let initialUndoCount;
 
     beforeEach(() => {
-      store.loadNoteSpheres([note]);
+      store.loadNoteRealms([note]);
       store.addEditingToUndoHistory(mockUpdatedNote);
       initialUndoCount = store.noteUndoHistories.length;
     });

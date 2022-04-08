@@ -11,7 +11,7 @@ describe('LinkNoteFinalize', () => {
   });
 
   it('going back', async () => {
-    const note = makeMe.aNoteSphere.please();
+    const note = makeMe.aNoteRealm.please();
     const wrapper = helper.component(LinkNoteFinalize).withProps({
         note,
         targetNote: note,

@@ -9,13 +9,13 @@ helper.resetWithApiMock(beforeEach, afterEach)
 
 describe('note show', () => {
   it('fetch API to be called ONCE', async () => {
-    const noteSphere = makeMe.aNoteSphere.please();
+    const noteRealm = makeMe.aNoteRealm.please();
     const stubResponse = {
       notePosition: makeMe.aNotePosition.please(),
-      notes: [noteSphere],
+      notes: [noteRealm],
     };
 
-    helper.apiMock.expecting(`/api/notes/${noteSphere.id}`, stubResponse);
-    helper.component(NoteEditDialog).withProps({ noteId: noteSphere.id }).render()
+    helper.apiMock.expecting(`/api/notes/${noteRealm.id}`, stubResponse);
+    helper.component(NoteEditDialog).withProps({ noteId: noteRealm.id }).render()
   });
 });

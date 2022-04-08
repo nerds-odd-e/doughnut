@@ -1,7 +1,7 @@
 <template>
     <div class="alert alert-danger" v-if="reviewPoint.removedFromReview">This review point has been removed from reviewing.</div>
     <div v-if="noteWithPosition">
-      <NoteSphereComponent
+      <NoteRealm
       v-if="noteId"
       v-bind="{
         noteId,
@@ -28,7 +28,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import NoteSphereComponent from "../notes/views/NoteSphereComponent.vue";
+import NoteRealm from "../notes/views/NoteRealm.vue";
 import LinkShow from "../links/LinkShow.vue";
 import LinkNob from "../links/LinkNob.vue";
 
@@ -36,7 +36,7 @@ export default defineComponent({
   props: {
     reviewPointViewedByUser: { type: Object as PropType<Generated.ReviewPointViewedByUser>, required: true },
   },
-  components: {NoteSphereComponent, LinkShow, LinkNob},
+  components: {NoteRealm, LinkShow, LinkNob},
   computed: {
     noteId() {
       return this.noteWithPosition?.note.id

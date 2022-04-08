@@ -20,8 +20,8 @@ describe('new/updated pink banner', () => {
   ])(
     'should show fresher color if recently updated',
     (updatedAt, expectedColor) => {
-      const note = makeMe.aNoteSphere.textContentUpdatedAt(updatedAt).please();
-      helper.store.loadNoteSpheres([note]);
+      const note = makeMe.aNoteRealm.textContentUpdatedAt(updatedAt).please();
+      helper.store.loadNoteRealms([note]);
 
       const wrapper = helper.component(NoteWithLinks).withProps(note).mount()
 
@@ -34,8 +34,8 @@ describe('new/updated pink banner', () => {
 
 describe('in place edit on title', () => {
   it('should display text field when one single click on title', async () => {
-    const noteParent = makeMe.aNoteSphere.title('Dummy Title').please();
-    helper.store.loadNoteSpheres([noteParent]);
+    const noteParent = makeMe.aNoteRealm.title('Dummy Title').please();
+    helper.store.loadNoteRealms([noteParent]);
 
     const wrapper = helper.component(NoteWithLinks).withProps(noteParent).mount()
 
@@ -47,8 +47,8 @@ describe('in place edit on title', () => {
   });
 
   it('should back to label when blur text field title', async () => {
-    const noteParentSphere = makeMe.aNoteSphere.title('Dummy Title').please();
-    helper.store.loadNoteSpheres([noteParentSphere]);
+    const noteParentSphere = makeMe.aNoteRealm.title('Dummy Title').please();
+    helper.store.loadNoteRealms([noteParentSphere]);
 
     const wrapper = helper.component(NoteWithLinks).withProps(noteParentSphere).mount()
 
@@ -63,17 +63,17 @@ describe('in place edit on title', () => {
 
 describe('undo editing', () => {
   it('should call addEditingToUndoHistory on submitChange', async () => {
-    const noteSphere = makeMe.aNoteSphere.title('Dummy Title').please();
-    helper.store.loadNoteSpheres([noteSphere]);
+    const noteRealm = makeMe.aNoteRealm.title('Dummy Title').please();
+    helper.store.loadNoteRealms([noteRealm]);
 
     const updatedTitle = 'updated';
-    const wrapper = helper.component(NoteWithLinks).withProps(noteSphere).mount()
+    const wrapper = helper.component(NoteWithLinks).withProps(noteRealm).mount()
 
     await wrapper.find('[role="title"]').trigger('click');
     await wrapper.find('[role="title"] input').setValue(updatedTitle);
     await wrapper.find('[role="title"] input').trigger('blur');
 
     expect(helper.store.peekUndo()).toMatchObject({ type: 'editing' });
-    helper.apiMock.verifyCall(`/api/text_content/${noteSphere.id}`)
+    helper.apiMock.verifyCall(`/api/text_content/${noteRealm.id}`)
   });
 });

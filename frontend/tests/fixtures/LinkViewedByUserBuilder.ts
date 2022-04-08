@@ -1,9 +1,9 @@
 import Builder from "./Builder"
-import NoteSphereBuilder from "./NoteSphereBuilder"
+import NoteRealmBuilder from "./NoteRealmBuilder"
 import NotePositionBuilder from "./NotePositionBuilder"
 
 class LinkViewedByUserBuilder extends Builder<Generated.LinkViewedByUser> {
-  sourceNoteBuilder = new NoteSphereBuilder()
+  sourceNoteBuilder = new NoteRealmBuilder()
 
   do(): Generated.LinkViewedByUser {
     return {
@@ -16,7 +16,7 @@ class LinkViewedByUserBuilder extends Builder<Generated.LinkViewedByUser> {
         notePosition: new NotePositionBuilder().do()
       },
       targetNoteWithPosition: {
-        note: new NoteSphereBuilder().do(),
+        note: new NoteRealmBuilder().do(),
         notePosition: new NotePositionBuilder().do()
       }
     };

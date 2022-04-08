@@ -92,7 +92,7 @@ export default defineComponent({
         this.offset.scale,
         this.mindmapSector,
         this.noteId,
-        this.piniaStore.getNoteSphereById,
+        this.piniaStore.getNoteRealmById,
       )
     },
 

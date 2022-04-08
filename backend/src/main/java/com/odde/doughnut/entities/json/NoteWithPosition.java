@@ -10,5 +10,5 @@ public class NoteWithPosition {
 
     @Setter
     @Getter
-    private NoteSphere note;
+    private NoteRealm note;
 }

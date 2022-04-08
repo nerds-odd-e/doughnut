@@ -3,7 +3,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.*;
-import com.odde.doughnut.entities.json.NoteSphere;
+import com.odde.doughnut.entities.json.NoteRealm;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.NoteViewer;
@@ -32,7 +32,7 @@ class RestTextContentController {
 
     @PatchMapping(path = "/{note}")
     @Transactional
-    public NoteSphere updateNote(@PathVariable(name = "note") Note note, @Valid @ModelAttribute TextContent textContent) throws NoAccessRightException {
+    public NoteRealm updateNote(@PathVariable(name = "note") Note note, @Valid @ModelAttribute TextContent textContent) throws NoAccessRightException {
         final UserModel user = currentUserFetcher.getUser();
         user.getAuthorization().assertAuthorization(note);
 

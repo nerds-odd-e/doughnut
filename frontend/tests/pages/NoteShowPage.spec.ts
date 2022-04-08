@@ -13,7 +13,7 @@ helper.resetWithApiMock(beforeEach, afterEach)
 
 describe('all in note show page', () => {
   describe('note show', () => {
-    const note = makeMe.aNoteSphere.please();
+    const note = makeMe.aNoteRealm.please();
     const stubResponse = {
       notePosition: makeMe.aNotePosition.for(note.note).inCircle('a circle').please(),
       notes: [note],

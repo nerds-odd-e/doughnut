@@ -12,7 +12,7 @@ export default defineStore('main', {
   state: () => ({
     notebooks: [],
     notebooksMapByHeadNoteId: {},
-    noteSpheres: {},
+    noteRealms: {},
     noteUndoHistories: [],
     popupInfo: undefined,
     currentUser: null,
@@ -21,7 +21,7 @@ export default defineStore('main', {
   } as State),
 
   getters: {
-    getNoteSphereById: (state) => (id: Doughnut.ID) => noteCache(state).getNoteSphereById(id),
+    getNoteRealmById: (state) => (id: Doughnut.ID) => noteCache(state).getNoteRealmById(id),
     getNotePosition: (state) => (id: Doughnut.ID) => noteCache(state).getNotePosition(id),
     peekUndo: (state) => () => history(state).peekUndo()
   },
@@ -32,17 +32,17 @@ export default defineStore('main', {
     },
 
     addEditingToUndoHistory({ noteId }: { noteId: Doughnut.ID }) {
-      const noteSphere = noteCache(this).getNoteSphereById(noteId)
-      if(!noteSphere) throw new Error('Note not in cache')
-      history(this).addEditingToUndoHistory(noteId, noteSphere.note.textContent);
+      const noteRealm = noteCache(this).getNoteRealmById(noteId)
+      if(!noteRealm) throw new Error('Note not in cache')
+      history(this).addEditingToUndoHistory(noteId, noteRealm.note.textContent);
     },
 
     popUndoHistory() {
       history(this).popUndoHistory()
     },
 
-    loadNoteSpheres(noteSpheres: Generated.NoteSphere[]) {
-      noteCache(this).loadNoteSpheres(noteSpheres)
+    loadNoteRealms(noteRealms: Generated.NoteRealm[]) {
+      noteCache(this).loadNoteRealms(noteRealms)
     },
 
     loadNotePosition(notePosition: Generated.NotePositionViewedByUser) {
@@ -50,12 +50,12 @@ export default defineStore('main', {
     },
 
     loadNotesBulk(noteBulk: Generated.NotesBulk) {
-      this.loadNoteSpheres(noteBulk.notes);
+      this.loadNoteRealms(noteBulk.notes);
       this.loadNotePosition(noteBulk.notePosition);
     },
 
     loadNoteWithPosition(noteWithPosition: Generated.NoteWithPosition) {
-      this.loadNoteSpheres([noteWithPosition.note]);
+      this.loadNoteRealms([noteWithPosition.note]);
       this.loadNotePosition(noteWithPosition.notePosition);
     },
 

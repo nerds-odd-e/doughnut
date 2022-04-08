@@ -9,7 +9,7 @@ import java.util.List;
 
 public class NotesBulk {
     public NotePositionViewedByUser notePosition;
-    public List<NoteSphere> notes = new ArrayList<>();
+    public List<NoteRealm> notes = new ArrayList<>();
 
     public static NotesBulk jsonNoteWithChildren(Note note, UserModel user) {
         NotesBulk notesBulk = new NotesBulk();

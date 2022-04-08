@@ -20,8 +20,8 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
     const res = await managedApi.restPatchMultiplePartForm(
       `text_content/${noteId}`,
       data
-    ) as Generated.NoteSphere;
-    piniaStore.loadNoteSpheres([res]);
+    ) as Generated.NoteRealm;
+    piniaStore.loadNoteRealms([res]);
     return res;
   }
 
@@ -163,8 +163,8 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
       const res = await managedApi.restPatchMultiplePartForm(
         `notes/${noteId}`,
         data
-      ) as Generated.NoteSphere;
-      piniaStore.loadNoteSpheres([res]);
+      ) as Generated.NoteRealm;
+      piniaStore.loadNoteRealms([res]);
       return res;
     },
 

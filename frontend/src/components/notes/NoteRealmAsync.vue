@@ -1,6 +1,6 @@
 <template>
   <LoadingPage v-bind="{ loading, contentExists: true }">
-    <NoteSphereComponent
+    <NoteRealm
       v-bind="{
         noteId,
         viewType,
@@ -15,7 +15,7 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import NoteSphereComponent from './views/NoteSphereComponent.vue';
+import NoteRealm from './views/NoteRealm.vue';
 import { ViewType, viewType } from "../../models/viewTypes";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 import LoadingPage from '../../pages/commons/LoadingPage.vue';
@@ -29,7 +29,7 @@ export default defineComponent({
      viewType: String,
      expandChildren: { type: Boolean, required: true },
   },
-  components: { LoadingPage, NoteSphereComponent },
+  components: { LoadingPage, NoteRealm },
   computed: {
     viewTypeObj() : ViewType {
       return viewType(this.viewType)

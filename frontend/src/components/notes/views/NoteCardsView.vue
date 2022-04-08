@@ -1,6 +1,6 @@
 <template>
-  <div class="container" v-if="noteSphere">
-    <NoteWithLinks v-bind="{ note: noteSphere.note, links: noteSphere.links }"/>
+  <div class="container" v-if="noteRealm">
+    <NoteWithLinks v-bind="{ note: noteRealm.note, links: noteRealm.links }"/>
     <NoteStatisticsButton :noteId="noteId" />
     <Cards v-if="expandChildren" :notes="children"/>
   </div>
@@ -29,12 +29,12 @@ export default defineComponent({
     NoteStatisticsButton,
   },
   computed: {
-    noteSphere() {
-      return this.piniaStore.getNoteSphereById(this.noteId);
+    noteRealm() {
+      return this.piniaStore.getNoteRealmById(this.noteId);
     },
     children() {
-      return this.noteSphere?.childrenIds
-        ?.map((id: Doughnut.ID)=>this.piniaStore.getNoteSphereById(id)?.note)
+      return this.noteRealm?.childrenIds
+        ?.map((id: Doughnut.ID)=>this.piniaStore.getNoteRealmById(id)?.note)
         .filter((n)=>n)
     },
   }

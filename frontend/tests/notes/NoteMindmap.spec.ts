@@ -7,7 +7,7 @@ import makeMe from '../fixtures/makeMe';
 
 
 describe('note mindmap', () => {
-  const notes: Generated.NoteSphere[] = [];
+  const notes: Generated.NoteRealm[] = [];
 
   beforeEach(() => {
     notes.length = 0;
@@ -15,13 +15,13 @@ describe('note mindmap', () => {
   });
 
   const getMountedElement = (noteId: Doughnut.ID, props = {}) => {
-    helper.store.loadNoteSpheres(notes);
+    helper.store.loadNoteRealms(notes);
     return helper.component(NoteMinmap).withProps({ noteId, offset: { scale: 1, rotate: 0 }, ...props }).mount()
   };
 
   it('should render one note', async () => {
     notes.push(
-      makeMe.aNoteSphere.title('single note').shortDescription('not long').please()
+      makeMe.aNoteRealm.title('single note').shortDescription('not long').please()
     );
     const wrapper = getMountedElement(notes[0].id);
     expect(wrapper.find("[role='card']").text()).toContain('single note');
@@ -29,8 +29,8 @@ describe('note mindmap', () => {
 
   describe('with two notes', () => {
     beforeEach(() => {
-      const note = makeMe.aNoteSphere.title('note1').please();
-      const childNote = makeMe.aNoteSphere.title('note2').under(note).please();
+      const note = makeMe.aNoteRealm.title('note1').please();
+      const childNote = makeMe.aNoteRealm.title('note2').under(note).please();
       notes.push(note);
       notes.push(childNote);
     });
@@ -51,8 +51,8 @@ describe('note mindmap', () => {
     describe('with two grandchildren notes', () => {
       beforeEach(() => {
         const childNote = notes[1];
-        notes.push(makeMe.aNoteSphere.title('grand1').under(childNote).please());
-        notes.push(makeMe.aNoteSphere.title('grand2').under(childNote).please());
+        notes.push(makeMe.aNoteRealm.title('grand1').under(childNote).please());
+        notes.push(makeMe.aNoteRealm.title('grand2').under(childNote).please());
       });
 
       it('should connect the two notes', async () => {
@@ -71,7 +71,7 @@ describe('note mindmap', () => {
     describe('links between notes', () => {
       beforeEach(() => {
         const [top, child1] = notes;
-        const child2 = makeMe.aNoteSphere
+        const child2 = makeMe.aNoteRealm
           .title('child2')
           .under(top)
           .linkTo(child1)
@@ -106,10 +106,10 @@ describe('note mindmap', () => {
     describe('links between note and note outside the map', () => {
       it('link target is not on the map', async () => {
         const [top] = notes;
-        const noteThatIsNotOnTheMap = makeMe.aNoteSphere
+        const noteThatIsNotOnTheMap = makeMe.aNoteRealm
           .title('not on the map')
           .please();
-        const child2 = makeMe.aNoteSphere
+        const child2 = makeMe.aNoteRealm
           .title('child2')
           .under(top)
           .linkTo(noteThatIsNotOnTheMap)
@@ -127,7 +127,7 @@ describe('note mindmap', () => {
   describe('size', () => {
     beforeEach(() => {
       notes.push(
-        makeMe.aNoteSphere
+        makeMe.aNoteRealm
           .title('single note')
           .picture('a.jpg')
           .shortDescription('not long')

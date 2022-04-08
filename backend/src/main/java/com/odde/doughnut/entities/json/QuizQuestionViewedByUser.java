@@ -58,7 +58,7 @@ public class QuizQuestionViewedByUser {
 
     public static class Option {
         @Getter
-        private NoteSphere note;
+        private NoteRealm note;
         @Getter
         private boolean isPicture = false;
 

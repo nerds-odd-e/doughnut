@@ -2,7 +2,6 @@ package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.Notebook;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.json.*;
 
@@ -25,8 +24,8 @@ public class NoteViewer {
         this.jsonViewer = new JsonViewer(viewer);
     }
 
-    public NoteSphere toJsonObject() {
-        NoteSphere nvb = new NoteSphere();
+    public NoteRealm toJsonObject() {
+        NoteRealm nvb = new NoteRealm();
         nvb.setId(note.getId());
         nvb.setLinks(Optional.of(getAllLinks()));
         nvb.setChildrenIds(Optional.of(note.getChildren().stream().map(Note::getId).toList()));

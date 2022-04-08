@@ -10,13 +10,13 @@ beforeEach(() => {
 });
 
 describe('storedApiCollection', () => {
-  const note = makeMe.aNoteSphere.please();
+  const note = makeMe.aNoteRealm.please();
   const sa = useStoredLoadingApi().storedApi;
 
   describe('delete note', () => {
     beforeEach(() => {
       fetch.mockResponseOnce(JSON.stringify({}));
-      store.loadNoteSpheres([note]);
+      store.loadNoteRealms([note]);
     });
 
     it('should call the api', async () => {
@@ -30,22 +30,22 @@ describe('storedApiCollection', () => {
 
     it('should change the store', async () => {
       await sa.deleteNote(note.id);
-      expect(store.getNoteSphereById(note.id)).toBeUndefined();
+      expect(store.getNoteRealmById(note.id)).toBeUndefined();
     });
 
     it('should remove children notes', async () => {
-      const child = makeMe.aNoteSphere.under(note).please();
-      store.loadNoteSpheres([child]);
+      const child = makeMe.aNoteRealm.under(note).please();
+      store.loadNoteRealms([child]);
       await sa.deleteNote(note.id);
-      expect(store.getNoteSphereById(child.id)).toBeUndefined();
+      expect(store.getNoteRealmById(child.id)).toBeUndefined();
     });
 
     it('should remove child from list', async () => {
-      const child = makeMe.aNoteSphere.under(note).please();
-      store.loadNoteSpheres([child]);
-      const childrenCount = store.getNoteSphereById(note.id).childrenIds.length;
+      const child = makeMe.aNoteRealm.under(note).please();
+      store.loadNoteRealms([child]);
+      const childrenCount = store.getNoteRealmById(note.id).childrenIds.length;
       await sa.deleteNote(child.id);
-      expect(store.getNoteSphereById(note.id).childrenIds).toHaveLength(
+      expect(store.getNoteRealmById(note.id).childrenIds).toHaveLength(
         childrenCount - 1
       );
     });

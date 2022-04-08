@@ -42,9 +42,9 @@ public class LinkViewedByUserTest {
             note2 = makeMe.aNote().under(top).description("note2description").inMemoryPlease();
             link = makeMe.aLink().between(note1, note2).inMemoryPlease();
             value = new NoteWithPosition(){{
-                NoteSphere noteSphere = new NoteViewer(null, note1).toJsonObject();
-                noteSphere.setLinks(Optional.of(links));
-                setNote(noteSphere);
+                NoteRealm noteRealm = new NoteViewer(null, note1).toJsonObject();
+                noteRealm.setLinks(Optional.of(links));
+                setNote(noteRealm);
             }};
 
         }

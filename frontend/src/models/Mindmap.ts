@@ -4,7 +4,7 @@ import { Coord, StraightConnection, Vector } from "./MindmapUnits";
 import MindmapMetrics from "./MindmapMetrics";
 
 
-type NoteFinder = (id: Doughnut.ID) => Generated.NoteSphere | undefined
+type NoteFinder = (id: Doughnut.ID) => Generated.NoteRealm | undefined
 class Mindmap {
   rootMindmapSector: MindmapSector
 
@@ -68,12 +68,12 @@ class Mindmap {
     return sector
   }
 
-  ancestorsUntilRoot(noteId: Doughnut.ID): Array<Generated.NoteSphere> | undefined {
-    const noteSphere = this.noteFinder(noteId)
-    if (!noteSphere) return undefined
-    if (noteId.toString() === this.rootNoteId.toString()) return [noteSphere]
-    if (!noteSphere.note.parentId) return undefined
-    return this.ancestorsUntilRoot(noteSphere.note.parentId)?.concat([noteSphere])
+  ancestorsUntilRoot(noteId: Doughnut.ID): Array<Generated.NoteRealm> | undefined {
+    const noteRealm = this.noteFinder(noteId)
+    if (!noteRealm) return undefined
+    if (noteId.toString() === this.rootNoteId.toString()) return [noteRealm]
+    if (!noteRealm.note.parentId) return undefined
+    return this.ancestorsUntilRoot(noteRealm.note.parentId)?.concat([noteRealm])
   }
 
 }

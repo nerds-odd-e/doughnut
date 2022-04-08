@@ -1,7 +1,7 @@
 interface NoteCacheState {
   notebooks: Generated.NotebookViewedByUser[]
   notebooksMapByHeadNoteId: { [id: Doughnut.ID]: Generated.NotebookViewedByUser }
-  noteSpheres: { [id: Doughnut.ID]: Generated.NoteSphere }
+  noteRealms: { [id: Doughnut.ID]: Generated.NoteRealm }
 }
 
 class NoteCache {
@@ -24,9 +24,9 @@ class NoteCache {
     this.loadNotebook(notePosition.notebook)
   }
 
-  loadNoteSpheres(noteSpheres: Generated.NoteSphere[]) {
-    noteSpheres.forEach((noteSphere) => {
-      this.state.noteSpheres[noteSphere.id] = noteSphere;
+  loadNoteRealms(noteRealms: Generated.NoteRealm[]) {
+    noteRealms.forEach((noteRealm) => {
+      this.state.noteRealms[noteRealm.id] = noteRealm;
     });
   }
 
@@ -35,17 +35,17 @@ class NoteCache {
     this.deleteNote(noteId)
   }
 
-  getNoteSphereById(id: Doughnut.ID | undefined) {
+  getNoteRealmById(id: Doughnut.ID | undefined) {
     if (id === undefined) return undefined;
-    return this.state.noteSpheres[id]
+    return this.state.noteRealms[id]
   }
 
   getNotePosition(id: Doughnut.ID | undefined) {
     if (!id) return undefined
     const ancestors: Generated.Note[] = []
-    let cursor = this.getNoteSphereById(id)
+    let cursor = this.getNoteRealmById(id)
     while (cursor && cursor.note.parentId) {
-      cursor = this.getNoteSphereById(cursor.note.parentId)
+      cursor = this.getNoteRealmById(cursor.note.parentId)
       if (!cursor) return undefined
       ancestors.unshift(cursor.note)
     }
@@ -59,25 +59,25 @@ class NoteCache {
   }
 
   private loadNote(id: Doughnut.ID, note: Generated.Note) {
-    const noteSphere = this.state.noteSpheres[id];
-    if (!noteSphere) {
-      this.state.noteSpheres[id] = { id, note }
+    const noteRealm = this.state.noteRealms[id];
+    if (!noteRealm) {
+      this.state.noteRealms[id] = { id, note }
       return
     }
-    noteSphere.note = note
+    noteRealm.note = note
   }
 
   private getChildrenIdsByParentId(parentId: Doughnut.ID) {
-    return this.getNoteSphereById(parentId)?.childrenIds
+    return this.getNoteRealmById(parentId)?.childrenIds
   }
 
   private deleteNote(id: Doughnut.ID) {
     this.getChildrenIdsByParentId(id)?.forEach((cid: Doughnut.ID) => this.deleteNote(cid))
-    delete this.state.noteSpheres[id]
+    delete this.state.noteRealms[id]
   }
 
   private deleteNoteFromParentChildrenList(id: Doughnut.ID) {
-    const parent = this.getNoteSphereById(id)?.note.parentId
+    const parent = this.getNoteRealmById(id)?.note.parentId
     if (!parent) return
     const children = this.getChildrenIdsByParentId(parent)
     if (children) {

@@ -33,7 +33,7 @@ class ReviewPointBuilder extends Builder<Generated.ReviewPointViewedByUser> {
     return this;
   }
 
-  ofNote(note: Generated.NoteSphere): ReviewPointBuilder {
+  ofNote(note: Generated.NoteRealm): ReviewPointBuilder {
     this.data.noteWithPosition = {
       note,
       notePosition: new NotePositionBuilder().do()

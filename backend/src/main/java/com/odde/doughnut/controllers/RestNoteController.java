@@ -40,7 +40,7 @@ class RestNoteController {
         private ReviewPoint reviewPoint;
         @Getter
         @Setter
-        private NoteSphere note;
+        private NoteRealm note;
 
     }
 
@@ -82,7 +82,7 @@ class RestNoteController {
 
     @PatchMapping(path = "/{note}")
     @Transactional
-    public NoteSphere updateNote(@PathVariable(name = "note") Note note, @Valid @ModelAttribute NoteAccessories noteAccessories) throws NoAccessRightException, IOException {
+    public NoteRealm updateNote(@PathVariable(name = "note") Note note, @Valid @ModelAttribute NoteAccessories noteAccessories) throws NoAccessRightException, IOException {
         final UserModel user = currentUserFetcher.getUser();
         user.getAuthorization().assertAuthorization(note);
 

@@ -32,17 +32,17 @@ export default defineComponent({
     mindmapSector: Object as PropType<MindmapSector>,
   },
   computed: {
-    noteSphere() {
-      return this.piniaStore.getNoteSphereById(this.noteId);
+    noteRealm() {
+      return this.piniaStore.getNoteRealmById(this.noteId);
     },
     note() {
-      return this.noteSphere?.note
+      return this.noteRealm?.note
     },
     links() {
-      return this.noteSphere?.links
+      return this.noteRealm?.links
     },
     childrenIds() {
-      return this.noteSphere?.childrenIds
+      return this.noteRealm?.childrenIds
     },
   },
 });

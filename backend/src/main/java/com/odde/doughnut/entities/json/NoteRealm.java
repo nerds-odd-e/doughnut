@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public class NoteSphere {
+public class NoteRealm {
     @Getter
     @Setter
     private Integer id;

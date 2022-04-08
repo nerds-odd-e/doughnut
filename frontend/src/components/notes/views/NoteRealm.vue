@@ -57,7 +57,7 @@ export default defineComponent({
     },
     selectedNote() {
       if(!this.selectedNoteId) return
-      return this.piniaStore.getNoteSphereById(this.selectedNoteId)?.note
+      return this.piniaStore.getNoteRealmById(this.selectedNoteId)?.note
     },
   },
   mounted() {

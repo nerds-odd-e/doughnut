@@ -1,9 +1,9 @@
 <template>
-<template v-if="noteSphere">
-  <NoteWithLinks v-bind="{ note: noteSphere?.note, links: noteSphere.links }"/>
+<template v-if="noteRealm">
+  <NoteWithLinks v-bind="{ note: noteRealm?.note, links: noteRealm.links }"/>
   <div class="note-list">
     <NoteOverview
-      v-for="childId in noteSphere.childrenIds"
+      v-for="childId in noteRealm.childrenIds"
       v-bind="{ noteId: childId, expandChildren }"
       :key="childId"
     />
@@ -27,8 +27,8 @@ export default defineComponent({
   },
   components: { NoteWithLinks },
   computed: {
-    noteSphere() {
-      return this.piniaStore.getNoteSphereById(this.noteId);
+    noteRealm() {
+      return this.piniaStore.getNoteRealmById(this.noteId);
     },
   },
 });

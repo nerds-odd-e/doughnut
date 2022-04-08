@@ -1,5 +1,5 @@
 <template>
-    <NoteSphereAsync
+    <NoteRealmAsync
       v-bind="{
         noteId,
         viewType,
@@ -11,11 +11,11 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import NoteSphereAsync from '../components/notes/NoteSphereAsync.vue';
+import NoteRealmAsync from '../components/notes/NoteRealmAsync.vue';
 
 export default defineComponent({
   props: { rawNoteId: String, viewType: String },
-  components: { NoteSphereAsync },
+  components: { NoteRealmAsync },
   computed: {
     noteId(): number {
       if(!this.rawNoteId) return Number.NaN;

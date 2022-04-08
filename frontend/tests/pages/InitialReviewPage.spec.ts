@@ -26,7 +26,7 @@ describe('repeat page', () => {
   });
 
   it('normal view', async () => {
-    const note = makeMe.aNoteSphere.please();
+    const note = makeMe.aNoteRealm.please();
     const reviewPoint = makeMe.aReviewPoint
       .ofNote(note)
       .remainingInitialReviewCountForToday(53)
@@ -44,15 +44,15 @@ describe('repeat page', () => {
   });
 
   it('minimized view', async () => {
-    const noteSphere = makeMe.aNoteSphere.please();
-    const reviewPoint = makeMe.aReviewPoint.ofNote(noteSphere).please();
+    const noteRealm = makeMe.aNoteRealm.please();
+    const reviewPoint = makeMe.aReviewPoint.ofNote(noteRealm).please();
     helper.apiMock.expecting('/api/reviews/initial', reviewPoint)
     const wrapper = renderer.withProps({nested: true}).currentRoute({ name: 'initial' }).mount()
     await flushPromises();
     expect(mockRouterPush).toHaveBeenCalledTimes(0);
     expect(wrapper.findAll('.initial-review-paused')).toHaveLength(1);
     expect(wrapper.find('.review-point-abbr span').text()).toContain(
-      noteSphere.note.title
+      noteRealm.note.title
     );
   });
 
