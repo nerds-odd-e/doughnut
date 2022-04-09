@@ -38,7 +38,7 @@ nixpkg_script_activate() {
     ln -sf /nix/var/nix/profiles/per-user/${user}/profile ${HOME}/.nix-profile
   fi
   
-  [ -f ${HOME}/.nix-profile/etc/profile.d/nix.sh ] &&  . ${HOME}/nix-profile/etc/profile.d/nix.sh
+  [ -f ${HOME}/.nix-profile/etc/profile.d/nix.sh ] && echo "Please start a new shell & execute '. ~/nix-profile/etc/profile.d/nix.sh'"
 }
 
 install_nixpkg_manager() {
