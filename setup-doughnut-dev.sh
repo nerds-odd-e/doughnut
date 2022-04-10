@@ -27,17 +27,16 @@ configure_nix_flakes() {
   fi
 
   if ! grep -Fxq "experimental-features = nix-command flakes" ${HOME}/.config/nix/nix.conf; then
-    echo 'experimental-features = nix-command flakes' >> ${HOME}/.config/nix/nix.conf
+    echo 'experimental-features = nix-command flakes' >>${HOME}/.config/nix/nix.conf
   fi
-  nixpkg_script_activate
 }
 
-nixpkg_script_activate() {
+ensure_nix_profile() {
   if [ ! -f ${HOME}/.nix-profile/etc/profile.d/nix.sh ]; then
     user=$(whoami)
     ln -sf /nix/var/nix/profiles/per-user/${user}/profile ${HOME}/.nix-profile
   fi
-  
+
   [ -f ${HOME}/.nix-profile/etc/profile.d/nix.sh ] && echo "Please start a new shell & execute '. ~/nix-profile/etc/profile.d/nix.sh'"
 }
 
@@ -60,7 +59,7 @@ install_nixpkg_manager() {
 
 install_nixpkg_manager
 
-nixpkg_script_activate
+ensure_nix_profile
 
 echo "------------------------------------------ CONGRATS !!! ----------------------------------------------------"
 echo "  doughnut basic nix development environment tooling setup complete."
