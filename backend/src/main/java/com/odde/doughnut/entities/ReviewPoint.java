@@ -1,11 +1,13 @@
 package com.odde.doughnut.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.odde.doughnut.algorithms.SpacedRepetitionAlgorithm;
+import com.odde.doughnut.models.TimestampOperations;
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -17,11 +19,6 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.AssertTrue;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.odde.doughnut.algorithms.SpacedRepetitionAlgorithm;
-import com.odde.doughnut.models.TimestampOperations;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -35,8 +32,7 @@ public class ReviewPoint {
 
   @Override
   public String toString() {
-    return "ReviewPoint{"
-        + "id=" + id + '}';
+    return "ReviewPoint{" + "id=" + id + '}';
   }
 
   @ManyToOne
@@ -81,8 +77,7 @@ public class ReviewPoint {
   @Column(name = "forgetting_curve_index")
   @Getter
   @Setter
-  private Integer forgettingCurveIndex =
-      SpacedRepetitionAlgorithm.DEFAULT_FORGETTING_CURVE_INDEX;
+  private Integer forgettingCurveIndex = SpacedRepetitionAlgorithm.DEFAULT_FORGETTING_CURVE_INDEX;
 
   @Column(name = "removed_from_review")
   @Getter
@@ -102,8 +97,7 @@ public class ReviewPoint {
   @JsonIgnore
   private Integer userId;
 
-  @JsonIgnore
-  @Transient @Getter @Setter private Boolean repeatAgainToday = false;
+  @JsonIgnore @Transient @Getter @Setter private Boolean repeatAgainToday = false;
 
   public void setNote(Note note) {
     this.note = note;
@@ -117,16 +111,14 @@ public class ReviewPoint {
     if (link != null) this.linkId = link.getId();
   }
 
-  public boolean isInitialReviewOnSameDay(Timestamp currentTime,
-                                          ZoneId timeZone) {
-    return TimestampOperations.getDayId(getInitialReviewedAt(), timeZone) ==
-        TimestampOperations.getDayId(currentTime, timeZone);
+  public boolean isInitialReviewOnSameDay(Timestamp currentTime, ZoneId timeZone) {
+    return TimestampOperations.getDayId(getInitialReviewedAt(), timeZone)
+        == TimestampOperations.getDayId(currentTime, timeZone);
   }
 
   @JsonIgnore
   public Note getSourceNote() {
-    if (link != null)
-      return link.getSourceNote();
+    if (link != null) return link.getSourceNote();
     return note;
   }
 
@@ -140,30 +132,35 @@ public class ReviewPoint {
     return note == null || link == null;
   }
 
-  public void updateMemoryState(Timestamp currentUTCTimestamp, int nextRepeatInHours, int nextForgettingCurveIndex) {
+  public void updateMemoryState(
+      Timestamp currentUTCTimestamp, int nextRepeatInHours, int nextForgettingCurveIndex) {
     setForgettingCurveIndex(nextForgettingCurveIndex);
-    setNextReviewAt(TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, nextRepeatInHours));
-      setLastReviewedAt(currentUTCTimestamp);
+    setNextReviewAt(
+        TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, nextRepeatInHours));
+    setLastReviewedAt(currentUTCTimestamp);
   }
 
   public void changeNextRepetitionWithAdjustment(Timestamp currentUTCTimestamp, int adjustment) {
-      SpacedRepetitionAlgorithm spacedRepetitionAlgorithm = getUser().getSpacedRepetitionAlgorithm();
-      long delayInHours = TimestampOperations.getDiffInHours(currentUTCTimestamp, getNextReviewAt());
-      final int nextForgettingCurveIndex = spacedRepetitionAlgorithm.getNextForgettingCurveIndex(getForgettingCurveIndex(), adjustment, delayInHours);
-      final int nextRepeatInHours = spacedRepetitionAlgorithm.getRepeatInHours(nextForgettingCurveIndex);
-      updateMemoryState(currentUTCTimestamp, nextRepeatInHours, nextForgettingCurveIndex);
+    SpacedRepetitionAlgorithm spacedRepetitionAlgorithm = getUser().getSpacedRepetitionAlgorithm();
+    long delayInHours = TimestampOperations.getDiffInHours(currentUTCTimestamp, getNextReviewAt());
+    final int nextForgettingCurveIndex =
+        spacedRepetitionAlgorithm.getNextForgettingCurveIndex(
+            getForgettingCurveIndex(), adjustment, delayInHours);
+    final int nextRepeatInHours =
+        spacedRepetitionAlgorithm.getRepeatInHours(nextForgettingCurveIndex);
+    updateMemoryState(currentUTCTimestamp, nextRepeatInHours, nextForgettingCurveIndex);
   }
 
-    public List<QuizQuestion.QuestionType> availableQuestionTypes() {
-        List<QuizQuestion.QuestionType> questionTypes = new ArrayList<>();
-        if (getLink() != null) {
-            Collections.addAll(questionTypes, getLink().getLinkType().getQuestionTypes());
-        } else {
-            questionTypes.add(QuizQuestion.QuestionType.SPELLING);
-            questionTypes.add(QuizQuestion.QuestionType.CLOZE_SELECTION);
-            questionTypes.add(QuizQuestion.QuestionType.PICTURE_TITLE);
-            questionTypes.add(QuizQuestion.QuestionType.PICTURE_SELECTION);
-        }
-        return questionTypes;
+  public List<QuizQuestion.QuestionType> availableQuestionTypes() {
+    List<QuizQuestion.QuestionType> questionTypes = new ArrayList<>();
+    if (getLink() != null) {
+      Collections.addAll(questionTypes, getLink().getLinkType().getQuestionTypes());
+    } else {
+      questionTypes.add(QuizQuestion.QuestionType.SPELLING);
+      questionTypes.add(QuizQuestion.QuestionType.CLOZE_SELECTION);
+      questionTypes.add(QuizQuestion.QuestionType.PICTURE_TITLE);
+      questionTypes.add(QuizQuestion.QuestionType.PICTURE_SELECTION);
     }
+    return questionTypes;
+  }
 }

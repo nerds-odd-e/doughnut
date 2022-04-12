@@ -1,8 +1,4 @@
-
 package com.odde.doughnut.controllers;
-
-import javax.annotation.Resource;
-import javax.validation.Valid;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.*;
@@ -14,7 +10,8 @@ import com.odde.doughnut.models.BazaarModel;
 import com.odde.doughnut.models.JsonViewer;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
-
+import javax.annotation.Resource;
+import javax.validation.Valid;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -26,53 +23,62 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/notebooks")
 class RestNotebookController {
-    private final ModelFactoryService modelFactoryService;
-    private final CurrentUserFetcher currentUserFetcher;
-    @Resource(name = "testabilitySettings")
-    private final TestabilitySettings testabilitySettings;
+  private final ModelFactoryService modelFactoryService;
+  private final CurrentUserFetcher currentUserFetcher;
 
-    public RestNotebookController(ModelFactoryService modelFactoryService, CurrentUserFetcher currentUserFetcher, TestabilitySettings testabilitySettings) {
-        this.modelFactoryService = modelFactoryService;
-        this.currentUserFetcher = currentUserFetcher;
-        this.testabilitySettings = testabilitySettings;
-    }
+  @Resource(name = "testabilitySettings")
+  private final TestabilitySettings testabilitySettings;
 
-    @GetMapping("")
-    public NotebooksViewedByUser myNotebooks() {
-        UserModel user = currentUserFetcher.getUser();
-        user.getAuthorization().assertLoggedIn();
+  public RestNotebookController(
+      ModelFactoryService modelFactoryService,
+      CurrentUserFetcher currentUserFetcher,
+      TestabilitySettings testabilitySettings) {
+    this.modelFactoryService = modelFactoryService;
+    this.currentUserFetcher = currentUserFetcher;
+    this.testabilitySettings = testabilitySettings;
+  }
 
-        NotebooksViewedByUser notebooksViewedByUser = new JsonViewer(user.getEntity()).jsonNotebooksViewedByUser(user.getEntity().getOwnership().getNotebooks());
-        notebooksViewedByUser.subscriptions = user.getEntity().getSubscriptions();
-        return notebooksViewedByUser;
-    }
+  @GetMapping("")
+  public NotebooksViewedByUser myNotebooks() {
+    UserModel user = currentUserFetcher.getUser();
+    user.getAuthorization().assertLoggedIn();
 
-    @PostMapping({"/create"})
-    public RedirectToNoteResponse createNotebook(@Valid @ModelAttribute TextContent textContent) {
-        UserModel user = currentUserFetcher.getUser();
-        user.getAuthorization().assertLoggedIn();
-        User userEntity = user.getEntity();
-        Note note = userEntity.getOwnership().createNotebook(userEntity, textContent, testabilitySettings.getCurrentUTCTimestamp());
-        modelFactoryService.noteRepository.save(note);
-        return new RedirectToNoteResponse(note.getId());
-    }
+    NotebooksViewedByUser notebooksViewedByUser =
+        new JsonViewer(user.getEntity())
+            .jsonNotebooksViewedByUser(user.getEntity().getOwnership().getNotebooks());
+    notebooksViewedByUser.subscriptions = user.getEntity().getSubscriptions();
+    return notebooksViewedByUser;
+  }
 
-    @PostMapping(value = "/{notebook}")
-    @Transactional
-    public Notebook update(@Valid Notebook notebook) throws NoAccessRightException {
-        UserModel user = currentUserFetcher.getUser();
-        user.getAuthorization().assertAuthorization(notebook);
-        modelFactoryService.notebookRepository.save(notebook);
-        return notebook;
-    }
+  @PostMapping({"/create"})
+  public RedirectToNoteResponse createNotebook(@Valid @ModelAttribute TextContent textContent) {
+    UserModel user = currentUserFetcher.getUser();
+    user.getAuthorization().assertLoggedIn();
+    User userEntity = user.getEntity();
+    Note note =
+        userEntity
+            .getOwnership()
+            .createNotebook(userEntity, textContent, testabilitySettings.getCurrentUTCTimestamp());
+    modelFactoryService.noteRepository.save(note);
+    return new RedirectToNoteResponse(note.getId());
+  }
 
-    @PostMapping(value = "/{notebook}/share")
-    public Notebook shareNote(@PathVariable("notebook") Notebook notebook) throws NoAccessRightException {
-        UserModel user = currentUserFetcher.getUser();
-        user.getAuthorization().assertAuthorization(notebook);
-        BazaarModel bazaar = modelFactoryService.toBazaarModel();
-        bazaar.shareNote(notebook);
-        return notebook;
-    }
+  @PostMapping(value = "/{notebook}")
+  @Transactional
+  public Notebook update(@Valid Notebook notebook) throws NoAccessRightException {
+    UserModel user = currentUserFetcher.getUser();
+    user.getAuthorization().assertAuthorization(notebook);
+    modelFactoryService.notebookRepository.save(notebook);
+    return notebook;
+  }
 
+  @PostMapping(value = "/{notebook}/share")
+  public Notebook shareNote(@PathVariable("notebook") Notebook notebook)
+      throws NoAccessRightException {
+    UserModel user = currentUserFetcher.getUser();
+    user.getAuthorization().assertAuthorization(notebook);
+    BazaarModel bazaar = modelFactoryService.toBazaarModel();
+    bazaar.shareNote(notebook);
+    return notebook;
+  }
 }

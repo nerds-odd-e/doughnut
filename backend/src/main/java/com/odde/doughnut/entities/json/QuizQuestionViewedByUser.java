@@ -7,97 +7,90 @@ import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionPresenter;
-import lombok.Getter;
-
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
+import lombok.Getter;
 
 public class QuizQuestionViewedByUser {
 
-    public QuizQuestion quizQuestion;
+  public QuizQuestion quizQuestion;
 
-    @Getter
-    public QuizQuestion.QuestionType questionType;
+  @Getter public QuizQuestion.QuestionType questionType;
 
-    @Getter
-    public String description;
+  @Getter public String description;
 
-    @Getter
-    public String mainTopic;
+  @Getter public String mainTopic;
 
-    @Getter
-    public Map<Link.LinkType, LinkViewed> hintLinks;
+  @Getter public Map<Link.LinkType, LinkViewed> hintLinks;
 
-    @Getter
-    public List<Integer> viceReviewPointIdList;
+  @Getter public List<Integer> viceReviewPointIdList;
 
-    public List<Note> scope;
+  public List<Note> scope;
 
-    @Getter
-    public List<Option> options;
+  @Getter public List<Option> options;
 
-    public Optional<PictureWithMask> pictureWithMask;
+  public Optional<PictureWithMask> pictureWithMask;
 
-    public static QuizQuestionViewedByUser from(QuizQuestion quizQuestion, NoteRepository noteRepository) {
-        QuizQuestionPresenter presenter = quizQuestion.getQuestionType().presenter.apply(quizQuestion);
-        QuizQuestionViewedByUser question = new QuizQuestionViewedByUser();
-        question.quizQuestion = quizQuestion;
-        question.questionType = quizQuestion.getQuestionType();
-        question.description = presenter.instruction();
-        question.mainTopic = presenter.mainTopic();
-        question.hintLinks = presenter.hintLinks();
-        question.pictureWithMask = presenter.pictureWithMask();
-        question.viceReviewPointIdList = quizQuestion.getViceReviewPointIdList();
-        question.scope = List.of(quizQuestion.getReviewPoint().getSourceNote().getNotebook().getHeadNote());
-        Stream<Note> noteStream = noteRepository.findAllByIds(quizQuestion.getOptionNoteIds().split(","));
-        question.options = noteStream.map(presenter.optionCreator()::optionFromNote).toList();
-        return question;
+  public static QuizQuestionViewedByUser from(
+      QuizQuestion quizQuestion, NoteRepository noteRepository) {
+    QuizQuestionPresenter presenter = quizQuestion.getQuestionType().presenter.apply(quizQuestion);
+    QuizQuestionViewedByUser question = new QuizQuestionViewedByUser();
+    question.quizQuestion = quizQuestion;
+    question.questionType = quizQuestion.getQuestionType();
+    question.description = presenter.instruction();
+    question.mainTopic = presenter.mainTopic();
+    question.hintLinks = presenter.hintLinks();
+    question.pictureWithMask = presenter.pictureWithMask();
+    question.viceReviewPointIdList = quizQuestion.getViceReviewPointIdList();
+    question.scope =
+        List.of(quizQuestion.getReviewPoint().getSourceNote().getNotebook().getHeadNote());
+    Stream<Note> noteStream =
+        noteRepository.findAllByIds(quizQuestion.getOptionNoteIds().split(","));
+    question.options = noteStream.map(presenter.optionCreator()::optionFromNote).toList();
+    return question;
+  }
+
+  public static class Option {
+    @Getter private NoteRealm note;
+    @Getter private boolean isPicture = false;
+
+    private Option() {}
+
+    public static Option createTitleOption(Note note) {
+      Option option = new Option();
+      option.note = new NoteViewer(null, note).toJsonObject();
+      return option;
     }
 
-    public static class Option {
-        @Getter
-        private NoteRealm note;
-        @Getter
-        private boolean isPicture = false;
-
-        private Option() {
-        }
-
-        public static Option createTitleOption(Note note) {
-            Option option = new Option();
-            option.note = new NoteViewer(null, note).toJsonObject();
-            return option;
-        }
-
-        public static Option createPictureOption(Note note) {
-            Option option = new Option();
-            option.note = new NoteViewer(null, note).toJsonObject();
-            option.isPicture = true;
-            return option;
-        }
-
-        public String getDisplay() {
-            return note.getNote().getTitle();
-        }
+    public static Option createPictureOption(Note note) {
+      Option option = new Option();
+      option.note = new NoteViewer(null, note).toJsonObject();
+      option.isPicture = true;
+      return option;
     }
 
-    public interface OptionCreator {
-        Option optionFromNote(Note note);
+    public String getDisplay() {
+      return note.getNote().getTitle();
     }
+  }
 
-    public static class TitleOptionCreator implements OptionCreator {
-        @Override
-        public Option optionFromNote(Note note) {
-            return Option.createTitleOption(note);
-        }
-    }
+  public interface OptionCreator {
+    Option optionFromNote(Note note);
+  }
 
-    public static class PictureOptionCreator implements OptionCreator {
-        @Override
-        public Option optionFromNote(Note note) {
-            return Option.createPictureOption(note);
-        }
+  public static class TitleOptionCreator implements OptionCreator {
+    @Override
+    public Option optionFromNote(Note note) {
+      return Option.createTitleOption(note);
     }
+  }
+
+  public static class PictureOptionCreator implements OptionCreator {
+    @Override
+    public Option optionFromNote(Note note) {
+      return Option.createPictureOption(note);
+    }
+  }
 }

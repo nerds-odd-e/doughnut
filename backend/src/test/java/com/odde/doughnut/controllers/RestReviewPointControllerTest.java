@@ -1,5 +1,9 @@
 package com.odde.doughnut.controllers;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.ReviewPointViewedByUser;
 import com.odde.doughnut.exceptions.NoAccessRightException;
@@ -16,52 +20,46 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
 class RestReviewPointControllerTest {
-    @Autowired
-    ModelFactoryService modelFactoryService;
-    @Autowired
-    MakeMe makeMe;
-    private UserModel userModel;
-    RestReviewPointController controller;
+  @Autowired ModelFactoryService modelFactoryService;
+  @Autowired MakeMe makeMe;
+  private UserModel userModel;
+  RestReviewPointController controller;
+
+  @BeforeEach
+  void setup() {
+    userModel = makeMe.aUser().toModelPlease();
+    controller =
+        new RestReviewPointController(modelFactoryService, new TestCurrentUserFetcher(userModel));
+  }
+
+  @Nested
+  class WhenThereIsAReviewPoint {
+    ReviewPoint rp;
 
     @BeforeEach
     void setup() {
-        userModel = makeMe.aUser().toModelPlease();
-        controller = new RestReviewPointController(modelFactoryService, new TestCurrentUserFetcher(userModel));
+      rp = makeMe.aReviewPointFor(makeMe.aNote().please()).by(userModel).please();
     }
 
-    @Nested
-    class WhenThereIsAReviewPoint {
-        ReviewPoint rp;
-
-        @BeforeEach
-        void setup() {
-            rp = makeMe.aReviewPointFor(makeMe.aNote().please()).by(userModel).please();
-        }
-
-        @Test
-        void show() throws NoAccessRightException {
-            ReviewPointViewedByUser result = controller.show(rp.getId());
-            assertThat(result, notNullValue());
-        }
-
-        @Test
-        void showNonExist() {
-            assertThrows(ResponseStatusException.class, ()->controller.show(rp.getId() + 1000));
-        }
-
-        @Test
-        void remove() {
-            controller.removeFromRepeating(rp);
-            assertThat(rp.getRemovedFromReview(), is(true));
-        }
+    @Test
+    void show() throws NoAccessRightException {
+      ReviewPointViewedByUser result = controller.show(rp.getId());
+      assertThat(result, notNullValue());
     }
 
+    @Test
+    void showNonExist() {
+      assertThrows(ResponseStatusException.class, () -> controller.show(rp.getId() + 1000));
+    }
+
+    @Test
+    void remove() {
+      controller.removeFromRepeating(rp);
+      assertThat(rp.getRemovedFromReview(), is(true));
+    }
+  }
 }

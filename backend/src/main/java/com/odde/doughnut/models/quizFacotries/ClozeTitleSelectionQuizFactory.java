@@ -2,32 +2,32 @@ package com.odde.doughnut.models.quizFacotries;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
+import java.util.List;
 import org.apache.logging.log4j.util.Strings;
 
-import java.util.List;
+public class ClozeTitleSelectionQuizFactory extends ClozeDescriptonQuizFactory
+    implements QuestionOptionsFactory {
+  public ClozeTitleSelectionQuizFactory(ReviewPoint reviewPoint) {
+    super(reviewPoint);
+  }
 
-public class ClozeTitleSelectionQuizFactory extends ClozeDescriptonQuizFactory implements QuestionOptionsFactory {
-    public ClozeTitleSelectionQuizFactory(ReviewPoint reviewPoint) {
-        super(reviewPoint);
-    }
+  @Override
+  public Note generateAnswerNote(QuizQuestionServant servant) {
+    return answerNote;
+  }
 
-    @Override
-    public Note generateAnswerNote(QuizQuestionServant servant) {
-        return answerNote;
-    }
+  @Override
+  public List<Note> generateFillingOptions(QuizQuestionServant servant) {
+    return servant.chooseFromCohort(answerNote, n -> !n.equals(answerNote));
+  }
 
-    @Override
-    public List<Note> generateFillingOptions(QuizQuestionServant servant) {
-        return servant.chooseFromCohort(answerNote, n -> !n.equals(answerNote));
-    }
+  @Override
+  public boolean isValidQuestion() {
+    return !Strings.isEmpty(reviewPoint.getNote().getTextContent().getDescription());
+  }
 
-    @Override
-    public boolean isValidQuestion() {
-        return !Strings.isEmpty(reviewPoint.getNote().getTextContent().getDescription());
-    }
-
-    @Override
-    public int minimumOptionCount() {
-        return 1;
-    }
+  @Override
+  public int minimumOptionCount() {
+    return 1;
+  }
 }

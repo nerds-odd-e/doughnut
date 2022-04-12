@@ -7,22 +7,34 @@ import org.springframework.stereotype.Component;
 @Component
 public class CommonConfiguration {
 
-  void commonConfig(HttpSecurity http, AbstractAuthenticationFilterConfigurer authenticationFilterConfigurer) throws Exception {
-      http.authorizeRequests()
+  void commonConfig(
+      HttpSecurity http, AbstractAuthenticationFilterConfigurer authenticationFilterConfigurer)
+      throws Exception {
+    http.authorizeRequests()
         .mvcMatchers("/robots.txt")
         .permitAll()
-        .antMatchers("/", "/login", "/error", "/images/**", "/odd-e.png", "/odd-e.ico",
-                     "/webjars/**", "/assets/**","/bazaar", "/bazaar/**",
-                     "/api/**", "/circles/join"
-                )
+        .antMatchers(
+            "/",
+            "/login",
+            "/error",
+            "/images/**",
+            "/odd-e.png",
+            "/odd-e.ico",
+            "/webjars/**",
+            "/assets/**",
+            "/bazaar",
+            "/bazaar/**",
+            "/api/**",
+            "/circles/join")
         .permitAll()
         .anyRequest()
         .authenticated()
         .and()
-        .logout(l
-                -> l.logoutUrl("/logout")
-                       .logoutSuccessUrl("/")
-                       .invalidateHttpSession(true)
-                       .permitAll());
+        .logout(
+            l ->
+                l.logoutUrl("/logout")
+                    .logoutSuccessUrl("/")
+                    .invalidateHttpSession(true)
+                    .permitAll());
   }
 }

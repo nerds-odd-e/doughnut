@@ -13,13 +13,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 @Profile({"e2e", "test", "dev"})
 public class NonProductConfiguration extends WebSecurityConfigurerAdapter {
 
-  @Autowired
-  private CommonConfiguration commonConfiguration;
+  @Autowired private CommonConfiguration commonConfiguration;
 
   @Override
   protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-    PasswordEncoder encoder =
-        PasswordEncoderFactories.createDelegatingPasswordEncoder();
+    PasswordEncoder encoder = PasswordEncoderFactories.createDelegatingPasswordEncoder();
     auth.inMemoryAuthentication()
         .withUser("user")
         .password(encoder.encode("password"))

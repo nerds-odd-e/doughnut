@@ -4,14 +4,14 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.FileSystemXmlApplicationContext;
 
 class ApplicationContextForRepositoriesHolder {
-    private static final ApplicationContext applicationContext;
+  private static final ApplicationContext applicationContext;
 
-    static {
-        String path = "/src/test/resources/repository.xml";
-        applicationContext = new FileSystemXmlApplicationContext(path);
-    }
+  static {
+    String path = "/src/test/resources/repository.xml";
+    applicationContext = new FileSystemXmlApplicationContext(path);
+  }
 
-    public static ApplicationContext getApplicationContext() {
-        return applicationContext;
-    }
+  public static ApplicationContext getApplicationContext() {
+    return applicationContext;
+  }
 }

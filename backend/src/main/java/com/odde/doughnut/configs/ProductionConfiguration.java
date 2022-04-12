@@ -10,19 +10,13 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 @Profile({"prod"})
 public class ProductionConfiguration extends WebSecurityConfigurerAdapter {
 
-  @Autowired
-  private CommonConfiguration commonConfiguration;
+  @Autowired private CommonConfiguration commonConfiguration;
 
   @Override
   protected void configure(HttpSecurity http) throws Exception {
 
-    http.csrf()
-        .disable()
-        .authorizeRequests()
-        .antMatchers("/api/healthcheck")
-        .permitAll();
+    http.csrf().disable().authorizeRequests().antMatchers("/api/healthcheck").permitAll();
 
     commonConfiguration.commonConfig(http, http.oauth2Login());
   }
-
 }

@@ -8,14 +8,17 @@ import org.springframework.context.ApplicationContext;
 
 public class ApplicationContextWithRepositories implements ParameterResolver {
 
-    @Override
-    public boolean supportsParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-        return parameterContext.getParameter().getType().equals(ApplicationContext.class);
-    }
+  @Override
+  public boolean supportsParameter(
+      ParameterContext parameterContext, ExtensionContext extensionContext)
+      throws ParameterResolutionException {
+    return parameterContext.getParameter().getType().equals(ApplicationContext.class);
+  }
 
-    @Override
-    public Object resolveParameter(ParameterContext parameterContext, ExtensionContext extensionContext) throws ParameterResolutionException {
-        return ApplicationContextForRepositoriesHolder.getApplicationContext();
-    }
-
+  @Override
+  public Object resolveParameter(
+      ParameterContext parameterContext, ExtensionContext extensionContext)
+      throws ParameterResolutionException {
+    return ApplicationContextForRepositoriesHolder.getApplicationContext();
+  }
 }

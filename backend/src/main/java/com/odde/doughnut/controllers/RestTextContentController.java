@@ -1,4 +1,3 @@
-
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
@@ -9,38 +8,42 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
-
+import java.sql.Timestamp;
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.sql.Timestamp;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/text_content")
 class RestTextContentController {
-    private final ModelFactoryService modelFactoryService;
-    private final CurrentUserFetcher currentUserFetcher;
-    @Resource(name = "testabilitySettings")
-    private final TestabilitySettings testabilitySettings;
+  private final ModelFactoryService modelFactoryService;
+  private final CurrentUserFetcher currentUserFetcher;
 
-    public RestTextContentController(ModelFactoryService modelFactoryService, CurrentUserFetcher currentUserFetcher, TestabilitySettings testabilitySettings) {
-        this.modelFactoryService = modelFactoryService;
-        this.currentUserFetcher = currentUserFetcher;
-        this.testabilitySettings = testabilitySettings;
-    }
+  @Resource(name = "testabilitySettings")
+  private final TestabilitySettings testabilitySettings;
 
-    @PatchMapping(path = "/{note}")
-    @Transactional
-    public NoteRealm updateNote(@PathVariable(name = "note") Note note, @Valid @ModelAttribute TextContent textContent) throws NoAccessRightException {
-        final UserModel user = currentUserFetcher.getUser();
-        user.getAuthorization().assertAuthorization(note);
+  public RestTextContentController(
+      ModelFactoryService modelFactoryService,
+      CurrentUserFetcher currentUserFetcher,
+      TestabilitySettings testabilitySettings) {
+    this.modelFactoryService = modelFactoryService;
+    this.currentUserFetcher = currentUserFetcher;
+    this.testabilitySettings = testabilitySettings;
+  }
 
-        Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
-        note.getTextContent().updateTextContent(textContent, currentUTCTimestamp);
+  @PatchMapping(path = "/{note}")
+  @Transactional
+  public NoteRealm updateNote(
+      @PathVariable(name = "note") Note note, @Valid @ModelAttribute TextContent textContent)
+      throws NoAccessRightException {
+    final UserModel user = currentUserFetcher.getUser();
+    user.getAuthorization().assertAuthorization(note);
 
-        modelFactoryService.noteRepository.save(note);
-        return new NoteViewer(user.getEntity(), note).toJsonObject();
-    }
+    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
+    note.getTextContent().updateTextContent(textContent, currentUTCTimestamp);
 
+    modelFactoryService.noteRepository.save(note);
+    return new NoteViewer(user.getEntity(), note).toJsonObject();
+  }
 }

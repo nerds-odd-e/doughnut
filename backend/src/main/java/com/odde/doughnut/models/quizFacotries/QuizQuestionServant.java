@@ -5,45 +5,46 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.Randomizer;
-
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class QuizQuestionServant {
-    final Randomizer randomizer;
-    final ModelFactoryService modelFactoryService;
-    final int maxFillingOptionCount = 3;
+  final Randomizer randomizer;
+  final ModelFactoryService modelFactoryService;
+  final int maxFillingOptionCount = 3;
 
-    public QuizQuestionServant(Randomizer randomizer, ModelFactoryService modelFactoryService) {
-        this.randomizer = randomizer;
-        this.modelFactoryService = modelFactoryService;
-    }
+  public QuizQuestionServant(Randomizer randomizer, ModelFactoryService modelFactoryService) {
+    this.randomizer = randomizer;
+    this.modelFactoryService = modelFactoryService;
+  }
 
-    List<Note> chooseFromCohort(Note answerNote, Predicate<Note> notePredicate) {
-        List<Note> list = getCohort(answerNote, notePredicate);
-        return randomizer.randomlyChoose(maxFillingOptionCount, list);
-    }
+  List<Note> chooseFromCohort(Note answerNote, Predicate<Note> notePredicate) {
+    List<Note> list = getCohort(answerNote, notePredicate);
+    return randomizer.randomlyChoose(maxFillingOptionCount, list);
+  }
 
-    private List<Note> getCohort(Note answerNote, Predicate<Note> notePredicate) {
-        List<Note> list = answerNote.getSiblings().stream().filter(notePredicate).collect(Collectors.toList());
-        if (list.size() > 1) return list;
+  private List<Note> getCohort(Note answerNote, Predicate<Note> notePredicate) {
+    List<Note> list =
+        answerNote.getSiblings().stream().filter(notePredicate).collect(Collectors.toList());
+    if (list.size() > 1) return list;
 
-        return answerNote.getGrandAsPossible().getDescendantsInBreathFirstOrder().stream().filter(notePredicate).collect(Collectors.toList());
-    }
+    return answerNote.getGrandAsPossible().getDescendantsInBreathFirstOrder().stream()
+        .filter(notePredicate)
+        .collect(Collectors.toList());
+  }
 
-    List<Note> randomlyChooseAndEnsure(List<Note> candidates, Note ensure) {
-        List<Note> list = candidates.stream()
-                .filter(n -> !n.equals(ensure)).collect(Collectors.toList());
-        List<Note> selectedList = this.randomizer.randomlyChoose(maxFillingOptionCount - 1, list);
-        selectedList.add(ensure);
-        return selectedList;
-    }
+  List<Note> randomlyChooseAndEnsure(List<Note> candidates, Note ensure) {
+    List<Note> list =
+        candidates.stream().filter(n -> !n.equals(ensure)).collect(Collectors.toList());
+    List<Note> selectedList = this.randomizer.randomlyChoose(maxFillingOptionCount - 1, list);
+    selectedList.add(ensure);
+    return selectedList;
+  }
 
-    Optional<Link> chooseOneCategoryLink(User user, Link link) {
-        Link result = randomizer.chooseOneRandomly(
-                link.categoryLinksOfTarget(user));
-        return Optional.ofNullable(result);
-    }
+  Optional<Link> chooseOneCategoryLink(User user, Link link) {
+    Link result = randomizer.chooseOneRandomly(link.categoryLinksOfTarget(user));
+    return Optional.ofNullable(result);
+  }
 }

@@ -3,12 +3,10 @@ package com.odde.doughnut.models;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-import java.sql.Timestamp;
-
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewSetting;
 import com.odde.doughnut.testability.MakeMe;
-
+import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -22,27 +20,26 @@ import org.springframework.transaction.annotation.Transactional;
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
 public class ReviewPointModelTest {
-    @Autowired
-    MakeMe makeMe;
-    UserModel userModel;
-    Timestamp day1;
+  @Autowired MakeMe makeMe;
+  UserModel userModel;
+  Timestamp day1;
 
-    @BeforeEach
-    void setup() {
-        userModel = makeMe.aUser().toModelPlease();
-        day1 = makeMe.aTimestamp().of(1, 8).forWhereTheUserIs(userModel).please();
+  @BeforeEach
+  void setup() {
+    userModel = makeMe.aUser().toModelPlease();
+    day1 = makeMe.aTimestamp().of(1, 8).forWhereTheUserIs(userModel).please();
+  }
+
+  @Nested
+  class InitialReview {
+
+    @Test
+    void initialReviewShouldSetBothInitialAndLastReviewAt() {
+      Note note = makeMe.aNote().byUser(userModel).please();
+      ReviewPointModel reviewPoint = makeMe.aReviewPointFor(note).by(userModel).toModelPlease();
+      reviewPoint.initialReview(userModel, new ReviewSetting(), day1);
+      assertThat(reviewPoint.getEntity().getInitialReviewedAt(), equalTo(day1));
+      assertThat(reviewPoint.getEntity().getLastReviewedAt(), equalTo(day1));
     }
-
-    @Nested
-    class InitialReview {
-
-        @Test
-        void initialReviewShouldSetBothInitialAndLastReviewAt() {
-            Note note = makeMe.aNote().byUser(userModel).please();
-            ReviewPointModel reviewPoint = makeMe.aReviewPointFor(note).by(userModel).toModelPlease();
-            reviewPoint.initialReview(userModel, new ReviewSetting(), day1);
-            assertThat(reviewPoint.getEntity().getInitialReviewedAt(), equalTo(day1));
-            assertThat(reviewPoint.getEntity().getLastReviewedAt(), equalTo(day1));
-        }
-    }
+  }
 }

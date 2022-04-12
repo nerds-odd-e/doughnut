@@ -1,4 +1,3 @@
 package com.odde.doughnut.exceptions;
 
-public class CyclicLinkDetectedException extends Throwable {
-}
+public class CyclicLinkDetectedException extends Throwable {}

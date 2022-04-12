@@ -6,7 +6,6 @@ import static org.hamcrest.Matchers.equalTo;
 import com.odde.doughnut.entities.Image;
 import com.odde.doughnut.entities.repositories.ImageBlobRepository;
 import com.odde.doughnut.testability.MakeMe;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,26 +20,25 @@ import org.springframework.transaction.annotation.Transactional;
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
 class ImageControllerTests {
-    @Autowired
-    ImageBlobRepository imageBlobRepository;
+  @Autowired ImageBlobRepository imageBlobRepository;
 
-    @Autowired
-    MakeMe makeMe;
-    ImageController controller;
+  @Autowired MakeMe makeMe;
+  ImageController controller;
 
-    @BeforeEach
-    void setup() {
-        controller = new ImageController(imageBlobRepository);
-    }
+  @BeforeEach
+  void setup() {
+    controller = new ImageController(imageBlobRepository);
+  }
 
-    @Test
-    void contentType() {
-        Image image = makeMe.anImage().please();
-        makeMe.refresh(image);
-        ResponseEntity<byte[]> resp = controller.show(image, "filename");
-        assertThat(resp.getStatusCode(), equalTo(HttpStatus.OK));
-        assertThat(resp.getHeaders().getContentType().toString(), equalTo("image/png"));
-        assertThat(resp.getHeaders().getContentDisposition().toString(), equalTo("inline; filename=\"example.png\""));
-    }
+  @Test
+  void contentType() {
+    Image image = makeMe.anImage().please();
+    makeMe.refresh(image);
+    ResponseEntity<byte[]> resp = controller.show(image, "filename");
+    assertThat(resp.getStatusCode(), equalTo(HttpStatus.OK));
+    assertThat(resp.getHeaders().getContentType().toString(), equalTo("image/png"));
+    assertThat(
+        resp.getHeaders().getContentDisposition().toString(),
+        equalTo("inline; filename=\"example.png\""));
+  }
 }
-
