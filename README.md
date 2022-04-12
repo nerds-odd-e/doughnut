@@ -136,3 +136,5 @@ Expect to find minified and uglified web bundle assets in `backend/src/main/reso
 ### 5. [Production environment](./docs/prod_env.md)
 
 ### 6. [Doughnut source code secrets management](./docs/secrets_management.md)
+
+### 7. [Style Guide](./docs/styleguide.md)
