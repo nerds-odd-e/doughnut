@@ -1,6 +1,12 @@
 package com.odde.doughnut.models;
 
-import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.Circle;
+import com.odde.doughnut.entities.Link;
+import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.Notebook;
+import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.Subscription;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.util.Arrays;

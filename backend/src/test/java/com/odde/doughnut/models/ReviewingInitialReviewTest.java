@@ -1,9 +1,14 @@
 package com.odde.doughnut.models;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 
-import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.Circle;
+import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;

@@ -1,9 +1,11 @@
 package com.odde.doughnut.entities;
 
-import static com.odde.doughnut.entities.Link.LinkType.*;
+import static com.odde.doughnut.entities.Link.LinkType.RELATED_TO;
+import static com.odde.doughnut.entities.Link.LinkType.SPECIALIZE;
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.hasSize;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 

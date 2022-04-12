@@ -1,7 +1,9 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
-import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.Circle;
+import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.TextContent;
 import com.odde.doughnut.entities.json.CircleForUserView;
 import com.odde.doughnut.entities.json.CircleJoiningByInvitation;
 import com.odde.doughnut.entities.json.RedirectToNoteResponse;

@@ -1,6 +1,7 @@
 package com.odde.doughnut.models.quizFacotries;
 
-import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.Link;
+import com.odde.doughnut.entities.PictureWithMask;
 import com.odde.doughnut.entities.json.LinkViewed;
 import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import java.util.Map;

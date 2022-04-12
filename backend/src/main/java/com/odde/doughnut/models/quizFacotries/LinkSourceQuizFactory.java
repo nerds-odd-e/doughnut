@@ -1,6 +1,9 @@
 package com.odde.doughnut.models.quizFacotries;
 
-import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.Link;
+import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.User;
 import java.util.List;
 
 public class LinkSourceQuizFactory implements QuizQuestionFactory, QuestionOptionsFactory {

@@ -2,7 +2,8 @@ package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.models.UserModel;
 import java.sql.Timestamp;
-import java.time.*;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 public class TimestampBuilder {
   private int day;

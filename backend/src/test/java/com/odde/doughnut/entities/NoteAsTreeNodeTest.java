@@ -1,7 +1,9 @@
 package com.odde.doughnut.entities;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.not;
 
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;

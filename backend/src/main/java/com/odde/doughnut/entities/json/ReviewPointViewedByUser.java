@@ -1,6 +1,9 @@
 package com.odde.doughnut.entities.json;
 
-import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.Link;
+import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.ReviewSetting;
 import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.UserModel;
 import java.util.Optional;
