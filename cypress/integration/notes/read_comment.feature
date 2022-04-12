@@ -1,7 +1,6 @@
 Feature: Read Comment
   As a learner, I want to read comments on a note.
 
-  @ignore
   Scenario: No comments on a note
     Given I've logged in as an existing user
     And there are some notes for the current user

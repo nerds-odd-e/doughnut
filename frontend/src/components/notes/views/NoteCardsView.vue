@@ -2,6 +2,9 @@
   <div class="container" v-if="noteRealm">
     <NoteWithLinks v-bind="{ note: noteRealm.note, links: noteRealm.links }"/>
     <NoteStatisticsButton :noteId="noteId" />
+
+    <input id="comment-input" />
+
     <Cards v-if="expandChildren" :notes="children"/>
   </div>
 
