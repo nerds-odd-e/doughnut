@@ -13,11 +13,13 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -145,5 +147,14 @@ class RestNoteController {
         note.mergeMasterReviewSetting(reviewSetting);
         modelFactoryService.noteRepository.save(note);
         return new RedirectToNoteResponse(note.getId());
+    }
+
+    public NotesBulk createComment(Note note, Comment comment) {
+        var userModel = currentUserFetcher.getUser();
+        if (CollectionUtils.isEmpty(note.getComments())) {
+            note.setComments(new ArrayList<>());
+        }
+        note.getComments().add(comment);
+        return NotesBulk.jsonNoteWithChildren(note, userModel);
     }
 }

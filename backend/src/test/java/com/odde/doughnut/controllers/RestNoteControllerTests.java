@@ -1,5 +1,6 @@
 package com.odde.doughnut.controllers;
 
+import com.odde.doughnut.entities.Comment;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteAccessories;
 import com.odde.doughnut.entities.User;
@@ -226,5 +227,17 @@ class RestNoteControllerTests {
             }
         }
 
+        @Nested
+        class CommentTest {
+
+            @Test
+            void shouldBeAbleToSaveCommentIntoTheNoteWhenValid() {
+                var otherUser = makeMe.aUser().please();
+                var note = makeMe.aNote().byUser(otherUser).please();
+                var comment = new Comment();
+                var notesBulk = controller.createComment(note, comment);
+                assertThat(notesBulk.notes.get(0).getNote().getComments(), hasSize(1));
+            }
+        }
     }
 }

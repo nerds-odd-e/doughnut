@@ -56,7 +56,7 @@ public class Note {
     @Getter
     @Setter
     private Timestamp createdAt;
-    
+
     @Column(name = "deleted_at")
     @Setter
     @Getter
@@ -117,7 +117,7 @@ public class Note {
 
     @JoinTable(name = "notes_closure", joinColumns = {
             @JoinColumn(name = "ancestor_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)}, inverseJoinColumns = {
-            @JoinColumn(name = "note_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
+        @JoinColumn(name = "note_id", referencedColumnName = "id", nullable = false, insertable = false, updatable = false)
     })
     @OneToMany(cascade = CascadeType.DETACH)
     @JsonIgnore
@@ -126,6 +126,11 @@ public class Note {
     @OrderBy("sibling_order")
     @Getter
     private final List<Note> children = new ArrayList<>();
+
+    @Transient // TODO remove @Transient after DB integration
+    @Getter
+    @Setter
+    private List<Comment> comments = new ArrayList<>();
 
     public static Note createNote(User user, Timestamp currentUTCTimestamp, TextContent textContent) {
         final Note note = new Note();
