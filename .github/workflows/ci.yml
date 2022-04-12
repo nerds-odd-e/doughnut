@@ -291,8 +291,8 @@ jobs:
         with:
           status: failure
           fields: repo,commit,message,author,action,workflow,eventName
-      # - uses: nobrayner/discord-webhook@v1
-      #   if: env.WORKFLOW_CONCLUSION == 'failure'
-      #   with:
-      #     github-token: ${{ secrets.GITHUB_TOKEN }}
-      #     discord-webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
+      - uses: nobrayner/discord-webhook@v1
+        if: env.WORKFLOW_CONCLUSION == 'failure'
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          discord-webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
