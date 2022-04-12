@@ -9,4 +9,3 @@ public class DoughnutApplication {
     SpringApplication.run(DoughnutApplication.class, args);
   }
 }
-

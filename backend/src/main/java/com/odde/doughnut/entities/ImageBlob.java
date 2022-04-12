@@ -1,18 +1,16 @@
 package com.odde.doughnut.entities;
 
+import javax.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-
-import javax.persistence.*;
 
 @Entity
 @Table(name = "image_blob")
 public class ImageBlob {
-    @Id
-    @Getter
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+  @Id
+  @Getter
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Integer id;
 
-    @Lob @Getter @Setter
-    private byte[]  data;
+  @Lob @Getter @Setter private byte[] data;
 }

@@ -10,12 +10,11 @@ import org.springframework.context.event.EventListener;
 @Configuration
 @Profile({"!test"})
 public class FlyWayFreeVersionRealMigration {
-    @Autowired
-    Flyway flyway;
+  @Autowired Flyway flyway;
 
-    @EventListener(ApplicationReadyEvent.class)
-    public void actualMigration() {
-        flyway.repair();
-        flyway.migrate();
-    }
+  @EventListener(ApplicationReadyEvent.class)
+  public void actualMigration() {
+    flyway.repair();
+    flyway.migrate();
+  }
 }

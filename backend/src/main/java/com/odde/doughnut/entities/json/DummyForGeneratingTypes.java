@@ -5,8 +5,7 @@ import com.odde.doughnut.entities.AnswerResult;
 import com.odde.doughnut.entities.AnswerViewedByUser;
 
 public class DummyForGeneratingTypes {
-    public AnswerViewedByUser answerViewedByUser;
-    public AnswerResult answerResult;
-    public Answer answer;
-
+  public AnswerViewedByUser answerViewedByUser;
+  public AnswerResult answerResult;
+  public Answer answer;
 }

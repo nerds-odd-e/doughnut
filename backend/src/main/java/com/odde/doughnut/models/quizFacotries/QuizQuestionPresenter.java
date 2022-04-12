@@ -3,23 +3,23 @@ package com.odde.doughnut.models.quizFacotries;
 import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.json.LinkViewed;
 import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
-
 import java.util.Map;
 import java.util.Optional;
 
 public interface QuizQuestionPresenter {
-    String instruction();
-    String mainTopic();
+  String instruction();
 
-    default Map<Link.LinkType, LinkViewed> hintLinks() {
-        return null;
-    }
+  String mainTopic();
 
-    default QuizQuestionViewedByUser.OptionCreator optionCreator() {
-        return new QuizQuestionViewedByUser.TitleOptionCreator();
-    }
+  default Map<Link.LinkType, LinkViewed> hintLinks() {
+    return null;
+  }
 
-    default Optional<PictureWithMask> pictureWithMask() {
-        return Optional.empty();
-    }
+  default QuizQuestionViewedByUser.OptionCreator optionCreator() {
+    return new QuizQuestionViewedByUser.TitleOptionCreator();
+  }
+
+  default Optional<PictureWithMask> pictureWithMask() {
+    return Optional.empty();
+  }
 }

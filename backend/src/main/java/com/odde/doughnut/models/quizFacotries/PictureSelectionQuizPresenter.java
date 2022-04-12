@@ -6,25 +6,24 @@ import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 
 public class PictureSelectionQuizPresenter implements QuizQuestionPresenter {
 
-    private ReviewPoint reviewPoint;
+  private ReviewPoint reviewPoint;
 
-    public PictureSelectionQuizPresenter(QuizQuestion quizQuestion) {
-        this.reviewPoint = quizQuestion.getReviewPoint();
-    }
+  public PictureSelectionQuizPresenter(QuizQuestion quizQuestion) {
+    this.reviewPoint = quizQuestion.getReviewPoint();
+  }
 
-    @Override
-    public String mainTopic() {
-        return reviewPoint.getNote().getTitle();
-    }
+  @Override
+  public String mainTopic() {
+    return reviewPoint.getNote().getTitle();
+  }
 
-    @Override
-    public String instruction() {
-        return "";
-    }
+  @Override
+  public String instruction() {
+    return "";
+  }
 
-    @Override
-    public QuizQuestionViewedByUser.OptionCreator optionCreator() {
-        return new QuizQuestionViewedByUser.PictureOptionCreator();
-    }
-
+  @Override
+  public QuizQuestionViewedByUser.OptionCreator optionCreator() {
+    return new QuizQuestionViewedByUser.PictureOptionCreator();
+  }
 }

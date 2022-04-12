@@ -1,4 +1,3 @@
-
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
@@ -15,7 +14,10 @@ class RestFailureReportController {
   private final CurrentUserFetcher currentUserFetcher;
   private final RealGithubService realGithubService;
 
-  public RestFailureReportController(ModelFactoryService modelFactoryService, CurrentUserFetcher currentUserFetcher, RealGithubService realGithubService) {
+  public RestFailureReportController(
+      ModelFactoryService modelFactoryService,
+      CurrentUserFetcher currentUserFetcher,
+      RealGithubService realGithubService) {
     this.modelFactoryService = modelFactoryService;
     this.currentUserFetcher = currentUserFetcher;
     this.realGithubService = realGithubService;
@@ -31,13 +33,15 @@ class RestFailureReportController {
     public FailureReport failureReport;
     public String githubIssueUrl;
   }
+
   @GetMapping("/{failureReport}")
-  public FailureReportForView failureReport(FailureReport failureReport) throws NoAccessRightException {
+  public FailureReportForView failureReport(FailureReport failureReport)
+      throws NoAccessRightException {
     currentUserFetcher.getUser().getAuthorization().assertDeveloperAuthorization();
     FailureReportForView failureReportForView = new FailureReportForView();
     failureReportForView.failureReport = failureReport;
-    failureReportForView.githubIssueUrl = realGithubService.getIssueUrl(failureReport.getIssueNumber());
+    failureReportForView.githubIssueUrl =
+        realGithubService.getIssueUrl(failureReport.getIssueNumber());
     return failureReportForView;
   }
-
 }

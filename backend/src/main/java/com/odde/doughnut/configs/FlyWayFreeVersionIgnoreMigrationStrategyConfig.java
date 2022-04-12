@@ -6,10 +6,10 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class FlyWayFreeVersionIgnoreMigrationStrategyConfig {
-    @Bean
-    public FlywayMigrationStrategy flywayMigrationStrategy() {
-        return flyway -> {
-            // do nothing
-        };
-    }
+  @Bean
+  public FlywayMigrationStrategy flywayMigrationStrategy() {
+    return flyway -> {
+      // do nothing
+    };
+  }
 }

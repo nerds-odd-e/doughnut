@@ -3,9 +3,9 @@ package com.odde.doughnut.controllers.currentUser;
 import com.odde.doughnut.models.UserModel;
 
 public interface CurrentUserFetcher {
-    UserModel getUser();
+  UserModel getUser();
 
-    String getExternalIdentifier();
+  String getExternalIdentifier();
 
-    void setExternalIdentifier(String name);
+  void setExternalIdentifier(String name);
 }

@@ -9,8 +9,7 @@ import javax.persistence.Table;
 @Entity
 @Table(name = "circle_user")
 public class CircleUser {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Integer id;
 }
-

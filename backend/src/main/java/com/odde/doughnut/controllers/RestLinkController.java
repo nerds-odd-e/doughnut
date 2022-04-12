@@ -1,4 +1,3 @@
-
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
@@ -13,6 +12,7 @@ import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.LinkModel;
 import com.odde.doughnut.models.UserModel;
+import javax.validation.Valid;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,15 +20,14 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
-
 @RestController
 @RequestMapping("/api/links")
 class RestLinkController {
   private final ModelFactoryService modelFactoryService;
   private final CurrentUserFetcher currentUserFetcher;
 
-  public RestLinkController(ModelFactoryService modelFactoryService, CurrentUserFetcher currentUserFetcher) {
+  public RestLinkController(
+      ModelFactoryService modelFactoryService, CurrentUserFetcher currentUserFetcher) {
     this.modelFactoryService = modelFactoryService;
     this.currentUserFetcher = currentUserFetcher;
   }
@@ -42,7 +41,8 @@ class RestLinkController {
 
   @PostMapping(value = "/{link}")
   @Transactional
-  public NotesBulk updateLink(Link link, @RequestBody LinkRequest linkRequest) throws NoAccessRightException {
+  public NotesBulk updateLink(Link link, @RequestBody LinkRequest linkRequest)
+      throws NoAccessRightException {
     currentUserFetcher.getUser().getAuthorization().assertAuthorization(link.getSourceNote());
     link.setTypeId(linkRequest.typeId);
     modelFactoryService.linkRepository.save(link);
@@ -60,13 +60,20 @@ class RestLinkController {
 
   @PostMapping(value = "/create/{sourceNote}/{targetNote}")
   @Transactional
-  public NotesBulk linkNoteFinalize(@PathVariable Note sourceNote, @PathVariable Note targetNote, @RequestBody @Valid LinkRequest linkRequest, BindingResult bindingResult) throws NoAccessRightException, CyclicLinkDetectedException, BindException {
-    if(bindingResult.hasErrors()) throw new BindException(bindingResult);
+  public NotesBulk linkNoteFinalize(
+      @PathVariable Note sourceNote,
+      @PathVariable Note targetNote,
+      @RequestBody @Valid LinkRequest linkRequest,
+      BindingResult bindingResult)
+      throws NoAccessRightException, CyclicLinkDetectedException, BindException {
+    if (bindingResult.hasErrors()) throw new BindException(bindingResult);
     currentUserFetcher.getUser().getAuthorization().assertAuthorization(sourceNote);
     currentUserFetcher.getUser().getAuthorization().assertReadAuthorization(targetNote);
     if (linkRequest != null && linkRequest.moveUnder != null && linkRequest.moveUnder) {
       currentUserFetcher.getUser().getAuthorization().assertAuthorization(targetNote);
-      modelFactoryService.toNoteMotionModel(sourceNote, targetNote, linkRequest.asFirstChild).execute();
+      modelFactoryService
+          .toNoteMotionModel(sourceNote, targetNote, linkRequest.asFirstChild)
+          .execute();
     }
     Link link = new Link();
     link.setSourceNote(sourceNote);
@@ -78,13 +85,8 @@ class RestLinkController {
   }
 
   class LinkStatistics {
-    @Getter
-    @Setter
-    private ReviewPoint reviewPoint;
-    @Getter
-    @Setter
-    private Link link;
-
+    @Getter @Setter private ReviewPoint reviewPoint;
+    @Getter @Setter private Link link;
   }
 
   @GetMapping("/{link}/statistics")
