@@ -23,8 +23,8 @@
     "test:dev": "yarn frontend:build && run-p -clnr sut frontend:sut cy:run:dev",
     "test:open": "yarn run-p -clnr sut frontend:sut cy:open",
     "sound": "node scripts/sound-monitor.js",
-    "format": "prettier cypress --write",
-    "lint": "eslint --ext .ts,.js cypress"
+    "format": "prettier cypress --write && backend/gradlew -p backend spotlessApply",
+    "lint": "eslint --ext .ts,.js cypress && backend/gradlew -p backend check"
   },
   "cypress-cucumber-preprocessor": {
     "nonGlobalStepDefinitions": true,
