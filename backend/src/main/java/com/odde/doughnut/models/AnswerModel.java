@@ -1,6 +1,11 @@
 package com.odde.doughnut.models;
 
-import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.Answer;
+import com.odde.doughnut.entities.AnswerResult;
+import com.odde.doughnut.entities.AnswerViewedByUser;
+import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.QuizQuestion;
+import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.sql.Timestamp;
 import java.util.List;

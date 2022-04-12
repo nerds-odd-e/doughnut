@@ -8,7 +8,10 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.AnswerViewedByUser;
+import com.odde.doughnut.entities.Link;
+import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;

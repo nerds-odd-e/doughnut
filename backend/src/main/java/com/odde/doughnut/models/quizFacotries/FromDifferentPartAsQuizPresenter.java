@@ -2,7 +2,6 @@ package com.odde.doughnut.models.quizFacotries;
 
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.QuizQuestion;
-import java.util.*;
 
 public class FromDifferentPartAsQuizPresenter implements QuizQuestionPresenter {
   protected final Link link;

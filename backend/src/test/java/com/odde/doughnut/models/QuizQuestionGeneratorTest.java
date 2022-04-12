@@ -1,6 +1,15 @@
 package com.odde.doughnut.models;
 
-import static com.odde.doughnut.entities.QuizQuestion.QuestionType.*;
+import static com.odde.doughnut.entities.QuizQuestion.QuestionType.CLOZE_SELECTION;
+import static com.odde.doughnut.entities.QuizQuestion.QuestionType.DESCRIPTION_LINK_TARGET;
+import static com.odde.doughnut.entities.QuizQuestion.QuestionType.FROM_DIFFERENT_PART_AS;
+import static com.odde.doughnut.entities.QuizQuestion.QuestionType.FROM_SAME_PART_AS;
+import static com.odde.doughnut.entities.QuizQuestion.QuestionType.LINK_SOURCE;
+import static com.odde.doughnut.entities.QuizQuestion.QuestionType.LINK_TARGET;
+import static com.odde.doughnut.entities.QuizQuestion.QuestionType.PICTURE_SELECTION;
+import static com.odde.doughnut.entities.QuizQuestion.QuestionType.PICTURE_TITLE;
+import static com.odde.doughnut.entities.QuizQuestion.QuestionType.SPELLING;
+import static com.odde.doughnut.entities.QuizQuestion.QuestionType.WHICH_SPEC_HAS_INSTANCE;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;

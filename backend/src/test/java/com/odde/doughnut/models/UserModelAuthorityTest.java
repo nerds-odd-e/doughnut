@@ -1,6 +1,8 @@
 package com.odde.doughnut.models;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.testability.MakeMe;

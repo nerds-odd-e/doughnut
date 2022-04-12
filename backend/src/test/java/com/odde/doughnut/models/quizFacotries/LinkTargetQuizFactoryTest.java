@@ -2,7 +2,10 @@ package com.odde.doughnut.models.quizFacotries;
 
 import static com.odde.doughnut.entities.QuizQuestion.QuestionType.LINK_TARGET;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.in;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;

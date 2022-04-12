@@ -1,7 +1,12 @@
 package com.odde.doughnut.testability;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcherFromRequest;
-import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.Circle;
+import com.odde.doughnut.entities.Link;
+import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.NoteAccessories;
+import com.odde.doughnut.entities.Ownership;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.LinkRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
@@ -14,7 +19,12 @@ import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import javax.persistence.EntityManagerFactory;
 import org.apache.logging.log4j.util.Strings;
@@ -22,7 +32,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Profile({"e2e", "test", "dev"})
