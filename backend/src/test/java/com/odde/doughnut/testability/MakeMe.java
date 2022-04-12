@@ -5,8 +5,6 @@ import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.models.quizFacotries.QuizQuestionDirector;
-import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.testability.builders.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -126,4 +124,7 @@ public class MakeMe {
         return aQuestion().buildValid(questionType, reviewPoint).ViewedByUserPlease();
     }
 
+    public CommentBuilder aComment() {
+        return new CommentBuilder(this);
+    }
 }

@@ -12,5 +12,6 @@ public class Comment {
     private User author;
     private Timestamp createdAt;
     private String description;
+    private Note parentNote;
 }
 
