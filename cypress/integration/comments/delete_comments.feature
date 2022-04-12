@@ -1,11 +1,10 @@
 Feature:
   User can delete comment which leave by himself
 
+  @ignore
   Scenario: I delete comment
     Given I've logged in as an existing user
-    And there are some notes for the current user
-      | title    |
-      | Sedition |
+    And I create a note 'A'
     And there are some comments for the note 'A'
       | content |
       | hello   |
@@ -27,3 +26,4 @@ Feature:
       | hello        | true   |
       | world        | true   |
       | hello world! | false  |
+
