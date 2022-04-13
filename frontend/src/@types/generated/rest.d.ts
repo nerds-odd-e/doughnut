@@ -217,7 +217,7 @@ declare namespace Generated {
         title: string;
         shortDescription: string;
         parentId?: number;
-        comments: Comment[];
+        comments?: Comment[];
     }
 
     interface Comment {
