@@ -4,7 +4,7 @@
     <NoteStatisticsButton :noteId="noteId" />
 
     <div v-if="featureToggle">
-      hello world<br/>
+      old_learner: hello world yyyy-MM-dd<br/>
       <input  id="comment-input" />
     </div>
 

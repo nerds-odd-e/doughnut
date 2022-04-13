@@ -28,3 +28,7 @@ When(
     cy.replaceFocusedText(description)
   },
 )
+
+Then("I should see comment posted time", () => {
+  cy.get("body").should("contain", "yyyy-MM-dd")
+})

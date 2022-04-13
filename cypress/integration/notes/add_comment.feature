@@ -12,5 +12,7 @@ Feature: Add Comment
     When I visit note "Less is More"
     And I add a comment "hello world"
     Then I should see "hello world" in the page
+    And I should see "old_learner" in the page
+    And I should see comment posted time
 
 
