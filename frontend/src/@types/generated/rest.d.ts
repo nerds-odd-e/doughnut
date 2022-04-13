@@ -217,6 +217,14 @@ declare namespace Generated {
         title: string;
         shortDescription: string;
         parentId?: number;
+        comments: Comment[];
+    }
+
+    interface Comment {
+        id: number;
+        author: string;
+        description: string;
+        createdAt: string;
     }
 
     interface Ownership {
