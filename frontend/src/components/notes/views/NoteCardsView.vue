@@ -3,7 +3,7 @@
     <NoteWithLinks v-bind="{ note: noteRealm.note, links: noteRealm.links }"/>
     <NoteStatisticsButton :noteId="noteId" />
 
-    <input id="comment-input" />
+    <input v-if="featureToggle" id="comment-input" />
 
     <Cards v-if="expandChildren" :notes="children"/>
   </div>
@@ -35,6 +35,7 @@ export default defineComponent({
     noteRealm() {
       return this.piniaStore.getNoteRealmById(this.noteId);
     },
+    featureToggle() { return this.piniaStore.featureToggle },
     children() {
       return this.noteRealm?.childrenIds
         ?.map((id: Doughnut.ID)=>this.piniaStore.getNoteRealmById(id)?.note)
