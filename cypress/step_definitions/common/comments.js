@@ -13,7 +13,9 @@ Given("there is a note and some comments of current user", (comment) => {
       "title": "A",
     },
   ])
-  cy.seedComments(comment.hashes())
+  cy.get("@seededNoteIdMap").then((seededNoteIdMap) =>{
+      cy.seedComments(seededNoteIdMap["A"],comment.hashes())
+    })
 })
 
 When("I click \"Delete\" button on comment \"Hello\"", (comment) => {

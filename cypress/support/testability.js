@@ -88,10 +88,10 @@ Cypress.Commands.add("cleanDownloadFolder", () => {
   }
 })
 
-Cypress.Commands.add("seedComments", (comments) => {
-  cy.request({
+Cypress.Commands.add("seedComments", (noteId,comments) => {
+  cy.request( {
     method: "POST",
-    url: `/api/testability/seed_comments`,
+    url: `/api/notes/${noteId}/comments/create`,
     body: {
       comments,
     },

@@ -278,9 +278,4 @@ class TestabilityRestController {
     testabilitySettings.setAlwaysChoose(randomization.choose);
     return Collections.emptyList();
   }
-
-  @PostMapping("/seed_comments")
-  public String seedComments(@RequestBody Object commentInfo) {
-    return "OK";
-  }
 }
