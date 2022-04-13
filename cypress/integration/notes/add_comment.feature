@@ -2,7 +2,7 @@ Feature: Add Comment
   As a learner, I want to add comments on a note.
 
   Background:
-    Given I've logged in as an existing user
+    Given I've logged in as "old_learner"
     And there are some notes for the current user
       | title        |
       | Less is More |
@@ -12,4 +12,5 @@ Feature: Add Comment
     When I visit note "Less is More"
     And I add a comment "hello world"
     Then I should see "hello world" in the page
+
 
