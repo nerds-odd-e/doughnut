@@ -8,12 +8,6 @@ Feature: Add Comment
       | Less is More |
 
   @featureToggle
-  Scenario: No comments on a note
-    When I visit note "Less is More"
-    Then I should see an input box for comment
-
-
-  @ignore
   Scenario: Add a comment on a note:w
     When I visit note "Less is More"
     And I add a comment "hello world"

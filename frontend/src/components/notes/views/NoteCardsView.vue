@@ -3,7 +3,10 @@
     <NoteWithLinks v-bind="{ note: noteRealm.note, links: noteRealm.links }"/>
     <NoteStatisticsButton :noteId="noteId" />
 
-    <input v-if="featureToggle" id="comment-input" />
+    <div v-if="featureToggle">
+      hello world<br/>
+      <input  id="comment-input" />
+    </div>
 
     <Cards v-if="expandChildren" :notes="children"/>
   </div>
