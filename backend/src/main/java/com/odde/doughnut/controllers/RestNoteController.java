@@ -20,12 +20,14 @@ import com.odde.doughnut.models.SearchTermModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -172,7 +174,12 @@ class RestNoteController {
   }
 
   @PostMapping(value = "/{note}/comments/create")
-  public String createComment(@PathVariable("note") Note note, Comment comment) {
-    return "OK";
+  public NotesBulk createComment(@PathVariable("note") Note note, Comment comment) {
+    var userModel = currentUserFetcher.getUser();
+    if (CollectionUtils.isEmpty(note.getComments())) {
+      note.setComments(new ArrayList<>());
+    }
+    note.getComments().add(comment);
+    return NotesBulk.jsonNoteWithChildren(note, userModel);
   }
 }
