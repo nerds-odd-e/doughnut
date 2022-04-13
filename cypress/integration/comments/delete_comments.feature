@@ -4,10 +4,7 @@ Feature:
   @ignore
   Scenario: I delete comment
     Given I've logged in as an existing user
-    And there are some notes for the current user
-      | title    |
-      | Sedition |
-    And there are some comments for the note 'A'
+    And there is a note and some comments of current user
       | content |
       | hello   |
       | world   |
