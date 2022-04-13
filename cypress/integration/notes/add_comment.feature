@@ -1,5 +1,5 @@
-Feature: Read Comment
-  As a learner, I want to read comments on a note.
+Feature: Add Comment
+  As a learner, I want to add comments on a note.
 
   Background:
     Given I've logged in as an existing user
