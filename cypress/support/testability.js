@@ -85,3 +85,14 @@ Cypress.Commands.add("cleanDownloadFolder", () => {
     console.error(`Error while deleting ${downloadsFolder}!`)
   }
 })
+
+Cypress.Commands.add("seedComments", (comments) => {
+  cy.request({
+    method: "POST",
+    url: `/api/testability/seed_comments`,
+    body: {
+      comments,
+    },
+  }).then((response) => {
+  })
+})
