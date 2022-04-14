@@ -1,5 +1,10 @@
 package com.odde.doughnut.controllers;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteAccessories;
 import com.odde.doughnut.entities.User;
@@ -12,6 +17,8 @@ import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
+import java.io.IOException;
+import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -21,23 +28,13 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
-import java.sql.Timestamp;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
 class RestNoteControllerTests {
-  @Autowired
-  ModelFactoryService modelFactoryService;
+  @Autowired ModelFactoryService modelFactoryService;
 
-  @Autowired
-  MakeMe makeMe;
+  @Autowired MakeMe makeMe;
   private UserModel userModel;
   RestNoteController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
@@ -46,8 +43,8 @@ class RestNoteControllerTests {
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
     controller =
-      new RestNoteController(
-        modelFactoryService, new TestCurrentUserFetcher(userModel), testabilitySettings);
+        new RestNoteController(
+            modelFactoryService, new TestCurrentUserFetcher(userModel), testabilitySettings);
   }
 
   @Nested
@@ -107,10 +104,10 @@ class RestNoteControllerTests {
       User otherUser = makeMe.aUser().please();
       Note note = makeMe.aNote().byUser(otherUser).please();
       makeMe
-        .aSubscription()
-        .forUser(userModel.getEntity())
-        .forNotebook(note.getNotebook())
-        .please();
+          .aSubscription()
+          .forUser(userModel.getEntity())
+          .forNotebook(note.getNotebook())
+          .please();
       makeMe.refresh(userModel.getEntity());
       assertThat(controller.statistics(note).getNote().getId(), equalTo(note.getId()));
     }
@@ -154,7 +151,7 @@ class RestNoteControllerTests {
 
     @Test
     void shouldNotRemoveThePictureIfNoNewPictureInTheUpdate()
-      throws NoAccessRightException, IOException {
+        throws NoAccessRightException, IOException {
       makeMe.theNote(note).withUploadedPicture();
       NoteAccessories newContent = makeMe.aNote().inMemoryPlease().getNoteAccessories();
       controller.updateNote(note, newContent);

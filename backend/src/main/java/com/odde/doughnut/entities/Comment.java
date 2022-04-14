@@ -1,10 +1,9 @@
 package com.odde.doughnut.entities;
 
-import lombok.Getter;
-import lombok.Setter;
-
 import java.sql.Timestamp;
 import java.util.Optional;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter

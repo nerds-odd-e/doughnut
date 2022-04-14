@@ -1,9 +1,19 @@
 package com.odde.doughnut.entities;
 
+import static java.util.stream.Collectors.toList;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.algorithms.ClozeDescription;
 import com.odde.doughnut.algorithms.NoteTitle;
 import com.odde.doughnut.algorithms.SiblingOrder;
+import java.io.IOException;
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import javax.persistence.*;
+import javax.validation.Valid;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.logging.log4j.util.Strings;
@@ -11,17 +21,6 @@ import org.hibernate.annotations.Where;
 import org.hibernate.annotations.WhereJoinTable;
 import org.springframework.beans.BeanUtils;
 import org.thymeleaf.util.StringUtils;
-
-import javax.persistence.*;
-import javax.validation.Valid;
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
-
-import static java.util.stream.Collectors.toList;
 
 @Entity
 @Table(name = "note")
@@ -32,10 +31,7 @@ public class Note {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
 
-  @Embedded
-  @Valid
-  @Getter
-  private final NoteAccessories noteAccessories = new NoteAccessories();
+  @Embedded @Valid @Getter private final NoteAccessories noteAccessories = new NoteAccessories();
 
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "text_content_id", referencedColumnName = "id")
@@ -103,23 +99,23 @@ public class Note {
   private List<NotesClosure> ancestorNotesClosures = new ArrayList<>();
 
   @JoinTable(
-    name = "notes_closure",
-    joinColumns = {
-      @JoinColumn(
-        name = "ancestor_id",
-        referencedColumnName = "id",
-        nullable = false,
-        insertable = false,
-        updatable = false)
-    },
-    inverseJoinColumns = {
-      @JoinColumn(
-        name = "note_id",
-        referencedColumnName = "id",
-        nullable = false,
-        insertable = false,
-        updatable = false)
-    })
+      name = "notes_closure",
+      joinColumns = {
+        @JoinColumn(
+            name = "ancestor_id",
+            referencedColumnName = "id",
+            nullable = false,
+            insertable = false,
+            updatable = false)
+      },
+      inverseJoinColumns = {
+        @JoinColumn(
+            name = "note_id",
+            referencedColumnName = "id",
+            nullable = false,
+            insertable = false,
+            updatable = false)
+      })
   @OneToMany(cascade = CascadeType.DETACH)
   @Where(clause = "deleted_at is null")
   @OrderBy("`notes_closure`.depth, sibling_order")
@@ -128,23 +124,23 @@ public class Note {
   private List<Note> descendantsInBreathFirstOrder = new ArrayList<>();
 
   @JoinTable(
-    name = "notes_closure",
-    joinColumns = {
-      @JoinColumn(
-        name = "ancestor_id",
-        referencedColumnName = "id",
-        nullable = false,
-        insertable = false,
-        updatable = false)
-    },
-    inverseJoinColumns = {
-      @JoinColumn(
-        name = "note_id",
-        referencedColumnName = "id",
-        nullable = false,
-        insertable = false,
-        updatable = false)
-    })
+      name = "notes_closure",
+      joinColumns = {
+        @JoinColumn(
+            name = "ancestor_id",
+            referencedColumnName = "id",
+            nullable = false,
+            insertable = false,
+            updatable = false)
+      },
+      inverseJoinColumns = {
+        @JoinColumn(
+            name = "note_id",
+            referencedColumnName = "id",
+            nullable = false,
+            insertable = false,
+            updatable = false)
+      })
   @OneToMany(cascade = CascadeType.DETACH)
   @JsonIgnore
   @WhereJoinTable(clause = "depth = 1")
@@ -157,7 +153,6 @@ public class Note {
   @Getter
   @Setter
   private Optional<List<Comment>> comments = Optional.of(new ArrayList<>());
-
 
   public static Note createNote(User user, Timestamp currentUTCTimestamp, TextContent textContent) {
     final Note note = new Note();
@@ -179,14 +174,14 @@ public class Note {
   private void addAncestors(List<Note> ancestors) {
     int[] counter = {1};
     ancestors.forEach(
-      anc -> {
-        NotesClosure notesClosure = new NotesClosure();
-        notesClosure.setNote(this);
-        notesClosure.setAncestor(anc);
-        notesClosure.setDepth(counter[0]);
-        getAncestorNotesClosures().add(0, notesClosure);
-        counter[0] += 1;
-      });
+        anc -> {
+          NotesClosure notesClosure = new NotesClosure();
+          notesClosure.setNote(this);
+          notesClosure.setAncestor(anc);
+          notesClosure.setDepth(counter[0]);
+          getAncestorNotesClosures().add(0, notesClosure);
+          counter[0] += 1;
+        });
   }
 
   public void setParentNote(Note parentNote) {
@@ -249,7 +244,7 @@ public class Note {
 
   public void updateSiblingOrder(Note relativeToNote, boolean asFirstChildOfNote) {
     Long newSiblingOrder =
-      relativeToNote.theSiblingOrderItTakesToMoveRelativeToMe(asFirstChildOfNote);
+        relativeToNote.theSiblingOrderItTakesToMoveRelativeToMe(asFirstChildOfNote);
     if (newSiblingOrder != null) {
       siblingOrder = newSiblingOrder;
     }
@@ -262,8 +257,8 @@ public class Note {
   private long getSiblingOrderToInsertBehindMe() {
     Optional<Note> nextSiblingNote = nextSibling();
     return nextSiblingNote
-      .map(x -> (siblingOrder + x.siblingOrder) / 2)
-      .orElse(siblingOrder + SiblingOrder.MINIMUM_SIBLING_ORDER_INCREMENT);
+        .map(x -> (siblingOrder + x.siblingOrder) / 2)
+        .orElse(siblingOrder + SiblingOrder.MINIMUM_SIBLING_ORDER_INCREMENT);
   }
 
   private Long getSiblingOrderToBecomeMyFirstChild() {
@@ -315,7 +310,7 @@ public class Note {
     if (Strings.isEmpty(description)) return "";
 
     return ClozeDescription.htmlClosedDescription()
-      .getClozeDescription(getNoteTitle(), description);
+        .getClozeDescription(getNoteTitle(), description);
   }
 
   @JsonIgnore
@@ -325,13 +320,13 @@ public class Note {
 
   public Optional<PictureWithMask> getPictureWithMask() {
     return getNotePicture()
-      .map(
-        (pic) -> {
-          PictureWithMask pictureWithMask = new PictureWithMask();
-          pictureWithMask.notePicture = pic;
-          pictureWithMask.pictureMask = getNoteAccessories().getPictureMask();
-          return pictureWithMask;
-        });
+        .map(
+            (pic) -> {
+              PictureWithMask pictureWithMask = new PictureWithMask();
+              pictureWithMask.notePicture = pic;
+              pictureWithMask.pictureMask = getNoteAccessories().getPictureMask();
+              return pictureWithMask;
+            });
   }
 
   private Optional<String> getNotePicture() {

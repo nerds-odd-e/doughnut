@@ -4,7 +4,6 @@ import com.odde.doughnut.entities.Comment;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
-
 import java.util.Optional;
 
 public class CommentBuilder extends EntityBuilder<Comment> {
@@ -18,6 +17,5 @@ public class CommentBuilder extends EntityBuilder<Comment> {
   }
 
   @Override
-  protected void beforeCreate(boolean needPersist) {
-  }
+  protected void beforeCreate(boolean needPersist) {}
 }

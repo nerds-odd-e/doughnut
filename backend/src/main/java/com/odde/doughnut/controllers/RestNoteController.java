@@ -9,17 +9,16 @@ import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.SearchTermModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
-
-import javax.annotation.Resource;
-import javax.validation.Valid;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import javax.annotation.Resource;
+import javax.validation.Valid;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/notes")
@@ -31,35 +30,31 @@ class RestNoteController {
   private final TestabilitySettings testabilitySettings;
 
   public RestNoteController(
-    ModelFactoryService modelFactoryService,
-    CurrentUserFetcher currentUserFetcher,
-    TestabilitySettings testabilitySettings) {
+      ModelFactoryService modelFactoryService,
+      CurrentUserFetcher currentUserFetcher,
+      TestabilitySettings testabilitySettings) {
     this.modelFactoryService = modelFactoryService;
     this.currentUserFetcher = currentUserFetcher;
     this.testabilitySettings = testabilitySettings;
   }
 
   static class NoteStatistics {
-    @Getter
-    @Setter
-    private ReviewPoint reviewPoint;
-    @Getter
-    @Setter
-    private NoteRealm note;
+    @Getter @Setter private ReviewPoint reviewPoint;
+    @Getter @Setter private NoteRealm note;
   }
 
   @PostMapping(value = "/{parentNote}/create")
   @Transactional
   public NotesBulk createNote(
-    @PathVariable(name = "parentNote") Note parentNote,
-    @Valid @ModelAttribute NoteCreation noteCreation)
-    throws NoAccessRightException {
+      @PathVariable(name = "parentNote") Note parentNote,
+      @Valid @ModelAttribute NoteCreation noteCreation)
+      throws NoAccessRightException {
     final UserModel userModel = currentUserFetcher.getUser();
     userModel.getAuthorization().assertAuthorization(parentNote);
     User user = userModel.getEntity();
     Note note =
-      Note.createNote(
-        user, testabilitySettings.getCurrentUTCTimestamp(), noteCreation.textContent);
+        Note.createNote(
+            user, testabilitySettings.getCurrentUTCTimestamp(), noteCreation.textContent);
     note.setParentNote(parentNote);
     modelFactoryService.noteRepository.save(note);
     if (noteCreation.getLinkTypeToParent() != null) {
@@ -92,9 +87,9 @@ class RestNoteController {
   @PatchMapping(path = "/{note}")
   @Transactional
   public NoteRealm updateNote(
-    @PathVariable(name = "note") Note note,
-    @Valid @ModelAttribute NoteAccessories noteAccessories)
-    throws NoAccessRightException, IOException {
+      @PathVariable(name = "note") Note note,
+      @Valid @ModelAttribute NoteAccessories noteAccessories)
+      throws NoAccessRightException, IOException {
     final UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertAuthorization(note);
 
@@ -119,7 +114,7 @@ class RestNoteController {
   @Transactional
   public List<Note> searchForLinkTarget(@Valid @RequestBody SearchTerm searchTerm) {
     SearchTermModel searchTermModel =
-      modelFactoryService.toSearchTermModel(currentUserFetcher.getUser().getEntity(), searchTerm);
+        modelFactoryService.toSearchTermModel(currentUserFetcher.getUser().getEntity(), searchTerm);
     return searchTermModel.searchForNotes();
   }
 
@@ -153,8 +148,8 @@ class RestNoteController {
   @PostMapping(value = "/{note}/review-setting")
   @Transactional
   public RedirectToNoteResponse updateReviewSetting(
-    @PathVariable("note") Note note, @Valid @RequestBody ReviewSetting reviewSetting)
-    throws NoAccessRightException {
+      @PathVariable("note") Note note, @Valid @RequestBody ReviewSetting reviewSetting)
+      throws NoAccessRightException {
     currentUserFetcher.getUser().getAuthorization().assertAuthorization(note);
     note.mergeMasterReviewSetting(reviewSetting);
     modelFactoryService.noteRepository.save(note);
