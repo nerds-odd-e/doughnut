@@ -1,8 +1,8 @@
 Feature:
   User can delete comment which leave by himself
 
-  @featureToggle
   @ignore
+  @featureToggle
   Scenario: I delete comment
     Given I've logged in as an existing user
     And there is a note and some comments of current user

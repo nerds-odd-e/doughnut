@@ -1,7 +1,7 @@
 package com.odde.doughnut.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.sql.Timestamp;
-import java.util.Optional;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -12,5 +12,5 @@ public class Comment {
   private User author;
   private Timestamp createdAt;
   private String description;
-  private Optional<Note> parentNote;
+  @JsonIgnore private Note parentNote;
 }

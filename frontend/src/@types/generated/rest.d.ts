@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-04-14 13:34:55.
+// Generated using typescript-generator version 2.35.1025 on 2022-04-14 15:04:58.
 
 declare namespace Generated {
 
@@ -271,7 +271,6 @@ declare namespace Generated {
         author: User;
         createdAt: string;
         description: string;
-        parentNote?: Note;
     }
 
     interface Circle {
