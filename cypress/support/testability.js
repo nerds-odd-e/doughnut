@@ -89,15 +89,20 @@ Cypress.Commands.add("cleanDownloadFolder", () => {
 })
 
 Cypress.Commands.add("seedComments", (noteId,comments) => {
-  cy.request( {
-    method: "POST",
-    url: `/api/notes/${noteId}/comments/create`,
-    body: {
-      comments,
-    },
-  }).then((response) => {
-    expect(response.body.length).to.equal(comments.length)
-  })
+  const contents = comments.map((n) => n["content"])
+  const commentMap = Object.assign({},
+    ...contents.map((t, index) => ({[t]: index})))
+  cy.wrap(commentMap).as("seededCommentIdMap")
+
+  // cy.request( {
+  //   method: "POST",
+  //   url: `/api/notes/${noteId}/comments/create`,
+  //   body: {
+  //     comments,
+  //   },
+  // }).then((response) => {
+  //   //expect(response.body.length).to.equal(comments.length)
+  // })
 })
 
 Cypress.Commands.add("deleteComment", (comment) => {

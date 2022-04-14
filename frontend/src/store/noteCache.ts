@@ -1,3 +1,5 @@
+import objectContaining = jasmine.objectContaining;
+
 interface NoteCacheState {
   notebooks: Generated.NotebookViewedByUser[]
   notebooksMapByHeadNoteId: { [id: Doughnut.ID]: Generated.NotebookViewedByUser }
@@ -13,12 +15,14 @@ class NoteCache {
 
   loadNotebooks(notebooks: Generated.NotebookViewedByUser[]) {
     this.state.notebooks = notebooks
-    notebooks.forEach(nb => { this.loadNotebook(nb) })
+    notebooks.forEach(nb => {
+      this.loadNotebook(nb)
+    })
   }
 
   loadNotePosition(notePosition: Generated.NotePositionViewedByUser) {
     notePosition.ancestors.forEach((note) => {
-      const { id } = note;
+      const {id} = note;
       this.loadNote(id, note)
     });
     this.loadNotebook(notePosition.notebook)
@@ -26,10 +30,24 @@ class NoteCache {
 
   loadNoteRealms(noteRealms: Generated.NoteRealm[]) {
     noteRealms.forEach((noteRealm) => {
-
       noteRealm.note.comments = [{
         id: 0,
         author: {
+          id: 0,
+          name: "old_learner",
+          externalIdentifier: '',
+          ownership: {
+            id: 0,
+          },
+          dailyNewNotesCount: 0,
+          spaceIntervals: '',
+        },
+        description: "hello",
+        createdAt: "yyyy-MM-dd"
+      },
+        {
+          id: 1,
+          author: {
             id: 0,
             name: "old_learner",
             externalIdentifier: '',
@@ -37,11 +55,11 @@ class NoteCache {
               id: 0,
             },
             dailyNewNotesCount: 0,
-            spaceIntervals: ''
+            spaceIntervals: '',
           },
-        description: "hello world",
-        createdAt:"yyyy-MM-dd"
-      }];
+          description: "world",
+          createdAt: "yyyy-MM-dd"
+        }];
       this.state.noteRealms[noteRealm.id] = noteRealm;
     });
   }
@@ -67,7 +85,7 @@ class NoteCache {
     }
     if (!cursor) return undefined
     const notebook = this.state.notebooksMapByHeadNoteId[cursor.id]
-    return { noteId: id, ancestors, notebook } as Generated.NotePositionViewedByUser
+    return {noteId: id, ancestors, notebook} as Generated.NotePositionViewedByUser
   }
 
   private loadNotebook(notebook: Generated.NotebookViewedByUser) {
@@ -77,7 +95,7 @@ class NoteCache {
   private loadNote(id: Doughnut.ID, note: Generated.Note) {
     const noteRealm = this.state.noteRealms[id];
     if (!noteRealm) {
-      this.state.noteRealms[id] = { id, note }
+      this.state.noteRealms[id] = {id, note}
       return
     }
     noteRealm.note = note
@@ -110,4 +128,4 @@ function noteCache(state: NoteCacheState) {
 }
 
 export default noteCache
-export { NoteCacheState }
+export {NoteCacheState}

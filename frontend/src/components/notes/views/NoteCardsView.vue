@@ -4,7 +4,10 @@
     <NoteStatisticsButton :noteId="noteId" />
 
     <div v-if="featureToggle">
-      {{noteRealm.note.comments[0].author.name}}: {{noteRealm.note.comments[0].description}} {{noteRealm.note.comments[0].createdAt}}<br/>
+      <div v-for="item in noteRealm.note.comments" :key="item.id">
+        {{item.author.name}}: {{item.description}} {{item.createdAt}}<br/>
+        <button :id="`comment-${item.id}-delete`">Delete</button>
+      </div>
       <input  id="comment-input" />
     </div>
 

@@ -19,8 +19,11 @@ Given("there is a note and some comments of current user", (comment) => {
     })
 })
 
-When("I click \"Delete\" button on comment \"Hello\"", (comment) => {
-  cy.deleteComment(comment)
+When("I delete comment {string} under Note {string}", (comment,noteTitle) => {
+  cy.navigateToNotePage(noteTitle);
+  cy.get("@seededCommentIdMap").then((seededCommentIdMap) =>{
+    cy.get(`#comment-${seededCommentIdMap[comment]}-delete`).click()
+  })
 })
 
 When("I reply to comment {string} with {string}", (commentName, description) => {

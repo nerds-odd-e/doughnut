@@ -1,6 +1,7 @@
 Feature:
   User can delete comment which leave by himself
 
+  @featureToggle
   @ignore
   Scenario: I delete comment
     Given I've logged in as an existing user
@@ -8,5 +9,5 @@ Feature:
       | content |
       | hello   |
       | world   |
-    When I click "Delete" button on comment "Hello"
+    When I delete comment "hello" under Note 'A'
     Then Note 'A' only have one comment 'world'
