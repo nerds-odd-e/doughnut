@@ -15,6 +15,9 @@
         <NoteCardsView v-if="!viewType || viewType==='cards'" 
           v-bind="{noteId, expandChildren}"
         />
+        <div class="comments" v-if="featureToggle" >
+          <input id="reply-input" type="text" name="reply-input">
+        </div>
       </div>
     </div>
 </template>
@@ -59,6 +62,7 @@ export default defineComponent({
       if(!this.selectedNoteId) return
       return this.piniaStore.getNoteRealmById(this.selectedNoteId)?.note
     },
+    featureToggle() { return this.piniaStore.featureToggle },
   },
   mounted() {
     this.highlight(this.noteId)
