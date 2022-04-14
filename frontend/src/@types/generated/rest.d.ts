@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-04-08 15:25:55.
+// Generated using typescript-generator version 2.35.1025 on 2022-04-14 10:23:12.
 
 declare namespace Generated {
 
@@ -213,18 +213,11 @@ declare namespace Generated {
         noteAccessories: NoteAccessories;
         textContent: TextContent;
         createdAt: string;
-        pictureWithMask?: PictureWithMask;
+        comments: Comment[];
         title: string;
         shortDescription: string;
+        pictureWithMask?: PictureWithMask;
         parentId?: number;
-        comments?: Comment[];
-    }
-
-    interface Comment {
-        id: number;
-        author: string;
-        description: string;
-        createdAt: string;
     }
 
     interface Ownership {
@@ -237,9 +230,9 @@ declare namespace Generated {
         dailyTargetOfNewNotes: number;
         user: User;
         notebook: Notebook;
-        headNote: Note;
         title: string;
         shortDescription: string;
+        headNote: Note;
     }
 
     interface QuizQuestion {
@@ -254,8 +247,8 @@ declare namespace Generated {
 
     interface Option {
         note: NoteRealm;
-        picture: boolean;
         display: string;
+        picture: boolean;
     }
 
     interface PictureWithMask {
@@ -271,6 +264,14 @@ declare namespace Generated {
         useParentPicture: boolean;
         skipReview: boolean;
         updatedAt: string;
+    }
+
+    interface Comment {
+        id: number;
+        author: User;
+        createdAt: string;
+        description: string;
+        parentNote: Note;
     }
 
     interface Circle {
