@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-04-14 11:22:20.
+// Generated using typescript-generator version 2.35.1025 on 2022-04-14 14:48:16.
 
 declare namespace Generated {
 
@@ -198,8 +198,8 @@ declare namespace Generated {
         targetNote: Note;
         typeId: number;
         createdAt: string;
-        linkTypeLabel: string;
         linkNameOfSource: string;
+        linkTypeLabel: string;
     }
 
     interface TextContent {
@@ -271,7 +271,7 @@ declare namespace Generated {
         author: User;
         createdAt: string;
         description: string;
-        parentNote: Note;
+        parentNote?: Note;
     }
 
     interface Circle {

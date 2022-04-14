@@ -26,9 +26,19 @@ class NoteCache {
 
   loadNoteRealms(noteRealms: Generated.NoteRealm[]) {
     noteRealms.forEach((noteRealm) => {
+
       noteRealm.note.comments = [{
         id: 0,
-        author: "old_learner",
+        author: {
+            id: 0,
+            name: "old_learner",
+            externalIdentifier: '',
+            ownership: {
+              id: 0,
+            },
+            dailyNewNotesCount: 0,
+            spaceIntervals: ''
+          },
         description: "hello world",
         createdAt:"yyyy-MM-dd"
       }];
