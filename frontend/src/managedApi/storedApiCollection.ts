@@ -227,6 +227,15 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
     async getCircle(circleId: Doughnut.ID) {
       return await managedApi.restGet(`circles/${circleId}`) as Generated.CircleForUserView;
     },
+
+    async addComment(noteId: Doughnut.ID, data: Generated.CommentCreation) {
+      const res = await managedApi.restPostMultiplePartForm(
+        `notes/${noteId}/comments/create`,
+        data
+      ) as Generated.NotesBulk;
+      piniaStore.loadNotesBulk(res);
+      return res;
+    },
   };
 };
 

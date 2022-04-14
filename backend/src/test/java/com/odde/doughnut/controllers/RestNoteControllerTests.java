@@ -8,6 +8,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteAccessories;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.json.CommentCreation;
 import com.odde.doughnut.entities.json.NoteCreation;
 import com.odde.doughnut.entities.json.NoteRealm;
 import com.odde.doughnut.entities.json.NotesBulk;
@@ -235,7 +236,9 @@ class RestNoteControllerTests {
         var otherUser = makeMe.aUser().please();
         var note = makeMe.aNote().byUser(otherUser).please();
         var comment = makeMe.aComment().byNote(note).inMemoryPlease();
-        var notesBulk = controller.createComment(note, comment);
+        CommentCreation commentCreation = new CommentCreation();
+        commentCreation.setDescription(comment.getDescription());
+        var notesBulk = controller.createComment(note, commentCreation);
         assertThat(notesBulk.notes.get(0).getNote().getComments().get(), hasSize(1));
       }
     }

@@ -1,5 +1,3 @@
-
-
 interface NoteCacheState {
   notebooks: Generated.NotebookViewedByUser[]
   notebooksMapByHeadNoteId: { [id: Doughnut.ID]: Generated.NotebookViewedByUser }

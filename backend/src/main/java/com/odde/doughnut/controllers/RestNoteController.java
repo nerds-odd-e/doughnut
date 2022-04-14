@@ -1,7 +1,13 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
-import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.Comment;
+import com.odde.doughnut.entities.Link;
+import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.NoteAccessories;
+import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.ReviewSetting;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.json.*;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -10,6 +16,8 @@ import com.odde.doughnut.models.SearchTermModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -157,11 +165,15 @@ class RestNoteController {
   }
 
   @PostMapping(value = "/{note}/comments/create")
-  public NotesBulk createComment(@PathVariable("note") Note note, Comment comment) {
+  public NotesBulk createComment(@PathVariable("note") Note note, @ModelAttribute CommentCreation commentCreation) {
     var userModel = currentUserFetcher.getUser();
     if (note.getComments().isPresent()) {
       note.setComments(Optional.of(new ArrayList<>()));
     }
+    Comment comment = new Comment();
+    comment.setDescription(commentCreation.getDescription());
+    comment.setAuthor(userModel.getEntity());
+    comment.setCreatedAt(Timestamp.from(Instant.now()));
     note.getComments().get().add(comment);
     return NotesBulk.jsonNoteWithChildren(note, userModel);
   }

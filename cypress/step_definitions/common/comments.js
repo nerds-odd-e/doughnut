@@ -29,6 +29,7 @@ Then("Note A only have one comment {string}", () => {
   cy.get(".comment").should("have.length", 1);
 });
 
+
 When(
   "I reply to comment {string} with {string}",
   (commentName, description) => {
@@ -37,10 +38,14 @@ When(
 );
 
 When("I add a comment {string}", (description) => {
-  cy.get("#comment-input").click({ force: true });
-  cy.replaceFocusedText(description);
+  cy.get("#comment-input").click()
+  cy.replaceFocusedText(description)
+  cy.get("#comment-input").blur()
 });
 
 Then("I should see comment posted time", () => {
-  cy.get("body").should("contain", "yyyy-MM-dd");
-});
+   cy.get(".comment-timestamp").should((div)=>{
+    var timestamp = div.text();
+    expect((new Date(timestamp)).getTime()>0).to.be.true;
+  })
+})

@@ -5,10 +5,10 @@
 
     <div v-if="featureToggle">
       <div v-for="item in noteRealm.note.comments" :key="item.id" class="comment">
-        {{ item.author.name }}: {{ item.description }} {{ item.createdAt }}<br/>
+        {{ item.author.name }}: {{ item.description }} <div class="comment-timestamp">{{ item.createdAt }}</div><br/>
         <button :id="`comment-${item.id}-delete`">Delete</button>
       </div>
-      <input id="comment-input"/>
+      <input  id="comment-input" @blur="handleBlur" v-model="creationData.description"/>
     </div>
 
     <Cards v-if="expandChildren" :notes="children"/>
@@ -23,6 +23,13 @@ import NoteStatisticsButton from "../NoteStatisticsButton.vue";
 import Cards from "../Cards.vue";
 import useStoredLoadingApi from "../../../managedApi/useStoredLoadingApi";
 
+function initialState() {
+  return {
+    creationData: {
+      description: ""
+    },
+  };
+}
 
 export default defineComponent({
   setup() {
@@ -32,10 +39,20 @@ export default defineComponent({
     noteId: { type: Number, required: true },
     expandChildren: { type: Boolean, required: true },
   },
+  data(){
+    return {
+      ...initialState(),
+    };
+  },
   components: {
     NoteWithLinks,
     Cards,
     NoteStatisticsButton,
+  },
+  methods:{
+    handleBlur(){
+      this.storedApi.addComment(this.noteId, this.creationData)
+    }
   },
   computed: {
     noteRealm() {

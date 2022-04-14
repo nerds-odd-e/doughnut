@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-04-14 15:21:16.
+// Generated using typescript-generator version 2.35.1025 on 2022-04-14 15:57:33.
 
 declare namespace Generated {
 
@@ -14,6 +14,10 @@ declare namespace Generated {
 
     interface CircleJoiningByInvitation {
         invitationCode: string;
+    }
+
+    interface CommentCreation {
+        description: string;
     }
 
     interface CurrentUserInfo {
@@ -213,7 +217,13 @@ declare namespace Generated {
         noteAccessories: NoteAccessories;
         textContent: TextContent;
         createdAt: string;
+<<<<<<< HEAD
         comments?: Comment[];
+=======
+        comments: Comment[];
+        pictureWithMask?: PictureWithMask;
+        title: string;
+>>>>>>> integrate createComment api
         shortDescription: string;
         parentId?: number;
         pictureWithMask?: PictureWithMask;
@@ -230,9 +240,15 @@ declare namespace Generated {
         dailyTargetOfNewNotes: number;
         user: User;
         notebook: Notebook;
+<<<<<<< HEAD
         shortDescription: string;
         headNote: Note;
         title: string;
+=======
+        headNote: Note;
+        title: string;
+        shortDescription: string;
+>>>>>>> integrate createComment api
     }
 
     interface QuizQuestion {
