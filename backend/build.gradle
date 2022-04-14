@@ -111,6 +111,10 @@ spotless {
   }
 }
 
+tasks.register("lint") {
+  dependsOn spotlessCheck
+}
+
 generateTypeScript {
   jsonLibrary = 'jackson2'
   classPatterns = [

@@ -10,6 +10,7 @@
     "frontend:lint": "yarn --cwd frontend --frozen-lockfile --silent install && yarn --cwd frontend lint",
     "frontend:test": "yarn --cwd frontend --frozen-lockfile --silent install && yarn --cwd frontend test",
     "frontend:sut": "yarn --cwd frontend --frozen-lockfile --silent install && yarn --cwd frontend dev",
+    "backend:lint": "backend/gradlew -p backend lint",
     "backend:test": "backend/gradlew -p backend testDBMigrate && backend/gradlew -p backend test --build-cache --parallel",
     "backend:build": "backend/gradlew -p backend build -x test --build-cache --parallel",
     "backend:prod_build": "backend/gradlew -p backend build -x test -Dspring.profiles.active=prod --build-cache --parallel",
@@ -24,7 +25,7 @@
     "test:open": "yarn run-p -clnr sut frontend:sut cy:open",
     "sound": "node scripts/sound-monitor.js",
     "format": "prettier cypress --write && backend/gradlew -p backend spotlessApply",
-    "lint": "eslint --ext .ts,.js cypress && backend/gradlew -p backend check"
+    "lint": "eslint --ext .ts,.js cypress && yarn backend:lint"
   },
   "cypress-cucumber-preprocessor": {
     "nonGlobalStepDefinitions": true,

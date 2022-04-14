@@ -13,6 +13,29 @@ env:
   GCS_BUCKET: "dough-01"
 
 jobs:
+  Backend-linting:
+    name: Backend Lint
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Code Checkout
+        uses: actions/checkout@v2
+      - name: Set up JDK 17
+        uses: actions/setup-java@v2
+        with:
+          java-version: 17
+          distribution: "zulu"
+          architecture: x64
+      - name: Cache local gradle repository & artifacts
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+      - run: yarn backend:lint
+
   Backend-unit-tests:
     name: Backend Unit tests with Database
     runs-on: ubuntu-20.04
