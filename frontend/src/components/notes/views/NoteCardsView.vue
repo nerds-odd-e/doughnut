@@ -4,11 +4,11 @@
     <NoteStatisticsButton :noteId="noteId" />
 
     <div v-if="featureToggle">
-      <div v-for="item in noteRealm.note.comments" :key="item.id">
-        {{item.author.name}}: {{item.description}} {{item.createdAt}}<br/>
+      <div v-for="item in noteRealm.note.comments" :key="item.id" class="comment">
+        {{ item.author.name }}: {{ item.description }} {{ item.createdAt }}<br/>
         <button :id="`comment-${item.id}-delete`">Delete</button>
       </div>
-      <input  id="comment-input" />
+      <input id="comment-input"/>
     </div>
 
     <Cards v-if="expandChildren" :notes="children"/>
@@ -17,7 +17,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import {defineComponent} from 'vue'
 import NoteWithLinks from "../NoteWithLinks.vue";
 import NoteStatisticsButton from "../NoteStatisticsButton.vue";
 import Cards from "../Cards.vue";

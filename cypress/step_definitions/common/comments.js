@@ -1,43 +1,46 @@
 /// <reference types="cypress" />
 // @ts-check
 
-import { Given, Then, When } from "cypress-cucumber-preprocessor/steps"
-
+import { Given, Then, When } from "cypress-cucumber-preprocessor/steps";
 
 Then("I should see an input box for comment", () => {
-  cy.get("#comment-input").should("be.visible")
-})
+  cy.get("#comment-input").should("be.visible");
+});
 
 Given("there is a note and some comments of current user", (comment) => {
   cy.seedNotes([
     {
-      "title": "A",
+      title: "A",
     },
-  ])
-  cy.get("@seededNoteIdMap").then((seededNoteIdMap) =>{
-      cy.seedComments(seededNoteIdMap["A"],comment.hashes())
-    })
-})
+  ]);
+  cy.get("@seededNoteIdMap").then((seededNoteIdMap) => {
+    cy.seedComments(seededNoteIdMap["A"], comment.hashes());
+  });
+});
 
-When("I delete comment {string} under Note {string}", (comment,noteTitle) => {
+When("I delete comment {string} under Note {string}", (comment, noteTitle) => {
   cy.navigateToNotePage(noteTitle);
-  cy.get("@seededCommentIdMap").then((seededCommentIdMap) =>{
-    cy.get(`#comment-${seededCommentIdMap[comment]}-delete`).click()
-  })
-})
+  cy.get("@seededCommentIdMap").then((seededCommentIdMap) => {
+    cy.get(`#comment-${seededCommentIdMap[comment]}-delete`).click();
+  });
+});
 
-When("I reply to comment {string} with {string}", (commentName, description) => {
-  cy.get("#reply-input").type(description).blur()
-})
+Then("Note A only have one comment {string}", () => {
+  cy.get(".comment").should("have.length", 1);
+});
 
 When(
-  "I add a comment {string}",
-  (description) => {
-    cy.get("#comment-input").click({ force: true })
-    cy.replaceFocusedText(description)
-  },
-)
+  "I reply to comment {string} with {string}",
+  (commentName, description) => {
+    cy.get("#reply-input").type(description).blur();
+  }
+);
+
+When("I add a comment {string}", (description) => {
+  cy.get("#comment-input").click({ force: true });
+  cy.replaceFocusedText(description);
+});
 
 Then("I should see comment posted time", () => {
-  cy.get("body").should("contain", "yyyy-MM-dd")
-})
+  cy.get("body").should("contain", "yyyy-MM-dd");
+});
