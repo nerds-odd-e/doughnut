@@ -3,6 +3,7 @@
 
 import { Given, Then, When } from "cypress-cucumber-preprocessor/steps"
 
+
 Then("I should see an input box for comment", () => {
   cy.get("#comment-input").should("be.visible")
 })
@@ -22,6 +23,9 @@ When("I click \"Delete\" button on comment \"Hello\"", (comment) => {
   cy.deleteComment(comment)
 })
 
+When("I reply to comment {string} with {string}", (commentName, description) => {
+  cy.get("#reply-input").type(description).blur()
+})
 
 When(
   "I add a comment {string}",
