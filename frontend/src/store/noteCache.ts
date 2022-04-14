@@ -1,4 +1,4 @@
-import objectContaining = jasmine.objectContaining;
+
 
 interface NoteCacheState {
   notebooks: Generated.NotebookViewedByUser[]
@@ -30,36 +30,38 @@ class NoteCache {
 
   loadNoteRealms(noteRealms: Generated.NoteRealm[]) {
     noteRealms.forEach((noteRealm) => {
-      noteRealm.note.comments = [{
-        id: 0,
-        author: {
+      noteRealm.note.comments = [
+        {
           id: 0,
-          name: "old_learner",
-          externalIdentifier: '',
-          ownership: {
+          author: {
             id: 0,
+            name: "old_learner",
+            externalIdentifier: "",
+            ownership: {
+              id: 0,
+            },
+            dailyNewNotesCount: 0,
+            spaceIntervals: "",
           },
-          dailyNewNotesCount: 0,
-          spaceIntervals: '',
+          description: "hello world",
+          createdAt: "yyyy-MM-dd",
         },
-        description: "hello",
-        createdAt: "yyyy-MM-dd"
-      },
         {
           id: 1,
           author: {
             id: 0,
             name: "old_learner",
-            externalIdentifier: '',
+            externalIdentifier: "",
             ownership: {
               id: 0,
             },
             dailyNewNotesCount: 0,
-            spaceIntervals: '',
+            spaceIntervals: "",
           },
           description: "world",
-          createdAt: "yyyy-MM-dd"
-        }];
+          createdAt: "yyyy-MM-dd",
+        },
+      ];
       this.state.noteRealms[noteRealm.id] = noteRealm;
     });
   }
