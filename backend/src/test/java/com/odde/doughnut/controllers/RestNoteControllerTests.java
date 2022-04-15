@@ -237,8 +237,7 @@ class RestNoteControllerTests {
 
       @Test
       void shouldBeAbleToSaveCommentIntoTheNoteWhenValid() {
-        var otherUser = makeMe.aUser().please();
-        var note = makeMe.aNote().byUser(otherUser).please();
+        var note = makeMe.aNote().please();
 
         CommentCreation commentCreation = new CommentCreation();
         commentCreation.setDescription("hello world");
@@ -256,6 +255,12 @@ class RestNoteControllerTests {
                 .getDescription(),
             equalTo("hello world"));
       }
+
+      // todo:
+      //   Refactor test
+      //   Remove add's response
+      //   modify read model
+
     }
   }
 }
