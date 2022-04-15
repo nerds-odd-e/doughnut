@@ -31,7 +31,7 @@ jobs:
   Backend-linting:
     name: Backend Lint
     runs-on: ubuntu-latest
-    steps:
+    steps: &checkout_with_jdk
       - name: Code Checkout
         uses: actions/checkout@v3
       - name: Set up JDK
@@ -49,20 +49,14 @@ jobs:
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
           restore-keys: |
             ${{ runner.os }}-gradle-
-      - run: yarn backend:lint
+      - name: Backend code linting
+        run: yarn backend:lint
 
   Backend-unit-tests:
-    name: Backend Unit tests with Database
+    name: Backend Unit tests
     runs-on: ubuntu-latest
     steps:
-      - name: Code Checkout
-        uses: actions/checkout@v3
-      - name: Set up JDK
-        uses: actions/setup-java@v3
-        with:
-          java-version: ${{ env.JDK_VERSION }}
-          distribution: ${{ env.JDK_DIST }}
-          architecture: ${{ env.JDK_ARCH }}
+      <<: *checkout_with_jdk
       - name: Setup MySQL DB Server
         uses: mirromutth/mysql-action@v1.1
         with:
@@ -74,15 +68,6 @@ jobs:
           mysql password: ${{ env.MYSQL_DB_PASSWORD }}
           host port: ${{ env.MYSQL_HOST_PORT }}
           container port: ${{ env.MYSQL_CONTAINER_PORT }}
-      - name: Cache local gradle repository & artifacts
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
       - name: DB Migration unit test
         run: backend/gradlew -p backend testDBMigrate -Dspring.profiles.active=test
       - name: Unit tests with Gradle
