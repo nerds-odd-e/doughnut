@@ -239,10 +239,7 @@ class RestNoteControllerTests {
       void shouldBeAbleToSaveCommentIntoTheNoteWhenValid() {
         var note = makeMe.aNote().please();
 
-        CommentCreation commentCreation = new CommentCreation();
-        commentCreation.setDescription("hello world");
-
-        var notesBulk = controller.createComment(note, commentCreation);
+        var notesBulk = controller.createComment(note, comment("hello world"));
 
         assertThat(notesBulk.notes.get(0).getNote().getComments().get(), hasSize(1));
 
@@ -254,6 +251,12 @@ class RestNoteControllerTests {
                 .get(0)
                 .getDescription(),
             equalTo("hello world"));
+      }
+
+      private CommentCreation comment(String description) {
+        CommentCreation commentCreation = new CommentCreation();
+        commentCreation.setDescription(description);
+        return commentCreation;
       }
 
       // todo:
