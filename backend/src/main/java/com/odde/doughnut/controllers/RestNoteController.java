@@ -8,7 +8,12 @@ import com.odde.doughnut.entities.NoteAccessories;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.ReviewSetting;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.json.*;
+import com.odde.doughnut.entities.json.CommentCreation;
+import com.odde.doughnut.entities.json.NoteCreation;
+import com.odde.doughnut.entities.json.NoteRealm;
+import com.odde.doughnut.entities.json.NotesBulk;
+import com.odde.doughnut.entities.json.RedirectToNoteResponse;
+import com.odde.doughnut.entities.json.SearchTerm;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.NoteViewer;
@@ -26,7 +31,14 @@ import javax.validation.Valid;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/notes")
