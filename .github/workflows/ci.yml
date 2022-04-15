@@ -12,6 +12,7 @@ env:
   ARTIFACT: "doughnut"
   VERSION: "0.0.1-SNAPSHOT"
   GCS_BUCKET: "dough-01"
+  RUNNER_OS: "ubuntu-latest"
   JDK_VERSION: "17"
   JDK_DIST: "zulu"
   JDK_ARCH: "x64"
@@ -29,7 +30,7 @@ env:
 jobs:
   Backend-linting:
     name: Backend Lint
-    runs-on: ubuntu-20.04
+    runs-on: ${{ env.RUNNER_OS }}
     steps:
       - name: Code Checkout
         uses: actions/checkout@v3
@@ -52,7 +53,7 @@ jobs:
 
   Backend-unit-tests:
     name: Backend Unit tests with Database
-    runs-on: ubuntu-20.04
+    runs-on: ${{ env.RUNNER_OS }}
     steps:
       - name: Code Checkout
         uses: actions/checkout@v3
@@ -89,7 +90,7 @@ jobs:
 
   Frontend-linting:
     name: Frontend Lint
-    runs-on: ubuntu-20.04
+    runs-on: ${{ env.RUNNER_OS }}
     steps:
       - name: Code Checkout
         uses: actions/checkout@v3
@@ -111,7 +112,7 @@ jobs:
 
   Frontend-unit-tests:
     name: Frontend Unit tests
-    runs-on: ubuntu-20.04
+    runs-on: ${{ env.RUNNER_OS }}
     steps:
       - name: Code Checkout
         uses: actions/checkout@v2
@@ -193,7 +194,7 @@ jobs:
 
   E2E-tests:
     name: End-to-End tests with Database
-    runs-on: ubuntu-20.04
+    runs-on: ${{ env.RUNNER_OS }}
     strategy:
       matrix:
         spec:
@@ -257,7 +258,7 @@ jobs:
 
   Package-n-Deploy:
     name: Package & GCP MIG Rolling Update Deploy
-    runs-on: ubuntu-20.04
+    runs-on: ${{ env.RUNNER_OS }}
     needs:
       [
         Backend-linting,
@@ -317,7 +318,7 @@ jobs:
 
   Slack-Notify:
     name: Single summary slack notification for entire workflow
-    runs-on: ubuntu-20.04
+    runs-on: ${{ env.RUNNER_OS }}
     needs:
       [
         Backend-linting,
