@@ -239,15 +239,22 @@ class RestNoteControllerTests {
       void shouldBeAbleToSaveCommentIntoTheNoteWhenValid() {
         var otherUser = makeMe.aUser().please();
         var note = makeMe.aNote().byUser(otherUser).please();
-        var comment = makeMe.aComment().byNote(note).inMemoryPlease();
 
         CommentCreation commentCreation = new CommentCreation();
-        commentCreation.setDescription(comment.getDescription());
+        commentCreation.setDescription("hello world");
+
         var notesBulk = controller.createComment(note, commentCreation);
 
         assertThat(notesBulk.notes.get(0).getNote().getComments().get(), hasSize(1));
 
-        assertThat(modelFactoryService.commentRepository.findByNoteId(note.getId()), (hasSize(1)));
+        assertThat(modelFactoryService.commentRepository.findByNoteId(note.getId()), hasSize(1));
+        assertThat(
+            modelFactoryService
+                .commentRepository
+                .findByNoteId(note.getId())
+                .get(0)
+                .getDescription(),
+            equalTo("hello world"));
       }
     }
   }

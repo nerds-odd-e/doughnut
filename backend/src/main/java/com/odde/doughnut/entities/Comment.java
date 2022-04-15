@@ -12,5 +12,7 @@ public class Comment {
   private User author;
   private Timestamp createdAt;
   private String description;
+
+  @JsonIgnore private Integer noteId;
   @JsonIgnore private Note parentNote;
 }

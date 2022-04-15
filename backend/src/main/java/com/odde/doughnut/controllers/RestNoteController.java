@@ -189,9 +189,14 @@ class RestNoteController {
       note.setComments(Optional.of(new ArrayList<>()));
     }
     Comment comment = new Comment();
-    comment.setDescription(commentCreation.getDescription());
     comment.setAuthor(userModel.getEntity());
     comment.setCreatedAt(Timestamp.from(Instant.now()));
+    comment.setDescription(commentCreation.getDescription());
+    comment.setNoteId(note.getId());
+    comment.setParentNote(note);
+
+    this.modelFactoryService.commentRepository.save(comment);
+
     note.getComments().get().add(comment);
     return NotesBulk.jsonNoteWithChildren(note, userModel);
   }
