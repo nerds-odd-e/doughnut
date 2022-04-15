@@ -184,7 +184,8 @@ class RestNoteController {
       @PathVariable("note") Note note, @ModelAttribute CommentCreation commentCreation) {
     var userModel = currentUserFetcher.getUser();
 
-    this.modelFactoryService.commentRepository.save(Comment.from(note, commentCreation, userModel));
+    this.modelFactoryService.commentRepository.save(
+        Comment.from(note.getId(), commentCreation, userModel));
 
     return "{}";
   }

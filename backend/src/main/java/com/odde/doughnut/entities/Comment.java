@@ -18,12 +18,12 @@ public class Comment {
 
   @JsonIgnore private Integer noteId;
 
-  public static Comment from(Note note, CommentCreation commentCreation, UserModel userModel) {
+  public static Comment from(Integer noteId, CommentCreation commentCreation, UserModel userModel) {
     Comment comment = new Comment();
     comment.setAuthor(userModel.getEntity());
     comment.setCreatedAt(Timestamp.from(Instant.now()));
     comment.setDescription(commentCreation.getDescription());
-    comment.setNoteId(note.getId());
+    comment.setNoteId(noteId);
     return comment;
   }
 }
