@@ -23,9 +23,7 @@ import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.sql.Timestamp;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import lombok.Getter;
@@ -185,10 +183,6 @@ class RestNoteController {
   public String createComment(
       @PathVariable("note") Note note, @ModelAttribute CommentCreation commentCreation) {
     var userModel = currentUserFetcher.getUser();
-
-    if (note.getComments().isPresent()) {
-      note.setComments(Optional.of(new ArrayList<>()));
-    }
 
     Comment comment = new Comment();
     comment.setAuthor(userModel.getEntity());

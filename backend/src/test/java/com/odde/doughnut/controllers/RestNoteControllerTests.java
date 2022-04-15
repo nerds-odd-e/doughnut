@@ -263,7 +263,6 @@ class RestNoteControllerTests {
       }
 
       // todo:
-      //   Remove add's response
       //   modify read model
 
     }
