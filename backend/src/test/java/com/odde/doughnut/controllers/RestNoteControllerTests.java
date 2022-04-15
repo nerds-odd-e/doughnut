@@ -1,7 +1,11 @@
 package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasSize;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -236,10 +240,14 @@ class RestNoteControllerTests {
         var otherUser = makeMe.aUser().please();
         var note = makeMe.aNote().byUser(otherUser).please();
         var comment = makeMe.aComment().byNote(note).inMemoryPlease();
+
         CommentCreation commentCreation = new CommentCreation();
         commentCreation.setDescription(comment.getDescription());
         var notesBulk = controller.createComment(note, commentCreation);
+
         assertThat(notesBulk.notes.get(0).getNote().getComments().get(), hasSize(1));
+
+        assertThat(modelFactoryService.commentRepository.findByNoteId(note.getId()), (hasSize(1)));
       }
     }
   }

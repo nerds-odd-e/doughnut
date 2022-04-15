@@ -55,6 +55,8 @@ public class ModelFactoryService {
   @Autowired public EntityManager entityManager;
   @Autowired public FailureReportRepository failureReportRepository;
 
+  @Autowired public CommentRepository commentRepository;
+
   public NoteModel toNoteModel(Note note) {
     return new NoteModel(note, this);
   }
