@@ -182,12 +182,14 @@ class RestNoteController {
   }
 
   @PostMapping(value = "/{note}/comments/create")
-  public NotesBulk createComment(
+  public void createComment(
       @PathVariable("note") Note note, @ModelAttribute CommentCreation commentCreation) {
     var userModel = currentUserFetcher.getUser();
+
     if (note.getComments().isPresent()) {
       note.setComments(Optional.of(new ArrayList<>()));
     }
+
     Comment comment = new Comment();
     comment.setAuthor(userModel.getEntity());
     comment.setCreatedAt(Timestamp.from(Instant.now()));
@@ -196,8 +198,5 @@ class RestNoteController {
     comment.setParentNote(note);
 
     this.modelFactoryService.commentRepository.save(comment);
-
-    note.getComments().get().add(comment);
-    return NotesBulk.jsonNoteWithChildren(note, userModel);
   }
 }
