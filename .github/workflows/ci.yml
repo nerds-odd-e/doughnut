@@ -8,9 +8,23 @@ env:
   SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
   DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
   ARTIFACT: "doughnut"
   VERSION: "0.0.1-SNAPSHOT"
   GCS_BUCKET: "dough-01"
+  JDK_VERSION: "17"
+  JDK_DIST: "zulu"
+  JDK_ARCH: "x64"
+  NODEJS_VERSION: "17"
+  MYSQL_VERSION: "8.0"
+  MYSQL_CHAR_SET: "utf8mb4"
+  MYSQL_COLLATION: "utf8mb4_unicode_ci"
+  MYSQL_UT_DB: "doughnut_test"
+  MYSQL_E2E_DB: "doughnut_e2e_test"
+  MYSQL_DB_USER: ${{ secrets.DBUSER }}
+  MYSQL_DB_PASSWORD: ${{ secrets.DBPASSWORD }}
+  MYSQL_HOST_PORT: "3309"
+  MYSQL_CONTAINER_PORT: "3309"
 
 jobs:
   Backend-linting:
@@ -18,13 +32,13 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Code Checkout
-        uses: actions/checkout@v2
-      - name: Set up JDK 17
-        uses: actions/setup-java@v2
+        uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
         with:
-          java-version: 17
-          distribution: "zulu"
-          architecture: x64
+          java-version: ${{ env.JDK_VERSION }}
+          distribution: ${{ env.JDK_DIST }}
+          architecture: ${{ env.JDK_ARCH }}
       - name: Cache local gradle repository & artifacts
         uses: actions/cache@v3
         with:
@@ -41,24 +55,24 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Code Checkout
-        uses: actions/checkout@v2
-      - name: Set up JDK 17
-        uses: actions/setup-java@v2
+        uses: actions/checkout@v3
+      - name: Set up JDK
+        uses: actions/setup-java@v3
         with:
-          java-version: 17
-          distribution: "zulu"
-          architecture: x64
-      - name: Setup MySQL DB Server 8.0
+          java-version: ${{ env.JDK_VERSION }}
+          distribution: ${{ env.JDK_DIST }}
+          architecture: ${{ env.JDK_ARCH }}
+      - name: Setup MySQL DB Server
         uses: mirromutth/mysql-action@v1.1
         with:
-          mysql version: "8.0"
-          character set server: "utf8mb4"
-          collation server: "utf8mb4_unicode_ci"
-          mysql database: "doughnut_test"
-          mysql user: ${{ secrets.DBUSER }}
-          mysql password: ${{ secrets.DBPASSWORD }}
-          host port: 3309
-          container port: 3309
+          mysql version: ${{ env.MYSQL_VERSION }}
+          character set server: ${{ env.MYSQL_CHAR_SET }}
+          collation server: ${{ env.MYSQL_COLLATION }}
+          mysql database: ${{ env.MYSQL_UT_DB }}
+          mysql user: ${{ env.MYSQL_DB_USER }}
+          mysql password: ${{ env.MYSQL_DB_PASSWORD }}
+          host port: ${{ env.MYSQL_HOST_PORT }}
+          container port: ${{ env.MYSQL_CONTAINER_PORT }}
       - name: Cache local gradle repository & artifacts
         uses: actions/cache@v3
         with:
@@ -78,7 +92,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Code Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Cache yarn directory path
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn cache dir)"
@@ -90,9 +104,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
       - name: eslint
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: "17"
+          node-version: ${{ env.NODEJS_VERSION }}
       - run: yarn frontend:lint
 
   Frontend-unit-tests:
@@ -112,9 +126,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
       - name: Unit tests with jest & vue-jest
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: "17"
+          node-version: ${{ env.NODEJS_VERSION }}
       - run: yarn frontend:test
 
   # mobile-unit-test:
@@ -198,22 +212,22 @@ jobs:
           - |
             cypress/integration/v*/**
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-java@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
         with:
-          java-version: 17
-          distribution: "zulu"
-          architecture: x64
+          java-version: ${{ env.JDK_VERSION }}
+          distribution: ${{ env.JDK_DIST }}
+          architecture: ${{ env.JDK_ARCH }}
       - uses: mirromutth/mysql-action@v1.1
         with:
-          mysql version: "8.0"
-          character set server: "utf8mb4"
-          collation server: "utf8mb4_unicode_ci"
-          mysql database: "doughnut_e2e_test"
-          mysql user: ${{ secrets.DBUSER }}
-          mysql password: ${{ secrets.DBPASSWORD }}
-          host port: 3309
-          container port: 3309
+          mysql version: ${{ env.MYSQL_VERSION }}
+          character set server: ${{ env.MYSQL_CHAR_SET }}
+          collation server: ${{ env.MYSQL_COLLATION }}
+          mysql database: ${{ env.MYSQL_E2E_DB }}
+          mysql user: ${{ env.MYSQL_DB_USER }}
+          mysql password: ${{ env.MYSQL_DB_PASSWORD }}
+          host port: ${{ env.MYSQL_HOST_PORT }}
+          container port: ${{ env.MYSQL_CONTAINER_PORT }}
       - name: Cache yarn directory path
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn cache dir)"
@@ -245,10 +259,16 @@ jobs:
     name: Package & GCP MIG Rolling Update Deploy
     runs-on: ubuntu-20.04
     needs:
-      [Backend-linting, Backend-unit-tests, Frontend-linting, Frontend-unit-tests, E2E-tests]
+      [
+        Backend-linting,
+        Backend-unit-tests,
+        Frontend-linting,
+        Frontend-unit-tests,
+        E2E-tests,
+      ]
     steps:
       - name: Code Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Cache yarn directory path
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn cache dir)"
@@ -260,16 +280,16 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
       - name: Build frontend
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
-          node-version: "17"
+          node-version: ${{ env.NODEJS_VERSION }}
       - run: yarn frontend:build
-      - name: Set up JDK 17
-        uses: actions/setup-java@v2
+      - name: Set up JDK
+        uses: actions/setup-java@v3
         with:
-          java-version: 17
-          distribution: "zulu"
-          architecture: x64
+          java-version: ${{ env.JDK_VERSION }}
+          distribution: ${{ env.JDK_DIST }}
+          architecture: ${{ env.JDK_ARCH }}
       - name: Cache local gradle repository & artifacts
         uses: actions/cache@v3
         with:
@@ -284,7 +304,7 @@ jobs:
       - name: GCP Auth with Service Account
         uses: google-github-actions/auth@v0
         with:
-          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+          credentials_json: ${{ env.GCP_CREDENTIALS }}
       - name: Set up GCP SDK
         uses: google-github-actions/setup-gcloud@v0
       - name: Upload production application jar to Google Cloud Storage
@@ -318,5 +338,5 @@ jobs:
       - uses: nobrayner/discord-webhook@v1
         if: env.WORKFLOW_CONCLUSION == 'failure'
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          discord-webhook: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          github-token: ${{ env.GITHUB_TOKEN }}
+          discord-webhook: ${{ env.DISCORD_WEBHOOK_URL }}
