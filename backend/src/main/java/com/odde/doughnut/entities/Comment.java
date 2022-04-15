@@ -17,7 +17,6 @@ public class Comment {
   private String description;
 
   @JsonIgnore private Integer noteId;
-  @JsonIgnore private Note parentNote;
 
   public static Comment from(Note note, CommentCreation commentCreation, UserModel userModel) {
     Comment comment = new Comment();
@@ -25,7 +24,6 @@ public class Comment {
     comment.setCreatedAt(Timestamp.from(Instant.now()));
     comment.setDescription(commentCreation.getDescription());
     comment.setNoteId(note.getId());
-    comment.setParentNote(note);
     return comment;
   }
 }
