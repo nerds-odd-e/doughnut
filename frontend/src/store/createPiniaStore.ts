@@ -63,6 +63,11 @@ export default defineStore('main', {
       noteCache(this).deleteNoteAndDescendents(noteId)
       history(this).deleteNote(noteId)
     },
+
+    deleteComment(noteId: Doughnut.ID, commentId: number) {
+      noteCache(this).deleteComment(noteId, commentId)
+    },
+
     setCurrentUser(user: Generated.User) {
       this.currentUser = user
     },

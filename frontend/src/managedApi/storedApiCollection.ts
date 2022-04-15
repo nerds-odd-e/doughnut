@@ -242,6 +242,7 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
         `notes/${noteId}/comments/delete/${commentId}`,
         {},
       )
+      piniaStore.deleteComment(noteId, commentId)
     },
   }
 }
