@@ -31,24 +31,13 @@ jobs:
   Backend-linting:
     name: Backend Lint
     runs-on: ubuntu-latest
-    steps: &checkout_with_jdk
-      - name: Code Checkout
-        uses: actions/checkout@v3
-      - name: Set up JDK
-        uses: actions/setup-java@v3
+    steps:
+      - name: Code checkout & setup JDK
+        uses: ./github/checkout_n_jdk
         with:
           java-version: ${{ env.JDK_VERSION }}
           distribution: ${{ env.JDK_DIST }}
           architecture: ${{ env.JDK_ARCH }}
-      - name: Cache local gradle repository & artifacts
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
       - name: Backend code linting
         run: yarn backend:lint
 
@@ -56,7 +45,6 @@ jobs:
     name: Backend Unit tests
     runs-on: ubuntu-latest
     steps:
-      <<: *checkout_with_jdk
       - name: Setup MySQL DB Server
         uses: mirromutth/mysql-action@v1.1
         with:
@@ -68,6 +56,12 @@ jobs:
           mysql password: ${{ env.MYSQL_DB_PASSWORD }}
           host port: ${{ env.MYSQL_HOST_PORT }}
           container port: ${{ env.MYSQL_CONTAINER_PORT }}
+      - name: Code checkout & setup JDK
+        uses: ./github/checkout_n_jdk
+        with:
+          java-version: ${{ env.JDK_VERSION }}
+          distribution: ${{ env.JDK_DIST }}
+          architecture: ${{ env.JDK_ARCH }}
       - name: DB Migration unit test
         run: backend/gradlew -p backend testDBMigrate -Dspring.profiles.active=test
       - name: Unit tests with Gradle
@@ -120,10 +114,10 @@ jobs:
   # mobile-unit-test:
   #   runs-on: ubuntu-latest
   #   steps:
-  #     - uses: actions/checkout@v2
+  #     - uses: actions/checkout@v3
   #     - uses: subosito/flutter-action@v1
   #       with:
-  #         flutter-version: "2.5.3"
+  #         flutter-version: "2.16.2"
   #     - run: flutter pub get
   #       working-directory: ./doughnut_mobile
   #     - run: flutter test
@@ -198,12 +192,6 @@ jobs:
           - |
             cypress/integration/v*/**
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-java@v3
-        with:
-          java-version: ${{ env.JDK_VERSION }}
-          distribution: ${{ env.JDK_DIST }}
-          architecture: ${{ env.JDK_ARCH }}
       - uses: mirromutth/mysql-action@v1.1
         with:
           mysql version: ${{ env.MYSQL_VERSION }}
@@ -214,6 +202,12 @@ jobs:
           mysql password: ${{ env.MYSQL_DB_PASSWORD }}
           host port: ${{ env.MYSQL_HOST_PORT }}
           container port: ${{ env.MYSQL_CONTAINER_PORT }}
+      - name: Code checkout & setup JDK
+        uses: ./github/checkout_n_jdk
+        with:
+          java-version: ${{ env.JDK_VERSION }}
+          distribution: ${{ env.JDK_DIST }}
+          architecture: ${{ env.JDK_ARCH }}
       - name: Cache yarn directory path
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn cache dir)"
@@ -253,8 +247,12 @@ jobs:
         E2E-tests,
       ]
     steps:
-      - name: Code Checkout
-        uses: actions/checkout@v3
+      - name: Code checkout & setup JDK
+        uses: ./github/checkout_n_jdk
+        with:
+          java-version: ${{ env.JDK_VERSION }}
+          distribution: ${{ env.JDK_DIST }}
+          architecture: ${{ env.JDK_ARCH }}
       - name: Cache yarn directory path
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn cache dir)"
@@ -270,21 +268,6 @@ jobs:
         with:
           node-version: ${{ env.NODEJS_VERSION }}
       - run: yarn frontend:build
-      - name: Set up JDK
-        uses: actions/setup-java@v3
-        with:
-          java-version: ${{ env.JDK_VERSION }}
-          distribution: ${{ env.JDK_DIST }}
-          architecture: ${{ env.JDK_ARCH }}
-      - name: Cache local gradle repository & artifacts
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
       - name: Build application jar artifact
         run: backend/gradlew -p backend build -x test -Dspring.profiles.active=prod --build-cache --parallel
       - name: GCP Auth with Service Account

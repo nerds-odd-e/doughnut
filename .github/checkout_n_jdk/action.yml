@@ -1,0 +1,35 @@
+name: "Checkout & JDK"
+description: "checkout code & setup JDK"
+inputs:
+  java-version:
+    description: "JDK Version"
+    required: true
+    default: "17"
+  distribution:
+    description: "JDK Type e.g. Zulu, Adopt, OpenJDK"
+    required: true
+    default: "zulu"
+  architecture:
+    description: "x86 or x64"
+    required: true
+    default: "x64"
+runs:
+  using: "composite"
+  steps:
+    - name: Code Checkout
+      uses: actions/checkout@v3
+    - name: Set up JDK
+      uses: actions/setup-java@v3
+      with:
+        java-version: ${{ inputs.java-version }}
+        distribution: ${{ inputs.distribution }}
+        architecture: ${{ inputs.architecture }}
+    - name: Cache local gradle repository & artifacts
+      uses: actions/cache@v3
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
