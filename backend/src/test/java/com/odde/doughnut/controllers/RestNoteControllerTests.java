@@ -9,6 +9,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.odde.doughnut.entities.Comment;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteAccessories;
 import com.odde.doughnut.entities.User;
@@ -24,6 +25,7 @@ import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -235,15 +237,31 @@ class RestNoteControllerTests {
     @Nested
     class CommentTest {
 
+      private Note existedNote;
+      private List<Comment> actualComments;
+
       @Test
       void shouldBeAbleToSaveCommentIntoTheNoteWhenValid() {
-        var note = makeMe.aNote().please();
 
-        controller.createComment(note, comment("hello world"));
+        given_note_existed();
 
-        assertThat(modelFactoryService.commentRepository.findByNoteId(note.getId()), hasSize(1));
+        when_add_comment("hello world");
 
-        then_first_comment_in_DB_will_be(note, "hello world");
+        then_comment_should_exist("hello world");
+      }
+
+      private void then_comment_should_exist(String description) {
+        actualComments = modelFactoryService.commentRepository.findByNoteId(existedNote.getId());
+
+        assertThat(actualComments.get(0).getDescription(), equalTo(description));
+      }
+
+      private void when_add_comment(String description) {
+        controller.createComment(existedNote, comment(description));
+      }
+
+      private void given_note_existed() {
+        existedNote = makeMe.aNote().please();
       }
 
       private void then_first_comment_in_DB_will_be(Note note, String description) {
