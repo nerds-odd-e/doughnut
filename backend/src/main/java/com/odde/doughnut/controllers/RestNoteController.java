@@ -165,7 +165,8 @@ class RestNoteController {
   }
 
   @PostMapping(value = "/{note}/comments/create")
-  public NotesBulk createComment(@PathVariable("note") Note note, @ModelAttribute CommentCreation commentCreation) {
+  public NotesBulk createComment(
+      @PathVariable("note") Note note, @ModelAttribute CommentCreation commentCreation) {
     var userModel = currentUserFetcher.getUser();
     if (note.getComments().isPresent()) {
       note.setComments(Optional.of(new ArrayList<>()));
