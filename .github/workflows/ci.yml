@@ -30,7 +30,7 @@ env:
 jobs:
   Backend-linting:
     name: Backend Lint
-    runs-on: ${{ env.RUNNER_OS }}
+    runs-on: ubuntu-latest
     steps:
       - name: Code Checkout
         uses: actions/checkout@v3
@@ -53,7 +53,7 @@ jobs:
 
   Backend-unit-tests:
     name: Backend Unit tests with Database
-    runs-on: ${{ env.RUNNER_OS }}
+    runs-on: ubuntu-latest
     steps:
       - name: Code Checkout
         uses: actions/checkout@v3
@@ -90,7 +90,7 @@ jobs:
 
   Frontend-linting:
     name: Frontend Lint
-    runs-on: ${{ env.RUNNER_OS }}
+    runs-on: ubuntu-latest
     steps:
       - name: Code Checkout
         uses: actions/checkout@v3
@@ -112,7 +112,7 @@ jobs:
 
   Frontend-unit-tests:
     name: Frontend Unit tests
-    runs-on: ${{ env.RUNNER_OS }}
+    runs-on: ubuntu-latest
     steps:
       - name: Code Checkout
         uses: actions/checkout@v2
@@ -194,7 +194,7 @@ jobs:
 
   E2E-tests:
     name: End-to-End tests with Database
-    runs-on: ${{ env.RUNNER_OS }}
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         spec:
@@ -258,7 +258,7 @@ jobs:
 
   Package-n-Deploy:
     name: Package & GCP MIG Rolling Update Deploy
-    runs-on: ${{ env.RUNNER_OS }}
+    runs-on: ubuntu-latest
     needs:
       [
         Backend-linting,
@@ -318,7 +318,7 @@ jobs:
 
   Slack-Notify:
     name: Single summary slack notification for entire workflow
-    runs-on: ${{ env.RUNNER_OS }}
+    runs-on: ubuntu-latest
     needs:
       [
         Backend-linting,
@@ -336,8 +336,8 @@ jobs:
         with:
           status: failure
           fields: repo,commit,message,author,action,workflow,eventName
-      - uses: nobrayner/discord-webhook@v1
-        if: env.WORKFLOW_CONCLUSION == 'failure'
-        with:
-          github-token: ${{ env.GITHUB_TOKEN }}
-          discord-webhook: ${{ env.DISCORD_WEBHOOK_URL }}
+      # - uses: nobrayner/discord-webhook@v1
+      #   if: env.WORKFLOW_CONCLUSION == 'failure'
+      #   with:
+      #     github-token: ${{ env.GITHUB_TOKEN }}
+      #     discord-webhook: ${{ env.DISCORD_WEBHOOK_URL }}
