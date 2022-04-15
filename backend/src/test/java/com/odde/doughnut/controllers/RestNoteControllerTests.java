@@ -244,13 +244,18 @@ class RestNoteControllerTests {
         assertThat(notesBulk.notes.get(0).getNote().getComments().get(), hasSize(1));
 
         assertThat(modelFactoryService.commentRepository.findByNoteId(note.getId()), hasSize(1));
+
+        then_first_comment_in_DB_will_be(note, "hello world");
+      }
+
+      private void then_first_comment_in_DB_will_be(Note note, String description) {
         assertThat(
             modelFactoryService
                 .commentRepository
                 .findByNoteId(note.getId())
                 .get(0)
                 .getDescription(),
-            equalTo("hello world"));
+            equalTo(description));
       }
 
       private CommentCreation comment(String description) {
