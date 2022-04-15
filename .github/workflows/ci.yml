@@ -32,8 +32,10 @@ jobs:
     name: Backend Lint
     runs-on: ubuntu-latest
     steps:
-      - name: Code checkout & setup JDK
-        uses: ./github/checkout_n_jdk
+      - name: Code checkout
+        uses: actions/checkout@v3
+      - name: Setup JDK
+        uses: ./github/setup_jdk_with_cache
         with:
           java-version: ${{ env.JDK_VERSION }}
           distribution: ${{ env.JDK_DIST }}
@@ -56,8 +58,10 @@ jobs:
           mysql password: ${{ env.MYSQL_DB_PASSWORD }}
           host port: ${{ env.MYSQL_HOST_PORT }}
           container port: ${{ env.MYSQL_CONTAINER_PORT }}
-      - name: Code checkout & setup JDK
-        uses: ./github/checkout_n_jdk
+      - name: Code checkout
+        uses: actions/checkout@v3
+      - name: Setup JDK with cache
+        uses: ./github/setup_jdk_with_cache
         with:
           java-version: ${{ env.JDK_VERSION }}
           distribution: ${{ env.JDK_DIST }}
@@ -94,7 +98,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Code Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Cache yarn directory path
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn cache dir)"
@@ -202,8 +206,10 @@ jobs:
           mysql password: ${{ env.MYSQL_DB_PASSWORD }}
           host port: ${{ env.MYSQL_HOST_PORT }}
           container port: ${{ env.MYSQL_CONTAINER_PORT }}
-      - name: Code checkout & setup JDK
-        uses: ./github/checkout_n_jdk
+      - name: Code checkout
+        uses: actions/checkout@v3
+      - name: Setup JDK with cache
+        uses: ./github/setup_jdk_with_cache
         with:
           java-version: ${{ env.JDK_VERSION }}
           distribution: ${{ env.JDK_DIST }}
@@ -247,8 +253,10 @@ jobs:
         E2E-tests,
       ]
     steps:
-      - name: Code checkout & setup JDK
-        uses: ./github/checkout_n_jdk
+      - name: Code Checkout
+        uses: actions/checkout@v3
+      - name: Setup JDK with cache
+        uses: ./github/setup_jdk_with_cache
         with:
           java-version: ${{ env.JDK_VERSION }}
           distribution: ${{ env.JDK_DIST }}

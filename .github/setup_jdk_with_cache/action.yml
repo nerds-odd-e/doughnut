@@ -1,5 +1,5 @@
-name: "Checkout & JDK"
-description: "checkout code & setup JDK"
+name: "Setup JDK with Gradle cache"
+description: "Setup JDK with Gradle cache"
 inputs:
   java-version:
     description: "JDK Version"
@@ -16,8 +16,6 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Code Checkout
-      uses: actions/checkout@v3
     - name: Set up JDK
       uses: actions/setup-java@v3
       with:
