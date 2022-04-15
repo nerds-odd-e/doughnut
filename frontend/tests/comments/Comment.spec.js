@@ -1,8 +1,8 @@
 /**
  * @jest-environment jsdom
  */
-import helper from '../helpers';
 import NoteCardsView from '@/components/notes/views/NoteCardsView.vue';
+import helper from '../helpers';
 import makeMe from "../fixtures/makeMe";
 
 helper.resetWithApiMock(beforeEach, afterEach)
