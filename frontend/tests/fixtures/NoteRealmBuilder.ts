@@ -1,4 +1,4 @@
-import { merge } from "lodash";
+import {merge} from "lodash";
 import Builder from "./Builder";
 import LinkBuilder from "./LinkBuilder";
 import NoteBuilder from "./NoteBuilder";
@@ -64,6 +64,26 @@ class NoteRealmBuilder extends Builder<Generated.NoteRealm> {
   do(): Generated.NoteRealm {
     this.data.note = this.noteBuilder.do()
     return this.data
+  }
+
+  withCommentOfId(commentId: number) {
+
+    this.data.note.comments = [{
+      id: commentId,
+      author: {
+        id: 0,
+        name: "old_learner",
+        externalIdentifier: "",
+        ownership: {
+          id: 0,
+        },
+        dailyNewNotesCount: 0,
+        spaceIntervals: "",
+      },
+      description: "hello world",
+      createdAt: "yyyy-MM-dd",
+    }];
+    return this;
   }
 }
 
