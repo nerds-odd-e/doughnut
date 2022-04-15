@@ -51,11 +51,11 @@ export default defineComponent({
   },
   methods:{
     handleBlur(){
-      this.storedApi.addComment(this.noteId, this.creationData)
+      this.storedApi.createComment(this.noteId, this.creationData)
     },
     deleteComment(commentId: number) {
       this.storedApi.deleteComment(this.noteId, commentId)
-    } 
+    }
   },
   computed: {
     noteRealm() {

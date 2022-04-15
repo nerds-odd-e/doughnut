@@ -182,7 +182,7 @@ class RestNoteController {
   }
 
   @PostMapping(value = "/{note}/comments/create")
-  public void createComment(
+  public String createComment(
       @PathVariable("note") Note note, @ModelAttribute CommentCreation commentCreation) {
     var userModel = currentUserFetcher.getUser();
 
@@ -198,5 +198,7 @@ class RestNoteController {
     comment.setParentNote(note);
 
     this.modelFactoryService.commentRepository.save(comment);
+
+    return "{}";
   }
 }
