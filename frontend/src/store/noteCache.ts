@@ -20,48 +20,16 @@ class NoteCache {
 
   loadNotePosition(notePosition: Generated.NotePositionViewedByUser) {
     notePosition.ancestors.forEach((note) => {
-      const {id} = note;
+      const { id } = note
       this.loadNote(id, note)
-    });
+    })
     this.loadNotebook(notePosition.notebook)
   }
 
   loadNoteRealms(noteRealms: Generated.NoteRealm[]) {
     noteRealms.forEach((noteRealm) => {
-      noteRealm.note.comments = [
-        {
-          id: 0,
-          author: {
-            id: 0,
-            name: "old_learner",
-            externalIdentifier: "",
-            ownership: {
-              id: 0,
-            },
-            dailyNewNotesCount: 0,
-            spaceIntervals: "",
-          },
-          description: "hello world",
-          createdAt: "yyyy-MM-dd",
-        },
-        {
-          id: 1,
-          author: {
-            id: 0,
-            name: "old_learner",
-            externalIdentifier: "",
-            ownership: {
-              id: 0,
-            },
-            dailyNewNotesCount: 0,
-            spaceIntervals: "",
-          },
-          description: "world",
-          createdAt: "yyyy-MM-dd",
-        },
-      ];
-      this.state.noteRealms[noteRealm.id] = noteRealm;
-    });
+      this.state.noteRealms[noteRealm.id] = noteRealm
+    })
   }
 
   deleteNoteAndDescendents(noteId: Doughnut.ID) {
@@ -70,7 +38,7 @@ class NoteCache {
   }
 
   getNoteRealmById(id: Doughnut.ID | undefined) {
-    if (id === undefined) return undefined;
+    if (id === undefined) return undefined
     return this.state.noteRealms[id]
   }
 
@@ -85,7 +53,7 @@ class NoteCache {
     }
     if (!cursor) return undefined
     const notebook = this.state.notebooksMapByHeadNoteId[cursor.id]
-    return {noteId: id, ancestors, notebook} as Generated.NotePositionViewedByUser
+    return { noteId: id, ancestors, notebook } as Generated.NotePositionViewedByUser
   }
 
   private loadNotebook(notebook: Generated.NotebookViewedByUser) {
@@ -93,9 +61,9 @@ class NoteCache {
   }
 
   private loadNote(id: Doughnut.ID, note: Generated.Note) {
-    const noteRealm = this.state.noteRealms[id];
+    const noteRealm = this.state.noteRealms[id]
     if (!noteRealm) {
-      this.state.noteRealms[id] = {id, note}
+      this.state.noteRealms[id] = { id, note }
       return
     }
     noteRealm.note = note
@@ -117,7 +85,7 @@ class NoteCache {
     if (children) {
       const index = children.indexOf(id)
       if (index > -1) {
-        children.splice(index, 1);
+        children.splice(index, 1)
       }
     }
   }
@@ -128,4 +96,4 @@ function noteCache(state: NoteCacheState) {
 }
 
 export default noteCache
-export {NoteCacheState}
+export { NoteCacheState }
