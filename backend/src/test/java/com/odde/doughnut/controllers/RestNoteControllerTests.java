@@ -239,9 +239,7 @@ class RestNoteControllerTests {
       void shouldBeAbleToSaveCommentIntoTheNoteWhenValid() {
         var note = makeMe.aNote().please();
 
-        var notesBulk = controller.createComment(note, comment("hello world"));
-
-        assertThat(notesBulk.notes.get(0).getNote().getComments().get(), hasSize(1));
+        controller.createComment(note, comment("hello world"));
 
         assertThat(modelFactoryService.commentRepository.findByNoteId(note.getId()), hasSize(1));
 
@@ -265,7 +263,6 @@ class RestNoteControllerTests {
       }
 
       // todo:
-      //   Refactor test
       //   Remove add's response
       //   modify read model
 
