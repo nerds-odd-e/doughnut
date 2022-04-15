@@ -184,15 +184,20 @@ class RestNoteController {
       @PathVariable("note") Note note, @ModelAttribute CommentCreation commentCreation) {
     var userModel = currentUserFetcher.getUser();
 
+    Comment comment = comment(note, commentCreation, userModel);
+
+    this.modelFactoryService.commentRepository.save(comment);
+
+    return "{}";
+  }
+
+  private Comment comment(Note note, CommentCreation commentCreation, UserModel userModel) {
     Comment comment = new Comment();
     comment.setAuthor(userModel.getEntity());
     comment.setCreatedAt(Timestamp.from(Instant.now()));
     comment.setDescription(commentCreation.getDescription());
     comment.setNoteId(note.getId());
     comment.setParentNote(note);
-
-    this.modelFactoryService.commentRepository.save(comment);
-
-    return "{}";
+    return comment;
   }
 }
