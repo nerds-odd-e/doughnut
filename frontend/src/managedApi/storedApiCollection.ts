@@ -229,12 +229,11 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
     },
 
     async addComment(noteId: Doughnut.ID, data: Generated.CommentCreation) {
-      const res = await managedApi.restPostMultiplePartForm(
+      await managedApi.restPostMultiplePartForm(
         `notes/${noteId}/comments/create`,
         data
       ) as Generated.NotesBulk;
-      piniaStore.loadNotesBulk(res);
-      return res;
+      return this.getNoteAndItsChildren(noteId);
     },
   };
 };

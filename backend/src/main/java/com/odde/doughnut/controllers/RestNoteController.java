@@ -92,6 +92,11 @@ class RestNoteController {
   public NotesBulk show(@PathVariable("note") Note note) throws NoAccessRightException {
     final UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertReadAuthorization(note);
+    Comment comment = new Comment();
+    comment.setDescription("hello world");
+    comment.setAuthor(user.getEntity());
+    comment.setCreatedAt(Timestamp.from(Instant.now()));
+    note.getComments().get().add(comment);
 
     return NotesBulk.jsonNoteWithChildren(note, user);
   }
