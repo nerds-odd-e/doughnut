@@ -235,6 +235,13 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
       ) as Generated.NotesBulk;
       return this.getNoteAndItsChildren(noteId);
     },
+
+    async deleteComment(noteId: Doughnut.ID, commentId: number) {
+      await managedApi.restPost(
+        `notes/${noteId}/comments/delete/${commentId}`,
+        {},
+      );
+    }
   };
 };
 

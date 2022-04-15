@@ -67,8 +67,10 @@ class NoteRealmBuilder extends Builder<Generated.NoteRealm> {
   }
 
   withCommentOfId(commentId: number) {
-
-    this.data.note.comments = [{
+    if (!this.data.note.comments) {
+      this.data.note.comments = []
+    }
+    this.data.note.comments?.push({
       id: commentId,
       author: {
         id: 0,
@@ -82,7 +84,7 @@ class NoteRealmBuilder extends Builder<Generated.NoteRealm> {
       },
       description: "hello world",
       createdAt: "yyyy-MM-dd",
-    }];
+    });
     return this;
   }
 }

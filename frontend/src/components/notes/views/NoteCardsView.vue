@@ -6,7 +6,7 @@
     <div v-if="featureToggle">
       <div v-for="item in noteRealm.note.comments" :key="item.id" class="comment">
         {{ item.author.name }}: {{ item.description }} <div class="comment-timestamp">{{ item.createdAt }}</div><br/>
-        <button :id="`comment-${item.id}-delete`">Delete</button>
+        <button :id="`comment-${item.id}-delete`" @click="deleteComment(item.id)">Delete</button>
       </div>
       <input  id="comment-input" @blur="handleBlur" v-model="creationData.description"/>
     </div>
@@ -52,7 +52,10 @@ export default defineComponent({
   methods:{
     handleBlur(){
       this.storedApi.addComment(this.noteId, this.creationData)
-    }
+    },
+    deleteComment(commentId: number) {
+      this.storedApi.deleteComment(this.noteId, commentId)
+    } 
   },
   computed: {
     noteRealm() {
