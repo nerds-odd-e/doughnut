@@ -31,11 +31,11 @@ jobs:
     name: Backend Unit tests
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
       - name: Setup MySQL DB Server
         uses: ./.github/mysql_db
         with:
           mysql_db_instance: ${{ env.MYSQL_UT_DB }}
-      - uses: actions/checkout@v3
       - uses: ./.github/setup_jdk_with_cache
       - uses: ./.github/setup_nodejs_with_cache
       - run: backend/gradlew -p backend testDBMigrate -Dspring.profiles.active=test
@@ -150,10 +150,10 @@ jobs:
           - |
             cypress/integration/v*/**
     steps:
+      - uses: actions/checkout@v3
       - uses: ./.github/mysql_db
         with:
           mysql_db_instance: ${{ env.MYSQL_E2E_DB }}
-      - uses: actions/checkout@v3
       - name: Setup JDK with cache
         uses: ./.github/setup_jdk_with_cache
       - uses: ./.github/setup_nodejs_with_cache
