@@ -80,12 +80,9 @@ jobs:
         run: yarn frontend:build
       - name: Build application jar artifact
         run: backend/gradlew -p backend build -x test -Dspring.profiles.active=prod --build-cache --parallel
-      - name: GCP Auth with Service Account
-        uses: google-github-actions/auth@v0
+      - uses: ./.github/gcloud_auth_n_sdk
         with:
           credentials_json: ${{ env.GCP_CREDENTIALS }}
-      - name: Set up GCP SDK
-        uses: google-github-actions/setup-gcloud@v0
       - name: Upload production application jar to Google Cloud Storage
         uses: google-github-actions/upload-cloud-storage@v0
         with:
@@ -270,6 +267,9 @@ jobs:
       ]
     steps:
       - uses: actions/checkout@v3
+      - uses: ./.github/gcloud_auth_n_sdk
+        with:
+          credentials_json: ${{ env.GCP_CREDENTIALS }}
       - name: Perform rolling replace to GCP MIG doughnut-app-group
         run: infra/scripts/perform-rolling-replace-app-mig.sh
 
