@@ -5,23 +5,18 @@ name: doughnut CI
 
 on: push
 env:
-  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-  DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
   ARTIFACT: "doughnut"
   VERSION: "0.0.1-SNAPSHOT"
   GCS_BUCKET: "dough-01"
   RUNNER_OS: "ubuntu-latest"
-  MYSQL_VERSION: "8.0"
-  MYSQL_CHAR_SET: "utf8mb4"
-  MYSQL_COLLATION: "utf8mb4_unicode_ci"
   MYSQL_UT_DB: "doughnut_test"
   MYSQL_E2E_DB: "doughnut_e2e_test"
   MYSQL_DB_USER: ${{ secrets.DBUSER }}
   MYSQL_DB_PASSWORD: ${{ secrets.DBPASSWORD }}
-  MYSQL_HOST_PORT: "3309"
-  MYSQL_CONTAINER_PORT: "3309"
+  SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+  DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
 
 jobs:
   Backend-linting:
@@ -37,16 +32,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Setup MySQL DB Server
-        uses: mirromutth/mysql-action@v1.1
+        uses: ./.github/mysql_db
         with:
-          mysql version: ${{ env.MYSQL_VERSION }}
-          character set server: ${{ env.MYSQL_CHAR_SET }}
-          collation server: ${{ env.MYSQL_COLLATION }}
-          mysql database: ${{ env.MYSQL_UT_DB }}
-          mysql user: ${{ env.MYSQL_DB_USER }}
-          mysql password: ${{ env.MYSQL_DB_PASSWORD }}
-          host port: ${{ env.MYSQL_HOST_PORT }}
-          container port: ${{ env.MYSQL_CONTAINER_PORT }}
+          mysql_db_instance: ${{ env.MYSQL_UT_DB }}
       - uses: actions/checkout@v3
       - uses: ./.github/setup_jdk_with_cache
       - uses: ./.github/setup_nodejs_with_cache
@@ -162,16 +150,9 @@ jobs:
           - |
             cypress/integration/v*/**
     steps:
-      - uses: mirromutth/mysql-action@v1.1
+      - uses: ./.github/mysql_db
         with:
-          mysql version: ${{ env.MYSQL_VERSION }}
-          character set server: ${{ env.MYSQL_CHAR_SET }}
-          collation server: ${{ env.MYSQL_COLLATION }}
-          mysql database: ${{ env.MYSQL_E2E_DB }}
-          mysql user: ${{ env.MYSQL_DB_USER }}
-          mysql password: ${{ env.MYSQL_DB_PASSWORD }}
-          host port: ${{ env.MYSQL_HOST_PORT }}
-          container port: ${{ env.MYSQL_CONTAINER_PORT }}
+          mysql_db_instance: ${{ env.MYSQL_E2E_DB }}
       - uses: actions/checkout@v3
       - name: Setup JDK with cache
         uses: ./.github/setup_jdk_with_cache

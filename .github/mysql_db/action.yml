@@ -1,0 +1,48 @@
+name: "MySQL DB Container"
+description: "Run MySQL DB container"
+inputs:
+  mysql_version:
+    description: "MySQL Server Version"
+    required: true
+    default: "8.0"
+  mysql_charset:
+    description: "MySQL DB server character set"
+    required: true
+    default: "utf8mb4"
+  mysql_collation:
+    description: "MySQL DB server collation"
+    required: true
+    default: "utf8mb4_unicode_ci"
+  mysql_db_instance:
+    description: "MySQL DB instance name"
+    required: true
+    default: "doughnut_test"
+  mysql_db_user:
+    description: "MySQL DB username"
+    required: true
+    default: ${{ env.MYSQL_DB_USER }}
+  mysql_db_password:
+    description: "MySQL DB password"
+    required: true
+    default: ${{ env.MYSQL_DB_PASSWORD }}
+  mysql_db_host_port:
+    description: "MySQL DB host port"
+    required: true
+    default: "3309"
+  mysql_db_container_port:
+    description: "MySQL DB container port"
+    required: true
+    default: "3309"
+runs:
+  using: "composite"
+  steps:
+    - uses: mirromutth/mysql-action@v1.1
+      with:
+        mysql version: ${{ inputs.mysql_version }}
+        character set server: ${{ inputs.mysql_charset }}
+        collation server: ${{ inputs.mysql_collation }}
+        mysql database: ${{ inputs.mysql_db_instance }}
+        mysql user: ${{ inputs.mysql_db_user }}
+        mysql password: ${{ inputs.mysql_db_password }}
+        host port: ${{ inputs.mysql_db_host_port }}
+        container port: ${{ inputs.mysql_db_container_port }}
