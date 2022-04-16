@@ -61,8 +61,37 @@ jobs:
           java-version: ${{ env.JDK_VERSION }}
           distribution: ${{ env.JDK_DIST }}
           architecture: ${{ env.JDK_ARCH }}
-      - run: backend/gradlew -p backend testDBMigrate -Dspring.profiles.active=test
-      - run: backend/gradlew -p backend test -Dspring.profiles.active=test --parallel
+      - name: Cache yarn directory path
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+      - uses: actions/cache@v3
+        id: yarn-cache
+        with:
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
+      - uses: actions/setup-node@v3
+        with:
+          node-version: ${{ env.NODEJS_VERSION }}
+      - name: Run DBMigrate and full Backend UT
+        run: backend/gradlew -p backend testDBMigrate -Dspring.profiles.active=test
+        run: backend/gradlew -p backend test -Dspring.profiles.active=test --parallel
+      - name: Compile & transform frontend assets for bundling with Backend
+        run: yarn frontend:build
+      - name: Build application jar artifact
+        run: backend/gradlew -p backend build -x test -Dspring.profiles.active=prod --build-cache --parallel
+      - name: GCP Auth with Service Account
+        uses: google-github-actions/auth@v0
+        with:
+          credentials_json: ${{ env.GCP_CREDENTIALS }}
+      - name: Set up GCP SDK
+        uses: google-github-actions/setup-gcloud@v0
+      - name: Upload production application jar to Google Cloud Storage
+        uses: google-github-actions/upload-cloud-storage@v0
+        with:
+          path: backend/build/libs/doughnut-0.0.1-SNAPSHOT.jar
+          destination: dough-01/backend_app_jar
 
   Frontend-linting:
     name: Frontend Lint
@@ -229,8 +258,8 @@ jobs:
           name: cypress-screenshots
           path: cypress/screenshots
 
-  Package-n-Deploy:
-    name: Package & GCP MIG Rolling Update Deploy
+  Deploy:
+    name: GCP MIG Rolling Update Deploy
     runs-on: ubuntu-latest
     needs:
       [
@@ -242,38 +271,6 @@ jobs:
       ]
     steps:
       - uses: actions/checkout@v3
-      - uses: ./.github/setup_jdk_with_cache
-        with:
-          java-version: ${{ env.JDK_VERSION }}
-          distribution: ${{ env.JDK_DIST }}
-          architecture: ${{ env.JDK_ARCH }}
-      - name: Cache yarn directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - uses: actions/cache@v3
-        id: yarn-cache
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - uses: actions/setup-node@v3
-        with:
-          node-version: ${{ env.NODEJS_VERSION }}
-      - run: yarn frontend:build
-      - name: Build application jar artifact
-        run: backend/gradlew -p backend build -x test -Dspring.profiles.active=prod --build-cache --parallel
-      - name: GCP Auth with Service Account
-        uses: google-github-actions/auth@v0
-        with:
-          credentials_json: ${{ env.GCP_CREDENTIALS }}
-      - name: Set up GCP SDK
-        uses: google-github-actions/setup-gcloud@v0
-      - name: Upload production application jar to Google Cloud Storage
-        uses: google-github-actions/upload-cloud-storage@v0
-        with:
-          path: backend/build/libs/doughnut-0.0.1-SNAPSHOT.jar
-          destination: dough-01/backend_app_jar
       - name: Perform rolling replace to GCP MIG doughnut-app-group
         run: infra/scripts/perform-rolling-replace-app-mig.sh
 
@@ -287,7 +284,7 @@ jobs:
         Frontend-linting,
         Frontend-unit-tests,
         E2E-tests,
-        Package-n-Deploy,
+        Deploy,
       ]
     if: always()
     steps:
