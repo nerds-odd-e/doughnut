@@ -36,6 +36,8 @@ jobs:
         uses: ./.github/mysql_db
         with:
           mysql_db_instance: ${{ env.MYSQL_UT_DB }}
+          mysql_db_user: ${{ env.MYSQL_DB_USER }}
+          mysql_db_password: ${{ env.MYSQL_DB_PASSWORD }}
       - uses: ./.github/setup_jdk_with_cache
       - uses: ./.github/setup_nodejs_with_cache
       - run: backend/gradlew -p backend testDBMigrate -Dspring.profiles.active=test
@@ -154,6 +156,8 @@ jobs:
       - uses: ./.github/mysql_db
         with:
           mysql_db_instance: ${{ env.MYSQL_E2E_DB }}
+          mysql_db_user: ${{ env.MYSQL_DB_USER }}
+          mysql_db_password: ${{ env.MYSQL_DB_PASSWORD }}
       - name: Setup JDK with cache
         uses: ./.github/setup_jdk_with_cache
       - uses: ./.github/setup_nodejs_with_cache

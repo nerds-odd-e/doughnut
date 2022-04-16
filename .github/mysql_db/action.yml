@@ -20,11 +20,9 @@ inputs:
   mysql_db_user:
     description: "MySQL DB username"
     required: true
-    default: ${{ env.MYSQL_DB_USER }}
   mysql_db_password:
     description: "MySQL DB password"
     required: true
-    default: ${{ env.MYSQL_DB_PASSWORD }}
   mysql_db_host_port:
     description: "MySQL DB host port"
     required: true
