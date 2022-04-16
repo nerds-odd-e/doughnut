@@ -13,7 +13,6 @@ env:
   VERSION: "0.0.1-SNAPSHOT"
   GCS_BUCKET: "dough-01"
   RUNNER_OS: "ubuntu-latest"
-  NODEJS_VERSION: "17"
   MYSQL_VERSION: "8.0"
   MYSQL_CHAR_SET: "utf8mb4"
   MYSQL_COLLATION: "utf8mb4_unicode_ci"
@@ -50,19 +49,7 @@ jobs:
           container port: ${{ env.MYSQL_CONTAINER_PORT }}
       - uses: actions/checkout@v3
       - uses: ./.github/setup_jdk_with_cache
-      - name: Cache yarn directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - uses: actions/cache@v3
-        id: yarn-cache
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - uses: actions/setup-node@v3
-        with:
-          node-version: ${{ env.NODEJS_VERSION }}
+      - uses: ./.github/setup_nodejs_with_cache
       - run: backend/gradlew -p backend testDBMigrate -Dspring.profiles.active=test
       - run: backend/gradlew -p backend test -Dspring.profiles.active=test --parallel
       - name: Compile & transform frontend assets for bundling with Backend
@@ -83,19 +70,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Cache yarn directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - uses: actions/cache@v3
-        id: yarn-cache
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - uses: actions/setup-node@v3
-        with:
-          node-version: ${{ env.NODEJS_VERSION }}
+      - uses: ./.github/setup_nodejs_with_cache
       - run: yarn frontend:lint
 
   Frontend-unit-tests:
@@ -103,19 +78,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - name: Cache yarn directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - uses: actions/cache@v3
-        id: yarn-cache
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-      - uses: actions/setup-node@v3
-        with:
-          node-version: ${{ env.NODEJS_VERSION }}
+      - uses: ./.github/setup_nodejs_with_cache
       - run: yarn frontend:test
 
   # mobile-unit-test:
@@ -212,16 +175,7 @@ jobs:
       - uses: actions/checkout@v3
       - name: Setup JDK with cache
         uses: ./.github/setup_jdk_with_cache
-      - name: Cache yarn directory path
-        id: yarn-cache-dir-path
-        run: echo "::set-output name=dir::$(yarn cache dir)"
-      - uses: actions/cache@v3
-        id: yarn-cache
-        with:
-          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
+      - uses: ./.github/setup_nodejs_with_cache
       - uses: cypress-io/github-action@v2
         with:
           browser: chrome
