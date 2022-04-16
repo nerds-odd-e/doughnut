@@ -74,9 +74,8 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
-      - name: Run DBMigrate and full Backend UT
-        run: backend/gradlew -p backend testDBMigrate -Dspring.profiles.active=test
-        run: backend/gradlew -p backend test -Dspring.profiles.active=test --parallel
+      - run: backend/gradlew -p backend testDBMigrate -Dspring.profiles.active=test
+      - run: backend/gradlew -p backend test -Dspring.profiles.active=test --parallel
       - name: Compile & transform frontend assets for bundling with Backend
         run: yarn frontend:build
       - name: Build application jar artifact
