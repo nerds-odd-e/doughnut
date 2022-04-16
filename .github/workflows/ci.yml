@@ -139,6 +139,7 @@ jobs:
         spec:
           - |
             cypress/integration/b*/**
+          - |
             cypress/integration/c*/**
           - |
             cypress/integration/t*/**
@@ -149,6 +150,8 @@ jobs:
             cypress/integration/notebooks*/**
           - |
             cypress/integration/r*/**
+          - |
+            cypress/integration/s*/**
           - |
             cypress/integration/v*/**
     steps:
