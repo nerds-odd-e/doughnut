@@ -32,16 +32,13 @@ jobs:
     name: Backend Lint
     runs-on: ubuntu-latest
     steps:
-      - name: Code checkout
-        uses: actions/checkout@v3
-      - name: Setup JDK
-        uses: ./github/setup_jdk_with_cache
+      - uses: actions/checkout@v3
+      - uses: ./.github/setup_jdk_with_cache
         with:
           java-version: ${{ env.JDK_VERSION }}
           distribution: ${{ env.JDK_DIST }}
           architecture: ${{ env.JDK_ARCH }}
-      - name: Backend code linting
-        run: yarn backend:lint
+      - run: yarn backend:lint
 
   Backend-unit-tests:
     name: Backend Unit tests
@@ -58,25 +55,20 @@ jobs:
           mysql password: ${{ env.MYSQL_DB_PASSWORD }}
           host port: ${{ env.MYSQL_HOST_PORT }}
           container port: ${{ env.MYSQL_CONTAINER_PORT }}
-      - name: Code checkout
-        uses: actions/checkout@v3
-      - name: Setup JDK with cache
-        uses: ./github/setup_jdk_with_cache
+      - uses: actions/checkout@v3
+      - uses: ./.github/setup_jdk_with_cache
         with:
           java-version: ${{ env.JDK_VERSION }}
           distribution: ${{ env.JDK_DIST }}
           architecture: ${{ env.JDK_ARCH }}
-      - name: DB Migration unit test
-        run: backend/gradlew -p backend testDBMigrate -Dspring.profiles.active=test
-      - name: Unit tests with Gradle
-        run: backend/gradlew -p backend test -Dspring.profiles.active=test --parallel
+      - run: backend/gradlew -p backend testDBMigrate -Dspring.profiles.active=test
+      - run: backend/gradlew -p backend test -Dspring.profiles.active=test --parallel
 
   Frontend-linting:
     name: Frontend Lint
     runs-on: ubuntu-latest
     steps:
-      - name: Code Checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
       - name: Cache yarn directory path
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn cache dir)"
@@ -87,8 +79,7 @@ jobs:
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
-      - name: eslint
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
       - run: yarn frontend:lint
@@ -97,8 +88,7 @@ jobs:
     name: Frontend Unit tests
     runs-on: ubuntu-latest
     steps:
-      - name: Code Checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
       - name: Cache yarn directory path
         id: yarn-cache-dir-path
         run: echo "::set-output name=dir::$(yarn cache dir)"
@@ -109,8 +99,7 @@ jobs:
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
-      - name: Unit tests with jest & vue-jest
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
       - run: yarn frontend:test
@@ -139,7 +128,7 @@ jobs:
   #       run: xcrun xctrace list devices
   #     - name: Start Simulator
   #       run: xcrun simctl boot "${{ matrix.device }}"
-  #     - uses: actions/checkout@v1
+  #     - uses: actions/checkout@v3
   #     - uses: ./.github/starting_backend_actions
   #       with:
   #         dbuser: ${{ secrets.DBUSER }}
@@ -206,10 +195,9 @@ jobs:
           mysql password: ${{ env.MYSQL_DB_PASSWORD }}
           host port: ${{ env.MYSQL_HOST_PORT }}
           container port: ${{ env.MYSQL_CONTAINER_PORT }}
-      - name: Code checkout
-        uses: actions/checkout@v3
+      - uses: actions/checkout@v3
       - name: Setup JDK with cache
-        uses: ./github/setup_jdk_with_cache
+        uses: ./.github/setup_jdk_with_cache
         with:
           java-version: ${{ env.JDK_VERSION }}
           distribution: ${{ env.JDK_DIST }}
@@ -253,10 +241,8 @@ jobs:
         E2E-tests,
       ]
     steps:
-      - name: Code Checkout
-        uses: actions/checkout@v3
-      - name: Setup JDK with cache
-        uses: ./github/setup_jdk_with_cache
+      - uses: actions/checkout@v3
+      - uses: ./.github/setup_jdk_with_cache
         with:
           java-version: ${{ env.JDK_VERSION }}
           distribution: ${{ env.JDK_DIST }}
@@ -271,8 +257,7 @@ jobs:
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
-      - name: Build frontend
-        uses: actions/setup-node@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: ${{ env.NODEJS_VERSION }}
       - run: yarn frontend:build
