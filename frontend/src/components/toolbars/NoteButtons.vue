@@ -50,9 +50,15 @@
         <button class="dropdown-item" title="Delete note" v-on:click="deleteNote">
           <SvgRemove />Delete note
         </button>
-        <button  v-if="featureToggle" class="dropdown-item" title="Add comment">
-          Add comment
-        </button>
+
+        <PopupButton title="Add comment">
+          <template v-slot:face>
+            Add comment
+          </template>
+          <template #default>
+            <TextInput field="comment" v-focus/>
+          </template>
+        </PopupButton>
       </div>
       <NoteDownloadButton :note="note" v-if="featureToggle" />
     </div>
@@ -75,6 +81,7 @@ import SvgReviewSetting from "../svgs/SvgReviewSetting.vue";
 import ReviewSettingEditDialog from "../review/ReviewSettingEditDialog.vue";
 import SvgEdit from "../svgs/SvgEdit.vue";
 import NoteEditDialog from "../notes/NoteEditDialog.vue";
+import TextInput from "../form/TextInput.vue";
 
 export default ({
   setup() {
@@ -98,7 +105,8 @@ export default ({
     SvgReviewSetting,
     ReviewSettingEditDialog,
     SvgEdit,
-    NoteEditDialog
+    NoteEditDialog,
+    TextInput,
   },
   methods: {
     async deleteNote() {
