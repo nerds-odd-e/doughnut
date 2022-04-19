@@ -18,7 +18,7 @@ Feature: Add, Reply or Delete a comment
   @featureToggle
   Scenario: Comment and reply on note from same circle
     Given There is a circle "Odd-e SG Team" with "old_learner, another_old_learner" members
-    And  Someone seed a notebook "Team agreement" in circle "Odd-e SG Team"
+    And  There is a notebook "Team agreement" in circle "Odd-e SG Team"
     When I comment with "why is this empty?" on note "Team agreement"
     And I've logged in as "another_old_learner"
     Then I should see note "Team agreement" has a comment "why is this empty?" from "old_learner"

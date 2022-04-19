@@ -13,14 +13,14 @@ Feature: Notes in circles
     When I add a note "Keep it complex" under "Team agreement"
 
   Scenario: subscribe to a note and review
-    Given  Someone seed a notebook "Team agreement" in circle "Odd-e SG Team"
+    Given  There is a notebook "Team agreement" in circle "Odd-e SG Team"
     When I subscribe to notebook "Team agreement" in the circle "Odd-e SG Team", with target of learning 1 notes per day
     Then  I should be able to edit the subscription to notebook "Team agreement"
 
   @stopTime
   Scenario: Realtime view when note is created and deleted in circle page
     Given I am on "Odd-e SG Team" circle page
-    When  Someone seed a notebook "Shared info" in circle "Odd-e SG Team"
+    When  There is a notebook "Shared info" in circle "Odd-e SG Team"
     Then I should see "Shared info" in the circle page within 5 seconds
     When someone of my circle deletes the "Shared info" notebook
     Then I should not see "Shared info" in the circle page within 5 seconds

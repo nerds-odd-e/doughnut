@@ -65,7 +65,7 @@ When("I am on {string} circle page", (circleName) => {
   cy.navigateToCircle(circleName)
 })
 
-When("Someone seed a notebook {string} in circle {string}", (title, circleName) => {
+When("There is a notebook {string} in circle {string}", (title, circleName) => {
   cy.seedNotes([{ title }], "", circleName)
 })
 
