@@ -1,19 +1,8 @@
 package com.odde.doughnut.controllers;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.not;
-import static org.hamcrest.Matchers.nullValue;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-import com.odde.doughnut.entities.Comment;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteAccessories;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.json.CommentCreation;
 import com.odde.doughnut.entities.json.NoteCreation;
 import com.odde.doughnut.entities.json.NoteRealm;
 import com.odde.doughnut.entities.json.NotesBulk;
@@ -23,9 +12,6 @@ import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -34,6 +20,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.io.IOException;
+import java.sql.Timestamp;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
@@ -232,57 +226,6 @@ class RestNoteControllerTests {
         makeMe.refresh(parent);
         assertThat(parent.getDescendantsInBreathFirstOrder(), hasSize(1));
       }
-    }
-
-    @Nested
-    class CommentTest {
-
-      private Note existedNote;
-      private List<Comment> actualComments;
-
-      @Test
-      void shouldBeAbleToSaveCommentIntoTheNoteWhenValid() {
-
-        given_note_existed();
-
-        when_add_comment("hello world");
-
-        then_comment_should_exist("hello world");
-      }
-
-      private void then_comment_should_exist(String description) {
-        actualComments = modelFactoryService.commentRepository.findByNoteId(existedNote.getId());
-
-        assertThat(actualComments.get(0).getDescription(), equalTo(description));
-      }
-
-      private void when_add_comment(String description) {
-        controller.createComment(existedNote, comment(description));
-      }
-
-      private void given_note_existed() {
-        existedNote = makeMe.aNote().please();
-      }
-
-      private void then_first_comment_in_DB_will_be(Note note, String description) {
-        assertThat(
-            modelFactoryService
-                .commentRepository
-                .findByNoteId(note.getId())
-                .get(0)
-                .getDescription(),
-            equalTo(description));
-      }
-
-      private CommentCreation comment(String description) {
-        CommentCreation commentCreation = new CommentCreation();
-        commentCreation.setDescription(description);
-        return commentCreation;
-      }
-
-      // todo:
-      //   modify read model
-
     }
   }
 }

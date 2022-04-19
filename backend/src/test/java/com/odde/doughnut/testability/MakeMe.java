@@ -1,35 +1,16 @@
 package com.odde.doughnut.testability;
 
-import com.odde.doughnut.entities.Image;
-import com.odde.doughnut.entities.Link;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.Notebook;
-import com.odde.doughnut.entities.QuizQuestion;
-import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.Subscription;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.testability.builders.AnswerBuilder;
-import com.odde.doughnut.testability.builders.BazaarNotebookBuilder;
-import com.odde.doughnut.testability.builders.CircleBuilder;
-import com.odde.doughnut.testability.builders.CommentBuilder;
-import com.odde.doughnut.testability.builders.FakeBindingResult;
-import com.odde.doughnut.testability.builders.ImageBuilder;
-import com.odde.doughnut.testability.builders.LinkBuilder;
-import com.odde.doughnut.testability.builders.NoteBuilder;
-import com.odde.doughnut.testability.builders.QuizQuestionBuilder;
-import com.odde.doughnut.testability.builders.ReviewPointBuilder;
-import com.odde.doughnut.testability.builders.ReviewSettingBuilder;
-import com.odde.doughnut.testability.builders.SubscriptionBuilder;
-import com.odde.doughnut.testability.builders.TimestampBuilder;
-import com.odde.doughnut.testability.builders.UploadedPictureBuilder;
-import com.odde.doughnut.testability.builders.UserBuilder;
-import java.nio.CharBuffer;
+import com.odde.doughnut.testability.builders.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.BindingResult;
+
+import java.nio.CharBuffer;
 
 @Component
 public class MakeMe {
@@ -141,9 +122,5 @@ public class MakeMe {
   public QuizQuestionViewedByUser buildAQuestion(
       QuizQuestion.QuestionType questionType, ReviewPoint reviewPoint) {
     return aQuestion().buildValid(questionType, reviewPoint).ViewedByUserPlease();
-  }
-
-  public CommentBuilder aComment() {
-    return new CommentBuilder(this);
   }
 }

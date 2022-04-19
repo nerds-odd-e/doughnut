@@ -163,11 +163,6 @@ public class Note {
   @Getter
   private final List<Note> children = new ArrayList<>();
 
-  @Transient // TODO remove @Transient after DB integration
-  @Getter
-  @Setter
-  private Optional<List<Comment>> comments = Optional.of(new ArrayList<>());
-
   public static Note createNote(User user, Timestamp currentUTCTimestamp, TextContent textContent) {
     final Note note = new Note();
     note.getTextContent().updateTextContent(textContent, currentUTCTimestamp);

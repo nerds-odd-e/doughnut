@@ -1,42 +1,23 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
-import com.odde.doughnut.entities.Comment;
-import com.odde.doughnut.entities.Link;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.NoteAccessories;
-import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.ReviewSetting;
-import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.json.CommentCreation;
-import com.odde.doughnut.entities.json.NoteCreation;
-import com.odde.doughnut.entities.json.NoteRealm;
-import com.odde.doughnut.entities.json.NotesBulk;
-import com.odde.doughnut.entities.json.RedirectToNoteResponse;
-import com.odde.doughnut.entities.json.SearchTerm;
+import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.json.*;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.SearchTermModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
-import java.io.IOException;
-import java.sql.Timestamp;
-import java.time.Instant;
-import java.util.List;
-import javax.annotation.Resource;
-import javax.validation.Valid;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import javax.annotation.Resource;
+import javax.validation.Valid;
+import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/notes")
@@ -90,11 +71,6 @@ class RestNoteController {
   public NotesBulk show(@PathVariable("note") Note note) throws NoAccessRightException {
     final UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertReadAuthorization(note);
-    Comment comment = new Comment();
-    comment.setDescription("hello world");
-    comment.setAuthor(user.getEntity());
-    comment.setCreatedAt(Timestamp.from(Instant.now()));
-    note.getComments().get().add(comment);
 
     return NotesBulk.jsonNoteWithChildren(note, user);
   }
@@ -177,16 +153,5 @@ class RestNoteController {
     note.mergeMasterReviewSetting(reviewSetting);
     modelFactoryService.noteRepository.save(note);
     return new RedirectToNoteResponse(note.getId());
-  }
-
-  @PostMapping(value = "/{note}/comments/create")
-  public String createComment(
-      @PathVariable("note") Note note, @ModelAttribute CommentCreation commentCreation) {
-    var userModel = currentUserFetcher.getUser();
-
-    this.modelFactoryService.commentRepository.save(
-        Comment.from(note.getId(), commentCreation, userModel));
-
-    return "{}";
   }
 }
