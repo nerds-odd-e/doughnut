@@ -75,7 +75,7 @@ in mkShell {
         export MYSQL_PID_FILE=$MYSQL_HOME/mysql.pid
         export MYSQL_TCP_PORT=3309
         export MYSQLX_TCP_PORT=33090
-        export NODE_OPTIONS="--max-old-space-size=4096"
+        #export NODE_OPTIONS="--max-old-space-size=4096" # For MS Windows WSL2 env ONLY
 
         export PATH=$PATH:$JAVA_HOME/bin:$NODE_HOME/bin:$MYSQL_BASEDIR/bin
 
