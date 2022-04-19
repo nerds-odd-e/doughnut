@@ -9,15 +9,14 @@ import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.SearchTermModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
+import java.io.IOException;
+import java.util.List;
+import javax.annotation.Resource;
+import javax.validation.Valid;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
-
-import javax.annotation.Resource;
-import javax.validation.Valid;
-import java.io.IOException;
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/notes")
