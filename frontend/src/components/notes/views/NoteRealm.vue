@@ -15,10 +15,6 @@
         <NoteCardsView v-if="!viewType || viewType==='cards'"
           v-bind="{noteId, expandChildren}"
         />
-        <div class="comments" v-if="featureToggle">
-          <div v-for="(comment, index) in comments" :key="index">{{index + 1}}-{{comment.description}}</div>
-          <input id="reply-input" data-testid="reply-input" name="reply-input" placeholder="Reply..." type="text" @blur="onBlurTextField"/>
-        </div>
       </div>
     </div>
 </template>
@@ -44,10 +40,8 @@ export default defineComponent({
   data() {
     return {
       selectedNoteId: undefined,
-      comments: []
     } as {
       selectedNoteId: Doughnut.ID | undefined,
-      comments: Comment[]
     }
   },
   components: { NoteControl, NoteMindmapView, NoteCardsView, NoteArticleView },
@@ -55,9 +49,6 @@ export default defineComponent({
     highlight(id: Doughnut.ID) {
       this.selectedNoteId = id
     },
-    onBlurTextField(event: Event) {
-      this.comments.push({description: event.target.value})
-    }
   },
   computed: {
     selectedNotePosition(): Generated.NotePositionViewedByUser | undefined {
@@ -67,7 +58,6 @@ export default defineComponent({
     selectedNote() {
       return this.piniaStore.getNoteRealmById(this.noteId)?.note
     },
-    featureToggle() { return this.piniaStore.featureToggle },
   },
   mounted() {
     this.highlight(this.noteId)

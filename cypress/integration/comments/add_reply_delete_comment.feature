@@ -6,6 +6,7 @@ Feature: Add, Reply or Delete a comment
   Background:
     Given I've logged in as an existing user
 
+  @ignore
   @featureToggle
   Scenario: Add a comment on a note
     And there are some notes for the current user

@@ -9,7 +9,7 @@ import makeMe from "../fixtures/makeMe";
 helper.resetWithApiMock(beforeEach, afterEach)
 
 describe('delete comment', () => {
-  it('should be call once', async () => {
+  xit('should be call once', async () => {
     const noteRealm = makeMe.aNoteRealm
     .withCommentOfId(237)
     .withCommentOfId(567).please();
