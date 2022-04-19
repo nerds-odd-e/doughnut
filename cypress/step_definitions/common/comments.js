@@ -3,10 +3,10 @@
 
 import { Given, Then, When } from "cypress-cucumber-preprocessor/steps";
 
-When("I add a comment {string}", (description) => {
-  cy.get("#comment-input").click()
-  cy.replaceFocusedText(description)
-  cy.get("#comment-input").blur()
+When("I comment with {string} on note {string}", (comment, noteTitle) => {
+  cy.jumpToNotePage(noteTitle)
+  cy.clickNotePageMoreOptionsButton(noteTitle, "Add comment")
+  cy.replaceFocusedText(comment)
 });
 
 Then("I should see comment posted time", () => {
