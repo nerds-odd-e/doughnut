@@ -50,6 +50,9 @@
         <button class="dropdown-item" title="Delete note" v-on:click="deleteNote">
           <SvgRemove />Delete note
         </button>
+        <button  v-if="featureToggle" class="dropdown-item" title="Add comment">
+          Add comment
+        </button>
       </div>
       <NoteDownloadButton :note="note" v-if="featureToggle" />
     </div>

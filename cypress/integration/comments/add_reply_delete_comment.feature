@@ -5,13 +5,13 @@ Feature: Add, Reply or Delete a comment
   Background:
     Given I've logged in as "old_learner"
 
-  @ignore
+    @ignore
   @featureToggle
   Scenario: Comment on my own note
     And there are some notes for the current user
       | title        |
       | Less is More |
-    When I comment with "please share more" on note "LeSS is More"
+    When I comment with "please share more" on note "Less is More"
     Then I should see note "LeSS is More" has a comment "please share more" from "old_learner"
 
   @ignore
