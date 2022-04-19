@@ -3,7 +3,10 @@
 
 name: doughnut CI
 
-on: push
+on:
+  push:
+    branches:
+      - main
 env:
   ARTIFACT: "doughnut"
   VERSION: "0.0.1-SNAPSHOT"
