@@ -195,7 +195,7 @@ jobs:
         with:
           credentials_json: ${{ env.GCP_CREDENTIALS }}
       - name: Upload production application jar to Google Cloud Storage
-      - uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v3
         with:
           name: ${{ env.ARTIFACT }}-${{ env.VERSION }}.jar
       - name: Display structure of downloaded files
