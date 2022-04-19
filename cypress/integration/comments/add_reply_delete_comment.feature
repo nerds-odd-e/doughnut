@@ -7,7 +7,7 @@ Feature: Add, Reply or Delete a comment
     Given I've logged in as an existing user
 
   @featureToggle
-  Scenario: Add a comment on a note:w
+  Scenario: Add a comment on a note
     And there are some notes for the current user
       | title        |
       | Less is More |
@@ -20,7 +20,7 @@ Feature: Add, Reply or Delete a comment
 
   @ignore
   @featureToggle
-  Scenario: I reply a comment
+  Scenario: reply a comment
     And there is a note and some comments of current user
       | comment |
       | hello   |
@@ -35,7 +35,7 @@ Feature: Add, Reply or Delete a comment
 
   @ignore
   @featureToggle
-  Scenario: I delete comment
+  Scenario: delete comment
     And there is a note and some comments of current user
       | content     |
       | hello world |
