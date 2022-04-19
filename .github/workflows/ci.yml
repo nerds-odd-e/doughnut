@@ -194,7 +194,8 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/gcloud_auth_n_sdk
-        with: credentials_json: ${{ env.GCP_CREDENTIALS }}
+        with:
+          credentials_json: ${{ env.GCP_CREDENTIALS }}
       - name: Upload production application jar to Google Cloud Storage
       - uses: actions/download-artifact@v3
         with:
