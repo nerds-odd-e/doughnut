@@ -66,27 +66,6 @@ class NoteRealmBuilder extends Builder<Generated.NoteRealm> {
     return this.data
   }
 
-  withCommentOfId(commentId: number) {
-    if (!this.data.note.comments) {
-      this.data.note.comments = []
-    }
-    this.data.note.comments?.push({
-      id: commentId,
-      author: {
-        id: 0,
-        name: "old_learner",
-        externalIdentifier: "",
-        ownership: {
-          id: 0,
-        },
-        dailyNewNotesCount: 0,
-        spaceIntervals: "",
-      },
-      description: "hello world",
-      createdAt: "yyyy-MM-dd",
-    });
-    return this;
-  }
 }
 
 export default NoteRealmBuilder;

@@ -228,22 +228,6 @@ const storedApiCollection = (managedApi: ManagedApi, piniaStore: ReturnType<type
       return await managedApi.restGet(`circles/${circleId}`) as Generated.CircleForUserView
     },
 
-    async createComment(noteId: Doughnut.ID, data: Generated.CommentCreation) {
-
-      await managedApi.restPostMultiplePartForm(
-        `notes/${noteId}/comments/create`,
-        data,
-      )
-      return this.getNoteAndItsChildren(noteId)
-    },
-
-    async deleteComment(noteId: Doughnut.ID, commentId: number) {
-      await managedApi.restPost(
-        `notes/${noteId}/comments/delete/${commentId}`,
-        {},
-      )
-      piniaStore.deleteComment(noteId, commentId)
-    },
   }
 }
 

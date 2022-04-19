@@ -37,15 +37,6 @@ class NoteCache {
     this.deleteNote(noteId)
   }
 
-  deleteComment(noteRealmId: Doughnut.ID, commentId: number) {
-    const noteRealm = this.getNoteRealmById(noteRealmId);
-    if (noteRealm) {
-      const newComment = noteRealm.note.comments?.filter(x => x.id !== commentId)
-      noteRealm.note.comments = newComment
-      this.state.noteRealms[noteRealmId] = noteRealm
-    }
-  }
-
   getNoteRealmById(id: Doughnut.ID | undefined) {
     if (id === undefined) return undefined
     return this.state.noteRealms[id]
