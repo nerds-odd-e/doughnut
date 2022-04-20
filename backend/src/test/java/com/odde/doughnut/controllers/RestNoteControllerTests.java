@@ -234,13 +234,6 @@ class RestNoteControllerTests {
   class CreateComment {
 
     @Test
-    void thereShouldBeNoCommentBeforeCreate() {
-      Note note = makeMe.aNote().please();
-      List<Comment> comments = makeMe.modelFactoryService.commentRepository.findAllByNote(note);
-      assertThat(comments, hasSize(0));
-    }
-
-    @Test
     void shouldCreateComment() throws NoAccessRightException {
       Note note = makeMe.aNote().byUser(userModel).please();
       controller.createComment(note);
