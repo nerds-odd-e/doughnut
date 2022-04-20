@@ -1,5 +1,6 @@
 <template>
   <TextInput field="comment" v-focus/>
+  <button>Submit</button>
 </template>
 
 <script lang="ts">
