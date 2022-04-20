@@ -36,11 +36,12 @@ class RestNoteController {
     this.testabilitySettings = testabilitySettings;
   }
 
-  public String createComment(Note note) {
+  public String createComment(Note note) throws NoAccessRightException {
+    final UserModel userModel = currentUserFetcher.getUser();
+    userModel.getAuthorization().assertAuthorization(note);
+
     Comment comment = new Comment();
     comment.setNote(note);
-
-    final UserModel userModel = currentUserFetcher.getUser();
     comment.setUser(userModel.getEntity());
     modelFactoryService.commentRepository.save(comment);
     return "{}";

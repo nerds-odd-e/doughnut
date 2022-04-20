@@ -241,11 +241,18 @@ class RestNoteControllerTests {
     }
 
     @Test
-    void shouldCreateComment() {
-      Note note = makeMe.aNote().please();
+    void shouldCreateComment() throws NoAccessRightException {
+      Note note = makeMe.aNote().byUser(userModel).please();
       controller.createComment(note);
       List<Comment> comments = makeMe.modelFactoryService.commentRepository.findAllByNote(note);
       assertThat(comments, hasSize(1));
+    }
+
+    @Test
+    void shouldNotBeAbleToAddCommentToNoteTheUserCannotSee() {
+      User anotherUser = makeMe.aUser().please();
+      Note note = makeMe.aNote().byUser(anotherUser).please();
+      assertThrows(NoAccessRightException.class, () -> controller.createComment(note));
     }
 
   }
