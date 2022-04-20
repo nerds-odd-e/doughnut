@@ -20,8 +20,9 @@ export default defineComponent({
   },
   emits: ["done"],
   methods: {
-    createComment() {
-      this.api.createComment(this.noteId);
+    async createComment() {
+      await this.api.createComment(this.noteId);
+      this.$router.push({name: "noteShow", params: {noteId: this.noteId}});
     }
   }
 });

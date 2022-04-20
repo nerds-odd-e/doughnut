@@ -56,7 +56,7 @@
             Add comment
           </template>
           <template #dialog_body>
-            <CommentCreateDialog/>
+            <CommentCreateDialog :noteId="note.id"/>
           </template>
         </PopupButton>
       </div>

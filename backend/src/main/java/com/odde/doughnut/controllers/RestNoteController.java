@@ -36,6 +36,8 @@ class RestNoteController {
     this.testabilitySettings = testabilitySettings;
   }
 
+  @PostMapping(value = "/{note}/createComment")
+  @Transactional
   public String createComment(Note note) throws NoAccessRightException {
     final UserModel userModel = currentUserFetcher.getUser();
     userModel.getAuthorization().assertAuthorization(note);
