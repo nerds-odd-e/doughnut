@@ -3,7 +3,7 @@
         <PopupButton
           :title="link.linkTypeLabel"
         >
-          <template v-slot:face>
+          <template v-slot:button_face>
             <SvgLinkTypeIcon
               :linkTypeId="link.typeId"
               :inverseIcon="inverseIcon"

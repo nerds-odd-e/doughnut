@@ -4,7 +4,7 @@
       v-if="!notebook.skipReviewEntirely"
       title="Add to my learning"
     >
-      <template v-slot:face>
+      <template v-slot:button_face>
         <SvgAdd/>
       </template>
       <template #default="{doneHandler}">

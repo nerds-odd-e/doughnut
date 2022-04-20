@@ -8,7 +8,7 @@
     />
     <div class="btn-group btn-group-sm">
       <PopupButton title="link note">
-        <template #face>
+        <template #button_face>
           <SvgSearch />
         </template>
         <template #default="{doneHandler}">

@@ -2,7 +2,7 @@
   <div class="btn-group btn-group-sm">
     <slot name="additional-buttons" />
     <PopupButton title="Edit notebook settings">
-      <template v-slot:face>
+      <template v-slot:button_face>
         <SvgEditNotebook/>
       </template>
       <template #default="{doneHandler}">

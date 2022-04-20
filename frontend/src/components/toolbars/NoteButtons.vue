@@ -16,7 +16,7 @@
       </NoteNewButton>
 
       <PopupButton title="edit note">
-        <template v-slot:face>
+        <template v-slot:button_face>
           <SvgEdit/>
         </template>
         <template #default="{doneHandler}">
@@ -36,7 +36,7 @@
       </a>
       <div class="dropdown-menu dropdown-menu-right">
         <PopupButton title="Edit review settings">
-          <template v-slot:face>
+          <template v-slot:button_face>
             <SvgReviewSetting />Edit review settings
           </template>
           <template #default="{ doneHandler }">
@@ -52,7 +52,7 @@
         </button>
 
         <PopupButton title="Add comment">
-          <template v-slot:face>
+          <template v-slot:button_face>
             Add comment
           </template>
           <template #default>
