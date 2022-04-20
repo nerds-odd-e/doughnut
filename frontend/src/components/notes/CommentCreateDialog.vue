@@ -18,7 +18,7 @@ export default defineComponent({
   emits: ["done"],
   methods: {
     createComment() {
-      this.managedApi.restPost("/api/notes/123/createComment", {});
+      this.api.createComment();
     }
   }
 });

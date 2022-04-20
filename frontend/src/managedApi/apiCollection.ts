@@ -83,6 +83,10 @@ const apiCollection = (managedApi: ManagedApi) => ({
       `${noteId ? `notes/${noteId}` : `links/${linkId}`}/statistics`
     );
   },
+
+  createComment() {
+    return managedApi.restPost("/api/notes/123/createComment", {});
+  }
 });
 
 export default apiCollection;
