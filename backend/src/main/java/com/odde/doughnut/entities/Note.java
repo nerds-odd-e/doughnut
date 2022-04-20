@@ -330,5 +330,4 @@ public class Note {
     }
     return noteAccessories.getNotePicture();
   }
-
 }

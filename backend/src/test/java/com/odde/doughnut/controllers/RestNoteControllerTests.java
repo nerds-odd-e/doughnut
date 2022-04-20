@@ -254,6 +254,5 @@ class RestNoteControllerTests {
       Note note = makeMe.aNote().byUser(anotherUser).please();
       assertThrows(NoAccessRightException.class, () -> controller.createComment(note));
     }
-
   }
 }

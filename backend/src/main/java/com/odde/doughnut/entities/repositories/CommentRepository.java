@@ -6,10 +6,8 @@ import java.util.List;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
-
 public interface CommentRepository extends CrudRepository<Comment, Integer> {
 
-  @Query(
-    value = "SELECT * from comment where note_id=:note", nativeQuery = true)
+  @Query(value = "SELECT * from comment where note_id=:note", nativeQuery = true)
   List<Comment> findAllByNote(Note note);
 }
