@@ -4,7 +4,7 @@
       <template v-slot:button_face>
         <SvgEdit />
       </template>
-      <template #default="{ doneHandler }">
+      <template #dialog_body="{ doneHandler }">
         <SubscriptionEditDialog :subscription="subscription" @done="doneHandler($event)" />
       </template>
     </PopupButton>

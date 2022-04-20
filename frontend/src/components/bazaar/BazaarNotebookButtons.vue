@@ -7,7 +7,7 @@
       <template v-slot:button_face>
         <SvgAdd/>
       </template>
-      <template #default="{doneHandler}">
+      <template #dialog_body="{doneHandler}">
         <SubscribeDialog v-bind="{notebook, user}" @done="doneHandler($event)"/>
       </template>
     </PopupButton>

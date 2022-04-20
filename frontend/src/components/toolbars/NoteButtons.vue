@@ -19,7 +19,7 @@
         <template v-slot:button_face>
           <SvgEdit/>
         </template>
-        <template #default="{doneHandler}">
+        <template #dialog_body="{doneHandler}">
           <NoteEditDialog :noteId="note.id" @done="doneHandler($event)"/>
         </template>
       </PopupButton>
@@ -39,7 +39,7 @@
           <template v-slot:button_face>
             <SvgReviewSetting />Edit review settings
           </template>
-          <template #default="{ doneHandler }">
+          <template #dialog_body="{ doneHandler }">
             <ReviewSettingEditDialog
               :noteId="note.id"
               :title="note.title"
@@ -55,7 +55,7 @@
           <template v-slot:button_face>
             Add comment
           </template>
-          <template #default>
+          <template #dialog_body>
             <TextInput field="comment" v-focus/>
           </template>
         </PopupButton>

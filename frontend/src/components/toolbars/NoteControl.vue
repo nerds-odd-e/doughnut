@@ -11,7 +11,7 @@
         <template #button_face>
           <SvgSearch />
         </template>
-        <template #default="{doneHandler}">
+        <template #dialog_body="{doneHandler}">
           <LinkNoteDialog :note="selectedNote" @done="doneHandler($event)" />
         </template>
       </PopupButton>

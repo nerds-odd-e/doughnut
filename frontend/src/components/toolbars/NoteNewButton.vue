@@ -3,7 +3,7 @@
     <template v-slot:button_face>
       <slot />
     </template>
-    <template #default="{doneHandler}">
+    <template #dialog_body="{doneHandler}">
       <NoteNewDialog v-bind="{parentId}" @done="doneHandler($event)"/>
     </template>
   </PopupButton>
