@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.odde.doughnut.entities.Comment;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteAccessories;
 import com.odde.doughnut.entities.User;
@@ -19,6 +20,7 @@ import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.sql.Timestamp;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -230,11 +232,21 @@ class RestNoteControllerTests {
 
   @Nested
   class CreateComment {
+
     @Test
-    void shouldCreateComment() {
+    void thereShouldBeNoCommentBeforeCreate() {
       Note note = makeMe.aNote().please();
-      controller.createComment(note);
-      assertThat(note.getComments(), hasSize(1));
+      List<Comment> comments = makeMe.modelFactoryService.commentRepository.findAllByNote(note);
+      assertThat(comments, hasSize(0));
     }
+
+//    @Test
+//    void shouldCreateComment() {
+//      Note note = makeMe.aNote().please();
+//      controller.createComment(note);
+//      List<Comment> comments = makeMe.commentRepository.findAllByNote(note);
+//      assertThat(comments, hasSize(1));
+//    }
+
   }
 }

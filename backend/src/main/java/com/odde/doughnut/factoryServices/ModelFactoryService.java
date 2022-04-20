@@ -12,6 +12,7 @@ import com.odde.doughnut.entities.json.SearchTerm;
 import com.odde.doughnut.entities.repositories.AnswerRepository;
 import com.odde.doughnut.entities.repositories.BazaarNotebookRepository;
 import com.odde.doughnut.entities.repositories.CircleRepository;
+import com.odde.doughnut.entities.repositories.CommentRepository;
 import com.odde.doughnut.entities.repositories.FailureReportRepository;
 import com.odde.doughnut.entities.repositories.LinkRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
@@ -54,6 +55,7 @@ public class ModelFactoryService {
   @Autowired public NotebookRepository notebookRepository;
   @Autowired public EntityManager entityManager;
   @Autowired public FailureReportRepository failureReportRepository;
+  @Autowired public CommentRepository commentRepository;
 
   public NoteModel toNoteModel(Note note) {
     return new NoteModel(note, this);

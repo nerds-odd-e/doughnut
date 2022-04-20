@@ -331,5 +331,4 @@ public class Note {
     return noteAccessories.getNotePicture();
   }
 
-  @Transient @Getter public List<String> comments = new ArrayList();
 }

@@ -36,11 +36,6 @@ class RestNoteController {
     this.testabilitySettings = testabilitySettings;
   }
 
-  public String createComment(Note note) {
-    note.getComments().add("aaa");
-    return "{}";
-  }
-
   static class NoteStatistics {
     @Getter @Setter private ReviewPoint reviewPoint;
     @Getter @Setter private NoteRealm note;
