@@ -7,6 +7,7 @@ When("I comment with {string} on note {string}", (comment, noteTitle) => {
   cy.jumpToNotePage(noteTitle)
   cy.clickNotePageMoreOptionsButton(noteTitle, "Add comment")
   cy.replaceFocusedText(comment)
+  cy.findByText('Submit').click()
 });
 
 Then("I should see comment posted time", () => {
