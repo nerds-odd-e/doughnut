@@ -227,4 +227,14 @@ class RestNoteControllerTests {
       }
     }
   }
+
+  @Nested
+  class CreateComment {
+    @Test
+    void shouldCreateComment() {
+      Note note = makeMe.aNote().please();
+      controller.createComment(note);
+      assertThat(note.getComments(), hasSize(1));
+    }
+  }
 }
