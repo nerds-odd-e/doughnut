@@ -56,7 +56,7 @@
             Add comment
           </template>
           <template #dialog_body>
-            <TextInput field="comment" v-focus/>
+            <CommentCreateDialog/>
           </template>
         </PopupButton>
       </div>
@@ -81,7 +81,7 @@ import SvgReviewSetting from "../svgs/SvgReviewSetting.vue";
 import ReviewSettingEditDialog from "../review/ReviewSettingEditDialog.vue";
 import SvgEdit from "../svgs/SvgEdit.vue";
 import NoteEditDialog from "../notes/NoteEditDialog.vue";
-import TextInput from "../form/TextInput.vue";
+import CommentCreateDialog from "../notes/CommentCreateDialog.vue";
 
 export default ({
   setup() {
@@ -106,7 +106,7 @@ export default ({
     ReviewSettingEditDialog,
     SvgEdit,
     NoteEditDialog,
-    TextInput,
+    CommentCreateDialog,
   },
   methods: {
     async deleteNote() {
