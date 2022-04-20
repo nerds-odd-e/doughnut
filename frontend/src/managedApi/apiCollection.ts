@@ -84,8 +84,8 @@ const apiCollection = (managedApi: ManagedApi) => ({
     );
   },
 
-  createComment() {
-    return managedApi.restPost("/api/notes/123/createComment", {});
+  createComment(noteId: Doughnut.ID) {
+    return managedApi.restPost(`/api/notes/${noteId}/createComment`, {});
   }
 });
 

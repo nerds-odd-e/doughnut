@@ -12,13 +12,16 @@ export default defineComponent({
   setup() {
     return useLoadingApi();
   },
+  props: {
+    noteId: {type: Number, required: true},
+  },
   components: {
     TextInput,
   },
   emits: ["done"],
   methods: {
     createComment() {
-      this.api.createComment();
+      this.api.createComment(this.noteId);
     }
   }
 });

@@ -5,7 +5,7 @@ Feature: Add, Reply or Delete a comment
   Background:
     Given I've logged in as "old_learner"
 
-    @ignore
+  @ignore
   @featureToggle
   Scenario: Comment on my own note
     And there are some notes for the current user
