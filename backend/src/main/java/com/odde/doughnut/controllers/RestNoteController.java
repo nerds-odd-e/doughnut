@@ -36,6 +36,16 @@ class RestNoteController {
     this.testabilitySettings = testabilitySettings;
   }
 
+  public String createComment(Note note) {
+    Comment comment = new Comment();
+    comment.setNote(note);
+
+    final UserModel userModel = currentUserFetcher.getUser();
+    comment.setUser(userModel.getEntity());
+    modelFactoryService.commentRepository.save(comment);
+    return "{}";
+  }
+
   static class NoteStatistics {
     @Getter @Setter private ReviewPoint reviewPoint;
     @Getter @Setter private NoteRealm note;

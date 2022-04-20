@@ -240,13 +240,13 @@ class RestNoteControllerTests {
       assertThat(comments, hasSize(0));
     }
 
-//    @Test
-//    void shouldCreateComment() {
-//      Note note = makeMe.aNote().please();
-//      controller.createComment(note);
-//      List<Comment> comments = makeMe.commentRepository.findAllByNote(note);
-//      assertThat(comments, hasSize(1));
-//    }
+    @Test
+    void shouldCreateComment() {
+      Note note = makeMe.aNote().please();
+      controller.createComment(note);
+      List<Comment> comments = makeMe.modelFactoryService.commentRepository.findAllByNote(note);
+      assertThat(comments, hasSize(1));
+    }
 
   }
 }
