@@ -53,7 +53,6 @@ public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory, Ques
 
   @Override
   public Note generateAnswerNote(QuizQuestionServant servant) {
-
     categoryLink = servant.chooseOneCategoryLink(reviewPoint.getUser(), link);
     return categoryLink
         .map(lk -> lk.getReverseLinksOfCousins(reviewPoint.getUser(), link.getLinkType()))

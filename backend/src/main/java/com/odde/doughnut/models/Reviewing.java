@@ -104,11 +104,10 @@ public class Reviewing {
   public ReviewPointModel getOneReviewPointNeedToRepeat(Randomizer randomizer) {
     List<ReviewPoint> reviewPointsNeedToRepeat =
         userModel.getReviewPointsNeedToRepeat(currentUTCTimestamp);
-    if (reviewPointsNeedToRepeat.size() == 0) {
-      return null;
-    }
-    ReviewPoint reviewPoint = randomizer.chooseOneRandomly(reviewPointsNeedToRepeat);
-    return modelFactoryService.toReviewPointModel(reviewPoint);
+    return randomizer
+        .chooseOneRandomly1(reviewPointsNeedToRepeat)
+        .map(modelFactoryService::toReviewPointModel)
+        .orElse(null);
   }
 
   private Stream<SubscriptionModel> getSubscriptionModelStream() {
@@ -118,9 +117,9 @@ public class Reviewing {
 
   public RepetitionForUser getOneRepetitionForUser(Randomizer randomizer) {
     ReviewPointModel reviewPointModel = getOneReviewPointNeedToRepeat(randomizer);
-    RepetitionForUser repetitionForUser = new RepetitionForUser();
     if (reviewPointModel == null) return null;
 
+    RepetitionForUser repetitionForUser = new RepetitionForUser();
     QuizQuestion quizQuestion = reviewPointModel.generateAQuizQuestion(randomizer);
     repetitionForUser.setQuizQuestion(
         QuizQuestionViewedByUser.from(quizQuestion, this.modelFactoryService.noteRepository));

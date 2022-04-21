@@ -109,7 +109,13 @@ class FromDifferentPartAsQuizFactoryTest {
         assertThat(ugly.getTitle(), not(in(strings)));
       }
 
-      @Nested
+      void WhenTheReviewingSourceNoteIsAlsoTaggedByADifferentPart() {
+        makeMe.aLink().between(ugly, objective, Link.LinkType.TAGGED_BY).please();
+        makeMe.refresh(userModel.getEntity());
+        assertThat(buildQuestion(), nullValue());
+      }
+
+        @Nested
       class WhenThereIsReviewPointOfTheCategory {
         ReviewPoint additionalReviewPoint;
 
