@@ -1,4 +1,6 @@
 /// <reference types="cypress" />
+// @ts-check
+
 const {rmdirSync} = require("fs")
 
 Cypress.Commands.add("cleanDBAndSeedData", () => {

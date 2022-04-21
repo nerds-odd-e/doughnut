@@ -1,9 +1,9 @@
 /// <reference types="cypress" />
 /// <reference types="@testing-library/cypress" />
-/// <reference types="../../support" />
+/// <reference types="../support" />
 // @ts-check
 
-import { And, Before, Given, Then, When } from "cypress-cucumber-preprocessor/steps"
+import { And, Before, Given, Then, When } from "@badeball/cypress-cucumber-preprocessor"
 
 When("I create a new circle {string} and copy the invitation code", (circleName) => {
   cy.visit("/circles")

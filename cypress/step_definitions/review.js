@@ -1,4 +1,8 @@
-import { Given, And, Then, When, Before } from "cypress-cucumber-preprocessor/steps"
+/// <reference types="cypress" />
+/// <reference types="../support" />
+// @ts-check
+
+import { Given, Then } from "@badeball/cypress-cucumber-preprocessor"
 
 Then("I do these initial reviews in sequence:", (data) => {
   cy.initialReviewInSequence(data.hashes())

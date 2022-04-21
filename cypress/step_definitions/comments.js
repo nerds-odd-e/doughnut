@@ -1,7 +1,8 @@
 /// <reference types="cypress" />
+/// <reference types="../support" />
 // @ts-check
 
-import { Given, Then, When } from "cypress-cucumber-preprocessor/steps";
+import { Given, Then, When } from "@badeball/cypress-cucumber-preprocessor";
 
 When("I comment with {string} on note {string}", (comment, noteTitle) => {
   cy.jumpToNotePage(noteTitle)

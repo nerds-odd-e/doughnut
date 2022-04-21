@@ -1,5 +1,5 @@
 /// <reference types="cypress" />
-
+// @ts-check
 declare namespace Cypress {
   interface userSetting {
     daily_new_notes_count?: number

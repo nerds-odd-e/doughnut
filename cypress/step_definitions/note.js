@@ -1,8 +1,8 @@
 /// <reference types="cypress" />
+/// <reference types="../support" />
 // @ts-check
 
-import { And, Before, Given, Then, When } from "cypress-cucumber-preprocessor/steps"
-const path = require("path")
+import { And, Given, Then, When } from "@badeball/cypress-cucumber-preprocessor"
 
 Given("I visit note {string}", (noteTitle) => {
   cy.jumpToNotePage(noteTitle);
@@ -101,7 +101,7 @@ When("I create a sibling note of {string}:", (noteTitle, data) => {
   cy.submitNoteCreationFormsWith(data.hashes())
 })
 
-When("I should see that the note creation is not successful", (noteTitle, data) => {
+When("I should see that the note creation is not successful", () => {
   cy.findByText("size must be between 1 and 100")
 })
 
@@ -168,7 +168,7 @@ Then("*for demo* I should see there are {int} descendants", (numberOfDescendants
 })
 
 When("I should be asked to log in again when I click the link {string}", (noteTitle) => {
-  cy.on("uncaught:exception", (err, runnable) => {
+  cy.on("uncaught:exception", () => {
     return false
   })
   cy.findByText(noteTitle).click()
@@ -249,7 +249,7 @@ When("I should see the zoom scale is {string}", (scale) => {
   cy.get(".mindmap-info").findByText(scale)
 })
 
-When("I click the zoom indicator", (scale) => {
+When("I click the zoom indicator", () => {
   cy.get(".mindmap-info").click()
 })
 

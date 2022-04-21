@@ -1,4 +1,9 @@
-import { Given, And, Then, When, Before, Background } from "cypress-cucumber-preprocessor/steps"
+/// <reference types="cypress" />
+/// <reference types="@testing-library/cypress" />
+/// <reference types="../support" />
+// @ts-check
+
+import { And, Then, When } from "@badeball/cypress-cucumber-preprocessor"
 
 When("I start searching", () => {
   cy.startSearching()

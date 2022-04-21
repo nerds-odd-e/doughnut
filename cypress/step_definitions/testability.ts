@@ -1,9 +1,9 @@
 /// <reference types="cypress" />
 /// <reference types="@testing-library/cypress" />
-/// <reference types="../../support" />
+/// <reference types="../support" />
 // @ts-check
 
-import { And, Before, Given, Then, When } from "cypress-cucumber-preprocessor/steps"
+import { Given, Then, When } from "@badeball/cypress-cucumber-preprocessor"
 
 When("Someone triggered an exception", (url) => {
   cy.triggerException()

@@ -1,9 +1,9 @@
 /// <reference types="cypress" />
 /// <reference types="@testing-library/cypress" />
-/// <reference types="../../support" />
+/// <reference types="../support" />
 // @ts-check
 
-import { And, Before, Given, Then, When } from "cypress-cucumber-preprocessor/steps"
+import { Given } from "@badeball/cypress-cucumber-preprocessor"
 
 Given("I let the server to time travel to {int} hours ago", (hours) => {
   cy.timeTravelRelativeToNow(-hours)

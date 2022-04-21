@@ -2,7 +2,7 @@
   "env": {
     "TAGS": "not @ignore and not @slow"
   },
-  "pluginsFile": "cypress/plugins/index.js",
+  "pluginsFile": "cypress/plugins/index.ts",
   "testFiles": "**/*.feature",
   "chromeWebSecurity": false,
   "ignoreTestFiles": [

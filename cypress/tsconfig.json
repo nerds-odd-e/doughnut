@@ -1,15 +1,18 @@
 {
   "compilerOptions": {
     "sourceMap": true,
-    "target": "esnext",
-    "module": "esnext",
+    "target": "es6",
+    "module": "CommonJS",
     "strict": true,
     "allowJs": true,
-    "lib": ["esnext", "dom"],
-    "types": ["cypress", "@testing-library/cypress", "./support", "node"],
+    "lib": ["es6", "dom"],
     "esModuleInterop": true,
-    "typeRoots": ["node_modules/@types"],
+    "typeRoots": ["types", "node_modules/@types"],
+    "types": ["cypress", "node", "@testing-library/cypress", "./support"],
     "skipLibCheck": true
   },
-  "include": ["**/*.ts"]
+  "include": [
+    "**/*.ts",
+    "**/*.js"
+  ]
 }
