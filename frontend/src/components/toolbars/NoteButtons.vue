@@ -56,7 +56,7 @@
             Add comment
           </template>
           <template #dialog_body>
-            <CommentCreateDialog :noteId="note.id"/>
+            <CommentCreateDialog :noteId="note.id" v-if="featureToggle" />
           </template>
         </PopupButton>
       </div>
