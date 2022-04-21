@@ -17,10 +17,12 @@ public class WhichSpecHasInstanceQuizFactory
   private List<Note> cachedFillingOptions = null;
   private final ReviewPoint reviewPoint;
   private final Link link;
+  private QuizQuestionServant servant;
 
   public WhichSpecHasInstanceQuizFactory(ReviewPoint reviewPoint, QuizQuestionServant servant) {
     this.reviewPoint = reviewPoint;
     this.link = reviewPoint.getLink();
+    this.servant = servant;
   }
 
   @Override
@@ -39,7 +41,7 @@ public class WhichSpecHasInstanceQuizFactory
   }
 
   @Override
-  public Note generateAnswerNote(QuizQuestionServant servant) {
+  public Note generateAnswerNote() {
     cachedInstanceLink = getInstanceLink(servant);
     if (cachedInstanceLink == null) return null;
     return cachedInstanceLink.getSourceNote();

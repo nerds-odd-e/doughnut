@@ -15,12 +15,14 @@ import java.util.stream.Collectors;
 public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory, QuestionOptionsFactory {
   protected final ReviewPoint reviewPoint;
   protected final Link link;
+  private QuizQuestionServant servant;
   private List<Note> cachedFillingOptions = null;
   private Optional<Link> categoryLink;
 
   public FromDifferentPartAsQuizFactory(ReviewPoint reviewPoint, QuizQuestionServant servant) {
     this.reviewPoint = reviewPoint;
     this.link = reviewPoint.getLink();
+    this.servant = servant;
   }
 
   @Override
@@ -54,7 +56,7 @@ public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory, Ques
   }
 
   @Override
-  public Note generateAnswerNote(QuizQuestionServant servant) {
+  public Note generateAnswerNote() {
     User user = reviewPoint.getUser();
     categoryLink = servant.chooseOneCategoryLink(user, link);
     return categoryLink

@@ -8,6 +8,7 @@ import java.util.List;
 
 public class LinkSourceExclusiveQuizFactory implements QuizQuestionFactory, QuestionOptionsFactory {
   private final Link link;
+  private QuizQuestionServant servant;
   private final ReviewPoint reviewPoint;
   private List<Note> cachedFillingOptions = null;
   private Note answerNote = null;
@@ -15,6 +16,7 @@ public class LinkSourceExclusiveQuizFactory implements QuizQuestionFactory, Ques
   public LinkSourceExclusiveQuizFactory(ReviewPoint reviewPoint, QuizQuestionServant servant) {
     this.reviewPoint = reviewPoint;
     this.link = reviewPoint.getLink();
+    this.servant = servant;
   }
 
   @Override
@@ -28,7 +30,7 @@ public class LinkSourceExclusiveQuizFactory implements QuizQuestionFactory, Ques
   }
 
   @Override
-  public Note generateAnswerNote(QuizQuestionServant servant) {
+  public Note generateAnswerNote() {
     if (answerNote == null) {
       Note note = link.getSourceNote();
       List<Note> siblings = new ArrayList<>(note.getSiblings());

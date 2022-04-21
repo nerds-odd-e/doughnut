@@ -18,7 +18,7 @@ public class PictureSelectionQuizFactory implements QuizQuestionFactory, Questio
   }
 
   @Override
-  public Note generateAnswerNote(QuizQuestionServant servant) {
+  public Note generateAnswerNote() {
     return answerNote;
   }
 

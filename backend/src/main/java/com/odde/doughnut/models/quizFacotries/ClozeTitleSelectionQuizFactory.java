@@ -12,7 +12,7 @@ public class ClozeTitleSelectionQuizFactory extends ClozeDescriptonQuizFactory
   }
 
   @Override
-  public Note generateAnswerNote(QuizQuestionServant servant) {
+  public Note generateAnswerNote() {
     return answerNote;
   }
 

@@ -15,11 +15,13 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory, QuestionO
   private List<Note> cachedFillingOptions = null;
   protected final ReviewPoint reviewPoint;
   protected final Link link;
+  private QuizQuestionServant servant;
   private Optional<Link> categoryLink = null;
 
   public FromSamePartAsQuizFactory(ReviewPoint reviewPoint, QuizQuestionServant servant) {
     this.reviewPoint = reviewPoint;
     this.link = reviewPoint.getLink();
+    this.servant = servant;
   }
 
   @Override
@@ -40,7 +42,7 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory, QuestionO
   }
 
   @Override
-  public Note generateAnswerNote(QuizQuestionServant servant) {
+  public Note generateAnswerNote() {
     if (getAnswerLink(servant) == null) return null;
     return getAnswerLink(servant).getSourceNote();
   }
