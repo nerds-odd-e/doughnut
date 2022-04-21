@@ -4,7 +4,7 @@ import com.odde.doughnut.entities.ReviewPoint;
 
 public class ClozeLinkTargetQuizFactory extends LinkTargetQuizFactory {
 
-  public ClozeLinkTargetQuizFactory(ReviewPoint reviewPoint) {
-    super(reviewPoint);
+  public ClozeLinkTargetQuizFactory(ReviewPoint reviewPoint, QuizQuestionServant servant) {
+    super(reviewPoint, servant);
   }
 }

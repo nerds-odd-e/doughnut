@@ -25,7 +25,7 @@ public class QuizQuestionDirector {
     this.reviewPoint = reviewPoint;
     this.modelFactoryService = modelFactoryService;
     this.servant = new QuizQuestionServant(randomizer, modelFactoryService);
-    this.quizQuestionFactory = questionType.factory.apply(reviewPoint);
+    this.quizQuestionFactory = questionType.factory.apply(reviewPoint, servant);
   }
 
   public QuizQuestion buildQuizQuestion() {

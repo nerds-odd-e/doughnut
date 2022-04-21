@@ -7,7 +7,7 @@ import java.util.List;
 public class PictureSelectionQuizFactory implements QuizQuestionFactory, QuestionOptionsFactory {
   private final Note answerNote;
 
-  public PictureSelectionQuizFactory(ReviewPoint reviewPoint) {
+  public PictureSelectionQuizFactory(ReviewPoint reviewPoint, QuizQuestionServant servant) {
     this.answerNote = reviewPoint.getNote();
   }
 

@@ -18,7 +18,7 @@ public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory, Ques
   private List<Note> cachedFillingOptions = null;
   private Optional<Link> categoryLink;
 
-  public FromDifferentPartAsQuizFactory(ReviewPoint reviewPoint) {
+  public FromDifferentPartAsQuizFactory(ReviewPoint reviewPoint, QuizQuestionServant servant) {
     this.reviewPoint = reviewPoint;
     this.link = reviewPoint.getLink();
   }

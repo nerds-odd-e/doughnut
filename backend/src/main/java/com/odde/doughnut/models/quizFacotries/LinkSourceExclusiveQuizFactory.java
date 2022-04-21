@@ -12,7 +12,7 @@ public class LinkSourceExclusiveQuizFactory implements QuizQuestionFactory, Ques
   private List<Note> cachedFillingOptions = null;
   private Note answerNote = null;
 
-  public LinkSourceExclusiveQuizFactory(ReviewPoint reviewPoint) {
+  public LinkSourceExclusiveQuizFactory(ReviewPoint reviewPoint, QuizQuestionServant servant) {
     this.reviewPoint = reviewPoint;
     this.link = reviewPoint.getLink();
   }

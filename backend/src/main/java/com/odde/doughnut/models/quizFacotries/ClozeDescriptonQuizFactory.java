@@ -8,7 +8,7 @@ public abstract class ClozeDescriptonQuizFactory implements QuizQuestionFactory 
   protected final ReviewPoint reviewPoint;
   protected final Note answerNote;
 
-  public ClozeDescriptonQuizFactory(ReviewPoint reviewPoint) {
+  public ClozeDescriptonQuizFactory(ReviewPoint reviewPoint, QuizQuestionServant servant) {
     this.reviewPoint = reviewPoint;
     this.answerNote = this.reviewPoint.getNote();
   }

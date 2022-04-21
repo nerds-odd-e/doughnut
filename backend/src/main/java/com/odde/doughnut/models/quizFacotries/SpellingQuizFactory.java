@@ -6,8 +6,8 @@ import com.odde.doughnut.entities.ReviewSetting;
 import org.apache.logging.log4j.util.Strings;
 
 public class SpellingQuizFactory extends ClozeDescriptonQuizFactory {
-  public SpellingQuizFactory(ReviewPoint reviewPoint) {
-    super(reviewPoint);
+  public SpellingQuizFactory(ReviewPoint reviewPoint, QuizQuestionServant servant) {
+    super(reviewPoint, servant);
   }
 
   @Override

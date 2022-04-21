@@ -8,8 +8,8 @@ import org.apache.logging.log4j.util.Strings;
 
 public class DescriptionLinkTargetQuizFactory extends LinkTargetQuizFactory {
 
-  public DescriptionLinkTargetQuizFactory(ReviewPoint reviewPoint) {
-    super(reviewPoint);
+  public DescriptionLinkTargetQuizFactory(ReviewPoint reviewPoint, QuizQuestionServant servant) {
+    super(reviewPoint, servant);
   }
 
   private String getSourceDescription() {

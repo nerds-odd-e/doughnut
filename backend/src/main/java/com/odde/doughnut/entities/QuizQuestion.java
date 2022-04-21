@@ -27,6 +27,7 @@ import com.odde.doughnut.models.quizFacotries.PictureTitleSelectionQuizFactory;
 import com.odde.doughnut.models.quizFacotries.PictureTitleSelectionQuizPresenter;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionFactory;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionPresenter;
+import com.odde.doughnut.models.quizFacotries.QuizQuestionServant;
 import com.odde.doughnut.models.quizFacotries.SpellingQuizFactory;
 import com.odde.doughnut.models.quizFacotries.SpellingQuizPresenter;
 import com.odde.doughnut.models.quizFacotries.WhichSpecHasInstanceQuizFactory;
@@ -36,6 +37,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
@@ -76,12 +78,12 @@ public class QuizQuestion {
     JUST_REVIEW(13, JustReviewQuizFactory::new, JustReviewQuizPresenter::new);
 
     public final Integer id;
-    public final Function<ReviewPoint, QuizQuestionFactory> factory;
+    public final BiFunction<ReviewPoint, QuizQuestionServant, QuizQuestionFactory> factory;
     public final Function<QuizQuestion, QuizQuestionPresenter> presenter;
 
     QuestionType(
         Integer id,
-        Function<ReviewPoint, QuizQuestionFactory> factory,
+        BiFunction<ReviewPoint, QuizQuestionServant, QuizQuestionFactory> factory,
         Function<QuizQuestion, QuizQuestionPresenter> presenter) {
       this.id = id;
       this.factory = factory;

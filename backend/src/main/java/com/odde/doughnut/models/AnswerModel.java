@@ -80,11 +80,11 @@ public class AnswerModel {
 
   private boolean isCorrect() {
     if (cachedResult != null) return cachedResult;
-    List<Note> wrongAnswers = questionType.factory.apply(reviewPoint).allWrongAnswers();
+    List<Note> wrongAnswers = questionType.factory.apply(reviewPoint, null).allWrongAnswers();
     if (wrongAnswers != null) {
       return wrongAnswers.stream().noneMatch(this::matchAnswer);
     }
-    List<Note> rightAnswers = questionType.factory.apply(reviewPoint).knownRightAnswers();
+    List<Note> rightAnswers = questionType.factory.apply(reviewPoint, null).knownRightAnswers();
     cachedResult = rightAnswers.stream().anyMatch(this::matchAnswer);
     return cachedResult;
   }

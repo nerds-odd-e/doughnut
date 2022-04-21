@@ -17,7 +17,7 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory, QuestionO
   protected final Link link;
   private Optional<Link> categoryLink = null;
 
-  public FromSamePartAsQuizFactory(ReviewPoint reviewPoint) {
+  public FromSamePartAsQuizFactory(ReviewPoint reviewPoint, QuizQuestionServant servant) {
     this.reviewPoint = reviewPoint;
     this.link = reviewPoint.getLink();
   }

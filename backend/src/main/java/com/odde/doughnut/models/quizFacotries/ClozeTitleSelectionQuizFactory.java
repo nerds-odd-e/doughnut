@@ -7,8 +7,8 @@ import org.apache.logging.log4j.util.Strings;
 
 public class ClozeTitleSelectionQuizFactory extends ClozeDescriptonQuizFactory
     implements QuestionOptionsFactory {
-  public ClozeTitleSelectionQuizFactory(ReviewPoint reviewPoint) {
-    super(reviewPoint);
+  public ClozeTitleSelectionQuizFactory(ReviewPoint reviewPoint, QuizQuestionServant servant) {
+    super(reviewPoint, servant);
   }
 
   @Override

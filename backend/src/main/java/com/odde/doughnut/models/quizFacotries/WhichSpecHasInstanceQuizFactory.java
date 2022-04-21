@@ -18,7 +18,7 @@ public class WhichSpecHasInstanceQuizFactory
   private final ReviewPoint reviewPoint;
   private final Link link;
 
-  public WhichSpecHasInstanceQuizFactory(ReviewPoint reviewPoint) {
+  public WhichSpecHasInstanceQuizFactory(ReviewPoint reviewPoint, QuizQuestionServant servant) {
     this.reviewPoint = reviewPoint;
     this.link = reviewPoint.getLink();
   }
