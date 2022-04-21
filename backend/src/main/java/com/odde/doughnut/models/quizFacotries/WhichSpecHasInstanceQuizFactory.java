@@ -79,7 +79,7 @@ public class WhichSpecHasInstanceQuizFactory
       cachedInstanceLink =
           servant
               .randomizer
-              .chooseOneRandomly1(
+              .chooseOneRandomly(
                   candidates.stream()
                       .filter(
                           l -> {
@@ -96,7 +96,7 @@ public class WhichSpecHasInstanceQuizFactory
       QuizQuestionServant servant, List<Link> candidates, Link.LinkType specialize) {
     servant
         .randomizer
-        .chooseOneRandomly1(
+        .chooseOneRandomly(
             new NoteViewer(reviewPoint.getUser(), link.getSourceNote())
                 .linksOfTypeThroughDirect(List.of(specialize)))
         .map(candidates::add);

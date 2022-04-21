@@ -3,6 +3,7 @@ package com.odde.doughnut.models.randomizers;
 import com.odde.doughnut.models.Randomizer;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import lombok.Setter;
 
 public class NonRandomizer implements Randomizer {
@@ -17,13 +18,13 @@ public class NonRandomizer implements Randomizer {
   }
 
   @Override
-  public <T> T chooseOneRandomly(List<T> list) {
+  public <T> Optional<T> chooseOneRandomly(List<T> list) {
     if (list.isEmpty()) {
-      return null;
+      return Optional.empty();
     }
     if (alwaysChoose.equals("last")) {
-      return list.get(list.size() - 1);
+      return Optional.of(list.get(list.size() - 1));
     }
-    return list.get(0);
+    return Optional.of(list.get(0));
   }
 }

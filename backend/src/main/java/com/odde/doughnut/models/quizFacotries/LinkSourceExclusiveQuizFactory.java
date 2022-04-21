@@ -35,7 +35,7 @@ public class LinkSourceExclusiveQuizFactory implements QuizQuestionFactory, Ques
       siblings.removeAll(link.getCousinOfSameLinkType(reviewPoint.getUser()));
       siblings.remove(link.getTargetNote());
       siblings.remove(link.getSourceNote());
-      answerNote = servant.randomizer.chooseOneRandomly1(siblings).orElse(null);
+      answerNote = servant.randomizer.chooseOneRandomly(siblings).orElse(null);
     }
     return answerNote;
   }

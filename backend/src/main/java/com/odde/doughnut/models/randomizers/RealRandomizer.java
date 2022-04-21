@@ -3,6 +3,7 @@ package com.odde.doughnut.models.randomizers;
 import com.odde.doughnut.models.Randomizer;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 public class RealRandomizer implements Randomizer {
@@ -13,11 +14,11 @@ public class RealRandomizer implements Randomizer {
   }
 
   @Override
-  public <T> T chooseOneRandomly(List<T> list) {
+  public <T> Optional<T> chooseOneRandomly(List<T> list) {
     if (list.isEmpty()) {
-      return null;
+      return Optional.empty();
     }
     Random rand = new Random();
-    return list.get(rand.nextInt(list.size()));
+    return Optional.of(list.get(rand.nextInt(list.size())));
   }
 }

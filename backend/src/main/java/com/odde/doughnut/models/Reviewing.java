@@ -106,7 +106,7 @@ public class Reviewing {
     List<ReviewPoint> reviewPointsNeedToRepeat =
         userModel.getReviewPointsNeedToRepeat(currentUTCTimestamp);
     return randomizer
-        .chooseOneRandomly1(reviewPointsNeedToRepeat)
+        .chooseOneRandomly(reviewPointsNeedToRepeat)
         .map(modelFactoryService::toReviewPointModel);
   }
 

@@ -13,6 +13,6 @@ class RealRandomizerTest {
   @Test
   void shouldReturnNullWhenListIsEmpty() {
     Randomizer randomizer = new RealRandomizer();
-    assertThat(randomizer.chooseOneRandomly1(new ArrayList<String>()), is(Optional.empty()));
+    assertThat(randomizer.chooseOneRandomly(new ArrayList<String>()), is(Optional.empty()));
   }
 }
