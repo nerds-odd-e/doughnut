@@ -6,12 +6,13 @@ import static org.hamcrest.Matchers.nullValue;
 
 import com.odde.doughnut.models.Randomizer;
 import java.util.ArrayList;
+import java.util.Optional;
 import org.junit.jupiter.api.Test;
 
 class RealRandomizerTest {
   @Test
   void shouldReturnNullWhenListIsEmpty() {
     Randomizer randomizer = new RealRandomizer();
-    assertThat(randomizer.chooseOneRandomly(new ArrayList<String>()), is(nullValue()));
+    assertThat(randomizer.chooseOneRandomly1(new ArrayList<String>()), is(Optional.empty()));
   }
 }

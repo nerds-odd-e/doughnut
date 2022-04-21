@@ -77,24 +77,29 @@ public class WhichSpecHasInstanceQuizFactory
       populateCandidate(servant, candidates, Link.LinkType.USES);
       populateCandidate(servant, candidates, Link.LinkType.RELATED_TO);
       cachedInstanceLink =
-          servant.randomizer.chooseOneRandomly(
-              candidates.stream()
-                  .filter(
-                      l -> {
-                        if (l == null) return false;
-                        return !link.equals(l);
-                      })
-                  .collect(Collectors.toList()));
+          servant
+              .randomizer
+              .chooseOneRandomly1(
+                  candidates.stream()
+                      .filter(
+                          l -> {
+                            if (l == null) return false;
+                            return !link.equals(l);
+                          })
+                      .collect(Collectors.toList()))
+              .orElse(null);
     }
     return cachedInstanceLink;
   }
 
   private void populateCandidate(
       QuizQuestionServant servant, List<Link> candidates, Link.LinkType specialize) {
-    candidates.add(
-        servant.randomizer.chooseOneRandomly(
+    servant
+        .randomizer
+        .chooseOneRandomly1(
             new NoteViewer(reviewPoint.getUser(), link.getSourceNote())
-                .linksOfTypeThroughDirect(List.of(specialize))));
+                .linksOfTypeThroughDirect(List.of(specialize)))
+        .map(candidates::add);
   }
 
   @Override

@@ -84,7 +84,7 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory, QuestionO
           link.getCousinLinksOfSameLinkType(reviewPoint.getUser()).stream()
               .filter(l -> userModel.getReviewPointFor(l) != null)
               .toList();
-      cachedAnswerLink = servant.randomizer.chooseOneRandomly(backwardPeers);
+      cachedAnswerLink = servant.randomizer.chooseOneRandomly1(backwardPeers).orElse(null);
     }
     return cachedAnswerLink;
   }
