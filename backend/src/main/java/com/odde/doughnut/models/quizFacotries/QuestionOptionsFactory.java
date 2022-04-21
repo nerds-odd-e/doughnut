@@ -6,14 +6,14 @@ import java.util.List;
 public interface QuestionOptionsFactory {
   Note generateAnswerNote();
 
-  List<Note> generateFillingOptions(QuizQuestionServant servant);
+  List<Note> generateFillingOptions();
 
   int minimumOptionCount();
 
-  default List<Note> generateOptions(QuizQuestionServant servant) {
+  default List<Note> generateOptions() {
     Note answerNote = generateAnswerNote();
     if (answerNote == null) return null;
-    List<Note> fillingOptions = generateFillingOptions(servant);
+    List<Note> fillingOptions = generateFillingOptions();
     if (minimumOptionCount() > fillingOptions.size() + 1) {
       return null;
     }

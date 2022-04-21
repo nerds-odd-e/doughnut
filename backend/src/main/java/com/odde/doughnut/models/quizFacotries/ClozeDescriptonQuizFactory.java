@@ -6,10 +6,12 @@ import java.util.List;
 
 public abstract class ClozeDescriptonQuizFactory implements QuizQuestionFactory {
   protected final ReviewPoint reviewPoint;
+  protected QuizQuestionServant servant;
   protected final Note answerNote;
 
   public ClozeDescriptonQuizFactory(ReviewPoint reviewPoint, QuizQuestionServant servant) {
     this.reviewPoint = reviewPoint;
+    this.servant = servant;
     this.answerNote = this.reviewPoint.getNote();
   }
 

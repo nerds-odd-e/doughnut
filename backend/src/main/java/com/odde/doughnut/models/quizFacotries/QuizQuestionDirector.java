@@ -11,7 +11,6 @@ public class QuizQuestionDirector {
   private final QuizQuestion.QuestionType questionType;
   private final Randomizer randomizer;
   private final ReviewPoint reviewPoint;
-  private final QuizQuestionServant servant;
   private final ModelFactoryService modelFactoryService;
   private final QuizQuestionFactory quizQuestionFactory;
 
@@ -24,7 +23,7 @@ public class QuizQuestionDirector {
     this.randomizer = randomizer;
     this.reviewPoint = reviewPoint;
     this.modelFactoryService = modelFactoryService;
-    this.servant = new QuizQuestionServant(randomizer, modelFactoryService);
+    QuizQuestionServant servant = new QuizQuestionServant(randomizer, modelFactoryService);
     this.quizQuestionFactory = questionType.factory.apply(reviewPoint, servant);
   }
 
@@ -50,7 +49,7 @@ public class QuizQuestionDirector {
 
   private List<Note> getOptions() {
     if (quizQuestionFactory instanceof QuestionOptionsFactory optionsFactory) {
-      return optionsFactory.generateOptions(servant);
+      return optionsFactory.generateOptions();
     }
     return List.of();
   }

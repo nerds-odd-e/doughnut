@@ -26,7 +26,7 @@ public class WhichSpecHasInstanceQuizFactory
   }
 
   @Override
-  public List<Note> generateFillingOptions(QuizQuestionServant servant) {
+  public List<Note> generateFillingOptions() {
     if (cachedFillingOptions != null) {
       return cachedFillingOptions;
     }

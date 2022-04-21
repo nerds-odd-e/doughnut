@@ -17,7 +17,7 @@ public class ClozeTitleSelectionQuizFactory extends ClozeDescriptonQuizFactory
   }
 
   @Override
-  public List<Note> generateFillingOptions(QuizQuestionServant servant) {
+  public List<Note> generateFillingOptions() {
     return servant.chooseFromCohort(answerNote, n -> !n.equals(answerNote));
   }
 

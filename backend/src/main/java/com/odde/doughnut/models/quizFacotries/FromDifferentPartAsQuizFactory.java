@@ -39,7 +39,7 @@ public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory, Ques
   }
 
   @Override
-  public List<Note> generateFillingOptions(QuizQuestionServant servant) {
+  public List<Note> generateFillingOptions() {
     if (cachedFillingOptions == null) {
       List<Link> cousinLinks = link.getCousinLinksOfSameLinkType(reviewPoint.getUser());
       cachedFillingOptions =

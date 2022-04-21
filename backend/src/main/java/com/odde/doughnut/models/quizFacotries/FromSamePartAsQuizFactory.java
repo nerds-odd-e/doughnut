@@ -25,7 +25,7 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory, QuestionO
   }
 
   @Override
-  public List<Note> generateFillingOptions(QuizQuestionServant servant) {
+  public List<Note> generateFillingOptions() {
     if (cachedFillingOptions == null) {
       categoryLink = servant.chooseOneCategoryLink(reviewPoint.getUser(), link);
       cachedFillingOptions =

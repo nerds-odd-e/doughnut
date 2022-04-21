@@ -20,7 +20,7 @@ public class LinkSourceExclusiveQuizFactory implements QuizQuestionFactory, Ques
   }
 
   @Override
-  public List<Note> generateFillingOptions(QuizQuestionServant servant) {
+  public List<Note> generateFillingOptions() {
     if (cachedFillingOptions == null) {
       Note sourceNote = link.getSourceNote();
       List<Note> backwardPeers = link.getCousinsOfSameLinkType(reviewPoint.getUser());
