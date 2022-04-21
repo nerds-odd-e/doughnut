@@ -21,7 +21,7 @@ public class LinkSourceQuizFactory implements QuizQuestionFactory, QuestionOptio
   @Override
   public List<Note> generateFillingOptions(QuizQuestionServant servant) {
     if (cachedFillingOptions == null) {
-      List<Note> cousinOfSameLinkType = link.getCousinOfSameLinkType(user);
+      List<Note> cousinOfSameLinkType = link.getCousinsOfSameLinkType(user);
       cachedFillingOptions =
           servant.chooseFromCohort(
               answerNote,

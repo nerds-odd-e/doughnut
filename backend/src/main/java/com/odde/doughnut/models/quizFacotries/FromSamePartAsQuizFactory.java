@@ -69,7 +69,7 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory, QuestionO
 
   @Override
   public List<Note> knownRightAnswers() {
-    return reviewPoint.getLink().getCousinOfSameLinkType(reviewPoint.getUser());
+    return reviewPoint.getLink().getCousinsOfSameLinkType(reviewPoint.getUser());
   }
 
   @Override

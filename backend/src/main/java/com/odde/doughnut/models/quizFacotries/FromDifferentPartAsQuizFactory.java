@@ -3,6 +3,8 @@ package com.odde.doughnut.models.quizFacotries;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.User;
+import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.UserModel;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -14,7 +16,7 @@ public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory, Ques
   protected final ReviewPoint reviewPoint;
   protected final Link link;
   private List<Note> cachedFillingOptions = null;
-  private Optional<Link> categoryLink = null;
+  private Optional<Link> categoryLink;
 
   public FromDifferentPartAsQuizFactory(ReviewPoint reviewPoint) {
     this.reviewPoint = reviewPoint;
@@ -29,7 +31,7 @@ public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory, Ques
   @Override
   public List<Note> allWrongAnswers() {
     List<Note> result =
-        new ArrayList<>(reviewPoint.getLink().getCousinOfSameLinkType(reviewPoint.getUser()));
+        new ArrayList<>(reviewPoint.getLink().getCousinsOfSameLinkType(reviewPoint.getUser()));
     result.add(link.getSourceNote());
     return result;
   }
@@ -53,12 +55,20 @@ public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory, Ques
 
   @Override
   public Note generateAnswerNote(QuizQuestionServant servant) {
-    categoryLink = servant.chooseOneCategoryLink(reviewPoint.getUser(), link);
+    User user = reviewPoint.getUser();
+    categoryLink = servant.chooseOneCategoryLink(user, link);
     return categoryLink
-        .map(lk -> lk.getReverseLinksOfCousins(reviewPoint.getUser(), link.getLinkType()))
+        .filter(cl -> noUncles(user, cl))
+        .map(lk -> lk.getReverseLinksOfCousins(user, link.getLinkType()))
         .flatMap(servant.randomizer::chooseOneRandomly)
         .map(Link::getSourceNote)
         .orElse(null);
+  }
+
+  private boolean noUncles(User user, Link categoryLink) {
+    NoteViewer noteViewer = new NoteViewer(user, link.getSourceNote());
+    List<Note> categoryCousins = categoryLink.getCousinsOfSameLinkType(user);
+    return noteViewer.linkTargetOfType(link.getLinkType()).noneMatch(categoryCousins::contains);
   }
 
   @Override

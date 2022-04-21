@@ -279,10 +279,8 @@ public class Link {
   }
 
   @JsonIgnore
-  public List<Note> getCousinOfSameLinkType(User viewer) {
-    return getCousinLinksOfSameLinkType(viewer).stream()
-        .map(Link::getSourceNote)
-        .collect(Collectors.toUnmodifiableList());
+  public List<Note> getCousinsOfSameLinkType(User viewer) {
+    return getCousinLinksOfSameLinkType(viewer).stream().map(Link::getSourceNote).toList();
   }
 
   @JsonIgnore
@@ -295,9 +293,7 @@ public class Link {
 
   @JsonIgnore
   public List<Note> getPiblingOfTheSameLinkType(User viewer) {
-    return getPiblingLinksOfSameLinkType(viewer).stream()
-        .map(Link::getTargetNote)
-        .collect(Collectors.toUnmodifiableList());
+    return getPiblingLinksOfSameLinkType(viewer).stream().map(Link::getTargetNote).toList();
   }
 
   @JsonIgnore
