@@ -271,10 +271,6 @@ public class Link {
     return getLinkType().label;
   }
 
-  public String getLinkNameOfSource() {
-    return getLinkType().nameOfSource;
-  }
-
   public void setLinkType(LinkType linkType) {
     if (linkType == null) {
       typeId = null;

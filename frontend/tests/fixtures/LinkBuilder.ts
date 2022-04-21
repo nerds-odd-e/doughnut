@@ -61,7 +61,6 @@ class LinkBuilder extends Builder<LinksMap> {
       sourceNote: this.fromNote.note,
       typeId: 15,
       linkTypeLabel: "using",
-      linkNameOfSource: "user",
       createdAt: '',
     }
   }

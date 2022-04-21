@@ -203,7 +203,6 @@ declare namespace Generated {
         typeId: number;
         createdAt: string;
         linkTypeLabel: string;
-        linkNameOfSource: string;
     }
 
     interface TextContent {
