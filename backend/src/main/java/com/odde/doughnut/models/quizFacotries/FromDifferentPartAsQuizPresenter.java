@@ -18,7 +18,7 @@ public class FromDifferentPartAsQuizPresenter implements QuizQuestionPresenter {
         + link.getLinkTypeLabel()
         + "</mark> a <em>DIFFERENT</em> "
         + categoryLink.getLinkType().nameOfSource
-        + " <mark>"
+        + " of <mark>"
         + categoryLink.getTargetNote().getTitle()
         + "</mark> than:";
   }

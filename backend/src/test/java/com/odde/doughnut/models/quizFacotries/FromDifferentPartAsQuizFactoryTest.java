@@ -100,7 +100,7 @@ class FromDifferentPartAsQuizFactoryTest {
         assertThat(
             quizQuestion.getDescription(),
             containsString(
-                "<p>Which one <mark>is tagged by</mark> a <em>DIFFERENT</em> part <mark>perspective</mark> than:"));
+                "<p>Which one <mark>is tagged by</mark> a <em>DIFFERENT</em> part of <mark>perspective</mark> than:"));
         assertThat(quizQuestion.getMainTopic(), containsString(ugly.getTitle()));
         List<String> strings = toOptionStrings(quizQuestion);
         assertThat(pretty.getTitle(), in(strings));
