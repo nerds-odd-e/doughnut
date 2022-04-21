@@ -115,7 +115,7 @@ class FromDifferentPartAsQuizFactoryTest {
         assertThat(buildQuestion(), nullValue());
       }
 
-        @Nested
+      @Nested
       class WhenThereIsReviewPointOfTheCategory {
         ReviewPoint additionalReviewPoint;
 

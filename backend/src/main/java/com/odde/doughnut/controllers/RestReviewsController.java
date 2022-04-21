@@ -17,7 +17,6 @@ import com.odde.doughnut.models.ReviewPointModel;
 import com.odde.doughnut.models.Reviewing;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
-import java.util.Optional;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -97,11 +96,13 @@ class RestReviewsController {
     UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertLoggedIn();
     Reviewing reviewing = user.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
-    RepetitionForUser oneRepetitionForUser =
-        reviewing.getOneRepetitionForUser(testabilitySettings.getRandomizer());
-    if (oneRepetitionForUser == null)
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "no more repetition for today");
-    return oneRepetitionForUser;
+    return reviewing
+        .getOneRepetitionForUser(testabilitySettings.getRandomizer())
+        .orElseThrow(
+            () -> {
+              throw new ResponseStatusException(
+                  HttpStatus.NOT_FOUND, "no more repetition for today");
+            });
   }
 
   @PostMapping("/answer")
@@ -115,7 +116,7 @@ class RestReviewsController {
     AnswerResult answerResult = answerModel.getAnswerResult();
     Reviewing reviewing = user.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
     answerResult.nextRepetition =
-        Optional.ofNullable(reviewing.getOneRepetitionForUser(testabilitySettings.getRandomizer()));
+        reviewing.getOneRepetitionForUser(testabilitySettings.getRandomizer());
     return answerResult;
   }
 

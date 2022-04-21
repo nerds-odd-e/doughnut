@@ -11,6 +11,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public class Reviewing {
@@ -101,13 +102,12 @@ public class Reviewing {
         .toList();
   }
 
-  public ReviewPointModel getOneReviewPointNeedToRepeat(Randomizer randomizer) {
+  private Optional<ReviewPointModel> getOneReviewPointNeedToRepeat(Randomizer randomizer) {
     List<ReviewPoint> reviewPointsNeedToRepeat =
         userModel.getReviewPointsNeedToRepeat(currentUTCTimestamp);
     return randomizer
         .chooseOneRandomly1(reviewPointsNeedToRepeat)
-        .map(modelFactoryService::toReviewPointModel)
-        .orElse(null);
+        .map(modelFactoryService::toReviewPointModel);
   }
 
   private Stream<SubscriptionModel> getSubscriptionModelStream() {
@@ -115,16 +115,18 @@ public class Reviewing {
         .map(modelFactoryService::toSubscriptionModel);
   }
 
-  public RepetitionForUser getOneRepetitionForUser(Randomizer randomizer) {
-    ReviewPointModel reviewPointModel = getOneReviewPointNeedToRepeat(randomizer);
-    if (reviewPointModel == null) return null;
-
-    RepetitionForUser repetitionForUser = new RepetitionForUser();
-    QuizQuestion quizQuestion = reviewPointModel.generateAQuizQuestion(randomizer);
-    repetitionForUser.setQuizQuestion(
-        QuizQuestionViewedByUser.from(quizQuestion, this.modelFactoryService.noteRepository));
-    repetitionForUser.setToRepeatCount(toRepeatCount());
-    return repetitionForUser;
+  public Optional<RepetitionForUser> getOneRepetitionForUser(Randomizer randomizer) {
+    return getOneReviewPointNeedToRepeat(randomizer)
+        .map(
+            reviewPointModel -> {
+              RepetitionForUser repetitionForUser = new RepetitionForUser();
+              QuizQuestion quizQuestion = reviewPointModel.generateAQuizQuestion(randomizer);
+              repetitionForUser.setQuizQuestion(
+                  QuizQuestionViewedByUser.from(
+                      quizQuestion, this.modelFactoryService.noteRepository));
+              repetitionForUser.setToRepeatCount(toRepeatCount());
+              return repetitionForUser;
+            });
   }
 
   public ReviewStatus getReviewStatus() {

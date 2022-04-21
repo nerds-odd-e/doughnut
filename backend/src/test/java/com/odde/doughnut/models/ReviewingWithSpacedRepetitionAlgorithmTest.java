@@ -127,10 +127,11 @@ public class ReviewingWithSpacedRepetitionAlgorithmTest {
   }
 
   private ReviewPoint getOneReviewPointNeedToRepeat(Timestamp timestamp) {
-    Reviewing reviewing = userModel.createReviewing(timestamp);
-    ReviewPointModel model = reviewing.getOneReviewPointNeedToRepeat(randomizer);
-    if (model == null) return null;
-    return model.getEntity();
+    return userModel
+        .createReviewing(timestamp)
+        .getOneRepetitionForUser(randomizer)
+        .map(repetitionForUser -> repetitionForUser.getQuizQuestion().quizQuestion.getReviewPoint())
+        .orElse(null);
   }
 
   private Timestamp daysAfterBase(ReviewPoint reviewPoint, Integer reviewDay) {
