@@ -7,22 +7,26 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.UserModel;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory, QuestionOptionsFactory {
   protected final ReviewPoint reviewPoint;
   protected final Link link;
-  private QuizQuestionServant servant;
+  private final QuizQuestionServant servant;
   private List<Note> cachedFillingOptions = null;
-  private Optional<Link> categoryLink;
+  private final Link categoryLink;
 
   public FromDifferentPartAsQuizFactory(ReviewPoint reviewPoint, QuizQuestionServant servant) {
     this.reviewPoint = reviewPoint;
     this.link = reviewPoint.getLink();
     this.servant = servant;
+    User user = reviewPoint.getUser();
+    if (servant != null) {
+      categoryLink = servant.chooseOneCategoryLink(user, link).orElse(null);
+    } else {
+      categoryLink = null;
+    }
   }
 
   @Override
@@ -52,17 +56,16 @@ public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory, Ques
 
   @Override
   public Link getCategoryLink() {
-    return this.categoryLink.orElse(null);
+    return this.categoryLink;
   }
 
   @Override
   public Note generateAnswerNote() {
     User user = reviewPoint.getUser();
-    categoryLink = servant.chooseOneCategoryLink(user, link);
-    return categoryLink
-        .filter(cl -> noUncles(user, cl))
-        .map(lk -> lk.getReverseLinksOfCousins(user, link.getLinkType()))
-        .flatMap(servant.randomizer::chooseOneRandomly)
+    if (!noUncles(user, categoryLink)) return null;
+    return servant
+        .randomizer
+        .chooseOneRandomly(categoryLink.getReverseLinksOfCousins(user, link.getLinkType()))
         .map(Link::getSourceNote)
         .orElse(null);
   }
@@ -75,9 +78,9 @@ public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory, Ques
 
   @Override
   public List<ReviewPoint> getViceReviewPoints(UserModel userModel) {
-    return categoryLink
-        .map(userModel::getReviewPointFor)
-        .map(List::of)
-        .orElse(Collections.emptyList());
+    if (categoryLink == null) return List.of();
+    ReviewPoint reviewPointFor = userModel.getReviewPointFor(categoryLink);
+    if (reviewPointFor == null) return List.of();
+    return List.of(reviewPointFor);
   }
 }
