@@ -1,6 +1,5 @@
 import Builder from "./Builder"
 import generateId from "./generateId";
-import NoteRealmBuilder from "./NoteRealmBuilder";
 
 class RepetitionBuilder extends Builder<Generated.RepetitionForUser> {
   quizQuestion: Generated.QuizQuestionViewedByUser
@@ -20,7 +19,7 @@ class RepetitionBuilder extends Builder<Generated.RepetitionForUser> {
           questionType: "CLOZE_SELECTION",
           options: [
             {
-              note: new NoteRealmBuilder().do(),
+              noteId: 1,
               picture: false,
               display: "question",
             },

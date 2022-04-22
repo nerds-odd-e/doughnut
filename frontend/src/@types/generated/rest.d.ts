@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-04-15 10:46:58.
+// Generated using typescript-generator version 2.35.1025 on 2022-04-22 19:12:22.
 
 declare namespace Generated {
 
@@ -216,11 +216,10 @@ declare namespace Generated {
         noteAccessories: NoteAccessories;
         textContent: TextContent;
         createdAt: string;
-        comments?: Comment[];
-        pictureWithMask?: PictureWithMask;
         title: string;
-        shortDescription: string;
+        pictureWithMask?: PictureWithMask;
         parentId?: number;
+        shortDescription: string;
     }
 
     interface Ownership {
@@ -233,8 +232,8 @@ declare namespace Generated {
         dailyTargetOfNewNotes: number;
         user: User;
         notebook: Notebook;
-        headNote: Note;
         title: string;
+        headNote: Note;
         shortDescription: string;
     }
 
@@ -249,8 +248,9 @@ declare namespace Generated {
     }
 
     interface Option {
-        note: NoteRealm;
+        noteId: number;
         display: string;
+        pictureWithMask?: PictureWithMask;
         picture: boolean;
     }
 
@@ -269,13 +269,6 @@ declare namespace Generated {
         updatedAt: string;
     }
 
-    interface Comment {
-        id: number;
-        author: User;
-        createdAt: string;
-        description: string;
-    }
-
     interface Circle {
         id: number;
         name: string;
@@ -291,6 +284,6 @@ declare namespace Generated {
 
     type LinkType = "related to" | "a specialization of" | "an application of" | "an instance of" | "a part of" | "tagged by" | "an attribute of" | "the opposite of" | "author of" | "using" | "an example of" | "before" | "similar to" | "confused with";
 
-    type QuestionType = "CLOZE_SELECTION" | "SPELLING" | "PICTURE_TITLE" | "PICTURE_SELECTION" | "LINK_TARGET" | "LINK_SOURCE" | "CLOZE_LINK_TARGET" | "DESCRIPTION_LINK_TARGET" | "WHICH_SPEC_HAS_INSTANCE" | "FROM_SAME_PART_AS" | "FROM_DIFFERENT_PART_AS" | "LINK_SOURCE_EXCLUSIVE" | "JUST_REVIEW";
+    type QuestionType = "CLOZE_SELECTION" | "SPELLING" | "PICTURE_TITLE" | "PICTURE_SELECTION" | "LINK_TARGET" | "LINK_SOURCE" | "CLOZE_LINK_TARGET" | "DESCRIPTION_LINK_TARGET" | "WHICH_SPEC_HAS_INSTANCE" | "FROM_SAME_PART_AS" | "FROM_DIFFERENT_PART_AS" | "JUST_REVIEW";
 
 }

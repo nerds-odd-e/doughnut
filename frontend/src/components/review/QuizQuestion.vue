@@ -32,18 +32,18 @@
       <div
         class="col-sm-6 mb-3 d-grid"
         v-for="option in quizQuestion.options"
-        :key="option.note.id"
+        :key="option.noteId"
       >
         <button
           class="btn btn-secondary btn-lg"
           v-on:click.once="
-            answerNoteId = option.note.id;
+            answerNoteId = option.noteId;
             processForm();
           "
         >
           <div v-if="!option.picture">{{ option.display }}</div>
           <div v-else>
-            <ShowPicture v-bind="option.note.note.pictureWithMask" :opacity="1" />
+            <ShowPicture v-bind="option.pictureWithMask" :opacity="1" />
           </div>
         </button>
       </div>

@@ -5,7 +5,6 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.PictureWithMask;
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.repositories.NoteRepository;
-import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionPresenter;
 import java.util.List;
 import java.util.Map;
@@ -53,27 +52,12 @@ public class QuizQuestionViewedByUser {
   }
 
   public static class Option {
-    @Getter private NoteRealm note;
+    @Getter private Integer noteId;
     @Getter private boolean isPicture = false;
+    @Getter private String display;
+    @Getter private Optional<PictureWithMask> pictureWithMask;
 
     private Option() {}
-
-    public static Option createTitleOption(Note note) {
-      Option option = new Option();
-      option.note = new NoteViewer(null, note).toJsonObject();
-      return option;
-    }
-
-    public static Option createPictureOption(Note note) {
-      Option option = new Option();
-      option.note = new NoteViewer(null, note).toJsonObject();
-      option.isPicture = true;
-      return option;
-    }
-
-    public String getDisplay() {
-      return note.getNote().getTitle();
-    }
   }
 
   public interface OptionCreator {
@@ -83,14 +67,22 @@ public class QuizQuestionViewedByUser {
   public static class TitleOptionCreator implements OptionCreator {
     @Override
     public Option optionFromNote(Note note) {
-      return Option.createTitleOption(note);
+      Option option = new Option();
+      option.noteId = note.getId();
+      option.display = note.getTitle();
+      return option;
     }
   }
 
   public static class PictureOptionCreator implements OptionCreator {
     @Override
     public Option optionFromNote(Note note) {
-      return Option.createPictureOption(note);
+      Option option = new Option();
+      option.noteId = note.getId();
+      option.display = note.getTitle();
+      option.pictureWithMask = note.getPictureWithMask();
+      option.isPicture = true;
+      return option;
     }
   }
 }
