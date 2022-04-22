@@ -36,14 +36,6 @@ public class QuizQuestionServant {
         .collect(Collectors.toList());
   }
 
-  List<Note> randomlyChooseAndEnsure(List<Note> candidates, Note ensure) {
-    List<Note> list =
-        candidates.stream().filter(n -> !n.equals(ensure)).collect(Collectors.toList());
-    List<Note> selectedList = this.randomizer.randomlyChoose(maxFillingOptionCount - 1, list);
-    selectedList.add(ensure);
-    return selectedList;
-  }
-
   Optional<Link> chooseOneCategoryLink(User user, Link link) {
     return randomizer.chooseOneRandomly(link.categoryLinksOfTarget(user));
   }

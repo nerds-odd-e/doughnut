@@ -5,7 +5,6 @@ import static com.odde.doughnut.entities.QuizQuestion.QuestionType.DESCRIPTION_L
 import static com.odde.doughnut.entities.QuizQuestion.QuestionType.FROM_DIFFERENT_PART_AS;
 import static com.odde.doughnut.entities.QuizQuestion.QuestionType.FROM_SAME_PART_AS;
 import static com.odde.doughnut.entities.QuizQuestion.QuestionType.LINK_SOURCE;
-import static com.odde.doughnut.entities.QuizQuestion.QuestionType.LINK_SOURCE_EXCLUSIVE;
 import static com.odde.doughnut.entities.QuizQuestion.QuestionType.LINK_TARGET;
 import static com.odde.doughnut.entities.QuizQuestion.QuestionType.WHICH_SPEC_HAS_INSTANCE;
 
@@ -89,7 +88,6 @@ public class Link {
         new QuestionType[] {
           LINK_TARGET,
           LINK_SOURCE,
-          LINK_SOURCE_EXCLUSIVE,
           WHICH_SPEC_HAS_INSTANCE,
           FROM_SAME_PART_AS,
           FROM_DIFFERENT_PART_AS,
@@ -103,7 +101,6 @@ public class Link {
         new QuestionType[] {
           LINK_TARGET,
           LINK_SOURCE,
-          LINK_SOURCE_EXCLUSIVE,
           WHICH_SPEC_HAS_INSTANCE,
           WHICH_SPEC_HAS_INSTANCE,
           DESCRIPTION_LINK_TARGET
@@ -132,9 +129,7 @@ public class Link {
         "author",
         "author of",
         "brought by",
-        new QuestionType[] {
-          LINK_TARGET, LINK_SOURCE, LINK_SOURCE_EXCLUSIVE, DESCRIPTION_LINK_TARGET
-        }),
+        new QuestionType[] {LINK_TARGET, LINK_SOURCE, DESCRIPTION_LINK_TARGET}),
     USES(
         15,
         "user",
@@ -143,7 +138,6 @@ public class Link {
         new QuestionType[] {
           LINK_TARGET,
           LINK_SOURCE,
-          LINK_SOURCE_EXCLUSIVE,
           WHICH_SPEC_HAS_INSTANCE,
           FROM_SAME_PART_AS,
           FROM_DIFFERENT_PART_AS,
@@ -155,20 +149,14 @@ public class Link {
         "an example of",
         "has examples",
         new QuestionType[] {
-          LINK_SOURCE,
-          LINK_SOURCE_EXCLUSIVE,
-          CLOZE_LINK_TARGET,
-          FROM_SAME_PART_AS,
-          FROM_DIFFERENT_PART_AS
+          LINK_SOURCE, CLOZE_LINK_TARGET, FROM_SAME_PART_AS, FROM_DIFFERENT_PART_AS
         }),
     PRECEDES(
         19,
         "precedence",
         "before",
         "after",
-        new QuestionType[] {
-          LINK_TARGET, LINK_SOURCE, LINK_SOURCE_EXCLUSIVE, DESCRIPTION_LINK_TARGET
-        }),
+        new QuestionType[] {LINK_TARGET, LINK_SOURCE, DESCRIPTION_LINK_TARGET}),
     SIMILAR_TO(
         22,
         "thing",

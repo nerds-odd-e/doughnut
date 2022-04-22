@@ -15,8 +15,6 @@ import com.odde.doughnut.models.quizFacotries.FromSamePartAsQuizFactory;
 import com.odde.doughnut.models.quizFacotries.FromSamePartAsQuizPresenter;
 import com.odde.doughnut.models.quizFacotries.JustReviewQuizFactory;
 import com.odde.doughnut.models.quizFacotries.JustReviewQuizPresenter;
-import com.odde.doughnut.models.quizFacotries.LinkSourceExclusiveQuizFactory;
-import com.odde.doughnut.models.quizFacotries.LinkSourceExclusiveQuizPresenter;
 import com.odde.doughnut.models.quizFacotries.LinkSourceQuizFactory;
 import com.odde.doughnut.models.quizFacotries.LinkSourceQuizPresenter;
 import com.odde.doughnut.models.quizFacotries.LinkTargetQuizFactory;
@@ -73,8 +71,6 @@ public class QuizQuestion {
     FROM_SAME_PART_AS(10, FromSamePartAsQuizFactory::new, FromSamePartAsQuizPresenter::new),
     FROM_DIFFERENT_PART_AS(
         11, FromDifferentPartAsQuizFactory::new, FromDifferentPartAsQuizPresenter::new),
-    LINK_SOURCE_EXCLUSIVE(
-        12, LinkSourceExclusiveQuizFactory::new, LinkSourceExclusiveQuizPresenter::new),
     JUST_REVIEW(13, JustReviewQuizFactory::new, JustReviewQuizPresenter::new);
 
     public final Integer id;
