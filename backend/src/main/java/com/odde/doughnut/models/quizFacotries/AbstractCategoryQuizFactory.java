@@ -10,19 +10,18 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public abstract class AbstractCategoryQuizFactory
-    implements QuizQuestionFactory, QuestionOptionsFactory {
-  protected final User user;
-  protected final Link link;
-  protected final QuizQuestionServant servant;
+public abstract class AbstractCategoryQuizFactory {
+  private final User user;
+  private final Link link;
+  private final QuizQuestionServant servant;
   private final Link categoryLink;
 
-  public AbstractCategoryQuizFactory(ReviewPoint reviewPoint, QuizQuestionServant servant) {
-    this.user = reviewPoint.getUser();
-    this.link = reviewPoint.getLink();
+  public AbstractCategoryQuizFactory(QuizQuestionServant servant, User user, Link link) {
+    this.user = user;
+    this.link = link;
     this.servant = servant;
     if (servant != null) {
-      categoryLink = servant.chooseOneCategoryLink(user, link).orElse(null);
+      categoryLink = servant.chooseOneCategoryLink(this.user, this.link).orElse(null);
     } else {
       categoryLink = null;
     }

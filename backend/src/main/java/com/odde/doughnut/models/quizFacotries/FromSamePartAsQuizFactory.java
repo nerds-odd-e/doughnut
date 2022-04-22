@@ -3,18 +3,26 @@ package com.odde.doughnut.models.quizFacotries;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.User;
 import com.odde.doughnut.models.UserModel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class FromSamePartAsQuizFactory extends AbstractCategoryQuizFactory {
+public class FromSamePartAsQuizFactory extends AbstractCategoryQuizFactory
+    implements QuizQuestionFactory, QuestionOptionsFactory {
   private Link cachedAnswerLink = null;
   private List<Note> cachedFillingOptions = null;
+  private final User user;
+  private final Link link;
+  private final QuizQuestionServant servant;
 
   public FromSamePartAsQuizFactory(ReviewPoint reviewPoint, QuizQuestionServant servant) {
-    super(reviewPoint, servant);
+    super(servant, reviewPoint.getUser(), reviewPoint.getLink());
+    user = reviewPoint.getUser();
+    link = reviewPoint.getLink();
+    this.servant = servant;
   }
 
   @Override
