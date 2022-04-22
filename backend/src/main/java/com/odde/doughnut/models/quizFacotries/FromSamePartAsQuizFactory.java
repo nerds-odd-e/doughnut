@@ -69,11 +69,7 @@ public class FromSamePartAsQuizFactory extends AbstractCategoryQuizFactory {
 
   protected Link getAnswerLink(QuizQuestionServant servant) {
     if (cachedAnswerLink == null) {
-      UserModel userModel = servant.modelFactoryService.toUserModel(reviewPoint.getUser());
-      List<Link> backwardPeers =
-          getCousinLinksFromSameCategoriesOfSameLinkType()
-              .filter(l -> userModel.getReviewPointFor(l) != null)
-              .toList();
+      List<Link> backwardPeers = getCousinLinksFromSameCategoriesOfSameLinkType().toList();
       cachedAnswerLink = servant.randomizer.chooseOneRandomly(backwardPeers).orElse(null);
     }
     return cachedAnswerLink;

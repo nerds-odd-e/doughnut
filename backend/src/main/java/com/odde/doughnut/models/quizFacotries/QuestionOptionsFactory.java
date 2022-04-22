@@ -14,7 +14,7 @@ public interface QuestionOptionsFactory {
     Note answerNote = generateAnswerNote();
     if (answerNote == null) return null;
     List<Note> fillingOptions = generateFillingOptions();
-    if (minimumOptionCount() > fillingOptions.size() + 1) {
+    if (fillingOptions.size() + 1 < minimumOptionCount()) {
       return null;
     }
     fillingOptions.add(answerNote);

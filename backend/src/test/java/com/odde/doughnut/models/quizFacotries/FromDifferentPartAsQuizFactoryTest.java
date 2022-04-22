@@ -43,6 +43,7 @@ class FromDifferentPartAsQuizFactoryTest {
   Note tall;
   Note kind;
   Link subjectivePerspective;
+  Link kindSubjective;
   ReviewPoint uglySubjectiveRp;
 
   @BeforeEach
@@ -59,7 +60,7 @@ class FromDifferentPartAsQuizFactoryTest {
     subjectivePerspective =
         makeMe.aLink().between(subjective, perspective, Link.LinkType.PART).please();
     makeMe.aLink().between(objective, perspective, Link.LinkType.PART).please();
-    makeMe.aLink().between(kind, subjective, Link.LinkType.TAGGED_BY).please();
+    kindSubjective = makeMe.aLink().between(kind, subjective, Link.LinkType.TAGGED_BY).please();
     Link uglySubjective =
         makeMe.aLink().between(ugly, subjective, Link.LinkType.TAGGED_BY).please();
     uglySubjectiveRp = makeMe.aReviewPointFor(uglySubjective).by(userModel).inMemoryPlease();
@@ -73,11 +74,12 @@ class FromDifferentPartAsQuizFactoryTest {
 
   @Nested
   class WhenThereIsAnCousin {
-    Link cousin;
+    Link prettySubjective;
 
     @BeforeEach
     void setup() {
-      cousin = makeMe.aLink().between(pretty, subjective, Link.LinkType.TAGGED_BY).please();
+      prettySubjective =
+          makeMe.aLink().between(pretty, subjective, Link.LinkType.TAGGED_BY).please();
       makeMe.refresh(userModel.getEntity());
     }
 
@@ -92,6 +94,7 @@ class FromDifferentPartAsQuizFactoryTest {
       @BeforeEach
       void setup() {
         makeMe.aLink().between(tall, objective, Link.LinkType.TAGGED_BY).please();
+        makeMe.aReviewPointFor(kindSubjective).by(userModel).please();
         makeMe.refresh(userModel.getEntity());
       }
 
@@ -104,9 +107,9 @@ class FromDifferentPartAsQuizFactoryTest {
                 "<p>Which one <mark>is tagged by</mark> a <em>DIFFERENT</em> part of <mark>perspective</mark> than:"));
         assertThat(quizQuestion.getMainTopic(), containsString(ugly.getTitle()));
         List<String> strings = toOptionStrings(quizQuestion);
-        assertThat(pretty.getTitle(), in(strings));
         assertThat(tall.getTitle(), in(strings));
         assertThat(kind.getTitle(), in(strings));
+        assertThat(pretty.getTitle(), not(in(strings)));
         assertThat(ugly.getTitle(), not(in(strings)));
       }
 

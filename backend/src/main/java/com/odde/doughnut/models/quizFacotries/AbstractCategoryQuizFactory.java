@@ -56,8 +56,10 @@ public abstract class AbstractCategoryQuizFactory
   }
 
   protected Stream<Link> getCousinLinksFromSameCategoriesOfSameLinkType() {
+    UserModel userModel = servant.modelFactoryService.toUserModel(reviewPoint.getUser());
     return new NoteViewer(reviewPoint.getUser(), categoryLink.getSourceNote())
         .linksOfTypeThroughReverse(link.getLinkType())
-        .filter(lk -> lk != link);
+        .filter(lk -> lk != link)
+        .filter(l -> userModel.getReviewPointFor(l) != null);
   }
 }
