@@ -27,21 +27,21 @@ public class CategoryHelper {
     }
   }
 
-  protected Link getCategoryLink() {
+  public Link getCategoryLink() {
     return categoryLink;
   }
 
-  protected List<ReviewPoint> getCategoryReviewPoints(UserModel userModel) {
+  public List<ReviewPoint> getCategoryReviewPoints(UserModel userModel) {
     if (categoryLink == null) return List.of();
     ReviewPoint reviewPointFor = userModel.getReviewPointFor(categoryLink);
     if (reviewPointFor == null) return List.of();
     return List.of(reviewPointFor);
   }
 
-  protected List<Link> getReverseLinksOfCousins(User user) {
-    List<Note> uncles = unclesFromSameCategory(user, categoryLink);
+  public List<Link> getReverseLinksOfCousins() {
+    List<Link> uncles = unclesFromSameCategory();
     return categoryLink.getCousinLinksOfSameLinkType(user).stream()
-        .filter(cl -> !uncles.contains(cl.getSourceNote()))
+        .filter(cl -> !uncles.contains(cl))
         .flatMap(
             p ->
                 new NoteViewer(user, p.getSourceNote())
@@ -49,16 +49,17 @@ public class CategoryHelper {
         .collect(Collectors.toList());
   }
 
-  protected List<Note> unclesFromSameCategory(User user, Link categoryLink) {
-    NoteViewer noteViewer = new NoteViewer(user, link.getSourceNote());
-    List<Note> categoryCousins = categoryLink.getCousinsOfSameLinkType(user);
-    return noteViewer
-        .linkTargetOfType(link.getLinkType())
-        .filter(categoryCousins::contains)
+  private List<Link> unclesFromSameCategory() {
+    List<Note> linkTargetOfType =
+        new NoteViewer(user, link.getSourceNote())
+            .linkTargetOfType(link.getLinkType())
+            .collect(Collectors.toList());
+    return categoryLink.getCousinLinksOfSameLinkType(user).stream()
+        .filter(cl -> linkTargetOfType.contains(cl.getSourceNote()))
         .collect(Collectors.toList());
   }
 
-  protected Stream<Link> getCousinLinksFromSameCategoriesOfSameLinkType() {
+  public Stream<Link> getCousinLinksFromSameCategoriesOfSameLinkType() {
     UserModel userModel = servant.modelFactoryService.toUserModel(user);
     return new NoteViewer(user, categoryLink.getSourceNote())
         .linksOfTypeThroughReverse(link.getLinkType())

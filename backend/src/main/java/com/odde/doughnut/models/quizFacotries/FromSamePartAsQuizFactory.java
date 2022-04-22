@@ -29,7 +29,7 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory, QuestionO
   @Override
   public List<Note> generateFillingOptions() {
     if (cachedFillingOptions == null) {
-      List<Link> remoteCousins = categoryHelper.getReverseLinksOfCousins(user);
+      List<Link> remoteCousins = categoryHelper.getReverseLinksOfCousins();
       cachedFillingOptions =
           servant.randomizer.randomlyChoose(5, remoteCousins).stream()
               .map(Link::getSourceNote)

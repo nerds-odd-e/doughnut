@@ -54,7 +54,7 @@ public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory, Ques
   public Note generateAnswerNote() {
     return servant
         .randomizer
-        .chooseOneRandomly(categoryHelper.getReverseLinksOfCousins(user))
+        .chooseOneRandomly(categoryHelper.getReverseLinksOfCousins())
         .map(Link::getSourceNote)
         .orElse(null);
   }
