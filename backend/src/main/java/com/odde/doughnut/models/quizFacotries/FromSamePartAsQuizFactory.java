@@ -10,18 +10,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-public class FromSamePartAsQuizFactory implements QuizQuestionFactory, QuestionOptionsFactory {
+public class FromSamePartAsQuizFactory extends AbstractCategoryQuizFactory {
   private Link cachedAnswerLink = null;
   private List<Note> cachedFillingOptions = null;
-  protected final ReviewPoint reviewPoint;
-  protected final Link link;
-  private QuizQuestionServant servant;
   private Optional<Link> categoryLink = null;
 
   public FromSamePartAsQuizFactory(ReviewPoint reviewPoint, QuizQuestionServant servant) {
-    this.reviewPoint = reviewPoint;
-    this.link = reviewPoint.getLink();
-    this.servant = servant;
+    super(reviewPoint, servant);
   }
 
   @Override

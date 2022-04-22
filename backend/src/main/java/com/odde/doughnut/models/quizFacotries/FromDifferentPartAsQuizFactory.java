@@ -10,17 +10,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory, QuestionOptionsFactory {
-  protected final ReviewPoint reviewPoint;
-  protected final Link link;
-  private final QuizQuestionServant servant;
+public class FromDifferentPartAsQuizFactory extends AbstractCategoryQuizFactory {
   private List<Note> cachedFillingOptions = null;
   private final Link categoryLink;
 
   public FromDifferentPartAsQuizFactory(ReviewPoint reviewPoint, QuizQuestionServant servant) {
-    this.reviewPoint = reviewPoint;
-    this.link = reviewPoint.getLink();
-    this.servant = servant;
+    super(reviewPoint, servant);
     User user = reviewPoint.getUser();
     if (servant != null) {
       categoryLink = servant.chooseOneCategoryLink(user, link).orElse(null);
@@ -62,7 +57,8 @@ public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory, Ques
   @Override
   public Note generateAnswerNote() {
     User user = reviewPoint.getUser();
-    if (!noUncles(user, categoryLink)) return null;
+    List<Note> uncles = unclesFromSameCategory(user, categoryLink);
+    if (uncles.size() > 0) return null;
     return servant
         .randomizer
         .chooseOneRandomly(categoryLink.getReverseLinksOfCousins(user, link.getLinkType()))
@@ -70,10 +66,15 @@ public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory, Ques
         .orElse(null);
   }
 
-  private boolean noUncles(User user, Link categoryLink) {
+  private List<Note> unclesFromSameCategory(User user, Link categoryLink) {
     NoteViewer noteViewer = new NoteViewer(user, link.getSourceNote());
     List<Note> categoryCousins = categoryLink.getCousinsOfSameLinkType(user);
-    return noteViewer.linkTargetOfType(link.getLinkType()).noneMatch(categoryCousins::contains);
+    List<Note> unclesOfCategory =
+        noteViewer
+            .linkTargetOfType(link.getLinkType())
+            .filter(categoryCousins::contains)
+            .collect(Collectors.toList());
+    return unclesOfCategory;
   }
 
   @Override

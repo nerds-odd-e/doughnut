@@ -12,6 +12,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.odde.doughnut.entities.AnswerViewedByUser;
 import com.odde.doughnut.entities.Link;
+import com.odde.doughnut.entities.Link.LinkType;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
@@ -109,11 +110,27 @@ class FromDifferentPartAsQuizFactoryTest {
         assertThat(ugly.getTitle(), not(in(strings)));
       }
 
-      @Test
-      void WhenTheReviewingSourceNoteIsAlsoTaggedByADifferentPart() {
-        makeMe.aLink().between(ugly, objective, Link.LinkType.TAGGED_BY).please();
-        makeMe.refresh(userModel.getEntity());
-        assertThat(buildQuestion(), nullValue());
+      @Nested
+      class WhenTheReviewingSourceNoteIsAlsoTaggedByADifferentPart {
+        @BeforeEach
+        void setup() {
+          makeMe.aLink().between(ugly, objective, Link.LinkType.TAGGED_BY).please();
+        }
+
+        @Test
+        void noRightAnswers() {
+          makeMe.refresh(userModel.getEntity());
+          assertThat(buildQuestion(), nullValue());
+        }
+
+        void thereIsAThirdPerspective() {
+          Note axiom = makeMe.aNote("objective").under(top).please();
+          makeMe.aLink().between(axiom, perspective, LinkType.PART).please();
+          Note pi = makeMe.aNote("pi").under(top).please();
+          makeMe.aLink().between(pi, axiom, LinkType.TAGGED_BY).please();
+          makeMe.refresh(userModel.getEntity());
+          assertThat(buildQuestion(), not(nullValue()));
+        }
       }
 
       @Nested
