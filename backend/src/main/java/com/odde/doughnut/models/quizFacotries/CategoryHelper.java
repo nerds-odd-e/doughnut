@@ -10,13 +10,13 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public abstract class AbstractCategoryQuizFactory {
+public class CategoryHelper {
   private final User user;
   private final Link link;
   private final QuizQuestionServant servant;
   private final Link categoryLink;
 
-  public AbstractCategoryQuizFactory(QuizQuestionServant servant, User user, Link link) {
+  public CategoryHelper(QuizQuestionServant servant, User user, Link link) {
     this.user = user;
     this.link = link;
     this.servant = servant;
@@ -27,7 +27,7 @@ public abstract class AbstractCategoryQuizFactory {
     }
   }
 
-  protected Link getCategoryLink1() {
+  protected Link getCategoryLink() {
     return categoryLink;
   }
 

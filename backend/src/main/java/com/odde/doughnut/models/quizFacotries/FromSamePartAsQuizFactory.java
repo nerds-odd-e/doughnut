@@ -10,8 +10,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class FromSamePartAsQuizFactory extends AbstractCategoryQuizFactory
-    implements QuizQuestionFactory, QuestionOptionsFactory {
+public class FromSamePartAsQuizFactory implements QuizQuestionFactory, QuestionOptionsFactory {
+
+  private final CategoryHelper categoryHelper;
   private Link cachedAnswerLink = null;
   private List<Note> cachedFillingOptions = null;
   private final User user;
@@ -19,16 +20,16 @@ public class FromSamePartAsQuizFactory extends AbstractCategoryQuizFactory
   private final QuizQuestionServant servant;
 
   public FromSamePartAsQuizFactory(ReviewPoint reviewPoint, QuizQuestionServant servant) {
-    super(servant, reviewPoint.getUser(), reviewPoint.getLink());
     user = reviewPoint.getUser();
     link = reviewPoint.getLink();
     this.servant = servant;
+    categoryHelper = new CategoryHelper(servant, user, link);
   }
 
   @Override
   public List<Note> generateFillingOptions() {
     if (cachedFillingOptions == null) {
-      List<Link> remoteCousins = getReverseLinksOfCousins(user);
+      List<Link> remoteCousins = categoryHelper.getReverseLinksOfCousins(user);
       cachedFillingOptions =
           servant.randomizer.randomlyChoose(5, remoteCousins).stream()
               .map(Link::getSourceNote)
@@ -56,7 +57,7 @@ public class FromSamePartAsQuizFactory extends AbstractCategoryQuizFactory
     ReviewPoint answerLinkReviewPoint = userModel.getReviewPointFor(cachedAnswerLink);
     List<ReviewPoint> result = new ArrayList<>();
     result.add(answerLinkReviewPoint);
-    result.addAll(getCategoryReviewPoints(userModel));
+    result.addAll(categoryHelper.getCategoryReviewPoints(userModel));
     return result;
   }
 
@@ -67,12 +68,13 @@ public class FromSamePartAsQuizFactory extends AbstractCategoryQuizFactory
 
   @Override
   public Link getCategoryLink() {
-    return getCategoryLink1();
+    return categoryHelper.getCategoryLink();
   }
 
   protected Link getAnswerLink(QuizQuestionServant servant) {
     if (cachedAnswerLink == null) {
-      List<Link> backwardPeers = getCousinLinksFromSameCategoriesOfSameLinkType().toList();
+      List<Link> backwardPeers =
+          categoryHelper.getCousinLinksFromSameCategoriesOfSameLinkType().toList();
       cachedAnswerLink = servant.randomizer.chooseOneRandomly(backwardPeers).orElse(null);
     }
     return cachedAnswerLink;

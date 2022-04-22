@@ -10,18 +10,19 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class FromDifferentPartAsQuizFactory extends AbstractCategoryQuizFactory
-    implements QuizQuestionFactory, QuestionOptionsFactory {
+public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory, QuestionOptionsFactory {
+
+  private final CategoryHelper categoryHelper;
   private List<Note> cachedFillingOptions = null;
   private final User user;
   private final Link link;
   private final QuizQuestionServant servant;
 
   public FromDifferentPartAsQuizFactory(ReviewPoint reviewPoint, QuizQuestionServant servant) {
-    super(servant, reviewPoint.getUser(), reviewPoint.getLink());
     user = reviewPoint.getUser();
     link = reviewPoint.getLink();
     this.servant = servant;
+    categoryHelper = new CategoryHelper(servant, user, link);
   }
 
   @Override
@@ -34,7 +35,7 @@ public class FromDifferentPartAsQuizFactory extends AbstractCategoryQuizFactory
   @Override
   public List<Note> generateFillingOptions() {
     if (cachedFillingOptions == null) {
-      Stream<Link> cousinLinks = getCousinLinksFromSameCategoriesOfSameLinkType();
+      Stream<Link> cousinLinks = categoryHelper.getCousinLinksFromSameCategoriesOfSameLinkType();
       cachedFillingOptions =
           servant
               .chooseFillingOptionsRandomly(cousinLinks)
@@ -46,20 +47,20 @@ public class FromDifferentPartAsQuizFactory extends AbstractCategoryQuizFactory
 
   @Override
   public Link getCategoryLink() {
-    return getCategoryLink1();
+    return categoryHelper.getCategoryLink();
   }
 
   @Override
   public Note generateAnswerNote() {
     return servant
         .randomizer
-        .chooseOneRandomly(getReverseLinksOfCousins(user))
+        .chooseOneRandomly(categoryHelper.getReverseLinksOfCousins(user))
         .map(Link::getSourceNote)
         .orElse(null);
   }
 
   @Override
   public List<ReviewPoint> getViceReviewPoints(UserModel userModel) {
-    return getCategoryReviewPoints(userModel);
+    return categoryHelper.getCategoryReviewPoints(userModel);
   }
 }
