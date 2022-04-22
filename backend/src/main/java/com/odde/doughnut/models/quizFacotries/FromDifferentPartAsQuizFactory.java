@@ -8,6 +8,7 @@ import com.odde.doughnut.models.UserModel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class FromDifferentPartAsQuizFactory extends AbstractCategoryQuizFactory {
   private List<Note> cachedFillingOptions = null;
@@ -32,9 +33,9 @@ public class FromDifferentPartAsQuizFactory extends AbstractCategoryQuizFactory 
   @Override
   public List<Note> generateFillingOptions() {
     if (cachedFillingOptions == null) {
-      List<Link> cousinLinks = link.getCousinLinksOfSameLinkType(reviewPoint.getUser());
+      Stream<Link> cousinLinks = getCousinLinksFromSameCategoriesOfSameLinkType();
       cachedFillingOptions =
-          servant.randomizer.randomlyChoose(5, cousinLinks).stream()
+          servant.randomizer.randomlyChoose(5, cousinLinks.collect(Collectors.toList())).stream()
               .map(Link::getSourceNote)
               .collect(Collectors.toList());
     }

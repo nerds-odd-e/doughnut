@@ -20,13 +20,11 @@ public class FromSamePartAsQuizFactory extends AbstractCategoryQuizFactory {
   @Override
   public List<Note> generateFillingOptions() {
     if (cachedFillingOptions == null) {
-      if (categoryLink != null) {
-        List<Link> remoteCousins = getReverseLinksOfCousins(reviewPoint.getUser());
-        cachedFillingOptions =
-            servant.randomizer.randomlyChoose(5, remoteCousins).stream()
-                .map(Link::getSourceNote)
-                .collect(Collectors.toList());
-      }
+      List<Link> remoteCousins = getReverseLinksOfCousins(reviewPoint.getUser());
+      cachedFillingOptions =
+          servant.randomizer.randomlyChoose(5, remoteCousins).stream()
+              .map(Link::getSourceNote)
+              .collect(Collectors.toList());
     }
     return cachedFillingOptions;
   }
@@ -73,7 +71,7 @@ public class FromSamePartAsQuizFactory extends AbstractCategoryQuizFactory {
     if (cachedAnswerLink == null) {
       UserModel userModel = servant.modelFactoryService.toUserModel(reviewPoint.getUser());
       List<Link> backwardPeers =
-          link.getCousinLinksOfSameLinkType(reviewPoint.getUser()).stream()
+          getCousinLinksFromSameCategoriesOfSameLinkType()
               .filter(l -> userModel.getReviewPointFor(l) != null)
               .toList();
       cachedAnswerLink = servant.randomizer.chooseOneRandomly(backwardPeers).orElse(null);

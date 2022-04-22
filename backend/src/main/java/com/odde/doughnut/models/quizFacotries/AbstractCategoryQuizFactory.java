@@ -8,6 +8,7 @@ import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.UserModel;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public abstract class AbstractCategoryQuizFactory
     implements QuizQuestionFactory, QuestionOptionsFactory {
@@ -52,5 +53,11 @@ public abstract class AbstractCategoryQuizFactory
         .linkTargetOfType(link.getLinkType())
         .filter(categoryCousins::contains)
         .collect(Collectors.toList());
+  }
+
+  protected Stream<Link> getCousinLinksFromSameCategoriesOfSameLinkType() {
+    return new NoteViewer(reviewPoint.getUser(), categoryLink.getSourceNote())
+        .linksOfTypeThroughReverse(link.getLinkType())
+        .filter(lk -> lk != link);
   }
 }
