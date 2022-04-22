@@ -1,12 +1,12 @@
 package com.odde.doughnut.entities;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 
+import com.odde.doughnut.entities.QuizQuestion.QuestionType;
 import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import com.odde.doughnut.models.ReviewPointModel;
 import com.odde.doughnut.models.UserModel;
@@ -47,7 +47,10 @@ class QuizQuestionTest {
 
   @Test
   void useClozeDescription() {
-    Note note = makeMe.aNote().title("abc").description("abc has 3 letters").please();
+    Note top = makeMe.aNote().please();
+    makeMe.aNote().under(top).please();
+    Note note = makeMe.aNote().under(top).title("abc").description("abc has 3 letters").please();
+    makeMe.refresh(top);
     QuizQuestionViewedByUser quizQuestion = getQuizQuestion(note);
     assertThat(
         quizQuestion.getDescription(),
@@ -65,10 +68,10 @@ class QuizQuestionTest {
     }
 
     @Test
-    void aNoteWithNoSiblings() {
+    void aNoteWithNoSiblingsShouldDoJustReview() {
       Note note = makeMe.aNote().please();
-      List<String> options = getOptions(note);
-      assertThat(options, contains(note.getTitle()));
+      QuizQuestionViewedByUser quizQuestion = getQuizQuestion(note);
+      assertThat(quizQuestion.getQuestionType(), equalTo(QuestionType.JUST_REVIEW));
     }
 
     @Test
@@ -99,7 +102,10 @@ class QuizQuestionTest {
 
     @BeforeEach
     void setup() {
-      note = makeMe.aNote().rememberSpelling().please();
+      Note top = makeMe.aNote().please();
+      note = makeMe.aNote().under(top).rememberSpelling().please();
+      makeMe.aNote("a necessary sibling as filling option").under(top).please();
+      makeMe.refresh(top);
     }
 
     @Test

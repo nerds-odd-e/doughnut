@@ -43,11 +43,6 @@ public class LinkSourceExclusiveQuizFactory implements QuizQuestionFactory, Ques
   }
 
   @Override
-  public int minimumOptionCount() {
-    return 2;
-  }
-
-  @Override
   public List<Note> allWrongAnswers() {
     return List.of(link.getSourceNote());
   }

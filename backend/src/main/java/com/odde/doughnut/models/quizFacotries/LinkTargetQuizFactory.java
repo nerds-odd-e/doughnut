@@ -38,11 +38,6 @@ public class LinkTargetQuizFactory implements QuizQuestionFactory, QuestionOptio
   }
 
   @Override
-  public int minimumOptionCount() {
-    return 2;
-  }
-
-  @Override
   public List<Note> knownRightAnswers() {
     return List.of(answerNote);
   }

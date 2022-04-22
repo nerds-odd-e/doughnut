@@ -8,13 +8,11 @@ public interface QuestionOptionsFactory {
 
   List<Note> generateFillingOptions();
 
-  int minimumOptionCount();
-
   default List<Note> generateOptions() {
     Note answerNote = generateAnswerNote();
     if (answerNote == null) return null;
     List<Note> fillingOptions = generateFillingOptions();
-    if (fillingOptions.size() + 1 < minimumOptionCount()) {
+    if (fillingOptions.isEmpty()) {
       return null;
     }
     fillingOptions.add(answerNote);

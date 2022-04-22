@@ -18,11 +18,6 @@ public class FromDifferentPartAsQuizFactory extends AbstractCategoryQuizFactory 
   }
 
   @Override
-  public int minimumOptionCount() {
-    return 2;
-  }
-
-  @Override
   public List<Note> allWrongAnswers() {
     List<Note> result =
         new ArrayList<>(reviewPoint.getLink().getCousinsOfSameLinkType(reviewPoint.getUser()));

@@ -48,11 +48,6 @@ public class WhichSpecHasInstanceQuizFactory
   }
 
   @Override
-  public int minimumOptionCount() {
-    return 2;
-  }
-
-  @Override
   public int minimumViceReviewPointCount() {
     return 1;
   }
