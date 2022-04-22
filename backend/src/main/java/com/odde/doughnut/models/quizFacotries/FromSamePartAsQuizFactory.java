@@ -13,18 +13,22 @@ import java.util.stream.Collectors;
 public class FromSamePartAsQuizFactory extends AbstractCategoryQuizFactory {
   private Link cachedAnswerLink = null;
   private List<Note> cachedFillingOptions = null;
-  private Optional<Link> categoryLink = null;
+  private Link categoryLink = null;
 
   public FromSamePartAsQuizFactory(ReviewPoint reviewPoint, QuizQuestionServant servant) {
     super(reviewPoint, servant);
+    if (servant != null) {
+    categoryLink = servant.chooseOneCategoryLink(reviewPoint.getUser(), link).orElse(null);
+    } else {
+      categoryLink = null;
+    }
   }
 
   @Override
   public List<Note> generateFillingOptions() {
     if (cachedFillingOptions == null) {
-      categoryLink = servant.chooseOneCategoryLink(reviewPoint.getUser(), link);
       cachedFillingOptions =
-          categoryLink
+          Optional.ofNullable(categoryLink)
               .map(lk -> lk.getReverseLinksOfCousins(reviewPoint.getUser(), link.getLinkType()))
               .map(
                   remoteCousins ->
@@ -58,7 +62,10 @@ public class FromSamePartAsQuizFactory extends AbstractCategoryQuizFactory {
       ReviewPoint answerLinkReviewPoint = userModel.getReviewPointFor(cachedAnswerLink);
       List<ReviewPoint> result = new ArrayList<>();
       result.add(answerLinkReviewPoint);
-      categoryLink.map(userModel::getReviewPointFor).ifPresent(result::add);
+      if(categoryLink != null) {
+        ReviewPoint reviewPointFor = userModel.getReviewPointFor(categoryLink);
+        if(reviewPointFor != null) result.add(reviewPointFor);
+      }
       return result;
     }
     return Collections.emptyList();
@@ -71,7 +78,7 @@ public class FromSamePartAsQuizFactory extends AbstractCategoryQuizFactory {
 
   @Override
   public Link getCategoryLink() {
-    return this.categoryLink.orElse(null);
+    return this.categoryLink;
   }
 
   protected Link getAnswerLink(QuizQuestionServant servant) {
