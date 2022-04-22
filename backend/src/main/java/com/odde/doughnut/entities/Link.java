@@ -338,11 +338,4 @@ public class Link {
         .linksOfTypeThroughDirect(
             List.of(LinkType.PART, LinkType.INSTANCE, LinkType.SPECIALIZE, LinkType.APPLICATION));
   }
-
-  @JsonIgnore
-  public List<Link> getReverseLinksOfCousins(User user, LinkType linkType) {
-    return getCousinLinksOfSameLinkType(user).stream()
-        .flatMap(p -> new NoteViewer(user, p.getSourceNote()).linksOfTypeThroughReverse(linkType))
-        .collect(Collectors.toList());
-  }
 }

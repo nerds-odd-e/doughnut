@@ -123,6 +123,7 @@ class FromDifferentPartAsQuizFactoryTest {
           assertThat(buildQuestion(), nullValue());
         }
 
+        @Test
         void thereIsAThirdPerspective() {
           Note axiom = makeMe.aNote("objective").under(top).please();
           makeMe.aLink().between(axiom, perspective, LinkType.PART).please();

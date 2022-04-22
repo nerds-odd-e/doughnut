@@ -7,35 +7,26 @@ import com.odde.doughnut.models.UserModel;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class FromSamePartAsQuizFactory extends AbstractCategoryQuizFactory {
   private Link cachedAnswerLink = null;
   private List<Note> cachedFillingOptions = null;
-  private Link categoryLink = null;
 
   public FromSamePartAsQuizFactory(ReviewPoint reviewPoint, QuizQuestionServant servant) {
     super(reviewPoint, servant);
-    if (servant != null) {
-    categoryLink = servant.chooseOneCategoryLink(reviewPoint.getUser(), link).orElse(null);
-    } else {
-      categoryLink = null;
-    }
   }
 
   @Override
   public List<Note> generateFillingOptions() {
     if (cachedFillingOptions == null) {
-      cachedFillingOptions =
-          Optional.ofNullable(categoryLink)
-              .map(lk -> lk.getReverseLinksOfCousins(reviewPoint.getUser(), link.getLinkType()))
-              .map(
-                  remoteCousins ->
-                      servant.randomizer.randomlyChoose(5, remoteCousins).stream()
-                          .map(Link::getSourceNote)
-                          .collect(Collectors.toList()))
-              .orElse(Collections.emptyList());
+      if (categoryLink != null) {
+        List<Link> remoteCousins = getReverseLinksOfCousins(reviewPoint.getUser());
+        cachedFillingOptions =
+            servant.randomizer.randomlyChoose(5, remoteCousins).stream()
+                .map(Link::getSourceNote)
+                .collect(Collectors.toList());
+      }
     }
     return cachedFillingOptions;
   }
@@ -58,17 +49,14 @@ public class FromSamePartAsQuizFactory extends AbstractCategoryQuizFactory {
 
   @Override
   public List<ReviewPoint> getViceReviewPoints(UserModel userModel) {
-    if (cachedAnswerLink != null) {
-      ReviewPoint answerLinkReviewPoint = userModel.getReviewPointFor(cachedAnswerLink);
-      List<ReviewPoint> result = new ArrayList<>();
-      result.add(answerLinkReviewPoint);
-      if(categoryLink != null) {
-        ReviewPoint reviewPointFor = userModel.getReviewPointFor(categoryLink);
-        if(reviewPointFor != null) result.add(reviewPointFor);
-      }
-      return result;
+    if (cachedAnswerLink == null) {
+      return Collections.emptyList();
     }
-    return Collections.emptyList();
+    ReviewPoint answerLinkReviewPoint = userModel.getReviewPointFor(cachedAnswerLink);
+    List<ReviewPoint> result = new ArrayList<>();
+    result.add(answerLinkReviewPoint);
+    result.addAll(getCategoryReviewPoints(userModel));
+    return result;
   }
 
   @Override
