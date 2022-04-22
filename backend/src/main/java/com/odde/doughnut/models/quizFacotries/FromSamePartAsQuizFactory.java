@@ -20,7 +20,7 @@ public class FromSamePartAsQuizFactory extends AbstractCategoryQuizFactory {
   @Override
   public List<Note> generateFillingOptions() {
     if (cachedFillingOptions == null) {
-      List<Link> remoteCousins = getReverseLinksOfCousins(reviewPoint.getUser());
+      List<Link> remoteCousins = getReverseLinksOfCousins(user);
       cachedFillingOptions =
           servant.randomizer.randomlyChoose(5, remoteCousins).stream()
               .map(Link::getSourceNote)
@@ -54,12 +54,12 @@ public class FromSamePartAsQuizFactory extends AbstractCategoryQuizFactory {
 
   @Override
   public List<Note> knownRightAnswers() {
-    return reviewPoint.getLink().getCousinsOfSameLinkType(reviewPoint.getUser());
+    return link.getCousinsOfSameLinkType(user);
   }
 
   @Override
   public Link getCategoryLink() {
-    return this.categoryLink;
+    return getCategoryLink1();
   }
 
   protected Link getAnswerLink(QuizQuestionServant servant) {

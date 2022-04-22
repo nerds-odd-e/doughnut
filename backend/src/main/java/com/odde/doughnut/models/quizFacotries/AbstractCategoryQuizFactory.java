@@ -12,20 +12,24 @@ import java.util.stream.Stream;
 
 public abstract class AbstractCategoryQuizFactory
     implements QuizQuestionFactory, QuestionOptionsFactory {
-  protected final ReviewPoint reviewPoint;
+  protected final User user;
   protected final Link link;
   protected final QuizQuestionServant servant;
-  protected final Link categoryLink;
+  private final Link categoryLink;
 
   public AbstractCategoryQuizFactory(ReviewPoint reviewPoint, QuizQuestionServant servant) {
-    this.reviewPoint = reviewPoint;
+    this.user = reviewPoint.getUser();
     this.link = reviewPoint.getLink();
     this.servant = servant;
     if (servant != null) {
-      categoryLink = servant.chooseOneCategoryLink(reviewPoint.getUser(), link).orElse(null);
+      categoryLink = servant.chooseOneCategoryLink(user, link).orElse(null);
     } else {
       categoryLink = null;
     }
+  }
+
+  protected Link getCategoryLink1() {
+    return categoryLink;
   }
 
   protected List<ReviewPoint> getCategoryReviewPoints(UserModel userModel) {
@@ -56,8 +60,8 @@ public abstract class AbstractCategoryQuizFactory
   }
 
   protected Stream<Link> getCousinLinksFromSameCategoriesOfSameLinkType() {
-    UserModel userModel = servant.modelFactoryService.toUserModel(reviewPoint.getUser());
-    return new NoteViewer(reviewPoint.getUser(), categoryLink.getSourceNote())
+    UserModel userModel = servant.modelFactoryService.toUserModel(user);
+    return new NoteViewer(user, categoryLink.getSourceNote())
         .linksOfTypeThroughReverse(link.getLinkType())
         .filter(lk -> lk != link)
         .filter(l -> userModel.getReviewPointFor(l) != null);

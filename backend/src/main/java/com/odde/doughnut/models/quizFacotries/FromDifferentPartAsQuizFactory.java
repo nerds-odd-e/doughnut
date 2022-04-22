@@ -3,7 +3,6 @@ package com.odde.doughnut.models.quizFacotries;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.User;
 import com.odde.doughnut.models.UserModel;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,8 +18,7 @@ public class FromDifferentPartAsQuizFactory extends AbstractCategoryQuizFactory 
 
   @Override
   public List<Note> allWrongAnswers() {
-    List<Note> result =
-        new ArrayList<>(reviewPoint.getLink().getCousinsOfSameLinkType(reviewPoint.getUser()));
+    List<Note> result = new ArrayList<>(link.getCousinsOfSameLinkType(user));
     result.add(link.getSourceNote());
     return result;
   }
@@ -40,12 +38,11 @@ public class FromDifferentPartAsQuizFactory extends AbstractCategoryQuizFactory 
 
   @Override
   public Link getCategoryLink() {
-    return this.categoryLink;
+    return getCategoryLink1();
   }
 
   @Override
   public Note generateAnswerNote() {
-    User user = reviewPoint.getUser();
     return servant
         .randomizer
         .chooseOneRandomly(getReverseLinksOfCousins(user))
