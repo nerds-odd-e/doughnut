@@ -30,7 +30,8 @@ public class FromDifferentPartAsQuizFactory extends AbstractCategoryQuizFactory 
     if (cachedFillingOptions == null) {
       Stream<Link> cousinLinks = getCousinLinksFromSameCategoriesOfSameLinkType();
       cachedFillingOptions =
-          servant.randomizer.randomlyChoose(5, cousinLinks.collect(Collectors.toList())).stream()
+          servant
+              .chooseFillingOptionsRandomly(cousinLinks)
               .map(Link::getSourceNote)
               .collect(Collectors.toList());
     }

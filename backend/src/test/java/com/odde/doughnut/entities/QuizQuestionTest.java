@@ -91,7 +91,7 @@ class QuizQuestionTest {
       Note note = makeMe.aNote().under(top).please();
       makeMe.refresh(top);
       List<String> options = getOptions(note);
-      assertThat(options.size(), equalTo(4));
+      assertThat(options.size(), equalTo(3));
       assertThat(options.contains(note.getTitle()), is(true));
     }
   }

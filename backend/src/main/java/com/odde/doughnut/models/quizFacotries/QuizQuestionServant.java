@@ -9,11 +9,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class QuizQuestionServant {
   final Randomizer randomizer;
   final ModelFactoryService modelFactoryService;
-  final int maxFillingOptionCount = 3;
+  final int maxFillingOptionCount = 2;
 
   public QuizQuestionServant(Randomizer randomizer, ModelFactoryService modelFactoryService) {
     this.randomizer = randomizer;
@@ -45,5 +46,11 @@ public class QuizQuestionServant {
 
   Optional<Link> chooseOneCategoryLink(User user, Link link) {
     return randomizer.chooseOneRandomly(link.categoryLinksOfTarget(user));
+  }
+
+  Stream<Link> chooseFillingOptionsRandomly(Stream<Link> cousinLinks) {
+    return randomizer
+        .randomlyChoose(maxFillingOptionCount, cousinLinks.collect(Collectors.toList()))
+        .stream();
   }
 }
