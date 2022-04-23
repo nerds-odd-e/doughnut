@@ -12,7 +12,6 @@ import java.util.stream.Collectors;
 public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory, QuestionOptionsFactory {
 
   private final CategoryHelper categoryHelper;
-  private List<Note> cachedFillingOptions = null;
   private final User user;
   private final Link link;
   private final QuizQuestionServant servant;
@@ -33,17 +32,16 @@ public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory, Ques
 
   @Override
   public List<Note> generateFillingOptions() {
-    if (cachedFillingOptions == null) {
-      List<Link> cousinLinks =
-          categoryHelper
-              .getCousinLinksFromSameCategoriesOfSameLinkType()
-              .collect(Collectors.toList());
-      cachedFillingOptions =
-          servant.chooseFillingOptionsRandomly(cousinLinks).stream()
-              .map(Link::getSourceNote)
-              .collect(Collectors.toList());
+    if (getCategoryLink() == null) {
+      return null;
     }
-    return cachedFillingOptions;
+    List<Link> cousinLinks =
+        categoryHelper
+            .getCousinLinksFromSameCategoriesOfSameLinkType()
+            .collect(Collectors.toList());
+    return servant.chooseFillingOptionsRandomly(cousinLinks).stream()
+        .map(Link::getSourceNote)
+        .collect(Collectors.toList());
   }
 
   @Override
