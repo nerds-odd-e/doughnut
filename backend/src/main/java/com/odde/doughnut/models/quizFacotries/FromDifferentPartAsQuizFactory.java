@@ -8,7 +8,6 @@ import com.odde.doughnut.models.UserModel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory, QuestionOptionsFactory {
 
@@ -35,10 +34,12 @@ public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory, Ques
   @Override
   public List<Note> generateFillingOptions() {
     if (cachedFillingOptions == null) {
-      Stream<Link> cousinLinks = categoryHelper.getCousinLinksFromSameCategoriesOfSameLinkType();
+      List<Link> cousinLinks =
+          categoryHelper
+              .getCousinLinksFromSameCategoriesOfSameLinkType()
+              .collect(Collectors.toList());
       cachedFillingOptions =
-          servant
-              .chooseFillingOptionsRandomly(cousinLinks)
+          servant.chooseFillingOptionsRandomly(cousinLinks).stream()
               .map(Link::getSourceNote)
               .collect(Collectors.toList());
     }

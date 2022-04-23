@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class QuizQuestionServant {
   final Randomizer randomizer;
@@ -40,9 +39,7 @@ public class QuizQuestionServant {
     return randomizer.chooseOneRandomly(link.categoryLinksOfTarget(user));
   }
 
-  Stream<Link> chooseFillingOptionsRandomly(Stream<Link> cousinLinks) {
-    return randomizer
-        .randomlyChoose(maxFillingOptionCount, cousinLinks.collect(Collectors.toList()))
-        .stream();
+  <T> List<T> chooseFillingOptionsRandomly(List<T> candidates) {
+    return randomizer.randomlyChoose(maxFillingOptionCount, candidates);
   }
 }

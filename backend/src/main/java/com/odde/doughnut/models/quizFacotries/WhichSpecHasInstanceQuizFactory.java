@@ -36,7 +36,7 @@ public class WhichSpecHasInstanceQuizFactory
         Stream.concat(instanceReverse.stream(), specReverse.stream())
             .filter(n -> !(instanceReverse.contains(n) && specReverse.contains(n)))
             .collect(Collectors.toList());
-    cachedFillingOptions = servant.randomizer.randomlyChoose(5, backwardPeers);
+    cachedFillingOptions = servant.chooseFillingOptionsRandomly(backwardPeers);
     return cachedFillingOptions;
   }
 
