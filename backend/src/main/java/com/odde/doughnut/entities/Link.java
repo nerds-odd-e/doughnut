@@ -5,6 +5,7 @@ import static com.odde.doughnut.entities.QuizQuestion.QuestionType.DESCRIPTION_L
 import static com.odde.doughnut.entities.QuizQuestion.QuestionType.FROM_DIFFERENT_PART_AS;
 import static com.odde.doughnut.entities.QuizQuestion.QuestionType.FROM_SAME_PART_AS;
 import static com.odde.doughnut.entities.QuizQuestion.QuestionType.LINK_SOURCE;
+import static com.odde.doughnut.entities.QuizQuestion.QuestionType.LINK_SOURCE_WITHIN_SAME_LINK_TYPE;
 import static com.odde.doughnut.entities.QuizQuestion.QuestionType.LINK_TARGET;
 import static com.odde.doughnut.entities.QuizQuestion.QuestionType.WHICH_SPEC_HAS_INSTANCE;
 
@@ -60,7 +61,7 @@ public class Link {
         "applied to",
         new QuestionType[] {
           LINK_TARGET,
-          LINK_SOURCE,
+          LINK_SOURCE_WITHIN_SAME_LINK_TYPE,
           WHICH_SPEC_HAS_INSTANCE,
           FROM_SAME_PART_AS,
           FROM_DIFFERENT_PART_AS,
@@ -149,7 +150,10 @@ public class Link {
         "an example of",
         "has examples",
         new QuestionType[] {
-          LINK_SOURCE, CLOZE_LINK_TARGET, FROM_SAME_PART_AS, FROM_DIFFERENT_PART_AS
+          LINK_SOURCE_WITHIN_SAME_LINK_TYPE,
+          CLOZE_LINK_TARGET,
+          FROM_SAME_PART_AS,
+          FROM_DIFFERENT_PART_AS
         }),
     PRECEDES(
         19,
