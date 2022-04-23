@@ -4,6 +4,7 @@ import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.models.NoteViewer;
 import java.util.List;
 
 public class LinkSourceWithinSameLinkTypeQuizFactory
@@ -30,7 +31,10 @@ public class LinkSourceWithinSameLinkTypeQuizFactory
           servant.chooseFromCohort(
               answerNote,
               n ->
-                  !n.equals(answerNote)
+                  !new NoteViewer(user, n)
+                          .linksOfTypeThroughDirect(List.of(link.getLinkType()))
+                          .isEmpty()
+                      && !n.equals(answerNote)
                       && !n.equals(link.getTargetNote())
                       && !cousinOfSameLinkType.contains(n));
     }
