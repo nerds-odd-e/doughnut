@@ -39,7 +39,7 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory, QuestionO
   }
 
   @Override
-  public Note generateAnswerNote() {
+  public Note generateAnswer() {
     if (getAnswerLink(servant) == null) return null;
     return getAnswerLink(servant).getSourceNote();
   }

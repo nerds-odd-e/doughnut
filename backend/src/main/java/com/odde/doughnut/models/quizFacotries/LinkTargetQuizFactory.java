@@ -33,7 +33,7 @@ public class LinkTargetQuizFactory implements QuizQuestionFactory, QuestionOptio
   }
 
   @Override
-  public Note generateAnswerNote() {
+  public Note generateAnswer() {
     return answerNote;
   }
 

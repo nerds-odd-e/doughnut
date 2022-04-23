@@ -41,7 +41,7 @@ public class WhichSpecHasInstanceQuizFactory
   }
 
   @Override
-  public Note generateAnswerNote() {
+  public Note generateAnswer() {
     cachedInstanceLink = getInstanceLink(servant);
     if (cachedInstanceLink == null) return null;
     return cachedInstanceLink.getSourceNote();

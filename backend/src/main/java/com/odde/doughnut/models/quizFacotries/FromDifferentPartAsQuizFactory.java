@@ -52,7 +52,7 @@ public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory, Ques
   }
 
   @Override
-  public Note generateAnswerNote() {
+  public Note generateAnswer() {
     return servant
         .randomizer
         .chooseOneRandomly(categoryHelper.getReverseLinksOfCousins())

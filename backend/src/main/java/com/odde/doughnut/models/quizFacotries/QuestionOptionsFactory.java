@@ -1,17 +1,16 @@
 package com.odde.doughnut.models.quizFacotries;
 
-import com.odde.doughnut.entities.Note;
 import java.util.List;
 
-public interface QuestionOptionsFactory {
-  Note generateAnswerNote();
+public interface QuestionOptionsFactory<T> {
+  T generateAnswer();
 
-  List<Note> generateFillingOptions();
+  List<T> generateFillingOptions();
 
-  default List<Note> generateOptions() {
-    Note answerNote = generateAnswerNote();
+  default List<T> generateOptions() {
+    T answerNote = generateAnswer();
     if (answerNote == null) return null;
-    List<Note> fillingOptions = generateFillingOptions();
+    List<T> fillingOptions = generateFillingOptions();
     if (fillingOptions.isEmpty()) {
       return null;
     }

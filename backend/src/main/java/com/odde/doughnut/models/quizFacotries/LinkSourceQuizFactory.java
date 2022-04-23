@@ -36,7 +36,7 @@ public class LinkSourceQuizFactory implements QuizQuestionFactory, QuestionOptio
   }
 
   @Override
-  public Note generateAnswerNote() {
+  public Note generateAnswer() {
     return answerNote;
   }
 

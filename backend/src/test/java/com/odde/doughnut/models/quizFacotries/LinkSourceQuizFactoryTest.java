@@ -40,9 +40,9 @@ class LinkSourceQuizFactoryTest {
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
     top = makeMe.aNote().byUser(userModel).please();
-    target = makeMe.aNote("target").under(top).please();
-    source = makeMe.aNote("source").under(top).linkTo(target).please();
-    anotherSource = makeMe.aNote("another note").under(top).please();
+    target = makeMe.aNote("sauce").under(top).please();
+    source = makeMe.aNote("tomato sauce").under(top).linkTo(target).please();
+    anotherSource = makeMe.aNote("blue cheese").under(top).please();
     reviewPoint = makeMe.aReviewPointFor(source.getLinks().get(0)).inMemoryPlease();
     makeMe.refresh(top);
   }
@@ -67,10 +67,10 @@ class LinkSourceQuizFactoryTest {
       assertThat(
           quizQuestion.getDescription(),
           equalTo("Which one <em>is immediately a specialization of</em>:"));
-      assertThat(quizQuestion.getMainTopic(), equalTo("target"));
+      assertThat(quizQuestion.getMainTopic(), equalTo(target.getTitle()));
       List<String> options = toOptionStrings(quizQuestion);
       assertThat(anotherSource.getTitle(), in(options));
-      assertThat(source.getTitle(), in(options));
+      assertThat("tomato sauce", in(options));
     }
 
     @Nested
