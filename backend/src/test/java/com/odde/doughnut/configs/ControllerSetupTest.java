@@ -2,6 +2,7 @@ package com.odde.doughnut.configs;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -55,7 +56,7 @@ public class ControllerSetupTest {
         () ->
             controllerSetup.handleSystemException(
                 request, new ResponseStatusException(HttpStatus.UNAUTHORIZED, "xx")));
-    //    assertThat(makeMe.modelFactoryService.failureReportRepository.count(), equalTo(count));
+    assertThat(makeMe.modelFactoryService.failureReportRepository.count(), equalTo(count + 1));
   }
 
   @Test

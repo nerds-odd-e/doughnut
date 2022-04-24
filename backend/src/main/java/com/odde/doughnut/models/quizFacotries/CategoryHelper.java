@@ -39,6 +39,7 @@ public class CategoryHelper {
   }
 
   public List<Link> getReverseLinksOfCousins() {
+    if (categoryLink == null) return List.of();
     List<Link> uncles = unclesFromSameCategory();
     return categoryLink.getCousinLinksOfSameLinkType(user).stream()
         .filter(cl -> !uncles.contains(cl))
@@ -60,6 +61,7 @@ public class CategoryHelper {
   }
 
   public Stream<Link> getCousinLinksFromSameCategoriesOfSameLinkType() {
+    if (categoryLink == null) return Stream.of();
     UserModel userModel = servant.modelFactoryService.toUserModel(user);
     return new NoteViewer(user, categoryLink.getSourceNote())
         .linksOfTypeThroughReverse(link.getLinkType())
