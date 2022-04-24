@@ -17,7 +17,7 @@ public record FailureReportFactory(
     ModelFactoryService modelFactoryService) {
 
   public void createUnlessAllowed() throws IOException, InterruptedException {
-    if (exception instanceof ResponseStatusException) return;
+//    if (exception instanceof ResponseStatusException) return;
 
     FailureReport failureReport = createFailureReport();
     Integer issueNumber = githubService.createGithubIssue(failureReport);
