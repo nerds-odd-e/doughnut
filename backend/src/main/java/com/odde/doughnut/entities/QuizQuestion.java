@@ -149,12 +149,6 @@ public class QuizQuestion {
             .collect(Collectors.joining(","));
   }
 
-  @JsonIgnore
-  public void setOptionNotes(List<Note> notes) {
-    optionNoteIds =
-        notes.stream().map(Note::getId).map(Object::toString).collect(Collectors.joining(","));
-  }
-
   public void setQuestionType(QuestionType questionType) {
     this.questionTypeId = questionType.id;
   }

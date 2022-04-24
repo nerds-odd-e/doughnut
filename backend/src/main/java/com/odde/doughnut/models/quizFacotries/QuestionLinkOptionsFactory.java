@@ -1,19 +1,20 @@
 package com.odde.doughnut.models.quizFacotries;
 
+import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.models.Randomizer;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public interface QuestionOptionsFactory {
-  Note generateAnswer();
+public interface QuestionLinkOptionsFactory {
+  Link generateAnswer();
 
-  List<Note> generateFillingOptions();
+  List<Link> generateFillingOptions();
 
-  default List<Note> generateOptions1() {
-    Note answerNote = generateAnswer();
+  default List<Link> generateOptions1() {
+    Link answerNote = generateAnswer();
     if (answerNote == null) return null;
-    List<Note> fillingOptions = generateFillingOptions();
+    List<Link> fillingOptions = generateFillingOptions();
     if (fillingOptions.isEmpty()) {
       return null;
     }
@@ -22,9 +23,10 @@ public interface QuestionOptionsFactory {
   }
 
   default String generateOptions(Randomizer randomizer) {
-    List<Note> options = generateOptions1();
+    List<Link> options = generateOptions1();
     if (options == null) return null;
     return randomizer.shuffle(options).stream()
+        .map(Link::getSourceNote)
         .map(Note::getId)
         .map(Object::toString)
         .collect(Collectors.joining(","));

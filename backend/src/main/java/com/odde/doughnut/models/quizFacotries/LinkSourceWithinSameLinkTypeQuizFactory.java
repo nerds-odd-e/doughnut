@@ -6,14 +6,15 @@ import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.models.NoteViewer;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class LinkSourceWithinSameLinkTypeQuizFactory
-    implements QuizQuestionFactory, QuestionOptionsFactory {
+    implements QuizQuestionFactory, QuestionLinkOptionsFactory {
   protected final Link link;
-  private QuizQuestionServant servant;
+  private final QuizQuestionServant servant;
   protected final Note answerNote;
   private final User user;
-  private List<Note> cachedFillingOptions = null;
+  private List<Link> cachedFillingOptions = null;
 
   public LinkSourceWithinSameLinkTypeQuizFactory(
       ReviewPoint reviewPoint, QuizQuestionServant servant) {
@@ -24,26 +25,30 @@ public class LinkSourceWithinSameLinkTypeQuizFactory
   }
 
   @Override
-  public List<Note> generateFillingOptions() {
+  public List<Link> generateFillingOptions() {
     if (cachedFillingOptions == null) {
       List<Note> cousinOfSameLinkType = link.getCousinsOfSameLinkType(user);
       cachedFillingOptions =
-          servant.chooseFromCohort(
-              answerNote,
-              n ->
-                  !new NoteViewer(user, n)
-                          .linksOfTypeThroughDirect(List.of(link.getLinkType()))
-                          .isEmpty()
-                      && !n.equals(answerNote)
-                      && !n.equals(link.getTargetNote())
-                      && !cousinOfSameLinkType.contains(n));
+          servant
+              .chooseFromCohort(
+                  answerNote,
+                  n ->
+                      !n.equals(answerNote)
+                          && !n.equals(link.getTargetNote())
+                          && !cousinOfSameLinkType.contains(n)
+                          && !new NoteViewer(user, n)
+                              .linksOfTypeThroughDirect(List.of(link.getLinkType()))
+                              .isEmpty())
+              .stream()
+              .map(n -> n.getLinks().get(0))
+              .collect(Collectors.toList());
     }
     return cachedFillingOptions;
   }
 
   @Override
-  public Note generateAnswer() {
-    return answerNote;
+  public Link generateAnswer() {
+    return link;
   }
 
   @Override

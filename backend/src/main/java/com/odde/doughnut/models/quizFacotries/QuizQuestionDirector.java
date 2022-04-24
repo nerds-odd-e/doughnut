@@ -1,6 +1,5 @@
 package com.odde.doughnut.models.quizFacotries;
 
-import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -32,9 +31,9 @@ public class QuizQuestionDirector {
     QuizQuestion quizQuestion = new QuizQuestion();
     quizQuestion.setReviewPoint(reviewPoint);
     quizQuestion.setQuestionType(questionType);
-    List<Note> options = getOptions();
+    String options = getOptions();
     if (options == null) return null;
-    quizQuestion.setOptionNotes(randomizer.shuffle(options));
+    quizQuestion.setOptionNoteIds(options);
     List<ReviewPoint> viceReviewPoints =
         quizQuestionFactory.getViceReviewPoints(
             modelFactoryService.toUserModel(reviewPoint.getUser()));
@@ -47,10 +46,13 @@ public class QuizQuestionDirector {
     return quizQuestion;
   }
 
-  private List<Note> getOptions() {
+  private String getOptions() {
     if (quizQuestionFactory instanceof QuestionOptionsFactory optionsFactory) {
-      return optionsFactory.generateOptions();
+      return optionsFactory.generateOptions(randomizer);
     }
-    return List.of();
+    if (quizQuestionFactory instanceof QuestionLinkOptionsFactory linkOptionsFactory) {
+      return linkOptionsFactory.generateOptions(randomizer);
+    }
+    return "";
   }
 }

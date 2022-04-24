@@ -25,12 +25,12 @@ public class QuizQuestionServant {
     return randomizer.randomlyChoose(maxFillingOptionCount, list);
   }
 
-  private List<Note> getCohort(Note answerNote, Predicate<Note> notePredicate) {
+  public List<Note> getCohort(Note note, Predicate<Note> notePredicate) {
     List<Note> list =
-        answerNote.getSiblings().stream().filter(notePredicate).collect(Collectors.toList());
+        note.getSiblings().stream().filter(notePredicate).collect(Collectors.toList());
     if (list.size() > 1) return list;
 
-    return answerNote.getGrandAsPossible().getDescendantsInBreathFirstOrder().stream()
+    return note.getGrandAsPossible().getDescendantsInBreathFirstOrder().stream()
         .filter(notePredicate)
         .collect(Collectors.toList());
   }
