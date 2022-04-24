@@ -103,7 +103,7 @@ public class QuizQuestionViewedByUser {
     public Option optionFromLink(Link link) {
       Option option = new Option();
       option.noteId = link.getSourceNote().getId();
-      option.display = link.getSourceNote().getTitle();
+      option.display = link.getClozeSource();
       return option;
     }
 

@@ -11,6 +11,7 @@ import static com.odde.doughnut.entities.QuizQuestion.QuestionType.WHICH_SPEC_HA
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonValue;
+import com.odde.doughnut.algorithms.ClozeDescription;
 import com.odde.doughnut.entities.QuizQuestion.QuestionType;
 import com.odde.doughnut.models.NoteViewer;
 import java.sql.Timestamp;
@@ -329,5 +330,10 @@ public class Link {
     return new NoteViewer(viewer, getTargetNote())
         .linksOfTypeThroughDirect(
             List.of(LinkType.PART, LinkType.INSTANCE, LinkType.SPECIALIZE, LinkType.APPLICATION));
+  }
+
+  public String getClozeSource() {
+    return ClozeDescription.htmlClosedDescription()
+        .getClozeDescription(getTargetNote().getNoteTitle(), getSourceNote().getTitle());
   }
 }
