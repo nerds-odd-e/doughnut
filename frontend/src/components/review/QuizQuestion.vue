@@ -41,7 +41,7 @@
             processForm();
           "
         >
-          <div v-if="!option.picture">{{ option.display }}</div>
+          <div v-if="!option.picture" v-html="option.display" />
           <div v-else>
             <ShowPicture v-bind="option.pictureWithMask" :opacity="1" />
           </div>
