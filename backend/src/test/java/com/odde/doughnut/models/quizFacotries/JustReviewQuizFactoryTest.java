@@ -65,14 +65,22 @@ class JustReviewQuizFactoryTest {
     @Test
     void correct() {
       AnswerViewedByUser answerResult =
-          makeMe.anAnswerFor(reviewPoint).type(JUST_REVIEW).answer("sad").inMemoryPlease();
+          makeMe
+              .anAnswerFor(reviewPoint)
+              .type(JUST_REVIEW)
+              .answerWithSpelling("sad")
+              .inMemoryPlease();
       assertTrue(answerResult.correct);
     }
 
     @Test
     void invalidAnswer() {
       AnswerViewedByUser answerResult =
-          makeMe.anAnswerFor(reviewPoint).type(JUST_REVIEW).answer("no idea").inMemoryPlease();
+          makeMe
+              .anAnswerFor(reviewPoint)
+              .type(JUST_REVIEW)
+              .answerWithSpelling("no idea")
+              .inMemoryPlease();
       assertTrue(answerResult.correct);
     }
   }

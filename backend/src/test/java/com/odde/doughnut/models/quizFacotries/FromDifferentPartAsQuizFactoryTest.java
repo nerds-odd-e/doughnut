@@ -164,7 +164,7 @@ class FromDifferentPartAsQuizFactoryTest {
               makeMe
                   .anAnswerFor(uglySubjectiveRp)
                   .type(FROM_DIFFERENT_PART_AS)
-                  .answer(tall.getTitle())
+                  .answerWithSpelling(tall.getTitle())
                   .inMemoryPlease();
           assertTrue(answerResult.correct);
         }
@@ -175,7 +175,7 @@ class FromDifferentPartAsQuizFactoryTest {
               makeMe
                   .anAnswerFor(uglySubjectiveRp)
                   .type(FROM_DIFFERENT_PART_AS)
-                  .answer(pretty.getTitle())
+                  .answerWithSpelling(pretty.getTitle())
                   .inMemoryPlease();
           assertFalse(answerResult.correct);
         }
@@ -186,7 +186,7 @@ class FromDifferentPartAsQuizFactoryTest {
               makeMe
                   .anAnswerFor(uglySubjectiveRp)
                   .type(FROM_DIFFERENT_PART_AS)
-                  .answer("metal")
+                  .answerWithSpelling("metal")
                   .inMemoryPlease();
           assertTrue(answerResult.correct);
         }

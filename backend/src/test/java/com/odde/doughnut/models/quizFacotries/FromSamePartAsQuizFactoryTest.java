@@ -145,7 +145,7 @@ class FromSamePartAsQuizFactoryTest {
                 makeMe
                     .anAnswerFor(reviewPoint)
                     .type(FROM_SAME_PART_AS)
-                    .answer(pretty.getTitle())
+                    .answerWithSpelling(pretty.getTitle())
                     .inMemoryPlease();
             assertTrue(answerResult.correct);
           }
@@ -156,7 +156,7 @@ class FromSamePartAsQuizFactoryTest {
                 makeMe
                     .anAnswerFor(reviewPoint)
                     .type(FROM_SAME_PART_AS)
-                    .answer("metal")
+                    .answerWithSpelling("metal")
                     .inMemoryPlease();
             assertFalse(answerResult.correct);
           }

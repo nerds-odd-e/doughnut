@@ -1,7 +1,6 @@
 package com.odde.doughnut.models.quizFacotries;
 
 import com.odde.doughnut.entities.Link;
-import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.models.Randomizer;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -26,8 +25,7 @@ public interface QuestionLinkOptionsFactory {
     List<Link> options = generateOptions1();
     if (options == null) return null;
     return randomizer.shuffle(options).stream()
-        .map(Link::getSourceNote)
-        .map(Note::getId)
+        .map(Link::getId)
         .map(Object::toString)
         .collect(Collectors.joining(","));
   }

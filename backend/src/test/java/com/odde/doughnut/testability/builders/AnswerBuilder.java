@@ -33,8 +33,13 @@ public class AnswerBuilder extends EntityBuilder<AnswerViewedByUser> {
     return this;
   }
 
-  public AnswerBuilder answer(String answer) {
+  public AnswerBuilder answerWithSpelling(String answer) {
     this.answer.setSpellingAnswer(answer);
+    return this;
+  }
+
+  public AnswerBuilder answerWithId(Integer id) {
+    this.answer.setAnswerNoteId(id);
     return this;
   }
 }

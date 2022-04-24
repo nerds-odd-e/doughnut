@@ -33,7 +33,11 @@ class AnswerViewedByUserTest {
     @Test
     void correct() {
       AnswerViewedByUser answer =
-          makeMe.anAnswerFor(reviewPoint).type(CLOZE_SELECTION).answer("this").inMemoryPlease();
+          makeMe
+              .anAnswerFor(reviewPoint)
+              .type(CLOZE_SELECTION)
+              .answerWithSpelling("this")
+              .inMemoryPlease();
       assertTrue(answer.correct);
     }
 
@@ -43,7 +47,7 @@ class AnswerViewedByUserTest {
           makeMe
               .anAnswerFor(reviewPoint)
               .type(CLOZE_SELECTION)
-              .answer("this / that")
+              .answerWithSpelling("this / that")
               .inMemoryPlease();
       assertTrue(answerResult.correct);
     }

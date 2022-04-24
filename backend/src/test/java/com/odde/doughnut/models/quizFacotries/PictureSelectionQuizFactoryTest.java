@@ -107,7 +107,7 @@ class PictureSelectionQuizFactoryTest {
             makeMe
                 .anAnswerFor(reviewPoint)
                 .type(PICTURE_SELECTION)
-                .answer(source.getTitle())
+                .answerWithSpelling(source.getTitle())
                 .inMemoryPlease();
         assertTrue(answerResult.correct);
       }

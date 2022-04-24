@@ -18,6 +18,7 @@ import com.odde.doughnut.models.quizFacotries.JustReviewQuizPresenter;
 import com.odde.doughnut.models.quizFacotries.LinkSourceQuizFactory;
 import com.odde.doughnut.models.quizFacotries.LinkSourceQuizPresenter;
 import com.odde.doughnut.models.quizFacotries.LinkSourceWithinSameLinkTypeQuizFactory;
+import com.odde.doughnut.models.quizFacotries.LinkSourceWithinSameLinkTypeQuizPresenter;
 import com.odde.doughnut.models.quizFacotries.LinkTargetQuizFactory;
 import com.odde.doughnut.models.quizFacotries.LinkTargetQuizPresenter;
 import com.odde.doughnut.models.quizFacotries.PictureSelectionQuizFactory;
@@ -65,7 +66,9 @@ public class QuizQuestion {
     LINK_TARGET(5, LinkTargetQuizFactory::new, LinkTargetQuizPresenter::new),
     LINK_SOURCE(6, LinkSourceQuizFactory::new, LinkSourceQuizPresenter::new),
     LINK_SOURCE_WITHIN_SAME_LINK_TYPE(
-        14, LinkSourceWithinSameLinkTypeQuizFactory::new, LinkSourceQuizPresenter::new),
+        14,
+        LinkSourceWithinSameLinkTypeQuizFactory::new,
+        LinkSourceWithinSameLinkTypeQuizPresenter::new),
     CLOZE_LINK_TARGET(7, ClozeLinkTargetQuizFactory::new, ClozeLinkTargetQuizPresenter::new),
     DESCRIPTION_LINK_TARGET(
         8, DescriptionLinkTargetQuizFactory::new, DescriptionLinkTargetQuizPresenter::new),

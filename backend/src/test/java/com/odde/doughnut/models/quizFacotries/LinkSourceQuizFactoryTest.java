@@ -81,7 +81,7 @@ class LinkSourceQuizFactoryTest {
             makeMe
                 .anAnswerFor(reviewPoint)
                 .type(LINK_SOURCE)
-                .answer(source.getTitle())
+                .answerWithSpelling(source.getTitle())
                 .inMemoryPlease();
         assertTrue(answerResult.correct);
       }

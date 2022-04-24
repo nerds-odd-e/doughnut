@@ -4,7 +4,7 @@ import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.PictureWithMask;
 import com.odde.doughnut.entities.QuizQuestion;
-import com.odde.doughnut.entities.repositories.NoteRepository;
+import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionPresenter;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +33,7 @@ public class QuizQuestionViewedByUser {
   public Optional<PictureWithMask> pictureWithMask;
 
   public static QuizQuestionViewedByUser from(
-      QuizQuestion quizQuestion, NoteRepository noteRepository) {
+      QuizQuestion quizQuestion, ModelFactoryService modelFactoryService) {
     QuizQuestionPresenter presenter = quizQuestion.getQuestionType().presenter.apply(quizQuestion);
     QuizQuestionViewedByUser question = new QuizQuestionViewedByUser();
     question.quizQuestion = quizQuestion;
@@ -45,9 +45,8 @@ public class QuizQuestionViewedByUser {
     question.viceReviewPointIdList = quizQuestion.getViceReviewPointIdList();
     question.scope =
         List.of(quizQuestion.getReviewPoint().getSourceNote().getNotebook().getHeadNote());
-    Stream<Note> noteStream =
-        noteRepository.findAllByIds(quizQuestion.getOptionNoteIds().split(","));
-    question.options = noteStream.map(presenter.optionCreator()::optionFromNote).toList();
+    question.options =
+        presenter.optionCreator().getOptions(modelFactoryService, quizQuestion.getOptionNoteIds());
     return question;
   }
 
@@ -61,6 +60,13 @@ public class QuizQuestionViewedByUser {
   }
 
   public interface OptionCreator {
+
+    default List<Option> getOptions(ModelFactoryService modelFactoryService, String optionNoteIds) {
+      Stream<Note> noteStream =
+          modelFactoryService.noteRepository.findAllByIds(optionNoteIds.split(","));
+      return noteStream.map(this::optionFromNote).toList();
+    }
+
     Option optionFromNote(Note note);
   }
 
@@ -83,6 +89,27 @@ public class QuizQuestionViewedByUser {
       option.pictureWithMask = note.getPictureWithMask();
       option.isPicture = true;
       return option;
+    }
+  }
+
+  public static class ClozeLinkOptionCreator implements OptionCreator {
+    @Override
+    public List<Option> getOptions(ModelFactoryService modelFactoryService, String optionNoteIds) {
+      Stream<Link> noteStream =
+          modelFactoryService.linkRepository.findAllByIds(optionNoteIds.split(","));
+      return noteStream.map(this::optionFromLink).toList();
+    }
+
+    public Option optionFromLink(Link link) {
+      Option option = new Option();
+      option.noteId = link.getSourceNote().getId();
+      option.display = link.getSourceNote().getTitle();
+      return option;
+    }
+
+    @Override
+    public Option optionFromNote(Note note) {
+      return null;
     }
   }
 }

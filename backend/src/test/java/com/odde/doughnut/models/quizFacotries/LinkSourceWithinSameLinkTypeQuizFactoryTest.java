@@ -9,6 +9,7 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.odde.doughnut.entities.AnswerViewedByUser;
+import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
@@ -34,6 +35,7 @@ class LinkSourceWithinSameLinkTypeQuizFactoryTest {
   Note target;
   Note source;
   Note anotherSource;
+  Link sourceTarget;
   ReviewPoint reviewPoint;
 
   @BeforeEach
@@ -41,10 +43,11 @@ class LinkSourceWithinSameLinkTypeQuizFactoryTest {
     userModel = makeMe.aUser().toModelPlease();
     top = makeMe.aNote().byUser(userModel).please();
     target = makeMe.aNote("sauce").under(top).please();
-    source = makeMe.aNote("tomato sauce").under(top).linkTo(target).please();
+    source = makeMe.aNote("tomato sauce").under(top).please();
+    sourceTarget = makeMe.aLink().between(source, target).please();
     Note cheese = makeMe.aNote("Note cheese").under(top).please();
     anotherSource = makeMe.aNote("blue cheese").under(top).linkTo(cheese).please();
-    reviewPoint = makeMe.aReviewPointFor(source.getLinks().get(0)).inMemoryPlease();
+    reviewPoint = makeMe.aReviewPointFor(sourceTarget).inMemoryPlease();
     makeMe.refresh(top);
   }
 
@@ -82,7 +85,7 @@ class LinkSourceWithinSameLinkTypeQuizFactoryTest {
             makeMe
                 .anAnswerFor(reviewPoint)
                 .type(LINK_SOURCE_WITHIN_SAME_LINK_TYPE)
-                .answer(source.getTitle())
+                .answerWithId(source.getId())
                 .inMemoryPlease();
         assertTrue(answerResult.correct);
       }

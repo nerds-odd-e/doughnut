@@ -97,7 +97,7 @@ class DescriptionLinkTargetQuizFactoryTest {
           makeMe
               .anAnswerFor(reviewPoint)
               .type(DESCRIPTION_LINK_TARGET)
-              .answer(target.getTitle())
+              .answerWithSpelling(target.getTitle())
               .inMemoryPlease();
       assertTrue(answerResult.correct);
     }

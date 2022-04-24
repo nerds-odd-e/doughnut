@@ -142,8 +142,7 @@ class QuizQuestionTest {
 
   private QuizQuestionViewedByUser getQuizQuestion(Note note) {
     return QuizQuestionViewedByUser.from(
-        getReviewPointModel(note).generateAQuizQuestion(randomizer),
-        makeMe.modelFactoryService.noteRepository);
+        getReviewPointModel(note).generateAQuizQuestion(randomizer), makeMe.modelFactoryService);
   }
 
   private ReviewPointModel getReviewPointModel(Note note) {

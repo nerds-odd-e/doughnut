@@ -4,6 +4,7 @@ import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import java.util.List;
+import java.util.stream.Stream;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
@@ -65,4 +66,7 @@ public interface LinkRepository extends CrudRepository<Link, Integer> {
       "JOIN notes_closure ON notes_closure.note_id = source_id "
           + "   AND notes_closure.ancestor_id = :ancestor "
           + whereThereIsNoReviewPoint;
+
+  @Query(value = "SELECT link.* FROM link where id in (:ids)", nativeQuery = true)
+  Stream<Link> findAllByIds(String[] ids);
 }
