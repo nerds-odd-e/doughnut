@@ -22,6 +22,7 @@ import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -122,7 +123,7 @@ class RestReviewsController {
 
   @GetMapping(path = "/answers/{answer}")
   @Transactional
-  public AnswerViewedByUser getAnswer(Answer answer) {
+  public AnswerViewedByUser getAnswer(@PathVariable("answer") Answer answer) {
     UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertAuthorization(answer.getQuestion().getReviewPoint());
     AnswerModel answerModel = modelFactoryService.toAnswerModel(answer);
