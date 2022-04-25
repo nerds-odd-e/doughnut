@@ -3,7 +3,6 @@
     "target": "es2021",
     "module": "commonjs",
     "strict": true,
-    "jsx": "preserve",
     "moduleResolution": "node",
     "allowJs": true,
     "skipLibCheck": true,
