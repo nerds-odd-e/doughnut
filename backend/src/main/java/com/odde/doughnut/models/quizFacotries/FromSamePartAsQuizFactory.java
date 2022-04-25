@@ -40,16 +40,17 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory, QuestionO
 
   @Override
   public Note generateAnswer() {
-    if (getAnswerLink(servant) == null) return null;
-    return getAnswerLink(servant).getSourceNote();
+    if (getAnswerLink() == null) return null;
+    return getAnswerLink().getSourceNote();
   }
 
   @Override
   public List<ReviewPoint> getViceReviewPoints(UserModel userModel) {
-    if (cachedAnswerLink == null) {
+    Link answerLink = this.getAnswerLink();
+    if (answerLink == null) {
       return Collections.emptyList();
     }
-    ReviewPoint answerLinkReviewPoint = userModel.getReviewPointFor(cachedAnswerLink);
+    ReviewPoint answerLinkReviewPoint = userModel.getReviewPointFor(answerLink);
     List<ReviewPoint> result = new ArrayList<>();
     result.add(answerLinkReviewPoint);
     result.addAll(categoryHelper.getCategoryReviewPoints(userModel));
@@ -66,7 +67,7 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory, QuestionO
     return categoryHelper.getCategoryLink();
   }
 
-  protected Link getAnswerLink(QuizQuestionServant servant) {
+  protected Link getAnswerLink() {
     if (cachedAnswerLink == null) {
       List<Link> backwardPeers =
           servant.getCousinLinksOfSameLinkTypeHavingReviewPoint(link, user).toList();

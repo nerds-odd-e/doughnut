@@ -15,7 +15,7 @@ public class WhichSpecHasInstanceQuizFactory
   private List<Note> cachedFillingOptions = null;
   private final ReviewPoint reviewPoint;
   private final Link link;
-  private QuizQuestionServant servant;
+  private final QuizQuestionServant servant;
 
   public WhichSpecHasInstanceQuizFactory(ReviewPoint reviewPoint, QuizQuestionServant servant) {
     this.reviewPoint = reviewPoint;
@@ -40,15 +40,16 @@ public class WhichSpecHasInstanceQuizFactory
 
   @Override
   public Note generateAnswer() {
-    cachedInstanceLink = getInstanceLink(servant);
-    if (cachedInstanceLink == null) return null;
-    return cachedInstanceLink.getSourceNote();
+    Link instanceLink = getInstanceLink();
+    if (instanceLink == null) return null;
+    return instanceLink.getSourceNote();
   }
 
   @Override
   public List<ReviewPoint> getViceReviewPoints(UserModel userModel) {
-    if (cachedInstanceLink != null) {
-      ReviewPoint reviewPointFor = userModel.getReviewPointFor(cachedInstanceLink);
+    Link instanceLink = getInstanceLink();
+    if (instanceLink != null) {
+      ReviewPoint reviewPointFor = userModel.getReviewPointFor(instanceLink);
       if (reviewPointFor != null) {
         return List.of(reviewPointFor);
       }
@@ -56,7 +57,7 @@ public class WhichSpecHasInstanceQuizFactory
     return Collections.emptyList();
   }
 
-  private Link getInstanceLink(QuizQuestionServant servant) {
+  private Link getInstanceLink() {
     if (cachedInstanceLink == null) {
       Stream<Link> candidates =
           servant.getLinksFromSameSourceHavingReviewPoint(reviewPoint.getUser(), link);
@@ -71,7 +72,7 @@ public class WhichSpecHasInstanceQuizFactory
 
   @Override
   public Link getCategoryLink() {
-    return cachedInstanceLink;
+    return getInstanceLink();
   }
 
   @Override
