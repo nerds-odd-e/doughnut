@@ -273,15 +273,14 @@ public class Link {
 
   @JsonIgnore
   public List<Note> getCousinsOfSameLinkType(User viewer) {
-    return getCousinLinksOfSameLinkType(viewer).stream().map(Link::getSourceNote).toList();
+    return getCousinLinksOfSameLinkType(viewer).map(Link::getSourceNote).toList();
   }
 
   @JsonIgnore
-  public List<Link> getCousinLinksOfSameLinkType(User viewer) {
+  public Stream<Link> getCousinLinksOfSameLinkType(User viewer) {
     return new NoteViewer(viewer, targetNote)
         .linksOfTypeThroughReverse(getLinkType())
-        .filter(l -> !l.equals(this))
-        .collect(Collectors.toList());
+        .filter(l -> !l.equals(this));
   }
 
   @JsonIgnore
@@ -303,7 +302,7 @@ public class Link {
         sourceNote.getLinks().stream()
             .filter(l -> l.targetNote == targetNote)
             .map(Link::getLinkType)
-            .collect(Collectors.toUnmodifiableList());
+            .toList();
     return Arrays.stream(LinkType.values())
         .filter(lt -> lt == getLinkType() || !existingTypes.contains(lt))
         .collect(Collectors.toList());

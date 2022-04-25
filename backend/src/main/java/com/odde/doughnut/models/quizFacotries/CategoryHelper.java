@@ -8,12 +8,11 @@ import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.UserModel;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class CategoryHelper {
   private final User user;
   private final Link link;
-  private final QuizQuestionServant servant;
+  final QuizQuestionServant servant;
   private final Link categoryLink;
 
   public CategoryHelper(QuizQuestionServant servant, User user, Link link) {
@@ -41,7 +40,8 @@ public class CategoryHelper {
   public List<Link> getReverseLinksOfCousins() {
     if (categoryLink == null) return List.of();
     List<Link> uncles = unclesFromSameCategory();
-    return categoryLink.getCousinLinksOfSameLinkType(user).stream()
+    return categoryLink
+        .getCousinLinksOfSameLinkType(user)
         .filter(cl -> !uncles.contains(cl))
         .flatMap(
             p ->
@@ -55,17 +55,9 @@ public class CategoryHelper {
         new NoteViewer(user, link.getSourceNote())
             .linkTargetOfType(link.getLinkType())
             .collect(Collectors.toList());
-    return categoryLink.getCousinLinksOfSameLinkType(user).stream()
+    return categoryLink
+        .getCousinLinksOfSameLinkType(user)
         .filter(cl -> linkTargetOfType.contains(cl.getSourceNote()))
         .collect(Collectors.toList());
-  }
-
-  public Stream<Link> getCousinLinksFromSameCategoriesOfSameLinkType() {
-    if (categoryLink == null) return Stream.of();
-    UserModel userModel = servant.modelFactoryService.toUserModel(user);
-    return new NoteViewer(user, categoryLink.getSourceNote())
-        .linksOfTypeThroughReverse(link.getLinkType())
-        .filter(lk -> lk != link)
-        .filter(l -> userModel.getReviewPointFor(l) != null);
   }
 }

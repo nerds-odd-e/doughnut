@@ -1,5 +1,6 @@
 package com.odde.doughnut.models.quizFacotries;
 
+import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.models.Randomizer;
 import java.util.List;
@@ -9,6 +10,10 @@ public interface QuestionOptionsFactory {
   Note generateAnswer();
 
   List<Note> generateFillingOptions();
+
+  default Link getCategoryLink() {
+    return null;
+  }
 
   default String generateOptions(Randomizer randomizer) {
     List<Note> options = null;

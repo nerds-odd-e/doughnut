@@ -36,8 +36,8 @@ public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory, Ques
       return null;
     }
     List<Link> cousinLinks =
-        categoryHelper
-            .getCousinLinksFromSameCategoriesOfSameLinkType()
+        servant
+            .getCousinLinksOfSameLinkTypeHavingReviewPoint(link, user)
             .collect(Collectors.toList());
     return servant.chooseFillingOptionsRandomly(cousinLinks).stream()
         .map(Link::getSourceNote)

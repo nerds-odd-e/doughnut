@@ -36,13 +36,14 @@ public class QuizQuestionDirector {
       final String options;
       if (quizQuestionFactory instanceof QuestionOptionsFactory optionsFactory) {
         options = optionsFactory.generateOptions(randomizer);
-        if (options == null) return Optional.empty();
+        quizQuestion.setCategoryLink(optionsFactory.getCategoryLink());
       } else {
         QuestionLinkOptionsFactory linkOptionsFactory =
             (QuestionLinkOptionsFactory) quizQuestionFactory;
         options = linkOptionsFactory.generateOptions(randomizer);
-        if (options == null) return Optional.empty();
+        quizQuestion.setCategoryLink(linkOptionsFactory.getCategoryLink());
       }
+      if (options == null) return Optional.empty();
       quizQuestion.setOptionNoteIds(options);
     }
 
@@ -50,11 +51,7 @@ public class QuizQuestionDirector {
         quizQuestionFactory.getViceReviewPoints(
             modelFactoryService.toUserModel(reviewPoint.getUser()));
 
-    if (quizQuestionFactory.minimumViceReviewPointCount() > viceReviewPoints.size()) {
-      return Optional.empty();
-    }
     quizQuestion.setViceReviewPoints(viceReviewPoints);
-    quizQuestion.setCategoryLink(quizQuestionFactory.getCategoryLink());
     return Optional.of(quizQuestion);
   }
 }

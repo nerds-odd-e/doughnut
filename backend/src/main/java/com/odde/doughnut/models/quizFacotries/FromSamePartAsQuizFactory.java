@@ -45,11 +45,6 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory, QuestionO
   }
 
   @Override
-  public int minimumViceReviewPointCount() {
-    return 1;
-  }
-
-  @Override
   public List<ReviewPoint> getViceReviewPoints(UserModel userModel) {
     if (cachedAnswerLink == null) {
       return Collections.emptyList();
@@ -74,7 +69,7 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory, QuestionO
   protected Link getAnswerLink(QuizQuestionServant servant) {
     if (cachedAnswerLink == null) {
       List<Link> backwardPeers =
-          categoryHelper.getCousinLinksFromSameCategoriesOfSameLinkType().toList();
+          servant.getCousinLinksOfSameLinkTypeHavingReviewPoint(link, user).toList();
       cachedAnswerLink = servant.randomizer.chooseOneRandomly(backwardPeers).orElse(null);
     }
     return cachedAnswerLink;

@@ -10,6 +10,10 @@ public interface QuestionLinkOptionsFactory {
 
   List<Link> generateFillingOptions();
 
+  default Link getCategoryLink() {
+    return null;
+  }
+
   default String generateOptions(Randomizer randomizer) {
     List<Link> options = null;
     Link answerNote = generateAnswer();
