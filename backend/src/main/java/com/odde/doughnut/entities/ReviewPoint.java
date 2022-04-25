@@ -2,6 +2,7 @@ package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.algorithms.SpacedRepetitionAlgorithm;
+import com.odde.doughnut.entities.QuizQuestion.QuestionType;
 import com.odde.doughnut.models.TimestampOperations;
 import java.sql.Timestamp;
 import java.time.ZoneId;
@@ -29,6 +30,13 @@ public class ReviewPoint {
   @Getter
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
+
+  public QuizQuestion createAQuizQuestionOfType(QuestionType questionType) {
+    QuizQuestion quizQuestion = new QuizQuestion();
+    quizQuestion.setReviewPoint(this);
+    quizQuestion.setQuestionType(questionType);
+    return quizQuestion;
+  }
 
   @Override
   public String toString() {

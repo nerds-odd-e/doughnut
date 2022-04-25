@@ -4,12 +4,12 @@ import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.models.UserModel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory, QuestionOptionsFactory {
+public class FromDifferentPartAsQuizFactory
+    implements QuizQuestionFactory, QuestionOptionsFactory, SecondaryReviewPointsFactory {
 
   private final CategoryHelper categoryHelper;
   private final User user;
@@ -59,7 +59,7 @@ public class FromDifferentPartAsQuizFactory implements QuizQuestionFactory, Ques
   }
 
   @Override
-  public List<ReviewPoint> getViceReviewPoints(UserModel userModel) {
-    return categoryHelper.getCategoryReviewPoints(userModel);
+  public List<ReviewPoint> getViceReviewPoints() {
+    return categoryHelper.getCategoryReviewPoints();
   }
 }

@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class WhichSpecHasInstanceQuizFactory
-    implements QuizQuestionFactory, QuestionOptionsFactory {
+    implements QuizQuestionFactory, QuestionOptionsFactory, SecondaryReviewPointsFactory {
   private Link cachedInstanceLink = null;
   private List<Note> cachedFillingOptions = null;
   private final ReviewPoint reviewPoint;
@@ -46,7 +46,8 @@ public class WhichSpecHasInstanceQuizFactory
   }
 
   @Override
-  public List<ReviewPoint> getViceReviewPoints(UserModel userModel) {
+  public List<ReviewPoint> getViceReviewPoints() {
+    UserModel userModel = servant.modelFactoryService.toUserModel(reviewPoint.getUser());
     Link instanceLink = getInstanceLink();
     if (instanceLink != null) {
       ReviewPoint reviewPointFor = userModel.getReviewPointFor(instanceLink);

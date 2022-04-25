@@ -1,9 +1,7 @@
 package com.odde.doughnut.models.quizFacotries;
 
 import com.odde.doughnut.entities.EntityWithId;
-import com.odde.doughnut.entities.Link;
-import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.models.UserModel;
+import java.util.ArrayList;
 import java.util.List;
 
 public interface QuestionOptionsFactory {
@@ -11,11 +9,11 @@ public interface QuestionOptionsFactory {
 
   List<? extends EntityWithId> generateFillingOptions();
 
-  default List<ReviewPoint> getViceReviewPoints(UserModel userModel) {
-    return List.of();
-  }
-
-  default Link getCategoryLink() {
-    return null;
+  default List<EntityWithId> getOptionEntities() {
+    EntityWithId answerNote = generateAnswer();
+    if (answerNote == null) return List.of();
+    List<EntityWithId> options = new ArrayList<>(generateFillingOptions());
+    options.add(answerNote);
+    return options;
   }
 }

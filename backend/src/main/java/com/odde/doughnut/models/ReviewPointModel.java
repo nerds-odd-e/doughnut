@@ -43,10 +43,10 @@ public record ReviewPointModel(ReviewPoint entity, ModelFactoryService modelFact
   public QuizQuestion generateAQuizQuestion(Randomizer randomizer) {
     return randomizer.shuffle(entity.availableQuestionTypes()).stream()
         .map(type -> new QuizQuestionDirector(entity, type, randomizer, modelFactoryService))
-        .map(QuizQuestionDirector::buildQuizQuestion1)
+        .map(QuizQuestionDirector::buildQuizQuestion)
         .flatMap(Optional::stream)
         .findFirst()
-        .orElse(QuizQuestion.createAQuizQuestionOfType(entity, QuestionType.JUST_REVIEW));
+        .orElse(entity.createAQuizQuestionOfType(QuestionType.JUST_REVIEW));
   }
 
   public void updateReviewPoint(Timestamp currentUTCTimestamp, String selfEvaluate) {

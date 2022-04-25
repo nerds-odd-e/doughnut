@@ -10,7 +10,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class FromSamePartAsQuizFactory implements QuizQuestionFactory, QuestionOptionsFactory {
+public class FromSamePartAsQuizFactory
+    implements QuizQuestionFactory, QuestionOptionsFactory, SecondaryReviewPointsFactory {
 
   private final CategoryHelper categoryHelper;
   private Link cachedAnswerLink = null;
@@ -45,7 +46,8 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory, QuestionO
   }
 
   @Override
-  public List<ReviewPoint> getViceReviewPoints(UserModel userModel) {
+  public List<ReviewPoint> getViceReviewPoints() {
+    UserModel userModel = servant.modelFactoryService.toUserModel(user);
     Link answerLink = this.getAnswerLink();
     if (answerLink == null) {
       return Collections.emptyList();
@@ -53,7 +55,7 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory, QuestionO
     ReviewPoint answerLinkReviewPoint = userModel.getReviewPointFor(answerLink);
     List<ReviewPoint> result = new ArrayList<>();
     result.add(answerLinkReviewPoint);
-    result.addAll(categoryHelper.getCategoryReviewPoints(userModel));
+    result.addAll(categoryHelper.getCategoryReviewPoints());
     return result;
   }
 

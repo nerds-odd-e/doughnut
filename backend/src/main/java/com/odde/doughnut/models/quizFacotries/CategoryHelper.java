@@ -30,7 +30,8 @@ public class CategoryHelper {
     return categoryLink;
   }
 
-  public List<ReviewPoint> getCategoryReviewPoints(UserModel userModel) {
+  public List<ReviewPoint> getCategoryReviewPoints() {
+    UserModel userModel = servant.modelFactoryService.toUserModel(user);
     if (categoryLink == null) return List.of();
     ReviewPoint reviewPointFor = userModel.getReviewPointFor(categoryLink);
     if (reviewPointFor == null) return List.of();
