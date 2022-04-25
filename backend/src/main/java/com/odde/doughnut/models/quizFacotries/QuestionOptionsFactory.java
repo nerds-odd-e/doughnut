@@ -10,19 +10,16 @@ public interface QuestionOptionsFactory {
 
   List<Note> generateFillingOptions();
 
-  default List<Note> generateOptions1() {
-    Note answerNote = generateAnswer();
-    if (answerNote == null) return null;
-    List<Note> fillingOptions = generateFillingOptions();
-    if (fillingOptions.isEmpty()) {
-      return null;
-    }
-    fillingOptions.add(answerNote);
-    return fillingOptions;
-  }
-
   default String generateOptions(Randomizer randomizer) {
-    List<Note> options = generateOptions1();
+    List<Note> options = null;
+    Note answerNote = generateAnswer();
+    if (answerNote != null) {
+      List<Note> fillingOptions = generateFillingOptions();
+      if (!fillingOptions.isEmpty()) {
+        fillingOptions.add(answerNote);
+        options = fillingOptions;
+      }
+    }
     if (options == null) return null;
     return randomizer.shuffle(options).stream()
         .map(Note::getId)

@@ -10,19 +10,16 @@ public interface QuestionLinkOptionsFactory {
 
   List<Link> generateFillingOptions();
 
-  default List<Link> generateOptions1() {
-    Link answerNote = generateAnswer();
-    if (answerNote == null) return null;
-    List<Link> fillingOptions = generateFillingOptions();
-    if (fillingOptions.isEmpty()) {
-      return null;
-    }
-    fillingOptions.add(answerNote);
-    return fillingOptions;
-  }
-
   default String generateOptions(Randomizer randomizer) {
-    List<Link> options = generateOptions1();
+    List<Link> options = null;
+    Link answerNote = generateAnswer();
+    if (answerNote != null) {
+      List<Link> fillingOptions = generateFillingOptions();
+      if (!fillingOptions.isEmpty()) {
+        fillingOptions.add(answerNote);
+        options = fillingOptions;
+      }
+    }
     if (options == null) return null;
     return randomizer.shuffle(options).stream()
         .map(Link::getId)

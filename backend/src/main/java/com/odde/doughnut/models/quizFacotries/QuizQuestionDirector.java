@@ -29,34 +29,32 @@ public class QuizQuestionDirector {
   }
 
   public Optional<QuizQuestion> buildQuizQuestion1() {
-    return Optional.ofNullable(buildQuizQuestion());
-  }
-
-  public QuizQuestion buildQuizQuestion() {
-    if (!quizQuestionFactory.isValidQuestion()) return null;
+    if (!quizQuestionFactory.isValidQuestion()) return Optional.empty();
     QuizQuestion quizQuestion = QuizQuestion.createAQuizQuestionOfType(reviewPoint, questionType);
-    String options = getOptions();
-    if (options == null) return null;
-    quizQuestion.setOptionNoteIds(options);
+    if (quizQuestionFactory instanceof QuestionOptionsFactory
+        || quizQuestionFactory instanceof QuestionLinkOptionsFactory) {
+      final String options;
+      if (quizQuestionFactory instanceof QuestionOptionsFactory optionsFactory) {
+        options = optionsFactory.generateOptions(randomizer);
+        if (options == null) return Optional.empty();
+      } else {
+        QuestionLinkOptionsFactory linkOptionsFactory =
+            (QuestionLinkOptionsFactory) quizQuestionFactory;
+        options = linkOptionsFactory.generateOptions(randomizer);
+        if (options == null) return Optional.empty();
+      }
+      quizQuestion.setOptionNoteIds(options);
+    }
+
     List<ReviewPoint> viceReviewPoints =
         quizQuestionFactory.getViceReviewPoints(
             modelFactoryService.toUserModel(reviewPoint.getUser()));
 
     if (quizQuestionFactory.minimumViceReviewPointCount() > viceReviewPoints.size()) {
-      return null;
+      return Optional.empty();
     }
     quizQuestion.setViceReviewPoints(viceReviewPoints);
     quizQuestion.setCategoryLink(quizQuestionFactory.getCategoryLink());
-    return quizQuestion;
-  }
-
-  private String getOptions() {
-    if (quizQuestionFactory instanceof QuestionOptionsFactory optionsFactory) {
-      return optionsFactory.generateOptions(randomizer);
-    }
-    if (quizQuestionFactory instanceof QuestionLinkOptionsFactory linkOptionsFactory) {
-      return linkOptionsFactory.generateOptions(randomizer);
-    }
-    return "";
+    return Optional.of(quizQuestion);
   }
 }
