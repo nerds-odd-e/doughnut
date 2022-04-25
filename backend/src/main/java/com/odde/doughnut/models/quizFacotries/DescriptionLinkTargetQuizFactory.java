@@ -12,13 +12,10 @@ public class DescriptionLinkTargetQuizFactory extends LinkTargetQuizFactory {
     super(reviewPoint, servant);
   }
 
-  private String getSourceDescription() {
-    return link.getSourceNote().getClozeDescription();
-  }
-
   @Override
   public boolean isValidQuestion() {
-    return super.isValidQuestion() && Strings.isNotEmpty(getSourceDescription());
+    return super.isValidQuestion()
+        && Strings.isNotEmpty(link.getSourceNote().getClozeDescription());
   }
 
   @Override

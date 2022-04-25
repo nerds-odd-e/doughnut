@@ -1,10 +1,12 @@
 package com.odde.doughnut.models.quizFacotries;
 
 import com.odde.doughnut.entities.QuizQuestion;
+import com.odde.doughnut.entities.QuizQuestion.QuestionType;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.Randomizer;
 import java.util.List;
+import java.util.Optional;
 
 public class QuizQuestionDirector {
   private final QuizQuestion.QuestionType questionType;
@@ -14,9 +16,9 @@ public class QuizQuestionDirector {
   private final QuizQuestionFactory quizQuestionFactory;
 
   public QuizQuestionDirector(
-      QuizQuestion.QuestionType questionType,
-      Randomizer randomizer,
       ReviewPoint reviewPoint,
+      QuestionType questionType,
+      Randomizer randomizer,
       ModelFactoryService modelFactoryService) {
     this.questionType = questionType;
     this.randomizer = randomizer;
@@ -24,6 +26,10 @@ public class QuizQuestionDirector {
     this.modelFactoryService = modelFactoryService;
     QuizQuestionServant servant = new QuizQuestionServant(randomizer, modelFactoryService);
     this.quizQuestionFactory = questionType.factory.apply(reviewPoint, servant);
+  }
+
+  public Optional<QuizQuestion> buildQuizQuestion1() {
+    return Optional.ofNullable(buildQuizQuestion());
   }
 
   public QuizQuestion buildQuizQuestion() {
