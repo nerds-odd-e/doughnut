@@ -31,7 +31,7 @@ public class FromSamePartAsQuizFactory implements QuizQuestionFactory, QuestionO
     if (cachedFillingOptions == null) {
       List<Link> remoteCousins = categoryHelper.getReverseLinksOfCousins();
       cachedFillingOptions =
-          servant.randomizer.randomlyChoose(5, remoteCousins).stream()
+          servant.chooseFillingOptionsRandomly(remoteCousins).stream()
               .map(Link::getSourceNote)
               .collect(Collectors.toList());
     }
