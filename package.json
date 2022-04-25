@@ -48,12 +48,15 @@
     "eslint-plugin-cypress": "^2.12.1",
     "eslint-plugin-prettier": "^4.0.0",
     "file-saver": "^2.0.5",
-    "got": "^12.0.3",
+    "got": "^12.0",
     "npm-run-all": "4.1.5",
     "prettier": "^2.6.2",
     "typescript": "latest"
   },
   "resolutions": {
+    "@cucumber/cucumber": "^8.1"
+  },
+  "dependencies": {
     "@cucumber/cucumber": "^8.1"
   }
 }
