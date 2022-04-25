@@ -2,10 +2,13 @@ package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestion;
+import com.odde.doughnut.entities.QuizQuestion.QuestionType;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.ReviewSetting;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.models.quizFacotries.QuizQuestionDirector;
 import java.sql.Timestamp;
+import java.util.Optional;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -38,7 +41,12 @@ public record ReviewPointModel(ReviewPoint entity, ModelFactoryService modelFact
   }
 
   public QuizQuestion generateAQuizQuestion(Randomizer randomizer) {
-    return new QuizQuestionGenerator(entity, randomizer, modelFactoryService).generateQuestion();
+    return randomizer.shuffle(entity.availableQuestionTypes()).stream()
+        .map(type -> new QuizQuestionDirector(entity, type, randomizer, modelFactoryService))
+        .map(QuizQuestionDirector::buildQuizQuestion1)
+        .flatMap(Optional::stream)
+        .findFirst()
+        .orElse(QuizQuestion.createAQuizQuestionOfType(entity, QuestionType.JUST_REVIEW));
   }
 
   public void updateReviewPoint(Timestamp currentUTCTimestamp, String selfEvaluate) {

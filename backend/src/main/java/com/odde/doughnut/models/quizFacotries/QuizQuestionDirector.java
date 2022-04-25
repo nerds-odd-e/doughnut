@@ -34,9 +34,7 @@ public class QuizQuestionDirector {
 
   public QuizQuestion buildQuizQuestion() {
     if (!quizQuestionFactory.isValidQuestion()) return null;
-    QuizQuestion quizQuestion = new QuizQuestion();
-    quizQuestion.setReviewPoint(reviewPoint);
-    quizQuestion.setQuestionType(questionType);
+    QuizQuestion quizQuestion = QuizQuestion.createAQuizQuestionOfType(reviewPoint, questionType);
     String options = getOptions();
     if (options == null) return null;
     quizQuestion.setOptionNoteIds(options);

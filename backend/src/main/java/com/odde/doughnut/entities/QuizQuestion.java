@@ -57,6 +57,14 @@ import org.apache.logging.log4j.util.Strings;
 @Table(name = "quiz_question")
 public class QuizQuestion {
 
+  public static QuizQuestion createAQuizQuestionOfType(
+      ReviewPoint reviewPoint, QuestionType questionType) {
+    QuizQuestion quizQuestion = new QuizQuestion();
+    quizQuestion.setReviewPoint(reviewPoint);
+    quizQuestion.setQuestionType(questionType);
+    return quizQuestion;
+  }
+
   public enum QuestionType {
     CLOZE_SELECTION(1, ClozeTitleSelectionQuizFactory::new, ClozeTitleSelectionQuizPresenter::new),
     SPELLING(2, SpellingQuizFactory::new, SpellingQuizPresenter::new),
