@@ -8,11 +8,11 @@ buildscript {
 }
 
 plugins {
-  id 'org.springframework.boot' version '2.6.6'
+  id 'org.springframework.boot' version '2.6.7'
   id 'io.spring.dependency-management' version '1.0.11.RELEASE'
   id 'java'
   // Spotless for the code style
-  id "com.diffplug.spotless" version "6.4.2"
+  id "com.diffplug.spotless" version "6.5.0"
 }
 
 apply plugin: 'cz.habarta.typescript-generator'
@@ -35,8 +35,8 @@ repositories {
 dependencies {
   implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
   implementation 'org.springframework.boot:spring-boot-starter-web'
-  implementation 'org.flywaydb:flyway-mysql:8.5.8'
-  implementation 'org.flywaydb:flyway-core:8.5.8'
+  implementation 'org.flywaydb:flyway-mysql:8.5.9'
+  implementation 'org.flywaydb:flyway-core:8.5.9'
   implementation 'org.springframework.session:spring-session-core'
   implementation 'org.springframework.boot:spring-boot-starter-validation'
   implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
