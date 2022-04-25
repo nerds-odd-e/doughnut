@@ -1,25 +1,31 @@
 package com.odde.doughnut.models.quizFacotries;
 
+import com.odde.doughnut.entities.EntityWithId;
 import com.odde.doughnut.entities.Link;
-import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.models.Randomizer;
+import com.odde.doughnut.models.UserModel;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public interface QuestionOptionsFactory {
-  Note generateAnswer();
+public interface QuestionOptionsFactory<T extends EntityWithId> {
+  T generateAnswer();
 
-  List<Note> generateFillingOptions();
+  List<T> generateFillingOptions();
+
+  default List<ReviewPoint> getViceReviewPoints(UserModel userModel) {
+    return List.of();
+  }
 
   default Link getCategoryLink() {
     return null;
   }
 
   default String generateOptions(Randomizer randomizer) {
-    List<Note> options = null;
-    Note answerNote = generateAnswer();
+    List<T> options = null;
+    T answerNote = generateAnswer();
     if (answerNote != null) {
-      List<Note> fillingOptions = generateFillingOptions();
+      List<T> fillingOptions = generateFillingOptions();
       if (!fillingOptions.isEmpty()) {
         fillingOptions.add(answerNote);
         options = fillingOptions;
@@ -27,7 +33,7 @@ public interface QuestionOptionsFactory {
     }
     if (options == null) return null;
     return randomizer.shuffle(options).stream()
-        .map(Note::getId)
+        .map(T::getId)
         .map(Object::toString)
         .collect(Collectors.joining(","));
   }

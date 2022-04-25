@@ -5,7 +5,6 @@ import com.odde.doughnut.entities.QuizQuestion.QuestionType;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.Randomizer;
-import java.util.List;
 import java.util.Optional;
 
 public class QuizQuestionDirector {
@@ -31,27 +30,18 @@ public class QuizQuestionDirector {
   public Optional<QuizQuestion> buildQuizQuestion1() {
     if (!quizQuestionFactory.isValidQuestion()) return Optional.empty();
     QuizQuestion quizQuestion = QuizQuestion.createAQuizQuestionOfType(reviewPoint, questionType);
-    if (quizQuestionFactory instanceof QuestionOptionsFactory
-        || quizQuestionFactory instanceof QuestionLinkOptionsFactory) {
-      final String options;
-      if (quizQuestionFactory instanceof QuestionOptionsFactory optionsFactory) {
-        options = optionsFactory.generateOptions(randomizer);
-        quizQuestion.setCategoryLink(optionsFactory.getCategoryLink());
-      } else {
-        QuestionLinkOptionsFactory linkOptionsFactory =
-            (QuestionLinkOptionsFactory) quizQuestionFactory;
-        options = linkOptionsFactory.generateOptions(randomizer);
-        quizQuestion.setCategoryLink(linkOptionsFactory.getCategoryLink());
-      }
-      if (options == null) return Optional.empty();
-      quizQuestion.setOptionNoteIds(options);
+
+    if (!(quizQuestionFactory instanceof QuestionOptionsFactory optionsFactory)) {
+      return Optional.of(quizQuestion);
     }
 
-    List<ReviewPoint> viceReviewPoints =
-        quizQuestionFactory.getViceReviewPoints(
-            modelFactoryService.toUserModel(reviewPoint.getUser()));
+    final String options = optionsFactory.generateOptions(randomizer);
+    quizQuestion.setViceReviewPoints(
+        optionsFactory.getViceReviewPoints(modelFactoryService.toUserModel(reviewPoint.getUser())));
+    quizQuestion.setCategoryLink(optionsFactory.getCategoryLink());
+    if (options == null) return Optional.empty();
+    quizQuestion.setOptionNoteIds(options);
 
-    quizQuestion.setViceReviewPoints(viceReviewPoints);
     return Optional.of(quizQuestion);
   }
 }

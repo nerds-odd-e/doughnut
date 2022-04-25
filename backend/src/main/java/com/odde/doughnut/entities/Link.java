@@ -25,9 +25,6 @@ import java.util.stream.Stream;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -38,7 +35,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "link")
-public class Link {
+public class Link extends EntityWithId {
 
   public enum LinkType {
     RELATED_TO(1, "related note", "related to", "related to", new QuestionType[] {}),
@@ -215,11 +212,6 @@ public class Link {
       return idMap.getOrDefault(id, null);
     }
   }
-
-  @Id
-  @Getter
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Integer id;
 
   @ManyToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "source_id", referencedColumnName = "id")

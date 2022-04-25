@@ -24,12 +24,7 @@ import org.thymeleaf.util.StringUtils;
 
 @Entity
 @Table(name = "note")
-public class Note {
-
-  @Id
-  @Getter
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Integer id;
+public class Note extends EntityWithId {
 
   @Embedded @Valid @Getter private final NoteAccessories noteAccessories = new NoteAccessories();
 
