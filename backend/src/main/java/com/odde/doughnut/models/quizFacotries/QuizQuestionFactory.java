@@ -11,8 +11,4 @@ public interface QuizQuestionFactory {
   default List<Note> knownRightAnswers() {
     return null;
   }
-
-  default List<Note> allWrongAnswers() {
-    return null;
-  }
 }

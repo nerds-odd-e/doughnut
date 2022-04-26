@@ -210,17 +210,6 @@ class FromDifferentPartAsQuizFactoryTest {
                   .inMemoryPlease();
           assertFalse(answerResult.correct);
         }
-
-        @Test
-        void wrongWhenRandomAnswer() {
-          AnswerViewedByUser answerResult =
-              makeMe
-                  .anAnswerFor(uglySubjectiveRp)
-                  .type(FROM_DIFFERENT_PART_AS)
-                  .answerWithSpelling("metal")
-                  .inMemoryPlease();
-          assertTrue(answerResult.correct);
-        }
       }
     }
   }

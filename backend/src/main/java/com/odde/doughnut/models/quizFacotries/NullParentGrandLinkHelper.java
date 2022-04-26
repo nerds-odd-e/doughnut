@@ -12,6 +12,6 @@ public class NullParentGrandLinkHelper implements IParentGrandLinkHelper {
 
   @Override
   public List<Link> getCousinLinksAvoidingSiblings() {
-    return null;
+    return List.of();
   }
 }

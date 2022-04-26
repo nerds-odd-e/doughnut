@@ -83,12 +83,12 @@ public class AnswerModel {
   private boolean isCorrect() {
     QuizQuestionServant servant = new QuizQuestionServant(new RealRandomizer(), null);
     if (cachedResult != null) return cachedResult;
-    List<Note> wrongAnswers = questionType.factory.apply(reviewPoint, servant).allWrongAnswers();
-    if (wrongAnswers != null) {
-      return wrongAnswers.stream().noneMatch(this::matchAnswer);
-    }
     List<Note> rightAnswers = questionType.factory.apply(reviewPoint, servant).knownRightAnswers();
-    cachedResult = rightAnswers.stream().anyMatch(this::matchAnswer);
+    if (rightAnswers != null) {
+      cachedResult = rightAnswers.stream().anyMatch(this::matchAnswer);
+    } else {
+      cachedResult = true;
+    }
     return cachedResult;
   }
 

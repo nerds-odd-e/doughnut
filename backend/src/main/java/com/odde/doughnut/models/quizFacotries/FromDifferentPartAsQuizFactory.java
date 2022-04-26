@@ -4,7 +4,6 @@ import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.User;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -24,10 +23,10 @@ public class FromDifferentPartAsQuizFactory
   }
 
   @Override
-  public List<Note> allWrongAnswers() {
-    List<Note> result = new ArrayList<>(link.getLinkedSiblingsOfSameLinkType(user));
-    result.add(link.getSourceNote());
-    return result;
+  public List<Note> knownRightAnswers() {
+    return parentGrandLinkHelper.getCousinLinksAvoidingSiblings().stream()
+        .map(Link::getSourceNote)
+        .collect(Collectors.toList());
   }
 
   @Override
