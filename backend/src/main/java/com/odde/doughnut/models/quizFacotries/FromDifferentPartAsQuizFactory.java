@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 public class FromDifferentPartAsQuizFactory
     implements QuizQuestionFactory, QuestionOptionsFactory, SecondaryReviewPointsFactory {
 
-  private final ParentGrandLinkHelper parentGrandLinkHelper;
+  private final IParentGrandLinkHelper parentGrandLinkHelper;
   private final User user;
   private final Link link;
   private final QuizQuestionServant servant;
@@ -20,7 +20,7 @@ public class FromDifferentPartAsQuizFactory
     user = reviewPoint.getUser();
     link = reviewPoint.getLink();
     this.servant = servant;
-    parentGrandLinkHelper = new ParentGrandLinkHelper(servant, user, link);
+    parentGrandLinkHelper = servant.getParentGrandLinkHelper(user, link);
   }
 
   @Override
@@ -60,6 +60,6 @@ public class FromDifferentPartAsQuizFactory
 
   @Override
   public List<ReviewPoint> getViceReviewPoints() {
-    return parentGrandLinkHelper.getCategoryReviewPoints();
+    return servant.getReviewPoints(parentGrandLinkHelper.getParentGrandLink(), user);
   }
 }

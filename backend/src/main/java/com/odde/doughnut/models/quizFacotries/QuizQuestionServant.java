@@ -3,6 +3,7 @@ package com.odde.doughnut.models.quizFacotries;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Link.LinkType;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.NoteViewer;
@@ -71,5 +72,18 @@ public class QuizQuestionServant {
   private Stream<Link> linksWithReviewPoint(Stream<Link> cousinLinksOfSameLinkType, User user) {
     UserModel userModel = modelFactoryService.toUserModel(user);
     return cousinLinksOfSameLinkType.filter(l -> userModel.getReviewPointFor(l) != null);
+  }
+
+  public List<ReviewPoint> getReviewPoints(Link link, User user) {
+    UserModel userModel = modelFactoryService.toUserModel(user);
+    ReviewPoint reviewPointFor = userModel.getReviewPointFor(link);
+    if (reviewPointFor == null) return List.of();
+    return List.of(reviewPointFor);
+  }
+
+  IParentGrandLinkHelper getParentGrandLinkHelper(User user, Link link) {
+    Link parentGrandLink = chooseOneCategoryLink(user, link).orElse(null);
+    if (parentGrandLink == null) return new NullParentGrandLinkHelper();
+    return new ParentGrandLinkHelper(user, link, parentGrandLink);
   }
 }

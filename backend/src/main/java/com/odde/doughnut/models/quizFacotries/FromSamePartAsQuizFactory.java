@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 public class FromSamePartAsQuizFactory
     implements QuizQuestionFactory, QuestionOptionsFactory, SecondaryReviewPointsFactory {
 
-  private final ParentGrandLinkHelper parentGrandLinkHelper;
+  private final IParentGrandLinkHelper parentGrandLinkHelper;
   private Link cachedAnswerLink = null;
   private List<Note> cachedFillingOptions = null;
   private final User user;
@@ -24,7 +24,7 @@ public class FromSamePartAsQuizFactory
     user = reviewPoint.getUser();
     link = reviewPoint.getLink();
     this.servant = servant;
-    parentGrandLinkHelper = new ParentGrandLinkHelper(servant, user, link);
+    parentGrandLinkHelper = servant.getParentGrandLinkHelper(user, link);
   }
 
   @Override
@@ -55,7 +55,7 @@ public class FromSamePartAsQuizFactory
     ReviewPoint answerLinkReviewPoint = userModel.getReviewPointFor(answerLink);
     List<ReviewPoint> result = new ArrayList<>();
     result.add(answerLinkReviewPoint);
-    result.addAll(parentGrandLinkHelper.getCategoryReviewPoints());
+    result.addAll(servant.getReviewPoints(parentGrandLinkHelper.getParentGrandLink(), user));
     return result;
   }
 

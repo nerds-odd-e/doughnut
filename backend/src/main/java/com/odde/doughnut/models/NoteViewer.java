@@ -1,7 +1,6 @@
 package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.Link;
-import com.odde.doughnut.entities.Link.LinkType;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.json.LinkViewed;
@@ -79,9 +78,5 @@ public class NoteViewer {
     nvb.setNote(toJsonObject());
     nvb.setNotePosition(jsonNotePosition(note));
     return nvb;
-  }
-
-  public Stream<Note> linkTargetOfType(LinkType linkType) {
-    return linksOfTypeThroughDirect(List.of(linkType)).stream().map(Link::getTargetNote);
   }
 }

@@ -114,6 +114,19 @@ class FromDifferentPartAsQuizFactoryTest {
       }
 
       @Nested
+      class WhenTheSupposedDifferentChoiceIsAlsoHavingTheSamePart {
+        @BeforeEach
+        void setup() {
+          makeMe.aLink().between(tall, subjective, Link.LinkType.TAGGED_BY).please();
+        }
+
+        void noRightAnswers() {
+          makeMe.refresh(userModel.getEntity());
+          assertThat(buildQuestion(), nullValue());
+        }
+      }
+
+      @Nested
       class WhenTheReviewingSourceNoteIsAlsoTaggedByADifferentPart {
         @BeforeEach
         void setup() {
