@@ -19,13 +19,20 @@ public class AnswerBuilder extends EntityBuilder<AnswerViewedByUser> {
 
   @Override
   protected void beforeCreate(boolean needPersist) {
-    answer.setQuestion(makeMe.aQuestion().buildValid(questionType, reviewPoint).inMemoryPlease());
+    if (answer.getQuestion() == null) {
+      answer.setQuestion(makeMe.aQuestion().buildValid(questionType, reviewPoint).inMemoryPlease());
+    }
     if (answer.getQuestion() == null)
       throw new RuntimeException(
           "Failed to generate a question of type "
               + questionType.name()
               + ", perhaps no enough data.");
     this.entity = makeMe.modelFactoryService.toAnswerModel(answer).getAnswerViewedByUser();
+  }
+
+  public AnswerBuilder forQuestion(QuizQuestion question) {
+    this.answer.setQuestion(question);
+    return this;
   }
 
   public AnswerBuilder forReviewPoint(ReviewPoint reviewPoint) {

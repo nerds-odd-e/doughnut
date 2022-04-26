@@ -8,6 +8,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import com.odde.doughnut.entities.AnswerViewedByUser;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.QuizQuestion;
+import com.odde.doughnut.entities.QuizQuestion.QuestionType;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import com.odde.doughnut.models.UserModel;
@@ -67,7 +69,7 @@ class JustReviewQuizFactoryTest {
       AnswerViewedByUser answerResult =
           makeMe
               .anAnswerFor(reviewPoint)
-              .type(JUST_REVIEW)
+              .forQuestion(buildQuizQuestion(reviewPoint))
               .answerWithSpelling("sad")
               .inMemoryPlease();
       assertTrue(answerResult.correct);
@@ -78,7 +80,7 @@ class JustReviewQuizFactoryTest {
       AnswerViewedByUser answerResult =
           makeMe
               .anAnswerFor(reviewPoint)
-              .type(JUST_REVIEW)
+              .forQuestion(buildQuizQuestion(reviewPoint))
               .answerWithSpelling("no idea")
               .inMemoryPlease();
       assertTrue(answerResult.correct);
@@ -86,6 +88,11 @@ class JustReviewQuizFactoryTest {
   }
 
   private QuizQuestionViewedByUser buildQuestion(ReviewPoint reviewPoint) {
-    return makeMe.buildAQuestion(JUST_REVIEW, reviewPoint);
+    return QuizQuestionViewedByUser.from(
+        buildQuizQuestion(reviewPoint), makeMe.modelFactoryService);
+  }
+
+  private QuizQuestion buildQuizQuestion(ReviewPoint reviewPoint) {
+    return reviewPoint.createAQuizQuestionOfType(QuestionType.JUST_REVIEW);
   }
 }

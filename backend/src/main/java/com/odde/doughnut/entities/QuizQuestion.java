@@ -13,7 +13,6 @@ import com.odde.doughnut.models.quizFacotries.FromDifferentPartAsQuizFactory;
 import com.odde.doughnut.models.quizFacotries.FromDifferentPartAsQuizPresenter;
 import com.odde.doughnut.models.quizFacotries.FromSamePartAsQuizFactory;
 import com.odde.doughnut.models.quizFacotries.FromSamePartAsQuizPresenter;
-import com.odde.doughnut.models.quizFacotries.JustReviewQuizFactory;
 import com.odde.doughnut.models.quizFacotries.JustReviewQuizPresenter;
 import com.odde.doughnut.models.quizFacotries.LinkSourceQuizFactory;
 import com.odde.doughnut.models.quizFacotries.LinkSourceQuizPresenter;
@@ -77,7 +76,7 @@ public class QuizQuestion {
     FROM_SAME_PART_AS(10, FromSamePartAsQuizFactory::new, FromSamePartAsQuizPresenter::new),
     FROM_DIFFERENT_PART_AS(
         11, FromDifferentPartAsQuizFactory::new, FromDifferentPartAsQuizPresenter::new),
-    JUST_REVIEW(13, JustReviewQuizFactory::new, JustReviewQuizPresenter::new);
+    JUST_REVIEW(13, null, JustReviewQuizPresenter::new);
 
     public final Integer id;
     public final BiFunction<ReviewPoint, QuizQuestionServant, QuizQuestionFactory> factory;

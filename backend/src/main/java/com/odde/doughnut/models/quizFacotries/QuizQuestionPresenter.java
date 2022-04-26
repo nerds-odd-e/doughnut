@@ -14,9 +14,7 @@ public interface QuizQuestionPresenter {
 
   String mainTopic();
 
-  default List<Note> knownRightAnswers() {
-    return null;
-  }
+  List<Note> knownRightAnswers();
 
   default Map<Link.LinkType, LinkViewed> hintLinks() {
     return null;
