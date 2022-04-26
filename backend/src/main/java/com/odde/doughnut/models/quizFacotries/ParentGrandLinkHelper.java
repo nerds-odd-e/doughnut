@@ -8,16 +8,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class ParentGrandLinkHelper implements IParentGrandLinkHelper {
-  private final User user;
-  private final Link link;
-  private final Link parentGrandLink;
-
-  public ParentGrandLinkHelper(User user, Link link, Link parentGrandLink) {
-    this.user = user;
-    this.link = link;
-    this.parentGrandLink = parentGrandLink;
-  }
+public record ParentGrandLinkHelper(User user, Link link, Link parentGrandLink)
+    implements IParentGrandLinkHelper {
 
   @Override
   public Link getParentGrandLink() {
@@ -26,12 +18,13 @@ public class ParentGrandLinkHelper implements IParentGrandLinkHelper {
 
   @Override
   public List<Link> getCousinLinksAvoidingSiblings() {
-    //    List<Note> linkedSiblingsOfSameLinkType = link.getLinkedSiblingsOfSameLinkType(user);
+    List<Note> linkedSiblingsOfSameLinkType = link.getLinkedSiblingsOfSameLinkType(user);
     return getUncles()
         .flatMap(
             p ->
                 new NoteViewer(user, p.getSourceNote())
                     .linksOfTypeThroughReverse(link.getLinkType()))
+        .filter(cousinLink -> !linkedSiblingsOfSameLinkType.contains(cousinLink.getSourceNote()))
         .collect(Collectors.toList());
   }
 

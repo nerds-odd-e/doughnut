@@ -120,6 +120,7 @@ class FromDifferentPartAsQuizFactoryTest {
           makeMe.aLink().between(tall, subjective, Link.LinkType.TAGGED_BY).please();
         }
 
+        @Test
         void noRightAnswers() {
           makeMe.refresh(userModel.getEntity());
           assertThat(buildQuestion(), nullValue());
@@ -128,6 +129,7 @@ class FromDifferentPartAsQuizFactoryTest {
 
       @Nested
       class WhenTheReviewingSourceNoteIsAlsoTaggedByADifferentPart {
+
         @BeforeEach
         void setup() {
           makeMe.aLink().between(ugly, objective, Link.LinkType.TAGGED_BY).please();
@@ -139,14 +141,30 @@ class FromDifferentPartAsQuizFactoryTest {
           assertThat(buildQuestion(), nullValue());
         }
 
-        @Test
-        void thereIsAThirdPerspective() {
-          Note axiom = makeMe.aNote("objective").under(top).please();
-          makeMe.aLink().between(axiom, perspective, LinkType.PART).please();
-          Note pi = makeMe.aNote("pi").under(top).please();
-          makeMe.aLink().between(pi, axiom, LinkType.TAGGED_BY).please();
-          makeMe.refresh(userModel.getEntity());
-          assertThat(buildQuestion(), not(nullValue()));
+        @Nested
+        class thereIsAThirdPerspective {
+          Note pi;
+
+          @BeforeEach
+          void setup() {
+            Note axiom = makeMe.aNote("objective").under(top).please();
+            makeMe.aLink().between(axiom, perspective, LinkType.PART).please();
+            pi = makeMe.aNote("pi").under(top).please();
+            makeMe.aLink().between(pi, axiom, LinkType.TAGGED_BY).please();
+          }
+
+          @Test
+          void thereIsAThirdPerspective() {
+            makeMe.refresh(userModel.getEntity());
+            assertThat(buildQuestion(), not(nullValue()));
+          }
+
+          @Test
+          void whenTheOptionOfTheThirdPerspectiveIsAlsoObjective() {
+            makeMe.aLink().between(pi, objective, LinkType.TAGGED_BY).please();
+            makeMe.refresh(userModel.getEntity());
+            assertThat(buildQuestion(), not(nullValue())); // wrong, this should be null
+          }
         }
       }
 
