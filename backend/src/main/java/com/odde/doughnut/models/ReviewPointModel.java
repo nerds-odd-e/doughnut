@@ -1,16 +1,17 @@
 package com.odde.doughnut.models;
 
+import static com.odde.doughnut.entities.SelfEvaluate.satisfying;
+
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.QuizQuestion.QuestionType;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.ReviewSetting;
+import com.odde.doughnut.entities.SelfEvaluate;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionDirector;
 import java.sql.Timestamp;
 import java.util.Optional;
-import org.springframework.http.HttpStatus;
-import org.springframework.web.server.ResponseStatusException;
 
 public record ReviewPointModel(ReviewPoint entity, ModelFactoryService modelFactoryService) {
   public ReviewPoint getEntity() {
@@ -26,7 +27,7 @@ public record ReviewPointModel(ReviewPoint entity, ModelFactoryService modelFact
     }
     entity.setUser(userModel.getEntity());
     entity.setInitialReviewedAt(currentUTCTimestamp);
-    evaluate(currentUTCTimestamp, "satisfying");
+    evaluate(currentUTCTimestamp, satisfying);
   }
 
   private void updateNextRepetitionWithAdjustment(Timestamp currentUTCTimestamp, int adjustment) {
@@ -49,28 +50,12 @@ public record ReviewPointModel(ReviewPoint entity, ModelFactoryService modelFact
         .orElse(entity.createAQuizQuestionOfType(QuestionType.JUST_REVIEW));
   }
 
-  public void updateReviewPoint(Timestamp currentUTCTimestamp, String selfEvaluate) {
+  public void updateReviewPoint(Timestamp currentUTCTimestamp, SelfEvaluate selfEvaluate) {
     increaseRepetitionCountAndSave();
     evaluate(currentUTCTimestamp, selfEvaluate);
   }
 
-  public void evaluate(Timestamp currentUTCTimestamp, String selfEvaluation) {
-    updateNextRepetitionWithAdjustment(currentUTCTimestamp, getAdjustment(selfEvaluation));
-  }
-
-  private int getAdjustment(String selfEvaluation) {
-    if ("reset".equals(selfEvaluation)) {
-      return -2;
-    }
-    if ("satisfying".equals(selfEvaluation)) {
-      return 0;
-    }
-    if ("sad".equals(selfEvaluation)) {
-      return -1;
-    }
-    if ("happy".equals(selfEvaluation)) {
-      return 1;
-    }
-    throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+  public void evaluate(Timestamp currentUTCTimestamp, SelfEvaluate selfEvaluation) {
+    updateNextRepetitionWithAdjustment(currentUTCTimestamp, selfEvaluation.adjustment);
   }
 }

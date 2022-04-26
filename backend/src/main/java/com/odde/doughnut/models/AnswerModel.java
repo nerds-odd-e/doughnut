@@ -5,6 +5,7 @@ import com.odde.doughnut.entities.AnswerResult;
 import com.odde.doughnut.entities.AnswerViewedByUser;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestion;
+import com.odde.doughnut.entities.SelfEvaluate;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.sql.Timestamp;
 import java.util.List;
@@ -16,11 +17,6 @@ public class AnswerModel {
 
   private Boolean cachedResult;
 
-  enum SelfEvaluate {
-    satisfying,
-    sad,
-  }
-
   public AnswerModel(Answer answer, ModelFactoryService modelFactoryService) {
     this.answer = answer;
     this.modelFactoryService = modelFactoryService;
@@ -28,7 +24,7 @@ public class AnswerModel {
   }
 
   public void updateReviewPoints(Timestamp currentUTCTimestamp) {
-    String selfEvaluate = getSelfEvaluate();
+    SelfEvaluate selfEvaluate = getSelfEvaluate();
     answer
         .getQuestion()
         .getViceReviewPointIdList()
@@ -47,12 +43,11 @@ public class AnswerModel {
     reviewPointModel.updateReviewPoint(currentUTCTimestamp, selfEvaluate);
   }
 
-  private String getSelfEvaluate() {
-    String selfEvaluate = isCorrect() ? "satisfying" : "sad";
+  private SelfEvaluate getSelfEvaluate() {
     if (answer.getQuestion().getQuestionType() == QuizQuestion.QuestionType.JUST_REVIEW) {
-      return answer.getSpellingAnswer();
+      return SelfEvaluate.valueOf(answer.getSpellingAnswer());
     }
-    return selfEvaluate;
+    return isCorrect() ? SelfEvaluate.satisfying : SelfEvaluate.sad;
   }
 
   public AnswerViewedByUser getAnswerViewedByUser() {
