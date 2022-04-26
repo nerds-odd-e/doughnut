@@ -15,7 +15,7 @@ public class JustReviewQuizPresenter implements QuizQuestionPresenter {
 
   @Override
   public List<Note> knownRightAnswers() {
-    return null;
+    return List.of();
   }
 
   @Override
