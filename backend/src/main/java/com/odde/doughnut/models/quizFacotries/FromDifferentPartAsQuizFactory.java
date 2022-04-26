@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 public class FromDifferentPartAsQuizFactory
     implements QuizQuestionFactory, QuestionOptionsFactory, SecondaryReviewPointsFactory {
 
-  private final CategoryHelper categoryHelper;
+  private final ParentGrandLinkHelper parentGrandLinkHelper;
   private final User user;
   private final Link link;
   private final QuizQuestionServant servant;
@@ -20,12 +20,12 @@ public class FromDifferentPartAsQuizFactory
     user = reviewPoint.getUser();
     link = reviewPoint.getLink();
     this.servant = servant;
-    categoryHelper = new CategoryHelper(servant, user, link);
+    parentGrandLinkHelper = new ParentGrandLinkHelper(servant, user, link);
   }
 
   @Override
   public List<Note> allWrongAnswers() {
-    List<Note> result = new ArrayList<>(link.getCousinsOfSameLinkType(user));
+    List<Note> result = new ArrayList<>(link.getLinkedSiblingsOfSameLinkType(user));
     result.add(link.getSourceNote());
     return result;
   }
@@ -37,7 +37,7 @@ public class FromDifferentPartAsQuizFactory
     }
     List<Link> cousinLinks =
         servant
-            .getCousinLinksOfSameLinkTypeHavingReviewPoint(link, user)
+            .getSiblingLinksOfSameLinkTypeHavingReviewPoint(link, user)
             .collect(Collectors.toList());
     return servant.chooseFillingOptionsRandomly(cousinLinks).stream()
         .map(Link::getSourceNote)
@@ -46,20 +46,20 @@ public class FromDifferentPartAsQuizFactory
 
   @Override
   public Link getCategoryLink() {
-    return categoryHelper.getCategoryLink();
+    return parentGrandLinkHelper.getParentGrandLink();
   }
 
   @Override
   public Note generateAnswer() {
     return servant
         .randomizer
-        .chooseOneRandomly(categoryHelper.getReverseLinksOfCousins())
+        .chooseOneRandomly(parentGrandLinkHelper.getCousinLinksAvoidingSiblings())
         .map(Link::getSourceNote)
         .orElse(null);
   }
 
   @Override
   public List<ReviewPoint> getViceReviewPoints() {
-    return categoryHelper.getCategoryReviewPoints();
+    return parentGrandLinkHelper.getCategoryReviewPoints();
   }
 }

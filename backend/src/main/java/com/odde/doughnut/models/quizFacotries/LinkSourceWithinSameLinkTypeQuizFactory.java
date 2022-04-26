@@ -27,7 +27,7 @@ public class LinkSourceWithinSameLinkTypeQuizFactory
   @Override
   public List<Link> generateFillingOptions() {
     if (cachedFillingOptions == null) {
-      List<Note> cousinOfSameLinkType = link.getCousinsOfSameLinkType(user);
+      List<Note> linkedSiblingsOfSameLinkType = link.getLinkedSiblingsOfSameLinkType(user);
       cachedFillingOptions =
           servant
               .chooseFromCohort(
@@ -35,7 +35,7 @@ public class LinkSourceWithinSameLinkTypeQuizFactory
                   n ->
                       !n.equals(answerNote)
                           && !n.equals(link.getTargetNote())
-                          && !cousinOfSameLinkType.contains(n)
+                          && !linkedSiblingsOfSameLinkType.contains(n)
                           && !new NoteViewer(user, n)
                               .linksOfTypeThroughDirect(List.of(link.getLinkType()))
                               .isEmpty())

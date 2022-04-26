@@ -28,8 +28,9 @@ public class WhichSpecHasInstanceQuizFactory
     if (cachedFillingOptions != null) {
       return cachedFillingOptions;
     }
-    List<Note> instanceReverse = cachedInstanceLink.getCousinsOfSameLinkType(reviewPoint.getUser());
-    List<Note> specReverse = link.getCousinsOfSameLinkType(reviewPoint.getUser());
+    List<Note> instanceReverse =
+        cachedInstanceLink.getLinkedSiblingsOfSameLinkType(reviewPoint.getUser());
+    List<Note> specReverse = link.getLinkedSiblingsOfSameLinkType(reviewPoint.getUser());
     List<Note> backwardPeers =
         Stream.concat(instanceReverse.stream(), specReverse.stream())
             .filter(n -> !(instanceReverse.contains(n) && specReverse.contains(n)))

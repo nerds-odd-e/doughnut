@@ -264,12 +264,12 @@ public class Link extends EntityWithId {
   }
 
   @JsonIgnore
-  public List<Note> getCousinsOfSameLinkType(User viewer) {
-    return getCousinLinksOfSameLinkType(viewer).map(Link::getSourceNote).toList();
+  public List<Note> getLinkedSiblingsOfSameLinkType(User viewer) {
+    return getSiblingLinksOfSameLinkType(viewer).map(Link::getSourceNote).toList();
   }
 
   @JsonIgnore
-  public Stream<Link> getCousinLinksOfSameLinkType(User viewer) {
+  public Stream<Link> getSiblingLinksOfSameLinkType(User viewer) {
     return new NoteViewer(viewer, targetNote)
         .linksOfTypeThroughReverse(getLinkType())
         .filter(l -> !l.equals(this));

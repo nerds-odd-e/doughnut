@@ -8,42 +8,41 @@ import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.UserModel;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-public class CategoryHelper {
+public class ParentGrandLinkHelper {
   private final User user;
   private final Link link;
   final QuizQuestionServant servant;
-  private final Link categoryLink;
+  private final Link parentGrandLink;
 
-  public CategoryHelper(QuizQuestionServant servant, User user, Link link) {
+  public ParentGrandLinkHelper(QuizQuestionServant servant, User user, Link link) {
     this.user = user;
     this.link = link;
     this.servant = servant;
     if (servant != null) {
-      categoryLink = servant.chooseOneCategoryLink(this.user, this.link).orElse(null);
+      parentGrandLink = servant.chooseOneCategoryLink(this.user, this.link).orElse(null);
     } else {
-      categoryLink = null;
+      parentGrandLink = null;
     }
   }
 
-  public Link getCategoryLink() {
-    return categoryLink;
+  public Link getParentGrandLink() {
+    return parentGrandLink;
   }
 
   public List<ReviewPoint> getCategoryReviewPoints() {
     UserModel userModel = servant.modelFactoryService.toUserModel(user);
-    if (categoryLink == null) return List.of();
-    ReviewPoint reviewPointFor = userModel.getReviewPointFor(categoryLink);
+    if (parentGrandLink == null) return List.of();
+    ReviewPoint reviewPointFor = userModel.getReviewPointFor(parentGrandLink);
     if (reviewPointFor == null) return List.of();
     return List.of(reviewPointFor);
   }
 
-  public List<Link> getReverseLinksOfCousins() {
-    if (categoryLink == null) return List.of();
-    List<Link> uncles = unclesFromSameCategory();
-    return categoryLink
-        .getCousinLinksOfSameLinkType(user)
-        .filter(cl -> !uncles.contains(cl))
+  public List<Link> getCousinLinksAvoidingSiblings() {
+    if (parentGrandLink == null) return List.of();
+    //    List<Note> linkedSiblingsOfSameLinkType = link.getLinkedSiblingsOfSameLinkType(user);
+    return getUncles()
         .flatMap(
             p ->
                 new NoteViewer(user, p.getSourceNote())
@@ -51,14 +50,13 @@ public class CategoryHelper {
         .collect(Collectors.toList());
   }
 
-  private List<Link> unclesFromSameCategory() {
+  private Stream<Link> getUncles() {
     List<Note> linkTargetOfType =
         new NoteViewer(user, link.getSourceNote())
             .linkTargetOfType(link.getLinkType())
             .collect(Collectors.toList());
-    return categoryLink
-        .getCousinLinksOfSameLinkType(user)
-        .filter(cl -> linkTargetOfType.contains(cl.getSourceNote()))
-        .collect(Collectors.toList());
+    return parentGrandLink
+        .getSiblingLinksOfSameLinkType(user)
+        .filter(cl1 -> !linkTargetOfType.contains(cl1.getSourceNote()));
   }
 }

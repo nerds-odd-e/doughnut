@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 public class FromSamePartAsQuizFactory
     implements QuizQuestionFactory, QuestionOptionsFactory, SecondaryReviewPointsFactory {
 
-  private final CategoryHelper categoryHelper;
+  private final ParentGrandLinkHelper parentGrandLinkHelper;
   private Link cachedAnswerLink = null;
   private List<Note> cachedFillingOptions = null;
   private final User user;
@@ -24,13 +24,13 @@ public class FromSamePartAsQuizFactory
     user = reviewPoint.getUser();
     link = reviewPoint.getLink();
     this.servant = servant;
-    categoryHelper = new CategoryHelper(servant, user, link);
+    parentGrandLinkHelper = new ParentGrandLinkHelper(servant, user, link);
   }
 
   @Override
   public List<Note> generateFillingOptions() {
     if (cachedFillingOptions == null) {
-      List<Link> remoteCousins = categoryHelper.getReverseLinksOfCousins();
+      List<Link> remoteCousins = parentGrandLinkHelper.getCousinLinksAvoidingSiblings();
       cachedFillingOptions =
           servant.chooseFillingOptionsRandomly(remoteCousins).stream()
               .map(Link::getSourceNote)
@@ -55,24 +55,24 @@ public class FromSamePartAsQuizFactory
     ReviewPoint answerLinkReviewPoint = userModel.getReviewPointFor(answerLink);
     List<ReviewPoint> result = new ArrayList<>();
     result.add(answerLinkReviewPoint);
-    result.addAll(categoryHelper.getCategoryReviewPoints());
+    result.addAll(parentGrandLinkHelper.getCategoryReviewPoints());
     return result;
   }
 
   @Override
   public List<Note> knownRightAnswers() {
-    return link.getCousinsOfSameLinkType(user);
+    return link.getLinkedSiblingsOfSameLinkType(user);
   }
 
   @Override
   public Link getCategoryLink() {
-    return categoryHelper.getCategoryLink();
+    return parentGrandLinkHelper.getParentGrandLink();
   }
 
   protected Link getAnswerLink() {
     if (cachedAnswerLink == null) {
       List<Link> backwardPeers =
-          servant.getCousinLinksOfSameLinkTypeHavingReviewPoint(link, user).toList();
+          servant.getSiblingLinksOfSameLinkTypeHavingReviewPoint(link, user).toList();
       cachedAnswerLink = servant.randomizer.chooseOneRandomly(backwardPeers).orElse(null);
     }
     return cachedAnswerLink;

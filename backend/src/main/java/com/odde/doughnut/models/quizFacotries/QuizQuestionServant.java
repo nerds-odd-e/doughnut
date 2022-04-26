@@ -56,9 +56,9 @@ public class QuizQuestionServant {
     return randomizer.randomlyChoose(maxFillingOptionCount, candidates);
   }
 
-  public Stream<Link> getCousinLinksOfSameLinkTypeHavingReviewPoint(Link link, User user) {
-    Stream<Link> cousinLinksOfSameLinkType = link.getCousinLinksOfSameLinkType(user);
-    return linksWithReviewPoint(cousinLinksOfSameLinkType, user);
+  public Stream<Link> getSiblingLinksOfSameLinkTypeHavingReviewPoint(Link link, User user) {
+    Stream<Link> siblingLinksOfSameLinkType = link.getSiblingLinksOfSameLinkType(user);
+    return linksWithReviewPoint(siblingLinksOfSameLinkType, user);
   }
 
   public Stream<Link> getLinksFromSameSourceHavingReviewPoint(User user, Link link) {
