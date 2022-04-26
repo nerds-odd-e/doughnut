@@ -5,7 +5,6 @@ import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.AnswerResult;
 import com.odde.doughnut.entities.AnswerViewedByUser;
 import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.SelfEvaluate;
 import com.odde.doughnut.entities.json.InitialInfo;
 import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import com.odde.doughnut.entities.json.RepetitionForUser;
@@ -147,15 +146,7 @@ class RestReviewsController {
     user.getAuthorization().assertLoggedIn();
     modelFactoryService
         .toReviewPointModel(reviewPoint)
-        .evaluate(testabilitySettings.getCurrentUTCTimestamp(), getSelfEvaluation(selfEvaluation));
+        .evaluate(testabilitySettings.getCurrentUTCTimestamp(), selfEvaluation.selfEvaluation);
     return reviewPoint;
-  }
-
-  private SelfEvaluate getSelfEvaluation(SelfEvaluation selfEvaluation) {
-    try {
-      return SelfEvaluate.valueOf(selfEvaluation.selfEvaluation);
-    } catch (IllegalArgumentException e) {
-      throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
-    }
   }
 }

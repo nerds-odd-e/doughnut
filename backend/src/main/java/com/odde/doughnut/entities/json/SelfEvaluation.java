@@ -1,5 +1,7 @@
 package com.odde.doughnut.entities.json;
 
+import com.odde.doughnut.entities.SelfEvaluate;
+
 public class SelfEvaluation {
-  public String selfEvaluation;
+  public SelfEvaluate selfEvaluation;
 }

@@ -1,5 +1,8 @@
 package com.odde.doughnut.controllers;
 
+import static com.odde.doughnut.entities.SelfEvaluate.happy;
+import static com.odde.doughnut.entities.SelfEvaluate.sad;
+import static com.odde.doughnut.entities.SelfEvaluate.satisfying;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
@@ -14,6 +17,7 @@ import com.odde.doughnut.entities.AnswerResult;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.SelfEvaluate;
 import com.odde.doughnut.entities.json.InitialInfo;
 import com.odde.doughnut.entities.json.ReviewPointViewedByUser;
 import com.odde.doughnut.entities.json.SelfEvaluation;
@@ -198,7 +202,7 @@ class RestReviewsControllerTests {
       SelfEvaluation selfEvaluation =
           new SelfEvaluation() {
             {
-              this.selfEvaluation = "happy";
+              this.selfEvaluation = happy;
             }
           };
       assertThrows(
@@ -211,7 +215,7 @@ class RestReviewsControllerTests {
       SelfEvaluation selfEvaluation =
           new SelfEvaluation() {
             {
-              this.selfEvaluation = "happy";
+              this.selfEvaluation = happy;
             }
           };
       assertThrows(
@@ -230,12 +234,12 @@ class RestReviewsControllerTests {
 
       @Test
       void repeat() {
-        evaluate("satisfying");
+        evaluate(satisfying);
         assertThat(rp.getForgettingCurveIndex(), equalTo(expectedSatisfyingForgettingCurveIndex));
         assertThat(rp.getRepetitionCount(), equalTo(0));
       }
 
-      private void evaluate(String evaluation) {
+      private void evaluate(SelfEvaluate evaluation) {
         SelfEvaluation selfEvaluation =
             new SelfEvaluation() {
               {
@@ -247,22 +251,17 @@ class RestReviewsControllerTests {
 
       @Test
       void repeatSad() {
-        evaluate("sad");
+        evaluate(sad);
         assertThat(rp.getForgettingCurveIndex(), lessThan(expectedSatisfyingForgettingCurveIndex));
         assertThat(rp.getRepetitionCount(), equalTo(0));
       }
 
       @Test
       void repeatHappy() {
-        evaluate("happy");
+        evaluate(happy);
         assertThat(
             rp.getForgettingCurveIndex(), greaterThan(expectedSatisfyingForgettingCurveIndex));
         assertThat(rp.getRepetitionCount(), equalTo(0));
-      }
-
-      @Test
-      void repeatUnknown() {
-        assertThrows(ResponseStatusException.class, () -> evaluate("unknown"));
       }
     }
   }

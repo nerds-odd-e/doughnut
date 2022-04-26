@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-04-22 19:12:22.
+// Generated using typescript-generator version 2.35.1025 on 2022-04-26 17:58:36.
 
 declare namespace Generated {
 
@@ -142,7 +142,7 @@ declare namespace Generated {
     }
 
     interface SelfEvaluation {
-        selfEvaluation: string;
+        selfEvaluation: SelfEvaluate;
     }
 
     interface UserForOtherUserView {
@@ -196,12 +196,12 @@ declare namespace Generated {
         level: number;
     }
 
-    interface Link {
-        id: number;
+    interface Link extends EntityWithId {
         sourceNote: Note;
         targetNote: Note;
         typeId: number;
         createdAt: string;
+        clozeSource: string;
         linkTypeLabel: string;
     }
 
@@ -211,15 +211,14 @@ declare namespace Generated {
         updatedAt: string;
     }
 
-    interface Note {
-        id: number;
+    interface Note extends EntityWithId {
         noteAccessories: NoteAccessories;
         textContent: TextContent;
         createdAt: string;
-        title: string;
         pictureWithMask?: PictureWithMask;
-        parentId?: number;
+        title: string;
         shortDescription: string;
+        parentId?: number;
     }
 
     interface Ownership {
@@ -232,8 +231,8 @@ declare namespace Generated {
         dailyTargetOfNewNotes: number;
         user: User;
         notebook: Notebook;
-        title: string;
         headNote: Note;
+        title: string;
         shortDescription: string;
     }
 
@@ -257,6 +256,10 @@ declare namespace Generated {
     interface PictureWithMask {
         notePicture: string;
         pictureMask: string;
+    }
+
+    interface EntityWithId {
+        id: number;
     }
 
     interface NoteAccessories {
@@ -284,6 +287,8 @@ declare namespace Generated {
 
     type LinkType = "related to" | "a specialization of" | "an application of" | "an instance of" | "a part of" | "tagged by" | "an attribute of" | "the opposite of" | "author of" | "using" | "an example of" | "before" | "similar to" | "confused with";
 
-    type QuestionType = "CLOZE_SELECTION" | "SPELLING" | "PICTURE_TITLE" | "PICTURE_SELECTION" | "LINK_TARGET" | "LINK_SOURCE" | "CLOZE_LINK_TARGET" | "DESCRIPTION_LINK_TARGET" | "WHICH_SPEC_HAS_INSTANCE" | "FROM_SAME_PART_AS" | "FROM_DIFFERENT_PART_AS" | "JUST_REVIEW";
+    type QuestionType = "CLOZE_SELECTION" | "SPELLING" | "PICTURE_TITLE" | "PICTURE_SELECTION" | "LINK_TARGET" | "LINK_SOURCE" | "LINK_SOURCE_WITHIN_SAME_LINK_TYPE" | "CLOZE_LINK_TARGET" | "DESCRIPTION_LINK_TARGET" | "WHICH_SPEC_HAS_INSTANCE" | "FROM_SAME_PART_AS" | "FROM_DIFFERENT_PART_AS" | "JUST_REVIEW";
+
+    type SelfEvaluate = "reset" | "satisfying" | "sad" | "happy";
 
 }
