@@ -26,8 +26,12 @@ class AnswerViewedByUserTest {
 
     @BeforeEach
     void setup() {
-      note = makeMe.aNote("this / that").inMemoryPlease();
-      reviewPoint = makeMe.aReviewPointFor(note).inMemoryPlease();
+      User user = makeMe.aUser().please();
+      Note top = makeMe.aNote().byUser(user).please();
+      note = makeMe.aNote("this / that").description("description").under(top).please();
+      makeMe.aNote().under(top).please();
+      reviewPoint = makeMe.aReviewPointFor(note).by(user).please();
+      makeMe.refresh(top);
     }
 
     @Test

@@ -1,7 +1,9 @@
 package com.odde.doughnut.models.quizFacotries;
 
 import com.odde.doughnut.entities.Link;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestion;
+import java.util.List;
 
 public class WhichSpecHasInstanceQuizPresenter implements QuizQuestionPresenter {
   private Link instanceLink;
@@ -28,5 +30,10 @@ public class WhichSpecHasInstanceQuizPresenter implements QuizQuestionPresenter 
         + " <mark>"
         + instanceLink.getTargetNote().getTitle()
         + "</mark>:";
+  }
+
+  @Override
+  public List<Note> knownRightAnswers() {
+    return List.of(link.getSourceNote());
   }
 }

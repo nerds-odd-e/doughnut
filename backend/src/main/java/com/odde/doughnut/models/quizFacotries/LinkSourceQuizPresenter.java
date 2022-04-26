@@ -1,7 +1,9 @@
 package com.odde.doughnut.models.quizFacotries;
 
 import com.odde.doughnut.entities.Link;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestion;
+import java.util.List;
 
 public class LinkSourceQuizPresenter implements QuizQuestionPresenter {
   protected final Link link;
@@ -18,5 +20,10 @@ public class LinkSourceQuizPresenter implements QuizQuestionPresenter {
   @Override
   public String instruction() {
     return "Which one <em>is immediately " + link.getLinkTypeLabel() + "</em>:";
+  }
+
+  @Override
+  public List<Note> knownRightAnswers() {
+    return List.of(link.getSourceNote());
   }
 }

@@ -23,13 +23,6 @@ public class FromDifferentPartAsQuizFactory
   }
 
   @Override
-  public List<Note> knownRightAnswers() {
-    return parentGrandLinkHelper.getCousinLinksAvoidingSiblings().stream()
-        .map(Link::getSourceNote)
-        .collect(Collectors.toList());
-  }
-
-  @Override
   public List<Note> generateFillingOptions() {
     if (getCategoryLink() == null) {
       return null;

@@ -7,8 +7,6 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
-import com.odde.doughnut.models.quizFacotries.QuizQuestionServant;
-import com.odde.doughnut.models.randomizers.RealRandomizer;
 import java.sql.Timestamp;
 import java.util.List;
 
@@ -81,11 +79,11 @@ public class AnswerModel {
   }
 
   private boolean isCorrect() {
-    QuizQuestionServant servant = new QuizQuestionServant(new RealRandomizer(), null);
     if (cachedResult != null) return cachedResult;
-    List<Note> rightAnswers = questionType.factory.apply(reviewPoint, servant).knownRightAnswers();
-    if (rightAnswers != null) {
-      cachedResult = rightAnswers.stream().anyMatch(this::matchAnswer);
+    List<Note> rightAnswers1 =
+        questionType.presenter.apply(answer.getQuestion()).knownRightAnswers();
+    if (rightAnswers1 != null) {
+      cachedResult = rightAnswers1.stream().anyMatch(this::matchAnswer);
     } else {
       cachedResult = true;
     }

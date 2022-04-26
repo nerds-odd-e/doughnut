@@ -39,9 +39,4 @@ public class LinkSourceQuizFactory implements QuizQuestionFactory, QuestionOptio
   public Note generateAnswer() {
     return answerNote;
   }
-
-  @Override
-  public List<Note> knownRightAnswers() {
-    return List.of(answerNote);
-  }
 }

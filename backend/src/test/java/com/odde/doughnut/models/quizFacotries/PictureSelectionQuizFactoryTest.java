@@ -52,7 +52,7 @@ class PictureSelectionQuizFactoryTest {
 
   @Test
   void shouldReturnNullIfCannotFindPicture() {
-    assertThat(buildLinkTargetQuizQuestion(), is(nullValue()));
+    assertThat(buildQuestion(), is(nullValue()));
   }
 
   @Nested
@@ -64,7 +64,7 @@ class PictureSelectionQuizFactoryTest {
 
     @Test
     void shouldReturnNullIfCannotFindPicture() {
-      assertThat(buildLinkTargetQuizQuestion(), is(nullValue()));
+      assertThat(buildQuestion(), is(nullValue()));
     }
 
     @Nested
@@ -76,7 +76,7 @@ class PictureSelectionQuizFactoryTest {
 
       @Test
       void shouldIncludeRightAnswers() {
-        QuizQuestionViewedByUser quizQuestion = buildLinkTargetQuizQuestion();
+        QuizQuestionViewedByUser quizQuestion = buildQuestion();
         assertThat(quizQuestion.getDescription(), equalTo(""));
         assertThat(quizQuestion.getMainTopic(), equalTo("source"));
         List<String> options = toOptionStrings(quizQuestion);
@@ -93,28 +93,28 @@ class PictureSelectionQuizFactoryTest {
 
       @Test
       void shouldIncludeUncle() {
-        QuizQuestionViewedByUser quizQuestion = buildLinkTargetQuizQuestion();
+        QuizQuestionViewedByUser quizQuestion = buildQuestion();
         List<String> options = toOptionStrings(quizQuestion);
         assertThat(uncle.getTitle(), in(options));
       }
-    }
 
-    @Nested
-    class Answer {
-      @Test
-      void correct() {
-        AnswerViewedByUser answerResult =
-            makeMe
-                .anAnswerFor(reviewPoint)
-                .type(PICTURE_SELECTION)
-                .answerWithSpelling(source.getTitle())
-                .inMemoryPlease();
-        assertTrue(answerResult.correct);
+      @Nested
+      class Answer {
+        @Test
+        void correct() {
+          AnswerViewedByUser answerResult =
+              makeMe
+                  .anAnswerFor(reviewPoint)
+                  .type(PICTURE_SELECTION)
+                  .answerWithSpelling(source.getTitle())
+                  .inMemoryPlease();
+          assertTrue(answerResult.correct);
+        }
       }
     }
   }
 
-  private QuizQuestionViewedByUser buildLinkTargetQuizQuestion() {
+  private QuizQuestionViewedByUser buildQuestion() {
     return makeMe.buildAQuestion(PICTURE_SELECTION, reviewPoint);
   }
 

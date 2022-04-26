@@ -60,11 +60,6 @@ public class FromSamePartAsQuizFactory
   }
 
   @Override
-  public List<Note> knownRightAnswers() {
-    return link.getLinkedSiblingsOfSameLinkType(user);
-  }
-
-  @Override
   public Link getCategoryLink() {
     return parentGrandLinkHelper.getParentGrandLink();
   }

@@ -28,9 +28,4 @@ public class PictureSelectionQuizFactory implements QuizQuestionFactory, Questio
   public boolean isValidQuestion() {
     return answerNote.getPictureWithMask().isPresent();
   }
-
-  @Override
-  public List<Note> knownRightAnswers() {
-    return List.of(answerNote);
-  }
 }

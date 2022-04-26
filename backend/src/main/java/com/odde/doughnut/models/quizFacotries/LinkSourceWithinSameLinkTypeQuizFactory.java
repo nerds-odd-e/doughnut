@@ -50,9 +50,4 @@ public class LinkSourceWithinSameLinkTypeQuizFactory
   public Link generateAnswer() {
     return link;
   }
-
-  @Override
-  public List<Note> knownRightAnswers() {
-    return List.of(answerNote);
-  }
 }

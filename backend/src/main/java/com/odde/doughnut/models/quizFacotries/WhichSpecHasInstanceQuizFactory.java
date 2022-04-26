@@ -76,9 +76,4 @@ public class WhichSpecHasInstanceQuizFactory
   public Link getCategoryLink() {
     return getInstanceLink();
   }
-
-  @Override
-  public List<Note> knownRightAnswers() {
-    return List.of(link.getSourceNote());
-  }
 }
