@@ -6,7 +6,6 @@ import flushPromises from 'flush-promises';
 import helper from '../helpers';
 import makeMe from '../fixtures/makeMe';
 import RenderingHelper from "../helpers/RenderingHelper";
-import usePopups, { PopupInfo } from '../../src/components/commons/Popups/usePopup';
 
 let renderer: RenderingHelper
 let mockRouterPush = jest.fn();
@@ -29,13 +28,13 @@ describe('repeat page', () => {
 
   it('redirect to review page if nothing to repeat', async () => {
     helper.apiMock.expectingResponse('/api/reviews/repeat', {status: 404});
-    renderer.currentRoute({ name: 'repeat' }).mount()
+    const wrapper = renderer.currentRoute({ name: 'repeat' }).mount()
     await flushPromises();
-    expect(mockRouterPush).toHaveBeenCalledWith({ name: 'reviews' });
+    expect(wrapper.find(".alert-success").text()).toEqual("You have finished all repetitions for this half a day!");
   });
 
   it('replace route with repeat/quiz if there is a quiz', async () => {
-    const repetition = makeMe.aRepetition.please();
+    const repetition = makeMe.aRepetition.withQuestion().please();
     await mountPage(repetition);
     expect(mockRouterPush).toHaveBeenCalledWith({ name: 'repeat-quiz' });
   });
@@ -45,7 +44,7 @@ describe('repeat page', () => {
 
     beforeEach(()=>{
       const reviewPoint = makeMe.aReviewPoint.please();
-      repetition = makeMe.aRepetition.reviewPoint(reviewPoint.reviewPoint).quizType("JUST_REVIEW").please();
+      repetition = makeMe.aRepetition.withReviewPointId(reviewPoint.reviewPoint.id).please();
       helper.apiMock.expecting(`/api/review-points/${reviewPoint.reviewPoint.id}`, reviewPoint);
     })
 
@@ -58,22 +57,8 @@ describe('repeat page', () => {
 
     it('should call the self-evaluate api', async () => {
       const wrapper = await mountPage(repetition);
-      helper.apiMock.expecting(`/api/reviews/answer`)
+      helper.apiMock.expecting(`/api/reviews/${repetition.reviewPoint}/self-evaluate`)
       await wrapper.find('#repeat-sad').trigger('click');
-    });
-
-    it('reload next review point if 404', async () => {
-      const {popups} = usePopups()
-      const popupData = {} as { popupInfo?: PopupInfo}
-      popups.register(popupData)
-      const wrapper = await mountPage(repetition);
-
-      helper.apiMock.expectingResponse(`/api/reviews/answer`, {status: 404})
-
-      wrapper.find('#repeat-sad').trigger('click');
-      await flushPromises();
-      expect(popupData.popupInfo?.message).toMatch(/review point/)
-      helper.apiMock.verifyCall(`/api/reviews/repeat`)
     });
   });
 });

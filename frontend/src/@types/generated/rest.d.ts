@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-04-26 17:58:36.
+// Generated using typescript-generator version 2.35.1025 on 2022-04-27 16:12:51.
 
 declare namespace Generated {
 
@@ -115,7 +115,8 @@ declare namespace Generated {
     }
 
     interface RepetitionForUser {
-        quizQuestion: QuizQuestionViewedByUser;
+        reviewPoint: number;
+        quizQuestion?: QuizQuestionViewedByUser;
         toRepeatCount: number;
     }
 
@@ -215,8 +216,8 @@ declare namespace Generated {
         noteAccessories: NoteAccessories;
         textContent: TextContent;
         createdAt: string;
-        pictureWithMask?: PictureWithMask;
         title: string;
+        pictureWithMask?: PictureWithMask;
         shortDescription: string;
         parentId?: number;
     }
@@ -231,8 +232,8 @@ declare namespace Generated {
         dailyTargetOfNewNotes: number;
         user: User;
         notebook: Notebook;
-        headNote: Note;
         title: string;
+        headNote: Note;
         shortDescription: string;
     }
 

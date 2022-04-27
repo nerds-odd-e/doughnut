@@ -21,12 +21,20 @@
           @answer="processAnswer($event)"
           :key="reviewPointId"
         />
+        <template v-else-if="repetition?.reviewPoint">
+          <ReviewPointAsync
+            v-bind="{
+              reviewPointId
+            }"
+            @selfEvaluated="fetchData"
+            :key="repetition?.reviewPoint"
+          />
+
+        </template>
         <template v-else>
-          <template v-if="finished > 0">
             <div class="alert alert-success">
               You have finished all repetitions for this half a day!
             </div>
-          </template>
         </template>
       </template>
   </ContainerPage>
@@ -37,6 +45,7 @@ import { defineComponent } from "vue";
 import QuizQuestion from "../components/review/QuizQuestion.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import RepeatProgressBar from "../components/review/RepeatProgressBar.vue";
+import ReviewPointAsync from "../components/review/ReviewPointAsync.vue";
 import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
 import usePopups from "../components/commons/Popups/usePopup";
 
@@ -50,6 +59,7 @@ export default defineComponent({
     QuizQuestion,
     ContainerPage,
     RepeatProgressBar,
+    ReviewPointAsync,
   },
   data() {
     return {
@@ -67,7 +77,7 @@ export default defineComponent({
       return this.previousResults.length
     },
     reviewPointId() {
-      return this.repetition?.quizQuestion?.quizQuestion?.reviewPoint;
+      return this.repetition?.reviewPoint;
     },
     latestAnswer() {
       if(this.previousResults.length === 0) return
@@ -101,7 +111,7 @@ export default defineComponent({
         .getNextReviewItem()
         .then(this.loadNew)
         .catch((e) => {
-          this.$router.push({ name: "reviews" });
+          this.repetition = undefined
         });
     },
 

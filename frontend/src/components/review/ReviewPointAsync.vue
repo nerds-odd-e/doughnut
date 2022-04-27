@@ -6,7 +6,7 @@
       }"
       :key="reviewPointId"
     />
-    <div v-if="showSelfEvaluate" class="btn-toolbar justify-content-between">
+    <div class="btn-toolbar justify-content-between">
       <label v-if="nextReviewAt" v-text="nextReviewAt" />
       <template v-else>
         <SelfEvaluateButtons @selfEvaluate="selfEvaluate" />
@@ -37,9 +37,9 @@ export default defineComponent({
   },
   props: {
     reviewPointId: { type: Number, required: true },
-    showSelfEvaluate: { type: Boolean, default: true},
   },
   components: { LoadingPage, ShowReviewPoint, SelfEvaluateButtons, SvgNoReview },
+  emits: ['selfEvaluated'],
   data() {
     return {
       reviewPointViewedByUser: undefined as Generated.ReviewPointViewedByUser | undefined,
@@ -54,6 +54,7 @@ export default defineComponent({
         })
         .then((res) => {
           this.nextReviewAt = res.nextReviewAt;
+          this.$emit('selfEvaluated');
         });
     },
 

@@ -1,14 +1,4 @@
 <template>
-  <template v-if="quizQuestion.questionType === 'JUST_REVIEW'">
-    <ReviewPointAsync
-      v-bind="{
-        reviewPointId: quizQuestion.quizQuestion.reviewPoint,
-        showSelfEvaluate: false,
-      }"
-    />
-    <SelfEvaluateButtons @selfEvaluate="onSelfEvaluate" />
-  </template>
-  <template v-else>
     <BasicBreadcrumb :ancestors="quizQuestion.scope" />
     <ShowPicture
       v-if="quizQuestion.pictureWithMask"
@@ -63,7 +53,6 @@
         <input type="submit" value="OK" class="btn btn-primary btn-lg btn-block" />
       </form>
     </div>
-  </template>
 </template>
 
 <script lang="ts">
@@ -72,9 +61,7 @@ import BasicBreadcrumb from "../commons/BasicBreadcrumb.vue";
 import ShowPicture from "../notes/ShowPicture.vue";
 import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
 import TextInput from "../form/TextInput.vue";
-import SelfEvaluateButtons from "./SelfEvaluateButtons.vue";
 import SvgNoReview from "../svgs/SvgNoReview.vue";
-import ReviewPointAsync from "./ReviewPointAsync.vue";
 
 export default defineComponent({
   props: {
@@ -88,9 +75,7 @@ export default defineComponent({
     ShowPicture,
     NoteFrameOfLinks,
     TextInput,
-    SelfEvaluateButtons,
     SvgNoReview,
-    ReviewPointAsync,
   },
   emits: ["answer", "removeFromReview"],
   data() {
@@ -112,10 +97,6 @@ export default defineComponent({
     },
   },
   methods: {
-    onSelfEvaluate(choice: string) {
-      this.answer = choice;
-      this.processForm();
-    },
     processForm() {
       this.$emit("answer", this.answerToQuestion);
     },

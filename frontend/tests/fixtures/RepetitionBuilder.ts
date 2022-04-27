@@ -2,10 +2,11 @@ import Builder from "./Builder"
 import generateId from "./generateId";
 
 class RepetitionBuilder extends Builder<Generated.RepetitionForUser> {
-  quizQuestion: Generated.QuizQuestionViewedByUser
+  quizQuestion: Generated.QuizQuestionViewedByUser | undefined
 
-  constructor() {
-    super();
+  reviewPointId: Doughnut.ID = 0
+
+  withQuestion() {
     this.quizQuestion = {
           quizQuestion: {
             id: generateId(),
@@ -30,22 +31,18 @@ class RepetitionBuilder extends Builder<Generated.RepetitionForUser> {
           hintLinks: {},
           scope: []
         }
-
+        return this;
   }
 
-  reviewPoint(reviewPoint: Generated.ReviewPoint) {
-    this.quizQuestion.quizQuestion.reviewPoint = reviewPoint.id
-    return this;
-  }
-
-  quizType(value: Generated.QuestionType): RepetitionBuilder {
-    this.quizQuestion.questionType = value;
+  withReviewPointId(id: Doughnut.ID) {
+    this.reviewPointId = id
     return this;
   }
 
   do(): Generated.RepetitionForUser {
     return {
         quizQuestion: this.quizQuestion,
+        reviewPoint: this.reviewPointId,
         toRepeatCount: 0,
     }
   }
