@@ -36,8 +36,8 @@ public class FromDifferentPartAsQuizPresenter implements QuizQuestionPresenter {
 
   @Override
   public List<Note> knownRightAnswers() {
-    ParentGrandLinkHelper parentGrandLinkHelper =
-        new ParentGrandLinkHelper(user, link, categoryLink);
+    ParentGrandLinkHelperImpl parentGrandLinkHelper =
+        new ParentGrandLinkHelperImpl(user, link, categoryLink);
     return parentGrandLinkHelper.getCousinLinksAvoidingSiblings().stream()
         .map(Link::getSourceNote)
         .collect(Collectors.toList());

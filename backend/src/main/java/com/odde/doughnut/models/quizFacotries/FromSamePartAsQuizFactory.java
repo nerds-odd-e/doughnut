@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 public class FromSamePartAsQuizFactory
     implements QuizQuestionFactory, QuestionOptionsFactory, SecondaryReviewPointsFactory {
 
-  private final IParentGrandLinkHelper parentGrandLinkHelper;
+  private final ParentGrandLinkHelper parentGrandLinkHelper;
   private Link cachedAnswerLink = null;
   private List<Note> cachedFillingOptions = null;
   private final User user;

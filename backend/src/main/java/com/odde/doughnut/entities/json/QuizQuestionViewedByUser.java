@@ -34,7 +34,7 @@ public class QuizQuestionViewedByUser {
 
   public static QuizQuestionViewedByUser from(
       QuizQuestion quizQuestion, ModelFactoryService modelFactoryService) {
-    QuizQuestionPresenter presenter = quizQuestion.getQuestionType().presenter.apply(quizQuestion);
+    QuizQuestionPresenter presenter = quizQuestion.buildPresenter();
     QuizQuestionViewedByUser question = new QuizQuestionViewedByUser();
     question.quizQuestion = quizQuestion;
     question.questionType = quizQuestion.getQuestionType();
@@ -43,10 +43,10 @@ public class QuizQuestionViewedByUser {
     question.hintLinks = presenter.hintLinks();
     question.pictureWithMask = presenter.pictureWithMask();
     question.viceReviewPointIdList = quizQuestion.getViceReviewPointIdList();
-    question.scope =
-        List.of(quizQuestion.getReviewPoint().getSourceNote().getNotebook().getHeadNote());
     question.options =
         presenter.optionCreator().getOptions(modelFactoryService, quizQuestion.getOptionNoteIds());
+    question.scope =
+        List.of(quizQuestion.getReviewPoint().getSourceNote().getNotebook().getHeadNote());
     return question;
   }
 

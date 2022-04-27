@@ -81,9 +81,9 @@ public class QuizQuestionServant {
     return List.of(reviewPointFor);
   }
 
-  IParentGrandLinkHelper getParentGrandLinkHelper(User user, Link link) {
+  ParentGrandLinkHelper getParentGrandLinkHelper(User user, Link link) {
     Link parentGrandLink = chooseOneCategoryLink(user, link).orElse(null);
     if (parentGrandLink == null) return new NullParentGrandLinkHelper();
-    return new ParentGrandLinkHelper(user, link, parentGrandLink);
+    return new ParentGrandLinkHelperImpl(user, link, parentGrandLink);
   }
 }

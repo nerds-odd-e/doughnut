@@ -8,19 +8,16 @@ import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.SelfEvaluate;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.sql.Timestamp;
-import java.util.List;
 
 public class AnswerModel {
   private final Answer answer;
   private final ModelFactoryService modelFactoryService;
-  private final QuizQuestion.QuestionType questionType;
 
   private Boolean cachedResult;
 
   public AnswerModel(Answer answer, ModelFactoryService modelFactoryService) {
     this.answer = answer;
     this.modelFactoryService = modelFactoryService;
-    this.questionType = answer.getQuestion().getQuestionType();
   }
 
   public void updateReviewPoints(Timestamp currentUTCTimestamp) {
@@ -78,9 +75,7 @@ public class AnswerModel {
 
   private boolean isCorrect() {
     if (cachedResult != null) return cachedResult;
-    List<Note> rightAnswers =
-        questionType.presenter.apply(answer.getQuestion()).knownRightAnswers();
-    cachedResult = rightAnswers.isEmpty() || rightAnswers.stream().anyMatch(this::matchAnswer);
+    cachedResult = answer.getQuestion().isAnswerCorrect(this::matchAnswer);
     return cachedResult;
   }
 

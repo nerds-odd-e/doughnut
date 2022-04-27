@@ -38,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -55,6 +56,17 @@ import org.apache.logging.log4j.util.Strings;
 @Entity
 @Table(name = "quiz_question")
 public class QuizQuestion {
+
+  public Boolean isAnswerCorrect(Predicate<Note> matchAnswer) {
+    if (getQuestionType() == QuestionType.JUST_REVIEW) {
+      return true;
+    }
+    return buildPresenter().knownRightAnswers().stream().anyMatch(matchAnswer);
+  }
+
+  public QuizQuestionPresenter buildPresenter() {
+    return getQuestionType().presenter.apply(this);
+  }
 
   public enum QuestionType {
     CLOZE_SELECTION(1, ClozeTitleSelectionQuizFactory::new, ClozeTitleSelectionQuizPresenter::new),
