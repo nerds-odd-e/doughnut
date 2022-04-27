@@ -52,9 +52,9 @@ export default defineComponent({
         .selfEvaluate(this.reviewPointId, {
           selfEvaluation: data,
         })
-        .then((res) => {
-          this.nextReviewAt = res.nextReviewAt;
-          this.$emit('selfEvaluated');
+        .then((reviewPoint) => {
+          this.nextReviewAt = reviewPoint.nextReviewAt;
+          this.$emit('selfEvaluated', reviewPoint);
         });
     },
 

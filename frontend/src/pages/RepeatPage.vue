@@ -97,6 +97,7 @@ export default defineComponent({
     },
 
     viewLastResult(cursor: number | undefined) {
+      if(cursor === undefined) return
       this.previousResultCursor = cursor
       if(this.pausing) {
         const answerId = this.previousResults[this.previousResultCursor].answerId;
