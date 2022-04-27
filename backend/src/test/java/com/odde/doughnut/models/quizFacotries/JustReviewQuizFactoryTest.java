@@ -88,8 +88,7 @@ class JustReviewQuizFactoryTest {
   }
 
   private QuizQuestionViewedByUser buildQuestion(ReviewPoint reviewPoint) {
-    return QuizQuestionViewedByUser.from(
-        buildQuizQuestion(reviewPoint), makeMe.modelFactoryService);
+    return new QuizQuestionViewedByUser(buildQuizQuestion(reviewPoint), makeMe.modelFactoryService);
   }
 
   private QuizQuestion buildQuizQuestion(ReviewPoint reviewPoint) {

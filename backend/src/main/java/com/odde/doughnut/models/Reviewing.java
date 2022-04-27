@@ -122,7 +122,7 @@ public class Reviewing {
               RepetitionForUser repetitionForUser = new RepetitionForUser();
               QuizQuestion quizQuestion = reviewPointModel.generateAQuizQuestion(randomizer);
               repetitionForUser.setQuizQuestion(
-                  QuizQuestionViewedByUser.from(quizQuestion, this.modelFactoryService));
+                  new QuizQuestionViewedByUser(quizQuestion, this.modelFactoryService));
               repetitionForUser.setToRepeatCount(toRepeatCount());
               return repetitionForUser;
             });

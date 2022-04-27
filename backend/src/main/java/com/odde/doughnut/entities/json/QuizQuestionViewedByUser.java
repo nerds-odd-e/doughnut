@@ -32,22 +32,19 @@ public class QuizQuestionViewedByUser {
 
   public Optional<PictureWithMask> pictureWithMask;
 
-  public static QuizQuestionViewedByUser from(
+  public QuizQuestionViewedByUser(
       QuizQuestion quizQuestion, ModelFactoryService modelFactoryService) {
     QuizQuestionPresenter presenter = quizQuestion.buildPresenter();
-    QuizQuestionViewedByUser question = new QuizQuestionViewedByUser();
-    question.quizQuestion = quizQuestion;
-    question.questionType = quizQuestion.getQuestionType();
-    question.description = presenter.instruction();
-    question.mainTopic = presenter.mainTopic();
-    question.hintLinks = presenter.hintLinks();
-    question.pictureWithMask = presenter.pictureWithMask();
-    question.viceReviewPointIdList = quizQuestion.getViceReviewPointIdList();
-    question.options =
+    this.quizQuestion = quizQuestion;
+    questionType = quizQuestion.getQuestionType();
+    description = presenter.instruction();
+    mainTopic = presenter.mainTopic();
+    hintLinks = presenter.hintLinks();
+    pictureWithMask = presenter.pictureWithMask();
+    options =
         presenter.optionCreator().getOptions(modelFactoryService, quizQuestion.getOptionNoteIds());
-    question.scope =
-        List.of(quizQuestion.getReviewPoint().getSourceNote().getNotebook().getHeadNote());
-    return question;
+    viceReviewPointIdList = quizQuestion.getViceReviewPointIdList();
+    scope = List.of(quizQuestion.getReviewPoint().getSourceNote().getNotebook().getHeadNote());
   }
 
   public static class Option {
