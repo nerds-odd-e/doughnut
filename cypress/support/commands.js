@@ -195,8 +195,10 @@ Cypress.Commands.add("jumpToNotePage", (noteTitle, forceLoadPage) => {
 
 Cypress.Commands.add("routerPush", (fallback, name, params, forceLoadPage) => {
   cy.get("@firstVisited").then((firstVisited) => {
+    cy.log(`first first ${firstVisited}`)
     cy.window().then((win) => {
-        if (!!win.router && !forceLoadPage && !firstVisited) {
+    cy.log(`second first ${firstVisited}`)
+        if (!!win.router && !forceLoadPage && firstVisited === 'yes') {
           const r = win.router.push({
             name,
             params,
@@ -205,7 +207,7 @@ Cypress.Commands.add("routerPush", (fallback, name, params, forceLoadPage) => {
           cy.get(".modal-body").should("not.exist")
           return
         }
-        cy.wrap(true).as("firstVisited")
+        cy.wrap('yes').as("firstVisited")
         cy.visit(fallback)
 
     })
@@ -359,7 +361,7 @@ Cypress.Commands.add("routerToInitialReview", () => {
 })
 
 Cypress.Commands.add("routerToReviews", () => {
-  cy.routerPush("/reviews", 'reviews', {}, false);
+  cy.visit("/reviews");
 })
 
 Cypress.Commands.add("routerToRepeatReview", () => {

@@ -7,7 +7,7 @@ import { Before, After } from "@badeball/cypress-cucumber-preprocessor"
 
 Before(() => {
   cy.cleanDBAndSeedData()
-  cy.wrap(false).as("firstVisited")
+  cy.wrap('no').as("firstVisited")
 })
 
 Before({ tags: "@stopTime" }, () => {
