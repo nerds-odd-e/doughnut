@@ -6,6 +6,9 @@ declare namespace Cypress {
     space_intervals?: number
   }
   interface Chainable {
+    routerToReviews(): Chainable<Element>
+    routerToInitialReview(): Chainable<Element>
+    routerToRepeatReview(): Chainable<Element>
     cleanDBAndSeedData(): void
     enableFeatureToggle(enabled: boolean): void
     cleanDownloadFolder(): void

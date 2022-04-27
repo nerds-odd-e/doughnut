@@ -193,11 +193,9 @@ Cypress.Commands.add("jumpToNotePage", (noteTitle, forceLoadPage) => {
   cy.expectNoteTitle(noteTitle)
 })
 
-// jumptoNotePage is faster than navigateToNotePage
-//    it uses the note id memorized when creating them with testability api
 Cypress.Commands.add("routerPush", (fallback, name, params, forceLoadPage) => {
   cy.get("@firstVisited").then((firstVisited) => {
-      cy.window().then((win) => {
+    cy.window().then((win) => {
         if (!!win.router && !forceLoadPage && !firstVisited) {
           const r = win.router.push({
             name,
@@ -209,8 +207,9 @@ Cypress.Commands.add("routerPush", (fallback, name, params, forceLoadPage) => {
         }
         cy.wrap(true).as("firstVisited")
         cy.visit(fallback)
-      }),
-    });
+
+    })
+  });
 })
 
 Cypress.Commands.add("clickButtonOnCardBody", (noteTitle, buttonTitle) => {
@@ -355,8 +354,20 @@ Cypress.Commands.add("navigateToCircle", (circleName) => {
   cy.findByText(circleName).click()
 })
 
+Cypress.Commands.add("routerToInitialReview", () => {
+  cy.routerPush("/reviews/initial", 'initial', {}, false);
+})
+
+Cypress.Commands.add("routerToReviews", () => {
+  cy.routerPush("/reviews", 'reviews', {}, false);
+})
+
+Cypress.Commands.add("routerToRepeatReview", () => {
+  cy.routerPush("/reviews/repeat", 'repeat', {}, false);
+})
+
 Cypress.Commands.add("initialReviewInSequence", (reviews) => {
-  cy.visit("/reviews/initial")
+  cy.routerToInitialReview();
   reviews.forEach((initialReview) => {
     cy.initialReviewOneNoteIfThereIs(initialReview)
   })
@@ -374,7 +385,7 @@ Cypress.Commands.add("initialReviewNotes", (noteTitles) => {
 })
 
 Cypress.Commands.add("repeatReviewNotes", (noteTitles) => {
-  cy.visit("/reviews/repeat")
+  cy.routerToRepeatReview();
   noteTitles.commonSenseSplit(",").forEach((title) => {
     const review_type = title === "end" ? "repeat done" : "single note"
     cy.repeatReviewOneNoteIfThereIs({ review_type, title })
@@ -407,10 +418,6 @@ Cypress.Commands.add("searchNote", (searchKey, options) => {
   options?.forEach(option=> cy.getFormControl(option).check())
   cy.findByPlaceholderText("Search").clear().type(searchKey)
   cy.tick(500)
-})
-
-Cypress.Commands.add("visitBlog", () => {
-  cy.visit("/index.html")
 })
 
 Cypress.Commands.add("assertBlogPostInWebsiteByTitle", (article) => {

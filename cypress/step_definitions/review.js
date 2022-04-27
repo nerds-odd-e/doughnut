@@ -23,7 +23,7 @@ Then(
 )
 
 Given("I go to the reviews page", () => {
-  cy.visit("/reviews")
+  cy.routerToReviews();
 })
 
 Then("I should see that I have old notes to repeat", () => {
@@ -38,7 +38,7 @@ Then(
   "On day {int} I should have {string} note for initial review and {string} for repeat",
   (day, numberOfInitialReviews, numberOfRepeats) => {
     cy.timeTravelTo(day, 8)
-    cy.visit("/reviews")
+    cy.routerToReviews();
     cy.findByText(numberOfInitialReviews, {
       selector: ".number-of-initial-reviews",
     })
@@ -72,7 +72,7 @@ Then("I learned one note {string} on day {int}", (noteTitle, day) => {
 
 Then("I am repeat-reviewing my old note on day {int}", (day) => {
   cy.timeTravelTo(day, 8)
-  cy.visit("/reviews/repeat")
+  cy.routerToRepeatReview();
 })
 
 Then("I should see the happy option", () => {
@@ -81,7 +81,7 @@ Then("I should see the happy option", () => {
 
 Then("I am learning new note on day {int}", (day) => {
   cy.timeTravelTo(day, 8)
-  cy.visit("/reviews/initial")
+  cy.routerToInitialReview();
 })
 
 Then(
