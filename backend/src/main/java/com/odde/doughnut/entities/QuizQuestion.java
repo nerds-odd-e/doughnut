@@ -13,13 +13,13 @@ import com.odde.doughnut.models.quizFacotries.FromDifferentPartAsQuizFactory;
 import com.odde.doughnut.models.quizFacotries.FromDifferentPartAsQuizPresenter;
 import com.odde.doughnut.models.quizFacotries.FromSamePartAsQuizFactory;
 import com.odde.doughnut.models.quizFacotries.FromSamePartAsQuizPresenter;
-import com.odde.doughnut.models.quizFacotries.JustReviewQuizPresenter;
 import com.odde.doughnut.models.quizFacotries.LinkSourceQuizFactory;
 import com.odde.doughnut.models.quizFacotries.LinkSourceQuizPresenter;
 import com.odde.doughnut.models.quizFacotries.LinkSourceWithinSameLinkTypeQuizFactory;
 import com.odde.doughnut.models.quizFacotries.LinkSourceWithinSameLinkTypeQuizPresenter;
 import com.odde.doughnut.models.quizFacotries.LinkTargetQuizFactory;
 import com.odde.doughnut.models.quizFacotries.LinkTargetQuizPresenter;
+import com.odde.doughnut.models.quizFacotries.NullQuizQuestionPresenter;
 import com.odde.doughnut.models.quizFacotries.PictureSelectionQuizFactory;
 import com.odde.doughnut.models.quizFacotries.PictureSelectionQuizPresenter;
 import com.odde.doughnut.models.quizFacotries.PictureTitleSelectionQuizFactory;
@@ -88,7 +88,7 @@ public class QuizQuestion {
     FROM_SAME_PART_AS(10, FromSamePartAsQuizFactory::new, FromSamePartAsQuizPresenter::new),
     FROM_DIFFERENT_PART_AS(
         11, FromDifferentPartAsQuizFactory::new, FromDifferentPartAsQuizPresenter::new),
-    JUST_REVIEW(13, null, JustReviewQuizPresenter::new);
+    JUST_REVIEW(13, null, NullQuizQuestionPresenter::new);
 
     public final Integer id;
     public final BiFunction<ReviewPoint, QuizQuestionServant, QuizQuestionFactory> factory;

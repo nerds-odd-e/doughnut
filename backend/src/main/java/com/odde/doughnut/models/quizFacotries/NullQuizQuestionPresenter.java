@@ -4,9 +4,9 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestion;
 import java.util.List;
 
-public class JustReviewQuizPresenter implements QuizQuestionPresenter {
+public class NullQuizQuestionPresenter implements QuizQuestionPresenter {
 
-  public JustReviewQuizPresenter(QuizQuestion quizQuestion) {}
+  public NullQuizQuestionPresenter(QuizQuestion quizQuestion) {}
 
   @Override
   public String mainTopic() {
@@ -15,7 +15,7 @@ public class JustReviewQuizPresenter implements QuizQuestionPresenter {
 
   @Override
   public List<Note> knownRightAnswers() {
-    return List.of();
+    return null;
   }
 
   @Override
