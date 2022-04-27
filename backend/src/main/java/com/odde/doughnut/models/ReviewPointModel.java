@@ -4,7 +4,6 @@ import static com.odde.doughnut.entities.SelfEvaluate.satisfying;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestion;
-import com.odde.doughnut.entities.QuizQuestion.QuestionType;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.ReviewSetting;
 import com.odde.doughnut.entities.SelfEvaluate;
@@ -41,13 +40,12 @@ public record ReviewPointModel(ReviewPoint entity, ModelFactoryService modelFact
     this.modelFactoryService.reviewPointRepository.save(entity);
   }
 
-  public QuizQuestion generateAQuizQuestion(Randomizer randomizer) {
+  public Optional<QuizQuestion> generateAQuizQuestion(Randomizer randomizer) {
     return randomizer.shuffle(entity.availableQuestionTypes()).stream()
         .map(type -> new QuizQuestionDirector(entity, type, randomizer, modelFactoryService))
         .map(QuizQuestionDirector::buildQuizQuestion)
         .flatMap(Optional::stream)
-        .findFirst()
-        .orElse(entity.createAQuizQuestionOfType(QuestionType.JUST_REVIEW));
+        .findFirst();
   }
 
   public void updateReviewPoint(Timestamp currentUTCTimestamp, SelfEvaluate selfEvaluate) {

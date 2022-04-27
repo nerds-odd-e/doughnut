@@ -7,7 +7,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.lessThan;
-import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -171,24 +170,6 @@ class RestReviewsControllerTests {
       userModel = makeMe.aNullUserModel();
       Answer answer = new Answer();
       assertThrows(ResponseStatusException.class, () -> controller().answerQuiz(answer));
-    }
-
-    @Test
-    void shouldUpdateSelfEvaluateIfJustReview() {
-      QuizQuestion quizQuestion =
-          makeMe
-              .aQuestion()
-              .of(QuizQuestion.QuestionType.JUST_REVIEW, reviewPoint)
-              .inMemoryPlease();
-      answer.setQuestion(quizQuestion);
-      answer.setAnswerNoteId(null);
-      answer.setSpellingAnswer("sad");
-      Integer oldForgettingCurveIndex = reviewPoint.getForgettingCurveIndex();
-      Integer oldRepetitionCount = reviewPoint.getRepetitionCount();
-      AnswerResult answerResult = controller().answerQuiz(answer);
-      assertTrue(answerResult.correct);
-      assertThat(reviewPoint.getRepetitionCount(), greaterThan(oldRepetitionCount));
-      assertThat(reviewPoint.getForgettingCurveIndex(), lessThanOrEqualTo(oldForgettingCurveIndex));
     }
   }
 

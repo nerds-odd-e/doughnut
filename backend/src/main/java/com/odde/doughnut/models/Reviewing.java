@@ -2,8 +2,6 @@ package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.QuizQuestion;
-import com.odde.doughnut.entities.QuizQuestion.QuestionType;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import com.odde.doughnut.entities.json.RepetitionForUser;
@@ -125,11 +123,10 @@ public class Reviewing {
       Randomizer randomizer, ReviewPointModel reviewPointModel) {
     RepetitionForUser repetitionForUser = new RepetitionForUser();
     repetitionForUser.setReviewPoint(reviewPointModel.getEntity());
-    QuizQuestion quizQuestion = reviewPointModel.generateAQuizQuestion(randomizer);
-    if (quizQuestion.getQuestionType() != QuestionType.JUST_REVIEW)
-      repetitionForUser.setQuizQuestion(
-          Optional.of(new QuizQuestionViewedByUser(quizQuestion, this.modelFactoryService)));
-    else repetitionForUser.setQuizQuestion(Optional.empty());
+    repetitionForUser.setQuizQuestion(
+        reviewPointModel
+            .generateAQuizQuestion(randomizer)
+            .map(q -> new QuizQuestionViewedByUser(q, this.modelFactoryService)));
     repetitionForUser.setToRepeatCount(toRepeatCount());
     return repetitionForUser;
   }

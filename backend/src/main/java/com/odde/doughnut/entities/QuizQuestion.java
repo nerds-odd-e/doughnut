@@ -58,9 +58,6 @@ import org.apache.logging.log4j.util.Strings;
 public class QuizQuestion {
 
   public Boolean isAnswerCorrect(Predicate<Note> matchAnswer) {
-    if (getQuestionType() == QuestionType.JUST_REVIEW) {
-      return true;
-    }
     return buildPresenter().knownRightAnswers().stream().anyMatch(matchAnswer);
   }
 
