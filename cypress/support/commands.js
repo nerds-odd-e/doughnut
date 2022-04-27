@@ -186,25 +186,31 @@ Cypress.Commands.add("navigateToNotePage", (noteTitlesDividedBySlash) => {
 // jumptoNotePage is faster than navigateToNotePage
 //    it uses the note id memorized when creating them with testability api
 Cypress.Commands.add("jumpToNotePage", (noteTitle, forceLoadPage) => {
+  cy.get("@seededNoteIdMap").then((seededNoteIdMap) => {
+    const noteId = seededNoteIdMap[noteTitle]
+    cy.routerPush(`/notes/${seededNoteIdMap[noteTitle]}`, 'noteShow', {rawNoteId: noteId}, forceLoadPage);
+  })
+  cy.expectNoteTitle(noteTitle)
+})
+
+// jumptoNotePage is faster than navigateToNotePage
+//    it uses the note id memorized when creating them with testability api
+Cypress.Commands.add("routerPush", (fallback, name, params, forceLoadPage) => {
   cy.get("@firstVisited").then((firstVisited) => {
-    cy.get("@seededNoteIdMap").then((seededNoteIdMap) =>
       cy.window().then((win) => {
         if (!!win.router && !forceLoadPage && !firstVisited) {
-          const noteId = seededNoteIdMap[noteTitle]
           const r = win.router.push({
-            name: "noteShow",
-            params: { rawNoteId: noteId },
-            query: { time: Date.now() },
+            name,
+            params,
+            query: { time: Date.now() }, // make sure the route re-render
           })
           cy.get(".modal-body").should("not.exist")
           return
         }
         cy.wrap(true).as("firstVisited")
-        cy.visit(`/notes/${seededNoteIdMap[noteTitle]}`)
+        cy.visit(fallback)
       }),
-    )
-  })
-  cy.expectNoteTitle(noteTitle)
+    });
 })
 
 Cypress.Commands.add("clickButtonOnCardBody", (noteTitle, buttonTitle) => {
