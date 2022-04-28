@@ -9,7 +9,6 @@ import com.odde.doughnut.entities.json.ReviewStatus;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
 
@@ -33,19 +32,18 @@ public class Reviewing {
     List<Integer> alreadyInitialReviewed =
         getNewReviewPointsOfToday().stream().map(rp -> rp.getSourceNote().getId()).toList();
     return getSubscriptionModelStream()
-        .filter(sub -> sub.needToLearnMoreToday(alreadyInitialReviewed))
-        .map(this::getOneNewReviewPoint)
-        .filter(Objects::nonNull)
+        .filter(sub -> sub.needToLearnCountToday(alreadyInitialReviewed) > 0)
+        .flatMap(this::getOneNewReviewPoint)
         .findFirst()
-        .orElseGet(() -> getOneNewReviewPoint(userModel));
+        .orElseGet(() -> getOneNewReviewPoint(userModel).findFirst().orElse(null));
   }
 
-  private ReviewPoint getOneNewReviewPoint(ReviewScope reviewScope) {
+  private Stream<ReviewPoint> getOneNewReviewPoint(ReviewScope reviewScope) {
     Note note = reviewScope.getNotesHaveNotBeenReviewedAtAll().stream().findFirst().orElse(null);
     Link link = reviewScope.getLinksHaveNotBeenReviewedAtAll().stream().findFirst().orElse(null);
 
     if (note == null && link == null) {
-      return null;
+      return Stream.of();
     }
     if (note != null && link != null) {
       if (note.getCreatedAt().compareTo(link.getCreatedAt()) > 0) {
@@ -58,7 +56,7 @@ public class Reviewing {
     ReviewPoint reviewPoint = new ReviewPoint();
     reviewPoint.setNote(note);
     reviewPoint.setLink(link);
-    return reviewPoint;
+    return Stream.of(reviewPoint);
   }
 
   private int toRepeatCount() {
