@@ -53,7 +53,7 @@ const request = async (
     return { status: 204, json: () => null, text: () => null };
   }
   if (res.status === 401) {
-    loginOrRegister();
+    await loginOrRegister();
   }
   throw new HttpResponseError(res.status);
 };
