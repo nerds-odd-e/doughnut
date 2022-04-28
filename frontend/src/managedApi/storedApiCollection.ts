@@ -23,6 +23,7 @@ const storedApiCollection = (
     noteId: Doughnut.ID,
     noteContentData: Generated.TextContent
   ) {
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { updatedAt, ...data } = noteContentData;
     const res = (await managedApi.restPatchMultiplePartForm(
       `text_content/${noteId}`,
@@ -47,7 +48,7 @@ const storedApiCollection = (
           `reviews/initial`
         )) as Generated.ReviewPointViewedByUser;
         loadReviewPointViewedByUser(res);
-        return res;
+        return [res];
       },
 
       async doInitialReview(data: Generated.InitialInfo) {
@@ -205,6 +206,7 @@ const storedApiCollection = (
       noteId: Doughnut.ID,
       noteContentData: Generated.NoteAccessories
     ) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { updatedAt, ...data } = noteContentData;
       const res = (await managedApi.restPatchMultiplePartForm(
         `notes/${noteId}`,

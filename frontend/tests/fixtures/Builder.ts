@@ -1,4 +1,5 @@
 abstract class Builder<T> {
+  // eslint-disable-next-line no-use-before-define
   parent<P extends Builder<S>, S>(parentBuilder: P) {
     const that = this as Omit<typeof this, "please">;
     const those = that as typeof that & {

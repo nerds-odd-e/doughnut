@@ -15,9 +15,9 @@ class ApiMockImpl implements ApiMock {
 
   private unexpectedApiCalls: string[] = [];
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private expected: {
     url: string;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     value: any;
     response?: MockParams;
     called: boolean;

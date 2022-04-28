@@ -61,8 +61,8 @@ const request = async (
 class RestfulFetch {
   baseUrl: string;
 
-  constructor(baseUrl: string) {
-    this.baseUrl = baseUrl;
+  constructor(base_url: string) {
+    this.base_url = base_url;
   }
 
   private expandUrl(url: string): string {

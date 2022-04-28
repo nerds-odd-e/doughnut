@@ -17,6 +17,7 @@ class RenderingHelper {
 
   private global = {
     directives: {
+      // eslint-disable-next-line @typescript-eslint/no-empty-function
       focus() {},
     },
     stubs: {

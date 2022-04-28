@@ -114,7 +114,9 @@ export default {
     },
 
     fetchData() {
-      this.storedApi.reviewMethods.getOneInitialReview().then(this.loadNew);
+      this.storedApi.reviewMethods
+        .getOneInitialReview()
+        .then((rs) => this.loadNew(rs[0]));
     },
   },
   mounted() {
