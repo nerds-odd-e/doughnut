@@ -48,8 +48,7 @@ module.exports = {
   },
   plugins: ['vue', 'testing-library', '@typescript-eslint', 'jest-dom'],
   rules: {
-    '@typescript-eslint/no-explicit-any': 'off',
-    '@typescript-eslint/explicit-module-boundary-types': 'off',
+    'no-unused-vars': ['error', { varsIgnorePattern: '.*', args: 'none' }],
     'no-param-reassign': ['error', { props: false }],
     'no-return-assign': ['error', 'except-parens'],
     'no-useless-return': 'off',

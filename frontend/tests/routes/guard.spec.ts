@@ -1,4 +1,4 @@
-import routerScopeGuard from "../../routes/relative_routes";
+import routerScopeGuard from "../../src/routes/relative_routes";
 
 describe("router guards", () => {
   let alert;
