@@ -23,13 +23,15 @@ env:
   GCP_CREDENTIALS: ${{ secrets.GCP_CREDENTIALS }}
 
 jobs:
-  Backend-linting:
-    name: Backend Lint
+  Linting:
+    name: cypress/backend/frontend Lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/setup_jdk_with_cache
-      - run: yarn backend:lint
+      - uses: actions/checkout@v3
+      - uses: ./.github/setup_nodejs_with_cache
+      - run: yarn lint:all
 
   Backend-unit-tests:
     name: Backend Unit tests
@@ -54,14 +56,6 @@ jobs:
         with:
           name: ${{ env.ARTIFACT }}-${{ env.VERSION }}.jar
           path: backend/build/libs/${{ env.ARTIFACT }}-${{ env.VERSION }}.jar
-
-  Frontend-linting:
-    name: Frontend Lint
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: ./.github/setup_nodejs_with_cache
-      - run: yarn frontend:lint
 
   Frontend-unit-tests:
     name: Frontend Unit tests
@@ -124,14 +118,7 @@ jobs:
   Deploy:
     name: GCP MIG Rolling Update Deploy
     runs-on: ubuntu-latest
-    needs:
-      [
-        Backend-linting,
-        Backend-unit-tests,
-        Frontend-linting,
-        Frontend-unit-tests,
-        E2E-tests,
-      ]
+    needs: [Linting, Backend-unit-tests, Frontend-unit-tests, E2E-tests]
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/gcloud_auth_n_sdk
@@ -153,15 +140,7 @@ jobs:
   Slack-Notify:
     name: Single summary slack notification for entire workflow
     runs-on: ubuntu-latest
-    needs:
-      [
-        Backend-linting,
-        Backend-unit-tests,
-        Frontend-linting,
-        Frontend-unit-tests,
-        E2E-tests,
-        Deploy,
-      ]
+    needs: [Linting, Backend-unit-tests, Frontend-unit-tests, E2E-tests, Deploy]
     if: always()
     steps:
       - uses: technote-space/workflow-conclusion-action@v2
