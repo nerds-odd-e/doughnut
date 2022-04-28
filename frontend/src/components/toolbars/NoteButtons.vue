@@ -60,7 +60,6 @@
           </template>
         </PopupButton>
       </div>
-      <NoteDownloadButton :note="note" v-if="featureToggle" />
     </div>
   </div>
 </template>
@@ -70,7 +69,6 @@ import SvgAddChild from "../svgs/SvgAddChild.vue";
 import SvgAddSibling from "../svgs/SvgAddSibling.vue";
 import SvgCog from "../svgs/SvgCog.vue";
 import SvgRemove from "../svgs/SvgRemove.vue";
-import NoteDownloadButton from "./NoteDownloadButton.vue"
 import NoteNewButton from "./NoteNewButton.vue";
 import ViewTypeButtons from "./ViewTypeButtons.vue";
 import { viewType } from "../../models/viewTypes";
@@ -100,7 +98,6 @@ export default ({
     SvgRemove,
     NoteNewButton,
     ViewTypeButtons,
-    NoteDownloadButton,
     PopupButton,
     SvgReviewSetting,
     ReviewSettingEditDialog,

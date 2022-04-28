@@ -1,8 +1,6 @@
 /// <reference types="cypress" />
 // @ts-check
 
-import rmdirSync from "fs"
-
 Cypress.Commands.add("cleanDBAndSeedData", () => {
   cy.request({
     method: "POST",
@@ -76,14 +74,4 @@ Cypress.Commands.add("seedCircle", (circle) => {
   }).then((response) => {
     expect(response.body).to.equal("OK")
   })
-})
-
-Cypress.Commands.add("cleanDownloadFolder", () => {
-  const downloadsFolder = Cypress.config("downloadsFolder")
-  try {
-    rmdirSync(downloadsFolder, { maxRetries: 10, recursive: true })
-    console.log(`${downloadsFolder} deleted successfully.`)
-  } catch (err) {
-    console.error(`Error while deleting ${downloadsFolder}!`)
-  }
 })

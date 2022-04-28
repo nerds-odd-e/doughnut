@@ -28,7 +28,3 @@ After({ tags: "@stopTime" }, () => {
 Before({ tags: "@featureToggle" }, () => {
   cy.enableFeatureToggle(true)
 })
-
-Before({ tags: "@cleanDownloadFolder" }, () => {
-  cy.cleanDownloadFolder()
-})

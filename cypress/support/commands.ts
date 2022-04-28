@@ -27,11 +27,6 @@
 import "@testing-library/cypress/add-commands"
 import "cypress-file-upload"
 require("cy-verify-downloads").addCustomCommand()
-// import cyVerifyDownloads from "cy-verify-downloads"
-// cyVerifyDownloads.addCustomCommand()
-
-// const compareSnapshotCommand = require('cypress-image-diff-js/dist/command');
-// compareSnapshotCommand();
 
 Cypress.Commands.add("pageIsLoaded", () => {
   cy.get(".loading-bar").should("not.exist")

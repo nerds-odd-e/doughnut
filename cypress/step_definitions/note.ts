@@ -301,19 +301,6 @@ Then("I should see {string} is {string} than {string}", (left, aging, right) => 
     })
 })
 
-Then("I download note", () => {
-  cy.get("#note-download-button").click()
-})
-
-Then("There is a {string} file downloaded", (fileName) => {
-  cy.verifyDownload(fileName)
-})
-
-And("the file {string} content is", (fileName, mdContent) => {
-  const downloadsFolder = Cypress.config("downloadsFolder")
-  cy.readFile(`${downloadsFolder}/${fileName}`).should("eq", mdContent)
-})
-
 When("I undo {string}", (undoType) => {
   cy.findByTitle(`undo ${undoType}`).click()
 })
