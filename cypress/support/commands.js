@@ -195,9 +195,7 @@ Cypress.Commands.add("jumpToNotePage", (noteTitle, forceLoadPage) => {
 
 Cypress.Commands.add("routerPush", (fallback, name, params, forceLoadPage) => {
   cy.get("@firstVisited").then((firstVisited) => {
-    cy.log(`first first ${firstVisited}`)
     cy.window().then((win) => {
-    cy.log(`second first ${firstVisited}`)
         if (!!win.router && !forceLoadPage && firstVisited === 'yes') {
           const r = win.router.push({
             name,
@@ -205,7 +203,7 @@ Cypress.Commands.add("routerPush", (fallback, name, params, forceLoadPage) => {
             query: { time: Date.now() }, // make sure the route re-render
           })
           cy.get(".modal-body").should("not.exist")
-          return
+          return r
         }
         cy.wrap('yes').as("firstVisited")
         cy.visit(fallback)
