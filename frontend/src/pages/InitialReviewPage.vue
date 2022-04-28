@@ -36,7 +36,8 @@
   </ContainerPage>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue";
 import ShowReviewPoint from "../components/review/ShowReviewPoint.vue";
 import ReviewSettingForm from "../components/review/ReviewSettingForm.vue";
 import ReviewPointAbbr from "../components/review/ReviewPointAbbr.vue";
@@ -47,7 +48,7 @@ import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
 import usePopups from "../components/commons/Popups/usePopup";
 import SvgResume from "../components/svgs/SvgResume.vue";
 
-export default {
+export default defineComponent({
   setup() {
     return { ...useStoredLoadingApi(), ...usePopups() };
   },
@@ -65,7 +66,7 @@ export default {
   data() {
     return {
       finished: 0,
-      reviewPointViewedByUser: null,
+      reviewPointViewedByUser: null as Generated.ReviewPointViewedByUser | null,
     };
   },
   computed: {
@@ -86,11 +87,12 @@ export default {
     resume() {
       this.$router.push({ name: "initial" });
     },
-    loadNew(resp) {
-      this.reviewPointViewedByUser = resp;
-      if (!this.reviewPointViewedByUser.reviewPoint) {
+    loadNew(resp: Generated.ReviewPointViewedByUser[]) {
+      if (resp.length === 0) {
         this.$router.push({ name: "reviews" });
+        return
       }
+      this.reviewPointViewedByUser = resp[0];
     },
 
     async processForm(skipReview) {
@@ -114,15 +116,13 @@ export default {
     },
 
     fetchData() {
-      this.storedApi.reviewMethods
-        .getOneInitialReview()
-        .then((rs) => this.loadNew(rs[0]));
+      this.storedApi.reviewMethods.getOneInitialReview().then(this.loadNew);
     },
   },
   mounted() {
     this.fetchData();
   },
-};
+});
 </script>
 
 <style>

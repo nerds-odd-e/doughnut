@@ -61,6 +61,7 @@ class RestReviewsController {
     user.getAuthorization().assertLoggedIn();
     Reviewing reviewing = user.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
     ReviewPoint reviewPoint = reviewing.getOneInitialReviewPoint();
+    if (reviewPoint == null) return List.of();
     ReviewPointViewedByUser from = ReviewPointViewedByUser.from(reviewPoint, user);
     from.setRemainingInitialReviewCountForToday(reviewing.toInitialReviewCount());
     return List.of(from);

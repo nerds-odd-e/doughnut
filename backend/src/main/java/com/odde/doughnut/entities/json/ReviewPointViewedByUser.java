@@ -19,8 +19,6 @@ public class ReviewPointViewedByUser {
 
   public static ReviewPointViewedByUser from(ReviewPoint reviewPoint, UserModel user) {
     ReviewPointViewedByUser result = new ReviewPointViewedByUser();
-    if (reviewPoint == null) return result;
-
     result.setReviewPoint(reviewPoint);
     if (reviewPoint.getNote() != null) {
       Note note = reviewPoint.getNote();
