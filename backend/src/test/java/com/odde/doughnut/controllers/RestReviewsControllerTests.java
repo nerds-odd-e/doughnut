@@ -69,7 +69,7 @@ class RestReviewsControllerTests {
     @Test
     void initialReview() {
       makeMe.aNote().byUser(userModel).please();
-      ReviewPointViewedByUser reviewPointViewedByUser = controller().initialReview();
+      ReviewPointViewedByUser reviewPointViewedByUser = controller().initialReview().get(0);
       assertThat(reviewPointViewedByUser.getRemainingInitialReviewCountForToday(), equalTo(1));
     }
 

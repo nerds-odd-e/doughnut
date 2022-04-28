@@ -17,6 +17,7 @@ import com.odde.doughnut.models.ReviewPointModel;
 import com.odde.doughnut.models.Reviewing;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
+import java.util.List;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -55,19 +56,19 @@ class RestReviewsController {
   }
 
   @GetMapping("/initial")
-  public ReviewPointViewedByUser initialReview() {
+  public List<ReviewPointViewedByUser> initialReview() {
     UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertLoggedIn();
     Reviewing reviewing = user.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
     ReviewPoint reviewPoint = reviewing.getOneInitialReviewPoint();
     ReviewPointViewedByUser from = ReviewPointViewedByUser.from(reviewPoint, user);
     from.setRemainingInitialReviewCountForToday(reviewing.toInitialReviewCount());
-    return from;
+    return List.of(from);
   }
 
   @PostMapping(path = "")
   @Transactional
-  public ReviewPointViewedByUser create(@RequestBody InitialInfo initialInfo) {
+  public List<ReviewPointViewedByUser> create(@RequestBody InitialInfo initialInfo) {
     UserModel userModel = currentUserFetcher.getUser();
     userModel.getAuthorization().assertLoggedIn();
     if (initialInfo.reviewPoint.getNoteId() != null) {
