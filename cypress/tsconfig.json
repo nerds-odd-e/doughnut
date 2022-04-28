@@ -5,10 +5,22 @@
     "module": "CommonJS",
     "strict": true,
     "allowJs": true,
-    "lib": ["es6", "dom"],
+    "lib": [
+      "es6",
+      "dom"
+    ],
     "esModuleInterop": true,
-    "typeRoots": ["types", "node_modules/@types"],
-    "types": ["cypress", "node", "@testing-library/cypress", "./support"],
+    "typeRoots": [
+      "types",
+      "node_modules/@types"
+    ],
+    "types": [
+      "cypress",
+      "cy-verify-downloads",
+      "node",
+      "@testing-library/cypress",
+      "./support"
+    ],
     "skipLibCheck": true
   },
   "include": [

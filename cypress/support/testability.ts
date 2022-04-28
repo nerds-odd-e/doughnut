@@ -1,7 +1,7 @@
 /// <reference types="cypress" />
 // @ts-check
 
-const { rmdirSync } = require("fs")
+import rmdirSync from "fs"
 
 Cypress.Commands.add("cleanDBAndSeedData", () => {
   cy.request({

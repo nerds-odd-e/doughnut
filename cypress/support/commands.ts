@@ -27,6 +27,8 @@
 import "@testing-library/cypress/add-commands"
 import "cypress-file-upload"
 require("cy-verify-downloads").addCustomCommand()
+// import cyVerifyDownloads from "cy-verify-downloads"
+// cyVerifyDownloads.addCustomCommand()
 
 // const compareSnapshotCommand = require('cypress-image-diff-js/dist/command');
 // compareSnapshotCommand();
@@ -110,7 +112,7 @@ Cypress.Commands.add("replaceFocusedText", (text) => {
 })
 
 Cypress.Commands.add("inPlaceEdit", (noteAttributes) => {
-  for (var propName in noteAttributes) {
+  for (const propName in noteAttributes) {
     const value = noteAttributes[propName]
     if (value) {
       cy.findByRole(propName.toLowerCase()).click()
@@ -120,7 +122,7 @@ Cypress.Commands.add("inPlaceEdit", (noteAttributes) => {
 })
 
 Cypress.Commands.add("submitNoteFormWith", (noteAttributes) => {
-  for (var propName in noteAttributes) {
+  for (const propName in noteAttributes) {
     const value = noteAttributes[propName]
     if (value) {
       cy.getFormControl(propName).then(($input) => {
@@ -162,7 +164,7 @@ Cypress.Commands.add("submitNoteFormsWith", (notes) => {
 
 Cypress.Commands.add("expectNoteCards", (expectedCards) => {
   expectedCards.forEach((elem) => {
-    for (var propName in elem) {
+    for (const propName in elem) {
       if (propName === "note-title") {
         cy.findByText(elem[propName], { selector: ".card-title a" }).should("be.visible")
       } else {
@@ -218,9 +220,15 @@ Cypress.Commands.add("routerPush", (fallback, name, params) => {
 })
 
 Cypress.Commands.add("clickButtonOnCardBody", (noteTitle, buttonTitle) => {
-  const card = cy.findByText(noteTitle, { selector: ".card-title a" })
-  const button = card.parent().parent().findByText(buttonTitle)
-  button.click()
+  cy.findByText(noteTitle, { selector: ".card-title a" }).then(($card) => {
+    cy.wrap($card)
+      .parent()
+      .parent()
+      .findByText(buttonTitle)
+      .then(($button) => {
+        cy.wrap($button).click()
+      })
+  })
 })
 
 Cypress.Commands.add("visitMyNotebooks", (noteTitle) => {
@@ -277,7 +285,7 @@ Cypress.Commands.add("updateCurrentUserSettingsWith", (hash) => {
 })
 
 Date.prototype.addDays = function (days) {
-  var date = new Date(this.valueOf())
+  const date = new Date(this.valueOf())
   date.setDate(date.getDate() + days)
   return date
 }

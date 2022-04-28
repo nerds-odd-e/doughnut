@@ -104,12 +104,14 @@ Then("I have unselected the option {string}", (option) => {
 })
 
 Then("I should see the option {string} is {string}", (option, status) => {
-  const elm = cy.getFormControl(option)
-  if (status === "on") {
-    elm.should("be.checked")
-  } else {
-    elm.should("not.be.checked")
-  }
+  cy.getFormControl(option).then(($elem) => {
+    elm = cy.wrap($elem)
+    if (status === "on") {
+      elm.should("be.checked")
+    } else {
+      elm.should("not.be.checked")
+    }
+  })
 })
 
 Then("choose to remove it fromm reviews", () => {
@@ -190,7 +192,7 @@ Then("I should see the statistics of note {string}", (noteTitle, data) => {
   cy.findByText(noteTitle)
   cy.findByRole("button", { name: "Statistics" }).click({ force: true })
   const attrs = data.hashes()[0]
-  for (var k in attrs) {
+  for (const k in attrs) {
     cy.findByText(attrs[k]).should("be.visible")
   }
 })

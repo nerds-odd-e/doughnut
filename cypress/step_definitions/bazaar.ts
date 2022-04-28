@@ -3,7 +3,7 @@
 /// <reference types="../support" />
 // @ts-check
 
-import { And, Before, Given, Then, When } from "@badeball/cypress-cucumber-preprocessor"
+import { Given, Then, When } from "@badeball/cypress-cucumber-preprocessor"
 
 Given("I choose to share my notebook {string}", (noteTitle) => {
   cy.visitMyNotebooks()

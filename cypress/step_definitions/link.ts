@@ -124,4 +124,6 @@ Then("I should be able to delete the link to note {string}", (noteTitle) => {
   cy.contains(noteTitle).should("not.exist")
 })
 
-Then("I should see the note {string} {string}", (linkType, linkTarget) => {})
+Then("I should see the note {string} {string}", (linkType, linkTarget) => {
+  cy.log("WHY AM I HERE???")
+})

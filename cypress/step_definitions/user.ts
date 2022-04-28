@@ -64,7 +64,9 @@ Then("my space setting is {string}", (number) => {
   cy.updateCurrentUserSettingsWith({ space_intervals: number })
 })
 
-Then("I haven't login", () => {})
+Then("I haven't login", () => {
+  cy.log("I haven't login!!!")
+})
 
 When("I visit {string} page", (pageName) => {
   switch (pageName) {
