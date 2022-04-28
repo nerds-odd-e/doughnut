@@ -8,6 +8,7 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.sql.Timestamp;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.stream.Stream;
 import lombok.Getter;
 
 public class UserModel implements ReviewScope {
@@ -43,7 +44,7 @@ public class UserModel implements ReviewScope {
   }
 
   @Override
-  public List<Note> getNotesHaveNotBeenReviewedAtAll() {
+  public Stream<Note> getNotesHaveNotBeenReviewedAtAll() {
     return modelFactoryService.noteRepository.findByOwnershipWhereThereIsNoReviewPoint(entity);
   }
 
@@ -53,7 +54,7 @@ public class UserModel implements ReviewScope {
   }
 
   @Override
-  public List<Link> getLinksHaveNotBeenReviewedAtAll() {
+  public Stream<Link> getLinksHaveNotBeenReviewedAtAll() {
     return modelFactoryService.linkRepository.findByOwnershipWhereThereIsNoReviewPoint(entity);
   }
 

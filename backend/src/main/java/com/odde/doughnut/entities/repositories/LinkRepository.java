@@ -3,7 +3,6 @@ package com.odde.doughnut.entities.repositories;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
-import java.util.List;
 import java.util.stream.Stream;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -13,7 +12,7 @@ public interface LinkRepository extends CrudRepository<Link, Integer> {
   @Query(
       value = "SELECT link.* from link " + byOwnershipWhereThereIsNoReviewPoint,
       nativeQuery = true)
-  List<Link> findByOwnershipWhereThereIsNoReviewPoint(@Param("user") User user);
+  Stream<Link> findByOwnershipWhereThereIsNoReviewPoint(@Param("user") User user);
 
   @Query(
       value = "SELECT count(1) from link " + byOwnershipWhereThereIsNoReviewPoint,
@@ -23,7 +22,7 @@ public interface LinkRepository extends CrudRepository<Link, Integer> {
   @Query(
       value = "SELECT link.* from link " + byAncestorWhereThereIsNoReviewPoint,
       nativeQuery = true)
-  List<Link> findByAncestorWhereThereIsNoReviewPoint(
+  Stream<Link> findByAncestorWhereThereIsNoReviewPoint(
       @Param("user") User user, @Param("ancestor") Note ancestor);
 
   @Query(

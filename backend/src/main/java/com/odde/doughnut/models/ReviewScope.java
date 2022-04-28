@@ -2,14 +2,14 @@ package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
-import java.util.List;
+import java.util.stream.Stream;
 
 public interface ReviewScope {
-  List<Note> getNotesHaveNotBeenReviewedAtAll();
+  Stream<Note> getNotesHaveNotBeenReviewedAtAll();
 
   int getNotesHaveNotBeenReviewedAtAllCount();
 
-  List<Link> getLinksHaveNotBeenReviewedAtAll();
+  Stream<Link> getLinksHaveNotBeenReviewedAtAll();
 
   int getLinksHaveNotBeenReviewedAtAllCount();
 }

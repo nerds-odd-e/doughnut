@@ -5,6 +5,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Subscription;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class SubscriptionModel implements ReviewScope {
   protected final Subscription entity;
@@ -16,7 +17,7 @@ public class SubscriptionModel implements ReviewScope {
   }
 
   @Override
-  public List<Note> getNotesHaveNotBeenReviewedAtAll() {
+  public Stream<Note> getNotesHaveNotBeenReviewedAtAll() {
     return modelFactoryService.noteRepository.findByAncestorWhereThereIsNoReviewPoint(
         entity.getUser(), entity.getHeadNote());
   }
@@ -28,7 +29,7 @@ public class SubscriptionModel implements ReviewScope {
   }
 
   @Override
-  public List<Link> getLinksHaveNotBeenReviewedAtAll() {
+  public Stream<Link> getLinksHaveNotBeenReviewedAtAll() {
     return modelFactoryService.linkRepository.findByAncestorWhereThereIsNoReviewPoint(
         entity.getUser(), entity.getHeadNote());
   }

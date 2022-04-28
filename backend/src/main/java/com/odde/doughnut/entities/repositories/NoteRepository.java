@@ -15,7 +15,7 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
   @Query(
       value = "SELECT note.*,rs.level as level from note " + byOwnershipWhereThereIsNoReviewPoint,
       nativeQuery = true)
-  List<Note> findByOwnershipWhereThereIsNoReviewPoint(@Param("user") User user);
+  Stream<Note> findByOwnershipWhereThereIsNoReviewPoint(@Param("user") User user);
 
   @Query(
       value = "SELECT count(1) as count from note " + byOwnershipWhereThereIsNoReviewPoint,
@@ -30,7 +30,7 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
   @Query(
       value = "SELECT note.* from note " + byAncestorWhereThereIsNoReviewPoint,
       nativeQuery = true)
-  List<Note> findByAncestorWhereThereIsNoReviewPoint(
+  Stream<Note> findByAncestorWhereThereIsNoReviewPoint(
       @Param("user") User user, @Param("ancestor") Note ancestor);
 
   @Query(

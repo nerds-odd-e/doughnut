@@ -8,6 +8,8 @@ import com.odde.doughnut.entities.json.RepetitionForUser;
 import com.odde.doughnut.entities.json.ReviewStatus;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -33,32 +35,42 @@ public class Reviewing {
         getNewReviewPointsOfToday().stream().map(rp -> rp.getSourceNote().getId()).toList();
     return Stream.concat(
             getSubscriptionModelStream()
-                .filter(sub -> sub.needToLearnCountToday(alreadyInitialReviewed) > 0)
-                .flatMap(this::getOneNewReviewPoint),
-            getOneNewReviewPoint(userModel))
+                .flatMap(
+                    sub ->
+                        getOneNewReviewPoint(
+                            sub, sub.needToLearnCountToday(alreadyInitialReviewed))),
+            getOneNewReviewPoint(userModel, 1))
         .findFirst()
         .orElse(null);
   }
 
-  private Stream<ReviewPoint> getOneNewReviewPoint(ReviewScope reviewScope) {
-    Note note = reviewScope.getNotesHaveNotBeenReviewedAtAll().stream().findFirst().orElse(null);
-    Link link = reviewScope.getLinksHaveNotBeenReviewedAtAll().stream().findFirst().orElse(null);
+  private Stream<ReviewPoint> getOneNewReviewPoint(ReviewScope reviewScope, int count) {
+    if (count <= 0) return Stream.of();
+    Iterator<Note> noteIterator = reviewScope.getNotesHaveNotBeenReviewedAtAll().iterator();
+    Iterator<Link> linkIterator = reviewScope.getLinksHaveNotBeenReviewedAtAll().iterator();
 
-    if (note == null && link == null) {
-      return Stream.of();
-    }
-    if (note != null && link != null) {
-      if (note.getCreatedAt().compareTo(link.getCreatedAt()) > 0) {
-        note = null;
-      } else {
-        link = null;
+    List<ReviewPoint> result = new ArrayList<>();
+    for (int cnt = 0; cnt < count; cnt++) {
+      Note note = noteIterator.hasNext() ? noteIterator.next() : null;
+      Link link = linkIterator.hasNext() ? linkIterator.next() : null;
+
+      if (note == null && link == null) {
+        break;
       }
-    }
+      if (note != null && link != null) {
+        if (note.getCreatedAt().compareTo(link.getCreatedAt()) > 0) {
+          note = null;
+        } else {
+          link = null;
+        }
+      }
 
-    ReviewPoint reviewPoint = new ReviewPoint();
-    reviewPoint.setNote(note);
-    reviewPoint.setLink(link);
-    return Stream.of(reviewPoint);
+      ReviewPoint reviewPoint = new ReviewPoint();
+      reviewPoint.setNote(note);
+      reviewPoint.setLink(link);
+      result.add(reviewPoint);
+    }
+    return result.stream();
   }
 
   private int toRepeatCount() {
