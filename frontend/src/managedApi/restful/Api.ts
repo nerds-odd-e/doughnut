@@ -3,8 +3,8 @@ import RestfullFetch, { JsonData } from "./RestfulFetch";
 class Api {
   fetch;
 
-  constructor(base_url: string) {
-    this.fetch = new RestfullFetch(base_url);
+  constructor(baseUrl: string) {
+    this.fetch = new RestfullFetch(baseUrl);
   }
 
   restGet(url: string) {

@@ -59,15 +59,15 @@ const request = async (
 };
 
 class RestfulFetch {
-  base_url: string;
+  baseUrl: string;
 
-  constructor(base_url: string) {
-    this.base_url = base_url;
+  constructor(baseUrl: string) {
+    this.baseUrl = baseUrl;
   }
 
   private expandUrl(url: string): string {
     if (url.startsWith("/")) return url;
-    return this.base_url + url;
+    return this.baseUrl + url;
   }
 
   async restRequest(url: string, data: JsonData, params: RequestOptions) {
