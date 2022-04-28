@@ -31,11 +31,13 @@ public class Reviewing {
     }
     List<Integer> alreadyInitialReviewed =
         getNewReviewPointsOfToday().stream().map(rp -> rp.getSourceNote().getId()).toList();
-    return getSubscriptionModelStream()
-        .filter(sub -> sub.needToLearnCountToday(alreadyInitialReviewed) > 0)
-        .flatMap(this::getOneNewReviewPoint)
+    return Stream.concat(
+            getSubscriptionModelStream()
+                .filter(sub -> sub.needToLearnCountToday(alreadyInitialReviewed) > 0)
+                .flatMap(this::getOneNewReviewPoint),
+            getOneNewReviewPoint(userModel))
         .findFirst()
-        .orElseGet(() -> getOneNewReviewPoint(userModel).findFirst().orElse(null));
+        .orElse(null);
   }
 
   private Stream<ReviewPoint> getOneNewReviewPoint(ReviewScope reviewScope) {
