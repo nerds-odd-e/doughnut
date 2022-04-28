@@ -189,10 +189,8 @@ Cypress.Commands.add("jumpToNotePage", (noteTitle, forceLoadPage) => {
   cy.get("@seededNoteIdMap").then((seededNoteIdMap) => {
     const noteId = seededNoteIdMap[noteTitle]
     const url = `/notes/${seededNoteIdMap[noteTitle]}`
-    if(forceLoadPage)
-      cy.visit(url)
-    else
-      cy.routerPush(url, 'noteShow', {rawNoteId: noteId});
+    if (forceLoadPage) cy.visit(url)
+    else cy.routerPush(url, "noteShow", { rawNoteId: noteId })
   })
   cy.expectNoteTitle(noteTitle)
 })
@@ -200,23 +198,23 @@ Cypress.Commands.add("jumpToNotePage", (noteTitle, forceLoadPage) => {
 Cypress.Commands.add("routerPush", (fallback, name, params) => {
   cy.get("@firstVisited").then((firstVisited) => {
     cy.window().then(async (win) => {
-        if (!!win.router && firstVisited === 'yes') {
-          const failed = await win.router.push({
-            name,
-            params,
-            query: { time: Date.now() }, // make sure the route re-render
-          })
-          if (!failed) {
-            await cy.get(".modal-body").should("not.exist")
-            return
-          }
-          cy.log("router push failed")
-          cy.log(failed)
+      if (!!win.router && firstVisited === "yes") {
+        const failed = await win.router.push({
+          name,
+          params,
+          query: { time: Date.now() }, // make sure the route re-render
+        })
+        if (!failed) {
+          await cy.get(".modal-body").should("not.exist")
+          return
         }
-        await cy.wrap('yes').as("firstVisited")
-        await cy.visit(fallback)
+        cy.log("router push failed")
+        cy.log(failed)
+      }
+      await cy.wrap("yes").as("firstVisited")
+      await cy.visit(fallback)
     })
-  });
+  })
 })
 
 Cypress.Commands.add("clickButtonOnCardBody", (noteTitle, buttonTitle) => {
@@ -249,7 +247,9 @@ Cypress.Commands.add("clickNotePageMoreOptionsButtonOnCurrentPage", (btnTextOrTi
 })
 
 Cypress.Commands.add("expectExactLinkTargets", (targets) => {
-  cy.get(".search-result .card-title a").then(elms=>Cypress._.map(elms, 'innerText')).should('deep.equal', targets)
+  cy.get(".search-result .card-title a")
+    .then((elms) => Cypress._.map(elms, "innerText"))
+    .should("deep.equal", targets)
 })
 
 Cypress.Commands.add("findNoteCardButton", (noteTitle, btnTextOrTitle) => {
@@ -362,20 +362,20 @@ Cypress.Commands.add("navigateToCircle", (circleName) => {
 })
 
 Cypress.Commands.add("routerToInitialReview", () => {
-  cy.routerPush("/reviews/initial", 'initial', {});
+  cy.routerPush("/reviews/initial", "initial", {})
 })
 
 Cypress.Commands.add("routerToReviews", () => {
-  cy.routerPush("/", 'root', {});
-  cy.routerPush("/reviews", 'reviews', {});
+  cy.routerPush("/", "root", {})
+  cy.routerPush("/reviews", "reviews", {})
 })
 
 Cypress.Commands.add("routerToRepeatReview", () => {
-  cy.routerPush("/reviews/repeat", 'repeat', {});
+  cy.routerPush("/reviews/repeat", "repeat", {})
 })
 
 Cypress.Commands.add("initialReviewInSequence", (reviews) => {
-  cy.routerToInitialReview();
+  cy.routerToInitialReview()
   reviews.forEach((initialReview) => {
     cy.initialReviewOneNoteIfThereIs(initialReview)
   })
@@ -393,7 +393,7 @@ Cypress.Commands.add("initialReviewNotes", (noteTitles) => {
 })
 
 Cypress.Commands.add("repeatReviewNotes", (noteTitles) => {
-  cy.routerToRepeatReview();
+  cy.routerToRepeatReview()
   noteTitles.commonSenseSplit(",").forEach((title) => {
     const review_type = title === "end" ? "repeat done" : "single note"
     cy.repeatReviewOneNoteIfThereIs({ review_type, title })
@@ -423,7 +423,7 @@ Cypress.Commands.add("unsubscribeFromNotebook", (noteTitle) => {
 })
 
 Cypress.Commands.add("searchNote", (searchKey, options) => {
-  options?.forEach(option=> cy.getFormControl(option).check())
+  options?.forEach((option) => cy.getFormControl(option).check())
   cy.findByPlaceholderText("Search").clear().type(searchKey)
   cy.tick(500)
 })

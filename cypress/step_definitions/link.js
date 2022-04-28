@@ -17,7 +17,7 @@ When("I am creating link for note {string}", (noteTitle) => {
 function makingLink(cy, fromNoteTitle, linkType, toNoteTitle) {
   cy.jumpToNotePage(fromNoteTitle)
   cy.startSearching()
-  cy.searchNote(toNoteTitle, ['All My Notebooks And Subscriptions'])
+  cy.searchNote(toNoteTitle, ["All My Notebooks And Subscriptions"])
   cy.clickButtonOnCardBody(toNoteTitle, "Select")
   cy.clickRadioByLabel(linkType)
 }
@@ -48,13 +48,10 @@ And("I should see the source note as {string}", (noteTitle) => {
   cy.findByText(noteTitle, { selector: "strong" }).should("be.visible")
 })
 
-And(
-  "I should see {string} as the possible duplicate",
-  (noteTitlesAsString) => {
-    cy.tick(500)
-    cy.expectExactLinkTargets(noteTitlesAsString.commonSenseSplit(",").map((i) => i.trim()))
-  },
-)
+And("I should see {string} as the possible duplicate", (noteTitlesAsString) => {
+  cy.tick(500)
+  cy.expectExactLinkTargets(noteTitlesAsString.commonSenseSplit(",").map((i) => i.trim()))
+})
 
 And(
   "I should see {string} as targets only when searching {string}",
@@ -67,15 +64,18 @@ And(
 And(
   "I should see {string} as targets only when searching in all my notebooks {string}",
   (noteTitlesAsString, searchKey) => {
-    cy.searchNote(searchKey, ['All My Notebooks And Subscriptions'])
+    cy.searchNote(searchKey, ["All My Notebooks And Subscriptions"])
     cy.expectExactLinkTargets(noteTitlesAsString.commonSenseSplit(",").map((i) => i.trim()))
   },
 )
 
-And("I should see note cannot be found when searching in all my notebooks {string}", (searchKey) => {
-  cy.searchNote(searchKey, ['All My Notebooks And Subscriptions'])
-  cy.findByText("No linkable notes found.").should("be.visible")
-})
+And(
+  "I should see note cannot be found when searching in all my notebooks {string}",
+  (searchKey) => {
+    cy.searchNote(searchKey, ["All My Notebooks And Subscriptions"])
+    cy.findByText("No linkable notes found.").should("be.visible")
+  },
+)
 
 Then(
   "On the current page, I should see {string} has link {string} {string}",
@@ -124,6 +124,4 @@ Then("I should be able to delete the link to note {string}", (noteTitle) => {
   cy.contains(noteTitle).should("not.exist")
 })
 
-Then("I should see the note {string} {string}", (linkType, linkTarget) => {
-})
-
+Then("I should see the note {string} {string}", (linkType, linkTarget) => {})

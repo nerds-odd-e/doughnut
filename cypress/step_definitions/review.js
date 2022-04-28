@@ -23,7 +23,7 @@ Then(
 )
 
 Given("I go to the reviews page", () => {
-  cy.routerToReviews();
+  cy.routerToReviews()
 })
 
 Then("I should see that I have old notes to repeat", () => {
@@ -38,7 +38,7 @@ Then(
   "On day {int} I should have {string} note for initial review and {string} for repeat",
   (day, numberOfInitialReviews, numberOfRepeats) => {
     cy.timeTravelTo(day, 8)
-    cy.routerToReviews();
+    cy.routerToReviews()
     cy.findByText(numberOfInitialReviews, {
       selector: ".number-of-initial-reviews",
     })
@@ -72,7 +72,7 @@ Then("I learned one note {string} on day {int}", (noteTitle, day) => {
 
 Then("I am repeat-reviewing my old note on day {int}", (day) => {
   cy.timeTravelTo(day, 8)
-  cy.routerToRepeatReview();
+  cy.routerToRepeatReview()
 })
 
 Then("I should see the happy option", () => {
@@ -81,7 +81,7 @@ Then("I should see the happy option", () => {
 
 Then("I am learning new note on day {int}", (day) => {
   cy.timeTravelTo(day, 8)
-  cy.routerToInitialReview();
+  cy.routerToInitialReview()
 })
 
 Then(
@@ -172,7 +172,9 @@ Then("I should see that my answer {string} is wrong", (answer) => {
 })
 
 Then("I should see the repetition is finished: {string}", (yesNo) => {
-  cy.findByText("You have finished all repetitions for this half a day!").should(yesNo === "yes" ? "exist" : "not.exist")
+  cy.findByText("You have finished all repetitions for this half a day!").should(
+    yesNo === "yes" ? "exist" : "not.exist",
+  )
 })
 
 Then("I am changing note {string}'s review setting", (noteTitle) => {
@@ -186,7 +188,7 @@ Then("The randomizer always choose the last", (yesNo) => {
 
 Then("I should see the statistics of note {string}", (noteTitle, data) => {
   cy.findByText(noteTitle)
-  cy.findByRole("button", { name: "Statistics" }).click({force: true})
+  cy.findByRole("button", { name: "Statistics" }).click({ force: true })
   const attrs = data.hashes()[0]
   for (var k in attrs) {
     cy.findByText(attrs[k]).should("be.visible")
@@ -197,8 +199,6 @@ Then("I view the last result", () => {
   cy.findByRole("button", { name: "view last result" }).click()
 })
 
-
 Then("I should see the review point is removed from review", () => {
   cy.findByText("This review point has been removed from reviewing.")
 })
-

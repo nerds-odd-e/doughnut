@@ -5,7 +5,7 @@
 import { And, Given, Then, When } from "@badeball/cypress-cucumber-preprocessor"
 
 Given("I visit note {string}", (noteTitle) => {
-  cy.jumpToNotePage(noteTitle);
+  cy.jumpToNotePage(noteTitle)
 })
 
 Given("there are some notes for the current user", (data) => {
