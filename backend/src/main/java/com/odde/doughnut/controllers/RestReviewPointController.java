@@ -6,13 +6,11 @@ import com.odde.doughnut.entities.json.ReviewPointViewedByUser;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/review-points")
@@ -26,22 +24,12 @@ class RestReviewPointController {
     this.currentUserFetcher = currentUserFetcher;
   }
 
-  @GetMapping("/{reviewPointId}")
-  public ReviewPointViewedByUser show(@PathVariable("reviewPointId") Integer reviewPointId)
+  @GetMapping("/{reviewPoint}")
+  public ReviewPointViewedByUser show(@PathVariable("reviewPoint") ReviewPoint reviewPoint)
       throws NoAccessRightException {
-    return modelFactoryService
-        .reviewPointRepository
-        .findById(reviewPointId)
-        .map(
-            reviewPoint -> {
-              final UserModel user = currentUserFetcher.getUser();
-              user.getAuthorization().assertAuthorization(reviewPoint);
-              return ReviewPointViewedByUser.from(reviewPoint, user);
-            })
-        .orElseThrow(
-            () ->
-                new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "The review point does not exist."));
+    final UserModel user = currentUserFetcher.getUser();
+    user.getAuthorization().assertAuthorization(reviewPoint);
+    return ReviewPointViewedByUser.from(reviewPoint, user);
   }
 
   @PostMapping(path = "/{reviewPoint}/remove")
