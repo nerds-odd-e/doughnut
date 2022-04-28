@@ -188,15 +188,19 @@ Cypress.Commands.add("navigateToNotePage", (noteTitlesDividedBySlash) => {
 Cypress.Commands.add("jumpToNotePage", (noteTitle, forceLoadPage) => {
   cy.get("@seededNoteIdMap").then((seededNoteIdMap) => {
     const noteId = seededNoteIdMap[noteTitle]
-    cy.routerPush(`/notes/${seededNoteIdMap[noteTitle]}`, 'noteShow', {rawNoteId: noteId}, forceLoadPage);
+    const url = `/notes/${seededNoteIdMap[noteTitle]}`
+    if(forceLoadPage)
+      cy.visit(url)
+    else
+      cy.routerPush(url, 'noteShow', {rawNoteId: noteId});
   })
   cy.expectNoteTitle(noteTitle)
 })
 
-Cypress.Commands.add("routerPush", (fallback, name, params, forceLoadPage) => {
+Cypress.Commands.add("routerPush", (fallback, name, params) => {
   cy.get("@firstVisited").then((firstVisited) => {
     cy.window().then(async (win) => {
-        if (!!win.router && !forceLoadPage && firstVisited === 'yes') {
+        if (!!win.router && firstVisited === 'yes') {
           const failed = await win.router.push({
             name,
             params,
@@ -358,15 +362,16 @@ Cypress.Commands.add("navigateToCircle", (circleName) => {
 })
 
 Cypress.Commands.add("routerToInitialReview", () => {
-  cy.routerPush("/reviews/initial", 'initial', {}, false);
+  cy.routerPush("/reviews/initial", 'initial', {});
 })
 
 Cypress.Commands.add("routerToReviews", () => {
-  cy.visit("/reviews");
+  cy.routerPush("/", 'root', {});
+  cy.routerPush("/reviews", 'reviews', {});
 })
 
 Cypress.Commands.add("routerToRepeatReview", () => {
-  cy.routerPush("/reviews/repeat", 'repeat', {}, false);
+  cy.routerPush("/reviews/repeat", 'repeat', {});
 })
 
 Cypress.Commands.add("initialReviewInSequence", (reviews) => {

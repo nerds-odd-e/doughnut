@@ -18,7 +18,6 @@ Feature: Logged in status
     Then I should be asked to log in again when I click the link "Triangle"
     When I login as "old_learner" I should see "Triangle"
 
-    @ignore
   Scenario: Session timeout out when post
     Given I added and learned one note "Fungible" on day 1
     When I am repeat-reviewing my old note on day 2
