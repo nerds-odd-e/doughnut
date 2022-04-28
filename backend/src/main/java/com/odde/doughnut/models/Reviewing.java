@@ -27,9 +27,13 @@ public class Reviewing {
   }
 
   public ReviewPoint getOneInitialReviewPoint() {
+    return getOneInitialReviewPoint1().findFirst().orElse(null);
+  }
+
+  public Stream<ReviewPoint> getOneInitialReviewPoint1() {
     int count = remainingDailyNewNotesCount();
     if (count == 0) {
-      return null;
+      return Stream.empty();
     }
     List<Integer> alreadyInitialReviewed =
         getNewReviewPointsOfToday().stream().map(rp -> rp.getSourceNote().getId()).toList();
@@ -39,9 +43,8 @@ public class Reviewing {
                     sub ->
                         getOneNewReviewPoint(
                             sub, sub.needToLearnCountToday(alreadyInitialReviewed))),
-            getOneNewReviewPoint(userModel, 1))
-        .findFirst()
-        .orElse(null);
+            getOneNewReviewPoint(userModel, count))
+        .limit(count);
   }
 
   private Stream<ReviewPoint> getOneNewReviewPoint(ReviewScope reviewScope, int count) {
