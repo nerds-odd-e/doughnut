@@ -1,9 +1,9 @@
-import Builder from "./Builder"
-import NoteRealmBuilder from "./NoteRealmBuilder"
-import NotePositionBuilder from "./NotePositionBuilder"
+import Builder from "./Builder";
+import NoteRealmBuilder from "./NoteRealmBuilder";
+import NotePositionBuilder from "./NotePositionBuilder";
 
 class LinkViewedByUserBuilder extends Builder<Generated.LinkViewedByUser> {
-  sourceNoteBuilder = new NoteRealmBuilder()
+  sourceNoteBuilder = new NoteRealmBuilder();
 
   do(): Generated.LinkViewedByUser {
     return {
@@ -13,14 +13,14 @@ class LinkViewedByUserBuilder extends Builder<Generated.LinkViewedByUser> {
       readonly: false,
       sourceNoteWithPosition: {
         note: this.sourceNoteBuilder.do(),
-        notePosition: new NotePositionBuilder().do()
+        notePosition: new NotePositionBuilder().do(),
       },
       targetNoteWithPosition: {
         note: new NoteRealmBuilder().do(),
-        notePosition: new NotePositionBuilder().do()
-      }
+        notePosition: new NotePositionBuilder().do(),
+      },
     };
   }
 }
 
-export default LinkViewedByUserBuilder
+export default LinkViewedByUserBuilder;

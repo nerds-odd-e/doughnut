@@ -1,25 +1,25 @@
 interface Vector {
-    x: number
+  x: number;
 
-    y: number
+  y: number;
 
-    angle: number
+  angle: number;
 }
 
 interface Coord {
-    x: number
+  x: number;
 
-    y: number
+  y: number;
 }
 
 interface StraightConnection {
-    x1: number
+  x1: number;
 
-    y1: number
+  y1: number;
 
-    x2: number
+  x2: number;
 
-    y2: number
+  y2: number;
 }
 
-export { Vector, StraightConnection, Coord }
+export { Vector, StraightConnection, Coord };

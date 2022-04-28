@@ -1,4 +1,4 @@
-import {merge} from "lodash";
+import { merge } from "lodash";
 import Builder from "./Builder";
 import LinkBuilder from "./LinkBuilder";
 import NoteBuilder from "./NoteBuilder";
@@ -6,17 +6,17 @@ import NoteBuilder from "./NoteBuilder";
 class NoteRealmBuilder extends Builder<Generated.NoteRealm> {
   data: Generated.NoteRealm;
 
-  noteBuilder
+  noteBuilder;
 
   constructor() {
     super();
-    this.noteBuilder = new NoteBuilder()
-    const noteData = this.noteBuilder.data
+    this.noteBuilder = new NoteBuilder();
+    const noteData = this.noteBuilder.data;
     this.data = {
       id: noteData.id,
       note: noteData,
       links: {},
-      childrenIds: []
+      childrenIds: [],
     };
   }
 
@@ -41,8 +41,8 @@ class NoteRealmBuilder extends Builder<Generated.NoteRealm> {
   }
 
   under(value: Generated.NoteRealm): NoteRealmBuilder {
-    value?.childrenIds?.push(this.data.note.id)
-    this.data.note.parentId = value.id
+    value?.childrenIds?.push(this.data.note.id);
+    this.data.note.parentId = value.id;
 
     return this;
   }
@@ -62,10 +62,9 @@ class NoteRealmBuilder extends Builder<Generated.NoteRealm> {
   }
 
   do(): Generated.NoteRealm {
-    this.data.note = this.noteBuilder.do()
-    return this.data
+    this.data.note = this.noteBuilder.do();
+    return this.data;
   }
-
 }
 
 export default NoteRealmBuilder;

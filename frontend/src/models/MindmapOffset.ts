@@ -1,8 +1,8 @@
 interface MindmapOffset {
-    x: number
-    y: number
-    scale: number
-    rotate: number
+  x: number;
+  y: number;
+  scale: number;
+  rotate: number;
 }
 
-export default MindmapOffset
+export default MindmapOffset;

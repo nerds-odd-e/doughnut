@@ -1,3 +1,3 @@
 declare namespace Doughnut {
-    type ID = number
+  type ID = number;
 }

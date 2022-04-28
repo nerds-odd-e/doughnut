@@ -7,17 +7,17 @@ class NotebooksBuilder extends Builder<Generated.NotebooksViewedByUser> {
     super();
     this.data = {
       notebooks: [],
-      subscriptions: []
+      subscriptions: [],
     };
   }
 
   notebooks(notebook: Generated.NotebookViewedByUser) {
-    this.data.notebooks = [ ...this.data.notebooks, notebook];
+    this.data.notebooks = [...this.data.notebooks, notebook];
     return this;
   }
 
   do(): Generated.NotebooksViewedByUser {
-    return this.data
+    return this.data;
   }
 }
 

@@ -5,7 +5,7 @@ import routerScopeGuard from "../../routes/relative_routes";
 
 declare module "@vue/runtime-core" {
   interface ComponentCustomProperties {
-    alert: Promise<boolean>
+    alert: Promise<boolean>;
   }
 }
 
@@ -24,7 +24,9 @@ function NestedPage(
       isNested() {
         if (this.$route) {
           const routeParts = this.$route?.name?.toString().split("-");
-          return routeParts && routeParts.length > 1 && routeParts[1] !== "quiz";
+          return (
+            routeParts && routeParts.length > 1 && routeParts[1] !== "quiz"
+          );
         }
         return true;
       },
@@ -46,7 +48,7 @@ function NestedPage(
       routerScopeGuard(scopeName, exceptRoutes, this.alert)(to, from, next);
     },
     render() {
-      return h("div", {class: 'inner-box'}, [
+      return h("div", { class: "inner-box" }, [
         h(WrappedComponent, { ...this.$props, nested: this.isNested }),
         h(RouterView, {}),
       ]);

@@ -9,9 +9,9 @@ class LinkBuilder extends Builder<LinksMap> {
 
   isReverse: boolean;
 
-  fromNote: Generated.NoteRealm
+  fromNote: Generated.NoteRealm;
 
-  toNote: Generated.NoteRealm
+  toNote: Generated.NoteRealm;
 
   constructor(
     linkType: Generated.LinkType,
@@ -37,11 +37,13 @@ class LinkBuilder extends Builder<LinksMap> {
   }
 
   do(): LinksMap {
-    if (!this.fromNote.links || !this.toNote.links) throw new Error('note does not have links');
-    if (!this.toNote.links[this.linkType]) this.toNote.links[this.linkType] = { direct: [], reverse: [] }
-    const linksOfType = this.toNote.links[this.linkType]
-    if (linksOfType && !linksOfType.reverse) linksOfType.reverse = []
-    linksOfType?.reverse.push(this.link())
+    if (!this.fromNote.links || !this.toNote.links)
+      throw new Error("note does not have links");
+    if (!this.toNote.links[this.linkType])
+      this.toNote.links[this.linkType] = { direct: [], reverse: [] };
+    const linksOfType = this.toNote.links[this.linkType];
+    if (linksOfType && !linksOfType.reverse) linksOfType.reverse = [];
+    linksOfType?.reverse.push(this.link());
 
     return {
       [this.linkType]: {
@@ -61,11 +63,10 @@ class LinkBuilder extends Builder<LinksMap> {
       sourceNote: this.fromNote.note,
       typeId: 15,
       linkTypeLabel: "using",
-      createdAt: '',
-    }
+      createdAt: "",
+    };
   }
-
 }
 
 export default LinkBuilder;
-export { LinksMap }
+export { LinksMap };

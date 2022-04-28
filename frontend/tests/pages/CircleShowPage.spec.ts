@@ -1,17 +1,20 @@
 /**
  * @jest-environment jsdom
  */
-import CircleShowPage from '@/pages/CircleShowPage.vue';
-import helper from '../helpers';
-import makeMe from '../fixtures/makeMe';
+import CircleShowPage from "@/pages/CircleShowPage.vue";
+import helper from "../helpers";
+import makeMe from "../fixtures/makeMe";
 
-helper.resetWithApiMock(beforeEach, afterEach)
+helper.resetWithApiMock(beforeEach, afterEach);
 
-describe('circle show page', () => {
-  it('fetch API to be called ONCE on mount', async () => {
+describe("circle show page", () => {
+  it("fetch API to be called ONCE on mount", async () => {
     const notebook = makeMe.aNotebook.please();
     const circleNote = makeMe.aCircleNote.notebooks(notebook).please();
     helper.apiMock.expecting(`/api/circles/${circleNote.id}`, circleNote);
-    helper.component(CircleShowPage).withProps({ circleId: circleNote.id }).render()
+    helper
+      .component(CircleShowPage)
+      .withProps({ circleId: circleNote.id })
+      .render();
   });
 });

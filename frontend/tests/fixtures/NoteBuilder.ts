@@ -7,34 +7,32 @@ class NoteBuilder extends Builder<Generated.Note> {
   constructor() {
     super();
     this.data = {
-        id: generateId(),
+      id: generateId(),
+      title: "Note1.1.1",
+      shortDescription: "",
+      createdAt: "2021-08-24T08:46:44.000+00:00",
+      noteAccessories: {
+        url: "",
+        urlIsVideo: false,
+        pictureUrl: "",
+        pictureMask: "",
+        useParentPicture: false,
+        skipReview: false,
+        updatedAt: "",
+      },
+      textContent: {
         title: "Note1.1.1",
-        shortDescription: '',
-        createdAt: "2021-08-24T08:46:44.000+00:00",
-        noteAccessories: {
-          url: '',
-          urlIsVideo: false,
-          pictureUrl: '',
-          pictureMask: '',
-          useParentPicture: false,
-          skipReview: false,
-          updatedAt: '',
-        },
-        textContent: {
-          title: "Note1.1.1",
-          description: "Desc",
-          updatedAt: "2021-08-24T08:46:44.000+00:00",
-
-        },
-
-      }
+        description: "Desc",
+        updatedAt: "2021-08-24T08:46:44.000+00:00",
+      },
+    };
   }
 
   for(note: Generated.Note | undefined) {
-    if(note) {
-      this.data = note
+    if (note) {
+      this.data = note;
     }
-    return this
+    return this;
   }
 
   title(value: string): NoteBuilder {
@@ -51,7 +49,7 @@ class NoteBuilder extends Builder<Generated.Note> {
   picture(value: string): NoteBuilder {
     this.data.pictureWithMask = {
       notePicture: value,
-      pictureMask: '',
+      pictureMask: "",
     };
     return this;
   }
@@ -65,9 +63,9 @@ class NoteBuilder extends Builder<Generated.Note> {
   }
 
   under(value: Generated.NoteRealm): NoteBuilder {
-    value.childrenIds ||= []
-    value.childrenIds.push(this.data.id)
-    this.data.parentId = value.id
+    value.childrenIds ||= [];
+    value.childrenIds.push(this.data.id);
+    this.data.parentId = value.id;
 
     return this;
   }
@@ -78,7 +76,7 @@ class NoteBuilder extends Builder<Generated.Note> {
   }
 
   do(): Generated.Note {
-    return this.data
+    return this.data;
   }
 }
 

@@ -1,46 +1,46 @@
 /**
  * @jest-environment jsdom
  */
-import NoteFrameOfLinks from '@/components/links/NoteFrameOfLinks.vue';
-import makeMe from '../fixtures/makeMe';
-import RenderingHelper from '../helpers/RenderingHelper';
-import helper from '../helpers';
+import NoteFrameOfLinks from "@/components/links/NoteFrameOfLinks.vue";
+import makeMe from "../fixtures/makeMe";
+import RenderingHelper from "../helpers/RenderingHelper";
+import helper from "../helpers";
 
-describe('a link lists of a note', () => {
+describe("a link lists of a note", () => {
   let renderer: RenderingHelper;
 
   beforeEach(() => {
-    helper.reset()
+    helper.reset();
     renderer = helper.component(NoteFrameOfLinks);
   });
 
-  it('link to upper level', async () => {
-    const links = makeMe.links.of('using').count(2).please();
+  it("link to upper level", async () => {
+    const links = makeMe.links.of("using").count(2).please();
     const wrapper = renderer.withProps({ links }).mount();
-    expect(wrapper.find('.parent-links').text()).toContain('target note');
-    expect(wrapper.findAll('.parent-links li').length).toEqual(2);
+    expect(wrapper.find(".parent-links").text()).toContain("target note");
+    expect(wrapper.findAll(".parent-links li").length).toEqual(2);
   });
 
-  it('tags are grouped', async () => {
-    const links = makeMe.links.of('tagged by').count(2).please();
+  it("tags are grouped", async () => {
+    const links = makeMe.links.of("tagged by").count(2).please();
     const wrapper = renderer.withProps({ links }).mount();
-    expect(wrapper.findAll('.parent-links li').length).toEqual(1);
+    expect(wrapper.findAll(".parent-links li").length).toEqual(1);
   });
 
-  it('related, opposite, similar, confuse are grouped at top', async () => {
+  it("related, opposite, similar, confuse are grouped at top", async () => {
     const links = makeMe.links
-      .of('confused with')
-      .and.of('similar to')
+      .of("confused with")
+      .and.of("similar to")
       .please();
     const wrapper = renderer.withProps({ links }).mount();
-    expect(wrapper.findAll('.parent-links li').length).toEqual(1);
-    expect(wrapper.findAll('.parent-links li .link-multi').length).toEqual(2);
-    expect(wrapper.findAll('.children-links li').length).toEqual(0);
+    expect(wrapper.findAll(".parent-links li").length).toEqual(1);
+    expect(wrapper.findAll(".parent-links li .link-multi").length).toEqual(2);
+    expect(wrapper.findAll(".children-links li").length).toEqual(0);
   });
 
-  it('taggings (reverse of tagged by) are grouped', async () => {
-    const links = makeMe.links.of('tagged by').reverse.count(2).please();
+  it("taggings (reverse of tagged by) are grouped", async () => {
+    const links = makeMe.links.of("tagged by").reverse.count(2).please();
     const wrapper = renderer.withProps({ links }).mount();
-    expect(wrapper.findAll('.children-links li').length).toEqual(1);
+    expect(wrapper.findAll(".children-links li").length).toEqual(1);
   });
 });

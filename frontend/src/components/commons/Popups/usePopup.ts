@@ -1,26 +1,26 @@
-import { Slot } from "vue"
+import { Slot } from "vue";
 
 interface PopupInfo {
-  type: 'alert' | 'confirm' | 'dialog'
-  message?: string
-  doneResolve: ((value: unknown) => void) | ((value: boolean) => void)
-  slot?: Slot
+  type: "alert" | "confirm" | "dialog";
+  message?: string;
+  doneResolve: ((value: unknown) => void) | ((value: boolean) => void);
+  slot?: Slot;
 }
 
 class Popup {
   static popupDataWrap = {
-    popupData: {} as { popupInfo?: PopupInfo }
-  }
+    popupData: {} as { popupInfo?: PopupInfo },
+  };
 }
 
 function usePopups() {
   const setPopupInfo = (info?: PopupInfo) => {
-    Popup.popupDataWrap.popupData.popupInfo = info
-  }
+    Popup.popupDataWrap.popupData.popupInfo = info;
+  };
   return {
     popups: {
-      register(data: {popupInfo?: PopupInfo}) {
-        Popup.popupDataWrap.popupData = data
+      register(data: { popupInfo?: PopupInfo }) {
+        Popup.popupDataWrap.popupData = data;
       },
 
       alert(msg: string) {
@@ -42,14 +42,14 @@ function usePopups() {
       },
 
       done(result: unknown) {
-        const {popupInfo} = Popup.popupDataWrap.popupData
-        if (!popupInfo) return
+        const { popupInfo } = Popup.popupDataWrap.popupData;
+        if (!popupInfo) return;
         if (popupInfo.doneResolve) popupInfo.doneResolve(result as boolean);
         setPopupInfo(undefined);
-      }
-    }
-  }
+      },
+    },
+  };
 }
 
-export default usePopups
-export { PopupInfo }
+export default usePopups;
+export { PopupInfo };

@@ -1,11 +1,11 @@
-import { createApp } from 'vue';
-import { createRouter, createWebHistory } from 'vue-router';
+import { createApp } from "vue";
+import { createRouter, createWebHistory } from "vue-router";
 import { createPinia } from "pinia";
 
-import routes from './routes/routes';
-import 'bootstrap/scss/bootstrap.scss';
-import 'bootstrap';
-import DoughnutAppVue from './DoughnutApp.vue';
+import routes from "./routes/routes";
+import "bootstrap/scss/bootstrap.scss";
+import "bootstrap";
+import DoughnutAppVue from "./DoughnutApp.vue";
 
 const router = createRouter({
   history: createWebHistory(),
@@ -13,17 +13,17 @@ const router = createRouter({
 });
 
 // to accelerate e2e test
-Object.assign(window, {router});
+Object.assign(window, { router });
 
 const app = createApp(DoughnutAppVue);
 
 app.use(router);
 app.use(createPinia());
 
-app.directive('focus', {
+app.directive("focus", {
   mounted(el) {
-    el.querySelector('input, textarea').focus()
-  }
-})
+    el.querySelector("input, textarea").focus();
+  },
+});
 
-app.mount('#app');
+app.mount("#app");

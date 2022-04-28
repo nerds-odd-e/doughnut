@@ -1,10 +1,10 @@
 /**
  * @jest-environment jsdom
  */
-import NoteStatistics from '@/components/notes/NoteStatistics.vue';
-import { mount } from '@vue/test-utils';
-import flushPromises from 'flush-promises';
-import makeMe from '../fixtures/makeMe';
+import NoteStatistics from "@/components/notes/NoteStatistics.vue";
+import { mount } from "@vue/test-utils";
+import flushPromises from "flush-promises";
+import makeMe from "../fixtures/makeMe";
 
 beforeEach(() => {
   fetch.resetMocks();
@@ -20,34 +20,34 @@ const stubLinkResponse = {
   link: makeMe.aLinkViewedByUser.please(),
 };
 
-describe('note statistics', () => {
-  it('fetch API to be called ONCE', async () => {
+describe("note statistics", () => {
+  it("fetch API to be called ONCE", async () => {
     fetch.mockResponseOnce(JSON.stringify({}));
     const wrapper = mount(NoteStatistics, { propsData: { noteId: 123 } });
     await flushPromises();
     expect(fetch).toHaveBeenCalledTimes(1);
     expect(fetch).toHaveBeenCalledWith(
-      '/api/notes/123/statistics',
+      "/api/notes/123/statistics",
       expect.anything()
     );
-    expect(wrapper.findAll('.statistics-value')).toHaveLength(0);
+    expect(wrapper.findAll(".statistics-value")).toHaveLength(0);
   });
 
-  it('should render values', async () => {
+  it("should render values", async () => {
     fetch.mockResponseOnce(JSON.stringify(stubResponse));
     const wrapper = mount(NoteStatistics, { propsData: { noteId: 123 } });
     await flushPromises();
-    expect(wrapper.findAll('.statistics-value')).toHaveLength(5);
+    expect(wrapper.findAll(".statistics-value")).toHaveLength(5);
   });
 
-  it('should render values for link as well', async () => {
+  it("should render values for link as well", async () => {
     fetch.mockResponseOnce(JSON.stringify(stubLinkResponse));
     const wrapper = mount(NoteStatistics, { propsData: { linkid: 123 } });
     await flushPromises();
     expect(fetch).toHaveBeenCalledWith(
-      '/api/links/123/statistics',
+      "/api/links/123/statistics",
       expect.anything()
     );
-    expect(wrapper.findAll('.statistics-value')).toHaveLength(4);
+    expect(wrapper.findAll(".statistics-value")).toHaveLength(4);
   });
 });

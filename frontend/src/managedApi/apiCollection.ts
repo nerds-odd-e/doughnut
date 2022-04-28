@@ -11,7 +11,6 @@ const apiCollection = (managedApi: ManagedApi) => ({
     },
   },
   reviewMethods: {
-
     removeFromReview(reviewPointId: Doughnut.ID) {
       return managedApi.restPost(`review-points/${reviewPointId}/remove`, {});
     },
@@ -30,18 +29,21 @@ const apiCollection = (managedApi: ManagedApi) => ({
   },
   circleMethods: {
     createCircle(data: Generated.Circle) {
-      return managedApi.restPostMultiplePartForm('circles', data);
+      return managedApi.restPostMultiplePartForm("circles", data);
     },
     joinCircle(data: Generated.CircleJoiningByInvitation) {
       return managedApi.restPostMultiplePartForm(`circles/join`, data);
     },
     getCirclesOfCurrentUser() {
-      return managedApi.restGet('circles');
+      return managedApi.restGet("circles");
     },
   },
 
   async relativeSearch(searchTerm: Generated.SearchTerm) {
-    return await managedApi.restPost(`notes/search`, searchTerm) as Generated.Note[];
+    return (await managedApi.restPost(
+      `notes/search`,
+      searchTerm
+    )) as Generated.Note[];
   },
 
   updateNotebookSettings(notebookId: Doughnut.ID, data: Generated.Notebook) {
@@ -49,14 +51,14 @@ const apiCollection = (managedApi: ManagedApi) => ({
   },
 
   getBazaar() {
-    return managedApi.restGet('bazaar');
+    return managedApi.restGet("bazaar");
   },
   shareToBazaar(notebookId: Doughnut.ID) {
     return managedApi.restPost(`notebooks/${notebookId}/share`, {});
   },
 
   getFailureReports() {
-    return managedApi.restGet('failure-reports');
+    return managedApi.restGet("failure-reports");
   },
   getFailureReport(failureReportId: Doughnut.ID) {
     return managedApi.restGet(`failure-reports/${failureReportId}`);
@@ -68,7 +70,10 @@ const apiCollection = (managedApi: ManagedApi) => ({
         data
       );
     },
-    updateSubscription(subscriptionId: Doughnut.ID, data: Generated.Subscription) {
+    updateSubscription(
+      subscriptionId: Doughnut.ID,
+      data: Generated.Subscription
+    ) {
       return managedApi.restPostMultiplePartForm(
         `subscriptions/${subscriptionId}`,
         data
@@ -78,7 +83,10 @@ const apiCollection = (managedApi: ManagedApi) => ({
       return managedApi.restPost(`subscriptions/${subscriptionId}/delete`, {});
     },
   },
-  getStatistics(noteId: Doughnut.ID | undefined, linkId: Doughnut.ID | undefined) {
+  getStatistics(
+    noteId: Doughnut.ID | undefined,
+    linkId: Doughnut.ID | undefined
+  ) {
     return managedApi.restGet(
       `${noteId ? `notes/${noteId}` : `links/${linkId}`}/statistics`
     );
@@ -86,7 +94,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
 
   createComment(noteId: Doughnut.ID) {
     return managedApi.restPost(`/api/notes/${noteId}/createComment`, {});
-  }
+  },
 });
 
 export default apiCollection;
