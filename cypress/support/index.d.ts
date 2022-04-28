@@ -1,11 +1,11 @@
 /// <reference types="cypress" />
 // @ts-check
 declare namespace Cypress {
-  interface userSetting {
+  interface IUserSetting {
     daily_new_notes_count?: number
     space_intervals?: number
   }
-  interface Chainable {
+  interface IChainable {
     routerToReviews(): Chainable<Element>
     routerToInitialReview(): Chainable<Element>
     routerToRepeatReview(): Chainable<Element>
