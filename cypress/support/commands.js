@@ -195,19 +195,22 @@ Cypress.Commands.add("jumpToNotePage", (noteTitle, forceLoadPage) => {
 
 Cypress.Commands.add("routerPush", (fallback, name, params, forceLoadPage) => {
   cy.get("@firstVisited").then((firstVisited) => {
-    cy.window().then((win) => {
+    cy.window().then(async (win) => {
         if (!!win.router && !forceLoadPage && firstVisited === 'yes') {
-          const r = win.router.push({
+          const failed = await win.router.push({
             name,
             params,
             query: { time: Date.now() }, // make sure the route re-render
           })
-          cy.get(".modal-body").should("not.exist")
-          return r
+          if (!failed) {
+            await cy.get(".modal-body").should("not.exist")
+            return
+          }
+          cy.log("router push failed")
+          cy.log(failed)
         }
-        cy.wrap('yes').as("firstVisited")
-        cy.visit(fallback)
-
+        await cy.wrap('yes').as("firstVisited")
+        await cy.visit(fallback)
     })
   });
 })
