@@ -1,3 +1,6 @@
+index.html
+components.d.ts
 dist/*
 .git/*
 .github/*
+*.md

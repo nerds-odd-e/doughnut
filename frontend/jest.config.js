@@ -1,18 +1,18 @@
 module.exports = {
   verbose: true,
-  testEnvironment: "node",
+  testEnvironment: 'node',
   collectCoverage: false,
   globals: {
-    "@vue/vue3-jest": { babelConfig: true },
-    "ts-jest": { babelConfig: true },
+    '@vue/vue3-jest': { babelConfig: true },
+    'ts-jest': { babelConfig: true },
   },
-  moduleFileExtensions: ["js", "ts", "json", "vue"],
+  moduleFileExtensions: ['js', 'ts', 'vue', 'json'],
   transform: {
-    ".*\\.(vue)$": "@vue/vue3-jest",
-    "^.+\\.(t|j)sx?$": "@swc/jest",
+    '^.+\\.(j|t)s?$': '@swc/jest',
+    '.*\\.(vue)$': '@vue/vue3-jest',
   },
   moduleNameMapper: {
-    "^@/(.*)$": "<rootDir>/src/$1",
+    '^@/(.*)$': '<rootDir>/src/$1',
   },
-  setupFilesAfterEnv: ["./tests/setupJest.js"],
+  setupFilesAfterEnv: ['./tests/setupJest.js'],
 };
