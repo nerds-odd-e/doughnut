@@ -26,7 +26,6 @@
 
 import "@testing-library/cypress/add-commands"
 import "cypress-file-upload"
-require("cy-verify-downloads").addCustomCommand()
 
 Cypress.Commands.add("pageIsLoaded", () => {
   cy.get(".loading-bar").should("not.exist")
