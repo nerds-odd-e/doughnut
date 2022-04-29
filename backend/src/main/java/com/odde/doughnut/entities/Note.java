@@ -325,4 +325,10 @@ public class Note extends EntityWithId {
     }
     return noteAccessories.getNotePicture();
   }
+
+  @JsonIgnore
+  public Integer getLevel() {
+    if (masterReviewSetting == null) return ReviewSetting.defaultLevel;
+    return masterReviewSetting.getLevel();
+  }
 }

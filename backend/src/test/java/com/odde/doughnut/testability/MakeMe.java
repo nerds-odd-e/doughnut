@@ -24,7 +24,7 @@ public class MakeMe {
   }
 
   public NoteBuilder aNote() {
-    return new NoteBuilder(new Note(), this);
+    return new NoteBuilder(this);
   }
 
   public NoteBuilder aNote(String title) {

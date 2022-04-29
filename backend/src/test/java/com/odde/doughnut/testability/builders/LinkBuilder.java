@@ -9,6 +9,8 @@ import java.sql.Timestamp;
 public class LinkBuilder extends EntityBuilder<Link> {
   public LinkBuilder(MakeMe makeMe) {
     super(makeMe, new Link());
+    Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+    createdAt(timestamp);
   }
 
   @Override

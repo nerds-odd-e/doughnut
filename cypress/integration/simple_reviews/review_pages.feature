@@ -9,9 +9,6 @@ Feature: Review Pages
       | Sedation | Put to sleep    |             |
       | Sedative | Sleep medicine  | a_slide.jpg |
     And there is "similar to" link between note "Sedition" and "Sedation"
-    And there are some notes for the current user
-      | title    | description     | pictureUrl  |
-      | x | y |             |
 
   Scenario: Different review pages for different notes
     * I do these initial reviews in sequence:
@@ -21,4 +18,14 @@ Feature: Review Pages
       | picture note | Sedative | Sleep medicine; a_slide.jpg |
       | link         | Sedition | similar to; Sedation     |
       | initial done |          |                             |
+
+  Scenario: Index page
+    Given It's day 1, 8 hour
+    And I do these initial reviews in sequence:
+      | review_type | title    |
+      | single note | Sedition |
+    When It's day 2, 9 hour
+    And I go to the reviews page
+    Then I should see that I have old notes to repeat
+    And I should see that I have new notes to learn
 

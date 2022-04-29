@@ -37,6 +37,11 @@ import lombok.Setter;
 @Table(name = "link")
 public class Link extends EntityWithId {
 
+  @JsonIgnore
+  public Integer getLevel() {
+    return Math.max(sourceNote.getLevel(), targetNote.getLevel());
+  }
+
   public enum LinkType {
     RELATED_TO(1, "related note", "related to", "related to", new QuestionType[] {}),
     SPECIALIZE(

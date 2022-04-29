@@ -9,8 +9,21 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 public interface LinkRepository extends CrudRepository<Link, Integer> {
+  String selectLinkWithLevelFromNotes =
+      ", GREATEST(source.level, target.level) as level from link "
+          + "INNER JOIN ("
+          + " SELECT sourceNote.id, srs.level as level FROM note sourceNote LEFT JOIN review_setting srs ON sourceNote.master_review_setting_id = srs.id) as source "
+          + " ON source.id = link.source_id "
+          + "INNER JOIN ("
+          + " SELECT targetNote.id, trs.level as level FROM note targetNote LEFT JOIN review_setting trs ON targetNote.master_review_setting_id = trs.id) as target "
+          + " ON target.id = link.target_id ";
+
   @Query(
-      value = "SELECT link.* from link " + byOwnershipWhereThereIsNoReviewPoint,
+      value =
+          "SELECT link.* "
+              + selectLinkWithLevelFromNotes
+              + byOwnershipWhereThereIsNoReviewPoint
+              + orderByDate,
       nativeQuery = true)
   Stream<Link> findByOwnershipWhereThereIsNoReviewPoint(@Param("user") User user);
 
@@ -20,7 +33,11 @@ public interface LinkRepository extends CrudRepository<Link, Integer> {
   int countByOwnershipWhereThereIsNoReviewPoint(@Param("user") User user);
 
   @Query(
-      value = "SELECT link.* from link " + byAncestorWhereThereIsNoReviewPoint,
+      value =
+          "SELECT link.* "
+              + selectLinkWithLevelFromNotes
+              + byAncestorWhereThereIsNoReviewPoint
+              + orderByDate,
       nativeQuery = true)
   Stream<Link> findByAncestorWhereThereIsNoReviewPoint(
       @Param("user") User user, @Param("ancestor") Note ancestor);
@@ -31,29 +48,14 @@ public interface LinkRepository extends CrudRepository<Link, Integer> {
   int countByAncestorWhereThereIsNoReviewPoint(
       @Param("user") User user, @Param("ancestor") Note ancestor);
 
-  String noteReviewedOrSkipped =
-      "   SELECT note.id, note.skip_review, nrp.id as nrp_id FROM note"
-          + "     LEFT JOIN review_point nrp"
-          + "     ON note.id = nrp.note_id "
-          + "        AND nrp.user_id = :user"
-          + "   WHERE note.skip_review IS TRUE"
-          + "         OR nrp.id IS NOT NULL ";
-
   String whereThereIsNoReviewPoint =
       " LEFT JOIN review_point rp"
           + " ON link.id = rp.link_id "
           + "   AND rp.user_id = :user"
-          + " INNER JOIN ("
-          + noteReviewedOrSkipped
-          + ") n1 "
-          + "   ON link.target_id = n1.id"
-          + " INNER JOIN ("
-          + noteReviewedOrSkipped
-          + ") n2 "
-          + "   ON link.source_id = n2.id"
           + " WHERE "
-          + "   rp.id IS NULL "
-          + " ORDER BY link.created_at";
+          + "   rp.id IS NULL ";
+
+  String orderByDate = " ORDER BY level, link.created_at";
 
   String byOwnershipWhereThereIsNoReviewPoint =
       " JOIN note ON note.id = source_id"

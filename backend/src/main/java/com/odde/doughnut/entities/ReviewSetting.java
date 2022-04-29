@@ -12,6 +12,9 @@ import lombok.Setter;
 @Entity
 @Table(name = "review_setting")
 public class ReviewSetting {
+
+  public static final Integer defaultLevel = 0;
+
   @Id
   @Getter
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,5 +25,5 @@ public class ReviewSetting {
   @Setter
   private Boolean rememberSpelling = false;
 
-  @Getter @Setter private Integer level = 0;
+  @Getter @Setter private Integer level = defaultLevel;
 }

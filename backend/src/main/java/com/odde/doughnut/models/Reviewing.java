@@ -37,36 +37,47 @@ public class Reviewing {
             getSubscriptionModelStream()
                 .flatMap(
                     sub ->
-                        getOneNewReviewPoint(
+                        getDueNewReviewPoint(
                             sub, sub.needToLearnCountToday(alreadyInitialReviewed))),
-            getOneNewReviewPoint(userModel, count))
+            getDueNewReviewPoint(userModel, count))
         .limit(count);
   }
 
-  private Stream<ReviewPoint> getOneNewReviewPoint(ReviewScope reviewScope, int count) {
+  private Stream<ReviewPoint> getDueNewReviewPoint(ReviewScope reviewScope, int count) {
     if (count <= 0) return Stream.of();
     Iterator<Note> noteIterator = reviewScope.getNotesHaveNotBeenReviewedAtAll().iterator();
     Iterator<Link> linkIterator = reviewScope.getLinksHaveNotBeenReviewedAtAll().iterator();
 
+    Note note = null;
+    Link link = null;
     List<ReviewPoint> result = new ArrayList<>();
     for (int cnt = 0; cnt < count; cnt++) {
-      Note note = noteIterator.hasNext() ? noteIterator.next() : null;
-      Link link = linkIterator.hasNext() ? linkIterator.next() : null;
+      if (note == null) note = noteIterator.hasNext() ? noteIterator.next() : null;
+      if (link == null) link = linkIterator.hasNext() ? linkIterator.next() : null;
 
       if (note == null && link == null) {
         break;
       }
-      if (note != null && link != null) {
-        if (note.getCreatedAt().compareTo(link.getCreatedAt()) > 0) {
-          note = null;
-        } else {
-          link = null;
-        }
-      }
-
       ReviewPoint reviewPoint = new ReviewPoint();
       reviewPoint.setNote(note);
       reviewPoint.setLink(link);
+
+      if (note != null && link != null) {
+
+        if (note.getLevel() > link.getLevel()
+            || (note.getLevel().equals(link.getLevel())
+                && note.getCreatedAt().compareTo(link.getCreatedAt()) > 0)) {
+          reviewPoint.setNote(null);
+          link = null;
+        } else {
+          reviewPoint.setLink(null);
+          note = null;
+        }
+      } else {
+        note = null;
+        link = null;
+      }
+
       result.add(reviewPoint);
     }
     return result.stream();
