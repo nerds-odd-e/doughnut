@@ -3,6 +3,7 @@ package com.odde.doughnut.models;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.sql.Timestamp;
@@ -61,6 +62,11 @@ public class UserModel implements ReviewScope {
   @Override
   public int getLinksHaveNotBeenReviewedAtAllCount() {
     return modelFactoryService.linkRepository.countByOwnershipWhereThereIsNoReviewPoint(entity);
+  }
+
+  @Override
+  public Stream<Thing> getThingHaveNotBeenReviewedAtAll() {
+    return modelFactoryService.thingRepository.findByOwnershipWhereThereIsNoReviewPoint(entity);
   }
 
   public List<ReviewPoint> getRecentReviewPoints(Timestamp since) {

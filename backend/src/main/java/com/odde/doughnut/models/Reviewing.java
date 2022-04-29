@@ -45,6 +45,7 @@ public class Reviewing {
 
   private Stream<ReviewPoint> getDueNewReviewPoint(ReviewScope reviewScope, int count) {
     if (count <= 0) return Stream.of();
+    //    Iterator<Thing> thingIterator = reviewScope.getThingHaveNotBeenReviewedAtAll().iterator();
     Iterator<Note> noteIterator = reviewScope.getNotesHaveNotBeenReviewedAtAll().iterator();
     Iterator<Link> linkIterator = reviewScope.getLinksHaveNotBeenReviewedAtAll().iterator();
 

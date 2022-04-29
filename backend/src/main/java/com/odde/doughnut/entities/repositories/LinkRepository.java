@@ -9,6 +9,7 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 public interface LinkRepository extends CrudRepository<Link, Integer> {
+
   String selectLinkWithLevelFromNotes =
       ", GREATEST(source.level, target.level) as level from link "
           + "INNER JOIN ("

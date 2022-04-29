@@ -3,6 +3,7 @@ package com.odde.doughnut.models;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Subscription;
+import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.util.List;
 import java.util.stream.Stream;
@@ -38,6 +39,11 @@ public class SubscriptionModel implements ReviewScope {
   public int getLinksHaveNotBeenReviewedAtAllCount() {
     return modelFactoryService.linkRepository.countByAncestorWhereThereIsNoReviewPoint(
         entity.getUser(), entity.getHeadNote());
+  }
+
+  @Override
+  public Stream<Thing> getThingHaveNotBeenReviewedAtAll() {
+    return Stream.empty();
   }
 
   public int needToLearnCountToday(List<Integer> noteIds) {
