@@ -61,4 +61,29 @@ public interface ThingRepository extends CrudRepository<Thing, Integer> {
           + ") jlink ON jlink.id = thing.link_id ";
 
   String orderByDate = " ORDER BY level, thing.created_at";
+
+  @Query(value = "SELECT thing.* " + selectNoteThings + orderByDate, nativeQuery = true)
+  Stream<Thing> findNotesByOwnershipWhereThereIsNoReviewPoint(@Param("user") User user);
+
+  String whereNoteThereIsNoReviewPoint =
+      " LEFT JOIN review_point rp"
+          + "   ON note.id = rp.note_id "
+          + "     AND rp.user_id = :#{#user.id} "
+          + " LEFT JOIN review_setting rs "
+          + "   ON note.master_review_setting_id = rs.id "
+          + " WHERE note.skip_review IS FALSE "
+          + "   AND rp.id IS NULL "
+          + "   AND note.deleted_at IS NULL ";
+
+  String byNoteOwnershipWhereThereIsNoReviewPoint =
+      " JOIN notebook ON notebook.id = note.notebook_id "
+          + " AND notebook.ownership_id = :#{#user.ownership.id} "
+          + whereNoteThereIsNoReviewPoint;
+
+  String selectNoteThings =
+      ", GREATEST(jnote.level, 0) as level from thing "
+          + "INNER JOIN ("
+          + " SELECT note.id as id, rs.level as level FROM note"
+          + byNoteOwnershipWhereThereIsNoReviewPoint
+          + ") jnote ON jnote.id = thing.note_id ";
 }

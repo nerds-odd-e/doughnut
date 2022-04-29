@@ -8,6 +8,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.lessThan;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -69,7 +70,9 @@ class RestReviewsControllerTests {
   class initalReview {
     @Test
     void initialReview() {
-      makeMe.aNote().byUser(userModel).please();
+      Note n = makeMe.aNote().byUser(userModel).please();
+      makeMe.refresh(n);
+      assertThat(n.getThing().getId(), notNullValue());
       List<ReviewPointViewedByUser> reviewPointViewedByUsers = controller().initialReview();
       assertThat(reviewPointViewedByUsers, hasSize(1));
     }
