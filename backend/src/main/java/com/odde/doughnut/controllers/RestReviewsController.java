@@ -66,12 +66,7 @@ class RestReviewsController {
 
     return reviewing
         .getDueInitialReviewPoint()
-        .map(
-            rp -> {
-              ReviewPointViewedByUser from = ReviewPointViewedByUser.from(rp, user);
-              from.setRemainingInitialReviewCountForToday(reviewing.toInitialReviewCount());
-              return from;
-            })
+        .map(rp -> ReviewPointViewedByUser.from(rp, user))
         .collect(Collectors.toList());
   }
 

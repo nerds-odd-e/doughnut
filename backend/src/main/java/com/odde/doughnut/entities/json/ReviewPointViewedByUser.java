@@ -15,7 +15,6 @@ public class ReviewPointViewedByUser {
   @Getter @Setter private Optional<NoteWithPosition> noteWithPosition;
   @Getter @Setter private Optional<LinkViewedByUser> linkViewedByUser;
   @Getter @Setter private ReviewSetting reviewSetting;
-  @Getter @Setter private Integer remainingInitialReviewCountForToday;
 
   public static ReviewPointViewedByUser from(ReviewPoint reviewPoint, UserModel user) {
     ReviewPointViewedByUser result = new ReviewPointViewedByUser();

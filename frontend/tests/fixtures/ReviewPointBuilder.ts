@@ -24,13 +24,7 @@ class ReviewPointBuilder extends Builder<Generated.ReviewPointViewedByUser> {
         rememberSpelling: false,
         level: 0,
       },
-      remainingInitialReviewCountForToday: 0,
     };
-  }
-
-  remainingInitialReviewCountForToday(value: number): ReviewPointBuilder {
-    this.data.remainingInitialReviewCountForToday = value;
-    return this;
   }
 
   ofNote(note: Generated.NoteRealm): ReviewPointBuilder {

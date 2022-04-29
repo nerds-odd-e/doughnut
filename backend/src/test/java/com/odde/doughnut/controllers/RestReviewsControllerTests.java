@@ -6,6 +6,7 @@ import static com.odde.doughnut.entities.SelfEvaluate.satisfying;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.lessThan;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -69,8 +70,8 @@ class RestReviewsControllerTests {
     @Test
     void initialReview() {
       makeMe.aNote().byUser(userModel).please();
-      ReviewPointViewedByUser reviewPointViewedByUser = controller().initialReview().get(0);
-      assertThat(reviewPointViewedByUser.getRemainingInitialReviewCountForToday(), equalTo(1));
+      List<ReviewPointViewedByUser> reviewPointViewedByUsers = controller().initialReview();
+      assertThat(reviewPointViewedByUsers, hasSize(1));
     }
 
     @Test

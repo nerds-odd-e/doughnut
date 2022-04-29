@@ -29,11 +29,11 @@ describe("repeat page", () => {
 
   it("normal view", async () => {
     const note = makeMe.aNoteRealm.please();
-    const reviewPoint = makeMe.aReviewPoint
-      .ofNote(note)
-      .remainingInitialReviewCountForToday(53)
-      .please();
-    helper.apiMock.expecting("/api/reviews/initial", [reviewPoint]);
+    const reviewPoint = makeMe.aReviewPoint.ofNote(note).please();
+    helper.apiMock.expecting("/api/reviews/initial", [
+      reviewPoint,
+      reviewPoint,
+    ]);
 
     const wrapper = renderer.currentRoute({ name: "initial" }).mount();
     await flushPromises();
@@ -41,7 +41,7 @@ describe("repeat page", () => {
     expect(wrapper.findAll(".initial-review-paused")).toHaveLength(0);
     expect(wrapper.findAll(".pause-stop")).toHaveLength(1);
     expect(wrapper.find(".progress-text").text()).toContain(
-      "Initial Review: 0/53"
+      "Initial Review: 0/2"
     );
   });
 

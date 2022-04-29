@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-04-27 18:36:52.
+// Generated using typescript-generator version 2.35.1025 on 2022-04-29 09:43:26.
 
 declare namespace Generated {
 
@@ -125,7 +125,6 @@ declare namespace Generated {
         noteWithPosition?: NoteWithPosition;
         linkViewedByUser?: LinkViewedByUser;
         reviewSetting: ReviewSetting;
-        remainingInitialReviewCountForToday: number;
     }
 
     interface ReviewStatus {
@@ -218,8 +217,8 @@ declare namespace Generated {
         createdAt: string;
         title: string;
         pictureWithMask?: PictureWithMask;
-        shortDescription: string;
         parentId?: number;
+        shortDescription: string;
     }
 
     interface Ownership {

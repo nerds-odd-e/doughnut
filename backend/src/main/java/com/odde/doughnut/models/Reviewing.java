@@ -92,7 +92,7 @@ public class Reviewing {
     return noteCount + linkCount;
   }
 
-  public int toInitialReviewCount() {
+  private int toInitialReviewCount() {
     if (getDueInitialReviewPoint().findFirst().isEmpty()) {
       return 0;
     }
