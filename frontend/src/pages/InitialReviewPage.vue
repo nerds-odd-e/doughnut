@@ -71,8 +71,8 @@ export default defineComponent({
   },
   computed: {
     reviewPointViewedByUser() {
-      if(this.reviewPointViewedByUsers.length == 0) return undefined
-      return this.reviewPointViewedByUsers[0];
+      if(this.finished >= this.reviewPointViewedByUsers.length) return undefined
+      return this.reviewPointViewedByUsers[this.finished];
     },
     reviewPoint() {
       return this.reviewPointViewedByUser?.reviewPoint;
@@ -102,8 +102,7 @@ export default defineComponent({
       this.reviewPointViewedByUsers = resp;
     },
 
-    async processForm(skipReview) {
-      this.finished += 1;
+    async processForm(skipReview: boolean) {
       if (skipReview) {
         if (
           !(await this.popups.confirm(
@@ -118,7 +117,12 @@ export default defineComponent({
           reviewPoint: this.reviewPoint,
           reviewSetting: this.reviewSetting,
         })
-        .then(this.loadNew);
+        .then(()=>{
+          this.finished += 1;
+          if (this.finished >= this.reviewPointViewedByUsers.length) {
+            this.$router.push({ name: "reviews" });
+          }
+        })
     },
 
     fetchData() {
