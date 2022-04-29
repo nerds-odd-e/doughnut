@@ -72,7 +72,7 @@ class RestReviewsController {
 
   @PostMapping(path = "")
   @Transactional
-  public List<ReviewPointViewedByUser> create(@RequestBody InitialInfo initialInfo) {
+  public ReviewPointViewedByUser create(@RequestBody InitialInfo initialInfo) {
     UserModel userModel = currentUserFetcher.getUser();
     userModel.getAuthorization().assertLoggedIn();
     if (initialInfo.reviewPoint.getNoteId() != null) {
@@ -93,7 +93,7 @@ class RestReviewsController {
         modelFactoryService.toReviewPointModel(initialInfo.reviewPoint);
     reviewPointModel.initialReview(
         userModel, initialInfo.reviewSetting, testabilitySettings.getCurrentUTCTimestamp());
-    return initialReview();
+    return ReviewPointViewedByUser.from(reviewPointModel.getEntity(), userModel);
   }
 
   @GetMapping("/repeat")

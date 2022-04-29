@@ -55,8 +55,8 @@ const storedApiCollection = (
         const res = (await managedApi.restPost(
           `reviews`,
           data
-        )) as Generated.ReviewPointViewedByUser[];
-        res.forEach(loadReviewPointViewedByUser);
+        )) as Generated.ReviewPointViewedByUser;
+        loadReviewPointViewedByUser(res);
         return res;
       },
 

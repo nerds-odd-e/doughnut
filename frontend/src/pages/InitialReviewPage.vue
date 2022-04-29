@@ -117,7 +117,8 @@ export default defineComponent({
           reviewPoint: this.reviewPoint,
           reviewSetting: this.reviewSetting,
         })
-        .then(()=>{
+        .then((res)=>{
+          this.reviewPointViewedByUsers[this.finished] = res;
           this.finished += 1;
           if (this.finished >= this.reviewPointViewedByUsers.length) {
             this.$router.push({ name: "reviews" });
