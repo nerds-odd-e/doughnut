@@ -141,9 +141,9 @@ public class Note extends Thingy {
   public static Note createNote(User user, Timestamp currentUTCTimestamp, TextContent textContent) {
     final Note note = new Note();
     note.getTextContent().updateTextContent(textContent, currentUTCTimestamp);
-    note.setCreatedAtAndUpdatedAt(currentUTCTimestamp);
+    note.setNoteAccessoriesUpdatedAt(currentUTCTimestamp);
 
-    Thing.createThing(user, note);
+    Thing.createThing(user, note, currentUTCTimestamp);
     return note;
   }
 
@@ -284,8 +284,7 @@ public class Note extends Thingy {
   }
 
   @JsonIgnore
-  public void setCreatedAtAndUpdatedAt(Timestamp currentUTCTimestamp) {
-    this.createdAt = currentUTCTimestamp;
+  public void setNoteAccessoriesUpdatedAt(Timestamp currentUTCTimestamp) {
     this.getNoteAccessories().setUpdatedAt(currentUTCTimestamp);
   }
 

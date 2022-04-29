@@ -49,7 +49,9 @@ public class Thing {
   @Setter
   private User user;
 
-  static <T extends Thingy> T createThing(User user, T thingy) {
+  static <T extends Thingy> T createThing(User user, T thingy,
+    Timestamp currentUTCTimestamp) {
+    thingy.setCreatedAt(currentUTCTimestamp);
     thingy.setUser(user);
 
     final Thing thing = new Thing();

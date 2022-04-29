@@ -14,6 +14,7 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import com.odde.doughnut.algorithms.ClozeDescription;
 import com.odde.doughnut.entities.QuizQuestion.QuestionType;
 import com.odde.doughnut.models.NoteViewer;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -37,13 +38,14 @@ import lombok.Setter;
 @Table(name = "link")
 public class Link extends Thingy {
 
-  public static Link createLink(Note sourceNote, Note targetNote, User user, Integer typeId) {
+  public static Link createLink(Note sourceNote, Note targetNote, User user, Integer typeId,
+    Timestamp currentUTCTimestamp) {
     Link link = new Link();
     link.setSourceNote(sourceNote);
     link.setTargetNote(targetNote);
     link.setTypeId(typeId);
 
-    return Thing.createThing(user, link);
+    return Thing.createThing(user, link, currentUTCTimestamp);
   }
 
   @OneToOne(mappedBy = "link", cascade = CascadeType.ALL)

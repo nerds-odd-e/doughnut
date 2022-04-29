@@ -12,6 +12,8 @@ import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.LinkModel;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.testability.TestabilitySettings;
+import javax.annotation.Resource;
 import javax.validation.Valid;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,10 +33,15 @@ class RestLinkController {
   private final ModelFactoryService modelFactoryService;
   private final CurrentUserFetcher currentUserFetcher;
 
+  @Resource(name = "testabilitySettings")
+  private final TestabilitySettings testabilitySettings;
+
   public RestLinkController(
-      ModelFactoryService modelFactoryService, CurrentUserFetcher currentUserFetcher) {
+    ModelFactoryService modelFactoryService, CurrentUserFetcher currentUserFetcher,
+    TestabilitySettings testabilitySettings) {
     this.modelFactoryService = modelFactoryService;
     this.currentUserFetcher = currentUserFetcher;
+    this.testabilitySettings = testabilitySettings;
   }
 
   @GetMapping("/{link}")
@@ -82,7 +89,8 @@ class RestLinkController {
     }
     Link link =
         Link.createLink(
-            sourceNote, targetNote, currentUserFetcher.getUser().getEntity(), linkRequest.typeId);
+            sourceNote, targetNote, currentUserFetcher.getUser().getEntity(), linkRequest.typeId,
+          testabilitySettings.getCurrentUTCTimestamp());
     modelFactoryService.linkRepository.save(link);
     return NotesBulk.jsonNoteWithChildren(link.getSourceNote(), currentUserFetcher.getUser());
   }

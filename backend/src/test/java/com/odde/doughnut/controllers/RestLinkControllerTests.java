@@ -14,6 +14,7 @@ import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
+import com.odde.doughnut.testability.TestabilitySettings;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -40,7 +41,8 @@ class RestLinkControllerTests {
   }
 
   RestLinkController controller() {
-    return new RestLinkController(modelFactoryService, new TestCurrentUserFetcher(userModel));
+    return new RestLinkController(modelFactoryService, new TestCurrentUserFetcher(userModel),
+      new TestabilitySettings());
   }
 
   @Nested

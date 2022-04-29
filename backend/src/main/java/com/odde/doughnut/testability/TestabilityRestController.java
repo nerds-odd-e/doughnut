@@ -124,7 +124,8 @@ class TestabilityRestController {
       content.setPictureMask(seedNote.pictureMask);
       content.setPictureUrl(seedNote.pictureUrl);
 
-      note.setCreatedAtAndUpdatedAt(currentUTCTimestamp);
+      note.setCreatedAt(currentUTCTimestamp);
+      note.setNoteAccessoriesUpdatedAt(currentUTCTimestamp);
       earlyNotes.put(seedNote.title, note);
       noteList.add(note);
       if (Strings.isBlank(seedNote.testingParent)) {
