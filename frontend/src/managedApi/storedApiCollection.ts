@@ -43,7 +43,7 @@ const storedApiCollection = (
         return res;
       },
 
-      async getOneInitialReview() {
+      async initialReview() {
         const res = (await managedApi.restGet(
           `reviews/initial`
         )) as Generated.ReviewPointViewedByUser[];
