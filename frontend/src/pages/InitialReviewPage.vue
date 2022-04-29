@@ -6,7 +6,7 @@
         v-bind="{
           title: `Initial Review: `,
           finished,
-          toRepeatCount: reviewPointViewedByUser.remainingInitialReviewCountForToday,
+          toRepeatCount: remainingInitialReviewCountForToday,
         }"
       >
         <template #default v-if="nested">
@@ -66,20 +66,27 @@ export default defineComponent({
   data() {
     return {
       finished: 0,
-      reviewPointViewedByUser: null as Generated.ReviewPointViewedByUser | null,
+      reviewPointViewedByUsers: [] as Generated.ReviewPointViewedByUser[],
     };
   },
   computed: {
+    reviewPointViewedByUser() {
+      if(this.reviewPointViewedByUsers.length == 0) return undefined
+      return this.reviewPointViewedByUsers[0];
+    },
     reviewPoint() {
-      return this.reviewPointViewedByUser.reviewPoint;
+      return this.reviewPointViewedByUser?.reviewPoint;
     },
     reviewSetting() {
-      return this.reviewPointViewedByUser.reviewSetting;
+      return this.reviewPointViewedByUser?.reviewSetting;
+    },
+    remainingInitialReviewCountForToday() {
+      return this.reviewPointViewedByUsers.length;
     },
     buttonKey() {
-      return !!this.reviewPoint.noteId
+      return !!this.reviewPoint?.noteId
         ? `note-${this.reviewPoint.noteId}`
-        : `link-${this.reviewPoint.linkId}`;
+        : `link-${this.reviewPoint?.linkId}`;
     },
   },
 
@@ -92,12 +99,11 @@ export default defineComponent({
         this.$router.push({ name: "reviews" });
         return
       }
-      this.reviewPointViewedByUser = resp[0];
+      this.reviewPointViewedByUsers = resp;
     },
 
     async processForm(skipReview) {
       this.finished += 1;
-      this.reviewPointViewedByUser.remainingInitialReviewCountForToday -= 1;
       if (skipReview) {
         if (
           !(await this.popups.confirm(
