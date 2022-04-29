@@ -45,13 +45,8 @@ public class UserModel implements ReviewScope {
   }
 
   @Override
-  public int getNotesHaveNotBeenReviewedAtAllCount() {
-    return modelFactoryService.noteRepository.countByOwnershipWhereThereIsNoReviewPoint(entity);
-  }
-
-  @Override
-  public int getLinksHaveNotBeenReviewedAtAllCount() {
-    return modelFactoryService.linkRepository.countByOwnershipWhereThereIsNoReviewPoint(entity);
+  public int getThingsHaveNotBeenReviewedAtAllCount() {
+    return modelFactoryService.thingRepository.countByOwnershipWhereThereIsNoReviewPoint(entity);
   }
 
   @Override

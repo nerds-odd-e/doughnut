@@ -18,9 +18,28 @@ public interface ThingRepository extends CrudRepository<Thing, Integer> {
   Stream<Thing> findByOwnershipWhereThereIsNoReviewPoint(@Param("user") User user);
 
   @Query(
+      value =
+          "SELECT count(1) as count from thing "
+              + selectThings
+              + selectNoteThings
+              + whereThereIsNoReviewPoint,
+      nativeQuery = true)
+  int countByOwnershipWhereThereIsNoReviewPoint(@Param("user") User user);
+
+  @Query(
       value = selectThingsFrom + selectThingsByAncestor + selectNoteThingsByAncestor + orderByDate,
       nativeQuery = true)
   Stream<Thing> findByAncestorWhereThereIsNoReviewPoint(
+      @Param("user") User user, @Param("ancestor") Note ancestor);
+
+  @Query(
+      value =
+          "SELECT count(1) as count from thing "
+              + selectThingsByAncestor
+              + selectNoteThingsByAncestor
+              + whereThereIsNoReviewPoint,
+      nativeQuery = true)
+  int countByAncestorWhereThereIsNoReviewPoint(
       @Param("user") User user, @Param("ancestor") Note ancestor);
 
   String byAncestorWhereThereIsNoReviewPoint =
@@ -54,11 +73,10 @@ public interface ThingRepository extends CrudRepository<Thing, Integer> {
           + " ON thing.id = rp.thing_id "
           + "   AND rp.user_id = :user"
           + " WHERE "
-          + "   rp.id IS NULL ";
+          + "   rp.id IS NULL "
+          + "   AND (jlink.id IS NOT NULL OR jnote.id IS NOT NULL) ";
 
-  String orderByDate =
-      whereThereIsNoReviewPoint
-          + " AND (jlink.id IS NOT NULL OR jnote.id IS NOT NULL) ORDER BY level, thing.created_at";
+  String orderByDate = whereThereIsNoReviewPoint + " ORDER BY level, thing.created_at";
 
   String whereNoteIsNotSkipped =
       " LEFT JOIN review_setting rs "

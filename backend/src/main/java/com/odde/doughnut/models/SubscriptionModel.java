@@ -1,6 +1,5 @@
 package com.odde.doughnut.models;
 
-import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Subscription;
 import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -17,14 +16,8 @@ public class SubscriptionModel implements ReviewScope {
   }
 
   @Override
-  public int getNotesHaveNotBeenReviewedAtAllCount() {
-    return modelFactoryService.noteRepository.countByAncestorWhereThereIsNoReviewPoint(
-        entity.getUser(), entity.getHeadNote());
-  }
-
-  @Override
-  public int getLinksHaveNotBeenReviewedAtAllCount() {
-    return modelFactoryService.linkRepository.countByAncestorWhereThereIsNoReviewPoint(
+  public int getThingsHaveNotBeenReviewedAtAllCount() {
+    return modelFactoryService.thingRepository.countByAncestorWhereThereIsNoReviewPoint(
         entity.getUser(), entity.getHeadNote());
   }
 

@@ -75,10 +75,7 @@ public class Reviewing {
   }
 
   private int getPendingNewReviewPointCount(ReviewScope reviewScope) {
-    int noteCount = reviewScope.getNotesHaveNotBeenReviewedAtAllCount();
-    int linkCount = reviewScope.getLinksHaveNotBeenReviewedAtAllCount();
-
-    return noteCount + linkCount;
+    return reviewScope.getThingsHaveNotBeenReviewedAtAllCount();
   }
 
   private int toInitialReviewCount() {

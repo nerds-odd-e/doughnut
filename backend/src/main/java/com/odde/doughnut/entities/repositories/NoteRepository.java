@@ -12,32 +12,11 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 public interface NoteRepository extends CrudRepository<Note, Integer> {
-  @Query(
-      value = "SELECT note.*,rs.level as level from note " + byOwnershipWhereThereIsNoReviewPoint,
-      nativeQuery = true)
-  Stream<Note> findByOwnershipWhereThereIsNoReviewPoint(@Param("user") User user);
-
-  @Query(
-      value = "SELECT count(1) as count from note " + byOwnershipWhereThereIsNoReviewPoint,
-      nativeQuery = true)
-  int countByOwnershipWhereThereIsNoReviewPoint(@Param("user") User user);
 
   @Query(
       value = selectFromNoteJoinTextContent + " where text_content.title = :noteTitle limit 1",
       nativeQuery = true)
   Note findFirstByTitle(@Param("noteTitle") String noteTitle);
-
-  @Query(
-      value = "SELECT note.* from note " + byAncestorWhereThereIsNoReviewPoint,
-      nativeQuery = true)
-  Stream<Note> findByAncestorWhereThereIsNoReviewPoint(
-      @Param("user") User user, @Param("ancestor") Note ancestor);
-
-  @Query(
-      value = "SELECT count(1) as count from note " + byAncestorWhereThereIsNoReviewPoint,
-      nativeQuery = true)
-  int countByAncestorWhereThereIsNoReviewPoint(
-      @Param("user") User user, @Param("ancestor") Note ancestor);
 
   @Query(
       value = "SELECT count(1) as count from note " + joinClosure + " WHERE note.id in :noteIds",
@@ -49,28 +28,9 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
       "SELECT note.*  from note JOIN text_content"
           + "   ON note.text_content_id = text_content.id ";
 
-  String whereThereIsNoReviewPointAndOrderByTime =
-      " LEFT JOIN review_point rp"
-          + "   ON note.id = rp.note_id "
-          + "     AND rp.user_id = :#{#user.id} "
-          + " LEFT JOIN review_setting rs "
-          + "   ON note.master_review_setting_id = rs.id "
-          + " WHERE note.skip_review IS FALSE "
-          + "   AND rp.id IS NULL "
-          + "   AND note.deleted_at IS NULL "
-          + "ORDER BY level, note.created_at ";
-
-  String byOwnershipWhereThereIsNoReviewPoint =
-      "JOIN notebook ON notebook.id = note.notebook_id "
-          + " AND notebook.ownership_id = :#{#user.ownership.id} "
-          + whereThereIsNoReviewPointAndOrderByTime;
-
   String joinClosure =
       " JOIN notes_closure ON notes_closure.note_id = note.id "
           + "   AND notes_closure.ancestor_id = :ancestor ";
-
-  String byAncestorWhereThereIsNoReviewPoint =
-      joinClosure + whereThereIsNoReviewPointAndOrderByTime;
 
   @Query(value = inAllMyNotebooksAndSubscriptions + searchForLinkTarget, nativeQuery = true)
   List<Note> searchForUserInAllMyNotebooksAndSubscriptions(
