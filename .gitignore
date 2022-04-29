@@ -102,3 +102,4 @@ mysql/
 
 # gitpod inteliij-projector
 **/.jetbrains
+.wireit

@@ -12,6 +12,7 @@ runs:
       uses: actions/setup-node@v3
       with:
         node-version: ${{ inputs.node-version }}
+        cache: true
     - name: Cache yarn directory path
       id: yarn-cache-dir-path
       shell: bash

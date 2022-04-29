@@ -7,15 +7,15 @@
   "license": "MIT",
   "scripts": {
     "frontend:build": "yarn --cwd frontend --frozen-lockfile --silent install && yarn --cwd frontend build",
-    "frontend:lint": "yarn --cwd frontend --frozen-lockfile --silent install && yarn --cwd frontend lint",
+    "frontend:lint": "wireit",
     "frontend:test": "yarn --cwd frontend --frozen-lockfile --silent install && yarn --cwd frontend test",
     "frontend:sut": "yarn --cwd frontend --frozen-lockfile --silent install && yarn --cwd frontend dev",
-    "backend:lint": "backend/gradlew -p backend lint",
+    "backend:lint": "wireit",
     "backend:test": "backend/gradlew -p backend testDBMigrate && backend/gradlew -p backend test --build-cache --parallel",
     "backend:build": "backend/gradlew -p backend build -x test --build-cache --parallel",
     "backend:prod_build": "backend/gradlew -p backend build -x test -Dspring.profiles.active=prod --build-cache --parallel",
     "generateTypeScript": "backend/gradlew -p backend generateTypeScript",
-    "cy:lint": "yarn --frozen-lockfile --silent install && eslint --ext .ts,.js cypress",
+    "cy:lint": "wireit",
     "cy:open": "cypress open --env configFile=development",
     "cy:run:dev": "cypress run --env configFile=development",
     "cy:run": "cypress run --env configFile=ci",
@@ -27,6 +27,17 @@
     "sound": "node scripts/sound-monitor.js",
     "format": "prettier cypress --write && backend/gradlew -p backend spotlessApply",
     "lint:all": "yarn backend:lint && yarn frontend:lint && yarn cy:lint"
+  },
+  "wireit": {
+    "frontend:lint": {
+      "command": "yarn --cwd frontend --frozen-lockfile --silent install && yarn --cwd frontend lint"
+    },
+    "backend:lint": {
+      "command": "backend/gradlew -p backend lint"
+    },
+    "cy:lint": {
+      "command": "yarn --frozen-lockfile --silent install && eslint --ext .ts,.js cypress"
+    }
   },
   "cypress-cucumber-preprocessor": {
     "stepDefinitions": "cypress/step_definitions/**/*.{js,ts}"
@@ -50,7 +61,8 @@
     "got": "^12.0",
     "npm-run-all": "4.1.5",
     "prettier": "^2.6",
-    "typescript": "latest"
+    "typescript": "^4.6.4",
+    "wireit": "^0.2.1"
   },
   "dependencies": {
     "@cucumber/cucumber": "^8.1"
