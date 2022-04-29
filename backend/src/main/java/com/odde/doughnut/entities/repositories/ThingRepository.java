@@ -1,5 +1,6 @@
 package com.odde.doughnut.entities.repositories;
 
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.entities.User;
 import java.util.stream.Stream;
@@ -12,12 +13,21 @@ public interface ThingRepository extends CrudRepository<Thing, Integer> {
   @Query(value = "SELECT thing.* " + selectThings + orderByDate, nativeQuery = true)
   Stream<Thing> findByOwnershipWhereThereIsNoReviewPoint(@Param("user") User user);
 
+  @Query(value = "SELECT thing.* " + selectThingsByAncestor + orderByDate, nativeQuery = true)
+  Stream<Thing> findByAncestorWhereThereIsNoReviewPoint(
+      @Param("user") User user, @Param("ancestor") Note ancestor);
+
   String whereThereIsNoReviewPoint =
       " LEFT JOIN review_point rp"
           + " ON link.id = rp.link_id "
           + "   AND rp.user_id = :user"
           + " WHERE "
           + "   rp.id IS NULL ";
+
+  String byAncestorWhereThereIsNoReviewPoint =
+      "JOIN notes_closure ON notes_closure.note_id = source_id "
+          + "   AND notes_closure.ancestor_id = :ancestor "
+          + whereThereIsNoReviewPoint;
 
   String selectLinkWithLevelFromNotes =
       ", GREATEST(source.level, target.level) as level from link "
@@ -40,6 +50,14 @@ public interface ThingRepository extends CrudRepository<Thing, Integer> {
           + " SELECT link.id"
           + selectLinkWithLevelFromNotes
           + byOwnershipWhereThereIsNoReviewPoint
+          + ") jlink ON jlink.id = thing.link_id ";
+
+  String selectThingsByAncestor =
+      ", GREATEST(jlink.level, 0) as level from thing "
+          + "INNER JOIN ("
+          + " SELECT link.id"
+          + selectLinkWithLevelFromNotes
+          + byAncestorWhereThereIsNoReviewPoint
           + ") jlink ON jlink.id = thing.link_id ";
 
   String orderByDate = " ORDER BY level, thing.created_at";

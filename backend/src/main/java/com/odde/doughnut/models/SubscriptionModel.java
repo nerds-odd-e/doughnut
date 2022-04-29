@@ -43,7 +43,8 @@ public class SubscriptionModel implements ReviewScope {
 
   @Override
   public Stream<Thing> getThingHaveNotBeenReviewedAtAll() {
-    return Stream.empty();
+    return modelFactoryService.thingRepository.findByAncestorWhereThereIsNoReviewPoint(
+        entity.getUser(), entity.getHeadNote());
   }
 
   public int needToLearnCountToday(List<Integer> noteIds) {

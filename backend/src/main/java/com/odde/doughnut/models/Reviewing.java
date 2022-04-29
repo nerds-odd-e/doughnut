@@ -48,36 +48,37 @@ public class Reviewing {
     if (count <= 0) return Stream.of();
     Iterator<Thing> thingIterator = reviewScope.getThingHaveNotBeenReviewedAtAll().iterator();
     Iterator<Note> noteIterator = reviewScope.getNotesHaveNotBeenReviewedAtAll().iterator();
-    Iterator<Link> linkIterator = reviewScope.getLinksHaveNotBeenReviewedAtAll().iterator();
 
     Note note = null;
-    Link link = null;
+    Thing thing = null;
     List<ReviewPoint> result = new ArrayList<>();
     for (int cnt = 0; cnt < count; cnt++) {
       if (note == null) note = noteIterator.hasNext() ? noteIterator.next() : null;
-      if (link == null) link = linkIterator.hasNext() ? linkIterator.next() : null;
+      if (thing == null) thing = thingIterator.hasNext() ? thingIterator.next() : null;
 
-      if (note == null && link == null) {
+      if (note == null && thing == null) {
         break;
       }
+      Link link = null;
+      if (thing != null) link = thing.getLink();
       ReviewPoint reviewPoint = new ReviewPoint();
       reviewPoint.setNote(note);
       reviewPoint.setLink(link);
 
-      if (note != null && link != null) {
+      if (note != null && thing != null) {
 
         if (note.getLevel() > link.getLevel()
             || (note.getLevel().equals(link.getLevel())
                 && note.getCreatedAt().compareTo(link.getCreatedAt()) > 0)) {
           reviewPoint.setNote(null);
-          link = null;
+          thing = null;
         } else {
           reviewPoint.setLink(null);
           note = null;
         }
       } else {
         note = null;
-        link = null;
+        thing = null;
       }
 
       result.add(reviewPoint);
