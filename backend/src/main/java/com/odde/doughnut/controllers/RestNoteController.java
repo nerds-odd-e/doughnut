@@ -70,8 +70,13 @@ class RestNoteController {
     modelFactoryService.noteRepository.save(note);
     if (noteCreation.getLinkTypeToParent() != null) {
 
-      Link link = Link.createLink(note, parentNote, user, noteCreation.getLinkTypeToParent(),
-        testabilitySettings.getCurrentUTCTimestamp());
+      Link link =
+          Link.createLink(
+              note,
+              parentNote,
+              user,
+              noteCreation.getLinkTypeToParent(),
+              testabilitySettings.getCurrentUTCTimestamp());
       modelFactoryService.linkRepository.save(link);
     }
     return NotesBulk.jsonNoteWithParent(note, userModel);

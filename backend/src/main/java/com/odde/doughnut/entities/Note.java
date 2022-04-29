@@ -50,10 +50,14 @@ public class Note extends Thingy {
   private Notebook notebook;
 
   @Column(name = "deleted_at")
-  @Setter
   @Getter
   @JsonIgnore
   private Timestamp deletedAt;
+
+  public void setDeletedAt(Timestamp value) {
+    this.deletedAt = value;
+    if (this.thing != null) this.thing.setDeletedAt(value);
+  }
 
   @OneToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "master_review_setting_id", referencedColumnName = "id")

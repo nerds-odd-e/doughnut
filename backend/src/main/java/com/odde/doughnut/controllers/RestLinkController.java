@@ -37,8 +37,9 @@ class RestLinkController {
   private final TestabilitySettings testabilitySettings;
 
   public RestLinkController(
-    ModelFactoryService modelFactoryService, CurrentUserFetcher currentUserFetcher,
-    TestabilitySettings testabilitySettings) {
+      ModelFactoryService modelFactoryService,
+      CurrentUserFetcher currentUserFetcher,
+      TestabilitySettings testabilitySettings) {
     this.modelFactoryService = modelFactoryService;
     this.currentUserFetcher = currentUserFetcher;
     this.testabilitySettings = testabilitySettings;
@@ -89,8 +90,11 @@ class RestLinkController {
     }
     Link link =
         Link.createLink(
-            sourceNote, targetNote, currentUserFetcher.getUser().getEntity(), linkRequest.typeId,
-          testabilitySettings.getCurrentUTCTimestamp());
+            sourceNote,
+            targetNote,
+            currentUserFetcher.getUser().getEntity(),
+            linkRequest.typeId,
+            testabilitySettings.getCurrentUTCTimestamp());
     modelFactoryService.linkRepository.save(link);
     return NotesBulk.jsonNoteWithChildren(link.getSourceNote(), currentUserFetcher.getUser());
   }

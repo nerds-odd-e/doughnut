@@ -38,8 +38,8 @@ import lombok.Setter;
 @Table(name = "link")
 public class Link extends Thingy {
 
-  public static Link createLink(Note sourceNote, Note targetNote, User user, Integer typeId,
-    Timestamp currentUTCTimestamp) {
+  public static Link createLink(
+      Note sourceNote, Note targetNote, User user, Integer typeId, Timestamp currentUTCTimestamp) {
     Link link = new Link();
     link.setSourceNote(sourceNote);
     link.setTargetNote(targetNote);
