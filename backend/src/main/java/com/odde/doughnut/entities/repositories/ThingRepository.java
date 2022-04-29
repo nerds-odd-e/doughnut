@@ -9,13 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface ThingRepository extends CrudRepository<Thing, Integer> {
 
-  @Query(
-      value =
-          "SELECT thing.* "
-              + selectLinkWithLevelFromNotes
-              + byOwnershipWhereThereIsNoReviewPoint
-              + orderByDate,
-      nativeQuery = true)
+  @Query(value = "SELECT thing.* " + selectThings + orderByDate, nativeQuery = true)
   Stream<Thing> findByOwnershipWhereThereIsNoReviewPoint(@Param("user") User user);
 
   String whereThereIsNoReviewPoint =
@@ -40,5 +34,13 @@ public interface ThingRepository extends CrudRepository<Thing, Integer> {
           + "   AND notebook.ownership_id = :#{#user.ownership.id} "
           + whereThereIsNoReviewPoint;
 
-  String orderByDate = " ORDER BY level, link.created_at";
+  String selectThings =
+      ", GREATEST(jlink.level, 0) as level from thing "
+          + "INNER JOIN ("
+          + " SELECT link.id"
+          + selectLinkWithLevelFromNotes
+          + byOwnershipWhereThereIsNoReviewPoint
+          + ") jlink ON jlink.id = thing.link_id ";
+
+  String orderByDate = " ORDER BY level, thing.created_at";
 }

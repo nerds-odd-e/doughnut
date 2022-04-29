@@ -3,6 +3,7 @@ package com.odde.doughnut.models;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import com.odde.doughnut.entities.json.RepetitionForUser;
 import com.odde.doughnut.entities.json.ReviewStatus;
@@ -45,7 +46,7 @@ public class Reviewing {
 
   private Stream<ReviewPoint> getDueNewReviewPoint(ReviewScope reviewScope, int count) {
     if (count <= 0) return Stream.of();
-    //    Iterator<Thing> thingIterator = reviewScope.getThingHaveNotBeenReviewedAtAll().iterator();
+    Iterator<Thing> thingIterator = reviewScope.getThingHaveNotBeenReviewedAtAll().iterator();
     Iterator<Note> noteIterator = reviewScope.getNotesHaveNotBeenReviewedAtAll().iterator();
     Iterator<Link> linkIterator = reviewScope.getLinksHaveNotBeenReviewedAtAll().iterator();
 

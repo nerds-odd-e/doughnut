@@ -3,9 +3,11 @@ package com.odde.doughnut.testability;
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcherFromRequest;
 import com.odde.doughnut.entities.Circle;
 import com.odde.doughnut.entities.Link;
+import com.odde.doughnut.entities.Link.LinkType;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteAccessories;
 import com.odde.doughnut.entities.Ownership;
+import com.odde.doughnut.entities.TextContent;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.LinkRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
@@ -111,7 +113,7 @@ class TestabilityRestController {
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
 
     for (SeedNote seedNote : seedInfo.seedNotes) {
-      Note note = new Note();
+      Note note = Note.createNote(user, currentUTCTimestamp, new TextContent());
       NoteAccessories content = note.getNoteAccessories();
 
       note.getTextContent().setTitle(seedNote.title);
@@ -124,7 +126,6 @@ class TestabilityRestController {
       content.setPictureMask(seedNote.pictureMask);
       content.setPictureUrl(seedNote.pictureUrl);
 
-      note.setCreatedAt(currentUTCTimestamp);
       note.setNoteAccessoriesUpdatedAt(currentUTCTimestamp);
       earlyNotes.put(seedNote.title, note);
       noteList.add(note);
@@ -133,7 +134,6 @@ class TestabilityRestController {
       } else {
         note.setParentNote(earlyNotes.get(seedNote.testingParent));
       }
-      note.setUser(user);
     }
 
     noteRepository.saveAll(noteList);
@@ -152,12 +152,15 @@ class TestabilityRestController {
   @PostMapping("/link_notes")
   @Transactional
   public String linkNotes(@RequestBody HashMap<String, String> linkInfo) {
-    Link link = new Link();
-    link.setTargetNote(noteRepository.findById(Integer.valueOf(linkInfo.get("target_id"))).get());
     Note sourceNote = noteRepository.findById(Integer.valueOf(linkInfo.get("source_id"))).get();
-    link.setSourceNote(sourceNote);
-    link.setUser(sourceNote.getUser());
-    link.setLinkType(Link.LinkType.fromLabel(linkInfo.get("type")));
+    Note targetNote = noteRepository.findById(Integer.valueOf(linkInfo.get("target_id"))).get();
+    LinkType type = LinkType.fromLabel(linkInfo.get("type"));
+    Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
+    Link link =
+        Link.createLink(sourceNote, targetNote, sourceNote.getUser(), null, currentUTCTimestamp);
+
+    link.setLinkType(type);
+
     linkRepository.save(link);
     return "OK";
   }

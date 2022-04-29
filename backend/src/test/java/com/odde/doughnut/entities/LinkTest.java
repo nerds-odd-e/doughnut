@@ -44,7 +44,7 @@ public class LinkTest {
 
     @Test
     void allLinkTypesAreAvailable() {
-      Link link = new Link();
+      Link link = Link.createLink(noteA, noteB, null, null, null);
       link.setSourceNote(noteA);
       link.setTargetNote(noteB);
       assertTrue(link.getPossibleLinkTypes().contains(RELATED_TO));
@@ -90,7 +90,7 @@ public class LinkTest {
       @Test
       void belongsIsNotAvailableBetweenTheSourceAndTargetAnyMore() {
         makeMe.refresh(noteA);
-        Link link = new Link();
+        Link link = Link.createLink(noteA, noteB, null, null, null);
         link.setSourceNote(noteA);
         link.setTargetNote(noteB);
         assertTrue(link.getPossibleLinkTypes().contains(RELATED_TO));

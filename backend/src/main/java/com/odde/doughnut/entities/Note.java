@@ -25,6 +25,7 @@ import org.thymeleaf.util.StringUtils;
 @Entity
 @Table(name = "note")
 public class Note extends Thingy {
+  private Note() {}
 
   @Embedded @Valid @Getter private final NoteAccessories noteAccessories = new NoteAccessories();
 

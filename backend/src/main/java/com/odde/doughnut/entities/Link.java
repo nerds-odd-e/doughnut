@@ -37,6 +37,7 @@ import lombok.Setter;
 @Entity
 @Table(name = "link")
 public class Link extends Thingy {
+  private Link() {}
 
   public static Link createLink(
       Note sourceNote, Note targetNote, User user, Integer typeId, Timestamp currentUTCTimestamp) {
