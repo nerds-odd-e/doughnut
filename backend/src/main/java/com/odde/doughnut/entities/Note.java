@@ -24,11 +24,11 @@ import org.thymeleaf.util.StringUtils;
 
 @Entity
 @Table(name = "note")
-public class Note extends EntityWithId {
+public class Note extends Thingy {
 
   @Embedded @Valid @Getter private final NoteAccessories noteAccessories = new NoteAccessories();
 
-  @OneToOne(mappedBy = "note")
+  @OneToOne(mappedBy = "note", cascade = CascadeType.ALL)
   @Getter
   @Setter
   @JsonIgnore
@@ -49,11 +49,6 @@ public class Note extends EntityWithId {
   @Getter
   private Notebook notebook;
 
-  @Column(name = "created_at")
-  @Getter
-  @Setter
-  private Timestamp createdAt;
-
   @Column(name = "deleted_at")
   @Setter
   @Getter
@@ -66,13 +61,6 @@ public class Note extends EntityWithId {
   @Getter
   @Setter
   private ReviewSetting masterReviewSetting;
-
-  @ManyToOne(cascade = CascadeType.PERSIST)
-  @JoinColumn(name = "user_id", referencedColumnName = "id")
-  @JsonIgnore
-  @Getter
-  @Setter
-  private User user;
 
   @OneToMany(mappedBy = "note", cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonIgnore
@@ -154,12 +142,8 @@ public class Note extends EntityWithId {
     final Note note = new Note();
     note.getTextContent().updateTextContent(textContent, currentUTCTimestamp);
     note.setCreatedAtAndUpdatedAt(currentUTCTimestamp);
-    note.setUser(user);
-    final Thing thing = new Thing();
-    thing.setNote(note);
-    thing.setUser(user);
-    thing.setCreatedAt(currentUTCTimestamp);
-    note.setThing(thing);
+
+    Thing.createThing(user, note);
     return note;
   }
 

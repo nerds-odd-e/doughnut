@@ -1,18 +1,18 @@
 package com.odde.doughnut.models.quizFacotries;
 
-import com.odde.doughnut.entities.EntityWithId;
+import com.odde.doughnut.entities.Thingy;
 import java.util.ArrayList;
 import java.util.List;
 
 public interface QuestionOptionsFactory {
-  EntityWithId generateAnswer();
+  Thingy generateAnswer();
 
-  List<? extends EntityWithId> generateFillingOptions();
+  List<? extends Thingy> generateFillingOptions();
 
-  default List<EntityWithId> getOptionEntities() {
-    EntityWithId answerNote = generateAnswer();
+  default List<Thingy> getOptionEntities() {
+    Thingy answerNote = generateAnswer();
     if (answerNote == null) return List.of();
-    List<EntityWithId> options = new ArrayList<>(generateFillingOptions());
+    List<Thingy> options = new ArrayList<>(generateFillingOptions());
     options.add(answerNote);
     return options;
   }

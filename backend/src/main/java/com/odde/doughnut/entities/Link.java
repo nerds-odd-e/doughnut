@@ -14,7 +14,6 @@ import com.fasterxml.jackson.annotation.JsonValue;
 import com.odde.doughnut.algorithms.ClozeDescription;
 import com.odde.doughnut.entities.QuizQuestion.QuestionType;
 import com.odde.doughnut.models.NoteViewer;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -28,6 +27,7 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
 import lombok.Getter;
@@ -35,7 +35,22 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "link")
-public class Link extends EntityWithId {
+public class Link extends Thingy {
+
+  public static Link createLink(Note sourceNote, Note targetNote, User user, Integer typeId) {
+    Link link = new Link();
+    link.setSourceNote(sourceNote);
+    link.setTargetNote(targetNote);
+    link.setTypeId(typeId);
+
+    return Thing.createThing(user, link);
+  }
+
+  @OneToOne(mappedBy = "link", cascade = CascadeType.ALL)
+  @Getter
+  @Setter
+  @JsonIgnore
+  private Thing thing;
 
   @JsonIgnore
   public Integer getLevel() {
@@ -235,18 +250,6 @@ public class Link extends EntityWithId {
   @Getter
   @Setter
   private Integer typeId;
-
-  @JsonIgnore
-  @ManyToOne(cascade = CascadeType.PERSIST)
-  @JoinColumn(name = "user_id", referencedColumnName = "id")
-  @Getter
-  @Setter
-  private User user;
-
-  @Column(name = "created_at")
-  @Getter
-  @Setter
-  private Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
   @OneToMany(mappedBy = "link", cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonIgnore

@@ -1,9 +1,9 @@
 package com.odde.doughnut.models.quizFacotries;
 
-import com.odde.doughnut.entities.EntityWithId;
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.QuizQuestion.QuestionType;
 import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.Thingy;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.Randomizer;
 import java.util.List;
@@ -24,7 +24,7 @@ public record QuizQuestionDirector(
     QuizQuestion quizQuestion = reviewPoint.createAQuizQuestionOfType(questionType);
 
     if (quizQuestionFactory instanceof QuestionOptionsFactory optionsFactory) {
-      List<EntityWithId> optionsEntities = optionsFactory.getOptionEntities();
+      List<Thingy> optionsEntities = optionsFactory.getOptionEntities();
       if (optionsEntities.size() <= 1) {
         return Optional.empty();
       }
@@ -44,9 +44,9 @@ public record QuizQuestionDirector(
         reviewPoint, new QuizQuestionServant(randomizer, modelFactoryService));
   }
 
-  private String toIdsString(List<EntityWithId> options1) {
+  private String toIdsString(List<Thingy> options1) {
     return randomizer.shuffle(options1).stream()
-        .map(EntityWithId::getId)
+        .map(Thingy::getId)
         .map(Object::toString)
         .collect(Collectors.joining(","));
   }

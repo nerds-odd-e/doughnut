@@ -80,11 +80,9 @@ class RestLinkController {
           .toNoteMotionModel(sourceNote, targetNote, linkRequest.asFirstChild)
           .execute();
     }
-    Link link = new Link();
-    link.setSourceNote(sourceNote);
-    link.setTargetNote(targetNote);
-    link.setTypeId(linkRequest.typeId);
-    link.setUser(currentUserFetcher.getUser().getEntity());
+    Link link =
+        Link.createLink(
+            sourceNote, targetNote, currentUserFetcher.getUser().getEntity(), linkRequest.typeId);
     modelFactoryService.linkRepository.save(link);
     return NotesBulk.jsonNoteWithChildren(link.getSourceNote(), currentUserFetcher.getUser());
   }

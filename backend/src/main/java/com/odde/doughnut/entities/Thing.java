@@ -36,10 +36,28 @@ public class Thing {
   @Setter
   private Note note;
 
+  @OneToOne(cascade = CascadeType.PERSIST)
+  @JoinColumn(name = "link_id", referencedColumnName = "id")
+  @Getter
+  @Setter
+  private Link link;
+
   @OneToOne
   @JoinColumn(name = "user_id")
   @JsonIgnore
   @Getter
   @Setter
   private User user;
+
+  static <T extends Thingy> T createThing(User user, T thingy) {
+    thingy.setUser(user);
+
+    final Thing thing = new Thing();
+    if (thingy instanceof Note note) thing.setNote(note);
+    if (thingy instanceof Link link) thing.setLink(link);
+    thing.setUser(user);
+    thing.setCreatedAt(thingy.getCreatedAt());
+    thingy.setThing(thing);
+    return thingy;
+  }
 }

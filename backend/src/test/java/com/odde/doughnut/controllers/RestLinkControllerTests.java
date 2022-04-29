@@ -9,6 +9,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.json.LinkRequest;
 import com.odde.doughnut.entities.json.LinkViewedByUser;
+import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
@@ -103,6 +104,16 @@ class RestLinkControllerTests {
       note2 = makeMe.aNote().byUser(userModel).please();
       linkRequest.typeId = 1;
       linkRequest.moveUnder = true;
+    }
+
+    @Test
+    void createdSuccessfully()
+        throws CyclicLinkDetectedException, BindException, NoAccessRightException {
+      Note note3 = makeMe.aNote().byUser(userModel).please();
+      long beforeThingCount = makeMe.modelFactoryService.thingRepository.count();
+      controller().linkNoteFinalize(note3, note2, linkRequest, makeMe.successfulBindingResult());
+      long afterThingCount = makeMe.modelFactoryService.thingRepository.count();
+      assertThat(afterThingCount, equalTo(beforeThingCount + 1));
     }
 
     @Test
