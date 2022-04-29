@@ -1,12 +1,12 @@
 {
   "compilerOptions": {
     "sourceMap": true,
-    "target": "es6",
+    "target": "esnext",
     "module": "CommonJS",
     "strict": true,
     "allowJs": true,
     "lib": [
-      "es6",
+      "esnext",
       "dom"
     ],
     "esModuleInterop": true,
@@ -15,9 +15,8 @@
       "node_modules/@types"
     ],
     "types": [
-      "cypress",
-      "cy-verify-downloads",
       "node",
+      "cypress",
       "@testing-library/cypress",
       "./support"
     ],
