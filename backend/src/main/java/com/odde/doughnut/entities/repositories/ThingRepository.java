@@ -65,6 +65,9 @@ public interface ThingRepository extends CrudRepository<Thing, Integer> {
   @Query(value = "SELECT thing.* " + selectNoteThings + orderByDate, nativeQuery = true)
   Stream<Thing> findNotesByOwnershipWhereThereIsNoReviewPoint(@Param("user") User user);
 
+  @Query(value = "SELECT thing.* " + selectNoteThingsByAncestor + orderByDate, nativeQuery = true)
+  Stream<Thing> findNotesByAncestorWhereThereIsNoReviewPoint(@Param("user") User user, @Param("ancestor") Note ancestor);
+
   String whereNoteThereIsNoReviewPoint =
       " LEFT JOIN review_point rp"
           + "   ON note.id = rp.note_id "
@@ -86,4 +89,16 @@ public interface ThingRepository extends CrudRepository<Thing, Integer> {
           + " SELECT note.id as id, rs.level as level FROM note"
           + byNoteOwnershipWhereThereIsNoReviewPoint
           + ") jnote ON jnote.id = thing.note_id ";
+
+  String joinClosure =
+    " JOIN notes_closure ON notes_closure.note_id = note.id "
+      + "   AND notes_closure.ancestor_id = :ancestor ";
+
+  String selectNoteThingsByAncestor =
+    ", GREATEST(jnote.level, 0) as level from thing "
+      + "INNER JOIN ("
+      + " SELECT note.id as id, rs.level as level FROM note"
+      + joinClosure + whereNoteThereIsNoReviewPoint
+      + ") jnote ON jnote.id = thing.note_id ";
+
 }
