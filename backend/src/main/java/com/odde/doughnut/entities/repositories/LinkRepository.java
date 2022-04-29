@@ -20,28 +20,9 @@ public interface LinkRepository extends CrudRepository<Link, Integer> {
           + " ON target.id = link.target_id ";
 
   @Query(
-      value =
-          "SELECT link.* "
-              + selectLinkWithLevelFromNotes
-              + byOwnershipWhereThereIsNoReviewPoint
-              + orderByDate,
-      nativeQuery = true)
-  Stream<Link> findByOwnershipWhereThereIsNoReviewPoint(@Param("user") User user);
-
-  @Query(
       value = "SELECT count(1) from link " + byOwnershipWhereThereIsNoReviewPoint,
       nativeQuery = true)
   int countByOwnershipWhereThereIsNoReviewPoint(@Param("user") User user);
-
-  @Query(
-      value =
-          "SELECT link.* "
-              + selectLinkWithLevelFromNotes
-              + byAncestorWhereThereIsNoReviewPoint
-              + orderByDate,
-      nativeQuery = true)
-  Stream<Link> findByAncestorWhereThereIsNoReviewPoint(
-      @Param("user") User user, @Param("ancestor") Note ancestor);
 
   @Query(
       value = "SELECT count(1) from link " + byAncestorWhereThereIsNoReviewPoint,

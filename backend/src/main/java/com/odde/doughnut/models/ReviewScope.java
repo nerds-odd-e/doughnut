@@ -5,11 +5,7 @@ import com.odde.doughnut.entities.Thing;
 import java.util.stream.Stream;
 
 public interface ReviewScope {
-  Stream<Thing> getNotesHaveNotBeenReviewedAtAll();
-
   int getNotesHaveNotBeenReviewedAtAllCount();
-
-  Stream<Link> getLinksHaveNotBeenReviewedAtAll();
 
   int getLinksHaveNotBeenReviewedAtAllCount();
 

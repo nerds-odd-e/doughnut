@@ -60,13 +60,6 @@ public interface ThingRepository extends CrudRepository<Thing, Integer> {
       whereThereIsNoReviewPoint
           + " AND (jlink.id IS NOT NULL OR jnote.id IS NOT NULL) ORDER BY level, thing.created_at";
 
-  @Query(value = "SELECT thing.* " + selectNoteThings + orderByDate, nativeQuery = true)
-  Stream<Thing> findNotesByOwnershipWhereThereIsNoReviewPoint(@Param("user") User user);
-
-  @Query(value = "SELECT thing.* " + selectNoteThingsByAncestor + orderByDate, nativeQuery = true)
-  Stream<Thing> findNotesByAncestorWhereThereIsNoReviewPoint(
-      @Param("user") User user, @Param("ancestor") Note ancestor);
-
   String whereNoteIsNotSkipped =
       " LEFT JOIN review_setting rs "
           + "   ON note.master_review_setting_id = rs.id "
