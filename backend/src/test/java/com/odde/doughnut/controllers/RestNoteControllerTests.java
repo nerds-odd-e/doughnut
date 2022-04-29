@@ -117,15 +117,28 @@ class RestNoteControllerTests {
 
   @Nested
   class createNoteTest {
+    Note parent;
+    NoteCreation noteCreation = new NoteCreation();
+
+    @BeforeEach
+    void setup() {
+      parent = makeMe.aNote().byUser(userModel).please();
+      Note newNote = makeMe.aNote().inMemoryPlease();
+      noteCreation.setTextContent(newNote.getTextContent());
+    }
+
     @Test
     void shouldBeAbleToSaveNoteWhenValid() throws NoAccessRightException {
-      Note parent = makeMe.aNote().byUser(userModel).please();
-      Note newNote = makeMe.aNote().inMemoryPlease();
-      NoteCreation noteCreation = new NoteCreation();
-      noteCreation.setTextContent(newNote.getTextContent());
-
       NotesBulk response = controller.createNote(parent, noteCreation);
       assertThat(response.notes.get(0).getId(), equalTo(parent.getId()));
+    }
+
+    @Test
+    void shouldBeAbleToCreateAThing() throws NoAccessRightException {
+      long beforeThingCount = makeMe.modelFactoryService.thingRepository.count();
+      controller.createNote(parent, noteCreation);
+      long afterThingCount = makeMe.modelFactoryService.thingRepository.count();
+      assertThat(afterThingCount, equalTo(beforeThingCount + 1));
     }
   }
 

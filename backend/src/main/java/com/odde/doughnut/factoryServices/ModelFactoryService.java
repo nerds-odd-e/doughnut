@@ -21,6 +21,7 @@ import com.odde.doughnut.entities.repositories.NotesClosureRepository;
 import com.odde.doughnut.entities.repositories.QuizQuestionRepository;
 import com.odde.doughnut.entities.repositories.ReviewPointRepository;
 import com.odde.doughnut.entities.repositories.TextContentRepository;
+import com.odde.doughnut.entities.repositories.ThingRepository;
 import com.odde.doughnut.entities.repositories.UserRepository;
 import com.odde.doughnut.models.AnswerModel;
 import com.odde.doughnut.models.Authorization;
@@ -43,6 +44,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class ModelFactoryService {
   @Autowired public TextContentRepository textContentRepository;
+  @Autowired public ThingRepository thingRepository;
   @Autowired public NoteRepository noteRepository;
   @Autowired public UserRepository userRepository;
   @Autowired public BazaarNotebookRepository bazaarNotebookRepository;

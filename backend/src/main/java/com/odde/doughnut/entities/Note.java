@@ -28,6 +28,12 @@ public class Note extends EntityWithId {
 
   @Embedded @Valid @Getter private final NoteAccessories noteAccessories = new NoteAccessories();
 
+  @OneToOne(mappedBy = "note")
+  @Getter
+  @Setter
+  @JsonIgnore
+  private Thing thing;
+
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "text_content_id", referencedColumnName = "id")
   @Getter
@@ -149,6 +155,11 @@ public class Note extends EntityWithId {
     note.getTextContent().updateTextContent(textContent, currentUTCTimestamp);
     note.setCreatedAtAndUpdatedAt(currentUTCTimestamp);
     note.setUser(user);
+    final Thing thing = new Thing();
+    thing.setNote(note);
+    thing.setUser(user);
+    thing.setCreatedAt(currentUTCTimestamp);
+    note.setThing(thing);
     return note;
   }
 
