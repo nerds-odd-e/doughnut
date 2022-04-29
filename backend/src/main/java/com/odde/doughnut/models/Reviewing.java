@@ -1,7 +1,6 @@
 package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.Link;
-import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
@@ -27,7 +26,7 @@ public class Reviewing {
     this.modelFactoryService = modelFactoryService;
   }
 
-  public Stream<ReviewPoint> getDueInitialReviewPoint() {
+  public Stream<ReviewPoint> getDueInitialReviewPoints() {
     int count = remainingDailyNewNotesCount();
     if (count == 0) {
       return Stream.empty();
@@ -47,9 +46,9 @@ public class Reviewing {
   private Stream<ReviewPoint> getDueNewReviewPoint(ReviewScope reviewScope, int count) {
     if (count <= 0) return Stream.of();
     Iterator<Thing> thingIterator = reviewScope.getThingHaveNotBeenReviewedAtAll().iterator();
-    Iterator<Note> noteIterator = reviewScope.getNotesHaveNotBeenReviewedAtAll().iterator();
+    Iterator<Thing> noteIterator = reviewScope.getNotesHaveNotBeenReviewedAtAll().iterator();
 
-    Note note = null;
+    Thing note = null;
     Thing thing = null;
     List<ReviewPoint> result = new ArrayList<>();
     for (int cnt = 0; cnt < count; cnt++) {
@@ -62,14 +61,14 @@ public class Reviewing {
       Link link = null;
       if (thing != null) link = thing.getLink();
       ReviewPoint reviewPoint = new ReviewPoint();
-      reviewPoint.setNote(note);
+      if (note != null) reviewPoint.setNote(note.getNote());
       reviewPoint.setLink(link);
 
       if (note != null && thing != null) {
 
-        if (note.getLevel() > link.getLevel()
-            || (note.getLevel().equals(link.getLevel())
-                && note.getCreatedAt().compareTo(link.getCreatedAt()) > 0)) {
+        if (note.getNote().getLevel() > link.getLevel()
+            || (note.getNote().getLevel().equals(link.getLevel())
+                && note.getNote().getCreatedAt().compareTo(link.getCreatedAt()) > 0)) {
           reviewPoint.setNote(null);
           thing = null;
         } else {
@@ -107,7 +106,7 @@ public class Reviewing {
   }
 
   private int toInitialReviewCount() {
-    if (getDueInitialReviewPoint().findFirst().isEmpty()) {
+    if (getDueInitialReviewPoints().findFirst().isEmpty()) {
       return 0;
     }
     return Math.min(remainingDailyNewNotesCount(), notLearntCount());

@@ -65,7 +65,7 @@ class RestReviewsController {
     Reviewing reviewing = user.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
 
     return reviewing
-        .getDueInitialReviewPoint()
+        .getDueInitialReviewPoints()
         .map(rp -> ReviewPointViewedByUser.from(rp, user))
         .collect(Collectors.toList());
   }

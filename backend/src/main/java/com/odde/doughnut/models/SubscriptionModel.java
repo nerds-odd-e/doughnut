@@ -18,9 +18,11 @@ public class SubscriptionModel implements ReviewScope {
   }
 
   @Override
-  public Stream<Note> getNotesHaveNotBeenReviewedAtAll() {
-    return modelFactoryService.noteRepository.findByAncestorWhereThereIsNoReviewPoint(
-        entity.getUser(), entity.getHeadNote());
+  public Stream<Thing> getNotesHaveNotBeenReviewedAtAll() {
+    return modelFactoryService
+        .noteRepository
+        .findByAncestorWhereThereIsNoReviewPoint(entity.getUser(), entity.getHeadNote())
+        .map(Note::getThing);
   }
 
   @Override

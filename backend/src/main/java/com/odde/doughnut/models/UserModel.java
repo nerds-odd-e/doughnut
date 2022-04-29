@@ -45,8 +45,11 @@ public class UserModel implements ReviewScope {
   }
 
   @Override
-  public Stream<Note> getNotesHaveNotBeenReviewedAtAll() {
-    return modelFactoryService.noteRepository.findByOwnershipWhereThereIsNoReviewPoint(entity);
+  public Stream<Thing> getNotesHaveNotBeenReviewedAtAll() {
+    return modelFactoryService
+        .noteRepository
+        .findByOwnershipWhereThereIsNoReviewPoint(entity)
+        .map(Note::getThing);
   }
 
   @Override

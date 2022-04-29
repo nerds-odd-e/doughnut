@@ -36,7 +36,7 @@ public class ReviewingInitialReviewTest {
   Reviewing reviewingOnDay1;
 
   public ReviewPoint getOneInitialReviewPoint(Reviewing reviewing) {
-    return reviewing.getDueInitialReviewPoint().findFirst().orElse(null);
+    return reviewing.getDueInitialReviewPoints().findFirst().orElse(null);
   }
 
   @BeforeEach
@@ -104,7 +104,7 @@ public class ReviewingInitialReviewTest {
       }
 
       private List<ReviewPoint> getAllDueReviewPoints() {
-        return reviewingOnDay1.getDueInitialReviewPoint().collect(Collectors.toList());
+        return reviewingOnDay1.getDueInitialReviewPoints().collect(Collectors.toList());
       }
 
       @Test
