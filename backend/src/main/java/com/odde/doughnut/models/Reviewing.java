@@ -26,11 +26,7 @@ public class Reviewing {
     this.modelFactoryService = modelFactoryService;
   }
 
-  public ReviewPoint getOneInitialReviewPoint() {
-    return getOneInitialReviewPoint1().findFirst().orElse(null);
-  }
-
-  public Stream<ReviewPoint> getOneInitialReviewPoint1() {
+  public Stream<ReviewPoint> getDueInitialReviewPoint() {
     int count = remainingDailyNewNotesCount();
     if (count == 0) {
       return Stream.empty();
@@ -97,8 +93,7 @@ public class Reviewing {
   }
 
   public int toInitialReviewCount() {
-    ReviewPoint oneInitialReviewPoint = getOneInitialReviewPoint();
-    if (oneInitialReviewPoint == null) {
+    if (getDueInitialReviewPoint().findFirst().isEmpty()) {
       return 0;
     }
     return Math.min(remainingDailyNewNotesCount(), notLearntCount());
