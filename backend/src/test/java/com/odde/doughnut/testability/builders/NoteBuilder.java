@@ -5,6 +5,7 @@ import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Ownership;
 import com.odde.doughnut.entities.ReviewSetting;
+import com.odde.doughnut.entities.TextContent;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.models.CircleModel;
 import com.odde.doughnut.models.UserModel;
@@ -21,17 +22,18 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   public NoteBuilder(MakeMe makeMe) {
-    super(makeMe, new Note());
+    super(
+        makeMe,
+        Note.createNote(null, new Timestamp(System.currentTimeMillis()), new TextContent()));
     if (Strings.isEmpty(entity.getTitle())) title(titleCounter.generate());
     description("descrption");
-    Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-    createdAt(timestamp);
-    updatedAt(timestamp);
-    textContentUpdateAt(timestamp);
+    updatedAt(entity.getCreatedAt());
+    textContentUpdateAt(entity.getCreatedAt());
   }
 
   public NoteBuilder byUser(User user) {
     entity.setUser(user);
+    entity.getThing().setUser(user);
     return this;
   }
 

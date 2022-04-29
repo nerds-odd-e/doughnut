@@ -50,6 +50,12 @@ public class ReviewPoint {
   private Note note;
 
   @ManyToOne
+  @JoinColumn(name = "thing_id")
+  @Getter
+  @JsonIgnore
+  private Thing thing;
+
+  @ManyToOne
   @JoinColumn(name = "link_id")
   @Getter
   @JsonIgnore
@@ -109,12 +115,14 @@ public class ReviewPoint {
 
   public void setNote(Note note) {
     this.note = note;
+    if (note != null) this.thing = note.getThing();
     this.noteId = null;
     if (note != null) this.noteId = note.getId();
   }
 
   public void setLink(Link link) {
     this.link = link;
+    if (link != null) this.thing = link.getThing();
     this.linkId = null;
     if (link != null) this.linkId = link.getId();
   }
