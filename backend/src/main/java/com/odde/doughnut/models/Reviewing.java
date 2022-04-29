@@ -1,6 +1,5 @@
 package com.odde.doughnut.models;
 
-import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
@@ -46,39 +45,16 @@ public class Reviewing {
   private Stream<ReviewPoint> getDueNewReviewPoint(ReviewScope reviewScope, int count) {
     if (count <= 0) return Stream.of();
     Iterator<Thing> thingIterator = reviewScope.getThingHaveNotBeenReviewedAtAll().iterator();
-    Iterator<Thing> noteIterator = reviewScope.getNotesHaveNotBeenReviewedAtAll().iterator();
 
-    Thing note = null;
-    Thing thing = null;
     List<ReviewPoint> result = new ArrayList<>();
     for (int cnt = 0; cnt < count; cnt++) {
-      if (note == null) note = noteIterator.hasNext() ? noteIterator.next() : null;
-      if (thing == null) thing = thingIterator.hasNext() ? thingIterator.next() : null;
+      if (!thingIterator.hasNext()) break;
+      Thing thing;
+      thing = thingIterator.next();
 
-      if (note == null && thing == null) {
-        break;
-      }
-      Link link = null;
-      if (thing != null) link = thing.getLink();
       ReviewPoint reviewPoint = new ReviewPoint();
-      if (note != null) reviewPoint.setNote(note.getNote());
-      reviewPoint.setLink(link);
-
-      if (note != null && thing != null) {
-
-        if (note.getNote().getLevel() > link.getLevel()
-            || (note.getNote().getLevel().equals(link.getLevel())
-                && note.getNote().getCreatedAt().compareTo(link.getCreatedAt()) > 0)) {
-          reviewPoint.setNote(null);
-          thing = null;
-        } else {
-          reviewPoint.setLink(null);
-          note = null;
-        }
-      } else {
-        note = null;
-        thing = null;
-      }
+      reviewPoint.setNote(thing.getNote());
+      reviewPoint.setLink(thing.getLink());
 
       result.add(reviewPoint);
     }

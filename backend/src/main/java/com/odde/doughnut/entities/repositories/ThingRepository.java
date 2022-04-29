@@ -9,11 +9,17 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
 public interface ThingRepository extends CrudRepository<Thing, Integer> {
+  String selectThingsFrom =
+      "SELECT thing.*,  IFNULL(jlink.level, jnote.level) as level from thing  ";
 
-  @Query(value = "SELECT thing.* " + selectThings + orderByDate, nativeQuery = true)
+  @Query(
+      value = selectThingsFrom + selectThings + selectNoteThings + orderByDate,
+      nativeQuery = true)
   Stream<Thing> findByOwnershipWhereThereIsNoReviewPoint(@Param("user") User user);
 
-  @Query(value = "SELECT thing.* " + selectThingsByAncestor + orderByDate, nativeQuery = true)
+  @Query(
+      value = selectThingsFrom + selectThingsByAncestor + selectNoteThingsByAncestor + orderByDate,
+      nativeQuery = true)
   Stream<Thing> findByAncestorWhereThereIsNoReviewPoint(
       @Param("user") User user, @Param("ancestor") Note ancestor);
 
@@ -30,7 +36,7 @@ public interface ThingRepository extends CrudRepository<Thing, Integer> {
           + whereThereIsNoReviewPoint;
 
   String selectLinkWithLevelFromNotes =
-      ", GREATEST(source.level, target.level) as level from link "
+      ", GREATEST(IFNULL(source.level, 0), IFNULL(target.level, 0)) as level from link "
           + "INNER JOIN ("
           + " SELECT sourceNote.id, srs.level as level FROM note sourceNote LEFT JOIN review_setting srs ON sourceNote.master_review_setting_id = srs.id) as source "
           + " ON source.id = link.source_id "
@@ -45,23 +51,15 @@ public interface ThingRepository extends CrudRepository<Thing, Integer> {
   String byOwnershipWhereThereIsNoReviewPoint =
       " JOIN note ON note.id = source_id" + joinNotebook + whereThereIsNoReviewPoint;
 
-  String selectThingsJoinLink =
-      ", GREATEST(jlink.level, 0) as level from thing "
-          + "INNER JOIN ("
-          + " SELECT link.id"
-          + selectLinkWithLevelFromNotes;
-
-  String selectThings =
-      selectThingsJoinLink
-          + byOwnershipWhereThereIsNoReviewPoint
-          + ") jlink ON jlink.id = thing.link_id ";
+  String selectThingsJoinLink = "LEFT JOIN (" + " SELECT link.id" + selectLinkWithLevelFromNotes;
 
   String selectThingsByAncestor =
       selectThingsJoinLink
           + byAncestorWhereThereIsNoReviewPoint
           + ") jlink ON jlink.id = thing.link_id ";
 
-  String orderByDate = " ORDER BY level, thing.created_at";
+  String orderByDate =
+      " WHERE jlink.id IS NOT NULL OR jnote.id IS NOT NULL ORDER BY level, thing.created_at";
 
   @Query(value = "SELECT thing.* " + selectNoteThings + orderByDate, nativeQuery = true)
   Stream<Thing> findNotesByOwnershipWhereThereIsNoReviewPoint(@Param("user") User user);
@@ -85,10 +83,12 @@ public interface ThingRepository extends CrudRepository<Thing, Integer> {
       " JOIN notes_closure ON notes_closure.note_id = note.id "
           + "   AND notes_closure.ancestor_id = :ancestor ";
 
-  String selectThingJoinNote =
-      ", GREATEST(jnote.level, 0) as level from thing "
-          + "INNER JOIN ("
-          + " SELECT note.id as id, rs.level as level FROM note";
+  String selectThingJoinNote = "LEFT JOIN (" + " SELECT note.id as id, rs.level as level FROM note";
+
+  String selectThings =
+      selectThingsJoinLink
+          + byOwnershipWhereThereIsNoReviewPoint
+          + ") jlink ON jlink.id = thing.link_id ";
 
   String selectNoteThings = selectThingJoinNote + joinNotebook + whereNoteThereIsNoReviewPoint;
 
