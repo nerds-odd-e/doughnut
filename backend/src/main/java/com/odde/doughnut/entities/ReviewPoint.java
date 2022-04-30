@@ -18,7 +18,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
-import javax.persistence.Transient;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -45,6 +44,7 @@ public class ReviewPoint {
   @ManyToOne
   @JoinColumn(name = "thing_id")
   @Getter
+  @Setter
   private Thing thing;
 
   @ManyToOne(cascade = CascadeType.PERSIST)
@@ -83,12 +83,6 @@ public class ReviewPoint {
   @Getter
   @Setter
   private Boolean removedFromReview = false;
-
-  @JsonIgnore @Transient @Getter @Setter private Boolean repeatAgainToday = false;
-
-  public void setThing(Thing thing) {
-    this.thing = thing;
-  }
 
   @JsonIgnore
   public Note getNote() {
