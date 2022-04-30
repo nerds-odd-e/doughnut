@@ -8,7 +8,7 @@ in mkShell {
   MYSQL_HOME = builtins.getEnv "MYSQL_HOME";
   MYSQL_DATADIR = builtins.getEnv "MYSQL_DATADIR";
   buildInputs = [
-    nodejs-17_x
+    nodejs-18_x
     yarn
     jdk
     libiconv
@@ -65,7 +65,7 @@ in mkShell {
         export NIXPKGS_ALLOW_UNFREE=1
         export GPG_TTY=$(tty)
         export JAVA_HOME="$(readlink -e $(type -p javac) | sed  -e 's/\/bin\/javac//g')"
-        export NODE_HOME="${pkgs.nodejs-17_x}"
+        export NODE_HOME="${pkgs.nodejs-18_x}"
 
         export MYSQL_BASEDIR=${pkgs.mysql80}
         export MYSQL_HOME="''${MYSQL_HOME:-$PWD/mysql}"
@@ -77,7 +77,7 @@ in mkShell {
         export MYSQLX_TCP_PORT=33090
         #export NODE_OPTIONS="--max-old-space-size=4096" # For MS Windows WSL2 env ONLY
 
-        export PATH=$PATH:$JAVA_HOME/bin:$NODE_HOME/bin:$MYSQL_BASEDIR/bin
+        export PATH=$JAVA_HOME/bin:$NODE_HOME/bin:$MYSQL_BASEDIR/bin:$PATH
 
         echo "###################################################################################################################"
         echo "                                                                                "
@@ -134,5 +134,5 @@ in mkShell {
           fi
         }
         trap cleanup EXIT
-      '';
+  '';
 }
