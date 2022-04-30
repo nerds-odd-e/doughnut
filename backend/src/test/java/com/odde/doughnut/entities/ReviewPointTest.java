@@ -34,7 +34,7 @@ public class ReviewPointTest {
 
   @Test
   void validate() {
-    reviewPoint.setNote(note);
+    reviewPoint.setThing(note.getThing());
     Set<ConstraintViolation<User>> violations = validator.validate(user);
     assertEquals(0, violations.size());
   }

@@ -108,18 +108,6 @@ public class ReviewPoint {
     return this.thing.getNote();
   }
 
-  @JsonIgnore
-  public void setNote(Note note) {
-    this.note = note;
-    if (note != null) this.thing = note.getThing();
-  }
-
-  @JsonIgnore
-  public void setLink(Link link) {
-    this.link = link;
-    if (link != null) this.thing = link.getThing();
-  }
-
   public boolean isInitialReviewOnSameDay(Timestamp currentTime, ZoneId timeZone) {
     return TimestampOperations.getDayId(getInitialReviewedAt(), timeZone)
         == TimestampOperations.getDayId(currentTime, timeZone);

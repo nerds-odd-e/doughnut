@@ -19,12 +19,12 @@ public class ReviewPointBuilder extends EntityBuilder<ReviewPoint> {
   }
 
   public ReviewPointBuilder forNote(Note note) {
-    entity.setNote(note);
+    entity.setThing(note.getThing());
     return this;
   }
 
   public ReviewPointBuilder forLink(Link link) {
-    entity.setLink(link);
+    entity.setThing(link.getThing());
     return this;
   }
 

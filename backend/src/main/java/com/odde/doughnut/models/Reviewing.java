@@ -48,8 +48,7 @@ public class Reviewing {
             thing ->
                 new ReviewPoint() {
                   {
-                    this.setNote(thing.getNote());
-                    this.setLink(thing.getLink());
+                    this.setThing(thing);
                   }
                 });
   }
