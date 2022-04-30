@@ -97,19 +97,6 @@ public class ReviewPoint {
   @Setter
   private Boolean removedFromReview = false;
 
-  @Column(name = "note_id", insertable = false, updatable = false)
-  @Getter
-  private Integer noteId;
-
-  @Column(name = "link_id", insertable = false, updatable = false)
-  @Getter
-  private Integer linkId;
-
-  @Column(name = "user_id", insertable = false, updatable = false)
-  @Getter
-  @JsonIgnore
-  private Integer userId;
-
   @JsonIgnore @Transient @Getter @Setter private Boolean repeatAgainToday = false;
 
   public void setThing(Thing thing) {
@@ -122,16 +109,12 @@ public class ReviewPoint {
   public void setNote(Note note) {
     this.note = note;
     if (note != null) this.thing = note.getThing();
-    this.noteId = null;
-    if (note != null) this.noteId = note.getId();
   }
 
   @JsonIgnore
   public void setLink(Link link) {
     this.link = link;
     if (link != null) this.thing = link.getThing();
-    this.linkId = null;
-    if (link != null) this.linkId = link.getId();
   }
 
   public boolean isInitialReviewOnSameDay(Timestamp currentTime, ZoneId timeZone) {
