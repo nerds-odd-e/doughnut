@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-04-29 09:43:26.
+// Generated using typescript-generator version 2.35.1025 on 2022-04-30 14:50:40.
 
 declare namespace Generated {
 
@@ -33,6 +33,8 @@ declare namespace Generated {
 
     interface InitialInfo {
         reviewPoint: ReviewPoint;
+        noteId?: number;
+        linkId?: number;
         reviewSetting: ReviewSetting;
     }
 
@@ -196,13 +198,12 @@ declare namespace Generated {
         level: number;
     }
 
-    interface Link extends EntityWithId {
+    interface Link extends Thingy {
         sourceNote: Note;
         targetNote: Note;
         typeId: number;
-        createdAt: string;
-        clozeSource: string;
         linkTypeLabel: string;
+        clozeSource: string;
     }
 
     interface TextContent {
@@ -211,14 +212,13 @@ declare namespace Generated {
         updatedAt: string;
     }
 
-    interface Note extends EntityWithId {
+    interface Note extends Thingy {
         noteAccessories: NoteAccessories;
         textContent: TextContent;
-        createdAt: string;
-        title: string;
         pictureWithMask?: PictureWithMask;
-        parentId?: number;
+        title: string;
         shortDescription: string;
+        parentId?: number;
     }
 
     interface Ownership {
@@ -231,8 +231,8 @@ declare namespace Generated {
         dailyTargetOfNewNotes: number;
         user: User;
         notebook: Notebook;
-        title: string;
         headNote: Note;
+        title: string;
         shortDescription: string;
     }
 
@@ -258,8 +258,9 @@ declare namespace Generated {
         pictureMask: string;
     }
 
-    interface EntityWithId {
+    interface Thingy {
         id: number;
+        createdAt: string;
     }
 
     interface NoteAccessories {
