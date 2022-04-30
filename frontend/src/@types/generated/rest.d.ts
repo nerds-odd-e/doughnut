@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-04-30 14:50:40.
+// Generated using typescript-generator version 2.35.1025 on 2022-04-30 14:58:59.
 
 declare namespace Generated {
 
@@ -32,7 +32,6 @@ declare namespace Generated {
     }
 
     interface InitialInfo {
-        reviewPoint: ReviewPoint;
         noteId?: number;
         linkId?: number;
         reviewSetting: ReviewSetting;
@@ -180,18 +179,6 @@ declare namespace Generated {
         question: QuizQuestion;
     }
 
-    interface ReviewPoint {
-        id: number;
-        lastReviewedAt: string;
-        nextReviewAt: string;
-        initialReviewedAt: string;
-        repetitionCount: number;
-        forgettingCurveIndex: number;
-        removedFromReview: boolean;
-        noteId: number;
-        linkId: number;
-    }
-
     interface ReviewSetting {
         id: number;
         rememberSpelling: boolean;
@@ -256,6 +243,18 @@ declare namespace Generated {
     interface PictureWithMask {
         notePicture: string;
         pictureMask: string;
+    }
+
+    interface ReviewPoint {
+        id: number;
+        lastReviewedAt: string;
+        nextReviewAt: string;
+        initialReviewedAt: string;
+        repetitionCount: number;
+        forgettingCurveIndex: number;
+        removedFromReview: boolean;
+        noteId: number;
+        linkId: number;
     }
 
     interface Thingy {

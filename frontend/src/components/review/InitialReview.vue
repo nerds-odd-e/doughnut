@@ -109,7 +109,6 @@ export default defineComponent({
       this.reviewPoint.removedFromReview = skipReview;
       this.storedApi.reviewMethods
         .doInitialReview({
-          reviewPoint: this.reviewPoint,
           noteId: this.reviewPoint.noteId,
           linkId: this.reviewPoint.linkId,
           reviewSetting: this.reviewSetting,

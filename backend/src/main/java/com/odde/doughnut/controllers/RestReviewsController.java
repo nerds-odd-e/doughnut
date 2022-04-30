@@ -75,22 +75,17 @@ class RestReviewsController {
   public ReviewPointViewedByUser create(@RequestBody InitialInfo initialInfo) {
     UserModel userModel = currentUserFetcher.getUser();
     userModel.getAuthorization().assertLoggedIn();
-    if (initialInfo.reviewPoint.getNoteId() != null) {
-      initialInfo.reviewPoint.setNote(
-          modelFactoryService
-              .noteRepository
-              .findById(initialInfo.reviewPoint.getNoteId())
-              .orElse(null));
-    }
-    if (initialInfo.reviewPoint.getLinkId() != null) {
-      initialInfo.reviewPoint.setLink(
-          modelFactoryService
-              .linkRepository
-              .findById(initialInfo.reviewPoint.getLinkId())
-              .orElse(null));
-    }
-    ReviewPointModel reviewPointModel =
-        modelFactoryService.toReviewPointModel(initialInfo.reviewPoint);
+    ReviewPoint reviewPoint = new ReviewPoint();
+
+    initialInfo.noteId.ifPresent(
+        (noteId) ->
+            reviewPoint.setNote(modelFactoryService.noteRepository.findById(noteId).orElse(null)));
+
+    initialInfo.linkId.ifPresent(
+        (linkId) ->
+            reviewPoint.setLink(modelFactoryService.linkRepository.findById(linkId).orElse(null)));
+
+    ReviewPointModel reviewPointModel = modelFactoryService.toReviewPointModel(reviewPoint);
     reviewPointModel.initialReview(
         userModel, initialInfo.reviewSetting, testabilitySettings.getCurrentUTCTimestamp());
     return ReviewPointViewedByUser.from(reviewPointModel.getEntity(), userModel);
