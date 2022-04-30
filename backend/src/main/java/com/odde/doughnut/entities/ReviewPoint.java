@@ -52,7 +52,6 @@ public class ReviewPoint {
   @ManyToOne
   @JoinColumn(name = "thing_id")
   @Getter
-  @JsonIgnore
   private Thing thing;
 
   @ManyToOne
@@ -112,6 +111,12 @@ public class ReviewPoint {
   private Integer userId;
 
   @JsonIgnore @Transient @Getter @Setter private Boolean repeatAgainToday = false;
+
+  public void setThing(Thing thing) {
+    this.thing = thing;
+    this.note = thing.getNote();
+    this.link = thing.getLink();
+  }
 
   @JsonIgnore
   public void setNote(Note note) {

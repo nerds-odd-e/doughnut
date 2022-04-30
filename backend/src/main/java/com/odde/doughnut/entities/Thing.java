@@ -27,6 +27,7 @@ public class Thing {
   private Timestamp createdAt;
 
   @Column(name = "deleted_at")
+  @JsonIgnore
   @Setter
   private Timestamp deletedAt;
 

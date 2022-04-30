@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-04-30 14:58:59.
+// Generated using typescript-generator version 2.35.1025 on 2022-04-30 18:22:31.
 
 declare namespace Generated {
 
@@ -32,8 +32,8 @@ declare namespace Generated {
     }
 
     interface InitialInfo {
-        noteId?: number;
-        linkId?: number;
+        thingId: number;
+        skipReview: boolean;
         reviewSetting: ReviewSetting;
     }
 
@@ -204,8 +204,8 @@ declare namespace Generated {
         textContent: TextContent;
         pictureWithMask?: PictureWithMask;
         title: string;
-        shortDescription: string;
         parentId?: number;
+        shortDescription: string;
     }
 
     interface Ownership {
@@ -247,6 +247,7 @@ declare namespace Generated {
 
     interface ReviewPoint {
         id: number;
+        thing: Thing;
         lastReviewedAt: string;
         nextReviewAt: string;
         initialReviewedAt: string;
@@ -283,6 +284,13 @@ declare namespace Generated {
         headNote: Note;
         skipReviewEntirely: boolean;
         deletedAt: string;
+    }
+
+    interface Thing {
+        id: number;
+        note: Note;
+        link: Link;
+        createdAt: string;
     }
 
     type LinkType = "related to" | "a specialization of" | "an application of" | "an instance of" | "a part of" | "tagged by" | "an attribute of" | "the opposite of" | "author of" | "using" | "an example of" | "before" | "similar to" | "confused with";

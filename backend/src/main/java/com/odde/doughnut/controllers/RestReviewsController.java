@@ -76,14 +76,9 @@ class RestReviewsController {
     UserModel userModel = currentUserFetcher.getUser();
     userModel.getAuthorization().assertLoggedIn();
     ReviewPoint reviewPoint = new ReviewPoint();
-
-    initialInfo.noteId.ifPresent(
-        (noteId) ->
-            reviewPoint.setNote(modelFactoryService.noteRepository.findById(noteId).orElse(null)));
-
-    initialInfo.linkId.ifPresent(
-        (linkId) ->
-            reviewPoint.setLink(modelFactoryService.linkRepository.findById(linkId).orElse(null)));
+    reviewPoint.setThing(
+        modelFactoryService.thingRepository.findById(initialInfo.thingId).orElse(null));
+    reviewPoint.setRemovedFromReview(initialInfo.skipReview);
 
     ReviewPointModel reviewPointModel = modelFactoryService.toReviewPointModel(reviewPoint);
     reviewPointModel.initialReview(

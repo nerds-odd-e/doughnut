@@ -1,11 +1,10 @@
 package com.odde.doughnut.entities.json;
 
 import com.odde.doughnut.entities.ReviewSetting;
-import java.util.Optional;
 import javax.validation.Valid;
 
 public class InitialInfo {
-  public Optional<Integer> noteId;
-  public Optional<Integer> linkId;
+  public Integer thingId;
+  public Boolean skipReview;
   @Valid public ReviewSetting reviewSetting;
 }
