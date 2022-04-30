@@ -3,6 +3,7 @@ package com.odde.doughnut.entities.repositories;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.entities.User;
+import java.util.List;
 import java.util.stream.Stream;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
@@ -41,6 +42,16 @@ public interface ThingRepository extends CrudRepository<Thing, Integer> {
       nativeQuery = true)
   int countByAncestorWhereThereIsNoReviewPoint(
       @Param("user") User user, @Param("ancestor") Note ancestor);
+
+  @Query(
+      value =
+          "SELECT count(1) as count from thing "
+              + selectThingsByAncestor
+              + selectNoteThingsByAncestor
+              + " WHERE (jlink.id IS NOT NULL OR jnote.id IS NOT NULL) AND thing.id in :thingIds",
+      nativeQuery = true)
+  int countByAncestorAndInTheList(
+      @Param("ancestor") Note ancestor, @Param("thingIds") List<Integer> thingIds);
 
   String byAncestorWhereThereIsNoReviewPoint =
       "JOIN notes_closure ON notes_closure.note_id = source_id "

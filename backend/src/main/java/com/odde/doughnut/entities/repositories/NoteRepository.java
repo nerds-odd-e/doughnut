@@ -18,19 +18,9 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
       nativeQuery = true)
   Note findFirstByTitle(@Param("noteTitle") String noteTitle);
 
-  @Query(
-      value = "SELECT count(1) as count from note " + joinClosure + " WHERE note.id in :noteIds",
-      nativeQuery = true)
-  int countByAncestorAndInTheList(
-      @Param("ancestor") Note ancestor, @Param("noteIds") List<Integer> noteIds);
-
   String selectFromNoteJoinTextContent =
       "SELECT note.*  from note JOIN text_content"
           + "   ON note.text_content_id = text_content.id ";
-
-  String joinClosure =
-      " JOIN notes_closure ON notes_closure.note_id = note.id "
-          + "   AND notes_closure.ancestor_id = :ancestor ";
 
   @Query(value = inAllMyNotebooksAndSubscriptions + searchForLinkTarget, nativeQuery = true)
   List<Note> searchForUserInAllMyNotebooksAndSubscriptions(

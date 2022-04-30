@@ -62,4 +62,15 @@ public class Thing {
     thingy.setThing(thing);
     return thingy;
   }
+
+  @JsonIgnore
+  Note getHeadNoteOfNotebook() {
+    Note result;
+    if (getLink() != null) {
+      result = getLink().getSourceNote();
+    } else {
+      result = getNote();
+    }
+    return result.getNotebook().getHeadNote();
+  }
 }

@@ -19,7 +19,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
-import javax.validation.constraints.AssertTrue;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -45,7 +44,6 @@ public class ReviewPoint {
 
   @ManyToOne
   @JoinColumn(name = "note_id")
-  @Getter
   @JsonIgnore
   private Note note;
 
@@ -106,6 +104,11 @@ public class ReviewPoint {
   }
 
   @JsonIgnore
+  public Note getNote() {
+    return this.thing.getNote();
+  }
+
+  @JsonIgnore
   public void setNote(Note note) {
     this.note = note;
     if (note != null) this.thing = note.getThing();
@@ -120,22 +123,6 @@ public class ReviewPoint {
   public boolean isInitialReviewOnSameDay(Timestamp currentTime, ZoneId timeZone) {
     return TimestampOperations.getDayId(getInitialReviewedAt(), timeZone)
         == TimestampOperations.getDayId(currentTime, timeZone);
-  }
-
-  @JsonIgnore
-  public Note getSourceNote() {
-    if (link != null) return link.getSourceNote();
-    return note;
-  }
-
-  @AssertTrue(message = "link and note cannot be both empty")
-  private boolean isNotBothLinkAndNoteEmpty() {
-    return note != null || link != null;
-  }
-
-  @AssertTrue(message = "cannot have both link and note")
-  private boolean isNotBothLinkAndNoteNotEmpty() {
-    return note == null || link == null;
   }
 
   public void updateMemoryState(
@@ -168,5 +155,10 @@ public class ReviewPoint {
       questionTypes.add(QuizQuestion.QuestionType.PICTURE_SELECTION);
     }
     return questionTypes;
+  }
+
+  @JsonIgnore
+  public Note getHeadNote() {
+    return this.thing.getHeadNoteOfNotebook();
   }
 }

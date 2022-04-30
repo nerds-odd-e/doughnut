@@ -27,10 +27,10 @@ public class SubscriptionModel implements ReviewScope {
         entity.getUser(), entity.getHeadNote());
   }
 
-  public int needToLearnCountToday(List<Integer> noteIds) {
+  public int needToLearnCountToday(List<Integer> thingIds) {
     int count =
-        modelFactoryService.noteRepository.countByAncestorAndInTheList(
-            entity.getHeadNote(), noteIds);
+        modelFactoryService.thingRepository.countByAncestorAndInTheList(
+            entity.getHeadNote(), thingIds);
     return entity.getDailyTargetOfNewNotes() - count;
   }
 }
