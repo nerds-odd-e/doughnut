@@ -15,7 +15,6 @@ import com.odde.doughnut.algorithms.ClozeDescription;
 import com.odde.doughnut.entities.QuizQuestion.QuestionType;
 import com.odde.doughnut.models.NoteViewer;
 import java.sql.Timestamp;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -27,7 +26,6 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotNull;
@@ -253,10 +251,6 @@ public class Link extends Thingy {
   @Getter
   @Setter
   private Integer typeId;
-
-  @OneToMany(mappedBy = "link", cascade = CascadeType.ALL, orphanRemoval = true)
-  @JsonIgnore
-  private final List<ReviewPoint> reviewPointEntities = new ArrayList<>();
 
   @JsonIgnore
   public LinkType getLinkType() {

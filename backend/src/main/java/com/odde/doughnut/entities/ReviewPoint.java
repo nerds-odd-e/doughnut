@@ -47,12 +47,6 @@ public class ReviewPoint {
   @Getter
   private Thing thing;
 
-  @ManyToOne
-  @JoinColumn(name = "link_id")
-  @Getter
-  @JsonIgnore
-  private Link link;
-
   @ManyToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "user_id", referencedColumnName = "id")
   @JsonIgnore
@@ -94,12 +88,16 @@ public class ReviewPoint {
 
   public void setThing(Thing thing) {
     this.thing = thing;
-    this.link = thing.getLink();
   }
 
   @JsonIgnore
   public Note getNote() {
     return this.thing.getNote();
+  }
+
+  @JsonIgnore
+  public Link getLink() {
+    return this.thing.getLink();
   }
 
   public boolean isInitialReviewOnSameDay(Timestamp currentTime, ZoneId timeZone) {
