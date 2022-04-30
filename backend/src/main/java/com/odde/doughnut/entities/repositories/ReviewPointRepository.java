@@ -1,8 +1,7 @@
 package com.odde.doughnut.entities.repositories;
 
-import com.odde.doughnut.entities.Link;
-import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.entities.User;
 import java.sql.Timestamp;
 import java.util.List;
@@ -25,11 +24,8 @@ public interface ReviewPointRepository extends CrudRepository<ReviewPoint, Integ
   List<ReviewPoint> findAllByUserAndNextReviewAtLessThanEqualOrderByNextReviewAt(
       @Param("user") User user, @Param("nextReviewAt") Timestamp nextReviewAt);
 
-  @Query(value = "SELECT * " + byUser + "AND rp.note_id =:#{#note.id}", nativeQuery = true)
-  ReviewPoint findByUserAndNote(User user, Note note);
-
-  @Query(value = "SELECT * " + byUser + "AND rp.link_id =:#{#link.id}", nativeQuery = true)
-  ReviewPoint findByUserAndLink(User user, Link link);
+  @Query(value = "SELECT * " + byUser + "AND rp.thing_id =:#{#thing.id}", nativeQuery = true)
+  ReviewPoint findByUserAndThing(User user, Thing thing);
 
   String byUser =
       " FROM review_point rp "

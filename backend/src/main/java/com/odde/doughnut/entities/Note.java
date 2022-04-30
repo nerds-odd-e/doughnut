@@ -67,12 +67,6 @@ public class Note extends Thingy {
   @Setter
   private ReviewSetting masterReviewSetting;
 
-  @OneToMany(mappedBy = "note", cascade = CascadeType.ALL, orphanRemoval = true)
-  @JsonIgnore
-  @Getter
-  @Setter
-  private List<ReviewPoint> reviewPoints = new ArrayList<>();
-
   @OneToMany(mappedBy = "sourceNote", cascade = CascadeType.ALL, orphanRemoval = true)
   @JsonIgnore
   @Getter
