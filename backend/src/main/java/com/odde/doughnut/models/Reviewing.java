@@ -1,14 +1,11 @@
 package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.Thing;
 import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import com.odde.doughnut.entities.json.RepetitionForUser;
 import com.odde.doughnut.entities.json.ReviewStatus;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -43,22 +40,17 @@ public class Reviewing {
   }
 
   private Stream<ReviewPoint> getDueNewReviewPoint(ReviewScope reviewScope, int count) {
-    if (count <= 0) return Stream.of();
-    Iterator<Thing> thingIterator = reviewScope.getThingHaveNotBeenReviewedAtAll().iterator();
-
-    List<ReviewPoint> result = new ArrayList<>();
-    for (int cnt = 0; cnt < count; cnt++) {
-      if (!thingIterator.hasNext()) break;
-      Thing thing;
-      thing = thingIterator.next();
-
-      ReviewPoint reviewPoint = new ReviewPoint();
-      reviewPoint.setNote(thing.getNote());
-      reviewPoint.setLink(thing.getLink());
-
-      result.add(reviewPoint);
-    }
-    return result.stream();
+    return reviewScope
+        .getThingHaveNotBeenReviewedAtAll()
+        .limit(count)
+        .map(
+            thing ->
+                new ReviewPoint() {
+                  {
+                    this.setNote(thing.getNote());
+                    this.setLink(thing.getLink());
+                  }
+                });
   }
 
   private int toRepeatCount() {
