@@ -86,9 +86,7 @@ export default defineComponent({
       return this.reviewPointViewedByUsers.length - this.finished;
     },
     buttonKey() {
-      return !!this.reviewPoint?.noteId
-        ? `note-${this.reviewPoint.noteId}`
-        : `link-${this.reviewPoint?.linkId}`;
+      return this.reviewPoint?.thing?.id;
     },
   },
 
