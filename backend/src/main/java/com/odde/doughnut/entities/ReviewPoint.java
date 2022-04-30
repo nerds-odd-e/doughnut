@@ -113,6 +113,7 @@ public class ReviewPoint {
 
   @JsonIgnore @Transient @Getter @Setter private Boolean repeatAgainToday = false;
 
+  @JsonIgnore
   public void setNote(Note note) {
     this.note = note;
     if (note != null) this.thing = note.getThing();
@@ -120,6 +121,7 @@ public class ReviewPoint {
     if (note != null) this.noteId = note.getId();
   }
 
+  @JsonIgnore
   public void setLink(Link link) {
     this.link = link;
     if (link != null) this.thing = link.getThing();
