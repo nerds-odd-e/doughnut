@@ -12,9 +12,6 @@
       </RepeatProgressBar>
     </div>
     <template v-if="!nested">
-      <div class="alert alert-success" v-if="latestAnswerCorrrect">
-        Correct!
-      </div>
       <QuizQuestion
         v-if="repetition?.quizQuestion"
         v-bind="{
@@ -81,13 +78,6 @@ export default defineComponent({
     reviewPointId() {
       return this.repetition?.reviewPoint;
     },
-    latestAnswer() {
-      if (this.previousResults.length === 0) return;
-      return this.previousResults[this.previousResults.length - 1];
-    },
-    latestAnswerCorrrect() {
-      return this.latestAnswer?.correct;
-    },
   },
   methods: {
     loadNew(resp?: Generated.RepetitionForUser) {
@@ -112,7 +102,7 @@ export default defineComponent({
       this.storedApi.reviewMethods
         .getNextReviewItem()
         .then(this.loadNew)
-        .catch((e) => {
+        .catch(() => {
           this.repetition = undefined;
         });
     },
@@ -135,7 +125,7 @@ export default defineComponent({
           }
           this.viewLastResult(this.previousResults.length - 1);
         })
-        .catch((err) => this.noLongerExist());
+        .catch(() => this.noLongerExist());
     },
   },
 
