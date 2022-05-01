@@ -24,6 +24,7 @@ public class Thing {
 
   @Column(name = "created_at")
   @Setter
+  @Getter
   private Timestamp createdAt;
 
   @Column(name = "deleted_at")
@@ -51,14 +52,13 @@ public class Thing {
   private User user;
 
   static <T extends Thingy> T createThing(User user, T thingy, Timestamp currentUTCTimestamp) {
-    thingy.setCreatedAt(currentUTCTimestamp);
     thingy.setUser(user);
 
     final Thing thing = new Thing();
     if (thingy instanceof Note note) thing.setNote(note);
     if (thingy instanceof Link link) thing.setLink(link);
     thing.setUser(user);
-    thing.setCreatedAt(thingy.getCreatedAt());
+    thing.setCreatedAt(currentUTCTimestamp);
     thingy.setThing(thing);
     return thingy;
   }

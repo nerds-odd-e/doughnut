@@ -27,8 +27,8 @@ public class NoteBuilder extends EntityBuilder<Note> {
         Note.createNote(null, new Timestamp(System.currentTimeMillis()), new TextContent()));
     if (Strings.isEmpty(entity.getTitle())) title(titleCounter.generate());
     description("descrption");
-    updatedAt(entity.getCreatedAt());
-    textContentUpdateAt(entity.getCreatedAt());
+    updatedAt(entity.getThing().getCreatedAt());
+    textContentUpdateAt(entity.getThing().getCreatedAt());
   }
 
   public NoteBuilder byUser(User user) {
@@ -116,11 +116,6 @@ public class NoteBuilder extends EntityBuilder<Note> {
       entity.setMasterReviewSetting(new ReviewSetting());
     }
     entity.getMasterReviewSetting().setRememberSpelling(true);
-    return this;
-  }
-
-  public NoteBuilder createdAt(Timestamp timestamp) {
-    entity.setCreatedAt(timestamp);
     return this;
   }
 

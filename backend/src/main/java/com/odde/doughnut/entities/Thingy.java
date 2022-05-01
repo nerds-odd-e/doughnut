@@ -1,9 +1,7 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import java.sql.Timestamp;
 import javax.persistence.CascadeType;
-import javax.persistence.Column;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -20,11 +18,6 @@ public abstract class Thingy {
   @Getter
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   protected Integer id;
-
-  @Column(name = "created_at")
-  @Getter
-  @Setter
-  protected Timestamp createdAt = new Timestamp(System.currentTimeMillis());
 
   @JsonIgnore
   @ManyToOne(cascade = CascadeType.PERSIST)
