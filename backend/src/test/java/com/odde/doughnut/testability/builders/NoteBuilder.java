@@ -31,19 +31,46 @@ public class NoteBuilder extends EntityBuilder<Note> {
     textContentUpdateAt(entity.getThing().getCreatedAt());
   }
 
-  public NoteBuilder byUser(User user) {
+  public NoteBuilder asHeadNoteOfANotebook() {
+    if (entity.getThing().getUser() == null) {
+      return creatorAndOwner(makeMe.aUser().inMemoryPlease());
+    }
+    return asHeadNoteOfANotebook(entity.getThing().getUser().getOwnership());
+  }
+
+  public NoteBuilder asHeadNoteOfANotebook(Ownership ownership) {
+    if (entity.getNotebook() != null)
+      throw new AssertionError(
+          "Can add note to circle, for `" + entity.toString() + "`, a notebook already exist.");
+    if (entity.getThing().getUser() == null) {
+      return creatorAndOwner(makeMe.aUser().inMemoryPlease());
+    }
+    entity.buildNotebookForHeadNote(ownership, entity.getThing().getUser());
+    return this;
+  }
+
+  public NoteBuilder creatorAndOwner(User user) {
+    if (entity.getNotebook() != null)
+      throw new AssertionError(
+          "Can add creator, for `" + entity.toString() + "`, a notebook already exist.");
+    return creator(user).asHeadNoteOfANotebook();
+  }
+
+  public NoteBuilder creator(User user) {
+    if (entity.getThing().getUser() != null)
+      throw new AssertionError("creator already set for " + entity.toString());
     entity.setUser(user);
     entity.getThing().setUser(user);
     return this;
   }
 
-  public NoteBuilder byUser(UserModel userModel) {
-    return byUser(userModel.getEntity());
+  public NoteBuilder creatorAndOwner(UserModel userModel) {
+    return creatorAndOwner(userModel.getEntity());
   }
 
   public NoteBuilder under(Note parentNote) {
     entity.setParentNote(parentNote);
-    byUser(parentNote.getThing().getUser());
+    if (entity.getThing().getUser() == null) creator(parentNote.getThing().getUser());
     return this;
   }
 
@@ -61,27 +88,14 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   public NoteBuilder inCircle(Circle circle) {
-    if(entity.getNotebook() != null) throw new AssertionError("Can add note to circle, for `" + entity.toString() + "`, a notebook already exist.");
-    entity.buildNotebookForHeadNote(circle.getOwnership(), entity.getUser());
-    return this;
+    return asHeadNoteOfANotebook(circle.getOwnership());
   }
 
   @Override
   protected void beforeCreate(boolean needPersist) {
-    if (entity.getNotebook() != null) {
-      return;
+    if (entity.getThing().getUser() == null) {
+      creator(makeMe.aUser().please(needPersist));
     }
-    if (entity.getUser() == null) {
-      Note parent = entity.getParentNote();
-      if (parent != null && parent.getUser() != null) {
-        byUser(parent.getUser());
-      } else {
-        byUser(makeMe.aUser().please(needPersist));
-      }
-    }
-
-    Ownership ownership = entity.getUser().getOwnership();
-    entity.buildNotebookForHeadNote(ownership, entity.getUser());
   }
 
   public NoteBuilder skipReview() {

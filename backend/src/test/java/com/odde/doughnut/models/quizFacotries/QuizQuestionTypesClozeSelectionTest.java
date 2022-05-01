@@ -11,7 +11,6 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.LinkViewed;
 import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
-import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.List;
 import java.util.Map;
@@ -29,12 +28,6 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 class QuizQuestionTypesClozeSelectionTest {
   @Autowired MakeMe makeMe;
-  UserModel userModel;
-
-  @BeforeEach
-  void setup() {
-    userModel = makeMe.aUser().toModelPlease();
-  }
 
   @Nested
   class ClozeQuestion {
@@ -45,9 +38,9 @@ class QuizQuestionTypesClozeSelectionTest {
 
     @BeforeEach
     void setup() {
-      top = makeMe.aNote().please();
-      note1 = makeMe.aNote("target").under(top).byUser(userModel).please();
-      note2 = makeMe.aNote("source").under(top).byUser(userModel).please();
+      top = makeMe.aHeadNote().please();
+      note1 = makeMe.aNote("target").under(top).please();
+      note2 = makeMe.aNote("source").under(top).please();
       reviewPoint = makeMe.aReviewPointFor(note1).inMemoryPlease();
     }
 

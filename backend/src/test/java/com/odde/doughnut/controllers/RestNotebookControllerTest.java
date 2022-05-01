@@ -39,7 +39,7 @@ class RestNotebookControllerTest {
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
-    topNote = makeMe.aNote().byUser(userModel).please();
+    topNote = makeMe.aNote().creatorAndOwner(userModel).please();
     controller =
         new RestNotebookController(
             modelFactoryService, new TestCurrentUserFetcher(userModel), testabilitySettings);
@@ -81,7 +81,7 @@ class RestNotebookControllerTest {
     @Test
     void shouldNotBeAbleToShareNoteThatBelongsToOtherUser() {
       User anotherUser = makeMe.aUser().please();
-      Note note = makeMe.aNote().byUser(anotherUser).please();
+      Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
       assertThrows(NoAccessRightException.class, () -> controller.shareNote(note.getNotebook()));
     }
   }
@@ -91,7 +91,7 @@ class RestNotebookControllerTest {
     @Test
     void shouldNotBeAbleToUpdateNotebookThatBelongsToOtherUser() {
       User anotherUser = makeMe.aUser().please();
-      Note note = makeMe.aNote().byUser(anotherUser).please();
+      Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
       assertThrows(NoAccessRightException.class, () -> controller.update(note.getNotebook()));
     }
   }

@@ -38,7 +38,7 @@ public class UserModelAuthorityTest {
     @BeforeEach
     void setup() {
       circleModel = makeMe.aCircle().toModelPlease();
-      note = makeMe.aNote().byUser(makeMe.aUser().please()).inCircle(circleModel).please();
+      note = makeMe.aNote().creator(makeMe.aUser().please()).inCircle(circleModel).please();
     }
 
     @Test
@@ -59,7 +59,7 @@ public class UserModelAuthorityTest {
 
     @BeforeEach
     void setup() {
-      note = makeMe.aNote().please();
+      note = makeMe.aHeadNote().please();
     }
 
     @Test

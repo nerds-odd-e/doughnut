@@ -31,6 +31,14 @@ public class MakeMe {
     return aNote().title(title);
   }
 
+  public NoteBuilder aHeadNote() {
+    return aNote().asHeadNoteOfANotebook();
+  }
+
+  public NoteBuilder aHeadNote(String title) {
+    return aHeadNote().title(title);
+  }
+
   public NoteBuilder aNote(String title, String description) {
     return aNote().title(title).description(description);
   }

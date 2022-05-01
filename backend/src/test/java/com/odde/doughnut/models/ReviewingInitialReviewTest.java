@@ -50,7 +50,7 @@ public class ReviewingInitialReviewTest {
 
   @Test
   void whenThereIsNoNotesForUser() {
-    makeMe.aNote().byUser(anotherUser).please();
+    makeMe.aNote().creatorAndOwner(anotherUser).please();
     assertThat(getOneInitialReviewPoint(reviewingOnDay1), is(nullValue()));
     assertThat(reviewingOnDay1.getReviewStatus().toInitialReviewCount, equalTo(0));
   }
@@ -62,8 +62,8 @@ public class ReviewingInitialReviewTest {
 
     @BeforeEach
     void setup() {
-      note1 = makeMe.aNote("note1").byUser(userModel).please();
-      note2 = makeMe.aNote("note2").byUser(userModel).please();
+      note1 = makeMe.aNote("note1").creatorAndOwner(userModel).please();
+      note2 = makeMe.aNote("note2").creatorAndOwner(userModel).please();
       makeMe.refresh(userModel.getEntity());
     }
 
@@ -99,7 +99,7 @@ public class ReviewingInitialReviewTest {
         note1ToNote2 = makeMe.aLink().between(note1, note2).please();
         makeMe.aReviewSettingFor(note1).level(5).please();
         makeMe.aReviewSettingFor(note2).level(2).please();
-        anotherNote = makeMe.aNote("another note").byUser(userModel).please();
+        anotherNote = makeMe.aNote("another note").creatorAndOwner(userModel).please();
         makeMe.refresh(userModel.getEntity());
       }
 
@@ -191,7 +191,7 @@ public class ReviewingInitialReviewTest {
     @BeforeEach
     void setup() {
       User anotherUser = makeMe.aUser().please();
-      Note top = makeMe.aNote().byUser(anotherUser).please();
+      Note top = makeMe.aNote().creatorAndOwner(anotherUser).please();
       note1 = makeMe.aNote().under(top).please();
       note2 = makeMe.aNote().under(top).please();
       makeMe.aSubscription().forNotebook(top.getNotebook()).forUser(userModel.entity).please();
@@ -219,7 +219,7 @@ public class ReviewingInitialReviewTest {
     @BeforeEach
     void setup() {
       Circle please = makeMe.aCircle().hasMember(userModel).please();
-      top = makeMe.aNote().byUser(userModel).inCircle(please).please();
+      top = makeMe.aNote().inCircle(please).please();
       makeMe.refresh(userModel.getEntity());
     }
 

@@ -26,7 +26,7 @@ public class LinkBuilder extends EntityBuilder<Link> {
     entity.setTargetNote(to);
     entity.setSourceNote(from);
     entity.setLinkType(linkType);
-    setUser(from.getUser());
+    setUser(from.getThing().getUser());
     from.getLinks().add(entity);
     to.getRefers().add(entity);
     return this;

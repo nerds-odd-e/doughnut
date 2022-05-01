@@ -33,7 +33,7 @@ public class NoteMotionModelTest {
 
   @BeforeEach
   void setup() {
-    topNote = makeMe.aNote("topNote").please();
+    topNote = makeMe.aHeadNote("topNote").please();
     firstChild = makeMe.aNote("firstChild").under(topNote).please();
     secondChild = makeMe.aNote("secondChild").under(topNote).please();
     makeMe.refresh(topNote);

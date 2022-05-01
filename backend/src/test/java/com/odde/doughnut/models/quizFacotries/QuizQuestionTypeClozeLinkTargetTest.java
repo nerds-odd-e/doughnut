@@ -33,7 +33,7 @@ class ClozeLinkTargetQuizFactoryTest {
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
-    top = makeMe.aNote().byUser(userModel).please();
+    top = makeMe.aNote().creatorAndOwner(userModel).please();
     target = makeMe.aNote("rome").under(top).please();
     source = makeMe.aNote("Rome is not built in a day").under(top).linkTo(target).please();
     reviewPoint = makeMe.aReviewPointFor(source.getLinks().get(0)).inMemoryPlease();

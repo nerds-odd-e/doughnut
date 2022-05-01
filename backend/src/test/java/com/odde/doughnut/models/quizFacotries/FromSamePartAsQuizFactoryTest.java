@@ -46,7 +46,7 @@ class FromSamePartAsQuizFactoryTest {
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
-    top = makeMe.aNote("top").byUser(userModel).please();
+    top = makeMe.aNote("top").creatorAndOwner(userModel).please();
     perspective = makeMe.aNote("perspective").under(top).please();
     subjective = makeMe.aNote("subjective").under(top).please();
     objective = makeMe.aNote("objective").under(top).please();

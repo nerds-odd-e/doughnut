@@ -37,7 +37,7 @@ class LinkTargetQuizFactoryTest {
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
-    top = makeMe.aNote().byUser(userModel).please();
+    top = makeMe.aNote().creatorAndOwner(userModel).please();
     target = makeMe.aNote("target").under(top).please();
     source = makeMe.aNote("source").under(top).linkTo(target).please();
     anotherTarget = makeMe.aNote("another note").under(top).please();

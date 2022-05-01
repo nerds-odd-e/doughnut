@@ -39,7 +39,7 @@ class LinkSourceQuizFactoryTest {
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
-    top = makeMe.aNote().byUser(userModel).please();
+    top = makeMe.aNote().creatorAndOwner(userModel).please();
     target = makeMe.aNote("sauce").under(top).please();
     source = makeMe.aNote("tomato sauce").under(top).linkTo(target).please();
     anotherSource = makeMe.aNote("blue cheese").under(top).please();

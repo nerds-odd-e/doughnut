@@ -70,7 +70,7 @@ class RestReviewsControllerTests {
   class initalReview {
     @Test
     void initialReview() {
-      Note n = makeMe.aNote().byUser(userModel).please();
+      Note n = makeMe.aNote().creatorAndOwner(userModel).please();
       makeMe.refresh(n);
       assertThat(n.getThing().getId(), notNullValue());
       List<ReviewPointViewedByUser> reviewPointViewedByUsers = controller().initialReview();

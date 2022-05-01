@@ -26,7 +26,7 @@ public class NoteWithPositionTest {
 
     @BeforeEach
     void thereAreTwoNotesWithALinkInBetween() {
-      Note top = makeMe.aNote().inMemoryPlease();
+      Note top = makeMe.aHeadNote().inMemoryPlease();
       note1 = makeMe.aNote().under(top).description("note1description").inMemoryPlease();
       value =
           new NoteWithPosition() {

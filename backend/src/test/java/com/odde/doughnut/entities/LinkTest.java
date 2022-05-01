@@ -37,7 +37,7 @@ public class LinkTest {
 
     @BeforeEach
     void setup() {
-      Note top = makeMe.aNote().please();
+      Note top = makeMe.aHeadNote().please();
       noteA = makeMe.aNote("noteA").under(top).please();
       noteB = makeMe.aNote("noteB").under(top).please();
     }
@@ -107,19 +107,19 @@ public class LinkTest {
     @BeforeEach
     void setup() {
       user = makeMe.aUser().please();
-      target = makeMe.aNote().byUser(user).please();
+      target = makeMe.aNote().creatorAndOwner(user).please();
     }
 
     @Test
     void shouldGetReversedLinkIfItBelongsToTheUser() {
-      Note source = makeMe.aNote().byUser(user).please();
+      Note source = makeMe.aNote().creatorAndOwner(user).please();
       assertTrue(hasReverseLinkFor(source, user));
     }
 
     @Test
     void shouldNotGetReversedLinkIfItDoesNotBelongsToTheUser() {
       User anotherUser = makeMe.aUser().please();
-      Note source = makeMe.aNote().byUser(anotherUser).please();
+      Note source = makeMe.aNote().creatorAndOwner(anotherUser).please();
       assertFalse(hasReverseLinkFor(source, user));
     }
 

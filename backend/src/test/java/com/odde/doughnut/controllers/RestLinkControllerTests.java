@@ -55,8 +55,8 @@ class RestLinkControllerTests {
     @BeforeEach
     void setup() {
       otherUser = makeMe.aUser().please();
-      note1 = makeMe.aNote().byUser(otherUser).please();
-      note2 = makeMe.aNote().byUser(otherUser).linkTo(note1).please();
+      note1 = makeMe.aNote().creatorAndOwner(otherUser).please();
+      note2 = makeMe.aNote().creatorAndOwner(otherUser).linkTo(note1).please();
       link = note2.getLinks().get(0);
     }
 
@@ -85,8 +85,8 @@ class RestLinkControllerTests {
     @Test
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
       User otherUser = makeMe.aUser().please();
-      Note note1 = makeMe.aNote().byUser(otherUser).please();
-      Note note2 = makeMe.aNote().byUser(otherUser).linkTo(note1).please();
+      Note note1 = makeMe.aNote().creatorAndOwner(otherUser).please();
+      Note note2 = makeMe.aNote().creatorAndOwner(otherUser).linkTo(note1).please();
       Link link = note2.getLinks().get(0);
       assertThrows(NoAccessRightException.class, () -> controller().statistics(link));
     }
@@ -102,8 +102,8 @@ class RestLinkControllerTests {
     @BeforeEach
     void setup() {
       anotherUser = makeMe.aUser().please();
-      note1 = makeMe.aNote().byUser(anotherUser).please();
-      note2 = makeMe.aNote().byUser(userModel).please();
+      note1 = makeMe.aNote().creatorAndOwner(anotherUser).please();
+      note2 = makeMe.aNote().creatorAndOwner(userModel).please();
       linkRequest.typeId = 1;
       linkRequest.moveUnder = true;
     }
@@ -111,7 +111,7 @@ class RestLinkControllerTests {
     @Test
     void createdSuccessfully()
         throws CyclicLinkDetectedException, BindException, NoAccessRightException {
-      Note note3 = makeMe.aNote().byUser(userModel).please();
+      Note note3 = makeMe.aNote().creatorAndOwner(userModel).please();
       long beforeThingCount = makeMe.modelFactoryService.thingRepository.count();
       controller().linkNoteFinalize(note3, note2, linkRequest, makeMe.successfulBindingResult());
       long afterThingCount = makeMe.modelFactoryService.thingRepository.count();

@@ -54,14 +54,14 @@ class RestNoteControllerTests {
     @Test
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
       User otherUser = makeMe.aUser().please();
-      Note note = makeMe.aNote().byUser(otherUser).please();
+      Note note = makeMe.aNote().creatorAndOwner(otherUser).please();
       assertThrows(NoAccessRightException.class, () -> controller.show(note));
     }
 
     @Test
     void shouldReturnTheNoteInfoIfHavingReadingAuth() throws NoAccessRightException {
       User otherUser = makeMe.aUser().please();
-      Note note = makeMe.aNote().byUser(otherUser).please();
+      Note note = makeMe.aNote().creatorAndOwner(otherUser).please();
       makeMe.aBazaarNodebook(note.getNotebook()).please();
       makeMe.refresh(userModel.getEntity());
       final NotesBulk show = controller.show(note);
@@ -71,7 +71,7 @@ class RestNoteControllerTests {
 
     @Test
     void shouldBeAbleToSeeOwnNote() throws NoAccessRightException {
-      Note note = makeMe.aNote().byUser(userModel).please();
+      Note note = makeMe.aNote().creatorAndOwner(userModel).please();
       makeMe.refresh(userModel.getEntity());
       final NotesBulk show = controller.show(note);
       assertThat(show.notes.get(0).getId(), equalTo(note.getId()));
@@ -80,8 +80,8 @@ class RestNoteControllerTests {
 
     @Test
     void shouldBeAbleToSeeOwnNoteOverview() throws NoAccessRightException {
-      Note note = makeMe.aNote().byUser(userModel).please();
-      Note childNote = makeMe.aNote().byUser(userModel).under(note).please();
+      Note note = makeMe.aNote().creatorAndOwner(userModel).please();
+      Note childNote = makeMe.aNote().creatorAndOwner(userModel).under(note).please();
       makeMe.theNote(childNote).with10Children().please();
       makeMe.refresh(note);
       makeMe.refresh(childNote);
@@ -97,14 +97,14 @@ class RestNoteControllerTests {
     @Test
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
       User otherUser = makeMe.aUser().please();
-      Note note = makeMe.aNote().byUser(otherUser).please();
+      Note note = makeMe.aNote().creatorAndOwner(otherUser).please();
       assertThrows(NoAccessRightException.class, () -> controller.statistics(note));
     }
 
     @Test
     void shouldReturnTheNoteInfoIfHavingReadingAuth() throws NoAccessRightException {
       User otherUser = makeMe.aUser().please();
-      Note note = makeMe.aNote().byUser(otherUser).please();
+      Note note = makeMe.aNote().creatorAndOwner(otherUser).please();
       makeMe
           .aSubscription()
           .forUser(userModel.getEntity())
@@ -122,7 +122,7 @@ class RestNoteControllerTests {
 
     @BeforeEach
     void setup() {
-      parent = makeMe.aNote().byUser(userModel).please();
+      parent = makeMe.aNote().creatorAndOwner(userModel).please();
       Note newNote = makeMe.aNote().inMemoryPlease();
       noteCreation.setTextContent(newNote.getTextContent());
     }
@@ -148,7 +148,7 @@ class RestNoteControllerTests {
 
     @BeforeEach
     void setup() {
-      note = makeMe.aNote("new").byUser(userModel).please();
+      note = makeMe.aNote("new").creatorAndOwner(userModel).please();
     }
 
     @Test
@@ -182,16 +182,16 @@ class RestNoteControllerTests {
 
     @BeforeEach
     void setup() {
-      parent = makeMe.aNote().byUser(userModel).please();
-      subject = makeMe.aNote().under(parent).byUser(userModel).please();
-      child = makeMe.aNote("child").under(subject).byUser(userModel).please();
+      parent = makeMe.aNote().creatorAndOwner(userModel).please();
+      subject = makeMe.aNote().under(parent).please();
+      child = makeMe.aNote("child").under(subject).please();
       makeMe.refresh(subject);
     }
 
     @Test
     void shouldNotBeAbleToDeleteNoteThatBelongsToOtherUser() {
       User anotherUser = makeMe.aUser().please();
-      Note note = makeMe.aNote().byUser(anotherUser).please();
+      Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
       assertThrows(NoAccessRightException.class, () -> controller.deleteNote(note));
     }
 
@@ -205,7 +205,7 @@ class RestNoteControllerTests {
 
     @Test
     void shouldDeleteTheChildNoteButNotSibling() throws NoAccessRightException {
-      makeMe.aNote("silbling").under(parent).byUser(userModel).please();
+      makeMe.aNote("silbling").under(parent).please();
       controller.deleteNote(subject);
       makeMe.refresh(parent);
       assertThat(parent.getChildren(), hasSize(1));
@@ -248,7 +248,7 @@ class RestNoteControllerTests {
 
     @Test
     void shouldCreateComment() throws NoAccessRightException {
-      Note note = makeMe.aNote().byUser(userModel).please();
+      Note note = makeMe.aNote().creatorAndOwner(userModel).please();
       controller.createComment(note);
       List<Comment> comments = makeMe.modelFactoryService.commentRepository.findAllByNote(note);
       assertThat(comments, hasSize(1));
@@ -257,7 +257,7 @@ class RestNoteControllerTests {
     @Test
     void shouldNotBeAbleToAddCommentToNoteTheUserCannotSee() {
       User anotherUser = makeMe.aUser().please();
-      Note note = makeMe.aNote().byUser(anotherUser).please();
+      Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
       assertThrows(NoAccessRightException.class, () -> controller.createComment(note));
     }
   }

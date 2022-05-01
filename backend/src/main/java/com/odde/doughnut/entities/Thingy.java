@@ -22,7 +22,6 @@ public abstract class Thingy {
   @JsonIgnore
   @ManyToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "user_id", referencedColumnName = "id")
-  @Getter
   @Setter
   protected User user;
 

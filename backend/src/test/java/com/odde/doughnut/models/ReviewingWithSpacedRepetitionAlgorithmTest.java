@@ -44,7 +44,7 @@ public class ReviewingWithSpacedRepetitionAlgorithmTest {
 
     @BeforeEach
     void setup() {
-      note = makeMe.aNote().byUser(userModel).please();
+      note = makeMe.aNote().creatorAndOwner(userModel).please();
     }
 
     @Test

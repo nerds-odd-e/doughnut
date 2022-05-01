@@ -26,8 +26,8 @@ public class ReviewPointTest {
   @BeforeEach
   void setup() {
     user = makeMe.aUser().please();
-    note = makeMe.aNote().byUser(user).please();
-    Note note2 = makeMe.aNote().byUser(user).linkTo(note).please();
+    note = makeMe.aNote().creatorAndOwner(user).please();
+    Note note2 = makeMe.aNote().creatorAndOwner(user).linkTo(note).please();
     link = note2.getLinks().get(0);
     reviewPoint.setUser(user);
   }

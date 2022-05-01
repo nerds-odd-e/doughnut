@@ -48,7 +48,7 @@ class RestTextContentControllerTests {
 
     @BeforeEach
     void setup() {
-      note = makeMe.aNote("new").byUser(userModel).please();
+      note = makeMe.aNote("new").creatorAndOwner(userModel).please();
       textContent.setTitle("new title");
       textContent.setDescription("new description");
     }
@@ -62,7 +62,7 @@ class RestTextContentControllerTests {
 
     @Test
     void shouldNotAllowOthersToChange() {
-      note = makeMe.aNote("another").byUser(makeMe.aUser().please()).please();
+      note = makeMe.aNote("another").creatorAndOwner(makeMe.aUser().please()).please();
       assertThrows(NoAccessRightException.class, () -> controller.updateNote(note, textContent));
     }
   }

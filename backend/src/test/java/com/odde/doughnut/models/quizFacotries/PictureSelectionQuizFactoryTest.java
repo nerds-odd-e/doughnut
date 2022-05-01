@@ -40,7 +40,7 @@ class PictureSelectionQuizFactoryTest {
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
-    top = makeMe.aNote().byUser(userModel).please();
+    top = makeMe.aNote().creatorAndOwner(userModel).please();
     father = makeMe.aNote("second level").under(top).please();
     uncle = makeMe.aNote("uncle").under(top).please();
     source = makeMe.aNote("source").under(father).please();

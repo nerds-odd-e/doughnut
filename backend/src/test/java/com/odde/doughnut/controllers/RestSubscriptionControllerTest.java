@@ -36,7 +36,7 @@ class RestSubscriptionControllerTest {
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
-    topNote = makeMe.aNote().byUser(userModel).please();
+    topNote = makeMe.aNote().creatorAndOwner(userModel).please();
     notebook = topNote.getNotebook();
     makeMe.aBazaarNodebook(topNote.getNotebook()).please();
     controller =
@@ -54,7 +54,7 @@ class RestSubscriptionControllerTest {
 
   @Test
   void notAllowToSubscribeToNoneBazaarNote() {
-    Note anotherNote = makeMe.aNote().byUser(makeMe.aUser().please()).please();
+    Note anotherNote = makeMe.aNote().creatorAndOwner(makeMe.aUser().please()).please();
     Subscription subscription = makeMe.aSubscription().inMemoryPlease();
     assertThrows(
         NoAccessRightException.class,

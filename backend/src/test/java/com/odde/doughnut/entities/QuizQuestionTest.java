@@ -40,13 +40,13 @@ class QuizQuestionTest {
 
   @Test
   void aNoteWithNoDescriptionHasNoQuiz() {
-    Note note = makeMe.aNote().withNoDescription().byUser(userModel).please();
+    Note note = makeMe.aNote().withNoDescription().creatorAndOwner(userModel).please();
     assertThat(getQuizQuestion(note), nullValue());
   }
 
   @Test
   void useClozeDescription() {
-    Note top = makeMe.aNote().please();
+    Note top = makeMe.aHeadNote().please();
     makeMe.aNote().under(top).please();
     Note note = makeMe.aNote().under(top).title("abc").description("abc has 3 letters").please();
     makeMe.refresh(top);
@@ -68,14 +68,14 @@ class QuizQuestionTest {
 
     @Test
     void aNoteWithNoSiblingsShouldDoJustReview() {
-      Note note = makeMe.aNote().please();
+      Note note = makeMe.aHeadNote().please();
       QuizQuestionViewedByUser quizQuestion = getQuizQuestion(note);
       assertThat(quizQuestion, nullValue());
     }
 
     @Test
     void aNoteWithOneSibling() {
-      Note top = makeMe.aNote().please();
+      Note top = makeMe.aHeadNote().please();
       Note note1 = makeMe.aNote().under(top).please();
       Note note2 = makeMe.aNote().under(top).please();
       makeMe.refresh(top);
@@ -85,7 +85,7 @@ class QuizQuestionTest {
 
     @Test
     void aNoteWithManySiblings() {
-      Note top = makeMe.aNote().please();
+      Note top = makeMe.aHeadNote().please();
       makeMe.theNote(top).with10Children().please();
       Note note = makeMe.aNote().under(top).please();
       makeMe.refresh(top);
@@ -101,7 +101,7 @@ class QuizQuestionTest {
 
     @BeforeEach
     void setup() {
-      Note top = makeMe.aNote().please();
+      Note top = makeMe.aHeadNote().please();
       note = makeMe.aNote().under(top).rememberSpelling().please();
       makeMe.aNote("a necessary sibling as filling option").under(top).please();
       makeMe.refresh(top);

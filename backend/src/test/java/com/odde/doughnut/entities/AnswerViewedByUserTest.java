@@ -27,7 +27,7 @@ class AnswerViewedByUserTest {
     @BeforeEach
     void setup() {
       User user = makeMe.aUser().please();
-      Note top = makeMe.aNote().byUser(user).please();
+      Note top = makeMe.aNote().creatorAndOwner(user).please();
       note = makeMe.aNote("this / that").description("description").under(top).please();
       makeMe.aNote().under(top).please();
       reviewPoint = makeMe.aReviewPointFor(note).by(user).please();

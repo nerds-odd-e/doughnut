@@ -40,7 +40,7 @@ class WhichSpecHasInstanceQuizFactoryTest {
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
-    top = makeMe.aNote("top").byUser(userModel).please();
+    top = makeMe.aNote("top").creatorAndOwner(userModel).please();
     target = makeMe.aNote("element").under(top).please();
     source = makeMe.aNote("noble gas").under(top).linkTo(target, Link.LinkType.SPECIALIZE).please();
     anotherSource = makeMe.aNote("non-official name").under(top).please();

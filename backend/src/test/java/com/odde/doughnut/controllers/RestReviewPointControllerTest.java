@@ -41,7 +41,7 @@ class RestReviewPointControllerTest {
 
     @BeforeEach
     void setup() {
-      rp = makeMe.aReviewPointFor(makeMe.aNote().please()).by(userModel).please();
+      rp = makeMe.aReviewPointFor(makeMe.aHeadNote().please()).by(userModel).please();
     }
 
     @Test
