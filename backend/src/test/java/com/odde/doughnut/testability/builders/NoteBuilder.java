@@ -61,13 +61,16 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   public NoteBuilder inCircle(Circle circle) {
-    buildNotebookUnlessExist();
-    entity.getNotebook().setOwnership(circle.getOwnership());
+    if(entity.getNotebook() != null) throw new AssertionError("Can add note to circle, for `" + entity.toString() + "`, a notebook already exist.");
+    entity.buildNotebookForHeadNote(circle.getOwnership(), entity.getUser());
     return this;
   }
 
   @Override
   protected void beforeCreate(boolean needPersist) {
+    if (entity.getNotebook() != null) {
+      return;
+    }
     if (entity.getUser() == null) {
       Note parent = entity.getParentNote();
       if (parent != null && parent.getUser() != null) {
@@ -77,16 +80,12 @@ public class NoteBuilder extends EntityBuilder<Note> {
       }
     }
 
-    buildNotebookUnlessExist();
+    Ownership ownership = entity.getUser().getOwnership();
+    entity.buildNotebookForHeadNote(ownership, entity.getUser());
   }
 
   public NoteBuilder skipReview() {
     entity.getNoteAccessories().setSkipReview(true);
-    return this;
-  }
-
-  public NoteBuilder cancelSkipReview() {
-    entity.getNoteAccessories().setSkipReview(false);
     return this;
   }
 
@@ -148,17 +147,6 @@ public class NoteBuilder extends EntityBuilder<Note> {
 
   public void withUploadedPicture() {
     entity.getNoteAccessories().setUploadPicture(makeMe.anImage().please());
-  }
-
-  private void buildNotebookUnlessExist() {
-    if (entity.getNotebook() != null) {
-      return;
-    }
-    Ownership ownership = null;
-    if (entity.getUser() != null) {
-      ownership = entity.getUser().getOwnership();
-    }
-    entity.buildNotebookForHeadNote(ownership, entity.getUser());
   }
 
   public NoteBuilder notebookOwnership(User user) {
