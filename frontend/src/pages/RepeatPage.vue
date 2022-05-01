@@ -1,42 +1,43 @@
 <template>
   <ContainerPage v-bind="{ loading, contentExists: true }">
-        <div :class="pausing ? 'repeat-paused' : ''">
-          <RepeatProgressBar
-            v-bind="{
-              finished,
-              toRepeatCount,
-              previousResultCursor,
-            }"
-            @viewLastResult="viewLastResult($event)"
-          >
-          </RepeatProgressBar>
-        </div>
-      <template v-if="!nested">
-        <div class="alert alert-success" v-if="latestAnswerCorrrect">Correct!</div>
-        <QuizQuestion
-          v-if="repetition?.quizQuestion"
+    <div :class="currentResult ? 'repeat-paused' : ''">
+      <RepeatProgressBar
+        v-bind="{
+          finished,
+          toRepeatCount,
+          previousResultCursor,
+        }"
+        @viewLastResult="viewLastResult($event)"
+      >
+      </RepeatProgressBar>
+    </div>
+    <template v-if="!nested">
+      <div class="alert alert-success" v-if="latestAnswerCorrrect">
+        Correct!
+      </div>
+      <QuizQuestion
+        v-if="repetition?.quizQuestion"
+        v-bind="{
+          quizQuestion: repetition?.quizQuestion,
+        }"
+        @answer="processAnswer($event)"
+        :key="reviewPointId"
+      />
+      <template v-else-if="repetition?.reviewPoint">
+        <ReviewPointAsync
           v-bind="{
-            quizQuestion: repetition?.quizQuestion,
+            reviewPointId,
           }"
-          @answer="processAnswer($event)"
-          :key="reviewPointId"
+          @selfEvaluated="fetchData"
+          :key="repetition?.reviewPoint"
         />
-        <template v-else-if="repetition?.reviewPoint">
-          <ReviewPointAsync
-            v-bind="{
-              reviewPointId
-            }"
-            @selfEvaluated="fetchData"
-            :key="repetition?.reviewPoint"
-          />
-
-        </template>
-        <template v-else>
-            <div class="alert alert-success">
-              You have finished all repetitions for this half a day!
-            </div>
-        </template>
       </template>
+      <template v-else>
+        <div class="alert alert-success">
+          You have finished all repetitions for this half a day!
+        </div>
+      </template>
+    </template>
   </ContainerPage>
 </template>
 
@@ -70,21 +71,22 @@ export default defineComponent({
     };
   },
   computed: {
-    pausing() {
-      return this.previousResultCursor !== undefined
+    currentResult() {
+      if (this.previousResultCursor === undefined) return undefined;
+      return this.previousResults[this.previousResultCursor];
     },
     finished() {
-      return this.previousResults.length
+      return this.previousResults.length;
     },
     reviewPointId() {
       return this.repetition?.reviewPoint;
     },
     latestAnswer() {
-      if(this.previousResults.length === 0) return
-      return this.previousResults[this.previousResults.length - 1]
+      if (this.previousResults.length === 0) return;
+      return this.previousResults[this.previousResults.length - 1];
     },
     latestAnswerCorrrect() {
-      return this.latestAnswer?.correct
+      return this.latestAnswer?.correct;
     },
   },
   methods: {
@@ -97,12 +99,11 @@ export default defineComponent({
     },
 
     viewLastResult(cursor: number | undefined) {
-      if(cursor === undefined) return
-      this.previousResultCursor = cursor
-      if(this.pausing) {
-        const answerId = this.previousResults[this.previousResultCursor].answerId;
+      this.previousResultCursor = cursor;
+      if (this.currentResult) {
+        const { answerId } = this.currentResult;
         this.$router.push({ name: "repeat-answer", params: { answerId } });
-        return
+        return;
       }
       this.$router.push({ name: "repeat" });
     },
@@ -112,7 +113,7 @@ export default defineComponent({
         .getNextReviewItem()
         .then(this.loadNew)
         .catch((e) => {
-          this.repetition = undefined
+          this.repetition = undefined;
         });
     },
 
@@ -132,11 +133,10 @@ export default defineComponent({
           if (res.correct) {
             return;
           }
-          this.viewLastResult(this.previousResults.length - 1)
+          this.viewLastResult(this.previousResults.length - 1);
         })
         .catch((err) => this.noLongerExist());
     },
-
   },
 
   mounted() {
