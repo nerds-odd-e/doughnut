@@ -2,12 +2,10 @@ package com.odde.doughnut.entities;
 
 import static java.util.stream.Collectors.toList;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.containsInRelativeOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -117,37 +115,6 @@ public class NoteTest {
 
     private Set<ConstraintViolation<Note>> getViolations() {
       return validator.validate(note);
-    }
-  }
-
-  @Nested
-  class NoteWithUser {
-
-    @BeforeEach
-    void setup() {
-      user = makeMe.aUser().with2Notes().please();
-    }
-
-    @Test
-    void thereShouldBe2NodesForUser() {
-      List<Note> notes = user.getNotes();
-      assertThat(notes, hasSize(equalTo(2)));
-    }
-
-    @Test
-    void targetIsEmptyByDefault() {
-      Note note = user.getNotes().get(0);
-      assertThat(note.getLinks(), is(empty()));
-    }
-
-    @Test
-    void targetOfLinkedNotes() {
-      Note note = user.getNotes().get(0);
-      Note targetNote = user.getNotes().get(1);
-      makeMe.theNote(note).linkTo(targetNote).please();
-      List<Note> targetNotes = note.getLinks().stream().map(Link::getTargetNote).collect(toList());
-      assertThat(targetNotes, hasSize(equalTo(1)));
-      assertThat(targetNotes, contains(targetNote));
     }
   }
 }

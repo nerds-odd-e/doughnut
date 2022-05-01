@@ -45,19 +45,17 @@ public class Thing {
   private Link link;
 
   @OneToOne
-  @JoinColumn(name = "user_id")
+  @JoinColumn(name = "creator_id")
   @JsonIgnore
   @Getter
   @Setter
-  private User user;
+  private User creator;
 
   static <T extends Thingy> T createThing(User user, T thingy, Timestamp currentUTCTimestamp) {
-    thingy.setUser(user);
-
     final Thing thing = new Thing();
     if (thingy instanceof Note note) thing.setNote(note);
     if (thingy instanceof Link link) thing.setLink(link);
-    thing.setUser(user);
+    thing.setCreator(user);
     thing.setCreatedAt(currentUTCTimestamp);
     thingy.setThing(thing);
     return thingy;

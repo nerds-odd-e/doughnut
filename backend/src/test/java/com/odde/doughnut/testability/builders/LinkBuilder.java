@@ -16,9 +16,8 @@ public class LinkBuilder extends EntityBuilder<Link> {
   @Override
   protected void beforeCreate(boolean needPersist) {}
 
-  public LinkBuilder setUser(User user) {
-    entity.setUser(user);
-    entity.getThing().setUser(user);
+  public LinkBuilder creator(User user) {
+    entity.getThing().setCreator(user);
     return this;
   }
 
@@ -26,7 +25,7 @@ public class LinkBuilder extends EntityBuilder<Link> {
     entity.setTargetNote(to);
     entity.setSourceNote(from);
     entity.setLinkType(linkType);
-    setUser(from.getThing().getUser());
+    creator(from.getThing().getCreator());
     from.getLinks().add(entity);
     to.getRefers().add(entity);
     return this;

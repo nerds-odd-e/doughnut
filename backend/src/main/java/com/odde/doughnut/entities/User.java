@@ -47,12 +47,6 @@ public class User {
   @JsonIgnore
   @Getter
   @Setter
-  private List<Note> notes = new ArrayList<>();
-
-  @OneToMany(mappedBy = "user")
-  @JsonIgnore
-  @Getter
-  @Setter
   private List<ReviewPoint> reviewPoints = new ArrayList<>();
 
   @OneToOne(mappedBy = "user", cascade = CascadeType.ALL)

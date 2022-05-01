@@ -17,6 +17,8 @@ import org.apache.logging.log4j.util.Strings;
 public class NoteBuilder extends EntityBuilder<Note> {
   static final TestObjectCounter titleCounter = new TestObjectCounter(n -> "title" + n);
 
+  UserBuilder creatorBuilder = null;
+
   public NoteBuilder(Note note, MakeMe makeMe) {
     super(makeMe, note);
   }
@@ -32,35 +34,34 @@ public class NoteBuilder extends EntityBuilder<Note> {
   }
 
   public NoteBuilder asHeadNoteOfANotebook() {
-    if (entity.getThing().getUser() == null) {
-      return creatorAndOwner(makeMe.aUser().inMemoryPlease());
+    buildCreatorIfNotExist();
+    return asHeadNoteOfANotebook(entity.getThing().getCreator().getOwnership());
+  }
+
+  private void buildCreatorIfNotExist() {
+    if (entity.getThing().getCreator() == null) {
+      creatorBuilder = makeMe.aUser();
+      creator(creatorBuilder.inMemoryPlease());
     }
-    return asHeadNoteOfANotebook(entity.getThing().getUser().getOwnership());
   }
 
   public NoteBuilder asHeadNoteOfANotebook(Ownership ownership) {
     if (entity.getNotebook() != null)
       throw new AssertionError(
-          "Can add note to circle, for `" + entity.toString() + "`, a notebook already exist.");
-    if (entity.getThing().getUser() == null) {
-      return creatorAndOwner(makeMe.aUser().inMemoryPlease());
-    }
-    entity.buildNotebookForHeadNote(ownership, entity.getThing().getUser());
+          "Can add notebook for `" + entity.toString() + "`, a notebook already exist.");
+    buildCreatorIfNotExist();
+    entity.buildNotebookForHeadNote(ownership, entity.getThing().getCreator());
     return this;
   }
 
   public NoteBuilder creatorAndOwner(User user) {
-    if (entity.getNotebook() != null)
-      throw new AssertionError(
-          "Can add creator, for `" + entity.toString() + "`, a notebook already exist.");
     return creator(user).asHeadNoteOfANotebook();
   }
 
   public NoteBuilder creator(User user) {
-    if (entity.getThing().getUser() != null)
+    if (entity.getThing().getCreator() != null)
       throw new AssertionError("creator already set for " + entity.toString());
-    entity.setUser(user);
-    entity.getThing().setUser(user);
+    entity.getThing().setCreator(user);
     return this;
   }
 
@@ -70,7 +71,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
 
   public NoteBuilder under(Note parentNote) {
     entity.setParentNote(parentNote);
-    if (entity.getThing().getUser() == null) creator(parentNote.getThing().getUser());
+    if (entity.getThing().getCreator() == null) creator(parentNote.getThing().getCreator());
     return this;
   }
 
@@ -93,9 +94,10 @@ public class NoteBuilder extends EntityBuilder<Note> {
 
   @Override
   protected void beforeCreate(boolean needPersist) {
-    if (entity.getThing().getUser() == null) {
+    if (entity.getThing().getCreator() == null) {
       creator(makeMe.aUser().please(needPersist));
     }
+    if (creatorBuilder != null) creatorBuilder.please(needPersist);
   }
 
   public NoteBuilder skipReview() {

@@ -78,7 +78,7 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
   }
 
   public void assertAuthorization(Link link) throws NoAccessRightException {
-    if (!link.getSourceNote().getThing().getUser().getId().equals(user.getId())) {
+    if (!link.getSourceNote().getThing().getCreator().getId().equals(user.getId())) {
       throw new NoAccessRightException();
     }
   }

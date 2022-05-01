@@ -24,12 +24,6 @@ public class UserBuilder extends EntityBuilder<User> {
     entity.setName(userName);
   }
 
-  public UserBuilder with2Notes() {
-    entity.getNotes().add(makeMe.aNote().creatorAndOwner(entity).inMemoryPlease());
-    entity.getNotes().add(makeMe.aNote().creatorAndOwner(entity).inMemoryPlease());
-    return this;
-  }
-
   public UserBuilder withSpaceIntervals(String spaceIntervals) {
     entity.setSpaceIntervals(spaceIntervals);
     return this;
