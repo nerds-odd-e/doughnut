@@ -264,6 +264,7 @@ public class Link extends Thingy {
   public void setLinkType(LinkType linkType) {
     if (linkType == null) {
       typeId = null;
+      return;
     }
     typeId = linkType.id;
   }

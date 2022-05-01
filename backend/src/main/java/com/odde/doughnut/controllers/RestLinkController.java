@@ -48,7 +48,7 @@ class RestLinkController {
   @GetMapping("/{link}")
   public LinkViewedByUser show(@PathVariable("link") Link link) throws NoAccessRightException {
     UserModel user = currentUserFetcher.getUser();
-    user.getAuthorization().assertReadAuthorization(link.getSourceNote());
+    user.getAuthorization().assertReadAuthorization(link);
     return LinkViewedByUser.from(link, user);
   }
 
@@ -56,7 +56,7 @@ class RestLinkController {
   @Transactional
   public NotesBulk updateLink(Link link, @RequestBody LinkRequest linkRequest)
       throws NoAccessRightException {
-    currentUserFetcher.getUser().getAuthorization().assertAuthorization(link.getSourceNote());
+    currentUserFetcher.getUser().getAuthorization().assertAuthorization(link);
     link.setTypeId(linkRequest.typeId);
     modelFactoryService.linkRepository.save(link);
     return NotesBulk.jsonNoteWithChildren(link.getSourceNote(), currentUserFetcher.getUser());
@@ -65,7 +65,7 @@ class RestLinkController {
   @PostMapping(value = "/{link}/delete")
   @Transactional
   public NotesBulk deleteLink(Link link) throws NoAccessRightException {
-    currentUserFetcher.getUser().getAuthorization().assertAuthorization(link.getSourceNote());
+    currentUserFetcher.getUser().getAuthorization().assertAuthorization(link);
     LinkModel linkModel = modelFactoryService.toLinkModel(link);
     linkModel.destroy();
     return NotesBulk.jsonNoteWithChildren(link.getSourceNote(), currentUserFetcher.getUser());

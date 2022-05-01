@@ -157,7 +157,8 @@ class TestabilityRestController {
     LinkType type = LinkType.fromLabel(linkInfo.get("type"));
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     Link link =
-        Link.createLink(sourceNote, targetNote, sourceNote.getUser(), null, currentUTCTimestamp);
+        Link.createLink(
+            sourceNote, targetNote, sourceNote.getThing().getUser(), null, currentUTCTimestamp);
 
     link.setLinkType(type);
 
@@ -221,8 +222,7 @@ class TestabilityRestController {
 
   static DateTimeFormatter getDateTimeFormatter() {
     String pattern = "\"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'\"";
-    DateTimeFormatter formatter = DateTimeFormatter.ofPattern(pattern);
-    return formatter;
+    return DateTimeFormatter.ofPattern(pattern);
   }
 
   @PostMapping("/trigger_exception")

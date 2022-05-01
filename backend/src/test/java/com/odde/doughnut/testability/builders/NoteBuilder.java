@@ -43,7 +43,7 @@ public class NoteBuilder extends EntityBuilder<Note> {
 
   public NoteBuilder under(Note parentNote) {
     entity.setParentNote(parentNote);
-    byUser(parentNote.getUser());
+    byUser(parentNote.getThing().getUser());
     return this;
   }
 
