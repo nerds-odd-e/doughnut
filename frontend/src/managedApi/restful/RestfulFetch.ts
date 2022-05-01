@@ -1,6 +1,6 @@
 import HttpResponseError from "./HttpResponseError";
 import BadRequestError from "./BadRequestError";
-import loginOrRegister from "./loginOrRegister";
+import loginOrRegisterAndHaltThisThread from "./loginOrRegisterAndHaltThisThread";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type JsonData = any;
@@ -53,7 +53,7 @@ const request = async (
     return { status: 204, json: () => null, text: () => null };
   }
   if (res.status === 401) {
-    await loginOrRegister();
+    await loginOrRegisterAndHaltThisThread();
   }
   throw new HttpResponseError(res.status);
 };

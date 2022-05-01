@@ -7,7 +7,7 @@
 <script>
 import CircleJoinForm from "../components/circles/CircleJoinForm.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
-import loginOrRegister from '../managedApi/restful/loginOrRegister';
+import loginOrRegisterAndHaltThisThread from '../managedApi/restful/loginOrRegisterAndHaltThisThread';
 import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
 
 export default ({
@@ -22,7 +22,7 @@ export default ({
   beforeRouteEnter(to, from, next) {
     next((vm) => {
       if (!vm.user) {
-        loginOrRegister();
+        loginOrRegisterAndHaltThisThread();
         next(false);
       }
       next();

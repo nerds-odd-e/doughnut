@@ -82,7 +82,7 @@
 </template>
 
 <script>
-import loginOrRegister from '../../managedApi/restful/loginOrRegister';
+import loginOrRegisterAndHaltThisThread from '../../managedApi/restful/loginOrRegisterAndHaltThisThread';
 import useStoredLoadingApi from '../../managedApi/useStoredLoadingApi';
 
 export default ({
@@ -95,7 +95,7 @@ export default ({
       window.location.href = "/bazaar"
     },
     login() {
-      loginOrRegister()
+      loginOrRegisterAndHaltThisThread()
     }
   },
   computed: {
