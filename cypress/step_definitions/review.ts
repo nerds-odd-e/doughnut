@@ -162,7 +162,9 @@ Then("I choose answer {string}", (noteTitle) => {
 })
 
 Then("I should see that my answer is correct", () => {
-  cy.findByText("Correct!")
+  // checking the css name isn't the best solution
+  // but the text changes
+  cy.get(".alert-success").should("exist");
 })
 
 Then("I should see the information of note {string}", (noteTitle) => {
