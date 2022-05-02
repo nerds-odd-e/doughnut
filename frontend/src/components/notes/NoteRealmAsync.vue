@@ -7,41 +7,39 @@
         expandChildren,
       }"
       :key="noteId"
-
-      />
-
+    />
   </LoadingPage>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
-import NoteRealm from './views/NoteRealm.vue';
+import { defineComponent } from "vue";
+import NoteRealm from "./views/NoteRealm.vue";
 import { ViewType, viewType } from "../../models/viewTypes";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
-import LoadingPage from '../../pages/commons/LoadingPage.vue';
+import LoadingPage from "../../pages/commons/LoadingPage.vue";
 
 export default defineComponent({
   setup() {
-    return useStoredLoadingApi({initalLoading: true});
+    return useStoredLoadingApi({ initalLoading: true });
   },
   props: {
-     noteId: { type: Number, required: true },
-     viewType: String,
-     expandChildren: { type: Boolean, required: true },
+    noteId: { type: Number, required: true },
+    viewType: String,
+    expandChildren: { type: Boolean, required: true },
   },
   components: { LoadingPage, NoteRealm },
   computed: {
-    viewTypeObj() : ViewType {
-      return viewType(this.viewType)
-    }
+    viewTypeObj(): ViewType {
+      return viewType(this.viewType);
+    },
   },
   methods: {
     fetchData() {
-      const storedApiCall = this.viewTypeObj.fetchAll ?
-                              this.storedApi.getNoteWithDescendents :
-                              this.storedApi.getNoteAndItsChildren
+      const storedApiCall = this.viewTypeObj.fetchAll
+        ? this.storedApi.getNoteWithDescendents
+        : this.storedApi.getNoteAndItsChildren;
 
-      storedApiCall(this.noteId)
+      storedApiCall(this.noteId);
     },
   },
   watch: {
@@ -56,5 +54,4 @@ export default defineComponent({
     this.fetchData();
   },
 });
-
 </script>
