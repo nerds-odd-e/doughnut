@@ -38,9 +38,13 @@ export default defineComponent({
     viewTypeObj(): ViewType {
       return viewType(this.viewType);
     },
+    user() {
+      return this.piniaStore.currentUser;
+    },
   },
   methods: {
     async fetchComments() {
+      if (!this.user) return;
       this.comments = await this.api.comments.getNoteComments(this.noteId);
     },
     fetchData() {
