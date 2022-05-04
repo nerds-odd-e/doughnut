@@ -1,18 +1,19 @@
 <template>
   <div class="container" v-if="noteRealm">
-    <NoteWithLinks v-bind="{ note: noteRealm.note, links: noteRealm.links }"/>
+    <NoteWithLinks v-bind="{ note: noteRealm.note, links: noteRealm.links }" />
     <NoteStatisticsButton :noteId="noteId" />
+    <Comments :noteId="noteId" />
 
-    <Cards v-if="expandChildren" :notes="children"/>
+    <Cards v-if="expandChildren" :notes="children" />
   </div>
-
 </template>
 
 <script lang="ts">
-import {defineComponent} from 'vue'
+import { defineComponent } from "vue";
 import NoteWithLinks from "../NoteWithLinks.vue";
 import NoteStatisticsButton from "../NoteStatisticsButton.vue";
 import Cards from "../Cards.vue";
+import Comments from "../Comments.vue";
 import useStoredLoadingApi from "../../../managedApi/useStoredLoadingApi";
 
 export default defineComponent({
@@ -27,18 +28,21 @@ export default defineComponent({
     NoteWithLinks,
     Cards,
     NoteStatisticsButton,
+    Comments,
   },
 
   computed: {
     noteRealm() {
       return this.piniaStore.getNoteRealmById(this.noteId);
     },
-    featureToggle() { return this.piniaStore.featureToggle },
+    featureToggle() {
+      return this.piniaStore.featureToggle;
+    },
     children() {
       return this.noteRealm?.childrenIds
-        ?.map((id: Doughnut.ID)=>this.piniaStore.getNoteRealmById(id)?.note)
-        .filter((n)=>n)
+        ?.map((id: Doughnut.ID) => this.piniaStore.getNoteRealmById(id)?.note)
+        .filter((n) => n);
     },
-  }
+  },
 });
 </script>

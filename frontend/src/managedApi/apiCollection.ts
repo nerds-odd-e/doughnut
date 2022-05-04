@@ -95,6 +95,10 @@ const apiCollection = (managedApi: ManagedApi) => ({
   createComment(noteId: Doughnut.ID) {
     return managedApi.restPost(`/api/notes/${noteId}/createComment`, {});
   },
+
+  getNoteComments(noteId: Doughnut.ID) {
+    return managedApi.restGet(`/api/notes/${noteId}/comments`);
+  },
 });
 
 export default apiCollection;
