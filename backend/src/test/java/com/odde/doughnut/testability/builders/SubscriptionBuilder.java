@@ -23,4 +23,9 @@ public class SubscriptionBuilder extends EntityBuilder<Subscription> {
     entity.setUser(user);
     return this;
   }
+
+  public SubscriptionBuilder daily(int dailyTargetOfNewNotes) {
+    entity.setDailyTargetOfNewNotes(dailyTargetOfNewNotes);
+    return this;
+  }
 }

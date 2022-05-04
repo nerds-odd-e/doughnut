@@ -31,6 +31,6 @@ public class SubscriptionModel implements ReviewScope {
     int count =
         modelFactoryService.thingRepository.countByAncestorAndInTheList(
             entity.getHeadNote(), thingIds);
-    return entity.getDailyTargetOfNewNotes() - count;
+    return Math.max(0, entity.getDailyTargetOfNewNotes() - count);
   }
 }
