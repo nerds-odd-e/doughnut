@@ -92,8 +92,8 @@ const apiCollection = (managedApi: ManagedApi) => ({
     );
   },
 
-  createComment(noteId: Doughnut.ID) {
-    return managedApi.restPost(`/api/notes/${noteId}/createComment`, {});
+  createComment(noteId: Doughnut.ID, content: Generated.CommentCreation) {
+    return managedApi.restPost(`/api/notes/${noteId}/createComment`, content);
   },
 
   async getNoteComments(noteId: Doughnut.ID) {

@@ -3,7 +3,7 @@
     toggle comments
   </button>
   <div class="comment" v-for="comment in comments" :key="comment.id">
-    <label>please share more</label>
+    {{ comment.content }}
   </div>
 </template>
 

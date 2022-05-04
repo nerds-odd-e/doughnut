@@ -1,5 +1,5 @@
 <template>
-  <TextInput field="comment" v-focus/>
+  <TextInput field="comment" v-focus v-model="content" />
   <button @click="createComment">Submit</button>
 </template>
 
@@ -13,7 +13,12 @@ export default defineComponent({
     return useLoadingApi();
   },
   props: {
-    noteId: {type: Number, required: true},
+    noteId: { type: Number, required: true },
+  },
+  data() {
+    return {
+      content: "",
+    };
   },
   components: {
     TextInput,
@@ -21,9 +26,9 @@ export default defineComponent({
   emits: ["done"],
   methods: {
     async createComment() {
-      await this.api.createComment(this.noteId);
-      this.$router.push({name: "noteShow", params: {noteId: this.noteId}});
-    }
-  }
+      await this.api.createComment(this.noteId, { description: this.content });
+      this.$router.push({ name: "noteShow", params: { noteId: this.noteId } });
+    },
+  },
 });
 </script>

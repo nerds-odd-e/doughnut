@@ -9,6 +9,7 @@ import com.odde.doughnut.entities.Comment;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteAccessories;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.json.CommentCreation;
 import com.odde.doughnut.entities.json.NoteCreation;
 import com.odde.doughnut.entities.json.NoteRealm;
 import com.odde.doughnut.entities.json.NotesBulk;
@@ -249,7 +250,7 @@ class RestNoteControllerTests {
     @Test
     void shouldCreateComment() throws NoAccessRightException {
       Note note = makeMe.aNote().creatorAndOwner(userModel).please();
-      controller.createComment(note);
+      controller.createComment(note, new CommentCreation());
       List<Comment> comments = makeMe.modelFactoryService.commentRepository.findAllByNote(note);
       assertThat(comments, hasSize(1));
     }
@@ -258,7 +259,9 @@ class RestNoteControllerTests {
     void shouldNotBeAbleToAddCommentToNoteTheUserCannotSee() {
       User anotherUser = makeMe.aUser().please();
       Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
-      assertThrows(NoAccessRightException.class, () -> controller.createComment(note));
+      assertThrows(
+          NoAccessRightException.class,
+          () -> controller.createComment(note, new CommentCreation()));
     }
 
     @Test

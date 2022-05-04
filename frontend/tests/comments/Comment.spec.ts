@@ -10,6 +10,10 @@ helper.resetWithApiMock(beforeEach, afterEach);
 describe("comments", () => {
   const noteId = 456;
 
+  beforeEach(() => {
+    helper.store.featureToggle = true;
+  });
+
   it("should not call api before clicked", async () => {
     const wrapper = helper.component(Comments).withProps({ noteId }).mount();
     await flushPromises();

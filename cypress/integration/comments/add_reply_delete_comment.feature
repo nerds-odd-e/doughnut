@@ -10,8 +10,8 @@ Feature: Add, Reply or Delete a comment
     And there are some notes for the current user
       | title        |
       | Less is More |
-    When I comment with "please share more" on note "Less is More"
-    Then I should see note "LeSS is More" has a comment "please share more" from "old_learner"
+    When I comment with "Is more also less?" on note "Less is More"
+    Then I should see note "LeSS is More" has a comment "Is more also less?" from "old_learner"
 
   @ignore
   @featureToggle

@@ -38,13 +38,15 @@ class RestNoteController {
 
   @PostMapping(value = "/{note}/createComment")
   @Transactional
-  public String createComment(Note note) throws NoAccessRightException {
+  public String createComment(Note note, @RequestBody CommentCreation commentCreation)
+      throws NoAccessRightException {
     final UserModel userModel = currentUserFetcher.getUser();
     userModel.getAuthorization().assertAuthorization(note);
 
     Comment comment = new Comment();
     comment.setNote(note);
     comment.setUser(userModel.getEntity());
+    comment.setContent(commentCreation.description);
     modelFactoryService.commentRepository.save(comment);
     return "{}";
   }

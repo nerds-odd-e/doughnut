@@ -31,4 +31,6 @@ public class Comment {
   @ManyToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "user_id", referencedColumnName = "id")
   private User user;
+
+  @Getter @Setter private String content;
 }
