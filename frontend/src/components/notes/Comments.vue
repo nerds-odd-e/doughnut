@@ -33,5 +33,8 @@ export default defineComponent({
       this.comments = await this.api.comments.getNoteComments(this.noteId);
     },
   },
+  mounted() {
+    this.fetchComments();
+  },
 });
 </script>

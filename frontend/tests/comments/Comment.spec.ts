@@ -1,6 +1,7 @@
 /**
  * @jest-environment jsdom
  */
+import { screen } from "@testing-library/vue";
 import Comments from "@/components/notes/Comments.vue";
 import flushPromises from "flush-promises";
 import helper from "../helpers";
@@ -14,19 +15,21 @@ describe("comments", () => {
     helper.store.featureToggle = true;
   });
 
-  it("should not call api before clicked", async () => {
-    const wrapper = helper.component(Comments).withProps({ noteId }).mount();
-    await flushPromises();
-    expect(wrapper.findAll(".comment").length).toBe(0);
-    // no api call should happen, this is checked in the afterEach
+  const queryToggleButton = () => {
+    return screen.queryByRole("button", {name: "toggle comments"});
+  };
+
+  xit("should not display toggle comments button if there is no comments", async () => {
+    helper.apiMock.expecting(`/api/notes/${noteId}/comments`, []);
+    helper.component(Comments).withProps({ noteId }).render();
+    expect(queryToggleButton()).toBeNull();
   });
 
   it("fetch comments & render", async () => {
-    const comment = {};
-    const wrapper = helper.component(Comments).withProps({ noteId }).mount();
+    const comment = {content: "my comment"};
     helper.apiMock.expecting(`/api/notes/${noteId}/comments`, [comment]);
-    await wrapper.find(".comments").trigger("click");
-    await flushPromises();
-    expect(wrapper.findAll(".comment").length).toBe(1);
+    helper.component(Comments).withProps({ noteId }).render();
+    await queryToggleButton()?.click();
+    screen.findByText("my comment");
   });
 });
