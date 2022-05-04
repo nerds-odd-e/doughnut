@@ -102,7 +102,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
         `/api/notes/${noteId}/comments`
       )) as Generated.Comment[];
     },
-  }
+  },
 });
 
 export default apiCollection;
