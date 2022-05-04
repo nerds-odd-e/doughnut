@@ -14,6 +14,7 @@ When("I comment with {string} on note {string}", (comment, noteTitle) => {
 Then(
   "I should see note {string} has a comment {string} from {string}",
   (noteTitle, comment, userName) => {
+    cy.findByRole("button", {name: "toggle comments"}).click()
     cy.findByText(comment)
   },
 )

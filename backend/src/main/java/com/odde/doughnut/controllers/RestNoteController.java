@@ -49,6 +49,14 @@ class RestNoteController {
     return "{}";
   }
 
+  @GetMapping(value = "/{note}/comments")
+  public List<Comment> getComments(Note note) throws NoAccessRightException {
+    final UserModel userModel = currentUserFetcher.getUser();
+    userModel.getAuthorization().assertAuthorization(note);
+
+    return modelFactoryService.commentRepository.findAllByNote(note);
+  }
+
   static class NoteStatistics {
     @Getter @Setter private ReviewPoint reviewPoint;
     @Getter @Setter private NoteRealm note;

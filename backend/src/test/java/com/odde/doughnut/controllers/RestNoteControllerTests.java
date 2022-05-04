@@ -244,7 +244,7 @@ class RestNoteControllerTests {
   }
 
   @Nested
-  class CreateComment {
+  class CommentCRUD {
 
     @Test
     void shouldCreateComment() throws NoAccessRightException {
@@ -259,6 +259,13 @@ class RestNoteControllerTests {
       User anotherUser = makeMe.aUser().please();
       Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
       assertThrows(NoAccessRightException.class, () -> controller.createComment(note));
+    }
+
+    @Test
+    void shouldNotBeAbleToGetCommentOfNoteTheUserCannotSee() {
+      User anotherUser = makeMe.aUser().please();
+      Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
+      assertThrows(NoAccessRightException.class, () -> controller.getComments(note));
     }
   }
 }

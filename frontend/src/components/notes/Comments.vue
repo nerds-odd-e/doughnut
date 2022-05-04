@@ -1,18 +1,19 @@
 <template>
-  <div class="comments" @click="fetchComments">
-    <div class="comment" v-for="comment in comments" :key="comment.id">
-      <label>{{ comment }}</label>
-    </div>
+  <button v-if="featureToggle" class="comments" @click="fetchComments">
+    toggle comments
+  </button>
+  <div class="comment" v-for="comment in comments" :key="comment.id">
+    <label>please share more</label>
   </div>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import useLoadingApi from "../../managedApi/useLoadingApi";
+import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 
 export default defineComponent({
   setup() {
-    return useLoadingApi({ initalLoading: false });
+    return useStoredLoadingApi({ initalLoading: false });
   },
   data() {
     return {
@@ -21,6 +22,11 @@ export default defineComponent({
   },
   props: {
     noteId: { type: Number, required: true },
+  },
+  computed: {
+    featureToggle() {
+      return this.piniaStore.featureToggle;
+    },
   },
   methods: {
     async fetchComments() {
