@@ -5,6 +5,7 @@
         noteId,
         viewType,
         expandChildren,
+        comments,
       }"
       :key="noteId"
     />
@@ -28,18 +29,27 @@ export default defineComponent({
     expandChildren: { type: Boolean, required: true },
   },
   components: { LoadingPage, NoteRealm },
+  data() {
+    return {
+      comments: [] as Generated.Comment[],
+    };
+  },
   computed: {
     viewTypeObj(): ViewType {
       return viewType(this.viewType);
     },
   },
   methods: {
+    async fetchComments() {
+      this.comments = await this.api.comments.getNoteComments(this.noteId);
+    },
     fetchData() {
       const storedApiCall = this.viewTypeObj.fetchAll
         ? this.storedApi.getNoteWithDescendents
         : this.storedApi.getNoteAndItsChildren;
 
       storedApiCall(this.noteId);
+      this.fetchComments();
     },
   },
   watch: {

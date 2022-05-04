@@ -1,15 +1,15 @@
 <template>
   <div class="container" v-if="noteRealm">
     <NoteWithLinks v-bind="{ note: noteRealm.note, links: noteRealm.links }" />
-    <NoteStatisticsButton :noteId="noteId" />
-    <Comments :noteId="noteId" />
+    <NoteStatisticsButton :note-id="noteId" />
+    <Comments v-bind="{ noteId, comments }" />
 
     <Cards v-if="expandChildren" :notes="children" />
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, PropType } from "vue";
 import NoteWithLinks from "../NoteWithLinks.vue";
 import NoteStatisticsButton from "../NoteStatisticsButton.vue";
 import Cards from "../Cards.vue";
@@ -23,6 +23,10 @@ export default defineComponent({
   props: {
     noteId: { type: Number, required: true },
     expandChildren: { type: Boolean, required: true },
+    comments: {
+      type: Object as PropType<Generated.Comment[]>,
+      default: () => [] as Generated.Comment[],
+    },
   },
   components: {
     NoteWithLinks,

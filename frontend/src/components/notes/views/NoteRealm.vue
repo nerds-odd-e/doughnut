@@ -16,14 +16,14 @@
       />
       <NoteCardsView
         v-if="!viewType || viewType === 'cards'"
-        v-bind="{ noteId, expandChildren }"
+        v-bind="{ noteId, expandChildren, comments }"
       />
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, PropType } from "vue";
 import NoteToolbar from "../../toolbars/NoteToolbar.vue";
 import NoteMindmapView from "./NoteMindmapView.vue";
 import NoteCardsView from "./NoteCardsView.vue";
@@ -38,6 +38,10 @@ export default defineComponent({
     noteId: { type: Number, required: true },
     viewType: String,
     expandChildren: { type: Boolean, required: true },
+    comments: {
+      type: Object as PropType<Generated.Comment[]>,
+      default: () => [] as Generated.Comment[],
+    },
   },
   data() {
     return {
