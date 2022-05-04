@@ -8,10 +8,21 @@ import helper from "../helpers";
 helper.resetWithApiMock(beforeEach, afterEach);
 
 describe("comments", () => {
-  it("fetch API to be called ONCE", async () => {
-    const noteId = 456;
-    helper.component(Comments).withProps({ noteId }).mount();
+  const noteId = 456;
+
+  it("should not call api before clicked", async () => {
+    const wrapper = helper.component(Comments).withProps({ noteId }).mount();
     await flushPromises();
-    helper.apiMock.verifyCall(`/api/notes/${noteId}/comments`);
+    expect(wrapper.findAll(".comment").length).toBe(0);
+    // no api call should happen, this is checked in the afterEach
+  });
+
+  it("fetch comments & render", async () => {
+    const comment = {};
+    const wrapper = helper.component(Comments).withProps({ noteId }).mount();
+    helper.apiMock.expecting(`/api/notes/${noteId}/comments`, [comment]);
+    await wrapper.find(".comments").trigger("click");
+    await flushPromises();
+    expect(wrapper.findAll(".comment").length).toBe(1);
   });
 });

@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-04-30 18:22:31.
+// Generated using typescript-generator version 2.35.1025 on 2022-05-04 14:53:52.
 
 declare namespace Generated {
 
@@ -29,6 +29,7 @@ declare namespace Generated {
         answerViewedByUser: AnswerViewedByUser;
         answerResult: AnswerResult;
         answer: Answer;
+        comment: Comment;
     }
 
     interface InitialInfo {
@@ -179,6 +180,12 @@ declare namespace Generated {
         question: QuizQuestion;
     }
 
+    interface Comment {
+        id: number;
+        note: Note;
+        user: User;
+    }
+
     interface ReviewSetting {
         id: number;
         rememberSpelling: boolean;
@@ -189,8 +196,8 @@ declare namespace Generated {
         sourceNote: Note;
         targetNote: Note;
         typeId: number;
-        linkTypeLabel: string;
         clozeSource: string;
+        linkTypeLabel: string;
     }
 
     interface TextContent {
@@ -203,9 +210,9 @@ declare namespace Generated {
         noteAccessories: NoteAccessories;
         textContent: TextContent;
         pictureWithMask?: PictureWithMask;
-        title: string;
         parentId?: number;
         shortDescription: string;
+        title: string;
     }
 
     interface Ownership {
@@ -219,8 +226,8 @@ declare namespace Generated {
         user: User;
         notebook: Notebook;
         headNote: Note;
-        title: string;
         shortDescription: string;
+        title: string;
     }
 
     interface QuizQuestion {
@@ -254,13 +261,10 @@ declare namespace Generated {
         repetitionCount: number;
         forgettingCurveIndex: number;
         removedFromReview: boolean;
-        noteId: number;
-        linkId: number;
     }
 
     interface Thingy {
         id: number;
-        createdAt: string;
     }
 
     interface NoteAccessories {
@@ -288,9 +292,9 @@ declare namespace Generated {
 
     interface Thing {
         id: number;
+        createdAt: string;
         note: Note;
         link: Link;
-        createdAt: string;
     }
 
     type LinkType = "related to" | "a specialization of" | "an application of" | "an instance of" | "a part of" | "tagged by" | "an attribute of" | "the opposite of" | "author of" | "using" | "an example of" | "before" | "similar to" | "confused with";

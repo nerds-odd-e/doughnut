@@ -40,8 +40,16 @@ class ApiMockImpl implements ApiMock {
   }
 
   noUnexpectedCalls() {
-    expect(this.unexpectedApiCalls).toHaveLength(0);
-    expect(this.mismatchedApiCalls).toHaveLength(0);
+    if (this.unexpectedApiCalls.length > 0) {
+      throw new Error(
+        `Unexpected API calls: ${this.unexpectedApiCalls.join(", ")}`
+      );
+    }
+    if (this.mismatchedApiCalls.length > 0) {
+      throw new Error(
+        `Expected but missed API calls: ${this.mismatchedApiCalls.join(", ")}`
+      );
+    }
   }
 
   private get mismatchedApiCalls(): string[] {

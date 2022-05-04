@@ -1,4 +1,9 @@
 <template>
+  <div class="comments" @click="fetchComments">
+    <div class="comment" v-for="comment in comments" :key="comment.id">
+      <label>{{ comment }}</label>
+    </div>
+  </div>
 </template>
 
 <script lang="ts">
@@ -9,11 +14,18 @@ export default defineComponent({
   setup() {
     return useLoadingApi({ initalLoading: false });
   },
+  data() {
+    return {
+      comments: [] as Generated.Comment[],
+    };
+  },
   props: {
     noteId: { type: Number, required: true },
   },
-  mounted() {
-      this.api.getNoteComments(this.noteId);
+  methods: {
+    async fetchComments() {
+      this.comments = await this.api.getNoteComments(this.noteId);
+    },
   },
 });
 </script>
