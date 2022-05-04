@@ -26,7 +26,9 @@ export default defineComponent({
   emits: ["done"],
   methods: {
     async createComment() {
-      await this.api.createComment(this.noteId, { description: this.content });
+      await this.api.comments.createNoteComment(this.noteId, {
+        description: this.content,
+      });
       this.$router.push({ name: "noteShow", params: { noteId: this.noteId } });
     },
   },

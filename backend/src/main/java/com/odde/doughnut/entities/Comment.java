@@ -1,5 +1,6 @@
 package com.odde.doughnut.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -22,6 +23,7 @@ public class Comment {
 
   @Getter
   @Setter
+  @JsonIgnore
   @ManyToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "note_id", referencedColumnName = "id")
   private Note note;

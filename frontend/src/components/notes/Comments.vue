@@ -30,7 +30,7 @@ export default defineComponent({
   },
   methods: {
     async fetchComments() {
-      this.comments = await this.api.getNoteComments(this.noteId);
+      this.comments = await this.api.comments.getNoteComments(this.noteId);
     },
   },
 });

@@ -92,15 +92,17 @@ const apiCollection = (managedApi: ManagedApi) => ({
     );
   },
 
-  createComment(noteId: Doughnut.ID, content: Generated.CommentCreation) {
-    return managedApi.restPost(`/api/notes/${noteId}/createComment`, content);
-  },
+  comments: {
+    createNoteComment(noteId: Doughnut.ID, content: Generated.CommentCreation) {
+      return managedApi.restPost(`/api/notes/${noteId}/createComment`, content);
+    },
 
-  async getNoteComments(noteId: Doughnut.ID) {
-    return (await managedApi.restGet(
-      `/api/notes/${noteId}/comments`
-    )) as Generated.Comment[];
-  },
+    async getNoteComments(noteId: Doughnut.ID) {
+      return (await managedApi.restGet(
+        `/api/notes/${noteId}/comments`
+      )) as Generated.Comment[];
+    },
+  }
 });
 
 export default apiCollection;
