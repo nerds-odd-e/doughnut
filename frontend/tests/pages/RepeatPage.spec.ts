@@ -68,6 +68,7 @@ describe("repeat page", () => {
       helper.apiMock.expecting(
         `/api/reviews/${repetition.reviewPoint}/self-evaluate`
       );
+      helper.apiMock.expecting("/api/reviews/repeat", repetition);
       await wrapper.find("#repeat-sad").trigger("click");
     });
   });

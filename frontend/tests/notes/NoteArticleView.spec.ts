@@ -2,22 +2,20 @@
  * @jest-environment jsdom
  */
 
+import { flushPromises } from "@vue/test-utils";
 import NoteArticleView from "@/components/notes/views/NoteArticleView.vue";
 import { screen } from "@testing-library/vue";
 import makeMe from "../fixtures/makeMe";
 import helper from "../helpers";
 
-describe("note overview", () => {
-  beforeEach(() => {
-    helper.reset();
-  });
+helper.resetWithApiMock(beforeEach, afterEach);
 
+describe("note overview", () => {
   it("should render one note", async () => {
     const note = makeMe.aNoteRealm.title("single note").please();
-    helper.store.loadNoteRealms([note]);
     helper
       .component(NoteArticleView)
-      .withProps({ noteId: note.id, expandChildren: true })
+      .withProps({ noteId: note.id, noteRealm: note, expandChildren: true })
       .render();
     expect(screen.getByRole("title")).toHaveTextContent("single note");
     expect(screen.getAllByRole("title")).toHaveLength(1);
@@ -28,10 +26,9 @@ describe("note overview", () => {
       .title("source")
       .linkToSomeNote("target note")
       .please();
-    helper.store.loadNoteRealms([note]);
     helper
       .component(NoteArticleView)
-      .withProps({ noteId: note.id, expandChildren: true })
+      .withProps({ noteId: note.id, noteRealm: note, expandChildren: true })
       .render();
     await screen.findByText("target note");
   });
@@ -42,11 +39,16 @@ describe("note overview", () => {
       .title("child")
       .under(noteParent)
       .please();
-    helper.store.loadNoteRealms([noteParent, noteChild]);
+    helper.apiMock.expecting("/api/notes/realms", [noteChild]);
     helper
       .component(NoteArticleView)
-      .withProps({ noteId: noteParent.id, expandChildren: true })
+      .withProps({
+        noteId: noteParent.id,
+        noteRealm: noteParent,
+        expandChildren: true,
+      })
       .render();
+    await flushPromises();
     expect(screen.getAllByRole("title")).toHaveLength(2);
     await screen.findByText("parent");
     await screen.findByText("child");
@@ -62,10 +64,15 @@ describe("note overview", () => {
       .title("grandchild")
       .under(noteChild)
       .please();
-    helper.store.loadNoteRealms([noteParent, noteChild, noteGrandchild]);
+    helper.apiMock.expecting("/api/notes/realms", [noteChild]);
+    helper.apiMock.expecting("/api/notes/realms", [noteGrandchild]);
     helper
       .component(NoteArticleView)
-      .withProps({ noteId: noteParent.id, expandChildren: true })
+      .withProps({
+        noteId: noteParent.id,
+        noteRealm: noteParent,
+        expandChildren: true,
+      })
       .render();
     await screen.findByText("parent");
     await screen.findByText("child");

@@ -25,9 +25,10 @@ class ApiMockImpl implements ApiMock {
 
   init() {
     this.fetchMock.doMock(async (request: Request) => {
-      const match = this.expected
-        .filter((exp) => exp.url === request.url)
-        .pop();
+      const matchedIndex = this.expected.findIndex(
+        (exp) => exp.url === request.url
+      );
+      const match = this.expected.splice(matchedIndex, 1)[0];
       if (match) {
         match.called = true;
         return match.response || JSON.stringify(match.value);

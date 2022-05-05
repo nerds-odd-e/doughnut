@@ -92,6 +92,16 @@ const apiCollection = (managedApi: ManagedApi) => ({
     );
   },
 
+  async getNoteRealmsByIds(noteIds: Doughnut.ID[]) {
+    if (noteIds.length === 0) {
+      return [];
+    }
+    return (await managedApi.restPost(
+      `notes/realms`,
+      noteIds
+    )) as Generated.NoteRealm[];
+  },
+
   comments: {
     createNoteComment(noteId: Doughnut.ID, content: Generated.CommentCreation) {
       return managedApi.restPost(`/api/notes/${noteId}/createComment`, content);
