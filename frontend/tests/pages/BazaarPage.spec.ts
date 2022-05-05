@@ -11,7 +11,7 @@ describe("bazaar page", () => {
   it("fetch API to be called ONCE on mount", async () => {
     const notebook = makeMe.aNotebook.please();
     const bazaarNotebooks = makeMe.bazaarNotebooks.notebooks(notebook).please();
-    helper.apiMock.expecting("/api/bazaar").andReturn(bazaarNotebooks);
+    helper.apiMock.expecting("/api/bazaar").andReturnOnce(bazaarNotebooks);
     helper.component(BazaarPage).render();
   });
 });

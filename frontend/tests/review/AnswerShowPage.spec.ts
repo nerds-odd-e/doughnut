@@ -16,7 +16,7 @@ describe("repetition page", () => {
       .please();
 
     beforeEach(async () => {
-      helper.apiMock.expecting("/api/reviews/answers/1").andReturn({
+      helper.apiMock.expecting("/api/reviews/answers/1").andReturnOnce({
         answerId: 1,
         answerDisplay: "",
         correct: true,
@@ -26,7 +26,7 @@ describe("repetition page", () => {
         .expecting(
           `/api/review-points/${reviewPointViewedByUser.reviewPoint.id}`
         )
-        .andReturn(reviewPointViewedByUser);
+        .andReturnOnce(reviewPointViewedByUser);
     });
 
     it("click on note when doing review", async () => {

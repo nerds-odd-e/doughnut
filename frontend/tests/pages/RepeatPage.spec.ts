@@ -21,14 +21,14 @@ describe("repeat page", () => {
   const mountPage = async (
     repetition: Generated.RepetitionForUser | Record<string, never>
   ) => {
-    helper.apiMock.expecting("/api/reviews/repeat").andReturn(repetition);
+    helper.apiMock.expecting("/api/reviews/repeat").andReturnOnce(repetition);
     const wrapper = renderer.currentRoute({ name: "repeat" }).mount();
     await flushPromises();
     return wrapper;
   };
 
   it("redirect to review page if nothing to repeat", async () => {
-    helper.apiMock.expectingResponse("/api/reviews/repeat", { status: 404 });
+    helper.apiMock.expecting("/api/reviews/repeat").andRespondOnceWith404();
     const wrapper = renderer.currentRoute({ name: "repeat" }).mount();
     await flushPromises();
     expect(wrapper.find(".alert-success").text()).toEqual(
@@ -52,7 +52,7 @@ describe("repeat page", () => {
         .please();
       helper.apiMock
         .expecting(`/api/review-points/${reviewPoint.reviewPoint.id}`)
-        .andReturn(reviewPoint);
+        .andReturnOnce(reviewPoint);
     });
 
     it("stay at repeat page if there is no quiz", async () => {
@@ -67,7 +67,7 @@ describe("repeat page", () => {
       helper.apiMock.expecting(
         `/api/reviews/${repetition.reviewPoint}/self-evaluate`
       );
-      helper.apiMock.expecting("/api/reviews/repeat").andReturn(repetition);
+      helper.apiMock.expecting("/api/reviews/repeat").andReturnOnce(repetition);
       await wrapper.find("#repeat-sad").trigger("click");
     });
   });

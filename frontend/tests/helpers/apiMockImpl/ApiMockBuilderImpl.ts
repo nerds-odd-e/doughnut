@@ -6,7 +6,6 @@ type ApiMockExpectation = {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   value: any;
   response?: MockParams;
-  called: boolean;
 };
 
 class ApiMockBuilderImpl implements ApiMockBuilder {
@@ -16,8 +15,16 @@ class ApiMockBuilderImpl implements ApiMockBuilder {
     this.expectation = expectation;
   }
 
+  andRespondOnceWith404(): void {
+    this.andRespondOnce({ status: 404 });
+  }
+
+  andRespondOnce(response: MockParams): void {
+    this.expectation.response = response;
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  andReturn(value: any): void {
+  andReturnOnce(value: any): void {
     this.expectation.value = value;
   }
 }

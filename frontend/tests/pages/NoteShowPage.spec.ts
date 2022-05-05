@@ -29,7 +29,9 @@ describe("all in note show page", () => {
     });
 
     it(" should fetch API to be called TWICE when viewType is not included ", async () => {
-      helper.apiMock.expecting(`/api/notes/${note.id}`).andReturn(stubResponse);
+      helper.apiMock
+        .expecting(`/api/notes/${note.id}`)
+        .andReturnOnce(stubResponse);
       helper
         .component(NoteShowPage)
         .withProps({ rawNoteId: `${note.id}` })
@@ -42,7 +44,7 @@ describe("all in note show page", () => {
       const viewTypeValue = "mindmap";
       helper.apiMock
         .expecting(`/api/notes/${note.id}/overview`)
-        .andReturn(stubResponse);
+        .andReturnOnce(stubResponse);
       helper
         .component(NoteShowPage)
         .withProps({ rawNoteId: `${note.id}`, viewType: viewTypeValue })

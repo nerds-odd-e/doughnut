@@ -1,4 +1,4 @@
-import fetchMock, { MockParams } from "jest-fetch-mock";
+import fetchMock from "jest-fetch-mock";
 import { ApiMock } from "../ApiMock";
 import ApiMockBuilderImpl, { ApiMockExpectation } from "./ApiMockBuilderImpl";
 
@@ -16,7 +16,6 @@ class ApiMockImpl implements ApiMock {
       );
       const match = this.expected.splice(matchedIndex, 1)[0];
       if (match) {
-        match.called = true;
         return match.response || JSON.stringify(match.value);
       }
 
@@ -40,16 +39,12 @@ class ApiMockImpl implements ApiMock {
   }
 
   private get mismatchedApiCalls(): string[] {
-    return this.expected.filter((exp) => !exp.called).map((exp) => exp.url);
+    return this.expected.map((exp) => exp.url);
   }
 
   expecting(url: string) {
-    const newLength = this.expected.push({ url, value: {}, called: false });
+    const newLength = this.expected.push({ url, value: {} });
     return new ApiMockBuilderImpl(this.expected[newLength - 1]);
-  }
-
-  expectingResponse(url: string, response: MockParams) {
-    this.expected.push({ url, value: {}, response, called: false });
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
