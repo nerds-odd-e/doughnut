@@ -2,7 +2,7 @@ import { createTestingPinia, TestingPinia } from "@pinia/testing";
 import { DefineComponent } from "vue";
 import createPiniaStore from "../../src/store/createPiniaStore";
 import RenderingHelper from "./RenderingHelper";
-import ApiMockImpl, { setupApiMock } from "./ApiMock";
+import setupApiMock from "./apiMockImpl/setupApiMock";
 
 type PiniaStore = ReturnType<typeof createPiniaStore>;
 
@@ -11,7 +11,7 @@ class StoredComponentTestHelper {
 
   private piniaStore?: PiniaStore;
 
-  private mockedApi?: ApiMockImpl;
+  private mockedApi?: ReturnType<typeof setupApiMock>;
 
   private mockedApiTeardown?: () => void;
 
@@ -25,7 +25,7 @@ class StoredComponentTestHelper {
     return this.piniaStore;
   }
 
-  get apiMock(): ApiMockImpl {
+  get apiMock() {
     if (!this.mockedApi) throw new Error("please call resetWithApiMock first.");
     return this.mockedApi;
   }
