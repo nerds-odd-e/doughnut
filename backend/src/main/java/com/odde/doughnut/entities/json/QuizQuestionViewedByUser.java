@@ -6,11 +6,14 @@ import com.odde.doughnut.entities.PictureWithMask;
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionPresenter;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.Getter;
+import org.apache.logging.log4j.util.Strings;
 
 public class QuizQuestionViewedByUser {
 
@@ -59,8 +62,12 @@ public class QuizQuestionViewedByUser {
   public interface OptionCreator {
 
     default List<Option> getOptions(ModelFactoryService modelFactoryService, String optionNoteIds) {
-      Stream<Note> noteStream =
-          modelFactoryService.noteRepository.findAllByIds(optionNoteIds.split(","));
+      if (Strings.isBlank(optionNoteIds)) return List.of();
+      List<Integer> idList =
+          Arrays.stream(optionNoteIds.split(","))
+              .map(Integer::parseInt)
+              .collect(Collectors.toList());
+      Stream<Note> noteStream = modelFactoryService.noteRepository.findAllByIds(idList);
       return noteStream.map(this::optionFromNote).toList();
     }
 

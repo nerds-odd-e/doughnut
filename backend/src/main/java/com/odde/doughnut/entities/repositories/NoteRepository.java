@@ -83,5 +83,5 @@ public interface NoteRepository extends CrudRepository<Note, Integer> {
       @Param("note") Note note, @Param("currentUTCTimestamp") Timestamp currentUTCTimestamp);
 
   @Query(value = "SELECT note.* FROM note where id in (:ids)", nativeQuery = true)
-  Stream<Note> findAllByIds(String[] ids);
+  Stream<Note> findAllByIds(List<Integer> ids);
 }

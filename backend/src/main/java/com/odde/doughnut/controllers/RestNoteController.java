@@ -11,6 +11,7 @@ import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.util.List;
+import java.util.stream.Stream;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import lombok.Getter;
@@ -98,6 +99,15 @@ class RestNoteController {
     user.getAuthorization().assertReadAuthorization(note);
 
     return NotesBulk.jsonNoteWithChildren(note, user);
+  }
+
+  @PostMapping("/realms")
+  @Transactional(readOnly = true)
+  public List<NoteRealm> getRealmsByIds(@RequestBody List<Integer> noteIds) {
+    final UserModel user = currentUserFetcher.getUser();
+    Stream<Note> notes = modelFactoryService.noteRepository.findAllByIds(noteIds);
+
+    return notes.map(n -> new NoteViewer(user.getEntity(), n).toJsonObject()).toList();
   }
 
   @GetMapping("/{note}/overview")
