@@ -11,7 +11,7 @@
         @selectNote="highlight($event)"
       />
       <div class="container" v-if="viewType === 'article'">
-        <NoteArticleView v-bind="{ noteId, noteRealm, expandChildren }" />
+        <NoteArticleView v-bind="{ noteRealm, expandChildren }" />
       </div>
       <NoteCardsView
         v-if="!viewType || viewType === 'cards'"

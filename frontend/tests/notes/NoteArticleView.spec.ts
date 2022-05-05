@@ -15,7 +15,7 @@ describe("note overview", () => {
     const note = makeMe.aNoteRealm.title("single note").please();
     helper
       .component(NoteArticleView)
-      .withProps({ noteId: note.id, noteRealm: note, expandChildren: true })
+      .withProps({ noteRealm: note, expandChildren: true })
       .render();
     expect(screen.getByRole("title")).toHaveTextContent("single note");
     expect(screen.getAllByRole("title")).toHaveLength(1);
@@ -28,7 +28,7 @@ describe("note overview", () => {
       .please();
     helper
       .component(NoteArticleView)
-      .withProps({ noteId: note.id, noteRealm: note, expandChildren: true })
+      .withProps({ noteRealm: note, expandChildren: true })
       .render();
     await screen.findByText("target note");
   });
@@ -43,7 +43,6 @@ describe("note overview", () => {
     helper
       .component(NoteArticleView)
       .withProps({
-        noteId: noteParent.id,
         noteRealm: noteParent,
         expandChildren: true,
       })
@@ -69,7 +68,6 @@ describe("note overview", () => {
     helper
       .component(NoteArticleView)
       .withProps({
-        noteId: noteParent.id,
         noteRealm: noteParent,
         expandChildren: true,
       })

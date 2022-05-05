@@ -36,7 +36,7 @@
     </marker>
 
     <NoteMindmapScaffold v-bind="{ noteId, mindmapSector }">
-      <template #default="{ note, mindmapSector }">
+      <template #default="{ note, links, mindmapSector }">
         <NoteParentChildConnection
           v-bind="{
             note,
@@ -44,10 +44,6 @@
             mindmapSector,
           }"
         />
-      </template>
-    </NoteMindmapScaffold>
-    <NoteMindmapScaffold v-bind="{ noteId, mindmapSector }">
-      <template #default="{ links, mindmapSector }">
         <NoteLinks
           v-bind="{
             links,
@@ -58,6 +54,7 @@
       </template>
     </NoteMindmapScaffold>
   </svg>
+
   <NoteMindmapScaffold v-bind="{ noteId, mindmapSector }">
     <template #default="{ note, mindmapSector }">
       <NoteCard
@@ -112,12 +109,7 @@ export default defineComponent({
       );
     },
     mindmap() {
-      return new Mindmap(
-        this.offset.scale,
-        this.mindmapSector,
-        this.noteId,
-        (id: Doughnut.ID) => undefined
-      );
+      return new Mindmap(this.offset.scale, this.mindmapSector, this.noteId);
     },
   },
 });

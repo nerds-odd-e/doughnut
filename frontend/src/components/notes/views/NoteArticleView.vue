@@ -4,7 +4,7 @@
     <div class="note-list">
       <NoteArticleView
         v-for="child in children"
-        v-bind="{ noteId: child.id, noteRealm: child, expandChildren }"
+        v-bind="{ noteRealm: child, expandChildren }"
         :key="child.id"
       />
     </div>
@@ -21,7 +21,6 @@ export default defineComponent({
     return useLoadingApi();
   },
   props: {
-    noteId: { type: Number, required: true },
     noteRealm: {
       type: Object as PropType<Generated.NoteRealm>,
       required: true,
