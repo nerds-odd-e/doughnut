@@ -26,7 +26,6 @@ describe("all in note show page", () => {
       // this shouldn't be needed
       // however, the computed notePosition doesn't seem to re-compute after the store value changes.
       helper.store.loadNotesBulk(stubResponse);
-      helper.apiMock.expecting(`/api/notes/${note.id}/comments`, []);
     });
 
     it(" should fetch API to be called TWICE when viewType is not included ", async () => {

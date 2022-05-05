@@ -194,7 +194,12 @@ public class ReviewingInitialReviewTest {
       Note top = makeMe.aNote().creatorAndOwner(anotherUser).please();
       note1 = makeMe.aNote().under(top).please();
       note2 = makeMe.aNote().under(top).please();
-      makeMe.aSubscription().forNotebook(top.getNotebook()).forUser(userModel.entity).daily(1).please();
+      makeMe
+          .aSubscription()
+          .forNotebook(top.getNotebook())
+          .forUser(userModel.entity)
+          .daily(1)
+          .please();
       makeMe.refresh(userModel.getEntity());
     }
 
@@ -215,10 +220,8 @@ public class ReviewingInitialReviewTest {
     void reviewedMoreThanPlanned() {
       makeMe.aReviewPointFor(note1).by(userModel).initiallyReviewedOn(day1).please();
       makeMe.aReviewPointFor(note2).by(userModel).initiallyReviewedOn(day1).please();
-      assertThat(
-        getOneInitialReviewPoint(reviewingOnDay1), nullValue());
+      assertThat(getOneInitialReviewPoint(reviewingOnDay1), nullValue());
     }
-
   }
 
   @Nested

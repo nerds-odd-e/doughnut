@@ -14,6 +14,7 @@ describe("comments", () => {
 
   beforeEach(() => {
     helper.store.featureToggle = true;
+    helper.store.currentUser = makeMe.aUser().please();
     note = makeMe.aNoteRealm.please();
     const notesBulk: Generated.NotesBulk = {
       notePosition: makeMe.aNotePosition.please(),

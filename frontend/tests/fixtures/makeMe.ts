@@ -8,8 +8,13 @@ import NotebookBuilder from "./NotebookBuilder";
 import CircleNoteBuilder from "./CircleNoteBuilder";
 import BazaarNoteBuilder from "./NotebooksBuilder";
 import NoteBuilder from "./NoteBuilder";
+import UserBuilder from "./UserBuilder";
 
 class MakeMe {
+  static aUser() {
+    return new UserBuilder();
+  }
+
   static get links(): LinksBuilder {
     return new LinksBuilder();
   }
