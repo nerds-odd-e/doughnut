@@ -76,7 +76,7 @@ class NoteCache {
   }
 
   private getChildrenIdsByParentId(parentId: Doughnut.ID) {
-    return this.getNoteRealmById(parentId)?.childrenIds;
+    return this.getNoteRealmById(parentId)?.children;
   }
 
   private deleteNote(id: Doughnut.ID) {

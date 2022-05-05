@@ -3,7 +3,7 @@
   <NoteWithLinks v-bind="{ note: noteRealm?.note, links: noteRealm.links }"/>
   <div class="note-list">
     <NoteOverview
-      v-for="childId in noteRealm.childrenIds"
+      v-for="childId in noteRealm.children"
       v-bind="{ noteId: childId, expandChildren }"
       :key="childId"
     />

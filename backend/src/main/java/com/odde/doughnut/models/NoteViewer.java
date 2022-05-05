@@ -29,7 +29,7 @@ public class NoteViewer {
     NoteRealm nvb = new NoteRealm();
     nvb.setId(note.getId());
     nvb.setLinks(getAllLinks());
-    nvb.setChildrenIds(note.getChildren().stream().map(Note::getId).toList());
+    nvb.setChildren(note.getChildren().stream().map(Note::getId).toList());
     nvb.setNote(note);
 
     return nvb;

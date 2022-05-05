@@ -44,7 +44,7 @@ export default defineComponent({
       return this.piniaStore.featureToggle;
     },
     children() {
-      return this.noteRealm?.childrenIds
+      return this.noteRealm?.children
         ?.map((id: Doughnut.ID) => this.piniaStore.getNoteRealmById(id)?.note)
         .filter((n) => n);
     },

@@ -42,7 +42,7 @@ export default defineComponent({
       return this.noteRealm?.links
     },
     childrenIds() {
-      return this.noteRealm?.childrenIds
+      return this.noteRealm?.children
     },
   },
 });

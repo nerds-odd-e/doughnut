@@ -16,7 +16,7 @@ class NoteRealmBuilder extends Builder<Generated.NoteRealm> {
       id: noteData.id,
       note: noteData,
       links: {},
-      childrenIds: [],
+      children: [],
     };
   }
 
@@ -41,7 +41,7 @@ class NoteRealmBuilder extends Builder<Generated.NoteRealm> {
   }
 
   under(value: Generated.NoteRealm): NoteRealmBuilder {
-    value?.childrenIds?.push(this.data.note.id);
+    value?.children?.push(this.data.note.id);
     this.data.note.parentId = value.id;
 
     return this;

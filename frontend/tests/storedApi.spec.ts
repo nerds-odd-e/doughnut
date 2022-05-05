@@ -43,9 +43,9 @@ describe("storedApiCollection", () => {
     it("should remove child from list", async () => {
       const child = makeMe.aNoteRealm.under(note).please();
       store.loadNoteRealms([child]);
-      const childrenCount = store.getNoteRealmById(note.id).childrenIds.length;
+      const childrenCount = store.getNoteRealmById(note.id).children.length;
       await sa.deleteNote(child.id);
-      expect(store.getNoteRealmById(note.id).childrenIds).toHaveLength(
+      expect(store.getNoteRealmById(note.id).children).toHaveLength(
         childrenCount - 1
       );
     });
