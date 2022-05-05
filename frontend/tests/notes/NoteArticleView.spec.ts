@@ -63,7 +63,7 @@ describe("note overview", () => {
       .title("grandchild")
       .under(noteChild)
       .please();
-    helper.apiMock.expecting("/api/notes/realms", [noteChild]);
+    helper.apiMock.expecting("/api/notes/realms").andReturn([noteChild]);
     helper.apiMock.expecting("/api/notes/realms", [noteGrandchild]);
     helper
       .component(NoteArticleView)

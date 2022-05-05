@@ -1,7 +1,12 @@
 import fetchMock, { MockParams } from "jest-fetch-mock";
 
+interface ApiMockBuilder {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  andReturn(value: any): void;
+}
+
 interface ApiMock {
-  expecting(url: string): void;
+  expecting(url: string): ApiMockBuilder;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   expecting(url: string, value: any): void;
   expectingResponse(url: string, response: MockParams): void;
@@ -10,18 +15,33 @@ interface ApiMock {
   verifyCall(url: string, matcher: any): void;
 }
 
-class ApiMockImpl implements ApiMock {
-  fetchMock = fetchMock;
-
-  private unexpectedApiCalls: string[] = [];
-
-  private expected: {
+type ApiMockExpectation = {
     url: string;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     value: any;
     response?: MockParams;
     called: boolean;
-  }[] = [];
+  };
+
+class ApiMockBuilderImpl implements ApiMockBuilder {
+
+  expectation
+
+  constructor(expectation: ApiMockExpectation) {
+    this.expectation = expectation
+  }
+
+  andReturn(value: any): void {
+    this.expectation.value = value
+  }
+}
+
+class ApiMockImpl implements ApiMock {
+  fetchMock = fetchMock;
+
+  private unexpectedApiCalls: string[] = [];
+
+  private expected: ApiMockExpectation[] = [];
 
   init() {
     this.fetchMock.doMock(async (request: Request) => {
@@ -59,7 +79,8 @@ class ApiMockImpl implements ApiMock {
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   expecting(url: string, value: any = {}) {
-    this.expected.push({ url, value, called: false });
+    const newLength = this.expected.push({ url, value, called: false });
+    return new ApiMockBuilderImpl(this.expected[newLength - 1]);
   }
 
   expectingResponse(url: string, response: MockParams) {
