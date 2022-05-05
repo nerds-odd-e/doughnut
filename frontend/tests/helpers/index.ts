@@ -1,5 +1,5 @@
 import { createTestingPinia, TestingPinia } from "@pinia/testing";
-import { DefineComponent } from "vue";
+import { defineComponent } from "vue";
 import createPiniaStore from "../../src/store/createPiniaStore";
 import RenderingHelper from "./RenderingHelper";
 import setupApiMock from "./apiMockImpl/setupApiMock";
@@ -51,7 +51,7 @@ class StoredComponentTestHelper {
     return this;
   }
 
-  component(comp: DefineComponent) {
+  component(comp: ReturnType<typeof defineComponent>) {
     return new RenderingHelper(comp).withGlobalPlugin(this.pinia);
   }
 }
