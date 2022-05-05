@@ -94,6 +94,17 @@ class RestNoteControllerTests {
   }
 
   @Nested
+  class getRealmsByNoteIdsTest {
+    @Test
+    void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
+      User otherUser = makeMe.aUser().please();
+      Note note = makeMe.aNote().creatorAndOwner(otherUser).please();
+      assertThrows(
+          NoAccessRightException.class, () -> controller.getRealmsByIds(List.of(note.getId())));
+    }
+  }
+
+  @Nested
   class showStatistics {
     @Test
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
