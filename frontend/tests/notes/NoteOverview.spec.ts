@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 
-import NoteOverview from "@/components/notes/NoteOverview.vue";
+import NoteArticleView from "@/components/notes/views/NoteArticleView.vue";
 import { screen } from "@testing-library/vue";
 import makeMe from "../fixtures/makeMe";
 import helper from "../helpers";
@@ -16,7 +16,7 @@ describe("note overview", () => {
     const note = makeMe.aNoteRealm.title("single note").please();
     helper.store.loadNoteRealms([note]);
     helper
-      .component(NoteOverview)
+      .component(NoteArticleView)
       .withProps({ noteId: note.id, expandChildren: true })
       .render();
     expect(screen.getByRole("title")).toHaveTextContent("single note");
@@ -30,7 +30,7 @@ describe("note overview", () => {
       .please();
     helper.store.loadNoteRealms([note]);
     helper
-      .component(NoteOverview)
+      .component(NoteArticleView)
       .withProps({ noteId: note.id, expandChildren: true })
       .render();
     await screen.findByText("target note");
@@ -44,7 +44,7 @@ describe("note overview", () => {
       .please();
     helper.store.loadNoteRealms([noteParent, noteChild]);
     helper
-      .component(NoteOverview)
+      .component(NoteArticleView)
       .withProps({ noteId: noteParent.id, expandChildren: true })
       .render();
     expect(screen.getAllByRole("title")).toHaveLength(2);
@@ -64,7 +64,7 @@ describe("note overview", () => {
       .please();
     helper.store.loadNoteRealms([noteParent, noteChild, noteGrandchild]);
     helper
-      .component(NoteOverview)
+      .component(NoteArticleView)
       .withProps({ noteId: noteParent.id, expandChildren: true })
       .render();
     await screen.findByText("parent");

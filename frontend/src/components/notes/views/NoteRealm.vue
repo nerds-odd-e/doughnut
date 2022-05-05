@@ -7,19 +7,18 @@
       <NoteMindmapView
         v-if="viewType === 'mindmap'"
         v-bind="{ noteId, expandChildren }"
-        :highlightNoteId="selectedNoteId"
+        :highlight-note-id="selectedNoteId"
         @selectNote="highlight($event)"
       />
-      <NoteArticleView
-        v-if="viewType === 'article'"
-        v-bind="{ noteId, expandChildren }"
-      />
+      <div class="container" v-if="viewType === 'article'">
+        <NoteArticleView v-bind="{ noteId, expandChildren }" />
+      </div>
       <NoteCardsView
         v-if="!viewType || viewType === 'cards'"
         v-bind="{ noteRealm, expandChildren, comments }"
       />
     </div>
-</div>
+  </div>
 </template>
 
 <script lang="ts">
