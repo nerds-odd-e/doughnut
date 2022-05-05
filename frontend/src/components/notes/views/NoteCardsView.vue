@@ -22,6 +22,10 @@ export default defineComponent({
   },
   props: {
     noteId: { type: Number, required: true },
+    noteRealm: {
+      type: Object as PropType<Generated.NoteRealm>,
+      required: true,
+    },
     expandChildren: { type: Boolean, required: true },
     comments: {
       type: Object as PropType<Generated.Comment[]>,
@@ -36,9 +40,6 @@ export default defineComponent({
   },
 
   computed: {
-    noteRealm() {
-      return this.piniaStore.getNoteRealmById(this.noteId);
-    },
     featureToggle() {
       return this.piniaStore.featureToggle;
     },

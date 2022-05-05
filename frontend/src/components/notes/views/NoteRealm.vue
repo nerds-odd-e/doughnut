@@ -3,7 +3,7 @@
     <div class="header">
       <NoteToolbar v-bind="{ selectedNote, selectedNotePosition, viewType }" />
     </div>
-    <div class="content">
+    <div class="content" v-if="noteRealm">
       <NoteMindmapView
         v-if="viewType === 'mindmap'"
         v-bind="{ noteId, expandChildren }"
@@ -16,7 +16,7 @@
       />
       <NoteCardsView
         v-if="!viewType || viewType === 'cards'"
-        v-bind="{ noteId, expandChildren, comments }"
+        v-bind="{ noteId, noteRealm, expandChildren, comments }"
       />
     </div>
   </div>
@@ -57,6 +57,9 @@ export default defineComponent({
     },
   },
   computed: {
+    noteRealm() {
+      return this.piniaStore.getNoteRealmById(this.noteId);
+    },
     selectedNotePosition(): Generated.NotePositionViewedByUser | undefined {
       if (!this.selectedNoteId) return;
       return this.piniaStore.getNotePosition(this.selectedNoteId);

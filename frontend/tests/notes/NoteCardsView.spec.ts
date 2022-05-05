@@ -15,10 +15,15 @@ describe("note wth child cards", () => {
       .title("child")
       .under(noteParent)
       .please();
-    helper.store.loadNoteRealms([noteParent, noteChild]);
+    helper.store.loadNoteRealms([noteChild]);
     helper
       .component(NoteCardsView)
-      .withProps({ noteId: noteParent.id, notePosition, expandChildren: true })
+      .withProps({
+        noteId: noteParent.id,
+        noteRealm: noteParent,
+        notePosition,
+        expandChildren: true,
+      })
       .render();
     expect(screen.getAllByRole("title")).toHaveLength(1);
     await screen.findByText("parent");
