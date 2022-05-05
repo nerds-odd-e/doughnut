@@ -1,20 +1,21 @@
 <template>
   <DragListner class="mindmap-event-receiver" v-model="offset">
     <div class="mindmap">
-      <NoteMindmap v-bind="{
+      <NoteMindmap
+        v-bind="{
           highlightNoteId,
           noteId,
           expandChildren,
           offset,
-          }"
-          @selectNote="$emit('selectNote', $event)"
+        }"
+        @selectNote="$emit('selectNote', $event)"
       />
     </div>
-  <div class="mindmap-info" @click.prevent="reset">
-    <span class="scale">{{scalePercentage}}</span>
-    <span class="offset">{{offsetMsg}}</span>
-    <span class="offset">{{rotateMsg}}&deg;</span>
-  </div>
+    <div class="mindmap-info" @click.prevent="reset">
+      <span class="scale">{{ scalePercentage }}</span>
+      <span class="offset">{{ offsetMsg }}</span>
+      <span class="offset">{{ rotateMsg }}&deg;</span>
+    </div>
   </DragListner>
 </template>
 
@@ -23,10 +24,9 @@ import NoteMindmap from "../mindmap/NoteMindmap.vue";
 import DragListner from "../../commons/DragListner.vue";
 import useStoredLoadingApi from "../../../managedApi/useStoredLoadingApi";
 
+const defaultOffset = { x: 0, y: 0, scale: 1.0, rotate: 0 };
 
-const defaultOffset = {x: 0, y: 0, scale: 1.0, rotate: 0}
-
-export default ({
+export default {
   setup() {
     return useStoredLoadingApi();
   },
@@ -35,36 +35,38 @@ export default ({
     highlightNoteId: Number,
     expandChildren: { type: Boolean, required: true },
   },
-  emits: ['selectNote'],
+  emits: ["selectNote"],
   data() {
     return {
-      offset: { ... defaultOffset },
+      offset: { ...defaultOffset },
     };
   },
   components: { NoteMindmap, DragListner },
   methods: {
     reset() {
-      this.offset = { ... defaultOffset }
+      this.offset = { ...defaultOffset };
     },
   },
   computed: {
     centerX() {
-      return `calc(50% + ${this.offset.x}px)`
+      return `calc(50% + ${this.offset.x}px)`;
     },
     centerY() {
-      return `calc(50% + ${this.offset.y}px)`
+      return `calc(50% + ${this.offset.y}px)`;
     },
     scalePercentage() {
-      return `${(this.offset.scale * 100).toFixed(0)}%`
+      return `${(this.offset.scale * 100).toFixed(0)}%`;
     },
     offsetMsg() {
-      return `offset: (${this.offset.x.toFixed(0)}, ${this.offset.y.toFixed(0)})`
+      return `offset: (${this.offset.x.toFixed(0)}, ${this.offset.y.toFixed(
+        0
+      )})`;
     },
     rotateMsg() {
-      return `rotate: ${ (this.offset.rotate * 180 / Math.PI).toFixed(0)}`
-    }
+      return `rotate: ${((this.offset.rotate * 180) / Math.PI).toFixed(0)}`;
+    },
   },
-});
+};
 </script>
 
 <style lang="sass" scoped>
@@ -96,5 +98,4 @@ export default ({
   font-size: 70%
   .offset
     margin-left: 10px
-
 </style>

@@ -100,16 +100,6 @@ describe("note mindmap", () => {
           "translate(-135, 0) rotate(360)"
         );
       });
-
-      it("should link the two linked notes", async () => {
-        const wrapper = getMountedElement(notes[0].id);
-        const connection = wrapper.find("svg.mindmap-canvas");
-        const lines = connection.findAll("g.notes-link path");
-        expect(lines).toHaveLength(1);
-        const d = lines[0].attributes("d");
-        expect(d).toMatch(/M -93 0/);
-        expect(d).toMatch(/.*? 327 0/);
-      });
     });
 
     describe("links between note and note outside the map", () => {
