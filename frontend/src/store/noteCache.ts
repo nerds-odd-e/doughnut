@@ -75,13 +75,13 @@ class NoteCache {
     noteRealm.note = note;
   }
 
-  private getChildrenIdsByParentId(parentId: Doughnut.ID) {
+  private getChildrenByParentId(parentId: Doughnut.ID) {
     return this.getNoteRealmById(parentId)?.children;
   }
 
   private deleteNote(id: Doughnut.ID) {
-    this.getChildrenIdsByParentId(id)?.forEach((cid: Doughnut.ID) =>
-      this.deleteNote(cid)
+    this.getChildrenByParentId(id)?.forEach((child) =>
+      this.deleteNote(child.id)
     );
     delete this.state.noteRealms[id];
   }
@@ -89,9 +89,10 @@ class NoteCache {
   private deleteNoteFromParentChildrenList(id: Doughnut.ID) {
     const parent = this.getNoteRealmById(id)?.note.parentId;
     if (!parent) return;
-    const children = this.getChildrenIdsByParentId(parent);
+    const children = this.getChildrenByParentId(parent);
     if (children) {
-      const index = children.indexOf(id);
+      const childrenIds = children.map((child) => child.id);
+      const index = childrenIds.indexOf(id);
       if (index > -1) {
         children.splice(index, 1);
       }

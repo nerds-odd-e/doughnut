@@ -23,7 +23,10 @@ describe("new/updated pink banner", () => {
       const note = makeMe.aNoteRealm.textContentUpdatedAt(updatedAt).please();
       helper.store.loadNoteRealms([note]);
 
-      const wrapper = helper.component(NoteWithLinks).withProps(note).mount();
+      const wrapper = helper
+        .component(NoteWithLinks)
+        .withProps({ note: note.note, links: note.links })
+        .mount();
 
       expect(wrapper.find(".note-body").element).toHaveStyle(
         `border-color: ${expectedColor};`
@@ -39,7 +42,7 @@ describe("in place edit on title", () => {
 
     const wrapper = helper
       .component(NoteWithLinks)
-      .withProps(noteParent)
+      .withProps({ note: noteParent.note, links: noteParent.links })
       .mount();
 
     expect(wrapper.findAll('[role="title"] input')).toHaveLength(0);
@@ -55,7 +58,7 @@ describe("in place edit on title", () => {
 
     const wrapper = helper
       .component(NoteWithLinks)
-      .withProps(noteParentSphere)
+      .withProps({ note: noteParentSphere.note, links: noteParentSphere.links })
       .mount();
 
     await wrapper.find('[role="title"]').trigger("click");
@@ -77,7 +80,7 @@ describe("undo editing", () => {
     const updatedTitle = "updated";
     const wrapper = helper
       .component(NoteWithLinks)
-      .withProps(noteRealm)
+      .withProps({ note: noteRealm.note, links: noteRealm.links })
       .mount();
 
     await wrapper.find('[role="title"]').trigger("click");

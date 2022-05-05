@@ -1,10 +1,10 @@
 <template>
   <div class="container" v-if="noteRealm">
     <NoteWithLinks v-bind="{ note: noteRealm.note, links: noteRealm.links }" />
-    <NoteStatisticsButton :note-id="noteId" />
-    <Comments v-bind="{ noteId, comments }" />
+    <NoteStatisticsButton :note-id="noteRealm.id" />
+    <Comments v-bind="{ noteId: noteRealm.id, comments }" />
 
-    <Cards v-if="expandChildren" :notes="children" />
+    <Cards v-if="expandChildren" :notes="noteRealm.children" />
   </div>
 </template>
 
@@ -21,7 +21,6 @@ export default defineComponent({
     return useStoredLoadingApi();
   },
   props: {
-    noteId: { type: Number, required: true },
     noteRealm: {
       type: Object as PropType<Generated.NoteRealm>,
       required: true,
@@ -42,11 +41,6 @@ export default defineComponent({
   computed: {
     featureToggle() {
       return this.piniaStore.featureToggle;
-    },
-    children() {
-      return this.noteRealm?.children
-        ?.map((id: Doughnut.ID) => this.piniaStore.getNoteRealmById(id)?.note)
-        .filter((n) => n);
     },
   },
 });

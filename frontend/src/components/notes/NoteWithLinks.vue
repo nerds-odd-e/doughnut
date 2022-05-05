@@ -12,7 +12,6 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
-import EditableText from "../form/EditableText.vue";
 import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
 import NoteShell from "./NoteShell.vue";
 import NoteContent from "./NoteContent.vue";
@@ -27,7 +26,6 @@ export default defineComponent({
     NoteFrameOfLinks,
     NoteShell,
     NoteContent,
-    EditableText,
   },
 });
 </script>

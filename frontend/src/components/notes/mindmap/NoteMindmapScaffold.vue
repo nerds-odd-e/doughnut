@@ -2,12 +2,12 @@
   <template v-if="note">
     <slot v-bind="{ note, links, mindmapSector }"/>
     <NoteMindmapScaffold
-      v-for="(childId, index) in childrenIds"
+      v-for="(child, index) in children"
       v-bind="{
-        noteId: childId,
-        mindmapSector: mindmapSector.getChildSector(childrenIds.length, index),
+        noteId: child.id,
+        mindmapSector: mindmapSector.getChildSector(children.length, index),
       }"
-      :key="childId"
+      :key="child.id"
     >
       <template #default="{note, links, mindmapSector}">
         <slot v-bind="{ note, links, mindmapSector }"/>
@@ -41,7 +41,7 @@ export default defineComponent({
     links() {
       return this.noteRealm?.links
     },
-    childrenIds() {
+    children() {
       return this.noteRealm?.children
     },
   },

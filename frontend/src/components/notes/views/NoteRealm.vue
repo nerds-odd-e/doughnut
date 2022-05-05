@@ -16,10 +16,10 @@
       />
       <NoteCardsView
         v-if="!viewType || viewType === 'cards'"
-        v-bind="{ noteId, noteRealm, expandChildren, comments }"
+        v-bind="{ noteRealm, expandChildren, comments }"
       />
     </div>
-  </div>
+</div>
 </template>
 
 <script lang="ts">

@@ -19,7 +19,6 @@ describe("note wth child cards", () => {
     helper
       .component(NoteCardsView)
       .withProps({
-        noteId: noteParent.id,
         noteRealm: noteParent,
         notePosition,
         expandChildren: true,

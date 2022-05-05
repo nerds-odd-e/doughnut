@@ -1,18 +1,18 @@
 <template>
-<template v-if="noteRealm">
-  <NoteWithLinks v-bind="{ note: noteRealm?.note, links: noteRealm.links }"/>
-  <div class="note-list">
-    <NoteOverview
-      v-for="childId in noteRealm.children"
-      v-bind="{ noteId: childId, expandChildren }"
-      :key="childId"
-    />
-  </div>
-</template>
+  <template v-if="noteRealm">
+    <NoteWithLinks v-bind="{ note: noteRealm?.note, links: noteRealm.links }" />
+    <div class="note-list">
+      <NoteOverview
+        v-for="child in noteRealm.children"
+        v-bind="{ noteId: child.id, expandChildren }"
+        :key="child.id"
+      />
+    </div>
+  </template>
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue'
+import { defineComponent } from "vue";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 import NoteWithLinks from "./NoteWithLinks.vue";
 

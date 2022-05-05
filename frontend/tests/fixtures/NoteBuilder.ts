@@ -10,7 +10,6 @@ class NoteBuilder extends Builder<Generated.Note> {
       id: generateId(),
       title: "Note1.1.1",
       shortDescription: "",
-      createdAt: "2021-08-24T08:46:44.000+00:00",
       noteAccessories: {
         url: "",
         urlIsVideo: false,
@@ -64,7 +63,7 @@ class NoteBuilder extends Builder<Generated.Note> {
 
   under(value: Generated.NoteRealm): NoteBuilder {
     value.children ||= [];
-    value.children.push(this.data.id);
+    value.children.push(this.data);
     this.data.parentId = value.id;
 
     return this;

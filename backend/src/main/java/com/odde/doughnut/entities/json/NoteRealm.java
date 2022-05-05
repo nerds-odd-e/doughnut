@@ -12,7 +12,7 @@ public class NoteRealm {
 
   @Getter @Setter private Map<Link.LinkType, LinkViewed> links;
 
-  @Getter @Setter private List<Integer> children;
+  @Getter @Setter private List<Note> children;
 
   @Getter @Setter private Note note;
 }

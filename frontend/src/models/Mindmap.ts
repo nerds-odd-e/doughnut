@@ -81,7 +81,9 @@ class Mindmap {
     if (!ancestors) return undefined;
     let sector = this.rootMindmapSector;
     for (let i = 0; i < ancestors.length - 1; i += 1) {
-      const ancestorChildrenIds = ancestors[i].children;
+      const ancestorChildrenIds = ancestors[i].children.map(
+        (child) => child.id
+      );
       if (ancestorChildrenIds !== undefined) {
         sector = sector.getChildSector(
           ancestorChildrenIds.length,

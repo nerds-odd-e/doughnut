@@ -1,19 +1,14 @@
 <template>
   <div class="note-body" :style="`border-color: ${bgColor}`">
-    <slot/>
+    <slot />
   </div>
 </template>
 
 <script lang="ts">
-
-
-
 export default {
   props: {
     id: Number,
     updatedAt: String,
-  },
-  components: {
   },
   computed: {
     bgColor() {
