@@ -14,7 +14,6 @@ import com.odde.doughnut.testability.MakeMe;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -47,7 +46,7 @@ public class LinkViewedByUserTest {
           new NoteWithPosition() {
             {
               NoteRealm noteRealm = new NoteViewer(null, note1).toJsonObject();
-              noteRealm.setLinks(Optional.of(links));
+              noteRealm.setLinks(links);
               setNote(noteRealm);
             }
           };

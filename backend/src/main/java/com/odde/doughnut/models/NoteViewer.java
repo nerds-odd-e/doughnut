@@ -10,7 +10,6 @@ import com.odde.doughnut.entities.json.NoteWithPosition;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -29,8 +28,8 @@ public class NoteViewer {
   public NoteRealm toJsonObject() {
     NoteRealm nvb = new NoteRealm();
     nvb.setId(note.getId());
-    nvb.setLinks(Optional.of(getAllLinks()));
-    nvb.setChildrenIds(Optional.of(note.getChildren().stream().map(Note::getId).toList()));
+    nvb.setLinks(getAllLinks());
+    nvb.setChildrenIds(note.getChildren().stream().map(Note::getId).toList());
     nvb.setNote(note);
 
     return nvb;
