@@ -21,7 +21,7 @@ describe("repeat page", () => {
   const mountPage = async (
     repetition: Generated.RepetitionForUser | Record<string, never>
   ) => {
-    helper.apiMock.expecting("/api/reviews/repeat", repetition);
+    helper.apiMock.expecting("/api/reviews/repeat").andReturn(repetition);
     const wrapper = renderer.currentRoute({ name: "repeat" }).mount();
     await flushPromises();
     return wrapper;
@@ -50,10 +50,9 @@ describe("repeat page", () => {
       repetition = makeMe.aRepetition
         .withReviewPointId(reviewPoint.reviewPoint.id)
         .please();
-      helper.apiMock.expecting(
-        `/api/review-points/${reviewPoint.reviewPoint.id}`,
-        reviewPoint
-      );
+      helper.apiMock
+        .expecting(`/api/review-points/${reviewPoint.reviewPoint.id}`)
+        .andReturn(reviewPoint);
     });
 
     it("stay at repeat page if there is no quiz", async () => {
@@ -68,7 +67,7 @@ describe("repeat page", () => {
       helper.apiMock.expecting(
         `/api/reviews/${repetition.reviewPoint}/self-evaluate`
       );
-      helper.apiMock.expecting("/api/reviews/repeat", repetition);
+      helper.apiMock.expecting("/api/reviews/repeat").andReturn(repetition);
       await wrapper.find("#repeat-sad").trigger("click");
     });
   });

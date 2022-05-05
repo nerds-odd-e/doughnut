@@ -11,7 +11,9 @@ describe("circle show page", () => {
   it("fetch API to be called ONCE on mount", async () => {
     const notebook = makeMe.aNotebook.please();
     const circleNote = makeMe.aCircleNote.notebooks(notebook).please();
-    helper.apiMock.expecting(`/api/circles/${circleNote.id}`, circleNote);
+    helper.apiMock
+      .expecting(`/api/circles/${circleNote.id}`)
+      .andReturn(circleNote);
     helper
       .component(CircleShowPage)
       .withProps({ circleId: circleNote.id })

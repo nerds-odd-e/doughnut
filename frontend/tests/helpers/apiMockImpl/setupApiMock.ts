@@ -43,9 +43,8 @@ class ApiMockImpl implements ApiMock {
     return this.expected.filter((exp) => !exp.called).map((exp) => exp.url);
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  expecting(url: string, value: any = {}) {
-    const newLength = this.expected.push({ url, value, called: false });
+  expecting(url: string) {
+    const newLength = this.expected.push({ url, value: {}, called: false });
     return new ApiMockBuilderImpl(this.expected[newLength - 1]);
   }
 

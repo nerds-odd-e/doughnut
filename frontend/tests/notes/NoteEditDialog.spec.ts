@@ -15,7 +15,9 @@ describe("note show", () => {
       notes: [noteRealm],
     };
 
-    helper.apiMock.expecting(`/api/notes/${noteRealm.id}`, stubResponse);
+    helper.apiMock
+      .expecting(`/api/notes/${noteRealm.id}`)
+      .andReturn(stubResponse);
     helper
       .component(NoteEditDialog)
       .withProps({ noteId: noteRealm.id })

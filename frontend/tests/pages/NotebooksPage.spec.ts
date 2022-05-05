@@ -12,7 +12,7 @@ describe("Notebooks Page", () => {
   it("fetch API to be called ONCE", async () => {
     const notebook = makeMe.aNotebook.please();
 
-    helper.apiMock.expecting("/api/notebooks", {
+    helper.apiMock.expecting("/api/notebooks").andReturn({
       notebooks: [notebook],
       subscriptions: [],
     });
@@ -25,7 +25,7 @@ describe("Notebooks Page", () => {
   it("show undo when there is something to undo", async () => {
     const notebook = makeMe.aNotebook.please();
     helper.store.deleteNote(notebook.headNote.id);
-    helper.apiMock.expecting("/api/notebooks", {
+    helper.apiMock.expecting("/api/notebooks").andReturn({
       notebooks: [],
       subscriptions: [],
     });

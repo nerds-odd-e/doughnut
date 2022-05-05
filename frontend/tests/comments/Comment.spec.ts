@@ -20,12 +20,14 @@ describe("comments", () => {
       notePosition: makeMe.aNotePosition.please(),
       notes: [note],
     };
-    helper.apiMock.expecting(`/api/notes/${note.id}`, notesBulk);
+    helper.apiMock.expecting(`/api/notes/${note.id}`).andReturn(notesBulk);
   });
 
   it("fetch comments & render", async () => {
     const comment = { content: "my comment" };
-    helper.apiMock.expecting(`/api/notes/${note.id}/comments`, [comment]);
+    helper.apiMock
+      .expecting(`/api/notes/${note.id}/comments`)
+      .andReturn([comment]);
     helper
       .component(NoteRealmAsync)
       .withProps({ noteId: note.id, expandChildren: false })

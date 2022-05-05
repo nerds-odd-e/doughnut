@@ -39,7 +39,7 @@ describe("note overview", () => {
       .title("child")
       .under(noteParent)
       .please();
-    helper.apiMock.expecting("/api/notes/realms", [noteChild]);
+    helper.apiMock.expecting("/api/notes/realms").andReturn([noteChild]);
     helper
       .component(NoteArticleView)
       .withProps({
@@ -64,7 +64,7 @@ describe("note overview", () => {
       .under(noteChild)
       .please();
     helper.apiMock.expecting("/api/notes/realms").andReturn([noteChild]);
-    helper.apiMock.expecting("/api/notes/realms", [noteGrandchild]);
+    helper.apiMock.expecting("/api/notes/realms").andReturn([noteGrandchild]);
     helper
       .component(NoteArticleView)
       .withProps({

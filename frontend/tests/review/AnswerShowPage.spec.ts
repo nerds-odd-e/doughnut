@@ -16,16 +16,17 @@ describe("repetition page", () => {
       .please();
 
     beforeEach(async () => {
-      helper.apiMock.expecting("/api/reviews/answers/1", {
+      helper.apiMock.expecting("/api/reviews/answers/1").andReturn({
         answerId: 1,
         answerDisplay: "",
         correct: true,
         reviewPoint: reviewPointViewedByUser,
       });
-      helper.apiMock.expecting(
-        `/api/review-points/${reviewPointViewedByUser.reviewPoint.id}`,
-        reviewPointViewedByUser
-      );
+      helper.apiMock
+        .expecting(
+          `/api/review-points/${reviewPointViewedByUser.reviewPoint.id}`
+        )
+        .andReturn(reviewPointViewedByUser);
     });
 
     it("click on note when doing review", async () => {
