@@ -33,7 +33,6 @@ describe("repeat page", () => {
     helper.apiMock
       .expectingGet("/api/reviews/initial")
       .andReturnOnce([reviewPoint, reviewPoint]);
-    helper.apiMock.expectingGet(`/api/notes/${note.id}`);
 
     const wrapper = renderer.currentRoute({ name: "initial" }).mount();
     await flushPromises();

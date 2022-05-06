@@ -2,7 +2,7 @@
   <div class="alert alert-danger" v-if="reviewPoint.removedFromReview">
     This review point has been removed from reviewing.
   </div>
-  <div v-if="noteWithPosition">
+  <div v-if="noteId">
     <NoteRealmAsync
       v-if="noteId"
       v-bind="{
@@ -42,13 +42,10 @@ export default defineComponent({
   components: { LinkShow, LinkNob, NoteRealmAsync },
   computed: {
     noteId() {
-      return this.noteWithPosition?.note.id;
+      return this.reviewPoint?.thing?.note?.id;
     },
     reviewPoint() {
       return this.reviewPointViewedByUser.reviewPoint;
-    },
-    noteWithPosition() {
-      return this.reviewPointViewedByUser?.noteWithPosition;
     },
     linkViewedByUser() {
       return this.reviewPointViewedByUser?.linkViewedByUser;
