@@ -14,7 +14,7 @@ describe("note mindmap", () => {
   });
 
   function toNoteRealmHash(noteRealms: Generated.NoteRealm[]) {
-    let noteRealmHash = {} as { [id: Doughnut.ID]: Generated.NoteRealm };
+    const noteRealmHash = {} as { [id: Doughnut.ID]: Generated.NoteRealm };
     noteRealms.forEach((noteRealm) => {
       noteRealmHash[noteRealm.id] = noteRealm;
     });
@@ -24,7 +24,12 @@ describe("note mindmap", () => {
   const getMountedElement = (noteId: Doughnut.ID, props = {}) => {
     return helper
       .component(NoteMinmap)
-      .withProps({ noteId, noteRealms: toNoteRealmHash(notes),  offset: { scale: 1, rotate: 0 }, ...props })
+      .withProps({
+        noteId,
+        noteRealms: toNoteRealmHash(notes),
+        offset: { scale: 1, rotate: 0 },
+        ...props,
+      })
       .mount();
   };
 
