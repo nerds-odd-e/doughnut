@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-05-05 11:09:59.
+// Generated using typescript-generator version 2.35.1025 on 2022-05-06 18:05:54.
 
 declare namespace Generated {
 
@@ -124,7 +124,6 @@ declare namespace Generated {
 
     interface ReviewPointViewedByUser {
         reviewPoint: ReviewPoint;
-        noteWithPosition?: NoteWithPosition;
         linkViewedByUser?: LinkViewedByUser;
         reviewSetting: ReviewSetting;
     }

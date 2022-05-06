@@ -1,6 +1,5 @@
 import Builder from "./Builder";
 import generateId from "./generateId";
-import NotePositionBuilder from "./NotePositionBuilder";
 
 class ReviewPointBuilder extends Builder<Generated.ReviewPointViewedByUser> {
   data: Generated.ReviewPointViewedByUser;
@@ -29,10 +28,6 @@ class ReviewPointBuilder extends Builder<Generated.ReviewPointViewedByUser> {
   }
 
   ofNote(note: Generated.NoteRealm): ReviewPointBuilder {
-    this.data.noteWithPosition = {
-      note,
-      notePosition: new NotePositionBuilder().do(),
-    };
     this.data.reviewPoint.thing.note = note.note;
     return this;
   }

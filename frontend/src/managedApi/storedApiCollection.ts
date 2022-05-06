@@ -9,10 +9,7 @@ const storedApiCollection = (
     data: Generated.ReviewPointViewedByUser
   ) {
     if (!data) return;
-    const { noteWithPosition, linkViewedByUser } = data;
-    if (noteWithPosition) {
-      piniaStore.loadNoteWithPosition(noteWithPosition);
-    }
+    const { linkViewedByUser } = data;
     if (linkViewedByUser) {
       piniaStore.loadNoteWithPosition(linkViewedByUser.sourceNoteWithPosition);
       piniaStore.loadNoteWithPosition(linkViewedByUser.targetNoteWithPosition);

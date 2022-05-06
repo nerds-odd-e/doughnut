@@ -4,7 +4,6 @@ import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.ReviewSetting;
-import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.UserModel;
 import java.util.Optional;
 import lombok.Getter;
@@ -12,7 +11,6 @@ import lombok.Setter;
 
 public class ReviewPointViewedByUser {
   @Getter @Setter private ReviewPoint reviewPoint;
-  @Getter @Setter private Optional<NoteWithPosition> noteWithPosition;
   @Getter @Setter private Optional<LinkViewedByUser> linkViewedByUser;
   @Getter @Setter private ReviewSetting reviewSetting;
 
@@ -20,9 +18,6 @@ public class ReviewPointViewedByUser {
     ReviewPointViewedByUser result = new ReviewPointViewedByUser();
     result.setReviewPoint(reviewPoint);
     if (reviewPoint.getNote() != null) {
-      Note note = reviewPoint.getNote();
-      result.setNoteWithPosition(
-          Optional.of(new NoteViewer(user.getEntity(), note).jsonNoteWithPosition(note)));
       result.setReviewSetting(getReviewSetting(reviewPoint.getNote()));
     } else {
       Link link = reviewPoint.getLink();
