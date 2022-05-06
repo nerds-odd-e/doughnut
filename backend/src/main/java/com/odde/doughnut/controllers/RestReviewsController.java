@@ -112,7 +112,7 @@ class RestReviewsController {
     AnswerResult answerResult = answerModel.getAnswerResult();
     Reviewing reviewing = user.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
     answerResult.nextRepetition =
-        reviewing.getOneRepetitionForUser(testabilitySettings.getRandomizer());
+        reviewing.getOneRepetitionForUser(testabilitySettings.getRandomizer()).orElse(null);
     return answerResult;
   }
 

@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -16,6 +15,7 @@ import javax.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.Where;
+import org.springframework.lang.Nullable;
 
 @Entity
 @Table(name = "ownership")
@@ -35,6 +35,8 @@ public class Ownership {
   @OneToOne
   @JoinColumn(name = "circle_id")
   @Setter
+  @Getter
+  @Nullable
   private Circle circle;
 
   @OneToMany(mappedBy = "ownership")
@@ -44,15 +46,12 @@ public class Ownership {
   @Setter
   private List<Notebook> notebooks = new ArrayList<>();
 
-  public Optional<Circle> getCircle() {
-    return Optional.ofNullable(circle);
-  }
-
   public boolean ownsBy(User user) {
     if (this.user != null) {
       return this.user.equals(user);
     }
-    return getCircle().map((circle) -> circle.getMembers().contains(user)).orElse(false);
+    if (this.circle == null) return false;
+    return this.circle.getMembers().contains(user);
   }
 
   public Note createNotebook(User user, TextContent textContent, Timestamp currentUTCTimestamp) {
