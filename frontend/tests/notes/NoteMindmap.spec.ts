@@ -13,11 +13,18 @@ describe("note mindmap", () => {
     helper.reset();
   });
 
+  function toNoteRealmHash(noteRealms: Generated.NoteRealm[]) {
+    let noteRealmHash = {} as { [id: Doughnut.ID]: Generated.NoteRealm };
+    noteRealms.forEach((noteRealm) => {
+      noteRealmHash[noteRealm.id] = noteRealm;
+    });
+    return noteRealmHash;
+  }
+
   const getMountedElement = (noteId: Doughnut.ID, props = {}) => {
-    helper.store.loadNoteRealms(notes);
     return helper
       .component(NoteMinmap)
-      .withProps({ noteId, offset: { scale: 1, rotate: 0 }, ...props })
+      .withProps({ noteId, noteRealms: toNoteRealmHash(notes),  offset: { scale: 1, rotate: 0 }, ...props })
       .mount();
   };
 

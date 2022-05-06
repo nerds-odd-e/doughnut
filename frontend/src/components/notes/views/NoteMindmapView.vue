@@ -5,6 +5,7 @@
         v-bind="{
           highlightNoteId,
           noteId,
+          noteRealms,
           expandChildren,
           offset,
         }"
@@ -48,6 +49,9 @@ export default {
     },
   },
   computed: {
+    noteRealms() {
+      return this.piniaStore.noteRealms;
+    },
     centerX() {
       return `calc(50% + ${this.offset.x}px)`;
     },

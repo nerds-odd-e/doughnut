@@ -64,6 +64,10 @@ export default defineComponent({
     highlightNoteId: Number,
     noteId: { type: Number, required: true },
     expandChildren: Boolean,
+    noteRealms: {
+      type: Object as PropType<{ [id: Doughnut.ID]: Generated.NoteRealm }>,
+      required: true,
+    },
     offset: { type: Object as PropType<MindmapOffset>, required: true },
   },
   components: {
@@ -75,9 +79,6 @@ export default defineComponent({
   },
   emits: ["selectNote"],
   computed: {
-    noteRealms() {
-      return this.piniaStore.noteRealms;
-    },
     mindmapSector() {
       return new MindmapSector(
         0,
