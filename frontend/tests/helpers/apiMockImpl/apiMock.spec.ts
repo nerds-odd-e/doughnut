@@ -30,7 +30,7 @@ describe("apiMock", () => {
     );
   });
 
-  xit("should expect multiple return once", async () => {
+  it("should expect multiple return once", async () => {
     mockedApi.expectingGet("url").andReturnOnce({ v: "1" });
     mockedApi.expectingGet("url").andReturnOnce({ v: "2" });
     expect(await (await fetch("url")).json()).toEqual({ v: "1" });

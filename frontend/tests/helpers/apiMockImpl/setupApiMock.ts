@@ -50,9 +50,19 @@ class ApiMockImpl implements ApiMock {
   }
 
   private get unmatchedExpectations() {
-    return this.expected.filter(
+    return this.rem(this.actualApiCalls);
+  }
+
+  private rem(calls: Request[]) {
+    if(calls.length === 0) return this.expected;
+    if(calls.length === 1){
+    return this.rem([]).filter(
+      (exp) => !exp.matchExpectation(calls[0])
+    );
+    }
+    return this.rem(calls.slice(0,1)).filter(
       (exp) =>
-        this.actualApiCalls.findIndex((actual) =>
+        calls.slice(1).findIndex((actual) =>
           exp.matchExpectation(actual)
         ) === -1
     );
