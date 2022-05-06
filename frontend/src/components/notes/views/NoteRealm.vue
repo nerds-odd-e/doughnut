@@ -1,5 +1,5 @@
 <template>
-  <div class="inner-box" v-if="selectedNote">
+  <div class="inner-box">
     <div class="header">
       <NoteToolbar v-bind="{ selectedNote, selectedNotePosition, viewType }" />
     </div>
@@ -35,6 +35,10 @@ export default defineComponent({
   },
   props: {
     noteId: { type: Number, required: true },
+    noteRealm: {
+      type: Object as PropType<Generated.NoteRealm>,
+      required: true,
+    },
     viewType: String,
     expandChildren: { type: Boolean, required: true },
     comments: {
@@ -56,15 +60,12 @@ export default defineComponent({
     },
   },
   computed: {
-    noteRealm() {
-      return this.piniaStore.getNoteRealmById(this.noteId);
-    },
     selectedNotePosition(): Generated.NotePositionViewedByUser | undefined {
       if (!this.selectedNoteId) return;
       return this.piniaStore.getNotePosition(this.selectedNoteId);
     },
     selectedNote() {
-      return this.piniaStore.getNoteRealmById(this.noteId)?.note;
+      return this.noteRealm?.note;
     },
   },
   mounted() {

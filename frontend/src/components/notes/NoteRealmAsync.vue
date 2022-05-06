@@ -3,6 +3,7 @@
     <NoteRealm
       v-bind="{
         noteId,
+        noteRealm,
         viewType,
         expandChildren,
         comments,
@@ -35,6 +36,9 @@ export default defineComponent({
     };
   },
   computed: {
+    noteRealm() {
+      return this.piniaStore.getNoteRealmById(this.noteId);
+    },
     viewTypeObj(): ViewType {
       return viewType(this.viewType);
     },
