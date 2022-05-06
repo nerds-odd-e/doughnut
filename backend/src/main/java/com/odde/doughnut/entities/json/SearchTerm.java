@@ -3,9 +3,9 @@ package com.odde.doughnut.entities.json;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.annotations.JsonUseIdInsteadOfNote;
-import java.util.Optional;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.lang.Nullable;
 
 public class SearchTerm {
   @Setter private String searchKey = "";
@@ -14,7 +14,7 @@ public class SearchTerm {
 
   @Getter @Setter private Boolean allMyCircles = false;
 
-  @JsonUseIdInsteadOfNote public Optional<Note> note = Optional.empty();
+  @JsonUseIdInsteadOfNote @Nullable public Note note;
 
   @JsonIgnore
   public String getTrimmedSearchKey() {

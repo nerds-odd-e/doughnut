@@ -5,13 +5,13 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.ReviewSetting;
 import com.odde.doughnut.models.UserModel;
-import java.util.Optional;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.lang.Nullable;
 
 public class ReviewPointViewedByUser {
   @Getter @Setter private ReviewPoint reviewPoint;
-  @Getter @Setter private Optional<LinkViewedByUser> linkViewedByUser;
+  @Getter @Setter @Nullable private LinkViewedByUser linkViewedByUser;
   @Getter @Setter private ReviewSetting reviewSetting;
 
   public static ReviewPointViewedByUser from(ReviewPoint reviewPoint, UserModel user) {
@@ -22,7 +22,7 @@ public class ReviewPointViewedByUser {
     } else {
       Link link = reviewPoint.getLink();
       LinkViewedByUser linkViewedByUser = LinkViewedByUser.from(link, user);
-      result.setLinkViewedByUser(Optional.of(linkViewedByUser));
+      result.setLinkViewedByUser(linkViewedByUser);
     }
     return result;
   }

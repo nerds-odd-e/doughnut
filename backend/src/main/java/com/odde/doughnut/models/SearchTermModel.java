@@ -28,7 +28,10 @@ public class SearchTermModel {
     if (searchTerm.getAllMyNotebooksAndSubscriptions()) {
       return noteRepository.searchForUserInAllMyNotebooksAndSubscriptions(user, getPattern());
     }
-    Notebook notebook = searchTerm.note.map(Note::getNotebook).orElse(null);
+    Notebook notebook = null;
+    if (searchTerm.note != null) {
+      notebook = searchTerm.note.getNotebook();
+    }
     return noteRepository.searchInNotebook(notebook, getPattern());
   }
 
@@ -41,9 +44,13 @@ public class SearchTermModel {
       return List.of();
     }
 
-    Integer avoidNoteId = searchTerm.note.map(Note::getId).orElse(null);
+    Integer avoidNoteId = null;
+    if (searchTerm.note != null) {
+      avoidNoteId = searchTerm.note.getId();
+    }
+    Integer finalAvoidNoteId = avoidNoteId;
     return search().stream()
-        .filter(n -> !n.getId().equals(avoidNoteId))
+        .filter(n -> !n.getId().equals(finalAvoidNoteId))
         .collect(Collectors.toList());
   }
 }

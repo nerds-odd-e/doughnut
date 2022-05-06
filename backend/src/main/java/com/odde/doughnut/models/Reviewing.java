@@ -114,7 +114,8 @@ public class Reviewing {
     repetitionForUser.setQuizQuestion(
         reviewPointModel
             .generateAQuizQuestion(randomizer)
-            .map(q -> new QuizQuestionViewedByUser(q, this.modelFactoryService)));
+            .map(q -> new QuizQuestionViewedByUser(q, this.modelFactoryService))
+            .orElse(null));
     repetitionForUser.setToRepeatCount(toRepeatCount());
     return repetitionForUser;
   }

@@ -12,7 +12,6 @@ import com.odde.doughnut.entities.json.SearchTerm;
 import com.odde.doughnut.testability.MakeMe;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -39,7 +38,7 @@ public class UserModelSearchTest {
   void setup() {
     user = makeMe.aUser().please();
     note = makeMe.aNote().creatorAndOwner(user).please();
-    searchTerm.note = Optional.of(note);
+    searchTerm.note = note;
     searchTermModel =
         new SearchTermModel(user, makeMe.modelFactoryService.noteRepository, searchTerm);
     anotherUser = makeMe.aUser().toModelPlease();
