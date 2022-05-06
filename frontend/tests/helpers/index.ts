@@ -14,8 +14,6 @@ class StoredComponentTestHelper {
 
   private mockedApi?: ApiMock;
 
-  private mockedApiTeardown?: () => void;
-
   private get pinia() {
     if (!this.piniaInstance) this.piniaInstance = createTestingPinia();
     return this.piniaInstance;
@@ -41,12 +39,10 @@ class StoredComponentTestHelper {
   resetWithApiMock(beforeEach: jest.Lifecycle, afterEach: jest.Lifecycle) {
     beforeEach(() => {
       this.reset();
-      const mock = setupApiMock();
-      this.mockedApi = mock.mockedApi;
-      this.mockedApiTeardown = mock.teardown;
+      this.mockedApi = setupApiMock();
     });
     afterEach(() => {
-      if (this.mockedApiTeardown) this.mockedApiTeardown();
+      this.mockedApi?.assertNoUnexpectedOrMissedCalls();
     });
     return this;
   }
@@ -57,3 +53,4 @@ class StoredComponentTestHelper {
 }
 
 export default new StoredComponentTestHelper();
+export { setupApiMock };

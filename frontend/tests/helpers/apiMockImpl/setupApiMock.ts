@@ -25,16 +25,21 @@ class ApiMockImpl implements ApiMock {
     return this;
   }
 
-  assertNoUnexpectedCalls() {
-    if (this.unexpectedApiCalls.length > 0) {
-      throw new Error(
-        `Unexpected API calls: ${this.unexpectedApiCalls.join(", ")}`
-      );
-    }
-    if (this.mismatchedApiCalls.length > 0) {
-      throw new Error(
-        `Expected but missed API calls: ${this.mismatchedApiCalls.join(", ")}`
-      );
+  assertNoUnexpectedOrMissedCalls() {
+    try {
+      if (this.unexpectedApiCalls.length > 0) {
+        throw new Error(
+          `Unexpected API calls: ${this.unexpectedApiCalls.join(", ")}`
+        );
+      }
+      if (this.mismatchedApiCalls.length > 0) {
+        throw new Error(
+          `Expected but missed API calls: ${this.mismatchedApiCalls.join(", ")}`
+        );
+      }
+    } finally {
+      this.unexpectedApiCalls = [];
+      this.expected = [];
     }
   }
 
@@ -57,12 +62,6 @@ class ApiMockImpl implements ApiMock {
   }
 }
 
-const setupApiMock = () => {
-  const mockedApi = new ApiMockImpl().init();
-  return {
-    mockedApi: mockedApi as ApiMock,
-    teardown: () => mockedApi.assertNoUnexpectedCalls(),
-  };
-};
+const setupApiMock = () => new ApiMockImpl().init() as ApiMock;
 
 export default setupApiMock;
