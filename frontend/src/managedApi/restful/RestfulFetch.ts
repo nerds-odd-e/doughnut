@@ -5,6 +5,8 @@ import loginOrRegisterAndHaltThisThread from "./loginOrRegisterAndHaltThisThread
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type JsonData = any;
 
+type HttpMethod = "GET" | "POST" | "PATCH";
+
 function objectToFormData(data: JsonData) {
   const formData = new FormData();
   Object.keys(data).forEach((key) => {
@@ -25,7 +27,7 @@ function objectToFormData(data: JsonData) {
 }
 
 interface RequestOptions {
-  method: "GET" | "POST" | "PUT" | "PATCH";
+  method: HttpMethod;
   contentType?: "json" | "MultiplePartForm";
 }
 
@@ -89,4 +91,4 @@ class RestfulFetch {
 }
 
 export default RestfulFetch;
-export { JsonData };
+export { JsonData, HttpMethod };

@@ -1,4 +1,5 @@
 import fetchMock from "jest-fetch-mock";
+import { HttpMethod } from "../../../src/managedApi/restful/RestfulFetch";
 import { ApiMock } from "../ApiMock";
 import ApiMockBuilderImpl from "./ApiMockBuilderImpl";
 import ApiMockExpectation from "./ApiMockExpectation";
@@ -7,6 +8,10 @@ function rejectFromArray<T>(array: T[], predicate: (value: T) => unknown): T[] {
   const firstMatch = array.findIndex(predicate);
   if (firstMatch === -1) return array;
   return array.filter((_, index) => index !== firstMatch);
+}
+
+function requestDescription(request: Request): string {
+  return `${request.method} ${request.url}`;
 }
 
 class ApiMockImpl implements ApiMock {
@@ -27,7 +32,9 @@ class ApiMockImpl implements ApiMock {
       if (matched) {
         return matched.response || JSON.stringify(matched.value);
       }
-      this.previousError = new Error(`Unexpected API call: ${request.url}`);
+      this.previousError = new Error(
+        `Unexpected API call: '${requestDescription(request)}'`
+      );
       throw this.previousError;
     });
     return this;
@@ -66,10 +73,7 @@ class ApiMockImpl implements ApiMock {
     );
   }
 
-  expecting(
-    url: string,
-    method: "GET" | "POST" | "PUT" | "PATCH" | "ANY" = "ANY"
-  ) {
+  private expecting(url: string, method: HttpMethod) {
     const newLength = this.expected.push(new ApiMockExpectation(url, method));
     return new ApiMockBuilderImpl(this.expected[newLength - 1]);
   }
@@ -80,6 +84,10 @@ class ApiMockImpl implements ApiMock {
 
   expectingPatch(url: string) {
     return this.expecting(url, "PATCH");
+  }
+
+  expectingPost(url: string) {
+    return this.expecting(url, "POST");
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

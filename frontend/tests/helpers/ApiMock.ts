@@ -8,8 +8,8 @@ interface ApiMockBuilder {
 }
 
 interface ApiMock {
-  expecting(url: string): ApiMockBuilder;
   expectingGet(url: string): ApiMockBuilder;
+  expectingPost(url: string): ApiMockBuilder;
   expectingPatch(url: string): ApiMockBuilder;
   verifyCall(url: string): void;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

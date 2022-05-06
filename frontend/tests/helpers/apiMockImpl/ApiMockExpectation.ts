@@ -1,6 +1,5 @@
 import { MockParams } from "jest-fetch-mock";
-
-type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "ANY";
+import { HttpMethod } from "../../../src/managedApi/restful/RestfulFetch";
 
 class ApiMockExpectation {
   url: string;
@@ -19,10 +18,7 @@ class ApiMockExpectation {
   }
 
   matchExpectation(request: Request) {
-    return (
-      this.url === request.url &&
-      (this.method === "ANY" || this.method === request.method)
-    );
+    return this.url === request.url && this.method === request.method;
   }
 }
 

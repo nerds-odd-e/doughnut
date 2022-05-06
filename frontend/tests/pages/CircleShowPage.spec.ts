@@ -12,7 +12,7 @@ describe("circle show page", () => {
     const notebook = makeMe.aNotebook.please();
     const circleNote = makeMe.aCircleNote.notebooks(notebook).please();
     helper.apiMock
-      .expecting(`/api/circles/${circleNote.id}`)
+      .expectingGet(`/api/circles/${circleNote.id}`)
       .andReturnOnce(circleNote);
     helper
       .component(CircleShowPage)

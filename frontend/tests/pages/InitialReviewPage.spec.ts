@@ -21,7 +21,7 @@ beforeEach(() => {
 
 describe("repeat page", () => {
   it("redirect to review page if nothing to review", async () => {
-    helper.apiMock.expecting("/api/reviews/initial").andReturnOnce([]);
+    helper.apiMock.expectingGet("/api/reviews/initial").andReturnOnce([]);
     renderer.currentRoute({ name: "initial" }).mount();
     await flushPromises();
     expect(mockRouterPush).toHaveBeenCalledWith({ name: "reviews" });
@@ -31,7 +31,7 @@ describe("repeat page", () => {
     const note = makeMe.aNoteRealm.please();
     const reviewPoint = makeMe.aReviewPoint.ofNote(note).please();
     helper.apiMock
-      .expecting("/api/reviews/initial")
+      .expectingGet("/api/reviews/initial")
       .andReturnOnce([reviewPoint, reviewPoint]);
 
     const wrapper = renderer.currentRoute({ name: "initial" }).mount();
@@ -48,7 +48,7 @@ describe("repeat page", () => {
     const noteRealm = makeMe.aNoteRealm.please();
     const reviewPoint = makeMe.aReviewPoint.ofNote(noteRealm).please();
     helper.apiMock
-      .expecting("/api/reviews/initial")
+      .expectingGet("/api/reviews/initial")
       .andReturnOnce([reviewPoint]);
     const wrapper = renderer
       .withProps({ nested: true })
@@ -66,7 +66,7 @@ describe("repeat page", () => {
     const link = makeMe.aLinkViewedByUser.please();
     const reviewPoint = makeMe.aReviewPoint.ofLink(link).please();
     helper.apiMock
-      .expecting("/api/reviews/initial")
+      .expectingGet("/api/reviews/initial")
       .andReturnOnce([reviewPoint]);
     const wrapper = renderer
       .withProps({ nested: true })

@@ -16,14 +16,14 @@ describe("repetition page", () => {
       .please();
 
     beforeEach(async () => {
-      helper.apiMock.expecting("/api/reviews/answers/1").andReturnOnce({
+      helper.apiMock.expectingGet("/api/reviews/answers/1").andReturnOnce({
         answerId: 1,
         answerDisplay: "",
         correct: true,
         reviewPoint: reviewPointViewedByUser,
       });
       helper.apiMock
-        .expecting(
+        .expectingGet(
           `/api/review-points/${reviewPointViewedByUser.reviewPoint.id}`
         )
         .andReturnOnce(reviewPointViewedByUser);

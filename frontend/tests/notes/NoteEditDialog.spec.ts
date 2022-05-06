@@ -16,7 +16,7 @@ describe("note show", () => {
     };
 
     helper.apiMock
-      .expecting(`/api/notes/${noteRealm.id}`)
+      .expectingGet(`/api/notes/${noteRealm.id}`)
       .andReturnOnce(stubResponse);
     helper
       .component(NoteEditDialog)

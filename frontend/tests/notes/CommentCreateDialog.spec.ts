@@ -12,7 +12,7 @@ describe("create a comment", () => {
   it("renders a dialog for comment with submit button that calls API to create comment", async () => {
     const noteId = 456;
     const mockPush = jest.fn();
-    helper.apiMock.expecting(`/api/notes/${noteId}/createComment`);
+    helper.apiMock.expectingPost(`/api/notes/${noteId}/createComment`);
     helper
       .component(CommentCreateDialog)
       .withMockRouterPush(mockPush)

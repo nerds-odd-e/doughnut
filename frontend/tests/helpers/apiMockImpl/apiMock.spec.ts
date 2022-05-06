@@ -14,20 +14,11 @@ describe("apiMock", () => {
   });
 
   it("should fail if expectation is not met", async () => {
-    mockedApi.expecting("url");
+    mockedApi.expectingGet("url");
     expect(() => mockedApi.assertNoUnexpectedOrMissedCalls()).toThrowError(
       "Expected but missed API calls: url"
     );
     mockedApi.assertNoUnexpectedOrMissedCalls(); // should be cleared after assert once
-  });
-
-  xit("should expect an api call only once", async () => {
-    mockedApi.expectingGet("url").andReturnOnce({ v: "token" });
-    expect(await (await fetch("url")).json()).toEqual({ v: "token" });
-    expect(await (await fetch("url")).json()).not.toEqual({ v: "token" });
-    expect(() => mockedApi.assertNoUnexpectedOrMissedCalls()).toThrowError(
-      "Unexpected API calls: url"
-    );
   });
 
   it("should expect multiple return once", async () => {
@@ -41,10 +32,10 @@ describe("apiMock", () => {
     mockedApi.expectingGet("url");
     mockedApi.expectingGet("url1");
     await expect(fetch("url", { method: "POST" })).rejects.toThrowError(
-      "Unexpected API call: url"
+      "Unexpected API call: 'POST url'"
     );
     expect(() => mockedApi.assertNoUnexpectedOrMissedCalls()).toThrowError(
-      /Unexpected API call: url/
+      /Unexpected API call: 'POST url'/
     );
   });
 });

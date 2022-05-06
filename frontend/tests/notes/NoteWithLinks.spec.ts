@@ -72,7 +72,7 @@ describe("undo editing", () => {
   it("should call addEditingToUndoHistory on submitChange", async () => {
     const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please();
     helper.store.loadNoteRealms([noteRealm]);
-    helper.apiMock.expecting(`/api/text_content/${noteRealm.id}`);
+    helper.apiMock.expectingPatch(`/api/text_content/${noteRealm.id}`);
 
     const updatedTitle = "updated";
     const wrapper = helper
