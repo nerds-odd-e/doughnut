@@ -3,6 +3,12 @@ import { ApiMock } from "../ApiMock";
 import ApiMockBuilderImpl from "./ApiMockBuilderImpl";
 import ApiMockExpectation from "./ApiMockExpectation";
 
+function rejectFromArray<T>(array: T[], predicate: (value: T) => unknown): T[] {
+  const firstMatch = array.findIndex(predicate);
+  if (firstMatch === -1) return array;
+  return array.filter((_, index) => index !== firstMatch);
+}
+
 class ApiMockImpl implements ApiMock {
   fetchMock = fetchMock;
 
@@ -50,21 +56,15 @@ class ApiMockImpl implements ApiMock {
   }
 
   private get unmatchedExpectations() {
-    return this.rem(this.actualApiCalls);
+    return this.remainingExpectations(this.actualApiCalls);
   }
 
-  private rem(calls: Request[]) {
-    if(calls.length === 0) return this.expected;
-    if(calls.length === 1){
-    return this.rem([]).filter(
-      (exp) => !exp.matchExpectation(calls[0])
-    );
-    }
-    return this.rem(calls.slice(0,1)).filter(
-      (exp) =>
-        calls.slice(1).findIndex((actual) =>
-          exp.matchExpectation(actual)
-        ) === -1
+  private remainingExpectations(calls: Request[]): ApiMockExpectation[] {
+    if (calls.length === 0) return this.expected;
+
+    return rejectFromArray(
+      this.remainingExpectations(calls.slice(0, calls.length - 1)),
+      (exp) => exp.matchExpectation(calls[calls.length - 1])
     );
   }
 
