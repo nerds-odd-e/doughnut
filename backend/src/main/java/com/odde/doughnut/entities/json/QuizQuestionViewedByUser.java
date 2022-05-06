@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import lombok.Getter;
 import org.apache.logging.log4j.util.Strings;
+import org.springframework.lang.Nullable;
 
 public class QuizQuestionViewedByUser {
 
@@ -54,7 +55,7 @@ public class QuizQuestionViewedByUser {
     @Getter private Integer noteId;
     @Getter private boolean isPicture = false;
     @Getter private String display;
-    @Getter private Optional<PictureWithMask> pictureWithMask;
+    @Getter @Nullable private PictureWithMask pictureWithMask;
 
     private Option() {}
   }
@@ -90,7 +91,7 @@ public class QuizQuestionViewedByUser {
       Option option = new Option();
       option.noteId = note.getId();
       option.display = note.getTitle();
-      option.pictureWithMask = note.getPictureWithMask();
+      option.pictureWithMask = note.getPictureWithMask().orElse(null);
       option.isPicture = true;
       return option;
     }
