@@ -37,12 +37,14 @@ describe("apiMock", () => {
     expect(await (await fetch("url")).json()).toEqual({ v: "2" });
   });
 
-  xit("should fail fast", async () => {
+  it("should fail fast", async () => {
     mockedApi.expectingGet("url");
     mockedApi.expectingGet("url1");
     await expect(fetch("url", { method: "POST" })).rejects.toThrowError(
-      "Expected GET but got POST"
+      "Unexpected API call: url"
     );
-    mockedApi.assertNoUnexpectedOrMissedCalls();
+    expect(() => mockedApi.assertNoUnexpectedOrMissedCalls()).toThrowError(
+      /Unexpected API call: url/
+    );
   });
 });

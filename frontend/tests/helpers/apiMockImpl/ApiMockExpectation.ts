@@ -1,5 +1,7 @@
 import { MockParams } from "jest-fetch-mock";
 
+type HttpMethod = "GET" | "POST" | "PUT" | "PATCH" | "ANY";
+
 class ApiMockExpectation {
   url: string;
 
@@ -8,9 +10,9 @@ class ApiMockExpectation {
 
   response?: MockParams;
 
-  method: "GET" | "POST" | "PUT" | "ANY";
+  method: HttpMethod;
 
-  constructor(url: string, method: "GET" | "POST" | "PUT" | "ANY") {
+  constructor(url: string, method: HttpMethod) {
     this.url = url;
     this.value = {};
     this.method = method;

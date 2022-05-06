@@ -55,6 +55,7 @@ describe("in place edit on title", () => {
   it("should back to label when blur text field title", async () => {
     const noteParentSphere = makeMe.aNoteRealm.title("Dummy Title").please();
     helper.store.loadNoteRealms([noteParentSphere]);
+    helper.apiMock.expectingPatch(`/api/text_content/${noteParentSphere.id}`);
 
     const wrapper = helper
       .component(NoteWithLinks)
@@ -64,11 +65,6 @@ describe("in place edit on title", () => {
     await wrapper.find('[role="title"]').trigger("click");
     await wrapper.find('[role="title"] input').setValue("updated");
     await wrapper.find('[role="title"] input').trigger("blur");
-
-    helper.apiMock.verifyCall(
-      `/api/text_content/${noteParentSphere.id}`,
-      expect.objectContaining({ method: "PATCH" })
-    );
   });
 });
 
@@ -76,6 +72,7 @@ describe("undo editing", () => {
   it("should call addEditingToUndoHistory on submitChange", async () => {
     const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please();
     helper.store.loadNoteRealms([noteRealm]);
+    helper.apiMock.expecting(`/api/text_content/${noteRealm.id}`);
 
     const updatedTitle = "updated";
     const wrapper = helper
@@ -88,6 +85,5 @@ describe("undo editing", () => {
     await wrapper.find('[role="title"] input').trigger("blur");
 
     expect(helper.store.peekUndo()).toMatchObject({ type: "editing" });
-    helper.apiMock.verifyCall(`/api/text_content/${noteRealm.id}`);
   });
 });

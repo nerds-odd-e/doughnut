@@ -10,6 +10,7 @@ interface ApiMockBuilder {
 interface ApiMock {
   expecting(url: string): ApiMockBuilder;
   expectingGet(url: string): ApiMockBuilder;
+  expectingPatch(url: string): ApiMockBuilder;
   verifyCall(url: string): void;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   verifyCall(url: string, matcher: any): void;

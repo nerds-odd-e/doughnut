@@ -12,11 +12,11 @@ function rejectFromArray<T>(array: T[], predicate: (value: T) => unknown): T[] {
 class ApiMockImpl implements ApiMock {
   fetchMock = fetchMock;
 
-  private unexpectedApiCalls: string[] = [];
-
   private expected: ApiMockExpectation[] = [];
 
   private actualApiCalls: Request[] = [];
+
+  private previousError?: Error;
 
   init() {
     this.fetchMock.doMock(async (request: Request) => {
@@ -27,19 +27,17 @@ class ApiMockImpl implements ApiMock {
       if (matched) {
         return matched.response || JSON.stringify(matched.value);
       }
-
-      // this.unexpectedApiCalls.push(request.url);
-      return JSON.stringify({});
+      this.previousError = new Error(`Unexpected API call: ${request.url}`);
+      throw this.previousError;
     });
     return this;
   }
 
   assertNoUnexpectedOrMissedCalls() {
     try {
-      if (this.unexpectedApiCalls.length > 0) {
-        throw new Error(
-          `Unexpected API calls: ${this.unexpectedApiCalls.join(", ")}`
-        );
+      if (this.previousError) {
+        this.previousError.message = `This error happened in an async api call (perhaps it's not expected by apiMock).\n If you cannot find the same error above, perhaps the production code have swallowed it.\n The original message: ${this.previousError.message}`;
+        throw this.previousError;
       }
       if (this.unmatchedExpectations.length > 0) {
         throw new Error(
@@ -49,7 +47,7 @@ class ApiMockImpl implements ApiMock {
         );
       }
     } finally {
-      this.unexpectedApiCalls = [];
+      this.previousError = undefined;
       this.expected = [];
       this.actualApiCalls = [];
     }
@@ -68,7 +66,10 @@ class ApiMockImpl implements ApiMock {
     );
   }
 
-  expecting(url: string, method: "GET" | "POST" | "PUT" | "ANY" = "ANY") {
+  expecting(
+    url: string,
+    method: "GET" | "POST" | "PUT" | "PATCH" | "ANY" = "ANY"
+  ) {
     const newLength = this.expected.push(new ApiMockExpectation(url, method));
     return new ApiMockBuilderImpl(this.expected[newLength - 1]);
   }
@@ -77,12 +78,12 @@ class ApiMockImpl implements ApiMock {
     return this.expecting(url, "GET");
   }
 
+  expectingPatch(url: string) {
+    return this.expecting(url, "PATCH");
+  }
+
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   verifyCall(url: string, matcher: any = expect.anything()) {
-    const unexpectedIndex = this.unexpectedApiCalls.indexOf(url);
-    if (unexpectedIndex >= 0)
-      this.unexpectedApiCalls.splice(unexpectedIndex, 1);
-
     expect(this.fetchMock).toHaveBeenCalledWith(url, matcher);
   }
 }
