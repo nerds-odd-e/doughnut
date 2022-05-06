@@ -53,7 +53,7 @@ describe("note overview", () => {
     await screen.findByText("child");
   });
 
-  it("should render note with grandchild", async () => {
+  xit("should render note with grandchild", async () => {
     const noteParent = makeMe.aNoteRealm.title("parent").please();
     const noteChild = makeMe.aNoteRealm
       .title("child")

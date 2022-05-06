@@ -1,12 +1,6 @@
 import { MockParams } from "jest-fetch-mock";
 import { ApiMockBuilder } from "../ApiMock";
-
-type ApiMockExpectation = {
-  url: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  value: any;
-  response?: MockParams;
-};
+import ApiMockExpectation from "./ApiMockExpectation";
 
 class ApiMockBuilderImpl implements ApiMockBuilder {
   expectation;
@@ -30,4 +24,3 @@ class ApiMockBuilderImpl implements ApiMockBuilder {
 }
 
 export default ApiMockBuilderImpl;
-export { ApiMockExpectation };

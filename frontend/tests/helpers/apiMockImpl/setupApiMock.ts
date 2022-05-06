@@ -1,6 +1,7 @@
 import fetchMock from "jest-fetch-mock";
 import { ApiMock } from "../ApiMock";
-import ApiMockBuilderImpl, { ApiMockExpectation } from "./ApiMockBuilderImpl";
+import ApiMockBuilderImpl from "./ApiMockBuilderImpl";
+import ApiMockExpectation from "./ApiMockExpectation";
 
 class ApiMockImpl implements ApiMock {
   fetchMock = fetchMock;
@@ -9,17 +10,19 @@ class ApiMockImpl implements ApiMock {
 
   private expected: ApiMockExpectation[] = [];
 
+  private actualApiCalls: Request[] = [];
+
   init() {
     this.fetchMock.doMock(async (request: Request) => {
-      const matchedIndex = this.expected.findIndex(
-        (exp) => exp.url === request.url
+      const matched = this.unmatchedExpectations.find((exp) =>
+        exp.matchExpectation(request)
       );
-      const match = this.expected.splice(matchedIndex, 1)[0];
-      if (match) {
-        return match.response || JSON.stringify(match.value);
+      this.actualApiCalls.push(request);
+      if (matched) {
+        return matched.response || JSON.stringify(matched.value);
       }
 
-      this.unexpectedApiCalls.push(request.url);
+      // this.unexpectedApiCalls.push(request.url);
       return JSON.stringify({});
     });
     return this;
@@ -32,24 +35,36 @@ class ApiMockImpl implements ApiMock {
           `Unexpected API calls: ${this.unexpectedApiCalls.join(", ")}`
         );
       }
-      if (this.mismatchedApiCalls.length > 0) {
+      if (this.unmatchedExpectations.length > 0) {
         throw new Error(
-          `Expected but missed API calls: ${this.mismatchedApiCalls.join(", ")}`
+          `Expected but missed API calls: ${this.unmatchedExpectations
+            .map((exp) => exp.url)
+            .join(", ")}`
         );
       }
     } finally {
       this.unexpectedApiCalls = [];
       this.expected = [];
+      this.actualApiCalls = [];
     }
   }
 
-  private get mismatchedApiCalls(): string[] {
-    return this.expected.map((exp) => exp.url);
+  private get unmatchedExpectations() {
+    return this.expected.filter(
+      (exp) =>
+        this.actualApiCalls.findIndex((actual) =>
+          exp.matchExpectation(actual)
+        ) === -1
+    );
   }
 
-  expecting(url: string) {
-    const newLength = this.expected.push({ url, value: {} });
+  expecting(url: string, method: "GET" | "POST" | "PUT" | "ANY" = "ANY") {
+    const newLength = this.expected.push(new ApiMockExpectation(url, method));
     return new ApiMockBuilderImpl(this.expected[newLength - 1]);
+  }
+
+  expectingGet(url: string) {
+    return this.expecting(url, "GET");
   }
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any

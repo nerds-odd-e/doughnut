@@ -28,7 +28,9 @@ describe("repeat page", () => {
   };
 
   it("redirect to review page if nothing to repeat", async () => {
-    helper.apiMock.expecting("/api/reviews/repeat").andRespondOnceWith404();
+    helper.apiMock
+      .expecting("/api/reviews/repeat")
+      .andRespondOnce({ status: 404 });
     const wrapper = renderer.currentRoute({ name: "repeat" }).mount();
     await flushPromises();
     expect(wrapper.find(".alert-success").text()).toEqual(

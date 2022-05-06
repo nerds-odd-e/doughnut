@@ -20,13 +20,15 @@ describe("comments", () => {
       notePosition: makeMe.aNotePosition.please(),
       notes: [note],
     };
-    helper.apiMock.expecting(`/api/notes/${note.id}`).andReturnOnce(notesBulk);
+    helper.apiMock
+      .expectingGet(`/api/notes/${note.id}`)
+      .andReturnOnce(notesBulk);
   });
 
   it("fetch comments & render", async () => {
     const comment = { content: "my comment" };
     helper.apiMock
-      .expecting(`/api/notes/${note.id}/comments`)
+      .expectingGet(`/api/notes/${note.id}/comments`)
       .andReturnOnce([comment]);
     helper
       .component(NoteRealmAsync)
