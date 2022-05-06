@@ -16,8 +16,9 @@ class ReviewPointBuilder extends Builder<Generated.ReviewPointViewedByUser> {
         repetitionCount: 0,
         forgettingCurveIndex: 0,
         removedFromReview: false,
-        noteId: 0,
-        linkId: 0,
+        thing: {
+          id: generateId(),
+        },
       },
       reviewSetting: {
         id: 0,
@@ -32,13 +33,12 @@ class ReviewPointBuilder extends Builder<Generated.ReviewPointViewedByUser> {
       note,
       notePosition: new NotePositionBuilder().do(),
     };
-    this.data.reviewPoint.noteId = note.id;
+    this.data.reviewPoint.thing.note = note.note;
     return this;
   }
 
   ofLink(link: Generated.LinkViewedByUser): ReviewPointBuilder {
     this.data.linkViewedByUser = link;
-    this.data.reviewPoint.linkId = link.id;
     return this;
   }
 

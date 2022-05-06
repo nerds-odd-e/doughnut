@@ -1,6 +1,6 @@
 <template>
   <div class="review-point-abbr">
-    <span v-if="!!noteWithPosition">
+    <span v-if="note">
       {{ noteTitle }}
     </span>
 
@@ -13,7 +13,6 @@
         {{ targetNoteTitle }}
       </span>
     </span>
-
   </div>
 </template>
 
@@ -22,26 +21,28 @@ import { defineComponent, PropType } from "vue";
 
 export default defineComponent({
   props: {
-    reviewPointViewedByUser: { type: Object as PropType<Generated.ReviewPointViewedByUser>, required: true },
+    reviewPointViewedByUser: {
+      type: Object as PropType<Generated.ReviewPointViewedByUser>,
+      required: true,
+    },
   },
   computed: {
-    noteWithPosition() {
-      return this.reviewPointViewedByUser?.noteWithPosition;
+    note() {
+      return this.reviewPointViewedByUser?.reviewPoint?.thing?.note;
     },
     linkViewedByUser() {
       return this.reviewPointViewedByUser?.linkViewedByUser;
     },
     noteTitle() {
-      return this.noteWithPosition?.note.note.title
+      return this.note?.title;
     },
     sourceNoteTitle() {
-      return this.linkViewedByUser?.sourceNoteWithPosition.note.note.title
+      return this.linkViewedByUser?.sourceNoteWithPosition.note.note.title;
     },
     targetNoteTitle() {
-      return this.linkViewedByUser?.targetNoteWithPosition.note.note.title
-    }
-
-  }
+      return this.linkViewedByUser?.targetNoteWithPosition.note.note.title;
+    },
+  },
 });
 </script>
 

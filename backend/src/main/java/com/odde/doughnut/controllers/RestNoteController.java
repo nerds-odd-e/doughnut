@@ -57,7 +57,7 @@ class RestNoteController {
   @GetMapping(value = "/{note}/comments")
   public List<Comment> getComments(Note note) throws NoAccessRightException {
     final UserModel userModel = currentUserFetcher.getUser();
-    userModel.getAuthorization().assertAuthorization(note);
+    userModel.getAuthorization().assertReadAuthorization(note);
 
     return modelFactoryService.commentRepository.findAllByNote(note);
   }
