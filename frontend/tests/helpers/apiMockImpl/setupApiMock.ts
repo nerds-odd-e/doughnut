@@ -25,7 +25,7 @@ class ApiMockImpl implements ApiMock {
     return this;
   }
 
-  noUnexpectedCalls() {
+  assertNoUnexpectedCalls() {
     if (this.unexpectedApiCalls.length > 0) {
       throw new Error(
         `Unexpected API calls: ${this.unexpectedApiCalls.join(", ")}`
@@ -61,7 +61,7 @@ const setupApiMock = () => {
   const mockedApi = new ApiMockImpl().init();
   return {
     mockedApi: mockedApi as ApiMock,
-    teardown: () => mockedApi.noUnexpectedCalls(),
+    teardown: () => mockedApi.assertNoUnexpectedCalls(),
   };
 };
 
