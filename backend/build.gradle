@@ -120,6 +120,7 @@ generateTypeScript {
   classPatterns = [
           'com.odde.doughnut.entities.json.*',
   ]
+  optionalAnnotations = ['org.springframework.lang.Nullable']
   customTypeMappings = [
           'java.sql.Timestamp:string'
   ]

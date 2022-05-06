@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-05-06 18:05:54.
+// Generated using typescript-generator version 2.35.1025 on 2022-05-06 18:24:16.
 
 declare namespace Generated {
 
@@ -292,8 +292,8 @@ declare namespace Generated {
     interface Thing {
         id: number;
         createdAt: string;
-        note: Note;
-        link: Link;
+        note?: Note;
+        link?: Link;
     }
 
     type LinkType = "related to" | "a specialization of" | "an application of" | "an instance of" | "a part of" | "tagged by" | "an attribute of" | "the opposite of" | "author of" | "using" | "an example of" | "before" | "similar to" | "confused with";

@@ -13,6 +13,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.lang.Nullable;
 
 @Entity
 @Table(name = "thing")
@@ -36,12 +37,14 @@ public class Thing {
   @JoinColumn(name = "note_id", referencedColumnName = "id")
   @Getter
   @Setter
+  @Nullable
   private Note note;
 
   @OneToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "link_id", referencedColumnName = "id")
   @Getter
   @Setter
+  @Nullable
   private Link link;
 
   @OneToOne
