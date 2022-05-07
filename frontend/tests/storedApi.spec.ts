@@ -28,26 +28,5 @@ describe("storedApiCollection", () => {
       );
     });
 
-    it("should change the store", async () => {
-      await sa.deleteNote(note.id);
-      expect(store.getNoteRealmById(note.id)).toBeUndefined();
-    });
-
-    it("should remove children notes", async () => {
-      const child = makeMe.aNoteRealm.under(note).please();
-      store.loadNoteRealms([child]);
-      await sa.deleteNote(note.id);
-      expect(store.getNoteRealmById(child.id)).toBeUndefined();
-    });
-
-    it("should remove child from list", async () => {
-      const child = makeMe.aNoteRealm.under(note).please();
-      store.loadNoteRealms([child]);
-      const childrenCount = store.getNoteRealmById(note.id)?.children.length;
-      await sa.deleteNote(child.id);
-      expect(store.getNoteRealmById(note.id)?.children).toHaveLength(
-        childrenCount - 1
-      );
-    });
   });
 });

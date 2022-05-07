@@ -61,7 +61,6 @@ export default defineStore("main", {
     },
 
     deleteNote(noteId: Doughnut.ID) {
-      noteCache(this).deleteNoteAndDescendents(noteId);
       history(this).deleteNote(noteId);
     },
 

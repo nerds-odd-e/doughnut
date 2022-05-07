@@ -5,6 +5,7 @@
       :note="selectedNote"
       :viewType="viewType"
       :featureToggle="featureToggle"
+      @note-deleted="emit('noteDeleted', $event)"
     />
     <div class="btn-group btn-group-sm">
       <PopupButton title="link note">
@@ -40,6 +41,7 @@ export default defineComponent({
     selectedNotePosition: Object as PropType<Generated.NotePositionViewedByUser>,
     viewType: String,
   },
+  emits: ["noteDeleted"],
   components: {
     NoteButtons,
     NoteUndoButton,

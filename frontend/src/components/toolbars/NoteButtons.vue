@@ -84,7 +84,6 @@ export default defineComponent({
   setup() {
     return { ...useStoredLoadingApi(), ...usePopups() };
   },
-  name: "NoteButtons",
   props: {
     note: Object,
     viewType: {
@@ -93,6 +92,7 @@ export default defineComponent({
     },
     featureToggle: Boolean,
   },
+  emits: ["noteDeleted"],
   components: {
     SvgCog,
     SvgAddChild,
@@ -110,10 +110,10 @@ export default defineComponent({
   methods: {
     async deleteNote() {
       if (await this.popups.confirm(`Confirm to delete this note?`)) {
-        const { parentId } = this.note;
-        await this.storedApi.deleteNote(this.note.id);
+        const { id, parentId } = this.note;
+        await this.storedApi.deleteNote(id);
+        this.$emit("noteDeleted", id);
         if (parentId) {
-          this.$emit("ensureVisible", parentId);
           if (this.viewType === "cards") {
             this.$router.push({
               name: "noteShow",

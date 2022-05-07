@@ -4,6 +4,7 @@
       <div class="header">
         <NoteToolbar
           v-bind="{ selectedNote, selectedNotePosition, viewType }"
+          @note-deleted="onNoteDeleted"
         />
       </div>
       <div class="content" v-if="noteRealm">
@@ -82,6 +83,9 @@ export default defineComponent({
     },
   },
   methods: {
+    onNoteDeleted(deletedNoteId: Doughnut.ID) {
+      this.noteRealms?.deleteNoteAndDescendents(deletedNoteId);
+    },
     noteRealmUpdated(updatedNoteRealm: Generated.NoteRealm) {
       this.noteRealms?.updateNoteRealm(updatedNoteRealm);
     },
