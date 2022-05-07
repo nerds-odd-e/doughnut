@@ -12,13 +12,17 @@ import helper from "../helpers";
 helper.resetWithApiMock(beforeEach, afterEach);
 
 describe("note overview", () => {
+  const toNoteRealmsCache = (notes: Generated.NoteRealm[]) => {
+    return new NoteRealmCache({ notes });
+  }
+
   it("should render one note", async () => {
     const note = makeMe.aNoteRealm.title("single note").please();
     helper
       .component(NoteArticleView)
       .withProps({
         noteId: note.id,
-        noteRealms: new NoteRealmCache([note]),
+        noteRealms: toNoteRealmsCache([note]),
         expandChildren: true,
       })
       .render();
@@ -35,7 +39,7 @@ describe("note overview", () => {
       .component(NoteArticleView)
       .withProps({
         noteId: note.id,
-        noteRealms: new NoteRealmCache([note]),
+        noteRealms: toNoteRealmsCache([note]),
         expandChildren: true,
       })
       .render();
@@ -52,7 +56,7 @@ describe("note overview", () => {
       .component(NoteArticleView)
       .withProps({
         noteId: noteParent.id,
-        noteRealms: new NoteRealmCache([noteParent, noteChild]),
+        noteRealms: toNoteRealmsCache([noteParent, noteChild]),
         expandChildren: true,
       })
       .render();
@@ -76,7 +80,7 @@ describe("note overview", () => {
       .component(NoteArticleView)
       .withProps({
         noteId: noteParent.id,
-        noteRealms: new NoteRealmCache([noteParent, noteChild, noteGrandchild]),
+        noteRealms: toNoteRealmsCache([noteParent, noteChild, noteGrandchild]),
         expandChildren: true,
       })
       .render();

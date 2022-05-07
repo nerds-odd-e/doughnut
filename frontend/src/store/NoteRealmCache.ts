@@ -5,8 +5,8 @@ interface NoteRealmsReader {
 class NoteRealmCache implements NoteRealmsReader {
   noteRealms: { [id: Doughnut.ID]: Generated.NoteRealm } = {};
 
-  constructor(noteRealms: Generated.NoteRealm[]) {
-    noteRealms.forEach((noteRealm) => {
+  constructor(notesBulk: Generated.NotesBulk) {
+    notesBulk.notes.forEach((noteRealm) => {
       this.noteRealms[noteRealm.id] = noteRealm;
     });
   }
