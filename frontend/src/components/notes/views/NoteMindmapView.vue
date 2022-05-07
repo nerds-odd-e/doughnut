@@ -10,6 +10,7 @@
           offset,
         }"
         @selectNote="$emit('selectNote', $event)"
+        @note-realm-updated="$emit('noteRealmUpdated', $event)"
       />
     </div>
     <div class="mindmap-info" @click.prevent="reset">
@@ -41,7 +42,7 @@ export default defineComponent({
     highlightNoteId: Number,
     expandChildren: { type: Boolean, required: true },
   },
-  emits: ["selectNote"],
+  emits: ["selectNote", "noteRealmUpdated"],
   data() {
     return {
       offset: { ...defaultOffset },

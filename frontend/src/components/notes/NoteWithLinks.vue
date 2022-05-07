@@ -7,7 +7,7 @@
     <NoteFrameOfLinks v-bind="{ links }">
       <NoteContent
         v-bind="{ note }"
-        @note-realm-updated="onNoteRealmUpdated"
+        @note-realm-updated="$emit('noteRealmUpdated', $event)"
       />
     </NoteFrameOfLinks>
   </NoteShell>
@@ -34,12 +34,6 @@ export default defineComponent({
     NoteFrameOfLinks,
     NoteShell,
     NoteContent,
-  },
-  methods: {
-    onNoteRealmUpdated(noteRealm: Generated.NoteRealm) {
-      this.note.textContent = noteRealm.note.textContent;
-      this.$emit("noteRealmUpdated", noteRealm);
-    },
   },
 });
 </script>
