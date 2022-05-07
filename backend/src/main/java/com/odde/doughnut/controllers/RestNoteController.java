@@ -10,10 +10,7 @@ import com.odde.doughnut.models.SearchTermModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.stream.Stream;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 import lombok.Getter;
@@ -101,22 +98,6 @@ class RestNoteController {
     user.getAuthorization().assertReadAuthorization(note);
 
     return NotesBulk.jsonNoteWithChildren(note, user);
-  }
-
-  @PostMapping("/realms")
-  @Transactional(readOnly = true)
-  public List<NoteRealm> getRealmsByIds(@RequestBody List<Integer> noteIds)
-      throws NoAccessRightException {
-    final UserModel user = currentUserFetcher.getUser();
-    List<NoteRealm> result = new ArrayList<>();
-    Stream<Note> notes = modelFactoryService.noteRepository.findAllByIds(noteIds);
-    for (Iterator<Note> it = notes.iterator(); it.hasNext(); ) {
-      Note note = it.next();
-      user.getAuthorization().assertReadAuthorization(note);
-      result.add(new NoteViewer(user.getEntity(), note).toJsonObject());
-    }
-
-    return result;
   }
 
   @GetMapping("/{note}/overview")
