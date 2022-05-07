@@ -54,13 +54,11 @@ export default defineComponent({
   data() {
     return {
       comments: [] as Generated.Comment[],
+      noteRealm: null as Generated.NoteRealm | null,
       selectedNoteId: undefined as Doughnut.ID | undefined,
     };
   },
   computed: {
-    noteRealm() {
-      return this.piniaStore.getNoteRealmById(this.noteId);
-    },
     viewTypeObj(): ViewType {
       return viewType(this.viewType);
     },
@@ -83,13 +81,13 @@ export default defineComponent({
       if (!this.user) return;
       this.comments = await this.api.comments.getNoteComments(this.noteId);
     },
-    fetchData() {
+    async fetchData() {
       const storedApiCall = this.viewTypeObj.fetchAll
         ? this.storedApi.getNoteWithDescendents
         : this.storedApi.getNoteAndItsChildren;
 
-      storedApiCall(this.noteId);
-      this.fetchComments();
+      this.noteRealm = await storedApiCall(this.noteId);
+      await this.fetchComments();
     },
   },
   watch: {

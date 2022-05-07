@@ -24,7 +24,7 @@ describe("comments", () => {
   });
 
   describe("rendering a note realm", () => {
-    xit("should render note with one child", async () => {
+    it("should render note with one child", async () => {
       helper
         .component(NoteRealmAsync)
         .withProps({ noteId: note.id, expandChildren: true })
