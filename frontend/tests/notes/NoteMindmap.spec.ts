@@ -4,7 +4,7 @@
 import NoteMinmap from "@/components/notes/mindmap/NoteMindmap.vue";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
-import NoteRealmCache from "../../src/store/noteRealmCache";
+import NoteRealmCache from "../../src/store/NoteRealmCache";
 
 describe("note mindmap", () => {
   const notes: Generated.NoteRealm[] = [];
@@ -19,7 +19,7 @@ describe("note mindmap", () => {
       .component(NoteMinmap)
       .withProps({
         noteId,
-        noteRealms: new NoteRealmCache({notes}),
+        noteRealms: new NoteRealmCache({ notes }),
         offset: { scale: 1, rotate: 0 },
         ...props,
       })

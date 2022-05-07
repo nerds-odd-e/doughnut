@@ -5,7 +5,7 @@
 import { flushPromises } from "@vue/test-utils";
 import NoteArticleView from "@/components/notes/views/NoteArticleView.vue";
 import { screen } from "@testing-library/vue";
-import NoteRealmCache from "../../src/store/noteRealmCache";
+import NoteRealmCache from "../../src/store/NoteRealmCache";
 import makeMe from "../fixtures/makeMe";
 import helper from "../helpers";
 
@@ -14,7 +14,7 @@ helper.resetWithApiMock(beforeEach, afterEach);
 describe("note overview", () => {
   const toNoteRealmsCache = (notes: Generated.NoteRealm[]) => {
     return new NoteRealmCache({ notes });
-  }
+  };
 
   it("should render one note", async () => {
     const note = makeMe.aNoteRealm.title("single note").please();

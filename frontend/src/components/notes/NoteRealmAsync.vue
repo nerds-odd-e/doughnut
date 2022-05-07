@@ -72,8 +72,7 @@ export default defineComponent({
       return viewType(this.viewType);
     },
     selectedNotePosition(): Generated.NotePositionViewedByUser | undefined {
-      if (!this.selectedNoteId) return;
-      return this.piniaStore.getNotePosition(this.selectedNoteId);
+      return this.noteRealms?.getNotePosition(this.selectedNoteId);
     },
     selectedNote() {
       return this.noteRealm?.note;
@@ -83,7 +82,9 @@ export default defineComponent({
     },
   },
   methods: {
-    noteRealmUpdated(updatedNoteRealm: Generated.NoteRealm) {},
+    noteRealmUpdated(updatedNoteRealm: Generated.NoteRealm) {
+      this.noteRealms?.updateNoteRealm(updatedNoteRealm);
+    },
     highlight(id: Doughnut.ID) {
       this.selectedNoteId = id;
     },
