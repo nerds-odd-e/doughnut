@@ -26,6 +26,7 @@ import { defineComponent, PropType } from "vue";
 import NoteMindmap from "../mindmap/NoteMindmap.vue";
 import DragListner from "../../commons/DragListner.vue";
 import useStoredLoadingApi from "../../../managedApi/useStoredLoadingApi";
+import { NoteRealmsReader } from "../../../store/NoteRealmCache";
 
 const defaultOffset = { x: 0, y: 0, scale: 1.0, rotate: 0 };
 
@@ -36,7 +37,7 @@ export default defineComponent({
   props: {
     noteId: { type: Number, required: true },
     noteRealms: {
-      type: Object as PropType<{ [id: Doughnut.ID]: Generated.NoteRealm }>,
+      type: Object as PropType<NoteRealmsReader>,
       required: true,
     },
     highlightNoteId: Number,

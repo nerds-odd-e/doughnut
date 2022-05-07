@@ -5,6 +5,7 @@
 import { flushPromises } from "@vue/test-utils";
 import NoteArticleView from "@/components/notes/views/NoteArticleView.vue";
 import { screen } from "@testing-library/vue";
+import NoteRealmCache from "../../src/store/noteRealmCache";
 import makeMe from "../fixtures/makeMe";
 import helper from "../helpers";
 
@@ -17,7 +18,7 @@ describe("note overview", () => {
       .component(NoteArticleView)
       .withProps({
         noteId: note.id,
-        noteRealms: { [note.id]: note },
+        noteRealms: new NoteRealmCache([note]),
         expandChildren: true,
       })
       .render();
@@ -34,7 +35,7 @@ describe("note overview", () => {
       .component(NoteArticleView)
       .withProps({
         noteId: note.id,
-        noteRealms: { [note.id]: note },
+        noteRealms: new NoteRealmCache([note]),
         expandChildren: true,
       })
       .render();
@@ -51,7 +52,7 @@ describe("note overview", () => {
       .component(NoteArticleView)
       .withProps({
         noteId: noteParent.id,
-        noteRealms: { [noteParent.id]: noteParent, [noteChild.id]: noteChild },
+        noteRealms: new NoteRealmCache([noteParent, noteChild]),
         expandChildren: true,
       })
       .render();
@@ -75,12 +76,7 @@ describe("note overview", () => {
       .component(NoteArticleView)
       .withProps({
         noteId: noteParent.id,
-        noteRealms: {
-          [noteParent.id]: noteParent,
-          [noteChild.id]: noteChild,
-          [noteGrandchild.id]: noteGrandchild,
-          [noteGrandchild.id]: noteGrandchild,
-        },
+        noteRealms: new NoteRealmCache([noteParent, noteChild, noteGrandchild]),
         expandChildren: true,
       })
       .render();

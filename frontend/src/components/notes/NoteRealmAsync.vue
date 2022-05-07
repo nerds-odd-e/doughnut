@@ -39,6 +39,7 @@ import NoteArticleView from "./views/NoteArticleView.vue";
 import { ViewType, viewType } from "../../models/viewTypes";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 import LoadingPage from "../../pages/commons/LoadingPage.vue";
+import NoteRealmCache from "../../store/NoteRealmCache";
 
 export default defineComponent({
   setup() {
@@ -59,13 +60,13 @@ export default defineComponent({
   data() {
     return {
       comments: [] as Generated.Comment[],
-      noteRealm: null as Generated.NoteRealm | null,
+      noteRealms: null as NoteRealmCache | undefined,
       selectedNoteId: undefined as Doughnut.ID | undefined,
     };
   },
   computed: {
-    noteRealms() {
-      return this.piniaStore.noteRealms;
+    noteRealm() {
+      return this.noteRealms?.getNoteRealmById(this.noteId);
     },
     viewTypeObj(): ViewType {
       return viewType(this.viewType);
@@ -95,7 +96,7 @@ export default defineComponent({
         ? this.storedApi.getNoteWithDescendents
         : this.storedApi.getNoteAndItsChildren;
 
-      this.noteRealm = { ...(await storedApiCall(this.noteId)) };
+      this.noteRealms = new NoteRealmCache(await storedApiCall(this.noteId));
       await this.fetchComments();
     },
   },

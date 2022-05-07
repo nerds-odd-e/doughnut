@@ -4,6 +4,7 @@
 import NoteMinmap from "@/components/notes/mindmap/NoteMindmap.vue";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
+import NoteRealmCache from "../../src/store/noteRealmCache";
 
 describe("note mindmap", () => {
   const notes: Generated.NoteRealm[] = [];
@@ -13,20 +14,12 @@ describe("note mindmap", () => {
     helper.reset();
   });
 
-  function toNoteRealmHash(noteRealms: Generated.NoteRealm[]) {
-    const noteRealmHash = {} as { [id: Doughnut.ID]: Generated.NoteRealm };
-    noteRealms.forEach((noteRealm) => {
-      noteRealmHash[noteRealm.id] = noteRealm;
-    });
-    return noteRealmHash;
-  }
-
   const getMountedElement = (noteId: Doughnut.ID, props = {}) => {
     return helper
       .component(NoteMinmap)
       .withProps({
         noteId,
-        noteRealms: toNoteRealmHash(notes),
+        noteRealms: new NoteRealmCache(notes),
         offset: { scale: 1, rotate: 0 },
         ...props,
       })

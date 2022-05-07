@@ -12,37 +12,34 @@ import NoteFormBody from "./NoteFormBody.vue";
 
 export default defineComponent({
   setup() {
-    return useStoredLoadingApi({initalLoading: true, hasFormError: true});
+    return useStoredLoadingApi({ initalLoading: true, hasFormError: true });
   },
   name: "NoteEditDialog",
   components: {
     NoteFormBody,
   },
-  props: { noteId: {type: Number, required: true}},
+  props: { noteId: { type: Number, required: true } },
   emits: ["done"],
   data() {
     return {
       formData: null,
     } as {
-      formData: any
+      formData: any;
     };
   },
 
   methods: {
     fetchData() {
-      this.storedApi.getNoteAndItsChildren(this.noteId)
-      .then((noteRealm) => {
-          const { updatedAt, ...rest } = noteRealm.note.noteAccessories
-          this.formData = rest
-        }
-      )
+      this.storedApi.getNoteAndItsChildren(this.noteId).then((res) => {
+        const { updatedAt, ...rest } = res[0].note.noteAccessories;
+        this.formData = rest;
+      });
     },
 
     processForm() {
-      this.storedApi.updateNote(this.noteId, this.formData)
-      .then(() => {
+      this.storedApi.updateNote(this.noteId, this.formData).then(() => {
         this.$emit("done");
-      })
+      });
     },
   },
   mounted() {

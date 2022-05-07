@@ -125,7 +125,7 @@ const storedApiCollection = (
         `notes/${noteId}/overview`
       )) as Generated.NotesBulk;
       piniaStore.loadNotesBulk(res);
-      return res.notes[0];
+      return res.notes;
     },
 
     async getNoteAndItsChildren(noteId: Doughnut.ID) {
@@ -133,7 +133,7 @@ const storedApiCollection = (
         `notes/${noteId}`
       )) as Generated.NotesBulk;
       piniaStore.loadNotesBulk(res);
-      return res.notes[0];
+      return res.notes;
     },
 
     async getNotebooks() {

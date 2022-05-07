@@ -20,19 +20,20 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import MindmapSector from "../../../models/MindmapSector";
+import { NoteRealmsReader } from "../../../store/NoteRealmCache";
 
 export default defineComponent({
   props: {
     noteId: { type: Number, required: true },
     mindmapSector: { type: Object as PropType<MindmapSector>, required: true },
     noteRealms: {
-      type: Object as PropType<{ [id: Doughnut.ID]: Generated.NoteRealm }>,
+      type: Object as PropType<NoteRealmsReader>,
       required: true,
     },
   },
   computed: {
     noteRealm() {
-      return this.noteRealms[this.noteId];
+      return this.noteRealms.getNoteRealmById(this.noteId);
     },
     note() {
       return this.noteRealm?.note;

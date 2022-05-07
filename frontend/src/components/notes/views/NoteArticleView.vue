@@ -18,12 +18,13 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import NoteWithLinks from "../NoteWithLinks.vue";
+import { NoteRealmsReader } from "../../../store/NoteRealmCache";
 
 export default defineComponent({
   props: {
     noteId: { type: Number, required: true },
     noteRealms: {
-      type: Object as PropType<{ [id: Doughnut.ID]: Generated.NoteRealm }>,
+      type: Object as PropType<NoteRealmsReader>,
       required: true,
     },
     expandChildren: { type: Boolean, required: true },
@@ -32,10 +33,12 @@ export default defineComponent({
   emits: ["noteRealmUpdated"],
   computed: {
     noteRealm() {
-      return this.noteRealms[this.noteId];
+      return this.noteRealms.getNoteRealmById(this.noteId);
     },
     children() {
-      return this.noteRealm.children.map((child) => this.noteRealms[child.id]);
+      return this.noteRealm?.children.map((child) =>
+        this.noteRealms.getNoteRealmById(child.id)
+      );
     },
   },
 });
