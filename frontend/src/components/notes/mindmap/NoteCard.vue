@@ -1,11 +1,17 @@
 <template>
-  <NoteShell 
-  :class="`inner-box note-card ${size} ${highlightClass}`"
-  v-bind="{id: note.id, updatedAt: note.textContent?.updatedAt}"
-  role="card" :aria-label="note.title"
-  :style="`top:${coord.y}px; left:${coord.x}px`"
-  v-on:click="$emit('highlight', note.id)">
-    <NoteContent v-bind="{note, size}" :titleAsLink="true"/>
+  <NoteShell
+    :class="`inner-box note-card ${size} ${highlightClass}`"
+    v-bind="{ id: note.id, updatedAt: note.textContent?.updatedAt }"
+    role="card"
+    :aria-label="note.title"
+    :style="`top:${coord.y}px; left:${coord.x}px`"
+    @click="$emit('highlight', note.id)"
+  >
+    <NoteContent
+      v-bind="{ note, size }"
+      :title-as-link="true"
+      @note-realm-updated="$emit('noteRealmUpdated', $event)"
+    />
   </NoteShell>
 </template>
 
@@ -14,7 +20,6 @@ import NoteShell from "../NoteShell.vue";
 import NoteContent from "../NoteContent.vue";
 import MindmapSector from "@/models/MindmapSector";
 
-
 export default {
   props: {
     note: Object,
@@ -22,19 +27,25 @@ export default {
     mindmap: Object,
     highlightNoteId: Number,
   },
-  emits: ['highlight'],
+  emits: ["highlight", "noteRealmUpdated"],
   components: {
-     NoteShell,
-     NoteContent,
+    NoteShell,
+    NoteContent,
   },
   computed: {
     highlightClass() {
-       return this.highlightNoteId?.toString() === this.note.id.toString() ? 'highlighted' : '' 
-      },
-    coord() { return this.mindmap.coord(this.mindmapSector) },
-    size() { return this.mindmap.size() },
+      return this.highlightNoteId?.toString() === this.note.id.toString()
+        ? "highlighted"
+        : "";
+    },
+    coord() {
+      return this.mindmap.coord(this.mindmapSector);
+    },
+    size() {
+      return this.mindmap.size();
+    },
   },
-}
+};
 </script>
 
 <style lang="sass" scoped>

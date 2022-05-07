@@ -1,6 +1,9 @@
 <template>
   <div class="container" v-if="noteRealm">
-    <NoteWithLinks v-bind="{ note: noteRealm.note, links: noteRealm.links }" />
+    <NoteWithLinks
+      v-bind="{ note: noteRealm.note, links: noteRealm.links }"
+      @note-realm-updated="$emit('noteRealmUpdated', $event)"
+    />
     <NoteStatisticsButton :note-id="noteRealm.id" />
     <Comments v-bind="{ noteId: noteRealm.id, comments }" />
 
@@ -31,6 +34,7 @@ export default defineComponent({
       default: () => [] as Generated.Comment[],
     },
   },
+  emits: ["noteRealmUpdated"],
   components: {
     NoteWithLinks,
     Cards,

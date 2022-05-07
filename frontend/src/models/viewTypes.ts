@@ -1,8 +1,9 @@
+type ViewTypeName = "cards" | "article" | "mindmap";
+
 interface ViewType {
-  value: string;
+  value: ViewTypeName;
   path: string;
   title: string;
-  redirectAfterDelete?: boolean;
   fetchAll?: boolean;
 }
 
@@ -11,7 +12,6 @@ const viewTypes: Array<ViewType> = [
     value: "cards",
     path: "cards",
     title: "cards view",
-    redirectAfterDelete: true,
   },
   { value: "article", path: "article", title: "article view", fetchAll: true },
   { value: "mindmap", path: "mindmap", title: "mindmap view", fetchAll: true },
@@ -22,4 +22,4 @@ const viewType = (value: string | undefined): ViewType => {
   if (result) return result;
   return viewTypes[0];
 };
-export { viewTypes, viewType, ViewType };
+export { viewTypes, viewType, ViewType, ViewTypeName };

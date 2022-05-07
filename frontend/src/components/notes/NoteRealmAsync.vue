@@ -12,13 +12,18 @@
           v-bind="{ noteId, expandChildren }"
           :highlight-note-id="selectedNoteId"
           @selectNote="highlight($event)"
+          @note-realm-updated="noteRealmUpdated($event)"
         />
         <div class="container" v-if="viewType === 'article'">
-          <NoteArticleView v-bind="{ noteRealm, expandChildren }" />
+          <NoteArticleView
+            v-bind="{ noteRealm, expandChildren }"
+            @note-realm-updated="noteRealmUpdated($event)"
+          />
         </div>
         <NoteCardsView
           v-if="!viewType || viewType === 'cards'"
           v-bind="{ noteRealm, expandChildren, comments }"
+          @note-realm-updated="noteRealmUpdated($event)"
         />
       </div>
     </div>
@@ -74,6 +79,7 @@ export default defineComponent({
     },
   },
   methods: {
+    noteRealmUpdated(updatedNoteRealm: Generated.NoteRealm) {},
     highlight(id: Doughnut.ID) {
       this.selectedNoteId = id;
     },

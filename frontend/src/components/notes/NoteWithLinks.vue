@@ -5,13 +5,16 @@
     v-bind="{ id: note.id, updatedAt: note.textContent?.updatedAt }"
   >
     <NoteFrameOfLinks v-bind="{ links }">
-      <NoteContent v-bind="{ note }" />
+      <NoteContent
+        v-bind="{ note }"
+        @note-realm-updated="onNoteRealmUpdated"
+      />
     </NoteFrameOfLinks>
   </NoteShell>
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from 'vue'
+import { defineComponent, PropType } from "vue";
 import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
 import NoteShell from "./NoteShell.vue";
 import NoteContent from "./NoteContent.vue";
@@ -20,12 +23,23 @@ export default defineComponent({
   name: "NoteWithLinks",
   props: {
     note: { type: Object as PropType<Generated.Note>, required: true },
-    links: { type: Object as PropType<{ [P in Generated.LinkType]?: Generated.LinkViewed }> },
+    links: {
+      type: Object as PropType<{
+        [P in Generated.LinkType]?: Generated.LinkViewed;
+      }>,
+    },
   },
+  emits: ["noteRealmUpdated"],
   components: {
     NoteFrameOfLinks,
     NoteShell,
     NoteContent,
+  },
+  methods: {
+    onNoteRealmUpdated(noteRealm: Generated.NoteRealm) {
+      this.note.textContent = noteRealm.note.textContent;
+      this.$emit("noteRealmUpdated", noteRealm);
+    },
   },
 });
 </script>

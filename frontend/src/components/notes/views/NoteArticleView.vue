@@ -1,11 +1,15 @@
 <template>
   <template v-if="noteRealm">
-    <NoteWithLinks v-bind="{ note: noteRealm.note, links: noteRealm.links }" />
+    <NoteWithLinks
+      v-bind="{ note: noteRealm.note, links: noteRealm.links }"
+      @note-realm-updated="$emit('noteRealmUpdated', $event)"
+    />
     <div class="note-list">
       <NoteArticleView
         v-for="child in children"
         v-bind="{ noteRealm: child, expandChildren }"
         :key="child.id"
+        @note-realm-updated="$emit('noteRealmUpdated', $event)"
       />
     </div>
   </template>
@@ -28,6 +32,7 @@ export default defineComponent({
     expandChildren: { type: Boolean, required: true },
   },
   components: { NoteWithLinks },
+  emits: ["noteRealmUpdated"],
   data() {
     return {
       children: undefined as Generated.NoteRealm[] | undefined,
