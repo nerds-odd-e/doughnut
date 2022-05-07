@@ -217,7 +217,7 @@ const storedApiCollection = (
       noteId: Doughnut.ID,
       noteContentData: Generated.TextContent
     ) {
-      piniaStore.addEditingToUndoHistory({ noteId });
+      piniaStore.addEditingToUndoHistory(noteId, noteContentData);
       return updateTextContentWithoutUndo(noteId, noteContentData);
     },
 

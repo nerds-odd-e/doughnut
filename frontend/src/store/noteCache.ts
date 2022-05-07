@@ -40,26 +40,9 @@ class NoteCache {
   }
 
   getNoteRealmById(id: Doughnut.ID | undefined) {
+    // throw new Error("Method not implemented.");
     if (id === undefined) return undefined;
     return this.state.noteRealms[id];
-  }
-
-  getNotePosition(id: Doughnut.ID | undefined) {
-    if (!id) return undefined;
-    const ancestors: Generated.Note[] = [];
-    let cursor = this.getNoteRealmById(id);
-    while (cursor && cursor.note.parentId) {
-      cursor = this.getNoteRealmById(cursor.note.parentId);
-      if (!cursor) return undefined;
-      ancestors.unshift(cursor.note);
-    }
-    if (!cursor) return undefined;
-    const notebook = this.state.notebooksMapByHeadNoteId[cursor.id];
-    return {
-      noteId: id,
-      ancestors,
-      notebook,
-    } as Generated.NotePositionViewedByUser;
   }
 
   private loadNotebook(notebook: Generated.NotebookViewedByUser) {

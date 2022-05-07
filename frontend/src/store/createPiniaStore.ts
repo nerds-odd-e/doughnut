@@ -34,10 +34,8 @@ export default defineStore("main", {
       noteCache(this).loadNotebooks(notebooks);
     },
 
-    addEditingToUndoHistory({ noteId }: { noteId: Doughnut.ID }) {
-      const noteRealm = noteCache(this).getNoteRealmById(noteId);
-      if (!noteRealm) throw new Error("Note not in cache");
-      history(this).addEditingToUndoHistory(noteId, noteRealm.note.textContent);
+    addEditingToUndoHistory(noteId : Doughnut.ID, textContent: Generated.TextContent) {
+      history(this).addEditingToUndoHistory(noteId, textContent);
     },
 
     popUndoHistory() {

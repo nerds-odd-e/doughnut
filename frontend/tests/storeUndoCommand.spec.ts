@@ -13,19 +13,18 @@ describe("storeUndoCommand", () => {
     });
 
     it("should push textContent into store state noteUndoHistories ", () => {
-      store.addEditingToUndoHistory({ noteId: note.id });
+      store.addEditingToUndoHistory(note.id, note.note.textContent);
 
       expect(store.noteUndoHistories.length).toEqual(1);
     });
   });
 
   describe("popUndoHistory", () => {
-    const mockUpdatedNote = { noteId: note.id };
     let initialUndoCount;
 
     beforeEach(() => {
       store.loadNoteRealms([note]);
-      store.addEditingToUndoHistory(mockUpdatedNote);
+      store.addEditingToUndoHistory(note.id, note.note.textContent);
       initialUndoCount = store.noteUndoHistories.length;
     });
 
