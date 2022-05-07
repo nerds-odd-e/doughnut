@@ -112,14 +112,15 @@ export default defineComponent({
       if (await this.popups.confirm(`Confirm to delete this note?`)) {
         const { id, parentId } = this.note;
         await this.storedApi.deleteNote(id);
-        this.$emit("noteDeleted", id);
         if (parentId) {
           if (this.viewType === "cards") {
             this.$router.push({
               name: "noteShow",
               params: { rawNoteId: parentId, viewType: this.viewType },
             });
+            return;
           }
+          this.$emit("noteDeleted", id);
         } else {
           this.$router.push({ name: "notebooks" });
         }

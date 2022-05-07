@@ -5,7 +5,7 @@
       :note="selectedNote"
       :viewType="viewType"
       :featureToggle="featureToggle"
-      @note-deleted="emit('noteDeleted', $event)"
+      @note-deleted="$emit('noteDeleted', $event)"
     />
     <div class="btn-group btn-group-sm">
       <PopupButton title="link note">

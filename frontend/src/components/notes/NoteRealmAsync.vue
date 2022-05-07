@@ -32,12 +32,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, PropType } from "vue";
 import NoteToolbar from "../toolbars/NoteToolbar.vue";
 import NoteMindmapView from "./views/NoteMindmapView.vue";
 import NoteCardsView from "./views/NoteCardsView.vue";
 import NoteArticleView from "./views/NoteArticleView.vue";
-import { ViewType, viewType } from "../../models/viewTypes";
+import { ViewType, viewType, ViewTypeName } from "../../models/viewTypes";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 import LoadingPage from "../../pages/commons/LoadingPage.vue";
 import NoteRealmCache from "../../store/NoteRealmCache";
@@ -48,7 +48,10 @@ export default defineComponent({
   },
   props: {
     noteId: { type: Number, required: true },
-    viewType: String,
+    viewType: {
+      type: String as PropType<ViewTypeName>,
+      default: () => "cards",
+    },
     expandChildren: { type: Boolean, required: true },
   },
   components: {
