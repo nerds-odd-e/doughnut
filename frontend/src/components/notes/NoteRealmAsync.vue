@@ -9,14 +9,14 @@
       <div class="content" v-if="noteRealm">
         <NoteMindmapView
           v-if="viewType === 'mindmap'"
-          v-bind="{ noteId, expandChildren }"
+          v-bind="{ noteId, noteRealms, expandChildren }"
           :highlight-note-id="selectedNoteId"
           @selectNote="highlight($event)"
           @note-realm-updated="noteRealmUpdated($event)"
         />
         <div class="container" v-if="viewType === 'article'">
           <NoteArticleView
-            v-bind="{ noteRealm, expandChildren }"
+            v-bind="{ noteId, noteRealms, expandChildren }"
             @note-realm-updated="noteRealmUpdated($event)"
           />
         </div>
@@ -64,6 +64,9 @@ export default defineComponent({
     };
   },
   computed: {
+    noteRealms() {
+      return this.piniaStore.noteRealms;
+    },
     viewTypeObj(): ViewType {
       return viewType(this.viewType);
     },
@@ -92,7 +95,7 @@ export default defineComponent({
         ? this.storedApi.getNoteWithDescendents
         : this.storedApi.getNoteAndItsChildren;
 
-      this.noteRealm = await storedApiCall(this.noteId);
+      this.noteRealm = { ...(await storedApiCall(this.noteId)) };
       await this.fetchComments();
     },
   },

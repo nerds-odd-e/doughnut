@@ -20,19 +20,24 @@
   </DragListner>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, PropType } from "vue";
 import NoteMindmap from "../mindmap/NoteMindmap.vue";
 import DragListner from "../../commons/DragListner.vue";
 import useStoredLoadingApi from "../../../managedApi/useStoredLoadingApi";
 
 const defaultOffset = { x: 0, y: 0, scale: 1.0, rotate: 0 };
 
-export default {
+export default defineComponent({
   setup() {
     return useStoredLoadingApi();
   },
   props: {
-    noteId: Number,
+    noteId: { type: Number, required: true },
+    noteRealms: {
+      type: Object as PropType<{ [id: Doughnut.ID]: Generated.NoteRealm }>,
+      required: true,
+    },
     highlightNoteId: Number,
     expandChildren: { type: Boolean, required: true },
   },
@@ -49,9 +54,6 @@ export default {
     },
   },
   computed: {
-    noteRealms() {
-      return this.piniaStore.noteRealms;
-    },
     centerX() {
       return `calc(50% + ${this.offset.x}px)`;
     },
@@ -70,7 +72,7 @@ export default {
       return `rotate: ${((this.offset.rotate * 180) / Math.PI).toFixed(0)}`;
     },
   },
-};
+});
 </script>
 
 <style lang="sass" scoped>

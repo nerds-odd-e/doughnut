@@ -7,7 +7,7 @@
     <div class="note-list">
       <NoteArticleView
         v-for="child in children"
-        v-bind="{ noteRealm: child, expandChildren }"
+        v-bind="{ noteId: child.id, noteRealms, expandChildren }"
         :key="child.id"
         @note-realm-updated="$emit('noteRealmUpdated', $event)"
       />
@@ -17,36 +17,26 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import useLoadingApi from "../../../managedApi/useLoadingApi";
 import NoteWithLinks from "../NoteWithLinks.vue";
 
 export default defineComponent({
-  setup() {
-    return useLoadingApi();
-  },
   props: {
-    noteRealm: {
-      type: Object as PropType<Generated.NoteRealm>,
+    noteId: { type: Number, required: true },
+    noteRealms: {
+      type: Object as PropType<{ [id: Doughnut.ID]: Generated.NoteRealm }>,
       required: true,
     },
     expandChildren: { type: Boolean, required: true },
   },
   components: { NoteWithLinks },
   emits: ["noteRealmUpdated"],
-  data() {
-    return {
-      children: undefined as Generated.NoteRealm[] | undefined,
-    };
-  },
-  methods: {
-    async fetchChildren() {
-      this.children = await this.api.getNoteRealmsByIds(
-        this.noteRealm.children.map((child) => child.id)
-      );
+  computed: {
+    noteRealm() {
+      return this.noteRealms[this.noteId];
     },
-  },
-  mounted() {
-    this.fetchChildren();
+    children() {
+      return this.noteRealm.children.map((child) => this.noteRealms[child.id]);
+    },
   },
 });
 </script>

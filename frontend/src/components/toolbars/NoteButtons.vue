@@ -112,8 +112,8 @@ export default defineComponent({
       if (await this.popups.confirm(`Confirm to delete this note?`)) {
         const { parentId } = this.note;
         await this.storedApi.deleteNote(this.note.id);
-        this.$emit("ensureVisible", parentId);
         if (parentId) {
+          this.$emit("ensureVisible", parentId);
           if (this.viewType === "cards") {
             this.$router.push({
               name: "noteShow",

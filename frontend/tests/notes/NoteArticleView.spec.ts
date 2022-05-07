@@ -15,7 +15,11 @@ describe("note overview", () => {
     const note = makeMe.aNoteRealm.title("single note").please();
     helper
       .component(NoteArticleView)
-      .withProps({ noteRealm: note, expandChildren: true })
+      .withProps({
+        noteId: note.id,
+        noteRealms: { [note.id]: note },
+        expandChildren: true,
+      })
       .render();
     expect(screen.getByRole("title")).toHaveTextContent("single note");
     expect(screen.getAllByRole("title")).toHaveLength(1);
@@ -28,7 +32,11 @@ describe("note overview", () => {
       .please();
     helper
       .component(NoteArticleView)
-      .withProps({ noteRealm: note, expandChildren: true })
+      .withProps({
+        noteId: note.id,
+        noteRealms: { [note.id]: note },
+        expandChildren: true,
+      })
       .render();
     await screen.findByText("target note");
   });
@@ -39,13 +47,11 @@ describe("note overview", () => {
       .title("child")
       .under(noteParent)
       .please();
-    helper.apiMock
-      .expectingPost("/api/notes/realms")
-      .andReturnOnce([noteChild]);
     helper
       .component(NoteArticleView)
       .withProps({
-        noteRealm: noteParent,
+        noteId: noteParent.id,
+        noteRealms: { [noteParent.id]: noteParent, [noteChild.id]: noteChild },
         expandChildren: true,
       })
       .render();
@@ -65,16 +71,16 @@ describe("note overview", () => {
       .title("grandchild")
       .under(noteChild)
       .please();
-    helper.apiMock
-      .expectingPost("/api/notes/realms")
-      .andReturnOnce([noteChild]);
-    helper.apiMock
-      .expectingPost("/api/notes/realms")
-      .andReturnOnce([noteGrandchild]);
     helper
       .component(NoteArticleView)
       .withProps({
-        noteRealm: noteParent,
+        noteId: noteParent.id,
+        noteRealms: {
+          [noteParent.id]: noteParent,
+          [noteChild.id]: noteChild,
+          [noteGrandchild.id]: noteGrandchild,
+          [noteGrandchild.id]: noteGrandchild,
+        },
         expandChildren: true,
       })
       .render();
