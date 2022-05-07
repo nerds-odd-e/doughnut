@@ -38,7 +38,7 @@ export default defineComponent({
     children() {
       return this.noteRealm?.children.map((child) =>
         this.noteRealms.getNoteRealmById(child.id)
-      );
+      ).filter((child) => child);
     },
   },
 });

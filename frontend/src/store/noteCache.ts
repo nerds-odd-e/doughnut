@@ -34,12 +34,6 @@ class NoteCache {
     });
   }
 
-  getNoteRealmById(id: Doughnut.ID | undefined) {
-    throw new Error("Method not implemented.");
-    if (id === undefined) return undefined;
-    return this.state.noteRealms[id];
-  }
-
   private loadNotebook(notebook: Generated.NotebookViewedByUser) {
     this.state.notebooksMapByHeadNoteId[notebook.headNoteId] = notebook;
   }
