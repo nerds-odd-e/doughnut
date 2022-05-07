@@ -22,10 +22,6 @@ export default defineStore("main", {
     } as State),
 
   getters: {
-    getNoteRealmById: (state) => (id: Doughnut.ID) =>
-      noteCache(state).getNoteRealmById(id),
-    getNotePosition: (state) => (id: Doughnut.ID) =>
-      noteCache(state).getNotePosition(id),
     peekUndo: (state) => () => history(state).peekUndo(),
   },
 

@@ -1,7 +1,6 @@
 /**
  * @jest-environment jsdom
  */
-import store from "./fixtures/testingStore";
 import makeMe from "./fixtures/makeMe";
 import NoteRealmCache from "../src/store/NoteRealmCache";
 
@@ -21,7 +20,7 @@ describe("storedApiCollection", () => {
     it("should change the store", async () => {
       const cache = toNoteRealmsCache([note]);
       cache.deleteNoteAndDescendents(note.id);
-      expect(store.getNoteRealmById(note.id)).toBeUndefined();
+      expect(cache.getNoteRealmById(note.id)).toBeUndefined();
     });
 
     it("should remove children notes", async () => {
