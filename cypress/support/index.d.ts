@@ -21,7 +21,7 @@ declare namespace Cypress {
     expectCurrentNoteDescription(expectedDescription: string): void
     loginAs(username: string): void
     logout(username?: string): void
-    pageIsLoaded(): void
+    pageIsNotLoading(): void
     subscribeToNote(noteTitle: string, dailyLearningCount: number): Chainable<Element>
     triggerException(): void
     unsubscribeFromNotebook(noteTitle: string): Chainable<Element>

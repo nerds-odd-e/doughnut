@@ -27,7 +27,7 @@
 import "@testing-library/cypress/add-commands"
 import "cypress-file-upload"
 
-Cypress.Commands.add("pageIsLoaded", () => {
+Cypress.Commands.add("pageIsNotLoading", () => {
   cy.get(".loading-bar").should("not.exist")
 })
 
@@ -140,7 +140,7 @@ Cypress.Commands.add("submitNoteFormWith", (noteAttributes) => {
 })
 
 Cypress.Commands.add("clickAddChildNoteButton", () => {
-  cy.pageIsLoaded()
+  cy.pageIsNotLoading()
   cy.findAllByRole("button", { name: "Add Child Note" }).first().click()
 })
 
@@ -452,7 +452,7 @@ Cypress.Commands.add("expectCurrentNoteDescription", (expectedDescription) => {
 })
 
 Cypress.Commands.add("withinMindmap", () => {
-  cy.pageIsLoaded()
+  cy.pageIsNotLoading()
   cy.wrap(
     new Promise((resolve, reject) => {
       cy.get(`.box .content .inner-box .content`).then((mindmap) => {

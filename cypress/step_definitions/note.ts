@@ -68,7 +68,7 @@ When("I am creating note under {string}", (noteTitles) => {
 })
 
 Then("I should see {string} in breadcrumb", (noteTitles) => {
-  cy.pageIsLoaded()
+  cy.pageIsNotLoading()
   cy.get(".breadcrumb").within(() =>
     noteTitles
       .commonSenseSplit(", ")
@@ -110,7 +110,7 @@ Then("I should see {string} in note title", (noteTitle) => {
 })
 
 Then("I should not see note {string} at the top level of all my notes", (noteTitle) => {
-  cy.pageIsLoaded()
+  cy.pageIsNotLoading()
   cy.findByText("Notebooks")
   cy.findByText(noteTitle).should("not.exist")
 })

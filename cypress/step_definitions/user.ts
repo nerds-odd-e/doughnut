@@ -21,7 +21,7 @@ Given("I've logged in as another existing user", () => {
 })
 
 Given("my session is logged out", () => {
-  cy.pageIsLoaded()
+  cy.pageIsNotLoading()
   cy.logout()
 })
 
