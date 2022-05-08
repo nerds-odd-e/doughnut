@@ -1,8 +1,7 @@
 import { defineStore } from "pinia";
 import history, { HistoryState } from "./history";
-import noteCache, { NoteCacheState } from "./noteCache";
 
-interface State extends NoteCacheState, HistoryState {
+interface State extends HistoryState {
   currentUser: Generated.User | null;
   featureToggle: boolean;
   environment: "production" | "testing";
@@ -11,7 +10,6 @@ interface State extends NoteCacheState, HistoryState {
 export default defineStore("main", {
   state: () =>
     ({
-      noteRealms: {},
       noteUndoHistories: [],
       popupInfo: undefined,
       currentUser: null,
@@ -24,10 +22,6 @@ export default defineStore("main", {
   },
 
   actions: {
-    loadNotebooks(notebooks: Generated.NotebookViewedByUser[]) {
-      noteCache(this).loadNotebooks(notebooks);
-    },
-
     addEditingToUndoHistory(
       noteId: Doughnut.ID,
       oldContent: Generated.TextContent
@@ -37,10 +31,6 @@ export default defineStore("main", {
 
     popUndoHistory() {
       history(this).popUndoHistory();
-    },
-
-    loadNotePosition(notePosition: Generated.NotePositionViewedByUser) {
-      noteCache(this).loadNotePosition(notePosition);
     },
 
     deleteNote(noteId: Doughnut.ID) {
