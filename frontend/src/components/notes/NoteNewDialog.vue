@@ -52,7 +52,7 @@ export default defineComponent({
   },
   methods: {
     fetchData() {
-      this.storedApi.getNoteAndItsChildren(this.parentId)
+      this.storedApi.getNoteRealm(this.parentId)
     },
 
     processForm() {

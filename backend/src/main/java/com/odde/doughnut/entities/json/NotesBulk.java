@@ -15,11 +15,6 @@ public class NotesBulk {
 
     notesBulk.notePosition = new NoteViewer(user.getEntity(), note).jsonNotePosition(note);
     notesBulk.notes.add(new NoteViewer(user.getEntity(), note).toJsonObject());
-    note.getChildren()
-        .forEach(
-            n -> {
-              notesBulk.notes.add(new NoteViewer(user.getEntity(), n).toJsonObject());
-            });
     return notesBulk;
   }
 

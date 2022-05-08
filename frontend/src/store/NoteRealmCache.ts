@@ -24,7 +24,8 @@ class NoteRealmCache implements NoteRealmsReader {
     return this.noteRealms[id];
   }
 
-  updateNoteRealm(noteRealm: Generated.NoteRealm) {
+  updateNoteRealm(noteRealm?: Generated.NoteRealm) {
+    if (!noteRealm) return;
     this.noteRealms[noteRealm.id] = noteRealm;
   }
 

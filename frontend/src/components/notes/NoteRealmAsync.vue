@@ -50,7 +50,7 @@ export default defineComponent({
   props: {
     noteId: { type: Number, required: true },
     viewType: {
-      type: String as PropType<ViewTypeName>,
+      type: String as ProgetNoteRealm
       default: () => "cards",
     },
     expandChildren: { type: Boolean, required: true },
@@ -88,10 +88,6 @@ export default defineComponent({
       this.noteRealms?.deleteNoteAndDescendents(deletedNoteId);
     },
     noteRealmUpdated(updatedNoteRealm?: Generated.NoteRealm) {
-      if (!updatedNoteRealm) {
-        return;
-      }
-
       this.noteRealms?.updateNoteRealm(updatedNoteRealm);
     },
     highlight(id: Doughnut.ID) {
