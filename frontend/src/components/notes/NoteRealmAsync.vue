@@ -50,7 +50,7 @@ export default defineComponent({
   props: {
     noteId: { type: Number, required: true },
     viewType: {
-      type: String as ProgetNoteRealm
+      type: String as PropType<ViewTypeName>,
       default: () => "cards",
     },
     expandChildren: { type: Boolean, required: true },
@@ -100,7 +100,7 @@ export default defineComponent({
     async fetchData() {
       if (this.viewType === "cards") {
         this.noteRealms = new NoteRealmCache(
-          await this.storedApi.getNoteAndItsChildren(this.noteId)
+          await this.storedApi.getNoteRealm(this.noteId)
         );
       } else {
         this.noteRealms = new NoteRealmCache(
