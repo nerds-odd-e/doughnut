@@ -154,11 +154,13 @@ class RestNoteController {
 
   @PatchMapping(value = "/{note}/undo-delete")
   @Transactional
-  public NotesBulk undoDeleteNote(@PathVariable("note") Note note) throws NoAccessRightException {
-    currentUserFetcher.getUser().getAuthorization().assertAuthorization(note);
+  public NoteRealm undoDeleteNote(@PathVariable("note") Note note) throws NoAccessRightException {
+    UserModel user = currentUserFetcher.getUser();
+    user.getAuthorization().assertAuthorization(note);
     modelFactoryService.toNoteModel(note).restore();
     modelFactoryService.entityManager.flush();
-    return NotesBulk.jsonNoteRealm(note, currentUserFetcher.getUser());
+
+    return new NoteViewer(user.getEntity(), note).toJsonObject();
   }
 
   @GetMapping("/{note}/review-setting")

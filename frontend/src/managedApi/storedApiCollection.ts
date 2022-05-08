@@ -187,11 +187,10 @@ const storedApiCollection = (
           history.textContent
         );
       }
-      const res = (await managedApi.restPatch(
+      return (await managedApi.restPatch(
         `notes/${history.noteId}/undo-delete`,
         {}
-      )) as Generated.NotesBulk;
-      return res.notes[0];
+      )) as Generated.NoteRealm;
     },
 
     async deleteNote(noteId: Doughnut.ID) {
