@@ -11,10 +11,7 @@ describe("note wth child cards", () => {
     helper.reset();
     const notePosition = makeMe.aNotePosition.please();
     const noteParent = makeMe.aNoteRealm.title("parent").please();
-    makeMe.aNoteRealm
-      .title("child")
-      .under(noteParent)
-      .please();
+    makeMe.aNoteRealm.title("child").under(noteParent).please();
     helper
       .component(NoteCardsView)
       .withProps({

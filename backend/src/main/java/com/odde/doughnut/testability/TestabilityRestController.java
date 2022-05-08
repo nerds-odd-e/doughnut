@@ -55,6 +55,7 @@ class TestabilityRestController {
   @Autowired TestabilitySettings testabilitySettings;
 
   @PostMapping("/clean_db_and_reset_testability_settings")
+  @Transactional
   public String resetDBAndTestabilitySettings() {
     new DBCleanerWorker(emf).truncateAllTables();
     createUser("old_learner", "Old Learner");
@@ -67,6 +68,7 @@ class TestabilityRestController {
   }
 
   @PostMapping("/feature_toggle")
+  @Transactional
   public List enableFeatureToggle(@RequestBody Map<String, String> requestBody) {
     testabilitySettings.enableFeatureToggle(requestBody.get("enabled").equals("true"));
     return new ArrayList();
@@ -104,6 +106,7 @@ class TestabilityRestController {
   //  Testability API to seed notebooks and notes
   //
   @PostMapping("/seed_notes")
+  @Transactional
   public List<Integer> seedNote(@RequestBody SeedInfo seedInfo) {
     final User user =
         getUserModelByExternalIdentifierOrCurrentUser(seedInfo.externalIdentifier).getEntity();
@@ -177,6 +180,7 @@ class TestabilityRestController {
   }
 
   @PostMapping("/share_to_bazaar")
+  @Transactional
   public String shareToBazaar(@RequestBody HashMap<String, String> map) {
     Note note = noteRepository.findFirstByTitle(map.get("noteTitle"));
     modelFactoryService.toBazaarModel().shareNote(note.getNotebook());
@@ -198,6 +202,7 @@ class TestabilityRestController {
   }
 
   @PostMapping("/seed_circle")
+  @Transactional
   public String seedCircle(@RequestBody HashMap<String, String> circleInfo) {
     Circle entity = new Circle();
     entity.setName(circleInfo.get("circleName"));
