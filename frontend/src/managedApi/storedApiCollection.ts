@@ -5,7 +5,6 @@ const storedApiCollection = (
   managedApi: ManagedApi,
   piniaStore: ReturnType<typeof createPiniaStore>
 ) => {
-
   async function updateTextContentWithoutUndo(
     noteId: Doughnut.ID,
     noteContentData: Generated.TextContent
