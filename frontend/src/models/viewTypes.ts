@@ -2,18 +2,16 @@ type ViewTypeName = "cards" | "article" | "mindmap";
 
 interface ViewType {
   value: ViewTypeName;
-  path: string;
   title: string;
 }
 
 const viewTypes: Array<ViewType> = [
   {
     value: "cards",
-    path: "cards",
     title: "cards view",
   },
-  { value: "article", path: "article", title: "article view" },
-  { value: "mindmap", path: "mindmap", title: "mindmap view" },
+  { value: "article", title: "article view" },
+  { value: "mindmap", title: "mindmap view" },
 ];
 
 const viewType = (value: string | undefined): ViewType => {
