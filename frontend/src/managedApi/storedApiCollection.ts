@@ -5,16 +5,6 @@ const storedApiCollection = (
   managedApi: ManagedApi,
   piniaStore: ReturnType<typeof createPiniaStore>
 ) => {
-  function loadReviewPointViewedByUser(
-    data: Generated.ReviewPointViewedByUser
-  ) {
-    if (!data) return;
-    const { linkViewedByUser } = data;
-    if (linkViewedByUser) {
-      piniaStore.loadNoteWithPosition(linkViewedByUser.sourceNoteWithPosition);
-      piniaStore.loadNoteWithPosition(linkViewedByUser.targetNoteWithPosition);
-    }
-  }
 
   async function updateTextContentWithoutUndo(
     noteId: Doughnut.ID,
@@ -33,28 +23,22 @@ const storedApiCollection = (
   return {
     reviewMethods: {
       async getReviewPoint(reviewPointId: Doughnut.ID) {
-        const res = (await managedApi.restGet(
+        return (await managedApi.restGet(
           `review-points/${reviewPointId}`
         )) as Generated.ReviewPointViewedByUser;
-        loadReviewPointViewedByUser(res);
-        return res;
       },
 
       async initialReview() {
-        const res = (await managedApi.restGet(
+        return (await managedApi.restGet(
           `reviews/initial`
         )) as Generated.ReviewPointViewedByUser[];
-        res.forEach(loadReviewPointViewedByUser);
-        return res;
       },
 
       async doInitialReview(data: Generated.InitialInfo) {
-        const res = (await managedApi.restPost(
+        return (await managedApi.restPost(
           `reviews`,
           data
         )) as Generated.ReviewPointViewedByUser;
-        loadReviewPointViewedByUser(res);
-        return res;
       },
 
       async processAnswer(data: Generated.Answer) {
@@ -66,13 +50,9 @@ const storedApiCollection = (
       },
 
       async getAnswer(answerId: Doughnut.ID) {
-        const res = (await managedApi.restGet(
+        return (await managedApi.restGet(
           `reviews/answers/${answerId}`
         )) as Generated.AnswerViewedByUser;
-        const reviewPointViewedByUser = res.reviewPoint;
-        if (reviewPointViewedByUser)
-          loadReviewPointViewedByUser(reviewPointViewedByUser);
-        return res;
       },
 
       async selfEvaluate(
