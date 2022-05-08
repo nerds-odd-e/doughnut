@@ -5,21 +5,22 @@
     v-bind="{ options }"
   >
     <template #labelAddition="{ value }">
-      <SvgMindmap v-if="value==='mindmap'"/>
-      <SvgArticle v-if="value==='article'"/>
-      <SvgCards v-if="value==='cards'"/>
+      <SvgMindmap v-if="value === 'mindmap'" />
+      <SvgArticle v-if="value === 'article'" />
+      <SvgCards v-if="value === 'cards'" />
     </template>
   </RadioButtons>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue";
 import RadioButtons from "../form/RadioButtons.vue";
 import SvgArticle from "../svgs/SvgArticle.vue";
 import SvgMindmap from "../svgs/SvgMindmap.vue";
 import SvgCards from "../svgs/SvgCards.vue";
-import {viewTypes} from "../../models/viewTypes";
+import { viewTypeNames } from "../../models/viewTypes";
 
-export default {
+export default defineComponent({
   props: {
     noteId: Number,
     viewType: String,
@@ -32,13 +33,20 @@ export default {
   },
 
   computed: {
-    options() {return viewTypes},
+    options() {
+      return viewTypeNames.map((name) => ({
+        value: name,
+        title: `${name} view`,
+      }));
+    },
   },
   methods: {
     viewTypeChange(newType) {
-      this.$router.push({name: 'noteShow', params:{ rawNoteId: this.noteId, viewType: newType }})
+      this.$router.push({
+        name: "noteShow",
+        params: { rawNoteId: this.noteId, viewType: newType },
+      });
     },
   },
-
-};
+});
 </script>
