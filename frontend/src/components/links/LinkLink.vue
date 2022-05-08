@@ -3,39 +3,41 @@
     <LinkNob
       v-bind="{ link, colors }"
       v-if="!!reverse"
-      :inverseIcon="true"
+      :inverse-icon="true"
+      @noteRealmUpdated="$emit('noteRealmUpdated', $event)"
     />
     <NoteTitleWithLink class="link-title" v-bind="{ note }" />
     <LinkNob
       v-bind="{ link, colors }"
       v-if="!reverse"
-      :inverseIcon="false"
+      :inverse-icon="false"
+      @noteRealmUpdated="$emit('noteRealmUpdated', $event)"
     />
   </span>
 </template>
 
-<script>
-export default {
-  name: "LinkLink"
-}
-</script>
+<script></script>
 
-<script setup>
-import { computed } from "@vue/runtime-core";
+<script lang="ts">
+import { defineComponent, PropType } from "vue";
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue";
 import LinkNob from "./LinkNob.vue";
 import { colors } from "../../colors";
 
-const props = defineProps({
-  link: Object,
-  reverse: Boolean,
+export default defineComponent({
+  props: { link: Object, reverse: Boolean },
+  emits: ["noteRealmUpdated"],
+  components: { NoteTitleWithLink, LinkNob },
+  computed: {
+    note() {
+      return this.reverse ? this.link.sourceNote : this.link.targetNote;
+    },
+    fontColor() {
+      this.reverse ? colors.target : colors.source;
+    },
+    colors() {return colors; }
+  },
 });
-const note = computed(() =>
-  !!props.reverse ? props.link.sourceNote : props.link.targetNote
-);
-const fontColor = computed(() =>
-  !!props.reverse ? colors["target"] : colors["source"]
-);
 </script>
 
 <style scoped>

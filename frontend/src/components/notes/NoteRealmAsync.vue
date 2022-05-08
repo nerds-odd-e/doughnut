@@ -5,6 +5,7 @@
         <NoteToolbar
           v-bind="{ selectedNote, selectedNotePosition, viewType }"
           @note-deleted="onNoteDeleted"
+          @note-realm-updated="noteRealmUpdated($event)"
         />
       </div>
       <div class="content" v-if="noteRealm">

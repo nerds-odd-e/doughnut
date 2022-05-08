@@ -2,16 +2,16 @@
   <div>
     <LinkTypeSelect
       field="linkType"
-      scopeName="link"
+      scope-name="link"
       v-model="formData.typeId"
       :errors="formErrors.typeId"
-      :inverseIcon="true"
+      :inverse-icon="true"
     />
     <div>
       Target: <strong>{{ targetNote.title }}</strong>
     </div>
     <CheckInput
-      scopeName="link"
+      scope-name="link"
       v-model="formData.moveUnder"
       :errors="formErrors.moveUnder"
       field="alsoMoveToUnderTargetNote"
@@ -19,7 +19,7 @@
 
     <RadioButtons
       v-if="!!formData.moveUnder"
-      scopeName="link"
+      scope-name="link"
       v-model="formData.asFirstChild"
       :errors="formErrors.asFristChild"
       :options="[
@@ -28,10 +28,7 @@
       ]"
     />
 
-    <button
-      class="btn btn-secondary go-back-button"
-      v-on:click="$emit('goBack')"
-    >
+    <button class="btn btn-secondary go-back-button" @click="$emit('goBack')">
       <SvgGoBack />
     </button>
     <button class="btn btn-primary" @click.once="createLink()">
@@ -40,7 +37,8 @@
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue";
 import LinkTypeSelect from "./LinkTypeSelect.vue";
 import CheckInput from "../form/CheckInput.vue";
 import RadioButtons from "../form/RadioButtons.vue";
@@ -48,9 +46,9 @@ import SvgGoBack from "../svgs/SvgGoBack.vue";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 import usePopups from "../commons/Popups/usePopup";
 
-export default ({
+export default defineComponent({
   setup() {
-    return {...useStoredLoadingApi({hasFormError: true}), ...usePopups()};
+    return { ...useStoredLoadingApi({ hasFormError: true }), ...usePopups() };
   },
   name: "LinkNoteFinalize",
   props: { note: Object, targetNote: { type: Object, required: true } },
@@ -72,10 +70,11 @@ export default ({
           return;
         }
       }
-      this.storedApi.createLink(this.note.id, this.targetNote.id, this.formData)
-        .then((r) => this.$emit("success"))
+      this.storedApi
+        .createLink(this.note.id, this.targetNote.id, this.formData)
+        .then((r) => this.$emit("success", r.notes[0]))
         .catch((res) => {
-          this.formErrors = res
+          this.formErrors = res;
         });
     },
   },

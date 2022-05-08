@@ -1,19 +1,23 @@
 <template>
-      <span class="link-nob">
-        <PopupButton
-          :title="link.linkTypeLabel"
-        >
-          <template v-slot:button_face>
-            <SvgLinkTypeIcon
-              :linkTypeId="link.typeId"
-              :inverseIcon="inverseIcon"
-            />
-          </template>
-          <template #dialog_body="{doneHandler}">
-            <LinkNobDialog v-bind="{link, inverseIcon, colors}" @done="doneHandler($event)"/>
-          </template>
-        </PopupButton>
-      </span>
+  <span class="link-nob">
+    <PopupButton :title="link.linkTypeLabel">
+      <template #button_face>
+        <SvgLinkTypeIcon
+          :link-type-id="link.typeId"
+          :inverse-icon="inverseIcon"
+        />
+      </template>
+      <template #dialog_body="{ doneHandler }">
+        <LinkNobDialog
+          v-bind="{ link, inverseIcon, colors }"
+          @done="
+            doneHandler($event);
+            $emit('noteRealmUpdated', $event);
+          "
+        />
+      </template>
+    </PopupButton>
+  </span>
 </template>
 
 <script lang="ts">
@@ -24,6 +28,7 @@ import LinkNobDialog from "./LinkNobDialog.vue";
 
 export default defineComponent({
   props: { link: Object, inverseIcon: Boolean, colors: Object },
+  emits: ["noteRealmUpdated"],
   components: { SvgLinkTypeIcon, PopupButton, LinkNobDialog },
 });
 </script>

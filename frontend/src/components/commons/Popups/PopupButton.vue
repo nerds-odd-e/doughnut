@@ -24,7 +24,7 @@ export default defineComponent({
   props: { title: String },
   methods: {
     showDialog() {
-      this.popups.dialog(this.$slots.dialog_body)
+      this.popups.dialog(this.$slots.dialog_body);
     },
   },
 });

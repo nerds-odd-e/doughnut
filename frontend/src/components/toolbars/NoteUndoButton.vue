@@ -1,15 +1,19 @@
 <template>
-  <button class="btn btn-small" :title="undoTitle" @click="undoDelete()" :disabled="!history">
-    <SvgUndo/>
+  <button
+    class="btn btn-small"
+    :title="undoTitle"
+    @click="undoDelete()"
+    :disabled="!history"
+  >
+    <SvgUndo />
   </button>
 </template>
 
 <script>
-
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 import SvgUndo from "../svgs/SvgUndo.vue";
 
-export default ({
+export default {
   setup() {
     return useStoredLoadingApi();
   },
@@ -18,23 +22,23 @@ export default ({
     SvgUndo,
   },
   props: {
-    noteId: Number
+    noteId: Number,
   },
   computed: {
     history() {
-      return this.piniaStore.peekUndo()
+      return this.piniaStore.peekUndo();
     },
     undoTitle() {
-      if(this.history) {
-        return `undo ${this.history.type}`
+      if (this.history) {
+        return `undo ${this.history.type}`;
       }
-      return 'undo'
-    }
+      return "undo";
+    },
   },
   methods: {
     undoDelete() {
-      this.storedApi.undo()
-    }
-  }
-});
+      this.storedApi.undo();
+    },
+  },
+};
 </script>

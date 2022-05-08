@@ -11,7 +11,7 @@
   <LinkNoteFinalize
     v-else
     v-bind="{ targetNote, note }"
-    @success="$emit('done')"
+    @success="$emit('done', $event)"
     @goBack="targetNote = undefined"
   />
 </template>

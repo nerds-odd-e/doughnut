@@ -5,14 +5,14 @@
       class="popups"
       @close_request="resolve(true)"
     >
-      <template v-slot:header>
+      <template #header>
         <h2>Information</h2>
       </template>
-      <template v-slot:body>
+      <template #body>
         <div>
           <span>{{ popupInfo.message }}</span>
         </div>
-        <button class="btn btn-success" v-on:click="resolve(true)">OK</button>
+        <button class="btn btn-success" @click="resolve(true)">OK</button>
       </template>
     </Modal>
 
@@ -21,15 +21,15 @@
       class="popups"
       @close_request="resolve(false)"
     >
-      <template v-slot:header>
+      <template #header>
         <h2>Please confirm</h2>
       </template>
-      <template v-slot:body>
+      <template #body>
         <div>
           <span>{{ popupInfo.message }}</span>
         </div>
-        <button class="btn btn-success" v-on:click="resolve(true)">OK</button>
-        <button class="btn btn-secondary" v-on:click="resolve(false)">
+        <button class="btn btn-success" @click="resolve(true)">OK</button>
+        <button class="btn btn-secondary" @click="resolve(false)">
           Cancel
         </button>
       </template>
@@ -40,19 +40,17 @@
       class="popups"
       @close_request="resolve(null)"
     >
-      <template v-slot:body>
-        <component :is="popupInfo.slot"
-        :doneHandler="resolve"
-         />
+      <template #body>
+        <component :is="popupInfo.slot" v-bind="{ doneHandler: resolve }" />
       </template>
     </Modal>
   </template>
 </template>
 
 <script lang="ts">
-import { defineComponent, } from "vue";
+import { defineComponent } from "vue";
 import Modal from "../Modal.vue";
-import usePopups, {PopupInfo} from "./usePopup";
+import usePopups, { PopupInfo } from "./usePopup";
 
 export default defineComponent({
   setup() {
@@ -62,27 +60,28 @@ export default defineComponent({
   components: { Modal },
   methods: {
     resolve(result: unknown) {
-      this.popups.done(result)
+      this.popups.done(result);
     },
   },
   data() {
     return {
       popupData: {
-        popupInfo: undefined
-      }
+        popupInfo: undefined,
+      },
     } as {
       popupData: {
-        popupInfo?: PopupInfo
-      }
+        popupInfo?: PopupInfo;
+      };
     };
   },
   computed: {
-    popupInfo() { return this.popupData.popupInfo }
+    popupInfo() {
+      return this.popupData.popupInfo;
+    },
   },
   mounted() {
     this.popups.register(this.popupData);
-
-  }
+  },
 });
 </script>
 

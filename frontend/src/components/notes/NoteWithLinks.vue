@@ -4,7 +4,10 @@
     class="note-body"
     v-bind="{ id: note.id, updatedAt: note.textContent?.updatedAt }"
   >
-    <NoteFrameOfLinks v-bind="{ links }">
+    <NoteFrameOfLinks
+      v-bind="{ links }"
+      @note-realm-updated="$emit('noteRealmUpdated', $event)"
+    >
       <NoteContent
         v-bind="{ note }"
         @note-realm-updated="$emit('noteRealmUpdated', $event)"

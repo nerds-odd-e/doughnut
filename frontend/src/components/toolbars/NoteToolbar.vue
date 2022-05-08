@@ -3,8 +3,8 @@
     <NoteButtons
       v-if="selectedNote"
       :note="selectedNote"
-      :viewType="viewType"
-      :featureToggle="featureToggle"
+      :view-type="viewType"
+      :feature-toggle="featureToggle"
       @note-deleted="$emit('noteDeleted', $event)"
     />
     <div class="btn-group btn-group-sm">
@@ -12,8 +12,14 @@
         <template #button_face>
           <SvgSearch />
         </template>
-        <template #dialog_body="{doneHandler}">
-          <LinkNoteDialog :note="selectedNote" @done="doneHandler($event)" />
+        <template #dialog_body="{ doneHandler }">
+          <LinkNoteDialog
+            :note="selectedNote"
+            @done="
+              doneHandler($event);
+              $emit('noteRealmUpdated', $event);
+            "
+          />
         </template>
       </PopupButton>
       <NoteUndoButton />
@@ -38,10 +44,11 @@ export default defineComponent({
   },
   props: {
     selectedNote: Object as PropType<Generated.Note>,
-    selectedNotePosition: Object as PropType<Generated.NotePositionViewedByUser>,
+    selectedNotePosition:
+      Object as PropType<Generated.NotePositionViewedByUser>,
     viewType: String,
   },
-  emits: ["noteDeleted"],
+  emits: ["noteDeleted", "noteRealmUpdated"],
   components: {
     NoteButtons,
     NoteUndoButton,
