@@ -89,7 +89,7 @@ class RestNoteController {
               testabilitySettings.getCurrentUTCTimestamp());
       modelFactoryService.linkRepository.save(link);
     }
-    return NotesBulk.jsonNoteWithParent(note, userModel);
+    return NotesBulk.jsonNoteRealm(note, userModel);
   }
 
   @GetMapping("/{note}")
@@ -97,7 +97,7 @@ class RestNoteController {
     final UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertReadAuthorization(note);
 
-    return NotesBulk.jsonNoteWithChildren(note, user);
+    return NotesBulk.jsonNoteRealm(note, user);
   }
 
   @GetMapping("/{note}/overview")
@@ -105,7 +105,7 @@ class RestNoteController {
     final UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertReadAuthorization(note);
 
-    return NotesBulk.jsonNoteWitheDescendants(note, user);
+    return NotesBulk.jsonNoteWithDescendants(note, user);
   }
 
   @PatchMapping(path = "/{note}")
@@ -157,7 +157,7 @@ class RestNoteController {
     currentUserFetcher.getUser().getAuthorization().assertAuthorization(note);
     modelFactoryService.toNoteModel(note).restore();
     modelFactoryService.entityManager.flush();
-    return NotesBulk.jsonNoteWithChildren(note, currentUserFetcher.getUser());
+    return NotesBulk.jsonNoteRealm(note, currentUserFetcher.getUser());
   }
 
   @GetMapping("/{note}/review-setting")

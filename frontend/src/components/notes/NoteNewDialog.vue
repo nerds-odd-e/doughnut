@@ -1,9 +1,9 @@
 <template>
   <form @submit.prevent="processForm">
     <LinkTypeSelect
-      scopeName="note"
+      scope-name="note"
       field="linkTypeToParent"
-      :allowEmpty="true"
+      :allow-empty="true"
       v-model="creationData.linkTypeToParent"
       :errors="formErrors.linkTypeToParent"
     />
@@ -12,7 +12,12 @@
       :errors="formErrors.textContent"
     />
     <input type="submit" value="Submit" class="btn btn-primary" />
-    <SearchResults v-bind="{noteId: parentId, inputSearchKey: creationData.textContent.title}"/>
+    <SearchResults
+      v-bind="{
+        noteId: parentId,
+        inputSearchKey: creationData.textContent.title,
+      }"
+    />
   </form>
 </template>
 
@@ -27,20 +32,20 @@ function initialState() {
   return {
     creationData: {
       linkTypeToParent: "",
-      textContent: {title: ""},
+      textContent: { title: "" },
     },
   };
 }
 
 export default defineComponent({
   setup() {
-    return useStoredLoadingApi({initalLoading: true, hasFormError: true});
+    return useStoredLoadingApi({ initalLoading: true, hasFormError: true });
   },
   components: {
     NoteFormTitleOnly,
     LinkTypeSelect,
-    SearchResults
-},
+    SearchResults,
+  },
   props: { parentId: Number },
   data() {
     return {
@@ -48,23 +53,23 @@ export default defineComponent({
     };
   },
   mounted() {
-    this.fetchData()
+    this.fetchData();
   },
   methods: {
     fetchData() {
-      this.storedApi.getNoteRealm(this.parentId)
+      this.storedApi.getNoteRealm(this.parentId);
     },
 
     processForm() {
-      this.storedApi.createNote(this.parentId,
-        this.creationData
-      ).then((res) => {
-        this.$router.push({
-          name: "noteShow",
-          params: { rawNoteId: res.notePosition.noteId },
+      this.storedApi
+        .createNote(this.parentId, this.creationData)
+        .then((res) => {
+          this.$router.push({
+            name: "noteShow",
+            params: { rawNoteId: res.notePosition.noteId },
+          });
         })
-      })
-      .catch((res) => (this.formErrors = res))
+        .catch((res) => (this.formErrors = res));
     },
   },
 });

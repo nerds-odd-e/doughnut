@@ -59,7 +59,7 @@ class RestLinkController {
     currentUserFetcher.getUser().getAuthorization().assertAuthorization(link);
     link.setTypeId(linkRequest.typeId);
     modelFactoryService.linkRepository.save(link);
-    return NotesBulk.jsonNoteWithChildren(link.getSourceNote(), currentUserFetcher.getUser());
+    return NotesBulk.jsonNoteRealm(link.getSourceNote(), currentUserFetcher.getUser());
   }
 
   @PostMapping(value = "/{link}/delete")
@@ -68,7 +68,7 @@ class RestLinkController {
     currentUserFetcher.getUser().getAuthorization().assertAuthorization(link);
     LinkModel linkModel = modelFactoryService.toLinkModel(link);
     linkModel.destroy();
-    return NotesBulk.jsonNoteWithChildren(link.getSourceNote(), currentUserFetcher.getUser());
+    return NotesBulk.jsonNoteRealm(link.getSourceNote(), currentUserFetcher.getUser());
   }
 
   @PostMapping(value = "/create/{sourceNote}/{targetNote}")
@@ -96,7 +96,7 @@ class RestLinkController {
             linkRequest.typeId,
             testabilitySettings.getCurrentUTCTimestamp());
     modelFactoryService.linkRepository.save(link);
-    return NotesBulk.jsonNoteWithChildren(link.getSourceNote(), currentUserFetcher.getUser());
+    return NotesBulk.jsonNoteRealm(link.getSourceNote(), currentUserFetcher.getUser());
   }
 
   class LinkStatistics {
