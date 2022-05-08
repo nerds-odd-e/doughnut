@@ -1,7 +1,4 @@
 interface NoteCacheState {
-  notebooksMapByHeadNoteId: {
-    [id: Doughnut.ID]: Generated.NotebookViewedByUser;
-  };
   noteRealms: { [id: Doughnut.ID]: Generated.NoteRealm };
 }
 
@@ -17,17 +14,12 @@ class NoteCache {
       const { id } = note;
       this.loadNote(id, note);
     });
-    this.loadNotebook(notePosition.notebook);
   }
 
   loadNoteRealms(noteRealms: Generated.NoteRealm[]) {
     noteRealms.forEach((noteRealm) => {
       this.state.noteRealms[noteRealm.id] = noteRealm;
     });
-  }
-
-  private loadNotebook(notebook: Generated.NotebookViewedByUser) {
-    this.state.notebooksMapByHeadNoteId[notebook.headNoteId] = notebook;
   }
 
   private loadNote(id: Doughnut.ID, note: Generated.Note) {

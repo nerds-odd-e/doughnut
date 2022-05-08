@@ -1,5 +1,5 @@
 <template>
-  <NoteToolbar @note-realm-updated="fetchData"/>
+  <NoteToolbar @note-realm-updated="fetchData" />
   <ContainerPage v-bind="{ loading, contentExists: true, title: 'Notebooks' }">
     <p>
       <NotebookNewButton>Add New Notebook</NotebookNewButton>

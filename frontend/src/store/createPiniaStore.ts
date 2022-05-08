@@ -11,8 +11,6 @@ interface State extends NoteCacheState, HistoryState {
 export default defineStore("main", {
   state: () =>
     ({
-      notebooks: [],
-      notebooksMapByHeadNoteId: {},
       noteRealms: {},
       noteUndoHistories: [],
       popupInfo: undefined,
