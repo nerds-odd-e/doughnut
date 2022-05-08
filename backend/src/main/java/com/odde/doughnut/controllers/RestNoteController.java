@@ -66,7 +66,7 @@ class RestNoteController {
 
   @PostMapping(value = "/{parentNote}/create")
   @Transactional
-  public NotesBulk createNote(
+  public NoteRealmWithPosition createNote(
       @PathVariable(name = "parentNote") Note parentNote,
       @Valid @ModelAttribute NoteCreation noteCreation)
       throws NoAccessRightException {
@@ -89,7 +89,7 @@ class RestNoteController {
               testabilitySettings.getCurrentUTCTimestamp());
       modelFactoryService.linkRepository.save(link);
     }
-    return NotesBulk.jsonNoteRealm(note, userModel);
+    return NoteRealmWithPosition.fromNote(note, userModel);
   }
 
   @GetMapping("/{note}")

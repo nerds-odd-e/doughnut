@@ -93,14 +93,10 @@ export default defineComponent({
     highlight(id: Doughnut.ID) {
       this.selectedNoteId = id;
     },
-    async fetchComments() {
-      if (!this.user) return;
-      this.comments = await this.api.comments.getNoteComments(this.noteId);
-    },
     async fetchData() {
       if (this.viewType === "cards") {
         this.noteRealms = new NoteRealmCache(
-          await this.storedApi.getNoteRealm(this.noteId)
+          await this.storedApi.getNoteRealmWithPosition(this.noteId)
         );
       } else {
         this.noteRealms = new NoteRealmCache(
@@ -108,7 +104,8 @@ export default defineComponent({
         );
       }
 
-      await this.fetchComments();
+      if (!this.user) return;
+      this.comments = await this.api.comments.getNoteComments(this.noteId);
     },
   },
   watch: {

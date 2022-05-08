@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-05-06 18:44:06.
+// Generated using typescript-generator version 2.35.1025 on 2022-05-08 16:10:52.
 
 declare namespace Generated {
 
@@ -74,6 +74,11 @@ declare namespace Generated {
         links: { [P in LinkType]?: LinkViewed };
         children: Note[];
         note: Note;
+    }
+
+    interface NoteRealmWithPosition {
+        notePosition: NotePositionViewedByUser;
+        noteRealm: NoteRealm;
     }
 
     interface NoteWithPosition {
@@ -195,8 +200,8 @@ declare namespace Generated {
         sourceNote: Note;
         targetNote: Note;
         typeId: number;
-        clozeSource: string;
         linkTypeLabel: string;
+        clozeSource: string;
     }
 
     interface TextContent {
@@ -210,8 +215,8 @@ declare namespace Generated {
         textContent: TextContent;
         title: string;
         pictureWithMask?: PictureWithMask;
-        parentId?: number;
         shortDescription: string;
+        parentId?: number;
     }
 
     interface Ownership {

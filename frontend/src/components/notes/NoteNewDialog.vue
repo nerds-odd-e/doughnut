@@ -57,7 +57,7 @@ export default defineComponent({
   },
   methods: {
     fetchData() {
-      this.storedApi.getNoteRealm(this.parentId);
+      this.storedApi.getNoteRealmWithPosition(this.parentId);
     },
 
     processForm() {

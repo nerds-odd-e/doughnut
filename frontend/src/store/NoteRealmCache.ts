@@ -7,11 +7,15 @@ class NoteRealmCache implements NoteRealmsReader {
 
   notePosition;
 
-  constructor(notesBulk: Generated.NotesBulk) {
-    notesBulk.notes.forEach((noteRealm) => {
-      this.noteRealms[noteRealm.id] = noteRealm;
-    });
-    this.notePosition = notesBulk.notePosition;
+  constructor(value: Generated.NotesBulk | Generated.NoteWithPosition) {
+    this.notePosition = value.notePosition;
+    if ("notes" in value) {
+      value.notes.forEach((noteRealm) => {
+        this.noteRealms[noteRealm.id] = noteRealm;
+      });
+    } else {
+      this.noteRealms[value.noteRealm.id] = value.noteRealm;
+    }
   }
 
   deleteNoteAndDescendents(noteId: Doughnut.ID) {

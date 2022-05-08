@@ -42,11 +42,13 @@ public record Authorization(User user, ModelFactoryService modelFactoryService) 
   }
 
   public void assertReadAuthorization(Notebook notebook) throws NoAccessRightException {
-    if (hasReferenceAuthority(notebook.getHeadNote())) {
-      return;
-    }
-    if (modelFactoryService.bazaarNotebookRepository.findByNotebook(notebook) != null) {
-      return;
+    if (notebook != null) {
+      if (hasReferenceAuthority(notebook.getHeadNote())) {
+        return;
+      }
+      if (modelFactoryService.bazaarNotebookRepository.findByNotebook(notebook) != null) {
+        return;
+      }
     }
     assertLoggedIn();
     throw new NoAccessRightException();
