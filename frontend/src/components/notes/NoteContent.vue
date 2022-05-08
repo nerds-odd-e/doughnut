@@ -92,7 +92,11 @@ export default defineComponent({
   methods: {
     onBlurTextField() {
       this.storedApi
-        .updateTextContent(this.note.id, this.textContent)
+        .updateTextContent(
+          this.note.id,
+          this.textContent,
+          this.note.textContent
+        )
         .then((res) => {
           this.$emit("noteRealmUpdated", res);
         })

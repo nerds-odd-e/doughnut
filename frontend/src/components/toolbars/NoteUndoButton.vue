@@ -9,11 +9,12 @@
   </button>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 import SvgUndo from "../svgs/SvgUndo.vue";
 
-export default {
+export default defineComponent({
   setup() {
     return useStoredLoadingApi();
   },
@@ -24,6 +25,7 @@ export default {
   props: {
     noteId: Number,
   },
+  emits: ["noteRealmUpdated"],
   computed: {
     history() {
       return this.piniaStore.peekUndo();
@@ -36,9 +38,10 @@ export default {
     },
   },
   methods: {
-    undoDelete() {
-      this.storedApi.undo();
+    async undoDelete() {
+      const noteRealm = await this.storedApi.undo();
+      this.$emit("noteRealmUpdated", noteRealm);
     },
   },
-};
+});
 </script>

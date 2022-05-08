@@ -215,9 +215,10 @@ const storedApiCollection = (
 
     async updateTextContent(
       noteId: Doughnut.ID,
-      noteContentData: Generated.TextContent
+      noteContentData: Generated.TextContent,
+      oldContent: Generated.TextContent
     ) {
-      piniaStore.addEditingToUndoHistory(noteId, noteContentData);
+      piniaStore.addEditingToUndoHistory(noteId, oldContent);
       return updateTextContentWithoutUndo(noteId, noteContentData);
     },
 
@@ -239,7 +240,7 @@ const storedApiCollection = (
       if (res.notes[0].note.parentId === null) {
         this.getNotebooks();
       }
-      return res;
+      return res.notes[0];
     },
 
     async deleteNote(noteId: Doughnut.ID) {

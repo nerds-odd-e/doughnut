@@ -22,7 +22,7 @@
           />
         </template>
       </PopupButton>
-      <NoteUndoButton />
+      <NoteUndoButton @note-realm-updated="$emit('noteRealmUpdated', $event)" />
     </div>
   </nav>
   <Breadcrumb v-bind="selectedNotePosition" />
