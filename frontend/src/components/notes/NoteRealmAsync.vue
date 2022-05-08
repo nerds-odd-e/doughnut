@@ -90,7 +90,11 @@ export default defineComponent({
     onNoteDeleted(deletedNoteId: Doughnut.ID) {
       this.noteRealms?.deleteNoteAndDescendents(deletedNoteId);
     },
-    noteRealmUpdated(updatedNoteRealm: Generated.NoteRealm) {
+    noteRealmUpdated(updatedNoteRealm?: Generated.NoteRealm) {
+      if (!updatedNoteRealm) {
+        return;
+      }
+
       this.noteRealms?.updateNoteRealm(updatedNoteRealm);
     },
     highlight(id: Doughnut.ID) {

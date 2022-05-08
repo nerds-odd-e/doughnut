@@ -9,43 +9,45 @@ interface PopupInfo {
 
 class Popup {
   static popupDataWrap = {
-    popupData: {} as { popupInfo?: PopupInfo },
+    popupData: {} as { popupInfo: PopupInfo[] },
   };
 }
 
 function usePopups() {
-  const setPopupInfo = (info?: PopupInfo) => {
-    Popup.popupDataWrap.popupData.popupInfo = info;
+  const push = (info: PopupInfo) => {
+    Popup.popupDataWrap.popupData.popupInfo.push(info);
+  };
+  const pop = () => {
+    return Popup.popupDataWrap.popupData.popupInfo.pop();
   };
   return {
     popups: {
-      register(data: { popupInfo?: PopupInfo }) {
+      register(data: { popupInfo: PopupInfo[] }) {
         Popup.popupDataWrap.popupData = data;
       },
 
       alert(msg: string) {
         return new Promise<boolean>((resolve) => {
-          setPopupInfo({ type: "alert", message: msg, doneResolve: resolve });
+          push({ type: "alert", message: msg, doneResolve: resolve });
         });
       },
 
       confirm(msg: string) {
         return new Promise<boolean>((resolve) => {
-          setPopupInfo({ type: "confirm", message: msg, doneResolve: resolve });
+          push({ type: "confirm", message: msg, doneResolve: resolve });
         });
       },
 
       dialog(slot?: Slot) {
         return new Promise((resolve) => {
-          setPopupInfo({ type: "dialog", slot, doneResolve: resolve });
+          push({ type: "dialog", slot, doneResolve: resolve });
         });
       },
 
       done(result: unknown) {
-        const { popupInfo } = Popup.popupDataWrap.popupData;
+        const popupInfo = pop();
         if (!popupInfo) return;
         if (popupInfo.doneResolve) popupInfo.doneResolve(result as boolean);
-        setPopupInfo(undefined);
       },
     },
   };

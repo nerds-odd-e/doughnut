@@ -54,17 +54,18 @@ export default defineComponent({
   },
 
   methods: {
-    updateLink() {
-      this.storedApi
-        .updateLink(this.link.id, this.formData)
-        .then((res) => this.$emit("done", res.notes[0]));
+    async updateLink() {
+      const res = await this.storedApi.updateLink(this.link.id, this.formData);
+      this.$emit("done", res.notes[0]);
     },
 
     async deleteLink() {
-      if (!(await this.popups.confirm("Confirm to delete this link?"))) return;
-      this.storedApi.deleteLink(this.link.id).then((res) => {
-        this.$emit("done", res.notes[0]);
-      });
+      if (!(await this.popups.confirm("Confirm to delete this link?"))) {
+        this.$emit("done", null);
+        return;
+      }
+      const res = await this.storedApi.deleteLink(this.link.id);
+      this.$emit("done", res.notes[0]);
     },
   },
 });

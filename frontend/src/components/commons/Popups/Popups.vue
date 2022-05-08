@@ -1,5 +1,5 @@
 <template>
-  <template v-if="popupInfo">
+  <template v-for="(popupInfo, index) in popupInfos" :key="index">
     <Modal
       v-if="popupInfo.type === 'alert'"
       class="popups"
@@ -66,16 +66,16 @@ export default defineComponent({
   data() {
     return {
       popupData: {
-        popupInfo: undefined,
+        popupInfo: [],
       },
     } as {
       popupData: {
-        popupInfo?: PopupInfo;
+        popupInfo: PopupInfo[];
       };
     };
   },
   computed: {
-    popupInfo() {
+    popupInfos() {
       return this.popupData.popupInfo;
     },
   },
