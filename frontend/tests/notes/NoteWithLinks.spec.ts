@@ -21,7 +21,6 @@ describe("new/updated pink banner", () => {
     "should show fresher color if recently updated",
     (updatedAt, expectedColor) => {
       const note = makeMe.aNoteRealm.textContentUpdatedAt(updatedAt).please();
-      helper.store.loadNoteRealms([note]);
 
       const wrapper = helper
         .component(NoteWithLinks)
@@ -38,7 +37,6 @@ describe("new/updated pink banner", () => {
 describe("in place edit on title", () => {
   it("should display text field when one single click on title", async () => {
     const noteParent = makeMe.aNoteRealm.title("Dummy Title").please();
-    helper.store.loadNoteRealms([noteParent]);
 
     const wrapper = helper
       .component(NoteWithLinks)
@@ -54,7 +52,6 @@ describe("in place edit on title", () => {
 
   it("should back to label when blur text field title", async () => {
     const noteParentSphere = makeMe.aNoteRealm.title("Dummy Title").please();
-    helper.store.loadNoteRealms([noteParentSphere]);
     helper.apiMock.expectingPatch(`/api/text_content/${noteParentSphere.id}`);
 
     const wrapper = helper
@@ -70,8 +67,8 @@ describe("in place edit on title", () => {
 
 describe("undo editing", () => {
   it("should call addEditingToUndoHistory on submitChange", async () => {
+    helper.store.$reset();
     const noteRealm = makeMe.aNoteRealm.title("Dummy Title").please();
-    helper.store.loadNoteRealms([noteRealm]);
     helper.apiMock.expectingPatch(`/api/text_content/${noteRealm.id}`);
 
     const updatedTitle = "updated";
