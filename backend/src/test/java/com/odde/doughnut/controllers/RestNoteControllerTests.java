@@ -12,6 +12,7 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.json.CommentCreation;
 import com.odde.doughnut.entities.json.NoteCreation;
 import com.odde.doughnut.entities.json.NoteRealm;
+import com.odde.doughnut.entities.json.NoteRealmWithAllDescendants;
 import com.odde.doughnut.entities.json.NoteRealmWithPosition;
 import com.odde.doughnut.entities.json.NotesBulk;
 import com.odde.doughnut.exceptions.NoAccessRightException;
@@ -87,7 +88,7 @@ class RestNoteControllerTests {
       makeMe.theNote(childNote).with10Children().please();
       makeMe.refresh(note);
       makeMe.refresh(childNote);
-      final NotesBulk showOverview = controller.showOverview(note);
+      final NoteRealmWithAllDescendants showOverview = controller.showOverview(note);
       assertThat(showOverview.notes, hasSize(12));
       assertThat(showOverview.notePosition.getNotebook().getFromBazaar(), equalTo(false));
       assertThat(showOverview.notes.get(0).getChildren(), hasSize(1));
@@ -132,7 +133,7 @@ class RestNoteControllerTests {
     @Test
     void shouldBeAbleToSaveNoteWhenValid() throws NoAccessRightException {
       NoteRealmWithPosition response = controller.createNote(parent, noteCreation);
-      assertThat(response.noteRealm.getId(), equalTo(parent.getId()));
+      assertThat(response.noteRealm.getId(), not(nullValue()));
     }
 
     @Test

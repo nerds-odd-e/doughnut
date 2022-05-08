@@ -101,11 +101,12 @@ class RestNoteController {
   }
 
   @GetMapping("/{note}/overview")
-  public NotesBulk showOverview(@PathVariable("note") Note note) throws NoAccessRightException {
+  public NoteRealmWithAllDescendants showOverview(@PathVariable("note") Note note)
+      throws NoAccessRightException {
     final UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertReadAuthorization(note);
 
-    return NotesBulk.jsonNoteWithDescendants(note, user);
+    return NoteRealmWithAllDescendants.fromNote(note, user);
   }
 
   @PatchMapping(path = "/{note}")

@@ -100,7 +100,7 @@ const storedApiCollection = (
     async getNoteWithDescendents(noteId: Doughnut.ID) {
       return (await managedApi.restGet(
         `notes/${noteId}/overview`
-      )) as Generated.NotesBulk;
+      )) as Generated.NoteRealmWithAllDescendants;
     },
 
     async getNoteRealmWithPosition(noteId: Doughnut.ID) {

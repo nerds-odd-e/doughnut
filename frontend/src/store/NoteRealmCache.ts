@@ -7,7 +7,9 @@ class NoteRealmCache implements NoteRealmsReader {
 
   notePosition;
 
-  constructor(value: Generated.NotesBulk | Generated.NoteWithPosition) {
+  constructor(
+    value: Generated.NoteRealmWithAllDescendants | Generated.NoteWithPosition
+  ) {
     this.notePosition = value.notePosition;
     if ("notes" in value) {
       value.notes.forEach((noteRealm) => {

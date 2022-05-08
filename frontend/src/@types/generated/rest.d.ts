@@ -1,6 +1,6 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-05-08 16:10:52.
+// Generated using typescript-generator version 2.35.1025 on 2022-05-08 16:32:49.
 
 declare namespace Generated {
 
@@ -74,6 +74,11 @@ declare namespace Generated {
         links: { [P in LinkType]?: LinkViewed };
         children: Note[];
         note: Note;
+    }
+
+    interface NoteRealmWithAllDescendants {
+        notePosition: NotePositionViewedByUser;
+        notes: NoteRealm[];
     }
 
     interface NoteRealmWithPosition {
