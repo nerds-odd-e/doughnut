@@ -5,7 +5,6 @@ import { screen } from "@testing-library/vue";
 import NoteShowPage from "@/pages/NoteShowPage.vue";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
-import { viewType } from "../../src/models/viewTypes";
 
 jest.useFakeTimers();
 
@@ -49,7 +48,6 @@ describe("all in note show page", () => {
         .component(NoteShowPage)
         .withProps({ rawNoteId: `${note.id}`, viewType: viewTypeValue })
         .render();
-      expect(viewType(viewTypeValue)?.fetchAll).toBe(true);
       helper.apiMock.verifyCall(`/api/notes/${note.id}/overview`);
       await screen.findByText(note.note.title);
     });

@@ -16,7 +16,6 @@ describe("storedApiCollection", () => {
   };
 
   describe("delete note", () => {
-
     it("should change the store", async () => {
       const cache = toNoteRealmsCache([note]);
       cache.deleteNoteAndDescendents(note.id);
@@ -39,6 +38,5 @@ describe("storedApiCollection", () => {
         childrenCount - 1
       );
     });
-
   });
 });

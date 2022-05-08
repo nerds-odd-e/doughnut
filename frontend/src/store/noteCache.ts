@@ -46,7 +46,6 @@ class NoteCache {
     }
     noteRealm.note = note;
   }
-
 }
 
 function noteCache(state: NoteCacheState) {

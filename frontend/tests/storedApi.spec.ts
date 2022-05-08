@@ -27,6 +27,5 @@ describe("storedApiCollection", () => {
         expect.anything()
       );
     });
-
   });
 });

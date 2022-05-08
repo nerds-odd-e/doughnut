@@ -64,7 +64,7 @@ export default defineComponent({
   data() {
     return {
       comments: [] as Generated.Comment[],
-      noteRealms: null as NoteRealmCache | undefined,
+      noteRealms: undefined as NoteRealmCache | undefined,
       selectedNoteId: undefined as Doughnut.ID | undefined,
     };
   },
@@ -100,11 +100,16 @@ export default defineComponent({
       this.comments = await this.api.comments.getNoteComments(this.noteId);
     },
     async fetchData() {
-      const storedApiCall = this.viewTypeObj.fetchAll
-        ? this.storedApi.getNoteWithDescendents
-        : this.storedApi.getNoteAndItsChildren;
+      if (this.viewType === "cards") {
+        this.noteRealms = new NoteRealmCache(
+          await this.storedApi.getNoteAndItsChildren(this.noteId)
+        );
+      } else {
+        this.noteRealms = new NoteRealmCache(
+          await this.storedApi.getNoteWithDescendents(this.noteId)
+        );
+      }
 
-      this.noteRealms = new NoteRealmCache(await storedApiCall(this.noteId));
       await this.fetchComments();
     },
   },

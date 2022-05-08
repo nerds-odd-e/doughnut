@@ -30,7 +30,10 @@ export default defineStore("main", {
       noteCache(this).loadNotebooks(notebooks);
     },
 
-    addEditingToUndoHistory(noteId : Doughnut.ID, textContent: Generated.TextContent) {
+    addEditingToUndoHistory(
+      noteId: Doughnut.ID,
+      textContent: Generated.TextContent
+    ) {
       history(this).addEditingToUndoHistory(noteId, textContent);
     },
 
