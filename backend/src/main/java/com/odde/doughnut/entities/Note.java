@@ -67,13 +67,13 @@ public class Note extends Thingy {
   @Setter
   private ReviewSetting masterReviewSetting;
 
-  @OneToMany(mappedBy = "sourceNote", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "sourceNote", cascade = CascadeType.ALL)
   @JsonIgnore
   @Getter
   @Setter
   private List<Link> links = new ArrayList<>();
 
-  @OneToMany(mappedBy = "targetNote", cascade = CascadeType.ALL, orphanRemoval = true)
+  @OneToMany(mappedBy = "targetNote", cascade = CascadeType.ALL)
   @JsonIgnore
   @Getter
   @Setter
