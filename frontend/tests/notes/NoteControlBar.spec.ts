@@ -12,9 +12,7 @@ describe("note wth child cards", () => {
   });
 
   it("view note belongs to other people in bazaar", async () => {
-    const note = makeMe.aNoteRealm.please();
     const notePosition = makeMe.aNotePosition.inBazaar().please();
-    helper.store.loadNoteRealms([note]);
     helper.component(Breadcrumb).withProps(notePosition).render();
     await screen.findByText("Bazaar");
   });

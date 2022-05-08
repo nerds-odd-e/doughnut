@@ -8,10 +8,6 @@ describe("storeUndoCommand", () => {
   const note = makeMe.aNoteRealm.title("Dummy Title").please();
 
   describe("addEditingToUndoHistory", () => {
-    beforeEach(() => {
-      store.loadNoteRealms([note]);
-    });
-
     it("should push textContent into store state noteUndoHistories ", () => {
       store.addEditingToUndoHistory(note.id, note.note.textContent);
 
@@ -23,7 +19,6 @@ describe("storeUndoCommand", () => {
     let initialUndoCount;
 
     beforeEach(() => {
-      store.loadNoteRealms([note]);
       store.addEditingToUndoHistory(note.id, note.note.textContent);
       initialUndoCount = store.noteUndoHistories.length;
     });

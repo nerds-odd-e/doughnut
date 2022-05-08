@@ -11,12 +11,10 @@ const storedApiCollection = (
   ) {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { updatedAt, ...data } = noteContentData;
-    const res = (await managedApi.restPatchMultiplePartForm(
+    return (await managedApi.restPatchMultiplePartForm(
       `text_content/${noteId}`,
       data
     )) as Generated.NoteRealm;
-    piniaStore.loadNoteRealms([res]);
-    return res;
   }
 
   return {
@@ -164,12 +162,10 @@ const storedApiCollection = (
     ) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { updatedAt, ...data } = noteContentData;
-      const res = (await managedApi.restPatchMultiplePartForm(
+      return (await managedApi.restPatchMultiplePartForm(
         `notes/${noteId}`,
         data
       )) as Generated.NoteRealm;
-      piniaStore.loadNoteRealms([res]);
-      return res;
     },
 
     async updateTextContent(

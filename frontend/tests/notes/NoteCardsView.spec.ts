@@ -11,11 +11,10 @@ describe("note wth child cards", () => {
     helper.reset();
     const notePosition = makeMe.aNotePosition.please();
     const noteParent = makeMe.aNoteRealm.title("parent").please();
-    const noteChild = makeMe.aNoteRealm
+    makeMe.aNoteRealm
       .title("child")
       .under(noteParent)
       .please();
-    helper.store.loadNoteRealms([noteChild]);
     helper
       .component(NoteCardsView)
       .withProps({

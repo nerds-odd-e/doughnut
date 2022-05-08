@@ -7,6 +7,7 @@ import useStoredLoadingApi from "../src/managedApi/useStoredLoadingApi";
 
 beforeEach(() => {
   fetch.resetMocks();
+  store.$reset();
 });
 
 describe("storedApiCollection", () => {
@@ -16,7 +17,6 @@ describe("storedApiCollection", () => {
   describe("delete note", () => {
     beforeEach(() => {
       fetch.mockResponseOnce(JSON.stringify({}));
-      store.loadNoteRealms([note]);
     });
 
     it("should call the api", async () => {

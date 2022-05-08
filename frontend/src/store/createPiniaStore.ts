@@ -39,10 +39,6 @@ export default defineStore("main", {
       history(this).popUndoHistory();
     },
 
-    loadNoteRealms(noteRealms: Generated.NoteRealm[]) {
-      noteCache(this).loadNoteRealms(noteRealms);
-    },
-
     loadNotePosition(notePosition: Generated.NotePositionViewedByUser) {
       noteCache(this).loadNotePosition(notePosition);
     },
