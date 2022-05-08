@@ -100,19 +100,15 @@ const storedApiCollection = (
     },
 
     async getNoteWithDescendents(noteId: Doughnut.ID) {
-      const res = (await managedApi.restGet(
+      return (await managedApi.restGet(
         `notes/${noteId}/overview`
       )) as Generated.NotesBulk;
-      piniaStore.loadNotesBulk(res);
-      return res;
     },
 
     async getNoteAndItsChildren(noteId: Doughnut.ID) {
-      const res = (await managedApi.restGet(
+      return (await managedApi.restGet(
         `notes/${noteId}`
       )) as Generated.NotesBulk;
-      piniaStore.loadNotesBulk(res);
-      return res;
     },
 
     async createNotebook(
@@ -131,12 +127,10 @@ const storedApiCollection = (
     },
 
     async createNote(parentId: Doughnut.ID, data: Generated.NoteCreation) {
-      const res = (await managedApi.restPostMultiplePartForm(
+      return (await managedApi.restPostMultiplePartForm(
         `notes/${parentId}/create`,
         data
       )) as Generated.NotesBulk;
-      piniaStore.loadNotesBulk(res);
-      return res;
     },
 
     async createLink(
@@ -144,30 +138,24 @@ const storedApiCollection = (
       targetId: Doughnut.ID,
       data: Generated.LinkRequest
     ) {
-      const res = (await managedApi.restPost(
+      return (await managedApi.restPost(
         `links/create/${sourceId}/${targetId}`,
         data
       )) as Generated.NotesBulk;
-      piniaStore.loadNotesBulk(res);
-      return res;
     },
 
     async updateLink(linkId: Doughnut.ID, data: Generated.LinkRequest) {
-      const res = (await managedApi.restPost(
+      return (await managedApi.restPost(
         `links/${linkId}`,
         data
       )) as Generated.NotesBulk;
-      piniaStore.loadNotesBulk(res);
-      return res;
     },
 
     async deleteLink(linkId: Doughnut.ID) {
-      const res = (await managedApi.restPost(
+      return (await managedApi.restPost(
         `links/${linkId}/delete`,
         {}
       )) as Generated.NotesBulk;
-      piniaStore.loadNotesBulk(res);
-      return res;
     },
 
     async updateNote(
@@ -207,7 +195,6 @@ const storedApiCollection = (
         `notes/${history.noteId}/undo-delete`,
         {}
       )) as Generated.NotesBulk;
-      piniaStore.loadNotesBulk(res);
       return res.notes[0];
     },
 

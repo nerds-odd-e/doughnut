@@ -47,11 +47,6 @@ export default defineStore("main", {
       noteCache(this).loadNotePosition(notePosition);
     },
 
-    loadNotesBulk(noteBulk: Generated.NotesBulk) {
-      this.loadNoteRealms(noteBulk.notes);
-      this.loadNotePosition(noteBulk.notePosition);
-    },
-
     deleteNote(noteId: Doughnut.ID) {
       history(this).deleteNote(noteId);
     },
