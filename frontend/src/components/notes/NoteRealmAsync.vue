@@ -38,7 +38,7 @@ import NoteToolbar from "../toolbars/NoteToolbar.vue";
 import NoteMindmapView from "./views/NoteMindmapView.vue";
 import NoteCardsView from "./views/NoteCardsView.vue";
 import NoteArticleView from "./views/NoteArticleView.vue";
-import { ViewType, viewType, ViewTypeName } from "../../models/viewTypes";
+import { ViewTypeName } from "../../models/viewTypes";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 import LoadingPage from "../../pages/commons/LoadingPage.vue";
 import NoteRealmCache from "../../store/NoteRealmCache";
@@ -72,9 +72,6 @@ export default defineComponent({
   computed: {
     noteRealm() {
       return this.noteRealms?.getNoteRealmById(this.noteId);
-    },
-    viewTypeObj(): ViewType {
-      return viewType(this.viewType);
     },
     selectedNotePosition(): Generated.NotePositionViewedByUser | undefined {
       return this.noteRealms?.getNotePosition(this.selectedNoteId);
