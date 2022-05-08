@@ -1,5 +1,4 @@
 interface NoteCacheState {
-  notebooks: Generated.NotebookViewedByUser[];
   notebooksMapByHeadNoteId: {
     [id: Doughnut.ID]: Generated.NotebookViewedByUser;
   };
@@ -11,13 +10,6 @@ class NoteCache {
 
   constructor(state: NoteCacheState) {
     this.state = state;
-  }
-
-  loadNotebooks(notebooks: Generated.NotebookViewedByUser[]) {
-    this.state.notebooks = notebooks;
-    notebooks.forEach((nb) => {
-      this.loadNotebook(nb);
-    });
   }
 
   loadNotePosition(notePosition: Generated.NotePositionViewedByUser) {

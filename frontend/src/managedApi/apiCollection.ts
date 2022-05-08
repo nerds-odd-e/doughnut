@@ -92,6 +92,12 @@ const apiCollection = (managedApi: ManagedApi) => ({
     );
   },
 
+  async getNotebooks() {
+    return (await managedApi.restGet(
+      `notebooks`
+    )) as Generated.NotebooksViewedByUser;
+  },
+
   comments: {
     createNoteComment(noteId: Doughnut.ID, content: Generated.CommentCreation) {
       return managedApi.restPost(`/api/notes/${noteId}/createComment`, content);

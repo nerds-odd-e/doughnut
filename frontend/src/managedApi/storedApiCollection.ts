@@ -136,14 +136,6 @@ const storedApiCollection = (
       return res;
     },
 
-    async getNotebooks() {
-      const res = (await managedApi.restGet(
-        `notebooks`
-      )) as Generated.NotebooksViewedByUser;
-      piniaStore.loadNotebooks(res.notebooks);
-      return res;
-    },
-
     async createNotebook(
       circle: Generated.Circle | undefined,
       data: Generated.Notebook
@@ -237,9 +229,6 @@ const storedApiCollection = (
         {}
       )) as Generated.NotesBulk;
       piniaStore.loadNotesBulk(res);
-      if (res.notes[0].note.parentId === null) {
-        this.getNotebooks();
-      }
       return res.notes[0];
     },
 

@@ -1,5 +1,5 @@
 <template>
-  <NoteToolbar />
+  <NoteToolbar @note-realm-updated="fetchData"/>
   <ContainerPage v-bind="{ loading, contentExists: true, title: 'Notebooks' }">
     <p>
       <NotebookNewButton>Add New Notebook</NotebookNewButton>
@@ -13,17 +13,18 @@
   </ContainerPage>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue";
 import NotebookViewCards from "../components/notebook/NotebookViewCards.vue";
 import NotebookNewButton from "../components/notebook/NotebookNewButton.vue";
 import NoteToolbar from "../components/toolbars/NoteToolbar.vue";
 import NotebookSubscriptionCards from "../components/subscriptions/NotebookSubscriptionCards.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
-import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
+import useLoadingApi from "../managedApi/useStoredLoadingApi";
 
-export default {
+export default defineComponent({
   setup() {
-    return useStoredLoadingApi();
+    return useLoadingApi();
   },
   name: "NotebooksPage",
   components: {
@@ -35,23 +36,20 @@ export default {
   },
   data() {
     return {
-      subscriptions: null,
+      subscriptions: undefined as Generated.NotebookSubscription[] | undefined,
+      notebooks: undefined as Generated.NotebookViewedByUser[] | undefined,
     };
-  },
-  computed: {
-    notebooks() {
-      return this.piniaStore.notebooks;
-    },
   },
   methods: {
     fetchData() {
-      this.storedApi
-        .getNotebooks()
-        .then((res) => (this.subscriptions = res.subscriptions));
+      this.api.getNotebooks().then((res) => {
+        this.notebooks = res.notebooks;
+        this.subscriptions = res.subscriptions;
+      });
     },
   },
   mounted() {
     this.fetchData();
   },
-};
+});
 </script>
