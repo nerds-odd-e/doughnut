@@ -94,13 +94,13 @@ export default defineComponent({
       this.selectedNoteId = id;
     },
     async fetchData() {
-      if (this.viewType === "cards") {
+      if (this.viewType === "mindmap" || this.viewType === "article") {
         this.noteRealms = new NoteRealmCache(
-          await this.storedApi.getNoteRealmWithPosition(this.noteId)
+          await this.storedApi.getNoteWithDescendents(this.noteId)
         );
       } else {
         this.noteRealms = new NoteRealmCache(
-          await this.storedApi.getNoteWithDescendents(this.noteId)
+          await this.storedApi.getNoteRealmWithPosition(this.noteId)
         );
       }
 
