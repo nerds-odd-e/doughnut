@@ -62,6 +62,10 @@ in mkShell {
     xvfb-run
   ];
   shellHook = ''
+        #!/usr/bin/env bash
+
+        bash --posix $(whoami)
+
         export NIXPKGS_ALLOW_UNFREE=1
         export GPG_TTY=$(tty)
         export JAVA_HOME="$(readlink -e $(type -p javac) | sed  -e 's/\/bin\/javac//g')"
