@@ -63,8 +63,11 @@ in mkShell {
   ];
   shellHook = ''
         #!/usr/bin/env bash
-
-        bash --posix $(whoami)
+	
+	OS_TYPE=$(uname -s)
+        if [ $OS_TYPE = "Linux" ]; then
+          bash --posix $(whoami)
+        fi
 
         export NIXPKGS_ALLOW_UNFREE=1
         export GPG_TTY=$(tty)
@@ -96,20 +99,20 @@ in mkShell {
         mkdir -p $MYSQL_HOME
         mkdir -p $MYSQL_DATADIR
 
-    cat <<EOF > $MYSQL_HOME/init_doughnut_db.sql
-    CREATE USER IF NOT EXISTS 'doughnut'@'localhost' IDENTIFIED BY 'doughnut';
-    CREATE USER IF NOT EXISTS 'doughnut'@'127.0.0.1' IDENTIFIED BY 'doughnut';
-    CREATE DATABASE IF NOT EXISTS doughnut_development DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-    CREATE DATABASE IF NOT EXISTS doughnut_test        DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-    CREATE DATABASE IF NOT EXISTS doughnut_e2e_test    DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-    GRANT ALL PRIVILEGES ON doughnut_development.* TO 'doughnut'@'localhost';
-    GRANT ALL PRIVILEGES ON doughnut_test.*        TO 'doughnut'@'localhost';
-    GRANT ALL PRIVILEGES ON doughnut_e2e_test.*    TO 'doughnut'@'localhost';
-    GRANT ALL PRIVILEGES ON doughnut_development.* TO 'doughnut'@'127.0.0.1';
-    GRANT ALL PRIVILEGES ON doughnut_test.*        TO 'doughnut'@'127.0.0.1';
-    GRANT ALL PRIVILEGES ON doughnut_e2e_test.*    TO 'doughnut'@'127.0.0.1';
-    FLUSH PRIVILEGES;
-    EOF
+cat <<EOF > $MYSQL_HOME/init_doughnut_db.sql
+CREATE USER IF NOT EXISTS 'doughnut'@'localhost' IDENTIFIED BY 'doughnut';
+CREATE USER IF NOT EXISTS 'doughnut'@'127.0.0.1' IDENTIFIED BY 'doughnut';
+CREATE DATABASE IF NOT EXISTS doughnut_development DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS doughnut_test        DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS doughnut_e2e_test    DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+GRANT ALL PRIVILEGES ON doughnut_development.* TO 'doughnut'@'localhost';
+GRANT ALL PRIVILEGES ON doughnut_test.*        TO 'doughnut'@'localhost';
+GRANT ALL PRIVILEGES ON doughnut_e2e_test.*    TO 'doughnut'@'localhost';
+GRANT ALL PRIVILEGES ON doughnut_development.* TO 'doughnut'@'127.0.0.1';
+GRANT ALL PRIVILEGES ON doughnut_test.*        TO 'doughnut'@'127.0.0.1';
+GRANT ALL PRIVILEGES ON doughnut_e2e_test.*    TO 'doughnut'@'127.0.0.1';
+FLUSH PRIVILEGES;
+EOF
 
         export MYSQLD_PID=$(ps -ax | grep -v " grep " | grep mysqld | awk '{ print $1 }')
         if [[ -z "$MYSQLD_PID" ]]; then
