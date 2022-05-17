@@ -63,8 +63,8 @@ in mkShell {
   ];
   shellHook = ''
         #!/usr/bin/env bash
-	
-	OS_TYPE=$(uname -s)
+
+        OS_TYPE=$(uname -s)
         if [ $OS_TYPE = "Linux" ]; then
           bash --posix $(whoami)
         fi
