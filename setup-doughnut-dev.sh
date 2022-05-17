@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -eo pipefail
 
@@ -16,7 +16,7 @@ get_os_type() {
 
 download_nixpkg_manager_install_script() {
   rm -f install-nix
-  curl -o install-nix https://releases.nixos.org/nix/nix-2.8.0/install
+  curl -o install-nix https://releases.nixos.org/nix/nix-2.8.1/install
   chmod +x ./install-nix
 }
 
@@ -27,7 +27,7 @@ configure_nix_flakes() {
   fi
 
   if ! grep -Fxq "experimental-features = nix-command flakes" ${HOME}/.config/nix/nix.conf; then
-    echo 'experimental-features = nix-command flakes' >>${HOME}/.config/nix/nix.conf
+    echo 'experimental-features = nix-command flakes' >> ${HOME}/.config/nix/nix.conf
   fi
 }
 
