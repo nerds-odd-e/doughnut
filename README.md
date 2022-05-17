@@ -38,6 +38,8 @@ From the root of doughnut directory:
 ./setup-doughnut-dev.sh
 ```
 
+Ensure your OS (WSL2/Ubuntu/Fedora, etc) has `/bin/sh` point to `bash`.
+If you are using Ubuntu where `/bin/sh` is symlinked to `dash`, please run `sudo dpkg-reconfigure dash` and answer "No" to reconfigure to `bash` as default.
 If you hit problems with the above quick-start setup, you should manually walk through the [local development environment nix setup](./docs/nix.md).
 
 ### 2. Setup and run doughnut with migrations in 'E2E' profile (backend app started on port 9081)
