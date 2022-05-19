@@ -3,7 +3,7 @@
     <div class="inner-box" :key="noteId">
       <div class="header">
         <NoteToolbar
-          v-if="selectedNote"
+          v-if="selectedNote && selectedNotePosition"
           v-bind="{ selectedNote, selectedNotePosition, viewType }"
           @note-deleted="onNoteDeleted"
           @note-realm-updated="noteRealmUpdated($event)"
