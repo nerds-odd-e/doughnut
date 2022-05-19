@@ -10,6 +10,7 @@ import com.odde.doughnut.models.SearchTermModel;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
+import java.sql.Timestamp;
 import java.util.List;
 import javax.annotation.Resource;
 import javax.validation.Valid;
@@ -62,6 +63,7 @@ class RestNoteController {
   static class NoteStatistics {
     @Getter @Setter private ReviewPoint reviewPoint;
     @Getter @Setter private NoteRealm note;
+    @Getter @Setter private Timestamp createdAt;
   }
 
   @PostMapping(value = "/{parentNote}/create")
@@ -132,6 +134,7 @@ class RestNoteController {
     NoteStatistics statistics = new NoteStatistics();
     statistics.setReviewPoint(user.getReviewPointFor(note));
     statistics.note = new NoteViewer(user.getEntity(), note).toJsonObject();
+    statistics.createdAt = note.getThing().getCreatedAt();
     return statistics;
   }
 
