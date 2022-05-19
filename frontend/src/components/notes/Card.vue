@@ -18,7 +18,7 @@ import NoteShortDescription from "./NoteShortDescription.vue";
 
 export default defineComponent({
   props: {
-    note: { type: Object as PropType<Generated.NoteRealm>, required: true },
+    note: { type: Object as PropType<Generated.Note>, required: true },
   },
   components: {
     NoteTitleWithLink,

@@ -24,11 +24,14 @@
           <ReviewSettingForm
             v-if="!!reviewPointViewedByUser.reviewSetting"
             v-model="reviewSetting"
-            :showLevel="false"
+            :show-level="false"
             :errors="{}"
           />
         </div>
-        <InitialReviewButtons :key="buttonKey" @doInitialReview="processForm($event)" />
+        <InitialReviewButtons
+          :key="buttonKey"
+          @doInitialReview="processForm($event)"
+        />
       </div>
     </template>
   </ContainerPage>
@@ -52,12 +55,12 @@ export default defineComponent({
   },
   name: "InitialReviewPage",
   props: {
-     nested: Boolean,
-     reviewPointViewedByUsers: {
-        type: Object as PropType<Generated.ReviewPointViewedByUser[]>,
-        required: true
-     },
-   },
+    nested: Boolean,
+    reviewPointViewedByUsers: {
+      type: Object as PropType<Generated.ReviewPointViewedByUser[]>,
+      required: true,
+    },
+  },
   components: {
     ShowReviewPoint,
     ReviewSettingForm,
@@ -111,14 +114,14 @@ export default defineComponent({
           skipReview,
           reviewSetting: this.reviewSetting,
         })
-        .then((res)=>{
+        .then((res) => {
           this.reviewPointViewedByUsers[this.finished] = res;
           if (this.finished + 1 === this.reviewPointViewedByUsers.length) {
             this.$router.push({ name: "reviews" });
-            return
+            return;
           }
           this.finished += 1;
-        })
+        });
     },
   },
 });
