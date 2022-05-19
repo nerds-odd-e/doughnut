@@ -21,7 +21,7 @@
       v-if="!!formData.moveUnder"
       scope-name="link"
       v-model="formData.asFirstChild"
-      :errors="formErrors.asFristChild"
+      :errors="formErrors.asFirstChild"
       :options="[
         { value: true, label: 'as its first child' },
         { value: false, label: 'as its last child' },
@@ -60,6 +60,11 @@ export default defineComponent({
         asFirstChild: false,
         typeId: undefined as number | undefined,
         moveUnder: false,
+      },
+      formErrors: {
+        asFirstChild: undefined as string | undefined,
+        typeId: undefined as string | undefined,
+        moveUnder: undefined as string | undefined,
       },
     };
   },
