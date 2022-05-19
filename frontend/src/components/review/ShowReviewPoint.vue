@@ -16,10 +16,16 @@
 
   <div v-if="linkViewedByUser">
     <div class="jumbotron py-4 mb-2">
-      <LinkShow v-bind="linkViewedByUser">
-        <LinkNob v-bind="{ link: linkViewedByUser }"
-        @note-realm-updated="$emit('noteRealmUpdated', $event)"
-         />
+      <LinkShow
+        v-bind="{
+          sourceNoteWithPosition: linkViewedByUser.sourceNoteWithPosition,
+          targetNoteWithPosition: linkViewedByUser.targetNoteWithPosition,
+        }"
+      >
+        <LinkNob
+          v-bind="{ link: linkViewedByUser }"
+          @note-realm-updated="$emit('noteRealmUpdated', $event)"
+        />
         <span class="badge bg-light text-dark">
           {{ linkViewedByUser.linkTypeLabel }}</span
         >
