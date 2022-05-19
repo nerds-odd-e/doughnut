@@ -1,6 +1,6 @@
 <template>
   <RadioButtons
-    v-model="viewType"
+    :modelValue="viewType"
     @update:modelValue="viewTypeChange"
     v-bind="{ options }"
   >
