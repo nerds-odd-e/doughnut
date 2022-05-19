@@ -471,7 +471,6 @@ Cypress.Commands.add("withinMindmap", () => {
 
 Cypress.Commands.add(
   "distanceBetweenCardsGreaterThan",
-  { prevSubject: true },
   (cards, note1, note2, min) => {
     const rect1 = cards[note1]
     const rect2 = cards[note2]

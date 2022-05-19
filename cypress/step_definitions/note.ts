@@ -256,12 +256,13 @@ When("I click the zoom indicator", () => {
 When(
   "I should see the notes {string} are around note {string} and apart from each other",
   (noteTitles, parentNoteTitle) => {
+    const titles = noteTitles.commonSenseSplit(",")
+    cy.findByText(titles[titles.length -1]);
     cy.withinMindmap().then((cards) => {
-      const titles = noteTitles.commonSenseSplit(",")
       titles.forEach((noteTitle) => {
-        cy.wrap(cards).distanceBetweenCardsGreaterThan(parentNoteTitle, noteTitle, 100)
+        cy.distanceBetweenCardsGreaterThan(cards, parentNoteTitle, noteTitle, 100)
       })
-      cy.wrap(cards).distanceBetweenCardsGreaterThan(titles[0], titles[1], 100)
+      cy.distanceBetweenCardsGreaterThan(cards, titles[0], titles[1], 100)
     })
   },
 )
