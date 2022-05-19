@@ -5,22 +5,24 @@
       <h5 class="card-title">
         <NoteTitleWithLink :note="note" class="card-title" />
       </h5>
-      <NoteShortDescription :shortDescription="note.shortDescription"/>
+      <NoteShortDescription :short-description="note.shortDescription" />
       <slot name="button" :note="note" />
     </div>
   </div>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, PropType } from "vue";
 import NoteTitleWithLink from "./NoteTitleWithLink.vue";
 import NoteShortDescription from "./NoteShortDescription.vue";
 
-export default {
+export default defineComponent({
   props: {
-    note: Object,
+    note: { type: Object as PropType<Generated.NoteRealm>, required: true },
   },
   components: {
-    NoteTitleWithLink, NoteShortDescription,
+    NoteTitleWithLink,
+    NoteShortDescription,
   },
-}
+});
 </script>

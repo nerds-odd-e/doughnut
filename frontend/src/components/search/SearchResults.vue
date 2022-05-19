@@ -1,9 +1,16 @@
 <template>
   <div>
-    <CheckInput scopeName="searchTerm" field="allMyNotebooksAndSubscriptions" v-model="searchTerm.allMyNotebooksAndSubscriptions"
+    <CheckInput
+      scope-name="searchTerm"
+      field="allMyNotebooksAndSubscriptions"
+      v-model="searchTerm.allMyNotebooksAndSubscriptions"
       :disabled="!noteId"
-     />
-    <CheckInput scopeName="searchTerm" field="allMyCircles" v-model="searchTerm.allMyCircles" />
+    />
+    <CheckInput
+      scope-name="searchTerm"
+      field="allMyCircles"
+      v-model="searchTerm.allMyCircles"
+    />
   </div>
 
   <div v-if="!searchResult || searchResult.length === 0">
@@ -11,18 +18,19 @@
   </div>
   <Cards v-else class="search-result" :notes="searchResult" columns="3">
     <template #button="{ note }">
-      <button class="btn btn-primary" v-on:click="$emit('selected', note)">Select</button>
+      <button class="btn btn-primary" @click="$emit('selected', note)">
+        Select
+      </button>
     </template>
   </Cards>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import _, { DebouncedFunc } from "lodash";
 import CheckInput from "../form/CheckInput.vue";
 import Cards from "../notes/Cards.vue";
-import _, { DebouncedFunc } from "lodash";
-import useLoadingApi from '../../managedApi/useLoadingApi';
-
+import useLoadingApi from "../../managedApi/useLoadingApi";
 
 const debounced = _.debounce((callback) => callback(), 500);
 
@@ -31,7 +39,7 @@ export default defineComponent({
     return useLoadingApi();
   },
   name: "SearchNote",
-  props: { noteId: Number, inputSearchKey: {type: String, required: true } },
+  props: { noteId: Number, inputSearchKey: { type: String, required: true } },
   components: { CheckInput, Cards },
   emits: ["selected"],
   data() {
@@ -48,11 +56,10 @@ export default defineComponent({
       } as Generated.SearchTerm,
       cache: {
         global: {},
-        local: {}
-
+        local: {},
       } as {
-        global: Record<string, Generated.Note[]>,
-        local: Record<string, Generated.Note[]>,
+        global: Record<string, Generated.Note[]>;
+        local: Record<string, Generated.Note[]>;
       },
       recentResult: undefined as Generated.Note[] | undefined,
     };
@@ -60,38 +67,43 @@ export default defineComponent({
   watch: {
     searchTerm: {
       handler() {
-        if (this.searchTerm.allMyCircles && !this.oldSearchTerm.allMyNotebooksAndSubscriptions) {
-          this.searchTerm.allMyNotebooksAndSubscriptions = true
-        }
-        else if (!this.searchTerm.allMyNotebooksAndSubscriptions && this.oldSearchTerm.allMyCircles) {
-          this.searchTerm.allMyCircles = false
+        if (
+          this.searchTerm.allMyCircles &&
+          !this.oldSearchTerm.allMyNotebooksAndSubscriptions
+        ) {
+          this.searchTerm.allMyNotebooksAndSubscriptions = true;
+        } else if (
+          !this.searchTerm.allMyNotebooksAndSubscriptions &&
+          this.oldSearchTerm.allMyCircles
+        ) {
+          this.searchTerm.allMyCircles = false;
         }
         if (this.searchTerm.searchKey.trim() === "") {
         } else {
           this.search();
         }
-        this.oldSearchTerm = { ... this.searchTerm}
+        this.oldSearchTerm = { ...this.searchTerm };
       },
       deep: true,
     },
     inputSearchKey() {
-      this.searchTerm.searchKey = this.inputSearchKey
-    }
+      this.searchTerm.searchKey = this.inputSearchKey;
+    },
   },
   computed: {
     trimmedSearchKey() {
-      return this.searchTerm.searchKey.trim()
+      return this.searchTerm.searchKey.trim();
     },
     cachedSearches() {
-      return this.searchTerm.allMyNotebooksAndSubscriptions ? this.cache.global : this.cache.local
+      return this.searchTerm.allMyNotebooksAndSubscriptions
+        ? this.cache.global
+        : this.cache.local;
     },
     cachedResult() {
-      return this.cachedSearches[
-        this.trimmedSearchKey
-      ];
+      return this.cachedSearches[this.trimmedSearchKey];
     },
     searchResult() {
-      return !!this.cachedResult ? this.cachedResult : this.recentResult;
+      return this.cachedResult ? this.cachedResult : this.recentResult;
     },
   },
   methods: {
@@ -102,22 +114,25 @@ export default defineComponent({
 
       debounced.cancel();
       debounced(async () => {
-        const originalTrimmedKey = this.trimmedSearchKey
-        const result = await this.api.relativeSearch({...this.searchTerm, note: this.noteId})
-        this.recentResult = result
-        this.cachedSearches[originalTrimmedKey] = result
+        const originalTrimmedKey = this.trimmedSearchKey;
+        const result = await this.api.relativeSearch({
+          ...this.searchTerm,
+          note: this.noteId,
+        });
+        this.recentResult = result;
+        this.cachedSearches[originalTrimmedKey] = result;
       });
     },
   },
   mounted() {
     if (!this.noteId) {
-      this.searchTerm.allMyNotebooksAndSubscriptions = true
+      this.searchTerm.allMyNotebooksAndSubscriptions = true;
     }
-    this.searchTerm.searchKey = this.inputSearchKey
+    this.searchTerm.searchKey = this.inputSearchKey;
   },
   beforeUnmount() {
     debounced.cancel();
-  }
+  },
 });
 </script>
 
