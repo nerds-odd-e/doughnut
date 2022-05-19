@@ -1,6 +1,7 @@
 <template>
   <LoadingPage v-bind="{ loading, contentExists: !!reviewPointViewedByUser }">
     <ShowReviewPoint
+      v-if="reviewPointViewedByUser"
       v-bind="{
         reviewPointViewedByUser,
       }"
@@ -33,16 +34,23 @@ import usePopups from "../commons/Popups/usePopup";
 
 export default defineComponent({
   setup() {
-    return {...useStoredLoadingApi({ initalLoading: true }), ...usePopups()}
+    return { ...useStoredLoadingApi({ initalLoading: true }), ...usePopups() };
   },
   props: {
     reviewPointId: { type: Number, required: true },
   },
-  components: { LoadingPage, ShowReviewPoint, SelfEvaluateButtons, SvgNoReview },
-  emits: ['selfEvaluated'],
+  components: {
+    LoadingPage,
+    ShowReviewPoint,
+    SelfEvaluateButtons,
+    SvgNoReview,
+  },
+  emits: ["selfEvaluated"],
   data() {
     return {
-      reviewPointViewedByUser: undefined as Generated.ReviewPointViewedByUser | undefined,
+      reviewPointViewedByUser: undefined as
+        | Generated.ReviewPointViewedByUser
+        | undefined,
       nextReviewAt: undefined as string | undefined,
     };
   },
@@ -54,7 +62,7 @@ export default defineComponent({
         })
         .then((reviewPoint) => {
           this.nextReviewAt = reviewPoint.nextReviewAt;
-          this.$emit('selfEvaluated', reviewPoint);
+          this.$emit("selfEvaluated", reviewPoint);
         });
     },
 
@@ -72,9 +80,8 @@ export default defineComponent({
     },
 
     async fetchData() {
-      this.reviewPointViewedByUser = await this.storedApi.reviewMethods.getReviewPoint(
-        this.reviewPointId
-      );
+      this.reviewPointViewedByUser =
+        await this.storedApi.reviewMethods.getReviewPoint(this.reviewPointId);
     },
   },
   watch: {
