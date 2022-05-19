@@ -18,7 +18,7 @@ export default defineComponent({
   methods: {
     async goHome() {
       if (await this.popups.confirm("Confirm to leave the reviewing?")) {
-        window.location = "/";
+        window.location.href = "/";
       }
     },
   },

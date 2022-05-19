@@ -9,17 +9,17 @@
           @note-realm-updated="noteRealmUpdated($event)"
         />
       </div>
-      <div class="content" v-if="noteRealm">
+      <div class="content" v-if="noteRealm && noteRealmCache">
         <NoteMindmapView
           v-if="viewType === 'mindmap'"
-          v-bind="{ noteId, noteRealms, expandChildren }"
+          v-bind="{ noteId, noteRealms: noteRealmCache, expandChildren }"
           :highlight-note-id="selectedNoteId"
           @selectNote="highlight($event)"
           @note-realm-updated="noteRealmUpdated($event)"
         />
         <div class="container" v-if="viewType === 'article'">
           <NoteArticleView
-            v-bind="{ noteId, noteRealms, expandChildren }"
+            v-bind="{ noteId, noteRealms: noteRealmCache, expandChildren }"
             @note-realm-updated="noteRealmUpdated($event)"
           />
         </div>
@@ -66,16 +66,16 @@ export default defineComponent({
   data() {
     return {
       comments: [] as Generated.Comment[],
-      noteRealms: undefined as NoteRealmCache | undefined,
+      noteRealmCache: undefined as NoteRealmCache | undefined,
       selectedNoteId: undefined as Doughnut.ID | undefined,
     };
   },
   computed: {
     noteRealm() {
-      return this.noteRealms?.getNoteRealmById(this.noteId);
+      return this.noteRealmCache?.getNoteRealmById(this.noteId);
     },
     selectedNotePosition(): Generated.NotePositionViewedByUser | undefined {
-      return this.noteRealms?.getNotePosition(this.selectedNoteId);
+      return this.noteRealmCache?.getNotePosition(this.selectedNoteId);
     },
     selectedNote() {
       return this.noteRealm?.note;
@@ -86,21 +86,21 @@ export default defineComponent({
   },
   methods: {
     onNoteDeleted(deletedNoteId: Doughnut.ID) {
-      this.noteRealms?.deleteNoteAndDescendents(deletedNoteId);
+      this.noteRealmCache?.deleteNoteAndDescendents(deletedNoteId);
     },
     noteRealmUpdated(updatedNoteRealm?: Generated.NoteRealm) {
-      this.noteRealms?.updateNoteRealm(updatedNoteRealm);
+      this.noteRealmCache?.updateNoteRealm(updatedNoteRealm);
     },
     highlight(id: Doughnut.ID) {
       this.selectedNoteId = id;
     },
     async fetchData() {
       if (this.viewType === "mindmap" || this.viewType === "article") {
-        this.noteRealms = new NoteRealmCache(
+        this.noteRealmCache = new NoteRealmCache(
           await this.storedApi.getNoteWithDescendents(this.noteId)
         );
       } else {
-        this.noteRealms = new NoteRealmCache(
+        this.noteRealmCache = new NoteRealmCache(
           await this.storedApi.getNoteRealmWithPosition(this.noteId)
         );
       }

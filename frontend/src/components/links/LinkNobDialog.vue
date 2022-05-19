@@ -50,6 +50,7 @@ export default defineComponent({
   data() {
     return {
       formData: { typeId: this.link.typeId },
+      formErrors: { typeId: undefined },
     };
   },
 

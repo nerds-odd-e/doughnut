@@ -5,7 +5,9 @@
 </template>
 
 <script lang="ts">
-export default {
+import { defineComponent } from "vue";
+
+export default defineComponent({
   props: {
     id: Number,
     updatedAt: String,
@@ -27,5 +29,5 @@ export default {
         .join(",")})`;
     },
   },
-};
+});
 </script>

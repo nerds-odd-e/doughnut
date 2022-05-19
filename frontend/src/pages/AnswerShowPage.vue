@@ -10,10 +10,15 @@
           { value: 'quiz', label: 'Quiz' },
         ]"
       />
-      <QuizQuestion v-if="showQuiz === 'quiz'" :quizQuestion="answerResult.quizQuestion" />
+      <QuizQuestion
+        v-if="showQuiz === 'quiz'"
+        :quiz-question="answerResult.quizQuestion"
+      />
       <div v-else>
-        <ReviewPointAsync v-bind="{ reviewPointId: reviewPointViewedByUser?.reviewPoint.id }" />
-
+        <ReviewPointAsync
+          v-if="reviewPointViewedByUser"
+          v-bind="{ reviewPointId: reviewPointViewedByUser?.reviewPoint.id }"
+        />
       </div>
     </LoadingPage>
   </div>
@@ -39,8 +44,8 @@ export default defineComponent({
     AnswerResult,
     QuizQuestion,
     RadioButtons,
-    ReviewPointAsync
-},
+    ReviewPointAsync,
+  },
   data() {
     return {
       answerResult: undefined as Generated.AnswerViewedByUser | undefined,
@@ -54,9 +59,10 @@ export default defineComponent({
   },
   methods: {
     async fetchData() {
-      this.answerResult = await this.storedApi.reviewMethods.getAnswer(this.answerId);
+      this.answerResult = await this.storedApi.reviewMethods.getAnswer(
+        this.answerId
+      );
     },
-
   },
   watch: {
     answerId() {
