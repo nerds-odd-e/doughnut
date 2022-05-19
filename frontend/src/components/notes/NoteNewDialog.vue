@@ -34,6 +34,10 @@ function initialState() {
       linkTypeToParent: "",
       textContent: { title: "" },
     },
+    formErrors: {
+      linkTypeToParent: undefined,
+      textContent: {},
+    },
   };
 }
 

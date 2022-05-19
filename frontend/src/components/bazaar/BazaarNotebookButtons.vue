@@ -1,14 +1,14 @@
 <template>
   <div class="btn-group btn-group-sm">
-    <PopupButton
-      v-if="!notebook.skipReviewEntirely"
-      title="Add to my learning"
-    >
-      <template v-slot:button_face>
-        <SvgAdd/>
+    <PopupButton v-if="!notebook.skipReviewEntirely" title="Add to my learning">
+      <template #button_face>
+        <SvgAdd />
       </template>
-      <template #dialog_body="{doneHandler}">
-        <SubscribeDialog v-bind="{notebook, user}" @done="doneHandler($event)"/>
+      <template #dialog_body="{ doneHandler }">
+        <SubscribeDialog
+          v-bind="{ notebook, user }"
+          @done="doneHandler($event)"
+        />
       </template>
     </PopupButton>
   </div>
@@ -22,5 +22,6 @@ import SvgAdd from "../svgs/SvgAdd.vue";
 
 const props = defineProps({
   notebook: { type: Object as PropType<Generated.Notebook>, required: true },
-  user: Boolean });
+  user: Object,
+});
 </script>

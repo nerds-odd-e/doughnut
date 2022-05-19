@@ -19,6 +19,7 @@
 import { defineComponent, PropType } from "vue";
 import NoteWithLinks from "../NoteWithLinks.vue";
 import { NoteRealmsReader } from "../../../store/NoteRealmCache";
+import generateId from "tests/fixtures/generateId";
 
 export default defineComponent({
   props: {
@@ -36,9 +37,9 @@ export default defineComponent({
       return this.noteRealms.getNoteRealmById(this.noteId);
     },
     children() {
-      return this.noteRealm?.children.map((child) =>
-        this.noteRealms.getNoteRealmById(child.id)
-      ).filter((child) => child);
+      return this.noteRealm?.children
+        .map((child) => this.noteRealms.getNoteRealmById(child.id))
+        .filter((child): child is generateId.NoteRealm => !!child);
     },
   },
 });
