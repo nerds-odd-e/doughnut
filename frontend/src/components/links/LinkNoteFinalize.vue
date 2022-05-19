@@ -56,7 +56,11 @@ export default defineComponent({
   emits: ["success", "goBack"],
   data() {
     return {
-      formData: { asFirstChild: false },
+      formData: {
+        asFirstChild: false,
+        typeId: undefined as number | undefined,
+        moveUnder: false,
+      },
     };
   },
   methods: {
