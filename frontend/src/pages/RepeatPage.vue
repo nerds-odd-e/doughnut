@@ -20,13 +20,13 @@
         @answer="processAnswer($event)"
         :key="reviewPointId"
       />
-      <template v-else-if="repetition?.reviewPoint">
+      <template v-else-if="reviewPointId && repetition?.reviewPoint">
         <ReviewPointAsync
           v-bind="{
             reviewPointId,
           }"
           @selfEvaluated="fetchData"
-          :key="repetition?.reviewPoint"
+          :key="repetition.reviewPoint"
         />
       </template>
       <template v-else>

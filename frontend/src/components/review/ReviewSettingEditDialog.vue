@@ -4,8 +4,8 @@
   </h3>
   <form @submit.prevent="processForm">
     <ReviewSettingForm
-      :showLevel="true"
-      scopeName="review-setting"
+      :show-level="true"
+      scope-name="review-setting"
       v-model="formData"
       :errors="formErrors"
     />
@@ -14,17 +14,17 @@
 </template>
 
 <script lang="ts">
+import { defineComponent } from "vue";
 import ReviewSettingForm from "./ReviewSettingForm.vue";
 import SvgReviewSetting from "../svgs/SvgReviewSetting.vue";
-import useLoadingApi from '../../managedApi/useLoadingApi';
+import useLoadingApi from "../../managedApi/useLoadingApi";
 
-
-export default {
+export default defineComponent({
   setup() {
-    return useLoadingApi({initalLoading: true, hasFormError: true});
+    return useLoadingApi({ initalLoading: true, hasFormError: true });
   },
   components: { ReviewSettingForm, SvgReviewSetting },
-  props: { noteId: Number, title: String },
+  props: { noteId: { type: Number, required: true }, title: String },
   emits: ["done"],
   data() {
     return {
@@ -33,16 +33,18 @@ export default {
   },
   methods: {
     fetchData() {
-      this.api.reviewMethods.getReviewSetting(this.noteId)
-      .then((res) => { this.formData = res })
+      this.api.reviewMethods.getReviewSetting(this.noteId).then((res) => {
+        this.formData = res;
+      });
     },
     processForm() {
-      this.api.reviewMethods.updateReviewSetting(this.noteId, this.formData)
-        .then((res) => this.$emit("done"))
+      this.api.reviewMethods
+        .updateReviewSetting(this.noteId, this.formData)
+        .then((res) => this.$emit("done"));
     },
   },
   mounted() {
     this.fetchData();
   },
-};
+});
 </script>

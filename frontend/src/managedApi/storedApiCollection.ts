@@ -106,7 +106,7 @@ const storedApiCollection = (
     async getNoteRealmWithPosition(noteId: Doughnut.ID) {
       return (await managedApi.restGet(
         `notes/${noteId}`
-      )) as Generated.NoteRealmWithPosition;
+      )) as Generated.NotesBulk;
     },
 
     async createNotebook(

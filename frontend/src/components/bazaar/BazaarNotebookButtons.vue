@@ -14,14 +14,21 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { PropType } from "vue";
+<script lang="ts">
+import { defineComponent, PropType } from "vue";
 import PopupButton from "../commons/Popups/PopupButton.vue";
 import SubscribeDialog from "./SubscribeDialog.vue";
 import SvgAdd from "../svgs/SvgAdd.vue";
 
-const props = defineProps({
-  notebook: { type: Object as PropType<Generated.Notebook>, required: true },
-  loggedIn: Boolean,
+export default defineComponent({
+  props: {
+    notebook: { type: Object as PropType<Generated.Notebook>, required: true },
+    loggedIn: Boolean,
+  },
+  components: {
+    PopupButton,
+    SvgAdd,
+    SubscribeDialog,
+  },
 });
 </script>

@@ -27,7 +27,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import _, { DebouncedFunc } from "lodash";
+import _ from "lodash";
 import CheckInput from "../form/CheckInput.vue";
 import Cards from "../notes/Cards.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";

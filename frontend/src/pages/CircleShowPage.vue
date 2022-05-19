@@ -25,7 +25,7 @@
         <div
           class="nav-item circle-member"
           v-for="member in circle.members"
-          :key="member.id"
+          :key="member.name"
         >
           <span :title="member.name"> <SvgMissingAvatar /> </span>
         </div>

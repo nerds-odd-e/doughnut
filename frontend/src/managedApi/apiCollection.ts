@@ -19,8 +19,10 @@ const apiCollection = (managedApi: ManagedApi) => ({
       return managedApi.restGet(`reviews/overview`);
     },
 
-    getReviewSetting(noteId: Doughnut.ID) {
-      return managedApi.restGet(`notes/${noteId}/review-setting`);
+    async getReviewSetting(noteId: Doughnut.ID) {
+      return (await managedApi.restGet(
+        `notes/${noteId}/review-setting`
+      )) as Generated.ReviewPointViewedByUser;
     },
 
     updateReviewSetting(noteId: Doughnut.ID, data: Generated.ReviewSetting) {
