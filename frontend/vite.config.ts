@@ -2,6 +2,7 @@ import { fileURLToPath, URL } from "url";
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import vueJsx from "@vitejs/plugin-vue-jsx";
+import checker from 'vite-plugin-checker'
 import AutoImport from 'unplugin-auto-import/vite'
 
 export default defineConfig({
@@ -13,6 +14,12 @@ export default defineConfig({
     }
   },
   plugins: [
+    checker({
+      vueTsc: true,
+      eslint: {
+        lintCommand: 'eslint "./src/**/*.{ts,tsx}"', // for example, lint .ts & .tsx
+      }
+    }),
     vue({
       reactivityTransform: true,
       template: {
