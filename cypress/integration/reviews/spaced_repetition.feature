@@ -18,8 +18,8 @@ Feature: Spaced-repetition
         * On day 2 I repeat old "Note 1, end         " and initial review new "Note 2, end "
         * On day 3 I repeat old "Note 2, end         " and initial review new "Note 3, end "
         * On day 4 I repeat old "Note 1, Note 3, end " and initial review new "end         "
-        * On day 5 I repeat old "Note 2, end         " and initial review new "            "
-        * On day 6 I repeat old "Note 3, end         " and initial review new "            "
-        * On day 7 I repeat old "                    " and initial review new "            "
-        * On day 8 I repeat old "Note 1, end         " and initial review new "            "
+        * On day 5 I repeat old "Note 2, end         " and initial review new "end         "
+        * On day 6 I repeat old "Note 3, end         " and initial review new "end         "
+        * On day 7 I repeat old "                    " and initial review new "end         "
+        * On day 8 I repeat old "Note 1, end         " and initial review new "end         "
 
