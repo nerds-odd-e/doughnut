@@ -103,3 +103,9 @@ mysql/
 # gitpod inteliij-projector
 **/.jetbrains
 .wireit
+
+# mountebank
+mb.log
+mb1.log
+mb.pid
+
