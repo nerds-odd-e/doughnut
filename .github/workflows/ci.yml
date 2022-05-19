@@ -45,17 +45,8 @@ jobs:
           mysql_db_user: ${{ env.MYSQL_DB_USER }}
           mysql_db_password: ${{ env.MYSQL_DB_PASSWORD }}
       - uses: ./.github/setup_jdk_with_cache
-      - uses: ./.github/setup_nodejs_with_cache
       - run: backend/gradlew -p backend testDBMigrate -Dspring.profiles.active=test
       - run: backend/gradlew -p backend test -Dspring.profiles.active=test --parallel
-      - name: Compile & transform frontend assets for bundling with Backend
-        run: yarn frontend:build
-      - name: Build application jar artifact
-        run: backend/gradlew -p backend build -x test -Dspring.profiles.active=prod --build-cache --parallel
-      - uses: actions/upload-artifact@v3
-        with:
-          name: ${{ env.ARTIFACT }}-${{ env.VERSION }}.jar
-          path: backend/build/libs/${{ env.ARTIFACT }}-${{ env.VERSION }}.jar
 
   Frontend-unit-tests:
     name: Frontend Unit tests
@@ -121,18 +112,19 @@ jobs:
     needs: [Linting, Backend-unit-tests, Frontend-unit-tests, E2E-tests]
     steps:
       - uses: actions/checkout@v3
+      - uses: ./.github/setup_jdk_with_cache
+      - uses: ./.github/setup_nodejs_with_cache
+      - name: Compile & transform frontend assets for bundling with Backend
+        run: yarn frontend:build
+      - name: Build application jar artifact
+        run: backend/gradlew -p backend build -x test -Dspring.profiles.active=prod --build-cache --parallel
       - uses: ./.github/gcloud_auth_n_sdk
         with:
           credentials_json: ${{ env.GCP_CREDENTIALS }}
       - name: Upload production application jar to Google Cloud Storage
-        uses: actions/download-artifact@v3
-        with:
-          name: ${{ env.ARTIFACT }}-${{ env.VERSION }}.jar
-      - name: Display structure of downloaded files
-        run: ls -R *.jar
       - uses: google-github-actions/upload-cloud-storage@v0
         with:
-          path: ./${{ env.ARTIFACT }}-${{ env.VERSION }}.jar
+          path: backend/build/libs/${{ env.ARTIFACT }}-${{ env.VERSION }}.jar
           destination: ${{ env.GCS_BUCKET }}/backend_app_jar
       - name: Perform rolling replace to GCP MIG doughnut-app-group
         run: infra/scripts/perform-rolling-replace-app-mig.sh
