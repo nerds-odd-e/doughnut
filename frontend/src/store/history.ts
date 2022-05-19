@@ -50,4 +50,4 @@ function history(state: HistoryState) {
 }
 
 export default history;
-export { HistoryState };
+export type { HistoryState };

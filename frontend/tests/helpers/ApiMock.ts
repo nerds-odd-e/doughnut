@@ -17,4 +17,4 @@ interface ApiMock {
   assertNoUnexpectedOrMissedCalls(): void;
 }
 
-export { ApiMock, ApiMockBuilder };
+export type { ApiMock, ApiMockBuilder };

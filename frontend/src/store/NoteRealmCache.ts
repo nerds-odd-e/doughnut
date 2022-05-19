@@ -83,4 +83,4 @@ class NoteRealmCache implements NoteRealmsReader {
 }
 
 export default NoteRealmCache;
-export { NoteRealmsReader };
+export type { NoteRealmsReader };

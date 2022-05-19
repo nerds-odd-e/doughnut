@@ -69,4 +69,4 @@ class LinkBuilder extends Builder<LinksMap> {
 }
 
 export default LinkBuilder;
-export { LinksMap };
+export type { LinksMap };

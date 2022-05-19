@@ -91,4 +91,4 @@ class RestfulFetch {
 }
 
 export default RestfulFetch;
-export { JsonData, HttpMethod };
+export type { JsonData, HttpMethod };

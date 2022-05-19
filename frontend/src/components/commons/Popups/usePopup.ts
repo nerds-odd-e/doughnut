@@ -54,4 +54,4 @@ function usePopups() {
 }
 
 export default usePopups;
-export { PopupInfo };
+export type { PopupInfo };
