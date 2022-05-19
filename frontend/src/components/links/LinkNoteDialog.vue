@@ -29,9 +29,8 @@ export default defineComponent({
     return {
       targetNote: undefined,
     } as {
-      targetNote: Generated.Note | undefined
-    }
-    ;
+      targetNote: Generated.Note | undefined;
+    };
   },
 });
 </script>

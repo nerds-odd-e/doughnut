@@ -1,7 +1,6 @@
 <template>
   <nav class="navbar toolbar">
     <NoteButtons
-      v-if="selectedNote"
       :note="selectedNote"
       :view-type="viewType"
       :feature-toggle="featureToggle"
@@ -37,16 +36,19 @@ import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 import PopupButton from "../commons/Popups/PopupButton.vue";
 import SvgSearch from "../svgs/SvgSearch.vue";
 import LinkNoteDialog from "../links/LinkNoteDialog.vue";
+import { ViewTypeName } from "../../models/viewTypes";
 
 export default defineComponent({
   setup() {
     return useStoredLoadingApi();
   },
   props: {
-    selectedNote: Object as PropType<Generated.Note>,
-    selectedNotePosition:
-      Object as PropType<Generated.NotePositionViewedByUser>,
-    viewType: String,
+    selectedNote: { type: Object as PropType<Generated.Note>, required: true },
+    selectedNotePosition: {
+      type: Object as PropType<Generated.NotePositionViewedByUser>,
+      required: true,
+    },
+    viewType: { type: String as PropType<ViewTypeName>, required: true },
   },
   emits: ["noteDeleted", "noteRealmUpdated"],
   components: {

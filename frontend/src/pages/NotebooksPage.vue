@@ -1,5 +1,5 @@
 <template>
-  <NoteToolbar @note-realm-updated="fetchData" />
+  <NotebooksToolbar @note-realm-updated="fetchData" />
   <ContainerPage v-bind="{ loading, contentExists: true, title: 'Notebooks' }">
     <p>
       <NotebookNewButton>Add New Notebook</NotebookNewButton>
@@ -17,7 +17,7 @@
 import { defineComponent } from "vue";
 import NotebookViewCards from "../components/notebook/NotebookViewCards.vue";
 import NotebookNewButton from "../components/notebook/NotebookNewButton.vue";
-import NoteToolbar from "../components/toolbars/NoteToolbar.vue";
+import NotebooksToolbar from "../components/toolbars/NotebooksToolbar.vue";
 import NotebookSubscriptionCards from "../components/subscriptions/NotebookSubscriptionCards.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import useLoadingApi from "../managedApi/useStoredLoadingApi";
@@ -29,7 +29,7 @@ export default defineComponent({
   name: "NotebooksPage",
   components: {
     ContainerPage,
-    NoteToolbar,
+    NotebooksToolbar,
     NotebookViewCards,
     NotebookSubscriptionCards,
     NotebookNewButton,
