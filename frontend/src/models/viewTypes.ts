@@ -1,5 +1,16 @@
 type ViewTypeName = "cards" | "article" | "mindmap";
 
-const viewTypeNames = ["cards", "article", "mindmap"] as ViewTypeName[];
+const viewTypeNamesRaw = ["cards", "article", "mindmap"];
+const viewTypeNames = viewTypeNamesRaw as ViewTypeName[];
 
-export { ViewTypeName, viewTypeNames };
+const sanitizeViewTypeName = (
+  viewTypeString: string | undefined
+): ViewTypeName => {
+  if (viewTypeString) {
+    if (viewTypeNamesRaw.includes(viewTypeString))
+      return viewTypeString as ViewTypeName;
+  }
+  return "cards";
+};
+
+export { ViewTypeName, viewTypeNames, sanitizeViewTypeName };
