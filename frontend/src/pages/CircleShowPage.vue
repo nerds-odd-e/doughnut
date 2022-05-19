@@ -10,9 +10,12 @@
 
       <NotebookCardsWithButtons :notebooks="circle.notebooks.notebooks">
         <template #default="{ notebook }">
-          <NotebookButtons v-bind="{ notebook, featureToggle }" class="card-header-btn">
+          <NotebookButtons
+            v-bind="{ notebook, featureToggle }"
+            class="card-header-btn"
+          >
             <template #additional-buttons>
-              <BazaarNotebookButtons :notebook="notebook" :user="true" />
+              <BazaarNotebookButtons :notebook="notebook" :logged-in="true" />
             </template>
           </NotebookButtons>
         </template>
@@ -48,10 +51,9 @@ import NotebookButtons from "../components/notebook/NotebookButtons.vue";
 import BazaarNotebookButtons from "../components/bazaar/BazaarNotebookButtons.vue";
 import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
 
-
 export default defineComponent({
   setup() {
-    return useStoredLoadingApi({initalLoading: true, hasFormError: true});
+    return useStoredLoadingApi({ initalLoading: true, hasFormError: true });
   },
   components: {
     SvgMissingAvatar,
@@ -68,35 +70,39 @@ export default defineComponent({
       queryCounter: 0,
       circle: null,
     } as {
-      queryCounter: number
-      circle: Generated.CircleForUserView | null
+      queryCounter: number;
+      circle: Generated.CircleForUserView | null;
     };
   },
 
   methods: {
     getCircle() {
-      this.storedApi.getCircle(this.circleId)
-      .then((res) =>  this.circle = res )
-      this.queryCounter += 1
+      this.storedApi
+        .getCircle(this.circleId)
+        .then((res) => (this.circle = res));
+      this.queryCounter += 1;
     },
     fetchData() {
-      this.getCircle()
+      this.getCircle();
     },
   },
 
   computed: {
     invitationUrl() {
-      return `${window.location.origin}/circles/join/${this.circle!.invitationCode}`;
+      return `${window.location.origin}/circles/join/${
+        this.circle!.invitationCode
+      }`;
     },
-    featureToggle() { return this.piniaStore.featureToggle }
+    featureToggle() {
+      return this.piniaStore.featureToggle;
+    },
   },
 
   watch: {
     queryCounter() {
       setTimeout(() => {
-        this.getCircle()
+        this.getCircle();
       }, 5000);
-
     },
   },
   mounted() {
@@ -109,4 +115,3 @@ export default defineComponent({
 #invitation-code
   width: 100%
 </style>
-

@@ -6,7 +6,7 @@
       </template>
       <template #dialog_body="{ doneHandler }">
         <SubscribeDialog
-          v-bind="{ notebook, user }"
+          v-bind="{ notebook, loggedIn }"
           @done="doneHandler($event)"
         />
       </template>
@@ -22,6 +22,6 @@ import SvgAdd from "../svgs/SvgAdd.vue";
 
 const props = defineProps({
   notebook: { type: Object as PropType<Generated.Notebook>, required: true },
-  user: Object,
+  loggedIn: Boolean,
 });
 </script>

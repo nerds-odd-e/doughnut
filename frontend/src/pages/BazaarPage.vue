@@ -4,7 +4,7 @@
     <div v-if="!!notebooksViewedByUser">
       <NotebookBazaarViewCards
         :notebooks="notebooksViewedByUser.notebooks"
-        :user="user"
+        :logged-in="!!user"
       />
     </div>
   </ContainerPage>

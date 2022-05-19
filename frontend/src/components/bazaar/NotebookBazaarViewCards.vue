@@ -1,7 +1,7 @@
 <template>
   <NotebookCardsWithButtons v-bind="{ notebooks }">
     <template #default="{ notebook }">
-      <BazaarNotebookButtons v-bind="{ notebook, user }" />
+      <BazaarNotebookButtons v-bind="{ notebook, loggedIn }" />
     </template>
   </NotebookCardsWithButtons>
 </template>
@@ -10,5 +10,5 @@
 import NotebookCardsWithButtons from "../notebook/NotebookCardsWithButtons.vue";
 import BazaarNotebookButtons from "./BazaarNotebookButtons.vue";
 
-const props = defineProps({ notebooks: Array, user: Boolean });
+const props = defineProps({ notebooks: Array, loggedIn: Boolean });
 </script>
