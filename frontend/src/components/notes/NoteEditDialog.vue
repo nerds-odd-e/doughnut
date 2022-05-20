@@ -31,7 +31,7 @@ export default defineComponent({
   methods: {
     fetchData() {
       this.storedApi.getNoteRealmWithPosition(this.noteId).then((res) => {
-        const { updatedAt, ...rest } = res.notes[0].note.noteAccessories;
+        const { updatedAt, ...rest } = res.noteRealm.note.noteAccessories;
         this.formData = rest;
       });
     },
