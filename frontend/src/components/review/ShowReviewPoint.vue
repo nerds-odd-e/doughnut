@@ -46,7 +46,7 @@ export default defineComponent({
       return this.reviewPointViewedByUser.reviewPoint;
     },
     link() {
-      return this.reviewPointViewedByUser?.linkViewedByUser.link;
+      return this.reviewPoint?.thing.link;
     },
   },
 });

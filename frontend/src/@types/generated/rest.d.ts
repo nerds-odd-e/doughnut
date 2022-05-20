@@ -54,7 +54,6 @@ declare namespace Generated {
         linkTypeLabel: string;
         typeId: number;
         targetNoteWithPosition: NoteWithPosition;
-        readonly: boolean;
         link: Link;
     }
 
@@ -134,7 +133,6 @@ declare namespace Generated {
 
     interface ReviewPointViewedByUser {
         reviewPoint: ReviewPoint;
-        linkViewedByUser?: LinkViewedByUser;
         reviewSetting: ReviewSetting;
     }
 

@@ -5,7 +5,6 @@ import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.LinkRequest;
-import com.odde.doughnut.entities.json.LinkViewedByUser;
 import com.odde.doughnut.entities.json.NotesBulk;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.NoAccessRightException;
@@ -46,10 +45,10 @@ class RestLinkController {
   }
 
   @GetMapping("/{link}")
-  public LinkViewedByUser show(@PathVariable("link") Link link) throws NoAccessRightException {
+  public Link show(@PathVariable("link") Link link) throws NoAccessRightException {
     UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertReadAuthorization(link);
-    return LinkViewedByUser.from(link, user);
+    return link;
   }
 
   @PostMapping(value = "/{link}")

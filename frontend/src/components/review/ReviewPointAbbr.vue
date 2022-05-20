@@ -28,13 +28,10 @@ export default defineComponent({
   },
   computed: {
     note() {
-      return this.reviewPointViewedByUser?.reviewPoint?.thing?.note;
+      return this.reviewPointViewedByUser?.reviewPoint?.thing.note;
     },
     link() {
-      return this.linkViewedByUser?.link;
-    },
-    linkViewedByUser() {
-      return this.reviewPointViewedByUser?.linkViewedByUser;
+      return this.reviewPointViewedByUser?.reviewPoint?.thing.link;
     },
     noteTitle() {
       return this.note?.title;

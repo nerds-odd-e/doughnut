@@ -29,9 +29,13 @@ describe("repetition page", () => {
         )
         .andReturnOnce(reviewPointViewedByUser);
       helper.apiMock
-        .expectingGet(`/api/notes/6/position`)
+        .expectingGet(
+          `/api/notes/${reviewPointViewedByUser.reviewPoint.thing.link?.targetNote.id}/position`
+        )
         .andReturnOnce(notePosition);
-      helper.apiMock.expectingGet(`/api/notes/2/position`);
+      helper.apiMock.expectingGet(
+        `/api/notes/${reviewPointViewedByUser.reviewPoint.thing.link?.sourceNote.id}/position`
+      );
     });
 
     it("click on note when doing review", async () => {

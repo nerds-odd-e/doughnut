@@ -8,7 +8,6 @@ import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.json.LinkRequest;
-import com.odde.doughnut.entities.json.LinkViewedByUser;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -75,8 +74,8 @@ class RestLinkControllerTests {
     void shouldBeAbleToSeeItIfICanReadBothNote() throws NoAccessRightException {
       makeMe.aBazaarNodebook(note1.getNotebook()).please();
       makeMe.aBazaarNodebook(note2.getNotebook()).please();
-      LinkViewedByUser linkViewedByUser = controller().show(link);
-      assertThat(linkViewedByUser.getReadonly(), equalTo(true));
+      Link linkViewedByUser = controller().show(link);
+      assertThat(linkViewedByUser.getId(), equalTo(link.getId()));
     }
   }
 
