@@ -15,6 +15,7 @@ public class LinkViewedByUser {
   @Getter @Setter private Integer typeId;
   @Getter @Setter private NoteWithPosition targetNoteWithPosition;
   @Getter @Setter private Boolean readonly;
+  @Getter @Setter private Link link;
 
   public static LinkViewedByUser from(Link link, UserModel user) {
     LinkViewedByUser linkViewedByUser = new LinkViewedByUser();
@@ -29,6 +30,7 @@ public class LinkViewedByUser {
     linkViewedByUser.setTypeId(link.getLinkType().id);
     linkViewedByUser.setId(link.getId());
     linkViewedByUser.setReadonly(!user.getAuthorization().hasFullAuthority(link.getSourceNote()));
+    linkViewedByUser.setLink(link);
     return linkViewedByUser;
   }
 }

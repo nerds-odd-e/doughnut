@@ -1,6 +1,5 @@
 /* tslint:disable */
 /* eslint-disable */
-// Generated using typescript-generator version 2.35.1025 on 2022-05-08 16:32:49.
 
 declare namespace Generated {
 
@@ -56,6 +55,7 @@ declare namespace Generated {
         typeId: number;
         targetNoteWithPosition: NoteWithPosition;
         readonly: boolean;
+        link: Link;
     }
 
     interface NoteCreation {
@@ -205,8 +205,8 @@ declare namespace Generated {
         sourceNote: Note;
         targetNote: Note;
         typeId: number;
-        linkTypeLabel: string;
         clozeSource: string;
+        linkTypeLabel: string;
     }
 
     interface TextContent {

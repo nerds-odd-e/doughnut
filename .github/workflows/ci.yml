@@ -47,6 +47,7 @@ jobs:
       - uses: ./.github/setup_jdk_with_cache
       - run: backend/gradlew -p backend testDBMigrate -Dspring.profiles.active=test
       - run: backend/gradlew -p backend test -Dspring.profiles.active=test --parallel
+      - run: bash -c ./assert_generated_type_script_up_to_date.sh
 
   Frontend-unit-tests:
     name: Frontend Unit tests
