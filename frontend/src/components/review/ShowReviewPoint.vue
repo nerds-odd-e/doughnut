@@ -37,7 +37,7 @@ export default defineComponent({
     },
   },
   emits: ["noteRealmUpdated"],
-  components: { LinkShow,  NoteRealmAsync },
+  components: { LinkShow, NoteRealmAsync },
   computed: {
     noteId() {
       return this.reviewPoint.thing.note?.id;

@@ -1,10 +1,8 @@
 <template>
-  <LoadingPage v-bind="{ loading, contentExists: !!reviewPointViewedByUser }">
+  <LoadingPage v-bind="{ loading, contentExists: !!reviewPoint }">
     <ShowReviewPoint
-      v-if="reviewPointViewedByUser"
-      v-bind="{
-        reviewpoint: reviewPointViewedByUser.reviewPoint,
-      }"
+      v-if="reviewPoint"
+      v-bind="{ reviewPoint }"
       :key="reviewPointId"
     />
     <div class="btn-toolbar justify-content-between">
@@ -48,9 +46,7 @@ export default defineComponent({
   emits: ["selfEvaluated"],
   data() {
     return {
-      reviewPointViewedByUser: undefined as
-        | Generated.ReviewPointWithReviewSetting
-        | undefined,
+      reviewPoint: undefined as Generated.ReviewPoint | undefined,
       nextReviewAt: undefined as string | undefined,
     };
   },
@@ -80,8 +76,9 @@ export default defineComponent({
     },
 
     async fetchData() {
-      this.reviewPointViewedByUser =
-        await this.storedApi.reviewMethods.getReviewPoint(this.reviewPointId);
+      this.reviewPoint = await this.storedApi.reviewMethods.getReviewPoint(
+        this.reviewPointId
+      );
     },
   },
   watch: {

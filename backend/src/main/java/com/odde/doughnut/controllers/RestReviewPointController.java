@@ -25,11 +25,11 @@ class RestReviewPointController {
   }
 
   @GetMapping("/{reviewPoint}")
-  public ReviewPointWithReviewSetting show(@PathVariable("reviewPoint") ReviewPoint reviewPoint)
+  public ReviewPoint show(@PathVariable("reviewPoint") ReviewPoint reviewPoint)
       throws NoAccessRightException {
     final UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertAuthorization(reviewPoint);
-    return ReviewPointWithReviewSetting.from(reviewPoint, user);
+    return reviewPoint;
   }
 
   @PostMapping(path = "/{reviewPoint}/remove")

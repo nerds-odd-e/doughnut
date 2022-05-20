@@ -11,7 +11,7 @@ helper.resetWithApiMock(beforeEach, afterEach);
 describe("repetition page", () => {
   describe("repetition page for a link", () => {
     const linkViewedByUser = makeMe.aLinkViewedByUser.please();
-    const reviewPointViewedByUser = makeMe.aReviewPoint
+    const reviewPointViewedByUser = makeMe.aReviewPointWithReviewSetting
       .ofLink(linkViewedByUser)
       .please();
     const notePosition = makeMe.aNotePosition.please();
@@ -27,7 +27,7 @@ describe("repetition page", () => {
         .expectingGet(
           `/api/review-points/${reviewPointViewedByUser.reviewPoint.id}`
         )
-        .andReturnOnce(reviewPointViewedByUser);
+        .andReturnOnce(reviewPointViewedByUser.reviewPoint);
       helper.apiMock
         .expectingGet(
           `/api/notes/${reviewPointViewedByUser.reviewPoint.thing.link?.targetNote.id}/position`

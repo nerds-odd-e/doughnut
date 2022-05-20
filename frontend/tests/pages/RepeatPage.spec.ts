@@ -52,10 +52,10 @@ describe("repeat page", () => {
     beforeEach(() => {
       const reviewPoint = makeMe.aReviewPoint.please();
       repetition = makeMe.aRepetition
-        .withReviewPointId(reviewPoint.reviewPoint.id)
+        .withReviewPointId(reviewPoint.id)
         .please();
       helper.apiMock
-        .expectingGet(`/api/review-points/${reviewPoint.reviewPoint.id}`)
+        .expectingGet(`/api/review-points/${reviewPoint.id}`)
         .andReturnOnce(reviewPoint);
     });
 

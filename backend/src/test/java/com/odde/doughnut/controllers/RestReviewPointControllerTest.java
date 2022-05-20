@@ -46,7 +46,7 @@ class RestReviewPointControllerTest {
 
     @Test
     void show() throws NoAccessRightException {
-      ReviewPointWithReviewSetting result = controller.show(rp);
+      ReviewPoint result = controller.show(rp);
       assertThat(result, notNullValue());
     }
 

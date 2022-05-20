@@ -1,44 +1,37 @@
 import Builder from "./Builder";
 import generateId from "./generateId";
 
-class ReviewPointBuilder extends Builder<Generated.ReviewPointWithReviewSetting> {
-  data: Generated.ReviewPointWithReviewSetting;
+class ReviewPointBuilder extends Builder<Generated.ReviewPoint> {
+  data: Generated.ReviewPoint;
 
   constructor() {
     super();
     this.data = {
-      reviewPoint: {
+      id: generateId(),
+      lastReviewedAt: "",
+      nextReviewAt: "",
+      initialReviewedAt: "",
+      repetitionCount: 0,
+      forgettingCurveIndex: 0,
+      removedFromReview: false,
+      thing: {
         id: generateId(),
-        lastReviewedAt: "",
-        nextReviewAt: "",
-        initialReviewedAt: "",
-        repetitionCount: 0,
-        forgettingCurveIndex: 0,
-        removedFromReview: false,
-        thing: {
-          id: generateId(),
-          createdAt: "",
-        },
-      },
-      reviewSetting: {
-        id: 0,
-        rememberSpelling: false,
-        level: 0,
+        createdAt: "",
       },
     };
   }
 
   ofNote(note: Generated.NoteRealm): ReviewPointBuilder {
-    this.data.reviewPoint.thing.note = note.note;
+    this.data.thing.note = note.note;
     return this;
   }
 
   ofLink(link: Generated.LinkViewedByUser): ReviewPointBuilder {
-    this.data.reviewPoint.thing.link = link.link;
+    this.data.thing.link = link.link;
     return this;
   }
 
-  do(): Generated.ReviewPointWithReviewSetting {
+  do(): Generated.ReviewPoint {
     return this.data;
   }
 }
