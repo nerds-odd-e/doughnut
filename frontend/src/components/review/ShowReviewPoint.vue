@@ -31,8 +31,8 @@ import LinkShow from "../links/LinkShow.vue";
 
 export default defineComponent({
   props: {
-    reviewPointViewedByUser: {
-      type: Object as PropType<Generated.ReviewPointWithReviewSetting>,
+    reviewPoint: {
+      type: Object as PropType<Generated.ReviewPoint>,
       required: true,
     },
   },
@@ -40,13 +40,10 @@ export default defineComponent({
   components: { LinkShow,  NoteRealmAsync },
   computed: {
     noteId() {
-      return this.reviewPoint?.thing?.note?.id;
-    },
-    reviewPoint() {
-      return this.reviewPointViewedByUser.reviewPoint;
+      return this.reviewPoint.thing.note?.id;
     },
     link() {
-      return this.reviewPoint?.thing.link;
+      return this.reviewPoint.thing.link;
     },
   },
 });

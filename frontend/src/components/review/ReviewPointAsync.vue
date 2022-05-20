@@ -3,7 +3,7 @@
     <ShowReviewPoint
       v-if="reviewPointViewedByUser"
       v-bind="{
-        reviewPointViewedByUser,
+        reviewpoint: reviewPointViewedByUser.reviewPoint,
       }"
       :key="reviewPointId"
     />

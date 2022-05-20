@@ -18,7 +18,9 @@
       </template>
     </ProgressBar>
     <template v-if="!nested">
-      <ShowReviewPoint v-bind="{ reviewPointViewedByUser }" />
+      <ShowReviewPoint
+        v-bind="{ reviewPoint: reviewPointViewedByUser.reviewPoint }"
+      />
       <div>
         <div class="mb-2">
           <ReviewSettingForm
