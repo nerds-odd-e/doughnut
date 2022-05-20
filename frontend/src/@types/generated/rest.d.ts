@@ -205,8 +205,8 @@ declare namespace Generated {
         sourceNote: Note;
         targetNote: Note;
         typeId: number;
-        clozeSource: string;
         linkTypeLabel: string;
+        clozeSource: string;
     }
 
     interface TextContent {
@@ -218,8 +218,8 @@ declare namespace Generated {
     interface Note extends Thingy {
         noteAccessories: NoteAccessories;
         textContent: TextContent;
-        title: string;
         pictureWithMask?: PictureWithMask;
+        title: string;
         shortDescription: string;
         parentId?: number;
     }
@@ -234,8 +234,8 @@ declare namespace Generated {
         dailyTargetOfNewNotes: number;
         user: User;
         notebook: Notebook;
-        title: string;
         headNote: Note;
+        title: string;
         shortDescription: string;
     }
 

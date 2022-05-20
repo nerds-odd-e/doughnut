@@ -257,6 +257,11 @@ public class Link extends Thingy {
     return LinkType.fromId(typeId);
   }
 
+  public String getClozeSource() {
+    return ClozeDescription.htmlClosedDescription()
+      .getClozeDescription(getTargetNote().getNoteTitle(), getSourceNote().getTitle());
+  }
+
   public String getLinkTypeLabel() {
     return getLinkType().label;
   }
@@ -329,8 +334,4 @@ public class Link extends Thingy {
             List.of(LinkType.PART, LinkType.INSTANCE, LinkType.SPECIALIZE, LinkType.APPLICATION));
   }
 
-  public String getClozeSource() {
-    return ClozeDescription.htmlClosedDescription()
-        .getClozeDescription(getTargetNote().getNoteTitle(), getSourceNote().getTitle());
-  }
 }

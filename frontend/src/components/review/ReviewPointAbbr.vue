@@ -4,11 +4,11 @@
       {{ noteTitle }}
     </span>
 
-    <span v-if="!!linkViewedByUser">
+    <span v-if="link">
       <span>
         {{ sourceNoteTitle }}
       </span>
-      <span class="badge mr-1"> {{ linkViewedByUser.linkTypeLabel }}</span>
+      <span class="badge mr-1"> {{ link.linkTypeLabel }}</span>
       <span>
         {{ targetNoteTitle }}
       </span>
@@ -30,6 +30,9 @@ export default defineComponent({
     note() {
       return this.reviewPointViewedByUser?.reviewPoint?.thing?.note;
     },
+    link() {
+      return this.linkViewedByUser?.link;
+    },
     linkViewedByUser() {
       return this.reviewPointViewedByUser?.linkViewedByUser;
     },
@@ -37,10 +40,10 @@ export default defineComponent({
       return this.note?.title;
     },
     sourceNoteTitle() {
-      return this.linkViewedByUser?.sourceNoteWithPosition.note.note.title;
+      return this.link?.sourceNote.title;
     },
     targetNoteTitle() {
-      return this.linkViewedByUser?.targetNoteWithPosition.note.note.title;
+      return this.link?.targetNote.title;
     },
   },
 });
