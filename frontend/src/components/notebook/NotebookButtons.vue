@@ -2,11 +2,11 @@
   <div class="btn-group btn-group-sm">
     <slot name="additional-buttons" />
     <PopupButton title="Edit notebook settings">
-      <template v-slot:button_face>
-        <SvgEditNotebook/>
+      <template #button_face>
+        <SvgEditNotebook />
       </template>
-      <template #dialog_body="{doneHandler}">
-      <NotebookEditDialog v-bind="{ notebook }" @done="doneHandler($event)"/>
+      <template #dialog_body="{ doneHandler }">
+        <NotebookEditDialog v-bind="{ notebook }" @done="doneHandler($event)" />
       </template>
     </PopupButton>
     <button
@@ -20,9 +20,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, PropType } from "vue";
 import SvgBazaarShare from "../svgs/SvgBazaarShare.vue";
-import useLoadingApi from '../../managedApi/useLoadingApi';
+import useLoadingApi from "../../managedApi/useLoadingApi";
 import usePopups from "../commons/Popups/usePopup";
 import PopupButton from "../commons/Popups/PopupButton.vue";
 import NotebookEditDialog from "./NotebookEditDialog.vue";
@@ -30,15 +30,23 @@ import SvgEditNotebook from "../svgs/SvgEditNotebook.vue";
 
 export default defineComponent({
   setup() {
-    return {...useLoadingApi(), ...usePopups()}
+    return { ...useLoadingApi(), ...usePopups() };
   },
-  props: { notebook: Object },
-  components: { SvgBazaarShare, PopupButton, NotebookEditDialog, SvgEditNotebook },
+  props: {
+    notebook: { type: Object as PropType<Generated.Notebook>, required: true },
+  },
+  components: {
+    SvgBazaarShare,
+    PopupButton,
+    NotebookEditDialog,
+    SvgEditNotebook,
+  },
   methods: {
     async shareNotebook() {
       if (await this.popups.confirm(`Confirm to share?`)) {
-        this.api.shareToBazaar(this.notebook.id)
-        .then((r) => this.$router.push({ name: "notebooks" }));
+        this.api
+          .shareToBazaar(this.notebook.id)
+          .then(() => this.$router.push({ name: "notebooks" }));
       }
     },
   },

@@ -25,7 +25,10 @@ const apiCollection = (managedApi: ManagedApi) => ({
       )) as Generated.ReviewSetting;
     },
 
-    updateReviewSetting(noteId: Doughnut.ID, data: Generated.ReviewSetting) {
+    updateReviewSetting(
+      noteId: Doughnut.ID,
+      data: Omit<Generated.ReviewSetting, "id">
+    ) {
       return managedApi.restPost(`notes/${noteId}/review-setting`, data);
     },
   },

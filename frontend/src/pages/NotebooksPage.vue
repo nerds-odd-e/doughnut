@@ -36,7 +36,7 @@ export default defineComponent({
   },
   data() {
     return {
-      subscriptions: undefined as Generated.NotebookSubscription[] | undefined,
+      subscriptions: undefined as Generated.Subscription[] | undefined,
       notebooks: undefined as Generated.NotebookViewedByUser[] | undefined,
     };
   },

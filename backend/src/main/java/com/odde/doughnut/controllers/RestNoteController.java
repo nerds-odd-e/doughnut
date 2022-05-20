@@ -167,7 +167,7 @@ class RestNoteController {
   }
 
   @GetMapping("/{note}/review-setting")
-  public ReviewSetting editReviewSetting(Note note) {
+  public ReviewSetting getReviewSetting(Note note) {
     ReviewSetting reviewSetting = note.getMasterReviewSetting();
     if (reviewSetting == null) {
       reviewSetting = new ReviewSetting();

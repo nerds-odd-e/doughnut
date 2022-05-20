@@ -28,7 +28,7 @@ export default defineComponent({
   emits: ["done"],
   data() {
     return {
-      formData: {},
+      formData: {} as Omit<Generated.ReviewSetting, "id">,
     };
   },
   methods: {
@@ -40,7 +40,7 @@ export default defineComponent({
     processForm() {
       this.api.reviewMethods
         .updateReviewSetting(this.noteId, this.formData)
-        .then((res) => this.$emit("done"));
+        .then(() => this.$emit("done"));
     },
   },
   mounted() {
