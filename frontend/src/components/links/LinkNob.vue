@@ -21,13 +21,20 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, PropType } from "vue";
 import SvgLinkTypeIcon from "../svgs/SvgLinkTypeIcon.vue";
 import PopupButton from "../commons/Popups/PopupButton.vue";
 import LinkNobDialog from "./LinkNobDialog.vue";
 
 export default defineComponent({
-  props: { link: Object, inverseIcon: Boolean, colors: Object },
+  props: {
+    link: {
+      type: Object as PropType<Generated.Link>,
+      required: true,
+    },
+    inverseIcon: Boolean,
+    colors: Object,
+  },
   emits: ["noteRealmUpdated"],
   components: { SvgLinkTypeIcon, PopupButton, LinkNobDialog },
 });

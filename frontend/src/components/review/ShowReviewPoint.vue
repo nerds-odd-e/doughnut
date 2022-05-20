@@ -23,7 +23,7 @@
         }"
       >
         <LinkNob
-          v-bind="{ link: linkViewedByUser }"
+          v-bind="{ link }"
           @note-realm-updated="$emit('noteRealmUpdated', $event)"
         />
         <span class="badge bg-light text-dark">
