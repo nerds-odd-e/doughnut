@@ -21,17 +21,17 @@ import { defineComponent, PropType } from "vue";
 
 export default defineComponent({
   props: {
-    reviewPointViewedByUser: {
-      type: Object as PropType<Generated.ReviewPointWithReviewSetting>,
+    reviewPoint: {
+      type: Object as PropType<Generated.ReviewPoint>,
       required: true,
     },
   },
   computed: {
     note() {
-      return this.reviewPointViewedByUser?.reviewPoint?.thing.note;
+      return this.reviewPoint?.thing.note;
     },
     link() {
-      return this.reviewPointViewedByUser?.reviewPoint?.thing.link;
+      return this.reviewPoint?.thing.link;
     },
     noteTitle() {
       return this.note?.title;

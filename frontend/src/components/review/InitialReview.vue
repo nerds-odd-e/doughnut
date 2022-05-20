@@ -13,18 +13,16 @@
           <a title="Go back to review">
             <SvgResume width="30" height="30" />
           </a>
-          <ReviewPointAbbr v-bind="{ reviewPointViewedByUser }" />
+          <ReviewPointAbbr v-bind="{ reviewPoint }" />
         </div>
       </template>
     </ProgressBar>
     <template v-if="!nested">
-      <ShowReviewPoint
-        v-bind="{ reviewPoint: reviewPointViewedByUser.reviewPoint }"
-      />
+      <ShowReviewPoint v-bind="{ reviewPoint }" />
       <div>
         <div class="mb-2">
           <ReviewSettingForm
-            v-if="!!reviewPointViewedByUser.reviewSetting"
+            v-if="reviewSetting"
             v-model="reviewSetting"
             :show-level="false"
             :errors="{}"
@@ -78,14 +76,14 @@ export default defineComponent({
     };
   },
   computed: {
-    reviewPointViewedByUser() {
+    reviewPointWithReviewSetting() {
       return this.reviewPointWithReviewSettings[this.finished];
     },
     reviewPoint() {
-      return this.reviewPointViewedByUser?.reviewPoint;
+      return this.reviewPointWithReviewSetting?.reviewPoint;
     },
     reviewSetting() {
-      return this.reviewPointViewedByUser?.reviewSetting;
+      return this.reviewPointWithReviewSetting?.reviewSetting;
     },
     remainingInitialReviewCountForToday() {
       return this.reviewPointWithReviewSettings.length - this.finished;
