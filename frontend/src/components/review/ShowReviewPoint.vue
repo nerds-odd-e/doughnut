@@ -14,7 +14,7 @@
     />
   </div>
 
-  <div v-if="link && linkViewedByUser">
+  <div v-if="link">
     <div class="jumbotron py-4 mb-2">
       <LinkShow
         v-bind="{ link }"
@@ -28,7 +28,6 @@
 import { defineComponent, PropType } from "vue";
 import NoteRealmAsync from "../notes/NoteRealmAsync.vue";
 import LinkShow from "../links/LinkShow.vue";
-import LinkNob from "../links/LinkNob.vue";
 
 export default defineComponent({
   props: {
@@ -38,7 +37,7 @@ export default defineComponent({
     },
   },
   emits: ["noteRealmUpdated"],
-  components: { LinkShow, LinkNob, NoteRealmAsync },
+  components: { LinkShow,  NoteRealmAsync },
   computed: {
     noteId() {
       return this.reviewPoint?.thing?.note?.id;
@@ -47,10 +46,7 @@ export default defineComponent({
       return this.reviewPointViewedByUser.reviewPoint;
     },
     link() {
-      return this.linkViewedByUser?.link;
-    },
-    linkViewedByUser() {
-      return this.reviewPointViewedByUser?.linkViewedByUser;
+      return this.reviewPointViewedByUser?.linkViewedByUser.link;
     },
   },
 });

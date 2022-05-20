@@ -19,6 +19,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import LinkNoteShow from "./LinkNoteShow.vue";
+import LinkNob from "./LinkNob.vue";
 
 export default defineComponent({
   props: {
@@ -28,6 +29,6 @@ export default defineComponent({
     },
   },
   emits: ["noteRealmUpdated"],
-  components: { LinkNoteShow },
+  components: { LinkNoteShow, LinkNob },
 });
 </script>
