@@ -174,7 +174,7 @@ declare namespace Generated {
 
     interface Answer {
         spellingAnswer: string;
-        answerNoteId: number;
+        answerNoteId?: number;
         question: QuizQuestion;
     }
 

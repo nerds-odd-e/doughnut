@@ -85,7 +85,7 @@ export default defineComponent({
   data() {
     return {
       answer: "" as string,
-      answerNoteId: null as Doughnut.ID | null,
+      answerNoteId: undefined as Doughnut.ID | undefined,
     };
   },
   computed: {

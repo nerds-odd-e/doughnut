@@ -22,4 +22,4 @@ interface StraightConnection {
   y2: number;
 }
 
-export { Vector, StraightConnection, Coord };
+export type { Vector, StraightConnection, Coord };

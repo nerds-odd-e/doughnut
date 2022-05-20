@@ -1,5 +1,5 @@
 const loginOrRegisterAndHaltThisThread = async () => {
-  window.location = `/users/identify?from=${window.location.href}`;
+  window.location.href = `/users/identify?from=${window.location.href}`;
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   await new Promise(() => {}); // I promise ... Wait, why am I still here?
 };

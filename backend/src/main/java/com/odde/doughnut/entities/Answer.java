@@ -13,6 +13,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import lombok.Getter;
 import lombok.Setter;
+import org.springframework.lang.Nullable;
 
 @Entity
 @Table(name = "quiz_answer")
@@ -31,6 +32,7 @@ public class Answer {
   @Getter
   @Setter
   @Column(name = "answer_note_id")
+  @Nullable
   Integer answerNoteId;
 
   @ManyToOne(cascade = CascadeType.PERSIST)

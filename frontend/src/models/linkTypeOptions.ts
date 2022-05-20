@@ -72,11 +72,11 @@ const linkTypeOptions = [
 ];
 
 const taggingTypes = linkTypeOptions
-  .filter((t) => parseInt(t.value, 10) === 8)
+  .filter((t) => t.value === 8)
   .map((t) => t.label);
 
 const groupedTypes = linkTypeOptions
-  .filter((t) => [1, 12, 22, 23].includes(parseInt(t.value, 10)))
+  .filter((t) => [1, 12, 22, 23].includes(t.value))
   .map((t) => t.label);
 
 const reverseLabel = (lbl) => {

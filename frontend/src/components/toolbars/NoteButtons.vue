@@ -85,7 +85,10 @@ export default defineComponent({
     return { ...useStoredLoadingApi(), ...usePopups() };
   },
   props: {
-    note: Object,
+    note: {
+      type: Object as PropType<Generated.Note>,
+      required: true,
+    },
     viewType: {
       type: String as PropType<ViewTypeName>,
       default: () => undefined,

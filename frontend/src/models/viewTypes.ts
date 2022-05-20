@@ -13,4 +13,5 @@ const sanitizeViewTypeName = (
   return "cards";
 };
 
-export { ViewTypeName, viewTypeNames, sanitizeViewTypeName };
+export { viewTypeNames, sanitizeViewTypeName };
+export type { ViewTypeName };

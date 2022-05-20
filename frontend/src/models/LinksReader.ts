@@ -6,7 +6,7 @@ import {
 } from "./linkTypeOptions";
 
 class LinksReader {
-  links;
+  links: LinksMap;
 
   constructor(links: LinksMap) {
     this.links = links;
