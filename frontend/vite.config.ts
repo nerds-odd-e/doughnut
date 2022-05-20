@@ -14,12 +14,12 @@ export default defineConfig({
     }
   },
   plugins: [
-    checker({
-      vueTsc: true,
-      eslint: {
-        lintCommand: 'eslint "./src/**/*.{ts,tsx}"', // for example, lint .ts & .tsx
-      }
-    }),
+//     checker({
+//       vueTsc: true,
+//       eslint: {
+//         lintCommand: 'eslint "./src/**/*.{ts,tsx}"', // for example, lint .ts & .tsx
+//       }
+//     }),
     vue({
       reactivityTransform: true,
       template: {
