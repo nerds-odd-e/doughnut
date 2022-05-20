@@ -28,19 +28,6 @@ import LinkTypeSelect from "../links/LinkTypeSelect.vue";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 import SearchResults from "../search/SearchResults.vue";
 
-function initialState() {
-  return {
-    creationData: {
-      linkTypeToParent: "",
-      textContent: { title: "" },
-    },
-    formErrors: {
-      linkTypeToParent: undefined,
-      textContent: {},
-    },
-  };
-}
-
 export default defineComponent({
   setup() {
     return useStoredLoadingApi({ initalLoading: true, hasFormError: true });
@@ -50,20 +37,20 @@ export default defineComponent({
     LinkTypeSelect,
     SearchResults,
   },
-  props: { parentId: Number },
+  props: { parentId: { type: Number, required: true } },
   data() {
     return {
-      ...initialState(),
+      creationData: {
+        linkTypeToParent: 0,
+        textContent: { title: "" },
+      } as Generated.NoteCreation,
+      formErrors: {
+        linkTypeToParent: undefined,
+        textContent: {},
+      },
     };
   },
-  mounted() {
-    this.fetchData();
-  },
   methods: {
-    fetchData() {
-      this.storedApi.getNoteRealmWithPosition(this.parentId);
-    },
-
     processForm() {
       this.storedApi
         .createNote(this.parentId, this.creationData)

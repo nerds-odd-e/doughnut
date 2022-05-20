@@ -31,7 +31,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, PropType } from "vue";
 import LinkTypeSelect from "./LinkTypeSelect.vue";
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
@@ -41,7 +41,14 @@ export default defineComponent({
   setup() {
     return { ...useStoredLoadingApi({ hasFormError: true }), ...usePopups() };
   },
-  props: { link: Object, inverseIcon: Boolean, colors: Object },
+  props: {
+    link: {
+      type: Object as PropType<Generated.Link>,
+      required: true,
+    },
+    inverseIcon: Boolean,
+    colors: Object,
+  },
   emits: ["done"],
   components: {
     LinkTypeSelect,
@@ -49,7 +56,7 @@ export default defineComponent({
   },
   data() {
     return {
-      formData: { typeId: this.link.typeId },
+      formData: { typeId: this.link.typeId } as Generated.LinkRequest,
       formErrors: { typeId: undefined },
     };
   },

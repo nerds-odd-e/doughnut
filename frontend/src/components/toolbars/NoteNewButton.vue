@@ -1,25 +1,24 @@
 <template>
   <PopupButton :title="buttonTitle">
-    <template v-slot:button_face>
+    <template #button_face>
       <slot />
     </template>
-    <template #dialog_body="{doneHandler}">
-      <NoteNewDialog v-bind="{parentId}" @done="doneHandler($event)"/>
+    <template #dialog_body="{ doneHandler }">
+      <NoteNewDialog v-bind="{ parentId }" @done="doneHandler($event)" />
     </template>
   </PopupButton>
 </template>
 
 <script lang="ts">
-
 import { defineComponent } from "vue";
 import NoteNewDialog from "../notes/NoteNewDialog.vue";
 import PopupButton from "../commons/Popups/PopupButton.vue";
 
 export default defineComponent({
   props: {
-      parentId: Number,
-      buttonTitle: String,
+    parentId: { type: Number, required: true },
+    buttonTitle: { type: String, required: true },
   },
-  components: { PopupButton, NoteNewDialog }
+  components: { PopupButton, NoteNewDialog },
 });
 </script>

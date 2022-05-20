@@ -51,7 +51,7 @@ export default defineComponent({
     };
   },
   methods: {
-    selfEvaluate(data: string) {
+    selfEvaluate(data: Generated.SelfEvaluate) {
       this.storedApi.reviewMethods
         .selfEvaluate(this.reviewPointId, {
           selfEvaluation: data,

@@ -38,7 +38,7 @@ export default defineComponent({
     return useStoredLoadingApi({ initalLoading: true });
   },
   name: "NoteShowPage",
-  props: { answerId: Number },
+  props: { answerId: { type: Number, required: true } },
   components: {
     LoadingPage,
     AnswerResult,
