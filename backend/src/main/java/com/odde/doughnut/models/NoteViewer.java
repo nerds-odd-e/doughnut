@@ -6,7 +6,6 @@ import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.json.LinkViewed;
 import com.odde.doughnut.entities.json.NotePositionViewedByUser;
 import com.odde.doughnut.entities.json.NoteRealm;
-import com.odde.doughnut.entities.json.NoteWithPosition;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -69,13 +68,6 @@ public class NoteViewer {
     nvb.setNoteId(note.getId());
     nvb.setNotebook(jsonViewer.jsonNotebookViewedByUser(note.getNotebook()));
     nvb.setAncestors(note.getAncestors());
-    return nvb;
-  }
-
-  public NoteWithPosition jsonNoteWithPosition(Note note) {
-    NoteWithPosition nvb = new NoteWithPosition();
-    nvb.setNote(toJsonObject());
-    nvb.setNotePosition(jsonNotePosition(note));
     return nvb;
   }
 }

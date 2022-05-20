@@ -95,11 +95,10 @@ class RestNoteController {
   }
 
   @GetMapping("/{note}")
-  public NotesBulk show(@PathVariable("note") Note note) throws NoAccessRightException {
+  public NoteRealmWithPosition show(@PathVariable("note") Note note) throws NoAccessRightException {
     final UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertReadAuthorization(note);
-
-    return NotesBulk.jsonNoteRealm(note, user);
+    return NoteRealmWithPosition.fromNote(note, user);
   }
 
   @GetMapping("/{note}/overview")

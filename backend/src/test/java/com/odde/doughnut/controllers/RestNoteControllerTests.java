@@ -14,7 +14,6 @@ import com.odde.doughnut.entities.json.NoteCreation;
 import com.odde.doughnut.entities.json.NoteRealm;
 import com.odde.doughnut.entities.json.NoteRealmWithAllDescendants;
 import com.odde.doughnut.entities.json.NoteRealmWithPosition;
-import com.odde.doughnut.entities.json.NotesBulk;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.TimestampOperations;
@@ -67,8 +66,8 @@ class RestNoteControllerTests {
       Note note = makeMe.aNote().creatorAndOwner(otherUser).please();
       makeMe.aBazaarNodebook(note.getNotebook()).please();
       makeMe.refresh(userModel.getEntity());
-      final NotesBulk show = controller.show(note);
-      assertThat(show.notes.get(0).getNote().getTitle(), equalTo(note.getTitle()));
+      final NoteRealmWithPosition show = controller.show(note);
+      assertThat(show.noteRealm.getNote().getTitle(), equalTo(note.getTitle()));
       assertThat(show.notePosition.getNotebook().getFromBazaar(), is(true));
     }
 
@@ -76,8 +75,8 @@ class RestNoteControllerTests {
     void shouldBeAbleToSeeOwnNote() throws NoAccessRightException {
       Note note = makeMe.aNote().creatorAndOwner(userModel).please();
       makeMe.refresh(userModel.getEntity());
-      final NotesBulk show = controller.show(note);
-      assertThat(show.notes.get(0).getId(), equalTo(note.getId()));
+      final NoteRealmWithPosition show = controller.show(note);
+      assertThat(show.noteRealm.getId(), equalTo(note.getId()));
       assertThat(show.notePosition.getNotebook().getFromBazaar(), is(false));
     }
 
