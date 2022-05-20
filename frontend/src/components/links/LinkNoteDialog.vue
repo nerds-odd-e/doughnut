@@ -9,7 +9,7 @@
     @selected="targetNote = $event"
   />
   <LinkNoteFinalize
-    v-else
+    v-if="targetNote && note"
     v-bind="{ targetNote, note }"
     @success="$emit('done', $event)"
     @goBack="targetNote = undefined"

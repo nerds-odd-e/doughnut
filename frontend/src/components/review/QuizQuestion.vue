@@ -1,58 +1,62 @@
 <template>
-    <BasicBreadcrumb :ancestors="quizQuestion.scope" />
-    <ShowPicture
-      v-if="quizQuestion.pictureWithMask"
-      v-bind="quizQuestion.pictureWithMask"
-      :opacity="1"
-    />
-    <NoteFrameOfLinks v-bind="{ links: quizQuestion.hintLinks }">
-      <div class="quiz-instruction">
-        <pre
-          style="white-space: pre-wrap"
-          v-if="!pictureQuestion"
-          v-html="quizQuestion.description"
-        />
-        <h2 v-if="!!quizQuestion.mainTopic" class="text-center">
-          {{ quizQuestion.mainTopic }}
-        </h2>
-      </div>
-    </NoteFrameOfLinks>
+  <BasicBreadcrumb :ancestors="quizQuestion.scope" />
+  <ShowPicture
+    v-if="quizQuestion.pictureWithMask"
+    v-bind="quizQuestion.pictureWithMask"
+    :opacity="1"
+  />
+  <NoteFrameOfLinks v-bind="{ links: quizQuestion.hintLinks }">
+    <div class="quiz-instruction">
+      <pre
+        style="white-space: pre-wrap"
+        v-if="!pictureQuestion"
+        v-html="quizQuestion.description"
+      />
+      <h2 v-if="!!quizQuestion.mainTopic" class="text-center">
+        {{ quizQuestion.mainTopic }}
+      </h2>
+    </div>
+  </NoteFrameOfLinks>
 
-    <div class="row" v-if="quizQuestion.questionType !== 'SPELLING'">
-      <div
-        class="col-sm-6 mb-3 d-grid"
-        v-for="option in quizQuestion.options"
-        :key="option.noteId"
+  <div class="row" v-if="quizQuestion.questionType !== 'SPELLING'">
+    <div
+      class="col-sm-6 mb-3 d-grid"
+      v-for="option in quizQuestion.options"
+      :key="option.noteId"
+    >
+      <button
+        class="btn btn-secondary btn-lg"
+        @click.once="
+          answerNoteId = option.noteId;
+          processForm();
+        "
       >
-        <button
-          class="btn btn-secondary btn-lg"
-          v-on:click.once="
-            answerNoteId = option.noteId;
-            processForm();
-          "
-        >
-          <div v-if="!option.picture" v-html="option.display" />
-          <div v-else>
-            <ShowPicture v-bind="option.pictureWithMask" :opacity="1" />
-          </div>
-        </button>
-      </div>
-    </div>
-
-    <div v-else>
-      <form @submit.prevent.once="processForm">
-        <div class="aaa">
-          <TextInput
-            scopeName="review_point"
-            field="answer"
-            v-model="answer"
-            placeholder="put your answer here"
-            :autofocus="true"
-          />
+        <div v-if="!option.picture" v-html="option.display" />
+        <div v-else>
+          <ShowPicture v-bind="option.pictureWithMask" :opacity="1" />
         </div>
-        <input type="submit" value="OK" class="btn btn-primary btn-lg btn-block" />
-      </form>
+      </button>
     </div>
+  </div>
+
+  <div v-else>
+    <form @submit.prevent.once="processForm">
+      <div class="aaa">
+        <TextInput
+          scope-name="review_point"
+          field="answer"
+          v-model="answer"
+          placeholder="put your answer here"
+          :autofocus="true"
+        />
+      </div>
+      <input
+        type="submit"
+        value="OK"
+        class="btn btn-primary btn-lg btn-block"
+      />
+    </form>
+  </div>
 </template>
 
 <script lang="ts">

@@ -72,7 +72,7 @@ export default defineComponent({
       }
       this.api.reviewMethods
         .removeFromReview(this.reviewPointId)
-        .then((r) => this.fetchData());
+        .then(() => this.fetchData());
     },
 
     async fetchData() {

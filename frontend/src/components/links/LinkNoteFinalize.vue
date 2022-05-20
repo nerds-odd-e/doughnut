@@ -38,7 +38,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, PropType } from "vue";
 import LinkTypeSelect from "./LinkTypeSelect.vue";
 import CheckInput from "../form/CheckInput.vue";
 import RadioButtons from "../form/RadioButtons.vue";
@@ -51,7 +51,10 @@ export default defineComponent({
     return { ...useStoredLoadingApi({ hasFormError: true }), ...usePopups() };
   },
   name: "LinkNoteFinalize",
-  props: { note: Object, targetNote: { type: Object, required: true } },
+  props: {
+    note: { type: Object as PropType<Generated.Note>, required: true },
+    targetNote: { type: Object as PropType<Generated.Note>, required: true },
+  },
   components: { LinkTypeSelect, SvgGoBack, CheckInput, RadioButtons },
   emits: ["success", "goBack"],
   data() {
@@ -60,7 +63,7 @@ export default defineComponent({
         asFirstChild: false,
         typeId: undefined as number | undefined,
         moveUnder: false,
-      },
+      } as Generated.LinkRequest,
       formErrors: {
         asFirstChild: undefined as string | undefined,
         typeId: undefined as string | undefined,
