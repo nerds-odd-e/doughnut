@@ -48,15 +48,6 @@ declare namespace Generated {
         reverse: Link[];
     }
 
-    interface LinkViewedByUser {
-        id: number;
-        sourceNoteWithPosition: NoteWithPosition;
-        linkTypeLabel: string;
-        typeId: number;
-        targetNoteWithPosition: NoteWithPosition;
-        link: Link;
-    }
-
     interface NoteCreation {
         linkTypeToParent: number;
         textContent: TextContent;

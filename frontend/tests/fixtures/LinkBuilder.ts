@@ -1,72 +1,19 @@
-import LinksMap from "../../src/models/LinksMap";
 import Builder from "./Builder";
-import generateId from "./generateId";
+import NoteRealmBuilder from "./NoteRealmBuilder";
 
-class LinkBuilder extends Builder<LinksMap> {
-  linkType: Generated.LinkType;
+class LinkBuilder extends Builder<Generated.Link> {
+  sourceNoteBuilder = new NoteRealmBuilder();
 
-  cnt: number;
-
-  isReverse: boolean;
-
-  fromNote: Generated.NoteRealm;
-
-  toNote: Generated.NoteRealm;
-
-  constructor(
-    linkType: Generated.LinkType,
-    from: Generated.NoteRealm,
-    to: Generated.NoteRealm
-  ) {
-    super();
-    this.linkType = linkType;
-    this.cnt = 1;
-    this.isReverse = false;
-    this.fromNote = from;
-    this.toNote = to;
-  }
-
-  count(cnt: number) {
-    this.cnt = cnt;
-    return this;
-  }
-
-  get reverse() {
-    this.isReverse = true;
-    return this;
-  }
-
-  do(): LinksMap {
-    if (!this.fromNote.links || !this.toNote.links)
-      throw new Error("note does not have links");
-    if (!this.toNote.links[this.linkType])
-      this.toNote.links[this.linkType] = { direct: [], reverse: [] };
-    const linksOfType = this.toNote.links[this.linkType];
-    if (linksOfType && !linksOfType.reverse) linksOfType.reverse = [];
-    linksOfType?.reverse.push(this.link());
-
+  do(): Generated.Link {
     return {
-      [this.linkType]: {
-        [this.isReverse ? "reverse" : "direct"]: Array.from(
-          { length: this.cnt },
-          () => this.link()
-        ),
-        [this.isReverse ? "direct" : "reverse"]: [],
-      },
-    };
-  }
-
-  private link(): Generated.Link {
-    return {
-      id: generateId(),
-      targetNote: this.toNote.note,
-      sourceNote: this.fromNote.note,
-      typeId: 15,
-      linkTypeLabel: "using",
-      createdAt: "",
+      id: 8,
+      linkTypeLabel: "a link",
+      clozeSource: "xxx",
+      typeId: 1,
+      sourceNote: this.sourceNoteBuilder.do().note,
+      targetNote: new NoteRealmBuilder().do().note,
     };
   }
 }
 
 export default LinkBuilder;
-export type { LinksMap };

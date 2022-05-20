@@ -17,7 +17,7 @@ const stubResponse = {
 
 const stubLinkResponse = {
   reviewPoint: makeMe.aReviewPoint.please(),
-  link: makeMe.aLinkViewedByUser.please(),
+  link: makeMe.aLink.please(),
 };
 
 describe("note statistics", () => {

@@ -67,7 +67,7 @@ describe("repeat page", () => {
   });
 
   it("minimized view for link", async () => {
-    const link = makeMe.aLinkViewedByUser.please();
+    const link = makeMe.aLink.please();
     const reviewPoint = makeMe.aReviewPoint.ofLink(link).please();
     helper.apiMock
       .expectingGet("/api/reviews/initial")
@@ -80,10 +80,10 @@ describe("repeat page", () => {
     expect(mockRouterPush).toHaveBeenCalledTimes(0);
     expect(wrapper.findAll(".initial-review-paused")).toHaveLength(1);
     expect(wrapper.find(".review-point-abbr span").text()).toContain(
-      link.sourceNoteWithPosition.note.note.title
+      link.sourceNote.title
     );
     expect(wrapper.find(".review-point-abbr span").text()).toContain(
-      link.targetNoteWithPosition.note.note.title
+      link.targetNote.title
     );
   });
 });

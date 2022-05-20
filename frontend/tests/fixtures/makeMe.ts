@@ -1,8 +1,8 @@
-import LinksBuilder from "./LInksBuilder";
+import LinksBuilder from "./LinksBuilder";
 import NoteRealmBuilder from "./NoteRealmBuilder";
 import NotePositionBuilder from "./NotePositionBuilder";
 import ReviewPointBuilder from "./ReviewPointBuilder";
-import LinkViewedByUserBuilder from "./LinkViewedByUserBuilder";
+import LinkBuilder from "./LinkBuilder";
 import RepetitionBuilder from "./RepetitionBuilder";
 import NotebookBuilder from "./NotebookBuilder";
 import CircleNoteBuilder from "./CircleNoteBuilder";
@@ -35,8 +35,8 @@ class MakeMe {
     return new ReviewPointBuilder();
   }
 
-  static get aLinkViewedByUser(): LinkViewedByUserBuilder {
-    return new LinkViewedByUserBuilder();
+  static get aLink(): LinkBuilder {
+    return new LinkBuilder();
   }
 
   static get aRepetition(): RepetitionBuilder {

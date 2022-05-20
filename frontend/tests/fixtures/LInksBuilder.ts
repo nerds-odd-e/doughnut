@@ -1,15 +1,15 @@
 import Builder from "./Builder";
 import generateId from "./generateId";
-import LinkBuilder, { LinksMap } from "./LinkBuilder";
+import LinkViewedBuilder, { LinksMap } from "./LinkViewedBuilder";
 import NoteRealmBuilder from "./NoteRealmBuilder";
 
 class LinksBuilder extends Builder<LinksMap> {
   from = new NoteRealmBuilder().title("source note").do();
 
-  protected childrenBuilders: Omit<LinkBuilder, "please">[] = [];
+  protected childrenBuilders: Omit<LinkViewedBuilder, "please">[] = [];
 
   of(linkType: Generated.LinkType) {
-    const child = new LinkBuilder(
+    const child = new LinkViewedBuilder(
       linkType,
       this.from,
       new NoteRealmBuilder().title(`target note ${generateId()}`).do()

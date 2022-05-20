@@ -26,8 +26,8 @@ class ReviewPointBuilder extends Builder<Generated.ReviewPoint> {
     return this;
   }
 
-  ofLink(link: Generated.LinkViewedByUser): ReviewPointBuilder {
-    this.data.thing.link = link.link;
+  ofLink(link: Generated.Link): ReviewPointBuilder {
+    this.data.thing.link = link;
     return this;
   }
 
