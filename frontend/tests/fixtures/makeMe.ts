@@ -2,7 +2,6 @@ import LinksBuilder from "./LInksBuilder";
 import NoteRealmBuilder from "./NoteRealmBuilder";
 import NotePositionBuilder from "./NotePositionBuilder";
 import ReviewPointBuilder from "./ReviewPointBuilder";
-import ReviewPointWithReviewSettingBuilder from "./ReviewPointWithReviewSettingBuilder";
 import LinkViewedByUserBuilder from "./LinkViewedByUserBuilder";
 import RepetitionBuilder from "./RepetitionBuilder";
 import NotebookBuilder from "./NotebookBuilder";
@@ -34,10 +33,6 @@ class MakeMe {
 
   static get aReviewPoint(): ReviewPointBuilder {
     return new ReviewPointBuilder();
-  }
-
-  static get aReviewPointWithReviewSetting(): ReviewPointWithReviewSettingBuilder {
-    return new ReviewPointWithReviewSettingBuilder();
   }
 
   static get aLinkViewedByUser(): LinkViewedByUserBuilder {
