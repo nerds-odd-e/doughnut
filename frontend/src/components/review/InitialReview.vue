@@ -114,8 +114,7 @@ export default defineComponent({
           skipReview,
           reviewSetting: this.reviewSetting,
         })
-        .then((res) => {
-          this.reviewPointWithReviewSettings[this.finished] = res;
+        .then(() => {
           if (this.finished + 1 === this.reviewPointWithReviewSettings.length) {
             this.$router.push({ name: "reviews" });
             return;

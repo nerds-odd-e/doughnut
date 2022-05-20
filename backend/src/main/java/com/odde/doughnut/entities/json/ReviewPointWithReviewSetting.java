@@ -3,7 +3,6 @@ package com.odde.doughnut.entities.json;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.ReviewSetting;
-import com.odde.doughnut.models.UserModel;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -11,7 +10,7 @@ public class ReviewPointWithReviewSetting {
   @Getter @Setter private ReviewPoint reviewPoint;
   @Getter @Setter private ReviewSetting reviewSetting;
 
-  public static ReviewPointWithReviewSetting from(ReviewPoint reviewPoint, UserModel user) {
+  public static ReviewPointWithReviewSetting from(ReviewPoint reviewPoint) {
     ReviewPointWithReviewSetting result = new ReviewPointWithReviewSetting();
     result.setReviewPoint(reviewPoint);
     if (reviewPoint.getNote() != null) {

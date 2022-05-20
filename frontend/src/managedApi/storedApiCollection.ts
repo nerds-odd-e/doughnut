@@ -35,7 +35,7 @@ const storedApiCollection = (
         return (await managedApi.restPost(
           `reviews`,
           data
-        )) as Generated.ReviewPointWithReviewSetting;
+        )) as Generated.ReviewPoint;
       },
 
       async processAnswer(data: Generated.Answer) {

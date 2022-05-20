@@ -66,13 +66,13 @@ class RestReviewsController {
 
     return reviewing
         .getDueInitialReviewPoints()
-        .map(rp -> ReviewPointWithReviewSetting.from(rp, user))
+        .map(ReviewPointWithReviewSetting::from)
         .collect(Collectors.toList());
   }
 
   @PostMapping(path = "")
   @Transactional
-  public ReviewPointWithReviewSetting create(@RequestBody InitialInfo initialInfo) {
+  public ReviewPoint create(@RequestBody InitialInfo initialInfo) {
     UserModel userModel = currentUserFetcher.getUser();
     userModel.getAuthorization().assertLoggedIn();
     ReviewPoint reviewPoint = new ReviewPoint();
@@ -83,7 +83,7 @@ class RestReviewsController {
     ReviewPointModel reviewPointModel = modelFactoryService.toReviewPointModel(reviewPoint);
     reviewPointModel.initialReview(
         userModel, initialInfo.reviewSetting, testabilitySettings.getCurrentUTCTimestamp());
-    return ReviewPointWithReviewSetting.from(reviewPointModel.getEntity(), userModel);
+    return ReviewPointWithReviewSetting.from(reviewPointModel.getEntity());
   }
 
   @GetMapping("/repeat")
@@ -124,7 +124,7 @@ class RestReviewsController {
     AnswerModel answerModel = modelFactoryService.toAnswerModel(answer);
     AnswerViewedByUser answerResult = answerModel.getAnswerViewedByUser();
     answerResult.reviewPoint =
-        ReviewPointWithReviewSetting.from(answer.getQuestion().getReviewPoint(), user);
+        ReviewPointWithReviewSetting.from(answer.getQuestion().getReviewPoint());
     answerResult.quizQuestion =
         new QuizQuestionViewedByUser(answer.getQuestion(), modelFactoryService);
     return answerResult;
