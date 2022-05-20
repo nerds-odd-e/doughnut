@@ -16,8 +16,8 @@
       />
       <div v-else>
         <ReviewPointAsync
-          v-if="reviewPointViewedByUser"
-          v-bind="{ reviewPointId: reviewPointViewedByUser?.reviewPoint.id }"
+          v-if="reviewPoint"
+          v-bind="{ reviewPointId: reviewPoint.id }"
         />
       </div>
     </LoadingPage>
@@ -53,7 +53,7 @@ export default defineComponent({
     };
   },
   computed: {
-    reviewPointViewedByUser() {
+    reviewPoint() {
       return this.answerResult?.reviewPoint;
     },
   },

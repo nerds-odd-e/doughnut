@@ -83,7 +83,7 @@ class RestReviewsController {
     ReviewPointModel reviewPointModel = modelFactoryService.toReviewPointModel(reviewPoint);
     reviewPointModel.initialReview(
         userModel, initialInfo.reviewSetting, testabilitySettings.getCurrentUTCTimestamp());
-    return ReviewPointWithReviewSetting.from(reviewPointModel.getEntity());
+    return reviewPointModel.getEntity();
   }
 
   @GetMapping("/repeat")
@@ -123,8 +123,7 @@ class RestReviewsController {
     user.getAuthorization().assertAuthorization(answer.getQuestion().getReviewPoint());
     AnswerModel answerModel = modelFactoryService.toAnswerModel(answer);
     AnswerViewedByUser answerResult = answerModel.getAnswerViewedByUser();
-    answerResult.reviewPoint =
-        ReviewPointWithReviewSetting.from(answer.getQuestion().getReviewPoint());
+    answerResult.reviewPoint = answer.getQuestion().getReviewPoint();
     answerResult.quizQuestion =
         new QuizQuestionViewedByUser(answer.getQuestion(), modelFactoryService);
     return answerResult;

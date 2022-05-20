@@ -11,9 +11,7 @@ helper.resetWithApiMock(beforeEach, afterEach);
 describe("repetition page", () => {
   describe("repetition page for a link", () => {
     const linkViewedByUser = makeMe.aLinkViewedByUser.please();
-    const reviewPointViewedByUser = makeMe.aReviewPointWithReviewSetting
-      .ofLink(linkViewedByUser)
-      .please();
+    const reviewPoint = makeMe.aReviewPoint.ofLink(linkViewedByUser).please();
     const notePosition = makeMe.aNotePosition.please();
 
     beforeEach(async () => {
@@ -21,20 +19,18 @@ describe("repetition page", () => {
         answerId: 1,
         answerDisplay: "",
         correct: true,
-        reviewPoint: reviewPointViewedByUser,
+        reviewPoint,
       });
       helper.apiMock
-        .expectingGet(
-          `/api/review-points/${reviewPointViewedByUser.reviewPoint.id}`
-        )
-        .andReturnOnce(reviewPointViewedByUser.reviewPoint);
+        .expectingGet(`/api/review-points/${reviewPoint.id}`)
+        .andReturnOnce(reviewPoint);
       helper.apiMock
         .expectingGet(
-          `/api/notes/${reviewPointViewedByUser.reviewPoint.thing.link?.targetNote.id}/position`
+          `/api/notes/${reviewPoint.thing.link?.targetNote.id}/position`
         )
         .andReturnOnce(notePosition);
       helper.apiMock.expectingGet(
-        `/api/notes/${reviewPointViewedByUser.reviewPoint.thing.link?.sourceNote.id}/position`
+        `/api/notes/${reviewPoint.thing.link?.sourceNote.id}/position`
       );
     });
 

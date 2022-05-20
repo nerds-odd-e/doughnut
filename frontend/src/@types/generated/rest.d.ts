@@ -171,7 +171,7 @@ declare namespace Generated {
         answerId: number;
         answerDisplay: string;
         correct: boolean;
-        reviewPoint: ReviewPointWithReviewSetting;
+        reviewPoint: ReviewPoint;
         quizQuestion: QuizQuestionViewedByUser;
     }
 
