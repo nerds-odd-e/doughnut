@@ -175,6 +175,13 @@ class RestNoteController {
     return reviewSetting;
   }
 
+  @GetMapping("/{note}/position")
+  public NotePositionViewedByUser getPosition(Note note) throws NoAccessRightException {
+    UserModel user = currentUserFetcher.getUser();
+    user.getAuthorization().assertAuthorization(note);
+    return new NoteViewer(user.getEntity(), note).jsonNotePosition(note);
+  }
+
   @PostMapping(value = "/{note}/review-setting")
   @Transactional
   public RedirectToNoteResponse updateReviewSetting(

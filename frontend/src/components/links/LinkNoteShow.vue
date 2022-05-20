@@ -1,5 +1,5 @@
 <template>
-  <Breadcrumb v-bind="notePosition" />
+  <BreadcrumbAsync v-bind="{ noteId: note.id }" />
   <Card :note="note.note">
     <template #button>
       <button
@@ -16,8 +16,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import Breadcrumb from "../toolbars/Breadcrumb.vue";
-import NoteWithLinks from "../notes/NoteWithLinks.vue";
+import BreadcrumbAsync from "../toolbars/BreadcrumbAsync.vue";
 import Card from "../notes/Card.vue";
 
 export default defineComponent({
@@ -26,6 +25,6 @@ export default defineComponent({
     note: { type: Object as PropType<Generated.NoteRealm>, required: true },
     notePosition: Object as PropType<Generated.NotePositionViewedByUser>,
   },
-  components: { Breadcrumb, NoteWithLinks, Card },
+  components: { BreadcrumbAsync, Card },
 });
 </script>

@@ -14,6 +14,7 @@ describe("repetition page", () => {
     const reviewPointViewedByUser = makeMe.aReviewPoint
       .ofLink(linkViewedByUser)
       .please();
+    const notePosition = makeMe.aNotePosition.please();
 
     beforeEach(async () => {
       helper.apiMock.expectingGet("/api/reviews/answers/1").andReturnOnce({
@@ -27,6 +28,10 @@ describe("repetition page", () => {
           `/api/review-points/${reviewPointViewedByUser.reviewPoint.id}`
         )
         .andReturnOnce(reviewPointViewedByUser);
+      helper.apiMock
+        .expectingGet(`/api/notes/6/position`)
+        .andReturnOnce(notePosition);
+      helper.apiMock.expectingGet(`/api/notes/2/position`);
     });
 
     it("click on note when doing review", async () => {
@@ -37,7 +42,7 @@ describe("repetition page", () => {
         .mount();
       await flushPromises();
       expect(
-        JSON.parse(wrapper.find(".link-source .router-link").attributes().to)
+        JSON.parse(wrapper.find(".link-target .router-link").attributes().to)
           .name
       ).toEqual("notebooks");
     });
@@ -50,7 +55,7 @@ describe("repetition page", () => {
         .mount();
       await flushPromises();
       expect(
-        JSON.parse(wrapper.find(".link-source .router-link").attributes().to)
+        JSON.parse(wrapper.find(".link-target .router-link").attributes().to)
       ).toEqual({ name: "notebooks" });
     });
   });

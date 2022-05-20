@@ -109,6 +109,12 @@ const storedApiCollection = (
       )) as Generated.NotesBulk;
     },
 
+    async getNotePosition(noteId: Doughnut.ID) {
+      return (await managedApi.restGet(
+        `notes/${noteId}/position`
+      )) as Generated.NotePositionViewedByUser;
+    },
+
     async createNotebook(
       circle: Generated.Circle | undefined,
       data: Generated.Notebook

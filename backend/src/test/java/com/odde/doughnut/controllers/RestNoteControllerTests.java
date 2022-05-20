@@ -273,4 +273,14 @@ class RestNoteControllerTests {
       assertThrows(NoAccessRightException.class, () -> controller.getComments(note));
     }
   }
+
+  @Nested
+  class gettingPosition {}
+
+  @Test
+  void shouldNotBeAbleToAddCommentToNoteTheUserCannotSee() {
+    User anotherUser = makeMe.aUser().please();
+    Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
+    assertThrows(NoAccessRightException.class, () -> controller.getPosition(note));
+  }
 }
