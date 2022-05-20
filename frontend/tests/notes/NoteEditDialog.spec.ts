@@ -12,7 +12,7 @@ describe("note show", () => {
     const noteRealm = makeMe.aNoteRealm.please();
     const stubResponse = {
       notePosition: makeMe.aNotePosition.please(),
-      notes: [noteRealm],
+      noteRealm,
     };
 
     helper.apiMock

@@ -31,7 +31,8 @@ describe("DragListner", () => {
     await wrapper
       .find("div")
       .trigger("pointermove", { clientX: 1000, clientY: 2000 });
-    expect(wrapper.emitted()["update:modelValue"][0][0]).toEqual({
+    const updated = wrapper.emitted()["update:modelValue"] as unknown[][];
+    expect(updated[0][0]).toEqual({
       x: 910,
       y: 1820,
     });
@@ -54,7 +55,8 @@ describe("DragListner", () => {
     await wrapper.find("div").trigger("touchmove", {
       changedTouches: [{ clientX: 1000, clientY: 2000, currentTarget }],
     });
-    expect(wrapper.emitted()["update:modelValue"][0][0]).toEqual({
+    const updated = wrapper.emitted()["update:modelValue"] as unknown[][];
+    expect(updated[0][0]).toEqual({
       x: 910,
       y: 1820,
     });
@@ -67,7 +69,8 @@ describe("DragListner", () => {
     await wrapper
       .find("div")
       .trigger("mousewheel", { clientX: 100, clientY: 200, deltaY: 200 });
-    expect(wrapper.emitted()["update:modelValue"][0][0]).toEqual({
+    const updated = wrapper.emitted()["update:modelValue"] as unknown[][];
+    expect(updated[0][0]).toEqual({
       x: -110,
       y: -220,
       scale: 3.5,
@@ -81,7 +84,8 @@ describe("DragListner", () => {
     await wrapper
       .find("div")
       .trigger("mousewheel", { clientX: 100, clientY: 200, deltaY: 2000 });
-    expect(wrapper.emitted()["update:modelValue"][0][0].scale).toEqual(5);
+    const updated = wrapper.emitted()["update:modelValue"] as unknown[][];
+    expect(updated[0][0]).toMatchObject({ scale: 5 });
   });
 
   it("wheel lower limit", async () => {
@@ -91,7 +95,8 @@ describe("DragListner", () => {
     await wrapper
       .find("div")
       .trigger("mousewheel", { clientX: 100, clientY: 200, deltaY: -2000 });
-    expect(wrapper.emitted()["update:modelValue"][0][0].scale).toEqual(0.1);
+    const updated = wrapper.emitted()["update:modelValue"] as unknown[][];
+    expect(updated[0][0]).toMatchObject({ scale: 0.1 });
   });
 
   it("pinch not zooming but move in parallel", async () => {
@@ -116,7 +121,8 @@ describe("DragListner", () => {
       clientY: 2400,
       currentTarget,
     });
-    expect(wrapper.emitted()["update:modelValue"][1][0]).toEqual({
+    const updated = wrapper.emitted()["update:modelValue"] as unknown[][];
+    expect(updated[1][0]).toEqual({
       x: 1010,
       y: 2020,
       scale: 1,
