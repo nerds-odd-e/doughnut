@@ -3,7 +3,7 @@ import generateId from "./generateId";
 import LinkViewedBuilder, { LinksMap } from "./LinkViewedBuilder";
 import NoteRealmBuilder from "./NoteRealmBuilder";
 
-class LinksBuilder extends Builder<LinksMap> {
+class LinksMapBuilder extends Builder<LinksMap> {
   from = new NoteRealmBuilder().title("source note").do();
 
   protected childrenBuilders: Omit<LinkViewedBuilder, "please">[] = [];
@@ -26,4 +26,4 @@ class LinksBuilder extends Builder<LinksMap> {
   }
 }
 
-export default LinksBuilder;
+export default LinksMapBuilder;

@@ -1,3 +1,4 @@
+import { RouteRecordRaw } from "vue-router";
 import HomePage from "@/pages/HomePage.vue";
 import BazaarPage from "@/pages/BazaarPage.vue";
 import CirclesPage from "@/pages/CirclesPage.vue";
@@ -105,6 +106,6 @@ const routes = [
     props: true,
   },
   { path: "/user-profile", name: "userProfile", component: UserProfilePage },
-];
+] as RouteRecordRaw[];
 
 export default routes;
