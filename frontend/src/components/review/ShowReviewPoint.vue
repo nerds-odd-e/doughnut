@@ -17,19 +17,9 @@
   <div v-if="link && linkViewedByUser">
     <div class="jumbotron py-4 mb-2">
       <LinkShow
-        v-bind="{
-          sourceNote: link.sourceNote,
-          targetNote: link.targetNote,
-        }"
-      >
-        <LinkNob
-          v-bind="{ link }"
-          @note-realm-updated="$emit('noteRealmUpdated', $event)"
-        />
-        <span class="badge bg-light text-dark">
-          {{ linkViewedByUser.linkTypeLabel }}</span
-        >
-      </LinkShow>
+        v-bind="{ link }"
+        @note-realm-updated="$emit('noteRealmUpdated', $event)"
+      />
     </div>
   </div>
 </template>
@@ -47,6 +37,7 @@ export default defineComponent({
       required: true,
     },
   },
+  emits: ["noteRealmUpdated"],
   components: { LinkShow, LinkNob, NoteRealmAsync },
   computed: {
     noteId() {

@@ -1,13 +1,17 @@
 <template>
   <div class="row">
     <div class="col-12 col-md-4 link-source">
-      <LinkNoteShow :note="sourceNote" />
+      <LinkNoteShow :note="link.sourceNote" />
     </div>
     <div class="col-12 col-md-4 text-center">
-      <slot />
+      <LinkNob
+        v-bind="{ link }"
+        @note-realm-updated="$emit('noteRealmUpdated', $event)"
+      />
+      <span class="badge bg-light text-dark"> {{ link.linkTypeLabel }}</span>
     </div>
     <div class="col-12 col-md-4 link-target">
-      <LinkNoteShow :note="targetNote" />
+      <LinkNoteShow :note="link.targetNote" />
     </div>
   </div>
 </template>
@@ -18,15 +22,12 @@ import LinkNoteShow from "./LinkNoteShow.vue";
 
 export default defineComponent({
   props: {
-    sourceNote: {
-      type: Object as PropType<Generated.Note>,
-      required: true,
-    },
-    targetNote: {
-      type: Object as PropType<Generated.Note>,
+    link: {
+      type: Object as PropType<Generated.Link>,
       required: true,
     },
   },
+  emits: ["noteRealmUpdated"],
   components: { LinkNoteShow },
 });
 </script>

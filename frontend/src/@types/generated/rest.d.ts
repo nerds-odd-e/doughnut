@@ -230,13 +230,13 @@ declare namespace Generated {
     }
 
     interface Subscription {
+        headNote: Note;
+        title: string;
+        shortDescription: string;
         id: number;
         dailyTargetOfNewNotes: number;
         user: User;
         notebook: Notebook;
-        headNote: Note;
-        title: string;
-        shortDescription: string;
     }
 
     interface QuizQuestion {

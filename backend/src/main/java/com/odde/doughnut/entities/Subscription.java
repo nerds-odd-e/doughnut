@@ -1,5 +1,6 @@
 package com.odde.doughnut.entities;
 
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -14,6 +15,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "subscription")
+@JsonPropertyOrder({"headNote", "title", "shortDescription"})
 public class Subscription {
   @Id
   @Getter
