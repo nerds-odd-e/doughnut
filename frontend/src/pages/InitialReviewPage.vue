@@ -1,6 +1,9 @@
 <template>
   <ContainerPage
-    v-bind="{ loading, contentExists: reviewPointWithReviewSettings !== undefined }"
+    v-bind="{
+      loading,
+      contentExists: reviewPointWithReviewSettings !== undefined,
+    }"
   >
     <InitialReview
       v-if="reviewPointWithReviewSettings"
