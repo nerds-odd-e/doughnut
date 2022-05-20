@@ -1,10 +1,10 @@
 <template>
   <ContainerPage
-    v-bind="{ loading, contentExists: reviewPointViewedByUsers !== undefined }"
+    v-bind="{ loading, contentExists: reviewPointWithReviewSettings !== undefined }"
   >
     <InitialReview
-      v-if="reviewPointViewedByUsers"
-      v-bind="{ nested, reviewPointViewedByUsers }"
+      v-if="reviewPointWithReviewSettings"
+      v-bind="{ nested, reviewPointWithReviewSettings }"
     />
   </ContainerPage>
 </template>
@@ -26,8 +26,8 @@ export default defineComponent({
   },
   data() {
     return {
-      reviewPointViewedByUsers: undefined as
-        | Generated.ReviewPointViewedByUser[]
+      reviewPointWithReviewSettings: undefined as
+        | Generated.ReviewPointWithReviewSetting[]
         | undefined,
     };
   },
@@ -38,7 +38,7 @@ export default defineComponent({
         this.$router.push({ name: "reviews" });
         return;
       }
-      this.reviewPointViewedByUsers = resp;
+      this.reviewPointWithReviewSettings = resp;
     });
   },
 });

@@ -56,8 +56,8 @@ export default defineComponent({
   name: "InitialReviewPage",
   props: {
     nested: Boolean,
-    reviewPointViewedByUsers: {
-      type: Object as PropType<Generated.ReviewPointViewedByUser[]>,
+    reviewPointWithReviewSettings: {
+      type: Object as PropType<Generated.ReviewPointWithReviewSetting[]>,
       required: true,
     },
   },
@@ -77,7 +77,7 @@ export default defineComponent({
   },
   computed: {
     reviewPointViewedByUser() {
-      return this.reviewPointViewedByUsers[this.finished];
+      return this.reviewPointWithReviewSettings[this.finished];
     },
     reviewPoint() {
       return this.reviewPointViewedByUser?.reviewPoint;
@@ -86,7 +86,7 @@ export default defineComponent({
       return this.reviewPointViewedByUser?.reviewSetting;
     },
     remainingInitialReviewCountForToday() {
-      return this.reviewPointViewedByUsers.length - this.finished;
+      return this.reviewPointWithReviewSettings.length - this.finished;
     },
     buttonKey() {
       return this.reviewPoint?.thing?.id;
@@ -115,8 +115,8 @@ export default defineComponent({
           reviewSetting: this.reviewSetting,
         })
         .then((res) => {
-          this.reviewPointViewedByUsers[this.finished] = res;
-          if (this.finished + 1 === this.reviewPointViewedByUsers.length) {
+          this.reviewPointWithReviewSettings[this.finished] = res;
+          if (this.finished + 1 === this.reviewPointWithReviewSettings.length) {
             this.$router.push({ name: "reviews" });
             return;
           }

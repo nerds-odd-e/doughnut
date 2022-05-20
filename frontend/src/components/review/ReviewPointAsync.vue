@@ -49,7 +49,7 @@ export default defineComponent({
   data() {
     return {
       reviewPointViewedByUser: undefined as
-        | Generated.ReviewPointViewedByUser
+        | Generated.ReviewPointWithReviewSetting
         | undefined,
       nextReviewAt: undefined as string | undefined,
     };

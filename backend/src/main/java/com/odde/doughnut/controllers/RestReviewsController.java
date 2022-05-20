@@ -8,7 +8,7 @@ import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.InitialInfo;
 import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import com.odde.doughnut.entities.json.RepetitionForUser;
-import com.odde.doughnut.entities.json.ReviewPointViewedByUser;
+import com.odde.doughnut.entities.json.ReviewPointWithReviewSetting;
 import com.odde.doughnut.entities.json.ReviewStatus;
 import com.odde.doughnut.entities.json.SelfEvaluation;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -59,20 +59,20 @@ class RestReviewsController {
 
   @GetMapping("/initial")
   @Transactional(readOnly = true)
-  public List<ReviewPointViewedByUser> initialReview() {
+  public List<ReviewPointWithReviewSetting> initialReview() {
     UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertLoggedIn();
     Reviewing reviewing = user.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
 
     return reviewing
         .getDueInitialReviewPoints()
-        .map(rp -> ReviewPointViewedByUser.from(rp, user))
+        .map(rp -> ReviewPointWithReviewSetting.from(rp, user))
         .collect(Collectors.toList());
   }
 
   @PostMapping(path = "")
   @Transactional
-  public ReviewPointViewedByUser create(@RequestBody InitialInfo initialInfo) {
+  public ReviewPointWithReviewSetting create(@RequestBody InitialInfo initialInfo) {
     UserModel userModel = currentUserFetcher.getUser();
     userModel.getAuthorization().assertLoggedIn();
     ReviewPoint reviewPoint = new ReviewPoint();
@@ -83,7 +83,7 @@ class RestReviewsController {
     ReviewPointModel reviewPointModel = modelFactoryService.toReviewPointModel(reviewPoint);
     reviewPointModel.initialReview(
         userModel, initialInfo.reviewSetting, testabilitySettings.getCurrentUTCTimestamp());
-    return ReviewPointViewedByUser.from(reviewPointModel.getEntity(), userModel);
+    return ReviewPointWithReviewSetting.from(reviewPointModel.getEntity(), userModel);
   }
 
   @GetMapping("/repeat")
@@ -124,7 +124,7 @@ class RestReviewsController {
     AnswerModel answerModel = modelFactoryService.toAnswerModel(answer);
     AnswerViewedByUser answerResult = answerModel.getAnswerViewedByUser();
     answerResult.reviewPoint =
-        ReviewPointViewedByUser.from(answer.getQuestion().getReviewPoint(), user);
+        ReviewPointWithReviewSetting.from(answer.getQuestion().getReviewPoint(), user);
     answerResult.quizQuestion =
         new QuizQuestionViewedByUser(answer.getQuestion(), modelFactoryService);
     return answerResult;

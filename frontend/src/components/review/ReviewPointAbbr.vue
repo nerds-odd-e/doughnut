@@ -22,7 +22,7 @@ import { defineComponent, PropType } from "vue";
 export default defineComponent({
   props: {
     reviewPointViewedByUser: {
-      type: Object as PropType<Generated.ReviewPointViewedByUser>,
+      type: Object as PropType<Generated.ReviewPointWithReviewSetting>,
       required: true,
     },
   },

@@ -2,7 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.json.ReviewPointViewedByUser;
+import com.odde.doughnut.entities.json.ReviewPointWithReviewSetting;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
@@ -25,11 +25,11 @@ class RestReviewPointController {
   }
 
   @GetMapping("/{reviewPoint}")
-  public ReviewPointViewedByUser show(@PathVariable("reviewPoint") ReviewPoint reviewPoint)
+  public ReviewPointWithReviewSetting show(@PathVariable("reviewPoint") ReviewPoint reviewPoint)
       throws NoAccessRightException {
     final UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertAuthorization(reviewPoint);
-    return ReviewPointViewedByUser.from(reviewPoint, user);
+    return ReviewPointWithReviewSetting.from(reviewPoint, user);
   }
 
   @PostMapping(path = "/{reviewPoint}/remove")

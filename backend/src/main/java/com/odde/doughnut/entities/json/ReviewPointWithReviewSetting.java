@@ -7,12 +7,12 @@ import com.odde.doughnut.models.UserModel;
 import lombok.Getter;
 import lombok.Setter;
 
-public class ReviewPointViewedByUser {
+public class ReviewPointWithReviewSetting {
   @Getter @Setter private ReviewPoint reviewPoint;
   @Getter @Setter private ReviewSetting reviewSetting;
 
-  public static ReviewPointViewedByUser from(ReviewPoint reviewPoint, UserModel user) {
-    ReviewPointViewedByUser result = new ReviewPointViewedByUser();
+  public static ReviewPointWithReviewSetting from(ReviewPoint reviewPoint, UserModel user) {
+    ReviewPointWithReviewSetting result = new ReviewPointWithReviewSetting();
     result.setReviewPoint(reviewPoint);
     if (reviewPoint.getNote() != null) {
       result.setReviewSetting(getReviewSetting(reviewPoint.getNote()));

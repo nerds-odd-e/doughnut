@@ -131,7 +131,7 @@ declare namespace Generated {
         toRepeatCount: number;
     }
 
-    interface ReviewPointViewedByUser {
+    interface ReviewPointWithReviewSetting {
         reviewPoint: ReviewPoint;
         reviewSetting: ReviewSetting;
     }
@@ -171,7 +171,7 @@ declare namespace Generated {
         answerId: number;
         answerDisplay: string;
         correct: boolean;
-        reviewPoint: ReviewPointViewedByUser;
+        reviewPoint: ReviewPointWithReviewSetting;
         quizQuestion: QuizQuestionViewedByUser;
     }
 

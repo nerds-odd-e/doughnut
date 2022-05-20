@@ -22,20 +22,20 @@ const storedApiCollection = (
       async getReviewPoint(reviewPointId: Doughnut.ID) {
         return (await managedApi.restGet(
           `review-points/${reviewPointId}`
-        )) as Generated.ReviewPointViewedByUser;
+        )) as Generated.ReviewPointWithReviewSetting;
       },
 
       async initialReview() {
         return (await managedApi.restGet(
           `reviews/initial`
-        )) as Generated.ReviewPointViewedByUser[];
+        )) as Generated.ReviewPointWithReviewSetting[];
       },
 
       async doInitialReview(data: Generated.InitialInfo) {
         return (await managedApi.restPost(
           `reviews`,
           data
-        )) as Generated.ReviewPointViewedByUser;
+        )) as Generated.ReviewPointWithReviewSetting;
       },
 
       async processAnswer(data: Generated.Answer) {

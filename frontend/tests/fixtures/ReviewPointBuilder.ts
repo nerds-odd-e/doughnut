@@ -1,8 +1,8 @@
 import Builder from "./Builder";
 import generateId from "./generateId";
 
-class ReviewPointBuilder extends Builder<Generated.ReviewPointViewedByUser> {
-  data: Generated.ReviewPointViewedByUser;
+class ReviewPointBuilder extends Builder<Generated.ReviewPointWithReviewSetting> {
+  data: Generated.ReviewPointWithReviewSetting;
 
   constructor() {
     super();
@@ -38,7 +38,7 @@ class ReviewPointBuilder extends Builder<Generated.ReviewPointViewedByUser> {
     return this;
   }
 
-  do(): Generated.ReviewPointViewedByUser {
+  do(): Generated.ReviewPointWithReviewSetting {
     return this.data;
   }
 }
