@@ -14,12 +14,12 @@
     />
   </div>
 
-  <div v-if="linkViewedByUser">
+  <div v-if="link && linkViewedByUser">
     <div class="jumbotron py-4 mb-2">
       <LinkShow
         v-bind="{
-          sourceNoteWithPosition: linkViewedByUser.sourceNoteWithPosition,
-          targetNoteWithPosition: linkViewedByUser.targetNoteWithPosition,
+          sourceNote: link.sourceNote,
+          targetNote: link.targetNote,
         }"
       >
         <LinkNob
@@ -54,6 +54,9 @@ export default defineComponent({
     },
     reviewPoint() {
       return this.reviewPointViewedByUser.reviewPoint;
+    },
+    link() {
+      return this.linkViewedByUser?.link;
     },
     linkViewedByUser() {
       return this.reviewPointViewedByUser?.linkViewedByUser;

@@ -1,6 +1,6 @@
 <template>
   <BreadcrumbAsync v-bind="{ noteId: note.id }" />
-  <Card :note="note.note">
+  <Card :note="note">
     <template #button>
       <button
         class="source_btn btn btn-sm btn-secondary"
@@ -22,8 +22,7 @@ import Card from "../notes/Card.vue";
 export default defineComponent({
   name: "LinkNoteShow",
   props: {
-    note: { type: Object as PropType<Generated.NoteRealm>, required: true },
-    notePosition: Object as PropType<Generated.NotePositionViewedByUser>,
+    note: { type: Object as PropType<Generated.Note>, required: true },
   },
   components: { BreadcrumbAsync, Card },
 });
