@@ -10,6 +10,7 @@ import static com.odde.doughnut.entities.QuizQuestion.QuestionType.LINK_TARGET;
 import static com.odde.doughnut.entities.QuizQuestion.QuestionType.WHICH_SPEC_HAS_INSTANCE;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.odde.doughnut.algorithms.ClozeDescription;
 import com.odde.doughnut.entities.QuizQuestion.QuestionType;
@@ -34,6 +35,7 @@ import lombok.Setter;
 
 @Entity
 @Table(name = "link")
+@JsonPropertyOrder({"clozeSource", "linkTypeLabel"})
 public class Link extends Thingy {
   private Link() {}
 

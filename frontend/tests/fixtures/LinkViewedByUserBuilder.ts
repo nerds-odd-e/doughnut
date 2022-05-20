@@ -19,6 +19,14 @@ class LinkViewedByUserBuilder extends Builder<Generated.LinkViewedByUser> {
         note: new NoteRealmBuilder().do(),
         notePosition: new NotePositionBuilder().do(),
       },
+      link: {
+        id: 8,
+        linkTypeLabel: "a link",
+        clozeSource: "xxx",
+        typeId: 1,
+        sourceNote: this.sourceNoteBuilder.do().note,
+        targetNote: new NoteRealmBuilder().do().note,
+      },
     };
   }
 }

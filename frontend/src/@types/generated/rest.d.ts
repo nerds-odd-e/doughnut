@@ -202,11 +202,11 @@ declare namespace Generated {
     }
 
     interface Link extends Thingy {
+        clozeSource: string;
+        linkTypeLabel: string;
         sourceNote: Note;
         targetNote: Note;
         typeId: number;
-        linkTypeLabel: string;
-        clozeSource: string;
     }
 
     interface TextContent {
@@ -216,12 +216,12 @@ declare namespace Generated {
     }
 
     interface Note extends Thingy {
-        noteAccessories: NoteAccessories;
-        textContent: TextContent;
-        pictureWithMask?: PictureWithMask;
         title: string;
         shortDescription: string;
         parentId?: number;
+        noteAccessories: NoteAccessories;
+        textContent: TextContent;
+        pictureWithMask?: PictureWithMask;
     }
 
     interface Ownership {

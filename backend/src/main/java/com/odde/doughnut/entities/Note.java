@@ -3,6 +3,7 @@ package com.odde.doughnut.entities;
 import static java.util.stream.Collectors.toList;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.odde.doughnut.algorithms.ClozeDescription;
 import com.odde.doughnut.algorithms.NoteTitle;
 import com.odde.doughnut.algorithms.SiblingOrder;
@@ -24,6 +25,7 @@ import org.thymeleaf.util.StringUtils;
 
 @Entity
 @Table(name = "note")
+@JsonPropertyOrder({"title", "shortDescription", "parentId"})
 public class Note extends Thingy {
   private Note() {}
 
