@@ -10,8 +10,8 @@ helper.resetWithApiMock(beforeEach, afterEach);
 
 describe("repetition page", () => {
   describe("repetition page for a link", () => {
-    const linkViewedByUser = makeMe.aLink.please();
-    const reviewPoint = makeMe.aReviewPoint.ofLink(linkViewedByUser).please();
+    const link = makeMe.aLink.please();
+    const reviewPoint = makeMe.aReviewPoint.ofLink(link).please();
     const notePosition = makeMe.aNotePosition.please();
 
     beforeEach(async () => {
