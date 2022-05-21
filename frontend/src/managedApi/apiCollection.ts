@@ -88,7 +88,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
       return managedApi.restPost(`subscriptions/${subscriptionId}/delete`, {});
     },
   },
-  getStatistics(
+  async getStatistics(
     noteId: Doughnut.ID | undefined,
     linkId: Doughnut.ID | undefined
   ) {

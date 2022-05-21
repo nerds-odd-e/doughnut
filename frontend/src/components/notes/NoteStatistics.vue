@@ -35,22 +35,32 @@
   </div>
 </template>
 
-<script setup>
+<script lang="ts">
+import { defineComponent } from "vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
-import { ref } from "vue";
 
-
-const props = defineProps({
-  noteId: Number,
-  linkid: Number,
+export default defineComponent({
+  setup() {
+    return useLoadingApi();
+  },
+  props: {
+    noteId: Number,
+    linkid: Number,
+  },
+  data() {
+    return {
+      statistics: undefined as undefined | unknown,
+    };
+  },
+  methods: {
+    fetchData() {
+      this.api.getStatistics(this.noteId, this.linkid).then((articles) => {
+        this.statistics = articles;
+      });
+    },
+  },
+  mounted() {
+    this.fetchData();
+  },
 });
-const statistics = ref(null);
-const { api } = useLoadingApi();
-const fetchData = () => {
-  api.getStatistics(props.noteId, props.linkid).then((articles) => {
-    statistics.value = articles;
-  });
-};
-
-fetchData();
 </script>

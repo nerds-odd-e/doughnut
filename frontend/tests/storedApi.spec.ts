@@ -1,12 +1,13 @@
 /**
  * @jest-environment jsdom
  */
+import fetchMock from "jest-fetch-mock";
 import store from "./fixtures/testingStore";
 import makeMe from "./fixtures/makeMe";
 import useStoredLoadingApi from "../src/managedApi/useStoredLoadingApi";
 
 beforeEach(() => {
-  fetch.resetMocks();
+  fetchMock.resetMocks();
   store.$reset();
 });
 
@@ -16,7 +17,7 @@ describe("storedApiCollection", () => {
 
   describe("delete note", () => {
     beforeEach(() => {
-      fetch.mockResponseOnce(JSON.stringify({}));
+      fetchMock.mockResponseOnce(JSON.stringify({}));
     });
 
     it("should call the api", async () => {

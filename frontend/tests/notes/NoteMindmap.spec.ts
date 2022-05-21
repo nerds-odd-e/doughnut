@@ -19,7 +19,10 @@ describe("note mindmap", () => {
       .component(NoteMinmap)
       .withProps({
         noteId,
-        noteRealms: new NoteRealmCache({ notes }),
+        noteRealms: new NoteRealmCache({
+          notes,
+          notePosition: makeMe.aNotePosition.please(),
+        }),
         offset: { scale: 1, rotate: 0 },
         ...props,
       })
