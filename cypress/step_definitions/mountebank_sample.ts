@@ -13,10 +13,7 @@ Given("I have a record on {string} on the external service", async (record) => {
 })
 
 When("I ask for the {string} record", (record) => {
-  const args = { record }
-  cy.origin("localhost:5000", { args }, ({ record }) => {
-    cy.request(`/external/${record}`).as("resp")
-  })
+  cy.request(`http://localhost:5000/external/${record}`).as("resp")
 })
 
 Then("I should get the expected payload", (record) => {

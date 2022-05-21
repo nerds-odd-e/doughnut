@@ -5,7 +5,6 @@
   "pluginsFile": "cypress/plugins/index.ts",
   "testFiles": "**/*.feature",
   "chromeWebSecurity": false,
-  "experimentalSessionAndOrigin": true,
   "ignoreTestFiles": [
     "**/*.{js,ts}",
     "**/__snapshots__/*",

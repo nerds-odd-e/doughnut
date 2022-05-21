@@ -8,6 +8,5 @@
   "defaultCommandTimeout": 6000,
   "trashAssetsBeforeRuns": true,
   "watchForFileChanges": false,
-  "chromeWebSecurity": false,
-  "experimentalSessionAndOrigin": true
+  "chromeWebSecurity": false
 }

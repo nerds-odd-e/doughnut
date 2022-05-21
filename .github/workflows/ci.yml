@@ -114,7 +114,7 @@ jobs:
           config-file: cypress/config/ci.json
           install-command: yarn --frozen-lockfile --silent
           build: yarn frontend:build
-          start: yarn sut
+          start: yarn run-p -clnr start:mb sut
           wait-on: "http://127.0.0.1:9081/api/healthcheck"
           wait-on-timeout: 150
           spec: ${{ matrix.spec }}
