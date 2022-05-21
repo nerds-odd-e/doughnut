@@ -58,7 +58,7 @@ jobs:
       - run: yarn frontend:test
 
   Package-artifacts:
-    name: Build backend and frontend artifacts as an artifact for deployment
+    name: Package backend & frontend artifacts for deployment
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -86,6 +86,7 @@ jobs:
           - |
             cypress/integration/t*/**
             cypress/integration/u*/**
+            cypress/integration/w*/**
           - |
             cypress/integration/notes*/**
           - |
@@ -96,6 +97,7 @@ jobs:
             cypress/integration/s*/**
           - |
             cypress/integration/v*/**
+
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/mysql_db
