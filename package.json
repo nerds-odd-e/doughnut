@@ -70,6 +70,7 @@
   "dependencies": {
     "@cucumber/cucumber": "^8.1",
     "ejs": "^3.1.7",
-    "superagent": "7.1"
+    "formidable": "^2.0",
+    "superagent": "^7.1"
   }
 }

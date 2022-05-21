@@ -111,7 +111,7 @@ jobs:
         with:
           browser: chrome
           headless: true
-          config: pageLoadTimeout=100000,video=false,watchForFileChanges=false,chromeWebSecurity=false
+          config-file: cypress/config/ci.json
           install-command: yarn --frozen-lockfile --silent
           build: yarn frontend:build
           start: yarn sut
