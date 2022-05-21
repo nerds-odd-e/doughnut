@@ -23,10 +23,10 @@
     "sut": "backend/gradlew -p backend bootRunE2E --build-cache",
     "open": "yarn frontend:build && run-p -clnr sut cy:open",
     "test": "yarn frontend:build && run-p -clnr start:mb sut cy:run",
-    "test:dev": "yarn frontend:build && run-p -clnr sut frontend:sut cy:run:dev",
-    "test:open": "yarn run-p -clnr sut frontend:sut cy:open",
+    "test:dev": "yarn frontend:build && run-p -clnr start:mb sut frontend:sut cy:run:dev",
+    "test:open": "yarn run-p -clnr start:mb sut frontend:sut cy:open",
     "sound": "node scripts/sound-monitor.js",
-    "format": "prettier cypress --write && backend/gradlew -p backend spotlessApply",
+    "format": "backend/gradlew -p backend spotlessApply && prettier cypress --write",
     "lint:all": "yarn && yarn backend:lint && yarn frontend:lint && yarn cy:lint"
   },
   "wireit": {
@@ -44,15 +44,15 @@
     "stepDefinitions": "cypress/step_definitions/**/*.{js,ts}"
   },
   "devDependencies": {
-    "@anev/ts-mountebank": "^1.5.0",
-    "@badeball/cypress-cucumber-preprocessor": "^9.1",
+    "@anev/ts-mountebank": "^1.5",
+    "@badeball/cypress-cucumber-preprocessor": "^9.2",
     "@bahmutov/cypress-esbuild-preprocessor": "^2.1",
     "@esbuild-plugins/node-modules-polyfill": "^0.1",
     "@testing-library/cypress": "8.0",
     "@types/cypress-cucumber-preprocessor": "^4.0",
     "@types/node": "^17.0",
-    "@typescript-eslint/eslint-plugin": "^5.19",
-    "@typescript-eslint/parser": "^5.19",
+    "@typescript-eslint/eslint-plugin": "^5.25",
+    "@typescript-eslint/parser": "^5.25",
     "cypress": "^9.6",
     "cypress-file-upload": "^5.0",
     "esbuild": "^0.14",
@@ -61,14 +61,15 @@
     "eslint-plugin-cypress": "^2.12",
     "eslint-plugin-prettier": "^4.0",
     "got": "^12.0",
-    "mountebank": "^2.6.0",
+    "mountebank": "^2.6",
     "npm-run-all": "4.1.5",
     "prettier": "^2.6",
-    "typescript": "^4.6.4",
-    "wireit": "^0.2.1"
+    "typescript": "^4.6",
+    "wireit": "^0.2"
   },
   "dependencies": {
     "@cucumber/cucumber": "^8.1",
-    "ejs": "^3.1.7"
+    "ejs": "^3.1.7",
+    "superagent": "7.1"
   }
 }

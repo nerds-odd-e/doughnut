@@ -7,6 +7,7 @@
   "pageLoadTimeout": 100000,
   "defaultCommandTimeout": 6000,
   "trashAssetsBeforeRuns": true,
+  "chromeWebSecurity": false,
   "viewportWidth": 1000,
   "viewportHeight": 660
 }

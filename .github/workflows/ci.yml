@@ -97,7 +97,6 @@ jobs:
             cypress/integration/s*/**
           - |
             cypress/integration/v*/**
-
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/mysql_db
@@ -112,7 +111,7 @@ jobs:
         with:
           browser: chrome
           headless: true
-          config: pageLoadTimeout=100000,video=false,watchForFileChanges=false
+          config: pageLoadTimeout=100000,video=false,watchForFileChanges=false,chromeWebSecurity=false
           install-command: yarn --frozen-lockfile --silent
           build: yarn frontend:build
           start: yarn sut

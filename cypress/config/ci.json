@@ -7,5 +7,6 @@
   "pageLoadTimeout": 100000,
   "defaultCommandTimeout": 6000,
   "trashAssetsBeforeRuns": true,
-  "watchForFileChanges": false
+  "watchForFileChanges": false,
+  "chromeWebSecurity": false
 }
