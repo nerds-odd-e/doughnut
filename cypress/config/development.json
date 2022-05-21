@@ -1,7 +1,6 @@
 {
   "baseUrl": "http://localhost:3000",
   "environment": "development",
-  "nodeVersion": "system",
   "screenshotOnRunFailure": true,
   "video": true,
   "pageLoadTimeout": 100000,
