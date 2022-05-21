@@ -8,7 +8,7 @@ import MakeMe from "../fixtures/makeMe";
 
 describe("LinkNoteDialog", () => {
   it("Search at the top level with no note", async () => {
-    render(LinkNoteDialog, { propsData: { note: null } });
+    render(LinkNoteDialog, { props: { note: null } });
     await screen.findByText("Searching");
     expect(
       await screen.findByLabelText("All My Notebooks And Subscriptions")
@@ -17,13 +17,13 @@ describe("LinkNoteDialog", () => {
 
   it("Search from a note", async () => {
     const note = MakeMe.aNote.please();
-    render(LinkNoteDialog, { propsData: { note } });
+    render(LinkNoteDialog, { props: { note } });
     await screen.findByText(`Link to`);
   });
 
   it("toggle search settings", async () => {
     const note = MakeMe.aNote.please();
-    render(LinkNoteDialog, { propsData: { note } });
+    render(LinkNoteDialog, { props: { note } });
     (await screen.findByLabelText("All My Circles")).click();
     expect(
       await screen.findByLabelText("All My Notebooks And Subscriptions")
