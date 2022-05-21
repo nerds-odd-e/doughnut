@@ -13,7 +13,10 @@ helper.resetWithApiMock(beforeEach, afterEach);
 
 describe("note overview", () => {
   const toNoteRealmsCache = (notes: Generated.NoteRealm[]) => {
-    return new NoteRealmCache({ notes });
+    return new NoteRealmCache({
+      notes,
+      notePosition: makeMe.aNotePosition.please(),
+    });
   };
 
   it("should render one note", async () => {

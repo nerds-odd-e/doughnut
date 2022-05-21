@@ -1,18 +1,22 @@
 /**
  * @jest-environment jsdom
  */
+import fetchMock from "jest-fetch-mock";
 import makeMe from "./fixtures/makeMe";
 import NoteRealmCache from "../src/store/NoteRealmCache";
 
 beforeEach(() => {
-  fetch.resetMocks();
+  fetchMock.resetMocks();
 });
 
 describe("storedApiCollection", () => {
   const note = makeMe.aNoteRealm.please();
 
   const toNoteRealmsCache = (notes: Generated.NoteRealm[]) => {
-    return new NoteRealmCache({ notes });
+    return new NoteRealmCache({
+      notes,
+      notePosition: makeMe.aNotePosition.please(),
+    });
   };
 
   describe("delete note", () => {
@@ -35,7 +39,8 @@ describe("storedApiCollection", () => {
       const childrenCount = cache.getNoteRealmById(note.id)?.children.length;
       cache.deleteNoteAndDescendents(child.id);
       expect(cache.getNoteRealmById(note.id)?.children).toHaveLength(
-        childrenCount - 1
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        childrenCount! - 1
       );
     });
   });
