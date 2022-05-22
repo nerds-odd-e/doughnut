@@ -6,7 +6,6 @@
           highlightNoteId,
           noteId,
           noteRealms,
-          expandChildren,
           offset,
         }"
         @selectNote="$emit('selectNote', $event)"
@@ -41,7 +40,6 @@ export default defineComponent({
       required: true,
     },
     highlightNoteId: Number,
-    expandChildren: { type: Boolean, required: true },
   },
   emits: ["selectNote", "noteRealmUpdated"],
   data() {
