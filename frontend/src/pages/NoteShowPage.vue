@@ -14,7 +14,7 @@
           @new-note-added="newNoteAdded($event)"
         />
       </div>
-      <div class="content" v-if="noteRealm && noteRealmCache">
+      <div class="content" v-if="noteRealm">
         <NoteCardsView
           v-bind="{ noteRealm, expandChildren: true, comments }"
           @note-realm-updated="noteRealmUpdated($event)"
@@ -30,7 +30,6 @@ import NoteToolbar from "../components/toolbars/NoteToolbar.vue";
 import NoteCardsView from "../components/notes/views/NoteCardsView.vue";
 import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
 import LoadingPage from "./commons/LoadingPage.vue";
-import NoteRealmCache from "../store/NoteRealmCache";
 
 export default defineComponent({
   setup() {
@@ -48,22 +47,17 @@ export default defineComponent({
     return {
       comments: [] as Generated.Comment[],
       notePosition: undefined as Generated.NotePositionViewedByUser | undefined,
-      noteRealmCache: undefined as NoteRealmCache | undefined,
+      noteRealm: undefined as Generated.NoteRealm | undefined,
       selectedNoteId: undefined as Doughnut.ID | undefined,
     };
   },
   computed: {
-    noteRealm() {
-      return this.noteRealmCache?.getNoteRealmById(this.noteId);
-    },
     user() {
       return this.piniaStore.currentUser;
     },
   },
   methods: {
-    onNoteDeleted(deletedNoteId: Doughnut.ID) {
-      this.noteRealmCache?.deleteNoteAndDescendents(deletedNoteId);
-    },
+    onNoteDeleted() {},
     newNoteAdded(newNote: Generated.NoteRealmWithPosition) {
       this.$router.push({
         name: "noteShow",
@@ -75,13 +69,13 @@ export default defineComponent({
         this.fetchData();
         return;
       }
-      this.noteRealmCache?.updateNoteRealm(updatedNoteRealm);
+      this.noteRealm = updatedNoteRealm;
     },
     async fetchData() {
       const noteRealmWithPosition =
         await this.storedApi.getNoteRealmWithPosition(this.noteId);
       this.notePosition = noteRealmWithPosition.notePosition;
-      this.noteRealmCache = new NoteRealmCache(noteRealmWithPosition);
+      this.noteRealm = noteRealmWithPosition.noteRealm;
       if (!this.user) return;
       this.comments = await this.api.comments.getNoteComments(this.noteId);
     },
