@@ -186,7 +186,7 @@ Cypress.Commands.add("jumpToNotePage", (noteTitle, forceLoadPage) => {
     const noteId = seededNoteIdMap[noteTitle]
     const url = `/notes/${seededNoteIdMap[noteTitle]}`
     if (forceLoadPage) cy.visit(url)
-    else cy.routerPush(url, "noteShow", { rawNoteId: noteId })
+    else cy.routerPush(url, "noteShow", { noteId: noteId })
   })
   cy.expectNoteTitle(noteTitle)
 })
