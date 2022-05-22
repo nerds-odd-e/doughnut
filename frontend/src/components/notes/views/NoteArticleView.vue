@@ -7,7 +7,7 @@
     <div class="note-list">
       <NoteArticleView
         v-for="child in children"
-        v-bind="{ noteId: child.id, noteRealms, expandChildren }"
+        v-bind="{ noteId: child.id, noteRealms }"
         :key="child.id"
         @note-realm-updated="$emit('noteRealmUpdated', $event)"
       />
@@ -27,7 +27,6 @@ export default defineComponent({
       type: Object as PropType<NoteRealmsReader>,
       required: true,
     },
-    expandChildren: { type: Boolean, required: true },
   },
   components: { NoteWithLinks },
   emits: ["noteRealmUpdated"],

@@ -137,13 +137,6 @@ export default defineComponent({
         const { id, parentId } = this.note;
         await this.storedApi.deleteNote(id);
         if (parentId) {
-          // if (this.viewType === "cards") {
-          //   this.$router.push({
-          //     name: "noteShow",
-          //     params: { noteId: parentId, viewType: this.viewType },
-          //   });
-          //   return;
-          // }
           this.$emit("noteDeleted", id);
         } else {
           this.$router.push({ name: "notebooks" });

@@ -57,7 +57,12 @@ export default defineComponent({
     },
   },
   methods: {
-    onNoteDeleted() {},
+    onNoteDeleted() {
+      this.$router.push({
+        name: "noteShow",
+        params: { noteId: this.noteRealm?.note.parentId },
+      });
+    },
     newNoteAdded(newNote: Generated.NoteRealmWithPosition) {
       this.$router.push({
         name: "noteShow",
