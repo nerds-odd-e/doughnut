@@ -3,6 +3,7 @@
  */
 import { screen } from "@testing-library/vue";
 import NoteShowPage from "@/pages/NoteShowPage.vue";
+import NoteShowMindmapPage from "@/pages/NoteShowMindmapPage.vue";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 
@@ -25,22 +26,18 @@ describe("all in note show page", () => {
       helper.apiMock
         .expectingGet(`/api/notes/${note.id}`)
         .andReturnOnce(stubResponse);
-      helper
-        .component(NoteShowPage)
-        .withProps({ noteId: `${note.id}` })
-        .render();
+      helper.component(NoteShowPage).withProps({ noteId: note.id }).render();
       helper.apiMock.verifyCall(`/api/notes/${note.id}`);
       await screen.findByText(note.note.title);
     });
 
     it(" should fetch API to be called when viewType is mindmap ", async () => {
-      const viewTypeValue = "mindmap";
       helper.apiMock
         .expectingGet(`/api/notes/${note.id}/overview`)
         .andReturnOnce(stubResponse);
       helper
-        .component(NoteShowPage)
-        .withProps({ noteId: `${note.id}`, viewType: viewTypeValue })
+        .component(NoteShowMindmapPage)
+        .withProps({ noteId: note.id })
         .render();
       helper.apiMock.verifyCall(`/api/notes/${note.id}/overview`);
       await screen.findByText(note.note.title);
