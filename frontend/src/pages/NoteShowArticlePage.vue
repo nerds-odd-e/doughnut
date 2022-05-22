@@ -2,7 +2,7 @@
   <NoteRealmAsync
     v-bind="{
       noteId,
-      viewType: sanitizedViewType,
+      viewType: 'article',
       expandChildren: true,
     }"
     :key="noteId"
@@ -11,20 +11,10 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import { sanitizeViewTypeName } from "../models/viewTypes";
 import NoteRealmAsync from "../components/notes/NoteRealmAsync.vue";
 
 export default defineComponent({
-  props: { rawNoteId: String, viewType: String },
+  props: { noteId: { type: Number, required: true } },
   components: { NoteRealmAsync },
-  computed: {
-    sanitizedViewType() {
-      return sanitizeViewTypeName(this.viewType);
-    },
-    noteId(): number {
-      if (!this.rawNoteId) return Number.NaN;
-      return Number.parseInt(this.rawNoteId);
-    },
-  },
 });
 </script>

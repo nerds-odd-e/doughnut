@@ -1,4 +1,4 @@
-import { RouteRecordRaw } from "vue-router";
+import { RouteLocation, RouteRecordRaw } from "vue-router";
 import HomePage from "@/pages/HomePage.vue";
 import BazaarPage from "@/pages/BazaarPage.vue";
 import CirclesPage from "@/pages/CirclesPage.vue";
@@ -44,17 +44,17 @@ const noteAndLinkRoutes = [
   },
 
   {
-    path: `notes/mindmap/:rawNoteId`,
-    name: "noteShow",
+    path: `notes/mindmap/:noteId`,
+    name: "noteShowMindmap",
     component: NoteShowMindmapPage,
-    props: true,
+    props: (route: RouteLocation) => ({ noteId: Number(route.params.noteId) }),
   },
 
   {
-    path: `notes/article/:rawNoteId`,
-    name: "noteShow",
+    path: `notes/article/:noteId`,
+    name: "noteShowArticle",
     component: NoteShowArticlePage,
-    props: true,
+    props: (route: RouteLocation) => ({ noteId: Number(route.params.noteId) }),
   },
 
   {
