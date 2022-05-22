@@ -38,6 +38,7 @@ export default defineComponent({
     SearchResults,
   },
   props: { parentId: { type: Number, required: true } },
+  emits: ["done"],
   data() {
     return {
       creationData: {
@@ -55,10 +56,7 @@ export default defineComponent({
       this.storedApi
         .createNote(this.parentId, this.creationData)
         .then((res) => {
-          this.$router.push({
-            name: "noteShow",
-            params: { rawNoteId: res.notePosition.noteId },
-          });
+          this.$emit("done", res);
         })
         .catch((res) => (this.formErrors = res));
     },

@@ -3,7 +3,11 @@
     <ViewTypeButtons v-bind="{ viewType, noteId: note.id }" />
 
     <div class="btn-group btn-group-sm">
-      <NoteNewButton :parent-id="note.id" button-title="Add Child Note">
+      <NoteNewButton
+        :parent-id="note.id"
+        button-title="Add Child Note"
+        @new-note-added="onNewNoteAdded($event)"
+      >
         <SvgAddChild />
       </NoteNewButton>
 
@@ -11,6 +15,7 @@
         :parent-id="note.parentId"
         button-title="Add Sibling Note"
         v-if="!!note.parentId"
+        @new-note-added="onNewNoteAdded($event)"
       >
         <SvgAddSibling />
       </NoteNewButton>
@@ -108,7 +113,7 @@ export default defineComponent({
     },
     featureToggle: Boolean,
   },
-  emits: ["noteDeleted", "noteRealmUpdated"],
+  emits: ["noteDeleted", "noteRealmUpdated", "newNoteAdded"],
   components: {
     SvgCog,
     SvgAddChild,
@@ -124,6 +129,9 @@ export default defineComponent({
     CommentCreateDialog,
   },
   methods: {
+    onNewNoteAdded(newNote: Generated.NoteRealmWithPosition) {
+      this.$emit("newNoteAdded", newNote);
+    },
     async deleteNote() {
       if (await this.popups.confirm(`Confirm to delete this note?`)) {
         const { id, parentId } = this.note;
@@ -132,7 +140,7 @@ export default defineComponent({
           if (this.viewType === "cards") {
             this.$router.push({
               name: "noteShow",
-              params: { rawNoteId: parentId, viewType: this.viewType },
+              params: { noteId: parentId, viewType: this.viewType },
             });
             return;
           }

@@ -20,9 +20,5 @@ describe("create a comment", () => {
       .render();
     (await screen.findByText("Submit")).click();
     await flushPromises();
-    expect(mockPush).toHaveBeenCalledWith({
-      name: "noteShow",
-      params: { noteId },
-    });
   });
 });

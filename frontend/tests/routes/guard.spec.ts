@@ -12,19 +12,19 @@ describe("router guards", () => {
   });
   it("when in repeat, go to nested noteShow", async () => {
     await guard(
-      { name: "noteShow", params: { rawNoteId: 3, viewType: "cards" } },
+      { name: "noteShow", params: { noteId: 3, viewType: "cards" } },
       { name: "repeat" },
       next
     );
     expect(next).toHaveBeenCalledWith({
       name: "repeat-noteShow",
-      params: { rawNoteId: 3, viewType: "cards" },
+      params: { noteId: 3, viewType: "cards" },
     });
   });
 
   it("when in repeat, and going to already nested route", async () => {
     await guard(
-      { name: "repeat-noteShow", params: { rawNoteId: 3 } },
+      { name: "repeat-noteShow", params: { noteId: 3 } },
       { name: "repeat" },
       next
     );
@@ -42,7 +42,7 @@ describe("router guards", () => {
 
   it("when in repeat-quiz, and going to a note route", async () => {
     await guard(
-      { name: "noteShow", params: { rawNoteId: 2 } },
+      { name: "noteShow", params: { noteId: 2 } },
       { name: "repeat-quiz" },
       next
     );

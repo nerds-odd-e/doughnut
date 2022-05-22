@@ -44,7 +44,7 @@ export default defineComponent({
     viewTypeChange(newType) {
       this.$router.push({
         name: "noteShow",
-        params: { rawNoteId: this.noteId, viewType: newType },
+        params: { noteId: this.noteId, viewType: newType },
       });
     },
   },

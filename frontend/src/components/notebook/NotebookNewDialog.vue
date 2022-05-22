@@ -12,9 +12,9 @@ import NoteFormTitleOnly from "../notes/NoteFormTitleOnly.vue";
 import LoadingPage from "../../pages/commons/LoadingPage.vue";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 
-export default ({
+export default {
   setup() {
-    return useStoredLoadingApi({hasFormError: true});
+    return useStoredLoadingApi({ hasFormError: true });
   },
   props: { circle: Object },
   components: {
@@ -27,18 +27,16 @@ export default ({
     };
   },
   methods: {
-
     processForm() {
-      this.storedApi.createNotebook(this.circle,
-        this.noteFormData,
-      )
+      this.storedApi
+        .createNotebook(this.circle, this.noteFormData)
         .then((res) =>
           this.$router.push({
             name: "noteShow",
-            params: { rawNoteId: res.noteId },
+            params: { noteId: res.noteId },
           })
-        )
+        );
     },
   },
-});
+};
 </script>

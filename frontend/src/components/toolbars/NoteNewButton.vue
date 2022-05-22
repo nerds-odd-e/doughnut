@@ -4,7 +4,13 @@
       <slot />
     </template>
     <template #dialog_body="{ doneHandler }">
-      <NoteNewDialog v-bind="{ parentId }" @done="doneHandler($event)" />
+      <NoteNewDialog
+        v-bind="{ parentId }"
+        @done="
+          doneHandler($event);
+          $emit('newNoteAdded', $event);
+        "
+      />
     </template>
   </PopupButton>
 </template>
@@ -19,6 +25,7 @@ export default defineComponent({
     parentId: { type: Number, required: true },
     buttonTitle: { type: String, required: true },
   },
+  emits: ["newNoteAdded"],
   components: { PopupButton, NoteNewDialog },
 });
 </script>

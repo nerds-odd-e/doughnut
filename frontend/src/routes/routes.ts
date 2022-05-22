@@ -37,10 +37,10 @@ const noteAndLinkRoutes = [
   { path: "notebooks", name: "notebooks", component: NotebooksPage },
 
   {
-    path: `notes/:rawNoteId/:viewType?`,
+    path: `notes/:noteId/:viewType?`,
     name: "noteShow",
     component: NoteShowPage,
-    props: true,
+    props: (route: RouteLocation) => ({ noteId: Number(route.params.noteId) }),
   },
 
   {
@@ -86,7 +86,7 @@ const routes = [
     props: true,
   },
   {
-    path: "/bazaar/notes/:rawNoteId",
+    path: "/bazaar/notes/:noteId",
     name: "bnoteShow",
     component: NoteShowPage,
     props: true,

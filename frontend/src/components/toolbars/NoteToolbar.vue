@@ -6,6 +6,7 @@
       :feature-toggle="featureToggle"
       @note-deleted="$emit('noteDeleted', $event)"
       @note-realm-updated="$emit('noteRealmUpdated', $event)"
+      @new-note-added="$emit('newNoteAdded', $event)"
     />
     <div class="btn-group btn-group-sm">
       <PopupButton title="link note">
@@ -51,7 +52,7 @@ export default defineComponent({
     },
     viewType: { type: String as PropType<ViewTypeName>, required: true },
   },
-  emits: ["noteDeleted", "noteRealmUpdated"],
+  emits: ["noteDeleted", "noteRealmUpdated", "newNoteAdded"],
   components: {
     NoteButtons,
     NoteUndoButton,

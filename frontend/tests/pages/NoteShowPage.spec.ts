@@ -27,7 +27,7 @@ describe("all in note show page", () => {
         .andReturnOnce(stubResponse);
       helper
         .component(NoteShowPage)
-        .withProps({ rawNoteId: `${note.id}` })
+        .withProps({ noteId: `${note.id}` })
         .render();
       helper.apiMock.verifyCall(`/api/notes/${note.id}`);
       await screen.findByText(note.note.title);
@@ -40,7 +40,7 @@ describe("all in note show page", () => {
         .andReturnOnce(stubResponse);
       helper
         .component(NoteShowPage)
-        .withProps({ rawNoteId: `${note.id}`, viewType: viewTypeValue })
+        .withProps({ noteId: `${note.id}`, viewType: viewTypeValue })
         .render();
       helper.apiMock.verifyCall(`/api/notes/${note.id}/overview`);
       await screen.findByText(note.note.title);

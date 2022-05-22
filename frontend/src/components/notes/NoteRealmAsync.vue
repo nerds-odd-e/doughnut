@@ -7,6 +7,7 @@
           v-bind="{ selectedNote, selectedNotePosition, viewType }"
           @note-deleted="onNoteDeleted"
           @note-realm-updated="noteRealmUpdated($event)"
+          @new-note-added="newNoteAdded($event)"
         />
       </div>
       <div class="content" v-if="noteRealm && noteRealmCache">
@@ -87,6 +88,12 @@ export default defineComponent({
   methods: {
     onNoteDeleted(deletedNoteId: Doughnut.ID) {
       this.noteRealmCache?.deleteNoteAndDescendents(deletedNoteId);
+    },
+    newNoteAdded(newNote: Generated.NoteRealmWithPosition) {
+      this.$router.push({
+        name: "noteShow",
+        params: { noteId: newNote.notePosition.noteId },
+      });
     },
     noteRealmUpdated(updatedNoteRealm?: Generated.NoteRealm) {
       if (!updatedNoteRealm) {

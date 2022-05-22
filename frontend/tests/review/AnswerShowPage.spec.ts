@@ -51,7 +51,7 @@ describe("repetition page", () => {
       const wrapper = helper
         .component(AnswerShowPage)
         .withProps({ answerId: 1 })
-        .currentRoute({ name: "repeat-noteShow", params: { rawNoteId: 123 } })
+        .currentRoute({ name: "repeat-noteShow", params: { noteId: 123 } })
         .mount();
       await flushPromises();
       expect(
