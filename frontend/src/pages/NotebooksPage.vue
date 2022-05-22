@@ -42,7 +42,7 @@ export default defineComponent({
   },
   methods: {
     fetchData() {
-      this.api.getNotebooks().then((res) => {
+      this.api.notebookMethods.getNotebooks().then((res) => {
         this.notebooks = res.notebooks;
         this.subscriptions = res.subscriptions;
       });

@@ -10,11 +10,11 @@
 <script>
 import NoteFormTitleOnly from "../notes/NoteFormTitleOnly.vue";
 import LoadingPage from "../../pages/commons/LoadingPage.vue";
-import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
+import useLoadingApi from "../../managedApi/useLoadingApi";
 
 export default {
   setup() {
-    return useStoredLoadingApi({ hasFormError: true });
+    return useLoadingApi({ hasFormError: true });
   },
   props: { circle: Object },
   components: {
@@ -28,7 +28,7 @@ export default {
   },
   methods: {
     processForm() {
-      this.storedApi
+      this.api.notebookMethods
         .createNotebook(this.circle, this.noteFormData)
         .then((res) =>
           this.$router.push({

@@ -44,27 +44,6 @@ const storedApiCollection = (
       },
     },
 
-    async getNotePosition(noteId: Doughnut.ID) {
-      return (await managedApi.restGet(
-        `notes/${noteId}/position`
-      )) as Generated.NotePositionViewedByUser;
-    },
-
-    async createNotebook(
-      circle: Generated.Circle | undefined,
-      data: Generated.Notebook
-    ) {
-      const url = (() => {
-        if (circle) {
-          return `circles/${circle.id}/notebooks`;
-        }
-        return `notebooks/create`;
-      })();
-
-      const res = await managedApi.restPostMultiplePartForm(url, data);
-      return res;
-    },
-
     async createNote(parentId: Doughnut.ID, data: Generated.NoteCreation) {
       return (await managedApi.restPostMultiplePartForm(
         `notes/${parentId}/create`,

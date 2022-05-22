@@ -102,10 +102,6 @@ const apiCollection = (managedApi: ManagedApi) => ({
     )) as Generated.Note[];
   },
 
-  updateNotebookSettings(notebookId: Doughnut.ID, data: Generated.Notebook) {
-    return managedApi.restPostMultiplePartForm(`notebooks/${notebookId}`, data);
-  },
-
   getBazaar() {
     return managedApi.restGet("bazaar");
   },
@@ -148,10 +144,34 @@ const apiCollection = (managedApi: ManagedApi) => ({
     );
   },
 
-  async getNotebooks() {
-    return (await managedApi.restGet(
-      `notebooks`
-    )) as Generated.NotebooksViewedByUser;
+  notebookMethods: {
+    async createNotebook(
+      circle: Generated.Circle | undefined,
+      data: Generated.Notebook
+    ) {
+      const url = (() => {
+        if (circle) {
+          return `circles/${circle.id}/notebooks`;
+        }
+        return `notebooks/create`;
+      })();
+
+      const res = await managedApi.restPostMultiplePartForm(url, data);
+      return res;
+    },
+
+    async getNotebooks() {
+      return (await managedApi.restGet(
+        `notebooks`
+      )) as Generated.NotebooksViewedByUser;
+    },
+
+    updateNotebookSettings(notebookId: Doughnut.ID, data: Generated.Notebook) {
+      return managedApi.restPostMultiplePartForm(
+        `notebooks/${notebookId}`,
+        data
+      );
+    },
   },
 
   comments: {
@@ -184,9 +204,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
         `notes/${noteId}/position`
       )) as Generated.NotePositionViewedByUser;
     },
-
   },
-
 });
 
 export default apiCollection;
