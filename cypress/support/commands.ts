@@ -170,6 +170,7 @@ Cypress.Commands.add("expectNoteCards", (expectedCards) => {
 
 Cypress.Commands.add("navigateToChild", (noteTitle) => {
   cy.findByText(noteTitle, { selector: ".card-title" }).click()
+  cy.expectNoteTitle(noteTitle)
 })
 
 Cypress.Commands.add("navigateToNotePage", (noteTitlesDividedBySlash) => {
