@@ -4,6 +4,8 @@ import BazaarPage from "@/pages/BazaarPage.vue";
 import CirclesPage from "@/pages/CirclesPage.vue";
 import NotebooksPage from "@/pages/NotebooksPage.vue";
 import NoteShowPage from "@/pages/NoteShowPage.vue";
+import NoteShowMindmapPage from "@/pages/NoteShowMindmapPage.vue";
+import NoteShowArticlePage from "@/pages/NoteShowArticlePage.vue";
 import ReviewHome from "@/pages/ReviewHome.vue";
 import RepeatPage from "@/pages/RepeatPage.vue";
 import DoingQuiz from "@/pages/DoingQuiz.vue";
@@ -33,12 +35,28 @@ const NestedRepeatPage = NestedPage(
 
 const noteAndLinkRoutes = [
   { path: "notebooks", name: "notebooks", component: NotebooksPage },
+
   {
     path: `notes/:rawNoteId/:viewType?`,
     name: "noteShow",
     component: NoteShowPage,
     props: true,
   },
+
+  {
+    path: `notes/mindmap/:rawNoteId`,
+    name: "noteShow",
+    component: NoteShowMindmapPage,
+    props: true,
+  },
+
+  {
+    path: `notes/article/:rawNoteId`,
+    name: "noteShow",
+    component: NoteShowArticlePage,
+    props: true,
+  },
+
   {
     path: `answers/:answerId`,
     name: "answer",
