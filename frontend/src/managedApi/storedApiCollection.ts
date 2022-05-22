@@ -18,59 +18,6 @@ const storedApiCollection = (
   }
 
   return {
-    reviewMethods: {
-      async getReviewPoint(reviewPointId: Doughnut.ID) {
-        return (await managedApi.restGet(
-          `review-points/${reviewPointId}`
-        )) as Generated.ReviewPoint;
-      },
-
-      async initialReview() {
-        return (await managedApi.restGet(
-          `reviews/initial`
-        )) as Generated.ReviewPointWithReviewSetting[];
-      },
-
-      async doInitialReview(data: Generated.InitialInfo) {
-        return (await managedApi.restPost(
-          `reviews`,
-          data
-        )) as Generated.ReviewPoint;
-      },
-
-      async processAnswer(data: Generated.Answer) {
-        const res = (await managedApi.restPost(
-          `reviews/answer`,
-          data
-        )) as Generated.AnswerResult;
-        return res;
-      },
-
-      async getAnswer(answerId: Doughnut.ID) {
-        return (await managedApi.restGet(
-          `reviews/answers/${answerId}`
-        )) as Generated.AnswerViewedByUser;
-      },
-
-      async selfEvaluate(
-        reviewPointId: Doughnut.ID,
-        data: Generated.SelfEvaluation
-      ) {
-        const res = (await managedApi.restPost(
-          `reviews/${reviewPointId}/self-evaluate`,
-          data
-        )) as Generated.ReviewPoint;
-        return res;
-      },
-
-      async getNextReviewItem() {
-        const res = (await managedApi.restGet(
-          `reviews/repeat`
-        )) as Generated.RepetitionForUser;
-        return res;
-      },
-    },
-
     testability: {
       getFeatureToggle() {
         return (

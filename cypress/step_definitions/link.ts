@@ -115,6 +115,7 @@ Then("I should be able to delete the link", () => {
 })
 
 Then("I should be able to delete the link to note {string}", (noteTitle) => {
+  cy.pageIsNotLoading()
   cy.findByText(noteTitle).siblings(".link-nob").click()
   cy.findByRole("button", { name: "Delete" }).click()
   cy.findByRole("button", { name: "Cancel" }).click()

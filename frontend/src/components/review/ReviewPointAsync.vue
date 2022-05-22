@@ -23,7 +23,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
+import useLoadingApi from "../../managedApi/useLoadingApi";
 import LoadingPage from "../../pages/commons/LoadingPage.vue";
 import ShowReviewPoint from "./ShowReviewPoint.vue";
 import SelfEvaluateButtons from "./SelfEvaluateButtons.vue";
@@ -32,7 +32,7 @@ import usePopups from "../commons/Popups/usePopup";
 
 export default defineComponent({
   setup() {
-    return { ...useStoredLoadingApi({ initalLoading: true }), ...usePopups() };
+    return { ...useLoadingApi({ initalLoading: true }), ...usePopups() };
   },
   props: {
     reviewPointId: { type: Number, required: true },
@@ -52,7 +52,7 @@ export default defineComponent({
   },
   methods: {
     selfEvaluate(data: Generated.SelfEvaluate) {
-      this.storedApi.reviewMethods
+      this.api.reviewMethods
         .selfEvaluate(this.reviewPointId, {
           selfEvaluation: data,
         })
@@ -76,7 +76,7 @@ export default defineComponent({
     },
 
     async fetchData() {
-      this.reviewPoint = await this.storedApi.reviewMethods.getReviewPoint(
+      this.reviewPoint = await this.api.reviewMethods.getReviewPoint(
         this.reviewPointId
       );
     },

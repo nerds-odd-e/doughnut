@@ -16,11 +16,11 @@
 import { defineComponent } from "vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import InitialReview from "../components/review/InitialReview.vue";
-import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
+import useLoadingApi from "../managedApi/useLoadingApi";
 
 export default defineComponent({
   setup() {
-    return { ...useStoredLoadingApi() };
+    return { ...useLoadingApi() };
   },
   props: { nested: Boolean },
   components: {
@@ -36,7 +36,7 @@ export default defineComponent({
   },
 
   mounted() {
-    this.storedApi.reviewMethods.initialReview().then((resp) => {
+    this.api.reviewMethods.initialReview().then((resp) => {
       if (resp.length === 0) {
         this.$router.push({ name: "reviews" });
         return;

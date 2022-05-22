@@ -44,12 +44,12 @@ import QuizQuestion from "../components/review/QuizQuestion.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import RepeatProgressBar from "../components/review/RepeatProgressBar.vue";
 import ReviewPointAsync from "../components/review/ReviewPointAsync.vue";
-import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
+import useLoadingApi from "../managedApi/useLoadingApi";
 import usePopups from "../components/commons/Popups/usePopup";
 
 export default defineComponent({
   setup() {
-    return { ...useStoredLoadingApi(), ...usePopups() };
+    return { ...useLoadingApi(), ...usePopups() };
   },
   name: "RepeatPage",
   props: { nested: Boolean },
@@ -99,7 +99,7 @@ export default defineComponent({
     },
 
     fetchData() {
-      this.storedApi.reviewMethods
+      this.api.reviewMethods
         .getNextReviewItem()
         .then(this.loadNew)
         .catch(() => {
@@ -115,7 +115,7 @@ export default defineComponent({
     },
 
     processAnswer(answerData: Generated.Answer) {
-      this.storedApi.reviewMethods
+      this.api.reviewMethods
         .processAnswer(answerData)
         .then((res: Generated.AnswerResult) => {
           this.previousResults.push(res);

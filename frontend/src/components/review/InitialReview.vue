@@ -45,13 +45,13 @@ import ReviewPointAbbr from "./ReviewPointAbbr.vue";
 import InitialReviewButtons from "./InitialReviewButtons.vue";
 import ProgressBar from "../commons/ProgressBar.vue";
 import ContainerPage from "../../pages/commons/ContainerPage.vue";
-import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
+import useLoadingApi from "../../managedApi/useLoadingApi";
 import usePopups from "../commons/Popups/usePopup";
 import SvgResume from "../svgs/SvgResume.vue";
 
 export default defineComponent({
   setup() {
-    return { ...useStoredLoadingApi(), ...usePopups() };
+    return { ...useLoadingApi(), ...usePopups() };
   },
   name: "InitialReviewPage",
   props: {
@@ -108,7 +108,7 @@ export default defineComponent({
           return;
       }
       this.reviewPoint.removedFromReview = skipReview;
-      this.storedApi.reviewMethods
+      this.api.reviewMethods
         .doInitialReview({
           thingId: this.reviewPoint.thing.id,
           skipReview,

@@ -27,7 +27,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import LoadingPage from "./commons/LoadingPage.vue";
-import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
+import useLoadingApi from "../managedApi/useLoadingApi";
 import AnswerResult from "../components/review/AnswerResult.vue";
 import QuizQuestion from "../components/review/QuizQuestion.vue";
 import RadioButtons from "../components/form/RadioButtons.vue";
@@ -35,7 +35,7 @@ import ReviewPointAsync from "../components/review/ReviewPointAsync.vue";
 
 export default defineComponent({
   setup() {
-    return useStoredLoadingApi({ initalLoading: true });
+    return useLoadingApi({ initalLoading: true });
   },
   name: "NoteShowPage",
   props: { answerId: { type: Number, required: true } },
@@ -59,9 +59,7 @@ export default defineComponent({
   },
   methods: {
     async fetchData() {
-      this.answerResult = await this.storedApi.reviewMethods.getAnswer(
-        this.answerId
-      );
+      this.answerResult = await this.api.reviewMethods.getAnswer(this.answerId);
     },
   },
   watch: {
