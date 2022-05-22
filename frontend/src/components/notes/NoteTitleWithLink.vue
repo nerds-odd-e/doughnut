@@ -26,7 +26,7 @@ export default {
       if (this.viewType) {
         return this.viewType;
       }
-      return viewTypeFromRouteName(this.$route?.routeName);
+      return viewTypeFromRouteName(this.$route?.name);
     },
   },
 };
