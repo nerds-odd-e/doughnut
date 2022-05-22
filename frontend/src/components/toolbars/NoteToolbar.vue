@@ -1,5 +1,5 @@
 <template>
-  <nav class="navbar toolbar">
+  <ToolbarFrame>
     <NoteButtons
       :note="selectedNote"
       :view-type="viewType"
@@ -25,7 +25,7 @@
       </PopupButton>
       <NoteUndoButton @note-realm-updated="$emit('noteRealmUpdated', $event)" />
     </div>
-  </nav>
+  </ToolbarFrame>
   <Breadcrumb v-bind="selectedNotePosition" />
 </template>
 
@@ -39,6 +39,7 @@ import PopupButton from "../commons/Popups/PopupButton.vue";
 import SvgSearch from "../svgs/SvgSearch.vue";
 import LinkNoteDialog from "../links/LinkNoteDialog.vue";
 import { ViewTypeName } from "../../models/viewTypes";
+import ToolbarFrame from "./ToolbarFrame.vue";
 
 export default defineComponent({
   setup() {
@@ -60,7 +61,8 @@ export default defineComponent({
     PopupButton,
     SvgSearch,
     LinkNoteDialog,
-  },
+    ToolbarFrame
+},
   computed: {
     featureToggle() {
       return this.piniaStore.featureToggle;
