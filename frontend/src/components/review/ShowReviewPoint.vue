@@ -3,12 +3,11 @@
     This review point has been removed from reviewing.
   </div>
   <div v-if="noteId">
-    <NoteRealmAsync
+    <NoteShowPage
       v-if="noteId"
       v-bind="{
         noteId,
         expandChildren: false,
-        viewType: 'cards',
       }"
       :key="noteId"
     />
@@ -26,8 +25,8 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import NoteRealmAsync from "../notes/NoteRealmAsync.vue";
 import LinkShow from "../links/LinkShow.vue";
+import NoteShowPage from "../../pages/NoteShowPage.vue";
 
 export default defineComponent({
   props: {
@@ -37,7 +36,7 @@ export default defineComponent({
     },
   },
   emits: ["noteRealmUpdated"],
-  components: { LinkShow, NoteRealmAsync },
+  components: { LinkShow, NoteShowPage },
   computed: {
     noteId() {
       return this.reviewPoint.thing.note?.id;

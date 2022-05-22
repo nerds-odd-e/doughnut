@@ -3,36 +3,36 @@
  */
 import { flushPromises } from "@vue/test-utils";
 import { screen } from "@testing-library/vue";
-import NoteRealmAsync from "@/components/notes/NoteRealmAsync.vue";
+import NoteShowPage from "@/pages/NoteShowPage.vue";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 
 helper.resetWithApiMock(beforeEach, afterEach);
 
 describe("comments", () => {
-  let note: Generated.NoteRealm;
+  let noteRealm: Generated.NoteRealm;
 
   beforeEach(() => {
     helper.store.featureToggle = true;
     helper.store.currentUser = makeMe.aUser().please();
-    note = makeMe.aNoteRealm.please();
-    const notesBulk: Generated.NotesBulk = {
+    noteRealm = makeMe.aNoteRealm.please();
+    const notesBulk: Generated.NoteRealmWithPosition = {
       notePosition: makeMe.aNotePosition.please(),
-      notes: [note],
+      noteRealm,
     };
     helper.apiMock
-      .expectingGet(`/api/notes/${note.id}`)
+      .expectingGet(`/api/notes/${noteRealm.id}`)
       .andReturnOnce(notesBulk);
   });
 
   it("fetch comments & render", async () => {
     const comment = { content: "my comment" };
     helper.apiMock
-      .expectingGet(`/api/notes/${note.id}/comments`)
+      .expectingGet(`/api/notes/${noteRealm.id}/comments`)
       .andReturnOnce([comment]);
     helper
-      .component(NoteRealmAsync)
-      .withProps({ noteId: note.id, expandChildren: false })
+      .component(NoteShowPage)
+      .withProps({ noteId: noteRealm.id, expandChildren: false })
       .render();
     await flushPromises();
     await screen.findByText("my comment");

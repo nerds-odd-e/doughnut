@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import { screen } from "@testing-library/vue";
-import NoteRealmAsync from "@/components/notes/NoteRealmAsync.vue";
+import NoteShowPage from "@/pages/NoteShowPage.vue";
 import flushPromises from "flush-promises";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
@@ -26,7 +26,7 @@ describe("comments", () => {
   describe("rendering a note realm", () => {
     it("should render note with one child", async () => {
       helper
-        .component(NoteRealmAsync)
+        .component(NoteShowPage)
         .withProps({ noteId: noteRealm.id, expandChildren: true })
         .render();
       await flushPromises();
@@ -46,7 +46,7 @@ describe("comments", () => {
         .expectingGet(`/api/notes/${noteRealm.id}/comments`)
         .andReturnOnce([comment]);
       helper
-        .component(NoteRealmAsync)
+        .component(NoteShowPage)
         .withProps({ noteId: noteRealm.id, expandChildren: false })
         .render();
       await flushPromises();
