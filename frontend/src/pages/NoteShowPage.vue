@@ -79,7 +79,7 @@ export default defineComponent({
     },
     async fetchData() {
       const noteRealmWithPosition =
-        await this.storedApi.getNoteRealmWithPosition(this.noteId);
+        await this.api.noteMethods.getNoteRealmWithPosition(this.noteId);
       this.notePosition = noteRealmWithPosition.notePosition;
       this.noteRealm = noteRealmWithPosition.noteRealm;
       if (!this.user) return;

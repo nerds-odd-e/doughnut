@@ -22,7 +22,7 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import NoteArticleView from "../components/notes/views/NoteArticleView.vue";
-import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
+import useLoadingApi from "../managedApi/useLoadingApi";
 import LoadingPage from "./commons/LoadingPage.vue";
 import NoteRealmCache from "../store/NoteRealmCache";
 import ToolbarFrame from "../components/toolbars/ToolbarFrame.vue";
@@ -31,7 +31,7 @@ import ViewTypeButtons from "../components/toolbars/ViewTypeButtons.vue";
 
 export default defineComponent({
   setup() {
-    return useStoredLoadingApi({ initalLoading: true });
+    return useLoadingApi({ initalLoading: true });
   },
   props: {
     noteId: { type: Number, required: true },
@@ -42,7 +42,7 @@ export default defineComponent({
     ToolbarFrame,
     Breadcrumb,
     ViewTypeButtons,
-},
+  },
   data() {
     return {
       noteRealmCache: undefined as NoteRealmCache | undefined,
@@ -63,9 +63,8 @@ export default defineComponent({
       this.noteRealmCache?.updateNoteRealm(updatedNoteRealm);
     },
     async fetchData() {
-      const noteWithDescendents = await this.storedApi.getNoteWithDescendents(
-        this.noteId
-      );
+      const noteWithDescendents =
+        await this.api.noteMethods.getNoteWithDescendents(this.noteId);
       this.notePosition = noteWithDescendents.notePosition;
       this.noteRealmCache = new NoteRealmCache(noteWithDescendents);
     },

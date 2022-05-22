@@ -26,13 +26,13 @@
 import { defineComponent } from "vue";
 import NoteToolbar from "../components/toolbars/NoteToolbar.vue";
 import NoteMindmapView from "../components/notes/views/NoteMindmapView.vue";
-import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
+import useLoadingApi from "../managedApi/useLoadingApi";
 import LoadingPage from "./commons/LoadingPage.vue";
 import NoteRealmCache from "../store/NoteRealmCache";
 
 export default defineComponent({
   setup() {
-    return useStoredLoadingApi({ initalLoading: true });
+    return useLoadingApi({ initalLoading: true });
   },
   props: {
     noteId: { type: Number, required: true },
@@ -78,7 +78,7 @@ export default defineComponent({
     },
     async fetchData() {
       this.noteRealmCache = new NoteRealmCache(
-        await this.storedApi.getNoteWithDescendents(this.noteId)
+        await this.api.noteMethods.getNoteWithDescendents(this.noteId)
       );
     },
   },

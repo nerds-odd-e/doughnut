@@ -6,13 +6,13 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
+import useLoadingApi from "../../managedApi/useLoadingApi";
 import LoadingPage from "../../pages/commons/LoadingPage.vue";
 import Breadcrumb from "./Breadcrumb.vue";
 
 export default defineComponent({
   setup() {
-    return { ...useStoredLoadingApi({ initalLoading: true }) };
+    return { ...useLoadingApi({ initalLoading: true }) };
   },
   props: {
     noteId: { type: Number, required: true },
@@ -28,7 +28,7 @@ export default defineComponent({
   },
   methods: {
     async fetchData() {
-      this.notePosition = await this.storedApi.getNotePosition(this.noteId);
+      this.notePosition = await this.api.noteMethods.getNotePosition(this.noteId);
     },
   },
 

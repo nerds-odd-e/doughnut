@@ -165,6 +165,28 @@ const apiCollection = (managedApi: ManagedApi) => ({
       )) as Generated.Comment[];
     },
   },
+
+  noteMethods: {
+    async getNoteWithDescendents(noteId: Doughnut.ID) {
+      return (await managedApi.restGet(
+        `notes/${noteId}/overview`
+      )) as Generated.NoteRealmWithAllDescendants;
+    },
+
+    async getNoteRealmWithPosition(noteId: Doughnut.ID) {
+      return (await managedApi.restGet(
+        `notes/${noteId}`
+      )) as Generated.NoteRealmWithPosition;
+    },
+
+    async getNotePosition(noteId: Doughnut.ID) {
+      return (await managedApi.restGet(
+        `notes/${noteId}/position`
+      )) as Generated.NotePositionViewedByUser;
+    },
+
+  },
+
 });
 
 export default apiCollection;
