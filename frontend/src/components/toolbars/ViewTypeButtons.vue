@@ -1,6 +1,6 @@
 <template>
   <RadioButtons
-    :modelValue="viewType"
+    :model-value="viewType"
     @update:modelValue="viewTypeChange"
     v-bind="{ options }"
   >
@@ -18,7 +18,7 @@ import RadioButtons from "../form/RadioButtons.vue";
 import SvgArticle from "../svgs/SvgArticle.vue";
 import SvgMindmap from "../svgs/SvgMindmap.vue";
 import SvgCards from "../svgs/SvgCards.vue";
-import { viewTypeNames } from "../../models/viewTypes";
+import { routeNameForViewType, viewTypeNames } from "../../models/viewTypes";
 
 export default defineComponent({
   props: {
@@ -43,8 +43,8 @@ export default defineComponent({
   methods: {
     viewTypeChange(newType) {
       this.$router.push({
-        name: "noteShow",
-        params: { noteId: this.noteId, viewType: newType },
+        name: routeNameForViewType(newType),
+        params: { noteId: this.noteId },
       });
     },
   },
