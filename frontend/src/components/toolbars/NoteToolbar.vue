@@ -5,6 +5,7 @@
       :view-type="viewType"
       :feature-toggle="featureToggle"
       @note-deleted="$emit('noteDeleted', $event)"
+      @note-realm-updated="$emit('noteRealmUpdated', $event)"
     />
     <div class="btn-group btn-group-sm">
       <PopupButton title="link note">

@@ -20,7 +20,13 @@
           <SvgEdit />
         </template>
         <template #dialog_body="{ doneHandler }">
-          <NoteEditDialog :note-id="note.id" @done="doneHandler($event)" />
+          <NoteEditDialog
+            :note-id="note.id"
+            @done="
+              doneHandler($event);
+              $emit('noteRealmUpdated');
+            "
+          />
         </template>
       </PopupButton>
 
@@ -53,8 +59,15 @@
 
         <PopupButton title="Add comment">
           <template #button_face> Add comment </template>
-          <template #dialog_body>
-            <CommentCreateDialog :note-id="note.id" v-if="featureToggle" />
+          <template #dialog_body="{ doneHandler }">
+            <CommentCreateDialog
+              :note-id="note.id"
+              v-if="featureToggle"
+              @done="
+                doneHandler($event);
+                $emit('noteRealmUpdated');
+              "
+            />
           </template>
         </PopupButton>
       </div>
@@ -95,7 +108,7 @@ export default defineComponent({
     },
     featureToggle: Boolean,
   },
-  emits: ["noteDeleted"],
+  emits: ["noteDeleted", "noteRealmUpdated"],
   components: {
     SvgCog,
     SvgAddChild,

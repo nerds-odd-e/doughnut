@@ -29,7 +29,7 @@ export default defineComponent({
       await this.api.comments.createNoteComment(this.noteId, {
         description: this.content,
       });
-      this.$router.push({ name: "noteShow", params: { noteId: this.noteId } });
+      this.$emit("done");
     },
   },
 });
