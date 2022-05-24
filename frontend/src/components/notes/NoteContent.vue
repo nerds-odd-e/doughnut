@@ -2,15 +2,24 @@
   <h5 v-if="titleAsLink" class="header note-card-title">
     <NoteTitleWithLink :note="note" class="card-title" />
   </h5>
-  <EditableText
-    v-else
-    role="title"
-    class="note-title"
-    :multiple-line="false"
-    scope-name="note"
-    v-model="textContent.title"
-    @blur="onBlurTextField"
-  />
+  <div v-else style="display: flex">
+    <EditableText
+      role="title"
+      class="note-title"
+      :multiple-line="false"
+      scope-name="note"
+      v-model="textContent.title"
+      @blur="onBlurTextField"
+    />
+    <a
+      v-if="note.wikidataId" 
+      role="wikidataUrl"
+      :href="wikiDataUrl"
+      target="_blank"
+      style="text-align: right; margin-left: 10px"
+      ><SvgLink
+    /></a>
+  </div>
   <div class="note-content">
     <EditableText
       :multiple-line="true"
@@ -62,6 +71,7 @@ import ShowPicture from "./ShowPicture.vue";
 import SvgDescriptionIndicator from "../svgs/SvgDescriptionIndicator.vue";
 import SvgPictureIndicator from "../svgs/SvgPictureIndicator.vue";
 import SvgUrlIndicator from "../svgs/SvgUrlIndicator.vue";
+import SvgLink from "../svgs/SvgLink.vue";
 import EditableText from "../form/EditableText.vue";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 
@@ -83,10 +93,15 @@ export default defineComponent({
     SvgUrlIndicator,
     EditableText,
     NoteTitleWithLink,
+    SvgLink,
   },
   computed: {
     textContent() {
       return { ...this.note.textContent };
+    },
+
+    wikiDataUrl() {
+      return `https://www.wikidata.org/wiki/${this.note.wikidataId}`;
     },
   },
   methods: {

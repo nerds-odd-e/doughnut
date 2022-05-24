@@ -86,13 +86,12 @@ describe("undo editing", () => {
 });
 
 describe("Link note to wikidata", () => {
-  xit("should display icon besides title when note is linked", async () => {
+  it("should display icon besides title when note is linked", async () => {
     helper.store.$reset();
     const noteRealm = makeMe.aNoteRealm
       .title("Dummy Title")
       .wikidataId("DummyId")
       .please();
-    helper.apiMock.expectingPatch(`/api/text_content/${noteRealm.id}`);
 
     const wrapper = helper
       .component(NoteWithLinks)
