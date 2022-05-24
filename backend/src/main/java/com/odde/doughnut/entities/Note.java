@@ -37,7 +37,7 @@ public class Note extends Thingy {
   @JsonIgnore
   private Thing thing;
 
-  @Transient
+  @Column(name = "wikidata_id")
   @Getter
   @Setter
   private String wikidataId;
