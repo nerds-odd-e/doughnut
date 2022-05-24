@@ -86,21 +86,17 @@ describe("undo editing", () => {
 });
 
 describe("Link note to wikidata", () => {
-    xit("should display icon besides title when note is linked", async () => {
-      helper.store.$reset();
-      const noteRealm = makeMe.aNoteRealm.title("Dummy Title").wikidataId("DummyId").please();
-      helper.apiMock.expectingPatch(`/api/text_content/${noteRealm.id}`);
-  
-      const updatedTitle = "updated";
-      const wrapper = helper
-        .component(NoteWithLinks)
-        .withProps({ note: noteRealm.note, links: noteRealm.links })
-        .mount();
-  
-      await wrapper.find('[role="title"]').trigger("click");
-      await wrapper.find('[role="title"] input').setValue(updatedTitle);
-      await wrapper.find('[role="title"] input').trigger("blur");
-  
-      expect(helper.store.peekUndo()).toMatchObject({ type: "editing" });
-    });
+  xit("should display icon besides title when note is linked", async () => {
+    helper.store.$reset();
+    const noteRealm = makeMe.aNoteRealm.title("Dummy Title").wikidataId("DummyId").please();
+    helper.apiMock.expectingPatch(`/api/text_content/${noteRealm.id}`);
+
+    const wrapper = helper
+      .component(NoteWithLinks)
+      .withProps({ note: noteRealm.note, links: noteRealm.links })
+      .mount();
+
+    await wrapper.find('[role="wikidataUrl"]').isVisible();
+    expect(await wrapper.find('[role="wikidataUrl"]').attributes('href')).toMatch("")
+  });
 });
