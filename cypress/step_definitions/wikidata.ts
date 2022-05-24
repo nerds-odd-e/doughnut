@@ -20,3 +20,12 @@ Then("I can get a payload {string}", (expectedPayload) => {
     expect(payload).to.equal(expectedPayload)
   })
 })
+
+When("I associate {string} with wikidata id {string}", (noteTitle, wikiDataId) => {
+  // UI steps
+})
+
+Then("I should see association confirmation message {string}", (message) => {
+  cy.log(message)
+})
+
