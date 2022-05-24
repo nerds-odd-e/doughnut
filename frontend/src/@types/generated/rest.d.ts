@@ -145,6 +145,7 @@ declare namespace Generated {
     }
 
     interface WikidataAssociationCreation {
+        wikidataId: string;
     }
 
     interface User {

@@ -63,7 +63,8 @@ class RestNoteController {
   @PostMapping(value = "/{note}/updateWikidataId")
   @Transactional
   public void updateWikidataId(
-    @PathVariable(name = "note") Note note, @RequestBody WikidataAssociationCreation wikidataAssociationCreation) {
+      @PathVariable(name = "note") Note note,
+      @RequestBody WikidataAssociationCreation wikidataAssociationCreation) {
     note.setWikidataId(wikidataAssociationCreation.wikidataId);
     modelFactoryService.noteRepository.save(note);
   }
