@@ -88,7 +88,10 @@ describe("undo editing", () => {
 describe("Link note to wikidata", () => {
   xit("should display icon besides title when note is linked", async () => {
     helper.store.$reset();
-    const noteRealm = makeMe.aNoteRealm.title("Dummy Title").wikidataId("DummyId").please();
+    const noteRealm = makeMe.aNoteRealm
+      .title("Dummy Title")
+      .wikidataId("DummyId")
+      .please();
     helper.apiMock.expectingPatch(`/api/text_content/${noteRealm.id}`);
 
     const wrapper = helper
@@ -97,6 +100,8 @@ describe("Link note to wikidata", () => {
       .mount();
 
     await wrapper.find('[role="wikidataUrl"]').isVisible();
-    expect(await wrapper.find('[role="wikidataUrl"]').attributes('href')).toMatch("https://www.wikidata.org/wiki/DummyId")
+    expect(
+      await wrapper.find('[role="wikidataUrl"]').attributes("href")
+    ).toMatch("https://www.wikidata.org/wiki/DummyId");
   });
 });
