@@ -53,6 +53,11 @@ declare namespace Generated {
         textContent: TextContent;
     }
 
+    interface WikiAssociation {
+        noteId: number;
+        wikiDataId: string;
+    }
+
     interface NotePositionViewedByUser {
         noteId: number;
         notebook: NotebookViewedByUser;

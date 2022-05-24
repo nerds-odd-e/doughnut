@@ -23,6 +23,20 @@
           />
         </template>
       </PopupButton>
+      <PopupButton title="link wiki data">
+        <template #button_face>
+          <SvgWikiData />
+        </template>
+        <template #dialog_body="{ doneHandler }">
+          <LinkWikiDialog
+            :note="selectedNote"
+            @done="
+              doneHandler($event);
+              $emit('noteRealmUpdated', $event);
+            "
+          />
+        </template>
+      </PopupButton>
       <NoteUndoButton @note-realm-updated="$emit('noteRealmUpdated', $event)" />
     </div>
   </ToolbarFrame>
@@ -40,6 +54,8 @@ import SvgSearch from "../svgs/SvgSearch.vue";
 import LinkNoteDialog from "../links/LinkNoteDialog.vue";
 import { ViewTypeName } from "../../models/viewTypes";
 import ToolbarFrame from "./ToolbarFrame.vue";
+import SvgWikiData from "../svgs/SvgWikiData.vue";
+import LinkWikiDialog from "../links/LinkWikiDialog.vue";
 
 export default defineComponent({
   setup() {
@@ -61,8 +77,10 @@ export default defineComponent({
     PopupButton,
     SvgSearch,
     LinkNoteDialog,
-    ToolbarFrame
-},
+    ToolbarFrame,
+    SvgWikiData,
+    LinkWikiDialog
+  },
   computed: {
     featureToggle() {
       return this.piniaStore.featureToggle;
