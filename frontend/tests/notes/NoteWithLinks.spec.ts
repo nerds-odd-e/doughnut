@@ -97,6 +97,6 @@ describe("Link note to wikidata", () => {
       .mount();
 
     await wrapper.find('[role="wikidataUrl"]').isVisible();
-    expect(await wrapper.find('[role="wikidataUrl"]').attributes('href')).toMatch("")
+    expect(await wrapper.find('[role="wikidataUrl"]').attributes('href')).toMatch("https://www.wikidata.org/wiki/DummyId")
   });
 });

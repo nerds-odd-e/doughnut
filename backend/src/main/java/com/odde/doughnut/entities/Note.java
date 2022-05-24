@@ -37,6 +37,11 @@ public class Note extends Thingy {
   @JsonIgnore
   private Thing thing;
 
+  @Transient
+  @Getter
+  @Setter
+  private String wikidataId;
+
   @OneToOne(cascade = CascadeType.ALL)
   @JoinColumn(name = "text_content_id", referencedColumnName = "id")
   @Getter
