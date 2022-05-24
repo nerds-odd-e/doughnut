@@ -17,6 +17,7 @@
       :href="wikiDataUrl"
       target="_blank"
       style="text-align: right; margin-left: 10px"
+      title="Wikidata"
       ><SvgLink
     /></a>
   </div>

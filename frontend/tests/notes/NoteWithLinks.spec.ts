@@ -98,9 +98,11 @@ describe("Link note to wikidata", () => {
       .withProps({ note: noteRealm.note, links: noteRealm.links })
       .mount();
 
-    await wrapper.find('[role="wikidataUrl"]').isVisible();
-    expect(
-      await wrapper.find('[role="wikidataUrl"]').attributes("href")
-    ).toMatch("https://www.wikidata.org/wiki/DummyId");
+    const element = await wrapper.find('[role="wikidataUrl"]');
+    element.isVisible();
+    expect(element.attributes("title")).toMatch("Wikidata");
+    expect(element.attributes("href")).toMatch(
+      "https://www.wikidata.org/wiki/DummyId"
+    );
   });
 });
