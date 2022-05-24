@@ -1,3 +1,8 @@
 package com.odde.doughnut.entities.json;
 
-public class WikidataAssociationCreation {}
+import lombok.Getter;
+import lombok.Setter;
+
+public class WikidataAssociationCreation {
+  public String wikidataId;
+}

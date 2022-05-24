@@ -282,10 +282,13 @@ class RestNoteControllerTests {
   @Nested
   class UpdateWikidataId {
     @Test
-    void shouldNotBeAbleToAddCommentToNoteTheUserCannotSee() {
+    void shouldUpdateWikidataId() {
       Note note = makeMe.aNote().creatorAndOwner(userModel).please();
-      WikidataAssociationCreation wikidataAssociationCreation = null;
+      WikidataAssociationCreation wikidataAssociationCreation = new WikidataAssociationCreation();
+      wikidataAssociationCreation.wikidataId = "Q123";
       controller.updateWikidataId(note, wikidataAssociationCreation);
+      Note sameNote = makeMe.modelFactoryService.noteRepository.findById(note.getId()).get();
+      assertThat(sameNote.getWikidataId(), equalTo("Q123"));
     }
   }
 }
