@@ -60,6 +60,9 @@ class RestNoteController {
     return modelFactoryService.commentRepository.findAllByNote(note);
   }
 
+  public void updateWikidataId(
+      Note note, WikidataAssociationCreation wikidataAssociationCreation) {}
+
   static class NoteStatistics {
     @Getter @Setter private ReviewPoint reviewPoint;
     @Getter @Setter private NoteRealm note;

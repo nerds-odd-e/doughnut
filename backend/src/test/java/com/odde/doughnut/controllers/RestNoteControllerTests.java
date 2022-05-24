@@ -9,11 +9,7 @@ import com.odde.doughnut.entities.Comment;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteAccessories;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.json.CommentCreation;
-import com.odde.doughnut.entities.json.NoteCreation;
-import com.odde.doughnut.entities.json.NoteRealm;
-import com.odde.doughnut.entities.json.NoteRealmWithAllDescendants;
-import com.odde.doughnut.entities.json.NoteRealmWithPosition;
+import com.odde.doughnut.entities.json.*;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.TimestampOperations;
@@ -281,5 +277,15 @@ class RestNoteControllerTests {
     User anotherUser = makeMe.aUser().please();
     Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
     assertThrows(NoAccessRightException.class, () -> controller.getPosition(note));
+  }
+
+  @Nested
+  class UpdateWikidataId {
+    @Test
+    void shouldNotBeAbleToAddCommentToNoteTheUserCannotSee() {
+      Note note = makeMe.aNote().creatorAndOwner(userModel).please();
+      WikidataAssociationCreation wikidataAssociationCreation = null;
+      controller.updateWikidataId(note, wikidataAssociationCreation);
+    }
   }
 }
