@@ -25,6 +25,12 @@ class NoteRealmBuilder extends Builder<Generated.NoteRealm> {
     return this;
   }
 
+  wikidataId(value: string): NoteRealmBuilder {
+    this.noteBuilder.wikidataId(value);
+    return this;
+  }
+
+
   description(value: string): NoteRealmBuilder {
     this.noteBuilder.description(value);
     return this;

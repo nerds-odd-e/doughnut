@@ -201,6 +201,7 @@ declare namespace Generated {
 
     interface Note extends Thingy {
         title: string;
+        wikidataId: string;
         shortDescription: string;
         parentId?: number;
         noteAccessories: NoteAccessories;
