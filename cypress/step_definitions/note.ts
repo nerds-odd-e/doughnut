@@ -333,6 +333,6 @@ And("I associate the note to wikidata by searching with {string}", () => {
 })
 
 When("I confirm the association with different title {string}", (wikidataTitle) => {
-  cy.findAllByText(wikidataTitle).should('exist')
-  cy.findByRole("button", { name: "Confirm"}).click()
+  cy.findAllByText(wikidataTitle).should("exist")
+  cy.findByRole("button", { name: "Confirm" }).click()
 })
