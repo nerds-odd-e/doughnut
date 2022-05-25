@@ -19,7 +19,7 @@
       target="_blank"
       style="text-align: right; margin-left: 10px"
       title="Wikidata"
-      ><SvgLink
+      ><SvgAssociation
     /></a>
   </div>
   <div class="note-content">
@@ -73,7 +73,7 @@ import ShowPicture from "./ShowPicture.vue";
 import SvgDescriptionIndicator from "../svgs/SvgDescriptionIndicator.vue";
 import SvgPictureIndicator from "../svgs/SvgPictureIndicator.vue";
 import SvgUrlIndicator from "../svgs/SvgUrlIndicator.vue";
-import SvgLink from "../svgs/SvgLink.vue";
+import SvgAssociation from "../svgs/SvgAssociation.vue";
 import EditableText from "../form/EditableText.vue";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 
@@ -95,7 +95,7 @@ export default defineComponent({
     SvgUrlIndicator,
     EditableText,
     NoteTitleWithLink,
-    SvgLink,
+    SvgAssociation,
   },
   computed: {
     textContent() {

@@ -1,11 +1,11 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.json.WikiDataDto;
-import com.odde.doughnut.models.LanguageValueModel;
-import com.odde.doughnut.models.WikiDataInfo;
-import com.odde.doughnut.models.WikiDataModel;
+import com.odde.doughnut.entities.json.WikiDataSearchResponseModel;
+import com.odde.doughnut.models.*;
 import com.odde.doughnut.services.WikiDataService;
 import java.io.IOException;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,5 +36,10 @@ public class RestWikidataController {
         returnDto.WikipediaEnglishLink = myInfo.sitelinks.get("enwiki").url;
     }
     return returnDto;
+  }
+
+  public List<WikiDataSearchResponseModel> searchWikiData(String searchTerm)
+      throws IOException, InterruptedException {
+    return wikiDataService.searchWikiData(searchTerm);
   }
 }

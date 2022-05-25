@@ -150,6 +150,11 @@ declare namespace Generated {
         WikipediaEnglishLink: string;
     }
 
+    interface WikiDataSearchResponseModel {
+        id: string;
+        label: string;
+    }
+
     interface WikidataAssociationCreation {
         wikidataId: string;
     }

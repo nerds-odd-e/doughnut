@@ -5,12 +5,17 @@ import static org.hamcrest.Matchers.*;
 import static org.mockito.ArgumentMatchers.any;
 
 import com.odde.doughnut.entities.json.WikiDataDto;
+import com.odde.doughnut.entities.json.WikiDataSearchResponseModel;
+import com.odde.doughnut.models.*;
+import com.odde.doughnut.services.HttpClientAdapter;
 import com.odde.doughnut.models.LanguageValueModel;
 import com.odde.doughnut.models.WikiDataInfo;
 import com.odde.doughnut.models.WikiDataModel;
 import com.odde.doughnut.models.WikiSiteLinkModel;
 import com.odde.doughnut.services.WikiDataService;
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,9 +28,12 @@ class WikiDataControllerTests {
 
   RestWikidataController controller;
   @Mock WikiDataService wikiDataService;
+  @Mock HttpClientAdapter httpClientAdapter;
+  private String searchId = "Q1234";
+  private String noteTitle = "TDD";
+  private String language = "en";
   private final String wikiDataIdWithNoWikipediaLink = "Q1234";
   private final String wikiDataIdWithWikipediaLink = "Q200";
-  private final String noteTitle = "TDD";
   private final String englishLanguage = "en";
 
   private final String englishWikipediaKey = "enwiki";
@@ -117,5 +125,54 @@ class WikiDataControllerTests {
       throws IOException, InterruptedException {
     WikiDataDto resultObj = controller.fetchWikiDataDto(wikiDataIdWithNoWikipediaLink);
     assertThat(StringUtils.isBlank(resultObj.WikipediaEnglishLink), is(true));
+  }
+
+  @Test
+  void GivenSearchName_ShouldBeAbleToGetSearchResult() throws IOException, InterruptedException {
+    WikiDataService service = new WikiDataService();
+    service.httpClientAdapter = httpClientAdapter;
+    Mockito.when(httpClientAdapter.getResponseString(any()))
+        .thenReturn(
+            "{\"searchinfo\": {\"search\": \"ktv\"},\"search\": [{\"id\": \"Q406955\",\"label\": \"KTV\"}, {\"id\": \"Q1790661\",\"label\": \"Kr\\u00f6peliner-Tor-Vorstadt\"}],\"search-continue\": 7,\"success\": 1}");
+
+    controller = new RestWikidataController(service);
+
+    List<WikiDataSearchResponseModel> expected =
+        Arrays.asList(
+            new WikiDataSearchResponseModel() {
+              {
+                id = "Q406955";
+                label = "KTV";
+              }
+            },
+            new WikiDataSearchResponseModel() {
+              {
+                id = "Q1790661";
+                label = "Kröpeliner-Tor-Vorstadt";
+              }
+            });
+
+    List<WikiDataSearchResponseModel> resultObj = controller.searchWikiData("tdd");
+
+    assertThat(resultObj.get(0).id, equalTo(expected.get(0).id));
+    assertThat(resultObj.get(0).label, equalTo(expected.get(0).label));
+    assertThat(resultObj.get(1).id, equalTo(expected.get(1).id));
+    assertThat(resultObj.get(1).label, equalTo(expected.get(1).label));
+  }
+
+  @Test
+  void GivenSearchNameMoreThan10Results_ShouldOnlyGetTop10SearchResult()
+      throws IOException, InterruptedException {
+    WikiDataService service = new WikiDataService();
+    service.httpClientAdapter = httpClientAdapter;
+    Mockito.when(httpClientAdapter.getResponseString(any()))
+        .thenReturn(
+            "{\"searchinfo\": {\"search\": \"ktv\"},\"search\": [{\"id\": \"1\",\"label\": \"1\"}, {\"id\": \"1\",\"label\": \"1\"},{\"id\": \"1\",\"label\": \"1\"},{\"id\": \"1\",\"label\": \"1\"},{\"id\": \"1\",\"label\": \"1\"},{\"id\": \"1\",\"label\": \"1\"},{\"id\": \"1\",\"label\": \"1\"},{\"id\": \"1\",\"label\": \"1\"},{\"id\": \"1\",\"label\": \"1\"},{\"id\": \"1\",\"label\": \"1\"},{\"id\": \"1\",\"label\": \"1\"},{\"id\": \"1\",\"label\": \"1\"}],\"search-continue\": 7,\"success\": 1}");
+
+    controller = new RestWikidataController(service);
+
+    List<WikiDataSearchResponseModel> resultObj = controller.searchWikiData("tdd");
+
+    assertThat(resultObj.size(), equalTo(10));
   }
 }
