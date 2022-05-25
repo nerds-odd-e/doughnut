@@ -317,3 +317,11 @@ Then("there should be no more undo to do", () => {
 Then("I type {string} in the title", (content) => {
   cy.focused().clear().type(content)
 })
+
+When("I associate the note {string} with wikidata id {string}", (title, wikiID)=> {
+
+})
+
+Then("I should see the wikidata url {string}", (url)=> {
+
+})
