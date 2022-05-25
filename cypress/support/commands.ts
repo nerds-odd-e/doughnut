@@ -484,7 +484,7 @@ Cypress.Commands.add(
 Cypress.Commands.add(
   "expectText",
   (text) => cy.findByText(text), //.should("be.visible")
-  // Add should be visible back when the link view page is remade.
+  // Add should be visible back when the link v.iew page is remade.
 )
 
 Cypress.Commands.add("clickNoteToolbarButton", (btnTextOrTitle) => {
@@ -509,4 +509,7 @@ Cypress.Commands.add("noteByTitle", (noteTitle) => {
 
 Cypress.Commands.add("clickAssociateWikiDataButton", (title,wikiID) => {
   cy.get(".toolbar").findByRole("button", { name: 'associate wikidata' }).click()
+  cy.get("#wikiID-wikiID").click()
+  cy.replaceFocusedText(wikiID)
+  cy.findByRole("button", { name: 'Save' }).click()
 })
