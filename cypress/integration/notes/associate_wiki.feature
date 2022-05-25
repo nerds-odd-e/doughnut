@@ -6,6 +6,7 @@ Feature: associate wiki to note
     And there are some notes for the current user
       | title | description             |
       | TDD   | Test driven development |
-    When I associate the note "TDD" with wikidata id "Q12345"
-    Then I should see the wikidata url ""
+    When I visit note "TDD"
+    And I associate the note "TDD" with wikidata id "Q12345"
+    Then I should see the wikidata icon
 

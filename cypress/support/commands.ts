@@ -506,3 +506,7 @@ Cypress.Commands.add("noteByTitle", (noteTitle) => {
     .invoke("attr", "href")
     .then(($attr) => /notes\/(\d+)/g.exec($attr)[1])
 })
+
+Cypress.Commands.add("clickAssociateWikiDataButton", (title,wikiID) => {
+  cy.get(".toolbar").findByRole("button", { name: 'associate wikidata' }).click()
+})

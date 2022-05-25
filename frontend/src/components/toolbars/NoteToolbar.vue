@@ -23,7 +23,7 @@
           />
         </template>
       </PopupButton>
-      <PopupButton title="link wiki data">
+      <PopupButton title="associate wikidata">
         <template #button_face>
           <SvgWikiData />
         </template>

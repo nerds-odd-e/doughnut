@@ -319,9 +319,10 @@ Then("I type {string} in the title", (content) => {
 })
 
 When("I associate the note {string} with wikidata id {string}", (title, wikiID)=> {
-return ;
+  cy.clickAssociateWikiDataButton(title, wikiID)
 })
 
-Then("I should see the wikidata url {string}", (url)=> {
-return;
+
+Then("I should see the wikidata icon", ()=> {
+
 })
