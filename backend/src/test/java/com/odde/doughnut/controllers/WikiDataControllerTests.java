@@ -1,5 +1,9 @@
 package com.odde.doughnut.controllers;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.*;
+import static org.mockito.ArgumentMatchers.any;
+
 import com.odde.doughnut.entities.json.WikiDataDto;
 import com.odde.doughnut.entities.json.WikiDataSearchResponseModel;
 import com.odde.doughnut.models.LanguageValueModel;
@@ -8,21 +12,16 @@ import com.odde.doughnut.models.WikiDataModel;
 import com.odde.doughnut.models.WikiSiteLinkModel;
 import com.odde.doughnut.services.HttpClientAdapter;
 import com.odde.doughnut.services.WikiDataService;
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.platform.commons.util.StringUtils;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
-import static org.mockito.ArgumentMatchers.any;
 
 class WikiDataControllerTests {
 
