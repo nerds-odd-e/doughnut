@@ -26,7 +26,7 @@ export default defineComponent({
       associationData: {
         noteId: 0,
         wikiDataId: "",
-      } as Generated.WikiAssociation,
+      }
     };
   },
   computed: {
