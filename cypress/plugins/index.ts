@@ -19,6 +19,11 @@ import NodeModulesPolyfills from "@esbuild-plugins/node-modules-polyfill"
 import fs from "fs-extra"
 import path from "path"
 
+function getConfigurationByFile(file) {
+  const pathToConfigFile = path.resolve("cypress/config", `${file}.json`)
+  return fs.readJson(pathToConfigFile)
+}
+
 export default (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions): void => {
   on(
     "file:preprocessor",
@@ -30,9 +35,4 @@ export default (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions): 
   const file = config.env.configFile || "ci"
   console.table(`<<<<<< CYPRESS RUN ENV: ${file} >>>>>>`)
   return getConfigurationByFile(file)
-}
-
-function getConfigurationByFile(file) {
-  const pathToConfigFile = path.resolve("cypress/config", `${file}.json`)
-  return fs.readJson(pathToConfigFile)
 }

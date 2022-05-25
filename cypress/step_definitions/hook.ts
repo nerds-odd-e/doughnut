@@ -14,7 +14,7 @@ After(() => {
   // make sure nothing is loading on the page.
   // So to avoid async request from this test
   // messing up the next test.
-  cy.pageIsNotLoading();
+  cy.pageIsNotLoading()
 })
 
 Before({ tags: "@stopTime" }, () => {
