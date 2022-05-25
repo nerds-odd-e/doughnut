@@ -324,5 +324,5 @@ When("I associate the note {string} with wikidata id {string}", (title, wikiID)=
 
 
 Then("I should see the wikidata icon", ()=> {
-
+  return
 })
