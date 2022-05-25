@@ -147,6 +147,7 @@ declare namespace Generated {
     interface WikiDataDto {
         WikiDataId: string;
         WikiDataTitleInEnglish: string;
+        WikipediaEnglishLink: string;
     }
 
     interface WikidataAssociationCreation {
