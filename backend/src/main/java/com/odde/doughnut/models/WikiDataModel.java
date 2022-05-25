@@ -1,9 +1,9 @@
 package com.odde.doughnut.models;
 
-import java.util.List;
+import java.util.Map;
 
 public class WikiDataModel {
-  public WikiDataEntity entities;
+  public Map<String, WikiDataInfo> entities;
 }
 
 

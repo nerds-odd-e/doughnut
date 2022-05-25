@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.models.WikiDataModel;
 import com.odde.doughnut.services.RealGithubService;
@@ -22,11 +23,9 @@ public class RestWikidataController {
   public WikiDataModel fetchWikidata(String wikiDataId) throws IOException, InterruptedException {
     HttpResponse<String> response = CallWikiDataApi(wikiDataId);
     ObjectMapper mapper = new ObjectMapper();
-
-    WikiDataModel returnModel = mapper.readValue(response.body().replace(wikiDataId, "id"), new TypeReference<WikiDataModel>() {
+    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    return mapper.readValue(response.body(), new TypeReference<>() {
     });
-
-    return returnModel;
   }
 
   private HttpResponse<String> CallWikiDataApi(String wikiDataId) throws IOException, InterruptedException {

@@ -20,6 +20,7 @@ class WikiDataControllerTests {
     controller = new RestWikidataController();
   }
 
+  @Test
   void ShouldBeAbleToConnectToWikiDataApi() throws IOException, InterruptedException {
     String searchId = "Q423392";
     WikiDataModel resultObj = controller.fetchWikidata(searchId);
@@ -28,8 +29,7 @@ class WikiDataControllerTests {
     String result = mapper.writeValueAsString(resultObj);
     System.out.println(resultObj);
     assertThat(result, containsString("TDD"));
-    assertThat(resultObj.entities, notNullValue());
-    assertThat(resultObj.entities.id.pageid, equalTo("399945"));
+    assertThat(resultObj.entities.containsKey(searchId), is(true));
   }
 
 }
