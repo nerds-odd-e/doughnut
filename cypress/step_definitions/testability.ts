@@ -5,7 +5,7 @@
 
 import { Given, Then, When } from "@badeball/cypress-cucumber-preprocessor"
 
-When("Someone triggered an exception", (url) => {
+When("Someone triggered an exception", () => {
   cy.triggerException()
 })
 
@@ -20,7 +20,7 @@ When("I should see a new open issue on github", () => {
   })
 })
 
-Given("Use real github sandbox and there are no open issues on github", (id) => {
+Given("Use real github sandbox and there are no open issues on github", () => {
   cy.request({
     method: "POST",
     url: `/api/testability/use_real_sandbox_github_and_close_all_github_issues`,
