@@ -3,7 +3,6 @@ package com.odde.doughnut.controllers;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.models.WikiDataModel;
 
 import java.io.IOException;
