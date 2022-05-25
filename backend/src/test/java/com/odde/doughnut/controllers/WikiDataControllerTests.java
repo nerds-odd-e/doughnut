@@ -22,10 +22,11 @@ class WikiDataControllerTests {
 
   RestWikidataController controller;
   @Mock WikiDataService wikiDataService;
-  private final String searchId = "Q1234";
-  private final String searchIdWithWikipediaLink = "Q200";
+  private final String wikiDataIdWithNoWikipediaLink = "Q1234";
+  private final String wikiDataIdWithWikipediaLink = "Q200";
   private final String noteTitle = "TDD";
   private final String englishLanguage = "en";
+  private final String englishWikipediaLink = "SomeEnglishLink";
 
   @BeforeEach
   void Setup() throws IOException, InterruptedException {
@@ -41,7 +42,7 @@ class WikiDataControllerTests {
         entities =
             Map.ofEntries(
                 Map.entry(
-                    searchId,
+                    wikiDataIdWithNoWikipediaLink,
                     new WikiDataInfo() {
                       {
                         title = noteTitle;
@@ -58,10 +59,10 @@ class WikiDataControllerTests {
                       }
                     }),
                 Map.entry(
-                    searchIdWithWikipediaLink,
+                    wikiDataIdWithWikipediaLink,
                     new WikiDataInfo() {
                       {
-                        title = "random";
+                        title = noteTitle;
                         labels =
                             Map.ofEntries(
                                 Map.entry(
@@ -69,7 +70,7 @@ class WikiDataControllerTests {
                                     new LanguageValueModel() {
                                       {
                                         language = englishLanguage;
-                                        value = "random";
+                                        value = noteTitle;
                                       }
                                     }));
                         sitelinks =
@@ -79,7 +80,7 @@ class WikiDataControllerTests {
                                     new LanguageValueModel() {
                                       {
                                         language = englishLanguage;
-                                        value = "SomeEnglishLink";
+                                        value = englishWikipediaLink;
                                       }
                                     }));
                       }
@@ -91,8 +92,8 @@ class WikiDataControllerTests {
   @Test
   void GivenSearchIdHasValue_ShouldBeAbleToGetWikiDataTitleAndId()
       throws IOException, InterruptedException {
-    WikiDataDto resultObj = controller.fetchWikiDataDto(searchId);
-    assertThat(resultObj.WikiDataId, equalTo(searchId));
+    WikiDataDto resultObj = controller.fetchWikiDataDto(wikiDataIdWithNoWikipediaLink);
+    assertThat(resultObj.WikiDataId, equalTo(wikiDataIdWithNoWikipediaLink));
     assertThat(resultObj.WikiDataTitleInEnglish, equalTo(noteTitle));
   }
 
@@ -105,14 +106,14 @@ class WikiDataControllerTests {
   @Test
   void GivenSearchIdHasWikipediaEnglishLink_ShouldBeAbleToRetrieveLink()
       throws IOException, InterruptedException {
-    WikiDataDto resultObj = controller.fetchWikiDataDto(searchIdWithWikipediaLink);
-    assertThat(resultObj.WikipediaEnglishLink, equalTo("SomeEnglishLink"));
+    WikiDataDto resultObj = controller.fetchWikiDataDto(wikiDataIdWithWikipediaLink);
+    assertThat(resultObj.WikipediaEnglishLink, equalTo(englishWikipediaLink));
   }
 
   @Test
   void GivenSearchIdHasNoWikipediaEnglishLink_ShouldReturnEmptyLink()
       throws IOException, InterruptedException {
-    WikiDataDto resultObj = controller.fetchWikiDataDto(searchId);
+    WikiDataDto resultObj = controller.fetchWikiDataDto(wikiDataIdWithNoWikipediaLink);
     assertThat(StringUtils.isBlank(resultObj.WikipediaEnglishLink), is(true));
   }
 }
