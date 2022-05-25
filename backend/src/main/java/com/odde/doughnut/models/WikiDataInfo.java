@@ -5,4 +5,5 @@ import java.util.Map;
 public class WikiDataInfo {
   public String title;
   public Map<String, LanguageValueModel> labels;
+  public Map<String, LanguageValueModel> sitelinks;
 }
