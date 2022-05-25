@@ -2,7 +2,7 @@
 /// <reference types="../support" />
 // @ts-check
 
-import { Given, Then, When } from "@badeball/cypress-cucumber-preprocessor"
+import { Given, Then, When, And } from "@badeball/cypress-cucumber-preprocessor"
 
 Given("I visit note {string}", (noteTitle) => {
   cy.jumpToNotePage(noteTitle)
@@ -326,4 +326,8 @@ Then("I should see the icon beside title linking to wikidata url with id {string
   cy.get("#wididataUrl")
     .invoke("attr", "href")
     .should("eq", `https://www.wikidata.org/wiki/${wikiID}`)
+})
+
+And("I associate the note to wikidata by searching with {string}", (searchText)=> {
+   cy.get(".toolbar").findByRole("button", { name: 'associate wikidata' }).click()
 })

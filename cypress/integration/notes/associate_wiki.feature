@@ -10,3 +10,10 @@ Feature: associate wiki to note
     And I associate the note "TDD" with wikidata id "Q12345"
     Then I should see the icon beside title linking to wikidata url with id "Q12345"
 
+  Scenario: Search wikidata link and associate one result for a note
+    Given I've logged in as an existing user
+    And there are some notes for the current user
+      | title | description             |
+      | KFC   | Kentucky Fried Chicken  |
+    When I visit note "KFC"
+    And I associate the note to wikidata by searching with "KFC"
