@@ -331,3 +331,12 @@ Then("I should see the icon beside title linking to wikidata url with id {string
 And("I associate the note to wikidata by searching with {string}", (searchText)=> {
    cy.get(".toolbar").findByRole("button", { name: 'associate wikidata' }).click()
 })
+
+When("I confirm the association with different title {string}", (wikidataTitle) => {
+  cy.findAllByText(wikidataTitle).should('exist')
+  cy.findByRole("button", { name: "Confirm"}).click()
+})
+
+Then("I should see the icon beside title linking to wikidata url with id {string}", (wikiID)=> {
+   cy.get("#wididataUrl").invoke('attr', 'href').should('eq', 'https://www.wikidata.org/wiki/'+wikiID)
+})
