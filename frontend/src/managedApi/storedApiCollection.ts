@@ -151,7 +151,10 @@ const storedApiCollection = (
       )) as Generated.CircleForUserView;
     },
 
-    async updateWikidataId(noteId: Doughnut.ID, data: Generated.WikidataAssociationCreation) {
+    async updateWikidataId(
+      noteId: Doughnut.ID,
+      data: Generated.WikidataAssociationCreation
+    ) {
       return (await managedApi.restPost(
         `notes/${noteId}/updateWikidataId`,
         data
