@@ -2,7 +2,7 @@
 /// <reference types="../support" />
 // @ts-check
 
-import { And, Given, Then, When } from "@badeball/cypress-cucumber-preprocessor"
+import { Given, Then, When } from "@badeball/cypress-cucumber-preprocessor"
 
 Given("I visit note {string}", (noteTitle) => {
   cy.jumpToNotePage(noteTitle)
@@ -257,7 +257,7 @@ When(
   "I should see the notes {string} are around note {string} and apart from each other",
   (noteTitles, parentNoteTitle) => {
     const titles = noteTitles.commonSenseSplit(",")
-    cy.findByText(titles[titles.length -1]);
+    cy.findByText(titles[titles.length - 1])
     cy.withinMindmap().then((cards) => {
       titles.forEach((noteTitle) => {
         cy.distanceBetweenCardsGreaterThan(cards, parentNoteTitle, noteTitle, 100)
@@ -318,11 +318,12 @@ Then("I type {string} in the title", (content) => {
   cy.focused().clear().type(content)
 })
 
-When("I associate the note {string} with wikidata id {string}", (title, wikiID)=> {
+When("I associate the note {string} with wikidata id {string}", (title, wikiID) => {
   cy.clickAssociateWikiDataButton(title, wikiID)
 })
 
-
-Then("I should see the icon beside title linking to wikidata url with id {string}", (wikiID)=> {
-   cy.get("#wididataUrl").invoke('attr', 'href').should('eq', 'https://www.wikidata.org/wiki/'+wikiID)
+Then("I should see the icon beside title linking to wikidata url with id {string}", (wikiID) => {
+  cy.get("#wididataUrl")
+    .invoke("attr", "href")
+    .should("eq", `https://www.wikidata.org/wiki/${wikiID}`)
 })

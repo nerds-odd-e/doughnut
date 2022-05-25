@@ -43,7 +43,7 @@ Cypress.Commands.add("loginAs", (username) => {
   })
 })
 
-Cypress.Commands.add("logout", (username) => {
+Cypress.Commands.add("logout", () => {
   cy.request({
     method: "POST",
     url: "/logout",
@@ -226,11 +226,11 @@ Cypress.Commands.add("clickButtonOnCardBody", (noteTitle, buttonTitle) => {
   })
 })
 
-Cypress.Commands.add("visitMyNotebooks", (noteTitle) => {
+Cypress.Commands.add("visitMyNotebooks", () => {
   cy.visit("/notebooks")
 })
 
-Cypress.Commands.add("startSearching", (noteTitle) => {
+Cypress.Commands.add("startSearching", () => {
   cy.clickNoteToolbarButton("link note")
 })
 
@@ -455,7 +455,7 @@ Cypress.Commands.add("expectCurrentNoteDescription", (expectedDescription) => {
 Cypress.Commands.add("withinMindmap", () => {
   cy.pageIsNotLoading()
   cy.wrap(
-    new Promise((resolve, reject) => {
+    new Promise((resolve) => {
       cy.get(`.box .content .inner-box .content`).then((mindmap) => {
         const rect = mindmap[0].getBoundingClientRect()
         cy.get("[role='card']").then(($elms) => {
@@ -470,16 +470,13 @@ Cypress.Commands.add("withinMindmap", () => {
   )
 })
 
-Cypress.Commands.add(
-  "distanceBetweenCardsGreaterThan",
-  (cards, note1, note2, min) => {
-    const rect1 = cards[note1]
-    const rect2 = cards[note2]
-    const xd = (rect1.right + rect1.left) / 2 - (rect2.right + rect2.left) / 2
-    const yd = (rect1.top + rect1.bottom) / 2 - (rect2.top + rect2.bottom) / 2
-    expect(Math.sqrt(xd * xd + yd * yd)).greaterThan(min)
-  },
-)
+Cypress.Commands.add("distanceBetweenCardsGreaterThan", (cards, note1, note2, min) => {
+  const rect1 = cards[note1]
+  const rect2 = cards[note2]
+  const xd = (rect1.right + rect1.left) / 2 - (rect2.right + rect2.left) / 2
+  const yd = (rect1.top + rect1.bottom) / 2 - (rect2.top + rect2.bottom) / 2
+  expect(Math.sqrt(xd * xd + yd * yd)).greaterThan(min)
+})
 
 Cypress.Commands.add(
   "expectText",
@@ -500,16 +497,15 @@ Cypress.Commands.add("deleteNoteViaAPI", { prevSubject: true }, (subject) => {
   })
 })
 
-Cypress.Commands.add("noteByTitle", (noteTitle) => {
+Cypress.Commands.add("noteByTitle", () => {
   return cy
     .get("a.card-title")
     .invoke("attr", "href")
     .then(($attr) => /notes\/(\d+)/g.exec($attr)[1])
 })
 
-Cypress.Commands.add("clickAssociateWikiDataButton", (title,wikiID) => {
-  cy.get(".toolbar").findByRole("button", { name: 'associate wikidata' }).click()
+Cypress.Commands.add("clickAssociateWikiDataButton", (title, wikiID) => {
+  cy.get(".toolbar").findByRole("button", { name: "associate wikidata" }).click()
   cy.get("#wikiID-wikiID").click()
   cy.replaceFocusedText(wikiID)
 })
-
