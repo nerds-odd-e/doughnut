@@ -29,8 +29,18 @@ Cypress.Commands.add("seedNotes", (notes, externalIdentifier = "", circleName = 
     },
   }).then((response) => {
     expect(response.body.length).to.equal(notes.length)
+
+    notes.forEach(n => {
+      response.body.forEach(res => {
+        if (res.wikidataId) {
+          expect(res.wikidataId).to.equal(n.wikidataId)
+        }
+      })
+    });
+
     const titles = notes.map((n) => n["title"])
-    const noteMap = Object.assign({}, ...titles.map((t, index) => ({ [t]: response.body[index] })))
+    const noteMap = Object.assign({}, ...titles.map((t, index) => ({ [t]: response.body[index].id })))
+
     cy.wrap(noteMap).as("seededNoteIdMap")
   })
 })

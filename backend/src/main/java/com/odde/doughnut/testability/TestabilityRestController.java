@@ -27,7 +27,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 import javax.persistence.EntityManagerFactory;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -89,6 +88,7 @@ class TestabilityRestController {
   static class SeedNote {
     public String title;
     public String description;
+    public String wikidataId;
     public String testingParent;
     public Boolean skipReview;
     public String url;
@@ -107,7 +107,7 @@ class TestabilityRestController {
   //
   @PostMapping("/seed_notes")
   @Transactional
-  public List<Integer> seedNote(@RequestBody SeedInfo seedInfo) {
+  public List<Note> seedNote(@RequestBody SeedInfo seedInfo) {
     final User user =
         getUserModelByExternalIdentifierOrCurrentUser(seedInfo.externalIdentifier).getEntity();
     Ownership ownership = getOwnership(seedInfo, user);
@@ -121,6 +121,7 @@ class TestabilityRestController {
 
       note.getTextContent().setTitle(seedNote.title);
       note.getTextContent().setDescription(seedNote.description);
+      note.setWikidataId(seedNote.wikidataId);
       note.getTextContent().setUpdatedAt(currentUTCTimestamp);
       if (seedNote.skipReview != null) {
         content.setSkipReview(seedNote.skipReview);
@@ -141,7 +142,7 @@ class TestabilityRestController {
 
     noteRepository.saveAll(noteList);
 
-    return noteList.stream().map(Note::getId).collect(Collectors.toList());
+    return noteList;
   }
 
   private Ownership getOwnership(SeedInfo seedInfo, User user) {

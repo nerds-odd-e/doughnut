@@ -6,8 +6,8 @@ Feature: Validate Wikidata link
   @ignore
   Scenario: Associate wikidata's id with note when wikidata's title is different from note's title
     Given there are some notes for the current user
-      | title | description |
-      | TDD   |             |
+      | title | description | wikidataId |
+      | TDD   |             | xxxx       |
 
     And I associate "TDD" with wikidata id "Q123"
     When I confirm the association with different title
