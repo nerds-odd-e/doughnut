@@ -3,16 +3,16 @@ buildscript {
     mavenCentral()
   }
   dependencies {
-    classpath 'cz.habarta.typescript-generator:typescript-generator-gradle-plugin:2.35.1025'
+    classpath 'cz.habarta.typescript-generator:typescript-generator-gradle-plugin:2.36.1070'
   }
 }
 
 plugins {
-  id 'org.springframework.boot' version '2.6.7'
+  id 'org.springframework.boot' version '2.7.0'
   id 'io.spring.dependency-management' version '1.0.11.RELEASE'
   id 'java'
   // Spotless for the code style
-  id "com.diffplug.spotless" version "6.5.0"
+  id "com.diffplug.spotless" version "6.6.1"
 }
 
 apply plugin: 'cz.habarta.typescript-generator'
@@ -48,7 +48,7 @@ dependencies {
   annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
   annotationProcessor 'org.projectlombok:lombok'
   testImplementation 'org.springframework.boot:spring-boot-starter-test'
-  implementation 'com.google.code.gson:gson:2.8.9'
+  implementation 'com.google.code.gson:gson:2.9.0'
 }
 
 task testDBMigrate(type: Test) {
