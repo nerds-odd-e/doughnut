@@ -17,6 +17,7 @@ When("I confirm the association with different title", () => {
 
 })
 
-Then("I should see association icon", () => {
-  
+Then("I should see association icon for note title {string}", (noteTitle) => {
+  cy.jumpToNotePage(noteTitle)
+  cy.findByRole("wikidataUrl")
 })
