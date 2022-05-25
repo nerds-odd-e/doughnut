@@ -16,7 +16,8 @@ Then("I should see association confirmation message {string}", (message) => {
 })
 
 When("I confirm the association with different title", () => {
-return;
+  // TODO
+  return;
 })
 
 Then("I should see association icon for note title {string}", (noteTitle) => {
