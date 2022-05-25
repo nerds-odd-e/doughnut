@@ -511,5 +511,5 @@ Cypress.Commands.add("clickAssociateWikiDataButton", (title,wikiID) => {
   cy.get(".toolbar").findByRole("button", { name: 'associate wikidata' }).click()
   cy.get("#wikiID-wikiID").click()
   cy.replaceFocusedText(wikiID)
-
 })
+

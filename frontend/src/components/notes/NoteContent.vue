@@ -12,7 +12,8 @@
       @blur="onBlurTextField"
     />
     <a
-      v-if="note.wikidataId" 
+      v-if="note.wikidataId"
+      id="wididataUrl"
       role="wikidataUrl"
       :href="wikiDataUrl"
       target="_blank"

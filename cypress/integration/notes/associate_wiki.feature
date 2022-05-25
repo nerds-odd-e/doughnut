@@ -8,5 +8,5 @@ Feature: associate wiki to note
       | TDD   | Test driven development |
     When I visit note "TDD"
     And I associate the note "TDD" with wikidata id "Q12345"
-    Then I should see the wikidata icon
+    Then I should see the icon beside title linking to wikidata url with id "Q12345"
 

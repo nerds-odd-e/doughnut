@@ -323,6 +323,6 @@ When("I associate the note {string} with wikidata id {string}", (title, wikiID)=
 })
 
 
-Then("I should see the wikidata icon", ()=> {
-  return
+Then("I should see the icon beside title linking to wikidata url with id {string}", (wikiID)=> {
+   cy.get("#wididataUrl").invoke('attr', 'href').should('eq', 'https://www.wikidata.org/wiki/'+wikiID)
 })
