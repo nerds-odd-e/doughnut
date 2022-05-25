@@ -59,12 +59,12 @@
     "@testing-library/cypress": "8.0",
     "@types/cypress-cucumber-preprocessor": "^4.0",
     "@types/node": "^17.0",
-    "@typescript-eslint/eslint-plugin": "^5.25",
-    "@typescript-eslint/parser": "^5.25",
-    "cypress": "^9.6",
+    "@typescript-eslint/eslint-plugin": "^5.26",
+    "@typescript-eslint/parser": "^5.26",
+    "cypress": "^9.7",
     "cypress-file-upload": "^5.0",
     "esbuild": "^0.14",
-    "eslint": "^8.12",
+    "eslint": "^8.16",
     "eslint-config-prettier": "^8.5",
     "eslint-plugin-cypress": "^2.12",
     "eslint-plugin-prettier": "^4.0",
@@ -77,7 +77,7 @@
   },
   "dependencies": {
     "@cucumber/cucumber": "^8.1",
-    "ejs": "^3.1.7",
+    "ejs": "^3.1.8",
     "formidable": "^2.0",
     "superagent": "^7.1"
   }
