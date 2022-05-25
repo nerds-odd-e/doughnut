@@ -12,3 +12,11 @@ When("I associate {string} with wikidata id {string}", (noteTitle, wikiDataId) =
 Then("I should see association confirmation message {string}", (message) => {
   // TODO
 })
+
+When("I confirm the association with different title", () => {
+
+})
+
+Then("I should see association icon", () => {
+  
+})
