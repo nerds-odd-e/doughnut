@@ -5,5 +5,3 @@ import java.util.Map;
 public class WikiDataModel {
   public Map<String, WikiDataInfo> entities;
 }
-
-
