@@ -35,8 +35,8 @@ public class RestWikidataController {
       LanguageValueModel englishTitlePair = myInfo.labels.get("en");
       returnDto.WikiDataId = wikiDataId;
       returnDto.WikiDataTitleInEnglish = englishTitlePair.value;
-      if (myInfo.sitelinks != null && myInfo.sitelinks.containsKey("en"))
-        returnDto.WikipediaEnglishLink = myInfo.sitelinks.get("en").url;
+      if (myInfo.sitelinks != null && myInfo.sitelinks.containsKey("enwiki"))
+        returnDto.WikipediaEnglishLink = myInfo.sitelinks.get("enwiki").url;
     }
     return returnDto;
   }
