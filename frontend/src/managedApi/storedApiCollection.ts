@@ -150,6 +150,13 @@ const storedApiCollection = (
         `circles/${circleId}`
       )) as Generated.CircleForUserView;
     },
+
+    async updateWikidataId(noteId: Doughnut.ID, data: Generated.WikidataAssociationCreation) {
+      return (await managedApi.restPost(
+        `notes/${noteId}/updateWikidataId`,
+        data
+      )) as Generated.NoteRealm;
+    },
   };
 };
 

@@ -6,7 +6,7 @@
     <TextInput
       scopeName="wikiID"
       field="wikiID"
-      v-model="associationData.wikiDataId"
+      v-model="associationData.wikidataId"
       placeholder="Q1234"
     />
     <input type="submit" value="Save" class="btn btn-primary" />
@@ -16,31 +16,40 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import TextInput from "../form/TextInput.vue";
+import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 
 export default defineComponent({
-  props: { note: Object as PropType<Generated.Note> },
+  setup() {
+    return useStoredLoadingApi({ initalLoading: true, hasFormError: true });
+  },
+  props: { note: {type: Object as PropType<Generated.Note>, required: true } },
   components: { TextInput },
   emits: ["done"],
   data() {
     return {
+      noteId: 0,
       associationData: {
-        noteId: 0,
-        wikiDataId: "",
-      }
+        wikidataId: ""
+      } as Generated.WikidataAssociationCreation,
     };
   },
   computed: {
     payload() {
       return {
-        noteId: this.note?.id,
-        wikiDataId: this.associationData.wikiDataId,
+        noteId: this.note.id,
+        associationData: {
+          wikidataId: this.associationData.wikidataId,
+        }
       };
     },
   },
   methods: {
-    async saveWiki() {
-      console.log("payload", this.payload);
-      this.$emit("done");
+    saveWiki() {
+      this.storedApi
+      .updateWikidataId(this.payload.noteId, this.payload.associationData)
+      .then(() => {
+        this.$emit("done");
+      })
     },
   },
 });
