@@ -3,6 +3,9 @@ package com.odde.doughnut.controllers;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.doughnut.entities.json.WikiDataDto;
+import com.odde.doughnut.models.LanguageValueModel;
+import com.odde.doughnut.models.WikiDataInfo;
 import com.odde.doughnut.models.WikiDataModel;
 import java.io.IOException;
 import java.net.URI;
@@ -11,14 +14,28 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api")
 public class RestWikidataController {
-  @GetMapping("/wikidata/Q123")
-  public WikiDataModel fetchWikidata(String wikiDataId) throws IOException, InterruptedException {
+  @GetMapping("/wikidata/{wikiDataId}")
+  public WikiDataDto fetchWikiDataDto(@PathVariable("wikiDataId") String wikiDataId)
+      throws IOException, InterruptedException {
+    WikiDataModel wikiModel = fetchWikidata(wikiDataId);
+    WikiDataDto returnDto = new WikiDataDto();
+    if (wikiModel.entities.containsKey(wikiDataId)) {
+      WikiDataInfo myInfo = wikiModel.entities.get(wikiDataId);
+      LanguageValueModel englishTitlePair = myInfo.labels.get("en");
+      returnDto.WikiDataId = wikiDataId;
+      returnDto.WikiDataTitleInEnglish = englishTitlePair.value;
+    }
+    return returnDto;
+  }
+
+  private WikiDataModel fetchWikidata(String wikiDataId) throws IOException, InterruptedException {
     HttpResponse<String> response = CallWikiDataApi(wikiDataId);
     ObjectMapper mapper = new ObjectMapper();
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
