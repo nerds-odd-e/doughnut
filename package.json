@@ -39,7 +39,7 @@
       "command": "yarn --cwd frontend --frozen-lockfile --silent install && yarn --cwd frontend lint"
     },
     "backend:lint": {
-      "command": "backend/gradlew -p backend spotlessApply"
+      "command": "backend/gradlew -p backend lint"
     },
     "cy:format": {
       "command": "yarn --frozen-lockfile --silent install && eslint --ext .ts,.js cypress --fix"
