@@ -252,7 +252,6 @@ When("I should see the zoom scale is {string}", (scale) => {
 
 When("I click the zoom indicator", () => {
   cy.get(".mindmap-info").click()
-
 })
 
 When(
@@ -267,7 +266,6 @@ When(
       cy.distanceBetweenCardsGreaterThan(cards, titles[0], titles[1], 100)
     })
   },
-
 )
 
 Then("I should see the title {string} of the notebook", (noteTitle) => {
@@ -347,4 +345,13 @@ Given("there are some wikidata on the external service", async (data) => {
     .withPort(5000)
     .withStub(new DefaultStub(`/external/searchWikidata`, HttpMethod.GET, data, 200))
   await mb.createImposter(imposter)
+})
+
+When("I cancel the association with different title {string}", (wikidataTitle) => {
+  cy.findAllByText(wikidataTitle).should("exist")
+  cy.findByDisplayValue("Cancel").click()
+})
+
+Then("I should be able to return to the association dialog", () => {
+  cy.findByRole("button", { name: "Save" })
 })

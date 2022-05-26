@@ -10,7 +10,7 @@
   <form v-else @submit.prevent.once="saveWiki">
     <p>Confirm to associate <strong>{{ note.title }}</strong> with <strong>{{ "Count von Count" }}</strong>?</p>
 
-    <input type="cancel" value="Cancel" class="btn btn-secondary" />
+    <input type="cancel" value="Cancel" class="btn btn-secondary" @click="showConfirmation = false"/>
     <input type="submit" value="Confirm" class="btn btn-primary" />
   </form>
 </template>
