@@ -2,13 +2,13 @@
   <h3>
     Associate <strong>{{ note.title }}</strong> to WIKI
   </h3>
-  <form v-if="!showConfirmation" @submit.prevent.once="saveWiki">
+  <form v-if="!showConfirmation" @submit.prevent.once="validateAssociation">
     <TextInput scopeName="wikiID" field="wikiID" v-model="associationData.wikidataId" placeholder="Q1234" />
     <input type="submit" value="Save" class="btn btn-primary" />
   </form>
 
   <form v-else @submit.prevent.once="saveWiki">
-    <p>Confirm to associate <strong>{{ note.title }}</strong> with <strong>{{ "XXXX" }}</strong>?</p>
+    <p>Confirm to associate <strong>{{ note.title }}</strong> with <strong>{{ "Count von Count" }}</strong>?</p>
 
     <input type="cancel" value="Cancel" class="btn btn-secondary" />
     <input type="submit" value="Confirm" class="btn btn-primary" />
@@ -47,20 +47,23 @@ export default defineComponent({
     },
   },
   methods: {
-    validateAssociation() {    
-      return true
+    validateAssociation() {
+      this.storedApi.getWikiData(this.payload.associationData.wikidataId)
+        .then((res: Generated.WikiDataDto) => {
+          if (res.WikiDataTitleInEnglish !== this.note.title) {
+            this.showConfirmation = true
+          } else {
+            this.saveWiki()
+          }
+        })
     },
     saveWiki() {
-      const canProceed = this.validateAssociation()
-
-      if (canProceed) {
-        this.storedApi
-          .updateWikidataId(this.payload.noteId, this.payload.associationData)
-          .then(() => {
-            this.$emit("done");
-          })
-      }
-    },
+      this.storedApi
+        .updateWikidataId(this.payload.noteId, this.payload.associationData)
+        .then(() => {
+          this.$emit("done");
+        })
+    }
   },
 });
 </script>

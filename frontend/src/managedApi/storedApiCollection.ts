@@ -160,6 +160,12 @@ const storedApiCollection = (
         data
       )) as Generated.NoteRealm;
     },
+
+    async getWikiData(wikiDataId: string) {
+      return (await managedApi.restGet(
+        `wikidata/${wikiDataId}`
+      )) as Generated.WikiDataDto;
+    },
   };
 };
 
