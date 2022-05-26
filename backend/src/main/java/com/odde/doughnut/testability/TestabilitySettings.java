@@ -62,7 +62,7 @@ public class TestabilitySettings {
   }
 
   public String getWikidataServiceUrl() {
-    if(this.useDummyWikidataService) {
+    if (this.useDummyWikidataService) {
       return "http://localhost:5000/external/searchWikidata";
     }
     return this.wikidataServiceUrl;
