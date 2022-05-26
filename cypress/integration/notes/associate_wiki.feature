@@ -15,8 +15,6 @@ Feature: associate wiki to note
     And there are some notes for the current user
       | title | description             |
       | KFC   | Kentucky Fried Chicken  |
-    And there are some wikidata on the external service
-      | id    | label                   |
-      | KFC   | Kentucky Fried Chicken  |
+    And there are some wikidata of KFC on the external service
     When I visit note "KFC"
     And I associate the note to wikidata by searching with "KFC"

@@ -4,6 +4,9 @@
   </h3>
   <form v-if="!showConfirmation" @submit.prevent.once="validateAssociation">
     <TextInput scopeName="wikiID" field="wikiID" v-model="associationData.wikidataId" placeholder="Q1234" />
+    <SearchWikidata
+      :note="note"
+    />
     <input type="submit" value="Save" class="btn btn-primary" />
   </form>
 
@@ -19,13 +22,14 @@
 import { defineComponent, PropType } from "vue";
 import TextInput from "../form/TextInput.vue";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
+import SearchWikidata from "../search/SearchWikidata.vue";
 
 export default defineComponent({
   setup() {
     return useStoredLoadingApi({ initalLoading: true, hasFormError: true });
   },
   props: { note: { type: Object as PropType<Generated.Note>, required: true } },
-  components: { TextInput },
+  components: { TextInput, SearchWikidata },
   emits: ["done"],
   data() {
     return {

@@ -25,11 +25,14 @@ public class WikiDataService {
   public List<WikiDataSearchResponseModel> searchWikiData(String searchTerm)
       throws IOException, InterruptedException {
     String response = httpClientAdapter.getResponseString(ConstructSearchWikiDataUrl(searchTerm));
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+
     Object searchResult =
-        new ObjectMapper()
+      mapper
             .readValue(response, new TypeReference<Map<String, Object>>() {})
             .get("search");
-    return new ObjectMapper().convertValue(searchResult, new TypeReference<>() {});
+    return mapper.convertValue(searchResult, new TypeReference<>() {});
   }
 
   private String CallWikiDataApi(String wikiDataId) throws IOException, InterruptedException {

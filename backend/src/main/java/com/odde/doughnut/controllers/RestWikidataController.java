@@ -28,7 +28,8 @@ public class RestWikidataController {
     return wikiDataService.FetchWikiData(wikiDataId).GetInfoForWikiDataId(wikiDataId).processInfo();
   }
 
-  public List<WikiDataSearchResponseModel> searchWikiData(String searchTerm)
+  @GetMapping("/wikidata/searchWikidata/{searchTerm}")
+  public List<WikiDataSearchResponseModel> searchWikiData(@PathVariable("searchTerm") String searchTerm)
       throws IOException, InterruptedException {
     return wikiDataService.searchWikiData(searchTerm);
   }

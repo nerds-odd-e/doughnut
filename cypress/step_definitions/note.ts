@@ -338,12 +338,12 @@ When("I confirm the association with different title {string}", (wikidataTitle) 
   cy.findByRole("button", { name: "Confirm" }).click()
 })
 
-Given("there are some wikidata on the external service", async (data) => {
+Given("there are some wikidata of KFC on the external service", async () => {
   cy.useDummyWikidataService()
   const mb = new Mountebank()
   const imposter = new Imposter()
     .withPort(5000)
-    .withStub(new DefaultStub(`/external/searchWikidata`, HttpMethod.GET, data, 200))
+    .withStub(new DefaultStub(`/external/searchWikidata`, HttpMethod.GET, "{\n                                                                               \"searchinfo\": {\n                                                                                   \"search\": \"KFC\"\n                                                                               },\n                                                                               \"search\": [\n                                                                                   {\n                                                                                       \"id\": \"Q1234\",\n                                                                                       \"label\": \"KFC\",\n                                                                                   }\n                                                                                   ]\n  ", 200))
   await mb.createImposter(imposter)
 })
 
