@@ -279,6 +279,11 @@ class TestabilityRestController {
     return Collections.emptyList();
   }
 
+  @PostMapping(value = "/use_dummy_wikidata_service")
+  public void turnOnDummyService() {
+    testabilitySettings.setUseDummyWikidataService(true);
+  }
+
   static class Randomization {
     public String choose;
   }

@@ -3,6 +3,7 @@
 // @ts-check
 
 import { Given, Then, When, And } from "@badeball/cypress-cucumber-preprocessor"
+import { HttpMethod, Imposter, Mountebank, DefaultStub } from "@anev/ts-mountebank"
 
 Given("I visit note {string}", (noteTitle) => {
   cy.jumpToNotePage(noteTitle)
@@ -251,6 +252,7 @@ When("I should see the zoom scale is {string}", (scale) => {
 
 When("I click the zoom indicator", () => {
   cy.get(".mindmap-info").click()
+
 })
 
 When(
@@ -265,6 +267,7 @@ When(
       cy.distanceBetweenCardsGreaterThan(cards, titles[0], titles[1], 100)
     })
   },
+
 )
 
 Then("I should see the title {string} of the notebook", (noteTitle) => {
@@ -335,4 +338,13 @@ And("I associate the note to wikidata by searching with {string}", () => {
 When("I confirm the association with different title {string}", (wikidataTitle) => {
   cy.findAllByText(wikidataTitle).should("exist")
   cy.findByRole("button", { name: "Confirm" }).click()
+})
+
+Given("there are some wikidata on the external service", async (data) => {
+  cy.useDummyWikidataService()
+  const mb = new Mountebank()
+  const imposter = new Imposter()
+    .withPort(5000)
+    .withStub(new DefaultStub(`/external/searchWikidata`, HttpMethod.GET, data, 200))
+  await mb.createImposter(imposter)
 })

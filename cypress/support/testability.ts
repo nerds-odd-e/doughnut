@@ -88,3 +88,10 @@ Cypress.Commands.add("seedCircle", (circle) => {
     expect(response.body).to.equal("OK")
   })
 })
+
+Cypress.Commands.add("useDummyWikidataService", () => {
+  cy.request({
+    method: "POST",
+    url: `/api/testability/use_dummy_wikidata_service`,
+  })
+})

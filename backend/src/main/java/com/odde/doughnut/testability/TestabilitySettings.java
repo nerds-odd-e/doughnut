@@ -19,6 +19,8 @@ public class TestabilitySettings {
   @Getter @Setter Boolean useRealGithub = true;
   @Autowired GithubService githubService;
   @Getter private boolean featureToggleEnabled = false;
+  @Getter @Setter Boolean useDummyWikidataService = false;
+  @Getter @Setter String wikidataServiceUrl = "";
 
   public void timeTravelTo(Timestamp timestamp) {
     this.timestamp = timestamp;
@@ -57,5 +59,12 @@ public class TestabilitySettings {
 
   public void enableFeatureToggle(boolean enabled) {
     this.featureToggleEnabled = enabled;
+  }
+
+  public String getWikidataServiceUrl() {
+    if(this.useDummyWikidataService) {
+      return "http://localhost:5000/external/searchWikidata";
+    }
+    return this.wikidataServiceUrl;
   }
 }
