@@ -25,17 +25,7 @@ public class RestWikidataController {
   @GetMapping("/wikidata/{wikiDataId}")
   public WikiDataDto fetchWikiDataDto(@PathVariable("wikiDataId") String wikiDataId)
       throws IOException, InterruptedException {
-    WikiDataModel wikiModel = wikiDataService.FetchWikiData(wikiDataId);
-    WikiDataDto returnDto = new WikiDataDto();
-    if (wikiModel.entities.containsKey(wikiDataId)) {
-      WikiDataInfo myInfo = wikiModel.entities.get(wikiDataId);
-      LanguageValueModel englishTitlePair = myInfo.labels.get("en");
-      returnDto.WikiDataId = wikiDataId;
-      returnDto.WikiDataTitleInEnglish = englishTitlePair.value;
-      if (myInfo.sitelinks != null && myInfo.sitelinks.containsKey("enwiki"))
-        returnDto.WikipediaEnglishLink = myInfo.sitelinks.get("enwiki").url;
-    }
-    return returnDto;
+    return wikiDataService.FetchWikiData(wikiDataId).GetInfoForWikiDataId(wikiDataId).processInfo();
   }
 
   public List<WikiDataSearchResponseModel> searchWikiData(String searchTerm)
