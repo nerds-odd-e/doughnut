@@ -8,7 +8,7 @@
   </form>
 
   <form v-else @submit.prevent.once="saveWiki">
-    <p>Confirm to associate <strong>{{ note.title }}</strong> with <strong>{{ "Count von Count" }}</strong>?</p>
+    <p>Confirm to associate <strong>{{ note.title }}</strong> with <strong>{{ wikiDataTitle }}</strong>?</p>
 
     <input type="cancel" value="Cancel" class="btn btn-secondary" @click="showConfirmation = false"/>
     <input type="submit" value="Confirm" class="btn btn-primary" />
@@ -33,6 +33,7 @@ export default defineComponent({
       associationData: {
         wikidataId: ""
       } as Generated.WikidataAssociationCreation,
+      wikiDataTitle: "",
       showConfirmation: false,
     };
   },
@@ -51,6 +52,7 @@ export default defineComponent({
       this.storedApi.getWikiData(this.payload.associationData.wikidataId)
         .then((res: Generated.WikiDataDto) => {
           if (res.WikiDataTitleInEnglish !== this.note.title) {
+            this.wikiDataTitle = res.WikiDataTitleInEnglish
             this.showConfirmation = true
           } else {
             this.saveWiki()
