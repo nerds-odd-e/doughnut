@@ -1,4 +1,6 @@
-## Code linting and formating (all layers/stacks)
+## [Style Guide](./docs/styleguide.md)
+
+## Code linting and formating (cypress, frontend & backend code)
 
 Details of yarn task aliases described below is visible in `doughnut/package.json`
 and `doughnut/frontend/package.json`.
@@ -11,7 +13,7 @@ From `doughnut` source root directory, to lint all code, run:
 yarn lint:all
 ```
 
-### 2. Formating
+### 2. Formatting
 
 ##### 2.1. Backend Java code formatting
 

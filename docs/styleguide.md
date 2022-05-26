@@ -12,14 +12,3 @@
       the [IntelliJ Java Google Style file](https://raw.githubusercontent.com/google/styleguide/gh-pages/intellij-java-google-style.xml)
       and import it into File→Settings→Editor→Code Style.  
       ![](images/import_google_java_style.png)
-
-## Build automatically
-
-- Format codes
-  ```bash
-  yarn format
-  ```
-- Check Code style
-  ```bash
-  yarn lint
-  ```

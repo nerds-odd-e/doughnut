@@ -154,10 +154,8 @@ directory:
 1 directory, 6 files
 ```
 
-### 5. [Code linting/formating](./docs/linting_formating.md)
+### 5. [Style Guide & Code linting/formating](./docs/linting_formating.md)
 
 ### 6. [Production environment](./docs/prod_env.md)
 
 ### 7. [Doughnut source code secrets management](./docs/secrets_management.md)
-
-### 8. [Style Guide](./docs/styleguide.md)
