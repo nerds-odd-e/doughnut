@@ -4,7 +4,11 @@
 
 ## About
 
-Doughnut is a Personal Knowledge Management ([PKM](https://en.wikipedia.org/wiki/Personal_knowledge_management)) tool combining [zettelkasten](https://eugeneyan.com/writing/note-taking-zettelkasten/) style of knowledge capture with some features to enhance learning (spaced-repetition, smart reminders) and ability to share knowledge bits with other people (for buddy/team learning).
+Doughnut is a Personal Knowledge
+Management ([PKM](https://en.wikipedia.org/wiki/Personal_knowledge_management)) tool
+combining [zettelkasten](https://eugeneyan.com/writing/note-taking-zettelkasten/) style of knowledge
+capture with some features to enhance learning (spaced-repetition, smart reminders) and ability to
+share knowledge bits with other people (for buddy/team learning).
 
 For more background info you can read:
 
@@ -19,7 +23,8 @@ For more background info you can read:
 
 - We welcome product ideas and code contribution.
 - Collaborate over:
-  - [GitHub Discussions](https://github.com/nerds-odd-e/doughnut/discussions) for product ideas/features,
+  - [GitHub Discussions](https://github.com/nerds-odd-e/doughnut/discussions) for product
+    ideas/features,
   - [GitHub Issues](https://github.com/nerds-odd-e/doughnut/issues) for reporting issues or bugs, OR
   - [doughnut gitter.im](https://gitter.im/Odd-e-doughnut/community)
 - FOSS style; Fork and submit GitHub PR.
@@ -39,13 +44,15 @@ From the root of doughnut directory:
 ```
 
 Ensure your OS (WSL2/Ubuntu/Fedora, etc) has `/bin/sh` point to `bash`.
-If you are using Ubuntu where `/bin/sh` is symlinked to `dash`, please run `sudo dpkg-reconfigure dash` and answer "No" to reconfigure to `bash` as default.
-If you hit problems with the above quick-start setup, you should manually walk through the [local development environment nix setup](./docs/nix.md).
+If you are using Ubuntu where `/bin/sh` is symlinked to `dash`, please
+run `sudo dpkg-reconfigure dash` and answer "No" to reconfigure to `bash` as default.
+If you hit problems with the above quick-start setup, you should manually walk through
+the [local development environment nix setup](./docs/nix.md).
 
 ### 2. Setup and run doughnut with migrations in 'E2E' profile (backend app started on port 9081)
 
 ```bash
-yarn sut
+yarn frontend:build && yarn sut
 ```
 
 - Rerun it each time you reset the database.
@@ -60,41 +67,46 @@ yarn backend:test
 
 ### 3. End-to-End Test / Features / Cucumber / SbE / ATDD
 
-We use cucumber [Gherkin](https://cucumber.io/docs/gherkin/) + cypress (test driver) Javascript/Typescript framework to drive the end-to-end test suite.
+We use cucumber [Gherkin](https://cucumber.io/docs/gherkin/) + cypress (test driver)
+Javascript/Typescript framework to drive the end-to-end test suite.
 
 - [Cucumber](https://cucumber.io/)
 
 The Cypress+Cucumber tests are in JavaScript/TypeScript.
 
-[cypress](https://docs.cypress.io/guides/getting-started/writing-your-first-test#Add-a-test-file) + [cypress-cucumber-preprocessor](https://github.com/TheBrainFamily/cypress-cucumber-preprocessor)
+[cypress](https://docs.cypress.io/guides/getting-started/writing-your-first-test#Add-a-test-file)
+
++ [cypress-cucumber-preprocessor](https://github.com/TheBrainFamily/cypress-cucumber-preprocessor)
 
 #### Commands
 
 For MS Windows WSL2 users:
 
-1. you need to ensure your WSL2 Linux has `xvfb` installed manually before you can run cypress. This is not managed by Nix!
-2. `export NODE_OPTIONS="--max-old-space-size=4096"` before running any cypress related commands (e.g. `cy:open` or `cy:run`).
+1. you need to ensure your WSL2 Linux has `xvfb` installed manually before you can run cypress. This
+   is not managed by Nix!
+2. `export NODE_OPTIONS="--max-old-space-size=4096"` before running any cypress related commands (
+   e.g. `cy:open` or `cy:run`).
 
-| Purpose                               | Command (run from `doughnut` source root directory)                                                               |
-|---------------------------------------|-------------------------------------------------------------------------------------------------------------------|
-| Install needed e2e tooling            | `yarn`                                                                                                            |
-| Start SUT (backend system under test) | `yarn sut`                                                                                                        |
-| Run all e2e test                      | `yarn test` (starts backend SUT and compile frontend and cypress headless)                                        |
-| Run all e2e test with FE in dev mode  | `yarn test:dev` (starts backend SUT and frontend in dev mode and cypress headless)                                |
-| Run cypress IDE                       | `yarn sut`, `yarn frontend:sut` and `yarn cy:open` (starts frontend SUT in dev mode, backend SUT and cypress IDE) |
-| Generate TypeScript Interfaces        | `yarn generateTypeScript` (Generate TypeScript Interfaces from backend JSON classes. Should run manually every time backend JSON class changes)|
+| Purpose                               | Command (run from `doughnut` source root directory)                                                                                             |
+|---------------------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|
+| Install needed e2e tooling            | `yarn`                                                                                                                                          |
+| Start SUT (backend system under test) | `yarn sut` (starts backend SUT ONLY)                                                                                                            |
+| Run all e2e test                      | `yarn test` (compile frontend assets, start backend SUT, mountebank virtual service provider & cypress headless e2e testing)                    |
+| Run all e2e test with FE in dev mode  | `yarn test:dev` (starts backend SUT, frontend SUT in HMR mode, mountebank virtual service provider & cypress headless e2e testing)              |
+| Run cypress IDE                       | `yarn test:open` (starts frontend SUT in HMR mode, backend SUT, mountebank virtual service provider & cypress IDE)                              |
+| Generate TypeScript Interfaces        | `yarn generateTypeScript` (Generate TypeScript Interfaces from backend JSON classes. Should run manually every time backend JSON class changes) |
 
 #### Structure
 
-| Purpose          | Location                                    |
-|------------------|---------------------------------------------|
-| feature files    | `cypress/integration/*.feature`             |
-| step definitions | `cypress/step_definitions/common/*.{js,ts}` |
-| custom DSL       | `cypress/support/*.js`                      |
-| cucumber hooks   | `cypress/step_definitions/common/hook.ts`   |
-| test fixtures    | `cypress/fixtures/*.*`                      |
-| cypress config   | `cypress/config/*.json`                     |
-| cypress plugins  | `cypress/plugins/index.js`                  |
+| Purpose          | Location                                  |
+|------------------|-------------------------------------------|
+| feature files    | `cypress/integration/*.feature`           |
+| step definitions | `cypress/step_definitions/*.ts`           |
+| custom DSL       | `cypress/support/*.ts`                    |
+| cucumber hooks   | `cypress/step_definitions/common/hook.ts` |
+| test fixtures    | `cypress/fixtures/*.*`                    |
+| cypress config   | `cypress/config/*.json`                   |
+| cypress plugins  | `cypress/plugins/index.ts`                |
 
 ### 4. [Vue3 web-app frontend](https://flutter.dev/docs/get-started/web)
 
@@ -110,14 +122,21 @@ From `doughnut` source root directory
 yarn frontend:test
 ```
 
-##### Build & Bundle Vue3 frontend web-app assets and startup backend app (doughnut webapp will launch on port 9081).
+##### Run frontend web-app (app will launch on port 3000)
+
+```bash
+yarn frontend:sut
+```
+
+##### Build & Bundle Vue3 frontend web-app assets and startup backend app (backend webapp will launch on port 9081).
 
 ```bash
 yarn frontend:build
 yarn sut
 ```
 
-Expect to find minified and uglified web bundle assets in `backend/src/main/resources/static` directory:
+Expect to find minified and uglified web bundle assets in `backend/src/main/resources/static`
+directory:
 
 ```bash
 ❯ pwd
@@ -135,8 +154,10 @@ Expect to find minified and uglified web bundle assets in `backend/src/main/reso
 1 directory, 6 files
 ```
 
-### 5. [Production environment](./docs/prod_env.md)
+### 5. [Code linting/formating](./docs/linting_formating.md)
 
-### 6. [Doughnut source code secrets management](./docs/secrets_management.md)
+### 6. [Production environment](./docs/prod_env.md)
 
-### 7. [Style Guide](./docs/styleguide.md)
+### 7. [Doughnut source code secrets management](./docs/secrets_management.md)
+
+### 8. [Style Guide](./docs/styleguide.md)
