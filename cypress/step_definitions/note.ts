@@ -355,3 +355,9 @@ When("I cancel the association with different title {string}", (wikidataTitle) =
 Then("I should be able to return to the association dialog", () => {
   cy.findByRole("button", { name: "Save" })
 })
+
+Then("I should see the icon beside title linking to wikipedia url", () => {
+  cy.get("#wikiUrl")
+  .invoke("attr", "href")
+  .should("eq", "https://en.wikipedia.org/wiki/Count_von_Count")
+})
