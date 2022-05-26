@@ -7,8 +7,8 @@ Feature: associate wiki to note
       | title | description             |
       | TDD   | Test driven development |
     When I visit note "TDD"
-    And I associate the note "TDD" with wikidata id "Q12345"
-    Then I should see the icon beside title linking to wikidata url with id "Q12345"
+    And I associate the note "TDD" with wikidata id "Q423392"
+    Then I should see the icon beside title linking to wikidata url with id "Q423392"
 
   Scenario: Search wikidata link and associate one result for a note
     Given I've logged in as an existing user
