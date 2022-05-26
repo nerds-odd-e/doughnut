@@ -29,8 +29,8 @@ public class RestWikidataController {
   }
 
   @GetMapping("/wikidata/searchWikidata/{searchTerm}")
-  public List<WikiDataSearchResponseModel> searchWikiData(@PathVariable("searchTerm") String searchTerm)
-      throws IOException, InterruptedException {
+  public List<WikiDataSearchResponseModel> searchWikiData(
+      @PathVariable("searchTerm") String searchTerm) throws IOException, InterruptedException {
     return wikiDataService.searchWikiData(searchTerm);
   }
 }

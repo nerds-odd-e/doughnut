@@ -4,9 +4,6 @@
   </h3>
   <form v-if="!showConfirmation" @submit.prevent.once="validateAssociation">
     <TextInput scopeName="wikiID" field="wikiID" v-model="associationData.wikidataId" placeholder="Q1234" />
-    <SearchWikidata
-      :note="note"
-    />
     <input type="submit" value="Save" class="btn btn-primary" />
   </form>
 

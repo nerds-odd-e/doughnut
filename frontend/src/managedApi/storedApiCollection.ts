@@ -165,12 +165,11 @@ const storedApiCollection = (
       return (await managedApi.restGet(
         `wikidata/${wikiDataId}`
       )) as Generated.WikiDataDto;
-
     },
 
     async searchWikidata(wikidataTitle: string) {
       return (await managedApi.restGet(
-        `wikidata/searchWikidata/${wikidataTitle}`,
+        `wikidata/searchWikidata/${wikidataTitle}`
       )) as Generated.WikiDataSearchResponseModel[];
     },
   };

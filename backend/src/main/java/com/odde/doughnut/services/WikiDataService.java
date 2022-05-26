@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.json.WikiDataSearchResponseModel;
 import com.odde.doughnut.models.WikiDataModel;
+import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -29,9 +30,7 @@ public class WikiDataService {
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     Object searchResult =
-      mapper
-            .readValue(response, new TypeReference<Map<String, Object>>() {})
-            .get("search");
+        mapper.readValue(response, new TypeReference<Map<String, Object>>() {}).get("search");
     return mapper.convertValue(searchResult, new TypeReference<>() {});
   }
 
