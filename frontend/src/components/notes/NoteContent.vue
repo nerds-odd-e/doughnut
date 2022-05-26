@@ -13,7 +13,7 @@
     />
     <a
       v-if="note.wikidataId"
-      id="wididataUrl"
+      id="wikidataUrl"
       role="wikidataUrl"
       :href="wikiDataUrl"
       target="_blank"
