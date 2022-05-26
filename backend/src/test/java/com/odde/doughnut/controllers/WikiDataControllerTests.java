@@ -156,20 +156,4 @@ class WikiDataControllerTests {
     assertThat(resultObj.get(1).id, equalTo(expected.get(1).id));
     assertThat(resultObj.get(1).label, equalTo(expected.get(1).label));
   }
-
-  @Test
-  void GivenSearchNameMoreThan10Results_ShouldOnlyGetTop10SearchResult()
-      throws IOException, InterruptedException {
-    WikiDataService service = new WikiDataService();
-    service.httpClientAdapter = httpClientAdapter;
-    Mockito.when(httpClientAdapter.getResponseString(any()))
-        .thenReturn(
-            "{\"searchinfo\": {\"search\": \"ktv\"},\"search\": [{\"id\": \"1\",\"label\": \"1\"}, {\"id\": \"1\",\"label\": \"1\"},{\"id\": \"1\",\"label\": \"1\"},{\"id\": \"1\",\"label\": \"1\"},{\"id\": \"1\",\"label\": \"1\"},{\"id\": \"1\",\"label\": \"1\"},{\"id\": \"1\",\"label\": \"1\"},{\"id\": \"1\",\"label\": \"1\"},{\"id\": \"1\",\"label\": \"1\"},{\"id\": \"1\",\"label\": \"1\"},{\"id\": \"1\",\"label\": \"1\"},{\"id\": \"1\",\"label\": \"1\"}],\"search-continue\": 7,\"success\": 1}");
-
-    controller = new RestWikidataController(service);
-
-    List<WikiDataSearchResponseModel> resultObj = controller.searchWikiData("tdd");
-
-    assertThat(resultObj.size(), equalTo(10));
-  }
 }
