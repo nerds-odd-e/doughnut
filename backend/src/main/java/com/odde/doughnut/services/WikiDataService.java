@@ -1,6 +1,5 @@
 package com.odde.doughnut.services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -18,20 +17,19 @@ public class WikiDataService {
 
   public WikiDataModel FetchWikiData(String wikiDataId) throws IOException, InterruptedException {
     String responseBody = CallWikiDataApi(wikiDataId);
-    return MapObject(responseBody);
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+    return mapper.readValue(responseBody, new TypeReference<WikiDataModel>() {});
   }
 
   public List<WikiDataSearchResponseModel> searchWikiData(String searchTerm)
       throws IOException, InterruptedException {
     String response = httpClientAdapter.getResponseString(ConstructSearchWikiDataUrl(searchTerm));
-    Object searchResult = this.<Map<String, Object>>MapObject(response).get("search");
+    Object searchResult =
+        new ObjectMapper()
+            .readValue(response, new TypeReference<Map<String, Object>>() {})
+            .get("search");
     return new ObjectMapper().convertValue(searchResult, new TypeReference<>() {});
-  }
-
-  private <T> T MapObject(String responseBody) throws JsonProcessingException {
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-    return mapper.readValue(responseBody, new TypeReference<T>() {});
   }
 
   private String CallWikiDataApi(String wikiDataId) throws IOException, InterruptedException {
