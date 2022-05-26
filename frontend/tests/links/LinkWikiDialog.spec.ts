@@ -10,13 +10,17 @@ describe("Save wikidata id", () => {
 
   it("should display modal when one single click on associate button", async () => {
     const note = makeMe.aNoteRealm.please();
-    const stubResponse = {
-      note,
-    };
+
+    const wikiData = makeMe.aWikiDataDto.please();
+
+    helper.apiMock
+      .expectingGet("/api/wikidata/Q12434")
+      .andReturnOnce({ wikiData });
 
     helper.apiMock
       .expectingPost(`/api/notes/${note.id}/updateWikidataId`)
-      .andReturnOnce(stubResponse);
+      .andReturnOnce({ note });
+
     const wrapper = helper
       .component(LinkWikiDialog)
       .withProps({
