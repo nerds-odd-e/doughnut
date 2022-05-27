@@ -20,7 +20,7 @@ public class TestabilitySettings {
   @Autowired GithubService githubService;
   @Getter private boolean featureToggleEnabled = false;
   @Getter @Setter Boolean useDummyWikidataService = false;
-  @Getter @Setter String wikidataServiceUrl = "";
+  @Setter String wikidataServiceUrl = "";
 
   public void timeTravelTo(Timestamp timestamp) {
     this.timestamp = timestamp;
