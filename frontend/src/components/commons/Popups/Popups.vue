@@ -1,5 +1,5 @@
 <template>
-  <template v-for="(popupInfo, index) in popupInfos" :key="index">
+  <template v-for="(popupInfo) in popupInfos" :key="index">
     <Modal
       v-if="popupInfo.type === 'alert'"
       class="popups"
