@@ -3,51 +3,20 @@
     <NoteTitleWithLink :note="note" class="card-title" />
   </h5>
   <div v-else style="display: flex">
-    <EditableText
-      role="title"
-      class="note-title"
-      :multiple-line="false"
-      scope-name="note"
-      v-model="textContent.title"
-      @blur="onBlurTextField"
-    />
-    <a
-      v-if="note.wikidataId"
-      id="wikidataUrl"
-      role="wikidataUrl"
-      :href="wikiDataUrl"
-      target="_blank"
-      style="text-align: right; margin-left: 10px"
-      title="Wikidata"
-      ><SvgAssociation
-    /></a>
+    <EditableText role="title" class="note-title" :multiple-line="false" scope-name="note" v-model="textContent.title"
+      @blur="onBlurTextField" />
+    <a v-if="note.wikidataId" id="wikiUrl" role="wikiUrl" :href="wikiUrl" target="_blank"
+      style="text-align: right; margin-left: 10px" title="Wikidata">
+      <SvgAssociation />
+    </a>
   </div>
   <div class="note-content">
-    <EditableText
-      :multiple-line="true"
-      role="description"
-      v-if="size === 'large'"
-      class="col note-description"
-      scope-name="note"
-      v-model="textContent.description"
-      @blur="onBlurTextField"
-    />
-    <NoteShortDescription
-      class="col"
-      v-if="size === 'medium'"
-      :short-description="note.shortDescription"
-    />
-    <SvgDescriptionIndicator
-      v-if="size === 'small' && !!textContent.description"
-      class="description-indicator"
-    />
+    <EditableText :multiple-line="true" role="description" v-if="size === 'large'" class="col note-description"
+      scope-name="note" v-model="textContent.description" @blur="onBlurTextField" />
+    <NoteShortDescription class="col" v-if="size === 'medium'" :short-description="note.shortDescription" />
+    <SvgDescriptionIndicator v-if="size === 'small' && !!textContent.description" class="description-indicator" />
     <template v-if="note.pictureWithMask">
-      <ShowPicture
-        v-if="size !== 'small'"
-        class="col text-center"
-        v-bind="note.pictureWithMask"
-        :opacity="0.2"
-      />
+      <ShowPicture v-if="size !== 'small'" class="col text-center" v-bind="note.pictureWithMask" :opacity="0.2" />
       <SvgPictureIndicator v-else class="picture-indicator" />
     </template>
     <template v-if="!!note.noteAccessories.url">
@@ -55,7 +24,7 @@
         <label v-if="note.noteAccessories.urlIsVideo">Video Url:</label>
         <label v-else>Url:</label>
         <a :href="note.noteAccessories.url" target="_blank">{{
-          note.noteAccessories.url
+            note.noteAccessories.url
         }}</a>
       </div>
       <a v-else :href="note.noteAccessories.url" target="_blank">
@@ -86,6 +55,9 @@ export default defineComponent({
     size: { type: String, default: "large" },
     titleAsLink: Boolean,
   },
+  data() {
+    return { wikipediaEnglishUrl: "" }
+  },
   emits: ["noteRealmUpdated"],
   components: {
     NoteShortDescription,
@@ -102,7 +74,11 @@ export default defineComponent({
       return { ...this.note.textContent };
     },
 
-    wikiDataUrl() {
+    wikiUrl() {
+      this.getWikiDataItem()
+      if (this.wikipediaEnglishUrl !== "") {
+        return this.wikipediaEnglishUrl;
+      }
       return `https://www.wikidata.org/wiki/${this.note.wikidataId}`;
     },
   },
@@ -118,6 +94,12 @@ export default defineComponent({
           this.$emit("noteRealmUpdated", res);
         })
         .catch((res) => (this.formErrors = res));
+    },
+    getWikiDataItem() {
+      this.storedApi.getWikiData(this.note.wikidataId)
+        .then((res: Generated.WikiDataDto) => {
+          this.wikipediaEnglishUrl = res.WikipediaEnglishUrl
+        })
     },
   },
 });

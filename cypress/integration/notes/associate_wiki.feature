@@ -10,7 +10,7 @@ Feature: associate wiki to note
       | TDD   | Test driven development |
     When I visit note "TDD"
     And I associate the note "TDD" with wikidata id "Q423392"
-    Then I should see the icon beside title linking to wikidata url with id "Q423392"
+    Then I should see the icon beside title linking to "wikipedia" url
 
     @ignore
   Scenario: Search wikidata link and associate one result for a note
@@ -21,13 +21,18 @@ Feature: associate wiki to note
     When I visit note "KFC"
     And I associate the note to wikidata by searching with "KFC"
 
-  @ignore
-  Scenario:
+  Scenario Outline: Associate note to wikipedia or wikidata if wikipedia does not exist
     Given there are some notes for the current user
       | title | description |
       | TDD   |             |
     And I visit note "TDD"
-    And I associate the note "TDD" with wikidata id "Q12345"
-    When I confirm the association with different title "Count von Count"
-    Then I should see the icon beside title linking to wikipedia url
+    And I associate the note "TDD" with wikidata id "<id>"
+    When I confirm the association with different title "<title>"
+    Then I should see the icon beside title linking to "<type>" url
+
+    Examples:
+      | id        | type      | title           |
+      | Q12345    | wikipedia | Count von Count |
+      | Q28799967 | wikidata  | Acanthias       |
+
 

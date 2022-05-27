@@ -323,12 +323,6 @@ When("I associate the note {string} with wikidata id {string}", (title, wikiID) 
   cy.clickAssociateWikiDataButton(title, wikiID)
 })
 
-Then("I should see the icon beside title linking to wikidata url with id {string}", (wikiID) => {
-  cy.get("#wikidataUrl")
-    .invoke("attr", "href")
-    .should("eq", `https://www.wikidata.org/wiki/${wikiID}`)
-})
-
 And("I associate the note to wikidata by searching with {string}", () => {
   cy.get(".toolbar").findByRole("button", { name: "associate wikidata" }).click()
 })
@@ -343,7 +337,14 @@ Given("there are some wikidata of KFC on the external service", async () => {
   const mb = new Mountebank()
   const imposter = new Imposter()
     .withPort(5000)
-    .withStub(new DefaultStub(`/external/searchWikidata`, HttpMethod.GET, "{\n                                                                               \"searchinfo\": {\n                                                                                   \"search\": \"KFC\"\n                                                                               },\n                                                                               \"search\": [\n                                                                                   {\n                                                                                       \"id\": \"Q1234\",\n                                                                                       \"label\": \"KFC\",\n                                                                                   }\n                                                                                   ]\n  ", 200))
+    .withStub(
+      new DefaultStub(
+        `/external/searchWikidata`,
+        HttpMethod.GET,
+        '{"searchinfo": {"search": "KFC"},"search": [{"id": "Q1234","label": "KFC",}]',
+        200,
+      ),
+    )
   await mb.createImposter(imposter)
 })
 
@@ -356,8 +357,16 @@ Then("I should be able to return to the association dialog", () => {
   cy.findByRole("button", { name: "Save" })
 })
 
-Then("I should see the icon beside title linking to wikipedia url", () => {
-  cy.get("#wikiUrl")
-  .invoke("attr", "href")
-  .should("eq", "https://en.wikipedia.org/wiki/Count_von_Count")
+Then("I should see the icon beside title linking to {string} url", (wikiType) => {
+  let expectedUrl = ""
+
+  if (wikiType == "wikipedia") {
+    expectedUrl = "https://en.wikipedia.org/"
+  }
+
+  if (wikiType == "wikidata") {
+    expectedUrl = "https://www.wikidata.org/"
+  }
+
+  cy.get("#wikiUrl").invoke("attr", "href").should("include", expectedUrl)
 })

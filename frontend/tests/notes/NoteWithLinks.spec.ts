@@ -98,7 +98,7 @@ describe("Link note to wikidata", () => {
       .withProps({ note: noteRealm.note, links: noteRealm.links })
       .mount();
 
-    const element = await wrapper.find('[role="wikidataUrl"]');
+    const element = await wrapper.find('[role="wikiUrl"]');
     element.isVisible();
     expect(element.attributes("title")).toMatch("Wikidata");
     expect(element.attributes("href")).toMatch(
