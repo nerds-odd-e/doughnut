@@ -1,4 +1,5 @@
 <template>
+<div>
   <template v-if="noteRealm">
     <NoteWithLinks
       v-bind="{ note: noteRealm.note, links: noteRealm.links }"
@@ -13,6 +14,7 @@
       />
     </div>
   </template>
+  </div>
 </template>
 
 <script lang="ts">

@@ -1,5 +1,7 @@
 Feature: associate wiki to note
   As a user, I want to associate wikidata to a note.
+
+  Background:
     Given I've logged in as an existing user
 
   Scenario: Associate wikidata ID for a note
@@ -12,14 +14,14 @@ Feature: associate wiki to note
 
   Scenario: Search wikidata link and associate one result for a note
     Given there are some notes for the current user
-      | title | description             |
-      | KFC   | Kentucky Fried Chicken  |
+      | title | description            |
+      | KFC   | Kentucky Fried Chicken |
     And there are some wikidata of KFC on the external service
     When I visit note "KFC"
     And I associate the note to wikidata by searching with "KFC"
-    
+
   @ignore
-  Scenario: 
+  Scenario:
     Given there are some notes for the current user
       | title | description |
       | TDD   |             |
