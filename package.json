@@ -42,7 +42,7 @@
       "command": "backend/gradlew -p backend lint"
     },
     "cy:format": {
-      "command": "yarn --frozen-lockfile --silent install && eslint cypress"
+      "command": "yarn --frozen-lockfile --silent install && eslint cypress --fix"
     },
     "cy:lint": {
       "command": "yarn --frozen-lockfile --silent install && eslint cypress"
