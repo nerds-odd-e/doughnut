@@ -108,7 +108,7 @@ For MS Windows WSL2 users:
 | cypress config   | `cypress/config/*.json`                   |
 | cypress plugins  | `cypress/plugins/index.ts`                |
 
-### 4. [Vue3 web-app frontend](https://flutter.dev/docs/get-started/web)
+### 4. Vue3 web-app frontend
 
 We chose Vue3 + Vite to build our frontend.
 
