@@ -42,8 +42,7 @@ describe("Save wikidata id", () => {
       .expectingGet("/api/wikidata/Q12434")
       .andReturnOnce({ wikiData });
 
-    helper.apiMock
-      .expectingPost(`/api/notes/${note.id}/updateWikidataId`);
+    helper.apiMock.expectingPost(`/api/notes/${note.id}/updateWikidataId`);
 
     const wrapper = helper
       .component(LinkWikiDialog)
@@ -51,15 +50,14 @@ describe("Save wikidata id", () => {
         note,
       })
       .mount();
-    
+
     const child = wrapper.findComponent(SearchWikidataVue);
-    child.vm.$emit('selected', "Q12434");
+    child.vm.$emit("selected", "Q12434");
     await wrapper.vm.$nextTick();
-    wrapper.emitted('selected');
+    wrapper.emitted("selected");
     const input = wrapper.find("#wikiID-wikiID").element as HTMLInputElement;
     expect(input.value).toEqual("Q12434");
 
     await wrapper.find('input[value="Save"]').trigger("submit");
-
   });
 });
