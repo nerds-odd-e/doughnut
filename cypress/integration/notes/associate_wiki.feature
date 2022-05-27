@@ -12,6 +12,7 @@ Feature: associate wiki to note
     And I associate the note "TDD" with wikidata id "Q423392"
     Then I should see the icon beside title linking to wikidata url with id "Q423392"
 
+    @ignore
   Scenario: Search wikidata link and associate one result for a note
     Given there are some notes for the current user
       | title | description            |

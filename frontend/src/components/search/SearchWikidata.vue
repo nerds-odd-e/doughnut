@@ -7,8 +7,8 @@
         placeholder="Search..."
       />
       <button class="btn btn-secondary" @click="searchWikidata()">Search</button>
-      <select v-if="wikidataItems.length" multiple >
-          <option v-for="wikidataItem in wikidataItems" :key="wikidataItem.id">{{ wikidataItem.label }}</option>
+      <select v-if="wikidataItems.length" multiple @change="onChange($event)">
+          <option v-for="wikidataItem in wikidataItems" :key="wikidataItem.id" :value="wikidataItem.id">{{ wikidataItem.label }}</option>
       </select>
   </div>
 </template>
@@ -25,11 +25,12 @@ export default defineComponent({
   },
   props: { note: {type: Object as PropType<Generated.Note>, required: true } },
   components: { TextInput },
-  emits: ["done"],
+  emits: ["selected"],
   data() {
     return {
         wikidataInput: "",
         wikidataItems: [] as Generated.WikiDataSearchResponseModel[],
+        wikiID: ""
     };
   },
   methods: {
@@ -39,6 +40,9 @@ export default defineComponent({
       .then((res) => {
         this.wikidataItems = res;
       })
+    },
+    onChange(event) {
+      this.$emit("selected", event.target.value);
     }
   }
 });
