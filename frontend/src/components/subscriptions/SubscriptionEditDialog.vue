@@ -32,7 +32,7 @@ export default {
     processForm() {
       this.api.subscriptionMethods
         .updateSubscription(this.subscription.id, this.formData)
-        .then((res) => {
+        .then(() => {
           this.$router.push({ name: "notebooks" });
         });
     },

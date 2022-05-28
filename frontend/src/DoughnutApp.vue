@@ -22,7 +22,7 @@ export default {
   components: { Popups, MainMenu, UserNewRegisterPage },
 
   watch: {
-    $route(to, from) {
+    $route(to) {
       this.popups.done(false);
       if (to.name) {
         this.showNavBar = !["repeat", "initial"].includes(

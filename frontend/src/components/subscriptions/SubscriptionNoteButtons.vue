@@ -39,7 +39,7 @@ export default {
       ) {
         this.api.subscriptionMethods
           .deleteSubscription(this.subscription.id)
-          .then((r) => {
+          .then(() => {
             this.$emit("updated");
           });
       }
