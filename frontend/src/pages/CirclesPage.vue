@@ -1,8 +1,10 @@
 <template>
-  <ContainerPage v-bind="{ loading, contentExists: !!circles, title: 'My Circles' }">
+  <ContainerPage
+    v-bind="{ loading, contentExists: !!circles, title: 'My Circles' }"
+  >
     <PopupButton title="Create a new circle">
-      <template #dialog_body="{doneHandler}">
-        <CircleNewDialog @done="doneHandler($event)"/>
+      <template #dialog_body="{ doneHandler }">
+        <CircleNewDialog @done="doneHandler($event)" />
       </template>
     </PopupButton>
     <div v-if="!!circles">
@@ -32,7 +34,7 @@
 import ContainerPage from "./commons/ContainerPage.vue";
 import PopupButton from "../components/commons/Popups/PopupButton.vue";
 import CircleJoinForm from "../components/circles/CircleJoinForm.vue";
-import useLoadingApi from '../managedApi/useLoadingApi';
+import useLoadingApi from "../managedApi/useLoadingApi";
 import CircleNewDialog from "../components/circles/CircleNewDialog.vue";
 
 export default {
@@ -47,11 +49,9 @@ export default {
   },
   methods: {
     fetchData() {
-      this.api.circleMethods.getCirclesOfCurrentUser().then(
-        (res) => {
-          this.circles = res
-        }
-      )
+      this.api.circleMethods.getCirclesOfCurrentUser().then((res) => {
+        this.circles = res;
+      });
     },
   },
   mounted() {

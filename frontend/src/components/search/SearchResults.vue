@@ -78,8 +78,7 @@ export default defineComponent({
         ) {
           this.searchTerm.allMyCircles = false;
         }
-        if (this.searchTerm.searchKey.trim() === "") {
-        } else {
+        if (this.searchTerm.searchKey.trim() !== "") {
           this.search();
         }
         this.oldSearchTerm = { ...this.searchTerm };

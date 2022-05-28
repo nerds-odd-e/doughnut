@@ -18,6 +18,7 @@
 
 <script>
 import InputWithType from "./InputWithType.vue";
+
 export default {
   props: {
     modelValue: String,

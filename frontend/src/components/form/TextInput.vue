@@ -17,6 +17,7 @@
 
 <script>
 import InputWithType from "./InputWithType.vue";
+
 export default {
   props: {
     modelValue: String,
@@ -29,8 +30,8 @@ export default {
     errors: Object,
   },
   components: {
-    InputWithType
+    InputWithType,
   },
   emits: ["update:modelValue", "blur"],
-}
+};
 </script>

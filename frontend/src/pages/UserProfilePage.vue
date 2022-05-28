@@ -1,5 +1,7 @@
 <template>
-  <ContainerPage v-bind="{ loading, contentExists: !!formData, title: 'Edit User Setting' }">
+  <ContainerPage
+    v-bind="{ loading, contentExists: !!formData, title: 'Edit User Setting' }"
+  >
     <div v-if="!!formData">
       <form @submit.prevent.once="processForm">
         <TextInput
@@ -32,9 +34,9 @@ import ContainerPage from "./commons/ContainerPage.vue";
 import TextInput from "../components/form/TextInput.vue";
 import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
 
-export default ({
+export default {
   setup() {
-    return useStoredLoadingApi({initalLoading: true, hasFormError: true})
+    return useStoredLoadingApi({ initalLoading: true, hasFormError: true });
   },
   components: { ContainerPage, TextInput },
   emits: ["userUpdated"],
@@ -46,18 +48,18 @@ export default ({
   methods: {
     fetchData() {
       this.api.userMethods.currentUser().then((res) => {
-        this.formData = res
-      })
+        this.formData = res;
+      });
     },
     processForm() {
-      this.storedApi.updateUser(this.formData.id, this.formData)
-        .then(() =>  this.$router.push({ name: "root" }))
-
+      this.storedApi
+        .updateUser(this.formData.id, this.formData)
+        .then(() => this.$router.push({ name: "root" }));
     },
   },
 
   mounted() {
     this.fetchData();
   },
-});
+};
 </script>

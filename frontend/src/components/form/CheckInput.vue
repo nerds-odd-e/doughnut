@@ -21,7 +21,7 @@ export default {
     scopeName: String,
     field: String,
     errors: Object,
-    disabled: Boolean
+    disabled: Boolean,
   },
   emits: ["update:modelValue"],
   components: { InputWithType },

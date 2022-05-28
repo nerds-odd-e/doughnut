@@ -64,8 +64,10 @@ import { defineComponent, PropType } from "vue";
 
 export default defineComponent({
   props: {
-    reviewing: { type: Object as PropType<Generated.ReviewStatus>, required: true },
+    reviewing: {
+      type: Object as PropType<Generated.ReviewStatus>,
+      required: true,
+    },
   },
-
-})
+});
 </script>

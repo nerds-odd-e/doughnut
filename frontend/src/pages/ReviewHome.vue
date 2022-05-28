@@ -7,7 +7,7 @@
 <script>
 import ReviewWelcome from "../components/review/ReviewWelcome.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
-import useLoadingApi from  "../managedApi/useLoadingApi";
+import useLoadingApi from "../managedApi/useLoadingApi";
 
 export default {
   setup() {
@@ -21,9 +21,7 @@ export default {
   components: { ReviewWelcome, ContainerPage },
   methods: {
     fetchData() {
-      this.api.reviewMethods.overview().then(
-        (res) => (this.reviewing = res)
-      )
+      this.api.reviewMethods.overview().then((res) => (this.reviewing = res));
     },
   },
   mounted() {

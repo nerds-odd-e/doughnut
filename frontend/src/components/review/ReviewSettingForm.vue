@@ -17,6 +17,7 @@
 <script>
 import CheckInput from "../form/CheckInput.vue";
 import TextInput from "../form/TextInput.vue";
+
 export default {
   props: { modelValue: Object, errors: Object, showLevel: Boolean },
   components: { CheckInput, TextInput },

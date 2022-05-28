@@ -1,6 +1,7 @@
 index.html
 components.d.ts
-dist/*
-.git/*
-.github/*
+dist
+node_modules
+.git
+.github
 *.md

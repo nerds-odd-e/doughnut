@@ -35,7 +35,9 @@ export default defineComponent({
     fontColor() {
       this.reverse ? colors.target : colors.source;
     },
-    colors() {return colors; }
+    colors() {
+      return colors;
+    },
   },
 });
 </script>

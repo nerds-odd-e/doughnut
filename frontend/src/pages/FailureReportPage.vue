@@ -1,5 +1,11 @@
 <template>
-  <ContainerPage v-bind="{ loading, contentExists: !!failureReport, title: 'Failure Report' }">
+  <ContainerPage
+    v-bind="{
+      loading,
+      contentExists: !!failureReport,
+      title: 'Failure Report',
+    }"
+  >
     <div v-if="!!failureReport">
       <div class="jumbotron py-4 mb-2">
         <h2><p v-text="failureReport.errorName" /></h2>
@@ -17,12 +23,12 @@
 </template>
 
 <script>
-import useLoadingApi from '../managedApi/useLoadingApi';
+import useLoadingApi from "../managedApi/useLoadingApi";
 import ContainerPage from "./commons/ContainerPage.vue";
 
 export default {
   setup() {
-    return useLoadingApi({initalLoading: true});
+    return useLoadingApi({ initalLoading: true });
   },
   props: { failureReportId: [String, Number] },
   components: { ContainerPage },
@@ -37,7 +43,7 @@ export default {
       this.api.getFailureReport(this.failureReportId).then((res) => {
         this.failureReport = res.failureReport;
         this.githubIssueUrl = res.githubIssueUrl;
-      })
+      });
     },
   },
   mounted() {

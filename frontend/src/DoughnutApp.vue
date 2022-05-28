@@ -8,9 +8,9 @@ import usePopups from "./components/commons/Popups/usePopup";
 export default {
   setup() {
     return {
-      ...useStoredLoadingApi({initalLoading: true, skipLoading: true}),
-      ...usePopups()
-    }
+      ...useStoredLoadingApi({ initalLoading: true, skipLoading: true }),
+      ...usePopups(),
+    };
   },
   data() {
     return {
@@ -23,7 +23,7 @@ export default {
 
   watch: {
     $route(to, from) {
-      this.popups.done(false)
+      this.popups.done(false);
       if (to.name) {
         this.showNavBar = !["repeat", "initial"].includes(
           to.name.split("-").shift()
@@ -33,35 +33,40 @@ export default {
   },
 
   computed: {
-    newUser() { return !this.user && !!this.externalIdentifier; },
-    user() { return this.piniaStore.currentUser },
+    newUser() {
+      return !this.user && !!this.externalIdentifier;
+    },
+    user() {
+      return this.piniaStore.currentUser;
+    },
   },
 
   mounted() {
-    this.storedApi.testability.getFeatureToggle()
+    this.storedApi.testability.getFeatureToggle();
 
-    this.storedApi.getCurrentUserInfo().then((res) => {
-      this.externalIdentifier = res.externalIdentifier;
-    })
-    .finally(()=> this.loading = false )
-
+    this.storedApi
+      .getCurrentUserInfo()
+      .then((res) => {
+        this.externalIdentifier = res.externalIdentifier;
+      })
+      .finally(() => (this.loading = false));
   },
 };
 </script>
 
 <template>
-<div class="box">
-  <Popups />
-  <UserNewRegisterPage v-if="newUser"/>
-  <template v-else>
-    <div class="header">
-      <MainMenu v-if="showNavBar" />
-    </div>
-    <div v-if="!loading" class="content">
-      <router-view/>
-    </div>
-  </template>
-</div>
+  <div class="box">
+    <Popups />
+    <UserNewRegisterPage v-if="newUser" />
+    <template v-else>
+      <div class="header">
+        <MainMenu v-if="showNavBar" />
+      </div>
+      <div v-if="!loading" class="content">
+        <router-view />
+      </div>
+    </template>
+  </div>
 </template>
 
 <style lang="sass" scoped>

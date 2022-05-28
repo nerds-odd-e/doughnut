@@ -14,11 +14,11 @@
 
 <script>
 import TextInput from "../form/TextInput.vue";
-import useLoadingApi from '../../managedApi/useLoadingApi';
+import useLoadingApi from "../../managedApi/useLoadingApi";
 
 export default {
   setup() {
-    return useLoadingApi({hasFormError: true});
+    return useLoadingApi({ hasFormError: true });
   },
   components: { TextInput },
   props: { invitationCode: Number },
@@ -32,13 +32,12 @@ export default {
 
   methods: {
     processForm() {
-      this.api.circleMethods.joinCircle(this.formData)
-        .then((res) => {
-          this.$router.push({
-            name: "circleShow",
-            params: { circleId: res.id },
-          });
-        })
+      this.api.circleMethods.joinCircle(this.formData).then((res) => {
+        this.$router.push({
+          name: "circleShow",
+          params: { circleId: res.id },
+        });
+      });
     },
   },
 };

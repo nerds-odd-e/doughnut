@@ -1,5 +1,11 @@
 <template>
-  <ContainerPage v-bind="{ loading, contentExists: !!notebooksViewedByUser, title: 'Welcome To The Bazaar' }">
+  <ContainerPage
+    v-bind="{
+      loading,
+      contentExists: !!notebooksViewedByUser,
+      title: 'Welcome To The Bazaar',
+    }"
+  >
     <p>These are shared notes from doughnut users.</p>
     <div v-if="!!notebooksViewedByUser">
       <NotebookBazaarViewCards
@@ -15,9 +21,9 @@ import NotebookBazaarViewCards from "../components/bazaar/NotebookBazaarViewCard
 import ContainerPage from "./commons/ContainerPage.vue";
 import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
 
-export default ({
+export default {
   setup() {
-    return useStoredLoadingApi({initalLoading: true});
+    return useStoredLoadingApi({ initalLoading: true });
   },
   name: "NotebooksPage",
   components: { ContainerPage, NotebookBazaarViewCards },
@@ -27,20 +33,20 @@ export default ({
     };
   },
   computed: {
-    user() { return this.piniaStore.currentUser }
+    user() {
+      return this.piniaStore.currentUser;
+    },
   },
 
   methods: {
     fetchData() {
-      this.api.getBazaar().then(
-        (res) => {
-          this.notebooksViewedByUser = res
-        }
-      )
+      this.api.getBazaar().then((res) => {
+        this.notebooksViewedByUser = res;
+      });
     },
   },
   mounted() {
     this.fetchData();
   },
-});
+};
 </script>

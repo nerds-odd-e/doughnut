@@ -3,7 +3,6 @@
 </template>
 
 <script lang="ts">
-
 import { defineComponent } from "vue";
 import usePopups from "../commons/Popups/usePopup";
 import SvgStop from "../svgs/SvgStop.vue";

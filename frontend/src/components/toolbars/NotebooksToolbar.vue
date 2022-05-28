@@ -28,6 +28,6 @@ export default defineComponent({
     SvgSearch,
     LinkNoteDialog,
     ToolbarFrame,
-},
+  },
 });
 </script>

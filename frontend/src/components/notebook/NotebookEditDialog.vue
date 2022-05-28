@@ -1,23 +1,23 @@
 <template>
-      <h3>Edit notebook settings</h3>
-      <form @submit.prevent.once="processForm">
-        <CheckInput
-          scopeName="notebook"
-          field="skipReviewEntirely"
-          v-model="formData.skipReviewEntirely"
-          :errors="formErrors.skipReviewEntirely"
-        />
-        <input type="submit" value="Update" class="btn btn-primary" />
-      </form>
+  <h3>Edit notebook settings</h3>
+  <form @submit.prevent.once="processForm">
+    <CheckInput
+      scopeName="notebook"
+      field="skipReviewEntirely"
+      v-model="formData.skipReviewEntirely"
+      :errors="formErrors.skipReviewEntirely"
+    />
+    <input type="submit" value="Update" class="btn btn-primary" />
+  </form>
 </template>
 
 <script>
-import useLoadingApi from '../../managedApi/useLoadingApi';
+import useLoadingApi from "../../managedApi/useLoadingApi";
 import CheckInput from "../form/CheckInput.vue";
 
 export default {
   setup() {
-    return useLoadingApi({hasFormError: true});
+    return useLoadingApi({ hasFormError: true });
   },
   props: { notebook: Object },
   components: { CheckInput },
@@ -30,10 +30,11 @@ export default {
 
   methods: {
     processForm() {
-      this.api.notebookMethods.updateNotebookSettings(this.notebook.id, this.formData)
+      this.api.notebookMethods
+        .updateNotebookSettings(this.notebook.id, this.formData)
         .then((res) => {
           this.$router.push({ name: "notebooks" });
-        })
+        });
     },
   },
 };

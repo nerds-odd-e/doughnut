@@ -22,6 +22,7 @@
 
 <script>
 import SvgClose from "../svgs/SvgClose.vue";
+
 export default {
   emits: ["close_request"],
   components: { SvgClose },

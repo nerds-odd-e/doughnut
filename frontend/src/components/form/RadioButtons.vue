@@ -5,7 +5,7 @@
       role="radiogroup"
       class="btn-group filter-switch"
     >
-      <template
+      <div
         v-for="option in options"
         :key="option.value"
         class="filter-switch-item"
@@ -17,17 +17,23 @@
           :id="`${scopeName}-${option.value}`"
           v-model="modelValue"
         />
-        <label role="button" :title ="option.title" class="btn btn-outline-primary text-nowrap" :for="`${scopeName}-${option.value}`">
+        <label
+          role="button"
+          :title="option.title"
+          class="btn btn-outline-primary text-nowrap"
+          :for="`${scopeName}-${option.value}`"
+        >
           <slot name="labelAddition" :value="option.value" />
           {{ option.label }}
         </label>
-      </template>
+      </div>
     </output>
   </InputWithType>
 </template>
 
 <script>
 import InputWithType from "./InputWithType.vue";
+
 export default {
   props: {
     modelValue: String,
@@ -54,5 +60,4 @@ export default {
 label {
   font-size: small;
 }
-
 </style>

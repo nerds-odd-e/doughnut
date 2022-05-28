@@ -6,7 +6,10 @@
       v-model="inputSearchKey"
       placeholder="Search"
     />
-    <SearchResults v-bind="{noteId, inputSearchKey}" @selected="$emit('selected', $event)"/>
+    <SearchResults
+      v-bind="{ noteId, inputSearchKey }"
+      @selected="$emit('selected', $event)"
+    />
   </div>
 </template>
 

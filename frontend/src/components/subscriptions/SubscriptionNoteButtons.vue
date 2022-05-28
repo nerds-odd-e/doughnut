@@ -5,7 +5,10 @@
         <SvgEdit />
       </template>
       <template #dialog_body="{ doneHandler }">
-        <SubscriptionEditDialog :subscription="subscription" @done="doneHandler($event)" />
+        <SubscriptionEditDialog
+          :subscription="subscription"
+          @done="doneHandler($event)"
+        />
       </template>
     </PopupButton>
     <button class="btn btn-sm" title="Unsubscribe" @click="processForm()">
@@ -16,7 +19,7 @@
 
 <script>
 import SvgUnsubscribe from "../svgs/SvgUnsubscribe.vue";
-import useLoadingApi from '../../managedApi/useLoadingApi';
+import useLoadingApi from "../../managedApi/useLoadingApi";
 import usePopups from "../commons/Popups/usePopup";
 import PopupButton from "../commons/Popups/PopupButton.vue";
 import SvgEdit from "../svgs/SvgEdit.vue";
@@ -32,14 +35,13 @@ export default {
   methods: {
     async processForm() {
       if (
-        await this.popups.confirm(
-          `Confirm to unsubscribe from this notebook?`
-        )
+        await this.popups.confirm(`Confirm to unsubscribe from this notebook?`)
       ) {
-        this.api.subscriptionMethods.deleteSubscription(this.subscription.id
-        ).then((r) => {
-          this.$emit("updated");
-        });
+        this.api.subscriptionMethods
+          .deleteSubscription(this.subscription.id)
+          .then((r) => {
+            this.$emit("updated");
+          });
       }
     },
   },

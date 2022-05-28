@@ -1,19 +1,19 @@
 <template>
-    <div class="container">
-      <h1>Testability</h1>
-      <CheckInput
-        scopeName="testability"
-        v-model="featureToggle"
-        field="featureToggle"
-      />
-      <TextInput
-        scopeName="testability"
-        v-model="randomSelector"
-        field="randomSelector"
-        hint="can be 'first' or 'last'"
-        @blur="updateRandomSelector"
-      />
-    </div>
+  <div class="container">
+    <h1>Testability</h1>
+    <CheckInput
+      scopeName="testability"
+      v-model="featureToggle"
+      field="featureToggle"
+    />
+    <TextInput
+      scopeName="testability"
+      v-model="randomSelector"
+      field="randomSelector"
+      hint="can be 'first' or 'last'"
+      @blur="updateRandomSelector"
+    />
+  </div>
 </template>
 
 <script lang="ts">
@@ -29,20 +29,19 @@ export default defineComponent({
   data() {
     return {
       featureToggle: false,
-      randomSelector: ""
-    }
-
+      randomSelector: "",
+    };
   },
   components: { CheckInput, TextInput },
   methods: {
     updateRandomSelector() {
-      this.storedApi.testability.setRandomizer(this.randomSelector)
-    }
+      this.storedApi.testability.setRandomizer(this.randomSelector);
+    },
   },
   watch: {
     featureToggle() {
-      this.storedApi.testability.setFeatureToggle(this.featureToggle)
-    }
-  }
-})
+      this.storedApi.testability.setFeatureToggle(this.featureToggle);
+    },
+  },
+});
 </script>

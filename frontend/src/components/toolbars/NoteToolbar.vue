@@ -79,7 +79,7 @@ export default defineComponent({
     LinkNoteDialog,
     ToolbarFrame,
     SvgWikiData,
-    LinkWikiDialog
+    LinkWikiDialog,
   },
   computed: {
     featureToggle() {

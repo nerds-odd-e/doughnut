@@ -1,5 +1,4 @@
 <script>
-
 import NoteStatistics from "./NoteStatistics.vue";
 
 export default {

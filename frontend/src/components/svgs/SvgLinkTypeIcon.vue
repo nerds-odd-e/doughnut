@@ -10,6 +10,7 @@
 </template>
 
 <script setup>
+import { computed } from "vue";
 import SvgLinkTypeSpecialize from "./link_types/SvgLinkTypeSpecialize.vue";
 import SvgLinkTypeRelated from "./link_types/SvgLinkTypeRelated.vue";
 import SvgLinkTypeApplication from "./link_types/SvgLinkTypeApplication.vue";
@@ -25,8 +26,7 @@ import SvgLinkTypeOpposite from "./link_types/SvgLinkTypeOpposite.vue";
 import SvgLinkTypeAttr from "./link_types/SvgLinkTypeAttr.vue";
 import SvgLinkTypeConfuse from "./link_types/SvgLinkTypeConfuse.vue";
 import SvgFolder from "./link_types/SvgFolder.vue";
-import { computed } from "@vue/runtime-core";
-import { linkTypeNameToId } from "@/models/linkTypeOptions";
+import { linkTypeNameToId } from "../..//models/linkTypeOptions";
 
 const props = defineProps({
   linkTypeId: Number,
@@ -38,7 +38,7 @@ const props = defineProps({
 
 const computedTypeId = computed(() => !props.linkTypeId ? linkTypeNameToId(props.linkTypeName) : props.linkTypeId)
 const iconComponent = computed(() => {
-  const linkTypeId = parseInt(computedTypeId.value);
+  const linkTypeId = parseInt(computedTypeId.value, 10);
   if (linkTypeId === 1) return SvgLinkTypeRelated;
   if (linkTypeId === 2) return SvgLinkTypeSpecialize;
   if (linkTypeId === 3) return SvgLinkTypeApplication;

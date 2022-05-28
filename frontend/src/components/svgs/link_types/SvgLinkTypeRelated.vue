@@ -17,5 +17,6 @@
 <script setup>
 import Object1 from "./Object1.vue";
 import Arrow from "./Arrow.vue";
+
 const props = defineProps({ ifInverse: { type: Number, default: 1 } });
 </script>

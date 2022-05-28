@@ -3,8 +3,8 @@
     <template v-slot:button_face>
       <slot />
     </template>
-    <template #dialog_body="{doneHandler}">
-      <NotebookNewDialog :circle="circle" @done="doneHandler($event)"/>
+    <template #dialog_body="{ doneHandler }">
+      <NotebookNewDialog :circle="circle" @done="doneHandler($event)" />
     </template>
   </PopupButton>
 </template>
@@ -15,7 +15,7 @@ import NotebookNewDialog from "./NotebookNewDialog.vue";
 import PopupButton from "../commons/Popups/PopupButton.vue";
 
 export default defineComponent({
-    props: { circle: Object },
-    components: { PopupButton, NotebookNewDialog }
+  props: { circle: Object },
+  components: { PopupButton, NotebookNewDialog },
 });
 </script>

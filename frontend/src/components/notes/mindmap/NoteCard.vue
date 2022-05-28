@@ -18,7 +18,7 @@
 <script>
 import NoteShell from "../NoteShell.vue";
 import NoteContent from "../NoteContent.vue";
-import MindmapSector from "@/models/MindmapSector";
+import MindmapSector from "../../../models/MindmapSector";
 
 export default {
   props: {

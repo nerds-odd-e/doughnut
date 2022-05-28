@@ -20,7 +20,9 @@
 import { defineComponent, PropType } from "vue";
 import Card from "../notes/Card.vue";
 export default defineComponent({
-  props: { notebooks: Array as PropType<Array<Generated.NotebookViewedByUser>> },
+  props: {
+    notebooks: Array as PropType<Array<Generated.NotebookViewedByUser>>,
+  },
   components: { Card },
 });
 </script>

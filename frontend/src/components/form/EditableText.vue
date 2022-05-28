@@ -1,23 +1,26 @@
 <template>
   <div class="text" @click="startEditing">
     <template v-if="!isEditing">
-      <component v-bind:is="displayComponent"
+      <component
+        v-bind:is="displayComponent"
         v-if="!!modelValue"
         v-text="modelValue"
-        />
-      <SvgEditText v-else/>
+      />
+      <SvgEditText v-else />
     </template>
-    <component v-bind:is="editingComponent"
-     v-else
-     v-focus
-     class="editor" 
-     v-model="localValue"
-     :scopeName="scopeName"
-     :field="field"
-     :title="title"
-     :errors="errors"
-     @blur="onBlurTextField"
-     v-on:keydown.enter="onEnterKey($event)"/>
+    <component
+      v-bind:is="editingComponent"
+      v-else
+      v-focus
+      class="editor"
+      v-model="localValue"
+      :scopeName="scopeName"
+      :field="field"
+      :title="title"
+      :errors="errors"
+      @blur="onBlurTextField"
+      v-on:keydown.enter="onEnterKey($event)"
+    />
   </div>
 </template>
 
@@ -51,31 +54,31 @@ export default {
   },
   computed: {
     displayComponent() {
-      return this.multipleLine ? 'pre' : 'h2'
+      return this.multipleLine ? "pre" : "h2";
     },
     editingComponent() {
-      return this.multipleLine ? 'TextArea' : 'TextInput'
+      return this.multipleLine ? "TextArea" : "TextInput";
     },
   },
   methods: {
     startEditing() {
-      if(this.isEditing) return
-      this.initialValue = this.modelValue
-      this.localValue = this.modelValue
+      if (this.isEditing) return;
+      this.initialValue = this.modelValue;
+      this.localValue = this.modelValue;
       this.isEditing = true;
     },
     onEnterKey(event) {
-      if(!this.multipleLine || event.shiftKey) {
-        event.target.blur()
+      if (!this.multipleLine || event.shiftKey) {
+        event.target.blur();
       }
     },
     onBlurTextField() {
       this.isEditing = false;
       if (this.initialValue !== this.localValue) {
-        this.$emit('update:modelValue', this.localValue)
+        this.$emit("update:modelValue", this.localValue);
         this.$emit("blur");
       }
-    }
+    },
   },
 };
 </script>

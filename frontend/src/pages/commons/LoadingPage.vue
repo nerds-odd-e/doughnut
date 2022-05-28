@@ -10,9 +10,9 @@ import LoadingThinBar from "../../components/commons/LoadingThinBar.vue";
 
 export default {
   props: {
-   loading: Boolean,
-   contentExists: Boolean,
+    loading: Boolean,
+    contentExists: Boolean,
   },
-  components: { ContentLoader, LoadingThinBar }
-}
+  components: { ContentLoader, LoadingThinBar },
+};
 </script>

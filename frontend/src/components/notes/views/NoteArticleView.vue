@@ -1,19 +1,19 @@
 <template>
-<div>
-  <template v-if="noteRealm">
-    <NoteWithLinks
-      v-bind="{ note: noteRealm.note, links: noteRealm.links }"
-      @note-realm-updated="$emit('noteRealmUpdated', $event)"
-    />
-    <div class="note-list">
-      <NoteArticleView
-        v-for="child in children"
-        v-bind="{ noteId: child.id, noteRealms }"
-        :key="child.id"
+  <div>
+    <template v-if="noteRealm">
+      <NoteWithLinks
+        v-bind="{ note: noteRealm.note, links: noteRealm.links }"
         @note-realm-updated="$emit('noteRealmUpdated', $event)"
       />
-    </div>
-  </template>
+      <div class="note-list">
+        <NoteArticleView
+          v-for="child in children"
+          v-bind="{ noteId: child.id, noteRealms }"
+          :key="child.id"
+          @note-realm-updated="$emit('noteRealmUpdated', $event)"
+        />
+      </div>
+    </template>
   </div>
 </template>
 

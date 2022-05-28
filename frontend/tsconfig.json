@@ -29,12 +29,17 @@
     ]
   },
   "compileOnSave": true,
+  "typeRoots": [
+    "node_modules/@types",
+    "src/@types/generated/rest.d.ts"
+  ],
   "types": [
     "node",
     "jest",
     "vite/client",
     "@testing-library/jest-dom"
   ],
+  "files": ["src/@types/generated/rest.d.ts"],
   "include": [
     "src/**/*.ts",
     "src/**/*.d.ts",

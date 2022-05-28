@@ -18,7 +18,7 @@
 </template>
 
 <script setup>
-import { computed } from "@vue/runtime-core";
+import { computed } from "vue";
 import { bgcolors } from "../../../colors";
 
 const props = defineProps({

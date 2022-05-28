@@ -23,7 +23,7 @@
 </template>
 
 <script>
-import useLoadingApi from '../managedApi/useLoadingApi';
+import useLoadingApi from "../managedApi/useLoadingApi";
 import ContainerPage from "./commons/ContainerPage.vue";
 
 export default {
@@ -39,20 +39,23 @@ export default {
   },
   methods: {
     fetchData() {
-      this.api.getFailureReports()
+      this.api
+        .getFailureReports()
         .then((res) => {
-          this.failureReports = res
+          this.failureReports = res;
         })
         .catch(
           () => (this.errorMessage = "It seems you cannot access this page.")
-        )
+        );
     },
   },
   mounted() {
     this.fetchData();
   },
   computed: {
-    user() { return this.$store.getters.getCurrentUser()},
+    user() {
+      return this.$store.getters.getCurrentUser();
+    },
   },
 };
 </script>

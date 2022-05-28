@@ -79,14 +79,16 @@
 <script>
 import LinkLink from "./LinkLink.vue";
 import LinksReader from "../../models/LinksReader";
-import { reverseLabel } from "../../models/linkTypeOptions"
+import { reverseLabel } from "../../models/linkTypeOptions";
 
 export default {
   props: { links: Object },
   emits: ["noteRealmUpdated"],
   components: { LinkLink },
   methods: {
-    reverseLabel(lbl) { return reverseLabel(lbl)}
+    reverseLabel(lbl) {
+      return reverseLabel(lbl);
+    },
   },
   computed: {
     linksReader() {

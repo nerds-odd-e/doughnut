@@ -56,6 +56,6 @@ export default defineComponent({
     modelValue: { type: Object, required: true },
     errors: { type: Object, default: {} },
   },
-  components: { TextInput, CheckInput, ImageInput }
+  components: { TextInput, CheckInput, ImageInput },
 });
 </script>

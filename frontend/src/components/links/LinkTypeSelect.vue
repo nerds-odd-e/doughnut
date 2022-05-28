@@ -1,5 +1,4 @@
 <template>
-
   <RadioButtons
     v-model="modelValue"
     @update:modelValue="$emit('update:modelValue', $event)"
@@ -11,13 +10,12 @@
       </div>
     </template>
   </RadioButtons>
-
 </template>
 
 <script>
 import RadioButtons from "../form/RadioButtons.vue";
 import SvgLinkTypeIcon from "../svgs/SvgLinkTypeIcon.vue";
-import { linkTypeOptions } from "../../models/linkTypeOptions"
+import { linkTypeOptions } from "../../models/linkTypeOptions";
 
 export default {
   name: "LinkTypeSelect",
@@ -34,10 +32,7 @@ export default {
   computed: {
     options() {
       if (!!this.allowEmpty) {
-        return [
-          { value: 0, label: "Default" },
-          ...linkTypeOptions,
-        ];
+        return [{ value: 0, label: "Default" }, ...linkTypeOptions];
       }
       return linkTypeOptions;
     },

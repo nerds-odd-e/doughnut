@@ -16,5 +16,6 @@
 import Object1 from "./Object1.vue";
 import Tool from "./Tool.vue";
 import Lnk from "./Lnk.vue";
+
 const props = defineProps({ ifInverse: { type: Number, default: 1 } });
 </script>

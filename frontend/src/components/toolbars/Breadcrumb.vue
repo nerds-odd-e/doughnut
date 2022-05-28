@@ -1,5 +1,5 @@
 <template>
-  <BasicBreadcrumb v-bind="{ancestors}">
+  <BasicBreadcrumb v-bind="{ ancestors }">
     <template #topLink v-if="notebook">
       <li v-if="fromBazaar" class="breadcrumb-item">
         <router-link :to="{ name: 'bazaar' }">Bazaar</router-link>

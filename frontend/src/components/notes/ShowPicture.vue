@@ -32,7 +32,7 @@
 const props = defineProps({
   notePicture: String,
   pictureMask: String,
-  opacity: Number
+  opacity: Number,
 });
 
 const createGroups = (arr, perGroup) => {
@@ -43,11 +43,9 @@ const createGroups = (arr, perGroup) => {
 };
 
 const getMasks = () => {
-  return createGroups(props.pictureMask.split(/\s+/), 4).map(
-    (arr, index) => {
-      const [x, y, width, height] = arr;
-      return { index, x, y, width, height };
-    }
-  );
+  return createGroups(props.pictureMask.split(/\s+/), 4).map((arr, index) => {
+    const [x, y, width, height] = arr;
+    return { index, x, y, width, height };
+  });
 };
 </script>

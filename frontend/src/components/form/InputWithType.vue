@@ -2,7 +2,7 @@
   <div class="form-group">
     <slot v-if="beforeLabel" />
     <label v-if="!!field || !!title" :for="controlId">{{ titlized }}</label>
-    <i v-if="hint" class="hint" v-text="hint"/>
+    <i v-if="hint" class="hint" v-text="hint" />
     <slot v-if="!beforeLabel" />
     <div class="error-msg" v-if="!!errors">{{ errors }}</div>
   </div>
@@ -10,6 +10,7 @@
 
 <script>
 import { startCase, camelCase } from "lodash";
+
 export default {
   props: {
     scopeName: String,

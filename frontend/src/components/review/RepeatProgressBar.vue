@@ -35,7 +35,6 @@
           >
             <SvgResume />
           </button>
-
         </template>
         <button
           v-else
@@ -125,5 +124,4 @@ export default {
     opacity: 0.5;
   }
 }
-
 </style>

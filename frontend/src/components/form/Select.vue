@@ -21,6 +21,7 @@
 
 <script setup>
 import InputWithType from "./InputWithType.vue";
+
 const props = defineProps({
   modelValue: String,
   scopeName: String,
