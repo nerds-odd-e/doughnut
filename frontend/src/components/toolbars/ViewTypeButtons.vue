@@ -1,7 +1,7 @@
 <template>
   <RadioButtons
     :model-value="viewType"
-    @update:modelValue="viewTypeChange"
+    @update:model-value="viewTypeChange"
     v-bind="{ options }"
   >
     <template #labelAddition="{ value }">

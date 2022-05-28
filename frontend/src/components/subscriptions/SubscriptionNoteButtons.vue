@@ -1,7 +1,7 @@
 <template>
   <div class="btn-group btn-group-sm">
     <PopupButton title="Edit subscription">
-      <template v-slot:button_face>
+      <template #button_face>
         <SvgEdit />
       </template>
       <template #dialog_body="{ doneHandler }">

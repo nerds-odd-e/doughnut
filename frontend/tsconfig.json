@@ -26,23 +26,19 @@
     "lib": [
       "esnext",
       "dom"
+    ],
+    "types": [
+      "node",
+      "jest",
+      "vite/client",
+      "@testing-library/jest-dom"
     ]
   },
   "compileOnSave": true,
-  "typeRoots": [
-    "node_modules/@types",
-    "src/@types/generated/rest.d.ts"
-  ],
-  "types": [
-    "node",
-    "jest",
-    "vite/client",
-    "@testing-library/jest-dom"
-  ],
-  "files": ["src/@types/generated/rest.d.ts"],
   "include": [
-    "src/**/*.ts",
+    "src/@types/generated/rest.d.ts",
     "src/**/*.d.ts",
+    "src/**/*.ts",
     "src/**/*.tsx",
     "src/**/*.vue",
     "tests/**/*.ts"

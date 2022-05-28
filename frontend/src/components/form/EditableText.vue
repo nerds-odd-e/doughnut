@@ -1,11 +1,9 @@
 <template>
   <div class="text" @click="startEditing">
     <template v-if="!isEditing">
-      <component
-        v-bind:is="displayComponent"
-        v-if="!!modelValue"
-        v-text="modelValue"
-      />
+      <component v-bind:is="displayComponent" v-if="!!modelValue">
+        {{ modelValue }}
+      </component>
       <SvgEditText v-else />
     </template>
     <component
@@ -14,12 +12,12 @@
       v-focus
       class="editor"
       v-model="localValue"
-      :scopeName="scopeName"
+      :scope-name="scopeName"
       :field="field"
       :title="title"
       :errors="errors"
       @blur="onBlurTextField"
-      v-on:keydown.enter="onEnterKey($event)"
+      @keydown.enter="onEnterKey($event)"
     />
   </div>
 </template>

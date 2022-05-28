@@ -7,7 +7,7 @@
           toRepeatCount,
           previousResultCursor,
         }"
-        @viewLastResult="viewLastResult($event)"
+        @view-last-result="viewLastResult($event)"
       >
       </RepeatProgressBar>
     </div>
@@ -25,7 +25,7 @@
           v-bind="{
             reviewPointId,
           }"
-          @selfEvaluated="fetchData"
+          @self-evaluated="fetchData"
           :key="repetition.reviewPoint"
         />
       </template>

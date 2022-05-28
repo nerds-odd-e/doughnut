@@ -12,7 +12,7 @@
     v-if="targetNote && note"
     v-bind="{ targetNote, note }"
     @success="$emit('done', $event)"
-    @goBack="targetNote = undefined"
+    @go-back="targetNote = undefined"
   />
 </template>
 

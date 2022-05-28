@@ -5,20 +5,20 @@
     <div v-if="!!formData">
       <form @submit.prevent.once="processForm">
         <TextInput
-          scopeName="user"
+          scope-name="user"
           field="name"
           v-model="formData.name"
           :autofocus="true"
           :errors="formErrors.name"
         />
         <TextInput
-          scopeName="user"
+          scope-name="user"
           field="dailyNewNotesCount"
           v-model="formData.dailyNewNotesCount"
           :errors="formErrors.dailyNewNotesCount"
         />
         <TextInput
-          scopeName="user"
+          scope-name="user"
           field="spaceIntervals"
           v-model="formData.spaceIntervals"
           :errors="formErrors.spaceIntervals"

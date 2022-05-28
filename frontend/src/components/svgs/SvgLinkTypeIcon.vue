@@ -5,7 +5,7 @@
     stroke="#000"
     stroke-width="5%"
   >
-    <component :is="iconComponent" :ifInverse="!!inverseIcon ? -1 : 1" />
+    <component :is="iconComponent" :if-inverse="!!inverseIcon ? -1 : 1" />
   </svg>
 </template>
 
@@ -26,7 +26,7 @@ import SvgLinkTypeOpposite from "./link_types/SvgLinkTypeOpposite.vue";
 import SvgLinkTypeAttr from "./link_types/SvgLinkTypeAttr.vue";
 import SvgLinkTypeConfuse from "./link_types/SvgLinkTypeConfuse.vue";
 import SvgFolder from "./link_types/SvgFolder.vue";
-import { linkTypeNameToId } from "../..//models/linkTypeOptions";
+import { linkTypeNameToId } from "../../models/linkTypeOptions";
 
 const props = defineProps({
   linkTypeId: Number,

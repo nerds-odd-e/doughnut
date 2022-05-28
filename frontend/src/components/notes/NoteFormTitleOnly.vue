@@ -1,6 +1,6 @@
 <template>
   <TextInput
-    scopeName="note"
+    scope-name="note"
     field="title"
     v-model="modelValue.title"
     :errors="errors.title"
@@ -13,6 +13,11 @@ import TextInput from "../form/TextInput.vue";
 
 const props = defineProps({
   modelValue: { type: Object, required: true },
-  errors: { type: Object, default: {} },
+  errors: {
+    type: Object,
+    default() {
+      return {};
+    },
+  },
 });
 </script>

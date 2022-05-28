@@ -1,12 +1,12 @@
 <template>
   <RadioButtons
     v-model="modelValue"
-    @update:modelValue="$emit('update:modelValue', $event)"
+    @update:model-value="$emit('update:modelValue', $event)"
     v-bind="{ scopeName, field, options, errors }"
   >
     <template #labelAddition="{ value }">
       <div class="text-center">
-        <SvgLinkTypeIcon :linkTypeId="value" :inverseIcon="inverseIcon" />
+        <SvgLinkTypeIcon :link-type-id="value" :inverse-icon="inverseIcon" />
       </div>
     </template>
   </RadioButtons>

@@ -8,7 +8,7 @@
   >
     <form @submit.prevent.once="processForm">
       <TextInput
-        scopeName="user"
+        scope-name="user"
         field="name"
         v-model="formData.name"
         :autofocus="true"

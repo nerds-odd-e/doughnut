@@ -40,7 +40,7 @@ export default {
   <div>
     <component
       :is="statisticComponentName"
-      :noteId="noteId"
+      :note-id="noteId"
       :linkid="linkid"
     ></component>
   </div>

@@ -37,9 +37,9 @@ module.exports = {
     'plugin:prettier/recommended',
     'prettier',
   ],
-  ignorePatterns: ['auto-imports.d.ts', 'index.d.ts', 'rest.d.ts', 'vite.config.ts', 'babel.config.js', 'jest.config.js', 'tests/setupJest.js'],
+  ignorePatterns: ['vite.config.ts', 'babel.config.js', 'jest.config.js', 'tests/setupJest.js'],
   settings: {
-    'import/extensions': ['.vue', '.ts', '.tsx'],
+    'import/extensions': ['.ts', '.tsx'],
     'import/resolver': {
       alias: {
         map: [['@', './src']],

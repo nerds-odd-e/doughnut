@@ -8,12 +8,12 @@
   >
     <Object1
       :stripes="false"
-      linkRole="source"
+      link-role="source"
       :x="ifInverse === 1 ? -70 : 300"
       :y="105"
       :size="30"
     />
-    <Object1 :stripes="false" linkRole="target" :x="250 * ifInverse" />
+    <Object1 :stripes="false" link-role="target" :x="250 * ifInverse" />
 
     <svg viewBox="0 0 200 100" x="-100" :y="0" :height="400">
       <path
@@ -21,7 +21,7 @@
         d="
     M155,40
     c 0 0, 0 -15, -25 -20
-    L 105,20 
+    L 105,20
     c -30 0, -50 0, -50 50
     m -25 -25
     l 25 25
@@ -35,7 +35,7 @@
         d="
     M90,30
     c 0 0, 0 -10, 5 -20
-    l 50,0 
+    l 50,0
     c 10 0, 10 0, 10 50
     m -25 -25
     l 25 25

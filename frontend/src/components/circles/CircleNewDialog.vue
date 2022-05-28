@@ -2,7 +2,7 @@
   <h3>Creating a new circle</h3>
   <form @submit.prevent.once="processForm">
     <TextInput
-      scopeName="circle"
+      scope-name="circle"
       field="name"
       v-model="formData.name"
       :errors="formErrors.name"

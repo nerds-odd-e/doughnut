@@ -14,7 +14,7 @@
         <NoteMindmapView
           v-bind="{ noteId, noteRealms: noteRealmCache }"
           :highlight-note-id="selectedNoteId"
-          @selectNote="highlight($event)"
+          @select-note="highlight($event)"
           @note-realm-updated="noteRealmUpdated($event)"
         />
       </div>

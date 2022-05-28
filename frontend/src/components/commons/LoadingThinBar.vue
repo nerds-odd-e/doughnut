@@ -4,7 +4,7 @@
       <content-loader
         height="2"
         :speed="1"
-        primaryColor="#00c"
+        primary-color="#00c"
       ></content-loader>
     </div>
   </div>

@@ -69,9 +69,7 @@
           >
         </span>
         <div class="form-inline my-2 my-lg-0">
-          <button
-            class="btn btn-outline-success me-2 my-sm-0" @click="logout"
-          >
+          <button class="btn btn-outline-success me-2 my-sm-0" @click="logout">
             Logout
           </button>
         </div>

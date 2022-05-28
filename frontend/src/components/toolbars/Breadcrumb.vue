@@ -21,7 +21,7 @@
         </template>
       </template>
     </template>
-    <template v-slot:additional>
+    <template #additional>
       <slot />
     </template>
   </BasicBreadcrumb>

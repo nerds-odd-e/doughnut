@@ -2,7 +2,7 @@
   <h1>Joining a Circle</h1>
   <form @submit.prevent.once="processForm">
     <TextInput
-      scopeName="join-circle"
+      scope-name="join-circle"
       field="invitationCode"
       v-model="formData.invitationCode"
       :autofocus="true"

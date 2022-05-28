@@ -1,7 +1,7 @@
 <template>
   <div>
     <TextInput
-      scopeName="wikidataTitle"
+      scope-name="wikidataTitle"
       field="wikidataTitle"
       v-model="wikidataInput"
       placeholder="Search..."

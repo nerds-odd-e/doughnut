@@ -1,6 +1,6 @@
 <template>
   <PopupButton title="New notebook">
-    <template v-slot:button_face>
+    <template #button_face>
       <slot />
     </template>
     <template #dialog_body="{ doneHandler }">

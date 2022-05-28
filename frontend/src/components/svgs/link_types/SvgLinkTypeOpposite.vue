@@ -6,9 +6,9 @@
     y="0px"
     viewBox="0 0 800 400"
   >
-    <ObjectLeft :linkRole="ifInverse === 1 ? `source` : `target`" :x="-275" />
+    <ObjectLeft :link-role="ifInverse === 1 ? `source` : `target`" :x="-275" />
     <Lnk />
-    <ObjectRight :linkRole="ifInverse === 1 ? `target` : `source`" :x="275" />
+    <ObjectRight :link-role="ifInverse === 1 ? `target` : `source`" :x="275" />
   </svg>
 </template>
 

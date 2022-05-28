@@ -2,7 +2,7 @@
   <h3>Edit subscription</h3>
   <form @submit.prevent.once="processForm">
     <TextInput
-      scopeName="subscription"
+      scope-name="subscription"
       field="dailyTargetOfNewNotes"
       v-model="formData.dailyTargetOfNewNotes"
       :errors="formErrors.dailyTargetOfNewNotes"

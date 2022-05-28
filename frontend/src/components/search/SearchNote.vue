@@ -1,7 +1,7 @@
 <template>
   <div>
     <TextInput
-      scopeName="searchTerm"
+      scope-name="searchTerm"
       field="searchKey"
       v-model="inputSearchKey"
       placeholder="Search"

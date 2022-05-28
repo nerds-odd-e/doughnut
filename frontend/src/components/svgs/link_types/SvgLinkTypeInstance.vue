@@ -8,12 +8,12 @@
   >
     <Object1
       :stripes="false"
-      linkRole="source"
+      link-role="source"
       :x="-250 * ifInverse"
       :abstract="true"
     />
     <Lnk />
-    <Object1 :stripes="false" linkRole="target" :x="250 * ifInverse" />
+    <Object1 :stripes="false" link-role="target" :x="250 * ifInverse" />
   </svg>
 </template>
 

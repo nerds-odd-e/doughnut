@@ -8,7 +8,7 @@
           noteRealms,
           offset,
         }"
-        @selectNote="$emit('selectNote', $event)"
+        @select-note="$emit('selectNote', $event)"
         @note-realm-updated="$emit('noteRealmUpdated', $event)"
       />
     </div>

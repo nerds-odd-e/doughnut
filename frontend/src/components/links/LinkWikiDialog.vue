@@ -4,7 +4,7 @@
   </h3>
   <form v-if="!showConfirmation" @submit.prevent.once="validateAssociation">
     <TextInput
-      scopeName="wikiID"
+      scope-name="wikiID"
       field="wikiID"
       v-model="associationData.wikidataId"
       placeholder="Q1234"

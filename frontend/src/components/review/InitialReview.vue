@@ -30,7 +30,7 @@
         </div>
         <InitialReviewButtons
           :key="buttonKey"
-          @doInitialReview="processForm($event)"
+          @do-initial-review="processForm($event)"
         />
       </div>
     </template>

@@ -1,13 +1,13 @@
 <template>
   <TextInput
     v-if="showLevel"
-    scopeName="review_setting"
+    scope-name="review_setting"
     field="level"
     v-model="modelValue.level"
     :errors="errors.level"
   />
   <CheckInput
-    scopeName="review_setting"
+    scope-name="review_setting"
     field="rememberSpelling"
     v-model="modelValue.rememberSpelling"
     :errors="errors.rememberSpelling"

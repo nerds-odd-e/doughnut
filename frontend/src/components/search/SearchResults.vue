@@ -107,7 +107,12 @@ export default defineComponent({
   },
   methods: {
     search() {
-      if (this.cachedSearches.hasOwnProperty(this.trimmedSearchKey)) {
+      if (
+        Object.prototype.hasOwnProperty.call(
+          this.cachedSearches,
+          "trimmedSearchKey"
+        )
+      ) {
         return;
       }
 

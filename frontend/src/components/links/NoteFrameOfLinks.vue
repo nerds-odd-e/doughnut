@@ -8,7 +8,7 @@
         <LinkLink
           v-bind="{ link }"
           :reverse="false"
-          @noteRealmUpdated="$emit('noteRealmUpdated', $event)"
+          @note-realm-updated="$emit('noteRealmUpdated', $event)"
         />
       </li>
     </template>
@@ -25,7 +25,7 @@
           :key="link.id"
           v-bind="{ link }"
           :reverse="false"
-          @noteRealmUpdated="$emit('noteRealmUpdated', $event)"
+          @note-realm-updated="$emit('noteRealmUpdated', $event)"
         />
         <LinkLink
           class="link-multi"
@@ -33,7 +33,7 @@
           :key="link.id"
           v-bind="{ link }"
           :reverse="true"
-          @noteRealmUpdated="$emit('noteRealmUpdated', $event)"
+          @note-realm-updated="$emit('noteRealmUpdated', $event)"
         />
       </template>
     </li>
@@ -48,7 +48,7 @@
           :key="link.id"
           v-bind="{ link }"
           :reverse="false"
-          @noteRealmUpdated="$emit('noteRealmUpdated', $event)"
+          @note-realm-updated="$emit('noteRealmUpdated', $event)"
         />
       </li>
     </template>
@@ -69,7 +69,7 @@
           :key="link.id"
           v-bind="{ link }"
           :reverse="true"
-          @noteRealmUpdated="$emit('noteRealmUpdated', $event)"
+          @note-realm-updated="$emit('noteRealmUpdated', $event)"
         />
       </li>
     </template>

@@ -2,7 +2,7 @@
   <h3>Edit notebook settings</h3>
   <form @submit.prevent.once="processForm">
     <CheckInput
-      scopeName="notebook"
+      scope-name="notebook"
       field="skipReviewEntirely"
       v-model="formData.skipReviewEntirely"
       :errors="formErrors.skipReviewEntirely"
@@ -32,7 +32,7 @@ export default {
     processForm() {
       this.api.notebookMethods
         .updateNotebookSettings(this.notebook.id, this.formData)
-        .then((res) => {
+        .then(() => {
           this.$router.push({ name: "notebooks" });
         });
     },

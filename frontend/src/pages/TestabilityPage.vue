@@ -2,12 +2,12 @@
   <div class="container">
     <h1>Testability</h1>
     <CheckInput
-      scopeName="testability"
+      scope-name="testability"
       v-model="featureToggle"
       field="featureToggle"
     />
     <TextInput
-      scopeName="testability"
+      scope-name="testability"
       v-model="randomSelector"
       field="randomSelector"
       hint="can be 'first' or 'last'"

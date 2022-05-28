@@ -6,9 +6,9 @@
     y="0px"
     viewBox="0 0 800 400"
   >
-    <Object1 :stripes="false" linkRole="source" :x="-250 * ifInverse" />
+    <Object1 :stripes="false" link-role="source" :x="-250 * ifInverse" />
     <Lnk />
-    <Object1 :stripes="true" linkRole="target" :x="250 * ifInverse" />
+    <Object1 :stripes="true" link-role="target" :x="250 * ifInverse" />
   </svg>
 </template>
 

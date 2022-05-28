@@ -8,7 +8,7 @@
     <div class="btn-toolbar justify-content-between">
       <label v-if="nextReviewAt" v-text="nextReviewAt" />
       <template v-else>
-        <SelfEvaluateButtons @selfEvaluate="selfEvaluate" />
+        <SelfEvaluateButtons @self-evaluate="selfEvaluate" />
         <button
           class="btn"
           title="remove this note from review"
