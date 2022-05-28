@@ -12,14 +12,14 @@
     "frontend:lint": "wireit",
     "frontend:test": "yarn --cwd frontend --frozen-lockfile --silent install && yarn --cwd frontend test",
     "frontend:sut": "yarn --cwd frontend --frozen-lockfile --silent install && yarn --cwd frontend dev",
+    "backend:format": "wireit",
     "backend:lint": "wireit",
-    "backend:format": "backend/gradlew -p backend spotlessApply",
     "backend:test": "backend/gradlew -p backend testDBMigrate && backend/gradlew -p backend test --build-cache --parallel",
     "backend:build": "backend/gradlew -p backend build -x test --build-cache --parallel",
     "backend:prod_build": "backend/gradlew -p backend build -x test -Dspring.profiles.active=prod --build-cache --parallel",
     "generateTypeScript": "backend/gradlew -p backend generateTypeScript",
-    "cy:lint": "wireit",
     "cy:format": "wireit",
+    "cy:lint": "wireit",
     "cy:open": "cypress open --env configFile=development",
     "cy:run:dev": "cypress run --env configFile=development",
     "cy:run": "cypress run --env configFile=ci",
@@ -29,7 +29,8 @@
     "test:dev": "yarn frontend:build && run-p -clnr start:mb sut frontend:sut cy:run:dev",
     "test:open": "yarn run-p -clnr start:mb sut frontend:sut cy:open",
     "sound": "node scripts/sound-monitor.js",
-    "lint:all": "yarn && yarn backend:lint && yarn frontend:lint && yarn cy:lint"
+    "lint:all": "yarn && yarn backend:lint && yarn frontend:lint && yarn cy:lint",
+    "format:all": "yarn && yarn backend:format && yarn frontend:format && yarn cy:format"
   },
   "wireit": {
     "frontend:format": {
@@ -37,6 +38,9 @@
     },
     "frontend:lint": {
       "command": "yarn --cwd frontend --frozen-lockfile --silent install && yarn --cwd frontend lint"
+    },
+    "backend:format": {
+      "command": "backend/gradlew -p backend spotlessApply"
     },
     "backend:lint": {
       "command": "backend/gradlew -p backend lint"
