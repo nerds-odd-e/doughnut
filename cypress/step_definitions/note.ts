@@ -331,9 +331,13 @@ And("I associate the note to wikidata by searching with {string}", () => {
   cy.get(".toolbar").findByRole("button", { name: "associate wikidata" }).click()
 })
 
-When("I need to confirm the association with different title {string}", (wikidataTitle) => {
+When("I need to confirm the association with different title {string}", (wikidataTitle: string) => {
   cy.findAllByText(wikidataTitle).should("exist")
   cy.findByRole("button", { name: "Confirm" }).click()
+})
+
+When("I don't need to confirm the association with different title {string}", () => {
+  // no action needed
 })
 
 Given("there are some wikidata of KFC on the external service", async () => {

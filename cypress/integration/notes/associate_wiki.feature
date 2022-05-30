@@ -4,11 +4,7 @@ Feature: associate wikidata ID to note
     Given I've logged in as an existing user
     And I have a note with title "TDD"
 
-  Scenario: Associate wikidata ID for a note
-    When I associate the note "TDD" with wikidata id "Q423392"
-    Then I should see the icon beside title linking to "wikipedia" url
-
-    @ignore
+  @ignore
   Scenario: Search wikidata link and associate one result for a note
     Given there are some wikidata of KFC on the external service
     When I visit note "TDD"
@@ -20,8 +16,9 @@ Feature: associate wikidata ID to note
     And I should see the icon beside title linking to "<type>" url
 
     Examples:
-      | id        | need to confirm | type      | title           |
-      | Q12345    | need to confirm | wikipedia | Count von Count |
-      | Q28799967 | need to confirm | wikidata   | Acanthias       |
+      | id        | need to confirm       | type      | title           |
+      | Q423392   | don't need to confirm | wikipedia | TDD             |
+      | Q12345    | need to confirm       | wikipedia | Count von Count |
+      | Q28799967 | need to confirm       | wikidata  | Acanthias       |
 
 
