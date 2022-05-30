@@ -10,6 +10,4 @@ public class WikiDataDto {
     this.WikiDataTitleInEnglish = wikiDataTitleInEnglish;
     this.WikipediaEnglishUrl = wikipediaEnglishUrl;
   }
-
-  public WikiDataDto() {}
 }
