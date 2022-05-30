@@ -331,7 +331,7 @@ And("I associate the note to wikidata by searching with {string}", () => {
   cy.get(".toolbar").findByRole("button", { name: "associate wikidata" }).click()
 })
 
-When("I confirm the association with different title {string}", (wikidataTitle) => {
+When("I need to confirm the association with different title {string}", (wikidataTitle) => {
   cy.findAllByText(wikidataTitle).should("exist")
   cy.findByRole("button", { name: "Confirm" }).click()
 })
@@ -361,7 +361,7 @@ Then("I should be able to return to the association dialog", () => {
   cy.findByRole("button", { name: "Save" })
 })
 
-Then("I should see the icon beside title linking to {string} url", (wikiType) => {
+Then("I should see the icon beside title linking to {string} url", (wikiType: "wikipedia" | "wikidata") => {
   let expectedUrl = ""
 
   if (wikiType == "wikipedia") {

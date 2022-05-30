@@ -15,13 +15,13 @@ Feature: associate wikidata ID to note
     And I associate the note to wikidata by searching with "TDD"
 
   Scenario Outline: Associate note to wikipedia or wikidata if wikipedia does not exist
-    Given I associate the note "TDD" with wikidata id "<id>"
-    When I confirm the association with different title "<title>"
-    Then I should see the icon beside title linking to "<type>" url
+    When I associate the note "TDD" with wikidata id "<id>"
+    Then I <need to confirm> the association with different title "<title>"
+    And I should see the icon beside title linking to "<type>" url
 
     Examples:
-      | id        | type      | title           |
-      | Q12345    | wikipedia | Count von Count |
-      | Q28799967 | wikidata  | Acanthias       |
+      | id        | need to confirm | type      | title           |
+      | Q12345    | need to confirm | wikipedia | Count von Count |
+      | Q28799967 | need to confirm | wikidata   | Acanthias       |
 
 
