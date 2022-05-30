@@ -505,7 +505,7 @@ Cypress.Commands.add("noteByTitle", () => {
 })
 
 Cypress.Commands.add("clickAssociateWikiDataButton", (title, wikiID) => {
-  cy.get(".toolbar").findByRole("button", { name: "associate wikidata" }).click()
+  cy.clickNotePageButton(title, "associate wikidata")
   cy.get("#wikiID-wikiID").click()
   cy.replaceFocusedText(wikiID)
 })
