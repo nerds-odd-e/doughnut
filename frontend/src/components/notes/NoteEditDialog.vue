@@ -24,6 +24,7 @@ export default defineComponent({
     return {
       formData: null,
     } as {
+      /* eslint-disable  @typescript-eslint/no-explicit-any */
       formData: any;
     };
   },

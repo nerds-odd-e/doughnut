@@ -4,6 +4,7 @@
     "module": "esnext",
     "strict": true,
     "strictNullChecks": true,
+    "strictFunctionTypes": true,
     "jsx": "preserve",
     "moduleResolution": "node",
     "allowJs": true,
@@ -19,26 +20,19 @@
     "noImplicitAny": false,
     "baseUrl": "./",
     "paths": {
-      "@/*": [
-        "src/*"
-      ]
+      "@/*": ["src/*"]
     },
     "lib": [
       "esnext",
       "dom"
-    ],
-    "types": [
-      "node",
-      "jest",
-      "vite/client",
-      "@testing-library/jest-dom"
-    ],
+    ]
   },
   "compileOnSave": true,
+  "typeAcquisition": {
+    "enable": true
+  },
   "include": [
-    "src/**/*.d.ts",
     "src/**/*.ts",
-    "src/**/*.tsx",
     "src/**/*.vue",
     "tests/**/*.ts"
   ]

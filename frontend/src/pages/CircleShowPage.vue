@@ -90,6 +90,7 @@ export default defineComponent({
   computed: {
     invitationUrl() {
       return `${window.location.origin}/circles/join/${
+        /* eslint-disable  @typescript-eslint/no-non-null-assertion */
         this.circle!.invitationCode
       }`;
     },

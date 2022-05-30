@@ -17,7 +17,7 @@ export default defineConfig({
     checker({
       vueTsc: true,
       eslint: {
-        lintCommand: 'eslint "./src/**/*.{ts,tsx}" "./tests/**/*.ts"',
+        lintCommand: 'eslint "./src/**/*.{vue,ts,tsx}" "./tests/**/*.ts"',
       }
     }),
     vue({

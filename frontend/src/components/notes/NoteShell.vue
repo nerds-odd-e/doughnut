@@ -18,6 +18,7 @@ export default defineComponent({
       const newColor = [208, 237, 23];
       const ageInMillisecond = Math.max(
         0,
+        /* eslint-disable  @typescript-eslint/no-non-null-assertion */
         Date.now() - new Date(this.updatedAt!).getTime()
       );
       const max = 15; // equals to 225 hours
