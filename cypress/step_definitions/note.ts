@@ -356,15 +356,6 @@ Given("there are some wikidata of KFC on the external service", async () => {
   await mb.createImposter(imposter)
 })
 
-When("I cancel the association with different title {string}", (wikidataTitle) => {
-  cy.findAllByText(wikidataTitle).should("exist")
-  cy.findByDisplayValue("Cancel").click()
-})
-
-Then("I should be able to return to the association dialog", () => {
-  cy.findByRole("button", { name: "Save" })
-})
-
 Then("I should see the icon beside title linking to {string} url", (wikiType: "wikipedia" | "wikidata") => {
   let expectedUrl = ""
 
