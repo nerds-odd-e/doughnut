@@ -37,7 +37,12 @@ module.exports = {
     "plugin:prettier/recommended",
     "prettier",
   ],
-  ignorePatterns: ["vite.config.ts", "babel.config.js", "jest.config.js", "tests/setupJest.js"],
+  ignorePatterns: [
+    "vite.config.ts",
+    "babel.config.js",
+    "jest.config.js",
+    "tests/setupJest.js",
+  ],
   settings: {
     "import/extensions": [".ts", ".tsx"],
     "import/resolver": {
