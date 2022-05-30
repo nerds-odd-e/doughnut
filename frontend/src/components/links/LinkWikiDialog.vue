@@ -8,6 +8,7 @@
       field="wikiID"
       v-model="associationData.wikidataId"
       placeholder="Q1234"
+      v-focus
     />
 
     <input type="submit" value="Save" class="btn btn-primary" />
