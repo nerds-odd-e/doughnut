@@ -105,12 +105,6 @@ class WikiDataControllerTests {
   }
 
   @Test
-  void GivenSearchIdHasNoValue_ShouldReturnEmpty() throws IOException, InterruptedException {
-    WikiDataDto resultObj = controller.fetchWikiDataDto("Q1");
-    assertThat(resultObj, samePropertyValuesAs(new WikiDataDto()));
-  }
-
-  @Test
   void GivenSearchIdHasWikipediaEnglishLink_ShouldBeAbleToRetrieveLink()
       throws IOException, InterruptedException {
     WikiDataDto resultObj = controller.fetchWikiDataDto(wikiDataIdWithWikipediaUrl);
