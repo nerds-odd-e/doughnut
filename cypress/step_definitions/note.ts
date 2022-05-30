@@ -341,7 +341,7 @@ When("I don't need to confirm the association with different title {string}", ()
 })
 
 Given("there are some wikidata of KFC on the external service", async () => {
-  cy.useDummyWikidataService()
+  cy.setWikidataServiceUrl()
   const mb = new Mountebank()
   const imposter = new Imposter()
     .withPort(5000)
@@ -356,16 +356,19 @@ Given("there are some wikidata of KFC on the external service", async () => {
   await mb.createImposter(imposter)
 })
 
-Then("I should see the icon beside title linking to {string} url", (wikiType: "wikipedia" | "wikidata") => {
-  let expectedUrl = ""
+Then(
+  "I should see the icon beside title linking to {string} url",
+  (wikiType: "wikipedia" | "wikidata") => {
+    let expectedUrl = ""
 
-  if (wikiType == "wikipedia") {
-    expectedUrl = "https://en.wikipedia.org/"
-  }
+    if (wikiType == "wikipedia") {
+      expectedUrl = "https://en.wikipedia.org/"
+    }
 
-  if (wikiType == "wikidata") {
-    expectedUrl = "https://www.wikidata.org/"
-  }
+    if (wikiType == "wikidata") {
+      expectedUrl = "https://www.wikidata.org/"
+    }
 
-  cy.get("#wikiUrl").invoke("attr", "href").should("include", expectedUrl)
-})
+    cy.get("#wikiUrl").invoke("attr", "href").should("include", expectedUrl)
+  },
+)

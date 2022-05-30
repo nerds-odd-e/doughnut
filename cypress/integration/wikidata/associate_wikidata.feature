@@ -8,6 +8,7 @@ Feature: associate wikidata ID to note
     Given I've logged in as an existing user
     And I have a note with title "TDD"
 
+  @usingWikidataService
   Scenario Outline: Associate note to wikipedia or wikidata
     When I associate the note "TDD" with wikidata id "<id>"
     Then I <need to confirm> the association with different title "<title>"

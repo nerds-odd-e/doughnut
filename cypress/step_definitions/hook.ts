@@ -35,3 +35,11 @@ After({ tags: "@stopTime" }, () => {
 Before({ tags: "@featureToggle" }, () => {
   cy.enableFeatureToggle(true)
 })
+
+Before({ tags: "@usingWikidataService" }, () => {
+  cy.setDummyWikidataServiceUrl("http://localhost:5000/external/")
+})
+
+After({ tags: "@usingWikidataService" }, () => {
+  cy.setDummyWikidataServiceUrl("")
+})
