@@ -13,6 +13,10 @@ Given("there are some notes for the current user", (data) => {
   cy.seedNotes(data.hashes())
 })
 
+Given("I have a note with title {string}", (noteTitle: string) => {
+  cy.seedNotes([{ title: noteTitle }])
+})
+
 Given("there are some notes for existing user {string}", (externalIdentifier, data) => {
   cy.seedNotes(data.hashes(), externalIdentifier)
 })

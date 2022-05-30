@@ -7,9 +7,7 @@ Feature: Add, Reply or Delete a comment
 
   @featureToggle
   Scenario: Comment on my own note
-    And there are some notes for the current user
-      | title        |
-      | Less is More |
+    Given I have a note with title "Less is More"
     When I comment with "Is more also less?" on note "Less is More"
     Then I should see note "LeSS is More" has a comment "Is more also less?" from "old_learner"
 

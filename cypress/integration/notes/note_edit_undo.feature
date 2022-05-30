@@ -5,8 +5,8 @@ Feature: Undo Note Edit
   Background:
     Given I've logged in as an existing user
     And there are some notes for the current user
-      | title          | testingParent | description         |
-      | LeSS in Action |               | An awesome training |
+      | title          | description         |
+      | LeSS in Action | An awesome training |
 
   Scenario: Edit a note title and edit description
     And I update note title "LeSS in Action" to become "Odd-e CSD"

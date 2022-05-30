@@ -21,9 +21,7 @@ Feature: Bazaar subscription
 
   Scenario: subscribe to a note and review
     Given I've logged in as an existing user
-    And there are some notes for the current user
-      | title   |
-      | My memo |
+    And I have a note with title "My memo"
     And my daily new notes to review is set to 2
     When I subscribe to notebook "Shape" in the bazaar, with target of learning 1 notes per day
     Then On day 1 I should have "2/4" note for initial review and "0/0" for repeat
