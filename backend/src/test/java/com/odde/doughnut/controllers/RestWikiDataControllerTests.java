@@ -15,7 +15,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-class WikiDataControllerTests {
+class RestWikiDataControllerTests {
 
   RestWikidataController controller;
   @Mock HttpClientAdapter httpClientAdapter;
@@ -45,6 +45,7 @@ class WikiDataControllerTests {
       WikiDataDto resultObj = controller.fetchWikiDataDto("Q13339");
       assertThat(resultObj.WikiDataId, equalTo("Q13339"));
       assertThat(resultObj.WikiDataTitleInEnglish, equalTo("Mohawk"));
+      Mockito.verify(httpClientAdapter).getResponseString("https://www.wikidata.org/wiki/Special:EntityData/Q13339.json");
     }
 
     @Test
