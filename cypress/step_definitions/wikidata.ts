@@ -44,7 +44,7 @@ Given("The wikidata service is not available", () => {
 })
 
 Then("I should see a message {string}", (message: string) => {
-  cy.findByText(message)
+  cy.expectFieldErrorMessage(message)
 })
 
 Then(

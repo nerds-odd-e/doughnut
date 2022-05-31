@@ -538,3 +538,7 @@ Cypress.Commands.add(
     return mb.createImposter(imposter)
   },
 )
+
+Cypress.Commands.add("expectFieldErrorMessage", (message: string) => {
+  cy.findByText(message, {selector: ".error-msg"})
+})

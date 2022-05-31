@@ -106,7 +106,7 @@ When("I create a sibling note of {string}:", (noteTitle, data) => {
 })
 
 When("I should see that the note creation is not successful", () => {
-  cy.findByText("size must be between 1 and 100")
+  cy.expectFieldErrorMessage("size must be between 1 and 100")
 })
 
 Then("I should see {string} in note title", (noteTitle) => {
