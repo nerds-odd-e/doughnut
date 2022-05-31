@@ -19,7 +19,7 @@ public class TestabilitySettings {
   @Getter @Setter Boolean useRealGithub = true;
   @Autowired GithubService githubService;
   @Getter private boolean featureToggleEnabled = false;
-  private String dummyWikidataServiceUrl = "";
+  private String dummyWikidataServiceUrl = "https://xxxx";
 
   public void timeTravelTo(Timestamp timestamp) {
     this.timestamp = timestamp;
@@ -60,7 +60,9 @@ public class TestabilitySettings {
     this.featureToggleEnabled = enabled;
   }
 
-  public void setUseDummyWikidataService(String wikidataServiceUrl) {
+  public String setUseDummyWikidataService(String wikidataServiceUrl) {
+    String saved = this.dummyWikidataServiceUrl;
     this.dummyWikidataServiceUrl = wikidataServiceUrl;
+    return saved;
   }
 }
