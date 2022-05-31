@@ -19,11 +19,3 @@ Feature: associate wikidata ID to note
       | Q423392   | don't need to confirm | wikipedia | TDD             |
       | Q12345    | need to confirm       | wikipedia | Count von Count |
       | Q28799967 | need to confirm       | wikidata  | Acanthias       |
-
-  @ignore
-  Scenario: Search wikidata link and associate one result for a note
-    Given there are some wikidata of KFC on the external service
-    When I visit note "TDD"
-    And I associate the note to wikidata by searching with "TDD"
-
-

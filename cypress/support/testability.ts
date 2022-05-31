@@ -89,10 +89,13 @@ Cypress.Commands.add("seedCircle", (circle) => {
   })
 })
 
-Cypress.Commands.add("setDummyWikidataServiceUrl", (wikidataServiceUrl: string) => {
+Cypress.Commands.add("setWikidataServiceUrl", (wikidataServiceUrl: string) => {
   cy.request({
     method: "POST",
     url: `/api/testability/use_dummy_wikidata_service`,
     body: { wikidataServiceUrl },
+  }).then((response) => {
+    //     expect(response.body).include("http")
+    //     return response.body
   })
 })
