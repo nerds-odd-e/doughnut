@@ -284,9 +284,9 @@ class TestabilityRestController {
   }
 
   @PostMapping(value = "/use_wikidata_service")
-  public String useWikidataService(
-      @RequestBody SetDummyWikidataService setDummyWikidataService) {
-    return testabilitySettings.setUseDummyWikidataService(setDummyWikidataService.wikidataServiceUrl);
+  public String useWikidataService(@RequestBody SetDummyWikidataService setDummyWikidataService) {
+    return testabilitySettings.setUseDummyWikidataService(
+        setDummyWikidataService.wikidataServiceUrl);
   }
 
   static class Randomization {

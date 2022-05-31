@@ -16,7 +16,7 @@
           :value="option.value"
           :id="`${scopeName}-${option.value}`"
           :modelValue="modelValue"
-          @update:modelValue="$emit('update:modelValue', $event)"
+          @change="selectionChanged"
         />
         <label
           role="button"
@@ -45,6 +45,11 @@ export default {
   },
   emits: ["update:modelValue"],
   components: { InputWithType },
+  methods: {
+    selectionChanged(event) {
+      this.$emit("update:modelValue", event.target.value);
+    },
+  },
 };
 </script>
 

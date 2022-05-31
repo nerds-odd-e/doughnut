@@ -90,12 +90,14 @@ Cypress.Commands.add("seedCircle", (circle) => {
 })
 
 Cypress.Commands.add("setWikidataServiceUrl", (wikidataServiceUrl: string) => {
-  return cy.request({
-    method: "POST",
-    url: `/api/testability/use_wikidata_service`,
-    body: { wikidataServiceUrl },
-  }).then((response) => {
-    expect(response.body).to.include("http")
-    cy.wrap(response.body)
-  })
+  return cy
+    .request({
+      method: "POST",
+      url: `/api/testability/use_wikidata_service`,
+      body: { wikidataServiceUrl },
+    })
+    .then((response) => {
+      expect(response.body).to.include("http")
+      cy.wrap(response.body)
+    })
 })

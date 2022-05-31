@@ -41,5 +41,5 @@ Before({ tags: "@usingWikidataService" }, () => {
 })
 
 After({ tags: "@usingWikidataService" }, () => {
-  cy.get("@savedWikidataServiceUrl").then(saved => cy.setWikidataServiceUrl(saved))
+  cy.get("@savedWikidataServiceUrl").then((saved) => cy.setWikidataServiceUrl(saved))
 })
