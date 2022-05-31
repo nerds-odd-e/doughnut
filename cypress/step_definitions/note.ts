@@ -340,21 +340,34 @@ When("I don't need to confirm the association with different title {string}", ()
   // no action needed
 })
 
-Given("there are some wikidata of KFC on the external service", async () => {
-  cy.setWikidataServiceUrl()
-  const mb = new Mountebank()
-  const imposter = new Imposter()
-    .withPort(5000)
-    .withStub(
+Given(
+  "Wikidata.org has an entity {string} with {string} and {string}",
+  async (wikidataId: string, wikidataTitle: string, wikipediaLink: string) => {
+    const wikipedia = wikipediaLink ? { enwiki: { site: "enwiki", url: wikipediaLink } } : {}
+    const mb = new Mountebank()
+    const imposter = new Imposter().withPort(5000).withStub(
       new DefaultStub(
-        `/external/searchWikidata`,
+        `/wiki/Special:EntityData/${wikidataId}.json`,
         HttpMethod.GET,
-        '{"searchinfo": {"search": "KFC"},"search": [{"id": "Q1234","label": "KFC",}]',
+        {
+          entities: {
+            [wikidataId]: {
+              labels: {
+                en: {
+                  language: "en",
+                  value: wikidataTitle,
+                },
+              },
+              sitelinks: { ...wikipedia },
+            },
+          },
+        },
         200,
       ),
     )
-  await mb.createImposter(imposter)
-})
+    await mb.createImposter(imposter)
+  },
+)
 
 Given("The wikidata service is not available", () => {
   // checking if the saved Wikidata service url is the real url, which indicate the service is mocked.

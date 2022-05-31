@@ -37,7 +37,7 @@ Before({ tags: "@featureToggle" }, () => {
 })
 
 Before({ tags: "@usingWikidataService" }, () => {
-  cy.setWikidataServiceUrl("http://localhost:5000/external/").as("savedWikidataServiceUrl")
+  cy.setWikidataServiceUrl("http://localhost:5000").as("savedWikidataServiceUrl")
 })
 
 After({ tags: "@usingWikidataService" }, () => {

@@ -15,13 +15,21 @@ Feature: associate wikidata ID to note
     Then I should see a message "The wikidata service is not available"
 
 
+  @usingWikidataService
   Scenario Outline: Associate note to wikipedia or wikidata
+    Given Wikidata.org has an entity "<id>" with "<wikidata title>" and "<wikipedia link>"
     When I associate the note "TDD" with wikidata id "<id>"
-    Then I <need to confirm> the association with different title "<title>"
+    Then I <need to confirm> the association with different title "<wikidata title>"
     And I should see the icon beside title linking to "<type>" url
 
     Examples:
-      | id        | need to confirm       | type      | title           |
-      | Q423392   | don't need to confirm | wikipedia | TDD             |
-      | Q12345    | need to confirm       | wikipedia | Count von Count |
-      | Q28799967 | need to confirm       | wikidata  | Acanthias       |
+      | id        | wikidata title  | wikipedia link               | need to confirm       | type      |
+      | Q423392   | TDD             |                              | don't need to confirm | wikidata  |
+      | Q12345    | Count von Count | https://en.wikipedia.org/TDD | need to confirm       | wikipedia |
+      | Q28799967 | Acanthias       |                              | need to confirm       | wikidata  |
+
+  @usingRealWikidataService
+  Scenario: Associate note to wikipedia via wikidata
+    When I associate the note "TDD" with wikidata id "Q12345"
+    Then I need to confirm the association with different title "Count von Count"
+    And I should see the icon beside title linking to "wikipedia" url
