@@ -1,6 +1,6 @@
 <template>
   <RadioButtons
-    v-model="modelValue"
+    :model-value="modelValue"
     @update:model-value="$emit('update:modelValue', $event)"
     v-bind="{ scopeName, field, options, errors }"
   >

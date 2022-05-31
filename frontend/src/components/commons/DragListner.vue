@@ -35,12 +35,16 @@ export default {
     },
     onDrag(e) {
       if (!this.gesture) return;
-      e = e.changedTouches ? e.changedTouches[0] : e;
-      this.gesture.move(e.currentTarget.getBoundingClientRect(), e.pointerId, {
-        x: e.clientX,
-        y: e.clientY,
-      });
-      this.gesture.shiftDown(e.shiftKey);
+      const event = e.changedTouches ? e.changedTouches[0] : e;
+      this.gesture.move(
+        event.currentTarget.getBoundingClientRect(),
+        event.pointerId,
+        {
+          x: event.clientX,
+          y: event.clientY,
+        }
+      );
+      this.gesture.shiftDown(event.shiftKey);
       Object.assign(this.modelValue, this.gesture.offset);
       this.$emit("update:modelValue", this.modelValue);
     },

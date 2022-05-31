@@ -15,7 +15,8 @@
           type="radio"
           :value="option.value"
           :id="`${scopeName}-${option.value}`"
-          v-model="modelValue"
+          :modelValue="modelValue"
+          @update:modelValue="$emit('update:modelValue', $event)"
         />
         <label
           role="button"
@@ -44,11 +45,6 @@ export default {
   },
   emits: ["update:modelValue"],
   components: { InputWithType },
-  watch: {
-    modelValue() {
-      this.$emit("update:modelValue", this.modelValue);
-    },
-  },
 };
 </script>
 

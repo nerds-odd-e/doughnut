@@ -22,8 +22,8 @@
       <div>
         <div class="mb-2">
           <ReviewSettingForm
-            v-if="reviewSetting"
-            v-model="reviewSetting"
+            v-if="reviewPointWithReviewSetting?.reviewSetting"
+            v-model="reviewPointWithReviewSetting.reviewSetting"
             :show-level="false"
             :errors="{}"
           />
@@ -82,9 +82,6 @@ export default defineComponent({
     reviewPoint() {
       return this.reviewPointWithReviewSetting?.reviewPoint;
     },
-    reviewSetting() {
-      return this.reviewPointWithReviewSetting?.reviewSetting;
-    },
     remainingInitialReviewCountForToday() {
       return this.reviewPointWithReviewSettings.length - this.finished;
     },
@@ -112,7 +109,7 @@ export default defineComponent({
         .doInitialReview({
           thingId: this.reviewPoint.thing.id,
           skipReview,
-          reviewSetting: this.reviewSetting,
+          reviewSetting: this.reviewPointWithReviewSetting.reviewSetting,
         })
         .then(() => {
           if (this.finished + 1 === this.reviewPointWithReviewSettings.length) {
