@@ -356,6 +356,18 @@ Given("there are some wikidata of KFC on the external service", async () => {
   await mb.createImposter(imposter)
 })
 
+Given("The wikidata service is not available", () => {
+  // checking if the saved Wikidata service url is the real url, which indicate the service is mocked.
+  // This test require the service to be mocked first.
+  cy.get("@savedWikidataServiceUrl").then((url) => {
+    expect(url).to.include("https://www.wikidata.org")
+  })
+})
+
+Then("I should see a message {string}", (message: string) => {
+  cy.findByText(message)
+})
+
 Then(
   "I should see the icon beside title linking to {string} url",
   (wikiType: "wikipedia" | "wikidata") => {

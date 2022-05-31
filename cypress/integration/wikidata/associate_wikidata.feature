@@ -8,7 +8,14 @@ Feature: associate wikidata ID to note
     Given I've logged in as an existing user
     And I have a note with title "TDD"
 
+  @ignore
   @usingWikidataService
+  Scenario: Associate note to wikidata when the service is not available
+    Given The wikidata service is not available
+    When I associate the note "TDD" with wikidata id "Q1"
+    Then I should see a message "The wikidata service is not available"
+
+
   Scenario Outline: Associate note to wikipedia or wikidata
     When I associate the note "TDD" with wikidata id "<id>"
     Then I <need to confirm> the association with different title "<title>"

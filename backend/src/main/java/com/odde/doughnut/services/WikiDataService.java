@@ -3,19 +3,21 @@ package com.odde.doughnut.services;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.odde.doughnut.entities.json.WikiDataDto;
 import com.odde.doughnut.models.WikiDataModel;
 import java.io.IOException;
 
 public class WikiDataService {
-  private final String wikidataBaseUrl = "https://www.wikidata.org";
+  private final String wikidataBaseUrl;
 
   private final HttpClientAdapter httpClientAdapter;
 
-  public WikiDataService(HttpClientAdapter httpClientAdapter) {
+  public WikiDataService(HttpClientAdapter httpClientAdapter, String wikidataBaseUrl) {
     this.httpClientAdapter = httpClientAdapter;
+    this.wikidataBaseUrl = wikidataBaseUrl;
   }
 
-  public WikiDataModel FetchWikiData(String wikiDataId) throws IOException, InterruptedException {
+  private WikiDataModel FetchWikiData(String wikiDataId) throws IOException, InterruptedException {
     String responseBody = httpClientAdapter.getResponseString(ConstructWikiDataUrl(wikiDataId));
     ObjectMapper mapper = new ObjectMapper();
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -24,5 +26,9 @@ public class WikiDataService {
 
   private String ConstructWikiDataUrl(String wikiDataId) {
     return wikidataBaseUrl + "/wiki/Special:EntityData/" + wikiDataId + ".json";
+  }
+
+  public WikiDataDto fetchWikiData(String wikiDataId) throws IOException, InterruptedException {
+    return FetchWikiData(wikiDataId).GetInfoForWikiDataId(wikiDataId).processInfo();
   }
 }

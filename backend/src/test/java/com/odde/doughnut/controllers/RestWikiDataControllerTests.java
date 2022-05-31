@@ -6,6 +6,7 @@ import static org.mockito.ArgumentMatchers.any;
 
 import com.odde.doughnut.entities.json.WikiDataDto;
 import com.odde.doughnut.services.HttpClientAdapter;
+import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -20,10 +21,12 @@ class RestWikiDataControllerTests {
   RestWikidataController controller;
   @Mock HttpClientAdapter httpClientAdapter;
 
+  TestabilitySettings testabilitySettings = new TestabilitySettings();
+
   @BeforeEach
   void Setup() {
     MockitoAnnotations.openMocks(this);
-    controller = new RestWikidataController(httpClientAdapter);
+    controller = new RestWikidataController(testabilitySettings, httpClientAdapter);
   }
 
   @Nested
