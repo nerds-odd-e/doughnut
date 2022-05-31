@@ -16,17 +16,26 @@ Feature: associate wikidata ID to note
 
 
   @usingWikidataService
-  Scenario Outline: Associate note to wikipedia or wikidata
-    Given Wikidata.org has an entity "<id>" with "<wikidata title>" and "<wikipedia link>"
+  Scenario Outline: Associate note to wikidata with validation
+    Given Wikidata.org has an entity "<id>" with "<wikidata title>" and ""
     When I associate the note "TDD" with wikidata id "<id>"
     Then I <need to confirm> the association with different title "<wikidata title>"
-    And I should see the icon beside title linking to "<type>" url
 
     Examples:
-      | id        | wikidata title  | wikipedia link               | need to confirm       | type      |
-      | Q423392   | TDD             |                              | don't need to confirm | wikidata  |
-      | Q12345    | Count von Count | https://en.wikipedia.org/TDD | need to confirm       | wikipedia |
-      | Q28799967 | Acanthias       |                              | need to confirm       | wikidata  |
+      | id        | wikidata title  | need to confirm       |
+      | Q423392   | TDD             | don't need to confirm |
+      | Q12345    | Count von Count | need to confirm       |
+
+  @usingWikidataService
+  Scenario Outline: Associate note to wikipedia via wikidata
+    Given Wikidata.org has an entity "<id>" with "TDD" and "<wikipedia link>"
+    When I associate the note "TDD" with wikidata id "<id>"
+    Then I should see the icon beside title linking to "<type>" url
+
+    Examples:
+      | id        | wikipedia link               | type      |
+      | Q423392   |                              | wikidata  |
+      | Q12345    | https://en.wikipedia.org/TDD | wikipedia |
 
   @usingRealWikidataService
   Scenario: Associate note to wikipedia via wikidata
