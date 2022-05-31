@@ -1,8 +1,4 @@
-/* tslint:disable */
-/* eslint-disable */
-
 declare namespace Generated {
-
     interface CircleForUserView {
         id: number;
         name: string;
@@ -145,6 +141,7 @@ declare namespace Generated {
     }
 
     interface WikiDataDto {
+        WikiDataId: string;
         WikiDataTitleInEnglish: string;
         WikipediaEnglishUrl: string;
     }
