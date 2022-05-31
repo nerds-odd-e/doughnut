@@ -19,7 +19,7 @@ public class RestWikidataController {
   }
 
   @GetMapping("/wikidata/{wikiDataId}")
-  public WikiDataDto fetchWikiDataDto(@PathVariable("wikiDataId") String wikiDataId)
+  public WikiDataDto fetchWikiDataByID(@PathVariable("wikiDataId") String wikiDataId)
       throws IOException, InterruptedException {
     return wikiDataService.FetchWikiData(wikiDataId).GetInfoForWikiDataId(wikiDataId).processInfo();
   }

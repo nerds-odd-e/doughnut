@@ -29,7 +29,7 @@ class RestWikiDataControllerTests {
   @Nested
   class FetchWikiData {
 
-    private String getEntityDataJsonString(String entityTitle, String enwikiJson, String entityId) {
+    private String getEntityDataJsonString(String entityId, String entityTitle, String enwikiJson) {
       return "{\"entities\":{\""
           + entityId
           + "\":{\"labels\":{\"en\":{\"language\":\"en\",\"value\":\""
@@ -40,37 +40,42 @@ class RestWikiDataControllerTests {
     }
 
     @Test
-    void GivenSearchIdHasValue_ShouldBeAbleToGetWikiDataTitleAndId()
-        throws IOException, InterruptedException {
+    void shouldFetchInfoViaWikidataApi() throws IOException, InterruptedException {
       Mockito.when(httpClientAdapter.getResponseString(any()))
-          .thenReturn(getEntityDataJsonString("Mohawk", "", "Q13339"));
-      WikiDataDto resultObj = controller.fetchWikiDataDto("Q13339");
-      assertThat(resultObj.WikiDataTitleInEnglish, equalTo("Mohawk"));
+          .thenReturn(getEntityDataJsonString("Q1", "Mohawk", ""));
+      controller.fetchWikiDataByID("Q1");
       Mockito.verify(httpClientAdapter)
-          .getResponseString("https://www.wikidata.org/wiki/Special:EntityData/Q13339.json");
+          .getResponseString("https://www.wikidata.org/wiki/Special:EntityData/Q1.json");
     }
 
     @Test
-    void GivenSearchIdHasWikipediaEnglishLink_ShouldBeAbleToRetrieveLink()
-        throws IOException, InterruptedException {
+    void shouldParseAndGetTheInfo() throws IOException, InterruptedException {
+      Mockito.when(httpClientAdapter.getResponseString(any()))
+          .thenReturn(getEntityDataJsonString("Q1", "Mohawk", ""));
+      WikiDataDto result = controller.fetchWikiDataByID("Q1");
+      assertThat(result.WikiDataTitleInEnglish, equalTo("Mohawk"));
+    }
+
+    @Test
+    void shouldRetrieveTheEnglishWikipediaLinkIfExists() throws IOException, InterruptedException {
       Mockito.when(httpClientAdapter.getResponseString(any()))
           .thenReturn(
               getEntityDataJsonString(
+                  "Q13339",
                   "Mohawk",
-                  "\"enwiki\":{\"site\":\"enwiki\",\"title\":\"Mohawk language\",\"badges\":[],\"url\":\"https://en.wikipedia.org/wiki/Mohawk_language\"}",
-                  "Q13339"));
-      WikiDataDto resultObj = controller.fetchWikiDataDto("Q13339");
+                  "\"enwiki\":{\"site\":\"enwiki\",\"title\":\"Mohawk language\",\"badges\":[],\"url\":\"https://en.wikipedia.org/wiki/Mohawk_language\"}"));
+      WikiDataDto result = controller.fetchWikiDataByID("Q13339");
       assertThat(
-          resultObj.WikipediaEnglishUrl, equalTo("https://en.wikipedia.org/wiki/Mohawk_language"));
+          result.WikipediaEnglishUrl, equalTo("https://en.wikipedia.org/wiki/Mohawk_language"));
     }
 
     @Test
-    void GivenSearchIdHasNoWikipediaEnglishLink_ShouldReturnEmptyLink()
+    void shouldReturnEmptyIfEnglishWikipediaLinkNotExist()
         throws IOException, InterruptedException {
       Mockito.when(httpClientAdapter.getResponseString(any()))
-          .thenReturn(getEntityDataJsonString("Mohawk", "", "Q13339"));
-      WikiDataDto resultObj = controller.fetchWikiDataDto("Q13339");
-      assertThat(StringUtils.isBlank(resultObj.WikipediaEnglishUrl), is(true));
+          .thenReturn(getEntityDataJsonString("Q13339", "Blah", ""));
+      WikiDataDto result = controller.fetchWikiDataByID("Q13339");
+      assertThat(StringUtils.isBlank(result.WikipediaEnglishUrl), is(true));
     }
   }
 }

@@ -31,7 +31,7 @@ export default {
   emits: ["update:modelValue"],
   computed: {
     options() {
-      if (!!this.allowEmpty) {
+      if (this.allowEmpty) {
         return [{ value: 0, label: "Default" }, ...linkTypeOptions];
       }
       return linkTypeOptions;
