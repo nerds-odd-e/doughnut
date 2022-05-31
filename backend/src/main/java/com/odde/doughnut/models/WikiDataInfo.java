@@ -4,12 +4,11 @@ import com.odde.doughnut.entities.json.WikiDataDto;
 import java.util.Map;
 
 public class WikiDataInfo {
-  public String title;
   public Map<String, LanguageValueModel> labels;
   public Map<String, WikiSiteLinkModel> sitelinks;
 
   public WikiDataDto processInfo() {
-    return new WikiDataDto(this.title, GetEnglishTitle(), GetEnglishWikipediaUrl());
+    return new WikiDataDto(GetEnglishTitle(), GetEnglishWikipediaUrl());
   }
 
   private String GetEnglishWikipediaUrl() {

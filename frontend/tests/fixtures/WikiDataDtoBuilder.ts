@@ -6,7 +6,6 @@ class WikiDataDtoBuilder extends Builder<Generated.WikiDataDto> {
   constructor() {
     super();
     this.data = {
-      WikiDataId: "Q12434",
       WikiDataTitleInEnglish: "Note1.1.1",
       WikipediaEnglishUrl: "",
     };

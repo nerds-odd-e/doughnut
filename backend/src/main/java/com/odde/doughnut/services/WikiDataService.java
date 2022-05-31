@@ -5,14 +5,11 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.models.WikiDataModel;
 import java.io.IOException;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
-@Component
 public class WikiDataService {
   private final String wikidataBaseUrl = "https://www.wikidata.org";
 
-  @Autowired private final HttpClientAdapter httpClientAdapter;
+  private final HttpClientAdapter httpClientAdapter;
 
   public WikiDataService(HttpClientAdapter httpClientAdapter) {
     this.httpClientAdapter = httpClientAdapter;
