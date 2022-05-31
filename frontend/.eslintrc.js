@@ -7,7 +7,7 @@ module.exports = {
       ts: "@typescript-eslint/parser",
       "<template>": "espree",
     },
-    ecmaVersion: 12,
+    ecmaVersion: 2021,
     sourceType: "module",
     createDefaultProgram: true,
     project: ["./tsconfig.json"],
