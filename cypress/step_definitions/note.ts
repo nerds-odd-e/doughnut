@@ -3,7 +3,6 @@
 // @ts-check
 
 import { Given, Then, When, And } from "@badeball/cypress-cucumber-preprocessor"
-import { HttpMethod, Imposter, Mountebank, DefaultStub } from "@anev/ts-mountebank"
 
 Given("I visit note {string}", (noteTitle) => {
   cy.jumpToNotePage(noteTitle)
@@ -322,78 +321,3 @@ Then("there should be no more undo to do", () => {
 Then("I type {string} in the title", (content) => {
   cy.focused().clear().type(content)
 })
-
-When("I associate the note {string} with wikidata id {string}", (title, wikiID) => {
-  cy.clickAssociateWikiDataButton(title, wikiID)
-})
-
-And("I associate the note to wikidata by searching with {string}", () => {
-  cy.get(".toolbar").findByRole("button", { name: "associate wikidata" }).click()
-})
-
-When("I need to confirm the association with different title {string}", (wikidataTitle: string) => {
-  cy.findAllByText(wikidataTitle).should("exist")
-  cy.findByRole("button", { name: "Confirm" }).click()
-})
-
-When("I don't need to confirm the association with different title {string}", () => {
-  // no action needed
-})
-
-Given(
-  "Wikidata.org has an entity {string} with {string} and {string}",
-  async (wikidataId: string, wikidataTitle: string, wikipediaLink: string) => {
-    const wikipedia = wikipediaLink ? { enwiki: { site: "enwiki", url: wikipediaLink } } : {}
-    const mb = new Mountebank()
-    const imposter = new Imposter().withPort(5000).withStub(
-      new DefaultStub(
-        `/wiki/Special:EntityData/${wikidataId}.json`,
-        HttpMethod.GET,
-        {
-          entities: {
-            [wikidataId]: {
-              labels: {
-                en: {
-                  language: "en",
-                  value: wikidataTitle,
-                },
-              },
-              sitelinks: { ...wikipedia },
-            },
-          },
-        },
-        200,
-      ),
-    )
-    await mb.createImposter(imposter)
-  },
-)
-
-Given("The wikidata service is not available", () => {
-  // checking if the saved Wikidata service url is the real url, which indicate the service is mocked.
-  // This test require the service to be mocked first.
-  cy.get("@savedWikidataServiceUrl").then((url) => {
-    expect(url).to.include("https://www.wikidata.org")
-  })
-})
-
-Then("I should see a message {string}", (message: string) => {
-  cy.findByText(message)
-})
-
-Then(
-  "I should see the icon beside title linking to {string} url",
-  (wikiType: "wikipedia" | "wikidata") => {
-    let expectedUrl = ""
-
-    if (wikiType == "wikipedia") {
-      expectedUrl = "https://en.wikipedia.org/"
-    }
-
-    if (wikiType == "wikidata") {
-      expectedUrl = "https://www.wikidata.org/"
-    }
-
-    cy.get("#wikiUrl").invoke("attr", "href").should("include", expectedUrl)
-  },
-)

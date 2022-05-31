@@ -36,10 +36,10 @@ Before({ tags: "@featureToggle" }, () => {
   cy.enableFeatureToggle(true)
 })
 
-Before({ tags: "@usingWikidataService" }, () => {
+Before({ tags: "@usingDummyWikidataService" }, () => {
   cy.setWikidataServiceUrl("http://localhost:5000").as("savedWikidataServiceUrl")
 })
 
-After({ tags: "@usingWikidataService" }, () => {
+After({ tags: "@usingDummyWikidataService" }, () => {
   cy.get("@savedWikidataServiceUrl").then((saved) => cy.setWikidataServiceUrl(saved))
 })

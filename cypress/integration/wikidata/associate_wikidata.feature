@@ -8,16 +8,16 @@ Feature: associate wikidata ID to note
     Given I've logged in as an existing user
     And I have a note with title "TDD"
 
-  @usingWikidataService
+  @usingDummyWikidataService
   Scenario: Associate note to wikidata when the service is not available
     Given The wikidata service is not available
     When I associate the note "TDD" with wikidata id "Q1"
     Then I should see a message "The wikidata service is not available"
 
 
-  @usingWikidataService
+  @usingDummyWikidataService
   Scenario Outline: Associate note to wikidata with validation
-    Given Wikidata.org has an entity "<id>" with "<wikidata title>" and ""
+    Given Wikidata.org has an entity "<id>" with "<wikidata title>"
     When I associate the note "TDD" with wikidata id "<id>"
     Then I <need to confirm> the association with different title "<wikidata title>"
 
@@ -26,7 +26,7 @@ Feature: associate wikidata ID to note
       | Q423392   | TDD             | don't need to confirm |
       | Q12345    | Count von Count | need to confirm       |
 
-  @usingWikidataService
+  @usingDummyWikidataService
   Scenario Outline: Associate note to wikipedia via wikidata
     Given Wikidata.org has an entity "<id>" with "TDD" and "<wikipedia link>"
     When I associate the note "TDD" with wikidata id "<id>"

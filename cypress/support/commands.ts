@@ -26,6 +26,7 @@
 
 import "@testing-library/cypress/add-commands"
 import "cypress-file-upload"
+import { HttpMethod, Imposter, Mountebank, DefaultStub } from "@anev/ts-mountebank"
 
 Cypress.Commands.add("pageIsNotLoading", () => {
   cy.get(".loading-bar").should("not.exist")
@@ -508,3 +509,32 @@ Cypress.Commands.add("clickAssociateWikiDataButton", (title, wikiID) => {
   cy.clickNotePageButton(title, "associate wikidata")
   cy.replaceFocusedText(wikiID)
 })
+
+Cypress.Commands.add(
+  "stubWikidataEntityQuery",
+  (wikidataId: string, wikidataTitle: string, wikipediaLink: string) => {
+    const wikipedia = wikipediaLink ? { enwiki: { site: "enwiki", url: wikipediaLink } } : {}
+    const mb = new Mountebank()
+    const imposter = new Imposter().withPort(5000).withStub(
+      new DefaultStub(
+        `/wiki/Special:EntityData/${wikidataId}.json`,
+        HttpMethod.GET,
+        {
+          entities: {
+            [wikidataId]: {
+              labels: {
+                en: {
+                  language: "en",
+                  value: wikidataTitle,
+                },
+              },
+              sitelinks: { ...wikipedia },
+            },
+          },
+        },
+        200,
+      ),
+    )
+    return mb.createImposter(imposter)
+  },
+)
