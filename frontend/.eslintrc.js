@@ -9,7 +9,8 @@ module.exports = {
     },
     ecmaVersion: 12,
     sourceType: "module",
-    project: "./tsconfig.json",
+    createDefaultProgram: true,
+    project: ["./tsconfig.json"],
     extraFileExtensions: [".vue"],
     vueFeatures: {
       filter: false,
@@ -94,6 +95,7 @@ module.exports = {
       parser: "@typescript-eslint/parser",
       rules: {
         "no-undef": "off",
+        "no-use-before-define": "off",
       },
     },
     {
