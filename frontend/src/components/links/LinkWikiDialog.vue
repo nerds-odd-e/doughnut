@@ -7,6 +7,7 @@
       scope-name="wikiID"
       field="wikiID"
       v-model="associationData.wikidataId"
+      :errors="wikidataIdError"
       placeholder="Q1234"
       v-focus
     />
@@ -39,7 +40,7 @@ import SearchWikidata from "../search/SearchWikidata.vue";
 
 export default defineComponent({
   setup() {
-    return useStoredLoadingApi({ initalLoading: true, hasFormError: true });
+    return useStoredLoadingApi({ initalLoading: true, hasFormError: false });
   },
   props: { note: { type: Object as PropType<Generated.Note>, required: true } },
   components: { TextInput, SearchWikidata },
@@ -52,6 +53,7 @@ export default defineComponent({
       } as Generated.WikidataAssociationCreation,
       wikiDataTitle: "",
       showConfirmation: false,
+      wikidataIdError: undefined as undefined | string,
     };
   },
   computed: {
@@ -65,17 +67,20 @@ export default defineComponent({
     },
   },
   methods: {
-    validateAssociation() {
-      this.storedApi
-        .getWikiData(this.payload.associationData.wikidataId)
-        .then((res: Generated.WikiDataDto) => {
-          if (res.WikiDataTitleInEnglish !== this.note.title) {
-            this.wikiDataTitle = res.WikiDataTitleInEnglish;
-            this.showConfirmation = true;
-          } else {
-            this.saveWiki();
-          }
-        });
+    async validateAssociation() {
+      try {
+        const res = await this.storedApi.getWikiData(
+          this.payload.associationData.wikidataId
+        );
+        if (res.WikiDataTitleInEnglish !== this.note.title) {
+          this.wikiDataTitle = res.WikiDataTitleInEnglish;
+          this.showConfirmation = true;
+        } else {
+          await this.saveWiki();
+        }
+      } catch (e) {
+        this.wikidataIdError = "The wikidata service is not available";
+      }
     },
     saveWiki() {
       this.storedApi

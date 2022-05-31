@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 
 import com.odde.doughnut.entities.json.WikiDataDto;
@@ -15,6 +16,7 @@ import org.junit.platform.commons.util.StringUtils;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.validation.BindException;
 
 class RestWikiDataControllerTests {
 
@@ -43,7 +45,15 @@ class RestWikiDataControllerTests {
     }
 
     @Test
-    void shouldFetchInfoViaWikidataApi() throws IOException, InterruptedException {
+    void serviceNotAvailable() throws IOException, InterruptedException {
+      Mockito.when(httpClientAdapter.getResponseString(any())).thenThrow(new IOException());
+      BindException exception =
+          assertThrows(BindException.class, () -> controller.fetchWikiDataByID("Q1"));
+      assertThat(exception.getErrorCount(), equalTo(1));
+    }
+
+    @Test
+    void shouldFetchInfoViaWikidataApi() throws IOException, InterruptedException, BindException {
       Mockito.when(httpClientAdapter.getResponseString(any()))
           .thenReturn(getEntityDataJsonString("Q1", "Mohawk", ""));
       controller.fetchWikiDataByID("Q1");
@@ -52,7 +62,7 @@ class RestWikiDataControllerTests {
     }
 
     @Test
-    void shouldParseAndGetTheInfo() throws IOException, InterruptedException {
+    void shouldParseAndGetTheInfo() throws IOException, InterruptedException, BindException {
       Mockito.when(httpClientAdapter.getResponseString(any()))
           .thenReturn(getEntityDataJsonString("Q1", "Mohawk", ""));
       WikiDataDto result = controller.fetchWikiDataByID("Q1");
@@ -60,7 +70,8 @@ class RestWikiDataControllerTests {
     }
 
     @Test
-    void shouldRetrieveTheEnglishWikipediaLinkIfExists() throws IOException, InterruptedException {
+    void shouldRetrieveTheEnglishWikipediaLinkIfExists()
+        throws IOException, InterruptedException, BindException {
       Mockito.when(httpClientAdapter.getResponseString(any()))
           .thenReturn(
               getEntityDataJsonString(
@@ -74,7 +85,7 @@ class RestWikiDataControllerTests {
 
     @Test
     void shouldReturnEmptyIfEnglishWikipediaLinkNotExist()
-        throws IOException, InterruptedException {
+        throws IOException, InterruptedException, BindException {
       Mockito.when(httpClientAdapter.getResponseString(any()))
           .thenReturn(getEntityDataJsonString("Q13339", "Blah", ""));
       WikiDataDto result = controller.fetchWikiDataByID("Q13339");

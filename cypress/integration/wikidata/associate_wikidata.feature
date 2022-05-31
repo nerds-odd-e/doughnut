@@ -8,7 +8,6 @@ Feature: associate wikidata ID to note
     Given I've logged in as an existing user
     And I have a note with title "TDD"
 
-  @ignore
   @usingWikidataService
   Scenario: Associate note to wikidata when the service is not available
     Given The wikidata service is not available

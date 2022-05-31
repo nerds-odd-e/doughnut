@@ -6,6 +6,9 @@ import com.odde.doughnut.services.WikiDataService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import javax.annotation.Resource;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindException;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,8 +30,14 @@ public class RestWikidataController {
 
   @GetMapping("/wikidata/{wikiDataId}")
   public WikiDataDto fetchWikiDataByID(@PathVariable("wikiDataId") String wikiDataId)
-      throws IOException, InterruptedException {
-    return getWikiDataService().fetchWikiData(wikiDataId);
+      throws InterruptedException, BindException {
+    try {
+      return getWikiDataService().fetchWikiData(wikiDataId);
+    } catch (IOException e) {
+      BindingResult bindingResult = new BeanPropertyBindingResult(wikiDataId, "wikiDataId");
+      bindingResult.rejectValue(null, "error.error", "The wikidata service is not available");
+      throw new BindException(bindingResult);
+    }
   }
 
   private WikiDataService getWikiDataService() {
