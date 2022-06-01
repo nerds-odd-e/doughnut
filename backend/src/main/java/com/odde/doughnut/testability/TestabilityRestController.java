@@ -8,6 +8,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteAccessories;
 import com.odde.doughnut.entities.Ownership;
 import com.odde.doughnut.entities.TextContent;
+import com.odde.doughnut.entities.Thingy;
 import com.odde.doughnut.entities.User;
 import com.odde.doughnut.entities.repositories.LinkRepository;
 import com.odde.doughnut.entities.repositories.NoteRepository;
@@ -27,7 +28,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import javax.persistence.EntityManagerFactory;
+import lombok.Setter;
 import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -87,19 +90,38 @@ class TestabilityRestController {
 
   static class SeedNote {
     public String title;
-    public String description;
-    public String wikidataId;
-    public String testingParent;
-    public Boolean skipReview;
-    public String url;
-    public String pictureUrl;
-    public String pictureMask;
+    @Setter private String description;
+    @Setter private String wikidataId;
+    @Setter private String testingParent;
+    @Setter private Boolean skipReview;
+    @Setter private String url;
+    @Setter private String pictureUrl;
+    @Setter private String pictureMask;
+
+    private Note buildNote(User user, Timestamp currentUTCTimestamp) {
+      Note note = Note.createNote(user, currentUTCTimestamp, new TextContent());
+      NoteAccessories content = note.getNoteAccessories();
+
+      note.getTextContent().setTitle(title);
+      note.getTextContent().setDescription(description);
+      note.setWikidataId(wikidataId);
+      note.getTextContent().setUpdatedAt(currentUTCTimestamp);
+      if (skipReview != null) {
+        content.setSkipReview(skipReview);
+      }
+      content.setUrl(url);
+      content.setPictureMask(pictureMask);
+      content.setPictureUrl(pictureUrl);
+
+      note.setNoteAccessoriesUpdatedAt(currentUTCTimestamp);
+      return note;
+    }
   }
 
   static class SeedInfo {
-    public List<SeedNote> seedNotes;
-    public String externalIdentifier;
-    public String circleName; // optional
+    @Setter private List<SeedNote> seedNotes;
+    @Setter private String externalIdentifier;
+    @Setter private String circleName; // optional
 
     public String getTestingParent(String title) {
       return seedNotes.stream()
@@ -107,6 +129,25 @@ class TestabilityRestController {
           .findFirst()
           .map(seed -> seed.testingParent)
           .orElse(null);
+    }
+
+    private Map<String, Note> buildIndividualNotes(User user, Timestamp currentUTCTimestamp) {
+      return seedNotes.stream()
+          .map(seedNote -> seedNote.buildNote(user, currentUTCTimestamp))
+          .collect(Collectors.toMap(Note::getTitle, n -> n));
+    }
+
+    private void buildNoteTree(User user, Ownership ownership, Map<String, Note> titleNoteMap) {
+      titleNoteMap.forEach(
+          (title, note) -> {
+            String testingParent = getTestingParent(title);
+
+            if (Strings.isBlank(testingParent)) {
+              note.buildNotebookForHeadNote(ownership, user);
+            } else {
+              note.setParentNote(titleNoteMap.get(testingParent));
+            }
+          });
     }
   }
 
@@ -119,43 +160,12 @@ class TestabilityRestController {
     final User user =
         getUserModelByExternalIdentifierOrCurrentUser(seedInfo.externalIdentifier).getEntity();
     Ownership ownership = getOwnership(seedInfo, user);
-    HashMap<String, Note> earlyNotes = new HashMap<>();
-    Map<String, Integer> titleIdMap = new HashMap<>();
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
 
-    for (SeedNote seedNote : seedInfo.seedNotes) {
-      Note note = Note.createNote(user, currentUTCTimestamp, new TextContent());
-      NoteAccessories content = note.getNoteAccessories();
-
-      note.getTextContent().setTitle(seedNote.title);
-      note.getTextContent().setDescription(seedNote.description);
-      note.setWikidataId(seedNote.wikidataId);
-      note.getTextContent().setUpdatedAt(currentUTCTimestamp);
-      if (seedNote.skipReview != null) {
-        content.setSkipReview(seedNote.skipReview);
-      }
-      content.setUrl(seedNote.url);
-      content.setPictureMask(seedNote.pictureMask);
-      content.setPictureUrl(seedNote.pictureUrl);
-
-      note.setNoteAccessoriesUpdatedAt(currentUTCTimestamp);
-      earlyNotes.put(seedNote.title, note);
-    }
-
-    earlyNotes.forEach(
-        (title, note) -> {
-          String testingParent = seedInfo.getTestingParent(title);
-
-          if (Strings.isBlank(testingParent)) {
-            note.buildNotebookForHeadNote(ownership, user);
-          } else {
-            note.setParentNote(earlyNotes.get(testingParent));
-          }
-          noteRepository.save(note);
-          titleIdMap.put(note.getTitle(), note.getId());
-        });
-
-    return titleIdMap;
+    Map<String, Note> titleNoteMap = seedInfo.buildIndividualNotes(user, currentUTCTimestamp);
+    seedInfo.buildNoteTree(user, ownership, titleNoteMap);
+    noteRepository.saveAll(titleNoteMap.values());
+    return titleNoteMap.values().stream().collect(Collectors.toMap(Note::getTitle, Thingy::getId));
   }
 
   private Ownership getOwnership(SeedInfo seedInfo, User user) {
