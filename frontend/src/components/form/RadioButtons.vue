@@ -1,15 +1,7 @@
 <template>
   <InputWithType v-bind="{ scopeName, field, errors }">
-    <output
-      :id="`${scopeName}-${field}`"
-      role="radiogroup"
-      class="btn-group filter-switch"
-    >
-      <div
-        v-for="option in options"
-        :key="option.value"
-        class="filter-switch-item"
-      >
+    <output :id="`${scopeName}-${field}`" role="radiogroup" class="btn-group">
+      <template v-for="option in options" :key="option.value">
         <input
           class="btn-check"
           type="radio"
@@ -18,6 +10,7 @@
           :modelValue="modelValue"
           @change="selectionChanged"
         />
+
         <label
           role="button"
           :title="option.title"
@@ -27,7 +20,7 @@
           <slot name="labelAddition" :value="option.value" />
           {{ option.label }}
         </label>
-      </div>
+      </template>
     </output>
   </InputWithType>
 </template>
