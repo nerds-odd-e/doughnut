@@ -26,7 +26,6 @@ describe("note overview", () => {
       .withProps({
         noteId: note.id,
         noteRealms: toNoteRealmsCache([note]),
-        expandChildren: true,
       })
       .render();
     expect(screen.getByRole("title")).toHaveTextContent("single note");
@@ -43,7 +42,6 @@ describe("note overview", () => {
       .withProps({
         noteId: note.id,
         noteRealms: toNoteRealmsCache([note]),
-        expandChildren: true,
       })
       .render();
     await screen.findByText("target note");
@@ -60,7 +58,6 @@ describe("note overview", () => {
       .withProps({
         noteId: noteParent.id,
         noteRealms: toNoteRealmsCache([noteParent, noteChild]),
-        expandChildren: true,
       })
       .render();
     await flushPromises();
@@ -84,7 +81,6 @@ describe("note overview", () => {
       .withProps({
         noteId: noteParent.id,
         noteRealms: toNoteRealmsCache([noteParent, noteChild, noteGrandchild]),
-        expandChildren: true,
       })
       .render();
     await screen.findByText("parent");

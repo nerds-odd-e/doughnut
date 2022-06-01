@@ -65,7 +65,6 @@ export default defineComponent({
   props: {
     highlightNoteId: Number,
     noteId: { type: Number, required: true },
-    expandChildren: Boolean,
     noteRealms: {
       type: Object as PropType<NoteRealmsReader>,
       required: true,
