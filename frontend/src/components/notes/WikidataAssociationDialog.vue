@@ -1,14 +1,14 @@
 <template>
   <h3>
-    Associate <strong>{{ note.title }}</strong> to WIKI
+    Associate <strong>{{ note.title }}</strong> to Wikidata
   </h3>
   <form v-if="!showConfirmation" @submit.prevent.once="validateAssociation">
     <TextInput
-      scope-name="wikiID"
-      field="wikiID"
+      scope-name="wikidataID"
+      field="wikidataID"
       v-model="associationData.wikidataId"
       :errors="wikidataIdError"
-      placeholder="Q1234"
+      placeholder="example: `Q1234`"
       v-focus
     />
 
@@ -28,6 +28,7 @@
       class="btn btn-secondary"
       @click="showConfirmation = false"
     />
+
     <input type="submit" value="Confirm" class="btn btn-primary" />
   </form>
 </template>
@@ -76,7 +77,7 @@ export default defineComponent({
           this.wikiDataTitle = res.WikiDataTitleInEnglish;
           this.showConfirmation = true;
         } else {
-          await this.saveWiki();
+          this.saveWiki();
         }
       } catch (e) {
         this.wikidataIdError = "The wikidata service is not available";

@@ -6,9 +6,14 @@ class WikiDataDtoBuilder extends Builder<Generated.WikiDataDto> {
   constructor() {
     super();
     this.data = {
-      WikiDataTitleInEnglish: "Note1.1.1",
+      WikiDataTitleInEnglish: "default title",
       WikipediaEnglishUrl: "",
     };
+  }
+
+  wikidataTitle(value: string) {
+    this.data.WikiDataTitleInEnglish = value;
+    return this;
   }
 
   do(): Generated.WikiDataDto {
