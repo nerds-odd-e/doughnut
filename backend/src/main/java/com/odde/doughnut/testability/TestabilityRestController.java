@@ -91,7 +91,6 @@ class TestabilityRestController {
   static class SeedNote {
     public String title;
     @Setter private String description;
-    @Setter private String wikidataId;
     @Setter private String testingParent;
     @Setter private Boolean skipReview;
     @Setter private String url;
@@ -104,7 +103,6 @@ class TestabilityRestController {
 
       note.getTextContent().setTitle(title);
       note.getTextContent().setDescription(description);
-      note.setWikidataId(wikidataId);
       note.getTextContent().setUpdatedAt(currentUTCTimestamp);
       if (skipReview != null) {
         content.setSkipReview(skipReview);
