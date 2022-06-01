@@ -10,7 +10,6 @@
           :checked="modelValue === option.value"
           @change="selectionChanged"
         />
-
         <label
           role="button"
           :title="option.title"

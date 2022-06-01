@@ -43,19 +43,10 @@ Then("I should see a message {string}", (message: string) => {
   cy.expectFieldErrorMessage(message)
 })
 
-Then(
-  "I should see the icon beside title linking to {string} url",
-  (wikiType: "wikipedia" | "wikidata") => {
-    let expectedUrl = ""
-
-    if (wikiType == "wikipedia") {
-      expectedUrl = "https://en.wikipedia.org/"
-    }
-
-    if (wikiType == "wikidata") {
-      expectedUrl = "https://www.wikidata.org/"
-    }
-
-    cy.get("#wikiUrl").invoke("attr", "href").should("include", expectedUrl)
-  },
-)
+Then("I should see the icon beside title linking to {string}", (associationUrl: string) => {
+  cy.window().then((win) => {
+    cy.stub(win, "open").as("open")
+    cy.findByRole("button", { name: "Wikidata" }).click()
+    cy.get("@open").should("have.been.calledWith", associationUrl)
+  })
+})

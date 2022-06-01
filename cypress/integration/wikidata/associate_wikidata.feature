@@ -30,15 +30,15 @@ Feature: associate wikidata ID to note
   Scenario Outline: Associate note to wikipedia via wikidata
     Given Wikidata.org has an entity "<id>" with "TDD" and "<wikipedia link>"
     When I associate the note "TDD" with wikidata id "<id>"
-    Then I should see the icon beside title linking to "<type>" url
+    Then I should see the icon beside title linking to "<expected url>"
 
     Examples:
-      | id        | wikipedia link               | type      |
-      | Q423392   |                              | wikidata  |
-      | Q12345    | https://en.wikipedia.org/TDD | wikipedia |
+      | id   | wikipedia link               | expected url                     |
+      | Q1   |                              | https://www.wikidata.org/wiki/Q1 |
+      | Q2   | https://en.wikipedia.org/TDD | https://en.wikipedia.org/TDD     |
 
   @usingRealWikidataService
   Scenario: Associate note to wikipedia via wikidata
     When I associate the note "TDD" with wikidata id "Q12345"
     Then I need to confirm the association with different title "Count von Count"
-    And I should see the icon beside title linking to "wikipedia" url
+    And I should see the icon beside title linking to "https://en.wikipedia.org/wiki/Count_von_Count"

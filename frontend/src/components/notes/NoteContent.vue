@@ -11,17 +11,10 @@
       v-model="textContent.title"
       @blur="onBlurTextField"
     />
-    <a
+    <NoteWikidataAssociation
       v-if="note.wikidataId"
-      id="wikiUrl"
-      role="wikiUrl"
-      :href="wikiUrl"
-      target="_blank"
-      style="text-align: right; margin-left: 10px"
-      title="Wikidata"
-    >
-      <SvgAssociation />
-    </a>
+      :wikidata-id="note.wikidataId"
+    />
   </div>
   <div class="note-content">
     <EditableText
@@ -74,9 +67,9 @@ import ShowPicture from "./ShowPicture.vue";
 import SvgDescriptionIndicator from "../svgs/SvgDescriptionIndicator.vue";
 import SvgPictureIndicator from "../svgs/SvgPictureIndicator.vue";
 import SvgUrlIndicator from "../svgs/SvgUrlIndicator.vue";
-import SvgAssociation from "../svgs/SvgAssociation.vue";
 import EditableText from "../form/EditableText.vue";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
+import NoteWikidataAssociation from "./NoteWikidataAssociation.vue";
 
 export default defineComponent({
   setup() {
@@ -87,9 +80,6 @@ export default defineComponent({
     size: { type: String, default: "large" },
     titleAsLink: Boolean,
   },
-  data() {
-    return { wikipediaEnglishUrl: "" };
-  },
   emits: ["noteRealmUpdated"],
   components: {
     NoteShortDescription,
@@ -99,19 +89,11 @@ export default defineComponent({
     SvgUrlIndicator,
     EditableText,
     NoteTitleWithLink,
-    SvgAssociation,
+    NoteWikidataAssociation,
   },
   computed: {
     textContent() {
       return { ...this.note.textContent };
-    },
-
-    wikiUrl() {
-      this.getWikiDataItem();
-      if (this.wikipediaEnglishUrl !== "") {
-        return this.wikipediaEnglishUrl;
-      }
-      return `https://www.wikidata.org/wiki/${this.note.wikidataId}`;
     },
   },
   methods: {
@@ -126,13 +108,6 @@ export default defineComponent({
           this.$emit("noteRealmUpdated", res);
         })
         .catch((res) => (this.formErrors = res));
-    },
-    getWikiDataItem() {
-      this.api.wikidata
-        .getWikiData(this.note.wikidataId)
-        .then((res: Generated.WikiDataDto) => {
-          this.wikipediaEnglishUrl = res.WikipediaEnglishUrl;
-        });
     },
   },
 });
