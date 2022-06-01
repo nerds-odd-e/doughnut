@@ -144,11 +144,6 @@ declare namespace Generated {
         name: string;
     }
 
-    interface WikiDataDto {
-        WikiDataTitleInEnglish: string;
-        WikipediaEnglishUrl: string;
-    }
-
     interface WikiDataSearchResponseModel {
         id: string;
         label: string;
@@ -156,6 +151,11 @@ declare namespace Generated {
 
     interface WikidataAssociationCreation {
         wikidataId: string;
+    }
+
+    interface WikidataEntity {
+        WikiDataTitleInEnglish: string;
+        WikipediaEnglishUrl: string;
     }
 
     interface User {

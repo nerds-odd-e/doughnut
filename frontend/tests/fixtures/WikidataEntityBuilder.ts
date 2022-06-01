@@ -1,7 +1,7 @@
 import Builder from "./Builder";
 
-class WikiDataDtoBuilder extends Builder<Generated.WikiDataDto> {
-  data: Generated.WikiDataDto;
+class WikidataEntityBuilder extends Builder<Generated.WikidataEntity> {
+  data: Generated.WikidataEntity;
 
   constructor() {
     super();
@@ -16,9 +16,9 @@ class WikiDataDtoBuilder extends Builder<Generated.WikiDataDto> {
     return this;
   }
 
-  do(): Generated.WikiDataDto {
+  do() {
     return this.data;
   }
 }
 
-export default WikiDataDtoBuilder;
+export default WikidataEntityBuilder;

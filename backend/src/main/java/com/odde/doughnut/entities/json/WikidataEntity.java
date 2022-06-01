@@ -1,10 +1,10 @@
 package com.odde.doughnut.entities.json;
 
-public class WikiDataDto {
+public class WikidataEntity {
   public String WikiDataTitleInEnglish;
   public String WikipediaEnglishUrl;
 
-  public WikiDataDto(String wikiDataTitleInEnglish, String wikipediaEnglishUrl) {
+  public WikidataEntity(String wikiDataTitleInEnglish, String wikipediaEnglishUrl) {
     this.WikiDataTitleInEnglish = wikiDataTitleInEnglish;
     this.WikipediaEnglishUrl = wikipediaEnglishUrl;
   }

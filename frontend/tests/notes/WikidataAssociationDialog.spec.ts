@@ -10,7 +10,7 @@ describe("Save wikidata id", () => {
   helper.resetWithApiMock(beforeEach, afterEach);
 
   beforeEach(() => {
-    const wikiData = makeMe.aWikiDataDto.wikidataTitle("TDD").please();
+    const wikiData = makeMe.aWikidataEntity.wikidataTitle("TDD").please();
     helper.apiMock.expectingGet("/api/wikidata/Q12434").andReturnOnce(wikiData);
   });
 

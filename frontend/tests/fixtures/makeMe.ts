@@ -9,7 +9,7 @@ import CircleNoteBuilder from "./CircleNoteBuilder";
 import BazaarNoteBuilder from "./NotebooksBuilder";
 import NoteBuilder from "./NoteBuilder";
 import UserBuilder from "./UserBuilder";
-import WikiDataDtoBuilder from "./WikiDataDtoBuilder";
+import WikidataEntityBuilder from "./WikidataEntityBuilder";
 
 class MakeMe {
   static aUser() {
@@ -56,8 +56,8 @@ class MakeMe {
     return new BazaarNoteBuilder();
   }
 
-  static get aWikiDataDto(): WikiDataDtoBuilder {
-    return new WikiDataDtoBuilder();
+  static get aWikidataEntity(): WikidataEntityBuilder {
+    return new WikidataEntityBuilder();
   }
 }
 

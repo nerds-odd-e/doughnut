@@ -1,14 +1,14 @@
 package com.odde.doughnut.models;
 
-import com.odde.doughnut.entities.json.WikiDataDto;
+import com.odde.doughnut.entities.json.WikidataEntity;
 import java.util.Map;
 
 public class WikiDataInfo {
   public Map<String, LanguageValueModel> labels;
   public Map<String, WikiSiteLinkModel> sitelinks;
 
-  public WikiDataDto processInfo() {
-    return new WikiDataDto(GetEnglishTitle(), GetEnglishWikipediaUrl());
+  public WikidataEntity processInfo() {
+    return new WikidataEntity(GetEnglishTitle(), GetEnglishWikipediaUrl());
   }
 
   private String GetEnglishWikipediaUrl() {

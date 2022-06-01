@@ -5,7 +5,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 
-import com.odde.doughnut.entities.json.WikiDataDto;
+import com.odde.doughnut.entities.json.WikidataEntity;
 import com.odde.doughnut.services.HttpClientAdapter;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
@@ -65,7 +65,7 @@ class RestWikiDataControllerTests {
     void shouldParseAndGetTheInfo() throws IOException, InterruptedException, BindException {
       Mockito.when(httpClientAdapter.getResponseString(any()))
           .thenReturn(getEntityDataJsonString("Q1", "Mohawk", ""));
-      WikiDataDto result = controller.fetchWikiDataByID("Q1");
+      WikidataEntity result = controller.fetchWikiDataByID("Q1");
       assertThat(result.WikiDataTitleInEnglish, equalTo("Mohawk"));
     }
 
@@ -78,7 +78,7 @@ class RestWikiDataControllerTests {
                   "Q13339",
                   "Mohawk",
                   "\"enwiki\":{\"site\":\"enwiki\",\"title\":\"Mohawk language\",\"badges\":[],\"url\":\"https://en.wikipedia.org/wiki/Mohawk_language\"}"));
-      WikiDataDto result = controller.fetchWikiDataByID("Q13339");
+      WikidataEntity result = controller.fetchWikiDataByID("Q13339");
       assertThat(
           result.WikipediaEnglishUrl, equalTo("https://en.wikipedia.org/wiki/Mohawk_language"));
     }
@@ -88,7 +88,7 @@ class RestWikiDataControllerTests {
         throws IOException, InterruptedException, BindException {
       Mockito.when(httpClientAdapter.getResponseString(any()))
           .thenReturn(getEntityDataJsonString("Q13339", "Blah", ""));
-      WikiDataDto result = controller.fetchWikiDataByID("Q13339");
+      WikidataEntity result = controller.fetchWikiDataByID("Q13339");
       assertThat(StringUtils.isBlank(result.WikipediaEnglishUrl), is(true));
     }
   }

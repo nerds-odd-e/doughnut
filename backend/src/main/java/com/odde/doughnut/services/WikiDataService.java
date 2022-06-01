@@ -3,7 +3,7 @@ package com.odde.doughnut.services;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.odde.doughnut.entities.json.WikiDataDto;
+import com.odde.doughnut.entities.json.WikidataEntity;
 import com.odde.doughnut.models.WikiDataModel;
 import java.io.IOException;
 
@@ -28,7 +28,7 @@ public class WikiDataService {
     return wikidataBaseUrl + "/wiki/Special:EntityData/" + wikiDataId + ".json";
   }
 
-  public WikiDataDto fetchWikiData(String wikiDataId) throws IOException, InterruptedException {
+  public WikidataEntity fetchWikiData(String wikiDataId) throws IOException, InterruptedException {
     return FetchWikiData(wikiDataId).GetInfoForWikiDataId(wikiDataId).processInfo();
   }
 }

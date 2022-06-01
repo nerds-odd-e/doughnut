@@ -219,7 +219,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
     async getWikiData(wikiDataId: string) {
       return (await managedApi.restGet(
         `wikidata/${wikiDataId}`
-      )) as Generated.WikiDataDto;
+      )) as Generated.WikidataEntity;
     },
   },
 });
