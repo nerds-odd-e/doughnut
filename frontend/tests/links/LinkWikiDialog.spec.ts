@@ -1,7 +1,7 @@
 /**
  * @jest-environment jsdom
  */
-import LinkWikiDialog from "@/components/links/LinkWikiDialog.vue";
+import WikidataAssociationDialog from "@/components/notes/WikidataAssociationDialog.vue";
 import SearchWikidataVue from "@/components/search/SearchWikidata.vue";
 import makeMe from "../fixtures/makeMe";
 import helper from "../helpers";
@@ -23,7 +23,7 @@ describe("Save wikidata id", () => {
       .andReturnOnce({ note });
 
     const wrapper = helper
-      .component(LinkWikiDialog)
+      .component(WikidataAssociationDialog)
       .withProps({
         note,
       })
@@ -45,7 +45,7 @@ describe("Save wikidata id", () => {
     helper.apiMock.expectingPost(`/api/notes/${note.id}/updateWikidataId`);
 
     const wrapper = helper
-      .component(LinkWikiDialog)
+      .component(WikidataAssociationDialog)
       .withProps({
         note,
       })

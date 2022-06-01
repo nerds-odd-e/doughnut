@@ -28,7 +28,7 @@
           <SvgWikiData />
         </template>
         <template #dialog_body="{ doneHandler }">
-          <LinkWikiDialog
+          <WikidataAssociationDialog
             :note="selectedNote"
             @done="
               doneHandler($event);
@@ -55,7 +55,7 @@ import LinkNoteDialog from "../links/LinkNoteDialog.vue";
 import { ViewTypeName } from "../../models/viewTypes";
 import ToolbarFrame from "./ToolbarFrame.vue";
 import SvgWikiData from "../svgs/SvgWikiData.vue";
-import LinkWikiDialog from "../links/LinkWikiDialog.vue";
+import WikidataAssociationDialog from "../notes/WikidataAssociationDialog.vue";
 
 export default defineComponent({
   setup() {
@@ -79,7 +79,7 @@ export default defineComponent({
     LinkNoteDialog,
     ToolbarFrame,
     SvgWikiData,
-    LinkWikiDialog,
+    WikidataAssociationDialog,
   },
   computed: {
     featureToggle() {
