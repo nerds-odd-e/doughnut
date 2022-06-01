@@ -205,6 +205,23 @@ const apiCollection = (managedApi: ManagedApi) => ({
       )) as Generated.NotePositionViewedByUser;
     },
   },
+  wikidata: {
+    async updateWikidataId(
+      noteId: Doughnut.ID,
+      data: Generated.WikidataAssociationCreation
+    ) {
+      return (await managedApi.restPost(
+        `notes/${noteId}/updateWikidataId`,
+        data
+      )) as Generated.NoteRealm;
+    },
+
+    async getWikiData(wikiDataId: string) {
+      return (await managedApi.restGet(
+        `wikidata/${wikiDataId}`
+      )) as Generated.WikiDataDto;
+    },
+  },
 });
 
 export default apiCollection;

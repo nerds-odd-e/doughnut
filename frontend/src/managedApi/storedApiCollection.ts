@@ -150,28 +150,6 @@ const storedApiCollection = (
         `circles/${circleId}`
       )) as Generated.CircleForUserView;
     },
-
-    async updateWikidataId(
-      noteId: Doughnut.ID,
-      data: Generated.WikidataAssociationCreation
-    ) {
-      return (await managedApi.restPost(
-        `notes/${noteId}/updateWikidataId`,
-        data
-      )) as Generated.NoteRealm;
-    },
-
-    async getWikiData(wikiDataId: string) {
-      return (await managedApi.restGet(
-        `wikidata/${wikiDataId}`
-      )) as Generated.WikiDataDto;
-    },
-
-    async searchWikidata(wikidataTitle: string) {
-      return (await managedApi.restGet(
-        `wikidata/searchWikidata/${wikidataTitle}`
-      )) as Generated.WikiDataSearchResponseModel[];
-    },
   };
 };
 

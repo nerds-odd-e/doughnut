@@ -6,7 +6,7 @@
       v-model="wikidataInput"
       placeholder="Search..."
     />
-    <button class="btn btn-secondary" @click="searchWikidata()">Search</button>
+    <button class="btn btn-secondary">Search</button>
     <select v-if="wikidataItems.length" multiple @change="onChange($event)">
       <option
         v-for="wikidataItem in wikidataItems"
@@ -39,11 +39,6 @@ export default defineComponent({
     };
   },
   methods: {
-    searchWikidata() {
-      this.storedApi.searchWikidata(this.wikidataInput).then((res) => {
-        this.wikidataItems = res;
-      });
-    },
     onChange(event) {
       this.$emit("selected", event.target.value);
     },

@@ -149,11 +149,13 @@ class TestabilityRestController {
             }
           });
     }
+
+    private void saveByOriginalOrder(
+        Map<String, Note> titleNoteMap, NoteRepository noteRepository1) {
+      seedNotes.forEach((seed -> noteRepository1.save(titleNoteMap.get(seed.title))));
+    }
   }
 
-  //
-  //  Testability API to seed notebooks and notes
-  //
   @PostMapping("/seed_notes")
   @Transactional
   public Map<String, Integer> seedNote(@RequestBody SeedInfo seedInfo) {
@@ -164,7 +166,7 @@ class TestabilityRestController {
 
     Map<String, Note> titleNoteMap = seedInfo.buildIndividualNotes(user, currentUTCTimestamp);
     seedInfo.buildNoteTree(user, ownership, titleNoteMap);
-    noteRepository.saveAll(titleNoteMap.values());
+    seedInfo.saveByOriginalOrder(titleNoteMap, this.noteRepository);
     return titleNoteMap.values().stream().collect(Collectors.toMap(Note::getTitle, Thingy::getId));
   }
 

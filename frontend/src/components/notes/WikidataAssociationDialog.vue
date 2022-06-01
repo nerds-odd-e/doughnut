@@ -36,12 +36,12 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import TextInput from "../form/TextInput.vue";
-import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
+import useLoadingApi from "../../managedApi/useLoadingApi";
 import SearchWikidata from "../search/SearchWikidata.vue";
 
 export default defineComponent({
   setup() {
-    return useStoredLoadingApi({ initalLoading: true, hasFormError: false });
+    return useLoadingApi({ initalLoading: true, hasFormError: false });
   },
   props: { note: { type: Object as PropType<Generated.Note>, required: true } },
   components: { TextInput, SearchWikidata },
@@ -70,7 +70,7 @@ export default defineComponent({
   methods: {
     async validateAssociation() {
       try {
-        const res = await this.storedApi.getWikiData(
+        const res = await this.api.wikidata.getWikiData(
           this.payload.associationData.wikidataId
         );
         if (res.WikiDataTitleInEnglish !== this.note.title) {
@@ -84,7 +84,7 @@ export default defineComponent({
       }
     },
     saveWiki() {
-      this.storedApi
+      this.api.wikidata
         .updateWikidataId(this.payload.noteId, this.payload.associationData)
         .then(() => {
           this.$emit("done");

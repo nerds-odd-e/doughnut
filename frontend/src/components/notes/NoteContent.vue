@@ -128,7 +128,7 @@ export default defineComponent({
         .catch((res) => (this.formErrors = res));
     },
     getWikiDataItem() {
-      this.storedApi
+      this.api.wikidata
         .getWikiData(this.note.wikidataId)
         .then((res: Generated.WikiDataDto) => {
           this.wikipediaEnglishUrl = res.WikipediaEnglishUrl;
