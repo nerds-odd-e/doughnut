@@ -107,12 +107,12 @@ class TestabilityRestController {
   //
   @PostMapping("/seed_notes")
   @Transactional
-  public List<Note> seedNote(@RequestBody SeedInfo seedInfo) {
+  public Map<String, Integer> seedNote(@RequestBody SeedInfo seedInfo) {
     final User user =
         getUserModelByExternalIdentifierOrCurrentUser(seedInfo.externalIdentifier).getEntity();
     Ownership ownership = getOwnership(seedInfo, user);
     HashMap<String, Note> earlyNotes = new HashMap<>();
-    List<Note> noteList = new ArrayList<>();
+    Map<String, Integer> titleIdMap = new HashMap<>();
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
 
     for (SeedNote seedNote : seedInfo.seedNotes) {
@@ -132,17 +132,16 @@ class TestabilityRestController {
 
       note.setNoteAccessoriesUpdatedAt(currentUTCTimestamp);
       earlyNotes.put(seedNote.title, note);
-      noteList.add(note);
       if (Strings.isBlank(seedNote.testingParent)) {
         note.buildNotebookForHeadNote(ownership, user);
       } else {
         note.setParentNote(earlyNotes.get(seedNote.testingParent));
       }
+      noteRepository.save(note);
+      titleIdMap.put(note.getTitle(), note.getId());
     }
 
-    noteRepository.saveAll(noteList);
-
-    return noteList;
+    return titleIdMap;
   }
 
   private Ownership getOwnership(SeedInfo seedInfo, User user) {

@@ -534,5 +534,5 @@ Cypress.Commands.add(
 )
 
 Cypress.Commands.add("expectFieldErrorMessage", (message: string) => {
-  cy.findByText(message, {selector: ".error-msg"})
+  cy.findByText(message, { selector: ".error-msg" })
 })

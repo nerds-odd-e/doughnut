@@ -18,35 +18,23 @@ Cypress.Commands.add("enableFeatureToggle", (enabled) => {
   })
 })
 
-Cypress.Commands.add("seedNotes", (notes, externalIdentifier = "", circleName = null) => {
-  cy.request({
-    method: "POST",
-    url: `/api/testability/seed_notes`,
-    body: {
-      externalIdentifier,
-      circleName,
-      seedNotes: notes,
-    },
-  }).then((response) => {
-    expect(response.body.length).to.equal(notes.length)
-
-    notes.forEach((n) => {
-      response.body.forEach((res) => {
-        if (res.wikidataId) {
-          expect(res.wikidataId).to.equal(n.wikidataId)
-        }
-      })
+Cypress.Commands.add(
+  "seedNotes",
+  (seedNotes: any[], externalIdentifier = "", circleName = null) => {
+    cy.request({
+      method: "POST",
+      url: `/api/testability/seed_notes`,
+      body: {
+        externalIdentifier,
+        circleName,
+        seedNotes,
+      },
+    }).then((response) => {
+      expect(Object.keys(response.body).length).to.equal(seedNotes.length)
+      cy.wrap(response.body).as("seededNoteIdMap")
     })
-
-    const titles = notes.map((n) => n["title"])
-    const noteMap = Object.assign(
-      {},
-      ...titles.map((t, index) => ({ [t]: response.body[index].id })),
-    )
-
-    cy.wrap(noteMap).as("seededNoteIdMap")
-  })
-})
+  },
+)
 
 Cypress.Commands.add("timeTravelTo", (day, hour) => {
   const travelTo = new Date(1976, 5, 1, hour).addDays(day)
