@@ -7,7 +7,7 @@
           type="radio"
           :value="option.value"
           :id="`${scopeName}-${option.value}`"
-          :modelValue="modelValue"
+          :checked="modelValue === option.value"
           @change="selectionChanged"
         />
 
