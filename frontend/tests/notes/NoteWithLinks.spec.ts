@@ -85,10 +85,8 @@ describe("undo editing", () => {
   });
 });
 
-describe("Link note to wikidata", () => {
+describe("note associated with wikidata", () => {
   it("should display icon besides title when note is linked", async () => {
-    helper.store.$reset();
-
     const noteRealm = makeMe.aNoteRealm
       .title("Dummy Title")
       .wikidataId("DummyId")

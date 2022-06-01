@@ -2,7 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.json.WikidataEntity;
 import com.odde.doughnut.services.HttpClientAdapter;
-import com.odde.doughnut.services.WikiDataService;
+import com.odde.doughnut.services.WikidataService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import javax.annotation.Resource;
@@ -40,7 +40,7 @@ public class RestWikidataController {
     }
   }
 
-  private WikiDataService getWikiDataService() {
-    return new WikiDataService(httpClientAdapter, testabilitySettings.getWikidataServiceUrl());
+  private WikidataService getWikiDataService() {
+    return new WikidataService(httpClientAdapter, testabilitySettings.getWikidataServiceUrl());
   }
 }

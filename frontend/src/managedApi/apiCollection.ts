@@ -206,14 +206,11 @@ const apiCollection = (managedApi: ManagedApi) => ({
     },
   },
   wikidata: {
-    async updateWikidataId(
+    updateWikidataId(
       noteId: Doughnut.ID,
       data: Generated.WikidataAssociationCreation
     ) {
-      return (await managedApi.restPost(
-        `notes/${noteId}/updateWikidataId`,
-        data
-      )) as Generated.NoteRealm;
+      return managedApi.restPost(`notes/${noteId}/updateWikidataId`, data);
     },
 
     async getWikiData(wikiDataId: string) {
