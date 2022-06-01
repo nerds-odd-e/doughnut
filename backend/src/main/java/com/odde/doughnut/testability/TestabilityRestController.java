@@ -100,6 +100,14 @@ class TestabilityRestController {
     public List<SeedNote> seedNotes;
     public String externalIdentifier;
     public String circleName; // optional
+
+    public String getTestingParent(String title) {
+      return seedNotes.stream()
+          .filter(seed -> title.equals(seed.title))
+          .findFirst()
+          .map(seed -> seed.testingParent)
+          .orElse(null);
+    }
   }
 
   //
@@ -132,14 +140,20 @@ class TestabilityRestController {
 
       note.setNoteAccessoriesUpdatedAt(currentUTCTimestamp);
       earlyNotes.put(seedNote.title, note);
-      if (Strings.isBlank(seedNote.testingParent)) {
-        note.buildNotebookForHeadNote(ownership, user);
-      } else {
-        note.setParentNote(earlyNotes.get(seedNote.testingParent));
-      }
-      noteRepository.save(note);
-      titleIdMap.put(note.getTitle(), note.getId());
     }
+
+    earlyNotes.forEach(
+        (title, note) -> {
+          String testingParent = seedInfo.getTestingParent(title);
+
+          if (Strings.isBlank(testingParent)) {
+            note.buildNotebookForHeadNote(ownership, user);
+          } else {
+            note.setParentNote(earlyNotes.get(testingParent));
+          }
+          noteRepository.save(note);
+          titleIdMap.put(note.getTitle(), note.getId());
+        });
 
     return titleIdMap;
   }
