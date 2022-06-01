@@ -89,10 +89,6 @@ describe("Link note to wikidata", () => {
   it("should display icon besides title when note is linked", async () => {
     helper.store.$reset();
 
-    helper.apiMock
-      .expectingGet("/api/wikidata/DummyId")
-      .andReturnOnce(makeMe.aWikiDataDto.please());
-
     const noteRealm = makeMe.aNoteRealm
       .title("Dummy Title")
       .wikidataId("DummyId")
@@ -103,9 +99,8 @@ describe("Link note to wikidata", () => {
       .withProps({ note: noteRealm.note, links: noteRealm.links })
       .mount();
 
-    const element = await wrapper.find('[role="wikiUrl"]');
+    const element = await wrapper.find('[role="button"]');
     element.isVisible();
     expect(element.attributes("title")).toMatch("Wikidata");
-    expect(element.attributes("href")).toContain("https://www.wikidata.org/");
   });
 });
