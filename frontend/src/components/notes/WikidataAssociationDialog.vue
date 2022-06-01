@@ -48,7 +48,6 @@ export default defineComponent({
   emits: ["done"],
   data() {
     return {
-      noteId: 0,
       associationData: {
         wikidataId: "",
       } as Generated.WikidataAssociationCreation,
@@ -57,21 +56,11 @@ export default defineComponent({
       wikidataIdError: undefined as undefined | string,
     };
   },
-  computed: {
-    payload() {
-      return {
-        noteId: this.note.id,
-        associationData: {
-          wikidataId: this.associationData.wikidataId,
-        },
-      };
-    },
-  },
   methods: {
     async validateAssociation() {
       try {
         const res = await this.api.wikidata.getWikiData(
-          this.payload.associationData.wikidataId
+          this.associationData.wikidataId
         );
         if (res.WikiDataTitleInEnglish !== this.note.title) {
           this.wikiDataTitle = res.WikiDataTitleInEnglish;
@@ -85,7 +74,7 @@ export default defineComponent({
     },
     saveWiki() {
       this.api.wikidata
-        .updateWikidataId(this.payload.noteId, this.payload.associationData)
+        .updateWikidataId(this.note.id, this.associationData)
         .then(() => {
           this.$emit("done");
         });
