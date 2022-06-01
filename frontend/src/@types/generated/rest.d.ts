@@ -144,11 +144,6 @@ declare namespace Generated {
         name: string;
     }
 
-    interface WikiDataSearchResponseModel {
-        id: string;
-        label: string;
-    }
-
     interface WikidataAssociationCreation {
         wikidataId: string;
     }
