@@ -18,7 +18,6 @@ Feature: see recent note update
   Scenario Outline: I should see new note banner on newly updated note
     And I update note "Note1.1" with the description "<new description>"
     Then I should see "Note1.1" is "<aging>" than "Note2"
-    #And I should see "Note1" has recently updated descendant
 
     Examples:
       | new description | aging     |

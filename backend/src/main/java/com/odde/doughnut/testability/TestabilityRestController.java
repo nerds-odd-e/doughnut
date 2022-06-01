@@ -123,14 +123,6 @@ class TestabilityRestController {
     @Setter private String externalIdentifier;
     @Setter private String circleName; // optional
 
-    public String getTestingParent(String title) {
-      return seedNotes.stream()
-          .filter(seed -> title.equals(seed.title))
-          .findFirst()
-          .map(seed -> seed.testingParent)
-          .orElse(null);
-    }
-
     private Map<String, Note> buildIndividualNotes(User user, Timestamp currentUTCTimestamp) {
       return seedNotes.stream()
           .map(seedNote -> seedNote.buildNote(user, currentUTCTimestamp))
@@ -138,14 +130,14 @@ class TestabilityRestController {
     }
 
     private void buildNoteTree(User user, Ownership ownership, Map<String, Note> titleNoteMap) {
-      titleNoteMap.forEach(
-          (title, note) -> {
-            String testingParent = getTestingParent(title);
+      seedNotes.forEach(
+          seed -> {
+            Note note = titleNoteMap.get(seed.title);
 
-            if (Strings.isBlank(testingParent)) {
+            if (Strings.isBlank(seed.testingParent)) {
               note.buildNotebookForHeadNote(ownership, user);
             } else {
-              note.setParentNote(titleNoteMap.get(testingParent));
+              note.setParentNote(titleNoteMap.get(seed.testingParent));
             }
           });
     }
