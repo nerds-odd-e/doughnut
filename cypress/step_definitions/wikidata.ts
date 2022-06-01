@@ -8,10 +8,6 @@ When("I associate the note {string} with wikidata id {string}", (title, wikiID) 
   cy.clickAssociateWikiDataButton(title, wikiID)
 })
 
-And("I associate the note to wikidata by searching with {string}", () => {
-  cy.get(".toolbar").findByRole("button", { name: "associate wikidata" }).click()
-})
-
 When("I need to confirm the association with different title {string}", (wikidataTitle: string) => {
   cy.findAllByText(wikidataTitle).should("exist")
   cy.findByRole("button", { name: "Confirm" }).click()

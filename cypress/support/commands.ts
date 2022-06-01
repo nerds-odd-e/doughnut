@@ -479,12 +479,6 @@ Cypress.Commands.add("distanceBetweenCardsGreaterThan", (cards, note1, note2, mi
   expect(Math.sqrt(xd * xd + yd * yd)).greaterThan(min)
 })
 
-Cypress.Commands.add(
-  "expectText",
-  (text) => cy.findByText(text), //.should("be.visible")
-  // Add should be visible back when the link v.iew page is remade.
-)
-
 Cypress.Commands.add("clickNoteToolbarButton", (btnTextOrTitle) => {
   cy.get(".toolbar").findByRole("button", { name: btnTextOrTitle }).click()
 })
@@ -498,9 +492,9 @@ Cypress.Commands.add("deleteNoteViaAPI", { prevSubject: true }, (subject) => {
   })
 })
 
-Cypress.Commands.add("noteByTitle", () => {
+Cypress.Commands.add("noteByTitle", (noteTitle: string) => {
   return cy
-    .get("a.card-title")
+    .findByText(noteTitle, { selector: "a.card-title" })
     .invoke("attr", "href")
     .then(($attr) => /notes\/(\d+)/g.exec($attr)[1])
 })
