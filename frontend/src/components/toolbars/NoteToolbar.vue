@@ -66,46 +66,50 @@
       </PopupButton>
 
       <NoteUndoButton @note-realm-updated="$emit('noteRealmUpdated', $event)" />
-      <a
-        class="btn btn-light dropdown-toggle"
-        data-bs-toggle="dropdown"
-        aria-haspopup="true"
-        aria-expanded="false"
-        role="button"
-        title="more options"
-      >
-        <SvgCog />
-      </a>
-      <div class="dropdown-menu dropdown-menu-right">
-        <PopupButton title="Edit review settings">
-          <template #button_face>
-            <SvgReviewSetting />Edit review settings
-          </template>
-          <template #dialog_body="{ doneHandler }">
-            <ReviewSettingEditDialog
-              :note-id="selectedNote.id"
-              :title="selectedNote.title"
-              @done="doneHandler($event)"
-            />
-          </template>
-        </PopupButton>
-        <button class="dropdown-item" title="Delete note" @click="deleteNote">
-          <SvgRemove />Delete note
+      <div class="dropdown">
+        <button
+          class="btn btn-light dropdown-toggle"
+          id="dropdownMenuButton"
+          data-bs-toggle="dropdown"
+          aria-haspopup="true"
+          aria-expanded="false"
+          role="button"
+          title="more options"
+        >
+          <SvgCog />
         </button>
-
-        <PopupButton title="Add comment">
-          <template #button_face> Add comment </template>
-          <template #dialog_body="{ doneHandler }">
-            <CommentCreateDialog
-              :note-id="selectedNote.id"
-              v-if="featureToggle"
-              @done="
-                doneHandler($event);
-                $emit('noteRealmUpdated');
-              "
-            />
-          </template>
-        </PopupButton>
+        <div class="dropdown-menu dropdown-menu-end">
+          <PopupButton class="dropdown-item" title="Edit review settings">
+            <template #button_face>
+              <SvgReviewSetting />Edit review settings
+            </template>
+            <template #dialog_body="{ doneHandler }">
+              <ReviewSettingEditDialog
+                :note-id="selectedNote.id"
+                :title="selectedNote.title"
+                @done="doneHandler($event)"
+              />
+            </template>
+          </PopupButton>
+          <NoteDeleteButton
+            class="dropdown-item"
+            :note="selectedNote"
+            @note-deleted="$emit('noteDeleted', $event)"
+          />
+          <PopupButton class="dropdown-item" title="Add comment">
+            <template #button_face><SvgReviewSetting /> Add comment </template>
+            <template #dialog_body="{ doneHandler }">
+              <CommentCreateDialog
+                :note-id="selectedNote.id"
+                v-if="featureToggle"
+                @done="
+                  doneHandler($event);
+                  $emit('noteRealmUpdated');
+                "
+              />
+            </template>
+          </PopupButton>
+        </div>
       </div>
     </div>
   </ToolbarFrame>
@@ -127,7 +131,6 @@ import WikidataAssociationDialog from "../notes/WikidataAssociationDialog.vue";
 import SvgAddChild from "../svgs/SvgAddChild.vue";
 import SvgAddSibling from "../svgs/SvgAddSibling.vue";
 import SvgCog from "../svgs/SvgCog.vue";
-import SvgRemove from "../svgs/SvgRemove.vue";
 import NoteNewButton from "./NoteNewButton.vue";
 import ViewTypeButtons from "./ViewTypeButtons.vue";
 import SvgReviewSetting from "../svgs/SvgReviewSetting.vue";
@@ -135,8 +138,8 @@ import ReviewSettingEditDialog from "../review/ReviewSettingEditDialog.vue";
 import SvgEdit from "../svgs/SvgEdit.vue";
 import NoteEditDialog from "../notes/NoteEditDialog.vue";
 import CommentCreateDialog from "../notes/CommentCreateDialog.vue";
-
 import usePopups from "../commons/Popups/usePopup";
+import NoteDeleteButton from "./NoteDeleteButton.vue";
 
 export default defineComponent({
   setup() {
@@ -163,7 +166,6 @@ export default defineComponent({
     SvgCog,
     SvgAddChild,
     SvgAddSibling,
-    SvgRemove,
     NoteNewButton,
     ViewTypeButtons,
     SvgReviewSetting,
@@ -171,6 +173,7 @@ export default defineComponent({
     SvgEdit,
     NoteEditDialog,
     CommentCreateDialog,
+    NoteDeleteButton,
   },
   computed: {
     featureToggle() {
@@ -180,17 +183,6 @@ export default defineComponent({
   methods: {
     onNewNoteAdded(newNote: Generated.NoteRealmWithPosition) {
       this.$emit("newNoteAdded", newNote);
-    },
-    async deleteNote() {
-      if (await this.popups.confirm(`Confirm to delete this note?`)) {
-        const { id, parentId } = this.selectedNote;
-        await this.storedApi.deleteNote(id);
-        if (parentId) {
-          this.$emit("noteDeleted", id);
-        } else {
-          this.$router.push({ name: "notebooks" });
-        }
-      }
     },
   },
 });
