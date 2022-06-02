@@ -1,6 +1,6 @@
 import { Ref } from "vue";
-import Api from "./restful/Api";
-import { JsonData } from "./restful/RestfulFetch";
+import Api from "./Api";
+import { JsonData } from "./window/RestfulFetch";
 
 interface ManagedComponent {
   formErrors: Ref<JsonData> | undefined;

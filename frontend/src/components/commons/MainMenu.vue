@@ -86,7 +86,7 @@
 </template>
 
 <script>
-import loginOrRegisterAndHaltThisThread from "../../managedApi/restful/loginOrRegisterAndHaltThisThread";
+import loginOrRegisterAndHaltThisThread from "../../managedApi/window/loginOrRegisterAndHaltThisThread";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 
 export default {

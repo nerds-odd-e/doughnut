@@ -9,7 +9,7 @@
 <script>
 import CircleJoinForm from "../components/circles/CircleJoinForm.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
-import loginOrRegisterAndHaltThisThread from "../managedApi/restful/loginOrRegisterAndHaltThisThread";
+import loginOrRegisterAndHaltThisThread from "../managedApi/window/loginOrRegisterAndHaltThisThread";
 import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
 
 export default {

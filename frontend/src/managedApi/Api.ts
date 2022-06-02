@@ -1,4 +1,4 @@
-import RestfullFetch, { JsonData } from "./RestfulFetch";
+import RestfullFetch, { JsonData } from "./window/RestfulFetch";
 
 class Api {
   fetch;

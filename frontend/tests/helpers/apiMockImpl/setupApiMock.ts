@@ -1,5 +1,5 @@
 import fetchMock from "jest-fetch-mock";
-import { HttpMethod } from "../../../src/managedApi/restful/RestfulFetch";
+import { HttpMethod } from "../../../src/managedApi/window/RestfulFetch";
 import { ApiMock } from "../ApiMock";
 import ApiMockBuilderImpl from "./ApiMockBuilderImpl";
 import ApiMockExpectation from "./ApiMockExpectation";

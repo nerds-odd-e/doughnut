@@ -8,6 +8,7 @@
 import { defineComponent } from "vue";
 import SvgAssociation from "../svgs/SvgAssociation.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
+import nonBlockingPopup from "../../managedApi/window/nonBlockingPopup";
 
 export default defineComponent({
   setup() {
@@ -20,8 +21,8 @@ export default defineComponent({
     SvgAssociation,
   },
   methods: {
-    async onClickWikidata() {
-      window.open(await this.wikiUrl(), "_blank");
+    onClickWikidata() {
+      nonBlockingPopup(this.wikiUrl());
     },
     async wikiUrl() {
       const wikipediaEnglishUrl = await this.getWikiDataItem();

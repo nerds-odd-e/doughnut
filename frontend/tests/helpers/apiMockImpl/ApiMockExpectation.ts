@@ -1,5 +1,5 @@
 import { MockParams } from "jest-fetch-mock";
-import { HttpMethod } from "../../../src/managedApi/restful/RestfulFetch";
+import { HttpMethod } from "../../../src/managedApi/window/RestfulFetch";
 
 class ApiMockExpectation {
   url: string;
