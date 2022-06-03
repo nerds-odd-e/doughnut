@@ -56,7 +56,7 @@ public class ControllerSetupTest {
         () ->
             controllerSetup.handleSystemException(
                 request, new ResponseStatusException(HttpStatus.UNAUTHORIZED, "xx")));
-    assertThat(makeMe.modelFactoryService.failureReportRepository.count(), equalTo(count + 1));
+    assertThat(makeMe.modelFactoryService.failureReportRepository.count(), equalTo(count));
   }
 
   @Test

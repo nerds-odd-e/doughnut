@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import javax.servlet.http.HttpServletRequest;
+import org.springframework.web.server.ResponseStatusException;
 
 public record FailureReportFactory(
     HttpServletRequest req,
@@ -16,7 +17,7 @@ public record FailureReportFactory(
     ModelFactoryService modelFactoryService) {
 
   public void createUnlessAllowed() throws IOException, InterruptedException {
-    //    if (exception instanceof ResponseStatusException) return;
+    if (exception instanceof ResponseStatusException) return;
 
     FailureReport failureReport = createFailureReport();
     Integer issueNumber = githubService.createGithubIssue(failureReport);
