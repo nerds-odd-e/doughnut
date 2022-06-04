@@ -5,7 +5,6 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.odde.doughnut.entities.Comment;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteAccessories;
 import com.odde.doughnut.entities.User;
@@ -18,7 +17,6 @@ import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.sql.Timestamp;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -238,34 +236,6 @@ class RestNoteControllerTests {
         makeMe.refresh(parent);
         assertThat(parent.getDescendantsInBreathFirstOrder(), hasSize(1));
       }
-    }
-  }
-
-  @Nested
-  class CommentCRUD {
-
-    @Test
-    void shouldCreateComment() throws NoAccessRightException {
-      Note note = makeMe.aNote().creatorAndOwner(userModel).please();
-      controller.createComment(note, new CommentCreation());
-      List<Comment> comments = makeMe.modelFactoryService.commentRepository.findAllByNote(note);
-      assertThat(comments, hasSize(1));
-    }
-
-    @Test
-    void shouldNotBeAbleToAddCommentToNoteTheUserCannotSee() {
-      User anotherUser = makeMe.aUser().please();
-      Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
-      assertThrows(
-          NoAccessRightException.class,
-          () -> controller.createComment(note, new CommentCreation()));
-    }
-
-    @Test
-    void shouldNotBeAbleToGetCommentOfNoteTheUserCannotSee() {
-      User anotherUser = makeMe.aUser().please();
-      Note note = makeMe.aNote().creatorAndOwner(anotherUser).please();
-      assertThrows(NoAccessRightException.class, () -> controller.getComments(note));
     }
   }
 

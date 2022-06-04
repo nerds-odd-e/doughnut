@@ -2,7 +2,7 @@
 /// <reference types="../support" />
 // @ts-check
 
-import { Given, Then, When, And } from "@badeball/cypress-cucumber-preprocessor"
+import { Given, Then, When } from "@badeball/cypress-cucumber-preprocessor"
 
 When("I associate the note {string} with wikidata id {string}", (title, wikiID) => {
   cy.clickAssociateWikiDataButton(title, wikiID)

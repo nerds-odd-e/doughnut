@@ -96,19 +96,6 @@
             :note="selectedNote"
             @note-deleted="$emit('noteDeleted', $event)"
           />
-          <PopupButton class="dropdown-item" title="Add comment">
-            <template #button_face><SvgReviewSetting /> Add comment </template>
-            <template #dialog_body="{ doneHandler }">
-              <CommentCreateDialog
-                :note-id="selectedNote.id"
-                v-if="featureToggle"
-                @done="
-                  doneHandler($event);
-                  $emit('noteRealmUpdated');
-                "
-              />
-            </template>
-          </PopupButton>
         </div>
       </div>
     </div>
@@ -137,7 +124,6 @@ import SvgReviewSetting from "../svgs/SvgReviewSetting.vue";
 import ReviewSettingEditDialog from "../review/ReviewSettingEditDialog.vue";
 import SvgEdit from "../svgs/SvgEdit.vue";
 import NoteEditDialog from "../notes/NoteEditDialog.vue";
-import CommentCreateDialog from "../notes/CommentCreateDialog.vue";
 import usePopups from "../commons/Popups/usePopup";
 import NoteDeleteButton from "./NoteDeleteButton.vue";
 
@@ -172,7 +158,6 @@ export default defineComponent({
     ReviewSettingEditDialog,
     SvgEdit,
     NoteEditDialog,
-    CommentCreateDialog,
     NoteDeleteButton,
   },
   computed: {

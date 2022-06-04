@@ -20,7 +20,7 @@ Cypress.Commands.add("enableFeatureToggle", (enabled) => {
 
 Cypress.Commands.add(
   "seedNotes",
-  (seedNotes: any[], externalIdentifier = "", circleName = null) => {
+  (seedNotes: unknown[], externalIdentifier = "", circleName = null) => {
     cy.request({
       method: "POST",
       url: `/api/testability/seed_notes`,

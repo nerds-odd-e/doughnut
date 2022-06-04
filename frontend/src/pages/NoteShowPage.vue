@@ -16,7 +16,7 @@
       </div>
       <div class="content" v-if="noteRealm">
         <NoteCardsView
-          v-bind="{ noteRealm, expandChildren, comments }"
+          v-bind="{ noteRealm, expandChildren }"
           @note-realm-updated="noteRealmUpdated($event)"
         />
       </div>
@@ -46,16 +46,10 @@ export default defineComponent({
   },
   data() {
     return {
-      comments: [] as Generated.Comment[],
       notePosition: undefined as Generated.NotePositionViewedByUser | undefined,
       noteRealm: undefined as Generated.NoteRealm | undefined,
       selectedNoteId: undefined as Doughnut.ID | undefined,
     };
-  },
-  computed: {
-    user() {
-      return this.piniaStore.currentUser;
-    },
   },
   methods: {
     onNoteDeleted() {
@@ -82,8 +76,6 @@ export default defineComponent({
         await this.api.noteMethods.getNoteRealmWithPosition(this.noteId);
       this.notePosition = noteRealmWithPosition.notePosition;
       this.noteRealm = noteRealmWithPosition.noteRealm;
-      if (!this.user) return;
-      this.comments = await this.api.comments.getNoteComments(this.noteId);
     },
   },
   watch: {

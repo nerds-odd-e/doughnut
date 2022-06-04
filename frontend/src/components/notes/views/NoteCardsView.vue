@@ -5,8 +5,6 @@
       @note-realm-updated="$emit('noteRealmUpdated', $event)"
     />
     <NoteStatisticsButton :note-id="noteRealm.id" />
-    <Comments v-bind="{ noteId: noteRealm.id, comments }" />
-
     <Cards v-if="expandChildren" :notes="noteRealm.children" />
   </div>
 </template>
@@ -16,7 +14,6 @@ import { defineComponent, PropType } from "vue";
 import NoteWithLinks from "../NoteWithLinks.vue";
 import NoteStatisticsButton from "../NoteStatisticsButton.vue";
 import Cards from "../Cards.vue";
-import Comments from "../Comments.vue";
 import useStoredLoadingApi from "../../../managedApi/useStoredLoadingApi";
 
 export default defineComponent({
@@ -29,17 +26,12 @@ export default defineComponent({
       required: true,
     },
     expandChildren: { type: Boolean, required: true },
-    comments: {
-      type: Object as PropType<Generated.Comment[]>,
-      default: () => [] as Generated.Comment[],
-    },
   },
   emits: ["noteRealmUpdated"],
   components: {
     NoteWithLinks,
     Cards,
     NoteStatisticsButton,
-    Comments,
   },
 
   computed: {

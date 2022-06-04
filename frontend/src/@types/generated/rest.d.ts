@@ -15,10 +15,6 @@ declare namespace Generated {
         invitationCode: string;
     }
 
-    interface CommentCreation {
-        description: string;
-    }
-
     interface CurrentUserInfo {
         user: User;
         externalIdentifier: string;
@@ -28,7 +24,6 @@ declare namespace Generated {
         answerViewedByUser: AnswerViewedByUser;
         answerResult: AnswerResult;
         answer: Answer;
-        comment: Comment;
     }
 
     interface InitialInfo {
@@ -180,12 +175,6 @@ declare namespace Generated {
         spellingAnswer: string;
         answerNoteId?: number;
         question: QuizQuestion;
-    }
-
-    interface Comment {
-        id: number;
-        user: User;
-        content: string;
     }
 
     interface ReviewSetting {

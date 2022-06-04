@@ -37,29 +37,6 @@ class RestNoteController {
     this.testabilitySettings = testabilitySettings;
   }
 
-  @PostMapping(value = "/{note}/createComment")
-  @Transactional
-  public String createComment(Note note, @RequestBody CommentCreation commentCreation)
-      throws NoAccessRightException {
-    final UserModel userModel = currentUserFetcher.getUser();
-    userModel.getAuthorization().assertAuthorization(note);
-
-    Comment comment = new Comment();
-    comment.setNote(note);
-    comment.setUser(userModel.getEntity());
-    comment.setContent(commentCreation.description);
-    modelFactoryService.commentRepository.save(comment);
-    return "{}";
-  }
-
-  @GetMapping(value = "/{note}/comments")
-  public List<Comment> getComments(Note note) throws NoAccessRightException {
-    final UserModel userModel = currentUserFetcher.getUser();
-    userModel.getAuthorization().assertReadAuthorization(note);
-
-    return modelFactoryService.commentRepository.findAllByNote(note);
-  }
-
   @PostMapping(value = "/{note}/updateWikidataId")
   @Transactional
   public String updateWikidataId(
