@@ -196,10 +196,10 @@ declare namespace Generated {
 
     interface Link extends Thingy {
         clozeSource: string;
-        linkTypeLabel: string;
         sourceNote: Note;
         targetNote: Note;
         typeId: number;
+        linkType: LinkType;
     }
 
     interface TextContent {

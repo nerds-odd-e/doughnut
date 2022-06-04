@@ -62,7 +62,7 @@ class LinkViewedBuilder extends Builder<LinksMap> {
       targetNote: this.toNote.note,
       sourceNote: this.fromNote.note,
       typeId: 15,
-      linkTypeLabel: "using",
+      linkType: "using",
       clozeSource: "",
     };
   }

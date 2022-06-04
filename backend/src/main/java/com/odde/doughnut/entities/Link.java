@@ -254,7 +254,6 @@ public class Link extends Thingy {
   @Setter
   private Integer typeId;
 
-  @JsonIgnore
   public LinkType getLinkType() {
     return LinkType.fromId(typeId);
   }
@@ -264,6 +263,7 @@ public class Link extends Thingy {
         .getClozeDescription(getTargetNote().getNoteTitle(), getSourceNote().getTitle());
   }
 
+  @JsonIgnore
   public String getLinkTypeLabel() {
     return getLinkType().label;
   }

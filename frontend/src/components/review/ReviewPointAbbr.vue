@@ -8,7 +8,7 @@
       <span>
         {{ sourceNoteTitle }}
       </span>
-      <span class="badge mr-1"> {{ link.linkTypeLabel }}</span>
+      <span class="badge mr-1"> {{ link.linkType }}</span>
       <span>
         {{ targetNoteTitle }}
       </span>

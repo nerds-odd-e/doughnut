@@ -1,6 +1,6 @@
 <template>
   <span class="link-nob">
-    <PopupButton :title="link.linkTypeLabel">
+    <PopupButton :title="link.linkType">
       <template #button_face>
         <SvgLinkTypeIcon
           :link-type-id="link.typeId"

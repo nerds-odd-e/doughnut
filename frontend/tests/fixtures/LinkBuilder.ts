@@ -7,7 +7,7 @@ class LinkBuilder extends Builder<Generated.Link> {
   do(): Generated.Link {
     return {
       id: 8,
-      linkTypeLabel: "a link",
+      linkType: "related to",
       clozeSource: "xxx",
       typeId: 1,
       sourceNote: this.sourceNoteBuilder.do().note,

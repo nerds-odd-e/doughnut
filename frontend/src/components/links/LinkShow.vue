@@ -8,7 +8,7 @@
         v-bind="{ link }"
         @note-realm-updated="$emit('noteRealmUpdated', $event)"
       />
-      <span class="badge bg-light text-dark"> {{ link.linkTypeLabel }}</span>
+      <span class="badge bg-light text-dark"> {{ link.linkType }}</span>
     </div>
     <div class="col-12 col-md-4 link-target">
       <LinkNoteShow :note="link.targetNote" />
