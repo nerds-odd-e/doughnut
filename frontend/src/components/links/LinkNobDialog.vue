@@ -56,7 +56,9 @@ export default defineComponent({
   },
   data() {
     return {
-      formData: { typeId: this.link.typeId } as Generated.LinkRequest,
+      formData: {
+        typeId: this.link.typeIdDeprecating,
+      } as Generated.LinkRequest,
       formErrors: { typeId: undefined },
     };
   },

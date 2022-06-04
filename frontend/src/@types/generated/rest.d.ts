@@ -187,7 +187,7 @@ declare namespace Generated {
         clozeSource: string;
         sourceNote: Note;
         targetNote: Note;
-        typeId: number;
+        typeIdDeprecating: number;
         linkType: LinkType;
     }
 

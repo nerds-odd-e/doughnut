@@ -252,7 +252,12 @@ public class Link extends Thingy {
   @Column(name = "type_id")
   @Getter
   @Setter
+  @JsonIgnore
   private Integer typeId;
+
+  public Integer getTypeIdDeprecating() {
+    return typeId;
+  }
 
   public LinkType getLinkType() {
     return LinkType.fromId(typeId);

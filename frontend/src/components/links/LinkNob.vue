@@ -3,7 +3,7 @@
     <PopupButton :title="link.linkType">
       <template #button_face>
         <SvgLinkTypeIcon
-          :link-type-id="link.typeId"
+          :link-type-id="link.typeIdDeprecating"
           :inverse-icon="inverseIcon"
         />
       </template>
