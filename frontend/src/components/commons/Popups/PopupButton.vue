@@ -1,10 +1,10 @@
 <template>
-  <button class="btn btn-sm" role="button" @click="showDialog" :title="title">
+  <a class="btn btn-sm" role="button" @click="showDialog" :title="title">
     <slot name="button_face" />
     <template v-if="!$slots.button_face">
       {{ title }}
     </template>
-  </button>
+  </a>
 </template>
 
 <script lang="ts">

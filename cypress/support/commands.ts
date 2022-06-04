@@ -131,6 +131,9 @@ Cypress.Commands.add("submitNoteFormWith", (noteAttributes) => {
           })
         } else if ($input.attr("role") === "radiogroup") {
           cy.clickRadioByLabel(value)
+        } else if ($input.attr("role") === "button") {
+          cy.wrap($input).click()
+          cy.clickRadioByLabel(value)
         } else {
           cy.wrap($input).clear().type(value)
         }

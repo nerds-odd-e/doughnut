@@ -1,6 +1,6 @@
 <template>
   <form @submit.prevent="processForm">
-    <LinkTypeSelect
+    <LinkTypeSelectCompact
       scope-name="note"
       field="linkTypeToParent"
       :allow-empty="true"
@@ -24,9 +24,9 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import NoteFormTitleOnly from "./NoteFormTitleOnly.vue";
-import LinkTypeSelect from "../links/LinkTypeSelect.vue";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 import SearchResults from "../search/SearchResults.vue";
+import LinkTypeSelectCompact from "../links/LinkTypeSelectCompact.vue";
 
 export default defineComponent({
   setup() {
@@ -34,8 +34,8 @@ export default defineComponent({
   },
   components: {
     NoteFormTitleOnly,
-    LinkTypeSelect,
     SearchResults,
+    LinkTypeSelectCompact,
   },
   props: { parentId: { type: Number, required: true } },
   emits: ["done"],
