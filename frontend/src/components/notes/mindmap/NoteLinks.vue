@@ -1,10 +1,10 @@
 <template>
   <LinkType
-    v-for="(directAndReverse, linkTypeName, index) in directLinks"
-    :key="linkTypeName"
+    v-for="(directAndReverse, linkType, index) in directLinks"
+    :key="linkType"
     v-bind="{
-      linkTypeName,
-      links: directAndReverse.direct,
+      linkType,
+      links: directAndReverse?.direct,
       totalLinkTypeCount: directLinkTypeCount,
       index,
       mindmapSector,
@@ -12,12 +12,12 @@
     }"
   />
   <LinkType
-    v-for="(directAndReverse, linkTypeName, index) in reverseLinks"
-    :key="linkTypeName"
+    v-for="(directAndReverse, linkType, index) in reverseLinks"
+    :key="linkType"
     v-bind="{
       reverse: true,
-      linkTypeName,
-      links: directAndReverse.reverse,
+      linkType,
+      links: directAndReverse?.reverse,
       totalLinkTypeCount: reverseLinkTypeCount,
       index,
       mindmapSector,
@@ -26,15 +26,19 @@
   />
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, PropType } from "vue";
+import Mindmap from "../../../models/Mindmap";
+import MindmapSector from "../../../models/MindmapSector";
 import LinksReader from "../../../models/LinksReader";
+import LinksMap from "../../../models/LinksMap";
 import LinkType from "./LinkType.vue";
 
-export default {
+export default defineComponent({
   props: {
-    links: Object,
-    mindmapSector: Object,
-    mindmap: Object,
+    links: { type: Array as PropType<LinksMap>, required: true },
+    mindmapSector: { type: Object as PropType<MindmapSector>, required: true },
+    mindmap: { type: Object as PropType<Mindmap>, required: true },
   },
   components: { LinkType },
   computed: {
@@ -51,7 +55,7 @@ export default {
       return Object.keys(this.reverseLinks).length;
     },
   },
-};
+});
 </script>
 
 <style lang="sass" scoped></style>

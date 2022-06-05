@@ -6,7 +6,7 @@
   >
     <template #labelAddition="{ value }">
       <div class="text-center">
-        <SvgLinkTypeIcon :link-type-name="value" :inverse-icon="inverseIcon" />
+        <SvgLinkTypeIcon :link-type="value" :inverse-icon="inverseIcon" />
       </div>
     </template>
   </RadioButtons>

@@ -29,7 +29,7 @@ import SvgFolder from "./link_types/SvgFolder.vue";
 
 export default defineComponent({
   props: {
-    linkTypeName: { type: String as PropType<Generated.LinkType>, required: true },
+    linkType: { type: String as PropType<Generated.LinkType>, required: true },
     width: String,
     height: String,
     inverseIcon: Boolean,
@@ -37,7 +37,7 @@ export default defineComponent({
 
   computed: {
     iconComponent() {
-      const linkType = this.linkTypeName;
+      const {linkType} = this;
       if (linkType === "related to") return SvgLinkTypeRelated;
       if (linkType === "a specialization of") return SvgLinkTypeSpecialize;
       if (linkType === "an application of") return SvgLinkTypeApplication;

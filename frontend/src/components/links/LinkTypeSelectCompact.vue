@@ -2,10 +2,7 @@
   <InputWithType v-bind="{ scopeName, field: '', errors, title: titlized }">
     <PopupButton :aria-label="titlized">
       <template #button_face>
-        <SvgLinkTypeIcon
-          :link-type-name="modelValue"
-          :inverse-icon="inverseIcon"
-        />
+        <SvgLinkTypeIcon :link-type="modelValue" :inverse-icon="inverseIcon" />
         {{ label }}
       </template>
       <template #dialog_body="{ doneHandler }">
