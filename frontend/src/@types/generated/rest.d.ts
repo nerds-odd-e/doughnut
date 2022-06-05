@@ -187,8 +187,8 @@ declare namespace Generated {
         clozeSource: string;
         sourceNote: Note;
         targetNote: Note;
-        typeIdDeprecating: number;
         linkType: LinkType;
+        typeIdDeprecating: number;
     }
 
     interface TextContent {
@@ -289,7 +289,7 @@ declare namespace Generated {
         link?: Link;
     }
 
-    type LinkType = "related to" | "a specialization of" | "an application of" | "an instance of" | "a part of" | "tagged by" | "an attribute of" | "the opposite of" | "author of" | "using" | "an example of" | "before" | "similar to" | "confused with";
+    type LinkType = "" | "related to" | "a specialization of" | "an application of" | "an instance of" | "a part of" | "tagged by" | "an attribute of" | "the opposite of" | "author of" | "using" | "an example of" | "before" | "similar to" | "confused with";
 
     type QuestionType = "CLOZE_SELECTION" | "SPELLING" | "PICTURE_TITLE" | "PICTURE_SELECTION" | "LINK_TARGET" | "LINK_SOURCE" | "LINK_SOURCE_WITHIN_SAME_LINK_TYPE" | "CLOZE_LINK_TARGET" | "DESCRIPTION_LINK_TARGET" | "WHICH_SPEC_HAS_INSTANCE" | "FROM_SAME_PART_AS" | "FROM_DIFFERENT_PART_AS";
 

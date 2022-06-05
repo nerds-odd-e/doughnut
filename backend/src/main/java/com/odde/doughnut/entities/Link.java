@@ -61,6 +61,7 @@ public class Link extends Thingy {
   }
 
   public enum LinkType {
+    NO_LINK(0, "no link", "", "", new QuestionType[]{}),
     RELATED_TO(1, "related note", "related to", "related to", new QuestionType[] {}),
     SPECIALIZE(
         2,
