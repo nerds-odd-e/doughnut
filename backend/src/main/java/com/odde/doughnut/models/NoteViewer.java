@@ -28,9 +28,7 @@ public class NoteViewer {
   public NoteRealm toJsonObject() {
     NoteRealm nvb = new NoteRealm();
     nvb.setId(note.getId());
-    LinksOfANote links = new LinksOfANote();
-    links.setLinks(getAllLinks());
-    nvb.setLinks(links);
+    nvb.setLinks(LinksOfANote.getLinksOfANote(this));
     nvb.setChildren(note.getChildren());
     nvb.setNote(note);
 
