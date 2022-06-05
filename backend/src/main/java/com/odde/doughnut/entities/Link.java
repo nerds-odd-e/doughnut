@@ -14,6 +14,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import com.fasterxml.jackson.annotation.JsonValue;
 import com.odde.doughnut.algorithms.ClozeDescription;
 import com.odde.doughnut.entities.QuizQuestion.QuestionType;
+import com.odde.doughnut.entities.validators.ValidateLinkType;
 import com.odde.doughnut.models.NoteViewer;
 import java.sql.Timestamp;
 import java.util.Arrays;
@@ -34,6 +35,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 @Entity
+@ValidateLinkType
 @Table(name = "link")
 @JsonPropertyOrder({"clozeSource", "linkTypeLabel"})
 public class Link extends Thingy {
@@ -61,7 +63,7 @@ public class Link extends Thingy {
   }
 
   public enum LinkType {
-    NO_LINK(0, "no link", "", "", new QuestionType[]{}),
+    NO_LINK(0, "no link", "", "", new QuestionType[] {}),
     RELATED_TO(1, "related note", "related to", "related to", new QuestionType[] {}),
     SPECIALIZE(
         2,
