@@ -38,8 +38,8 @@
       </template>
     </li>
     <template
-      v-for="(linksOfType, linkType) in linksReader.tagLinks"
-      :key="linkType"
+      v-for="(linksOfType, _linkType) in linksReader.tagLinks"
+      :key="_linkType"
     >
       <li v-if="linksOfType.direct.length > 0">
         <LinkLink

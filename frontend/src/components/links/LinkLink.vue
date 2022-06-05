@@ -16,8 +16,6 @@
   </span>
 </template>
 
-<script></script>
-
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import NoteTitleWithLink from "../notes/NoteTitleWithLink.vue";
@@ -25,7 +23,10 @@ import LinkNob from "./LinkNob.vue";
 import { colors } from "../../colors";
 
 export default defineComponent({
-  props: { link: Object, reverse: Boolean },
+  props: {
+    link: { type: Object as PropType<Generated.Link>, required: true },
+    reverse: Boolean,
+  },
   emits: ["noteRealmUpdated"],
   components: { NoteTitleWithLink, LinkNob },
   computed: {
@@ -33,7 +34,7 @@ export default defineComponent({
       return this.reverse ? this.link.sourceNote : this.link.targetNote;
     },
     fontColor() {
-      this.reverse ? colors.target : colors.source;
+      return this.reverse ? colors.target : colors.source;
     },
     colors() {
       return colors;

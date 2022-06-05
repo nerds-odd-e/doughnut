@@ -1,6 +1,6 @@
 import Builder from "./Builder";
 import generateId from "./generateId";
-import LinkViewedBuilder, { LinksMap } from "./LinkViewedBuilder";
+import LinkViewedBuilder from "./LinkViewedBuilder";
 import NoteRealmBuilder from "./NoteRealmBuilder";
 
 class LinksMapBuilder extends Builder<Generated.LinksOfANote> {
