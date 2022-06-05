@@ -2,6 +2,7 @@ package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.*;
+import com.odde.doughnut.entities.Link.LinkType;
 import com.odde.doughnut.entities.json.*;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -67,8 +68,8 @@ class RestNoteController {
             user, testabilitySettings.getCurrentUTCTimestamp(), noteCreation.textContent);
     note.setParentNote(parentNote);
     modelFactoryService.noteRepository.save(note);
-    Integer linkTypeToParent = noteCreation.getLinkTypeToParent();
-    if (linkTypeToParent != null && linkTypeToParent != 0) {
+    LinkType linkTypeToParent = noteCreation.getLinkTypeToParent();
+    if (linkTypeToParent != LinkType.NO_LINK) {
       Link link =
           Link.createLink(
               note,

@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.odde.doughnut.entities.Link.LinkType;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.NoteAccessories;
 import com.odde.doughnut.entities.User;
@@ -121,6 +122,7 @@ class RestNoteControllerTests {
       parent = makeMe.aNote().creatorAndOwner(userModel).please();
       Note newNote = makeMe.aNote().inMemoryPlease();
       noteCreation.setTextContent(newNote.getTextContent());
+      noteCreation.setLinkTypeToParent(LinkType.NO_LINK);
     }
 
     @Test

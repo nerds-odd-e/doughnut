@@ -4,7 +4,7 @@ import com.odde.doughnut.controllers.currentUser.CurrentUserFetcher;
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.json.LinkRequest;
+import com.odde.doughnut.entities.json.LinkCreation;
 import com.odde.doughnut.entities.json.NotesBulk;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.NoAccessRightException;
@@ -53,10 +53,10 @@ class RestLinkController {
 
   @PostMapping(value = "/{link}")
   @Transactional
-  public NotesBulk updateLink(Link link, @RequestBody LinkRequest linkRequest)
+  public NotesBulk updateLink(Link link, @RequestBody LinkCreation linkCreation)
       throws NoAccessRightException {
     currentUserFetcher.getUser().getAuthorization().assertAuthorization(link);
-    link.setTypeId(linkRequest.typeId);
+    link.setLinkType(linkCreation.linkType);
     modelFactoryService.linkRepository.save(link);
     return NotesBulk.jsonNoteRealm(link.getSourceNote(), currentUserFetcher.getUser());
   }
@@ -75,16 +75,16 @@ class RestLinkController {
   public NotesBulk linkNoteFinalize(
       @PathVariable Note sourceNote,
       @PathVariable Note targetNote,
-      @RequestBody @Valid LinkRequest linkRequest,
+      @RequestBody @Valid LinkCreation linkCreation,
       BindingResult bindingResult)
       throws NoAccessRightException, CyclicLinkDetectedException, BindException {
     if (bindingResult.hasErrors()) throw new BindException(bindingResult);
     currentUserFetcher.getUser().getAuthorization().assertAuthorization(sourceNote);
     currentUserFetcher.getUser().getAuthorization().assertReadAuthorization(targetNote);
-    if (linkRequest != null && linkRequest.moveUnder != null && linkRequest.moveUnder) {
+    if (linkCreation != null && linkCreation.moveUnder != null && linkCreation.moveUnder) {
       currentUserFetcher.getUser().getAuthorization().assertAuthorization(targetNote);
       modelFactoryService
-          .toNoteMotionModel(sourceNote, targetNote, linkRequest.asFirstChild)
+          .toNoteMotionModel(sourceNote, targetNote, linkCreation.asFirstChild)
           .execute();
     }
     Link link =
@@ -92,7 +92,7 @@ class RestLinkController {
             sourceNote,
             targetNote,
             currentUserFetcher.getUser().getEntity(),
-            linkRequest.typeId,
+            linkCreation.linkType,
             testabilitySettings.getCurrentUTCTimestamp());
     modelFactoryService.linkRepository.save(link);
     return NotesBulk.jsonNoteRealm(link.getSourceNote(), currentUserFetcher.getUser());

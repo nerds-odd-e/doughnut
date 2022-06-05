@@ -54,7 +54,7 @@ const storedApiCollection = (
     async createLink(
       sourceId: Doughnut.ID,
       targetId: Doughnut.ID,
-      data: Generated.LinkRequest
+      data: Generated.LinkCreation
     ) {
       return (await managedApi.restPost(
         `links/create/${sourceId}/${targetId}`,
@@ -62,7 +62,7 @@ const storedApiCollection = (
       )) as Generated.NotesBulk;
     },
 
-    async updateLink(linkId: Doughnut.ID, data: Generated.LinkRequest) {
+    async updateLink(linkId: Doughnut.ID, data: Generated.LinkCreation) {
       return (await managedApi.restPost(
         `links/${linkId}`,
         data

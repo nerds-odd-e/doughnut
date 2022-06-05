@@ -1,5 +1,10 @@
 const linkTypeOptions = [
   {
+    reversedLabel: "no link",
+    label: "no link",
+    value: 0,
+  },
+  {
     reversedLabel: "related to",
     label: "related to",
     value: 1,

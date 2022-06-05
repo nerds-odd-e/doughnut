@@ -12,8 +12,8 @@
   <LinkTypeSelect
     field="linkType"
     scope-name="link"
-    v-model="formData.typeId"
-    :errors="formErrors.typeId"
+    v-model="formData.linkType"
+    :errors="formErrors.linkType"
     :inverse-icon="true"
   />
   <div v-if="!inverseIcon">
@@ -57,9 +57,9 @@ export default defineComponent({
   data() {
     return {
       formData: {
-        typeId: this.link.typeIdDeprecating,
-      } as Generated.LinkRequest,
-      formErrors: { typeId: undefined },
+        linkType: this.link.linkType,
+      } as Generated.LinkCreation,
+      formErrors: { linkType: undefined },
     };
   },
 

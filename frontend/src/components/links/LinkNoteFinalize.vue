@@ -3,8 +3,8 @@
     <LinkTypeSelect
       field="linkType"
       scope-name="link"
-      v-model="formData.typeId"
-      :errors="formErrors.typeId"
+      v-model="formData.linkType"
+      :errors="formErrors.linkType"
       :inverse-icon="true"
     />
     <div>
@@ -61,12 +61,12 @@ export default defineComponent({
     return {
       formData: {
         asFirstChild: false,
-        typeId: undefined as number | undefined,
+        linkType: "no link",
         moveUnder: false,
-      } as Generated.LinkRequest,
+      } as Generated.LinkCreation,
       formErrors: {
         asFirstChild: undefined as string | undefined,
-        typeId: undefined as string | undefined,
+        linkType: undefined as string | undefined,
         moveUnder: undefined as string | undefined,
       },
     };

@@ -9,7 +9,6 @@ class LinkBuilder extends Builder<Generated.Link> {
       id: 8,
       linkType: "related to",
       clozeSource: "xxx",
-      typeIdDeprecating: 1,
       sourceNote: this.sourceNoteBuilder.do().note,
       targetNote: new NoteRealmBuilder().do().note,
     };

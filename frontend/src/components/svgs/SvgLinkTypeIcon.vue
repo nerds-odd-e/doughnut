@@ -9,8 +9,8 @@
   </svg>
 </template>
 
-<script setup>
-import { computed } from "vue";
+<script lang="ts">
+import { defineComponent } from "vue";
 import SvgLinkTypeSpecialize from "./link_types/SvgLinkTypeSpecialize.vue";
 import SvgLinkTypeRelated from "./link_types/SvgLinkTypeRelated.vue";
 import SvgLinkTypeApplication from "./link_types/SvgLinkTypeApplication.vue";
@@ -28,31 +28,37 @@ import SvgLinkTypeConfuse from "./link_types/SvgLinkTypeConfuse.vue";
 import SvgFolder from "./link_types/SvgFolder.vue";
 import { linkTypeNameToId } from "../../models/linkTypeOptions";
 
-const props = defineProps({
-  linkTypeId: Number,
-  linkTypeName: String,
-  width: String,
-  height: String,
-  inverseIcon: Boolean,
-});
+export default defineComponent({
+  props: {
+    linkTypeId: Number,
+    linkTypeName: String,
+    width: String,
+    height: String,
+    inverseIcon: Boolean,
+  },
 
-const computedTypeId = computed(() => !props.linkTypeId ? linkTypeNameToId(props.linkTypeName) : props.linkTypeId)
-const iconComponent = computed(() => {
-  const linkTypeId = parseInt(computedTypeId.value, 10);
-  if (linkTypeId === 1) return SvgLinkTypeRelated;
-  if (linkTypeId === 2) return SvgLinkTypeSpecialize;
-  if (linkTypeId === 3) return SvgLinkTypeApplication;
-  if (linkTypeId === 4) return SvgLinkTypeInstance;
-  if (linkTypeId === 6) return SvgLinkTypePart;
-  if (linkTypeId === 8) return SvgLinkTypeTagged;
-  if (linkTypeId === 10) return SvgLinkTypeAttr;
-  if (linkTypeId === 12) return SvgLinkTypeOpposite;
-  if (linkTypeId === 14) return SvgLinkTypeAuthor;
-  if (linkTypeId === 15) return SvgLinkTypeUse;
-  if (linkTypeId === 17) return SvgLinkTypeExample;
-  if (linkTypeId === 19) return SvgLinkTypePrecede;
-  if (linkTypeId === 22) return SvgLinkTypeSimilar;
-  if (linkTypeId === 23) return SvgLinkTypeConfuse;
-  return SvgFolder;
+  computed: {
+    computedTypeId() {
+      return !this.linkTypeId ? linkTypeNameToId(this.linkTypeName) : this.linkTypeId;
+    },
+    iconComponent() {
+      const linkTypeId = parseInt(this.computedTypeId.toString(), 10);
+      if (linkTypeId === 1) return SvgLinkTypeRelated;
+      if (linkTypeId === 2) return SvgLinkTypeSpecialize;
+      if (linkTypeId === 3) return SvgLinkTypeApplication;
+      if (linkTypeId === 4) return SvgLinkTypeInstance;
+      if (linkTypeId === 6) return SvgLinkTypePart;
+      if (linkTypeId === 8) return SvgLinkTypeTagged;
+      if (linkTypeId === 10) return SvgLinkTypeAttr;
+      if (linkTypeId === 12) return SvgLinkTypeOpposite;
+      if (linkTypeId === 14) return SvgLinkTypeAuthor;
+      if (linkTypeId === 15) return SvgLinkTypeUse;
+      if (linkTypeId === 17) return SvgLinkTypeExample;
+      if (linkTypeId === 19) return SvgLinkTypePrecede;
+      if (linkTypeId === 22) return SvgLinkTypeSimilar;
+      if (linkTypeId === 23) return SvgLinkTypeConfuse;
+      return SvgFolder;
+    },
+  },
 });
 </script>

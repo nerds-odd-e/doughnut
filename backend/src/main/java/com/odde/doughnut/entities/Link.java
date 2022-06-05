@@ -42,11 +42,15 @@ public class Link extends Thingy {
   private Link() {}
 
   public static Link createLink(
-      Note sourceNote, Note targetNote, User user, Integer typeId, Timestamp currentUTCTimestamp) {
+      Note sourceNote,
+      Note targetNote,
+      User user,
+      LinkType linkType,
+      Timestamp currentUTCTimestamp) {
     Link link = new Link();
     link.setSourceNote(sourceNote);
     link.setTargetNote(targetNote);
-    link.setTypeId(typeId);
+    link.setLinkType(linkType);
 
     return Thing.createThing(user, link, currentUTCTimestamp);
   }
@@ -63,7 +67,7 @@ public class Link extends Thingy {
   }
 
   public enum LinkType {
-    NO_LINK(0, "no link", "", "", new QuestionType[] {}),
+    NO_LINK(0, "no link", "no link", "", new QuestionType[] {}),
     RELATED_TO(1, "related note", "related to", "related to", new QuestionType[] {}),
     SPECIALIZE(
         2,
@@ -257,10 +261,6 @@ public class Link extends Thingy {
   @Setter
   @JsonIgnore
   private Integer typeId;
-
-  public Integer getTypeIdDeprecating() {
-    return typeId;
-  }
 
   public LinkType getLinkType() {
     return LinkType.fromId(typeId);

@@ -6,23 +6,27 @@
   >
     <template #labelAddition="{ value }">
       <div class="text-center">
-        <SvgLinkTypeIcon :link-type-id="value" :inverse-icon="inverseIcon" />
+        <SvgLinkTypeIcon :link-type-name="value" :inverse-icon="inverseIcon" />
       </div>
     </template>
   </RadioButtons>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, PropType } from "vue";
 import RadioButtons from "../form/RadioButtons.vue";
 import SvgLinkTypeIcon from "../svgs/SvgLinkTypeIcon.vue";
 import { linkTypeOptions } from "../../models/linkTypeOptions";
 
-export default {
+export default defineComponent({
   name: "LinkTypeSelect",
   props: {
     scopeName: String,
-    modelValue: Object,
-    errors: Object,
+    modelValue: {
+      type: String as PropType<Generated.LinkType>,
+      required: true,
+    },
+    errors: String,
     allowEmpty: { type: Boolean, default: false },
     field: { type: String, defalt: "linkType" },
     inverseIcon: Boolean,
@@ -31,11 +35,17 @@ export default {
   emits: ["update:modelValue"],
   computed: {
     options() {
+      return this.optionsRaw.map(({ label }) => ({
+        value: label,
+        label,
+      }));
+    },
+    optionsRaw() {
       if (this.allowEmpty) {
-        return [{ value: 0, label: "Default" }, ...linkTypeOptions];
+        return linkTypeOptions;
       }
-      return linkTypeOptions;
+      return linkTypeOptions.filter(({ label }) => label !== "no link");
     },
   },
-};
+});
 </script>

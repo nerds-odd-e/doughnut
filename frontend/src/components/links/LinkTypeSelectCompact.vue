@@ -3,7 +3,7 @@
     <PopupButton :aria-label="titlized">
       <template #button_face>
         <SvgLinkTypeIcon
-          :link-type-id="modelValue"
+          :link-type-name="modelValue"
           :inverse-icon="inverseIcon"
         />
         {{ label }}
@@ -28,19 +28,22 @@
   </InputWithType>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, PropType } from "vue";
 import { startCase, camelCase } from "lodash";
 import PopupButton from "../commons/Popups/PopupButton.vue";
 import SvgLinkTypeIcon from "../svgs/SvgLinkTypeIcon.vue";
 import LinkTypeSelect from "./LinkTypeSelect.vue";
 import InputWithType from "../form/InputWithType.vue";
-import { linkTypeOptions } from "../../models/linkTypeOptions";
 
-export default {
+export default defineComponent({
   props: {
     scopeName: String,
-    modelValue: Object,
-    errors: Object,
+    modelValue: {
+      type: String as PropType<Generated.LinkType>,
+      required: true,
+    },
+    errors: String,
     allowEmpty: { type: Boolean, default: false },
     field: { type: String, defalt: "linkType" },
     inverseIcon: Boolean,
@@ -52,11 +55,8 @@ export default {
       return startCase(camelCase(this.field));
     },
     label() {
-      const linkType = linkTypeOptions.find(
-        (lt) => lt.value.toString() === this.modelValue
-      );
-      return linkType ? linkType.label : "default";
+      return this.modelValue ? this.modelValue : "default";
     },
   },
-};
+});
 </script>

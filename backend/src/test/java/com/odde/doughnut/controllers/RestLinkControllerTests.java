@@ -5,9 +5,10 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.entities.Link;
+import com.odde.doughnut.entities.Link.LinkType;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.User;
-import com.odde.doughnut.entities.json.LinkRequest;
+import com.odde.doughnut.entities.json.LinkCreation;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -96,15 +97,15 @@ class RestLinkControllerTests {
     User anotherUser;
     Note note1;
     Note note2;
-    LinkRequest linkRequest = new LinkRequest();
+    LinkCreation linkCreation = new LinkCreation();
 
     @BeforeEach
     void setup() {
       anotherUser = makeMe.aUser().please();
       note1 = makeMe.aNote().creatorAndOwner(anotherUser).please();
       note2 = makeMe.aNote().creatorAndOwner(userModel).please();
-      linkRequest.typeId = 1;
-      linkRequest.moveUnder = true;
+      linkCreation.linkType = LinkType.APPLICATION;
+      linkCreation.moveUnder = true;
     }
 
     @Test
@@ -112,7 +113,7 @@ class RestLinkControllerTests {
         throws CyclicLinkDetectedException, BindException, NoAccessRightException {
       Note note3 = makeMe.aNote().creatorAndOwner(userModel).please();
       long beforeThingCount = makeMe.modelFactoryService.thingRepository.count();
-      controller().linkNoteFinalize(note3, note2, linkRequest, makeMe.successfulBindingResult());
+      controller().linkNoteFinalize(note3, note2, linkCreation, makeMe.successfulBindingResult());
       long afterThingCount = makeMe.modelFactoryService.thingRepository.count();
       assertThat(afterThingCount, equalTo(beforeThingCount + 1));
     }
@@ -124,7 +125,7 @@ class RestLinkControllerTests {
           ResponseStatusException.class,
           () ->
               controller()
-                  .linkNoteFinalize(note1, note2, linkRequest, makeMe.successfulBindingResult()));
+                  .linkNoteFinalize(note1, note2, linkCreation, makeMe.successfulBindingResult()));
     }
 
     @Test
@@ -133,7 +134,7 @@ class RestLinkControllerTests {
           BindException.class,
           () ->
               controller()
-                  .linkNoteFinalize(note1, note2, linkRequest, makeMe.failedBindingResult()));
+                  .linkNoteFinalize(note1, note2, linkCreation, makeMe.failedBindingResult()));
     }
 
     @Test
@@ -142,7 +143,7 @@ class RestLinkControllerTests {
           NoAccessRightException.class,
           () ->
               controller()
-                  .linkNoteFinalize(note1, note2, linkRequest, makeMe.successfulBindingResult()));
+                  .linkNoteFinalize(note1, note2, linkCreation, makeMe.successfulBindingResult()));
     }
 
     @Test
@@ -151,7 +152,7 @@ class RestLinkControllerTests {
           NoAccessRightException.class,
           () ->
               controller()
-                  .linkNoteFinalize(note2, note1, linkRequest, makeMe.successfulBindingResult()));
+                  .linkNoteFinalize(note2, note1, linkCreation, makeMe.successfulBindingResult()));
     }
   }
 }

@@ -42,7 +42,7 @@ export default defineComponent({
   data() {
     return {
       creationData: {
-        linkTypeToParent: 0,
+        linkTypeToParent: "no link",
         textContent: { title: "" },
       } as Generated.NoteCreation,
       formErrors: {
