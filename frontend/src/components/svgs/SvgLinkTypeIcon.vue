@@ -10,7 +10,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, PropType } from "vue";
 import SvgLinkTypeSpecialize from "./link_types/SvgLinkTypeSpecialize.vue";
 import SvgLinkTypeRelated from "./link_types/SvgLinkTypeRelated.vue";
 import SvgLinkTypeApplication from "./link_types/SvgLinkTypeApplication.vue";
@@ -26,37 +26,32 @@ import SvgLinkTypeOpposite from "./link_types/SvgLinkTypeOpposite.vue";
 import SvgLinkTypeAttr from "./link_types/SvgLinkTypeAttr.vue";
 import SvgLinkTypeConfuse from "./link_types/SvgLinkTypeConfuse.vue";
 import SvgFolder from "./link_types/SvgFolder.vue";
-import { linkTypeNameToId } from "../../models/linkTypeOptions";
 
 export default defineComponent({
   props: {
-    linkTypeId: Number,
-    linkTypeName: String,
+    linkTypeName: { type: String as PropType<Generated.LinkType>, required: true },
     width: String,
     height: String,
     inverseIcon: Boolean,
   },
 
   computed: {
-    computedTypeId() {
-      return !this.linkTypeId ? linkTypeNameToId(this.linkTypeName) : this.linkTypeId;
-    },
     iconComponent() {
-      const linkTypeId = parseInt(this.computedTypeId.toString(), 10);
-      if (linkTypeId === 1) return SvgLinkTypeRelated;
-      if (linkTypeId === 2) return SvgLinkTypeSpecialize;
-      if (linkTypeId === 3) return SvgLinkTypeApplication;
-      if (linkTypeId === 4) return SvgLinkTypeInstance;
-      if (linkTypeId === 6) return SvgLinkTypePart;
-      if (linkTypeId === 8) return SvgLinkTypeTagged;
-      if (linkTypeId === 10) return SvgLinkTypeAttr;
-      if (linkTypeId === 12) return SvgLinkTypeOpposite;
-      if (linkTypeId === 14) return SvgLinkTypeAuthor;
-      if (linkTypeId === 15) return SvgLinkTypeUse;
-      if (linkTypeId === 17) return SvgLinkTypeExample;
-      if (linkTypeId === 19) return SvgLinkTypePrecede;
-      if (linkTypeId === 22) return SvgLinkTypeSimilar;
-      if (linkTypeId === 23) return SvgLinkTypeConfuse;
+      const linkType = this.linkTypeName;
+      if (linkType === "related to") return SvgLinkTypeRelated;
+      if (linkType === "a specialization of") return SvgLinkTypeSpecialize;
+      if (linkType === "an application of") return SvgLinkTypeApplication;
+      if (linkType === "an instance of") return SvgLinkTypeInstance;
+      if (linkType === "a part of") return SvgLinkTypePart;
+      if (linkType === "tagged by") return SvgLinkTypeTagged;
+      if (linkType === "an attribute of") return SvgLinkTypeAttr;
+      if (linkType === "the opposite of") return SvgLinkTypeOpposite;
+      if (linkType === "author of") return SvgLinkTypeAuthor;
+      if (linkType === "using") return SvgLinkTypeUse;
+      if (linkType === "an example of") return SvgLinkTypeExample;
+      if (linkType === "before") return SvgLinkTypePrecede;
+      if (linkType === "similar to") return SvgLinkTypeSimilar;
+      if (linkType === "confused with") return SvgLinkTypeConfuse;
       return SvgFolder;
     },
   },

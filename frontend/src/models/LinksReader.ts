@@ -1,9 +1,5 @@
 import LinksMap from "./LinksMap";
-import {
-  taggingTypes,
-  groupedTypes,
-  linkTypeNameToId,
-} from "./linkTypeOptions";
+import { taggingTypes, groupedTypes } from "./linkTypeOptions";
 
 class LinksReader {
   links: LinksMap;
@@ -57,10 +53,6 @@ class LinksReader {
         (t) => t[1].reverse && t[1].reverse.length > 0
       )
     );
-  }
-
-  get reverseLinkTypes() {
-    return Object.keys(this.reverseLinks).map((ln) => linkTypeNameToId(ln));
   }
 }
 
