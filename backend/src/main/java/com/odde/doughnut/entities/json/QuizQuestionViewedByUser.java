@@ -8,7 +8,6 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionPresenter;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -26,7 +25,7 @@ public class QuizQuestionViewedByUser {
 
   @Getter public String mainTopic;
 
-  @Getter public Map<Link.LinkType, LinkViewed> hintLinks;
+  @Getter public LinksOfANote hintLinks;
 
   @Getter public List<Integer> viceReviewPointIdList;
 

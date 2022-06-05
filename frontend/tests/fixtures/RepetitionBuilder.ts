@@ -28,7 +28,9 @@ class RepetitionBuilder extends Builder<Generated.RepetitionForUser> {
       viceReviewPointIdList: [],
       description: "answer",
       mainTopic: "",
-      hintLinks: {},
+      hintLinks: {
+        links: {},
+      },
       scope: [],
     };
     return this;

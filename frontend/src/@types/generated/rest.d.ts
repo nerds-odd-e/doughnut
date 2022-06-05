@@ -43,6 +43,10 @@ declare namespace Generated {
         reverse: Link[];
     }
 
+    interface LinksOfANote {
+        links: { [P in LinkType]?: LinkViewed };
+    }
+
     interface NoteCreation {
         linkTypeToParent: LinkType;
         textContent: TextContent;
@@ -56,7 +60,7 @@ declare namespace Generated {
 
     interface NoteRealm {
         id: number;
-        links: { [P in LinkType]?: LinkViewed };
+        links: LinksOfANote;
         children: Note[];
         note: Note;
     }
@@ -95,7 +99,7 @@ declare namespace Generated {
         questionType: QuestionType;
         description: string;
         mainTopic: string;
-        hintLinks: { [P in LinkType]?: LinkViewed };
+        hintLinks: LinksOfANote;
         viceReviewPointIdList: number[];
         scope: Note[];
         options: Option[];

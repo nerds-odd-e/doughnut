@@ -1,10 +1,9 @@
 <template>
   <LinkType
-    v-for="(directAndReverse, linkType, index) in directLinks"
+    v-for="(_, linkType, index) in directLinks"
     :key="linkType"
     v-bind="{
       linkType,
-      links: directAndReverse?.direct,
       totalLinkTypeCount: directLinkTypeCount,
       index,
       mindmapSector,
@@ -12,12 +11,11 @@
     }"
   />
   <LinkType
-    v-for="(directAndReverse, linkType, index) in reverseLinks"
+    v-for="(_, linkType, index) in reverseLinks"
     :key="linkType"
     v-bind="{
       reverse: true,
       linkType,
-      links: directAndReverse?.reverse,
       totalLinkTypeCount: reverseLinkTypeCount,
       index,
       mindmapSector,
@@ -31,22 +29,21 @@ import { defineComponent, PropType } from "vue";
 import Mindmap from "../../../models/Mindmap";
 import MindmapSector from "../../../models/MindmapSector";
 import LinksReader from "../../../models/LinksReader";
-import LinksMap from "../../../models/LinksMap";
 import LinkType from "./LinkType.vue";
 
 export default defineComponent({
   props: {
-    links: { type: Object as PropType<LinksMap>, required: true },
+    links: { type: Object as PropType<Generated.LinksOfANote>, required: true },
     mindmapSector: { type: Object as PropType<MindmapSector>, required: true },
     mindmap: { type: Object as PropType<Mindmap>, required: true },
   },
   components: { LinkType },
   computed: {
     directLinks() {
-      return new LinksReader(this.links).directLinks;
+      return new LinksReader(this.links.links).directLinks;
     },
     reverseLinks() {
-      return new LinksReader(this.links).reverseLinks;
+      return new LinksReader(this.links.links).reverseLinks;
     },
     directLinkTypeCount() {
       return Object.keys(this.directLinks).length;

@@ -1,12 +1,10 @@
 package com.odde.doughnut.models.quizFacotries;
 
-import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.PictureWithMask;
-import com.odde.doughnut.entities.json.LinkViewed;
+import com.odde.doughnut.entities.json.LinksOfANote;
 import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 
 public interface QuizQuestionPresenter {
@@ -16,7 +14,7 @@ public interface QuizQuestionPresenter {
 
   List<Note> knownRightAnswers();
 
-  default Map<Link.LinkType, LinkViewed> hintLinks() {
+  default LinksOfANote hintLinks() {
     return null;
   }
 

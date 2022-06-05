@@ -1,8 +1,8 @@
 <template>
   <ul class="parent-links">
     <template
-      v-for="(linksOfType, linkType) in linksReader.hierachyLinks"
-      :key="linkType"
+      v-for="(linksOfType, _linkType) in linksReader.hierachyLinks"
+      :key="_linkType"
     >
       <li v-for="link in linksOfType.direct" :key="link.id">
         <LinkLink
@@ -76,13 +76,16 @@
   </ul>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent, PropType } from "vue";
 import LinkLink from "./LinkLink.vue";
 import LinksReader from "../../models/LinksReader";
 import { reverseLabel } from "../../models/linkTypeOptions";
 
-export default {
-  props: { links: Object },
+export default defineComponent({
+  props: {
+    links: { type: Object as PropType<Generated.LinksOfANote>, required: true },
+  },
   emits: ["noteRealmUpdated"],
   components: { LinkLink },
   methods: {
@@ -92,11 +95,10 @@ export default {
   },
   computed: {
     linksReader() {
-      if (!this.links) return {};
-      return new LinksReader(this.links);
+      return new LinksReader(this.links.links);
     },
   },
-};
+});
 </script>
 
 <style scoped>

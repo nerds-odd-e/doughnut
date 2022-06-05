@@ -5,6 +5,7 @@
     v-bind="{ id: note.id, updatedAt: note.textContent?.updatedAt }"
   >
     <NoteFrameOfLinks
+      v-if="links && links.links"
       v-bind="{ links }"
       @note-realm-updated="$emit('noteRealmUpdated', $event)"
     >
@@ -27,9 +28,7 @@ export default defineComponent({
   props: {
     note: { type: Object as PropType<Generated.Note>, required: true },
     links: {
-      type: Object as PropType<{
-        [P in Generated.LinkType]?: Generated.LinkViewed;
-      }>,
+      type: Object as PropType<Generated.LinksOfANote>,
     },
   },
   emits: ["noteRealmUpdated"],

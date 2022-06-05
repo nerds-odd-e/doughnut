@@ -3,7 +3,7 @@ import generateId from "./generateId";
 import LinkViewedBuilder, { LinksMap } from "./LinkViewedBuilder";
 import NoteRealmBuilder from "./NoteRealmBuilder";
 
-class LinksMapBuilder extends Builder<LinksMap> {
+class LinksMapBuilder extends Builder<Generated.LinksOfANote> {
   from = new NoteRealmBuilder().title("source note").do();
 
   protected childrenBuilders: Omit<LinkViewedBuilder, "please">[] = [];
@@ -18,11 +18,13 @@ class LinksMapBuilder extends Builder<LinksMap> {
     return child;
   }
 
-  do(): LinksMap {
-    return this.childrenBuilders.reduce(
-      (prev, curr) => ({ ...prev, ...curr.do() }),
-      {}
-    );
+  do(): Generated.LinksOfANote {
+    return {
+      links: this.childrenBuilders.reduce(
+        (prev, curr) => ({ ...prev, ...curr.do() }),
+        {}
+      ),
+    };
   }
 }
 
