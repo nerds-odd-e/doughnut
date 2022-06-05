@@ -36,7 +36,7 @@ import LinkType from "./LinkType.vue";
 
 export default defineComponent({
   props: {
-    links: { type: Array as PropType<LinksMap>, required: true },
+    links: { type: Object as PropType<LinksMap>, required: true },
     mindmapSector: { type: Object as PropType<MindmapSector>, required: true },
     mindmap: { type: Object as PropType<Mindmap>, required: true },
   },
