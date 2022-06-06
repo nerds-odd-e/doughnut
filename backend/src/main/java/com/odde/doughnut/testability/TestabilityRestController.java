@@ -177,9 +177,7 @@ class TestabilityRestController {
     Timestamp currentUTCTimestamp = testabilitySettings.getCurrentUTCTimestamp();
     Link link =
         Link.createLink(
-            sourceNote, targetNote, sourceNote.getThing().getCreator(), null, currentUTCTimestamp);
-
-    link.setLinkType(type);
+            sourceNote, targetNote, sourceNote.getThing().getCreator(), type, currentUTCTimestamp);
 
     linkRepository.save(link);
     return "OK";

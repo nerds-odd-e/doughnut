@@ -5,10 +5,7 @@
     v-bind="quizQuestion.pictureWithMask"
     :opacity="1"
   />
-  <NoteFrameOfLinks
-    v-if="quizQuestion.hintLinks && quizQuestion.hintLinks.links"
-    v-bind="{ links: quizQuestion.hintLinks }"
-  >
+  <NoteFrameOfLinks v-bind="{ links: quizQuestion.hintLinks }">
     <div class="quiz-instruction">
       <pre
         style="white-space: pre-wrap"

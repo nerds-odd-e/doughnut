@@ -1,5 +1,5 @@
 <template>
-  <ul class="parent-links">
+  <ul class="parent-links" v-if="linksReader">
     <template
       v-for="(linksOfType, _linkType) in linksReader.hierachyLinks"
       :key="_linkType"
@@ -56,7 +56,7 @@
 
   <slot />
 
-  <ul class="children-links">
+  <ul class="children-links" v-if="linksReader">
     <template
       v-for="(linksOfType, linkType) in linksReader.childrenLinks"
       :key="linkType"
@@ -84,7 +84,7 @@ import { reverseLabel } from "../../models/linkTypeOptions";
 
 export default defineComponent({
   props: {
-    links: { type: Object as PropType<Generated.LinksOfANote>, required: true },
+    links: Object as PropType<Generated.LinksOfANote>,
   },
   emits: ["noteRealmUpdated"],
   components: { LinkLink },
@@ -95,7 +95,10 @@ export default defineComponent({
   },
   computed: {
     linksReader() {
-      return new LinksReader(this.links.links);
+      if (this.links && this.links.links) {
+        return new LinksReader(this.links.links);
+      }
+      return undefined;
     },
   },
 });
