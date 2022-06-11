@@ -159,3 +159,4 @@ directory:
 ### 6. [Production environment](./docs/prod_env.md)
 
 ### 7. [Doughnut source code secrets management](./docs/secrets_management.md)
+
