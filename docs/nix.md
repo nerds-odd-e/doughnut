@@ -22,14 +22,12 @@ sh < (curl -k -L https://nixos.org/nix/install) --no-daemon
 
 ### 2. Setup and run doughnut for the first time (local development profile)
 
-Launch a new terminal in your favourite shell (I highly recommend zsh).
 
 ```bash
 mkdir -p ~/.config/nix
 echo 'experimental-features = nix-command flakes' >> ~/.config/nix/nix.conf
-. ~/.nix-profile/etc/profile.d/nix.sh
 ```
-
+Launch a new terminal in your favourite shell (I highly recommend zsh).
 Clone full all-in-one doughnut codebase from Github (Microsoft Windows OS users, please clone the repo to a non-Windows mount directory)
 
 ```bash
@@ -41,8 +39,7 @@ MySQL DB server is started and initialised on entering the `nix develop`.
 
 ```bash
 cd doughnut
-export NIXPKGS_ALLOW_UNFREE=1
-nix develop -c $SHELL
+nix develop
 ```
 
 All development tool commands henceforth should be run within `nix develop -c $SHELL`
