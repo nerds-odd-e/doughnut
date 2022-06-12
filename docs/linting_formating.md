@@ -5,51 +5,81 @@
 Details of yarn task aliases described below is visible in `doughnut/package.json`
 and `doughnut/frontend/package.json`.
 
-### 1. Formatting
+### 1. VSCode IDE extension for Vue3 Typescript
+
+##### 1.1. Install Volar VSCode Typescript extension for Vue3
+
+[Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) replaces Vetur, the previous
+official VSCode extension for Vue 2.
+
+If you have Vetur currently installed, make sure to disable it in Vue 3 projects.
+
+##### 1.2. Turn on Volar Takeover mode
+
+To enable Takeover Mode, you need to disable VSCode's built-in TS language service in your project's
+workspace only by following these steps:
+
+- In your project workspace, bring up the command palette with Ctrl + Shift + P (macOS: Cmd + Shift
+  + P).
+- Type built and select "Extensions: Show Built-in Extensions".
+- Type typescript in the extension search box (do not remove @builtin prefix).
+- Click the little gear icon of "TypeScript and JavaScript Language Features", and select "Disable (
+  Workspace)".
+- Reload the workspace. Takeover mode will be enabled when you open a Vue or TS file.
+  ![Volar Takeover mode](./images/disable_vscode_typescript_extension.png "Disable VSCode default Typescript extension")
+
+### 2. Formatting
 
 From `doughnut` source root directory, run:
 
-##### 1.1. Format All code
+##### 2.1. Format All code
+
 ```bash
 yarn format:all
 ```
 
-##### 1.2. Backend Java code formatting
+##### 2.2. Backend Java code formatting
+
 ```bash
 yarn backend:format
 ```
 
-##### 1.3. Frontend Vue3/Typescript code formatting
+##### 2.3. Frontend Vue3/Typescript code formatting
+
 ```bash
 yarn frontend:format
 ```
 
-##### 1.4. Cypress E2E Typescript code formatting
+##### 2.4. Cypress E2E Typescript code formatting
+
 ```bash
 yarn cy:format
 ```
 
-
-### 2. Linting
+### 3. Linting
 
 From `doughnut` source root directory, run:
 
-##### 2.1. Lint All code
+##### 3.1. Lint All code
+
 ```bash
 yarn lint:all
 ```
 
-##### 2.2. Backend Java code linting
+##### 3.2. Backend Java code linting
+
 ```bash
 yarn backend:lint
 ```
 
-##### 2.3. Frontend Vue3/Typescript code linting
+##### 3.3. Frontend Vue3/Typescript code linting
+
 ```bash
 yarn frontend:lint
 ```
 
-##### 2.4. Cypress E2E Typescript code linting
+##### 3.4. Cypress E2E Typescript code linting
+
 ```bash
 yarn cy:lint
 ```
