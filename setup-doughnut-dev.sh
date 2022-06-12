@@ -15,8 +15,8 @@ get_os_type() {
 }
 
 download_nixpkg_manager_install_script() {
-  rm -f install-nix
-  curl -o install-nix https://releases.nixos.org/nix/nix-2.8.1/install
+  rm -f ./install-nix
+  curl -o install-nix https://nixos.org/releases/nix/nix-2.9.1/install
   chmod +x ./install-nix
 }
 
@@ -31,6 +31,10 @@ configure_nix_flakes() {
   fi
 }
 
+allow_nix_unfree() {
+  mkdir -p ${HOME}/.config/nixpkgs && echo '{ allowUnfree = true; }' >> ${HOME}/.config/nixpkgs/config.nix
+}
+
 ensure_nix_profile() {
   if [ ! -f ${HOME}/.nix-profile/etc/profile.d/nix.sh ]; then
     user=$(whoami)
@@ -42,6 +46,7 @@ install_nixpkg_manager() {
   get_os_type
   if ! command -v nix >/dev/null 2>&1; then
     download_nixpkg_manager_install_script
+    touch .bash_profile
     if [ "${os_type}" = "Mac" ]; then
       ./install-nix --darwin-use-unencrypted-nix-store-volume
     elif [ "${os_type}" = "Linux" ]; then
@@ -50,8 +55,10 @@ install_nixpkg_manager() {
       echo "Unsupported OS Platform for Nix development enviroment. Exiting!!!"
       exit 1
     fi
-    rm -f ./install-nix
   fi
+
+  allow_nix_unfree
+
   configure_nix_flakes
 }
 
