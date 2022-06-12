@@ -7,8 +7,6 @@ import NoteShowMindmapPage from "@/pages/NoteShowMindmapPage.vue";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
 
-jest.useFakeTimers();
-
 helper.resetWithApiMock(beforeEach, afterEach);
 
 describe("all in note show page", () => {

@@ -16,7 +16,7 @@
   <div v-if="!searchResult || searchResult.length === 0">
     <em>No linkable notes found.</em>
   </div>
-  <Cards v-else class="search-result" :notes="searchResult" columns="3">
+  <Cards v-else class="search-result" :notes="searchResult" :columns="3">
     <template #button="{ note }">
       <button class="btn btn-primary" @click="$emit('selected', note)">
         Select
