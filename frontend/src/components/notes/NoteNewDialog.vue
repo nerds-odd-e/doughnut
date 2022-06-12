@@ -12,12 +12,15 @@
       :errors="formErrors.textContent"
     />
     <input type="submit" value="Submit" class="btn btn-primary" />
-    <SearchResults
-      v-bind="{
-        noteId: parentId,
-        inputSearchKey: creationData.textContent.title,
-      }"
-    />
+    <fieldset class="secondary-info">
+      <legend>Similar Notes</legend>
+      <SearchResults
+        v-bind="{
+          noteId: parentId,
+          inputSearchKey: creationData.textContent.title,
+        }"
+      />
+    </fieldset>
   </form>
 </template>
 
@@ -63,3 +66,20 @@ export default defineComponent({
   },
 });
 </script>
+
+<style lang="sass">
+.secondary-info
+  margin-top: 1rem
+  padding: 5px
+  margin: 0
+  border: 1px solid #ccc
+  border-radius: 4px
+  color: #999
+  font-size: smaller
+
+  legend
+    font-size: 1.2rem
+    margin-bottom: 0.5rem
+    float: none
+    width: auto
+</style>

@@ -14,13 +14,11 @@
   </div>
 
   <div v-if="!searchResult || searchResult.length === 0">
-    <em>No linkable notes found.</em>
+    <em>No matching notes found.</em>
   </div>
   <Cards v-else class="search-result" :notes="searchResult" :columns="3">
     <template #button="{ note }">
-      <button class="btn btn-primary" @click="$emit('selected', note)">
-        Select
-      </button>
+      <slot name="button" :note="note" />
     </template>
   </Cards>
 </template>
@@ -41,7 +39,6 @@ export default defineComponent({
   name: "SearchNote",
   props: { noteId: Number, inputSearchKey: { type: String, required: true } },
   components: { CheckInput, Cards },
-  emits: ["selected"],
   data() {
     return {
       searchTerm: {

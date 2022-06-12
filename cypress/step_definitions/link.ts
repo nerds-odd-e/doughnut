@@ -73,7 +73,7 @@ And(
   "I should see note cannot be found when searching in all my notebooks {string}",
   (searchKey) => {
     cy.searchNote(searchKey, ["All My Notebooks And Subscriptions"])
-    cy.findByText("No linkable notes found.").should("be.visible")
+    cy.findByText("No matching notes found.").should("be.visible")
   },
 )
 
