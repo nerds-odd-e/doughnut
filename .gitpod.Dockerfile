@@ -47,10 +47,11 @@ RUN apt-get -y update \
     && rm -rf /home/gitpod/.nix-profile \
     && rm -rf /home/gitpod/.config/nixpkgs
 
-RUN addgroup --system nixbld \
-  && adduser gitpod nixbld \
-  && for i in $(seq 1 30); do useradd -ms /bin/bash nixbld$i &&  adduser nixbld$i nixbld; done \
-  && mkdir -m 0755 /nix && chown gitpod /nix \
+# RUN addgroup --system nixbld \
+#  && adduser gitpod nixbld \
+#  && for i in $(seq 1 30); do useradd -ms /bin/bash nixbld$i && adduser nixbld$i nixbld; done
+
+RUN mkdir -m 0755 /nix && chown gitpod /nix \
   && mkdir -p /etc/nix && echo 'sandbox = false' > /etc/nix/nix.conf
 
 # -----------------------------------------------------
