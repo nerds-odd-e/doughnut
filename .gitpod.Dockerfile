@@ -47,6 +47,9 @@ RUN apt-get -y update \
     && rm -rf /home/gitpod/.nix-profile \
     && rm -rf /home/gitpod/.config/nixpkgs
 
+# use bash over dash for /bin/sh
+RUN dpkg-reconfigure dash
+
 # RUN addgroup --system nixbld \
 #  && adduser gitpod nixbld \
 #  && for i in $(seq 1 30); do useradd -ms /bin/bash nixbld$i && adduser nixbld$i nixbld; done
@@ -84,6 +87,17 @@ RUN . /home/gitpod/.nix-profile/etc/profile.d/nix.sh \
 # Install git
 RUN . /home/gitpod/.nix-profile/etc/profile.d/nix.sh \
   && nix-env -i git git-lfs
+
+# xclip
+cat << EOF >> ~/.bashrc
+alias pbcopy='xclip -selection clipboard'
+alias pbpaste='xclip -selection clipboard -o'
+EOF
+
+cat << EOF >> ~/.zshrc
+alias pbcopy='xclip -selection clipboard'
+alias pbpaste='xclip -selection clipboard -o'
+EOF
 
 EXPOSE 3000
 EXPOSE 3309
