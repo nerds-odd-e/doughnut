@@ -47,6 +47,11 @@ RUN apt-get -y update \
     && rm -rf /home/gitpod/.nix-profile \
     && rm -rf /home/gitpod/.config/nixpkgs
 
+RUN addgroup --system nixbld \
+  && adduser gitpod nixbld \
+  && for i in $(seq 1 30); do useradd -ms /bin/bash nixbld$i &&  adduser nixbld$i nixbld; done \
+  && mkdir -m 0755 /nix && chown gitpod /nix \
+  && mkdir -p /etc/nix && echo 'sandbox = false' > /etc/nix/nix.conf
 
 # -----------------------------------------------------
 # -------------------- USER gitpod --------------------
@@ -59,12 +64,25 @@ USER gitpod
 ENV USER gitpod
 WORKDIR /home/gitpod
 
-RUN curl -o install-nix https://releases.nixos.org/nix/nix-2.7.0/install \
-    && chmod +x ./install-nix \
-    && ./install-nix --no-daemon
+# Install Nix
+RUN touch .bash_profile \
+    && curl https://nixos.org/releases/nix/nix-2.9.1/install | sh
+
+RUN echo '. /home/gitpod/.nix-profile/etc/profile.d/nix.sh' >> /home/gitpod/.bashrc
+RUN mkdir -p /home/gitpod/.config/nixpkgs && echo '{ allowUnfree = true; }' >> /home/gitpod/.config/nixpkgs/config.nix
+
 RUN mkdir -p /home/gitpod/.config/nix \
     && touch /home/gitpod/.config/nix/nix.conf \
     && echo "experimental-features = nix-command flakes" >> /home/gitpod/.config/nix/nix.conf
+
+# Install cachix
+RUN . /home/gitpod/.nix-profile/etc/profile.d/nix.sh \
+  && nix-env -iA cachix -f https://cachix.org/api/v1/install \
+  && cachix use cachix
+
+# Install git
+RUN . /home/gitpod/.nix-profile/etc/profile.d/nix.sh \
+  && nix-env -i git git-lfs
 
 EXPOSE 3000
 EXPOSE 3309
