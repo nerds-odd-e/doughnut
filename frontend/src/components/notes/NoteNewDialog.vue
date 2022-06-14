@@ -26,7 +26,7 @@
             :key="suggestion.id"
             :value="suggestion.id"
           >
-            {{ suggestion.name }}
+            {{ suggestion.label }} - {{ suggestion.description }}
           </option>
         </select>
       </div>
@@ -74,7 +74,8 @@ export default defineComponent({
       wikiSearchSuggestions: [
         {
           id: "Q12345",
-          name: "Snake",
+          label: "Snake",
+          description: "limbless, scaly, elongate reptile",
         },
       ],
       selectedWikiSuggestion: null,
