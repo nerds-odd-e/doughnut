@@ -12,6 +12,12 @@
       :errors="formErrors.textContent"
     />
     <input type="submit" value="Submit" class="btn btn-primary" />
+    <input
+      type="button"
+      value="Search on Wikidata"
+      class="btn btn-outline-primary"
+      @click="processForm"
+    />
     <fieldset class="secondary-info">
       <legend>Similar Notes</legend>
       <SearchResults
