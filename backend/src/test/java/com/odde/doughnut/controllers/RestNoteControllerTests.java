@@ -138,6 +138,23 @@ class RestNoteControllerTests {
       long afterThingCount = makeMe.modelFactoryService.thingRepository.count();
       assertThat(afterThingCount, equalTo(beforeThingCount + 1));
     }
+
+    @Test
+    void shouldBeAbleToSaveNoteWithWikidataIdWhenValid() throws NoAccessRightException {
+      String wikidataId = "Q12345";
+      noteCreation.setWikidataId(wikidataId);
+
+      NoteRealmWithPosition response = controller.createNote(parent, noteCreation);
+
+      assertThat(response.noteRealm.getNote().getWikidataId(), equalTo(wikidataId));
+    }
+
+    @Test
+    void shouldBeAbleToSaveNoteWithoutWikidataIdWhenValid() throws NoAccessRightException {
+      NoteRealmWithPosition response = controller.createNote(parent, noteCreation);
+
+      assertThat(response.noteRealm.getNote().getWikidataId(), equalTo(null));
+    }
   }
 
   @Nested
