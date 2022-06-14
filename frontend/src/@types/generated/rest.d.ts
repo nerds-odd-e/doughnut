@@ -50,6 +50,7 @@ declare namespace Generated {
     interface NoteCreation {
         linkTypeToParent: LinkType;
         textContent: TextContent;
+        wikidataId?: string;
     }
 
     interface NotePositionViewedByUser {
