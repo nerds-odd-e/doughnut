@@ -64,7 +64,8 @@ class RestNoteController {
     userModel.getAuthorization().assertAuthorization(parentNote);
     User user = userModel.getEntity();
     Note note =
-        Note.createNote(user, testabilitySettings.getCurrentUTCTimestamp(), noteCreation.textContent);
+      Note.createNote(
+        user, testabilitySettings.getCurrentUTCTimestamp(), noteCreation.textContent);
     note.setParentNote(parentNote);
     note.setWikidataId(noteCreation.getWikidataId());
     modelFactoryService.noteRepository.save(note);
