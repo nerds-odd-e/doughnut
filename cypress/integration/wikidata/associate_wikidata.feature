@@ -50,3 +50,9 @@ Feature: associate wikidata ID to note
     And I click the barcode icon on the note toolbar
     Then I should see that the placeholder containing the new wikidata id "Q6789"
 
+  @ignore
+  Scenario: Show wikidata id already associated with note
+    Given I have a note with title "TDD"
+    And I already associate the note "TDD" with wikidata id "Q12345"
+    When I associate the note "TDD" with other wikidata id
+    Then I should see wikidata id in the text input  "Q12345"
