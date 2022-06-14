@@ -29,5 +29,4 @@ export default defineComponent({
   components: { TextInput },
 });
 
-// test push to github
 </script>
