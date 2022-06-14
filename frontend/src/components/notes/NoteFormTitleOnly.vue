@@ -28,5 +28,4 @@ export default defineComponent({
   emits: ["update:modelValue"],
   components: { TextInput },
 });
-
 </script>
