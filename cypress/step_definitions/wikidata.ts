@@ -2,7 +2,7 @@
 /// <reference types="../support" />
 // @ts-check
 
-import { Given, Then, When } from "@badeball/cypress-cucumber-preprocessor"
+import { And, Given, Then, When } from "@badeball/cypress-cucumber-preprocessor"
 
 When("I associate the note {string} with wikidata id {string}", (title, wikiID) => {
   cy.clickAssociateWikiDataButton(title, wikiID)
@@ -57,3 +57,27 @@ Then("I should see the icon beside title linking to {string}", (associationUrl: 
       })
   })
 })
+
+Given(
+  "I have an existing note {string} that is already associated with wikidata id {string}",
+  (title, wikiID) => {
+    cy.clickAssociateWikiDataButton(title, wikiID)
+    cy.findByRole("button", { name: "Confirm" }).click()
+  },
+)
+
+When("I associate the note {string} with a new wikidata id {string}", (title, wikiID) => {
+  cy.clickAssociateWikiDataButton(title, wikiID)
+  cy.findByRole("button", { name: "Confirm" }).click()
+})
+
+And("I click the associate wikidata button on the note toolbar", () => {
+  cy.clickNoteToolbarButton("associate wikidata")
+})
+
+Then(
+  "I should see that the placeholder containing the new wikidata id {string}",
+  (placeholderText: string) => {
+    cy.findByRole("input", { name: "wikidataID" }).contains(placeholderText)
+  },
+)

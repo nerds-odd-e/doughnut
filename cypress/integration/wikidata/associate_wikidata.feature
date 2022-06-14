@@ -43,11 +43,11 @@ Feature: associate wikidata ID to note
     Then I need to confirm the association with different title "Count von Count"
     And I should see the icon beside title linking to "https://en.wikipedia.org/wiki/Count_von_Count"
 
-  @ignore
+  @usingRealWikidataService @ignore
   Scenario: Updating existing note that has previously been associated with wikidata
     Given I have an existing note "TDD" that is already associated with wikidata id "Q12345"
     When I associate the note "TDD" with a new wikidata id "Q6789"
-    And I click the barcode icon on the note toolbar
+    And I click the associate wikidata button on the note toolbar
     Then I should see that the placeholder containing the new wikidata id "Q6789"
 
   @ignore
@@ -56,7 +56,7 @@ Feature: associate wikidata ID to note
     And I already associate the note "TDD" with wikidata id "Q12345"
     When I associate the note "TDD" with other wikidata id
     Then I should see wikidata id in the text input  "Q12345"
-  
+
   @ignore
   Scenario: Updating existing note that has been associated with wikidata using the same wikidata id
     Given I have an existing note "TDD" that is already associated with wikidata id "Q12345"
