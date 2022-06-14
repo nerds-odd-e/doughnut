@@ -5,9 +5,15 @@ Cypress.Commands.add("cleanDBAndSeedData", () => {
   cy.request({
     method: "POST",
     url: "/api/testability/clean_db_and_reset_testability_settings",
+    failOnStatusCode: false,
+  }).then((response) => {
+    if (response.status !== 200) {
+      cy.request({
+        method: "POST",
+        url: "/api/testability/clean_db_and_reset_testability_settings",
+      })
+    }
   })
-    .its("body")
-    .should("equal", "OK")
 })
 
 Cypress.Commands.add("enableFeatureToggle", (enabled) => {
