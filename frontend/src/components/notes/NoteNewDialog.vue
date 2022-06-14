@@ -11,13 +11,26 @@
       v-model="creationData.textContent"
       :errors="formErrors.textContent"
     />
-    <input type="submit" value="Submit" class="btn btn-primary" />
-    <input
-      type="button"
-      value="Search on Wikidata"
-      class="btn btn-outline-primary"
-      @click="processForm"
-    />
+    <div class="row mt-2 mb-2">
+      <div class="col-6 btn-group" role="group" aria-label="Action Group">
+        <input type="submit" value="Submit" class="btn btn-primary" />
+        <button class="btn btn-outline-primary" @click="processForm">
+          Search on Wikidata
+        </button>
+      </div>
+      <div class="col-6">
+        <select class="form-control" v-model="selectedWikiSuggestion">
+          <option disabled selected>- Choose Item -</option>
+          <option
+            v-for="suggestion in wikiSearchSuggestions"
+            :key="suggestion.id"
+            :value="suggestion.id"
+          >
+            {{ suggestion.name }}
+          </option>
+        </select>
+      </div>
+    </div>
     <fieldset class="secondary-info">
       <legend>Similar Notes</legend>
       <SearchResults
@@ -58,6 +71,13 @@ export default defineComponent({
         linkTypeToParent: undefined,
         textContent: {},
       },
+      wikiSearchSuggestions: [
+        {
+          id: "Q12345",
+          name: "Snake",
+        },
+      ],
+      selectedWikiSuggestion: null,
     };
   },
   methods: {
