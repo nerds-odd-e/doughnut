@@ -512,7 +512,7 @@ Cypress.Commands.add(
   (wikidataId: string, wikidataTitle: string, wikipediaLink: string) => {
     const wikipedia = wikipediaLink ? { enwiki: { site: "enwiki", url: wikipediaLink } } : {}
     const mb = new Mountebank()
-    const imposter = new Imposter().withPort(5000).withStub(
+    const imposter = new Imposter().withPort(5001).withStub(
       new DefaultStub(
         `/wiki/Special:EntityData/${wikidataId}.json`,
         HttpMethod.GET,
