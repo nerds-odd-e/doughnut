@@ -20,7 +20,7 @@
       </div>
       <div class="col-6">
         <select class="form-control" v-model="selectedWikiSuggestion">
-          <option disabled selected>- Choose Item -</option>
+          <option disabled value="">- Choose Wikidata Search Result -</option>
           <option
             v-for="suggestion in wikiSearchSuggestions"
             :key="suggestion.id"
@@ -78,7 +78,7 @@ export default defineComponent({
           description: "limbless, scaly, elongate reptile",
         },
       ],
-      selectedWikiSuggestion: null,
+      selectedWikiSuggestion: "",
     };
   },
   methods: {
