@@ -56,3 +56,10 @@ Feature: associate wikidata ID to note
     And I already associate the note "TDD" with wikidata id "Q12345"
     When I associate the note "TDD" with other wikidata id
     Then I should see wikidata id in the text input  "Q12345"
+  
+  @ignore
+  Scenario: Updating existing note that has been associated with wikidata using the same wikidata id
+    Given I have an existing note "TDD" that is already associated with wikidata id "Q12345"
+    When I associate the note "TDD" with the same wikidata id "Q12345"
+    Then I should see the message "TDD is already associated with Q12345"
+
