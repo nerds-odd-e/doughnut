@@ -85,3 +85,7 @@ Then(
       })
   },
 )
+
+Given("I have a note with title {string} associated with wikidata id {string}", (noteTitle: string, wikidataId: string) => {
+  cy.seedNotes([{ title: noteTitle, wikidataId: wikidataId }])
+})
