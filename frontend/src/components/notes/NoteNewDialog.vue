@@ -1,5 +1,5 @@
 <template>
-  <form v-if="!selectedWikiSuggestion" @submit.prevent="processForm">
+  <form v-show="!selectedWikiSuggestion" @submit.prevent="processForm">
     <LinkTypeSelectCompact
       scope-name="note"
       field="linkTypeToParent"
@@ -51,6 +51,17 @@
       />
     </fieldset>
   </form>
+  <form v-show="selectedWikiSuggestion" @submit.prevent.once="confirm">
+    Are you sure want to replace the title with the title from Wikidata?
+    <br />
+    <input
+      type="cancel"
+      value="Cancel"
+      class="btn btn-secondary"
+      @click="selectedWikiSuggestion = ''"
+    />
+    <input type="submit" value="Yes" class="btn btn-primary" @click="confirm" />
+  </form>
 </template>
 
 <script lang="ts">
@@ -99,7 +110,12 @@ export default defineComponent({
         .catch((res) => (this.formErrors = res));
     },
     async confirm() {
-      this.creationData.textContent.title = this.wikiSearchSuggestions[0].label;
+      const selectedSuggestion = this.wikiSearchSuggestions.find((obj) => {
+        return obj.id === this.selectedWikiSuggestion;
+      });
+      if (selectedSuggestion) {
+        this.creationData.textContent.title = selectedSuggestion?.label;
+      }
       this.selectedWikiSuggestion = "";
     },
     async fetchSearchResult() {
