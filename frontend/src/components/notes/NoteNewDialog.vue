@@ -13,9 +13,7 @@
     />
     <div class="row mt-2 mb-2">
       <div class="col-6 btn-group" role="group" aria-label="Action Group">
-        <button class="btn btn-primary" @click.prevent="processForm">
-          Submit
-        </button>
+        <input type="submit" value="Submit" class="btn btn-primary" />
         <button
           class="btn btn-outline-primary"
           @click.prevent="fetchSearchResult"
