@@ -77,7 +77,7 @@ export default defineComponent({
         textContent: {},
       },
       wikiSearchSuggestions: [] as Generated.WikidataSearchEntity[],
-      selectedWikiSuggestion: undefined as undefined | string,
+      selectedWikiSuggestion: "",
     };
   },
   methods: {
