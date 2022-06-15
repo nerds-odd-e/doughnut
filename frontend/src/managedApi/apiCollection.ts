@@ -206,6 +206,12 @@ const apiCollection = (managedApi: ManagedApi) => ({
         `wikidata/${wikiDataId}`
       )) as Generated.WikidataEntity;
     },
+
+    async getWikiDatas(keyword: string) {
+      return (await managedApi.restGet(
+        `wikidatas/${keyword}`
+      )) as Generated.WikidataSearchEntity[];
+    },
   },
 });
 

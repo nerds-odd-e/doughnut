@@ -13,8 +13,13 @@
     />
     <div class="row mt-2 mb-2">
       <div class="col-6 btn-group" role="group" aria-label="Action Group">
-        <input type="submit" value="Submit" class="btn btn-primary" />
-        <button class="btn btn-outline-primary" @click="processForm">
+        <button class="btn btn-primary" @click.prevent="processForm">
+          Submit
+        </button>
+        <button
+          class="btn btn-outline-primary"
+          @click.prevent="fetchSearchResult"
+        >
           Search on Wikidata
         </button>
       </div>
@@ -90,13 +95,7 @@ export default defineComponent({
         linkTypeToParent: undefined,
         textContent: {},
       },
-      wikiSearchSuggestions: [
-        {
-          id: "Q12345",
-          label: "Snake",
-          description: "limbless, scaly, elongate reptile",
-        },
-      ],
+      wikiSearchSuggestions: [] as Generated.WikidataSearchEntity[],
       selectedWikiSuggestion: undefined as undefined | string,
     };
   },
@@ -112,6 +111,19 @@ export default defineComponent({
     async confirm() {
       this.creationData.textContent.title = this.wikiSearchSuggestions[0].label;
       this.selectedWikiSuggestion = undefined;
+    },
+    async fetchSearchResult() {
+      if (this.creationData.textContent.title) {
+        this.wikiSearchSuggestions = await this.api.wikidata.getWikiDatas(
+          this.creationData.textContent.title
+        );
+        if (this.wikiSearchSuggestions.length === 0) {
+          this.selectedWikiSuggestion = "";
+        }
+      } else {
+        this.wikiSearchSuggestions = [];
+        this.selectedWikiSuggestion = "";
+      }
     },
   },
 });
