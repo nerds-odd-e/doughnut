@@ -1,6 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import com.odde.doughnut.entities.json.WikidataEntity;
+import com.odde.doughnut.entities.json.WikidataSearchEntity;
 import com.odde.doughnut.services.HttpClientAdapter;
 import com.odde.doughnut.services.WikidataService;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -13,6 +14,9 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.ArrayList;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -35,6 +39,18 @@ public class RestWikidataController {
       return getWikiDataService().fetchWikiData(wikiDataId);
     } catch (IOException e) {
       BindingResult bindingResult = new BeanPropertyBindingResult(wikiDataId, "wikiDataId");
+      bindingResult.rejectValue(null, "error.error", "The wikidata service is not available");
+      throw new BindException(bindingResult);
+    }
+  }
+
+  @GetMapping("/wikidatas/{search}")
+  public ArrayList<WikidataSearchEntity> fetchsWikiDataBySearch(@PathVariable("search") String search)
+      throws InterruptedException, BindException {
+    try {
+      return getWikiDataService().fetchsWikiDataBySearch(search);
+    } catch (IOException e) {
+      BindingResult bindingResult = new BeanPropertyBindingResult(search, "search");
       bindingResult.rejectValue(null, "error.error", "The wikidata service is not available");
       throw new BindException(bindingResult);
     }
