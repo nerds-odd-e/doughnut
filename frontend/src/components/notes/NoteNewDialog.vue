@@ -41,25 +41,6 @@
       />
     </fieldset>
   </form>
-
-  <div class="row" v-else @submit.prevent.once="confirm">
-    <center>
-      Are you sure want to replace the title with the title from Wikidata?
-      <br />
-      <strong
-        >{{ creationData.textContent.title }} >
-        {{ wikiSearchSuggestions[0].label }}</strong
-      >
-    </center>
-    <input
-      type="cancel"
-      value="Cancel"
-      class="btn btn-secondary"
-      @click="selectedWikiSuggestion = undefined"
-    />
-
-    <input type="submit" value="Yes" class="btn btn-primary" @click="confirm" />
-  </div>
 </template>
 
 <script lang="ts">
@@ -132,9 +113,4 @@ export default defineComponent({
     margin-bottom: 0.5rem
     float: none
     width: auto
-
-.row
-  text-align: center
-  margin-left: -20px
-  marin-right: -20px
 </style>
