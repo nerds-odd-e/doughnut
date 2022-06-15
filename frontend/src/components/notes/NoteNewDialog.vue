@@ -91,7 +91,7 @@ export default defineComponent({
     },
     async confirm() {
       this.creationData.textContent.title = this.wikiSearchSuggestions[0].label;
-      this.selectedWikiSuggestion = undefined;
+      this.selectedWikiSuggestion = "";
     },
     async fetchSearchResult() {
       if (this.creationData.textContent.title) {
