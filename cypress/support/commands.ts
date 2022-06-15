@@ -540,6 +540,35 @@ Cypress.Commands.add(
   },
 )
 
+Cypress.Commands.add("stubWikidataSearchResult", (search: string) => {
+  const mb = new Mountebank()
+  const imposter = new Imposter().withPort(5001).withStub(
+    new DefaultStub(
+      `/w/api.php?action=wbsearchentities&search=${search}&format=json&errorformat=plaintext&language=en&uselang=en&type=item&limit=10`,
+      HttpMethod.GET,
+      {
+        search: [
+          {
+            id: "Q678",
+            display: {
+              label: {
+                value: "rock music",
+              },
+              description: {
+                value:
+                  'genre of popular music that originated as"rock and roll"in 1950s United States',
+                language: "en",
+              },
+            },
+          },
+        ],
+      },
+      200,
+    ),
+  )
+  return mb.createImposter(imposter)
+})
+
 Cypress.Commands.add("expectFieldErrorMessage", (message: string) => {
   cy.findByText(message, { selector: ".error-msg" })
 })

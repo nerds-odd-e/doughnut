@@ -7,7 +7,8 @@ Feature: Select from Wikidata search results when creating child note
     Given I've logged in as an existing user
     And I have a note with title "TDD"
     And I am creating note under "TDD"
-  @ignore
+
+  @usingRealWikidataService @ignore
   Scenario: Select one of the Wikidata entries from the search result
     When I type "Rock" in the title
     And I search on Wikidata for "Rock"

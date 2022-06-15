@@ -84,3 +84,8 @@ Given(
     cy.seedNotes([{ title: noteTitle, wikidataId: wikidataId }])
   },
 )
+
+And("I search on Wikidata for {string}", (title: string) => {
+  cy.stubWikidataSearchResult(title)
+  cy.findByRole("button", { name: "Search on Wikidata" }).click()
+})
