@@ -8,12 +8,7 @@
       field="wikidataID"
       v-model="associationData.wikidataId"
       :errors="wikidataIdError"
-      :placeholder="[
-        [
-          'previously associated with ' + note.wikidataId ??
-            'example: `Q12345`',
-        ],
-      ]"
+      :placeholder="placeHolderText"
       v-focus
     />
 
@@ -58,6 +53,11 @@ export default defineComponent({
       conflictWikidataTitle: undefined as undefined | string,
       wikidataIdError: undefined as undefined | string,
     };
+  },
+  computed: {
+    placeHolderText() {
+      return this.note.wikidataId ? this.note.wikidataId : "example: `Q12345`";
+    },
   },
   methods: {
     async validateAndSave() {
