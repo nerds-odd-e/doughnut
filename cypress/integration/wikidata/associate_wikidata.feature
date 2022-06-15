@@ -45,7 +45,7 @@ Feature: associate wikidata ID to note
 
   @usingRealWikidataService
   Scenario: Updating existing note that has previously been associated with wikidata
-    Given I have an existing note "TDD" that is already associated with wikidata id "Q12345"
+    Given I have a note with title "TDD" associated with wikidata id "Q12345"
     When I associate the note "TDD" with a new wikidata id "Q6789"
     And I click the associate wikidata button on the note toolbar
     Then I should see that the placeholder containing the new wikidata id "Q6789"

@@ -58,14 +58,6 @@ Then("I should see the icon beside title linking to {string}", (associationUrl: 
   })
 })
 
-Given(
-  "I have an existing note {string} that is already associated with wikidata id {string}",
-  (title, wikiID) => {
-    cy.clickAssociateWikiDataButton(title, wikiID)
-    cy.findByRole("button", { name: "Confirm" }).click()
-  },
-)
-
 When("I associate the note {string} with a new wikidata id {string}", (title, wikiID) => {
   cy.clickAssociateWikiDataButton(title, wikiID)
   cy.findByRole("button", { name: "Confirm" }).click()
