@@ -53,9 +53,9 @@ Feature: associate wikidata ID to note
   @ignore
   Scenario: Show wikidata id already associated with note
     Given I have a note with title "TDD"
-    And I already associate the note "TDD" with wikidata id "Q12345"
+    And I have an existing note "TDD" that is already associated with wikidata id "Q12345"
     When I associate the note "TDD" with other wikidata id
-    Then I should see wikidata id in the text input  "Q12345"
+    Then I should see that the placeholder containing the new wikidata id "Q12345"
 
   @ignore
   Scenario: Updating existing note that has been associated with wikidata using the same wikidata id

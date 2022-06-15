@@ -8,7 +8,12 @@
       field="wikidataID"
       v-model="associationData.wikidataId"
       :errors="wikidataIdError"
-      placeholder="example: `Q1234`"
+      :placeholder="[
+        [
+          'previously associated with ' + note.wikidataId ??
+            'example: `Q12345`',
+        ],
+      ]"
       v-focus
     />
 
