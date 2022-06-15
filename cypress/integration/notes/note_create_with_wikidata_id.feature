@@ -5,11 +5,12 @@ Feature: Nested Note Create with wikidata
   Background:
     Given I've logged in as an existing user
     And there are some notes for the current user
-      | title          | testingParent  | description         |
+      | title   | testingParent  | description         |
       | Animals |                | An awesome training |
 
   @ignore
   Scenario: Create a new note with a wikidata id
     When I create note belonging to "Animals":
-      | Title | WikidataId |
-      | snake | Q1234      |
+      | Title | Description | wikidataID |
+      | snake | description | Q2102      |
+    Then I should see the icon beside title linking to "https://en.wikipedia.org/wiki/Snake"

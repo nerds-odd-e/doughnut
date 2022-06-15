@@ -11,6 +11,13 @@
       v-model="creationData.textContent"
       :errors="formErrors.textContent"
     />
+    <TextInput
+      scope-name="wikidataID"
+      field="wikidataID"
+      v-model="creationData.wikidataId"
+      :errors="formErrors.wikidataId"
+      placeholder="example: `Q1234`"
+    />
     <div class="row mt-2 mb-2">
       <div class="col-6 btn-group" role="group" aria-label="Action Group">
         <input type="submit" value="Submit" class="btn btn-primary" />
@@ -48,6 +55,7 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import TextInput from "../form/TextInput.vue";
 import NoteFormTitleOnly from "./NoteFormTitleOnly.vue";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 import SearchResults from "../search/SearchResults.vue";
@@ -61,6 +69,7 @@ export default defineComponent({
     NoteFormTitleOnly,
     SearchResults,
     LinkTypeSelectCompact,
+    TextInput,
   },
   props: { parentId: { type: Number, required: true } },
   emits: ["done"],
@@ -69,10 +78,12 @@ export default defineComponent({
       creationData: {
         linkTypeToParent: "no link",
         textContent: { title: "" },
+        wikidataId: "",
       } as Generated.NoteCreation,
       formErrors: {
         linkTypeToParent: undefined,
         textContent: {},
+        wikidataId: undefined,
       },
       wikiSearchSuggestions: [] as Generated.WikidataSearchEntity[],
       selectedWikiSuggestion: "",
