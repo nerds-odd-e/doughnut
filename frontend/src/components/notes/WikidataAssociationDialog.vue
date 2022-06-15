@@ -61,6 +61,11 @@ export default defineComponent({
   },
   methods: {
     async validateAndSave() {
+      if (this.note.wikidataId === this.associationData.wikidataId) {
+        this.wikidataIdError = `${this.note.title} is already associated with ${this.associationData.wikidataId}`;
+        return;
+      }
+
       try {
         const res = await this.api.wikidata.getWikiData(
           this.associationData.wikidataId
