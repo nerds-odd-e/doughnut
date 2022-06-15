@@ -54,7 +54,6 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
       @SuppressWarnings("unchecked")
       WikidataSearchEntity item = new WikidataSearchEntity((Map<String, Object>) obj);
       myArray.add(item);
-      System.out.println(item);
     }
     return myArray;
 
