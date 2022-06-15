@@ -78,6 +78,10 @@ And("I click the associate wikidata button on the note toolbar", () => {
 Then(
   "I should see that the placeholder containing the new wikidata id {string}",
   (placeholderText: string) => {
-    cy.findByRole("input", { name: "wikidataID" }).contains(placeholderText)
+    cy.get('input[name="wikidataID"]')
+      .invoke('attr', 'placeholder')
+      .then((text) => {
+        expect(text).to.equal(placeholderText);
+      })
   },
 )
