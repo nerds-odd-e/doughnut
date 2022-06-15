@@ -1,5 +1,5 @@
 <template>
-  <form @submit.prevent="processForm">
+  <form v-if="!selectedWikiSuggestion" @submit.prevent="processForm">
     <LinkTypeSelectCompact
       scope-name="note"
       field="linkTypeToParent"
@@ -41,6 +41,25 @@
       />
     </fieldset>
   </form>
+
+  <div class="row" v-else @submit.prevent.once="confirm">
+    <center>
+      Are you sure want to replace the title with the title from Wikidata?
+      <br />
+      <strong
+        >{{ creationData.textContent.title }} >
+        {{ wikiSearchSuggestions[0].label }}</strong
+      >
+    </center>
+    <input
+      type="cancel"
+      value="Cancel"
+      class="btn btn-secondary"
+      @click="selectedWikiSuggestion = undefined"
+    />
+
+    <input type="submit" value="Yes" class="btn btn-primary" @click="confirm" />
+  </div>
 </template>
 
 <script lang="ts">
@@ -78,7 +97,7 @@ export default defineComponent({
           description: "limbless, scaly, elongate reptile",
         },
       ],
-      selectedWikiSuggestion: "",
+      selectedWikiSuggestion: undefined as undefined | string,
     };
   },
   methods: {
@@ -89,6 +108,10 @@ export default defineComponent({
           this.$emit("done", res);
         })
         .catch((res) => (this.formErrors = res));
+    },
+    async confirm() {
+      this.creationData.textContent.title = this.wikiSearchSuggestions[0].label;
+      this.selectedWikiSuggestion = undefined;
     },
   },
 });
@@ -109,4 +132,9 @@ export default defineComponent({
     margin-bottom: 0.5rem
     float: none
     width: auto
+
+.row
+  text-align: center
+  margin-left: -20px
+  marin-right: -20px
 </style>
