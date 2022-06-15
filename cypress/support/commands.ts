@@ -81,9 +81,13 @@ Cypress.Commands.add("triggerException", () => {
 Cypress.Commands.add("submitNoteCreationFormWith", (noteAttributes) => {
   const linkTypeToParent = noteAttributes["Link Type To Parent"]
   delete noteAttributes["Link Type To Parent"]
-  const { Title, Description, ...remainingAttrs } = noteAttributes
+  const { Title, Description, ["Wikidata Id"]: wikidataId, ...remainingAttrs } = noteAttributes
 
-  cy.submitNoteFormWith({ Title, "Link Type To Parent": linkTypeToParent })
+  cy.submitNoteFormWith({
+    Title,
+    "Link Type To Parent": linkTypeToParent,
+    "Wikidata Id": wikidataId,
+  })
 
   if (!!Title) {
     cy.findByText(Title)
