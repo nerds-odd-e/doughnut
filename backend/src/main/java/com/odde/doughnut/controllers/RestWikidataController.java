@@ -6,6 +6,7 @@ import com.odde.doughnut.services.HttpClientAdapter;
 import com.odde.doughnut.services.WikidataService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
+import java.util.ArrayList;
 import javax.annotation.Resource;
 import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindException;
@@ -14,9 +15,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import java.util.ArrayList;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -45,8 +43,8 @@ public class RestWikidataController {
   }
 
   @GetMapping("/wikidatas/{search}")
-  public ArrayList<WikidataSearchEntity> fetchsWikiDataBySearch(@PathVariable("search") String search)
-      throws InterruptedException, BindException {
+  public ArrayList<WikidataSearchEntity> fetchsWikiDataBySearch(
+      @PathVariable("search") String search) throws InterruptedException, BindException {
     try {
       return getWikiDataService().fetchsWikiDataBySearch(search);
     } catch (IOException e) {

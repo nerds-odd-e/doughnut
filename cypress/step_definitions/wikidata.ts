@@ -79,9 +79,9 @@ Then(
   "I should see that the placeholder containing the new wikidata id {string}",
   (placeholderText: string) => {
     cy.get('input[name="wikidataID"]')
-      .invoke('attr', 'placeholder')
+      .invoke("attr", "placeholder")
       .then((text) => {
-        expect(text).to.equal(placeholderText);
+        expect(text).to.equal(placeholderText)
       })
   },
 )

@@ -19,7 +19,8 @@ public class WikidataSearchEntity {
     this.title = obj.get("title").toString();
     this.pageid = Integer.parseInt(obj.get("pageid").toString());
     @SuppressWarnings("unchecked")
-    WikidataDisplayEntity _display = new WikidataDisplayEntity((Map<String, Object>) obj.get("display"));
+    WikidataDisplayEntity _display =
+        new WikidataDisplayEntity((Map<String, Object>) obj.get("display"));
     this.display = _display;
     this.repository = obj.get("repository").toString();
     this.url = obj.get("url").toString();

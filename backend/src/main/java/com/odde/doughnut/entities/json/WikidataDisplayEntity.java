@@ -6,8 +6,7 @@ public class WikidataDisplayEntity {
   public WikidataLangEntity label;
   public WikidataLangEntity description;
 
-  public WikidataDisplayEntity(
-      Map<String, Object> obj) {
+  public WikidataDisplayEntity(Map<String, Object> obj) {
     this.label = new WikidataLangEntity((Map<String, Object>) obj.get("label"));
     this.description = new WikidataLangEntity((Map<String, Object>) obj.get("description"));
   }

@@ -5,7 +5,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.odde.doughnut.entities.json.WikidataEntity;
 import com.odde.doughnut.entities.json.WikidataSearchEntity;
-
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -39,13 +38,14 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
 
   public ArrayList<WikidataSearchEntity> fetchsWikiDataBySearch(String search)
       throws IOException, InterruptedException {
-    String url = wikidataBaseUrl + "/w/api.php?action=wbsearchentities&search=" +
-        search
-        +
-        "&format=json&errorformat=plaintext&language=en&uselang=en&type=item&limit=10";
+    String url =
+        wikidataBaseUrl
+            + "/w/api.php?action=wbsearchentities&search="
+            + search
+            + "&format=json&errorformat=plaintext&language=en&uselang=en&type=item&limit=10";
     String responseBody = httpClientAdapter.getResponseString(url);
-    HashMap<String, ?> entities = getObjectMapper().readValue(responseBody, new TypeReference<>() {
-    });
+    HashMap<String, ?> entities =
+        getObjectMapper().readValue(responseBody, new TypeReference<>() {});
     ArrayList<WikidataSearchEntity> myArray = new ArrayList<WikidataSearchEntity>();
     for (Object obj : (List<?>) entities.get("search")) {
       @SuppressWarnings("unchecked")
@@ -53,6 +53,5 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
       myArray.add(item);
     }
     return myArray;
-
   }
 }
