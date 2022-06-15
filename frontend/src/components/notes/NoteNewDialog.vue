@@ -1,5 +1,5 @@
 <template>
-  <form v-show="!selectedWikiSuggestion" @submit.prevent="processForm">
+  <form @submit.prevent="processForm">
     <LinkTypeSelectCompact
       scope-name="note"
       field="linkTypeToParent"
@@ -29,7 +29,11 @@
         </button>
       </div>
       <div class="col-6">
-        <select class="form-control" v-model="selectedWikiSuggestion">
+        <select
+          name="wikidataSearchResult"
+          class="form-control"
+          v-model="selectedWikiSuggestion"
+        >
           <option disabled value="">- Choose Wikidata Search Result -</option>
           <option
             v-for="suggestion in wikiSearchSuggestions"

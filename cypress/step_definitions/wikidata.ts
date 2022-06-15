@@ -89,3 +89,29 @@ And("I search on Wikidata for {string}", (title: string) => {
   cy.stubWikidataSearchResult(title)
   cy.findByRole("button", { name: "Search on Wikidata" }).click()
 })
+
+And(
+  "I select {string} with wikidataID {string} from the Wikidata search result",
+  (wikidataEntry: string, wikidataID: string) => {
+    cy.get('select[name="wikidataSearchResult"]').select(wikidataID)
+  },
+)
+
+Then("I should see that the title is automatically populated with {string}", (title: string) => {
+  cy.get('input[name="title"]')
+    .invoke("val")
+    .then((text) => {
+      expect(text).to.equal(title)
+    })
+})
+
+Then(
+  "I should see that the Wikidata ID is automatically populated with {string}",
+  (wikidataID: string) => {
+    cy.get('input[name="wikidataID"]')
+      .invoke("val")
+      .then((text) => {
+        expect(text).to.equal(wikidataID)
+      })
+  },
+)
