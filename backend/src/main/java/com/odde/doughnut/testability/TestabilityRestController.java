@@ -96,6 +96,7 @@ class TestabilityRestController {
     @Setter private String url;
     @Setter private String pictureUrl;
     @Setter private String pictureMask;
+    @Setter private String wikidataId;
 
     private Note buildNote(User user, Timestamp currentUTCTimestamp) {
       Note note = Note.createNote(user, currentUTCTimestamp, new TextContent());
@@ -111,6 +112,7 @@ class TestabilityRestController {
       content.setPictureMask(pictureMask);
       content.setPictureUrl(pictureUrl);
 
+      note.setWikidataId(wikidataId);
       note.setNoteAccessoriesUpdatedAt(currentUTCTimestamp);
       return note;
     }
