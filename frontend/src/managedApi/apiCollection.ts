@@ -209,7 +209,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
 
     async getWikiDatas(keyword: string) {
       return (await managedApi.restGet(
-        `wikidatas/${keyword}`
+        `wikidata/search/${keyword}`
       )) as Generated.WikidataSearchEntity[];
     },
   },

@@ -120,7 +120,7 @@ class RestWikiDataControllerTests {
     void serviceNotAvailableAtSearchWikidata() throws IOException, InterruptedException {
       Mockito.when(httpClientAdapter.getResponseString(any())).thenThrow(new IOException());
       BindException exception =
-          assertThrows(BindException.class, () -> controller.fetchsWikiDataBySearch("berlin"));
+          assertThrows(BindException.class, () -> controller.fetchsWikidataBySearch("berlin"));
       assertThat(exception.getErrorCount(), equalTo(1));
     }
 
@@ -128,7 +128,7 @@ class RestWikiDataControllerTests {
     void shouldFetchDataAtSearchWikidata() throws IOException, InterruptedException, BindException {
       Mockito.when(httpClientAdapter.getResponseString(any()))
           .thenReturn(getEntityDataJsonSearch("berlin"));
-      controller.fetchsWikiDataBySearch("berlin");
+      controller.fetchsWikidataBySearch("berlin");
       Mockito.verify(httpClientAdapter).getResponseString(any());
     }
 
@@ -137,8 +137,8 @@ class RestWikiDataControllerTests {
         throws IOException, InterruptedException, BindException {
       Mockito.when(httpClientAdapter.getResponseString(any()))
           .thenReturn(getEntityDataJsonSearch("berlin"));
-      ArrayList<WikidataSearchEntity> result = controller.fetchsWikiDataBySearch("berlin");
-      assertThat(result.get(0).id, equalTo("Q64"));
+      ArrayList<WikidataSearchEntity> result = controller.fetchsWikidataBySearch("berlin");
+      assertThat(result.get(0).label, equalTo("berlin"));
     }
 
     @Test
@@ -146,7 +146,7 @@ class RestWikiDataControllerTests {
         throws IOException, InterruptedException, BindException {
       Mockito.when(httpClientAdapter.getResponseString(any()))
           .thenReturn(getEntityDataJsonSearchEmpty("berlin"));
-      ArrayList<WikidataSearchEntity> result = controller.fetchsWikiDataBySearch("berlin");
+      ArrayList<WikidataSearchEntity> result = controller.fetchsWikidataBySearch("berlin");
       assertThat(result.size(), is(0));
     }
   }

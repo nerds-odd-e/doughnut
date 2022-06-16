@@ -148,38 +148,14 @@ declare namespace Generated {
         wikidataId: string;
     }
 
-    interface WikidataDisplayEntity {
-        label: WikidataLangEntity;
-        description: WikidataLangEntity;
-    }
-
     interface WikidataEntity {
         WikiDataTitleInEnglish: string;
         WikipediaEnglishUrl: string;
     }
 
-    interface WikidataLangEntity {
-        value: string;
-        language: string;
-    }
-
-    interface WikidataMatchEntity {
-        type: string;
-        language: string;
-        text: string;
-    }
-
     interface WikidataSearchEntity {
-        id: string;
-        title: string;
-        pageid: number;
-        display: WikidataDisplayEntity;
-        repository: string;
-        url: string;
-        concepturi: string;
         label: string;
         description: string;
-        match: WikidataMatchEntity;
     }
 
     interface User {
