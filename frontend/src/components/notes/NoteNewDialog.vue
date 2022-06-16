@@ -119,15 +119,6 @@ export default defineComponent({
         })
         .catch((res) => (this.formErrors = res));
     },
-    async confirm() {
-      const selectedSuggestion = this.wikiSearchSuggestions.find((obj) => {
-        return obj.id === this.selectedWikiSuggestion;
-      });
-      if (selectedSuggestion) {
-        this.creationData.textContent.title = selectedSuggestion?.label;
-      }
-      this.selectedWikiSuggestion = "";
-    },
     async onChange() {
       const selectedSuggestion = this.wikiSearchSuggestions.find((obj) => {
         return obj.id === this.selectedWikiSuggestion;
@@ -135,6 +126,10 @@ export default defineComponent({
       if (selectedSuggestion) {
         this.selectedWikiTitle = selectedSuggestion?.label;
       }
+    },
+    async confirm() {
+      this.creationData.textContent.title = this.selectedWikiTitle;
+      this.selectedWikiSuggestion = "";
     },
     async fetchSearchResult() {
       if (this.creationData.textContent.title) {
