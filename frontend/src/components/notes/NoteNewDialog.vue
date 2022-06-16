@@ -1,5 +1,5 @@
 <template>
-  <form v-if="!selectedWikiSuggestion" @submit.prevent="processForm">
+  <form v-show="!selectedWikiSuggestion" @submit.prevent="processForm">
     <LinkTypeSelectCompact
       scope-name="note"
       field="linkTypeToParent"
@@ -29,7 +29,12 @@
         </button>
       </div>
       <div class="col-6">
-        <select class="form-control" v-model="selectedWikiSuggestion">
+        <select
+          name="wikidataSearchResult"
+          @change="onChange"
+          class="form-control"
+          v-model="selectedWikiSuggestion"
+        >
           <option disabled value="">- Choose Wikidata Search Result -</option>
           <option
             v-for="suggestion in wikiSearchSuggestions"
@@ -50,6 +55,21 @@
         }"
       />
     </fieldset>
+  </form>
+  <form v-show="selectedWikiSuggestion" @submit.prevent.once="confirm">
+    Are you sure want to replace the title with the title from Wikidata?
+    <br />
+    <strong
+      >{{ creationData.textContent.title }} > {{ selectedWikiTitle }}</strong
+    >
+    <br />
+    <input
+      type="cancel"
+      value="Cancel"
+      class="btn btn-secondary"
+      @click="selectedWikiSuggestion = ''"
+    />
+    <input type="submit" value="Yes" class="btn btn-primary" @click="confirm" />
   </form>
 </template>
 
@@ -87,6 +107,7 @@ export default defineComponent({
       },
       wikiSearchSuggestions: [] as Generated.WikidataSearchEntity[],
       selectedWikiSuggestion: "",
+      selectedWikiTitle: "",
     };
   },
   methods: {
@@ -98,8 +119,16 @@ export default defineComponent({
         })
         .catch((res) => (this.formErrors = res));
     },
+    async onChange() {
+      const selectedSuggestion = this.wikiSearchSuggestions.find((obj) => {
+        return obj.id === this.selectedWikiSuggestion;
+      });
+      if (selectedSuggestion) {
+        this.selectedWikiTitle = selectedSuggestion?.label;
+      }
+    },
     async confirm() {
-      this.creationData.textContent.title = this.wikiSearchSuggestions[0].label;
+      this.creationData.textContent.title = this.selectedWikiTitle;
       this.selectedWikiSuggestion = "";
     },
     async fetchSearchResult() {
