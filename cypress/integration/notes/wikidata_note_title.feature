@@ -17,7 +17,7 @@ Feature: Note using wikidata title
             | Contain | Length |
             | sand    | 10     |
 
-    @ignore
+    @ignore @usingDummyWikidataService
     Scenario: Accept title from wikidata
         When I create note belonging to "Wikidata Notebook":
             | Title | searchWikidata |
