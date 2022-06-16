@@ -144,9 +144,13 @@ class RestWikiDataControllerTests {
     @Test
     void shouldReturnEmptyAtSearchWikidata()
         throws IOException, InterruptedException, BindException {
+
       Mockito.when(httpClientAdapter.getResponseString(any()))
           .thenReturn(getEntityDataJsonSearchEmpty("berlin"));
       ArrayList<WikidataSearchEntity> result = controller.fetchsWikidataBySearch("berlin");
+      Mockito.verify(httpClientAdapter)
+          .getResponseString(
+              "https://www.wikidata.org/w/api.php?action=wbsearchentities&search=berlin&format=json&errorformat=plaintext&language=en&uselang=en&type=item&limit=10");
       assertThat(result.size(), is(0));
     }
   }
