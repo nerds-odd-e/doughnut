@@ -154,6 +154,7 @@ declare namespace Generated {
     }
 
     interface WikidataSearchEntity {
+        id: string;
         label: string;
         description: string;
     }

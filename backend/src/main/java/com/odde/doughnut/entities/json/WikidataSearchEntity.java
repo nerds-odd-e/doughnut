@@ -3,15 +3,17 @@ package com.odde.doughnut.entities.json;
 import java.util.Map;
 
 public class WikidataSearchEntity {
+  public String id;
   public String label;
   public String description;
 
   public WikidataSearchEntity(Map<String, Object> object) {
-    this.label = correctionString(object.get("label")).toString();
-    this.description = correctionString(object.get("description")).toString();
+    this.id = correction(object.get("id")).toString();
+    this.label = correction(object.get("label")).toString();
+    this.description = correction(object.get("description")).toString();
   }
 
-  private Object correctionString(Object object) {
+  private Object correction(Object object) {
     return (object != null) ? object : "";
   }
 }
