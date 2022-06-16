@@ -10,6 +10,7 @@ import BazaarNoteBuilder from "./NotebooksBuilder";
 import NoteBuilder from "./NoteBuilder";
 import UserBuilder from "./UserBuilder";
 import WikidataEntityBuilder from "./WikidataEntityBuilder";
+import WikidataSearchEntityBuilder from "./WikidataSearchEntityBuilder";
 
 class MakeMe {
   static aUser() {
@@ -58,6 +59,10 @@ class MakeMe {
 
   static get aWikidataEntity(): WikidataEntityBuilder {
     return new WikidataEntityBuilder();
+  }
+
+  static get aWikidataSearchEntity(): WikidataSearchEntityBuilder {
+    return new WikidataSearchEntityBuilder();
   }
 }
 
