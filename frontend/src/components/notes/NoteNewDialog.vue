@@ -22,6 +22,7 @@
       <div class="col-6 btn-group" role="group" aria-label="Action Group">
         <input type="submit" value="Submit" class="btn btn-primary" />
         <button
+          id="search-wikidata"
           class="btn btn-outline-primary"
           @click.prevent="fetchSearchResult"
         >
