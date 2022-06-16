@@ -47,9 +47,9 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
     HashMap<String, ?> entities =
         getObjectMapper().readValue(responseBody, new TypeReference<>() {});
     ArrayList<WikidataSearchEntity> myArray = new ArrayList<WikidataSearchEntity>();
-    for (Object obj : (List<?>) entities.get("search")) {
+    for (Object object : (List<?>) entities.get("search")) {
       @SuppressWarnings("unchecked")
-      WikidataSearchEntity item = new WikidataSearchEntity((Map<String, Object>) obj);
+      WikidataSearchEntity item = new WikidataSearchEntity((Map<String, Object>) object);
       myArray.add(item);
     }
     return myArray;
