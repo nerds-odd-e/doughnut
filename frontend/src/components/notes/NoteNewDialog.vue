@@ -1,5 +1,5 @@
 <template>
-  <form @submit.prevent="processForm">
+  <form v-show="!selectedWikiSuggestion" @submit.prevent="processForm">
     <LinkTypeSelectCompact
       scope-name="note"
       field="linkTypeToParent"
@@ -31,6 +31,7 @@
       <div class="col-6">
         <select
           name="wikidataSearchResult"
+          @change="onChange"
           class="form-control"
           v-model="selectedWikiSuggestion"
         >
@@ -57,6 +58,10 @@
   </form>
   <form v-show="selectedWikiSuggestion" @submit.prevent.once="confirm">
     Are you sure want to replace the title with the title from Wikidata?
+    <br />
+    <strong
+      >{{ creationData.textContent.title }} > {{ selectedWikiTitle }}</strong
+    >
     <br />
     <input
       type="cancel"
@@ -102,6 +107,7 @@ export default defineComponent({
       },
       wikiSearchSuggestions: [] as Generated.WikidataSearchEntity[],
       selectedWikiSuggestion: "",
+      selectedWikiTitle: "",
     };
   },
   methods: {
@@ -121,6 +127,14 @@ export default defineComponent({
         this.creationData.textContent.title = selectedSuggestion?.label;
       }
       this.selectedWikiSuggestion = "";
+    },
+    async onChange() {
+      const selectedSuggestion = this.wikiSearchSuggestions.find((obj) => {
+        return obj.id === this.selectedWikiSuggestion;
+      });
+      if (selectedSuggestion) {
+        this.selectedWikiTitle = selectedSuggestion?.label;
+      }
     },
     async fetchSearchResult() {
       if (this.creationData.textContent.title) {
