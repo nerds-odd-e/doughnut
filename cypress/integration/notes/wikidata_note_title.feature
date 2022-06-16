@@ -1,6 +1,6 @@
 Feature: Note using wikidata title
-    As a learner, I want to maintain my newly acquired knowledge in
-    notes, so that I can review them in the future.
+    As a learner, I want to be able searching from wikidata resource,
+    so that I can create my note using title from wikidata.
 
     Background:
         Given I've logged in as an existing user
@@ -12,7 +12,7 @@ Feature: Note using wikidata title
     Scenario: Use title to search Wikidata when creating note
         When I create note belonging to "Wikidata Notebook":
             | Title | searchWikidata |
-            | Snake | True           |
+            | Sand  | True           |
         Then I should see search result from wikidata
             | Contain | Length |
-            | snake   | 10     |
+            | sand    | 10     |
