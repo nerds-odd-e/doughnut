@@ -90,6 +90,11 @@ And("I search on Wikidata for {string}", (title: string) => {
   cy.findByRole("button", { name: "Search on Wikidata" }).click()
 })
 
+
+Then("I should see {int} search result from wikidata", (length) => {
+  cy.assertWikidataSearchResult(length)
+})
+
 And(
   "I select {string} with wikidataID {string} from the Wikidata search result",
   (wikidataEntry: string, wikidataID: string) => {

@@ -40,6 +40,7 @@
             v-for="suggestion in wikiSearchSuggestions"
             :key="suggestion.id"
             :value="suggestion.id"
+            scope-name="searchItem"
           >
             {{ suggestion.label }} - {{ suggestion.description }}
           </option>

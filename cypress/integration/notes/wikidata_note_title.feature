@@ -4,9 +4,14 @@ Feature: Note using wikidata title
 
     Background:
         Given I've logged in as an existing user
-        And there are some notes for the current user
-            | title             | testingParent | description               |
-            | Wikidata Notebook |               | Notebook wikidata testing |
+        And I have a note with title "Wikidata Note"
+        And I am creating note under "Wikidata Note"
+
+    # @ignore
+    Scenario: Use title to search Wikidata when creating note
+        When I type "sand" in the title
+        And I search on Wikidata for "sand"
+        Then I should see 10 search result from wikidata
 
     @ignore
     Scenario: Use title to search Wikidata when creating note
