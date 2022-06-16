@@ -16,3 +16,12 @@ Feature: Note using wikidata title
         Then I should see search result from wikidata
             | Contain | Length |
             | sand    | 10     |
+
+    @ignore
+    Scenario: Accept title from wikidata
+        When I create note belonging to "Wikidata Notebook":
+            | Title | searchWikidata |
+            | Sand  | True           |
+        And I update the title using wikidata title "first" recommendation
+        Then I accept update title confirmation pop up
+        And I should see "Sand First" in note title
