@@ -63,7 +63,7 @@ When("I associate the note {string} with a new wikidata id {string}", (title, wi
   cy.findByRole("button", { name: "Confirm" }).click()
 })
 
-And("I click the associate wikidata button on the note toolbar", () => {
+And("When I revisit the associate wikidata dialog", () => {
   cy.clickNoteToolbarButton("associate wikidata")
 })
 
@@ -97,21 +97,17 @@ And(
   },
 )
 
+And("I confirm that I want to replace the current title with the title from Wikidata", () => {
+  cy.get('input[name="acceptSuggestion"]').click()
+})
+
 Then("I should see that the title is automatically populated with {string}", (title: string) => {
-  cy.get('input[name="title"]')
-    .invoke("val")
-    .then((text) => {
-      expect(text).to.equal(title)
-    })
+  cy.assertInputElementValue("title", title)
 })
 
 Then(
   "I should see that the Wikidata ID is automatically populated with {string}",
   (wikidataID: string) => {
-    cy.get('input[name="wikidataID"]')
-      .invoke("val")
-      .then((text) => {
-        expect(text).to.equal(wikidataID)
-      })
+    cy.assertInputElementValue("wikidataID", wikidataID)
   },
 )

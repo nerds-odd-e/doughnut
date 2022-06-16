@@ -572,3 +572,11 @@ Cypress.Commands.add("stubWikidataSearchResult", (search: string) => {
 Cypress.Commands.add("expectFieldErrorMessage", (message: string) => {
   cy.findByText(message, { selector: ".error-msg" })
 })
+
+Cypress.Commands.add("assertInputElementValue", (inputName: string, expectedValue: string) => {
+  cy.get(`input[name="${inputName}"]`)
+    .invoke("val")
+    .then((text) => {
+      expect(text).to.equal(expectedValue)
+    })
+})

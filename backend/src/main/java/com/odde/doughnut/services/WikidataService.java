@@ -36,7 +36,7 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
     public Map<String, WikiDataInfo> entities;
   }
 
-  public ArrayList<WikidataSearchEntity> fetchsWikiDataBySearch(String search)
+  public ArrayList<WikidataSearchEntity> fetchsWikidataBySearch(String search)
       throws IOException, InterruptedException {
     String url =
         wikidataBaseUrl

@@ -2,7 +2,7 @@
   <h3>
     Associate <strong>{{ note.title }}</strong> to Wikidata
   </h3>
-  <form v-if="!conflictWikidataTitle" @submit.prevent.once="validateAndSave">
+  <form v-if="!conflictWikidataTitle" @submit.prevent="validateAndSave">
     <TextInput
       scope-name="wikidataID"
       field="wikidataID"
