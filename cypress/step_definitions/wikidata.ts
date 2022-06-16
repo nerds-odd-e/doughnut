@@ -97,6 +97,10 @@ And(
   },
 )
 
+And("I confirm that I want to replace the current title with the title from Wikidata", () => {
+  cy.get('input[name="acceptSuggestion"]').click()
+})
+
 Then("I should see that the title is automatically populated with {string}", (title: string) => {
   cy.get('input[name="title"]')
     .invoke("val")

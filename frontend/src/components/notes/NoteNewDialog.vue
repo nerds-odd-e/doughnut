@@ -1,5 +1,5 @@
 <template>
-  <form v-show="!selectedWikiSuggestion" @submit.prevent="processForm">
+  <form v-show="!selectedOption" @submit.prevent="processForm">
     <LinkTypeSelectCompact
       scope-name="note"
       field="linkTypeToParent"
@@ -31,9 +31,9 @@
       <div class="col-6">
         <select
           name="wikidataSearchResult"
-          @change="onChange"
+          @change="onSelectSearchResult"
           class="form-control"
-          v-model="selectedWikiSuggestion"
+          v-model="selectedOption"
         >
           <option disabled value="">- Choose Wikidata Search Result -</option>
           <option
@@ -56,20 +56,27 @@
       />
     </fieldset>
   </form>
-  <form v-show="selectedWikiSuggestion" @submit.prevent.once="confirm">
+  <form v-show="selectedOption" @submit.prevent="acceptSuggestion">
     Are you sure want to replace the title with the title from Wikidata?
     <br />
     <strong
-      >{{ creationData.textContent.title }} > {{ selectedWikiTitle }}</strong
+      >{{ creationData.textContent.title }} >
+      {{ selectedWikidataEntry.label }}</strong
     >
     <br />
     <input
       type="cancel"
       value="Cancel"
       class="btn btn-secondary"
-      @click="selectedWikiSuggestion = ''"
+      @click="selectedOption = ''"
     />
-    <input type="submit" value="Yes" class="btn btn-primary" @click="confirm" />
+    <input
+      name="acceptSuggestion"
+      type="submit"
+      value="Yes"
+      class="btn btn-primary"
+      @click="acceptSuggestion"
+    />
   </form>
 </template>
 
@@ -106,8 +113,8 @@ export default defineComponent({
         wikidataId: undefined,
       },
       wikiSearchSuggestions: [] as Generated.WikidataSearchEntity[],
-      selectedWikiSuggestion: "",
-      selectedWikiTitle: "",
+      selectedOption: "",
+      selectedWikidataEntry: {} as Generated.WikidataSearchEntity,
     };
   },
   methods: {
@@ -119,17 +126,18 @@ export default defineComponent({
         })
         .catch((res) => (this.formErrors = res));
     },
-    async onChange() {
+    async onSelectSearchResult() {
       const selectedSuggestion = this.wikiSearchSuggestions.find((obj) => {
-        return obj.id === this.selectedWikiSuggestion;
+        return obj.id === this.selectedOption;
       });
       if (selectedSuggestion) {
-        this.selectedWikiTitle = selectedSuggestion?.label;
+        this.selectedWikidataEntry = selectedSuggestion;
       }
     },
-    async confirm() {
-      this.creationData.textContent.title = this.selectedWikiTitle;
-      this.selectedWikiSuggestion = "";
+    async acceptSuggestion() {
+      this.creationData.textContent.title = this.selectedWikidataEntry.label;
+      this.creationData.wikidataId = this.selectedWikidataEntry.id;
+      this.selectedOption = "";
     },
     async fetchSearchResult() {
       if (this.creationData.textContent.title) {
@@ -137,11 +145,11 @@ export default defineComponent({
           this.creationData.textContent.title
         );
         if (this.wikiSearchSuggestions.length === 0) {
-          this.selectedWikiSuggestion = "";
+          this.selectedOption = "";
         }
       } else {
         this.wikiSearchSuggestions = [];
-        this.selectedWikiSuggestion = "";
+        this.selectedOption = "";
       }
     },
   },
