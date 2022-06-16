@@ -89,6 +89,10 @@ Cypress.Commands.add("submitNoteCreationFormWith", (noteAttributes) => {
     "Wikidata Id": wikidataId,
   })
 
+  if (!!wikidataId) {
+    return
+  }
+
   if (!!Title) {
     cy.findByText(Title)
   }

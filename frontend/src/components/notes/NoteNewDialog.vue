@@ -15,7 +15,7 @@
       scope-name="wikidataID"
       field="wikidataID"
       v-model="creationData.wikidataId"
-      :errors="formErrors.wikidataId"
+      :errors="formErrors.wikiDataId"
       placeholder="example: `Q1234`"
     />
     <div class="row mt-2 mb-2">
@@ -112,7 +112,7 @@ export default defineComponent({
       formErrors: {
         linkTypeToParent: undefined,
         textContent: {},
-        wikidataId: undefined,
+        wikiDataId: undefined as undefined | string,
       },
       wikiSearchSuggestions: [] as Generated.WikidataSearchEntity[],
       selectedOption: "",
@@ -120,7 +120,17 @@ export default defineComponent({
     };
   },
   methods: {
-    processForm() {
+    async processForm() {
+      this.formErrors.wikiDataId = undefined;
+      if (this.creationData.wikidataId) {
+        await this.validateWikidataId(this.creationData.wikidataId);
+      }
+      if (!this.formErrors.wikiDataId) {
+        await this.save();
+      }
+      return;
+    },
+    save() {
       this.storedApi
         .createNote(this.parentId, this.creationData)
         .then((res) => {
@@ -153,6 +163,9 @@ export default defineComponent({
         this.wikiSearchSuggestions = [];
         this.selectedOption = "";
       }
+    },
+    async validateWikidataId(wikidataId) {
+      await this.api.wikidata.getWikiData(wikidataId);
     },
   },
 });

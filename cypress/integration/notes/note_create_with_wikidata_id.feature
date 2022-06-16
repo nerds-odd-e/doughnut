@@ -10,13 +10,12 @@ Feature: Nested Note Create with wikidata
 
   Scenario: Create a new note with a wikidata id
     When I create note belonging to "Animals":
-      | Title | Description | Wikidata Id |
-      | snake | description | Q2102       |
+      | Title |  Wikidata Id |
+      | snake |  Q2102       |
     Then I should see the icon beside title linking to "https://en.wikipedia.org/wiki/Snake"
 
-    @ignore
   Scenario: Create a new note with invalid wikidata id
     When I create note belonging to "Animals":
-      | Title | Description | Wikidata Id |
-      | snake | description | Q2102R      |
+      | Title | Wikidata Id |
+      | snake | Q12345R     |
     Then I should see a message "The wikidata service is not available"
