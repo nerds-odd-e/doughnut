@@ -1,5 +1,8 @@
 <template>
-  <form v-show="!selectedOption" @submit.prevent="processForm">
+  <form
+    v-if="!selectedOption && !conflictWikidataTitle"
+    @submit.prevent="processForm"
+  >
     <LinkTypeSelectCompact
       scope-name="note"
       field="linkTypeToParent"
@@ -58,7 +61,7 @@
       />
     </fieldset>
   </form>
-  <form v-show="selectedOption" @submit.prevent="acceptSuggestion">
+  <form v-if="selectedOption" @submit.prevent="acceptSuggestion">
     Are you sure want to replace the title with the title from Wikidata?
     <br />
     <strong
@@ -80,6 +83,23 @@
       class="btn btn-primary"
       @click="acceptSuggestion"
     />
+  </form>
+  <form v-if="conflictWikidataTitle" @submit.prevent.once="save">
+    <p>
+      Confirm to associate
+      <strong>{{ creationData.textContent.title }}</strong> with
+      <strong>{{ conflictWikidataTitle }}</strong
+      >?
+    </p>
+
+    <input
+      type="cancel"
+      value="Cancel"
+      class="btn btn-secondary"
+      @click="conflictWikidataTitle = undefined"
+    />
+
+    <input type="submit" value="Confirm" class="btn btn-primary" />
   </form>
 </template>
 
@@ -118,15 +138,18 @@ export default defineComponent({
       wikiSearchSuggestions: [] as Generated.WikidataSearchEntity[],
       selectedOption: "",
       selectedWikidataEntry: {} as Generated.WikidataSearchEntity,
+      conflictWikidataTitle: undefined as undefined | string,
     };
   },
   methods: {
     async processForm() {
       this.formErrors.wikiDataId = undefined;
+
       if (this.creationData.wikidataId) {
         await this.validateWikidataId(this.creationData.wikidataId);
       }
-      if (!this.formErrors.wikiDataId) {
+
+      if (!this.formErrors.wikiDataId && !this.conflictWikidataTitle) {
         await this.save();
       }
       return;
@@ -166,7 +189,13 @@ export default defineComponent({
       }
     },
     async validateWikidataId(wikidataId) {
-      await this.api.wikidata.getWikiData(wikidataId);
+      const response = await this.api.wikidata.getWikiData(wikidataId);
+
+      if (
+        response.WikiDataTitleInEnglish !== this.creationData.textContent.title
+      ) {
+        this.conflictWikidataTitle = response.WikiDataTitleInEnglish;
+      }
     },
   },
 });

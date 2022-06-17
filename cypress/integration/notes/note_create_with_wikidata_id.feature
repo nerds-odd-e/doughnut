@@ -20,7 +20,6 @@ Feature: Nested Note Create with wikidata
       | snake | Q12345R     |
     Then I should see a message "The wikidata service is not available"
 
-    @ignore
   Scenario: Create a new note with different wikidata title
     When I create note belonging to "Animals":
       | Title | Wikidata Id |
