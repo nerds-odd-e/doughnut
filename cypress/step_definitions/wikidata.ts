@@ -116,3 +116,17 @@ Then(
     cy.assertInputElementValue("wikidataID", wikidataID)
   },
 )
+
+And(
+  "I cancel using the note title from wikidata",
+  () => {
+    cy.get('input[name="declineSuggestion"]').click()
+  },
+)
+
+Then(
+  "I should see note title is {string}",
+  (title: string) => {
+    cy.get('input[id="note-title"]').should('have.value', title);
+  },
+)

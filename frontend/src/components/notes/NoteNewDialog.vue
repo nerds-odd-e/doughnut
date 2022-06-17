@@ -70,6 +70,7 @@
       type="cancel"
       value="Cancel"
       class="btn btn-secondary"
+      name="declineSuggestion"
       @click="selectedOption = ''"
     />
     <input
