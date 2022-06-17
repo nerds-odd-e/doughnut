@@ -14,6 +14,12 @@ Feature: Nested Note Create with wikidata
       | snake |  Q2102       |
     Then I should see the icon beside title linking to "https://en.wikipedia.org/wiki/Snake"
 
+  Scenario: Create a new note with invalid title
+    When I create note belonging to "Animals":
+      | Title | Wikidata Id |
+      |       | Q12345      |
+    Then I should see that the note creation is not successful
+
   Scenario: Create a new note with invalid wikidata id
     When I create note belonging to "Animals":
       | Title | Wikidata Id |

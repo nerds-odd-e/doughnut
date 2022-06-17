@@ -144,8 +144,9 @@ export default defineComponent({
   methods: {
     async processForm() {
       this.formErrors.wikiDataId = undefined;
+      this.formErrors.textContent = {};
 
-      if (this.creationData.wikidataId) {
+      if (this.creationData.textContent.title && this.creationData.wikidataId) {
         await this.validateWikidataId(this.creationData.wikidataId);
       }
 
