@@ -580,5 +580,6 @@ Cypress.Commands.add("assertInputElementValue", (inputName: string, expectedValu
 
 Cypress.Commands.add("assertWikidataSearchResult", (resultLength) => {
   cy.get('select[name="wikidataSearchResult"]')
-    .find('option[scope-name="searchItem"]').should('have.length', resultLength)
+    .find('option[scope-name="searchItem"]')
+    .should("have.length", resultLength)
 })

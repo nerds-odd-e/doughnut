@@ -90,7 +90,6 @@ And("I search on Wikidata for {string}", (title: string) => {
   cy.findByRole("button", { name: "Search on Wikidata" }).click()
 })
 
-
 Then("I should see {int} search result from wikidata", (length) => {
   cy.assertWikidataSearchResult(length)
 })
@@ -117,16 +116,10 @@ Then(
   },
 )
 
-And(
-  "I cancel using the note title from wikidata",
-  () => {
-    cy.get('input[name="declineSuggestion"]').click()
-  },
-)
+And("I cancel using the note title from wikidata", () => {
+  cy.get('input[name="declineSuggestion"]').click()
+})
 
-Then(
-  "I should see note title is {string}",
-  (title: string) => {
-    cy.get('input[id="note-title"]').should('have.value', title);
-  },
-)
+Then("I should see note title is {string}", (title: string) => {
+  cy.get('input[id="note-title"]').should("have.value", title)
+})
