@@ -43,10 +43,10 @@ public class RestWikidataController {
   }
 
   @GetMapping("/wikidata/search/{search}")
-  public ArrayList<WikidataSearchEntity> fetchsWikidataBySearch(
+  public ArrayList<WikidataSearchEntity> fetchWikidataBySearch(
       @PathVariable("search") String search) throws InterruptedException, BindException {
     try {
-      return getWikiDataService().fetchsWikidataBySearch(search);
+      return getWikiDataService().fetchWikidataBySearch(search);
     } catch (IOException e) {
       BindingResult bindingResult = new BeanPropertyBindingResult(search, "search");
       bindingResult.rejectValue(null, "error.error", "The wikidata service is not available");

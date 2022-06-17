@@ -7,7 +7,6 @@ import com.odde.doughnut.entities.json.WikidataEntity;
 import com.odde.doughnut.entities.json.WikidataSearchEntity;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -36,7 +35,7 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
     public Map<String, WikiDataInfo> entities;
   }
 
-  public ArrayList<WikidataSearchEntity> fetchsWikidataBySearch(String search)
+  public ArrayList<WikidataSearchEntity> fetchWikidataBySearch(String search)
       throws IOException, InterruptedException {
     String url =
         wikidataBaseUrl
@@ -44,14 +43,17 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
             + search
             + "&format=json&errorformat=plaintext&language=en&uselang=en&type=item&limit=10";
     String responseBody = httpClientAdapter.getResponseString(url);
-    HashMap<String, ?> entities =
+    WikidataSearchModel entities =
         getObjectMapper().readValue(responseBody, new TypeReference<>() {});
     ArrayList<WikidataSearchEntity> myArray = new ArrayList<WikidataSearchEntity>();
-    for (Object object : (List<?>) entities.get("search")) {
-      @SuppressWarnings("unchecked")
+    for (Map<String, Object> object : (List<Map<String, Object>>) entities.search) {
       WikidataSearchEntity item = new WikidataSearchEntity((Map<String, Object>) object);
       myArray.add(item);
     }
     return myArray;
+  }
+
+  public static class WikidataSearchModel {
+    public List<Map<String, Object>> search;
   }
 }
