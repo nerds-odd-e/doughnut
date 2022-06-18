@@ -37,9 +37,9 @@ Before({ tags: "@featureToggle" }, () => {
 })
 
 Before({ tags: "@usingDummyWikidataService" }, () => {
-  cy.setWikidataServiceUrl("http://localhost:5001").as("savedWikidataServiceUrl")
+  cy.wikidataService().mock()
 })
 
 After({ tags: "@usingDummyWikidataService" }, () => {
-  cy.get("@savedWikidataServiceUrl").then((saved) => cy.setWikidataServiceUrl(saved))
+  cy.wikidataService().restore()
 })

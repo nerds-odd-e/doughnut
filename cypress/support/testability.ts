@@ -1,5 +1,6 @@
 /// <reference types="cypress" />
 // @ts-check
+import WikidataServiceTester from "./WikidataServiceTester"
 
 Cypress.Commands.add("cleanDBAndSeedData", () => {
   cy.request({
@@ -82,6 +83,30 @@ Cypress.Commands.add("seedCircle", (circle) => {
     expect(response.body).to.equal("OK")
   })
 })
+
+Cypress.Commands.add("wikidataService", () => {
+  cy.wrap(new WikidataServiceTester())
+})
+
+Cypress.Commands.add(
+  "mock",
+  { prevSubject: true },
+  (wikidataServiceTester: WikidataServiceTester) => {
+    cy.setWikidataServiceUrl(`http://localhost:${wikidataServiceTester.port}`).as(
+      wikidataServiceTester.savedServiceUrlName,
+    )
+  },
+)
+
+Cypress.Commands.add(
+  "restore",
+  { prevSubject: true },
+  (wikidataServiceTester: WikidataServiceTester) => {
+    cy.get(`@${wikidataServiceTester.savedServiceUrlName}`).then((saved) =>
+      cy.setWikidataServiceUrl(saved),
+    )
+  },
+)
 
 Cypress.Commands.add("setWikidataServiceUrl", (wikidataServiceUrl: string) => {
   return cy
