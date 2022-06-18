@@ -85,14 +85,16 @@ Given(
   },
 )
 
+Given(
+  "Wikidata has search result for {string} with wikidata ID {string}",
+  (wikidataLabel: string, wikidataId: string) => {
+    cy.stubWikidataSearchResult(wikidataLabel, wikidataId)
+  },
+)
+
 And("I type {string} in the title and search on Wikidata", (title) => {
-  cy.stubWikidataSearchResult()
   cy.focused().clear().type(title)
   cy.findByRole("button", { name: "Search on Wikidata" }).click()
-})
-
-Then("I should see {int} search result from wikidata", (length) => {
-  cy.assertWikidataSearchResult(length)
 })
 
 And(
@@ -116,11 +118,3 @@ Then(
     cy.assertInputElementValue("wikidataID", wikidataID)
   },
 )
-
-And("I cancel using the note title from wikidata", () => {
-  cy.get('input[name="declineSuggestion"]').click()
-})
-
-Then("I should see note title is {string}", (title: string) => {
-  cy.get('input[id="note-title"]').should("have.value", title)
-})

@@ -544,7 +544,7 @@ Cypress.Commands.add(
   },
 )
 
-Cypress.Commands.add("stubWikidataSearchResult", () => {
+Cypress.Commands.add("stubWikidataSearchResult", (wikidataLabel: string, wikidataId: string) => {
   const mb = new Mountebank()
   const imposter = new Imposter().withPort(5001).withStub(
     new DefaultStub(
@@ -553,8 +553,8 @@ Cypress.Commands.add("stubWikidataSearchResult", () => {
       {
         search: [
           {
-            id: "Q11399",
-            label: "rock music",
+            id: wikidataId,
+            label: wikidataLabel,
             description:
               'genre of popular music that originated as"rock and roll"in 1950s United States',
           },
@@ -576,10 +576,4 @@ Cypress.Commands.add("assertInputElementValue", (inputName: string, expectedValu
     .then((text) => {
       expect(text).to.equal(expectedValue)
     })
-})
-
-Cypress.Commands.add("assertWikidataSearchResult", (resultLength) => {
-  cy.get('select[name="wikidataSearchResult"]')
-    .find('option[scope-name="searchItem"]')
-    .should("have.length", resultLength)
 })

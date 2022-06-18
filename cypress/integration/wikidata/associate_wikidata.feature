@@ -62,8 +62,9 @@ Feature: associate wikidata ID to note
 
   @usingDummyWikidataService
   Scenario: Select one of the Wikidata entries from the search result
-    Given I am creating note under "TDD"
-    When I type "Rock" in the title and search on Wikidata
+    Given Wikidata has search result for "rock music" with wikidata ID "Q11399"
+    When I am creating note under "TDD"
+    And I type "Rock" in the title and search on Wikidata
     And I select "rock music" with wikidataID "Q11399" from the Wikidata search result
     And I confirm that I want to replace the current title with the title from Wikidata
     Then I should see that the title is automatically populated with "rock music"
