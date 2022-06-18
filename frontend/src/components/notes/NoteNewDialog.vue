@@ -61,29 +61,6 @@
       />
     </fieldset>
   </form>
-  <form v-if="selectedOption" @submit.prevent="acceptSuggestion">
-    Are you sure want to replace the title with the title from Wikidata?
-    <br />
-    <strong
-      >{{ creationData.textContent.title }} >
-      {{ selectedWikidataEntry.label }}</strong
-    >
-    <br />
-    <input
-      type="cancel"
-      value="Cancel"
-      class="btn btn-secondary"
-      name="declineSuggestion"
-      @click="selectedOption = ''"
-    />
-    <input
-      name="acceptSuggestion"
-      type="submit"
-      value="Yes"
-      class="btn btn-primary"
-      @click="acceptSuggestion"
-    />
-  </form>
   <form v-if="conflictWikidataTitle" @submit.prevent.once="save">
     <p>
       Confirm to associate
@@ -137,7 +114,6 @@ export default defineComponent({
       },
       wikiSearchSuggestions: [] as Generated.WikidataSearchEntity[],
       selectedOption: "",
-      selectedWikidataEntry: {} as Generated.WikidataSearchEntity,
       conflictWikidataTitle: undefined as undefined | string,
     };
   },
@@ -167,13 +143,9 @@ export default defineComponent({
       const selectedSuggestion = this.wikiSearchSuggestions.find((obj) => {
         return obj.id === this.selectedOption;
       });
-      if (selectedSuggestion) {
-        this.selectedWikidataEntry = selectedSuggestion;
-      }
-    },
-    async acceptSuggestion() {
-      this.creationData.textContent.title = this.selectedWikidataEntry.label;
-      this.creationData.wikidataId = this.selectedWikidataEntry.id;
+      if (!selectedSuggestion) return;
+      this.creationData.textContent.title = selectedSuggestion.label;
+      this.creationData.wikidataId = selectedSuggestion.id;
       this.selectedOption = "";
     },
     async fetchSearchResult() {

@@ -66,6 +66,5 @@ Feature: associate wikidata ID to note
     When I am creating note under "TDD"
     And I type "Rock" in the title and search on Wikidata
     And I select "rock music" with wikidataID "Q11399" from the Wikidata search result
-    And I confirm that I want to replace the current title with the title from Wikidata
     Then I should see that the title is automatically populated with "rock music"
     Then I should see that the Wikidata ID is automatically populated with "Q11399"
