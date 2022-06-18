@@ -75,8 +75,9 @@ export default defineComponent({
           return;
         }
         this.save();
-      } catch (e) {
-        this.wikidataIdError = "The wikidata service is not available";
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      } catch (e: any) {
+        this.wikidataIdError = e.wikiDataId;
       }
     },
     async save() {
