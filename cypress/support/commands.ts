@@ -26,7 +26,7 @@
 
 import "@testing-library/cypress/add-commands"
 import "cypress-file-upload"
-import { HttpMethod, Imposter, Mountebank, DefaultStub } from "@anev/ts-mountebank"
+import WikidataServiceTester from "./WikidataServiceTester"
 
 Cypress.Commands.add("pageIsNotLoading", () => {
   cy.get(".loading-bar").should("not.exist")
@@ -517,54 +517,24 @@ Cypress.Commands.add("clickAssociateWikiDataButton", (title, wikiID) => {
 
 Cypress.Commands.add(
   "stubWikidataEntityQuery",
-  (wikidataId: string, wikidataTitle: string, wikipediaLink: string) => {
-    const wikipedia = wikipediaLink ? { enwiki: { site: "enwiki", url: wikipediaLink } } : {}
-    const mb = new Mountebank()
-    const imposter = new Imposter().withPort(5001).withStub(
-      new DefaultStub(
-        `/wiki/Special:EntityData/${wikidataId}.json`,
-        HttpMethod.GET,
-        {
-          entities: {
-            [wikidataId]: {
-              labels: {
-                en: {
-                  language: "en",
-                  value: wikidataTitle,
-                },
-              },
-              sitelinks: { ...wikipedia },
-            },
-          },
-        },
-        200,
-      ),
-    )
-    return mb.createImposter(imposter)
+  { prevSubject: true },
+  (
+    wikidataServiceTester: WikidataServiceTester,
+    wikidataId: string,
+    wikidataTitle: string,
+    wikipediaLink: string,
+  ) => {
+    wikidataServiceTester.stubWikidataEntityQuery(wikidataId, wikidataTitle, wikipediaLink)
   },
 )
 
-Cypress.Commands.add("stubWikidataSearchResult", (wikidataLabel: string, wikidataId: string) => {
-  const mb = new Mountebank()
-  const imposter = new Imposter().withPort(5001).withStub(
-    new DefaultStub(
-      `/w/api.php`,
-      HttpMethod.GET,
-      {
-        search: [
-          {
-            id: wikidataId,
-            label: wikidataLabel,
-            description:
-              'genre of popular music that originated as"rock and roll"in 1950s United States',
-          },
-        ],
-      },
-      200,
-    ),
-  )
-  return mb.createImposter(imposter)
-})
+Cypress.Commands.add(
+  "stubWikidataSearchResult",
+  { prevSubject: true },
+  (wikidataServiceTester: WikidataServiceTester, wikidataLabel: string, wikidataId: string) => {
+    wikidataServiceTester.stubWikidataSearchResult(wikidataLabel, wikidataId)
+  },
+)
 
 Cypress.Commands.add("expectFieldErrorMessage", (message: string) => {
   cy.findByText(message, { selector: ".error-msg" })

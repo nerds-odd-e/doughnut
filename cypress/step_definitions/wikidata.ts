@@ -20,14 +20,14 @@ When("I don't need to confirm the association with different title {string}", ()
 Given(
   "Wikidata.org has an entity {string} with {string} and {string}",
   (wikidataId: string, wikidataTitle: string, wikipediaLink: string) => {
-    cy.stubWikidataEntityQuery(wikidataId, wikidataTitle, wikipediaLink)
+    cy.wikidataService().stubWikidataEntityQuery(wikidataId, wikidataTitle, wikipediaLink)
   },
 )
 
 Given(
   "Wikidata.org has an entity {string} with {string}",
   (wikidataId: string, wikidataTitle: string) => {
-    cy.stubWikidataEntityQuery(wikidataId, wikidataTitle, undefined)
+    cy.wikidataService().stubWikidataEntityQuery(wikidataId, wikidataTitle, undefined)
   },
 )
 
@@ -77,7 +77,7 @@ Given(
 Given(
   "Wikidata has search result for {string} with wikidata ID {string}",
   (wikidataLabel: string, wikidataId: string) => {
-    cy.stubWikidataSearchResult(wikidataLabel, wikidataId)
+    cy.wikidataService().stubWikidataSearchResult(wikidataLabel, wikidataId)
   },
 )
 
