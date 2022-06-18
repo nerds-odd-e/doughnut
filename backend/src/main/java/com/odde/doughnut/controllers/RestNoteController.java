@@ -20,9 +20,7 @@ import javax.validation.Valid;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.BeanPropertyBindingResult;
 import org.springframework.validation.BindException;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -76,18 +74,7 @@ class RestNoteController {
         Note.createNote(
             user, testabilitySettings.getCurrentUTCTimestamp(), noteCreation.textContent);
     note.setParentNote(parentNote);
-    note.setWikidataId(noteCreation.getWikidataId());
-
-    if (noteCreation.getWikidataId() != null) {
-      try {
-        getWikiDataService().fetchWikiData(note.getWikidataId());
-      } catch (IOException e) {
-        BindingResult bindingResult =
-            new BeanPropertyBindingResult(note.getWikidataId(), "wikiDataId");
-        bindingResult.rejectValue(null, "error.error", "The wikidata service is not available");
-        throw new BindException(bindingResult);
-      }
-    }
+    getWikiDataService().assignWikidataIdToNote(note, noteCreation.getWikidataId());
 
     modelFactoryService.noteRepository.save(note);
     LinkType linkTypeToParent = noteCreation.getLinkTypeToParent();
