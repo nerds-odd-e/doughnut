@@ -8,27 +8,27 @@ Feature: Nested Note Create with wikidata
       | title   | testingParent  | description         |
       | Animals |                | An awesome training |
 
+  @usingDummyWikidataService
   Scenario: Create a new note with a wikidata id
+    Given Wikidata.org has an entity "Q2102" with "long animal"
     When I create note belonging to "Animals":
       | Title |  Wikidata Id |
       | snake |  Q2102       |
-    Then I should see the icon beside title linking to "https://en.wikipedia.org/wiki/Snake"
+    Then I should see the icon beside title linking to "https://www.wikidata.org/wiki/Q2102"
 
-  Scenario: Create a new note with invalid title
-    When I create note belonging to "Animals":
-      | Title | Wikidata Id |
-      |       | Q12345      |
-    Then I should see that the note creation is not successful
-
+  @usingDummyWikidataService
   Scenario: Create a new note with invalid wikidata id
+    Given The wikidata service is not available
     When I create note belonging to "Animals":
       | Title | Wikidata Id |
       | snake | Q12345R     |
     Then I should see a message "The wikidata service is not available"
 
-  Scenario: Create a new note with different wikidata title
-    When I create note belonging to "Animals":
-      | Title | Wikidata Id |
-      | snake | Q152        |
-    And I should see the icon beside title linking to "https://en.wikipedia.org/wiki/Fish"
-
+  @usingDummyWikidataService
+  Scenario: Select one of the Wikidata entries from the search result
+    Given Wikidata has search result for "rock music" with wikidata ID "Q11399"
+    When I am creating note under "Animals"
+    And I search with title "Rock" on Wikidata
+    And I select "rock music" with wikidataID "Q11399" from the Wikidata search result
+    Then I should see that the title is automatically populated with "rock music"
+    Then I should see that the Wikidata ID is automatically populated with "Q11399"

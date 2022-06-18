@@ -36,7 +36,7 @@ public class RestWikidataController {
     try {
       return getWikiDataService().fetchWikiData(wikiDataId);
     } catch (IOException e) {
-      BindingResult bindingResult = new BeanPropertyBindingResult(wikiDataId, "wikiDataId");
+      BindingResult bindingResult = new BeanPropertyBindingResult(wikiDataId, "wikidataId");
       bindingResult.rejectValue(null, "error.error", "The wikidata service is not available");
       throw new BindException(bindingResult);
     }

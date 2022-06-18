@@ -92,7 +92,7 @@ Given(
   },
 )
 
-And("I type {string} in the title and search on Wikidata", (title) => {
+And("I search with title {string} on Wikidata", (title: string) => {
   cy.focused().clear().type(title)
   cy.findByRole("button", { name: "Search on Wikidata" }).click()
 })

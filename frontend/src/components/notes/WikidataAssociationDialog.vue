@@ -77,7 +77,7 @@ export default defineComponent({
         this.save();
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } catch (e: any) {
-        this.wikidataIdError = e.wikiDataId;
+        this.wikidataIdError = e.wikidataId;
       }
     },
     async save() {
