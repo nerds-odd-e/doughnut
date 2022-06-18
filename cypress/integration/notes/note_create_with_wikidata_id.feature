@@ -20,6 +20,7 @@ Feature: Nested Note Create with wikidata
       |       | Q12345      |
     Then I should see that the note creation is not successful
 
+  @ignore
   Scenario: Create a new note with invalid wikidata id
     When I create note belonging to "Animals":
       | Title | Wikidata Id |
@@ -30,6 +31,5 @@ Feature: Nested Note Create with wikidata
     When I create note belonging to "Animals":
       | Title | Wikidata Id |
       | snake | Q152        |
-    Then I need to confirm the association with different title "fish"
     And I should see the icon beside title linking to "https://en.wikipedia.org/wiki/Fish"
 

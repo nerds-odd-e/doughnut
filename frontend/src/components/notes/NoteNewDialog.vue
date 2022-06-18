@@ -1,8 +1,5 @@
 <template>
-  <form
-    v-if="!selectedOption && !conflictWikidataTitle"
-    @submit.prevent="processForm"
-  >
+  <form @submit.prevent="processForm">
     <LinkTypeSelectCompact
       scope-name="note"
       field="linkTypeToParent"
@@ -61,23 +58,6 @@
       />
     </fieldset>
   </form>
-  <form v-if="conflictWikidataTitle" @submit.prevent.once="save">
-    <p>
-      Confirm to associate
-      <strong>{{ creationData.textContent.title }}</strong> with
-      <strong>{{ conflictWikidataTitle }}</strong
-      >?
-    </p>
-
-    <input
-      type="cancel"
-      value="Cancel"
-      class="btn btn-secondary"
-      @click="conflictWikidataTitle = undefined"
-    />
-
-    <input type="submit" value="Confirm" class="btn btn-primary" />
-  </form>
 </template>
 
 <script lang="ts">
@@ -114,24 +94,12 @@ export default defineComponent({
       },
       wikiSearchSuggestions: [] as Generated.WikidataSearchEntity[],
       selectedOption: "",
-      conflictWikidataTitle: undefined as undefined | string,
     };
   },
   methods: {
-    async processForm() {
+    processForm() {
       this.formErrors.wikiDataId = undefined;
       this.formErrors.textContent = {};
-
-      if (this.creationData.textContent.title && this.creationData.wikidataId) {
-        await this.validateWikidataId(this.creationData.wikidataId);
-      }
-
-      if (!this.formErrors.wikiDataId && !this.conflictWikidataTitle) {
-        await this.save();
-      }
-      return;
-    },
-    save() {
       this.storedApi
         .createNote(this.parentId, this.creationData)
         .then((res) => {
@@ -159,15 +127,6 @@ export default defineComponent({
       } else {
         this.wikiSearchSuggestions = [];
         this.selectedOption = "";
-      }
-    },
-    async validateWikidataId(wikidataId) {
-      const response = await this.api.wikidata.getWikiData(wikidataId);
-
-      if (
-        response.WikiDataTitleInEnglish !== this.creationData.textContent.title
-      ) {
-        this.conflictWikidataTitle = response.WikiDataTitleInEnglish;
       }
     },
   },
