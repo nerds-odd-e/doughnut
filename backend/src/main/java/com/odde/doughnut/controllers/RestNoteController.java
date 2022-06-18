@@ -9,6 +9,8 @@ import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.SearchTermModel;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.HttpClientAdapter;
+import com.odde.doughnut.services.WikidataService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.sql.Timestamp;
@@ -18,6 +20,9 @@ import javax.validation.Valid;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.BindException;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -26,15 +31,19 @@ class RestNoteController {
   private final ModelFactoryService modelFactoryService;
   private final CurrentUserFetcher currentUserFetcher;
 
+  private HttpClientAdapter httpClientAdapter;
+
   @Resource(name = "testabilitySettings")
   private final TestabilitySettings testabilitySettings;
 
   public RestNoteController(
       ModelFactoryService modelFactoryService,
       CurrentUserFetcher currentUserFetcher,
+      HttpClientAdapter httpClientAdapter,
       TestabilitySettings testabilitySettings) {
     this.modelFactoryService = modelFactoryService;
     this.currentUserFetcher = currentUserFetcher;
+    this.httpClientAdapter = httpClientAdapter;
     this.testabilitySettings = testabilitySettings;
   }
 
@@ -59,7 +68,7 @@ class RestNoteController {
   public NoteRealmWithPosition createNote(
       @PathVariable(name = "parentNote") Note parentNote,
       @Valid @ModelAttribute NoteCreation noteCreation)
-      throws NoAccessRightException {
+      throws NoAccessRightException, BindException, InterruptedException {
     final UserModel userModel = currentUserFetcher.getUser();
     userModel.getAuthorization().assertAuthorization(parentNote);
     User user = userModel.getEntity();
@@ -68,6 +77,18 @@ class RestNoteController {
             user, testabilitySettings.getCurrentUTCTimestamp(), noteCreation.textContent);
     note.setParentNote(parentNote);
     note.setWikidataId(noteCreation.getWikidataId());
+
+    if (noteCreation.getWikidataId() != null) {
+      try {
+        getWikiDataService().fetchWikiData(note.getWikidataId());
+      } catch (IOException e) {
+        BindingResult bindingResult =
+            new BeanPropertyBindingResult(note.getWikidataId(), "wikiDataId");
+        bindingResult.rejectValue(null, "error.error", "The wikidata service is not available");
+        throw new BindException(bindingResult);
+      }
+    }
+
     modelFactoryService.noteRepository.save(note);
     LinkType linkTypeToParent = noteCreation.getLinkTypeToParent();
     if (linkTypeToParent != LinkType.NO_LINK) {
@@ -179,5 +200,9 @@ class RestNoteController {
     note.mergeMasterReviewSetting(reviewSetting);
     modelFactoryService.noteRepository.save(note);
     return new RedirectToNoteResponse(note.getId());
+  }
+
+  private WikidataService getWikiDataService() {
+    return new WikidataService(httpClientAdapter, testabilitySettings.getWikidataServiceUrl());
   }
 }

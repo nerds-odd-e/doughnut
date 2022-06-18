@@ -8,6 +8,7 @@ import static org.mockito.ArgumentMatchers.any;
 import com.odde.doughnut.entities.json.WikidataEntity;
 import com.odde.doughnut.entities.json.WikidataSearchEntity;
 import com.odde.doughnut.services.HttpClientAdapter;
+import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -21,7 +22,6 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.validation.BindException;
 
 class RestWikiDataControllerTests {
-
   RestWikidataController controller;
   @Mock HttpClientAdapter httpClientAdapter;
 
@@ -35,16 +35,6 @@ class RestWikiDataControllerTests {
 
   @Nested
   class FetchWikiData {
-
-    private String getEntityDataJsonString(String entityId, String entityTitle, String enwikiJson) {
-      return "{\"entities\":{\""
-          + entityId
-          + "\":{\"labels\":{\"en\":{\"language\":\"en\",\"value\":\""
-          + entityTitle
-          + "\"}},\"sitelinks\":{"
-          + enwikiJson
-          + "}}}}";
-    }
 
     private String getEntityDataJsonSearch(String search) {
       return "{\"searchinfo\":{\"search\":\""
@@ -79,7 +69,8 @@ class RestWikiDataControllerTests {
     @Test
     void shouldFetchInfoViaWikidataApi() throws IOException, InterruptedException, BindException {
       Mockito.when(httpClientAdapter.getResponseString(any()))
-          .thenReturn(getEntityDataJsonString("Q1", "Mohawk", ""));
+          .thenReturn(
+              new MakeMe().wikidataEntityJson().entityId("Q1").entitleTitle("Mohawk").please());
       controller.fetchWikiDataByID("Q1");
       Mockito.verify(httpClientAdapter)
           .getResponseString("https://www.wikidata.org/wiki/Special:EntityData/Q1.json");
@@ -88,7 +79,8 @@ class RestWikiDataControllerTests {
     @Test
     void shouldParseAndGetTheInfo() throws IOException, InterruptedException, BindException {
       Mockito.when(httpClientAdapter.getResponseString(any()))
-          .thenReturn(getEntityDataJsonString("Q1", "Mohawk", ""));
+          .thenReturn(
+              new MakeMe().wikidataEntityJson().entityId("Q1").entitleTitle("Mohawk").please());
       WikidataEntity result = controller.fetchWikiDataByID("Q1");
       assertThat(result.WikiDataTitleInEnglish, equalTo("Mohawk"));
     }
@@ -98,10 +90,12 @@ class RestWikiDataControllerTests {
         throws IOException, InterruptedException, BindException {
       Mockito.when(httpClientAdapter.getResponseString(any()))
           .thenReturn(
-              getEntityDataJsonString(
-                  "Q13339",
-                  "Mohawk",
-                  "\"enwiki\":{\"site\":\"enwiki\",\"title\":\"Mohawk language\",\"badges\":[],\"url\":\"https://en.wikipedia.org/wiki/Mohawk_language\"}"));
+              new MakeMe()
+                  .wikidataEntityJson()
+                  .entityId("Q13339")
+                  .entitleTitle("Mohawk")
+                  .enwiki("https://en.wikipedia.org/wiki/Mohawk_language")
+                  .please());
       WikidataEntity result = controller.fetchWikiDataByID("Q13339");
       assertThat(
           result.WikipediaEnglishUrl, equalTo("https://en.wikipedia.org/wiki/Mohawk_language"));
@@ -111,7 +105,7 @@ class RestWikiDataControllerTests {
     void shouldReturnEmptyIfEnglishWikipediaLinkNotExist()
         throws IOException, InterruptedException, BindException {
       Mockito.when(httpClientAdapter.getResponseString(any()))
-          .thenReturn(getEntityDataJsonString("Q13339", "Blah", ""));
+          .thenReturn(new MakeMe().wikidataEntityJson().entityId("Q13339").please());
       WikidataEntity result = controller.fetchWikiDataByID("Q13339");
       assertThat(StringUtils.isBlank(result.WikipediaEnglishUrl), is(true));
     }

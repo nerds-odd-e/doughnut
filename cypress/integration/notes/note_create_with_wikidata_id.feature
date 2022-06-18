@@ -20,7 +20,6 @@ Feature: Nested Note Create with wikidata
       |       | Q12345      |
     Then I should see that the note creation is not successful
 
-  @ignore
   Scenario: Create a new note with invalid wikidata id
     When I create note belonging to "Animals":
       | Title | Wikidata Id |

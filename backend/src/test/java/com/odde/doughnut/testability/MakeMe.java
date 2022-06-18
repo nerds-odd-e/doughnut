@@ -130,4 +130,8 @@ public class MakeMe {
       QuizQuestion.QuestionType questionType, ReviewPoint reviewPoint) {
     return aQuestion().buildValid(questionType, reviewPoint).ViewedByUserPlease();
   }
+
+  public WikidataEntityJsonBuilder wikidataEntityJson() {
+    return new WikidataEntityJsonBuilder();
+  }
 }

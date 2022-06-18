@@ -4,6 +4,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 
 import com.odde.doughnut.entities.Link.LinkType;
 import com.odde.doughnut.entities.Note;
@@ -14,6 +15,7 @@ import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
+import com.odde.doughnut.services.HttpClientAdapter;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
@@ -22,10 +24,13 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.BindException;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations = {"classpath:repository.xml"})
@@ -34,6 +39,7 @@ class RestNoteControllerTests {
   @Autowired ModelFactoryService modelFactoryService;
 
   @Autowired MakeMe makeMe;
+  @Mock HttpClientAdapter httpClientAdapter;
   private UserModel userModel;
   RestNoteController controller;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
@@ -43,7 +49,10 @@ class RestNoteControllerTests {
     userModel = makeMe.aUser().toModelPlease();
     controller =
         new RestNoteController(
-            modelFactoryService, new TestCurrentUserFetcher(userModel), testabilitySettings);
+            modelFactoryService,
+            new TestCurrentUserFetcher(userModel),
+            httpClientAdapter,
+            testabilitySettings);
   }
 
   @Nested
@@ -126,13 +135,15 @@ class RestNoteControllerTests {
     }
 
     @Test
-    void shouldBeAbleToSaveNoteWhenValid() throws NoAccessRightException {
+    void shouldBeAbleToSaveNoteWhenValid()
+        throws NoAccessRightException, BindException, InterruptedException {
       NoteRealmWithPosition response = controller.createNote(parent, noteCreation);
       assertThat(response.noteRealm.getId(), not(nullValue()));
     }
 
     @Test
-    void shouldBeAbleToCreateAThing() throws NoAccessRightException {
+    void shouldBeAbleToCreateAThing()
+        throws NoAccessRightException, BindException, InterruptedException {
       long beforeThingCount = makeMe.modelFactoryService.thingRepository.count();
       controller.createNote(parent, noteCreation);
       long afterThingCount = makeMe.modelFactoryService.thingRepository.count();
@@ -140,7 +151,10 @@ class RestNoteControllerTests {
     }
 
     @Test
-    void shouldBeAbleToSaveNoteWithWikidataIdWhenValid() throws NoAccessRightException {
+    void shouldBeAbleToSaveNoteWithWikidataIdWhenValid()
+        throws NoAccessRightException, BindException, InterruptedException, IOException {
+      Mockito.when(httpClientAdapter.getResponseString(any()))
+          .thenReturn(new MakeMe().wikidataEntityJson().entityId("Q12345").please());
       String wikidataId = "Q12345";
       noteCreation.setWikidataId(wikidataId);
 
@@ -150,7 +164,8 @@ class RestNoteControllerTests {
     }
 
     @Test
-    void shouldBeAbleToSaveNoteWithoutWikidataIdWhenValid() throws NoAccessRightException {
+    void shouldBeAbleToSaveNoteWithoutWikidataIdWhenValid()
+        throws NoAccessRightException, BindException, InterruptedException {
       NoteRealmWithPosition response = controller.createNote(parent, noteCreation);
 
       assertThat(response.noteRealm.getNote().getWikidataId(), equalTo(null));
