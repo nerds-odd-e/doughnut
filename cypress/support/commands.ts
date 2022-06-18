@@ -544,7 +544,7 @@ Cypress.Commands.add(
   },
 )
 
-Cypress.Commands.add("stubWikidataSearchResult", (search: string) => {
+Cypress.Commands.add("stubWikidataSearchResult", () => {
   const mb = new Mountebank()
   const imposter = new Imposter().withPort(5001).withStub(
     new DefaultStub(

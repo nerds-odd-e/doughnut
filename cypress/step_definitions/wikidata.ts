@@ -85,8 +85,9 @@ Given(
   },
 )
 
-And("I search on Wikidata for {string}", (title: string) => {
-  cy.stubWikidataSearchResult(title)
+And("I type {string} in the title and search on Wikidata", (title) => {
+  cy.stubWikidataSearchResult()
+  cy.focused().clear().type(title)
   cy.findByRole("button", { name: "Search on Wikidata" }).click()
 })
 

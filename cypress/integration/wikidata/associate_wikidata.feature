@@ -60,3 +60,11 @@ Feature: associate wikidata ID to note
     When I associate the note "TDD" with wikidata id "Q12345"
     Then I should see a message "TDD is already associated with Q12345"
 
+  @usingDummyWikidataService
+  Scenario: Select one of the Wikidata entries from the search result
+    Given I am creating note under "TDD"
+    When I type "Rock" in the title and search on Wikidata
+    And I select "rock music" with wikidataID "Q11399" from the Wikidata search result
+    And I confirm that I want to replace the current title with the title from Wikidata
+    Then I should see that the title is automatically populated with "rock music"
+    Then I should see that the Wikidata ID is automatically populated with "Q11399"
