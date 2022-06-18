@@ -22,11 +22,3 @@ Feature: Notebook creation
       | Title |
       |       |
     Then I should see that the note creation is not successful
-
-  @ignore
-  Scenario: Create a new notebook with a wikidataId
-    When I create a notebook with:
-      | title      | wikidata id |
-      | Meditation | Q20537230   |
-    Then I should see that the note creation is successful
-
