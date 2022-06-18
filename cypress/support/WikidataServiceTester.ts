@@ -15,50 +15,32 @@ class WikidataServiceTester {
   }
   stubWikidataEntityQuery(wikidataId: string, wikidataTitle: string, wikipediaLink: string) {
     const wikipedia = wikipediaLink ? { enwiki: { site: "enwiki", url: wikipediaLink } } : {}
-    const mb = new Mountebank()
-    const imposter = new Imposter().withPort(5001).withStub(
-      new DefaultStub(
-        `/wiki/Special:EntityData/${wikidataId}.json`,
-        HttpMethod.GET,
-        {
-          entities: {
-            [wikidataId]: {
-              labels: {
-                en: {
-                  language: "en",
-                  value: wikidataTitle,
-                },
-              },
-              sitelinks: { ...wikipedia },
+    this.stub(`/wiki/Special:EntityData/${wikidataId}.json`, {
+      entities: {
+        [wikidataId]: {
+          labels: {
+            en: {
+              language: "en",
+              value: wikidataTitle,
             },
           },
+          sitelinks: { ...wikipedia },
         },
-        200,
-      ),
-    )
-    return mb.createImposter(imposter)
+      },
+    })
   }
 
   stubWikidataSearchResult(wikidataLabel: string, wikidataId: string) {
-    const mb = new Mountebank()
-    const imposter = new Imposter().withPort(5001).withStub(
-      new DefaultStub(
-        `/w/api.php`,
-        HttpMethod.GET,
+    this.stub(`/w/api.php`, {
+      search: [
         {
-          search: [
-            {
-              id: wikidataId,
-              label: wikidataLabel,
-              description:
-                'genre of popular music that originated as"rock and roll"in 1950s United States',
-            },
-          ],
+          id: wikidataId,
+          label: wikidataLabel,
+          description:
+            'genre of popular music that originated as"rock and roll"in 1950s United States',
         },
-        200,
-      ),
-    )
-    return mb.createImposter(imposter)
+      ],
+    })
   }
 
   get savedServiceUrlName() {
@@ -78,6 +60,13 @@ class WikidataServiceTester {
         expect(response.body).to.include("http")
         cy.wrap(response.body)
       })
+  }
+  private stub(url: string, data: unknown) {
+    const mb = new Mountebank()
+    const imposter = new Imposter()
+      .withPort(this.port)
+      .withStub(new DefaultStub(url, HttpMethod.GET, data, 200))
+    return mb.createImposter(imposter)
   }
 }
 
