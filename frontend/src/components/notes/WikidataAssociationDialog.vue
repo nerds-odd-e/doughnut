@@ -8,7 +8,7 @@
       field="wikidataID"
       v-model="associationData.wikidataId"
       :errors="wikidataIdError"
-      :placeholder="placeHolderText"
+      placeholder="example: `Q12345`"
       v-focus
     />
 
@@ -48,24 +48,14 @@ export default defineComponent({
   data() {
     return {
       associationData: {
-        wikidataId: "",
+        wikidataId: this.note.wikidataId,
       } as Generated.WikidataAssociationCreation,
       conflictWikidataTitle: undefined as undefined | string,
       wikidataIdError: undefined as undefined | string,
     };
   },
-  computed: {
-    placeHolderText() {
-      return this.note.wikidataId ? this.note.wikidataId : "example: `Q12345`";
-    },
-  },
   methods: {
     async validateAndSave() {
-      if (this.note.wikidataId === this.associationData.wikidataId) {
-        this.wikidataIdError = `${this.note.title} is already associated with ${this.associationData.wikidataId}`;
-        return;
-      }
-
       try {
         const res = await this.api.wikidata.getWikiData(
           this.associationData.wikidataId

@@ -38,24 +38,7 @@ Feature: associate wikidata ID to note
       | Q2 | https://en.wikipedia.org/TDD | https://en.wikipedia.org/TDD     |
 
   @usingRealWikidataService
-  Scenario: Associate note to wikipedia via wikidata
+  Scenario: Associate note to wikipedia via wikidata using real service
     When I associate the note "TDD" with wikidata id "Q12345"
     Then I need to confirm the association with different title "Count von Count"
     And I should see the icon beside title linking to "https://en.wikipedia.org/wiki/Count_von_Count"
-
-  @usingRealWikidataService
-  Scenario: Updating existing note that has previously been associated with wikidata
-    Given I have a note with title "TDD" associated with wikidata id "Q12345"
-    When I associate the note "TDD" with a new wikidata id "Q6789"
-    And When I revisit the associate wikidata dialog
-    Then I should see that the placeholder containing the new wikidata id "Q6789"
-
-  Scenario: Show wikidata id already associated with note
-    Given I have a note with title "TDD" associated with wikidata id "Q12345"
-    When I associate the note "TDD" with wikidata id "Q12345"
-    Then I should see that the placeholder containing the new wikidata id "Q12345"
-
-  Scenario: Updating existing note that has been associated with wikidata using the same wikidata id
-    Given I have a note with title "TDD" associated with wikidata id "Q12345"
-    When I associate the note "TDD" with wikidata id "Q12345"
-    Then I should see a message "TDD is already associated with Q12345"

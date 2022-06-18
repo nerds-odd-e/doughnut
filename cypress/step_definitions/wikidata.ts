@@ -67,17 +67,6 @@ And("When I revisit the associate wikidata dialog", () => {
   cy.clickNoteToolbarButton("associate wikidata")
 })
 
-Then(
-  "I should see that the placeholder containing the new wikidata id {string}",
-  (placeholderText: string) => {
-    cy.get('input[name="wikidataID"]')
-      .invoke("attr", "placeholder")
-      .then((text) => {
-        expect(text).to.equal(placeholderText)
-      })
-  },
-)
-
 Given(
   "I have a note with title {string} associated with wikidata id {string}",
   (noteTitle: string, wikidataId: string) => {
