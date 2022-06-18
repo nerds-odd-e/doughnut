@@ -92,9 +92,7 @@ Cypress.Commands.add(
   "mock",
   { prevSubject: true },
   (wikidataServiceTester: WikidataServiceTester) => {
-    cy.setWikidataServiceUrl(`http://localhost:${wikidataServiceTester.port}`).as(
-      wikidataServiceTester.savedServiceUrlName,
-    )
+    wikidataServiceTester.mock(cy)
   },
 )
 
@@ -102,21 +100,6 @@ Cypress.Commands.add(
   "restore",
   { prevSubject: true },
   (wikidataServiceTester: WikidataServiceTester) => {
-    cy.get(`@${wikidataServiceTester.savedServiceUrlName}`).then((saved) =>
-      cy.setWikidataServiceUrl(saved),
-    )
+    wikidataServiceTester.restore(cy)
   },
 )
-
-Cypress.Commands.add("setWikidataServiceUrl", (wikidataServiceUrl: string) => {
-  return cy
-    .request({
-      method: "POST",
-      url: `/api/testability/use_wikidata_service`,
-      body: { wikidataServiceUrl },
-    })
-    .then((response) => {
-      expect(response.body).to.include("http")
-      cy.wrap(response.body)
-    })
-})
