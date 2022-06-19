@@ -114,7 +114,7 @@ class RestWikiDataControllerTests {
     void serviceNotAvailableAtSearchWikidata() throws IOException, InterruptedException {
       Mockito.when(httpClientAdapter.getResponseString(any())).thenThrow(new IOException());
       BindException exception =
-          assertThrows(BindException.class, () -> controller.fetchWikidataByQuery("berlin"));
+          assertThrows(BindException.class, () -> controller.searchWikidata("berlin"));
       assertThat(exception.getErrorCount(), equalTo(1));
     }
 
@@ -122,7 +122,7 @@ class RestWikiDataControllerTests {
     void shouldFetchDataAtSearchWikidata() throws IOException, InterruptedException, BindException {
       Mockito.when(httpClientAdapter.getResponseString(any()))
           .thenReturn(getEntityDataJsonSearch("berlin"));
-      controller.fetchWikidataByQuery("berlin");
+      controller.searchWikidata("berlin");
       Mockito.verify(httpClientAdapter).getResponseString(any());
     }
 
@@ -131,7 +131,7 @@ class RestWikiDataControllerTests {
         throws IOException, InterruptedException, BindException {
       Mockito.when(httpClientAdapter.getResponseString(any()))
           .thenReturn(getEntityDataJsonSearch("berlin"));
-      ArrayList<WikidataSearchEntity> result = controller.fetchWikidataByQuery("berlin");
+      ArrayList<WikidataSearchEntity> result = controller.searchWikidata("berlin");
       assertThat(result.get(0).label, equalTo("berlin"));
     }
 
@@ -141,7 +141,7 @@ class RestWikiDataControllerTests {
 
       Mockito.when(httpClientAdapter.getResponseString(any()))
           .thenReturn(getEntityDataJsonSearchEmpty("berlin"));
-      ArrayList<WikidataSearchEntity> result = controller.fetchWikidataByQuery("berlin");
+      ArrayList<WikidataSearchEntity> result = controller.searchWikidata("berlin");
       Mockito.verify(httpClientAdapter)
           .getResponseString(
               "https://www.wikidata.org/w/api.php?action=wbsearchentities&search=berlin&format=json&errorformat=plaintext&language=en&uselang=en&type=item&limit=10");

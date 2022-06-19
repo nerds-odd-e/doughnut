@@ -43,7 +43,7 @@ public class RestWikidataController {
   }
 
   @GetMapping("/wikidata/search/{search}")
-  public ArrayList<WikidataSearchEntity> fetchWikidataByQuery(@PathVariable("search") String search)
+  public ArrayList<WikidataSearchEntity> searchWikidata(@PathVariable("search") String search)
       throws InterruptedException, BindException {
     try {
       return getWikiDataService().fetchWikidataByQuery(search);
