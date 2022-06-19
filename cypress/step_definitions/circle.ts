@@ -55,9 +55,9 @@ When("I add a note {string} under {string}", (noteTitle, parentNoteTitle) => {
 
 When(
   "I subscribe to notebook {string} in the circle {string}, with target of learning {int} notes per day",
-  (noteTitle, circleName, count) => {
+  (notebookTitle, circleName, count) => {
     cy.navigateToCircle(circleName)
-    cy.subscribeToNote(noteTitle, count)
+    cy.subscribeToNotebook(notebookTitle, count)
   },
 )
 

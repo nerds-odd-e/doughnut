@@ -22,7 +22,7 @@ declare namespace Cypress {
     loginAs(username: string): void
     logout(username?: string): void
     pageIsNotLoading(): void
-    subscribeToNote(noteTitle: string, dailyLearningCount: number): Chainable<Element>
+    subscribeToNotebook(notebookTitle: string, dailyLearningCount: number): Chainable<Element>
     triggerException(): void
     unsubscribeFromNotebook(noteTitle: string): Chainable<Element>
     updateCurrentUserSettingsWith(settings: userSetting): Chainable<Element>

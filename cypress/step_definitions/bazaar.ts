@@ -40,9 +40,9 @@ When("I go to the bazaar", () => {
 
 When(
   "I subscribe to notebook {string} in the bazaar, with target of learning {int} notes per day",
-  (noteTitle, count) => {
+  (notebookTitle, count) => {
     cy.visit("/bazaar")
-    cy.subscribeToNote(noteTitle, count)
+    cy.subscribeToNotebook(notebookTitle, count)
   },
 )
 

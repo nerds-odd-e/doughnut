@@ -19,7 +19,6 @@ Feature: Nested Note CRUD
     And I should see these notes as children
       | note-title   |
       | Re-quirement |
-    When I am creating a note under "Top/LeSS in Action/Re-quirement"
 
   Scenario: Create a new note with wrong info
     When I create a note belonging to "LeSS in Action":

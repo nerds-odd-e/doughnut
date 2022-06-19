@@ -434,8 +434,8 @@ Cypress.Commands.add("getFormControl", (label) => {
   return cy.findByLabelText(label)
 })
 
-Cypress.Commands.add("subscribeToNote", (noteTitle, dailyLearningCount) => {
-  cy.findNoteCardButton(noteTitle, "Add to my learning").click()
+Cypress.Commands.add("subscribeToNotebook", (notebookTitle: string, dailyLearningCount: string) => {
+  cy.findNoteCardButton(notebookTitle, "Add to my learning").click()
   cy.get("#subscription-dailyTargetOfNewNotes").clear().type(dailyLearningCount)
   cy.findByRole("button", { name: "Submit" }).click()
 })
