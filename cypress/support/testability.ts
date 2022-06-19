@@ -1,29 +1,27 @@
 /// <reference types="cypress" />
 // @ts-check
 import WikidataServiceTester from "./WikidataServiceTester"
+import TestabilityHelper from "./TestabilityHelper"
 
-Cypress.Commands.add("cleanDBAndSeedData", () => {
-  cy.request({
-    method: "POST",
-    url: "/api/testability/clean_db_and_reset_testability_settings",
-    failOnStatusCode: false,
-  }).then((response) => {
-    if (response.status !== 200) {
-      cy.request({
-        method: "POST",
-        url: "/api/testability/clean_db_and_reset_testability_settings",
-      })
-    }
-  })
+Cypress.Commands.add("testability", () => {
+  cy.wrap(new TestabilityHelper())
 })
 
-Cypress.Commands.add("enableFeatureToggle", (enabled) => {
-  cy.request({
-    method: "POST",
-    url: "/api/testability/feature_toggle",
-    body: { enabled },
-  })
-})
+Cypress.Commands.add(
+  "cleanDBAndResetTestabilitySettings",
+  { prevSubject: true },
+  (testability: TestabilityHelper) => {
+    testability.cleanDBAndResetTestabilitySettings(cy)
+  },
+)
+
+Cypress.Commands.add(
+  "featureToggle",
+  { prevSubject: true },
+  (testability: TestabilityHelper, enabled: boolean) => {
+    testability.featureToggle(cy, enabled)
+  },
+)
 
 Cypress.Commands.add(
   "seedNotes",

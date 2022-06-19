@@ -9,8 +9,6 @@ declare namespace Cypress {
     routerToReviews(): Chainable<Element>
     routerToInitialReview(): Chainable<Element>
     routerToRepeatReview(): Chainable<Element>
-    cleanDBAndSeedData(): void
-    enableFeatureToggle(enabled: boolean): void
     cleanDownloadFolder(): void
     timeTravelRelativeToNow(hours: number): void
     failure(): void

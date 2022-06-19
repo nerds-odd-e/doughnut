@@ -6,7 +6,7 @@
 import { Before, After } from "@badeball/cypress-cucumber-preprocessor"
 
 Before(() => {
-  cy.cleanDBAndSeedData()
+  cy.testability().cleanDBAndResetTestabilitySettings()
   cy.wrap("no").as("firstVisited")
 })
 
@@ -33,7 +33,7 @@ After({ tags: "@stopTime" }, () => {
 })
 
 Before({ tags: "@featureToggle" }, () => {
-  cy.enableFeatureToggle(true)
+  cy.testability().featureToggle(true)
 })
 
 Before({ tags: "@usingDummyWikidataService" }, () => {
