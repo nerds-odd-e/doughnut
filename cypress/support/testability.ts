@@ -106,8 +106,8 @@ Cypress.Commands.add(
 Cypress.Commands.add(
   "seedCircle",
   { prevSubject: true },
-  (testability: TestabilityHelper, circleName: string) => {
-    testability.postToTestabilityApiSuccessfully(cy, "seed_circle", { body: { circleName } })
+  (testability: TestabilityHelper, circleInfo: Record<string, string>) => {
+    testability.postToTestabilityApiSuccessfully(cy, "seed_circle", { body: circleInfo })
   },
 )
 
