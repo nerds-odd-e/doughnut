@@ -11,7 +11,7 @@ Cypress.Commands.add(
   "cleanDBAndResetTestabilitySettings",
   { prevSubject: true },
   (testability: TestabilityHelper) => {
-    testability.cleanDBAndResetTestabilitySettings(cy)
+    testability.cleanAndReset(cy, 5)
   },
 )
 
@@ -19,7 +19,7 @@ Cypress.Commands.add(
   "featureToggle",
   { prevSubject: true },
   (testability: TestabilityHelper, enabled: boolean) => {
-    testability.featureToggle(cy, enabled)
+    testability.postToTestabilityApiSuccessfully(cy, "feature_toggle", { body: { enabled } })
   },
 )
 
@@ -52,11 +52,20 @@ Cypress.Commands.add(
   },
 )
 
+const addDays = function (date: Date, days: number) {
+  const newDate = new Date(date.valueOf())
+  newDate.setDate(newDate.getDate() + days)
+  return newDate
+}
+
 Cypress.Commands.add(
   "timeTravelTo",
   { prevSubject: true },
   (testability: TestabilityHelper, day: number, hour: number) => {
-    testability.timeTravelTo(cy, day, hour)
+    const travelTo = addDays(new Date(1976, 5, 1, hour), day)
+    testability.postToTestabilityApiSuccessfully(cy, "time_travel", {
+      body: { travel_to: JSON.stringify(travelTo) },
+    })
   },
 )
 
@@ -64,7 +73,9 @@ Cypress.Commands.add(
   "timeTravelRelativeToNow",
   { prevSubject: true },
   (testability: TestabilityHelper, hours: number) => {
-    testability.timeTravelRelativeToNow(cy, hours)
+    testability.postToTestabilityApiSuccessfully(cy, "time_travel_relative_to_now", {
+      body: { hours: JSON.stringify(hours) },
+    })
   },
 )
 
@@ -72,7 +83,7 @@ Cypress.Commands.add(
   "randomizerAlwaysChooseLast",
   { prevSubject: true },
   (testability: TestabilityHelper) => {
-    testability.randomizerAlwaysChooseLast(cy)
+    testability.postToTestabilityApiSuccessfully(cy, "randomizer", { body: { choose: "last" } })
   },
 )
 
@@ -80,7 +91,7 @@ Cypress.Commands.add(
   "triggerException",
   { prevSubject: true },
   (testability: TestabilityHelper) => {
-    testability.triggerException()
+    testability.postToTestabilityApi(cy, "trigger_exception", { failOnStatusCode: false })
   },
 )
 
@@ -88,15 +99,15 @@ Cypress.Commands.add(
   "shareToBazaar",
   { prevSubject: true },
   (testability: TestabilityHelper, noteTitle: string) => {
-    testability.shareToBazaar(cy, noteTitle)
+    testability.postToTestabilityApiSuccessfully(cy, "share_to_bazaar", { body: { noteTitle } })
   },
 )
 
 Cypress.Commands.add(
   "seedCircle",
   { prevSubject: true },
-  (testability: TestabilityHelper, circle: string) => {
-    testability.seedCircle(cy, circle)
+  (testability: TestabilityHelper, circleName: string) => {
+    testability.postToTestabilityApiSuccessfully(cy, "seed_circle", { body: { circleName } })
   },
 )
 
@@ -104,7 +115,7 @@ Cypress.Commands.add(
   "updateCurrentUserSettingsWith",
   { prevSubject: true },
   (testability: TestabilityHelper, hash: Record<string, string>) => {
-    testability.updateCurrentUserSettingsWith(cy, hash)
+    testability.postToTestabilityApiSuccessfully(cy, "update_current_user", { body: hash })
   },
 )
 

@@ -2,33 +2,7 @@
 
 // @ts-check
 
-const addDays = function (date: Date, days: number) {
-  const newDate = new Date(date.valueOf())
-  newDate.setDate(newDate.getDate() + days)
-  return newDate
-}
-
 class TestabilityHelper {
-  updateCurrentUserSettingsWith(cy: Cypress.cy & CyEventEmitter, hash: Record<string, string>) {
-    this.postToTestabilityApiSuccessfully(cy, "update_current_user", { body: hash })
-  }
-  shareToBazaar(cy: Cypress.cy & CyEventEmitter, noteTitle: string) {
-    this.postToTestabilityApiSuccessfully(cy, "share_to_bazaar", { body: noteTitle })
-  }
-  seedCircle(cy: Cypress.cy & CyEventEmitter, circle: string) {
-    this.postToTestabilityApiSuccessfully(cy, "seed_circle", { body: circle })
-  }
-  triggerException() {
-    this.postToTestabilityApi(cy, "trigger_exception", { failOnStatusCode: false })
-  }
-  randomizerAlwaysChooseLast(cy: Cypress.cy & CyEventEmitter) {
-    this.postToTestabilityApiSuccessfully(cy, "randomizer", { body: { choose: "last" } })
-  }
-  timeTravelRelativeToNow(cy: Cypress.cy & CyEventEmitter, hours: number) {
-    this.postToTestabilityApiSuccessfully(cy, "time_travel_relative_to_now", {
-      body: { hours: JSON.stringify(hours) },
-    })
-  }
   seedLink(
     cy: Cypress.cy & CyEventEmitter,
     type: string,
@@ -72,26 +46,12 @@ class TestabilityHelper {
       cy.wrap(response.body).as(this.seededNoteIdMapAliasName)
     })
   }
-  timeTravelTo(cy: Cypress.cy & CyEventEmitter, day: number, hour: number) {
-    const travelTo = addDays(new Date(1976, 5, 1, hour), day)
-    this.postToTestabilityApiSuccessfully(cy, "time_travel", {
-      body: { travel_to: JSON.stringify(travelTo) },
-    })
-  }
-
-  featureToggle(cy: Cypress.cy & CyEventEmitter, enabled: boolean) {
-    this.postToTestabilityApiSuccessfully(cy, "feature_toggle", { body: { enabled } })
-  }
-
-  cleanDBAndResetTestabilitySettings(cy: Cypress.cy & CyEventEmitter) {
-    this.cleanAndReset(cy, 5)
-  }
 
   private get seededNoteIdMapAliasName() {
     return "seededNoteIdMap"
   }
 
-  private async cleanAndReset(cy: Cypress.cy & CyEventEmitter, countdown: number) {
+  cleanAndReset(cy: Cypress.cy & CyEventEmitter, countdown: number) {
     this.postToTestabilityApi(cy, "clean_db_and_reset_testability_settings", {
       failOnStatusCode: countdown === 1,
     }).then((response) => {
@@ -104,7 +64,7 @@ class TestabilityHelper {
   postToTestabilityApiSuccessfully(
     cy: Cypress.cy & CyEventEmitter,
     path: string,
-    options: { body?: Record<string, unknown> | string; failOnStatusCode?: boolean },
+    options: { body?: Record<string, unknown>; failOnStatusCode?: boolean },
   ) {
     this.postToTestabilityApi(cy, path, options).its("status").should("equal", 200)
   }
@@ -112,7 +72,7 @@ class TestabilityHelper {
   postToTestabilityApi(
     cy: Cypress.cy & CyEventEmitter,
     path: string,
-    options: { body?: Record<string, unknown> | string; failOnStatusCode?: boolean },
+    options: { body?: Record<string, unknown>; failOnStatusCode?: boolean },
   ) {
     return cy.request({
       method: "POST",
