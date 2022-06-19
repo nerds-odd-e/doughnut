@@ -66,8 +66,8 @@ When("I create a note belonging to {string}:", (noteTitle, data) => {
   cy.submitNoteCreationFormsWith(data.hashes())
 })
 
-When("I am creating note under {string}", (noteTitles) => {
-  cy.navigateToNotePage(noteTitles)
+When("I am creating a note under {string}", (notePath) => {
+  cy.navigateToNotePage(notePath)
   cy.clickAddChildNoteButton()
 })
 
@@ -119,8 +119,8 @@ Then("I should not see note {string} at the top level of all my notes", (noteTit
   cy.findByText(noteTitle).should("not.exist")
 })
 
-When("I open {string} note from top level", (noteTitles) => {
-  cy.navigateToNotePage(noteTitles)
+When("I navigate to {string} note", (notePath) => {
+  cy.navigateToNotePage(notePath)
 })
 
 When("I click the child note {string}", (noteTitle) => {

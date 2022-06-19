@@ -13,7 +13,7 @@ Feature: Logged in status
       | title                | testingParent |
       | Shape                |               |
       | Triangle             | Shape         |
-    And I open "Shape" note from top level
+    And I navigate to "Top/Shape" note
     When my session is logged out
     Then I should be asked to log in again when I click the link "Triangle"
     When I login as "old_learner" I should see "Triangle"

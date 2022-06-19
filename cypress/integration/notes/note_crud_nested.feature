@@ -14,12 +14,12 @@ Feature: Nested Note CRUD
     When I create a note belonging to "LeSS in Action":
       | Title        | Description                        |
       | Re-quirement | Re-think the way we do requirement |
-    And I open "LeSS in Action" note from top level
+    And I navigate to "Top/LeSS in Action" note
     Then I should see "LeSS in Action" in note title
     And I should see these notes as children
       | note-title   |
       | Re-quirement |
-    When I am creating note under "LeSS in Action/Re-quirement"
+    When I am creating a note under "Top/LeSS in Action/Re-quirement"
 
   Scenario: Create a new note with wrong info
     When I create a note belonging to "LeSS in Action":
@@ -34,7 +34,7 @@ Feature: Nested Note CRUD
     When I create a sibling note of "Re-quirement":
       | Title     | Description                   | Link Type To Parent |
       | Re-Design | Re-think the way we do design | a specialization of |
-    When I open "LeSS in Action" note from top level
+    When I navigate to "Top/LeSS in Action" note
     And I should see these notes as children
       | note-title   |
       | Re-quirement |

@@ -42,7 +42,7 @@ Feature: link note
   @stopTime
   Scenario: link and move
     Given I link note "Sedition" as "similar to" note "Sedation" and move under it
-    When I open "Sedation/Sedition" note from top level
+    When I navigate to "Top/Sedation/Sedition" note
     Then On the current page, I should see "Sedition" has link "similar to" "Sedation"
     When I visit all my notebooks
     Then I should not see note "Sedition" at the top level of all my notes

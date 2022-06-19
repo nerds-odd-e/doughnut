@@ -188,7 +188,12 @@ Cypress.Commands.add("navigateToChild", (noteTitle) => {
   cy.expectNoteTitle(noteTitle)
 })
 
-Cypress.Commands.add("navigateToNotePage", (noteTitlesDividedBySlash) => {
+Cypress.Commands.add("navigateToNotePage", (notePath: string) => {
+  const found = notePath.match(/Top\/(.*)/)
+  if (!found || found.length < 2) {
+    throw new Error("the note path should be something like `Top/path/to/note`")
+  }
+  const noteTitlesDividedBySlash = found[1]
   cy.visitMyNotebooks()
   noteTitlesDividedBySlash
     .commonSenseSplit("/")

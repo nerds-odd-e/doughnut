@@ -24,6 +24,6 @@ Feature: search note
 
   @stopTime
   Scenario: Search when adding new note
-    Given I am creating note under "Sedation"
+    Given I am creating a note under "Top/Sedation"
     When I type "ph" in the title
     Then I should see "Physical" as the possible duplicate
