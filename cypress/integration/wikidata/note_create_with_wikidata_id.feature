@@ -11,7 +11,7 @@ Feature: Nested Note Create with wikidata
   @usingDummyWikidataService
   Scenario: Create a new note with a wikidata id
     Given Wikidata.org has an entity "Q2102" with "long animal"
-    When I create note belonging to "Animals":
+    When I create a note belonging to "Animals":
       | Title |  Wikidata Id |
       | snake |  Q2102       |
     Then I should see the icon beside title linking to "https://www.wikidata.org/wiki/Q2102"
@@ -19,7 +19,7 @@ Feature: Nested Note Create with wikidata
   @usingDummyWikidataService
   Scenario: Create a new note with invalid wikidata id
     Given The wikidata service is not available
-    When I create note belonging to "Animals":
+    When I create a note belonging to "Animals":
       | Title | Wikidata Id |
       | snake | Q12345R     |
     Then I should see a message "The wikidata service is not available"

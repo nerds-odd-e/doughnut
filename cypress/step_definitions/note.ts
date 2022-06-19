@@ -59,7 +59,7 @@ When("I update note {string} with the description {string}", (noteTitle, newDesc
   cy.inPlaceEdit({ Description: newDescription })
 })
 
-When("I create note belonging to {string}:", (noteTitle, data) => {
+When("I create a note belonging to {string}:", (noteTitle, data) => {
   cy.jumpToNotePage(noteTitle)
   cy.findByText(noteTitle)
   cy.clickAddChildNoteButton()

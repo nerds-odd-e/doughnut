@@ -11,7 +11,7 @@ Feature: Nested Note CRUD
       | tech           | LeSS in Action |                     |
 
   Scenario: Create a new note belonging to another note
-    When I create note belonging to "LeSS in Action":
+    When I create a note belonging to "LeSS in Action":
       | Title        | Description                        |
       | Re-quirement | Re-think the way we do requirement |
     And I open "LeSS in Action" note from top level
@@ -22,13 +22,13 @@ Feature: Nested Note CRUD
     When I am creating note under "LeSS in Action/Re-quirement"
 
   Scenario: Create a new note with wrong info
-    When I create note belonging to "LeSS in Action":
+    When I create a note belonging to "LeSS in Action":
       | Title |
       |       |
     Then I should see that the note creation is not successful
 
   Scenario: Create a new sibling note
-    Given I create note belonging to "LeSS in Action":
+    Given I create a note belonging to "LeSS in Action":
       | Title        | Description                        |
       | Re-quirement | Re-think the way we do requirement |
     When I create a sibling note of "Re-quirement":

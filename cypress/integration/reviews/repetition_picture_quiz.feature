@@ -7,10 +7,10 @@ Feature: Repetition Picture Quiz
       | title | skipReview | testingParent |
       | Space | true       |               |
       | Mars  | true       | Space         |
-    When I create note belonging to "Space":
+    And I create a note belonging to "Space":
       | Title | Upload Picture | Picture Mask           |
       | Earth | example.png   | 20 40 70 30 40 80 5 8 |
-    And I create note belonging to "Space":
+    And I create a note belonging to "Space":
       | Title | Upload Picture | Picture Mask |
       | Moon  | moon.jpg      | 30 40 20 30 |
 
