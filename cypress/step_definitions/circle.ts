@@ -66,7 +66,7 @@ When("I am on {string} circle page", (circleName) => {
 })
 
 When("There is a notebook {string} in circle {string}", (title, circleName) => {
-  cy.seedNotes([{ title }], "", circleName)
+  cy.testability().seedNotes([{ title }], "", circleName)
 })
 
 And("someone of my circle deletes the {string} notebook", (noteTitle) => {

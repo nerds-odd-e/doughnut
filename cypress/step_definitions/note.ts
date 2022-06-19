@@ -9,15 +9,15 @@ Given("I visit note {string}", (noteTitle) => {
 })
 
 Given("there are some notes for the current user", (data) => {
-  cy.seedNotes(data.hashes())
+  cy.testability().seedNotes(data.hashes())
 })
 
 Given("I have a note with title {string}", (noteTitle: string) => {
-  cy.seedNotes([{ title: noteTitle }])
+  cy.testability().seedNotes([{ title: noteTitle }])
 })
 
 Given("there are some notes for existing user {string}", (externalIdentifier, data) => {
-  cy.seedNotes(data.hashes(), externalIdentifier)
+  cy.testability().seedNotes(data.hashes(), externalIdentifier)
 })
 
 Given("there are notes from Note {int} to Note {int}", (from, to) => {
@@ -26,7 +26,7 @@ Given("there are notes from Note {int} to Note {int}", (from, to) => {
     .map((_, i) => {
       return { title: `Note ${i + from}` }
     })
-  cy.seedNotes(notes)
+  cy.testability().seedNotes(notes)
 })
 
 When("I create a notebook with:", (data) => {

@@ -25,19 +25,14 @@ Cypress.Commands.add(
 
 Cypress.Commands.add(
   "seedNotes",
-  (seedNotes: unknown[], externalIdentifier = "", circleName = null) => {
-    cy.request({
-      method: "POST",
-      url: `/api/testability/seed_notes`,
-      body: {
-        externalIdentifier,
-        circleName,
-        seedNotes,
-      },
-    }).then((response) => {
-      expect(Object.keys(response.body).length).to.equal(seedNotes.length)
-      cy.wrap(response.body).as("seededNoteIdMap")
-    })
+  { prevSubject: true },
+  (
+    testability: TestabilityHelper,
+    seedNotes: unknown[],
+    externalIdentifier = "",
+    circleName = null,
+  ) => {
+    testability.seedNotes(cy, seedNotes, externalIdentifier, circleName)
   },
 )
 

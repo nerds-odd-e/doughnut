@@ -60,7 +60,7 @@ Then("I initial review {string}", (noteTitle) => {
 })
 
 Then("I added and learned one note {string} on day {int}", (noteTitle, day) => {
-  cy.seedNotes([{ title: noteTitle }])
+  cy.testability().seedNotes([{ title: noteTitle }])
   cy.testability().timeTravelTo(day, 8)
   cy.initialReviewNotes(noteTitle)
 })

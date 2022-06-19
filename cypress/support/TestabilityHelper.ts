@@ -9,6 +9,23 @@ const addDays = function (date: Date, days: number) {
 }
 
 class TestabilityHelper {
+  seedNotes(
+    cy: Cypress.cy & CyEventEmitter,
+    seedNotes: unknown[],
+    externalIdentifier: string,
+    circleName: string | null,
+  ) {
+    this.postToTestabilityApi(cy, "seed_notes", {
+      body: {
+        externalIdentifier,
+        circleName,
+        seedNotes,
+      },
+    }).then((response) => {
+      expect(Object.keys(response.body).length).to.equal(seedNotes.length)
+      cy.wrap(response.body).as(this.seededNoteIdMapAliasName)
+    })
+  }
   timeTravelTo(cy: Cypress.cy & CyEventEmitter, day: number, hour: number) {
     const travelTo = addDays(new Date(1976, 5, 1, hour), day)
     this.postToTestabilityApiSuccessfully(cy, "time_travel", {
@@ -22,6 +39,10 @@ class TestabilityHelper {
 
   cleanDBAndResetTestabilitySettings(cy: Cypress.cy & CyEventEmitter) {
     this.cleanAndReset(cy, 5)
+  }
+
+  private get seededNoteIdMapAliasName() {
+    return "seededNoteIdMap"
   }
 
   private async cleanAndReset(cy: Cypress.cy & CyEventEmitter, countdown: number) {
