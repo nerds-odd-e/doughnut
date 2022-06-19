@@ -31,6 +31,7 @@
       </div>
       <div class="col-6">
         <select
+          v-if="wikiSearchSuggestions?.length > 0"
           name="wikidataSearchResult"
           @change="onSelectSearchResult"
           class="form-control"

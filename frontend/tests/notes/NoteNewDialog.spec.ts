@@ -19,7 +19,6 @@ afterEach(() => {
 
 describe("adding new note", () => {
   const note = makeMe.aNote.title("mythical").please();
-  const searchResult = makeMe.aWikidataSearchEntity.label("rock").please();
 
   it("search for duplicate", async () => {
     helper.apiMock.expectingPost(`/api/notes/search`).andReturnOnce([note]);
@@ -35,7 +34,8 @@ describe("adding new note", () => {
 
   it("search wikidata for result suggestions", async () => {
     const searchInput = "rock";
-    helper.apiMock.expectingPost(`/api/notes/search`).andReturnOnce([note]);
+    const searchResult = makeMe.aWikidataSearchEntity.label("rock").please();
+    helper.apiMock.expectingPost(`/api/notes/search`).andReturnOnce([]);
     helper.apiMock
       .expectingGet(`/api/wikidata/search/${searchInput}`)
       .andReturnOnce([searchResult]);
@@ -45,6 +45,7 @@ describe("adding new note", () => {
       .mount();
     await wrapper.find("input#note-title").setValue(searchInput);
     await wrapper.find("button#search-wikidata").trigger("click");
+    await flushPromises();
     await wrapper.find('select[name="wikidataSearchResult"]').trigger("click");
     await wrapper.find("option").trigger("click");
     jest.runAllTimers();
