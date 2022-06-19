@@ -89,23 +89,26 @@ Cypress.Commands.add("submitNoteCreationFormWith", (noteAttributes) => {
     "Wikidata Id": wikidataId,
   })
 
-  if (!!wikidataId) {
-    return
-  }
-
-  if (!!Title) {
-    cy.findByText(Title)
-  }
-
   if (!!Description) {
+    if (!!Title) {
+      cy.findByText(Title) // the creation has to be successful before continuing to edit the description
+    }
     cy.inPlaceEdit({ Description })
   }
 
   if (Object.keys(remainingAttrs).length > 0) {
-    cy.clickNoteToolbarButton("edit note")
-    cy.submitNoteFormWith(remainingAttrs)
+    cy.openAndSubmitNoteAccessoriesFormWith(Title, remainingAttrs)
   }
 })
+
+Cypress.Commands.add(
+  "openAndSubmitNoteAccessoriesFormWith",
+  (noteTitle: string, noteAccessoriesAttributes: Record<string, string>) => {
+    cy.findByText(noteTitle)
+    cy.clickNoteToolbarButton("edit note")
+    cy.submitNoteFormWith(noteAccessoriesAttributes)
+  },
+)
 
 Cypress.Commands.add("replaceFocusedText", (text) => {
   // cy.clear for now is an alias of cy.type('{selectall}{backspace}')

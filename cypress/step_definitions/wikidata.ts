@@ -58,22 +58,6 @@ Then("I should see the icon beside title linking to {string}", (associationUrl: 
   })
 })
 
-When("I associate the note {string} with a new wikidata id {string}", (title, wikiID) => {
-  cy.clickAssociateWikiDataButton(title, wikiID)
-  cy.findByRole("button", { name: "Confirm" }).click()
-})
-
-And("When I revisit the associate wikidata dialog", () => {
-  cy.clickNoteToolbarButton("associate wikidata")
-})
-
-Given(
-  "I have a note with title {string} associated with wikidata id {string}",
-  (noteTitle: string, wikidataId: string) => {
-    cy.seedNotes([{ title: noteTitle, wikidataId: wikidataId }])
-  },
-)
-
 Given(
   "Wikidata has search result for {string} with wikidata ID {string}",
   (wikidataLabel: string, wikidataId: string) => {
