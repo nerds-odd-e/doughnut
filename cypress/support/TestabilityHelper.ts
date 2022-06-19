@@ -2,13 +2,20 @@
 
 // @ts-check
 
+const addDays = function (date: Date, days: number) {
+  const newDate = new Date(date.valueOf())
+  newDate.setDate(newDate.getDate() + days)
+  return newDate
+}
+
 class TestabilityHelper {
+  timeTravelTo(cy: Cypress.cy & CyEventEmitter, day: number, hour: number) {
+    const travelTo = addDays(new Date(1976, 5, 1, hour), day)
+    this.postToTestabilityApi(cy, "time_travel", { travel_to: JSON.stringify(travelTo) })
+  }
+
   featureToggle(cy: Cypress.cy & CyEventEmitter, enabled: boolean) {
-    cy.request({
-      method: "POST",
-      url: "/api/testability/feature_toggle",
-      body: { enabled },
-    })
+    this.postToTestabilityApi(cy, "feature_toggle", { enabled })
   }
   cleanDBAndResetTestabilitySettings(cy: Cypress.cy & CyEventEmitter) {
     cy.request({
@@ -23,6 +30,20 @@ class TestabilityHelper {
         })
       }
     })
+  }
+
+  private postToTestabilityApi(
+    cy: Cypress.cy & CyEventEmitter,
+    path: string,
+    body: Record<string, unknown>,
+  ) {
+    cy.request({
+      method: "POST",
+      url: `/api/testability/{path}`,
+      body,
+    })
+      .its("status")
+      .should("equal", 200)
   }
 }
 

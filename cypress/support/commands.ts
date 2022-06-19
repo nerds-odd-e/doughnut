@@ -299,12 +299,6 @@ Cypress.Commands.add("updateCurrentUserSettingsWith", (hash) => {
     .should("contain", "OK")
 })
 
-Date.prototype.addDays = function (days) {
-  const date = new Date(this.valueOf())
-  date.setDate(date.getDate() + days)
-  return date
-}
-
 Cypress.Commands.add(
   "initialReviewOneNoteIfThereIs",
   ({ review_type, title, additional_info, skip }) => {

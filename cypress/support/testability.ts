@@ -41,16 +41,13 @@ Cypress.Commands.add(
   },
 )
 
-Cypress.Commands.add("timeTravelTo", (day, hour) => {
-  const travelTo = new Date(1976, 5, 1, hour).addDays(day)
-  cy.request({
-    method: "POST",
-    url: "/api/testability/time_travel",
-    body: { travel_to: JSON.stringify(travelTo) },
-  })
-    .its("status")
-    .should("equal", 200)
-})
+Cypress.Commands.add(
+  "timeTravelTo",
+  { prevSubject: true },
+  (testability: TestabilityHelper, day: number, hour: number) => {
+    testability.timeTravelTo(cy, day, hour)
+  },
+)
 
 Cypress.Commands.add("timeTravelRelativeToNow", (hours) => {
   cy.request({
