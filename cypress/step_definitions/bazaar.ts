@@ -17,13 +17,7 @@ Then("I should see {string} is shared in the Bazaar", (noteTitle) => {
 })
 
 Then("notebook {string} is shared to the Bazaar", (noteTitle) => {
-  cy.request({
-    method: "POST",
-    url: "/api/testability/share_to_bazaar",
-    body: { noteTitle },
-  }).then((response) => {
-    expect(response.status).to.equal(200)
-  })
+  cy.testability().shareToBazaar(noteTitle)
 })
 
 Then("there shouldn't be any note edit button for {string}", (noteTitle) => {

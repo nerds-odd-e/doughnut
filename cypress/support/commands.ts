@@ -265,16 +265,6 @@ Cypress.Commands.add("findNoteCardEditButton", (noteTitle) => {
   return cy.findNoteCardButton(noteTitle, "edit note")
 })
 
-Cypress.Commands.add("updateCurrentUserSettingsWith", (hash) => {
-  cy.request({
-    method: "POST",
-    url: "/api/testability/update_current_user",
-    body: hash,
-  })
-    .its("body")
-    .should("contain", "OK")
-})
-
 Cypress.Commands.add(
   "initialReviewOneNoteIfThereIs",
   ({ review_type, title, additional_info, skip }) => {

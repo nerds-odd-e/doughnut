@@ -9,6 +9,12 @@ const addDays = function (date: Date, days: number) {
 }
 
 class TestabilityHelper {
+  updateCurrentUserSettingsWith(cy: Cypress.cy & CyEventEmitter, hash: Record<string, string>) {
+    this.postToTestabilityApiSuccessfully(cy, "update_current_user", { body: hash })
+  }
+  shareToBazaar(cy: Cypress.cy & CyEventEmitter, noteTitle: string) {
+    this.postToTestabilityApiSuccessfully(cy, "share_to_bazaar", { body: noteTitle })
+  }
   seedCircle(cy: Cypress.cy & CyEventEmitter, circle: string) {
     this.postToTestabilityApiSuccessfully(cy, "seed_circle", { body: circle })
   }
@@ -95,7 +101,7 @@ class TestabilityHelper {
     })
   }
 
-  private postToTestabilityApiSuccessfully(
+  postToTestabilityApiSuccessfully(
     cy: Cypress.cy & CyEventEmitter,
     path: string,
     options: { body?: Record<string, unknown> | string; failOnStatusCode?: boolean },
@@ -103,7 +109,7 @@ class TestabilityHelper {
     this.postToTestabilityApi(cy, path, options).its("status").should("equal", 200)
   }
 
-  private postToTestabilityApi(
+  postToTestabilityApi(
     cy: Cypress.cy & CyEventEmitter,
     path: string,
     options: { body?: Record<string, unknown> | string; failOnStatusCode?: boolean },
@@ -112,6 +118,12 @@ class TestabilityHelper {
       method: "POST",
       url: `/api/testability/${path}`,
       ...options,
+    })
+  }
+  getTestabilityApiSuccessfully(cy: Cypress.cy & CyEventEmitter, path: string) {
+    return cy.request({
+      method: "GET",
+      url: `/api/testability/${path}`,
     })
   }
 }

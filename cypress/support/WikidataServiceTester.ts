@@ -1,6 +1,7 @@
 /// <reference types="cypress" />
 
 import { Mountebank, Imposter, DefaultStub, HttpMethod } from "@anev/ts-mountebank"
+import TestabilityHelper from "./TestabilityHelper"
 
 // @ts-check
 
@@ -50,12 +51,8 @@ class WikidataServiceTester {
     return 5001
   }
   private setWikidataServiceUrl(cy: Cypress.cy & CyEventEmitter, wikidataServiceUrl: string) {
-    return cy
-      .request({
-        method: "POST",
-        url: `/api/testability/use_wikidata_service`,
-        body: { wikidataServiceUrl },
-      })
+    return new TestabilityHelper()
+      .postToTestabilityApi(cy, `use_wikidata_service`, { body: { wikidataServiceUrl } })
       .then((response) => {
         expect(response.body).to.include("http")
         cy.wrap(response.body)

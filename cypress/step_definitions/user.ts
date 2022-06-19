@@ -57,11 +57,11 @@ Then("My name {string} is in the top bar", (name) => {
 })
 
 Then("my daily new notes to review is set to {int}", (number) => {
-  cy.updateCurrentUserSettingsWith({ daily_new_notes_count: number })
+  cy.testability().updateCurrentUserSettingsWith({ daily_new_notes_count: number })
 })
 
 Then("my space setting is {string}", (number) => {
-  cy.updateCurrentUserSettingsWith({ space_intervals: number })
+  cy.testability().updateCurrentUserSettingsWith({ space_intervals: number })
 })
 
 Then("I haven't login", () => {

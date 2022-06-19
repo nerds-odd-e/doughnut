@@ -85,10 +85,26 @@ Cypress.Commands.add(
 )
 
 Cypress.Commands.add(
+  "shareToBazaar",
+  { prevSubject: true },
+  (testability: TestabilityHelper, noteTitle: string) => {
+    testability.shareToBazaar(cy, noteTitle)
+  },
+)
+
+Cypress.Commands.add(
   "seedCircle",
   { prevSubject: true },
   (testability: TestabilityHelper, circle: string) => {
     testability.seedCircle(cy, circle)
+  },
+)
+
+Cypress.Commands.add(
+  "updateCurrentUserSettingsWith",
+  { prevSubject: true },
+  (testability: TestabilityHelper, hash: Record<string, string>) => {
+    testability.updateCurrentUserSettingsWith(cy, hash)
   },
 )
 
