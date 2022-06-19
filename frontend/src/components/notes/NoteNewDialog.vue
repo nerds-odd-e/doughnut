@@ -18,37 +18,10 @@
       :errors="formErrors.wikiDataId"
       placeholder="example: `Q1234`"
     />
-    <div class="row mt-2 mb-2">
-      <div class="col-6 btn-group" role="group" aria-label="Action Group">
-        <input type="submit" value="Submit" class="btn btn-primary" />
-        <button
-          id="search-wikidata"
-          class="btn btn-outline-primary"
-          @click.prevent="fetchSearchResult"
-        >
-          Search on Wikidata
-        </button>
-      </div>
-      <div class="col-6">
-        <select
-          v-if="wikiSearchSuggestions?.length > 0"
-          name="wikidataSearchResult"
-          @change="onSelectSearchResult"
-          class="form-control"
-          v-model="selectedOption"
-        >
-          <option disabled value="">- Choose Wikidata Search Result -</option>
-          <option
-            v-for="suggestion in wikiSearchSuggestions"
-            :key="suggestion.id"
-            :value="suggestion.id"
-            scope-name="searchItem"
-          >
-            {{ suggestion.label }} - {{ suggestion.description }}
-          </option>
-        </select>
-      </div>
-    </div>
+    <WikidataSearchByLabel
+      :title="creationData.textContent.title"
+      @selected="onSelectWikidataEntry"
+    />
     <fieldset class="secondary-info">
       <legend>Similar Notes</legend>
       <SearchResults
@@ -68,6 +41,7 @@ import NoteFormTitleOnly from "./NoteFormTitleOnly.vue";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 import SearchResults from "../search/SearchResults.vue";
 import LinkTypeSelectCompact from "../links/LinkTypeSelectCompact.vue";
+import WikidataSearchByLabel from "./WikidataSearchByLabel.vue";
 
 export default defineComponent({
   setup() {
@@ -78,6 +52,7 @@ export default defineComponent({
     SearchResults,
     LinkTypeSelectCompact,
     TextInput,
+    WikidataSearchByLabel,
   },
   props: { parentId: { type: Number, required: true } },
   emits: ["done"],
@@ -93,8 +68,6 @@ export default defineComponent({
         textContent: {},
         wikiDataId: undefined as undefined | string,
       },
-      wikiSearchSuggestions: [] as Generated.WikidataSearchEntity[],
-      selectedOption: "",
     };
   },
   methods: {
@@ -108,27 +81,9 @@ export default defineComponent({
         })
         .catch((res) => (this.formErrors = res));
     },
-    async onSelectSearchResult() {
-      const selectedSuggestion = this.wikiSearchSuggestions.find((obj) => {
-        return obj.id === this.selectedOption;
-      });
-      if (!selectedSuggestion) return;
+    onSelectWikidataEntry(selectedSuggestion: Generated.WikidataSearchEntity) {
       this.creationData.textContent.title = selectedSuggestion.label;
       this.creationData.wikidataId = selectedSuggestion.id;
-      this.selectedOption = "";
-    },
-    async fetchSearchResult() {
-      if (this.creationData.textContent.title) {
-        this.wikiSearchSuggestions = await this.api.wikidata.getWikiDatas(
-          this.creationData.textContent.title
-        );
-        if (this.wikiSearchSuggestions.length === 0) {
-          this.selectedOption = "";
-        }
-      } else {
-        this.wikiSearchSuggestions = [];
-        this.selectedOption = "";
-      }
     },
   },
 });

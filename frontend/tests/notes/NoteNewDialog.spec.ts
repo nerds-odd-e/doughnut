@@ -8,16 +8,16 @@ import makeMe from "../fixtures/makeMe";
 
 helper.resetWithApiMock(beforeEach, afterEach);
 
-beforeEach(() => {
-  jest.useFakeTimers();
-});
-
-afterEach(() => {
-  jest.runOnlyPendingTimers();
-  jest.useRealTimers();
-});
-
 describe("adding new note", () => {
+  beforeEach(() => {
+    jest.useFakeTimers();
+  });
+
+  afterEach(() => {
+    jest.runOnlyPendingTimers();
+    jest.useRealTimers();
+  });
+
   const note = makeMe.aNote.title("mythical").please();
 
   it("search for duplicate", async () => {
@@ -48,7 +48,6 @@ describe("adding new note", () => {
     await flushPromises();
     await wrapper.find('select[name="wikidataSearchResult"]').trigger("click");
     await wrapper.find("option").trigger("click");
-    jest.runAllTimers();
     await flushPromises();
     expect(wrapper.text()).toContain(searchInput);
   });
