@@ -11,39 +11,47 @@ const addDays = function (date: Date, days: number) {
 class TestabilityHelper {
   timeTravelTo(cy: Cypress.cy & CyEventEmitter, day: number, hour: number) {
     const travelTo = addDays(new Date(1976, 5, 1, hour), day)
-    this.postToTestabilityApi(cy, "time_travel", { travel_to: JSON.stringify(travelTo) })
+    this.postToTestabilityApiSuccessfully(cy, "time_travel", {
+      body: { travel_to: JSON.stringify(travelTo) },
+    })
   }
 
   featureToggle(cy: Cypress.cy & CyEventEmitter, enabled: boolean) {
-    this.postToTestabilityApi(cy, "feature_toggle", { enabled })
+    this.postToTestabilityApiSuccessfully(cy, "feature_toggle", { body: { enabled } })
   }
+
   cleanDBAndResetTestabilitySettings(cy: Cypress.cy & CyEventEmitter) {
-    cy.request({
-      method: "POST",
-      url: "/api/testability/clean_db_and_reset_testability_settings",
-      failOnStatusCode: false,
+    this.cleanAndReset(cy, 5)
+  }
+
+  private async cleanAndReset(cy: Cypress.cy & CyEventEmitter, countdown: number) {
+    this.postToTestabilityApi(cy, "clean_db_and_reset_testability_settings", {
+      failOnStatusCode: countdown === 1,
     }).then((response) => {
-      if (response.status !== 200) {
-        cy.request({
-          method: "POST",
-          url: "/api/testability/clean_db_and_reset_testability_settings",
-        })
+      if (countdown > 0 && response.status !== 200) {
+        this.cleanAndReset(cy, countdown - 1)
       }
     })
+  }
+
+  private postToTestabilityApiSuccessfully(
+    cy: Cypress.cy & CyEventEmitter,
+    path: string,
+    options: { body?: Record<string, unknown>; failOnStatusCode?: boolean },
+  ) {
+    this.postToTestabilityApi(cy, path, options).its("status").should("equal", 200)
   }
 
   private postToTestabilityApi(
     cy: Cypress.cy & CyEventEmitter,
     path: string,
-    body: Record<string, unknown>,
+    options: { body?: Record<string, unknown>; failOnStatusCode?: boolean },
   ) {
-    cy.request({
+    return cy.request({
       method: "POST",
-      url: `/api/testability/{path}`,
-      body,
+      url: `/api/testability/${path}`,
+      ...options,
     })
-      .its("status")
-      .should("equal", 200)
   }
 }
 
