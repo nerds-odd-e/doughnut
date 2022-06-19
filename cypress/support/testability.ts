@@ -60,35 +60,37 @@ Cypress.Commands.add(
   },
 )
 
-Cypress.Commands.add("timeTravelRelativeToNow", (hours) => {
-  cy.request({
-    method: "POST",
-    url: "/api/testability/time_travel_relative_to_now",
-    body: { hours: JSON.stringify(hours) },
-  })
-    .its("status")
-    .should("equal", 200)
-})
+Cypress.Commands.add(
+  "timeTravelRelativeToNow",
+  { prevSubject: true },
+  (testability: TestabilityHelper, hours: number) => {
+    testability.timeTravelRelativeToNow(cy, hours)
+  },
+)
 
-Cypress.Commands.add("randomizerAlwaysChooseLast", () => {
-  cy.request({
-    method: "POST",
-    url: "/api/testability/randomizer",
-    body: { choose: "last" },
-  })
-    .its("status")
-    .should("equal", 200)
-})
+Cypress.Commands.add(
+  "randomizerAlwaysChooseLast",
+  { prevSubject: true },
+  (testability: TestabilityHelper) => {
+    testability.randomizerAlwaysChooseLast(cy)
+  },
+)
 
-Cypress.Commands.add("seedCircle", (circle) => {
-  cy.request({
-    method: "POST",
-    url: `/api/testability/seed_circle`,
-    body: circle,
-  }).then((response) => {
-    expect(response.body).to.equal("OK")
-  })
-})
+Cypress.Commands.add(
+  "triggerException",
+  { prevSubject: true },
+  (testability: TestabilityHelper) => {
+    testability.triggerException()
+  },
+)
+
+Cypress.Commands.add(
+  "seedCircle",
+  { prevSubject: true },
+  (testability: TestabilityHelper, circle: string) => {
+    testability.seedCircle(cy, circle)
+  },
+)
 
 Cypress.Commands.add("wikidataService", () => {
   cy.wrap(new WikidataServiceTester())

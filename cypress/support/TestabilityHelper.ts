@@ -9,6 +9,20 @@ const addDays = function (date: Date, days: number) {
 }
 
 class TestabilityHelper {
+  seedCircle(cy: Cypress.cy & CyEventEmitter, circle: string) {
+    this.postToTestabilityApiSuccessfully(cy, "seed_circle", { body: circle })
+  }
+  triggerException() {
+    this.postToTestabilityApi(cy, "trigger_exception", { failOnStatusCode: false })
+  }
+  randomizerAlwaysChooseLast(cy: Cypress.cy & CyEventEmitter) {
+    this.postToTestabilityApiSuccessfully(cy, "randomizer", { body: { choose: "last" } })
+  }
+  timeTravelRelativeToNow(cy: Cypress.cy & CyEventEmitter, hours: number) {
+    this.postToTestabilityApiSuccessfully(cy, "time_travel_relative_to_now", {
+      body: { hours: JSON.stringify(hours) },
+    })
+  }
   seedLink(
     cy: Cypress.cy & CyEventEmitter,
     type: string,
@@ -84,7 +98,7 @@ class TestabilityHelper {
   private postToTestabilityApiSuccessfully(
     cy: Cypress.cy & CyEventEmitter,
     path: string,
-    options: { body?: Record<string, unknown>; failOnStatusCode?: boolean },
+    options: { body?: Record<string, unknown> | string; failOnStatusCode?: boolean },
   ) {
     this.postToTestabilityApi(cy, path, options).its("status").should("equal", 200)
   }
@@ -92,7 +106,7 @@ class TestabilityHelper {
   private postToTestabilityApi(
     cy: Cypress.cy & CyEventEmitter,
     path: string,
-    options: { body?: Record<string, unknown>; failOnStatusCode?: boolean },
+    options: { body?: Record<string, unknown> | string; failOnStatusCode?: boolean },
   ) {
     return cy.request({
       method: "POST",

@@ -10,7 +10,6 @@ declare namespace Cypress {
     routerToInitialReview(): Chainable<Element>
     routerToRepeatReview(): Chainable<Element>
     cleanDownloadFolder(): void
-    timeTravelRelativeToNow(hours: number): void
     failure(): void
     findNoteCardButton(noteTitle: string, btnTextOrTitle: string): Chainable<Element>
     findNoteCardEditButton(noteTitle: string): Chainable<Element>
@@ -21,7 +20,6 @@ declare namespace Cypress {
     logout(username?: string): void
     pageIsNotLoading(): void
     subscribeToNotebook(notebookTitle: string, dailyLearningCount: number): Chainable<Element>
-    triggerException(): void
     unsubscribeFromNotebook(noteTitle: string): Chainable<Element>
     updateCurrentUserSettingsWith(settings: userSetting): Chainable<Element>
     visitMyNotebooks(noteTitle?: string): Chainable<Element>

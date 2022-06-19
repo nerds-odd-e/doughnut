@@ -6,7 +6,7 @@
 import { Given, Then, When } from "@badeball/cypress-cucumber-preprocessor"
 
 When("Someone triggered an exception", () => {
-  cy.triggerException()
+  cy.testability().triggerException()
 })
 
 Then("I should see {string} in the failure report", (content) => {

@@ -187,7 +187,7 @@ Then("I am changing note {string}'s review setting", (noteTitle) => {
 })
 
 Then("The randomizer always choose the last", () => {
-  cy.randomizerAlwaysChooseLast()
+  cy.testability().randomizerAlwaysChooseLast()
 })
 
 Then("I should see the statistics of note {string}", (noteTitle, data) => {

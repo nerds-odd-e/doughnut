@@ -53,14 +53,6 @@ Cypress.Commands.add("logout", () => {
   })
 })
 
-Cypress.Commands.add("triggerException", () => {
-  cy.request({
-    method: "POST",
-    url: `/api/testability/trigger_exception`,
-    failOnStatusCode: false,
-  })
-})
-
 Cypress.Commands.add("submitNoteCreationFormWith", (noteAttributes) => {
   const linkTypeToParent = noteAttributes["Link Type To Parent"]
   delete noteAttributes["Link Type To Parent"]
