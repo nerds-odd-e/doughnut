@@ -53,23 +53,6 @@ Cypress.Commands.add("logout", () => {
   })
 })
 
-Cypress.Commands.add("createLink", (type, fromNoteTitle, toNoteTitle) => {
-  cy.get("@seededNoteIdMap").then((seededNoteIdMap) =>
-    cy
-      .request({
-        method: "POST",
-        url: "/api/testability/link_notes",
-        body: {
-          type,
-          source_id: seededNoteIdMap[fromNoteTitle],
-          target_id: seededNoteIdMap[toNoteTitle],
-        },
-      })
-      .its("body")
-      .should("contain", "OK"),
-  )
-})
-
 Cypress.Commands.add("triggerException", () => {
   cy.request({
     method: "POST",
@@ -203,12 +186,13 @@ Cypress.Commands.add("navigateToNotePage", (notePath: string) => {
 // jumptoNotePage is faster than navigateToNotePage
 //    it uses the note id memorized when creating them with testability api
 Cypress.Commands.add("jumpToNotePage", (noteTitle, forceLoadPage) => {
-  cy.get("@seededNoteIdMap").then((seededNoteIdMap) => {
-    const noteId = seededNoteIdMap[noteTitle]
-    const url = `/notes/${seededNoteIdMap[noteTitle]}`
-    if (forceLoadPage) cy.visit(url)
-    else cy.routerPush(url, "noteShow", { noteId: noteId })
-  })
+  cy.testability()
+    .getSeededNoteIdByTitle(noteTitle)
+    .then((noteId) => {
+      const url = `/notes/${noteId}`
+      if (forceLoadPage) cy.visit(url)
+      else cy.routerPush(url, "noteShow", { noteId: noteId })
+    })
   cy.expectNoteTitle(noteTitle)
 })
 

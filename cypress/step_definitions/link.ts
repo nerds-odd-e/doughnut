@@ -40,7 +40,7 @@ When(
 When(
   "there is {string} link between note {string} and {string}",
   (linkType, fromNoteTitle, toNoteTitle) => {
-    cy.createLink(linkType, fromNoteTitle, toNoteTitle)
+    cy.testability().seedLink(linkType, fromNoteTitle, toNoteTitle)
   },
 )
 

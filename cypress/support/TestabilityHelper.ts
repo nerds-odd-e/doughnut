@@ -9,6 +9,32 @@ const addDays = function (date: Date, days: number) {
 }
 
 class TestabilityHelper {
+  seedLink(
+    cy: Cypress.cy & CyEventEmitter,
+    type: string,
+    fromNoteTitle: string,
+    toNoteTitle: string,
+  ) {
+    return cy.get(`@${this.seededNoteIdMapAliasName}`).then((seededNoteIdMap) => {
+      expect(seededNoteIdMap).haveOwnPropertyDescriptor(fromNoteTitle)
+      expect(seededNoteIdMap).haveOwnPropertyDescriptor(toNoteTitle)
+      const fromNoteId = seededNoteIdMap[fromNoteTitle]
+      const toNoteId = seededNoteIdMap[toNoteTitle]
+      this.postToTestabilityApiSuccessfully(cy, "link_notes", {
+        body: {
+          type,
+          source_id: fromNoteId,
+          target_id: toNoteId,
+        },
+      })
+    })
+  }
+  getSeededNoteIdByTitle(cy: Cypress.cy & CyEventEmitter, noteTitle: string) {
+    return cy.get(`@${this.seededNoteIdMapAliasName}`).then((seededNoteIdMap) => {
+      expect(seededNoteIdMap).haveOwnPropertyDescriptor(noteTitle)
+      return seededNoteIdMap[noteTitle]
+    })
+  }
   seedNotes(
     cy: Cypress.cy & CyEventEmitter,
     seedNotes: unknown[],

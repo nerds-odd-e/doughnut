@@ -37,6 +37,22 @@ Cypress.Commands.add(
 )
 
 Cypress.Commands.add(
+  "seedLink",
+  { prevSubject: true },
+  (testability: TestabilityHelper, type: string, fromNoteTitle: string, toNoteTitle: string) => {
+    testability.seedLink(cy, type, fromNoteTitle, toNoteTitle)
+  },
+)
+
+Cypress.Commands.add(
+  "getSeededNoteIdByTitle",
+  { prevSubject: true },
+  (testability: TestabilityHelper, noteTitle: string) => {
+    testability.getSeededNoteIdByTitle(cy, noteTitle)
+  },
+)
+
+Cypress.Commands.add(
   "timeTravelTo",
   { prevSubject: true },
   (testability: TestabilityHelper, day: number, hour: number) => {
