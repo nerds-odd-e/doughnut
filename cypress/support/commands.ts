@@ -547,7 +547,3 @@ Cypress.Commands.add(
 Cypress.Commands.add("expectFieldErrorMessage", (message: string) => {
   cy.findByText(message, { selector: ".error-msg" })
 })
-
-Cypress.Commands.add("assertInputElementValue", (inputName: string, expectedValue: string) => {
-  cy.get(`input[name="${inputName}"]`).should("have.value", expectedValue)
-})

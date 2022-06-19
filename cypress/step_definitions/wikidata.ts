@@ -77,13 +77,6 @@ And(
   },
 )
 
-Then("I should see that the title is automatically populated with {string}", (title: string) => {
-  cy.assertInputElementValue("title", title)
+Then("I should see that the {string} becomes {string}", (field: string, value: string) => {
+  cy.getFormControl(field).should("have.value", value)
 })
-
-Then(
-  "I should see that the Wikidata ID is automatically populated with {string}",
-  (wikidataID: string) => {
-    cy.assertInputElementValue("wikidataID", wikidataID)
-  },
-)

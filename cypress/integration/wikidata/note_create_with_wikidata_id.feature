@@ -30,5 +30,5 @@ Feature: Nested Note Create with wikidata
     When I am creating a note under "Top/Animals"
     And I search with title "Rock" on Wikidata
     And I select "rock music" with wikidataID "Q11399" from the Wikidata search result
-    Then I should see that the title is automatically populated with "rock music"
-    Then I should see that the Wikidata ID is automatically populated with "Q11399"
+    Then I should see that the "Title" becomes "rock music"
+    Then I should see that the "Wikidata Id" becomes "Q11399"
