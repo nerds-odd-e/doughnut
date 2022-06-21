@@ -105,7 +105,7 @@ Then("I have unselected the option {string}", (option) => {
 
 Then("I should see the option {string} is {string}", (option, status) => {
   cy.getFormControl(option).then(($elem) => {
-    elm = cy.wrap($elem)
+    const elm = cy.wrap($elem)
     if (status === "on") {
       elm.should("be.checked")
     } else {
