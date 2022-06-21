@@ -24,7 +24,7 @@ env:
 
 jobs:
   Linting:
-    name: cypress/backend/frontend Lint
+    name: Backend + Frontend + Cypress Lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -176,7 +176,6 @@ jobs:
   #      with:
   #        github-token: ${{ env.GITHUB_TOKEN }}
   #        discord-webhook: ${{ env.DISCORD_WEBHOOK_URL }}
-
   # mobile-unit-test:
   #   runs-on: ubuntu-latest
   #   steps:
