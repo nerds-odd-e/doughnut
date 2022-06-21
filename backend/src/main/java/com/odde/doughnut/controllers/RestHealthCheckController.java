@@ -18,7 +18,6 @@ class RestHealthCheckController {
 
   @GetMapping("/healthcheck")
   public String ping() {
-    // hello
     return "OK. Active Profile: " + String.join(", ", environment.getActiveProfiles());
   }
 
