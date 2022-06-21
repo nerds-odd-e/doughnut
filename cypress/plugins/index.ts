@@ -16,8 +16,6 @@
 import createBundler from "@bahmutov/cypress-esbuild-preprocessor"
 import { createEsbuildPlugin } from "@badeball/cypress-cucumber-preprocessor/esbuild"
 import NodeModulesPolyfills from "@esbuild-plugins/node-modules-polyfill"
-import fs from "fs-extra"
-import path from "path"
 
 export default (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions): void => {
   on(
@@ -26,8 +24,4 @@ export default (on: Cypress.PluginEvents, config: Cypress.PluginConfigOptions): 
       plugins: [NodeModulesPolyfills(), createEsbuildPlugin(config)],
     }),
   )
-
-  const file = config.env.configFile || "ci"
-  console.table(`<<<<<< CYPRESS RUN ENV: ${file} >>>>>>`)
-  return fs.readJson(path.resolve("cypress/config", `${file}.json`))
 }

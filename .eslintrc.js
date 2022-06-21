@@ -32,6 +32,7 @@ module.exports = {
         useTabs: false,
       },
     ],
+    '@typescript-eslint/no-var-requires': 'off',
     '@typescript-eslint/indent': 'off',
     '@typescript-eslint/no-use-before-define': 'warn',
     '@typescript-eslint/camelcase': 'off',
