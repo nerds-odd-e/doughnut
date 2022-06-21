@@ -7,6 +7,8 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.json.WikidataEntity;
 import com.odde.doughnut.entities.json.WikidataSearchEntity;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +62,7 @@ public record WikidataService(HttpClientAdapter httpClientAdapter, String wikida
     String url =
         wikidataBaseUrl
             + "/w/api.php?action=wbsearchentities&search="
-            + search
+            + URLEncoder.encode(search, StandardCharsets.UTF_8)
             + "&format=json&errorformat=plaintext&language=en&uselang=en&type=item&limit=10";
     String responseBody = httpClientAdapter.getResponseString(url);
     WikidataSearchModel entities =
