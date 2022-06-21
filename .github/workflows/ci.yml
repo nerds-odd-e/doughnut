@@ -111,7 +111,7 @@ jobs:
         with:
           browser: chrome
           headless: true
-          config-file: cypress/config/ci.json
+          config-file: cypress/config/ci.ts
           install-command: yarn --frozen-lockfile --silent
           build: yarn frontend:build
           start: yarn run-p -clnr start:mb sut
