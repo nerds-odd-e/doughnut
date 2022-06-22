@@ -1,3 +1,4 @@
+const { defaults } = require('jest-config');
 module.exports = {
   verbose: true,
   testEnvironment: 'node',
@@ -6,13 +7,17 @@ module.exports = {
     '@vue/vue3-jest': { babelConfig: true },
     'ts-jest': { babelConfig: true },
   },
-  moduleFileExtensions: ['js', 'ts', 'vue', 'json'],
+  moduleFileExtensions: [...defaults.moduleFileExtensions, 'js', 'ts', 'vue', 'json'],
   transform: {
     '^.+\\.(j|t)s?$': '@swc/jest',
     '.*\\.(vue)$': '@vue/vue3-jest',
   },
+  transformIgnorePatterns: ['/node_modules/(?!pinia)'],
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/$1',
+  },
+  testEnvironmentOptions: {
+    customExportConditions: ["node", "node-addons"],
   },
   setupFilesAfterEnv: ['./tests/setupJest.js'],
 };
