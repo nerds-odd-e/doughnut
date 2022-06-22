@@ -65,7 +65,6 @@ import BasicBreadcrumb from "../commons/BasicBreadcrumb.vue";
 import ShowPicture from "../notes/ShowPicture.vue";
 import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
 import TextInput from "../form/TextInput.vue";
-import SvgNoReview from "../svgs/SvgNoReview.vue";
 
 export default defineComponent({
   props: {
@@ -79,7 +78,6 @@ export default defineComponent({
     ShowPicture,
     NoteFrameOfLinks,
     TextInput,
-    SvgNoReview,
   },
   emits: ["answer", "removeFromReview"],
   data() {

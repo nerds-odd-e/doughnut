@@ -21,13 +21,12 @@
 
 <script>
 import Card from "./Card.vue";
-import NoteTitleWithLink from "./NoteTitleWithLink.vue";
 
 export default {
   props: {
     notes: Array,
     columns: { type: Number, default: 4 },
   },
-  components: { Card, NoteTitleWithLink },
+  components: { Card },
 };
 </script>

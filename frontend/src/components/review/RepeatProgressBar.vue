@@ -52,7 +52,6 @@
 
 <script>
 import ProgressBar from "../commons/ProgressBar.vue";
-import SvgLastResult from "../svgs/SvgLastResult.vue";
 import SvgResume from "../svgs/SvgResume.vue";
 import SvgPause from "../svgs/SvgPause.vue";
 import SvgBackward from "../svgs/SvgBackward.vue";
@@ -61,7 +60,6 @@ import SvgForward from "../svgs/SvgForward.vue";
 export default {
   components: {
     ProgressBar,
-    SvgLastResult,
     SvgResume,
     SvgPause,
     SvgBackward,

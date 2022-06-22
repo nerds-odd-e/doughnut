@@ -16,14 +16,13 @@
 <script lang="ts">
 import { defineComponent } from "vue";
 import ReviewSettingForm from "./ReviewSettingForm.vue";
-import SvgReviewSetting from "../svgs/SvgReviewSetting.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 
 export default defineComponent({
   setup() {
     return useLoadingApi({ initalLoading: true, hasFormError: true });
   },
-  components: { ReviewSettingForm, SvgReviewSetting },
+  components: { ReviewSettingForm },
   props: { noteId: { type: Number, required: true }, title: String },
   emits: ["done"],
   data() {
