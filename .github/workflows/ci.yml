@@ -84,19 +84,20 @@ jobs:
           - |
             cypress/integration/c*/**
           - |
-            cypress/integration/t*/**
-            cypress/integration/u*/**
-            cypress/integration/w*/**
+            cypress/integration/notebooks*/**
           - |
             cypress/integration/notes*/**
-          - |
-            cypress/integration/notebooks*/**
           - |
             cypress/integration/r*/**
           - |
             cypress/integration/s*/**
           - |
+            cypress/integration/t*/**
+            cypress/integration/u*/**
+          - |
             cypress/integration/v*/**
+          - |
+            cypress/integration/w*/**
     steps:
       - uses: actions/checkout@v3
       - uses: ./.github/mysql_db
