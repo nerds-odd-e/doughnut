@@ -4,6 +4,14 @@
 
 import { Given, Then } from "@badeball/cypress-cucumber-preprocessor"
 
+const checkBoxPredicate = (status) => {
+  if (status === "on") {
+    return "be.checked"
+  } else {
+    return "not.be.checked"
+  }
+}
+
 Then("I do these initial reviews in sequence:", (data) => {
   cy.initialReviewInSequence(data.hashes())
 })
@@ -105,11 +113,8 @@ Then("I have unselected the option {string}", (option) => {
 
 Then("I should see the option {string} is {string}", (option, status) => {
   cy.getFormControl(option).then(($elem) => {
-    if (status === "on") {
-      cy.wrap($elem).should("be.checked")
-    } else {
-      cy.wrap($elem).should("not.be.checked")
-    }
+    const expectedCheckBoxState = checkBoxPredicate(status)
+    cy.wrap($elem).should(expectedCheckBoxState)
   })
 })
 
