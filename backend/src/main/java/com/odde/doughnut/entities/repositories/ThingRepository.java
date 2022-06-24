@@ -11,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 
 public interface ThingRepository extends CrudRepository<Thing, Integer> {
   String selectThingsFrom =
-      "SELECT thing.*,  IFNULL(jlink.level, jnote.level) as level from thing  ";
+      "SELECT thing.*,  IFNULL(IFNULL(jlink.level, jnote.level),0) as level from thing  ";
 
   @Query(
       value = selectThingsFrom + selectThings + selectNoteThings + orderByDate,

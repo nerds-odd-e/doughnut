@@ -29,6 +29,14 @@ public class ReviewPoint {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Integer id;
 
+  public static ReviewPoint createReviewPointForThing(Thing thing) {
+    return new ReviewPoint() {
+      {
+        this.setThing(thing);
+      }
+    };
+  }
+
   public QuizQuestion createAQuizQuestionOfType(QuestionType questionType) {
     QuizQuestion quizQuestion = new QuizQuestion();
     quizQuestion.setReviewPoint(this);

@@ -1,16 +1,9 @@
 package com.odde.doughnut.models;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
+import static org.hamcrest.Matchers.*;
 
-import com.odde.doughnut.entities.Circle;
-import com.odde.doughnut.entities.Link;
-import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.User;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
 import java.util.List;
@@ -95,10 +88,8 @@ public class ReviewingInitialReviewTest {
       Note anotherNote;
 
       @BeforeEach
-      void Note1And2SkippedReview_AndThereIsALink() {
+      void thereIsALinkAndAnotherNote() {
         note1ToNote2 = makeMe.aLink().between(note1, note2).please();
-        makeMe.aReviewSettingFor(note1).level(5).please();
-        makeMe.aReviewSettingFor(note2).level(2).please();
         anotherNote = makeMe.aNote("another note").creatorAndOwner(userModel).please();
         makeMe.refresh(userModel.getEntity());
       }
@@ -108,35 +99,54 @@ public class ReviewingInitialReviewTest {
       }
 
       @Test
-      void shouldReturnReviewPointForLowerLevelNoteOrLink() {
+      void shouldReturnLinkBeforeAnotherNote() {
         List<ReviewPoint> reviewPoints = getAllDueReviewPoints();
         assertThat(reviewPoints, hasSize(4));
-        assertThat(reviewPoints.get(0).getNote(), equalTo(anotherNote));
+        assertThat(reviewPoints.get(0).getNote(), equalTo(note1));
         assertThat(reviewPoints.get(1).getNote(), equalTo(note2));
-        assertThat(reviewPoints.get(2).getNote(), equalTo(note1));
-        assertThat(reviewPoints.get(3).getLink(), equalTo(note1ToNote2));
+        assertThat(reviewPoints.get(2).getLink(), equalTo(note1ToNote2));
+        assertThat(reviewPoints.get(3).getNote(), equalTo(anotherNote));
       }
 
-      @Test
-      void shouldReturnLinksOrderedByLevels() {
-        Link aLevel2Link = makeMe.aLink().between(anotherNote, note2).please();
-        makeMe.refresh(userModel.getEntity());
-        List<ReviewPoint> reviewPoints = getAllDueReviewPoints();
-        assertThat(reviewPoints, hasSize(5));
-        assertThat(reviewPoints.get(0).getNote(), equalTo(anotherNote));
-        assertThat(reviewPoints.get(1).getNote(), equalTo(note2));
-        assertThat(reviewPoints.get(2).getLink(), equalTo(aLevel2Link));
-        assertThat(reviewPoints.get(4).getLink(), equalTo(note1ToNote2));
-      }
+      @Nested
+      class WithLevels {
+        @BeforeEach
+        void Note1And2HaveDifferentLevels() {
+          makeMe.aReviewSettingFor(note1).level(5).please();
+          makeMe.aReviewSettingFor(note2).level(2).please();
+        }
 
-      @Test
-      void shouldNotReturnReviewPointForLinkIfCreatedByOtherPeople() {
-        makeMe.theNote(note1).notebookOwnership(makeMe.aUser().please()).please();
-        makeMe.refresh(userModel.getEntity());
-        List<ReviewPoint> reviewPoints = getAllDueReviewPoints();
-        assertThat(reviewPoints, hasSize(2));
-        assertThat(reviewPoints.get(0).getNote(), equalTo(anotherNote));
-        assertThat(reviewPoints.get(1).getNote(), equalTo(note2));
+        @Test
+        void shouldReturnReviewPointForLowerLevelNoteOrLink() {
+          List<ReviewPoint> reviewPoints = getAllDueReviewPoints();
+          assertThat(reviewPoints, hasSize(4));
+          assertThat(reviewPoints.get(0).getNote(), equalTo(anotherNote));
+          assertThat(reviewPoints.get(1).getNote(), equalTo(note2));
+          assertThat(reviewPoints.get(2).getNote(), equalTo(note1));
+          assertThat(reviewPoints.get(3).getLink(), equalTo(note1ToNote2));
+        }
+
+        @Test
+        void shouldReturnLinksOrderedByLevels() {
+          Link aLevel2Link = makeMe.aLink().between(anotherNote, note2).please();
+          makeMe.refresh(userModel.getEntity());
+          List<ReviewPoint> reviewPoints = getAllDueReviewPoints();
+          assertThat(reviewPoints, hasSize(5));
+          assertThat(reviewPoints.get(0).getNote(), equalTo(anotherNote));
+          assertThat(reviewPoints.get(1).getNote(), equalTo(note2));
+          assertThat(reviewPoints.get(2).getLink(), equalTo(aLevel2Link));
+          assertThat(reviewPoints.get(4).getLink(), equalTo(note1ToNote2));
+        }
+
+        @Test
+        void shouldNotReturnReviewPointForLinkIfCreatedByOtherPeople() {
+          makeMe.theNote(note1).notebookOwnership(makeMe.aUser().please()).please();
+          makeMe.refresh(userModel.getEntity());
+          List<ReviewPoint> reviewPoints = getAllDueReviewPoints();
+          assertThat(reviewPoints, hasSize(2));
+          assertThat(reviewPoints.get(0).getNote(), equalTo(anotherNote));
+          assertThat(reviewPoints.get(1).getNote(), equalTo(note2));
+        }
       }
     }
 
