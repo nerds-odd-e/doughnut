@@ -57,7 +57,7 @@
   },
   "devDependencies": {
     "@anev/ts-mountebank": "^1.5",
-    "@badeball/cypress-cucumber-preprocessor": "^11.1",
+    "@badeball/cypress-cucumber-preprocessor": "^11.2",
     "@bahmutov/cypress-esbuild-preprocessor": "^2.1",
     "@esbuild-plugins/node-modules-polyfill": "^0.1",
     "@testing-library/cypress": "8.0",
