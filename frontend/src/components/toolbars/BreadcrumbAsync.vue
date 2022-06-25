@@ -37,5 +37,10 @@ export default defineComponent({
   mounted() {
     this.fetchData();
   },
+  watch: {
+    noteId() {
+      this.fetchData();
+    },
+  },
 });
 </script>
