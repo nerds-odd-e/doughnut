@@ -3,17 +3,9 @@ import { RouterView } from "vue-router";
 import usePopups from "../../components/commons/Popups/usePopup";
 import routerScopeGuard from "../../routes/relative_routes";
 
-declare module "@vue/runtime-core" {
-  interface ComponentCustomProperties {
-    alert: Promise<boolean>;
-  }
-}
-
 function NestedPage(
   WrappedComponent: ReturnType<typeof defineComponent>,
-  scopeName: string,
-  exceptRoutes: string[],
-  notAllowedMessage: string
+  scopeName: string
 ) {
   return defineComponent({
     name: "NestedPage",
@@ -31,21 +23,14 @@ function NestedPage(
         return true;
       },
     },
-    methods: {
-      async alert() {
-        return this.popups.alert(notAllowedMessage);
-      },
+    beforeRouteEnter(to, _from, next) {
+      next(() => routerScopeGuard(scopeName)(to, next));
     },
-    beforeRouteEnter(to, from, next) {
-      next((vm) =>
-        routerScopeGuard(scopeName, exceptRoutes, vm.alert)(to, from, next)
-      );
+    beforeRouteUpdate(to, _from, next) {
+      routerScopeGuard(scopeName)(to, next);
     },
-    beforeRouteUpdate(to, from, next) {
-      routerScopeGuard(scopeName, exceptRoutes, this.alert)(to, from, next);
-    },
-    beforeRouteLeave(to, from, next) {
-      routerScopeGuard(scopeName, exceptRoutes, this.alert)(to, from, next);
+    beforeRouteLeave(to, _from, next) {
+      routerScopeGuard(scopeName)(to, next);
     },
     render() {
       return h("div", { class: "inner-box" }, [

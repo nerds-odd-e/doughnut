@@ -19,19 +19,9 @@ import TestabilityPage from "@/pages/TestabilityPage.vue";
 import AnswerShowPage from "@/pages/AnswerShowPage.vue";
 import NestedPage from "../pages/commons/NestedPage";
 
-const NestedInitialReviewPage = NestedPage(
-  InitialReviewPage,
-  "initial",
-  [],
-  "This will leave the initial review, are you sure?"
-);
+const NestedInitialReviewPage = NestedPage(InitialReviewPage, "initial");
 
-const NestedRepeatPage = NestedPage(
-  RepeatPage,
-  "repeat",
-  ["repeat-quiz"],
-  "Please answer the question first before you explore the notes."
-);
+const NestedRepeatPage = NestedPage(RepeatPage, "repeat");
 
 const noteAndLinkRoutes = [
   { path: "notebooks", name: "notebooks", component: NotebooksPage },
