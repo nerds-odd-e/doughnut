@@ -2,7 +2,16 @@
 /// <reference types="../support" />
 // @ts-check
 
-import { Given, Then, When } from "@badeball/cypress-cucumber-preprocessor"
+import { Given, Then, When, defineParameterType } from "@badeball/cypress-cucumber-preprocessor"
+import NotePath from "../support/NotePath"
+
+defineParameterType({
+  name: "notepath",
+  regexp: /.*/,
+  transformer(s: string) {
+    return new NotePath(s)
+  },
+})
 
 Given("I visit note {string}", (noteTitle) => {
   cy.jumpToNotePage(noteTitle)
@@ -66,7 +75,7 @@ When("I create a note belonging to {string}:", (noteTitle, data) => {
   cy.submitNoteCreationFormsWith(data.hashes())
 })
 
-When("I am creating a note under {string}", (notePath) => {
+When("I am creating a note under {notepath}", (notePath: NotePath) => {
   cy.navigateToNotePage(notePath)
   cy.clickAddChildNoteButton()
 })
@@ -119,7 +128,7 @@ Then("I should not see note {string} at the top level of all my notes", (noteTit
   cy.findByText(noteTitle).should("not.exist")
 })
 
-When("I navigate to {string} note", (notePath) => {
+When("I navigate to {notepath} note", (notePath: NotePath) => {
   cy.navigateToNotePage(notePath)
 })
 

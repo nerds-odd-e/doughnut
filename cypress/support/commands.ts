@@ -26,6 +26,7 @@
 
 import "@testing-library/cypress/add-commands"
 import "cypress-file-upload"
+import NotePath from "./NotePath"
 import WikidataServiceTester from "./WikidataServiceTester"
 
 Cypress.Commands.add("pageIsNotLoading", () => {
@@ -163,16 +164,12 @@ Cypress.Commands.add("navigateToChild", (noteTitle) => {
   cy.expectNoteTitle(noteTitle)
 })
 
-Cypress.Commands.add("navigateToNotePage", (notePath: string) => {
-  const found = notePath.match(/Top\/(.*)/)
-  if (!found || found.length < 2) {
-    throw new Error("the note path should be something like `Top/path/to/note`")
+Cypress.Commands.add("navigateToNotePage", (notePath: NotePath) => {
+  if (notePath.root !== "Top") {
+    throw new Error("only Top is implmemented")
   }
-  const noteTitlesDividedBySlash = found[1]
   cy.visitMyNotebooks()
-  noteTitlesDividedBySlash
-    .commonSenseSplit("/")
-    .forEach((noteTitle) => cy.navigateToChild(noteTitle))
+  notePath.path.forEach((noteTitle) => cy.navigateToChild(noteTitle))
 })
 
 // jumptoNotePage is faster than navigateToNotePage
