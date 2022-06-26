@@ -5,11 +5,12 @@ import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.LinkCreation;
-import com.odde.doughnut.entities.json.NotesBulk;
+import com.odde.doughnut.entities.json.NoteRealm;
 import com.odde.doughnut.exceptions.CyclicLinkDetectedException;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.LinkModel;
+import com.odde.doughnut.models.NoteViewer;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.TestabilitySettings;
 import javax.annotation.Resource;
@@ -72,17 +73,18 @@ class RestLinkController {
 
   @PostMapping(value = "/create/{sourceNote}/{targetNote}")
   @Transactional
-  public NotesBulk linkNoteFinalize(
+  public NoteRealm linkNoteFinalize(
       @PathVariable Note sourceNote,
       @PathVariable Note targetNote,
       @RequestBody @Valid LinkCreation linkCreation,
       BindingResult bindingResult)
       throws NoAccessRightException, CyclicLinkDetectedException, BindException {
     if (bindingResult.hasErrors()) throw new BindException(bindingResult);
-    currentUserFetcher.getUser().getAuthorization().assertAuthorization(sourceNote);
-    currentUserFetcher.getUser().getAuthorization().assertReadAuthorization(targetNote);
+    UserModel userModel = currentUserFetcher.getUser();
+    userModel.getAuthorization().assertAuthorization(sourceNote);
+    userModel.getAuthorization().assertReadAuthorization(targetNote);
     if (linkCreation != null && linkCreation.moveUnder != null && linkCreation.moveUnder) {
-      currentUserFetcher.getUser().getAuthorization().assertAuthorization(targetNote);
+      userModel.getAuthorization().assertAuthorization(targetNote);
       modelFactoryService
           .toNoteMotionModel(sourceNote, targetNote, linkCreation.asFirstChild)
           .execute();
@@ -91,11 +93,11 @@ class RestLinkController {
         Link.createLink(
             sourceNote,
             targetNote,
-            currentUserFetcher.getUser().getEntity(),
+            userModel.getEntity(),
             linkCreation.linkType,
             testabilitySettings.getCurrentUTCTimestamp());
     modelFactoryService.linkRepository.save(link);
-    return NotesBulk.jsonNoteRealm(link.getSourceNote(), currentUserFetcher.getUser());
+    return new NoteViewer(userModel.getEntity(), link.getSourceNote()).toJsonObject();
   }
 
   class LinkStatistics {

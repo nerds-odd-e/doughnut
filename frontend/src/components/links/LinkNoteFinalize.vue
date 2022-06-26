@@ -84,7 +84,7 @@ export default defineComponent({
       }
       this.storedApi
         .createLink(this.note.id, this.targetNote.id, this.formData)
-        .then((r) => this.$emit("success", r.notes[0]))
+        .then((r) => this.$emit("success", r))
         .catch((res) => {
           this.formErrors = res;
         });

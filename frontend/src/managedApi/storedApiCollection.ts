@@ -48,7 +48,7 @@ const storedApiCollection = (
       return (await managedApi.restPostMultiplePartForm(
         `notes/${parentId}/create`,
         data
-      )) as Generated.NotesBulk;
+      )) as Generated.NoteRealm;
     },
 
     async createLink(
@@ -59,7 +59,7 @@ const storedApiCollection = (
       return (await managedApi.restPost(
         `links/create/${sourceId}/${targetId}`,
         data
-      )) as Generated.NotesBulk;
+      )) as Generated.NoteRealm;
     },
 
     async updateLink(linkId: Doughnut.ID, data: Generated.LinkCreation) {

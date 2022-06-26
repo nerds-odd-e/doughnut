@@ -90,11 +90,6 @@ declare namespace Generated {
         subscriptions: Subscription[];
     }
 
-    interface NotesBulk {
-        notePosition: NotePositionViewedByUser;
-        notes: NoteRealm[];
-    }
-
     interface QuizQuestionViewedByUser {
         quizQuestion: QuizQuestion;
         questionType: QuestionType;
