@@ -5,7 +5,7 @@
       :key="_linkType"
     >
       <li v-for="link in linksOfType.direct" :key="link.id">
-        <LinkLink
+        <LinkOfNote
           v-bind="{ link }"
           :reverse="false"
           @note-realm-updated="$emit('noteRealmUpdated', $event)"
@@ -19,7 +19,7 @@
         v-for="{ direct, reverse } in linksReader.groupedLinks"
         :key="direct"
       >
-        <LinkLink
+        <LinkOfNote
           class="link-multi"
           v-for="link in direct"
           :key="link.id"
@@ -27,7 +27,7 @@
           :reverse="false"
           @note-realm-updated="$emit('noteRealmUpdated', $event)"
         />
-        <LinkLink
+        <LinkOfNote
           class="link-multi"
           v-for="link in reverse"
           :key="link.id"
@@ -42,7 +42,7 @@
       :key="_linkType"
     >
       <li v-if="linksOfType.direct.length > 0">
-        <LinkLink
+        <LinkOfNote
           class="link-multi"
           v-for="link in linksOfType.direct"
           :key="link.id"
@@ -63,7 +63,7 @@
     >
       <li v-if="linksOfType.reverse.length > 0">
         <span>{{ reverseLabel(linkType) }} </span>
-        <LinkLink
+        <LinkOfNote
           class="link-multi"
           v-for="link in linksOfType.reverse"
           :key="link.id"
@@ -78,7 +78,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import LinkLink from "./LinkLink.vue";
+import LinkOfNote from "./LinkOfNote.vue";
 import LinksReader from "../../models/LinksReader";
 import { reverseLabel } from "../../models/linkTypeOptions";
 
@@ -87,7 +87,7 @@ export default defineComponent({
     links: Object as PropType<Generated.LinksOfANote>,
   },
   emits: ["noteRealmUpdated"],
-  components: { LinkLink },
+  components: { LinkOfNote },
   methods: {
     reverseLabel(lbl) {
       return reverseLabel(lbl);
