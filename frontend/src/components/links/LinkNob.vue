@@ -14,6 +14,10 @@
             doneHandler($event);
             $emit('noteRealmUpdated', $event);
           "
+          @link-deleted="
+            doneHandler($event);
+            $emit('noteRealmUpdated', $event);
+          "
         />
       </template>
     </PopupButton>

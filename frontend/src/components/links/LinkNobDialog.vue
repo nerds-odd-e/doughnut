@@ -49,7 +49,7 @@ export default defineComponent({
     inverseIcon: Boolean,
     colors: Object,
   },
-  emits: ["done"],
+  emits: ["done", "linkDeleted"],
   components: {
     LinkTypeSelect,
     NoteTitleWithLink,
@@ -75,7 +75,7 @@ export default defineComponent({
         return;
       }
       const res = await this.storedApi.deleteLink(this.link.id);
-      this.$emit("done", res.notes[0]);
+      this.$emit("linkDeleted", res.notes[0]);
     },
   },
 });
