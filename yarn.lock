@@ -47,10 +47,10 @@
     glob "^7.1.6"
     minimatch "^3.0.4"
 
-"@badeball/cypress-cucumber-preprocessor@^11.2":
-  version "11.2.0"
-  resolved "https://registry.yarnpkg.com/@badeball/cypress-cucumber-preprocessor/-/cypress-cucumber-preprocessor-11.2.0.tgz#e8db4b9e96b6f50058cd1f0f1e2427068ec7bbe5"
-  integrity sha512-GDtECRbccBUj0ssh4bBl2F7pR2/C5/H3M94wZylM42zGlCvFtALbP9VmInRVyBls9rngize+FOsppnyG6tVpFA==
+"@badeball/cypress-cucumber-preprocessor@^11.3":
+  version "11.3.0"
+  resolved "https://registry.yarnpkg.com/@badeball/cypress-cucumber-preprocessor/-/cypress-cucumber-preprocessor-11.3.0.tgz#67a5ff5acc6931f356930feb5c699126c506e84e"
+  integrity sha512-utrxw6WuJFvkxCrA+tZDbYOF71uHyNIvXYJ5O40pQN5c6UZew3mT3z9hFbEgQU2VCb1myQJBBBAjsKE5rlu8cA==
   dependencies:
     "@badeball/cypress-configuration" "^3.0.0"
     "@cucumber/cucumber-expressions" "^15.0.1"
