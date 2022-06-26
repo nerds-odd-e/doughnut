@@ -74,6 +74,8 @@ export default defineComponent({
         this.$emit("done", null);
         return;
       }
+      const res = await this.storedApi.deleteLink(this.link.id);
+      this.$emit("done", res.notes[0]);
     },
   },
 });

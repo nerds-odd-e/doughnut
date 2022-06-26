@@ -248,6 +248,10 @@ Cypress.Commands.add("expectExactLinkTargets", (targets) => {
     .should("deep.equal", targets)
 })
 
+Cypress.Commands.add("clickLinkNob", (target: string) => {
+  cy.findByText(target).siblings(".link-nob").click()
+})
+
 Cypress.Commands.add("findNoteCardButton", (noteTitle, btnTextOrTitle) => {
   return cy
     .findByText(noteTitle)

@@ -94,33 +94,35 @@ Then(
   },
 )
 
-Then("I should see {string} has no link of type {string}", (noteTitle, linkType) => {
+Then("I should see {string} has no link to {string}", (noteTitle: string, targetTitle: string) => {
   cy.jumpToNotePage(noteTitle)
-  cy.findByText(linkType).should("not.exist")
+  cy.findByText(targetTitle).should("not.exist")
 })
 
-When("I open link {string}", (linkTitle) => {
-  cy.findByText(linkTitle).siblings(".link-nob").click()
-})
-
-Then("I should be able to change the link to {string}", (linkType) => {
-  cy.clickRadioByLabel(linkType)
-  cy.pageIsNotLoading()
-  cy.findByRole("button", { name: "Update" }).click()
-  cy.findAllByRole("button", { name: linkType }).should("be.visible")
-})
+Then(
+  "I change the link from {string} to {string} to {string}",
+  (noteTitle: string, targetTitle: string, linkType: string) => {
+    cy.jumpToNotePage(noteTitle)
+    cy.clickLinkNob(targetTitle)
+    cy.clickRadioByLabel(linkType)
+    cy.pageIsNotLoading()
+    cy.findByRole("button", { name: "Update" }).click()
+    cy.findAllByRole("button", { name: linkType }).should("be.visible")
+  },
+)
 
 Then("I should be able to delete the link", () => {
   cy.findByRole("button", { name: "Delete" }).click()
 })
 
-Then("I should be able to delete the link to note {string}", (noteTitle) => {
+Then("I delete the link from {string} to {string}", (noteTitle, targetTitle) => {
   cy.pageIsNotLoading()
-  cy.findByText(noteTitle).siblings(".link-nob").click()
+  cy.jumpToNotePage(noteTitle)
+  cy.clickLinkNob(targetTitle)
   cy.findByRole("button", { name: "Delete" }).click()
   cy.findByRole("button", { name: "Cancel" }).click()
-  cy.findByText(noteTitle).siblings(".link-nob").click()
+  cy.clickLinkNob(targetTitle)
   cy.findByRole("button", { name: "Delete" }).click()
   cy.findByRole("button", { name: "OK" }).click()
-  cy.contains(noteTitle).should("not.exist")
+  // cy.contains(targetTitle).should("not.exist")
 })
