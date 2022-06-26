@@ -73,7 +73,7 @@ const storedApiCollection = (
       return (await managedApi.restPost(
         `links/${linkId}/delete`,
         {}
-      )) as Generated.NotesBulk;
+      )) as number;
     },
 
     async updateNote(

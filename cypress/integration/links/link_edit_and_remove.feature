@@ -17,3 +17,7 @@ Feature: link edit and remove
   Scenario: delete link
     When I delete the link from "Moon" to "Earth"
     Then I should see "Moon" has no link to "Earth"
+
+  Scenario: delete reverse link
+    When I delete the link from "Earth" to "Moon"
+    Then I should see "Moon" has no link to "Earth"
