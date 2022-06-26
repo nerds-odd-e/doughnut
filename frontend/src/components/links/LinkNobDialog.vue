@@ -65,8 +65,8 @@ export default defineComponent({
 
   methods: {
     async updateLink() {
-      const res = await this.storedApi.updateLink(this.link.id, this.formData);
-      this.$emit("done", res.notes[0]);
+      await this.storedApi.updateLink(this.link.id, this.formData);
+      this.$emit("done");
     },
 
     async deleteLink() {

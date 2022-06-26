@@ -53,12 +53,12 @@ class RestLinkController {
 
   @PostMapping(value = "/{link}")
   @Transactional
-  public NotesBulk updateLink(Link link, @RequestBody LinkCreation linkCreation)
+  public Integer updateLink(Link link, @RequestBody LinkCreation linkCreation)
       throws NoAccessRightException {
     currentUserFetcher.getUser().getAuthorization().assertAuthorization(link);
     link.setLinkType(linkCreation.linkType);
     modelFactoryService.linkRepository.save(link);
-    return NotesBulk.jsonNoteRealm(link.getSourceNote(), currentUserFetcher.getUser());
+    return link.getId();
   }
 
   @PostMapping(value = "/{link}/delete")

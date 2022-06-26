@@ -63,10 +63,7 @@ const storedApiCollection = (
     },
 
     async updateLink(linkId: Doughnut.ID, data: Generated.LinkCreation) {
-      return (await managedApi.restPost(
-        `links/${linkId}`,
-        data
-      )) as Generated.NotesBulk;
+      return (await managedApi.restPost(`links/${linkId}`, data)) as number;
     },
 
     async deleteLink(linkId: Doughnut.ID) {
