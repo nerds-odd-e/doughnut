@@ -24,7 +24,6 @@ import NoteShell from "./NoteShell.vue";
 import NoteContent from "./NoteContent.vue";
 
 export default defineComponent({
-  name: "NoteWithLinks",
   props: {
     note: { type: Object as PropType<Generated.Note>, required: true },
     links: {
