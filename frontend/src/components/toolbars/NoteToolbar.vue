@@ -79,18 +79,6 @@
           <SvgCog />
         </button>
         <div class="dropdown-menu dropdown-menu-end">
-          <PopupButton class="dropdown-item" title="Edit review settings">
-            <template #button_face>
-              <SvgReviewSetting />Edit review settings
-            </template>
-            <template #dialog_body="{ doneHandler }">
-              <ReviewSettingEditDialog
-                :note-id="selectedNote.id"
-                :title="selectedNote.title"
-                @done="doneHandler($event)"
-              />
-            </template>
-          </PopupButton>
           <NoteDeleteButton
             class="dropdown-item"
             :note="selectedNote"
@@ -121,7 +109,6 @@ import SvgCog from "../svgs/SvgCog.vue";
 import NoteNewButton from "./NoteNewButton.vue";
 import ViewTypeButtons from "./ViewTypeButtons.vue";
 import SvgReviewSetting from "../svgs/SvgReviewSetting.vue";
-import ReviewSettingEditDialog from "../review/ReviewSettingEditDialog.vue";
 import SvgEdit from "../svgs/SvgEdit.vue";
 import NoteEditDialog from "../notes/NoteEditDialog.vue";
 import usePopups from "../commons/Popups/usePopup";
@@ -155,7 +142,6 @@ export default defineComponent({
     NoteNewButton,
     ViewTypeButtons,
     SvgReviewSetting,
-    ReviewSettingEditDialog,
     SvgEdit,
     NoteEditDialog,
     NoteDeleteButton,
