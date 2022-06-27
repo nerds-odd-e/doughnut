@@ -36,7 +36,7 @@ export default defineComponent({
     noteId: { type: Number, required: true },
   },
   components: { CheckInput, RadioButtons },
-  emits: ["update:modelValue"],
+  emits: ["levelChanged"],
   data() {
     return {
       formData: {} as Omit<Generated.ReviewSetting, "id">,
@@ -54,8 +54,13 @@ export default defineComponent({
         ...this.formData,
         ...newValue,
       };
-      this.$emit("update:modelValue", updated);
-      this.api.reviewMethods.updateReviewSetting(this.noteId, updated);
+      this.api.reviewMethods
+        .updateReviewSetting(this.noteId, updated)
+        .then(() => {
+          if (newValue.level !== undefined) {
+            this.$emit("levelChanged", newValue.level);
+          }
+        });
     },
   },
   mounted() {

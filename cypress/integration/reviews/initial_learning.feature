@@ -8,7 +8,6 @@ Feature: Initial learning
       | hard     |
       | easy     |
 
-  @ignore
   Scenario: Update review setting
     When I am learning new note on day 1
     And I set the level of "hard" to be 2
