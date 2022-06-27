@@ -81,8 +81,7 @@ class RestReviewsController {
     reviewPoint.setRemovedFromReview(initialInfo.skipReview);
 
     ReviewPointModel reviewPointModel = modelFactoryService.toReviewPointModel(reviewPoint);
-    reviewPointModel.initialReview(
-        userModel, initialInfo.reviewSetting, testabilitySettings.getCurrentUTCTimestamp());
+    reviewPointModel.initialReview(userModel, testabilitySettings.getCurrentUTCTimestamp());
     return reviewPointModel.getEntity();
   }
 

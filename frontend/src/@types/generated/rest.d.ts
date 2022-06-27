@@ -29,7 +29,6 @@ declare namespace Generated {
     interface InitialInfo {
         thingId: number;
         skipReview: boolean;
-        reviewSetting: ReviewSetting;
     }
 
     interface LinkCreation {
@@ -183,12 +182,6 @@ declare namespace Generated {
         question: QuizQuestion;
     }
 
-    interface ReviewSetting {
-        id: number;
-        rememberSpelling: boolean;
-        level: number;
-    }
-
     interface Link extends Thingy {
         clozeSource: string;
         sourceNote: Note;
@@ -258,6 +251,12 @@ declare namespace Generated {
         repetitionCount: number;
         forgettingCurveIndex: number;
         removedFromReview: boolean;
+    }
+
+    interface ReviewSetting {
+        id: number;
+        rememberSpelling: boolean;
+        level: number;
     }
 
     interface Thingy {

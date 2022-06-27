@@ -4,7 +4,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.ReviewSetting;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,7 +36,7 @@ public class ReviewPointModelTest {
     void initialReviewShouldSetBothInitialAndLastReviewAt() {
       Note note = makeMe.aNote().creatorAndOwner(userModel).please();
       ReviewPointModel reviewPoint = makeMe.aReviewPointFor(note).by(userModel).toModelPlease();
-      reviewPoint.initialReview(userModel, new ReviewSetting(), day1);
+      reviewPoint.initialReview(userModel, day1);
       assertThat(reviewPoint.getEntity().getInitialReviewedAt(), equalTo(day1));
       assertThat(reviewPoint.getEntity().getLastReviewedAt(), equalTo(day1));
     }

@@ -2,8 +2,8 @@
   <RadioButtons
     scope-name="review_setting"
     field="level"
-    :model-value="modelValue.level"
-    :errors="errors.level"
+    :model-value="formData.level"
+    :errors="formErrors.level"
     :options="
       [0, 1, 2, 3, 4, 5, 6].map((level) => ({
         value: level,
@@ -16,14 +16,14 @@
   <CheckInput
     scope-name="review_setting"
     field="rememberSpelling"
-    :model-value="modelValue.rememberSpelling"
-    :errors="errors.rememberSpelling"
+    :model-value="formData.rememberSpelling"
+    :errors="formErrors.rememberSpelling"
     @update:model-value="updateModelValue({ rememberSpelling: $event })"
   />
 </template>
 
 <script lang="ts">
-import { defineComponent, PropType } from "vue";
+import { defineComponent } from "vue";
 import CheckInput from "../form/CheckInput.vue";
 import RadioButtons from "../form/RadioButtons.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
@@ -34,23 +34,32 @@ export default defineComponent({
   },
   props: {
     noteId: { type: Number, required: true },
-    modelValue: {
-      type: Object as PropType<Omit<Generated.ReviewSetting, "id">>,
-      required: true,
-    },
-    errors: Object,
   },
   components: { CheckInput, RadioButtons },
   emits: ["update:modelValue"],
+  data() {
+    return {
+      formData: {} as Omit<Generated.ReviewSetting, "id">,
+      formErrors: {} as Partial<Generated.ReviewSetting>,
+    };
+  },
   methods: {
+    fetchData() {
+      this.api.reviewMethods.getReviewSetting(this.noteId).then((res) => {
+        this.formData = res;
+      });
+    },
     updateModelValue(newValue: Partial<Generated.ReviewSetting>) {
       const updated = {
-        ...this.modelValue,
+        ...this.formData,
         ...newValue,
       };
       this.$emit("update:modelValue", updated);
       this.api.reviewMethods.updateReviewSetting(this.noteId, updated);
     },
+  },
+  mounted() {
+    this.fetchData();
   },
 });
 </script>

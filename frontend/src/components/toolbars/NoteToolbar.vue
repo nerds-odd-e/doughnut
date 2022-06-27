@@ -108,7 +108,6 @@ import SvgAddSibling from "../svgs/SvgAddSibling.vue";
 import SvgCog from "../svgs/SvgCog.vue";
 import NoteNewButton from "./NoteNewButton.vue";
 import ViewTypeButtons from "./ViewTypeButtons.vue";
-import SvgReviewSetting from "../svgs/SvgReviewSetting.vue";
 import SvgEdit from "../svgs/SvgEdit.vue";
 import NoteEditDialog from "../notes/NoteEditDialog.vue";
 import usePopups from "../commons/Popups/usePopup";
@@ -141,7 +140,6 @@ export default defineComponent({
     SvgAddSibling,
     NoteNewButton,
     ViewTypeButtons,
-    SvgReviewSetting,
     SvgEdit,
     NoteEditDialog,
     NoteDeleteButton,

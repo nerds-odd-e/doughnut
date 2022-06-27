@@ -22,13 +22,8 @@
       <div>
         <div class="mb-2">
           <ReviewSettingForm
-            v-if="
-              reviewPointWithReviewSetting?.reviewSetting &&
-              reviewPointWithReviewSetting.reviewPoint.thing.note?.id
-            "
-            v-model="reviewPointWithReviewSetting.reviewSetting"
+            v-if="reviewPointWithReviewSetting.reviewPoint.thing.note?.id"
             :note-id="reviewPointWithReviewSetting.reviewPoint.thing.note?.id"
-            :errors="{}"
           />
         </div>
         <InitialReviewButtons
@@ -112,7 +107,6 @@ export default defineComponent({
         .doInitialReview({
           thingId: this.reviewPoint.thing.id,
           skipReview,
-          reviewSetting: this.reviewPointWithReviewSetting.reviewSetting,
         })
         .then(() => {
           if (this.finished + 1 === this.reviewPointWithReviewSettings.length) {
