@@ -24,6 +24,7 @@ declare namespace Generated {
         answerViewedByUser: AnswerViewedByUser;
         answerResult: AnswerResult;
         answer: Answer;
+        reviewSetting: ReviewSetting;
     }
 
     interface InitialInfo {
@@ -111,11 +112,6 @@ declare namespace Generated {
         toRepeatCount: number;
     }
 
-    interface ReviewPointWithReviewSetting {
-        reviewPoint: ReviewPoint;
-        reviewSetting: ReviewSetting;
-    }
-
     interface ReviewStatus {
         toRepeatCount: number;
         learntCount: number;
@@ -180,6 +176,12 @@ declare namespace Generated {
         spellingAnswer: string;
         answerNoteId?: number;
         question: QuizQuestion;
+    }
+
+    interface ReviewSetting {
+        id: number;
+        rememberSpelling: boolean;
+        level: number;
     }
 
     interface Link extends Thingy {
@@ -251,12 +253,6 @@ declare namespace Generated {
         repetitionCount: number;
         forgettingCurveIndex: number;
         removedFromReview: boolean;
-    }
-
-    interface ReviewSetting {
-        id: number;
-        rememberSpelling: boolean;
-        level: number;
     }
 
     interface Thingy {

@@ -41,7 +41,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
     async initialReview() {
       return (await managedApi.restGet(
         `reviews/initial`
-      )) as Generated.ReviewPointWithReviewSetting[];
+      )) as Generated.ReviewPoint[];
     },
 
     async doInitialReview(data: Generated.InitialInfo) {

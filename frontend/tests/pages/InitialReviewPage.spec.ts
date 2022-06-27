@@ -32,7 +32,8 @@ describe("repeat page", () => {
     const reviewPoint = makeMe.aReviewPoint.ofNote(note).please();
     helper.apiMock
       .expectingGet("/api/reviews/initial")
-      .andReturnOnce([{ reviewPoint }, { reviewPoint }]);
+      .andReturnOnce([reviewPoint, reviewPoint]);
+    helper.apiMock.expectingGet(`/api/notes/${note.id}/review-setting`);
     helper.apiMock.expectingGet(`/api/notes/${note.id}`).andReturnOnce({
       notePosition: makeMe.aNotePosition.please(),
       notes: [note],
@@ -53,7 +54,7 @@ describe("repeat page", () => {
     const reviewPoint = makeMe.aReviewPoint.ofNote(noteRealm).please();
     helper.apiMock
       .expectingGet("/api/reviews/initial")
-      .andReturnOnce([{ reviewPoint }]);
+      .andReturnOnce([reviewPoint]);
     const wrapper = renderer
       .withProps({ nested: true })
       .currentRoute({ name: "initial" })
@@ -71,7 +72,7 @@ describe("repeat page", () => {
     const reviewPoint = makeMe.aReviewPoint.ofLink(link).please();
     helper.apiMock
       .expectingGet("/api/reviews/initial")
-      .andReturnOnce([{ reviewPoint }]);
+      .andReturnOnce([reviewPoint]);
     const wrapper = renderer
       .withProps({ nested: true })
       .currentRoute({ name: "initial" })

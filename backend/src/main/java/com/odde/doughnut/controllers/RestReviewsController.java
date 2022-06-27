@@ -8,7 +8,6 @@ import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.InitialInfo;
 import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import com.odde.doughnut.entities.json.RepetitionForUser;
-import com.odde.doughnut.entities.json.ReviewPointWithReviewSetting;
 import com.odde.doughnut.entities.json.ReviewStatus;
 import com.odde.doughnut.entities.json.SelfEvaluation;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -59,15 +58,12 @@ class RestReviewsController {
 
   @GetMapping("/initial")
   @Transactional(readOnly = true)
-  public List<ReviewPointWithReviewSetting> initialReview() {
+  public List<ReviewPoint> initialReview() {
     UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertLoggedIn();
     Reviewing reviewing = user.createReviewing(testabilitySettings.getCurrentUTCTimestamp());
 
-    return reviewing
-        .getDueInitialReviewPoints()
-        .map(ReviewPointWithReviewSetting::from)
-        .collect(Collectors.toList());
+    return reviewing.getDueInitialReviewPoints().collect(Collectors.toList());
   }
 
   @PostMapping(path = "")

@@ -22,8 +22,8 @@
       <div>
         <div class="mb-2">
           <ReviewSettingForm
-            v-if="reviewPointWithReviewSetting.reviewPoint.thing.note?.id"
-            :note-id="reviewPointWithReviewSetting.reviewPoint.thing.note?.id"
+            v-if="reviewPoint.thing.note?.id"
+            :note-id="reviewPoint.thing.note?.id"
           />
         </div>
         <InitialReviewButtons
@@ -54,8 +54,8 @@ export default defineComponent({
   name: "InitialReviewPage",
   props: {
     nested: Boolean,
-    reviewPointWithReviewSettings: {
-      type: Object as PropType<Generated.ReviewPointWithReviewSetting[]>,
+    reviewPoints: {
+      type: Object as PropType<Generated.ReviewPoint[]>,
       required: true,
     },
   },
@@ -74,14 +74,11 @@ export default defineComponent({
     };
   },
   computed: {
-    reviewPointWithReviewSetting() {
-      return this.reviewPointWithReviewSettings[this.finished];
-    },
     reviewPoint() {
-      return this.reviewPointWithReviewSetting?.reviewPoint;
+      return this.reviewPoints[this.finished];
     },
     remainingInitialReviewCountForToday() {
-      return this.reviewPointWithReviewSettings.length - this.finished;
+      return this.reviewPoints.length - this.finished;
     },
     buttonKey() {
       return this.reviewPoint?.thing?.id;
@@ -109,7 +106,7 @@ export default defineComponent({
           skipReview,
         })
         .then(() => {
-          if (this.finished + 1 === this.reviewPointWithReviewSettings.length) {
+          if (this.finished + 1 === this.reviewPoints.length) {
             this.$router.push({ name: "reviews" });
             return;
           }

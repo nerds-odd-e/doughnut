@@ -20,7 +20,6 @@ import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.SelfEvaluate;
 import com.odde.doughnut.entities.json.InitialInfo;
-import com.odde.doughnut.entities.json.ReviewPointWithReviewSetting;
 import com.odde.doughnut.entities.json.SelfEvaluation;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
@@ -73,8 +72,7 @@ class RestReviewsControllerTests {
       Note n = makeMe.aNote().creatorAndOwner(userModel).please();
       makeMe.refresh(n);
       assertThat(n.getThing().getId(), notNullValue());
-      List<ReviewPointWithReviewSetting> reviewPointWithReviewSettings =
-          controller().initialReview();
+      List<ReviewPoint> reviewPointWithReviewSettings = controller().initialReview();
       assertThat(reviewPointWithReviewSettings, hasSize(1));
     }
 
