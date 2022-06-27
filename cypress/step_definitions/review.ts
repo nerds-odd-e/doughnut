@@ -4,14 +4,6 @@
 
 import { Given, Then } from "@badeball/cypress-cucumber-preprocessor"
 
-const checkBoxPredicate = (status) => {
-  if (status === "on") {
-    return "be.checked"
-  } else {
-    return "not.be.checked"
-  }
-}
-
 Then("I do these initial reviews in sequence:", (data) => {
   cy.initialReviewInSequence(data.hashes())
 })
@@ -92,30 +84,18 @@ Then("I am learning new note on day {int}", (day) => {
   cy.routerToInitialReview()
 })
 
-Then(
-  "I have selected the option {string} in review setting and set the level to be {int}",
-  (option, level) => {
-    cy.getFormControl(option).check()
-    cy.getFormControl("Level").clear().type(level)
-    cy.findByRole("button", { name: "Update" }).click()
-  },
-)
+Then("I set the level of {string} to be {int}", (noteTitle: string, level: number) => {
+  cy.expectNoteTitle(noteTitle)
+  cy.getFormControl("Level").then(($control) => {
+    cy.wrap($control).within(() => {
+      cy.findByRole("button", { name: "" + level }).click()
+    })
+  })
+})
 
 Then("I have selected the option {string}", (option) => {
   cy.getFormControl(option).check()
   cy.findByRole("button", { name: "Keep for repetition" }).click()
-})
-
-Then("I have unselected the option {string}", (option) => {
-  cy.getFormControl(option).uncheck()
-  cy.findByRole("button", { name: "Keep for repetition" }).click()
-})
-
-Then("I should see the option {string} is {string}", (option, status) => {
-  cy.getFormControl(option).then(($elem) => {
-    const expectedCheckBoxState = checkBoxPredicate(status)
-    cy.wrap($elem).should(expectedCheckBoxState)
-  })
 })
 
 Then("choose to remove it fromm reviews", () => {
@@ -183,11 +163,6 @@ Then("I should see the repetition is finished: {string}", (yesNo) => {
   cy.findByText("You have finished all repetitions for this half a day!").should(
     yesNo === "yes" ? "exist" : "not.exist",
   )
-})
-
-Then("I am changing note {string}'s review setting", (noteTitle) => {
-  cy.visit("/")
-  cy.clickNotePageMoreOptionsButton(noteTitle, "Edit review settings")
 })
 
 Then("The randomizer always choose the last", () => {

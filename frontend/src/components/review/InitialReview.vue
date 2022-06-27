@@ -22,9 +22,12 @@
       <div>
         <div class="mb-2">
           <ReviewSettingForm
-            v-if="reviewPointWithReviewSetting?.reviewSetting"
+            v-if="
+              reviewPointWithReviewSetting?.reviewSetting &&
+              reviewPointWithReviewSetting.reviewPoint.thing.note?.id
+            "
             v-model="reviewPointWithReviewSetting.reviewSetting"
-            :show-level="false"
+            :note-id="reviewPointWithReviewSetting.reviewPoint.thing.note?.id"
             :errors="{}"
           />
         </div>

@@ -7,6 +7,7 @@
       :show-level="true"
       scope-name="review-setting"
       v-model="formData"
+      :note-id="noteId"
       :errors="formErrors"
     />
     <input type="submit" value="Update" class="btn btn-primary" />
