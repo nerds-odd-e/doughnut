@@ -70,7 +70,7 @@
     "ts-jest": "^28",
     "typescript": "^4.7",
     "unplugin-auto-import": "^0.8",
-    "vite": "^2.9.12",
+    "vite": "^2.9.13",
     "vite-plugin-checker": "^0.4",
     "vite-plugin-eslint": "^1.6",
     "vue-tsc": "^0.35"
