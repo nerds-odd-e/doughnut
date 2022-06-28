@@ -1,6 +1,9 @@
 <template>
   <div class="note-body" :style="`border-color: ${bgColor}`">
     <slot />
+    <div class="note-footer" :style="`background-color: ${bgColor}`">
+      <slot name="footer" />
+    </div>
   </div>
 </template>
 
@@ -32,3 +35,25 @@ export default defineComponent({
   },
 });
 </script>
+
+<style scoped>
+.note-body {
+  padding-left: 10px;
+  padding-right: 10px;
+  border-radius: 10px;
+  border-style: solid;
+  border-top-width: 3px;
+  border-bottom-width: 1px;
+  border-right-width: 3px;
+  border-left-width: 1px;
+}
+
+.note-footer {
+  padding-left: 13px;
+  padding-right: 13px;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  margin-left: -13px;
+  margin-right: -13px;
+}
+</style>

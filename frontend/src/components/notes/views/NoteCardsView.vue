@@ -2,12 +2,15 @@
   <NoteWithLinks
     v-bind="{ note: noteRealm.note, links: noteRealm.links }"
     @note-realm-updated="$emit('noteRealmUpdated', $event)"
-  />
-  <NoteStatisticsButton
-    :note-id="noteRealm.id"
-    :expanded="expandInfo"
-    :key="noteRealm.id"
-  />
+  >
+    <template #footer>
+      <NoteStatisticsButton
+        :note-id="noteRealm.id"
+        :expanded="expandInfo"
+        :key="noteRealm.id"
+      />
+    </template>
+  </NoteWithLinks>
   <Cards v-if="expandChildren" :notes="noteRealm.children" />
 </template>
 

@@ -1,7 +1,6 @@
 <template>
   <NoteShell
     v-if="note"
-    class="note-body"
     v-bind="{ id: note.id, updatedAt: note.textContent?.updatedAt }"
   >
     <NoteFrameOfLinks
@@ -14,6 +13,9 @@
         @note-realm-updated="$emit('noteRealmUpdated', $event)"
       />
     </NoteFrameOfLinks>
+    <template #footer>
+      <slot name="footer" />
+    </template>
   </NoteShell>
 </template>
 
@@ -40,17 +42,6 @@ export default defineComponent({
 </script>
 
 <style scoped>
-.note-body {
-  padding-left: 10px;
-  padding-right: 10px;
-  border-radius: 10px;
-  border-style: solid;
-  border-top-width: 3px;
-  border-bottom-width: 1px;
-  border-right-width: 3px;
-  border-left-width: 1px;
-}
-
 .note-title {
   margin-top: 0px;
   padding-top: 10px;

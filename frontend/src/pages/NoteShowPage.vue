@@ -14,7 +14,7 @@
           @new-note-added="newNoteAdded($event)"
         />
       </div>
-      <div class="content" v-if="noteRealm">
+      <div class="container" v-if="noteRealm">
         <NoteCardsView
           v-bind="{ noteRealm, expandChildren, expandInfo }"
           @note-realm-updated="noteRealmUpdated($event)"
