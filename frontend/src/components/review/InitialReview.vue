@@ -1,7 +1,7 @@
 <template>
   <ContainerPage v-bind="{ loading, contentExists: true }">
     <template v-if="!nested">
-      <ShowReviewPoint v-bind="{ reviewPoint }" />
+      <ShowReviewPoint v-bind="{ reviewPoint, expandInfo: true }" />
       <div>
         <div class="mb-2">
           <ReviewSettingForm

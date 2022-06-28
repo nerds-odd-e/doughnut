@@ -5,6 +5,7 @@ import Modal from "@/components/commons/Modal.vue";
 import { mount } from "@vue/test-utils";
 
 describe("Modal", () => {
+  const Comp = Modal;
   const TestComponent = {
     template: `
       <Modal @close_request="$emit('close_request')">
@@ -16,7 +17,7 @@ describe("Modal", () => {
         </template>
       </Modal>
     `,
-    components: { Modal },
+    components: { Modal: Comp },
     emits: ["close_request"],
   };
 

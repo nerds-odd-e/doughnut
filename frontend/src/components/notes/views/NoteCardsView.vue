@@ -31,7 +31,7 @@ export default defineComponent({
       required: true,
     },
     expandChildren: { type: Boolean, required: true },
-    expandInfo: { type: Boolean, required: false },
+    expandInfo: { type: Boolean, default: false },
   },
   emits: ["noteRealmUpdated"],
   components: {

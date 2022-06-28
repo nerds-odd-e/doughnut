@@ -7,7 +7,7 @@
             <SvgClose />
           </button>
 
-          <div class="modal-header" v-if="this.$slots.header">
+          <div class="modal-header" v-if="$slots.header">
             <slot name="header" />
           </div>
 
@@ -20,13 +20,14 @@
   </transition>
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue";
 import SvgClose from "../svgs/SvgClose.vue";
 
-export default {
+export default defineComponent({
   emits: ["close_request"],
   components: { SvgClose },
-};
+});
 </script>
 
 <style scoped>

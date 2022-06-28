@@ -8,7 +8,7 @@
       v-bind="{
         noteId,
         expandChildren: false,
-        expandInfo: true,
+        expandInfo,
       }"
       :key="noteId"
     />
@@ -35,6 +35,7 @@ export default defineComponent({
       type: Object as PropType<Generated.ReviewPoint>,
       required: true,
     },
+    expandInfo: { type: Boolean, default: false },
   },
   emits: ["noteRealmUpdated"],
   components: { LinkShow, NoteShowPage },

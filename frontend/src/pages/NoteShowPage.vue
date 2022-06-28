@@ -1,27 +1,27 @@
 <template>
-  <LoadingPage v-bind="{ loading, contentExists: !!noteRealm }">
-    <div class="inner-box" v-if="noteRealm" :key="noteId">
-      <div class="header">
-        <NoteToolbar
-          v-if="notePosition"
-          v-bind="{
-            selectedNote: noteRealm.note,
-            selectedNotePosition: notePosition,
-            viewType: 'cards',
-          }"
-          @note-deleted="onNoteDeleted"
-          @note-realm-updated="noteRealmUpdated($event)"
-          @new-note-added="newNoteAdded($event)"
-        />
-      </div>
-      <div class="container" v-if="noteRealm">
+  <div class="container" v-if="noteRealm">
+    <LoadingPage v-bind="{ loading, contentExists: !!noteRealm }">
+      <div class="inner-box" v-if="noteRealm" :key="noteId">
+        <div class="header">
+          <NoteToolbar
+            v-if="notePosition"
+            v-bind="{
+              selectedNote: noteRealm.note,
+              selectedNotePosition: notePosition,
+              viewType: 'cards',
+            }"
+            @note-deleted="onNoteDeleted"
+            @note-realm-updated="noteRealmUpdated($event)"
+            @new-note-added="newNoteAdded($event)"
+          />
+        </div>
         <NoteCardsView
           v-bind="{ noteRealm, expandChildren, expandInfo }"
           @note-realm-updated="noteRealmUpdated($event)"
         />
       </div>
-    </div>
-  </LoadingPage>
+    </LoadingPage>
+  </div>
 </template>
 
 <script lang="ts">
