@@ -1,33 +1,3 @@
-<script>
-import NoteStatistics from "./NoteStatistics.vue";
-
-export default {
-  name: "NoteStatisticsButton",
-  props: { noteId: Number, linkid: Number },
-  components: { NoteStatistics },
-  data() {
-    return { statisticComponentName: null };
-  },
-  methods: {
-    toggleStatistics() {
-      if (!this.statisticComponentName) {
-        this.statisticComponentName = "NoteStatistics";
-      } else {
-        this.statisticComponentName = null;
-      }
-    },
-  },
-  watch: {
-    noteId() {
-      this.statisticComponentName = null;
-    },
-    linkid() {
-      this.statisticComponentName = null;
-    },
-  },
-};
-</script>
-
 <template>
   <a
     @click="toggleStatistics()"
@@ -37,11 +7,27 @@ export default {
   >
     Statistics
   </a>
-  <div>
-    <component
-      :is="statisticComponentName"
-      :note-id="noteId"
-      :linkid="linkid"
-    ></component>
-  </div>
+  <NoteStatistics v-if="showInfo" :note-id="noteId"></NoteStatistics>
 </template>
+
+<script lang="ts">
+import { defineComponent } from "vue";
+import NoteStatistics from "./NoteStatistics.vue";
+
+export default defineComponent({
+  props: { noteId: Number, expanded: Boolean },
+  components: { NoteStatistics },
+  data() {
+    return { showInfo: this.expanded as boolean };
+  },
+  methods: {
+    toggleStatistics() {
+      if (!this.showInfo) {
+        this.showInfo = true;
+      } else {
+        this.showInfo = false;
+      }
+    },
+  },
+});
+</script>

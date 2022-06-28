@@ -1,5 +1,4 @@
 <template>
-  {{ formData }}
   <RadioButtons
     scope-name="review_setting"
     field="level"

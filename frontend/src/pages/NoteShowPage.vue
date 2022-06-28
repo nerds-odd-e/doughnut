@@ -16,7 +16,7 @@
       </div>
       <div class="content" v-if="noteRealm">
         <NoteCardsView
-          v-bind="{ noteRealm, expandChildren }"
+          v-bind="{ noteRealm, expandChildren, expandInfo }"
           @note-realm-updated="noteRealmUpdated($event)"
         />
       </div>
@@ -38,6 +38,7 @@ export default defineComponent({
   props: {
     noteId: { type: Number, required: true },
     expandChildren: { type: Boolean, default: true },
+    expandInfo: { type: Boolean, default: false },
   },
   components: {
     LoadingPage,

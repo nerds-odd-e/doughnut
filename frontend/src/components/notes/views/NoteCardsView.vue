@@ -3,7 +3,11 @@
     v-bind="{ note: noteRealm.note, links: noteRealm.links }"
     @note-realm-updated="$emit('noteRealmUpdated', $event)"
   />
-  <NoteStatisticsButton :note-id="noteRealm.id" />
+  <NoteStatisticsButton
+    :note-id="noteRealm.id"
+    :expanded="expandInfo"
+    :key="noteRealm.id"
+  />
   <Cards v-if="expandChildren" :notes="noteRealm.children" />
 </template>
 
@@ -24,6 +28,7 @@ export default defineComponent({
       required: true,
     },
     expandChildren: { type: Boolean, required: true },
+    expandInfo: { type: Boolean, required: false },
   },
   emits: ["noteRealmUpdated"],
   components: {
