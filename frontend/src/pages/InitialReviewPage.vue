@@ -2,7 +2,7 @@
   <ContainerPage
     v-bind="{
       loading,
-      contentExists: reviewPoints !== undefined,
+      contentExists: reviewPoint,
     }"
   >
     <ProgressBar
@@ -42,6 +42,7 @@ import InitialReview from "../components/review/InitialReview.vue";
 import useLoadingApi from "../managedApi/useLoadingApi";
 
 export default defineComponent({
+  name: "InitialReviewPage",
   setup() {
     return { ...useLoadingApi() };
   },

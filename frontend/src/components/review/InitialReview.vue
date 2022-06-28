@@ -29,6 +29,7 @@ import useLoadingApi from "../../managedApi/useLoadingApi";
 import usePopups from "../commons/Popups/usePopup";
 
 export default defineComponent({
+  name: "InitialReview",
   setup() {
     return { ...useLoadingApi(), ...usePopups() };
   },
