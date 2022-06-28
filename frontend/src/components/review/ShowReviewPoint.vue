@@ -11,6 +11,7 @@
         expandInfo,
       }"
       :key="noteId"
+      @level-changed="$emit('levelChanged', $event)"
     />
   </div>
 
@@ -37,7 +38,7 @@ export default defineComponent({
     },
     expandInfo: { type: Boolean, default: false },
   },
-  emits: ["noteRealmUpdated"],
+  emits: ["noteRealmUpdated", "levelChanged"],
   components: { LinkShow, NoteCardsView },
   computed: {
     noteId() {

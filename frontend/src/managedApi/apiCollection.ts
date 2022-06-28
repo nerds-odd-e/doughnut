@@ -135,13 +135,8 @@ const apiCollection = (managedApi: ManagedApi) => ({
       return managedApi.restPost(`subscriptions/${subscriptionId}/delete`, {});
     },
   },
-  async getStatistics(
-    noteId: Doughnut.ID | undefined,
-    linkId: Doughnut.ID | undefined
-  ) {
-    return managedApi.restGet(
-      `${noteId ? `notes/${noteId}` : `links/${linkId}`}/statistics`
-    );
+  async getStatistics(noteId: Doughnut.ID) {
+    return managedApi.restGet(`notes/${noteId}/statistics`);
   },
 
   notebookMethods: {

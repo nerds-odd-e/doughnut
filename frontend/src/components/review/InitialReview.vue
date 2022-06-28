@@ -1,20 +1,14 @@
 <template>
   <ContainerPage v-bind="{ loading, contentExists: true }">
     <template v-if="!nested">
-      <ShowReviewPoint v-bind="{ reviewPoint, expandInfo: true }" />
-      <div>
-        <div class="mb-2">
-          <ReviewSettingForm
-            v-if="reviewPoint.thing.note?.id"
-            :note-id="reviewPoint.thing.note?.id"
-            @level-changed="$emit('levelChanged', $event)"
-          />
-        </div>
-        <InitialReviewButtons
-          :key="buttonKey"
-          @do-initial-review="processForm($event)"
-        />
-      </div>
+      <ShowReviewPoint
+        v-bind="{ reviewPoint, expandInfo: true }"
+        @level-changed="$emit('levelChanged', $event)"
+      />
+      <InitialReviewButtons
+        :key="buttonKey"
+        @do-initial-review="processForm($event)"
+      />
     </template>
   </ContainerPage>
 </template>
@@ -22,7 +16,6 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import ShowReviewPoint from "./ShowReviewPoint.vue";
-import ReviewSettingForm from "./ReviewSettingForm.vue";
 import InitialReviewButtons from "./InitialReviewButtons.vue";
 import ContainerPage from "../../pages/commons/ContainerPage.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
@@ -43,7 +36,6 @@ export default defineComponent({
   emits: ["levelChanged", "initialReviewDone"],
   components: {
     ShowReviewPoint,
-    ReviewSettingForm,
     ContainerPage,
     InitialReviewButtons,
   },

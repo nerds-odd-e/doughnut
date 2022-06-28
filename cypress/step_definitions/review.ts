@@ -171,7 +171,7 @@ Then("The randomizer always choose the last", () => {
 
 Then("I should see the statistics of note {string}", (noteTitle, data) => {
   cy.findByText(noteTitle)
-  cy.findByRole("button", { name: "Statistics" }).click({ force: true })
+  cy.findByRole("button", { name: "i..." }).click({ force: true })
   const attrs = data.hashes()[0]
   for (const k in attrs) {
     cy.findByText(attrs[k]).should("be.visible")

@@ -24,6 +24,7 @@
             :note-id="noteRealm.id"
             :expanded="expandInfo"
             :key="noteRealm.id"
+            @level-changed="$emit('levelChanged', $event)"
           />
         </template>
       </NoteWithLinks>
@@ -50,6 +51,7 @@ export default defineComponent({
     expandChildren: { type: Boolean, required: true },
     expandInfo: { type: Boolean, default: false },
   },
+  emits: ["levelChanged"],
   components: {
     NoteWithLinks,
     Cards,

@@ -34,6 +34,10 @@
         }}</span>
       </div>
     </div>
+    <ReviewSettingForm
+      :note-id="noteId"
+      @level-changed="$emit('levelChanged', $event)"
+    />
   </LoadingPage>
 </template>
 
@@ -41,15 +45,16 @@
 import { defineComponent } from "vue";
 import LoadingPage from "@/pages/commons/LoadingPage.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
+import ReviewSettingForm from "../review/ReviewSettingForm.vue";
 
 export default defineComponent({
   setup() {
     return useLoadingApi();
   },
   props: {
-    noteId: Number,
-    linkid: Number,
+    noteId: { type: Number, required: true },
   },
+  emits: ["levelChanged"],
   data() {
     return {
       statistics: undefined as undefined | unknown,
@@ -57,7 +62,7 @@ export default defineComponent({
   },
   methods: {
     fetchData() {
-      this.api.getStatistics(this.noteId, this.linkid).then((articles) => {
+      this.api.getStatistics(this.noteId).then((articles) => {
         this.statistics = articles;
       });
     },
@@ -65,6 +70,6 @@ export default defineComponent({
   mounted() {
     this.fetchData();
   },
-  components: { LoadingPage },
+  components: { LoadingPage, ReviewSettingForm },
 });
 </script>
