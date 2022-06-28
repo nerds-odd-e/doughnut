@@ -16,11 +16,6 @@ const stubResponse = {
   note: makeMe.aNoteRealm.please(),
 };
 
-const stubLinkResponse = {
-  reviewPoint: makeMe.aReviewPoint.please(),
-  link: makeMe.aLink.please(),
-};
-
 describe("note statistics", () => {
   it("fetch API to be called ONCE", async () => {
     fetchMock.mockResponseOnce(JSON.stringify({}));
@@ -39,16 +34,5 @@ describe("note statistics", () => {
     const wrapper = mount(NoteStatistics, { propsData: { noteId: 123 } });
     await flushPromises();
     expect(wrapper.findAll(".statistics-value")).toHaveLength(5);
-  });
-
-  it("should render values for link as well", async () => {
-    fetchMock.mockResponseOnce(JSON.stringify(stubLinkResponse));
-    const wrapper = mount(NoteStatistics, { propsData: { linkid: 123 } });
-    await flushPromises();
-    expect(fetch).toHaveBeenCalledWith(
-      "/api/links/123/statistics",
-      expect.anything()
-    );
-    expect(wrapper.findAll(".statistics-value")).toHaveLength(4);
   });
 });

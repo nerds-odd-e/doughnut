@@ -26,18 +26,11 @@
           new Date(statistics.note.note.textContent.updatedAt).toLocaleString()
         }}</span>
       </div>
-
-      <div v-if="statistics.link">
-        <label>Created:</label>
-        <span class="statistics-value">{{
-          new Date(statistics.link.createdAt).toLocaleString()
-        }}</span>
-      </div>
+      <ReviewSettingForm
+        v-bind="{ noteId, reviewSetting }"
+        @level-changed="$emit('levelChanged', $event)"
+      />
     </div>
-    <ReviewSettingForm
-      :note-id="noteId"
-      @level-changed="$emit('levelChanged', $event)"
-    />
   </LoadingPage>
 </template>
 
@@ -57,8 +50,13 @@ export default defineComponent({
   emits: ["levelChanged"],
   data() {
     return {
-      statistics: undefined as undefined | unknown,
+      statistics: undefined as undefined | Generated.NoteStatistics,
     };
+  },
+  computed: {
+    reviewSetting() {
+      return this.statistics?.reviewSetting;
+    },
   },
   methods: {
     fetchData() {

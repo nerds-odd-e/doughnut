@@ -24,7 +24,6 @@ declare namespace Generated {
         answerViewedByUser: AnswerViewedByUser;
         answerResult: AnswerResult;
         answer: Answer;
-        reviewSetting: ReviewSetting;
     }
 
     interface InitialInfo {
@@ -74,6 +73,13 @@ declare namespace Generated {
     interface NoteRealmWithPosition {
         notePosition: NotePositionViewedByUser;
         noteRealm: NoteRealm;
+    }
+
+    interface NoteStatistics {
+        reviewPoint: ReviewPoint;
+        note: NoteRealm;
+        createdAt: string;
+        reviewSetting: ReviewSetting;
     }
 
     interface NotebookViewedByUser {
@@ -178,12 +184,6 @@ declare namespace Generated {
         question: QuizQuestion;
     }
 
-    interface ReviewSetting {
-        id: number;
-        rememberSpelling: boolean;
-        level: number;
-    }
-
     interface Link extends Thingy {
         clozeSource: string;
         sourceNote: Note;
@@ -205,6 +205,23 @@ declare namespace Generated {
         wikidataId: string;
         textContent: TextContent;
         pictureWithMask?: PictureWithMask;
+    }
+
+    interface ReviewPoint {
+        id: number;
+        thing: Thing;
+        lastReviewedAt: string;
+        nextReviewAt: string;
+        initialReviewedAt: string;
+        repetitionCount: number;
+        forgettingCurveIndex: number;
+        removedFromReview: boolean;
+    }
+
+    interface ReviewSetting {
+        id: number;
+        rememberSpelling: boolean;
+        level: number;
     }
 
     interface Ownership {
@@ -244,17 +261,6 @@ declare namespace Generated {
         pictureMask: string;
     }
 
-    interface ReviewPoint {
-        id: number;
-        thing: Thing;
-        lastReviewedAt: string;
-        nextReviewAt: string;
-        initialReviewedAt: string;
-        repetitionCount: number;
-        forgettingCurveIndex: number;
-        removedFromReview: boolean;
-    }
-
     interface Thingy {
         id: number;
     }
@@ -269,6 +275,13 @@ declare namespace Generated {
         updatedAt: string;
     }
 
+    interface Thing {
+        id: number;
+        createdAt: string;
+        note?: Note;
+        link?: Link;
+    }
+
     interface Circle {
         id: number;
         name: string;
@@ -280,13 +293,6 @@ declare namespace Generated {
         headNote: Note;
         skipReviewEntirely: boolean;
         deletedAt: string;
-    }
-
-    interface Thing {
-        id: number;
-        createdAt: string;
-        note?: Note;
-        link?: Link;
     }
 
     type LinkType = "no link" | "related to" | "a specialization of" | "an application of" | "an instance of" | "a part of" | "tagged by" | "an attribute of" | "the opposite of" | "author of" | "using" | "an example of" | "before" | "similar to" | "confused with";

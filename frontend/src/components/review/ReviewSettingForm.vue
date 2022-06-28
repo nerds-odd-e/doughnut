@@ -23,7 +23,7 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, PropType } from "vue";
 import CheckInput from "../form/CheckInput.vue";
 import RadioButtons from "../form/RadioButtons.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
@@ -34,21 +34,23 @@ export default defineComponent({
   },
   props: {
     noteId: { type: Number, required: true },
+    reviewSetting: {
+      type: Object as PropType<Generated.ReviewSetting>,
+      required: false,
+    },
   },
   components: { CheckInput, RadioButtons },
   emits: ["levelChanged"],
   data() {
     return {
-      formData: {} as Omit<Generated.ReviewSetting, "id">,
+      formData: (this.reviewSetting ? this.reviewSetting : {}) as Omit<
+        Generated.ReviewSetting,
+        "id"
+      >,
       formErrors: {} as Partial<Generated.ReviewSetting>,
     };
   },
   methods: {
-    fetchData() {
-      this.api.reviewMethods.getReviewSetting(this.noteId).then((res) => {
-        this.formData = res;
-      });
-    },
     updateModelValue(newValue: Partial<Generated.ReviewSetting>) {
       this.formData = {
         ...this.formData,
@@ -62,9 +64,6 @@ export default defineComponent({
           }
         });
     },
-  },
-  mounted() {
-    this.fetchData();
   },
 });
 </script>

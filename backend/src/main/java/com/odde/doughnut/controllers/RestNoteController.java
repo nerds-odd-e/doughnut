@@ -13,12 +13,9 @@ import com.odde.doughnut.services.HttpClientAdapter;
 import com.odde.doughnut.services.WikidataService;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
-import java.sql.Timestamp;
 import java.util.List;
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import lombok.Getter;
-import lombok.Setter;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindException;
 import org.springframework.web.bind.annotation.*;
@@ -53,12 +50,6 @@ class RestNoteController {
     note.setWikidataId(wikidataAssociationCreation.wikidataId);
     modelFactoryService.noteRepository.save(note);
     return "{}";
-  }
-
-  static class NoteStatistics {
-    @Getter @Setter private ReviewPoint reviewPoint;
-    @Getter @Setter private NoteRealm note;
-    @Getter @Setter private Timestamp createdAt;
   }
 
   @PostMapping(value = "/{parentNote}/create")
@@ -129,8 +120,9 @@ class RestNoteController {
     user.getAuthorization().assertReadAuthorization(note);
     NoteStatistics statistics = new NoteStatistics();
     statistics.setReviewPoint(user.getReviewPointFor(note));
-    statistics.note = new NoteViewer(user.getEntity(), note).toJsonObject();
-    statistics.createdAt = note.getThing().getCreatedAt();
+    statistics.setNote(new NoteViewer(user.getEntity(), note).toJsonObject());
+    statistics.setCreatedAt(note.getThing().getCreatedAt());
+    statistics.setReviewSetting(note.getMasterReviewSetting());
     return statistics;
   }
 
@@ -160,15 +152,6 @@ class RestNoteController {
     modelFactoryService.entityManager.flush();
 
     return new NoteViewer(user.getEntity(), note).toJsonObject();
-  }
-
-  @GetMapping("/{note}/review-setting")
-  public ReviewSetting getReviewSetting(Note note) {
-    ReviewSetting reviewSetting = note.getMasterReviewSetting();
-    if (reviewSetting == null) {
-      reviewSetting = new ReviewSetting();
-    }
-    return reviewSetting;
   }
 
   @GetMapping("/{note}/position")

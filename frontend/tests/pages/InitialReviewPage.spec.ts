@@ -33,7 +33,6 @@ describe("repeat page", () => {
     helper.apiMock
       .expectingGet("/api/reviews/initial")
       .andReturnOnce([reviewPoint, reviewPoint]);
-    helper.apiMock.expectingGet(`/api/notes/${note.id}/review-setting`);
     helper.apiMock.expectingGet(`/api/notes/${note.id}`).andReturnOnce({
       notePosition: makeMe.aNotePosition.please(),
       notes: [note],
