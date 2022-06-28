@@ -99,19 +99,4 @@ class RestLinkController {
     modelFactoryService.linkRepository.save(link);
     return new NoteViewer(userModel.getEntity(), link.getSourceNote()).toJsonObject();
   }
-
-  class LinkStatistics {
-    @Getter @Setter private ReviewPoint reviewPoint;
-    @Getter @Setter private Link link;
-  }
-
-  @GetMapping("/{link}/statistics")
-  public LinkStatistics statistics(@PathVariable("link") Link link) throws NoAccessRightException {
-    final UserModel user = currentUserFetcher.getUser();
-    user.getAuthorization().assertAuthorization(link);
-    LinkStatistics statistics = new LinkStatistics();
-    statistics.setReviewPoint(user.getReviewPointFor(link));
-    statistics.setLink(link);
-    return statistics;
-  }
 }

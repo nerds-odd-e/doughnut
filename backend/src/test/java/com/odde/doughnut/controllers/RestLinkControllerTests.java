@@ -81,18 +81,6 @@ class RestLinkControllerTests {
   }
 
   @Nested
-  class showLinkStatisticsTest {
-    @Test
-    void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
-      User otherUser = makeMe.aUser().please();
-      Note note1 = makeMe.aNote().creatorAndOwner(otherUser).please();
-      Note note2 = makeMe.aNote().creatorAndOwner(otherUser).linkTo(note1).please();
-      Link link = note2.getLinks().get(0);
-      assertThrows(NoAccessRightException.class, () -> controller().statistics(link));
-    }
-  }
-
-  @Nested
   class MoveNoteTest {
     User anotherUser;
     Note note1;
