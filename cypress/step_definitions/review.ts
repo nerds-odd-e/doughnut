@@ -174,7 +174,7 @@ Then("I should see the statistics of note {string}", (noteTitle, data) => {
   cy.findByRole("button", { name: "i..." }).click({ force: true })
   const attrs = data.hashes()[0]
   for (const k in attrs) {
-    cy.findByText(attrs[k]).should("be.visible")
+    cy.contains(k).findByText(attrs[k]).should("be.visible")
   }
 })
 

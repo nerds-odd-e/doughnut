@@ -19,8 +19,8 @@ Feature: Repetition Quiz
     And I should see that my answer is correct
     Then I should see "sedition" in note title
     And I should see the statistics of note "sedition"
-      | RepetitionCount |
-      | 1               |
+      | Repetition Count |
+      | 1                |
     When I choose the happy option
 
   Scenario: I can remove a note from further reviews

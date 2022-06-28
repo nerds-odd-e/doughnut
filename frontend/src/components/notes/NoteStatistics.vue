@@ -2,29 +2,41 @@
   <LoadingPage v-bind="{ loading, contentExists: true }">
     <div v-if="statistics">
       <div v-if="statistics.reviewPoint">
-        <label>Repetition Count:</label>
-        <span class="statistics-value">{{
-          statistics.reviewPoint.repetitionCount
-        }}</span>
-        <label>Forgetting Curive Index:</label>
-        <span class="statistics-value">{{
-          statistics.reviewPoint.forgettingCurveIndex
-        }}</span>
-        <label>Next Review:</label>
-        <span class="statistics-value">{{
-          new Date(statistics.reviewPoint.nextReviewAt).toLocaleString()
-        }}</span>
+        <label
+          >Repetition Count:
+          <span class="statistics-value">{{
+            statistics.reviewPoint.repetitionCount
+          }}</span></label
+        >
+        <label
+          >Forgetting Curive Index:
+          <span class="statistics-value">{{
+            statistics.reviewPoint.forgettingCurveIndex
+          }}</span></label
+        >
+        <label
+          >Next Review:
+          <span class="statistics-value">{{
+            new Date(statistics.reviewPoint.nextReviewAt).toLocaleString()
+          }}</span></label
+        >
       </div>
 
       <div v-if="statistics.note">
-        <label>Created:</label>
-        <span class="statistics-value">{{
-          new Date(statistics.createdAt).toLocaleString()
-        }}</span>
-        <label>Last Content Updated:</label>
-        <span class="statistics-value">{{
-          new Date(statistics.note.note.textContent.updatedAt).toLocaleString()
-        }}</span>
+        <label
+          >Created:
+          <span class="statistics-value">{{
+            new Date(statistics.createdAt).toLocaleString()
+          }}</span></label
+        >
+        <label
+          >Last Content Updated:
+          <span class="statistics-value">{{
+            new Date(
+              statistics.note.note.textContent.updatedAt
+            ).toLocaleString()
+          }}</span></label
+        >
       </div>
       <ReviewSettingForm
         v-bind="{ noteId, reviewSetting }"
