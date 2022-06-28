@@ -1,12 +1,10 @@
 <template>
-  <div class="container" v-if="noteRealm">
-    <NoteWithLinks
-      v-bind="{ note: noteRealm.note, links: noteRealm.links }"
-      @note-realm-updated="$emit('noteRealmUpdated', $event)"
-    />
-    <NoteStatisticsButton :note-id="noteRealm.id" />
-    <Cards v-if="expandChildren" :notes="noteRealm.children" />
-  </div>
+  <NoteWithLinks
+    v-bind="{ note: noteRealm.note, links: noteRealm.links }"
+    @note-realm-updated="$emit('noteRealmUpdated', $event)"
+  />
+  <NoteStatisticsButton :note-id="noteRealm.id" />
+  <Cards v-if="expandChildren" :notes="noteRealm.children" />
 </template>
 
 <script lang="ts">

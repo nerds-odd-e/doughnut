@@ -2,7 +2,7 @@
   <ContainerPage
     v-bind="{
       loading,
-      contentExists: reviewPoint,
+      contentExists: !!reviewPoint,
     }"
   >
     <ProgressBar
