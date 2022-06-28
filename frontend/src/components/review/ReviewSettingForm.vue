@@ -1,4 +1,5 @@
 <template>
+  {{ formData }}
   <RadioButtons
     scope-name="review_setting"
     field="level"
@@ -50,12 +51,12 @@ export default defineComponent({
       });
     },
     updateModelValue(newValue: Partial<Generated.ReviewSetting>) {
-      const updated = {
+      this.formData = {
         ...this.formData,
         ...newValue,
       };
       this.api.reviewMethods
-        .updateReviewSetting(this.noteId, updated)
+        .updateReviewSetting(this.noteId, this.formData)
         .then(() => {
           if (newValue.level !== undefined) {
             this.$emit("levelChanged", newValue.level);

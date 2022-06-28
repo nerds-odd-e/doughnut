@@ -9,14 +9,12 @@ import makeMe from "../fixtures/makeMe";
 describe("note wth child cards", () => {
   it("should render note with one child", async () => {
     helper.reset();
-    const notePosition = makeMe.aNotePosition.please();
     const noteParent = makeMe.aNoteRealm.title("parent").please();
     makeMe.aNoteRealm.title("child").under(noteParent).please();
     helper
       .component(NoteCardsView)
       .withProps({
         noteRealm: noteParent,
-        notePosition,
         expandChildren: true,
       })
       .render();
