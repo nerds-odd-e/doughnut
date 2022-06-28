@@ -3,7 +3,7 @@
     This review point has been removed from reviewing.
   </div>
   <div v-if="noteId">
-    <NoteShowPage
+    <NoteCardsView
       v-if="noteId"
       v-bind="{
         noteId,
@@ -27,7 +27,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import LinkShow from "../links/LinkShow.vue";
-import NoteShowPage from "../../pages/NoteShowPage.vue";
+import NoteCardsView from "../notes/views/NoteCardsView.vue";
 
 export default defineComponent({
   props: {
@@ -38,7 +38,7 @@ export default defineComponent({
     expandInfo: { type: Boolean, default: false },
   },
   emits: ["noteRealmUpdated"],
-  components: { LinkShow, NoteShowPage },
+  components: { LinkShow, NoteCardsView },
   computed: {
     noteId() {
       return this.reviewPoint.thing.note?.id;
