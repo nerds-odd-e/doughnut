@@ -63,7 +63,11 @@ export default defineComponent({
           skipReview,
         })
         .then((data) => {
-          this.$emit("initialReviewDone", data);
+          if (skipReview) {
+            this.$emit("reloadNeeded", data);
+          } else {
+            this.$emit("initialReviewDone", data);
+          }
         });
     },
   },

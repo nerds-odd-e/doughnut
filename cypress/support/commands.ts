@@ -306,7 +306,7 @@ Cypress.Commands.add(
         default:
           expect(review_type).equal("a known review page type")
       }
-      if (skip) {
+      if (skip === "yes") {
         cy.findByText("Skip repetition").click()
         cy.findByRole("button", { name: "OK" }).click()
       } else {
