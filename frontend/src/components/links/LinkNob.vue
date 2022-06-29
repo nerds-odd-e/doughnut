@@ -12,11 +12,11 @@
           v-bind="{ link, inverseIcon, colors }"
           @done="
             doneHandler($event);
-            $emit('noteRealmUpdated', $event);
+            $emit('linkUpdated', $event);
           "
           @link-deleted="
             doneHandler($event);
-            $emit('noteRealmUpdated', $event);
+            $emit('linkDeleted', $event);
           "
         />
       </template>
@@ -39,7 +39,7 @@ export default defineComponent({
     inverseIcon: Boolean,
     colors: Object,
   },
-  emits: ["noteRealmUpdated"],
+  emits: ["linkUpdated", "linkDeleted"],
   components: { SvgLinkTypeIcon, PopupButton, LinkNobDialog },
 });
 </script>

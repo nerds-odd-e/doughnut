@@ -6,7 +6,8 @@
     <div class="col-12 col-md-4 text-center">
       <LinkNob
         v-bind="{ link }"
-        @note-realm-updated="$emit('noteRealmUpdated', $event)"
+        @link-deleted="$emit('linkDeleted', $event)"
+        @link-updated="$emit('linkUpdated', $event)"
       />
       <span class="badge bg-light text-dark"> {{ link.linkType }}</span>
     </div>
@@ -28,7 +29,7 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ["noteRealmUpdated"],
+  emits: ["linkDeleted", "linkUpdated"],
   components: { LinkNoteShow, LinkNob },
 });
 </script>

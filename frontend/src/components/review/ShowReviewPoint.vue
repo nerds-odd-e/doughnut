@@ -20,7 +20,8 @@
     <div class="jumbotron py-4 mb-2">
       <LinkShow
         v-bind="{ link }"
-        @note-realm-updated="$emit('noteRealmUpdated', $event)"
+        @link-updated="$emit('noteRealmUpdated', $event)"
+        @link-deleted="$emit('linkDeleted', $event)"
       />
     </div>
   </div>
@@ -39,7 +40,7 @@ export default defineComponent({
     },
     expandInfo: { type: Boolean, default: false },
   },
-  emits: ["noteRealmUpdated", "levelChanged", "noteDeleted"],
+  emits: ["noteRealmUpdated", "levelChanged", "noteDeleted", "linkDeleted"],
   components: { LinkShow, NoteCardsView },
   computed: {
     noteId() {

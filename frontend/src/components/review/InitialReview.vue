@@ -5,6 +5,7 @@
         v-bind="{ reviewPoint, expandInfo: true }"
         @level-changed="$emit('reloadNeeded', $event)"
         @note-deleted="$emit('reloadNeeded', $event)"
+        @link-deleted="$emit('reloadNeeded', $event)"
       />
       <InitialReviewButtons
         :key="buttonKey"

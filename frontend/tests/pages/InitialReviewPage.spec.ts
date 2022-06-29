@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import InitialReviewPage from "@/pages/InitialReviewPage.vue";
-import NoteCardsView from "@/components/notes/views/NoteCardsView.vue";
+import ShowReviewPoint from "@/components/review/ShowReviewPoint.vue";
 import flushPromises from "flush-promises";
 import helper from "../helpers";
 import makeMe from "../fixtures/makeMe";
@@ -54,13 +54,17 @@ describe("repeat page", () => {
     });
 
     (
-      ["levelChanged", "noteDeleted"] as ("levelChanged" | "noteDeleted")[]
+      ["levelChanged", "noteDeleted", "linkDeleted"] as (
+        | "levelChanged"
+        | "noteDeleted"
+        | "linkDeleted"
+      )[]
     ).forEach((event) => {
       it(`reloads when ${event}`, async () => {
         const wrapper = renderer.currentRoute({ name: "initial" }).mount();
         await flushPromises();
         helper.apiMock.expectingGet("/api/reviews/initial").andReturnOnce([]);
-        wrapper.findComponent(NoteCardsView).vm.$emit(event);
+        wrapper.findComponent(ShowReviewPoint).vm.$emit(event);
       });
     });
   });

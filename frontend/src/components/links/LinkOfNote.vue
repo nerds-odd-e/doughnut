@@ -4,14 +4,16 @@
       v-bind="{ link, colors }"
       v-if="!!reverse"
       :inverse-icon="true"
-      @note-realm-updated="$emit('noteRealmUpdated', $event)"
+      @link-deleted="$emit('noteRealmUpdated', $event)"
+      @link-updated="$emit('noteRealmUpdated', $event)"
     />
     <NoteTitleWithLink class="link-title" v-bind="{ note }" />
     <LinkNob
       v-bind="{ link, colors }"
       v-if="!reverse"
       :inverse-icon="false"
-      @note-realm-updated="$emit('noteRealmUpdated', $event)"
+      @link-deleted="$emit('noteRealmUpdated', $event)"
+      @link-updated="$emit('noteRealmUpdated', $event)"
     />
   </span>
 </template>
