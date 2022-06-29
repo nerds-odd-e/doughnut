@@ -80,6 +80,7 @@ public class Reviewing {
     Timestamp oneDayAgo = TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, -24);
     return userModel.getRecentReviewPoints(oneDayAgo).stream()
         .filter(p -> userModel.isInitialReviewOnSameDay(p, currentUTCTimestamp))
+        .filter(p -> !p.getRemovedFromReview())
         .toList();
   }
 

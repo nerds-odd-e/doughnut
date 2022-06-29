@@ -67,4 +67,9 @@ public class ReviewPointBuilder extends EntityBuilder<ReviewPoint> {
     entity.setRepetitionCount(value);
     return this;
   }
+
+  public ReviewPointBuilder removedFromReview() {
+    entity.setRemovedFromReview(true);
+    return this;
+  }
 }

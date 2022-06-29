@@ -170,6 +170,17 @@ public class ReviewingInitialReviewTest {
       }
 
       @Test
+      void shouldNotCountSkippedReviewPoint() {
+        makeMe
+            .aReviewPointFor(note1)
+            .by(userModel)
+            .initiallyReviewedOn(day1)
+            .removedFromReview()
+            .please();
+        assertThat(getOneInitialReviewPoint(reviewingOnDay1).getNote(), is(note2));
+      }
+
+      @Test
       void shouldIncludeNotesThatAreReviewedByOtherPeople() {
         makeMe.aReviewPointFor(note1).by(anotherUser).initiallyReviewedOn(day1).please();
         assertThat(getOneInitialReviewPoint(reviewingOnDay1).getNote(), equalTo(note1));
