@@ -5,7 +5,6 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
 
 import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import com.odde.doughnut.models.ReviewPointModel;
@@ -41,7 +40,8 @@ class QuizQuestionTest {
   @Test
   void aNoteWithNoDescriptionHasNoQuiz() {
     Note note = makeMe.aNote().withNoDescription().creatorAndOwner(userModel).please();
-    assertThat(getQuizQuestion(note), nullValue());
+    assertThat(
+        getQuizQuestion(note).getQuestionType(), equalTo(QuizQuestion.QuestionType.JUST_REVIEW));
   }
 
   @Test
@@ -70,7 +70,7 @@ class QuizQuestionTest {
     void aNoteWithNoSiblingsShouldDoJustReview() {
       Note note = makeMe.aHeadNote().please();
       QuizQuestionViewedByUser quizQuestion = getQuizQuestion(note);
-      assertThat(quizQuestion, nullValue());
+      assertThat(quizQuestion.getQuestionType(), equalTo(QuizQuestion.QuestionType.JUST_REVIEW));
     }
 
     @Test
@@ -116,8 +116,7 @@ class QuizQuestionTest {
     @Test
     void shouldReturnTheSameType() {
       ReviewPointModel reviewPoint = getReviewPointModel(note);
-      QuizQuestion randomQuizQuestion =
-          reviewPoint.generateAQuizQuestion(new RealRandomizer()).get();
+      QuizQuestion randomQuizQuestion = reviewPoint.generateAQuizQuestion(new RealRandomizer());
       Set<QuizQuestion.QuestionType> types = new HashSet<>();
       for (int i = 0; i < 3; i++) {
         types.add(randomQuizQuestion.getQuestionType());
@@ -130,8 +129,7 @@ class QuizQuestionTest {
       Set<QuizQuestion.QuestionType> types = new HashSet<>();
       ReviewPointModel reviewPoint = getReviewPointModel(note);
       for (int i = 0; i < 10; i++) {
-        QuizQuestion randomQuizQuestion =
-            reviewPoint.generateAQuizQuestion(new RealRandomizer()).get();
+        QuizQuestion randomQuizQuestion = reviewPoint.generateAQuizQuestion(new RealRandomizer());
         types.add(randomQuizQuestion.getQuestionType());
       }
       assertThat(
@@ -142,10 +140,8 @@ class QuizQuestionTest {
   }
 
   private QuizQuestionViewedByUser getQuizQuestion(Note note) {
-    return getReviewPointModel(note)
-        .generateAQuizQuestion(randomizer)
-        .map(q -> new QuizQuestionViewedByUser(q, makeMe.modelFactoryService))
-        .orElse(null);
+    return new QuizQuestionViewedByUser(
+        getReviewPointModel(note).generateAQuizQuestion(randomizer), makeMe.modelFactoryService);
   }
 
   private ReviewPointModel getReviewPointModel(Note note) {

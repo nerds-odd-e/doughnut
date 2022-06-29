@@ -158,6 +158,7 @@ class RestReviewsControllerTests {
       ReviewPoint anotherReviewPoint = makeMe.aReviewPointFor(note2).by(userModel).please();
       answer.getQuestion().setViceReviewPoints(List.of(anotherReviewPoint));
       makeMe.refresh(anotherReviewPoint);
+      makeMe.refresh(note2);
 
       Integer oldForgettingCurveIndex = anotherReviewPoint.getForgettingCurveIndex();
       Integer oldRepetitionCount = anotherReviewPoint.getRepetitionCount();

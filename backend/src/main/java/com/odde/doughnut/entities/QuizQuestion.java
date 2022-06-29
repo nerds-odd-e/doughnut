@@ -3,33 +3,7 @@ package com.odde.doughnut.entities;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.odde.doughnut.entities.annotations.JsonUseIdInsteadOfLink;
 import com.odde.doughnut.entities.annotations.JsonUseIdInsteadOfReviewPoint;
-import com.odde.doughnut.models.quizFacotries.ClozeLinkTargetQuizFactory;
-import com.odde.doughnut.models.quizFacotries.ClozeLinkTargetQuizPresenter;
-import com.odde.doughnut.models.quizFacotries.ClozeTitleSelectionQuizFactory;
-import com.odde.doughnut.models.quizFacotries.ClozeTitleSelectionQuizPresenter;
-import com.odde.doughnut.models.quizFacotries.DescriptionLinkTargetQuizFactory;
-import com.odde.doughnut.models.quizFacotries.DescriptionLinkTargetQuizPresenter;
-import com.odde.doughnut.models.quizFacotries.FromDifferentPartAsQuizFactory;
-import com.odde.doughnut.models.quizFacotries.FromDifferentPartAsQuizPresenter;
-import com.odde.doughnut.models.quizFacotries.FromSamePartAsQuizFactory;
-import com.odde.doughnut.models.quizFacotries.FromSamePartAsQuizPresenter;
-import com.odde.doughnut.models.quizFacotries.LinkSourceQuizFactory;
-import com.odde.doughnut.models.quizFacotries.LinkSourceQuizPresenter;
-import com.odde.doughnut.models.quizFacotries.LinkSourceWithinSameLinkTypeQuizFactory;
-import com.odde.doughnut.models.quizFacotries.LinkSourceWithinSameLinkTypeQuizPresenter;
-import com.odde.doughnut.models.quizFacotries.LinkTargetQuizFactory;
-import com.odde.doughnut.models.quizFacotries.LinkTargetQuizPresenter;
-import com.odde.doughnut.models.quizFacotries.PictureSelectionQuizFactory;
-import com.odde.doughnut.models.quizFacotries.PictureSelectionQuizPresenter;
-import com.odde.doughnut.models.quizFacotries.PictureTitleSelectionQuizFactory;
-import com.odde.doughnut.models.quizFacotries.PictureTitleSelectionQuizPresenter;
-import com.odde.doughnut.models.quizFacotries.QuizQuestionFactory;
-import com.odde.doughnut.models.quizFacotries.QuizQuestionPresenter;
-import com.odde.doughnut.models.quizFacotries.QuizQuestionServant;
-import com.odde.doughnut.models.quizFacotries.SpellingQuizFactory;
-import com.odde.doughnut.models.quizFacotries.SpellingQuizPresenter;
-import com.odde.doughnut.models.quizFacotries.WhichSpecHasInstanceQuizFactory;
-import com.odde.doughnut.models.quizFacotries.WhichSpecHasInstanceQuizPresenter;
+import com.odde.doughnut.models.quizFacotries.*;
 import java.sql.Timestamp;
 import java.util.Arrays;
 import java.util.Collections;
@@ -65,6 +39,7 @@ public class QuizQuestion {
   }
 
   public enum QuestionType {
+    JUST_REVIEW(0, null, JustReviewQuizPresenter::new),
     CLOZE_SELECTION(1, ClozeTitleSelectionQuizFactory::new, ClozeTitleSelectionQuizPresenter::new),
     SPELLING(2, SpellingQuizFactory::new, SpellingQuizPresenter::new),
     PICTURE_TITLE(

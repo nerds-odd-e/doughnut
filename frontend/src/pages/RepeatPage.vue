@@ -12,22 +12,24 @@
       </RepeatProgressBar>
     </div>
     <template v-if="!nested">
-      <QuizQuestion
-        v-if="repetition?.quizQuestion"
-        v-bind="{
-          quizQuestion: repetition?.quizQuestion,
-        }"
-        @answer="processAnswer($event)"
-        :key="reviewPointId"
-      />
-      <template v-else-if="reviewPointId && repetition?.reviewPoint">
-        <ReviewPointAsync
+      <template v-if="repetition">
+        <QuizQuestion
+          v-if="repetition.quizQuestion.questionType !== 'JUST_REVIEW'"
           v-bind="{
-            reviewPointId,
+            quizQuestion: repetition?.quizQuestion,
           }"
-          @self-evaluated="fetchData"
+          @answer="processAnswer($event)"
           :key="repetition.reviewPoint"
         />
+        <template v-else>
+          <ReviewPointAsync
+            v-bind="{
+              reviewPointId: repetition.reviewPoint,
+            }"
+            @self-evaluated="fetchData"
+            :key="repetition.reviewPoint"
+          />
+        </template>
       </template>
       <template v-else>
         <div class="alert alert-success">
@@ -74,9 +76,6 @@ export default defineComponent({
     },
     finished() {
       return this.previousResults.length;
-    },
-    reviewPointId() {
-      return this.repetition?.reviewPoint;
     },
   },
   methods: {

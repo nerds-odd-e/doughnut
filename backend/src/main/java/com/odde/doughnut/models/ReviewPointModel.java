@@ -32,12 +32,13 @@ public record ReviewPointModel(ReviewPoint entity, ModelFactoryService modelFact
     this.modelFactoryService.reviewPointRepository.save(entity);
   }
 
-  public Optional<QuizQuestion> generateAQuizQuestion(Randomizer randomizer) {
+  public QuizQuestion generateAQuizQuestion(Randomizer randomizer) {
     return randomizer.shuffle(entity.availableQuestionTypes()).stream()
         .map(type -> new QuizQuestionDirector(entity, type, randomizer, modelFactoryService))
         .map(QuizQuestionDirector::buildQuizQuestion)
         .flatMap(Optional::stream)
-        .findFirst();
+        .findFirst()
+        .orElseGet(() -> entity.createAQuizQuestionOfType(QuizQuestion.QuestionType.JUST_REVIEW));
   }
 
   public void updateReviewPoint(Timestamp currentUTCTimestamp, SelfEvaluate selfEvaluate) {

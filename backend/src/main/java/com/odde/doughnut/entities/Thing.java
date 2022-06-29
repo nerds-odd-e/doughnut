@@ -72,6 +72,7 @@ public class Thing {
     } else {
       result = getNote();
     }
+
     return result.getNotebook().getHeadNote();
   }
 }

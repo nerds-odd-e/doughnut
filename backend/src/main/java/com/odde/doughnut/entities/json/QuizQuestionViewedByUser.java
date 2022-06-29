@@ -47,6 +47,7 @@ public class QuizQuestionViewedByUser {
     options =
         presenter.optionCreator().getOptions(modelFactoryService, quizQuestion.getOptionNoteIds());
     viceReviewPointIdList = quizQuestion.getViceReviewPointIdList();
+    if (questionType == QuizQuestion.QuestionType.JUST_REVIEW) return;
     scope = List.of(quizQuestion.getReviewPoint().getHeadNote());
   }
 
