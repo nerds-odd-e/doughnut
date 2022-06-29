@@ -51,7 +51,7 @@ export default defineComponent({
     expandChildren: { type: Boolean, required: true },
     expandInfo: { type: Boolean, default: false },
   },
-  emits: ["levelChanged"],
+  emits: ["levelChanged", "noteDeleted"],
   components: {
     NoteWithLinks,
     Cards,
@@ -73,10 +73,15 @@ export default defineComponent({
   },
   methods: {
     onNoteDeleted() {
-      this.$router.push({
-        name: "noteShow",
-        params: { noteId: this.noteRealm?.note.parentId },
-      });
+      if (this.noteRealm?.note.parentId) {
+        this.$router.push({
+          name: "noteShow",
+          params: { noteId: this.noteRealm?.note.parentId },
+        });
+      } else {
+        this.$router.push({ name: "notebooks" });
+      }
+      this.$emit("noteDeleted");
     },
     newNoteAdded(newNote: Generated.NoteRealmWithPosition) {
       this.$router.push({

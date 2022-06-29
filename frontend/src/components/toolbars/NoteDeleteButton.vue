@@ -24,13 +24,9 @@ export default defineComponent({
   methods: {
     async deleteNote() {
       if (await this.popups.confirm(`Confirm to delete this note?`)) {
-        const { id, parentId } = this.note;
+        const { id } = this.note;
         await this.storedApi.deleteNote(id);
-        if (parentId) {
-          this.$emit("noteDeleted", id);
-        } else {
-          this.$router.push({ name: "notebooks" });
-        }
+        this.$emit("noteDeleted", id);
       }
     },
   },

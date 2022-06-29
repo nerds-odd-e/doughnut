@@ -3,7 +3,8 @@
     <template v-if="!nested">
       <ShowReviewPoint
         v-bind="{ reviewPoint, expandInfo: true }"
-        @level-changed="$emit('levelChanged', $event)"
+        @level-changed="$emit('reloadNeeded', $event)"
+        @note-deleted="$emit('reloadNeeded', $event)"
       />
       <InitialReviewButtons
         :key="buttonKey"
@@ -33,7 +34,7 @@ export default defineComponent({
       required: true,
     },
   },
-  emits: ["levelChanged", "initialReviewDone"],
+  emits: ["reloadNeeded", "initialReviewDone"],
   components: {
     ShowReviewPoint,
     ContainerPage,

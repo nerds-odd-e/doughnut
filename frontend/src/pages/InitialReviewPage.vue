@@ -26,7 +26,7 @@
       v-if="reviewPoint"
       v-bind="{ nested, reviewPoint }"
       @initial-review-done="initialReviewDone"
-      @level-changed="levelChanged"
+      @reload-needed="onReloadNeeded"
       :key="reviewPoint?.thing?.id"
     />
   </ContainerPage>
@@ -79,7 +79,7 @@ export default defineComponent({
       }
       this.finished += 1;
     },
-    levelChanged() {
+    onReloadNeeded() {
       this.loadInitialReview();
     },
     loadInitialReview() {
@@ -88,7 +88,10 @@ export default defineComponent({
           this.$router.push({ name: "reviews" });
           return;
         }
-        this.reviewPoints = resp;
+        this.reviewPoints = [
+          ...this.reviewPoints.slice(0, this.finished),
+          ...resp,
+        ];
       });
     },
   },
