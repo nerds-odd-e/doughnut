@@ -62,10 +62,10 @@ export default defineComponent({
   },
   computed: {
     reviewPoint() {
-      return this.reviewPoints[this.finished];
+      return this.reviewPoints[0];
     },
     remainingInitialReviewCountForToday() {
-      return this.reviewPoints.length - this.finished;
+      return this.reviewPoints.length;
     },
   },
   methods: {
@@ -73,11 +73,12 @@ export default defineComponent({
       this.$router.push({ name: "initial" });
     },
     initialReviewDone() {
-      if (this.finished + 1 === this.reviewPoints.length) {
+      this.finished += 1;
+      this.reviewPoints.shift();
+      if (this.reviewPoints.length === 0) {
         this.$router.push({ name: "reviews" });
         return;
       }
-      this.finished += 1;
     },
     onReloadNeeded() {
       this.loadInitialReview();
@@ -88,10 +89,7 @@ export default defineComponent({
           this.$router.push({ name: "reviews" });
           return;
         }
-        this.reviewPoints = [
-          ...this.reviewPoints.slice(0, this.finished),
-          ...resp,
-        ];
+        this.reviewPoints = resp;
       });
     },
   },
