@@ -15,10 +15,10 @@
       <template v-if="repetition">
         <QuizQuestion
           v-bind="{
-            quizQuestion: repetition?.quizQuestion,
+            quizQuestion: repetition.quizQuestion,
           }"
           @answer="processAnswer($event)"
-          :key="repetition.reviewPoint"
+          :key="repetition.quizQuestion.quizQuestion.reviewPoint"
         />
       </template>
       <template v-else>

@@ -8,7 +8,6 @@ import static org.hamcrest.Matchers.nullValue;
 
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.json.RepetitionForUser;
 import com.odde.doughnut.models.randomizers.NonRandomizer;
 import com.odde.doughnut.testability.MakeMe;
 import java.sql.Timestamp;
@@ -132,7 +131,9 @@ public class ReviewingWithSpacedRepetitionAlgorithmTest {
     return userModel
         .createReviewing(timestamp)
         .getOneRepetitionForUser(randomizer)
-        .map(RepetitionForUser::getReviewPoint)
+        .map(
+            (repetitionForUser ->
+                repetitionForUser.getQuizQuestion().quizQuestion.getReviewPoint()))
         .orElse(null);
   }
 

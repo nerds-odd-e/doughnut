@@ -69,7 +69,7 @@ describe("repeat page", () => {
     it("should call the self-evaluate api", async () => {
       const wrapper = await mountPage(repetition);
       helper.apiMock.expectingPost(
-        `/api/reviews/${repetition.reviewPoint}/self-evaluate`
+        `/api/reviews/${repetition.quizQuestion.quizQuestion.reviewPoint}/self-evaluate`
       );
       helper.apiMock
         .expectingGet("/api/reviews/repeat")

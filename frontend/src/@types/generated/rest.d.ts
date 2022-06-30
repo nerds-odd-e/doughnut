@@ -113,7 +113,6 @@ declare namespace Generated {
     }
 
     interface RepetitionForUser {
-        reviewPoint: number;
         quizQuestion: QuizQuestionViewedByUser;
         toRepeatCount: number;
     }

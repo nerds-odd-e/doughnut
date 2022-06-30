@@ -105,7 +105,6 @@ public class Reviewing {
   private RepetitionForUser buildRepetitionForUser(
       Randomizer randomizer, ReviewPointModel reviewPointModel) {
     RepetitionForUser repetitionForUser = new RepetitionForUser();
-    repetitionForUser.setReviewPoint(reviewPointModel.getEntity());
     repetitionForUser.setQuizQuestion(
         new QuizQuestionViewedByUser(
             reviewPointModel.generateAQuizQuestion(randomizer), this.modelFactoryService));
