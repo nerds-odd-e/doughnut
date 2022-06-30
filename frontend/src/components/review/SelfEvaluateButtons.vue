@@ -4,7 +4,7 @@
       class="btn btn-light"
       id="repeat-reset"
       name="reset"
-      @click.once="processForm('reset')"
+      @click="processForm('reset')"
       title="reset the interval to mininum"
     >
       <SvgFailed />
@@ -22,7 +22,7 @@
       class="btn btn-light"
       id="repeat-satisfied"
       name="satisfying"
-      @click.once="processForm('satisfying')"
+      @click="processForm('satisfying')"
       title="use normal repeat interval (days)"
     >
       <SvgSatisfying />
@@ -31,7 +31,7 @@
       class="btn btn-light"
       id="repeat-happy"
       name="happy"
-      @click.once="processForm('happy')"
+      @click="processForm('happy')"
       title="add to next repeat interval (days) by half"
     >
       <SvgHappy />

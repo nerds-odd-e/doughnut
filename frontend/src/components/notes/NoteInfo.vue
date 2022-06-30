@@ -22,9 +22,12 @@
         @level-changed="$emit('levelChanged', $event)"
       />
     </li>
-    <li v-if="noteInfo.reviewPoint">
+    <li v-if="reviewPoint">
       <h6>Review Point</h6>
-      <NoteInfoReviewPoint v-bind="{ reviewPoint: noteInfo.reviewPoint }" />
+      <NoteInfoReviewPoint
+        v-bind="{ reviewPoint }"
+        @self-evaluated="onSelfEvaluated($event)"
+      />
     </li>
   </ul>
 </template>
@@ -38,13 +41,24 @@ export default defineComponent({
   props: {
     noteInfo: { type: Object as PropType<Generated.NoteInfo>, required: true },
   },
-  emits: ["levelChanged"],
+  emits: ["levelChanged", "selfEvaluated"],
+  data() {
+    return {
+      reviewPoint: this.noteInfo.reviewPoint,
+    };
+  },
   computed: {
     reviewSetting() {
       return this.noteInfo.reviewSetting;
     },
   },
   components: { ReviewSettingForm, NoteInfoReviewPoint },
+  methods: {
+    onSelfEvaluated(reviewPoint: Generated.ReviewPoint) {
+      this.reviewPoint = reviewPoint;
+      this.$emit("selfEvaluated", reviewPoint);
+    },
+  },
 });
 </script>
 

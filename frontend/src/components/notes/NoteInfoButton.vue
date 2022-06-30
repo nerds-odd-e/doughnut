@@ -14,6 +14,7 @@
       v-if="noteInfo"
       :note-info="noteInfo"
       @level-changed="$emit('levelChanged', $event)"
+      @self-evaluated="$emit('selfEvaluated', $event)"
     />
   </LoadingPage>
 </template>
@@ -29,7 +30,7 @@ export default defineComponent({
     return useLoadingApi();
   },
   props: { noteId: { type: Number, required: true }, expanded: Boolean },
-  emits: ["levelChanged"],
+  emits: ["levelChanged", "selfEvaluated"],
   components: { LoadingPage, NoteInfo },
   data() {
     return { noteInfo: undefined as undefined | Generated.NoteInfo };

@@ -66,12 +66,10 @@ describe("repeat page", () => {
       });
     });
 
-    it("should call the self-evaluate api", async () => {
+    it("should call the answer api", async () => {
       const wrapper = await mountPage(repetition);
-      helper.apiMock.expectingPost(
-        `/api/reviews/${repetition.quizQuestion.quizQuestion.reviewPoint}/self-evaluate`
-      );
-      await wrapper.find("#repeat-sad").trigger("click");
+      helper.apiMock.expectingPost(`/api/reviews/answer`);
+      await wrapper.find("button.btn-primary").trigger("click");
     });
   });
 });

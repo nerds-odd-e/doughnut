@@ -18,17 +18,14 @@
     }}</span></label
   >
   <div class="btn-toolbar justify-content-between">
-    <label v-if="nextReviewAt" v-text="nextReviewAt" />
-    <template v-else>
-      <SelfEvaluateButtons @self-evaluate="selfEvaluate" />
-      <button
-        class="btn"
-        title="remove this note from review"
-        @click="removeFromReview"
-      >
-        <SvgNoReview />
-      </button>
-    </template>
+    <SelfEvaluateButtons @self-evaluate="selfEvaluate" />
+    <button
+      class="btn"
+      title="remove this note from review"
+      @click="removeFromReview"
+    >
+      <SvgNoReview />
+    </button>
   </div>
 </template>
 
@@ -51,11 +48,6 @@ export default defineComponent({
   },
   emits: ["selfEvaluated"],
   components: { SelfEvaluateButtons, SvgNoReview },
-  data() {
-    return {
-      nextReviewAt: undefined as string | undefined,
-    };
-  },
   methods: {
     selfEvaluate(data: Generated.SelfEvaluate) {
       this.api.reviewMethods
@@ -63,7 +55,6 @@ export default defineComponent({
           selfEvaluation: data,
         })
         .then((reviewPoint) => {
-          this.nextReviewAt = reviewPoint.nextReviewAt;
           this.$emit("selfEvaluated", reviewPoint);
         });
     },

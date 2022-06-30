@@ -4,10 +4,6 @@
       v-if="reviewPoint"
       v-bind="{ reviewPoint }"
       :key="reviewPointId"
-    />
-    <NoteInfoReviewPoint
-      v-if="reviewPoint"
-      v-bind="{ reviewPoint }"
       @self-evaluated="onSelfEvaluted($event)"
     />
   </LoadingPage>
@@ -17,7 +13,6 @@
 import { defineComponent } from "vue";
 import LoadingPage from "../../pages/commons/LoadingPage.vue";
 import ShowReviewPoint from "./ShowReviewPoint.vue";
-import NoteInfoReviewPoint from "../notes/NoteInfoReviewPoint.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 
 export default defineComponent({
@@ -30,7 +25,6 @@ export default defineComponent({
   components: {
     LoadingPage,
     ShowReviewPoint,
-    NoteInfoReviewPoint,
   },
   data() {
     return {
