@@ -320,7 +320,7 @@ Cypress.Commands.add("expectNoteTitle", (title) =>
   cy.findByText(title, { selector: "[role=title] *" }),
 )
 
-Cypress.Commands.add("yesIRemember", (title) =>
+Cypress.Commands.add("yesIRemember", () =>
   cy.findByRole("button", { name: "Yes, I remember" }).click(),
 )
 

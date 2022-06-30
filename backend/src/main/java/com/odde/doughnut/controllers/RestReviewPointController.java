@@ -6,8 +6,6 @@ import com.odde.doughnut.entities.json.SelfEvaluation;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
-import com.odde.doughnut.testability.TestabilitySettings;
-import javax.annotation.Resource;
 import org.springframework.http.HttpStatus;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
@@ -19,16 +17,10 @@ class RestReviewPointController {
   private final ModelFactoryService modelFactoryService;
   private final CurrentUserFetcher currentUserFetcher;
 
-  @Resource(name = "testabilitySettings")
-  private final TestabilitySettings testabilitySettings;
-
   public RestReviewPointController(
-      ModelFactoryService modelFactoryService,
-      CurrentUserFetcher currentUserFetcher,
-      TestabilitySettings testabilitySettings) {
+      ModelFactoryService modelFactoryService, CurrentUserFetcher currentUserFetcher) {
     this.modelFactoryService = modelFactoryService;
     this.currentUserFetcher = currentUserFetcher;
-    this.testabilitySettings = testabilitySettings;
   }
 
   @GetMapping("/{reviewPoint}")
@@ -55,9 +47,7 @@ class RestReviewPointController {
     }
     UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertLoggedIn();
-    modelFactoryService
-        .toReviewPointModel(reviewPoint)
-        .evaluate(testabilitySettings.getCurrentUTCTimestamp(), selfEvaluation.selfEvaluation);
+    modelFactoryService.toReviewPointModel(reviewPoint).evaluate(selfEvaluation.selfEvaluation);
     return reviewPoint;
   }
 }

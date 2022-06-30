@@ -60,20 +60,17 @@ public record ReviewPointModel(ReviewPoint entity, ModelFactoryService modelFact
     this.modelFactoryService.reviewPointRepository.save(entity);
   }
 
-  public void evaluate(Timestamp currentUTCTimestamp, SelfEvaluate selfEvaluation) {
+  public void evaluate(SelfEvaluate selfEvaluation) {
     SpacedRepetitionAlgorithm spacedRepetitionAlgorithm =
         entity.getUser().getSpacedRepetitionAlgorithm();
-    long delayInHours =
-        TimestampOperations.getDiffInHours(currentUTCTimestamp, entity.getNextReviewAt());
     final int nextForgettingCurveIndex =
         spacedRepetitionAlgorithm.getNextForgettingCurveIndex(
-            entity.getForgettingCurveIndex(), selfEvaluation.adjustment, delayInHours);
+            entity.getForgettingCurveIndex(), selfEvaluation.adjustment, 0);
     final int nextRepeatInHours =
         spacedRepetitionAlgorithm.getRepeatInHours(nextForgettingCurveIndex);
     entity.setForgettingCurveIndex(nextForgettingCurveIndex);
     entity.setNextReviewAt(
-        TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, nextRepeatInHours));
-    entity.setLastReviewedAt(currentUTCTimestamp);
+        TimestampOperations.addHoursToTimestamp(entity.getLastReviewedAt(), nextRepeatInHours));
     this.modelFactoryService.reviewPointRepository.save(entity);
   }
 }
