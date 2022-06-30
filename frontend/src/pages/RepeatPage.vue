@@ -17,7 +17,8 @@
           v-bind="{
             quizQuestion: repetition.quizQuestion,
           }"
-          @answer="processAnswer($event)"
+          @answered="onAnswered($event)"
+          @reload-needed="fetchData"
           :key="repetition.quizQuestion.quizQuestion.reviewPoint"
         />
       </template>
@@ -36,11 +37,10 @@ import QuizQuestion from "../components/review/QuizQuestion.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import RepeatProgressBar from "../components/review/RepeatProgressBar.vue";
 import useLoadingApi from "../managedApi/useLoadingApi";
-import usePopups from "../components/commons/Popups/usePopup";
 
 export default defineComponent({
   setup() {
-    return { ...useLoadingApi(), ...usePopups() };
+    return useLoadingApi();
   },
   name: "RepeatPage",
   props: { nested: Boolean },
@@ -94,32 +94,13 @@ export default defineComponent({
         });
     },
 
-    async noLongerExist() {
-      await this.popups.alert(
-        "This review point doesn't exist any more or is being skipped now. Moving on to the next review point..."
-      );
-      return this.fetchData();
-    },
-
-    processAnswer(answerData: Partial<Generated.Answer> | null) {
-      if (answerData === null || this.repetition === undefined) {
-        this.fetchData();
+    onAnswered(answerResult: Generated.AnswerResult) {
+      this.previousResults.push(answerResult);
+      this.loadNew(answerResult.nextRepetition);
+      if (answerResult.correct) {
         return;
       }
-      this.api.reviewMethods
-        .processAnswer({
-          question: this.repetition?.quizQuestion.quizQuestion,
-          ...answerData,
-        })
-        .then((res: Generated.AnswerResult) => {
-          this.previousResults.push(res);
-          this.loadNew(res.nextRepetition);
-          if (res.correct) {
-            return;
-          }
-          this.viewLastResult(this.previousResults.length - 1);
-        })
-        .catch(() => this.noLongerExist());
+      this.viewLastResult(this.previousResults.length - 1);
     },
   },
 

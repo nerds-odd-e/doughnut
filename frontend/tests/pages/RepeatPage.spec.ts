@@ -71,9 +71,6 @@ describe("repeat page", () => {
       helper.apiMock.expectingPost(
         `/api/reviews/${repetition.quizQuestion.quizQuestion.reviewPoint}/self-evaluate`
       );
-      helper.apiMock
-        .expectingGet("/api/reviews/repeat")
-        .andReturnOnce(repetition);
       await wrapper.find("#repeat-sad").trigger("click");
     });
   });

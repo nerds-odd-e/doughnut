@@ -83,8 +83,13 @@ import ShowPicture from "../notes/ShowPicture.vue";
 import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
 import TextInput from "../form/TextInput.vue";
 import ReviewPointAsync from "./ReviewPointAsync.vue";
+import useLoadingApi from "../../managedApi/useLoadingApi";
+import usePopups from "../commons/Popups/usePopup";
 
 export default defineComponent({
+  setup() {
+    return { ...useLoadingApi(), ...usePopups() };
+  },
   props: {
     quizQuestion: {
       type: Object as PropType<Generated.QuizQuestionViewedByUser>,
@@ -98,15 +103,26 @@ export default defineComponent({
     TextInput,
     ReviewPointAsync,
   },
-  emits: ["answer", "removeFromReview"],
+  emits: ["answered", "reloadNeeded"],
   data() {
     return {
       answer: "" as string,
     };
   },
   methods: {
-    sumbitAnswer(answerData: Partial<Generated.Answer>) {
-      this.$emit("answer", answerData);
+    async sumbitAnswer(answerData: Partial<Generated.Answer>) {
+      try {
+        const answerResult = await this.api.reviewMethods.processAnswer({
+          question: this.quizQuestion.quizQuestion,
+          ...answerData,
+        });
+        this.$emit("answered", answerResult);
+      } catch (_e) {
+        await this.popups.alert(
+          "This review point doesn't exist any more or is being skipped now. Moving on to the next review point..."
+        );
+        this.$emit("reloadNeeded");
+      }
     },
   },
 });
