@@ -20,7 +20,7 @@ public class AnswerModel {
   }
 
   public void updateReviewPoints(Timestamp currentUTCTimestamp) {
-    SelfEvaluate selfEvaluate = isCorrect() ? SelfEvaluate.satisfying : SelfEvaluate.sad;
+    SelfEvaluate selfEvaluate = isCorrect() ? SelfEvaluate.happy : SelfEvaluate.sad;
     answer
         .getQuestion()
         .getViceReviewPointIdList()

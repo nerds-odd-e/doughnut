@@ -104,7 +104,7 @@ class RestReviewPointControllerTest {
 
       @Test
       void repeat() {
-        evaluate(satisfying);
+        evaluate(happy);
         assertThat(rp.getForgettingCurveIndex(), equalTo(expectedSatisfyingForgettingCurveIndex));
         assertThat(rp.getRepetitionCount(), equalTo(0));
       }
@@ -123,14 +123,6 @@ class RestReviewPointControllerTest {
       void repeatSad() {
         evaluate(sad);
         assertThat(rp.getForgettingCurveIndex(), lessThan(expectedSatisfyingForgettingCurveIndex));
-        assertThat(rp.getRepetitionCount(), equalTo(0));
-      }
-
-      @Test
-      void repeatHappy() {
-        evaluate(happy);
-        assertThat(
-            rp.getForgettingCurveIndex(), greaterThan(expectedSatisfyingForgettingCurveIndex));
         assertThat(rp.getRepetitionCount(), equalTo(0));
       }
     }

@@ -1,6 +1,6 @@
 package com.odde.doughnut.testability.builders;
 
-import static com.odde.doughnut.entities.SelfEvaluate.satisfying;
+import static com.odde.doughnut.entities.SelfEvaluate.happy;
 
 import com.odde.doughnut.entities.Link;
 import com.odde.doughnut.entities.Note;
@@ -46,7 +46,8 @@ public class ReviewPointBuilder extends EntityBuilder<ReviewPoint> {
   public ReviewPointBuilder nthStrictRepetitionOn(Integer repetitionDone) {
     ReviewPointModel reviewPointModel = makeMe.modelFactoryService.toReviewPointModel(entity);
     for (int i = 0; i < repetitionDone; i++) {
-      reviewPointModel.updateNextRepetitionWithAdjustment(entity.getNextReviewAt(), satisfying);
+      reviewPointModel.updateNextRepetitionWithAdjustment(
+          entity.getNextReviewAt(), happy.adjustment);
     }
     return this;
   }

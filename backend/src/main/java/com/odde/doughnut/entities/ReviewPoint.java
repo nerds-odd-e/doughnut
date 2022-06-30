@@ -137,7 +137,7 @@ public class ReviewPoint {
   public void updateForgettingCurve(long delayInHours, int adjustment) {
     setForgettingCurveIndex(
         getSpacedRepetitionAlgorithm()
-            .getNextForgettingCurveIndex(getForgettingCurveIndex(), adjustment, delayInHours));
+            .addTotForgettingCurveIndex(getForgettingCurveIndex(), adjustment, delayInHours));
   }
 
   private SpacedRepetitionAlgorithm getSpacedRepetitionAlgorithm() {

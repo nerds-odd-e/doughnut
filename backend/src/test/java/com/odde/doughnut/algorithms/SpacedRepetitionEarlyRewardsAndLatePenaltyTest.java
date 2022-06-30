@@ -73,7 +73,7 @@ public class SpacedRepetitionEarlyRewardsAndLatePenaltyTest {
   }
 
   private int getNextForgettingCurveIndexWithDelay(int delayInHours) {
-    return spacedRepetitionAlgorithm.getNextForgettingCurveIndex(
-        currentForgettingCurveIndex, 0, delayInHours);
+    return spacedRepetitionAlgorithm.addTotForgettingCurveIndex(
+        currentForgettingCurveIndex, 1, delayInHours);
   }
 }
