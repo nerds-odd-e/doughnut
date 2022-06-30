@@ -1,6 +1,29 @@
 <template>
-  <div>
-    <div v-if="noteInfo.reviewPoint">
+  <ul>
+    <li v-if="noteInfo.note">
+      <h6>Note</h6>
+      <label
+        >Created:
+        <span class="statistics-value">{{
+          new Date(noteInfo.createdAt).toLocaleString()
+        }}</span></label
+      >
+      <label
+        >Last Content Updated:
+        <span class="statistics-value">{{
+          new Date(noteInfo.note.note.textContent.updatedAt).toLocaleString()
+        }}</span></label
+      >
+    </li>
+    <li>
+      <h6>Review Settings</h6>
+      <ReviewSettingForm
+        v-bind="{ noteId: noteInfo.note.id, reviewSetting }"
+        @level-changed="$emit('levelChanged', $event)"
+      />
+    </li>
+    <li v-if="noteInfo.reviewPoint">
+      <h6>Review Point</h6>
       <label
         >Repetition Count:
         <span class="statistics-value">{{
@@ -19,27 +42,8 @@
           new Date(noteInfo.reviewPoint.nextReviewAt).toLocaleString()
         }}</span></label
       >
-    </div>
-
-    <div v-if="noteInfo.note">
-      <label
-        >Created:
-        <span class="statistics-value">{{
-          new Date(noteInfo.createdAt).toLocaleString()
-        }}</span></label
-      >
-      <label
-        >Last Content Updated:
-        <span class="statistics-value">{{
-          new Date(noteInfo.note.note.textContent.updatedAt).toLocaleString()
-        }}</span></label
-      >
-    </div>
-    <ReviewSettingForm
-      v-bind="{ noteId: noteInfo.note.id, reviewSetting }"
-      @level-changed="$emit('levelChanged', $event)"
-    />
-  </div>
+    </li>
+  </ul>
 </template>
 
 <script lang="ts">
@@ -59,3 +63,9 @@ export default defineComponent({
   components: { ReviewSettingForm },
 });
 </script>
+
+<style lang="scss" scoped>
+ul {
+  margin-bottom: 0;
+}
+</style>
