@@ -38,9 +38,9 @@ import { defineComponent } from "vue";
 import LoadingPage from "@/pages/commons/LoadingPage.vue";
 import NoteToolbar from "@/components/toolbars/NoteToolbar.vue";
 import NoteWithLinks from "../NoteWithLinks.vue";
-import NoteInfoButton from "../NoteInfoButton.vue";
 import Cards from "../Cards.vue";
 import useStoredLoadingApi from "../../../managedApi/useStoredLoadingApi";
+import NoteInfoButton from "../NoteInfoButton.vue";
 
 export default defineComponent({
   setup() {
@@ -55,9 +55,9 @@ export default defineComponent({
   components: {
     NoteWithLinks,
     Cards,
-    NoteInfoButton,
     LoadingPage,
     NoteToolbar,
+    NoteInfoButton,
   },
   data() {
     return {
