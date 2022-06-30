@@ -107,25 +107,6 @@ public class ReviewPoint {
         == TimestampOperations.getDayId(currentTime, timeZone);
   }
 
-  public void updateMemoryState(
-      Timestamp currentUTCTimestamp, int nextRepeatInHours, int nextForgettingCurveIndex) {
-    setForgettingCurveIndex(nextForgettingCurveIndex);
-    setNextReviewAt(
-        TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, nextRepeatInHours));
-    setLastReviewedAt(currentUTCTimestamp);
-  }
-
-  public void changeNextRepetitionWithAdjustment(Timestamp currentUTCTimestamp, int adjustment) {
-    SpacedRepetitionAlgorithm spacedRepetitionAlgorithm = getUser().getSpacedRepetitionAlgorithm();
-    long delayInHours = TimestampOperations.getDiffInHours(currentUTCTimestamp, getNextReviewAt());
-    final int nextForgettingCurveIndex =
-        spacedRepetitionAlgorithm.getNextForgettingCurveIndex(
-            getForgettingCurveIndex(), adjustment, delayInHours);
-    final int nextRepeatInHours =
-        spacedRepetitionAlgorithm.getRepeatInHours(nextForgettingCurveIndex);
-    updateMemoryState(currentUTCTimestamp, nextRepeatInHours, nextForgettingCurveIndex);
-  }
-
   public List<QuizQuestion.QuestionType> availableQuestionTypes() {
     List<QuizQuestion.QuestionType> questionTypes = new ArrayList<>();
     if (getLink() != null) {

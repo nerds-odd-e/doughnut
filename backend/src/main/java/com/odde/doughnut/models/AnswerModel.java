@@ -33,10 +33,10 @@ public class AnswerModel {
                         vice ->
                             this.modelFactoryService
                                 .toReviewPointModel(vice)
-                                .updateReviewPoint(currentUTCTimestamp, selfEvaluate)));
+                                .updateAfterRepetition(currentUTCTimestamp, selfEvaluate)));
     ReviewPointModel reviewPointModel =
         this.modelFactoryService.toReviewPointModel(answer.getQuestion().getReviewPoint());
-    reviewPointModel.updateReviewPoint(currentUTCTimestamp, selfEvaluate);
+    reviewPointModel.updateAfterRepetition(currentUTCTimestamp, selfEvaluate);
   }
 
   public AnswerViewedByUser getAnswerViewedByUser() {
