@@ -1,10 +1,7 @@
 package com.odde.doughnut.controllers;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.*;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -16,6 +13,7 @@ import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.json.InitialInfo;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
+import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
@@ -144,6 +142,21 @@ class RestReviewsControllerTests {
       assertFalse(answerResult.correct);
       assertThat(reviewPoint.getForgettingCurveIndex(), equalTo(oldForgettingCurveIndex));
       assertThat(reviewPoint.getRepetitionCount(), greaterThan(oldRepetitionCount));
+    }
+
+    @Test
+    void shouldRepeatTheNextDay() {
+      QuizQuestion quizQuestion =
+          makeMe.aQuestion().of(QuizQuestion.QuestionType.SPELLING, reviewPoint).inMemoryPlease();
+      answer.setQuestion(quizQuestion);
+      answer.setAnswerNoteId(null);
+      answer.setSpellingAnswer("wrong");
+      controller().answerQuiz(answer);
+      assertThat(
+          reviewPoint.getNextReviewAt(),
+          lessThan(
+              TimestampOperations.addHoursToTimestamp(
+                  testabilitySettings.getCurrentUTCTimestamp(), 25)));
     }
 
     @Test

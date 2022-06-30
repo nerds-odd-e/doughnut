@@ -1,6 +1,6 @@
 package com.odde.doughnut.models;
 
-import static com.odde.doughnut.entities.SelfEvaluate.satisfying;
+import static com.odde.doughnut.entities.SelfEvaluate.*;
 
 import com.odde.doughnut.algorithms.SpacedRepetitionAlgorithm;
 import com.odde.doughnut.entities.QuizQuestion;
@@ -51,11 +51,15 @@ public record ReviewPointModel(ReviewPoint entity, ModelFactoryService modelFact
     final int nextForgettingCurveIndex =
         spacedRepetitionAlgorithm.getNextForgettingCurveIndex(
             entity.getForgettingCurveIndex(), selfEvaluation.adjustment, delayInHours);
-    final int nextRepeatInHours =
-        spacedRepetitionAlgorithm.getRepeatInHours(nextForgettingCurveIndex);
     entity.setForgettingCurveIndex(nextForgettingCurveIndex);
-    entity.setNextReviewAt(
-        TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, nextRepeatInHours));
+    if (selfEvaluation.equals(sad)) {
+      entity.setNextReviewAt(TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, 12));
+    } else {
+      final int nextRepeatInHours =
+          spacedRepetitionAlgorithm.getRepeatInHours(nextForgettingCurveIndex);
+      entity.setNextReviewAt(
+          TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, nextRepeatInHours));
+    }
     entity.setLastReviewedAt(currentUTCTimestamp);
     this.modelFactoryService.reviewPointRepository.save(entity);
   }
@@ -66,9 +70,9 @@ public record ReviewPointModel(ReviewPoint entity, ModelFactoryService modelFact
     final int nextForgettingCurveIndex =
         spacedRepetitionAlgorithm.getNextForgettingCurveIndex(
             entity.getForgettingCurveIndex(), selfEvaluation.adjustment, 0);
+    entity.setForgettingCurveIndex(nextForgettingCurveIndex);
     final int nextRepeatInHours =
         spacedRepetitionAlgorithm.getRepeatInHours(nextForgettingCurveIndex);
-    entity.setForgettingCurveIndex(nextForgettingCurveIndex);
     entity.setNextReviewAt(
         TimestampOperations.addHoursToTimestamp(entity.getLastReviewedAt(), nextRepeatInHours));
     this.modelFactoryService.reviewPointRepository.save(entity);
