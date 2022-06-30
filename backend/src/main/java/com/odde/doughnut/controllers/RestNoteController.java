@@ -115,10 +115,10 @@ class RestNoteController {
   }
 
   @GetMapping("/{note}/statistics")
-  public NoteStatistics statistics(@PathVariable("note") Note note) throws NoAccessRightException {
+  public NoteInfo statistics(@PathVariable("note") Note note) throws NoAccessRightException {
     final UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertReadAuthorization(note);
-    NoteStatistics statistics = new NoteStatistics();
+    NoteInfo statistics = new NoteInfo();
     statistics.setReviewPoint(user.getReviewPointFor(note));
     statistics.setNote(new NoteViewer(user.getEntity(), note).toJsonObject());
     statistics.setCreatedAt(note.getThing().getCreatedAt());

@@ -2,7 +2,7 @@
  * @jest-environment jsdom
  */
 import fetchMock from "jest-fetch-mock";
-import NoteStatistics from "@/components/notes/NoteStatistics.vue";
+import NoteInfoButton from "@/components/notes/NoteInfoButton.vue";
 import { mount } from "@vue/test-utils";
 import flushPromises from "flush-promises";
 import makeMe from "../fixtures/makeMe";
@@ -17,21 +17,11 @@ const stubResponse = {
 };
 
 describe("note statistics", () => {
-  it("fetch API to be called ONCE", async () => {
-    fetchMock.mockResponseOnce(JSON.stringify({}));
-    const wrapper = mount(NoteStatistics, { propsData: { noteId: 123 } });
-    await flushPromises();
-    expect(fetch).toHaveBeenCalledTimes(1);
-    expect(fetch).toHaveBeenCalledWith(
-      "/api/notes/123/statistics",
-      expect.anything()
-    );
-    expect(wrapper.findAll(".statistics-value")).toHaveLength(0);
-  });
-
   it("should render values", async () => {
     fetchMock.mockResponseOnce(JSON.stringify(stubResponse));
-    const wrapper = mount(NoteStatistics, { propsData: { noteId: 123 } });
+    const wrapper = mount(NoteInfoButton, {
+      propsData: { noteId: 123, expanded: true },
+    });
     await flushPromises();
     expect(wrapper.findAll(".statistics-value")).toHaveLength(5);
   });

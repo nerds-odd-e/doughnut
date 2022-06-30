@@ -52,6 +52,13 @@ declare namespace Generated {
         wikidataId?: string;
     }
 
+    interface NoteInfo {
+        reviewPoint: ReviewPoint;
+        note: NoteRealm;
+        createdAt: string;
+        reviewSetting: ReviewSetting;
+    }
+
     interface NotePositionViewedByUser {
         noteId: number;
         notebook: NotebookViewedByUser;
@@ -73,13 +80,6 @@ declare namespace Generated {
     interface NoteRealmWithPosition {
         notePosition: NotePositionViewedByUser;
         noteRealm: NoteRealm;
-    }
-
-    interface NoteStatistics {
-        reviewPoint: ReviewPoint;
-        note: NoteRealm;
-        createdAt: string;
-        reviewSetting: ReviewSetting;
     }
 
     interface NotebookViewedByUser {
@@ -196,16 +196,6 @@ declare namespace Generated {
         updatedAt: string;
     }
 
-    interface Note extends Thingy {
-        title: string;
-        shortDescription: string;
-        parentId?: number;
-        noteAccessories: NoteAccessories;
-        wikidataId: string;
-        textContent: TextContent;
-        pictureWithMask?: PictureWithMask;
-    }
-
     interface ReviewPoint {
         id: number;
         thing: Thing;
@@ -221,6 +211,16 @@ declare namespace Generated {
         id: number;
         rememberSpelling: boolean;
         level: number;
+    }
+
+    interface Note extends Thingy {
+        title: string;
+        shortDescription: string;
+        parentId?: number;
+        noteAccessories: NoteAccessories;
+        wikidataId: string;
+        textContent: TextContent;
+        pictureWithMask?: PictureWithMask;
     }
 
     interface Ownership {
@@ -264,6 +264,13 @@ declare namespace Generated {
         id: number;
     }
 
+    interface Thing {
+        id: number;
+        createdAt: string;
+        note?: Note;
+        link?: Link;
+    }
+
     interface NoteAccessories {
         url: string;
         urlIsVideo: boolean;
@@ -272,13 +279,6 @@ declare namespace Generated {
         useParentPicture: boolean;
         skipReview: boolean;
         updatedAt: string;
-    }
-
-    interface Thing {
-        id: number;
-        createdAt: string;
-        note?: Note;
-        link?: Link;
     }
 
     interface Circle {

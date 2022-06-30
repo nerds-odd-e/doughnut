@@ -6,7 +6,7 @@ import java.sql.Timestamp;
 import lombok.Getter;
 import lombok.Setter;
 
-public class NoteStatistics {
+public class NoteInfo {
   @Getter @Setter private ReviewPoint reviewPoint;
   @Getter @Setter private NoteRealm note;
   @Getter @Setter private Timestamp createdAt;

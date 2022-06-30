@@ -132,7 +132,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
   async getStatistics(noteId: Doughnut.ID) {
     return (await managedApi.restGet(
       `notes/${noteId}/statistics`
-    )) as Generated.NoteStatistics;
+    )) as Generated.NoteInfo;
   },
 
   notebookMethods: {

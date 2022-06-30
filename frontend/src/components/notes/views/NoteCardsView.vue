@@ -20,7 +20,7 @@
         @note-realm-updated="noteRealmUpdated($event)"
       >
         <template #footer>
-          <NoteStatisticsButton
+          <NoteInfoButton
             :note-id="noteRealm.id"
             :expanded="expandInfo"
             :key="noteRealm.id"
@@ -38,7 +38,7 @@ import { defineComponent } from "vue";
 import LoadingPage from "@/pages/commons/LoadingPage.vue";
 import NoteToolbar from "@/components/toolbars/NoteToolbar.vue";
 import NoteWithLinks from "../NoteWithLinks.vue";
-import NoteStatisticsButton from "../NoteStatisticsButton.vue";
+import NoteInfoButton from "../NoteInfoButton.vue";
 import Cards from "../Cards.vue";
 import useStoredLoadingApi from "../../../managedApi/useStoredLoadingApi";
 
@@ -55,7 +55,7 @@ export default defineComponent({
   components: {
     NoteWithLinks,
     Cards,
-    NoteStatisticsButton,
+    NoteInfoButton,
     LoadingPage,
     NoteToolbar,
   },
