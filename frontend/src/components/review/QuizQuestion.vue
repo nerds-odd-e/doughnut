@@ -18,7 +18,34 @@
     </div>
   </NoteFrameOfLinks>
 
-  <div class="row" v-if="quizQuestion.questionType !== 'SPELLING'">
+  <div v-if="quizQuestion.questionType === 'JUST_REVIEW'">
+    <ReviewPointAsync
+      v-bind="{
+        reviewPointId: quizQuestion.quizQuestion.reviewPoint,
+      }"
+      @self-evaluated="$emit('answer', null)"
+    />
+  </div>
+  <div v-else-if="quizQuestion.questionType === 'SPELLING'">
+    <form @submit.prevent.once="processForm">
+      <div class="aaa">
+        <TextInput
+          scope-name="review_point"
+          field="answer"
+          v-model="answer"
+          placeholder="put your answer here"
+          :autofocus="true"
+        />
+      </div>
+      <input
+        type="submit"
+        value="OK"
+        class="btn btn-primary btn-lg btn-block"
+      />
+    </form>
+  </div>
+
+  <div class="row" v-else>
     <div
       class="col-sm-6 mb-3 d-grid"
       v-for="option in quizQuestion.options"
@@ -38,25 +65,6 @@
       </button>
     </div>
   </div>
-
-  <div v-else>
-    <form @submit.prevent.once="processForm">
-      <div class="aaa">
-        <TextInput
-          scope-name="review_point"
-          field="answer"
-          v-model="answer"
-          placeholder="put your answer here"
-          :autofocus="true"
-        />
-      </div>
-      <input
-        type="submit"
-        value="OK"
-        class="btn btn-primary btn-lg btn-block"
-      />
-    </form>
-  </div>
 </template>
 
 <script lang="ts">
@@ -65,6 +73,7 @@ import BasicBreadcrumb from "../commons/BasicBreadcrumb.vue";
 import ShowPicture from "../notes/ShowPicture.vue";
 import NoteFrameOfLinks from "../links/NoteFrameOfLinks.vue";
 import TextInput from "../form/TextInput.vue";
+import ReviewPointAsync from "./ReviewPointAsync.vue";
 
 export default defineComponent({
   props: {
@@ -78,6 +87,7 @@ export default defineComponent({
     ShowPicture,
     NoteFrameOfLinks,
     TextInput,
+    ReviewPointAsync,
   },
   emits: ["answer", "removeFromReview"],
   data() {

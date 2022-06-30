@@ -14,22 +14,12 @@
     <template v-if="!nested">
       <template v-if="repetition">
         <QuizQuestion
-          v-if="repetition.quizQuestion.questionType !== 'JUST_REVIEW'"
           v-bind="{
             quizQuestion: repetition?.quizQuestion,
           }"
           @answer="processAnswer($event)"
           :key="repetition.reviewPoint"
         />
-        <template v-else>
-          <ReviewPointAsync
-            v-bind="{
-              reviewPointId: repetition.reviewPoint,
-            }"
-            @self-evaluated="fetchData"
-            :key="repetition.reviewPoint"
-          />
-        </template>
       </template>
       <template v-else>
         <div class="alert alert-success">
@@ -45,7 +35,6 @@ import { defineComponent } from "vue";
 import QuizQuestion from "../components/review/QuizQuestion.vue";
 import ContainerPage from "./commons/ContainerPage.vue";
 import RepeatProgressBar from "../components/review/RepeatProgressBar.vue";
-import ReviewPointAsync from "../components/review/ReviewPointAsync.vue";
 import useLoadingApi from "../managedApi/useLoadingApi";
 import usePopups from "../components/commons/Popups/usePopup";
 
@@ -59,7 +48,6 @@ export default defineComponent({
     QuizQuestion,
     ContainerPage,
     RepeatProgressBar,
-    ReviewPointAsync,
   },
   data() {
     return {
@@ -113,7 +101,11 @@ export default defineComponent({
       return this.fetchData();
     },
 
-    processAnswer(answerData: Generated.Answer) {
+    processAnswer(answerData: Generated.Answer | null) {
+      if (answerData === null) {
+        this.fetchData();
+        return;
+      }
       this.api.reviewMethods
         .processAnswer(answerData)
         .then((res: Generated.AnswerResult) => {
