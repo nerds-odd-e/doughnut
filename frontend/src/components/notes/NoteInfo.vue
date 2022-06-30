@@ -24,24 +24,7 @@
     </li>
     <li v-if="noteInfo.reviewPoint">
       <h6>Review Point</h6>
-      <label
-        >Repetition Count:
-        <span class="statistics-value">{{
-          noteInfo.reviewPoint.repetitionCount
-        }}</span></label
-      >
-      <label
-        >Forgetting Curive Index:
-        <span class="statistics-value">{{
-          noteInfo.reviewPoint.forgettingCurveIndex
-        }}</span></label
-      >
-      <label
-        >Next Review:
-        <span class="statistics-value">{{
-          new Date(noteInfo.reviewPoint.nextReviewAt).toLocaleString()
-        }}</span></label
-      >
+      <NoteInfoReviewPoint v-bind="{ reviewPoint: noteInfo.reviewPoint }" />
     </li>
   </ul>
 </template>
@@ -49,6 +32,7 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import ReviewSettingForm from "../review/ReviewSettingForm.vue";
+import NoteInfoReviewPoint from "./NoteInfoReviewPoint.vue";
 
 export default defineComponent({
   props: {
@@ -60,7 +44,7 @@ export default defineComponent({
       return this.noteInfo.reviewSetting;
     },
   },
-  components: { ReviewSettingForm },
+  components: { ReviewSettingForm, NoteInfoReviewPoint },
 });
 </script>
 
