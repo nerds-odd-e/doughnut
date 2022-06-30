@@ -67,20 +67,13 @@ public class AnswerModel {
 
   private boolean isCorrect() {
     if (cachedResult != null) return cachedResult;
-    cachedResult = answer.getQuestion().isAnswerCorrect(this::matchAnswer);
+    cachedResult =
+        answer.getQuestion().isAnswerCorrect(getAnswerNote(), answer.getSpellingAnswer());
     return cachedResult;
   }
 
   private Note getAnswerNote() {
     if (answer.getAnswerNoteId() == null) return null;
     return this.modelFactoryService.noteRepository.findById(answer.getAnswerNoteId()).orElse(null);
-  }
-
-  private boolean matchAnswer(Note correctAnswerNote) {
-    if (getAnswerNote() != null) {
-      return correctAnswerNote.equals(getAnswerNote());
-    }
-
-    return correctAnswerNote.getNoteTitle().matches(answer.getSpellingAnswer());
   }
 }

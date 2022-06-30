@@ -11,7 +11,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
@@ -30,8 +29,18 @@ import org.apache.logging.log4j.util.Strings;
 @Table(name = "quiz_question")
 public class QuizQuestion {
 
-  public Boolean isAnswerCorrect(Predicate<Note> matchAnswer) {
-    return buildPresenter().knownRightAnswers().stream().anyMatch(matchAnswer);
+  public Boolean isAnswerCorrect(Note answerNote, String spellingAnswer) {
+    if (getQuestionType() == QuestionType.JUST_REVIEW) {
+      return spellingAnswer.equals("yes");
+    }
+    return buildPresenter().knownRightAnswers().stream()
+        .anyMatch(
+            correctAnswerNote -> {
+              if (answerNote != null) {
+                return correctAnswerNote.equals(answerNote);
+              }
+              return correctAnswerNote.getNoteTitle().matches(spellingAnswer);
+            });
   }
 
   public QuizQuestionPresenter buildPresenter() {

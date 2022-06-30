@@ -330,13 +330,13 @@ Cypress.Commands.add("repeatReviewOneNoteIfThereIs", ({ review_type, title, addi
         if (additional_info) {
           cy.get(".note-body").should("contain", additional_info)
         }
+        cy.findByRole("button", { name: "Yes, I remember" }).click()
         break
       }
 
       default:
         expect(review_type).equal("a known review page type")
     }
-    cy.get("#repeat-satisfied").click()
   }
 })
 

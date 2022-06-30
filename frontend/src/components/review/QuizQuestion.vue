@@ -9,7 +9,7 @@
     <div class="quiz-instruction">
       <pre
         style="white-space: pre-wrap"
-        v-if="!pictureQuestion"
+        v-if="quizQuestion.questionType !== 'PICTURE_TITLE'"
         v-html="quizQuestion.description"
       />
       <h2 v-if="!!quizQuestion.mainTopic" class="text-center">
@@ -23,11 +23,24 @@
       v-bind="{
         reviewPointId: quizQuestion.quizQuestion.reviewPoint,
       }"
-      @self-evaluated="$emit('answer', null)"
     />
+    <div class="btn-group">
+      <button
+        class="btn btn-primary"
+        @click.once="sumbitAnswer({ spellingAnswer: 'yes' })"
+      >
+        Yes, I remember
+      </button>
+      <button
+        class="btn btn-secondary"
+        @click.once="sumbitAnswer({ spellingAnswer: 'no' })"
+      >
+        No, I need more repetition
+      </button>
+    </div>
   </div>
   <div v-else-if="quizQuestion.questionType === 'SPELLING'">
-    <form @submit.prevent.once="sumbitAnswer">
+    <form @submit.prevent.once="sumbitAnswer({ spellingAnswer: answer })">
       <div class="aaa">
         <TextInput
           scope-name="review_point"
@@ -44,7 +57,6 @@
       />
     </form>
   </div>
-
   <div class="row" v-else>
     <div
       class="col-sm-6 mb-3 d-grid"
@@ -53,7 +65,7 @@
     >
       <button
         class="btn btn-secondary btn-lg"
-        @click.once="$emit('answer', { answerNoteId: option.noteId })"
+        @click.once="sumbitAnswer({ answerNoteId: option.noteId })"
       >
         <div v-if="!option.picture" v-html="option.display" />
         <div v-else>
@@ -92,20 +104,9 @@ export default defineComponent({
       answer: "" as string,
     };
   },
-  computed: {
-    answerToQuestion(): Generated.Answer {
-      return {
-        spellingAnswer: this.answer,
-        question: this.quizQuestion.quizQuestion,
-      };
-    },
-    pictureQuestion() {
-      return this.quizQuestion.questionType === "PICTURE_TITLE";
-    },
-  },
   methods: {
-    sumbitAnswer() {
-      this.$emit("answer", this.answerToQuestion);
+    sumbitAnswer(answerData: Partial<Generated.Answer>) {
+      this.$emit("answer", answerData);
     },
   },
 });
