@@ -44,10 +44,10 @@ export default defineComponent({
   components: { LinkShow, NoteCardsView },
   computed: {
     noteId() {
-      return this.reviewPoint.thing.note?.id;
+      return this.reviewPoint.thing?.note?.id;
     },
     link() {
-      return this.reviewPoint.thing.link;
+      return this.reviewPoint.thing?.link;
     },
   },
 });

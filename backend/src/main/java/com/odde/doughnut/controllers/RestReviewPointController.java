@@ -32,9 +32,9 @@ class RestReviewPointController {
   }
 
   @PostMapping(path = "/{reviewPoint}/remove")
-  public Integer removeFromRepeating(ReviewPoint reviewPoint) {
+  public ReviewPoint removeFromRepeating(ReviewPoint reviewPoint) {
     reviewPoint.setRemovedFromReview(true);
     modelFactoryService.reviewPointRepository.save(reviewPoint);
-    return reviewPoint.getId();
+    return reviewPoint;
   }
 }
