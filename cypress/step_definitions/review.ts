@@ -75,10 +75,6 @@ Then("I am repeat-reviewing my old note on day {int}", (day) => {
   cy.routerToRepeatReview()
 })
 
-Then("I should see the happy option", () => {
-  cy.get("#repeat-happy").should("exist")
-})
-
 Then("I am learning new note on day {int}", (day) => {
   cy.testability().timeTravelTo(day, 8)
   cy.routerToInitialReview()
@@ -105,6 +101,10 @@ Then("choose to remove it fromm reviews", () => {
 
 Then("I choose the happy option", () => {
   cy.get("#repeat-happy").click()
+})
+
+Then("I choose yes I remember", () => {
+  cy.yesIRemember()
 })
 
 Then(

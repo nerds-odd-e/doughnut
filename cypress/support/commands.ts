@@ -320,6 +320,10 @@ Cypress.Commands.add("expectNoteTitle", (title) =>
   cy.findByText(title, { selector: "[role=title] *" }),
 )
 
+Cypress.Commands.add("yesIRemember", (title) =>
+  cy.findByRole("button", { name: "Yes, I remember" }).click(),
+)
+
 Cypress.Commands.add("repeatReviewOneNoteIfThereIs", ({ review_type, title, additional_info }) => {
   if (review_type == "repeat done") {
     cy.findByText("You have finished all repetitions for this half a day!").should("be.visible")
@@ -330,7 +334,7 @@ Cypress.Commands.add("repeatReviewOneNoteIfThereIs", ({ review_type, title, addi
         if (additional_info) {
           cy.get(".note-body").should("contain", additional_info)
         }
-        cy.findByRole("button", { name: "Yes, I remember" }).click()
+        cy.yesIRemember()
         break
       }
 
