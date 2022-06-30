@@ -9,7 +9,6 @@ import com.odde.doughnut.entities.json.InitialInfo;
 import com.odde.doughnut.entities.json.QuizQuestionViewedByUser;
 import com.odde.doughnut.entities.json.RepetitionForUser;
 import com.odde.doughnut.entities.json.ReviewStatus;
-import com.odde.doughnut.entities.json.SelfEvaluation;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.AnswerModel;
 import com.odde.doughnut.models.ReviewPointModel;
@@ -122,20 +121,5 @@ class RestReviewsController {
     answerResult.quizQuestion =
         new QuizQuestionViewedByUser(answer.getQuestion(), modelFactoryService);
     return answerResult;
-  }
-
-  @PostMapping(path = "/{reviewPoint}/self-evaluate")
-  @Transactional
-  public ReviewPoint selfEvaluate(
-      ReviewPoint reviewPoint, @RequestBody SelfEvaluation selfEvaluation) {
-    if (reviewPoint == null || reviewPoint.getId() == null) {
-      throw new ResponseStatusException(HttpStatus.NOT_FOUND, "The review point does not exist.");
-    }
-    UserModel user = currentUserFetcher.getUser();
-    user.getAuthorization().assertLoggedIn();
-    modelFactoryService
-        .toReviewPointModel(reviewPoint)
-        .evaluate(testabilitySettings.getCurrentUTCTimestamp(), selfEvaluation.selfEvaluation);
-    return reviewPoint;
   }
 }

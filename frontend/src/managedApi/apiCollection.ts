@@ -67,7 +67,7 @@ const apiCollection = (managedApi: ManagedApi) => ({
       data: Generated.SelfEvaluation
     ) {
       const res = (await managedApi.restPost(
-        `reviews/${reviewPointId}/self-evaluate`,
+        `review-points/${reviewPointId}/self-evaluate`,
         data
       )) as Generated.ReviewPoint;
       return res;

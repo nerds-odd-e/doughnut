@@ -14,10 +14,11 @@
         v-if="showQuiz === 'quiz'"
         :quiz-question="answerResult.quizQuestion"
       />
-      <div v-else>
-        <ReviewPointAsync
-          v-if="reviewPoint"
-          v-bind="{ reviewPointId: reviewPoint.id }"
+      <div v-else-if="reviewPoint">
+        <ShowReviewPoint v-bind="{ reviewPoint }" />
+        <NoteInfoReviewPoint
+          v-bind="{ reviewPoint }"
+          @self-evaluated="onSelfEvaluated($event)"
         />
       </div>
     </LoadingPage>
@@ -26,12 +27,13 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
+import NoteInfoReviewPoint from "@/components/notes/NoteInfoReviewPoint.vue";
 import LoadingPage from "./commons/LoadingPage.vue";
 import useLoadingApi from "../managedApi/useLoadingApi";
 import AnswerResult from "../components/review/AnswerResult.vue";
 import QuizQuestion from "../components/review/QuizQuestion.vue";
 import RadioButtons from "../components/form/RadioButtons.vue";
-import ReviewPointAsync from "../components/review/ReviewPointAsync.vue";
+import ShowReviewPoint from "../components/review/ShowReviewPoint.vue";
 
 export default defineComponent({
   setup() {
@@ -43,7 +45,8 @@ export default defineComponent({
     AnswerResult,
     QuizQuestion,
     RadioButtons,
-    ReviewPointAsync,
+    ShowReviewPoint,
+    NoteInfoReviewPoint,
   },
   data() {
     return {
@@ -57,6 +60,13 @@ export default defineComponent({
     },
   },
   methods: {
+    onSelfEvaluated(reviewPoint: Generated.ReviewPoint) {
+      if (!this.answerResult) return;
+      this.answerResult = {
+        ...this.answerResult,
+        reviewPoint,
+      };
+    },
     async fetchData() {
       this.answerResult = await this.api.reviewMethods.getAnswer(this.answerId);
     },

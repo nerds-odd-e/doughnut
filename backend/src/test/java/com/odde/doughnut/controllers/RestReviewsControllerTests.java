@@ -1,13 +1,9 @@
 package com.odde.doughnut.controllers;
 
-import static com.odde.doughnut.entities.SelfEvaluate.happy;
-import static com.odde.doughnut.entities.SelfEvaluate.sad;
-import static com.odde.doughnut.entities.SelfEvaluate.satisfying;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -18,9 +14,7 @@ import com.odde.doughnut.entities.AnswerResult;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.SelfEvaluate;
 import com.odde.doughnut.entities.json.InitialInfo;
-import com.odde.doughnut.entities.json.SelfEvaluation;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
@@ -174,80 +168,6 @@ class RestReviewsControllerTests {
       userModel = makeMe.aNullUserModel();
       Answer answer = new Answer();
       assertThrows(ResponseStatusException.class, () -> controller().answerQuiz(answer));
-    }
-  }
-
-  @Nested
-  class evaluate {
-
-    @Test
-    void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
-      userModel = makeMe.aNullUserModel();
-      ReviewPoint reviewPoint = new ReviewPoint();
-      SelfEvaluation selfEvaluation =
-          new SelfEvaluation() {
-            {
-              this.selfEvaluation = happy;
-            }
-          };
-      assertThrows(
-          ResponseStatusException.class,
-          () -> controller().selfEvaluate(reviewPoint, selfEvaluation));
-    }
-
-    @Test
-    void whenTheReviewPointDoesNotExist() {
-      SelfEvaluation selfEvaluation =
-          new SelfEvaluation() {
-            {
-              this.selfEvaluation = happy;
-            }
-          };
-      assertThrows(
-          ResponseStatusException.class, () -> controller().selfEvaluate(null, selfEvaluation));
-    }
-
-    @Nested
-    class WhenThereIsAReviewPoint {
-      ReviewPoint rp;
-      final int expectedSatisfyingForgettingCurveIndex = 110;
-
-      @BeforeEach
-      void setup() {
-        rp = makeMe.aReviewPointFor(makeMe.aNote().please()).by(userModel).please();
-      }
-
-      @Test
-      void repeat() {
-        evaluate(satisfying);
-        assertThat(rp.getForgettingCurveIndex(), equalTo(expectedSatisfyingForgettingCurveIndex));
-        assertThat(rp.getRepetitionCount(), equalTo(0));
-      }
-
-      private void evaluate(SelfEvaluate evaluation) {
-        SelfEvaluation selfEvaluation =
-            new SelfEvaluation() {
-              {
-                this.selfEvaluation = evaluation;
-              }
-            };
-        controller().selfEvaluate(rp, selfEvaluation);
-      }
-
-      @Test
-      void repeatSad() {
-        evaluate(sad);
-        assertThat(rp.getForgettingCurveIndex(), lessThan(expectedSatisfyingForgettingCurveIndex));
-        assertThat(rp.getRepetitionCount(), equalTo(0));
-      }
-
-      @Test
-      void repeatHappy() {
-        evaluate(happy);
-        assertThat(
-            rp.getForgettingCurveIndex(), greaterThan(expectedSatisfyingForgettingCurveIndex));
-        assertThat(rp.getRepetitionCount(), equalTo(0));
-      }
     }
   }
 }
