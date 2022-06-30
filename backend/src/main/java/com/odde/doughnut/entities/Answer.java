@@ -27,6 +27,7 @@ public class Answer {
   @Getter
   @Setter
   @Column(name = "answer")
+  @Nullable
   String spellingAnswer;
 
   @Getter

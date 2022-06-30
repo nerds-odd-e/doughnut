@@ -101,13 +101,16 @@ export default defineComponent({
       return this.fetchData();
     },
 
-    processAnswer(answerData: Generated.Answer | null) {
-      if (answerData === null) {
+    processAnswer(answerData: Partial<Generated.Answer> | null) {
+      if (answerData === null || this.repetition === undefined) {
         this.fetchData();
         return;
       }
       this.api.reviewMethods
-        .processAnswer(answerData)
+        .processAnswer({
+          question: this.repetition?.quizQuestion.quizQuestion,
+          ...answerData,
+        })
         .then((res: Generated.AnswerResult) => {
           this.previousResults.push(res);
           this.loadNew(res.nextRepetition);

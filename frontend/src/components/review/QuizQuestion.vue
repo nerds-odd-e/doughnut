@@ -27,7 +27,7 @@
     />
   </div>
   <div v-else-if="quizQuestion.questionType === 'SPELLING'">
-    <form @submit.prevent.once="processForm">
+    <form @submit.prevent.once="sumbitAnswer">
       <div class="aaa">
         <TextInput
           scope-name="review_point"
@@ -53,10 +53,7 @@
     >
       <button
         class="btn btn-secondary btn-lg"
-        @click.once="
-          answerNoteId = option.noteId;
-          processForm();
-        "
+        @click.once="$emit('answer', { answerNoteId: option.noteId })"
       >
         <div v-if="!option.picture" v-html="option.display" />
         <div v-else>
@@ -93,14 +90,12 @@ export default defineComponent({
   data() {
     return {
       answer: "" as string,
-      answerNoteId: undefined as Doughnut.ID | undefined,
     };
   },
   computed: {
     answerToQuestion(): Generated.Answer {
       return {
         spellingAnswer: this.answer,
-        answerNoteId: this.answerNoteId,
         question: this.quizQuestion.quizQuestion,
       };
     },
@@ -109,7 +104,7 @@ export default defineComponent({
     },
   },
   methods: {
-    processForm() {
+    sumbitAnswer() {
       this.$emit("answer", this.answerToQuestion);
     },
   },
