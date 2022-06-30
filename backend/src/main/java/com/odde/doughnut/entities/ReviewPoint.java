@@ -124,4 +124,23 @@ public class ReviewPoint {
   public Note getHeadNote() {
     return this.thing.getHeadNoteOfNotebook();
   }
+
+  public Timestamp calculateNextReviewAt(Timestamp base) {
+    return TimestampOperations.addHoursToTimestamp(
+        base, getSpacedRepetitionAlgorithm().getRepeatInHours(getForgettingCurveIndex()));
+  }
+
+  public Timestamp calculateDefaultNextReviewAt() {
+    return calculateNextReviewAt(getLastReviewedAt());
+  }
+
+  public void updateForgettingCurve(long delayInHours, int adjustment) {
+    setForgettingCurveIndex(
+        getSpacedRepetitionAlgorithm()
+            .getNextForgettingCurveIndex(getForgettingCurveIndex(), adjustment, delayInHours));
+  }
+
+  private SpacedRepetitionAlgorithm getSpacedRepetitionAlgorithm() {
+    return getUser().getSpacedRepetitionAlgorithm();
+  }
 }

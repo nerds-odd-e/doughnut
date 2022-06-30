@@ -110,6 +110,7 @@ class RestReviewsControllerTests {
               .repetitionCount(5)
               .forgettiveCurveIndex(200)
               .please();
+      reviewPoint.setNextReviewAt(reviewPoint.calculateDefaultNextReviewAt());
       QuizQuestion quizQuestion =
           makeMe
               .aQuestion()
@@ -123,10 +124,19 @@ class RestReviewsControllerTests {
     void shouldValidateTheAnswerAndUpdateReviewPoint() {
       Integer oldForgettingCurveIndex = reviewPoint.getForgettingCurveIndex();
       Integer oldRepetitionCount = reviewPoint.getRepetitionCount();
+      testabilitySettings.timeTravelTo(reviewPoint.getLastReviewedAt());
       AnswerResult answerResult = controller().answerQuiz(answer);
       assertTrue(answerResult.correct);
-      assertThat(reviewPoint.getForgettingCurveIndex(), greaterThan(oldForgettingCurveIndex));
+      assertThat(reviewPoint.getForgettingCurveIndex(), equalTo(oldForgettingCurveIndex));
       assertThat(reviewPoint.getRepetitionCount(), greaterThan(oldRepetitionCount));
+    }
+
+    @Test
+    void shouldIncreaseTheIndex() {
+      Integer oldForgettingCurveIndex = reviewPoint.getForgettingCurveIndex();
+      testabilitySettings.timeTravelTo(reviewPoint.getNextReviewAt());
+      controller().answerQuiz(answer);
+      assertThat(reviewPoint.getForgettingCurveIndex(), greaterThan(oldForgettingCurveIndex));
     }
 
     @Test
@@ -140,7 +150,7 @@ class RestReviewsControllerTests {
       Integer oldRepetitionCount = reviewPoint.getRepetitionCount();
       AnswerResult answerResult = controller().answerQuiz(answer);
       assertFalse(answerResult.correct);
-      assertThat(reviewPoint.getForgettingCurveIndex(), equalTo(oldForgettingCurveIndex));
+      assertThat(reviewPoint.getForgettingCurveIndex(), lessThan(oldForgettingCurveIndex));
       assertThat(reviewPoint.getRepetitionCount(), greaterThan(oldRepetitionCount));
     }
 

@@ -2,7 +2,6 @@ package com.odde.doughnut.models;
 
 import static com.odde.doughnut.entities.SelfEvaluate.*;
 
-import com.odde.doughnut.algorithms.SpacedRepetitionAlgorithm;
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.SelfEvaluate;
@@ -44,37 +43,26 @@ public record ReviewPointModel(ReviewPoint entity, ModelFactoryService modelFact
 
   public void updateNextRepetitionWithAdjustment(
       Timestamp currentUTCTimestamp, SelfEvaluate selfEvaluation) {
-    SpacedRepetitionAlgorithm spacedRepetitionAlgorithm =
-        entity.getUser().getSpacedRepetitionAlgorithm();
     long delayInHours =
-        TimestampOperations.getDiffInHours(currentUTCTimestamp, entity.getNextReviewAt());
-    final int nextForgettingCurveIndex =
-        spacedRepetitionAlgorithm.getNextForgettingCurveIndex(
-            entity.getForgettingCurveIndex(), selfEvaluation.adjustment, delayInHours);
-    entity.setForgettingCurveIndex(nextForgettingCurveIndex);
+        TimestampOperations.getDiffInHours(
+            currentUTCTimestamp, entity.calculateDefaultNextReviewAt());
+    //    long delayInHours = TimestampOperations.getDiffInHours(currentUTCTimestamp,
+    // entity.getNextReviewAt());
+
+    entity.updateForgettingCurve(delayInHours, selfEvaluation.adjustment);
+
     if (selfEvaluation.equals(sad)) {
       entity.setNextReviewAt(TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, 12));
     } else {
-      final int nextRepeatInHours =
-          spacedRepetitionAlgorithm.getRepeatInHours(nextForgettingCurveIndex);
-      entity.setNextReviewAt(
-          TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, nextRepeatInHours));
+      entity.setNextReviewAt(entity.calculateNextReviewAt(currentUTCTimestamp));
     }
     entity.setLastReviewedAt(currentUTCTimestamp);
     this.modelFactoryService.reviewPointRepository.save(entity);
   }
 
   public void evaluate(SelfEvaluate selfEvaluation) {
-    SpacedRepetitionAlgorithm spacedRepetitionAlgorithm =
-        entity.getUser().getSpacedRepetitionAlgorithm();
-    final int nextForgettingCurveIndex =
-        spacedRepetitionAlgorithm.getNextForgettingCurveIndex(
-            entity.getForgettingCurveIndex(), selfEvaluation.adjustment, 0);
-    entity.setForgettingCurveIndex(nextForgettingCurveIndex);
-    final int nextRepeatInHours =
-        spacedRepetitionAlgorithm.getRepeatInHours(nextForgettingCurveIndex);
-    entity.setNextReviewAt(
-        TimestampOperations.addHoursToTimestamp(entity.getLastReviewedAt(), nextRepeatInHours));
+    entity.updateForgettingCurve(0, selfEvaluation.adjustment);
+    entity.setNextReviewAt(entity.calculateDefaultNextReviewAt());
     this.modelFactoryService.reviewPointRepository.save(entity);
   }
 }
