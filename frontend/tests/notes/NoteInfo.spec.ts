@@ -16,7 +16,7 @@ const stubResponse = {
   note: makeMe.aNoteRealm.please(),
 };
 
-describe("note statistics", () => {
+describe("note info", () => {
   it("should render values", async () => {
     fetchMock.mockResponseOnce(JSON.stringify(stubResponse));
     const wrapper = mount(NoteInfoButton, {

@@ -32,7 +32,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.BindException;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(SpringExtension.classt )
 @ContextConfiguration(locations = {"classpath:repository.xml"})
 @Transactional
 class RestNoteControllerTests {
@@ -104,7 +104,7 @@ class RestNoteControllerTests {
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
       User otherUser = makeMe.aUser().please();
       Note note = makeMe.aNote().creatorAndOwner(otherUser).please();
-      assertThrows(NoAccessRightException.class, () -> controller.statistics(note));
+      assertThrows(NoAccessRightException.class, () -> controller.getNoteInfo(note));
     }
 
     @Test
@@ -117,7 +117,7 @@ class RestNoteControllerTests {
           .forNotebook(note.getNotebook())
           .please();
       makeMe.refresh(userModel.getEntity());
-      assertThat(controller.statistics(note).getNote().getId(), equalTo(note.getId()));
+      assertThat(controller.getNoteInfo(note).getNote().getId(), equalTo(note.getId()));
     }
   }
 

@@ -169,7 +169,7 @@ Then("The randomizer always choose the last", () => {
   cy.testability().randomizerAlwaysChooseLast()
 })
 
-Then("I should see the statistics of note {string}", (noteTitle, data) => {
+Then("I should see the info of note {string}", (noteTitle, data) => {
   cy.findByText(noteTitle)
   cy.findByRole("button", { name: "i..." }).click({ force: true })
   const attrs = data.hashes()[0]

@@ -1,10 +1,10 @@
 <template>
   <span
     v-if="!noteInfo"
-    @click="toggleStatistics()"
+    @click="toggleNoteInfo()"
     class="info-button"
     role="button"
-    title="statistics"
+    title="note info"
     width="100%"
   >
     i...
@@ -36,12 +36,12 @@ export default defineComponent({
   },
   methods: {
     fetchData() {
-      this.api.getStatistics(this.noteId).then((articles) => {
+      this.api.getNoteInfo(this.noteId).then((articles) => {
         this.noteInfo = articles;
       });
     },
 
-    toggleStatistics() {
+    toggleNoteInfo() {
       if (!this.noteInfo) {
         this.fetchData();
       } else {

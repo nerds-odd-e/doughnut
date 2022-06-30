@@ -114,16 +114,16 @@ class RestNoteController {
     return new NoteViewer(user.getEntity(), note).toJsonObject();
   }
 
-  @GetMapping("/{note}/statistics")
-  public NoteInfo statistics(@PathVariable("note") Note note) throws NoAccessRightException {
+  @GetMapping("/{note}/note-into")
+  public NoteInfo getNoteInfo(@PathVariable("note") Note note) throws NoAccessRightException {
     final UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertReadAuthorization(note);
-    NoteInfo statistics = new NoteInfo();
-    statistics.setReviewPoint(user.getReviewPointFor(note));
-    statistics.setNote(new NoteViewer(user.getEntity(), note).toJsonObject());
-    statistics.setCreatedAt(note.getThing().getCreatedAt());
-    statistics.setReviewSetting(note.getMasterReviewSetting());
-    return statistics;
+    NoteInfo noteInfo = new NoteInfo();
+    noteInfo.setReviewPoint(user.getReviewPointFor(note));
+    noteInfo.setNote(new NoteViewer(user.getEntity(), note).toJsonObject());
+    noteInfo.setCreatedAt(note.getThing().getCreatedAt());
+    noteInfo.setReviewSetting(note.getMasterReviewSetting());
+    return noteInfo;
   }
 
   @PostMapping("/search")

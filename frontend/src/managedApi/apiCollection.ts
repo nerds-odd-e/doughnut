@@ -129,9 +129,9 @@ const apiCollection = (managedApi: ManagedApi) => ({
       return managedApi.restPost(`subscriptions/${subscriptionId}/delete`, {});
     },
   },
-  async getStatistics(noteId: Doughnut.ID) {
+  async getNoteInfo(noteId: Doughnut.ID) {
     return (await managedApi.restGet(
-      `notes/${noteId}/statistics`
+      `notes/${noteId}/note-info`
     )) as Generated.NoteInfo;
   },
 
