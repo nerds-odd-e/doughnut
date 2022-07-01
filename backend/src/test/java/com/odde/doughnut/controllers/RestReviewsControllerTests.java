@@ -33,7 +33,6 @@ import org.springframework.web.server.ResponseStatusException;
 @Transactional
 class RestReviewsControllerTests {
   @Autowired ModelFactoryService modelFactoryService;
-
   @Autowired MakeMe makeMe;
   private UserModel userModel;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
@@ -107,10 +106,8 @@ class RestReviewsControllerTests {
           makeMe
               .aReviewPointFor(note1)
               .by(userModel)
-              .repetitionCount(5)
-              .forgettiveCurveIndex(200)
+              .forgettingCurveAndNextReviewAt(200)
               .please();
-      reviewPoint.setNextReviewAt(reviewPoint.calculateDefaultNextReviewAt());
       QuizQuestion quizQuestion =
           makeMe
               .aQuestion()
@@ -118,11 +115,11 @@ class RestReviewsControllerTests {
               .inMemoryPlease();
       answer.setQuestion(quizQuestion);
       answer.setAnswerNoteId(note1.getId());
-      testabilitySettings.timeTravelTo(reviewPoint.getLastReviewedAt());
     }
 
     @Test
     void shouldValidateTheAnswerAndUpdateReviewPoint() {
+      testabilitySettings.timeTravelTo(reviewPoint.getLastReviewedAt());
       Integer oldForgettingCurveIndex = reviewPoint.getForgettingCurveIndex();
       Integer oldRepetitionCount = reviewPoint.getRepetitionCount();
       AnswerResult answerResult = controller.answerQuiz(answer);

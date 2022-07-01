@@ -30,11 +30,6 @@ public class AnswerBuilder extends EntityBuilder<AnswerViewedByUser> {
     this.entity = makeMe.modelFactoryService.toAnswerModel(answer).getAnswerViewedByUser();
   }
 
-  public AnswerBuilder forQuestion(QuizQuestion question) {
-    this.answer.setQuestion(question);
-    return this;
-  }
-
   public AnswerBuilder forReviewPoint(ReviewPoint reviewPoint) {
     this.reviewPoint = reviewPoint;
     return this;

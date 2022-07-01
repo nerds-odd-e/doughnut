@@ -43,7 +43,7 @@ public class ReviewPointBuilder extends EntityBuilder<ReviewPoint> {
     return this;
   }
 
-  public ReviewPointBuilder nthStrictRepetitionOn(Integer repetitionDone) {
+  public ReviewPointBuilder afterNthStrictRepetition(Integer repetitionDone) {
     ReviewPointModel reviewPointModel = makeMe.modelFactoryService.toReviewPointModel(entity);
     for (int i = 0; i < repetitionDone; i++) {
       reviewPointModel.updateNextRepetitionWithAdjustment(
@@ -59,13 +59,9 @@ public class ReviewPointBuilder extends EntityBuilder<ReviewPoint> {
   @Override
   protected void beforeCreate(boolean needPersist) {}
 
-  public ReviewPointBuilder forgettiveCurveIndex(int value) {
+  public ReviewPointBuilder forgettingCurveAndNextReviewAt(int value) {
     entity.setForgettingCurveIndex(value);
-    return this;
-  }
-
-  public ReviewPointBuilder repetitionCount(int value) {
-    entity.setRepetitionCount(value);
+    entity.setNextReviewAt(entity.calculateDefaultNextReviewAt());
     return this;
   }
 
