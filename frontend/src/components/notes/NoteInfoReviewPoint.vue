@@ -49,10 +49,10 @@ export default defineComponent({
   emits: ["selfEvaluated"],
   components: { SelfEvaluateButtons, SvgNoReview },
   methods: {
-    selfEvaluate(data: Generated.SelfEvaluate) {
+    selfEvaluate(adjustment: number) {
       this.api.reviewMethods
         .selfEvaluate(this.reviewPoint.id, {
-          selfEvaluation: data,
+          adjustment,
         })
         .then((reviewPoint) => {
           this.$emit("selfEvaluated", reviewPoint);

@@ -4,7 +4,7 @@
       class="btn btn-light"
       id="repeat-sad"
       name="sad"
-      @click.once="processForm('sad')"
+      @click.once="processForm(-5)"
       title="reduce next repeat interval (days) by half"
     >
       <SvgSad />
@@ -13,7 +13,7 @@
       class="btn btn-light"
       id="repeat-happy"
       name="happy"
-      @click="processForm('happy')"
+      @click="processForm(5)"
       title="add to next repeat interval (days) by half"
     >
       <SvgHappy />
@@ -30,7 +30,7 @@ export default defineComponent({
   emits: ["selfEvaluate"],
   components: { SvgSad, SvgHappy },
   methods: {
-    processForm(evaluation: Generated.SelfEvaluate) {
+    processForm(evaluation: number) {
       this.$emit("selfEvaluate", evaluation);
     },
   },

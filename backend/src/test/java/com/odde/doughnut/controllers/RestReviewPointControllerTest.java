@@ -1,14 +1,11 @@
 package com.odde.doughnut.controllers;
 
-import static com.odde.doughnut.entities.SelfEvaluate.*;
-import static com.odde.doughnut.entities.SelfEvaluate.happy;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.*;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.SelfEvaluate;
 import com.odde.doughnut.entities.json.SelfEvaluation;
 import com.odde.doughnut.exceptions.NoAccessRightException;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
@@ -72,7 +69,7 @@ class RestReviewPointControllerTest {
       SelfEvaluation selfEvaluation =
           new SelfEvaluation() {
             {
-              this.selfEvaluation = happy;
+              this.adjustment = 1;
             }
           };
       assertThrows(
@@ -85,7 +82,7 @@ class RestReviewPointControllerTest {
       SelfEvaluation selfEvaluation =
           new SelfEvaluation() {
             {
-              this.selfEvaluation = happy;
+              this.adjustment = 1;
             }
           };
       assertThrows(
@@ -95,7 +92,6 @@ class RestReviewPointControllerTest {
     @Nested
     class WhenThereIsAReviewPoint {
       ReviewPoint rp;
-      final int expectedSatisfyingForgettingCurveIndex = 101;
 
       @BeforeEach
       void setup() {
@@ -104,26 +100,19 @@ class RestReviewPointControllerTest {
 
       @Test
       void repeat() {
-        evaluate(happy);
-        assertThat(rp.getForgettingCurveIndex(), equalTo(expectedSatisfyingForgettingCurveIndex));
+        evaluate(1);
+        assertThat(rp.getForgettingCurveIndex(), equalTo(101));
         assertThat(rp.getRepetitionCount(), equalTo(0));
       }
 
-      private void evaluate(SelfEvaluate evaluation) {
+      private void evaluate(int adj) {
         SelfEvaluation selfEvaluation =
             new SelfEvaluation() {
               {
-                this.selfEvaluation = evaluation;
+                this.adjustment = adj;
               }
             };
         controller.selfEvaluate(rp, selfEvaluation);
-      }
-
-      @Test
-      void repeatSad() {
-        evaluate(sad);
-        assertThat(rp.getForgettingCurveIndex(), lessThan(expectedSatisfyingForgettingCurveIndex));
-        assertThat(rp.getRepetitionCount(), equalTo(0));
       }
     }
   }
