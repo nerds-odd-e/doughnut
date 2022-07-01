@@ -324,26 +324,6 @@ Cypress.Commands.add("yesIRemember", () =>
   cy.findByRole("button", { name: "Yes, I remember" }).click(),
 )
 
-Cypress.Commands.add("repeatReviewOneNoteIfThereIs", ({ review_type, title, additional_info }) => {
-  if (review_type == "repeat done") {
-    cy.findByText("You have finished all repetitions for this half a day!").should("be.visible")
-  } else {
-    cy.findByText(title, { selector: "h2" })
-    switch (review_type) {
-      case "single note": {
-        if (additional_info) {
-          cy.get(".note-body").should("contain", additional_info)
-        }
-        cy.yesIRemember()
-        break
-      }
-
-      default:
-        expect(review_type).equal("a known review page type")
-    }
-  }
-})
-
 Cypress.Commands.add("navigateToCircle", (circleName) => {
   cy.visit("/circles")
   cy.findByText(circleName).click()
@@ -384,7 +364,20 @@ Cypress.Commands.add("repeatReviewNotes", (noteTitles) => {
   cy.routerToRepeatReview()
   noteTitles.commonSenseSplit(",").forEach((title) => {
     const review_type = title === "end" ? "repeat done" : "single note"
-    cy.repeatReviewOneNoteIfThereIs({ review_type, title })
+
+    if (review_type == "repeat done") {
+      cy.findByText("You have finished all repetitions for this half a day!").should("be.visible")
+    } else {
+      cy.findByText(title, { selector: "h2" })
+      switch (review_type) {
+        case "single note": {
+          cy.yesIRemember()
+          break
+        }
+        default:
+          expect(review_type).equal("a known review page type")
+      }
+    }
   })
 })
 
