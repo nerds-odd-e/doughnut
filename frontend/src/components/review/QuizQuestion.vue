@@ -24,23 +24,12 @@
         reviewPointId: quizQuestion.quizQuestion.reviewPoint,
       }"
     />
-    <div class="btn-group">
-      <button
-        class="btn btn-primary"
-        @click.once="sumbitAnswer({ spellingAnswer: 'yes' })"
-      >
-        Yes, I remember
-      </button>
-      <button
-        class="btn btn-secondary"
-        @click.once="sumbitAnswer({ spellingAnswer: 'no' })"
-      >
-        No, I need more repetition
-      </button>
-    </div>
+    <SelfEvaluateButtons
+      @self-evaluated-memory-state="submitAnswer({ spellingAnswer: $event })"
+    />
   </div>
   <div v-else-if="quizQuestion.questionType === 'SPELLING'">
-    <form @submit.prevent.once="sumbitAnswer({ spellingAnswer: answer })">
+    <form @submit.prevent.once="submitAnswer({ spellingAnswer: answer })">
       <div class="aaa">
         <TextInput
           scope-name="review_point"
@@ -65,7 +54,7 @@
     >
       <button
         class="btn btn-secondary btn-lg"
-        @click.once="sumbitAnswer({ answerNoteId: option.noteId })"
+        @click.once="submitAnswer({ answerNoteId: option.noteId })"
       >
         <div v-if="!option.picture" v-html="option.display" />
         <div v-else>
@@ -85,6 +74,7 @@ import TextInput from "../form/TextInput.vue";
 import ReviewPointAsync from "./ReviewPointAsync.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import usePopups from "../commons/Popups/usePopup";
+import SelfEvaluateButtons from "./SelfEvaluateButtons.vue";
 
 export default defineComponent({
   setup() {
@@ -102,6 +92,7 @@ export default defineComponent({
     NoteFrameOfLinks,
     TextInput,
     ReviewPointAsync,
+    SelfEvaluateButtons,
   },
   emits: ["answered", "reloadNeeded"],
   data() {
@@ -110,7 +101,7 @@ export default defineComponent({
     };
   },
   methods: {
-    async sumbitAnswer(answerData: Partial<Generated.Answer>) {
+    async submitAnswer(answerData: Partial<Generated.Answer>) {
       try {
         const answerResult = await this.api.reviewMethods.processAnswer({
           question: this.quizQuestion.quizQuestion,
