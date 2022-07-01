@@ -4,7 +4,6 @@ import com.odde.doughnut.entities.Answer;
 import com.odde.doughnut.entities.AnswerResult;
 import com.odde.doughnut.entities.AnswerViewedByUser;
 import com.odde.doughnut.entities.Note;
-import com.odde.doughnut.entities.SelfEvaluate;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import java.sql.Timestamp;
 
@@ -20,7 +19,6 @@ public class AnswerModel {
   }
 
   public void updateReviewPoints(Timestamp currentUTCTimestamp) {
-    SelfEvaluate selfEvaluate = isCorrect() ? SelfEvaluate.happy : SelfEvaluate.sad;
     answer
         .getQuestion()
         .getViceReviewPointIdList()
@@ -33,10 +31,10 @@ public class AnswerModel {
                         vice ->
                             this.modelFactoryService
                                 .toReviewPointModel(vice)
-                                .updateAfterRepetition(currentUTCTimestamp, selfEvaluate)));
+                                .updateAfterRepetition(currentUTCTimestamp, isCorrect())));
     ReviewPointModel reviewPointModel =
         this.modelFactoryService.toReviewPointModel(answer.getQuestion().getReviewPoint());
-    reviewPointModel.updateAfterRepetition(currentUTCTimestamp, selfEvaluate);
+    reviewPointModel.updateAfterRepetition(currentUTCTimestamp, isCorrect());
   }
 
   public AnswerViewedByUser getAnswerViewedByUser() {

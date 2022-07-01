@@ -1,6 +1,5 @@
 package com.odde.doughnut.models;
 
-import static com.odde.doughnut.entities.SelfEvaluate.happy;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -123,7 +122,7 @@ public class ReviewingWithSpacedRepetitionAlgorithmTest {
         reviewPoint.updateAfterRepetition(
             TimestampOperations.addHoursToTimestamp(
                 reviewPoint.getEntity().getNextReviewAt(), daysDelay * 24),
-            happy);
+            true);
         assertThat(
             reviewPoint.getEntity().getForgettingCurveIndex(),
             equalTo(expectedForgettingCurveIndex));

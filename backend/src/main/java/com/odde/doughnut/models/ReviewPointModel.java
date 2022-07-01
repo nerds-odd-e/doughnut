@@ -2,7 +2,6 @@ package com.odde.doughnut.models;
 
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
-import com.odde.doughnut.entities.SelfEvaluate;
 import com.odde.doughnut.factoryServices.ModelFactoryService;
 import com.odde.doughnut.models.quizFacotries.QuizQuestionDirector;
 import java.sql.Timestamp;
@@ -29,9 +28,9 @@ public record ReviewPointModel(ReviewPoint entity, ModelFactoryService modelFact
         .orElseGet(() -> entity.createAQuizQuestionOfType(QuizQuestion.QuestionType.JUST_REVIEW));
   }
 
-  public void updateAfterRepetition(Timestamp currentUTCTimestamp, SelfEvaluate selfEvaluate) {
+  public void updateAfterRepetition(Timestamp currentUTCTimestamp, boolean successful) {
     entity.setRepetitionCount(entity.getRepetitionCount() + 1);
-    if (selfEvaluate == SelfEvaluate.happy) {
+    if (successful) {
       entity.reviewedSuccessfully(currentUTCTimestamp);
     } else {
       entity.reviewFailed(currentUTCTimestamp);
