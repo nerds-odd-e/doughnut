@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-import lombok.Getter;
 import org.apache.logging.log4j.util.Strings;
 
 public class SpacedRepetitionAlgorithm {
@@ -25,21 +24,6 @@ public class SpacedRepetitionAlgorithm {
     } else {
       spaces = new ArrayList<>();
     }
-  }
-
-  public static class MemoryStateChange {
-    @Getter public final int nextForgettingCurveIndex;
-
-    public MemoryStateChange(int nextForgettingCurveIndex) {
-      this.nextForgettingCurveIndex = nextForgettingCurveIndex;
-    }
-  }
-
-  public int addTotForgettingCurveIndex(
-      Integer oldForgettingCurveIndex, int selfEvaluationIndex, long delayInHours) {
-    int adjustment =
-        withDelayAdjustment(oldForgettingCurveIndex, delayInHours) * selfEvaluationIndex;
-    return addTotForgettingCurveIndex1(oldForgettingCurveIndex, adjustment);
   }
 
   public int addTotForgettingCurveIndex1(Integer oldForgettingCurveIndex, int adjustment) {

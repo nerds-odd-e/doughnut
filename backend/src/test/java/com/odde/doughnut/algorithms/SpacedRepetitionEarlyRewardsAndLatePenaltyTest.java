@@ -9,11 +9,13 @@ import static org.hamcrest.Matchers.greaterThanOrEqualTo;
 import static org.hamcrest.Matchers.lessThan;
 import static org.hamcrest.Matchers.lessThanOrEqualTo;
 
+import com.odde.doughnut.entities.Note;
+import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.User;
+import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.Test;
 
 public class SpacedRepetitionEarlyRewardsAndLatePenaltyTest {
-  SpacedRepetitionAlgorithm spacedRepetitionAlgorithm =
-      new SpacedRepetitionAlgorithm("3, 6, 9, 12, 15");
   final int currentForgettingCurveIndex =
       DEFAULT_FORGETTING_CURVE_INDEX + DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT * 2;
   final int baselineForgettingCurveIndex =
@@ -73,7 +75,15 @@ public class SpacedRepetitionEarlyRewardsAndLatePenaltyTest {
   }
 
   private int getNextForgettingCurveIndexWithDelay(int delayInHours) {
-    return spacedRepetitionAlgorithm.addTotForgettingCurveIndex(
-        currentForgettingCurveIndex, 1, delayInHours);
+    User user = new MakeMe().aUser().withSpaceIntervals("3, 6, 9, 12, 15").inMemoryPlease();
+    Note note = new MakeMe().aNote().inMemoryPlease();
+    ReviewPoint reviewPoint =
+        new MakeMe()
+            .aReviewPointFor(note)
+            .by(user)
+            .forgettingCurveAndNextReviewAt(currentForgettingCurveIndex)
+            .inMemoryPlease();
+    reviewPoint.updateForgettingCurve(delayInHours, 1);
+    return reviewPoint.getForgettingCurveIndex();
   }
 }

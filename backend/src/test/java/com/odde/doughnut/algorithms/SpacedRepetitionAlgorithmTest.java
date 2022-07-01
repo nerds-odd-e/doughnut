@@ -17,7 +17,7 @@ public class SpacedRepetitionAlgorithmTest {
     SpacedRepetitionAlgorithm spacedRepetitionAlgorithm = new SpacedRepetitionAlgorithm(null);
 
     final int nextForgettingCurveIndex =
-        spacedRepetitionAlgorithm.addTotForgettingCurveIndex(0, 0, 0);
+        spacedRepetitionAlgorithm.addTotForgettingCurveIndex1(0, 0);
     assertThat(spacedRepetitionAlgorithm.getRepeatInHours(nextForgettingCurveIndex), equalTo(0));
   }
 
@@ -32,7 +32,7 @@ public class SpacedRepetitionAlgorithmTest {
     }
 
     @Test
-    void fallOnTheFirstRepeatLevel() {
+    void repeatForTheFirstTime() {
       int index = DEFAULT_FORGETTING_CURVE_INDEX;
       assertThat(spacedRepetitionAlgorithm.getRepeatInHours(index), equalTo(3 * 24));
     }
@@ -46,23 +46,9 @@ public class SpacedRepetitionAlgorithmTest {
 
     @Test
     void fallOnTheSecondRepeatLevel() {
-      int index = getNextForgettingCurveIndex(DEFAULT_FORGETTING_CURVE_INDEX);
-      assertThat(spacedRepetitionAlgorithm.getRepeatInHours(index), equalTo(6 * 24));
-    }
-
-    @Test
-    void beyondSettingShouldGetFromDefault() {
-      int index = getNextForgettingCurveIndex(DEFAULT_FORGETTING_CURVE_INDEX);
-      index = getNextForgettingCurveIndex(index);
-      index = getNextForgettingCurveIndex(index);
-      index = getNextForgettingCurveIndex(index);
-      index = getNextForgettingCurveIndex(index);
-      index = getNextForgettingCurveIndex(index);
-      assertThat(spacedRepetitionAlgorithm.getRepeatInHours(index), equalTo(8 * 24));
-    }
-
-    private int getNextForgettingCurveIndex(Integer index) {
-      return spacedRepetitionAlgorithm.addTotForgettingCurveIndex(index, 1, 0);
+      int index =
+          spacedRepetitionAlgorithm.addTotForgettingCurveIndex1(DEFAULT_FORGETTING_CURVE_INDEX, 1);
+      assertThat(spacedRepetitionAlgorithm.getRepeatInHours(index), equalTo(79));
     }
   }
 }
