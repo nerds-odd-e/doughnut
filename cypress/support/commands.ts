@@ -360,23 +360,15 @@ Cypress.Commands.add("initialReviewNotes", (noteTitles) => {
   )
 })
 
-Cypress.Commands.add("repeatReviewNotes", (noteTitles) => {
+Cypress.Commands.add("repeatReviewNotes", (noteTitles: string) => {
   cy.routerToRepeatReview()
   noteTitles.commonSenseSplit(",").forEach((title) => {
-    const review_type = title === "end" ? "repeat done" : "single note"
 
-    if (review_type == "repeat done") {
+    if (title == "end") {
       cy.findByText("You have finished all repetitions for this half a day!").should("be.visible")
     } else {
       cy.findByText(title, { selector: "h2" })
-      switch (review_type) {
-        case "single note": {
-          cy.yesIRemember()
-          break
-        }
-        default:
-          expect(review_type).equal("a known review page type")
-      }
+      cy.yesIRemember()
     }
   })
 })
