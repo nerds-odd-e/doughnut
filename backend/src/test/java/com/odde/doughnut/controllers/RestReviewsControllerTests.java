@@ -38,22 +38,25 @@ class RestReviewsControllerTests {
   private UserModel userModel;
   private final TestabilitySettings testabilitySettings = new TestabilitySettings();
 
+  RestReviewsController controller;
+
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
+    controller = new RestReviewsController(
+      modelFactoryService, new TestCurrentUserFetcher(userModel), testabilitySettings);
   }
 
-  RestReviewsController controller() {
+  RestReviewsController nullUserController() {
     return new RestReviewsController(
-        modelFactoryService, new TestCurrentUserFetcher(userModel), testabilitySettings);
+        modelFactoryService, new TestCurrentUserFetcher(makeMe.aNullUserModel()), testabilitySettings);
   }
 
   @Nested
   class overall {
     @Test
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
-      userModel = makeMe.aNullUserModel();
-      assertThrows(ResponseStatusException.class, () -> controller().overview());
+      assertThrows(ResponseStatusException.class, () -> nullUserController().overview());
     }
   }
 
@@ -64,14 +67,13 @@ class RestReviewsControllerTests {
       Note n = makeMe.aNote().creatorAndOwner(userModel).please();
       makeMe.refresh(n);
       assertThat(n.getThing().getId(), notNullValue());
-      List<ReviewPoint> reviewPointWithReviewSettings = controller().initialReview();
+      List<ReviewPoint> reviewPointWithReviewSettings = controller.initialReview();
       assertThat(reviewPointWithReviewSettings, hasSize(1));
     }
 
     @Test
     void notLoggedIn() {
-      userModel = makeMe.aNullUserModel();
-      assertThrows(ResponseStatusException.class, () -> controller().initialReview());
+      assertThrows(ResponseStatusException.class, () -> nullUserController().initialReview());
     }
   }
 
@@ -79,9 +81,8 @@ class RestReviewsControllerTests {
   class createInitialReviewPoiint {
     @Test
     void create() {
-      userModel = makeMe.aNullUserModel();
       InitialInfo info = new InitialInfo();
-      assertThrows(ResponseStatusException.class, () -> controller().create(info));
+      assertThrows(ResponseStatusException.class, () -> nullUserController().create(info));
     }
   }
 
@@ -89,8 +90,7 @@ class RestReviewsControllerTests {
   class repeat {
     @Test
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
-      userModel = makeMe.aNullUserModel();
-      assertThrows(ResponseStatusException.class, () -> controller().repeatReview());
+      assertThrows(ResponseStatusException.class, () -> nullUserController().repeatReview());
     }
   }
 
@@ -118,14 +118,14 @@ class RestReviewsControllerTests {
               .inMemoryPlease();
       answer.setQuestion(quizQuestion);
       answer.setAnswerNoteId(note1.getId());
+      testabilitySettings.timeTravelTo(reviewPoint.getLastReviewedAt());
     }
 
     @Test
     void shouldValidateTheAnswerAndUpdateReviewPoint() {
       Integer oldForgettingCurveIndex = reviewPoint.getForgettingCurveIndex();
       Integer oldRepetitionCount = reviewPoint.getRepetitionCount();
-      testabilitySettings.timeTravelTo(reviewPoint.getLastReviewedAt());
-      AnswerResult answerResult = controller().answerQuiz(answer);
+      AnswerResult answerResult = controller.answerQuiz(answer);
       assertTrue(answerResult.correct);
       assertThat(reviewPoint.getForgettingCurveIndex(), equalTo(oldForgettingCurveIndex));
       assertThat(reviewPoint.getRepetitionCount(), greaterThan(oldRepetitionCount));
@@ -133,14 +133,15 @@ class RestReviewsControllerTests {
 
     @Test
     void shouldIncreaseTheIndex() {
-      Integer oldForgettingCurveIndex = reviewPoint.getForgettingCurveIndex();
       testabilitySettings.timeTravelTo(reviewPoint.getNextReviewAt());
-      controller().answerQuiz(answer);
+      Integer oldForgettingCurveIndex = reviewPoint.getForgettingCurveIndex();
+      controller.answerQuiz(answer);
       assertThat(reviewPoint.getForgettingCurveIndex(), greaterThan(oldForgettingCurveIndex));
     }
 
     @Test
     void shouldValidateTheWrongAnswer() {
+      testabilitySettings.timeTravelTo(reviewPoint.getNextReviewAt());
       QuizQuestion quizQuestion =
           makeMe.aQuestion().of(QuizQuestion.QuestionType.SPELLING, reviewPoint).inMemoryPlease();
       answer.setQuestion(quizQuestion);
@@ -148,7 +149,7 @@ class RestReviewsControllerTests {
       answer.setSpellingAnswer("wrong");
       Integer oldForgettingCurveIndex = reviewPoint.getForgettingCurveIndex();
       Integer oldRepetitionCount = reviewPoint.getRepetitionCount();
-      AnswerResult answerResult = controller().answerQuiz(answer);
+      AnswerResult answerResult = controller.answerQuiz(answer);
       assertFalse(answerResult.correct);
       assertThat(reviewPoint.getForgettingCurveIndex(), lessThan(oldForgettingCurveIndex));
       assertThat(reviewPoint.getRepetitionCount(), greaterThan(oldRepetitionCount));
@@ -161,7 +162,7 @@ class RestReviewsControllerTests {
       answer.setQuestion(quizQuestion);
       answer.setAnswerNoteId(null);
       answer.setSpellingAnswer("wrong");
-      controller().answerQuiz(answer);
+      controller.answerQuiz(answer);
       assertThat(
           reviewPoint.getNextReviewAt(),
           lessThan(
@@ -179,7 +180,7 @@ class RestReviewsControllerTests {
 
       Integer oldForgettingCurveIndex = anotherReviewPoint.getForgettingCurveIndex();
       Integer oldRepetitionCount = anotherReviewPoint.getRepetitionCount();
-      AnswerResult answerResult = controller().answerQuiz(answer);
+      AnswerResult answerResult = controller.answerQuiz(answer);
       assertTrue(answerResult.correct);
       assertThat(
           anotherReviewPoint.getForgettingCurveIndex(), greaterThan(oldForgettingCurveIndex));
@@ -188,9 +189,8 @@ class RestReviewsControllerTests {
 
     @Test
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
-      userModel = makeMe.aNullUserModel();
       Answer answer = new Answer();
-      assertThrows(ResponseStatusException.class, () -> controller().answerQuiz(answer));
+      assertThrows(ResponseStatusException.class, () -> nullUserController().answerQuiz(answer));
     }
   }
 }
