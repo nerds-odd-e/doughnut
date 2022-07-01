@@ -38,8 +38,8 @@ class AnswerViewedByUserTest {
     void correct() {
       AnswerViewedByUser answer =
           makeMe
-              .anAnswerFor(reviewPoint)
-              .type(CLOZE_SELECTION)
+              .anAnswerViewedByUserFor(reviewPoint)
+              .validQuestionOfType(CLOZE_SELECTION)
               .answerWithSpelling("this")
               .inMemoryPlease();
       assertTrue(answer.correct);
@@ -49,8 +49,8 @@ class AnswerViewedByUserTest {
     void literalAnswer() {
       AnswerViewedByUser answerResult =
           makeMe
-              .anAnswerFor(reviewPoint)
-              .type(CLOZE_SELECTION)
+              .anAnswerViewedByUserFor(reviewPoint)
+              .validQuestionOfType(CLOZE_SELECTION)
               .answerWithSpelling("this / that")
               .inMemoryPlease();
       assertTrue(answerResult.correct);

@@ -84,8 +84,8 @@ class LinkSourceWithinSameLinkTypeQuizFactoryTest {
       void correct() {
         AnswerViewedByUser answerResult =
             makeMe
-                .anAnswerFor(reviewPoint)
-                .type(LINK_SOURCE_WITHIN_SAME_LINK_TYPE)
+                .anAnswerViewedByUserFor(reviewPoint)
+                .validQuestionOfType(LINK_SOURCE_WITHIN_SAME_LINK_TYPE)
                 .answerWithId(source.getId())
                 .inMemoryPlease();
         assertTrue(answerResult.correct);

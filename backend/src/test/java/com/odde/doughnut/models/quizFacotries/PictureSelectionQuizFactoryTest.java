@@ -104,8 +104,8 @@ class PictureSelectionQuizFactoryTest {
         void correct() {
           AnswerViewedByUser answerResult =
               makeMe
-                  .anAnswerFor(reviewPoint)
-                  .type(PICTURE_SELECTION)
+                  .anAnswerViewedByUserFor(reviewPoint)
+                  .validQuestionOfType(PICTURE_SELECTION)
                   .answerWithSpelling(source.getTitle())
                   .inMemoryPlease();
           assertTrue(answerResult.correct);

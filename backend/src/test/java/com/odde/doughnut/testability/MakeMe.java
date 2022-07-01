@@ -102,6 +102,10 @@ public class MakeMe {
     return new UploadedPictureBuilder();
   }
 
+  public AnswerViewedByUserBuilder anAnswerViewedByUserFor(ReviewPoint reviewPoint) {
+    return new AnswerViewedByUserBuilder(this).forReviewPoint(reviewPoint);
+  }
+
   public AnswerBuilder anAnswerFor(ReviewPoint reviewPoint) {
     return new AnswerBuilder(this).forReviewPoint(reviewPoint);
   }

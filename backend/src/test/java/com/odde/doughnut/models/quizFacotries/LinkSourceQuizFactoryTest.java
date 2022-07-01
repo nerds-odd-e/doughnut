@@ -79,8 +79,8 @@ class LinkSourceQuizFactoryTest {
       void correct() {
         AnswerViewedByUser answerResult =
             makeMe
-                .anAnswerFor(reviewPoint)
-                .type(LINK_SOURCE)
+                .anAnswerViewedByUserFor(reviewPoint)
+                .validQuestionOfType(LINK_SOURCE)
                 .answerWithSpelling(source.getTitle())
                 .inMemoryPlease();
         assertTrue(answerResult.correct);

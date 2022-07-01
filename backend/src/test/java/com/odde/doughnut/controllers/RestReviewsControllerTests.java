@@ -97,7 +97,7 @@ class RestReviewsControllerTests {
   class answer {
     ReviewPoint reviewPoint;
     Note note1;
-    Answer answer = new Answer();
+    Answer answer;
 
     @BeforeEach
     void setup() {
@@ -108,12 +108,10 @@ class RestReviewsControllerTests {
               .by(userModel)
               .forgettingCurveAndNextReviewAt(200)
               .please();
-      QuizQuestion quizQuestion =
-          makeMe
-              .aQuestion()
-              .of(QuizQuestion.QuestionType.CLOZE_SELECTION, reviewPoint)
-              .inMemoryPlease();
-      answer.setQuestion(quizQuestion);
+      makeMe.anAnswerViewedByUserFor(
+        reviewPoint
+      );
+      answer = makeMe.anAnswerFor(reviewPoint).type(QuizQuestion.QuestionType.CLOZE_SELECTION).inMemoryPlease();
       answer.setAnswerNoteId(note1.getId());
     }
 

@@ -7,27 +7,29 @@ import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 
-public class AnswerBuilder extends EntityBuilder<AnswerViewedByUser> {
-  Answer answer;
+public class AnswerBuilder extends EntityBuilder<Answer> {
   private QuizQuestion.QuestionType questionType = QuizQuestion.QuestionType.SPELLING;
   private ReviewPoint reviewPoint;
 
   public AnswerBuilder(MakeMe makeMe) {
-    super(makeMe, null);
-    answer = new Answer();
+    super(makeMe, new Answer());
   }
 
   @Override
   protected void beforeCreate(boolean needPersist) {
-    if (answer.getQuestion() == null) {
-      answer.setQuestion(makeMe.aQuestion().buildValid(questionType, reviewPoint).inMemoryPlease());
+    if (entity.getQuestion() == null) {
+      entity.setQuestion(makeMe.aQuestion().of(questionType, reviewPoint).inMemoryPlease());
     }
-    if (answer.getQuestion() == null)
+  }
+
+  public AnswerBuilder withValidQuestion() {
+    entity.setQuestion(makeMe.aQuestion().buildValid(questionType, reviewPoint).inMemoryPlease());
+    if (entity.getQuestion() == null)
       throw new RuntimeException(
-          "Failed to generate a question of type "
-              + questionType.name()
-              + ", perhaps no enough data.");
-    this.entity = makeMe.modelFactoryService.toAnswerModel(answer).getAnswerViewedByUser();
+        "Failed to generate a question of type "
+          + questionType.name()
+          + ", perhaps no enough data.");
+    return this;
   }
 
   public AnswerBuilder forReviewPoint(ReviewPoint reviewPoint) {
@@ -41,12 +43,14 @@ public class AnswerBuilder extends EntityBuilder<AnswerViewedByUser> {
   }
 
   public AnswerBuilder answerWithSpelling(String answer) {
-    this.answer.setSpellingAnswer(answer);
+    this.entity.setAnswerNoteId(null);
+    this.entity.setSpellingAnswer(answer);
     return this;
   }
 
   public AnswerBuilder answerWithId(Integer id) {
-    this.answer.setAnswerNoteId(id);
+    this.entity.setSpellingAnswer(null);
+    this.entity.setAnswerNoteId(id);
     return this;
   }
 }
