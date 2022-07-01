@@ -26,6 +26,7 @@
     />
     <SelfEvaluateButtons
       @self-evaluated-memory-state="submitAnswer({ spellingAnswer: $event })"
+      :key="quizQuestion.quizQuestion.reviewPoint"
     />
   </div>
   <div v-else-if="quizQuestion.questionType === 'SPELLING'">
