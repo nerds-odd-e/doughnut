@@ -132,12 +132,35 @@ public class ReviewPoint {
   }
 
   public void updateForgettingCurve(long delayInHours, int adjustment) {
+    SpacedRepetitionAlgorithm spacedRepetitionAlgorithm = getSpacedRepetitionAlgorithm();
+    Integer oldForgettingCurveIndex = getForgettingCurveIndex();
+    int adjustment1 =
+        spacedRepetitionAlgorithm.withDelayAdjustment(oldForgettingCurveIndex, delayInHours)
+            * adjustment;
+    updateForgettingCurve1(adjustment1);
+  }
+
+  public void updateForgettingCurve1(int adjustment) {
     setForgettingCurveIndex(
         getSpacedRepetitionAlgorithm()
-            .addTotForgettingCurveIndex(getForgettingCurveIndex(), adjustment, delayInHours));
+            .addTotForgettingCurveIndex1(getForgettingCurveIndex(), adjustment));
   }
 
   private SpacedRepetitionAlgorithm getSpacedRepetitionAlgorithm() {
     return getUser().getSpacedRepetitionAlgorithm();
+  }
+
+  public void updateNextRepetitionWithAdjustment(Timestamp currentUTCTimestamp, int adjustment) {
+    long delayInHours =
+        TimestampOperations.getDiffInHours(currentUTCTimestamp, calculateNextReviewAt());
+
+    updateForgettingCurve(delayInHours, adjustment);
+
+    if (adjustment < 0) {
+      setNextReviewAt(TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, 12));
+    } else {
+      setLastReviewedAt(currentUTCTimestamp);
+      setNextReviewAt(calculateNextReviewAt());
+    }
   }
 }

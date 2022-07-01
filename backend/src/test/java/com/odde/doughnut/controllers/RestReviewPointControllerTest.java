@@ -95,7 +95,7 @@ class RestReviewPointControllerTest {
     @Nested
     class WhenThereIsAReviewPoint {
       ReviewPoint rp;
-      final int expectedSatisfyingForgettingCurveIndex = 110;
+      final int expectedSatisfyingForgettingCurveIndex = 101;
 
       @BeforeEach
       void setup() {

@@ -120,10 +120,10 @@ public class ReviewingWithSpacedRepetitionAlgorithmTest {
                 .by(userModel)
                 .afterNthStrictRepetition(ntimes)
                 .toModelPlease();
-        reviewPoint.updateNextRepetitionWithAdjustment(
+        reviewPoint.updateAfterRepetition(
             TimestampOperations.addHoursToTimestamp(
                 reviewPoint.getEntity().getNextReviewAt(), daysDelay * 24),
-            happy.adjustment);
+            happy);
         assertThat(
             reviewPoint.getEntity().getForgettingCurveIndex(),
             equalTo(expectedForgettingCurveIndex));

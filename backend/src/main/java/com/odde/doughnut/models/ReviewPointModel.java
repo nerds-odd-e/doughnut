@@ -31,26 +31,12 @@ public record ReviewPointModel(ReviewPoint entity, ModelFactoryService modelFact
 
   public void updateAfterRepetition(Timestamp currentUTCTimestamp, SelfEvaluate selfEvaluate) {
     entity.setRepetitionCount(entity.getRepetitionCount() + 1);
-    updateNextRepetitionWithAdjustment(currentUTCTimestamp, selfEvaluate.adjustment);
-  }
-
-  public void updateNextRepetitionWithAdjustment(Timestamp currentUTCTimestamp, int adjustment) {
-    long delayInHours =
-        TimestampOperations.getDiffInHours(currentUTCTimestamp, entity.calculateNextReviewAt());
-
-    entity.updateForgettingCurve(delayInHours, adjustment);
-
-    if (adjustment < 0) {
-      entity.setNextReviewAt(TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, 12));
-    } else {
-      entity.setLastReviewedAt(currentUTCTimestamp);
-      entity.setNextReviewAt(entity.calculateNextReviewAt());
-    }
+    entity.updateNextRepetitionWithAdjustment(currentUTCTimestamp, selfEvaluate.adjustment);
     this.modelFactoryService.reviewPointRepository.save(entity);
   }
 
   public void evaluate(int adjustment) {
-    entity.updateForgettingCurve(0, adjustment);
+    entity.updateForgettingCurve1(adjustment);
     entity.setNextReviewAt(entity.calculateNextReviewAt());
     this.modelFactoryService.reviewPointRepository.save(entity);
   }

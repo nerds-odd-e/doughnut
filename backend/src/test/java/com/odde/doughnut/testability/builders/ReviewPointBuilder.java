@@ -46,8 +46,7 @@ public class ReviewPointBuilder extends EntityBuilder<ReviewPoint> {
   public ReviewPointBuilder afterNthStrictRepetition(Integer repetitionDone) {
     ReviewPointModel reviewPointModel = makeMe.modelFactoryService.toReviewPointModel(entity);
     for (int i = 0; i < repetitionDone; i++) {
-      reviewPointModel.updateNextRepetitionWithAdjustment(
-          entity.getNextReviewAt(), happy.adjustment);
+      reviewPointModel.updateAfterRepetition(entity.getNextReviewAt(), happy);
     }
     return this;
   }
