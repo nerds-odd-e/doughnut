@@ -80,8 +80,8 @@ public class SpacedRepetitionEarlyRewardsAndLatePenaltyTest {
     Note note = new MakeMe().aNote().inMemoryPlease();
     ReviewPoint reviewPoint =
         new MakeMe().aReviewPointFor(note).by(user).afterNthStrictRepetition(3).inMemoryPlease();
-    reviewPoint.updateNextRepetitionWithAdjustment(
-        TimestampOperations.addHoursToTimestamp(reviewPoint.getNextReviewAt(), delayInHours), 1);
+    reviewPoint.reviewedSuccessfully(
+        TimestampOperations.addHoursToTimestamp(reviewPoint.getNextReviewAt(), delayInHours));
     return reviewPoint.getForgettingCurveIndex();
   }
 }

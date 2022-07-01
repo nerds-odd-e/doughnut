@@ -14,7 +14,7 @@ public class ForgettingCurve {
     this.forgettingCurveIndex = forgettingCurveIndex;
   }
 
-  public int add(int adjustment) {
+  private int add(int adjustment) {
     int newIndex = forgettingCurveIndex + adjustment;
     if (newIndex < DEFAULT_FORGETTING_CURVE_INDEX) {
       newIndex = DEFAULT_FORGETTING_CURVE_INDEX;
@@ -29,7 +29,7 @@ public class ForgettingCurve {
     return spacedRepetitionAlgorithm.getRepeatInHours(index);
   }
 
-  int getDelayAdjustment(long delayInHours) {
+  int succeeded(long delayInHours) {
     int delayAdjustment = DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT;
     Integer oldRepeatInHours = getRepeatInHours();
     if (oldRepeatInHours > 0) {
@@ -40,6 +40,10 @@ public class ForgettingCurve {
                       * DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT
                       / oldRepeatInHours);
     }
-    return delayAdjustment;
+    return add(delayAdjustment);
+  }
+
+  public int failed() {
+    return add(-DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT * 2);
   }
 }

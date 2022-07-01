@@ -130,26 +130,22 @@ public class ReviewPoint {
         getLastReviewedAt(), forgettingCurve().getRepeatInHours());
   }
 
-  public void addToForgettingCurve(int adjustment) {
-    setForgettingCurveIndex(forgettingCurve().add(adjustment));
-  }
-
   private ForgettingCurve forgettingCurve() {
     return new ForgettingCurve(getUser().getSpacedRepetitionAlgorithm(), getForgettingCurveIndex());
   }
 
-  public void updateNextRepetitionWithAdjustment(Timestamp currentUTCTimestamp, int adjustment) {
+  public void reviewFailed(Timestamp currentUTCTimestamp) {
+    setForgettingCurveIndex(forgettingCurve().failed());
+    setNextReviewAt(TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, 12));
+  }
+
+  public void reviewedSuccessfully(Timestamp currentUTCTimestamp) {
     long delayInHours =
         TimestampOperations.getDiffInHours(currentUTCTimestamp, calculateNextReviewAt());
 
-    int delayAdjustment = forgettingCurve().getDelayAdjustment(delayInHours);
-    addToForgettingCurve(delayAdjustment * adjustment);
+    setForgettingCurveIndex(forgettingCurve().succeeded(delayInHours));
 
-    if (adjustment < 0) {
-      setNextReviewAt(TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, 12));
-    } else {
-      setLastReviewedAt(currentUTCTimestamp);
-      setNextReviewAt(calculateNextReviewAt());
-    }
+    setLastReviewedAt(currentUTCTimestamp);
+    setNextReviewAt(calculateNextReviewAt());
   }
 }
