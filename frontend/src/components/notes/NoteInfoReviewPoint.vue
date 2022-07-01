@@ -17,8 +17,25 @@
       new Date(reviewPoint.nextReviewAt).toLocaleString()
     }}</span></label
   >
-  <div class="btn-toolbar justify-content-between">
-    <SelfEvaluateButtons @self-evaluate="selfEvaluate" />
+  <div class="btn-group" role="group" aria-label="First group">
+    <button
+      class="btn"
+      id="repeat-sad"
+      name="sad"
+      @click="selfEvaluate(-5)"
+      title="reduce next repeat interval (days) by half"
+    >
+      <SvgSad />
+    </button>
+    <button
+      class="btn"
+      id="repeat-happy"
+      name="happy"
+      @click="selfEvaluate(5)"
+      title="add to next repeat interval (days) by half"
+    >
+      <SvgHappy />
+    </button>
     <button
       class="btn"
       title="remove this note from review"
@@ -31,10 +48,11 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
-import SelfEvaluateButtons from "../review/SelfEvaluateButtons.vue";
 import SvgNoReview from "../svgs/SvgNoReview.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import usePopups from "../commons/Popups/usePopup";
+import SvgSad from "../svgs/SvgSad.vue";
+import SvgHappy from "../svgs/SvgHappy.vue";
 
 export default defineComponent({
   setup() {
@@ -47,7 +65,7 @@ export default defineComponent({
     },
   },
   emits: ["selfEvaluated"],
-  components: { SelfEvaluateButtons, SvgNoReview },
+  components: { SvgNoReview, SvgSad, SvgHappy },
   methods: {
     selfEvaluate(adjustment: number) {
       this.api.reviewMethods
