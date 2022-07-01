@@ -86,7 +86,7 @@ class LinkSourceWithinSameLinkTypeQuizFactoryTest {
             makeMe
                 .anAnswerViewedByUserFor(reviewPoint)
                 .validQuestionOfType(LINK_SOURCE_WITHIN_SAME_LINK_TYPE)
-                .answerWithId(source.getId())
+                .answerWith(source)
                 .inMemoryPlease();
         assertTrue(answerResult.correct);
       }

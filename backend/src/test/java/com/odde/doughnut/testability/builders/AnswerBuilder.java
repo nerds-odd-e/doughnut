@@ -1,9 +1,6 @@
 package com.odde.doughnut.testability.builders;
 
-import com.odde.doughnut.entities.Answer;
-import com.odde.doughnut.entities.AnswerViewedByUser;
-import com.odde.doughnut.entities.QuizQuestion;
-import com.odde.doughnut.entities.ReviewPoint;
+import com.odde.doughnut.entities.*;
 import com.odde.doughnut.testability.EntityBuilder;
 import com.odde.doughnut.testability.MakeMe;
 
@@ -26,9 +23,9 @@ public class AnswerBuilder extends EntityBuilder<Answer> {
     entity.setQuestion(makeMe.aQuestion().buildValid(questionType, reviewPoint).inMemoryPlease());
     if (entity.getQuestion() == null)
       throw new RuntimeException(
-        "Failed to generate a question of type "
-          + questionType.name()
-          + ", perhaps no enough data.");
+          "Failed to generate a question of type "
+              + questionType.name()
+              + ", perhaps no enough data.");
     return this;
   }
 
@@ -48,9 +45,9 @@ public class AnswerBuilder extends EntityBuilder<Answer> {
     return this;
   }
 
-  public AnswerBuilder answerWithId(Integer id) {
+  public AnswerBuilder answerWithId(Note answerNote) {
     this.entity.setSpellingAnswer(null);
-    this.entity.setAnswerNoteId(id);
+    this.entity.setAnswerNoteId(answerNote.getId());
     return this;
   }
 }

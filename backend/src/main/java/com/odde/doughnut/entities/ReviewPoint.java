@@ -125,13 +125,10 @@ public class ReviewPoint {
     return this.thing.getHeadNoteOfNotebook();
   }
 
-  public Timestamp calculateNextReviewAt(Timestamp base) {
+  public Timestamp calculateNextReviewAt() {
     return TimestampOperations.addHoursToTimestamp(
-        base, getSpacedRepetitionAlgorithm().getRepeatInHours(getForgettingCurveIndex()));
-  }
-
-  public Timestamp calculateDefaultNextReviewAt() {
-    return calculateNextReviewAt(getLastReviewedAt());
+        getLastReviewedAt(),
+        getSpacedRepetitionAlgorithm().getRepeatInHours(getForgettingCurveIndex()));
   }
 
   public void updateForgettingCurve(long delayInHours, int adjustment) {

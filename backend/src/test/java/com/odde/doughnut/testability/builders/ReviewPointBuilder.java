@@ -61,7 +61,7 @@ public class ReviewPointBuilder extends EntityBuilder<ReviewPoint> {
 
   public ReviewPointBuilder forgettingCurveAndNextReviewAt(int value) {
     entity.setForgettingCurveIndex(value);
-    entity.setNextReviewAt(entity.calculateDefaultNextReviewAt());
+    entity.setNextReviewAt(entity.calculateNextReviewAt());
     return this;
   }
 

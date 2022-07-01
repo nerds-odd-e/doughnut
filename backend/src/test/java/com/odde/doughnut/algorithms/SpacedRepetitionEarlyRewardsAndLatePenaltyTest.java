@@ -27,13 +27,13 @@ public class SpacedRepetitionEarlyRewardsAndLatePenaltyTest {
 
   @Test
   void repeatEarly_immediatelyWhichIsImpossible() {
-    int index = getNextForgettingCurveIndexWithDelay(-6 * 24);
+    int index = getNextForgettingCurveIndexWithDelay(-9 * 24);
     assertThat(index, equalTo(currentForgettingCurveIndex));
   }
 
   @Test
   void repeatEarly_inOneHour() {
-    int index = getNextForgettingCurveIndexWithDelay(-6 * 24 + 1);
+    int index = getNextForgettingCurveIndexWithDelay(-9 * 24 + 1);
     assertThat(index, greaterThanOrEqualTo(currentForgettingCurveIndex));
     assertThat(index, lessThan(baselineForgettingCurveIndex));
   }

@@ -17,6 +17,7 @@ import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.models.UserModel;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
+import java.sql.Timestamp;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -42,13 +43,16 @@ class RestReviewsControllerTests {
   @BeforeEach
   void setup() {
     userModel = makeMe.aUser().toModelPlease();
-    controller = new RestReviewsController(
-      modelFactoryService, new TestCurrentUserFetcher(userModel), testabilitySettings);
+    controller =
+        new RestReviewsController(
+            modelFactoryService, new TestCurrentUserFetcher(userModel), testabilitySettings);
   }
 
   RestReviewsController nullUserController() {
     return new RestReviewsController(
-        modelFactoryService, new TestCurrentUserFetcher(makeMe.aNullUserModel()), testabilitySettings);
+        modelFactoryService,
+        new TestCurrentUserFetcher(makeMe.aNullUserModel()),
+        testabilitySettings);
   }
 
   @Nested
@@ -96,34 +100,39 @@ class RestReviewsControllerTests {
   @Nested
   class answer {
     ReviewPoint reviewPoint;
-    Note note1;
     Answer answer;
 
     @BeforeEach
     void setup() {
-      note1 = makeMe.aNote().please();
+      Note answerNote = makeMe.aNote().please();
       reviewPoint =
           makeMe
-              .aReviewPointFor(note1)
+              .aReviewPointFor(answerNote)
               .by(userModel)
               .forgettingCurveAndNextReviewAt(200)
               .please();
-      makeMe.anAnswerViewedByUserFor(
-        reviewPoint
-      );
-      answer = makeMe.anAnswerFor(reviewPoint).type(QuizQuestion.QuestionType.CLOZE_SELECTION).inMemoryPlease();
-      answer.setAnswerNoteId(note1.getId());
+      answer =
+          makeMe
+              .anAnswerFor(reviewPoint)
+              .type(QuizQuestion.QuestionType.CLOZE_SELECTION)
+              .answerWithId(answerNote)
+              .inMemoryPlease();
     }
 
     @Test
     void shouldValidateTheAnswerAndUpdateReviewPoint() {
-      testabilitySettings.timeTravelTo(reviewPoint.getLastReviewedAt());
-      Integer oldForgettingCurveIndex = reviewPoint.getForgettingCurveIndex();
       Integer oldRepetitionCount = reviewPoint.getRepetitionCount();
       AnswerResult answerResult = controller.answerQuiz(answer);
       assertTrue(answerResult.correct);
-      assertThat(reviewPoint.getForgettingCurveIndex(), equalTo(oldForgettingCurveIndex));
       assertThat(reviewPoint.getRepetitionCount(), greaterThan(oldRepetitionCount));
+    }
+
+    @Test
+    void shouldNoteIncreaseIndexIfRepeatImmediately() {
+      testabilitySettings.timeTravelTo(reviewPoint.getLastReviewedAt());
+      Integer oldForgettingCurveIndex = reviewPoint.getForgettingCurveIndex();
+      controller.answerQuiz(answer);
+      assertThat(reviewPoint.getForgettingCurveIndex(), equalTo(oldForgettingCurveIndex));
     }
 
     @Test
@@ -132,37 +141,8 @@ class RestReviewsControllerTests {
       Integer oldForgettingCurveIndex = reviewPoint.getForgettingCurveIndex();
       controller.answerQuiz(answer);
       assertThat(reviewPoint.getForgettingCurveIndex(), greaterThan(oldForgettingCurveIndex));
-    }
-
-    @Test
-    void shouldValidateTheWrongAnswer() {
-      testabilitySettings.timeTravelTo(reviewPoint.getNextReviewAt());
-      QuizQuestion quizQuestion =
-          makeMe.aQuestion().of(QuizQuestion.QuestionType.SPELLING, reviewPoint).inMemoryPlease();
-      answer.setQuestion(quizQuestion);
-      answer.setAnswerNoteId(null);
-      answer.setSpellingAnswer("wrong");
-      Integer oldForgettingCurveIndex = reviewPoint.getForgettingCurveIndex();
-      Integer oldRepetitionCount = reviewPoint.getRepetitionCount();
-      AnswerResult answerResult = controller.answerQuiz(answer);
-      assertFalse(answerResult.correct);
-      assertThat(reviewPoint.getForgettingCurveIndex(), lessThan(oldForgettingCurveIndex));
-      assertThat(reviewPoint.getRepetitionCount(), greaterThan(oldRepetitionCount));
-    }
-
-    @Test
-    void shouldRepeatTheNextDay() {
-      QuizQuestion quizQuestion =
-          makeMe.aQuestion().of(QuizQuestion.QuestionType.SPELLING, reviewPoint).inMemoryPlease();
-      answer.setQuestion(quizQuestion);
-      answer.setAnswerNoteId(null);
-      answer.setSpellingAnswer("wrong");
-      controller.answerQuiz(answer);
       assertThat(
-          reviewPoint.getNextReviewAt(),
-          lessThan(
-              TimestampOperations.addHoursToTimestamp(
-                  testabilitySettings.getCurrentUTCTimestamp(), 25)));
+          reviewPoint.getLastReviewedAt(), equalTo(testabilitySettings.getCurrentUTCTimestamp()));
     }
 
     @Test
@@ -186,6 +166,48 @@ class RestReviewsControllerTests {
     void shouldNotBeAbleToSeeNoteIDontHaveAccessTo() {
       Answer answer = new Answer();
       assertThrows(ResponseStatusException.class, () -> nullUserController().answerQuiz(answer));
+    }
+
+    @Nested
+    class WrongAnswer {
+      @BeforeEach
+      void setup() {
+        answer =
+            makeMe
+                .anAnswerFor(reviewPoint)
+                .type(QuizQuestion.QuestionType.SPELLING)
+                .answerWithSpelling("wrong")
+                .inMemoryPlease();
+      }
+
+      @Test
+      void shouldValidateTheWrongAnswer() {
+        testabilitySettings.timeTravelTo(reviewPoint.getNextReviewAt());
+        Integer oldRepetitionCount = reviewPoint.getRepetitionCount();
+        AnswerResult answerResult = controller.answerQuiz(answer);
+        assertFalse(answerResult.correct);
+        assertThat(reviewPoint.getRepetitionCount(), greaterThan(oldRepetitionCount));
+      }
+
+      @Test
+      void shouldNotChangeTheLastReviewedAtTime() {
+        testabilitySettings.timeTravelTo(reviewPoint.getNextReviewAt());
+        Timestamp lastReviewedAt = reviewPoint.getLastReviewedAt();
+        Integer oldForgettingCurveIndex = reviewPoint.getForgettingCurveIndex();
+        controller.answerQuiz(answer);
+        assertThat(reviewPoint.getForgettingCurveIndex(), lessThan(oldForgettingCurveIndex));
+        assertThat(reviewPoint.getLastReviewedAt(), equalTo(lastReviewedAt));
+      }
+
+      @Test
+      void shouldRepeatTheNextDay() {
+        controller.answerQuiz(answer);
+        assertThat(
+            reviewPoint.getNextReviewAt(),
+            lessThan(
+                TimestampOperations.addHoursToTimestamp(
+                    testabilitySettings.getCurrentUTCTimestamp(), 25)));
+      }
     }
   }
 }

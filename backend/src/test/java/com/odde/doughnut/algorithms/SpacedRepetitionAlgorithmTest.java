@@ -26,28 +26,28 @@ public class SpacedRepetitionAlgorithmTest {
     SpacedRepetitionAlgorithm spacedRepetitionAlgorithm = new SpacedRepetitionAlgorithm("3, 6, 9");
 
     @Test
-    void fallBeforeTheFirstRepeatLevel() {
-      int index = DEFAULT_FORGETTING_CURVE_INDEX - 1;
-      assertThat(getNextRepeatInHours(index), equalTo(0));
+    void repeatBelowDefaultIndex() {
+      int index = DEFAULT_FORGETTING_CURVE_INDEX - 2;
+      assertThat(spacedRepetitionAlgorithm.getRepeatInHours(index), equalTo(0));
     }
 
     @Test
     void fallOnTheFirstRepeatLevel() {
       int index = DEFAULT_FORGETTING_CURVE_INDEX;
-      assertThat(getNextRepeatInHours(index), equalTo(3 * 24));
+      assertThat(spacedRepetitionAlgorithm.getRepeatInHours(index), equalTo(3 * 24));
     }
 
     @Test
     void betweenTheFirstAndSecond() {
       int index = DEFAULT_FORGETTING_CURVE_INDEX + DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT / 2;
-      assertThat(getNextRepeatInHours(index), greaterThan(3 * 24));
-      assertThat(getNextRepeatInHours(index), lessThan(6 * 24));
+      assertThat(spacedRepetitionAlgorithm.getRepeatInHours(index), greaterThan(3 * 24));
+      assertThat(spacedRepetitionAlgorithm.getRepeatInHours(index), lessThan(6 * 24));
     }
 
     @Test
     void fallOnTheSecondRepeatLevel() {
       int index = getNextForgettingCurveIndex(DEFAULT_FORGETTING_CURVE_INDEX);
-      assertThat(getNextRepeatInHours(index), equalTo(6 * 24));
+      assertThat(spacedRepetitionAlgorithm.getRepeatInHours(index), equalTo(6 * 24));
     }
 
     @Test
@@ -58,11 +58,7 @@ public class SpacedRepetitionAlgorithmTest {
       index = getNextForgettingCurveIndex(index);
       index = getNextForgettingCurveIndex(index);
       index = getNextForgettingCurveIndex(index);
-      assertThat(getNextRepeatInHours(index), equalTo(8 * 24));
-    }
-
-    private Integer getNextRepeatInHours(int index) {
-      return spacedRepetitionAlgorithm.getRepeatInHours(getNextForgettingCurveIndex(index));
+      assertThat(spacedRepetitionAlgorithm.getRepeatInHours(index), equalTo(8 * 24));
     }
 
     private int getNextForgettingCurveIndex(Integer index) {

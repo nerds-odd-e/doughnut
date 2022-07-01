@@ -47,7 +47,9 @@ class RestReviewPointController {
     }
     UserModel user = currentUserFetcher.getUser();
     user.getAuthorization().assertLoggedIn();
-    modelFactoryService.toReviewPointModel(reviewPoint).evaluate(selfEvaluation.selfEvaluation);
+    modelFactoryService
+        .toReviewPointModel(reviewPoint)
+        .evaluate(selfEvaluation.selfEvaluation.adjustment);
     return reviewPoint;
   }
 }

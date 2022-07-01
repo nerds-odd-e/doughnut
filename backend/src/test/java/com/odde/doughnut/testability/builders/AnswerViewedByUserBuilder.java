@@ -1,6 +1,7 @@
 package com.odde.doughnut.testability.builders;
 
 import com.odde.doughnut.entities.AnswerViewedByUser;
+import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.QuizQuestion;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.testability.EntityBuilder;
@@ -16,7 +17,11 @@ public class AnswerViewedByUserBuilder extends EntityBuilder<AnswerViewedByUser>
 
   @Override
   protected void beforeCreate(boolean needPersist) {
-    this.entity = makeMe.modelFactoryService.toAnswerModel(answerBuilder.please(needPersist)).getAnswerViewedByUser();
+    this.entity =
+        makeMe
+            .modelFactoryService
+            .toAnswerModel(answerBuilder.please(needPersist))
+            .getAnswerViewedByUser();
   }
 
   public AnswerViewedByUserBuilder forReviewPoint(ReviewPoint reviewPoint) {
@@ -35,8 +40,8 @@ public class AnswerViewedByUserBuilder extends EntityBuilder<AnswerViewedByUser>
     return this;
   }
 
-  public AnswerViewedByUserBuilder answerWithId(Integer id) {
-    this.answerBuilder.answerWithId(id);
+  public AnswerViewedByUserBuilder answerWith(Note answerNote) {
+    this.answerBuilder.answerWithId(answerNote);
     return this;
   }
 }

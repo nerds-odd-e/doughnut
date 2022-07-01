@@ -70,7 +70,11 @@ public class ReviewingWithSpacedRepetitionAlgorithmTest {
     void whenThereIsOneReviewedNotesForUser(
         Integer repetitionDone, Integer reviewDay, Boolean expectedToRepeat) {
       ReviewPoint reviewPoint =
-          makeMe.aReviewPointFor(note).by(userModel).afterNthStrictRepetition(repetitionDone).please();
+          makeMe
+              .aReviewPointFor(note)
+              .by(userModel)
+              .afterNthStrictRepetition(repetitionDone)
+              .please();
       ReviewPoint mostUrgentReviewPoint =
           getOneReviewPointNeedToRepeat(daysAfterBase(reviewPoint, reviewDay));
       assertThat(mostUrgentReviewPoint != null, is(expectedToRepeat));
@@ -101,11 +105,11 @@ public class ReviewingWithSpacedRepetitionAlgorithmTest {
     class EarlyAndLateReview {
       @ParameterizedTest
       @CsvSource({
-        "0, 0,  110",
+        "0, 0,  100",
         "0, 1,  110",
-        "2, -1,  125",
-        "2, 0, 130",
-        "2, 1, 125",
+        "2, -1,  115",
+        "2, 0, 120",
+        "2, 1, 115",
         "2, 100, 100",
       })
       void aReviewPointHasBeenReviewedStrictly(
