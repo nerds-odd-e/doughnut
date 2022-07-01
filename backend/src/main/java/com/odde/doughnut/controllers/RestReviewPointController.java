@@ -49,7 +49,7 @@ class RestReviewPointController {
     user.getAuthorization().assertLoggedIn();
     modelFactoryService
         .toReviewPointModel(reviewPoint)
-        .evaluate(selfEvaluation.selfEvaluation.adjustment);
+        .updateForgettingCurve(selfEvaluation.selfEvaluation.adjustment);
     return reviewPoint;
   }
 }

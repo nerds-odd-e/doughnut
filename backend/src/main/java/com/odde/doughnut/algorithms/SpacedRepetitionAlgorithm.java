@@ -24,7 +24,7 @@ public class SpacedRepetitionAlgorithm {
     }
   }
 
-  public Integer getRepeatInHoursF(float index) {
+  public Integer getRepeatInHours(float index) {
     if (index < 0) {
       return 0;
     }

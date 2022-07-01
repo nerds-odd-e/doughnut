@@ -14,7 +14,7 @@ public class SpacedRepetitionAlgorithmTest {
   void defaultSetting() {
     SpacedRepetitionAlgorithm spacedRepetitionAlgorithm = new SpacedRepetitionAlgorithm(null);
 
-    assertThat(spacedRepetitionAlgorithm.getRepeatInHoursF(0), equalTo(0));
+    assertThat(spacedRepetitionAlgorithm.getRepeatInHours(0), equalTo(0));
   }
 
   @Nested
@@ -23,18 +23,18 @@ public class SpacedRepetitionAlgorithmTest {
 
     @Test
     void repeatBelowDefaultIndex() {
-      assertThat(spacedRepetitionAlgorithm.getRepeatInHoursF(-0.5f), equalTo(0));
+      assertThat(spacedRepetitionAlgorithm.getRepeatInHours(-0.5f), equalTo(0));
     }
 
     @Test
     void repeatForTheFirstTime() {
-      assertThat(spacedRepetitionAlgorithm.getRepeatInHoursF(0), equalTo(3 * 24));
+      assertThat(spacedRepetitionAlgorithm.getRepeatInHours(0), equalTo(3 * 24));
     }
 
     @Test
     void betweenTheFirstAndSecond() {
-      assertThat(spacedRepetitionAlgorithm.getRepeatInHoursF(1.5f), greaterThan(6 * 24));
-      assertThat(spacedRepetitionAlgorithm.getRepeatInHoursF(1.5f), lessThan(9 * 24));
+      assertThat(spacedRepetitionAlgorithm.getRepeatInHours(1.5f), greaterThan(6 * 24));
+      assertThat(spacedRepetitionAlgorithm.getRepeatInHours(1.5f), lessThan(9 * 24));
     }
   }
 }

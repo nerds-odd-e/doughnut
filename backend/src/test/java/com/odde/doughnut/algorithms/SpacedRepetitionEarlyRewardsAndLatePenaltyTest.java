@@ -1,7 +1,7 @@
 package com.odde.doughnut.algorithms;
 
-import static com.odde.doughnut.entities.ReviewPoint.DEFAULT_FORGETTING_CURVE_INDEX;
-import static com.odde.doughnut.entities.ReviewPoint.DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT;
+import static com.odde.doughnut.entities.ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX;
+import static com.odde.doughnut.entities.ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.greaterThan;
@@ -12,6 +12,7 @@ import static org.hamcrest.Matchers.lessThanOrEqualTo;
 import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.ReviewPoint;
 import com.odde.doughnut.entities.User;
+import com.odde.doughnut.models.TimestampOperations;
 import com.odde.doughnut.testability.MakeMe;
 import org.junit.jupiter.api.Test;
 
@@ -78,12 +79,9 @@ public class SpacedRepetitionEarlyRewardsAndLatePenaltyTest {
     User user = new MakeMe().aUser().withSpaceIntervals("3, 6, 9, 12, 15").inMemoryPlease();
     Note note = new MakeMe().aNote().inMemoryPlease();
     ReviewPoint reviewPoint =
-        new MakeMe()
-            .aReviewPointFor(note)
-            .by(user)
-            .forgettingCurveAndNextReviewAt(currentForgettingCurveIndex)
-            .inMemoryPlease();
-    reviewPoint.updateForgettingCurve(delayInHours, 1);
+        new MakeMe().aReviewPointFor(note).by(user).afterNthStrictRepetition(3).inMemoryPlease();
+    reviewPoint.updateNextRepetitionWithAdjustment(
+        TimestampOperations.addHoursToTimestamp(reviewPoint.getNextReviewAt(), delayInHours), 1);
     return reviewPoint.getForgettingCurveIndex();
   }
 }

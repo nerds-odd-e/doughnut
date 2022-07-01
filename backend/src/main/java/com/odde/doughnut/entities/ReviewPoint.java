@@ -1,7 +1,6 @@
 package com.odde.doughnut.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.odde.doughnut.algorithms.SpacedRepetitionAlgorithm;
 import com.odde.doughnut.entities.QuizQuestion.QuestionType;
 import com.odde.doughnut.models.TimestampOperations;
 import java.sql.Timestamp;
@@ -24,8 +23,6 @@ import lombok.Setter;
 @Entity
 @Table(name = "review_point")
 public class ReviewPoint {
-  public static final Integer DEFAULT_FORGETTING_CURVE_INDEX = 100;
-  public static final Integer DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT = 10;
 
   @Id
   @Getter
@@ -88,7 +85,7 @@ public class ReviewPoint {
   @Column(name = "forgetting_curve_index")
   @Getter
   @Setter
-  private Integer forgettingCurveIndex = DEFAULT_FORGETTING_CURVE_INDEX;
+  private Integer forgettingCurveIndex = ForgettingCurve.DEFAULT_FORGETTING_CURVE_INDEX;
 
   @Column(name = "removed_from_review")
   @Getter
@@ -129,47 +126,24 @@ public class ReviewPoint {
   }
 
   public Timestamp calculateNextReviewAt() {
-    return TimestampOperations.addHoursToTimestamp(getLastReviewedAt(), getRepeatInHours());
-  }
-
-  public void updateForgettingCurve(long delayInHours, int adjustment) {
-    int delayAdjustment = DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT;
-    Integer oldRepeatInHours = getRepeatInHours();
-    if (oldRepeatInHours > 0) {
-      delayAdjustment =
-          (int)
-              (DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT
-                  - Math.abs(delayInHours)
-                      * DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT
-                      / oldRepeatInHours);
-    }
-    addToForgettingCurve(delayAdjustment * adjustment);
-  }
-
-  private Integer getRepeatInHours() {
-    float index =
-        (float) (getForgettingCurveIndex() - DEFAULT_FORGETTING_CURVE_INDEX)
-            / DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT;
-    return getSpacedRepetitionAlgorithm().getRepeatInHoursF(index);
+    return TimestampOperations.addHoursToTimestamp(
+        getLastReviewedAt(), forgettingCurve().getRepeatInHours());
   }
 
   public void addToForgettingCurve(int adjustment) {
-    int newIndex = getForgettingCurveIndex() + adjustment;
-    if (newIndex < DEFAULT_FORGETTING_CURVE_INDEX) {
-      newIndex = DEFAULT_FORGETTING_CURVE_INDEX;
-    }
-    setForgettingCurveIndex(newIndex);
+    setForgettingCurveIndex(forgettingCurve().add(adjustment));
   }
 
-  private SpacedRepetitionAlgorithm getSpacedRepetitionAlgorithm() {
-    return getUser().getSpacedRepetitionAlgorithm();
+  private ForgettingCurve forgettingCurve() {
+    return new ForgettingCurve(getUser().getSpacedRepetitionAlgorithm(), getForgettingCurveIndex());
   }
 
   public void updateNextRepetitionWithAdjustment(Timestamp currentUTCTimestamp, int adjustment) {
     long delayInHours =
         TimestampOperations.getDiffInHours(currentUTCTimestamp, calculateNextReviewAt());
 
-    updateForgettingCurve(delayInHours, adjustment);
+    int delayAdjustment = forgettingCurve().getDelayAdjustment(delayInHours);
+    addToForgettingCurve(delayAdjustment * adjustment);
 
     if (adjustment < 0) {
       setNextReviewAt(TimestampOperations.addHoursToTimestamp(currentUTCTimestamp, 12));

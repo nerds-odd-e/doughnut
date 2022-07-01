@@ -17,7 +17,7 @@ public record ReviewPointModel(ReviewPoint entity, ModelFactoryService modelFact
     entity.setUser(userModel.getEntity());
     entity.setInitialReviewedAt(currentUTCTimestamp);
     entity.setLastReviewedAt(currentUTCTimestamp);
-    evaluate(0);
+    updateForgettingCurve(0);
   }
 
   public QuizQuestion generateAQuizQuestion(Randomizer randomizer) {
@@ -35,7 +35,7 @@ public record ReviewPointModel(ReviewPoint entity, ModelFactoryService modelFact
     this.modelFactoryService.reviewPointRepository.save(entity);
   }
 
-  public void evaluate(int adjustment) {
+  public void updateForgettingCurve(int adjustment) {
     entity.addToForgettingCurve(adjustment);
     entity.setNextReviewAt(entity.calculateNextReviewAt());
     this.modelFactoryService.reviewPointRepository.save(entity);
