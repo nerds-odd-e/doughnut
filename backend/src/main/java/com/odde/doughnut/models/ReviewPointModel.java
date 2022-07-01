@@ -36,7 +36,7 @@ public record ReviewPointModel(ReviewPoint entity, ModelFactoryService modelFact
   }
 
   public void evaluate(int adjustment) {
-    entity.updateForgettingCurve1(adjustment);
+    entity.addToForgettingCurve(adjustment);
     entity.setNextReviewAt(entity.calculateNextReviewAt());
     this.modelFactoryService.reviewPointRepository.save(entity);
   }

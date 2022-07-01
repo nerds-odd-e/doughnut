@@ -24,6 +24,9 @@ import lombok.Setter;
 @Entity
 @Table(name = "review_point")
 public class ReviewPoint {
+  public static final Integer DEFAULT_FORGETTING_CURVE_INDEX = 100;
+  public static final Integer DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT = 10;
+
   @Id
   @Getter
   @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -85,7 +88,7 @@ public class ReviewPoint {
   @Column(name = "forgetting_curve_index")
   @Getter
   @Setter
-  private Integer forgettingCurveIndex = SpacedRepetitionAlgorithm.DEFAULT_FORGETTING_CURVE_INDEX;
+  private Integer forgettingCurveIndex = DEFAULT_FORGETTING_CURVE_INDEX;
 
   @Column(name = "removed_from_review")
   @Getter
@@ -126,24 +129,36 @@ public class ReviewPoint {
   }
 
   public Timestamp calculateNextReviewAt() {
-    return TimestampOperations.addHoursToTimestamp(
-        getLastReviewedAt(),
-        getSpacedRepetitionAlgorithm().getRepeatInHours(getForgettingCurveIndex()));
+    return TimestampOperations.addHoursToTimestamp(getLastReviewedAt(), getRepeatInHours());
   }
 
   public void updateForgettingCurve(long delayInHours, int adjustment) {
-    SpacedRepetitionAlgorithm spacedRepetitionAlgorithm = getSpacedRepetitionAlgorithm();
-    Integer oldForgettingCurveIndex = getForgettingCurveIndex();
-    int adjustment1 =
-        spacedRepetitionAlgorithm.withDelayAdjustment(oldForgettingCurveIndex, delayInHours)
-            * adjustment;
-    updateForgettingCurve1(adjustment1);
+    int delayAdjustment = DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT;
+    Integer oldRepeatInHours = getRepeatInHours();
+    if (oldRepeatInHours > 0) {
+      delayAdjustment =
+          (int)
+              (DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT
+                  - Math.abs(delayInHours)
+                      * DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT
+                      / oldRepeatInHours);
+    }
+    addToForgettingCurve(delayAdjustment * adjustment);
   }
 
-  public void updateForgettingCurve1(int adjustment) {
-    setForgettingCurveIndex(
-        getSpacedRepetitionAlgorithm()
-            .addTotForgettingCurveIndex1(getForgettingCurveIndex(), adjustment));
+  private Integer getRepeatInHours() {
+    float index =
+        (float) (getForgettingCurveIndex() - DEFAULT_FORGETTING_CURVE_INDEX)
+            / DEFAULT_FORGETTING_CURVE_INDEX_INCREMENT;
+    return getSpacedRepetitionAlgorithm().getRepeatInHoursF(index);
+  }
+
+  public void addToForgettingCurve(int adjustment) {
+    int newIndex = getForgettingCurveIndex() + adjustment;
+    if (newIndex < DEFAULT_FORGETTING_CURVE_INDEX) {
+      newIndex = DEFAULT_FORGETTING_CURVE_INDEX;
+    }
+    setForgettingCurveIndex(newIndex);
   }
 
   private SpacedRepetitionAlgorithm getSpacedRepetitionAlgorithm() {
