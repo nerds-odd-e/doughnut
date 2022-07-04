@@ -3,6 +3,7 @@
     <button
       class="btn btn-primary loading"
       @click.once="$emit('selfEvaluatedMemoryState', 'yes')"
+      :disabled="!ready"
     >
       Yes, I remember
     </button>
@@ -24,9 +25,13 @@ export default defineComponent({
   data() {
     return {
       loadingWidth: "100%",
+      ready: false,
     };
   },
   mounted() {
+    setTimeout(() => {
+      this.ready = true;
+    }, 10 * 1000);
     gsap.to(this, {
       duration: 10,
       loadingWidth: "0%",

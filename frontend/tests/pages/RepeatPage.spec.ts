@@ -50,6 +50,7 @@ describe("repeat page", () => {
     let repetition: Generated.RepetitionForUser;
 
     beforeEach(() => {
+      jest.useFakeTimers();
       const reviewPoint = makeMe.aReviewPoint.please();
       repetition = makeMe.aRepetition
         .withReviewPointId(reviewPoint.id)
@@ -69,6 +70,7 @@ describe("repeat page", () => {
     it("should call the answer api", async () => {
       const wrapper = await mountPage(repetition);
       helper.apiMock.expectingPost(`/api/reviews/answer`);
+      await jest.runAllTimers();
       await wrapper.find("button.btn-primary").trigger("click");
     });
   });
