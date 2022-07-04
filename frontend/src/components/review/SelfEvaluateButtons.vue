@@ -28,7 +28,7 @@ export default defineComponent({
   },
   mounted() {
     gsap.to(this, {
-      duration: 5,
+      duration: 10,
       loadingWidth: "0%",
     });
   },

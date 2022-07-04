@@ -361,16 +361,15 @@ Cypress.Commands.add("initialReviewNotes", (noteTitles) => {
 })
 
 Cypress.Commands.add("repeatReviewNotes", (noteTitles: string) => {
-  cy.routerToRepeatReview()
-  noteTitles.commonSenseSplit(",").forEach((title) => {
-
-    if (title == "end") {
-      cy.findByText("You have finished all repetitions for this half a day!").should("be.visible")
-    } else {
-      cy.findByText(title, { selector: "h2" })
-      cy.yesIRemember()
-    }
-  })
+    cy.routerToRepeatReview()
+    noteTitles.commonSenseSplit(",").forEach((title) => {
+      if (title == "end") {
+        cy.findByText("You have finished all repetitions for this half a day!").should("be.visible")
+      } else {
+        cy.findByText(title, { selector: "h2" })
+        cy.yesIRemember()
+      }
+    })
 })
 
 Cypress.Commands.add("shouldSeeQuizWithOptions", (questionParts, options) => {

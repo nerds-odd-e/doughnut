@@ -24,7 +24,7 @@ Before({ tags: "@stopTime" }, () => {
   // For Vue component with v-if for a ref/react object that is changed during mount by async call
   // the event, eg. click, will not work.
   //
-  cy.clock(new Date())
+  cy.clock(new Date(2021, 1, 3))
 })
 
 // If a test needs to stop the timer, perhaps the tested
