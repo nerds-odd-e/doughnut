@@ -18,7 +18,13 @@ After(() => {
 })
 
 Before({ tags: "@stopTime" }, () => {
-  cy.clock()
+  // It too me 3.5 days to figure out that cy.clock() need to be called
+  // with a date object, otherwise it will not work.
+  //
+  // For Vue component with v-if for a ref/react object that is changed during mount by async call
+  // the event, eg. click, will not work.
+  //
+  cy.clock(new Date())
 })
 
 // If a test needs to stop the timer, perhaps the tested
