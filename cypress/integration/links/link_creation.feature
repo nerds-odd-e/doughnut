@@ -11,14 +11,14 @@ Feature: link note
       | Sedation | Put to sleep    |
       | Sedative | Sleep medicine  |
 
-    @stopTime
+    @mockBrowserTime
   Scenario: View all linkable notes for a note when no link exists
     When I am creating link for note "Sedition"
     Then I should see the source note as "Sedition"
     And I should see "Sedation, Sedative" as targets only when searching in all my notebooks " se "
     And I should see note cannot be found when searching in all my notebooks "Sedition"
 
-  @stopTime
+  @mockBrowserTime
   Scenario Outline: Search note for linking with partial input
     Given I am creating link for note "Sedition"
     And I should see "<targets>" as targets only when searching in all my notebooks "<search key>"
@@ -27,13 +27,13 @@ Feature: link note
       | Sed        | Sedation, Sedative |
       | Sedatio    | Sedation           |
 
-  @stopTime
+  @mockBrowserTime
   Scenario: creating link
     When I link note "Sedition" as "similar to" note "Sedation"
     And I link note "Sedition" as "similar to" note "Sedative"
     Then On the current page, I should see "Sedition" has link "similar to" "Sedation, Sedative"
 
-  @stopTime
+  @mockBrowserTime
   Scenario: link and move
     Given I link note "Sedition" as "similar to" note "Sedation" and move under it
     When I navigate to "Top/Sedation/Sedition" note

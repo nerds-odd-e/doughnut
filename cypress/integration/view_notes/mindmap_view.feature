@@ -29,7 +29,7 @@ Feature: Mindmap view
     Then I should see the note "Singapore" is 0px * 0px offset the center of the map
     And I should see the note "Geography" is -145px * -44px offset the center of the map
 
-    @stopTime
+    @mockBrowserTime
   Scenario: highlight a note
     When I click note "History"
     Then I should see the note "History" is "highlighted"

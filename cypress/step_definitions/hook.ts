@@ -17,7 +17,7 @@ After(() => {
   cy.pageIsNotLoading()
 })
 
-Before({ tags: "@stopTime" }, () => {
+Before({ tags: "@mockBrowserTime" }, () => {
   //
   // when using `cy.clock()` to set the time,
   // for Vue component with v-if for a ref/react object that is changed during mount by async call
@@ -31,7 +31,7 @@ Before({ tags: "@stopTime" }, () => {
 // between tests. It may cause a hard-to-trace problem when
 // the next test resets the DB while the current page refreshes
 // itself. So, here it visits the blank page at the end of each test.
-After({ tags: "@stopTime" }, () => {
+After({ tags: "@mockBrowserTime" }, () => {
   cy.window().then((win) => {
     win.location.href = "about:blank"
   })

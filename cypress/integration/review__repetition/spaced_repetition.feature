@@ -13,7 +13,7 @@ Feature: Spaced-repetition
         Then On day 1 I should have "0/2" note for initial review and "0/1" for repeat
         And On day 2 I should have "1/2" note for initial review and "1/1" for repeat
 
-    @stopTime
+    @mockBrowserTime
     Scenario: Strictly follow the schedule
         * On day 1 I repeat old "                    " and initial review new "Note 1, end "
         * On day 2 I repeat old "Note 1, end         " and initial review new "Note 2, end "

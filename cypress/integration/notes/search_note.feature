@@ -12,7 +12,7 @@ Feature: search note
       | Physical |                | Sedation      |
       | Magical  |                | Sedation      |
 
-  @stopTime
+  @mockBrowserTime
   Scenario Outline: Search at the top level
     Given I visit all my notebooks
     Then I start searching
@@ -22,7 +22,7 @@ Feature: search note
       | Sed        | Sedation, Sedative |
       | Sedatio    | Sedation           |
 
-  @stopTime
+  @mockBrowserTime
   Scenario: Search when adding new note
     Given I am creating a note under "Top/Sedation"
     When I type "ph" in the title

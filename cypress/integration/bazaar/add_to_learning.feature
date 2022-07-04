@@ -19,6 +19,7 @@ Feature: Bazaar subscription
     When I unsubscribe from notebook "Shape"
     Then I should see I've not subscribed to "Shape"
 
+  @mockBrowserTime
   Scenario: subscribe to a note and review
     Given I've logged in as an existing user
     And I have a note with title "My memo"
