@@ -23,7 +23,7 @@
         />
       </template>
       <template v-else>
-        <div class="alert alert-success">
+        <div v-if="finished > 0" class="alert alert-success">
           You have finished all repetitions for this half a day!
         </div>
       </template>
@@ -71,9 +71,7 @@ export default defineComponent({
   methods: {
     loadNew(resp?: Generated.RepetitionForUser) {
       this.repetition = resp;
-      if (resp) {
-        this.$router.push({ name: "repeat-quiz" });
-      }
+      this.$router.push({ name: "repeat-quiz" });
     },
 
     viewLastResult(cursor: number | undefined) {
@@ -92,6 +90,9 @@ export default defineComponent({
         .then(this.loadNew)
         .catch(() => {
           this.repetition = undefined;
+          if (this.finished === 0) {
+            this.$router.push({ name: "reviews" });
+          }
         });
     },
 

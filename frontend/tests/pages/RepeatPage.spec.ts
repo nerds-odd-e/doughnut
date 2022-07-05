@@ -33,11 +33,9 @@ describe("repeat page", () => {
     helper.apiMock
       .expectingGet("/api/reviews/repeat")
       .andRespondOnce({ status: 404 });
-    const wrapper = renderer.currentRoute({ name: "repeat" }).mount();
+    renderer.currentRoute({ name: "repeat" }).mount();
     await flushPromises();
-    expect(wrapper.find(".alert-success").text()).toEqual(
-      "You have finished all repetitions for this half a day!"
-    );
+    expect(mockRouterPush).toHaveBeenCalledWith({ name: "reviews" });
   });
 
   it("replace route with repeat/quiz if there is a quiz", async () => {
