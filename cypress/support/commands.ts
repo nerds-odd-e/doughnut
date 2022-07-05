@@ -320,9 +320,10 @@ Cypress.Commands.add("expectNoteTitle", (title) =>
   cy.findByText(title, { selector: "[role=title] *" }),
 )
 
-Cypress.Commands.add("yesIRemember", () =>
-  cy.findByRole("button", { name: "Yes, I remember" }).click(),
-)
+Cypress.Commands.add("yesIRemember", () => {
+  cy.tick(10 * 1000)
+  cy.findByRole("button", { name: "Yes, I remember" }).click()
+})
 
 Cypress.Commands.add("navigateToCircle", (circleName) => {
   cy.visit("/circles")
@@ -367,7 +368,6 @@ Cypress.Commands.add("repeatReviewNotes", (noteTitles: string) => {
       cy.findByText("You have finished all repetitions for this half a day!").should("be.visible")
     } else {
       cy.findByText(title, { selector: "h2" })
-      cy.tick(10 * 1000)
       cy.yesIRemember()
     }
   })
