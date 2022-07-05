@@ -54,7 +54,6 @@ export default defineComponent({
       repetition: undefined as Generated.RepetitionForUser | undefined,
       previousResults: [] as Generated.AnswerResult[],
       previousResultCursor: undefined as number | undefined,
-      toRepeatCount: 0,
     };
   },
   computed: {
@@ -65,12 +64,14 @@ export default defineComponent({
     finished() {
       return this.previousResults.length;
     },
+    toRepeatCount() {
+      return this.repetition?.toRepeatCount || 0;
+    },
   },
   methods: {
     loadNew(resp?: Generated.RepetitionForUser) {
       this.repetition = resp;
       if (resp) {
-        this.toRepeatCount = resp.toRepeatCount;
         this.$router.push({ name: "repeat-quiz" });
       }
     },
