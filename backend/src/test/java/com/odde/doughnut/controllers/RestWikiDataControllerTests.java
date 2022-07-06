@@ -11,6 +11,7 @@ import com.odde.doughnut.services.HttpClientAdapter;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
+import java.net.URI;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -58,7 +59,8 @@ class RestWikiDataControllerTests {
               new MakeMe().wikidataEntityJson().entityId("Q1").entitleTitle("Mohawk").please());
       controller.fetchWikiDataByID("Q1");
       Mockito.verify(httpClientAdapter)
-          .getResponseString("https://www.wikidata.org/wiki/Special:EntityData/Q1.json");
+          .getResponseString(
+              URI.create("https://www.wikidata.org/wiki/Special:EntityData/Q1.json"));
     }
 
     @Test
@@ -136,7 +138,8 @@ class RestWikiDataControllerTests {
       controller.searchWikidata("john cena");
       Mockito.verify(httpClientAdapter)
           .getResponseString(
-              "https://www.wikidata.org/w/api.php?action=wbsearchentities&search=john+cena&format=json&language=en&uselang=en&type=item&limit=10");
+              URI.create(
+                  "https://www.wikidata.org/w/api.php?action=wbsearchentities&search=john+cena&format=json&language=en&uselang=en&type=item&limit=10"));
     }
   }
 }

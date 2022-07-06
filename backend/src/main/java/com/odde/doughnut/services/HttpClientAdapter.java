@@ -12,11 +12,12 @@ import org.springframework.stereotype.Component;
 public class HttpClientAdapter {
   public HttpClientAdapter() {}
 
-  public String getResponseString(String url) throws IOException, InterruptedException {
-    final HttpRequest.Builder builder = HttpRequest.newBuilder(URI.create(url));
-    HttpRequest request = builder.build();
-    HttpResponse.BodyHandler<String> bodyHandler =
-        HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8);
-    return HttpClient.newBuilder().build().send(request, bodyHandler).body();
+  public String getResponseString(URI uri) throws IOException, InterruptedException {
+    return HttpClient.newBuilder()
+        .build()
+        .send(
+            HttpRequest.newBuilder(uri).build(),
+            HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8))
+        .body();
   }
 }

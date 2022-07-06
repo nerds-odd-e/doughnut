@@ -10,7 +10,6 @@ import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.annotation.SessionScope;
-import org.springframework.web.util.UriComponentsBuilder;
 
 @Component
 @SessionScope
@@ -21,9 +20,7 @@ public class TestabilitySettings {
   @Autowired GithubService githubService;
   @Getter private boolean featureToggleEnabled = false;
 
-  @Getter
-  private UriComponentsBuilder wikidataServiceUrl =
-      UriComponentsBuilder.fromHttpUrl("https://www.wikidata.org");
+  @Getter private String wikidataServiceUrl = "https://www.wikidata.org";
 
   public void timeTravelTo(Timestamp timestamp) {
     this.timestamp = timestamp;
@@ -65,8 +62,8 @@ public class TestabilitySettings {
   }
 
   public String setWikidataService(String wikidataServiceUrl) {
-    UriComponentsBuilder saved = this.wikidataServiceUrl;
-    this.wikidataServiceUrl = UriComponentsBuilder.fromHttpUrl(wikidataServiceUrl);
-    return saved.toUriString();
+    String saved = this.wikidataServiceUrl;
+    this.wikidataServiceUrl = wikidataServiceUrl;
+    return saved;
   }
 }

@@ -7,6 +7,7 @@ import com.odde.doughnut.entities.Note;
 import com.odde.doughnut.entities.json.WikidataEntity;
 import com.odde.doughnut.entities.json.WikidataSearchEntity;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -18,10 +19,14 @@ import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.util.UriComponentsBuilder;
 
-public record WikidataService(
-    HttpClientAdapter httpClientAdapter, UriComponentsBuilder wikidataUriBuilder) {
+public record WikidataService(HttpClientAdapter httpClientAdapter, String wikidataUrl) {
+  private UriComponentsBuilder wikidataUriBuilder() {
+    return UriComponentsBuilder.fromHttpUrl(wikidataUrl);
+  }
+
   public WikidataEntity fetchWikiData(String wikiDataId) throws IOException, InterruptedException {
     String responseBody = httpClientAdapter.getResponseString(ConstructWikiDataUrl(wikiDataId));
+    if (responseBody == null) return null;
     WikiDataModel wikiDataModel =
         getObjectMapper().readValue(responseBody, new TypeReference<>() {});
     WikiDataInfo wikiDataInfo = wikiDataModel.entities.get(wikiDataId);
@@ -29,10 +34,11 @@ public record WikidataService(
         wikiDataInfo.GetEnglishTitle(), wikiDataInfo.GetEnglishWikipediaUrl());
   }
 
-  private String ConstructWikiDataUrl(String wikiDataId) {
-    return wikidataUriBuilder
+  private URI ConstructWikiDataUrl(String wikiDataId) {
+    return wikidataUriBuilder()
         .path("/wiki/Special:EntityData/" + wikiDataId + ".json")
-        .toUriString();
+        .build()
+        .toUri();
   }
 
   private ObjectMapper getObjectMapper() {
@@ -62,8 +68,8 @@ public record WikidataService(
 
   public List<WikidataSearchEntity> fetchWikidataByQuery(String search)
       throws IOException, InterruptedException {
-    String url =
-        wikidataUriBuilder
+    URI uri =
+        wikidataUriBuilder()
             .path("/w/api.php")
             .queryParam("action", "wbsearchentities")
             .queryParam("search", URLEncoder.encode(search, StandardCharsets.UTF_8))
@@ -73,8 +79,8 @@ public record WikidataService(
             .queryParam("type", "item")
             .queryParam("limit", 10)
             .build()
-            .toUriString();
-    String responseBody = httpClientAdapter.getResponseString(url);
+            .toUri();
+    String responseBody = httpClientAdapter.getResponseString(uri);
     WikidataSearchModel entities =
         getObjectMapper().readValue(responseBody, new TypeReference<>() {});
     return entities.getWikidataSearchEntities();

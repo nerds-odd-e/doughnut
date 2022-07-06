@@ -19,6 +19,7 @@ import com.odde.doughnut.services.HttpClientAdapter;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
+import java.net.URI;
 import java.sql.Timestamp;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -155,12 +156,19 @@ class RestNoteControllerTests {
         throws NoAccessRightException, BindException, InterruptedException, IOException {
       Mockito.when(httpClientAdapter.getResponseString(any()))
           .thenReturn(new MakeMe().wikidataEntityJson().entityId("Q12345").please());
-      String wikidataId = "Q12345";
-      noteCreation.setWikidataId(wikidataId);
-
+      noteCreation.setWikidataId("Q12345");
       NoteRealmWithPosition response = controller.createNote(parent, noteCreation);
+      assertThat(response.noteRealm.getNote().getWikidataId(), equalTo("Q12345"));
+    }
 
-      assertThat(response.noteRealm.getNote().getWikidataId(), equalTo(wikidataId));
+    @Test
+    void shouldCallTheCorrectApi()
+        throws NoAccessRightException, BindException, InterruptedException, IOException {
+      noteCreation.setWikidataId("Q12345");
+      controller.createNote(parent, noteCreation);
+      Mockito.verify(httpClientAdapter)
+          .getResponseString(
+              URI.create("https://www.wikidata.org/wiki/Special:EntityData/Q12345.json"));
     }
 
     @Test
