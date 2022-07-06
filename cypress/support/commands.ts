@@ -362,7 +362,7 @@ Cypress.Commands.add("initialReviewNotes", (noteTitles) => {
 })
 
 Cypress.Commands.add("repeatReviewNotes", (noteTitles: string) => {
-  if(noteTitles.trim() === "") return
+  if (noteTitles.trim() === "") return
   cy.routerToRepeatReview()
   noteTitles.commonSenseSplit(",").forEach((title) => {
     if (title == "end") {

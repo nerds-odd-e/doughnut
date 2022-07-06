@@ -24,7 +24,6 @@ import org.springframework.validation.BindException;
 class RestWikiDataControllerTests {
   RestWikidataController controller;
   @Mock HttpClientAdapter httpClientAdapter;
-
   TestabilitySettings testabilitySettings = new TestabilitySettings();
 
   @BeforeEach
@@ -37,25 +36,11 @@ class RestWikiDataControllerTests {
   class FetchWikiData {
 
     private String getEntityDataJsonSearch(String search) {
-      return "{\"searchinfo\":{\"search\":\""
-          + search
-          + "\"},\"search\":[{\"id\":\"Q64\",\"title\":\"Q64\",\"pageid\":190,\"display\""
-          + ":{\"label\":{\"value\":\""
-          + search
-          + "\",\"language\":\"en\"},\"description\":{\"value\":\"federal state, capital and largest city of Germany\""
-          + ",\"language\":\"en\"}},\"repository\":\"wikidata\",\"url\":\"//www.wikidata.org/wiki/Q64\",\"concepturi\":"
-          + "\"http://www.wikidata.org/entity/Q64\",\"label\":\""
-          + search
-          + "\",\"description\":\"federal state, capital and largest city of Germany\""
-          + ",\"match\":{\"type\":\"label\",\"language\":\"en\",\"text\":\""
-          + search
-          + "\"}}],\"search-continue\":10,\"success\":1}";
+      return getString(search, "{\"id\":\"Q64\",\"label\":\"" + search + "\"" + "}");
     }
 
-    private String getEntityDataJsonSearchEmpty(String search) {
-      return "{\"searchinfo\":{\"search\":\""
-          + search
-          + "\"},\"search\":[],\"search-continue\":10,\"success\":1}";
+    private String getString(String search, String entity) {
+      return "{\"searchinfo\":{\"search\":\"" + search + "\"},\"search\":[" + entity + "]}";
     }
 
     @Test
@@ -138,14 +123,20 @@ class RestWikiDataControllerTests {
     @Test
     void shouldReturnEmptyAtSearchWikidata()
         throws IOException, InterruptedException, BindException {
+      Mockito.when(httpClientAdapter.getResponseString(any())).thenReturn(getString("key", ""));
+      ArrayList<WikidataSearchEntity> result = controller.searchWikidata("key");
+      assertThat(result.size(), is(0));
+    }
 
+    @Test
+    void shouldUseTheProperlyEncodedSearchKey()
+        throws IOException, InterruptedException, BindException {
       Mockito.when(httpClientAdapter.getResponseString(any()))
-          .thenReturn(getEntityDataJsonSearchEmpty("john cena"));
-      ArrayList<WikidataSearchEntity> result = controller.searchWikidata("john cena");
+          .thenReturn(getString("john cena", ""));
+      controller.searchWikidata("john cena");
       Mockito.verify(httpClientAdapter)
           .getResponseString(
               "https://www.wikidata.org/w/api.php?action=wbsearchentities&search=john+cena&format=json&errorformat=plaintext&language=en&uselang=en&type=item&limit=10");
-      assertThat(result.size(), is(0));
     }
   }
 }
