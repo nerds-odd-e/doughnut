@@ -11,7 +11,7 @@ import com.odde.doughnut.services.HttpClientAdapter;
 import com.odde.doughnut.testability.MakeMe;
 import com.odde.doughnut.testability.TestabilitySettings;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -116,7 +116,7 @@ class RestWikiDataControllerTests {
         throws IOException, InterruptedException, BindException {
       Mockito.when(httpClientAdapter.getResponseString(any()))
           .thenReturn(getEntityDataJsonSearch("berlin"));
-      ArrayList<WikidataSearchEntity> result = controller.searchWikidata("berlin");
+      List<WikidataSearchEntity> result = controller.searchWikidata("berlin");
       assertThat(result.get(0).label, equalTo("berlin"));
     }
 
@@ -124,7 +124,7 @@ class RestWikiDataControllerTests {
     void shouldReturnEmptyAtSearchWikidata()
         throws IOException, InterruptedException, BindException {
       Mockito.when(httpClientAdapter.getResponseString(any())).thenReturn(getString("key", ""));
-      ArrayList<WikidataSearchEntity> result = controller.searchWikidata("key");
+      List<WikidataSearchEntity> result = controller.searchWikidata("key");
       assertThat(result.size(), is(0));
     }
 
@@ -136,7 +136,7 @@ class RestWikiDataControllerTests {
       controller.searchWikidata("john cena");
       Mockito.verify(httpClientAdapter)
           .getResponseString(
-              "https://www.wikidata.org/w/api.php?action=wbsearchentities&search=john+cena&format=json&errorformat=plaintext&language=en&uselang=en&type=item&limit=10");
+              "https://www.wikidata.org/w/api.php?action=wbsearchentities&search=john+cena&format=json&language=en&uselang=en&type=item&limit=10");
     }
   }
 }
