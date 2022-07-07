@@ -23,11 +23,11 @@
       </template>
     </ProgressBar>
     <InitialReview
-      v-if="reviewPoint"
-      v-bind="{ minimized, reviewPoint }"
+      v-if="!minimized && reviewPoint"
+      v-bind="{ reviewPoint }"
       @initial-review-done="initialReviewDone"
       @reload-needed="onReloadNeeded"
-      :key="reviewPoint?.thing?.id"
+      :key="reviewPoint.thing.id"
     />
   </ContainerPage>
 </template>

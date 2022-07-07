@@ -1,17 +1,15 @@
 <template>
   <ContainerPage v-bind="{ loading, contentExists: true }">
-    <template v-if="!minimized">
-      <ShowReviewPoint
-        v-bind="{ reviewPoint, expandInfo: true }"
-        @level-changed="$emit('reloadNeeded', $event)"
-        @note-deleted="$emit('reloadNeeded', $event)"
-        @link-deleted="$emit('reloadNeeded', $event)"
-      />
-      <InitialReviewButtons
-        :key="buttonKey"
-        @do-initial-review="processForm($event)"
-      />
-    </template>
+    <ShowReviewPoint
+      v-bind="{ reviewPoint, expandInfo: true }"
+      @level-changed="$emit('reloadNeeded', $event)"
+      @note-deleted="$emit('reloadNeeded', $event)"
+      @link-deleted="$emit('reloadNeeded', $event)"
+    />
+    <InitialReviewButtons
+      :key="buttonKey"
+      @do-initial-review="processForm($event)"
+    />
   </ContainerPage>
 </template>
 
@@ -29,7 +27,6 @@ export default defineComponent({
     return { ...useLoadingApi(), ...usePopups() };
   },
   props: {
-    minimized: Boolean,
     reviewPoint: {
       type: Object as PropType<Generated.ReviewPoint>,
       required: true,
