@@ -1,6 +1,6 @@
 <template>
   <ContainerPage v-bind="{ loading, contentExists: true }">
-    <template v-if="!nested">
+    <template v-if="!minimized">
       <ShowReviewPoint
         v-bind="{ reviewPoint, expandInfo: true }"
         @level-changed="$emit('reloadNeeded', $event)"
@@ -29,7 +29,7 @@ export default defineComponent({
     return { ...useLoadingApi(), ...usePopups() };
   },
   props: {
-    nested: Boolean,
+    minimized: Boolean,
     reviewPoint: {
       type: Object as PropType<Generated.ReviewPoint>,
       required: true,

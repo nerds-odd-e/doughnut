@@ -11,7 +11,7 @@
       >
       </RepeatProgressBar>
     </div>
-    <template v-if="!nested">
+    <template v-if="!minimized">
       <template v-if="repetition">
         <QuizQuestion
           v-bind="{
@@ -43,7 +43,7 @@ export default defineComponent({
     return useLoadingApi();
   },
   name: "RepeatPage",
-  props: { nested: Boolean },
+  props: { minimized: Boolean },
   components: {
     QuizQuestion,
     ContainerPage,

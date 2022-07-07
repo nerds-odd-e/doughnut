@@ -76,7 +76,7 @@ describe("repeat page", () => {
       .expectingGet("/api/reviews/initial")
       .andReturnOnce([reviewPoint]);
     const wrapper = renderer
-      .withProps({ nested: true })
+      .withProps({ minimized: true })
       .currentRoute({ name: "initial" })
       .mount();
     await flushPromises();
@@ -94,7 +94,7 @@ describe("repeat page", () => {
       .expectingGet("/api/reviews/initial")
       .andReturnOnce([reviewPoint]);
     const wrapper = renderer
-      .withProps({ nested: true })
+      .withProps({ minimized: true })
       .currentRoute({ name: "initial" })
       .mount();
     await flushPromises();

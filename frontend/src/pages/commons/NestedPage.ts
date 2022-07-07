@@ -32,7 +32,7 @@ function NestedPage(
     },
     render() {
       return h("div", { class: "inner-box" }, [
-        h(WrappedComponent, { ...this.$props, nested: this.isNested }),
+        h(WrappedComponent, { ...this.$props, minimized: this.isNested }),
         h(RouterView, {}),
       ]);
     },

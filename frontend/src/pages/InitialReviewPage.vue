@@ -6,14 +6,14 @@
     }"
   >
     <ProgressBar
-      :class="nested ? 'initial-review-paused' : ''"
+      :class="minimized ? 'initial-review-paused' : ''"
       v-bind="{
         title: `Initial Review: `,
         finished,
         toRepeatCount: remainingInitialReviewCountForToday,
       }"
     >
-      <template #default v-if="nested">
+      <template #default v-if="minimized">
         <div style="display: flex" @click="resume">
           <a title="Go back to review">
             <SvgResume width="30" height="30" />
@@ -24,7 +24,7 @@
     </ProgressBar>
     <InitialReview
       v-if="reviewPoint"
-      v-bind="{ nested, reviewPoint }"
+      v-bind="{ minimized, reviewPoint }"
       @initial-review-done="initialReviewDone"
       @reload-needed="onReloadNeeded"
       :key="reviewPoint?.thing?.id"
@@ -46,7 +46,7 @@ export default defineComponent({
   setup() {
     return { ...useLoadingApi() };
   },
-  props: { nested: Boolean },
+  props: { minimized: Boolean },
   components: {
     ContainerPage,
     InitialReview,
