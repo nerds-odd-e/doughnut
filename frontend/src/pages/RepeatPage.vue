@@ -71,7 +71,6 @@ export default defineComponent({
   methods: {
     loadNew(resp?: Generated.RepetitionForUser) {
       this.repetition = resp;
-      this.$router.push({ name: "repeat-quiz" });
     },
 
     viewLastResult(cursor: number | undefined) {
@@ -84,21 +83,20 @@ export default defineComponent({
       this.$router.push({ name: "repeat" });
     },
 
-    fetchData() {
-      this.api.reviewMethods
-        .getNextReviewItem()
-        .then(this.loadNew)
-        .catch(() => {
-          this.repetition = undefined;
-          if (this.finished === 0) {
-            this.$router.push({ name: "reviews" });
-          }
-        });
+    async fetchData() {
+      try {
+        this.repetition = await this.api.reviewMethods.getNextReviewItem();
+      } catch (_e) {
+        this.repetition = undefined;
+        if (this.finished === 0) {
+          this.$router.push({ name: "reviews" });
+        }
+      }
     },
 
     onAnswered(answerResult: Generated.AnswerResult) {
       this.previousResults.push(answerResult);
-      this.loadNew(answerResult.nextRepetition);
+      this.repetition = answerResult.nextRepetition;
       if (answerResult.correct) {
         return;
       }

@@ -38,12 +38,6 @@ describe("repeat page", () => {
     expect(mockRouterPush).toHaveBeenCalledWith({ name: "reviews" });
   });
 
-  it("replace route with repeat/quiz if there is a quiz", async () => {
-    const repetition = makeMe.aRepetition.withQuestion().please();
-    await mountPage(repetition);
-    expect(mockRouterPush).toHaveBeenCalledWith({ name: "repeat-quiz" });
-  });
-
   describe('repeat page with "just review" quiz', () => {
     let repetition: Generated.RepetitionForUser;
 
@@ -56,13 +50,6 @@ describe("repeat page", () => {
       helper.apiMock
         .expectingGet(`/api/review-points/${reviewPoint.id}`)
         .andReturnOnce(reviewPoint);
-    });
-
-    it("stay at repeat page if there is no quiz", async () => {
-      await mountPage(repetition);
-      expect(mockRouterPush).toHaveBeenCalledWith({
-        name: "repeat-quiz",
-      });
     });
 
     it("should call the answer api", async () => {

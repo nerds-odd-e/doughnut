@@ -16,9 +16,7 @@ function NestedPage(
       isNested() {
         if (this.$route) {
           const routeParts = this.$route?.name?.toString().split("-");
-          return (
-            routeParts && routeParts.length > 1 && routeParts[1] !== "quiz"
-          );
+          return routeParts && routeParts.length > 1;
         }
         return true;
       },

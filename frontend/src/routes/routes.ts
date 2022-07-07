@@ -8,7 +8,6 @@ import NoteShowMindmapPage from "@/pages/NoteShowMindmapPage.vue";
 import NoteShowArticlePage from "@/pages/NoteShowArticlePage.vue";
 import ReviewHome from "@/pages/ReviewHome.vue";
 import RepeatPage from "@/pages/RepeatPage.vue";
-import DoingQuiz from "@/pages/DoingQuiz.vue";
 import InitialReviewPage from "@/pages/InitialReviewPage.vue";
 import CircleShowPage from "@/pages/CircleShowPage.vue";
 import CircleJoinPage from "@/pages/CircleJoinPage.vue";
@@ -92,10 +91,7 @@ const routes = [
     path: "/reviews/repeat",
     name: "repeat",
     component: NestedRepeatPage,
-    children: [
-      ...nestedNoteAndLinkRoutes("repeat-"),
-      { path: "quiz", name: "repeat-quiz", component: DoingQuiz },
-    ],
+    children: [...nestedNoteAndLinkRoutes("repeat-")],
   },
   {
     path: "/failure-report-list",
