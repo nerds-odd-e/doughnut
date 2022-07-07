@@ -99,10 +99,6 @@ Then("choose to remove it fromm reviews", () => {
   cy.findByRole("button", { name: "Remove This Note from Review" }).click()
 })
 
-Then("I choose the happy option", () => {
-  cy.get("#repeat-happy").click()
-})
-
 Then("I choose yes I remember", () => {
   cy.yesIRemember()
 })

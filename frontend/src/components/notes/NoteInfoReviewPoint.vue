@@ -20,7 +20,6 @@
   <div class="btn-group" role="group" aria-label="First group">
     <button
       class="btn"
-      id="repeat-sad"
       name="sad"
       @click="selfEvaluate(-5)"
       title="reduce next repeat interval (days) by half"
@@ -29,7 +28,6 @@
     </button>
     <button
       class="btn"
-      id="repeat-happy"
       name="happy"
       @click="selfEvaluate(5)"
       title="add to next repeat interval (days) by half"

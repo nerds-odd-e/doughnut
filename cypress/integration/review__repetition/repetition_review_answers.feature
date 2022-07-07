@@ -21,7 +21,6 @@ Feature: Repetition Quiz
     And I should see the info of note "sedition"
       | Repetition Count |
       | 1                |
-    When I choose the happy option
 
   Scenario: I can remove a note from further reviews
     Given I learned one note "sedition" on day 1
