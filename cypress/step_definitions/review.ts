@@ -9,13 +9,13 @@ Then("I do these initial reviews in sequence:", (data) => {
 })
 
 Given("It's day {int}, {int} hour", (day, hour) => {
-  cy.testability().timeTravelTo(day, hour)
+  cy.testability().backendTimeTravelTo(day, hour)
 })
 
 Then(
   "On day {int} I repeat old {string} and initial review new {string}",
   (day, repeatNotes, initialNotes) => {
-    cy.testability().timeTravelTo(day, 8)
+    cy.testability().backendTimeTravelTo(day, 8)
 
     cy.repeatReviewNotes(repeatNotes)
     cy.initialReviewNotes(initialNotes)
@@ -61,22 +61,22 @@ Then("I initial review {string}", (noteTitle) => {
 
 Then("I added and learned one note {string} on day {int}", (noteTitle, day) => {
   cy.testability().seedNotes([{ title: noteTitle }])
-  cy.testability().timeTravelTo(day, 8)
+  cy.testability().backendTimeTravelTo(day, 8)
   cy.initialReviewNotes(noteTitle)
 })
 
 Then("I learned one note {string} on day {int}", (noteTitle, day) => {
-  cy.testability().timeTravelTo(day, 8)
+  cy.testability().backendTimeTravelTo(day, 8)
   cy.initialReviewNotes(noteTitle)
 })
 
 Then("I am repeat-reviewing my old note on day {int}", (day) => {
-  cy.testability().timeTravelTo(day, 8)
+  cy.testability().backendTimeTravelTo(day, 8)
   cy.routerToRepeatReview()
 })
 
 Then("I am learning new note on day {int}", (day) => {
-  cy.testability().timeTravelTo(day, 8)
+  cy.testability().backendTimeTravelTo(day, 8)
   cy.routerToInitialReview()
 })
 

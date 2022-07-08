@@ -59,7 +59,7 @@ const addDays = function (date: Date, days: number) {
 }
 
 Cypress.Commands.add(
-  "timeTravelTo",
+  "backendTimeTravelTo",
   { prevSubject: true },
   (testability: TestabilityHelper, day: number, hour: number) => {
     const travelTo = addDays(new Date(1976, 5, 1, hour), day)

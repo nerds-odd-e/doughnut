@@ -334,8 +334,12 @@ Cypress.Commands.add("routerToInitialReview", () => {
   cy.routerPush("/reviews/initial", "initial", {})
 })
 
-Cypress.Commands.add("routerToReviews", () => {
+Cypress.Commands.add("routerToRoot", () => {
   cy.routerPush("/", "root", {})
+})
+
+Cypress.Commands.add("routerToReviews", () => {
+  cy.routerToRoot()
   cy.routerPush("/reviews", "reviews", {})
 })
 
