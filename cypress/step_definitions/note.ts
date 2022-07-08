@@ -63,9 +63,10 @@ Given(
   },
 )
 
-When("I update note {string} with the description {string}", (noteTitle, newDescription) => {
+When("I update note {string} with description {string}", (noteTitle, newDescription) => {
   cy.jumpToNotePage(noteTitle)
   cy.inPlaceEdit({ Description: newDescription })
+  cy.expectCurrentNoteDescription(newDescription)
 })
 
 When("I create a note belonging to {string}:", (noteTitle, data) => {

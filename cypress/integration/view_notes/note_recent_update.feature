@@ -16,7 +16,7 @@ Feature: see recent note update
     And I let the server to time travel to 24 hours ago
 
   Scenario Outline: I should see new note banner on newly updated note
-    And I update note "Note1.1" with the description "<new description>"
+    And I update note "Note1.1" with description "<new description>"
     Then I should see "Note1.1" is "<aging>" than "Note2"
 
     Examples:
