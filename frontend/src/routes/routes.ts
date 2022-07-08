@@ -52,6 +52,13 @@ const noteAndLinkRoutes = [
     component: AnswerShowPage,
     props: true,
   },
+  { path: "/circles", name: "circles", component: CirclesPage },
+  {
+    path: "/circles/:circleId",
+    name: "circleShow",
+    component: CircleShowPage,
+    props: true,
+  },
 ];
 
 const nestedNoteAndLinkRoutes = (prefix: string) =>
@@ -61,13 +68,6 @@ const routes = [
   ...noteAndLinkRoutes.map((route) => ({ ...route, path: `/${route.path}` })),
   { path: "/", name: "root", component: HomePage },
   { path: "/bazaar", name: "bazaar", component: BazaarPage },
-  { path: "/circles", name: "circles", component: CirclesPage },
-  {
-    path: "/circles/:circleId",
-    name: "circleShow",
-    component: CircleShowPage,
-    props: true,
-  },
   {
     path: "/circles/join/:invitationCode",
     name: "circleJoin",
