@@ -22,6 +22,7 @@ Feature: Repetition Quiz
       | Repetition Count |
       | 1                |
 
+  @mockBrowserTime
   Scenario: I can remove a note from further reviews
     Given I learned one note "sedition" on day 1
     When I am repeat-reviewing my old note on day 2

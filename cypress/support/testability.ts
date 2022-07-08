@@ -53,6 +53,17 @@ Cypress.Commands.add(
 )
 
 Cypress.Commands.add(
+  "timeTravelTo",
+  { prevSubject: true },
+  (testability: TestabilityHelper, day: number, hour: number) => {
+    cy.wrap(testability).backendTimeTravelTo(day, hour)
+    cy.window().then((window) => {
+      cy.tick(testability.hourOfDay(day, hour).getTime() - new window.Date().getTime())
+    })
+  },
+)
+
+Cypress.Commands.add(
   "backendTimeTravelTo",
   { prevSubject: true },
   (testability: TestabilityHelper, day: number, hour: number) => {

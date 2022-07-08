@@ -37,7 +37,7 @@ Then("I should see that I have new notes to learn", () => {
 Then(
   "On day {int} I should have {string} note for initial review and {string} for repeat",
   (day, numberOfInitialReviews, numberOfRepeats) => {
-    cy.testability().backendTimeTravelTo(day, 8)
+    cy.testability().timeTravelTo(day, 8)
     cy.routerToReviews()
     cy.findByText(numberOfInitialReviews, {
       selector: ".number-of-initial-reviews",
