@@ -25,7 +25,13 @@ Before({ tags: "@mockBrowserTime" }, () => {
   // the event, eg. click, will not work.
   //
   cy.testability().then((testability: TestabilityHelper) => {
-    cy.clock(testability.hourOfDay(0, 0), ["setTimeout", "setInterval", "Date"])
+    cy.clock(testability.hourOfDay(0, 0), [
+      "setTimeout",
+      "setInterval",
+      "clearInterval",
+      "clearTimeout",
+      "Date",
+    ])
   })
 })
 

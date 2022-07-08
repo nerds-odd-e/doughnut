@@ -62,7 +62,7 @@ export default {
     <UserNewRegisterPage v-if="newUser" />
     <template v-else>
       <div class="header">
-        <ReviewDoughnut :review-data="reviewData" />
+        <ReviewDoughnut v-if="user" :review-data="reviewData" />
         <MainMenu v-if="showNavBar" />
       </div>
       <div v-if="!loading" class="content">

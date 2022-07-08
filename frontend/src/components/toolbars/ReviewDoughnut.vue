@@ -19,15 +19,22 @@ export default {
   data() {
     return {
       reviewing: null,
+      timer: null,
     };
   },
   methods: {
     fetchData() {
       this.api.reviewMethods.overview().then((res) => (this.reviewing = res));
+      this.timer = setTimeout(() => {
+        this.fetchData();
+      }, 12 * 60 * 60 * 1000);
     },
   },
   mounted() {
     this.fetchData();
+  },
+  beforeUnmount() {
+    clearTimeout(this.timer);
   },
 };
 </script>
