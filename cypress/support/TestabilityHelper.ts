@@ -4,7 +4,9 @@
 
 class TestabilityHelper {
   hourOfDay(days: number, hours: number) {
-    return new Date(1976, 5, 1 + days, hours);
+    const newDate = new Date(new Date(1976, 5, 1, hours).valueOf())
+    newDate.setDate(newDate.getDate() + days)
+    return newDate
   }
 
   seedLink(
