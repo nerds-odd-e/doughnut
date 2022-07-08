@@ -23,11 +23,22 @@ export default {
     };
   },
   methods: {
+    timeToRefresh() {
+      const now = new Date();
+      return (
+        new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          now.getDate(),
+          (Math.floor(now.getHours() / 12) + 1) * 12
+        ).getTime() - now.getTime()
+      );
+    },
     fetchData() {
       this.api.reviewMethods.overview().then((res) => (this.reviewing = res));
       this.timer = setTimeout(() => {
         this.fetchData();
-      }, 12 * 60 * 60 * 1000);
+      }, this.timeToRefresh());
     },
   },
   mounted() {
