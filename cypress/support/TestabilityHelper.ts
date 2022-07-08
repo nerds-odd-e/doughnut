@@ -3,6 +3,9 @@
 // @ts-check
 
 class TestabilityHelper {
+  hourOfDay(days: number, hours: number) {
+    return new Date(1976, 5, 1 + days, hours)
+  }
   seedLink(
     cy: Cypress.cy & CyEventEmitter,
     type: string,
