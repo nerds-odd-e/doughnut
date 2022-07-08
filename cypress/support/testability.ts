@@ -74,7 +74,7 @@ Cypress.Commands.add(
 )
 
 Cypress.Commands.add(
-  "timeTravelRelativeToNow",
+  "backendTimeTravelRelativeToNow",
   { prevSubject: true },
   (testability: TestabilityHelper, hours: number) => {
     testability.postToTestabilityApiSuccessfully(cy, "time_travel_relative_to_now", {

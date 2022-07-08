@@ -54,6 +54,7 @@ export default defineComponent({
     ReviewPointAbbr,
     SvgResume,
   },
+  emits: ["update-reviewing"],
   data() {
     return {
       finished: 0,

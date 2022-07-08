@@ -4,6 +4,7 @@ import MainMenu from "./components/commons/MainMenu.vue";
 import UserNewRegisterPage from "./pages/UserNewRegisterPage.vue";
 import useStoredLoadingApi from "./managedApi/useStoredLoadingApi";
 import usePopups from "./components/commons/Popups/usePopup";
+import ReviewDoughnut from "./components/toolbars/ReviewDoughnut.vue";
 
 export default {
   setup() {
@@ -14,12 +15,13 @@ export default {
   },
   data() {
     return {
+      reviewData: null,
       externalIdentifier: null,
       showNavBar: true,
     };
   },
 
-  components: { Popups, MainMenu, UserNewRegisterPage },
+  components: { Popups, MainMenu, UserNewRegisterPage, ReviewDoughnut },
 
   watch: {
     $route(to) {
@@ -60,10 +62,11 @@ export default {
     <UserNewRegisterPage v-if="newUser" />
     <template v-else>
       <div class="header">
+        <ReviewDoughnut :review-data="reviewData" />
         <MainMenu v-if="showNavBar" />
       </div>
       <div v-if="!loading" class="content">
-        <router-view />
+        <router-view @update-reviewing="reviewData = $event" />
       </div>
     </template>
   </div>
