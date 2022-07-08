@@ -52,12 +52,19 @@ Cypress.Commands.add(
   },
 )
 
+const addDays = function (date: Date, days: number) {
+  const newDate = new Date(date.valueOf())
+  newDate.setDate(newDate.getDate() + days)
+  return newDate
+}
+
 Cypress.Commands.add(
   "backendTimeTravelTo",
   { prevSubject: true },
   (testability: TestabilityHelper, day: number, hour: number) => {
+    const travelTo = addDays(new Date(1976, 5, 1, hour), day)
     testability.postToTestabilityApiSuccessfully(cy, "time_travel", {
-      body: { travel_to: JSON.stringify(testability.hourOfDay(day, hour)) },
+      body: { travel_to: JSON.stringify(travelTo) },
     })
   },
 )

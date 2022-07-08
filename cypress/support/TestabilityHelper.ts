@@ -3,12 +3,6 @@
 // @ts-check
 
 class TestabilityHelper {
-  hourOfDay(days: number, hours: number) {
-    const newDate = new Date(new Date(1976, 5, 1, hours).valueOf())
-    newDate.setDate(newDate.getDate() + days)
-    return newDate
-  }
-
   seedLink(
     cy: Cypress.cy & CyEventEmitter,
     type: string,
