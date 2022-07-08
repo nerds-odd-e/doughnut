@@ -34,11 +34,9 @@ export default {
         ).getTime() - now.getTime()
       );
     },
-    fetchData() {
-      this.api.reviewMethods.overview().then((res) => (this.reviewing = res));
-      this.timer = setTimeout(() => {
-        this.fetchData();
-      }, this.timeToRefresh());
+    async fetchData() {
+      this.reviewing = await this.api.reviewMethods.overview();
+      this.timer = setTimeout(this.fetchData, this.timeToRefresh());
     },
   },
   mounted() {

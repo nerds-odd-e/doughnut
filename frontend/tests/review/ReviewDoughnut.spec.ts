@@ -32,6 +32,7 @@ describe("repetition page", () => {
     it("refreshes", async () => {
       jest.setSystemTime(new Date(2020, 1, 1, 10, 30));
       helper.component(ReviewDoughnut).mount();
+      await flushPromises();
       helper.apiMock.expectingGet("/api/reviews/overview");
       jest.advanceTimersToNextTimer();
       expect(new Date()).toEqual(new Date(2020, 1, 1, 12));
