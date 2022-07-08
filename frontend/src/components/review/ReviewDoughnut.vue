@@ -34,9 +34,8 @@ export default {
         ).getTime() - now.getTime()
       );
     },
-    async fetchData() {
-      await this.api.reviewMethods.overview();
-      clearTimeout(this.timer);
+    fetchData() {
+      this.api.reviewMethods.overview().then((res) => (this.reviewing = res));
       this.timer = setTimeout(() => {
         this.fetchData();
       }, this.timeToRefresh());
