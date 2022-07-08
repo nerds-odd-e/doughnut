@@ -52,9 +52,9 @@ const noteAndLinkRoutes = [
     component: AnswerShowPage,
     props: true,
   },
-  { path: "/circles", name: "circles", component: CirclesPage },
+  { path: "circles", name: "circles", component: CirclesPage },
   {
-    path: "/circles/:circleId",
+    path: "circles/:circleId",
     name: "circleShow",
     component: CircleShowPage,
     props: true,

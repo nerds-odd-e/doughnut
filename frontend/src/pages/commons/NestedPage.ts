@@ -22,7 +22,7 @@ function NestedPage(
       },
     },
     beforeRouteEnter(to, _from, next) {
-      next(() => routerScopeGuard(scopeName)(to, next));
+      routerScopeGuard(scopeName)(to, next);
     },
     beforeRouteUpdate(to, _from, next) {
       routerScopeGuard(scopeName)(to, next);
