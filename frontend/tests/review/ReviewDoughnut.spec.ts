@@ -7,7 +7,7 @@ import helper from "../helpers";
 
 helper.resetWithApiMock(beforeEach, afterEach);
 
-describe("repetition page", () => {
+describe("review doughnut", () => {
   describe("repetition page for a link", () => {
     beforeEach(async () => {
       jest.useFakeTimers();

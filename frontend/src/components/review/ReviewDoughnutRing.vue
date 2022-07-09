@@ -1,30 +1,27 @@
 <template>
-  <svg class="doughnut-ring" viewBox="0 0 100 100" width="100" height="100">
-    <g class="initial-review">
-      <path
-        id="initial-curve"
-        d="M50 10,A40 40 3 1 1,10 50"
-        stroke="#3BAFDA"
-        fill="none"
-        stroke-width="20"
-      />
-
-      <text>
-        <textPath
-          startOffset="50%"
-          text-anchor="middle"
-          alignment-baseline="middle"
-          xlink:href="#initial-curve"
-        >
-          {{ `${reviewing.toInitialReviewCount}/${reviewing.notLearntCount}` }}
-        </textPath>
-      </text>
-    </g>
+  <svg class="doughnut-ring" viewBox="-50 -50 100 100" width="100" height="100">
+    <ReviewDoughnutRingPiece
+      class="initial-review"
+      name="initial"
+      :start-point="startPoint"
+      :end-point="endPoint"
+      :text="`${reviewing.toInitialReviewCount}/${reviewing.notLearntCount}`"
+    />
+    <ReviewDoughnutRingPiece
+      class="repeat-review"
+      name="repeat"
+      :start-point="endPoint"
+      :end-point="startPoint"
+      :text="`${reviewing.toInitialReviewCount}/${reviewing.notLearntCount}`"
+    />
   </svg>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
+import ReviewDoughnutRingPiece from "./ReviewDoughnutRingPiece.vue";
+
+const radius = 40;
 
 export default defineComponent({
   props: {
@@ -33,6 +30,15 @@ export default defineComponent({
       required: true,
     },
   },
+  computed: {
+    startPoint() {
+      return `0 ${-radius}`;
+    },
+    endPoint() {
+      return `0 ${radius}`;
+    },
+  },
+  components: { ReviewDoughnutRingPiece },
 });
 </script>
 
@@ -47,5 +53,14 @@ export default defineComponent({
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
+  transform: rotate(45deg);
+}
+
+.initial-review {
+  stroke: #3bafda;
+}
+
+.repeat-review {
+  stroke: #3baf3a;
 }
 </style>
