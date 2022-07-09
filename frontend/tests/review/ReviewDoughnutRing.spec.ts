@@ -43,4 +43,20 @@ describe("doughnut ring", () => {
       "A40 40 0 0 1,0 -40"
     );
   });
+
+  it("draw the rings when nothing to initial or repeat", async () => {
+    const reviewing = {
+      learntCount: 0,
+      notLearntCount: 0,
+      toRepeatCount: 0,
+      toInitialReviewCount: 0,
+    } as Generated.ReviewStatus;
+    const wrapper = mount(ReviewDoughnutRing, {
+      propsData: { reviewing },
+    });
+    expect(wrapper.find("#initial-curve").attributes("d")).toContain("M0 -40");
+    expect(wrapper.find("#initial-curve").attributes("d")).toContain(
+      ",0.00 40.00"
+    );
+  });
 });

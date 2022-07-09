@@ -38,11 +38,17 @@ export default defineComponent({
     },
     endPoint() {
       const angle =
-        (Math.PI * this.reviewing.toInitialReviewCount) /
-        (this.reviewing.toInitialReviewCount + this.reviewing.toRepeatCount);
+        (Math.PI * this.flooredToInitialReviewCount) /
+        (this.flooredToInitialReviewCount + this.flooredToRepeatCount);
       return `${(Math.cos(angle) * radius).toFixed(2)} ${(
         Math.sin(angle) * radius
       ).toFixed(2)}`;
+    },
+    flooredToInitialReviewCount() {
+      return Math.max(1, this.reviewing.toInitialReviewCount);
+    },
+    flooredToRepeatCount() {
+      return Math.max(1, this.reviewing.toRepeatCount);
     },
   },
   components: { ReviewDoughnutRingPiece },
