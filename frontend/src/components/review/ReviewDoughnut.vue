@@ -1,15 +1,13 @@
 <template>
-  <div v-if="reviewing" v-bind="{ reviewing }">
-    <span class="doughnut-initial-reviews">
-      {{ `${reviewing.toInitialReviewCount}/${reviewing.notLearntCount}` }}
-    </span>
-  </div>
+  <ReviewDoughnutRing v-if="reviewing" :reviewing="reviewing" />
 </template>
 
-<script>
+<script lang="ts">
+import { defineComponent } from "vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
+import ReviewDoughnutRing from "./ReviewDoughnutRing.vue";
 
-export default {
+export default defineComponent({
   setup() {
     return useLoadingApi();
   },
@@ -18,8 +16,8 @@ export default {
   },
   data() {
     return {
-      reviewing: null,
-      timer: null,
+      reviewing: undefined as undefined | Generated.ReviewStatus,
+      timer: null as null | NodeJS.Timeout,
     };
   },
   methods: {
@@ -43,7 +41,24 @@ export default {
     this.fetchData();
   },
   beforeUnmount() {
-    clearTimeout(this.timer);
+    if (this.timer) {
+      clearTimeout(this.timer);
+    }
   },
-};
+  components: { ReviewDoughnutRing },
+});
 </script>
+
+<style lang="scss" scoped>
+.doughnut-ring {
+  font-size: 0.8rem;
+  font-weight: bold;
+  color: #fff;
+  background-color: #000;
+  padding: 0.2rem 0.5rem;
+  border-radius: 0.5rem;
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+}
+</style>

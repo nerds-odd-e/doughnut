@@ -18,8 +18,10 @@ const apiCollection = (managedApi: ManagedApi) => ({
       )) as Generated.ReviewPoint;
     },
 
-    overview() {
-      return managedApi.restGet(`reviews/overview`);
+    async overview() {
+      return (await managedApi.restGet(
+        `reviews/overview`
+      )) as Generated.ReviewStatus;
     },
 
     updateReviewSetting(

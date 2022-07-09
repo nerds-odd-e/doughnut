@@ -26,7 +26,7 @@ describe("repetition page", () => {
     it("fetches the data", async () => {
       const wrapper = helper.component(ReviewDoughnut).mount();
       await flushPromises();
-      expect(wrapper.find(".doughnut-initial-reviews").text()).toBe("3/6");
+      expect(wrapper.find(".doughnut-ring .initial-review").text()).toBe("3/6");
     });
 
     it("refreshes", async () => {
