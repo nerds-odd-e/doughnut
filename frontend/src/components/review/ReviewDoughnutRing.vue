@@ -4,15 +4,17 @@
       class="initial-review"
       name="initial"
       :start-point="startPoint"
+      :big-arc="true"
       :end-point="endPoint"
       :text="`${reviewing.toInitialReviewCount}/${reviewing.notLearntCount}`"
     />
     <ReviewDoughnutRingPiece
       class="repeat-review"
       name="repeat"
+      :big-arc="false"
       :start-point="endPoint"
       :end-point="startPoint"
-      :text="`${reviewing.toInitialReviewCount}/${reviewing.notLearntCount}`"
+      :text="`${reviewing.toRepeatCount}/${reviewing.learntCount}`"
     />
   </svg>
 </template>
@@ -35,7 +37,12 @@ export default defineComponent({
       return `0 ${-radius}`;
     },
     endPoint() {
-      return `0 ${radius}`;
+      const angle =
+        (Math.PI * this.reviewing.toInitialReviewCount) /
+        (this.reviewing.toInitialReviewCount + this.reviewing.toRepeatCount);
+      return `${(Math.cos(angle) * radius).toFixed(2)} ${(
+        Math.sin(angle) * radius
+      ).toFixed(2)}`;
     },
   },
   components: { ReviewDoughnutRingPiece },
@@ -53,7 +60,7 @@ export default defineComponent({
   position: absolute;
   top: 0.5rem;
   right: 0.5rem;
-  transform: rotate(45deg);
+  // transform: rotate(45deg);
 }
 
 .initial-review {
