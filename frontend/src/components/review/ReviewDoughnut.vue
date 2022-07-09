@@ -48,17 +48,3 @@ export default defineComponent({
   components: { ReviewDoughnutRing },
 });
 </script>
-
-<style lang="scss" scoped>
-.doughnut-ring {
-  font-size: 0.8rem;
-  font-weight: bold;
-  color: #fff;
-  background-color: #000;
-  padding: 0.2rem 0.5rem;
-  border-radius: 0.5rem;
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-}
-</style>
