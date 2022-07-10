@@ -5,14 +5,14 @@
         class="initial-review"
         name="initial"
         :start-point="startPoint"
-        :big-arc="true"
+        :big-arc="moreTInitialReview"
         :end-point="endPoint"
         :text="`${reviewing.toInitialReviewCount}/${reviewing.notLearntCount}`"
       />
       <ReviewDoughnutRingPiece
         class="repeat-review"
         name="repeat"
-        :big-arc="false"
+        :big-arc="!moreTInitialReview"
         :start-point="endPoint"
         :end-point="startPoint"
         :text="`${reviewing.toRepeatCount}/${reviewing.learntCount}`"
@@ -45,6 +45,9 @@ export default defineComponent({
       return `${(Math.cos(angle) * radius).toFixed(2)} ${(
         Math.sin(angle) * radius
       ).toFixed(2)}`;
+    },
+    moreTInitialReview() {
+      return this.flooredToInitialReviewCount > this.flooredToRepeatCount;
     },
     flooredToInitialReviewCount() {
       return Math.max(1, this.reviewing.toInitialReviewCount);

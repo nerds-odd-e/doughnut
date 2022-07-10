@@ -40,7 +40,7 @@ describe("doughnut ring", () => {
       ",20.00 34.64"
     );
     expect(wrapper.find("#repeat-curve").attributes("d")).toContain(
-      "A40 40 0 0 1,0 -40"
+      "A40 40 0 1 1,0 -40"
     );
   });
 
