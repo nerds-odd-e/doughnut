@@ -68,11 +68,6 @@
             >{{ user.name }}</router-link
           >
         </span>
-        <div class="form-inline my-2 my-lg-0">
-          <button class="btn btn-outline-success me-2 my-sm-0" @click="logout">
-            Logout
-          </button>
-        </div>
       </div>
     </div>
   </nav>
@@ -84,12 +79,6 @@ import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 export default {
   setup() {
     return useStoredLoadingApi();
-  },
-  methods: {
-    async logout() {
-      await this.api.userMethods.logout();
-      window.location.href = "/bazaar";
-    },
   },
   computed: {
     user() {

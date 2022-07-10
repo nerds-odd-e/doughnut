@@ -1,5 +1,10 @@
 <template>
-  <ReviewDoughnutRing v-if="reviewing" :reviewing="reviewing" />
+  <ReviewDoughnutRing
+    v-if="reviewing"
+    :reviewing="reviewing"
+    @logout="logout"
+  />
+  />
 </template>
 
 <script lang="ts">
@@ -36,6 +41,10 @@ export default defineComponent({
       this.reviewing = await this.api.reviewMethods.overview();
       this.timer = setTimeout(this.fetchData, this.timeToRefresh());
     },
+    async logout() {
+      await this.api.userMethods.logout();
+      window.location.href = "/bazaar";
+    },
   },
   mounted() {
     this.fetchData();
@@ -48,23 +57,3 @@ export default defineComponent({
   components: { ReviewDoughnutRing },
 });
 </script>
-
-<style lang="scss" scoped>
-.doughnut-ring {
-  pointer-events: none;
-  font-size: 0.8rem;
-  font-weight: bold;
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-}
-.doughnut-ring-pieces {
-  pointer-events: visiblePainted;
-  transform: rotate(45deg);
-}
-
-.login {
-  pointer-events: visiblePainted;
-  top: -20px;
-}
-</style>

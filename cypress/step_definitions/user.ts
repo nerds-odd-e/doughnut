@@ -115,7 +115,8 @@ Then("I change my name to {string}", (name) => {
 
 Then("I logout via the UI", () => {
   cy.visit("/")
-  cy.findByRole("button", { name: "Logout" }).click({ force: true })
+  cy.findByRole("button", { name: "User actions" }).click()
+  cy.findByRole("button", { name: "Logout" }).click()
 })
 
 Then("I should be on the welcome page and asked to login", () => {

@@ -13,6 +13,7 @@
   >
     <UserIconMenu
       role="button"
+      aria-label="User actions"
       class="user-icon-menu"
       style="pointer-events: visiblePainted"
     />
@@ -23,7 +24,9 @@
     aria-labelledby="dropdownMenuButton"
   >
     <router-link to="/settings">Settings</router-link>
-    <router-link to="/logout">Logout</router-link>
+    <a href="#" class="dropdown-item" role="button" @click="$emit('logout')"
+      >Logout</a
+    >
   </div>
   <svg class="doughnut-ring" viewBox="-50 -50 100 100" width="100" height="100">
     <g class="doughnut-ring-pieces">
@@ -61,6 +64,7 @@ export default defineComponent({
       required: true,
     },
   },
+  emits: ["logout"],
   computed: {
     startPoint() {
       return `0 ${-radius}`;
@@ -85,6 +89,23 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+.doughnut-ring {
+  pointer-events: none;
+  font-size: 0.8rem;
+  font-weight: bold;
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+}
+.doughnut-ring-pieces {
+  pointer-events: visiblePainted;
+  transform: rotate(45deg);
+}
+
+.login {
+  pointer-events: visiblePainted;
+  top: -20px;
+}
 .initial-review {
   stroke: #3bafda;
 }
