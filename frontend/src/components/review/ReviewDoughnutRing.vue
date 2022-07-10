@@ -18,12 +18,14 @@
         :text="`${reviewing.toRepeatCount}/${reviewing.learntCount}`"
       />
     </g>
+    <UserIconMenu class="user-icon-menu" />
   </svg>
 </template>
 
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import ReviewDoughnutRingPiece from "./ReviewDoughnutRingPiece.vue";
+import UserIconMenu from "../toolbars/UserIconMenu.vue";
 
 const radius = 40;
 
@@ -53,7 +55,7 @@ export default defineComponent({
       return Math.max(1, this.reviewing.toRepeatCount);
     },
   },
-  components: { ReviewDoughnutRingPiece },
+  components: { ReviewDoughnutRingPiece, UserIconMenu },
 });
 </script>
 
