@@ -105,7 +105,8 @@ Then("I login as {string} I should see {string}", (username, expectation) => {
 
 Then("I edit user profile", () => {
   cy.visit("/")
-  cy.get(".user-profile-link").click()
+  cy.findByRole("button", { name: "User actions" }).click()
+  cy.findByRole("button", { name: "Old Learner" }).click()
 })
 
 Then("I change my name to {string}", (name) => {

@@ -60,15 +60,6 @@
           <a class="nav-link" href="/failure-report-list">Failure Reports</a>
         </li>
       </ul>
-      <div class="d-flex" v-if="user">
-        <span style="margin-right: 10px" class="navbar-text">
-          <router-link
-            class="user-profile-link"
-            :to="{ name: 'userProfile' }"
-            >{{ user.name }}</router-link
-          >
-        </span>
-      </div>
     </div>
   </nav>
 </template>

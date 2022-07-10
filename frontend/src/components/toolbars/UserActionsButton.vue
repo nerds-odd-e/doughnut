@@ -23,7 +23,13 @@
     class="dropdown-menu dropdown-menu-end"
     aria-labelledby="dropdownMenuButton"
   >
-    <router-link to="/settings">Settings</router-link>
+    <router-link
+      class="dropdown-item"
+      role="button"
+      :to="{ name: 'userProfile' }"
+    >
+      {{ user.name }}
+    </router-link>
     <a href="#" class="dropdown-item" role="button" @click="$emit('logout')"
       >Logout</a
     >

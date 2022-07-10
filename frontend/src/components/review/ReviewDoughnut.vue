@@ -1,7 +1,6 @@
 <template>
   <UserActionsButton :user="user" @logout="logout" />
   <ReviewDoughnutRing v-if="reviewing" :reviewing="reviewing" />
-  />
 </template>
 
 <script lang="ts">
