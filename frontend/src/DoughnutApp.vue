@@ -74,7 +74,7 @@ export default {
       <div v-if="!loading" class="content">
         <router-view @update-reviewing="reviewData = $event" />
       </div>
-      <ReviewDoughnut v-if="user" :review-data="reviewData" />
+      <ReviewDoughnut v-if="user" :user="user" :review-data="reviewData" />
       <LoginButton v-else />
     </template>
   </div>

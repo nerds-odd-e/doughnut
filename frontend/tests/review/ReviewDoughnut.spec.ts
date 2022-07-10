@@ -4,10 +4,12 @@
 import { flushPromises } from "@vue/test-utils";
 import ReviewDoughnut from "@/components/review/ReviewDoughnut.vue";
 import helper from "../helpers";
+import MakeMe from "../fixtures/makeMe";
 
 helper.resetWithApiMock(beforeEach, afterEach);
 
 describe("review doughnut", () => {
+  const user = MakeMe.aUser().please();
   describe("repetition page for a link", () => {
     beforeEach(async () => {
       jest.useFakeTimers();
@@ -24,14 +26,17 @@ describe("review doughnut", () => {
     });
 
     it("fetches the data", async () => {
-      const wrapper = helper.component(ReviewDoughnut).mount();
+      const wrapper = helper
+        .component(ReviewDoughnut)
+        .withProps({ user })
+        .mount();
       await flushPromises();
       expect(wrapper.find(".doughnut-ring .initial-review").text()).toBe("3/6");
     });
 
     it("refreshes", async () => {
       jest.setSystemTime(new Date(2020, 1, 1, 10, 30));
-      helper.component(ReviewDoughnut).mount();
+      helper.component(ReviewDoughnut).withProps({ user }).mount();
       await flushPromises();
       helper.apiMock.expectingGet("/api/reviews/overview");
       jest.advanceTimersToNextTimer();

@@ -1,22 +1,24 @@
 <template>
-  <ReviewDoughnutRing
-    v-if="reviewing"
-    :reviewing="reviewing"
-    @logout="logout"
-  />
+  <UserActionsButton :user="user" @logout="logout" />
+  <ReviewDoughnutRing v-if="reviewing" :reviewing="reviewing" />
   />
 </template>
 
 <script lang="ts">
-import { defineComponent } from "vue";
+import { defineComponent, PropType } from "vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import ReviewDoughnutRing from "./ReviewDoughnutRing.vue";
+import UserActionsButton from "../toolbars/UserActionsButton.vue";
 
 export default defineComponent({
   setup() {
     return useLoadingApi();
   },
   props: {
+    user: {
+      type: Object as PropType<Generated.User>,
+      required: true,
+    },
     reviewData: Object,
   },
   data() {
@@ -54,6 +56,6 @@ export default defineComponent({
       clearTimeout(this.timer);
     }
   },
-  components: { ReviewDoughnutRing },
+  components: { ReviewDoughnutRing, UserActionsButton },
 });
 </script>
