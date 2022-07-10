@@ -74,19 +74,11 @@
           </button>
         </div>
       </div>
-      <button
-        v-else
-        class="btn btn-outline-primary me-2 my-sm-0"
-        @click="login"
-      >
-        Login via Github
-      </button>
     </div>
   </nav>
 </template>
 
 <script>
-import loginOrRegisterAndHaltThisThread from "../../managedApi/window/loginOrRegisterAndHaltThisThread";
 import useStoredLoadingApi from "../../managedApi/useStoredLoadingApi";
 
 export default {
@@ -97,9 +89,6 @@ export default {
     async logout() {
       await this.api.userMethods.logout();
       window.location.href = "/bazaar";
-    },
-    login() {
-      loginOrRegisterAndHaltThisThread();
     },
   },
   computed: {

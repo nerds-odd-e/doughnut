@@ -1,5 +1,5 @@
 <template>
-  <g>
+  <g role="button" title="user manu">
     <circle style="fill: #ffc10e" cx="0" cy="0" r="25" />
     <SvgMissingAvatar :x="-13" :y="-20" :height="40" />
   </g>

@@ -1,4 +1,30 @@
 <template>
+  <svg
+    id="dropdownMenuButton"
+    data-bs-toggle="dropdown"
+    data-toggle="dropdown"
+    aria-haspopup="true"
+    aria-expanded="false"
+    title="more options"
+    class="doughnut-ring"
+    viewBox="-50 -50 100 100"
+    width="100"
+    height="100"
+  >
+    <UserIconMenu
+      role="button"
+      class="user-icon-menu"
+      style="pointer-events: visiblePainted"
+    />
+  </svg>
+
+  <div
+    class="dropdown-menu dropdown-menu-end"
+    aria-labelledby="dropdownMenuButton"
+  >
+    <router-link to="/settings">Settings</router-link>
+    <router-link to="/logout">Logout</router-link>
+  </div>
   <svg class="doughnut-ring" viewBox="-50 -50 100 100" width="100" height="100">
     <g class="doughnut-ring-pieces">
       <ReviewDoughnutRingPiece
@@ -18,7 +44,6 @@
         :text="`${reviewing.toRepeatCount}/${reviewing.learntCount}`"
       />
     </g>
-    <UserIconMenu class="user-icon-menu" />
   </svg>
 </template>
 
@@ -60,17 +85,6 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.doughnut-ring {
-  font-size: 0.8rem;
-  font-weight: bold;
-  position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
-}
-.doughnut-ring-pieces {
-  transform: rotate(45deg);
-}
-
 .initial-review {
   stroke: #3bafda;
 }

@@ -5,6 +5,7 @@ import UserNewRegisterPage from "./pages/UserNewRegisterPage.vue";
 import useStoredLoadingApi from "./managedApi/useStoredLoadingApi";
 import usePopups from "./components/commons/Popups/usePopup";
 import ReviewDoughnut from "./components/review/ReviewDoughnut.vue";
+import LoginButton from "./components/toolbars/LoginButton.vue";
 
 export default {
   setup() {
@@ -21,7 +22,13 @@ export default {
     };
   },
 
-  components: { Popups, MainMenu, UserNewRegisterPage, ReviewDoughnut },
+  components: {
+    Popups,
+    MainMenu,
+    UserNewRegisterPage,
+    ReviewDoughnut,
+    LoginButton,
+  },
 
   watch: {
     $route(to) {
@@ -66,8 +73,9 @@ export default {
       </div>
       <div v-if="!loading" class="content">
         <router-view @update-reviewing="reviewData = $event" />
-        <ReviewDoughnut v-if="user" :review-data="reviewData" />
       </div>
+      <ReviewDoughnut v-if="user" :user="user" :review-data="reviewData" />
+      <LoginButton v-else />
     </template>
   </div>
 </template>
