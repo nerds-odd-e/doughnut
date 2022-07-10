@@ -52,8 +52,9 @@ Then("I should see {string} in the page", (content) => {
   cy.get("body").should("contain", content)
 })
 
-Then("My name {string} is in the top bar", (name) => {
-  cy.get("nav").should("contain", name)
+Then("My name {string} is in the user action menu", (name) => {
+  cy.findByRole("button", { name: "User actions" }).click()
+  cy.findByRole("button", { name })
 })
 
 Then("my daily new notes to review is set to {int}", (number) => {

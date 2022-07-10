@@ -8,5 +8,5 @@ Feature: new user
       | Name      |
       | Learner A |
     Then I should see "Welcome Learner A" in the page
-    And My name "Learner A" is in the top bar
+    And My name "Learner A" is in the user action menu
 
