@@ -39,7 +39,7 @@ Given("there are notes from Note {int} to Note {int}", (from, to) => {
 })
 
 When("I create a notebook with:", (data) => {
-  cy.visitMyNotebooks()
+  cy.routerToNotebooks()
   cy.findByText("Add New Notebook").click()
   cy.submitNoteCreationFormsWith(data.hashes())
 })
@@ -91,11 +91,11 @@ Then("I should see {string} in breadcrumb", (noteTitles) => {
 })
 
 When("I visit all my notebooks", () => {
-  cy.visitMyNotebooks()
+  cy.routerToNotebooks()
 })
 
 Then("I should see these notes belonging to the user at the top level of all my notes", (data) => {
-  cy.visitMyNotebooks()
+  cy.routerToNotebooks()
   cy.expectNoteCards(data.hashes())
 })
 

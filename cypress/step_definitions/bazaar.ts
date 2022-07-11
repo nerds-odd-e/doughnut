@@ -6,7 +6,7 @@
 import { Given, Then, When } from "@badeball/cypress-cucumber-preprocessor"
 
 Given("I choose to share my notebook {string}", (noteTitle) => {
-  cy.visitMyNotebooks()
+  cy.routerToNotebooks()
   cy.findNoteCardButton(noteTitle, "Share notebook to bazaar").click()
   cy.findByRole("button", { name: "OK" }).click()
 })
@@ -45,7 +45,7 @@ Then("I should not see the {string} button on notebook {string}", (btnTitle, not
 })
 
 Then("I should see readonly notebook {string} in my notes", (noteTitle) => {
-  cy.visitMyNotebooks()
+  cy.routerToNotebooks()
   cy.findNoteCardButton(noteTitle, "edit note").should("not.exist")
 })
 
@@ -59,13 +59,13 @@ Then("I should see I've not subscribed to {string}", (noteTitle) => {
 })
 
 Then("I should be able to edit the subscription to notebook {string}", (noteTitle) => {
-  cy.visitMyNotebooks()
+  cy.routerToNotebooks()
   cy.findNoteCardButton(noteTitle, "Edit subscription").click()
   cy.findByRole("button", { name: "Update" }).click()
 })
 
 When("I change notebook {string} to skip review", (noteTitle) => {
-  cy.visitMyNotebooks()
+  cy.routerToNotebooks()
   cy.findNoteCardButton(noteTitle, "Edit notebook settings").click()
   cy.getFormControl("Skip Review Entirely").check()
   cy.findByRole("button", { name: "Update" }).click()

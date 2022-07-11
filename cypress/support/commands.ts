@@ -168,7 +168,7 @@ Cypress.Commands.add("navigateToNotePage", (notePath: NotePath) => {
   if (notePath.root !== "My Notes") {
     throw new Error("only My Notes is implmemented")
   }
-  cy.visitMyNotebooks()
+  cy.routerToNotebooks()
   notePath.path.forEach((noteTitle) => cy.navigateToChild(noteTitle))
 })
 
@@ -219,8 +219,8 @@ Cypress.Commands.add("clickButtonOnCardBody", (noteTitle, buttonTitle) => {
   })
 })
 
-Cypress.Commands.add("visitMyNotebooks", () => {
-  cy.visit("/notebooks")
+Cypress.Commands.add("routerToNotebooks", () => {
+  cy.routerPush("/notebooks", "notebooks", {})
 })
 
 Cypress.Commands.add("startSearching", () => {
@@ -396,7 +396,7 @@ Cypress.Commands.add("subscribeToNotebook", (notebookTitle: string, dailyLearnin
 })
 
 Cypress.Commands.add("unsubscribeFromNotebook", (noteTitle) => {
-  cy.visitMyNotebooks()
+  cy.routerToNotebooks()
   cy.findNoteCardButton(noteTitle, "Unsubscribe").click()
 })
 
