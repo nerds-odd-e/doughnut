@@ -23,6 +23,16 @@
     class="dropdown-menu dropdown-menu-end"
     aria-labelledby="dropdownMenuButton"
   >
+    <PopupButton class="dropdown-item" title="choose a circle" :sidebar="true">
+      <template #button_face>All Notes</template>
+      <template #dialog_body="{ doneHandler }">
+        <CircleSelector @done="doneHandler($event)" />
+      </template>
+    </PopupButton>
+    <router-link class="dropdown-item" :to="{ name: 'reviews' }"
+      >Review</router-link
+    >
+    <div class="dropdown-divider"></div>
     <router-link
       class="dropdown-item"
       role="button"
@@ -39,6 +49,8 @@
 <script lang="ts">
 import { defineComponent, PropType } from "vue";
 import UserIconMenu from "./UserIconMenu.vue";
+import PopupButton from "../commons/Popups/PopupButton.vue";
+import CircleSelector from "../circles/CircleSelector.vue";
 
 export default defineComponent({
   props: {
@@ -48,7 +60,7 @@ export default defineComponent({
     },
   },
   emits: ["logout"],
-  components: { UserIconMenu },
+  components: { UserIconMenu, PopupButton, CircleSelector },
 });
 </script>
 

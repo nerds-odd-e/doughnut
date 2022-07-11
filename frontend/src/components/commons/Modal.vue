@@ -70,7 +70,7 @@ export default defineComponent({
   height: 100vh;
   overflow: auto;
   margin-left: 0px;
-  padding: 5px 30px;
+  padding: 5px 0px;
   background-color: #fff;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
   transition: all 0.3s ease;

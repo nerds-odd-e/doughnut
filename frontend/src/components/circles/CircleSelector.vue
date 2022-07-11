@@ -1,36 +1,41 @@
 <template>
-  <ContainerPage
+  <BrandBar />
+  <LoadingPage
     v-bind="{ loading, contentExists: !!circles, title: 'My Circles' }"
   >
+    <div v-if="!!circles">
+      <ul class="list-group">
+        <li class="list-group-item">
+          <router-link :to="{ name: 'notebooks' }"> My Notebooks </router-link>
+        </li>
+        <li class="list-group-item">
+          <router-link :to="{ name: 'bazaar' }"> Bazaar </router-link>
+        </li>
+        <li class="list-group-item" v-for="circle in circles" :key="circle.id">
+          <router-link
+            :to="{ name: 'circleShow', params: { circleId: circle.id } }"
+          >
+            {{ circle.name }}
+          </router-link>
+        </li>
+      </ul>
+    </div>
     <PopupButton title="Create a new circle">
       <template #dialog_body="{ doneHandler }">
         <CircleNewDialog @done="$emit('done', doneHandler($event))" />
       </template>
     </PopupButton>
-    <div v-if="!!circles">
-      <ul class="list-group" v-for="circle in circles" :key="circle.id">
-        <li class="list-group-item">
-          <div class="card-title">
-            <router-link
-              :to="{ name: 'circleShow', params: { circleId: circle.id } }"
-            >
-              {{ circle.name }}
-            </router-link>
-          </div>
-        </li>
-      </ul>
-    </div>
-    <CircleJoinForm />
-  </ContainerPage>
+    <router-link :to="{ name: 'circleJoin' }"> Join a circle </router-link>
+  </LoadingPage>
 </template>
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import ContainerPage from "@/pages/commons/ContainerPage.vue";
+import LoadingPage from "@/pages/commons/LoadingPage.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import PopupButton from "../commons/Popups/PopupButton.vue";
 import CircleNewDialog from "./CircleNewDialog.vue";
-import CircleJoinForm from "./CircleJoinForm.vue";
+import BrandBar from "../toolbars/BrandBar.vue";
 
 export default defineComponent({
   setup() {
@@ -52,6 +57,11 @@ export default defineComponent({
   mounted() {
     this.fetchData();
   },
-  components: { ContainerPage, PopupButton, CircleNewDialog, CircleJoinForm },
+  components: {
+    PopupButton,
+    CircleNewDialog,
+    LoadingPage,
+    BrandBar,
+  },
 });
 </script>

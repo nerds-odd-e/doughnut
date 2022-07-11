@@ -1,6 +1,6 @@
 <script>
 import Popups from "./components/commons/Popups/Popups.vue";
-import MainMenu from "./components/commons/MainMenu.vue";
+import TestMenu from "./components/commons/TestMenu.vue";
 import UserNewRegisterPage from "./pages/UserNewRegisterPage.vue";
 import useStoredLoadingApi from "./managedApi/useStoredLoadingApi";
 import usePopups from "./components/commons/Popups/usePopup";
@@ -24,7 +24,7 @@ export default {
 
   components: {
     Popups,
-    MainMenu,
+    TestMenu,
     UserNewRegisterPage,
     ReviewDoughnut,
     LoginButton,
@@ -48,6 +48,12 @@ export default {
     user() {
       return this.piniaStore.currentUser;
     },
+    environment() {
+      return this.piniaStore.environment;
+    },
+    featureToggle() {
+      return this.piniaStore.featureToggle;
+    },
   },
 
   mounted() {
@@ -68,14 +74,16 @@ export default {
     <Popups />
     <UserNewRegisterPage v-if="newUser" />
     <template v-else>
-      <div class="header">
-        <MainMenu v-if="showNavBar" />
-      </div>
       <div v-if="!loading" class="content">
         <router-view @update-reviewing="reviewData = $event" />
       </div>
       <ReviewDoughnut v-if="user" :user="user" :review-data="reviewData" />
       <LoginButton v-else />
+      <TestMenu
+        v-if="environment === 'testing'"
+        :feature-toggle="featureToggle"
+        :user="user"
+      />
     </template>
   </div>
 </template>

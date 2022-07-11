@@ -1,4 +1,5 @@
 <template>
+  <BrandBar />
   <ContainerPage v-bind="{ loading: false, contentExists: true }">
     <h1 v-if="!!user" class="display-4">Welcome {{ user.name }}!</h1>
     <h1 v-else class="display-4">Welcome to Doughnut!!!</h1>
@@ -81,6 +82,7 @@
 <script>
 import PopupButton from "@/components/commons/Popups/PopupButton.vue";
 import CircleSelector from "@/components/circles/CircleSelector.vue";
+import BrandBar from "@/components/toolbars/BrandBar.vue";
 import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
 import ContainerPage from "./commons/ContainerPage.vue";
 
@@ -88,7 +90,7 @@ export default {
   setup() {
     return useStoredLoadingApi();
   },
-  components: { ContainerPage, PopupButton, CircleSelector },
+  components: { ContainerPage, PopupButton, CircleSelector, BrandBar },
   computed: {
     user() {
       return this.piniaStore.currentUser;

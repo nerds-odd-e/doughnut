@@ -67,7 +67,7 @@ const routes = [
   { path: "/", name: "root", component: HomePage },
   { path: "/bazaar", name: "bazaar", component: BazaarPage },
   {
-    path: "/circles/join/:invitationCode",
+    path: "/circles/join/:invitationCode?",
     name: "circleJoin",
     component: CircleJoinPage,
     props: true,
