@@ -61,9 +61,16 @@
               circle.
             </p>
             <p v-if="!user">Please login</p>
-            <router-link class="btn btn-light" v-else :to="{ name: 'circles' }">
-              Go To Circles
-            </router-link>
+            <PopupButton
+              class="btn btn-light"
+              title="choose a circle"
+              :sidebar="true"
+            >
+              <template #button_face> Go To Circles </template>
+              <template #dialog_body="{ doneHandler }">
+                <CircleSelector @done="doneHandler($event)" />
+              </template>
+            </PopupButton>
           </div>
         </div>
       </div>
@@ -72,6 +79,8 @@
 </template>
 
 <script>
+import PopupButton from "@/components/commons/Popups/PopupButton.vue";
+import CircleSelector from "@/components/circles/CircleSelector.vue";
 import useStoredLoadingApi from "../managedApi/useStoredLoadingApi";
 import ContainerPage from "./commons/ContainerPage.vue";
 
@@ -79,7 +88,7 @@ export default {
   setup() {
     return useStoredLoadingApi();
   },
-  components: { ContainerPage },
+  components: { ContainerPage, PopupButton, CircleSelector },
   computed: {
     user() {
       return this.piniaStore.currentUser;

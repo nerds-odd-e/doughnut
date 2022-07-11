@@ -15,10 +15,10 @@ export default defineComponent({
   setup() {
     return usePopups();
   },
-  props: { title: String },
+  props: { title: String, sidebar: Boolean },
   methods: {
     showDialog() {
-      this.popups.dialog(this.$slots.dialog_body);
+      this.popups.dialog(this.$slots.dialog_body, this.sidebar);
     },
   },
 });

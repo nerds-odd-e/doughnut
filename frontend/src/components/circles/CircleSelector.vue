@@ -8,23 +8,17 @@
       </template>
     </PopupButton>
     <div v-if="!!circles">
-      <div class="row">
-        <div
-          class="col-12 col-sm-6 col-md-4 col-lg-3"
-          v-for="circle in circles"
-          :key="circle.id"
-        >
-          <div class="card rounded-circle text-center">
-            <div class="card-title">
-              <router-link
-                :to="{ name: 'circleShow', params: { circleId: circle.id } }"
-              >
-                {{ circle.name }}
-              </router-link>
-            </div>
+      <ul class="list-group" v-for="circle in circles" :key="circle.id">
+        <li class="list-group-item">
+          <div class="card-title">
+            <router-link
+              :to="{ name: 'circleShow', params: { circleId: circle.id } }"
+            >
+              {{ circle.name }}
+            </router-link>
           </div>
-        </div>
-      </div>
+        </li>
+      </ul>
     </div>
     <CircleJoinForm />
   </ContainerPage>
@@ -36,6 +30,7 @@ import ContainerPage from "@/pages/commons/ContainerPage.vue";
 import useLoadingApi from "../../managedApi/useLoadingApi";
 import PopupButton from "../commons/Popups/PopupButton.vue";
 import CircleNewDialog from "./CircleNewDialog.vue";
+import CircleJoinForm from "./CircleJoinForm.vue";
 
 export default defineComponent({
   setup() {
@@ -57,6 +52,6 @@ export default defineComponent({
   mounted() {
     this.fetchData();
   },
-  components: { ContainerPage, PopupButton, CircleNewDialog },
+  components: { ContainerPage, PopupButton, CircleNewDialog, CircleJoinForm },
 });
 </script>

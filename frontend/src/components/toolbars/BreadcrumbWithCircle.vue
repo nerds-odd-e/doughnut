@@ -2,7 +2,7 @@
   <BasicBreadcrumb v-bind="{ ancestors }">
     <template #topLink>
       <li>
-        <PopupButton title="choose a circle">
+        <PopupButton title="choose a circle" :sidebar="true">
           <template #button_face>
             <SvgForward />
           </template>

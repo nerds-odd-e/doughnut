@@ -2,7 +2,7 @@
   <transition name="modal">
     <div class="modal-mask">
       <div class="modal-wrapper" @mousedown.self="$emit('close_request')">
-        <div class="modal-container">
+        <div :class="sidebar ? 'modal-sidebar' : 'modal-container'">
           <button class="close-button" @click="$emit('close_request')">
             <SvgClose />
           </button>
@@ -25,6 +25,9 @@ import { defineComponent } from "vue";
 import SvgClose from "../svgs/SvgClose.vue";
 
 export default defineComponent({
+  props: {
+    sidebar: Boolean,
+  },
   emits: ["close_request"],
   components: { SvgClose },
 });
@@ -59,7 +62,18 @@ export default defineComponent({
   border-radius: 2px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
   transition: all 0.3s ease;
-  font-family: Helvetica, Arial, sans-serif;
+}
+
+.modal-sidebar {
+  position: relative;
+  max-width: 300px;
+  height: 100vh;
+  overflow: auto;
+  margin-left: 0px;
+  padding: 5px 30px;
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.33);
+  transition: all 0.3s ease;
 }
 
 .modal-header h3 {

@@ -3,6 +3,7 @@ import { Slot } from "vue";
 interface PopupInfo {
   type: "alert" | "confirm" | "dialog";
   message?: string;
+  sidebar?: boolean;
   doneResolve: ((value: unknown) => void) | ((value: boolean) => void);
   slot?: Slot;
 }
@@ -38,9 +39,9 @@ function usePopups() {
         });
       },
 
-      dialog(slot?: Slot) {
+      dialog(slot?: Slot, sidebar?: boolean) {
         return new Promise((resolve) => {
-          push({ type: "dialog", slot, doneResolve: resolve });
+          push({ type: "dialog", slot, doneResolve: resolve, sidebar });
         });
       },
 

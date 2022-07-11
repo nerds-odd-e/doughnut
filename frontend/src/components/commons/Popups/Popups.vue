@@ -38,6 +38,7 @@
     <Modal
       v-if="popupInfo.type === 'dialog'"
       class="popups"
+      :sidebar="popupInfo.sidebar"
       @close_request="resolve(null)"
     >
       <template #body>
