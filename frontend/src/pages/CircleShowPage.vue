@@ -2,7 +2,6 @@
   <ContainerPage v-bind="{ loading, contentExists: !!circle }">
     <div v-if="circle">
       <BreadcrumbWithCircle v-bind="{ ancestors: [], circle }" />
-      <h1 v-text="circle.name" />
       <p>
         <NotebookNewButton :circle="circle">
           Add New Notebook In This Circle

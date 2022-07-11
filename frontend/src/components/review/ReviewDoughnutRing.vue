@@ -2,20 +2,24 @@
   <svg class="doughnut-ring" viewBox="-50 -50 100 100" width="100" height="100">
     <g class="doughnut-ring-pieces">
       <ReviewDoughnutRingPiece
+        role="button"
         class="initial-review"
         name="initial"
         :start-point="startPoint"
         :big-arc="moreTInitialReview"
         :end-point="endPoint"
         :text="`${reviewing.toInitialReviewCount}/${reviewing.notLearntCount}`"
+        @click="$router.push({ name: 'initial' })"
       />
       <ReviewDoughnutRingPiece
+        role="button"
         class="repeat-review"
         name="repeat"
         :big-arc="!moreTInitialReview"
         :start-point="endPoint"
         :end-point="startPoint"
         :text="`${reviewing.toRepeatCount}/${reviewing.learntCount}`"
+        @click="$router.push({ name: 'repeat' })"
       />
     </g>
   </svg>
