@@ -139,7 +139,18 @@ class RestWikiDataControllerTests {
       Mockito.verify(httpClientAdapter)
           .getResponseString(
               URI.create(
-                  "https://www.wikidata.org/w/api.php?action=wbsearchentities&search=john+cena&format=json&language=en&uselang=en&type=item&limit=10"));
+                  "https://www.wikidata.org/w/api.php?action=wbsearchentities&search=john%20cena&format=json&language=en&uselang=en&type=item&limit=10"));
+    }
+
+    @Test
+    void shouldUseTheProperlyEncodedSearchKeyForUnicode()
+        throws IOException, InterruptedException, BindException {
+      Mockito.when(httpClientAdapter.getResponseString(any())).thenReturn(getString("梵我一如", ""));
+      controller.searchWikidata("梵我一如");
+      Mockito.verify(httpClientAdapter)
+          .getResponseString(
+              URI.create(
+                  "https://www.wikidata.org/w/api.php?action=wbsearchentities&search=%E6%A2%B5%E6%88%91%E4%B8%80%E5%A6%82&format=json&language=en&uselang=en&type=item&limit=10"));
     }
   }
 }
