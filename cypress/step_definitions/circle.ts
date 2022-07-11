@@ -6,7 +6,7 @@
 import { And, Given, Then, When } from "@badeball/cypress-cucumber-preprocessor"
 
 When("I create a new circle {string} and copy the invitation code", (circleName) => {
-  cy.visit("/circles")
+  cy.openCirclesSelector()
   cy.findByRole("button", { name: "Create a new circle" }).click()
   cy.getFormControl("Name").type(circleName)
   cy.get('input[value="Submit"]').click()
