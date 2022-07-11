@@ -21,6 +21,5 @@ describe("breadcrumb with circles", () => {
       .withProps({})
       .mount();
     wrapper.find("[role='button']").trigger("click");
-    expect(wrapper.emitted("open-circle-selector")).toBeTruthy();
   });
 });

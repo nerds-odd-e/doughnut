@@ -1,8 +1,5 @@
 <template>
-  <BreadcrumbWithCircle
-    v-bind="{ ancestors: [] }"
-    @open-circle-selector="$emit('open-circle-selector')"
-  />
+  <BreadcrumbWithCircle v-bind="{ ancestors: [] }" />
   <NotebooksToolbar @note-realm-updated="fetchData" />
   <ContainerPage v-bind="{ loading, contentExists: true, title: 'Notebooks' }">
     <p>
@@ -31,7 +28,7 @@ export default defineComponent({
   setup() {
     return useLoadingApi();
   },
-  emits: ["open-circle-selector"],
+  name: "NotebooksPage",
   components: {
     ContainerPage,
     NotebooksToolbar,

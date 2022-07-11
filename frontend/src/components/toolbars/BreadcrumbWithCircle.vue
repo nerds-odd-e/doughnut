@@ -2,13 +2,7 @@
   <BasicBreadcrumb v-bind="{ ancestors }">
     <template #topLink>
       <li>
-        <a
-          href="#"
-          role="button"
-          title="choose a circle"
-          @click="$emit('open-circle-selector')"
-          ><SvgForward
-        /></a>
+        <a href="#" role="button" title="choose a circle"><SvgForward /></a>
       </li>
       <li v-if="fromBazaar" class="breadcrumb-item">
         <router-link :to="{ name: 'bazaar' }">Bazaar</router-link>
@@ -44,7 +38,6 @@ export default defineComponent({
     circle: Object as PropType<Generated.Circle>,
     fromBazaar: Boolean,
   },
-  emits: ["open-circle-selector"],
   components: {
     BasicBreadcrumb,
     SvgForward,
